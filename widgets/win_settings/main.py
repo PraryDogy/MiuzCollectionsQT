@@ -322,12 +322,12 @@ class WinSettings(WinStandartBase):
             scan_again = True
 
         if scan_again:
-            utils_signals_app.scaner_stoped.connect(self.start_scaner)
-
             utils_signals_app.scaner_stop.emit()
             utils_signals_app.watcher_stop.emit()
 
+            utils_signals_app.scaner_start.emit()
             utils_signals_app.watcher_start.emit()
+
 
         self.change_lang.finalize()
         self.thumb_move.finalize()
@@ -335,9 +335,6 @@ class WinSettings(WinStandartBase):
         self.delete_win.emit()
         self.deleteLater()
         gui_signals_app.set_focus_viewer.emit()
-
-    def start_scaner(self):
-        utils_signals_app.scaner_start.emit()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:

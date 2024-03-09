@@ -426,6 +426,7 @@ class Scaner(ScanerBaseClass):
         super().__init__()
 
     def scaner_actions(self):
+        Manager.flag = True
         Manager.curr_percent = 0
         gui_signals_app.scan_progress_value.emit(0)
 
@@ -444,10 +445,8 @@ class Scaner(ScanerBaseClass):
             Manager.need_gui_reload = False
 
         Manager.flag = True
-        utils_signals_app.scaner_stoped.emit()
 
     def run(self):
-        print("run scaner")
         try:
             self.scaner_actions()
         except Exception:
