@@ -2,7 +2,7 @@ import os
 from typing import Literal
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget, QFrame
+from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget, QDesktopWidget
 
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
@@ -20,7 +20,7 @@ class BrowseColl(LayoutV):
         super().__init__()
         descr = QLabel(cnf.lng.browse_coll_first)
         self.addWidget(descr)
-        self.addSpacerItem(QSpacerItem(0, 10))
+        # self.addSpacerItem(QSpacerItem(0, 10))
 
         h_wid = QWidget()
         h_wid.setFixedHeight(50)
@@ -192,16 +192,22 @@ class WinFirstLoad(WinStandartBase):
 
         super().__init__(close_func=self.cancel_cmd)
         self.disable_min_max()
-        self.titlebar.btns.close_btn.setDisabled(True)
 
         self.init_ui()
         self.setFixedSize(350, 340)
-        self.center_win()
+        self.center()
         self.setFocus()
 
         self.new_coll_path = None
         self.new_lang = None
         self.need_reset = None
+
+    def center(self):
+        screen = QDesktopWidget().screenGeometry()
+        size = self.geometry()
+        x = (screen.width() - size.width()) // 2
+        y = (screen.height() - size.height()) // 2
+        self.move(x, y)
 
     def cancel_cmd(self, event):
         pass
