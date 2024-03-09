@@ -469,6 +469,7 @@ class Scaner(ScanerBaseClass):
         NonExistCollRemover()
         DublicateRemover()
 
+        Dbase.vacuum()
         Dbase.cleanup_engine()
 
         Manager.curr_percent = 0

@@ -46,10 +46,10 @@ class ThumbMove(LayoutH):
 
     def get_bg(self, flag: Literal["jpg", "tiff"]):
         if flag == "jpg":
-            return Styles.menu_sel_item_color if self.move_jpg else Styles.btn_base_color
+            return Styles.st_bar_sel if self.move_jpg else Styles.btn_base_color
         
         elif flag == "tiff":
-            return Styles.menu_sel_item_color if self.move_layers else Styles.btn_base_color
+            return Styles.st_bar_sel if self.move_layers else Styles.btn_base_color
 
     def get_jpg_style(self):
         return f"""

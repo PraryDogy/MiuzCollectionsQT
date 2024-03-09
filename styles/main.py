@@ -17,6 +17,7 @@ class Styles:
     # st_bar
     st_bar_bg_color = "#242424"
     st_bar_x_colr = "#303030"
+    st_bar_sel = "#676767"
 
     # menu
     menu_w = 210
