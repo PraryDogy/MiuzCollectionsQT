@@ -1,10 +1,10 @@
 import sqlalchemy
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea, QWidget, QFrame
+from PyQt5.QtWidgets import QFrame, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
 from cfg import cnf
-from database import Queries, ThumbsMd
+from database import Dbase, ThumbsMd
 from signals import gui_signals_app
 from styles import Styles
 from utils import MainUtils
@@ -66,11 +66,12 @@ class BaseLeftMenu(QScrollArea):
         menus = {}
         
         q = sqlalchemy.select(ThumbsMd.collection).distinct()
-        res = Queries.get_query(query=q).fetchall()
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # 
-        # 
-        # res = res[:10]
+
+        session = Dbase.get_session()
+        try:
+            res = session.execute(q).fetchall()
+        finally:
+            session.close()
 
         for i in res:
             if not i:

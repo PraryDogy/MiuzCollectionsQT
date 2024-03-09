@@ -42,51 +42,6 @@ class Dbase:
         Session = sessionmaker(bind=Dbase.get_engine())
         return scoped_session(Session)
 
-
-class Queries:
-    @staticmethod
-    def bulk_insert(table, values):
-        session = Dbase.get_session()
-        try:
-            insert_stmt = sqlalchemy.insert(table).values(values)
-            session.execute(insert_stmt)
-            session.commit()
-        except Exception as e:
-            print(f"Error occurred: {e}")
-            session.rollback()
-        finally:
-            session.close()
-
-    @staticmethod
-    def bulk_queries(queries: list):
-        session = Dbase.get_session()
-        try:
-            for q in queries:
-                session.execute(q)
-            session.commit()
-        except Exception as e:
-            print(f"Error occurred: {e}")
-            session.rollback()
-        finally:
-            session.close()
-
-    @staticmethod
-    def get_query(query):
-        session = Dbase.get_session()
-        try:
-            return session.execute(query)
-        finally:
-            session.close()
-
-    @staticmethod
-    def post_single_query(query):
-        session = Dbase.get_session()
-        try:
-            session.execute(query)
-            session.commit()
-        finally:
-            session.close()
-
     @staticmethod
     def vacuum():
         session = Dbase.get_session()

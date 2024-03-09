@@ -5,7 +5,7 @@ from typing import Literal
 import sqlalchemy
 
 from cfg import cnf
-from database import Queries, ThumbsMd
+from database import Dbase, ThumbsMd
 
 
 class ThumbsDict(dict):
@@ -15,7 +15,12 @@ class ThumbsDict(dict):
 
     def thumbsdict_create(self):
         q = self.create_query()
-        data = Queries.get_query(q).fetchall()
+
+        session = Dbase.get_session()
+        try:
+            data = session.execute(q).fetchall()
+        finally:
+            session.close()
 
         thumbs_dict = defaultdict(list)
 

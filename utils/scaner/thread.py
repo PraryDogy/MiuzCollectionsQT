@@ -8,8 +8,8 @@ import sqlalchemy
 from PyQt5.QtCore import QThread
 
 from cfg import cnf
-from database import Dbase, Queries, ThumbsMd
-from signals import gui_signals_app, utils_signals_app
+from database import Dbase, ThumbsMd
+from signals import gui_signals_app
 
 from ..image_utils import BytesThumb, UndefBytesThumb
 from ..main_utils import MainUtils
@@ -43,13 +43,24 @@ class NonExistCollRemover:
 
         q = (sqlalchemy.select(ThumbsMd.src)
             .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
-        trash_img = Queries.get_query(q).first()
+
+        session = Dbase.get_session()
+        try:
+            trash_img = session.execute(q).first()
+        finally:
+            session.close()
 
         if trash_img:
 
             q = (sqlalchemy.delete(ThumbsMd)
                 .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
-            Queries.post_single_query(q)
+
+            session = Dbase.get_session()
+            try:
+                session.execute(q)
+                session.commit()
+            finally:
+                session.close()
 
             Manager.need_gui_reload = True
 
@@ -57,7 +68,13 @@ class NonExistCollRemover:
 class DublicateRemover:
     def __init__(self):
         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-        res = Queries.get_query(q).fetchall()
+
+        session = Dbase.get_session()
+        try:
+            res = session.execute(q).fetchall()
+        finally:
+            session.close()
+
         res = {t_id: t_src for t_id, t_src in res}
 
         dublicates = {}
@@ -77,11 +94,24 @@ class DublicateRemover:
                       if len(thumb_id_list) > 1]
 
         if dublicates:
+
             queries = [
                 sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.id==i)
                 for i in dublicates
                 ]
-            Queries.bulk_queries(queries)
+
+            session = Dbase.get_session()
+
+            try:
+                for q in queries:
+                    session.execute(q)
+                session.commit()
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                session.rollback()
+            finally:
+                session.close()
+
             Manager.need_gui_reload = True
 
 
@@ -162,7 +192,12 @@ class DbImages(dict):
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
                               ThumbsMd.modified)
 
-        res = Queries.get_query(q).fetchall()
+        session = Dbase.get_session()
+        try:
+            res = session.execute(q).fetchall()
+        finally:
+            session.close()
+
         self.update({i[0]: i[1:] for i in res})
 
 

@@ -7,7 +7,7 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
 from cfg import cnf
-from database import Dbase, Queries, ThumbsMd
+from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
 
 from ..image_utils import BytesThumb, UndefBytesThumb
@@ -55,14 +55,26 @@ class MovedFile:
             .filter(ThumbsMd.src==src)
             .values({"src": dest, "collection": coll})
             )
-        Queries.post_single_query(q)
+
+        session = Dbase.get_session()
+        try:
+            session.execute(q)
+            session.commit()
+        finally:
+            session.close()
 
 
 class DeletedFile:
     def __init__(self, src: str):
         q = (sqlalchemy.delete(ThumbsMd)
              .filter(ThumbsMd.src==src))
-        Queries.post_single_query(q)
+
+        session = Dbase.get_session()
+        try:
+            session.execute(q)
+            session.commit()
+        finally:
+            session.close()
 
 
 class NewFile:
@@ -91,7 +103,13 @@ class NewFile:
                     }
 
         q = sqlalchemy.insert(ThumbsMd).values(data)
-        Queries.post_single_query(q)
+
+        session = Dbase.get_session()
+        try:
+            session.execute(q)
+            session.commit()
+        finally:
+            session.close()
 
 
 class Handler(FileSystemEventHandler):

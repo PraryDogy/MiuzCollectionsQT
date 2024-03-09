@@ -1,7 +1,5 @@
 import os
 
-import cv2
-import numpy as np
 import sqlalchemy
 from PyQt5.QtCore import QSize, Qt, QThread, QTimer, pyqtSignal
 from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
@@ -10,7 +8,7 @@ from PyQt5.QtWidgets import QWidget
 
 from base_widgets import WinImgViewBase
 from cfg import cnf
-from database import Queries, ThumbsMd
+from database import Dbase, ThumbsMd
 from signals import gui_signals_app
 from utils import MainUtils, ReadDesatImage
 
@@ -121,7 +119,20 @@ class WinImageView(ImageViewerBase):
         self.fullimg_timer.stop()
         q = (sqlalchemy.select(ThumbsMd.img150)
              .filter(ThumbsMd.src == self.image_path))
-        res = Queries.get_query(q).first()[0]
+
+        session = Dbase.get_session()
+        try:
+            res = session.execute(q).first()[0]
+
+        except Exception as e:
+            print(e)
+            self.update_geometry()
+            self.delete_win.emit()
+            self.deleteLater()
+            return
+
+        finally:
+            session.close()    
 
         pixmap = QPixmap()
         pixmap.loadFromData(res)
