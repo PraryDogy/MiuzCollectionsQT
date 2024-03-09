@@ -132,8 +132,19 @@ class Config(User, Dymanic, Static, AppInfo):
     def read_json_cfg(self):
         with open(self.json_file, "r", encoding="utf8") as file:
             data: dict = json.load(file)
+        
+        if "key" not in data:
+            data["key"] = self.key
+            shutil.copyfile(src="db.db", dst=self.db_file)
+            data["key"]["db_ver"] = self.key["db_ver"]
 
-        if "key" not in data or data["key"]["db_ver"] != self.key["db_ver"]:
+        if "key" in data:
+            if data["key"].keys() != self.key.keys():
+                data["key"] = self.key
+                shutil.copyfile(src="db.db", dst=self.db_file)
+                data["key"]["db_ver"] = self.key["db_ver"]     
+
+        if data["key"]["db_ver"] != self.key["db_ver"]:
             print("New DB. Copying database")
             shutil.copyfile(src="db.db", dst=self.db_file)
             data["key"]["db_ver"] = self.key["db_ver"]

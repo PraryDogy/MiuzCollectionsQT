@@ -1,14 +1,16 @@
 import os
 from typing import Literal
 
-from PyQt5.QtCore import Qt, QObject, pyqtSignal
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget, QDesktopWidget
+from PyQt5.QtCore import QObject, Qt, pyqtSignal
+from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QLabel, QSpacerItem,
+                             QWidget)
 
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from styles import Styles
 from utils import MainUtils
+from widgets.win_smb import WinSmb
 
 
 class Manager:
@@ -20,7 +22,6 @@ class BrowseColl(LayoutV):
         super().__init__()
         descr = QLabel(cnf.lng.browse_coll_first)
         self.addWidget(descr)
-        # self.addSpacerItem(QSpacerItem(0, 10))
 
         h_wid = QWidget()
         h_wid.setFixedHeight(50)
@@ -67,8 +68,14 @@ class BrowseColl(LayoutV):
             utils_signals_app.scaner_stop.emit()
             utils_signals_app.watcher_stop.emit()
 
-            utils_signals_app.scaner_start.emit()
-            utils_signals_app.watcher_start.emit()
+        utils_signals_app.scaner_start.emit()
+        utils_signals_app.watcher_start.emit()
+
+        if not MainUtils.smb_check():
+
+            Manager.smb_win = WinSmb()
+            Manager.smb_win.show()
+
 
 
 class ChangeLang(LayoutH, QObject):
