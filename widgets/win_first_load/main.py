@@ -14,7 +14,7 @@ from utils import MainUtils
 class BrowseColl(LayoutH):
     def __init__(self):
         super().__init__()
-        self.new_coll_path = None
+        self.coll_folder = cnf.coll_folder
 
         self.browse_btn = Btn(cnf.lng.browse)
         self.browse_btn.mouseReleaseEvent = self.choose_folder
@@ -22,7 +22,7 @@ class BrowseColl(LayoutH):
 
         self.addSpacerItem(QSpacerItem(10, 0))
 
-        self.coll_path_label = QLabel(self.cut_text(cnf.coll_folder))
+        self.coll_path_label = QLabel(self.cut_text(self.coll_folder))
         self.coll_path_label.setWordWrap(True)
         self.coll_path_label.setFixedHeight(35)
         self.addWidget(self.coll_path_label)
@@ -31,8 +31,8 @@ class BrowseColl(LayoutH):
         file_dialog = QFileDialog()
         file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
 
-        if self.new_coll_path:
-            file_dialog.setDirectory(self.new_coll_path)
+        if self.coll_folder:
+            file_dialog.setDirectory(self.coll_folder)
 
         elif not os.path.exists(cnf.coll_folder):
             file_dialog.setDirectory(cnf.down_folder)
@@ -43,8 +43,8 @@ class BrowseColl(LayoutH):
         selected_folder = file_dialog.getExistingDirectory()
 
         if selected_folder:
-            self.new_coll_path = selected_folder
-            self.coll_path_label.setText(self.cut_text(self.new_coll_path))
+            self.coll_folder = selected_folder
+            self.coll_path_label.setText(self.cut_text(self.coll_folder))
 
     def cut_text(self, text: str, max_ln: int = 70):
         if len(text) > max_ln:
@@ -52,6 +52,15 @@ class BrowseColl(LayoutH):
         else:
             return text
         
+    def finalize(self):
+        if self.coll_folder != cnf.coll_folder:
+            cnf.coll_folder = self.browse_coll.new_coll_path
+            utils_signals_app.scaner_stop.emit()
+            utils_signals_app.watcher_stop.emit()
+
+            utils_signals_app.scaner_start.emit()
+            utils_signals_app.watcher_start.emit()
+
 
 class ChangeLang(LayoutH):
     def __init__(self):
@@ -214,21 +223,9 @@ class WinFirstLoad(WinStandartBase):
         gui_signals_app.set_focus_viewer.emit()
 
     def ok_cmd(self, e):
-        scan_again = False
-
-        if self.browse_coll.new_coll_path:
-            cnf.coll_folder = self.browse_coll.new_coll_path
-            scan_again = True
-
-        if scan_again:
-            utils_signals_app.scaner_stop.emit()
-            utils_signals_app.watcher_stop.emit()
-
-            utils_signals_app.scaner_start.emit()
-            utils_signals_app.watcher_start.emit()
-
         self.change_lang.finalize()
         self.thumb_move.finalize()
+        self.browse_coll.finalize()
 
         self.delete_win.emit()
         self.deleteLater()
