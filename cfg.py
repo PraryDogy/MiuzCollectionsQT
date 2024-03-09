@@ -11,7 +11,7 @@ class User:
     def __init__(self) -> None:
         super().__init__()
 
-        self.key: str = "9004"
+        self.key: dict = {"db_ver": 1.0, "load": True}
 
         self.coll_folder: str = os.path.join(
             "Volumes",
@@ -133,8 +133,8 @@ class Config(User, Dymanic, Static, AppInfo):
         with open(self.json_file, "r", encoding="utf8") as file:
             data: dict = json.load(file)
 
-        if "key" not in data or data["key"] != self.key:
-            print("New key. Copying database")
+        if "key" not in data or data["key"]["db_ver"] != self.key["db_ver"]:
+            print("New DB. Copying database")
             shutil.copyfile(src="db.db", dst=self.db_file)
             data["key"] = self.key
 

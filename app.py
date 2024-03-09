@@ -51,12 +51,17 @@ class App(QApplication):
 
 app = App()
 
-utils_signals_app.scaner_start.emit()
-utils_signals_app.watcher_start.emit()
+if not cnf.key["load"]:
 
-if not MainUtils.smb_check():
-    from widgets.win_smb import WinSmb
+    utils_signals_app.scaner_start.emit()
+    utils_signals_app.watcher_start.emit()
 
-    Manager.smb_win = WinSmb()
-    app.main_win.raise_()
-    Manager.smb_win.show()
+    if not MainUtils.smb_check():
+        from widgets.win_smb import WinSmb
+
+        Manager.smb_win = WinSmb()
+        app.main_win.raise_()
+        Manager.smb_win.show()
+
+else:
+    print("first load screen")
