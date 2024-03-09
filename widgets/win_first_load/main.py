@@ -2,7 +2,7 @@ import os
 from typing import Literal
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget, QFrame
 
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
@@ -23,6 +23,7 @@ class BrowseColl(LayoutV):
         self.addSpacerItem(QSpacerItem(0, 10))
 
         h_wid = QWidget()
+        h_wid.setFixedHeight(50)
         self.addWidget(h_wid)
 
         h_layout = LayoutH()
@@ -121,7 +122,10 @@ class ChooseUserType(LayoutV):
         self.addWidget(descr)
 
         h_wid = QWidget()
+        h_wid.setFixedHeight(50)
         self.addWidget(h_wid)
+
+        self.addSpacerItem(QSpacerItem(0, 10))
 
         h_layout = LayoutH()
         h_wid.setLayout(h_layout)
@@ -188,11 +192,10 @@ class WinFirstLoad(WinStandartBase):
 
         super().__init__(close_func=self.cancel_cmd)
         self.disable_min_max()
-        self.set_title(cnf.lng.settings)
+        self.titlebar.btns.close_btn.setDisabled(True)
 
-        self.setFixedWidth(420)
         self.init_ui()
-        self.setFixedSize(420, 550)
+        self.setFixedSize(350, 340)
         self.center_win()
         self.setFocus()
 
@@ -200,19 +203,23 @@ class WinFirstLoad(WinStandartBase):
         self.new_lang = None
         self.need_reset = None
 
+    def cancel_cmd(self, event):
+        pass
+
     def init_ui(self):
         self.change_lang = ChangeLang()
         self.change_lang.change_lang.connect(self.reload_ui)
         self.content_layout.addLayout(self.change_lang)
-        self.content_layout.addLayout(self.my_separ())
+
+        self.content_layout.addSpacerItem(QSpacerItem(0, 20))
 
         self.browse_coll = BrowseColl()
         self.content_layout.addLayout(self.browse_coll)
-        self.content_layout.addLayout(self.my_separ())
 
-        self.thumb_move = ChooseUserType()
-        self.content_layout.addLayout(self.thumb_move)
-        self.content_layout.addLayout(self.my_separ())
+        self.content_layout.addSpacerItem(QSpacerItem(0, 20))
+
+        self.user_type = ChooseUserType()
+        self.content_layout.addLayout(self.user_type)
 
         self.ok_btn = Btn(cnf.lng.ok)
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
@@ -222,19 +229,10 @@ class WinFirstLoad(WinStandartBase):
         MainUtils.clear_layout(self.content_layout)
         self.init_ui()
 
-    def my_separ(self, value=40) -> LayoutV:
-        v_layout = LayoutV()
-        v_layout.addSpacerItem(QSpacerItem(0, value))
-        return v_layout
-
-    def cancel_cmd(self, e):
-        self.delete_win.emit()
-        self.deleteLater()
-        gui_signals_app.set_focus_viewer.emit()
-
     def ok_cmd(self, e):
-        self.thumb_move.finalize()
+        self.user_type.finalize()
         self.browse_coll.finalize()
+        cnf.key["load"] = False
 
         self.delete_win.emit()
         self.deleteLater()
