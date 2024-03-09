@@ -65,3 +65,6 @@ if not cnf.key["load"]:
 
 else:
     print("first load screen")
+    from widgets.win_first_load import WinFirstLoad
+    a = WinFirstLoad()
+    a.show()
