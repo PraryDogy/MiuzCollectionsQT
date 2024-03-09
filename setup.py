@@ -61,14 +61,19 @@ if __name__ == "__main__":
             data_files=DATA_FILES,
             options={"py2app": OPTIONS},
             setup_requires=["py2app"],
-        )
+            )
+        SetupExt(appname=cnf.app_name)
+
     except Exception:
         print(traceback.format_exc())
-        shutil.rmtree("build")
-        shutil.rmtree(".eggs")
-        shutil.rmtree("dist")
 
-    SetupExt(appname=cnf.app_name)
+        try:
+            shutil.rmtree("build")
+            shutil.rmtree(".eggs")
+            shutil.rmtree("dist")
+        except FileNotFoundError:
+            pass
+
 
 
 
