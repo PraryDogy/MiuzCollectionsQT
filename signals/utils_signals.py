@@ -9,7 +9,6 @@ class UtilsSignals(QObject):
     scaner_start = pyqtSignal()
     scaner_stop = pyqtSignal()
     scaner_stoped = pyqtSignal()
-    scan_finished_with_err = pyqtSignal()
 
     def __init__(self):
         super().__init__()

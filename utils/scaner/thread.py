@@ -22,6 +22,7 @@ class Manager:
     finished_with_err = False
     curr_percent = 0
     progressbar_len = 50
+    flag = True
 
     @staticmethod
     def sleep():
@@ -61,6 +62,10 @@ class DublicateRemover:
 
         dublicates = {}
         for thumb_id, thumb_src in res.items():
+
+            if not Manager.flag:
+                return
+
             if not dublicates.get(thumb_src):
                 dublicates[thumb_src] = [thumb_id]
             else:
@@ -115,6 +120,9 @@ class FinderImages(dict):
 
         for collection_walk in collections:
 
+            if not Manager.flag:
+                return
+
             float_value += step_value
 
             if float_value >= 1:
@@ -125,7 +133,14 @@ class FinderImages(dict):
             Manager.sleep()
 
             for root, _, files in os.walk(top=collection_walk):
+
+                if not Manager.flag:
+                    return
+
                 for file in files:
+
+                    if not Manager.flag:
+                        return
 
                     if file.endswith(Manager.jpg_exsts):
                         src = os.path.join(root, file)
@@ -157,12 +172,20 @@ class ComparedImages(dict):
         super().__init__({"insert": {}, "update": {}, "delete": {}})
 
         for db_src, db_stats in db_images.items():
+
+            if not Manager.flag:
+                return
+
             finder_stats = finder_images.get(db_src)
 
             if not finder_stats:
                 self["delete"][db_src] = db_stats
 
         for finder_src, finder_stats in finder_images.items():
+
+            if not Manager.flag:
+                return
+
             db_stats = db_images.get(finder_src)
 
             if not db_stats:
@@ -212,6 +235,9 @@ class SummaryScan:
 
         for src, (size, created, modified) in data.items():
 
+            if not Manager.flag:
+                return
+
             float_value += self.step_value
 
             if float_value >= 1:
@@ -254,10 +280,14 @@ class SummaryScan:
             {key: self.images["insert"][key]
              for key in list(self.images["insert"])[i:i + limit]}
              for i in range(0, len(self.images["insert"]), limit)
+             if Manager.flag
              ]
 
         for sub in subdicts:
             values = self.create_values(sub)
+
+            if not Manager.flag:
+                return
 
             if not values:
                 return
@@ -296,15 +326,18 @@ class SummaryScan:
     def update_db(self):
         limit = 10
         subdicts = [
-            {
-                key: self.images["update"][key]
-                for key in list(self.images["update"])[i:i + limit]
-                }
-                for i in range(0, len(self.images["update"]), limit)
-                ]
+            {key: self.images["update"][key]
+             for key in list(self.images["update"])[i:i + limit]
+             }
+             for i in range(0, len(self.images["update"]), limit)
+             if Manager.flag
+             ]
 
         for sub in subdicts:
             values = self.create_values(sub)
+
+            if not Manager.flag:
+                return
 
             if not values:
                 return
@@ -345,14 +378,20 @@ class SummaryScan:
         queries = [
             sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==i)
             for i in self.images["delete"]
+            if Manager.flag
             ]
+
         limit = 50
         sublists = [
             queries[i:i+limit]
             for i in range(0, len(queries), limit)
+            if Manager.flag
             ]
 
         for sublist in sublists:
+            if not Manager.flag:
+                return
+
             try:
                 session = Dbase.get_session()
 
@@ -404,13 +443,15 @@ class Scaner(ScanerBaseClass):
             gui_signals_app.reload_thumbnails.emit()
             Manager.need_gui_reload = False
 
+        Manager.flag = True
+        utils_signals_app.scaner_stoped.emit()
+
     def run(self):
         print("run scaner")
         try:
             self.scaner_actions()
         except Exception:
             Manager.curr_percent = 0
-            utils_signals_app.scan_finished_with_err.emit()
             gui_signals_app.scan_progress_value.emit(100)
             print(traceback.format_exc())
 
