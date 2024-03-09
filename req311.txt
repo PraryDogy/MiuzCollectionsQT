@@ -1,0 +1,5 @@
+greenlet==3.0.3
+PyQt5==5.15.10
+SQLAlchemy==2.0.25
+watchdog==3.0.0
+opencv-python==4.9.0.80

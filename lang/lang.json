@@ -1,0 +1,352 @@
+{
+    "name": [
+        "ru",
+        "en"
+    ],
+    "cust_fltr_names": [
+        {
+            "prod": "Имиджи",
+            "mod": "Модели"
+        },
+        {
+            "prod": "Product",
+            "mod": "Models"
+        }
+    ],
+    "sys_fltr_names": [
+        {
+            "other": "Остальное"
+        },
+        {
+            "other": "Other"
+        }
+    ],
+    "lang_label": [
+        "Язык/Language",
+        "Language/Язык"
+    ],
+    "ok": [
+        "Ок",
+        "Ok"
+    ],
+    "cancel": [
+        "Отмена",
+        "Cancel"
+    ],
+    "all_colls": [
+        "Все коллекции",
+        "All collections"
+    ],
+    "close": [
+        "Закрыть",
+        "Close"
+    ],
+    "paste": [
+        "Вставить",
+        "Paste"
+    ],
+    "view": [
+        "Просмотр",
+        "View"
+    ],
+    "info": [
+        "Инфо",
+        "Info"
+    ],
+    "settings": [
+        "Настройки",
+        "Settings"
+    ],
+    "browse": [
+        "Обзор",
+        "Browse"
+    ],
+    "reset": [
+        "Сброс",
+        "Reset"
+    ],
+    "photo": [
+        "Фото",
+        "Photo"
+    ],
+    "total": [
+        "Всего",
+        "Total"
+    ],
+    "start": [
+        "Начало",
+        "Start"
+    ],
+    "end": [
+        "Конец",
+        "End"
+    ],
+    "copying": [
+        "Копирую",
+        "Copying"
+    ],
+    "copy": [
+        "Копировать",
+        "Copy"
+    ],
+    "resolution": [
+        "Разрешение",
+        "Resolution"
+    ],
+    "file_size": [
+        "Размер",
+        "Size"
+    ],
+    "file_path": [
+        "Расположение",
+        "Location"
+    ],
+    "collection": [
+        "Коллекция",
+        "Collection"
+    ],
+    "dates": [
+        "Даты",
+        "Dates"
+    ],
+    "mb": [
+        "мб",
+        "mb"
+    ],
+    "smb_descr": [
+        "Коллекции недоступны.\nВозможные причины:\n\n- Нет подключения к интернету\n- Нет подключения к сетевому диску\n- Неправильно указано расположение коллекций\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh",
+        "Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh"
+    ],
+    "copy_all": [
+        "Копировать все",
+        "Copy all"
+    ],
+    "browse_colls_descr": [
+        "Расположение коллекций",
+        "Collections location"
+    ],
+    "show_more": [
+        "Позазать еще",
+        "Show more"
+    ],
+    "no_photo": [
+        "Нет фотографий",
+        "No photos"
+    ],
+    "with_name": [
+        "с именем",
+        "with name"
+    ],
+    "date_changed": [
+        "Дата изменения",
+        "Date changed"
+    ],
+    "reset_dates": [
+        "Сбросить даты",
+        "Dates reset"
+    ],
+    "d_m_y": [
+        "день.месяц.год",
+        "day.month.year"
+    ],
+    "no_connection": [
+        "Нет подключения",
+        "No connection"
+    ],
+    "file_name": [
+        "Имя файла",
+        "Filename"
+    ],
+    "show_all": [
+        "Показать все",
+        "Show all"
+    ],
+    "reset_search": [
+        "Очистить поиск",
+        "Reset search"
+    ],
+    "no_photo_filter": [
+        "Нет фотографий в категории",
+        "No photos in cathegory"
+    ],
+    "weekdays": [
+        {
+            "0": "понедельник",
+            "1": "вторник",
+            "2": "среда",
+            "3": "четверг",
+            "4": "пятница",
+            "5": "суббота",
+            "6": "воскресенье"
+        },
+        {
+            "0": "monday",
+            "1": "tuesday",
+            "2": "wednesday",
+            "3": "thursday",
+            "4": "friday",
+            "5": "saturday",
+            "6": "sunday"
+        }
+    ],
+    "months_genitive_case": [
+        {
+            "1": "января",
+            "2": "февраля",
+            "3": "марта",
+            "4": "апреля",
+            "5": "мая",
+            "6": "июня",
+            "7": "июля",
+            "8": "августа",
+            "9": "сентября",
+            "10": "октября",
+            "11": "ноября",
+            "12": "декабря"
+        },
+        {
+            "1": "january",
+            "2": "february",
+            "3": "march",
+            "4": "april",
+            "5": "may",
+            "6": "june",
+            "7": "july",
+            "8": "august",
+            "9": "september",
+            "10": "october",
+            "11": "november",
+            "12": "december"
+        }
+    ],
+    "months": [
+        {
+            "1": "Январь",
+            "2": "Февраль",
+            "3": "Март",
+            "4": "Апрель",
+            "5": "Май",
+            "6": "Июнь",
+            "7": "Июль",
+            "8": "Август",
+            "9": "Сентябрь",
+            "10": "Октябрь",
+            "11": "Ноябрь",
+            "12": "Декабрь"
+        },
+        {
+            "1": "January",
+            "2": "February",
+            "3": "March",
+            "4": "April",
+            "5": "May",
+            "6": "June",
+            "7": "July",
+            "8": "August",
+            "9": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December"
+        }
+    ],
+    "reveal": [
+        "Показать",
+        "Reveal"
+    ],
+    "in_finder": [
+        "в Finder",
+        "in Finder"
+    ],
+    "recents": [
+        "Недавние",
+        "Recents"
+    ],
+    "open_settings_window": [
+        "Открыть настройки",
+        "Open settings window"
+    ],
+    "about_my_app": [
+        "О приложении",
+        "Show about app"
+    ],
+    "search": [
+        "Поиск",
+        "Search"
+    ],
+    "copy_selected": [
+        "Копировать выделенный текст",
+        "Copy selected text"
+    ],
+    "cut": [
+        "Вырезать",
+        "Cut"
+    ],
+    "photos_named_dates": [
+        "Фото за даты",
+        "Photo from"
+    ],
+    "search_dates": [
+        "Поиск фотографий по датам.\nУправляйте датами с клавишами вверх/вниз.",
+        "Searching for photos by dates.\nControl dates with up/down keys."
+    ],
+    "searching_photos": [
+        "Поиск новых фотографий",
+        "Searching for new photos"
+    ],
+    "adding_photos": [
+        "Добавляю новые фотографии",
+        "Adding new photos"
+    ],
+    "reveal_in_finder": [
+        "Показать в Finder",
+        "Reveal in Finder"
+    ],
+    "layers": [
+        "Слои",
+        "Layers"
+    ],
+    "save_image_in": [
+        "Сохранить как...",
+        "Save as..."
+    ],
+    "save_image_downloads": [
+        "Сохранить в загрузки",
+        "Save to Downloads"
+    ],
+    "copying_files": [
+        "Копирую файлы...",
+        "Copying files..."
+    ],
+    "copying_title": [
+        "Копирование",
+        "Copying"
+    ],
+    "save_group_in": [
+        "Сохранить группу фото как...",
+        "Save group of photos as..."
+    ],
+    "save_group_downloads": [
+        "Сохранить группу фото в загрузки",
+        "Save group of photos to Downloads"
+    ],
+    "sett_stopwords": [
+        "Игнорировать слова в имени файла при поиске tiff/psd",
+        "Ignore words in the file name when searching for tiff/psd"
+    ],
+    "sett_stopcolls": [
+        "Игнорировать папки при поиске",
+        "Ignore folders during the search"
+    ],
+    "no_tiff": [
+        "Не могу найти слои",
+        "Can't find layers"
+    ],
+    "loading": [
+        "Загрузка...",
+        "Loading..."
+    ],
+    "thumb_move": [
+        "Копировать при перетаскивании",
+        "Copy on drag"
+    ]
+}
