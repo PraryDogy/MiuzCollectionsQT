@@ -67,3 +67,7 @@ class Eng:
 	no_tiff = "Can't find layers"
 	loading = "Loading..."
 	thumb_move = "Copy on drag"
+	browse_coll_first = "Specify the location of collections\nor leave it as default."
+	choose_user_first = "Choose user type.\nStandard: suitable for viewing.\nDesigner: ability to work with layers."
+	user_standart = "Standart"
+	user_designer = "Designer"

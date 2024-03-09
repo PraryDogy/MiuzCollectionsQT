@@ -1,50 +1,58 @@
 import os
 from typing import Literal
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
+from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
+from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from styles import Styles
 from utils import MainUtils
 
 
-class BrowseColl(LayoutH):
+class Manager:
+    coll_folder = cnf.coll_folder
+
+
+class BrowseColl(LayoutV):
     def __init__(self):
         super().__init__()
-        self.coll_folder = cnf.coll_folder
+        descr = QLabel(cnf.lng.browse_coll_first)
+        self.addWidget(descr)
+        self.addSpacerItem(QSpacerItem(0, 10))
+
+        h_wid = QWidget()
+        self.addWidget(h_wid)
+
+        h_layout = LayoutH()
+        h_wid.setLayout(h_layout)
 
         self.browse_btn = Btn(cnf.lng.browse)
         self.browse_btn.mouseReleaseEvent = self.choose_folder
-        self.addWidget(self.browse_btn)
+        h_layout.addWidget(self.browse_btn)
 
-        self.addSpacerItem(QSpacerItem(10, 0))
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.coll_path_label = QLabel(self.cut_text(self.coll_folder))
+        self.coll_path_label = QLabel(self.cut_text(Manager.coll_folder))
         self.coll_path_label.setWordWrap(True)
         self.coll_path_label.setFixedHeight(35)
-        self.addWidget(self.coll_path_label)
+        h_layout.addWidget(self.coll_path_label)
 
     def choose_folder(self, e):
         file_dialog = QFileDialog()
         file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
 
-        if self.coll_folder:
-            file_dialog.setDirectory(self.coll_folder)
-
-        elif not os.path.exists(cnf.coll_folder):
+        if not os.path.exists(Manager.coll_folder):
             file_dialog.setDirectory(cnf.down_folder)
-
         else:
-            file_dialog.setDirectory(cnf.coll_folder)
+            file_dialog.setDirectory(Manager.coll_folder)
 
         selected_folder = file_dialog.getExistingDirectory()
 
         if selected_folder:
-            self.coll_folder = selected_folder
-            self.coll_path_label.setText(self.cut_text(self.coll_folder))
+            Manager.coll_folder = selected_folder
+            self.coll_path_label.setText(self.cut_text(Manager.coll_folder))
 
     def cut_text(self, text: str, max_ln: int = 70):
         if len(text) > max_ln:
@@ -53,8 +61,8 @@ class BrowseColl(LayoutH):
             return text
         
     def finalize(self):
-        if self.coll_folder != cnf.coll_folder:
-            cnf.coll_folder = self.browse_coll.new_coll_path
+        if Manager.coll_folder != cnf.coll_folder:
+            cnf.coll_folder = Manager.coll_folder
             utils_signals_app.scaner_stop.emit()
             utils_signals_app.watcher_stop.emit()
 
@@ -62,7 +70,9 @@ class BrowseColl(LayoutH):
             utils_signals_app.watcher_start.emit()
 
 
-class ChangeLang(LayoutH):
+class ChangeLang(LayoutH, QObject):
+    change_lang = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.lang = cnf.user_lng
@@ -87,51 +97,55 @@ class ChangeLang(LayoutH):
 
         self.lang_btn.setText(self.get_lng_text())
 
-    def finalize(self):
-        if self.lang != cnf.user_lng:
+        cnf.set_language(self.lang)
 
-            cnf.set_language(self.lang)
+        gui_signals_app.reload_menu.emit()
+        gui_signals_app.reload_stbar.emit()
+        gui_signals_app.reload_filters_bar.emit()
+        gui_signals_app.reload_thumbnails.emit()
+        gui_signals_app.reload_title.emit()
+        gui_signals_app.reload_search_wid.emit()
+        gui_signals_app.reload_menubar.emit()
 
-            gui_signals_app.reload_menu.emit()
-            gui_signals_app.reload_stbar.emit()
-            gui_signals_app.reload_filters_bar.emit()
-            gui_signals_app.reload_thumbnails.emit()
-            gui_signals_app.reload_title.emit()
-            gui_signals_app.reload_search_wid.emit()
-            gui_signals_app.reload_menubar.emit()
+        self.change_lang.emit()
 
 
-class ThumbMove(LayoutH):
+class ChooseUserType(LayoutV):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.move_jpg = cnf.move_jpg
         self.move_layers = cnf.move_layers
 
-        self.btn_jpg = Btn("JPG")
-        self.btn_jpg.setStyleSheet(self.get_jpg_style())
-        self.btn_jpg.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
-        self.addWidget(self.btn_jpg)
-
-        self.addSpacerItem(QSpacerItem(1, 0))
-
-        self.btn_tiff = Btn(cnf.lng.layers)
-        self.btn_tiff.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
-        self.btn_tiff.setStyleSheet(self.get_tiff_style())
-        
-        self.addWidget(self.btn_tiff)
-
-        self.addSpacerItem(QSpacerItem(10, 0))
-
-        descr = QLabel(cnf.lng.thumb_move)
+        descr = QLabel(cnf.lng.choose_user_first)
         self.addWidget(descr)
 
-        self.addStretch()
+        h_wid = QWidget()
+        self.addWidget(h_wid)
+
+        h_layout = LayoutH()
+        h_wid.setLayout(h_layout)
+
+        h_layout.addStretch()
+
+        self.btn_standart = Btn(cnf.lng.user_standart)
+        self.btn_standart.setStyleSheet(self.get_jpg_style())
+        self.btn_standart.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
+        h_layout.addWidget(self.btn_standart)
+
+        h_layout.addSpacerItem(QSpacerItem(1, 0))
+
+        self.btn_tiff = Btn(cnf.lng.user_designer)
+        self.btn_tiff.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
+        self.btn_tiff.setStyleSheet(self.get_tiff_style())
+        h_layout.addWidget(self.btn_tiff)
+
+        h_layout.addStretch()
 
     def btn_cmd(self, flag: Literal["jpg", "tiff"]):
         if flag == "jpg":
             self.move_jpg = not self.move_jpg
-            self.btn_jpg.setStyleSheet(self.get_jpg_style())
+            self.btn_standart.setStyleSheet(self.get_jpg_style())
         
         elif flag == "tiff":
             self.move_layers = not self.move_layers
@@ -187,30 +201,26 @@ class WinFirstLoad(WinStandartBase):
         self.need_reset = None
 
     def init_ui(self):
-        coll_title = QLabel(cnf.lng.browse_colls_descr)
-        self.content_layout.addWidget(coll_title)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 10))
+        self.change_lang = ChangeLang()
+        self.change_lang.change_lang.connect(self.reload_ui)
+        self.content_layout.addLayout(self.change_lang)
+        self.content_layout.addLayout(self.my_separ())
 
         self.browse_coll = BrowseColl()
         self.content_layout.addLayout(self.browse_coll)
         self.content_layout.addLayout(self.my_separ())
 
-        self.change_lang = ChangeLang()
-        self.content_layout.addLayout(self.change_lang)
-        self.content_layout.addLayout(self.my_separ())
-
-        self.thumb_move = ThumbMove()
+        self.thumb_move = ChooseUserType()
         self.content_layout.addLayout(self.thumb_move)
         self.content_layout.addLayout(self.my_separ())
 
-        btns_layout = LayoutH()
-        self.content_layout.addLayout(btns_layout)
-
-        btns_layout.addStretch(1)
-
         self.ok_btn = Btn(cnf.lng.ok)
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
-        btns_layout.addWidget(self.ok_btn)
+        self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
+
+    def reload_ui(self):
+        MainUtils.clear_layout(self.content_layout)
+        self.init_ui()
 
     def my_separ(self, value=40) -> LayoutV:
         v_layout = LayoutV()
@@ -223,7 +233,6 @@ class WinFirstLoad(WinStandartBase):
         gui_signals_app.set_focus_viewer.emit()
 
     def ok_cmd(self, e):
-        self.change_lang.finalize()
         self.thumb_move.finalize()
         self.browse_coll.finalize()
 
@@ -232,12 +241,5 @@ class WinFirstLoad(WinStandartBase):
         gui_signals_app.set_focus_viewer.emit()
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.delete_win.emit()
-            self.deleteLater()
-            gui_signals_app.set_focus_viewer.emit()
+        event.ignore()
 
-        elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            self.ok_cmd(event)
-
-        super().keyPressEvent(event)

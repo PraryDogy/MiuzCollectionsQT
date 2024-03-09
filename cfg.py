@@ -30,7 +30,7 @@ class User:
         self.user_lng: str = "en"
         self.zoom: bool = False
         self.move_jpg = True
-        self.move_layers = True
+        self.move_layers = False
 
         self.root_g: dict = {
             "ax": 100,
