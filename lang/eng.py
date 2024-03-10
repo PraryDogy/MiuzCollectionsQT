@@ -71,3 +71,4 @@ class Eng:
 	choose_user_first = "Choose user type.\nStandard: suitable for viewing.\nDesigner: ability to work with layers."
 	user_standart = "Standart"
 	user_designer = "Designer"
+	deleting_photos = "Removing unnecessary"

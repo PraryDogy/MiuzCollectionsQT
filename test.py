@@ -1,6 +1,27 @@
-descr = "Укажите расположение коллекций\nили оставьте по умолчанию."
-descr = "Specify the location of collections\n or leave it as default."
+images = {
+    "insert": {},
+    "update": {
+        "upd1": "_val1",
+        "upd2": "_val2",
+        "upd3": "_upd3",
+        "upd4": "_upd4",
+        "upd5": "_upd5",
+        "upd6": "_upd6"
+        }
+        }
 
 
-descr = "Выберите тип пользователя.\nСтандарт: подходит для просмотра.\nДизайнер: возможность работы со слоями"
-descr = "Choose user type.\nStandard: suitable for viewing.\nDesigner: ability to work with layers."
+data: dict = images["update"]
+data_keys: list = list(data.keys())
+limit = 4
+
+chunks = [
+    {
+        key: data[key]
+        for key in data_keys[i:i + limit]
+        }
+        for i in range(0, len(data), limit)
+        ]
+
+
+print(chunks)

@@ -27,6 +27,7 @@ class ProgressBar(QWidget):
         gui_signals_app.scan_progress_value.connect(self.progress_bar_set)
         gui_signals_app.progress_search_photos.connect(self.search_photos)
         gui_signals_app.progress_add_photos.connect(self.add_photos)
+        gui_signals_app.progress_del_photos.connect(self.del_photos)
 
     def progress_bar_set(self, value):
         if self.isHidden():
@@ -44,3 +45,6 @@ class ProgressBar(QWidget):
 
     def add_photos(self):
         self.title.setText(cnf.lng.adding_photos)
+
+    def del_photos(self):
+        self.title.setText(cnf.lng.deleting_photos)

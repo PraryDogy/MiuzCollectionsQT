@@ -13,7 +13,8 @@ from signals import gui_signals_app, utils_signals_app
 
 from ..image_utils import BytesThumb, UndefBytesThumb
 from ..main_utils import MainUtils
-
+from typing import Dict, List
+from sqlalchemy.orm import Query
 
 class Manager:
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
@@ -236,8 +237,6 @@ class SummaryScan:
         except ZeroDivisionError:
             self.step_value = 1
 
-        gui_signals_app.progress_add_photos.emit()
-
         if self.images["delete"]:
             self.delete_db()
 
@@ -247,7 +246,7 @@ class SummaryScan:
         if self.images["insert"]:
             self.insert_db()
 
-    def create_values(self, data: dict):
+    def create_values(self, data: Dict[str, tuple]) -> List[Dict]:
         values = []
         float_value = 0
 
@@ -295,16 +294,21 @@ class SummaryScan:
         return values
 
     def insert_db(self):
-        limit = 10
-        subdicts = [
-            {key: self.images["insert"][key]
-             for key in list(self.images["insert"])[i:i + limit]}
-             for i in range(0, len(self.images["insert"]), limit)
-             if Manager.flag
-             ]
+        gui_signals_app.progress_add_photos.emit()
+        limit: int = 10
+        data: dict = self.images["insert"]
+        data_keys: list = list(data.keys())
 
-        for sub in subdicts:
-            values = self.create_values(sub)
+        chunks: List[Dict[str, tuple]]
+        chunks = [
+            {key: data[key] for key in data_keys[i:i + limit]}
+            for i in range(0, len(data), limit)
+            if Manager.flag
+            ]
+
+        for chunk in chunks:
+            chunk: Dict[str, tuple]
+            values: List[Dict] = self.create_values(chunk)
 
             if not Manager.flag:
                 return
@@ -312,18 +316,20 @@ class SummaryScan:
             if not values:
                 return
 
-            queries = [(
-                sqlalchemy.insert(ThumbsMd)
-                .values({
-                    "img150": i["img150"],
-                    "src": i["src"],
-                    "size": i["size"],
-                    "created": i["created"],
-                    "modified": i["modified"],
-                    "collection": i["collection"],
-                    }))
-                    for i in values
-                    ]
+            queries = List[Query]
+            queries = [
+                sqlalchemy
+                    .insert(ThumbsMd)
+                    .values({
+                        "img150": i["img150"],
+                        "src": i["src"],
+                        "size": i["size"],
+                        "created": i["created"],
+                        "modified": i["modified"],
+                        "collection": i["collection"],
+                        })
+                for i in values
+                ]
 
             try:
                 session = Dbase.get_session()
@@ -344,17 +350,20 @@ class SummaryScan:
                 session.close()
 
     def update_db(self):
-        limit = 10
-        subdicts = [
-            {key: self.images["update"][key]
-             for key in list(self.images["update"])[i:i + limit]
-             }
-             for i in range(0, len(self.images["update"]), limit)
-             if Manager.flag
-             ]
+        limit: int = 10
+        data: dict = self.images["update"]
+        data_keys: list = list(data.keys())
 
-        for sub in subdicts:
-            values = self.create_values(sub)
+        chunks: List[Dict[str, tuple]]
+        chunks = [
+            {key: data[key] for key in data_keys[i:i + limit]}
+            for i in range(0, len(data), limit)
+            if Manager.flag
+            ]
+
+        for chunk in chunks:
+            chunk: Dict[str, tuple]
+            values: List[Dict] = self.create_values(chunk)
 
             if not Manager.flag:
                 return
@@ -362,17 +371,17 @@ class SummaryScan:
             if not values:
                 return
 
+            queries = List[Query]
             queries = [
-                (
-                sqlalchemy.update(ThumbsMd)
-                .values({
-                    "img150": i["img150"],
-                    "size": i["size"],
-                    "created": i["created"],
-                    "modified": i["modified"],
-                    })
-                .where(ThumbsMd.src==i["src"])
-                )
+                sqlalchemy
+                    .update(ThumbsMd)
+                    .values({
+                        "img150": i["img150"],
+                        "size": i["size"],
+                        "created": i["created"],
+                        "modified": i["modified"]
+                        })
+                    .where(ThumbsMd.src==i["src"])
                 for i in values
                 ]
 
@@ -395,13 +404,16 @@ class SummaryScan:
                 session.close()
 
     def delete_db(self):
+        gui_signals_app.progress_del_photos.emit()
+
+        queries = List[Query]
         queries = [
             sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==i)
             for i in self.images["delete"]
             if Manager.flag
             ]
 
-        limit = 50
+        limit = 20
         sublists = [
             queries[i:i+limit]
             for i in range(0, len(queries), limit)

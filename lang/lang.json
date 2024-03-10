@@ -364,5 +364,9 @@
     "user_designer": [
         "Дизайнер",
         "Designer"
+    ],
+    "deleting_photos": [
+        "Удаляю лишнее",
+        "Removing unnecessary"
     ]
 }

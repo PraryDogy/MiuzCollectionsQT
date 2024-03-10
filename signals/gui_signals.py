@@ -23,6 +23,7 @@ class GuiSignals(QObject):
 
     progress_search_photos = pyqtSignal()
     progress_add_photos = pyqtSignal()
+    progress_del_photos = pyqtSignal()
 
     def __init__(self):
         super().__init__()
