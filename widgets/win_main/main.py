@@ -1,16 +1,17 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAction, QFrame, QMainWindow, QWidget, QSpacerItem
+from PyQt5.QtWidgets import (QAction, QDesktopWidget, QFrame, QMainWindow,
+                             QSpacerItem, QWidget)
 
 from base_widgets import BaseEmptyWin, LayoutH, LayoutV
 from cfg import cnf
 from signals import gui_signals_app
 
+from ..filters_bar import FiltersBar
 from ..left_menu import LeftMenu
 from ..menu_bar import MacMenuBar
+from ..search_bar import SearchBar
 from ..st_bar import StBar
 from ..thumbnails import Thumbnails
-from ..filters_bar import FiltersBar
-from ..search_bar import SearchBar
 
 
 class Manager:
@@ -65,7 +66,8 @@ class WinMain(BaseEmptyWin):
         self.setContentsMargins(0, 0, 0, 0)
         self.setFocus()
         self.setWindowTitle(cnf.app_name)
-        self.setGeometry(*cnf.root_g.values())
+        self.resize(cnf.root_g["aw"], cnf.root_g["ah"])
+        self.center()
 
         menubar = MacMenuBar()
         self.setMenuBar(menubar)
@@ -90,6 +92,13 @@ class WinMain(BaseEmptyWin):
 
         # Подключение методов к главному окну
         self.keyPressEvent = self.mykeyPressEvent
+
+    def center(self):
+        screen = QDesktopWidget().screenGeometry()
+        size = self.geometry()
+        x = (screen.width() - size.width()) // 2
+        y = (screen.height() - size.height()) // 2
+        self.move(x, y)
 
     def mycloseEvent(self, event):
         if event.spontaneous():
