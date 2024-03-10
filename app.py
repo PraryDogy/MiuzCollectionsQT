@@ -39,9 +39,8 @@ class App(QApplication):
         geo = self.main_win.geometry()
 
         cnf.root_g.update(
-            {"aw": geo.width(), "ah": geo.height(),
-             "ax": geo.x(), "ay": geo.y()}
-        )
+            {"aw": geo.width(), "ah": geo.height()}
+            )
         cnf.write_json_cfg()
         MainUtils.close_all_win()
 

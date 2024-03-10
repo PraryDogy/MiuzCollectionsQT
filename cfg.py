@@ -33,15 +33,11 @@ class User:
         self.move_layers = False
 
         self.root_g: dict = {
-            "ax": 100,
-            "ay": 100,
             "aw": 700,
             "ah": 500
             }
 
         self.imgview_g: dict = {
-            "ax": 100,
-            "ay": 100,
             "aw": 700,
             "ah": 500
             }
