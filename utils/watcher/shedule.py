@@ -10,28 +10,41 @@ class WatcherShedule(QObject):
         super().__init__()
 
         ms = 15000
-        self.timer = QTimer(self)
-        self.timer.setInterval(ms)
-        self.timer.timeout.connect(self.start_sheduled)
+        self.smb_wait_timer = QTimer(self)
+        self.smb_wait_timer.setInterval(ms)
+        self.smb_wait_timer.timeout.connect(self.start_thread)
 
-        utils_signals_app.watcher_start.connect(self.start_sheduled)
-        utils_signals_app.watcher_stop.connect(self.stop_watcher_thread)
+        self.thread_wait_timer = QTimer(self)
+        self.thread_wait_timer.setInterval(ms)
+        self.thread_wait_timer.timeout.connect(self.wait_thread)
 
-        self.watcher_thread = None
+        utils_signals_app.watcher_start.connect(self.wait_thread)
+        utils_signals_app.watcher_stop.connect(self.stop_thread)
 
-    def start_sheduled(self):
+        self.watcher_thread = False
 
+    def start_thread(self):
         if MainUtils.smb_check():
+            print("watcher started from shedule")
             self.watcher_thread = WatcherThread()
             self.watcher_thread.start()
 
         else:
-            self.timer.start()
+            print("watcher no smb, 15 sec wait")
+            self.smb_wait_timer.start()
 
-    def stop_watcher_thread(self):
+    def wait_thread(self):
+        if not self.watcher_thread or not self.watcher_thread.isRunning():
+            self.thread_wait_timer.stop()
+            self.start_thread()
+        
+        else:
+            print("watcher wait prev thread stop")
+            self.thread_wait_timer.start()
+
+    def stop_thread(self):
         if self.watcher_thread:
             self.watcher_thread.clean_engine()
             self.watcher_thread.stop_watcher()
-
 
 watcher_app = WatcherShedule()
