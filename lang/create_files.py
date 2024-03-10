@@ -31,7 +31,10 @@ def create_all_files(file: str):
     en_class = "Eng"
 
     ru_data = {k: v[0] for k, v in data.items()}
+    ru_data = dict(sorted(ru_data.items()))
+
     en_data = {k: v[1] for k, v in data.items()}
+    en_data = dict(sorted(en_data.items()))
 
     create_py(ru_file, ru_class, ru_data)
     create_py(en_file, en_class, en_data)

@@ -15,6 +15,7 @@ class LangAdmin:
         print()
         print("1 add new key")
         print("2 remove existing key")
+        print("3 reload files")
 
         try:
             inp = int(input())
@@ -48,9 +49,8 @@ class LangAdmin:
 
             print("done delete")
 
-        elif not inp:
-            print("end")
-            return
+        elif inp == 3:
+            data = dict(sorted(data.items()))
 
         else:
             print("ERROR: not 1 or 2")
