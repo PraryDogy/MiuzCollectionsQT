@@ -1,4 +1,6 @@
 import subprocess
+import os
+
 
 print("Choose py ver: 3.10, 3.11")
 ver: str = input()
@@ -7,8 +9,9 @@ if ver not in ("3.10", "3.11"):
     raise Exception("3.10 or 3.11")
 
 # Команда для создания виртуального окружения
-venv_command = f"python{ver} -m venv env"
-subprocess.run(venv_command, shell=True, check=True)
+if not os.path.exists("env"):
+    venv_command = f"python{ver} -m venv env"
+    subprocess.run(venv_command, shell=True, check=True)
 
 # Команда для активации виртуального окружения
 activate_command = ". env/bin/activate"
