@@ -9,7 +9,7 @@ from PyQt5.QtCore import QThread
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from signals import gui_signals_app
+from signals import gui_signals_app, utils_signals_app
 
 from ..image_utils import BytesThumb, UndefBytesThumb
 from ..main_utils import MainUtils
@@ -18,8 +18,6 @@ from ..main_utils import MainUtils
 class Manager:
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
     tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
-    need_gui_reload = False
-    finished_with_err = False
     curr_percent = 0
     progressbar_len = 50
     flag = True
@@ -28,13 +26,6 @@ class Manager:
     def sleep():
         return
         sleep(0.5)
-
-    @staticmethod
-    def check_need_gui_reload(images: dict):
-        for _, v in images.items():
-            if v:
-                return True
-        return False
 
 
 class NonExistCollRemover:
@@ -62,57 +53,53 @@ class NonExistCollRemover:
             finally:
                 session.close()
 
-            Manager.need_gui_reload = True
 
+# class DublicateRemover:
+#     def __init__(self):
+#         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
 
-class DublicateRemover:
-    def __init__(self):
-        q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
+#         session = Dbase.get_session()
+#         try:
+#             res = session.execute(q).fetchall()
+#         finally:
+#             session.close()
 
-        session = Dbase.get_session()
-        try:
-            res = session.execute(q).fetchall()
-        finally:
-            session.close()
+#         res = {t_id: t_src for t_id, t_src in res}
 
-        res = {t_id: t_src for t_id, t_src in res}
+#         dublicates = {}
+#         for thumb_id, thumb_src in res.items():
 
-        dublicates = {}
-        for thumb_id, thumb_src in res.items():
+#             if not Manager.flag:
+#                 return
 
-            if not Manager.flag:
-                return
+#             if not dublicates.get(thumb_src):
+#                 dublicates[thumb_src] = [thumb_id]
+#             else:
+#                 dublicates[thumb_src].append(thumb_id)
 
-            if not dublicates.get(thumb_src):
-                dublicates[thumb_src] = [thumb_id]
-            else:
-                dublicates[thumb_src].append(thumb_id)
+#         dublicates = [thumb_id
+#                       for _, thumb_id_list in dublicates.items()
+#                       for thumb_id in thumb_id_list[1:]
+#                       if len(thumb_id_list) > 1]
 
-        dublicates = [thumb_id
-                      for _, thumb_id_list in dublicates.items()
-                      for thumb_id in thumb_id_list[1:]
-                      if len(thumb_id_list) > 1]
+#         if dublicates:
 
-        if dublicates:
+#             queries = [
+#                 sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.id==i)
+#                 for i in dublicates
+#                 ]
 
-            queries = [
-                sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.id==i)
-                for i in dublicates
-                ]
+#             session = Dbase.get_session()
 
-            session = Dbase.get_session()
-
-            try:
-                for q in queries:
-                    session.execute(q)
-                session.commit()
-            except Exception as e:
-                print(f"Error occurred: {e}")
-                session.rollback()
-            finally:
-                session.close()
-
-            Manager.need_gui_reload = True
+#             try:
+#                 for q in queries:
+#                     session.execute(q)
+#                 session.commit()
+#             except Exception as e:
+#                 print(f"Error occurred: {e}")
+#                 session.rollback()
+#             finally:
+#                 session.close()
 
 
 class FinderImages(dict):
@@ -124,6 +111,8 @@ class FinderImages(dict):
 
         except (OSError, FileNotFoundError):
             print(traceback.format_exc())
+            utils_signals_app.scaner_err.emit()
+            Manager.flag = False
 
     def run(self):
         gui_signals_app.progress_search_photos.emit()
@@ -240,12 +229,6 @@ class SummaryScan:
             return
 
         self.images = ComparedImages(finder_images, db_images)
-
-        if Manager.check_need_gui_reload(self.images):
-            Manager.need_gui_reload = True
-        else:
-            return
-
         ln_images = len(self.images["insert"]) + len(self.images["update"])
 
         try:
@@ -294,7 +277,9 @@ class SummaryScan:
 
             except FileNotFoundError:
                 print(traceback.format_exc())
-                continue
+                utils_signals_app.scaner_err.emit()
+                Manager.flag = False
+                return
 
             except Exception as e:
                 obj = {"img150": UndefBytesThumb().getvalue(),
@@ -467,7 +452,7 @@ class Scaner(ScanerBaseClass):
 
         SummaryScan()
         NonExistCollRemover()
-        DublicateRemover()
+        # DublicateRemover()
 
         Dbase.vacuum()
         Dbase.cleanup_engine()
@@ -475,10 +460,8 @@ class Scaner(ScanerBaseClass):
         Manager.curr_percent = 0
         gui_signals_app.scan_progress_value.emit(100)
 
-        if Manager.need_gui_reload:
-            gui_signals_app.reload_menu.emit()
-            gui_signals_app.reload_thumbnails.emit()
-            Manager.need_gui_reload = False
+        gui_signals_app.reload_menu.emit()
+        gui_signals_app.reload_thumbnails.emit()
 
         Manager.flag = True
 
@@ -488,6 +471,7 @@ class Scaner(ScanerBaseClass):
         except Exception:
             Manager.curr_percent = 0
             gui_signals_app.scan_progress_value.emit(100)
+            utils_signals_app.scaner_err.emit()
             print(traceback.format_exc())
 
 

@@ -20,11 +20,13 @@ class ScanerShedule(QObject):
 
         utils_signals_app.scaner_start.connect(self.check_thread)
         utils_signals_app.scaner_stop.connect(self.stop_scaner_thread)
+        utils_signals_app.scaner_err.connect(self.check_thread)
 
         self.scaner_thread = False
 
     def check_thread(self):
         if not self.scaner_thread or not self.scaner_thread.isRunning():
+            print("wait prev scan finished")
             self.thread_wait_timer.stop()
             self.start_sheduled()
 
