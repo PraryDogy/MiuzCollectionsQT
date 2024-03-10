@@ -295,6 +295,7 @@ class SummaryScan:
 
     def insert_db(self):
         gui_signals_app.progress_add_photos.emit()
+        print("insert")
         limit: int = 10
         data: dict = self.images["insert"]
         data_keys: list = list(data.keys())
@@ -405,6 +406,7 @@ class SummaryScan:
 
     def delete_db(self):
         gui_signals_app.progress_del_photos.emit()
+        print("delete")
 
         queries = List[Query]
         queries = [
@@ -413,21 +415,24 @@ class SummaryScan:
             if Manager.flag
             ]
 
-        limit = 20
-        sublists = [
+        limit: int = 200
+        chunks: List[List]
+        chunks = [
             queries[i:i+limit]
             for i in range(0, len(queries), limit)
             if Manager.flag
             ]
 
-        for sublist in sublists:
+        for chunk in chunks:
+            chunk: List[Query]
+
             if not Manager.flag:
                 return
 
             try:
                 session = Dbase.get_session()
 
-                for query in  queries:
+                for query in chunk:
                     session.execute(query)
 
                 session.commit()
