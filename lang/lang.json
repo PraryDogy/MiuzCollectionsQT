@@ -16,8 +16,8 @@
         "Browse"
     ],
     "browse_coll_first": [
-        "Укажите расположение коллекций\\nили оставьте по умолчанию.",
-        "Specify the location of collections\\nor leave it as default."
+        "Укажите расположение коллекций\nили оставьте по умолчанию.",
+        "Specify the location of collections\nor leave it as default."
     ],
     "browse_colls_descr": [
         "Расположение коллекций",
@@ -28,8 +28,8 @@
         "Cancel"
     ],
     "choose_user_first": [
-        "Выберите тип пользователя.\\nСтандарт: подходит для просмотра.\\nДизайнер: возможность работы со слоями",
-        "Choose user type.\\nStandard: suitable for viewing.\\nDesigner: ability to work with layers."
+        "Выберите тип пользователя.\nСтандарт: подходит для просмотра.\nДизайнер: возможность работы со слоями",
+        "Choose user type.\nStandard: suitable for viewing.\nDesigner: ability to work with layers."
     ],
     "close": [
         "Закрыть",
