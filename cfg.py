@@ -11,15 +11,17 @@ class User:
     def __init__(self) -> None:
         super().__init__()
 
-        self.key: dict = {"db_ver": 1.0, "load": True}
+        self.key: dict = {
+            "db_ver": 1.0,
+            "load": True
+            }
 
         self.coll_folder: str = os.path.join(
             "Volumes",
             "Shares",
-            "Marketing",
-            "Photo",
-            "_Collections"
+            "Collections"
             )
+        
         
         self.down_folder: str = os.path.join(
             os.path.expanduser("~"),
