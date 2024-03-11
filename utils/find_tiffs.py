@@ -44,10 +44,19 @@ class FindTiffLocal:
         super().__init__()
         self.src = src
         self.tiff_list = cnf.tiff_images
+        self.count = 0
 
     def run_search(self):
-        tiff_list = self.find_tiffs()
-        self.final_tiff = TiffUtils.nearest_len(self.src, tiff_list)
+        try:
+            tiff_list = self.find_tiffs()
+            self.final_tiff = TiffUtils.nearest_len(self.src, tiff_list)
+            self.count = 0
+        except RuntimeError:
+            self.count += 1
+            if self.count != 10:
+                self.run_search()
+            else:
+                self.count == 0
 
     def find_tiffs(self) -> list:
         _, src_filename = os.path.split(self.src)

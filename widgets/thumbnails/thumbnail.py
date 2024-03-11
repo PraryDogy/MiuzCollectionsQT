@@ -76,7 +76,7 @@ class Thumbnail(QLabel, QObject):
 
     def finalize_move(self):
 
-        if not any((cnf.move_jpg, cnf.move_layers)):
+        if len(self.urls) == 0:
             return
 
         self.mime_data.setUrls(self.urls)
