@@ -22,7 +22,8 @@ if os.path.exists("lib"):
         "lib",
         f"python{py_ver}",
         "PyQt5",
-        "plugins"
+        "Qt5",
+        "plugins",
         )
 
     log = os.path.join(
@@ -35,7 +36,7 @@ if os.path.exists("lib"):
     sys.excepthook = log_unhandled_exception
 
     print("logging enabled")
-    print("plugin path enabled")
+    print(f"plugin path enabled {plugin_path}")
 
 try:
     from app import app
