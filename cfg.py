@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 from datetime import datetime
-from typing import Literal, Type, Union
+from typing import Literal, Type, Union, Dict
 
 from lang import Eng, Rus
 
@@ -12,11 +12,12 @@ class User:
         super().__init__()
 
         self.key: dict = {
-            "db_ver": 1.0,
+            "db_ver": 1.1,
             "load": True
             }
 
         self.coll_folder: str = os.path.join(
+            os.sep,
             "Volumes",
             "Shares",
             "Collections"
@@ -132,20 +133,24 @@ class Config(User, Dymanic, Static, AppInfo):
             data: dict = json.load(file)
         
         if "key" not in data:
-            data["key"] = self.key
             shutil.copyfile(src="db.db", dst=self.db_file)
-            data["key"]["db_ver"] = self.key["db_ver"]
+            self.write_json_cfg()
+            self.set_language(self.user_lng)
+            return
 
         if "key" in data:
             if data["key"].keys() != self.key.keys():
-                data["key"] = self.key
                 shutil.copyfile(src="db.db", dst=self.db_file)
-                data["key"]["db_ver"] = self.key["db_ver"]     
+                self.write_json_cfg()
+                self.set_language(self.user_lng)
+                return
 
         if data["key"]["db_ver"] != self.key["db_ver"]:
             print("New DB. Copying database")
             shutil.copyfile(src="db.db", dst=self.db_file)
-            data["key"]["db_ver"] = self.key["db_ver"]
+            self.write_json_cfg()
+            self.set_language(self.user_lng)
+            return
 
         for k, v in data.items():
             if hasattr(self, k):
