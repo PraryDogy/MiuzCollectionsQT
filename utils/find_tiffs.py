@@ -29,7 +29,7 @@ class TiffUtils:
         return name
 
     @staticmethod
-    def nearest_len(src: str, tiff_list: list):
+    def nearest_len(src: str, tiff_list: list) -> str | None:
         len_src = len(src)
         len_tiffs = {abs(len(i) - len_src) : i for i in tiff_list}
 
@@ -57,6 +57,7 @@ class FindTiffLocal:
                 self.run_search()
             else:
                 self.count == 0
+                self.final_tiff = None
 
     def find_tiffs(self) -> list:
         _, src_filename = os.path.split(self.src)
