@@ -10,12 +10,6 @@ from lang import Eng, Rus
 class User:
     def __init__(self) -> None:
         super().__init__()
-
-        self.key: dict = {
-            "db_ver": 1.1,
-            "load": True
-            }
-
         self.coll_folder: str = os.path.join(
             os.sep,
             "Volumes",
@@ -131,7 +125,16 @@ class Config(User, Dymanic, Static, AppInfo):
     def read_json_cfg(self):
         with open(self.json_file, "r", encoding="utf8") as file:
             data: dict = json.load(file)
-        
+
+        key: dict = {
+            "db_ver": 1.1,
+            "load": True
+            }
+
+        const_settings = []
+        # в будущем мы будем записывать переменные, которые не нужно копировать
+        # при обновлении программы
+
         if "key" not in data:
             shutil.copyfile(src="db.db", dst=self.db_file)
             self.write_json_cfg()
@@ -139,13 +142,13 @@ class Config(User, Dymanic, Static, AppInfo):
             return
 
         if "key" in data:
-            if data["key"].keys() != self.key.keys():
+            if data["key"].keys() != key.keys():
                 shutil.copyfile(src="db.db", dst=self.db_file)
                 self.write_json_cfg()
                 self.set_language(self.user_lng)
                 return
 
-        if data["key"]["db_ver"] != self.key["db_ver"]:
+        if data["key"]["db_ver"] != key["db_ver"]:
             print("New DB. Copying database")
             shutil.copyfile(src="db.db", dst=self.db_file)
             self.write_json_cfg()
