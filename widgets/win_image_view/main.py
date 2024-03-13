@@ -31,6 +31,7 @@ class ImageWinUtils:
                 widget.delete_win.emit()
                 widget.deleteLater()
 
+
 IMAGES = {}
 
 
@@ -55,6 +56,9 @@ class ImageLoaderThread(QThread):
                 q_image = IMAGES[self.image_path]
 
             pixmap = QPixmap.fromImage(q_image)
+
+            if len(IMAGES) > 50:
+                IMAGES.pop(next(iter(IMAGES)))
 
         except Exception as e:
             print("image viewer cant open image with PIL")
