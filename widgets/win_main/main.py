@@ -73,12 +73,7 @@ class WinMain(BaseEmptyWin):
         self.setMenuBar(menubar)
 
         search_bar = SearchBar()
-        self.titlebar.title.setStyleSheet(
-            f"""
-            padding-left: {search_bar.width()}px;
-            """)
-        self.titlebar.main_layout.addWidget(search_bar)
-        self.titlebar.main_layout.addSpacerItem(QSpacerItem(5, 0))
+        self.titlebar.add_r_wid(search_bar)
 
         self.set_title(self.check_coll())
         gui_signals_app.reload_title.connect(self.reload_title)

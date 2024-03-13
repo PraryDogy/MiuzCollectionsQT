@@ -91,6 +91,14 @@ class CustomTitleBar(QFrame):
         self.my_win.move(self.my_win.x() + delta.x(), self.my_win.y() + delta.y())
         self.oldPos = event.globalPos()
 
+    def add_r_wid(self, wid: QWidget):
+        self.main_layout.addWidget(wid)
+
+        self.title.setStyleSheet(
+            f"""
+            padding-left: {wid.width()}px;
+            """)
+
 
 class BaseEmptyWin(QMainWindow):
     was_closed = pyqtSignal()
@@ -236,21 +244,25 @@ class WinImgViewBase(WinAutoRemove):
 
         self.titlebar.setFixedHeight(28)
 
+        # zoom widget top right corner
+
+        zoom_wid = QWidget()
+        self.titlebar.main_layout.addWidget(zoom_wid)
         zoom_layout = LayoutH()
-        zoom_layout.setSpacing(30)
-        self.titlebar.main_layout.addLayout(zoom_layout)
+        zoom_wid.setLayout(zoom_layout)
+        zoom_wid.setFixedWidth(100)
+
 
         self.zoom_fit = SvgBtn("zoom_fit.svg", 20)
         self.zoom_out = SvgBtn("zoom_out.svg", 20)
         self.zoom_in = SvgBtn("zoom_in.svg", 20)
-        fake = QWidget()
-        fake.setFixedWidth(0)
-        fake.setStyleSheet("background-color: transparent;")
-
         zoom_layout.addWidget(self.zoom_in)
         zoom_layout.addWidget(self.zoom_out)
         zoom_layout.addWidget(self.zoom_fit)
-        zoom_layout.addWidget(fake)
+
+        self.titlebar.add_r_wid(zoom_wid)
+
+        # end zoom
 
         self.content_wid = BaseBottomWid(left=10, top=0, right=10, bottom=0)
         self.base_layout.addWidget(self.content_wid)
