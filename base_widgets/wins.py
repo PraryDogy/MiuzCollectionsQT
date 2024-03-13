@@ -236,21 +236,21 @@ class WinImgViewBase(WinAutoRemove):
 
         self.titlebar.setFixedHeight(28)
 
-        self.zoom_layout = LayoutH()
-        self.zoom_layout.setSpacing(30)
-        self.titlebar.main_layout.addLayout(self.zoom_layout)
+        zoom_layout = LayoutH()
+        zoom_layout.setSpacing(30)
+        self.titlebar.main_layout.addLayout(zoom_layout)
 
-        zoom_fit = SvgBtn("zoom_fit.svg", 20)
-        zoom_out = SvgBtn("zoom_out.svg", 20)
-        zoom_in = SvgBtn("zoom_in.svg", 20)
+        self.zoom_fit = SvgBtn("zoom_fit.svg", 20)
+        self.zoom_out = SvgBtn("zoom_out.svg", 20)
+        self.zoom_in = SvgBtn("zoom_in.svg", 20)
         fake = QWidget()
         fake.setFixedWidth(10)
         fake.setStyleSheet("background-color: transparent;")
 
-        self.zoom_layout.addWidget(zoom_in)
-        self.zoom_layout.addWidget(zoom_out)
-        self.zoom_layout.addWidget(zoom_fit)
-        self.zoom_layout.addWidget(fake)
+        zoom_layout.addWidget(self.zoom_in)
+        zoom_layout.addWidget(self.zoom_out)
+        zoom_layout.addWidget(self.zoom_fit)
+        zoom_layout.addWidget(fake)
 
         self.content_wid = BaseBottomWid(left=10, top=0, right=10, bottom=0)
         self.base_layout.addWidget(self.content_wid)
@@ -260,6 +260,11 @@ class WinImgViewBase(WinAutoRemove):
 
     def bind_content_wid(self, func: callable):
         self.content_wid.mouseReleaseEvent = func
+
+    def bind_zoom(self, zoom_in: callable, zoom_out: callable, zoom_fit: callable):
+        self.zoom_in.mouseReleaseEvent = zoom_in
+        self.zoom_out.mouseReleaseEvent = zoom_out
+        self.zoom_fit.mouseReleaseEvent = zoom_fit
 
 
 class WinSmallBase(WinAutoRemove):
