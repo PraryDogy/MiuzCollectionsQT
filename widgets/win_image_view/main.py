@@ -137,11 +137,11 @@ class ImageViewerBase(WinImgViewBase):
         cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
 
     def my_close(self, event):
-        if event.spontaneous():
-            self.update_geometry()
-            self.delete_win.emit()
-            self.deleteLater()
-            event.ignore()
+        # if event.spontaneous():
+        self.update_geometry()
+        self.delete_win.emit()
+        self.deleteLater()
+        event.ignore()
 
 
 class WinImageView(ImageViewerBase):
