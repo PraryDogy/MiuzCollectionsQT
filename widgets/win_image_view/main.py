@@ -124,11 +124,13 @@ class WinImageView(ImageViewerBase):
     def load_image(self):
         self.my_set_title(loading=True)
         self.fullimg_timer.stop()
-        q = (sqlalchemy.select(ThumbsMd.img150)
-             .filter(ThumbsMd.src == self.image_path))
 
         if self.image_path not in IMAGES:
+
+            q = (sqlalchemy.select(ThumbsMd.img150)
+                .filter(ThumbsMd.src == self.image_path))
             session = Dbase.get_session()
+
             try:
                 res = session.execute(q).first()[0]
 
@@ -152,7 +154,7 @@ class WinImageView(ImageViewerBase):
         self.fullimg_timer.start()
 
     def load_fullsize_image(self):
-        ww, hh = self.image_label.width(), self.image_label.height()
+        ww, hh = self.width(), self.height()
         self.fullsize_thread = ImageLoaderThread(self.image_path, ww, hh)
         self.fullsize_thread.image_loaded.connect(self.set_fullsize_image)
         self.fullsize_thread.start()
