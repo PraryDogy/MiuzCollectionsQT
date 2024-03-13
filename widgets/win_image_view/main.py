@@ -90,14 +90,31 @@ class ImageWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.current_pixmap = None
+        self.scale_factor = 1.0
 
     def paintEvent(self, event):
         painter = QPainter(self)
         icon = QIcon(self.current_pixmap)
-        icon.paint(painter, 0, 0, self.width(), self.height(), Qt.AlignmentFlag.AlignCenter)
+
+        ww = int(self.width() * self.scale_factor)
+        hh = int(self.height() * self.scale_factor)
+        x = int((self.width() - ww) / 2)
+        y = int((self.height() - hh) / 2)
+
+        icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
 
     def update_image(self, pixmap):
         self.current_pixmap = pixmap
+        self.update()
+
+        self.scale_factor = 1.0
+
+    def zoom_in(self):
+        self.scale_factor *= 1.1
+        self.update()
+
+    def zoom_out(self):
+        self.scale_factor /= 1.1
         self.update()
 
 
@@ -204,12 +221,21 @@ class WinImageView(ImageViewerBase):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Left:
             self.switch_image(-1)
+
         elif event.key() == Qt.Key_Right:
             self.switch_image(1)
+
         elif event.key() == Qt.Key_Escape:
             self.update_geometry()
             self.delete_win.emit()
             self.deleteLater()
+
+        elif event.key() == Qt.Key_Equal:
+            self.image_label.zoom_in()
+
+        elif event.key() == Qt.Key_Minus:
+            self.image_label.zoom_out()
+
         super().keyPressEvent(event)
 
     def contextMenuEvent(self, event):
