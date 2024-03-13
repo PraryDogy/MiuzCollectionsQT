@@ -157,6 +157,11 @@ class WinImageView(ImageViewerBase):
 
         self.image_label = ImageWidget()
         self.content_layout.addWidget(self.image_label)
+        self.bind_zoom(
+            zoom_fit=lambda e: self.image_label.zoom_reset(),
+            zoom_out=lambda e: self.image_label.zoom_out(),
+            zoom_in=lambda e: self.image_label.zoom_in()
+            )
 
         self.fullimg_timer = QTimer(self)
         self.fullimg_timer.setInterval(50)
