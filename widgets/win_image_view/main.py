@@ -31,6 +31,8 @@ class ImageWinUtils:
                 widget.delete_win.emit()
                 widget.deleteLater()
 
+IMAGES = {}
+
 
 class ImageLoaderThread(QThread):
     image_loaded = pyqtSignal(dict)
@@ -42,11 +44,16 @@ class ImageLoaderThread(QThread):
 
     def run(self):
         try:
-            img = ReadDesatImage(self.image_path)
-            img = img.get_rgb_image()
+            if self.image_path not in IMAGES:
+                img = ReadDesatImage(self.image_path)
+                img = img.get_rgb_image()
 
-            q_image = QImage(img.data, img.shape[1], img.shape[0],
-                            img.shape[1] * 3, QImage.Format_RGB888)
+                q_image = QImage(img.data, img.shape[1], img.shape[0],
+                                img.shape[1] * 3, QImage.Format_RGB888)
+                IMAGES[self.image_path] = q_image
+            else:
+                q_image = IMAGES[self.image_path]
+
             pixmap = QPixmap.fromImage(q_image)
 
         except Exception as e:
@@ -120,26 +127,27 @@ class WinImageView(ImageViewerBase):
         q = (sqlalchemy.select(ThumbsMd.img150)
              .filter(ThumbsMd.src == self.image_path))
 
-        session = Dbase.get_session()
-        try:
-            res = session.execute(q).first()[0]
+        if self.image_path not in IMAGES:
+            session = Dbase.get_session()
+            try:
+                res = session.execute(q).first()[0]
 
-        except Exception as e:
-            print(e)
-            self.update_geometry()
-            self.delete_win.emit()
-            self.deleteLater()
-            return
+            except Exception as e:
+                print(e)
+                self.update_geometry()
+                self.delete_win.emit()
+                self.deleteLater()
+                return
 
-        finally:
-            session.close()    
+            finally:
+                session.close()    
 
-        pixmap = QPixmap()
-        pixmap.loadFromData(res)
+            pixmap = QPixmap()
+            pixmap.loadFromData(res)
 
-        ww, hh = self.width(), self.height()
-        pixmap = pixmap.scaled(ww, hh, Qt.KeepAspectRatio)
-        self.image_label.update_image(pixmap)
+            ww, hh = self.width(), self.height()
+            pixmap = pixmap.scaled(ww, hh, Qt.KeepAspectRatio)
+            self.image_label.update_image(pixmap)
 
         self.fullimg_timer.start()
 
