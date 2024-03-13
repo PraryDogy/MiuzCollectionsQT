@@ -86,7 +86,7 @@ class ImageWidget(QWidget):
 
         icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
 
-    def update_image(self, pixmap):
+    def set_image(self, pixmap):
         self.current_pixmap = pixmap
         self.offset = QPoint(0, 0)  # Сброс смещения
         self.update()
@@ -95,27 +95,35 @@ class ImageWidget(QWidget):
     def zoom_in(self):
         self.scale_factor *= 1.1
         self.update()
+        self.setCursor(Qt.OpenHandCursor) 
 
     def zoom_out(self):
         self.scale_factor /= 1.1
         self.update()
+        self.setCursor(Qt.OpenHandCursor)
 
     def zoom_reset(self):
         self.scale_factor = 1.0
         self.offset = QPoint(0, 0)  # Сброс смещения
         self.update()
+        self.setCursor(Qt.ArrowCursor) 
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.last_mouse_pos = event.pos()
 
     def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.LeftButton:
+        if event.buttons() == Qt.LeftButton and self.scale_factor > 1.0:
             delta = event.pos() - self.last_mouse_pos
             self.offset += delta
             self.last_mouse_pos = event.pos()
             self.update()
+            self.setCursor(Qt.ClosedHandCursor)
 
+    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+        if self.scale_factor > 1.0:
+            self.setCursor(Qt.OpenHandCursor)
+        return super().mouseReleaseEvent(a0)
 
 class ImageViewerBase(WinImgViewBase):
     def __init__(self):
@@ -187,7 +195,7 @@ class WinImageView(ImageViewerBase):
 
             ww, hh = self.width(), self.height()
             pixmap = pixmap.scaled(ww, hh, Qt.KeepAspectRatio)
-            self.image_label.update_image(pixmap)
+            self.image_label.set_image(pixmap)
 
         self.fullimg_timer.start()
 
@@ -201,7 +209,7 @@ class WinImageView(ImageViewerBase):
         if data["image"].size().width() == 0 or data["src"] != self.image_path:
             return
         
-        self.image_label.update_image(data["image"])
+        self.image_label.set_image(data["image"])
         self.my_set_title()
 
     def switch_image(self, offset):
