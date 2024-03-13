@@ -246,9 +246,7 @@ class WinImageView(ImageViewerBase):
             self.switch_image(1)
 
         elif event.key() == Qt.Key_Escape:
-            self.update_geometry()
-            self.delete_win.emit()
-            self.deleteLater()
+            self.my_close(event)
 
         elif event.modifiers() & Qt.ControlModifier and event.key() == Qt.Key_Equal:
             self.image_label.zoom_in()
