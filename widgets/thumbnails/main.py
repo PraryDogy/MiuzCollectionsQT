@@ -30,6 +30,7 @@ class Thumbnails(QScrollArea):
                 border: 0px;
                 border-radius: 0px;
             }}
+            {Styles.get_scroll_style(Styles.btn_base_color)}
             """)
 
         # if MainUtils.get_mac_ver() <= 10.15:
@@ -72,7 +73,7 @@ class Thumbnails(QScrollArea):
 
     def checkScrollValue(self, value):
         self.up_btn.move(
-            self.width() - 65,
+            self.width() - 60,
             self.height() - 60 + value
             )
         self.up_btn.setVisible(value > 0)

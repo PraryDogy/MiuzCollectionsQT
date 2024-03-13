@@ -20,8 +20,8 @@ class BaseLeftMenu(QScrollArea):
         self.setStyleSheet(
             f"""
             QScrollArea {{
-                border: 0px;
-            }}
+                border: 0px;}}
+            {Styles.get_scroll_style(Styles.menu_sel_item_color)}
             """)
 
         # if MainUtils.get_mac_ver() <= 10.15:

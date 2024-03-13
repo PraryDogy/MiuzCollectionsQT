@@ -42,3 +42,21 @@ class Styles:
 
     # info win
     info_bg_color = "#1e1e1e"
+
+    @staticmethod
+    def get_scroll_style(color: str):
+        return f"""
+                QScrollBar:vertical {{
+                    background-color: transparent;
+                    width: 10px;
+                    padding-right:2px;}}
+                QScrollBar::handle:vertical {{
+                    background-color: {color};
+                    border-radius: 4px;}}
+                QScrollBar::add-line:vertical {{
+                    height: 0px;}}
+                QScrollBar::sub-line:vertical {{
+                    height: 0px;}}
+                QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+                    height: 0px;}}
+                """
