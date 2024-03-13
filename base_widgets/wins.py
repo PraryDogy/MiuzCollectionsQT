@@ -247,11 +247,9 @@ class WinImgViewBase(WinAutoRemove):
         # zoom widget top right corner
 
         zoom_wid = QWidget()
-        self.titlebar.main_layout.addWidget(zoom_wid)
+        zoom_wid.setFixedWidth(100)
         zoom_layout = LayoutH()
         zoom_wid.setLayout(zoom_layout)
-        zoom_wid.setFixedWidth(100)
-
 
         self.zoom_fit = SvgBtn("zoom_fit.svg", 20)
         self.zoom_out = SvgBtn("zoom_out.svg", 20)
