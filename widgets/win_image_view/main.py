@@ -118,7 +118,7 @@ class ImageWidget(QWidget):
         self.update()
 
     def zoom_reset(self):
-        self.scale_factor /= 1.0
+        self.scale_factor = 1.0
         self.update()
 
 class WinImageView(ImageViewerBase):
