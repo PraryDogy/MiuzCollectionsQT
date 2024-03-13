@@ -73,8 +73,3 @@ if __name__ == "__main__":
             shutil.rmtree("dist")
         except FileNotFoundError:
             pass
-
-
-
-
-# python3 -m pip install opencv-python==4.6.0.66 --verbose
