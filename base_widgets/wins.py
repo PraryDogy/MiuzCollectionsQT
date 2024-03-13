@@ -244,7 +244,7 @@ class WinImgViewBase(WinAutoRemove):
         self.zoom_out = SvgBtn("zoom_out.svg", 20)
         self.zoom_in = SvgBtn("zoom_in.svg", 20)
         fake = QWidget()
-        fake.setFixedWidth(10)
+        fake.setFixedWidth(0)
         fake.setStyleSheet("background-color: transparent;")
 
         zoom_layout.addWidget(self.zoom_in)
