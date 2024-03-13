@@ -32,8 +32,8 @@ class Thumbnails(QScrollArea):
             }}
             """)
 
-        if MainUtils.get_mac_ver() <= 10.15:
-            self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # if MainUtils.get_mac_ver() <= 10.15:
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         # Создаем фрейм для виджетов в области скролла
