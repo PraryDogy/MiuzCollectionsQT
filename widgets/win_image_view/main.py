@@ -117,6 +117,9 @@ class ImageWidget(QWidget):
         self.scale_factor /= 1.1
         self.update()
 
+    def zoom_reset(self):
+        self.scale_factor /= 1.0
+        self.update()
 
 class WinImageView(ImageViewerBase):
     def __init__(self, image_path):
@@ -230,11 +233,14 @@ class WinImageView(ImageViewerBase):
             self.delete_win.emit()
             self.deleteLater()
 
-        elif event.key() == Qt.Key_Equal:
+        elif event.modifiers() & Qt.ControlModifier and event.key() == Qt.Key_Equal:
             self.image_label.zoom_in()
 
-        elif event.key() == Qt.Key_Minus:
+        elif event.modifiers() & Qt.ControlModifier and  event.key() == Qt.Key_Minus:
             self.image_label.zoom_out()
+
+        elif event.modifiers() & Qt.ControlModifier and  event.key() == Qt.Key_0:
+            self.image_label.zoom_reset()
 
         super().keyPressEvent(event)
 
