@@ -25,8 +25,8 @@ class BaseLeftMenu(QScrollArea):
             """)
 
         if MainUtils.get_mac_ver() <= 10.15:
-            self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.scroll_widget = QWidget()
         self.scroll_widget.setStyleSheet(
