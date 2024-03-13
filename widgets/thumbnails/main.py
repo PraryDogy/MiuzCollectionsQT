@@ -44,10 +44,6 @@ class Thumbnails(QScrollArea):
             background-color: {Styles.thumbs_bg_color}
             """)
 
-        self.up_btn = UpBtn(self.scroll_area_widget)
-        self.up_btn.setVisible(False)
-        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
-
         # Основной лейаут фрейма в области скролла
         frame_layout = LayoutV(self.scroll_area_widget)
 
@@ -83,6 +79,10 @@ class Thumbnails(QScrollArea):
         self.verticalScrollBar().setValue(0)
 
     def init_ui(self):
+        self.up_btn = UpBtn(self.scroll_area_widget)
+        self.up_btn.setVisible(False)
+        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
+
         thumbs_dict = ThumbsDict()
         cnf.images.clear()
 
@@ -108,10 +108,9 @@ class Thumbnails(QScrollArea):
         if self.first_load:
             self.first_load = False
         else:
-            self.scroll_area_widget.hide()
             MainUtils.clear_layout(self.thumbnails_layout)
+            self.up_btn.deleteLater()
             self.init_ui()
-            self.scroll_area_widget.show()
 
     def create_one_grid(self, month, images_data):
         title_label = Title(month, [i[-1] for i in images_data], self.width())
