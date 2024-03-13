@@ -68,30 +68,12 @@ class ImageLoaderThread(QThread):
         self.image_loaded.emit({"image": pixmap, "src": self.image_path})
 
 
-class ImageViewerBase(WinImgViewBase):
-    def __init__(self):
-        ImageWinUtils.close_same_win()
-        super().__init__(close_func=self.my_close)
-        self.disable_min_max()
-        self.setMinimumSize(QSize(500, 400))
-
-    def update_geometry(self):
-        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
-
-    def my_close(self, event):
-        if event.spontaneous():
-            self.update_geometry()
-            self.delete_win.emit()
-            self.deleteLater()
-            event.ignore()
-
-
 class ImageWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.current_pixmap = None
         self.scale_factor = 1.0
-        self.offset = QPoint(0, 0)  # Добавлено для отслеживания смещения изображения
+        self.offset = QPoint(0, 0)
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -133,6 +115,25 @@ class ImageWidget(QWidget):
             self.offset += delta
             self.last_mouse_pos = event.pos()
             self.update()
+
+
+class ImageViewerBase(WinImgViewBase):
+    def __init__(self):
+        ImageWinUtils.close_same_win()
+        super().__init__(close_func=self.my_close)
+        self.disable_min_max()
+        self.setMinimumSize(QSize(500, 400))
+
+    def update_geometry(self):
+        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
+
+    def my_close(self, event):
+        if event.spontaneous():
+            self.update_geometry()
+            self.delete_win.emit()
+            self.deleteLater()
+            event.ignore()
+
 
 class WinImageView(ImageViewerBase):
     def __init__(self, image_path):
@@ -226,8 +227,7 @@ class WinImageView(ImageViewerBase):
         self.set_title(f"{coll[:50]} - {name[:50]}")
 
     def mouse_click(self, event: QMouseEvent | None) -> None:
-        return
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and self.image_label.scale_factor == 1.0:
             move_left = event.x() < self.width() / 2
             offset = -1 if move_left else 1
             self.switch_image(offset)
