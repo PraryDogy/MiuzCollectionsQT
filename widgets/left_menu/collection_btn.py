@@ -101,7 +101,8 @@ class CollectionBtn(QLabel):
         self.true_name = true_name
         self.fake_name = fake_name
 
-        self.setFixedSize(Styles.menu_w - 20, 28)
+        btn_w = Styles.menu_w - 20 - 10
+        self.setFixedSize(btn_w, 28)
 
         self.setStyleSheet(
             f"""
