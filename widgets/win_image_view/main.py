@@ -1,7 +1,7 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QSize, Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, QThread, QTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
                          QPixmap)
 from PyQt5.QtWidgets import QWidget
@@ -91,6 +91,7 @@ class ImageWidget(QWidget):
         super().__init__()
         self.current_pixmap = None
         self.scale_factor = 1.0
+        self.offset = QPoint(0, 0)  # Добавлено для отслеживания смещения изображения
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -98,15 +99,15 @@ class ImageWidget(QWidget):
 
         ww = int(self.width() * self.scale_factor)
         hh = int(self.height() * self.scale_factor)
-        x = int((self.width() - ww) / 2)
-        y = int((self.height() - hh) / 2)
+        x = int((self.width() - ww) / 2) + self.offset.x()  # Учтено смещение
+        y = int((self.height() - hh) / 2) + self.offset.y()  # Учтено смещение
 
         icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
 
     def update_image(self, pixmap):
         self.current_pixmap = pixmap
+        self.offset = QPoint(0, 0)  # Сброс смещения
         self.update()
-
         self.scale_factor = 1.0
 
     def zoom_in(self):
@@ -119,7 +120,19 @@ class ImageWidget(QWidget):
 
     def zoom_reset(self):
         self.scale_factor = 1.0
+        self.offset = QPoint(0, 0)  # Сброс смещения
         self.update()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.last_mouse_pos = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            delta = event.pos() - self.last_mouse_pos
+            self.offset += delta
+            self.last_mouse_pos = event.pos()
+            self.update()
 
 class WinImageView(ImageViewerBase):
     def __init__(self, image_path):
@@ -213,6 +226,7 @@ class WinImageView(ImageViewerBase):
         self.set_title(f"{coll[:50]} - {name[:50]}")
 
     def mouse_click(self, event: QMouseEvent | None) -> None:
+        return
         if event.button() == Qt.LeftButton:
             move_left = event.x() < self.width() / 2
             offset = -1 if move_left else 1
