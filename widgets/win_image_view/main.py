@@ -81,8 +81,8 @@ class ImageWidget(QWidget):
 
         ww = int(self.width() * self.scale_factor)
         hh = int(self.height() * self.scale_factor)
-        x = int((self.width() - ww) / 2) + self.offset.x()  # Учтено смещение
-        y = int((self.height() - hh) / 2) + self.offset.y()  # Учтено смещение
+        x = int((self.width() - ww) / 2) + self.offset.x()
+        y = int((self.height() - hh) / 2) + self.offset.y()
 
         icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
 
@@ -125,6 +125,7 @@ class ImageWidget(QWidget):
             self.setCursor(Qt.OpenHandCursor)
         return super().mouseReleaseEvent(a0)
 
+
 class ImageViewerBase(WinImgViewBase):
     def __init__(self):
         ImageWinUtils.close_same_win()
@@ -163,20 +164,16 @@ class WinImageView(ImageViewerBase):
             zoom_in=lambda e: self.image_label.zoom_in()
             )
 
-        self.fullimg_timer = QTimer(self)
-        self.fullimg_timer.setInterval(50)
-        self.fullimg_timer.setSingleShot(True)
-        self.fullimg_timer.timeout.connect(self.load_fullsize_image)
-
         self.setFocus()
         self.center_win()
         self.load_image()
 
+
     def load_image(self):
-        self.my_set_title(loading=True)
-        self.fullimg_timer.stop()
+        ww, hh = self.width(), self.height()
 
         if self.image_path not in IMAGES:
+            self.my_set_title(loading=True)
 
             q = (sqlalchemy.select(ThumbsMd.img150)
                 .filter(ThumbsMd.src == self.image_path))
@@ -198,14 +195,9 @@ class WinImageView(ImageViewerBase):
             pixmap = QPixmap()
             pixmap.loadFromData(res)
 
-            ww, hh = self.width(), self.height()
             pixmap = pixmap.scaled(ww, hh, Qt.KeepAspectRatio)
             self.image_label.set_image(pixmap)
 
-        self.fullimg_timer.start()
-
-    def load_fullsize_image(self):
-        ww, hh = self.width(), self.height()
         self.fullsize_thread = ImageLoaderThread(self.image_path, ww, hh)
         self.fullsize_thread.image_loaded.connect(self.set_fullsize_image)
         self.fullsize_thread.start()
@@ -244,8 +236,6 @@ class WinImageView(ImageViewerBase):
             move_left = event.x() < self.width() / 2
             offset = -1 if move_left else 1
             self.switch_image(offset)
-            self.my_set_title()
-            self.load_image()
             self.setFocus()
 
     def keyPressEvent(self, event):
