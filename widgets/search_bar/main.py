@@ -7,7 +7,7 @@ from base_widgets import InputBase, LayoutH
 from signals import gui_signals_app
 
 
-class SearchBar(InputBase):
+class SearchBarBase(InputBase):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(150)
@@ -48,3 +48,17 @@ class SearchBar(InputBase):
 
     def reload_search(self):
         self.setPlaceholderText(cnf.lng.search)
+
+
+class SearchBar(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        h_layout = LayoutH()
+        self.setLayout(h_layout)
+
+        search = SearchBarBase()
+        h_layout.addWidget(search)
+        h_layout.addSpacerItem(QSpacerItem(5, 0))
+
+        self.setFixedWidth(search.width() + 5)
