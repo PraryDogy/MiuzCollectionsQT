@@ -33,8 +33,6 @@ class Thumbnails(QScrollArea):
             {Styles.get_scroll_style(Styles.btn_base_color)}
             """)
 
-        # if MainUtils.get_mac_ver() <= 10.15:
-        # self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         # Создаем фрейм для виджетов в области скролла
@@ -80,7 +78,6 @@ class Thumbnails(QScrollArea):
 
     def init_ui(self):
         self.up_btn = UpBtn(self.scroll_area_widget)
-        self.up_btn.setVisible(False)
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         thumbs_dict = ThumbsDict()
@@ -101,8 +98,6 @@ class Thumbnails(QScrollArea):
             h_layout.setContentsMargins(0, 0, 0, 10)
             self.thumbnails_layout.addLayout(h_layout)
             h_layout.addWidget(LimitBtn())
-
-        self.up_btn.raise_()
 
     def reload_thumbnails(self):
         if self.first_load:
@@ -144,3 +139,4 @@ class Thumbnails(QScrollArea):
     def resizeEvent(self, e: QEvent):
         self.resize_timer.stop()
         self.resize_timer.start()
+        self.up_btn.setVisible(False)
