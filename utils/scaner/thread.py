@@ -295,7 +295,6 @@ class SummaryScan:
 
     def insert_db(self):
         gui_signals_app.progress_add_photos.emit()
-        print("insert")
         limit: int = 10
         data: dict = self.images["insert"]
         data_keys: list = list(data.keys())
