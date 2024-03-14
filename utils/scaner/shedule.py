@@ -19,8 +19,8 @@ class ScanerShedule(QObject):
         self.thread_wait_timer.timeout.connect(self.wait_thread)
 
         self.scan_again_timer = QTimer(self)
-        # self.scan_again_timer.setInterval(60 * 10 * 1000)
-        self.scan_again_timer.setInterval(120 * 1000)
+        self.scan_again_timer.setInterval(60 * 10 * 1000)
+        # self.scan_again_timer.setInterval(120 * 1000)
         self.scan_again_timer.setSingleShot(True)
         self.scan_again_timer.timeout.connect(self.wait_thread)
 
