@@ -10,7 +10,7 @@ from base_widgets import WinImgViewBase
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
-from utils import MainUtils, ReadDesatImage
+from utils import MainUtils, ReadDesatImage, get_image_size
 
 from ..image_context import ImageContext
 
@@ -234,10 +234,14 @@ class WinImageView(ImageViewerBase):
             self.set_title(cnf.lng.loading)
             return
 
+        try:
+            w, h = get_image_size(self.image_path)
+        except Exception:
+            w, h = "?", "?"
         coll = MainUtils.get_coll_name(self.image_path)
         name = os.path.basename(self.image_path)
 
-        self.set_title(f"{coll[:50]} - {name[:50]}")
+        self.set_title(f"{w}x{h} {coll[:50]} - {name[:50]}")
 
     def mouse_click(self, event: QMouseEvent | None) -> None:
         if event.button() == Qt.LeftButton and self.image_label.scale_factor == 1.0:
