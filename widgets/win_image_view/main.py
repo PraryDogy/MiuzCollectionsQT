@@ -215,10 +215,10 @@ class WinImageView(ImageViewerBase):
 
     def run_thread(self):
         self.fullsize_thread = ImageLoaderThread(self.image_path, self.width(), self.height())
-        self.fullsize_thread.image_loaded.connect(self.set_fullsize_image)
+        self.fullsize_thread.image_loaded.connect(self.finalize_thread)
         self.fullsize_thread.start()
 
-    def set_fullsize_image(self, data: dict):
+    def finalize_thread(self, data: dict):
         if data["image"].size().width() == 0 or data["src"] != self.image_path:
             return
         
