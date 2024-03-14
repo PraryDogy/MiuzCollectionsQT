@@ -1,4 +1,4 @@
-src = "/Volumes/Shares/Collections/6 Arabella"
+src = "/Volumes/Shares/Collections/"
 
 
 import time
