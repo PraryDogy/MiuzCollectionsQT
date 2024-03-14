@@ -3,8 +3,6 @@ class Styles:
     small_radius = big_radius - 2
     title_font_size = "18pt"
     blue_color = "#2e59cb"
-    red_color = "#5C2121"
-    yellow_color = "#826C03"
     btn_base_color = "#303030"
 
     base_bg_color = "#1e1e1e"
@@ -54,6 +52,9 @@ class Styles:
                     padding-bottom: 2px;}}
                 QScrollBar::handle:vertical {{
                     background-color: {color};
+                    border-radius: 4px;}}
+                QScrollBar::handle:vertical:hover {{
+                    background-color: {__class__.st_bar_sel};
                     border-radius: 4px;}}
                 QScrollBar::add-line:vertical {{
                     height: 0px;}}
