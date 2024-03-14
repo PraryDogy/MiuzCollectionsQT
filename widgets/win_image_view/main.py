@@ -80,13 +80,7 @@ class ImageWidget(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         px = self.current_pixmap
-
-        # if px.width() < 4000 or px.height() < 4000:
-            # print("yes")
-        px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
-
-        # if px.width() < self.width() and px.height() < self.height():
-            # px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
+        # px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
 
         icon = QIcon(px)
 
@@ -97,6 +91,8 @@ class ImageWidget(QWidget):
         y = int((self.height() - hh) / 2) + self.offset.y()
 
         icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
+
+        print(ww, hh)
 
     def set_image(self, pixmap):
         self.current_pixmap = pixmap
@@ -245,6 +241,12 @@ class WinImageView(ImageViewerBase):
         self.my_set_title()
         self.load_image()
 
+    def cut_text(self, text: str) -> str:
+        limit = 40
+        if len(text) > limit:
+            return text[:limit] + "..."
+        return text
+
     def my_set_title(self, loading=False):
         if loading:
             self.set_title(cnf.lng.loading)
@@ -254,10 +256,10 @@ class WinImageView(ImageViewerBase):
             w, h = get_image_size(self.image_path)
         except Exception:
             w, h = "?", "?"
-        coll = MainUtils.get_coll_name(self.image_path)
-        name = os.path.basename(self.image_path)
+        coll = self.cut_text(MainUtils.get_coll_name(self.image_path))
+        name = self.cut_text(os.path.basename(self.image_path))
 
-        self.set_title(f"{w}x{h} {coll[:50]} - {name[:50]}")
+        self.set_title(f"{w}x{h} - {coll} - {name}")
 
     def mouse_click(self, event: QMouseEvent | None) -> None:
         if event.button() == Qt.LeftButton and self.image_label.scale_factor == 1.0:
