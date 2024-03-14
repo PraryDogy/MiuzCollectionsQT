@@ -80,9 +80,11 @@ class ImageWidget(QWidget):
         painter = QPainter(self)
         px = self.current_pixmap
 
-        if px.width() < self.width():
-            if px.height() < self.height():
+        try:
+            if px.width() < self.width() and px.height() < self.height():
                 px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
+        except AttributeError:
+            pass
 
         icon = QIcon(px)
 
@@ -146,6 +148,7 @@ class ImageViewerBase(WinImgViewBase):
 
     def my_close(self, event):
         # if event.spontaneous():
+        # Manager.images.clear()
         self.update_geometry()
         self.delete_win.emit()
         self.deleteLater()
@@ -158,6 +161,11 @@ class WinImageView(ImageViewerBase):
 
         self.image_path = image_path
         self.fullsize_thread = None
+
+        self.thread_timer = QTimer(self)
+        self.thread_timer.setSingleShot(True)
+        self.thread_timer.setInterval(10)
+        self.thread_timer.timeout.connect(self.run_thread)
 
         self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
@@ -206,7 +214,10 @@ class WinImageView(ImageViewerBase):
             pixmap = pixmap.scaled(ww, hh, Qt.KeepAspectRatio)
             self.image_label.set_image(pixmap)
 
-        self.fullsize_thread = ImageLoaderThread(self.image_path, ww, hh)
+        self.thread_timer.start()
+
+    def run_thread(self):
+        self.fullsize_thread = ImageLoaderThread(self.image_path, self.width(), self.height())
         self.fullsize_thread.image_loaded.connect(self.set_fullsize_image)
         self.fullsize_thread.start()
 
