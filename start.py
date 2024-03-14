@@ -1,15 +1,33 @@
 import logging
 import os
 import sys
+import traceback
+
+from PyQt5.QtWidgets import QMessageBox
 
 from cfg import cnf
 
 
 def log_unhandled_exception(exc_type, exc_value, exc_traceback):
-    logging.error(
-        "Необработанное исключение",
-        exc_info=(exc_type, exc_value, exc_traceback)
-        )
+    error_message = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    logging.error("Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback))
+    show_error_dialog(error_message)
+
+def show_error_dialog(error_message):
+    error_dialog = QMessageBox()
+    error_dialog.setIcon(QMessageBox.Critical)
+    error_dialog.setWindowTitle("Error / Ошидка")
+
+    tt = [
+        "Отправьте ошибку / Send error",
+        "email: loshkarev@miuz.ru",
+        "tg: evlosh"]
+    
+    tt = "\n".join(tt)
+    
+    error_dialog.setText(tt)
+    error_dialog.setDetailedText(error_message)
+    error_dialog.exec_()
 
 
 if os.path.exists("lib"): 

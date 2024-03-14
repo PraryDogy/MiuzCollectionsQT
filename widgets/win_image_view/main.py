@@ -17,6 +17,7 @@ from ..image_context import ImageContext
 
 class Manager:
     images = {}
+    threads = []
 
 
 class ImageWinUtils:
@@ -80,8 +81,12 @@ class ImageWidget(QWidget):
         painter = QPainter(self)
         px = self.current_pixmap
 
-        if px.width() < self.width() and px.height() < self.height():
-            px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
+        # if px.width() < 4000 or px.height() < 4000:
+            # print("yes")
+        px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
+
+        # if px.width() < self.width() and px.height() < self.height():
+            # px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
 
         icon = QIcon(px)
 
@@ -145,7 +150,7 @@ class ImageViewerBase(WinImgViewBase):
 
     def my_close(self, event):
         # if event.spontaneous():
-        # Manager.images.clear()
+        Manager.images.clear()
         self.update_geometry()
         self.delete_win.emit()
         self.deleteLater()
@@ -161,7 +166,7 @@ class WinImageView(ImageViewerBase):
 
         self.thread_timer = QTimer(self)
         self.thread_timer.setSingleShot(True)
-        self.thread_timer.setInterval(10)
+        self.thread_timer.setInterval(100)
         self.thread_timer.timeout.connect(self.run_thread)
 
         self.my_set_title()
@@ -217,6 +222,8 @@ class WinImageView(ImageViewerBase):
         self.fullsize_thread = ImageLoaderThread(self.image_path, self.width(), self.height())
         self.fullsize_thread.image_loaded.connect(self.finalize_thread)
         self.fullsize_thread.start()
+        self.fullsize_thread.setPriority(QThread.HighestPriority)
+        Manager.threads.append(self.fullsize_thread)
 
     def finalize_thread(self, data: dict):
         if data["image"].size().width() == 0 or data["src"] != self.image_path:
@@ -224,6 +231,7 @@ class WinImageView(ImageViewerBase):
         
         self.image_label.set_image(data["image"])
         self.my_set_title()
+        Manager.threads.remove(self.fullsize_thread)
 
     def switch_image(self, offset):
         try:
