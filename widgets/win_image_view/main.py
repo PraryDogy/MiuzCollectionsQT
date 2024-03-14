@@ -15,6 +15,10 @@ from utils import MainUtils, ReadDesatImage
 from ..image_context import ImageContext
 
 
+class Manager:
+    images = {}
+
+
 class ImageWinUtils:
     @staticmethod
     def close_same_win():
@@ -32,9 +36,6 @@ class ImageWinUtils:
                 widget.deleteLater()
 
 
-IMAGES = {}
-
-
 class ImageLoaderThread(QThread):
     image_loaded = pyqtSignal(dict)
 
@@ -45,23 +46,23 @@ class ImageLoaderThread(QThread):
 
     def run(self):
         try:
-            if self.image_path not in IMAGES:
+            if self.image_path not in Manager.images:
                 img = ReadDesatImage(self.image_path)
                 img = img.get_rgb_image()
 
                 q_image = QImage(img.data, img.shape[1], img.shape[0],
                                 img.shape[1] * 3, QImage.Format_RGB888)
-                IMAGES[self.image_path] = q_image
+                Manager.images[self.image_path] = q_image
             else:
-                q_image = IMAGES[self.image_path]
+                q_image = Manager.images[self.image_path]
 
             pixmap = QPixmap.fromImage(q_image)
 
-            if len(IMAGES) > 50:
-                IMAGES.pop(next(iter(IMAGES)))
+            if len(Manager.images) > 50:
+                Manager.images.pop(next(iter(Manager.images)))
 
         except Exception as e:
-            print("image viewer cant open image with PIL")
+            print("image viewer cant open image, open with pixmap")
             print(e)
             pixmap = QPixmap(self.image_path)
         
@@ -71,16 +72,23 @@ class ImageLoaderThread(QThread):
 class ImageWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.current_pixmap = None
-        self.scale_factor = 1.0
+        self.current_pixmap: QPixmap = None
+        self.scale_factor: float = 1.0
         self.offset = QPoint(0, 0)
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        icon = QIcon(self.current_pixmap)
+        px = self.current_pixmap
+
+        if px.width() < self.width():
+            if px.height() < self.height():
+                px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
+
+        icon = QIcon(px)
 
         ww = int(self.width() * self.scale_factor)
         hh = int(self.height() * self.scale_factor)
+
         x = int((self.width() - ww) / 2) + self.offset.x()
         y = int((self.height() - hh) / 2) + self.offset.y()
 
@@ -88,9 +96,9 @@ class ImageWidget(QWidget):
 
     def set_image(self, pixmap):
         self.current_pixmap = pixmap
-        self.offset = QPoint(0, 0)  # Сброс смещения
-        self.update()
+        self.offset = QPoint(0, 0)
         self.scale_factor = 1.0
+        self.update()
 
     def zoom_in(self):
         self.scale_factor *= 1.1
@@ -172,7 +180,7 @@ class WinImageView(ImageViewerBase):
     def load_image(self):
         ww, hh = self.width(), self.height()
 
-        if self.image_path not in IMAGES:
+        if self.image_path not in Manager.images:
             self.my_set_title(loading=True)
 
             q = (sqlalchemy.select(ThumbsMd.img150)
