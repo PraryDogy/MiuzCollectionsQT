@@ -53,7 +53,6 @@ app = App()
 if not cnf.key["load"]:
 
     utils_signals_app.scaner_start.emit()
-    utils_signals_app.watcher_start.emit()
 
     if not MainUtils.smb_check():
         from widgets.win_smb import WinSmb

@@ -420,19 +420,18 @@ class Scaner(ScanerBaseClass):
         Manager.flag = True
         Manager.curr_percent = 0
         gui_signals_app.scan_progress_value.emit(0)
+        utils_signals_app.watcher_stop.emit()
 
         SummaryScan()
         NonExistCollRemover()
-
         Dbase.vacuum()
         Dbase.cleanup_engine()
 
+        Manager.flag = True
         gui_signals_app.scan_progress_value.emit(100)
-
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
-
-        Manager.flag = True
+        utils_signals_app.watcher_start.emit()
 
     def run(self):
         try:

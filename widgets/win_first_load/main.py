@@ -69,7 +69,6 @@ class BrowseColl(LayoutV):
             utils_signals_app.watcher_stop.emit()
 
         utils_signals_app.scaner_start.emit()
-        utils_signals_app.watcher_start.emit()
 
         if not MainUtils.smb_check():
 
