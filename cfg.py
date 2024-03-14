@@ -134,23 +134,10 @@ class Config(User, Dymanic, Static, AppInfo):
         
         if "key" not in data:
             shutil.copyfile(src="db.db", dst=self.db_file)
-            self.write_json_cfg()
-            self.set_language(self.user_lng)
-            return
-
-        if "key" in data:
-            if data["key"].keys() != self.key.keys():
-                shutil.copyfile(src="db.db", dst=self.db_file)
-                self.write_json_cfg()
-                self.set_language(self.user_lng)
-                return
 
         if data["key"]["db_ver"] != self.key["db_ver"]:
             print("New DB. Copying database")
             shutil.copyfile(src="db.db", dst=self.db_file)
-            self.write_json_cfg()
-            self.set_language(self.user_lng)
-            return
 
         for k, v in data.items():
             if hasattr(self, k):

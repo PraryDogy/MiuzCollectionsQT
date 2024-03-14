@@ -3,6 +3,7 @@ import os
 import sys
 import traceback
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
 
 from cfg import cnf
@@ -15,6 +16,7 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
 
 def show_error_dialog(error_message):
     error_dialog = QMessageBox()
+    # error_dialog.setWindowFlags(Qt.Window | Qt.WindowAnimationOff)
     error_dialog.setIcon(QMessageBox.Critical)
     error_dialog.setWindowTitle("Error / Ошидка")
 
@@ -61,17 +63,5 @@ try:
     app.exec_()
 
 except Exception as e:
+    show_error_dialog(e)
     print(e)
-    print("try set to default settings")
-
-    import os
-
-    from cfg import cnf
-
-    os.remove(cnf.json_file)
-    cnf.set_default()
-    cnf.check_app_dirs()
-
-    from app import app
-    app.exec_()
-
