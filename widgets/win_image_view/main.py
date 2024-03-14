@@ -80,11 +80,8 @@ class ImageWidget(QWidget):
         painter = QPainter(self)
         px = self.current_pixmap
 
-        try:
-            if px.width() < self.width() and px.height() < self.height():
-                px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
-        except AttributeError:
-            pass
+        if px.width() < self.width() and px.height() < self.height():
+            px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
 
         icon = QIcon(px)
 
