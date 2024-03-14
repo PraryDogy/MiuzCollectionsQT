@@ -3,7 +3,7 @@ from time import sleep
 
 import sqlalchemy
 from PyQt5.QtCore import QThread, QTimer, QObject
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 from watchdog.observers import Observer
 
@@ -114,6 +114,11 @@ class NewFile:
 
 
 class Handler(FileSystemEventHandler):
+    def on_any_event(self, event: FileSystemEvent) -> None:
+        # print(event.src_path)
+        return super().on_any_event(event)
+    
+
     def on_created(self, event):
         if not event.is_directory:
 
@@ -167,8 +172,8 @@ class WatcherThread(QThread):
         utils_signals_app.reset_event_timer_watcher.connect(self.reset_event_timer)
 
     def run(self):
-        # self.observer = PollingObserver()
-        self.observer = Observer()
+        self.observer = PollingObserver()
+        # self.observer = Observer()
         self.handler = Handler()
         self.flag = True
 
@@ -182,12 +187,9 @@ class WatcherThread(QThread):
         try:
             while self.flag:
                 sleep(Manager.observer_timeout)
+        finally:
             self.observer.stop()
-
-        except KeyboardInterrupt as e:
-            self.observer.stop()
-            print(e)
-        self.observer.join()
+            self.observer.join()
 
     def reset_event_timer(self):
         self.event_timer.start()
