@@ -63,5 +63,5 @@ try:
     app.exec_()
 
 except Exception as e:
-    show_error_dialog(e)
+    show_error_dialog(traceback.format_exc())
     print(e)
