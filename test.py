@@ -9,6 +9,7 @@ from watchdog.observers.polling import PollingObserver
 
 class Handler(FileSystemEventHandler):
     def on_any_event(self, event: FileSystemEvent) -> None:
+        print(event.event_type)
         print(event.src_path)
         return super().on_any_event(event)
     
