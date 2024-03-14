@@ -115,7 +115,7 @@ class NewFile:
 
 class Handler(FileSystemEventHandler):
     def on_any_event(self, event: FileSystemEvent) -> None:
-        # print(event.src_path)
+        print(f"{event.event_type}: {event.src_path}")
         return super().on_any_event(event)
     
 
