@@ -18,11 +18,26 @@ class ScanerShedule(QObject):
         self.thread_wait_timer.setInterval(smb_check_ms)
         self.thread_wait_timer.timeout.connect(self.wait_thread)
 
+        self.scan_again_timer = QTimer(self)
+        # self.scan_again_timer.setInterval(60 * 10 * 1000)
+        self.scan_again_timer.setInterval(120 * 1000)
+        self.scan_again_timer.setSingleShot(True)
+        self.scan_again_timer.timeout.connect(self.wait_thread)
+
         utils_signals_app.scaner_start.connect(self.wait_thread)
         utils_signals_app.scaner_stop.connect(self.stop_thread)
         utils_signals_app.scaner_err.connect(self.wait_thread)
 
         self.scaner_thread = False
+
+    def wait_thread(self):
+        if not self.scaner_thread or not self.scaner_thread.isRunning():
+            self.thread_wait_timer.stop()
+            self.start_thread()
+
+        else:
+            print("scaner wait prev thread finished")
+            self.thread_wait_timer.start()
 
     def start_thread(self):
         if not MainUtils.smb_check():
@@ -34,15 +49,7 @@ class ScanerShedule(QObject):
             self.scaner_thread = ScanerThread()
             self.smb_wait_timer.stop()
             self.scaner_thread.start()
-
-    def wait_thread(self):
-        if not self.scaner_thread or not self.scaner_thread.isRunning():
-            self.thread_wait_timer.stop()
-            self.start_thread()
-
-        else:
-            print("scaner wait prev thread finished")
-            self.thread_wait_timer.start()
+            self.scan_again_timer.start()
 
     def stop_thread(self):
         ScanerThreadManager.flag = False

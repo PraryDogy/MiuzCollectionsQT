@@ -55,54 +55,6 @@ class NonExistCollRemover:
                 session.close()
 
 
-# class DublicateRemover:
-#     def __init__(self):
-#         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-
-#         session = Dbase.get_session()
-#         try:
-#             res = session.execute(q).fetchall()
-#         finally:
-#             session.close()
-
-#         res = {t_id: t_src for t_id, t_src in res}
-
-#         dublicates = {}
-#         for thumb_id, thumb_src in res.items():
-
-#             if not Manager.flag:
-#                 return
-
-#             if not dublicates.get(thumb_src):
-#                 dublicates[thumb_src] = [thumb_id]
-#             else:
-#                 dublicates[thumb_src].append(thumb_id)
-
-#         dublicates = [thumb_id
-#                       for _, thumb_id_list in dublicates.items()
-#                       for thumb_id in thumb_id_list[1:]
-#                       if len(thumb_id_list) > 1]
-
-#         if dublicates:
-
-#             queries = [
-#                 sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.id==i)
-#                 for i in dublicates
-#                 ]
-
-#             session = Dbase.get_session()
-
-#             try:
-#                 for q in queries:
-#                     session.execute(q)
-#                 session.commit()
-#             except Exception as e:
-#                 print(f"Error occurred: {e}")
-#                 session.rollback()
-#             finally:
-#                 session.close()
-
-
 class FinderImages(dict):
     def __init__(self):
         super().__init__()
@@ -235,6 +187,7 @@ class SummaryScan:
         try:
             self.step_value = Manager.progressbar_len / ln_images
         except ZeroDivisionError:
+            print(traceback.format_exc())
             self.step_value = 1
 
         if self.images["delete"]:
@@ -468,12 +421,10 @@ class Scaner(ScanerBaseClass):
 
         SummaryScan()
         NonExistCollRemover()
-        # DublicateRemover()
 
         Dbase.vacuum()
         Dbase.cleanup_engine()
 
-        Manager.curr_percent = 0
         gui_signals_app.scan_progress_value.emit(100)
 
         gui_signals_app.reload_menu.emit()
@@ -485,7 +436,6 @@ class Scaner(ScanerBaseClass):
         try:
             self.scaner_actions()
         except Exception:
-            Manager.curr_percent = 0
             gui_signals_app.scan_progress_value.emit(100)
             utils_signals_app.scaner_err.emit()
             print(traceback.format_exc())
