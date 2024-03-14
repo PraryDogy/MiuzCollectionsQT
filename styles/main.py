@@ -49,7 +49,9 @@ class Styles:
                 QScrollBar:vertical {{
                     background-color: transparent;
                     width: 10px;
-                    padding-right:2px;}}
+                    padding-right:2px;
+                    padding-top: 2px;
+                    padding-bottom: 2px;}}
                 QScrollBar::handle:vertical {{
                     background-color: {color};
                     border-radius: 4px;}}
