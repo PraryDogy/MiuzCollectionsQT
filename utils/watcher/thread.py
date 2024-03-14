@@ -5,6 +5,7 @@ import sqlalchemy
 from PyQt5.QtCore import QThread, QTimer, QObject
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
+from watchdog.observers import Observer
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
@@ -114,6 +115,7 @@ class NewFile:
 
 class Handler(FileSystemEventHandler):
     def on_created(self, event):
+        print("on cre")
         if not event.is_directory:
 
             if event.src_path.endswith(Manager.jpg_exsts):
@@ -126,6 +128,7 @@ class Handler(FileSystemEventHandler):
 
 
     def on_deleted(self, event):
+        print("om del")
         if not event.is_directory:
 
             if event.src_path.endswith(Manager.jpg_exsts):
@@ -166,7 +169,8 @@ class WatcherThread(QThread):
         utils_signals_app.reset_event_timer_watcher.connect(self.reset_event_timer)
 
     def run(self):
-        self.observer = PollingObserver()
+        # self.observer = PollingObserver()
+        self.observer = Observer()
         self.handler = Handler()
         self.flag = True
 
