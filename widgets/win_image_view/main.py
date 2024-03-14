@@ -79,10 +79,7 @@ class ImageWidget(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        px = self.current_pixmap
-        # px = px.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
-
-        icon = QIcon(px)
+        icon = QIcon(self.current_pixmap)
 
         ww = int(self.width() * self.scale_factor)
         hh = int(self.height() * self.scale_factor)
@@ -92,10 +89,9 @@ class ImageWidget(QWidget):
 
         icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
 
-        print(ww, hh)
-
-    def set_image(self, pixmap):
-        self.current_pixmap = pixmap
+    def set_image(self, pixmap: QPixmap):
+        print("set img")
+        self.current_pixmap = pixmap.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
         self.offset = QPoint(0, 0)
         self.scale_factor = 1.0
         self.update()
@@ -208,8 +204,6 @@ class WinImageView(ImageViewerBase):
 
             pixmap = QPixmap()
             pixmap.loadFromData(res)
-
-            pixmap = pixmap.scaled(ww, hh, Qt.KeepAspectRatio)
             self.image_label.set_image(pixmap)
 
         self.thread_timer.start()
