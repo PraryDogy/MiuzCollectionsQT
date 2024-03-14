@@ -29,7 +29,6 @@ class WaitWriteFinish:
         current_timeout = 0
 
         while not flag:
-            print("wait img")
             try:
                 BytesThumb(src)
                 current_timeout = 0
@@ -114,13 +113,7 @@ class NewFile:
 
 
 class Handler(FileSystemEventHandler):
-    # def on_any_event(self, event):
-    #     print(event.src_path)
-    #     return super().on_any_event(event)
-
     def on_created(self, event):
-        print("on created")
-
         if not event.is_directory:
 
             if event.src_path.endswith(Manager.jpg_exsts):
@@ -132,35 +125,33 @@ class Handler(FileSystemEventHandler):
                 cnf.tiff_images.add(event.src_path)
 
 
-    # def on_deleted(self, event):
-    #     print("on deleted")
+    def on_deleted(self, event):
+        if not event.is_directory:
 
-    #     if not event.is_directory:
+            if event.src_path.endswith(Manager.jpg_exsts):
+                DeletedFile(src=event.src_path)
+                utils_signals_app.reset_event_timer_watcher.emit()
 
-    #         if event.src_path.endswith(Manager.jpg_exsts):
-    #             DeletedFile(src=event.src_path)
-    #             utils_signals_app.reset_event_timer_watcher.emit()
-
-    #         elif event.src_path.endswith(Manager.tiff_exsts):
-    #             try:
-    #                 cnf.tiff_images.remove(event.src_path)
-    #             except KeyError:
-    #                 pass
+            elif event.src_path.endswith(Manager.tiff_exsts):
+                try:
+                    cnf.tiff_images.remove(event.src_path)
+                except KeyError:
+                    pass
 
 
-    # def on_moved(self, event):
-    #     if not event.is_directory:
+    def on_moved(self, event):
+        if not event.is_directory:
 
-    #         if event.src_path.endswith(Manager.jpg_exsts):
-    #             MovedFile(src=event.src_path, dest=event.dest_path)
-    #             utils_signals_app.reset_event_timer_watcher.emit()
+            if event.src_path.endswith(Manager.jpg_exsts):
+                MovedFile(src=event.src_path, dest=event.dest_path)
+                utils_signals_app.reset_event_timer_watcher.emit()
 
-    #         elif event.src_path.endswith(Manager.tiff_exsts):
-    #             try:
-    #                 cnf.tiff_images.remove(event.src_path)
-    #             except KeyError:
-    #                 pass
-    #             cnf.tiff_images.add(event.dest_path)
+            elif event.src_path.endswith(Manager.tiff_exsts):
+                try:
+                    cnf.tiff_images.remove(event.src_path)
+                except KeyError:
+                    pass
+                cnf.tiff_images.add(event.dest_path)
 
 
 class WatcherThread(QThread):
