@@ -86,6 +86,7 @@ class FinderImages(dict):
             step_value = Manager.progressbar_len / len(collections)
         except ZeroDivisionError:
             print(traceback.format_exc())
+            print("it means that current coll_folder don't have subfolders")
             step_value = 1
 
         float_value = 0
@@ -188,6 +189,7 @@ class SummaryScan:
             self.step_value = Manager.progressbar_len / ln_images
         except ZeroDivisionError:
             print(traceback.format_exc())
+            print("it's ok, no new photos")
             self.step_value = 1
 
         if self.images["delete"]:
