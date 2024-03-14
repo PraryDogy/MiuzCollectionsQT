@@ -90,7 +90,6 @@ class ImageWidget(QWidget):
         icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
 
     def set_image(self, pixmap: QPixmap):
-        print("set img")
         self.current_pixmap = pixmap.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
         self.offset = QPoint(0, 0)
         self.scale_factor = 1.0

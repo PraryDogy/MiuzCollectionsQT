@@ -16,7 +16,6 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
 
 def show_error_dialog(error_message):
     error_dialog = QMessageBox()
-    # error_dialog.setWindowFlags(Qt.Window | Qt.WindowAnimationOff)
     error_dialog.setIcon(QMessageBox.Critical)
     error_dialog.setWindowTitle("Error / Ошидка")
 

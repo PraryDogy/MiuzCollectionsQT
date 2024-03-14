@@ -181,12 +181,6 @@ class Config(User, Dymanic, Static, AppInfo):
         if not os.path.exists(path=self.db_file):
             shutil.copyfile(src="db.db", dst=self.db_file)
 
-    def set_default(self):
-        defaults = User().__dict__
-        for k, v in defaults.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
-
 
 cnf = Config()
 cnf.check_app_dirs()
