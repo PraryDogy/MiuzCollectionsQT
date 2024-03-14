@@ -48,4 +48,5 @@ class WatcherShedule(QObject):
             self.watcher_thread.clean_engine()
             self.watcher_thread.stop_watcher()
 
+
 watcher_app = WatcherShedule()
