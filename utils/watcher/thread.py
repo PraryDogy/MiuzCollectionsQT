@@ -115,7 +115,6 @@ class NewFile:
 
 class Handler(FileSystemEventHandler):
     def on_created(self, event):
-        print("on cre")
         if not event.is_directory:
 
             if event.src_path.endswith(Manager.jpg_exsts):
@@ -128,7 +127,6 @@ class Handler(FileSystemEventHandler):
 
 
     def on_deleted(self, event):
-        print("om del")
         if not event.is_directory:
 
             if event.src_path.endswith(Manager.jpg_exsts):
@@ -183,8 +181,7 @@ class WatcherThread(QThread):
 
         try:
             while self.flag:
-                # sleep(Manager.observer_timeout)
-                sleep(1)
+                sleep(Manager.observer_timeout)
             self.observer.stop()
 
         except KeyboardInterrupt as e:
