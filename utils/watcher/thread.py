@@ -2,7 +2,7 @@ import os
 from time import sleep
 
 import sqlalchemy
-from PyQt5.QtCore import QThread, QTimer
+from PyQt5.QtCore import QThread, QTimer, QObject
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
@@ -179,8 +179,6 @@ class WatcherThread(QThread):
         self.handler = Handler()
         self.flag = True
 
-        print(cnf.coll_folder)
-    
         self.observer.schedule(
             event_handler=self.handler,
             path=cnf.coll_folder,
