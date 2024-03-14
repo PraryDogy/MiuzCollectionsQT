@@ -57,10 +57,6 @@ if os.path.exists("lib"):
     print("logging enabled")
     print(f"plugin path enabled {plugin_path}")
 
-try:
-    from app import app
-    app.exec_()
+from app import app
 
-except Exception as e:
-    show_error_dialog(traceback.format_exc())
-    print(e)
+app.exec_()
