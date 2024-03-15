@@ -96,14 +96,14 @@ class WinMain(BaseEmptyWin):
         self.move(x, y)
 
     def mycloseEvent(self, event):
-        if event.spontaneous():
-            self.hide()
-            event.ignore()
+        self.titlebar.btns.non_symbolic_icons()
+        self.hide()
+        event.ignore()
 
     def mykeyPressEvent(self, event):
         if event.key() == Qt.Key_W:
             if event.modifiers() == Qt.ControlModifier:
-                self.hide()
+                self.mycloseEvent(event)
 
         if event.key() == Qt.Key_F:
             if event.modifiers() == Qt.ControlModifier:
