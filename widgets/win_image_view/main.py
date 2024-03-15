@@ -21,9 +21,9 @@ class Manager:
 
 
 class ImageWinUtils:
+
     @staticmethod
     def close_same_win():
-
         widgets: list[WinImgViewBase] = MainUtils.get_app().topLevelWidgets()
 
         for widget in widgets:
@@ -37,13 +37,12 @@ class ImageWinUtils:
                 widget.deleteLater()
 
 
-class ImageLoaderThread(QThread):
+class FSizeImgThread(QThread):
     image_loaded = pyqtSignal(dict)
 
-    def __init__(self, image_path: str, w, h):
+    def __init__(self, image_path: str):
         super().__init__()
         self.image_path = image_path
-        self.width, self.height = w, h
 
     def run(self):
         try:
@@ -73,6 +72,7 @@ class ImageLoaderThread(QThread):
 class ImageWidget(QWidget):
     def __init__(self):
         super().__init__()
+
         self.current_pixmap: QPixmap = None
         self.scale_factor: float = 1.0
         self.offset = QPoint(0, 0)
@@ -90,7 +90,8 @@ class ImageWidget(QWidget):
         icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
 
     def set_image(self, pixmap: QPixmap):
-        self.current_pixmap = pixmap.scaled(4000, 4000, aspectRatioMode=Qt.KeepAspectRatio)
+        aspect = Qt.AspectRatioMode.KeepAspectRatio
+        self.current_pixmap = pixmap.scaled(4000, 4000, aspectRatioMode=aspect)
         self.offset = QPoint(0, 0)
         self.scale_factor = 1.0
         self.update()
@@ -107,12 +108,12 @@ class ImageWidget(QWidget):
 
     def zoom_reset(self):
         self.scale_factor = 1.0
-        self.offset = QPoint(0, 0)  # Сброс смещения
+        self.offset = QPoint(0, 0)
         self.update()
         self.setCursor(Qt.ArrowCursor) 
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.last_mouse_pos = event.pos()
 
     def mouseMoveEvent(self, event):
@@ -129,41 +130,24 @@ class ImageWidget(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class ImageViewerBase(WinImgViewBase):
-    def __init__(self):
+class WinImageView(WinImgViewBase):
+    def __init__(self, image_path):
         ImageWinUtils.close_same_win()
+        self.image_path = image_path
+        self.fsize_img_thread = None
+
         super().__init__(close_func=self.my_close)
         self.disable_min_max()
         self.setMinimumSize(QSize(500, 400))
-
-    def update_geometry(self):
-        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
-
-    def my_close(self, event):
-        # if event.spontaneous():
-        Manager.images.clear()
-        self.update_geometry()
-        self.delete_win.emit()
-        self.deleteLater()
-        event.ignore()
-
-
-class WinImageView(ImageViewerBase):
-    def __init__(self, image_path):
-        super().__init__()
-
-        self.image_path = image_path
-        self.fullsize_thread = None
-
-        self.thread_timer = QTimer(self)
-        self.thread_timer.setSingleShot(True)
-        self.thread_timer.setInterval(100)
-        self.thread_timer.timeout.connect(self.run_thread)
-
         self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
-        self.bind_content_wid(self.mouse_click)
+        self.bind_content_wid(self.mouse_switch_img)
         gui_signals_app.set_focus_viewer.connect(self.setFocus)
+
+        self.fsize_img_timer = QTimer(self)
+        self.fsize_img_timer.setSingleShot(True)
+        self.fsize_img_timer.setInterval(200)
+        self.fsize_img_timer.timeout.connect(self.run_thread)
 
         self.image_label = ImageWidget()
         self.content_layout.addWidget(self.image_label)
@@ -177,10 +161,7 @@ class WinImageView(ImageViewerBase):
         self.center_win()
         self.load_image()
 
-
     def load_image(self):
-        ww, hh = self.width(), self.height()
-
         if self.image_path not in Manager.images:
             self.my_set_title(loading=True)
 
@@ -205,14 +186,15 @@ class WinImageView(ImageViewerBase):
             pixmap.loadFromData(res)
             self.image_label.set_image(pixmap)
 
-        self.thread_timer.start()
+        self.fsize_img_timer.start()
 
     def run_thread(self):
-        self.fullsize_thread = ImageLoaderThread(self.image_path, self.width(), self.height())
-        self.fullsize_thread.image_loaded.connect(self.finalize_thread)
-        self.fullsize_thread.start()
-        self.fullsize_thread.setPriority(QThread.HighestPriority)
-        Manager.threads.append(self.fullsize_thread)
+        self.fsize_img_thread = FSizeImgThread(self.image_path)
+        self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
+        self.fsize_img_thread.start()
+
+        self.fsize_img_thread.setPriority(QThread.HighestPriority)
+        Manager.threads.append(self.fsize_img_thread)
 
     def finalize_thread(self, data: dict):
         if data["image"].size().width() == 0 or data["src"] != self.image_path:
@@ -220,7 +202,7 @@ class WinImageView(ImageViewerBase):
         
         self.image_label.set_image(data["image"])
         self.my_set_title()
-        Manager.threads.remove(self.fullsize_thread)
+        Manager.threads.remove(self.fsize_img_thread)
 
     def switch_image(self, offset):
         try:
@@ -254,7 +236,7 @@ class WinImageView(ImageViewerBase):
 
         self.set_title(f"{w}x{h} - {coll} - {name}")
 
-    def mouse_click(self, event: QMouseEvent | None) -> None:
+    def mouse_switch_img(self, event: QMouseEvent | None) -> None:
         if event.button() == Qt.LeftButton and self.image_label.scale_factor == 1.0:
             move_left = event.x() < self.width() / 2
             offset = -1 if move_left else 1
@@ -288,3 +270,14 @@ class WinImageView(ImageViewerBase):
     def focusInEvent(self, a0: QFocusEvent | None) -> None:
         self.setFocus()
         return super().focusInEvent(a0)
+
+    def update_geometry(self):
+        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
+
+    def my_close(self, event):
+        # if event.spontaneous():
+        Manager.images.clear()
+        self.update_geometry()
+        self.delete_win.emit()
+        self.deleteLater()
+        event.ignore()
