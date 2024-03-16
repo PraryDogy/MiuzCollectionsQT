@@ -87,12 +87,11 @@ class DatesWinBase(WinStandartBase):
         self.disable_min_max()
 
     def my_close(self, event):
-        if event.spontaneous():
-            self.delete_win.emit()
-            FiltersDateBtncolor.date_based_color()
-            self.deleteLater()
-            gui_signals_app.set_focus_viewer.emit()
-            event.ignore()
+        self.delete_win.emit()
+        FiltersDateBtncolor.date_based_color()
+        self.deleteLater()
+        gui_signals_app.set_focus_viewer.emit()
+        event.ignore()
 
 
 class WinDates(DatesWinBase):
