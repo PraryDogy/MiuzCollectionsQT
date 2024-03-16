@@ -257,13 +257,13 @@ class WinImgViewBase(WinAutoRemove):
         zoom_layout = LayoutH()
         zoom_wid.setLayout(zoom_layout)
 
-        self.zoom_in = SvgBtn("zoom_in.svg", svg_w)
-        self.zoom_in.setFixedWidth(btn_w)
-        zoom_layout.addWidget(self.zoom_in)
-
         self.zoom_out = SvgBtn("zoom_out.svg", svg_w)
         self.zoom_out.setFixedWidth(btn_w)
         zoom_layout.addWidget(self.zoom_out)
+
+        self.zoom_in = SvgBtn("zoom_in.svg", svg_w)
+        self.zoom_in.setFixedWidth(btn_w)
+        zoom_layout.addWidget(self.zoom_in)
 
         self.zoom_fit = SvgBtn("zoom_fit.svg", svg_w)
         self.zoom_fit.setFixedWidth(btn_w)

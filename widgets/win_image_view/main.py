@@ -64,8 +64,6 @@ class FSizeImgThread(QThread):
             q_image = QImage()
             q_image.load(self.image_path)
             Manager.images[self.image_path] = q_image
-            # pixmap = QPixmap(self.image_path)
-
 
         pixmap = QPixmap.fromImage(q_image)
 
