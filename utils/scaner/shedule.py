@@ -9,12 +9,12 @@ class ScanerShedule(QObject):
     def __init__(self):
         super().__init__()
         self.smb_wait_timer = QTimer(self)
-        self.smb_wait_timer.setInterval(1500)
+        self.smb_wait_timer.setInterval(15000)
         self.smb_wait_timer.setSingleShot(True)
         self.smb_wait_timer.timeout.connect(self.start_thread)
         
         self.thread_wait_timer = QTimer(self)
-        self.thread_wait_timer.setInterval(1500)
+        self.thread_wait_timer.setInterval(15000)
         self.thread_wait_timer.setSingleShot(True)
         self.thread_wait_timer.timeout.connect(self.wait_thread)
 

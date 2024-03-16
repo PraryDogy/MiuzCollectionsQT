@@ -47,25 +47,31 @@ class FSizeImgThread(QThread):
     def run(self):
         try:
             if self.image_path not in Manager.images:
+
                 img = ReadDesatImage(self.image_path)
                 img = img.get_rgb_image()
-
                 q_image = QImage(img.data, img.shape[1], img.shape[0],
                                 img.shape[1] * 3, QImage.Format_RGB888)
                 Manager.images[self.image_path] = q_image
+
             else:
                 q_image = Manager.images[self.image_path]
-
-            pixmap = QPixmap.fromImage(q_image)
-
-            if len(Manager.images) > 50:
-                Manager.images.pop(next(iter(Manager.images)))
 
         except Exception as e:
             print("image viewer cant open image, open with pixmap")
             print(e)
-            pixmap = QPixmap(self.image_path)
-        
+
+            q_image = QImage()
+            q_image.load(self.image_path)
+            Manager.images[self.image_path] = q_image
+            # pixmap = QPixmap(self.image_path)
+
+
+        pixmap = QPixmap.fromImage(q_image)
+
+        if len(Manager.images) > 50:
+            Manager.images.pop(next(iter(Manager.images)))
+
         self.image_loaded.emit({"image": pixmap, "src": self.image_path})
 
 
@@ -146,7 +152,7 @@ class WinImageView(WinImgViewBase):
 
         self.fsize_img_timer = QTimer(self)
         self.fsize_img_timer.setSingleShot(True)
-        self.fsize_img_timer.setInterval(200)
+        self.fsize_img_timer.setInterval(20)
         self.fsize_img_timer.timeout.connect(self.run_thread)
 
         self.image_label = ImageWidget()

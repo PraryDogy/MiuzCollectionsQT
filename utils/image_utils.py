@@ -52,9 +52,9 @@ class ReadDesatImage:
     def get_bgr_image(self):
         return self.rgb_image
     
-    def get_rgb_image(self):
+    def get_rgb_image(self) -> bytearray:
         return cv2.cvtColor(self.rgb_image, cv2.COLOR_BGR2RGB)
-    
+
 
 class PixmapThumb(QPixmap):
     def __init__(self, byte_array: QByteArray) -> QPixmap:
