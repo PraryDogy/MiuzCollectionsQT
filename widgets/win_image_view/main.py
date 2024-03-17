@@ -374,6 +374,7 @@ class WinImageView(WinImgViewBase):
     
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == 129: # mouse move
+            self.mouse_move_timer.stop()
             self.navi_prev.show()
             self.navi_next.show()
             self.navi_zoom.show()
