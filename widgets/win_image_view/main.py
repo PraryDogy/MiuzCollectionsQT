@@ -1,12 +1,12 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QSize, Qt, QThread, QTimer, pyqtSignal, QPoint
+from PyQt5.QtCore import QEvent, QSize, Qt, QThread, QTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
                          QPixmap)
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QLabel
 
-from base_widgets import WinImgViewBase
+from base_widgets import WinImgViewBase, SvgBtn
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
@@ -160,6 +160,9 @@ class WinImageView(WinImgViewBase):
             zoom_out=lambda e: self.image_label.zoom_out(),
             zoom_in=lambda e: self.image_label.zoom_in()
             )
+        
+        self.navigate_next = SvgBtn("next.svg", 50, parent=self.content_wid)
+        self.navigate_prev = SvgBtn("prev.svg", 50, parent=self.content_wid)
 
         self.setFocus()
         self.center_win()
@@ -191,6 +194,14 @@ class WinImageView(WinImgViewBase):
             self.image_label.set_image(pixmap)
 
         self.fsize_img_timer.start()
+
+    def show_navigate_btns(self):
+        mid_h = (self.height() // 2) - (self.navigate_next.height() // 2)
+        prev_w = 0 + 30
+        next_w = self.width() - self.navigate_next.width() - 30
+
+        self.navigate_prev.move(prev_w, mid_h)
+        self.navigate_next.move(next_w, mid_h)
 
     def run_thread(self):
         self.fsize_img_thread = FSizeImgThread(self.image_path)
@@ -279,9 +290,22 @@ class WinImageView(WinImgViewBase):
         cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
 
     def my_close(self, event):
-        # if event.spontaneous():
         Manager.images.clear()
         self.update_geometry()
         self.delete_win.emit()
         self.deleteLater()
         event.ignore()
+
+    def resizeEvent(self, event):
+        self.show_navigate_btns()
+        return super().resizeEvent(event)
+    
+    def enterEvent(self, a0: QEvent | None) -> None:
+        self.navigate_prev.show()
+        self.navigate_next.show()
+        return super().enterEvent(a0)
+    
+    def leaveEvent(self, a0: QEvent | None) -> None:
+        self.navigate_prev.hide()
+        self.navigate_next.hide()
+        return super().leaveEvent(a0)
