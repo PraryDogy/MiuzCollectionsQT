@@ -50,3 +50,7 @@ class ContextSubMenuBase(QMenu):
         self.setMinimumWidth(150)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)
+
+    def enterEvent(self, a0: QEvent | None) -> None:
+        self.raise_()
+        return super().enterEvent(a0)
