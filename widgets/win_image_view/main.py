@@ -1,12 +1,13 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QEvent, QObject, QSize, Qt, QThread, QTimer, pyqtSignal, QPoint
+from PyQt5.QtCore import (QEvent, QObject, QPoint, QSize, Qt, QThread, QTimer,
+                          pyqtSignal)
 from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
                          QPixmap)
-from PyQt5.QtWidgets import QWidget, QSpacerItem, QLabel, QFrame
+from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from base_widgets import WinImgViewBase, SvgBtn, LayoutH
+from base_widgets import LayoutH, LayoutV, SvgBtn, WinImgViewBase
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
@@ -134,7 +135,7 @@ class ImageWidget(QWidget):
         return super().mouseReleaseEvent(a0)
     
 
-class ZoomWid(QFrame):
+class NaviZoom(QFrame):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
 
@@ -171,28 +172,30 @@ class ZoomWid(QFrame):
         self.zoom_fit.mouseReleaseEvent = f3
 
 
-class NaviPrev(QWidget):
-    def __init__(self, parent: QWidget = None) -> None:
+class NaviArrow(QWidget):
+    def __init__(self, icon_name: str, parent: QWidget = None) -> None:
         super().__init__(parent)
-        self.setFixedSize(100, parent.height())
+        self.setFixedSize(100, parent.height() - 20)
 
-        h_layout = LayoutH()
-        self.setLayout(h_layout)
+        self.setStyleSheet("background: red;")
 
-        btn = SvgBtn("prev.svg", 50)
-        h_layout.addWidget(btn)
+        v_layout = LayoutV()
+        self.setLayout(v_layout)
+
+        v_layout.addStretch()
+        btn = SvgBtn(icon_name, 50)
+        v_layout.addWidget(btn)
+        v_layout.addStretch()
 
 
-class NaviNext(QWidget):
+class NaviArrowPrev(NaviArrow):
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(parent)
-        self.setFixedSize(100, parent.height())
+        super().__init__("prev.svg", parent)
 
-        h_layout = LayoutH()
-        self.setLayout(h_layout)
 
-        btn = SvgBtn("next.svg", 50)
-        h_layout.addWidget(btn)
+class NaviArrowNext(NaviArrow):
+    def __init__(self, parent: QWidget = None) -> None:
+        super().__init__("next.svg", parent)
 
 
 class WinImageView(WinImgViewBase):
@@ -222,13 +225,13 @@ class WinImageView(WinImgViewBase):
         self.image_label = ImageWidget()
         self.content_layout.addWidget(self.image_label)
 
-        self.navi_prev = NaviPrev(self.content_wid)
+        self.navi_prev = NaviArrowPrev(self.content_wid)
         self.navi_prev.mouseReleaseEvent = lambda e: self.navi_switch_img("-")
 
-        self.navi_next = NaviNext(self.content_wid)
+        self.navi_next = NaviArrowNext(self.content_wid)
         self.navi_next.mouseReleaseEvent = lambda e: self.navi_switch_img("+")
 
-        self.navi_zoom = ZoomWid(parent=self.content_wid)
+        self.navi_zoom = NaviZoom(parent=self.content_wid)
         self.navi_zoom.bind_btns(
             lambda e: self.image_label.zoom_out(),
             lambda e: self.image_label.zoom_in(),
