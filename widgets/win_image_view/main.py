@@ -182,10 +182,8 @@ class NaviArrow(QWidget):
         v_layout = LayoutV()
         self.setLayout(v_layout)
 
-        v_layout.addStretch()
         btn = SvgBtn(icon_name, 50)
         v_layout.addWidget(btn)
-        v_layout.addStretch()
 
 
 class NaviArrowPrev(NaviArrow):
