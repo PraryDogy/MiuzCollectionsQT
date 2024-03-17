@@ -150,15 +150,15 @@ class ZoomWid(QFrame):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_out = SvgBtn("zoom_out.svg", 50)
+        self.zoom_out = SvgBtn("zoom_out.svg", 45)
         h_layout.addWidget(self.zoom_out)
         h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.zoom_in = SvgBtn("zoom_in.svg", 50)
+        self.zoom_in = SvgBtn("zoom_in.svg", 45)
         h_layout.addWidget(self.zoom_in)
         h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.zoom_fit = SvgBtn("zoom_fit.svg", 50)
+        self.zoom_fit = SvgBtn("zoom_fit.svg", 45)
         h_layout.addWidget(self.zoom_fit)
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
