@@ -314,13 +314,6 @@ class WinImageView(WinImgViewBase):
             self.switch_image(-1)
         self.setFocus()
 
-    # def mouse_switch_img(self, event: QMouseEvent | None) -> None:
-    #     if event.button() == Qt.LeftButton and self.image_label.scale_factor == 1.0:
-    #         move_left = event.x() < self.width() / 2
-    #         offset = -1 if move_left else 1
-    #         self.switch_image(offset)
-    #         self.setFocus()
-
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Left:
             self.switch_image(-1)
