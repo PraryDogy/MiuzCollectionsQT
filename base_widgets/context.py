@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QEvent, QObject, Qt
-from PyQt5.QtGui import QFocusEvent
+from PyQt5.QtGui import QFocusEvent, QMouseEvent
 from PyQt5.QtWidgets import QMenu
 
 from styles import Styles
@@ -50,4 +50,7 @@ class ContextSubMenuBase(QMenu):
         self.setMinimumWidth(150)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)
-        self.mousePressEvent = lambda e: self.raise_()
+
+    def mousePressEvent(self, a0: QMouseEvent | None) -> None:
+        self.raise_()
+        return super().mousePressEvent(a0)
