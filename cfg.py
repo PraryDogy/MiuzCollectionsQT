@@ -104,7 +104,7 @@ class AppInfo:
         super().__init__()
 
         self.app_name: str = "MiuzCollections"
-        self.app_ver: str = "5.0.0"
+        self.app_ver: str = "5.1.1"
 
 
 class Config(User, Dymanic, Static, AppInfo):
