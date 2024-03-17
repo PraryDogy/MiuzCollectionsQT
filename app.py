@@ -50,7 +50,7 @@ class App(QApplication):
 
 app = App()
 
-if not cnf.key["load"]:
+if not cnf.key["hello_screen"]:
 
     utils_signals_app.scaner_start.emit()
 

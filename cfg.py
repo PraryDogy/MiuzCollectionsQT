@@ -13,7 +13,7 @@ class User:
 
         self.key: dict = {
             "db_ver": 1.1,
-            "load": True
+            "hello_screen": True
             }
 
         self.coll_folder: str = os.path.join(

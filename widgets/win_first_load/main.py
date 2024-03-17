@@ -244,7 +244,7 @@ class WinFirstLoad(WinStandartBase):
     def ok_cmd(self, e):
         self.user_type.finalize()
         self.browse_coll.finalize()
-        cnf.key["load"] = False
+        cnf.key["hello_screen"] = False
 
         self.delete_win.emit()
         self.deleteLater()
