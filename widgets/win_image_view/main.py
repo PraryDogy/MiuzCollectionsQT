@@ -174,6 +174,7 @@ class ZoomWid(QFrame):
 class NaviPrev(QWidget):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
+        self.setFixedSize(100, parent.height())
 
         h_layout = LayoutH()
         self.setLayout(h_layout)
@@ -181,20 +182,17 @@ class NaviPrev(QWidget):
         btn = SvgBtn("prev.svg", 50)
         h_layout.addWidget(btn)
 
-        self.setFixedSize(100, 100)
-
 
 class NaviNext(QWidget):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
+        self.setFixedSize(100, parent.height())
 
         h_layout = LayoutH()
         self.setLayout(h_layout)
 
         btn = SvgBtn("next.svg", 50)
         h_layout.addWidget(btn)
-
-        self.setFixedSize(100, 100)
 
 
 class WinImageView(WinImgViewBase):
