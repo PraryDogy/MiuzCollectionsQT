@@ -126,11 +126,11 @@ class ImageWidget(QWidget):
             self.offset += delta
             self.last_mouse_pos = event.pos()
             self.update()
-            self.setCursor(Qt.ClosedHandCursor)
+            self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
         if self.scale_factor > 1.0:
-            self.setCursor(Qt.OpenHandCursor)
+            self.setCursor(Qt.CursorShape.OpenHandCursor)
         return super().mouseReleaseEvent(a0)
     
 
@@ -338,6 +338,7 @@ class WinImageView(WinImgViewBase):
         else:
             self.switch_image(-1)
         self.setFocus()
+        self.image_label.setCursor(Qt.CursorShape.ArrowCursor)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Left:
@@ -367,16 +368,6 @@ class WinImageView(WinImgViewBase):
         self.setFocus()
         return super().focusInEvent(a0)
 
-    def update_geometry(self):
-        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
-
-    def my_close(self, event):
-        Manager.images.clear()
-        self.update_geometry()
-        self.delete_win.emit()
-        self.deleteLater()
-        event.ignore()
-
     def resizeEvent(self, event):
         self.move_navi_btns()
         return super().resizeEvent(event)
@@ -392,3 +383,13 @@ class WinImageView(WinImgViewBase):
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.hide_navi_btns()
         return super().leaveEvent(a0)
+    
+    def update_geometry(self):
+        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
+
+    def my_close(self, event):
+        Manager.images.clear()
+        self.update_geometry()
+        self.delete_win.emit()
+        self.deleteLater()
+        event.ignore()
