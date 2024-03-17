@@ -26,3 +26,11 @@
 # except KeyboardInterrupt:
 #     observer.stop()
 #     observer.join()
+
+a = None
+b = None
+c = 1
+
+
+if not any((a, b, c)):
+    print(1)

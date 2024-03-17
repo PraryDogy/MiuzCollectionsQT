@@ -280,6 +280,9 @@ class WinImageView(WinImgViewBase):
         self.navi_zoom.move(zoom_w, zoom_h)
 
     def hide_navi_btns(self):
+        for i in (self.navi_prev, self.navi_next, self.navi_zoom):
+            if i.underMouse():
+                return
         self.navi_zoom.hide()
         self.navi_prev.hide()
         self.navi_next.hide()
