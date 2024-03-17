@@ -171,6 +171,32 @@ class ZoomWid(QFrame):
         self.zoom_fit.mouseReleaseEvent = f3
 
 
+class NaviPrev(QWidget):
+    def __init__(self, parent: QWidget = None) -> None:
+        super().__init__(parent)
+
+        h_layout = LayoutH()
+        self.setLayout(h_layout)
+
+        btn = SvgBtn("prev.svg", 50)
+        h_layout.addWidget(btn)
+
+        self.setFixedSize(150, 100)
+
+
+class NaviNext(QWidget):
+    def __init__(self, parent: QWidget = None) -> None:
+        super().__init__(parent)
+
+        h_layout = LayoutH()
+        self.setLayout(h_layout)
+
+        btn = SvgBtn("next.svg", 50)
+        h_layout.addWidget(btn)
+
+        self.setFixedSize(150, 100)
+
+
 class WinImageView(WinImgViewBase):
     def __init__(self, image_path):
         ImageWinUtils.close_same_win()
@@ -198,11 +224,11 @@ class WinImageView(WinImgViewBase):
         self.image_label = ImageWidget()
         self.content_layout.addWidget(self.image_label)
 
-        self.navi_next = SvgBtn("next.svg", 50, parent=self.content_wid)
-        self.navi_next.mouseReleaseEvent = lambda e: self.navi_switch_img("+")
-
-        self.navi_prev = SvgBtn("prev.svg", 50, parent=self.content_wid)
+        self.navi_prev = NaviPrev(self.content_wid)
         self.navi_prev.mouseReleaseEvent = lambda e: self.navi_switch_img("-")
+
+        self.navi_next = NaviNext(self.content_wid)
+        self.navi_next.mouseReleaseEvent = lambda e: self.navi_switch_img("+")
 
         self.navi_zoom = ZoomWid(parent=self.content_wid)
         self.navi_zoom.bind_btns(
@@ -245,9 +271,8 @@ class WinImageView(WinImgViewBase):
 
     def move_navi_btns(self):
         navi_h = (self.height() // 2) - (self.navi_next.height() // 2)
-        navi_prev_w = 0 + 30
-        navi_next_w = self.width() - self.navi_next.width() - 30
-        self.navi_prev.move(navi_prev_w, navi_h)
+        navi_next_w = self.width() - self.navi_next.width()
+        self.navi_prev.move(0, navi_h)
         self.navi_next.move(navi_next_w, navi_h)
 
         zoom_w = self.width() // 2 - self.navi_zoom.width() // 2
