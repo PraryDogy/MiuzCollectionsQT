@@ -360,7 +360,6 @@ class SummaryScan:
 
     def delete_db(self):
         gui_signals_app.progress_del_photos.emit()
-        print("delete")
 
         queries = List[Query]
         queries = [
