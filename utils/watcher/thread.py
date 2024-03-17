@@ -18,8 +18,8 @@ from ..main_utils import MainUtils
 class Manager:
     observer_timeout = 5
     img_wait_time_sleep = 3
-    event_timer_timeout = 4000
-    img_timeout = 5 * 60
+    img_wait_time_count = 2 * 60
+    event_timer_timeout = 4 * 1000
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
     tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
 
@@ -42,7 +42,7 @@ class WaitWriteFinish:
 
                 sleep(Manager.img_wait_time_sleep)
 
-                if current_timeout == Manager.img_timeout:
+                if current_timeout == Manager.img_wait_time_count:
                     break
                 else:
                     continue
