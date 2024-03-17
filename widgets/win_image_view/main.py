@@ -181,7 +181,7 @@ class NaviPrev(QWidget):
         btn = SvgBtn("prev.svg", 50)
         h_layout.addWidget(btn)
 
-        self.setFixedSize(150, 100)
+        self.setFixedSize(100, 100)
 
 
 class NaviNext(QWidget):
@@ -194,7 +194,7 @@ class NaviNext(QWidget):
         btn = SvgBtn("next.svg", 50)
         h_layout.addWidget(btn)
 
-        self.setFixedSize(150, 100)
+        self.setFixedSize(100, 100)
 
 
 class WinImageView(WinImgViewBase):
