@@ -44,12 +44,13 @@ class ContextMenuBase(QMenu):
 
 
 class ContextSubMenuBase(QMenu):
-    def __init__(self, parent, title):
+    def __init__(self, parent: QMenu, title):
         super().__init__(parent)
         self.setTitle(title)
         self.setMinimumWidth(150)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)
+        self.mousePressEvent = lambda e: self.raise_()
 
     def enterEvent(self, a0: QEvent | None) -> None:
         self.raise_()
