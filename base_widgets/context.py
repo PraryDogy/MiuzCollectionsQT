@@ -51,7 +51,3 @@ class ContextSubMenuBase(QMenu):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)
         self.mousePressEvent = lambda e: self.raise_()
-
-    def enterEvent(self, a0: QEvent | None) -> None:
-        self.raise_()
-        return super().enterEvent(a0)
