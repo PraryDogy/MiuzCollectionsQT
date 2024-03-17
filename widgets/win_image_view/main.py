@@ -1,12 +1,12 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QEvent, QSize, Qt, QThread, QTimer, pyqtSignal, QPoint
+from PyQt5.QtCore import QEvent, QObject, QSize, Qt, QThread, QTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
                          QPixmap)
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtWidgets import QWidget, QSpacerItem, QLabel, QFrame
 
-from base_widgets import WinImgViewBase, SvgBtn
+from base_widgets import WinImgViewBase, SvgBtn, LayoutH
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
@@ -132,6 +132,43 @@ class ImageWidget(QWidget):
         if self.scale_factor > 1.0:
             self.setCursor(Qt.OpenHandCursor)
         return super().mouseReleaseEvent(a0)
+    
+
+class ZoomWid(QFrame):
+    def __init__(self, parent: QWidget = None) -> None:
+        super().__init__(parent)
+
+        self.setStyleSheet(
+            f"""
+            background-color: rgba(128, 128, 128, 70);
+            border-radius: 15px;
+            """
+            )
+
+        h_layout = LayoutH()
+        self.setLayout(h_layout)
+
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
+
+        self.zoom_out = SvgBtn("zoom_out.svg", 50)
+        h_layout.addWidget(self.zoom_out)
+        h_layout.addSpacerItem(QSpacerItem(20, 0))
+
+        self.zoom_in = SvgBtn("zoom_in.svg", 50)
+        h_layout.addWidget(self.zoom_in)
+        h_layout.addSpacerItem(QSpacerItem(20, 0))
+
+        self.zoom_fit = SvgBtn("zoom_fit.svg", 50)
+        h_layout.addWidget(self.zoom_fit)
+
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
+
+        self.adjustSize()
+
+    def bind_btns(self, f1: callable, f2: callable, f3: callable):
+        self.zoom_out.mouseReleaseEvent = f1
+        self.zoom_in.mouseReleaseEvent = f2
+        self.zoom_fit.mouseReleaseEvent = f3
 
 
 class WinImageView(WinImgViewBase):
@@ -145,7 +182,6 @@ class WinImageView(WinImgViewBase):
         self.setMinimumSize(QSize(500, 400))
         self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
-        self.bind_content_wid(self.mouse_switch_img)
         gui_signals_app.set_focus_viewer.connect(self.setFocus)
 
         self.fsize_img_timer = QTimer(self)
@@ -153,16 +189,28 @@ class WinImageView(WinImgViewBase):
         self.fsize_img_timer.setInterval(20)
         self.fsize_img_timer.timeout.connect(self.run_thread)
 
+        self.mouse_move_timer = QTimer(self)
+        self.mouse_move_timer.setSingleShot(True)
+        self.mouse_move_timer.setInterval(2000)
+        self.mouse_move_timer.timeout.connect(self.hide_navi_btns)
+        self.installEventFilter(self)
+
         self.image_label = ImageWidget()
         self.content_layout.addWidget(self.image_label)
-        self.bind_zoom(
-            zoom_fit=lambda e: self.image_label.zoom_reset(),
-            zoom_out=lambda e: self.image_label.zoom_out(),
-            zoom_in=lambda e: self.image_label.zoom_in()
+
+        self.navi_next = SvgBtn("next.svg", 50, parent=self.content_wid)
+        self.navi_next.mouseReleaseEvent = lambda e: self.navi_switch_img("+")
+
+        self.navi_prev = SvgBtn("prev.svg", 50, parent=self.content_wid)
+        self.navi_prev.mouseReleaseEvent = lambda e: self.navi_switch_img("-")
+
+        self.navi_zoom = ZoomWid(parent=self.content_wid)
+        self.navi_zoom.bind_btns(
+            lambda e: self.image_label.zoom_out(),
+            lambda e: self.image_label.zoom_in(),
+            lambda e : self.image_label.zoom_reset()
             )
-        
-        self.navigate_next = SvgBtn("next.svg", 50, parent=self.content_wid)
-        self.navigate_prev = SvgBtn("prev.svg", 50, parent=self.content_wid)
+        self.hide_navi_btns()
 
         self.setFocus()
         self.center_win()
@@ -195,13 +243,21 @@ class WinImageView(WinImgViewBase):
 
         self.fsize_img_timer.start()
 
-    def show_navigate_btns(self):
-        mid_h = (self.height() // 2) - (self.navigate_next.height() // 2)
-        prev_w = 0 + 30
-        next_w = self.width() - self.navigate_next.width() - 30
+    def move_navi_btns(self):
+        navi_h = (self.height() // 2) - (self.navi_next.height() // 2)
+        navi_prev_w = 0 + 30
+        navi_next_w = self.width() - self.navi_next.width() - 30
+        self.navi_prev.move(navi_prev_w, navi_h)
+        self.navi_next.move(navi_next_w, navi_h)
 
-        self.navigate_prev.move(prev_w, mid_h)
-        self.navigate_next.move(next_w, mid_h)
+        zoom_w = self.width() // 2 - self.navi_zoom.width() // 2
+        zoom_h = self.height() - self.navi_zoom.height() - 50
+        self.navi_zoom.move(zoom_w, zoom_h)
+
+    def hide_navi_btns(self):
+        self.navi_zoom.hide()
+        self.navi_prev.hide()
+        self.navi_next.hide()
 
     def run_thread(self):
         self.fsize_img_thread = FSizeImgThread(self.image_path)
@@ -228,8 +284,8 @@ class WinImageView(WinImgViewBase):
         total_images = len(cnf.images)
         new_index = (current_index + offset) % total_images
         self.image_path = cnf.images[new_index]
-        self.my_set_title()
         self.load_image()
+        self.my_set_title()
 
     def cut_text(self, text: str) -> str:
         limit = 40
@@ -251,12 +307,19 @@ class WinImageView(WinImgViewBase):
 
         self.set_title(f"{w}x{h} - {coll} - {name}")
 
-    def mouse_switch_img(self, event: QMouseEvent | None) -> None:
-        if event.button() == Qt.LeftButton and self.image_label.scale_factor == 1.0:
-            move_left = event.x() < self.width() / 2
-            offset = -1 if move_left else 1
-            self.switch_image(offset)
-            self.setFocus()
+    def navi_switch_img(self, flag: str) -> None:
+        if flag == "+":
+            self.switch_image(1)
+        else:
+            self.switch_image(-1)
+        self.setFocus()
+
+    # def mouse_switch_img(self, event: QMouseEvent | None) -> None:
+    #     if event.button() == Qt.LeftButton and self.image_label.scale_factor == 1.0:
+    #         move_left = event.x() < self.width() / 2
+    #         offset = -1 if move_left else 1
+    #         self.switch_image(offset)
+    #         self.setFocus()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Left:
@@ -297,15 +360,17 @@ class WinImageView(WinImgViewBase):
         event.ignore()
 
     def resizeEvent(self, event):
-        self.show_navigate_btns()
+        self.move_navi_btns()
         return super().resizeEvent(event)
     
-    def enterEvent(self, a0: QEvent | None) -> None:
-        self.navigate_prev.show()
-        self.navigate_next.show()
-        return super().enterEvent(a0)
-    
+    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
+        if a1.type() == 129: # mouse move
+            self.navi_prev.show()
+            self.navi_next.show()
+            self.navi_zoom.show()
+            self.mouse_move_timer.start()
+        return super().eventFilter(a0, a1)
+
     def leaveEvent(self, a0: QEvent | None) -> None:
-        self.navigate_prev.hide()
-        self.navigate_next.hide()
+        self.hide_navi_btns()
         return super().leaveEvent(a0)

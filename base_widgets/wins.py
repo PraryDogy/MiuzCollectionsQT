@@ -246,35 +246,35 @@ class WinImgViewBase(WinAutoRemove):
 
         # zoom widget top right corner
 
-        btn_w = 40
-        svg_w = 20
-        r_spacer = 10
+        # btn_w = 40
+        # svg_w = 20
+        # r_spacer = 10
 
-        zoom_wid = QWidget()
-        zoom_wid.setStyleSheet(f"""background-color: transparent;""")
-        zoom_wid.setFixedWidth(btn_w * 3 + r_spacer)
+        # zoom_wid = QWidget()
+        # zoom_wid.setStyleSheet(f"""background-color: transparent;""")
+        # zoom_wid.setFixedWidth(btn_w * 3 + r_spacer)
 
-        zoom_layout = LayoutH()
-        zoom_wid.setLayout(zoom_layout)
+        # zoom_layout = LayoutH()
+        # zoom_wid.setLayout(zoom_layout)
 
-        self.zoom_out = SvgBtn("zoom_out.svg", svg_w)
-        self.zoom_out.setFixedWidth(btn_w)
-        zoom_layout.addWidget(self.zoom_out)
+        # self.zoom_out = SvgBtn("zoom_out.svg", svg_w)
+        # self.zoom_out.setFixedWidth(btn_w)
+        # zoom_layout.addWidget(self.zoom_out)
 
-        self.zoom_in = SvgBtn("zoom_in.svg", svg_w)
-        self.zoom_in.setFixedWidth(btn_w)
-        zoom_layout.addWidget(self.zoom_in)
+        # self.zoom_in = SvgBtn("zoom_in.svg", svg_w)
+        # self.zoom_in.setFixedWidth(btn_w)
+        # zoom_layout.addWidget(self.zoom_in)
 
-        self.zoom_fit = SvgBtn("zoom_fit.svg", svg_w)
-        self.zoom_fit.setFixedWidth(btn_w)
-        zoom_layout.addWidget(self.zoom_fit)
+        # self.zoom_fit = SvgBtn("zoom_fit.svg", svg_w)
+        # self.zoom_fit.setFixedWidth(btn_w)
+        # zoom_layout.addWidget(self.zoom_fit)
 
-        fake = QWidget()
-        fake.setFixedWidth(r_spacer)
-        fake.setStyleSheet(f"""background-color: transparent;""")
-        zoom_layout.addWidget(fake)
+        # fake = QWidget()
+        # fake.setFixedWidth(r_spacer)
+        # fake.setStyleSheet(f"""background-color: transparent;""")
+        # zoom_layout.addWidget(fake)
 
-        self.titlebar.add_r_wid(zoom_wid)
+        # self.titlebar.add_r_wid(zoom_wid)
 
         # end zoom
 
@@ -287,10 +287,10 @@ class WinImgViewBase(WinAutoRemove):
     def bind_content_wid(self, func: callable):
         self.content_wid.mouseReleaseEvent = func
 
-    def bind_zoom(self, zoom_in: callable, zoom_out: callable, zoom_fit: callable):
-        self.zoom_in.mouseReleaseEvent = zoom_in
-        self.zoom_out.mouseReleaseEvent = zoom_out
-        self.zoom_fit.mouseReleaseEvent = zoom_fit
+    # def bind_zoom(self, zoom_in: callable, zoom_out: callable, zoom_fit: callable):
+    #     self.zoom_in.mouseReleaseEvent = zoom_in
+    #     self.zoom_out.mouseReleaseEvent = zoom_out
+    #     self.zoom_fit.mouseReleaseEvent = zoom_fit
 
 
 class WinSmallBase(WinAutoRemove):
