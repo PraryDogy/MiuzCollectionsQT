@@ -180,14 +180,13 @@ class WatcherThread(QThread):
         self.observer.schedule(
             event_handler=self.handler,
             path=cnf.coll_folder,
-            # recursive=False
+            recursive=True
             )
         self.observer.start()
 
         try:
             while self.flag:
-                sleep(1)
-                # sleep(Manager.observer_timeout)
+                sleep(Manager.observer_timeout)
         except KeyboardInterrupt:
             self.observer.stop()
             self.observer.join()
@@ -203,5 +202,4 @@ class WatcherThread(QThread):
         Dbase.cleanup_engine()
 
     def stop_watcher(self):
-        return
         self.flag = False
