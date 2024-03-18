@@ -24,6 +24,26 @@ class ReadDesatImage(QWidget):
             label.setPixmap(qImg)
             label.setAlignment(Qt.AlignCenter)
 
+
+            qimage = qImg.toImage()
+
+            # Преобразование QImage в массив numpy
+            width = qimage.width()
+            height = qimage.height()
+            bytes_per_line = qimage.bytesPerLine()
+            image_data = qimage.bits().asarray(height * bytes_per_line)
+
+            # Создание массива numpy изображения
+            image = np.array(image_data, dtype=np.uint8)
+            image = image.reshape((height, width, 4)) 
+
+            cv2.imshow("123", image)
+            cv2.waitKey(0)
+
+            return
+
+
+
             # Размещение метки в макете
             layout = QVBoxLayout()
             layout.addWidget(label)
@@ -40,7 +60,7 @@ os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plg
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ReadDesatImage(src)
-    window.show()
-    sys.exit(app.exec_())
+    # window.show()
+    # sys.exit(app.exec_())
 
  
