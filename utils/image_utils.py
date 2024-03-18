@@ -28,7 +28,7 @@ class ReadDesatImage:
             return
 
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        hsv[:, :, 1] = hsv[:, :, 1] * 0.9
+        hsv[:, :, 1] = hsv[:, :, 1] * 0.85
         self.rgb_image = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
     def read_transparent_png(self, image) -> np.ndarray:
