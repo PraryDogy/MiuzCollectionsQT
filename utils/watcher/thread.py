@@ -3,7 +3,7 @@ from time import sleep
 
 import sqlalchemy
 from PyQt5.QtCore import QThread, QTimer
-from watchdog.events import FileSystemEvent, FileSystemEventHandler
+from watchdog.events import FileSystemEvent, PatternMatchingEventHandler
 from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
 
@@ -24,17 +24,6 @@ class Manager:
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
     tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
 
-    @staticmethod
-    def is_good_file(event: FileSystemEvent):
-        if event.is_directory:
-             return False
-    
-        for i in [os.sep + i + os.sep for i in cnf.stop_colls]:
-            if i in event.src_path:
-                return False
-
-        return True
-        
 
 class WaitWriteFinish:
     def __init__(self, src: str):
@@ -125,16 +114,16 @@ class NewFile:
             session.close()
 
 
-class Handler(FileSystemEventHandler):
+class Handler(PatternMatchingEventHandler):
+    def __init__(self):
+        dirs = [f"*/{i}/*" for i in cnf.stop_colls]
+        super().__init__(ignore_directories=True, ignore_patterns=dirs)
+
     def on_any_event(self, event: FileSystemEvent) -> None:
         print(f"{event.event_type}: {event.src_path}")
         return super().on_any_event(event)
 
-
     def on_created(self, event: FileSystemEvent):
-        if not Manager.is_good_file(event):
-            return
-
         if event.src_path.endswith(Manager.jpg_exsts):
             WaitWriteFinish(src=event.src_path)
             NewFile(src=event.src_path)
@@ -145,9 +134,6 @@ class Handler(FileSystemEventHandler):
 
 
     def on_deleted(self, event: FileSystemEvent):
-        if not Manager.is_good_file(event):
-            return
-
         if event.src_path.endswith(Manager.jpg_exsts):
             DeletedFile(src=event.src_path)
             utils_signals_app.reset_event_timer_watcher.emit()
@@ -160,9 +146,6 @@ class Handler(FileSystemEventHandler):
 
 
     def on_moved(self, event: FileSystemEvent):
-        if not Manager.is_good_file(event):
-            return
-
         if event.src_path.endswith(Manager.jpg_exsts):
             MovedFile(src=event.src_path, dest=event.dest_path)
             utils_signals_app.reset_event_timer_watcher.emit()
@@ -189,6 +172,7 @@ class WatcherThread(QThread):
     def run(self):
         self.handler = Handler()
         self.observer = PollingObserver()
+
         # self.observer = Observer()
         Manager.flag = True
 

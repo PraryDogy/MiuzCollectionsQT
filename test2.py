@@ -4,7 +4,7 @@ from time import sleep
 import sqlalchemy
 from PyQt5.QtCore import QObject, QThread, QTimer
 from watchdog.events import (FileSystemEvent, FileSystemEventHandler,
-                             LoggingEventHandler)
+                             LoggingEventHandler, PatternMatchingEventHandler)
 from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
 
@@ -34,54 +34,33 @@ class Manager:
         return True
         
 
-class Handler(FileSystemEventHandler):
-    def on_any_event(self, event: FileSystemEvent) -> None:
-        # print(f"{event.event_type}: {event.src_path}")
-        return super().on_any_event(event)
+class Handler(PatternMatchingEventHandler):
+    def __init__(self):
+        dirs = ["/Volumes/Shares/Marketing/Photo/2024/01 - Январь/Test gallert/001 Test_1"]
+        super().__init__(ignore_directories=True, ignore_patterns=["*/001 Test_1/*"])
+
+    # def on_any_event(self, event: FileSystemEvent) -> None:
+        # return super().on_any_event(event)
 
     def on_created(self, event: FileSystemEvent):
-        if not Manager.is_good_file(event):
-            return
-
-        if event.src_path.endswith(Manager.jpg_exsts):
-            print("created jpg")
-            
-        elif event.src_path.endswith(Manager.tiff_exsts):
-            print("created tiff")
-
+        print(event)
 
     def on_deleted(self, event: FileSystemEvent):
-        if not Manager.is_good_file(event):
-            return
-
-        if event.src_path.endswith(Manager.jpg_exsts):
-            print("deleted jpg")
-
-        elif event.src_path.endswith(Manager.tiff_exsts):
-            print("deleted jpg")
+        print(event)
 
 
     def on_moved(self, event):
-        if not Manager.is_good_file(event):
-            return
-
-        if event.src_path.endswith(Manager.jpg_exsts):
-            print("moved jpg")
-
-        elif event.src_path.endswith(Manager.tiff_exsts):
-            print("moved jpg")
-
+        print(event)
 
 
 handler = Handler()
 observer = PollingObserver()
-# self.observer = Observer()
 Manager.flag = True
 
 observer.schedule(
     event_handler=handler,
     path="/Volumes/Shares/Marketing/Photo/2024/01 - Январь/Test gallert",
-    recursive=True
+    recursive=True,
     )
 observer.start()
 
