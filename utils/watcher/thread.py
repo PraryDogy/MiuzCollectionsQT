@@ -28,9 +28,11 @@ class Manager:
     def is_good_file(event: FileSystemEvent):
         if event.is_directory:
              return False
-        for i in [os.sep + i + os.sep for i in Manager.stop_colls]:
+    
+        for i in [os.sep + i + os.sep for i in cnf.stop_colls]:
             if i in event.src_path:
                 return False
+
         return True
         
 
