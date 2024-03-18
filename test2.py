@@ -40,10 +40,6 @@ class ReadDesatImage(QWidget):
             cv2.imshow("123", image)
             cv2.waitKey(0)
 
-            return
-
-
-
             # Размещение метки в макете
             layout = QVBoxLayout()
             layout.addWidget(label)
