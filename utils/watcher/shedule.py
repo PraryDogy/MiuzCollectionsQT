@@ -49,8 +49,8 @@ class WatcherShedule(QObject):
     def stop_thread(self):
         if self.watcher_thread:
             self.stop_timers()
-            self.watcher_thread.clean_engine()
             self.watcher_thread.stop_watcher()
+            self.watcher_thread.clean_engine()
 
     def stop_timers(self):
         self.smb_wait_timer.stop()

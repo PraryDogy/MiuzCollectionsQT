@@ -2,10 +2,10 @@ import os
 from time import sleep
 
 import sqlalchemy
-from PyQt5.QtCore import QThread, QTimer, QObject
-from watchdog.events import FileSystemEvent, FileSystemEventHandler, LoggingEventHandler
-from watchdog.observers.polling import PollingObserver
+from PyQt5.QtCore import QThread, QTimer
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
@@ -16,6 +16,7 @@ from ..main_utils import MainUtils
 
 
 class Manager:
+    flag = True
     observer_timeout = 5
     img_wait_time_sleep = 3
     img_wait_time_count = 2 * 60
@@ -23,6 +24,15 @@ class Manager:
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
     tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
 
+    @staticmethod
+    def is_good_file(event: FileSystemEvent):
+        if event.is_directory:
+             return False
+        for i in [os.sep + i + os.sep for i in Manager.stop_colls]:
+            if i in event.src_path:
+                return False
+        return True
+        
 
 class WaitWriteFinish:
     def __init__(self, src: str):
@@ -113,51 +123,54 @@ class NewFile:
             session.close()
 
 
-class Handler(LoggingEventHandler):
-    def on_any_event(self, event) -> None:
+class Handler(FileSystemEventHandler):
+    def on_any_event(self, event: FileSystemEvent) -> None:
         print(f"{event.event_type}: {event.src_path}")
         return super().on_any_event(event)
 
 
-    def on_created(self, event):
-        if not event.is_directory:
+    def on_created(self, event: FileSystemEvent):
+        if not Manager.is_good_file(event):
+            return
 
-            if event.src_path.endswith(Manager.jpg_exsts):
-                WaitWriteFinish(src=event.src_path)
-                NewFile(src=event.src_path)
-                utils_signals_app.reset_event_timer_watcher.emit()
+        if event.src_path.endswith(Manager.jpg_exsts):
+            WaitWriteFinish(src=event.src_path)
+            NewFile(src=event.src_path)
+            utils_signals_app.reset_event_timer_watcher.emit()
 
-            elif event.src_path.endswith(Manager.tiff_exsts):
-                cnf.tiff_images.add(event.src_path)
-
-
-    def on_deleted(self, event):
-        if not event.is_directory:
-
-            if event.src_path.endswith(Manager.jpg_exsts):
-                DeletedFile(src=event.src_path)
-                utils_signals_app.reset_event_timer_watcher.emit()
-
-            elif event.src_path.endswith(Manager.tiff_exsts):
-                try:
-                    cnf.tiff_images.remove(event.src_path)
-                except KeyError:
-                    pass
+        elif event.src_path.endswith(Manager.tiff_exsts):
+            cnf.tiff_images.add(event.src_path)
 
 
-    def on_moved(self, event):
-        if not event.is_directory:
+    def on_deleted(self, event: FileSystemEvent):
+        if not Manager.is_good_file(event):
+            return
 
-            if event.src_path.endswith(Manager.jpg_exsts):
-                MovedFile(src=event.src_path, dest=event.dest_path)
-                utils_signals_app.reset_event_timer_watcher.emit()
+        if event.src_path.endswith(Manager.jpg_exsts):
+            DeletedFile(src=event.src_path)
+            utils_signals_app.reset_event_timer_watcher.emit()
 
-            elif event.src_path.endswith(Manager.tiff_exsts):
-                try:
-                    cnf.tiff_images.remove(event.src_path)
-                except KeyError:
-                    pass
-                cnf.tiff_images.add(event.dest_path)
+        elif event.src_path.endswith(Manager.tiff_exsts):
+            try:
+                cnf.tiff_images.remove(event.src_path)
+            except KeyError:
+                pass
+
+
+    def on_moved(self, event: FileSystemEvent):
+        if not Manager.is_good_file(event):
+            return
+
+        if event.src_path.endswith(Manager.jpg_exsts):
+            MovedFile(src=event.src_path, dest=event.dest_path)
+            utils_signals_app.reset_event_timer_watcher.emit()
+
+        elif event.src_path.endswith(Manager.tiff_exsts):
+            try:
+                cnf.tiff_images.remove(event.src_path)
+            except KeyError:
+                pass
+            cnf.tiff_images.add(event.dest_path)
 
 
 class WatcherThread(QThread):
@@ -175,7 +188,7 @@ class WatcherThread(QThread):
         self.handler = Handler()
         self.observer = PollingObserver()
         # self.observer = Observer()
-        self.flag = True
+        Manager.flag = True
 
         self.observer.schedule(
             event_handler=self.handler,
@@ -185,11 +198,16 @@ class WatcherThread(QThread):
         self.observer.start()
 
         try:
-            while self.flag:
+            while Manager.flag:
                 sleep(Manager.observer_timeout)
         except KeyboardInterrupt:
             self.observer.stop()
             self.observer.join()
+            print("watcher stoped")
+
+        self.observer.stop()
+        self.observer.join()
+        print("watcher stoped")
 
     def reset_event_timer(self):
         self.event_timer.start()
@@ -202,4 +220,4 @@ class WatcherThread(QThread):
         Dbase.cleanup_engine()
 
     def stop_watcher(self):
-        self.flag = False
+        Manager.flag = False
