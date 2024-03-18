@@ -36,8 +36,11 @@ class Manager:
 
 class Handler(PatternMatchingEventHandler):
     def __init__(self):
-        dirs = ["/Volumes/Shares/Marketing/Photo/2024/01 - Январь/Test gallert/001 Test_1"]
-        super().__init__(ignore_directories=True, ignore_patterns=["*/001 Test_1/*"])
+        dirs = [
+            f"*/{i}/*"
+            for i in ("001 Test_1", "002 Test_2")
+        ]
+        super().__init__(ignore_directories=True, ignore_patterns=dirs)
 
     # def on_any_event(self, event: FileSystemEvent) -> None:
         # return super().on_any_event(event)
