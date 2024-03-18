@@ -323,7 +323,9 @@ class WinSettings(WinStandartBase):
 
         if scan_again:
             utils_signals_app.scaner_stop.emit()
-            utils_signals_app.watcher_stop.emit()
+
+            if cnf.watcher:
+                utils_signals_app.watcher_stop.emit()
 
             utils_signals_app.scaner_start.emit()
 

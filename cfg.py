@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 from datetime import datetime
-from typing import Literal, Type, Union, Dict
+from typing import Dict, Literal, Type, Union
 
 from lang import Eng, Rus
 
@@ -34,6 +34,7 @@ class User:
         self.zoom: bool = False
         self.move_jpg = True
         self.move_layers = False
+        self.watcher = False
 
         self.root_g: dict = {
             "aw": 700,
