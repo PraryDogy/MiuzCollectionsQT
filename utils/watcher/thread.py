@@ -119,11 +119,8 @@ class Handler(PatternMatchingEventHandler):
         dirs = [f"*/{i}/*" for i in cnf.stop_colls]
         super().__init__(ignore_directories=True, ignore_patterns=dirs)
 
-    def on_any_event(self, event: FileSystemEvent) -> None:
-        print(f"{event.event_type}: {event.src_path}")
-        return super().on_any_event(event)
-
     def on_created(self, event: FileSystemEvent):
+        print(event)
         if event.src_path.endswith(Manager.jpg_exsts):
             WaitWriteFinish(src=event.src_path)
             NewFile(src=event.src_path)
@@ -134,6 +131,7 @@ class Handler(PatternMatchingEventHandler):
 
 
     def on_deleted(self, event: FileSystemEvent):
+        print(event)
         if event.src_path.endswith(Manager.jpg_exsts):
             DeletedFile(src=event.src_path)
             utils_signals_app.reset_event_timer_watcher.emit()
@@ -146,6 +144,7 @@ class Handler(PatternMatchingEventHandler):
 
 
     def on_moved(self, event: FileSystemEvent):
+        print(event)
         if event.src_path.endswith(Manager.jpg_exsts):
             MovedFile(src=event.src_path, dest=event.dest_path)
             utils_signals_app.reset_event_timer_watcher.emit()
