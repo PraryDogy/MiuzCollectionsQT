@@ -15,7 +15,9 @@ class ReadDesatImage(QWidget):
         if img is not None:
             h, w, ch = img.shape
             bytesPerLine = ch * w
-            qImg = QPixmap.fromImage(QImage(img.data, w, h, bytesPerLine, QImage.Format.Format_BGR888))
+            qImg = QPixmap.fromImage(
+                QImage(img.data, w, h, bytesPerLine, QImage.Format.Format_BGR888)
+                )
 
             # Создание метки QLabel и отображение изображения
             label = QLabel(self)
