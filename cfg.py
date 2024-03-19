@@ -32,9 +32,10 @@ class User:
         self.curr_coll: str = "miuzcollections_all"
         self.user_lng: str = "en"
         self.zoom: bool = False
-        self.move_jpg = True
-        self.move_layers = False
-        self.watcher = False
+        self.move_jpg: bool = True
+        self.move_layers: bool = False
+        self.watcher: bool = True
+        self.scaner_minutes: int = 20
 
         self.root_g: dict = {
             "aw": 700,

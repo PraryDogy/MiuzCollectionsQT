@@ -1,8 +1,11 @@
 from PyQt5.QtCore import QObject, QTimer
 
+from cfg import cnf
 from signals import utils_signals_app
+
 from ..main_utils import MainUtils
-from .thread import ScanerThread, Manager as ScanerThreadManager
+from .thread import Manager as ScanerThreadManager
+from .thread import ScanerThread
 
 
 class ScanerShedule(QObject):
@@ -19,7 +22,7 @@ class ScanerShedule(QObject):
         self.thread_wait_timer.timeout.connect(self.wait_thread)
 
         self.next_scan_timer = QTimer(self)
-        self.next_scan_timer.setInterval(5 * 60 * 1000)
+        self.next_scan_timer.setInterval(cnf.scaner_minutes * 60 * 1000)
         self.next_scan_timer.setSingleShot(True)
         self.next_scan_timer.timeout.connect(self.wait_thread)
 
