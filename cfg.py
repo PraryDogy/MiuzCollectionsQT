@@ -11,10 +11,8 @@ class User:
     def __init__(self) -> None:
         super().__init__()
 
-        self.key: dict = {
-            "db_ver": 1.1,
-            "hello_screen": True
-            }
+        self.app_ver: str = "5.1.2"
+        self.first_load = True
 
         self.coll_folder: str = os.path.join(
             os.sep,
@@ -72,6 +70,7 @@ class User:
         self.stop_colls: dict = [
             "_Archive_Commerce_Брендинг",
             "Chosed",
+            "LEVIEV"
             ]
         
 
@@ -104,9 +103,7 @@ class Dymanic:
 class AppInfo:
     def __init__(self):
         super().__init__()
-
         self.app_name: str = "MiuzCollections"
-        self.app_ver: str = "5.1.1"
 
 
 class Config(User, Dymanic, Static, AppInfo):
@@ -129,20 +126,25 @@ class Config(User, Dymanic, Static, AppInfo):
             self.app_support_app_dir,
             "db.db"
             )
+        
+    def update_json(self, data: dict):
+        data["watcher"] = False
+        data["scaner_minutes"] = 5
+
+        if "LEVIEV" not in data["stop_colls"]:
+            data["stop_colls"].append("LEVIEV")
+
+        shutil.copyfile(src="db.db", dst=self.db_file)
+        data["app_ver"] = self.app_ver
+        return data
 
     def read_json_cfg(self):
         with open(self.json_file, "r", encoding="utf8") as file:
             data: dict = json.load(file)
+
+        if "app_ver" not in data or self.app_ver != data["app_ver"]:
+            data = self.update_json(data)
         
-        if "key" not in data:
-            shutil.copyfile(src="db.db", dst=self.db_file)
-            data["key"] = self.key
-
-        if data["key"]["db_ver"] != self.key["db_ver"]:
-            print("New DB. Copying database")
-            shutil.copyfile(src="db.db", dst=self.db_file)
-            data["key"]["db_ver"] = self.key["db_ver"]
-
         for k, v in data.items():
             if hasattr(self, k):
 
