@@ -39,7 +39,7 @@ class ScanerShedule(QObject):
             self.start_thread()
 
         else:
-            print("scaner wait prev thread finished")
+            print(f"scaner wait prev thread finished, flag: {ScanerThreadManager.flag}")
             self.thread_wait_timer.start()
 
     def start_thread(self):
@@ -57,6 +57,7 @@ class ScanerShedule(QObject):
             self.next_scan_timer.start()
 
     def stop_thread(self):
+        print("run stop thread")
         ScanerThreadManager.flag = False
         self.stop_timers()
 
