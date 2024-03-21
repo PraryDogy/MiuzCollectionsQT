@@ -63,7 +63,3 @@ if not MainUtils.smb_check():
 
     Manager.smb_win = WinSmb()
     Manager.smb_win.show()
-
-
-from signals import gui_signals_app
-gui_signals_app.noti_main.emit("Helloo")
