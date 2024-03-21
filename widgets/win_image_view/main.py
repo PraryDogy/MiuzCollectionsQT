@@ -14,6 +14,7 @@ from signals import gui_signals_app
 from utils import MainUtils, ReadDesatImage, get_image_size
 
 from ..image_context import ImageContext
+from ..notification import Notification
 
 
 class Manager:
@@ -223,6 +224,13 @@ class WinImageView(WinImgViewBase):
         self.image_label = ImageWidget()
         self.content_layout.addWidget(self.image_label)
 
+        self.notification = Notification(self.content_wid)
+        gui_signals_app.noti_img_view.connect(self.notification.show_notify)
+        self.notification.move(
+            self.width() // 2 - self.notification.width() // 2,
+            2
+            )
+
         self.navi_prev = NaviArrowPrev(self.content_wid)
         self.navi_prev.mouseReleaseEvent = lambda e: self.navi_switch_img("-")
 
@@ -372,6 +380,12 @@ class WinImageView(WinImgViewBase):
 
     def resizeEvent(self, event):
         self.move_navi_btns()
+
+        self.notification.move(
+            self.width() // 2 - self.notification.width() // 2,
+            2
+            )
+
         return super().resizeEvent(event)
     
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:

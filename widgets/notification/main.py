@@ -8,7 +8,7 @@ from signals import gui_signals_app
 from styles import Styles
 
 
-class NoTiffNoti(QFrame):
+class Notification(QFrame):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setFixedWidth(300)
@@ -37,12 +37,12 @@ class NoTiffNoti(QFrame):
         self.hide_timer.setSingleShot(True)
         self.hide_timer.timeout.connect(self.hide)
 
-        gui_signals_app.noti_main.connect(self.show_notify)
-
         self.hide()
 
     def show_notify(self, text: str):
         self.label.setText(text)
         self.show()
         self.hide_timer.start()
+
+        print(text)
 
