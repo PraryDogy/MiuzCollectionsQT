@@ -43,6 +43,3 @@ class Notification(QFrame):
         self.label.setText(text)
         self.show()
         self.hide_timer.start()
-
-        print(text)
-

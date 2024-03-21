@@ -38,7 +38,6 @@ class CustomContext(ContextMenuBase):
 
     def paste_text(self):
         text = MainUtils.paste_text()
-        print(text)
         self.root.insert(text)
 
 
