@@ -65,11 +65,11 @@ class BrowseColl(LayoutV):
     def finalize(self):
         if Manager.coll_folder != cnf.coll_folder:
             cnf.coll_folder = Manager.coll_folder
-            utils_signals_app.scaner_stop.emit()
 
-            if cnf.watcher:
-                utils_signals_app.watcher_stop.emit()
+        if cnf.watcher:
+            utils_signals_app.watcher_stop.emit()
 
+        utils_signals_app.scaner_stop.emit()
         utils_signals_app.scaner_start.emit()
 
         if not MainUtils.smb_check():

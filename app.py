@@ -51,6 +51,7 @@ class App(QApplication):
 
 
 app = App()
+utils_signals_app.scaner_start.emit()
 
 if cnf.first_load:
     from widgets.win_first_load import WinFirstLoad
@@ -64,5 +65,3 @@ if not MainUtils.smb_check():
     Manager.smb_win = WinSmb()
     Manager.smb_win.show()
 
-else:
-    utils_signals_app.scaner_start.emit()
