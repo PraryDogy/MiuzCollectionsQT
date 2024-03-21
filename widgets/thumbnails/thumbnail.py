@@ -18,6 +18,7 @@ class Thumbnail(QLabel, QObject):
         self.img_src = img_src
         self.tiff_src = None
         self.find_tiff_thread = None
+        self.show_no_tiff = False
         cnf.images.append(img_src)
 
         self.setStyleSheet(
@@ -74,6 +75,9 @@ class Thumbnail(QLabel, QObject):
             if self.tiff_src:
                 self.urls.append(QUrl.fromLocalFile(self.tiff_src))
 
+            else:
+                self.show_no_tiff = True
+
     def finalize_move(self):
 
         if len(self.urls) == 0:
@@ -84,7 +88,8 @@ class Thumbnail(QLabel, QObject):
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.CopyAction)
 
-        if not self.tiff_src:
+        if self.show_no_tiff:
+            self.show_no_tiff = False
             self.tiff_win = WinNoTiff()
             self.tiff_win.show()
 
