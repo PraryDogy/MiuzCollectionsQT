@@ -128,6 +128,7 @@ class Config(User, Dymanic, Static, AppInfo):
             )
         
     def update_json(self, data: dict):
+        data["first_load"] = False
         data["watcher"] = False
         data["scaner_minutes"] = 5
 
