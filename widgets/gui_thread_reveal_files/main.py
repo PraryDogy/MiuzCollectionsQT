@@ -1,8 +1,8 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
+from cfg import cnf
+from signals import gui_signals_app
 from utils import FindTiffThread, RevealFiles
-
-from ..win_no_tiff import WinNoTiff
 
 
 class Manager:
@@ -52,8 +52,8 @@ class GuiThreadRevealFiles(QObject):
         tiffs = [i for i in self.tiff_list if i]
 
         if len(tiffs) == 0:
-            no_tiff_win = WinNoTiff()
-            no_tiff_win.show()
+            gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
+            gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
             return
         else:
             self.run_reveal(tiffs)

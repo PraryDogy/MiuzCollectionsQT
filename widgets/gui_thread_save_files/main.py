@@ -5,8 +5,7 @@ from cfg import cnf
 from utils import FindTiffThread
 
 from ..win_copy_files_thread import WinCopyFilesThread
-from ..win_no_tiff import WinNoTiff
-
+from signals import gui_signals_app
 
 class Manager:
     threads = []
@@ -32,8 +31,8 @@ class GuiThreadSaveFiles(QObject):
             raise Exception("files must be list")
 
         if len(files) == 0:
-            self.no_tiff_win = WinNoTiff()
-            self.no_tiff_win.show()
+            gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
+            gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
             return
 
         if is_fiff:
@@ -62,8 +61,8 @@ class GuiThreadSaveFiles(QObject):
         tiffs = [i for i in self.tiff_list if i]
 
         if len(tiffs) == 0:
-            no_tiff_win = WinNoTiff()
-            no_tiff_win.show()
+            gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
+            gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
             return
         else:
             self.run_save_files(tiffs)
