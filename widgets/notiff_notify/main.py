@@ -37,7 +37,7 @@ class NoTiffNoti(QFrame):
         self.hide_timer.setSingleShot(True)
         self.hide_timer.timeout.connect(self.hide)
 
-        gui_signals_app.notiff_noti_main.connect(self.show_notify)
+        gui_signals_app.noti_main.connect(self.show_notify)
 
         self.hide()
 

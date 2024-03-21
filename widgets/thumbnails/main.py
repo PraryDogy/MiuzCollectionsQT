@@ -72,7 +72,7 @@ class Thumbnails(QScrollArea):
         gui_signals_app.reload_thumbnails.connect(self.reload_thumbnails)
         gui_signals_app.scroll_top.connect(self.scroll_top)
 
-        gui_signals_app.notiff_noti_main.emit(cnf.lng.no_tiff)
+        gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
 
     def checkScrollValue(self, value):
         self.up_btn.move(

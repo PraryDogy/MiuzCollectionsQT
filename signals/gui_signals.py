@@ -25,7 +25,8 @@ class GuiSignals(QObject):
     progress_add_photos = pyqtSignal()
     progress_del_photos = pyqtSignal()
 
-    notiff_noti_main = pyqtSignal(str)
+    noti_main = pyqtSignal(str)
+    noti_img_view = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
