@@ -11,7 +11,7 @@ class User:
     def __init__(self) -> None:
         super().__init__()
 
-        self.app_ver: str = "5.1.2"
+        self.app_ver: str = "5.1.3"
         self.first_load = True
 
         self.coll_folder: str = os.path.join(
@@ -128,6 +128,8 @@ class Config(User, Dymanic, Static, AppInfo):
             )
         
     def update_json(self, data: dict):
+        print("UPDATING JSON, COPYING DB")
+        
         data["first_load"] = False
         data["watcher"] = False
         data["scaner_minutes"] = 5
