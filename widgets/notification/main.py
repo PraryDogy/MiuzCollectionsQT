@@ -12,7 +12,7 @@ class Notification(QFrame):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setFixedWidth(300)
-        self.setFixedHeight(35)
+        self.setFixedHeight(30)
         self.setStyleSheet(
             f"""
             background-color: {Styles.blue_color};
@@ -21,16 +21,16 @@ class Notification(QFrame):
 
         effect = QGraphicsDropShadowEffect()
         effect.setOffset(0, 0)
-        effect.setBlurRadius(30)
+        effect.setBlurRadius(28)
         self.setGraphicsEffect(effect)
                 
         h_layout = LayoutH(self)
-        h_layout.addStretch()
+        h_layout.addStretch(1)
 
         self.label = QLabel(cnf.lng.no_tiff)
         h_layout.addWidget(self.label)
 
-        h_layout.addStretch()
+        h_layout.addStretch(1)
 
         self.hide_timer = QTimer(self)
         self.hide_timer.setInterval(3000)
