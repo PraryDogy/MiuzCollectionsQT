@@ -1,14 +1,14 @@
-from PyQt5.QtCore import QMimeData, Qt, QUrl, QObject, pyqtSignal
+from PyQt5.QtCore import QMimeData, QObject, Qt, QUrl, pyqtSignal
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QApplication, QLabel
 
 from cfg import cnf
+from signals import gui_signals_app
 from utils import FindTiffLocal, PixmapThumb
 
 from ..image_context import ImageContext
 from ..win_image_view import WinImageView
-from ..win_no_tiff import WinNoTiff
-import os
+
 
 class Thumbnail(QLabel, QObject):
     finish_find_tiff = pyqtSignal(str)
@@ -90,8 +90,8 @@ class Thumbnail(QLabel, QObject):
 
         if self.show_no_tiff:
             self.show_no_tiff = False
-            self.tiff_win = WinNoTiff()
-            self.tiff_win.show()
+            gui_signals_app.notiff_noti_main.emit(cnf.lng.no_tiff)
+
 
     def contextMenuEvent(self, event):
         self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)

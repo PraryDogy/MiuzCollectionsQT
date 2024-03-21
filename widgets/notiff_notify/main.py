@@ -1,0 +1,48 @@
+from PyQt5.QtCore import QRect, Qt, QTimer
+from PyQt5.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
+                             QLabel, QWidget)
+
+from base_widgets import LayoutH
+from cfg import cnf
+from signals import gui_signals_app
+from styles import Styles
+
+
+class NoTiffNoti(QFrame):
+    def __init__(self, parent: QWidget):
+        super().__init__(parent)
+        self.setFixedWidth(300)
+        self.setFixedHeight(35)
+        self.setStyleSheet(
+            f"""
+            background-color: {Styles.blue_color};
+            border-radius: {Styles.big_radius};
+            """)
+
+        effect = QGraphicsDropShadowEffect()
+        effect.setOffset(0, 0)
+        effect.setBlurRadius(30)
+        self.setGraphicsEffect(effect)
+                
+        h_layout = LayoutH(self)
+        h_layout.addStretch()
+
+        self.label = QLabel(cnf.lng.no_tiff)
+        h_layout.addWidget(self.label)
+
+        h_layout.addStretch()
+
+        self.hide_timer = QTimer(self)
+        self.hide_timer.setInterval(3000)
+        self.hide_timer.setSingleShot(True)
+        self.hide_timer.timeout.connect(self.hide)
+
+        gui_signals_app.notiff_noti_main.connect(self.show_notify)
+
+        self.hide()
+
+    def show_notify(self, text: str):
+        self.label.setText(text)
+        self.show()
+        self.hide_timer.start()
+

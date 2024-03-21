@@ -8,7 +8,6 @@ from widgets import WinMain
 from signals import utils_signals_app
 from utils import MainUtils
 
-
 class Manager:
     smb_win = None
 
