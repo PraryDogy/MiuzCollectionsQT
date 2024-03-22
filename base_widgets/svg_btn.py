@@ -1,6 +1,9 @@
-from PyQt5.QtSvg import QSvgWidget
 import os
-from PyQt5.QtWidgets import QWidget
+
+from PyQt5.QtGui import QColor
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QWidget
+
 from .layouts import LayoutH
 
 
@@ -20,3 +23,14 @@ class SvgBtn(QWidget):
 
     def set_icon(self, icon_name):
         self.svg_btn.load(os.path.join("images", icon_name))
+
+
+class SvgShadowed(SvgBtn):
+    def __init__(self, icon_name: str, size: int, parent: QWidget = None):
+        super().__init__(icon_name, size, parent)
+
+        effect = QGraphicsDropShadowEffect()
+        effect.setOffset(0, 0)
+        effect.setColor(QColor(0, 0, 0, 200))
+        effect.setBlurRadius(15)
+        self.setGraphicsEffect(effect)

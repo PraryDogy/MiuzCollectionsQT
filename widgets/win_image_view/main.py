@@ -5,9 +5,9 @@ from PyQt5.QtCore import (QEvent, QObject, QPoint, QSize, Qt, QThread, QTimer,
                           pyqtSignal)
 from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
                          QPixmap)
-from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QFrame, QSpacerItem, QWidget
 
-from base_widgets import LayoutH, LayoutV, SvgBtn, WinImgViewBase
+from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
@@ -152,15 +152,15 @@ class NaviZoom(QFrame):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_out = SvgBtn("zoom_out.svg", 45)
+        self.zoom_out = SvgShadowed("zoom_out.svg", 45)
         h_layout.addWidget(self.zoom_out)
         h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.zoom_in = SvgBtn("zoom_in.svg", 45)
+        self.zoom_in = SvgShadowed("zoom_in.svg", 45)
         h_layout.addWidget(self.zoom_in)
         h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.zoom_fit = SvgBtn("zoom_fit.svg", 45)
+        self.zoom_fit = SvgShadowed("zoom_fit.svg", 45)
         h_layout.addWidget(self.zoom_fit)
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
@@ -183,7 +183,7 @@ class NaviArrow(QWidget):
         v_layout = LayoutV()
         self.setLayout(v_layout)
 
-        btn = SvgBtn(icon_name, 50)
+        btn = SvgShadowed(icon_name, 50)
         v_layout.addWidget(btn)
 
 
