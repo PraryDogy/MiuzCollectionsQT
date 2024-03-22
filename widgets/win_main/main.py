@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QResizeEvent
 from PyQt5.QtWidgets import (QAction, QDesktopWidget, QFrame, QMainWindow,
-                             QSpacerItem, QWidget, QSizePolicy)
+                             QWidget)
 
 from base_widgets import BaseEmptyWin, LayoutH, LayoutV
 from cfg import cnf
@@ -10,10 +10,11 @@ from signals import gui_signals_app
 from ..filters_bar import FiltersBar
 from ..left_menu import LeftMenu
 from ..menu_bar import MacMenuBar
+from ..notification import Notification
 from ..search_bar import SearchBar
 from ..st_bar import StBar
 from ..thumbnails import Thumbnails
-from ..notification import Notification
+
 
 class Manager:
     smb_win = None
