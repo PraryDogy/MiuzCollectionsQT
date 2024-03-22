@@ -9,7 +9,6 @@ from signals import gui_signals_app
 from styles import Styles
 from utils import MainUtils
 
-from ..notification import Notification
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .limit_btn import LimitBtn
 from .thumbnail import Thumbnail
@@ -43,13 +42,6 @@ class Thumbnails(QScrollArea):
             background-color: {Styles.thumbs_bg_color}
             """)
         
-        self.notification = Notification(self)
-        gui_signals_app.noti_main.connect(self.notification.show_notify)
-        self.notification.move(
-            self.width() // 2 - self.notification.width() // 2,
-            2
-            )
-
         # Основной лейаут фрейма в области скролла
         frame_layout = LayoutV(self.scroll_area_widget)
 
@@ -149,7 +141,3 @@ class Thumbnails(QScrollArea):
         self.resize_timer.start()
 
         self.up_btn.setVisible(False)
-        self.notification.move(
-            self.width() // 2 - self.notification.width() // 2,
-            2
-            )

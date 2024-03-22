@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QResizeEvent
 from PyQt5.QtWidgets import (QAction, QDesktopWidget, QFrame, QMainWindow,
-                             QSpacerItem, QWidget)
+                             QSpacerItem, QWidget, QSizePolicy)
 
 from base_widgets import BaseEmptyWin, LayoutH, LayoutV
 from cfg import cnf
@@ -12,7 +13,7 @@ from ..menu_bar import MacMenuBar
 from ..search_bar import SearchBar
 from ..st_bar import StBar
 from ..thumbnails import Thumbnails
-
+from ..notification import Notification
 
 class Manager:
     smb_win = None
@@ -38,6 +39,21 @@ class RightWidget(QWidget):
         v_layout.addWidget(sep)
         v_layout.addWidget(self.thumbnails)
         v_layout.addWidget(self.st_bar)
+
+        self.notification = Notification(parent=self)
+        gui_signals_app.noti_main.connect(self.notification.show_notify)
+        self.notification.move(2, 2)
+        self.notification.resize(
+            self.thumbnails.width() - 6,
+            self.filters_bar.height() - 4
+            )
+        
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        self.notification.resize(
+            self.thumbnails.width() - 6,
+            self.filters_bar.height() - 4
+            )
+        return super().resizeEvent(a0)
 
 
 class ContentWid(QWidget):

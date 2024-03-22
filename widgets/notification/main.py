@@ -11,8 +11,6 @@ from styles import Styles
 class Notification(QFrame):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setFixedWidth(300)
-        self.setFixedHeight(30)
         self.setStyleSheet(
             f"""
             background-color: {Styles.blue_color};
