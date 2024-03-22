@@ -2,6 +2,8 @@ from PyQt5.QtCore import QRect, Qt, QTimer
 from PyQt5.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
                              QLabel, QWidget)
 
+from PyQt5.QtGui import QColor
+
 from base_widgets import LayoutH
 from cfg import cnf
 from signals import gui_signals_app
@@ -18,8 +20,9 @@ class Notification(QFrame):
             """)
 
         effect = QGraphicsDropShadowEffect()
+        effect.setColor(QColor(0, 0, 0, 240))
         effect.setOffset(0, 0)
-        effect.setBlurRadius(28)
+        effect.setBlurRadius(15)
         self.setGraphicsEffect(effect)
                 
         h_layout = LayoutH(self)
