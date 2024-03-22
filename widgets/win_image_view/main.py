@@ -229,10 +229,7 @@ class WinImageView(WinImgViewBase):
             self.width() - 20,
             30
             )
-        self.notification.move(
-            (self.width() // 2 - self.notification.width() // 2),
-            2
-            )
+        self.notification.move(10, 2)
         gui_signals_app.noti_img_view.connect(self.notification.show_notify)
 
         self.navi_prev = NaviArrowPrev(self.content_wid)
