@@ -13,7 +13,8 @@ class CopyFilesThread(QThread):
 
     def __init__(self):
         super().__init__()
-        self.stop.connect(self.quit)
+        self.stop.connect(self.stop_copying)
+        self.flag = True
 
     def set_sources(self, dest_folder: str, source_files: list):
         self.source_files = source_files
@@ -28,22 +29,31 @@ class CopyFilesThread(QThread):
         self.value.emit(0)
 
         for file_path in self.source_files:
+
+            if not self.flag:
+                return
+
             dest_path = os.path.join(self.dest_folder, os.path.basename(file_path))
             files_dests.append(dest_path)
 
             with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
-                while True:
+
+                while self.flag:
+
                     buf = fsrc.read(self.buffer_size)
+
                     if not buf:
                         break
+
                     fdest.write(buf)
                     copied_size += len(buf)
                     percent = int((copied_size / total_size) * 100)
 
-                    # print(percent)
                     self.value.emit(percent)
         
         self.value.emit(100)
         self.finished.emit(files_dests)
         RevealFiles(files_dests)
 
+    def stop_copying(self):
+        self.flag = False
