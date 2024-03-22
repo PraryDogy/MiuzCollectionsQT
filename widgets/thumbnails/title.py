@@ -90,6 +90,7 @@ class Title(QLabel):
             width: int
             ):
 
+        Manager.threads.clear()
         super().__init__(f"{title}. {cnf.lng.total}: {len(images)}")
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)
