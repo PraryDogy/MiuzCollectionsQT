@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QWidget
 
 from cfg import cnf
 from utils import FindTiffThread
@@ -14,12 +14,20 @@ class Manager:
 class GuiThreadSaveFiles(QObject):
     finished = pyqtSignal()
 
-    def __init__(self, files: list, is_fiff: bool, is_downloads: bool):
+    def __init__(
+            self,
+            parent: QWidget | QMainWindow,
+            files: list,
+            is_fiff: bool,
+            is_downloads: bool
+            ):
+
         super().__init__()
         Manager.threads.append(self)
 
         self.copy_files_win = None
         self.tiff_thread = None
+        self.my_parent = parent
 
         self.tiff_list = []
         self.input_files = files
@@ -31,8 +39,10 @@ class GuiThreadSaveFiles(QObject):
             raise Exception("files must be list")
 
         if len(files) == 0:
-            gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
-            gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
+            if isinstance(self.my_parent, QMainWindow):
+                gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
+            else:
+                gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
             return
 
         if is_fiff:
@@ -61,8 +71,10 @@ class GuiThreadSaveFiles(QObject):
         tiffs = [i for i in self.tiff_list if i]
 
         if len(tiffs) == 0:
-            gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
-            gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
+            if isinstance(self.my_parent, QMainWindow):
+                gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
+            else:
+                gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
             return
         else:
             self.run_save_files(tiffs)

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QAction, QLabel
+from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
@@ -7,9 +7,20 @@ from styles import Styles
 from ..gui_thread_save_files import GuiThreadSaveFiles
 
 
+class Manager:
+    threads = []
+
+
 class CustomContext(ContextMenuBase):
-    def __init__(self, files_list: list, event):
+    def __init__(
+            self,
+            parent: QLabel | QWidget, 
+            files_list: list,
+            event
+            ):
+
         super().__init__(event=event)
+        self.my_parent = parent
 
         save_as_menu = ContextSubMenuBase(self, cnf.lng.save_group_in)
         self.addMenu(save_as_menu)
@@ -39,20 +50,46 @@ class CustomContext(ContextMenuBase):
         self.show_menu()
 
     def save_as_jpg(self, files_list):
-        self.save_as_win = GuiThreadSaveFiles(files_list, is_downloads=False, is_fiff=False)
+        self.save_as_win = GuiThreadSaveFiles(
+            parent=self.my_parent,
+            files=files_list,
+            is_downloads=False,
+            is_fiff=False
+            )
 
     def save_as_tiffs(self, files_list):
-        self.save_as_win = GuiThreadSaveFiles(files_list, is_downloads=False, is_fiff=True)
+        self.save_as_win = GuiThreadSaveFiles(
+            parent=self.my_parent,
+            files=files_list,
+            is_downloads=False,
+            is_fiff=True
+            )
 
     def save_jpg(self, files_list):
-        self.save_as_win = GuiThreadSaveFiles(files_list, is_downloads=True, is_fiff=False)
+        self.save_as_win = GuiThreadSaveFiles(
+            parent=self.my_parent,
+            files=files_list,
+            is_downloads=True,
+            is_fiff=False
+            )
 
     def save_tiffs(self, files_list):
-        self.save_as_win = GuiThreadSaveFiles(files_list, is_downloads=True, is_fiff=True)
+        self.save_as_win = GuiThreadSaveFiles(
+            parent=self.my_parent,
+            files=files_list,
+            is_downloads=True,
+            is_fiff=True
+            )
 
 
 class Title(QLabel):
-    def __init__(self, title: str, images: list, width):
+    def __init__(
+            self,
+            title: str,
+            images: list,
+            width: int
+            ):
+
         super().__init__(f"{title}. {cnf.lng.total}: {len(images)}")
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)
@@ -67,4 +104,8 @@ class Title(QLabel):
         self.my_context = None
 
     def contextMenuEvent(self, event):
-        self.my_context = CustomContext(self.images, event)
+        self.my_context = CustomContext(
+            parent=self,
+            files_list=self.images,
+            event=event
+            )

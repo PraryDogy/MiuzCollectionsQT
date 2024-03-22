@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QMainWindow
 
 from cfg import cnf
 from signals import gui_signals_app
@@ -12,13 +13,20 @@ class Manager:
 class GuiThreadRevealFiles(QObject):
     finished = pyqtSignal()
 
-    def __init__(self, files: list, is_tiff: bool) -> None:
+    def __init__(
+            self,
+            parent: QWidget | QMainWindow,
+            files: list,
+            is_tiff: bool
+            ) -> None:
+
         super().__init__()
         Manager.threads.append(self)
 
         self.input_files: list = files
         self.tiff_list = []
         self.current_index = 0
+        self.my_parent = parent
 
         self.tiff_thread = None
         self.reveal_app = None
@@ -52,8 +60,10 @@ class GuiThreadRevealFiles(QObject):
         tiffs = [i for i in self.tiff_list if i]
 
         if len(tiffs) == 0:
-            gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
-            gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
+            if isinstance(self.my_parent, QMainWindow):
+                gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
+            else:
+                gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
             return
         else:
             self.run_reveal(tiffs)

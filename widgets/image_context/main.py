@@ -17,8 +17,14 @@ class Manager:
 
 
 class ImageContext(ContextMenuBase):
-    def __init__(self, parent: QLabel, img_src, event):
-        super().__init__(event=event)
+    def __init__(
+            self,
+            parent: QLabel | QMainWindow,
+            img_src: str,
+            event
+            ):
+
+        super().__init__(event)
         self.my_parent = parent
         
         if not isinstance(parent, QMainWindow):
@@ -111,20 +117,48 @@ class ImageContext(ContextMenuBase):
         Manager.viewer_win.show()
 
     def reveal_jpg(self, img_src):
-        self.reveal_files = GuiThreadRevealFiles([img_src], is_tiff=False)
+        self.reveal_files = GuiThreadRevealFiles(
+            parent=self.my_parent,
+            files=[img_src],
+            is_tiff=False
+            )
 
     def reveal_tiffs(self, img_src):
-        self.reveal_files = GuiThreadRevealFiles([img_src], is_tiff=True)
+        self.reveal_files = GuiThreadRevealFiles(
+            parent=self.my_parent,
+            files=[img_src],
+            is_tiff=True
+            )
 
     def save_as_jpg(self, img_src):
-        self.save_files = GuiThreadSaveFiles([img_src], is_fiff=False, is_downloads=False)
+        self.save_files = GuiThreadSaveFiles(
+            parent=self.my_parent,
+            files=[img_src],
+            is_fiff=False,
+            is_downloads=False
+            )
 
     def save_as_tiffs(self, img_src):
-        self.save_files = GuiThreadSaveFiles([img_src], is_fiff=True,is_downloads=False)
+        self.save_files = GuiThreadSaveFiles(
+            parent=self.my_parent, 
+            files=[img_src],
+            is_fiff=True,
+            is_downloads=False
+            )
 
     def save_jpg(self, img_src):
-        self.save_files = GuiThreadSaveFiles([img_src], is_fiff=False, is_downloads=True)
+        self.save_files = GuiThreadSaveFiles(
+            parent=self.my_parent,
+            files=[img_src],
+            is_fiff=False,
+            is_downloads=True
+            )
 
     def save_tiffs(self, img_src):
-        self.save_files = GuiThreadSaveFiles([img_src], is_fiff=True, is_downloads=True)
+        self.save_files = GuiThreadSaveFiles(
+            parent=self.my_parent,
+            files=[img_src],
+            is_fiff=True,
+            is_downloads=True
+            )
         
