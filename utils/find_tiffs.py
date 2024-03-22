@@ -4,8 +4,11 @@ import re
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from cfg import cnf
-from database import Dbase, ThumbsMd
-import sqlalchemy
+
+
+class Manager:
+    threads = []
+
 
 class TiffUtils:
 
@@ -96,6 +99,8 @@ class FindTiffThread(QThread):
         self.src = src
 
     def run(self):
+        Manager.threads.append(self)
         search = FindTiffLocal(src=self.src)
         search.run_search()
         self.finished.emit(search.get_result())
+        Manager.threads.remove(self)

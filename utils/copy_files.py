@@ -6,6 +6,10 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from .reveal_files import RevealFiles
 
 
+class Manager:
+    threads = []
+
+
 class CopyFilesThread(QThread):
     finished = pyqtSignal(list)
     value = pyqtSignal(int)
@@ -22,6 +26,7 @@ class CopyFilesThread(QThread):
         self.buffer_size = 1024*1024
 
     def run(self):
+        Manager.threads.append(self)
         total_size = sum(os.path.getsize(file) for file in self.source_files)
         copied_size = 0
         files_dests = []
@@ -54,6 +59,7 @@ class CopyFilesThread(QThread):
         self.value.emit(100)
         self.finished.emit(files_dests)
         RevealFiles(files_dests)
+        Manager.threads.remove(self)
 
     def stop_copying(self):
         self.flag = False
