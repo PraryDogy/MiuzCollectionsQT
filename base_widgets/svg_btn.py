@@ -26,11 +26,17 @@ class SvgBtn(QWidget):
 
 
 class SvgShadowed(SvgBtn):
-    def __init__(self, icon_name: str, size: int, parent: QWidget = None):
+    def __init__(
+            self,
+            icon_name: str,
+            size: int,
+            shadow_depth: int = 200,
+            parent: QWidget = None
+            ):
         super().__init__(icon_name, size, parent)
 
         effect = QGraphicsDropShadowEffect()
         effect.setOffset(0, 0)
-        effect.setColor(QColor(0, 0, 0, 200))
+        effect.setColor(QColor(0, 0, 0, shadow_depth))
         effect.setBlurRadius(15)
         self.setGraphicsEffect(effect)
