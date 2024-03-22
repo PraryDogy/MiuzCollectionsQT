@@ -7,10 +7,6 @@ from styles import Styles
 from ..gui_thread_save_files import GuiThreadSaveFiles
 
 
-class Manager:
-    threads = []
-
-
 class CustomContext(ContextMenuBase):
     def __init__(
             self,
@@ -90,7 +86,6 @@ class Title(QLabel):
             width: int
             ):
 
-        Manager.threads.clear()
         super().__init__(f"{title}. {cnf.lng.total}: {len(images)}")
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)
