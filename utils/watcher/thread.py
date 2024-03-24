@@ -184,6 +184,7 @@ class WatcherThread(QThread):
         try:
             while Manager.flag:
                 sleep(cnf.watcher_timeout)
+                print(1)
         except KeyboardInterrupt:
             self.observer.stop()
             self.observer.join()

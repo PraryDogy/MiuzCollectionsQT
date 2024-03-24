@@ -11,7 +11,7 @@ class User:
     def __init__(self) -> None:
         super().__init__()
 
-        self.app_ver: str = "5.1.4"
+        self.app_ver: str = "5.1.5"
         self.first_load = True
 
         self.coll_folder: str = os.path.join(
@@ -139,7 +139,7 @@ class Config(User, Dymanic, Static, AppInfo):
         if "LEVIEV" not in data["stop_colls"]:
             data["stop_colls"].append("LEVIEV")
 
-        shutil.copyfile(src="db.db", dst=self.db_file)
+        # shutil.copyfile(src="db.db", dst=self.db_file)
         data["app_ver"] = self.app_ver
         return data
 
