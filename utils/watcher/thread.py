@@ -196,7 +196,7 @@ class WatcherThread(QThread):
         self.event_timer.setSingleShot(True)
         self.event_timer.setInterval(Manager.event_timer_timeout)
         self.event_timer.timeout.connect(self.reload_gui)
-        # utils_signals_app.watcher_timer.connect(self.reset_event_timer)
+        utils_signals_app.watcher_timer.connect(self.reset_event_timer)
 
     def run(self):
         self.flag = True
