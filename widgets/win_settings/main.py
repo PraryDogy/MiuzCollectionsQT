@@ -1,7 +1,7 @@
 import os
 from typing import Literal
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem
 
 from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
@@ -241,7 +241,10 @@ class WinSettings(WinStandartBase):
         self.set_title(cnf.lng.settings)
 
         self.setFixedWidth(420)
-        self.init_ui()
+        temp = QTimer(self)
+        temp.setSingleShot(True)
+        temp.timeout.connect(self.init_ui)
+        temp.start(10)
         self.setFixedSize(420, 550)
         self.center_win()
         self.setFocus()
