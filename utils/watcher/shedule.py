@@ -1,5 +1,7 @@
 from PyQt5.QtCore import QObject, QTimer
 
+from cfg import cnf
+
 from .. import utils_signals_app
 from ..main_utils import MainUtils
 from .thread import WatcherThread
@@ -39,8 +41,10 @@ class WatcherShedule(QObject):
             print("watcher started from shedule")
 
             self.stop_timers()
-            self.watcher_thread = WatcherThread()
-            self.watcher_thread.start()
+
+            if cnf.watcher:
+                self.watcher_thread = WatcherThread()
+                self.watcher_thread.start()
 
         else:
             print("watcher no smb, 15 sec wait")
