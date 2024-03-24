@@ -165,7 +165,7 @@ class Handler(PatternMatchingEventHandler):
 
         if event.src_path.endswith(Manager.jpg_exsts):
             DeletedFile(src=event.src_path)
-            self.event_timer.stop()
+            # self.event_timer.stop()
             self.event_timer.start()
 
         elif event.src_path.endswith(Manager.tiff_exsts):
