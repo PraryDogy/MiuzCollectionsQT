@@ -12,7 +12,7 @@ from signals import gui_signals_app, utils_signals_app
 
 from ..image_utils import BytesThumb, UndefBytesThumb
 from ..main_utils import MainUtils
-from PIL import Image
+# from PIL import Image
 
 class Manager:
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
@@ -35,13 +35,13 @@ class WaitWriteFinish:
 
         while not flag:
             try:
-                # BytesThumb(src)
-                Image.open(src)
+                BytesThumb(src)
+                # Image.open(src)
                 current_timeout = 0
                 flag = True
 
-            except Exception as e:
-            # except ZeroDivisionError as e:
+            # except Exception as e:
+            except ZeroDivisionError as e:
                 flag = None
                 current_timeout += 1
                 sleep(3)
