@@ -299,8 +299,6 @@ class WinImageView(WinImgViewBase):
         self.fsize_img_thread = FSizeImgThread(self.image_path)
         self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
         self.fsize_img_thread.start()
-
-        self.fsize_img_thread.setPriority(QThread.HighestPriority)
         Manager.threads.append(self.fsize_img_thread)
 
     def finalize_thread(self, data: dict):
