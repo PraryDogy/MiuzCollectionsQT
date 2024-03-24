@@ -152,7 +152,7 @@ class Handler(PatternMatchingEventHandler):
         elif event.is_directory:
             return
 
-        if event.src_path.endswith(Manager.jpg_exsts):
+        elif event.src_path.endswith(Manager.jpg_exsts):
             DeletedFile(src=event.src_path)
 
         elif event.src_path.endswith(Manager.tiff_exsts):
@@ -171,7 +171,7 @@ class Handler(PatternMatchingEventHandler):
         elif event.is_directory:
             return
 
-        if event.src_path.endswith(Manager.jpg_exsts):
+        elif event.src_path.endswith(Manager.jpg_exsts):
             MovedFile(src=event.src_path, dest=event.dest_path)
 
         elif event.src_path.endswith(Manager.tiff_exsts):
