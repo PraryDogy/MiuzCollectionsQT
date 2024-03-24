@@ -30,11 +30,15 @@ class User:
         self.curr_coll: str = "miuzcollections_all"
         self.user_lng: str = "en"
         self.zoom: bool = False
+
         self.move_jpg: bool = True
         self.move_layers: bool = False
+
         self.watcher: bool = True
+        self.watcher_timeout: int = 5
+
         self.scaner_minutes: int = 20
-        self.watcher_timeout: int = 30
+        self.scaner_recursive: bool = False
 
         self.root_g: dict = {
             "aw": 700,
