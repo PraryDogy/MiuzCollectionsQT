@@ -424,9 +424,6 @@ class Scaner(ScanerBaseClass):
         Manager.curr_percent = 0
         gui_signals_app.scan_progress_value.emit(0)
 
-        if cnf.watcher:
-            utils_signals_app.watcher_stop.emit()
-
         SummaryScan()
         NonExistCollRemover()
         Dbase.vacuum()
@@ -436,9 +433,6 @@ class Scaner(ScanerBaseClass):
         gui_signals_app.scan_progress_value.emit(100)
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
-
-        if cnf.watcher:
-            utils_signals_app.watcher_start.emit()
 
     def run(self):
         try:
