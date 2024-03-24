@@ -116,11 +116,15 @@ class FinderImages(dict):
                         return
 
                     if file.endswith(Manager.jpg_exsts):
+                        
                         src = os.path.join(root, file)
+                        file_stats = os.stat(path=src)
+
                         self[src] = (
-                            int(os.path.getsize(filename=src)),
-                            int(os.stat(path=src).st_birthtime),
-                            int(os.stat(path=src).st_mtime))
+                            int(file_stats.st_size),
+                            int(file_stats.st_birthtime),
+                            int(file_stats.st_mtime)
+                            )
 
                     elif file.endswith(Manager.tiff_exsts):
                         cnf.tiff_images.add(os.path.join(root, file))
