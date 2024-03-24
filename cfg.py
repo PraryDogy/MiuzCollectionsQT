@@ -133,7 +133,7 @@ class Config(User, Dymanic, Static, AppInfo):
         
         data["first_load"] = False
         data["watcher"] = True
-        data["scaner_minutes"] = 30
+        data["scaner_minutes"] = 60
         data["watcher_timeout"] = 30
 
         if "LEVIEV" not in data["stop_colls"]:
