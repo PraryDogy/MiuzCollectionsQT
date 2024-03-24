@@ -3,7 +3,6 @@ import os
 import sys
 import traceback
 
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
 
 from cfg import cnf
