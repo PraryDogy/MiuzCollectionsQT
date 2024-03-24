@@ -7,7 +7,7 @@ from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
                          QPixmap)
 from PyQt5.QtWidgets import QFrame, QSpacerItem, QWidget
 
-from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
+from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase, SvgBtn
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
