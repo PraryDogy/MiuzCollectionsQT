@@ -37,7 +37,7 @@ class User:
         self.watcher: bool = True
         self.watcher_timeout: int = 5
 
-        self.scaner_minutes: int = 20
+        self.scaner_minutes: int = 10
         self.scaner_recursive: bool = False
 
         self.root_g: dict = {

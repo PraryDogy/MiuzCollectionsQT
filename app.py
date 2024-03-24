@@ -44,15 +44,12 @@ class App(QApplication):
         MainUtils.close_all_win()
 
         utils_signals_app.scaner_stop.emit()
-
-        if cnf.watcher:
-            utils_signals_app.watcher_stop.emit()
+        utils_signals_app.watcher_stop.emit()
 
 
 app = App()
 utils_signals_app.scaner_start.emit()
-if cnf.watcher:
-    utils_signals_app.watcher_start.emit()
+utils_signals_app.watcher_start.emit()
 
 if cnf.first_load:
     from widgets.win_first_load import WinFirstLoad
