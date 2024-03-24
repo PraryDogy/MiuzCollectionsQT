@@ -11,7 +11,7 @@ class User:
     def __init__(self) -> None:
         super().__init__()
 
-        self.app_ver: str = "5.1.5"
+        self.app_ver: str = "5.1.6"
         self.first_load = True
 
         self.coll_folder: str = os.path.join(
@@ -171,6 +171,8 @@ class Config(User, Dymanic, Static, AppInfo):
             i: getattr(self, i)
             for i in list(User().__dict__)
             }
+
+        data = dict(sorted(data.items()))
 
         with open(self.json_file, "w", encoding="utf8") as file:
             json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
