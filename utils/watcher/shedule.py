@@ -38,11 +38,10 @@ class WatcherShedule(QObject):
 
     def start_thread(self):
         if MainUtils.smb_check():
-            print("watcher started from shedule")
-
             self.stop_timers()
 
             if cnf.watcher:
+                print("watcher started from shedule")
                 self.watcher_thread = WatcherThread()
                 self.watcher_thread.start()
 

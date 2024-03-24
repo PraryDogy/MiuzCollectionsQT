@@ -21,7 +21,6 @@ class User:
             "Collections"
             )
         
-        
         self.down_folder: str = os.path.join(
             os.path.expanduser("~"),
             "Downloads"
