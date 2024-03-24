@@ -167,10 +167,16 @@ class NaviZoom(QFrame):
 
         self.adjustSize()
 
-    def bind_btns(self, f1: callable, f2: callable, f3: callable):
-        self.zoom_out.mouseReleaseEvent = f1
-        self.zoom_in.mouseReleaseEvent = f2
-        self.zoom_fit.mouseReleaseEvent = f3
+    def bind_btns(
+            self,
+            zoom_out_cmd: callable,
+            zoom_in_cmd: callable,
+            zoom_fit_cmd: callable
+            ):
+
+        self.zoom_out.mouseReleaseEvent = zoom_out_cmd
+        self.zoom_in.mouseReleaseEvent = zoom_in_cmd
+        self.zoom_fit.mouseReleaseEvent = zoom_fit_cmd
 
 
 class NaviArrow(QWidget):
