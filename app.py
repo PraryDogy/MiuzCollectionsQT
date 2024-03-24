@@ -51,6 +51,8 @@ class App(QApplication):
 
 app = App()
 utils_signals_app.scaner_start.emit()
+if cnf.watcher:
+    utils_signals_app.watcher_start.emit()
 
 if cnf.first_load:
     from widgets.win_first_load import WinFirstLoad
