@@ -32,7 +32,7 @@ class Manager:
 
 
 class WaitWriteFinish:
-    def __init__(self, src: str):
+    def __init__(self, src: str, event_timer: QTimer):
         flag = None
         current_timeout = 0
 
@@ -45,9 +45,9 @@ class WaitWriteFinish:
             except ZeroDivisionError as e:
                 flag = None
                 current_timeout += 1
-                utils_signals_app.reset_event_timer_watcher.emit()
-
+                event_timer.stop()
                 sleep(Manager.img_wait_time_sleep)
+                event_timer.start()
 
                 if current_timeout == Manager.img_wait_time_count:
                     break
@@ -121,7 +121,10 @@ class NewFile:
 
 
 class Handler(PatternMatchingEventHandler):
-    def __init__(self):
+    def __init__(self, event_timer: QTimer):
+
+        self.event_timer = event_timer
+
         dirs = [
             f"*/{i}/*"
             for i in cnf.stop_colls
@@ -141,9 +144,10 @@ class Handler(PatternMatchingEventHandler):
             return
 
         elif event.src_path.endswith(Manager.jpg_exsts):
-            WaitWriteFinish(src=event.src_path)
+            WaitWriteFinish(src=event.src_path, event_timer=self.event_timer)
             NewFile(src=event.src_path)
-            utils_signals_app.reset_event_timer_watcher.emit()
+            self.event_timer.stop()
+            self.event_timer.start()
 
         elif event.src_path.endswith(Manager.tiff_exsts):
             cnf.tiff_images.add(event.src_path)
@@ -161,7 +165,8 @@ class Handler(PatternMatchingEventHandler):
 
         if event.src_path.endswith(Manager.jpg_exsts):
             DeletedFile(src=event.src_path)
-            utils_signals_app.reset_event_timer_watcher.emit()
+            self.event_timer.stop()
+            self.event_timer.start()
 
         elif event.src_path.endswith(Manager.tiff_exsts):
             try:
@@ -182,7 +187,8 @@ class Handler(PatternMatchingEventHandler):
 
         if event.src_path.endswith(Manager.jpg_exsts):
             MovedFile(src=event.src_path, dest=event.dest_path)
-            utils_signals_app.reset_event_timer_watcher.emit()
+            self.event_timer.stop()
+            self.event_timer.start()
 
         elif event.src_path.endswith(Manager.tiff_exsts):
             try:
@@ -202,13 +208,10 @@ class WatcherThread(QThread):
         self.event_timer = QTimer()
         self.event_timer.setSingleShot(True)
         self.event_timer.setInterval(Manager.event_timer_timeout)
-
-        self.event_timer.timeout.connect(self.finished_event_timer)
-        utils_signals_app.reset_event_timer_watcher.connect(self.reset_event_timer)
-        utils_signals_app.watcher_stop.connect(self.stop_watcher)
+        self.event_timer.timeout.connect(self.reload_gui)
 
         self.flag = True
-        self.handler = Handler()
+        self.handler = Handler(self.event_timer)
         self.observer = PollingObserver()
 
         self.observer.schedule(
@@ -227,16 +230,11 @@ class WatcherThread(QThread):
         self.observer.join()
         print("watcher stoped")
 
-    def reset_event_timer(self):
-        self.event_timer.start()
-
-    def finished_event_timer(self):
+    def reload_gui(self):
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
-
-    def clean_engine(self):
-        Dbase.cleanup_engine()
 
     def stop_watcher(self):
         self.flag = False
         self.observer.stop()
+        Dbase.cleanup_engine()
