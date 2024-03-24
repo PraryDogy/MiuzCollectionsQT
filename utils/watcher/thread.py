@@ -4,7 +4,6 @@ from time import sleep
 import sqlalchemy
 from PyQt5.QtCore import QThread, QTimer
 from watchdog.events import FileSystemEvent, PatternMatchingEventHandler
-from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
 
 from cfg import cnf
@@ -16,12 +15,20 @@ from ..main_utils import MainUtils
 
 
 class Manager:
-    flag = True
     img_wait_time_sleep = 3
     img_wait_time_count = 2 * 60
     event_timer_timeout = 4 * 1000
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
     tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
+
+    @staticmethod
+    def smb_connected():
+        if not os.path.exists(cnf.coll_folder):
+            print("smb deleted")
+            utils_signals_app.watcher_stop.emit()
+            utils_signals_app.watcher_start.emit()
+            return False
+        return True
 
 
 class WaitWriteFinish:
@@ -115,12 +122,25 @@ class NewFile:
 
 class Handler(PatternMatchingEventHandler):
     def __init__(self):
-        dirs = [f"*/{i}/*" for i in cnf.stop_colls]
-        super().__init__(ignore_directories=True, ignore_patterns=dirs)
+        dirs = [
+            f"*/{i}/*"
+            for i in cnf.stop_colls
+            ]
+
+        super().__init__(
+            # ignore_directories=True,
+            ignore_patterns=dirs
+            )
 
     def on_created(self, event: FileSystemEvent):
-        print(event)
-        if event.src_path.endswith(Manager.jpg_exsts):
+
+        if not Manager.smb_connected():
+            return
+        
+        elif event.is_directory:
+            return
+
+        elif event.src_path.endswith(Manager.jpg_exsts):
             WaitWriteFinish(src=event.src_path)
             NewFile(src=event.src_path)
             utils_signals_app.reset_event_timer_watcher.emit()
@@ -128,9 +148,17 @@ class Handler(PatternMatchingEventHandler):
         elif event.src_path.endswith(Manager.tiff_exsts):
             cnf.tiff_images.add(event.src_path)
 
+        print(event)
+
 
     def on_deleted(self, event: FileSystemEvent):
-        print(event)
+
+        if not Manager.smb_connected():
+            return
+        
+        elif event.is_directory:
+            return
+
         if event.src_path.endswith(Manager.jpg_exsts):
             DeletedFile(src=event.src_path)
             utils_signals_app.reset_event_timer_watcher.emit()
@@ -141,9 +169,17 @@ class Handler(PatternMatchingEventHandler):
             except KeyError:
                 pass
 
+        print(event)
+
 
     def on_moved(self, event: FileSystemEvent):
-        print(event)
+
+        if not Manager.smb_connected():
+            return
+        
+        elif event.is_directory:
+            return
+
         if event.src_path.endswith(Manager.jpg_exsts):
             MovedFile(src=event.src_path, dest=event.dest_path)
             utils_signals_app.reset_event_timer_watcher.emit()
@@ -155,24 +191,25 @@ class Handler(PatternMatchingEventHandler):
                 pass
             cnf.tiff_images.add(event.dest_path)
 
+        print(event)
+
 
 class WatcherThread(QThread):
     def __init__(self):
         super().__init__()
          
+    def run(self):
         self.event_timer = QTimer()
         self.event_timer.setSingleShot(True)
         self.event_timer.setInterval(Manager.event_timer_timeout)
 
         self.event_timer.timeout.connect(self.finished_event_timer)
         utils_signals_app.reset_event_timer_watcher.connect(self.reset_event_timer)
+        utils_signals_app.watcher_stop.connect(self.stop_watcher)
 
-    def run(self):
+        self.flag = True
         self.handler = Handler()
         self.observer = PollingObserver()
-
-        # self.observer = Observer()
-        Manager.flag = True
 
         self.observer.schedule(
             event_handler=self.handler,
@@ -182,15 +219,11 @@ class WatcherThread(QThread):
         self.observer.start()
 
         try:
-            while Manager.flag:
+            while self.flag:
                 sleep(cnf.watcher_timeout)
-                print(1)
         except KeyboardInterrupt:
             self.observer.stop()
-            self.observer.join()
-            print("watcher stoped")
 
-        self.observer.stop()
         self.observer.join()
         print("watcher stoped")
 
@@ -205,4 +238,5 @@ class WatcherThread(QThread):
         Dbase.cleanup_engine()
 
     def stop_watcher(self):
-        Manager.flag = False
+        self.flag = False
+        self.observer.stop()

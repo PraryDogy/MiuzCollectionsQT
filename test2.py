@@ -5,8 +5,22 @@ from watchdog.events import FileSystemEvent, PatternMatchingEventHandler
 from watchdog.observers.polling import PollingObserver
 
 
+class Manager:
+    src = "/Volumes/Files"
+    flag = True
+
+
+def smb_connected():
+    if not os.path.exists(Manager.src):
+        print("deleted")
+        Manager.flag = False
+        return False
+    return True
+
+
 class Handler(PatternMatchingEventHandler):
-    def __init__(self):
+    def __init__(self, observer: PollingObserver):
+        self.observer: PollingObserver = observer
 
         dirs = [
             f"*/{i}/*"
@@ -14,36 +28,46 @@ class Handler(PatternMatchingEventHandler):
             ]
 
         super().__init__(
-            ignore_directories=True,
+            # ignore_directories=True,
             ignore_patterns=dirs
             )
 
     def on_created(self, event: FileSystemEvent):
-        print(event)
+        if not smb_connected():
+            self.observer.stop()
+            return
+        print("created:\n", event)
 
     def on_deleted(self, event: FileSystemEvent):
-        print(event)
+        if not smb_connected():
+            self.observer.stop()
+            return
+        print("deleted:\n", event)
 
 
     def on_moved(self, event):
-        print(event)
+        if not smb_connected():
+            self.observer.stop()
+            return
+        print("moved:\n", event)
 
 
-handler = Handler()
 observer = PollingObserver()
+handler = Handler(observer)
 
 
 observer.schedule(
     event_handler=handler,
-    path="/Users/evlosh/Desktop/test",
+    path=Manager.src,
     recursive=True,
     )
 observer.start()
 
 try:
-    while True:
-        sleep(20)
+    while Manager.flag:
+        sleep(1)
 except KeyboardInterrupt:
     observer.stop()
 observer.join()
-    
+
+print("end watchdog")
