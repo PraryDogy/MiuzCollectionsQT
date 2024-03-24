@@ -11,7 +11,7 @@ class User:
     def __init__(self) -> None:
         super().__init__()
 
-        self.app_ver: str = "5.1.6"
+        self.app_ver: str = "5.1.3"
         self.first_load = True
 
         self.coll_folder: str = os.path.join(
