@@ -70,7 +70,7 @@ class User:
 
         self.watcher: bool = True
         self.watcher_timeout: int = 5
-        
+
         self.zoom: bool = False
 
         
@@ -132,14 +132,17 @@ class Config(User, Dymanic, Static, AppInfo):
         print("UPDATING JSON, COPYING DB")
         
         data["first_load"] = False
+
+        data["scaner_minutes"] = 10
+        data["scaner_recursive"] = False
+
         data["watcher"] = True
-        data["scaner_minutes"] = 60
         data["watcher_timeout"] = 30
 
         if "LEVIEV" not in data["stop_colls"]:
             data["stop_colls"].append("LEVIEV")
 
-        # shutil.copyfile(src="db.db", dst=self.db_file)
+        shutil.copyfile(src="db.db", dst=self.db_file)
         data["app_ver"] = self.app_ver
         return data
 
