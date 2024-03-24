@@ -2,7 +2,7 @@ import os
 from time import sleep
 
 import sqlalchemy
-from PyQt5.QtCore import QThread, QTimer
+from PyQt5.QtCore import QThread, QTimer, QObject
 from watchdog.events import FileSystemEvent, PatternMatchingEventHandler
 from watchdog.observers.polling import PollingObserver
 
@@ -32,7 +32,7 @@ class Manager:
 
 
 class WaitWriteFinish:
-    def __init__(self, src: str, event_timer: QTimer):
+    def __init__(self, src: str):
         flag = None
         current_timeout = 0
 
@@ -45,9 +45,7 @@ class WaitWriteFinish:
             except ZeroDivisionError as e:
                 flag = None
                 current_timeout += 1
-                event_timer.stop()
                 sleep(Manager.img_wait_time_sleep)
-                event_timer.start()
 
                 if current_timeout == Manager.img_wait_time_count:
                     break
@@ -121,10 +119,7 @@ class NewFile:
 
 
 class Handler(PatternMatchingEventHandler):
-    def __init__(self, event_timer: QTimer):
-
-        self.event_timer = event_timer
-
+    def __init__(self):
         dirs = [
             f"*/{i}/*"
             for i in cnf.stop_colls
@@ -144,16 +139,13 @@ class Handler(PatternMatchingEventHandler):
             return
 
         elif event.src_path.endswith(Manager.jpg_exsts):
-            WaitWriteFinish(src=event.src_path, event_timer=self.event_timer)
+            WaitWriteFinish(src=event.src_path)
             NewFile(src=event.src_path)
-            self.event_timer.stop()
-            self.event_timer.start()
 
         elif event.src_path.endswith(Manager.tiff_exsts):
             cnf.tiff_images.add(event.src_path)
 
         print(event)
-
 
     def on_deleted(self, event: FileSystemEvent):
 
@@ -165,8 +157,6 @@ class Handler(PatternMatchingEventHandler):
 
         if event.src_path.endswith(Manager.jpg_exsts):
             DeletedFile(src=event.src_path)
-            # self.event_timer.stop()
-            self.event_timer.start()
 
         elif event.src_path.endswith(Manager.tiff_exsts):
             try:
@@ -187,8 +177,6 @@ class Handler(PatternMatchingEventHandler):
 
         if event.src_path.endswith(Manager.jpg_exsts):
             MovedFile(src=event.src_path, dest=event.dest_path)
-            self.event_timer.stop()
-            self.event_timer.start()
 
         elif event.src_path.endswith(Manager.tiff_exsts):
             try:
