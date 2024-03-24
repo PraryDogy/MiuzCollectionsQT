@@ -15,9 +15,6 @@ from ..main_utils import MainUtils
 
 
 class Manager:
-    img_wait_time_sleep = 3
-    img_wait_time_count = 2 * 60
-    event_timer_timeout = 4 * 1000
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
     tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
 
@@ -45,9 +42,9 @@ class WaitWriteFinish:
             except ZeroDivisionError as e:
                 flag = None
                 current_timeout += 1
-                sleep(Manager.img_wait_time_sleep)
+                sleep(3)
 
-                if current_timeout == Manager.img_wait_time_count:
+                if current_timeout == 60: # wait image ... sec
                     break
                 else:
                     continue
@@ -194,7 +191,7 @@ class WatcherThread(QThread):
 
         self.event_timer = QTimer()
         self.event_timer.setSingleShot(True)
-        self.event_timer.setInterval(Manager.event_timer_timeout)
+        self.event_timer.setInterval(5000)
         self.event_timer.timeout.connect(self.reload_gui)
         utils_signals_app.watcher_timer.connect(self.reset_event_timer)
 
