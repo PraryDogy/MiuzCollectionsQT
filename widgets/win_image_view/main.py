@@ -248,7 +248,11 @@ class WinImageView(WinImgViewBase):
 
         self.setFocus()
         self.center_win()
-        self.load_image()
+
+        temp = QTimer(self)
+        temp.setSingleShot(True)
+        temp.timeout.connect(self.load_image)
+        temp.start(30)
 
     def load_image(self):
         if self.image_path not in Manager.images:
