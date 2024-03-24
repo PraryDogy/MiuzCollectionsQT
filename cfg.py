@@ -11,7 +11,7 @@ class User:
     def __init__(self) -> None:
         super().__init__()
 
-        self.app_ver: str = "5.1.3"
+        self.app_ver: str = "5.1.4"
         self.first_load = True
 
         self.coll_folder: str = os.path.join(
@@ -34,6 +34,7 @@ class User:
         self.move_layers: bool = False
         self.watcher: bool = True
         self.scaner_minutes: int = 20
+        self.watcher_timeout: int = 30
 
         self.root_g: dict = {
             "aw": 700,
@@ -131,8 +132,9 @@ class Config(User, Dymanic, Static, AppInfo):
         print("UPDATING JSON, COPYING DB")
         
         data["first_load"] = False
-        data["watcher"] = False
-        data["scaner_minutes"] = 5
+        data["watcher"] = True
+        data["scaner_minutes"] = 30
+        data["watcher_timeout"] = 30
 
         if "LEVIEV" not in data["stop_colls"]:
             data["stop_colls"].append("LEVIEV")

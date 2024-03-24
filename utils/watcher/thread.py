@@ -17,7 +17,6 @@ from ..main_utils import MainUtils
 
 class Manager:
     flag = True
-    observer_timeout = 5
     img_wait_time_sleep = 3
     img_wait_time_count = 2 * 60
     event_timer_timeout = 4 * 1000
@@ -184,7 +183,7 @@ class WatcherThread(QThread):
 
         try:
             while Manager.flag:
-                sleep(Manager.observer_timeout)
+                sleep(cnf.watcher_timeout)
         except KeyboardInterrupt:
             self.observer.stop()
             self.observer.join()
