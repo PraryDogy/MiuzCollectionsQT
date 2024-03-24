@@ -54,10 +54,11 @@ class ScanerShedule(QObject):
             self.scaner_thread = ScanerThread()
             self.scaner_thread.start()
 
-            self.next_scan_timer.start()
+            if cnf.scaner_recursive:
+                self.next_scan_timer.start()
 
     def stop_thread(self):
-        print("run stop thread")
+        print("scaner stoped")
         ScanerThreadManager.flag = False
         self.stop_timers()
 
