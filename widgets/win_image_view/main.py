@@ -212,7 +212,7 @@ class WinImageView(WinImgViewBase):
 
         self.fsize_img_timer = QTimer(self)
         self.fsize_img_timer.setSingleShot(True)
-        self.fsize_img_timer.setInterval(300)
+        self.fsize_img_timer.setInterval(50)
         self.fsize_img_timer.timeout.connect(self.run_thread)
 
         self.mouse_move_timer = QTimer(self)
