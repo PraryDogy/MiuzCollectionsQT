@@ -10,59 +10,51 @@ from lang import Eng, Rus
 class User:
     def __init__(self) -> None:
         super().__init__()
-
-        self.app_ver: str = "5.1.3"
-        self.first_load = True
-
+        self.app_ver: str = "5.1.5"
+    
         self.coll_folder: str = os.path.join(
             os.sep,
             "Volumes",
             "Shares",
             "Collections"
             )
+        self.curr_coll: str = "miuzcollections_all"
+        self.cust_fltr_names: dict = {
+            "prod": "1 IMG",
+            "mod": "2 Model IMG"
+            }
+        self.cust_fltr_vals: dict = {
+            "prod": False,
+            "mod": False
+            }    
         
         self.down_folder: str = os.path.join(
             os.path.expanduser("~"),
             "Downloads"
             )
-
-        self.curr_coll: str = "miuzcollections_all"
-        self.user_lng: str = "en"
-        self.zoom: bool = False
-
-        self.move_jpg: bool = True
-        self.move_layers: bool = False
-
-        self.watcher: bool = True
-        self.watcher_timeout: int = 5
-
-        self.scaner_minutes: int = 10
-        self.scaner_recursive: bool = False
-
-        self.root_g: dict = {
-            "aw": 700,
-            "ah": 500
-            }
+    
+        self.first_load = True
 
         self.imgview_g: dict = {
             "aw": 700,
             "ah": 500
             }
         
-        self.cust_fltr_vals: dict = {
-            "prod": False,
-            "mod": False
-            }
+        self.move_jpg: bool = True
+        self.move_layers: bool = False    
 
-        self.sys_fltr_vals: dict = {
-            "other" : False
+        self.root_g: dict = {
+            "aw": 700,
+            "ah": 500
             }
-
-        self.cust_fltr_names: dict = {
-            "prod": "1 IMG",
-            "mod": "2 Model IMG"
-            }
-
+        
+        self.scaner_minutes: int = 10
+        self.scaner_recursive: bool = False
+        self.stop_colls: dict = [
+            "_Archive_Commerce_Брендинг",
+            "Chosed",
+            "LEVIEV"
+            ]
         self.stop_words: dict = [
             "копия",
             "copy",
@@ -70,12 +62,17 @@ class User:
             "preview",
             "square"
             ]
+        self.sys_fltr_vals: dict = {
+            "other" : False
+            }
         
-        self.stop_colls: dict = [
-            "_Archive_Commerce_Брендинг",
-            "Chosed",
-            "LEVIEV"
-            ]
+        self.user_lng: str = "en"
+
+        self.watcher: bool = True
+        self.watcher_timeout: int = 5
+        
+        self.zoom: bool = False
+
         
 
 class Static:
