@@ -120,6 +120,7 @@ class NewFile:
 
 class Handler(PatternMatchingEventHandler):
     def __init__(self):
+
         dirs = [
             f"*/{i}/*"
             for i in cnf.stop_colls
@@ -131,7 +132,6 @@ class Handler(PatternMatchingEventHandler):
             )
 
     def on_created(self, event: FileSystemEvent):
-
         if not Manager.smb_connected():
             return
         
@@ -145,10 +145,10 @@ class Handler(PatternMatchingEventHandler):
         elif event.src_path.endswith(Manager.tiff_exsts):
             cnf.tiff_images.add(event.src_path)
 
+        utils_signals_app.watcher_timer.emit()
         print(event)
 
     def on_deleted(self, event: FileSystemEvent):
-
         if not Manager.smb_connected():
             return
         
@@ -164,11 +164,10 @@ class Handler(PatternMatchingEventHandler):
             except KeyError:
                 pass
 
+        utils_signals_app.watcher_timer.emit()
         print(event)
 
-
     def on_moved(self, event: FileSystemEvent):
-
         if not Manager.smb_connected():
             return
         
@@ -185,21 +184,23 @@ class Handler(PatternMatchingEventHandler):
                 pass
             cnf.tiff_images.add(event.dest_path)
 
+        utils_signals_app.watcher_timer.emit()
         print(event)
 
 
 class WatcherThread(QThread):
     def __init__(self):
         super().__init__()
-         
-    def run(self):
+
         self.event_timer = QTimer()
         self.event_timer.setSingleShot(True)
         self.event_timer.setInterval(Manager.event_timer_timeout)
         self.event_timer.timeout.connect(self.reload_gui)
+        # utils_signals_app.watcher_timer.connect(self.reset_event_timer)
 
+    def run(self):
         self.flag = True
-        self.handler = Handler(self.event_timer)
+        self.handler = Handler()
         self.observer = PollingObserver()
 
         self.observer.schedule(
@@ -218,11 +219,15 @@ class WatcherThread(QThread):
         self.observer.join()
         print("watcher stoped")
 
-    def reload_gui(self):
-        gui_signals_app.reload_menu.emit()
-        gui_signals_app.reload_thumbnails.emit()
-
     def stop_watcher(self):
         self.flag = False
         self.observer.stop()
         Dbase.cleanup_engine()
+
+    def reload_gui(self):
+        gui_signals_app.reload_menu.emit()
+        gui_signals_app.reload_thumbnails.emit()
+
+    def reset_event_timer(self):
+        self.event_timer.stop()
+        self.event_timer.start()
