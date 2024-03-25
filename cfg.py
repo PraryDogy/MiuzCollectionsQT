@@ -10,7 +10,7 @@ from lang import Eng, Rus
 class User:
     def __init__(self) -> None:
         super().__init__()
-        self.app_ver: str = "5.1.5"
+        self.app_ver: str = "5.1.2"
     
         self.coll_folder: str = os.path.join(
             os.sep,
