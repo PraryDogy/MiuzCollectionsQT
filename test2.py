@@ -1,73 +1,141 @@
 import os
 from time import sleep
 
+import sqlalchemy
+from PyQt5.QtCore import QThread, QTimer, QObject
 from watchdog.events import FileSystemEvent, PatternMatchingEventHandler
 from watchdog.observers.polling import PollingObserver
 
+from cfg import cnf
+from database import Dbase, ThumbsMd
+from signals import gui_signals_app, utils_signals_app
 
 class Manager:
-    src = "/Volumes/Files"
-    flag = True
+    jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
+    tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
 
-
-def smb_connected():
-    if not os.path.exists(Manager.src):
-        print("deleted")
-        Manager.flag = False
+    @staticmethod
+    def smb_connected():
+        if not os.path.exists(cnf.coll_folder):
+            print("smb deleted")
+            utils_signals_app.watcher_stop.emit()
+            utils_signals_app.watcher_start.emit()
+            return False
+        return True
+    
+    @staticmethod
+    def is_stop_dir(src: str, stop_dirs: list):
+        for i in stop_dirs:
+            if i in src:
+                return True
         return False
-    return True
 
 
 class Handler(PatternMatchingEventHandler):
-    def __init__(self, observer: PollingObserver):
-        self.observer: PollingObserver = observer
+    def __init__(self):
 
-        dirs = [
-            f"*/{i}/*"
-            for i in ("001 Test_1", "002 Test_2")
+        self.stop_dirs = [
+            os.path.join(cnf.coll_folder, i)
+            for i in cnf.stop_colls
             ]
 
-        super().__init__(
-            # ignore_directories=True,
-            ignore_patterns=dirs
-            )
+        super().__init__()
 
     def on_created(self, event: FileSystemEvent):
-        if not smb_connected():
-            self.observer.stop()
+        if not Manager.smb_connected():
             return
-        print("created:\n", event)
+        
+        elif event.is_directory:
+            return
+        
+        elif Manager.is_stop_dir(event.src_path, self.stop_dirs):
+            return
+
+        elif event.src_path.endswith(Manager.jpg_exsts):
+            ...
+
+        elif event.src_path.endswith(Manager.tiff_exsts):
+            ...
+
+        print(event)
 
     def on_deleted(self, event: FileSystemEvent):
-        if not smb_connected():
-            self.observer.stop()
+        if not Manager.smb_connected():
             return
-        print("deleted:\n", event)
-
-
-    def on_moved(self, event):
-        if not smb_connected():
-            self.observer.stop()
+        
+        elif event.is_directory:
             return
-        print("moved:\n", event)
+
+        elif Manager.is_stop_dir(event.src_path, self.stop_dirs):
+            return
+
+        elif event.src_path.endswith(Manager.jpg_exsts):
+            ...
+
+        elif event.src_path.endswith(Manager.tiff_exsts):
+            ...
+
+        print(event)
+
+    def on_moved(self, event: FileSystemEvent):
+        if not Manager.smb_connected():
+            return
+        
+        elif event.is_directory:
+            return
+
+        elif Manager.is_stop_dir(event.src_path, self.stop_dirs):
+            return
+
+        elif event.src_path.endswith(Manager.jpg_exsts):
+            ...
+
+        elif event.src_path.endswith(Manager.tiff_exsts):
+            ...
+
+        print(event)
 
 
-observer = PollingObserver()
-handler = Handler(observer)
+class WatcherThread(QThread):
+    def __init__(self):
+        super().__init__()
 
+        self.event_timer = QTimer()
+        self.event_timer.setSingleShot(True)
+        self.event_timer.setInterval(5000)
+        self.event_timer.timeout.connect(self.reload_gui)
+        utils_signals_app.watcher_timer.connect(self.reset_event_timer)
 
-observer.schedule(
-    event_handler=handler,
-    path=Manager.src,
-    recursive=True,
-    )
-observer.start()
+    def run(self):
+        self.flag = True
+        self.handler = Handler()
+        self.observer = PollingObserver()
 
-try:
-    while Manager.flag:
-        sleep(1)
-except KeyboardInterrupt:
-    observer.stop()
-observer.join()
+        self.observer.schedule(
+            event_handler=self.handler,
+            path=cnf.coll_folder,
+            recursive=True
+            )
+        self.observer.start()
 
-print("end watchdog")
+        try:
+            while self.flag:
+                sleep(cnf.watcher_timeout)
+        except KeyboardInterrupt:
+            self.observer.stop()
+
+        self.observer.join()
+        print("watcher stoped")
+
+    def stop_watcher(self):
+        self.flag = False
+        self.observer.stop()
+        Dbase.cleanup_engine()
+
+    def reload_gui(self):
+        gui_signals_app.reload_menu.emit()
+        gui_signals_app.reload_thumbnails.emit()
+
+    def reset_event_timer(self):
+        self.event_timer.stop()
+        self.event_timer.start()
