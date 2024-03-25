@@ -96,15 +96,9 @@ class Handler(PatternMatchingEventHandler):
         print(event)
 
 
-class WatcherThread(QThread):
+class WatcherThread(object):
     def __init__(self):
         super().__init__()
-
-        self.event_timer = QTimer()
-        self.event_timer.setSingleShot(True)
-        self.event_timer.setInterval(5000)
-        self.event_timer.timeout.connect(self.reload_gui)
-        utils_signals_app.watcher_timer.connect(self.reset_event_timer)
 
     def run(self):
         self.flag = True
@@ -127,15 +121,6 @@ class WatcherThread(QThread):
         self.observer.join()
         print("watcher stoped")
 
-    def stop_watcher(self):
-        self.flag = False
-        self.observer.stop()
-        Dbase.cleanup_engine()
 
-    def reload_gui(self):
-        gui_signals_app.reload_menu.emit()
-        gui_signals_app.reload_thumbnails.emit()
-
-    def reset_event_timer(self):
-        self.event_timer.stop()
-        self.event_timer.start()
+a = WatcherThread()
+a.run()
