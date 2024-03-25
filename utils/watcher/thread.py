@@ -26,6 +26,13 @@ class Manager:
             utils_signals_app.watcher_start.emit()
             return False
         return True
+    
+    @staticmethod
+    def is_stop_dir(src: str, stop_dirs: list):
+        for i in stop_dirs:
+            if i in src:
+                return True
+        return False
 
 
 class WaitWriteFinish:
@@ -120,14 +127,19 @@ class NewFile:
 class Handler(PatternMatchingEventHandler):
     def __init__(self):
 
-        dirs = [
-            f"*/{i}/*"
+        # dirs = [
+        #     f"*/{i}/*"
+        #     for i in cnf.stop_colls
+        #     ]
+
+        self.stop_dirs = [
+            os.path.join(cnf.coll_folder, i)
             for i in cnf.stop_colls
             ]
 
         super().__init__(
             # ignore_directories=True,
-            ignore_patterns=dirs
+            # ignore_patterns=dirs
             )
 
     def on_created(self, event: FileSystemEvent):
@@ -135,6 +147,9 @@ class Handler(PatternMatchingEventHandler):
             return
         
         elif event.is_directory:
+            return
+        
+        elif Manager.is_stop_dir(event.src_path, self.stop_dirs):
             return
 
         elif event.src_path.endswith(Manager.jpg_exsts):
@@ -154,6 +169,9 @@ class Handler(PatternMatchingEventHandler):
         elif event.is_directory:
             return
 
+        elif Manager.is_stop_dir(event.src_path, self.stop_dirs):
+            return
+
         elif event.src_path.endswith(Manager.jpg_exsts):
             DeletedFile(src=event.src_path)
 
@@ -171,6 +189,9 @@ class Handler(PatternMatchingEventHandler):
             return
         
         elif event.is_directory:
+            return
+
+        elif Manager.is_stop_dir(event.src_path, self.stop_dirs):
             return
 
         elif event.src_path.endswith(Manager.jpg_exsts):
