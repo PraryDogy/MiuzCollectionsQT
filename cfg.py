@@ -133,11 +133,11 @@ class Config(User, Dymanic, Static, AppInfo):
         
         data["first_load"] = False
 
-        data["scaner_minutes"] = 10
-        data["scaner_recursive"] = False
+        data["scaner_minutes"] = self.scaner_minutes
+        data["scaner_recursive"] = self.scaner_recursive
 
-        data["watcher"] = True
-        data["watcher_timeout"] = 30
+        data["watcher"] = self.watcher
+        data["watcher_timeout"] = self.watcher_timeout
 
         if "LEVIEV" not in data["stop_colls"]:
             data["stop_colls"].append("LEVIEV")
