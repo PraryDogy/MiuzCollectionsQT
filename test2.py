@@ -18,8 +18,6 @@ class Manager:
     def smb_connected():
         if not os.path.exists(cnf.coll_folder):
             print("smb deleted")
-            utils_signals_app.watcher_stop.emit()
-            utils_signals_app.watcher_start.emit()
             return False
         return True
     
