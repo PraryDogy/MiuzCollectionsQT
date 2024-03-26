@@ -1,19 +1,5 @@
-percent = 0
+ln_images = 120
 
-def progressbar(value: int):
-    global percent
+step = 50 if ln_images == 0 else 50 / ln_images
 
-    if isinstance(value, int):
-        percent += value
-        print(percent)
-    else:
-        raise TypeError
-
-collections = [i for i in range(0, 353)]
-maximum = 50
-step = maximum / len(collections)
-
-
-step = 0.49999
-
-print(round(step))
+print(step)

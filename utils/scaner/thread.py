@@ -19,8 +19,6 @@ from sqlalchemy.orm import Query
 class Manager:
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
     tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
-    curr_percent = 0
-    progressbar_len = 50
     flag = True
 
     @staticmethod
@@ -69,41 +67,25 @@ class FinderImages(dict):
 
     def run(self):
         gui_signals_app.progressbar_search_photos.emit()
-        collections = []
 
-        for i in os.listdir(cnf.coll_folder):
-            collection = os.path.join(cnf.coll_folder, i)
-            if not os.path.isdir(collection):
-                continue
-            if i in cnf.stop_colls:
-                continue
-            collections.append(collection)
+        collections = [
+            os.path.join(cnf.coll_folder, i)
+            for i in os.listdir(cnf.coll_folder)
+            if os.path.isdir(os.path.join(cnf.coll_folder, i))
+            and i not in cnf.stop_colls
+            ]
 
         if not collections:
             collections = [cnf.coll_folder]
 
-        try:
-            step_value = Manager.progressbar_len / len(collections)
-        except ZeroDivisionError as e:
-            print(f"scaner > FinderImages > run, {e}")
-            print("coll_folder don't have subfolders")
-            step_value = 1
-
-        float_value = 0
+        ln_colls = len(collections)
+        step_value = 50 if ln_colls == 0 else 50 / ln_colls
 
         for collection_walk in collections:
+            gui_signals_app.progressbar_value.emit(step_value)
 
             if not Manager.flag:
                 return
-
-            float_value += step_value
-
-            if float_value >= 1:
-                Manager.curr_percent += int(float_value)
-                gui_signals_app.progressbar_value.emit(Manager.curr_percent)
-                float_value = 0
-
-            Manager.sleep()
 
             for root, _, files in os.walk(top=collection_walk):
 
@@ -188,13 +170,7 @@ class SummaryScan:
 
         self.images = ComparedImages(finder_images, db_images)
         ln_images = len(self.images["insert"]) + len(self.images["update"])
-
-        try:
-            self.step_value = Manager.progressbar_len / ln_images
-        except ZeroDivisionError as e:
-            print(f"scaner > SummaryScan, {e}")
-            print("it's ok, no new photos")
-            self.step_value = 1
+        self.step_value = 50 if ln_images == 0 else 50 / ln_images
 
         if self.images["delete"]:
             self.delete_db()
