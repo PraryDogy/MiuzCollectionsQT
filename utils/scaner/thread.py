@@ -390,8 +390,7 @@ class Scaner(ScanerBaseClass):
 
     def scaner_actions(self):
         Manager.flag = True
-        Manager.curr_percent = 0
-        gui_signals_app.progressbar_value.emit(0)
+        gui_signals_app.progressbar_show.emit()
 
         SummaryScan()
         NonExistCollRemover()
@@ -399,7 +398,7 @@ class Scaner(ScanerBaseClass):
         Dbase.cleanup_engine()
 
         Manager.flag = True
-        gui_signals_app.progressbar_value.emit(100)
+        gui_signals_app.progressbar_hide.emit()
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
 
@@ -407,7 +406,7 @@ class Scaner(ScanerBaseClass):
         try:
             self.scaner_actions()
         except Exception:
-            gui_signals_app.progressbar_value.emit(100)
+            gui_signals_app.progressbar_hide.emit()
             utils_signals_app.scaner_err.emit()
             print(traceback.format_exc())
 
