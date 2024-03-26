@@ -35,14 +35,15 @@ class ProgressBar(QWidget):
         self.current_value = 0
 
     def progressbar_value(self, value):
-
         self.temp_value += value
+
         if self.temp_value > 1:
+            self.current_value += round(self.temp_value)
             self.temp_value = 0
-            self.current_value += 1
 
         self.progress_bar.setValue(self.current_value)
 
+        print(value)
         print(self.current_value)
 
     def search_photos(self):
