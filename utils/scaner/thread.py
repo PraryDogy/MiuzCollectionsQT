@@ -183,19 +183,12 @@ class SummaryScan:
 
     def create_values(self, data: Dict[str, tuple]) -> List[Dict]:
         values = []
-        float_value = 0
 
         for src, (size, created, modified) in data.items():
+            gui_signals_app.progressbar_value.emit(self.step_value)
 
             if not Manager.flag:
                 return
-
-            float_value += self.step_value
-
-            if float_value >= 1:
-                Manager.curr_percent += int(float_value)
-                gui_signals_app.progressbar_value.emit(Manager.curr_percent)
-                float_value = 0
 
             try:
                 obj = {
