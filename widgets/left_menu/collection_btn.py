@@ -53,8 +53,8 @@ class CustomContext(ContextMenuBase):
                     background-color: {original_color};
                     border: 2px solid {Styles.blue_color};
                     border-radius: {Styles.small_radius};
-                    padding-left: 5px;
-                    padding-right: 5px;
+                    padding-left: 2px;
+                    padding-right: 2px;
                     }}
                 QToolTip {{
                     background: {Styles.menu_sel_item_color};
@@ -75,8 +75,8 @@ class CustomContext(ContextMenuBase):
                     background-color: {original_color};
                     border: 2px solid transparent;
                     border-radius: {Styles.small_radius};
-                    padding-left: 5px;
-                    padding-right: 5px;
+                    padding-left: 2px;
+                    padding-right: 2px;
                     }}
                 QToolTip {{
                     background: {Styles.menu_sel_item_color};
@@ -127,8 +127,8 @@ class CollectionBtn(QLabel):
             QLabel {{
                 background-color: {Styles.menu_bg_color};
                 border: 2px solid transparent;
-                padding-left: 5px;
-                padding-right: 5px;
+                padding-left: 2px;
+                padding-right: 2px;
                 }}
                 QToolTip {{
                     background: {Styles.menu_sel_item_color};
@@ -145,8 +145,8 @@ class CollectionBtn(QLabel):
                     background-color: {Styles.menu_sel_item_color};
                     border: 2px solid transparent;
                     border-radius: {Styles.small_radius};
-                    padding-left: 5px;
-                    padding-right: 5px;
+                    padding-left: 2px;
+                    padding-right: 2px;
                     }}
                 QToolTip {{
                     background: {Styles.menu_sel_item_color};
