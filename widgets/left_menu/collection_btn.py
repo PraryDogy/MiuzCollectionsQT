@@ -49,10 +49,19 @@ class CustomContext(ContextMenuBase):
         try:
             parent.setStyleSheet(
                 f"""
-                background-color: {original_color};
-                border: 2px solid {Styles.blue_color};
-                border-radius: {Styles.small_radius};
-                padding-left: 10px;
+                QLabel {{
+                    background-color: {original_color};
+                    border: 2px solid {Styles.blue_color};
+                    border-radius: {Styles.small_radius};
+                    padding-left: 5px;
+                    padding-right: 5px;
+                    }}
+                QToolTip {{
+                    background: {Styles.menu_sel_item_color};
+                    border: 2px solid transparent;
+                    font-size: 14px;
+                    font-weight: bold;
+                    }}
                 """)
         except Exception as e:
             print(e)
@@ -62,10 +71,19 @@ class CustomContext(ContextMenuBase):
         try:
             parent.setStyleSheet(
                 f"""
-                background-color: {original_color};
-                border: 2px solid transparent;
-                border-radius: {Styles.small_radius};
-                padding-left: 10px;
+                QLabel {{
+                    background-color: {original_color};
+                    border: 2px solid transparent;
+                    border-radius: {Styles.small_radius};
+                    padding-left: 5px;
+                    padding-right: 5px;
+                    }}
+                QToolTip {{
+                    background: {Styles.menu_sel_item_color};
+                    border: 2px solid transparent;
+                    font-size: 14px;
+                    font-weight: bold;
+                    }}
                 """)
         except Exception as e:
             print(e)
@@ -106,18 +124,36 @@ class CollectionBtn(QLabel):
 
         self.setStyleSheet(
             f"""
-            background-color: {Styles.menu_bg_color};
-            border: 2px solid transparent;
-            padding-left: 10px;
+            QLabel {{
+                background-color: {Styles.menu_bg_color};
+                border: 2px solid transparent;
+                padding-left: 5px;
+                padding-right: 5px;
+                }}
+                QToolTip {{
+                    background: {Styles.menu_sel_item_color};
+                    border: 2px solid transparent;
+                    font-size: 14px;
+                    font-weight: bold;
+                    }}
             """)
 
         if true_name == cnf.curr_coll:
             self.setStyleSheet(
                 f"""
-                background-color: {Styles.menu_sel_item_color};
-                border: 2px solid transparent;
-                border-radius: {Styles.small_radius};
-                padding-left: 10px;
+                QLabel {{
+                    background-color: {Styles.menu_sel_item_color};
+                    border: 2px solid transparent;
+                    border-radius: {Styles.small_radius};
+                    padding-left: 5px;
+                    padding-right: 5px;
+                    }}
+                QToolTip {{
+                    background: {Styles.menu_sel_item_color};
+                    border: 2px solid transparent;
+                    font-size: 14px;
+                    font-weight: bold;
+                    }}
                 """)
 
     def mouseReleaseEvent(self, event):
@@ -133,3 +169,15 @@ class CollectionBtn(QLabel):
         
     def contextMenuEvent(self, event):
         CustomContext(parent=self, true_name=self.true_name, event=event)
+
+    def enterEvent(self, event):
+        super().enterEvent(event)
+
+        if self.true_name in ((cnf.ALL_COLLS, cnf.RECENT_COLLS)):
+            return
+
+        self.setToolTip(self.true_name)
+
+    def leaveEvent(self, event):
+        super().leaveEvent(event)
+        self.setToolTip("")
