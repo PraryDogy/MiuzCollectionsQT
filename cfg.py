@@ -190,12 +190,17 @@ class Config(User, Dymanic, Static, AppInfo):
     def check_app_dirs(self):
         os.makedirs(name=self.app_support_app_dir, exist_ok=True)
 
+        if not os.path.exists(path="db.db"):
+            print("please, download db.db.zip from")
+            print("https://disk.yandex.ru/d/FmwEPA8nS3JsMw")
+            print("extract and move to project root directory")
+            quit()
+
         if not os.path.exists(path=self.json_file):
             self.write_json_cfg()
 
         if not os.path.exists(path=self.db_file):
             shutil.copyfile(src="db.db", dst=self.db_file)
-
 
 cnf = Config()
 cnf.check_app_dirs()
