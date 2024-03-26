@@ -19,11 +19,12 @@ class GuiSignals(QObject):
     set_focus_search = pyqtSignal()
     set_focus_viewer = pyqtSignal()
 
-    scan_progress_value = pyqtSignal(int)
-
-    progress_search_photos = pyqtSignal()
-    progress_add_photos = pyqtSignal()
-    progress_del_photos = pyqtSignal()
+    progressbar_value = pyqtSignal(int)
+    progressbar_show = pyqtSignal()
+    progressbar_hide = pyqtSignal()
+    progressbar_search_photos = pyqtSignal()
+    progressbar_add_photos = pyqtSignal()
+    progressbar_del_photos = pyqtSignal()
 
     noti_main = pyqtSignal(str)
     noti_img_view = pyqtSignal(str)

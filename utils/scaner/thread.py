@@ -68,7 +68,7 @@ class FinderImages(dict):
             Manager.flag = False
 
     def run(self):
-        gui_signals_app.progress_search_photos.emit()
+        gui_signals_app.progressbar_search_photos.emit()
         collections = []
 
         for i in os.listdir(cnf.coll_folder):
@@ -100,7 +100,7 @@ class FinderImages(dict):
 
             if float_value >= 1:
                 Manager.curr_percent += int(float_value)
-                gui_signals_app.scan_progress_value.emit(Manager.curr_percent)
+                gui_signals_app.progressbar_value.emit(Manager.curr_percent)
                 float_value = 0
 
             Manager.sleep()
@@ -218,7 +218,7 @@ class SummaryScan:
 
             if float_value >= 1:
                 Manager.curr_percent += int(float_value)
-                gui_signals_app.scan_progress_value.emit(Manager.curr_percent)
+                gui_signals_app.progressbar_value.emit(Manager.curr_percent)
                 float_value = 0
 
             try:
@@ -253,7 +253,7 @@ class SummaryScan:
         return values
 
     def insert_db(self):
-        gui_signals_app.progress_add_photos.emit()
+        gui_signals_app.progressbar_add_photos.emit()
         limit: int = 10
         data: dict = self.images["insert"]
         data_keys: list = list(data.keys())
@@ -363,7 +363,7 @@ class SummaryScan:
                 session.close()
 
     def delete_db(self):
-        gui_signals_app.progress_del_photos.emit()
+        gui_signals_app.progressbar_del_photos.emit()
 
         queries = List[Query]
         queries = [
@@ -422,7 +422,7 @@ class Scaner(ScanerBaseClass):
     def scaner_actions(self):
         Manager.flag = True
         Manager.curr_percent = 0
-        gui_signals_app.scan_progress_value.emit(0)
+        gui_signals_app.progressbar_value.emit(0)
 
         SummaryScan()
         NonExistCollRemover()
@@ -430,7 +430,7 @@ class Scaner(ScanerBaseClass):
         Dbase.cleanup_engine()
 
         Manager.flag = True
-        gui_signals_app.scan_progress_value.emit(100)
+        gui_signals_app.progressbar_value.emit(100)
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
 
@@ -438,7 +438,7 @@ class Scaner(ScanerBaseClass):
         try:
             self.scaner_actions()
         except Exception:
-            gui_signals_app.scan_progress_value.emit(100)
+            gui_signals_app.progressbar_value.emit(100)
             utils_signals_app.scaner_err.emit()
             print(traceback.format_exc())
 

@@ -24,21 +24,24 @@ class ProgressBar(QWidget):
         self.progress_bar.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.progress_bar)
 
-        gui_signals_app.scan_progress_value.connect(self.progress_bar_set)
-        gui_signals_app.progress_search_photos.connect(self.search_photos)
-        gui_signals_app.progress_add_photos.connect(self.add_photos)
-        gui_signals_app.progress_del_photos.connect(self.del_photos)
+        gui_signals_app.progressbar_value.connect(self.progressbar_value)
+        gui_signals_app.progressbar_show.connect(self.progressbar_show)
+        gui_signals_app.progressbar_hide.connect(self.progressbar_hide)
+        gui_signals_app.progressbar_search_photos.connect(self.search_photos)
+        gui_signals_app.progressbar_add_photos.connect(self.add_photos)
+        gui_signals_app.progressbar_del_photos.connect(self.del_photos)
 
-    def progress_bar_set(self, value):
-        if self.isHidden():
-            if value != 0 or value != 100:
-                self.show()
+        self.temp_value = 0
+        self.current_value = 0
 
-        elif value == 0 or value == 100:
-            self.hide()
+    def progressbar_value(self, value):
 
-        else:
-            self.progress_bar.setValue(value)
+        self.temp_value += value
+        if self.temp_value > 1:
+            self.temp_value = 0
+            self.current_value += 1
+
+        self.progress_bar.setValue(self.current_value)
 
     def search_photos(self):
         self.title.setText(cnf.lng.searching_photos)
@@ -48,3 +51,11 @@ class ProgressBar(QWidget):
 
     def del_photos(self):
         self.title.setText(cnf.lng.deleting_photos)
+
+    def progressbar_show(self):
+        self.current_value = 0
+        self.progress_bar.setValue(self.current_value)
+        self.show()
+
+    def progressbar_hide(self):
+        self.hide()
