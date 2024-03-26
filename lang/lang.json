@@ -290,12 +290,12 @@
         "Searching for new photos"
     ],
     "sett_stopcolls": [
-        "Игнорировать папки при поиске",
-        "Ignore folders during the search"
+        "Скрыть коллекции",
+        "Hide collections"
     ],
     "sett_stopwords": [
-        "Игнорировать слова в имени файла при поиске tiff/psd",
-        "Ignore words in the file name when searching for tiff/psd"
+        "Игнорировать * в имени файла при поиске tiff/psd",
+        "Ignore * in the file name when searching for tiff/psd"
     ],
     "settings": [
         "Настройки",
