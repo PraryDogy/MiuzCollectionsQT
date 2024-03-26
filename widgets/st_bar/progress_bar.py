@@ -41,7 +41,7 @@ class ProgressBar(QWidget):
             self.current_value += round(self.temp_value)
             self.temp_value = 0
 
-        self.progress_bar.setValue(self.current_value)
+        self.progress_bar.setValsue(self.current_value)
 
     def search_photos(self):
         self.title.setText(cnf.lng.searching_photos)

@@ -10,7 +10,7 @@ from lang import Eng, Rus
 class User:
     def __init__(self) -> None:
         super().__init__()
-        self.app_ver: str = "5.1.6"
+        self.app_ver: str = "5.1.7"
     
         self.coll_folder: str = os.path.join(
             os.sep,
@@ -48,8 +48,8 @@ class User:
             "ah": 500
             }
         
-        self.scaner_minutes: int = 10
-        self.scaner_recursive: bool = False
+        self.scaner_minutes: int = 5
+        self.scaner_recursive: bool = True
         self.stop_colls: dict = [
             "_Archive_Commerce_Брендинг",
             "Chosed",
@@ -68,11 +68,10 @@ class User:
         
         self.user_lng: str = "en"
 
-        self.watcher: bool = True
+        self.watcher: bool = False
         self.watcher_timeout: int = 5
 
         self.zoom: bool = False
-
         
 
 class Static:
