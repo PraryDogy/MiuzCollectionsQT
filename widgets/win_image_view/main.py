@@ -72,7 +72,12 @@ class FSizeImgThread(QThread):
         if len(Manager.images) > 50:
             Manager.images.pop(next(iter(Manager.images)))
 
-        self.image_loaded.emit({"image": pixmap, "src": self.image_path})
+        self.image_loaded.emit(
+            {"image": pixmap,
+             "width": pixmap.width(),
+             "src": self.image_path
+             }
+             )
 
 
 class ImageWidget(QWidget):
@@ -231,10 +236,7 @@ class WinImageView(WinImgViewBase):
         self.content_layout.addWidget(self.image_label)
 
         self.notification = Notification(self.content_wid)
-        self.notification.resize(
-            self.width() - 20,
-            30
-            )
+        self.notification.resize(self.width() - 20, 30)
         self.notification.move(10, 2)
         gui_signals_app.noti_img_view.connect(self.notification.show_notify)
 
@@ -315,7 +317,7 @@ class WinImageView(WinImgViewBase):
             gui_signals_app.noti_img_view.emit(cnf.lng.no_connection)
 
     def finalize_thread(self, data: dict):
-        if data["image"].size().width() == 0 or data["src"] != self.image_path:
+        if data["width"] == 0 or data["src"] != self.image_path:
             return
         
         self.image_label.set_image(data["image"])
@@ -392,12 +394,7 @@ class WinImageView(WinImgViewBase):
 
     def resizeEvent(self, event):
         self.move_navi_btns()
-
-        self.notification.resize(
-            self.width() - 20,
-            30
-            )
-
+        self.notification.resize(self.width() - 20, 30)
         return super().resizeEvent(event)
     
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
