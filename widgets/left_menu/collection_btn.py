@@ -59,8 +59,7 @@ class CustomContext(ContextMenuBase):
                 QToolTip {{
                     background: {Styles.menu_sel_item_color};
                     border: 2px solid transparent;
-                    font-size: 14px;
-                    font-weight: bold;
+                    font-size: 12px;
                     }}
                 """)
         except Exception as e:
@@ -81,8 +80,7 @@ class CustomContext(ContextMenuBase):
                 QToolTip {{
                     background: {Styles.menu_sel_item_color};
                     border: 2px solid transparent;
-                    font-size: 14px;
-                    font-weight: bold;
+                    font-size: 12px;
                     }}
                 """)
         except Exception as e:
@@ -133,8 +131,7 @@ class CollectionBtn(QLabel):
                 QToolTip {{
                     background: {Styles.menu_sel_item_color};
                     border: 2px solid transparent;
-                    font-size: 14px;
-                    font-weight: bold;
+                    font-size: 12px;
                     }}
             """)
 
@@ -151,8 +148,7 @@ class CollectionBtn(QLabel):
                 QToolTip {{
                     background: {Styles.menu_sel_item_color};
                     border: 2px solid transparent;
-                    font-size: 14px;
-                    font-weight: bold;
+                    font-size: 12px;
                     }}
                 """)
 
