@@ -236,10 +236,7 @@ class WinImageView(WinImgViewBase):
         self.content_layout.addWidget(self.image_label)
 
         self.notification = Notification(self.content_wid)
-        self.notification.resize(
-            self.width() - 20,
-            30
-            )
+        self.notification.resize(self.width() - 20, 30)
         self.notification.move(10, 2)
         gui_signals_app.noti_img_view.connect(self.notification.show_notify)
 
@@ -394,12 +391,7 @@ class WinImageView(WinImgViewBase):
 
     def resizeEvent(self, event):
         self.move_navi_btns()
-
-        self.notification.resize(
-            self.width() - 20,
-            30
-            )
-
+        self.notification.resize(self.width() - 20, 30)
         return super().resizeEvent(event)
     
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
