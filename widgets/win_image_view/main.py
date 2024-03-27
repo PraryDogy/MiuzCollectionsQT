@@ -306,10 +306,13 @@ class WinImageView(WinImgViewBase):
         self.navi_next.hide()
 
     def run_thread(self):
-        self.fsize_img_thread = FSizeImgThread(self.image_path)
-        self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
-        self.fsize_img_thread.start()
-        Manager.threads.append(self.fsize_img_thread)
+        if MainUtils.smb_check():
+            self.fsize_img_thread = FSizeImgThread(self.image_path)
+            self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
+            self.fsize_img_thread.start()
+            Manager.threads.append(self.fsize_img_thread)
+        else:
+            gui_signals_app.noti_img_view.emit(cnf.lng.no_connection)
 
     def finalize_thread(self, data: dict):
         if data["image"].size().width() == 0 or data["src"] != self.image_path:

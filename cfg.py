@@ -97,7 +97,7 @@ class Dymanic:
         self.date_end: datetime = None
         self.date_start_text: str = None # datetime as readable text
         self.date_end_text: str = None # datetime as readable text
-        self.lng: Union[Type[Eng], Type[Rus]] = Eng()
+        self.lng: Eng = Eng()
 
 
 class AppInfo:

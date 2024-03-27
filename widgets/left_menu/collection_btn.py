@@ -8,7 +8,7 @@ from cfg import cnf
 from signals import gui_signals_app
 
 from styles import Styles
-
+from utils import MainUtils
 
 class Manager:
     reveal_coll_win = None
@@ -166,6 +166,9 @@ class CollectionBtn(QLabel):
         gui_signals_app.scroll_top.emit()
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
+
+        if not MainUtils.smb_check():
+            gui_signals_app.noti_main.emit(cnf.lng.no_connection)
         
     def contextMenuEvent(self, event):
         CustomContext(parent=self, true_name=self.true_name, event=event)
