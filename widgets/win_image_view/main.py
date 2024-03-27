@@ -72,7 +72,12 @@ class FSizeImgThread(QThread):
         if len(Manager.images) > 50:
             Manager.images.pop(next(iter(Manager.images)))
 
-        self.image_loaded.emit({"image": pixmap, "src": self.image_path})
+        self.image_loaded.emit(
+            {"image": pixmap,
+             "width": pixmap.width(),
+             "src": self.image_path
+             }
+             )
 
 
 class ImageWidget(QWidget):
@@ -312,7 +317,7 @@ class WinImageView(WinImgViewBase):
         Manager.threads.append(self.fsize_img_thread)
 
     def finalize_thread(self, data: dict):
-        if data["image"].size().width() == 0 or data["src"] != self.image_path:
+        if data["width"] == 0 or data["src"] != self.image_path:
             return
         
         self.image_label.set_image(data["image"])
