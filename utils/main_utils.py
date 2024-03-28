@@ -26,7 +26,7 @@ class MainUtils:
 
     @staticmethod
     def migrate_coll(old_coll: str, new_coll: str):
-        print("collections detected, migrate")
+        print("migrate")
         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
         sess = Dbase.get_session()
         res = sess.execute(q).fetchall()
@@ -51,24 +51,9 @@ class MainUtils:
         # зависит от порядка подключения
         # в таком случае функция попытается перебрать все подключенные тома
         # оставив остальной путь к коллекциям без изменений
-
         if not os.path.exists(cnf.coll_folder):
-            cut_path = cnf.coll_folder.strip("/").split("/")[2:]
-
-            assumed_dirs = [
-                os.path.join("/Volumes", i, *cut_path)
-                for i in os.listdir("/Volumes")
-                ]
-            
-            for i in assumed_dirs:
-                if os.path.exists(i):
-                    MainUtils.migrate_coll(cnf.coll_folder, i)
-                    break
-
             return False
-        
-        else:
-            return True
+        return True
 
     # @staticmethod
     # def smb_check() -> bool:
