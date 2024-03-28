@@ -18,6 +18,7 @@ class User:
             "Shares",
             "Collections"
             )
+
         self.curr_coll: str = "miuzcollections_all"
         self.cust_fltr_names: dict = {
             "prod": "1 IMG",
