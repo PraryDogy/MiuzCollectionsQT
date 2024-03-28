@@ -28,6 +28,35 @@ class Manager:
         sleep(0.5)
 
 
+class Migrate:
+    def __init__(self, old_coll: str, new_coll: str):
+
+        print("migrate")
+
+        q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
+        sess = Dbase.get_session()
+        res = sess.execute(q).fetchall()
+
+        new_res = [
+            (res_id, src.replace(old_coll, new_coll))
+            for res_id, src in res
+            ]
+        
+        for res_id, src in new_res:
+            q = (
+                sqlalchemy.update(ThumbsMd)
+                .values({"src": src})
+                .filter(ThumbsMd.id==res_id)
+                )
+            sess.execute(q)
+
+        sess.commit()
+        sess.close()
+
+        for k, v in cnf.migrate_data.items():
+            cnf.migrate_data[k] = False
+
+
 class NonExistCollRemover:
     def __init__(self):
         coll_folder = cnf.coll_folder + os.sep
@@ -426,6 +455,12 @@ class Scaner(ScanerBaseClass):
     def scaner_actions(self):
         Manager.flag = True
         gui_signals_app.progressbar_show.emit()
+
+        if cnf.migrate_data["migrate"]:
+            Migrate(
+                old_coll=cnf.migrate_data["old_coll"],
+                new_coll=cnf.migrate_data["new_coll"]
+                )
 
         SummaryScan()
         NonExistCollRemover()

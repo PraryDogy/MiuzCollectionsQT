@@ -25,26 +25,6 @@ class MainUtils:
                 f.write(traceback.format_exc())
 
     @staticmethod
-    def migrate_coll(old_coll: str, new_coll: str):
-        print("migrate")
-        q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-        sess = Dbase.get_session()
-        res = sess.execute(q).fetchall()
-
-        new_res = [
-            (res_id, src.replace(old_coll, new_coll))
-            for res_id, src in res
-            ]
-        
-        for res_id, src in new_res:
-            q = sqlalchemy.update(ThumbsMd).values({"src": src}).filter(ThumbsMd.id==res_id)
-            sess.execute(q)
-
-        sess.commit()
-        sess.close()
-        cnf.coll_folder = new_coll
-
-    @staticmethod
     def smb_check() -> bool:
         return bool(os.path.exists(path=cnf.coll_folder))
 
