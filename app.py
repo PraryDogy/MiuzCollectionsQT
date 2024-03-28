@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtCore import QEvent, Qt, QTimer
 from PyQt5.QtWidgets import QApplication
 
 from cfg import cnf
@@ -10,6 +10,7 @@ from utils import MainUtils
 
 class Manager:
     smb_win = None
+    first_load_win = None
 
 
 class App(QApplication):
@@ -29,6 +30,11 @@ class App(QApplication):
         self.installEventFilter(self)
         self.aboutToQuit.connect(self.on_exit)
 
+        self.after_start_timer = QTimer(self)
+        self.after_start_timer.setSingleShot(True)
+        self.after_start_timer.timeout.connect(self.after_start)
+        self.after_start_timer.start(100)
+
     def eventFilter(self, obj, event: QEvent):
         if event.type() == QEvent.ApplicationActivate:
             self.main_win.show()
@@ -46,19 +52,20 @@ class App(QApplication):
         utils_signals_app.scaner_stop.emit()
         utils_signals_app.watcher_stop.emit()
 
+    def after_start(self):
+        utils_signals_app.scaner_start.emit()
+        utils_signals_app.watcher_start.emit()
+
+        if cnf.first_load:
+            from widgets.win_first_load import WinFirstLoad
+            cnf.first_load = False
+            Manager.first_load_win = WinFirstLoad()
+            Manager.first_load_win.show()
+
+        if not MainUtils.smb_check():
+            from widgets.win_smb import WinSmb
+            Manager.smb_win = WinSmb()
+            Manager.smb_win.show()
+
 
 app = App()
-utils_signals_app.scaner_start.emit()
-utils_signals_app.watcher_start.emit()
-
-if cnf.first_load:
-    from widgets.win_first_load import WinFirstLoad
-    cnf.first_load = False
-    a = WinFirstLoad()
-    a.show()
-
-if not MainUtils.smb_check():
-    from widgets.win_smb import WinSmb
-
-    Manager.smb_win = WinSmb()
-    Manager.smb_win.show()
