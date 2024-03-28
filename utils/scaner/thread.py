@@ -1,11 +1,13 @@
 import os
 import traceback
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from time import sleep
-from typing import Literal
+from typing import Dict, List, Literal
 
 import sqlalchemy
 from PyQt5.QtCore import QThread
+from sqlalchemy.orm import Query
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
@@ -13,8 +15,7 @@ from signals import gui_signals_app, utils_signals_app
 
 from ..image_utils import BytesThumb, UndefBytesThumb
 from ..main_utils import MainUtils
-from typing import Dict, List
-from sqlalchemy.orm import Query
+
 
 class Manager:
     jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
@@ -51,6 +52,37 @@ class NonExistCollRemover:
                 session.commit()
             finally:
                 session.close()
+
+
+class DubFinder:
+    def __init__(self):
+        q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
+        conn = Dbase.get_session()
+        res = conn.execute(q).fetchall()
+
+        dubs = defaultdict(list)
+
+        for res_id, res_src in res:
+            dubs[res_src].append(res_id)
+
+        dubs = [
+            x
+            for k, v in dubs.items()
+            for x in v[1:]
+            if len(v) > 1
+            ]
+
+        if dubs:
+            values = [
+                sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.id==dub_id)
+                for dub_id in dubs
+                ]
+
+            for i in values:
+                conn.execute(i)
+
+            conn.commit()
+            conn.close()
 
 
 class FinderImages(dict):
@@ -394,6 +426,7 @@ class Scaner(ScanerBaseClass):
 
         SummaryScan()
         NonExistCollRemover()
+        DubFinder()
         Dbase.vacuum()
         Dbase.cleanup_engine()
 

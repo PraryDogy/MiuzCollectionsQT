@@ -33,5 +33,3 @@ class DubFinder:
             conn.commit()
             conn.close()
             
-
-DubFinder()
