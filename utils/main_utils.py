@@ -46,18 +46,7 @@ class MainUtils:
 
     @staticmethod
     def smb_check() -> bool:
-        # коллекции могут лежать там же, где и лежали
-        # но раньше подключенный диск был Shares-1, а может стать Shares-2
-        # зависит от порядка подключения
-        # в таком случае функция попытается перебрать все подключенные тома
-        # оставив остальной путь к коллекциям без изменений
-        if not os.path.exists(cnf.coll_folder):
-            return False
-        return True
-
-    # @staticmethod
-    # def smb_check() -> bool:
-    #     return bool(os.path.exists(path=cnf.coll_folder))
+        return bool(os.path.exists(path=cnf.coll_folder))
 
     @staticmethod
     def get_coll_name(src_path: str) -> str:
