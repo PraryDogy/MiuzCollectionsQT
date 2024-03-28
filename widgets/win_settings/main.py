@@ -313,7 +313,12 @@ class WinSettings(WinStandartBase):
         scan_again = False
 
         if self.browse_coll.new_coll_path:
-            cnf.coll_folder = self.browse_coll.new_coll_path
+            # миграция и только после скан
+            MainUtils.migrate_coll(
+                old_coll=cnf.coll_folder,
+                new_coll=self.browse_coll.new_coll_path
+                )
+            # cnf.coll_folder = self.browse_coll.new_coll_path
             scan_again = True
 
         if self.stopwords.get_stopwords() != cnf.stop_words:
