@@ -97,6 +97,9 @@ class FinderImages(dict):
             utils_signals_app.scaner_err.emit()
             Manager.flag = False
 
+        if not self:
+            Manager.flag = False
+
     def run(self):
         gui_signals_app.progressbar_search_photos.emit()
 
