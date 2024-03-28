@@ -63,9 +63,8 @@ class App(QApplication):
             Manager.first_load_win.show()
 
         if not MainUtils.smb_check():
-            from widgets.win_smb import WinSmb
-            Manager.smb_win = WinSmb()
-            Manager.smb_win.show()
+            from widgets.win_err import WinErr
+            WinErr(cnf.lng.no_connection, cnf.lng.smb_descr)
 
 
 app = App()

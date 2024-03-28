@@ -10,7 +10,7 @@ from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from styles import Styles
 from utils import MainUtils
-from widgets.win_smb import WinSmb
+from widgets.win_err import WinErr
 
 
 class Manager:
@@ -74,7 +74,7 @@ class BrowseColl(LayoutV):
 
         if not MainUtils.smb_check():
 
-            Manager.smb_win = WinSmb()
+            Manager.smb_win = WinErr()
             Manager.smb_win.show()
 
 
