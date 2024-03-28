@@ -1,9 +1,4 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QSpacerItem, QMessageBox
-
-from base_widgets import Btn, WinStandartBase
-from cfg import cnf
-from signals import gui_signals_app
+from PyQt5.QtWidgets import QMessageBox
 
 
 class WinErr(QMessageBox):
