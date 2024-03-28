@@ -15,36 +15,27 @@ gui_signals_app = ...
 utils_signals_app = ...
 
 
-class SummaryScan:
-    def __init__(self):
+class Values(list):
+    def __init__(self, data: Dict[str, tuple]) -> List[Dict]:
         super().__init__()
-        finder_images = FinderImages()
-        db_images = DbImages()
-
-        if not finder_images:
-            return
-
-        self.images = ComparedImages(finder_images, db_images)
-        ln_images = len(self.images["insert"]) + len(self.images["update"])
-        self.step_value = 50 if ln_images == 0 else 50 / ln_images
-
-        if self.images["delete"]:
-            self.delete_db()
-
-        if self.images["update"]:
-            self.update_db()
-
-        if self.images["insert"]:
-            self.insert_db()
-
-    def create_values(self, data: Dict[str, tuple]) -> List[Dict]:
-        values = []
 
         for src, (size, created, modified) in data.items():
             gui_signals_app.progressbar_value.emit(self.step_value)
 
             if not Manager.flag:
                 return
+            
+            try:
+                image = BytesThumb(src).getvalue()
+
+            except FileNotFoundError as e:
+                print(f"scaner > Values > {e}")
+                utils_signals_app.scaner_err.emit()
+                Manager.flag = False
+                break
+
+            except Exception as e:
+                image = UndefBytesThumb().getvalue()
 
             try:
                 obj = {
@@ -75,7 +66,28 @@ class SummaryScan:
 
                 values.append(obj)
         
-        return values
+
+class SummaryScan:
+    def __init__(self):
+        super().__init__()
+        finder_images = FinderImages()
+        db_images = DbImages()
+
+        if not finder_images:
+            return
+
+        self.images = ComparedImages(finder_images, db_images)
+        ln_images = len(self.images["insert"]) + len(self.images["update"])
+        self.step_value = 50 if ln_images == 0 else 50 / ln_images
+
+        if self.images["delete"]:
+            self.delete_db()
+
+        if self.images["update"]:
+            self.update_db()
+
+        if self.images["insert"]:
+            self.insert_db()
 
     def insert_db(self):
         gui_signals_app.progressbar_add_photos.emit()
