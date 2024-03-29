@@ -97,8 +97,6 @@ class DatesWinBase(WinStandartBase):
 class WinDates(DatesWinBase):
     def __init__(self):
         super().__init__()
-
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.set_title(cnf.lng.dates)
 
         self.init_ui()
