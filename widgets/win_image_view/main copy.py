@@ -111,7 +111,6 @@ class ImageWidget(QLabel):
         self.setPixmap(self.current_pixmap)
 
 
-
     def zoom_in(self):
         self.scale_factor *= 1.1
         self.update()
@@ -139,11 +138,6 @@ class ImageWidget(QLabel):
             self.last_mouse_pos = event.pos()
             self.update()
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
-
-    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        if self.scale_factor > 1.0:
-            self.setCursor(Qt.CursorShape.OpenHandCursor)
-        return super().mouseReleaseEvent(a0)
     
 
 class NaviZoom(QFrame):

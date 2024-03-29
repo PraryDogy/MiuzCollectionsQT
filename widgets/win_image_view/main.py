@@ -92,6 +92,9 @@ class ImageWidget(QLabel):
 
     def set_image(self, pixmap: QPixmap):
         self.current_pixmap = pixmap
+        self.scale_factor = 1.0
+        self.offset = QPoint(0, 0)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
         self.w, self.h = self.width(), self.height()
 
         self.current_pixmap.scaled(
@@ -103,6 +106,7 @@ class ImageWidget(QLabel):
 
     def zoom_in(self):
         self.scale_factor *= 1.1
+        self.setCursor(Qt.OpenHandCursor)
         self.update()
 
     def zoom_out(self):
@@ -112,6 +116,7 @@ class ImageWidget(QLabel):
     def zoom_reset(self):
         self.scale_factor = 1.0
         self.offset = QPoint(0, 0)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
         self.update()
 
     def mousePressEvent(self, event):
@@ -123,11 +128,13 @@ class ImageWidget(QLabel):
             delta = event.pos() - self.last_mouse_pos
             self.offset += delta
             self.last_mouse_pos = event.pos()
+            self.setCursor(Qt.CursorShape.ClosedHandCursor)
             self.update()
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if self.scale_factor > 1.0:
-            self.setCursor(Qt.OpenHandCursor)
+            self.setCursor(Qt.CursorShape.OpenHandCursor)
+        return super().mouseReleaseEvent(ev)
 
     def paintEvent(self, event):
         if self.current_pixmap is not None:
