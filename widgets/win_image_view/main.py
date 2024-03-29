@@ -83,53 +83,38 @@ class FSizeImgThread(QThread):
 class ImageWidget(QLabel):
     def __init__(self):
         super().__init__()
+        self.setAlignment(Qt.AlignCenter)
 
         self.current_pixmap: QPixmap = None
         self.scale_factor: float = 1.0
         self.offset = QPoint(0, 0)
+        self.w, self.h = 0, 0
 
-    # def paintEvent(self, event):
-    #     painter = QPainter(self)
-    #     icon = QIcon(self.current_pixmap)
-
-    #     ww = int(self.width() * self.scale_factor)
-    #     hh = int(self.height() * self.scale_factor)
-
-    #     x = int((self.width() - ww) / 2) + self.offset.x()
-    #     y = int((self.height() - hh) / 2) + self.offset.y()
-
-        # icon.paint(painter, x, y, ww, hh, Qt.AlignmentFlag.AlignCenter)
-
-    def set_image(self, pixmap: QPixmap):
-        aspect = Qt.AspectRatioMode.KeepAspectRatio
-        # self.current_pixmap = pixmap.scaled(4000, 4000, aspectRatioMode=aspect)
-        # self.offset = QPoint(0, 0)
-        # self.scale_factor = 1.0
-        # self.update()
-
-        self.current_pixmap = pixmap.scaled(self.width(), self.height(), aspectRatioMode=aspect)
-        self.setPixmap(self.current_pixmap)
-
-
+    def set_image(self, pixmap: QPixmap, w: int, h: int):
+        self.current_pixmap = pixmap
+        self.w, self.h = w, h
+        self.current_pixmap.scaled(
+            w, h, 
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+            )
+        self.update()
 
     def zoom_in(self):
         self.scale_factor *= 1.1
         self.update()
-        self.setCursor(Qt.OpenHandCursor) 
 
     def zoom_out(self):
         self.scale_factor /= 1.1
         self.update()
-        self.setCursor(Qt.OpenHandCursor)
 
     def zoom_reset(self):
         self.scale_factor = 1.0
         self.offset = QPoint(0, 0)
         self.update()
-        self.setCursor(Qt.ArrowCursor) 
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
+        if event.button() == Qt.LeftButton:
             self.last_mouse_pos = event.pos()
 
     def mouseMoveEvent(self, event):
@@ -138,12 +123,26 @@ class ImageWidget(QLabel):
             self.offset += delta
             self.last_mouse_pos = event.pos()
             self.update()
-            self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
-    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+    def mouseReleaseEvent(self, event):
         if self.scale_factor > 1.0:
-            self.setCursor(Qt.CursorShape.OpenHandCursor)
-        return super().mouseReleaseEvent(a0)
+            self.setCursor(Qt.OpenHandCursor)
+
+    def paintEvent(self, event):
+        if self.current_pixmap is not None:
+            painter = QPainter(self)
+            scaled_pixmap = self.current_pixmap.scaled(
+                int(self.w * self.scale_factor),
+                int(self.h * self.scale_factor),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+                )
+
+            offset = self.offset + QPoint(
+                int((self.width() - scaled_pixmap.width()) / 2),
+                int((self.height() - scaled_pixmap.height()) / 2)
+                )
+            painter.drawPixmap(offset, scaled_pixmap)
     
 
 class NaviZoom(QFrame):
@@ -238,7 +237,9 @@ class WinImageView(WinImgViewBase):
         self.installEventFilter(self)
 
         self.image_label = ImageWidget()
-        self.content_layout.addWidget(self.image_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.content_layout.addWidget(
+            self.image_label,
+            )
 
         self.notification = Notification(self.content_wid)
         self.notification.resize(self.width() - 20, 30)
@@ -286,7 +287,9 @@ class WinImageView(WinImgViewBase):
 
             pixmap = QPixmap()
             pixmap.loadFromData(res)
-            self.image_label.set_image(pixmap)
+            self.image_label.set_image(
+                pixmap, self.width(), self.height()
+                )
 
         self.fsize_img_timer.start()
 
@@ -321,7 +324,9 @@ class WinImageView(WinImgViewBase):
         if data["width"] == 0 or data["src"] != self.image_path:
             return
         
-        self.image_label.set_image(data["image"])
+        self.image_label.set_image(
+            data["image"], self.width(), self.height()
+            )
         self.my_set_title()
         Manager.threads.remove(self.fsize_img_thread)
 
