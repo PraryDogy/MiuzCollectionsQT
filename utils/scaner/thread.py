@@ -454,6 +454,8 @@ class Scaner(ScanerBaseClass):
 
     def scaner_actions(self):
         Manager.flag = True
+        cnf.scaner_running = True
+
         gui_signals_app.progressbar_show.emit()
 
         if cnf.migrate_data["migrate"]:
@@ -469,6 +471,7 @@ class Scaner(ScanerBaseClass):
         Dbase.cleanup_engine()
 
         Manager.flag = True
+        cnf.scaner_running = False
         gui_signals_app.progressbar_hide.emit()
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
