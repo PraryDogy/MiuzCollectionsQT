@@ -19,6 +19,8 @@ class WinSmb(WinStandartBase):
 
         self.content_layout.addSpacerItem(QSpacerItem(0, 10))
 
+
+        # перейти в настройки
         close = Btn(cnf.lng.close)
         close.mouseReleaseEvent = self.close_cmd
         self.content_layout.addWidget(close, alignment=Qt.AlignCenter)
