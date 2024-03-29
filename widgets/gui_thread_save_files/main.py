@@ -39,10 +39,19 @@ class GuiThreadSaveFiles(QObject):
             raise Exception("files must be list")
 
         if len(files) == 0:
-            if isinstance(self.my_parent, QMainWindow):
-                gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
+
+            if cnf.scaner_running:
+                t = f"{cnf.lng.no_tiff} {cnf.lng.wait_scan_finished}"
+
             else:
-                gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
+                t = cnf.lng.no_tiff
+
+            if isinstance(self.my_parent, QMainWindow):
+                gui_signals_app.noti_img_view.emit(t)
+
+            else:
+                gui_signals_app.noti_main.emit(t)
+
             return
 
         if is_fiff:
@@ -71,11 +80,19 @@ class GuiThreadSaveFiles(QObject):
         tiffs = [i for i in self.tiff_list if i]
 
         if len(tiffs) == 0:
-            if isinstance(self.my_parent, QMainWindow):
-                gui_signals_app.noti_img_view.emit(cnf.lng.no_tiff)
+
+            if cnf.scaner_running:
+                t = f"{cnf.lng.no_tiff} {cnf.lng.wait_scan_finished}"
             else:
-                gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
+                t = cnf.lng.no_tiff
+
+            if isinstance(self.my_parent, QMainWindow):
+                gui_signals_app.noti_img_view.emit(t)
+            else:
+                gui_signals_app.noti_main.emit(t)
+
             return
+
         else:
             self.run_save_files(tiffs)
 

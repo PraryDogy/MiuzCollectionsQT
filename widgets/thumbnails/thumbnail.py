@@ -90,7 +90,13 @@ class Thumbnail(QLabel, QObject):
 
         if self.show_no_tiff:
             self.show_no_tiff = False
-            gui_signals_app.noti_main.emit(cnf.lng.no_tiff)
+
+            if cnf.scaner_running:
+                t = f"{cnf.lng.no_tiff} {cnf.lng.wait_scan_finished}"
+            else:
+                t = cnf.lng.no_tiff
+
+            gui_signals_app.noti_main.emit(t)
 
 
     def contextMenuEvent(self, event):

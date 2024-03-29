@@ -72,5 +72,6 @@ class Eng:
 		self.user_designer = 'Designer'
 		self.user_standart = 'Standart'
 		self.view = 'View'
+		self.wait_scan_finished = 'Please, wait. Searching for new photos.'
 		self.weekdays = {'0': 'monday', '1': 'tuesday', '2': 'wednesday', '3': 'thursday', '4': 'friday', '5': 'saturday', '6': 'sunday'}
 		self.with_name = 'with name'

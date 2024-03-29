@@ -368,5 +368,9 @@
     "with_name": [
         "с именем",
         "with name"
+    ],
+    "wait_scan_finished": [
+        "Пожалуйста, подождите. Идет поиск фотографий.",
+        "Please, wait. Searching for new photos."
     ]
 }
