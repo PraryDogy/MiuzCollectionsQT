@@ -92,7 +92,7 @@ class Thumbnail(QLabel, QObject):
             self.show_no_tiff = False
 
             if cnf.scaner_running:
-                t = f"{cnf.lng.no_tiff} {cnf.lng.wait_scan_finished}"
+                t = f"{cnf.lng.no_tiff}. {cnf.lng.wait_scan_finished}"
             else:
                 t = cnf.lng.no_tiff
 

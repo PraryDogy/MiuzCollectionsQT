@@ -41,7 +41,7 @@ class GuiThreadSaveFiles(QObject):
         if len(files) == 0:
 
             if cnf.scaner_running:
-                t = f"{cnf.lng.no_tiff} {cnf.lng.wait_scan_finished}"
+                t = f"{cnf.lng.no_tiff}. {cnf.lng.wait_scan_finished}"
 
             else:
                 t = cnf.lng.no_tiff
@@ -82,7 +82,7 @@ class GuiThreadSaveFiles(QObject):
         if len(tiffs) == 0:
 
             if cnf.scaner_running:
-                t = f"{cnf.lng.no_tiff} {cnf.lng.wait_scan_finished}"
+                t = f"{cnf.lng.no_tiff}. {cnf.lng.wait_scan_finished}"
             else:
                 t = cnf.lng.no_tiff
 
