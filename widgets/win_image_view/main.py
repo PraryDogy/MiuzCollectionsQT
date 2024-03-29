@@ -4,7 +4,7 @@ import sqlalchemy
 from PyQt5.QtCore import (QEvent, QObject, QPoint, QSize, Qt, QThread, QTimer,
                           pyqtSignal)
 from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
-                         QPixmap)
+                         QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QSpacerItem, QWidget, QLabel
 
 from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase, SvgBtn
@@ -90,12 +90,12 @@ class ImageWidget(QLabel):
         self.offset = QPoint(0, 0)
         self.w, self.h = 0, 0
 
-    def set_image(self, pixmap: QPixmap, w: int, h: int):
+    def set_image(self, pixmap: QPixmap):
         self.current_pixmap = pixmap
-        self.w, self.h = w, h
+        self.w, self.h = self.width(), self.height()
 
         self.current_pixmap.scaled(
-            w, h, 
+            self.w, self.h, 
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation
             )
@@ -144,6 +144,11 @@ class ImageWidget(QLabel):
                 int((self.height() - scaled_pixmap.height()) / 2)
                 )
             painter.drawPixmap(offset, scaled_pixmap)
+
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        self.w, self.h = self.width(), self.height()
+        self.update()
+        return super().resizeEvent(a0)
     
 
 class NaviZoom(QFrame):
@@ -228,7 +233,7 @@ class WinImageView(WinImgViewBase):
 
         self.fsize_img_timer = QTimer(self)
         self.fsize_img_timer.setSingleShot(True)
-        self.fsize_img_timer.setInterval(500)
+        self.fsize_img_timer.setInterval(50)
         self.fsize_img_timer.timeout.connect(self.run_thread)
 
         self.mouse_move_timer = QTimer(self)
@@ -288,9 +293,7 @@ class WinImageView(WinImgViewBase):
 
             pixmap = QPixmap()
             pixmap.loadFromData(res)
-            self.image_label.set_image(
-                pixmap, self.width(), self.height()
-                )
+            self.image_label.set_image(pixmap)
 
         self.fsize_img_timer.start()
 
@@ -325,9 +328,7 @@ class WinImageView(WinImgViewBase):
         if data["width"] == 0 or data["src"] != self.image_path:
             return
         
-        self.image_label.set_image(
-            data["image"], self.width(), self.height()
-            )
+        self.image_label.set_image(data["image"])
         self.my_set_title()
         Manager.threads.remove(self.fsize_img_thread)
 
