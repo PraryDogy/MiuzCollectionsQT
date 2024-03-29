@@ -13,6 +13,7 @@ class WinSmb(WinStandartBase):
         self.set_title(cnf.lng.no_connection)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
+        # QLineEdit
         label = QLabel(cnf.lng.smb_descr)
         self.content_layout.addWidget(label)
 
