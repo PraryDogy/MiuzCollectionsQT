@@ -93,6 +93,7 @@ class ImageWidget(QLabel):
     def set_image(self, pixmap: QPixmap, w: int, h: int):
         self.current_pixmap = pixmap
         self.w, self.h = w, h
+
         self.current_pixmap.scaled(
             w, h, 
             Qt.AspectRatioMode.KeepAspectRatio,
