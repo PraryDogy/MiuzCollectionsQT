@@ -11,7 +11,7 @@ class WinSmb(WinStandartBase):
         super().__init__(close_func=self.close_cmd)
         self.disable_min_max()
         self.set_title(cnf.lng.no_connection)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal, Qt.WindowAnimationOff)
 
         # QLineEdit
         label = QLabel(cnf.lng.smb_descr)
