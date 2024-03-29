@@ -238,7 +238,7 @@ class WinImageView(WinImgViewBase):
         self.installEventFilter(self)
 
         self.image_label = ImageWidget()
-        self.content_layout.addWidget(self.image_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.content_layout.addWidget(self.image_label)
 
         self.notification = Notification(self.content_wid)
         self.notification.resize(self.width() - 20, 30)
