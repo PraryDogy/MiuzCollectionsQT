@@ -11,6 +11,7 @@ class WinSmb(WinStandartBase):
         super().__init__(close_func=self.close_cmd)
         self.disable_min_max()
         self.set_title(cnf.lng.no_connection)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         label = QLabel(cnf.lng.smb_descr)
         self.content_layout.addWidget(label)
@@ -28,3 +29,4 @@ class WinSmb(WinStandartBase):
         self.delete_win.emit()
         self.deleteLater()
         gui_signals_app.set_focus_viewer.emit()
+
