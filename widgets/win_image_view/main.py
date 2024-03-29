@@ -223,7 +223,7 @@ class WinImageView(WinImgViewBase):
 
         self.fsize_img_timer = QTimer(self)
         self.fsize_img_timer.setSingleShot(True)
-        self.fsize_img_timer.setInterval(50)
+        self.fsize_img_timer.setInterval(500)
         self.fsize_img_timer.timeout.connect(self.run_thread)
 
         self.mouse_move_timer = QTimer(self)
@@ -256,11 +256,7 @@ class WinImageView(WinImgViewBase):
 
         self.setFocus()
         self.center_win()
-
-        temp = QTimer(self)
-        temp.setSingleShot(True)
-        temp.timeout.connect(self.load_image)
-        temp.start(30)
+        self.load_image()
 
     def load_image(self):
         if self.image_path not in Manager.images:
