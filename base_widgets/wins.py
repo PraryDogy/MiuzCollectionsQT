@@ -210,7 +210,7 @@ class WinAutoRemove(BaseEmptyWin):
 
     def __init__(self, close_func: callable):
         super().__init__(close_func)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        # self.setWindowModality(Qt.WindowModality.ApplicationModal)
         Manager.wins.append(self)
         self.delete_win.connect(self.delete_win_cmd)
 
