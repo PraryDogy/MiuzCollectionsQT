@@ -78,7 +78,6 @@ class FindTiffLocal:
 
             if aa_name == bb_name:
                 tiff_list.append(tiff)
-                print("tiff == jpeg")
                 return tiff_list
 
             if len(bb_name) <= 2:
