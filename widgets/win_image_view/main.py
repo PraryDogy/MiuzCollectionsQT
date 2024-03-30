@@ -236,7 +236,6 @@ class WinImageView(WinImgViewBase):
         self.setMinimumSize(QSize(500, 400))
         self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
-        gui_signals_app.set_focus_viewer.connect(self.setFocus)
 
         self.fsize_img_timer = QTimer(self)
         self.fsize_img_timer.setSingleShot(True)

@@ -90,7 +90,6 @@ class DatesWinBase(WinStandartBase):
         self.delete_win.emit()
         FiltersDateBtncolor.date_based_color()
         self.deleteLater()
-        gui_signals_app.set_focus_viewer.emit()
         event.ignore()
 
 
@@ -164,8 +163,6 @@ class WinDates(DatesWinBase):
             cnf.date_start, cnf.date_end = None, None
             FiltersDateBtncolor.date_based_color()
             self.deleteLater()
-
-            gui_signals_app.set_focus_viewer.emit()
             gui_signals_app.reload_thumbnails.emit()
 
             return
@@ -187,21 +184,17 @@ class WinDates(DatesWinBase):
         self.deleteLater()
 
         gui_signals_app.reload_thumbnails.emit()
-        gui_signals_app.set_focus_viewer.emit()
 
     def cancel_cmd(self, event):
         FiltersDateBtncolor.date_based_color()
         self.delete_win.emit()
         self.deleteLater()
 
-        gui_signals_app.set_focus_viewer.emit()
-    
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             FiltersDateBtncolor.date_based_color()
             self.delete_win.emit()
             self.deleteLater()
-            gui_signals_app.set_focus_viewer.emit()
 
         elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
             self.ok_cmd(event)

@@ -307,7 +307,6 @@ class WinSettings(WinStandartBase):
     def cancel_cmd(self, e):
         self.delete_win.emit()
         self.deleteLater()
-        gui_signals_app.set_focus_viewer.emit()
 
     def ok_cmd(self, e):
         scan_again = False
@@ -341,13 +340,11 @@ class WinSettings(WinStandartBase):
 
         self.delete_win.emit()
         self.deleteLater()
-        gui_signals_app.set_focus_viewer.emit()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.delete_win.emit()
             self.deleteLater()
-            gui_signals_app.set_focus_viewer.emit()
 
         elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
             self.ok_cmd(event)

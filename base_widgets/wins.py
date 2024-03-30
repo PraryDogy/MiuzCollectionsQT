@@ -165,7 +165,6 @@ class BaseEmptyWin(QMainWindow):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.deleteLater()
-            gui_signals_app.set_focus_viewer.emit()
         super().keyPressEvent(event)
 
     def fit_size(self):

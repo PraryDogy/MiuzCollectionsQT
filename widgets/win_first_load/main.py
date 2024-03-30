@@ -251,7 +251,6 @@ class WinFirstLoad(WinStandartBase):
 
         self.delete_win.emit()
         self.deleteLater()
-        gui_signals_app.set_focus_viewer.emit()
 
     def keyPressEvent(self, event):
         event.ignore()

@@ -30,5 +30,3 @@ class WinSmb(WinStandartBase):
     def close_cmd(self, e):
         self.delete_win.emit()
         self.deleteLater()
-        gui_signals_app.set_focus_viewer.emit()
-

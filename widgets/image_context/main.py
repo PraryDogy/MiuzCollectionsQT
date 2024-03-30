@@ -100,7 +100,6 @@ class ImageContext(ContextMenuBase):
                     f"""
                     border: 2px solid transparent;
                     """)
-                gui_signals_app.set_focus_viewer.emit()
         except Exception as e:
             print(e)
 

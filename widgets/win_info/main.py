@@ -167,4 +167,3 @@ class WinInfo(WinStandartBase):
     def my_close(self, event):
         self.delete_win.emit()
         self.deleteLater()
-        gui_signals_app.set_focus_viewer.emit()

@@ -17,7 +17,6 @@ class GuiSignals(QObject):
     set_dates_btn_normal = pyqtSignal()
     set_dates_btn_blue = pyqtSignal()
     set_focus_search = pyqtSignal()
-    set_focus_viewer = pyqtSignal()
 
     progressbar_value = pyqtSignal(object)
     progressbar_show = pyqtSignal()

@@ -56,7 +56,6 @@ class WinCopyFilesThread(WinStandartBase, QObject):
         self.copy_thread.stop.emit()
         self.delete_win.emit()
         self.deleteLater()
-        gui_signals_app.set_focus_viewer.emit()
 
     def update_progress(self, progress_percentage):
         self.progress.setValue(progress_percentage)
@@ -65,7 +64,6 @@ class WinCopyFilesThread(WinStandartBase, QObject):
         self.delete_win.emit()
         self.finished.emit()
         self.deleteLater()        
-        gui_signals_app.set_focus_viewer.emit()
 
     def center_win(self):
         parent = MainUtils.get_central_widget()
