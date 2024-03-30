@@ -240,7 +240,6 @@ class WinImageView(WinImgViewBase):
 
         self.fsize_img_timer = QTimer(self)
         self.fsize_img_timer.setSingleShot(True)
-        self.fsize_img_timer.setInterval(50)
         self.fsize_img_timer.timeout.connect(self.run_thread)
 
         self.mouse_move_timer = QTimer(self)
@@ -275,9 +274,9 @@ class WinImageView(WinImgViewBase):
 
         self.setFocus()
         self.center_win()
-        self.load_image()
+        self.load_image(interval=1000)
 
-    def load_image(self):
+    def load_image(self, interval: int = 50):
         if self.image_path not in Manager.images:
             self.my_set_title(loading=True)
 
@@ -302,7 +301,7 @@ class WinImageView(WinImgViewBase):
             pixmap.loadFromData(res)
             self.image_label.set_image(pixmap)
 
-        self.fsize_img_timer.start()
+        self.fsize_img_timer.start(interval)
 
     def move_navi_btns(self):
         navi_h = (self.height() // 2) - (self.navi_next.height() // 2)
