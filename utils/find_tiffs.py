@@ -76,6 +76,11 @@ class FindTiffLocal:
             bb_name = TiffUtils.remove_punct(tiff_name)
             bb_name = TiffUtils.remove_stop_words(bb_name)
 
+            if aa_name == bb_name:
+                tiff_list.append(tiff)
+                print("tiff == jpeg")
+                return tiff_list
+
             if len(bb_name) <= 2:
                 continue
 
