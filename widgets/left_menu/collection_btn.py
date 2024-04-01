@@ -9,10 +9,11 @@ from signals import gui_signals_app
 
 from styles import Styles
 from utils import MainUtils
+from ..win_smb import WinSmb
 
 class Manager:
     reveal_coll_win = None
-
+    win_smb = None
 
 class CustomContext(ContextMenuBase):
     def __init__(self, parent: QLabel, true_name, event):
@@ -164,7 +165,9 @@ class CollectionBtn(QLabel):
         gui_signals_app.reload_thumbnails.emit()
 
         if not MainUtils.smb_check():
-            gui_signals_app.noti_main.emit(cnf.lng.no_connection)
+            Manager.win_smb = WinSmb()
+            Manager.win_smb.show()
+            
         
     def contextMenuEvent(self, event):
         CustomContext(parent=self, true_name=self.true_name, event=event)
