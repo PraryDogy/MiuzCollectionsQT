@@ -481,7 +481,6 @@ class Scaner(ScanerBaseClass):
         gui_signals_app.progressbar_show.emit()
 
         Migrate()
-
         SummaryScan()
         NonExistCollRemover()
         DubFinder()
