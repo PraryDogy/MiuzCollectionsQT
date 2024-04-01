@@ -66,6 +66,11 @@ class App(QApplication):
             Manager.smb_win = WinSmb()
             Manager.smb_win.show()
 
+        from widgets.win_smb import WinSmb
+
+        Manager.smb_win = WinSmb()
+        Manager.smb_win.show()
+
         utils_signals_app.scaner_start.emit()
         utils_signals_app.watcher_start.emit()
 
