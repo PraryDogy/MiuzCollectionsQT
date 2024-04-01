@@ -64,7 +64,7 @@ class BrowseColl(LayoutV):
         
         self.set_label_h()
 
-    def finalize(self):
+    def finalize(self):        
         cnf.coll_folder = Manager.coll_folder
 
         utils_signals_app.watcher_stop.emit()
