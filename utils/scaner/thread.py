@@ -65,7 +65,11 @@ class Migrate:
                 )
             sess.execute(q)
 
-        sess.commit()
+        try:
+            sess.commit()
+        except Exception as e:
+            print("migrate commit err", e)
+
         sess.close()
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
