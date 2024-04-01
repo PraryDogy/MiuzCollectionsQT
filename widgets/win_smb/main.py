@@ -24,7 +24,6 @@ class BrowseColl(LayoutV):
         self.addWidget(descr)
 
         h_wid = QWidget()
-        h_wid.setFixedHeight(50)
         self.addWidget(h_wid)
 
         h_layout = LayoutH()
@@ -64,8 +63,6 @@ class BrowseColl(LayoutV):
         self.set_label_h()
 
     def finalize(self):
-        cnf.migrate_data["old_coll"] = cnf.coll_folder
-        cnf.migrate_data["new_coll"] = Manager.coll_folder
         cnf.coll_folder = Manager.coll_folder
 
         utils_signals_app.watcher_stop.emit()
@@ -73,12 +70,6 @@ class BrowseColl(LayoutV):
 
         utils_signals_app.scaner_stop.emit()
         utils_signals_app.scaner_start.emit()
-
-        if not MainUtils.smb_check():
-
-            Manager.smb_win = WinErr()
-            Manager.smb_win.show()
-
 
 class WinSmb(WinStandartBase):
     def __init__(self):
@@ -89,7 +80,7 @@ class WinSmb(WinStandartBase):
         self.set_title(cnf.lng.no_connection)
         self.disable_min_max()
 
-        self.setFixedWidth(320)
+        self.resize(320, 150)
         self.init_ui()
         self.center()
         self.setFocus()
@@ -131,3 +122,6 @@ class WinSmb(WinStandartBase):
     def keyPressEvent(self, event):
         event.ignore()
 
+    def resizeEvent(self, event):
+        self.browse_coll.set_label_h()
+        return super().resizeEvent(event)
