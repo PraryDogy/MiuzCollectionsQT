@@ -8,6 +8,7 @@ class Rus:
 		self.browse_coll_first = 'Укажите расположение коллекций\nили оставьте по умолчанию.'
 		self.browse_colls_descr = 'Расположение коллекций'
 		self.cancel = 'Отмена'
+		self.choose_coll_smb = 'Укажите расположение коллекций'
 		self.choose_user_first = 'Выберите тип пользователя.\nСтандарт: подходит для просмотра.\nДизайнер: возможность работы со слоями'
 		self.close = 'Закрыть'
 		self.collection = 'Коллекция'

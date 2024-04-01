@@ -20,8 +20,10 @@ class Manager:
 class BrowseColl(LayoutV):
     def __init__(self):
         super().__init__()
-        descr = QLabel(cnf.lng.browse_coll_first)
+        descr = QLabel(cnf.lng.choose_coll_smb)
         self.addWidget(descr)
+        
+        self.addSpacerItem(QSpacerItem(0, 15))
 
         h_wid = QWidget()
         self.addWidget(h_wid)

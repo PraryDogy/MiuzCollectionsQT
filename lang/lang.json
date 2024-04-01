@@ -372,5 +372,9 @@
     "wait_scan_finished": [
         "Пожалуйста, подождите. Идет поиск фотографий.",
         "Please, wait. Searching for new photos."
+    ],
+    "choose_coll_smb": [
+        "Укажите расположение коллекций",
+        "Choose collections folder"
     ]
 }
