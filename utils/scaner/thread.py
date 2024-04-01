@@ -29,7 +29,9 @@ class Manager:
 
 
 class Migrate:
-    def __init__(self, old_coll: str, new_coll: str):
+    def __init__(self):
+        old_coll = cnf.migrate_data["old_coll"]
+        new_coll = cnf.migrate_data["new_coll"]
         sess = Dbase.get_session()
 
         if not old_coll or not new_coll:
@@ -46,8 +48,6 @@ class Migrate:
                 return
 
             new_coll = cnf.coll_folder
-
-        print(old_coll, new_coll)
 
         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
         res = sess.execute(q).fetchall()
@@ -475,11 +475,7 @@ class Scaner(ScanerBaseClass):
 
         gui_signals_app.progressbar_show.emit()
 
-        # if cnf.migrate_data["migrate"]:
-        Migrate(
-            old_coll=cnf.migrate_data["old_coll"],
-            new_coll=cnf.migrate_data["new_coll"]
-            )
+        Migrate()
 
         SummaryScan()
         NonExistCollRemover()

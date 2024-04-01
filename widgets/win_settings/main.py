@@ -313,7 +313,6 @@ class WinSettings(WinStandartBase):
 
         if self.browse_coll.new_coll_path:
 
-            cnf.migrate_data["migrate"] = True
             cnf.migrate_data["old_coll"] = cnf.coll_folder
             cnf.migrate_data["new_coll"] = self.browse_coll.new_coll_path
             cnf.coll_folder = self.browse_coll.new_coll_path

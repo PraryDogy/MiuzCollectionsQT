@@ -101,7 +101,6 @@ class Dymanic:
         self.lng: Eng = Eng()
         self.scaner_running: bool = False
         self.migrate_data: dict = {
-            "migrate": False,
             "old_coll": False,
             "new_coll": False
             }
