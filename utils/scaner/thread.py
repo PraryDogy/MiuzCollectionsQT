@@ -460,11 +460,11 @@ class Scaner(ScanerBaseClass):
 
         gui_signals_app.progressbar_show.emit()
 
-        if cnf.migrate_data["migrate"]:
-            Migrate(
-                old_coll=cnf.migrate_data["old_coll"],
-                new_coll=cnf.migrate_data["new_coll"]
-                )
+        # if cnf.migrate_data["migrate"]:
+        Migrate(
+            old_coll=cnf.migrate_data["old_coll"],
+            new_coll=cnf.migrate_data["new_coll"]
+            )
 
         SummaryScan()
         NonExistCollRemover()
