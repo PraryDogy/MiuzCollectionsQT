@@ -200,6 +200,7 @@ class WinFirstLoad(WinStandartBase):
         MainUtils.close_same_win(WinFirstLoad)
 
         super().__init__(close_func=self.cancel_cmd)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min_max()
 
         self.init_ui()
