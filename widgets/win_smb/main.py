@@ -40,16 +40,21 @@ class BrowseColl(LayoutV):
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.coll_path_label = QLabel(Manager.coll_folder)
-        self.coll_path_label.setWordWrap(True)
         self.set_label_h()
         h_layout.addWidget(self.coll_path_label)
 
-    def set_label_h(self):
-        print(self.coll_path_label.height())
+    def resizeEvent(self, event):
+        self.set_label_h()
+        return super().resizeEvent(event)
+
+    def set_label_h(self, text: str):
+        max_symb = 40
         lbl_h = 30
+        new_text = text.split()
+
         num_lines = self.coll_path_label.text().count('\n') + 1
         self.coll_path_label.setFixedHeight(lbl_h * num_lines)
-        print(self.coll_path_label.height())
+        print(num_lines)
 
     def choose_folder(self, e):
         file_dialog = QFileDialog()
