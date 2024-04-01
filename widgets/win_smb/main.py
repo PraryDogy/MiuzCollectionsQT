@@ -18,6 +18,8 @@ class Manager:
 
 
 class BrowseColl(LayoutV):
+    changed = pyqtSignal()
+    
     def __init__(self):
         super().__init__()
         descr = QLabel(cnf.lng.choose_coll_smb)
@@ -43,9 +45,11 @@ class BrowseColl(LayoutV):
         h_layout.addWidget(self.coll_path_label)
 
     def set_label_h(self):
+        print(self.coll_path_label.height())
         lbl_h = 30
         num_lines = self.coll_path_label.text().count('\n') + 1
         self.coll_path_label.setFixedHeight(lbl_h * num_lines)
+        print(self.coll_path_label.height())
 
     def choose_folder(self, e):
         file_dialog = QFileDialog()
@@ -63,6 +67,7 @@ class BrowseColl(LayoutV):
             self.coll_path_label.setText(Manager.coll_folder)
         
         self.set_label_h()
+        self.changed.emit()
 
     def finalize(self):        
         cnf.coll_folder = Manager.coll_folder
@@ -91,13 +96,6 @@ class WinSmb(WinStandartBase):
         self.new_lang = None
         self.need_reset = None
 
-    # def center(self):
-    #     screen = QDesktopWidget().screenGeometry()
-    #     size = self.geometry()
-    #     x = (screen.width() - size.width()) // 2
-    #     y = (screen.height() - size.height()) // 2
-    #     self.move(x, y)
-
     def cancel_cmd(self, event):
         pass
 
@@ -116,7 +114,7 @@ class WinSmb(WinStandartBase):
         self.init_ui()
 
     def ok_cmd(self, e):
-        self.browse_coll.finalize()
+        # self.browse_coll.finalize()
 
         self.delete_win.emit()
         self.deleteLater()

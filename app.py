@@ -53,6 +53,7 @@ class App(QApplication):
         utils_signals_app.watcher_stop.emit()
 
     def after_start(self):
+
         if cnf.first_load:
             from widgets.win_first_load import WinFirstLoad
             cnf.first_load = False
@@ -69,5 +70,8 @@ class App(QApplication):
         utils_signals_app.scaner_start.emit()
         utils_signals_app.watcher_start.emit()
 
+        from widgets.win_smb import WinSmb
+        Manager.smb_win = WinSmb()
+        Manager.smb_win.show()
 
 app = App()
