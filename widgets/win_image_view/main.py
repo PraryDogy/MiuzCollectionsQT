@@ -3,11 +3,11 @@ import os
 import sqlalchemy
 from PyQt5.QtCore import (QEvent, QObject, QPoint, QSize, Qt, QThread, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import (QFocusEvent, QIcon, QImage, QMouseEvent, QPainter,
-                         QPixmap, QResizeEvent)
-from PyQt5.QtWidgets import QFrame, QSpacerItem, QWidget, QLabel
+from PyQt5.QtGui import (QFocusEvent, QImage, QMouseEvent, QPainter, QPixmap,
+                         QResizeEvent)
+from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase, SvgBtn
+from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
@@ -15,11 +15,13 @@ from utils import MainUtils, ReadDesatImage, get_image_size
 
 from ..image_context import ImageContext
 from ..notification import Notification
+from ..win_smb import WinSmb
 
 
 class Manager:
     images = {}
     threads = []
+    win_smb = None
 
 
 class ImageWinUtils:
@@ -327,7 +329,8 @@ class WinImageView(WinImgViewBase):
             self.fsize_img_thread.start()
             Manager.threads.append(self.fsize_img_thread)
         else:
-            gui_signals_app.noti_img_view.emit(cnf.lng.no_connection)
+            Manager.win_smb = WinSmb(self)
+            Manager.win_smb.show()
 
     def finalize_thread(self, data: dict):
         if data["width"] == 0 or data["src"] != self.image_path:

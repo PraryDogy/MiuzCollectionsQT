@@ -74,7 +74,7 @@ class BrowseColl(LayoutV):
         utils_signals_app.scaner_start.emit()
 
 class WinSmb(WinStandartBase):
-    def __init__(self):
+    def __init__(self, parent = None):
         MainUtils.close_same_win(WinSmb)
 
         super().__init__(close_func=self.cancel_cmd)
@@ -84,19 +84,19 @@ class WinSmb(WinStandartBase):
 
         self.resize(320, 150)
         self.init_ui()
-        self.center()
+        self.center_win(parent=parent)
         self.setFocus()
 
         self.new_coll_path = None
         self.new_lang = None
         self.need_reset = None
 
-    def center(self):
-        screen = QDesktopWidget().screenGeometry()
-        size = self.geometry()
-        x = (screen.width() - size.width()) // 2
-        y = (screen.height() - size.height()) // 2
-        self.move(x, y)
+    # def center(self):
+    #     screen = QDesktopWidget().screenGeometry()
+    #     size = self.geometry()
+    #     x = (screen.width() - size.width()) // 2
+    #     y = (screen.height() - size.height()) // 2
+    #     self.move(x, y)
 
     def cancel_cmd(self, event):
         pass
