@@ -30,11 +30,26 @@ class Manager:
 
 class Migrate:
     def __init__(self, old_coll: str, new_coll: str):
+        sess = Dbase.get_session()
 
-        print("migrate")
+        if not old_coll or not new_coll:
+            q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
+
+            try:
+                th_src, th_collection = sess.execute(q).first()
+                old_coll = th_src.split(os.sep)
+                old_coll = old_coll[:old_coll.index(th_collection)]
+                old_coll = "/".join(old_coll)
+
+            except Exception as e:
+                print("migrate load first result err", e)
+                return
+
+            new_coll = cnf.coll_folder
+
+        print(old_coll, new_coll)
 
         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-        sess = Dbase.get_session()
         res = sess.execute(q).fetchall()
 
         new_res = [
