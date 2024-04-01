@@ -52,6 +52,8 @@ class Migrate:
 
         sess.commit()
         sess.close()
+        gui_signals_app.reload_menu.emit()
+        gui_signals_app.reload_thumbnails.emit()
 
         for k, v in cnf.migrate_data.items():
             cnf.migrate_data[k] = False
