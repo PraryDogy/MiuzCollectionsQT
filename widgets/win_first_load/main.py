@@ -63,8 +63,6 @@ class BrowseColl(LayoutV):
             return text
         
     def finalize(self):
-        cnf.migrate_data["old_coll"] = cnf.coll_folder
-        cnf.migrate_data["new_coll"] = Manager.coll_folder
         cnf.coll_folder = Manager.coll_folder
 
         utils_signals_app.watcher_stop.emit()

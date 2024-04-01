@@ -100,10 +100,6 @@ class Dymanic:
         self.date_end_text: str = None # datetime as readable text
         self.lng: Eng = Eng()
         self.scaner_running: bool = False
-        self.migrate_data: dict = {
-            "old_coll": False,
-            "new_coll": False
-            }
 
 
 class AppInfo:
