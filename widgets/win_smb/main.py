@@ -9,6 +9,7 @@ from signals import gui_signals_app
 class WinSmb(WinStandartBase):
     def __init__(self):
         super().__init__(close_func=self.close_cmd)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min_max()
         self.set_title(cnf.lng.no_connection)
 
