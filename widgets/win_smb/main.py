@@ -37,9 +37,9 @@ class BrowseColl(LayoutV):
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.coll_path_label = QLabel()
+        self.coll_path_label.setWordWrap(True)
+        self.coll_path_label.setText(Manager.coll_folder)
         h_layout.addWidget(self.coll_path_label)
-
-        self.set_coll_path_label_text(text=Manager.coll_folder)
 
     def choose_folder(self, e):
         file_dialog = QFileDialog()
@@ -54,8 +54,7 @@ class BrowseColl(LayoutV):
 
         if selected_folder:
             Manager.coll_folder = selected_folder
-            self.set_coll_path_label_text(Manager.coll_folder)
-            self.coll_path_label.adjustSize()
+            self.coll_path_label.setText(Manager.coll_folder)
 
     def finalize(self):        
         cnf.coll_folder = Manager.coll_folder
@@ -66,14 +65,6 @@ class BrowseColl(LayoutV):
         utils_signals_app.scaner_stop.emit()
         utils_signals_app.scaner_start.emit()
 
-    def set_coll_path_label_text(self, text: str, limit: int = 30):
-        chunks = [
-            text[i:i+limit]
-            for i in range(0, len(text), limit)
-            ]
-        self.coll_path_label.setText("\n".join(chunks))
-        self.h_wid.setFixedHeight(len(chunks) * 30)
-
 
 class WinSmb(WinStandartBase):
     def __init__(self, parent = None):
@@ -82,12 +73,11 @@ class WinSmb(WinStandartBase):
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setMinimumSize(320, 160)
-        self.setMaximumWidth(350)
         self.set_title(cnf.lng.no_connection)
         self.disable_min_max()
 
-        self.resize(320, 150)
         self.init_ui()
+        self.adjustSize()
         self.center_win(parent=parent)
         self.setFocus()
 
@@ -116,8 +106,8 @@ class WinSmb(WinStandartBase):
         self.init_ui()
 
     def ok_cmd(self, e):
-        # self.browse_coll.finalize()
-        print("finalize disabled")
+        self.browse_coll.finalize()
+        # print("finalize disabled")
 
         self.delete_win.emit()
         self.deleteLater()
