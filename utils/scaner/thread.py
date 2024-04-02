@@ -183,6 +183,10 @@ class FinderImages(dict):
                     if not Manager.flag:
                         return
 
+                    if not os.path.exists(cnf.coll_folder):
+                        Manager.flag = False
+                        return
+
                     if file.endswith(Manager.jpg_exsts):
                         
                         src = os.path.join(root, file)
