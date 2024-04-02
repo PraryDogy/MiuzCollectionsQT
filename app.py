@@ -70,8 +70,8 @@ class App(QApplication):
         utils_signals_app.scaner_start.emit()
         utils_signals_app.watcher_start.emit()
 
-        from widgets.win_smb import WinSmb
-        Manager.smb_win = WinSmb()
-        Manager.smb_win.show()
+        # from widgets.win_smb import WinSmb
+        # Manager.smb_win = WinSmb()
+        # Manager.smb_win.show()
 
 app = App()
