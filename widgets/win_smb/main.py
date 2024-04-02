@@ -1,16 +1,13 @@
 import os
-from typing import Literal
 
-from PyQt5.QtCore import QObject, Qt, pyqtSignal
-from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QLabel, QSpacerItem,
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import (QFileDialog, QLabel, QSizePolicy, QSpacerItem,
                              QWidget)
 
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
-from signals import gui_signals_app, utils_signals_app
-from styles import Styles
+from signals import utils_signals_app
 from utils import MainUtils
-from widgets.win_err import WinErr
 
 
 class Manager:
@@ -18,6 +15,8 @@ class Manager:
 
 
 class BrowseColl(LayoutV):
+    chanded = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         descr = QLabel(cnf.lng.choose_coll_smb)
@@ -25,11 +24,11 @@ class BrowseColl(LayoutV):
         
         self.addSpacerItem(QSpacerItem(0, 15))
 
-        h_wid = QWidget()
-        self.addWidget(h_wid)
+        self.h_wid = QWidget()
+        self.addWidget(self.h_wid)
 
         h_layout = LayoutH()
-        h_wid.setLayout(h_layout)
+        self.h_wid.setLayout(h_layout)
 
         self.browse_btn = Btn(cnf.lng.browse)
         self.browse_btn.mouseReleaseEvent = self.choose_folder
@@ -37,9 +36,10 @@ class BrowseColl(LayoutV):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.coll_path_label = QLabel(Manager.coll_folder)
-        self.coll_path_label.setWordWrap(True)
+        self.coll_path_label = QLabel()
         h_layout.addWidget(self.coll_path_label)
+
+        self.set_coll_path_label_text(text=Manager.coll_folder)
 
     def choose_folder(self, e):
         file_dialog = QFileDialog()
@@ -54,7 +54,8 @@ class BrowseColl(LayoutV):
 
         if selected_folder:
             Manager.coll_folder = selected_folder
-            self.coll_path_label.setText(Manager.coll_folder)
+            self.set_coll_path_label_text(Manager.coll_folder)
+            self.coll_path_label.adjustSize()
 
     def finalize(self):        
         cnf.coll_folder = Manager.coll_folder
@@ -65,6 +66,15 @@ class BrowseColl(LayoutV):
         utils_signals_app.scaner_stop.emit()
         utils_signals_app.scaner_start.emit()
 
+    def set_coll_path_label_text(self, text: str, limit: int = 30):
+        chunks = [
+            text[i:i+limit]
+            for i in range(0, len(text), limit)
+            ]
+        self.coll_path_label.setText("\n".join(chunks))
+        self.h_wid.setFixedHeight(len(chunks) * 30)
+
+
 class WinSmb(WinStandartBase):
     def __init__(self, parent = None):
         MainUtils.close_same_win(WinSmb)
@@ -72,6 +82,7 @@ class WinSmb(WinStandartBase):
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setMinimumSize(320, 160)
+        self.setMaximumWidth(350)
         self.set_title(cnf.lng.no_connection)
         self.disable_min_max()
 
@@ -89,6 +100,7 @@ class WinSmb(WinStandartBase):
 
     def init_ui(self):
         self.browse_coll = BrowseColl()
+
         self.content_layout.addLayout(self.browse_coll)
 
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
@@ -97,12 +109,15 @@ class WinSmb(WinStandartBase):
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
         self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
 
+        self.browse_coll.chanded.connect(self.adjustSize)
+
     def reload_ui(self):
         MainUtils.clear_layout(self.content_layout)
         self.init_ui()
 
     def ok_cmd(self, e):
         # self.browse_coll.finalize()
+        print("finalize disabled")
 
         self.delete_win.emit()
         self.deleteLater()
