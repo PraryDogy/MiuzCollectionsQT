@@ -18,8 +18,6 @@ class Manager:
 
 
 class BrowseColl(LayoutV):
-    changed = pyqtSignal()
-    
     def __init__(self):
         super().__init__()
         descr = QLabel(cnf.lng.choose_coll_smb)
@@ -40,21 +38,8 @@ class BrowseColl(LayoutV):
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.coll_path_label = QLabel(Manager.coll_folder)
-        self.set_label_h()
+        self.coll_path_label.setWordWrap(True)
         h_layout.addWidget(self.coll_path_label)
-
-    def resizeEvent(self, event):
-        self.set_label_h()
-        return super().resizeEvent(event)
-
-    def set_label_h(self, text: str):
-        max_symb = 40
-        lbl_h = 30
-        new_text = text.split()
-
-        num_lines = self.coll_path_label.text().count('\n') + 1
-        self.coll_path_label.setFixedHeight(lbl_h * num_lines)
-        print(num_lines)
 
     def choose_folder(self, e):
         file_dialog = QFileDialog()
@@ -70,9 +55,6 @@ class BrowseColl(LayoutV):
         if selected_folder:
             Manager.coll_folder = selected_folder
             self.coll_path_label.setText(Manager.coll_folder)
-        
-        self.set_label_h()
-        self.changed.emit()
 
     def finalize(self):        
         cnf.coll_folder = Manager.coll_folder
@@ -89,6 +71,7 @@ class WinSmb(WinStandartBase):
 
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setMinimumSize(320, 160)
         self.set_title(cnf.lng.no_connection)
         self.disable_min_max()
 
@@ -126,7 +109,3 @@ class WinSmb(WinStandartBase):
 
     def keyPressEvent(self, event):
         event.ignore()
-
-    def resizeEvent(self, event):
-        self.browse_coll.set_label_h()
-        return super().resizeEvent(event)
