@@ -22,9 +22,10 @@ class BrowseColl(LayoutV):
         descr = QLabel(cnf.lng.choose_coll_smb)
         self.addWidget(descr)
         
-        self.addSpacerItem(QSpacerItem(0, 15))
+        self.addSpacerItem(QSpacerItem(0, 5))
 
         self.h_wid = QWidget()
+        self.h_wid.setFixedSize(375, 60)
         self.addWidget(self.h_wid)
 
         h_layout = LayoutH()
@@ -37,9 +38,17 @@ class BrowseColl(LayoutV):
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.coll_path_label = QLabel()
+
         self.coll_path_label.setWordWrap(True)
-        self.coll_path_label.setText(Manager.coll_folder)
+        self.coll_path_label.setText(self.cut_text(text=Manager.coll_folder))
         h_layout.addWidget(self.coll_path_label)
+
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
+
+    def cut_text(self, text: str, limit: int = 130):
+        if len(text) > limit:
+            return text[:limit] + "..."
+        return text
 
     def choose_folder(self, e):
         file_dialog = QFileDialog()
@@ -54,7 +63,7 @@ class BrowseColl(LayoutV):
 
         if selected_folder:
             Manager.coll_folder = selected_folder
-            self.coll_path_label.setText(Manager.coll_folder)
+            self.coll_path_label.setText(self.cut_text(text=Manager.coll_folder))
 
     def finalize(self):        
         cnf.coll_folder = Manager.coll_folder
@@ -72,12 +81,11 @@ class WinSmb(WinStandartBase):
 
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.setMinimumSize(320, 160)
         self.set_title(cnf.lng.no_connection)
         self.disable_min_max()
 
         self.init_ui()
-        self.adjustSize()
+        self.setFixedSize(375, 170)
         self.center_win(parent=parent)
         self.setFocus()
 
@@ -90,11 +98,9 @@ class WinSmb(WinStandartBase):
 
     def init_ui(self):
         self.browse_coll = BrowseColl()
-
         self.content_layout.addLayout(self.browse_coll)
-
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
-
+        self.content_layout.addStretch()
         self.ok_btn = Btn(cnf.lng.ok)
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
         self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
