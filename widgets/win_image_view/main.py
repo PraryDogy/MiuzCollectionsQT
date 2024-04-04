@@ -275,7 +275,7 @@ class WinImageView(WinImgViewBase):
 
         self.setFocus()
         self.center_win()
-        self.load_image(interval=1000)
+        self.load_image(interval=1500)
 
     def load_image(self, interval: int = 50):
         if self.image_path not in Manager.images:
