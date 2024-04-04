@@ -19,13 +19,8 @@ class BrowseColl(QWidget):
     def __init__(self):
         super().__init__()
 
-        main_layout = LayoutV()
+        main_layout = LayoutH()
         self.setLayout(main_layout)
-
-        descr = QLabel("123")
-        main_layout.addWidget(descr)
-
-        main_layout.addSpacerItem(QSpacerItem(0, 15))
 
         self.h_wid = QWidget()
         main_layout.addWidget(self.h_wid)
@@ -44,22 +39,11 @@ class BrowseColl(QWidget):
         self.coll_path_label.setText(Manager.coll_folder)
         h_layout.addWidget(self.coll_path_label)
 
-
     def choose_folder(self, e):
-        file_dialog = QFileDialog()
-        file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
-
-        selected_folder = file_dialog.getExistingDirectory()
-
-        if selected_folder:
-            Manager.coll_folder = selected_folder
-            self.coll_path_label.setText(Manager.coll_folder)
-
-        print(self.height())
+        print(self.coll_path_label.height())
+        self.coll_path_label.setText("/Users/Loshkarev/Documents/_Projects/MiuzCollectionsQT/env/lib/python3.11/site-packages/cv2/__pycache__")
         self.coll_path_label.adjustSize()
-        self.adjustSize()
-        self.text_changed.emit()
-        print(self.height())
+        print(self.coll_path_label.height())
 
     def finalize(self):        
         ...
@@ -71,7 +55,7 @@ class WinSmb(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("title")
-        self.setMinimumSize(320, 100)
+        self.setFixedSize(320, 120)
         
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -79,33 +63,19 @@ class WinSmb(QMainWindow):
         self.main_layout = QVBoxLayout(self.central_widget)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
-        
         self.init_ui()
 
     def init_ui(self):
         self.browse_coll = BrowseColl()
-
         self.main_layout.addWidget(self.browse_coll)
-
         self.main_layout.addItem(QSpacerItem(0, 20))
-
         self.ok_btn = QPushButton("Ok")
         self.ok_btn.clicked.connect(self.ok_cmd)
         self.main_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
 
-        self.browse_coll.text_changed.connect(self.test)
-
     def ok_cmd(self):
-        # self.browse_coll.finalize()
-        print("finalize disabled")
-
         self.close()
 
-    def keyPressEvent(self, event):
-        event.ignore()
-
-    def test(self):
-        print(1)
 
 
 
