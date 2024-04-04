@@ -3,8 +3,13 @@ from PyQt5.QtWidgets import QLabel, QProgressBar, QSpacerItem
 
 from base_widgets import Btn, WinStandartBase
 from cfg import cnf
-from signals import gui_signals_app
 from utils import CopyFilesThread, MainUtils
+
+from ..win_smb import WinSmb
+
+
+class Manager:
+    win_smb: WinSmb = None
 
 
 class WinCopyFilesThread(WinStandartBase, QObject):
@@ -32,6 +37,14 @@ class WinCopyFilesThread(WinStandartBase, QObject):
         self.content_layout.addWidget(cancel, alignment=Qt.AlignRight)
 
         self.center_win()
+
+        if not MainUtils.smb_check():
+            self.delete_win.emit()
+            self.deleteLater()
+            Manager.win_smb = WinSmb()
+            Manager.win_smb.show()
+            return
+
         self.show()
 
         self.copy_thread = CopyFilesThread()
