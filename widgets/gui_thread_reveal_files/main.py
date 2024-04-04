@@ -1,13 +1,16 @@
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QWidget
 
 from cfg import cnf
 from signals import gui_signals_app
-from utils import FindTiffThread, RevealFiles
+from utils import FindTiffThread, MainUtils, RevealFiles
+
+from ..win_smb import WinSmb
 
 
 class Manager:
     threads = []
+    win_smb: WinSmb = None
 
 
 class GuiThreadRevealFiles(QObject):
@@ -30,6 +33,12 @@ class GuiThreadRevealFiles(QObject):
 
         self.tiff_thread = None
         self.reveal_app = None
+
+        if not MainUtils.smb_check():
+            Manager.win_smb = WinSmb()
+            Manager.win_smb.show()
+            Manager.threads.remove(self)
+            return
 
         if not isinstance(files, list):
             raise Exception("files must be list")

@@ -2,13 +2,16 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QWidget
 
 from cfg import cnf
-from utils import FindTiffThread
+from signals import gui_signals_app
+from utils import FindTiffThread, MainUtils
 
 from ..win_copy_files_thread import WinCopyFilesThread
-from signals import gui_signals_app
+from ..win_smb import WinSmb
+
 
 class Manager:
     threads = []
+    win_smb: WinSmb = None
 
 
 class GuiThreadSaveFiles(QObject):
@@ -34,6 +37,12 @@ class GuiThreadSaveFiles(QObject):
 
         self.is_tiff = is_fiff
         self.is_downloads = is_downloads
+
+        if not MainUtils.smb_check():
+            Manager.win_smb = WinSmb()
+            Manager.win_smb.show()
+            Manager.threads.remove(self)
+            return
 
         if not isinstance(files, list):
             raise Exception("files must be list")
