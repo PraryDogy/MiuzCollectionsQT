@@ -22,28 +22,19 @@ class BrowseColl(QWidget):
         main_layout = LayoutH()
         self.setLayout(main_layout)
 
-        self.h_wid = QWidget()
-        main_layout.addWidget(self.h_wid)
-
-        h_layout = LayoutH()
-        self.h_wid.setLayout(h_layout)
-
         self.browse_btn = Btn("Обзор")
         self.browse_btn.mouseReleaseEvent = self.choose_folder
-        h_layout.addWidget(self.browse_btn)
+        main_layout.addWidget(self.browse_btn)
 
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
+        main_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.coll_path_label = QLabel()
         self.coll_path_label.setWordWrap(True)
         self.coll_path_label.setText(Manager.coll_folder)
-        h_layout.addWidget(self.coll_path_label)
+        main_layout.addWidget(self.coll_path_label)
 
     def choose_folder(self, e):
-        print(self.coll_path_label.height())
         self.coll_path_label.setText("/Users/Loshkarev/Documents/_Projects/MiuzCollectionsQT/env/lib/python3.11/site-packages/cv2/__pycache__")
-        self.coll_path_label.adjustSize()
-        print(self.coll_path_label.height())
 
     def finalize(self):        
         ...
@@ -55,7 +46,7 @@ class WinSmb(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("title")
-        self.setFixedSize(320, 120)
+        self.resize(420, 120)
         
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -66,8 +57,11 @@ class WinSmb(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
+        title = QLabel("123")
+        self.main_layout.addWidget(title)
         self.browse_coll = BrowseColl()
         self.main_layout.addWidget(self.browse_coll)
+        self.main_layout.addStretch()
         self.main_layout.addItem(QSpacerItem(0, 20))
         self.ok_btn = QPushButton("Ok")
         self.ok_btn.clicked.connect(self.ok_cmd)
