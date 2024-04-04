@@ -1,19 +1,16 @@
 import os
 import subprocess
 
-from PyQt5.QtWidgets import QLabel, QAction, QFrame
+from PyQt5.QtWidgets import QAction, QFrame, QLabel
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from signals import gui_signals_app
-
 from styles import Styles
-from utils import MainUtils
-from ..win_smb import WinSmb
+
 
 class Manager:
     reveal_coll_win = None
-    win_smb = None
 
 class CustomContext(ContextMenuBase):
     def __init__(self, parent: QLabel, true_name, event):
@@ -163,10 +160,6 @@ class CollectionBtn(QLabel):
         gui_signals_app.scroll_top.emit()
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
-
-        if not MainUtils.smb_check():
-            Manager.win_smb = WinSmb()
-            Manager.win_smb.show()
             
         
     def contextMenuEvent(self, event):
