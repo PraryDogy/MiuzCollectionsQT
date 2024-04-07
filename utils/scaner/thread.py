@@ -37,10 +37,7 @@ class Migrate:
 
         try:
             th_src, th_collection = sess.execute(q).first()
-            old_coll = th_src.split(os.sep)
-            old_coll = old_coll[:old_coll.index(th_collection)]
-            old_coll = "/".join(old_coll)
-
+            old_coll = th_src.split(os.sep + th_collection + os.sep)[0]
         except Exception as e:
             print("migrate load first result err", e)
             return
