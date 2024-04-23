@@ -15,7 +15,7 @@ class Manager:
 
 
 class BrowseColl(LayoutV):
-    chanded = pyqtSignal()
+    changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -62,6 +62,7 @@ class BrowseColl(LayoutV):
         selected_folder = file_dialog.getExistingDirectory()
 
         if selected_folder:
+            self.changed.emit()
             Manager.coll_folder = selected_folder
             self.coll_path_label.setText(self.cut_text(text=Manager.coll_folder))
 
@@ -102,10 +103,15 @@ class WinSmb(WinStandartBase):
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
         self.content_layout.addStretch()
         self.ok_btn = Btn(cnf.lng.ok)
+        self.ok_btn.setDisabled(True)
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
         self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
 
-        self.browse_coll.chanded.connect(self.adjustSize)
+        self.browse_coll.changed.connect(self.on_coll_changed)
+
+    def on_coll_changed(self):
+        self.adjustSize()
+        self.ok_btn.setDisabled(False)
 
     def reload_ui(self):
         MainUtils.clear_layout(self.content_layout)
