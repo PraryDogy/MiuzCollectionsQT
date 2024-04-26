@@ -50,7 +50,7 @@ class App(QApplication):
         MainUtils.close_all_win()
 
         utils_signals_app.scaner_stop.emit()
-        utils_signals_app.watcher_stop.emit()
+        # utils_signals_app.watcher_stop.emit()
 
     def after_start(self):
 
@@ -68,7 +68,7 @@ class App(QApplication):
             Manager.smb_win.show()
 
         utils_signals_app.scaner_start.emit()
-        utils_signals_app.watcher_start.emit()
+        # utils_signals_app.watcher_start.emit()
 
         # from widgets.win_smb import WinSmb
         # Manager.smb_win = WinSmb()
