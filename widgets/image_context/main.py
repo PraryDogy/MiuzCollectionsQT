@@ -3,7 +3,6 @@ from functools import partial
 from PyQt5.QtWidgets import QAction, QLabel, QMainWindow
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
-from signals import gui_signals_app
 from styles import Styles
 
 from ..win_info import WinInfo
@@ -12,8 +11,8 @@ from ..gui_thread_save_files import GuiThreadSaveFiles
 
 
 class Manager:
-    info_win = None
-    viewer_win = None
+    win_info = None
+    win_image_view = None
 
 
 class ImageContext(ContextMenuBase):
@@ -105,15 +104,15 @@ class ImageContext(ContextMenuBase):
 
     def show_info_win(self, img_src):
         if isinstance(self.my_parent, QMainWindow):
-            Manager.info_win = WinInfo(img_src, self.my_parent)
+            Manager.win_info = WinInfo(img_src, self.my_parent)
         else:
-            Manager.info_win = WinInfo(img_src)
-        Manager.info_win.show()
+            Manager.win_info = WinInfo(img_src)
+        Manager.win_info.show()
         
     def show_image_viewer(self, img_src):
         from ..win_image_view import WinImageView
-        Manager.viewer_win = WinImageView(img_src)
-        Manager.viewer_win.show()
+        Manager.win_image_view = WinImageView(img_src)
+        Manager.win_image_view.show()
 
     def reveal_jpg(self, img_src):
         self.reveal_files = GuiThreadRevealFiles(

@@ -11,6 +11,10 @@ from .progress_bar import ProgressBar
 from .thumb_move import ThumbMove
 
 
+class Manager:
+    win_settings = None
+
+
 class StBar(QWidget):
     def __init__(self):
         super().__init__()
@@ -82,8 +86,8 @@ class StBar(QWidget):
         self.init_ui()
 
     def sett_btn_cmd(self, e):
-        settings_win = WinSettings()
-        settings_win.show()
+        Manager.win_settings = WinSettings()
+        Manager.win_settings.show()
 
     def zoom_cmd(self, e):
         cnf.zoom = not cnf.zoom

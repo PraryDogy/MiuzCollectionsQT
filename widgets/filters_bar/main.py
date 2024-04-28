@@ -11,7 +11,7 @@ from styles import Styles
 
 
 class Manager:
-    dates_win = None
+    win_dates = None
 
 
 class DatesBtn(Btn):
@@ -53,8 +53,8 @@ class DatesBtn(Btn):
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
-            Manager.dates_win = WinDates()
-            Manager.dates_win.show()
+            Manager.win_dates = WinDates()
+            Manager.win_dates.show()
 
 
 class FilterBtn(Btn):

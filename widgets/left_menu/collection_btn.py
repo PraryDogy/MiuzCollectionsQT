@@ -9,9 +9,6 @@ from signals import gui_signals_app
 from styles import Styles
 
 
-class Manager:
-    reveal_coll_win = None
-
 class CustomContext(ContextMenuBase):
     def __init__(self, parent: QLabel, true_name, event):
         super().__init__(event=event)

@@ -7,7 +7,7 @@ from ..win_settings import WinSettings
 
 
 class Manager:
-    settings_win = None
+    win_settings = None
 
 
 class MacMenuBar(QMenuBar):
@@ -39,8 +39,8 @@ class MacMenuBar(QMenuBar):
         self.setNativeMenuBar(True)
 
     def open_settings_window(self):
-        Manager.settings_win = WinSettings()
-        Manager.settings_win.show()
+        Manager.win_settings = WinSettings()
+        Manager.win_settings.show()
 
     def open_about_window(self):
         print("Opening About Window")
