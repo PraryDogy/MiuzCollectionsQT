@@ -305,7 +305,6 @@ class WinSettings(WinStandartBase):
         return v_layout
 
     def cancel_cmd(self, e):
-        self.delete_win.emit()
         self.deleteLater()
 
     def ok_cmd(self, e):
@@ -333,12 +332,10 @@ class WinSettings(WinStandartBase):
         self.change_lang.finalize()
         self.thumb_move.finalize()
 
-        self.delete_win.emit()
         self.deleteLater()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.delete_win.emit()
             self.deleteLater()
 
         elif event.key() in (Qt.Key_Return, Qt.Key_Enter):

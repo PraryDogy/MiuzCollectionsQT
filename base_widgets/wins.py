@@ -103,8 +103,8 @@ class CustomTitleBar(QFrame):
 class BaseEmptyWin(QMainWindow):
     was_closed = pyqtSignal()
 
-    def __init__(self, close_func: callable):
-        super().__init__()
+    def __init__(self, close_func: callable, parent=None):
+        super().__init__(parent=parent)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
@@ -200,33 +200,7 @@ class BaseBottomWid(QFrame):
             """)
 
 
-class Manager:
-    wins = []
-
-
-class WinAutoRemove(BaseEmptyWin):
-    delete_win = pyqtSignal()
-
-    def __init__(self, close_func: callable):
-        super().__init__(close_func)
-        # self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        Manager.wins.append(self)
-        self.delete_win.connect(self.delete_win_cmd)
-
-    def delete_win_cmd(self):
-        try:
-            Manager.wins.remove(self)
-        except ValueError:
-            print("delete win: win not in manager.wins")
-
-    def closeEvent(self, event):
-        self.delete_win.emit()
-        super().closeEvent(event)
-
-
-class WinStandartBase(WinAutoRemove):
-    delete_win = pyqtSignal()
-    
+class WinStandartBase(BaseEmptyWin):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
         self.titlebar.setFixedHeight(28)
@@ -238,7 +212,7 @@ class WinStandartBase(WinAutoRemove):
         self.content_wid.setLayout(self.content_layout)
     
 
-class WinImgViewBase(WinAutoRemove):
+class WinImgViewBase(BaseEmptyWin):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
 
@@ -254,7 +228,7 @@ class WinImgViewBase(WinAutoRemove):
         self.content_wid.mouseReleaseEvent = func
 
 
-class WinSmallBase(WinAutoRemove):
+class WinSmallBase(BaseEmptyWin):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
 

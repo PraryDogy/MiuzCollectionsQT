@@ -240,8 +240,6 @@ class WinFirstLoad(WinStandartBase):
     def ok_cmd(self, e):
         self.user_type.finalize()
         self.browse_coll.finalize()
-
-        self.delete_win.emit()
         self.deleteLater()
 
     def keyPressEvent(self, event):

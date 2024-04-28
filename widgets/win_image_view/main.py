@@ -37,7 +37,6 @@ class ImageWinUtils:
                     {"aw": widget.width(), "ah": widget.height()}
                     )
 
-                widget.delete_win.emit()
                 widget.deleteLater()
 
 
@@ -291,7 +290,6 @@ class WinImageView(WinImgViewBase):
             except Exception as e:
                 print(e)
                 self.update_geometry()
-                self.delete_win.emit()
                 self.deleteLater()
                 return
 
@@ -432,6 +430,5 @@ class WinImageView(WinImgViewBase):
     def my_close(self, event):
         Manager.images.clear()
         self.update_geometry()
-        self.delete_win.emit()
         self.deleteLater()
         event.ignore()

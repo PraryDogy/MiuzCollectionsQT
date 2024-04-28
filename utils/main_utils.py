@@ -85,7 +85,6 @@ class MainUtils:
         for widget in widgets:
             if isinstance(widget, object):
                 # win with delete_win signal in base_widgets > win > StandartWin
-                widget.delete_win.emit()
                 widget.deleteLater()
 
     @staticmethod

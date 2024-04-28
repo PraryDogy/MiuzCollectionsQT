@@ -87,7 +87,6 @@ class DatesWinBase(WinStandartBase):
         self.disable_min_max()
 
     def my_close(self, event):
-        self.delete_win.emit()
         FiltersDateBtncolor.date_based_color()
         self.deleteLater()
         event.ignore()
@@ -180,20 +179,17 @@ class WinDates(DatesWinBase):
         cnf.date_end_text = self.named_date(date=cnf.date_end)
 
         FiltersDateBtncolor.date_based_color()
-        self.delete_win.emit()
         self.deleteLater()
 
         gui_signals_app.reload_thumbnails.emit()
 
     def cancel_cmd(self, event):
         FiltersDateBtncolor.date_based_color()
-        self.delete_win.emit()
         self.deleteLater()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             FiltersDateBtncolor.date_based_color()
-            self.delete_win.emit()
             self.deleteLater()
 
         elif event.key() in (Qt.Key_Return, Qt.Key_Enter):

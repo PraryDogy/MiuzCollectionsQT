@@ -10,6 +10,10 @@ from ..image_context import ImageContext
 from ..win_image_view import WinImageView
 
 
+class Manager:
+    win_image_view = None
+
+
 class Thumbnail(QLabel, QObject):
     finish_find_tiff = pyqtSignal(str)
 
@@ -34,8 +38,8 @@ class Thumbnail(QLabel, QObject):
         self.image_context = None
 
     def mouseReleaseEvent(self, event):
-        view_win = WinImageView(self.img_src)
-        view_win.show()
+        Manager.win_image_view = WinImageView(self.img_src)
+        Manager.win_image_view.show()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -97,7 +101,6 @@ class Thumbnail(QLabel, QObject):
                 t = cnf.lng.no_tiff
 
             gui_signals_app.noti_main.emit(t)
-
 
     def contextMenuEvent(self, event):
         self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)

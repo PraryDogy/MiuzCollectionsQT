@@ -39,7 +39,6 @@ class WinCopyFilesThread(WinStandartBase, QObject):
         self.center_win()
 
         if not MainUtils.smb_check():
-            self.delete_win.emit()
             self.deleteLater()
             Manager.win_smb = WinSmb()
             Manager.win_smb.show()
@@ -67,14 +66,12 @@ class WinCopyFilesThread(WinStandartBase, QObject):
 
     def cancel_cmd(self, e):
         self.copy_thread.stop.emit()
-        self.delete_win.emit()
         self.deleteLater()
 
     def update_progress(self, progress_percentage):
         self.progress.setValue(progress_percentage)
 
     def finalize(self):
-        self.delete_win.emit()
         self.finished.emit()
         self.deleteLater()        
 

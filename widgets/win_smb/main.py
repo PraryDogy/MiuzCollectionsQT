@@ -121,7 +121,6 @@ class WinSmb(WinStandartBase):
         self.browse_coll.finalize()
         # print("finalize disabled")
 
-        self.delete_win.emit()
         self.deleteLater()
 
     def keyPressEvent(self, event):
