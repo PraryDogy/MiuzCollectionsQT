@@ -26,11 +26,7 @@ class ScanerShedule(QObject):
         self.next_scan_timer.setSingleShot(True)
         self.next_scan_timer.timeout.connect(self.wait_thread)
 
-        utils_signals_app.scaner_start.connect(self.wait_thread)
-        utils_signals_app.scaner_stop.connect(self.stop_thread)
-        utils_signals_app.scaner_err.connect(self.wait_thread)
-
-        self.scaner_thread = False
+        self.scaner_thread = None
 
     def wait_thread(self):
         self.stop_timers()
@@ -39,8 +35,7 @@ class ScanerShedule(QObject):
             self.start_thread()
 
         else:
-            print(f"scaner wait prev thread finished, flag: {ScanerThreadManager.flag}")
-            self.scaner_thread = False
+            print(f"wait prev scaner is finished")
             self.thread_wait_timer.start()
 
     def start_thread(self):
@@ -52,14 +47,19 @@ class ScanerShedule(QObject):
 
         else:
             print("scaner start from shedule")
+
+            utils_signals_app.scaner_start.connect(self.wait_thread)
+            utils_signals_app.scaner_stop.connect(self.stop_thread)
+            utils_signals_app.scaner_err.connect(self.wait_thread)
+
             self.scaner_thread = ScanerThread()
+            self.scaner_thread.finished.connect()
             self.scaner_thread.start()
 
             if cnf.scaner_recursive:
                 self.next_scan_timer.start()
 
     def stop_thread(self):
-        print("scaner stoped")
         ScanerThreadManager.flag = False
         self.stop_timers()
 
@@ -67,6 +67,14 @@ class ScanerShedule(QObject):
         self.smb_wait_timer.stop()
         self.thread_wait_timer.stop()
         self.next_scan_timer.stop()
+
+    def finalize_scan(self):
+        try:
+            self.scaner_thread.quit()
+        except Exception as e:
+            print("scaner finalze scan quit thread", e)
+
+        self.scaner_thread = None
 
 
 scaner_app = ScanerShedule()

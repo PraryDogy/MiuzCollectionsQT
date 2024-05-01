@@ -6,7 +6,7 @@ from time import sleep
 from typing import Dict, List, Literal
 
 import sqlalchemy
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSignal
 from sqlalchemy.orm import Query
 
 from cfg import cnf
@@ -504,9 +504,12 @@ class Scaner(ScanerBaseClass):
 
 
 class ScanerThread(QThread):
+    finished = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
     def run(self):
         self.scaner = Scaner()
         self.scaner.run()
+        self.finished.emit()
