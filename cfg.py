@@ -50,7 +50,6 @@ class User:
             }
         
         self.scaner_minutes: int = 5
-        self.scaner_recursive: bool = True
         self.stop_colls: dict = [
             "_Archive_Commerce_Брендинг",
             "Chosed",
@@ -135,7 +134,6 @@ class Config(User, Dymanic, Static, AppInfo):
         data["first_load"] = False
 
         data["scaner_minutes"] = 5
-        data["scaner_recursive"] = True
 
         data["watcher"] = False
         data["watcher_timeout"] = self.watcher_timeout

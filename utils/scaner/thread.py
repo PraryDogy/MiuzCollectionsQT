@@ -142,7 +142,6 @@ class FinderImages(dict):
 
         except (OSError, FileNotFoundError):
             print(traceback.format_exc())
-            utils_signals_app.scaner_err.emit()
             Manager.flag = False
 
         if not self:
@@ -291,7 +290,6 @@ class SummaryScan:
 
             except FileNotFoundError:
                 print(traceback.format_exc())
-                utils_signals_app.scaner_err.emit()
                 Manager.flag = False
                 return
 
@@ -499,7 +497,6 @@ class Scaner(ScanerBaseClass):
             self.scaner_actions()
         except Exception:
             gui_signals_app.progressbar_hide.emit()
-            utils_signals_app.scaner_err.emit()
             print(traceback.format_exc())
 
 

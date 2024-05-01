@@ -11,62 +11,43 @@ from .thread import ScanerThread
 class ScanerShedule(QObject):
     def __init__(self):
         super().__init__()
-        self.smb_wait_timer = QTimer(self)
-        self.smb_wait_timer.setInterval(15000)
-        self.smb_wait_timer.setSingleShot(True)
-        self.smb_wait_timer.timeout.connect(self.start_thread)
-        
-        self.thread_wait_timer = QTimer(self)
-        self.thread_wait_timer.setInterval(15000)
-        self.thread_wait_timer.setSingleShot(True)
-        self.thread_wait_timer.timeout.connect(self.wait_thread)
 
-        self.next_scan_timer = QTimer(self)
-        self.next_scan_timer.setInterval(cnf.scaner_minutes * 60 * 1000)
-        self.next_scan_timer.setSingleShot(True)
-        self.next_scan_timer.timeout.connect(self.wait_thread)
+        self.wait_timer = QTimer(self)
+        self.wait_timer.setSingleShot(True)
+        self.wait_timer.timeout.connect(self.prepare_thread)
 
         self.scaner_thread = None
 
-    def wait_thread(self):
-        self.stop_timers()
-
-        if not self.scaner_thread or not self.scaner_thread.isRunning():
-            self.start_thread()
-
-        else:
-            print(f"wait prev scaner is finished")
-            self.thread_wait_timer.start()
-
-    def start_thread(self):
-        self.stop_timers()
+    def prepare_thread(self):
+        self.wait_timer.stop()
 
         if not MainUtils.smb_check():
-            print("scaner no smb, 15 sec wait")
-            self.smb_wait_timer.start()
+            print("scaner no smb")
+            self.wait_timer.start(15000)
+
+        elif self.scaner_thread:
+            print("scaner wait prev scaner finished")
+            self.wait_timer.start(15000)
 
         else:
-            print("scaner start from shedule")
+            print("scaner started")
+            self.start_thread()
 
-            utils_signals_app.scaner_start.connect(self.wait_thread)
-            utils_signals_app.scaner_stop.connect(self.stop_thread)
-            utils_signals_app.scaner_err.connect(self.wait_thread)
+    def start_thread(self):
+        utils_signals_app.scaner_start.connect(self.prepare_thread)
+        utils_signals_app.scaner_stop.connect(self.stop_thread)
 
-            self.scaner_thread = ScanerThread()
-            self.scaner_thread.finished.connect()
-            self.scaner_thread.start()
+        self.scaner_thread = ScanerThread()
 
-            if cnf.scaner_recursive:
-                self.next_scan_timer.start()
+        self.scaner_thread.finished.connect(self.finalize_scan)
+        self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)
+
+        self.scaner_thread.start()
 
     def stop_thread(self):
+        print("scaner manualy stopep. You need emit scaner start signal")
         ScanerThreadManager.flag = False
-        self.stop_timers()
-
-    def stop_timers(self):
-        self.smb_wait_timer.stop()
-        self.thread_wait_timer.stop()
-        self.next_scan_timer.stop()
+        self.wait_timer.stop()
 
     def finalize_scan(self):
         try:
