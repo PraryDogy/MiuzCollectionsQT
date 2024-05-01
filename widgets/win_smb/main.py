@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtWidgets import (QFileDialog, QLabel, QSizePolicy, QSpacerItem,
                              QWidget)
 
@@ -8,25 +8,29 @@ from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import utils_signals_app
 from utils import MainUtils
-
+from styles import Styles
 
 class Manager:
     coll_folder = cnf.coll_folder
 
 
-class BrowseColl(LayoutV):
+class BrowseColl(QWidget):
     changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+
+        my_layout = LayoutV()
+        self.setLayout(my_layout)
+
         descr = QLabel(cnf.lng.choose_coll_smb)
-        self.addWidget(descr)
+        my_layout.addWidget(descr)
         
-        self.addSpacerItem(QSpacerItem(0, 5))
+        my_layout.addSpacerItem(QSpacerItem(0, 5))
 
         self.h_wid = QWidget()
         self.h_wid.setFixedSize(375, 60)
-        self.addWidget(self.h_wid)
+        my_layout.addWidget(self.h_wid)
 
         h_layout = LayoutH()
         self.h_wid.setLayout(h_layout)
@@ -44,6 +48,35 @@ class BrowseColl(LayoutV):
         h_layout.addWidget(self.coll_path_label)
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
+
+        self.blue_count = 0
+
+    def blue_browse_btn(self):
+        self.browse_btn.setStyleSheet(f"""
+            background-color: {Styles.blue_color};
+            border-radius: {Styles.big_radius};
+            """)
+                
+        my_timer = QTimer(self)
+        my_timer.setSingleShot(True)
+        my_timer.timeout.connect(self.default_browse_btn)
+        my_timer.start(200)
+        self.blue_count += 1
+
+    def default_browse_btn(self):
+        self.browse_btn.setStyleSheet(f"""
+            background-color: {Styles.btn_base_color};
+            border-radius: {Styles.big_radius};
+            """)
+        
+        if self.blue_count == 3:
+            self.blue_count = 0
+            return
+
+        my_timer = QTimer(self)
+        my_timer.setSingleShot(True)
+        my_timer.timeout.connect(self.blue_browse_btn)
+        my_timer.start(200)
 
     def cut_text(self, text: str, limit: int = 130):
         if len(text) > limit:
@@ -96,19 +129,19 @@ class WinSmb(WinStandartBase):
 
     def init_ui(self):
         self.browse_coll = BrowseColl()
-        self.content_layout.addLayout(self.browse_coll)
+        self.content_layout.addWidget(self.browse_coll)
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
         self.content_layout.addStretch()
+
         self.ok_btn = Btn(cnf.lng.ok)
-        self.ok_btn.setDisabled(True)
-        self.ok_btn.mouseReleaseEvent = self.ok_cmd
+        self.ok_btn.mouseReleaseEvent = lambda e: self.browse_coll.blue_browse_btn()
         self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
 
         self.browse_coll.changed.connect(self.on_coll_changed)
 
     def on_coll_changed(self):
         self.adjustSize()
-        self.ok_btn.setDisabled(False)
+        self.ok_btn.mouseReleaseEvent = self.ok_cmd
 
     def reload_ui(self):
         MainUtils.clear_layout(self.content_layout)
@@ -116,8 +149,6 @@ class WinSmb(WinStandartBase):
 
     def ok_cmd(self, e):
         self.browse_coll.finalize()
-        # print("finalize disabled")
-
         self.deleteLater()
 
     def keyPressEvent(self, event):
