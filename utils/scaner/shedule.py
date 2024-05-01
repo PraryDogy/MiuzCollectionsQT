@@ -42,7 +42,7 @@ class ScanerShedule(QObject):
         self.scaner_thread.start()
 
     def stop_thread(self):
-        print("scaner manualy stopep. You need emit scaner start signal")
+        print("scaner manualy stoped from utils_signals_app. You need emit scaner start signal")
         ScanerThreadManager.flag = False
         self.wait_timer.stop()
 
