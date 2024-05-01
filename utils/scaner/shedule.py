@@ -55,4 +55,5 @@ class ScanerShedule(QObject):
         self.scaner_thread = None
         self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)
 
+
 scaner_app = ScanerShedule()
