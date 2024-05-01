@@ -16,6 +16,9 @@ class ScanerShedule(QObject):
         self.wait_timer.setSingleShot(True)
         self.wait_timer.timeout.connect(self.prepare_thread)
 
+        utils_signals_app.scaner_start.connect(self.prepare_thread)
+        utils_signals_app.scaner_stop.connect(self.stop_thread)
+
         self.scaner_thread = None
 
     def prepare_thread(self):
@@ -34,14 +37,8 @@ class ScanerShedule(QObject):
             self.start_thread()
 
     def start_thread(self):
-        utils_signals_app.scaner_start.connect(self.prepare_thread)
-        utils_signals_app.scaner_stop.connect(self.stop_thread)
-
         self.scaner_thread = ScanerThread()
-
         self.scaner_thread.finished.connect(self.finalize_scan)
-        self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)
-
         self.scaner_thread.start()
 
     def stop_thread(self):
@@ -56,6 +53,6 @@ class ScanerShedule(QObject):
             print("scaner finalze scan quit thread", e)
 
         self.scaner_thread = None
-
+        self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)
 
 scaner_app = ScanerShedule()
