@@ -41,16 +41,16 @@ class App(QApplication):
         return super().eventFilter(obj, event)
     
     def on_exit(self):
+        utils_signals_app.scaner_stop.emit()
+
         geo = self.main_win.geometry()
 
         cnf.root_g.update(
             {"aw": geo.width(), "ah": geo.height()}
             )
+
         cnf.write_json_cfg()
         MainUtils.close_all_win()
-
-        utils_signals_app.scaner_stop.emit()
-        # utils_signals_app.watcher_stop.emit()
 
     def after_start(self):
 
@@ -68,7 +68,6 @@ class App(QApplication):
             Manager.smb_win.show()
 
         utils_signals_app.scaner_start.emit()
-        # utils_signals_app.watcher_start.emit()
 
         # from widgets.win_smb import WinSmb
         # Manager.smb_win = WinSmb()

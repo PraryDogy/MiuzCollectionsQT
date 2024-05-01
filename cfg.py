@@ -67,10 +67,6 @@ class User:
             }
         
         self.user_lng: str = "en"
-
-        self.watcher: bool = False
-        self.watcher_timeout: int = 5
-
         self.zoom: bool = False
         
 
@@ -134,9 +130,6 @@ class Config(User, Dymanic, Static, AppInfo):
         data["first_load"] = False
 
         data["scaner_minutes"] = 5
-
-        data["watcher"] = False
-        data["watcher_timeout"] = self.watcher_timeout
 
         if "LEVIEV" not in data["stop_colls"]:
             data["stop_colls"].append("LEVIEV")
