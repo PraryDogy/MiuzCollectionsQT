@@ -166,18 +166,12 @@ class FinderImages(dict):
         for collection_walk in collections:
             gui_signals_app.progressbar_value.emit(step_value)
 
-            if not Manager.flag:
-                return
-
             for root, _, files in os.walk(top=collection_walk):
 
                 if not Manager.flag:
                     return
 
                 for file in files:
-
-                    if not Manager.flag:
-                        return
 
                     if not os.path.exists(cnf.coll_folder):
                         Manager.flag = False
@@ -316,7 +310,6 @@ class SummaryScan:
         chunks = [
             {key: data[key] for key in data_keys[i:i + limit]}
             for i in range(0, len(data), limit)
-            if Manager.flag
             ]
 
         for chunk in chunks:
@@ -371,7 +364,6 @@ class SummaryScan:
         chunks = [
             {key: data[key] for key in data_keys[i:i + limit]}
             for i in range(0, len(data), limit)
-            if Manager.flag
             ]
 
         for chunk in chunks:
@@ -423,7 +415,6 @@ class SummaryScan:
         queries = [
             sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==i)
             for i in self.images["delete"]
-            if Manager.flag
             ]
 
         limit: int = 200
@@ -431,7 +422,6 @@ class SummaryScan:
         chunks = [
             queries[i:i+limit]
             for i in range(0, len(queries), limit)
-            if Manager.flag
             ]
 
         for chunk in chunks:
