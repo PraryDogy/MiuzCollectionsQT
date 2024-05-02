@@ -52,6 +52,14 @@ OPTIONS = {"iconfile": "icon/icon.icns",
 
 if __name__ == "__main__":
 
+    print()
+    print("Copy db file from App Support?")
+    print("Type \"1\" to confirm")
+    print()
+    res = input()
+    if res == "1":
+        shutil.copyfile(src=cnf.db_file, dst="db.db")
+
     sys.argv.append("py2app")
 
     try:

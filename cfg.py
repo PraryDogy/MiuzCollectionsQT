@@ -10,7 +10,7 @@ from lang import Eng, Rus
 class User:
     def __init__(self) -> None:
         super().__init__()
-        self.app_ver: str = "5.1.7"
+        self.app_ver: str = "5.1.8"
     
         self.coll_folder: str = os.path.join(
             os.sep,
@@ -125,10 +125,9 @@ class Config(User, Dymanic, Static, AppInfo):
             )
         
     def update_json(self, data: dict):
-        print("UPDATING JSON, COPYING DB")
+        print("UPDATING JSON")
         
         data["first_load"] = False
-
         data["scaner_minutes"] = 5
 
         if "LEVIEV" not in data["stop_colls"]:
