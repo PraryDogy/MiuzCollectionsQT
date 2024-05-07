@@ -146,6 +146,9 @@ class BaseEmptyWin(QMainWindow):
             grip.resize(self.gripSize, self.gripSize)
             self.grips.append(grip)
 
+        self.titlebar.btns.max_btn.setDisabled(True)
+        self.titlebar.btns.max_btn.set_icon("gray-2.svg")
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
         rect = self.rect()

@@ -91,9 +91,9 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        self.test = TestWid()
-        self.test.show()
-        
+        # self.test = TestWid()
+        # self.test.show()
+
         # from widgets.win_smb import WinSmb
         # Manager.smb_win = WinSmb()
         # Manager.smb_win.show()
