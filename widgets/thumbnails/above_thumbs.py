@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem
+from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from cfg import cnf
 
@@ -91,9 +91,12 @@ class ShowAllBtn(QLabel):
         gui_signals_app.scroll_top.emit()
 
 
-class AboveThumbsNoImages(LayoutV):
+class AboveThumbsNoImages(QWidget):
     def __init__(self, width):
         super().__init__()
+
+        self.v_layout = LayoutV()
+        self.setLayout(self.v_layout)
 
         noimg_t = cnf.lng.no_photo
 
@@ -106,11 +109,11 @@ class AboveThumbsNoImages(LayoutV):
             font-size: {Styles.title_font_size};
             font-weight: bold;
             """)
-        self.addWidget(title_label)
+        self.v_layout.addWidget(title_label)
 
         h_layout = LayoutH()
         h_layout.setContentsMargins(0, 10, 0, 0)
-        self.addLayout(h_layout)
+        self.v_layout.addLayout(h_layout)
 
         merg_fltr_vals = {
             **cnf.cust_fltr_vals,
@@ -152,11 +155,16 @@ class AboveThumbsNoImages(LayoutV):
             h_layout.addWidget(ShowAllBtn())
 
 
-class AboveThumbs(LayoutV):
+class AboveThumbs(QWidget):
     def __init__(self, width):
         super().__init__()
+
+        self.v_layout = LayoutV()
+        self.setLayout(self.v_layout)
+
+
         label = QLabel()
-        self.addWidget(label)
+        self.v_layout.addWidget(label)
         label.setFixedWidth(width - 20)
         label.setWordWrap(True)
         label.setStyleSheet(
@@ -167,7 +175,7 @@ class AboveThumbs(LayoutV):
 
         h_layout = LayoutH()
         h_layout.setContentsMargins(0, 10, 0, 0)
-        self.addLayout(h_layout)
+        self.v_layout.addLayout(h_layout)
 
         if any((cnf.date_start, cnf.date_end)):
             label.setText(
@@ -176,7 +184,7 @@ class AboveThumbs(LayoutV):
             h_layout.addWidget(ResetDatesBtn())
 
             spacer = QSpacerItem(1, 10)
-            self.addSpacerItem(spacer)
+            self.v_layout.addSpacerItem(spacer)
 
         elif cnf.search_text:
             label.setText(f"{cnf.lng.search}: {cnf.search_text}")
@@ -184,7 +192,7 @@ class AboveThumbs(LayoutV):
             h_layout.addSpacerItem(QSpacerItem(1, 30))
 
             spacer = QSpacerItem(1, 10)
-            self.addSpacerItem(spacer)
+            self.v_layout.addSpacerItem(spacer)
 
         else:
             self.deleteLater()

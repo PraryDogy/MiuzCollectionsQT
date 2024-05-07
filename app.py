@@ -1,16 +1,37 @@
 import sys
 
 from PyQt5.QtCore import QEvent, Qt, QTimer
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 
 from cfg import cnf
 from widgets import WinMain
-from signals import utils_signals_app
+from signals import utils_signals_app, gui_signals_app
 from utils import MainUtils
 
 class Manager:
     smb_win = None
     first_load_win = None
+
+
+class TestWid(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+
+        v_layout = QVBoxLayout()
+        self.setLayout(v_layout)
+
+        btn = QPushButton('reload')
+        v_layout.addWidget(btn)
+        btn.clicked.connect(self.reload)
+
+    def widgets_count(self):
+        all_widgets = QApplication.instance().allWidgets()
+        return len(all_widgets)
+
+    def reload(self):
+        print(self.widgets_count())
+        gui_signals_app.reload_thumbnails.emit()
+        print(self.widgets_count())
 
 
 class App(QApplication):
@@ -34,6 +55,7 @@ class App(QApplication):
         self.after_start_timer.setSingleShot(True)
         self.after_start_timer.timeout.connect(self.after_start)
         self.after_start_timer.start(100)
+
 
     def eventFilter(self, obj, event: QEvent):
         if event.type() == QEvent.ApplicationActivate:
@@ -69,6 +91,9 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
+        self.test = TestWid()
+        self.test.show()
+        
         # from widgets.win_smb import WinSmb
         # Manager.smb_win = WinSmb()
         # Manager.smb_win.show()

@@ -84,13 +84,15 @@ class Thumbnails(QScrollArea):
         cnf.images.clear()
 
         if thumbs_dict:
-            self.thumbnails_layout.addLayout(AboveThumbs(self.width()))
+            above_thumbs = AboveThumbs(self.width())
+            self.thumbnails_layout.addWidget(above_thumbs)
 
             for month, images_data in thumbs_dict.items():
                 self.create_one_grid(month, images_data)
 
         else:
-            self.thumbnails_layout.addLayout(AboveThumbsNoImages(self.width()))
+            no_images = AboveThumbsNoImages(self.width())
+            self.thumbnails_layout.addWidget(no_images)
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
         if ln_thumbs == cnf.current_limit:
