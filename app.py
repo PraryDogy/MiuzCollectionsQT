@@ -29,6 +29,11 @@ class TestWid(QWidget):
         return len(all_widgets)
 
     def reload(self):
+        from widgets import win_first_load
+        self.abc = win_first_load.WinFirstLoad()
+        self.abc.show()
+        return
+
         print(self.widgets_count())
         gui_signals_app.reload_thumbnails.emit()
         print(self.widgets_count())

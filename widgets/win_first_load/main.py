@@ -224,17 +224,17 @@ class WinFirstLoad(WinStandartBase):
     def init_ui(self):
         self.change_lang = ChangeLang()
         self.change_lang.change_lang.connect(self.reload_ui)
-        self.content_layout.addLayout(self.change_lang)
+        self.content_layout.addWidget(self.change_lang)
 
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
 
         self.browse_coll = BrowseColl()
-        self.content_layout.addLayout(self.browse_coll)
+        self.content_layout.addWidget(self.browse_coll)
 
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
 
         self.user_type = ChooseUserType()
-        self.content_layout.addLayout(self.user_type)
+        self.content_layout.addWidget(self.user_type)
 
         self.ok_btn = Btn(cnf.lng.ok)
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
