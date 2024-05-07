@@ -60,7 +60,7 @@ class StBar(QWidget):
         self.h_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.thumb_move = ThumbMove()
-        self.h_layout.addLayout(self.thumb_move)
+        self.h_layout.addWidget(self.thumb_move)
 
         # self.h_layout.addSpacerItem(QSpacerItem(10, 0))
 
