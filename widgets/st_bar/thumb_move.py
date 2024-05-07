@@ -1,6 +1,6 @@
 from typing import Literal
 
-from PyQt5.QtWidgets import QSpacerItem
+from PyQt5.QtWidgets import QSpacerItem, QWidget
 
 from base_widgets import Btn, LayoutH
 from cfg import cnf
@@ -8,9 +8,12 @@ from signals import gui_signals_app
 from styles import Styles
 
 
-class ThumbMove(LayoutH):
+class ThumbMove(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        layout_h = LayoutH()
+        self.setLayout(layout_h)
 
         self.move_jpg = cnf.move_jpg
         self.move_layers = cnf.move_layers
@@ -21,16 +24,16 @@ class ThumbMove(LayoutH):
         self.btn_jpg.setStyleSheet(self.get_jpg_style())
         self.btn_jpg.setFixedSize(*size)
         self.btn_jpg.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
-        self.addWidget(self.btn_jpg)
+        layout_h.addWidget(self.btn_jpg)
 
-        self.addSpacerItem(QSpacerItem(1, 0))
+        layout_h.addSpacerItem(QSpacerItem(1, 0))
 
         self.btn_tiff = Btn(cnf.lng.layers)
         self.btn_tiff.setFixedSize(*size)
         self.btn_tiff.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
         self.btn_tiff.setStyleSheet(self.get_tiff_style())
         
-        self.addWidget(self.btn_tiff)
+        layout_h.addWidget(self.btn_tiff)
 
 
     def btn_cmd(self, flag: Literal["jpg", "tiff"]):

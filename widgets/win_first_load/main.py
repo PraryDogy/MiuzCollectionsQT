@@ -10,22 +10,25 @@ from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from styles import Styles
 from utils import MainUtils
-from ..win_smb import WinSmb
 
 
 class Manager:
     coll_folder = cnf.coll_folder
 
 
-class BrowseColl(LayoutV):
+class BrowseColl(QWidget):
     def __init__(self):
         super().__init__()
+
+        layout_v = LayoutV()
+        self.setLayout(layout_v)
+
         descr = QLabel(cnf.lng.browse_coll_first)
-        self.addWidget(descr)
+        layout_v.addWidget(descr)
 
         h_wid = QWidget()
         h_wid.setFixedHeight(50)
-        self.addWidget(h_wid)
+        layout_v.addWidget(h_wid)
 
         h_layout = LayoutH()
         h_wid.setLayout(h_layout)
@@ -69,21 +72,25 @@ class BrowseColl(LayoutV):
         utils_signals_app.scaner_start.emit()
 
 
-class ChangeLang(LayoutH, QObject):
+class ChangeLang(QWidget, QObject):
     change_lang = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+
+        layout_h = LayoutH()
+        self.setLayout(layout_h)
+
         self.lang = cnf.user_lng
 
         self.lang_btn = Btn(self.get_lng_text())
         self.lang_btn.mouseReleaseEvent = self.lng_cmd
-        self.addWidget(self.lang_btn)
+        layout_h.addWidget(self.lang_btn)
 
-        self.addSpacerItem(QSpacerItem(10, 0))
+        layout_h.addSpacerItem(QSpacerItem(10, 0))
 
         self.lang_label = QLabel(cnf.lng.lang_label)
-        self.addWidget(self.lang_label)
+        layout_h.addWidget(self.lang_label)
 
     def get_lng_text(self):
         return "🇷🇺 Ru" if self.lang == "ru" else "🇺🇸 En"
@@ -109,21 +116,24 @@ class ChangeLang(LayoutH, QObject):
         self.change_lang.emit()
 
 
-class ChooseUserType(LayoutV):
+class ChooseUserType(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        layout_v = LayoutV()
+        self.setLayout(layout_v)
 
         self.move_jpg = cnf.move_jpg
         self.move_layers = cnf.move_layers
 
         descr = QLabel(cnf.lng.choose_user_first)
-        self.addWidget(descr)
+        layout_v.addWidget(descr)
 
         h_wid = QWidget()
         h_wid.setFixedHeight(50)
-        self.addWidget(h_wid)
+        layout_v.addWidget(h_wid)
 
-        self.addSpacerItem(QSpacerItem(0, 10))
+        layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         h_layout = LayoutH()
         h_wid.setLayout(h_layout)

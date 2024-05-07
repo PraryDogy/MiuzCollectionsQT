@@ -2,7 +2,7 @@ from datetime import datetime
 from functools import partial
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QLabel, QSpacerItem
+from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import (Btn, WinStandartBase, LayoutH,
                           LayoutV)
@@ -29,21 +29,24 @@ class FiltersDateBtncolor:
         gui_signals_app.set_dates_btn_blue_border.emit()
 
 
-class BaseDateLayout(LayoutV):
+class BaseDateLayout(QWidget):
     dateChangedSignal = pyqtSignal()
 
     def __init__(self, title_label_text):
         super().__init__()
 
+        layout_v = LayoutV()
+        self.setLayout(layout_v)
+
         self.title_label = TitleLabel(title_label_text)
-        self.addWidget(self.title_label)
+        layout_v.addWidget(self.title_label)
 
         spacer_item = QSpacerItem(1, 5)
-        self.addItem(spacer_item)
+        layout_v.addSpacerItem(spacer_item)
 
         self.input = BaseDateInput()
         self.input.inputChangedSignal.connect(self.input_changed)
-        self.addWidget(self.input)
+        layout_v.addWidget(self.input)
 
     def input_changed(self):
         date = self.get_datetime_date()
@@ -59,7 +62,7 @@ class BaseDateLayout(LayoutV):
         return self.input.date
 
 
-class LeftDateLayout(BaseDateLayout):
+class LeftDateWidget(BaseDateLayout):
     def __init__(self):
         super().__init__(cnf.lng.start)
 
@@ -67,7 +70,7 @@ class LeftDateLayout(BaseDateLayout):
             self.input.setText(DateUtils.date_to_text(cnf.date_start))
 
 
-class RightDateLayout(BaseDateLayout):
+class RightDateWidget(BaseDateLayout):
     def __init__(self):
         super().__init__(cnf.lng.end)
 
@@ -109,16 +112,16 @@ class WinDates(DatesWinBase):
         widget_layout = LayoutH()
         self.content_layout.addLayout(widget_layout)
 
-        self.left_date = LeftDateLayout()
+        self.left_date = LeftDateWidget()
         self.left_date.dateChangedSignal.connect(partial(self.date_change, "start"))
-        widget_layout.addLayout(self.left_date)
+        widget_layout.addWidget(self.left_date)
 
         spacer_item = QSpacerItem(10, 1)
         widget_layout.addItem(spacer_item)
 
-        self.right_date = RightDateLayout()
+        self.right_date = RightDateWidget()
         self.right_date.dateChangedSignal.connect(partial(self.date_change, "end"))
-        widget_layout.addLayout(self.right_date)
+        widget_layout.addWidget(self.right_date)
 
         # ok cancel button
 
