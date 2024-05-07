@@ -2,7 +2,7 @@ import os
 from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem
+from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
@@ -11,21 +11,24 @@ from styles import Styles
 from utils import MainUtils
 
 
-class BrowseColl(LayoutH):
+class BrowseColl(QWidget):
     def __init__(self):
         super().__init__()
         self.new_coll_path = None
 
+        layout_h = LayoutH()
+        self.setLayout(layout_h)
+
         self.browse_btn = Btn(cnf.lng.browse)
         self.browse_btn.mouseReleaseEvent = self.choose_folder
-        self.addWidget(self.browse_btn)
+        layout_h.addWidget(self.browse_btn)
 
-        self.addSpacerItem(QSpacerItem(10, 0))
+        layout_h.addSpacerItem(QSpacerItem(10, 0))
 
         self.coll_path_label = QLabel(self.cut_text(cnf.coll_folder))
         self.coll_path_label.setWordWrap(True)
         self.coll_path_label.setFixedHeight(35)
-        self.addWidget(self.coll_path_label)
+        layout_h.addWidget(self.coll_path_label)
 
     def choose_folder(self, e):
         file_dialog = QFileDialog()
@@ -53,19 +56,22 @@ class BrowseColl(LayoutH):
             return text
         
 
-class ChangeLang(LayoutH):
+class ChangeLang(QWidget):
     def __init__(self):
         super().__init__()
         self.lang = cnf.user_lng
 
+        layout_h = LayoutH()
+        self.setLayout(layout_h)
+
         self.lang_btn = Btn(self.get_lng_text())
         self.lang_btn.mouseReleaseEvent = self.lng_cmd
-        self.addWidget(self.lang_btn)
+        layout_h.addWidget(self.lang_btn)
 
-        self.addSpacerItem(QSpacerItem(10, 0))
+        layout_h.addSpacerItem(QSpacerItem(10, 0))
 
         self.lang_label = QLabel(cnf.lng.lang_label)
-        self.addWidget(self.lang_label)
+        layout_h.addWidget(self.lang_label)
 
     def get_lng_text(self):
         return "🇷🇺 Ru" if self.lang == "ru" else "🇺🇸 En"
@@ -92,12 +98,15 @@ class ChangeLang(LayoutH):
             gui_signals_app.reload_menubar.emit()
 
 
-class CustFilters(LayoutH):
+class CustFilters(QWidget):
     def __init__(self):
         super().__init__()
 
+        layout_h = LayoutH()
+        self.setLayout(layout_h)
+
         self.v_left = LayoutV()
-        self.addLayout(self.v_left)
+        layout_h.addLayout(self.v_left)
 
         self.prod_label = QLabel(cnf.lng.cust_fltr_names["prod"])
         self.v_left.addWidget(self.prod_label)
@@ -108,10 +117,10 @@ class CustFilters(LayoutH):
         self.prod_input.insert(cnf.cust_fltr_names["prod"])
         self.v_left.addWidget(self.prod_input)
 
-        self.addSpacerItem(QSpacerItem(10, 0))
+        layout_h.addSpacerItem(QSpacerItem(10, 0))
 
         self.v_right = LayoutV()
-        self.addLayout(self.v_right)
+        layout_h.addLayout(self.v_right)
 
         self.mod_label = QLabel(cnf.lng.cust_fltr_names["mod"])
         self.v_right.addWidget(self.mod_label)
@@ -129,45 +138,54 @@ class CustFilters(LayoutH):
             }
     
 
-class StopWords(LayoutV):
+class StopWords(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.label = QLabel(cnf.lng.sett_stopwords)
-        self.addWidget(self.label)
+        layout_v = LayoutV()
+        self.setLayout(layout_v)
 
-        self.addSpacerItem(QSpacerItem(0, 10))
+        self.label = QLabel(cnf.lng.sett_stopwords)
+        layout_v.addWidget(self.label)
+
+        layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.input = InputBase()
         self.input.insert(", ".join(cnf.stop_words))
-        self.addWidget(self.input)
+        layout_v.addWidget(self.input)
 
     def get_stopwords(self):
         text = self.input.text()
         return [i.strip() for i in text.split(",")]
 
 
-class StopColls(LayoutV):
+class StopColls(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.label = QLabel(cnf.lng.sett_stopcolls)
-        self.addWidget(self.label)
+        layout_v = LayoutV()
+        self.setLayout(layout_v)
 
-        self.addSpacerItem(QSpacerItem(0, 10))
+        self.label = QLabel(cnf.lng.sett_stopcolls)
+        layout_v.addWidget(self.label)
+
+        layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.input = InputBase()
         self.input.insert(", ".join(cnf.stop_colls))
-        self.addWidget(self.input)
+        layout_v.addWidget(self.input)
 
     def get_stopcolls(self):
         text = self.input.text()
         return [i.strip() for i in text.split(",")]
 
 
-class ThumbMove(LayoutH):
+class ThumbMove(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        layout_h = LayoutH()
+        self.setLayout(layout_h)
 
         self.move_jpg = cnf.move_jpg
         self.move_layers = cnf.move_layers
@@ -175,22 +193,22 @@ class ThumbMove(LayoutH):
         self.btn_jpg = Btn("JPG")
         self.btn_jpg.setStyleSheet(self.get_jpg_style())
         self.btn_jpg.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
-        self.addWidget(self.btn_jpg)
+        layout_h.addWidget(self.btn_jpg)
 
-        self.addSpacerItem(QSpacerItem(1, 0))
+        layout_h.addSpacerItem(QSpacerItem(1, 0))
 
         self.btn_tiff = Btn(cnf.lng.layers)
         self.btn_tiff.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
         self.btn_tiff.setStyleSheet(self.get_tiff_style())
         
-        self.addWidget(self.btn_tiff)
+        layout_h.addWidget(self.btn_tiff)
 
-        self.addSpacerItem(QSpacerItem(10, 0))
+        layout_h.addSpacerItem(QSpacerItem(10, 0))
 
         descr = QLabel(cnf.lng.thumb_move)
-        self.addWidget(descr)
+        layout_h.addWidget(descr)
 
-        self.addStretch()
+        layout_h.addStretch()
 
     def btn_cmd(self, flag: Literal["jpg", "tiff"]):
         if flag == "jpg":
@@ -259,28 +277,30 @@ class WinSettings(WinStandartBase):
         self.content_layout.addSpacerItem(QSpacerItem(0, 10))
 
         self.browse_coll = BrowseColl()
-        self.content_layout.addLayout(self.browse_coll)
-        self.content_layout.addLayout(self.my_separ())
+        self.content_layout.addWidget(self.browse_coll)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.change_lang = ChangeLang()
-        self.content_layout.addLayout(self.change_lang)
-        self.content_layout.addLayout(self.my_separ())
+        self.content_layout.addWidget(self.change_lang)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.thumb_move = ThumbMove()
-        self.content_layout.addLayout(self.thumb_move)
-        self.content_layout.addLayout(self.my_separ())
+        self.content_layout.addWidget(self.thumb_move)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.cust_filters = CustFilters()
-        self.content_layout.addLayout(self.cust_filters)
-        self.content_layout.addLayout(self.my_separ())
+        self.content_layout.addWidget(self.cust_filters)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.stopwords = StopWords()
-        self.content_layout.addLayout(self.stopwords)
-        self.content_layout.addLayout(self.my_separ())
+        self.content_layout.addWidget(self.stopwords)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.stopcolls = StopColls()
-        self.content_layout.addLayout(self.stopcolls)
-        self.content_layout.addLayout(self.my_separ())
+        self.content_layout.addWidget(self.stopcolls)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+
+        self.content_layout.addStretch()
 
         btns_layout = LayoutH()
         self.content_layout.addLayout(btns_layout)
@@ -298,11 +318,6 @@ class WinSettings(WinStandartBase):
         btns_layout.addWidget(self.cancel_btn)
 
         btns_layout.addStretch(1)
-
-    def my_separ(self, value=40) -> LayoutV:
-        v_layout = LayoutV()
-        v_layout.addSpacerItem(QSpacerItem(0, value))
-        return v_layout
 
     def cancel_cmd(self, e):
         self.deleteLater()
