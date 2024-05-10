@@ -20,7 +20,7 @@ class Manager:
     smb_win = None
 
 
-class RightWidget(QWidget):
+class RightWidget(QFrame):
     def __init__(self):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
@@ -28,16 +28,10 @@ class RightWidget(QWidget):
         v_layout = LayoutV(self)
 
         self.filters_bar = FiltersBar()
-
-        sep = QFrame()
-        sep.setFixedHeight(1)
-        sep.setStyleSheet("background-color: black;")
-
         self.thumbnails = Thumbnails()
         self.st_bar = StBar()
 
         v_layout.addWidget(self.filters_bar)
-        v_layout.addWidget(sep)
         v_layout.addWidget(self.thumbnails)
         v_layout.addWidget(self.st_bar)
 

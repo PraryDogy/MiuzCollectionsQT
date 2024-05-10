@@ -15,39 +15,26 @@ class Manager:
     win_settings = None
 
 
-class StBar(QWidget):
+class StBar(QFrame):
     def __init__(self):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedHeight(28)
+        self.setObjectName("st_bar")
         self.setStyleSheet(
             f"""
+            #st_bar {{
             background-color: {Styles.st_bar_bg_color};
             border-bottom-right-radius: {Styles.base_radius}px;
+            border-top: 1px solid black;
+            }}
             """)
-
-        v_layout = LayoutV(self)
-
-        h_frame = QFrame()
-        h_frame.setFixedHeight(1)
-        h_frame.setStyleSheet(
-            f"""
-            background-color: black;
-            """)
-        v_layout.addWidget(h_frame)
-
-        main_wid = QWidget()
-        main_wid.setContentsMargins(0, 0, 0, 0)
-        main_wid.setStyleSheet(
-            f"""
-            background-color: {Styles.st_bar_bg_color};
-            """)
-        v_layout.addWidget(main_wid)
-        self.h_layout = LayoutH(main_wid)
+        
+        self.h_layout = LayoutH(self)
         self.init_ui()
         
         gui_signals_app.reload_stbar.connect(self.reload_stbar)
-        
+
     def init_ui(self):
         self.h_layout.addStretch(1)
 
