@@ -1,1 +1,0 @@
-from .shedule import watcher_app

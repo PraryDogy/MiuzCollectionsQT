@@ -1,8 +1,0 @@
-# pip install --upgrade pip
-# pip install --upgrade pip setuptools wheel
-opencv-python==4.6.0.66
-greenlet==3.0.3
-pillow==10.2.0
-PyQt5==5.15.10
-SQLAlchemy==2.0.25
-watchdog==3.0.0
