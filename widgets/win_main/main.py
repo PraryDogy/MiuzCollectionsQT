@@ -96,7 +96,7 @@ class WinMain(BaseEmptyWin):
         gui_signals_app.reload_title.connect(self.reload_title)
 
         content_wid = ContentWid()
-        self.base_layout.addWidget(content_wid)
+        self.central_layout.addWidget(content_wid)
 
         # что делать при выходе
         quit_action = QAction("Quit", self)

@@ -58,16 +58,20 @@ class Btns(QWidget):
         return super().eventFilter(source, event)
 
 
-class CustomTitleBar(QFrame):
+class TitleBar(QFrame):
     def __init__(self, win: QMainWindow):
         super().__init__(win)
         self.my_win = win
         self.setFixedHeight(33)
+        self.setObjectName("title_bar")
         self.setStyleSheet(
             f"""
+            #title_bar {{
             background: {Styles.st_bar_bg_color};
             border-top-right-radius: {Styles.base_radius}px;
             border-top-left-radius: {Styles.base_radius}px;
+            border-bottom: 1px solid black;
+            }}
             """)
 
         self.main_layout = LayoutH()
@@ -105,39 +109,31 @@ class BaseEmptyWin(QMainWindow):
 
     def __init__(self, close_func: callable, parent=None):
         super().__init__(parent=parent)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
-        main_widget = QWidget()
-        self.setCentralWidget(main_widget)
-        zero_layout = LayoutV(main_widget)
-
-        border_wid = QWidget()
-        border_wid.setContentsMargins(1, 1, 1, 1)
-        border_wid.setObjectName("border_wid")
-        border_wid.setStyleSheet(
+        central_widget = QWidget()
+        central_widget.setContentsMargins(1, 1, 1, 1)
+        central_widget.setObjectName("central_widget")
+        central_widget.setStyleSheet(
             f"""
-            #border_wid 
+            #central_widget 
                 {{
                 border-radius: {Styles.base_radius}px;
-                background: {Styles.menu_sel_item_color}
+                background: {Styles.menu_sel_item_color};
                 }}
             """)
-        zero_layout.addWidget(border_wid)
 
-        self.base_layout = LayoutV()
-        border_wid.setLayout(self.base_layout)
+        self.setCentralWidget(central_widget)
+        self.central_layout = LayoutV(central_widget)
 
-        self.titlebar = CustomTitleBar(self)
+        self.titlebar = TitleBar(self)
         self.titlebar.btns.max_btn.mouseReleaseEvent = self.toggle_fullscreen
         self.titlebar.btns.min_btn.mouseReleaseEvent = lambda e: self.showMinimized()
         self.titlebar.btns.close_btn.mouseReleaseEvent = close_func
-        self.base_layout.addWidget(self.titlebar)
-
-        sep = QFrame()
-        sep.setFixedHeight(1)
-        sep.setStyleSheet("background-color: black;")
-        self.base_layout.addWidget(sep)
+        self.titlebar.btns.max_btn.setDisabled(True)
+        self.titlebar.btns.max_btn.set_icon("gray-2.svg")
+        self.central_layout.addWidget(self.titlebar)
 
         self.gripSize = 16
         self.grips = []
@@ -145,9 +141,6 @@ class BaseEmptyWin(QMainWindow):
             grip = QSizeGrip(self)
             grip.resize(self.gripSize, self.gripSize)
             self.grips.append(grip)
-
-        self.titlebar.btns.max_btn.setDisabled(True)
-        self.titlebar.btns.max_btn.set_icon("gray-2.svg")
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -209,7 +202,7 @@ class WinStandartBase(BaseEmptyWin):
         self.titlebar.setFixedHeight(28)
 
         self.content_wid = BaseBottomWid()
-        self.base_layout.addWidget(self.content_wid)
+        self.central_layout.addWidget(self.content_wid)
 
         self.content_layout = LayoutV()
         self.content_wid.setLayout(self.content_layout)
@@ -222,7 +215,7 @@ class WinImgViewBase(BaseEmptyWin):
         self.titlebar.setFixedHeight(28)
 
         self.content_wid = BaseBottomWid(left=10, top=0, right=10, bottom=0)
-        self.base_layout.addWidget(self.content_wid)
+        self.central_layout.addWidget(self.content_wid)
 
         self.content_layout = LayoutV()
         self.content_wid.setLayout(self.content_layout)
@@ -238,7 +231,7 @@ class WinSmallBase(BaseEmptyWin):
         self.titlebar.setFixedHeight(28)
 
         self.content_wid = BaseBottomWid(left=10, top=5, right=10, bottom=7)
-        self.base_layout.addWidget(self.content_wid)
+        self.central_layout.addWidget(self.content_wid)
 
         self.content_layout = LayoutV()
         self.content_wid.setLayout(self.content_layout)
