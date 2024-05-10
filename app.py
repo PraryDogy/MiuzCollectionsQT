@@ -43,7 +43,6 @@ class App(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
 
-        self.setAttribute(Qt.AA_UseHighDpiPixmaps)
         self.setStyleSheet(
             f"""
             QLabel {{ color: white; }};
