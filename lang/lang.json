@@ -1,0 +1,380 @@
+{
+    "about_my_app": [
+        "О приложении",
+        "Show about app"
+    ],
+    "adding_photos": [
+        "Добавляю новые фотографии",
+        "Adding new photos"
+    ],
+    "all_colls": [
+        "Все коллекции",
+        "All collections"
+    ],
+    "browse": [
+        "Обзор",
+        "Browse"
+    ],
+    "browse_coll_first": [
+        "Укажите расположение коллекций\nили оставьте по умолчанию.",
+        "Specify the location of collections\nor leave it as default."
+    ],
+    "browse_colls_descr": [
+        "Расположение коллекций",
+        "Collections location"
+    ],
+    "cancel": [
+        "Отмена",
+        "Cancel"
+    ],
+    "choose_user_first": [
+        "Выберите тип пользователя.\nСтандарт: подходит для просмотра.\nДизайнер: возможность работы со слоями",
+        "Choose user type.\nStandard: suitable for viewing.\nDesigner: ability to work with layers."
+    ],
+    "close": [
+        "Закрыть",
+        "Close"
+    ],
+    "collection": [
+        "Коллекция",
+        "Collection"
+    ],
+    "copy": [
+        "Копировать",
+        "Copy"
+    ],
+    "copy_all": [
+        "Копировать все",
+        "Copy all"
+    ],
+    "copy_selected": [
+        "Копировать выделенный текст",
+        "Copy selected text"
+    ],
+    "copying": [
+        "Копирую",
+        "Copying"
+    ],
+    "copying_files": [
+        "Копирую файлы...",
+        "Copying files..."
+    ],
+    "copying_title": [
+        "Копирование",
+        "Copying"
+    ],
+    "cust_fltr_names": [
+        {
+            "prod": "Имиджи",
+            "mod": "Модели"
+        },
+        {
+            "prod": "Product",
+            "mod": "Models"
+        }
+    ],
+    "cut": [
+        "Вырезать",
+        "Cut"
+    ],
+    "d_m_y": [
+        "день.месяц.год",
+        "day.month.year"
+    ],
+    "date_changed": [
+        "Дата изменения",
+        "Date changed"
+    ],
+    "dates": [
+        "Даты",
+        "Dates"
+    ],
+    "deleting_photos": [
+        "Удаляю лишнее",
+        "Removing unnecessary"
+    ],
+    "end": [
+        "Конец",
+        "End"
+    ],
+    "file_name": [
+        "Имя файла",
+        "Filename"
+    ],
+    "file_path": [
+        "Расположение",
+        "Location"
+    ],
+    "file_size": [
+        "Размер",
+        "Size"
+    ],
+    "in_finder": [
+        "в Finder",
+        "in Finder"
+    ],
+    "info": [
+        "Инфо",
+        "Info"
+    ],
+    "lang_label": [
+        "Язык/Language",
+        "Language/Язык"
+    ],
+    "layers": [
+        "Слои",
+        "Layers"
+    ],
+    "loading": [
+        "Загрузка...",
+        "Loading..."
+    ],
+    "mb": [
+        "мб",
+        "mb"
+    ],
+    "months": [
+        {
+            "1": "Январь",
+            "2": "Февраль",
+            "3": "Март",
+            "4": "Апрель",
+            "5": "Май",
+            "6": "Июнь",
+            "7": "Июль",
+            "8": "Август",
+            "9": "Сентябрь",
+            "10": "Октябрь",
+            "11": "Ноябрь",
+            "12": "Декабрь"
+        },
+        {
+            "1": "January",
+            "2": "February",
+            "3": "March",
+            "4": "April",
+            "5": "May",
+            "6": "June",
+            "7": "July",
+            "8": "August",
+            "9": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December"
+        }
+    ],
+    "months_genitive_case": [
+        {
+            "1": "января",
+            "2": "февраля",
+            "3": "марта",
+            "4": "апреля",
+            "5": "мая",
+            "6": "июня",
+            "7": "июля",
+            "8": "августа",
+            "9": "сентября",
+            "10": "октября",
+            "11": "ноября",
+            "12": "декабря"
+        },
+        {
+            "1": "january",
+            "2": "february",
+            "3": "march",
+            "4": "april",
+            "5": "may",
+            "6": "june",
+            "7": "july",
+            "8": "august",
+            "9": "september",
+            "10": "october",
+            "11": "november",
+            "12": "december"
+        }
+    ],
+    "name": [
+        "ru",
+        "en"
+    ],
+    "no_connection": [
+        "Нет подключения",
+        "No connection"
+    ],
+    "no_photo": [
+        "Нет фотографий",
+        "No photos"
+    ],
+    "no_photo_filter": [
+        "Нет фотографий в категории",
+        "No photos in cathegory"
+    ],
+    "no_tiff": [
+        "Не могу найти слои",
+        "Can't find layers"
+    ],
+    "ok": [
+        "Ок",
+        "Ok"
+    ],
+    "open_settings_window": [
+        "Открыть настройки",
+        "Open settings window"
+    ],
+    "paste": [
+        "Вставить",
+        "Paste"
+    ],
+    "photo": [
+        "Фото",
+        "Photo"
+    ],
+    "photos_named_dates": [
+        "Фото за даты",
+        "Photo from"
+    ],
+    "recents": [
+        "Недавние",
+        "Recents"
+    ],
+    "reset": [
+        "Сброс",
+        "Reset"
+    ],
+    "reset_dates": [
+        "Сбросить даты",
+        "Dates reset"
+    ],
+    "reset_search": [
+        "Очистить поиск",
+        "Reset search"
+    ],
+    "resolution": [
+        "Разрешение",
+        "Resolution"
+    ],
+    "reveal": [
+        "Показать",
+        "Reveal"
+    ],
+    "reveal_in_finder": [
+        "Показать в Finder",
+        "Reveal in Finder"
+    ],
+    "save_group_downloads": [
+        "Сохранить группу фото в загрузки",
+        "Save group of photos to Downloads"
+    ],
+    "save_group_in": [
+        "Сохранить группу фото как...",
+        "Save group of photos as..."
+    ],
+    "save_image_downloads": [
+        "Сохранить в загрузки",
+        "Save to Downloads"
+    ],
+    "save_image_in": [
+        "Сохранить как...",
+        "Save as..."
+    ],
+    "search": [
+        "Поиск",
+        "Search"
+    ],
+    "search_dates": [
+        "Поиск фотографий по датам.\nУправляйте датами с клавишами вверх/вниз.",
+        "Searching for photos by dates.\nControl dates with up/down keys."
+    ],
+    "searching_photos": [
+        "Поиск новых фотографий",
+        "Searching for new photos"
+    ],
+    "sett_stopcolls": [
+        "Скрыть коллекции",
+        "Hide collections"
+    ],
+    "sett_stopwords": [
+        "Игнорировать * в имени файла при поиске tiff/psd",
+        "Ignore * in the file name when searching for tiff/psd"
+    ],
+    "settings": [
+        "Настройки",
+        "Settings"
+    ],
+    "show_all": [
+        "Показать все",
+        "Show all"
+    ],
+    "show_more": [
+        "Позазать еще",
+        "Show more"
+    ],
+    "smb_descr": [
+        "Коллекции недоступны.\nВозможные причины:\n\n- Нет подключения к интернету\n- Нет подключения к сетевому диску\n- Неправильно указано расположение коллекций\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh",
+        "Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh"
+    ],
+    "start": [
+        "Начало",
+        "Start"
+    ],
+    "sys_fltr_names": [
+        {
+            "other": "Остальное"
+        },
+        {
+            "other": "Other"
+        }
+    ],
+    "thumb_move": [
+        "Копировать при перетаскивании",
+        "Copy on drag"
+    ],
+    "total": [
+        "Всего",
+        "Total"
+    ],
+    "user_designer": [
+        "Дизайнер",
+        "Designer"
+    ],
+    "user_standart": [
+        "Стандарт",
+        "Standart"
+    ],
+    "view": [
+        "Просмотр",
+        "View"
+    ],
+    "weekdays": [
+        {
+            "0": "понедельник",
+            "1": "вторник",
+            "2": "среда",
+            "3": "четверг",
+            "4": "пятница",
+            "5": "суббота",
+            "6": "воскресенье"
+        },
+        {
+            "0": "monday",
+            "1": "tuesday",
+            "2": "wednesday",
+            "3": "thursday",
+            "4": "friday",
+            "5": "saturday",
+            "6": "sunday"
+        }
+    ],
+    "with_name": [
+        "с именем",
+        "with name"
+    ],
+    "wait_scan_finished": [
+        "Пожалуйста, подождите. Идет поиск фотографий.",
+        "Please, wait. Searching for new photos."
+    ],
+    "choose_coll_smb": [
+        "Укажите расположение коллекций",
+        "Choose collections folder"
+    ]
+}

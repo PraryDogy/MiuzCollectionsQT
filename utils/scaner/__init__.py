@@ -1,0 +1,1 @@
+from .shedule import scaner_app
