@@ -9,7 +9,7 @@ from .layouts import LayoutH
 
 class SvgBtn(QWidget):
     def __init__(self, icon_name: str, size: int, parent: QWidget = None):
-        QWidget.__init__(self, parent=parent)
+        super().__init__(self, parent=parent)
         self.setStyleSheet(f"""background-color: transparent;""")
 
         h_layout = LayoutH()
