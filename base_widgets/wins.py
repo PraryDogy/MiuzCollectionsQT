@@ -105,8 +105,6 @@ class TitleBar(QFrame):
 
 
 class BaseEmptyWin(QMainWindow):
-    was_closed = pyqtSignal()
-
     def __init__(self, close_func: callable, parent=None):
         super().__init__(parent=parent)
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)

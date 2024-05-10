@@ -11,7 +11,7 @@ from styles import Styles
 
 
 class Manager:
-    win_dates = None
+    win_dates: WinDates = None
 
 
 class DatesBtn(Btn):
