@@ -104,7 +104,7 @@ class TitleBar(QFrame):
             """)
 
 
-class BaseEmptyWin(QMainWindow):
+class WinBase(QMainWindow):
     def __init__(self, close_func: callable, parent=None):
         super().__init__(parent=parent)
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
@@ -194,7 +194,7 @@ class BaseBottomWid(QFrame):
             """)
 
 
-class WinStandartBase(BaseEmptyWin):
+class WinStandartBase(WinBase):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
         self.titlebar.setFixedHeight(28)
@@ -206,7 +206,7 @@ class WinStandartBase(BaseEmptyWin):
         self.content_wid.setLayout(self.content_layout)
     
 
-class WinImgViewBase(BaseEmptyWin):
+class WinImgViewBase(WinBase):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
 
@@ -222,7 +222,7 @@ class WinImgViewBase(BaseEmptyWin):
         self.content_wid.mouseReleaseEvent = func
 
 
-class WinSmallBase(BaseEmptyWin):
+class WinSmallBase(WinBase):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
 

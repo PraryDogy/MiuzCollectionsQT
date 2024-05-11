@@ -5,7 +5,7 @@ from PyQt5.QtGui import QResizeEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
                              QMainWindow, QPushButton, QVBoxLayout, QWidget)
 
-from base_widgets import BaseEmptyWin, LayoutH, LayoutV
+from base_widgets import WinBase, LayoutH, LayoutV
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from utils import MainUtils
@@ -86,7 +86,7 @@ class ContentWid(QFrame):
         h_layout.addWidget(self.right_widget)
 
 
-class WinMain(BaseEmptyWin):
+class WinMain(WinBase):
     def __init__(self):
         super().__init__(close_func=self.mycloseEvent)
 
