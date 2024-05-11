@@ -9,7 +9,8 @@ from .layouts import LayoutH
 
 class SvgBtn(QWidget):
     def __init__(self, icon_name: str, size: int, parent: QWidget = None):
-        super().__init__(self, parent=parent)
+
+        super().__init__(parent=parent)
         self.setStyleSheet(f"""background-color: transparent;""")
 
         h_layout = LayoutH()
@@ -26,13 +27,9 @@ class SvgBtn(QWidget):
 
 
 class SvgShadowed(SvgBtn):
-    def __init__(
-            self,
-            icon_name: str,
-            size: int,
-            shadow_depth: int = 200,
-            parent: QWidget = None
-            ):
+    def __init__(self, icon_name: str, size: int, shadow_depth: int = 200,
+                 parent: QWidget = None):
+
         super().__init__(icon_name, size, parent)
 
         effect = QGraphicsDropShadowEffect()

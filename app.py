@@ -42,12 +42,7 @@ class TestWid(QWidget):
 class App(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
-
-        self.setStyleSheet(
-            f"""
-            QLabel {{ color: white; }};
-            """
-            )
+        self.setStyleSheet(f"""QLabel {{color: white;}}""")
 
         self.main_win = WinMain()
         self.main_win.show()
