@@ -20,12 +20,12 @@ class BaseLeftMenu(QScrollArea):
         self.setStyleSheet(
             f"""
             QScrollArea {{
-                border: 0px;}}
+                border: 0px;
+                border-right: 1px solid black;
+                }}
             {Styles.get_scroll_style(Styles.menu_sel_item_color)}
             """)
 
-        # if MainUtils.get_mac_ver() <= 10.15:
-        # self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.scroll_widget = QWidget()
@@ -99,11 +99,14 @@ class LeftMenu(QFrame):
 
         fake = QFrame()
         fake.setFixedWidth(10)
+        fake.setObjectName("fake_widget")
         fake.setStyleSheet(
             f"""
+            #fake_widget{{
             border: 0px;
             background-color: {Styles.menu_bg_color};
             border-bottom-left-radius: {Styles.base_radius}px;
+            }}
             """)
         h_lay.addWidget(fake)
 

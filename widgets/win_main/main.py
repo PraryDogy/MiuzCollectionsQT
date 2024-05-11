@@ -23,7 +23,6 @@ class Manager:
 class RightWidget(QFrame):
     def __init__(self):
         super().__init__()
-        self.setContentsMargins(0, 0, 0, 0)
 
         v_layout = LayoutV(self)
 
@@ -51,22 +50,15 @@ class RightWidget(QFrame):
         return super().resizeEvent(a0)
 
 
-class ContentWid(QWidget):
+class ContentWid(QFrame):
     def __init__(self):
         super().__init__()
-        self.setContentsMargins(0, 0, 0, 0)
         h_layout = LayoutH(self)
 
         self.left_menu = LeftMenu()
-
-        vertical_separator = QFrame()
-        vertical_separator.setFixedWidth(1)
-        vertical_separator.setStyleSheet("background-color: black;")
-
         self.right_widget = RightWidget()
 
         h_layout.addWidget(self.left_menu)
-        h_layout.addWidget(vertical_separator)
         h_layout.addWidget(self.right_widget)
 
 
