@@ -48,7 +48,6 @@ QScrollArea#menu_scrollbar {
     border: 0px;
     border-right: 1px solid black;
     }
-
 QScrollBar#menu_scrollbar:vertical {
     background-color: transparent;
     width: 10px;
@@ -211,4 +210,43 @@ QScrollBar#menu_scrollbar::add-page:vertical, QScrollBar#menu_scrollbar::sub-pag
 #th_title {
     font-size: 18pt;
     font-weight: bold;
+}
+
+
+QScrollArea#th_scrollbar {
+    background-color: #1e1e1e;
+    border: 0px;
+    border-radius: 0px;
+    }
+QScrollBar#th_scrollbar:vertical {
+    background-color: transparent;
+    width: 10px;
+    padding-right:2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+QScrollBar#th_scrollbar::handle:vertical {
+    background-color: #303030;
+    border-radius: 4px;
+}
+QScrollBar#th_scrollbar::handle:vertical:hover {
+    background-color: #676767;
+    border-radius: 4px;
+}
+QScrollBar#th_scrollbar::add-line:vertical {
+    height: 0px;
+}
+QScrollBar#th_scrollbar::sub-line:vertical {
+    height: 0px;
+}
+QScrollBar#th_scrollbar::add-page:vertical, QScrollBar#th_scrollbar::sub-page:vertical {
+    height: 0px;
+}
+
+
+
+
+
+#th_scroll_widget {
+    background-color: #1e1e1e;
 }

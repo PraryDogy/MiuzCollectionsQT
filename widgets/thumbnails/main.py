@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 from base_widgets import LayoutH, LayoutV
 from cfg import cnf
 from signals import gui_signals_app
-from styles import Styles
+from styles import Styles, Names, default_theme
 from utils import MainUtils
 
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
@@ -22,25 +22,15 @@ class Thumbnails(QScrollArea):
         super().__init__()
         self.setWidgetResizable(True)
         self.resize(cnf.root_g["aw"] - Styles.menu_w, cnf.root_g["ah"])
-
-        self.setStyleSheet(
-            f"""
-            QScrollArea {{
-                background-color: {Styles.thumbs_bg_color};
-                border: 0px;
-                border-radius: 0px;
-            }}
-            {Styles.get_scroll_style(Styles.btn_base_color)}
-            """)
+        self.setObjectName(Names.th_scrollbar)
+        self.setStyleSheet(default_theme)
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         # Создаем фрейм для виджетов в области скролла
         self.scroll_area_widget = QWidget()
-        self.scroll_area_widget.setStyleSheet(
-            f"""
-            background-color: {Styles.thumbs_bg_color}
-            """)
+        self.scroll_area_widget.setObjectName(Names.th_scroll_widget)
+        self.scroll_area_widget.setStyleSheet(default_theme)
         
         # Основной лейаут фрейма в области скролла
         frame_layout = LayoutV(self.scroll_area_widget)
