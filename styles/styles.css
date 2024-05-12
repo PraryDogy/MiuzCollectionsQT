@@ -140,3 +140,43 @@ QScrollBar#menu_scrollbar::add-page:vertical, QScrollBar#menu_scrollbar::sub-pag
     background-color: #2e59cb;
     border-radius: 8;
 }
+
+/* STATUS BAR */
+#st_bar_frame {
+    background-color: #242424;
+    border-bottom-right-radius: 10px;
+    border-top: 1px solid black;
+}
+
+#st_bar_jpg {
+    background: #303030;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+#st_bar_jpg_sel {
+    background: #676767;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+#st_bar_tiff {
+    background: #303030;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+#st_bar_tiff_sel {
+    background: #676767;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+

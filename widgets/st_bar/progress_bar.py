@@ -59,3 +59,5 @@ class ProgressBar(QWidget):
 
     def progressbar_hide(self):
         self.hide()
+
+        

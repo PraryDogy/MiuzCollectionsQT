@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutH, LayoutV, SvgBtn
 from cfg import cnf
 from signals import gui_signals_app
-from styles import Styles
+from styles import Names, default_theme
 from utils import MainUtils
 
 from ..win_settings import WinSettings
@@ -20,15 +20,8 @@ class StBar(QFrame):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedHeight(28)
-        self.setObjectName("st_bar")
-        self.setStyleSheet(
-            f"""
-            #st_bar {{
-            background-color: {Styles.st_bar_bg_color};
-            border-bottom-right-radius: {Styles.base_radius}px;
-            border-top: 1px solid black;
-            }}
-            """)
+        self.setObjectName(Names.st_bar_frame)
+        self.setStyleSheet(default_theme)
         
         self.h_layout = LayoutH(self)
         self.init_ui()

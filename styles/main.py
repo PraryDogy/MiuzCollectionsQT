@@ -24,6 +24,12 @@ class Names:
 
     notification_widget = "notification_widget"
 
+    st_bar_frame = "st_bar_frame"
+    st_bar_jpg = "st_bar_jpg"
+    st_bar_jpg_sel = "st_bar_jpg_sel"
+    st_bar_tiff = "st_bar_tiff"
+    st_bar_tiff_sel = "st_bar_tiff_sel"
+
 
 class Styles:
     big_radius = 8
