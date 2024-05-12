@@ -220,3 +220,37 @@ QScrollArea#th_scrollbar {
 #th_scroll_widget {
     background-color: #1e1e1e;
 }
+
+
+/* FIRST LOAD, SETTINGS */
+#btn_jpg {
+    background: #303030;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+#btn_jpg_selected{
+    background: #2e59cb;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+#btn_tiff {
+    background: #303030;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+#btn_tiff_selected {
+    background: #2e59cb;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}

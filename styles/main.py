@@ -36,6 +36,11 @@ class Names:
     st_bar_tiff = "st_bar_tiff"
     st_bar_tiff_sel = "st_bar_tiff_sel"
 
+    btn_jpg = "btn_jpg"
+    btn_jpg_selected = "btn_jpg_selected"
+    btn_tiff = "btn_tiff"
+    btn_tiff_selected = "btn_tiff_selected"
+
 
 class Styles:
     big_radius = 8

@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QLabel, QSpacerItem,
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from styles import Styles
+from styles import Names, default_theme
 from utils import MainUtils
 
 
@@ -140,28 +140,28 @@ class ChooseUserType(QWidget):
 
         h_layout.addStretch()
 
-        self.btn_standart = Btn(cnf.lng.user_standart)
-        self.btn_standart.setStyleSheet(self.get_jpg_style())
-        self.btn_standart.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
-        h_layout.addWidget(self.btn_standart)
+        self.jpg_btn = Btn(cnf.lng.user_standart)
+        self.set_jpg_btn_style()
+        self.jpg_btn.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
+        h_layout.addWidget(self.jpg_btn)
 
         h_layout.addSpacerItem(QSpacerItem(1, 0))
 
-        self.btn_tiff = Btn(cnf.lng.user_designer)
-        self.btn_tiff.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
-        self.btn_tiff.setStyleSheet(self.get_tiff_style())
-        h_layout.addWidget(self.btn_tiff)
+        self.tiff_btn = Btn(cnf.lng.user_designer)
+        self.tiff_btn.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
+        self.set_tiff_btn_style()
+        h_layout.addWidget(self.tiff_btn)
 
         h_layout.addStretch()
 
     def btn_cmd(self, flag: Literal["jpg", "tiff"]):
         if flag == "jpg":
             self.move_jpg = not self.move_jpg
-            self.btn_standart.setStyleSheet(self.get_jpg_style())
+            self.set_jpg_btn_style()
         
         elif flag == "tiff":
             self.move_layers = not self.move_layers
-            self.btn_tiff.setStyleSheet(self.get_tiff_style())
+            self.set_tiff_btn_style()
 
     def finalize(self):
         if self.move_jpg != cnf.move_jpg or self.move_layers != cnf.move_layers:
@@ -169,30 +169,20 @@ class ChooseUserType(QWidget):
             cnf.move_layers = self.move_layers
             gui_signals_app.reload_stbar.emit()
 
-    def get_bg(self, flag: Literal["jpg", "tiff"]):
-        if flag == "jpg":
-            return Styles.blue_color if self.move_jpg else Styles.btn_base_color
-        
-        elif flag == "tiff":
-            return Styles.blue_color if self.move_layers else Styles.btn_base_color
+    def set_jpg_btn_style(self):
+        if self.move_jpg:
+            self.jpg_btn.setObjectName(Names.btn_jpg_selected)
+        else:
+            self.jpg_btn.setObjectName(Names.btn_jpg)
+        self.jpg_btn.setStyleSheet(default_theme)
 
-    def get_jpg_style(self):
-        return f"""
-                background: {self.get_bg("jpg")};
-                border-top-left-radius: {Styles.small_radius}px;
-                border-bottom-left-radius: {Styles.small_radius}px;
-                border-top-right-radius: 0px;
-                border-bottom-right-radius: 0px;
-                """
+    def set_tiff_btn_style(self):
+        if self.move_layers:
+            self.tiff_btn.setObjectName(Names.btn_tiff_selected)
+        else:
+            self.tiff_btn.setObjectName(Names.btn_tiff)
+        self.tiff_btn.setStyleSheet(default_theme)
 
-    def get_tiff_style(self):
-        return f"""
-                background: {self.get_bg("tiff")};
-                border-top-left-radius: 0px;
-                border-bottom-left-radius: 0px;
-                border-top-right-radius: {Styles.small_radius}px;
-                border-bottom-right-radius: {Styles.small_radius}px;
-                """
 
 class WinFirstLoad(WinStandartBase):
     def __init__(self):
