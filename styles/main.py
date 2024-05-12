@@ -58,3 +58,4 @@ class Names:
     title_bar = "title_bar"
     central_widget = "central_widget"
     base_bottom_widget = "base_bottom_widget"
+    separator = "separator"

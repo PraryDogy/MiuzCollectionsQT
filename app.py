@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
 from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from styles import Themes
+from styles import Names, Themes
 from utils import MainUtils
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
@@ -93,9 +93,14 @@ class ContentWid(QFrame):
         h_layout = LayoutH(self)
 
         self.left_menu = LeftMenu()
+        sep = QFrame()
+        sep.setFixedWidth(1)
+        sep.setObjectName(Names.separator)
+        sep.setStyleSheet(Themes.current)
         self.right_widget = RightWidget()
 
         h_layout.addWidget(self.left_menu)
+        h_layout.addWidget(sep)
         h_layout.addWidget(self.right_widget)
 
 
