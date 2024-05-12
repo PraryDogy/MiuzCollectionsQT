@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
-from styles import Styles
+from styles import Names, default_theme
 
 from ..gui_thread_save_files import GuiThreadSaveFiles
 
@@ -90,11 +90,8 @@ class Title(QLabel):
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)
         self.setContentsMargins(0, 0, 0, 5)
-        self.setStyleSheet(
-            f"""
-            font-size: {Styles.title_font_size};
-            font-weight: bold;
-            """)
+        self.setObjectName(Names.th_title)
+        self.setStyleSheet(default_theme)
 
         self.images = images
         self.my_context = None
