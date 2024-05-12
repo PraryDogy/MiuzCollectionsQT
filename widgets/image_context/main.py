@@ -92,6 +92,11 @@ class ImageContext(ContextMenuBase):
                 parent.setStyleSheet(Themes.current)
             except Exception as e:
                 print(e)
+        else:
+            try:
+                self.show_menu()
+            except Exception as e:
+                print(e)
 
     def show_info_win(self, img_src):
         if isinstance(self.my_parent, QMainWindow):
