@@ -113,10 +113,22 @@ QScrollBar#menu_scrollbar::add-page:vertical, QScrollBar#menu_scrollbar::sub-pag
     margin-right: 5px;
 }
 
+
 /* FILTER BAR FRAME */
 
 #filter_bar_frame {
     background-color: #242424;
     border-radius: 0px;
     border-bottom: 1px solid black;
+}
+
+
+/* THUMBNAIL */
+
+#thumbnail_normal {
+    border: 2px solid transparent;
+}
+
+#thumbnail_selected {
+    border: 2px solid #2e59cb;
 }

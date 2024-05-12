@@ -19,6 +19,9 @@ class Names:
 
     filter_bar_frame = "filter_bar_frame"
 
+    thumbnail_normal = "thumbnail_normal"
+    thumbnail_selected = "thumbnail_selected"
+
 
 class Styles:
     big_radius = 8

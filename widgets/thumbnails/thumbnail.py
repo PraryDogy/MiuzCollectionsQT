@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QLabel
 
 from cfg import cnf
 from signals import gui_signals_app
+from styles import Names, default_theme
 from utils import FindTiffLocal, PixmapThumb
 
 from ..image_context import ImageContext
@@ -25,10 +26,8 @@ class Thumbnail(QLabel, QObject):
         self.show_no_tiff = False
         cnf.images.append(img_src)
 
-        self.setStyleSheet(
-            f"""
-            border: 2px solid transparent;
-            """)
+        self.setObjectName(Names.thumbnail_normal)
+        self.setStyleSheet(default_theme)
 
         byte_array = PixmapThumb(byte_array)
         if cnf.zoom:

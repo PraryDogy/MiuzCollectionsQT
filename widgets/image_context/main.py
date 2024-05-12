@@ -3,7 +3,7 @@ from functools import partial
 from PyQt5.QtWidgets import QAction, QLabel, QMainWindow
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
-from styles import Styles
+from styles import Names, default_theme
 
 from ..win_info import WinInfo
 from ..gui_thread_reveal_files import GuiThreadRevealFiles
@@ -82,25 +82,15 @@ class ImageContext(ContextMenuBase):
         self.tiff_thread = None
         self.save_files = None
 
-        try:
-            if not isinstance(parent, QMainWindow):
-                parent.setStyleSheet(
-                    f"""
-                    border: 2px solid {Styles.blue_color};
-                    """)
-        except Exception as e:
-            print(e)
-
-        self.show_menu()
-
-        try:
-            if not isinstance(parent, QMainWindow):
-                parent.setStyleSheet(
-                    f"""
-                    border: 2px solid transparent;
-                    """)
-        except Exception as e:
-            print(e)
+        if parent.objectName() == Names.thumbnail_normal:
+            try:
+                parent.setObjectName(Names.thumbnail_selected)
+                parent.setStyleSheet(default_theme)
+                self.show_menu()
+                parent.setObjectName(Names.thumbnail_normal)
+                parent.setStyleSheet(default_theme)
+            except Exception as e:
+                print(e)
 
     def show_info_win(self, img_src):
         if isinstance(self.my_parent, QMainWindow):
