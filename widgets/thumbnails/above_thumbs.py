@@ -1,22 +1,21 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
-from cfg import cnf
-
 from base_widgets import LayoutH, LayoutV
-from styles import Styles
+from cfg import cnf
 from signals import gui_signals_app
+from styles import Names, Styles, default_theme
+
 
 class ResetDatesBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.reset_dates)
-        self.setFixedSize(Styles.thumbs_item_w, Styles.thumbs_item_h)
+        self.setFixedSize(120, 28)
         self.setAlignment(Qt.AlignCenter)
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.thumbs_item_color};
-            border-radius: {Styles.small_radius};
-            """)
+        self.setObjectName(Names.th_reset_dates_btn)
+        self.setStyleSheet(default_theme)
+
+        print(self.width(), self.height())
 
     def mouseReleaseEvent(self, event):
         cnf.date_start, cnf.date_end = None, None
@@ -30,13 +29,10 @@ class ResetDatesBtn(QLabel):
 class ResetSearchBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.reset_search)
-        self.setFixedSize(Styles.thumbs_item_w, Styles.thumbs_item_h)
+        self.setFixedSize(120, 28)
         self.setAlignment(Qt.AlignCenter)
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.thumbs_item_color};
-            border-radius: {Styles.small_radius};
-            """)
+        self.setObjectName(Names.th_reset_search_btn)
+        self.setStyleSheet(default_theme)
 
     def mouseReleaseEvent(self, event):
         cnf.current_limit = cnf.LIMIT
@@ -49,13 +45,10 @@ class ResetSearchBtn(QLabel):
 class ResetFiltersBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.show_all)
-        self.setFixedSize(Styles.thumbs_item_w, Styles.thumbs_item_h)
+        self.setFixedSize(120, 28)
         self.setAlignment(Qt.AlignCenter)
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.thumbs_item_color};
-            border-radius: {Styles.small_radius};
-            """)
+        self.setObjectName(Names.th_reset_filters_btn)
+        self.setStyleSheet(default_theme)
 
     def mouseReleaseEvent(self, event):
         cnf.current_limit = cnf.LIMIT
@@ -68,13 +61,10 @@ class ResetFiltersBtn(QLabel):
 class ShowAllBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.show_all)
-        self.setFixedSize(Styles.thumbs_item_w, Styles.thumbs_item_h)
+        self.setFixedSize(120, 28)
         self.setAlignment(Qt.AlignCenter)
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.thumbs_item_color};
-            border-radius: {Styles.small_radius};
-            """)
+        self.setObjectName(Names.th_show_all_btn)
+        self.setStyleSheet(default_theme)
 
     def mouseReleaseEvent(self, event):
         cnf.date_start, cnf.date_end = None, None
@@ -104,12 +94,9 @@ class AboveThumbsNoImages(QWidget):
         title_label.setFixedWidth(width - 20)
         title_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         title_label.setWordWrap(True)
-        title_label.setStyleSheet(
-            f"""
-            font-size: {Styles.title_font_size};
-            font-weight: bold;
-            """)
         self.v_layout.addWidget(title_label)
+        title_label.setObjectName(Names.th_title)
+        title_label.setStyleSheet(default_theme)
 
         h_layout = LayoutH()
         h_layout.setContentsMargins(0, 10, 0, 0)
@@ -167,11 +154,8 @@ class AboveThumbs(QWidget):
         self.v_layout.addWidget(label)
         label.setFixedWidth(width - 20)
         label.setWordWrap(True)
-        label.setStyleSheet(
-            f"""
-            font-size: {Styles.title_font_size};
-            font-weight: bold;
-            """)
+        label.setObjectName(Names.th_title)
+        label.setStyleSheet(default_theme)
 
         h_layout = LayoutH()
         h_layout.setContentsMargins(0, 10, 0, 0)

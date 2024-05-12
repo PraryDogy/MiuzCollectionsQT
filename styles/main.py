@@ -16,11 +16,15 @@ class Names:
 
     filter_btn = "filter_btn"
     filter_btn_selected = "filter_btn_selected"
-
     filter_bar_frame = "filter_bar_frame"
 
     thumbnail_normal = "thumbnail_normal"
     thumbnail_selected = "thumbnail_selected"
+    th_reset_dates_btn = "th_reset_dates_btn"
+    th_reset_search_btn = "th_reset_search_btn"
+    th_reset_filters_btn = "th_reset_filters_btn"
+    th_show_all_btn = "th_show_all_btn"
+    th_title = "th_title"
 
     notification_widget = "notification_widget"
 

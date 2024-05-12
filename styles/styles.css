@@ -123,17 +123,6 @@ QScrollBar#menu_scrollbar::add-page:vertical, QScrollBar#menu_scrollbar::sub-pag
 }
 
 
-/* THUMBNAIL */
-
-#thumbnail_normal {
-    border: 2px solid transparent;
-}
-
-#thumbnail_selected {
-    border: 2px solid #2e59cb;
-}
-
-
 /* NOTIFICATION WIDGET */
 
 #notification_widget {
@@ -180,3 +169,46 @@ QScrollBar#menu_scrollbar::add-page:vertical, QScrollBar#menu_scrollbar::sub-pag
     border-bottom-right-radius: 6px;
 }
 
+
+/* THUMBNAILS */
+
+#thumbnail_normal {
+    border: 2px solid transparent;
+}
+
+#thumbnail_selected {
+    border: 2px solid #2e59cb;
+}
+
+#th_reset_dates_btn{
+    /* width: 120px; */
+    /* height: 28px; */
+    background-color: #303030;
+    border-radius: 6;
+}
+
+#th_reset_search_btn{
+    /* width: 120px; */
+    /* height: 28px; */
+    background-color: #303030;
+    border-radius: 6;
+}
+
+#th_reset_filters_btn {
+    /* width: 120px; */
+    /* height: 28px; */
+    background-color: #303030;
+    border-radius: 6;
+}
+
+#th_show_all_btn{
+    /* width: 120px; */
+    /* height: 28px; */
+    background-color: #303030;
+    border-radius: 6;
+}
+
+#th_title {
+    font-size: 18pt;
+    font-weight: bold;
+}
