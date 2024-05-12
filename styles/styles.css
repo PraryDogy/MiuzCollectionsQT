@@ -132,3 +132,11 @@ QScrollBar#menu_scrollbar::add-page:vertical, QScrollBar#menu_scrollbar::sub-pag
 #thumbnail_selected {
     border: 2px solid #2e59cb;
 }
+
+
+/* NOTIFICATION WIDGET */
+
+#notification_widget {
+    background-color: #2e59cb;
+    border-radius: 8;
+}

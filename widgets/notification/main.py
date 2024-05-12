@@ -1,23 +1,18 @@
-from PyQt5.QtCore import QRect, Qt, QTimer
-from PyQt5.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
-                             QLabel, QWidget)
-
+from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QFrame, QGraphicsDropShadowEffect, QLabel, QWidget
 
 from base_widgets import LayoutH
 from cfg import cnf
-from signals import gui_signals_app
-from styles import Styles
+from styles import Names, default_theme
 
 
 class Notification(QFrame):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.blue_color};
-            border-radius: {Styles.big_radius};
-            """)
+
+        self.setObjectName(Names.notification_widget)
+        self.setStyleSheet(default_theme)
 
         effect = QGraphicsDropShadowEffect()
         effect.setColor(QColor(0, 0, 0, 240))

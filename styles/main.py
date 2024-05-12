@@ -22,6 +22,8 @@ class Names:
     thumbnail_normal = "thumbnail_normal"
     thumbnail_selected = "thumbnail_selected"
 
+    notification_widget = "notification_widget"
+
 
 class Styles:
     big_radius = 8
