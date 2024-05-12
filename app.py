@@ -170,7 +170,6 @@ class WinMain(WinBase):
 class App(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
-        self.setStyleSheet(f"""QLabel {{color: white;}}""")
 
         self.main_win = WinMain()
         self.main_win.show()
@@ -225,4 +224,5 @@ class App(QApplication):
         # Manager.smb_win.show()
 
 Themes.set_theme("dark_theme")
+Themes.set_theme("light_theme")
 app = App()

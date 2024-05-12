@@ -1,3 +1,10 @@
+/* GLOBAL FONT COLOR */
+
+QLabel {
+    color: #ffffff;
+}
+
+
 /* UNIVERSAL SCROLL */
 
 QScrollBar:vertical {
