@@ -111,7 +111,6 @@ class CollectionBtn(QLabel):
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
             
-        
     def contextMenuEvent(self, event):
         CustomContext(parent=self, true_name=self.true_name, event=event)
 
