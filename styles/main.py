@@ -17,6 +17,8 @@ class Names:
     filter_btn = "filter_btn"
     filter_btn_selected = "filter_btn_selected"
 
+    filter_bar_frame = "filter_bar_frame"
+
 
 class Styles:
     big_radius = 8

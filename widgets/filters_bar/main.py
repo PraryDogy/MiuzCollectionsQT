@@ -80,15 +80,8 @@ class FiltersBar(QFrame):
     def __init__(self):
         super().__init__()
         self.setContentsMargins(*Styles.topbar_marg)
-        self.setObjectName("filters_bar")
-        self.setStyleSheet(
-            f"""
-            #filters_bar{{
-            background-color: {Styles.topbar_bg_color};
-            border-radius: 0px;
-            border-bottom: 1px solid black;
-            }}
-            """)
+        self.setObjectName(Names.filter_bar_frame)
+        self.setStyleSheet(default_theme)
         self.setFixedHeight(34)
 
         self.h_layout = LayoutH(self)
