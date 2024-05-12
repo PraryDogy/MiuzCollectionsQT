@@ -73,3 +73,27 @@ QScrollBar#menu_scrollbar::sub-line:vertical {
 QScrollBar#menu_scrollbar::add-page:vertical, QScrollBar#menu_scrollbar::sub-page:vertical {
     height: 0px;
 }
+
+
+/* DATES BUTTON IN FILTERS BAR */
+
+#dates_btn{
+    border-radius: 6;
+    margin-right: 5px;
+    border: 2px solid transparent;
+    background-color: #242424;
+}
+
+#dates_btn_selected {
+    border-radius: 6;
+    margin-right: 5px;
+    border: 2px solid transparent;
+    background-color: #2e59cb;
+}
+
+#dates_btn_bordered {
+    border-radius: 6;
+    margin-right: 5px;
+    border: 2px solid #2e59cb;
+    background-color: #242424;
+}

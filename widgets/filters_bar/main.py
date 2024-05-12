@@ -7,7 +7,7 @@ from utils import MainUtils
 
 from base_widgets import Btn, LayoutH
 from ..win_dates import WinDates
-from styles import Styles
+from styles import Styles, Names, dark_theme
 
 
 class Manager:
@@ -25,31 +25,16 @@ class DatesBtn(Btn):
         gui_signals_app.set_dates_btn_blue_border.connect(self.set_border_blue_style)
 
     def set_normal_style(self):
-        self.setStyleSheet(
-            f"""
-            border-radius: {Styles.small_radius};
-            margin-right: {Styles.topbar_items_space}px;
-            border: 2px solid transparent;
-            background-color: {Styles.topbar_bg_color};
-            """)
+        self.setObjectName(Names.dates_btn)
+        self.setStyleSheet(dark_theme)
 
     def set_blue_style(self):
-        self.setStyleSheet(
-            f"""
-            border-radius: {Styles.small_radius};
-            margin-right: {Styles.topbar_items_space}px;
-            border: 2px solid transparent;
-            background-color: {Styles.blue_color};
-            """)
-        
+        self.setObjectName(Names.dates_btn_selected)
+        self.setStyleSheet(dark_theme)
+
     def set_border_blue_style(self):
-        self.setStyleSheet(
-            f"""
-            border-radius: {Styles.small_radius};
-            margin-right: {Styles.topbar_items_space}px;
-            border: 2px solid {Styles.blue_color};
-            background-color: {Styles.topbar_bg_color};
-            """)
+        self.setObjectName(Names.dates_btn_bordered)
+        self.setStyleSheet(dark_theme)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:

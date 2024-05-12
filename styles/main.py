@@ -10,10 +10,14 @@ class Names:
     menu_scrollbar_qwidget = "menu_scrollbar_qwidget"
     menu_fake_widget = "menu_fake_widget"
 
+    dates_btn = "dates_btn"
+    dates_btn_selected = "dates_btn_selected"
+    dates_btn_bordered = "dates_btn_bordered"
+
 
 class Styles:
     big_radius = 8
-    small_radius = big_radius - 2
+    small_radius = 6
     title_font_size = "18pt"
     blue_color = "#2e59cb"
     btn_base_color = "#303030"
