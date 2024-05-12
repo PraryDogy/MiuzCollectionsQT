@@ -22,6 +22,7 @@ class Thumbnails(QScrollArea):
         super().__init__()
         self.setWidgetResizable(True)
         self.resize(cnf.root_g["aw"] - Styles.menu_w, cnf.root_g["ah"])
+        self.setObjectName(Names.th_scrollbar)
         self.setStyleSheet(default_theme)
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
