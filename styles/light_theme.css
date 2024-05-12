@@ -27,8 +27,8 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 /* UNIVERSAL CONTEXT MENU */
 
 QMenu {
-    background-color: #e8e8e8;
-    border: 1px solid #6c6c6c;
+    background-color: #ffffff;
+    border: 1px solid #b3b3b3;
     border-radius: 8;
     padding : 3px;
 }      
@@ -56,37 +56,6 @@ QScrollArea#menu_scrollbar {
     border: 0px;
 }
 
-#menu_btn {
-    background-color: #343434;
-    border: 2px solid transparent;
-    padding-left: 2px;
-    padding-right: 2px;
-}
-
-#menu_btn_bordered {
-    background-color: #343434;
-    border: 2px solid #2e59cb;
-    border-radius: 6;
-    padding-left: 2px;
-    padding-right: 2px;
-}
-
-#menu_btn_selected {
-    background-color: #525252;
-    border: 2px solid transparent;
-    border-radius: 6;
-    padding-left: 2px;
-    padding-right: 2px;
-}
-
-#menu_btn_selected_bordered {
-    background-color: #525252;
-    border: 2px solid #2e59cb;
-    border-radius: 6;
-    padding-left: 2px;
-    padding-right: 2px;
-}
-
 #menu_scrollbar_qwidget {
     background-color: #ffffff;
     border: 0px;
@@ -98,8 +67,49 @@ QScrollArea#menu_scrollbar {
     border-bottom-left-radius: 10px;
     }
 
+#menu_btn {
+    background-color: #ffffff;
+    border: 2px solid transparent;
+    padding-left: 2px;
+    padding-right: 2px;
+    color: #3d3d3d;
+}
 
-/* DATES BUTTON IN FILTER BAR */
+#menu_btn_bordered {
+    background-color: #ffffff;
+    border: 2px solid #2e59cb;
+    border-radius: 6;
+    padding-left: 2px;
+    padding-right: 2px;
+    color: #3d3d3d;
+}
+
+#menu_btn_selected {
+    background-color: #cccccc;
+    border: 2px solid transparent;
+    border-radius: 6;
+    padding-left: 2px;
+    padding-right: 2px;
+    color: #3d3d3d;
+}
+
+#menu_btn_selected_bordered {
+    background-color: #cccccc;
+    border: 2px solid #2e59cb;
+    border-radius: 6;
+    padding-left: 2px;
+    padding-right: 2px;
+    color: #3d3d3d;
+}
+
+
+/* FILTERS BAR */
+
+#filter_bar_frame {
+    background-color: #ffffff;
+    border-radius: 0px;
+    border-bottom: 1px solid black;
+}
 
 #dates_btn{
     border-radius: 6;
@@ -123,8 +133,6 @@ QScrollArea#menu_scrollbar {
 }
 
 
-/* FILTER BUTTON IN FILTERS BAR */
-
 #filter_btn {
     background-color: #242424;
     border-radius: 6;
@@ -135,15 +143,6 @@ QScrollArea#menu_scrollbar {
     background-color: #2e59cb;
     border-radius: 6;
     margin-right: 5px;
-}
-
-
-/* FILTER BAR FRAME */
-
-#filter_bar_frame {
-    background-color: #242424;
-    border-radius: 0px;
-    border-bottom: 1px solid black;
 }
 
 
