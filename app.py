@@ -101,6 +101,7 @@ class ContentWid(QFrame):
 
 class WinMain(WinBase):
     def __init__(self):
+        # Themes.set_theme("dark_theme")
         super().__init__(close_func=self.mycloseEvent)
 
         self.setContentsMargins(0, 0, 0, 0)
@@ -108,8 +109,6 @@ class WinMain(WinBase):
         self.setWindowTitle(cnf.app_name)
         self.resize(cnf.root_g["aw"], cnf.root_g["ah"])
         self.center()
-
-        Themes.set_theme("dark_theme")
 
         menubar = MacMenuBar()
         self.setMenuBar(menubar)
@@ -213,12 +212,12 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        self.test = TestWid()
-        self.test.show()
+        # self.test = TestWid()
+        # self.test.show()
 
         # from widgets.win_smb import WinSmb
         # Manager.smb_win = WinSmb()
         # Manager.smb_win.show()
 
-
+Themes.set_theme("light_theme")
 app = App()

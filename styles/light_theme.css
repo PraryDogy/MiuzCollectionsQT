@@ -6,7 +6,7 @@ QScrollBar:vertical {
     padding: 2px;
 }
 QScrollBar::handle:vertical {
-    background-color: #ff0808;
+    background-color: #2f2f2f;
     border-radius: 4px;
 }
 QScrollBar::handle:vertical:hover {
@@ -28,7 +28,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 
 QMenu {
     background-color: #e8e8e8;
-    border: 1px solid #c8c8c8;
+    border: 1px solid #6c6c6c;
     border-radius: 8;
     padding : 3px;
 }      
@@ -37,7 +37,7 @@ QMenu::indicator {
 }
 QMenu::item {
     padding: 3 15 3 15;
-    color: rgb(91, 91, 91);
+    color: #3d3d3d;
 }
 QMenu::item:selected {
     padding: 3 15 3 15;
@@ -57,14 +57,14 @@ QScrollArea#menu_scrollbar {
 }
 
 #menu_btn {
-    background-color: #333333;
+    background-color: #343434;
     border: 2px solid transparent;
     padding-left: 2px;
     padding-right: 2px;
 }
 
 #menu_btn_bordered {
-    background-color: #333333;
+    background-color: #343434;
     border: 2px solid #2e59cb;
     border-radius: 6;
     padding-left: 2px;
@@ -88,13 +88,13 @@ QScrollArea#menu_scrollbar {
 }
 
 #menu_scrollbar_qwidget {
-    background-color: #333333;
+    background-color: #ffffff;
     border: 0px;
 }
 
 #menu_fake_widget{
     border: 0px;
-    background-color: #333333;
+    background-color: #ffffff;
     border-bottom-left-radius: 10px;
     }
 
@@ -326,7 +326,7 @@ QScrollArea#th_scrollbar {
 }
 
 #title_bar {
-    background: #242424;
+    background: #dcdcdc;
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
     border-bottom: 1px solid black;
@@ -334,11 +334,11 @@ QScrollArea#th_scrollbar {
 
 #central_widget {
     border-radius: 10px;
-    background: #525252;
+    background: #ffffff;
 }
 
 #base_bottom_widget {
-    background: #1e1e1e;
+    background: #ffffff;
     border: 0px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;

@@ -2,6 +2,7 @@ from PyQt5.QtCore import QEvent, QPoint, Qt
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
+from cfg import cnf
 from styles import Names, Themes
 from utils import MainUtils
 
@@ -113,8 +114,6 @@ class WinBase(QMainWindow):
         self.titlebar.btns.max_btn.mouseReleaseEvent = self.toggle_fullscreen
         self.titlebar.btns.min_btn.mouseReleaseEvent = lambda e: self.showMinimized()
         self.titlebar.btns.close_btn.mouseReleaseEvent = close_func
-        self.titlebar.btns.max_btn.setDisabled(True)
-        self.titlebar.btns.max_btn.set_icon("gray-2.svg")
         self.central_layout.addWidget(self.titlebar)
 
         self.gripSize = 16
@@ -150,10 +149,10 @@ class WinBase(QMainWindow):
         self.setFixedSize(self.width(), self.height())
 
     def toggle_fullscreen(self, event):
-        if self.isFullScreen():
+        if self.isMaximized():
             self.showNormal()
         else:
-            self.showFullScreen()
+            self.showMaximized()
 
     def set_title(self, text):
         self.titlebar.title.setText(text)
