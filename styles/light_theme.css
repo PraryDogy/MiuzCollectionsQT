@@ -115,7 +115,7 @@ QScrollArea#menu_scrollbar {
 #filter_bar_frame {
     background-color: #ffffff;
     border-radius: 0px;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #dbdbdb;
 }
 
 #dates_btn{
@@ -170,11 +170,11 @@ QScrollArea#menu_scrollbar {
 #st_bar_frame {
     background-color: #ffffff;
     border-bottom-right-radius: 10px;
-    border-top: 1px solid black;
+    border-top: 1px solid #dbdbdb;
 }
 
 #st_bar_jpg {
-    background: #303030;
+    background: #ffffff;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
@@ -182,7 +182,7 @@ QScrollArea#menu_scrollbar {
 }
 
 #st_bar_jpg_sel {
-    background: #676767;
+    background: #cccccc;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
@@ -190,7 +190,7 @@ QScrollArea#menu_scrollbar {
 }
 
 #st_bar_tiff {
-    background: #303030;
+    background: #ffffff;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
@@ -198,7 +198,7 @@ QScrollArea#menu_scrollbar {
 }
 
 #st_bar_tiff_sel {
-    background: #676767;
+    background: #cccccc;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
@@ -250,12 +250,12 @@ QScrollArea#menu_scrollbar {
 }
 
 QScrollArea#th_scrollbar {
-    background-color: #1e1e1e;
+    background-color: #ffffff;
     border: 0px;
 }
 
 #th_scroll_widget {
-    background-color: #1e1e1e;
+    background-color: #ffffff;
 }
 
 
@@ -337,10 +337,10 @@ QScrollArea#th_scrollbar {
 }
 
 #title_bar {
-    background: #dcdcdc;
+    background: #ffffff;
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #dbdbdb;
     color: #3d3d3d;
 }
 
@@ -357,5 +357,5 @@ QScrollArea#th_scrollbar {
 }
 
 #separator {
-    background-color: #000000;
+    background-color: #dbdbdb;
 }
