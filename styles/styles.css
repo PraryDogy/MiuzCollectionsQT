@@ -223,6 +223,7 @@ QScrollArea#th_scrollbar {
 
 
 /* FIRST LOAD, SETTINGS */
+
 #btn_jpg {
     background: #303030;
     border-top-left-radius: 6px;
@@ -253,4 +254,32 @@ QScrollArea#th_scrollbar {
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
+}
+
+
+/* IMAGE VIEWER */
+
+#navi_zoom {
+    background-color: rgba(128, 128, 128, 70);
+    border-radius: 15px;
+}
+
+
+/* INFO WINDOW */
+
+#info_base_label {
+    background-color: #1e1e1e;
+}
+
+
+/* SMB WIN */
+
+#smb_browse_btn {
+    background-color: #2e59cb;
+    border-radius: 8;
+}
+
+#smb_browse_btn_selected {
+    background-color: #303030;
+    border-radius: 8;
 }

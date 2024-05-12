@@ -41,6 +41,12 @@ class Names:
     btn_tiff = "btn_tiff"
     btn_tiff_selected = "btn_tiff_selected"
 
+    navi_zoom = "navi_zoom"
+
+    info_base_label = "info_base_label"
+    smb_browse_btn = "smb_browse_btn"
+    smb_browse_btn_selected = "smb_browse_btn_selected"
+
 
 class Styles:
     big_radius = 8

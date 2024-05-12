@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from styles import Styles
+from styles import Names, default_theme
 from utils import MainUtils
 
 
@@ -191,15 +191,15 @@ class ThumbMove(QWidget):
         self.move_layers = cnf.move_layers
 
         self.btn_jpg = Btn("JPG")
-        self.btn_jpg.setStyleSheet(self.get_jpg_style())
+        self.set_jpg_btn_style()
         self.btn_jpg.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
         layout_h.addWidget(self.btn_jpg)
 
         layout_h.addSpacerItem(QSpacerItem(1, 0))
 
         self.btn_tiff = Btn(cnf.lng.layers)
+        self.set_tiff_btn_style()
         self.btn_tiff.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
-        self.btn_tiff.setStyleSheet(self.get_tiff_style())
         
         layout_h.addWidget(self.btn_tiff)
 
@@ -213,11 +213,11 @@ class ThumbMove(QWidget):
     def btn_cmd(self, flag: Literal["jpg", "tiff"]):
         if flag == "jpg":
             self.move_jpg = not self.move_jpg
-            self.btn_jpg.setStyleSheet(self.get_jpg_style())
+            self.set_jpg_btn_style()
         
         elif flag == "tiff":
             self.move_layers = not self.move_layers
-            self.btn_tiff.setStyleSheet(self.get_tiff_style())
+            self.set_tiff_btn_style()
 
     def finalize(self):
         if self.move_jpg != cnf.move_jpg or self.move_layers != cnf.move_layers:
@@ -225,30 +225,20 @@ class ThumbMove(QWidget):
             cnf.move_layers = self.move_layers
             gui_signals_app.reload_stbar.emit()
 
-    def get_bg(self, flag: Literal["jpg", "tiff"]):
-        if flag == "jpg":
-            return Styles.blue_color if self.move_jpg else Styles.btn_base_color
-        
-        elif flag == "tiff":
-            return Styles.blue_color if self.move_layers else Styles.btn_base_color
+    def set_jpg_btn_style(self):
+        if self.move_jpg:
+            self.btn_jpg.setObjectName(Names.btn_jpg_selected)
+        else:
+            self.btn_jpg.setObjectName(Names.btn_jpg)
+        self.btn_jpg.setStyleSheet(default_theme)
 
-    def get_jpg_style(self):
-        return f"""
-                background: {self.get_bg("jpg")};
-                border-top-left-radius: {Styles.small_radius}px;
-                border-bottom-left-radius: {Styles.small_radius}px;
-                border-top-right-radius: 0px;
-                border-bottom-right-radius: 0px;
-                """
+    def set_tiff_btn_style(self):
+        if self.move_layers:
+            self.btn_tiff.setObjectName(Names.btn_tiff_selected)
+        else:
+            self.btn_tiff.setObjectName(Names.btn_tiff)
+        self.btn_tiff.setStyleSheet(default_theme)
 
-    def get_tiff_style(self):
-        return f"""
-                background: {self.get_bg("tiff")};
-                border-top-left-radius: 0px;
-                border-bottom-left-radius: 0px;
-                border-top-right-radius: {Styles.small_radius}px;
-                border-bottom-right-radius: {Styles.small_radius}px;
-                """
 
 class WinSettings(WinStandartBase):
     def __init__(self):
