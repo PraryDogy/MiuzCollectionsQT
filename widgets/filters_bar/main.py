@@ -51,6 +51,9 @@ class FilterBtn(Btn):
         self.key = true_name
 
     def set_normal_style(self):
+        self.setObjectName(Names.filter_btn)
+        self.setStyleSheet(dark_theme)
+
         self.setStyleSheet(
             f"""
             background-color: {Styles.topbar_bg_color};
@@ -59,6 +62,9 @@ class FilterBtn(Btn):
             """)
 
     def set_blue_style(self):
+        self.setObjectName(Names.filter_btn_selected)
+        self.setStyleSheet(dark_theme)
+        
         self.setStyleSheet(
             f"""
             background-color: {Styles.blue_color};

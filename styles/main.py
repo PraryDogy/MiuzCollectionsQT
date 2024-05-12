@@ -14,6 +14,9 @@ class Names:
     dates_btn_selected = "dates_btn_selected"
     dates_btn_bordered = "dates_btn_bordered"
 
+    filter_btn = "filter_btn"
+    filter_btn_selected = "filter_btn_selected"
+
 
 class Styles:
     big_radius = 8
