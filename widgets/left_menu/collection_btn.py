@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from signals import gui_signals_app
-from styles import Names, Styles, dark_theme
+from styles import Names, Styles, default_theme
 
 
 class CustomContext(ContextMenuBase):
@@ -42,20 +42,20 @@ class CustomContext(ContextMenuBase):
         if parent.objectName() == Names.menu_btn:
             try:
                 parent.setObjectName(Names.menu_btn_bordered)
-                parent.setStyleSheet(dark_theme)
+                parent.setStyleSheet(default_theme)
                 self.show_menu()
                 parent.setObjectName(Names.menu_btn)
-                parent.setStyleSheet(dark_theme)
+                parent.setStyleSheet(default_theme)
             except Exception as e:
                 print(e)
 
         else:
             try:
                 parent.setObjectName(Names.menu_btn_selected_bordered)
-                parent.setStyleSheet(dark_theme)
+                parent.setStyleSheet(default_theme)
                 self.show_menu()
                 parent.setObjectName(Names.menu_btn_selected)
-                parent.setStyleSheet(dark_theme)
+                parent.setStyleSheet(default_theme)
             except Exception as e:
                 print(e)
 
@@ -98,7 +98,7 @@ class CollectionBtn(QLabel):
         else:
             self.setObjectName(Names.menu_btn)
 
-        self.setStyleSheet(dark_theme)
+        self.setStyleSheet(default_theme)
 
     def mouseReleaseEvent(self, event):
         self.load_collection()

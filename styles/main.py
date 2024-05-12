@@ -1,5 +1,5 @@
 with open("styles/styles.css") as file:
-    dark_theme = file.read()
+    default_theme = file.read()
 
 class Names:
     menu_btn = "menu_btn"

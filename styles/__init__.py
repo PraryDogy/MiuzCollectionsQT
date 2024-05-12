@@ -1,1 +1,1 @@
-from .main import Names, Styles, dark_theme
+from .main import Names, Styles, default_theme
