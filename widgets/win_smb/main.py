@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import utils_signals_app
-from styles import Names, Styles, default_theme
+from styles import Names, default_theme
 from utils import MainUtils
 
 

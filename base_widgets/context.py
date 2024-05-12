@@ -1,8 +1,8 @@
-from PyQt5.QtCore import QEvent, QObject, Qt
-from PyQt5.QtGui import QFocusEvent, QMouseEvent
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QMenu
 
-from styles import Styles
+from styles import default_theme
 
 
 class ContextMenuBase(QMenu):
@@ -13,31 +13,7 @@ class ContextMenuBase(QMenu):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)
         self.setMinimumWidth(200)
-
-        self.setStyleSheet(
-            f"""
-            QMenu {{
-                background-color: {Styles.context_bg_color};
-                border: 1px solid {Styles.context_border_color};
-                border-radius: {Styles.big_radius};
-                padding : 3px;
-                color: white;
-            }}      
-            QMenu::indicator {{
-                image: none;
-            }}
-            QMenu::item {{
-                padding: 3 15 3 15;
-            }}
-            QMenu::item:selected {{
-                padding: 3 15 3 15;
-                background: {Styles.blue_color};
-                border-radius: {Styles.small_radius};
-            }}
-            QMenu::right-arrow {{
-                image: None;
-                }}
-            """)
+        self.setStyleSheet(default_theme)
     
     def show_menu(self):
         self.exec_(self.ev.globalPos())

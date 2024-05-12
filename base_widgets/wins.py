@@ -1,13 +1,12 @@
-from PyQt5.QtCore import QEvent, QPoint, Qt, pyqtSignal
+from PyQt5.QtCore import QEvent, QPoint, Qt
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
-from signals import gui_signals_app
-from styles import Styles
+from styles import Names, default_theme
 from utils import MainUtils
 
-from .svg_btn import SvgBtn
 from .layouts import LayoutH, LayoutV
+from .svg_btn import SvgBtn
 
 
 class Btns(QWidget):
@@ -63,16 +62,8 @@ class TitleBar(QFrame):
         super().__init__(win)
         self.my_win = win
         self.setFixedHeight(33)
-        self.setObjectName("title_bar")
-        self.setStyleSheet(
-            f"""
-            #title_bar {{
-            background: {Styles.st_bar_bg_color};
-            border-top-right-radius: {Styles.base_radius}px;
-            border-top-left-radius: {Styles.base_radius}px;
-            border-bottom: 1px solid black;
-            }}
-            """)
+        self.setObjectName(Names.title_bar)
+        self.setStyleSheet(default_theme)
 
         self.main_layout = LayoutH()
         self.setLayout(self.main_layout)
@@ -112,15 +103,8 @@ class WinBase(QMainWindow):
 
         central_widget = QWidget()
         central_widget.setContentsMargins(1, 1, 1, 1)
-        central_widget.setObjectName("central_widget")
-        central_widget.setStyleSheet(
-            f"""
-            #central_widget 
-                {{
-                border-radius: {Styles.base_radius}px;
-                background: {Styles.menu_sel_item_color};
-                }}
-            """)
+        central_widget.setObjectName(Names.central_widget)
+        central_widget.setStyleSheet(default_theme)
 
         self.setCentralWidget(central_widget)
         self.central_layout = LayoutV(central_widget)
@@ -182,16 +166,11 @@ class WinBase(QMainWindow):
 
 
 class BaseBottomWid(QFrame):
-    def __init__(self, bg=Styles.base_bg_color, left=10, top=10, right=10, bottom=10):
+    def __init__(self, left=10, top=10, right=10, bottom=10):
         super().__init__()
         self.setContentsMargins(left, top, right, bottom)
-        self.setStyleSheet(
-            f"""
-            background: {bg};
-            border: 0px;
-            border-bottom-left-radius: {Styles.base_radius}px;
-            border-bottom-right-radius: {Styles.base_radius}px;
-            """)
+        self.setObjectName(Names.base_bottom_widget)
+        self.setStyleSheet(default_theme)
 
 
 class WinStandartBase(WinBase):

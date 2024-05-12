@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QLabel
 
 from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
 from cfg import cnf
-from styles import Names, Styles, default_theme
+from styles import Names, default_theme
 from utils import MainUtils, get_image_size
 
 

@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
-from styles import Styles
+from styles import Names, default_theme
 
 
 class Btn(QLabel):
@@ -10,8 +10,6 @@ class Btn(QLabel):
         self.setFixedSize(80, 28)
         self.setAlignment(Qt.AlignCenter)
 
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.thumbs_item_color};
-            border-radius: {Styles.small_radius};
-            """)
+        self.setObjectName(Names.base_btn)
+        self.setStyleSheet(default_theme)
+

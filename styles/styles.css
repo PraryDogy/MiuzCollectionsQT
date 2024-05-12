@@ -24,6 +24,31 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 }
 
 
+/* UNIVERSAL CONTEXT MENU */
+
+QMenu {
+    background-color: #333333;
+    border: 1px solid #5d5d5d;
+    border-radius: 8;
+    padding : 3px;
+    color: white;
+}      
+QMenu::indicator {
+    height: 0px;
+}
+QMenu::item {
+    padding: 3 15 3 15;
+}
+QMenu::item:selected {
+    padding: 3 15 3 15;
+    background: #2e59cb;
+    border-radius: 6;
+}
+QMenu::right-arrow {
+    height: 0px;
+    }
+
+
 /* LEFT MENU */
 
 QScrollArea#menu_scrollbar {
@@ -282,4 +307,38 @@ QScrollArea#th_scrollbar {
 #smb_browse_btn_selected {
     background-color: #303030;
     border-radius: 8;
+}
+
+
+/* BASE WIDGETS */
+
+#base_btn {
+    background-color: #303030;
+    border-radius: 6;
+}
+
+#base_input {
+    background-color: #131313;
+    border-radius: 6;
+    padding-left: 5px; padding-right: 5px;
+    color: white;
+}
+
+#title_bar {
+    background: #242424;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-bottom: 1px solid black;
+}
+
+#central_widget {
+    border-radius: 10px;
+    background: #525252;
+}
+
+#base_bottom_widget {
+    background: #1e1e1e;
+    border: 0px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }

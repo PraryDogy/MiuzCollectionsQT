@@ -1,10 +1,10 @@
 from PyQt5.QtWidgets import QAction, QLineEdit
 
 from cfg import cnf
+from styles import Names, default_theme
 from utils import MainUtils
 
 from .context import ContextMenuBase
-from styles import Styles
 
 
 class CustomContext(ContextMenuBase):
@@ -44,14 +44,9 @@ class CustomContext(ContextMenuBase):
 class InputBase(QLineEdit):
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(Styles.topbar_item_h)
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.topbar_search_bg};
-            border-radius: {Styles.small_radius};
-            padding-left: 5px; padding-right: 5px;
-            color: white;
-            """)
+        self.setFixedHeight(28)
+        self.setObjectName(Names.base_input)
+        self.setStyleSheet(default_theme)
 
     def contextMenuEvent(self, event):
         CustomContext(parent=self, event=event)
