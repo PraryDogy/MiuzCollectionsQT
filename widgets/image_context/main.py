@@ -1,13 +1,14 @@
 from functools import partial
 
 from PyQt5.QtWidgets import QAction, QLabel, QMainWindow
+
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from styles import Names, default_theme
 
-from ..win_info import WinInfo
 from ..gui_thread_reveal_files import GuiThreadRevealFiles
 from ..gui_thread_save_files import GuiThreadSaveFiles
+from ..win_info import WinInfo
 
 
 class Manager:

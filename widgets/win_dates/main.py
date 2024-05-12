@@ -4,8 +4,7 @@ from functools import partial
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import (Btn, WinStandartBase, LayoutH,
-                          LayoutV)
+from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app
 from utils import MainUtils

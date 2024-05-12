@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget
 
-from base_widgets import SvgShadowed, SvgBtn
+from base_widgets import SvgBtn
 from signals import gui_signals_app
 
 

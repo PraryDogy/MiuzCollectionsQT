@@ -1,23 +1,25 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame
 
+from base_widgets import Btn, LayoutH
 from cfg import cnf
 from signals import gui_signals_app
+from styles import Names, default_theme
 from utils import MainUtils
 
-from base_widgets import Btn, LayoutH
 from ..win_dates import WinDates
-from styles import Styles, Names, default_theme
 
 
 class Manager:
     win_dates: WinDates = None
+    btn_w = 80
+    btn_h = 28
 
 
 class DatesBtn(Btn):
     def __init__(self):
         super().__init__(text=cnf.lng.dates)
-        self.setFixedSize(Styles.topbar_item_w, Styles.topbar_item_h)
+        self.setFixedSize(Manager.btn_w, Manager.btn_h)
         self.setAlignment(Qt.AlignCenter)
 
         gui_signals_app.set_dates_btn_blue.connect(self.set_blue_style)
@@ -45,7 +47,7 @@ class DatesBtn(Btn):
 class FilterBtn(Btn):
     def __init__(self, text: str, true_name: str):
         super().__init__(text=text)
-        self.setFixedSize(Styles.topbar_item_w, Styles.topbar_item_h)
+        self.setFixedSize(Manager.btn_w, Manager.btn_h)
         self.setAlignment(Qt.AlignCenter)
 
         self.key = true_name
@@ -79,7 +81,7 @@ class FilterBtn(Btn):
 class FiltersBar(QFrame):
     def __init__(self):
         super().__init__()
-        self.setContentsMargins(*Styles.topbar_marg)
+        self.setContentsMargins(5, 0, 5, 0)
         self.setObjectName(Names.filter_bar_frame)
         self.setStyleSheet(default_theme)
         self.setFixedHeight(34)

@@ -6,7 +6,7 @@ from base_widgets import LayoutH, LayoutV
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
-from styles import Styles, Names, default_theme
+from styles import Names, default_theme
 from utils import MainUtils
 
 from .collection_btn import CollectionBtn
@@ -81,7 +81,7 @@ class BaseLeftMenu(QScrollArea):
 class LeftMenu(QFrame):
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(Styles.menu_w)
+        self.setFixedWidth(cnf.MENU_W)
 
         h_lay = LayoutH()
         self.setLayout(h_lay)

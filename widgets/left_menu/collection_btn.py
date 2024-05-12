@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from signals import gui_signals_app
-from styles import Names, Styles, default_theme
+from styles import Names, default_theme
 
 
 class CustomContext(ContextMenuBase):
@@ -90,7 +90,7 @@ class CollectionBtn(QLabel):
         self.true_name = true_name
         self.fake_name = fake_name
 
-        btn_w = Styles.menu_w - 20 - 5
+        btn_w = cnf.MENU_W - 20 - 5
         self.setFixedSize(btn_w, 28)
 
         if true_name == cnf.curr_coll:

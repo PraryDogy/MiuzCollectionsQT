@@ -79,7 +79,7 @@ class Static:
         self.LIMIT: int = 150
         self.ALL_COLLS: str = "miuzcollections_all"
         self.RECENT_COLLS: str = "miuzcollections_recents"
-
+        self.MENU_W: int = 210
 
 class Dymanic:
     def __init__(self) -> None:
