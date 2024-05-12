@@ -13,7 +13,7 @@ QScrollBar:vertical {
     padding: 2px;
 }
 QScrollBar::handle:vertical {
-    background-color: #2f2f2f;
+    background-color: #cccccc;
     border-radius: 4px;
 }
 QScrollBar::handle:vertical:hover {
@@ -219,28 +219,28 @@ QScrollArea#menu_scrollbar {
 #th_reset_dates_btn{
     /* width: 120px; */
     /* height: 28px; */
-    background-color: #303030;
+    background-color: #cccccc;
     border-radius: 6;
 }
 
 #th_reset_search_btn{
     /* width: 120px; */
     /* height: 28px; */
-    background-color: #303030;
+    background-color: #cccccc;
     border-radius: 6;
 }
 
 #th_reset_filters_btn {
     /* width: 120px; */
     /* height: 28px; */
-    background-color: #303030;
+    background-color: #cccccc;
     border-radius: 6;
 }
 
 #th_show_all_btn{
     /* width: 120px; */
     /* height: 28px; */
-    background-color: #303030;
+    background-color: #cccccc;
     border-radius: 6;
 }
 
@@ -262,7 +262,7 @@ QScrollArea#th_scrollbar {
 /* FIRST LOAD, SETTINGS */
 
 #btn_jpg {
-    background: #303030;
+    background: #cccccc;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
@@ -275,10 +275,11 @@ QScrollArea#th_scrollbar {
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
+    color: #ffffff;
 }
 
 #btn_tiff {
-    background: #303030;
+    background: #cccccc;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
@@ -291,6 +292,7 @@ QScrollArea#th_scrollbar {
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
+    color: #ffffff;
 }
 
 
@@ -305,7 +307,7 @@ QScrollArea#th_scrollbar {
 /* INFO WINDOW */
 
 #info_base_label {
-    background-color: #1e1e1e;
+    background-color: #ffffff;
 }
 
 
@@ -325,15 +327,15 @@ QScrollArea#th_scrollbar {
 /* BASE WIDGETS */
 
 #base_btn {
-    background-color: #303030;
+    background-color: #cccccc;
     border-radius: 6;
 }
 
 #base_input {
-    background-color: #131313;
+    background-color: #cccccc;
     border-radius: 6;
     padding-left: 5px; padding-right: 5px;
-    color: white;
+    color: #3d3d3d;
 }
 
 #title_bar {
