@@ -1,0 +1,30 @@
+#menu_btn {
+    background-color: #333333;
+    border: 2px solid transparent;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+#menu_btn_bordered {
+    background-color: #333333;
+    border: 2px solid #2e59cb;
+    border-radius: 6;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+#menu_btn_selected {
+    background-color: #525252;
+    border: 2px solid transparent;
+    border-radius: 6;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+#menu_btn_selected_bordered {
+    background-color: #525252;
+    border: 2px solid #2e59cb;
+    border-radius: 6;
+    padding-left: 2px;
+    padding-right: 2px;
+}

@@ -1,3 +1,13 @@
+with open("styles/styles.css") as file:
+    dark_theme = file.read()
+
+class Names:
+    menu_btn = "menu_btn"
+    menu_btn_bordered = "menu_btn_bordered"
+    menu_btn_selected = "menu_btn_selected"
+    menu_btn_selected_bordered = "menu_btn_selected_bordered"
+
+
 class Styles:
     big_radius = 8
     small_radius = big_radius - 2

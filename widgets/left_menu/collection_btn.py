@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from signals import gui_signals_app
-from styles import Styles
+from styles import Names, Styles, dark_theme
 
 
 class CustomContext(ContextMenuBase):
@@ -39,47 +39,25 @@ class CustomContext(ContextMenuBase):
         mod_coll.triggered.connect(lambda e: self.reveal_collection("mod"))
         reveal_menu.addAction(mod_coll)
 
-        original_color = parent.palette().color(parent.backgroundRole()).name()
+        if parent.objectName() == Names.menu_btn:
+            try:
+                parent.setObjectName(Names.menu_btn_bordered)
+                parent.setStyleSheet(dark_theme)
+                self.show_menu()
+                parent.setObjectName(Names.menu_btn)
+                parent.setStyleSheet(dark_theme)
+            except Exception as e:
+                print(e)
 
-        try:
-            parent.setStyleSheet(
-                f"""
-                QLabel {{
-                    background-color: {original_color};
-                    border: 2px solid {Styles.blue_color};
-                    border-radius: {Styles.small_radius};
-                    padding-left: 2px;
-                    padding-right: 2px;
-                    }}
-                QToolTip {{
-                    background: {Styles.menu_sel_item_color};
-                    border: 2px solid transparent;
-                    font-size: 12px;
-                    }}
-                """)
-        except Exception as e:
-            print(e)
-
-        self.show_menu()
-
-        try:
-            parent.setStyleSheet(
-                f"""
-                QLabel {{
-                    background-color: {original_color};
-                    border: 2px solid transparent;
-                    border-radius: {Styles.small_radius};
-                    padding-left: 2px;
-                    padding-right: 2px;
-                    }}
-                QToolTip {{
-                    background: {Styles.menu_sel_item_color};
-                    border: 2px solid transparent;
-                    font-size: 12px;
-                    }}
-                """)
-        except Exception as e:
-            print(e)
+        else:
+            try:
+                parent.setObjectName(Names.menu_btn_selected_bordered)
+                parent.setStyleSheet(dark_theme)
+                self.show_menu()
+                parent.setObjectName(Names.menu_btn_selected)
+                parent.setStyleSheet(dark_theme)
+            except Exception as e:
+                print(e)
 
     def show_collection(self):
         cnf.curr_coll = self.true_name
@@ -115,37 +93,12 @@ class CollectionBtn(QLabel):
         btn_w = Styles.menu_w - 20 - 5
         self.setFixedSize(btn_w, 28)
 
-        self.setStyleSheet(
-            f"""
-            QLabel {{
-                background-color: {Styles.menu_bg_color};
-                border: 2px solid transparent;
-                padding-left: 2px;
-                padding-right: 2px;
-                }}
-                QToolTip {{
-                    background: {Styles.menu_sel_item_color};
-                    border: 2px solid transparent;
-                    font-size: 12px;
-                    }}
-            """)
-
         if true_name == cnf.curr_coll:
-            self.setStyleSheet(
-                f"""
-                QLabel {{
-                    background-color: {Styles.menu_sel_item_color};
-                    border: 2px solid transparent;
-                    border-radius: {Styles.small_radius};
-                    padding-left: 2px;
-                    padding-right: 2px;
-                    }}
-                QToolTip {{
-                    background: {Styles.menu_sel_item_color};
-                    border: 2px solid transparent;
-                    font-size: 12px;
-                    }}
-                """)
+            self.setObjectName(Names.menu_btn_selected)
+        else:
+            self.setObjectName(Names.menu_btn)
+
+        self.setStyleSheet(dark_theme)
 
     def mouseReleaseEvent(self, event):
         self.load_collection()
