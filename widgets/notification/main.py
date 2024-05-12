@@ -24,6 +24,8 @@ class Notification(QFrame):
         h_layout.addStretch(1)
 
         self.label = QLabel(cnf.lng.no_tiff)
+        self.label.setObjectName(Names.notification_font_color)
+        self.label.setStyleSheet(Themes.current)
         h_layout.addWidget(self.label)
 
         h_layout.addStretch(1)

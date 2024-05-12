@@ -160,6 +160,9 @@ QScrollArea#menu_scrollbar {
     border-radius: 8;
 }
 
+#notification_font_color {
+    color: #ffffff;
+}
 
 /* STATUS BAR */
 #st_bar_frame {

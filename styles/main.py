@@ -35,6 +35,7 @@ class Names:
     th_scroll_widget = "th_scroll_widget"
 
     notification_widget = "notification_widget"
+    notification_font_color = "notification_font_color"
 
     st_bar_frame = "st_bar_frame"
     st_bar_jpg = "st_bar_jpg"
