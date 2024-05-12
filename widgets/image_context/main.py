@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QAction, QLabel, QMainWindow
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
-from styles import Names, default_theme
+from styles import Names, Themes
 
 from ..gui_thread_reveal_files import GuiThreadRevealFiles
 from ..gui_thread_save_files import GuiThreadSaveFiles
@@ -86,10 +86,10 @@ class ImageContext(ContextMenuBase):
         if parent.objectName() == Names.thumbnail_normal:
             try:
                 parent.setObjectName(Names.thumbnail_selected)
-                parent.setStyleSheet(default_theme)
+                parent.setStyleSheet(Themes.current)
                 self.show_menu()
                 parent.setObjectName(Names.thumbnail_normal)
-                parent.setStyleSheet(default_theme)
+                parent.setStyleSheet(Themes.current)
             except Exception as e:
                 print(e)
 

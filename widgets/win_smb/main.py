@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import utils_signals_app
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils
 
 
@@ -53,7 +53,7 @@ class BrowseColl(QWidget):
 
     def blue_browse_btn(self):
         self.browse_btn.setObjectName(Names.smb_browse_btn_selected)
-        self.browse_btn.setStyleSheet(default_theme)
+        self.browse_btn.setStyleSheet(Themes.current)
                 
         my_timer = QTimer(self)
         my_timer.setSingleShot(True)
@@ -63,7 +63,7 @@ class BrowseColl(QWidget):
 
     def default_browse_btn(self):
         self.browse_btn.setObjectName(Names.smb_browse_btn)
-        self.browse_btn.setStyleSheet(default_theme)
+        self.browse_btn.setStyleSheet(Themes.current)
         
         if self.blue_count == 3:
             self.blue_count = 0

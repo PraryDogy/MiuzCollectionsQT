@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils
 
 
@@ -230,14 +230,14 @@ class ThumbMove(QWidget):
             self.btn_jpg.setObjectName(Names.btn_jpg_selected)
         else:
             self.btn_jpg.setObjectName(Names.btn_jpg)
-        self.btn_jpg.setStyleSheet(default_theme)
+        self.btn_jpg.setStyleSheet(Themes.current)
 
     def set_tiff_btn_style(self):
         if self.move_layers:
             self.btn_tiff.setObjectName(Names.btn_tiff_selected)
         else:
             self.btn_tiff.setObjectName(Names.btn_tiff)
-        self.btn_tiff.setStyleSheet(default_theme)
+        self.btn_tiff.setStyleSheet(Themes.current)
 
 
 class WinSettings(WinStandartBase):

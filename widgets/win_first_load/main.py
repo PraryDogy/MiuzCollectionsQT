@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QLabel, QSpacerItem,
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils
 
 
@@ -174,14 +174,14 @@ class ChooseUserType(QWidget):
             self.jpg_btn.setObjectName(Names.btn_jpg_selected)
         else:
             self.jpg_btn.setObjectName(Names.btn_jpg)
-        self.jpg_btn.setStyleSheet(default_theme)
+        self.jpg_btn.setStyleSheet(Themes.current)
 
     def set_tiff_btn_style(self):
         if self.move_layers:
             self.tiff_btn.setObjectName(Names.btn_tiff_selected)
         else:
             self.tiff_btn.setObjectName(Names.btn_tiff)
-        self.tiff_btn.setStyleSheet(default_theme)
+        self.tiff_btn.setStyleSheet(Themes.current)
 
 
 class WinFirstLoad(WinStandartBase):

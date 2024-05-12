@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QSpacerItem, QWidget
 
 from base_widgets import Btn, LayoutH
 from cfg import cnf
-from styles import Names, default_theme
+from styles import Names, Themes
 
 
 class ThumbMove(QWidget):
@@ -50,7 +50,7 @@ class ThumbMove(QWidget):
         else:
             self.btn_jpg.setObjectName(Names.st_bar_jpg)
 
-        self.btn_jpg.setStyleSheet(default_theme)
+        self.btn_jpg.setStyleSheet(Themes.current)
 
     def tiff_btn_style(self):
         if cnf.move_layers:
@@ -58,4 +58,4 @@ class ThumbMove(QWidget):
         else:
             self.btn_tiff.setObjectName(Names.st_bar_tiff)
         
-        self.btn_tiff.setStyleSheet(default_theme)
+        self.btn_tiff.setStyleSheet(Themes.current)

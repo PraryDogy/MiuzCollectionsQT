@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 from base_widgets import LayoutH, LayoutV
 from cfg import cnf
 from signals import gui_signals_app
-from styles import Names, default_theme
+from styles import Names, Themes
 
 
 class Manager:
@@ -18,7 +18,7 @@ class ResetDatesBtn(QLabel):
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
         self.setAlignment(Qt.AlignCenter)
         self.setObjectName(Names.th_reset_dates_btn)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
         print(self.width(), self.height())
 
@@ -37,7 +37,7 @@ class ResetSearchBtn(QLabel):
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
         self.setAlignment(Qt.AlignCenter)
         self.setObjectName(Names.th_reset_search_btn)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, event):
         cnf.current_limit = cnf.LIMIT
@@ -53,7 +53,7 @@ class ResetFiltersBtn(QLabel):
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
         self.setAlignment(Qt.AlignCenter)
         self.setObjectName(Names.th_reset_filters_btn)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, event):
         cnf.current_limit = cnf.LIMIT
@@ -69,7 +69,7 @@ class ShowAllBtn(QLabel):
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
         self.setAlignment(Qt.AlignCenter)
         self.setObjectName(Names.th_show_all_btn)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, event):
         cnf.date_start, cnf.date_end = None, None
@@ -101,7 +101,7 @@ class AboveThumbsNoImages(QWidget):
         title_label.setWordWrap(True)
         self.v_layout.addWidget(title_label)
         title_label.setObjectName(Names.th_title)
-        title_label.setStyleSheet(default_theme)
+        title_label.setStyleSheet(Themes.current)
 
         h_layout = LayoutH()
         h_layout.setContentsMargins(0, 10, 0, 0)
@@ -160,7 +160,7 @@ class AboveThumbs(QWidget):
         label.setFixedWidth(width - 20)
         label.setWordWrap(True)
         label.setObjectName(Names.th_title)
-        label.setStyleSheet(default_theme)
+        label.setStyleSheet(Themes.current)
 
         h_layout = LayoutH()
         h_layout.setContentsMargins(0, 10, 0, 0)

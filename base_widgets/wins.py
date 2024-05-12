@@ -2,7 +2,7 @@ from PyQt5.QtCore import QEvent, QPoint, Qt
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils
 
 from .layouts import LayoutH, LayoutV
@@ -63,7 +63,7 @@ class TitleBar(QFrame):
         self.my_win = win
         self.setFixedHeight(33)
         self.setObjectName(Names.title_bar)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
         self.main_layout = LayoutH()
         self.setLayout(self.main_layout)
@@ -104,7 +104,7 @@ class WinBase(QMainWindow):
         central_widget = QWidget()
         central_widget.setContentsMargins(1, 1, 1, 1)
         central_widget.setObjectName(Names.central_widget)
-        central_widget.setStyleSheet(default_theme)
+        central_widget.setStyleSheet(Themes.current)
 
         self.setCentralWidget(central_widget)
         self.central_layout = LayoutV(central_widget)
@@ -170,7 +170,7 @@ class BaseBottomWid(QFrame):
         super().__init__()
         self.setContentsMargins(left, top, right, bottom)
         self.setObjectName(Names.base_bottom_widget)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
 
 class WinStandartBase(WinBase):

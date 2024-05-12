@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
-from styles import Names, default_theme
+from styles import Names, Themes
 
 
 class Btn(QLabel):
@@ -11,5 +11,5 @@ class Btn(QLabel):
         self.setAlignment(Qt.AlignCenter)
 
         self.setObjectName(Names.base_btn)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 

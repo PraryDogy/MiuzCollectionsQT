@@ -11,7 +11,7 @@ from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils, ReadDesatImage, get_image_size
 
 from ..image_context import ImageContext
@@ -165,7 +165,7 @@ class NaviZoom(QFrame):
         super().__init__(parent)
 
         self.setObjectName(Names.navi_zoom)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
         h_layout = LayoutH()
         self.setLayout(h_layout)

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFrame, QGraphicsDropShadowEffect, QLabel, QWidget
 
 from base_widgets import LayoutH
 from cfg import cnf
-from styles import Names, default_theme
+from styles import Names, Themes
 
 
 class Notification(QFrame):
@@ -12,7 +12,7 @@ class Notification(QFrame):
         super().__init__(parent)
 
         self.setObjectName(Names.notification_widget)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
         effect = QGraphicsDropShadowEffect()
         effect.setColor(QColor(0, 0, 0, 240))

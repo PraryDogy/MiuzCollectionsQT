@@ -1,5 +1,11 @@
-with open("styles/styles.css") as file:
-    default_theme = file.read()
+class Themes:
+    current = None
+
+    @staticmethod
+    def set_theme(name: str):
+        with open(f"styles/{name}.css") as file:
+            Themes.current = file.read()
+
 
 class Names:
     menu_btn = "menu_btn"

@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QLabel
 
 from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
 from cfg import cnf
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils, get_image_size
 
 
@@ -78,7 +78,7 @@ class BaseLabel(QLabel):
         self.adjustSize()
 
         self.setObjectName(Names.info_base_label)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
 
 class LeftLabel(BaseLabel):

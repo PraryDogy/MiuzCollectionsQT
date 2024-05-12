@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFrame
 from base_widgets import Btn, LayoutH
 from cfg import cnf
 from signals import gui_signals_app
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils
 
 from ..win_dates import WinDates
@@ -28,15 +28,15 @@ class DatesBtn(Btn):
 
     def set_normal_style(self):
         self.setObjectName(Names.dates_btn)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def set_blue_style(self):
         self.setObjectName(Names.dates_btn_selected)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def set_border_blue_style(self):
         self.setObjectName(Names.dates_btn_bordered)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -54,11 +54,11 @@ class FilterBtn(Btn):
 
     def set_normal_style(self):
         self.setObjectName(Names.filter_btn)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def set_blue_style(self):
         self.setObjectName(Names.filter_btn_selected)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, event):
         if event.button() != Qt.LeftButton:
@@ -83,7 +83,7 @@ class FiltersBar(QFrame):
         super().__init__()
         self.setContentsMargins(5, 0, 5, 0)
         self.setObjectName(Names.filter_bar_frame)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
         self.setFixedHeight(34)
 
         self.h_layout = LayoutH(self)

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QAction, QLineEdit
 
 from cfg import cnf
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils
 
 from .context import ContextMenuBase
@@ -46,7 +46,7 @@ class InputBase(QLineEdit):
         super().__init__()
         self.setFixedHeight(28)
         self.setObjectName(Names.base_input)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
 
     def contextMenuEvent(self, event):
         CustomContext(parent=self, event=event)

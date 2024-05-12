@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QMenu
 
-from styles import default_theme
+from styles import Themes
 
 
 class ContextMenuBase(QMenu):
@@ -13,7 +13,7 @@ class ContextMenuBase(QMenu):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)
         self.setMinimumWidth(200)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
     
     def show_menu(self):
         self.exec_(self.ev.globalPos())

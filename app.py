@@ -5,9 +5,10 @@ from PyQt5.QtGui import QResizeEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
                              QMainWindow, QPushButton, QVBoxLayout, QWidget)
 
-from base_widgets import WinBase, LayoutH, LayoutV
+from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
+from styles import Themes
 from utils import MainUtils
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
@@ -34,14 +35,26 @@ class TestWid(QWidget):
         return len(all_widgets)
 
     def reload(self):
-        from widgets import win_first_load
-        self.abc = win_first_load.WinFirstLoad()
-        self.abc.show()
-        return
+        all_widgets = QApplication.allWidgets()
+        widgets = [
+            widget
+            for widget in all_widgets
+            if widget.objectName()
+            ]
+        
+        Themes.set_theme("light_theme")
 
-        print(self.widgets_count())
-        gui_signals_app.reload_thumbnails.emit()
-        print(self.widgets_count())
+        for i in widgets:
+            i.setStyleSheet(Themes.current)
+
+        # from widgets import win_first_load
+        # self.abc = win_first_load.WinFirstLoad()
+        # self.abc.show()
+        # return
+
+        # print(self.widgets_count())
+        # gui_signals_app.reload_thumbnails.emit()
+        # print(self.widgets_count())
 
 
 class RightWidget(QFrame):
@@ -95,6 +108,8 @@ class WinMain(WinBase):
         self.setWindowTitle(cnf.app_name)
         self.resize(cnf.root_g["aw"], cnf.root_g["ah"])
         self.center()
+
+        Themes.set_theme("dark_theme")
 
         menubar = MacMenuBar()
         self.setMenuBar(menubar)
@@ -198,8 +213,8 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        # self.test = TestWid()
-        # self.test.show()
+        self.test = TestWid()
+        self.test.show()
 
         # from widgets.win_smb import WinSmb
         # Manager.smb_win = WinSmb()

@@ -6,7 +6,7 @@ from base_widgets import LayoutH, LayoutV
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
-from styles import Names, default_theme
+from styles import Names, Themes
 from utils import MainUtils
 
 from .collection_btn import CollectionBtn
@@ -17,12 +17,12 @@ class BaseLeftMenu(QScrollArea):
         super().__init__()
         self.setWidgetResizable(True)
         self.setObjectName(Names.menu_scrollbar)
-        self.setStyleSheet(default_theme)
+        self.setStyleSheet(Themes.current)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         scroll_widget = QWidget()
         # scroll_widget.setObjectName(Names.menu_scrollbar_qwidget)
-        # scroll_widget.setStyleSheet(dark_theme)
+        # scroll_widget.setStyleSheet(Themes.current)
         self.setWidget(scroll_widget)
 
         self.v_layout = LayoutV()
@@ -89,7 +89,7 @@ class LeftMenu(QFrame):
         fake = QFrame()
         fake.setFixedWidth(10)
         fake.setObjectName("menu_fake_widget")
-        fake.setStyleSheet(default_theme)
+        fake.setStyleSheet(Themes.current)
         h_lay.addWidget(fake)
 
         menu = BaseLeftMenu()
