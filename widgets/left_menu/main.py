@@ -6,7 +6,7 @@ from base_widgets import LayoutH, LayoutV
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
-from styles import Styles
+from styles import Styles, Names, dark_theme
 from utils import MainUtils
 
 from .collection_btn import CollectionBtn
@@ -16,28 +16,17 @@ class BaseLeftMenu(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
-
-        self.setStyleSheet(
-            f"""
-            QScrollArea {{
-                border: 0px;
-                border-right: 1px solid black;
-                }}
-            {Styles.get_scroll_style(Styles.menu_sel_item_color)}
-            """)
-
+        self.setObjectName(Names.menu_scrollbar)
+        self.setStyleSheet(dark_theme)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.scroll_widget = QWidget()
-        self.scroll_widget.setStyleSheet(
-            f"""
-            background-color: {Styles.menu_bg_color};
-            border: 0px;
-            """)
-        self.setWidget(self.scroll_widget)
+        scroll_widget = QWidget()
+        # scroll_widget.setObjectName(Names.menu_scrollbar_qwidget)
+        # scroll_widget.setStyleSheet(dark_theme)
+        self.setWidget(scroll_widget)
 
         self.v_layout = LayoutV()
-        self.scroll_widget.setLayout(self.v_layout)
+        scroll_widget.setLayout(self.v_layout)
         self.init_ui()
         gui_signals_app.reload_menu.connect(self.reload_menu)
 
@@ -99,15 +88,8 @@ class LeftMenu(QFrame):
 
         fake = QFrame()
         fake.setFixedWidth(10)
-        fake.setObjectName("fake_widget")
-        fake.setStyleSheet(
-            f"""
-            #fake_widget{{
-            border: 0px;
-            background-color: {Styles.menu_bg_color};
-            border-bottom-left-radius: {Styles.base_radius}px;
-            }}
-            """)
+        fake.setObjectName("menu_fake_widget")
+        fake.setStyleSheet(dark_theme)
         h_lay.addWidget(fake)
 
         menu = BaseLeftMenu()

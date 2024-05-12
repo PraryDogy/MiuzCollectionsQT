@@ -6,6 +6,9 @@ class Names:
     menu_btn_bordered = "menu_btn_bordered"
     menu_btn_selected = "menu_btn_selected"
     menu_btn_selected_bordered = "menu_btn_selected_bordered"
+    menu_scrollbar = "menu_scrollbar"
+    menu_scrollbar_qwidget = "menu_scrollbar_qwidget"
+    menu_fake_widget = "menu_fake_widget"
 
 
 class Styles:
@@ -61,10 +64,10 @@ class Styles:
                     padding-top: 2px;
                     padding-bottom: 2px;}}
                 QScrollBar::handle:vertical {{
-                    background-color: {color};
+                    background-color: #525252;
                     border-radius: 4px;}}
                 QScrollBar::handle:vertical:hover {{
-                    background-color: {__class__.st_bar_sel};
+                    background-color: #676767;
                     border-radius: 4px;}}
                 QScrollBar::add-line:vertical {{
                     height: 0px;}}
