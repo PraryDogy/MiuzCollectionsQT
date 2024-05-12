@@ -101,3 +101,14 @@ QScrollBar#menu_scrollbar::add-page:vertical, QScrollBar#menu_scrollbar::sub-pag
 
 /* FILTER BUTTON IN FILTERS BAR */
 
+#filter_btn {
+    background-color: #242424;
+    border-radius: 6;
+    margin-right: 5px;
+}
+
+#filter_btn_selected {
+    background-color: #2e59cb;
+    border-radius: 6;
+    margin-right: 5px;
+}

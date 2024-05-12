@@ -54,30 +54,15 @@ class FilterBtn(Btn):
         self.setObjectName(Names.filter_btn)
         self.setStyleSheet(default_theme)
 
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.topbar_bg_color};
-            border-radius: {Styles.small_radius};
-            margin-right: {Styles.topbar_items_space}px;
-            """)
-
     def set_blue_style(self):
         self.setObjectName(Names.filter_btn_selected)
         self.setStyleSheet(default_theme)
-        
-        self.setStyleSheet(
-            f"""
-            background-color: {Styles.blue_color};
-            border-radius: {Styles.small_radius};
-            margin-right: {Styles.topbar_items_space}px;
-            """)
 
     def mouseReleaseEvent(self, event):
         if event.button() != Qt.LeftButton:
             return
-
-        bg_color = self.palette().color(self.backgroundRole()).name()
-        if bg_color == Styles.blue_color:
+        
+        if self.objectName() == Names.filter_btn_selected:
             self.set_normal_style()
         else:
             self.set_blue_style()
