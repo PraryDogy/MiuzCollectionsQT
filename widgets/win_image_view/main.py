@@ -228,7 +228,7 @@ class WinImageView(WinImgViewBase):
         self.fsize_img_thread = None
 
         super().__init__(close_func=self.my_close)
-        self.disable_min_max()
+        # self.disable_min_max()
         self.setMinimumSize(QSize(500, 400))
         self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
