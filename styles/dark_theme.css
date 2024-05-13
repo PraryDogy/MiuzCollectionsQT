@@ -1,64 +1,79 @@
-/* name = dark_theme */
-
 /* GLOBAL FONT COLOR */
 
+
+/* параметры для всех виджетов QLabel, у которых нет своего стиля */
 QLabel {
     color: #ffffff;
 }
 
 
-/* UNIVERSAL SCROLL */
+/* UNIVERSAL SCROLL UNIVERSAL SCROLL UNIVERSAL SCROLL UNIVERSAL SCROLL */
 
+/* подложка скролла */
 QScrollBar:vertical {
     background-color: transparent;
     width: 12px;
     padding: 2px;
 }
+
+/* ползунок скролла */
 QScrollBar::handle:vertical {
     background-color: #464646;
     border-radius: 4px;
 }
+
+/* ползунок скролла под курсором */
 QScrollBar::handle:vertical:hover {
     background-color: #676767;
     border-radius: 4px;
 }
+
+/* кнопка лишняя */
 QScrollBar::add-line:vertical {
     height: 0px;
 }
+
+/* кнопка лишняя */
 QScrollBar::sub-line:vertical {
     height: 0px;
 }
+
+/* кнопки лишние */
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     height: 0px;
 }
 
 
-/* UNIVERSAL CONTEXT MENU */
+/* UNIVERSAL CONTEXT MENU UNIVERSAL CONTEXT MENU UNIVERSAL CONTEXT MENU */
 
+/* основной виджет меню */
 QMenu {
     background-color: #333333;
     border: 1px solid #5d5d5d;
     border-radius: 8;
     padding : 3px;
     color: white;
-}      
-QMenu::indicator {
-    height: 0px;
 }
+
+/* пункт контекстного меню */
 QMenu::item {
     padding: 3 15 3 15;
 }
+
+/* пункт контекстного меню под мышкой */
 QMenu::item:selected {
     padding: 3 15 3 15;
     background: #2e59cb;
     border-radius: 6;
 }
+
+/* стрелочка для субменю */
 QMenu::right-arrow {
     height: 0px;
     }
 
 
-/* LEFT MENU */
+/* LEFT MENU LEFT MENU LEFT MENU LEFT MENU LEFT MENU LEFT MENU LEFT MENU */
 
 QScrollArea#menu_scrollbar {
     border: 0px;
@@ -107,7 +122,14 @@ QScrollArea#menu_scrollbar {
     }
 
 
-/* DATES BUTTON IN FILTER BAR */
+/* FILTERS BAR FILTERS BAR FILTERS BAR FILTERS BAR FILTERS BAR FILTERS BAR */
+
+#filter_bar_frame {
+    background-color: #242424;
+    border-radius: 0px;
+    border-bottom: 1px solid black;
+}
+
 
 #dates_btn{
     border-radius: 6;
@@ -130,9 +152,6 @@ QScrollArea#menu_scrollbar {
     background-color: #242424;
 }
 
-
-/* FILTER BUTTON IN FILTERS BAR */
-
 #filter_btn {
     background-color: #242424;
     border-radius: 6;
@@ -143,15 +162,6 @@ QScrollArea#menu_scrollbar {
     background-color: #2e59cb;
     border-radius: 6;
     margin-right: 5px;
-}
-
-
-/* FILTER BAR FRAME */
-
-#filter_bar_frame {
-    background-color: #242424;
-    border-radius: 0px;
-    border-bottom: 1px solid black;
 }
 
 
