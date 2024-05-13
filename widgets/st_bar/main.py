@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QFrame, QSpacerItem, QWidget
 
-from base_widgets import LayoutH, LayoutV, SvgBtn
+from base_widgets import LayoutH, SvgBtn, SvgShadowed
 from cfg import cnf
 from signals import gui_signals_app
 from styles import Names, Themes
@@ -53,9 +53,11 @@ class StBar(QFrame):
         sett_base.setLayout(sett_layout)
 
         sett_widget = SvgBtn("settings.svg", 17)
+        # sett_widget = SvgShadowed("settings.svg", 17, 200)
         sett_layout.addWidget(sett_widget)
 
         self.zoom_wid = SvgBtn(self.get_zoom_icon(), 17)
+        # self.zoom_wid = SvgShadowed(self.get_zoom_icon(), 17, 200)
         self.zoom_wid.mouseReleaseEvent = self.zoom_cmd
         self.h_layout.addWidget(self.zoom_wid)
 

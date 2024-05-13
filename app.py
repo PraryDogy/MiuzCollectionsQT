@@ -224,5 +224,5 @@ class App(QApplication):
         # Manager.smb_win.show()
 
 Themes.set_theme("dark_theme")
-# Themes.set_theme("light_theme")
+Themes.set_theme("light_theme")
 app = App()

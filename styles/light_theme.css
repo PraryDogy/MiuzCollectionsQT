@@ -177,7 +177,7 @@ QScrollArea#menu_scrollbar {
 }
 
 #st_bar_jpg {
-    background: #ffffff;
+    background: #e3e3e3;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
@@ -185,7 +185,7 @@ QScrollArea#menu_scrollbar {
 }
 
 #st_bar_jpg_sel {
-    background: #cccccc;
+    background: #c2c1c1;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
@@ -193,7 +193,7 @@ QScrollArea#menu_scrollbar {
 }
 
 #st_bar_tiff {
-    background: #ffffff;
+    background: #e3e3e3;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
@@ -201,7 +201,7 @@ QScrollArea#menu_scrollbar {
 }
 
 #st_bar_tiff_sel {
-    background: #cccccc;
+    background: #c2c1c1;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
@@ -250,6 +250,7 @@ QScrollArea#menu_scrollbar {
 #th_title {
     font-size: 18pt;
     font-weight: bold;
+    color: #7d7d7d;
 }
 
 QScrollArea#th_scrollbar {
