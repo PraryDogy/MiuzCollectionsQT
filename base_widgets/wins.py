@@ -192,6 +192,8 @@ class WinImgViewBase(WinBase):
 
         self.content_wid = BaseBottomWid(left=10, top=0, right=10, bottom=0)
         self.central_layout.addWidget(self.content_wid)
+        self.content_wid.setObjectName("img_view_bg")
+        self.content_wid.setStyleSheet(Themes.current)
 
         self.content_layout = LayoutV()
         self.content_wid.setLayout(self.content_layout)

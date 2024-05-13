@@ -311,6 +311,12 @@ QScrollArea#th_scrollbar {
     border-radius: 15px;
 }
 
+#img_view_bg {
+    background-color: #101010;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+ }
+
 
 /* INFO WINDOW */
 

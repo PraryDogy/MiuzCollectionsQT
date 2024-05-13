@@ -60,3 +60,4 @@ class Names:
     central_widget = "central_widget"
     base_bottom_widget = "base_bottom_widget"
     separator = "separator"
+    img_view_bg = "img_view_bg"
