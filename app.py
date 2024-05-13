@@ -184,7 +184,14 @@ class App(QApplication):
 
     def eventFilter(self, obj, event: QEvent):
         if event.type() == QEvent.ApplicationActivate:
-            self.main_win.show()
+            # self.main_win.show()
+            for widget in QApplication.topLevelWidgets():
+                if isinstance(widget, QMainWindow):
+                    if widget.isMaximized():
+                        widget.showMaximized()
+                    else:
+                        widget.showNormal()
+
         return super().eventFilter(obj, event)
     
     def on_exit(self):
