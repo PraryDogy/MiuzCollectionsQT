@@ -31,12 +31,19 @@ applescripts = [
     if i.endswith((".scpt"))
     ]
 
+styles = [
+    os.path.join("styles", i)
+    for i in os.listdir("styles")
+    if i.endswith((".css"))
+]
+
 
 DATA_FILES = [
     "db.db",
     "lang/lang.json",
     ("images", images),
     ("applescripts", applescripts),
+    ("styles", styles)
     ]
 
 OPTIONS = {"iconfile": "icon/icon.icns",

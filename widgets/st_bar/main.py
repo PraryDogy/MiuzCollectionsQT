@@ -52,9 +52,9 @@ class StBar(QFrame):
 
         self.zoom_wid = SvgBtn(self.get_zoom_icon(), 17)
         self.zoom_wid.mouseReleaseEvent = self.zoom_cmd
-        self.h_layout.addWidget(self.zoom_wid)
+        # self.h_layout.addWidget(self.zoom_wid)
 
-        self.h_layout.addSpacerItem(QSpacerItem(20, 0))
+        # self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
         switch_theme = SvgBtn("switch_theme.svg", 17)
         switch_theme.mouseReleaseEvent = self.switch_theme_cmd
