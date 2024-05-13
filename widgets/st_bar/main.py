@@ -38,20 +38,21 @@ class StBar(QFrame):
 
         self.h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        sett_widget = SvgBtn(f"{cnf.theme}_settings.svg", 17)
-        sett_widget.mouseReleaseEvent = self.sett_btn_cmd
-        self.h_layout.addWidget(sett_widget)
+        self.sett_widget = SvgBtn(f"{cnf.theme}_settings.svg", 17)
+        self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
+        self.h_layout.addWidget(self.sett_widget)
 
         self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        switch_theme = SvgBtn(f"{cnf.theme}_switch.svg", 17)
-        switch_theme.mouseReleaseEvent = self.switch_theme_cmd
-        self.h_layout.addWidget(switch_theme)
+        self.switch_theme = SvgBtn(f"{cnf.theme}_switch.svg", 17)
+        self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
+        self.h_layout.addWidget(self.switch_theme)
 
         self.h_layout.addSpacerItem(QSpacerItem(30, 0))
 
     def reload_stbar(self):
         MainUtils.clear_layout(self.h_layout)
+        cnf.stbar_btns.clear()
         self.init_ui()
 
     def switch_theme_cmd(self, e):
@@ -71,6 +72,9 @@ class StBar(QFrame):
 
         for i in widgets:
             i.setStyleSheet(Themes.current)
+
+        self.sett_widget.set_icon(f"{cnf.theme}_settings.svg")
+        self.switch_theme.set_icon(f"{cnf.theme}_switch.svg")
 
     def sett_btn_cmd(self, e):
         Manager.win_settings = WinSettings()
