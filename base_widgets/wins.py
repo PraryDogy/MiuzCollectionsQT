@@ -159,9 +159,9 @@ class WinBase(QMainWindow):
 
     def disable_min_max(self):
         self.titlebar.btns.min_btn.setDisabled(True)
-        self.titlebar.btns.min_btn.set_icon("gray-2.svg")
+        self.titlebar.btns.min_btn.set_icon(f"{cnf.theme}_gray.svg")
         self.titlebar.btns.max_btn.setDisabled(True)
-        self.titlebar.btns.max_btn.set_icon("gray-2.svg")
+        self.titlebar.btns.max_btn.set_icon(f"{cnf.theme}_gray.svg")
 
 
 class BaseBottomWid(QFrame):
