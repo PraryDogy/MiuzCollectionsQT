@@ -230,6 +230,5 @@ class App(QApplication):
         # Manager.smb_win = WinSmb()
         # Manager.smb_win.show()
 
-Themes.set_theme("dark_theme")
-# Themes.set_theme("light_theme")
+Themes.set_theme(cnf.theme)
 app = App()

@@ -66,6 +66,7 @@ class User:
             "other" : False
             }
         
+        self.theme: str = "dark_theme"
         self.user_lng: str = "en"
         self.zoom: bool = False
         

@@ -74,10 +74,12 @@ class StBar(QFrame):
             if widget.objectName()
             ]
         
-        if "light_theme" in Themes.current:
-            Themes.set_theme("dark_theme")
-        else:
+        if cnf.theme == "dark_theme":
             Themes.set_theme("light_theme")
+            cnf.theme = "light_theme"
+        else:
+            Themes.set_theme("dark_theme")
+            cnf.theme = "dark_theme"
 
         for i in widgets:
             i.setStyleSheet(Themes.current)
