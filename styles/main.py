@@ -3,7 +3,7 @@ class Themes:
 
     @staticmethod
     def set_theme(name: str):
-        with open(f"styles/{name}.css") as file:
+        with open(f"styles/{name}.css", mode="r", encoding="utf-8") as file:
             Themes.current = file.read()
 
 
