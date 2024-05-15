@@ -22,7 +22,7 @@ from ..win_smb import WinSmb
 class Manager:
     images = {}
     threads = []
-    win_smb = None
+    win_smb: WinSmb = None
 
 
 class ImageWinUtils:
@@ -325,6 +325,7 @@ class WinImageView(WinImgViewBase):
         else:
             Manager.win_smb = WinSmb(self)
             Manager.win_smb.show()
+            Manager.win_smb.finished.connect(self.run_thread)
 
     def finalize_thread(self, data: dict):
         if data["width"] == 0 or data["src"] != self.image_path:

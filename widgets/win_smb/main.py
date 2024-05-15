@@ -103,6 +103,8 @@ class BrowseColl(QWidget):
 
 
 class WinSmb(WinStandartBase):
+    finished = pyqtSignal()
+
     def __init__(self, parent = None):
         MainUtils.close_same_win(WinSmb)
 
@@ -144,6 +146,7 @@ class WinSmb(WinStandartBase):
         self.init_ui()
 
     def ok_cmd(self, e):
+        self.finished.emit()
         self.browse_coll.finalize()
         self.deleteLater()
 
