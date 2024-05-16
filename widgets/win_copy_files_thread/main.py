@@ -19,6 +19,8 @@ class WinCopyFilesThread(WinStandartBase, QObject):
         super().__init__(close_func=self.my_close)
         self.set_title(cnf.lng.copying_title)
         self.disable_min_max()
+        self.titlebar.btns.close_btn.setDisabled(True)
+        self.titlebar.btns.close_btn.set_icon(f"{cnf.theme}_gray.svg")
         self.setFixedSize(270, 130)
 
         label = QLabel(cnf.lng.copying_files)
@@ -73,7 +75,7 @@ class WinCopyFilesThread(WinStandartBase, QObject):
 
     def finalize(self):
         self.finished.emit()
-        self.deleteLater()        
+        # self.deleteLater()
 
     def center_win(self):
         parent = MainUtils.get_central_widget()
