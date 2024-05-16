@@ -75,7 +75,7 @@ class WinCopyFilesThread(WinStandartBase, QObject):
 
     def finalize(self):
         self.finished.emit()
-        # self.deleteLater()
+        self.deleteLater()
 
     def center_win(self):
         parent = MainUtils.get_central_widget()
