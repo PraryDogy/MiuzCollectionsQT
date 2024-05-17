@@ -38,15 +38,16 @@ class StBar(QFrame):
 
         self.h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.sett_widget = SvgBtn(f"{cnf.theme}_settings.svg", 17)
-        self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
-        self.h_layout.addWidget(self.sett_widget)
+        self.switch_theme = SvgBtn(f"{cnf.theme}_switch.svg", 19)
+        self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
+        self.h_layout.addWidget(self.switch_theme)
 
         self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.switch_theme = SvgBtn(f"{cnf.theme}_switch.svg", 17)
-        self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
-        self.h_layout.addWidget(self.switch_theme)
+        self.sett_widget = SvgBtn(f"{cnf.theme}_settings.svg", 19)
+        self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
+        self.h_layout.addWidget(self.sett_widget)
+   
 
         self.h_layout.addSpacerItem(QSpacerItem(30, 0))
 
