@@ -26,35 +26,12 @@ class TestWid(QWidget):
         v_layout = QVBoxLayout()
         self.setLayout(v_layout)
 
-        btn = QPushButton('reload')
+        btn = QPushButton('test btn')
         v_layout.addWidget(btn)
         btn.clicked.connect(self.reload)
 
-    def widgets_count(self):
-        all_widgets = QApplication.instance().allWidgets()
-        return len(all_widgets)
-
     def reload(self):
-        all_widgets = QApplication.allWidgets()
-        widgets = [
-            widget
-            for widget in all_widgets
-            if widget.objectName()
-            ]
-        
-        Themes.set_theme("light_theme")
-
-        for i in widgets:
-            i.setStyleSheet(Themes.current)
-
-        # from widgets import win_first_load
-        # self.abc = win_first_load.WinFirstLoad()
-        # self.abc.show()
-        # return
-
-        # print(self.widgets_count())
-        # gui_signals_app.reload_thumbnails.emit()
-        # print(self.widgets_count())
+        ...
 
 
 class RightWidget(QFrame):
@@ -223,12 +200,8 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        # self.test = TestWid()
-        # self.test.show()
-
-        # from widgets.win_smb import WinSmb
-        # Manager.smb_win = WinSmb()
-        # Manager.smb_win.show()
+        self.test = TestWid()
+        self.test.show()
 
 Themes.set_theme(cnf.theme)
 app = App()
