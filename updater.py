@@ -1,12 +1,17 @@
 import os
 import shutil
+import subprocess
 import zipfile
+
 from cfg import cnf
- 
+
+
 class Updater:
     def __init__(self):
         self.path = self.get_path()
         self.download_zip()
+
+
 
     def get_path(self):
         possible_paths = (
@@ -28,5 +33,15 @@ class Updater:
         with zipfile.ZipFile(dest, 'r') as zip_ref:
             zip_ref.extractall(cnf.app_support_app_dir)
 
+    def run_udate(self):
+        exit_app = "applescripts/exit_app.scpt"
+        run_app = "applescripts/run_app.scpt"
+        
+        command = ["osascript", exit_app, cnf.app_name]
+        subprocess.run(command)
 
-Updater()
+        # shutil.copy2()
+
+
+
+# Updater()

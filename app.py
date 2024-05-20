@@ -13,7 +13,6 @@ from utils import MainUtils
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
 
-
 class Manager:
     smb_win = None
     first_load_win = None
@@ -31,7 +30,9 @@ class TestWid(QWidget):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-        ...
+        import subprocess
+        subprocess.run(["python", "updater.py"])
+        
 
 
 class RightWidget(QFrame):
