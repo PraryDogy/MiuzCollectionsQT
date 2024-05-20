@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 import zipfile
-
+from time import sleep
 from cfg import cnf
 
 
@@ -32,10 +32,12 @@ class Updater:
         with zipfile.ZipFile(dest, 'r') as zip_ref:
             zip_ref.extractall(cnf.app_support_app_dir)
 
-            return os.path.join(
-                cnf.app_support_app_dir,
-                cnf.app_name + ".app",
-                )
+        sleep(2)
+
+        return os.path.join(
+            cnf.app_support_app_dir,
+            cnf.app_name + ".app",
+            )
 
     def run_udate(self, unzipped_app: str):
         exit_app = "applescripts/exit_app.scpt"
@@ -49,6 +51,8 @@ class Updater:
         app_index = current_path.find(ext)
 
         dest = current_path[:app_index] + ext
+        print(dest)
+        return
         shutil.copy2(unzipped_app, dest)
 
         command = ["osascript", run_app, cnf.app_name]
