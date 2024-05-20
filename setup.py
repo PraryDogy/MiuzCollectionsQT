@@ -43,7 +43,8 @@ DATA_FILES = [
     "lang/lang.json",
     ("images", images),
     ("applescripts", applescripts),
-    ("styles", styles)
+    ("styles", styles),
+    "updater.py"
     ]
 
 OPTIONS = {"iconfile": "icon/icon.icns",
