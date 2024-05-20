@@ -254,6 +254,20 @@ class WinSettings(WinStandartBase):
         temp.timeout.connect(self.init_ui)
         temp.start(10)
         self.setFixedSize(420, 550)
+
+        self.test_wid = QWidget(parent=self.content_wid)
+        self.test_wid.setFixedSize(420, 550)
+        self.test_wid.setStyleSheet("background-color: red;")
+        self.test_wid.setWindowFlags(Qt.WindowFlags.Al)
+
+        self.test_l = LayoutV()
+        self.test_wid.setLayout(self.test_l)
+        
+        test_label = QLabel("Настройки")
+        self.test_l.addWidget(test_label)
+        test_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+
         self.center_win()
         self.setFocus()
 
