@@ -44,7 +44,6 @@ DATA_FILES = [
     ("images", images),
     ("applescripts", applescripts),
     ("styles", styles),
-    "updater.py"
     ]
 
 OPTIONS = {"iconfile": "icon/icon.icns",
