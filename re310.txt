@@ -5,4 +5,3 @@ greenlet==3.0.3
 pillow==10.2.0
 PyQt5==5.15.10
 SQLAlchemy==2.0.25
-watchdog==3.0.0

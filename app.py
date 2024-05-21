@@ -33,14 +33,7 @@ class TestWid(QWidget):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-
-        script = "/Users/Loshkarev/Library/Application Support/MiuzCollectionsQT/update_app.scpt"
-
-        src = "/Users/Loshkarev/Library/Application Support/MiuzCollectionsQT/MiuzCollections.app"
-        dest = "/Users/Loshkarev/Desktop/MiuzCollections.app"
-
-        subprocess.run(["osascript", script, "MiuzCollections.app", src, dest])
-
+        print("test btn press")
 
 
 class RightWidget(QFrame):
@@ -209,8 +202,8 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        self.test = TestWid()
-        self.test.show()
+        # self.test = TestWid()
+        # self.test.show()
 
 Themes.set_theme(cnf.theme)
 app = App()
