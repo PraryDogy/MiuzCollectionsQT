@@ -1,3 +1,5 @@
+import os
+import subprocess
 import sys
 
 from PyQt5.QtCore import QEvent, Qt, QTimer
@@ -12,6 +14,7 @@ from styles import Names, Themes
 from utils import MainUtils
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
+
 
 class Manager:
     smb_win = None
@@ -30,9 +33,14 @@ class TestWid(QWidget):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-        import subprocess
-        subprocess.run(["python", "updater.py"])
-        
+
+        script = "/Users/Loshkarev/Library/Application Support/MiuzCollectionsQT/update_app.scpt"
+
+        src = "/Users/Loshkarev/Library/Application Support/MiuzCollectionsQT/MiuzCollections.app"
+        dest = "/Users/Loshkarev/Desktop/MiuzCollections.app"
+
+        subprocess.run(["osascript", script, "MiuzCollections.app", src, dest])
+
 
 
 class RightWidget(QFrame):
