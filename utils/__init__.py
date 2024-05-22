@@ -9,3 +9,4 @@ from .main_utils import MainUtils
 from .reveal_files import RevealFiles
 from .scaner import scaner_app
 # from .watcher import watcher_app
+from .updater import Updater
