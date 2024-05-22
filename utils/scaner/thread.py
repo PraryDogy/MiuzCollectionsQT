@@ -486,7 +486,10 @@ class Scaner(ScanerBaseClass):
         try:
             self.scaner_actions()
         except Exception:
-            gui_signals_app.progressbar_hide.emit()
+            try:
+                gui_signals_app.progressbar_hide.emit()
+            except Exception as ee:
+                print(ee)
             print(traceback.format_exc())
 
 

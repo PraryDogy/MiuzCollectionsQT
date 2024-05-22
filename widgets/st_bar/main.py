@@ -55,7 +55,7 @@ class StBar(QFrame):
 
     def reload_stbar(self):
         MainUtils.clear_layout(self.h_layout)
-        cnf.stbar_btns.clear()
+        # cnf.stbar_btns.clear()
         self.init_ui()
 
     def switch_theme_cmd(self, e):
