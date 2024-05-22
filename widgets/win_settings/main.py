@@ -8,7 +8,7 @@ from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from styles import Names, Themes
-from utils import MainUtils
+from utils import MainUtils, Updater
 
 
 class BrowseColl(QWidget):
@@ -240,6 +240,28 @@ class ThumbMove(QWidget):
         self.btn_tiff.setStyleSheet(Themes.current)
 
 
+class UpdaterWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.v_layout = LayoutV()
+        self.setLayout(self.v_layout)
+
+        self.btn = Btn("Скачать обновление")
+        self.btn.setFixedWidth(150)
+        self.btn.mouseReleaseEvent = self.update_btn_cmd
+        self.v_layout.addWidget(self.btn)
+
+    def update_btn_cmd(self, e):
+        self.task = Updater()
+        self.btn.setText("Подождите...")
+        self.task.finished.connect(self.finalize)
+        self.task.start()
+
+    def finalize(self):
+        self.btn.setText("Скачать обновление")
+
+
 class WinSettings(WinStandartBase):
     def __init__(self):
         MainUtils.close_same_win(WinSettings)
@@ -253,21 +275,7 @@ class WinSettings(WinStandartBase):
         temp.setSingleShot(True)
         temp.timeout.connect(self.init_ui)
         temp.start(10)
-        self.setFixedSize(420, 550)
-
-        self.test_wid = QWidget(parent=self.content_wid)
-        self.test_wid.setFixedSize(420, 550)
-        self.test_wid.setStyleSheet("background-color: red;")
-        self.test_wid.setWindowFlags(Qt.WindowFlags.Al)
-
-        self.test_l = LayoutV()
-        self.test_wid.setLayout(self.test_l)
-        
-        test_label = QLabel("Настройки")
-        self.test_l.addWidget(test_label)
-        test_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-
+        self.setFixedSize(420, 600)
         self.center_win()
         self.setFocus()
 
@@ -290,6 +298,10 @@ class WinSettings(WinStandartBase):
 
         self.thumb_move = ThumbMove()
         self.content_layout.addWidget(self.thumb_move)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+
+        self.update_wid = UpdaterWidget()
+        self.content_layout.addWidget(self.update_wid)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.cust_filters = CustFilters()

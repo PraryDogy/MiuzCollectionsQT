@@ -40,6 +40,10 @@ class UpdaterMain:
 
         shutil.copy2(zip_file, downloaded_zip)
 
+        while not os.path.exists(downloaded_zip):
+            time.sleep(1)
+        time.sleep(1)
+
         app_file = os.path.join(down_folder, filename_app_file)
 
         if os.path.exists(app_file):
@@ -55,6 +59,7 @@ class UpdaterMain:
 
         while not os.path.exists(app_file):
             time.sleep(1)
+        time.sleep(1)
 
         if os.path.exists(downloaded_zip):
             os.remove(downloaded_zip)

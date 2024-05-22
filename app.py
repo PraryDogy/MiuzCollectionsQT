@@ -204,8 +204,8 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        self.test = TestWid()
-        self.test.show()
+        # self.test = TestWid()
+        # self.test.show()
 
 Themes.set_theme(cnf.theme)
 app = App()
