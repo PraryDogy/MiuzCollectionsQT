@@ -34,9 +34,16 @@ class UpdaterMain:
 
         down_folder = cnf.down_folder
         downloaded_zip = os.path.join(down_folder, filename_zip_file)
+
+        if os.path.exists(downloaded_zip):
+            os.remove(downloaded_zip)
+
         shutil.copy2(zip_file, downloaded_zip)
 
         app_file = os.path.join(down_folder, filename_app_file)
+
+        if os.path.exists(app_file):
+            shutil.rmtree(app_file)
 
         apple_script = f"""
             tell application \"Archive Utility\"
@@ -49,7 +56,9 @@ class UpdaterMain:
         while not os.path.exists(app_file):
             time.sleep(1)
 
-        os.remove(downloaded_zip)
+        if os.path.exists(downloaded_zip):
+            os.remove(downloaded_zip)
+
         subprocess.run(["open", "-R", app_file])
 
         apple_script = f"""
@@ -70,3 +79,6 @@ class Updater(QThread):
     def run(self):
         UpdaterMain()
         self.finished.emit()
+
+
+
