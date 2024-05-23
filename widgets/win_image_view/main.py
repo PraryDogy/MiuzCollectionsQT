@@ -228,7 +228,6 @@ class WinImageView(WinImgViewBase):
         self.fsize_img_thread = None
 
         super().__init__(close_func=self.my_close)
-        # self.disable_min_max()
         self.setMinimumSize(QSize(500, 400))
         self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
@@ -269,7 +268,18 @@ class WinImageView(WinImgViewBase):
 
         self.setFocus()
         self.center_win()
-        self.load_image(interval=1500)
+        self.load_image(interval=200)
+
+        smb_timer = QTimer(self)
+        smb_timer.setSingleShot(True)
+        smb_timer.timeout.connect(self.smb_check_first)
+        smb_timer.start(300)
+
+    def smb_check_first(self):
+        if not MainUtils.smb_check():
+            Manager.win_smb = WinSmb(self)
+            Manager.win_smb.show()
+            # Manager.win_smb.finished.connect(self.run_thread)
 
     def load_image(self, interval: int = 50):
         if self.image_path not in Manager.images:
@@ -316,15 +326,10 @@ class WinImageView(WinImgViewBase):
         self.navi_next.hide()
 
     def run_thread(self):
-        if MainUtils.smb_check():
-            self.fsize_img_thread = FSizeImgThread(self.image_path)
-            self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
-            self.fsize_img_thread.start()
-            Manager.threads.append(self.fsize_img_thread)
-        else:
-            Manager.win_smb = WinSmb(self)
-            Manager.win_smb.show()
-            Manager.win_smb.finished.connect(self.run_thread)
+        self.fsize_img_thread = FSizeImgThread(self.image_path)
+        self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
+        self.fsize_img_thread.start()
+        Manager.threads.append(self.fsize_img_thread)
 
     def finalize_thread(self, data: dict):
         if data["width"] == 0 or data["src"] != self.image_path:
