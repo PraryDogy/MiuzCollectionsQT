@@ -83,10 +83,10 @@ class BrowseColl(QWidget):
         file_dialog = QFileDialog()
         file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
 
-        if not os.path.exists(Manager.coll_folder):
-            file_dialog.setDirectory(cnf.down_folder)
-        else:
-            file_dialog.setDirectory(Manager.coll_folder)
+        # if not os.path.exists(Manager.coll_folder):
+        #     file_dialog.setDirectory(cnf.down_folder)
+        # else:
+        #     file_dialog.setDirectory(Manager.coll_folder)
 
         selected_folder = file_dialog.getExistingDirectory()
 

@@ -50,6 +50,10 @@ class FSizeImgThread(QThread):
 
     def run(self):
         try:
+            if not os.path.exists(self.image_path):
+                print("image viewer thread no connection")
+                return
+
             if self.image_path not in Manager.images:
 
                 img = ReadDesatImage(self.image_path)
@@ -279,7 +283,7 @@ class WinImageView(WinImgViewBase):
         if not MainUtils.smb_check():
             Manager.win_smb = WinSmb(self)
             Manager.win_smb.show()
-            # Manager.win_smb.finished.connect(self.run_thread)
+            Manager.win_smb.finished.connect(self.run_thread)
 
     def load_image(self, interval: int = 50):
         if self.image_path not in Manager.images:
