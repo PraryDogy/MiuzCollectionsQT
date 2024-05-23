@@ -3,17 +3,22 @@ import shutil
 import subprocess
 import time
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QObject
 
 from cfg import cnf
 
 
-class UpdaterMain:
-    def __init__(self):
-        volumes = "Volumes"
-        zip_file = "Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip"
+class UpdaterMain(QObject):
+    no_connection = pyqtSignal()
+    finished = pyqtSignal()
 
-        filename_zip_file = os.path.basename(zip_file)
+    def __init__(self):
+        super().__init__()
+
+    def go(self):
+        volumes = "Volumes"
+
+        filename_zip_file = os.path.basename(cnf.updater_path)
         filename_app_file = os.path.splitext(filename_zip_file)[0] + ".app"
 
         drives = os.listdir(os.path.join(os.sep, volumes))
@@ -24,16 +29,20 @@ class UpdaterMain:
         
         try:
             zip_file = [
-                os.path.join(drive, zip_file)
+                os.path.join(drive, cnf.updater_path)
                 for drive in drives
-                if os.path.exists(os.path.join(drive, zip_file))
+                if os.path.exists(os.path.join(drive, cnf.updater_path))
                 ][0]
 
         except IndexError:
+            zip_file = None
             print("no zip file")
 
-        down_folder = cnf.down_folder
-        downloaded_zip = os.path.join(down_folder, filename_zip_file)
+        if not zip_file:
+            self.no_connection.emit()
+            return
+
+        downloaded_zip = os.path.join(cnf.down_folder, filename_zip_file)
 
         if os.path.exists(downloaded_zip):
             os.remove(downloaded_zip)
@@ -44,7 +53,7 @@ class UpdaterMain:
             time.sleep(1)
         time.sleep(1)
 
-        app_file = os.path.join(down_folder, filename_app_file)
+        app_file = os.path.join(cnf.down_folder, filename_app_file)
 
         if os.path.exists(app_file):
             shutil.rmtree(app_file)
@@ -74,16 +83,27 @@ class UpdaterMain:
 
         subprocess.run(["osascript", "-e", apple_script])
 
+        self.finished.emit()
+        print(1)
+
 
 class Updater(QThread):
     finished = pyqtSignal()
+    no_connection = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+        self.task = None
 
     def run(self):
-        UpdaterMain()
+        self.task = UpdaterMain()
+        self.task.no_connection.connect(self.no_connection_cmd)
+        self.task.finished.connect(self.finished_cmd)
+        self.task.go()
+
+    def no_connection_cmd(self):
+        self.no_connection.emit()
+
+    def finished_cmd(self):
         self.finished.emit()
-
-
 

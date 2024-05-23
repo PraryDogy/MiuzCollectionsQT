@@ -18,6 +18,16 @@ class User:
             "Shares",
             "Collections"
             )
+        
+        self.updater_path: str = os.path.join(
+            "Studio",
+            "Photo",
+            "Art",
+            "Raw",
+            "2024",
+            "soft",
+            "MiuzCollections.zip"
+            )
 
         self.curr_coll: str = "miuzcollections_all"
         self.cust_fltr_names: dict = {

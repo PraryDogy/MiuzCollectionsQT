@@ -376,5 +376,13 @@
     "choose_coll_smb": [
         "Укажите расположение коллекций",
         "Choose collections folder"
+    ],
+    "download_update": [
+        "Скачать обновление",
+        "Update app"
+    ],
+    "wait_update": [
+        "Подождите...",
+        "Wait..."
     ]
 }

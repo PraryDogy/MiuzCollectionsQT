@@ -125,15 +125,32 @@ class WinSmb(WinStandartBase):
     def cancel_cmd(self, event):
         pass
 
+    def pass_btn_cmd(self, event):
+        self.finished.emit()
+        self.deleteLater()
+
     def init_ui(self):
         self.browse_coll = BrowseColl()
         self.content_layout.addWidget(self.browse_coll)
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
         self.content_layout.addStretch()
 
+        btns_layout = LayoutH()
+        self.content_layout.addLayout(btns_layout)
+
+        btns_layout.addStretch()
+
         self.ok_btn = Btn(cnf.lng.ok)
         self.ok_btn.mouseReleaseEvent = lambda e: self.browse_coll.blue_browse_btn()
-        self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
+        btns_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
+
+        btns_layout.addSpacerItem(QSpacerItem(15, 0))
+
+        self.pass_btn = Btn(cnf.lng.cancel)
+        self.pass_btn.mouseReleaseEvent = self.pass_btn_cmd
+        btns_layout.addWidget(self.pass_btn, alignment=Qt.AlignCenter)
+
+        btns_layout.addStretch()
 
         self.browse_coll.changed.connect(self.on_coll_changed)
 

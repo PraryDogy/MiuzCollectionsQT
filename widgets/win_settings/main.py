@@ -247,19 +247,27 @@ class UpdaterWidget(QWidget):
         self.v_layout = LayoutV()
         self.setLayout(self.v_layout)
 
-        self.btn = Btn("Скачать обновление")
+        self.btn = Btn(cnf.lng.download_update)
         self.btn.setFixedWidth(150)
         self.btn.mouseReleaseEvent = self.update_btn_cmd
         self.v_layout.addWidget(self.btn)
 
     def update_btn_cmd(self, e):
         self.task = Updater()
-        self.btn.setText("Подождите...")
+        self.btn.setText(cnf.lng.wait_update)
+        self.task.no_connection.connect(self.no_connection_btn)
         self.task.finished.connect(self.finalize)
         self.task.start()
 
     def finalize(self):
-        self.btn.setText("Скачать обновление")
+        self.btn.setText(cnf.lng.download_update)
+
+    def no_connection_btn(self):
+        self.btn.setText(cnf.lng.no_connection)
+        timer = QTimer(self)
+        timer.setSingleShot(True)
+        timer.timeout.connect(lambda: self.btn.setText(cnf.lng.download_update))
+        timer.start(1500)
 
 
 class WinSettings(WinStandartBase):

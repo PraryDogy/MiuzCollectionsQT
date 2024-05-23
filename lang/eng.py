@@ -24,6 +24,7 @@ class Eng:
 		self.date_changed = 'Date changed'
 		self.dates = 'Dates'
 		self.deleting_photos = 'Removing unnecessary'
+		self.download_update = 'Update app'
 		self.end = 'End'
 		self.file_name = 'Filename'
 		self.file_path = 'Location'
@@ -74,5 +75,6 @@ class Eng:
 		self.user_standart = 'Standart'
 		self.view = 'View'
 		self.wait_scan_finished = 'Please, wait. Searching for new photos.'
+		self.wait_update = 'Wait...'
 		self.weekdays = {'0': 'monday', '1': 'tuesday', '2': 'wednesday', '3': 'thursday', '4': 'friday', '5': 'saturday', '6': 'sunday'}
 		self.with_name = 'with name'

@@ -24,6 +24,7 @@ class Rus:
 		self.date_changed = 'Дата изменения'
 		self.dates = 'Даты'
 		self.deleting_photos = 'Удаляю лишнее'
+		self.download_update = 'Скачать обновление'
 		self.end = 'Конец'
 		self.file_name = 'Имя файла'
 		self.file_path = 'Расположение'
@@ -74,5 +75,6 @@ class Rus:
 		self.user_standart = 'Стандарт'
 		self.view = 'Просмотр'
 		self.wait_scan_finished = 'Пожалуйста, подождите. Идет поиск фотографий.'
+		self.wait_update = 'Подождите...'
 		self.weekdays = {'0': 'понедельник', '1': 'вторник', '2': 'среда', '3': 'четверг', '4': 'пятница', '5': 'суббота', '6': 'воскресенье'}
 		self.with_name = 'с именем'
