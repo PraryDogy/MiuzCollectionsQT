@@ -49,6 +49,7 @@ class Names:
     btn_tiff_selected = "btn_tiff_selected"
 
     navi_zoom = "navi_zoom"
+    navi_switch = "navi_switch"
 
     info_base_label = "info_base_label"
     smb_browse_btn = "smb_browse_btn"

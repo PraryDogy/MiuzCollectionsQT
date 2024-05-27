@@ -203,10 +203,12 @@ class NaviZoom(QFrame):
         self.zoom_fit.mouseReleaseEvent = zoom_fit_cmd
 
 
-class NaviArrow(QWidget):
+class NaviArrow(QFrame):
     def __init__(self, icon_name: str, parent: QWidget = None) -> None:
         super().__init__(parent)
-        self.setFixedSize(100, parent.height() - 20)
+        self.setObjectName(Names.navi_switch)
+        self.setStyleSheet(Themes.current)
+        self.setFixedSize(54, 54) # 27px border-radius, 27 * 2 for round shape
 
         v_layout = LayoutV()
         self.setLayout(v_layout)
@@ -313,8 +315,8 @@ class WinImageView(WinImgViewBase):
 
     def move_navi_btns(self):
         navi_h = (self.height() // 2) - (self.navi_next.height() // 2)
-        navi_next_w = self.width() - self.navi_next.width()
-        self.navi_prev.move(0, navi_h)
+        navi_next_w = self.width() - self.navi_next.width() - 12
+        self.navi_prev.move(10, navi_h)
         self.navi_next.move(navi_next_w, navi_h)
 
         zoom_w = self.width() // 2 - self.navi_zoom.width() // 2
