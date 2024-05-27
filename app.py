@@ -33,9 +33,10 @@ class TestWid(QWidget):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-        from utils import Updater
-        self.task = Updater()
-        self.task.start()
+        return
+        from widgets import WinSmb
+        self.a = WinSmb()
+        self.a.show()
 
 
 class RightWidget(QFrame):
@@ -204,8 +205,9 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        # self.test = TestWid()
-        # self.test.show()
+        return
+        self.test = TestWid()
+        self.test.show()
 
 Themes.set_theme(cnf.theme)
 app = App()
