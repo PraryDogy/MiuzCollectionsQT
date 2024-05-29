@@ -376,3 +376,8 @@ QScrollArea#th_scrollbar {
 #separator {
     background-color: #dbdbdb;
 }
+
+#up_btn {
+    background-color: rgb(191, 191, 191);
+    border-radius: 22px;
+}

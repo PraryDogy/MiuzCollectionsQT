@@ -307,12 +307,12 @@ QScrollArea#th_scrollbar {
 /* IMAGE VIEWER */
 
 #navi_zoom {
-    background-color: rgba(128, 128, 128, 70);
+    background-color: rgba(128, 128, 128, 0.70);
     border-radius: 15px;
 }
 
 #navi_switch {
-    background-color: rgba(128, 128, 128, 70);
+    background-color: rgba(128, 128, 128, 0.70);
     border-radius: 27px;
 }
 
@@ -378,4 +378,9 @@ QScrollArea#th_scrollbar {
 
 #separator {
     background-color: #000000;
+}
+
+#up_btn {
+    background-color: rgb(77, 77, 77);
+    border-radius: 22px;
 }

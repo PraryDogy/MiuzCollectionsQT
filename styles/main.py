@@ -62,3 +62,5 @@ class Names:
     base_bottom_widget = "base_bottom_widget"
     separator = "separator"
     img_view_bg = "img_view_bg"
+
+    up_btn = "up_btn"
