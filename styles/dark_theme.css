@@ -278,6 +278,10 @@ QMenu {
     color: white;
 }
 
+QMenu::indicator {
+    height: 0px;
+}
+
 QMenu::item {
     padding: 3 15 3 15;
 }
@@ -329,7 +333,3 @@ QScrollBar:vertical {
     padding: 2px;
 }
 
-
-QMenu::indicator {
-    height: 0px;
-}
