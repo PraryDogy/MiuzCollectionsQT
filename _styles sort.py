@@ -67,16 +67,48 @@ def to_css(css_dict: dict, filename: str):
         f.write(css_text)
 
 
+def compare_dicts(dict1: dict, dict2: dict, dict1_name: str, dict2_name: str):
+    for selector, properties in dict1.items():
+        if selector in dict2:
+            properties_dict1 = {list(prop.keys())[0]: list(prop.values())[0] for prop in properties}
+            properties_dict2 = {list(prop.keys())[0]: list(prop.values())[0] for prop in dict2[selector]}
+            
+            missing_properties = set(properties_dict1.keys()) - set(properties_dict2.keys())
+            
+            if missing_properties:
+                print(f"Есть в {dict1_name}, нет в {dict2_name}")
+                print(f"Селектор: {selector}")
+                for prop in missing_properties:
+                    print(f"{prop}: {properties_dict1[prop]}")
+                print()
+
+
+
 l_theme = css_dict(l_theme)
 d_theme = css_dict(d_theme)
 
-keys_only_in_A = set(l_theme.keys()) - set(d_theme.keys())
-keys_only_in_B = set(d_theme.keys()) - set(l_theme.keys())
-
 print()
-print("Есть в light_theme.css, нет в dark theme.css:", keys_only_in_A)
-print("Есть в dark_theme.css, нет в light_theme.css:", keys_only_in_B)
+print("Нажмите 1, если хотите обновить и упорядочить css файлы")
+print("Нажмите 2, если хотите узнать, каких селекторов не хватает в css")
+print("Нажмите 3, если хотите узнать, каких свойств селекторов не хватает")
 print()
 
-to_css(l_theme, "light_theme")
-to_css(d_theme, "dark_theme")
+inp = input()
+
+if inp == "1":
+    to_css(l_theme, "light_theme")
+    to_css(d_theme, "dark_theme")
+
+elif inp == "2":
+    keys_only_in_A = set(l_theme.keys()) - set(d_theme.keys())
+    keys_only_in_B = set(d_theme.keys()) - set(l_theme.keys())
+    print()
+    print("Есть в light_theme.css, нет в dark theme.css:", keys_only_in_A)
+    print("Есть в dark_theme.css, нет в light_theme.css:", keys_only_in_B)
+    print()
+
+elif inp == "3":
+    compare_dicts(l_theme, d_theme, "light_theme", "dark_theme")
+    print("--------")
+    compare_dicts(d_theme, l_theme, "dark_theme", "light")
+# print(l_theme)
