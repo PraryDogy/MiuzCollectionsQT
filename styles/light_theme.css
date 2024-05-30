@@ -1,78 +1,115 @@
-/* GLOBAL FONT COLOR */
-
-QLabel {
-    color: #3d3d3d;
+#base_bottom_widget {
+    background: #ffffff;
+    border: 0px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
-
-/* UNIVERSAL SCROLL */
-
-QScrollBar:vertical {
-    background-color: transparent;
-    width: 12px;
-    padding: 2px;
-}
-QScrollBar::handle:vertical {
+#base_btn {
     background-color: #cccccc;
-    border-radius: 4px;
-}
-QScrollBar::handle:vertical:hover {
-    background-color: #676767;
-    border-radius: 4px;
-}
-QScrollBar::add-line:vertical {
-    height: 0px;
-}
-QScrollBar::sub-line:vertical {
-    height: 0px;
-}
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-    height: 0px;
-}
-
-
-/* UNIVERSAL CONTEXT MENU */
-
-QMenu {
-    background-color: #ffffff;
-    border: 1px solid #b3b3b3;
-    border-radius: 8;
-    padding : 3px;
-}      
-QMenu::indicator {
-    height: 0px;
-}
-QMenu::item {
-    padding: 3 15 3 15;
-    color: #3d3d3d;
-}
-QMenu::item:selected {
-    padding: 3 15 3 15;
-    background: #2e59cb;
-    color: rgb(255, 255, 255);
     border-radius: 6;
 }
-QMenu::right-arrow {
-    height: 0px;
-    }
 
-
-/* LEFT MENU */
-
-QScrollArea#menu_scrollbar {
-    border: 0px;
+#base_input {
+    background-color: #cccccc;
+    border-radius: 6;
+    padding-left: 5px;
+    padding-right: 5px;
+    color: #3d3d3d;
 }
 
-#menu_scrollbar_qwidget {
-    background-color: #ffffff;
-    border: 0px;
+#btn_jpg {
+    background: #cccccc;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
 
-#menu_fake_widget{
-    border: 0px;
+#btn_jpg_selected {
+    background: #2e59cb;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    color: #ffffff;
+}
+
+#btn_tiff {
+    background: #cccccc;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+#btn_tiff_selected {
+    background: #2e59cb;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    color: #ffffff;
+}
+
+#central_widget {
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+#dates_btn {
+    border-radius: 6;
+    margin-right: 5px;
+    border: 2px solid transparent;
     background-color: #ffffff;
+    color: #3d3d3d;
+}
+
+#dates_btn_bordered {
+    border-radius: 6;
+    margin-right: 5px;
+    border: 2px solid #2e59cb;
+    background-color: #ffffff;
+    color: #3d3d3d;
+}
+
+#dates_btn_selected {
+    border-radius: 6;
+    margin-right: 5px;
+    border: 2px solid transparent;
+    background-color: #2e59cb;
+    color: #ffffff;
+}
+
+#filter_bar_frame {
+    background-color: #ffffff;
+    border-radius: 0px;
+    border-bottom: 1px solid #dbdbdb;
+}
+
+#filter_btn {
+    background-color: #ffffff;
+    border-radius: 6;
+    margin-right: 5px;
+    color: #3d3d3d;
+}
+
+#filter_btn_selected {
+    background-color: #2e59cb;
+    border-radius: 6;
+    margin-right: 5px;
+    color: #ffffff;
+}
+
+#img_view_bg {
+    background-color: #1e1e1e;
     border-bottom-left-radius: 10px;
-    }
+    border-bottom-right-radius: 10px;
+}
+
+#info_base_label {
+    background-color: #ffffff;
+}
 
 #menu_btn {
     background-color: #ffffff;
@@ -109,67 +146,51 @@ QScrollArea#menu_scrollbar {
     color: #3d3d3d;
 }
 
-
-/* FILTERS BAR */
-
-#filter_bar_frame {
+#menu_fake_widget {
+    border: 0px;
     background-color: #ffffff;
-    border-radius: 0px;
-    border-bottom: 1px solid #dbdbdb;
+    border-bottom-left-radius: 10px;
 }
 
-#dates_btn{
-    border-radius: 6;
-    margin-right: 5px;
-    border: 2px solid transparent;
+#menu_scrollbar_qwidget {
     background-color: #ffffff;
-    color: #3d3d3d;
+    border: 0px;
 }
 
-#dates_btn_selected {
-    border-radius: 6;
-    margin-right: 5px;
-    border: 2px solid transparent;
-    background-color: #2e59cb;
+#navi_switch {
+    background-color: rgba(128, 128, 128, 0.40);
+    border-radius: 27px;
+}
+
+#navi_zoom {
+    background-color: rgba(128, 128, 128, 0.40);
+    border-radius: 15px;
+}
+
+#notification_font_color {
     color: #ffffff;
 }
-
-#dates_btn_bordered {
-    border-radius: 6;
-    margin-right: 5px;
-    border: 2px solid #2e59cb;
-    background-color: #ffffff;
-    color: #3d3d3d;
-}
-
-
-#filter_btn {
-    background-color: #ffffff;
-    border-radius: 6;
-    margin-right: 5px;
-    color: #3d3d3d;
-}
-
-#filter_btn_selected {
-    background-color: #2e59cb;
-    border-radius: 6;
-    margin-right: 5px;
-    color: #ffffff;
-}
-
-
-/* NOTIFICATION WIDGET */
 
 #notification_widget {
     background-color: #2e59cb;
     border-radius: 8;
     color: #ffffff;
 }
-#notification_font_color {
-    color: #ffffff;
+
+#separator {
+    background-color: #dbdbdb;
 }
 
-/* STATUS BAR */
+#smb_browse_btn {
+    background-color: #2e59cb;
+    border-radius: 8;
+}
+
+#smb_browse_btn_selected {
+    background-color: #303030;
+    border-radius: 8;
+}
+
 #st_bar_frame {
     background-color: #ffffff;
     border-bottom-right-radius: 10px;
@@ -208,41 +229,26 @@ QScrollArea#menu_scrollbar {
     border-bottom-right-radius: 6px;
 }
 
-
-/* THUMBNAILS */
-
-#thumbnail_normal {
-    border: 2px solid transparent;
-}
-
-#thumbnail_selected {
-    border: 2px solid #2e59cb;
-}
-
-#th_reset_dates_btn{
-    /* width: 120px; */
-    /* height: 28px; */
-    background-color: #cccccc;
-    border-radius: 6;
-}
-
-#th_reset_search_btn{
-    /* width: 120px; */
-    /* height: 28px; */
+#th_reset_dates_btn {
     background-color: #cccccc;
     border-radius: 6;
 }
 
 #th_reset_filters_btn {
-    /* width: 120px; */
-    /* height: 28px; */
     background-color: #cccccc;
     border-radius: 6;
 }
 
-#th_show_all_btn{
-    /* width: 120px; */
-    /* height: 28px; */
+#th_reset_search_btn {
+    background-color: #cccccc;
+    border-radius: 6;
+}
+
+#th_scroll_widget {
+    background-color: #ffffff;
+}
+
+#th_show_all_btn {
     background-color: #cccccc;
     border-radius: 6;
 }
@@ -253,104 +259,12 @@ QScrollArea#menu_scrollbar {
     color: #7d7d7d;
 }
 
-QScrollArea#th_scrollbar {
-    background-color: #ffffff;
-    border: 0px;
+#thumbnail_normal {
+    border: 2px solid transparent;
 }
 
-#th_scroll_widget {
-    background-color: #ffffff;
-}
-
-
-/* FIRST LOAD, SETTINGS */
-
-#btn_jpg {
-    background: #cccccc;
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-}
-
-#btn_jpg_selected{
-    background: #2e59cb;
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    color: #ffffff;
-}
-
-#btn_tiff {
-    background: #cccccc;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-}
-
-#btn_tiff_selected {
-    background: #2e59cb;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-    color: #ffffff;
-}
-
-
-/* IMAGE VIEWER */
-
-#navi_zoom {
-    background-color: rgba(128, 128, 128, 0.40);
-    border-radius: 15px;
-}
-
-#navi_switch {
-    background-color: rgba(128, 128, 128, 0.40);
-    border-radius: 27px;
-}
-
- #img_view_bg {
-    background-color: #1e1e1e;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
- }
-
-
-/* INFO WINDOW */
-
-#info_base_label {
-    background-color: #ffffff;
-}
-
-
-/* SMB WIN */
-
-#smb_browse_btn {
-    background-color: #2e59cb;
-    border-radius: 8;
-}
-
-#smb_browse_btn_selected {
-    background-color: #303030;
-    border-radius: 8;
-}
-
-
-/* BASE WIDGETS */
-
-#base_btn {
-    background-color: #cccccc;
-    border-radius: 6;
-}
-
-#base_input {
-    background-color: #cccccc;
-    border-radius: 6;
-    padding-left: 5px; padding-right: 5px;
-    color: #3d3d3d;
+#thumbnail_selected {
+    border: 2px solid #2e59cb;
 }
 
 #title_bar {
@@ -361,23 +275,76 @@ QScrollArea#th_scrollbar {
     color: #3d3d3d;
 }
 
-#central_widget {
-    border-radius: 10px;
-    background: #ffffff;
-}
-
-#base_bottom_widget {
-    background: #ffffff;
-    border: 0px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-}
-
-#separator {
-    background-color: #dbdbdb;
-}
-
 #up_btn {
     background-color: rgb(191, 191, 191);
     border-radius: 22px;
 }
+
+QLabel {
+    color: #3d3d3d;
+}
+
+QMenu {
+    background-color: #ffffff;
+    border: 1px solid #b3b3b3;
+    border-radius: 8;
+    padding: 3px;
+}
+
+QMenu::indicator {
+    height: 0px;
+}
+
+QMenu::item {
+    padding: 3 15 3 15;
+    color: #3d3d3d;
+}
+
+QMenu::item:selected {
+    padding: 3 15 3 15;
+    background: #2e59cb;
+    color: rgb(255, 255, 255);
+    border-radius: 6;
+}
+
+QMenu::right-arrow {
+    height: 0px;
+}
+
+QScrollArea#menu_scrollbar {
+    border: 0px;
+}
+
+QScrollArea#th_scrollbar {
+    background-color: #ffffff;
+    border: 0px;
+}
+
+QScrollBar::add-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #cccccc;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #676767;
+    border-radius: 4px;
+}
+
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::sub-page:vertical {
+    height: 0px;
+}
+
+QScrollBar:vertical {
+    background-color: transparent;
+    width: 12px;
+    padding: 2px;
+}
+
