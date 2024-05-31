@@ -32,6 +32,7 @@
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
+    color: #ffffff;
 }
 
 #btn_tiff {
@@ -48,6 +49,7 @@
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
+    color: #ffffff;
 }
 
 #central_widget {
@@ -60,6 +62,7 @@
     margin-right: 5px;
     border: 2px solid transparent;
     background-color: #242424;
+    color: #ffffff;
 }
 
 #dates_btn_bordered {
@@ -67,6 +70,7 @@
     margin-right: 5px;
     border: 2px solid #2e59cb;
     background-color: #242424;
+    color: #ffffff;
 }
 
 #dates_btn_selected {
@@ -74,6 +78,7 @@
     margin-right: 5px;
     border: 2px solid transparent;
     background-color: #2e59cb;
+    color: #ffffff;
 }
 
 #filter_bar_frame {
@@ -86,12 +91,14 @@
     background-color: #242424;
     border-radius: 6;
     margin-right: 5px;
+    color: #ffffff;
 }
 
 #filter_btn_selected {
     background-color: #2e59cb;
     border-radius: 6;
     margin-right: 5px;
+    color: #ffffff;
 }
 
 #img_view_bg {
@@ -109,6 +116,7 @@
     border: 2px solid transparent;
     padding-left: 2px;
     padding-right: 2px;
+    color: #ffffff;
 }
 
 #menu_btn_bordered {
@@ -117,6 +125,7 @@
     border-radius: 6;
     padding-left: 2px;
     padding-right: 2px;
+    color: #ffffff;
 }
 
 #menu_btn_selected {
@@ -125,6 +134,7 @@
     border-radius: 6;
     padding-left: 2px;
     padding-right: 2px;
+    color: #ffffff;
 }
 
 #menu_btn_selected_bordered {
@@ -133,6 +143,7 @@
     border-radius: 6;
     padding-left: 2px;
     padding-right: 2px;
+    color: #ffffff;
 }
 
 #menu_fake_widget {
@@ -163,6 +174,7 @@
 #notification_widget {
     background-color: #2e59cb;
     border-radius: 8;
+    color: #ffffff;
 }
 
 #separator {
@@ -244,6 +256,7 @@
 #th_title {
     font-size: 18pt;
     font-weight: bold;
+    color: #ffffff;
 }
 
 #thumbnail_normal {
@@ -259,6 +272,7 @@
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
     border-bottom: 1px solid black;
+    color: #ffffff;
 }
 
 #up_btn {
@@ -284,12 +298,14 @@ QMenu::indicator {
 
 QMenu::item {
     padding: 3 15 3 15;
+    color: #ffffff;
 }
 
 QMenu::item:selected {
     padding: 3 15 3 15;
     background: #2e59cb;
     border-radius: 6;
+    color: #ffffff;
 }
 
 QMenu::right-arrow {

@@ -1,25 +1,25 @@
 #base_bottom_widget {
-    background: #ffffff;
+    background: #1e1e1e;
     border: 0px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
 #base_btn {
-    background-color: #cccccc;
+    background-color: #303030;
     border-radius: 6;
 }
 
 #base_input {
-    background-color: #cccccc;
+    background-color: #131313;
     border-radius: 6;
     padding-left: 5px;
     padding-right: 5px;
-    color: #3d3d3d;
+    color: white;
 }
 
 #btn_jpg {
-    background: #cccccc;
+    background: #303030;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
@@ -36,7 +36,7 @@
 }
 
 #btn_tiff {
-    background: #cccccc;
+    background: #303030;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
@@ -54,23 +54,23 @@
 
 #central_widget {
     border-radius: 10px;
-    background: #ffffff;
+    background: #525252;
 }
 
 #dates_btn {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid transparent;
-    background-color: #ffffff;
-    color: #3d3d3d;
+    background-color: #242424;
+    color: #ffffff;
 }
 
 #dates_btn_bordered {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid #2e59cb;
-    background-color: #ffffff;
-    color: #3d3d3d;
+    background-color: #242424;
+    color: #ffffff;
 }
 
 #dates_btn_selected {
@@ -82,16 +82,16 @@
 }
 
 #filter_bar_frame {
-    background-color: #ffffff;
+    background-color: #242424;
     border-radius: 0px;
-    border-bottom: 1px solid #dbdbdb;
+    border-bottom: 1px solid black;
 }
 
 #filter_btn {
-    background-color: #ffffff;
+    background-color: #242424;
     border-radius: 6;
     margin-right: 5px;
-    color: #3d3d3d;
+    color: #ffffff;
 }
 
 #filter_btn_selected {
@@ -102,58 +102,58 @@
 }
 
 #img_view_bg {
-    background-color: #1e1e1e;
+    background-color: #101010;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
 #info_base_label {
-    background-color: #ffffff;
+    background-color: #1e1e1e;
 }
 
 #menu_btn {
-    background-color: #ffffff;
+    background-color: #333333;
     border: 2px solid transparent;
     padding-left: 2px;
     padding-right: 2px;
-    color: #3d3d3d;
+    color: #ffffff;
 }
 
 #menu_btn_bordered {
-    background-color: #ffffff;
+    background-color: #333333;
     border: 2px solid #2e59cb;
     border-radius: 6;
     padding-left: 2px;
     padding-right: 2px;
-    color: #3d3d3d;
+    color: #ffffff;
 }
 
 #menu_btn_selected {
-    background-color: #cccccc;
+    background-color: #525252;
     border: 2px solid transparent;
     border-radius: 6;
     padding-left: 2px;
     padding-right: 2px;
-    color: #3d3d3d;
+    color: #ffffff;
 }
 
 #menu_btn_selected_bordered {
-    background-color: #cccccc;
+    background-color: #525252;
     border: 2px solid #2e59cb;
     border-radius: 6;
     padding-left: 2px;
     padding-right: 2px;
-    color: #3d3d3d;
+    color: #ffffff;
 }
 
 #menu_fake_widget {
     border: 0px;
-    background-color: #ffffff;
+    background-color: #333333;
     border-bottom-left-radius: 10px;
 }
 
 #menu_scrollbar_qwidget {
-    background-color: #ffffff;
+    background-color: #333333;
     border: 0px;
 }
 
@@ -178,7 +178,7 @@
 }
 
 #separator {
-    background-color: #dbdbdb;
+    background-color: #000000;
 }
 
 #smb_browse_btn {
@@ -192,13 +192,13 @@
 }
 
 #st_bar_frame {
-    background-color: #ffffff;
+    background-color: #242424;
     border-bottom-right-radius: 10px;
-    border-top: 1px solid #dbdbdb;
+    border-top: 1px solid black;
 }
 
 #st_bar_jpg {
-    background: #e3e3e3;
+    background: #303030;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
@@ -206,7 +206,7 @@
 }
 
 #st_bar_jpg_sel {
-    background: #c2c1c1;
+    background: #676767;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-top-right-radius: 0px;
@@ -214,7 +214,7 @@
 }
 
 #st_bar_tiff {
-    background: #e3e3e3;
+    background: #303030;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
@@ -222,7 +222,7 @@
 }
 
 #st_bar_tiff_sel {
-    background: #c2c1c1;
+    background: #676767;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
@@ -230,33 +230,33 @@
 }
 
 #th_reset_dates_btn {
-    background-color: #cccccc;
+    background-color: #303030;
     border-radius: 6;
 }
 
 #th_reset_filters_btn {
-    background-color: #cccccc;
+    background-color: #303030;
     border-radius: 6;
 }
 
 #th_reset_search_btn {
-    background-color: #cccccc;
+    background-color: #303030;
     border-radius: 6;
 }
 
 #th_scroll_widget {
-    background-color: #ffffff;
+    background-color: #1e1e1e;
 }
 
 #th_show_all_btn {
-    background-color: #cccccc;
+    background-color: #303030;
     border-radius: 6;
 }
 
 #th_title {
     font-size: 18pt;
     font-weight: bold;
-    color: #7d7d7d;
+    color: #ffffff;
 }
 
 #thumbnail_normal {
@@ -268,25 +268,25 @@
 }
 
 #title_bar {
-    background: #ffffff;
+    background: #242424;
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
-    border-bottom: 1px solid #dbdbdb;
-    color: #3d3d3d;
+    border-bottom: 1px solid black;
+    color: #ffffff;
 }
 
 #up_btn {
-    background-color: rgb(191, 191, 191);
+    background-color: rgb(77, 77, 77);
     border-radius: 22px;
 }
 
 QLabel {
-    color: #3d3d3d;
+    color: #ffffff;
 }
 
 QMenu {
-    background-color: #ffffff;
-    border: 1px solid #b3b3b3;
+    background-color: #333333;
+    border: 1px solid #5d5d5d;
     border-radius: 8;
     padding: 3px;
     color: white;
@@ -298,14 +298,14 @@ QMenu::indicator {
 
 QMenu::item {
     padding: 3 15 3 15;
-    color: #3d3d3d;
+    color: #ffffff;
 }
 
 QMenu::item:selected {
     padding: 3 15 3 15;
     background: #2e59cb;
-    color: rgb(255, 255, 255);
     border-radius: 6;
+    color: #ffffff;
 }
 
 QMenu::right-arrow {
@@ -317,7 +317,7 @@ QScrollArea#menu_scrollbar {
 }
 
 QScrollArea#th_scrollbar {
-    background-color: #ffffff;
+    background-color: #1e1e1e;
     border: 0px;
 }
 
@@ -326,7 +326,7 @@ QScrollBar::add-line:vertical {
 }
 
 QScrollBar::handle:vertical {
-    background-color: #cccccc;
+    background-color: #464646;
     border-radius: 4px;
 }
 
@@ -348,3 +348,4 @@ QScrollBar:vertical {
     width: 12px;
     padding: 2px;
 }
+

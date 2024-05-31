@@ -69,19 +69,29 @@ def to_css(css_dict: dict, filename: str):
 
 def compare_dicts(dict1: dict, dict2: dict, dict1_name: str, dict2_name: str):
     for selector, properties in dict1.items():
+
         if selector in dict2:
-            properties_dict1 = {list(prop.keys())[0]: list(prop.values())[0] for prop in properties}
-            properties_dict2 = {list(prop.keys())[0]: list(prop.values())[0] for prop in dict2[selector]}
+
+            properties_dict1 = {
+                list(prop.keys())[0]: list(prop.values())[0]
+                for prop in properties
+                }
+
+            properties_dict2 = {
+                list(prop.keys())[0]: list(prop.values())[0]
+                for prop in dict2[selector]
+                }
             
-            missing_properties = set(properties_dict1.keys()) - set(properties_dict2.keys())
+            missing_properties = set(
+                properties_dict1.keys()) - set(properties_dict2.keys()
+                                               )
             
             if missing_properties:
-                print(f"Есть в {dict1_name}, нет в {dict2_name}")
-                print(f"Селектор: {selector}")
+                print(f"Есть в ---{dict1_name}---, нет в ---{dict2_name}---")
+                print(f"{selector}")
                 for prop in missing_properties:
                     print(f"{prop}: {properties_dict1[prop]}")
                 print()
-
 
 
 l_theme = css_dict(l_theme)
@@ -91,6 +101,7 @@ print()
 print("Нажмите 1, если хотите обновить и упорядочить css файлы")
 print("Нажмите 2, если хотите узнать, каких селекторов не хватает в css")
 print("Нажмите 3, если хотите узнать, каких свойств селекторов не хватает")
+print("Нажмите 4, чтобы сравнить селекторы в styles.main --> Names и css")
 print()
 
 inp = input()
@@ -103,12 +114,63 @@ elif inp == "2":
     keys_only_in_A = set(l_theme.keys()) - set(d_theme.keys())
     keys_only_in_B = set(d_theme.keys()) - set(l_theme.keys())
     print()
-    print("Есть в light_theme.css, нет в dark theme.css:", keys_only_in_A)
-    print("Есть в dark_theme.css, нет в light_theme.css:", keys_only_in_B)
+    print("Есть в ---light_theme---, нет в ---dark theme---:", keys_only_in_A)
+    print()
+    print("Есть в ---dark_theme---, нет в ---light_theme---:", keys_only_in_B)
     print()
 
 elif inp == "3":
+    print(3)
     compare_dicts(l_theme, d_theme, "light_theme", "dark_theme")
     print("--------")
     compare_dicts(d_theme, l_theme, "dark_theme", "light")
-# print(l_theme)
+
+
+elif inp == "4":
+    from styles.main import Names
+
+    names = {
+        i
+        for i in Names.__dict__.values()
+        if type(i) == str
+        }
+    
+    names_l_theme = {
+        i.replace("#", "")
+        for i in l_theme.keys()
+        if i.startswith("#")
+        }
+    
+    names_d_theme = {
+        i.replace("#", "")
+        for i in l_theme.keys()
+        if i.startswith("#")
+        }
+    
+    names.remove("styles.main")
+    names = set(sorted(names))
+    names_l_theme = set(sorted(names_l_theme))
+    names_d_theme = set(sorted(names_d_theme))
+
+    if names > names_l_theme:
+        print()
+        print("Есть в main.py и нет в light_theme.css:")
+        print(names - names_l_theme)
+    else:
+        print()
+        print("Есть в light_theme.css и нет в main.py:")
+        print(names_l_theme - names)
+
+    print()
+    print("------")
+    print()
+
+    if names > names_d_theme:
+        print("Есть в main.py и нет в dark_theme.css:")
+        print(names - names_d_theme)
+    else:
+        print()
+        print("Есть в dark_theme.css и нет в main.py:")
+        print(names_d_theme - names)
+    
+    print()
