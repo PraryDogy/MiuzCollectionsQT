@@ -56,12 +56,15 @@ class Thumbnails(QScrollArea):
         gui_signals_app.scroll_top.connect(self.scroll_top)
 
     def checkScrollValue(self, value):
-        self.up_btn.move(
-            self.width() - 60,
-            self.height() - 60 + value
-            )
-        self.up_btn.setVisible(value > 0)
-        self.up_btn.raise_()
+        if self.height() == 0:
+            return
+        else:
+            self.up_btn.move(
+                self.width() - 60,
+                self.height() - 60 + value
+                )
+            self.up_btn.setVisible(value > 0)
+            self.up_btn.raise_()
 
     def scroll_top(self):
         self.verticalScrollBar().setValue(0)
