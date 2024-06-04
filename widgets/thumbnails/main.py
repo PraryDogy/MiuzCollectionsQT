@@ -56,23 +56,17 @@ class Thumbnails(QScrollArea):
         gui_signals_app.scroll_top.connect(self.scroll_top)
 
     def checkScrollValue(self, value):
-        if self.height() == 0:
-            return
-        else:
-            self.up_btn.move(
-                self.width() - 60,
-                self.height() - 60 + value
-                )
-            self.up_btn.setVisible(value > 0)
-            self.up_btn.raise_()
+        self.up_btn.move(
+            self.width() - 60,
+            self.height() - 60 + value
+            )
+        self.up_btn.setVisible(value > 0)
+        self.up_btn.raise_()
 
     def scroll_top(self):
         self.verticalScrollBar().setValue(0)
 
     def init_ui(self):
-        self.up_btn = UpBtn(self.scroll_area_widget)
-        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
-
         thumbs_dict = ThumbsDict()
         cnf.images.clear()
 
@@ -93,6 +87,9 @@ class Thumbnails(QScrollArea):
             h_layout.setContentsMargins(0, 0, 0, 10)
             self.thumbnails_layout.addLayout(h_layout)
             h_layout.addWidget(LimitBtn())
+
+        self.up_btn = UpBtn(self.scroll_area_widget)
+        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
     def reload_thumbnails(self):
         if self.first_load:
