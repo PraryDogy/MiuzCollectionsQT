@@ -164,7 +164,10 @@ class FinderImages(dict):
         step_value = 50 if ln_colls == 0 else 50 / ln_colls
 
         for collection_walk in collections:
-            gui_signals_app.progressbar_value.emit(step_value)
+            try:
+                gui_signals_app.progressbar_value.emit(step_value)
+            except Exception as e:
+                print(e)
 
             for root, _, files in os.walk(top=collection_walk):
 
