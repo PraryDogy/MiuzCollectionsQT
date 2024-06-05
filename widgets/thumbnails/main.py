@@ -89,6 +89,7 @@ class Thumbnails(QScrollArea):
             h_layout.addWidget(LimitBtn())
 
         self.up_btn = UpBtn(self.scroll_area_widget)
+        self.up_btn.setVisible(False)
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
     def reload_thumbnails(self):
