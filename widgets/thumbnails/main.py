@@ -1,6 +1,7 @@
 from math import ceil
 
 from PyQt5.QtCore import QEvent, Qt, QTimer
+from PyQt5.QtGui import QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
@@ -40,6 +41,7 @@ class Thumbnails(QScrollArea):
         frame_layout.addLayout(self.thumbnails_layout)
 
         self.first_load = True
+        self.columns = self.get_columns()
         self.init_ui()
 
         frame_layout.addStretch(1)
@@ -108,12 +110,8 @@ class Thumbnails(QScrollArea):
         grid_layout.setAlignment(Qt.AlignLeft)
         grid_layout.setContentsMargins(0, 0, 0, 30)
 
-        ww = self.width()
-        
-        if not cnf.zoom:
-            columns = max(ww // (cnf.THUMBSIZE), 1)
-        else:
-            columns = max(ww // (cnf.ZOOMED_THUMBSIZE), 1)
+        # ww = self.width()
+        # columns = max(ww // (cnf.THUMBSIZE), 1)
 
         # Добавляем изображения в сетку
         for idx, (byte_array, img_src) in enumerate(images_data):
@@ -121,16 +119,19 @@ class Thumbnails(QScrollArea):
                 byte_array=byte_array,
                 img_src=img_src
                 )
-            grid_layout.addWidget(label, idx // columns, idx % columns)
+            grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
 
-        rows = ceil(len(images_data) / columns)
-        grid_layout.setColumnStretch(columns, 1)
+        rows = ceil(len(images_data) / self.columns)
+        grid_layout.setColumnStretch(self.columns, 1)
         grid_layout.setRowStretch(rows, 1)
-
         self.thumbnails_layout.addLayout(grid_layout)
 
-    def resizeEvent(self, e: QEvent):
-        self.resize_timer.stop()
-        self.resize_timer.start()
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        new_columns = self.get_columns()
+        if self.columns != new_columns:
+            self.columns = new_columns
+            self.reload_thumbnails()
+        return super().resizeEvent(a0)
 
-        self.up_btn.setVisible(False)
+    def get_columns(self):
+        return max(self.width() // (cnf.THUMBSIZE), 1)
