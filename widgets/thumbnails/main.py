@@ -49,7 +49,6 @@ class Thumbnails(QScrollArea):
         self.setWidget(self.scroll_area_widget)
 
         self.resize_timer = QTimer(self)
-        self.resize_timer.setInterval(500)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.reload_thumbnails)
         self.first_load = True
@@ -127,10 +126,11 @@ class Thumbnails(QScrollArea):
         self.thumbnails_layout.addLayout(grid_layout)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        self.up_btn.setVisible(False)
         new_columns = self.get_columns()
         if self.columns != new_columns:
             self.columns = new_columns
-            self.reload_thumbnails()
+            self.resize_timer.start(300)
         return super().resizeEvent(a0)
 
     def get_columns(self):
