@@ -355,7 +355,6 @@ class WinImageView(WinImgViewBase):
         new_index = (current_index + offset) % total_images
         self.image_path = cnf.images[new_index]
         self.load_image()
-        self.my_set_title()
 
     def cut_text(self, text: str) -> str:
         limit = 40
