@@ -45,12 +45,8 @@ class Thumbnails(QScrollArea):
         self.init_ui()
 
         frame_layout.addStretch(1)
-
         self.setWidget(self.scroll_area_widget)
 
-        self.resize_timer = QTimer(self)
-        self.resize_timer.setSingleShot(True)
-        self.resize_timer.timeout.connect(self.reload_thumbnails)
         self.first_load = True
 
         gui_signals_app.reload_thumbnails.connect(self.reload_thumbnails)
@@ -130,7 +126,7 @@ class Thumbnails(QScrollArea):
         new_columns = self.get_columns()
         if self.columns != new_columns:
             self.columns = new_columns
-            self.resize_timer.start(300)
+            self.reload_thumbnails()
         return super().resizeEvent(a0)
 
     def get_columns(self):
