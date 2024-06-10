@@ -149,7 +149,7 @@ class WinSmb(WinStandartBase):
 
         btns_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.pass_btn = Btn(cnf.lng.cancel)
+        self.pass_btn = Btn(cnf.lng.close)
         self.pass_btn.mouseReleaseEvent = self.pass_btn_cmd
         btns_layout.addWidget(self.pass_btn, alignment=Qt.AlignCenter)
 
