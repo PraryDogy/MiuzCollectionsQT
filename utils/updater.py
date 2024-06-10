@@ -48,43 +48,9 @@ class UpdaterMain(QObject):
             os.remove(downloaded_zip)
 
         shutil.copy2(zip_file, downloaded_zip)
-
-        while not os.path.exists(downloaded_zip):
-            time.sleep(1)
-        time.sleep(1)
-
-        app_file = os.path.join(cnf.down_folder, filename_app_file)
-
-        if os.path.exists(app_file):
-            shutil.rmtree(app_file)
-
-        apple_script = f"""
-            tell application \"Archive Utility\"
-                open POSIX file "{downloaded_zip}"
-            end tell
-            """
-
-        subprocess.run(["osascript", "-e", apple_script])
-
-        while not os.path.exists(app_file):
-            time.sleep(1)
-        time.sleep(1)
-
-        if os.path.exists(downloaded_zip):
-            os.remove(downloaded_zip)
-
-        subprocess.run(["open", "-R", app_file])
-
-        apple_script = f"""
-            tell application \"Archive Utility\"
-                quit
-            end tell
-            """
-
-        subprocess.run(["osascript", "-e", apple_script])
+        subprocess.run(["open", "-R", downloaded_zip])
 
         self.finished.emit()
-        print(1)
 
 
 class Updater(QThread):
