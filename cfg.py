@@ -50,9 +50,6 @@ class User:
             "aw": 700,
             "ah": 500
             }
-        
-        self.move_jpg: bool = True
-        self.move_layers: bool = False    
 
         self.root_g: dict = {
             "aw": 700,
@@ -78,7 +75,6 @@ class User:
         
         self.theme: str = "dark_theme"
         self.user_lng: str = "en"
-        self.zoom: bool = False
         
 
 class Static:
@@ -86,7 +82,6 @@ class Static:
         super().__init__()
 
         self.THUMBSIZE: int = 200
-        self.ZOOMED_THUMBSIZE: int = 240
         self.LIMIT: int = 150
         self.ALL_COLLS: str = "miuzcollections_all"
         self.RECENT_COLLS: str = "miuzcollections_recents"
@@ -140,7 +135,6 @@ class Config(User, Dymanic, Static, AppInfo):
         
         data["first_load"] = False
         data["scaner_minutes"] = 5
-        data["zoom"] = False
 
         if "LEVIEV" not in data["stop_colls"]:
             data["stop_colls"].append("LEVIEV")

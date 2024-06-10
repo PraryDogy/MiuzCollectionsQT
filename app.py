@@ -121,7 +121,7 @@ class WinMain(WinBase):
         self.move(x, y)
 
     def mycloseEvent(self, event):
-        self.titlebar.btns.non_symbolic_icons()
+        self.titlebar.btns.nonfocused_icons()
         self.hide()
         event.ignore()
 
@@ -204,6 +204,11 @@ class App(QApplication):
             Manager.smb_win.show()
 
         utils_signals_app.scaner_start.emit()
+
+        return
+        from widgets.win_first_load import WinFirstLoad
+        self.test = WinFirstLoad()
+        self.test.show()
 
         return
         self.test = TestWid()

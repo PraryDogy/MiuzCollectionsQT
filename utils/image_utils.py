@@ -71,11 +71,6 @@ class PixmapThumb(QPixmap):
         crop = self.copy(ax, ay, cnf.THUMBSIZE, cnf.THUMBSIZE)
         self.swap(crop)
 
-    def resize_zoom(self):
-        resized = self.scaled(cnf.ZOOMED_THUMBSIZE, cnf.ZOOMED_THUMBSIZE)
-        self.swap(resized)
-
-
 class UndefBytesThumb(io.BytesIO,  MainUtils):
     def __init__(self):
         super().__init__()

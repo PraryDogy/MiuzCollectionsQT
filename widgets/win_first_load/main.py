@@ -116,74 +116,6 @@ class ChangeLang(QWidget, QObject):
         self.change_lang.emit()
 
 
-class ChooseUserType(QWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        layout_v = LayoutV()
-        self.setLayout(layout_v)
-
-        self.move_jpg = cnf.move_jpg
-        self.move_layers = cnf.move_layers
-
-        descr = QLabel(cnf.lng.choose_user_first)
-        layout_v.addWidget(descr)
-
-        h_wid = QWidget()
-        h_wid.setFixedHeight(50)
-        layout_v.addWidget(h_wid)
-
-        layout_v.addSpacerItem(QSpacerItem(0, 10))
-
-        h_layout = LayoutH()
-        h_wid.setLayout(h_layout)
-
-        h_layout.addStretch()
-
-        self.jpg_btn = Btn(cnf.lng.user_standart)
-        self.set_jpg_btn_style()
-        self.jpg_btn.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
-        h_layout.addWidget(self.jpg_btn)
-
-        h_layout.addSpacerItem(QSpacerItem(1, 0))
-
-        self.tiff_btn = Btn(cnf.lng.user_designer)
-        self.tiff_btn.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
-        self.set_tiff_btn_style()
-        h_layout.addWidget(self.tiff_btn)
-
-        h_layout.addStretch()
-
-    def btn_cmd(self, flag: Literal["jpg", "tiff"]):
-        if flag == "jpg":
-            self.move_jpg = not self.move_jpg
-            self.set_jpg_btn_style()
-        
-        elif flag == "tiff":
-            self.move_layers = not self.move_layers
-            self.set_tiff_btn_style()
-
-    def finalize(self):
-        if self.move_jpg != cnf.move_jpg or self.move_layers != cnf.move_layers:
-            cnf.move_jpg = self.move_jpg
-            cnf.move_layers = self.move_layers
-            gui_signals_app.reload_stbar.emit()
-
-    def set_jpg_btn_style(self):
-        if self.move_jpg:
-            self.jpg_btn.setObjectName(Names.btn_jpg_selected)
-        else:
-            self.jpg_btn.setObjectName(Names.btn_jpg)
-        self.jpg_btn.setStyleSheet(Themes.current)
-
-    def set_tiff_btn_style(self):
-        if self.move_layers:
-            self.tiff_btn.setObjectName(Names.btn_tiff_selected)
-        else:
-            self.tiff_btn.setObjectName(Names.btn_tiff)
-        self.tiff_btn.setStyleSheet(Themes.current)
-
-
 class WinFirstLoad(WinStandartBase):
     def __init__(self):
         MainUtils.close_same_win(WinFirstLoad)
@@ -191,9 +123,10 @@ class WinFirstLoad(WinStandartBase):
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min_max()
+        self.disable_close()
 
         self.init_ui()
-        self.setFixedSize(350, 340)
+        self.setFixedSize(350, 220)
         self.center()
         self.setFocus()
 
@@ -223,9 +156,6 @@ class WinFirstLoad(WinStandartBase):
 
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
 
-        self.user_type = ChooseUserType()
-        self.content_layout.addWidget(self.user_type)
-
         self.ok_btn = Btn(cnf.lng.ok)
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
         self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
@@ -235,7 +165,6 @@ class WinFirstLoad(WinStandartBase):
         self.init_ui()
 
     def ok_cmd(self, e):
-        self.user_type.finalize()
         self.browse_coll.finalize()
         self.deleteLater()
 

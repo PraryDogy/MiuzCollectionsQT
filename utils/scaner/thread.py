@@ -481,9 +481,13 @@ class Scaner(ScanerBaseClass):
 
         Manager.flag = True
         cnf.scaner_running = False
-        gui_signals_app.progressbar_hide.emit()
-        gui_signals_app.reload_menu.emit()
-        gui_signals_app.reload_thumbnails.emit()
+        try:
+            gui_signals_app.progressbar_hide.emit()
+            gui_signals_app.reload_menu.emit()
+            gui_signals_app.reload_thumbnails.emit()
+        except RuntimeError:
+            pass
+
 
     def run(self):
         try:

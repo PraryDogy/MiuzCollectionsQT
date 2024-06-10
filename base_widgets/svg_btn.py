@@ -10,6 +10,8 @@ from .layouts import LayoutH
 class SvgBtn(QWidget):
     def __init__(self, icon_name: str, size: int, parent: QWidget = None):
 
+        self.icon_name = None
+
         super().__init__(parent=parent)
         self.setStyleSheet(f"""background-color: transparent;""")
 
@@ -24,6 +26,10 @@ class SvgBtn(QWidget):
 
     def set_icon(self, icon_name):
         self.svg_btn.load(os.path.join("images", icon_name))
+        self.icon_name = icon_name
+    
+    def get_icon_name(self):
+        return self.icon_name
 
 
 class SvgShadowed(SvgBtn):

@@ -19,8 +19,7 @@ class WinCopyFilesThread(WinStandartBase, QObject):
         super().__init__(close_func=self.my_close)
         self.set_title(cnf.lng.copying_title)
         self.disable_min_max()
-        self.titlebar.btns.close_btn.setDisabled(True)
-        self.titlebar.btns.close_btn.set_icon(f"{cnf.theme}_gray.svg")
+        self.disable_close()
         self.setFixedSize(270, 130)
 
         label = QLabel(cnf.lng.copying_files)

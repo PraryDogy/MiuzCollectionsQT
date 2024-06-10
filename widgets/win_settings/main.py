@@ -180,66 +180,6 @@ class StopColls(QWidget):
         return [i.strip() for i in text.split(",")]
 
 
-class ThumbMove(QWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        layout_h = LayoutH()
-        self.setLayout(layout_h)
-
-        self.move_jpg = cnf.move_jpg
-        self.move_layers = cnf.move_layers
-
-        self.btn_jpg = Btn("JPG")
-        self.set_jpg_btn_style()
-        self.btn_jpg.mouseReleaseEvent = lambda f: self.btn_cmd("jpg")
-        layout_h.addWidget(self.btn_jpg)
-
-        layout_h.addSpacerItem(QSpacerItem(1, 0))
-
-        self.btn_tiff = Btn(cnf.lng.layers)
-        self.set_tiff_btn_style()
-        self.btn_tiff.mouseReleaseEvent = lambda f: self.btn_cmd("tiff")
-        
-        layout_h.addWidget(self.btn_tiff)
-
-        layout_h.addSpacerItem(QSpacerItem(10, 0))
-
-        descr = QLabel(cnf.lng.thumb_move)
-        layout_h.addWidget(descr)
-
-        layout_h.addStretch()
-
-    def btn_cmd(self, flag: Literal["jpg", "tiff"]):
-        if flag == "jpg":
-            self.move_jpg = not self.move_jpg
-            self.set_jpg_btn_style()
-        
-        elif flag == "tiff":
-            self.move_layers = not self.move_layers
-            self.set_tiff_btn_style()
-
-    def finalize(self):
-        if self.move_jpg != cnf.move_jpg or self.move_layers != cnf.move_layers:
-            cnf.move_jpg = self.move_jpg
-            cnf.move_layers = self.move_layers
-            gui_signals_app.reload_stbar.emit()
-
-    def set_jpg_btn_style(self):
-        if self.move_jpg:
-            self.btn_jpg.setObjectName(Names.btn_jpg_selected)
-        else:
-            self.btn_jpg.setObjectName(Names.btn_jpg)
-        self.btn_jpg.setStyleSheet(Themes.current)
-
-    def set_tiff_btn_style(self):
-        if self.move_layers:
-            self.btn_tiff.setObjectName(Names.btn_tiff_selected)
-        else:
-            self.btn_tiff.setObjectName(Names.btn_tiff)
-        self.btn_tiff.setStyleSheet(Themes.current)
-
-
 class UpdaterWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -278,12 +218,12 @@ class WinSettings(WinStandartBase):
         self.disable_min_max()
         self.set_title(cnf.lng.settings)
 
-        self.setFixedWidth(420)
+        # self.setFixedWidth(420)
         temp = QTimer(self)
         temp.setSingleShot(True)
         temp.timeout.connect(self.init_ui)
         temp.start(10)
-        self.setFixedSize(420, 600)
+        self.setFixedSize(420, 540)
         self.center_win()
         self.setFocus()
 
@@ -302,10 +242,6 @@ class WinSettings(WinStandartBase):
 
         self.change_lang = ChangeLang()
         self.content_layout.addWidget(self.change_lang)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
-
-        self.thumb_move = ThumbMove()
-        self.content_layout.addWidget(self.thumb_move)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.update_wid = UpdaterWidget()
@@ -366,7 +302,6 @@ class WinSettings(WinStandartBase):
             utils_signals_app.scaner_start.emit()
 
         self.change_lang.finalize()
-        self.thumb_move.finalize()
 
         self.deleteLater()
 

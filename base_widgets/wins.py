@@ -36,24 +36,28 @@ class Btns(QWidget):
 
         self.installEventFilter(self)
 
-    def symbolic_icons(self):
-        self.close_btn.set_icon("close-2.svg")
+    def focused_icons(self):
+        if self.close_btn.isEnabled():
+            self.close_btn.set_icon("close-2.svg")
+
         if self.min_btn.isEnabled():
             self.min_btn.set_icon("min-2.svg")
             self.max_btn.set_icon("max-2.svg")
 
-    def non_symbolic_icons(self):
-        self.close_btn.set_icon("close-1.svg")
+    def nonfocused_icons(self):
+        if self.close_btn.isEnabled():
+            self.close_btn.set_icon("close-1.svg")
+
         if self.min_btn.isEnabled():
             self.min_btn.set_icon("min-1.svg")
             self.max_btn.set_icon("max-1.svg")
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.Enter:
-            self.symbolic_icons()
+            self.focused_icons()
 
         elif event.type() == QEvent.Leave:
-            self.non_symbolic_icons()
+            self.nonfocused_icons()
 
         return super().eventFilter(source, event)
 
@@ -162,6 +166,10 @@ class WinBase(QMainWindow):
         self.titlebar.btns.min_btn.set_icon(f"{cnf.theme}_gray.svg")
         self.titlebar.btns.max_btn.setDisabled(True)
         self.titlebar.btns.max_btn.set_icon(f"{cnf.theme}_gray.svg")
+
+    def disable_close(self):
+        self.titlebar.btns.close_btn.setDisabled(True)
+        self.titlebar.btns.close_btn.set_icon(f"{cnf.theme}_gray.svg")
 
 
 class BaseBottomWid(QFrame):
