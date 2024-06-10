@@ -21,17 +21,12 @@ class Thumbnail(QLabel, QObject):
     def __init__(self, byte_array: bytearray, img_src: str):
         super().__init__()
         self.img_src = img_src
-        self.tiff_src = None
-        self.find_tiff_thread = None
-        self.show_no_tiff = False
         cnf.images.append(img_src)
 
         self.setObjectName(Names.thumbnail_normal)
         self.setStyleSheet(Themes.current)
 
         byte_array = PixmapThumb(byte_array)
-        if cnf.zoom:
-            byte_array.resize_zoom()
 
         self.setPixmap(byte_array)
         self.image_context = None
@@ -57,49 +52,12 @@ class Thumbnail(QLabel, QObject):
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
         self.drag.setPixmap(self.pixmap())
-
-        self.find_tiff()
-
-    def find_tiff(self):
-        self.find_tiff_local = FindTiffLocal(self.img_src)
-        self.find_tiff_local.run_search()
-        self.tiff_src = self.find_tiff_local.get_result()
-        self.set_urls()
-        self.finalize_move()
-
-    def set_urls(self):
-        self.urls = []
-
-        if cnf.move_jpg:
-            if self.img_src:
-                self.urls.append(QUrl.fromLocalFile(self.img_src))
-
-        if cnf.move_layers:
-            if self.tiff_src:
-                self.urls.append(QUrl.fromLocalFile(self.tiff_src))
-
-            else:
-                self.show_no_tiff = True
-
-    def finalize_move(self):
-
-        if len(self.urls) == 0:
-            return
-
-        self.mime_data.setUrls(self.urls)
+        
+        url = [QUrl.fromLocalFile(self.img_src)]
+        self.mime_data.setUrls(url)
 
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.CopyAction)
-
-        if self.show_no_tiff:
-            self.show_no_tiff = False
-
-            if cnf.scaner_running:
-                t = f"{cnf.lng.no_tiff}. {cnf.lng.wait_scan_finished}"
-            else:
-                t = cnf.lng.no_tiff
-
-            gui_signals_app.noti_main.emit(t)
 
     def contextMenuEvent(self, event):
         self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)
