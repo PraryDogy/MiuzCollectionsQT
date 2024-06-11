@@ -1,5 +1,7 @@
 from functools import partial
 
+from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QMainWindow
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
@@ -16,13 +18,10 @@ class Manager:
     win_image_view = None
 
 
-class ImageContext(ContextMenuBase):
-    def __init__(
-            self,
-            parent: QLabel | QMainWindow,
-            img_src: str,
-            event
-            ):
+class ImageContext(ContextMenuBase, QObject):
+    closed = pyqtSignal()
+
+    def __init__(self, parent: QLabel | QMainWindow, img_src: str, event):
 
         super().__init__(event)
         self.my_parent = parent
@@ -83,21 +82,6 @@ class ImageContext(ContextMenuBase):
         self.tiff_thread = None
         self.save_files = None
 
-        if parent.objectName() == Names.thumbnail_normal:
-            try:
-                parent.setObjectName(Names.thumbnail_selected)
-                parent.setStyleSheet(Themes.current)
-                self.show_menu()
-                parent.setObjectName(Names.thumbnail_normal)
-                parent.setStyleSheet(Themes.current)
-            except Exception as e:
-                print(e)
-        else:
-            try:
-                self.show_menu()
-            except Exception as e:
-                print(e)
-
     def show_info_win(self, img_src):
         if isinstance(self.my_parent, QMainWindow):
             Manager.win_info = WinInfo(img_src, self.my_parent)
@@ -155,4 +139,7 @@ class ImageContext(ContextMenuBase):
             is_fiff=True,
             is_downloads=True
             )
-        
+    
+    def closeEvent(self, a0: QCloseEvent | None) -> None:
+        self.closed.emit()
+        return super().closeEvent(a0)

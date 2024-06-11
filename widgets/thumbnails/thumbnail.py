@@ -3,9 +3,8 @@ from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QApplication, QLabel
 
 from cfg import cnf
-from signals import gui_signals_app
 from styles import Names, Themes
-from utils import FindTiffLocal, PixmapThumb
+from utils import PixmapThumb
 
 from ..image_context import ImageContext
 from ..win_image_view import WinImageView
@@ -60,4 +59,18 @@ class Thumbnail(QLabel, QObject):
         self.drag.exec_(Qt.CopyAction)
 
     def contextMenuEvent(self, event):
-        self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)
+        try:
+            self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)
+            self.image_context.closed.connect(self.closed_context)
+            self.setObjectName(Names.thumbnail_selected)
+            self.setStyleSheet(Themes.current)
+            self.image_context.show_menu()
+        except Exception as e:
+            print(e)
+
+    def closed_context(self):
+        try:
+            self.setObjectName(Names.thumbnail_normal)
+            self.setStyleSheet(Themes.current)
+        except Exception as e:
+            print(e)
