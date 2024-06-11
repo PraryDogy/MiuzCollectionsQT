@@ -136,7 +136,7 @@ class WinBase(QMainWindow):
         self.grips[3].move(0, rect.bottom() - self.gripSize)
 
     def center_win(self, parent: QMainWindow = None):
-        if not parent:
+        if type(parent) != QMainWindow:
             parent = MainUtils.get_central_widget()
 
         geo = self.geometry()
