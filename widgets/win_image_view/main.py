@@ -406,7 +406,10 @@ class WinImageView(WinImgViewBase):
         super().keyPressEvent(event)
 
     def contextMenuEvent(self, event):
-        ImageContext(parent=self, img_src=self.image_path, event=event)
+        self.image_context = ImageContext(
+            parent=self, img_src=self.image_path, event=event
+            )
+        self.image_context.show_menu()
 
     def focusInEvent(self, a0: QFocusEvent | None) -> None:
         self.setFocus()

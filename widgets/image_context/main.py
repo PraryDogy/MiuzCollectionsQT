@@ -2,11 +2,10 @@ from functools import partial
 
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QCloseEvent
-from PyQt5.QtWidgets import QAction, QLabel, QMainWindow
+from PyQt5.QtWidgets import QAction, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
-from styles import Names, Themes
 
 from ..gui_thread_reveal_files import GuiThreadRevealFiles
 from ..gui_thread_save_files import GuiThreadSaveFiles
@@ -21,19 +20,15 @@ class Manager:
 class ImageContext(ContextMenuBase, QObject):
     closed = pyqtSignal()
 
-    def __init__(self, parent: QLabel | QMainWindow, img_src: str, event):
-
+    def __init__(self, img_src: str, event, parent: QWidget = None):
         super().__init__(event)
-        self.my_parent = parent
-        
-        if not isinstance(parent, QMainWindow):
-            open_action = QAction(cnf.lng.view, self)
-            open_action.triggered.connect(partial(self.show_image_viewer, img_src))
-            self.addAction(open_action)
 
-        info_action = QAction(cnf.lng.info, self)
-        info_action.triggered.connect(partial(self.show_info_win, img_src))
-        self.addAction(info_action)
+        self.my_parent = parent
+        self.img_src = img_src
+        
+        self.info_action = QAction(cnf.lng.info, self)
+        self.info_action.triggered.connect(partial(self.show_info_win, img_src))
+        self.addAction(self.info_action)
 
         self.addSeparator()
 
@@ -82,11 +77,16 @@ class ImageContext(ContextMenuBase, QObject):
         self.tiff_thread = None
         self.save_files = None
 
+    def add_preview_item(self):
+        open_action = QAction(cnf.lng.view, self)
+        open_action.triggered.connect(
+            lambda: self.show_image_viewer(self.img_src)
+            )
+        self.addAction(open_action)
+        self.insertAction(self.info_action, open_action)
+
     def show_info_win(self, img_src):
-        if isinstance(self.my_parent, QMainWindow):
-            Manager.win_info = WinInfo(img_src, self.my_parent)
-        else:
-            Manager.win_info = WinInfo(img_src)
+        Manager.win_info = WinInfo(img_src, self.my_parent)
         Manager.win_info.show()
         
     def show_image_viewer(self, img_src):

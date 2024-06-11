@@ -58,7 +58,8 @@ class Thumbnail(QLabel, QObject):
 
     def contextMenuEvent(self, event):
         try:
-            self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)
+            self.image_context = ImageContext(img_src=self.img_src, event=event)
+            self.image_context.add_preview_item()
             self.image_context.closed.connect(self.closed_context)
             self.setObjectName(Names.thumbnail_selected)
             self.setStyleSheet(Themes.current)
