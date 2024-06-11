@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QMimeData, QObject, Qt, QUrl, pyqtSignal
+from PyQt5.QtCore import QMimeData, QObject, Qt, QUrl
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QApplication, QLabel
 
@@ -15,8 +15,6 @@ class Manager:
 
 
 class Thumbnail(QLabel, QObject):
-    finish_find_tiff = pyqtSignal(str)
-
     def __init__(self, byte_array: bytearray, img_src: str):
         super().__init__()
         self.img_src = img_src
