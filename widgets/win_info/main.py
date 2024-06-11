@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLabel
 
 from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
@@ -90,25 +91,23 @@ class LeftLabel(BaseLabel):
 class CustomContextRLabel(ContextMenuBase):
     def __init__(self, parent: QLabel, event):
         super().__init__(event=event)
-        self.root = parent
+        self.my_parent = parent
 
-        sel = QAction(cnf.lng.copy_selected, self)
+        sel = QAction(text=cnf.lng.copy_selected, parent=self)
         sel.triggered.connect(self.my_sel)
         self.addAction(sel)
 
         self.addSeparator()
 
-        sel_all = QAction(cnf.lng.copy_all, self)
+        sel_all = QAction(text=cnf.lng.copy_all, parent=self)
         sel_all.triggered.connect(self.my_sel_all)
         self.addAction(sel_all)
 
-        self.show_menu()
-
     def my_sel_all(self):
-        MainUtils.copy_text(self.root.text())
+        MainUtils.copy_text(self.my_parent.text())
 
     def my_sel(self):
-        text = self.root.selectedText().replace("\u2029", "")
+        text = self.my_parent.selectedText().replace("\u2029", "")
         MainUtils.copy_text(text)
 
 
@@ -118,8 +117,10 @@ class RightLabel(BaseLabel):
         self.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.setCursor(Qt.IBeamCursor)
 
-    def contextMenuEvent(self, event):
-        CustomContextRLabel(parent=self, event=event)
+    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        self.my_context = CustomContextRLabel(parent=self, event=ev)
+        self.my_context.show_menu()
+        return super().contextMenuEvent(ev)
 
 
 class WinInfo(WinStandartBase):

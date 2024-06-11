@@ -10,35 +10,33 @@ from .context import ContextMenuBase
 class CustomContext(ContextMenuBase):
     def __init__(self, parent: QLineEdit, event):
         super().__init__(event=event)
-        self.root = parent
+        self.my_parent = parent
         self.setFixedWidth(120)
 
-        sel = QAction(cnf.lng.cut, self)
+        sel = QAction(text=cnf.lng.cut, parent=self)
         sel.triggered.connect(self.cut_selection)
         self.addAction(sel)
 
-        sel_all = QAction(cnf.lng.copy, self)
+        sel_all = QAction(text=cnf.lng.copy, parent=self)
         sel_all.triggered.connect(self.copy_selection)
         self.addAction(sel_all)
 
-        sel_all = QAction(cnf.lng.paste, self)
+        sel_all = QAction(text=cnf.lng.paste, parent=self)
         sel_all.triggered.connect(self.paste_text)
         self.addAction(sel_all)
 
-        self.show_menu()
-
     def copy_selection(self):
-        text = self.root.selectedText()
+        text = self.my_parent.selectedText()
         MainUtils.copy_text(text)
 
     def cut_selection(self):
-        text = self.root.selectedText()
+        text = self.my_parent.selectedText()
         MainUtils.copy_text(text)
-        self.root.clear()
+        self.my_parent.clear()
 
     def paste_text(self):
         text = MainUtils.paste_text()
-        self.root.insert(text)
+        self.my_parent.insert(text)
 
 
 class InputBase(QLineEdit):
@@ -49,4 +47,5 @@ class InputBase(QLineEdit):
         self.setStyleSheet(Themes.current)
 
     def contextMenuEvent(self, event):
-        CustomContext(parent=self, event=event)
+        self.context_menu = CustomContext(parent=self, event=event)
+        self.context_menu.show_menu()
