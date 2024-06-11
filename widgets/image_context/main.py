@@ -18,8 +18,6 @@ class Manager:
 
 
 class ImageContext(ContextMenuBase):
-    closed = pyqtSignal()
-
     def __init__(self, img_src: str, event, parent: QWidget = None):
         super().__init__(event)
 
@@ -77,7 +75,6 @@ class ImageContext(ContextMenuBase):
         self.reveal_files = None
         self.tiff_thread = None
         self.save_files = None
-
 
     def add_preview_item(self):
         open_action = QAction(cnf.lng.view, self)
@@ -142,6 +139,3 @@ class ImageContext(ContextMenuBase):
             is_downloads=True
             )
     
-    def closeEvent(self, a0: QCloseEvent | None) -> None:
-        self.closed.emit()
-        return super().closeEvent(a0)
