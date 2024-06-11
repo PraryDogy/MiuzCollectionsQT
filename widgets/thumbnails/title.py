@@ -25,6 +25,8 @@ class CustomContext(ContextMenuBase):
         save_as_jpg.triggered.connect(lambda: self.save_as_jpg(files_list))
         save_as_menu.addAction(save_as_jpg)
 
+        save_as_menu.addSeparator()
+
         save_as_layers = QAction(cnf.lng.layers)
         save_as_layers.triggered.connect(lambda: self.save_as_tiffs(files_list))
         save_as_menu.addAction(save_as_layers)
@@ -37,6 +39,8 @@ class CustomContext(ContextMenuBase):
         save_jpg = QAction("JPG")
         save_jpg.triggered.connect(lambda: self.save_jpg(files_list))
         save_menu.addAction(save_jpg)
+
+        save_menu.addSeparator()
 
         save_layers = QAction(cnf.lng.layers)
         save_layers.triggered.connect(lambda: self.save_tiffs(files_list))

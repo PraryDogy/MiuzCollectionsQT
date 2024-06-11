@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QMimeData, QObject, Qt, QUrl
-from PyQt5.QtGui import QDrag
+from PyQt5.QtGui import QContextMenuEvent, QDrag
 from PyQt5.QtWidgets import QApplication, QLabel
 
 from cfg import cnf
@@ -12,6 +12,7 @@ from ..win_image_view import WinImageView
 
 class Manager:
     win_image_view = None
+    co = None
 
 
 class Thumbnail(QLabel, QObject):
@@ -56,14 +57,15 @@ class Thumbnail(QLabel, QObject):
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.CopyAction)
 
-    def contextMenuEvent(self, event):
+    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.image_context = ImageContext(img_src=self.img_src, event=event)
-            self.image_context.add_preview_item()
+            self.image_context = ImageContext(img_src=self.img_src, event=ev, parent=self)
             self.image_context.closed.connect(self.closed_context)
+            self.image_context.add_preview_item()
             self.setObjectName(Names.thumbnail_selected)
             self.setStyleSheet(Themes.current)
             self.image_context.show_menu()
+            return super().contextMenuEvent(ev)
         except Exception as e:
             print(e)
 

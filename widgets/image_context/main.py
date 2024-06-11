@@ -17,7 +17,7 @@ class Manager:
     win_image_view = None
 
 
-class ImageContext(ContextMenuBase, QObject):
+class ImageContext(ContextMenuBase):
     closed = pyqtSignal()
 
     def __init__(self, img_src: str, event, parent: QWidget = None):
@@ -26,56 +26,58 @@ class ImageContext(ContextMenuBase, QObject):
         self.my_parent = parent
         self.img_src = img_src
         
-        self.info_action = QAction(cnf.lng.info, self)
+        self.info_action = QAction(text=cnf.lng.info, parent=self)
         self.info_action.triggered.connect(partial(self.show_info_win, img_src))
         self.addAction(self.info_action)
 
         self.addSeparator()
 
-        reveal_menu = ContextSubMenuBase(self, cnf.lng.reveal_in_finder)
-        self.addMenu(reveal_menu)
+        self.reveal_menu = ContextSubMenuBase(parent=self, title=cnf.lng.reveal_in_finder)
+        self.addMenu(self.reveal_menu)
 
-        reveal_jpg = QAction("JPG")
+        reveal_jpg = QAction(parent=self, text="JPG")
         reveal_jpg.triggered.connect(lambda: self.reveal_jpg(img_src))
-        reveal_menu.addAction(reveal_jpg)
+        self.reveal_menu.addAction(reveal_jpg)
 
-        reveal_menu.addSeparator()
+        self.reveal_menu.addSeparator()
 
-        reveal_layers = QAction(cnf.lng.layers)
+        reveal_layers = QAction(parent=self, text=cnf.lng.layers)
         reveal_layers.triggered.connect(lambda: self.reveal_tiffs(img_src))
-        reveal_menu.addAction(reveal_layers)
+        self.reveal_menu.addAction(reveal_layers)
 
         self.addSeparator()
 
-        save_as_menu = ContextSubMenuBase(self, cnf.lng.save_image_in)
+        save_as_menu = ContextSubMenuBase(parent=self, title=cnf.lng.save_image_in)
         self.addMenu(save_as_menu)
 
-        save_as_jpg = QAction("JPG")
+        save_as_jpg = QAction(parent=self, text="JPG")
         save_as_jpg.triggered.connect(lambda: self.save_as_jpg(img_src))
         save_as_menu.addAction(save_as_jpg)
 
         save_as_menu.addSeparator()
 
-        save_as_layers = QAction(cnf.lng.layers)
+        save_as_layers = QAction(text=cnf.lng.layers, parent=self)
         save_as_layers.triggered.connect(lambda: self.save_as_tiffs(img_src))
         save_as_menu.addAction(save_as_layers)
 
-        save_menu = ContextSubMenuBase(self, cnf.lng.save_image_downloads)
+        save_menu = ContextSubMenuBase(parent=self, title=cnf.lng.save_image_downloads)
         self.addMenu(save_menu)
 
-        save_jpg = QAction("JPG")
+        save_jpg = QAction(text="JPG", parent=self)
         save_jpg.triggered.connect(lambda: self.save_jpg(img_src))
         save_menu.addAction(save_jpg)
 
         save_menu.addSeparator()
 
-        save_layers = QAction(cnf.lng.layers)
+        save_layers = QAction(text=cnf.lng.layers, parent=self)
         save_layers.triggered.connect(lambda: self.save_tiffs(img_src))
         save_menu.addAction(save_layers)
+
 
         self.reveal_files = None
         self.tiff_thread = None
         self.save_files = None
+
 
     def add_preview_item(self):
         open_action = QAction(cnf.lng.view, self)
