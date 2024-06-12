@@ -1,12 +1,12 @@
-from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QMenu, QMenuBar, QLabel, QAction
+from PyQt5.QtGui import QContextMenuEvent, QIcon, QPainter, QPixmap
+from PyQt5.QtWidgets import QAction, QMenu, QMenuBar, QLabel, QAction, QWidget, QSpacerItem
 from PyQt5.QtCore import Qt
 
 from cfg import cnf
 from signals import gui_signals_app
 
 from ..win_settings import WinSettings
-from base_widgets import WinSmallBase, ContextMenuBase
+from base_widgets import WinSmallBase, ContextMenuBase, SvgBtn
 from utils import MainUtils
 
 class Manager:
@@ -48,7 +48,6 @@ class SelectableLabel(QLabel):
         MainUtils.copy_text(self.selectedText())
 
 
-
 class MacMenuBar(QMenuBar):
     def __init__(self):
         super().__init__()
@@ -58,8 +57,6 @@ class MacMenuBar(QMenuBar):
         self.init_ui()
 
     def init_ui(self):
-
-        # Создаем меню
         self.mainMenu = QMenu(cnf.lng.bar_menu, self)
 
         # Добавляем пункт "Открыть настройки"
@@ -82,18 +79,30 @@ class MacMenuBar(QMenuBar):
         Manager.win_settings.show()
 
     def open_about_window(self):
-        Manager.win_about = WinSmallBase(close_func = lambda e: Manager.win_about.deleteLater())
-        Manager.win_about.setWindowModality(Qt.WindowModality.ApplicationModal)
-        Manager.win_about.setFixedSize(255, 150)
-        Manager.win_about.disable_min_max()
-        Manager.win_about.content_layout.setContentsMargins(10, 10, 10, 10)
-        Manager.win_about.set_title(cnf.app_name)
+        win = WinSmallBase(close_func = lambda e: win.deleteLater())
+        Manager.win_about = win
 
-        lbl = SelectableLabel(Manager.win_about)
-        Manager.win_about.content_layout.addWidget(lbl)
+        win.setWindowModality(Qt.WindowModality.ApplicationModal)
+        win.disable_min_max()
+        win.set_title(cnf.app_name)
+        win.setFixedSize(280, 240)
 
-        Manager.win_about.center_win(self)
-        Manager.win_about.show()
+        img = QPixmap("icon/icon.png")
+        img = img.scaled(
+            120, 120, 
+            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+            transformMode=Qt.TransformationMode.SmoothTransformation
+            )
+        icon = QLabel(parent=win, pixmap=img)
+        win.content_layout.addWidget(icon, alignment=Qt.AlignCenter)
+
+        win.content_layout.addSpacerItem(QSpacerItem(0, 20))
+
+        lbl = SelectableLabel(win)
+        win.content_layout.addWidget(lbl)
+
+        win.center_win(self)
+        win.show()
 
     def reload_menubar(self):
         self.mainMenu.deleteLater()
