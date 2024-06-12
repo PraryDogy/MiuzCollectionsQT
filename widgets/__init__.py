@@ -1,6 +1,4 @@
 from .filters_bar import FiltersBar
-from .gui_thread_reveal_files import GuiThreadRevealFiles
-from .gui_thread_save_files import GuiThreadSaveFiles
 from .image_context import ImageContext
 from .left_menu import LeftMenu
 from .menu_bar import MacMenuBar
@@ -8,7 +6,7 @@ from .notification import Notification
 from .search_bar import SearchBar
 from .st_bar import StBar
 from .thumbnails import Thumbnails
-from .win_copy_files_thread import WinCopyFilesThread
+from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_first_load import WinFirstLoad
 from .win_image_view import WinImageView

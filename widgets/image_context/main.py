@@ -1,20 +1,26 @@
 from functools import partial
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtGui import QCloseEvent
-from PyQt5.QtWidgets import QAction, QWidget
+from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
+from utils import RevealFiles, ThreadCopyFiles, ThreadFindTiff
 
-from ..gui_thread_reveal_files import GuiThreadRevealFiles
-from ..gui_thread_save_files import GuiThreadSaveFiles
+from ..win_copy_files import WinCopyFiles
 from ..win_info import WinInfo
 
 
 class Manager:
     win_info = None
     win_image_view = None
+    dialog = None
+    copy_files_wins = []
+    threads = []
+
+
+# We save some items to the Manager. We want to prevent the widget/thread 
+# from being destroyed if the parent widgets are reinitialized.
+# for example reinit images grid
 
 
 class ImageContext(ContextMenuBase):
@@ -89,53 +95,82 @@ class ImageContext(ContextMenuBase):
         Manager.win_info.show()
         
     def show_image_viewer(self, img_src):
+        # import here to prevent circular import
         from ..win_image_view import WinImageView
         Manager.win_image_view = WinImageView(img_src)
         Manager.win_image_view.show()
 
     def reveal_jpg(self, img_src):
-        self.reveal_files = GuiThreadRevealFiles(
-            parent=self.my_parent,
-            files=[img_src],
-            is_tiff=False
-            )
+        RevealFiles([img_src])
 
-    def reveal_tiffs(self, img_src):
-        self.reveal_files = GuiThreadRevealFiles(
-            parent=self.my_parent,
-            files=[img_src],
-            is_tiff=True
-            )
+    def reveal_tiffs(self, img_src: str):
+        tiff_task = ThreadFindTiff(img_src)
+        Manager.threads.append(tiff_task)
 
-    def save_as_jpg(self, img_src):
-        self.save_files = GuiThreadSaveFiles(
-            parent=self.my_parent,
-            files=[img_src],
-            is_fiff=False,
-            is_downloads=False
-            )
+        tiff_task.finished.connect(lambda tiff: RevealFiles([tiff]))
+        tiff_task.can_remove.connect(lambda: Manager.threads.remove(tiff_task))
 
-    def save_as_tiffs(self, img_src):
-        self.save_files = GuiThreadSaveFiles(
-            parent=self.my_parent, 
-            files=[img_src],
-            is_fiff=True,
-            is_downloads=False
-            )
+        tiff_task.run()
 
-    def save_jpg(self, img_src):
-        self.save_files = GuiThreadSaveFiles(
-            parent=self.my_parent,
-            files=[img_src],
-            is_fiff=False,
-            is_downloads=True
-            )
+    def save_as_jpg(self, img_src: str):
+        dest = self.select_folder()
+        if dest:
+            self.copy_file(dest=dest, file=img_src)
 
-    def save_tiffs(self, img_src):
-        self.save_files = GuiThreadSaveFiles(
-            parent=self.my_parent,
-            files=[img_src],
-            is_fiff=True,
-            is_downloads=True
-            )
+    def save_jpg(self, img_src: str):
+        self.copy_file(dest=cnf.down_folder, file=img_src)
+
+    def save_as_tiffs(self, img_src: str):
+        dest = self.select_folder()
+        if dest:
+            self.find_tiffs(dest=dest, img_src=img_src)
+
+    def save_tiffs(self, img_src: str):
+        self.find_tiffs(dest=cnf.down_folder, img_src=img_src)
+        
+    def find_tiffs(self, dest: str, img_src: str):
+        tiff_task = ThreadFindTiff(img_src)
+        Manager.threads.append(tiff_task)
+
+        tiff_task.finished.connect(lambda tiff: self.copy_file(dest, tiff))
+        tiff_task.can_remove.connect(lambda: Manager.threads.remove(tiff_task))
+
+        tiff_task.run()
+
+    def select_folder(self):
+        Manager.dialog = QFileDialog()
+        Manager.dialog.setOption(QFileDialog.ShowDirsOnly, True)
+        selected_folder = Manager.dialog.getExistingDirectory()
+
+        if selected_folder:
+            return selected_folder
+        return None
     
+    def copy_file(self, dest: str, file: str):
+        if not file:
+            return
+
+        copy_task = ThreadCopyFiles(dest=dest, files=[file])
+        copy_win = WinCopyFiles(parent=self.my_parent)
+
+        Manager.threads.append(copy_task)
+        Manager.copy_files_wins.append(copy_win)
+
+        copy_task.value_changed.connect(lambda val: copy_win.set_value(val))
+        copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, copy_win, files=files))
+        copy_win.cancel_sign.connect(lambda: self.copy_files_cancel(copy_task, copy_win))
+        
+        copy_win.show()
+        copy_task.run()
+
+    def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
+        self.reveal_files = RevealFiles(files)
+        Manager.threads.remove(copy_task)
+        Manager.copy_files_wins.remove(copy_win)
+        copy_win.deleteLater()
+
+    def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
+        copy_task.stop.emit()
+        Manager.threads.remove(copy_task)
+        Manager.copy_files_wins.remove(copy_win)
+        copy_win.deleteLater()

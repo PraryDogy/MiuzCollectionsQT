@@ -1,4 +1,3 @@
-import os
 import subprocess
 
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -13,6 +12,5 @@ class RevealFiles(QObject):
         reveal_script = "applescripts/reveal_files.scpt"
         
         command = ["osascript", reveal_script] + files_list
-        # subprocess.run(command)
         subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.finished.emit()

@@ -10,7 +10,7 @@ class Manager:
     threads = []
 
 
-class TiffUtils:
+class _TiffUtils:
 
     @staticmethod
     def compare_names(src: str, tiff: str):
@@ -42,7 +42,7 @@ class TiffUtils:
             return None
 
 
-class FindTiffLocal:
+class _FindTiffLocal:
     def __init__(self, src: str):
         super().__init__()
         self.src = src
@@ -52,7 +52,7 @@ class FindTiffLocal:
     def run_search(self):
         try:
             tiff_list = self.find_tiffs()
-            self.final_tiff = TiffUtils.nearest_len(self.src, tiff_list)
+            self.final_tiff = _TiffUtils.nearest_len(self.src, tiff_list)
             self.count = 0
         except RuntimeError:
             self.count += 1
@@ -65,16 +65,16 @@ class FindTiffLocal:
     def find_tiffs(self) -> list:
         _, src_filename = os.path.split(self.src)
 
-        aa_name = TiffUtils.remove_punct(src_filename)
-        aa_name = TiffUtils.remove_stop_words(aa_name)
+        aa_name = _TiffUtils.remove_punct(src_filename)
+        aa_name = _TiffUtils.remove_stop_words(aa_name)
 
         tiff_list = []
 
         for tiff in self.tiff_list:
             _, tiff_name = os.path.split(tiff)
 
-            bb_name = TiffUtils.remove_punct(tiff_name)
-            bb_name = TiffUtils.remove_stop_words(bb_name)
+            bb_name = _TiffUtils.remove_punct(tiff_name)
+            bb_name = _TiffUtils.remove_stop_words(bb_name)
 
             if aa_name == bb_name:
                 tiff_list.append(tiff)
@@ -83,7 +83,7 @@ class FindTiffLocal:
             if len(bb_name) <= 2:
                 continue
 
-            if TiffUtils.compare_names(src=aa_name, tiff=bb_name):
+            if _TiffUtils.compare_names(src=aa_name, tiff=bb_name):
                 tiff_list.append(tiff)
 
         return tiff_list
@@ -95,8 +95,9 @@ class FindTiffLocal:
             return ""
 
 
-class FindTiffThread(QThread):
+class ThreadFindTiff(QThread):
     finished = pyqtSignal(str)
+    can_remove = pyqtSignal()
 
     def __init__(self, src: str):
         super().__init__()
@@ -104,7 +105,33 @@ class FindTiffThread(QThread):
 
     def run(self):
         Manager.threads.append(self)
-        search = FindTiffLocal(src=self.src)
+        search = _FindTiffLocal(src=self.src)
         search.run_search()
         self.finished.emit(search.get_result())
+        self.can_remove.emit()
+        Manager.threads.remove(self)
+
+
+class ThreadFindTiffsMultiple(QThread):
+    finished = pyqtSignal(list)
+    can_remove = pyqtSignal()
+
+    def __init__(self, files_list: list):
+        super().__init__()
+        self.files_list = files_list
+
+    def run(self):
+        Manager.threads.append(self)
+        tiff_list = []
+
+        for i in self.files_list:
+            search = _FindTiffLocal(src=i)
+            search.run_search()
+
+            res = search.get_result()
+            if res:
+                tiff_list.append(res)
+
+        self.finished.emit(tiff_list)
+        self.can_remove.emit()
         Manager.threads.remove(self)
