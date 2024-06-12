@@ -27,6 +27,10 @@
         "Отмена",
         "Cancel"
     ],
+    "choose_coll_smb": [
+        "Укажите расположение коллекций",
+        "Choose collections folder"
+    ],
     "choose_user_first": [
         "Выберите тип пользователя.\nСтандарт: подходит для просмотра.\nДизайнер: возможность работы со слоями",
         "Choose user type.\nStandard: suitable for viewing.\nDesigner: ability to work with layers."
@@ -92,6 +96,10 @@
     "deleting_photos": [
         "Удаляю лишнее",
         "Removing unnecessary"
+    ],
+    "download_update": [
+        "Скачать обновление",
+        "Update app"
     ],
     "end": [
         "Конец",
@@ -201,6 +209,10 @@
         "Нет подключения",
         "No connection"
     ],
+    "no_file": [
+        "Не могу найти файл",
+        "Can't find file"
+    ],
     "no_photo": [
         "Нет фотографий",
         "No photos"
@@ -208,10 +220,6 @@
     "no_photo_filter": [
         "Нет фотографий в категории",
         "No photos in cathegory"
-    ],
-    "no_tiff": [
-        "Не могу найти слои",
-        "Can't find layers"
     ],
     "ok": [
         "Ок",
@@ -345,6 +353,14 @@
         "Просмотр",
         "View"
     ],
+    "wait_scan_finished": [
+        "Пожалуйста, подождите. Идет поиск фотографий.",
+        "Please, wait. Searching for new photos."
+    ],
+    "wait_update": [
+        "Подождите...",
+        "Wait..."
+    ],
     "weekdays": [
         {
             "0": "понедельник",
@@ -368,21 +384,5 @@
     "with_name": [
         "с именем",
         "with name"
-    ],
-    "wait_scan_finished": [
-        "Пожалуйста, подождите. Идет поиск фотографий.",
-        "Please, wait. Searching for new photos."
-    ],
-    "choose_coll_smb": [
-        "Укажите расположение коллекций",
-        "Choose collections folder"
-    ],
-    "download_update": [
-        "Скачать обновление",
-        "Update app"
-    ],
-    "wait_update": [
-        "Подождите...",
-        "Wait..."
     ]
 }
