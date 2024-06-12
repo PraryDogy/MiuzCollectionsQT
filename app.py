@@ -198,7 +198,7 @@ class App(QApplication):
         if not MainUtils.smb_check():
             from widgets.win_smb import WinSmb
 
-            Manager.smb_win = WinSmb()
+            Manager.smb_win = WinSmb(parent=self)
             Manager.smb_win.show()
 
         utils_signals_app.scaner_start.emit()

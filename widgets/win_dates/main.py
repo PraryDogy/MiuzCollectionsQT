@@ -95,13 +95,13 @@ class DatesWinBase(WinStandartBase):
 
 
 class WinDates(DatesWinBase):
-    def __init__(self):
+    def __init__(self, parent: QWidget):
         super().__init__()
         self.set_title(cnf.lng.dates)
 
         self.init_ui()
         self.fit_size()
-        self.center_win()
+        self.center_win(parent=parent)
 
     def init_ui(self):
         title_label = QLabel(cnf.lng.search_dates)

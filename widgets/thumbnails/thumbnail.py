@@ -30,7 +30,7 @@ class Thumbnail(QLabel, QObject):
         self.image_context = None
 
     def mouseReleaseEvent(self, event):
-        Manager.win_image_view = WinImageView(self.img_src)
+        Manager.win_image_view = WinImageView(parent=self, img_src=self.img_src)
         Manager.win_image_view.show()
 
     def mousePressEvent(self, event):

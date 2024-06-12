@@ -80,5 +80,5 @@ class StBar(QFrame):
         self.switch_theme.set_icon(f"{cnf.theme}_switch.svg")
 
     def sett_btn_cmd(self, e):
-        Manager.win_settings = WinSettings()
+        Manager.win_settings = WinSettings(parent=self)
         Manager.win_settings.show()

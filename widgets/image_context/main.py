@@ -90,14 +90,14 @@ class ImageContext(ContextMenuBase):
         self.addAction(open_action)
         self.insertAction(self.info_action, open_action)
 
-    def show_info_win(self, img_src):
-        Manager.win_info = WinInfo(img_src, self.my_parent)
+    def show_info_win(self, img_src: str):
+        Manager.win_info = WinInfo(img_src=img_src, parent=self.my_parent)
         Manager.win_info.show()
         
-    def show_image_viewer(self, img_src):
+    def show_image_viewer(self, img_src: str):
         # import here to prevent circular import
         from ..win_image_view import WinImageView
-        Manager.win_image_view = WinImageView(img_src)
+        Manager.win_image_view = WinImageView(parent=self.my_parent, img_src=img_src)
         Manager.win_image_view.show()
 
     def reveal_jpg(self, img_src: str):

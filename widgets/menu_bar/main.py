@@ -39,7 +39,7 @@ class MacMenuBar(QMenuBar):
         self.setNativeMenuBar(True)
 
     def open_settings_window(self):
-        Manager.win_settings = WinSettings()
+        Manager.win_settings = WinSettings(self)
         Manager.win_settings.show()
 
     def open_about_window(self):

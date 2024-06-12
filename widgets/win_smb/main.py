@@ -108,7 +108,7 @@ class BrowseColl(QWidget):
 class WinSmb(WinStandartBase):
     finished = pyqtSignal()
 
-    def __init__(self, parent = None):
+    def __init__(self, parent: QWidget):
         MainUtils.close_same_win(WinSmb)
 
         super().__init__(close_func=self.cancel_cmd)

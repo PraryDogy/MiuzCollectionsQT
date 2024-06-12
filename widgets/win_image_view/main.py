@@ -228,9 +228,9 @@ class NaviArrowNext(NaviArrow):
 
 
 class WinImageView(WinImgViewBase):
-    def __init__(self, image_path):
+    def __init__(self, parent: QWidget, img_src: str):
         ImageWinUtils.close_same_win()
-        self.image_path = image_path
+        self.img_src = img_src
         self.fsize_img_thread = None
 
         super().__init__(close_func=self.my_close)
@@ -273,7 +273,7 @@ class WinImageView(WinImgViewBase):
         self.hide_navi_btns()
 
         self.setFocus()
-        self.center_win()
+        self.center_win(parent)
         self.load_image(interval=200)
 
         smb_timer = QTimer(self)
@@ -283,16 +283,16 @@ class WinImageView(WinImgViewBase):
 
     def smb_check_first(self):
         if not MainUtils.smb_check():
-            Manager.win_smb = WinSmb(self)
+            Manager.win_smb = WinSmb(parent=self)
             Manager.win_smb.show()
             Manager.win_smb.finished.connect(self.run_thread)
 
     def load_image(self, interval: int = 50):
-        if self.image_path not in Manager.images:
+        if self.img_src not in Manager.images:
             self.my_set_title(loading=True)
 
             q = (sqlalchemy.select(ThumbsMd.img150)
-                .filter(ThumbsMd.src == self.image_path))
+                .filter(ThumbsMd.src == self.img_src))
             session = Dbase.get_session()
 
             try:
@@ -332,13 +332,13 @@ class WinImageView(WinImgViewBase):
         self.navi_next.hide()
 
     def run_thread(self):
-        self.fsize_img_thread = FSizeImgThread(self.image_path)
+        self.fsize_img_thread = FSizeImgThread(self.img_src)
         self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
         self.fsize_img_thread.start()
         Manager.threads.append(self.fsize_img_thread)
 
     def finalize_thread(self, data: dict):
-        if data["width"] == 0 or data["src"] != self.image_path:
+        if data["width"] == 0 or data["src"] != self.img_src:
             return
         
         self.image_label.set_image(data["image"])
@@ -347,13 +347,13 @@ class WinImageView(WinImgViewBase):
 
     def switch_image(self, offset):
         try:
-            current_index = cnf.images.index(self.image_path)
+            current_index = cnf.images.index(self.img_src)
         except ValueError:
             current_index = 0
 
         total_images = len(cnf.images)
         new_index = (current_index + offset) % total_images
-        self.image_path = cnf.images[new_index]
+        self.img_src = cnf.images[new_index]
         self.load_image()
 
     def cut_text(self, text: str) -> str:
@@ -368,11 +368,11 @@ class WinImageView(WinImgViewBase):
             return
 
         try:
-            w, h = get_image_size(self.image_path)
+            w, h = get_image_size(self.img_src)
         except Exception:
             w, h = "?", "?"
-        coll = self.cut_text(MainUtils.get_coll_name(self.image_path))
-        name = self.cut_text(os.path.basename(self.image_path))
+        coll = self.cut_text(MainUtils.get_coll_name(self.img_src))
+        name = self.cut_text(os.path.basename(self.img_src))
 
         self.set_title(f"{w}x{h} - {coll} - {name}")
 
@@ -407,7 +407,7 @@ class WinImageView(WinImgViewBase):
 
     def contextMenuEvent(self, event):
         self.image_context = ImageContext(
-            parent=self, img_src=self.image_path, event=event
+            parent=self, img_src=self.img_src, event=event
             )
         self.image_context.show_menu()
 

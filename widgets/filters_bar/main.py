@@ -40,7 +40,7 @@ class DatesBtn(Btn):
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
-            Manager.win_dates = WinDates()
+            Manager.win_dates = WinDates(parent=self)
             Manager.win_dates.show()
 
 

@@ -135,12 +135,9 @@ class WinBase(QMainWindow):
             rect.right() - self.gripSize, rect.bottom() - self.gripSize)
         self.grips[3].move(0, rect.bottom() - self.gripSize)
 
-    def center_win(self, parent: QMainWindow = None):
-        if type(parent) != QMainWindow:
-            parent = MainUtils.get_central_widget()
-
+    def center_win(self, parent: QWidget):
         geo = self.geometry()
-        geo.moveCenter(parent.geometry().center())
+        geo.moveCenter(parent.window().geometry().center())
         self.setGeometry(geo)
 
     def keyPressEvent(self, event):

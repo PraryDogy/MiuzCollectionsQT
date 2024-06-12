@@ -211,7 +211,7 @@ class UpdaterWidget(QWidget):
 
 
 class WinSettings(WinStandartBase):
-    def __init__(self):
+    def __init__(self, parent: QWidget):
         MainUtils.close_same_win(WinSettings)
 
         super().__init__(close_func=self.cancel_cmd)
@@ -224,7 +224,7 @@ class WinSettings(WinStandartBase):
         temp.timeout.connect(self.init_ui)
         temp.start(10)
         self.setFixedSize(420, 540)
-        self.center_win()
+        self.center_win(parent)
         self.setFocus()
 
         self.new_coll_path = None

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QContextMenuEvent
-from PyQt5.QtWidgets import QAction, QLabel
+from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
 from cfg import cnf
@@ -124,7 +124,7 @@ class RightLabel(BaseLabel):
 
 
 class WinInfo(WinStandartBase):
-    def __init__(self, img_src: str, parent = None):
+    def __init__(self, img_src: str, parent: QWidget):
         MainUtils.close_same_win(WinInfo)
 
         super().__init__(close_func=self.my_close)
@@ -136,10 +136,7 @@ class WinInfo(WinStandartBase):
         self.init_ui()
 
         self.fit_size()
-        if parent:
-            self.center_win(parent)
-        else:
-            self.center_win()
+        self.center_win(parent)
 
     def init_ui(self):
         info_layout = LayoutH()
