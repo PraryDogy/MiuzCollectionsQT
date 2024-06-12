@@ -19,7 +19,6 @@ class SelectableLabel(QLabel):
         super().__init__(parent)
 
         txt = "\n".join([
-            f"{cnf.app_name}",
             f"Version {cnf.app_ver}",
             "Developed by Evlosh",
             "email: evlosh@gmail.com",
@@ -68,7 +67,7 @@ class MacMenuBar(QMenuBar):
         self.mainMenu.addAction(actionSettings)
 
         # Добавляем пункт "О приложении"
-        actionAbout = QAction(cnf.lng.about_my_app, self)
+        actionAbout = QAction(cnf.lng.show_about, self)
         actionAbout.triggered.connect(self.open_about_window)
         self.mainMenu.addAction(actionAbout)
 
@@ -84,10 +83,10 @@ class MacMenuBar(QMenuBar):
     def open_about_window(self):
         Manager.win_about = WinSmallBase(close_func = lambda e: Manager.win_about.deleteLater())
         Manager.win_about.setWindowModality(Qt.WindowModality.ApplicationModal)
-        Manager.win_about.setFixedSize(250, 150)
+        Manager.win_about.setFixedSize(255, 150)
         Manager.win_about.disable_min_max()
         Manager.win_about.content_layout.setContentsMargins(10, 10, 10, 10)
-        Manager.win_about.set_title(cnf.lng.about_my_app)
+        Manager.win_about.set_title(cnf.app_name)
 
         lbl = SelectableLabel(Manager.win_about)
         Manager.win_about.content_layout.addWidget(lbl)

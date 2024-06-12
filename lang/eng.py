@@ -1,7 +1,6 @@
 class Eng:
 	def __init__(self):
 		super().__init__()
-		self.about_my_app = 'Show about app'
 		self.adding_photos = 'Adding new photos'
 		self.all_colls = 'All collections'
 		self.bar_menu = 'Menu'
@@ -63,6 +62,7 @@ class Eng:
 		self.sett_stopcolls = 'Hide collections'
 		self.sett_stopwords = 'Ignore * in the file name when searching for tiff/psd'
 		self.settings = 'Settings'
+		self.show_about = 'Show about '
 		self.show_all = 'Show all'
 		self.show_more = 'Show more'
 		self.smb_descr = 'Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh'

@@ -1,7 +1,6 @@
 class Rus:
 	def __init__(self):
 		super().__init__()
-		self.about_my_app = 'О приложении'
 		self.adding_photos = 'Добавляю новые фотографии'
 		self.all_colls = 'Все коллекции'
 		self.bar_menu = 'Меню'
@@ -63,6 +62,7 @@ class Rus:
 		self.sett_stopcolls = 'Скрыть коллекции'
 		self.sett_stopwords = 'Игнорировать * в имени файла при поиске tiff/psd'
 		self.settings = 'Настройки'
+		self.show_about = 'О приложении'
 		self.show_all = 'Показать все'
 		self.show_more = 'Позазать еще'
 		self.smb_descr = 'Коллекции недоступны.\nВозможные причины:\n\n- Нет подключения к интернету\n- Нет подключения к сетевому диску\n- Неправильно указано расположение коллекций\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh'

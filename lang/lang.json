@@ -1,8 +1,4 @@
 {
-    "about_my_app": [
-        "О приложении",
-        "Show about app"
-    ],
     "adding_photos": [
         "Добавляю новые фотографии",
         "Adding new photos"
@@ -304,6 +300,10 @@
     "settings": [
         "Настройки",
         "Settings"
+    ],
+    "show_about": [
+        "О приложении",
+        "Show about"
     ],
     "show_all": [
         "Показать все",
