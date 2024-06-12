@@ -11,6 +11,7 @@ from utils import MainUtils
 
 class Manager:
     win_settings = None
+    win_about = None
 
 
 class SelectableLabel(QLabel):
@@ -81,18 +82,18 @@ class MacMenuBar(QMenuBar):
         Manager.win_settings.show()
 
     def open_about_window(self):
-        self.about_win = WinSmallBase(close_func = lambda e: self.about_win.deleteLater())
-        self.about_win.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.about_win.setFixedSize(250, 150)
-        self.about_win.disable_min_max()
-        self.about_win.content_layout.setContentsMargins(10, 10, 10, 10)
-        self.about_win.set_title(cnf.lng.about_my_app)
+        Manager.win_about = WinSmallBase(close_func = lambda e: Manager.win_about.deleteLater())
+        Manager.win_about.setWindowModality(Qt.WindowModality.ApplicationModal)
+        Manager.win_about.setFixedSize(250, 150)
+        Manager.win_about.disable_min_max()
+        Manager.win_about.content_layout.setContentsMargins(10, 10, 10, 10)
+        Manager.win_about.set_title(cnf.lng.about_my_app)
 
-        lbl = SelectableLabel(self.about_win)
-        self.about_win.content_layout.addWidget(lbl)
+        lbl = SelectableLabel(Manager.win_about)
+        Manager.win_about.content_layout.addWidget(lbl)
 
-        self.about_win.center_win(self)
-        self.about_win.show()
+        Manager.win_about.center_win(self)
+        Manager.win_about.show()
 
     def reload_menubar(self):
         self.mainMenu.deleteLater()
