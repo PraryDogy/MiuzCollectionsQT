@@ -8,4 +8,5 @@ from .image_utils import (BytesThumb, PixmapThumb, ReadDesatImage,
 from .main_utils import MainUtils
 from .reveal_files import RevealFiles
 from .scaner import scaner_app
+from .send_notification import SendNotification
 from .updater import Updater

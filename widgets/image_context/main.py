@@ -4,11 +4,11 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
-from utils import RevealFiles, ThreadCopyFiles, ThreadFindTiff
+from utils import RevealFiles, ThreadCopyFiles, ThreadFindTiff, SendNotification
 
 from ..win_copy_files import WinCopyFiles
 from ..win_info import WinInfo
-
+import os
 
 class Manager:
     win_info = None
@@ -100,17 +100,23 @@ class ImageContext(ContextMenuBase):
         Manager.win_image_view = WinImageView(img_src)
         Manager.win_image_view.show()
 
-    def reveal_jpg(self, img_src):
-        RevealFiles([img_src])
+    def reveal_jpg(self, img_src: str):
+        self.reveal_file_finish(img_src)
 
     def reveal_tiff(self, img_src: str):
         tiff_task = ThreadFindTiff(img_src)
         Manager.threads.append(tiff_task)
 
-        tiff_task.finished.connect(lambda tiff: RevealFiles([tiff]))
+        tiff_task.finished.connect(lambda tiff: self.reveal_file_finish(tiff))
         tiff_task.can_remove.connect(lambda: Manager.threads.remove(tiff_task))
 
         tiff_task.run()
+
+    def reveal_file_finish(self, file: str):
+        if not os.path.exists(file):
+            SendNotification(cnf.lng.no_file)
+            return
+        RevealFiles([file])
 
     def save_as_jpg(self, img_src: str):
         dest = self.select_folder()
@@ -148,6 +154,7 @@ class ImageContext(ContextMenuBase):
     
     def copy_file(self, dest: str, file: str):
         if not file:
+            SendNotification(cnf.lng.no_file)
             return
 
         copy_task = ThreadCopyFiles(dest=dest, files=[file])
