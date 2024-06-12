@@ -4,6 +4,7 @@ class Eng:
 		self.about_my_app = 'Show about app'
 		self.adding_photos = 'Adding new photos'
 		self.all_colls = 'All collections'
+		self.bar_menu = 'Menu'
 		self.browse = 'Browse'
 		self.browse_coll_first = 'Specify the location of collections\nor leave it as default.'
 		self.browse_colls_descr = 'Collections location'

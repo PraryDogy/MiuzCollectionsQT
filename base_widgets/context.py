@@ -11,7 +11,6 @@ class ContextMenuBase(QMenu):
     def __init__(self, event):
         self.ev = event
         super().__init__()
-
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)
         self.setMinimumWidth(200)
@@ -28,7 +27,6 @@ class ContextMenuBase(QMenu):
 class ContextSubMenuBase(QMenu):
     def __init__(self, parent: QMenu, title):
         super().__init__(parent)
-        self.setTitle(title)
         self.setMinimumWidth(150)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)

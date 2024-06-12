@@ -4,6 +4,7 @@ class Rus:
 		self.about_my_app = 'О приложении'
 		self.adding_photos = 'Добавляю новые фотографии'
 		self.all_colls = 'Все коллекции'
+		self.bar_menu = 'Меню'
 		self.browse = 'Обзор'
 		self.browse_coll_first = 'Укажите расположение коллекций\nили оставьте по умолчанию.'
 		self.browse_colls_descr = 'Расположение коллекций'

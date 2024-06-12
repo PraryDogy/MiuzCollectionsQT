@@ -64,3 +64,5 @@ Thumbs.db
 build/
 dist/
 _Collections/
+
+$RECYCLE.BIN
