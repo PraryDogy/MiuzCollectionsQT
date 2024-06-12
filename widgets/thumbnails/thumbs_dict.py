@@ -32,10 +32,7 @@ class ThumbsDict(dict):
             else:
                 modified = f"{cnf.lng.months[str(modified.month)]} {modified.year}"
 
-            if cnf.curr_coll == cnf.RECENT_COLLS:
-                thumbs_dict[cnf.lng.recents].append((img, src))
-            else:
-                thumbs_dict[modified].append((img, src))
+            thumbs_dict[modified].append((img, src))
 
         self.update(thumbs_dict)
 
@@ -55,7 +52,7 @@ class ThumbsDict(dict):
             search = cnf.search_text.replace("\n", "").strip()
             q = q.filter(ThumbsMd.src.like(f"%{search}%"))
 
-        if cnf.curr_coll not in ((cnf.ALL_COLLS, cnf.RECENT_COLLS)):
+        if cnf.curr_coll != cnf.ALL_COLLS:
             q = q.filter(ThumbsMd.collection == cnf.curr_coll)
 
         filters = [
@@ -85,9 +82,5 @@ class ThumbsDict(dict):
             q = q.filter(ThumbsMd.modified < t[1])
 
         q = q.limit(cnf.current_limit)
-
-        if cnf.curr_coll == cnf.RECENT_COLLS:
-            q = q.order_by(-ThumbsMd.id)
-        else:
-            q = q.order_by(-ThumbsMd.modified)
+        q = q.order_by(-ThumbsMd.modified)
         return q

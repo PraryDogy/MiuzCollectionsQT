@@ -49,7 +49,7 @@ class CustomContext(ContextMenuBase):
         gui_signals_app.reload_thumbnails.emit()
 
     def reveal_collection(self, flag):
-        if self.true_name in (cnf.ALL_COLLS, cnf.RECENT_COLLS):
+        if self.true_name == cnf.ALL_COLLS:
             if os.path.exists(cnf.coll_folder):
                 subprocess.Popen(["open", cnf.coll_folder])
             else:
@@ -132,7 +132,7 @@ class CollectionBtn(QLabel):
     def enterEvent(self, event):
         super().enterEvent(event)
 
-        if self.true_name in ((cnf.ALL_COLLS, cnf.RECENT_COLLS)):
+        if self.true_name == cnf.ALL_COLLS:
             return
 
         self.setToolTip(self.true_name)

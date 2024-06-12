@@ -38,11 +38,6 @@ class BaseLeftMenu(QScrollArea):
                               true_name=cnf.ALL_COLLS)
         main_btns_layout.addWidget(label)
 
-
-        label = CollectionBtn(parent=self, fake_name=cnf.lng.recents,
-                              true_name=cnf.RECENT_COLLS)
-        main_btns_layout.addWidget(label)
-
         self.v_layout.addLayout(main_btns_layout)
 
         for fake_name, true_name in self.load_colls_query().items():

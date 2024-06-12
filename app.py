@@ -143,8 +143,6 @@ class WinMain(WinBase):
     def check_coll(self) -> str:
         if cnf.curr_coll == cnf.ALL_COLLS:
             return cnf.lng.all_colls
-        elif cnf.curr_coll == cnf.RECENT_COLLS:
-            return cnf.lng.recents
         else:
             return cnf.curr_coll
         
