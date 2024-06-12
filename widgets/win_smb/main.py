@@ -157,6 +157,8 @@ class WinSmb(WinStandartBase):
 
         self.browse_coll.changed.connect(self.on_coll_changed)
 
+        self.browse_coll.blue_browse_btn()
+
     def on_coll_changed(self):
         self.adjustSize()
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
