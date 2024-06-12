@@ -28,7 +28,7 @@ class CustomContext(ContextMenuBase):
         self.addMenu(reveal_menu)
 
         base_coll = QAction(text=cnf.lng.collection, parent=self)
-        base_coll.triggered.connect(lambda e: self.reveal_collection("base"))
+        base_coll.triggered.connect(lambda e: self.reveal_collection())
         reveal_menu.addAction(base_coll)
 
         reveal_menu.addSeparator()
@@ -48,7 +48,7 @@ class CustomContext(ContextMenuBase):
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
 
-    def reveal_collection(self, flag):
+    def reveal_collection(self, flag: str = None):
         if self.true_name == cnf.ALL_COLLS:
             if os.path.exists(cnf.coll_folder):
                 subprocess.Popen(["open", cnf.coll_folder])
@@ -57,14 +57,15 @@ class CustomContext(ContextMenuBase):
             return
 
         coll_path = os.path.join(cnf.coll_folder, self.true_name)
-        flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
 
         if flag == "prod":
+            flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
             if os.path.exists(flag_path):
                 subprocess.Popen(["open", flag_path])
                 return
 
         if flag == "mod":
+            flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
             if os.path.exists(flag_path):
                 subprocess.Popen(["open", flag_path])
                 return
