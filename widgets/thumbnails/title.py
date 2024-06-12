@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 
@@ -86,6 +88,8 @@ class CustomContext(ContextMenuBase):
         return None
 
     def copy_files(self, dest: str, files: list):
+        files = [i for i in files if os.path.exists(i)]
+
         if len(files) == 0:
             SendNotification(cnf.lng.no_file)
             return

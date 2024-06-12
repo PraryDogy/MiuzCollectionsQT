@@ -153,7 +153,7 @@ class ImageContext(ContextMenuBase):
         return None
     
     def copy_file(self, dest: str, file: str):
-        if not file:
+        if not file or not os.path.exists(file):
             SendNotification(cnf.lng.no_file)
             return
 

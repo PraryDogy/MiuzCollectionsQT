@@ -3,6 +3,7 @@ from time import sleep
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
+
 class Manager:
     threads = []
 
@@ -23,9 +24,17 @@ class ThreadCopyFiles(QThread):
 
     def run(self):
         Manager.threads.append(self)
-        total_size = sum(os.path.getsize(file) for file in self.files)
         copied_size = 0
         files_dests = []
+
+        try:
+            total_size = sum(os.path.getsize(file) for file in self.files)
+        except Exception as e:
+            print(e)
+            self.value_changed.emit(100)
+            self.finished.emit(files_dests)
+            Manager.threads.remove(self)
+            return
 
         self.value_changed.emit(0)
 
@@ -37,20 +46,26 @@ class ThreadCopyFiles(QThread):
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             files_dests.append(dest_path)
 
-            with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
+            try:
 
-                while self.flag:
+                with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
 
-                    buf = fsrc.read(self.buffer_size)
+                    while self.flag:
 
-                    if not buf:
-                        break
+                        buf = fsrc.read(self.buffer_size)
 
-                    fdest.write(buf)
-                    copied_size += len(buf)
-                    percent = int((copied_size / total_size) * 100)
+                        if not buf:
+                            break
 
-                    self.value_changed.emit(percent)
+                        fdest.write(buf)
+                        copied_size += len(buf)
+                        percent = int((copied_size / total_size) * 100)
+
+                        self.value_changed.emit(percent)
+
+            except Exception as e:
+                print(e)
+                break
         
         self.value_changed.emit(100)
         self.finished.emit(files_dests)

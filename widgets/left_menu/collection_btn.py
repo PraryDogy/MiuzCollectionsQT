@@ -57,28 +57,22 @@ class CustomContext(ContextMenuBase):
             return
 
         coll_path = os.path.join(cnf.coll_folder, self.true_name)
+        flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
 
         if flag == "prod":
-            new_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
-            if os.path.exists(new_path):
-                subprocess.Popen(["open", new_path])
-            else:
-                subprocess.Popen(["open", coll_path])
-            return
+            if os.path.exists(flag_path):
+                subprocess.Popen(["open", flag_path])
+                return
 
         if flag == "mod":
-            if os.path.exists(new_path):
-                subprocess.Popen(["open", new_path])
-            else:
-                subprocess.Popen(["open", coll_path])
-            return
+            if os.path.exists(flag_path):
+                subprocess.Popen(["open", flag_path])
+                return
 
-        if flag == "base":
-            if os.path.exists(coll_path):
-                subprocess.Popen(["open", coll_path])
-            else:
-                SendNotification(cnf.lng.no_connection)
-            return
+        if os.path.exists(coll_path):
+            subprocess.Popen(["open", coll_path])
+        else:
+            SendNotification(cnf.lng.no_connection)
 
 class CollectionBtn(QLabel):
     def __init__(self, parent: QFrame, fake_name: str, true_name: str):
