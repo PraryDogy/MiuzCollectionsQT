@@ -46,7 +46,7 @@ class ImageContext(ContextMenuBase):
         self.reveal_menu.addSeparator()
 
         reveal_layers = QAction(parent=self, text=cnf.lng.layers)
-        reveal_layers.triggered.connect(lambda: self.reveal_tiffs(img_src))
+        reveal_layers.triggered.connect(lambda: self.reveal_tiff(img_src))
         self.reveal_menu.addAction(reveal_layers)
 
         self.addSeparator()
@@ -103,7 +103,7 @@ class ImageContext(ContextMenuBase):
     def reveal_jpg(self, img_src):
         RevealFiles([img_src])
 
-    def reveal_tiffs(self, img_src: str):
+    def reveal_tiff(self, img_src: str):
         tiff_task = ThreadFindTiff(img_src)
         Manager.threads.append(tiff_task)
 
