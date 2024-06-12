@@ -27,6 +27,7 @@ class SelectableLabel(QLabel):
         
         self.setText(txt)
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = ContextMenuBase(ev)
