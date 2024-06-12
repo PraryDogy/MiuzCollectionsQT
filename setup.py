@@ -41,6 +41,7 @@ styles = [
 DATA_FILES = [
     "db.db",
     "lang/lang.json",
+    ("icon", [os.path.join("icon", "icon.png")]),
     ("images", images),
     ("applescripts", applescripts),
     ("styles", styles),
