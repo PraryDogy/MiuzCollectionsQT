@@ -8,6 +8,7 @@ from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from signals import gui_signals_app
 from styles import Names, Themes
+from utils import SendNotification
 
 
 class CustomContext(ContextMenuBase):
@@ -49,22 +50,35 @@ class CustomContext(ContextMenuBase):
 
     def reveal_collection(self, flag):
         if self.true_name in (cnf.ALL_COLLS, cnf.RECENT_COLLS):
-            subprocess.Popen(["open", cnf.coll_folder])
+            if os.path.exists(cnf.coll_folder):
+                subprocess.Popen(["open", cnf.coll_folder])
+            else:
+                SendNotification(cnf.lng.no_connection)
             return
 
         coll_path = os.path.join(cnf.coll_folder, self.true_name)
 
+        if flag == "prod":
+            new_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
+            if os.path.exists(new_path):
+                subprocess.Popen(["open", new_path])
+            else:
+                subprocess.Popen(["open", coll_path])
+            return
+
+        if flag == "mod":
+            if os.path.exists(new_path):
+                subprocess.Popen(["open", new_path])
+            else:
+                subprocess.Popen(["open", coll_path])
+            return
+
         if flag == "base":
-            subprocess.Popen(["open", coll_path])
-
-        elif flag == "prod":
-            new_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
-            subprocess.Popen(["open", new_path])
-
-        elif flag == "mod":
-            new_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
-            subprocess.Popen(["open", new_path])
-
+            if os.path.exists(coll_path):
+                subprocess.Popen(["open", coll_path])
+            else:
+                SendNotification(cnf.lng.no_connection)
+            return
 
 class CollectionBtn(QLabel):
     def __init__(self, parent: QFrame, fake_name: str, true_name: str):

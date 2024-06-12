@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from styles import Names, Themes
-from utils import ThreadCopyFiles, RevealFiles, ThreadFindTiffsMultiple
+from utils import (RevealFiles, SendNotification, ThreadCopyFiles,
+                   ThreadFindTiffsMultiple)
 
 from ..win_copy_files import WinCopyFiles
 
@@ -86,6 +87,7 @@ class CustomContext(ContextMenuBase):
 
     def copy_files(self, dest: str, files: list):
         if len(files) == 0:
+            SendNotification(cnf.lng.no_file)
             return
 
         copy_task = ThreadCopyFiles(dest=dest, files=files)
