@@ -31,10 +31,6 @@
         "Укажите расположение коллекций",
         "Choose collections folder"
     ],
-    "choose_user_first": [
-        "Выберите тип пользователя.\nСтандарт: подходит для просмотра.\nДизайнер: возможность работы со слоями",
-        "Choose user type.\nStandard: suitable for viewing.\nDesigner: ability to work with layers."
-    ],
     "close": [
         "Закрыть",
         "Close"
@@ -333,29 +329,13 @@
             "other": "Other"
         }
     ],
-    "thumb_move": [
-        "Копировать при перетаскивании",
-        "Copy on drag"
-    ],
     "total": [
         "Всего",
         "Total"
     ],
-    "user_designer": [
-        "Дизайнер",
-        "Designer"
-    ],
-    "user_standart": [
-        "Стандарт",
-        "Standart"
-    ],
     "view": [
         "Просмотр",
         "View"
-    ],
-    "wait_scan_finished": [
-        "Пожалуйста, подождите. Идет поиск фотографий.",
-        "Please, wait. Searching for new photos."
     ],
     "wait_update": [
         "Подождите...",

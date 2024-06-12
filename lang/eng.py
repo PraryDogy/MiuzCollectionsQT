@@ -9,7 +9,6 @@ class Eng:
 		self.browse_colls_descr = 'Collections location'
 		self.cancel = 'Cancel'
 		self.choose_coll_smb = 'Choose collections folder'
-		self.choose_user_first = 'Choose user type.\nStandard: suitable for viewing.\nDesigner: ability to work with layers.'
 		self.close = 'Close'
 		self.collection = 'Collection'
 		self.copy = 'Copy'
@@ -69,12 +68,8 @@ class Eng:
 		self.smb_descr = 'Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Start'
 		self.sys_fltr_names = {'other': 'Other'}
-		self.thumb_move = 'Copy on drag'
 		self.total = 'Total'
-		self.user_designer = 'Designer'
-		self.user_standart = 'Standart'
 		self.view = 'View'
-		self.wait_scan_finished = 'Please, wait. Searching for new photos.'
 		self.wait_update = 'Wait...'
 		self.weekdays = {'0': 'monday', '1': 'tuesday', '2': 'wednesday', '3': 'thursday', '4': 'friday', '5': 'saturday', '6': 'sunday'}
 		self.with_name = 'with name'

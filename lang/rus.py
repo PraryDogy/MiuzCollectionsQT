@@ -9,7 +9,6 @@ class Rus:
 		self.browse_colls_descr = 'Расположение коллекций'
 		self.cancel = 'Отмена'
 		self.choose_coll_smb = 'Укажите расположение коллекций'
-		self.choose_user_first = 'Выберите тип пользователя.\nСтандарт: подходит для просмотра.\nДизайнер: возможность работы со слоями'
 		self.close = 'Закрыть'
 		self.collection = 'Коллекция'
 		self.copy = 'Копировать'
@@ -69,12 +68,8 @@ class Rus:
 		self.smb_descr = 'Коллекции недоступны.\nВозможные причины:\n\n- Нет подключения к интернету\n- Нет подключения к сетевому диску\n- Неправильно указано расположение коллекций\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Начало'
 		self.sys_fltr_names = {'other': 'Остальное'}
-		self.thumb_move = 'Копировать при перетаскивании'
 		self.total = 'Всего'
-		self.user_designer = 'Дизайнер'
-		self.user_standart = 'Стандарт'
 		self.view = 'Просмотр'
-		self.wait_scan_finished = 'Пожалуйста, подождите. Идет поиск фотографий.'
 		self.wait_update = 'Подождите...'
 		self.weekdays = {'0': 'понедельник', '1': 'вторник', '2': 'среда', '3': 'четверг', '4': 'пятница', '5': 'суббота', '6': 'воскресенье'}
 		self.with_name = 'с именем'
