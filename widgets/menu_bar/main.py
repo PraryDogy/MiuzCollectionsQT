@@ -1,13 +1,14 @@
-from PyQt5.QtGui import QContextMenuEvent, QIcon, QPainter, QPixmap
-from PyQt5.QtWidgets import QAction, QMenu, QMenuBar, QLabel, QAction, QWidget, QSpacerItem
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QContextMenuEvent, QPixmap
+from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
+from base_widgets import ContextMenuBase, WinSmallBase
 from cfg import cnf
 from signals import gui_signals_app
+from utils import MainUtils
 
 from ..win_settings import WinSettings
-from base_widgets import WinSmallBase, ContextMenuBase, SvgBtn
-from utils import MainUtils
+
 
 class Manager:
     win_settings = None
