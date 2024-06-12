@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QMenu, QMenuBar, QLabel
+from PyQt5.QtWidgets import QAction, QMenu, QMenuBar, QLabel, QAction
 from PyQt5.QtCore import Qt
 
 from cfg import cnf
@@ -7,7 +7,7 @@ from signals import gui_signals_app
 
 from ..win_settings import WinSettings
 from base_widgets import WinSmallBase, ContextMenuBase
-
+from utils import MainUtils
 
 class Manager:
     win_settings = None
@@ -26,19 +26,25 @@ class SelectableLabel(QLabel):
             ])
         
         self.setText(txt)
-
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        # self.setContextMenuPolicy(Qt.CustomContextMenu)
-        # self.customContextMenuRequested.connect(self.show_context_menu)
-
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = ContextMenuBase(ev)
 
-        context_menu.addAction("Copy")
+        copy_text = QAction(parent=context_menu, text=cnf.lng.copy)
+        copy_text.triggered.connect(self.copy_text_md)
+        context_menu.addAction(copy_text)
+
+        context_menu.addSeparator()
+
+        select_all = QAction(parent=context_menu, text=cnf.lng.copy_all)
+        select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
+        context_menu.addAction(select_all)
+
         context_menu.show_menu()
 
-        return super().contextMenuEvent(ev)
+    def copy_text_md(self):
+        MainUtils.copy_text(self.selectedText())
 
 
 
@@ -91,6 +97,3 @@ class MacMenuBar(QMenuBar):
     def reload_menubar(self):
         self.mainMenu.deleteLater()
         self.init_ui()
-
-
- 
