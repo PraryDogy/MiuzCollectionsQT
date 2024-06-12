@@ -11,6 +11,8 @@ def remove_empty_dirs():
             if i not in stop
             ]
 
+    base_path = os.path.dirname(os.path.dirname(__file__))
+
     for xx in dirs:
         for dirpath, dirnames, filenames in os.walk(xx, topdown=False):
             # Проверка наличия только .pyc файлов или отсутствия файлов в папке
@@ -18,7 +20,7 @@ def remove_empty_dirs():
                 # Удаление папки
                 try:
                     shutil.rmtree(dirpath)
-                    print(f"Удалена пустая или содержащая только .pyc файлы папка: {dirpath}")
+                    print(f"Удалена папка: {dirpath.replace(base_path, '...')}")
                 except Exception as e:
                     print(f"Ошибка при удалении папки {dirpath}: {e}")
 
