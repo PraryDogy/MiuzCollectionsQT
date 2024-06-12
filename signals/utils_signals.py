@@ -2,10 +2,6 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 
 class UtilsSignals(QObject):
-    watcher_start = pyqtSignal()
-    watcher_stop = pyqtSignal()
-    watcher_timer = pyqtSignal()
-
     scaner_start = pyqtSignal()
     scaner_stop = pyqtSignal()
 
