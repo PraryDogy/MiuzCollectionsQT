@@ -136,9 +136,12 @@ class WinBase(QMainWindow):
         self.grips[3].move(0, rect.bottom() - self.gripSize)
 
     def center_win(self, parent: QWidget):
-        geo = self.geometry()
-        geo.moveCenter(parent.window().geometry().center())
-        self.setGeometry(geo)
+        try:
+            geo = self.geometry()
+            geo.moveCenter(parent.window().geometry().center())
+            self.setGeometry(geo)
+        except (RuntimeError, Exception) as e:
+            print(e)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
