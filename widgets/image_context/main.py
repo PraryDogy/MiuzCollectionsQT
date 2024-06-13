@@ -110,7 +110,7 @@ class ImageContext(ContextMenuBase):
         tiff_task.finished.connect(lambda tiff: self.reveal_file_finish(tiff))
         tiff_task.can_remove.connect(lambda: Manager.threads.remove(tiff_task))
 
-        tiff_task.run()
+        tiff_task.start()
 
     def reveal_file_finish(self, file: str):
         if not os.path.exists(file):
@@ -141,7 +141,7 @@ class ImageContext(ContextMenuBase):
         tiff_task.finished.connect(lambda tiff: self.copy_file(dest, tiff))
         tiff_task.can_remove.connect(lambda: Manager.threads.remove(tiff_task))
 
-        tiff_task.run()
+        tiff_task.start()
 
     def select_folder(self):
         Manager.dialog = QFileDialog()
@@ -168,16 +168,22 @@ class ImageContext(ContextMenuBase):
         copy_win.cancel_sign.connect(lambda: self.copy_files_cancel(copy_task, copy_win))
         
         copy_win.show()
-        copy_task.run()
+        copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
-        Manager.threads.remove(copy_task)
-        Manager.copy_files_wins.remove(copy_win)
-        copy_win.deleteLater()
+        try:
+            Manager.threads.remove(copy_task)
+            Manager.copy_files_wins.remove(copy_win)
+            copy_win.deleteLater()
+        except Exception as e:
+            print(e)
 
     def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
-        copy_task.stop.emit()
-        Manager.threads.remove(copy_task)
-        Manager.copy_files_wins.remove(copy_win)
-        copy_win.deleteLater()
+        try:
+            copy_task.stop.emit()
+            Manager.threads.remove(copy_task)
+            Manager.copy_files_wins.remove(copy_win)
+            copy_win.deleteLater()
+        except Exception as e:
+            print(e)

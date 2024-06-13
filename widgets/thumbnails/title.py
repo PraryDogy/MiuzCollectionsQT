@@ -76,7 +76,7 @@ class CustomContext(ContextMenuBase):
         tsk.finished.connect(lambda tiff_list: self.copy_files(dest, tiff_list))
         tsk.can_remove.connect(lambda: Manager.threads.remove(tsk))
 
-        tsk.run()
+        tsk.start()
 
     def select_folder(self):
         Manager.dialog = QFileDialog()
@@ -105,19 +105,25 @@ class CustomContext(ContextMenuBase):
         copy_win.cancel_sign.connect(lambda: self.copy_files_cancel(copy_task, copy_win))
         
         copy_win.show()
-        copy_task.run()
+        copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
-        Manager.threads.remove(copy_task)
-        Manager.copy_files_wins.remove(copy_win)
-        copy_win.deleteLater()
+        try:
+            Manager.threads.remove(copy_task)
+            Manager.copy_files_wins.remove(copy_win)
+            copy_win.deleteLater()
+        except Exception as e:
+            print(e)
 
     def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
-        copy_task.stop.emit()
-        Manager.threads.remove(copy_task)
-        Manager.copy_files_wins.remove(copy_win)
-        copy_win.deleteLater()
+        try:
+            copy_task.stop.emit()
+            Manager.threads.remove(copy_task)
+            Manager.copy_files_wins.remove(copy_win)
+            copy_win.deleteLater()
+        except Exception as e:
+            print(e)
 
 
 class Title(QLabel):

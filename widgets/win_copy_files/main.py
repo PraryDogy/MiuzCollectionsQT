@@ -44,4 +44,7 @@ class WinCopyFiles(WinStandartBase, QObject):
         self.deleteLater()
 
     def set_value(self, value: int):
-        self.progress.setValue(value)
+        try:
+            self.progress.setValue(value)
+        except (Exception, RuntimeError) as e:
+            print(e)
