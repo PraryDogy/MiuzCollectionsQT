@@ -1,11 +1,11 @@
 import os
 
-from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QContextMenuEvent, QPixmap
+from PyQt5.QtGui import QContextMenuEvent
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
-from base_widgets import ContextMenuBase, WinSmallBase, SvgBtn
+from base_widgets import ContextMenuBase, WinSmallBase
 from cfg import cnf
 from signals import gui_signals_app
 from utils import MainUtils
@@ -91,7 +91,7 @@ class MacMenuBar(QMenuBar):
         win.set_title(cnf.app_name)
         win.setFixedSize(280, 240)
 
-        icon = QSvgWidget(os.path.join("logo", "app_name.svg"))
+        icon = QSvgWidget(os.path.join("logo", f"{cnf.theme}_text_logo.svg"))
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(150, 130)
         win.content_layout.addWidget(icon, alignment=Qt.AlignCenter)
