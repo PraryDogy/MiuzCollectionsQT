@@ -9,7 +9,7 @@ from utils import MainUtils
 
 from ..win_settings import WinSettings
 from .progress_bar import ProgressBar
-
+import os
 
 class Manager:
     win_settings = None
@@ -39,13 +39,13 @@ class StBar(QFrame):
 
         self.h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.switch_theme = SvgBtn(f"{cnf.theme}_switch.svg", 18)
+        self.switch_theme = SvgBtn(os.path.join("images", f"{cnf.theme}_switch.svg"), 18)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
         self.h_layout.addWidget(self.switch_theme)
 
         self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.sett_widget = SvgBtn(f"{cnf.theme}_settings.svg", 20)
+        self.sett_widget = SvgBtn(os.path.join("images", f"{cnf.theme}_settings.svg"), 20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
    
@@ -76,8 +76,8 @@ class StBar(QFrame):
         for i in widgets:
             i.setStyleSheet(Themes.current)
 
-        self.sett_widget.set_icon(f"{cnf.theme}_settings.svg")
-        self.switch_theme.set_icon(f"{cnf.theme}_switch.svg")
+        self.sett_widget.set_icon(os.path.join("images", f"{cnf.theme}_settings.svg"))
+        self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
 
     def sett_btn_cmd(self, e):
         Manager.win_settings = WinSettings(parent=self)

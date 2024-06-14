@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QContextMenuEvent, QPixmap
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
-from base_widgets import ContextMenuBase, WinSmallBase
+from base_widgets import ContextMenuBase, WinSmallBase, SvgBtn
 from cfg import cnf
 from signals import gui_signals_app
 from utils import MainUtils
@@ -90,13 +90,7 @@ class MacMenuBar(QMenuBar):
         win.set_title(cnf.app_name)
         win.setFixedSize(280, 240)
 
-        img = QPixmap("icon/icon.png")
-        img = img.scaled(
-            120, 120, 
-            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-            transformMode=Qt.TransformationMode.SmoothTransformation
-            )
-        icon = QLabel(parent=win, pixmap=img)
+        icon = SvgBtn(os.path.join("logo", "app_name.svg"), 120)
         win.content_layout.addWidget(icon, alignment=Qt.AlignCenter)
 
         win.content_layout.addSpacerItem(QSpacerItem(0, 20))

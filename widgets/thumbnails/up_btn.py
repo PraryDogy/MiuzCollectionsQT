@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QFrame
 
-from base_widgets import SvgBtn, SvgShadowed, LayoutV
+from base_widgets import SvgBtn, LayoutV
 from signals import gui_signals_app
 from styles import Names, Themes
+import os
 
 # class _UpBtn(SvgBtn):
 #     def __init__(self, parent: QWidget):
@@ -26,7 +27,7 @@ class UpBtn(QFrame):
         v_layout = LayoutV()
         self.setLayout(v_layout)
 
-        self.svg = SvgBtn("up_new.svg", 44)
+        self.svg = SvgBtn(os.path.join("images", "up_new.svg"), 44)
         v_layout.addWidget(self.svg)
 
     def mouseReleaseEvent(self, event):

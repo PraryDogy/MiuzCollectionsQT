@@ -8,7 +8,7 @@ from .layouts import LayoutH
 
 
 class SvgBtn(QWidget):
-    def __init__(self, icon_name: str, size: int, parent: QWidget = None):
+    def __init__(self, icon_path: str, size: int, parent: QWidget = None):
 
         self.icon_name = None
 
@@ -20,16 +20,12 @@ class SvgBtn(QWidget):
 
         self.svg_btn = QSvgWidget()
         self.svg_btn.setFixedSize(size, size)
-        self.set_icon(icon_name)
+        self.set_icon(icon_path)
         h_layout.addWidget(self.svg_btn)
         self.adjustSize()
 
-    def set_icon(self, icon_name):
-        self.svg_btn.load(os.path.join("images", icon_name))
-        self.icon_name = icon_name
-    
-    def get_icon_name(self):
-        return self.icon_name
+    def set_icon(self, icon_path):
+        self.svg_btn.load(icon_path)
 
 
 class SvgShadowed(SvgBtn):

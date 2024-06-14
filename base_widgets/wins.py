@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
 
 from cfg import cnf
 from styles import Names, Themes
-from utils import MainUtils
+import os
 
 from .layouts import LayoutH, LayoutV
 from .svg_btn import SvgBtn
@@ -20,13 +20,13 @@ class Btns(QWidget):
 
         btn_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.close_btn = SvgBtn("close-1.svg", 13)
+        self.close_btn = SvgBtn(os.path.join("images", "close-1.svg"), 13)
         btn_layout.addWidget(self.close_btn)
 
-        self.min_btn = SvgBtn("min-1.svg", 13)
+        self.min_btn = SvgBtn(os.path.join("images", "min-1.svg"), 13)
         btn_layout.addWidget(self.min_btn)
 
-        self.max_btn = SvgBtn("max-1.svg", 13)
+        self.max_btn = SvgBtn(os.path.join("images", "max-1.svg"), 13)
         btn_layout.addWidget(self.max_btn)
 
         btn_layout.addSpacerItem(QSpacerItem(10, 0))
@@ -38,19 +38,19 @@ class Btns(QWidget):
 
     def focused_icons(self):
         if self.close_btn.isEnabled():
-            self.close_btn.set_icon("close-2.svg")
+            self.close_btn.set_icon(os.path.join("images", "close-2.svg"))
 
         if self.min_btn.isEnabled():
-            self.min_btn.set_icon("min-2.svg")
-            self.max_btn.set_icon("max-2.svg")
+            self.min_btn.set_icon(os.path.join("images", "min-2.svg"))
+            self.max_btn.set_icon(os.path.join("images", "max-2.svg"))
 
     def nonfocused_icons(self):
         if self.close_btn.isEnabled():
-            self.close_btn.set_icon("close-1.svg")
+            self.close_btn.set_icon(os.path.join("images", "close-1.svg"))
 
         if self.min_btn.isEnabled():
-            self.min_btn.set_icon("min-1.svg")
-            self.max_btn.set_icon("max-1.svg")
+            self.min_btn.set_icon(os.path.join("images", "min-1.svg"))
+            self.max_btn.set_icon(os.path.join("images", "max-1.svg"))
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.Enter:
@@ -163,13 +163,13 @@ class WinBase(QMainWindow):
 
     def disable_min_max(self):
         self.titlebar.btns.min_btn.setDisabled(True)
-        self.titlebar.btns.min_btn.set_icon(f"{cnf.theme}_gray.svg")
+        self.titlebar.btns.min_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
         self.titlebar.btns.max_btn.setDisabled(True)
-        self.titlebar.btns.max_btn.set_icon(f"{cnf.theme}_gray.svg")
+        self.titlebar.btns.max_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
 
     def disable_close(self):
         self.titlebar.btns.close_btn.setDisabled(True)
-        self.titlebar.btns.close_btn.set_icon(f"{cnf.theme}_gray.svg")
+        self.titlebar.btns.close_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
 
 
 class BaseBottomWid(QFrame):
