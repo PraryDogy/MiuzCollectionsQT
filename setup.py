@@ -40,7 +40,6 @@ styles = [
 logos = [
     os.path.join("logo", i)
     for i in os.listdir("logo")
-    if os.path.isfile(i)
     ]
 
 
