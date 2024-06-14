@@ -176,15 +176,15 @@ class NaviZoom(QFrame):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_out = SvgShadowed("zoom_out.svg", 45)
+        self.zoom_out = SvgShadowed(os.path.join("images", "zoom_out.svg"), 45)
         h_layout.addWidget(self.zoom_out)
         h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.zoom_in = SvgShadowed("zoom_in.svg", 45)
+        self.zoom_in = SvgShadowed(os.path.join("images", "zoom_in.svg"), 45)
         h_layout.addWidget(self.zoom_in)
         h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.zoom_fit = SvgShadowed("zoom_fit.svg", 45)
+        self.zoom_fit = SvgShadowed(os.path.join("images", "zoom_fit.svg"), 45)
         h_layout.addWidget(self.zoom_fit)
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
@@ -213,7 +213,7 @@ class NaviArrow(QFrame):
         v_layout = LayoutV()
         self.setLayout(v_layout)
 
-        btn = SvgShadowed(icon_name, 50)
+        btn = SvgShadowed(os.path.join("images", icon_name), 50)
         v_layout.addWidget(btn)
 
 
