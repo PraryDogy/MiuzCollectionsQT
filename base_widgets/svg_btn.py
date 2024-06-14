@@ -1,5 +1,4 @@
-import os
-
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QWidget
@@ -19,6 +18,7 @@ class SvgBtn(QWidget):
         self.setLayout(h_layout)
 
         self.svg_btn = QSvgWidget()
+        self.svg_btn.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self.svg_btn.setFixedSize(size, size)
         self.set_icon(icon_path)
         h_layout.addWidget(self.svg_btn)
