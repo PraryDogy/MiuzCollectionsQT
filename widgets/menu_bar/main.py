@@ -91,7 +91,7 @@ class MacMenuBar(QMenuBar):
         win.set_title(cnf.app_name)
         win.setFixedSize(280, 240)
 
-        icon = QSvgWidget(os.path.join("logo", "icon.svg"))
+        icon = QSvgWidget(os.path.join("icon", "icon.svg"))
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(150, 130)
         win.content_layout.addWidget(icon, alignment=Qt.AlignCenter)

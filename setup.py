@@ -37,9 +37,9 @@ styles = [
     if i.endswith((".css"))
 ]
 
-logos = [
-    os.path.join("logo", i)
-    for i in os.listdir("logo")
+icons = [
+    os.path.join("icon", i)
+    for i in os.listdir("icon")
     ]
 
 
@@ -49,10 +49,10 @@ DATA_FILES = [
     ("images", images),
     ("applescripts", applescripts),
     ("styles", styles),
-    ("logo", logos)
+    ("icon", icons)
     ]
 
-OPTIONS = {"iconfile": "logo/icon.icns",
+OPTIONS = {"iconfile": "icon/icon.icns",
            "plist": {"CFBundleName": cnf.app_name,
                      "CFBundleShortVersionString": cnf.app_ver,
                      "CFBundleVersion": cnf.app_ver,
