@@ -17,55 +17,44 @@ class ScrollWidget(QWidget):
         self.content_widget = QWidget()
         grid_layout = QVBoxLayout(self.content_widget)
 
-        self.widgets = []
-        self.line_y_position = 100  # Y координата линии
-
-        # Создаем 30 виджетов с подписью их номера
-        for idx in range(1, 31):
-            chunk_widget = QLabel(f"Widget {idx}")
-            chunk_widget.setStyleSheet("background-color: lightgray; border: 1px solid black;")
-            chunk_widget.setFixedHeight(100)  # Фиксированная высота виджета
-            grid_layout.addWidget(chunk_widget)
-            self.widgets.append(chunk_widget)
-
         self.scroll_area.setWidget(self.content_widget)
         layout.addWidget(self.scroll_area)
 
-        # Линия, которая будет пересекать виджеты
-        self.line = QLabel(self)
-        self.line.setGeometry(0, self.line_y_position, self.width(), 2)
-        self.line.setStyleSheet("background-color: red;")
-        self.line.raise_()
+        self.widgets = []
 
-        # Информация о пересечении линии
-        self.info_label = QLabel(self)
-        self.info_label.setGeometry(10, self.line_y_position - 20, 200, 20)
-        self.info_label.setStyleSheet("background-color: yellow;")
+        for i in range(0, 3):
+            my_grid = QWidget()
+            grid_layout.addWidget(my_grid)
+            my_grid_layout = QVBoxLayout()
+            my_grid.setLayout(my_grid_layout)
+
+            title = QLabel(text=f"ноябрь {i}")
+            my_grid_layout.addWidget(title)
+
+            self.widgets.append(title)
+
+            for i in range(0, 10):
+                test = QLabel(text="test")
+                my_grid_layout.addWidget(test)
 
         # Подключаем сигналы прокрутки скроллбаров
-        self.scroll_area.verticalScrollBar().valueChanged.connect(self.check_intersections)
+        self.scroll_area.verticalScrollBar().valueChanged.connect(self.on_scroll)
 
-        # Таймер для периодической проверки пересечений
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.check_intersections)
-        self.timer.start(100)  # Проверка каждые 100 мс
+    def on_scroll(self, value):
+        for title in self.widgets:
+            if not self.is_widget_visible(title):
+                print(f"{title.text()} is out of view")
+                break
 
-    def check_intersections(self):
-        for widget in self.widgets:
-            widget_rect = self.get_widget_rect_relative_to_scroll_area(widget)
-            line_rect = QRect(0, self.line_y_position, self.width(), 2)
-
-            if widget_rect.intersects(line_rect):
-                self.info_label.setText(widget.text())
-                print(widget.text())
-                return
-
-        self.info_label.setText("")
-
-    def get_widget_rect_relative_to_scroll_area(self, widget):
-        widget_pos = widget.mapTo(self.scroll_area.viewport(), widget.pos())
-        rect = QRect(widget_pos, widget.size())
-        return rect.normalized()
+    def is_widget_visible(self, widget):
+        # Получаем видимую область прокручиваемого содержимого
+        visible_rect = self.scroll_area.viewport().rect()
+        # Преобразуем координаты виджета относительно видимой области
+        widget_rect = self.scroll_area.viewport().mapFromGlobal(widget.mapToGlobal(widget.rect().topLeft()))
+        widget_geom = QRect(widget_rect, widget.size())
+        
+        # Проверяем пересечение областей
+        return visible_rect.intersects(widget_geom)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
