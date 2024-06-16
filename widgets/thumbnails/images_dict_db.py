@@ -13,11 +13,7 @@ class ImagesDictDb(dict):
         """
         dict:
             key: "date start - date fin / month year"
-            value: [{
-                    "img": img byte_array,
-                    "src": img_src,
-                    "coll": coll)
-                    }, ...]
+            value: [ {"img": img byte_array, "src": img_src, "coll": coll}, ... ]
         """
         super().__init__()
         self.thumbsdict_create()

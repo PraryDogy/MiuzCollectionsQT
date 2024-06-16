@@ -98,6 +98,10 @@ class Thumbnails(QScrollArea):
             self.init_ui()
 
     def images_grid(self, images_date: str, images_list: list[dict]):
+        """
+            images_date: "date start - date fin / month year"
+            images_list: [ {"img": img byte_array, "src": img_src, "coll": coll}, ... ]
+        """
 
         img_src_list = [img_dict["src"] for img_dict in images_list]
         title_label = Title(title=images_date, images=img_src_list, width=self.width())
