@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QMimeData, QObject, Qt, QUrl
+from PyQt5.QtCore import QEvent, QMimeData, QObject, Qt, QUrl
 from PyQt5.QtGui import QContextMenuEvent, QDrag
 from PyQt5.QtWidgets import QApplication, QLabel
 
@@ -16,9 +16,13 @@ class Manager:
 
 
 class Thumbnail(QLabel, QObject):
-    def __init__(self, byte_array: bytearray, img_src: str):
+    def __init__(self, byte_array: bytearray, img_src: str, coll: str, images_date: str):
         super().__init__()
+
         self.img_src = img_src
+        self.coll = coll
+        self.images_date = images_date
+
         cnf.images.append(img_src)
 
         self.setObjectName(Names.thumbnail_normal)
@@ -75,3 +79,11 @@ class Thumbnail(QLabel, QObject):
             self.setStyleSheet(Themes.current)
         except Exception as e:
             print(e)
+
+    def enterEvent(self, a0: QEvent | None) -> None:
+        self.setToolTip(f"{self.images_date}\n{cnf.lng.collection}: {self.coll}")
+        return super().enterEvent(a0)
+    
+    def leaveEvent(self, a0: QEvent | None) -> None:
+        self.setToolTip("")
+        return super().leaveEvent(a0)

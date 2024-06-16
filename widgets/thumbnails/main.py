@@ -1,6 +1,6 @@
 from math import ceil
 
-from PyQt5.QtCore import QEvent, Qt, QTimer
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
@@ -12,8 +12,8 @@ from utils import MainUtils
 
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .limit_btn import LimitBtn
+from .images_dict_db import ImagesDictDb
 from .thumbnail import Thumbnail
-from .thumbs_dict import ThumbsDict
 from .title import Title
 from .up_btn import UpBtn
 
@@ -64,15 +64,15 @@ class Thumbnails(QScrollArea):
         self.verticalScrollBar().setValue(0)
 
     def init_ui(self):
-        thumbs_dict = ThumbsDict()
+        thumbs_dict = ImagesDictDb()
         cnf.images.clear()
 
         if thumbs_dict:
             above_thumbs = AboveThumbs(self.width())
             self.thumbnails_layout.addWidget(above_thumbs)
 
-            for month, images_data in thumbs_dict.items():
-                self.create_one_grid(month, images_data)
+            for some_date, images_list in thumbs_dict.items():
+                self.images_grid(some_date, images_list)
 
         else:
             no_images = AboveThumbsNoImages(self.width())
@@ -97,26 +97,27 @@ class Thumbnails(QScrollArea):
             self.up_btn.deleteLater()
             self.init_ui()
 
-    def create_one_grid(self, month, images_data):
-        title_label = Title(month, [i[-1] for i in images_data], self.width())
+    def images_grid(self, images_date: str, images_list: list[dict]):
+
+        img_src_list = [img_dict["src"] for img_dict in images_list]
+        title_label = Title(title=images_date, images=img_src_list, width=self.width())
         self.thumbnails_layout.addWidget(title_label)
 
         grid_layout = QGridLayout()
         grid_layout.setAlignment(Qt.AlignLeft)
         grid_layout.setContentsMargins(0, 0, 0, 30)
 
-        # ww = self.width()
-        # columns = max(ww // (cnf.THUMBSIZE), 1)
-
         # Добавляем изображения в сетку
-        for idx, (byte_array, img_src) in enumerate(images_data):
+        for idx, img_dict in enumerate(images_list):
             label = Thumbnail(
-                byte_array=byte_array,
-                img_src=img_src
+                byte_array=img_dict["img"],
+                img_src=img_dict["src"],
+                coll=img_dict["coll"],
+                images_date=images_date
                 )
             grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
 
-        rows = ceil(len(images_data) / self.columns)
+        rows = ceil(len(images_list) / self.columns)
         grid_layout.setColumnStretch(self.columns, 1)
         grid_layout.setRowStretch(rows, 1)
         self.thumbnails_layout.addLayout(grid_layout)

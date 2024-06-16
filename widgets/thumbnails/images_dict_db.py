@@ -8,8 +8,17 @@ from cfg import cnf
 from database import Dbase, ThumbsMd
 
 
-class ThumbsDict(dict):
-    def __init__(self) -> dict[Literal["month year: [(PIL Image, src), ...]"]]:
+class ImagesDictDb(dict):
+    def __init__(self) -> dict:
+        """
+        dict:
+            key: "date start - date fin / month year"
+            value: [{
+                    "img": img byte_array,
+                    "src": img_src,
+                    "coll": coll)
+                    }, ...]
+        """
         super().__init__()
         self.thumbsdict_create()
 
@@ -24,7 +33,7 @@ class ThumbsDict(dict):
 
         thumbs_dict = defaultdict(list)
 
-        for img, src, modified in data:
+        for img, src, modified, coll in data:
             modified = datetime.fromtimestamp(modified).date()
 
             if cnf.date_start or cnf.date_end:
@@ -32,7 +41,7 @@ class ThumbsDict(dict):
             else:
                 modified = f"{cnf.lng.months[str(modified.month)]} {modified.year}"
 
-            thumbs_dict[modified].append((img, src))
+            thumbs_dict[modified].append({"img": img, "src": src, "coll": coll})
 
         self.update(thumbs_dict)
 
@@ -46,6 +55,7 @@ class ThumbsDict(dict):
             ThumbsMd.img150,
             ThumbsMd.src,
             ThumbsMd.modified,
+            ThumbsMd.collection
             )
 
         if cnf.search_text:
