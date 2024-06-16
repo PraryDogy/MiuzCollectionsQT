@@ -77,7 +77,7 @@ class Migrate:
         gui_signals_app.reload_thumbnails.emit()
 
 
-class NonExistCollRemover:
+class TrashRemover:
     def __init__(self):
         coll_folder = cnf.coll_folder + os.sep
 
@@ -258,26 +258,25 @@ class SummaryScan:
         try:
             gui_signals_app.progressbar_value.emit(70)
             gui_signals_app.progressbar_del_photos.emit()
-        except (Exception, RuntimeError) as e:
-            print(e)
+        except RuntimeError:
+            pass
 
         if self.images["delete"]:
             self.delete_db()
 
-
         try:
             gui_signals_app.progressbar_value.emit(80)
             gui_signals_app.progressbar_add_photos.emit()
-        except (Exception, RuntimeError) as e:
-            print(e)
+        except RuntimeError:
+            pass
 
         if self.images["insert"]:
             self.insert_db()
 
         try:
             gui_signals_app.progressbar_value.emit(90)
-        except (Exception, RuntimeError) as e:
-            print(e)
+        except RuntimeError:
+            pass
 
         if self.images["update"]:
             self.update_db()
@@ -470,34 +469,37 @@ class Scaner(object):
     def __init__(self):
         super().__init__()
 
-    def scaner_actions(self):
-        Manager.flag = True
-        gui_signals_app.progressbar_show.emit()
-
-        Migrate()
-        SummaryScan()
-        NonExistCollRemover()
-        DubFinder()
-        Dbase.vacuum()
-        Dbase.cleanup_engine()
-
-        Manager.flag = True
         try:
-            gui_signals_app.progressbar_hide.emit()
-            gui_signals_app.reload_menu.emit()
-            gui_signals_app.reload_thumbnails.emit()
-        except RuntimeError:
-            pass
+            Manager.flag = True
 
+            try:
+                gui_signals_app.progressbar_show.emit()
+            except RuntimeError:
+                pass
 
-    def run(self):
-        try:
-            self.scaner_actions()
-        except Exception:
+            Migrate()
+            SummaryScan()
+            TrashRemover()
+            DubFinder()
+            Dbase.vacuum()
+            Dbase.cleanup_engine()
+
+            Manager.flag = True
+
             try:
                 gui_signals_app.progressbar_hide.emit()
-            except Exception as ee:
-                print(ee)
+                gui_signals_app.reload_menu.emit()
+                gui_signals_app.reload_thumbnails.emit()
+            except RuntimeError:
+                pass
+
+        except Exception:
+
+            try:
+                gui_signals_app.progressbar_hide.emit()
+            except RuntimeError:
+                pass
+
             print(traceback.format_exc())
 
 
@@ -509,5 +511,4 @@ class ScanerThread(QThread):
 
     def run(self):
         self.scaner = Scaner()
-        self.scaner.run()
         self.finished.emit()
