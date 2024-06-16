@@ -150,7 +150,7 @@ class WinMain(WinBase):
 class App(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
-        self.setWindowIcon(QIcon("icon/icon.icns"))
+        self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
 
         self.main_win = WinMain()
         self.main_win.show()
