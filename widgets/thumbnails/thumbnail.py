@@ -8,7 +8,7 @@ from utils import PixmapThumb
 
 from ..image_context import ImageContext
 from ..win_image_view import WinImageView
-
+import os
 
 class Manager:
     win_image_view = None
@@ -22,6 +22,7 @@ class Thumbnail(QLabel, QObject):
         self.img_src = img_src
         self.coll = coll
         self.images_date = images_date
+        self.img_name = os.path.basename(img_src)
 
         cnf.images.append(img_src)
 
@@ -81,7 +82,11 @@ class Thumbnail(QLabel, QObject):
             print(e)
 
     def enterEvent(self, a0: QEvent | None) -> None:
-        self.setToolTip(f"{self.images_date}\n{cnf.lng.collection}: {self.coll}")
+        self.setToolTip(
+            f"{self.images_date}\n"
+            f"{cnf.lng.collection}: {self.coll}"
+            f"\n{cnf.lng.file_name}: {self.img_name}"
+            )
         return super().enterEvent(a0)
     
     def leaveEvent(self, a0: QEvent | None) -> None:
