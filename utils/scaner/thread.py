@@ -162,7 +162,7 @@ class FinderImages(dict):
             collections = [cnf.coll_folder]
 
         ln_colls = len(collections)
-        step_value = 50 if ln_colls == 0 else 50 / ln_colls
+        step_value = 60 if ln_colls == 0 else 60 / ln_colls
 
         for collection_walk in collections:
             try:
@@ -253,23 +253,39 @@ class SummaryScan:
             return
 
         self.images = ComparedImages(finder_images, db_images)
-        ln_images = len(self.images["insert"]) + len(self.images["update"])
-        self.step_value = 50 if ln_images == 0 else 50 / ln_images
+
+
+        try:
+            gui_signals_app.progressbar_value.emit(70)
+            gui_signals_app.progressbar_del_photos.emit()
+        except (Exception, RuntimeError) as e:
+            print(e)
 
         if self.images["delete"]:
             self.delete_db()
 
-        if self.images["update"]:
-            self.update_db()
+
+        try:
+            gui_signals_app.progressbar_value.emit(80)
+            gui_signals_app.progressbar_add_photos.emit()
+        except (Exception, RuntimeError) as e:
+            print(e)
 
         if self.images["insert"]:
             self.insert_db()
+
+        try:
+            gui_signals_app.progressbar_value.emit(90)
+        except (Exception, RuntimeError) as e:
+            print(e)
+
+        if self.images["update"]:
+            self.update_db()
 
     def create_values(self, data: Dict[str, tuple]) -> List[Dict]:
         values = []
 
         for src, (size, created, modified) in data.items():
-            gui_signals_app.progressbar_value.emit(self.step_value)
 
             if not Manager.flag:
                 return
@@ -305,7 +321,6 @@ class SummaryScan:
         return values
 
     def insert_db(self):
-        gui_signals_app.progressbar_add_photos.emit()
         limit: int = 10
         data: dict = self.images["insert"]
         data_keys: list = list(data.keys())
@@ -413,8 +428,6 @@ class SummaryScan:
                 session.close()
 
     def delete_db(self):
-        gui_signals_app.progressbar_del_photos.emit()
-
         queries = List[Query]
         queries = [
             sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==i)
@@ -459,8 +472,6 @@ class Scaner(object):
 
     def scaner_actions(self):
         Manager.flag = True
-        cnf.scaner_running = True
-
         gui_signals_app.progressbar_show.emit()
 
         Migrate()
@@ -471,7 +482,6 @@ class Scaner(object):
         Dbase.cleanup_engine()
 
         Manager.flag = True
-        cnf.scaner_running = False
         try:
             gui_signals_app.progressbar_hide.emit()
             gui_signals_app.reload_menu.emit()
