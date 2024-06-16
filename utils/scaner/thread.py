@@ -1,6 +1,5 @@
 import os
 import traceback
-from abc import ABC, abstractmethod
 from collections import defaultdict
 from time import sleep
 from typing import Dict, List, Literal
@@ -11,7 +10,7 @@ from sqlalchemy.orm import Query
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from signals import gui_signals_app, utils_signals_app
+from signals import gui_signals_app
 
 from ..image_utils import BytesThumb, UndefBytesThumb
 from ..main_utils import MainUtils
@@ -454,17 +453,7 @@ class SummaryScan:
                 session.close()
 
 
-class ScanerBaseClass(ABC):
-    @abstractmethod
-    def scaner_actions(self):
-        ...
-
-    @abstractmethod
-    def run(self):
-        ...
-
-
-class Scaner(ScanerBaseClass):
+class Scaner(object):
     def __init__(self):
         super().__init__()
 
