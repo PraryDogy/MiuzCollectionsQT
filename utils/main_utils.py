@@ -1,32 +1,18 @@
 import os
 import platform
 import subprocess
-import traceback
 
-import sqlalchemy
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout
 
 from cfg import cnf
-from database import Dbase, ThumbsMd
 
 
 class MainUtils:
     @staticmethod
-    def print_err(write=False):
-        print(traceback.format_exc())
-
-        if write:
-            log = os.path.join(
-                cnf.app_support_app_dir,
-                "log.txt"
-                )
-
-            with open(log, "a") as f:
-                f.write(traceback.format_exc())
-
-    @staticmethod
     def smb_check() -> bool:
-        return bool(os.path.exists(path=cnf.coll_folder))
+        if not os.path.exists(cnf.coll_folder):
+            return False
+        return True
 
     @staticmethod
     def get_coll_name(src_path: str) -> str:
@@ -72,13 +58,6 @@ class MainUtils:
             )
         return paste_result.stdout.strip()
     
-    @staticmethod
-    def close_all_win():
-        for child_window in MainUtils.get_app().topLevelWidgets():
-            if isinstance(child_window, QMainWindow):
-                if child_window.windowTitle() != cnf.app_name:
-                    child_window.deleteLater()
-
     @staticmethod
     def close_same_win(object):
         widgets = MainUtils.get_app().topLevelWidgets()

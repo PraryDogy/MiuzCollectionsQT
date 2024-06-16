@@ -62,4 +62,3 @@ class ScrollWidget(QWidget):
 #     window = ScrollWidget()
 #     window.show()
 #     sys.exit(app.exec_())
-

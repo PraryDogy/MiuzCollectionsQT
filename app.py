@@ -150,7 +150,7 @@ class WinMain(WinBase):
 class App(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
-        self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
+        # self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
 
         self.main_win = WinMain()
         self.main_win.show()
@@ -185,7 +185,6 @@ class App(QApplication):
             )
 
         cnf.write_json_cfg()
-        MainUtils.close_all_win()
 
     def after_start(self):
 

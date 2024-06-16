@@ -26,7 +26,7 @@ class SelectableLabel(QLabel):
             f"Version {cnf.app_ver}",
             "Developed by Evlosh",
             "email: evlosh@gmail.com",
-            "telegram: @evlosh",
+            "telegram: evlosh",
             ])
         
         self.setText(txt)
