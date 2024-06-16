@@ -31,20 +31,22 @@ class Manager:
 class Migrate:
     def __init__(self):
         sess = Dbase.get_session()
-        new_coll = cnf.coll_folder
-
-        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
 
         try:
-            th_src, th_collection = sess.execute(q).first()
-            old_coll = th_src.split(os.sep + th_collection + os.sep)[0]
+            q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
+            img_src, img_coll = sess.execute(q).first()
+            img_src: str
         except Exception as e:
             print("migrate load first result err", e)
             return
 
-        q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
+        old_coll = img_src.split(os.sep + img_coll + os.sep)[0]
+
+        if cnf.coll_folder == old_coll:
+            return
 
         try:
+            q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
             res = sess.execute(q).fetchall()
         except Exception as e:
             print("migrate load all rows err", e)
@@ -54,7 +56,7 @@ class Migrate:
             return
 
         new_res = [
-            (res_id, src.replace(old_coll, new_coll))
+            (res_id, src.replace(old_coll, cnf.coll_folder))
             for res_id, src in res
             ]
         
