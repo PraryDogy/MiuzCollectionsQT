@@ -467,7 +467,7 @@ class Scaner(object):
             except RuntimeError:
                 pass
 
-            Migrate()
+            self.migrate = Migrate()
 
             finder_images = FinderImages()
             db_images = DbImages()
@@ -476,10 +476,10 @@ class Scaner(object):
                 return
 
             images = ComparedImages(finder_images, db_images)
-            UpdateDb(images=images)
+            self.update_db = UpdateDb(images=images)
 
-            TrashRemover()
-            DubFinder()
+            self.trash_remover = TrashRemover()
+            self.dub_finder = DubFinder()
 
             Dbase.vacuum()
             Dbase.cleanup_engine()
