@@ -243,17 +243,9 @@ class ComparedImages(dict):
                 self["update"][finder_src] = finder_stats
 
 
-class SummaryScan:
-    def __init__(self):
+class UpdateDb:
+    def __init__(self, images: dict):
         super().__init__()
-        finder_images = FinderImages()
-        db_images = DbImages()
-
-        if not finder_images:
-            return
-
-        self.images = ComparedImages(finder_images, db_images)
-
 
         try:
             gui_signals_app.progressbar_value.emit(70)
@@ -261,8 +253,8 @@ class SummaryScan:
         except RuntimeError:
             pass
 
-        if self.images["delete"]:
-            self.delete_db()
+        if images["delete"]:
+            self.delete_db(images["delete"])
 
         try:
             gui_signals_app.progressbar_value.emit(80)
@@ -270,16 +262,16 @@ class SummaryScan:
         except RuntimeError:
             pass
 
-        if self.images["insert"]:
-            self.insert_db()
+        if images["insert"]:
+            self.insert_db(images["insert"])
 
         try:
             gui_signals_app.progressbar_value.emit(90)
         except RuntimeError:
             pass
 
-        if self.images["update"]:
-            self.update_db()
+        if images["update"]:
+            self.update_db(images["update"])
 
     def create_values(self, data: Dict[str, tuple]) -> List[Dict]:
         values = []
@@ -319,15 +311,14 @@ class SummaryScan:
         
         return values
 
-    def insert_db(self):
+    def insert_db(self, images: dict):
         limit: int = 10
-        data: dict = self.images["insert"]
-        data_keys: list = list(data.keys())
+        data_keys: list = list(images.keys())
 
         chunks: List[Dict[str, tuple]]
         chunks = [
-            {key: data[key] for key in data_keys[i:i + limit]}
-            for i in range(0, len(data), limit)
+            {key: images[key] for key in data_keys[i:i + limit]}
+            for i in range(0, len(images), limit)
             ]
 
         for chunk in chunks:
@@ -373,15 +364,14 @@ class SummaryScan:
             finally:
                 session.close()
 
-    def update_db(self):
+    def update_db(self, images: dict):
         limit: int = 10
-        data: dict = self.images["update"]
-        data_keys: list = list(data.keys())
+        data_keys: list = list(images.keys())
 
         chunks: List[Dict[str, tuple]]
         chunks = [
-            {key: data[key] for key in data_keys[i:i + limit]}
-            for i in range(0, len(data), limit)
+            {key: images[key] for key in data_keys[i:i + limit]}
+            for i in range(0, len(images), limit)
             ]
 
         for chunk in chunks:
@@ -426,11 +416,11 @@ class SummaryScan:
             finally:
                 session.close()
 
-    def delete_db(self):
+    def delete_db(self, images: dict):
         queries = List[Query]
         queries = [
             sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==i)
-            for i in self.images["delete"]
+            for i in images.keys()
             ]
 
         limit: int = 200
@@ -478,9 +468,19 @@ class Scaner(object):
                 pass
 
             Migrate()
-            SummaryScan()
+
+            finder_images = FinderImages()
+            db_images = DbImages()
+
+            if not finder_images:
+                return
+
+            images = ComparedImages(finder_images, db_images)
+            UpdateDb(images=images)
+
             TrashRemover()
             DubFinder()
+
             Dbase.vacuum()
             Dbase.cleanup_engine()
 
