@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 from PyQt5.QtCore import QEvent, Qt, QTimer
-from PyQt5.QtGui import QResizeEvent
+from PyQt5.QtGui import QResizeEvent, QIcon
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
                              QMainWindow, QPushButton, QVBoxLayout, QWidget)
 
@@ -150,6 +150,7 @@ class WinMain(WinBase):
 class App(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
+        self.setWindowIcon(QIcon("icon/icon.icns"))
 
         self.main_win = WinMain()
         self.main_win.show()
