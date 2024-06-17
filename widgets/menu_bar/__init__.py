@@ -1,1 +1,1 @@
-from .main import MacMenuBar
+from .main import MacMenuBar, AboutWin

@@ -52,6 +52,26 @@ class SelectableLabel(QLabel):
         MainUtils.copy_text(self.selectedText())
 
 
+class AboutWin(WinSmallBase):
+    def __init__(self, parent):
+        super().__init__(close_func=lambda e: self.deleteLater())
+
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.disable_min_max()
+        self.set_title(cnf.app_name)
+        self.setFixedSize(280, 240)
+
+        icon = QSvgWidget(os.path.join("icon", "icon.svg"))
+        icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+        icon.setFixedSize(150, 130)
+        self.content_layout.addWidget(icon, alignment=Qt.AlignCenter)
+
+        self.content_layout.addSpacerItem(QSpacerItem(0, 20))
+
+        lbl = SelectableLabel(self)
+        self.content_layout.addWidget(lbl)
+
+
 class MacMenuBar(QMenuBar):
     def __init__(self):
         super().__init__()
@@ -83,26 +103,11 @@ class MacMenuBar(QMenuBar):
         Manager.win_settings.show()
 
     def open_about_window(self):
-        win = WinSmallBase(close_func = lambda e: win.deleteLater())
+        win = AboutWin(self)
         Manager.win_about = win
-
-        win.setWindowModality(Qt.WindowModality.ApplicationModal)
-        win.disable_min_max()
-        win.set_title(cnf.app_name)
-        win.setFixedSize(280, 240)
-
-        icon = QSvgWidget(os.path.join("icon", "icon.svg"))
-        icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        icon.setFixedSize(150, 130)
-        win.content_layout.addWidget(icon, alignment=Qt.AlignCenter)
-
-        win.content_layout.addSpacerItem(QSpacerItem(0, 20))
-
-        lbl = SelectableLabel(win)
-        win.content_layout.addWidget(lbl)
-
         win.center_win(self)
         win.show()
+
 
     def reload_menubar(self):
         self.mainMenu.deleteLater()

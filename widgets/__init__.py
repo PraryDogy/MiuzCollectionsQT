@@ -13,3 +13,4 @@ from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
 from .win_smb import WinSmb
+from .menu_bar import AboutWin
