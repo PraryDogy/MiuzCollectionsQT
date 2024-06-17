@@ -209,8 +209,8 @@ class App(QApplication):
         # self.test.show()
         # return
 
-        self.test = TestWid()
-        self.test.show()
+        # self.test = TestWid()
+        # self.test.show()
 
 Themes.set_theme(cnf.theme)
 app = App()

@@ -56,8 +56,7 @@ class AboutWin(WinSmallBase):
     def __init__(self, parent):
         super().__init__(close_func=lambda e: self.deleteLater())
 
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeDialogs)
+        # self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min_max()
         self.set_title(cnf.app_name)
         self.setFixedSize(280, 240)
@@ -108,6 +107,9 @@ class MacMenuBar(QMenuBar):
         Manager.win_about = win
         win.center_win(self)
         win.show()
+
+        win.setWindowModality(Qt.WindowModality.ApplicationModal)
+        win.updateGeometry()
 
 
     def reload_menubar(self):
