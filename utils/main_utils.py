@@ -15,7 +15,13 @@ class MainUtils:
             old_coll = os.sep + cnf.coll_folder.strip(os.sep)
 
             if "Volumes" + os.sep in old_coll:
-                old_coll = old_coll.strip(os.sep).split(os.sep)[2:]
+
+                try:
+                    old_coll = old_coll.strip(os.sep).split(os.sep)[2:]
+                except Exception as e:
+                    print(e)
+                    return False
+
                 old_coll = os.path.join(os.sep, *old_coll)
 
 
