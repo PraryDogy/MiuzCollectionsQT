@@ -62,3 +62,22 @@ class ScrollWidget(QWidget):
 #     window = ScrollWidget()
 #     window.show()
 #     sys.exit(app.exec_())
+
+
+import os
+
+coll = "Volumes/Mac os/Users/evlosh/Desktop/misha.mp4"
+coll = os.sep + coll.strip(os.sep)
+
+volumes = [os.path.join(os.sep, "Volumes", i)
+           for i in os.listdir(os.sep + "Volumes")
+           ]
+
+for i in volumes:
+    coll = coll.replace(i, "")
+
+for i in volumes:
+    new_coll = os.path.join(os.sep, i.strip(os.sep), coll.strip(os.sep))
+
+    if os.path.exists(new_coll):
+        print(new_coll)
