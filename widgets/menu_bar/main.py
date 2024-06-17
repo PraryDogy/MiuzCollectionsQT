@@ -57,6 +57,7 @@ class AboutWin(WinSmallBase):
         super().__init__(close_func=lambda e: self.deleteLater())
 
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeDialogs)
         self.disable_min_max()
         self.set_title(cnf.app_name)
         self.setFixedSize(280, 240)
