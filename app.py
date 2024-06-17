@@ -203,12 +203,12 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        return
-        from widgets.win_first_load import WinFirstLoad
-        self.test = WinFirstLoad()
-        self.test.show()
+        # return
+        # from widgets.win_first_load import WinFirstLoad
+        # self.test = WinFirstLoad()
+        # self.test.show()
+        # return
 
-        return
         self.test = TestWid()
         self.test.show()
 
