@@ -14,13 +14,15 @@ class MainUtils:
 
             old_coll = os.sep + cnf.coll_folder.strip(os.sep)
 
+            if "Volumes" + os.sep in old_coll:
+                old_coll = old_coll.strip(os.sep).split(os.sep)[2:]
+                old_coll = os.path.join(os.sep, *old_coll)
+
+
             volumes = [
                 os.path.join(os.sep, "Volumes", i)
                 for i in os.listdir(os.sep + "Volumes")
                 ]
-
-            for i in volumes:
-                old_coll = old_coll.replace(i, "")
 
             for i in volumes:
                 new_coll = os.path.join(os.sep, i.strip(os.sep), old_coll.strip(os.sep))
