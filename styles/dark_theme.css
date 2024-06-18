@@ -265,6 +265,7 @@
 
 #thumbnail_selected {
     background-color: #2e59cb;
+    border-radius: 10px;
 }
 
 #title_bar {
