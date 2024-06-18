@@ -443,6 +443,7 @@ class WinImageView(WinImgViewBase):
         wid: QLabel = cnf.images[self.img_src]
         wid.setObjectName(Names.thumbnail_selected)
         wid.setStyleSheet(Themes.current)
+        gui_signals_app.move_to_wid.emit(wid)
 
         timer = QTimer(parent=MainUtils.get_central_widget())
         timer.setSingleShot(True)

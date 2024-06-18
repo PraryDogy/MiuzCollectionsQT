@@ -48,6 +48,7 @@ class Thumbnails(QScrollArea):
 
         gui_signals_app.reload_thumbnails.connect(self.reload_thumbnails)
         gui_signals_app.scroll_top.connect(self.scroll_top)
+        gui_signals_app.move_to_wid.connect(self.move_to_wid)
 
     def checkScrollValue(self, value):
         self.up_btn.move(
@@ -135,3 +136,7 @@ class Thumbnails(QScrollArea):
 
     def get_columns(self):
         return max(self.width() // (cnf.THUMBSIZE + cnf.THUMBPAD), 1)
+    
+    def move_to_wid(self, wid):
+        self.ensureWidgetVisible(wid)
+        print("move to wid")
