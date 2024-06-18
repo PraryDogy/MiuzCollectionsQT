@@ -123,7 +123,6 @@ class Thumbnail(QFrame):
             self.title.setObjectName(Names.thumbnail_text_selected)
             self.title.setStyleSheet(Themes.current)
 
-
             self.image_context.show_menu()
             return super().contextMenuEvent(ev)
         except Exception as e:
