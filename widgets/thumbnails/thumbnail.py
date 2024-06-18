@@ -19,14 +19,14 @@ class Manager:
 
 
 class SelectableLabel(QLabel):
-    def __init__(self, parent, text: str):
+    def __init__(self, parent, text: str, coll: str):
         super().__init__(parent)
 
         name = text
         only_name, ext = os.path.splitext(name)
 
         max_row = 25
-        max_chars = 45
+        max_chars = 40
         diff = len(name) - max_row *2
 
         if diff > 0:
@@ -37,8 +37,12 @@ class SelectableLabel(QLabel):
                     [name[i:i + max_row]
                         for i in range(0, len(name), max_row)]
                         )
+            
+        if len(coll) > max_row:
+            coll = coll[:max_row] + "..."
+            print(coll)
 
-        self.setText(name)
+        self.setText(f"{cnf.lng.collection}: {coll}\n{name}")
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
@@ -88,14 +92,14 @@ class Thumbnail(QFrame):
         self.img_label.setPixmap(byte_array)
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.title = SelectableLabel(parent=self, text=self.img_name)
+        self.title = SelectableLabel(parent=self, text=self.img_name, coll=coll)
         self.title.setContentsMargins(8, 2, 8, 7)
 
         self.title.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addWidget(self.title)
 
         self.setFixedWidth(cnf.THUMBSIZE + cnf.THUMBPAD)
-        self.setMaximumHeight(cnf.THUMBSIZE + 50)
+        self.setMaximumHeight(cnf.THUMBSIZE + 75)
         
 
     def mouseReleaseEvent(self, event):
