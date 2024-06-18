@@ -117,21 +117,6 @@ class Thumbnails(QScrollArea):
                 )
             grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
 
-            # prepare to show tiffs
-            # tiff = FindTiffBase(img_dict["src"])
-            # tiff.run()
-            # tiff = tiff.get_result()
-
-            # if tiff:
-            #     label = Thumbnail(
-            #         byte_array=img_dict["img"],
-            #         img_src=img_dict["src"],
-            #         coll=img_dict["coll"],
-            #         images_date=images_date
-            #         )
-            #     idx += 1
-            #     grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
-
             idx += 1
 
         rows = ceil(len(images_list) / self.columns)
@@ -148,4 +133,4 @@ class Thumbnails(QScrollArea):
         return super().resizeEvent(a0)
 
     def get_columns(self):
-        return max(self.width() // (cnf.THUMBSIZE), 1)
+        return max(self.width() // (cnf.THUMBSIZE + cnf.THUMBPAD), 1)

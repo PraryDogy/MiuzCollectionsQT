@@ -82,6 +82,7 @@ class Static:
         super().__init__()
 
         self.THUMBSIZE: int = 200
+        self.THUMBPAD: int = 16
         self.LIMIT: int = 150
         self.ALL_COLLS: str = "miuzcollections_all"
         self.MENU_W: int = 210

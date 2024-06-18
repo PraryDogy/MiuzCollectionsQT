@@ -81,7 +81,7 @@ class Thumbnail(QFrame):
         self.title.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addWidget(self.title)
 
-        self.setFixedWidth(cnf.THUMBSIZE + 16)
+        self.setFixedWidth(cnf.THUMBSIZE + cnf.THUMBPAD)
         self.setMaximumHeight(cnf.THUMBSIZE + 50)
         
 
