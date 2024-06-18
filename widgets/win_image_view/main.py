@@ -447,7 +447,7 @@ class WinImageView(WinImgViewBase):
         timer = QTimer(parent=MainUtils.get_central_widget())
         timer.setSingleShot(True)
         timer.timeout.connect(lambda: self.after_close(wid=wid))
-        timer.start(1000)
+        timer.start(1500)
 
         Manager.images.clear()
         self.update_geometry()
