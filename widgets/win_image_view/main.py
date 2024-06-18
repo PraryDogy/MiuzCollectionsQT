@@ -440,7 +440,21 @@ class WinImageView(WinImgViewBase):
         cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
 
     def my_close(self, event):
+        wid: QLabel = cnf.images[self.img_src]
+        wid.setObjectName(Names.thumbnail_selected)
+        wid.setStyleSheet(Themes.current)
+
+        timer = QTimer(parent=MainUtils.get_central_widget())
+        timer.setSingleShot(True)
+        timer.timeout.connect(lambda: self.after_close(wid=wid))
+        timer.start(1000)
+
         Manager.images.clear()
         self.update_geometry()
         self.deleteLater()
         event.ignore()
+
+    def after_close(self, wid: QLabel):
+        wid.setFocus()
+        wid.setObjectName(Names.thumbnail_normal)
+        wid.setStyleSheet(Themes.current)
