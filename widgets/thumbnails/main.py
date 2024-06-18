@@ -118,19 +118,19 @@ class Thumbnails(QScrollArea):
             grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
 
             # prepare to show tiffs
-            # tiff = FindTiffBase(img_dict["src"])
-            # tiff.run()
-            # tiff = tiff.get_result()
+            tiff = FindTiffBase(img_dict["src"])
+            tiff.run()
+            tiff = tiff.get_result()
 
-            # if tiff:
-            #     label = Thumbnail(
-            #         byte_array=img_dict["img"],
-            #         img_src=img_dict["src"],
-            #         coll=img_dict["coll"],
-            #         images_date=images_date
-            #         )
-            #     idx += 1
-            #     grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
+            if tiff:
+                label = Thumbnail(
+                    byte_array=img_dict["img"],
+                    img_src=img_dict["src"],
+                    coll=img_dict["coll"],
+                    images_date=images_date
+                    )
+                idx += 1
+                grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
 
             idx += 1
 
