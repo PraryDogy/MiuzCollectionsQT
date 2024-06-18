@@ -9,6 +9,7 @@ from cfg import cnf
 from signals import gui_signals_app
 from styles import Names, Themes
 from utils import MainUtils
+from utils.find_tiffs import FindTiffBase
 
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .limit_btn import LimitBtn
@@ -40,14 +41,11 @@ class Thumbnails(QScrollArea):
         self.thumbnails_layout.setContentsMargins(5, 10, 5, 0)
         frame_layout.addLayout(self.thumbnails_layout)
 
-        self.first_load = True
         self.columns = self.get_columns()
         self.init_ui()
 
         frame_layout.addStretch(1)
         self.setWidget(self.scroll_area_widget)
-
-        self.first_load = True
 
         gui_signals_app.reload_thumbnails.connect(self.reload_thumbnails)
         gui_signals_app.scroll_top.connect(self.scroll_top)
@@ -90,12 +88,9 @@ class Thumbnails(QScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
     def reload_thumbnails(self):
-        if self.first_load:
-            self.first_load = False
-        else:
-            MainUtils.clear_layout(self.thumbnails_layout)
-            self.up_btn.deleteLater()
-            self.init_ui()
+        MainUtils.clear_layout(self.thumbnails_layout)
+        self.up_btn.deleteLater()
+        self.init_ui()
 
     def images_grid(self, images_date: str, images_list: list[dict]):
         """
@@ -111,8 +106,9 @@ class Thumbnails(QScrollArea):
         grid_layout.setAlignment(Qt.AlignLeft)
         grid_layout.setContentsMargins(0, 0, 0, 30)
 
-        # Добавляем изображения в сетку
-        for idx, img_dict in enumerate(images_list):
+        idx = 0
+
+        for img_dict in images_list:
             label = Thumbnail(
                 byte_array=img_dict["img"],
                 img_src=img_dict["src"],
@@ -120,6 +116,24 @@ class Thumbnails(QScrollArea):
                 images_date=images_date
                 )
             grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
+
+
+            # prepare to show tiffs
+            # tiff = FindTiffBase(img_dict["src"])
+            # tiff.run()
+            # tiff = tiff.get_result()
+
+            # if tiff:
+            #     label = Thumbnail(
+            #         byte_array=img_dict["img"],
+            #         img_src=img_dict["src"],
+            #         coll=img_dict["coll"],
+            #         images_date=images_date
+            #         )
+            #     idx += 1
+            #     grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
+
+            idx += 1
 
         rows = ceil(len(images_list) / self.columns)
         grid_layout.setColumnStretch(self.columns, 1)
