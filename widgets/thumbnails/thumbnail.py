@@ -19,17 +19,19 @@ class Manager:
 
 
 class SelectableLabel(QLabel):
-    def __init__(self, parent, text: str, coll: str):
+    def __init__(self, parent, filename: str, coll: str):
         super().__init__(parent)
 
-        name = text
-        only_name, ext = os.path.splitext(name)
+        self.filename = filename
+        self.coll = coll
 
         max_row = 25
         max_chars = 40
-        diff = len(name) - max_row *2
 
-        if diff > 0:
+        name = f"{cnf.lng.file_name}: {filename}"
+        only_name, ext = os.path.splitext(name)
+
+        if len(name) - max_row * 2 > 0:
             name = name[:max_chars] + "..." + only_name[-3:] + ext
 
         if len(name) > max_row:
@@ -37,34 +39,13 @@ class SelectableLabel(QLabel):
                     [name[i:i + max_row]
                         for i in range(0, len(name), max_row)]
                         )
-            
+        
+        coll = f"{cnf.lng.collection}: {coll}"
+
         if len(coll) > max_row:
             coll = coll[:max_row] + "..."
-            print(coll)
 
-        self.setText(f"{cnf.lng.collection}: {coll}\n{name}")
-        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.setCursor(Qt.CursorShape.IBeamCursor)
-
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        context_menu = ContextMenuBase(ev)
-
-        small_text = self.selectedText().replace("\n", "")
-        copy_text = QAction(parent=context_menu, text=f"{cnf.lng.copy} \"{small_text}\"")
-        copy_text.triggered.connect(lambda: self.copy_text_md(text=small_text))
-        context_menu.addAction(copy_text)
-
-        context_menu.addSeparator()
-
-        full_text = self.text().replace("\n", "")
-        select_all = QAction(parent=context_menu, text=f"{cnf.lng.copy} \"{full_text}\"")
-        select_all.triggered.connect(lambda: MainUtils.copy_text(full_text))
-        context_menu.addAction(select_all)
-
-        context_menu.show_menu()
-
-    def copy_text_md(self, text: str):
-        MainUtils.copy_text(text)
+        self.setText(f"{coll}\n{name}")
 
 
 class Thumbnail(QFrame):
@@ -92,7 +73,7 @@ class Thumbnail(QFrame):
         self.img_label.setPixmap(byte_array)
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.title = SelectableLabel(parent=self, text=self.img_name, coll=coll)
+        self.title = SelectableLabel(parent=self, filename=self.img_name, coll=coll)
         self.title.setContentsMargins(8, 2, 8, 7)
 
         self.title.setAlignment(Qt.AlignmentFlag.AlignTop)
