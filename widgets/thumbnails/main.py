@@ -27,6 +27,7 @@ class Thumbnails(QScrollArea):
         self.setStyleSheet(Themes.current)
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.horizontalScrollBar().setDisabled(True)
 
         # Создаем фрейм для виджетов в области скролла
         self.scroll_area_widget = QWidget()
@@ -118,9 +119,9 @@ class Thumbnails(QScrollArea):
 
             idx += 1
 
-        rows = ceil(len(images_list) / self.columns)
-        grid_layout.setColumnStretch(self.columns, 1)
-        grid_layout.setRowStretch(rows, 1)
+        # rows = ceil(len(images_list) / self.columns)
+        # grid_layout.setColumnStretch(self.columns, 1)
+        # grid_layout.setRowStretch(rows, 1)
         self.thumbnails_layout.addLayout(grid_layout)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
@@ -128,6 +129,7 @@ class Thumbnails(QScrollArea):
         new_columns = self.get_columns()
         if self.columns != new_columns:
             self.columns = new_columns
+            self.resize(a0.size().width(), self.height())
             self.reload_thumbnails()
         return super().resizeEvent(a0)
 
