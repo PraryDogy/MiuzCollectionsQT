@@ -22,12 +22,21 @@ class SelectableLabel(QLabel):
     def __init__(self, parent, text: str):
         super().__init__(parent)
 
-        max_chars = 30
-        name = '\n'.join(
-                [text[i:i + max_chars]
-                 for i in range(0, len(text), max_chars)]
-                 )
+        name = text
+        only_name, ext = os.path.splitext(name)
 
+        max_row = 25
+        max_chars = 45
+        diff = len(name) - max_row *2
+
+        if diff > 0:
+            name = name[:max_chars] + "..." + only_name[-3:] + ext
+
+        if len(name) > max_row:
+            name = '\n'.join(
+                    [name[i:i + max_row]
+                        for i in range(0, len(name), max_row)]
+                        )
 
         self.setText(name)
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
