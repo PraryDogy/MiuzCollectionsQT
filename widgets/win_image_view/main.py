@@ -351,11 +351,12 @@ class WinImageView(WinImgViewBase):
             current_index = keys.index(self.img_src)
         except Exception as e:
             print(e)
+            keys = list(cnf.images.keys())
             current_index = 0
 
         total_images = len(cnf.images)
         new_index = (current_index + offset) % total_images
-        self.img_src = cnf.images[new_index]
+        self.img_src = keys[new_index]
         self.load_image()
 
     def cut_text(self, text: str) -> str:
