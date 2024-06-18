@@ -132,8 +132,7 @@ class Thumbnails(QScrollArea):
 
         if abs(a0.size().width() - self.ww) > cnf.THUMBSIZE:
             self.ww = a0.size().width()
-            new_columns = self.get_columns()
-            self.columns = new_columns
+            self.columns = self.get_columns()
             self.reload_thumbnails()
             self.resize(a0.size().width(), self.height())
         return super().resizeEvent(a0)
