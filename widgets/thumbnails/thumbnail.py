@@ -149,7 +149,7 @@ class Thumbnail(QFrame):
 
         self.setFixedWidth(byte_array.width() + 4)
 
-        max_chars = 20
+        max_chars = 30
         name = '\n'.join(
                 [self.img_name[i:i + max_chars]
                  for i in range(0, len(self.img_name), max_chars)]
