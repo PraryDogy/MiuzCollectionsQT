@@ -131,8 +131,14 @@ class Thumbnail(QFrame):
             self.image_context = ImageContext(img_src=self.img_src, event=ev, parent=self)
             self.image_context.closed.connect(self.closed_context)
             self.image_context.add_preview_item()
+
             self.setObjectName(Names.thumbnail_selected)
             self.setStyleSheet(Themes.current)
+
+            self.title.setObjectName(Names.thumbnail_text_selected)
+            self.title.setStyleSheet(Themes.current)
+
+
             self.image_context.show_menu()
             return super().contextMenuEvent(ev)
         except Exception as e:
@@ -142,6 +148,10 @@ class Thumbnail(QFrame):
         try:
             self.setObjectName(Names.thumbnail_normal)
             self.setStyleSheet(Themes.current)
+
+            self.title.setObjectName("Fake")
+            self.title.setStyleSheet(Themes.current)
+
         except Exception as e:
             print(e)
 
