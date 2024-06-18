@@ -23,6 +23,9 @@ class Thumbnails(QScrollArea):
         super().__init__()
         self.setWidgetResizable(True)
         self.resize(cnf.root_g["aw"] - cnf.MENU_W, cnf.root_g["ah"])
+        self.ww = cnf.root_g["aw"] - cnf.MENU_W
+        self.horizontalScrollBar().setDisabled(True)
+
         self.setObjectName(Names.th_scrollbar)
         self.setStyleSheet(Themes.current)
 
@@ -126,12 +129,13 @@ class Thumbnails(QScrollArea):
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.up_btn.setVisible(False)
-        new_columns = self.get_columns()
-        if self.columns != new_columns:
+
+        if abs(a0.size().width() - self.ww) > cnf.THUMBSIZE:
+            self.ww = a0.size().width()
+            new_columns = self.get_columns()
             self.columns = new_columns
-            self.resize(a0.size().width(), self.height())
             self.reload_thumbnails()
-            self.horizontalScrollBar().setDisabled(True)
+            self.resize(a0.size().width(), self.height())
         return super().resizeEvent(a0)
 
     def get_columns(self):
@@ -139,4 +143,3 @@ class Thumbnails(QScrollArea):
     
     def move_to_wid(self, wid):
         self.ensureWidgetVisible(wid)
-        print("move to wid")
