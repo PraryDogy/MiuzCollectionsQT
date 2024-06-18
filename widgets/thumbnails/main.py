@@ -117,7 +117,6 @@ class Thumbnails(QScrollArea):
                 )
             grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
 
-
             # prepare to show tiffs
             # tiff = FindTiffBase(img_dict["src"])
             # tiff.run()
