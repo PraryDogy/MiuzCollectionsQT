@@ -347,8 +347,10 @@ class WinImageView(WinImgViewBase):
 
     def switch_image(self, offset):
         try:
-            current_index = cnf.images.index(self.img_src)
-        except ValueError:
+            keys = list(cnf.images.keys())
+            current_index = keys.index(self.img_src)
+        except Exception as e:
+            print(e)
             current_index = 0
 
         total_images = len(cnf.images)

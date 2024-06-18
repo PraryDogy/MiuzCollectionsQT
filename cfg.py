@@ -93,7 +93,7 @@ class Dymanic:
 
         self.current_limit: int = self.LIMIT
         self.search_text: str = None
-        self.images: list = []
+        self.images: dict = {}
         self.tiff_images: set = set()
         self.date_start: datetime = None
         self.date_end: datetime = None
