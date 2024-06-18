@@ -134,7 +134,6 @@ class Thumbnails(QScrollArea):
             self.ww = a0.size().width()
             self.columns = self.get_columns()
             self.reload_thumbnails()
-            self.resize(a0.size().width(), self.height())
         return super().resizeEvent(a0)
 
     def get_columns(self):
