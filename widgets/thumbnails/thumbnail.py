@@ -129,6 +129,7 @@ class Thumbnail(QFrame):
         super().__init__()
 
         self.v_layout = LayoutV()
+        self.v_layout.setContentsMargins(0, 2, 0, 0)
         self.setLayout(self.v_layout)
 
         self.img_src = img_src
@@ -144,7 +145,7 @@ class Thumbnail(QFrame):
         self.img_label = QLabel()
         byte_array = PixmapThumb(byte_array)
         self.img_label.setPixmap(byte_array)
-        self.v_layout.addWidget(self.img_label)
+        self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setFixedSize(byte_array.width() + 4, byte_array.height() + 55)
 
@@ -178,7 +179,7 @@ class Thumbnail(QFrame):
 
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
-        self.drag.setPixmap(self.pixmap())
+        self.drag.setPixmap(self.img_label.pixmap())
         
         url = [QUrl.fromLocalFile(self.img_src)]
         self.mime_data.setUrls(url)
@@ -216,3 +217,4 @@ class Thumbnail(QFrame):
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.setToolTip("")
         return super().leaveEvent(a0)
+    

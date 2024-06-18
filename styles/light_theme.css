@@ -260,11 +260,11 @@
 }
 
 #thumbnail_normal {
-    border: 2px solid transparent;
+    background-color: transparent;
 }
 
 #thumbnail_selected {
-    border: 2px solid #2e59cb;
+    background-color: #2e59cb;
 }
 
 #title_bar {
