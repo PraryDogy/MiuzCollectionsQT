@@ -456,6 +456,9 @@ class WinImageView(WinImgViewBase):
         event.ignore()
 
     def after_close(self, wid: QLabel):
-        wid.setFocus()
-        wid.setObjectName(Names.thumbnail_normal)
-        wid.setStyleSheet(Themes.current)
+        try:
+            wid.setFocus()
+            wid.setObjectName(Names.thumbnail_normal)
+            wid.setStyleSheet(Themes.current)
+        except Exception as e:
+            print(e)
