@@ -42,27 +42,27 @@ class _TiffUtils:
             return None
 
 
-class _FindTiffLocal:
+class FindTiffBase:
     def __init__(self, src: str):
         super().__init__()
         self.src = src
         self.tiff_list = cnf.tiff_images
         self.count = 0
 
-    def run_search(self):
+    def run(self):
         try:
-            tiff_list = self.find_tiffs()
+            tiff_list = self._find_tiffs()
             self.final_tiff = _TiffUtils.nearest_len(self.src, tiff_list)
             self.count = 0
         except RuntimeError:
             self.count += 1
             if self.count != 10:
-                self.run_search()
+                self.run()
             else:
                 self.count == 0
                 self.final_tiff = None
 
-    def find_tiffs(self) -> list:
+    def _find_tiffs(self) -> list:
         _, src_filename = os.path.split(self.src)
 
         aa_name = _TiffUtils.remove_punct(src_filename)
@@ -105,8 +105,8 @@ class ThreadFindTiff(QThread):
 
     def run(self):
         Manager.threads.append(self)
-        search = _FindTiffLocal(src=self.src)
-        search.run_search()
+        search = FindTiffBase(src=self.src)
+        search.run()
         self.finished.emit(search.get_result())
         self.can_remove.emit()
         Manager.threads.remove(self)
@@ -125,8 +125,8 @@ class ThreadFindTiffsMultiple(QThread):
         tiff_list = []
 
         for i in self.files_list:
-            search = _FindTiffLocal(src=i)
-            search.run_search()
+            search = FindTiffBase(src=i)
+            search.run()
 
             res = search.get_result()
             if res:
