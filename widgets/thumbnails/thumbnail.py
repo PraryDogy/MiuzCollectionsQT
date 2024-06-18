@@ -213,8 +213,3 @@ class Thumbnail(QFrame):
             f"\n{cnf.lng.file_name}: {self.img_name}"
             )
         return super().enterEvent(a0)
-    
-    def leaveEvent(self, a0: QEvent | None) -> None:
-        self.setToolTip("")
-        return super().leaveEvent(a0)
-    
