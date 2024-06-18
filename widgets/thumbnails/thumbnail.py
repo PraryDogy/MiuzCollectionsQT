@@ -147,7 +147,7 @@ class Thumbnail(QFrame):
         self.img_label.setPixmap(byte_array)
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.setFixedSize(byte_array.width() + 4, byte_array.height() + 55)
+        self.setFixedWidth(byte_array.width() + 4)
 
         max_chars = 20
         name = '\n'.join(
@@ -155,7 +155,7 @@ class Thumbnail(QFrame):
                  for i in range(0, len(self.img_name), max_chars)]
                  )
         self.title = SelectableLabel(parent=self, text=name)
-        self.title.setContentsMargins(3, 2, 3, 0)
+        self.title.setContentsMargins(3, 2, 3, 7)
 
         self.title.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addWidget(self.title)
