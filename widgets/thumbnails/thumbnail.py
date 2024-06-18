@@ -155,6 +155,7 @@ class Thumbnail(QFrame):
                  for i in range(0, len(self.img_name), max_chars)]
                  )
         self.title = SelectableLabel(parent=self, text=name)
+        self.title.setContentsMargins(3, 2, 3, 0)
 
         self.title.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addWidget(self.title)
