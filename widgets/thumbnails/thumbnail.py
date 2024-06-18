@@ -18,7 +18,7 @@ class Manager:
     co = None
 
 
-class SelectableLabel(QLabel):
+class NameLabel(QLabel):
     def __init__(self, parent, filename: str, coll: str):
         super().__init__(parent)
 
@@ -43,7 +43,7 @@ class SelectableLabel(QLabel):
         coll = f"{cnf.lng.collection}: {coll}"
 
         if len(coll) > max_row:
-            coll = coll[:max_row] + "..."
+            coll = coll[:max_row] + "..." + coll[-3:]
 
         self.setText(f"{coll}\n{name}")
 
@@ -73,8 +73,8 @@ class Thumbnail(QFrame):
         self.img_label.setPixmap(byte_array)
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.title = SelectableLabel(parent=self, filename=self.img_name, coll=coll)
-        self.title.setContentsMargins(8, 2, 8, 7)
+        self.title = NameLabel(parent=self, filename=self.img_name, coll=coll)
+        self.title.setContentsMargins(8, 5, 8, 7)
 
         self.title.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addWidget(self.title)
