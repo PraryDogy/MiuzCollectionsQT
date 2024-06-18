@@ -9,7 +9,6 @@ from cfg import cnf
 from signals import gui_signals_app
 from styles import Names, Themes
 from utils import MainUtils
-from utils.find_tiffs import FindTiffBase
 
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .limit_btn import LimitBtn
