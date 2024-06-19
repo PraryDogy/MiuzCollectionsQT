@@ -32,7 +32,7 @@ class Thumbnails(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         # Создаем фрейм для виджетов в области скролла
-        self.scroll_area_widget = QWidget()
+        self.scroll_area_widget = QWidget(parent=self)
         self.scroll_area_widget.setObjectName(Names.th_scroll_widget)
         self.scroll_area_widget.setStyleSheet(Themes.current)
         
@@ -130,7 +130,7 @@ class Thumbnails(QScrollArea):
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.up_btn.setVisible(False)
 
-        if abs(a0.size().width() - self.ww) >= cnf.THUMBSIZE:
+        if abs(a0.size().width() - self.ww) >= cnf.THUMBSIZE + cnf.THUMBPAD:
             self.ww = a0.size().width()
             self.columns = self.get_columns()
             self.reload_thumbnails()

@@ -203,6 +203,12 @@ class UpdaterWidget(QWidget):
         self.btn.setText(cnf.lng.download_update)
 
     def no_connection_btn(self):
+        timer = QTimer(self)
+        timer.setSingleShot(True)
+        timer.timeout.connect(self.no_connection_btn_style)
+        timer.start(1000)
+
+    def no_connection_btn_style(self):
         self.btn.setText(cnf.lng.no_connection)
         timer = QTimer(self)
         timer.setSingleShot(True)
