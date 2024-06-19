@@ -138,8 +138,8 @@ class Config(User, Dymanic, Static, AppInfo):
         if "LEVIEV" not in data["stop_colls"]:
             data["stop_colls"].append("LEVIEV")
 
-        shutil.copyfile(src="db.db", dst=self.db_file)
         data["app_ver"] = self.app_ver
+
         return data
 
     def read_json_cfg(self):
