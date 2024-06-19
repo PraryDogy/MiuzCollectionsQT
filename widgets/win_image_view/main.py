@@ -232,17 +232,18 @@ class WinImageView(WinImgViewBase):
         ImageWinUtils.close_same_win()
         self.img_src = img_src
         self.fsize_img_thread = None
+        self.coll = None
 
         super().__init__(close_func=self.my_close)
         self.setMinimumSize(QSize(500, 400))
         self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
+        self.installEventFilter(self)
 
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
         self.mouse_move_timer.setInterval(2000)
         self.mouse_move_timer.timeout.connect(self.hide_navi_btns)
-        self.installEventFilter(self)
 
         self.image_label = ImageWidget()
         self.content_layout.addWidget(
@@ -367,10 +368,10 @@ class WinImageView(WinImgViewBase):
             w, h = get_image_size(self.img_src)
         except Exception:
             w, h = "?", "?"
-        coll = self.cut_text(MainUtils.get_coll_name(self.img_src))
+        self.coll = self.cut_text(MainUtils.get_coll_name(self.img_src))
         name = self.cut_text(os.path.basename(self.img_src))
 
-        self.set_title(f"{w}x{h} - {coll} - {name}")
+        self.set_title(f"{w}x{h} - {self.coll} - {name}")
 
     def navi_switch_img(self, flag: str) -> None:
         if flag == "+":
@@ -434,7 +435,7 @@ class WinImageView(WinImgViewBase):
 
     def my_close(self, event):
         try:
-            wid: QLabel = cnf.images[self.img_src]
+            wid: QLabel = cnf.images[self.img_src]["widget"]
             wid.selected_style() # thumbnails > Thumbnail
             gui_signals_app.move_to_wid.emit(wid)
             QTimer.singleShot(1500, lambda: self.after_close(wid=wid))

@@ -61,7 +61,11 @@ class Thumbnail(QFrame):
         self.images_date = images_date
         self.img_name = os.path.basename(img_src)
 
-        cnf.images[img_src] = self
+        cnf.images[img_src] = {
+            "widget": self,
+            "collection": coll,
+            "filename": self.img_name
+            }
 
         self.setObjectName(Names.thumbnail_normal)
         self.setStyleSheet(Themes.current)
