@@ -442,7 +442,7 @@ class WinImageView(WinImgViewBase):
     def my_close(self, event):
         try:
             wid: QLabel = cnf.images[self.img_src]
-            wid.selected_style()
+            wid.selected_style() # thumbnails > Thumbnail
             gui_signals_app.move_to_wid.emit(wid)
             timer = QTimer(parent=MainUtils.get_central_widget())
             timer.setSingleShot(True)
@@ -458,6 +458,6 @@ class WinImageView(WinImgViewBase):
 
     def after_close(self, wid: QLabel):
         try:
-            wid.regular_style()
+            wid.regular_style() # thumbnails > Thumbnail
         except Exception as e:
             print(e)

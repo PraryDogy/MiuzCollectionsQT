@@ -82,18 +82,14 @@ class Thumbnail(QFrame):
         self.setFixedWidth(cnf.THUMBSIZE + cnf.THUMBPAD)
         self.setMaximumHeight(cnf.THUMBSIZE + 75)
         
-
     def mouseReleaseEvent(self, event):
-        self.selected_style()
-        timer = QTimer(self)
-        timer.setSingleShot(True)
-        timer.timeout.connect(self.regular_style)
-        timer.start(1500)
         Manager.win_image_view = WinImageView(parent=self, img_src=self.img_src)
         Manager.win_image_view.show()
+        self.regular_style()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
+            self.selected_style()
             self.drag_start_position = event.pos()
         super().mousePressEvent(event)
 
@@ -115,6 +111,7 @@ class Thumbnail(QFrame):
 
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.CopyAction)
+        self.regular_style()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
