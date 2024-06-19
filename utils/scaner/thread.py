@@ -73,24 +73,29 @@ class TrashRemover:
     def __init__(self):
         coll_folder = os.sep + cnf.coll_folder.strip(os.sep) + os.sep
 
+        session = Dbase.get_session()
+
         q = (sqlalchemy.select(ThumbsMd.src)
             .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
 
-        session = Dbase.get_session()
         try:
             trash_img = session.execute(q).first()
-        finally:
-            session.close()
+        
+        except Exception as e:
+            print(e)
+            return
 
         if trash_img:
 
             q = (sqlalchemy.delete(ThumbsMd)
                 .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
 
-            session = Dbase.get_session()
             try:
                 session.execute(q)
                 session.commit()
+            except Exception as e:
+                print(e)
+                return
             finally:
                 session.close()
 
