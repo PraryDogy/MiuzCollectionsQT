@@ -31,19 +31,6 @@ class Migrate:
     def __init__(self):
         sess = Dbase.get_session()
 
-        # try:
-        #     q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
-        #     img_src, img_coll = sess.execute(q).first()
-        #     img_src: str
-        # except Exception as e:
-        #     print("migrate load first result err", e)
-        #     return
-
-        # old_coll_folder = img_src.split(os.sep + img_coll + os.sep)[0]
-
-        # if cnf.coll_folder == old_coll_folder:
-        #     return
-
         if cnf.old_coll_folder is None or cnf.coll_folder == cnf.old_coll_folder:
             return
 
@@ -76,6 +63,7 @@ class Migrate:
             print("migrate commit err", e)
 
         sess.close()
+        cnf.old_coll_folder = None
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
         utils_signals_app.migrate_finished.emit()
