@@ -299,13 +299,9 @@ class WinImageView(WinImgViewBase):
 
             try:
                 res = session.execute(q).first()[0]
-
             except Exception as e:
                 print(e)
-                self.update_geometry()
-                self.deleteLater()
                 return
-
             finally:
                 session.close()    
 
