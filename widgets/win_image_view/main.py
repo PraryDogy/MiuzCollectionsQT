@@ -440,17 +440,16 @@ class WinImageView(WinImgViewBase):
         cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
 
     def my_close(self, event):
-        wid: QLabel = cnf.images[self.img_src]
         try:
+            wid: QLabel = cnf.images[self.img_src]
             wid.selected_style()
             gui_signals_app.move_to_wid.emit(wid)
-        except Exception as e:
+            timer = QTimer(parent=MainUtils.get_central_widget())
+            timer.setSingleShot(True)
+            timer.timeout.connect(lambda: self.after_close(wid=wid))
+            timer.start(1500)
+        except (KeyError, Exception) as e:
             print(e)
-
-        timer = QTimer(parent=MainUtils.get_central_widget())
-        timer.setSingleShot(True)
-        timer.timeout.connect(lambda: self.after_close(wid=wid))
-        timer.start(1500)
 
         Manager.images.clear()
         self.update_geometry()

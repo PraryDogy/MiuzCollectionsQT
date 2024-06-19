@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QEvent, QMimeData, Qt, QUrl
+from PyQt5.QtCore import QEvent, QMimeData, Qt, QUrl, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QDrag
 from PyQt5.QtWidgets import QAction, QApplication, QFrame, QLabel, QSpacerItem
 
@@ -84,6 +84,11 @@ class Thumbnail(QFrame):
         
 
     def mouseReleaseEvent(self, event):
+        self.selected_style()
+        timer = QTimer(self)
+        timer.setSingleShot(True)
+        timer.timeout.connect(self.regular_style)
+        timer.start(1500)
         Manager.win_image_view = WinImageView(parent=self, img_src=self.img_src)
         Manager.win_image_view.show()
 
