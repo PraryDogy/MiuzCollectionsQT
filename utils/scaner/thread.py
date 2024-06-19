@@ -71,7 +71,7 @@ class Migrate:
 
 class TrashRemover:
     def __init__(self):
-        coll_folder = cnf.coll_folder + os.sep
+        coll_folder = os.sep + cnf.coll_folder.strip(os.sep) + os.sep
 
         q = (sqlalchemy.select(ThumbsMd.src)
             .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
