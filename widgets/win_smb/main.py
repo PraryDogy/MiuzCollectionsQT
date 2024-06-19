@@ -52,21 +52,28 @@ class BrowseColl(QWidget):
         self.blue_count = 0
 
     def blue_browse_btn(self):
-        self.browse_btn.setObjectName(Names.smb_browse_btn_selected)
-        self.browse_btn.setStyleSheet(Themes.current)
-                
-        QTimer.singleShot(200, self.default_browse_btn)
-        self.blue_count += 1
+        try:
+            self.browse_btn.setObjectName(Names.smb_browse_btn_selected)
+            self.browse_btn.setStyleSheet(Themes.current)
+                    
+            QTimer.singleShot(200, self.default_browse_btn)
+            self.blue_count += 1
+        except Exception as e:
+            print(e)
 
     def default_browse_btn(self):
-        self.browse_btn.setObjectName(Names.smb_browse_btn)
-        self.browse_btn.setStyleSheet(Themes.current)
-        
-        if self.blue_count == 3:
-            self.blue_count = 0
-            return
+        try:
+            self.browse_btn.setObjectName(Names.smb_browse_btn)
+            self.browse_btn.setStyleSheet(Themes.current)
+            
+            if self.blue_count == 4:
+                self.blue_count = 0
+                return
 
-        QTimer.singleShot(200, self.blue_browse_btn)
+            QTimer.singleShot(200, self.blue_browse_btn)
+        except Exception as e:
+            print(e)
+
 
     def cut_text(self, text: str, limit: int = 130):
         if len(text) > limit:
