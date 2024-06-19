@@ -274,25 +274,26 @@ class WinImageView(WinImgViewBase):
 
         self.setFocus()
         self.center_win(parent)
-        self.load_image()
+        self.load_thumbnail()
 
         QTimer.singleShot(300, self.smb_check_first)
 
     def smb_check_first(self):
-        if not MainUtils.smb_check():
+        smb = MainUtils.smb_check()
+        if not smb:
+            utils_signals_app.migrate_finished.connect(self.finalize_smb)
             Manager.win_smb = WinSmb(parent=self)
             Manager.win_smb.show()
-            utils_signals_app.migrate_finished.connect(self.finalize_smb)
 
     def finalize_smb(self):
         name = os.path.basename(self.img_src)
         for k, v in cnf.images.items():
             if name == v["filename"] and self.coll == v["collection"]:
                 self.img_src = k
-                self.run_thread()
+                self.load_image_thread()
                 return
                 
-    def load_image(self):
+    def load_thumbnail(self):
         if self.img_src not in Manager.images:
             self.my_set_title(loading=True)
 
@@ -312,7 +313,7 @@ class WinImageView(WinImgViewBase):
             pixmap.loadFromData(res)
             self.image_label.set_image(pixmap)
 
-        QTimer.singleShot(50, self.run_thread)
+        self.load_image_thread()
 
     def move_navi_btns(self):
         navi_h = (self.height() // 2) - (self.navi_next.height() // 2)
@@ -332,7 +333,7 @@ class WinImageView(WinImgViewBase):
         self.navi_prev.hide()
         self.navi_next.hide()
 
-    def run_thread(self):
+    def load_image_thread(self):
         self.fsize_img_thread = FSizeImgThread(self.img_src)
         self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
         self.fsize_img_thread.start()
@@ -358,7 +359,7 @@ class WinImageView(WinImgViewBase):
         total_images = len(cnf.images)
         new_index = (current_index + offset) % total_images
         self.img_src = keys[new_index]
-        self.load_image()
+        self.load_thumbnail()
 
     def cut_text(self, text: str) -> str:
         limit = 40
@@ -375,10 +376,11 @@ class WinImageView(WinImgViewBase):
             w, h = get_image_size(self.img_src)
         except Exception:
             w, h = "?", "?"
-        self.coll = self.cut_text(MainUtils.get_coll_name(self.img_src))
+        self.coll = MainUtils.get_coll_name(self.img_src)
+        cut_coll = self.cut_text(MainUtils.get_coll_name(self.img_src))
         name = self.cut_text(os.path.basename(self.img_src))
 
-        self.set_title(f"{w}x{h} - {self.coll} - {name}")
+        self.set_title(f"{w}x{h} - {cut_coll} - {name}")
 
     def navi_switch_img(self, flag: str) -> None:
         if flag == "+":

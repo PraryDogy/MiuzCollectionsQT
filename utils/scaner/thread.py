@@ -33,7 +33,7 @@ class Migrate:
 
         if cnf.old_coll_folder is None or cnf.coll_folder == cnf.old_coll_folder:
             return
-
+        
         try:
             q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
             res = sess.execute(q).fetchall()
