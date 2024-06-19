@@ -66,7 +66,7 @@ class BrowseColl(QWidget):
             self.browse_btn.setObjectName(Names.smb_browse_btn)
             self.browse_btn.setStyleSheet(Themes.current)
             
-            if self.blue_count == 4:
+            if self.blue_count == 3:
                 self.blue_count = 0
                 return
 
@@ -99,7 +99,16 @@ class BrowseColl(QWidget):
             Manager.coll_folder = selected_folder
             self.coll_path_label.setText(self.cut_text(text=Manager.coll_folder))
 
-    def finalize(self):        
+    def finalize(self):
+        try:
+            new_images: dict = {}
+            for k, v in cnf.images.items():
+                new_images[k.replace(cnf.coll_folder, Manager.coll_folder)] = v
+            cnf.images.clear()
+            cnf.images = new_images
+        except Exception as e:
+            print(e)
+
         cnf.coll_folder = Manager.coll_folder
 
         utils_signals_app.scaner_stop.emit()
@@ -169,9 +178,9 @@ class WinSmb(WinStandartBase):
         self.init_ui()
 
     def ok_cmd(self, e):
-        self.finished.emit()
         self.browse_coll.finalize()
         self.deleteLater()
+        self.finished.emit()
 
     def keyPressEvent(self, event):
         event.ignore()

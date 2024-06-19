@@ -279,8 +279,16 @@ class WinImageView(WinImgViewBase):
         if not MainUtils.smb_check():
             Manager.win_smb = WinSmb(parent=self)
             Manager.win_smb.show()
-            Manager.win_smb.finished.connect(self.run_thread)
+            Manager.win_smb.finished.connect(self.finalize_smb)
 
+    def finalize_smb(self):
+        name = os.path.basename(self.img_src)
+        for k, v in cnf.images.items():
+            if name == v["filename"] and self.coll == v["collection"]:
+                self.img_src = k
+                self.run_thread()
+                return
+                
     def load_image(self):
         if self.img_src not in Manager.images:
             self.my_set_title(loading=True)

@@ -39,9 +39,9 @@ class Migrate:
             print("migrate load first result err", e)
             return
 
-        old_coll = img_src.split(os.sep + img_coll + os.sep)[0]
+        old_coll_folder = img_src.split(os.sep + img_coll + os.sep)[0]
 
-        if cnf.coll_folder == old_coll:
+        if cnf.coll_folder == old_coll_folder:
             return
 
         try:
@@ -55,7 +55,7 @@ class Migrate:
             return
 
         new_res = [
-            (res_id, src.replace(old_coll, cnf.coll_folder))
+            (res_id, src.replace(old_coll_folder, cnf.coll_folder))
             for res_id, src in res
             ]
         
