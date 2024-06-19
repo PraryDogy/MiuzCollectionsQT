@@ -3,7 +3,7 @@ import os
 import sqlalchemy
 from PyQt5.QtCore import (QEvent, QObject, QPoint, QSize, Qt, QThread, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import (QFocusEvent, QImage, QMouseEvent, QPainter, QPixmap,
+from PyQt5.QtGui import (QFocusEvent, QImage, QMouseEvent, QPaintEvent, QPainter, QPixmap,
                          QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
@@ -125,24 +125,26 @@ class ImageWidget(QLabel):
         self.setCursor(Qt.CursorShape.ArrowCursor)
         self.update()
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.last_mouse_pos = event.pos()
+    def mousePressEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.button() == Qt.LeftButton:
+            self.last_mouse_pos = ev.pos()
+        return super().mousePressEvent(ev)
 
-    def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.LeftButton and self.scale_factor > 1.0:
-            delta = event.pos() - self.last_mouse_pos
+    def mouseMoveEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.buttons() == Qt.LeftButton and self.scale_factor > 1.0:
+            delta = ev.pos() - self.last_mouse_pos
             self.offset += delta
-            self.last_mouse_pos = event.pos()
+            self.last_mouse_pos = ev.pos()
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
             self.update()
+        return super().mouseMoveEvent(ev)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if self.scale_factor > 1.0:
             self.setCursor(Qt.CursorShape.OpenHandCursor)
         return super().mouseReleaseEvent(ev)
 
-    def paintEvent(self, event):
+    def paintEvent(self, a0: QPaintEvent | None) -> None:
         if self.current_pixmap is not None:
             painter = QPainter(self)
             scaled_pixmap = self.current_pixmap.scaled(
@@ -157,6 +159,7 @@ class ImageWidget(QLabel):
                 int((self.height() - scaled_pixmap.height()) / 2)
                 )
             painter.drawPixmap(offset, scaled_pixmap)
+        return super().paintEvent(a0)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.w, self.h = self.width(), self.height()
@@ -227,7 +230,7 @@ class NaviArrowNext(NaviArrow):
         super().__init__("next.svg", parent)
 
 
-class WinImageView(WinImgViewBase):
+class WinImageView(WinImgViewBase, QLabel):
     def __init__(self, parent: QWidget, img_src: str):
         ImageWinUtils.close_same_win()
         self.img_src = img_src
@@ -395,13 +398,13 @@ class WinImageView(WinImgViewBase):
         elif event.key() == Qt.Key_Escape:
             self.my_close(event)
 
-        elif event.modifiers() & Qt.ControlModifier and event.key() == Qt.Key_Equal:
+        elif event.key() == Qt.Key_Equal:
             self.image_label.zoom_in()
 
-        elif event.modifiers() & Qt.ControlModifier and  event.key() == Qt.Key_Minus:
+        elif event.key() == Qt.Key_Minus:
             self.image_label.zoom_out()
 
-        elif event.modifiers() & Qt.ControlModifier and  event.key() == Qt.Key_0:
+        elif event.key() == Qt.Key_0:
             self.image_label.zoom_reset()
 
         super().keyPressEvent(event)
@@ -415,7 +418,7 @@ class WinImageView(WinImgViewBase):
     def focusInEvent(self, a0: QFocusEvent | None) -> None:
         self.setFocus()
         return super().focusInEvent(a0)
-
+    
     def resizeEvent(self, event):
         self.move_navi_btns()
         self.notification.resize(self.width() - 20, 30)
