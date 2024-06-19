@@ -76,12 +76,12 @@ class FindTiffBase:
             bb_name = _TiffUtils.remove_punct(tiff_name)
             bb_name = _TiffUtils.remove_stop_words(bb_name)
 
+            if len(aa_name) <= 3:
+                continue
+
             if aa_name == bb_name:
                 tiff_list.append(tiff)
                 return tiff_list
-
-            if len(bb_name) <= 2:
-                continue
 
             if _TiffUtils.compare_names(src=aa_name, tiff=bb_name):
                 tiff_list.append(tiff)
