@@ -116,13 +116,7 @@ class Thumbnail(QFrame):
             self.image_context = ImageContext(img_src=self.img_src, event=ev, parent=self)
             self.image_context.closed.connect(self.closed_context)
             self.image_context.add_preview_item()
-
-            self.setObjectName(Names.thumbnail_selected)
-            self.setStyleSheet(Themes.current)
-
-            self.title.setObjectName(Names.thumbnail_text_selected)
-            self.title.setStyleSheet(Themes.current)
-
+            self.selected_style()
             self.image_context.show_menu()
             return super().contextMenuEvent(ev)
         except Exception as e:
@@ -130,12 +124,7 @@ class Thumbnail(QFrame):
 
     def closed_context(self):
         try:
-            self.setObjectName(Names.thumbnail_normal)
-            self.setStyleSheet(Themes.current)
-
-            self.title.setObjectName("Fake")
-            self.title.setStyleSheet(Themes.current)
-
+            self.regular_style()
         except Exception as e:
             print(e)
 
@@ -146,3 +135,17 @@ class Thumbnail(QFrame):
             f"\n{cnf.lng.file_name}: {self.img_name}"
             )
         return super().enterEvent(a0)
+
+    def selected_style(self):
+        self.setObjectName(Names.thumbnail_selected)
+        self.setStyleSheet(Themes.current)
+
+        self.title.setObjectName(Names.thumbnail_text_selected)
+        self.title.setStyleSheet(Themes.current)
+
+    def regular_style(self):
+        self.setObjectName(Names.thumbnail_normal)
+        self.setStyleSheet(Themes.current)
+
+        self.title.setObjectName("Fake")
+        self.title.setStyleSheet(Themes.current)
