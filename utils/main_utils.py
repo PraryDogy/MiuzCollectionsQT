@@ -2,10 +2,10 @@ import os
 import platform
 import subprocess
 
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout
 
 from cfg import cnf
-
+from signals import gui_signals_app
 
 class MainUtils:
     @staticmethod
@@ -35,6 +35,8 @@ class MainUtils:
 
                 if os.path.exists(new_coll):
                     cnf.coll_folder = new_coll
+                    gui_signals_app.reload_menu.emit()
+                    gui_signals_app.reload_thumbnails.emit()
                     return True
 
             return False
