@@ -5,7 +5,7 @@ import subprocess
 from PyQt5.QtWidgets import QVBoxLayout
 
 from cfg import cnf
-from signals import gui_signals_app
+from signals import gui_signals_app, utils_signals_app
 
 class MainUtils:
     @staticmethod
@@ -24,7 +24,6 @@ class MainUtils:
 
                 old_coll = os.path.join(os.sep, *old_coll)
 
-
             volumes = [
                 os.path.join(os.sep, "Volumes", i)
                 for i in os.listdir(os.sep + "Volumes")
@@ -34,9 +33,10 @@ class MainUtils:
                 new_coll = os.path.join(os.sep, i.strip(os.sep), old_coll.strip(os.sep))
 
                 if os.path.exists(new_coll):
+                    cnf.old_coll_folder = cnf.coll_folder
                     cnf.coll_folder = new_coll
-                    gui_signals_app.reload_menu.emit()
-                    gui_signals_app.reload_thumbnails.emit()
+                    utils_signals_app.scaner_stop.emit()
+                    utils_signals_app.scaner_start.emit()
                     return True
 
             return False

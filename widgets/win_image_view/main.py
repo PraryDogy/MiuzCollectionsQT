@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from signals import gui_signals_app
+from signals import gui_signals_app, utils_signals_app
 from styles import Names, Themes
 from utils import MainUtils, ReadDesatImage, get_image_size
 
@@ -279,7 +279,7 @@ class WinImageView(WinImgViewBase):
         if not MainUtils.smb_check():
             Manager.win_smb = WinSmb(parent=self)
             Manager.win_smb.show()
-            Manager.win_smb.finished.connect(self.finalize_smb)
+            utils_signals_app.migrate_finished.connect(self.finalize_smb)
 
     def finalize_smb(self):
         name = os.path.basename(self.img_src)

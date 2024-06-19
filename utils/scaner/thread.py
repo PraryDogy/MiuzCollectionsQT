@@ -10,7 +10,7 @@ from sqlalchemy.orm import Query
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from signals import gui_signals_app
+from signals import gui_signals_app, utils_signals_app
 
 from ..image_utils import BytesThumb, UndefBytesThumb
 from ..main_utils import MainUtils
@@ -31,17 +31,20 @@ class Migrate:
     def __init__(self):
         sess = Dbase.get_session()
 
-        try:
-            q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
-            img_src, img_coll = sess.execute(q).first()
-            img_src: str
-        except Exception as e:
-            print("migrate load first result err", e)
-            return
+        # try:
+        #     q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
+        #     img_src, img_coll = sess.execute(q).first()
+        #     img_src: str
+        # except Exception as e:
+        #     print("migrate load first result err", e)
+        #     return
 
-        old_coll_folder = img_src.split(os.sep + img_coll + os.sep)[0]
+        # old_coll_folder = img_src.split(os.sep + img_coll + os.sep)[0]
 
-        if cnf.coll_folder == old_coll_folder:
+        # if cnf.coll_folder == old_coll_folder:
+        #     return
+
+        if cnf.old_coll_folder is None or cnf.coll_folder == cnf.old_coll_folder:
             return
 
         try:
@@ -55,7 +58,7 @@ class Migrate:
             return
 
         new_res = [
-            (res_id, src.replace(old_coll_folder, cnf.coll_folder))
+            (res_id, src.replace(cnf.old_coll_folder, cnf.coll_folder))
             for res_id, src in res
             ]
         
@@ -75,6 +78,7 @@ class Migrate:
         sess.close()
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
+        utils_signals_app.migrate_finished.emit()
 
 
 class TrashRemover:

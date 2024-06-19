@@ -100,17 +100,8 @@ class BrowseColl(QWidget):
             self.coll_path_label.setText(self.cut_text(text=Manager.coll_folder))
 
     def finalize(self):
-        try:
-            new_images: dict = {}
-            for k, v in cnf.images.items():
-                new_images[k.replace(cnf.coll_folder, Manager.coll_folder)] = v
-            cnf.images.clear()
-            cnf.images = new_images
-        except Exception as e:
-            print(e)
-
+        cnf.old_coll_folder = cnf.coll_folder
         cnf.coll_folder = Manager.coll_folder
-
         utils_signals_app.scaner_stop.emit()
         utils_signals_app.scaner_start.emit()
 

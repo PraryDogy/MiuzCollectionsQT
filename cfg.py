@@ -100,6 +100,7 @@ class Dymanic:
         self.date_start_text: str = None # datetime as readable text
         self.date_end_text: str = None # datetime as readable text
         self.lng: Eng = Eng()
+        self.old_coll_folder: str = None
 
 
 class AppInfo:
