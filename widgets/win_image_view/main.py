@@ -230,7 +230,7 @@ class NaviArrowNext(NaviArrow):
         super().__init__("next.svg", parent)
 
 
-class WinImageView(WinImgViewBase, QLabel):
+class WinImageView(WinImgViewBase):
     def __init__(self, parent: QWidget, img_src: str):
         ImageWinUtils.close_same_win()
         self.img_src = img_src
