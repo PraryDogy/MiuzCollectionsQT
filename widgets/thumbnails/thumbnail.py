@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QEvent, QMimeData, Qt, QUrl, QTimer
+from PyQt5.QtCore import QEvent, QMimeData, Qt, QUrl
 from PyQt5.QtGui import QContextMenuEvent, QDrag
 from PyQt5.QtWidgets import QAction, QApplication, QFrame, QLabel, QSpacerItem
 

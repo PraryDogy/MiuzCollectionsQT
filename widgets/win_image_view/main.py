@@ -238,10 +238,6 @@ class WinImageView(WinImgViewBase):
         self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
 
-        self.fsize_img_timer = QTimer(self)
-        self.fsize_img_timer.setSingleShot(True)
-        self.fsize_img_timer.timeout.connect(self.run_thread)
-
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
         self.mouse_move_timer.setInterval(2000)
@@ -274,12 +270,9 @@ class WinImageView(WinImgViewBase):
 
         self.setFocus()
         self.center_win(parent)
-        self.load_image(interval=200)
+        self.load_image()
 
-        smb_timer = QTimer(self)
-        smb_timer.setSingleShot(True)
-        smb_timer.timeout.connect(self.smb_check_first)
-        smb_timer.start(300)
+        QTimer.singleShot(300, self.smb_check_first)
 
     def smb_check_first(self):
         if not MainUtils.smb_check():
@@ -287,7 +280,7 @@ class WinImageView(WinImgViewBase):
             Manager.win_smb.show()
             Manager.win_smb.finished.connect(self.run_thread)
 
-    def load_image(self, interval: int = 50):
+    def load_image(self):
         if self.img_src not in Manager.images:
             self.my_set_title(loading=True)
 
@@ -311,7 +304,7 @@ class WinImageView(WinImgViewBase):
             pixmap.loadFromData(res)
             self.image_label.set_image(pixmap)
 
-        self.fsize_img_timer.start(interval)
+        QTimer.singleShot(50, self.run_thread)
 
     def move_navi_btns(self):
         navi_h = (self.height() // 2) - (self.navi_next.height() // 2)
@@ -444,10 +437,7 @@ class WinImageView(WinImgViewBase):
             wid: QLabel = cnf.images[self.img_src]
             wid.selected_style() # thumbnails > Thumbnail
             gui_signals_app.move_to_wid.emit(wid)
-            timer = QTimer(parent=MainUtils.get_central_widget())
-            timer.setSingleShot(True)
-            timer.timeout.connect(lambda: self.after_close(wid=wid))
-            timer.start(1500)
+            QTimer.singleShot(1500, lambda: self.after_close(wid=wid))
         except (KeyError, Exception) as e:
             print(e)
 

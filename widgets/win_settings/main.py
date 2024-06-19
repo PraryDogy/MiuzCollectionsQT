@@ -203,17 +203,11 @@ class UpdaterWidget(QWidget):
         self.btn.setText(cnf.lng.download_update)
 
     def no_connection_btn(self):
-        timer = QTimer(self)
-        timer.setSingleShot(True)
-        timer.timeout.connect(self.no_connection_btn_style)
-        timer.start(1000)
+        QTimer.singleShot(1000, self.no_connection_btn_style)
 
     def no_connection_btn_style(self):
         self.btn.setText(cnf.lng.no_connection)
-        timer = QTimer(self)
-        timer.setSingleShot(True)
-        timer.timeout.connect(lambda: self.btn.setText(cnf.lng.download_update))
-        timer.start(1500)
+        QTimer.singleShot(1500, lambda: self.btn.setText(cnf.lng.download_update))
 
 
 class WinSettings(WinStandartBase):
@@ -224,11 +218,7 @@ class WinSettings(WinStandartBase):
         self.disable_min_max()
         self.set_title(cnf.lng.settings)
 
-        # self.setFixedWidth(420)
-        temp = QTimer(self)
-        temp.setSingleShot(True)
-        temp.timeout.connect(self.init_ui)
-        temp.start(10)
+        QTimer.singleShot(10, self.init_ui)
         self.setFixedSize(420, 540)
         self.center_win(parent)
         self.setFocus()

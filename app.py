@@ -159,10 +159,7 @@ class App(QApplication):
         self.installEventFilter(self)
         self.aboutToQuit.connect(self.on_exit)
 
-        self.after_start_timer = QTimer(self)
-        self.after_start_timer.setSingleShot(True)
-        self.after_start_timer.timeout.connect(self.after_start)
-        self.after_start_timer.start(100)
+        QTimer.singleShot(100, self.after_start)
 
     def eventFilter(self, obj, event: QEvent):
         if event.type() == QEvent.ApplicationActivate:

@@ -30,14 +30,9 @@ class Notification(QFrame):
 
         h_layout.addStretch(1)
 
-        self.hide_timer = QTimer(self)
-        self.hide_timer.setInterval(3000)
-        self.hide_timer.setSingleShot(True)
-        self.hide_timer.timeout.connect(self.hide)
-
         self.hide()
 
     def show_notify(self, text: str):
         self.label.setText(text)
         self.show()
-        self.hide_timer.start()
+        QTimer.singleShot(3000, self.hide)
