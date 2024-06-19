@@ -64,5 +64,3 @@ class Names:
     img_view_bg = "img_view_bg"
 
     up_btn = "up_btn"
-
-    thumbnail_text_selected = "thumbnail_text_selected"

@@ -137,15 +137,11 @@ class Thumbnail(QFrame):
         return super().enterEvent(a0)
 
     def selected_style(self):
-        self.setObjectName(Names.thumbnail_selected)
-        self.setStyleSheet(Themes.current)
-
-        self.title.setObjectName(Names.thumbnail_text_selected)
-        self.title.setStyleSheet(Themes.current)
+        for i in (self, self.title):
+            i.setObjectName(Names.thumbnail_selected)
+            i.setStyleSheet(Themes.current)
 
     def regular_style(self):
-        self.setObjectName(Names.thumbnail_normal)
-        self.setStyleSheet(Themes.current)
-
-        self.title.setObjectName("Fake")
-        self.title.setStyleSheet(Themes.current)
+        for i in (self, self.title):
+            i.setObjectName(Names.thumbnail_normal)
+            i.setStyleSheet(Themes.current)
