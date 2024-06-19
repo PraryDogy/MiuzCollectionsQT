@@ -137,7 +137,3 @@ class CollectionBtn(QLabel):
             return
 
         self.setToolTip(self.true_name)
-
-    def leaveEvent(self, event):
-        super().leaveEvent(event)
-        self.setToolTip("")
