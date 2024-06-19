@@ -136,4 +136,4 @@ class CollectionBtn(QLabel):
         if self.true_name == cnf.ALL_COLLS:
             return
 
-        self.setToolTip(self.true_name)
+        self.setToolTip(f"{cnf.lng.collection}: {self.true_name}")

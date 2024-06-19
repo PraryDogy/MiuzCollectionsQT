@@ -351,3 +351,7 @@ QScrollBar:vertical {
     padding: 2px;
 }
 
+QToolTip {
+    margin: 5 5 5 5;
+    font-size: 12pt;
+}
