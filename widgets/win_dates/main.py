@@ -130,7 +130,7 @@ class WinDates(DatesWinBase):
         self.content_layout.addLayout(buttons_layout)
 
         buttons_layout.addStretch(1)
-        buttons_layout.setAlignment(Qt.AlignCenter)
+        buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.ok_label = Btn(cnf.lng.ok)
         self.ok_label.mouseReleaseEvent = self.ok_cmd
         buttons_layout.addWidget(self.ok_label)

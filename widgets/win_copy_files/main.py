@@ -30,7 +30,7 @@ class WinCopyFiles(WinStandartBase, QObject):
 
         self.cancel_btn = Btn(cnf.lng.cancel)
         self.cancel_btn.mouseReleaseEvent = self.cancel_btn_cmd
-        self.content_layout.addWidget(self.cancel_btn, alignment=Qt.AlignRight)
+        self.content_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.center_win(parent=parent)
 

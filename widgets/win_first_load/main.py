@@ -159,7 +159,7 @@ class WinFirstLoad(WinStandartBase):
 
         self.ok_btn = Btn(cnf.lng.ok)
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
-        self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignCenter)
+        self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def reload_ui(self):
         MainUtils.clear_layout(self.content_layout)

@@ -126,11 +126,11 @@ class WinMain(WinBase):
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_W:
-            if a0.modifiers() == Qt.ControlModifier:
+            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 self.mycloseEvent(a0)
 
         elif a0.key() == Qt.Key.Key_F:
-            if a0.modifiers() == Qt.ControlModifier:
+            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 gui_signals_app.set_focus_search.emit()
 
         elif a0.key() == Qt.Key.Key_Escape:

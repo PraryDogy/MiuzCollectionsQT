@@ -21,7 +21,7 @@ class DatesBtn(Btn):
     def __init__(self):
         super().__init__(text=cnf.lng.dates)
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         gui_signals_app.set_dates_btn_blue.connect(self.set_blue_style)
         gui_signals_app.set_dates_btn_normal.connect(self.set_normal_style)
@@ -51,7 +51,7 @@ class FilterBtn(Btn):
     def __init__(self, text: str, true_name: str):
         super().__init__(text=text)
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.key = true_name
 

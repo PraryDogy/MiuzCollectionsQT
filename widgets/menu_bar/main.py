@@ -65,7 +65,7 @@ class AboutWin(WinSmallBase):
         icon = QSvgWidget(os.path.join("icon", "icon.svg"))
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(150, 130)
-        self.content_layout.addWidget(icon, alignment=Qt.AlignCenter)
+        self.content_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.content_layout.addSpacerItem(QSpacerItem(0, 20))
 

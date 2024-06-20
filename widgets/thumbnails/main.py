@@ -29,7 +29,7 @@ class Thumbnails(QScrollArea):
         self.setObjectName(Names.th_scrollbar)
         self.setStyleSheet(Themes.current)
 
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         # Создаем фрейм для виджетов в области скролла
         self.scroll_area_widget = QWidget(parent=self)
@@ -109,7 +109,7 @@ class Thumbnails(QScrollArea):
         self.thumbnails_layout.addWidget(title_label)
 
         grid_layout = QGridLayout()
-        grid_layout.setAlignment(Qt.AlignLeft)
+        grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         grid_layout.setContentsMargins(0, 0, 0, 30)
 
         idx = 0

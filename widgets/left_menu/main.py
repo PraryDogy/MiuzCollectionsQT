@@ -18,7 +18,7 @@ class BaseLeftMenu(QScrollArea):
         self.setWidgetResizable(True)
         self.setObjectName(Names.menu_scrollbar)
         self.setStyleSheet(Themes.current)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         scroll_widget = QWidget()
         scroll_widget.setObjectName(Names.menu_scrollbar_qwidget)

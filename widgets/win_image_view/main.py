@@ -85,7 +85,7 @@ class LoadImageThread(QThread, QObject):
 class ImageWidget(QLabel):
     def __init__(self):
         super().__init__()
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.current_pixmap: QPixmap = None
         self.scale_factor: float = 1.0
@@ -108,7 +108,7 @@ class ImageWidget(QLabel):
 
     def zoom_in(self):
         self.scale_factor *= 1.1
-        self.setCursor(Qt.OpenHandCursor)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
         self.update()
 
     def zoom_out(self):
@@ -122,12 +122,12 @@ class ImageWidget(QLabel):
         self.update()
 
     def mousePressEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() == Qt.LeftButton:
+        if ev.button() == Qt.MouseButton.LeftButton:
             self.last_mouse_pos = ev.pos()
         return super().mousePressEvent(ev)
 
     def mouseMoveEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.buttons() == Qt.LeftButton and self.scale_factor > 1.0:
+        if ev.buttons() == Qt.MouseButton.LeftButton and self.scale_factor > 1.0:
             delta = ev.pos() - self.last_mouse_pos
             self.offset += delta
             self.last_mouse_pos = ev.pos()
@@ -381,22 +381,22 @@ class WinImageView(WinImgViewBase):
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
     def keyPressEvent(self, ev: QKeyEvent | None) -> None:
-        if ev.key() == Qt.Key_Left:
+        if ev.key() == Qt.Key.Key_Left:
             self.switch_image(-1)
 
-        elif ev.key() == Qt.Key_Right:
+        elif ev.key() == Qt.Key.Key_Right:
             self.switch_image(1)
 
-        elif ev.key() == Qt.Key_Escape:
+        elif ev.key() == Qt.Key.Key_Escape:
             self.my_close(ev)
 
-        elif ev.key() == Qt.Key_Equal:
+        elif ev.key() == Qt.Key.Key_Equal:
             self.image_label.zoom_in()
 
-        elif ev.key() == Qt.Key_Minus:
+        elif ev.key() == Qt.Key.Key_Minus:
             self.image_label.zoom_out()
 
-        elif ev.key() == Qt.Key_0:
+        elif ev.key() == Qt.Key.Key_0:
             self.image_label.zoom_reset()
 
         return super().keyPressEvent(ev)

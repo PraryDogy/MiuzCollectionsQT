@@ -17,7 +17,7 @@ class ResetDatesBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.reset_dates)
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_dates_btn)
         self.setStyleSheet(Themes.current)
 
@@ -35,7 +35,7 @@ class ResetSearchBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.reset_search)
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_search_btn)
         self.setStyleSheet(Themes.current)
 
@@ -52,7 +52,7 @@ class ResetFiltersBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.show_all)
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_filters_btn)
         self.setStyleSheet(Themes.current)
 
@@ -69,7 +69,7 @@ class ShowAllBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.show_all)
         self.setFixedSize(Manager.btn_w, Manager.btn_h)
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_show_all_btn)
         self.setStyleSheet(Themes.current)
 

@@ -78,7 +78,7 @@ class TitleBar(QFrame):
         self.main_layout.addWidget(self.btns)
 
         self.title = QLabel()
-        self.main_layout.addWidget(self.title, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.title, alignment=Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addSpacerItem(QSpacerItem(self.btns.width(), 0))
 
         self.oldPos = self.pos()
@@ -106,8 +106,8 @@ class TitleBar(QFrame):
 class WinBase(QMainWindow, QObject):
     def __init__(self, close_func: callable, parent=None):
         super().__init__(parent=parent)
-        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         central_widget = QWidget()
         central_widget.setContentsMargins(1, 1, 1, 1)
@@ -139,7 +139,7 @@ class WinBase(QMainWindow, QObject):
         return super().resizeEvent(a0)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() == Qt.Key_Escape:
+        if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
     

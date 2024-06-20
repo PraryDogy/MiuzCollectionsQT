@@ -84,7 +84,7 @@ class BaseLabel(QLabel):
 
 class LeftLabel(BaseLabel):
     def __init__(self, text, ww):
-        super().__init__(text=text, align=Qt.AlignRight, ww=ww)
+        super().__init__(text=text, align=Qt.AlignmentFlag.AlignRight, ww=ww)
         self.contextMenuEvent = lambda event: None
 
 
@@ -113,9 +113,9 @@ class CustomContextRLabel(ContextMenuBase):
 
 class RightLabel(BaseLabel):
     def __init__(self, text, ww):
-        super().__init__(text=text, align=Qt.AlignLeft, ww=ww)
-        self.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.setCursor(Qt.IBeamCursor)
+        super().__init__(text=text, align=Qt.AlignmentFlag.AlignLeft, ww=ww)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.my_context = CustomContextRLabel(parent=self, event=ev)

@@ -10,7 +10,7 @@ class LimitBtn(Btn):
     def __init__(self):
         super().__init__(text=cnf.lng.show_more)
         self.setFixedWidth(100)
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.current_limit += cnf.LIMIT

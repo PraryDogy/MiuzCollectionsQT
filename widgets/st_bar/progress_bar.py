@@ -21,7 +21,7 @@ class ProgressBar(QWidget):
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setTextVisible(False)
-        self.progress_bar.setAlignment(Qt.AlignCenter)
+        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.progress_bar)
 
         gui_signals_app.progressbar_value.connect(self.progressbar_value)
