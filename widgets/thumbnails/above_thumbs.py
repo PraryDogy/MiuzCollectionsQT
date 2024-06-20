@@ -20,8 +20,6 @@ class ResetDatesBtn(QLabel):
         self.setObjectName(Names.th_reset_dates_btn)
         self.setStyleSheet(Themes.current)
 
-        print(self.width(), self.height())
-
     def mouseReleaseEvent(self, event):
         cnf.date_start, cnf.date_end = None, None
         cnf.current_limit = cnf.LIMIT

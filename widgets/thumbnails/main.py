@@ -70,6 +70,7 @@ class Thumbnails(QScrollArea):
 
         if thumbs_dict:
             above_thumbs = AboveThumbs(self.width())
+            above_thumbs.setContentsMargins(9, 0, 0, 0)
             self.thumbnails_layout.addWidget(above_thumbs)
 
             for some_date, images_list in thumbs_dict.items():
@@ -77,6 +78,7 @@ class Thumbnails(QScrollArea):
 
         else:
             no_images = AboveThumbsNoImages(self.width())
+            no_images.setContentsMargins(9, 0, 0, 0)
             self.thumbnails_layout.addWidget(no_images)
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
@@ -103,6 +105,7 @@ class Thumbnails(QScrollArea):
 
         img_src_list = [img_dict["src"] for img_dict in images_list]
         title_label = Title(title=images_date, images=img_src_list, width=self.width())
+        title_label.setContentsMargins(9, 0, 0, 0)
         self.thumbnails_layout.addWidget(title_label)
 
         grid_layout = QGridLayout()
