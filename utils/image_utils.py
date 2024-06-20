@@ -56,7 +56,7 @@ class ReadImage:
         return cv2.cvtColor(self.rgb_image, cv2.COLOR_BGR2RGB)
 
 
-class PixmapThumb(QPixmap):
+class PixmapFromBytes(QPixmap):
     def __init__(self, byte_array: QByteArray) -> QPixmap:
         super().__init__()
 
@@ -70,6 +70,7 @@ class PixmapThumb(QPixmap):
 
         crop = self.copy(ax, ay, cnf.THUMBSIZE, cnf.THUMBSIZE)
         self.swap(crop)
+
 
 class UndefBytesThumb(io.BytesIO,  MainUtils):
     def __init__(self):
