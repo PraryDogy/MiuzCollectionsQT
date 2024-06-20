@@ -20,7 +20,7 @@ from ..win_smb import WinSmb
 
 
 class Manager:
-    images: dict = {}
+    loaded_images: dict = {}
     threads: list = []
     win_smb = None
 
@@ -50,16 +50,16 @@ class LoadImageThread(QThread, QObject):
                 print("image viewer thread no connection")
                 return
 
-            if self.img_src not in Manager.images:
+            if self.img_src not in Manager.loaded_images:
 
                 img = ReadImage(src=self.img_src, desaturate_value=0.85)
                 img = img.get_rgb_image()
                 q_image = QImage(img.data, img.shape[1], img.shape[0],
                                 img.shape[1] * 3, QImage.Format_RGB888)
-                Manager.images[self.img_src] = q_image
+                Manager.loaded_images[self.img_src] = q_image
 
             else:
-                q_image = Manager.images[self.img_src]
+                q_image = Manager.loaded_images[self.img_src]
 
         except Exception as e:
             print("image viewer cant open image, open with pixmap")
@@ -67,12 +67,12 @@ class LoadImageThread(QThread, QObject):
 
             q_image = QImage()
             q_image.load(self.img_src)
-            Manager.images[self.img_src] = q_image
+            Manager.loaded_images[self.img_src] = q_image
 
         pixmap = QPixmap.fromImage(q_image)
 
-        if len(Manager.images) > 50:
-            Manager.images.pop(next(iter(Manager.images)))
+        if len(Manager.loaded_images) > 50:
+            Manager.loaded_images.pop(next(iter(Manager.loaded_images)))
 
         self.finished.emit(
             {"image": pixmap,
@@ -218,126 +218,133 @@ class NextImageBtn(SwitchImageBtn):
 class WinImageView(WinImgViewBase):
     def __init__(self, parent: QWidget, img_src: str):
         ImageWinUtils.close_same_win()
+
         self.img_src = img_src
         self.img_thread = None
-        self.coll = None
+        self.collection = None
 
         super().__init__(close_func=self.my_close)
         self.setMinimumSize(QSize(500, 400))
-        self.my_set_title()
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
         self.installEventFilter(self)
 
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
-        self.mouse_move_timer.setInterval(2000)
-        self.mouse_move_timer.timeout.connect(self.hide_navi_btns)
+        self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
         self.image_label = ImageWidget()
-        self.content_layout.addWidget(
-            self.image_label,
-            )
+        self.content_layout.addWidget(self.image_label)
 
         self.notification = Notification(self.content_wid)
-        self.notification.resize(self.width() - 20, 30)
-        self.notification.move(10, 2)
+        self.notification.move(10, 2) # 10 left side, 10 right side, 2 top side
         gui_signals_app.noti_img_view.connect(self.notification.show_notify)
 
-        self.navi_prev = PrevImageBtn(self.content_wid)
-        self.navi_prev.mouseReleaseEvent = lambda e: self.navi_switch_img("-")
+        self.prev_image_btn = PrevImageBtn(self.content_wid)
+        self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
 
-        self.navi_next = NextImageBtn(self.content_wid)
-        self.navi_next.mouseReleaseEvent = lambda e: self.navi_switch_img("+")
+        self.next_image_btn = NextImageBtn(self.content_wid)
+        self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
 
-        self.navi_zoom = ZoomBtns(parent=self.content_wid)
-        self.navi_zoom.bind_btns(
-            lambda e: self.image_label.zoom_out(),
-            lambda e: self.image_label.zoom_in(),
-            lambda e : self.image_label.zoom_reset()
-            )
-        self.hide_navi_btns()
+        self.zoom_btns = ZoomBtns(parent=self.content_wid)
+        self.zoom_btns.zoom_in.mouseReleaseEvent = lambda e: self.image_label.zoom_in()
+        self.zoom_btns.zoom_out.mouseReleaseEvent = lambda e: self.image_label.zoom_out()
+        self.zoom_btns.zoom_fit.mouseReleaseEvent = lambda e: self.image_label.zoom_reset()
 
+        self.hide_all_buttons()
         self.setFocus()
-        self.center_win(parent)
+        self.center_win(parent=parent)
         self.load_thumbnail()
 
         QTimer.singleShot(300, self.smb_check_first)
 
+# SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
+
     def smb_check_first(self):
-        smb = MainUtils.smb_check()
-        if not smb:
+        if not MainUtils.smb_check():
             utils_signals_app.migrate_finished.connect(self.finalize_smb)
-            Manager.win_smb = WinSmb(parent=self)
-            Manager.win_smb.show()
+            win_smb = WinSmb(parent=self)
+            Manager.win_smb = win_smb
+            win_smb.show()
 
     def finalize_smb(self):
         name = os.path.basename(self.img_src)
         for k, v in cnf.images.items():
-            if name == v["filename"] and self.coll == v["collection"]:
+            if name == v["filename"] and self.collection == v["collection"]:
                 self.img_src = k
                 self.load_image_thread()
                 return
                 
     def load_thumbnail(self):
-        if self.img_src not in Manager.images:
-            self.my_set_title(loading=True)
+        if self.img_src not in Manager.loaded_images:
+            self.set_title(cnf.lng.loading)
 
             q = (sqlalchemy.select(ThumbsMd.img150)
                 .filter(ThumbsMd.src == self.img_src))
             session = Dbase.get_session()
 
             try:
-                res = session.execute(q).first()[0]
+                thumbnail = session.execute(q).first()[0]
+                session.close()
             except Exception as e:
                 print(e)
                 return
-            finally:
-                session.close()    
 
             pixmap = QPixmap()
-            pixmap.loadFromData(res)
+            pixmap.loadFromData(thumbnail)
             self.image_label.set_image(pixmap)
 
         self.load_image_thread()
 
-    def move_navi_btns(self):
-        navi_h = (self.height() // 2) - (self.navi_next.height() // 2)
-        navi_next_w = self.width() - self.navi_next.width() - 12
-        self.navi_prev.move(10, navi_h)
-        self.navi_next.move(navi_next_w, navi_h)
-
-        zoom_w = self.width() // 2 - self.navi_zoom.width() // 2
-        zoom_h = self.height() - self.navi_zoom.height() - 50
-        self.navi_zoom.move(zoom_w, zoom_h)
-
-    def hide_navi_btns(self):
-        for i in (self.navi_prev, self.navi_next, self.navi_zoom):
-            if i.underMouse():
-                return
-        self.navi_zoom.hide()
-        self.navi_prev.hide()
-        self.navi_next.hide()
-
     def load_image_thread(self):
         self.img_thread = LoadImageThread(self.img_src)
-        self.img_thread.finished.connect(self.finalize_thread)
+        self.img_thread.finished.connect(self.load_image_finished)
         self.img_thread.start()
         Manager.threads.append(self.img_thread)
 
-    def finalize_thread(self, data: dict):
+    def load_image_finished(self, data: dict):
         if data["width"] == 0 or data["src"] != self.img_src:
             return
         
         self.image_label.set_image(data["image"])
-        self.my_set_title()
+        self.set_image_title()
         Manager.threads.remove(self.img_thread)
+
+    def my_close(self, event):
+        try:
+            # wid = thumbnails > thumbnail.py > Thumbnail
+            wid: QLabel = cnf.images[self.img_src]["widget"]
+            wid.selected_style()
+            gui_signals_app.move_to_wid.emit(wid)
+            QTimer.singleShot(1500, lambda: self.after_close(wid=wid))
+        except (KeyError, Exception) as e:
+            print(e)
+
+        Manager.loaded_images.clear()
+        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
+        self.deleteLater()
+
+    def after_close(self, wid: QLabel):
+        try:
+            # wid = thumbnails > thumbnail.py > Thumbnail
+            wid.regular_style()
+        except Exception as e:
+            print(e)
+
+# GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
+
+    def hide_all_buttons(self):
+        for i in (self.prev_image_btn, self.next_image_btn, self.zoom_btns):
+            if i.underMouse():
+                return
+        self.zoom_btns.hide()
+        self.prev_image_btn.hide()
+        self.next_image_btn.hide()
 
     def switch_image(self, offset):
         try:
             keys = list(cnf.images.keys())
             current_index = keys.index(self.img_src)
         except Exception as e:
-            print(e)
             keys = list(cnf.images.keys())
             current_index = 0
 
@@ -352,28 +359,26 @@ class WinImageView(WinImgViewBase):
             return text[:limit] + "..."
         return text
 
-    def my_set_title(self, loading=False):
-        if loading:
-            self.set_title(cnf.lng.loading)
-            return
-
+    def set_image_title(self):
         try:
             w, h = get_image_size(self.img_src)
         except Exception:
             w, h = "?", "?"
-        self.coll = MainUtils.get_coll_name(self.img_src)
+        self.collection = MainUtils.get_coll_name(self.img_src)
         cut_coll = self.cut_text(MainUtils.get_coll_name(self.img_src))
         name = self.cut_text(os.path.basename(self.img_src))
 
         self.set_title(f"{w}x{h} - {cut_coll} - {name}")
 
-    def navi_switch_img(self, flag: str) -> None:
+    def button_switch_cmd(self, flag: str) -> None:
         if flag == "+":
             self.switch_image(1)
         else:
             self.switch_image(-1)
         self.setFocus()
         self.image_label.setCursor(Qt.CursorShape.ArrowCursor)
+
+# EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Left:
@@ -406,43 +411,29 @@ class WinImageView(WinImgViewBase):
         self.setFocus()
         return super().focusInEvent(a0)
     
-    def resizeEvent(self, event):
-        self.move_navi_btns()
-        self.notification.resize(self.width() - 20, 30)
-        return super().resizeEvent(event)
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2
+        right_window_side = a0.size().width() - self.next_image_btn.width()
+        self.prev_image_btn.move(10, vertical_center)
+        self.next_image_btn.move(right_window_side - 10, vertical_center)
+
+        horizontal_center = a0.size().width() // 2 - self.zoom_btns.width() // 2
+        bottom_window_side = a0.size().height() - self.zoom_btns.height()
+        self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
+
+        self.notification.resize(a0.size().width() - 20, 30)
+
+        return super().resizeEvent(a0)
     
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == 129: # mouse move
             self.mouse_move_timer.stop()
-            self.navi_prev.show()
-            self.navi_next.show()
-            self.navi_zoom.show()
-            self.mouse_move_timer.start()
+            self.prev_image_btn.show()
+            self.next_image_btn.show()
+            self.zoom_btns.show()
+            self.mouse_move_timer.start(2000)
         return super().eventFilter(a0, a1)
 
     def leaveEvent(self, a0: QEvent | None) -> None:
-        self.hide_navi_btns()
+        self.hide_all_buttons()
         return super().leaveEvent(a0)
-    
-    def update_geometry(self):
-        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
-
-    def my_close(self, event):
-        try:
-            wid: QLabel = cnf.images[self.img_src]["widget"]
-            wid.selected_style() # thumbnails > Thumbnail
-            gui_signals_app.move_to_wid.emit(wid)
-            QTimer.singleShot(1500, lambda: self.after_close(wid=wid))
-        except (KeyError, Exception) as e:
-            print(e)
-
-        Manager.images.clear()
-        self.update_geometry()
-        self.deleteLater()
-        event.ignore()
-
-    def after_close(self, wid: QLabel):
-        try:
-            wid.regular_style() # thumbnails > Thumbnail
-        except Exception as e:
-            print(e)
