@@ -3,7 +3,7 @@ import os
 import sqlalchemy
 from PyQt5.QtCore import (QEvent, QObject, QPoint, QSize, Qt, QThread, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import (QFocusEvent, QImage, QMouseEvent, QPaintEvent, QPainter, QPixmap,
+from PyQt5.QtGui import (QContextMenuEvent, QImage, QKeyEvent, QMouseEvent, QPaintEvent, QPainter, QPixmap,
                          QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
@@ -380,37 +380,32 @@ class WinImageView(WinImgViewBase):
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Left:
+    def keyPressEvent(self, ev: QKeyEvent | None) -> None:
+        if ev.key() == Qt.Key_Left:
             self.switch_image(-1)
 
-        elif event.key() == Qt.Key_Right:
+        elif ev.key() == Qt.Key_Right:
             self.switch_image(1)
 
-        elif event.key() == Qt.Key_Escape:
-            self.my_close(event)
+        elif ev.key() == Qt.Key_Escape:
+            self.my_close(ev)
 
-        elif event.key() == Qt.Key_Equal:
+        elif ev.key() == Qt.Key_Equal:
             self.image_label.zoom_in()
 
-        elif event.key() == Qt.Key_Minus:
+        elif ev.key() == Qt.Key_Minus:
             self.image_label.zoom_out()
 
-        elif event.key() == Qt.Key_0:
+        elif ev.key() == Qt.Key_0:
             self.image_label.zoom_reset()
 
-        super().keyPressEvent(event)
+        return super().keyPressEvent(ev)
 
-    def contextMenuEvent(self, event):
-        self.image_context = ImageContext(
-            parent=self, img_src=self.img_src, event=event
-            )
+    def  contextMenuEvent(self, event: QContextMenuEvent | None) -> None:
+        self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)
         self.image_context.show_menu()
+        return super().contextMenuEvent(event)
 
-    def focusInEvent(self, a0: QFocusEvent | None) -> None:
-        self.setFocus()
-        return super().focusInEvent(a0)
-    
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2
         right_window_side = a0.size().width() - self.next_image_btn.width()
@@ -424,9 +419,9 @@ class WinImageView(WinImgViewBase):
         self.notification.resize(a0.size().width() - 20, 30)
 
         return super().resizeEvent(a0)
-    
+
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
-        if a1.type() == 129: # mouse move
+        if a1.type() == 129:
             self.mouse_move_timer.stop()
             self.prev_image_btn.show()
             self.next_image_btn.show()

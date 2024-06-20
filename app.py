@@ -1,9 +1,8 @@
 import os
-import subprocess
 import sys
 
-from PyQt5.QtCore import QEvent, Qt, QTimer
-from PyQt5.QtGui import QResizeEvent, QIcon
+from PyQt5.QtCore import QEvent, Qt, QTimer, QObject
+from PyQt5.QtGui import QKeyEvent, QResizeEvent, QIcon
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
                              QMainWindow, QPushButton, QVBoxLayout, QWidget)
 
@@ -125,17 +124,19 @@ class WinMain(WinBase):
         self.hide()
         event.ignore()
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_W:
-            if event.modifiers() == Qt.ControlModifier:
-                self.mycloseEvent(event)
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_W:
+            if a0.modifiers() == Qt.ControlModifier:
+                self.mycloseEvent(a0)
 
-        elif event.key() == Qt.Key_F:
-            if event.modifiers() == Qt.ControlModifier:
+        elif a0.key() == Qt.Key.Key_F:
+            if a0.modifiers() == Qt.ControlModifier:
                 gui_signals_app.set_focus_search.emit()
 
-        else:
-            super(QMainWindow, self).keyPressEvent(event)
+        elif a0.key() == Qt.Key.Key_Escape:
+            a0.ignore()
+
+        # return super().keyPressEvent(a0)
 
     def reload_title(self):
         self.set_title(self.check_coll())
@@ -161,17 +162,15 @@ class App(QApplication):
 
         QTimer.singleShot(100, self.after_start)
 
-    def eventFilter(self, obj, event: QEvent):
-        if event.type() == QEvent.ApplicationActivate:
-            # self.main_win.show()
+    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
+        if a1.type() == QEvent.Type.ApplicationActivate:
             for widget in QApplication.topLevelWidgets():
                 if isinstance(widget, QMainWindow):
                     if widget.isMaximized():
                         widget.showMaximized()
                     else:
                         widget.showNormal()
-
-        return super().eventFilter(obj, event)
+        return super().eventFilter(a0, a1)
     
     def on_exit(self):
         utils_signals_app.scaner_stop.emit()

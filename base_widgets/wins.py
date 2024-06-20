@@ -1,4 +1,5 @@
-from PyQt5.QtCore import QEvent, QPoint, Qt
+from PyQt5.QtCore import QEvent, QPoint, Qt, QObject
+from PyQt5.QtGui import QKeyEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
@@ -100,7 +101,7 @@ class TitleBar(QFrame):
             """)
 
 
-class WinBase(QMainWindow):
+class WinBase(QMainWindow, QObject):
     def __init__(self, close_func: callable, parent=None):
         super().__init__(parent=parent)
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
@@ -127,14 +128,19 @@ class WinBase(QMainWindow):
             grip.resize(self.gripSize, self.gripSize)
             self.grips.append(grip)
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
         rect = self.rect()
         self.grips[1].move(rect.right() - self.gripSize, 0)
         self.grips[2].move(
             rect.right() - self.gripSize, rect.bottom() - self.gripSize)
         self.grips[3].move(0, rect.bottom() - self.gripSize)
+        return super().resizeEvent(a0)
 
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+    
     def center_win(self, parent: QWidget):
         try:
             geo = self.geometry()
@@ -142,11 +148,6 @@ class WinBase(QMainWindow):
             self.setGeometry(geo)
         except (RuntimeError, Exception) as e:
             print(e)
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.deleteLater()
-        super().keyPressEvent(event)
 
     def fit_size(self):
         self.adjustSize()
