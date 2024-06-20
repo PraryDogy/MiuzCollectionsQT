@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV
@@ -20,13 +21,14 @@ class ResetDatesBtn(QLabel):
         self.setObjectName(Names.th_reset_dates_btn)
         self.setStyleSheet(Themes.current)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.date_start, cnf.date_end = None, None
         cnf.current_limit = cnf.LIMIT
 
         gui_signals_app.set_dates_btn_normal.emit()
         gui_signals_app.reload_thumbnails.emit()
         gui_signals_app.scroll_top.emit()
+        return super().mouseReleaseEvent(ev)
 
 
 class ResetSearchBtn(QLabel):
@@ -37,12 +39,13 @@ class ResetSearchBtn(QLabel):
         self.setObjectName(Names.th_reset_search_btn)
         self.setStyleSheet(Themes.current)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.current_limit = cnf.LIMIT
 
         gui_signals_app.clear_search.emit()
         gui_signals_app.reload_thumbnails.emit()
         gui_signals_app.scroll_top.emit()
+        return super().mouseReleaseEvent(ev)
 
 
 class ResetFiltersBtn(QLabel):
@@ -53,12 +56,13 @@ class ResetFiltersBtn(QLabel):
         self.setObjectName(Names.th_reset_filters_btn)
         self.setStyleSheet(Themes.current)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.current_limit = cnf.LIMIT
 
         gui_signals_app.disable_filters.emit()
         gui_signals_app.reload_thumbnails.emit()
         gui_signals_app.scroll_top.emit()
+        return super().mouseReleaseEvent(ev)
 
 
 class ShowAllBtn(QLabel):
@@ -69,7 +73,7 @@ class ShowAllBtn(QLabel):
         self.setObjectName(Names.th_show_all_btn)
         self.setStyleSheet(Themes.current)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.date_start, cnf.date_end = None, None
         cnf.curr_coll = cnf.ALL_COLLS
         cnf.current_limit = cnf.LIMIT
@@ -82,6 +86,7 @@ class ShowAllBtn(QLabel):
         gui_signals_app.reload_menu.emit()
 
         gui_signals_app.scroll_top.emit()
+        return super().mouseReleaseEvent(ev)
 
 
 class AboveThumbsNoImages(QWidget):

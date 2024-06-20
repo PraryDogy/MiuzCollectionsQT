@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import QEvent, QMimeData, Qt, QUrl
-from PyQt5.QtGui import QContextMenuEvent, QDrag
+from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent
 from PyQt5.QtWidgets import QAction, QApplication, QFrame, QLabel, QSpacerItem
 
 from base_widgets import ContextMenuBase, LayoutV
@@ -86,22 +86,24 @@ class Thumbnail(QFrame):
         self.setFixedWidth(cnf.THUMBSIZE + cnf.THUMBPAD)
         self.setMaximumHeight(cnf.THUMBSIZE + 75)
         
-    def mouseReleaseEvent(self, event):
-        Manager.win_image_view = WinImageView(parent=self, img_src=self.img_src)
-        Manager.win_image_view.show()
+    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+        win_image_view = WinImageView(parent=self, img_src=self.img_src)
+        Manager.win_image_view = win_image_view
+        win_image_view.show()
         self.regular_style()
+        return super().mouseReleaseEvent(a0)
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+    def mousePressEvent(self, a0: QMouseEvent | None) -> None:
+        if a0.button() == Qt.MouseButton.LeftButton:
             self.selected_style()
-            self.drag_start_position = event.pos()
-        super().mousePressEvent(event)
+            self.drag_start_position = a0.pos()
+        return super().mousePressEvent(a0)
 
-    def mouseMoveEvent(self, event):
-        if event.buttons() != Qt.LeftButton:
+    def mouseMoveEvent(self, a0: QMouseEvent | None) -> None:
+        if a0.button() != Qt.MouseButton.LeftButton:
             return
 
-        distance = (event.pos() - self.drag_start_position).manhattanLength()
+        distance = (a0.pos() - self.drag_start_position).manhattanLength()
 
         if distance < QApplication.startDragDistance():
             return
@@ -114,8 +116,10 @@ class Thumbnail(QFrame):
         self.mime_data.setUrls(url)
 
         self.drag.setMimeData(self.mime_data)
-        self.drag.exec_(Qt.CopyAction)
+        self.drag.exec_(Qt.DropAction.CopyAction)
         self.regular_style()
+
+        return super().mouseMoveEvent(a0)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:

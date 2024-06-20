@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QProgressBar, QSpacerItem, QWidget
 
 from base_widgets import Btn, WinStandartBase
@@ -33,11 +34,12 @@ class WinCopyFiles(WinStandartBase, QObject):
 
         self.center_win(parent=parent)
 
-    def keyPressEvent(self, event):
-        event.ignore()
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        return
+        return super().keyPressEvent(a0)
 
     def my_close(self, event):
-        event.ignore()
+        return
 
     def cancel_btn_cmd(self, e):
         self.cancel_sign.emit()

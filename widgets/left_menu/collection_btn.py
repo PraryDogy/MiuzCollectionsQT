@@ -1,8 +1,9 @@
 import os
 import subprocess
 
-from PyQt5.QtGui import QContextMenuEvent
+from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import QAction, QFrame, QLabel
+from PyQt5.QtCore import QEvent, Qt
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
@@ -91,8 +92,10 @@ class CollectionBtn(QLabel):
 
         self.setStyleSheet(Themes.current)
 
-    def mouseReleaseEvent(self, event):
-        self.load_collection()
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.button() == Qt.MouseButton.LeftButton:
+            self.load_collection()
+        return super().mouseReleaseEvent(ev)
 
     def load_collection(self):
         cnf.curr_coll = self.true_name
@@ -130,10 +133,7 @@ class CollectionBtn(QLabel):
         except Exception as e:
             print(e)
 
-    def enterEvent(self, event):
-        super().enterEvent(event)
-
-        if self.true_name == cnf.ALL_COLLS:
-            return
-
-        self.setToolTip(f"{cnf.lng.collection}: {self.true_name}")
+    def enterEvent(self, a0: QEvent | None) -> None:
+        if self.true_name != cnf.ALL_COLLS:
+            self.setToolTip(f"{cnf.lng.collection}: {self.true_name}")
+        return super().enterEvent(a0)

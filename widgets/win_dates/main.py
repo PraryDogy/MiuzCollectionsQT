@@ -2,6 +2,7 @@ from datetime import datetime
 from functools import partial
 
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
@@ -189,12 +190,12 @@ class WinDates(DatesWinBase):
         FiltersDateBtncolor.date_based_color()
         self.deleteLater()
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Escape:
             FiltersDateBtncolor.date_based_color()
             self.deleteLater()
 
-        elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            self.ok_cmd(event)
+        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.ok_cmd(a0)
+        return super().keyPressEvent(a0)
 
-        super().keyPressEvent(event)

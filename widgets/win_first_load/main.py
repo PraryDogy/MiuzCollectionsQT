@@ -2,6 +2,7 @@ import os
 from typing import Literal
 
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QLabel, QSpacerItem,
                              QWidget)
 
@@ -168,6 +169,6 @@ class WinFirstLoad(WinStandartBase):
         self.browse_coll.finalize()
         self.deleteLater()
 
-    def keyPressEvent(self, event):
-        event.ignore()
-
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        return
+        return super().keyPressEvent(a0)

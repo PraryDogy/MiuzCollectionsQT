@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from cfg import cnf
@@ -25,10 +26,10 @@ class SearchBarBase(InputBase):
         gui_signals_app.set_focus_search.connect(self.setFocus)
         gui_signals_app.reload_search_wid.connect(self.reload_search)
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Escape:
             self.clearFocus()
-        super().keyPressEvent(event)
+        return super().keyPressEvent(a0)
 
     def create_search(self, new_text):
         if len(new_text) > 0:

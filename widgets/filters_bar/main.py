@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QFrame
 
 from base_widgets import Btn, LayoutH
@@ -38,10 +39,12 @@ class DatesBtn(Btn):
         self.setObjectName(Names.dates_btn_bordered)
         self.setStyleSheet(Themes.current)
 
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            Manager.win_dates = WinDates(parent=self)
-            Manager.win_dates.show()
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.button() == Qt.MouseButton.LeftButton:
+            win_dates = WinDates(parent=self)
+            Manager.win_dates = win_dates
+            win_dates.show()
+        return super().mouseReleaseEvent(ev)
 
 
 class FilterBtn(Btn):
@@ -60,8 +63,8 @@ class FilterBtn(Btn):
         self.setObjectName(Names.filter_btn_selected)
         self.setStyleSheet(Themes.current)
 
-    def mouseReleaseEvent(self, event):
-        if event.button() != Qt.LeftButton:
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.button() != Qt.MouseButton.LeftButton:
             return
         
         if self.objectName() == Names.filter_btn_selected:
@@ -76,6 +79,8 @@ class FilterBtn(Btn):
 
         gui_signals_app.reload_thumbnails.emit()
         gui_signals_app.scroll_top.emit()
+
+        return super().mouseReleaseEvent(ev)
 
 
 class FiltersBar(QFrame):

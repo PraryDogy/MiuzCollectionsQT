@@ -1,20 +1,10 @@
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QWidget, QFrame
 
 from base_widgets import SvgBtn, LayoutV
 from signals import gui_signals_app
 from styles import Names, Themes
 import os
-
-# class _UpBtn(SvgBtn):
-#     def __init__(self, parent: QWidget):
-#         super().__init__(
-#             icon_name="up.svg",
-#             size=45,
-#             parent=parent,
-#             )
-
-#     def mouseReleaseEvent(self, event):
-#         gui_signals_app.scroll_top.emit()
 
 
 class UpBtn(QFrame):
@@ -30,5 +20,6 @@ class UpBtn(QFrame):
         self.svg = SvgBtn(os.path.join("images", "up_new.svg"), 44)
         v_layout.addWidget(self.svg)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
         gui_signals_app.scroll_top.emit()
+        return super().mouseReleaseEvent(a0)

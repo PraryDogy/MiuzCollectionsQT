@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QMouseEvent
 
 from cfg import cnf
 
@@ -11,6 +12,7 @@ class LimitBtn(Btn):
         self.setFixedWidth(100)
         self.setAlignment(Qt.AlignCenter)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.current_limit += cnf.LIMIT
         gui_signals_app.reload_thumbnails.emit()
+        return super().mouseReleaseEvent(ev)

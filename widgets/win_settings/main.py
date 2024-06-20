@@ -2,6 +2,7 @@ import os
 from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
@@ -301,11 +302,10 @@ class WinSettings(WinStandartBase):
 
         self.deleteLater()
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
 
-        elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            self.ok_cmd(event)
-
-        super().keyPressEvent(event)
+        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.ok_cmd(a0)
+        return super().keyPressEvent(a0)

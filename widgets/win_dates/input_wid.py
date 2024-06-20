@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QKeyEvent
 
 from base_widgets import InputBase
 from cfg import cnf
@@ -35,8 +36,8 @@ class BaseDateInput(InputBase):
         self.textChanged.connect(self.onTextChanged)
         self.date = None
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Up:
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Up:
             if self.date:
                 self.date = DateUtils.add_or_subtract_days(self.date, 1)
                 self.setText(DateUtils.date_to_text(self.date))
@@ -44,7 +45,7 @@ class BaseDateInput(InputBase):
                 self.date = datetime.today().date()
                 self.setText(DateUtils.date_to_text(self.date))
 
-        elif event.key() == Qt.Key_Down:
+        elif a0.key() == Qt.Key.Key_Down:
             if self.date:
                 self.date = DateUtils.add_or_subtract_days(self.date, -1)
                 self.setText(DateUtils.date_to_text(self.date))
@@ -52,7 +53,7 @@ class BaseDateInput(InputBase):
                 self.date = datetime.today().date()
                 self.setText(DateUtils.date_to_text(self.date))
 
-        super().keyPressEvent(event)
+        return super().keyPressEvent(a0)
 
     def onTextChanged(self):
         date_check = ReDate(self.text()).converted_text

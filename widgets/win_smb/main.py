@@ -1,6 +1,7 @@
 import os
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
@@ -173,5 +174,6 @@ class WinSmb(WinStandartBase):
         self.deleteLater()
         self.finished.emit()
 
-    def keyPressEvent(self, event):
-        event.ignore()
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        return
+        return super().keyPressEvent(a0)

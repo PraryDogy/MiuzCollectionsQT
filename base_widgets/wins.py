@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QEvent, QPoint, Qt, QObject
-from PyQt5.QtGui import QKeyEvent, QResizeEvent
+from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
@@ -84,13 +84,15 @@ class TitleBar(QFrame):
         self.oldPos = self.pos()
         self.show()
 
-    def mousePressEvent(self, event):
-        self.oldPos = event.globalPos()
+    def mousePressEvent(self, a0: QMouseEvent | None) -> None:
+        self.oldPos = a0.globalPos()
+        return super().mousePressEvent(a0)
 
-    def mouseMoveEvent(self, event):
-        delta = QPoint(event.globalPos() - self.oldPos)
+    def mouseMoveEvent(self, a0: QMouseEvent | None) -> None:
+        delta = QPoint(a0.globalPos() - self.oldPos)
         self.my_win.move(self.my_win.x() + delta.x(), self.my_win.y() + delta.y())
-        self.oldPos = event.globalPos()
+        self.oldPos = a0.globalPos()
+        return super().mouseMoveEvent(a0)
 
     def add_r_wid(self, wid: QWidget):
         self.main_layout.addWidget(wid)

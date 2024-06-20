@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLineEdit
 
 from cfg import cnf
@@ -46,6 +47,7 @@ class InputBase(QLineEdit):
         self.setObjectName(Names.base_input)
         self.setStyleSheet(Themes.current)
 
-    def contextMenuEvent(self, event):
-        self.context_menu = CustomContext(parent=self, event=event)
+    def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
+        self.context_menu = CustomContext(parent=self, event=a0)
         self.context_menu.show_menu()
+        return super().contextMenuEvent(a0)

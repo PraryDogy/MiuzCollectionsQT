@@ -47,6 +47,7 @@ class SelectableLabel(QLabel):
         context_menu.addAction(select_all)
 
         context_menu.show_menu()
+        return super().contextMenuEvent(ev)
 
     def copy_text_md(self):
         MainUtils.copy_text(self.selectedText())
