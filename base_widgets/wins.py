@@ -130,6 +130,9 @@ class WinBase(QMainWindow, QObject):
             grip.resize(self.gripSize, self.gripSize)
             self.grips.append(grip)
 
+    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+        return super().mouseReleaseEvent(a0)
+
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         rect = self.rect()
         self.grips[1].move(rect.right() - self.gripSize, 0)
