@@ -3,7 +3,7 @@ import subprocess
 
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import QAction, QFrame, QLabel
-from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtCore import QEvent, Qt, QTimer
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
@@ -13,9 +13,10 @@ from utils import SendNotification
 
 
 class CustomContext(ContextMenuBase):
-    def __init__(self, true_name, event):
+    def __init__(self, parent: QLabel, true_name: str, event: QContextMenuEvent):
         super().__init__(event=event)
 
+        self.my_parent = parent
         self.true_name = true_name
 
         view_coll = QAction(text=cnf.lng.view, parent=self)
@@ -76,6 +77,7 @@ class CustomContext(ContextMenuBase):
         else:
             SendNotification(cnf.lng.no_connection)
 
+
 class CollectionBtn(QLabel):
     def __init__(self, parent: QFrame, fake_name: str, true_name: str):
         super().__init__(text=fake_name)
@@ -107,7 +109,7 @@ class CollectionBtn(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.context_menu = CustomContext(true_name=self.true_name, event=ev)
+            self.context_menu = CustomContext(parent=self, true_name=self.true_name, event=ev)
             self.context_menu.closed.connect(self.closed_context)
 
             if self.objectName() == Names.menu_btn:

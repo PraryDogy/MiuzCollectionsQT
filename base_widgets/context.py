@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt, pyqtSignal, QObject
-from PyQt5.QtGui import QCloseEvent, QMouseEvent
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QCloseEvent, QMouseEvent, QContextMenuEvent
 from PyQt5.QtWidgets import QMenu
 
 from styles import Themes
@@ -8,7 +8,7 @@ from styles import Themes
 class ContextMenuBase(QMenu):
     closed = pyqtSignal()
 
-    def __init__(self, event):
+    def __init__(self, event: QContextMenuEvent):
         self.ev = event
         super().__init__()
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
