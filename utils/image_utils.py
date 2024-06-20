@@ -14,8 +14,8 @@ from database import *
 from .main_utils import MainUtils
 
 
-class ReadDesatImage:
-    def __init__(self, src: str) -> io.BytesIO:
+class ReadImage:
+    def __init__(self, src: str, desaturate_value: float) -> io.BytesIO:
         super().__init__()
 
         img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
@@ -28,7 +28,7 @@ class ReadDesatImage:
             return
 
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        hsv[:, :, 1] = hsv[:, :, 1] * 0.85
+        hsv[:, :, 1] = hsv[:, :, 1] * desaturate_value
         self.rgb_image = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
     def read_transparent_png(self, image) -> np.ndarray:
@@ -122,7 +122,7 @@ class BaseBytesThumb(io.BytesIO):
     def __init__(self, src: str) -> io.BytesIO:
         super().__init__()
 
-        img = ReadDesatImage(src)
+        img = ReadImage(src)
         img = img.get_bgr_image()
 
         resized = self.fit_thumb(img)

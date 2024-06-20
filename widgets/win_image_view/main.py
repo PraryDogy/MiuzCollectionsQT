@@ -12,7 +12,7 @@ from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
 from styles import Names, Themes
-from utils import MainUtils, ReadDesatImage, get_image_size
+from utils import MainUtils, ReadImage, get_image_size
 
 from ..image_context import ImageContext
 from ..notification import Notification
@@ -20,68 +20,64 @@ from ..win_smb import WinSmb
 
 
 class Manager:
-    images = {}
-    threads = []
-    win_smb: WinSmb = None
+    images: dict = {}
+    threads: list = []
+    win_smb = None
 
 
 class ImageWinUtils:
 
     @staticmethod
     def close_same_win():
-        widgets: list[WinImgViewBase] = MainUtils.get_app().topLevelWidgets()
+        widgets = MainUtils.get_app().topLevelWidgets()
 
         for widget in widgets:
             if isinstance(widget, WinImgViewBase):
-
-                cnf.imgview_g.update(
-                    {"aw": widget.width(), "ah": widget.height()}
-                    )
-
+                cnf.imgview_g.update({"aw": widget.width(), "ah": widget.height()})
                 widget.deleteLater()
 
 
-class FSizeImgThread(QThread):
-    image_loaded = pyqtSignal(dict)
+class LoadImageThread(QThread, QObject):
+    finished = pyqtSignal(dict)
 
-    def __init__(self, image_path: str):
+    def __init__(self, img_src: str):
         super().__init__()
-        self.image_path = image_path
+        self.img_src = img_src
 
     def run(self):
         try:
-            if not os.path.exists(self.image_path):
+            if not os.path.exists(self.img_src):
                 print("image viewer thread no connection")
                 return
 
-            if self.image_path not in Manager.images:
+            if self.img_src not in Manager.images:
 
-                img = ReadDesatImage(self.image_path)
+                img = ReadImage(src=self.img_src, desaturate_value=0.85)
                 img = img.get_rgb_image()
                 q_image = QImage(img.data, img.shape[1], img.shape[0],
                                 img.shape[1] * 3, QImage.Format_RGB888)
-                Manager.images[self.image_path] = q_image
+                Manager.images[self.img_src] = q_image
 
             else:
-                q_image = Manager.images[self.image_path]
+                q_image = Manager.images[self.img_src]
 
         except Exception as e:
             print("image viewer cant open image, open with pixmap")
             print(e)
 
             q_image = QImage()
-            q_image.load(self.image_path)
-            Manager.images[self.image_path] = q_image
+            q_image.load(self.img_src)
+            Manager.images[self.img_src] = q_image
 
         pixmap = QPixmap.fromImage(q_image)
 
         if len(Manager.images) > 50:
             Manager.images.pop(next(iter(Manager.images)))
 
-        self.image_loaded.emit(
+        self.finished.emit(
             {"image": pixmap,
              "width": pixmap.width(),
-             "src": self.image_path
+             "src": self.img_src
              }
              )
 
@@ -167,7 +163,7 @@ class ImageWidget(QLabel):
         return super().resizeEvent(a0)
     
 
-class NaviZoom(QFrame):
+class ZoomBtns(QFrame):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
 
@@ -194,19 +190,8 @@ class NaviZoom(QFrame):
 
         self.adjustSize()
 
-    def bind_btns(
-            self,
-            zoom_out_cmd: callable,
-            zoom_in_cmd: callable,
-            zoom_fit_cmd: callable
-            ):
 
-        self.zoom_out.mouseReleaseEvent = zoom_out_cmd
-        self.zoom_in.mouseReleaseEvent = zoom_in_cmd
-        self.zoom_fit.mouseReleaseEvent = zoom_fit_cmd
-
-
-class NaviArrow(QFrame):
+class SwitchImageBtn(QFrame):
     def __init__(self, icon_name: str, parent: QWidget = None) -> None:
         super().__init__(parent)
         self.setObjectName(Names.navi_switch)
@@ -220,12 +205,12 @@ class NaviArrow(QFrame):
         v_layout.addWidget(btn)
 
 
-class NaviArrowPrev(NaviArrow):
+class PrevImageBtn(SwitchImageBtn):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__("prev.svg", parent)
 
 
-class NaviArrowNext(NaviArrow):
+class NextImageBtn(SwitchImageBtn):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__("next.svg", parent)
 
@@ -234,7 +219,7 @@ class WinImageView(WinImgViewBase):
     def __init__(self, parent: QWidget, img_src: str):
         ImageWinUtils.close_same_win()
         self.img_src = img_src
-        self.fsize_img_thread = None
+        self.img_thread = None
         self.coll = None
 
         super().__init__(close_func=self.my_close)
@@ -258,13 +243,13 @@ class WinImageView(WinImgViewBase):
         self.notification.move(10, 2)
         gui_signals_app.noti_img_view.connect(self.notification.show_notify)
 
-        self.navi_prev = NaviArrowPrev(self.content_wid)
+        self.navi_prev = PrevImageBtn(self.content_wid)
         self.navi_prev.mouseReleaseEvent = lambda e: self.navi_switch_img("-")
 
-        self.navi_next = NaviArrowNext(self.content_wid)
+        self.navi_next = NextImageBtn(self.content_wid)
         self.navi_next.mouseReleaseEvent = lambda e: self.navi_switch_img("+")
 
-        self.navi_zoom = NaviZoom(parent=self.content_wid)
+        self.navi_zoom = ZoomBtns(parent=self.content_wid)
         self.navi_zoom.bind_btns(
             lambda e: self.image_label.zoom_out(),
             lambda e: self.image_label.zoom_in(),
@@ -334,10 +319,10 @@ class WinImageView(WinImgViewBase):
         self.navi_next.hide()
 
     def load_image_thread(self):
-        self.fsize_img_thread = FSizeImgThread(self.img_src)
-        self.fsize_img_thread.image_loaded.connect(self.finalize_thread)
-        self.fsize_img_thread.start()
-        Manager.threads.append(self.fsize_img_thread)
+        self.img_thread = LoadImageThread(self.img_src)
+        self.img_thread.finished.connect(self.finalize_thread)
+        self.img_thread.start()
+        Manager.threads.append(self.img_thread)
 
     def finalize_thread(self, data: dict):
         if data["width"] == 0 or data["src"] != self.img_src:
@@ -345,7 +330,7 @@ class WinImageView(WinImgViewBase):
         
         self.image_label.set_image(data["image"])
         self.my_set_title()
-        Manager.threads.remove(self.fsize_img_thread)
+        Manager.threads.remove(self.img_thread)
 
     def switch_image(self, offset):
         try:
