@@ -222,6 +222,7 @@ class WinImageView(WinImgViewBase):
         self.collection = None
 
         super().__init__(close_func=self.my_close)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setMinimumSize(QSize(500, 400))
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
         self.installEventFilter(self)

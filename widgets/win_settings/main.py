@@ -214,6 +214,7 @@ class WinSettings(WinStandartBase):
         MainUtils.close_same_win(WinSettings)
 
         super().__init__(close_func=self.cancel_cmd)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min_max()
         self.set_title(cnf.lng.settings)
 

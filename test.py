@@ -1,26 +1,5 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel
-from PyQt5.QtCore import QThread
-import time
-
-class NewWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle('Новое окно')
-        self.setGeometry(100, 100, 200, 100)
-        label = QLabel('Это новое окно', self)
-        centralWidget = QWidget()
-        layout = QVBoxLayout(centralWidget)
-        layout.addWidget(label)
-        self.setCentralWidget(centralWidget)
-
-class Worker(QThread):
-    def run(self):
-        count = 0
-        while True:
-            print(count)
-            count += 1
-            time.sleep(1)
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -28,44 +7,54 @@ class MainWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Главное окно')
-        self.setGeometry(100, 100, 300, 200)
+        self.setWindowTitle('Main Window')
+        self.setGeometry(100, 100, 400, 300)
 
-        centralWidget = QWidget()
-        self.layout = QVBoxLayout(centralWidget)
+        button = QPushButton('Open Modal Window', self)
+        button.clicked.connect(self.openModalWindow)
+        self.setCentralWidget(button)
 
-        self.openWindowButton = QPushButton('Открыть новое окно', self)
-        self.openWindowButton.clicked.connect(self.openNewWindow)
-        self.layout.addWidget(self.openWindowButton)
+    def openModalWindow(self):
+        self.modalWindow = ModalWindow(self)
+        self.modalWindow.setWindowModality(Qt.ApplicationModal)
+        self.modalWindow.show()
 
-        self.restartButton = QPushButton('Перезапустить GUI', self)
-        self.restartButton.clicked.connect(self.restartGUI)
-        self.layout.addWidget(self.restartButton)
+class ModalWindow(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('Modal Window')
+        self.setGeometry(150, 150, 200, 100)
 
-        self.startThreadButton = QPushButton('Запустить поток', self)
-        self.startThreadButton.clicked.connect(self.startThread)
-        self.layout.addWidget(self.startThreadButton)
+        self.child_windows = []  # Список для хранения дочерних окон
 
-        self.setCentralWidget(centralWidget)
+        layout = QVBoxLayout()
+        button1 = QPushButton('Open Child Window 1', self)
+        button1.clicked.connect(lambda: self.openChildWindow('Child Window 1'))
+        layout.addWidget(button1)
 
-    def openNewWindow(self):
-        self.newWindow = NewWindow()
-        self.newWindow.show()
+        button2 = QPushButton('Open Child Window 2', self)
+        button2.clicked.connect(lambda: self.openChildWindow('Child Window 2'))
+        layout.addWidget(button2)
 
-    def restartGUI(self):
-        print("restart gui")
-        for i in reversed(range(self.layout.count())):
-            widget = self.layout.itemAt(i).widget()
-            if widget is not None:
-                widget.setParent(None)
-        self.initUI()
+        self.setLayout(layout)
 
-    def startThread(self):
-        self.worker = Worker()
-        self.worker.start()
+    def openChildWindow(self, title):
+        child_window = ChildWindow(self, title)
+        child_window.show()
+        self.child_windows.append(child_window)  # Сохраняем ссылку на дочернее окно
+
+class ChildWindow(QWidget):
+    def __init__(self, parent=None, title=''):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setGeometry(200, 200, 150, 100)
+        layout = QVBoxLayout()
+        label = QLabel(f'This is {title}', self)
+        layout.addWidget(label)
+        self.setLayout(layout)
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
+    app = QApplication([])
     mainWindow = MainWindow()
     mainWindow.show()
-    sys.exit(app.exec_())
+    app.exec_()
