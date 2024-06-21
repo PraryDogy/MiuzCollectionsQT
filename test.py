@@ -1,40 +1,71 @@
 import sys
-import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QVBoxLayout
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel
+from PyQt5.QtCore import QThread
+import time
+
+class NewWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Новое окно')
+        self.setGeometry(100, 100, 200, 100)
+        label = QLabel('Это новое окно', self)
+        centralWidget = QWidget()
+        layout = QVBoxLayout(centralWidget)
+        layout.addWidget(label)
+        self.setCentralWidget(centralWidget)
+
+class Worker(QThread):
+    def run(self):
+        count = 0
+        while True:
+            print(count)
+            count += 1
+            time.sleep(1)
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.init_ui()
+        self.initUI()
 
-    def init_ui(self):
-        self.setWindowTitle('Main Window')
-        self.setGeometry(100, 100, 800, 600)
-        
-        self.reveal_file_button = QPushButton('Reveal File in Finder', self)
-        self.reveal_file_button.clicked.connect(self.reveal_file)
-        self.reveal_file_button.enterEvent = lambda e: self.test()
-        
-        central_widget = QWidget()
-        layout = QVBoxLayout(central_widget)
-        layout.addWidget(self.reveal_file_button)
-        
-        self.setCentralWidget(central_widget)
+    def initUI(self):
+        self.setWindowTitle('Главное окно')
+        self.setGeometry(100, 100, 300, 200)
 
-    def test(self):
-        self.reveal_file_button.setToolTip("hello")
+        centralWidget = QWidget()
+        self.layout = QVBoxLayout(centralWidget)
 
-    def reveal_file(self):
-        os.system('open .')
-        QTimer.singleShot(500, self.restore_focus)
+        self.openWindowButton = QPushButton('Открыть новое окно', self)
+        self.openWindowButton.clicked.connect(self.openNewWindow)
+        self.layout.addWidget(self.openWindowButton)
 
-    def restore_focus(self):
-        self.raise_()
-        # self.reveal_file_button.setFocus()
+        self.restartButton = QPushButton('Перезапустить GUI', self)
+        self.restartButton.clicked.connect(self.restartGUI)
+        self.layout.addWidget(self.restartButton)
+
+        self.startThreadButton = QPushButton('Запустить поток', self)
+        self.startThreadButton.clicked.connect(self.startThread)
+        self.layout.addWidget(self.startThreadButton)
+
+        self.setCentralWidget(centralWidget)
+
+    def openNewWindow(self):
+        self.newWindow = NewWindow()
+        self.newWindow.show()
+
+    def restartGUI(self):
+        print("restart gui")
+        for i in reversed(range(self.layout.count())):
+            widget = self.layout.itemAt(i).widget()
+            if widget is not None:
+                widget.setParent(None)
+        self.initUI()
+
+    def startThread(self):
+        self.worker = Worker()
+        self.worker.start()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
+    mainWindow = MainWindow()
+    mainWindow.show()
     sys.exit(app.exec_())

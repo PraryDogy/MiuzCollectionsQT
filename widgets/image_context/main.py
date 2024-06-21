@@ -77,10 +77,11 @@ class ImageContext(ContextMenuBase):
         save_layers.triggered.connect(lambda: self.save_tiffs(img_src))
         save_menu.addAction(save_layers)
 
-
         self.reveal_files = None
         self.tiff_thread = None
         self.save_files = None
+
+        self.win_info = None
 
     def add_preview_item(self):
         open_action = QAction(cnf.lng.view, self)
@@ -91,8 +92,8 @@ class ImageContext(ContextMenuBase):
         self.insertAction(self.info_action, open_action)
 
     def show_info_win(self, img_src: str):
-        Manager.win_info = WinInfo(img_src=img_src, parent=self.my_parent)
-        Manager.win_info.show()
+        self.win_info = WinInfo(img_src=img_src, parent=self.my_parent)
+        self.win_info.show()
         
     def show_image_viewer(self, img_src: str):
         # import here to prevent circular import

@@ -78,27 +78,17 @@ class RightDateWidget(BaseDateLayout):
             self.input.setText(DateUtils.date_to_text(cnf.date_end))
 
 
-class DatesWinBase(WinStandartBase):
-    def __init__(self):
+class WinDates(WinStandartBase):
+    def __init__(self, parent: QWidget):
         MainUtils.close_same_win(WinDates)
 
         super().__init__(close_func=self.my_close)
-
         FiltersDateBtncolor.set_border()
+        self.disable_min_max()
+        self.set_title(cnf.lng.dates)
+
         self.date_start = cnf.date_start
         self.date_end = cnf.date_end
-        self.disable_min_max()
-
-    def my_close(self, event):
-        FiltersDateBtncolor.date_based_color()
-        self.deleteLater()
-        event.ignore()
-
-
-class WinDates(DatesWinBase):
-    def __init__(self, parent: QWidget):
-        super().__init__()
-        self.set_title(cnf.lng.dates)
 
         self.init_ui()
         self.fit_size()
@@ -199,3 +189,7 @@ class WinDates(DatesWinBase):
             self.ok_cmd(a0)
         return super().keyPressEvent(a0)
 
+    def my_close(self, event):
+        FiltersDateBtncolor.date_based_color()
+        self.deleteLater()
+        event.ignore()

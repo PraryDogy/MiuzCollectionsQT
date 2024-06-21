@@ -11,9 +11,6 @@ from ..win_settings import WinSettings
 from .progress_bar import ProgressBar
 import os
 
-class Manager:
-    win_settings = None
-
 
 class StBar(QFrame):
     def __init__(self):
@@ -53,9 +50,18 @@ class StBar(QFrame):
         self.h_layout.addSpacerItem(QSpacerItem(30, 0))
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
+        from PyQt5.QtWidgets import QPushButton
+        self.restarter = QPushButton(self, text="Reload")
+        self.restarter.clicked.connect(self.reload)
+
+    def reload(self):
+        gui_signals_app.reload_thumbnails.emit()
+        gui_signals_app.reload_menu.emit()
+        gui_signals_app.reload_filters_bar.emit()
+        gui_signals_app.reload_stbar.emit()
+
     def reload_stbar(self):
         MainUtils.clear_layout(self.h_layout)
-        # cnf.stbar_btns.clear()
         self.init_ui()
 
     def switch_theme_cmd(self, e):
@@ -80,5 +86,5 @@ class StBar(QFrame):
         self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
 
     def sett_btn_cmd(self, e):
-        Manager.win_settings = WinSettings(parent=self)
-        Manager.win_settings.show()
+        self.settings = WinSettings(parent=self)
+        self.settings.show()

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QFrame
 
@@ -10,17 +10,15 @@ from utils import MainUtils
 
 from ..win_dates import WinDates
 
-
-class Manager:
-    win_dates: WinDates = None
-    btn_w = 80
-    btn_h = 28
+BTN_W, BTN_H = 80, 28
 
 
 class DatesBtn(Btn):
+    win_dates_opened = pyqtSignal()
+
     def __init__(self):
         super().__init__(text=cnf.lng.dates)
-        self.setFixedSize(Manager.btn_w, Manager.btn_h)
+        self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         gui_signals_app.set_dates_btn_blue.connect(self.set_blue_style)
@@ -41,16 +39,14 @@ class DatesBtn(Btn):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
-            win_dates = WinDates(parent=self)
-            Manager.win_dates = win_dates
-            win_dates.show()
+            self.win_dates_opened.emit()
         return super().mouseReleaseEvent(ev)
 
 
 class FilterBtn(Btn):
     def __init__(self, text: str, true_name: str):
         super().__init__(text=text)
-        self.setFixedSize(Manager.btn_w, Manager.btn_h)
+        self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.key = true_name
@@ -96,10 +92,12 @@ class FiltersBar(QFrame):
         self.h_layout.setContentsMargins(0, 0, 0, 0)
 
         self.filter_btns = []
-        self.init_ui()
+        self.win_dates = None
 
         gui_signals_app.disable_filters.connect(self.disable_filters)
         gui_signals_app.reload_filters_bar.connect(self.reload_filters)
+
+        self.init_ui()
 
     def init_ui(self):
         self.filter_btns.clear()
@@ -127,6 +125,7 @@ class FiltersBar(QFrame):
             self.filter_btns.append(label)
 
         self.dates_btn = DatesBtn()
+        self.dates_btn.win_dates_opened.connect(self.open_win_dates)
         self.h_layout.addWidget(self.dates_btn)
 
         if any((cnf.date_start, cnf.date_end)):
@@ -136,6 +135,10 @@ class FiltersBar(QFrame):
 
         self.h_layout.addStretch(1)
         self.setLayout(self.h_layout)
+    
+    def open_win_dates(self):
+        self.win_dates = WinDates(parent=self)
+        self.win_dates.show()
 
     def disable_filters(self):
         for i in self.filter_btns:
