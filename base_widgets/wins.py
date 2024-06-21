@@ -158,7 +158,7 @@ class WinBase(QMainWindow, QObject):
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
-            self.deleteLater()
+            self.close()
         return super().keyPressEvent(a0)
     
     def center_win(self, parent: QWidget):

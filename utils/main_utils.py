@@ -2,10 +2,12 @@ import os
 import platform
 import subprocess
 
+from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QVBoxLayout
 
 from cfg import cnf
-from signals import gui_signals_app, utils_signals_app
+from signals import utils_signals_app
+
 
 class MainUtils:
     @staticmethod
@@ -72,13 +74,13 @@ class MainUtils:
             return None
 
     @staticmethod
-    def copy_text(text):
+    def copy_text(text: str):
         text_bytes = text.encode('utf-8')
         subprocess.run(['pbcopy'], input=text_bytes, check=True)
         return True
 
     @staticmethod
-    def paste_text():
+    def paste_text() -> str:
         paste_result = subprocess.run(
             ['pbpaste'],
             capture_output=True,
@@ -88,12 +90,12 @@ class MainUtils:
         return paste_result.stdout.strip()
     
     @staticmethod
-    def close_same_win(object):
+    def close_same_win(wid = QObject):
         widgets = MainUtils.get_app().topLevelWidgets()
         for widget in widgets:
-            if isinstance(widget, object):
+            if isinstance(widget, wid):
                 # win with delete_win signal in base_widgets > win > StandartWin
-                widget.deleteLater()
+                widget.close()
 
     @staticmethod
     def get_app():
