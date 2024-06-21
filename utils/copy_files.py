@@ -1,14 +1,11 @@
 import os
-from time import sleep
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 
-
-class Manager:
-    threads = []
+from base_widgets import MyThread
 
 
-class ThreadCopyFiles(QThread):
+class ThreadCopyFiles(MyThread):
     finished = pyqtSignal(list)
     value_changed = pyqtSignal(int)
     stop = pyqtSignal()
@@ -23,17 +20,16 @@ class ThreadCopyFiles(QThread):
         self.buffer_size = 1024*1024
 
     def run(self):
-        Manager.threads.append(self)
         copied_size = 0
         files_dests = []
 
         try:
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
-            print(e)
+            print("copy_files.py > run > total size", e)
             self.value_changed.emit(100)
             self.finished.emit(files_dests)
-            Manager.threads.remove(self)
+            self.remove_threads()
             return
 
         self.value_changed.emit(0)
@@ -64,12 +60,13 @@ class ThreadCopyFiles(QThread):
                         self.value_changed.emit(percent)
 
             except Exception as e:
-                print(e)
+                print("copy_files.py > run > while self.flag", e)
+                self.remove_threads()
                 break
         
         self.value_changed.emit(100)
         self.finished.emit(files_dests)
-        Manager.threads.remove(self)
+        self.remove_threads()
 
     def stop_copying(self):
         self.flag = False

@@ -3,8 +3,9 @@ import shutil
 import subprocess
 import time
 
-from PyQt5.QtCore import QThread, pyqtSignal, QObject
+from PyQt5.QtCore import QObject, pyqtSignal
 
+from base_widgets import MyThread
 from cfg import cnf
 
 
@@ -53,7 +54,7 @@ class UpdaterMain(QObject):
         self.finished.emit()
 
 
-class Updater(QThread):
+class Updater(MyThread):
     finished = pyqtSignal()
     no_connection = pyqtSignal()
 
@@ -66,10 +67,13 @@ class Updater(QThread):
         self.task.no_connection.connect(self.no_connection_cmd)
         self.task.finished.connect(self.finished_cmd)
         self.task.go()
+        self.remove_threads()
 
     def no_connection_cmd(self):
         self.no_connection.emit()
+        self.remove_threads()
 
     def finished_cmd(self):
         self.finished.emit()
+        self.remove_threads()
 

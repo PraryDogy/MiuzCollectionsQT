@@ -140,8 +140,6 @@ class WinBase(QMainWindow, QObject):
         except Exception as e:
             print("wins.py > WinBase > closeEvent", e)
 
-        print(Manager.wins)
-
         return super().closeEvent(a0)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:

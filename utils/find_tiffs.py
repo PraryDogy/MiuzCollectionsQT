@@ -1,13 +1,10 @@
 import os
 import re
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 
+from base_widgets import MyThread
 from cfg import cnf
-
-
-class Manager:
-    threads = []
 
 
 class _TiffUtils:
@@ -95,7 +92,7 @@ class FindTiffBase:
             return ""
 
 
-class ThreadFindTiff(QThread):
+class ThreadFindTiff(MyThread):
     finished = pyqtSignal(str)
     can_remove = pyqtSignal()
 
@@ -104,15 +101,14 @@ class ThreadFindTiff(QThread):
         self.src = src
 
     def run(self):
-        Manager.threads.append(self)
         search = FindTiffBase(src=self.src)
         search.run()
         self.finished.emit(search.get_result())
         self.can_remove.emit()
-        Manager.threads.remove(self)
+        self.remove_threads()
 
 
-class ThreadFindTiffsMultiple(QThread):
+class ThreadFindTiffsMultiple(MyThread):
     finished = pyqtSignal(list)
     can_remove = pyqtSignal()
 
@@ -121,7 +117,6 @@ class ThreadFindTiffsMultiple(QThread):
         self.files_list = files_list
 
     def run(self):
-        Manager.threads.append(self)
         tiff_list = []
 
         for i in self.files_list:
@@ -134,4 +129,4 @@ class ThreadFindTiffsMultiple(QThread):
 
         self.finished.emit(tiff_list)
         self.can_remove.emit()
-        Manager.threads.remove(self)
+        self.remove_threads()

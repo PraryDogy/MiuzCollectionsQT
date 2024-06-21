@@ -16,15 +16,8 @@ from ..image_utils import BytesThumb, UndefBytesThumb
 from ..main_utils import MainUtils
 
 
-class Manager:
-    jpg_exsts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
-    tiff_exsts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
+class Shared:
     flag = True
-
-    @staticmethod
-    def sleep():
-        return
-        sleep(0.5)
 
 
 class Migrate:
@@ -140,10 +133,10 @@ class FinderImages(dict):
 
         except (OSError, FileNotFoundError):
             print(traceback.format_exc())
-            Manager.flag = False
+            Shared.flag = False
 
         if not self:
-            Manager.flag = False
+            Shared.flag = False
 
     def run(self):
         gui_signals_app.progressbar_search_photos.emit()
@@ -169,16 +162,16 @@ class FinderImages(dict):
 
             for root, _, files in os.walk(top=collection_walk):
 
-                if not Manager.flag:
+                if not Shared.flag:
                     return
 
                 for file in files:
 
                     if not os.path.exists(cnf.coll_folder):
-                        Manager.flag = False
+                        Shared.flag = False
                         return
 
-                    if file.endswith(Manager.jpg_exsts):
+                    if file.endswith((".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")):
                         
                         src = os.path.join(root, file)
                         file_stats = os.stat(path=src)
@@ -189,7 +182,7 @@ class FinderImages(dict):
                             int(file_stats.st_mtime)
                             )
 
-                    elif file.endswith(Manager.tiff_exsts):
+                    elif file.endswith((".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")):
                         cnf.tiff_images.add(os.path.join(root, file))
 
 
@@ -218,7 +211,7 @@ class ComparedImages(dict):
 
         for db_src, db_stats in db_images.items():
 
-            if not Manager.flag:
+            if not Shared.flag:
                 return
 
             finder_stats = finder_images.get(db_src)
@@ -228,7 +221,7 @@ class ComparedImages(dict):
 
         for finder_src, finder_stats in finder_images.items():
 
-            if not Manager.flag:
+            if not Shared.flag:
                 return
 
             db_stats = db_images.get(finder_src)
@@ -275,7 +268,7 @@ class UpdateDb:
 
         for src, (size, created, modified) in data.items():
 
-            if not Manager.flag:
+            if not Shared.flag:
                 return
 
             try:
@@ -292,7 +285,7 @@ class UpdateDb:
 
             except FileNotFoundError:
                 print(traceback.format_exc())
-                Manager.flag = False
+                Shared.flag = False
                 return
 
             except Exception as e:
@@ -322,7 +315,7 @@ class UpdateDb:
             chunk: Dict[str, tuple]
             values: List[Dict] = self.create_values(chunk)
 
-            if not Manager.flag:
+            if not Shared.flag:
                 return
 
             if not values:
@@ -375,7 +368,7 @@ class UpdateDb:
             chunk: Dict[str, tuple]
             values: List[Dict] = self.create_values(chunk)
 
-            if not Manager.flag:
+            if not Shared.flag:
                 return
 
             if not values:
@@ -430,7 +423,7 @@ class UpdateDb:
         for chunk in chunks:
             chunk: List[Query]
 
-            if not Manager.flag:
+            if not Shared.flag:
                 return
 
             try:
@@ -457,7 +450,7 @@ class Scaner(object):
         super().__init__()
 
         try:
-            Manager.flag = True
+            Shared.flag = True
 
             try:
                 gui_signals_app.progressbar_show.emit()
@@ -481,7 +474,7 @@ class Scaner(object):
             Dbase.vacuum()
             Dbase.cleanup_engine()
 
-            Manager.flag = True
+            Shared.flag = True
 
             try:
                 gui_signals_app.progressbar_hide.emit()

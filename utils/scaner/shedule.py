@@ -4,7 +4,7 @@ from cfg import cnf
 from signals import utils_signals_app
 
 from ..main_utils import MainUtils
-from .thread import Manager as ScanerThreadManager
+from .thread import Shared as ScanerThreadManager
 from .thread import ScanerThread
 
 

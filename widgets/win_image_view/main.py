@@ -1,13 +1,13 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import (QEvent, QObject, QPoint, QSize, Qt, QThread, QTimer,
-                          pyqtSignal)
-from PyQt5.QtGui import (QContextMenuEvent, QImage, QKeyEvent, QMouseEvent, QPaintEvent, QPainter, QPixmap,
-                         QResizeEvent)
+from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import (QContextMenuEvent, QImage, QKeyEvent, QMouseEvent,
+                         QPainter, QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
+from base_widgets import (LayoutH, LayoutV, MyThread, SvgShadowed,
+                          WinImgViewBase)
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
@@ -19,9 +19,8 @@ from ..notification import Notification
 from ..win_smb import WinSmb
 
 
-class Manager:
+class Shared:
     loaded_images: dict = {}
-    threads: list = []
 
 
 class ImageWinUtils:
@@ -36,11 +35,11 @@ class ImageWinUtils:
                 widget.close()
 
 
-class LoadImageThread(QThread, QObject):
+class LoadImageThread(MyThread):
     finished = pyqtSignal(dict)
 
     def __init__(self, img_src: str):
-        super().__init__()
+        super().__init__(parent=None)
         self.img_src = img_src
 
     def run(self):
@@ -49,16 +48,16 @@ class LoadImageThread(QThread, QObject):
                 print("image viewer thread no connection")
                 return
 
-            if self.img_src not in Manager.loaded_images:
+            if self.img_src not in Shared.loaded_images:
 
                 img = ReadImage(src=self.img_src, desaturate_value=0.85)
                 img = img.get_rgb_image()
                 q_image = QImage(img.data, img.shape[1], img.shape[0],
                                 img.shape[1] * 3, QImage.Format_RGB888)
-                Manager.loaded_images[self.img_src] = q_image
+                Shared.loaded_images[self.img_src] = q_image
 
             else:
-                q_image = Manager.loaded_images[self.img_src]
+                q_image = Shared.loaded_images[self.img_src]
 
         except Exception as e:
             print("image viewer cant open image, open with pixmap")
@@ -66,12 +65,12 @@ class LoadImageThread(QThread, QObject):
 
             q_image = QImage()
             q_image.load(self.img_src)
-            Manager.loaded_images[self.img_src] = q_image
+            Shared.loaded_images[self.img_src] = q_image
 
         pixmap = QPixmap.fromImage(q_image)
 
-        if len(Manager.loaded_images) > 50:
-            Manager.loaded_images.pop(next(iter(Manager.loaded_images)))
+        if len(Shared.loaded_images) > 50:
+            Shared.loaded_images.pop(next(iter(Shared.loaded_images)))
 
         self.finished.emit(
             {"image": pixmap,
@@ -79,6 +78,8 @@ class LoadImageThread(QThread, QObject):
              "src": self.img_src
              }
              )
+        
+        self.remove_threads()
 
 
 class ImageWidget(QLabel):
@@ -219,7 +220,6 @@ class WinImageView(WinImgViewBase):
         ImageWinUtils.close_same_win()
 
         self.img_src = img_src
-        self.img_thread = None
         self.collection = None
 
         super().__init__(close_func=self.my_close)
@@ -273,7 +273,7 @@ class WinImageView(WinImgViewBase):
                 return
                 
     def load_thumbnail(self):
-        if self.img_src not in Manager.loaded_images:
+        if self.img_src not in Shared.loaded_images:
             self.set_title(cnf.lng.loading)
 
             q = (sqlalchemy.select(ThumbsMd.img150)
@@ -294,18 +294,16 @@ class WinImageView(WinImgViewBase):
         self.load_image_thread()
 
     def load_image_thread(self):
-        self.img_thread = LoadImageThread(self.img_src)
-        self.img_thread.finished.connect(self.load_image_finished)
-        self.img_thread.start()
-        Manager.threads.append(self.img_thread)
+        img_thread = LoadImageThread(self.img_src)
+        img_thread.finished.connect(self.load_image_finished)
+        img_thread.start()
 
     def load_image_finished(self, data: dict):
         if data["width"] == 0 or data["src"] != self.img_src:
             return
-        
+                
         self.image_label.set_image(data["image"])
         self.set_image_title()
-        Manager.threads.remove(self.img_thread)
 
     def my_close(self, event):
         try:
@@ -317,7 +315,7 @@ class WinImageView(WinImgViewBase):
         except (KeyError, Exception) as e:
             print(e)
 
-        Manager.loaded_images.clear()
+        Shared.loaded_images.clear()
         cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
         self.close()
 
