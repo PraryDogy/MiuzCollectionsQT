@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, pyqtSignal, QObject
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QProgressBar, QSpacerItem, QWidget
 
@@ -6,7 +6,7 @@ from base_widgets import Btn, WinStandartBase
 from cfg import cnf
 
 
-class WinCopyFiles(WinStandartBase, QObject):
+class WinCopyFiles(WinStandartBase):
     cancel_sign = pyqtSignal()
 
     def __init__(self, parent: QWidget):
@@ -43,7 +43,7 @@ class WinCopyFiles(WinStandartBase, QObject):
 
     def cancel_btn_cmd(self, e):
         self.cancel_sign.emit()
-        self.deleteLater()
+        self.close()
 
     def set_value(self, value: int):
         try:

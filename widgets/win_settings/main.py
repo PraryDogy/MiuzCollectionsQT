@@ -1,5 +1,4 @@
 import os
-from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent
@@ -8,7 +7,6 @@ from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from styles import Names, Themes
 from utils import MainUtils, Updater
 
 
@@ -277,7 +275,7 @@ class WinSettings(WinStandartBase):
         btns_layout.addStretch(1)
 
     def cancel_cmd(self, e):
-        self.deleteLater()
+        self.close()
 
     def ok_cmd(self, e):
         scan_again = False
@@ -300,11 +298,11 @@ class WinSettings(WinStandartBase):
 
         self.change_lang.finalize()
 
-        self.deleteLater()
+        self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
-            self.deleteLater()
+            self.close()
 
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd(a0)

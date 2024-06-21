@@ -9,11 +9,10 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QLabel, QSpacerItem,
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from styles import Names, Themes
 from utils import MainUtils
 
 
-class Manager:
+class Shared:
     coll_folder = cnf.coll_folder
 
 
@@ -40,7 +39,7 @@ class BrowseColl(QWidget):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.coll_path_label = QLabel(self.cut_text(Manager.coll_folder))
+        self.coll_path_label = QLabel(self.cut_text(Shared.coll_folder))
         self.coll_path_label.setWordWrap(True)
         self.coll_path_label.setFixedHeight(35)
         h_layout.addWidget(self.coll_path_label)
@@ -49,16 +48,16 @@ class BrowseColl(QWidget):
         file_dialog = QFileDialog()
         file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
 
-        if not os.path.exists(Manager.coll_folder):
+        if not os.path.exists(Shared.coll_folder):
             file_dialog.setDirectory(cnf.down_folder)
         else:
-            file_dialog.setDirectory(Manager.coll_folder)
+            file_dialog.setDirectory(Shared.coll_folder)
 
         selected_folder = file_dialog.getExistingDirectory()
 
         if selected_folder:
-            Manager.coll_folder = selected_folder
-            self.coll_path_label.setText(self.cut_text(Manager.coll_folder))
+            Shared.coll_folder = selected_folder
+            self.coll_path_label.setText(self.cut_text(Shared.coll_folder))
 
     def cut_text(self, text: str, max_ln: int = 70):
         if len(text) > max_ln:
@@ -67,7 +66,7 @@ class BrowseColl(QWidget):
             return text
         
     def finalize(self):
-        cnf.coll_folder = Manager.coll_folder
+        cnf.coll_folder = Shared.coll_folder
 
         utils_signals_app.scaner_stop.emit()
         utils_signals_app.scaner_start.emit()
@@ -167,7 +166,7 @@ class WinFirstLoad(WinStandartBase):
 
     def ok_cmd(self, e):
         self.browse_coll.finalize()
-        self.deleteLater()
+        self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         return

@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QEvent, QPoint, Qt, QObject
-from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
+from PyQt5.QtGui import QCloseEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
@@ -9,6 +9,7 @@ import os
 
 from .layouts import LayoutH, LayoutV
 from .svg_btn import SvgBtn
+from .manager import Manager
 
 
 class Btns(QWidget):
@@ -129,6 +130,19 @@ class WinBase(QMainWindow, QObject):
             grip = QSizeGrip(self)
             grip.resize(self.gripSize, self.gripSize)
             self.grips.append(grip)
+
+        Manager.wins.append(self)
+
+    def closeEvent(self, a0: QCloseEvent | None) -> None:
+        try:
+            Manager.wins.remove(self)
+            self.deleteLater()
+        except Exception as e:
+            print("wins.py > WinBase > closeEvent", e)
+
+        print(Manager.wins)
+
+        return super().closeEvent(a0)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
         return super().mouseReleaseEvent(a0)

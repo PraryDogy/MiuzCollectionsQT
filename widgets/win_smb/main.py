@@ -11,7 +11,7 @@ from styles import Names, Themes
 from utils import MainUtils
 
 
-class Manager:
+class Shared:
     coll_folder = cnf.coll_folder
 
 
@@ -45,7 +45,7 @@ class BrowseColl(QWidget):
         self.coll_path_label = QLabel()
 
         self.coll_path_label.setWordWrap(True)
-        self.coll_path_label.setText(self.cut_text(text=Manager.coll_folder))
+        self.coll_path_label.setText(self.cut_text(text=Shared.coll_folder))
         h_layout.addWidget(self.coll_path_label)
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
@@ -88,21 +88,21 @@ class BrowseColl(QWidget):
         file_dialog.setFileMode(QFileDialog.Directory)
         file_dialog.setViewMode(QFileDialog.ViewMode.List)
 
-        if not os.path.exists(Manager.coll_folder):
+        if not os.path.exists(Shared.coll_folder):
             file_dialog.setDirectory(cnf.down_folder)
         else:
-            file_dialog.setDirectory(Manager.coll_folder)
+            file_dialog.setDirectory(Shared.coll_folder)
 
         selected_folder = file_dialog.getExistingDirectory()
 
         if selected_folder:
             self.changed.emit()
-            Manager.coll_folder = selected_folder
-            self.coll_path_label.setText(self.cut_text(text=Manager.coll_folder))
+            Shared.coll_folder = selected_folder
+            self.coll_path_label.setText(self.cut_text(text=Shared.coll_folder))
 
     def finalize(self):
         cnf.old_coll_folder = cnf.coll_folder
-        cnf.coll_folder = Manager.coll_folder
+        cnf.coll_folder = Shared.coll_folder
         utils_signals_app.scaner_stop.emit()
         utils_signals_app.scaner_start.emit()
 
@@ -132,7 +132,7 @@ class WinSmb(WinStandartBase):
 
     def pass_btn_cmd(self, event):
         self.finished.emit()
-        self.deleteLater()
+        self.close()
 
     def init_ui(self):
         self.browse_coll = BrowseColl()
@@ -171,8 +171,8 @@ class WinSmb(WinStandartBase):
 
     def ok_cmd(self, e):
         self.browse_coll.finalize()
-        self.deleteLater()
         self.finished.emit()
+        self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         return

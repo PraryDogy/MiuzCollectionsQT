@@ -154,7 +154,7 @@ class WinDates(WinStandartBase):
         if not any((self.date_start, self.date_end)):
             cnf.date_start, cnf.date_end = None, None
             FiltersDateBtncolor.date_based_color()
-            self.deleteLater()
+            self.close()
             gui_signals_app.reload_thumbnails.emit()
 
             return
@@ -172,18 +172,18 @@ class WinDates(WinStandartBase):
         cnf.date_end_text = self.named_date(date=cnf.date_end)
 
         FiltersDateBtncolor.date_based_color()
-        self.deleteLater()
+        self.close()
 
         gui_signals_app.reload_thumbnails.emit()
 
     def cancel_cmd(self, event):
         FiltersDateBtncolor.date_based_color()
-        self.deleteLater()
+        self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
             FiltersDateBtncolor.date_based_color()
-            self.deleteLater()
+            self.close()
 
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd(a0)
@@ -191,5 +191,4 @@ class WinDates(WinStandartBase):
 
     def my_close(self, event):
         FiltersDateBtncolor.date_based_color()
-        self.deleteLater()
-        event.ignore()
+        self.close()

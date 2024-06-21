@@ -22,7 +22,6 @@ from ..win_smb import WinSmb
 class Manager:
     loaded_images: dict = {}
     threads: list = []
-    win_smb = None
 
 
 class ImageWinUtils:
@@ -34,7 +33,7 @@ class ImageWinUtils:
         for widget in widgets:
             if isinstance(widget, WinImgViewBase):
                 cnf.imgview_g.update({"aw": widget.width(), "ah": widget.height()})
-                widget.deleteLater()
+                widget.close()
 
 
 class LoadImageThread(QThread, QObject):
@@ -262,9 +261,8 @@ class WinImageView(WinImgViewBase):
     def smb_check_first(self):
         if not MainUtils.smb_check():
             utils_signals_app.migrate_finished.connect(self.finalize_smb)
-            win_smb = WinSmb(parent=self)
-            Manager.win_smb = win_smb
-            win_smb.show()
+            self.win_smb = WinSmb(parent=self)
+            self.win_smb.show()
 
     def finalize_smb(self):
         name = os.path.basename(self.img_src)
@@ -321,7 +319,7 @@ class WinImageView(WinImgViewBase):
 
         Manager.loaded_images.clear()
         cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
-        self.deleteLater()
+        self.close()
 
     def after_close(self, wid: QLabel):
         try:

@@ -4,3 +4,4 @@ from .input import InputBase
 from .svg_btn import SvgBtn, SvgShadowed
 from .wins import WinBase, WinStandartBase, WinImgViewBase, WinSmallBase
 from .layouts import LayoutH, LayoutV
+from .manager import Manager
