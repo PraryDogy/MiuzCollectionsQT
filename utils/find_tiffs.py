@@ -3,7 +3,7 @@ import re
 
 from PyQt5.QtCore import pyqtSignal
 
-from base_widgets import MyThread
+from .my_thread import MyThread
 from cfg import cnf
 
 
@@ -97,7 +97,7 @@ class ThreadFindTiff(MyThread):
     can_remove = pyqtSignal()
 
     def __init__(self, src: str):
-        super().__init__()
+        super().__init__(parent=None)
         self.src = src
 
     def run(self):
@@ -113,7 +113,7 @@ class ThreadFindTiffsMultiple(MyThread):
     can_remove = pyqtSignal()
 
     def __init__(self, files_list: list):
-        super().__init__()
+        super().__init__(parent=None)
         self.files_list = files_list
 
     def run(self):

@@ -46,13 +46,12 @@ class StBar(QFrame):
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
    
-
         self.h_layout.addSpacerItem(QSpacerItem(30, 0))
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        from PyQt5.QtWidgets import QPushButton
-        self.restarter = QPushButton(self, text="Reload")
-        self.restarter.clicked.connect(self.reload)
+        # from PyQt5.QtWidgets import QPushButton
+        # self.restarter = QPushButton(self, text="Reload")
+        # self.restarter.clicked.connect(self.reload)
 
     def reload(self):
         gui_signals_app.reload_thumbnails.emit()

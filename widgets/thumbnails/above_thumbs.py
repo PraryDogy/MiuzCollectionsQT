@@ -7,16 +7,13 @@ from cfg import cnf
 from signals import gui_signals_app
 from styles import Names, Themes
 
-
-class Manager:
-    btn_w = 120
-    btn_h = 28
+BTN_W, BTN_H = 120, 28
 
 
 class ResetDatesBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.reset_dates)
-        self.setFixedSize(Manager.btn_w, Manager.btn_h)
+        self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_dates_btn)
         self.setStyleSheet(Themes.current)
@@ -34,7 +31,7 @@ class ResetDatesBtn(QLabel):
 class ResetSearchBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.reset_search)
-        self.setFixedSize(Manager.btn_w, Manager.btn_h)
+        self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_search_btn)
         self.setStyleSheet(Themes.current)
@@ -51,7 +48,7 @@ class ResetSearchBtn(QLabel):
 class ResetFiltersBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.show_all)
-        self.setFixedSize(Manager.btn_w, Manager.btn_h)
+        self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_filters_btn)
         self.setStyleSheet(Themes.current)
@@ -68,7 +65,7 @@ class ResetFiltersBtn(QLabel):
 class ShowAllBtn(QLabel):
     def __init__(self):
         super().__init__(text=cnf.lng.show_all)
-        self.setFixedSize(Manager.btn_w, Manager.btn_h)
+        self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_show_all_btn)
         self.setStyleSheet(Themes.current)

@@ -5,7 +5,7 @@ import time
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from base_widgets import MyThread
+from .my_thread import MyThread
 from cfg import cnf
 
 
@@ -59,7 +59,7 @@ class Updater(MyThread):
     no_connection = pyqtSignal()
 
     def __init__(self):
-        super().__init__()
+        super().__init__(parent=None)
         self.task = None
 
     def run(self):

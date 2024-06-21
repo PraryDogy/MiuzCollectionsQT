@@ -1,8 +1,8 @@
 import os
 import sys
 
-from PyQt5.QtCore import QEvent, Qt, QTimer, QObject
-from PyQt5.QtGui import QKeyEvent, QResizeEvent, QIcon
+from PyQt5.QtCore import QEvent, QObject, Qt, QTimer
+from PyQt5.QtGui import QIcon, QKeyEvent, QResizeEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
                              QMainWindow, QPushButton, QVBoxLayout, QWidget)
 
@@ -13,11 +13,6 @@ from styles import Names, Themes
 from utils import MainUtils
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
-
-
-class Manager:
-    smb_win = None
-    first_load_win = None
 
 
 class TestWid(QWidget):
@@ -188,15 +183,15 @@ class App(QApplication):
         if cnf.first_load:
             from widgets.win_first_load import WinFirstLoad
             cnf.first_load = False
-            Manager.first_load_win = WinFirstLoad()
-            Manager.first_load_win.show()
+            self.first_load_win = WinFirstLoad()
+            self.first_load_win.show()
             return
 
         if not MainUtils.smb_check():
             from widgets.win_smb import WinSmb
 
-            Manager.smb_win = WinSmb(parent=self.main_win)
-            Manager.smb_win.show()
+            self.smb_win = WinSmb(parent=self.main_win)
+            self.smb_win.show()
 
         utils_signals_app.scaner_start.emit()
 

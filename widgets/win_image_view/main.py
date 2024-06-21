@@ -6,13 +6,12 @@ from PyQt5.QtGui import (QContextMenuEvent, QImage, QKeyEvent, QMouseEvent,
                          QPainter, QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from base_widgets import (LayoutH, LayoutV, MyThread, SvgShadowed,
-                          WinImgViewBase)
+from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
 from styles import Names, Themes
-from utils import MainUtils, ReadImage, get_image_size
+from utils import MainUtils, MyThread, ReadImage, get_image_size
 
 from ..image_context import ImageContext
 from ..notification import Notification

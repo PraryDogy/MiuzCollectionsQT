@@ -4,7 +4,7 @@ from cfg import cnf
 from signals import utils_signals_app
 
 from ..main_utils import MainUtils
-from .thread import Shared as ScanerThreadManager
+from .thread import Shared
 from .thread import ScanerThread
 
 
@@ -43,7 +43,7 @@ class ScanerShedule(QObject):
 
     def stop_thread(self):
         print("scaner manualy stoped from utils_signals_app. You need emit scaner start signal")
-        ScanerThreadManager.flag = False
+        Shared.flag = False
         self.wait_timer.stop()
 
     def finalize_scan(self):

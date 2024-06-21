@@ -12,10 +12,8 @@ from utils import (RevealFiles, SendNotification, ThreadCopyFiles,
 from ..win_copy_files import WinCopyFiles
 
 
-class Manager:
+class Shared:
     dialog = None
-    threads = []
-    copy_files_wins = []
 
 
 class CustomContext(ContextMenuBase):
@@ -71,17 +69,16 @@ class CustomContext(ContextMenuBase):
         
     def find_tiffs(self, dest: str, files_list: list):
         tsk = ThreadFindTiffsMultiple(files_list)
-        Manager.threads.append(tsk)
-
         tsk.finished.connect(lambda tiff_list: self.copy_files(dest, tiff_list))
-        tsk.can_remove.connect(lambda: Manager.threads.remove(tsk))
+        tsk.can_remove.connect(tsk.remove_threads)
 
         tsk.start()
 
     def select_folder(self):
-        Manager.dialog = QFileDialog()
-        Manager.dialog.setOption(QFileDialog.ShowDirsOnly, True)
-        selected_folder = Manager.dialog.getExistingDirectory()
+        self.dialog = QFileDialog()
+        Shared.dialog = self.dialog
+        self.dialog.setOption(QFileDialog.ShowDirsOnly, True)
+        selected_folder = self.dialog.getExistingDirectory()
 
         if selected_folder:
             return selected_folder
@@ -97,9 +94,6 @@ class CustomContext(ContextMenuBase):
         copy_task = ThreadCopyFiles(dest=dest, files=files)
         copy_win = WinCopyFiles(parent=self.my_parent)
 
-        Manager.threads.append(copy_task)
-        Manager.copy_files_wins.append(copy_win)
-
         copy_task.value_changed.connect(lambda val: copy_win.set_value(val))
         copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, copy_win, files=files))
         copy_win.cancel_sign.connect(lambda: self.copy_files_cancel(copy_task, copy_win))
@@ -110,18 +104,15 @@ class CustomContext(ContextMenuBase):
     def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
         try:
-            Manager.threads.remove(copy_task)
-            Manager.copy_files_wins.remove(copy_win)
-            copy_win.deleteLater()
+            copy_task.remove_threads()
+            copy_win.close()
         except Exception as e:
             print(e)
 
     def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
         try:
-            copy_task.stop.emit()
-            Manager.threads.remove(copy_task)
-            Manager.copy_files_wins.remove(copy_win)
-            copy_win.deleteLater()
+            copy_task.remove_threads()
+            copy_win.close()
         except Exception as e:
             print(e)
 

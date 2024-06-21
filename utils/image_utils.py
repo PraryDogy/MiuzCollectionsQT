@@ -123,7 +123,7 @@ class BaseBytesThumb(io.BytesIO):
     def __init__(self, src: str) -> io.BytesIO:
         super().__init__()
 
-        img = ReadImage(src)
+        img = ReadImage(src=src, desaturate_value=0.85)
         img = img.get_bgr_image()
 
         resized = self.fit_thumb(img)

@@ -2,7 +2,7 @@ import os
 
 from PyQt5.QtCore import pyqtSignal
 
-from base_widgets import MyThread
+from .my_thread import MyThread
 
 
 class ThreadCopyFiles(MyThread):
@@ -11,7 +11,7 @@ class ThreadCopyFiles(MyThread):
     stop = pyqtSignal()
 
     def __init__(self, dest: str, files: list):
-        super().__init__()
+        super().__init__(parent=None)
         self.stop.connect(self.stop_copying)
         self.flag = True
 

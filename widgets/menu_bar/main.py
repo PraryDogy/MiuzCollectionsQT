@@ -13,11 +13,6 @@ from utils import MainUtils
 from ..win_settings import WinSettings
 
 
-class Manager:
-    win_settings = None
-    win_about = None
-
-
 class SelectableLabel(QLabel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -100,15 +95,13 @@ class MacMenuBar(QMenuBar):
         self.setNativeMenuBar(True)
 
     def open_settings_window(self):
-        Manager.win_settings = WinSettings(self)
-        Manager.win_settings.show()
+        self.win_settings = WinSettings(self)
+        self.win_settings.show()
 
     def open_about_window(self):
-        win = AboutWin(self)
-        Manager.win_about = win
-
-        win.center_win(self)
-        win.show()
+        self.about_win = AboutWin(self)
+        self.about_win.center_win(self)
+        self.about_win.show()
 
     def reload_menubar(self):
         self.mainMenu.deleteLater()

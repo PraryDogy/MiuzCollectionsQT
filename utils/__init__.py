@@ -6,6 +6,7 @@ from .image_size import get_image_size
 from .image_utils import (BytesThumb, PixmapFromBytes, ReadImage,
                           UndefBytesThumb)
 from .main_utils import MainUtils
+from .my_thread import MyThread
 from .reveal_files import RevealFiles
 from .scaner import scaner_app
 from .send_notification import SendNotification

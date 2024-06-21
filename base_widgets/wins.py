@@ -9,7 +9,6 @@ import os
 
 from .layouts import LayoutH, LayoutV
 from .svg_btn import SvgBtn
-from .manager import Manager
 
 
 class Btns(QWidget):
@@ -102,6 +101,10 @@ class TitleBar(QFrame):
             f"""
             padding-left: {wid.width()}px;
             """)
+
+
+class Manager:
+    wins = []
 
 
 class WinBase(QMainWindow, QObject):

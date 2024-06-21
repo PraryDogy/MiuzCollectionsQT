@@ -2,20 +2,15 @@ import os
 
 from PyQt5.QtCore import QEvent, QMimeData, Qt, QUrl
 from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent
-from PyQt5.QtWidgets import QAction, QApplication, QFrame, QLabel, QSpacerItem
+from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem
 
-from base_widgets import ContextMenuBase, LayoutV
+from base_widgets import LayoutV
 from cfg import cnf
 from styles import Names, Themes
 from utils import MainUtils, PixmapFromBytes
 
 from ..image_context import ImageContext
 from ..win_image_view import WinImageView
-
-
-class Manager:
-    win_image_view = None
-    co = None
 
 
 class NameLabel(QLabel):
@@ -87,9 +82,8 @@ class Thumbnail(QFrame):
         self.setMaximumHeight(cnf.THUMBSIZE + 75)
         
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        win_image_view = WinImageView(parent=self, img_src=self.img_src)
-        Manager.win_image_view = win_image_view
-        win_image_view.show()
+        self.win_image_view = WinImageView(parent=self, img_src=self.img_src)
+        self.win_image_view.show()
         self.regular_style()
         return super().mouseReleaseEvent(a0)
 
