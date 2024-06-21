@@ -20,18 +20,7 @@ from ..win_smb import WinSmb
 
 class Shared:
     loaded_images: dict = {}
-
-
-class ImageWinUtils:
-
-    @staticmethod
-    def close_same_win():
-        widgets = MainUtils.get_app().topLevelWidgets()
-
-        for widget in widgets:
-            if isinstance(widget, WinImgViewBase):
-                cnf.imgview_g.update({"aw": widget.width(), "ah": widget.height()})
-                widget.close()
+    win: WinImgViewBase = None
 
 
 class LoadImageThread(MyThread):
@@ -216,16 +205,21 @@ class NextImageBtn(SwitchImageBtn):
 
 class WinImageView(WinImgViewBase):
     def __init__(self, parent: QWidget, img_src: str):
-        ImageWinUtils.close_same_win()
 
-        self.img_src = img_src
-        self.collection = None
+        try:
+            cnf.imgview_g.update({"aw": Shared.win.width(), "ah": Shared.win.height()})
+            Shared.win.close()
+        except AttributeError:
+            pass
 
         super().__init__(close_func=self.my_close)
-        # self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setMinimumSize(QSize(500, 400))
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
         self.installEventFilter(self)
+
+        self.img_src = img_src
+        self.collection = None
+        Shared.win = self
 
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
