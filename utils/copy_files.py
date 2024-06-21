@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import pyqtSignal
 
 from .my_thread import MyThread
-
+from .main_utils import MainUtils
 
 class ThreadCopyFiles(MyThread):
     finished = pyqtSignal(list)
@@ -26,7 +26,7 @@ class ThreadCopyFiles(MyThread):
         try:
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
-            print("copy_files.py > run > total size", e)
+            MainUtils.print_err(parent=self, error=e)
             self.value_changed.emit(100)
             self.finished.emit(files_dests)
             self.remove_threads()
@@ -60,7 +60,7 @@ class ThreadCopyFiles(MyThread):
                         self.value_changed.emit(percent)
 
             except Exception as e:
-                print("copy_files.py > run > while self.flag", e)
+                MainUtils.print_err(parent=self, error=e)
                 self.remove_threads()
                 break
         

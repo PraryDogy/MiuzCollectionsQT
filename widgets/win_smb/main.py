@@ -60,7 +60,7 @@ class BrowseColl(QWidget):
             QTimer.singleShot(200, self.default_browse_btn)
             self.blue_count += 1
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
     def default_browse_btn(self):
         try:
@@ -73,7 +73,7 @@ class BrowseColl(QWidget):
 
             QTimer.singleShot(200, self.blue_browse_btn)
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
 
     def cut_text(self, text: str, limit: int = 130):

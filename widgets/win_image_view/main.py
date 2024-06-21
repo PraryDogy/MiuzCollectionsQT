@@ -48,8 +48,7 @@ class LoadImageThread(MyThread):
                 q_image = Shared.loaded_images[self.img_src]
 
         except Exception as e:
-            print("image viewer cant open image, open with pixmap")
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
             q_image = QImage()
             q_image.load(self.img_src)
@@ -208,8 +207,8 @@ class WinImageView(WinImgViewBase):
 
         try:
             Shared.win.close()
-        except (AttributeError, RuntimeError):
-            pass
+        except (AttributeError, RuntimeError) as e:
+            MainUtils.print_err(parent=self, error=e)
 
         super().__init__(close_func=self.my_close)
         self.setMinimumSize(QSize(500, 400))
@@ -277,7 +276,7 @@ class WinImageView(WinImgViewBase):
                 thumbnail = session.execute(q).first()[0]
                 session.close()
             except Exception as e:
-                print(e)
+                MainUtils.print_err(parent=self, error=e)
                 return
 
             pixmap = QPixmap()
@@ -306,7 +305,7 @@ class WinImageView(WinImgViewBase):
             gui_signals_app.move_to_wid.emit(wid)
             QTimer.singleShot(1500, lambda: self.after_close(wid=wid))
         except (KeyError, Exception) as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
         Shared.loaded_images.clear()
         self.close()
@@ -316,13 +315,13 @@ class WinImageView(WinImgViewBase):
             try:
                 v["widget"].regular_style()
             except Exception as e:
-                print("win_image_view.py > after_close > for loop", e)
+                MainUtils.print_err(parent=self, error=e)
 
         try:
             # wid = thumbnails > thumbnail.py > Thumbnail
             wid.regular_style()
         except Exception as e:
-            print("win_image_view.py > after_close > regular style", e)
+            MainUtils.print_err(parent=self, error=e)
 
 # GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
 

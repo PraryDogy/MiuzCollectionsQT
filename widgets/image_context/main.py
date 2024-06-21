@@ -10,7 +10,7 @@ from utils import (RevealFiles, SendNotification, ThreadCopyFiles,
 
 from ..win_copy_files import WinCopyFiles
 from ..win_info import WinInfo
-
+from utils import MainUtils
 
 class Shared:
     file_dialog = None
@@ -159,7 +159,7 @@ class ImageContext(ContextMenuBase):
             copy_task.remove_threads()
             copy_win.close()
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
     def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
         try:
@@ -167,4 +167,4 @@ class ImageContext(ContextMenuBase):
             copy_task.remove_threads()
             copy_win.close()
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)

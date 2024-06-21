@@ -9,7 +9,7 @@ import os
 
 from .layouts import LayoutH, LayoutV
 from .svg_btn import SvgBtn
-
+from utils import MainUtils
 
 class Btns(QWidget):
     def __init__(self):
@@ -141,7 +141,7 @@ class WinBase(QMainWindow, QObject):
             Manager.wins.remove(self)
             self.deleteLater()
         except Exception as e:
-            print("wins.py > WinBase > closeEvent", e)
+            MainUtils.print_err(parent=self, error=e)
 
         return super().closeEvent(a0)
 
@@ -167,7 +167,7 @@ class WinBase(QMainWindow, QObject):
             geo.moveCenter(parent.window().geometry().center())
             self.setGeometry(geo)
         except (RuntimeError, Exception) as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
     def fit_size(self):
         self.adjustSize()

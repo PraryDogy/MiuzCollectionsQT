@@ -9,7 +9,7 @@ from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from signals import gui_signals_app
 from styles import Names, Themes
-from utils import SendNotification
+from utils import SendNotification, MainUtils
 
 
 class CustomContext(ContextMenuBase):
@@ -123,7 +123,7 @@ class CollectionBtn(QLabel):
             return super().contextMenuEvent(ev)
 
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
     def closed_context(self):
         try:
@@ -133,7 +133,7 @@ class CollectionBtn(QLabel):
                 self.setObjectName(Names.menu_btn_selected)
             self.setStyleSheet(Themes.current)
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
     def enterEvent(self, a0: QEvent | None) -> None:
         if self.true_name != cnf.ALL_COLLS:

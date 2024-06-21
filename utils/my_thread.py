@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QObject, QThread
-
+from .main_utils import MainUtils
 
 class Threads:
     list = []
@@ -18,4 +18,4 @@ class MyThread(QThread):
                 if not i.isRunning():
                     Threads.list.remove(i)
         except Exception as e:
-            print("Base Widgets > my_thread.py > remove_thread", e)
+            MainUtils.print_err(parent=self, error=e)

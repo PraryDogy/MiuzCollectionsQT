@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QLabel, QProgressBar, QSpacerItem, QWidget
 
 from base_widgets import Btn, WinStandartBase
 from cfg import cnf
+from utils import MainUtils
 
 
 class WinCopyFiles(WinStandartBase):
@@ -49,4 +50,4 @@ class WinCopyFiles(WinStandartBase):
         try:
             self.progress.setValue(value)
         except (Exception, RuntimeError) as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)

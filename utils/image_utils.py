@@ -152,7 +152,7 @@ class BytesThumb(io.BytesIO):
             self.write(bytes_thumb.getvalue())
 
         except Exception as e:
-            print(f"Bytes thumb: {str(e)}, try heif convert")
+            MainUtils.print_err(parent=self, error=e)
         
         if not self.getvalue():
             try:
@@ -162,7 +162,7 @@ class BytesThumb(io.BytesIO):
                 os.remove(heif.converted_img_path)
 
             except Exception as e:
-                print(f"Unable to convert HEIF to JPEG: {str(e)}")
+                MainUtils.print_err(parent=self, error=e)
             
         if not self.getvalue():
             raise ZeroDivisionError("Unable to open or convert image.")

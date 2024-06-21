@@ -1,7 +1,7 @@
 import os
 import shutil
 import subprocess
-import time
+from .main_utils import MainUtils
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -37,7 +37,7 @@ class UpdaterMain(QObject):
 
         except IndexError:
             zip_file = None
-            print("no zip file")
+            MainUtils.print_err(parent=self, error=e)
 
         if not zip_file:
             self.no_connection.emit()

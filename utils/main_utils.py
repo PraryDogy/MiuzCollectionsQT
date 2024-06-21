@@ -1,8 +1,8 @@
 import os
 import platform
 import subprocess
+import traceback
 
-from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QVBoxLayout
 
 from cfg import cnf
@@ -21,7 +21,7 @@ class MainUtils:
                 try:
                     old_coll = old_coll.strip(os.sep).split(os.sep)[2:]
                 except Exception as e:
-                    print(e)
+                    print("MainUtils > smb_check",e)
                     return False
 
                 old_coll = os.path.join(os.sep, *old_coll)
@@ -97,3 +97,18 @@ class MainUtils:
     @staticmethod
     def get_central_widget():
         return MainUtils.get_app().main_win
+
+    @staticmethod
+    def print_err(parent: object, error: Exception):
+        tb = traceback.extract_tb(error.__traceback__)
+        last_call = tb[-1]
+        filepath = last_call.filename
+        filename = os.path.basename(filepath)
+        class_name = parent.__class__.__name__
+        line_number = last_call.lineno
+        error_message = str(error)
+        
+        print()
+        print(f"{filename} > {class_name} > row {line_number}: {error_message}")
+        print(f"{filepath}:{line_number}")
+        print()

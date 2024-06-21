@@ -50,7 +50,7 @@ class ScanerShedule(QObject):
         try:
             self.scaner_thread.quit()
         except Exception as e:
-            print("scaner finalze scan quit thread", e)
+            MainUtils.print_err(parent=self, error=e)
 
         self.scaner_thread = None
         self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)

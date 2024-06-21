@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
 from styles import Names, Themes
-from utils import (RevealFiles, SendNotification, ThreadCopyFiles,
+from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiffsMultiple)
 
 from ..win_copy_files import WinCopyFiles
@@ -107,14 +107,14 @@ class CustomContext(ContextMenuBase):
             copy_task.remove_threads()
             copy_win.close()
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
     def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
         try:
             copy_task.remove_threads()
             copy_win.close()
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
 
 class Title(QLabel):

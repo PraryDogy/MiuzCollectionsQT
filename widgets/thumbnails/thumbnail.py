@@ -124,13 +124,13 @@ class Thumbnail(QFrame):
             self.image_context.show_menu()
             return super().contextMenuEvent(ev)
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
     def closed_context(self):
         try:
             self.regular_style()
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
 
     def enterEvent(self, a0: QEvent | None) -> None:
         self.setToolTip(

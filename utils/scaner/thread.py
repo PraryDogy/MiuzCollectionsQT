@@ -31,7 +31,7 @@ class Migrate:
             q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
             res = sess.execute(q).fetchall()
         except Exception as e:
-            print("migrate load all rows err", e)
+            MainUtils.print_err(parent=self, error=e)
             return
         
         if len(res) == 0:
@@ -53,7 +53,7 @@ class Migrate:
         try:
             sess.commit()
         except Exception as e:
-            print("migrate commit err", e)
+            MainUtils.print_err(parent=self, error=e)
 
         sess.close()
         cnf.old_coll_folder = None
@@ -75,7 +75,7 @@ class TrashRemover:
             trash_img = session.execute(q).first()
         
         except Exception as e:
-            print(e)
+            MainUtils.print_err(parent=self, error=e)
             return
 
         if trash_img:
@@ -87,7 +87,7 @@ class TrashRemover:
                 session.execute(q)
                 session.commit()
             except Exception as e:
-                print(e)
+                MainUtils.print_err(parent=self, error=e)
                 return
             finally:
                 session.close()
@@ -132,7 +132,7 @@ class FinderImages(dict):
             self.run()
 
         except (OSError, FileNotFoundError):
-            print(traceback.format_exc())
+            MainUtils.print_err(parent=self, error=e)
             Shared.flag = False
 
         if not self:
@@ -158,7 +158,7 @@ class FinderImages(dict):
             try:
                 gui_signals_app.progressbar_value.emit(step_value)
             except Exception as e:
-                print(e)
+                MainUtils.print_err(parent=self, error=e)
 
             for root, _, files in os.walk(top=collection_walk):
 
@@ -241,7 +241,7 @@ class UpdateDb:
             gui_signals_app.progressbar_value.emit(70)
             gui_signals_app.progressbar_del_photos.emit()
         except RuntimeError:
-            pass
+            MainUtils.print_err(parent=self, error=e)
 
         if images["delete"]:
             self.delete_db(images["delete"])
@@ -250,7 +250,7 @@ class UpdateDb:
             gui_signals_app.progressbar_value.emit(80)
             gui_signals_app.progressbar_add_photos.emit()
         except RuntimeError:
-            pass
+            MainUtils.print_err(parent=self, error=e)
 
         if images["insert"]:
             self.insert_db(images["insert"])
@@ -258,7 +258,7 @@ class UpdateDb:
         try:
             gui_signals_app.progressbar_value.emit(90)
         except RuntimeError:
-            pass
+            MainUtils.print_err(parent=self, error=e)
 
         if images["update"]:
             self.update_db(images["update"])
@@ -284,11 +284,12 @@ class UpdateDb:
                 values.append(obj)
 
             except FileNotFoundError:
-                print(traceback.format_exc())
+                MainUtils.print_err(parent=self, error=e)
                 Shared.flag = False
                 return
 
             except Exception as e:
+                MainUtils.print_err(parent=self, error=e)
                 obj = {"img150": UndefBytesThumb().getvalue(),
                         "src": src,
                         "size": 666,
@@ -348,7 +349,7 @@ class UpdateDb:
                 gui_signals_app.reload_menu.emit()
 
             except Exception as e:
-                print(f"Error occurred: {e}")
+                MainUtils.print_err(parent=self, error=e)
                 session.rollback()
 
             finally:
@@ -400,7 +401,7 @@ class UpdateDb:
                 gui_signals_app.reload_menu.emit()
 
             except Exception as e:
-                print(f"Error occurred: {e}")
+                MainUtils.print_err(parent=self, error=e)
                 session.rollback()
 
             finally:
@@ -438,7 +439,7 @@ class UpdateDb:
                 gui_signals_app.reload_menu.emit()
 
             except Exception as e:
-                print(f"Error occurred: {e}")
+                MainUtils.print_err(parent=self, error=e)
                 session.rollback()
 
             finally:
@@ -454,8 +455,8 @@ class Scaner(object):
 
             try:
                 gui_signals_app.progressbar_show.emit()
-            except RuntimeError:
-                pass
+            except RuntimeError as e:
+                MainUtils.print_err(parent=self, error=e)
 
             self.migrate = Migrate()
 
@@ -480,17 +481,16 @@ class Scaner(object):
                 gui_signals_app.progressbar_hide.emit()
                 gui_signals_app.reload_menu.emit()
                 gui_signals_app.reload_thumbnails.emit()
-            except RuntimeError:
-                pass
+            except RuntimeError as e:
+                MainUtils.print_err(parent=self, error=e)
 
-        except Exception:
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
 
             try:
                 gui_signals_app.progressbar_hide.emit()
-            except RuntimeError:
-                pass
-
-            print(traceback.format_exc())
+            except RuntimeError as e:
+                MainUtils.print_err(parent=self, error=e)
 
 
 class ScanerThread(QThread):

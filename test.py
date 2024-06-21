@@ -1,60 +1,35 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel
+import traceback
+import os
 
-class MainWindow(QMainWindow):
+class Utils:
+    @staticmethod
+    def print_err(parent: object, error: Exception):
+        # Получаем текущий стек вызовов
+        tb = traceback.extract_tb(error.__traceback__)
+        last_call = tb[-1]
+        filepath = last_call.filename
+        filename = os.path.basename(filepath)
+        class_name = parent.__class__.__name__
+        line_number = last_call.lineno
+        error_message = str(error)
+        
+        print()
+        print(f"{filename} > {class_name} > row {line_number}: {error_message}")
+        print(f"{filepath}:{line_number}")
+        print()
+
+class Foo:
     def __init__(self):
         super().__init__()
-        self.initUI()
+        self.test = []
 
-    def initUI(self):
-        self.setWindowTitle('Main Window')
-        self.setGeometry(100, 100, 400, 300)
+    def test_method(self):
+        try:
+            self.test[1]
+        except Exception as e:
+            Utils.print_err(self, e)
 
-        button = QPushButton('Open Modal Window', self)
-        button.clicked.connect(self.openModalWindow)
-        self.setCentralWidget(button)
 
-    def openModalWindow(self):
-        self.modalWindow = ModalWindow(self)
-        self.modalWindow.setWindowModality(Qt.ApplicationModal)
-        self.modalWindow.show()
+a = Foo()
+a.test_method()
 
-class ModalWindow(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle('Modal Window')
-        self.setGeometry(150, 150, 200, 100)
-
-        self.child_windows = []  # Список для хранения дочерних окон
-
-        layout = QVBoxLayout()
-        button1 = QPushButton('Open Child Window 1', self)
-        button1.clicked.connect(lambda: self.openChildWindow('Child Window 1'))
-        layout.addWidget(button1)
-
-        button2 = QPushButton('Open Child Window 2', self)
-        button2.clicked.connect(lambda: self.openChildWindow('Child Window 2'))
-        layout.addWidget(button2)
-
-        self.setLayout(layout)
-
-    def openChildWindow(self, title):
-        child_window = ChildWindow(self, title)
-        child_window.show()
-        self.child_windows.append(child_window)  # Сохраняем ссылку на дочернее окно
-
-class ChildWindow(QWidget):
-    def __init__(self, parent=None, title=''):
-        super().__init__(parent)
-        self.setWindowTitle(title)
-        self.setGeometry(200, 200, 150, 100)
-        layout = QVBoxLayout()
-        label = QLabel(f'This is {title}', self)
-        layout.addWidget(label)
-        self.setLayout(layout)
-
-if __name__ == '__main__':
-    app = QApplication([])
-    mainWindow = MainWindow()
-    mainWindow.show()
-    app.exec_()
