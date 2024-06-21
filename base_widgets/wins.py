@@ -104,7 +104,7 @@ class TitleBar(QFrame):
 
 
 class WinBase(QMainWindow, QObject):
-    def __init__(self, close_func: callable, parent=None):
+    def __init__(self, close_func: callable, parent: QWidget = None):
         super().__init__(parent=parent)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)

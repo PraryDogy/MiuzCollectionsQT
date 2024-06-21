@@ -25,7 +25,7 @@ class ContextMenuBase(QMenu):
 
 
 class ContextSubMenuBase(QMenu):
-    def __init__(self, parent: QMenu, title):
+    def __init__(self, parent: QMenu, title: str):
         super().__init__(parent=parent, title=title)
         self.setMinimumWidth(150)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
