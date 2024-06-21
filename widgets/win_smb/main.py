@@ -111,8 +111,6 @@ class WinSmb(WinStandartBase):
     finished = pyqtSignal()
 
     def __init__(self, parent: QWidget):
-        MainUtils.close_same_win(WinSmb)
-
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.set_title(cnf.lng.no_connection)

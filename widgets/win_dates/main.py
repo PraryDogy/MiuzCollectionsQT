@@ -80,8 +80,6 @@ class RightDateWidget(BaseDateLayout):
 
 class WinDates(WinStandartBase):
     def __init__(self, parent: QWidget):
-        MainUtils.close_same_win(WinDates)
-
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         FiltersDateBtncolor.set_border()

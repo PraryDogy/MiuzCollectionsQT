@@ -90,14 +90,6 @@ class MainUtils:
         return paste_result.stdout.strip()
     
     @staticmethod
-    def close_same_win(wid = QObject):
-        widgets = MainUtils.get_app().topLevelWidgets()
-        for widget in widgets:
-            if isinstance(widget, wid):
-                # win with delete_win signal in base_widgets > win > StandartWin
-                widget.close()
-
-    @staticmethod
     def get_app():
         from app import app
         return app

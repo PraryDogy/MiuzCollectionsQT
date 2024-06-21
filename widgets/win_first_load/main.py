@@ -118,8 +118,6 @@ class ChangeLang(QWidget, QObject):
 
 class WinFirstLoad(WinStandartBase):
     def __init__(self):
-        MainUtils.close_same_win(WinFirstLoad)
-
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min_max()

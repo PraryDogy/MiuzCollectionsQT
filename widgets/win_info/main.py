@@ -125,8 +125,6 @@ class RightLabel(BaseLabel):
 
 class WinInfo(WinStandartBase):
     def __init__(self, img_src: str, parent: QWidget):
-        MainUtils.close_same_win(WinInfo)
-
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min_max()
