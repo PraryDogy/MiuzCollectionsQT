@@ -207,9 +207,8 @@ class WinImageView(WinImgViewBase):
     def __init__(self, parent: QWidget, img_src: str):
 
         try:
-            cnf.imgview_g.update({"aw": Shared.win.width(), "ah": Shared.win.height()})
             Shared.win.close()
-        except AttributeError:
+        except (AttributeError, RuntimeError):
             pass
 
         super().__init__(close_func=self.my_close)
@@ -310,15 +309,20 @@ class WinImageView(WinImgViewBase):
             print(e)
 
         Shared.loaded_images.clear()
-        cnf.imgview_g.update({"aw": self.width(), "ah": self.height()})
         self.close()
 
     def after_close(self, wid: QLabel):
+        for k, v in cnf.images.items():
+            try:
+                v["widget"].regular_style()
+            except Exception as e:
+                print("win_image_view.py > after_close > for loop", e)
+
         try:
             # wid = thumbnails > thumbnail.py > Thumbnail
             wid.regular_style()
         except Exception as e:
-            print(e)
+            print("win_image_view.py > after_close > regular style", e)
 
 # GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
 
@@ -391,7 +395,7 @@ class WinImageView(WinImgViewBase):
 
         return super().keyPressEvent(ev)
 
-    def  contextMenuEvent(self, event: QContextMenuEvent | None) -> None:
+    def contextMenuEvent(self, event: QContextMenuEvent | None) -> None:
         self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)
         self.image_context.show_menu()
         return super().contextMenuEvent(event)
@@ -407,6 +411,8 @@ class WinImageView(WinImgViewBase):
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
 
         self.notification.resize(a0.size().width() - 20, 30)
+
+        cnf.imgview_g.update({"aw": a0.size().width(), "ah": a0.size().height()})
 
         return super().resizeEvent(a0)
 
