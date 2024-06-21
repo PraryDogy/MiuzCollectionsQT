@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCloseEvent, QContextMenuEvent
+from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
