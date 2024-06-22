@@ -159,7 +159,11 @@ class App(QApplication):
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            wins = (i for i in (self.main_win, cnf.image_viewer) if i)
+            wins = (
+                i
+                for i in (self.main_win, cnf.image_viewer)
+                if i is not None
+                )
             for win in wins:
                 win.hide()
                 win.show()
