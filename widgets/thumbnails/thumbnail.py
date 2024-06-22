@@ -88,10 +88,15 @@ class Thumbnail(QFrame):
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
-            for k, v in cnf.images.items():
-                v["widget"].regular_style()
 
+            try:
+                cnf.selected_thumbnail.regular_style()
+            except Exception as e:
+                MainUtils.print_err(parent=self, error=e)
+
+            cnf.selected_thumbnail = self
             self.selected_style()
+
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
 
@@ -113,6 +118,7 @@ class Thumbnail(QFrame):
 
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.DropAction.CopyAction)
+
         self.regular_style()
 
         return super().mouseMoveEvent(a0)
@@ -123,8 +129,12 @@ class Thumbnail(QFrame):
             self.image_context.closed.connect(self.closed_context)
             self.image_context.add_preview_item()
 
-            for k, v in cnf.images.items():
-                v["widget"].regular_style()
+            try:
+                cnf.selected_thumbnail.regular_style()
+            except Exception as e:
+                MainUtils.print_err(parent=self, error=e)
+
+            cnf.selected_thumbnail = self
             self.selected_style()
 
             self.image_context.show_menu()

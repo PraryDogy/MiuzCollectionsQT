@@ -4,8 +4,21 @@ import shutil
 from datetime import datetime
 from typing import Literal
 
-from lang import Eng, Rus
 from PyQt5.QtCore import QObject
+
+from lang import Eng, Rus
+
+
+class Thumbnail(QObject):
+    def __init__(self):
+        super().__init__()
+
+    def regular_style(self):
+        ...
+
+    def selected_style(self):
+        ...
+
 
 class User:
     def __init__(self) -> None:
@@ -93,7 +106,7 @@ class Dymanic:
 
         self.current_photo_limit: int = self.LIMIT
 
-        self.images: dict = {str: {"filename": str, "collection": str, "widget": QObject}}
+        self.images: dict = {"img_src": {"filename": str, "collection": str, "widget": QObject}}
         self.tiff_images: set = set()
 
         self.date_start: datetime = None
@@ -107,7 +120,7 @@ class Dymanic:
         self.lng: Eng = Eng()
 
         self.image_viewer: QObject = None
-        self.selected_thumbnail: QObject = None
+        self.selected_thumbnail: Thumbnail = None
 
 
 class AppInfo:

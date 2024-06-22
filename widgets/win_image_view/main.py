@@ -298,22 +298,18 @@ class WinImageView(WinImgViewBase):
 
     def my_close(self, event):
         try:
-            # wid = thumbnails > thumbnail.py > Thumbnail
-
-            for k, v in cnf.images.items():
-                try:
-                    v["widget"].regular_style()
-                except Exception as e:
-                    MainUtils.print_err(parent=self, error=e)
-
-            wid: QLabel = cnf.images[self.img_src]["widget"]
-            wid.selected_style()
-            gui_signals_app.move_to_wid.emit(wid)
-
-            QTimer.singleShot(1500, lambda: self.after_close(wid=wid))
-
-        except (KeyError, Exception) as e:
+            cnf.selected_thumbnail.regular_style()
+        except Exception as e:
             MainUtils.print_err(parent=self, error=e)
+
+        try:
+            cnf.selected_thumbnail = cnf.images[self.img_src]
+            cnf.selected_thumbnail.selected_style()
+            gui_signals_app.move_to_wid.emit(cnf.selected_thumbnail)
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+        QTimer.singleShot(1500, self.after_close)
 
         Shared.loaded_images.clear()
         cnf.image_viewer = None
@@ -321,8 +317,7 @@ class WinImageView(WinImgViewBase):
 
     def after_close(self, wid: QLabel):
         try:
-            # wid = thumbnails > thumbnail.py > Thumbnail
-            wid.regular_style()
+            cnf.selected_thumbnail.regular_style()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 
