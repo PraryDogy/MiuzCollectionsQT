@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Literal
 
 from lang import Eng, Rus
-
+from PyQt5.QtWidgets import QMainWindow
 
 class User:
     def __init__(self) -> None:
@@ -101,6 +101,7 @@ class Dymanic:
         self.date_end_text: str = None # datetime as readable text
         self.lng: Eng = Eng()
         self.old_coll_folder: str = None
+        self.image_viewer: QMainWindow = None
 
 
 class AppInfo:

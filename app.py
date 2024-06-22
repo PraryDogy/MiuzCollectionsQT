@@ -159,12 +159,11 @@ class App(QApplication):
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            for widget in QApplication.topLevelWidgets():
-                if isinstance(widget, QMainWindow):
-                    if widget.isMaximized():
-                        widget.showMaximized()
-                    else:
-                        widget.showNormal()
+            wins = (i for i in (self.main_win, cnf.image_viewer) if i)
+            for win in wins:
+                win.hide()
+                win.show()
+
         return super().eventFilter(a0, a1)
     
     def on_exit(self):

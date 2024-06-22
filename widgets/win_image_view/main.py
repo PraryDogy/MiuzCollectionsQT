@@ -20,7 +20,6 @@ from ..win_smb import WinSmb
 
 class Shared:
     loaded_images: dict = {}
-    win: WinImgViewBase = None
 
 
 class LoadImageThread(MyThread):
@@ -206,7 +205,7 @@ class WinImageView(WinImgViewBase):
     def __init__(self, parent: QWidget, img_src: str):
 
         try:
-            Shared.win.close()
+            cnf.image_viewer.close()
         except (AttributeError, RuntimeError) as e:
             pass
 
@@ -217,7 +216,7 @@ class WinImageView(WinImgViewBase):
 
         self.img_src = img_src
         self.collection = None
-        Shared.win = self
+        cnf.image_viewer = self
 
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
@@ -310,11 +309,14 @@ class WinImageView(WinImgViewBase):
             wid: QLabel = cnf.images[self.img_src]["widget"]
             wid.selected_style()
             gui_signals_app.move_to_wid.emit(wid)
+
             QTimer.singleShot(1500, lambda: self.after_close(wid=wid))
+
         except (KeyError, Exception) as e:
             MainUtils.print_err(parent=self, error=e)
 
         Shared.loaded_images.clear()
+        cnf.image_viewer = None
         self.close()
 
     def after_close(self, wid: QLabel):
