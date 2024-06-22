@@ -82,7 +82,19 @@ class ImageContext(ContextMenuBase):
         self.win_info.show()
         
     def show_image_viewer(self, img_src: str):
-        # import here to prevent circular import
+
+        try:
+            cnf.selected_thumbnail.regular_style()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+        try:
+            cnf.selected_thumbnail = cnf.images[img_src]["widget"]
+            cnf.selected_thumbnail.selected_style()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+        # prevent circular import
         from ..win_image_view import WinImageView
         self.win_img = WinImageView(parent=self.my_parent, img_src=img_src)
         self.win_img.show()
