@@ -141,7 +141,7 @@ class WinBase(QMainWindow, QObject):
             Manager.wins.remove(self)
             self.deleteLater()
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            pass
 
         return super().closeEvent(a0)
 
