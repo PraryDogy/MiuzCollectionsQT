@@ -20,7 +20,7 @@ class ResetDatesBtn(QLabel):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.date_start, cnf.date_end = None, None
-        cnf.current_limit = cnf.LIMIT
+        cnf.current_photo_limit = cnf.LIMIT
 
         gui_signals_app.set_dates_btn_normal.emit()
         gui_signals_app.reload_thumbnails.emit()
@@ -37,7 +37,7 @@ class ResetSearchBtn(QLabel):
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.current_limit = cnf.LIMIT
+        cnf.current_photo_limit = cnf.LIMIT
 
         gui_signals_app.clear_search.emit()
         gui_signals_app.reload_thumbnails.emit()
@@ -54,7 +54,7 @@ class ResetFiltersBtn(QLabel):
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.current_limit = cnf.LIMIT
+        cnf.current_photo_limit = cnf.LIMIT
 
         gui_signals_app.disable_filters.emit()
         gui_signals_app.reload_thumbnails.emit()
@@ -73,7 +73,7 @@ class ShowAllBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.date_start, cnf.date_end = None, None
         cnf.curr_coll = cnf.ALL_COLLS
-        cnf.current_limit = cnf.LIMIT
+        cnf.current_photo_limit = cnf.LIMIT
 
         gui_signals_app.clear_search.emit()
         gui_signals_app.disable_filters.emit()
@@ -117,9 +117,9 @@ class AboveThumbsNoImages(QWidget):
             **cnf.lng.sys_fltr_names
             }
 
-        if cnf.search_text:
+        if cnf.search_widget_text:
             noimg_t = (f"{cnf.lng.no_photo} {cnf.lng.with_name}: "
-                       f"{cnf.search_text}")
+                       f"{cnf.search_widget_text}")
 
             title_label.setText(noimg_t)
 
@@ -175,8 +175,8 @@ class AboveThumbs(QWidget):
             spacer = QSpacerItem(1, 10)
             self.v_layout.addSpacerItem(spacer)
 
-        elif cnf.search_text:
-            label.setText(f"{cnf.lng.search}: {cnf.search_text}")
+        elif cnf.search_widget_text:
+            label.setText(f"{cnf.lng.search}: {cnf.search_widget_text}")
             h_layout.addWidget(ResetSearchBtn())
             h_layout.addSpacerItem(QSpacerItem(1, 30))
 

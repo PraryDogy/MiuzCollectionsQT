@@ -82,7 +82,7 @@ class Thumbnails(QScrollArea):
             self.thumbnails_layout.addWidget(no_images)
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
-        if ln_thumbs == cnf.current_limit:
+        if ln_thumbs == cnf.current_photo_limit:
             h_layout = LayoutH()
             h_layout.setContentsMargins(0, 0, 0, 10)
             self.thumbnails_layout.addLayout(h_layout)

@@ -101,7 +101,7 @@ class CollectionBtn(QLabel):
 
     def load_collection(self):
         cnf.curr_coll = self.true_name
-        cnf.current_limit = cnf.LIMIT
+        cnf.current_photo_limit = cnf.LIMIT
         gui_signals_app.reload_title.emit()
         gui_signals_app.scroll_top.emit()
         gui_signals_app.reload_menu.emit()

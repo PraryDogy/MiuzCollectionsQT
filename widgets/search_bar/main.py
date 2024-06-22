@@ -33,9 +33,9 @@ class SearchBarBase(InputBase):
 
     def create_search(self, new_text):
         if len(new_text) > 0:
-            cnf.search_text = new_text
+            cnf.search_widget_text = new_text
         else:
-            cnf.search_text = None
+            cnf.search_widget_text = None
 
         self.timer.stop()
         self.timer.start()
@@ -45,7 +45,7 @@ class SearchBarBase(InputBase):
 
     def clear_search(self):
         self.clear()
-        cnf.search_text = None
+        cnf.search_widget_text = None
 
     def reload_search(self):
         self.setPlaceholderText(cnf.lng.search)

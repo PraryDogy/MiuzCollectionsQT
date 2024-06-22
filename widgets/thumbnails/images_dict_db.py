@@ -54,8 +54,8 @@ class ImagesDictDb(dict):
             ThumbsMd.collection
             )
 
-        if cnf.search_text:
-            search = cnf.search_text.replace("\n", "").strip()
+        if cnf.search_widget_text:
+            search = cnf.search_widget_text.replace("\n", "").strip()
             q = q.filter(ThumbsMd.src.like(f"%{search}%"))
 
         if cnf.curr_coll != cnf.ALL_COLLS:
@@ -87,6 +87,6 @@ class ImagesDictDb(dict):
             q = q.filter(ThumbsMd.modified > t[0])
             q = q.filter(ThumbsMd.modified < t[1])
 
-        q = q.limit(cnf.current_limit)
+        q = q.limit(cnf.current_photo_limit)
         q = q.order_by(-ThumbsMd.modified)
         return q

@@ -13,6 +13,6 @@ class LimitBtn(Btn):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.current_limit += cnf.LIMIT
+        cnf.current_photo_limit += cnf.LIMIT
         gui_signals_app.reload_thumbnails.emit()
         return super().mouseReleaseEvent(ev)

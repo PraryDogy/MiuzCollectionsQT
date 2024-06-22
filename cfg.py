@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Literal
 
 from lang import Eng, Rus
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtCore import QObject
 
 class User:
     def __init__(self) -> None:
@@ -91,17 +91,23 @@ class Dymanic:
     def __init__(self) -> None:
         super().__init__()
 
-        self.current_limit: int = self.LIMIT
-        self.search_text: str = None
-        self.images: dict = {}
+        self.current_photo_limit: int = self.LIMIT
+
+        self.images: dict = {str: {"filename": str, "collection": str, "widget": QObject}}
         self.tiff_images: set = set()
+
         self.date_start: datetime = None
         self.date_end: datetime = None
-        self.date_start_text: str = None # datetime as readable text
-        self.date_end_text: str = None # datetime as readable text
+
+        self.search_widget_text: str = None
+        self.date_start_text: str = "1 january 1991" # datetime as readable text
+        self.date_end_text: str = "31 december 1991" # datetime as readable text
+        self.old_coll_folder: str = None # for utils > scaner > thread > Migrate
+
         self.lng: Eng = Eng()
-        self.old_coll_folder: str = None
-        self.image_viewer: QMainWindow = None
+
+        self.image_viewer: QObject = None
+        self.selected_thumbnail: QObject = None
 
 
 class AppInfo:
