@@ -11,6 +11,10 @@ from lang import Eng, Rus
 
 class Thumbnail(QObject):
     def __init__(self):
+        """
+        reference:
+        widgets > thumbnails > thumbnail.py > Thumbnail
+        """
         super().__init__()
 
     def regular_style(self):
