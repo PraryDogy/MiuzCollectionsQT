@@ -120,7 +120,7 @@ class Dymanic:
         self.lng: Eng = Eng()
 
         self.image_viewer: QObject = None
-        self.selected_thumbnail: Thumbnail = None
+        self.selected_thumbnail: Thumbnail = Thumbnail()
 
 
 class AppInfo:

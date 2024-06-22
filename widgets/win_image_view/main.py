@@ -302,20 +302,21 @@ class WinImageView(WinImgViewBase):
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 
+        cnf.selected_thumbnail = cnf.images[self.img_src]["widget"]
+
         try:
-            cnf.selected_thumbnail = cnf.images[self.img_src]
             cnf.selected_thumbnail.selected_style()
             gui_signals_app.move_to_wid.emit(cnf.selected_thumbnail)
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 
-        QTimer.singleShot(1500, self.after_close)
+        QTimer.singleShot(1500, lambda: self.after_close())
 
         Shared.loaded_images.clear()
         cnf.image_viewer = None
         self.close()
 
-    def after_close(self, wid: QLabel):
+    def after_close(self):
         try:
             cnf.selected_thumbnail.regular_style()
         except Exception as e:
