@@ -5,12 +5,12 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
-from utils import (RevealFiles, SendNotification, ThreadCopyFiles,
+from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiff)
 
 from ..win_copy_files import WinCopyFiles
 from ..win_info import WinInfo
-from utils import MainUtils
+
 
 class Shared:
     file_dialog = None
