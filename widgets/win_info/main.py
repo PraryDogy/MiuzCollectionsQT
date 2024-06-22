@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QContextMenuEvent
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
@@ -157,6 +157,16 @@ class WinInfo(WinStandartBase):
         button = Btn(cnf.lng.close)
         button.mouseReleaseEvent = self.my_close
         btn_layout.addWidget(button)
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Escape:
+            self.my_close(a0)
+        return super().keyPressEvent(a0)
   
     def my_close(self, event):
+        if not cnf.image_viewer:
+            try:
+                cnf.selected_thumbnail.regular_style()
+            except Exception as e:
+                MainUtils.print_err(parent=self, error=e)
         self.close()

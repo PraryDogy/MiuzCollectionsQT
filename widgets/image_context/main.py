@@ -69,6 +69,19 @@ class ImageContext(ContextMenuBase):
         save_layers.triggered.connect(lambda: self.save_tiffs(img_src))
         save_menu.addAction(save_layers)
 
+    def select_thumbnail(self, img_src: str):
+        if not cnf.image_viewer:
+            try:
+                cnf.selected_thumbnail.regular_style()
+            except Exception as e:
+                MainUtils.print_err(parent=self, error=e)
+
+            try:
+                cnf.selected_thumbnail = cnf.images[img_src]["widget"]
+                cnf.selected_thumbnail.selected_style()
+            except Exception as e:
+                MainUtils.print_err(parent=self, error=e)
+
     def add_preview_item(self):
         open_action = QAction(cnf.lng.view, self)
         open_action.triggered.connect(
@@ -78,21 +91,12 @@ class ImageContext(ContextMenuBase):
         self.insertAction(self.info_action, open_action)
 
     def show_info_win(self, img_src: str):
+        self.select_thumbnail(img_src=img_src)
         self.win_info = WinInfo(img_src=img_src, parent=self.my_parent)
         self.win_info.show()
         
     def show_image_viewer(self, img_src: str):
-
-        try:
-            cnf.selected_thumbnail.regular_style()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-        try:
-            cnf.selected_thumbnail = cnf.images[img_src]["widget"]
-            cnf.selected_thumbnail.selected_style()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+        self.select_thumbnail(img_src=img_src)
 
         # prevent circular import
         from ..win_image_view import WinImageView
