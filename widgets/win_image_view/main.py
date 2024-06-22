@@ -208,7 +208,7 @@ class WinImageView(WinImgViewBase):
         try:
             Shared.win.close()
         except (AttributeError, RuntimeError) as e:
-            MainUtils.print_err(parent=self, error=e)
+            pass
 
         super().__init__(close_func=self.my_close)
         self.setMinimumSize(QSize(500, 400))

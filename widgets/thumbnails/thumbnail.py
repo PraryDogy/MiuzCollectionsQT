@@ -94,7 +94,7 @@ class Thumbnail(QFrame):
         return super().mousePressEvent(a0)
 
     def mouseMoveEvent(self, a0: QMouseEvent | None) -> None:
-        if a0.button() != Qt.MouseButton.LeftButton:
+        if a0.button() == Qt.MouseButton.RightButton:
             return
 
         distance = (a0.pos() - self.drag_start_position).manhattanLength()
