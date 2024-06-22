@@ -84,11 +84,14 @@ class Thumbnail(QFrame):
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
         self.win_image_view = WinImageView(parent=self, img_src=self.img_src)
         self.win_image_view.show()
-        self.regular_style()
+        # self.regular_style()
         return super().mouseReleaseEvent(a0)
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
+            for k, v in cnf.images.items():
+                v["widget"].regular_style()
+
             self.selected_style()
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)

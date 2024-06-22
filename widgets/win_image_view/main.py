@@ -300,6 +300,13 @@ class WinImageView(WinImgViewBase):
     def my_close(self, event):
         try:
             # wid = thumbnails > thumbnail.py > Thumbnail
+
+            for k, v in cnf.images.items():
+                try:
+                    v["widget"].regular_style()
+                except Exception as e:
+                    MainUtils.print_err(parent=self, error=e)
+
             wid: QLabel = cnf.images[self.img_src]["widget"]
             wid.selected_style()
             gui_signals_app.move_to_wid.emit(wid)
@@ -311,12 +318,6 @@ class WinImageView(WinImgViewBase):
         self.close()
 
     def after_close(self, wid: QLabel):
-        for k, v in cnf.images.items():
-            try:
-                v["widget"].regular_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
         try:
             # wid = thumbnails > thumbnail.py > Thumbnail
             wid.regular_style()
