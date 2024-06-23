@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Literal
 
 from PyQt5.QtCore import QObject
+from PyQt5.QtWidgets import QMainWindow
 
 from lang import Eng, Rus
 
@@ -123,7 +124,7 @@ class Dymanic:
 
         self.lng: Eng = Eng()
 
-        self.image_viewer: QObject = None
+        self.image_viewer: QMainWindow = None
         self.selected_thumbnail: Thumbnail = Thumbnail()
 
 
