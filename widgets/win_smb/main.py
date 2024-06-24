@@ -101,7 +101,6 @@ class BrowseColl(QWidget):
             self.coll_path_label.setText(self.cut_text(text=Shared.coll_folder))
 
     def finalize(self):
-        print("hello")
         cnf.old_coll_folder = cnf.coll_folder
         cnf.coll_folder = Shared.coll_folder
         utils_signals_app.scaner_stop.emit()
