@@ -163,6 +163,7 @@ class App(QApplication):
             self.main_win.show()
             if cnf.image_viewer is not None:
                 cnf.image_viewer.showNormal()
+                cnf.image_viewer.raise_()
         return super().eventFilter(a0, a1)
     
     def on_exit(self):
