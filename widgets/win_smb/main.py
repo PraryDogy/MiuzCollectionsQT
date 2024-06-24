@@ -11,15 +11,13 @@ from styles import Names, Themes
 from utils import MainUtils
 
 
-class Shared:
-    coll_folder = cnf.coll_folder
-
-
 class BrowseColl(QWidget):
-    changed = pyqtSignal()
+    coll_changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+
+        self.coll_folder = cnf.coll_folder
 
         my_layout = LayoutV()
         self.setLayout(my_layout)
@@ -45,7 +43,7 @@ class BrowseColl(QWidget):
         self.coll_path_label = QLabel()
 
         self.coll_path_label.setWordWrap(True)
-        self.coll_path_label.setText(self.cut_text(text=Shared.coll_folder))
+        self.coll_path_label.setText(self.cut_text(text=self.coll_folder))
         h_layout.addWidget(self.coll_path_label)
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
@@ -88,23 +86,20 @@ class BrowseColl(QWidget):
         file_dialog.setFileMode(QFileDialog.Directory)
         file_dialog.setViewMode(QFileDialog.ViewMode.List)
 
-        if not os.path.exists(Shared.coll_folder):
-            file_dialog.setDirectory(cnf.down_folder)
-        else:
-            file_dialog.setDirectory(Shared.coll_folder)
-
+        file_dialog.setDirectory(cnf.down_folder)
         selected_folder = file_dialog.getExistingDirectory()
 
         if selected_folder:
-            self.changed.emit()
-            Shared.coll_folder = selected_folder
-            self.coll_path_label.setText(self.cut_text(text=Shared.coll_folder))
+            self.coll_changed.emit()
+            self.coll_folder = selected_folder
+            self.coll_path_label.setText(self.cut_text(text=self.coll_folder))
 
     def finalize(self):
-        cnf.old_coll_folder = cnf.coll_folder
-        cnf.coll_folder = Shared.coll_folder
-        utils_signals_app.scaner_stop.emit()
-        utils_signals_app.scaner_start.emit()
+        if self.coll_folder != cnf.coll_folder:
+            cnf.old_coll_folder = cnf.coll_folder
+            cnf.coll_folder = self.coll_folder
+            utils_signals_app.scaner_stop.emit()
+            utils_signals_app.scaner_start.emit()
 
 
 class WinSmb(WinStandartBase):
@@ -155,7 +150,7 @@ class WinSmb(WinStandartBase):
 
         btns_layout.addStretch()
 
-        self.browse_coll.changed.connect(self.on_coll_changed)
+        self.browse_coll.coll_changed.connect(self.on_coll_changed)
 
         self.browse_coll.blue_browse_btn()
 
