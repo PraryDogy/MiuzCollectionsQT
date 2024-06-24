@@ -159,20 +159,24 @@ class ZoomBtns(QFrame):
         h_layout = LayoutH()
         self.setLayout(h_layout)
 
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
+        h_layout.addSpacerItem(QSpacerItem(5, 0))
 
         self.zoom_out = SvgShadowed(os.path.join("images", "zoom_out.svg"), 45)
         h_layout.addWidget(self.zoom_out)
-        h_layout.addSpacerItem(QSpacerItem(20, 0))
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.zoom_in = SvgShadowed(os.path.join("images", "zoom_in.svg"), 45)
         h_layout.addWidget(self.zoom_in)
-        h_layout.addSpacerItem(QSpacerItem(20, 0))
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.zoom_fit = SvgShadowed(os.path.join("images", "zoom_fit.svg"), 45)
         h_layout.addWidget(self.zoom_fit)
-
         h_layout.addSpacerItem(QSpacerItem(10, 0))
+
+        self.zoom_close = SvgShadowed(os.path.join("images", "zoom_close.svg"), 45)
+        h_layout.addWidget(self.zoom_close)
+
+        h_layout.addSpacerItem(QSpacerItem(5, 0))
 
         self.adjustSize()
 
@@ -239,6 +243,7 @@ class WinImageView(WinImgViewBase):
         self.zoom_btns.zoom_in.mouseReleaseEvent = lambda e: self.image_label.zoom_in()
         self.zoom_btns.zoom_out.mouseReleaseEvent = lambda e: self.image_label.zoom_out()
         self.zoom_btns.zoom_fit.mouseReleaseEvent = lambda e: self.image_label.zoom_reset()
+        self.zoom_btns.zoom_close.mouseReleaseEvent = self.my_close
 
         self.hide_all_buttons()
         self.setFocus()
