@@ -76,6 +76,12 @@ class Thumbnail(QFrame):
 
         self.setFixedWidth(cnf.THUMBSIZE + cnf.THUMBPAD)
         self.setMaximumHeight(cnf.THUMBSIZE + 75)
+
+        self.setToolTip(
+            f"{cnf.lng.collection}: {self.coll}\n"
+            f"{cnf.lng.file_name}: {self.img_name}\n"
+            f"{self.images_date}"
+            )
         
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
         self.win_image_view = WinImageView(parent=self, img_src=self.img_src)
@@ -143,14 +149,6 @@ class Thumbnail(QFrame):
             self.regular_style()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
-
-    def enterEvent(self, a0: QEvent | None) -> None:
-        self.setToolTip(
-            f"{self.images_date}\n"
-            f"{cnf.lng.collection}: {self.coll}"
-            f"\n{cnf.lng.file_name}: {self.img_name}"
-            )
-        return super().enterEvent(a0)
 
     def selected_style(self):
         for i in (self, self.title):
