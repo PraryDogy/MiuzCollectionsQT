@@ -62,13 +62,14 @@ class Eng:
 		self.sett_stopcolls = 'Hide collections'
 		self.sett_stopwords = 'Ignore * in the file name when searching for tiff/psd'
 		self.settings = 'Settings'
-		self.show_about = 'Show about '
+		self.show_about = 'Show about'
 		self.show_all = 'Show all'
 		self.show_more = 'Show more'
 		self.smb_descr = 'Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Start'
 		self.sys_fltr_names = {'other': 'Other'}
 		self.total = 'Total'
+		self.type = 'Type'
 		self.view = 'View'
 		self.wait_update = 'Wait...'
 		self.weekdays = {'0': 'monday', '1': 'tuesday', '2': 'wednesday', '3': 'thursday', '4': 'friday', '5': 'saturday', '6': 'sunday'}

@@ -69,6 +69,7 @@ class Rus:
 		self.start = 'Начало'
 		self.sys_fltr_names = {'other': 'Остальное'}
 		self.total = 'Всего'
+		self.type = 'Тип'
 		self.view = 'Просмотр'
 		self.wait_update = 'Подождите...'
 		self.weekdays = {'0': 'понедельник', '1': 'вторник', '2': 'среда', '3': 'четверг', '4': 'пятница', '5': 'суббота', '6': 'воскресенье'}

@@ -1,35 +1,12 @@
-import traceback
-import os
+max_row = 25
+name = "R01-FST-0193_R01-FST-0184_R01-FST-0190.jpg"
+name = f"Filename: {name}"
 
-class Utils:
-    @staticmethod
-    def print_err(parent: object, error: Exception):
-        # Получаем текущий стек вызовов
-        tb = traceback.extract_tb(error.__traceback__)
-        last_call = tb[-1]
-        filepath = last_call.filename
-        filename = os.path.basename(filepath)
-        class_name = parent.__class__.__name__
-        line_number = last_call.lineno
-        error_message = str(error)
-        
-        print()
-        print(f"{filename} > {class_name} > row {line_number}: {error_message}")
-        print(f"{filepath}:{line_number}")
-        print()
+if len(name) >= max_row * 2:
+    cut_name = name[:max_row * 2]
+    cut_name = cut_name[:-6]
+    name = cut_name + "..." + name[-3:]
 
-class Foo:
-    def __init__(self):
-        super().__init__()
-        self.test = []
+name = name[:max_row] + "\n" + name[max_row:]
 
-    def test_method(self):
-        try:
-            self.test[1]
-        except Exception as e:
-            Utils.print_err(self, e)
-
-
-a = Foo()
-a.test_method()
-
+print(name)

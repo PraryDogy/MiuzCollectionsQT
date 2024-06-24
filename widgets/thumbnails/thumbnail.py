@@ -19,28 +19,24 @@ class NameLabel(QLabel):
 
         self.filename = filename
         self.coll = coll
+        max_row = 27
 
-        max_row = 25
-        max_chars = 40
-
-        name = f"{cnf.lng.file_name}: {filename}"
-        only_name, ext = os.path.splitext(name)
-
-        if len(name) - max_row * 2 > 0:
-            name = name[:max_chars] + "..." + only_name[-3:] + ext
-
-        if len(name) > max_row:
-            name = '\n'.join(
-                    [name[i:i + max_row]
-                        for i in range(0, len(name), max_row)]
-                        )
-        
         coll = f"{cnf.lng.collection}: {coll}"
+        name, ext = os.path.splitext(filename)
+        name = f"{cnf.lng.file_name}: {name}"
+        ext = f"{cnf.lng.type}: {ext.replace('.', '')}"
 
         if len(coll) > max_row:
-            coll = coll[:max_row] + "..." + coll[-3:]
+            cut_coll = coll[:max_row]
+            cut_coll = cut_coll[:-6]
+            coll = cut_coll + "..." + coll[-3:]
 
-        self.setText(f"{coll}\n{name}")
+        if len(name) >= max_row:
+            cut_name = name[:max_row]
+            cut_name = cut_name[:-6]
+            name = cut_name + "..." + name[-3:]
+
+        self.setText(f"{coll}\n{name}\n{ext}")
 
 
 class Thumbnail(QFrame):
