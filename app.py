@@ -159,11 +159,12 @@ class App(QApplication):
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            self.main_win.hide()
-            self.main_win.show()
-            if cnf.image_viewer is not None:
-                cnf.image_viewer.showNormal()
-                cnf.image_viewer.raise_()
+            if self.main_win.isMinimized() or self.main_win.isHidden():
+                self.main_win.show()
+            if cnf.image_viewer:
+                if cnf.image_viewer.isMinimized() or cnf.image_viewer.isHidden():
+                        cnf.image_viewer.show()
+                        cnf.image_viewer.showNormal()
         return super().eventFilter(a0, a1)
     
     def on_exit(self):
