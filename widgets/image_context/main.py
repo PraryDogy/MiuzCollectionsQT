@@ -10,7 +10,7 @@ from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
 
 from ..win_copy_files import WinCopyFiles
 from ..win_info import WinInfo
-from ..actions.main import RevealJpg, RevealLayers, SaveJpg
+
 
 class Shared:
     file_dialog = None
@@ -31,12 +31,14 @@ class ImageContext(ContextMenuBase):
         self.reveal_menu = ContextSubMenuBase(parent=self, title=cnf.lng.reveal_in_finder)
         self.addMenu(self.reveal_menu)
 
-        reveal_jpg = RevealJpg(parent=self, img_src=img_src)
+        reveal_jpg = QAction(parent=self, text="JPG")
+        reveal_jpg.triggered.connect(lambda: self.reveal_jpg(img_src=img_src))
         self.reveal_menu.addAction(reveal_jpg)
 
         self.reveal_menu.addSeparator()
 
-        reveal_layers = RevealLayers(parent=self, img_src=img_src)
+        reveal_layers = QAction(parent=self, text=cnf.lng.layers)
+        reveal_layers.triggered.connect(lambda: self.reveal_tiff(img_src=img_src))
         self.reveal_menu.addAction(reveal_layers)
 
         self.addSeparator()
@@ -67,8 +69,11 @@ class ImageContext(ContextMenuBase):
         save_layers.triggered.connect(lambda: self.save_tiffs(img_src))
         save_menu.addAction(save_layers)
 
-        self.test = SaveJpg(parent=self, img_src=img_src, dest=cnf.down_folder)
-        self.addAction(self.test)
+        # self.test = SaveJpg(parent=self, img_src=img_src, dest=cnf.down_folder)
+        # self.addAction(self.test)
+
+        # self.test = SaveLayers(parent=self, img_src=img_src, dest=cnf.down_folder)
+        # self.addAction(self.test)
 
     def select_thumbnail(self, img_src: str):
         if not cnf.image_viewer:
