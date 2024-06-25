@@ -69,12 +69,6 @@ class ImageContext(ContextMenuBase):
         save_layers.triggered.connect(lambda: self.save_tiffs(img_src))
         save_menu.addAction(save_layers)
 
-        # self.test = SaveJpg(parent=self, img_src=img_src, dest=cnf.down_folder)
-        # self.addAction(self.test)
-
-        # self.test = SaveLayers(parent=self, img_src=img_src, dest=cnf.down_folder)
-        # self.addAction(self.test)
-
     def select_thumbnail(self, img_src: str):
         if not cnf.image_viewer:
             try:
