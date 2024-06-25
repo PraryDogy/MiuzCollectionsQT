@@ -165,6 +165,12 @@ class App(QApplication):
                 if cnf.image_viewer.isMinimized() or cnf.image_viewer.isHidden():
                         cnf.image_viewer.show()
                         cnf.image_viewer.showNormal()
+
+            # import subprocess
+            # cmd = "tell application \"Hello\" to activate"
+            # command = ["osascript", cmd]
+            # subprocess.Popen(command)
+
         return super().eventFilter(a0, a1)
     
     def on_exit(self):
