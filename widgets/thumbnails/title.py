@@ -96,7 +96,7 @@ class CustomContext(ContextMenuBase):
 
         copy_task.value_changed.connect(lambda val: copy_win.set_value(val))
         copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, copy_win, files=files))
-        copy_win.cancel_sign.connect(lambda: self.copy_files_cancel(copy_task, copy_win))
+        copy_win.cancel_pressed.connect(lambda: self.copy_files_cancel(copy_task, copy_win))
         
         copy_win.show()
         copy_task.start()

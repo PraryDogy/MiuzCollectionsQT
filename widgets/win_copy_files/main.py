@@ -8,7 +8,7 @@ from utils import MainUtils
 
 
 class WinCopyFiles(WinStandartBase):
-    cancel_sign = pyqtSignal()
+    cancel_pressed = pyqtSignal()
 
     def __init__(self, parent: QWidget):
         super().__init__(close_func=self.my_close)
@@ -43,7 +43,7 @@ class WinCopyFiles(WinStandartBase):
         return
 
     def cancel_btn_cmd(self, e):
-        self.cancel_sign.emit()
+        self.cancel_pressed.emit()
         self.close()
 
     def set_value(self, value: int):
