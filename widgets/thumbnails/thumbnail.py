@@ -130,6 +130,8 @@ class Thumbnail(QFrame):
             self.image_context = ImageContext(img_src=self.img_src, event=ev, parent=self)
             self.image_context.closed.connect(self.closed_context)
             self.image_context.add_preview_item()
+            if cnf.curr_coll == cnf.ALL_COLLS:
+                self.image_context.add_show_coll_item(collection=self.coll)
 
             try:
                 cnf.selected_thumbnail.regular_style()

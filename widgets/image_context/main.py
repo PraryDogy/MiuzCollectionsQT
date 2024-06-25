@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
+from signals import gui_signals_app
 from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiff)
 
@@ -87,6 +88,12 @@ class ImageContext(ContextMenuBase):
         open_action.triggered.connect(
             lambda: self.show_image_viewer(self.img_src)
             )
+        self.addAction(open_action)
+        self.insertAction(self.info_action, open_action)
+
+    def add_show_coll_item(self, collection: str):
+        open_action = QAction(cnf.lng.open_collection, self)
+        open_action.triggered.connect(lambda: self.load_collection(collection=collection))
         self.addAction(open_action)
         self.insertAction(self.info_action, open_action)
 
@@ -184,3 +191,14 @@ class ImageContext(ContextMenuBase):
             copy_win.close()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
+
+    def load_collection(self, collection: str):
+        cnf.curr_coll = collection
+        cnf.current_photo_limit = cnf.LIMIT
+        gui_signals_app.reload_title.emit()
+        gui_signals_app.scroll_top.emit()
+        gui_signals_app.reload_menu.emit()
+        gui_signals_app.reload_thumbnails.emit()
+
+        # self.select_thumbnail(img_src=self.img_src)
+        # gui_signals_app.move_to_wid.emit(cnf.selected_thumbnail)

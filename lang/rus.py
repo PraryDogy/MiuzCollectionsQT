@@ -42,6 +42,7 @@ class Rus:
 		self.no_photo = 'Нет фотографий'
 		self.no_photo_filter = 'Нет фотографий в категории'
 		self.ok = 'Ок'
+		self.open_collection = 'Просмотр коллекции'
 		self.open_settings_window = 'Открыть настройки'
 		self.paste = 'Вставить'
 		self.photo = 'Фото'

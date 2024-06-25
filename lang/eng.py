@@ -42,6 +42,7 @@ class Eng:
 		self.no_photo = 'No photos'
 		self.no_photo_filter = 'No photos in cathegory'
 		self.ok = 'Ok'
+		self.open_collection = 'View collection'
 		self.open_settings_window = 'Open settings window'
 		self.paste = 'Paste'
 		self.photo = 'Photo'

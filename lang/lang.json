@@ -221,6 +221,10 @@
         "Ок",
         "Ok"
     ],
+    "open_collection": [
+        "Просмотр коллекции",
+        "View collection"
+    ],
     "open_settings_window": [
         "Открыть настройки",
         "Open settings window"
