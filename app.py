@@ -2,7 +2,7 @@ import os
 import sys
 
 from PyQt5.QtCore import QEvent, QObject, Qt, QTimer
-from PyQt5.QtGui import QIcon, QKeyEvent, QResizeEvent
+from PyQt5.QtGui import QIcon, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
                              QMainWindow, QPushButton, QVBoxLayout, QWidget)
 
