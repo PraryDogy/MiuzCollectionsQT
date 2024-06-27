@@ -131,7 +131,7 @@ class FinderImages(dict):
         try:
             self.run()
 
-        except (OSError, FileNotFoundError):
+        except (OSError, FileNotFoundError) as e:
             MainUtils.print_err(parent=self, error=e)
             Shared.flag = False
 
@@ -240,7 +240,7 @@ class UpdateDb:
         try:
             gui_signals_app.progressbar_value.emit(70)
             gui_signals_app.progressbar_del_photos.emit()
-        except RuntimeError:
+        except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
         if images["delete"]:
@@ -249,7 +249,7 @@ class UpdateDb:
         try:
             gui_signals_app.progressbar_value.emit(80)
             gui_signals_app.progressbar_add_photos.emit()
-        except RuntimeError:
+        except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
         if images["insert"]:
@@ -257,7 +257,7 @@ class UpdateDb:
 
         try:
             gui_signals_app.progressbar_value.emit(90)
-        except RuntimeError:
+        except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
         if images["update"]:
@@ -283,7 +283,7 @@ class UpdateDb:
 
                 values.append(obj)
 
-            except FileNotFoundError:
+            except FileNotFoundError as e:
                 MainUtils.print_err(parent=self, error=e)
                 Shared.flag = False
                 return
