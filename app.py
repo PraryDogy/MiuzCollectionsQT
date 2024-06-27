@@ -2,9 +2,9 @@ import os
 import sys
 
 from PyQt5.QtCore import QEvent, QObject, Qt, QTimer
-from PyQt5.QtGui import QIcon, QKeyEvent, QMouseEvent, QResizeEvent
+from PyQt5.QtGui import QDragEnterEvent, QDragLeaveEvent, QDragMoveEvent, QDropEvent, QIcon, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
-                             QMainWindow, QPushButton, QVBoxLayout, QWidget)
+                             QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel)
 
 from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import cnf
@@ -107,6 +107,8 @@ class WinMain(WinBase):
         quit_action = QAction("Quit", self)
         quit_action.triggered.connect(self.close)
 
+        self.setAcceptDrops(True)
+
     def center(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
@@ -141,6 +143,29 @@ class WinMain(WinBase):
             return cnf.lng.all_colls
         else:
             return cnf.curr_coll
+
+    def dragEnterEvent(self, a0: QDragEnterEvent | None) -> None:
+        if not a0.source() and a0.mimeData().hasUrls():
+            self.drop_widget = QLabel(parent=self.centralWidget(), text="TEST")
+            self.drop_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.drop_widget.resize(self.width(), self.height())
+            self.drop_widget.setObjectName(Names.drop_widget)
+            self.drop_widget.setStyleSheet(Themes.current)
+            self.drop_widget.show()
+            a0.acceptProposedAction()
+        return super().dragEnterEvent(a0)
+
+    def dropEvent(self, a0: QDropEvent | None) -> None:
+        if a0.mimeData().hasUrls():
+            files = [url.toLocalFile() for url in a0.mimeData().urls()]
+            self.drop_widget.deleteLater()
+            print(files)
+            a0.acceptProposedAction()
+        return super().dropEvent(a0)
+    
+    def dragLeaveEvent(self, a0: QDragLeaveEvent | None) -> None:
+        self.drop_widget.deleteLater()
+        return super().dragLeaveEvent(a0)
         
 
 class App(QApplication):

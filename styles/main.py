@@ -64,3 +64,5 @@ class Names:
     img_view_bg = "img_view_bg"
 
     up_btn = "up_btn"
+
+    drop_widget = "drop_widget"

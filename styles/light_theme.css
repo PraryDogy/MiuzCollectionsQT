@@ -81,6 +81,11 @@
     color: #ffffff;
 }
 
+#drop_widget {
+    background-color: rgba(49, 49, 49, 0.8);
+    border-radius: 10px;
+}
+
 #filter_bar_frame {
     background-color: #ffffff;
     border-radius: 0px;
@@ -355,3 +360,4 @@ QToolTip {
     margin: 5 5 5 5;
     font-size: 12pt;
 }
+
