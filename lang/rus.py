@@ -24,6 +24,7 @@ class Rus:
 		self.dates = 'Даты'
 		self.deleting_photos = 'Удаляю лишнее'
 		self.download_update = 'Скачать обновление'
+		self.drop_to_collections = 'Скопировать файлы в коллекции'
 		self.end = 'Конец'
 		self.file_name = 'Имя файла'
 		self.file_path = 'Расположение'

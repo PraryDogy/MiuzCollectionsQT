@@ -151,7 +151,7 @@ class WinMain(WinBase):
 
     def dragEnterEvent(self, a0: QDragEnterEvent | None) -> None:
         if not a0.source() and a0.mimeData().hasUrls():
-            self.drop_widget = QLabel(parent=self.centralWidget(), text="TEST")
+            self.drop_widget = QLabel(parent=self.centralWidget(), text=cnf.lng.drop_to_collections)
             self.drop_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.drop_widget.resize(self.width(), self.height())
             self.drop_widget.setObjectName(Names.drop_widget)

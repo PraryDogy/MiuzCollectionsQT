@@ -24,6 +24,7 @@ class Eng:
 		self.dates = 'Dates'
 		self.deleting_photos = 'Removing unnecessary'
 		self.download_update = 'Update app'
+		self.drop_to_collections = 'Copy files to Collections'
 		self.end = 'End'
 		self.file_name = 'Filename'
 		self.file_path = 'Location'

@@ -97,6 +97,10 @@
         "Скачать обновление",
         "Update app"
     ],
+    "drop_to_collections": [
+        "Скопировать файлы в коллекции",
+        "Copy files to Collections"
+    ],
     "end": [
         "Конец",
         "End"
