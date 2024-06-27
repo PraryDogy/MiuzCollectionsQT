@@ -108,6 +108,12 @@ class WinMain(WinBase):
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)
 
+        self.drop_widget = QLabel(parent=self.centralWidget(), text=cnf.lng.drop_to_collections)
+        self.drop_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.drop_widget.setObjectName(Names.drop_widget)
+        self.drop_widget.setStyleSheet(Themes.current)
+        self.drop_widget.hide()
+
         # что делать при выходе
         quit_action = QAction("Quit", self)
         quit_action.triggered.connect(self.close)
@@ -151,11 +157,7 @@ class WinMain(WinBase):
 
     def dragEnterEvent(self, a0: QDragEnterEvent | None) -> None:
         if not a0.source() and a0.mimeData().hasUrls():
-            self.drop_widget = QLabel(parent=self.centralWidget(), text=cnf.lng.drop_to_collections)
-            self.drop_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.drop_widget.resize(self.width(), self.height())
-            self.drop_widget.setObjectName(Names.drop_widget)
-            self.drop_widget.setStyleSheet(Themes.current)
             self.drop_widget.show()
             a0.acceptProposedAction()
         return super().dragEnterEvent(a0)
@@ -163,7 +165,7 @@ class WinMain(WinBase):
     def dropEvent(self, a0: QDropEvent | None) -> None:
         if a0.mimeData().hasUrls():
             files = [url.toLocalFile() for url in a0.mimeData().urls()]
-            self.drop_widget.deleteLater()
+            self.drop_widget.hide()
 
             directory = cnf.coll_folder
             if cnf.curr_coll != cnf.ALL_COLLS:
@@ -204,7 +206,7 @@ class WinMain(WinBase):
             MainUtils.print_err(parent=self, error=e)
     
     def dragLeaveEvent(self, a0: QDragLeaveEvent | None) -> None:
-        self.drop_widget.deleteLater()
+        self.drop_widget.hide()
         return super().dragLeaveEvent(a0)
         
 

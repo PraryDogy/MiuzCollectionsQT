@@ -35,7 +35,7 @@ class UpdaterMain(QObject):
                 if os.path.exists(os.path.join(drive, cnf.updater_path))
                 ][0]
 
-        except IndexError:
+        except IndexError as e:
             zip_file = None
             MainUtils.print_err(parent=self, error=e)
 
