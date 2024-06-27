@@ -2,17 +2,22 @@ import os
 import sys
 
 from PyQt5.QtCore import QEvent, QObject, Qt, QTimer
-from PyQt5.QtGui import QDragEnterEvent, QDragLeaveEvent, QDragMoveEvent, QDropEvent, QIcon, QKeyEvent, QMouseEvent, QResizeEvent
-from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QFrame,
-                             QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel)
+from PyQt5.QtGui import (QDragEnterEvent, QDragLeaveEvent, QDropEvent, QIcon,
+                         QKeyEvent, QResizeEvent)
+from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
+                             QFileDialog, QFrame, QLabel, QPushButton,
+                             QVBoxLayout, QWidget)
 
 from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from styles import Names, Themes
 from utils import MainUtils
+from utils.copy_files import ThreadCopyFiles
+from utils.reveal_files import RevealFiles
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
+from widgets.win_copy_files import WinCopyFiles
 
 
 class TestWid(QWidget):
@@ -159,9 +164,44 @@ class WinMain(WinBase):
         if a0.mimeData().hasUrls():
             files = [url.toLocalFile() for url in a0.mimeData().urls()]
             self.drop_widget.deleteLater()
-            print(files)
+
+            directory = cnf.coll_folder
+            if cnf.curr_coll != cnf.ALL_COLLS:
+                directory = os.path.join(cnf.coll_folder, cnf.curr_coll)
+
+
+            folder = QFileDialog.getExistingDirectory(self, directory=directory)
+
+            if folder:
+                self.copy_task = ThreadCopyFiles(dest=folder, files=files)
+                copy_win = WinCopyFiles(parent=self)
+
+                self.copy_task.value_changed.connect(lambda val: copy_win.set_value(val))
+                self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, copy_win, files))
+                copy_win.cancel_pressed.connect(lambda: self.copy_files_cancel(self.copy_task, copy_win))
+                
+                copy_win.show()
+                self.copy_task.start()
+            
             a0.acceptProposedAction()
+
         return super().dropEvent(a0)
+    
+    def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
+        self.reveal_files = RevealFiles(files)
+        try:
+            copy_task.remove_threads()
+            copy_win.close()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+    def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
+        try:
+            copy_task.stop.emit()
+            copy_task.remove_threads()
+            copy_win.close()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
     
     def dragLeaveEvent(self, a0: QDragLeaveEvent | None) -> None:
         self.drop_widget.deleteLater()

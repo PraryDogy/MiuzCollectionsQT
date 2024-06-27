@@ -82,8 +82,13 @@
 }
 
 #drop_widget {
-    background-color: rgba(49, 49, 49, 0.8);
+    background-color: rgb(49, 49, 49);
     border-radius: 10px;
+    border: 5px dashed white;
+    margin: 20px;
+    font-size: 18pt;
+    font-weight: bold;
+    color: #ffffff;
 }
 
 #filter_bar_frame {
