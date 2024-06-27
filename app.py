@@ -15,6 +15,7 @@ from styles import Names, Themes
 from utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
 from utils.reveal_files import RevealFiles
+from utils.send_notification import SendNotification
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
 from widgets.win_copy_files import WinCopyFiles
@@ -166,6 +167,10 @@ class WinMain(WinBase):
         if a0.mimeData().hasUrls():
             files = [url.toLocalFile() for url in a0.mimeData().urls()]
             self.drop_widget.hide()
+
+            if not MainUtils.smb_check():
+                SendNotification(text=cnf.lng.no_connection)
+                return
 
             directory = cnf.coll_folder
             if cnf.curr_coll != cnf.ALL_COLLS:
