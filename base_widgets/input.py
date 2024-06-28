@@ -50,4 +50,5 @@ class InputBase(QLineEdit):
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.context_menu = CustomContext(parent=self, event=a0)
         self.context_menu.show_menu()
+        return
         return super().contextMenuEvent(a0)
