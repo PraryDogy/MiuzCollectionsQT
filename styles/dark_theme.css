@@ -198,12 +198,12 @@
 }
 
 #smb_browse_btn {
-    background-color: #2e59cb;
+    background-color: #303030;
     border-radius: 8;
 }
 
 #smb_browse_btn_selected {
-    background-color: #303030;
+    background-color: #2e59cb;
     border-radius: 8;
 }
 
