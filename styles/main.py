@@ -66,3 +66,4 @@ class Names:
     up_btn = "up_btn"
 
     drop_widget = "drop_widget"
+    letter_btn = "letter_btn"

@@ -1,6 +1,6 @@
 import sqlalchemy
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFrame, QScrollArea, QWidget
+from PyQt5.QtWidgets import QFrame, QScrollArea, QWidget, QLabel
 
 from base_widgets import LayoutH, LayoutV
 from cfg import cnf
@@ -8,7 +8,7 @@ from database import Dbase, ThumbsMd
 from signals import gui_signals_app
 from styles import Names, Themes
 from utils import MainUtils
-
+from collections import defaultdict
 from .collection_btn import CollectionBtn
 
 
@@ -40,34 +40,43 @@ class BaseLeftMenu(QScrollArea):
 
         self.v_layout.addLayout(main_btns_layout)
 
-        for fake_name, true_name in self.load_colls_query().items():
-            label = CollectionBtn(parent=self, fake_name=fake_name, true_name=true_name)
-            self.v_layout.addWidget(label)
+        for letter, collections in self.load_colls_query().items():
+
+            test = QLabel(text=letter)
+            test.setContentsMargins(0, 20, 0, 0)
+            test.setObjectName(Names.menu_btn)
+            test.setStyleSheet(Themes.current)
+            self.v_layout.addWidget(test)
+
+            for coll in collections:
+                label = CollectionBtn(parent=self, fake_name=coll["fake_name"], true_name=coll["true_name"])
+                self.v_layout.addWidget(label)
 
         self.v_layout.addStretch(1)
 
     def load_colls_query(self) -> dict:
-        menus = {}
+        menus = defaultdict(list)
         
         q = sqlalchemy.select(ThumbsMd.collection).distinct()
 
         session = Dbase.get_session()
         try:
-            res = session.execute(q).fetchall()
+            res = (i[0] for i in session.execute(q).fetchall() if i)
         finally:
             session.close()
 
-        for i in res:
-            if not i:
-                continue
-            fakename = i[0].lstrip("0123456789").strip()
-            fakename = fakename if fakename else i[0]
-            menus[fakename] = i[0]
+        for true_name in res:
+            fake_name = true_name.lstrip("0123456789").strip()
+            fake_name = fake_name if fake_name else true_name
+            letter = fake_name[0].capitalize()
+
+            menus[letter].append({"fake_name": fake_name, "true_name": true_name})
+
+        return {
+            key: sorted(value, key=lambda x: x['fake_name'])
+            for key, value in sorted(menus.items())
+            }
         
-        sort_keys = sorted(menus.keys())
-
-        return {fake_name: menus[fake_name] for fake_name in sort_keys}
-
     def reload_menu(self):
         MainUtils.clear_layout(self.v_layout)
         self.init_ui()

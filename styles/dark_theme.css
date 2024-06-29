@@ -129,6 +129,16 @@
     color: #ffffff;
 }
 
+#letter_btn {
+    background-color: #333333;
+    border: 2px solid transparent;
+    padding-left: 2px;
+    padding-right: 2px;
+    font-size: 18pt;
+    font-weight: bold;
+    color: #ffffff;
+}
+
 #menu_btn_bordered {
     background-color: #333333;
     border: 2px solid #2e59cb;
