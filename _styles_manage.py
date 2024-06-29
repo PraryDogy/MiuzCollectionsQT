@@ -63,7 +63,7 @@ def to_css(css_dict: dict, filename: str):
         css_text += "}\n\n"
 
     # Запись CSS-текста в файл
-    with open(f"{filename}.css", "w") as f:
+    with open(f"styles/{filename}.css", "w") as f:
         f.write(css_text)
 
 
