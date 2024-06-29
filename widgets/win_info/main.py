@@ -93,8 +93,10 @@ class CustomContextRLabel(ContextMenuBase):
         super().__init__(event=event)
         self.my_parent = parent
 
-        sel = QAction(text=cnf.lng.copy_selected, parent=self)
-        sel.triggered.connect(self.my_sel)
+        selected_text = parent.selectedText().replace("\u2029", "")
+        label_text = f"{cnf.lng.copy} \"{selected_text}\""
+        sel = QAction(text=label_text, parent=self)
+        sel.triggered.connect(lambda: self.my_sel(text=selected_text))
         self.addAction(sel)
 
         self.addSeparator()
@@ -106,8 +108,8 @@ class CustomContextRLabel(ContextMenuBase):
     def my_sel_all(self):
         MainUtils.copy_text(self.my_parent.text())
 
-    def my_sel(self):
-        text = self.my_parent.selectedText().replace("\u2029", "")
+    def my_sel(self, text: str):
+        # text = self.my_parent.selectedText().replace("\u2029", "")
         MainUtils.copy_text(text)
 
 
@@ -120,6 +122,7 @@ class RightLabel(BaseLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.my_context = CustomContextRLabel(parent=self, event=ev)
         self.my_context.show_menu()
+        return
         return super().contextMenuEvent(ev)
 
 
