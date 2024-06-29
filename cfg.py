@@ -28,7 +28,7 @@ class Thumbnail(QObject):
 class User:
     def __init__(self) -> None:
         super().__init__()
-        self.app_ver: str = "5.2.5"
+        self.app_ver: str = "5.2.6"
     
         self.coll_folder: str = os.path.join(
             os.sep,

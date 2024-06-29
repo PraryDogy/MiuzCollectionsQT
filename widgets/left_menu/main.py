@@ -43,7 +43,7 @@ class BaseLeftMenu(QScrollArea):
         for letter, collections in self.load_colls_query().items():
 
             test = QLabel(text=letter)
-            test.setContentsMargins(0, 20, 0, 5)
+            test.setContentsMargins(6, 20, 0, 5)
             test.setObjectName(Names.letter_btn)
             test.setStyleSheet(Themes.current)
             self.v_layout.addWidget(test)
