@@ -94,9 +94,13 @@ class CustomContextRLabel(ContextMenuBase):
         self.my_parent = parent
 
         selected_text = parent.selectedText().replace("\u2029", "")
-        label_text = f"{cnf.lng.copy} \"{selected_text}\""
-        sel = QAction(text=label_text, parent=self)
-        sel.triggered.connect(lambda: self.my_sel(text=selected_text))
+        if selected_text:
+            label_text = f"{cnf.lng.copy} \"{selected_text}\""
+            sel = QAction(text=label_text, parent=self)
+            sel.triggered.connect(lambda: self.my_sel(text=selected_text))
+        else:
+            sel = QAction(text=cnf.lng.copy, parent=self)
+            sel.setDisabled(True)
         self.addAction(sel)
 
         self.addSeparator()
