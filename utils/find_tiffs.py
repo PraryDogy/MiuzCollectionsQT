@@ -73,7 +73,7 @@ class FindTiffBase:
             bb_name = _TiffUtils.remove_punct(tiff_name)
             bb_name = _TiffUtils.remove_stop_words(bb_name)
 
-            if len(aa_name) <= 3:
+            if len(aa_name) <= 3 or len(bb_name) <= 3:
                 continue
 
             if aa_name == bb_name:
