@@ -100,7 +100,6 @@ class CustomContextRLabel(ContextMenuBase):
             sel.triggered.connect(lambda: self.my_sel(text=selected_text))
         else:
             sel = QAction(text=cnf.lng.copy, parent=self)
-            sel.setDisabled(True)
         self.addAction(sel)
 
         self.addSeparator()
