@@ -195,8 +195,13 @@ class Config(User, Dymanic, Static, AppInfo):
 
         data = dict(sorted(data.items()))
 
-        with open(self.json_file, "w", encoding="utf8") as file:
-            json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
+        try:
+            with open(self.json_file, "w", encoding="utf8") as file:
+                json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
+        except FileNotFoundError:
+            self.check_app_dirs()
+            with open(self.json_file, "w", encoding="utf8") as file:
+                json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
 
     def set_language(self, lang_name: Literal["ru", "en"]):
         if lang_name == "ru":
