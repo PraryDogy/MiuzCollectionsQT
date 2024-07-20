@@ -96,8 +96,11 @@ class Thumbnail(QFrame):
             except Exception as e:
                 MainUtils.print_err(parent=self, error=e)
 
-            cnf.selected_thumbnail = self
-            self.selected_style()
+            try:
+                cnf.selected_thumbnail = self
+                self.selected_style()
+            except Exception as e:
+                MainUtils.print_err(parent=self, error=e)
 
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
@@ -138,8 +141,11 @@ class Thumbnail(QFrame):
             except Exception as e:
                 MainUtils.print_err(parent=self, error=e)
 
-            cnf.selected_thumbnail = self
-            self.selected_style()
+            try:
+                cnf.selected_thumbnail = self
+                self.selected_style()
+            except Exception as e:
+                MainUtils.print_err(parent=self, error=e)
 
             self.image_context.show_menu()
             return super().contextMenuEvent(ev)
