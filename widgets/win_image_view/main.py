@@ -307,7 +307,10 @@ class WinImageView(WinImgViewBase):
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 
-        cnf.selected_thumbnail = cnf.images[self.img_src]["widget"]
+        try:
+            cnf.selected_thumbnail = cnf.images[self.img_src]["widget"]
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
 
         try:
             cnf.selected_thumbnail.selected_style()
