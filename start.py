@@ -1,19 +1,20 @@
-import logging
 import os
 import sys
 import traceback
 
 from PyQt5.QtWidgets import QMessageBox
 
-from cfg import cnf
+from app import app
 
 
 def log_unhandled_exception(exc_type, exc_value, exc_traceback):
     error_message = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-    logging.error("Unhandled exception", exc_info=(exc_type, exc_value, exc_traceback))
     show_error_dialog(error_message)
 
+
 def show_error_dialog(error_message):
+
+
     error_dialog = QMessageBox()
     error_dialog.setIcon(QMessageBox.Critical)
     error_dialog.setWindowTitle("Error / Ошидка")
@@ -35,27 +36,11 @@ if os.path.exists("lib"):
 
     py_ver = sys.version_info
     py_ver = f"{py_ver.major}.{py_ver.minor}"
-
-    plugin_path = os.path.join(
-        "lib",
-        f"python{py_ver}",
-        "PyQt5",
-        "Qt5",
-        "plugins",
-        )
-
-    log = os.path.join(
-        cnf.app_support_app_dir,
-        "log.txt"
-        )
-
+    plugin_path = os.path.join("lib", f"python{py_ver}", "PyQt5", "Qt5", "plugins")
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
-    logging.basicConfig(filename=log, level=logging.ERROR)
-    sys.excepthook = log_unhandled_exception
-
-    print("logging enabled")
     print(f"plugin path enabled {plugin_path}")
 
-from app import app
+    sys.excepthook = log_unhandled_exception
 
+sys.excepthook = log_unhandled_exception
 app.exec_()
