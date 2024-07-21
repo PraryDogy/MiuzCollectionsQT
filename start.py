@@ -2,32 +2,29 @@ import os
 import sys
 import traceback
 
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QApplication, QMessageBox, QPushButton
 
 from app import app
 
 
-def log_unhandled_exception(exc_type, exc_value, exc_traceback):
+def catch_err(exc_type, exc_value, exc_traceback):
     error_message = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-    show_error_dialog(error_message)
+    error_dialog(error_message)
 
 
-def show_error_dialog(error_message):
-
-
+def error_dialog(error_message):
     error_dialog = QMessageBox()
     error_dialog.setIcon(QMessageBox.Critical)
-    error_dialog.setWindowTitle("Error / Ошидка")
+    error_dialog.setWindowTitle("Error / Ошибка")
 
-    tt = [
-        "Отправьте ошибку / Send error",
-        "email: loshkarev@miuz.ru",
-        "tg: evlosh"]
-    
-    tt = "\n".join(tt)
-    
+    tt = "\n".join(["Отправьте ошибку / Send error", "email: loshkarev@miuz.ru", "tg: evlosh"])
     error_dialog.setText(tt)
     error_dialog.setDetailedText(error_message)
+
+    exit_button = QPushButton("Выход")
+    exit_button.clicked.connect(QApplication.quit)
+    error_dialog.addButton(exit_button, QMessageBox.ActionRole)
+
     error_dialog.exec_()
 
 
@@ -40,7 +37,10 @@ if os.path.exists("lib"):
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
     print(f"plugin path enabled {plugin_path}")
 
-    sys.excepthook = log_unhandled_exception
+    sys.excepthook = catch_err
 
-sys.excepthook = log_unhandled_exception
+sys.excepthook = catch_err
 app.exec_()
+
+
+# source deacivate

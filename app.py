@@ -273,6 +273,8 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
+        raise Exception
+
         # return
         # from widgets.win_first_load import WinFirstLoad
         # self.test = WinFirstLoad()
