@@ -1,5 +1,3 @@
-from PyQt5.QtWidgets import QMainWindow
-
 from signals import gui_signals_app
 
 from .main_utils import MainUtils
