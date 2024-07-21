@@ -1,0 +1,9 @@
+cssutils==2.11.0
+greenlet==3.0.3
+numpy==1.26.4
+opencv-python==4.6.0.66
+PyQt5==5.15.10
+PyQt5-Qt5==5.15.14
+PyQt5_sip==12.15.0
+SQLAlchemy==2.0.25
+typing_extensions==4.12.2
