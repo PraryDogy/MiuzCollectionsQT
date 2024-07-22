@@ -39,7 +39,7 @@ if os.path.exists("lib"):
 
     sys.excepthook = catch_err
 
-sys.excepthook = catch_err
+
 app.exec_()
 
 
