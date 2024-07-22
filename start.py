@@ -4,8 +4,6 @@ import traceback
 
 from PyQt5.QtWidgets import QApplication, QMessageBox, QPushButton
 
-from app import app
-
 
 def catch_err(exc_type, exc_value, exc_traceback):
     error_message = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
@@ -30,17 +28,16 @@ def error_dialog(error_message):
 
 if os.path.exists("lib"): 
     #lib folder appears when we pack this project to .app with py2app
-
-    py_ver = sys.version_info
-    py_ver = f"{py_ver.major}.{py_ver.minor}"
-    plugin_path = os.path.join("lib", f"python{py_ver}", "PyQt5", "Qt5", "plugins")
+    ...
+    plugin_path = "lib/python3.11/PyQt5/Qt5/plugins"
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
-    print(f"plugin path enabled {plugin_path}")
-
     sys.excepthook = catch_err
+    print()
+    print(f"plugin path enabled")
+    print()
 
 
+from app import app
 app.exec_()
-
-
 # source deacivate
+# import app происходит только после активации os.environ plugin_path
