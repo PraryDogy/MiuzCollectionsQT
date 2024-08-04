@@ -11,19 +11,24 @@ import sys
 from datetime import datetime
 
 from setuptools import setup
+
 from cfg import cnf
 
+# ****************** DON'T CHANGE IT ******************
+
 def remove_trash():
+
     trash = ("build", ".eggs", "dist")
+
     for i in trash:
         try:
             shutil.rmtree(i)
         except Exception as e:
-            print(e)
             continue
 
 
 def move_app_to_desktop(appname: str):
+
     desktop = os.path.expanduser("~/Desktop")
 
     dest = os.path.join(desktop, f"{appname}.app")
@@ -53,17 +58,18 @@ def include_files(folder_name: str) -> list[str, list]:
         )
 
 
-YEAR = datetime.now().year # CURRENT YEAR
+
+
+
+# ****************** YOUR DATA ******************
+
 AUTHOR = "Evgeny Loshkarev"  # "Evgeny Loshkarev"
 SHORT_AUTHOR_NAME = "Evlosh" # "Evlosh"
-COMPANY = "MIUZ Diamonds" # "MIUZ Diamonds" or ""
+COMPANY = "MIUZ Diamonds" # "MIUZ Diamonds"
 APP_NAME = cnf.app_name
 APP_VER = cnf.app_ver
 ICON_PATH = "icon/icon.icns" # "icon/icon.icns" or "icon.icns"
 MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
-
-BUNDLE_ID = f"com.{SHORT_AUTHOR_NAME}.{APP_NAME}" # DON'T CHANGE IT
-PY_2APP = "py2app" # DON'T CHANGE IT
 
 
 DATA_FILES = [
@@ -72,11 +78,18 @@ DATA_FILES = [
     include_files("images"),
     include_files("applescripts"),
     include_files("styles"),
-    include_files("icon"),
+    include_files("icon")
     ]
 
 
-# DON'T CHANGE IT
+
+
+
+# ****************** DON'T CHANGE IT ******************
+
+YEAR = datetime.now().year # CURRENT YEAR
+BUNDLE_ID = f"com.{SHORT_AUTHOR_NAME}.{APP_NAME}" # DON'T CHANGE IT
+PY2APP = "py2app" # DON'T CHANGE IT
 
 OPTIONS = {"iconfile": ICON_PATH,
            "plist": {"CFBundleName": APP_NAME,
@@ -88,33 +101,22 @@ OPTIONS = {"iconfile": ICON_PATH,
                          f"\nCopyright © {YEAR} {COMPANY}."
                          f"\nAll rights reserved.")}}
 
+sys.argv.append(PY2APP)
 
-if __name__ == "__main__":
+try:
+    remove_trash()
 
-    print()
-    print("Copy db file from App Support?")
-    print("Type \"1\" to confirm")
-    print()
-    res = input()
-    if res == "1":
-        shutil.copyfile(src=cnf.db_file, dst="db.db")
+    setup(
+        app=MAIN_FILES,
+        name=APP_NAME,
+        data_files=DATA_FILES,
+        options={PY2APP: OPTIONS},
+        setup_requires=[PY2APP],
+        )
 
-    sys.argv.append(PY_2APP)
+    move_app_to_desktop(APP_NAME)
+    remove_trash()
 
-    try:
-        remove_trash()
-
-        setup(
-            app=MAIN_FILES,
-            name=APP_NAME,
-            data_files=DATA_FILES,
-            options={PY_2APP: OPTIONS},
-            setup_requires=[PY_2APP],
-            )
-
-        move_app_to_desktop(APP_NAME)
-        remove_trash()
-
-    except Exception as e:
-        print(e)
-        remove_trash()
+except Exception as e:
+    print(e)
+    remove_trash()
