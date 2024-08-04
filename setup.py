@@ -46,6 +46,13 @@ def move_app_to_desktop(appname: str):
         print(e)
 
 
+def include_files(folder_name: str) -> list[str, list]:
+    return (
+        folder_name,
+        [os.path.join(folder_name, i) for i in os.listdir(folder_name)]
+        )
+
+
 YEAR = datetime.now().year # CURRENT YEAR
 AUTHOR = "Evgeny Loshkarev"  # "Evgeny Loshkarev"
 SHORT_AUTHOR_NAME = "Evlosh" # "Evlosh"
@@ -59,36 +66,13 @@ BUNDLE_ID = f"com.{SHORT_AUTHOR_NAME}.{APP_NAME}" # DON'T CHANGE IT
 PY_2APP = "py2app" # DON'T CHANGE IT
 
 
-images = [
-    os.path.join("images", i)
-    for i in os.listdir("images")
-    if i.endswith((".svg", ".jpg"))
-    ]
-
-applescripts = [
-    os.path.join("applescripts", i)
-    for i in os.listdir("applescripts")
-    if i.endswith((".scpt"))
-    ]
-
-styles = [
-    os.path.join("styles", i)
-    for i in os.listdir("styles")
-    if i.endswith((".css"))
-]
-
-icons = [
-    os.path.join("icon", i)
-    for i in os.listdir("icon")
-    ]
-
 DATA_FILES = [
     "db.db",
     "lang/lang.json",
-    ("images", images),
-    ("applescripts", applescripts),
-    ("styles", styles),
-    ("icon", icons)
+    include_files("images"),
+    include_files("applescripts"),
+    include_files("styles"),
+    include_files("icon"),
     ]
 
 
