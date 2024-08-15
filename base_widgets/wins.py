@@ -138,6 +138,13 @@ class WinBase(QMainWindow, QObject):
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:
+            main_win = MainUtils.get_main_win()
+            if main_win.isHidden():
+                main_win.show()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+        try:
             Manager.wins.remove(self)
             self.deleteLater()
         except Exception as e:
