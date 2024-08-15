@@ -3,7 +3,7 @@ import platform
 import subprocess
 import traceback
 
-from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout, QMainWindow
 
 from cfg import cnf
 from signals import utils_signals_app
@@ -95,7 +95,7 @@ class MainUtils:
         return app
     
     @staticmethod
-    def get_central_widget():
+    def get_main_win() -> QMainWindow:
         return MainUtils.get_app().main_win
 
     @staticmethod

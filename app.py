@@ -197,6 +197,9 @@ class WinMain(WinBase):
     def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
         try:
+            main_win = MainUtils.get_main_win()
+            if main_win.isHidden():
+                main_win.show()
             copy_task.remove_threads()
             copy_win.close()
         except Exception as e:
@@ -204,6 +207,9 @@ class WinMain(WinBase):
 
     def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
         try:
+            main_win = MainUtils.get_main_win()
+            if main_win.isHidden():
+                main_win.show()
             copy_task.stop.emit()
             copy_task.remove_threads()
             copy_win.close()
