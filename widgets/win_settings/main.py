@@ -271,10 +271,6 @@ class WinSettings(WinStandartBase):
     def ok_cmd(self, e):
         scan_again = False
 
-        if self.browse_coll.new_coll_path:
-            cnf.coll_folder = self.browse_coll.new_coll_path
-            scan_again = True
-
         if self.stopwords.get_stopwords() != cnf.stop_words:
             cnf.stop_words = self.stopwords.get_stopwords()
             scan_again = True
