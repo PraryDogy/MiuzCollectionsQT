@@ -8,7 +8,6 @@ from .st_bar import StBar
 from .thumbnails import Thumbnails
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
-from .win_first_load import WinFirstLoad
 from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings

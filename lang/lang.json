@@ -15,21 +15,13 @@
         "Обзор",
         "Browse"
     ],
-    "browse_coll_first": [
-        "Укажите расположение коллекций\nили оставьте по умолчанию.",
-        "Specify the location of collections\nor leave it as default."
-    ],
-    "browse_colls_descr": [
-        "Расположение коллекций",
-        "Collections location"
-    ],
     "cancel": [
         "Отмена",
         "Cancel"
     ],
     "choose_coll_smb": [
-        "Укажите расположение коллекций",
-        "Choose collections folder"
+        "Подключите sb06 or sb01",
+        "Connect sb06 or sb01"
     ],
     "close": [
         "Закрыть",
@@ -46,10 +38,6 @@
     "copy_all": [
         "Копировать все",
         "Copy all"
-    ],
-    "copy_selected": [
-        "Копировать выделенный текст",
-        "Copy selected text"
     ],
     "copying": [
         "Копирую",

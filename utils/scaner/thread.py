@@ -24,9 +24,23 @@ class Migrate:
     def __init__(self):
         sess = Dbase.get_session()
 
-        if cnf.old_coll_folder is None or cnf.coll_folder == cnf.old_coll_folder:
+        try:
+            q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
+            img_src, coll_name = sess.execute(q).first()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
             return
         
+        try:
+            img_src: str
+            old_coll_folder = img_src.split(os.sep + coll_name + os.sep)[0]
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+            return
+
+        if cnf.coll_folder == old_coll_folder:
+            return
+                
         try:
             q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
             res = sess.execute(q).fetchall()
@@ -38,10 +52,11 @@ class Migrate:
             return
 
         new_res = [
-            (res_id, src.replace(cnf.old_coll_folder, cnf.coll_folder))
+            (res_id, src.replace(old_coll_folder, cnf.coll_folder))
             for res_id, src in res
             ]
         
+
         for res_id, src in new_res:
             q = (
                 sqlalchemy.update(ThumbsMd)
@@ -56,7 +71,6 @@ class Migrate:
             MainUtils.print_err(parent=self, error=e)
 
         sess.close()
-        cnf.old_coll_folder = None
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
         utils_signals_app.migrate_finished.emit()

@@ -13,36 +13,13 @@ class MainUtils:
     @staticmethod
     def smb_check() -> bool:
         if not os.path.exists(cnf.coll_folder):
-
-            old_coll = os.sep + cnf.coll_folder.strip(os.sep)
-
-            if "Volumes" + os.sep in old_coll:
-
-                try:
-                    old_coll = old_coll.strip(os.sep).split(os.sep)[2:]
-                except Exception as e:
-                    print("MainUtils > smb_check",e)
-                    return False
-
-                old_coll = os.path.join(os.sep, *old_coll)
-
-            volumes = [
-                os.path.join(os.sep, "Volumes", i)
-                for i in os.listdir(os.sep + "Volumes")
-                ]
-
-            for i in volumes:
-                new_coll = os.path.join(os.sep, i.strip(os.sep), old_coll.strip(os.sep))
-
-                if os.path.exists(new_coll):
-                    cnf.old_coll_folder = cnf.coll_folder
-                    cnf.coll_folder = new_coll
+            for coll_folder in cnf.coll_folder_list:
+                if os.path.exists(coll_folder):
+                    cnf.coll_folder = coll_folder
                     utils_signals_app.scaner_stop.emit()
                     utils_signals_app.scaner_start.emit()
                     return True
-
             return False
-
         return True
 
     @staticmethod

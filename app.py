@@ -258,13 +258,6 @@ class App(QApplication):
 
     def after_start(self):
 
-        if cnf.first_load:
-            from widgets.win_first_load import WinFirstLoad
-            cnf.first_load = False
-            self.first_load_win = WinFirstLoad()
-            self.first_load_win.show()
-            return
-
         if not MainUtils.smb_check():
             from widgets.win_smb import WinSmb
 
@@ -273,14 +266,6 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        # return
-        # from widgets.win_first_load import WinFirstLoad
-        # self.test = WinFirstLoad()
-        # self.test.show()
-        # return
-
-        # self.test = TestWid()
-        # self.test.show()
 
 Themes.set_theme(cnf.theme)
 app = App()

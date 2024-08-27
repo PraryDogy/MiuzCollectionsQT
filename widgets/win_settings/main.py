@@ -217,7 +217,7 @@ class WinSettings(WinStandartBase):
         self.set_title(cnf.lng.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 540)
+        self.setFixedSize(420, 440)
         self.center_win(parent)
         self.setFocus()
 
@@ -226,14 +226,6 @@ class WinSettings(WinStandartBase):
         self.need_reset = None
 
     def init_ui(self):
-        coll_title = QLabel(cnf.lng.browse_colls_descr)
-        self.content_layout.addWidget(coll_title)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 10))
-
-        self.browse_coll = BrowseColl()
-        self.content_layout.addWidget(self.browse_coll)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
-
         self.change_lang = ChangeLang()
         self.content_layout.addWidget(self.change_lang)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))

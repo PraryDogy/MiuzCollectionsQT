@@ -30,12 +30,7 @@ class User:
         super().__init__()
         self.app_ver: str = "5.2.6"
     
-        self.coll_folder: str = os.path.join(
-            os.sep,
-            "Volumes",
-            "Shares",
-            "Collections"
-            )
+        self.coll_folder: str = "/Volumes/Shares/Collections"
         
         self.updater_path: str = os.path.join(
             "Studio",
@@ -61,8 +56,6 @@ class User:
             os.path.expanduser("~"),
             "Downloads"
             )
-    
-        self.first_load = True
 
         self.imgview_g: dict = {
             "aw": 700,
@@ -120,12 +113,30 @@ class Dymanic:
         self.search_widget_text: str = None
         self.date_start_text: str = "1 january 1991" # datetime as readable text
         self.date_end_text: str = "31 december 1991" # datetime as readable text
-        self.old_coll_folder: str = None # for utils > scaner > thread > Migrate
 
         self.lng: Eng = Eng()
 
         self.image_viewer: QMainWindow = None
         self.selected_thumbnail: Thumbnail = Thumbnail()
+
+
+class CollFolderList:
+    def __init__(self):
+        super().__init__()
+
+        shares = [f"/Volumes/Shares-{i}" for i in range(1, 4)]
+        shares.insert(0, "/Volumes/Shares")
+
+        coll_paths = [
+            "/Studio/Photo/Art/Ready",
+            "/Collections"
+            ]
+        
+        self.coll_folder_list = [
+            share + coll_path
+            for coll_path in coll_paths
+            for share in shares
+        ]
 
 
 class AppInfo:
@@ -134,7 +145,7 @@ class AppInfo:
         self.app_name: str = "MiuzCollections"
 
 
-class Config(User, Dymanic, Static, AppInfo):
+class Config(User, Dymanic, Static, CollFolderList, AppInfo):
     def __init__(self):
         super().__init__()
 
@@ -155,10 +166,7 @@ class Config(User, Dymanic, Static, AppInfo):
             "db.db"
             )
         
-    def update_json(self, data: dict):
-        print("UPDATING JSON")
-        
-        data["first_load"] = False
+    def update_json(self, data: dict):        
         data["scaner_minutes"] = 5
 
         if "LEVIEV" not in data["stop_colls"]:
