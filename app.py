@@ -266,6 +266,8 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
+        return
+
         from widgets.win_smb import WinSmb
         self.smb_win = WinSmb(parent=self.main_win)
         self.smb_win.show()  
