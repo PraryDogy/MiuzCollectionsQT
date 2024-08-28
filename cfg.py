@@ -28,7 +28,7 @@ class Thumbnail(QObject):
 class User:
     def __init__(self) -> None:
         super().__init__()
-        self.app_ver: str = "5.3.1"
+        self.app_ver: str = "5.3.2"
     
         self.coll_folder: str = "/Volumes/Shares/Collections"
         
@@ -82,7 +82,7 @@ class User:
             '/Volumes/Shares-1/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
             '/Volumes/Shares-2/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
             '/Volumes/Shares-3/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-        ]
+            ]
 
         self.coll_folder_list = [
             '/Volumes/Shares/Studio/Photo/Art/Ready',

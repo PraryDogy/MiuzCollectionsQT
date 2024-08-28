@@ -20,8 +20,8 @@
         "Cancel"
     ],
     "choose_coll_smb": [
-        "Подключите sb06 или sb01",
-        "Connect sb06 or sb01"
+        "Подключитесь к sb01 или sb06",
+        "Connect to sb01 or sb06"
     ],
     "close": [
         "Закрыть",
@@ -30,6 +30,10 @@
     "collection": [
         "Коллекция",
         "Collection"
+    ],
+    "connect_sb06": [
+        "Подключитесь к sb06",
+        "Connect to sb06"
     ],
     "copy": [
         "Копировать",

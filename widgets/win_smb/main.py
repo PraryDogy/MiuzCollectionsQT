@@ -9,8 +9,14 @@ from cfg import cnf
 class WinSmb(WinStandartBase):
     finished = pyqtSignal()
 
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: QWidget, text: str = None):
         super().__init__(close_func=self.cancel_cmd)
+
+        if text:
+            self.my_text = text
+        else:
+            self.my_text = cnf.lng.choose_coll_smb
+
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.set_title(cnf.lng.no_connection)
         self.disable_min()
@@ -43,7 +49,7 @@ class WinSmb(WinStandartBase):
 
         h_layout.addSpacerItem(QSpacerItem(15, 0))
 
-        descr = QLabel(cnf.lng.choose_coll_smb)
+        descr = QLabel(self.my_text)
         h_layout.addWidget(descr)
 
         h_layout.addStretch()
