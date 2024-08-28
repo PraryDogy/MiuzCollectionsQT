@@ -87,6 +87,16 @@ class User:
         self.theme: str = "dark_theme"
         self.user_lng: str = "en"
         
+        self.coll_folder_list = [
+            '/Volumes/Shares/Studio/Photo/Art/Ready',
+            '/Volumes/Shares-1/Studio/Photo/Art/Ready',
+            '/Volumes/Shares-2/Studio/Photo/Art/Ready',
+            '/Volumes/Shares-3/Studio/Photo/Art/Ready',
+            '/Volumes/Shares/Collections',
+            '/Volumes/Shares-1/Collections',
+            '/Volumes/Shares-2/Collections',
+            '/Volumes/Shares-3/Collections'
+            ]
 
 class Static:
     def __init__(self):
@@ -120,32 +130,13 @@ class Dymanic:
         self.selected_thumbnail: Thumbnail = Thumbnail()
 
 
-class CollFolderList:
-    def __init__(self):
-        super().__init__()
-
-        shares = [f"/Volumes/Shares-{i}" for i in range(1, 4)]
-        shares.insert(0, "/Volumes/Shares")
-
-        coll_paths = [
-            "/Studio/Photo/Art/Ready",
-            "/Collections"
-            ]
-        
-        self.coll_folder_list = [
-            share + coll_path
-            for coll_path in coll_paths
-            for share in shares
-        ]
-
-
 class AppInfo:
     def __init__(self):
         super().__init__()
         self.app_name: str = "MiuzCollections"
 
 
-class Config(User, Dymanic, Static, CollFolderList, AppInfo):
+class Config(User, Dymanic, Static, AppInfo):
     def __init__(self):
         super().__init__()
 

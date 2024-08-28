@@ -2,12 +2,15 @@ import os
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
+from PyQt5.QtWidgets import (QFileDialog, QLabel, QSpacerItem, QTextEdit,
+                             QWidget)
 
-from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase, CustomTextEdit
+from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
+                          WinStandartBase)
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from utils import MainUtils, Updater
+
 
 class BrowseColl(QWidget):
     def __init__(self):
@@ -58,9 +61,22 @@ class CollFolderListInput(CustomTextEdit):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(150)
+        self.setLineWrapMode(QTextEdit.NoWrap)
 
         text = "\n".join(cnf.coll_folder_list)
         self.setText(text)
+
+    def get_text(self):
+        text = self.toPlainText()
+        coll_folder_list = text.split("\n")
+
+
+        coll_folder_list = [
+            os.sep + i.strip().strip(os.sep)
+            for i in coll_folder_list
+            ]
+        
+        return coll_folder_list
 
 
 class ChangeLang(QWidget):
@@ -282,6 +298,9 @@ class WinSettings(WinStandartBase):
 
     def ok_cmd(self, e):
         scan_again = False
+
+        coll_folder_list = self.coll_folder_list_input.get_text()
+        cnf.coll_folder_list = coll_folder_list
 
         if self.stopwords.get_stopwords() != cnf.stop_words:
             cnf.stop_words = self.stopwords.get_stopwords()
