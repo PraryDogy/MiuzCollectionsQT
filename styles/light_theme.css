@@ -205,7 +205,6 @@
 #smb_browse_btn_selected {
     background-color: #2e59cb;
     border-radius: 8;
-    color: #ffffff
 }
 
 #st_bar_frame {
@@ -244,6 +243,14 @@
     border-bottom-left-radius: 0px;
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
+}
+
+#text_edit {
+    background-color: rgb(204, 204, 204);
+    border-radius: 6;
+    padding-left: 5px;
+    padding-right: 5px;
+    color: #3d3d3d;
 }
 
 #th_reset_dates_btn {

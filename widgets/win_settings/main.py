@@ -4,11 +4,10 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QFileDialog, QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
+from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase, CustomTextEdit
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from utils import MainUtils, Updater
-
 
 class BrowseColl(QWidget):
     def __init__(self):
@@ -53,7 +52,16 @@ class BrowseColl(QWidget):
             return text[:max_ln] + "..."
         else:
             return text
-        
+
+
+class CollFolderListInput(CustomTextEdit):
+    def __init__(self):
+        super().__init__()
+        self.setFixedHeight(150)
+
+        text = "\n".join(cnf.coll_folder_list)
+        self.setText(text)
+
 
 class ChangeLang(QWidget):
     def __init__(self):
@@ -217,7 +225,7 @@ class WinSettings(WinStandartBase):
         self.set_title(cnf.lng.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 440)
+        self.setFixedSize(420, 630)
         self.center_win(parent)
         self.setFocus()
 
@@ -244,6 +252,10 @@ class WinSettings(WinStandartBase):
 
         self.stopcolls = StopColls()
         self.content_layout.addWidget(self.stopcolls)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+
+        self.coll_folder_list_input = CollFolderListInput()
+        self.content_layout.addWidget(self.coll_folder_list_input)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.content_layout.addStretch()

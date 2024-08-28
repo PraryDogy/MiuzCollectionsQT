@@ -67,3 +67,5 @@ class Names:
 
     drop_widget = "drop_widget"
     letter_btn = "letter_btn"
+
+    text_edit = "text_edit"
