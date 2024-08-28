@@ -6,7 +6,7 @@ class Rus:
 		self.bar_menu = 'Меню'
 		self.browse = 'Обзор'
 		self.cancel = 'Отмена'
-		self.choose_coll_smb = 'Подключите sb06 or sb01'
+		self.choose_coll_smb = 'Подключите sb06 или sb01'
 		self.close = 'Закрыть'
 		self.collection = 'Коллекция'
 		self.copy = 'Копировать'
