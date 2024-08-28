@@ -13,7 +13,8 @@ class WinCopyFiles(WinStandartBase):
     def __init__(self, parent: QWidget):
         super().__init__(close_func=self.my_close)
         self.set_title(cnf.lng.copying_title)
-        self.disable_min_max()
+        self.disable_min()
+        self.disable_max()
         self.disable_close()
         self.setFixedSize(270, 130)
 

@@ -189,9 +189,11 @@ class WinBase(QMainWindow, QObject):
     def set_title(self, text):
         self.titlebar.title.setText(text)
 
-    def disable_min_max(self):
+    def disable_min(self):
         self.titlebar.btns.min_btn.setDisabled(True)
         self.titlebar.btns.min_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
+
+    def disable_max(self):
         self.titlebar.btns.max_btn.setDisabled(True)
         self.titlebar.btns.max_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
 

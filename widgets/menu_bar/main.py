@@ -53,7 +53,8 @@ class AboutWin(WinSmallBase):
         super().__init__(close_func=lambda e: self.deleteLater())
 
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.disable_min_max()
+        self.disable_min()
+        self.disable_max()
         self.set_title(cnf.app_name)
         self.setFixedSize(280, 240)
 

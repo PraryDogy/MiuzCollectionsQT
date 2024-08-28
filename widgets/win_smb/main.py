@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QLabel, QWidget
+from PyQt5.QtWidgets import QLabel, QWidget, QSpacerItem
 
-from base_widgets import Btn, WinStandartBase
+from base_widgets import Btn, LayoutH, WinStandartBase, SvgBtn
 from cfg import cnf
 
 
@@ -13,10 +13,11 @@ class WinSmb(WinStandartBase):
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.set_title(cnf.lng.no_connection)
-        self.disable_min_max()
+        self.disable_min()
+        self.disable_max()
 
         self.init_ui()
-        self.setFixedSize(300, 130)
+        self.setFixedSize(300, 150)
         self.center_win(parent=parent)
         self.setFocus()
 
@@ -32,10 +33,24 @@ class WinSmb(WinStandartBase):
         self.close()
 
     def init_ui(self):
-        descr = QLabel(cnf.lng.choose_coll_smb)
-        self.content_layout.addWidget(descr)
+        h_wid = QWidget()
+        self.content_layout.addWidget(h_wid)
+        h_layout = LayoutH()
+        h_wid.setLayout(h_layout)
 
-        self.pass_btn = Btn(cnf.lng.close)
+        icon_label = SvgBtn("images/warning.svg", 64)
+        h_layout.addWidget(icon_label)
+
+        h_layout.addSpacerItem(QSpacerItem(15, 0))
+
+        descr = QLabel(cnf.lng.choose_coll_smb)
+        h_layout.addWidget(descr)
+
+        h_layout.addStretch()
+
+        self.content_layout.addSpacerItem(QSpacerItem(0, 10))
+
+        self.pass_btn = Btn(cnf.lng.ok)
         self.pass_btn.mouseReleaseEvent = self.pass_btn_cmd
         self.content_layout.addWidget(self.pass_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 

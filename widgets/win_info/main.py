@@ -133,7 +133,8 @@ class WinInfo(WinStandartBase):
     def __init__(self, img_src: str, parent: QWidget):
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.disable_min_max()
+        self.disable_min()
+        self.disable_max()
         self.set_title(cnf.lng.info)
 
         self.img_src = img_src

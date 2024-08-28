@@ -83,7 +83,8 @@ class WinDates(WinStandartBase):
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         FiltersDateBtncolor.set_border()
-        self.disable_min_max()
+        self.disable_min()
+        self.disable_max()
         self.set_title(cnf.lng.dates)
 
         self.date_start = cnf.date_start
