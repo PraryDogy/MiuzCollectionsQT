@@ -62,6 +62,8 @@ class CollFolderListInput(CustomTextEdit):
         super().__init__()
         self.setFixedHeight(150)
         self.setLineWrapMode(QTextEdit.NoWrap)
+        h_bar = self.horizontalScrollBar()
+        h_bar.setFixedHeight(0)
 
         text = "\n".join(cnf.coll_folder_list)
         self.setText(text)
