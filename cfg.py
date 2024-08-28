@@ -32,16 +32,6 @@ class User:
     
         self.coll_folder: str = "/Volumes/Shares/Collections"
         
-        self.updater_path: str = os.path.join(
-            "Studio",
-            "Photo",
-            "Art",
-            "Raw",
-            "2024",
-            "soft",
-            "MiuzCollections.zip"
-            )
-
         self.curr_coll: str = "miuzcollections_all"
         self.cust_fltr_names: dict = {
             "prod": "1 IMG",
@@ -86,7 +76,14 @@ class User:
         
         self.theme: str = "dark_theme"
         self.user_lng: str = "en"
-        
+
+        self.udpdate_file_paths = [
+            '/Volumes/Shares/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+            '/Volumes/Shares-1/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+            '/Volumes/Shares-2/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+            '/Volumes/Shares-3/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+        ]
+
         self.coll_folder_list = [
             '/Volumes/Shares/Studio/Photo/Art/Ready',
             '/Volumes/Shares-1/Studio/Photo/Art/Ready',

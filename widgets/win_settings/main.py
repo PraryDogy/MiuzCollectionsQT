@@ -9,7 +9,8 @@ from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from utils import MainUtils, Updater
+from utils import Updater
+from ..win_smb import WinSmb
 
 
 class BrowseColl(QWidget):
@@ -220,15 +221,17 @@ class UpdaterWidget(QWidget):
     def update_btn_cmd(self, e):
         self.task = Updater()
         self.btn.setText(cnf.lng.wait_update)
-        self.task.no_connection.connect(self.no_connection_btn)
+        self.task.no_connection.connect(self.no_connection_win)
         self.task.finished.connect(self.finalize)
         self.task.start()
 
     def finalize(self):
         self.btn.setText(cnf.lng.download_update)
 
-    def no_connection_btn(self):
-        QTimer.singleShot(1000, self.no_connection_btn_style)
+    def no_connection_win(self):
+        QTimer.singleShot(1000, lambda: self.btn.setText(cnf.lng.download_update))
+        self.smb_win = WinSmb(parent=self)
+        self.smb_win.show()
 
     def no_connection_btn_style(self):
         self.btn.setText(cnf.lng.no_connection)

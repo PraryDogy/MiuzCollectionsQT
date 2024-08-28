@@ -17,41 +17,24 @@ class UpdaterMain(QObject):
         super().__init__()
 
     def go(self):
-        volumes = "Volumes"
+        for update_file_path in cnf.udpdate_file_paths:
 
-        filename_zip_file = os.path.basename(cnf.updater_path)
-        filename_app_file = os.path.splitext(filename_zip_file)[0] + ".app"
+            if os.path.exists(update_file_path):
 
-        drives = os.listdir(os.path.join(os.sep, volumes))
-        drives = [
-            os.path.join(os.sep, volumes, drive)
-            for drive in drives
-            ]
+                zip_filename = os.path.basename(update_file_path)
+                destination = os.path.join(cnf.down_folder, zip_filename)
+
+                if os.path.exists(destination):
+                    os.remove(destination)
+
+                shutil.copy2(update_file_path, destination)
+                subprocess.run(["open", "-R", destination])
+
+                self.finished.emit()
+                return True
         
-        try:
-            zip_file = [
-                os.path.join(drive, cnf.updater_path)
-                for drive in drives
-                if os.path.exists(os.path.join(drive, cnf.updater_path))
-                ][0]
-
-        except IndexError as e:
-            zip_file = None
-            MainUtils.print_err(parent=self, error=e)
-
-        if not zip_file:
-            self.no_connection.emit()
-            return
-
-        downloaded_zip = os.path.join(cnf.down_folder, filename_zip_file)
-
-        if os.path.exists(downloaded_zip):
-            os.remove(downloaded_zip)
-
-        shutil.copy2(zip_file, downloaded_zip)
-        subprocess.run(["open", "-R", downloaded_zip])
-
-        self.finished.emit()
+        self.no_connection.emit()
+        return False
 
 
 class Updater(MyThread):
