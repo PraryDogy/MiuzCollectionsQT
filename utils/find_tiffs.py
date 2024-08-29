@@ -7,10 +7,10 @@ from .my_thread import MyThread
 from cfg import cnf
 
 
-class _TiffUtils:
+class TiffUtils:
 
     @staticmethod
-    def compare_names(src: str, tiff: str):
+    def filename_in_filename(src: str, tiff: str):
         if src in tiff or tiff in src:
             return True
         return False
@@ -49,7 +49,7 @@ class FindTiffBase:
     def run(self):
         try:
             tiff_list = self._find_tiffs()
-            self.final_tiff = _TiffUtils.nearest_len(self.src, tiff_list)
+            self.final_tiff = TiffUtils.nearest_len(self.src, tiff_list)
             self.count = 0
         except RuntimeError:
             self.count += 1
@@ -60,27 +60,36 @@ class FindTiffBase:
                 self.final_tiff = None
 
     def _find_tiffs(self) -> list:
-        _, src_filename = os.path.split(self.src)
-
-        aa_name = _TiffUtils.remove_punct(src_filename)
-        aa_name = _TiffUtils.remove_stop_words(aa_name)
-
+        src_path, full_src_filename = os.path.split(self.src)
+        src_filename = TiffUtils.remove_punct(full_src_filename)
+        src_filename = TiffUtils.remove_stop_words(src_filename)
         tiff_list = []
+
+        if len(src_filename) <= 5:
+            nearly_files = sorted(os.listdir(src_path))
+            posible_tiff = nearly_files[nearly_files.index(full_src_filename) + 1]
+            _, ext = os.path.splitext(posible_tiff)
+
+            if ext.lower() in (".tif", ".tiff", ".psd", "psb"):
+                posible_tiff = os.path.join(src_path, posible_tiff)
+                tiff_list.append(posible_tiff)
+
+            return tiff_list
 
         for tiff in self.tiff_list:
             _, tiff_name = os.path.split(tiff)
 
-            bb_name = _TiffUtils.remove_punct(tiff_name)
-            bb_name = _TiffUtils.remove_stop_words(bb_name)
+            tiff_filename = TiffUtils.remove_punct(tiff_name)
+            tiff_filename = TiffUtils.remove_stop_words(tiff_filename)
 
-            if len(aa_name) <= 3 or len(bb_name) <= 3:
-                continue
+            # if len(src_filename) <= 3 or len(tiff_filename) <= 3:
+            #     continue
 
-            if aa_name == bb_name:
+            if src_filename == tiff_filename:
                 tiff_list.append(tiff)
                 return tiff_list
 
-            if _TiffUtils.compare_names(src=aa_name, tiff=bb_name):
+            if TiffUtils.filename_in_filename(src=src_filename, tiff=tiff_filename):
                 tiff_list.append(tiff)
 
         return tiff_list
