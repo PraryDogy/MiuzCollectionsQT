@@ -61,6 +61,6 @@ class WinSmb(WinStandartBase):
         self.pass_btn.mouseReleaseEvent = self.pass_btn_cmd
         self.content_layout.addWidget(self.pass_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        return
-        return super().keyPressEvent(a0)
+    # def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        # return
+        # return super().keyPressEvent(a0)
