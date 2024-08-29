@@ -37,7 +37,7 @@ class Eng:
 		self.months_genitive_case = {'1': 'january', '2': 'february', '3': 'march', '4': 'april', '5': 'may', '6': 'june', '7': 'july', '8': 'august', '9': 'september', '10': 'october', '11': 'november', '12': 'december'}
 		self.name = 'en'
 		self.no_connection = 'No connection'
-		self.no_file = "Can't find the files or there is no connection."
+		self.no_file = "Can't find the file(s)"
 		self.no_photo = 'No photos'
 		self.no_photo_filter = 'No photos in cathegory'
 		self.ok = 'Ok'

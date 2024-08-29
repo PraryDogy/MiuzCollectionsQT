@@ -10,7 +10,7 @@ from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiffsMultiple)
 
 from ..win_copy_files import WinCopyFiles
-
+from ..win_smb import WinSmb
 
 class Shared:
     dialog = None
@@ -52,20 +52,36 @@ class CustomContext(ContextMenuBase):
         self.save_as_win = None
 
     def save_as_jpg(self, files_list: list):
-        dest = self.select_folder()
-        if dest:
-            self.copy_files(dest, files_list)
+        if MainUtils.smb_check():
+            dest = self.select_folder()
+            if dest:
+                self.copy_files(dest, files_list)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
 
     def save_as_tiffs(self, files_list):
-        dest = self.select_folder()
-        if dest:
-            self.find_tiffs(dest, files_list)
+        if MainUtils.smb_check():
+            dest = self.select_folder()
+            if dest:
+                self.find_tiffs(dest, files_list)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
 
     def save_jpg(self, files_list: list):
-        self.copy_files(cnf.down_folder, files_list)
+        if MainUtils.smb_check():
+            self.copy_files(cnf.down_folder, files_list)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
 
     def save_tiffs(self, files_list: list):
-        self.find_tiffs(cnf.down_folder, files_list)
+        if MainUtils.smb_check():
+            self.find_tiffs(cnf.down_folder, files_list)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
         
     def find_tiffs(self, dest: str, files_list: list):
         tsk = ThreadFindTiffsMultiple(files_list)

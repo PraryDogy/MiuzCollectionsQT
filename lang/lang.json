@@ -202,8 +202,8 @@
         "No connection"
     ],
     "no_file": [
-        "Не могу найти файлы или нет подключения",
-        "Can't find the files or there is no connection."
+        "Не могу найти файл(ы)",
+        "Can't find the file(s)"
     ],
     "no_photo": [
         "Нет фотографий",

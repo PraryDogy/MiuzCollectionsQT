@@ -10,7 +10,7 @@ from cfg import cnf
 from signals import gui_signals_app
 from styles import Names, Themes
 from utils import SendNotification, MainUtils
-
+from ..win_smb import WinSmb
 
 class CustomContext(ContextMenuBase):
     def __init__(self, parent: QLabel, true_name: str, event: QContextMenuEvent):
@@ -51,31 +51,37 @@ class CustomContext(ContextMenuBase):
         gui_signals_app.reload_thumbnails.emit()
 
     def reveal_collection(self, flag: str = None):
-        if self.true_name == cnf.ALL_COLLS:
-            if os.path.exists(cnf.coll_folder):
-                subprocess.Popen(["open", cnf.coll_folder])
+        if MainUtils.smb_check():
+
+            if self.true_name == cnf.ALL_COLLS:
+                if os.path.exists(cnf.coll_folder):
+                    subprocess.Popen(["open", cnf.coll_folder])
+                else:
+                    SendNotification(cnf.lng.no_connection)
+                return
+
+            coll_path = os.path.join(cnf.coll_folder, self.true_name)
+
+            if flag == "prod":
+                flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
+                if os.path.exists(flag_path):
+                    subprocess.Popen(["open", flag_path])
+                    return
+
+            if flag == "mod":
+                flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
+                if os.path.exists(flag_path):
+                    subprocess.Popen(["open", flag_path])
+                    return
+
+            if os.path.exists(coll_path):
+                subprocess.Popen(["open", coll_path])
             else:
                 SendNotification(cnf.lng.no_connection)
-            return
 
-        coll_path = os.path.join(cnf.coll_folder, self.true_name)
-
-        if flag == "prod":
-            flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
-            if os.path.exists(flag_path):
-                subprocess.Popen(["open", flag_path])
-                return
-
-        if flag == "mod":
-            flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
-            if os.path.exists(flag_path):
-                subprocess.Popen(["open", flag_path])
-                return
-
-        if os.path.exists(coll_path):
-            subprocess.Popen(["open", coll_path])
         else:
-            SendNotification(cnf.lng.no_connection)
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
 
 
 class CollectionBtn(QLabel):

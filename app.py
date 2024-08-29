@@ -15,10 +15,10 @@ from styles import Names, Themes
 from utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
 from utils.reveal_files import RevealFiles
-from utils.send_notification import SendNotification
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
 from widgets.win_copy_files import WinCopyFiles
+from widgets.win_smb import WinSmb
 
 
 class TestWid(QWidget):
@@ -169,7 +169,8 @@ class WinMain(WinBase):
             self.drop_widget.hide()
 
             if not MainUtils.smb_check():
-                SendNotification(text=cnf.lng.no_connection)
+                self.win_smb = WinSmb(parent=self)
+                self.win_smb.show()
                 return
 
             directory = cnf.coll_folder

@@ -11,6 +11,7 @@ from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
 
 from ..win_copy_files import WinCopyFiles
 from ..win_info import WinInfo
+from ..win_smb import WinSmb
 
 
 class Shared:
@@ -98,9 +99,13 @@ class ImageContext(ContextMenuBase):
         self.insertAction(self.info_action, open_action)
 
     def show_info_win(self, img_src: str):
-        self.select_thumbnail(img_src=img_src)
-        self.win_info = WinInfo(img_src=img_src, parent=self.my_parent)
-        self.win_info.show()
+        if MainUtils.smb_check():
+            self.select_thumbnail(img_src=img_src)
+            self.win_info = WinInfo(img_src=img_src, parent=self.my_parent)
+            self.win_info.show()
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
         
     def show_image_viewer(self, img_src: str):
         self.select_thumbnail(img_src=img_src)
@@ -111,15 +116,24 @@ class ImageContext(ContextMenuBase):
         self.win_img.show()
 
     def reveal_jpg(self, img_src: str):
-        self.reveal_file_finish(img_src)
+        if MainUtils.smb_check():
+            self.reveal_file_finish(img_src)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
+
 
     def reveal_tiff(self, img_src: str):
-        self.reveal_tiff_task = ThreadFindTiff(img_src)
+        if MainUtils.smb_check():
+            self.reveal_tiff_task = ThreadFindTiff(img_src)
 
-        self.reveal_tiff_task.finished.connect(lambda tiff: self.reveal_file_finish(tiff))
-        self.reveal_tiff_task.can_remove.connect(self.reveal_tiff_task.remove_threads)
+            self.reveal_tiff_task.finished.connect(lambda tiff: self.reveal_file_finish(tiff))
+            self.reveal_tiff_task.can_remove.connect(self.reveal_tiff_task.remove_threads)
 
-        self.reveal_tiff_task.start()
+            self.reveal_tiff_task.start()
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
 
     def reveal_file_finish(self, file: str):
         if not os.path.exists(file):
@@ -128,20 +142,36 @@ class ImageContext(ContextMenuBase):
         RevealFiles([file])
 
     def save_as_jpg(self, img_src: str):
-        dest = self.select_folder()
-        if dest:
-            self.copy_file(dest=dest, file=img_src)
+        if MainUtils.smb_check():
+            dest = self.select_folder()
+            if dest:
+                self.copy_file(dest=dest, file=img_src)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
 
     def save_jpg(self, img_src: str):
-        self.copy_file(dest=cnf.down_folder, file=img_src)
+        if MainUtils.smb_check():
+            self.copy_file(dest=cnf.down_folder, file=img_src)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
 
     def save_as_tiffs(self, img_src: str):
-        dest = self.select_folder()
-        if dest:
-            self.find_tiffs(dest=dest, img_src=img_src)
+        if MainUtils.smb_check():
+            dest = self.select_folder()
+            if dest:
+                self.find_tiffs(dest=dest, img_src=img_src)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
 
     def save_tiffs(self, img_src: str):
-        self.find_tiffs(dest=cnf.down_folder, img_src=img_src)
+        if MainUtils.smb_check():
+            self.find_tiffs(dest=cnf.down_folder, img_src=img_src)
+        else:
+            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win.show()
         
     def find_tiffs(self, dest: str, img_src: str):
         self.find_tiff_task = ThreadFindTiff(img_src)
