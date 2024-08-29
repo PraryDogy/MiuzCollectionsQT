@@ -21,6 +21,7 @@ class WinSmb(WinStandartBase):
         self.set_title(cnf.lng.no_connection)
         self.disable_min()
         self.disable_max()
+        self.disable_close()
 
         self.init_ui()
         self.setFixedSize(300, 130)
