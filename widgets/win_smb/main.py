@@ -23,7 +23,7 @@ class WinSmb(WinStandartBase):
         self.disable_max()
 
         self.init_ui()
-        self.setFixedSize(300, 150)
+        self.setFixedSize(300, 130)
         self.center_win(parent=parent)
         self.setFocus()
 
@@ -44,7 +44,7 @@ class WinSmb(WinStandartBase):
         h_layout = LayoutH()
         h_wid.setLayout(h_layout)
 
-        icon_label = SvgBtn("images/warning.svg", 64)
+        icon_label = SvgBtn("images/warning.svg", 40)
         h_layout.addWidget(icon_label)
 
         h_layout.addSpacerItem(QSpacerItem(15, 0))
