@@ -42,11 +42,6 @@ class User:
             "mod": False
             }    
         
-        self.down_folder: str = os.path.join(
-            os.path.expanduser("~"),
-            "Downloads"
-            )
-
         self.imgview_g: dict = {
             "aw": 700,
             "ah": 500
@@ -58,12 +53,12 @@ class User:
             }
         
         self.scaner_minutes: int = 5
-        self.stop_colls: dict = [
+        self.stop_colls: list = [
             "_Archive_Commerce_Брендинг",
             "Chosed",
             "LEVIEV"
             ]
-        self.stop_words: dict = [
+        self.stop_words: list = [
             "копия",
             "copy",
             "1x1",
@@ -76,6 +71,8 @@ class User:
         
         self.theme: str = "dark_theme"
         self.user_lng: str = "en"
+
+        self.down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
         self.udpdate_file_paths = [
             '/Volumes/Shares/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
