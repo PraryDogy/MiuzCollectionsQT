@@ -1,5 +1,7 @@
-from PyQt5.QtWidgets import QApplication, QFrame, QSpacerItem
+import os
+
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QFrame, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, SvgBtn
 from cfg import cnf
@@ -9,7 +11,16 @@ from utils import MainUtils
 
 from ..win_settings import WinSettings
 from .progress_bar import ProgressBar
-import os
+
+
+class SwitchView(SvgBtn):
+    def __init__(self, size: int, parent: QWidget = None):
+        icn = f"{cnf.theme}_{str(cnf.small_view).lower()}_view.svg"
+        super().__init__(icon_path=os.path.join("images", icn), size=size, parent=parent)
+
+    def switch_icon(self):
+        icn = f"{cnf.theme}_{str(cnf.small_view).lower()}_view.svg"
+        self.set_icon(icon_path=os.path.join("images", icn))
 
 
 class StBar(QFrame):
@@ -35,19 +46,19 @@ class StBar(QFrame):
 
         self.h_layout.addSpacerItem(QSpacerItem(15, 0))
 
-        self.switch_view = SvgBtn(os.path.join("images", f"{cnf.theme}_view.svg"), 18)
+        self.switch_view = SwitchView(size=20)
         self.switch_view.mouseReleaseEvent = self.switch_view_cmd
         self.h_layout.addWidget(self.switch_view)
 
         self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.switch_theme = SvgBtn(os.path.join("images", f"{cnf.theme}_switch.svg"), 18)
+        self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_switch.svg"), size=18)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
         self.h_layout.addWidget(self.switch_theme)
 
         self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
-        self.sett_widget = SvgBtn(os.path.join("images", f"{cnf.theme}_settings.svg"), 20)
+        self.sett_widget = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_settings.svg"), size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
    
@@ -76,10 +87,11 @@ class StBar(QFrame):
             for widget in all_widgets
             if widget.objectName()
             ]
-        
+                
         if cnf.theme == "dark_theme":
             Themes.set_theme("light_theme")
             cnf.theme = "light_theme"
+
         else:
             Themes.set_theme("dark_theme")
             cnf.theme = "dark_theme"
@@ -89,7 +101,7 @@ class StBar(QFrame):
 
         self.sett_widget.set_icon(os.path.join("images", f"{cnf.theme}_settings.svg"))
         self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
-        self.switch_view.set_icon(os.path.join("images", f"{cnf.theme}_view.svg"))
+        self.switch_view.switch_icon()
 
         cnf.write_json_cfg()
 
@@ -100,4 +112,5 @@ class StBar(QFrame):
     def switch_view_cmd(self, e):
         cnf.small_view = not cnf.small_view
         gui_signals_app.reload_thumbnails.emit()
+        self.switch_view.switch_icon()
         cnf.write_json_cfg()
