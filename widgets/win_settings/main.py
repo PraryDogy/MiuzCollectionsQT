@@ -61,7 +61,7 @@ class BrowseColl(QWidget):
 class CollFolderListInput(CustomTextEdit):
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(150)
+        self.setFixedHeight(100)
         self.setLineWrapMode(QTextEdit.NoWrap)
         h_bar = self.horizontalScrollBar()
         h_bar.setFixedHeight(0)
@@ -247,7 +247,7 @@ class WinSettings(WinStandartBase):
         self.set_title(cnf.lng.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 630)
+        self.setFixedSize(420, 580)
         self.center_win(parent)
         self.setFocus()
 
