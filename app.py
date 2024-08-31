@@ -21,9 +21,11 @@ from widgets.win_copy_files import WinCopyFiles
 from widgets.win_smb import WinSmb
 
 
-class TestWid(QWidget):
+class TestWid(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
+        self.setFixedSize(100, 100)
+        self.setStyleSheet("background: black;")
 
         v_layout = QVBoxLayout()
         self.setLayout(v_layout)
@@ -33,6 +35,8 @@ class TestWid(QWidget):
         btn.clicked.connect(self.reload)
 
     def reload(self):
+        from utils import SendNotification
+        SendNotification("test")
         return
         from widgets import WinSmb
         self.a = WinSmb()
@@ -239,11 +243,6 @@ class App(QApplication):
                         cnf.image_viewer.show()
                         cnf.image_viewer.showNormal()
 
-            # import subprocess
-            # cmd = "tell application \"Hello\" to activate"
-            # command = ["osascript", cmd]
-            # subprocess.Popen(command)
-
         return super().eventFilter(a0, a1)
     
     def on_exit(self):
@@ -266,13 +265,6 @@ class App(QApplication):
             self.smb_win.show()
 
         utils_signals_app.scaner_start.emit()
-
-        return
-
-        from widgets.win_smb import WinSmb
-        self.smb_win = WinSmb(parent=self.main_win)
-        self.smb_win.show()  
-
 
 Themes.set_theme(cnf.theme)
 app = App()
