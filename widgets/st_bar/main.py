@@ -91,6 +91,8 @@ class StBar(QFrame):
         self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
         self.switch_view.set_icon(os.path.join("images", f"{cnf.theme}_view.svg"))
 
+        cnf.write_json_cfg()
+
     def sett_btn_cmd(self, e):
         self.settings = WinSettings(parent=self)
         self.settings.show()
