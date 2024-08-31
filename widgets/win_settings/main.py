@@ -247,7 +247,7 @@ class WinSettings(WinStandartBase):
         self.set_title(cnf.lng.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 580)
+        self.setFixedSize(420, 600)
         self.center_win(parent)
         self.setFocus()
 
@@ -275,6 +275,11 @@ class WinSettings(WinStandartBase):
         self.stopcolls = StopColls()
         self.content_layout.addWidget(self.stopcolls)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+
+
+        coll_folder_list_label = QLabel(text=cnf.lng.where_to_look_coll_folder)
+        self.content_layout.addWidget(coll_folder_list_label)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 10))
 
         self.coll_folder_list_input = CollFolderListInput()
         self.content_layout.addWidget(self.coll_folder_list_input)

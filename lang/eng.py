@@ -73,4 +73,5 @@ class Eng:
 		self.view = 'View'
 		self.wait_update = 'Wait...'
 		self.weekdays = {'0': 'monday', '1': 'tuesday', '2': 'wednesday', '3': 'thursday', '4': 'friday', '5': 'saturday', '6': 'sunday'}
+		self.where_to_look_coll_folder = 'Where to look for a collections folder'
 		self.with_name = 'with name'
