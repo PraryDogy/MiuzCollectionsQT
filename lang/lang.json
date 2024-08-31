@@ -372,5 +372,9 @@
     "where_to_look_coll_folder": [
         "Где искать папку с коллекциями",
         "Where to look for a collections folder"
+    ],
+    "show_app_support": [
+        "Показать файлы",
+        "Show files"
     ]
 }

@@ -21,7 +21,7 @@ class WinSmb(WinStandartBase):
         self.set_title(cnf.lng.no_connection)
         self.disable_min()
         self.disable_max()
-        self.disable_close()
+        # self.disable_close()
 
         self.init_ui()
         self.setFixedSize(300, 130)
@@ -33,7 +33,8 @@ class WinSmb(WinStandartBase):
         self.need_reset = None
 
     def cancel_cmd(self, event):
-        pass
+        self.finished.emit()
+        self.close()
 
     def pass_btn_cmd(self, event):
         self.finished.emit()
@@ -57,9 +58,9 @@ class WinSmb(WinStandartBase):
 
         self.content_layout.addSpacerItem(QSpacerItem(0, 10))
 
-        self.pass_btn = Btn(cnf.lng.ok)
-        self.pass_btn.mouseReleaseEvent = self.pass_btn_cmd
-        self.content_layout.addWidget(self.pass_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.ok_btn = Btn(cnf.lng.ok)
+        self.ok_btn.mouseReleaseEvent = self.pass_btn_cmd
+        self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     # def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         # return

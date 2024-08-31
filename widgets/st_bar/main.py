@@ -56,8 +56,8 @@ class StBar(QFrame):
 
         self.progress_bar.hide()
 
-        from PyQt5.QtCore import QTimer
-        QTimer.singleShot(1000, self.progress_bar.show)
+        # from PyQt5.QtCore import QTimer
+        # QTimer.singleShot(1000, self.progress_bar.show)
 
     def reload(self):
         gui_signals_app.reload_thumbnails.emit()

@@ -64,6 +64,7 @@ class Eng:
 		self.settings = 'Settings'
 		self.show_about = 'Show about'
 		self.show_all = 'Show all'
+		self.show_app_support = 'Show files'
 		self.show_more = 'Show more'
 		self.smb_descr = 'Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Start'

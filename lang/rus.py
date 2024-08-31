@@ -64,6 +64,7 @@ class Rus:
 		self.settings = 'Настройки'
 		self.show_about = 'О приложении'
 		self.show_all = 'Показать все'
+		self.show_app_support = 'Показать файлы'
 		self.show_more = 'Позазать еще'
 		self.smb_descr = 'Коллекции недоступны.\nВозможные причины:\n\n- Нет подключения к интернету\n- Нет подключения к сетевому диску\n- Неправильно указано расположение коллекций\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Начало'

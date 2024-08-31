@@ -11,7 +11,7 @@ from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
 from utils import Updater
 from ..win_smb import WinSmb
-
+import subprocess
 
 class BrowseColl(QWidget):
     def __init__(self):
@@ -238,6 +238,25 @@ class UpdaterWidget(QWidget):
         QTimer.singleShot(1500, lambda: self.btn.setText(cnf.lng.download_update))
 
 
+class ShowFiles(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.v_layout = LayoutV()
+        self.setLayout(self.v_layout)
+
+        self.btn = Btn(cnf.lng.show_app_support)
+        self.btn.setFixedWidth(150)
+        self.btn.mouseReleaseEvent = self.btn_cmd
+        self.v_layout.addWidget(self.btn)
+
+    def btn_cmd(self, e):
+        try:
+            subprocess.Popen(["open", cnf.app_support_app_dir])
+        except Exception as e:
+            print(e)
+
+
 class WinSettings(WinStandartBase):
     def __init__(self, parent: QWidget):
         super().__init__(close_func=self.cancel_cmd)
@@ -260,9 +279,17 @@ class WinSettings(WinStandartBase):
         self.content_layout.addWidget(self.change_lang)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
+        h_wid = QWidget()
+        self.content_layout.addWidget(h_wid)
+        h_layout = LayoutH()
+        h_wid.setLayout(h_layout)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 25))
+
         self.update_wid = UpdaterWidget()
-        self.content_layout.addWidget(self.update_wid)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        h_layout.addWidget(self.update_wid)
+
+        show_files = ShowFiles()
+        h_layout.addWidget(show_files)
 
         self.cust_filters = CustFilters()
         self.content_layout.addWidget(self.cust_filters)
