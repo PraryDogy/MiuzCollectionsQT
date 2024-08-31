@@ -33,10 +33,9 @@ class StBar(QFrame):
         self.progress_bar = ProgressBar()
         self.h_layout.addWidget(self.progress_bar)
 
-        self.h_layout.addSpacerItem(QSpacerItem(10, 0))
+        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
 
-
-        self.switch_view = SvgBtn(os.path.join("images", f"{cnf.theme}_switch.svg"), 18)
+        self.switch_view = SvgBtn(os.path.join("images", f"{cnf.theme}_view.svg"), 18)
         self.switch_view.mouseReleaseEvent = self.switch_view_cmd
         self.h_layout.addWidget(self.switch_view)
 
@@ -90,7 +89,7 @@ class StBar(QFrame):
 
         self.sett_widget.set_icon(os.path.join("images", f"{cnf.theme}_settings.svg"))
         self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
-        self.switch_view.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
+        self.switch_view.set_icon(os.path.join("images", f"{cnf.theme}_view.svg"))
 
     def sett_btn_cmd(self, e):
         self.settings = WinSettings(parent=self)
