@@ -326,7 +326,7 @@ class WinSettings(WinStandartBase):
             utils_signals_app.scaner_start.emit()
 
         self.change_lang.finalize()
-
+        cnf.write_json_cfg()
         self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

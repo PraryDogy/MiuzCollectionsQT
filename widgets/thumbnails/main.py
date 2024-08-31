@@ -13,7 +13,7 @@ from utils import MainUtils
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .limit_btn import LimitBtn
 from .images_dict_db import ImagesDictDb
-from .thumbnail import Thumbnail
+from .thumbnail import Thumbnail, SmallThumbnail
 from .title import Title
 from .up_btn import UpBtn
 
@@ -73,8 +73,12 @@ class Thumbnails(QScrollArea):
             above_thumbs.setContentsMargins(9, 0, 0, 0)
             self.thumbnails_layout.addWidget(above_thumbs)
 
-            for some_date, images_list in thumbs_dict.items():
-                self.images_grid(some_date, images_list)
+            if cnf.small_view:
+                for some_date, images_list in thumbs_dict.items():
+                    self.images_grid(SmallThumbnail, some_date, images_list)
+            else:
+                for some_date, images_list in thumbs_dict.items():
+                    self.images_grid(Thumbnail, some_date, images_list)
 
         else:
             no_images = AboveThumbsNoImages(self.width())
@@ -97,7 +101,7 @@ class Thumbnails(QScrollArea):
         self.up_btn.deleteLater()
         self.init_ui()
 
-    def images_grid(self, images_date: str, images_list: list[dict]):
+    def images_grid(self, thumbnail: Thumbnail, images_date: str, images_list: list[dict]):
         """
             images_date: "date start - date fin / month year"
             images_list: [ {"img": img byte_array, "src": img_src, "coll": coll}, ... ]
@@ -115,7 +119,7 @@ class Thumbnails(QScrollArea):
         idx = 0
 
         for img_dict in images_list:
-            label = Thumbnail(
+            label = thumbnail(
                 byte_array=img_dict["img"],
                 img_src=img_dict["src"],
                 coll=img_dict["coll"],

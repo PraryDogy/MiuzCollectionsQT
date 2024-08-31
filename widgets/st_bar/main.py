@@ -32,9 +32,15 @@ class StBar(QFrame):
 
         self.progress_bar = ProgressBar()
         self.h_layout.addWidget(self.progress_bar)
-        self.progress_bar.hide()
 
         self.h_layout.addSpacerItem(QSpacerItem(10, 0))
+
+
+        self.switch_view = SvgBtn(os.path.join("images", f"{cnf.theme}_switch.svg"), 18)
+        self.switch_view.mouseReleaseEvent = self.switch_view_cmd
+        self.h_layout.addWidget(self.switch_view)
+
+        self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
         self.switch_theme = SvgBtn(os.path.join("images", f"{cnf.theme}_switch.svg"), 18)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
@@ -49,9 +55,10 @@ class StBar(QFrame):
         self.h_layout.addSpacerItem(QSpacerItem(30, 0))
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        # from PyQt5.QtWidgets import QPushButton
-        # self.restarter = QPushButton(self, text="Reload")
-        # self.restarter.clicked.connect(self.reload)
+        self.progress_bar.hide()
+
+        from PyQt5.QtCore import QTimer
+        QTimer.singleShot(1000, self.progress_bar.show)
 
     def reload(self):
         gui_signals_app.reload_thumbnails.emit()
@@ -83,7 +90,13 @@ class StBar(QFrame):
 
         self.sett_widget.set_icon(os.path.join("images", f"{cnf.theme}_settings.svg"))
         self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
+        self.switch_view.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
 
     def sett_btn_cmd(self, e):
         self.settings = WinSettings(parent=self)
         self.settings.show()
+
+    def switch_view_cmd(self, e):
+        cnf.small_view = not cnf.small_view
+        gui_signals_app.reload_thumbnails.emit()
+        cnf.write_json_cfg()
