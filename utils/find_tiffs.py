@@ -1,103 +1,140 @@
 import os
 import re
+from difflib import SequenceMatcher
 
 from PyQt5.QtCore import pyqtSignal
 
-from .my_thread import MyThread
 from cfg import cnf
 
+from .my_thread import MyThread
 
-class TiffUtils:
 
-    @staticmethod
-    def filename_in_filename(src: str, tiff: str):
-        if src in tiff or tiff in src:
-            return True
-        return False
+# class TiffUtils:
 
-    @staticmethod
-    def remove_punct(name: str):
-        name, _ = os.path.splitext(p=name)
-        pattern = re.compile('[\W_]+')
-        result = re.sub(pattern, '', name)
-        return result
+#     @staticmethod
+#     def filename_in_filename(src: str, tiff: str):
+#         if src in tiff or tiff in src:
+#             return True
+#         return False
 
-    @staticmethod
-    def remove_stop_words(name: str):
-        for stop_word in cnf.stop_words:
-            name = re.sub(stop_word, '', name, flags=re.IGNORECASE)
-        return name
+#     @staticmethod
+#     def remove_punct(name: str):
+#         name, _ = os.path.splitext(p=name)
+#         pattern = re.compile('[\W_]+')
+#         result = re.sub(pattern, '', name)
+#         return result
 
-    @staticmethod
-    def nearest_len(src: str, tiff_list: list) -> str | None:
-        len_src = len(src)
-        len_tiffs = {abs(len(i) - len_src) : i for i in tiff_list}
+#     @staticmethod
+#     def remove_stop_words(name: str):
+#         for stop_word in cnf.stop_words:
+#             name = re.sub(stop_word, '', name, flags=re.IGNORECASE)
+#         return name
 
-        try:
-            return len_tiffs[min(len_tiffs)]
-        except ValueError:
-            return None
+#     @staticmethod
+#     def nearest_len(src: str, tiff_list: list) -> str | None:
+#         len_src = len(src)
+#         len_tiffs = {abs(len(i) - len_src) : i for i in tiff_list}
+
+#         try:
+#             return len_tiffs[min(len_tiffs)]
+#         except ValueError:
+#             return None
+
+
+# class FindTiffBase:
+#     def __init__(self, src: str):
+#         super().__init__()
+#         self.src = src
+#         self.tiff_list = cnf.tiff_images
+#         self.count = 0
+
+#     def run(self):
+#         try:
+#             tiff_list = self._find_tiffs()
+#             self.final_tiff = TiffUtils.nearest_len(self.src, tiff_list)
+#             self.count = 0
+#         except RuntimeError:
+#             self.count += 1
+#             if self.count != 10:
+#                 self.run()
+#             else:
+#                 self.count == 0
+#                 self.final_tiff = None
+
+#     def _find_tiffs(self) -> list:
+#         src_path, full_src_filename = os.path.split(self.src)
+#         src_filename = TiffUtils.remove_punct(full_src_filename)
+#         src_filename = TiffUtils.remove_stop_words(src_filename)
+#         tiff_list = []
+
+#         if len(src_filename) <= 5:
+#             nearly_files = sorted(os.listdir(src_path))
+#             posible_tiff = nearly_files[nearly_files.index(full_src_filename) + 1]
+#             _, ext = os.path.splitext(posible_tiff)
+
+#             if ext.lower() in (".tif", ".tiff", ".psd", "psb"):
+#                 posible_tiff = os.path.join(src_path, posible_tiff)
+#                 tiff_list.append(posible_tiff)
+
+#             return tiff_list
+
+#         for tiff in self.tiff_list:
+#             _, tiff_name = os.path.split(tiff)
+
+#             tiff_filename = TiffUtils.remove_punct(tiff_name)
+#             tiff_filename = TiffUtils.remove_stop_words(tiff_filename)
+
+#             # if len(src_filename) <= 3 or len(tiff_filename) <= 3:
+#             #     continue
+
+#             if src_filename == tiff_filename:
+#                 tiff_list.append(tiff)
+#                 return tiff_list
+
+#             if TiffUtils.filename_in_filename(src=src_filename, tiff=tiff_filename):
+#                 tiff_list.append(tiff)
+
+#         return tiff_list
+
+#     def get_result(self) -> str:
+#         if self.final_tiff:
+#             return self.final_tiff
+#         else:
+#             return ""
 
 
 class FindTiffBase:
     def __init__(self, src: str):
         super().__init__()
         self.src = src
-        self.tiff_list = cnf.tiff_images
-        self.count = 0
 
-    def run(self):
+    def similar(self, jpg: str, tiff: str):
+        return SequenceMatcher(None, jpg, tiff).ratio()
+
+    def get_result(self):
+        root, jpg = os.path.split(self.src)
+        jpg_no_ext, ext = jpg.split(".")
+
+        files = {
+            f: f.split(".")[0]
+            for f in os.listdir(root)
+            if f.lower().endswith((".tiff", ".tif", ".psd", ".psb"))
+            }
+
+        files_ratio = {
+            tiff_ext: self.similar(jpg_no_ext, tiff_no_ext)
+            for tiff_ext, tiff_no_ext in files.items()
+            }
+        
+        files_ratio = {
+            os.path.join(root, k): v
+            for k, v in files_ratio.items()
+            if v > 0.7
+            }
+        
         try:
-            tiff_list = self._find_tiffs()
-            self.final_tiff = TiffUtils.nearest_len(self.src, tiff_list)
-            self.count = 0
-        except RuntimeError:
-            self.count += 1
-            if self.count != 10:
-                self.run()
-            else:
-                self.count == 0
-                self.final_tiff = None
-
-    def _find_tiffs(self) -> list:
-        src_path, full_src_filename = os.path.split(self.src)
-        src_filename = TiffUtils.remove_punct(full_src_filename)
-        src_filename = TiffUtils.remove_stop_words(src_filename)
-        tiff_list = []
-
-        if len(src_filename) <= 5:
-            nearly_files = sorted(os.listdir(src_path))
-            posible_tiff = nearly_files[nearly_files.index(full_src_filename) + 1]
-            _, ext = os.path.splitext(posible_tiff)
-
-            if ext.lower() in (".tif", ".tiff", ".psd", "psb"):
-                posible_tiff = os.path.join(src_path, posible_tiff)
-                tiff_list.append(posible_tiff)
-
-            return tiff_list
-
-        for tiff in self.tiff_list:
-            _, tiff_name = os.path.split(tiff)
-
-            tiff_filename = TiffUtils.remove_punct(tiff_name)
-            tiff_filename = TiffUtils.remove_stop_words(tiff_filename)
-
-            # if len(src_filename) <= 3 or len(tiff_filename) <= 3:
-            #     continue
-
-            if src_filename == tiff_filename:
-                tiff_list.append(tiff)
-                return tiff_list
-
-            if TiffUtils.filename_in_filename(src=src_filename, tiff=tiff_filename):
-                tiff_list.append(tiff)
-
-        return tiff_list
-
-    def get_result(self) -> str:
-        if self.final_tiff:
-            return self.final_tiff
-        else:
+            return max(files_ratio, key=files_ratio.get)
+        except Exception:
             return ""
 
 
@@ -111,7 +148,8 @@ class ThreadFindTiff(MyThread):
 
     def run(self):
         search = FindTiffBase(src=self.src)
-        search.run()
+        res = search.get_result()
+        print(res)
         self.finished.emit(search.get_result())
         self.can_remove.emit()
         self.remove_threads()
@@ -130,8 +168,6 @@ class ThreadFindTiffsMultiple(MyThread):
 
         for i in self.files_list:
             search = FindTiffBase(src=i)
-            search.run()
-
             res = search.get_result()
             if res:
                 tiff_list.append(res)
