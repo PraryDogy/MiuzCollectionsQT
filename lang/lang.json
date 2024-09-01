@@ -376,5 +376,13 @@
     "show_app_support": [
         "Показать файлы",
         "Show files"
+    ],
+    "view_mode": [
+        "Режим отображения",
+        "View mode"
+    ],
+    "set_theme": [
+        "Тема",
+        "Theme"
     ]
 }

@@ -59,6 +59,7 @@ class Rus:
 		self.search = 'Поиск'
 		self.search_dates = 'Поиск фотографий по датам.\nУправляйте датами с клавишами вверх/вниз.'
 		self.searching_photos = 'Поиск новых фотографий'
+		self.set_theme = 'Тема'
 		self.sett_stopcolls = 'Скрыть коллекции'
 		self.sett_stopwords = 'Игнорировать * в имени файла при поиске tiff/psd'
 		self.settings = 'Настройки'
@@ -72,6 +73,7 @@ class Rus:
 		self.total = 'Всего'
 		self.type = 'Тип'
 		self.view = 'Просмотр'
+		self.view_mode = 'Режим отображения'
 		self.wait_update = 'Подождите...'
 		self.weekdays = {'0': 'понедельник', '1': 'вторник', '2': 'среда', '3': 'четверг', '4': 'пятница', '5': 'суббота', '6': 'воскресенье'}
 		self.where_to_look_coll_folder = 'Где искать папку с коллекциями'

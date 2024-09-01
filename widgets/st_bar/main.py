@@ -49,18 +49,21 @@ class StBar(QFrame):
         self.switch_view = SwitchView(size=20)
         self.switch_view.mouseReleaseEvent = self.switch_view_cmd
         self.h_layout.addWidget(self.switch_view)
+        self.switch_view.setToolTip(cnf.lng.view_mode)
 
         self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_switch.svg"), size=20)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
         self.h_layout.addWidget(self.switch_theme)
+        self.switch_theme.setToolTip(cnf.lng.set_theme)
 
         self.h_layout.addSpacerItem(QSpacerItem(20, 0))
 
         self.sett_widget = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_settings.svg"), size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
+        self.sett_widget.setToolTip(cnf.lng.settings)
    
         self.h_layout.addSpacerItem(QSpacerItem(30, 0))
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)

@@ -59,6 +59,7 @@ class Eng:
 		self.search = 'Search'
 		self.search_dates = 'Searching for photos by dates.\nControl dates with up/down keys.'
 		self.searching_photos = 'Searching for new photos'
+		self.set_theme = 'Theme'
 		self.sett_stopcolls = 'Hide collections'
 		self.sett_stopwords = 'Ignore * in the file name when searching for tiff/psd'
 		self.settings = 'Settings'
@@ -72,6 +73,7 @@ class Eng:
 		self.total = 'Total'
 		self.type = 'Type'
 		self.view = 'View'
+		self.view_mode = 'View mode'
 		self.wait_update = 'Wait...'
 		self.weekdays = {'0': 'monday', '1': 'tuesday', '2': 'wednesday', '3': 'thursday', '4': 'friday', '5': 'saturday', '6': 'sunday'}
 		self.where_to_look_coll_folder = 'Where to look for a collections folder'
