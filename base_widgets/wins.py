@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QCloseEvent, QKeyEvent, QMouseEvent, QResizeEvent
+from PyQt5.QtGui import QCloseEvent, QFocusEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
