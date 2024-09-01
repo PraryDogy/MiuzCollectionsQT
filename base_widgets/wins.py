@@ -1,15 +1,17 @@
-from PyQt5.QtCore import QEvent, QPoint, Qt, QObject
+import os
+
+from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
 from cfg import cnf
 from styles import Names, Themes
-import os
+from utils import MainUtils
 
 from .layouts import LayoutH, LayoutV
 from .svg_btn import SvgBtn
-from utils import MainUtils
+
 
 class Btns(QWidget):
     def __init__(self):
