@@ -185,7 +185,7 @@ class FinderImages(dict):
                         Shared.flag = False
                         return
 
-                    if file.endswith((".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")):
+                    if file.lower().endswith((".jpg", ".jpeg", ".png")):
                         
                         src = os.path.join(root, file)
                         file_stats = os.stat(path=src)
@@ -195,9 +195,6 @@ class FinderImages(dict):
                             int(file_stats.st_birthtime),
                             int(file_stats.st_mtime)
                             )
-
-                    elif file.endswith((".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")):
-                        cnf.tiff_images.add(os.path.join(root, file))
 
 
 class DbImages(dict):
