@@ -265,6 +265,7 @@ class App(QApplication):
             self.smb_win.show()
 
         utils_signals_app.scaner_start.emit()
+        
 
 Themes.set_theme(cnf.theme)
 app = App()
