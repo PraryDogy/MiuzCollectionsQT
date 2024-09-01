@@ -340,9 +340,9 @@ class WinSettings(WinStandartBase):
         coll_folder_list = self.coll_folder_list_input.get_text()
         cnf.coll_folder_list = coll_folder_list
 
-        if self.stopwords.get_stopwords() != cnf.stop_words:
-            cnf.stop_words = self.stopwords.get_stopwords()
-            scan_again = True
+        # if self.stopwords.get_stopwords() != cnf.stop_words:
+        #     cnf.stop_words = self.stopwords.get_stopwords()
+        #     scan_again = True
 
         if self.stopcolls.get_stopcolls() != cnf.stop_colls:
             cnf.stop_colls = self.stopcolls.get_stopcolls()
