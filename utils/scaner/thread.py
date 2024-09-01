@@ -185,7 +185,7 @@ class FinderImages(dict):
                         Shared.flag = False
                         return
 
-                    if file.lower().endswith((".jpg", ".jpeg", ".png")):
+                    if file.endswith((".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")):
                         
                         src = os.path.join(root, file)
                         file_stats = os.stat(path=src)

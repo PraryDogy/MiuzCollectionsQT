@@ -148,8 +148,6 @@ class ThreadFindTiff(MyThread):
 
     def run(self):
         search = FindTiffBase(src=self.src)
-        res = search.get_result()
-        print(res)
         self.finished.emit(search.get_result())
         self.can_remove.emit()
         self.remove_threads()

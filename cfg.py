@@ -110,7 +110,6 @@ class Dymanic:
         self.current_photo_limit: int = self.LIMIT
 
         self.images: dict = {"img_src": {"filename": str, "collection": str, "widget": QObject}}
-        self.tiff_images: set = set()
 
         self.date_start: datetime = None
         self.date_end: datetime = None
