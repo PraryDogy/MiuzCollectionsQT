@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QFileDialog, QLabel, QSpacerItem, QTextEdit,
                              QWidget)
@@ -9,7 +9,7 @@ from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
 from cfg import cnf
 from signals import gui_signals_app, utils_signals_app
-from utils import Updater
+from utils import Updater, MainUtils
 from ..win_smb import WinSmb
 import subprocess
 
@@ -83,6 +83,8 @@ class CollFolderListInput(CustomTextEdit):
 
 
 class ChangeLang(QWidget):
+    pressed = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.lang = cnf.user_lng
@@ -109,6 +111,8 @@ class ChangeLang(QWidget):
             self.lang = "ru"
 
         self.lang_btn.setText(self.get_lng_text())
+        self.finalize()
+        self.pressed.emit()
 
     def finalize(self):
         if self.lang != cnf.user_lng:
@@ -278,6 +282,7 @@ class WinSettings(WinStandartBase):
         self.change_lang = ChangeLang()
         self.content_layout.addWidget(self.change_lang)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        self.change_lang.pressed.connect(self.reload_ui)
 
         h_wid = QWidget()
         self.content_layout.addWidget(h_wid)
@@ -330,6 +335,10 @@ class WinSettings(WinStandartBase):
         btns_layout.addWidget(self.cancel_btn)
 
         btns_layout.addStretch(1)
+
+    def reload_ui(self):
+        MainUtils.clear_layout(self.content_layout)
+        self.init_ui()
 
     def cancel_cmd(self, e):
         self.close()
