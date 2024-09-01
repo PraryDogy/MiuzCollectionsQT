@@ -266,7 +266,7 @@ class WinSettings(WinStandartBase):
         self.set_title(cnf.lng.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 600)
+        self.setFixedSize(420, 510)
         self.center_win(parent)
         self.setFocus()
 
@@ -295,9 +295,9 @@ class WinSettings(WinStandartBase):
         self.content_layout.addWidget(self.cust_filters)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
-        self.stopwords = StopWords()
-        self.content_layout.addWidget(self.stopwords)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        # self.stopwords = StopWords()
+        # self.content_layout.addWidget(self.stopwords)
+        # self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.stopcolls = StopColls()
         self.content_layout.addWidget(self.stopcolls)
