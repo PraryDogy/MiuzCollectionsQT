@@ -9,3 +9,5 @@ def convert():
         img.add_media(file="icon.png")
         img.write("icon/icon.icns")
         os.remove("icon/icon.png")
+
+        
