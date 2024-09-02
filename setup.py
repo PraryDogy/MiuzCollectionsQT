@@ -10,6 +10,7 @@ import subprocess
 import sys
 from datetime import datetime
 
+import icnsutil
 from setuptools import setup
 
 from cfg import cnf
@@ -102,6 +103,12 @@ OPTIONS = {"iconfile": ICON_PATH,
                          f"\nAll rights reserved.")}}
 
 sys.argv.append(PY2APP)
+
+if os.path.exists("icon/icon.png"):
+    img = icnsutil.IcnsFile()
+    img.add_media(file="icon.png")
+    img.write("icon/icon.icns")
+    os.remove("icon/icon.png")
 
 try:
     remove_trash()
