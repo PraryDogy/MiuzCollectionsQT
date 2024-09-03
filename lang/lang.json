@@ -384,5 +384,13 @@
     "set_theme": [
         "Тема",
         "Theme"
+    ],
+    "compact_menu": [
+        "Компактное меню",
+        "Compact menu"
+    ],
+    "detail_menu": [
+        "Подробное меню",
+        "Detailed menu"
     ]
 }

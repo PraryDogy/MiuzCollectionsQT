@@ -2,7 +2,7 @@ import sqlalchemy
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QScrollArea, QWidget, QLabel
 
-from base_widgets import LayoutH, LayoutV
+from base_widgets import LayoutH, LayoutV, Btn
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app
@@ -40,19 +40,29 @@ class BaseLeftMenu(QScrollArea):
 
         self.v_layout.addLayout(main_btns_layout)
 
-        for letter, collections in self.load_colls_query().items():
+        if cnf.small_menu_view:
+            for letter, collections in self.load_colls_query().items():
+                for coll in collections:
+                    label = CollectionBtn(parent=self, fake_name=coll["fake_name"], true_name=coll["true_name"])
+                    self.v_layout.addWidget(label)
+        else:
+            for letter, collections in self.load_colls_query().items():
 
-            test = QLabel(text=letter)
-            test.setContentsMargins(6, 20, 0, 5)
-            test.setObjectName(Names.letter_btn)
-            test.setStyleSheet(Themes.current)
-            self.v_layout.addWidget(test)
+                test = QLabel(text=letter)
+                test.setContentsMargins(6, 20, 0, 5)
+                test.setObjectName(Names.letter_btn)
+                test.setStyleSheet(Themes.current)
+                self.v_layout.addWidget(test)
 
-            for coll in collections:
-                label = CollectionBtn(parent=self, fake_name=coll["fake_name"], true_name=coll["true_name"])
-                self.v_layout.addWidget(label)
+                for coll in collections:
+                    label = CollectionBtn(parent=self, fake_name=coll["fake_name"], true_name=coll["true_name"])
+                    self.v_layout.addWidget(label)
 
         self.v_layout.addStretch(1)
+
+    def change_view(self):
+        cnf.small_menu_view = not cnf.small_menu_view
+        gui_signals_app.reload_menu.emit()
 
     def load_colls_query(self) -> dict:
         menus = defaultdict(list)
@@ -76,7 +86,7 @@ class BaseLeftMenu(QScrollArea):
             key: sorted(value, key=lambda x: x['fake_name'])
             for key, value in sorted(menus.items())
             }
-        
+
     def reload_menu(self):
         MainUtils.clear_layout(self.v_layout)
         self.init_ui()

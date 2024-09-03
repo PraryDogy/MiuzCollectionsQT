@@ -23,6 +23,11 @@ class CustomContext(ContextMenuBase):
         view_coll.triggered.connect(lambda e: self.show_collection())
         self.addAction(view_coll)
 
+        t = cnf.lng.detail_menu if cnf.small_menu_view else cnf.lng.compact_menu
+        view = QAction(text=t, parent=self)
+        view.triggered.connect(lambda e: self.change_view())
+        self.addAction(view)
+
         self.addSeparator()
 
         action_text = f"{cnf.lng.reveal} {cnf.lng.in_finder}"
@@ -39,10 +44,13 @@ class CustomContext(ContextMenuBase):
         prod_coll.triggered.connect(lambda e: self.reveal_collection("prod"))
         reveal_menu.addAction(prod_coll)
 
-
         mod_coll = QAction(text=cnf.lng.cust_fltr_names["mod"], parent=self)
         mod_coll.triggered.connect(lambda e: self.reveal_collection("mod"))
         reveal_menu.addAction(mod_coll)
+
+    def change_view(self):
+        cnf.small_menu_view = not cnf.small_menu_view
+        gui_signals_app.reload_menu.emit()
 
     def show_collection(self):
         cnf.curr_coll = self.true_name
