@@ -172,7 +172,8 @@ class Thumbnail(QFrame):
 class SmallThumbnail(QLabel):
     def __init__(self, byte_array: bytearray, img_src: str, coll: str, images_date: str):
         super().__init__()
-        self.setContentsMargins(10, 10, 10, 10)
+        # 0 2 0 0
+        self.setContentsMargins(8, 9, 8, 8)
 
         self.img_src = img_src
         self.coll = coll
