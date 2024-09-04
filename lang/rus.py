@@ -22,7 +22,7 @@ class Rus:
 		self.date_changed = 'Дата изменения'
 		self.dates = 'Даты'
 		self.deleting_photos = 'Удаляю лишнее'
-		self.detail_menu = 'Подробное меню'
+		self.detail_menu = 'Стандартное меню'
 		self.download_update = 'Скачать обновление'
 		self.drop_to_collections = 'Скопировать файлы в коллекции'
 		self.end = 'Конец'

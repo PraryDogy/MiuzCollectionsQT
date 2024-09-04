@@ -31,6 +31,10 @@
         "Коллекция",
         "Collection"
     ],
+    "compact_menu": [
+        "Компактное меню",
+        "Compact menu"
+    ],
     "connect_sb06": [
         "Подключитесь к sb06",
         "Connect to sb06"
@@ -84,6 +88,10 @@
     "deleting_photos": [
         "Удаляю лишнее",
         "Removing unnecessary"
+    ],
+    "detail_menu": [
+        "Стандартное меню",
+        "Standart menu"
     ],
     "download_update": [
         "Скачать обновление",
@@ -289,6 +297,10 @@
         "Поиск новых фотографий",
         "Searching for new photos"
     ],
+    "set_theme": [
+        "Тема",
+        "Theme"
+    ],
     "sett_stopcolls": [
         "Скрыть коллекции",
         "Hide collections"
@@ -308,6 +320,10 @@
     "show_all": [
         "Показать все",
         "Show all"
+    ],
+    "show_app_support": [
+        "Показать файлы",
+        "Show files"
     ],
     "show_more": [
         "Позазать еще",
@@ -341,6 +357,10 @@
         "Просмотр",
         "View"
     ],
+    "view_mode": [
+        "Режим отображения",
+        "View mode"
+    ],
     "wait_update": [
         "Подождите...",
         "Wait..."
@@ -365,32 +385,12 @@
             "6": "sunday"
         }
     ],
-    "with_name": [
-        "с именем",
-        "with name"
-    ],
     "where_to_look_coll_folder": [
         "Где искать папку с коллекциями",
         "Where to look for a collections folder"
     ],
-    "show_app_support": [
-        "Показать файлы",
-        "Show files"
-    ],
-    "view_mode": [
-        "Режим отображения",
-        "View mode"
-    ],
-    "set_theme": [
-        "Тема",
-        "Theme"
-    ],
-    "compact_menu": [
-        "Компактное меню",
-        "Compact menu"
-    ],
-    "detail_menu": [
-        "Подробное меню",
-        "Detailed menu"
+    "with_name": [
+        "с именем",
+        "with name"
     ]
 }

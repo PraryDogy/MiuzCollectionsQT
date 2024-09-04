@@ -22,7 +22,7 @@ class Eng:
 		self.date_changed = 'Date changed'
 		self.dates = 'Dates'
 		self.deleting_photos = 'Removing unnecessary'
-		self.detail_menu = 'Detailed menu'
+		self.detail_menu = 'Standart menu'
 		self.download_update = 'Update app'
 		self.drop_to_collections = 'Copy files to Collections'
 		self.end = 'End'
