@@ -46,6 +46,7 @@ class FindTiffBase:
         super().__init__()
         self.src = src
         self.count = 0
+        self.run()
 
     def run(self):
         try:
@@ -69,9 +70,8 @@ class FindTiffBase:
         if len(short_jpg) <= 5:
             files = sorted(os.listdir(root))
             posible_tiff = files[files.index(full_jpg) + 1]
-            _, tiff_ext = os.path.splitext(posible_tiff)
 
-            if tiff_ext.lower() in (".tif", ".tiff", ".psd", "psb"):
+            if posible_tiff.lower().endswith((".tif", ".tiff", ".psd", "psb")):
                 posible_tiff = os.path.join(root, posible_tiff)
                 result.append(posible_tiff)
 
@@ -80,7 +80,7 @@ class FindTiffBase:
         tiff_list = [
             os.path.join(root, file)
             for file in os.listdir(root)
-            if tiff_ext.lower() in (".tif", ".tiff", ".psd", "psb")
+            if file.lower().endswith((".tif", ".tiff", ".psd", "psb"))
             ]
 
         for tiff in tiff_list:
@@ -113,14 +113,30 @@ class FindTiffBase:
 #     def similar(self, jpg: str, tiff: str):
 #         return SequenceMatcher(None, jpg, tiff).ratio()
 
+#     def remove_punct(self, filename: str):
+#         filename, _ = os.path.splitext(p=filename)
+#         pattern = re.compile('[\W_]+')
+#         return re.sub(pattern, '', filename)
+
+#     def remove_stop_words(self, filename: str):
+#         for stop_word in cnf.stop_words:
+#             filename = re.sub(stop_word, '', filename, flags=re.IGNORECASE)
+#         return filename
+
 #     def get_result(self):
 #         root, jpg = os.path.split(self.src)
 #         jpg_no_ext, ext = os.path.splitext(jpg)
+#         jpg_no_ext = self.remove_punct(self.remove_stop_words(jpg_no_ext))
 
 #         files = {
-#             f: f.split(".")[0]
-#             for f in os.listdir(root)
-#             if f.lower().endswith((".tiff", ".tif", ".psd", ".psb"))
+#             tiff_ext: tiff_ext.split(".")[0]
+#             for tiff_ext in os.listdir(root)
+#             if tiff_ext.lower().endswith((".tiff", ".tif", ".psd", ".psb"))
+#             }
+        
+#         files = {
+#             tiff_ext: self.remove_punct(self.remove_stop_words(tiff_ext))
+#             for tiff_ext in files
 #             }
 
 #         files_ratio = {
@@ -131,7 +147,7 @@ class FindTiffBase:
 #         files_ratio = {
 #             os.path.join(root, k): v
 #             for k, v in files_ratio.items()
-#             if v > 0.7
+#             if v > 0.85
 #             }
         
 #         try:
@@ -150,7 +166,6 @@ class ThreadFindTiff(MyThread):
 
     def run(self):
         search = FindTiffBase(src=self.src)
-        search.run()
         self.finished.emit(search.get_result())
         self.can_remove.emit()
         self.remove_threads()
@@ -169,7 +184,6 @@ class ThreadFindTiffsMultiple(MyThread):
 
         for i in self.files_list:
             search = FindTiffBase(src=i)
-            search.run()
             res = search.get_result()
             if res:
                 tiff_list.append(res)
