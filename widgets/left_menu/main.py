@@ -1,6 +1,6 @@
 import sqlalchemy
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFrame, QScrollArea, QWidget, QLabel
+from PyQt5.QtWidgets import QFrame, QScrollArea, QWidget, QLabel, QSpacerItem
 
 from base_widgets import LayoutH, LayoutV, Btn
 from cfg import cnf
@@ -58,6 +58,7 @@ class BaseLeftMenu(QScrollArea):
                     label = CollectionBtn(parent=self, fake_name=coll["fake_name"], true_name=coll["true_name"])
                     self.v_layout.addWidget(label)
 
+        self.v_layout.addSpacerItem(QSpacerItem(0, 5))
         self.v_layout.addStretch(1)
 
     def change_view(self):
