@@ -1,41 +1,83 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QListView, QVBoxLayout, QWidget, QScroller, QScrollerProperties
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
+                             QWidget)
 
-class BounceScrollApp(QWidget):
-    def __init__(self):
-        super().__init__()
+from base_widgets import Btn, LayoutV, WinStandartBase
+from styles import Names, Themes
+from utils import MainUtils
+from cfg import cnf
 
-        layout = QVBoxLayout(self)
+class Threads:
+    threads_list: list = [i for i in range(0, 10)]
 
-        # Создаем QListView как пример
-        self.list_view = QListView()
-        layout.addWidget(self.list_view)
 
-        # Модель данных для примера
-        model = QStandardItemModel()
-        for i in range(50):
-            item = QStandardItem(f'Item {i + 1}')
-            model.appendRow(item)
-        self.list_view.setModel(model)
 
-        # Включаем отскакивание при скроллинге
-        scroller = QScroller.scroller(self.list_view.viewport())
-        scroller.grabGesture(self.list_view.viewport(), QScroller.LeftMouseButtonGesture)
+class DownloadsWin(WinStandartBase):
+    cancel_pressed = pyqtSignal()
 
-        # Настройка поведения скроллинга через QScrollerProperties
-        properties = scroller.scrollerProperties()
-        properties.setScrollMetric(QScrollerProperties.OvershootDragResistanceFactor, 0.5)
-        properties.setScrollMetric(QScrollerProperties.OvershootScrollDistanceFactor, 0.3)
-        properties.setScrollMetric(QScrollerProperties.OvershootScrollTime, 0.5)
-        scroller.setScrollerProperties(properties)
+    def __init__(self, parent: QWidget):
+        super().__init__(close_func=self.my_close)
+        self.set_title("Заменить заголовок")
+        self.disable_min()
+        self.disable_max()
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setFixedSize(400, 420)
 
-        self.setLayout(layout)
-        self.setWindowTitle('Bounce Scroll Example')
-        self.setGeometry(300, 300, 300, 400)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setObjectName(Names.th_scrollbar)
+        self.scroll_area.setStyleSheet(Themes.current)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-if __name__ == '__main__':
-    app = QApplication([])
-    window = BounceScrollApp()
-    window.show()
-    app.exec_()
+        self.scroll_widget = QWidget()
+        self.scroll_widget.setObjectName(Names.th_scroll_widget)
+        self.scroll_widget.setStyleSheet(Themes.current)
+        self.scroll_area.setWidget(self.scroll_widget)
+
+        self.v_layout = LayoutV()
+        self.scroll_widget.setLayout(self.v_layout)
+
+        self.content_layout.addWidget(self.scroll_area)
+
+        for i in Threads.threads_list:
+            self.add_progress()
+
+    def add_progress(self):
+        main = QWidget(parent=self.scroll_widget)
+        # main.setFixedHeight(50)
+        v_layout = LayoutV()
+        v_layout.setContentsMargins(10, 0, 20, 0)
+        main.setLayout(v_layout)
+
+        label = QLabel(text="Заменить текст", parent=main)
+        label.setFixedHeight(15)
+        v_layout.addWidget(label)
+
+        self.progress = QProgressBar(parent=main)
+        self.progress.setFixedHeight(10)
+        self.progress.setTextVisible(False)
+        self.progress.setValue(0)
+        v_layout.addWidget(self.progress)
+
+        v_layout.addSpacerItem(QSpacerItem(0, 10))
+
+        self.cancel_btn = Btn(text=cnf.lng.cancel)
+        self.cancel_btn.mouseReleaseEvent = self.cancel_btn_cmd
+        v_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignRight)
+
+        self.v_layout.addWidget(main)
+
+    def my_close(self, event):
+        self.close()
+        return
+
+    def cancel_btn_cmd(self, e):
+        self.cancel_pressed.emit()
+        self.close()
+
+    def set_value(self, value: int):
+        try:
+            self.progress.setValue(value)
+        except (Exception, RuntimeError) as e:
+            MainUtils.print_err(parent=self, error=e)
