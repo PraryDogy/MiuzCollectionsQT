@@ -72,6 +72,7 @@ class Eng:
 		self.smb_descr = 'Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Start'
 		self.sys_fltr_names = {'other': 'Other'}
+		self.title_downloads = 'Downloads'
 		self.total = 'Total'
 		self.type = 'Type'
 		self.view = 'View'

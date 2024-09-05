@@ -50,7 +50,7 @@ class DownloadsWin(WinStandartBase):
         super().__init__(close_func=self.my_close)
         self.copy_threads: list = []
 
-        self.set_title(cnf.lng.copying_files)
+        self.set_title(cnf.lng.title_downloads)
         self.disable_min()
         self.disable_max()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)

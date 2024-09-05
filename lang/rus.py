@@ -72,6 +72,7 @@ class Rus:
 		self.smb_descr = 'Коллекции недоступны.\nВозможные причины:\n\n- Нет подключения к интернету\n- Нет подключения к сетевому диску\n- Неправильно указано расположение коллекций\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Начало'
 		self.sys_fltr_names = {'other': 'Остальное'}
+		self.title_downloads = 'Загрузки'
 		self.total = 'Всего'
 		self.type = 'Тип'
 		self.view = 'Просмотр'
