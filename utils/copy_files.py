@@ -49,7 +49,6 @@ class ThreadCopyFiles(MyThread):
             files_dests.append(dest_path)
             root, filename = os.path.split(file_path)
             self.text_changed.emit(filename)
-            print(filename)
 
             try:
 
