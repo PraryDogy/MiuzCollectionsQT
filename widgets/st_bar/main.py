@@ -1,4 +1,5 @@
 import os
+from test import DownloadsWin
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QFrame, QSpacerItem, QWidget
@@ -51,14 +52,21 @@ class StBar(QFrame):
         self.h_layout.addWidget(self.switch_view)
         self.switch_view.setToolTip(cnf.lng.view_mode)
 
-        self.h_layout.addSpacerItem(QSpacerItem(20, 0))
+        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_switch.svg"), size=20)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
         self.h_layout.addWidget(self.switch_theme)
         self.switch_theme.setToolTip(cnf.lng.set_theme)
 
-        self.h_layout.addSpacerItem(QSpacerItem(20, 0))
+        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
+
+        self.downloads = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_downloads.svg") , size=20)
+        self.downloads.mouseReleaseEvent = self.open_downloads
+        self.h_layout.addWidget(self.downloads)
+        self.switch_view.setToolTip(cnf.lng.title_downloads)
+
+        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
 
         self.sett_widget = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_settings.svg"), size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
@@ -103,10 +111,16 @@ class StBar(QFrame):
             i.setStyleSheet(Themes.current)
 
         self.sett_widget.set_icon(os.path.join("images", f"{cnf.theme}_settings.svg"))
+        self.downloads.set_icon(os.path.join("images", f"{cnf.theme}_downloads.svg"))
         self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
         self.switch_view.switch_icon()
 
         cnf.write_json_cfg()
+
+    def open_downloads(self, e):
+        self.downloads_win = DownloadsWin(parent=self)
+        self.downloads_win.center_win(self)
+        self.downloads_win.show()
 
     def sett_btn_cmd(self, e):
         self.settings = WinSettings(parent=self)
