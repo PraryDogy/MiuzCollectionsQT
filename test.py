@@ -1,16 +1,68 @@
+from time import sleep
+
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import Btn, LayoutV, WinStandartBase
+from cfg import cnf
 from styles import Names, Themes
 from utils import MainUtils
-from cfg import cnf
+from functools import partial
 
 class Threads:
-    threads_list: list = [i for i in range(0, 10)]
+    threads_list: list = []
 
+
+class TestThread(QThread):
+    thread_finished = pyqtSignal()
+    thread_value = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        Threads.threads_list.append(self)
+        self.value = 0
+
+    def run(self):
+        for i in range(0, 100):
+            self.value += 1
+            self.thread_value.emit(self.value)
+            sleep(0.5)
+        self.finished.emit()
+        Threads.threads_list.remove(self)
+
+
+class TreadsRunner:
+    def __init__(self) -> None:
+        self.threader = TestThread()
+        self.threader.start()
+
+
+class Progresser(QWidget):
+    set_value = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        v_layout = LayoutV()
+        v_layout.setContentsMargins(10, 0, 20, 0)
+        self.setLayout(v_layout)
+
+        label = QLabel(text="Заменить текст", parent=self)
+        label.setFixedHeight(15)
+        v_layout.addWidget(label)
+
+        self.progress = QProgressBar(parent=self)
+        self.progress.setFixedHeight(10)
+        self.progress.setTextVisible(False)
+        self.progress.setValue(0)
+        v_layout.addWidget(self.progress)
+        self.set_value.connect(lambda v: self.progress.setValue(v))
+
+        v_layout.addSpacerItem(QSpacerItem(0, 10))
+
+        self.cancel_btn = Btn(text=cnf.lng.cancel)
+        v_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignRight)
 
 
 class DownloadsWin(WinStandartBase):
@@ -40,33 +92,25 @@ class DownloadsWin(WinStandartBase):
 
         self.content_layout.addWidget(self.scroll_area)
 
+        for i in range(0, 3):
+            TreadsRunner()
+
         for i in Threads.threads_list:
-            self.add_progress()
+            progresser = Progresser()
+            self.v_layout.addWidget(progresser)
 
-    def add_progress(self):
-        main = QWidget(parent=self.scroll_widget)
-        # main.setFixedHeight(50)
-        v_layout = LayoutV()
-        v_layout.setContentsMargins(10, 0, 20, 0)
-        main.setLayout(v_layout)
+            i: TestThread
+            # i.thread_value.connect(lambda v: self.test(wid=progresser, v=v))
+            i.thread_value.connect(partial(self.test, progresser))
 
-        label = QLabel(text="Заменить текст", parent=main)
-        label.setFixedHeight(15)
-        v_layout.addWidget(label)
+        self.v_layout.addStretch()
 
-        self.progress = QProgressBar(parent=main)
-        self.progress.setFixedHeight(10)
-        self.progress.setTextVisible(False)
-        self.progress.setValue(0)
-        v_layout.addWidget(self.progress)
-
-        v_layout.addSpacerItem(QSpacerItem(0, 10))
-
-        self.cancel_btn = Btn(text=cnf.lng.cancel)
-        self.cancel_btn.mouseReleaseEvent = self.cancel_btn_cmd
-        v_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignRight)
-
-        self.v_layout.addWidget(main)
+    def test(self, wid, v: int):
+        print(v)
+        try:
+            wid.set_value.emit(v)
+        except Exception:
+            pass
 
     def my_close(self, event):
         self.close()
