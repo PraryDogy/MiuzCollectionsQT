@@ -1,11 +1,10 @@
 from functools import partial
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
-                             QWidget)
+                             QWidget, QFrame)
 
-from base_widgets import Btn, LayoutV, WinStandartBase
+from base_widgets import SvgBtn, LayoutV, WinStandartBase, LayoutH
 from cfg import cnf
 from styles import Names, Themes
 from utils import MainUtils
@@ -15,34 +14,50 @@ import os
 class Progresser(QWidget):
     set_value = pyqtSignal(int)
     set_text = pyqtSignal(str)
+    progress_stop = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+        # self.setStyleSheet("background: rgba(128, 128, 128, 0.40);")
+
         v_layout = LayoutV()
         v_layout.setContentsMargins(10, 0, 20, 0)
         self.setLayout(v_layout)
 
         self.copy_label = QLabel(text=cnf.lng.copying_files, parent=self)
-        self.copy_label.setFixedHeight(20)
         v_layout.addWidget(self.copy_label)
         self.set_text.connect(self.set_text_label)
 
         v_layout.addSpacerItem(QSpacerItem(0, 10))
 
+        h_wid = QWidget()
+        v_layout.addWidget(h_wid)
+        h_layout = LayoutH()
+        h_wid.setLayout(h_layout)
+
         self.progress = QProgressBar(parent=self)
         self.progress.setFixedHeight(10)
         self.progress.setTextVisible(False)
         self.progress.setValue(0)
-        v_layout.addWidget(self.progress)
+        h_layout.addWidget(self.progress)
         self.set_value.connect(lambda v: self.progress.setValue(v))
+
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
+
+        self.close_btn = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_close.svg"), size=15)
+        self.close_btn.mouseReleaseEvent = self.close_cmd
+        h_layout.addWidget(self.close_btn)
 
         v_layout.addSpacerItem(QSpacerItem(0, 10))
 
-        self.cancel_btn = Btn(text=cnf.lng.cancel)
+        # self.cancel_btn = Btn(text=cnf.lng.cancel)
         # v_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignRight)
 
     def set_text_label(self, text: str):
         self.copy_label.setText(text)
+
+    def close_cmd(self, e):
+        self.progress_stop.emit()
 
 
 class DownloadsWin(WinStandartBase):
@@ -79,25 +94,41 @@ class DownloadsWin(WinStandartBase):
 
         self.add_progress_widgets()
 
+        # for i in range(0, 14):
+            # progress = Progresser()
+            # self.progress_layout.addWidget(progress)
+
     def add_progress_widgets(self):
-        for copy_task in cnf.copy_threads:
+        try:
+            for copy_task in cnf.copy_threads:
 
-            if copy_task not in self.copy_threads:
-                progress = Progresser()
-                self.progress_layout.addWidget(progress)
+                if copy_task not in self.copy_threads:
+                    copy_wid = Progresser()
+                    self.progress_layout.addWidget(copy_wid)
 
-                copy_task: ThreadCopyFiles
-                self.copy_threads.append(copy_task)
+                    copy_task: ThreadCopyFiles
+                    self.copy_threads.append(copy_task)
 
-                copy_task.value_changed.connect(partial(self.change_progress_value, progress))
-                copy_task.text_changed.connect(partial(self.change_progress_text, progress))
-                copy_task.finished.connect(partial(self.remove_progress, progress, copy_task))
+                    copy_wid.progress_stop.connect(partial(self.stop_progress, copy_wid, copy_task))
+                    copy_task.value_changed.connect(partial(self.change_progress_value, copy_wid))
+                    copy_task.text_changed.connect(partial(self.change_progress_text, copy_wid))
+                    copy_task.finished.connect(partial(self.remove_progress, copy_wid, copy_task))
 
-        QTimer.singleShot(1000, self.add_progress_widgets)
+            QTimer.singleShot(1000, self.add_progress_widgets)
+
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+    def stop_progress(self, widget: Progresser, task: ThreadCopyFiles):
+        task.finished.connect(partial(self.remove_progress, widget, task))
+        task.stop.emit()
 
     def remove_progress(self, widget: Progresser, task: ThreadCopyFiles):
-        QTimer.singleShot(1000, widget.deleteLater)
-        self.copy_threads.remove(task)
+        try:
+            widget.deleteLater()
+            self.copy_threads.remove(task)
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
     
     def change_progress_text(self, widget: Progresser, text: str):
         text = self.cut_text(text)
@@ -131,7 +162,6 @@ class DownloadsWin(WinStandartBase):
 
     def my_close(self, event):
         self.close()
-        return
 
     def set_value(self, value: int):
         try:
