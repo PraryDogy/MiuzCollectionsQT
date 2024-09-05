@@ -1,6 +1,6 @@
 from time import sleep
 
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
                              QWidget)
@@ -25,11 +25,11 @@ class TestThread(QThread):
         self.value = 0
 
     def run(self):
-        for i in range(0, 100):
+        for i in range(0, 10):
             self.value += 1
             self.thread_value.emit(self.value)
-            sleep(0.5)
-        self.finished.emit()
+            sleep(0.1)
+        self.thread_finished.emit()
         Threads.threads_list.remove(self)
 
 
@@ -100,13 +100,16 @@ class DownloadsWin(WinStandartBase):
             self.v_layout.addWidget(progresser)
 
             i: TestThread
-            # i.thread_value.connect(lambda v: self.test(wid=progresser, v=v))
             i.thread_value.connect(partial(self.test, progresser))
+            i.thread_finished.connect(partial(self.remove_prog, progresser))
 
         self.v_layout.addStretch()
 
-    def test(self, wid, v: int):
-        print(v)
+    def remove_prog(self, wid: Progresser):
+        print(wid)
+        QTimer.singleShot(1000, wid.deleteLater)
+
+    def test(self, wid: Progresser, v: int):
         try:
             wid.set_value.emit(v)
         except Exception:
