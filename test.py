@@ -18,7 +18,6 @@ class Progresser(QWidget):
 
     def __init__(self):
         super().__init__()
-        # self.setStyleSheet("background: rgba(128, 128, 128, 0.40);")
 
         v_layout = LayoutV()
         v_layout.setContentsMargins(10, 0, 20, 0)
