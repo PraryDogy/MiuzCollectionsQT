@@ -99,7 +99,7 @@ class DownloadsWin(WinStandartBase):
         try:
             for copy_task in cnf.copy_threads:
 
-                if copy_task not in self.copy_threads:
+                if copy_task not in self.copy_threads and copy_task.isRunning():
                     copy_wid = Progresser()
                     self.progress_layout.addWidget(copy_wid)
 
@@ -117,8 +117,9 @@ class DownloadsWin(WinStandartBase):
             MainUtils.print_err(parent=self, error=e)
 
     def stop_progress(self, widget: Progresser, task: ThreadCopyFiles):
-        task.finished.connect(partial(self.remove_progress, widget, task))
         task.stop.emit()
+        task.disconnect()
+        self.remove_progress(widget, task)
 
     def remove_progress(self, widget: Progresser, task: ThreadCopyFiles):
         try:
