@@ -234,7 +234,7 @@ class SmallThumbnail(QLabel):
 
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
-        self.drag.setPixmap(self.img_label.pixmap())
+        self.drag.setPixmap(self.pixmap())
         
         url = [QUrl.fromLocalFile(self.img_src)]
         self.mime_data.setUrls(url)

@@ -266,10 +266,10 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        from test import DownloadsWin
-        win = DownloadsWin(parent=self)
-        win.center_win(parent=self)
-        win.show()
+        # from test import DownloadsWin
+        # win = DownloadsWin(parent=self)
+        # win.center_win(parent=self)
+        # win.show()
         
 
 Themes.set_theme(cnf.theme)
