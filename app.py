@@ -263,10 +263,6 @@ class App(QApplication):
             self.smb_win.show()
 
         utils_signals_app.scaner_start.emit()
-
-        self.test = TestWid(parent=self.main_win)
-        self.test.show()
-
         
 
 Themes.set_theme(cnf.theme)
