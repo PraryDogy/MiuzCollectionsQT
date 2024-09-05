@@ -50,9 +50,6 @@ class Progresser(QWidget):
 
         v_layout.addSpacerItem(QSpacerItem(0, 10))
 
-        # self.cancel_btn = Btn(text=cnf.lng.cancel)
-        # v_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignRight)
-
     def set_text_label(self, text: str):
         self.copy_label.setText(text)
 
