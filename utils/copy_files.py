@@ -11,6 +11,7 @@ from .my_thread import MyThread
 class ThreadCopyFiles(MyThread):
     finished = pyqtSignal(list)
     value_changed = pyqtSignal(int)
+    text_changed = pyqtSignal(str)
     stop = pyqtSignal()
 
     def __init__(self, dest: str, files: list):
@@ -46,6 +47,9 @@ class ThreadCopyFiles(MyThread):
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             files_dests.append(dest_path)
+            root, filename = os.path.split(file_path)
+            self.text_changed.emit(filename)
+            print(filename)
 
             try:
 

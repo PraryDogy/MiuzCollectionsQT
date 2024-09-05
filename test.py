@@ -1,7 +1,6 @@
 from functools import partial
-from time import sleep
 
-from PyQt5.QtCore import Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
                              QWidget)
@@ -11,37 +10,11 @@ from cfg import cnf
 from styles import Names, Themes
 from utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
-
-# class Threads:
-#     threads_list: list = []
-
-
-# class TestThread(QThread):
-#     thread_finished = pyqtSignal()
-#     thread_value = pyqtSignal(int)
-
-#     def __init__(self):
-#         super().__init__()
-#         Threads.threads_list.append(self)
-#         self.value = 0
-
-#     def run(self):
-#         for i in range(0, 10):
-#             self.value += 1
-#             self.thread_value.emit(self.value)
-#             sleep(0.1)
-#         self.thread_finished.emit()
-#         Threads.threads_list.remove(self)
-
-
-# class TreadsRunner:
-#     def __init__(self) -> None:
-#         self.threader = TestThread()
-#         self.threader.start()
-
+import os
 
 class Progresser(QWidget):
     set_value = pyqtSignal(int)
+    set_text = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -49,9 +22,12 @@ class Progresser(QWidget):
         v_layout.setContentsMargins(10, 0, 20, 0)
         self.setLayout(v_layout)
 
-        label = QLabel(text="Заменить текст", parent=self)
-        label.setFixedHeight(15)
-        v_layout.addWidget(label)
+        self.copy_label = QLabel(text=cnf.lng.copying_files, parent=self)
+        self.copy_label.setFixedHeight(20)
+        v_layout.addWidget(self.copy_label)
+        self.set_text.connect(self.set_text_label)
+
+        v_layout.addSpacerItem(QSpacerItem(0, 10))
 
         self.progress = QProgressBar(parent=self)
         self.progress.setFixedHeight(10)
@@ -63,12 +39,13 @@ class Progresser(QWidget):
         v_layout.addSpacerItem(QSpacerItem(0, 10))
 
         self.cancel_btn = Btn(text=cnf.lng.cancel)
-        v_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignRight)
+        # v_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignRight)
+
+    def set_text_label(self, text: str):
+        self.copy_label.setText(text)
 
 
 class DownloadsWin(WinStandartBase):
-    cancel_pressed = pyqtSignal()
-
     def __init__(self, parent: QWidget):
         super().__init__(close_func=self.my_close)
         self.copy_threads: list = []
@@ -111,7 +88,9 @@ class DownloadsWin(WinStandartBase):
 
                 copy_task: ThreadCopyFiles
                 self.copy_threads.append(copy_task)
+
                 copy_task.value_changed.connect(partial(self.change_progress_value, progress))
+                copy_task.text_changed.connect(partial(self.change_progress_text, progress))
                 copy_task.finished.connect(partial(self.remove_progress, progress, copy_task))
 
         QTimer.singleShot(1000, self.add_progress_widgets)
@@ -119,20 +98,40 @@ class DownloadsWin(WinStandartBase):
     def remove_progress(self, widget: Progresser, task: ThreadCopyFiles):
         QTimer.singleShot(1000, widget.deleteLater)
         self.copy_threads.remove(task)
+    
+    def change_progress_text(self, widget: Progresser, text: str):
+        text = self.cut_text(text)
+
+        try:
+            widget.set_text.emit(text)
+        except Exception as e:
+            # MainUtils.print_err(parent=self, error=e)
+            pass
 
     def change_progress_value(self, widget: Progresser, value: int):
         try:
             widget.set_value.emit(value)
-        except Exception:
+        except Exception as e:
+            # MainUtils.print_err(parent=self, error=e)
             pass
+
+    def cut_text(self, text: str):
+        name, ext = os.path.splitext(text)
+        name = f"{cnf.lng.copying} {name}"
+        max_row = 27
+
+        if len(name) >= max_row:
+            cut_name = name[:max_row]
+            cut_name = cut_name[:-6]
+            name = cut_name + "..." + name[-3:] + ext
+        else:
+            name = name + ext
+
+        return name
 
     def my_close(self, event):
         self.close()
         return
-
-    def cancel_btn_cmd(self, e):
-        self.cancel_pressed.emit()
-        self.close()
 
     def set_value(self, value: int):
         try:
