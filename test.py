@@ -91,10 +91,6 @@ class DownloadsWin(WinStandartBase):
 
         self.add_progress_widgets()
 
-        # for i in range(0, 14):
-            # progress = Progresser()
-            # self.progress_layout.addWidget(progress)
-
     def add_progress_widgets(self):
         try:
             for copy_task in cnf.copy_threads:
