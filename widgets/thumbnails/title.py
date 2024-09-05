@@ -108,14 +108,15 @@ class CustomContext(ContextMenuBase):
             return
 
         copy_task = ThreadCopyFiles(dest=dest, files=files)
-        copy_win = WinCopyFiles(parent=self.my_parent)
-
-        copy_task.value_changed.connect(lambda val: copy_win.set_value(val))
-        copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, copy_win, files=files))
-        copy_win.cancel_pressed.connect(lambda: self.copy_files_cancel(copy_task, copy_win))
-        
-        copy_win.show()
         copy_task.start()
+        # copy_win = WinCopyFiles(parent=self.my_parent)
+
+        # copy_task.value_changed.connect(lambda val: copy_win.set_value(val))
+        # copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, copy_win, files=files))
+        # copy_win.cancel_pressed.connect(lambda: self.copy_files_cancel(copy_task, copy_win))
+        
+        # copy_win.show()
+        # copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)

@@ -124,6 +124,7 @@ class Dymanic:
         self.image_viewer: QMainWindow = None
         self.selected_thumbnail: Thumbnail = Thumbnail()
 
+        self.copy_threads: list = []
 
 class AppInfo:
     def __init__(self):

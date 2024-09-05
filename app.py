@@ -35,12 +35,10 @@ class TestWid(QFrame):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-        from utils import SendNotification
-        SendNotification("test")
-        return
-        from widgets import WinSmb
-        self.a = WinSmb()
-        self.a.show()
+        from test import DownloadsWin
+        win = DownloadsWin(parent=self)
+        win.center_win(parent=self)
+        win.show()
 
 
 class RightWidget(QFrame):
@@ -266,10 +264,9 @@ class App(QApplication):
 
         utils_signals_app.scaner_start.emit()
 
-        # from test import DownloadsWin
-        # win = DownloadsWin(parent=self)
-        # win.center_win(parent=self)
-        # win.show()
+        self.test = TestWid(parent=self.main_win)
+        self.test.show()
+
         
 
 Themes.set_theme(cnf.theme)
