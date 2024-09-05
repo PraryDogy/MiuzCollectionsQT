@@ -1,15 +1,16 @@
+import os
 from functools import partial
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
-                             QWidget, QFrame)
+                             QWidget)
 
-from base_widgets import SvgBtn, LayoutV, WinStandartBase, LayoutH
+from base_widgets import LayoutH, LayoutV, SvgBtn, WinStandartBase
 from cfg import cnf
 from styles import Names, Themes
 from utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
-import os
+
 
 class Progresser(QWidget):
     set_value = pyqtSignal(int)
