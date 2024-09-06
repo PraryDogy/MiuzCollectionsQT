@@ -1,7 +1,7 @@
 import os
 from test import DownloadsWin
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QFrame, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, SvgBtn
@@ -36,6 +36,7 @@ class StBar(QFrame):
         self.init_ui()
         
         gui_signals_app.reload_stbar.connect(self.reload_stbar)
+        gui_signals_app.jerk_downloads.connect(self.jerk_downloads)
 
     def init_ui(self):
         self.h_layout.addStretch(1)
@@ -121,6 +122,20 @@ class StBar(QFrame):
         self.downloads_win = DownloadsWin(parent=self)
         self.downloads_win.center_win(self)
         self.downloads_win.show()
+
+    def jerk_downloads(self):
+        self.blue_downloads()
+        QTimer.singleShot(300, self.default_downloads)
+        QTimer.singleShot(300*2, self.blue_downloads)
+        QTimer.singleShot(300*3, self.default_downloads)
+        QTimer.singleShot(300*4, self.blue_downloads)
+        QTimer.singleShot(300*5, self.default_downloads)
+
+    def default_downloads(self):
+        self.downloads.set_icon(os.path.join("images", f"{cnf.theme}_downloads.svg"))
+
+    def blue_downloads(self):
+        self.downloads.set_icon(os.path.join("images", f"blue_downloads.svg"))
 
     def sett_btn_cmd(self, e):
         self.settings = WinSettings(parent=self)

@@ -25,6 +25,8 @@ class GuiSignals(QObject):
     progressbar_add_photos = pyqtSignal()
     progressbar_del_photos = pyqtSignal()
 
+    jerk_downloads = pyqtSignal()
+
     noti_main = pyqtSignal(str)
     noti_img_view = pyqtSignal(str)
 
