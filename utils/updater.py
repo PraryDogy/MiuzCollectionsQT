@@ -31,8 +31,10 @@ class UpdaterMain(QObject):
                 subprocess.run(["open", "-R", destination])
 
                 current_dir = os.path.dirname(__file__)
-                current_dir = current_dir.strip().split(os.sep)[:-2]
+                current_dir = current_dir.strip().split(os.sep)
+                current_dir = current_dir[:-5]
                 app_dir = os.path.join(os.sep, *current_dir)
+                print(current_dir)
                 subprocess.run(["open", "-R", app_dir])
 
                 self.finished.emit()
