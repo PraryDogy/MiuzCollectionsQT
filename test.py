@@ -3,7 +3,7 @@ from functools import partial
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
-                             QWidget)
+                             QWidget, QFrame)
 
 from base_widgets import LayoutH, LayoutV, SvgBtn, WinStandartBase
 from cfg import cnf
@@ -35,6 +35,7 @@ class Progresser(QWidget):
         h_layout = LayoutH()
         h_wid.setLayout(h_layout)
 
+
         self.progress = QProgressBar(parent=self)
         self.progress.setFixedHeight(10)
         self.progress.setTextVisible(False)
@@ -48,7 +49,14 @@ class Progresser(QWidget):
         self.close_btn.mouseReleaseEvent = self.close_cmd
         h_layout.addWidget(self.close_btn)
 
-        v_layout.addSpacerItem(QSpacerItem(0, 10))
+        # v_layout.addSpacerItem(QSpacerItem(0, 10))
+
+        # sep = QFrame(parent=self)
+        # sep.setFixedHeight(2)
+        # sep.setStyleSheet("background-color: black;")
+        # v_layout.addWidget(sep)
+
+        v_layout.addSpacerItem(QSpacerItem(0, 20))
 
     def set_text_label(self, text: str):
         self.copy_label.setText(text)
@@ -89,7 +97,12 @@ class DownloadsWin(WinStandartBase):
         self.v_layout.addWidget(self.progress_wid)
         self.v_layout.addStretch()
 
-        self.add_progress_widgets()
+        # self.add_progress_widgets()
+
+        for i in range(0, 10):
+            wid = Progresser()
+            self.progress_layout.addWidget(wid)
+            wid.set_value.emit(50)
 
     def add_progress_widgets(self):
         try:
