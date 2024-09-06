@@ -125,11 +125,12 @@ class StBar(QFrame):
 
     def jerk_downloads(self):
         self.blue_downloads()
-        QTimer.singleShot(300, self.default_downloads)
-        QTimer.singleShot(300*2, self.blue_downloads)
-        QTimer.singleShot(300*3, self.default_downloads)
-        QTimer.singleShot(300*4, self.blue_downloads)
-        QTimer.singleShot(300*5, self.default_downloads)
+        ms = 200
+        QTimer.singleShot(ms, self.default_downloads)
+        QTimer.singleShot(ms*2, self.blue_downloads)
+        QTimer.singleShot(ms*3, self.default_downloads)
+        QTimer.singleShot(ms*4, self.blue_downloads)
+        QTimer.singleShot(ms*5, self.default_downloads)
 
     def default_downloads(self):
         self.downloads.set_icon(os.path.join("images", f"{cnf.theme}_downloads.svg"))
