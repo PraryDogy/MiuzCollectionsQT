@@ -1,6 +1,7 @@
 class Eng:
 	def __init__(self):
 		super().__init__()
+		self.added_to_downloads = 'Added to Downloads'
 		self.adding_photos = 'Adding new photos'
 		self.all_colls = 'All collections'
 		self.bar_menu = 'Menu'

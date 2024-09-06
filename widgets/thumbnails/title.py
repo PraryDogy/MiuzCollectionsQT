@@ -9,9 +9,8 @@ from styles import Names, Themes
 from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiffsMultiple)
 
-# from ..win_copy_files import WinCopyFiles
 from ..win_smb import WinSmb
-
+from signals import gui_signals_app
 
 class Shared:
     dialog = None
@@ -108,9 +107,11 @@ class CustomContext(ContextMenuBase):
             SendNotification(cnf.lng.no_file)
             return
 
+        SendNotification(cnf.lng.added_to_downloads)
+        gui_signals_app.jerk_downloads.emit()
+
         copy_task = ThreadCopyFiles(dest=dest, files=files)
         copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, files=files))
-        copy_task.stop.connect(lambda files: self.copy_files_fin(copy_task, files=files))
         copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):

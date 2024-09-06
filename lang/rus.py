@@ -1,6 +1,7 @@
 class Rus:
 	def __init__(self):
 		super().__init__()
+		self.added_to_downloads = 'Добавлено в загрузки'
 		self.adding_photos = 'Добавляю новые фотографии'
 		self.all_colls = 'Все коллекции'
 		self.bar_menu = 'Меню'

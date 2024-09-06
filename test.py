@@ -97,12 +97,12 @@ class DownloadsWin(WinStandartBase):
         self.v_layout.addWidget(self.progress_wid)
         self.v_layout.addStretch()
 
-        # self.add_progress_widgets()
+        self.add_progress_widgets()
 
-        for i in range(0, 10):
-            wid = Progresser()
-            self.progress_layout.addWidget(wid)
-            wid.set_value.emit(50)
+        # for i in range(0, 10):
+        #     wid = Progresser()
+        #     self.progress_layout.addWidget(wid)
+        #     wid.set_value.emit(50)
 
     def add_progress_widgets(self):
         try:

@@ -396,5 +396,9 @@
     "title_downloads": [
         "Загрузки",
         "Downloads"
+    ],
+    "added_to_downloads": [
+        "Добавлено в загрузки",
+        "Added to Downloads"
     ]
 }
