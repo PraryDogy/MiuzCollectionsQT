@@ -9,7 +9,6 @@ from signals import gui_signals_app
 from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiff)
 
-from ..win_copy_files import WinCopyFiles
 from ..win_info import WinInfo
 from ..win_smb import WinSmb
 
@@ -196,29 +195,17 @@ class ImageContext(ContextMenuBase):
             SendNotification(cnf.lng.no_file)
             return
 
-        self.copy_task = ThreadCopyFiles(dest=dest, files=[file])
-        copy_win = WinCopyFiles(parent=self.my_parent)
+        SendNotification(cnf.lng.added_to_downloads)
+        gui_signals_app.jerk_downloads.emit()
 
-        self.copy_task.value_changed.connect(lambda val: copy_win.set_value(val))
-        self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, copy_win, files))
-        copy_win.cancel_pressed.connect(lambda: self.copy_files_cancel(self.copy_task, copy_win))
-        
-        copy_win.show()
+        self.copy_task = ThreadCopyFiles(dest=dest, files=[file])
+        self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, files))
         self.copy_task.start()
 
-    def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
+    def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
         try:
             copy_task.remove_threads()
-            copy_win.close()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-    def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
-        try:
-            copy_task.stop.emit()
-            copy_task.remove_threads()
-            copy_win.close()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 

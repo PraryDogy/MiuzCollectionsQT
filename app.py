@@ -15,9 +15,9 @@ from styles import Names, Themes
 from utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
 from utils.reveal_files import RevealFiles
+from utils.send_notification import SendNotification
 from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
                      StBar, Thumbnails)
-from widgets.win_copy_files import WinCopyFiles
 from widgets.win_smb import WinSmb
 
 
@@ -183,33 +183,21 @@ class WinMain(WinBase):
             folder = QFileDialog.getExistingDirectory(self, directory=directory)
 
             if folder:
-                self.copy_task = ThreadCopyFiles(dest=folder, files=files)
-                copy_win = WinCopyFiles(parent=self)
+                SendNotification(cnf.lng.added_to_downloads)
+                gui_signals_app.jerk_downloads.emit()
 
-                self.copy_task.value_changed.connect(lambda val: copy_win.set_value(val))
+                self.copy_task = ThreadCopyFiles(dest=folder, files=files)
                 self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, copy_win, files))
-                copy_win.cancel_pressed.connect(lambda: self.copy_files_cancel(self.copy_task, copy_win))
-                
-                copy_win.show()
                 self.copy_task.start()
             
             a0.acceptProposedAction()
 
         return super().dropEvent(a0)
     
-    def copy_files_fin(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles, files: list):
+    def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
         try:
             copy_task.remove_threads()
-            copy_win.close()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-    def copy_files_cancel(self, copy_task: ThreadCopyFiles, copy_win: WinCopyFiles):
-        try:
-            copy_task.stop.emit()
-            copy_task.remove_threads()
-            copy_win.close()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
     
