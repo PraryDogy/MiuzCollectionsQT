@@ -107,7 +107,7 @@ class CustomContext(ContextMenuBase):
             SendNotification(cnf.lng.no_file)
             return
 
-        SendNotification(cnf.lng.added_to_downloads)
+        # SendNotification(cnf.lng.added_to_downloads)
         gui_signals_app.jerk_downloads.emit()
 
         copy_task = ThreadCopyFiles(dest=dest, files=files)

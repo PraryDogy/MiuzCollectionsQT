@@ -1,5 +1,4 @@
 import os
-from test import DownloadsWin
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QFrame, QSpacerItem, QWidget
@@ -10,6 +9,7 @@ from signals import gui_signals_app
 from styles import Names, Themes
 from utils import MainUtils
 
+from ..win_downloads import DownloadsWin
 from ..win_settings import WinSettings
 from .progress_bar import ProgressBar
 

@@ -35,7 +35,7 @@ class TestWid(QFrame):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-        from test import DownloadsWin
+        from widgets.win_downloads import DownloadsWin
         win = DownloadsWin(parent=self)
         win.center_win(parent=self)
         win.show()
@@ -183,11 +183,11 @@ class WinMain(WinBase):
             folder = QFileDialog.getExistingDirectory(self, directory=directory)
 
             if folder:
-                SendNotification(cnf.lng.added_to_downloads)
+                # SendNotification(cnf.lng.added_to_downloads)
                 gui_signals_app.jerk_downloads.emit()
 
                 self.copy_task = ThreadCopyFiles(dest=folder, files=files)
-                self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, copy_win, files))
+                self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, files))
                 self.copy_task.start()
             
             a0.acceptProposedAction()
