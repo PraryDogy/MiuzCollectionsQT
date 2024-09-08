@@ -21,11 +21,9 @@ class GuiSignals(QObject):
     progressbar_value = pyqtSignal(object)
     progressbar_show = pyqtSignal()
     progressbar_hide = pyqtSignal()
-    progressbar_search_photos = pyqtSignal()
-    progressbar_add_photos = pyqtSignal()
-    progressbar_del_photos = pyqtSignal()
 
-    jerk_downloads = pyqtSignal()
+    hide_downloads = pyqtSignal()
+    show_downloads = pyqtSignal()
 
     noti_main = pyqtSignal(str)
     noti_img_view = pyqtSignal(str)

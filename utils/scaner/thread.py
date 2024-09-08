@@ -153,8 +153,6 @@ class FinderImages(dict):
             Shared.flag = False
 
     def run(self):
-        gui_signals_app.progressbar_search_photos.emit()
-
         collections = [
             os.path.join(cnf.coll_folder, i)
             for i in os.listdir(cnf.coll_folder)
@@ -250,7 +248,6 @@ class UpdateDb:
 
         try:
             gui_signals_app.progressbar_value.emit(70)
-            gui_signals_app.progressbar_del_photos.emit()
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
@@ -259,7 +256,6 @@ class UpdateDb:
 
         try:
             gui_signals_app.progressbar_value.emit(80)
-            gui_signals_app.progressbar_add_photos.emit()
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 

@@ -27,9 +27,6 @@ class ProgressBar(QWidget):
         gui_signals_app.progressbar_value.connect(self.progressbar_value)
         gui_signals_app.progressbar_show.connect(self.progressbar_show)
         gui_signals_app.progressbar_hide.connect(self.progressbar_hide)
-        gui_signals_app.progressbar_search_photos.connect(self.search_photos)
-        gui_signals_app.progressbar_add_photos.connect(self.add_photos)
-        gui_signals_app.progressbar_del_photos.connect(self.del_photos)
 
         self.temp_value = 0
         self.current_value = 0
@@ -42,15 +39,6 @@ class ProgressBar(QWidget):
             self.temp_value = 0
 
         self.progress_bar.setValue(self.current_value)
-
-    def search_photos(self):
-        self.title.setText(cnf.lng.searching_photos)
-
-    def add_photos(self):
-        self.title.setText(cnf.lng.adding_photos)
-
-    def del_photos(self):
-        self.title.setText(cnf.lng.deleting_photos)
 
     def progressbar_show(self):
         self.current_value = 0

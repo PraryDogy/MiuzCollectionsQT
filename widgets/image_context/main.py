@@ -195,15 +195,15 @@ class ImageContext(ContextMenuBase):
             SendNotification(cnf.lng.no_file)
             return
 
-        # SendNotification(cnf.lng.added_to_downloads)
-        gui_signals_app.jerk_downloads.emit()
-
         self.copy_task = ThreadCopyFiles(dest=dest, files=[file])
+        gui_signals_app.show_downloads.emit()
         self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, files))
         self.copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
+        if len(cnf.copy_threads) == 0:
+            gui_signals_app.hide_downloads.emit()
         try:
             copy_task.remove_threads()
         except Exception as e:
