@@ -136,6 +136,9 @@ class Title(QLabel):
         self.my_context = None
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        self.my_context = CustomContext(parent=self, files_list=self.images, event=ev)
-        self.my_context.show_menu()
-        return super().contextMenuEvent(ev)
+        try:
+            self.my_context = CustomContext(parent=self, files_list=self.images, event=ev)
+            self.my_context.show_menu()
+            return super().contextMenuEvent(ev)
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)

@@ -109,7 +109,8 @@ class DownloadsWin(WinStandartBase):
             for copy_task in cnf.copy_threads:
 
                 if copy_task not in self.copy_threads and copy_task.isRunning():
-                    copy_wid = Progresser(text=copy_task.get_current_file())
+                    t = self.cut_text(copy_task.get_current_file())
+                    copy_wid = Progresser(text=t)
                     self.progress_layout.addWidget(copy_wid)
 
                     copy_task: ThreadCopyFiles
