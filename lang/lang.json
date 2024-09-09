@@ -1,4 +1,8 @@
 {
+    "added_to_downloads": [
+        "Добавлено в загрузки",
+        "Added to Downloads"
+    ],
     "adding_photos": [
         "Добавляю новые фотографии",
         "Adding new photos"
@@ -20,8 +24,8 @@
         "Cancel"
     ],
     "choose_coll_smb": [
-        "Подключитесь к sb01 или sb06",
-        "Connect to sb01 or sb06"
+        "Подключите Marketing/Design\nили Studio/Photo",
+        "Connect Marketing/Design\nor Studio/Photo"
     ],
     "close": [
         "Закрыть",
@@ -36,8 +40,8 @@
         "Compact menu"
     ],
     "connect_sb06": [
-        "Подключитесь к sb06",
-        "Connect to sb06"
+        "Подключите Studio/Photo",
+        "Connect Studio/Photo"
     ],
     "copy": [
         "Копировать",
@@ -345,6 +349,10 @@
             "other": "Other"
         }
     ],
+    "title_downloads": [
+        "Загрузки",
+        "Downloads"
+    ],
     "total": [
         "Всего",
         "Total"
@@ -392,13 +400,5 @@
     "with_name": [
         "с именем",
         "with name"
-    ],
-    "title_downloads": [
-        "Загрузки",
-        "Downloads"
-    ],
-    "added_to_downloads": [
-        "Добавлено в загрузки",
-        "Added to Downloads"
     ]
 }
