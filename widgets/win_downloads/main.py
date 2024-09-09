@@ -17,14 +17,14 @@ class Progresser(QWidget):
     set_text = pyqtSignal(str)
     progress_stop = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, text: str):
         super().__init__()
 
         v_layout = LayoutV()
         v_layout.setContentsMargins(10, 0, 20, 0)
         self.setLayout(v_layout)
 
-        self.copy_label = QLabel(text=cnf.lng.copying_files, parent=self)
+        self.copy_label = QLabel(text=text, parent=self)
         v_layout.addWidget(self.copy_label)
         self.set_text.connect(self.set_text_label)
 
@@ -109,7 +109,7 @@ class DownloadsWin(WinStandartBase):
             for copy_task in cnf.copy_threads:
 
                 if copy_task not in self.copy_threads and copy_task.isRunning():
-                    copy_wid = Progresser()
+                    copy_wid = Progresser(text=copy_task.get_current_file())
                     self.progress_layout.addWidget(copy_wid)
 
                     copy_task: ThreadCopyFiles
@@ -127,7 +127,6 @@ class DownloadsWin(WinStandartBase):
 
     def stop_progress(self, widget: Progresser, task: ThreadCopyFiles):
         task.stop.emit()
-        task.disconnect()
         self.remove_progress(widget, task)
 
     def remove_progress(self, widget: Progresser, task: ThreadCopyFiles):

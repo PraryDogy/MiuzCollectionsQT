@@ -22,6 +22,7 @@ class ThreadCopyFiles(MyThread):
         self.files = files
         self.dest = dest
         self.buffer_size = 1024*1024
+        self.current_file = ""
 
         cnf.copy_threads.append(self)
 
@@ -43,12 +44,17 @@ class ThreadCopyFiles(MyThread):
         for file_path in self.files:
 
             if not self.flag:
+                self.value_changed.emit(100)
+                self.finished.emit(files_dests)
+                self.remove_threads()
+                cnf.copy_threads.remove(self)
                 return
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             files_dests.append(dest_path)
             root, filename = os.path.split(file_path)
             self.text_changed.emit(filename)
+            self.current_file = filename
 
             try:
 
@@ -79,3 +85,6 @@ class ThreadCopyFiles(MyThread):
 
     def stop_copying(self):
         self.flag = False
+
+    def get_current_file(self):
+        return self.current_file
