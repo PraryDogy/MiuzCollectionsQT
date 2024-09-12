@@ -28,7 +28,7 @@ class Thumbnail(QObject):
 class User:
     def __init__(self) -> None:
         super().__init__()
-        self.app_ver: str = "5.4.1"
+        self.app_ver: str = "5.4.2"
     
         self.coll_folder: str = "/Volumes/Shares/Collections"
         
@@ -77,17 +77,17 @@ class User:
         self.down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
         self.udpdate_file_paths = [
-            '/Volumes/Shares/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-            '/Volumes/Shares-1/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-            '/Volumes/Shares-2/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-            '/Volumes/Shares-3/Studio/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+            '/Volumes/Shares/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+            '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+            '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+            '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
             ]
 
         self.coll_folder_list = [
-            '/Volumes/Shares/Studio/Photo/Art/Ready',
-            '/Volumes/Shares-1/Studio/Photo/Art/Ready',
-            '/Volumes/Shares-2/Studio/Photo/Art/Ready',
-            '/Volumes/Shares-3/Studio/Photo/Art/Ready',
+            '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
+            '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
+            '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
+            '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Ready',
             '/Volumes/Shares/Collections',
             '/Volumes/Shares-1/Collections',
             '/Volumes/Shares-2/Collections',
@@ -158,6 +158,9 @@ class Config(User, Dymanic, Static, AppInfo):
 
         if "LEVIEV" not in data["stop_colls"]:
             data["stop_colls"].append("LEVIEV")
+
+        data["coll_folder_list"] = self.coll_folder_list
+        data["udpdate_file_paths"] = self.udpdate_file_paths
 
         data["app_ver"] = self.app_ver
 
