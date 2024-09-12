@@ -380,3 +380,13 @@ QToolTip {
     font-size: 12pt;
 }
 
+
+
+QProgressBar {
+    background-color: #cccccc;
+    border-radius: 3px;
+    }
+QProgressBar::chunk {
+    background-color: #2e59cb;
+    border-radius: 3px;
+    }

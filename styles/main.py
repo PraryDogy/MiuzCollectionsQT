@@ -69,3 +69,5 @@ class Names:
     letter_btn = "letter_btn"
 
     text_edit = "text_edit"
+
+    progress = "progress"

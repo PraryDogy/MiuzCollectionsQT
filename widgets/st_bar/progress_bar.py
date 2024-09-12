@@ -1,10 +1,9 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QProgressBar, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
+from base_widgets import CustomProgressBar, LayoutH
 from cfg import cnf
 from signals import gui_signals_app
-
-from base_widgets import LayoutH
 
 
 class ProgressBar(QWidget):
@@ -19,7 +18,7 @@ class ProgressBar(QWidget):
         spacer = QSpacerItem(10, 0)
         layout.addItem(spacer)
 
-        self.progress_bar = QProgressBar()
+        self.progress_bar = CustomProgressBar()
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.progress_bar)

@@ -2,10 +2,10 @@ import os
 from functools import partial
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import (QFrame, QLabel, QProgressBar, QScrollArea,
-                             QSpacerItem, QWidget)
+from PyQt5.QtWidgets import QLabel, QScrollArea, QSpacerItem, QWidget
 
-from base_widgets import LayoutH, LayoutV, SvgBtn, WinStandartBase
+from base_widgets import (CustomProgressBar, LayoutH, LayoutV, SvgBtn,
+                          WinStandartBase)
 from cfg import cnf
 from styles import Names, Themes
 from utils import MainUtils
@@ -36,8 +36,7 @@ class Progresser(QWidget):
         h_wid.setLayout(h_layout)
 
 
-        self.progress = QProgressBar(parent=self)
-        self.progress.setFixedHeight(10)
+        self.progress = CustomProgressBar(parent=self)
         self.progress.setTextVisible(False)
         self.progress.setValue(0)
         h_layout.addWidget(self.progress)
@@ -48,13 +47,6 @@ class Progresser(QWidget):
         self.close_btn = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_close.svg"), size=15)
         self.close_btn.mouseReleaseEvent = self.close_cmd
         h_layout.addWidget(self.close_btn)
-
-        # v_layout.addSpacerItem(QSpacerItem(0, 10))
-
-        # sep = QFrame(parent=self)
-        # sep.setFixedHeight(2)
-        # sep.setStyleSheet("background-color: black;")
-        # v_layout.addWidget(sep)
 
         v_layout.addSpacerItem(QSpacerItem(0, 20))
 
@@ -100,7 +92,7 @@ class DownloadsWin(WinStandartBase):
         self.add_progress_widgets()
 
         # for i in range(0, 10):
-        #     wid = Progresser()
+        #     wid = Progresser(text="test")
         #     self.progress_layout.addWidget(wid)
         #     wid.set_value.emit(50)
 
