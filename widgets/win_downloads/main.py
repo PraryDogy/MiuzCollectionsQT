@@ -37,7 +37,6 @@ class Progresser(QWidget):
 
 
         self.progress = CustomProgressBar(parent=self)
-        self.progress.setTextVisible(False)
         self.progress.setValue(0)
         h_layout.addWidget(self.progress)
         self.set_value.connect(lambda v: self.progress.setValue(v))

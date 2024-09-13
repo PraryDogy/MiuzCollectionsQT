@@ -19,8 +19,6 @@ class ProgressBar(QWidget):
         layout.addItem(spacer)
 
         self.progress_bar = CustomProgressBar()
-        self.progress_bar.setTextVisible(False)
-        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.progress_bar)
 
         gui_signals_app.progressbar_value.connect(self.progressbar_value)
