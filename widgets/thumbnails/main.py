@@ -1,7 +1,7 @@
 from math import ceil
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QResizeEvent
+from PyQt5.QtGui import QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
