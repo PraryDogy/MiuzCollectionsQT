@@ -319,8 +319,6 @@ class WinImageView(WinImgViewBase):
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 
-        QTimer.singleShot(1500, lambda: self.after_close())
-
         Shared.loaded_images.clear()
         cnf.image_viewer = None
         self.close()
