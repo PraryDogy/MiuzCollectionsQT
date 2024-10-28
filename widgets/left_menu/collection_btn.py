@@ -64,9 +64,7 @@ class CustomContext(ContextMenuBase):
             if self.true_name == cnf.ALL_COLLS:
                 if os.path.exists(cnf.coll_folder):
                     subprocess.Popen(["open", cnf.coll_folder])
-                else:
-                    SendNotification(cnf.lng.no_connection)
-                return
+                    return
 
             coll_path = os.path.join(cnf.coll_folder, self.true_name)
 
@@ -75,17 +73,24 @@ class CustomContext(ContextMenuBase):
                 if os.path.exists(flag_path):
                     subprocess.Popen(["open", flag_path])
                     return
+                else:
+                    os.mkdir(flag_path)
+                    subprocess.Popen(["open", flag_path])
+                    return
 
             if flag == "mod":
                 flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
                 if os.path.exists(flag_path):
                     subprocess.Popen(["open", flag_path])
                     return
+                else:
+                    os.mkdir(flag_path)
+                    subprocess.Popen(["open", flag_path])
+                    return
 
             if os.path.exists(coll_path):
                 subprocess.Popen(["open", coll_path])
-            else:
-                SendNotification(cnf.lng.no_connection)
+                return
 
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
