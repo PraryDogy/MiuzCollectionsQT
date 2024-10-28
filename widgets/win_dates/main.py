@@ -152,18 +152,22 @@ class WinDates(WinStandartBase):
 
     def ok_cmd(self, event):
         if not any((self.date_start, self.date_end)):
-            cnf.date_start, cnf.date_end = None, None
-            FiltersDateBtncolor.date_based_color()
-            self.close()
-            gui_signals_app.reload_thumbnails.emit()
+            return
+            # cnf.date_start, cnf.date_end = None, None
+            # FiltersDateBtncolor.date_based_color()
+            # self.close()
+            # gui_signals_app.reload_thumbnails.emit()
 
             return
 
         elif not self.date_start:
-            self.date_start = self.date_end
+            return
+            # self.date_start = self.date_end
 
         elif not self.date_end:
             self.date_end = self.date_start
+            self.date_end = datetime.today().date()
+            print(self.date_end)
 
         cnf.date_start = self.date_start
         cnf.date_end = self.date_end
