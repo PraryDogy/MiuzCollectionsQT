@@ -82,11 +82,16 @@ class Thumbnail(QFrame):
             f"{cnf.lng.file_name}: {self.img_name}\n"
             f"{self.images_date}"
             )
-        
-    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+    
+    def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.win_image_view = WinImageView(parent=self, img_src=self.img_src)
         self.win_image_view.show()
-        return super().mouseReleaseEvent(a0)
+        return super().mouseDoubleClickEvent(a0)
+    
+    # def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+    #     self.win_image_view = WinImageView(parent=self, img_src=self.img_src)
+    #     self.win_image_view.show()
+    #     return super().mouseReleaseEvent(a0)
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
@@ -201,10 +206,10 @@ class SmallThumbnail(QLabel):
             f"{self.images_date}"
             )
         
-    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+    def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.win_image_view = WinImageView(parent=self, img_src=self.img_src)
         self.win_image_view.show()
-        return super().mouseReleaseEvent(a0)
+        return super().mouseDoubleClickEvent(a0)
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
