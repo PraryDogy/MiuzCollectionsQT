@@ -240,6 +240,9 @@ class Thumbnails(QScrollArea):
         
         return super().keyPressEvent(a0)
 
+    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+        self.reset_selection()
+
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.up_btn.setVisible(False)
 

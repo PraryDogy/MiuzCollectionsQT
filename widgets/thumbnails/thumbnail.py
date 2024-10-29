@@ -87,7 +87,8 @@ class BaseThumb(QFrame):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         self.select.emit(self.src)
-        return super().mouseReleaseEvent(ev)
+
+        # return super().mouseReleaseEvent(ev)
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
