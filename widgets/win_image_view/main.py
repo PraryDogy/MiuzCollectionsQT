@@ -303,33 +303,10 @@ class WinImageView(WinImgViewBase):
         self.set_image_title()
 
     def my_close(self, event):
-        try:
-            cnf.selected_thumbnail.regular_style()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-        try:
-            cnf.selected_thumbnail = cnf.images[self.img_src]["widget"]
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-        try:
-            cnf.selected_thumbnail.selected_style()
-            gui_signals_app.move_to_wid.emit(cnf.selected_thumbnail)
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-        QTimer.singleShot(1500, lambda: self.after_close())
-
         Shared.loaded_images.clear()
         cnf.image_viewer = None
         self.close()
 
-    def after_close(self):
-        try:
-            cnf.selected_thumbnail.regular_style()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
 
 # GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
 
