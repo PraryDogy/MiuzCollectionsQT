@@ -76,8 +76,6 @@ class Thumbnails(QScrollArea):
         thumbs_dict = ImagesDictDb()
         cnf.images.clear()
 
-        print(list(thumbs_dict.keys()))
-
         if thumbs_dict:
             above_thumbs = AboveThumbs(self.width())
             above_thumbs.setContentsMargins(9, 0, 0, 0)
