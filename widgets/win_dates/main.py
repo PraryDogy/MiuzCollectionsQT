@@ -99,8 +99,10 @@ class WinDates(WinStandartBase):
         title_label.setContentsMargins(0, 0, 0, 5)
         self.content_layout.addWidget(title_label)
 
+        widget_wid = QWidget()
         widget_layout = LayoutH()
-        self.content_layout.addLayout(widget_layout)
+        widget_wid.setLayout(widget_layout)
+        self.content_layout.addWidget(widget_wid)
 
         self.left_date = LeftDateWidget()
         self.left_date.dateChangedSignal.connect(partial(self.date_change, "start"))
@@ -115,9 +117,11 @@ class WinDates(WinStandartBase):
 
         # ok cancel button
 
+        buttons_wid = QWidget()
         buttons_layout = LayoutH()
+        buttons_wid.setLayout(buttons_layout)
         buttons_layout.setContentsMargins(0, 10, 0, 0)
-        self.content_layout.addLayout(buttons_layout)
+        self.content_layout.addWidget(buttons_wid)
 
         buttons_layout.addStretch(1)
         buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)

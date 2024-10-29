@@ -135,8 +135,10 @@ class CustFilters(QWidget):
         layout_h = LayoutH()
         self.setLayout(layout_h)
 
+        left_wid = QWidget()
         self.v_left = LayoutV()
-        layout_h.addLayout(self.v_left)
+        left_wid.setLayout(self.v_left)
+        layout_h.addWidget(left_wid)
 
         self.prod_label = QLabel(cnf.lng.cust_fltr_names["prod"])
         self.v_left.addWidget(self.prod_label)
@@ -149,8 +151,10 @@ class CustFilters(QWidget):
 
         layout_h.addSpacerItem(QSpacerItem(10, 0))
 
+        r_wid = QWidget()
         self.v_right = LayoutV()
-        layout_h.addLayout(self.v_right)
+        r_wid.setLayout(self.v_right)
+        layout_h.addWidget(r_wid)
 
         self.mod_label = QLabel(cnf.lng.cust_fltr_names["mod"])
         self.v_right.addWidget(self.mod_label)
@@ -319,8 +323,10 @@ class WinSettings(WinStandartBase):
 
         self.content_layout.addStretch()
 
+        btns_wid = QWidget()
         btns_layout = LayoutH()
-        self.content_layout.addLayout(btns_layout)
+        btns_wid.setLayout(btns_layout)
+        self.content_layout.addWidget(btns_wid)
 
         btns_layout.addStretch(1)
 

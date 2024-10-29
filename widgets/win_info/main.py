@@ -145,8 +145,10 @@ class WinInfo(WinStandartBase):
         self.center_win(parent)
 
     def init_ui(self):
+        info_wid = QWidget()
         info_layout = LayoutH()
-        self.content_layout.addLayout(info_layout)
+        info_wid.setLayout(info_layout)
+        self.content_layout.addWidget(info_wid)
 
         new_data = ImgInfo(img_src=self.img_src)
         
@@ -159,8 +161,10 @@ class WinInfo(WinStandartBase):
             r_label.setContentsMargins(0, 0, 0, 10)
             info_layout.addWidget(r_label)
 
+        btns_wid = QWidget()
         btn_layout = LayoutH()
-        self.content_layout.addLayout(btn_layout)
+        btns_wid.setLayout(btns_wid)
+        self.content_layout.addWidget(btns_wid)
         button = Btn(cnf.lng.close)
         button.mouseReleaseEvent = self.my_close
         btn_layout.addWidget(button)

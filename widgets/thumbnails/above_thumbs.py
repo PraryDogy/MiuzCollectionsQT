@@ -103,9 +103,11 @@ class AboveThumbsNoImages(QWidget):
         title_label.setObjectName(Names.th_title)
         title_label.setStyleSheet(Themes.current)
 
+        h_wid = QWidget()
         h_layout = LayoutH()
+        h_wid.setLayout(h_layout)
         h_layout.setContentsMargins(0, 10, 0, 0)
-        self.v_layout.addLayout(h_layout)
+        self.v_layout.addWidget(h_wid)
 
         merg_fltr_vals = {
             **cnf.cust_fltr_vals,
@@ -162,9 +164,11 @@ class AboveThumbs(QWidget):
         label.setObjectName(Names.th_title)
         label.setStyleSheet(Themes.current)
 
+        h_wid = QWidget()
         h_layout = LayoutH()
+        h_wid.setLayout(h_layout)
         h_layout.setContentsMargins(0, 10, 0, 0)
-        self.v_layout.addLayout(h_layout)
+        self.v_layout.addWidget(h_wid)
 
         if any((cnf.date_start, cnf.date_end)):
             label.setText(

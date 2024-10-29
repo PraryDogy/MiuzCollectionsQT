@@ -44,9 +44,11 @@ class Thumbnails(QScrollArea):
         # Основной лейаут фрейма в области скролла
         frame_layout = LayoutV(self.scroll_area_widget)
 
+        thumbnails_wid = QWidget()
         self.thumbnails_layout = LayoutV()
+        thumbnails_wid.setLayout(self.thumbnails_layout)
         self.thumbnails_layout.setContentsMargins(5, 10, 5, 0)
-        frame_layout.addLayout(self.thumbnails_layout)
+        frame_layout.addWidget(thumbnails_wid)
 
         self.columns = self.get_columns()
         self.init_ui()
@@ -100,9 +102,11 @@ class Thumbnails(QScrollArea):
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
         if ln_thumbs == cnf.current_photo_limit:
+            h_wid = QWidget()
             h_layout = LayoutH()
+            h_wid.setLayout(h_layout)
             h_layout.setContentsMargins(0, 0, 0, 10)
-            self.thumbnails_layout.addLayout(h_layout)
+            self.thumbnails_layout.addWidget(h_wid)
             h_layout.addWidget(LimitBtn())
 
         self.up_btn = UpBtn(self.scroll_area_widget)
