@@ -185,6 +185,12 @@ class Config(User, Dymanic, Static, AppInfo):
 
         self.set_language(self.user_lng)
 
+        if self.coll_folder not in self.coll_folder_list:
+            print("\ncoll folder в json не из coll folder list")
+            print("исправь вручную json файл")
+            print("coll folder:\n", self.coll_folder)
+            print("coll folder list:\n", *[i + "\n" for i in self.coll_folder_list], "\n")
+
     def write_json_cfg(self):
         data = {
             i: getattr(self, i)
