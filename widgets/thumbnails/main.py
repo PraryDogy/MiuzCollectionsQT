@@ -1,7 +1,7 @@
 from math import ceil
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMouseEvent, QResizeEvent
+from PyQt5.QtGui import QMouseEvent, QResizeEvent, QKeyEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
@@ -25,11 +25,14 @@ class Thumbnails(QScrollArea):
         self.resize(cnf.root_g["aw"] - cnf.MENU_W, cnf.root_g["ah"])
         self.ww = cnf.root_g["aw"] - cnf.MENU_W
         self.horizontalScrollBar().setDisabled(True)
-
         self.setObjectName(Names.th_scrollbar)
         self.setStyleSheet(Themes.current)
-
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.curr_cell: tuple = (0, 0)
+        self.cell_to_wid: dict[tuple, Thumbnail | SmallThumbnail] = {}
+        self.path_to_wid: dict[str, Thumbnail | SmallThumbnail] = {}
+        self.ordered_widgets: list[Thumbnail | SmallThumbnail] = []
 
         # Создаем фрейм для виджетов в области скролла
         self.scroll_area_widget = QWidget(parent=self)
@@ -73,6 +76,13 @@ class Thumbnails(QScrollArea):
             above_thumbs.setContentsMargins(9, 0, 0, 0)
             self.thumbnails_layout.addWidget(above_thumbs)
 
+            self.curr_cell: tuple = (0, 0)
+            # self.main_row, self.main_col = 0, 0
+            self.all_grids_row = 0
+            self.cell_to_wid.clear()
+            self.path_to_wid.clear()
+            self.ordered_widgets.clear()
+
             if cnf.small_view:
                 for some_date, images_list in thumbs_dict.items():
                     self.images_grid(SmallThumbnail, some_date, images_list)
@@ -101,7 +111,7 @@ class Thumbnails(QScrollArea):
         self.up_btn.deleteLater()
         self.init_ui()
 
-    def images_grid(self, thumbnail: Thumbnail, images_date: str, images_list: list[dict]):
+    def images_grid(self, thumbnail: Thumbnail | SmallThumbnail, images_date: str, images_list: list[dict]):
         """
             images_date: "date start - date fin / month year"
             images_list: [ {"img": img byte_array, "src": img_src, "coll": coll}, ... ]
@@ -116,23 +126,119 @@ class Thumbnails(QScrollArea):
         grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         grid_layout.setContentsMargins(0, 0, 0, 30)
 
-        idx = 0
+        row, col = 0, 0
 
         for img_dict in images_list:
-            label = thumbnail(
+            wid: Thumbnail | SmallThumbnail = thumbnail(
                 byte_array=img_dict["img"],
-                img_src=img_dict["src"],
+                src=img_dict["src"],
                 coll=img_dict["coll"],
                 images_date=images_date
                 )
-            grid_layout.addWidget(label, idx // self.columns, idx % self.columns)
+            wid.select.connect(lambda w=wid: self.select_new_widget(w))
+            wid.open_in_view.connect(lambda w=wid: self.open_in_view(w))
 
-            idx += 1
+            self.add_widget_data(wid, self.all_grids_row, col)
+            grid_layout.addWidget(wid, row, col)
 
-        # rows = ceil(len(images_list) / self.columns)
-        # grid_layout.setColumnStretch(self.columns, 1)
-        # grid_layout.setRowStretch(rows, 1)
+            col += 1
+            if col >= self.columns:
+                col = 0
+                row += 1
+                self.all_grids_row += 1
+
+        self.all_grids_row += 1
+
         self.thumbnails_layout.addLayout(grid_layout)
+        self.scroll_area_widget.setFocus()
+
+    def select_new_widget(self, data: tuple | str | Thumbnail | SmallThumbnail):
+        if isinstance(data, (Thumbnail, SmallThumbnail)):
+            coords = data.row, data.col
+            new_wid = data
+
+        elif isinstance(data, tuple):
+            coords = data
+            new_wid = self.cell_to_wid.get(data)
+
+        elif isinstance(data, str):
+            new_wid = self.path_to_wid.get(data)
+            coords = new_wid.row, new_wid.col
+
+        prev_wid = self.cell_to_wid.get(self.curr_cell)
+
+        print(coords)
+
+        if isinstance(new_wid, (Thumbnail, SmallThumbnail)):
+            prev_wid.regular_style()
+            new_wid.selected_style()
+            self.curr_cell = coords
+            self.ensureWidgetVisible(new_wid)
+        else:
+            try:
+                prev_wid.selected_style()
+            except AttributeError:
+                pass
+
+        self.setFocus()
+
+    def reset_selection(self):
+        widget = self.cell_to_wid.get(self.curr_cell)
+
+        if isinstance(widget, (Thumbnail, SmallThumbnail)):
+            widget.regular_style()
+            self.curr_cell: tuple = (0, 0)
+
+    def add_widget_data(self, wid: Thumbnail | SmallThumbnail, row: int, col: int):
+        wid.row, wid.col = row, col
+        self.cell_to_wid[row, col] = wid
+        self.path_to_wid[wid.src] = wid
+        self.ordered_widgets.append(wid)
+
+    def open_in_view(self, wid: Thumbnail | SmallThumbnail):
+        wid = self.path_to_wid.get(wid.src)
+
+        if isinstance(wid, (Thumbnail, SmallThumbnail)):
+            from ..win_image_view import WinImageView
+            self.win_image_view = WinImageView(parent=self, img_src=wid.src)
+            self.win_image_view.show()
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        wid: Thumbnail
+
+        if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
+            wid = self.cell_to_wid.get(self.curr_cell)
+            # wid.show_info_win()
+            print("show info win")
+
+        elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
+            wid = self.cell_to_wid.get(self.curr_cell)
+            if wid:
+                self.open_in_view(wid)
+
+        elif a0.key() == Qt.Key.Key_Left:
+            coords = (self.curr_cell[0], self.curr_cell[1] - 1)
+            self.select_new_widget(coords)
+
+        elif a0.key() == Qt.Key.Key_Right:
+            coords = (self.curr_cell[0], self.curr_cell[1] + 1)
+            self.select_new_widget(coords)
+
+        elif a0.key() == Qt.Key.Key_Up:
+            coords = (self.curr_cell[0] - 1, self.curr_cell[1])
+            self.select_new_widget(coords)
+
+        elif a0.key() == Qt.Key.Key_Down:
+            coords = (self.curr_cell[0] + 1, self.curr_cell[1])
+            self.select_new_widget(coords)
+        
+        return super().keyPressEvent(a0)
+
+    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+        wid = self.cell_to_wid.get(self.curr_cell)
+        if isinstance(wid, (Thumbnail | SmallThumbnail)):
+            wid.regular_style()
+        self.setFocus()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.up_btn.setVisible(False)

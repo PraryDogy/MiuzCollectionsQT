@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QEvent, QMimeData, Qt, QUrl
+from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem
 
@@ -40,19 +40,22 @@ class NameLabel(QLabel):
 
 
 class Thumbnail(QFrame):
-    def __init__(self, byte_array: bytearray, img_src: str, coll: str, images_date: str):
+    select = pyqtSignal(str)
+    open_in_view = pyqtSignal(str)
+
+    def __init__(self, byte_array: bytearray, src: str, coll: str, images_date: str):
         super().__init__()
 
         self.v_layout = LayoutV()
         self.v_layout.setContentsMargins(0, 2, 0, 0)
         self.setLayout(self.v_layout)
 
-        self.img_src = img_src
+        self.src = src
         self.coll = coll
         self.images_date = images_date
-        self.img_name = os.path.basename(img_src)
+        self.img_name = os.path.basename(src)
 
-        cnf.images[img_src] = {
+        cnf.images[src] = {
             "widget": self,
             "collection": coll,
             "filename": self.img_name
@@ -84,23 +87,16 @@ class Thumbnail(QFrame):
             )
     
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
-        self.win_image_view = WinImageView(parent=self, img_src=self.img_src)
-        self.win_image_view.show()
+        self.open_in_view.emit(self.src)
         return super().mouseDoubleClickEvent(a0)
-    
+
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        self.select.emit(self.src)
+        return super().mouseReleaseEvent(ev)
+
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
-            try:
-                cnf.selected_thumbnail.regular_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
-            try:
-                cnf.selected_thumbnail = self
-                self.selected_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
+            self.select.emit(self.src)
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
 
@@ -117,43 +113,24 @@ class Thumbnail(QFrame):
         self.mime_data = QMimeData()
         self.drag.setPixmap(self.img_label.pixmap())
         
-        url = [QUrl.fromLocalFile(self.img_src)]
+        url = [QUrl.fromLocalFile(self.src)]
         self.mime_data.setUrls(url)
 
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.DropAction.CopyAction)
 
-        self.regular_style()
-
         return super().mouseMoveEvent(a0)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.image_context = ImageContext(img_src=self.img_src, event=ev, parent=self)
-            self.image_context.closed.connect(self.closed_context)
+            self.image_context = ImageContext(img_src=self.src, event=ev, parent=self)
             self.image_context.add_preview_item()
             if cnf.curr_coll == cnf.ALL_COLLS:
                 self.image_context.add_show_coll_item(collection=self.coll)
 
-            try:
-                cnf.selected_thumbnail.regular_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
-            try:
-                cnf.selected_thumbnail = self
-                self.selected_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
+            self.select.emit(self.src)
             self.image_context.show_menu()
             return super().contextMenuEvent(ev)
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-    def closed_context(self):
-        try:
-            self.regular_style()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 
@@ -169,17 +146,20 @@ class Thumbnail(QFrame):
 
 
 class SmallThumbnail(QLabel):
-    def __init__(self, byte_array: bytearray, img_src: str, coll: str, images_date: str):
+    select = pyqtSignal(str)
+    open_in_view = pyqtSignal(str)
+
+    def __init__(self, byte_array: bytearray, src: str, coll: str, images_date: str):
         super().__init__()
         # 0 2 0 0
         self.setContentsMargins(8, 9, 8, 8)
 
-        self.img_src = img_src
+        self.src = src
         self.coll = coll
         self.images_date = images_date
-        self.img_name = os.path.basename(img_src)
+        self.img_name = os.path.basename(src)
 
-        cnf.images[img_src] = {
+        cnf.images[src] = {
             "widget": self,
             "collection": coll,
             "filename": self.img_name
@@ -199,26 +179,18 @@ class SmallThumbnail(QLabel):
             f"{cnf.lng.file_name}: {self.img_name}\n"
             f"{self.images_date}"
             )
-        
+
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
-        self.win_image_view = WinImageView(parent=self, img_src=self.img_src)
-        self.win_image_view.show()
+        self.open_in_view.emit(self.src)
         return super().mouseDoubleClickEvent(a0)
+
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        self.select.emit(self.src)
+        return super().mouseReleaseEvent(ev)
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
-
-            try:
-                cnf.selected_thumbnail.regular_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
-            try:
-                cnf.selected_thumbnail = self
-                self.selected_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
+            self.select.emit(self.src)
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
 
@@ -235,43 +207,24 @@ class SmallThumbnail(QLabel):
         self.mime_data = QMimeData()
         self.drag.setPixmap(self.pixmap())
         
-        url = [QUrl.fromLocalFile(self.img_src)]
+        url = [QUrl.fromLocalFile(self.src)]
         self.mime_data.setUrls(url)
 
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.DropAction.CopyAction)
 
-        self.regular_style()
-
         return super().mouseMoveEvent(a0)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.image_context = ImageContext(img_src=self.img_src, event=ev, parent=self)
-            self.image_context.closed.connect(self.closed_context)
+            self.image_context = ImageContext(img_src=self.src, event=ev, parent=self)
             self.image_context.add_preview_item()
             if cnf.curr_coll == cnf.ALL_COLLS:
                 self.image_context.add_show_coll_item(collection=self.coll)
 
-            try:
-                cnf.selected_thumbnail.regular_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
-            try:
-                cnf.selected_thumbnail = self
-                self.selected_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
+            self.select.emit(self.src)
             self.image_context.show_menu()
             return super().contextMenuEvent(ev)
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-    def closed_context(self):
-        try:
-            self.regular_style()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 
