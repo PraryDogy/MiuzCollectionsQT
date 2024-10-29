@@ -138,7 +138,7 @@ class Thumbnails(QScrollArea):
                 images_date=images_date
                 )
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
-            wid.open_in_view.connect(lambda w=wid: self.open_in_view(w))
+            wid.open_in_view.connect(lambda src, w=wid: self.open_in_view(w))
 
             self.add_widget_data(wid, self.all_grids_row, col)
             grid_layout.addWidget(wid, row, col)
