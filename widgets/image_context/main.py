@@ -2,6 +2,7 @@ import os
 from functools import partial
 
 from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
+from PyQt5.QtCore import pyqtSignal
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
@@ -70,19 +71,6 @@ class ImageContext(ContextMenuBase):
         save_layers.triggered.connect(lambda: self.save_tiffs(img_src))
         save_menu.addAction(save_layers)
 
-    def select_thumbnail(self, img_src: str):
-        if not cnf.image_viewer:
-            try:
-                cnf.selected_thumbnail.regular_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
-            try:
-                cnf.selected_thumbnail = cnf.images[img_src]["widget"]
-                cnf.selected_thumbnail.selected_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-
     def add_preview_item(self):
         open_action = QAction(cnf.lng.view, self)
         open_action.triggered.connect(
@@ -99,7 +87,6 @@ class ImageContext(ContextMenuBase):
 
     def show_info_win(self, img_src: str):
         if MainUtils.smb_check():
-            self.select_thumbnail(img_src=img_src)
             self.win_info = WinInfo(img_src=img_src, parent=self.my_parent)
             self.win_info.show()
         else:
@@ -107,9 +94,6 @@ class ImageContext(ContextMenuBase):
             self.smb_win.show()
         
     def show_image_viewer(self, img_src: str):
-        self.select_thumbnail(img_src=img_src)
-
-        # prevent circular import
         from ..win_image_view import WinImageView
         self.win_img = WinImageView(parent=self.my_parent, img_src=img_src)
         self.win_img.show()
@@ -216,6 +200,3 @@ class ImageContext(ContextMenuBase):
         gui_signals_app.scroll_top.emit()
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
-
-        # self.select_thumbnail(img_src=self.img_src)
-        # gui_signals_app.move_to_wid.emit(cnf.selected_thumbnail)

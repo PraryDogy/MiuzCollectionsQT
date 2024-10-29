@@ -171,9 +171,4 @@ class WinInfo(WinStandartBase):
         return super().keyPressEvent(a0)
   
     def my_close(self, event):
-        if not cnf.image_viewer:
-            try:
-                cnf.selected_thumbnail.regular_style()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
         self.close()

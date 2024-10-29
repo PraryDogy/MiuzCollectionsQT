@@ -29,6 +29,7 @@ class GuiSignals(QObject):
     noti_img_view = pyqtSignal(str)
 
     move_to_wid = pyqtSignal(QObject)
+    select_new_wid = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()

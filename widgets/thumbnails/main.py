@@ -57,6 +57,7 @@ class Thumbnails(QScrollArea):
         gui_signals_app.reload_thumbnails.connect(self.reload_thumbnails)
         gui_signals_app.scroll_top.connect(self.scroll_top)
         gui_signals_app.move_to_wid.connect(self.move_to_wid)
+        gui_signals_app.select_new_wid.connect(self.select_new_widget)
 
     def checkScrollValue(self, value):
         self.up_btn.move(
@@ -201,7 +202,6 @@ class Thumbnails(QScrollArea):
         if isinstance(wid, (Thumbnail, SmallThumbnail)):
             from ..win_image_view import WinImageView
             self.win_image_view = WinImageView(parent=self, img_src=wid.src)
-            self.win_image_view.select_new_widget.connect(self.select_new_widget)
             self.win_image_view.show()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
