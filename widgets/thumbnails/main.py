@@ -106,6 +106,8 @@ class Thumbnails(QScrollArea):
         self.up_btn.setVisible(False)
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
+        self.scroll_area_widget.setFocus()
+
     def reload_thumbnails(self):
         MainUtils.clear_layout(self.thumbnails_layout)
         self.up_btn.deleteLater()
@@ -150,7 +152,6 @@ class Thumbnails(QScrollArea):
         self.all_grids_row += 1
 
         self.thumbnails_layout.addLayout(grid_layout)
-        self.scroll_area_widget.setFocus()
 
     def select_new_widget(self, data: tuple | str | Thumbnail | SmallThumbnail):
         if isinstance(data, (Thumbnail, SmallThumbnail)):
@@ -167,20 +168,17 @@ class Thumbnails(QScrollArea):
 
         prev_wid = self.cell_to_wid.get(self.curr_cell)
 
-        print(coords)
-
         if isinstance(new_wid, (Thumbnail, SmallThumbnail)):
             prev_wid.regular_style()
             new_wid.selected_style()
             self.curr_cell = coords
             self.ensureWidgetVisible(new_wid)
+
         else:
             try:
                 prev_wid.selected_style()
             except AttributeError:
                 pass
-
-        self.setFocus()
 
     def reset_selection(self):
         widget = self.cell_to_wid.get(self.curr_cell)
@@ -233,12 +231,6 @@ class Thumbnails(QScrollArea):
             self.select_new_widget(coords)
         
         return super().keyPressEvent(a0)
-
-    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        wid = self.cell_to_wid.get(self.curr_cell)
-        if isinstance(wid, (Thumbnail | SmallThumbnail)):
-            wid.regular_style()
-        self.setFocus()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.up_btn.setVisible(False)

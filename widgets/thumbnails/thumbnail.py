@@ -45,6 +45,7 @@ class Thumbnail(QFrame):
 
     def __init__(self, byte_array: bytearray, src: str, coll: str, images_date: str):
         super().__init__()
+        self.row, self.col = 0, 0
 
         self.v_layout = LayoutV()
         self.v_layout.setContentsMargins(0, 2, 0, 0)
@@ -87,6 +88,7 @@ class Thumbnail(QFrame):
             )
     
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
+        self.select.emit(self.src)
         self.open_in_view.emit(self.src)
         return super().mouseDoubleClickEvent(a0)
 
@@ -96,7 +98,6 @@ class Thumbnail(QFrame):
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.select.emit(self.src)
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
 
@@ -109,6 +110,7 @@ class Thumbnail(QFrame):
         if distance < QApplication.startDragDistance():
             return
 
+        self.select.emit(self.src)
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
         self.drag.setPixmap(self.img_label.pixmap())
@@ -151,7 +153,7 @@ class SmallThumbnail(QLabel):
 
     def __init__(self, byte_array: bytearray, src: str, coll: str, images_date: str):
         super().__init__()
-        # 0 2 0 0
+        self.row, self.col = 0, 0
         self.setContentsMargins(8, 9, 8, 8)
 
         self.src = src
@@ -180,17 +182,16 @@ class SmallThumbnail(QLabel):
             f"{self.images_date}"
             )
 
-    def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
-        self.open_in_view.emit(self.src)
-        return super().mouseDoubleClickEvent(a0)
-
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         self.select.emit(self.src)
         return super().mouseReleaseEvent(ev)
 
+    def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
+        self.open_in_view.emit(self.src)
+        return super().mouseDoubleClickEvent(a0)
+
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.select.emit(self.src)
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
 
@@ -203,6 +204,7 @@ class SmallThumbnail(QLabel):
         if distance < QApplication.startDragDistance():
             return
 
+        self.select.emit(self.src)
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
         self.drag.setPixmap(self.pixmap())
