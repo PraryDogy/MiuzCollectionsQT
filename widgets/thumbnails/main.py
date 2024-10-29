@@ -1,7 +1,7 @@
 from math import ceil
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMouseEvent, QResizeEvent, QKeyEvent
+from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
@@ -10,10 +10,12 @@ from signals import gui_signals_app
 from styles import Names, Themes
 from utils import MainUtils
 
+from ..win_info import WinInfo
+from ..win_smb import WinSmb
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
-from .limit_btn import LimitBtn
 from .images_dict_db import ImagesDictDb
-from .thumbnail import Thumbnail, SmallThumbnail
+from .limit_btn import LimitBtn
+from .thumbnail import SmallThumbnail, Thumbnail
 from .title import Title
 from .up_btn import UpBtn
 
@@ -207,8 +209,13 @@ class Thumbnails(QScrollArea):
 
         if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
             wid = self.cell_to_wid.get(self.curr_cell)
-            # wid.show_info_win()
-            print("show info win")
+
+            if MainUtils.smb_check():
+                self.win_info = WinInfo(img_src=wid.src, parent=self)
+                self.win_info.show()
+            else:
+                self.smb_win = WinSmb(parent=self.my_parent)
+                self.smb_win.show()
 
         elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             wid = self.cell_to_wid.get(self.curr_cell)

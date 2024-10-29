@@ -10,7 +10,6 @@ from styles import Names, Themes
 from utils import MainUtils, PixmapFromBytes
 
 from ..image_context import ImageContext
-from ..win_image_view import WinImageView
 
 
 class NameLabel(QLabel):
