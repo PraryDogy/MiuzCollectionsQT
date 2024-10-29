@@ -127,8 +127,10 @@ class Thumbnails(QScrollArea):
         title_label.setContentsMargins(9, 0, 0, 0)
         self.thumbnails_layout.addWidget(title_label)
 
+        grid_widget = QWidget()
         grid_layout = QGridLayout()
-        grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        grid_widget.setLayout(grid_layout)
+        grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         grid_layout.setContentsMargins(0, 0, 0, 30)
 
         row, col = 0, 0
@@ -154,7 +156,7 @@ class Thumbnails(QScrollArea):
 
         self.all_grids_row += 1
 
-        self.thumbnails_layout.addLayout(grid_layout)
+        self.thumbnails_layout.addWidget(grid_widget)
 
     def select_new_widget(self, data: tuple | str | Thumbnail | SmallThumbnail):
         if isinstance(data, (Thumbnail, SmallThumbnail)):
