@@ -163,7 +163,7 @@ class WinInfo(WinStandartBase):
 
         btns_wid = QWidget()
         btn_layout = LayoutH()
-        btns_wid.setLayout(btns_wid)
+        btns_wid.setLayout(btn_layout)
         self.content_layout.addWidget(btns_wid)
         button = Btn(cnf.lng.close)
         button.mouseReleaseEvent = self.my_close
