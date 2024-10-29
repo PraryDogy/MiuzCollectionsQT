@@ -1,4 +1,6 @@
 import os
+import shutil
+import subprocess
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
@@ -8,10 +10,12 @@ from PyQt5.QtWidgets import (QFileDialog, QLabel, QSpacerItem, QTextEdit,
 from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
 from cfg import cnf
+from database import Dbase
 from signals import gui_signals_app, utils_signals_app
-from utils import Updater, MainUtils
+from utils import MainUtils, Updater
+
 from ..win_smb import WinSmb
-import subprocess
+
 
 class BrowseColl(QWidget):
     def __init__(self):
@@ -304,6 +308,7 @@ class WinSettings(WinStandartBase):
         self.restore_db.setFixedWidth(150)
         self.content_layout.addWidget(self.restore_db)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        self.restore_db.mouseReleaseEvent = self.restore_db_cmd
 
         self.cust_filters = CustFilters()
         self.content_layout.addWidget(self.cust_filters)
@@ -316,7 +321,6 @@ class WinSettings(WinStandartBase):
         self.stopcolls = StopColls()
         self.content_layout.addWidget(self.stopcolls)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
-
 
         coll_folder_list_label = QLabel(text=cnf.lng.where_to_look_coll_folder)
         self.content_layout.addWidget(coll_folder_list_label)
@@ -347,6 +351,17 @@ class WinSettings(WinStandartBase):
 
         btns_layout.addStretch(1)
 
+    def restore_db_cmd(self, e):
+        if os.path.exists(cnf.db_file):
+            os.remove(cnf.db_file)
+        shutil.copyfile(src="db.db", dst=cnf.db_file)
+
+        self.restore_db.setDisabled(True)
+        setattr(self, "restore_flag", True)
+
+        Dbase.clear_all_engines()
+        gui_signals_app.reload_thumbnails.emit()
+
     def reload_ui(self):
         MainUtils.clear_layout(self.content_layout)
         self.init_ui()
@@ -360,9 +375,8 @@ class WinSettings(WinStandartBase):
         coll_folder_list = self.coll_folder_list_input.get_text()
         cnf.coll_folder_list = coll_folder_list
 
-        # if self.stopwords.get_stopwords() != cnf.stop_words:
-        #     cnf.stop_words = self.stopwords.get_stopwords()
-        #     scan_again = True
+        # if hasattr(self, "restore_flag"):
+            # scan_again = True
 
         if self.stopcolls.get_stopcolls() != cnf.stop_colls:
             cnf.stop_colls = self.stopcolls.get_stopcolls()

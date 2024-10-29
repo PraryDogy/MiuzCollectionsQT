@@ -8,7 +8,7 @@ from cfg import cnf
 
 
 class Dbase:
-    engines_dict = {}
+    engines_dict: dict[str, sqlalchemy.Engine] = {}
     base = declarative_base()
 
     @staticmethod
@@ -51,6 +51,11 @@ class Dbase:
         finally:
             session.close()
 
+    @staticmethod
+    def clear_all_engines():
+        Dbase.engines_dict.clear()
+        # for thread, engine in Dbase.engines_dict.items():
+            # engine: sqlalchemy.Engine = engine
 
 class ThumbsMd(Dbase.base):
     __tablename__ = "thumbs"
