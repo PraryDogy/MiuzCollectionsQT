@@ -31,14 +31,17 @@ class BaseLeftMenu(QScrollArea):
         gui_signals_app.reload_menu.connect(self.reload_menu)
 
     def init_ui(self):
+        btns_widget = QWidget()
         main_btns_layout = LayoutV()
+        btns_widget.setLayout(main_btns_layout)
+
         main_btns_layout.setContentsMargins(0, 5, 0, 15)
 
         label = CollectionBtn(parent=self, fake_name=cnf.lng.all_colls,
                               true_name=cnf.ALL_COLLS)
         main_btns_layout.addWidget(label)
 
-        self.v_layout.addLayout(main_btns_layout)
+        self.v_layout.addWidget(btns_widget)
 
         if cnf.small_menu_view:
             for letter, collections in self.load_colls_query().items():
