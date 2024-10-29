@@ -199,6 +199,7 @@ class Thumbnails(QScrollArea):
         if isinstance(wid, (Thumbnail, SmallThumbnail)):
             from ..win_image_view import WinImageView
             self.win_image_view = WinImageView(parent=self, img_src=wid.src)
+            self.win_image_view.select_new_widget.connect(self.select_new_widget)
             self.win_image_view.show()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

@@ -206,6 +206,8 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinImgViewBase):
+    select_new_widget = pyqtSignal(str)
+
     def __init__(self, parent: QWidget, img_src: str):
 
         try:
@@ -329,6 +331,7 @@ class WinImageView(WinImgViewBase):
         total_images = len(cnf.images)
         new_index = (current_index + offset) % total_images
         self.img_src = keys[new_index]
+        self.select_new_widget.emit(self.img_src)
         self.load_thumbnail()
 
     def cut_text(self, text: str) -> str:
