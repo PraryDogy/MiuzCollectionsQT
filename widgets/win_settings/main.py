@@ -274,7 +274,7 @@ class WinSettings(WinStandartBase):
         self.set_title(cnf.lng.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 510)
+        self.setFixedSize(420, 550)
         self.center_win(parent)
         self.setFocus()
 
@@ -299,6 +299,11 @@ class WinSettings(WinStandartBase):
 
         show_files = ShowFiles()
         h_layout.addWidget(show_files)
+
+        self.restore_db = Btn(cnf.lng.restore_db)
+        self.restore_db.setFixedWidth(150)
+        self.content_layout.addWidget(self.restore_db)
+        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.cust_filters = CustFilters()
         self.content_layout.addWidget(self.cust_filters)

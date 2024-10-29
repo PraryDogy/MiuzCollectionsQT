@@ -53,6 +53,7 @@ class Eng:
 		self.reset_dates = 'Dates reset'
 		self.reset_search = 'Reset search'
 		self.resolution = 'Resolution'
+		self.restore_db = 'Restore DB'
 		self.reveal = 'Reveal'
 		self.reveal_in_finder = 'Reveal in Finder'
 		self.save_group_downloads = 'Save group of photos to Downloads'

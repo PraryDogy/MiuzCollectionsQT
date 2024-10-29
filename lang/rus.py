@@ -53,6 +53,7 @@ class Rus:
 		self.reset_dates = 'Сбросить даты'
 		self.reset_search = 'Очистить поиск'
 		self.resolution = 'Разрешение'
+		self.restore_db = 'Восстановить БД'
 		self.reveal = 'Показать'
 		self.reveal_in_finder = 'Показать в Finder'
 		self.save_group_downloads = 'Сохранить группу фото в загрузки'

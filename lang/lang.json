@@ -400,5 +400,9 @@
     "with_name": [
         "с именем",
         "with name"
+    ],
+    "restore_db": [
+        "Восстановить БД",
+        "Restore DB"
     ]
 }
