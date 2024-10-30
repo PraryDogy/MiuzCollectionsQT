@@ -10,7 +10,7 @@ from cfg import IMG_EXT, cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
 
-from ..image_utils import ResizeImg, ImageUtils
+from ..image_utils import ImageUtils
 from ..main_utils import MainUtils
 
 
