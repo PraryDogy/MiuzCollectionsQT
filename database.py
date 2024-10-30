@@ -1,61 +1,30 @@
-import threading
-
 import sqlalchemy
-from sqlalchemy.orm import (Session, declarative_base, scoped_session,
-                            sessionmaker)
+from sqlalchemy.orm import declarative_base
 
 from cfg import cnf
 
 
 class Dbase:
-    engines_dict: dict[str, sqlalchemy.Engine] = {}
     base = declarative_base()
+    engine: sqlalchemy.Engine = None
 
-    @staticmethod
-    def create_engine() -> sqlalchemy.Engine:
-        print("create engine", threading.currentThread())
-        return sqlalchemy.create_engine(
+    @classmethod
+    def create_engine(cls) -> sqlalchemy.Engine:
+        cls.engine = sqlalchemy.create_engine(
             "sqlite:////" + cnf.db_file,
             connect_args={"check_same_thread": False},
             echo=False
-        )
-
-    @staticmethod
-    def cleanup_engine() -> None:
-        current_thread_name = threading.current_thread().name
-
-        if current_thread_name in Dbase.engines_dict:
-            Dbase.engines_dict[current_thread_name].dispose()
-            del Dbase.engines_dict[current_thread_name]
-
-    @staticmethod
-    def get_engine() -> sqlalchemy.Engine:
-        current_thread_name = threading.current_thread().name
-
-        if current_thread_name not in Dbase.engines_dict:
-            Dbase.engines_dict[current_thread_name] = Dbase.create_engine()
-
-        return Dbase.engines_dict[current_thread_name]
-
-    @staticmethod
-    def get_session() -> Session:
-        Session = sessionmaker(bind=Dbase.get_engine())
-        return scoped_session(Session)
-
-    @staticmethod
-    def vacuum():
-        session = Dbase.get_session()
+            )
+        
+    @classmethod
+    def vacuum(cls):
+        conn = cls.engine.connect()
         try:
-            session.execute(sqlalchemy.text("VACUUM"))
-            session.commit()
+            conn.execute(sqlalchemy.text("VACUUM"))
+            conn.commit()
         finally:
-            session.close()
+            conn.close()
 
-    @staticmethod
-    def clear_all_engines():
-        Dbase.engines_dict.clear()
-        # for thread, engine in Dbase.engines_dict.items():
-            # engine: sqlalchemy.Engine = engine
 
 class ThumbsMd(Dbase.base):
     __tablename__ = "thumbs"

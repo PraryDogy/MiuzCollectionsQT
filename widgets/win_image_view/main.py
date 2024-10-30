@@ -271,11 +271,11 @@ class WinImageView(WinImgViewBase):
 
             q = (sqlalchemy.select(ThumbsMd.img150)
                 .filter(ThumbsMd.src == self.img_src))
-            session = Dbase.get_session()
+            conn = Dbase.engine.connect()
 
             try:
-                thumbnail = session.execute(q).first()[0]
-                session.close()
+                thumbnail = conn.execute(q).first()[0]
+                conn.close()
             except Exception as e:
                 MainUtils.print_err(parent=self, error=e)
                 return

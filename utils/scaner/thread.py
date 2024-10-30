@@ -19,11 +19,11 @@ class Shared:
 
 class Migrate:
     def __init__(self):
-        sess = Dbase.get_session()
+        conn = Dbase.engine.connect()
 
         try:
             q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
-            img_src, coll_name = sess.execute(q).first()
+            img_src, coll_name = conn.execute(q).first()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
             return
@@ -40,7 +40,7 @@ class Migrate:
                 
         try:
             q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-            res = sess.execute(q).fetchall()
+            res = conn.execute(q).fetchall()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
             return
@@ -60,14 +60,14 @@ class Migrate:
                 .values({"src": src})
                 .filter(ThumbsMd.id==res_id)
                 )
-            sess.execute(q)
+            conn.execute(q)
 
         try:
-            sess.commit()
+            conn.commit()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
 
-        sess.close()
+        conn.close()
         gui_signals_app.reload_menu.emit()
         gui_signals_app.reload_thumbnails.emit()
         utils_signals_app.migrate_finished.emit()
@@ -77,13 +77,13 @@ class TrashRemover:
     def __init__(self):
         coll_folder = os.sep + cnf.coll_folder.strip(os.sep) + os.sep
 
-        session = Dbase.get_session()
+        conn = Dbase.engine.connect()
 
         q = (sqlalchemy.select(ThumbsMd.src)
             .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
 
         try:
-            trash_img = session.execute(q).first()
+            trash_img = conn.execute(q).first()
         
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
@@ -95,19 +95,19 @@ class TrashRemover:
                 .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
 
             try:
-                session.execute(q)
-                session.commit()
+                conn.execute(q)
+                conn.commit()
             except Exception as e:
                 MainUtils.print_err(parent=self, error=e)
                 return
             finally:
-                session.close()
+                conn.close()
 
 
 class DubFinder:
     def __init__(self):
         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-        conn = Dbase.get_session()
+        conn = Dbase.engine.connect()
         res = conn.execute(q).fetchall()
 
         dubs = defaultdict(list)
@@ -200,11 +200,11 @@ class DbImages(dict):
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
                               ThumbsMd.modified)
 
-        session = Dbase.get_session()
+        conn = Dbase.engine.connect()
         try:
-            res = session.execute(q).fetchall()
+            res = conn.execute(q).fetchall()
         finally:
-            session.close()
+            conn.close()
 
         self.update({i[0]: i[1:] for i in res})
 
@@ -255,7 +255,7 @@ class UpdateDb:
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
-        self.sess = Dbase.get_session()
+        self.conn = Dbase.engine.connect()
 
         if images["insert"]:
             self.insert_db(images["insert"])
@@ -268,7 +268,7 @@ class UpdateDb:
         if images["update"]:
             self.update_db(images["update"])
 
-        self.sess.close()
+        self.conn.close()
 
     def insert_db(self, images: dict):
         counter = 0
@@ -304,14 +304,14 @@ class UpdateDb:
                     }
 
             stmt =  sqlalchemy.insert(ThumbsMd).values(values)
-            self.sess.execute(stmt)
+            self.conn.execute(stmt)
 
             counter += 1
 
             if counter == 10:
                 counter = 0
-                self.sess.commit()
-                self.sess = Dbase.get_session()
+                self.conn.commit()
+                self.conn = Dbase.engine.connect()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
 
@@ -347,14 +347,14 @@ class UpdateDb:
                     }
 
             stmt =  sqlalchemy.update(ThumbsMd).values(values).where(ThumbsMd.src==src)
-            self.sess.execute(stmt)
+            self.conn.execute(stmt)
 
             counter += 1
 
             if counter == 10:
                 counter = 0
-                self.sess.commit()
-                self.sess = Dbase.get_session()
+                self.conn.commit()
+                self.conn = Dbase.engine.connect()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
 
@@ -369,14 +369,14 @@ class UpdateDb:
                 return
 
             stmt =  sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
-            self.sess.execute(stmt)
+            self.conn.execute(stmt)
 
             counter += 1
 
             if counter == 10:
                 counter = 0
-                self.sess.commit()
-                self.sess = Dbase.get_session()
+                self.conn.commit()
+                self.conn = Dbase.engine.connect()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
 
@@ -408,7 +408,6 @@ class Scaner(object):
             self.dub_finder = DubFinder()
 
             Dbase.vacuum()
-            Dbase.cleanup_engine()
 
             Shared.flag = True
 

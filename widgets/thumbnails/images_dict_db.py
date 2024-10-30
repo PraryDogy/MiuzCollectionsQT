@@ -21,11 +21,11 @@ class ImagesDictDb(dict):
     def thumbsdict_create(self):
         q = self.create_query()
 
-        session = Dbase.get_session()
+        conn = Dbase.engine.connect()
         try:
-            data = session.execute(q).fetchall()
+            data = conn.execute(q).fetchall()
         finally:
-            session.close()
+            conn.close()
 
         thumbs_dict = defaultdict(list)
 

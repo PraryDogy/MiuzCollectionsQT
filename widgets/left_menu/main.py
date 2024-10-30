@@ -72,11 +72,11 @@ class BaseLeftMenu(QScrollArea):
         menus = defaultdict(list)
         
         q = sqlalchemy.select(ThumbsMd.collection).distinct()
-        session = Dbase.get_session()
+        conn = Dbase.engine.connect()
         try:
-            res = (i[0] for i in session.execute(q).fetchall() if i)
+            res = (i[0] for i in conn.execute(q).fetchall() if i)
         finally:
-            session.close()
+            conn.close()
 
         for true_name in res:
             fake_name = true_name.lstrip("0123456789").strip()
