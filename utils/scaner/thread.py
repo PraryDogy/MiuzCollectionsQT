@@ -277,7 +277,7 @@ class UpdateDb:
 
             try:
                 array_img = ImageUtils.read_image(src)
-                array_img = FitImg.start(array_img, cnf.THUMBSIZE)
+                array_img = FitImg.fit_in_square(array_img, cnf.THUMBSIZE)
 
                 if array_img is None:
                     print("scaner > thread > UpdateDb > create_values > array img is None, continue")
