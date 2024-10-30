@@ -167,7 +167,7 @@ class ImageUtils:
             return None
 
     @classmethod
-    def image_array_to_bytes(cls, image: np.ndarray, quality: int = 90) -> bytes | None:
+    def image_array_to_bytes(cls, image: np.ndarray, quality: int = 80) -> bytes | None:
         if isinstance(image, np.ndarray):
             img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             res, buffer = cv2.imencode(".jpeg", img, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
