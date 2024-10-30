@@ -283,8 +283,7 @@ class UpdateDb:
 
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
-            array_img = ResizeImg.crop_to_square(array_img)
-            array_img = ResizeImg.resize_aspect_ratio(array_img, cnf.THUMBSIZE)
+            array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
             values = {
@@ -319,8 +318,7 @@ class UpdateDb:
 
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
-            array_img = ResizeImg.crop_to_square(array_img)
-            array_img = ResizeImg.resize_aspect_ratio(array_img, cnf.THUMBSIZE)
+            array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
             values = {

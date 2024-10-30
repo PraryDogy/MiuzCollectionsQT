@@ -1,9 +1,7 @@
 import io
 import logging
 import os
-import subprocess
 import traceback
-from random import randint
 
 import cv2
 import numpy as np
@@ -15,57 +13,10 @@ from tifffile import tifffile
 from cfg import cnf
 from database import *
 
-from .main_utils import MainUtils
-
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
 psd_logger.setLevel(logging.CRITICAL)
 
-
-class ResizeImg:    
-    @classmethod
-    def resize_aspect_ratio(cls, image: np.ndarray, size: int) -> np.ndarray | None:
-        if isinstance(image, np.ndarray):
-
-            try:
-                h, w = image.shape[:2]
-                if w > h:  # Горизонтальное изображение
-                    new_w = size
-                    new_h = int(h * (size / w))
-                elif h > w:  # Вертикальное изображение
-                    new_h = size
-                    new_w = int(w * (size / h))
-                else:  # Квадратное изображение
-                    new_w, new_h = size, size
-                return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
-            except Exception as e:
-                print("fit img error: ", e)
-                return None
-
-        else:
-            return None
-
-    # @classmethod
-    # def crop_to_square(cls, image: np.ndarray, size: int) -> np.ndarray | None:
-    #     if isinstance(image, np.array):
-    #         height, width = image.shape[:2]
-    #         min_side = min(height, width)
-    #         scale_factor = cnf.THUMBSIZE / min_side
-    #         new_height = int(height * scale_factor)
-    #         new_width = int(width * scale_factor)
-    #         return cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
-    #     return None
-
-    @classmethod
-    def crop_to_square(cls, image: np.ndarray) -> np.ndarray | None:
-        if isinstance(image, np.ndarray):
-            height, width = image.shape[:2]
-            min_dim = min(height, width)
-            start_x = (width - min_dim) // 2
-            start_y = (height - min_dim) // 2
-            return image[start_y:start_y + min_dim, start_x:start_x + min_dim]
-        else:
-            return None
 
 class ImageUtils:
     @classmethod
@@ -186,6 +137,44 @@ class ImageUtils:
             aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
             transformMode=Qt.TransformationMode.SmoothTransformation
             )
+
+    @classmethod
+    def resize_min_aspect_ratio(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+        if isinstance(image, np.ndarray):
+            try:
+                h, w = image.shape[:2]
+                # Вычисляем коэффициент масштабирования для того, чтобы минимальная сторона стала равной size
+                scale = size / min(h, w)
+                new_w, new_h = int(w * scale), int(h * scale)
+                return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+            except Exception as e:
+                print("fit img error:", e)
+                return None
+        else:
+            return None
+
+    @classmethod
+    def crop_to_square(cls, image: np.ndarray | QPixmap) -> np.ndarray | None:
+
+        if isinstance(image, np.ndarray):
+            height, width = image.shape[:2]
+            min_dim = min(height, width)
+            start_x = (width - min_dim) // 2
+            start_y = (height - min_dim) // 2
+            return image[start_y:start_y + min_dim, start_x:start_x + min_dim]
+
+        elif isinstance(image, QPixmap):
+            w = image.width()
+            h = image.height()
+
+            side = min(w, h)
+            x_offset = (w - side) // 2
+            y_offset = (h - side) // 2
+            
+            return image.copy(x_offset, y_offset, side, side)
+
+        else:
+            return None
 
     @classmethod
     def print_error(cls, parent: object, error: Exception):
