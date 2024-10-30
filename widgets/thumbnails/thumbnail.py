@@ -67,8 +67,8 @@ class BaseThumb(QFrame):
         self.v_layout.addSpacerItem(QSpacerItem(0, 7))
 
         self.img_label = QLabel()
-        # byte_array = ImageUtils.crop_to_square(byte_array)
         pixmap = ImageUtils.pixmap_from_bytes(byte_array)
+        pixmap = ImageUtils.crop_to_square(pixmap)
         self.img_label.setPixmap(pixmap)
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
