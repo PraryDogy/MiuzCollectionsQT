@@ -1,11 +1,12 @@
 import os
 import shutil
 import subprocess
+import sys
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QProcess, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import (QFileDialog, QLabel, QSpacerItem, QTextEdit,
-                             QWidget)
+from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
+                             QTextEdit, QWidget)
 
 from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
@@ -304,11 +305,11 @@ class WinSettings(WinStandartBase):
         show_files = ShowFiles()
         h_layout.addWidget(show_files)
 
-        self.restore_db = Btn(cnf.lng.restore_db)
-        self.restore_db.setFixedWidth(150)
-        self.content_layout.addWidget(self.restore_db)
+        self.restore_db_btn = Btn(cnf.lng.restore_db)
+        self.restore_db_btn.setFixedWidth(150)
+        self.content_layout.addWidget(self.restore_db_btn)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
-        self.restore_db.mouseReleaseEvent = self.restore_db_cmd
+        self.restore_db_btn.mouseReleaseEvent = self.restore_db_cmd
 
         self.cust_filters = CustFilters()
         self.content_layout.addWidget(self.cust_filters)
@@ -352,15 +353,9 @@ class WinSettings(WinStandartBase):
         btns_layout.addStretch(1)
 
     def restore_db_cmd(self, e):
-        if os.path.exists(cnf.db_file):
-            os.remove(cnf.db_file)
-        shutil.copyfile(src="db.db", dst=cnf.db_file)
-
-        self.restore_db.setDisabled(True)
         setattr(self, "restore_flag", True)
-
-        Dbase.clear_all_engines()
-        gui_signals_app.reload_thumbnails.emit()
+        self.restore_db_btn.setText(cnf.lng.press_ok)
+        self.restore_db_btn.setDisabled(True)
 
     def reload_ui(self):
         MainUtils.clear_layout(self.content_layout)
@@ -375,7 +370,17 @@ class WinSettings(WinStandartBase):
         coll_folder_list = self.coll_folder_list_input.get_text()
         cnf.coll_folder_list = coll_folder_list
 
-        # if hasattr(self, "restore_flag"):
+        if hasattr(self, "restore_flag"):
+            # Dbase.clear_all_engines()
+
+            QApplication.quit()
+            if os.path.exists(cnf.db_file):
+                os.remove(cnf.db_file)
+
+            shutil.copyfile(src="db.db", dst=cnf.db_file)
+            QProcess.startDetached(sys.executable, sys.argv)
+
+            # gui_signals_app.reload_thumbnails.emit()
             # scan_again = True
 
         if self.stopcolls.get_stopcolls() != cnf.stop_colls:

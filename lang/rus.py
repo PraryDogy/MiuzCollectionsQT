@@ -49,6 +49,7 @@ class Rus:
 		self.paste = 'Вставить'
 		self.photo = 'Фото'
 		self.photos_named_dates = 'Фото за даты'
+		self.press_ok = 'Нажмите ок'
 		self.reset = 'Сброс'
 		self.reset_dates = 'Сбросить даты'
 		self.reset_search = 'Очистить поиск'

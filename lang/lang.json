@@ -404,5 +404,9 @@
     "restore_db": [
         "Восстановить БД",
         "Restore DB"
+    ],
+    "press_ok": [
+        "Нажмите ок",
+        "Press ok"
     ]
 }

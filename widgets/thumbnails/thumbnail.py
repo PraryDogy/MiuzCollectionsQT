@@ -145,14 +145,20 @@ class Thumbnail(BaseThumb):
         self.v_layout.addWidget(self.title)
     
     def selected_style(self):
-        for i in (self, self.title):
-            i.setObjectName(Names.thumbnail_selected)
-            i.setStyleSheet(Themes.current)
+        try:
+            for i in (self, self.title):
+                i.setObjectName(Names.thumbnail_selected)
+                i.setStyleSheet(Themes.current)
+        except RuntimeError:
+            ...
 
     def regular_style(self):
-        for i in (self, self.title):
-            i.setObjectName(Names.thumbnail_normal)
-            i.setStyleSheet(Themes.current)
+        try:
+            for i in (self, self.title):
+                i.setObjectName(Names.thumbnail_normal)
+                i.setStyleSheet(Themes.current)
+        except RuntimeError:
+            ...
 
 
 class SmallThumbnail(BaseThumb):
@@ -165,9 +171,15 @@ class SmallThumbnail(BaseThumb):
         self.v_layout.setContentsMargins(0, 0, 0, 0)
 
     def selected_style(self):
-        self.setObjectName(Names.thumbnail_selected)
-        self.setStyleSheet(Themes.current)
+        try:
+            self.setObjectName(Names.thumbnail_selected)
+            self.setStyleSheet(Themes.current)
+        except RuntimeError:
+            ...
 
     def regular_style(self):
-        self.setObjectName(Names.thumbnail_normal)
-        self.setStyleSheet(Themes.current)
+        try:
+            self.setObjectName(Names.thumbnail_normal)
+            self.setStyleSheet(Themes.current)
+        except RuntimeError:
+            ...

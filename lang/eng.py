@@ -49,6 +49,7 @@ class Eng:
 		self.paste = 'Paste'
 		self.photo = 'Photo'
 		self.photos_named_dates = 'Photo from'
+		self.press_ok = 'Press ok'
 		self.reset = 'Reset'
 		self.reset_dates = 'Dates reset'
 		self.reset_search = 'Reset search'
