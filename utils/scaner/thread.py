@@ -294,10 +294,6 @@ class UpdateDb:
 
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
-            if bytes_img is None:
-                print("bytes img is none")
-                continue
-
             values = {
                     "img150": bytes_img,
                     "src": src,
@@ -334,16 +330,12 @@ class UpdateDb:
                 print("error read image")
                 continue
 
-            array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
+            array_img = ImageUtils.resize_min_aspect_ratio(array_img, cnf.THUMBSIZE)
 
             if src.endswith(PSD_TIFF):
                 array_img = ImageUtils.array_bgr_to_rgb(array_img)
 
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
-
-            if bytes_img is None:
-                print("bytes img is none")
-                continue
 
             values = {
                     "img150": bytes_img,
