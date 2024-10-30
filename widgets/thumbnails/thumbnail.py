@@ -1,13 +1,13 @@
 import os
 
 from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent
+from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem
 
 from base_widgets import LayoutV
 from cfg import cnf
 from styles import Names, Themes
-from utils import MainUtils, ImageUtils
+from utils import ImageUtils, MainUtils
 
 from ..image_context import ImageContext
 
@@ -69,7 +69,8 @@ class BaseThumb(QFrame):
         self.img_label = QLabel()
         pixmap = ImageUtils.pixmap_from_bytes(byte_array)
         pixmap = ImageUtils.crop_to_square(pixmap)
-        self.img_label.setPixmap(pixmap)
+        if isinstance(pixmap, QPixmap):
+            self.img_label.setPixmap(pixmap)
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setToolTip(
