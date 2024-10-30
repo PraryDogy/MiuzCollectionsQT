@@ -256,6 +256,8 @@ class UpdateDb:
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
+        self.sess = Dbase.get_session()
+
         if images["insert"]:
             self.insert_db(images["insert"])
 
@@ -266,6 +268,8 @@ class UpdateDb:
 
         if images["update"]:
             self.update_db(images["update"])
+
+        self.sess.close()
 
     def create_values(self, data: Dict[str, tuple]) -> List[Dict]:
         values = []
@@ -302,147 +306,94 @@ class UpdateDb:
         return values
 
     def insert_db(self, images: dict):
-        limit: int = 10
-        data_keys: list = list(images.keys())
+        counter = 0
 
-        chunks: List[Dict[str, tuple]]
-        chunks = [
-            {key: images[key] for key in data_keys[i:i + limit]}
-            for i in range(0, len(images), limit)
-            ]
+        for src, img_data in images.items():
 
-        for chunk in chunks:
-            chunk: Dict[str, tuple]
-            values: List[Dict] = self.create_values(chunk)
+            print("insert", os.path.basename(src))
 
             if not Shared.flag:
                 return
 
-            if not values:
-                return
+            size, created, modified = img_data
+            array_img = ImageUtils.read_image(src)
+            array_img = FitImg.fit_in_square(array_img, cnf.THUMBSIZE)
+            bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
-            queries = List[Query]
-            queries = [
-                sqlalchemy
-                    .insert(ThumbsMd)
-                    .values({
-                        "img150": i["img150"],
-                        "src": i["src"],
-                        "size": i["size"],
-                        "created": i["created"],
-                        "modified": i["modified"],
-                        "collection": i["collection"],
-                        })
-                for i in values
-                ]
+            values = {
+                    "img150": bytes_img,
+                    "src": src,
+                    "size": size,
+                    "created": created,
+                    "modified": modified,
+                    "collection": MainUtils.get_coll_name(src),
+                    }
 
-            try:
-                session = Dbase.get_session()
+            stmt =  sqlalchemy.insert(ThumbsMd).values(values)
+            self.sess.execute(stmt)
 
-                for query in  queries:
-                    session.execute(query)
+            counter += 1
 
-                session.commit()
-                session.close()
+            if counter == 10:
+                counter = 0
+                self.sess.commit()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
-
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-                session.rollback()
-
-            finally:
-                session.close()
 
     def update_db(self, images: dict):
-        limit: int = 10
-        data_keys: list = list(images.keys())
+        counter = 0
 
-        chunks: List[Dict[str, tuple]]
-        chunks = [
-            {key: images[key] for key in data_keys[i:i + limit]}
-            for i in range(0, len(images), limit)
-            ]
+        for src, img_data in images.items():
 
-        for chunk in chunks:
-            chunk: Dict[str, tuple]
-            values: List[Dict] = self.create_values(chunk)
+            print("update", os.path.basename(src))
 
             if not Shared.flag:
                 return
 
-            if not values:
-                return
+            size, created, modified = img_data
+            array_img = ImageUtils.read_image(src)
+            array_img = FitImg.fit_in_square(array_img, cnf.THUMBSIZE)
+            bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
-            queries = List[Query]
-            queries = [
-                sqlalchemy
-                    .update(ThumbsMd)
-                    .values({
-                        "img150": i["img150"],
-                        "size": i["size"],
-                        "created": i["created"],
-                        "modified": i["modified"]
-                        })
-                    .where(ThumbsMd.src==i["src"])
-                for i in values
-                ]
+            values = {
+                    "img150": bytes_img,
+                    "size": size,
+                    "created": created,
+                    "modified": modified,
+                    "collection": MainUtils.get_coll_name(src),
+                    }
 
-            try:
-                session = Dbase.get_session()
+            stmt =  sqlalchemy.update(ThumbsMd).values(values).where(ThumbsMd.src==src)
+            self.sess.execute(stmt)
 
-                for query in  queries:
-                    session.execute(query)
+            counter += 1
 
-                session.commit()
-                session.close()
+            if counter == 10:
+                counter = 0
+                self.sess.commit()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
-
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-                session.rollback()
-
-            finally:
-                session.close()
 
     def delete_db(self, images: dict):
-        queries = List[Query]
-        queries = [
-            sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==i)
-            for i in images.keys()
-            ]
+        counter = 0
 
-        limit: int = 200
-        chunks: List[List]
-        chunks = [
-            queries[i:i+limit]
-            for i in range(0, len(queries), limit)
-            ]
+        for src, img_data in images.items():
 
-        for chunk in chunks:
-            chunk: List[Query]
+            print("delete", os.path.basename(src))
 
             if not Shared.flag:
                 return
 
-            try:
-                session = Dbase.get_session()
+            stmt =  sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
+            self.sess.execute(stmt)
 
-                for query in chunk:
-                    session.execute(query)
+            counter += 1
 
-                session.commit()
-                session.close()
+            if counter == 10:
+                counter = 0
+                self.sess.commit()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
-
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-                session.rollback()
-
-            finally:
-                session.close()
 
 
 class Scaner(object):
