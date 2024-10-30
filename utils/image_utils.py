@@ -45,23 +45,27 @@ class FitImg:
         else:
             return None
 
+    # @classmethod
+    # def crop_to_square(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+    #     if isinstance(image, np.array):
+    #         height, width = image.shape[:2]
+    #         min_side = min(height, width)
+    #         scale_factor = cnf.THUMBSIZE / min_side
+    #         new_height = int(height * scale_factor)
+    #         new_width = int(width * scale_factor)
+    #         return cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+    #     return None
+
     @classmethod
     def crop_to_square(cls, image: np.ndarray, size: int) -> np.ndarray | None:
-        if isinstance(image, np.array):
+        if isinstance(image, np.ndarray):
             height, width = image.shape[:2]
-            min_side = min(height, width)
-            scale_factor = cnf.THUMBSIZE / min_side
-            new_height = int(height * scale_factor)
-            new_width = int(width * scale_factor)
-            return cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
-        return None
-
-    def crop_center_square(image):
-        height, width = image.shape[:2]
-        min_dim = min(height, width)
-        start_x = (width - min_dim) // 2
-        start_y = (height - min_dim) // 2
-        return image[start_y:start_y + min_dim, start_x:start_x + min_dim]
+            min_dim = min(height, width)
+            start_x = (width - min_dim) // 2
+            start_y = (height - min_dim) // 2
+            return image[start_y:start_y + min_dim, start_x:start_x + min_dim]
+        else:
+            return None
 
 class ImageUtils:
     @classmethod
