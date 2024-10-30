@@ -283,7 +283,7 @@ class UpdateDb:
 
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
-            array_img = FitImg.fit_in_square(array_img, cnf.THUMBSIZE)
+            array_img = FitImg.crop_to_square(array_img, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
             values = {
@@ -318,7 +318,7 @@ class UpdateDb:
 
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
-            array_img = FitImg.fit_in_square(array_img, cnf.THUMBSIZE)
+            array_img = FitImg.crop_to_square(array_img, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
             values = {
