@@ -271,40 +271,6 @@ class UpdateDb:
 
         self.sess.close()
 
-    def create_values(self, data: Dict[str, tuple]) -> List[Dict]:
-        values = []
-
-        for src, (size, created, modified) in data.items():
-
-            if not Shared.flag:
-                return
-
-            try:
-                array_img = ImageUtils.read_image(src)
-                array_img = FitImg.fit_in_square(array_img, cnf.THUMBSIZE)
-
-                if array_img is None:
-                    print("scaner > thread > UpdateDb > create_values > array img is None, continue")
-                    continue
-
-                bytes_img = ImageUtils.image_array_to_bytes(array_img)
-                obj = {
-                    "img150": bytes_img,
-                    "src": src,
-                    "size": size,
-                    "created": created,
-                    "modified": modified,
-                    "collection": MainUtils.get_coll_name(src),
-                    }
-
-                values.append(obj)
-
-            except (FileNotFoundError, Exception) as e:
-                MainUtils.print_err(parent=self, error=e)
-                continue
-
-        return values
-
     def insert_db(self, images: dict):
         counter = 0
 
