@@ -311,6 +311,7 @@ class UpdateDb:
             if counter == 10:
                 counter = 0
                 self.sess.commit()
+                self.sess = Dbase.get_session()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
 
@@ -353,6 +354,7 @@ class UpdateDb:
             if counter == 10:
                 counter = 0
                 self.sess.commit()
+                self.sess = Dbase.get_session()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
 
@@ -374,6 +376,7 @@ class UpdateDb:
             if counter == 10:
                 counter = 0
                 self.sess.commit()
+                self.sess = Dbase.get_session()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
 
