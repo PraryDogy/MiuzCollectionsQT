@@ -1,17 +1,21 @@
-from utils import ImageUtils, ResizeImg
+from utils import ImageUtils
 from database import Dbase, ThumbsMd
 import sqlalchemy
 
 
-src = "/Users/Loshkarev/Desktop/S29 E53 R66 N028/2024-10-14 21-43-49.tif"
+src = "/Volumes/Shares-1/Collections/0 Other/1 IMG/2021-08-25 19-33-14 (B,Radius4,Smoothing1).psd"
 img = ImageUtils.read_image(src)
-img = ResizeImg.crop_to_square(img)
-img = ResizeImg.resize_aspect_ratio(img, 200)
+# img = ImageUtils.crop_to_square(img)
+img = ImageUtils.resize_min_aspect_ratio(img, 200)
+
+test = ImageUtils.image_array_to_bytes(img)
+
+print(len(test))
 
 
-import cv2
-cv2.imshow("123", img)
-cv2.waitKey(0)
+# import cv2
+# cv2.imshow("123", img)
+# cv2.waitKey(0)
 
 
 # sess = Dbase.get_session()

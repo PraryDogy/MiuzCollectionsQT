@@ -286,6 +286,10 @@ class UpdateDb:
             array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
+            if bytes_img is None:
+                print("scaner can't create image", src)
+                continue
+
             values = {
                     "img150": bytes_img,
                     "src": src,
@@ -320,6 +324,10 @@ class UpdateDb:
             array_img = ImageUtils.read_image(src)
             array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
+
+            if bytes_img is None:
+                print("scaner can't create image", src)
+                continue
 
             values = {
                     "img150": bytes_img,
