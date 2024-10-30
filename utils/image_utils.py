@@ -94,10 +94,14 @@ class ImageUtils:
             img = None
 
         if src_lower.endswith((".psd", ".psb", ".tiff", ".tif")) and isinstance(img, np.ndarray):
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cls.array_bgr_to_rgb(img)
 
         return img
     
+    @classmethod
+    def array_bgr_to_rgb(cls, img: np.ndarray):
+        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
     @classmethod
     def pixmap_from_bytes(cls, image: bytes) -> QPixmap | None:
         if isinstance(image, bytes):

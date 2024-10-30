@@ -2,8 +2,8 @@ import os
 
 import sqlalchemy
 from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import (QContextMenuEvent, QImage, QKeyEvent, QMouseEvent,
-                         QPainter, QPaintEvent, QPixmap, QResizeEvent)
+from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
+                         QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
@@ -46,6 +46,7 @@ class LoadImageThread(MyThread):
             if self.img_src not in Shared.loaded_images:
 
                 img = ImageUtils.read_image(self.img_src)
+                img = ImageUtils.array_bgr_to_rgb(img)
                 pixmap = ImageUtils.pixmap_from_array(img)
                 Shared.loaded_images[self.img_src] = pixmap
 
