@@ -64,7 +64,7 @@ class ImageUtils:
                 img = (img/256).astype(dtype="uint8")
             # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             return img
-        except (tifffile.tifffile.TiffFileError, RuntimeError) as e:
+        except (tifffile.TiffFileError, RuntimeError) as e:
             cls.print_error(cls, e)
             return None
 
