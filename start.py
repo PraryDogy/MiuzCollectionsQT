@@ -36,10 +36,12 @@ if os.path.exists("lib"):
     print(f"plugin path enabled")
     print()
 
-from database import Dbase
-from app import app
 
+from database import Dbase
 Dbase.create_engine()
+
+
+from app import app
 app.exec_()
 # source deacivate
 # import app происходит только после активации os.environ plugin_path
