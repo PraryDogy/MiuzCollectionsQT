@@ -275,7 +275,7 @@ class UpdateDb:
 
         for src, img_data in images.items():
 
-            # print("insert", os.path.basename(src))
+            print("insert", os.path.basename(src), counter)
 
             if not Shared.flag:
                 return
