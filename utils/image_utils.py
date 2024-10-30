@@ -91,6 +91,7 @@ class ImageUtils:
             img = cls.read_png(src)
 
         else:
+            print("image utils > read img > none", src)
             img = None
 
         return img
@@ -101,34 +102,26 @@ class ImageUtils:
 
     @classmethod
     def pixmap_from_bytes(cls, image: bytes) -> QPixmap | None:
-        if isinstance(image, bytes):
-            ba = QByteArray(image)
-            pixmap = QPixmap()
-            pixmap.loadFromData(ba, "JPEG")
-            return pixmap
-        return None
+        ba = QByteArray(image)
+        pixmap = QPixmap()
+        pixmap.loadFromData(ba, "JPEG")
+        return pixmap
     
     @classmethod
     def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
-        if isinstance(image, np.ndarray):
-            height, width, channel = image.shape
-            bytes_per_line = channel * width
-            qimage = QImage(image.tobytes(), width, height, bytes_per_line, QImage.Format.Format_RGB888)
-            return QPixmap.fromImage(qimage)
-        else:
-            return None
+        height, width, channel = image.shape
+        bytes_per_line = channel * width
+        qimage = QImage(image.tobytes(), width, height, bytes_per_line, QImage.Format.Format_RGB888)
+        return QPixmap.fromImage(qimage)
 
     @classmethod
     def image_array_to_bytes(cls, image: np.ndarray, quality: int = 80) -> bytes | None:
-        if isinstance(image, np.ndarray):
-            img = image
-            res, buffer = cv2.imencode(".jpeg", img, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
-            image_io = io.BytesIO()
-            image_io.write(buffer)
-            img = image_io.getvalue()
-            return img
-        else:
-            return None
+        img = image
+        res, buffer = cv2.imencode(".jpeg", img, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
+        image_io = io.BytesIO()
+        image_io.write(buffer)
+        img = image_io.getvalue()
+        return img
 
     @classmethod
     def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
@@ -141,17 +134,13 @@ class ImageUtils:
 
     @classmethod
     def resize_min_aspect_ratio(cls, image: np.ndarray, size: int) -> np.ndarray | None:
-        if isinstance(image, np.ndarray):
-            try:
-                h, w = image.shape[:2]
-                # Вычисляем коэффициент масштабирования для того, чтобы минимальная сторона стала равной size
-                scale = size / min(h, w)
-                new_w, new_h = int(w * scale), int(h * scale)
-                return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
-            except Exception as e:
-                print("fit img error:", e)
-                return None
-        else:
+        try:
+            h, w = image.shape[:2]
+            scale = size / min(h, w)
+            new_w, new_h = int(w * scale), int(h * scale)
+            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+        except Exception as e:
+            print("resize_min_aspect_ratio error:", e)
             return None
 
     @classmethod

@@ -275,21 +275,27 @@ class UpdateDb:
 
         for src, img_data in images.items():
 
-            print("insert", os.path.basename(src))
+            # print("insert", os.path.basename(src))
 
             if not Shared.flag:
                 return
 
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
-            array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
-            bytes_img = ImageUtils.image_array_to_bytes(array_img)
+
+            if array_img is None:
+                print("error read image")
+                continue
+
+            array_img = ImageUtils.resize_min_aspect_ratio(array_img, cnf.THUMBSIZE)
 
             if src.endswith(PSD_TIFF):
                 array_img = ImageUtils.array_bgr_to_rgb(array_img)
 
+            bytes_img = ImageUtils.image_array_to_bytes(array_img)
+
             if bytes_img is None:
-                print("scaner can't create image", src)
+                print("bytes img is none")
                 continue
 
             values = {
@@ -323,6 +329,11 @@ class UpdateDb:
 
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
+
+            if array_img is None:
+                print("error read image")
+                continue
+
             array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
 
             if src.endswith(PSD_TIFF):
@@ -331,7 +342,7 @@ class UpdateDb:
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
             if bytes_img is None:
-                print("scaner can't create image", src)
+                print("bytes img is none")
                 continue
 
             values = {
