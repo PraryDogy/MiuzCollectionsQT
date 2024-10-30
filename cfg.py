@@ -21,6 +21,7 @@ IMG_EXT: tuple = tuple(
     for ext in _IMG_EXT
     for upper_ext in (ext, ext.upper())
     )
+PSD_TIFF: tuple = (".psd", ".psb", ".tiff", ".tif", ".PSD", ".PSB", ".TIFF", ".TIF")
 
 class Thumbnail(QObject):
     def __init__(self):

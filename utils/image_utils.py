@@ -93,13 +93,10 @@ class ImageUtils:
         else:
             img = None
 
-        if src_lower.endswith((".psd", ".psb", ".tiff", ".tif")) and isinstance(img, np.ndarray):
-            img = cls.array_bgr_to_rgb(img)
-
         return img
     
     @classmethod
-    def array_bgr_to_rgb(cls, img: np.ndarray):
+    def array_bgr_to_rgb(cls, img: np.ndarray) -> np.ndarray:
         return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     @classmethod

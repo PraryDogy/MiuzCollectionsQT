@@ -1,12 +1,11 @@
 import os
 from collections import defaultdict
-from typing import Dict, List, Literal
+from typing import Literal
 
 import sqlalchemy
 from PyQt5.QtCore import QThread, pyqtSignal
-from sqlalchemy.orm import Query
 
-from cfg import IMG_EXT, cnf
+from cfg import IMG_EXT, PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
 
@@ -286,6 +285,9 @@ class UpdateDb:
             array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
+            if src.endswith(PSD_TIFF):
+                array_img = ImageUtils.array_bgr_to_rgb(array_img)
+
             if bytes_img is None:
                 print("scaner can't create image", src)
                 continue
@@ -314,7 +316,6 @@ class UpdateDb:
         counter = 0
 
         for src, img_data in images.items():
-
             print("update", os.path.basename(src))
 
             if not Shared.flag:
@@ -323,6 +324,10 @@ class UpdateDb:
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
             array_img = ImageUtils.resize_min_aspect_ratio(src, cnf.THUMBSIZE)
+
+            if src.endswith(PSD_TIFF):
+                array_img = ImageUtils.array_bgr_to_rgb(array_img)
+
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
             if bytes_img is None:

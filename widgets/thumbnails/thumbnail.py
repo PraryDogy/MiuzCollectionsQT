@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent, QPixmap
+from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem
 
 from base_widgets import LayoutV
@@ -67,10 +67,16 @@ class BaseThumb(QFrame):
         self.v_layout.addSpacerItem(QSpacerItem(0, 7))
 
         self.img_label = QLabel()
+
         pixmap = ImageUtils.pixmap_from_bytes(byte_array)
         pixmap = ImageUtils.crop_to_square(pixmap)
-        if isinstance(pixmap, QPixmap):
-            self.img_label.setPixmap(pixmap)
+
+        if not isinstance(pixmap, QPixmap):
+            pixmap = QPixmap(500, 500)
+            pixmap.fill(QColor(128, 128, 128))
+
+        self.img_label.setPixmap(pixmap)
+
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setToolTip(
