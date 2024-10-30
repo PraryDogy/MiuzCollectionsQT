@@ -10,7 +10,7 @@ from cfg import IMG_EXT, cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
 
-from ..image_utils import FitImg, ImageUtils
+from ..image_utils import ResizeImg, ImageUtils
 from ..main_utils import MainUtils
 
 
@@ -283,7 +283,8 @@ class UpdateDb:
 
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
-            array_img = FitImg.crop_to_square(array_img, cnf.THUMBSIZE)
+            array_img = ResizeImg.crop_to_square(array_img)
+            array_img = ResizeImg.resize_aspect_ratio(array_img, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
             values = {
@@ -318,7 +319,8 @@ class UpdateDb:
 
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
-            array_img = FitImg.crop_to_square(array_img, cnf.THUMBSIZE)
+            array_img = ResizeImg.crop_to_square(array_img)
+            array_img = ResizeImg.resize_aspect_ratio(array_img, cnf.THUMBSIZE)
             bytes_img = ImageUtils.image_array_to_bytes(array_img)
 
             values = {

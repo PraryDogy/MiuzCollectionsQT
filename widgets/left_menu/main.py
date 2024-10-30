@@ -72,7 +72,6 @@ class BaseLeftMenu(QScrollArea):
         menus = defaultdict(list)
         
         q = sqlalchemy.select(ThumbsMd.collection).distinct()
-
         session = Dbase.get_session()
         try:
             res = (i[0] for i in session.execute(q).fetchall() if i)

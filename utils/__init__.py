@@ -3,7 +3,7 @@ from signals import utils_signals_app
 from .copy_files import ThreadCopyFiles
 from .find_tiffs import ThreadFindTiff, ThreadFindTiffsMultiple
 from .image_size import get_image_size
-from .image_utils import FitImg, ImageUtils
+from .image_utils import ResizeImg, ImageUtils
 from .main_utils import MainUtils
 from .my_thread import MyThread
 from .reveal_files import RevealFiles

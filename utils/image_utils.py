@@ -22,9 +22,9 @@ psd_logger = logging.getLogger("psd_tools")
 psd_logger.setLevel(logging.CRITICAL)
 
 
-class FitImg:    
+class ResizeImg:    
     @classmethod
-    def fit_in_window(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+    def resize_aspect_ratio(cls, image: np.ndarray, size: int) -> np.ndarray | None:
         if isinstance(image, np.ndarray):
 
             try:
@@ -57,7 +57,7 @@ class FitImg:
     #     return None
 
     @classmethod
-    def crop_to_square(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+    def crop_to_square(cls, image: np.ndarray) -> np.ndarray | None:
         if isinstance(image, np.ndarray):
             height, width = image.shape[:2]
             min_dim = min(height, width)
