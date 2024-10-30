@@ -1,18 +1,16 @@
 import os
-import traceback
 from collections import defaultdict
-from time import sleep
 from typing import Dict, List, Literal
 
 import sqlalchemy
 from PyQt5.QtCore import QThread, pyqtSignal
 from sqlalchemy.orm import Query
 
-from cfg import cnf
+from cfg import IMG_EXT, cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
 
-from ..image_utils import BytesThumb, UndefBytesThumb
+from ..image_utils import FitImg, ImageUtils
 from ..main_utils import MainUtils
 
 
@@ -183,7 +181,7 @@ class FinderImages(dict):
                         Shared.flag = False
                         return
 
-                    if file.endswith((".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")):
+                    if file.endswith(IMG_EXT):
                         
                         src = os.path.join(root, file)
                         file_stats = os.stat(path=src)
@@ -193,7 +191,6 @@ class FinderImages(dict):
                             int(file_stats.st_birthtime),
                             int(file_stats.st_mtime)
                             )
-
 
 class DbImages(dict):
     def __init__(self):
@@ -279,8 +276,16 @@ class UpdateDb:
                 return
 
             try:
+                array_img = ImageUtils.read_image(src)
+                array_img = FitImg.start(array_img, cnf.THUMBSIZE)
+
+                if array_img is None:
+                    print("scaner > thread > UpdateDb > create_values > array img is None, continue")
+                    continue
+
+                bytes_img = ImageUtils.image_array_to_bytes(array_img)
                 obj = {
-                    "img150": BytesThumb(src).getvalue(),
+                    "img150": bytes_img,
                     "src": src,
                     "size": size,
                     "created": created,
@@ -290,23 +295,10 @@ class UpdateDb:
 
                 values.append(obj)
 
-            except FileNotFoundError as e:
+            except (FileNotFoundError, Exception) as e:
                 MainUtils.print_err(parent=self, error=e)
-                Shared.flag = False
-                return
+                continue
 
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-                obj = {"img150": UndefBytesThumb().getvalue(),
-                        "src": src,
-                        "size": 666,
-                        "created": 666,
-                        "modified":666,
-                        "collection": "Errors",
-                        }
-
-                values.append(obj)
-        
         return values
 
     def insert_db(self, images: dict):

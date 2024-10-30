@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem
 from base_widgets import LayoutV
 from cfg import cnf
 from styles import Names, Themes
-from utils import MainUtils, PixmapFromBytes
+from utils import MainUtils, ImageUtils
 
 from ..image_context import ImageContext
 
@@ -67,8 +67,8 @@ class BaseThumb(QFrame):
         self.v_layout.addSpacerItem(QSpacerItem(0, 7))
 
         self.img_label = QLabel()
-        byte_array = PixmapFromBytes(byte_array)
-        self.img_label.setPixmap(byte_array)
+        pixmap = ImageUtils.pixmap_from_bytes(byte_array)
+        self.img_label.setPixmap(pixmap)
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setToolTip(

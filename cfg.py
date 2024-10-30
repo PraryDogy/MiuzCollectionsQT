@@ -10,6 +10,18 @@ from PyQt5.QtWidgets import QMainWindow
 from lang import Eng, Rus
 
 
+_IMG_EXT: tuple = (
+    ".jpg", ".jpeg", ".jfif",
+    ".tif", ".tiff",
+    ".psd", ".psb",
+    ".png",
+    )
+IMG_EXT: tuple = tuple(
+    upper_ext
+    for ext in _IMG_EXT
+    for upper_ext in (ext, ext.upper())
+    )
+
 class Thumbnail(QObject):
     def __init__(self):
         """

@@ -11,7 +11,7 @@ from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import gui_signals_app, utils_signals_app
 from styles import Names, Themes
-from utils import MainUtils, MyThread, ReadImage, get_image_size
+from utils import ImageUtils, MainUtils, MyThread, get_image_size
 
 from ..image_context import ImageContext
 from ..notification import Notification
@@ -19,11 +19,19 @@ from ..win_smb import WinSmb
 
 
 class Shared:
-    loaded_images: dict = {}
+    loaded_images: dict[str, QPixmap] = {}
+
+
+class ImageData:
+    __slots__ = ["src", "width", "pixmap"]
+    def __init__(self, src: str, width: int, pixmap: QPixmap):
+        self.src = src
+        self.width = width
+        self.pixmap = pixmap
 
 
 class LoadImageThread(MyThread):
-    finished = pyqtSignal(dict)
+    finished = pyqtSignal(object)
 
     def __init__(self, img_src: str):
         super().__init__(parent=None)
@@ -37,34 +45,21 @@ class LoadImageThread(MyThread):
 
             if self.img_src not in Shared.loaded_images:
 
-                img = ReadImage(src=self.img_src, desaturate_value=0.85)
-                img = img.get_rgb_image()
-                q_image = QImage(img.data, img.shape[1], img.shape[0],
-                                img.shape[1] * 3, QImage.Format_RGB888)
-                Shared.loaded_images[self.img_src] = q_image
+                img = ImageUtils.read_image(self.img_src)
+                pixmap = ImageUtils.pixmap_from_array(img)
+                Shared.loaded_images[self.img_src] = pixmap
 
             else:
-                q_image = Shared.loaded_images[self.img_src]
+                pixmap = Shared.loaded_images.get(self.img_src)
 
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
-
-            q_image = QImage()
-            q_image.load(self.img_src)
-            Shared.loaded_images[self.img_src] = q_image
-
-        pixmap = QPixmap.fromImage(q_image)
+            pixmap = None
 
         if len(Shared.loaded_images) > 50:
             Shared.loaded_images.pop(next(iter(Shared.loaded_images)))
 
-        self.finished.emit(
-            {"image": pixmap,
-             "width": pixmap.width(),
-             "src": self.img_src
-             }
-             )
-        
+        self.finished.emit(ImageData(self.img_src, pixmap.width(), pixmap))
         self.remove_threads()
 
 
@@ -295,12 +290,13 @@ class WinImageView(WinImgViewBase):
         img_thread.finished.connect(self.load_image_finished)
         img_thread.start()
 
-    def load_image_finished(self, data: dict):
-        if data["width"] == 0 or data["src"] != self.img_src:
+    def load_image_finished(self, data: ImageData):
+        if data.width == 0 or data.src != self.img_src:
             return
-                
-        self.image_label.set_image(data["image"])
-        self.set_image_title()
+        
+        if isinstance(data.pixmap, QPixmap):
+            self.image_label.set_image(data.pixmap)
+            self.set_image_title()
 
     def my_close(self, event):
         Shared.loaded_images.clear()
