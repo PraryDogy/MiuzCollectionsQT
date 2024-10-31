@@ -13,8 +13,8 @@ from .image_utils import ImageUtils
 from .main_utils import MainUtils
 
 
-class Shared:
-    flag = True
+class Storage:
+    can_scan = True
 
 
 class Migrate:
@@ -59,35 +59,20 @@ class Migrate:
 
 
 class TrashRemover:
-    def start(self):
-        coll_folder = os.sep + cnf.coll_folder.strip(os.sep) + os.sep
 
+    def start(self):
+
+        coll_folder = os.sep + cnf.coll_folder.strip(os.sep) + os.sep
         conn = Dbase.engine.connect()
 
-        q = (sqlalchemy.select(ThumbsMd.src)
-            .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
-
-        try:
-            trash_img = conn.execute(q).first()
-        
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-            return
+        q = (sqlalchemy.select(ThumbsMd.src).where(ThumbsMd.src.not_like(f"%{coll_folder}%")))
+        trash_img = conn.execute(q).scalar() or None
 
         if trash_img:
-
-            q = (sqlalchemy.delete(ThumbsMd)
-                .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
-
-            try:
-                conn.execute(q)
-                conn.commit()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-                return
-            finally:
-                conn.close()
-
+            q = (sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src.not_like(f"%{coll_folder}%")))
+            conn.execute(q)
+            conn.commit()
+            conn.close()
 
 # class DubFinder:
 #     def start(self):
@@ -164,13 +149,13 @@ class FinderImages:
 
         for root, _, files in os.walk(collection):
 
-            if not Shared.flag:
+            if not Storage.can_scan:
                 return
 
             for file in files:
 
                 if not os.path.exists(cnf.coll_folder):
-                    Shared.flag = False
+                    Storage.can_scan = False
                     return
 
                 if file.endswith(IMG_EXT):
@@ -228,7 +213,7 @@ class ImageCompator:
 
         for db_src, db_item in self.db_images.items():
 
-            if not Shared.flag:
+            if not Storage.can_scan:
                 return
 
             finder_item = self.finder_images.get(db_src)
@@ -238,7 +223,7 @@ class ImageCompator:
 
         for finder_src, finder_item in self.finder_images.items():
 
-            if not Shared.flag:
+            if not Storage.can_scan:
                 return
 
             db_item = self.db_images.get(finder_src)
@@ -287,7 +272,7 @@ class DbUpdater:
 
         for src, img_data in self.compared_result.insert.items():
 
-            if not Shared.flag:
+            if not Storage.can_scan:
                 return
 
             size, created, modified = img_data
@@ -334,7 +319,7 @@ class DbUpdater:
 
         for src, img_data in self.compared_result.update.items():
 
-            if not Shared.flag:
+            if not Storage.can_scan:
                 return
 
             size, created, modified = img_data
@@ -380,7 +365,7 @@ class DbUpdater:
 
         for src, img_data in self.compared_result.delete.items():
 
-            if not Shared.flag:
+            if not Storage.can_scan:
                 return
 
             stmt =  sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
@@ -411,28 +396,26 @@ class ScanerThread(QThread):
         self.finished.emit()
     
     def start_scan(self):
+        Storage.can_scan = True
+
         try:
-            Shared.flag = True
+            signals_app.progressbar_show.emit()
+        except RuntimeError as e:
+            MainUtils.print_err(parent=self, error=e)
 
-            try:
-                signals_app.progressbar_show.emit()
-            except RuntimeError as e:
-                MainUtils.print_err(parent=self, error=e)
+        try:
+            migrate = Migrate()
+            migrate.start()
+        except Exception as e:
+            MainUtils.print_err(parent=migrate, error=e)
 
-            try:
-                migrate = Migrate()
-                migrate.start()
-            except Exception as e:
-                MainUtils.print_err(parent=migrate, error=e)
+        finder_images = FinderImages()
+        finder_images = finder_images.get()
 
-            finder_images = FinderImages()
-            finder_images = finder_images.get()
-
+        if finder_images:
+        
             db_images = DbImages()
             db_images = db_images.get()
-
-            if not finder_images:
-                return
 
             image_compator = ImageCompator(finder_images, db_images)
             compared_res = image_compator.get_result()
@@ -440,29 +423,22 @@ class ScanerThread(QThread):
             db_updater = DbUpdater(compared_res)
             db_updater.start()
 
+        try:
             trash_remover = TrashRemover()
             trash_remover.start()
-            # dub_finder = DubFinder()
-            # dub_finder.start()
-
-            Dbase.vacuum()
-
-            Shared.flag = True
-
-            try:
-                signals_app.progressbar_hide.emit()
-                signals_app.reload_menu.emit()
-                signals_app.reload_thumbnails.emit()
-            except RuntimeError as e:
-                MainUtils.print_err(parent=self, error=e)
-
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            MainUtils.print_err(parent=trash_remover, error=e)
 
-            try:
-                signals_app.progressbar_hide.emit()
-            except RuntimeError as e:
-                MainUtils.print_err(parent=self, error=e)
+        Dbase.vacuum()
+        Storage.can_scan = True
+
+        try:
+            signals_app.progressbar_hide.emit()
+            signals_app.reload_menu.emit()
+            signals_app.reload_thumbnails.emit()
+            signals_app.progressbar_hide.emit()
+        except RuntimeError as e:
+            MainUtils.print_err(parent=self, error=e)
 
 
 class ScanerShedule(QObject):
@@ -499,7 +475,7 @@ class ScanerShedule(QObject):
 
     def stop_thread(self):
         print("scaner manualy stoped from signals_app. You need emit scaner start signal")
-        Shared.flag = False
+        Storage.can_scan = False
         self.wait_timer.stop()
 
     def finalize_scan(self):
