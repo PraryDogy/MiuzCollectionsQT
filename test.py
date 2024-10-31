@@ -1,9 +1,7 @@
-class Test:
-    __slots__ = ["a", "b"]
-    def __init__(self):
-        self.a = 1
-        self.b = 2
+from utils.scaner import DubFinder
 
-
-c = Test()
-print(c.__slots__)
+from database import Dbase
+Dbase.create_engine()
+dub_finder = DubFinder()
+a = dub_finder.start()
+print(a)

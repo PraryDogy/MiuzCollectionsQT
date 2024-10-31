@@ -104,35 +104,33 @@ class TrashRemover:
                 conn.close()
 
 
-class DubFinder:
-    def start(self):
-        q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-        conn = Dbase.engine.connect()
-        res = conn.execute(q).fetchall()
+# class DubFinder:
+#     def start(self):
+#         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
+#         conn = Dbase.engine.connect()
+#         res = conn.execute(q).fetchall()
 
-        dubs = defaultdict(list)
+#         dubs = defaultdict(list)
 
-        for res_id, res_src in res:
-            dubs[res_src].append(res_id)
+#         for res_id, res_src in res:
+#             dubs[res_src].append(res_id)
 
-        dubs = [
-            x
-            for k, v in dubs.items()
-            for x in v[1:]
-            if len(v) > 1
-            ]
+#         dubs = [
+#             x
+#             for k, v in dubs.items()
+#             for x in v[1:]
+#             if len(v) > 1
+#             ]
 
-        if dubs:
-            values = [
-                sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.id==dub_id)
-                for dub_id in dubs
-                ]
-
-            for i in values:
-                conn.execute(i)
-
-            conn.commit()
-            conn.close()
+#         if dubs:
+#             for dub_id in dubs:
+#                 q = sqlalchemy.delete(ThumbsMd).where(ThumbsMd.id==dub_id)
+#                 conn.execute(q)
+#             conn.commit()
+#             conn.close()
+#             return True
+        
+#         return False
 
 
 class ImageItem:
@@ -456,8 +454,8 @@ class ScanerThread(QThread):
 
             trash_remover = TrashRemover()
             trash_remover.start()
-            dub_finder = DubFinder()
-            dub_finder.start()
+            # dub_finder = DubFinder()
+            # dub_finder.start()
 
             Dbase.vacuum()
 
