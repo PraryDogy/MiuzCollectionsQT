@@ -29,46 +29,15 @@ class ContextImg(ContextMenuBase):
 
         self.addSeparator()
 
-        self.reveal_menu = ContextSubMenuBase(parent=self, title=cnf.lng.reveal_in_finder)
-        self.addMenu(self.reveal_menu)
+        self.reveal_menu = QAction(parent=self, text=cnf.lng.reveal_in_finder)
+        self.reveal_menu.triggered.connect(self.reveal_cmd)
+        self.addAction(self.reveal_menu)
 
-        reveal_jpg = QAction(parent=self, text="JPG")
-        reveal_jpg.triggered.connect(lambda: self.reveal_jpg(img_src=img_src))
-        self.reveal_menu.addAction(reveal_jpg)
+        save_as_menu = QAction(parent=self, text=cnf.lng.save_image_in)
+        self.addAction(save_as_menu)
 
-        self.reveal_menu.addSeparator()
-
-        reveal_layers = QAction(parent=self, text=cnf.lng.layers)
-        reveal_layers.triggered.connect(lambda: self.reveal_tiff(img_src=img_src))
-        self.reveal_menu.addAction(reveal_layers)
-
-        self.addSeparator()
-
-        save_as_menu = ContextSubMenuBase(parent=self, title=cnf.lng.save_image_in)
-        self.addMenu(save_as_menu)
-
-        save_as_jpg = QAction(parent=self, text="JPG")
-        save_as_jpg.triggered.connect(lambda: self.save_as_jpg(img_src))
-        save_as_menu.addAction(save_as_jpg)
-
-        save_as_menu.addSeparator()
-
-        save_as_layers = QAction(text=cnf.lng.layers, parent=self)
-        save_as_layers.triggered.connect(lambda: self.save_as_tiffs(img_src))
-        save_as_menu.addAction(save_as_layers)
-
-        save_menu = ContextSubMenuBase(parent=self, title=cnf.lng.save_image_downloads)
-        self.addMenu(save_menu)
-
-        save_jpg = QAction(text="JPG", parent=self)
-        save_jpg.triggered.connect(lambda: self.save_jpg(img_src))
-        save_menu.addAction(save_jpg)
-
-        save_menu.addSeparator()
-
-        save_layers = QAction(text=cnf.lng.layers, parent=self)
-        save_layers.triggered.connect(lambda: self.save_tiffs(img_src))
-        save_menu.addAction(save_layers)
+        save_menu = QAction(parent=self, text=cnf.lng.save_image_downloads)
+        self.addAction(save_menu)
 
     def add_preview_item(self):
         open_action = QAction(cnf.lng.view, self)
@@ -97,31 +66,15 @@ class ContextImg(ContextMenuBase):
         self.win_img = WinImageView(parent=self.my_parent, img_src=img_src)
         self.win_img.show()
 
-    def reveal_jpg(self, img_src: str):
+    def reveal_cmd(self):
         if MainUtils.smb_check():
-            self.reveal_file_finish(img_src)
+            if not os.path.exists(self.img_src):
+                SendNotification(cnf.lng.no_file)
+            else:
+                RevealFiles([self.img_src])
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
-
-
-    def reveal_tiff(self, img_src: str):
-        if MainUtils.smb_check():
-            self.reveal_tiff_task = ThreadFindTiff(img_src)
-
-            self.reveal_tiff_task.finished.connect(lambda tiff: self.reveal_file_finish(tiff))
-            self.reveal_tiff_task.can_remove.connect(self.reveal_tiff_task.remove_threads)
-
-            self.reveal_tiff_task.start()
-        else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
-
-    def reveal_file_finish(self, file: str):
-        if not os.path.exists(file):
-            SendNotification(cnf.lng.no_file)
-            return
-        RevealFiles([file])
 
     def save_as_jpg(self, img_src: str):
         if MainUtils.smb_check():
