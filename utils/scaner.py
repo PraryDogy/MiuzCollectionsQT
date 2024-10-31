@@ -205,86 +205,100 @@ class FinderImages:
             return None
 
 
-class DbImages(dict):
+class DbImages:
     def __init__(self):
         super().__init__()
-        self.run()
 
-    def run(self) -> dict[Literal["img path: list of ints"]]:
-        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
-                              ThumbsMd.modified)
-
+    def get(self) -> dict[str, ImageItem]:
         conn = Dbase.engine.connect()
+        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created, ThumbsMd.modified)
         try:
             res = conn.execute(q).fetchall()
-        finally:
+            return {
+                src: ImageItem(size, created, modified)
+                for src, size, created, modified in res
+                }
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
             conn.close()
+            return {}
 
-        self.update({i[0]: i[1:] for i in res})
+
+class ComparedResult:
+    def __init__(self):
+        self.insert: dict[str, ImageItem] = {}
+        self.update: dict[str, ImageItem] = {}
+        self.delete : dict[str, ImageItem]= {}
 
 
-class ComparedImages(dict):
-    def __init__(self, finder_images: dict, db_images: dict):
+class CompareImages:
+    def __init__(self, finder_images: dict[str, ImageItem], db_images: dict[str, ImageItem]):
+        super().__init__()
+        self.finder_images = finder_images
+        self.db_images = db_images
 
-        super().__init__({"insert": {}, "update": {}, "delete": {}})
+    def get_result(self) -> ComparedResult:
 
-        for db_src, db_stats in db_images.items():
+        compared_result = ComparedResult()
+
+        for db_src, db_item in self.db_images.items():
 
             if not Shared.flag:
                 return
 
-            finder_stats = finder_images.get(db_src)
+            finder_item = self.finder_images.get(db_src)
 
-            if not finder_stats:
-                self["delete"][db_src] = db_stats
+            if not finder_item:
+                compared_result.delete[db_src] = db_item
 
-        for finder_src, finder_stats in finder_images.items():
+        for finder_src, finder_item in self.finder_images.items():
 
             if not Shared.flag:
                 return
 
-            db_stats = db_images.get(finder_src)
+            db_item = self.db_images.get(finder_src)
+            b = (finder_item.size, finder_item.modified) == (db_item.size, db_item.modified)
 
-            if not db_stats:
-                self["insert"][finder_src] = finder_stats
+            if not db_item:
+                compared_result.insert[finder_src] = finder_item
 
-            if db_stats and finder_stats != db_stats:
-                self["update"][finder_src] = finder_stats
+            if db_item and not b:
+                compared_result.update[finder_src] = finder_item
+
+        return compared_result
 
 
 class UpdateDb:
-    def __init__(self, images: dict):
+    def __init__(self, compared_result: ComparedResult):
         super().__init__()
 
-        try:
-            signals_app.progressbar_value.emit(70)
-        except RuntimeError as e:
-            MainUtils.print_err(parent=self, error=e)
+        self.compared_result = compared_result
+        self.progressbar_value(70)
 
-        if images["delete"]:
-            self.delete_db(images["delete"])
+        if compared_result.delete:
+            self.delete_db()
 
-        try:
-            signals_app.progressbar_value.emit(80)
-        except RuntimeError as e:
-            MainUtils.print_err(parent=self, error=e)
+        self.progressbar_value(80)
 
-        if images["insert"]:
-            self.insert_db(images["insert"])
+        if compared_result.insert:
+            self.insert_db()
 
+        self.progressbar_value(90)
+
+        if compared_result.update:
+            self.update_db()
+
+    def progressbar_value(self, value):
         try:
             signals_app.progressbar_value.emit(90)
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
-        if images["update"]:
-            self.update_db(images["update"])
-
-    def insert_db(self, images: dict):
+    def insert_db(self):
         counter = 0
         conn = Dbase.engine.connect()
 
-        for src, img_data in images.items():
+        for src, img_data in self.compared_result.insert.items():
 
             if not Shared.flag:
                 return
@@ -327,11 +341,11 @@ class UpdateDb:
             conn.commit()
         conn.close()
 
-    def update_db(self, images: dict):
+    def update_db(self):
         counter = 0
         conn = Dbase.engine.connect()
 
-        for src, img_data in images.items():
+        for src, img_data in self.compared_result.update.items():
 
             if not Shared.flag:
                 return
@@ -373,11 +387,11 @@ class UpdateDb:
             conn.commit()
         conn.close()
 
-    def delete_db(self, images: dict):
+    def delete_db(self):
         counter = 0
         conn = Dbase.engine.connect()
 
-        for src, img_data in images.items():
+        for src, img_data in self.compared_result.delete.items():
 
             if not Shared.flag:
                 return
@@ -427,8 +441,8 @@ class ScanerThread(QThread):
             if not finder_images:
                 return
 
-            images = ComparedImages(finder_images, db_images)
-            self.update_db = UpdateDb(images=images)
+            images = CompareImages(finder_images, db_images)
+            self.update_db = UpdateDb(compared_result=images)
 
             self.trash_remover = TrashRemover()
             self.dub_finder = DubFinder()
