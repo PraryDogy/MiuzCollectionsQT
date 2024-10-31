@@ -91,14 +91,30 @@ class MainUtils:
     @classmethod
     def print_err(cls, parent: object, error: Exception):
         tb = traceback.extract_tb(error.__traceback__)
-        last_call = tb[-1]
-        filepath = last_call.filename
-        filename = os.path.basename(filepath)
+
+        # Попробуем найти первую строчку стека, которая относится к вашему коду.
+        for trace in tb:
+            filepath = trace.filename
+            filename = os.path.basename(filepath)
+            
+            # Если файл - не стандартный модуль, считаем его основным
+            if not filepath.startswith("<") and filename != "site-packages":
+                line_number = trace.lineno
+                break
+        else:
+            # Если не нашли, то берем последний вызов
+            trace = tb[-1]
+            filepath = trace.filename
+            filename = os.path.basename(filepath)
+            line_number = trace.lineno
+
         class_name = parent.__class__.__name__
-        line_number = last_call.lineno
         error_message = str(error)
-        
+
         print()
-        print(f"{filename} > {class_name} > row {line_number}: {error_message}")
+        print("#" * 100)
         print(f"{filepath}:{line_number}")
+        print()
+        print("ERROR:", error_message)
+        print("#" * 100)
         print()

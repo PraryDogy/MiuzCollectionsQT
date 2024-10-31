@@ -1,7 +1,5 @@
 import io
 import logging
-import os
-import traceback
 
 import cv2
 import numpy as np
@@ -10,8 +8,9 @@ from PyQt5.QtCore import QByteArray, Qt
 from PyQt5.QtGui import QImage, QPixmap
 from tifffile import tifffile
 
-from cfg import cnf
 from database import *
+
+from .main_utils import MainUtils
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
@@ -27,8 +26,7 @@ class ImageUtils:
                 img = (img/256).astype(dtype="uint8")
             return img
         except (tifffile.TiffFileError, RuntimeError) as e:
-            print(path)
-            cls.print_error(cls, e)
+            MainUtils.print_err(cls, e)
             return None
 
     @classmethod
@@ -44,7 +42,7 @@ class ImageUtils:
             return img
 
         except Exception as e:
-            cls.print_error(cls, e)
+            MainUtils.print_err(cls, e)
             return None
             
     @classmethod
@@ -53,7 +51,7 @@ class ImageUtils:
             image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
             return image
         except (Exception, cv2.error) as e:
-            cls.print_error(cls, e)
+            MainUtils.print_err(cls, e)
             return None
         
     @classmethod
@@ -71,7 +69,7 @@ class ImageUtils:
             return converted
         
         except Exception as e:
-            cls.print_error(cls, e)
+            MainUtils.print_err(cls, e)
             return None
 
     @classmethod
@@ -166,34 +164,3 @@ class ImageUtils:
 
         else:
             return None
-
-    @classmethod
-    def print_error(cls, parent: object, error: Exception):
-        tb = traceback.extract_tb(error.__traceback__)
-
-        # Попробуем найти первую строчку стека, которая относится к вашему коду.
-        for trace in tb:
-            filepath = trace.filename
-            filename = os.path.basename(filepath)
-            
-            # Если файл - не стандартный модуль, считаем его основным
-            if not filepath.startswith("<") and filename != "site-packages":
-                line_number = trace.lineno
-                break
-        else:
-            # Если не нашли, то берем последний вызов
-            trace = tb[-1]
-            filepath = trace.filename
-            filename = os.path.basename(filepath)
-            line_number = trace.lineno
-
-        class_name = parent.__class__.__name__
-        error_message = str(error)
-
-        print()
-        print("#" * 100)
-        print(f"{filepath}:{line_number}")
-        print()
-        print("ERROR:", error_message)
-        print("#" * 100)
-        print()
