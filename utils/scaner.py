@@ -3,14 +3,15 @@ from collections import defaultdict
 from typing import Literal
 
 import sqlalchemy
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 
 from cfg import IMG_EXT, PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
-from signals import signals_app, signals_app
+from signals import signals_app
 
-from ..image_utils import ImageUtils
-from ..main_utils import MainUtils
+from .image_utils import ImageUtils
+from .main_utils import MainUtils
+from .scaner import ScanerThread, Shared
 
 
 class Shared:
@@ -439,3 +440,53 @@ class ScanerThread(QThread):
     def run(self):
         self.scaner = Scaner()
         self.finished.emit()
+
+
+class ScanerShedule(QObject):
+    def __init__(self):
+        super().__init__()
+
+        self.wait_timer = QTimer(self)
+        self.wait_timer.setSingleShot(True)
+        self.wait_timer.timeout.connect(self.prepare_thread)
+
+        self.scaner_thread = None
+
+    def prepare_thread(self):
+        self.wait_timer.stop()
+
+        if not MainUtils.smb_check():
+            print("scaner no smb")
+            self.wait_timer.start(15000)
+
+        elif self.scaner_thread:
+            print("scaner wait prev scaner finished")
+            self.wait_timer.start(15000)
+
+        else:
+            print("scaner started")
+            self.start_thread()
+
+    def start_thread(self):
+        self.scaner_thread = ScanerThread()
+        self.scaner_thread.finished.connect(self.finalize_scan)
+        self.scaner_thread.start()
+
+    def stop_thread(self):
+        print("scaner manualy stoped from signals_app. You need emit scaner start signal")
+        Shared.flag = False
+        self.wait_timer.stop()
+
+    def finalize_scan(self):
+        try:
+            self.scaner_thread.quit()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+        self.scaner_thread = None
+        self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)
+
+
+scaner_app = ScanerShedule()
+signals_app.scaner_start.connect(scaner_app.prepare_thread)
+signals_app.scaner_stop.connect(scaner_app.stop_thread)
