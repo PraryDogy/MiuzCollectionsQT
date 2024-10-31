@@ -1,17 +1,86 @@
-from datetime import datetime
+import re
+from datetime import datetime, timedelta
 from functools import partial
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
+from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app
 
-from .date_utils import DateUtils
-from .input_wid import BaseDateInput
-from .label_title import TitleLabel
+
+class DateUtils:
+    @staticmethod
+    def date_to_text(date: datetime):
+        return date.strftime("%d.%m.%Y")
+
+    @staticmethod
+    def add_or_subtract_days(date: datetime, days: int):
+        return date + timedelta(days=days)
+    
+    @staticmethod
+    def text_to_datetime_date(text: str):
+        return datetime.strptime(text, "%d.%m.%Y").date()
+
+
+class ReDate:
+    def __init__(self, text: str):
+        self.converted_text = None
+        t_reg = re.match(r"\d{,2}\W\d{,2}\W\d{4}", text)
+        if t_reg:
+            self.converted_text = re.sub("\W", ".", t_reg.group(0))
+
+
+class ConvertDate:
+    def __init__(self, text: str):
+        try:
+            self.date = DateUtils.text_to_datetime_date(text)
+        except (ValueError, TypeError):
+            self.date = None
+
+
+class BaseDateInput(InputBase):
+    inputChangedSignal = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.setFixedWidth(150)
+        self.setPlaceholderText(cnf.lng.d_m_y)
+        self.textChanged.connect(self.onTextChanged)
+        self.date = None
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Up:
+            if self.date:
+                self.date = DateUtils.add_or_subtract_days(self.date, 1)
+                self.setText(DateUtils.date_to_text(self.date))
+            else:
+                self.date = datetime.today().date()
+                self.setText(DateUtils.date_to_text(self.date))
+
+        elif a0.key() == Qt.Key.Key_Down:
+            if self.date:
+                self.date = DateUtils.add_or_subtract_days(self.date, -1)
+                self.setText(DateUtils.date_to_text(self.date))
+            else:
+                self.date = datetime.today().date()
+                self.setText(DateUtils.date_to_text(self.date))
+
+        return super().keyPressEvent(a0)
+
+    def onTextChanged(self):
+        date_check = ReDate(self.text()).converted_text
+        new_date = ConvertDate(date_check).date
+
+        if new_date:
+            self.setText(date_check)
+            self.date = ConvertDate(date_check).date
+        else:
+            self.date = None
+
+        self.inputChangedSignal.emit()
 
 
 class FiltersDateBtncolor:
@@ -26,6 +95,30 @@ class FiltersDateBtncolor:
     @staticmethod
     def set_border():
         gui_signals_app.set_dates_btn_blue_border.emit()
+
+
+class TitleLabel(QLabel):
+    def __init__(self, default_text: str):
+        self.default_text = "\n" + default_text
+
+        super().__init__(self.default_text)
+        self.setFixedWidth(150)
+
+    def set_named_date_text(self, date: datetime):
+        weekday = self.get_named_weekday(date).capitalize()
+        named_date = self.get_named_date(date)
+
+        self.setText(f"{weekday}:\n{named_date}")
+
+    def set_default_text(self):
+        self.setText(self.default_text)
+
+    def get_named_weekday(self, date: datetime) -> str:
+        return cnf.lng.weekdays[str(date.weekday())]
+    
+    def get_named_date(self, date: datetime) -> str:
+        month = cnf.lng.months_genitive_case[str(date.month)]
+        return f"{date.day} {month} {date.year}"
 
 
 class BaseDateLayout(QWidget):
@@ -156,21 +249,13 @@ class WinDates(WinStandartBase):
     def ok_cmd(self, event):
         if not any((self.date_start, self.date_end)):
             return
-            # cnf.date_start, cnf.date_end = None, None
-            # FiltersDateBtncolor.date_based_color()
-            # self.close()
-            # gui_signals_app.reload_thumbnails.emit()
-
-            return
 
         elif not self.date_start:
             return
-            # self.date_start = self.date_end
 
         elif not self.date_end:
             self.date_end = self.date_start
             self.date_end = datetime.today().date()
-            print(self.date_end)
 
         cnf.date_start = self.date_start
         cnf.date_end = self.date_end
