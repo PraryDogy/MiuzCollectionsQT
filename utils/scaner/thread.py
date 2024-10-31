@@ -278,10 +278,7 @@ class UpdateDb:
             size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
 
-            if array_img is None:
-                counter = 0
-                conn.commit()
-                conn = Dbase.engine.connect()         
+            if array_img is None:     
                 continue
 
             array_img = ImageUtils.resize_min_aspect_ratio(array_img, cnf.THUMBSIZE)
@@ -329,7 +326,6 @@ class UpdateDb:
             array_img = ImageUtils.read_image(src)
 
             if array_img is None:
-                print("error read image")
                 continue
 
             array_img = ImageUtils.resize_min_aspect_ratio(array_img, cnf.THUMBSIZE)
