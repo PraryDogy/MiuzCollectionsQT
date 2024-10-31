@@ -18,7 +18,7 @@ class Shared:
 
 
 class Migrate:
-    def __init__(self):
+    def start(self):
         conn = Dbase.engine.connect()
 
         try:
@@ -74,7 +74,7 @@ class Migrate:
 
 
 class TrashRemover:
-    def __init__(self):
+    def start(self):
         coll_folder = os.sep + cnf.coll_folder.strip(os.sep) + os.sep
 
         conn = Dbase.engine.connect()
@@ -105,7 +105,7 @@ class TrashRemover:
 
 
 class DubFinder:
-    def __init__(self):
+    def start(self):
         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
         conn = Dbase.engine.connect()
         res = conn.execute(q).fetchall()
@@ -436,7 +436,8 @@ class ScanerThread(QThread):
             except RuntimeError as e:
                 MainUtils.print_err(parent=self, error=e)
 
-            self.migrate = Migrate()
+            migrate = Migrate()
+            migrate.start()
 
             finder_images = FinderImages()
             finder_images = finder_images.get()
@@ -453,8 +454,10 @@ class ScanerThread(QThread):
             db_updater = DbUpdater(compared_result=compared_res)
             db_updater.start()
 
-            self.trash_remover = TrashRemover()
-            self.dub_finder = DubFinder()
+            trash_remover = TrashRemover()
+            trash_remover.start()
+            dub_finder = DubFinder()
+            dub_finder.start()
 
             Dbase.vacuum()
 
