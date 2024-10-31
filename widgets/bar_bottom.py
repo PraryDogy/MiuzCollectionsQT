@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import CustomProgressBar, LayoutH, SvgBtn
 from cfg import cnf
-from signals import gui_signals_app
+from signals import signals_app
 from styles import Names, Themes
 from utils import MainUtils
 
@@ -28,9 +28,9 @@ class ProgressBar(QWidget):
         self.progress_bar = CustomProgressBar()
         layout.addWidget(self.progress_bar)
 
-        gui_signals_app.progressbar_value.connect(self.progressbar_value)
-        gui_signals_app.progressbar_show.connect(self.progressbar_show)
-        gui_signals_app.progressbar_hide.connect(self.progressbar_hide)
+        signals_app.progressbar_value.connect(self.progressbar_value)
+        signals_app.progressbar_show.connect(self.progressbar_show)
+        signals_app.progressbar_hide.connect(self.progressbar_hide)
 
         self.temp_value = 0
         self.current_value = 0
@@ -74,7 +74,7 @@ class BarBottom(QFrame):
         self.h_layout = LayoutH(self)
         self.init_ui()
         
-        gui_signals_app.reload_stbar.connect(self.reload_stbar)
+        signals_app.reload_stbar.connect(self.reload_stbar)
 
     def init_ui(self):
         self.h_layout.addStretch(1)
@@ -90,8 +90,8 @@ class BarBottom(QFrame):
         self.downloads.mouseReleaseEvent = self.open_downloads
         self.h_layout.addWidget(self.downloads)
         self.downloads.setToolTip(cnf.lng.title_downloads)
-        gui_signals_app.hide_downloads.connect(self.downloads.hide)
-        gui_signals_app.show_downloads.connect(self.downloads.show)
+        signals_app.hide_downloads.connect(self.downloads.hide)
+        signals_app.show_downloads.connect(self.downloads.show)
 
     
         self.h_layout.addSpacerItem(QSpacerItem(15, 0))
@@ -125,10 +125,10 @@ class BarBottom(QFrame):
         # QTimer.singleShot(1500, self.downloads.show)
 
     def reload(self):
-        gui_signals_app.reload_thumbnails.emit()
-        gui_signals_app.reload_menu.emit()
-        gui_signals_app.reload_filters_bar.emit()
-        gui_signals_app.reload_stbar.emit()
+        signals_app.reload_thumbnails.emit()
+        signals_app.reload_menu.emit()
+        signals_app.reload_filters_bar.emit()
+        signals_app.reload_stbar.emit()
 
     def reload_stbar(self):
         MainUtils.clear_layout(self.h_layout)
@@ -171,6 +171,6 @@ class BarBottom(QFrame):
 
     def switch_view_cmd(self, e):
         cnf.small_view = not cnf.small_view
-        gui_signals_app.reload_thumbnails.emit()
+        signals_app.reload_thumbnails.emit()
         self.switch_view.switch_icon()
         cnf.write_json_cfg()

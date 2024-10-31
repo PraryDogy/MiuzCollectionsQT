@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
 from base_widgets import ContextMenuBase, ContextSubMenuBase, LayoutH, LayoutV
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from signals import gui_signals_app
+from signals import signals_app
 from styles import Names, Themes
 from utils import MainUtils
 
@@ -56,13 +56,13 @@ class CustomContext(ContextMenuBase):
 
     def change_view(self):
         cnf.small_menu_view = not cnf.small_menu_view
-        gui_signals_app.reload_menu.emit()
+        signals_app.reload_menu.emit()
 
     def show_collection(self):
         cnf.curr_coll = self.true_name
-        gui_signals_app.reload_title.emit()
-        gui_signals_app.reload_menu.emit()
-        gui_signals_app.reload_thumbnails.emit()
+        signals_app.reload_title.emit()
+        signals_app.reload_menu.emit()
+        signals_app.reload_thumbnails.emit()
 
     def reveal_collection(self, flag: str = None):
         if MainUtils.smb_check():
@@ -127,10 +127,10 @@ class CollectionBtn(QLabel):
     def load_collection(self):
         cnf.curr_coll = self.true_name
         cnf.current_photo_limit = cnf.LIMIT
-        gui_signals_app.reload_title.emit()
-        gui_signals_app.scroll_top.emit()
-        gui_signals_app.reload_menu.emit()
-        gui_signals_app.reload_thumbnails.emit()
+        signals_app.reload_title.emit()
+        signals_app.scroll_top.emit()
+        signals_app.reload_menu.emit()
+        signals_app.reload_thumbnails.emit()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
@@ -182,7 +182,7 @@ class BaseLeftMenu(QScrollArea):
         self.v_layout = LayoutV()
         scroll_widget.setLayout(self.v_layout)
         self.init_ui()
-        gui_signals_app.reload_menu.connect(self.reload_menu)
+        signals_app.reload_menu.connect(self.reload_menu)
 
     def init_ui(self):
         btns_widget = QWidget()
@@ -220,7 +220,7 @@ class BaseLeftMenu(QScrollArea):
 
     def change_view(self):
         cnf.small_menu_view = not cnf.small_menu_view
-        gui_signals_app.reload_menu.emit()
+        signals_app.reload_menu.emit()
 
     def load_colls_query(self) -> dict:
         menus = defaultdict(list)

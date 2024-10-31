@@ -3,10 +3,10 @@ import platform
 import subprocess
 import traceback
 
-from PyQt5.QtWidgets import QVBoxLayout, QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout
 
 from cfg import cnf
-from signals import utils_signals_app
+from signals import signals_app
 
 
 class MainUtils:
@@ -16,8 +16,8 @@ class MainUtils:
             for coll_folder in cnf.coll_folder_list:
                 if os.path.exists(coll_folder):
                     cnf.coll_folder = coll_folder
-                    utils_signals_app.scaner_stop.emit()
-                    utils_signals_app.scaner_start.emit()
+                    signals_app.scaner_stop.emit()
+                    signals_app.scaner_start.emit()
                     return True
             return False
         return True

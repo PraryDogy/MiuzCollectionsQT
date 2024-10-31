@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
-from signals import gui_signals_app
+from signals import signals_app
 from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiff)
 
@@ -179,14 +179,14 @@ class ContextImg(ContextMenuBase):
             return
 
         self.copy_task = ThreadCopyFiles(dest=dest, files=[file])
-        gui_signals_app.show_downloads.emit()
+        signals_app.show_downloads.emit()
         self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, files))
         self.copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
         if len(cnf.copy_threads) == 0:
-            gui_signals_app.hide_downloads.emit()
+            signals_app.hide_downloads.emit()
         try:
             copy_task.remove_threads()
         except Exception as e:
@@ -195,7 +195,7 @@ class ContextImg(ContextMenuBase):
     def load_collection(self, collection: str):
         cnf.curr_coll = collection
         cnf.current_photo_limit = cnf.LIMIT
-        gui_signals_app.reload_title.emit()
-        gui_signals_app.scroll_top.emit()
-        gui_signals_app.reload_menu.emit()
-        gui_signals_app.reload_thumbnails.emit()
+        signals_app.reload_title.emit()
+        signals_app.scroll_top.emit()
+        signals_app.reload_menu.emit()
+        signals_app.reload_thumbnails.emit()

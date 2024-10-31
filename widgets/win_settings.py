@@ -12,7 +12,7 @@ from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
 from cfg import cnf
 from database import Dbase
-from signals import gui_signals_app, utils_signals_app
+from signals import signals_app, signals_app
 from utils import MainUtils, Updater
 
 from .win_smb import WinSmb
@@ -124,13 +124,13 @@ class ChangeLang(QWidget):
 
             cnf.set_language(self.lang)
 
-            gui_signals_app.reload_menu.emit()
-            gui_signals_app.reload_stbar.emit()
-            gui_signals_app.reload_filters_bar.emit()
-            gui_signals_app.reload_thumbnails.emit()
-            gui_signals_app.reload_title.emit()
-            gui_signals_app.reload_search_wid.emit()
-            gui_signals_app.reload_menubar.emit()
+            signals_app.reload_menu.emit()
+            signals_app.reload_stbar.emit()
+            signals_app.reload_filters_bar.emit()
+            signals_app.reload_thumbnails.emit()
+            signals_app.reload_title.emit()
+            signals_app.reload_search_wid.emit()
+            signals_app.reload_menubar.emit()
 
 
 class CustFilters(QWidget):
@@ -388,8 +388,8 @@ class WinSettings(WinStandartBase):
             scan_again = True
 
         if scan_again:
-            utils_signals_app.scaner_stop.emit()
-            utils_signals_app.scaner_start.emit()
+            signals_app.scaner_stop.emit()
+            signals_app.scaner_start.emit()
 
         cnf.write_json_cfg()
         self.close()

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from signals import gui_signals_app, utils_signals_app
+from signals import signals_app, signals_app
 from styles import Names, Themes
 from utils import ImageUtils, MainUtils, MyThread, get_image_size
 
@@ -228,7 +228,7 @@ class WinImageView(WinImgViewBase):
 
         self.notification = Notification(self.content_wid)
         self.notification.move(10, 2) # 10 left side, 10 right side, 2 top side
-        gui_signals_app.noti_img_view.connect(self.notification.show_notify)
+        signals_app.noti_img_view.connect(self.notification.show_notify)
 
         self.prev_image_btn = PrevImageBtn(self.content_wid)
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
@@ -253,7 +253,7 @@ class WinImageView(WinImgViewBase):
 
     def smb_check_first(self):
         if not MainUtils.smb_check():
-            utils_signals_app.migrate_finished.connect(self.finalize_smb)
+            signals_app.migrate_finished.connect(self.finalize_smb)
             self.win_smb = WinSmb(parent=self)
             self.win_smb.show()
 
@@ -326,7 +326,7 @@ class WinImageView(WinImgViewBase):
         total_images = len(cnf.images)
         new_index = (current_index + offset) % total_images
         self.img_src = keys[new_index]
-        gui_signals_app.select_new_wid.emit(self.img_src)
+        signals_app.select_new_wid.emit(self.img_src)
         self.load_thumbnail()
 
     def cut_text(self, text: str) -> str:

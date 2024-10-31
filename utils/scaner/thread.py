@@ -7,7 +7,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 from cfg import IMG_EXT, PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
-from signals import gui_signals_app, utils_signals_app
+from signals import signals_app, signals_app
 
 from ..image_utils import ImageUtils
 from ..main_utils import MainUtils
@@ -68,9 +68,9 @@ class Migrate:
             MainUtils.print_err(parent=self, error=e)
 
         conn.close()
-        gui_signals_app.reload_menu.emit()
-        gui_signals_app.reload_thumbnails.emit()
-        utils_signals_app.migrate_finished.emit()
+        signals_app.reload_menu.emit()
+        signals_app.reload_thumbnails.emit()
+        signals_app.migrate_finished.emit()
 
 
 class TrashRemover:
@@ -165,7 +165,7 @@ class FinderImages(dict):
 
         for collection_walk in collections:
             try:
-                gui_signals_app.progressbar_value.emit(step_value)
+                signals_app.progressbar_value.emit(step_value)
             except Exception as e:
                 MainUtils.print_err(parent=self, error=e)
 
@@ -243,7 +243,7 @@ class UpdateDb:
         super().__init__()
 
         try:
-            gui_signals_app.progressbar_value.emit(70)
+            signals_app.progressbar_value.emit(70)
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
@@ -251,7 +251,7 @@ class UpdateDb:
             self.delete_db(images["delete"])
 
         try:
-            gui_signals_app.progressbar_value.emit(80)
+            signals_app.progressbar_value.emit(80)
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
@@ -259,7 +259,7 @@ class UpdateDb:
             self.insert_db(images["insert"])
 
         try:
-            gui_signals_app.progressbar_value.emit(90)
+            signals_app.progressbar_value.emit(90)
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
@@ -306,8 +306,8 @@ class UpdateDb:
                 counter = 0
                 conn.commit()
                 conn = Dbase.engine.connect()
-                gui_signals_app.reload_thumbnails.emit()
-                gui_signals_app.reload_menu.emit()
+                signals_app.reload_thumbnails.emit()
+                signals_app.reload_menu.emit()
 
         if counter != 0:
             conn.commit()
@@ -352,8 +352,8 @@ class UpdateDb:
                 counter = 0
                 conn.commit()
                 conn = Dbase.engine.connect()
-                gui_signals_app.reload_thumbnails.emit()
-                gui_signals_app.reload_menu.emit()
+                signals_app.reload_thumbnails.emit()
+                signals_app.reload_menu.emit()
         
         if counter != 0:
             conn.commit()
@@ -377,8 +377,8 @@ class UpdateDb:
                 counter = 0
                 conn.commit()
                 conn = Dbase.engine.connect()
-                gui_signals_app.reload_thumbnails.emit()
-                gui_signals_app.reload_menu.emit()
+                signals_app.reload_thumbnails.emit()
+                signals_app.reload_menu.emit()
 
         if counter != 0:
             conn.commit()
@@ -392,7 +392,7 @@ class Scaner(object):
             Shared.flag = True
 
             try:
-                gui_signals_app.progressbar_show.emit()
+                signals_app.progressbar_show.emit()
             except RuntimeError as e:
                 MainUtils.print_err(parent=self, error=e)
 
@@ -415,9 +415,9 @@ class Scaner(object):
             Shared.flag = True
 
             try:
-                gui_signals_app.progressbar_hide.emit()
-                gui_signals_app.reload_menu.emit()
-                gui_signals_app.reload_thumbnails.emit()
+                signals_app.progressbar_hide.emit()
+                signals_app.reload_menu.emit()
+                signals_app.reload_thumbnails.emit()
             except RuntimeError as e:
                 MainUtils.print_err(parent=self, error=e)
 
@@ -425,7 +425,7 @@ class Scaner(object):
             MainUtils.print_err(parent=self, error=e)
 
             try:
-                gui_signals_app.progressbar_hide.emit()
+                signals_app.progressbar_hide.emit()
             except RuntimeError as e:
                 MainUtils.print_err(parent=self, error=e)
 

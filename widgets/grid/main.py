@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
 from cfg import cnf
-from signals import gui_signals_app
+from signals import signals_app
 from styles import Names, Themes
 from utils import MainUtils
 
@@ -54,10 +54,10 @@ class Thumbnails(QScrollArea):
         frame_layout.addStretch(1)
         self.setWidget(self.scroll_area_widget)
 
-        gui_signals_app.reload_thumbnails.connect(self.reload_thumbnails)
-        gui_signals_app.scroll_top.connect(self.scroll_top)
-        gui_signals_app.move_to_wid.connect(self.move_to_wid)
-        gui_signals_app.select_new_wid.connect(self.select_new_widget)
+        signals_app.reload_thumbnails.connect(self.reload_thumbnails)
+        signals_app.scroll_top.connect(self.scroll_top)
+        signals_app.move_to_wid.connect(self.move_to_wid)
+        signals_app.select_new_wid.connect(self.select_new_widget)
 
     def checkScrollValue(self, value):
         self.up_btn.move(

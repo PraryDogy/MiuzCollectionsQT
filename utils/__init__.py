@@ -1,4 +1,4 @@
-from signals import utils_signals_app
+from signals import signals_app
 
 from .copy_files import ThreadCopyFiles
 from .find_tiffs import ThreadFindTiff, ThreadFindTiffsMultiple

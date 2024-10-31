@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
 from base_widgets import ContextMenuBase, WinSmallBase
 from cfg import cnf
-from signals import gui_signals_app
+from signals import signals_app
 from utils import MainUtils
 
 from .win_settings import WinSettings
@@ -73,7 +73,7 @@ class BarMacos(QMenuBar):
     def __init__(self):
         super().__init__()
         self.settings_win = None
-        gui_signals_app.reload_menubar.connect(self.reload_menubar)
+        signals_app.reload_menubar.connect(self.reload_menubar)
         
         self.init_ui()
 

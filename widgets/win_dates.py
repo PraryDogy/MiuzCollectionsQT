@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
-from signals import gui_signals_app
+from signals import signals_app
 
 
 class DateUtils:
@@ -88,13 +88,13 @@ class FiltersDateBtncolor:
     @staticmethod
     def date_based_color():
         if not cnf.date_start:
-            gui_signals_app.set_dates_btn_normal.emit()
+            signals_app.set_dates_btn_normal.emit()
         else:
-            gui_signals_app.set_dates_btn_blue.emit()
+            signals_app.set_dates_btn_blue.emit()
 
     @staticmethod
     def set_border():
-        gui_signals_app.set_dates_btn_blue_border.emit()
+        signals_app.set_dates_btn_blue_border.emit()
 
 
 class TitleLabel(QLabel):
@@ -266,7 +266,7 @@ class WinDates(WinStandartBase):
         FiltersDateBtncolor.date_based_color()
         self.close()
 
-        gui_signals_app.reload_thumbnails.emit()
+        signals_app.reload_thumbnails.emit()
 
     def cancel_cmd(self, event):
         FiltersDateBtncolor.date_based_color()

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QSpacerItem, QWidget
 
 from base_widgets import InputBase, LayoutH
 from cfg import cnf
-from signals import gui_signals_app
+from signals import signals_app
 
 
 class SearchBarBase(InputBase):
@@ -21,9 +21,9 @@ class SearchBarBase(InputBase):
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.delayed_search)
 
-        gui_signals_app.clear_search.connect(self.clear_search)
-        gui_signals_app.set_focus_search.connect(self.setFocus)
-        gui_signals_app.reload_search_wid.connect(self.reload_search)
+        signals_app.clear_search.connect(self.clear_search)
+        signals_app.set_focus_search.connect(self.setFocus)
+        signals_app.reload_search_wid.connect(self.reload_search)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
@@ -40,7 +40,7 @@ class SearchBarBase(InputBase):
         self.timer.start()
 
     def delayed_search(self):
-        gui_signals_app.reload_thumbnails.emit()
+        signals_app.reload_thumbnails.emit()
 
     def clear_search(self):
         self.clear()

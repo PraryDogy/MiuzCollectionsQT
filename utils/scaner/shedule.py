@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, QTimer
 
 from cfg import cnf
-from signals import utils_signals_app
+from signals import signals_app
 
 from ..main_utils import MainUtils
 from .thread import Shared
@@ -16,8 +16,8 @@ class ScanerShedule(QObject):
         self.wait_timer.setSingleShot(True)
         self.wait_timer.timeout.connect(self.prepare_thread)
 
-        utils_signals_app.scaner_start.connect(self.prepare_thread)
-        utils_signals_app.scaner_stop.connect(self.stop_thread)
+        signals_app.scaner_start.connect(self.prepare_thread)
+        signals_app.scaner_stop.connect(self.stop_thread)
 
         self.scaner_thread = None
 
@@ -42,7 +42,7 @@ class ScanerShedule(QObject):
         self.scaner_thread.start()
 
     def stop_thread(self):
-        print("scaner manualy stoped from utils_signals_app. You need emit scaner start signal")
+        print("scaner manualy stoped from signals_app. You need emit scaner start signal")
         Shared.flag = False
         self.wait_timer.stop()
 

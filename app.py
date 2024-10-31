@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
 
 from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import cnf
-from signals import gui_signals_app, utils_signals_app
+from signals import signals_app
 from styles import Names, Themes
 from utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
@@ -56,7 +56,7 @@ class RightWidget(QFrame):
         v_layout.addWidget(self.st_bar)
 
         self.notification = Notification(parent=self)
-        gui_signals_app.noti_main.connect(self.notification.show_notify)
+        signals_app.noti_main.connect(self.notification.show_notify)
         self.notification.move(2, 2)
         self.notification.resize(
             self.thumbnails.width() - 6,
@@ -106,7 +106,7 @@ class WinMain(WinBase):
         self.titlebar.add_r_wid(search_bar)
 
         self.set_title(self.check_coll())
-        gui_signals_app.reload_title.connect(self.reload_title)
+        signals_app.reload_title.connect(self.reload_title)
 
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)
@@ -142,7 +142,7 @@ class WinMain(WinBase):
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                gui_signals_app.set_focus_search.emit()
+                signals_app.set_focus_search.emit()
 
         elif a0.key() == Qt.Key.Key_Escape:
             a0.ignore()
@@ -185,7 +185,7 @@ class WinMain(WinBase):
             if folder:
                 self.copy_task = ThreadCopyFiles(dest=folder, files=files)
                 self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, files))
-                gui_signals_app.show_downloads.emit()
+                signals_app.show_downloads.emit()
                 self.copy_task.start()
             
             a0.acceptProposedAction()
@@ -195,7 +195,7 @@ class WinMain(WinBase):
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = RevealFiles(files)
         if len(cnf.copy_threads) == 0:
-            gui_signals_app.hide_downloads.emit()
+            signals_app.hide_downloads.emit()
         try:
             copy_task.remove_threads()
         except Exception as e:
@@ -232,7 +232,7 @@ class App(QApplication):
         return super().eventFilter(a0, a1)
     
     def on_exit(self):
-        utils_signals_app.scaner_stop.emit()
+        signals_app.scaner_stop.emit()
 
         geo = self.main_win.geometry()
 
@@ -250,7 +250,7 @@ class App(QApplication):
             self.smb_win = WinSmb(parent=self.main_win)
             self.smb_win.show()
 
-        utils_signals_app.scaner_start.emit()
+        signals_app.scaner_start.emit()
         
 
 Themes.set_theme(cnf.theme)

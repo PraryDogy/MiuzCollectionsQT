@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV
 from cfg import cnf
-from signals import gui_signals_app
+from signals import signals_app
 from styles import Names, Themes
 
 BTN_W, BTN_H = 120, 28
@@ -22,9 +22,9 @@ class ResetDatesBtn(QLabel):
         cnf.date_start, cnf.date_end = None, None
         cnf.current_photo_limit = cnf.LIMIT
 
-        gui_signals_app.set_dates_btn_normal.emit()
-        gui_signals_app.reload_thumbnails.emit()
-        gui_signals_app.scroll_top.emit()
+        signals_app.set_dates_btn_normal.emit()
+        signals_app.reload_thumbnails.emit()
+        signals_app.scroll_top.emit()
         return super().mouseReleaseEvent(ev)
 
 
@@ -39,9 +39,9 @@ class ResetSearchBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.current_photo_limit = cnf.LIMIT
 
-        gui_signals_app.clear_search.emit()
-        gui_signals_app.reload_thumbnails.emit()
-        gui_signals_app.scroll_top.emit()
+        signals_app.clear_search.emit()
+        signals_app.reload_thumbnails.emit()
+        signals_app.scroll_top.emit()
         return super().mouseReleaseEvent(ev)
 
 
@@ -56,9 +56,9 @@ class ResetFiltersBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.current_photo_limit = cnf.LIMIT
 
-        gui_signals_app.disable_filters.emit()
-        gui_signals_app.reload_thumbnails.emit()
-        gui_signals_app.scroll_top.emit()
+        signals_app.disable_filters.emit()
+        signals_app.reload_thumbnails.emit()
+        signals_app.scroll_top.emit()
         return super().mouseReleaseEvent(ev)
 
 
@@ -75,14 +75,14 @@ class ShowAllBtn(QLabel):
         cnf.curr_coll = cnf.ALL_COLLS
         cnf.current_photo_limit = cnf.LIMIT
 
-        gui_signals_app.clear_search.emit()
-        gui_signals_app.disable_filters.emit()
+        signals_app.clear_search.emit()
+        signals_app.disable_filters.emit()
 
-        gui_signals_app.reload_title.emit()
-        gui_signals_app.reload_thumbnails.emit()
-        gui_signals_app.reload_menu.emit()
+        signals_app.reload_title.emit()
+        signals_app.reload_thumbnails.emit()
+        signals_app.reload_menu.emit()
 
-        gui_signals_app.scroll_top.emit()
+        signals_app.scroll_top.emit()
         return super().mouseReleaseEvent(ev)
 
 

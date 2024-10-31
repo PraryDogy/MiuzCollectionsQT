@@ -1,7 +1,11 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
 
-class GuiSignals(QObject):
+class Signals(QObject):
+    scaner_start = pyqtSignal()
+    scaner_stop = pyqtSignal()
+    migrate_finished = pyqtSignal()
+
     reload_thumbnails = pyqtSignal()
     reload_menu = pyqtSignal()
     reload_filters_bar = pyqtSignal()
@@ -35,4 +39,4 @@ class GuiSignals(QObject):
         super().__init__()
 
 
-gui_signals_app = GuiSignals()
+signals_app = Signals()
