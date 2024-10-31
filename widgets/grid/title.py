@@ -3,12 +3,11 @@ import os
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 
-from base_widgets import ContextMenuBase, ContextSubMenuBase
-from cfg import cnf, PSD_TIFF
+from base_widgets import ContextMenuBase
+from cfg import PSD_TIFF, cnf
 from signals import signals_app
 from styles import Names, Themes
-from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
-                   ThreadFindTiffsMultiple)
+from utils import MainUtils, RevealFiles, SendNotification, ThreadCopyFiles
 
 from ..win_smb import WinSmb
 
@@ -24,24 +23,23 @@ class CustomContext(ContextMenuBase):
         self.my_parent = parent
         self.files_list = files_list
 
-        save_as_jpg = QAction(text=cnf.lng.save_group_in + "JPG", parent=self)
-        save_as_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=True))
-        self.addAction(save_as_jpg)
-
-        save_as_layers = QAction(text=cnf.lng.save_group_in + cnf.lng.layers, parent=self)
-        save_as_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=True))
-        self.addAction(save_as_layers)
-
-        self.addSeparator()
-
-        save_jpg = QAction(text=cnf.lng.save_group_downloads + "JPG", parent=self)
+        save_jpg = QAction(text=cnf.lng.save_all_JPG, parent=self)
         save_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=False))
         self.addAction(save_jpg)
 
-
-        save_layers = QAction(text=cnf.lng.save_group_downloads + cnf.lng.layers, parent=self)
+        save_layers = QAction(text=cnf.lng.save_all_layers, parent=self)
         save_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=False))
         self.addAction(save_layers)
+
+        self.addSeparator()
+
+        save_as_jpg = QAction(text=cnf.lng.save_all_JPG_as, parent=self)
+        save_as_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=True))
+        self.addAction(save_as_jpg)
+
+        save_as_layers = QAction(text=cnf.lng.save_all_layers_as, parent=self)
+        save_as_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=True))
+        self.addAction(save_as_layers)
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
@@ -57,6 +55,10 @@ class CustomContext(ContextMenuBase):
                 Shared.dialog = self.dialog
                 self.dialog.setOption(QFileDialog.ShowDirsOnly, True)
                 dest = self.dialog.getExistingDirectory()
+
+                if not dest:
+                    return
+
             else:
                 dest = cnf.down_folder
             

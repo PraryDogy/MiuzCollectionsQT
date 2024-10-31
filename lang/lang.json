@@ -1,12 +1,4 @@
 {
-    "added_to_downloads": [
-        "Добавлено в загрузки",
-        "Added to Downloads"
-    ],
-    "adding_photos": [
-        "Добавляю новые фотографии",
-        "Adding new photos"
-    ],
     "all_colls": [
         "Все коллекции",
         "All collections"
@@ -55,14 +47,6 @@
         "Копирую",
         "Copying"
     ],
-    "copying_files": [
-        "Копирую файлы...",
-        "Copying files..."
-    ],
-    "copying_title": [
-        "Копирование",
-        "Copying"
-    ],
     "cust_fltr_names": [
         {
             "prod": "Имиджи",
@@ -88,10 +72,6 @@
     "dates": [
         "Даты",
         "Dates"
-    ],
-    "deleting_photos": [
-        "Удаляю лишнее",
-        "Removing unnecessary"
     ],
     "detail_menu": [
         "Стандартное меню",
@@ -132,10 +112,6 @@
     "lang_label": [
         "Язык/Language",
         "Language/Язык"
-    ],
-    "layers": [
-        "Слои",
-        "Layers"
     ],
     "loading": [
         "Загрузка...",
@@ -229,10 +205,6 @@
         "Ок",
         "Ok"
     ],
-    "open_collection": [
-        "Просмотр коллекции",
-        "View collection"
-    ],
     "open_settings_window": [
         "Открыть настройки",
         "Open settings window"
@@ -273,14 +245,6 @@
         "Показать в Finder",
         "Reveal in Finder"
     ],
-    "save_group_downloads": [
-        "Сохранить группу фото в загрузки",
-        "Save group of photos to Downloads"
-    ],
-    "save_group_in": [
-        "Сохранить группу фото как...",
-        "Save group of photos as..."
-    ],
     "save_image_downloads": [
         "Сохранить в загрузки",
         "Save to Downloads"
@@ -296,10 +260,6 @@
     "search_dates": [
         "Поиск фотографий по датам.\nУправляйте датами с клавишами вверх/вниз.",
         "Searching for photos by dates.\nControl dates with up/down keys."
-    ],
-    "searching_photos": [
-        "Поиск новых фотографий",
-        "Searching for new photos"
     ],
     "set_theme": [
         "Тема",
@@ -408,5 +368,21 @@
     "press_ok": [
         "Нажмите ок",
         "Press ok"
+    ],
+    "save_all_JPG": [
+        "Сохранить все JPG",
+        "Save all JPG"
+    ],
+    "save_all_JPG_as": [
+        "Сохранить все JPG как ...",
+        "Save all JPG as ..."
+    ],
+    "save_all_layers": [
+        "Сохранить все слои",
+        "Save all layers"
+    ],
+    "save_all_layers_as": [
+        "Сохранить все слои как ...",
+        "Save all layers as ..."
     ]
 }
