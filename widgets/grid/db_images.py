@@ -5,30 +5,38 @@ import sqlalchemy
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
+from utils.main_utils import MainUtils
 
 
-class ImagesDictDb(dict):
-    def __init__(self) -> dict:
-        """
-        dict:
-            key: "date start - date fin / month year"
-            value: [ {"img": img byte_array, "src": img_src, "coll": coll}, ... ]
-        """
+class DbImage:
+    __slots__ = ["img", "src", "coll"]
+    def __init__(self, img: bytes, src: str, coll: str):
+        self.img = img
+        self.src = src
+        self.coll = coll
+
+
+class DbImages:
+    def __init__(self):
         super().__init__()
-        self.thumbsdict_create()
 
-    def thumbsdict_create(self):
-        q = self.create_query()
+    def get(self) -> dict[str, list[DbImage]]:
+        return self._create_dict()
 
+    def _create_dict(self) -> dict[str, list[DbImage]]:
         conn = Dbase.engine.connect()
+        stmt = self._get_stmt()
+
         try:
-            data = conn.execute(q).fetchall()
-        finally:
+            res: list[ tuple[bytes, str, int, str] ] = conn.execute(stmt).fetchall()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
             conn.close()
+            return
 
         thumbs_dict = defaultdict(list)
 
-        for img, src, modified, coll in data:
+        for img, src, modified, coll in res:
             modified = datetime.fromtimestamp(modified).date()
 
             if cnf.date_start or cnf.date_end:
@@ -36,16 +44,16 @@ class ImagesDictDb(dict):
             else:
                 modified = f"{cnf.lng.months[str(modified.month)]} {modified.year}"
 
-            thumbs_dict[modified].append({"img": img, "src": src, "coll": coll})
+            thumbs_dict[modified].append(DbImage(img, src, coll))
 
-        self.update(thumbs_dict)
+        return thumbs_dict
 
-    def stamp_dates(self) -> tuple[datetime, datetime]:
+    def _stamp_dates(self) -> tuple[datetime, datetime]:
         start = datetime.combine(cnf.date_start, datetime.min.time())
         end = datetime.combine(cnf.date_end, datetime.max.time().replace(microsecond=0))
         return datetime.timestamp(start), datetime.timestamp(end)
 
-    def create_query(self):
+    def _get_stmt(self):
         q = sqlalchemy.select(
             ThumbsMd.img150,
             ThumbsMd.src,
@@ -82,7 +90,7 @@ class ImagesDictDb(dict):
             q = q.filter(sqlalchemy.and_(*other_filter))
 
         if any((cnf.date_start, cnf.date_end)):
-            t = self.stamp_dates()
+            t = self._stamp_dates()
             q = q.filter(ThumbsMd.modified > t[0])
             q = q.filter(ThumbsMd.modified < t[1])
 

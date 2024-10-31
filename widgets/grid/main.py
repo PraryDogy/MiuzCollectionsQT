@@ -11,7 +11,7 @@ from utils.main_utils import MainUtils
 from ..win_info import WinInfo
 from ..win_smb import WinSmb
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
-from .images_dict_db import ImagesDictDb
+from .db_images import DbImages, DbImage
 from .limit_btn import LimitBtn
 from .thumbnail import SmallThumbnail, Thumbnail
 from .title import Title
@@ -71,7 +71,8 @@ class Thumbnails(QScrollArea):
         self.verticalScrollBar().setValue(0)
 
     def init_ui(self):
-        thumbs_dict = ImagesDictDb()
+        thumbs_dict = DbImages()
+        thumbs_dict = thumbs_dict.get()
         cnf.images.clear()
 
         if thumbs_dict:
@@ -86,12 +87,8 @@ class Thumbnails(QScrollArea):
             self.path_to_wid.clear()
             self.ordered_widgets.clear()
 
-            if cnf.small_view:
-                for some_date, images_list in thumbs_dict.items():
-                    self.images_grid(SmallThumbnail, some_date, images_list)
-            else:
-                for some_date, images_list in thumbs_dict.items():
-                    self.images_grid(Thumbnail, some_date, images_list)
+            for date, db_images in thumbs_dict.items():
+                self.images_grid(date, db_images)
 
         else:
             no_images = AboveThumbsNoImages(self.width())
@@ -118,14 +115,9 @@ class Thumbnails(QScrollArea):
         self.up_btn.deleteLater()
         self.init_ui()
 
-    def images_grid(self, thumbnail: Thumbnail | SmallThumbnail, images_date: str, images_list: list[dict]):
-        """
-            images_date: "date start - date fin / month year"
-            images_list: [ {"img": img byte_array, "src": img_src, "coll": coll}, ... ]
-        """
-
-        img_src_list = [img_dict["src"] for img_dict in images_list]
-        title_label = Title(title=images_date, images=img_src_list, width=self.width())
+    def images_grid(self, date: str, db_images: list[DbImage]):
+        img_src_list = [db_image.src for db_image in db_images]
+        title_label = Title(title=date, images=img_src_list, width=self.width())
         title_label.setContentsMargins(9, 0, 0, 0)
         self.thumbnails_layout.addWidget(title_label)
 
@@ -137,13 +129,13 @@ class Thumbnails(QScrollArea):
 
         row, col = 0, 0
 
-        for img_dict in images_list:
-            wid: Thumbnail | SmallThumbnail = thumbnail(
-                byte_array=img_dict["img"],
-                src=img_dict["src"],
-                coll=img_dict["coll"],
-                images_date=images_date
-                )
+        if cnf.small_view:
+            thumb = SmallThumbnail
+        else:
+            thumb = Thumbnail
+
+        for db_image in db_images:
+            wid = thumb(img=db_image.img, src=db_image.src, coll=db_image.coll, images_date=date)
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
             wid.open_in_view.connect(lambda src, w=wid: self.open_in_view(w))
 

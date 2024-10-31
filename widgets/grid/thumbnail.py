@@ -43,7 +43,7 @@ class BaseThumb(QFrame):
     select = pyqtSignal(str)
     open_in_view = pyqtSignal(str)
 
-    def __init__(self, byte_array: bytearray, src: str, coll: str, images_date: str):
+    def __init__(self, img: bytes, src: str, coll: str, images_date: str):
         super().__init__()
 
         self.row, self.col = 0, 0
@@ -69,7 +69,7 @@ class BaseThumb(QFrame):
 
         self.img_label = QLabel()
 
-        pixmap = ImageUtils.pixmap_from_bytes(byte_array)
+        pixmap = ImageUtils.pixmap_from_bytes(img)
         pixmap = ImageUtils.crop_to_square(pixmap)
 
         if not isinstance(pixmap, QPixmap):
@@ -142,8 +142,8 @@ class Thumbnail(BaseThumb):
     select = pyqtSignal(str)
     open_in_view = pyqtSignal(str)
 
-    def __init__(self, byte_array: bytearray, src: str, coll: str, images_date: str):
-        super().__init__(byte_array, src, coll, images_date)
+    def __init__(self, img: bytes, src: str, coll: str, images_date: str):
+        super().__init__(img, src, coll, images_date)
    
         self.title = NameLabel(parent=self, filename=self.img_name, coll=coll)
         self.title.setContentsMargins(8, 5, 8, 7)
@@ -172,8 +172,8 @@ class SmallThumbnail(BaseThumb):
     select = pyqtSignal(str)
     open_in_view = pyqtSignal(str)
 
-    def __init__(self, byte_array: bytearray, src: str, coll: str, images_date: str):
-        super().__init__(byte_array, src, coll, images_date)
+    def __init__(self, img: bytes, src: str, coll: str, images_date: str):
+        super().__init__(img, src, coll, images_date)
         self.setContentsMargins(0, 0, 0, 8)
         self.v_layout.setContentsMargins(0, 0, 0, 0)
 
