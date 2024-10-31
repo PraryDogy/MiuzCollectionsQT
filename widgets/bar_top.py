@@ -1,8 +1,8 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QFrame
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QKeyEvent, QMouseEvent
+from PyQt5.QtWidgets import QFrame, QSpacerItem, QWidget
 
-from base_widgets import Btn, LayoutH
+from base_widgets import Btn, InputBase, LayoutH
 from cfg import cnf
 from signals import signals_app
 from styles import Names, Themes
@@ -79,6 +79,63 @@ class FilterBtn(Btn):
         return super().mouseReleaseEvent(ev)
 
 
+class SearchBarBase(InputBase):
+    def __init__(self):
+        super().__init__()
+        self.setFixedWidth(150)
+        self.setFixedHeight(25)
+
+        self.textChanged.connect(self.create_search)
+        self.setPlaceholderText(cnf.lng.search)
+
+        self.timer = QTimer(self)
+        self.timer.setInterval(1000)
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.delayed_search)
+
+        signals_app.clear_search.connect(self.clear_search)
+        signals_app.set_focus_search.connect(self.setFocus)
+        signals_app.reload_search_wid.connect(self.reload_search)
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Escape:
+            self.clearFocus()
+        return super().keyPressEvent(a0)
+
+    def create_search(self, new_text):
+        if len(new_text) > 0:
+            cnf.search_widget_text = new_text
+        else:
+            cnf.search_widget_text = None
+
+        self.timer.stop()
+        self.timer.start()
+
+    def delayed_search(self):
+        signals_app.reload_thumbnails.emit()
+
+    def clear_search(self):
+        self.clear()
+        cnf.search_widget_text = None
+
+    def reload_search(self):
+        self.setPlaceholderText(cnf.lng.search)
+
+
+class WidSearch(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        h_layout = LayoutH()
+        self.setLayout(h_layout)
+
+        search = SearchBarBase()
+        h_layout.addWidget(search)
+        h_layout.addSpacerItem(QSpacerItem(5, 0))
+
+        self.setFixedWidth(search.width() + 5)
+
+
 class BarTop(QFrame):
     def __init__(self):
         super().__init__()
@@ -128,12 +185,14 @@ class BarTop(QFrame):
         self.dates_btn.win_dates_opened.connect(self.open_win_dates)
         self.h_layout.addWidget(self.dates_btn)
 
+        self.search_btn = WidSearch()
+        self.h_layout.addWidget(self.search_btn, alignment=Qt.AlignmentFlag.AlignRight)
+
         if any((cnf.date_start, cnf.date_end)):
             self.dates_btn.set_blue_style()
         else:
             self.dates_btn.set_normal_style()
 
-        self.h_layout.addStretch(1)
         self.setLayout(self.h_layout)
     
     def open_win_dates(self):
