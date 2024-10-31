@@ -11,7 +11,6 @@ from signals import signals_app
 
 from .image_utils import ImageUtils
 from .main_utils import MainUtils
-from .scaner import ScanerThread, Shared
 
 
 class Shared:
@@ -442,6 +441,8 @@ class ScanerThread(QThread):
 class ScanerShedule(QObject):
     def __init__(self):
         super().__init__()
+        signals_app.scaner_start.connect(self.prepare_thread)
+        signals_app.scaner_stop.connect(self.stop_thread)
 
         self.wait_timer = QTimer(self)
         self.wait_timer.setSingleShot(True)
@@ -483,7 +484,3 @@ class ScanerShedule(QObject):
         self.scaner_thread = None
         self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)
 
-
-scaner_app = ScanerShedule()
-signals_app.scaner_start.connect(scaner_app.prepare_thread)
-signals_app.scaner_stop.connect(scaner_app.stop_thread)

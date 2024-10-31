@@ -37,9 +37,11 @@ if os.path.exists("lib"):
     print()
 
 
+from utils.scaner import ScanerShedule
 from database import Dbase
-Dbase.create_engine()
 
+Dbase.create_engine()
+scaner_app = ScanerShedule()
 
 from app import app
 app.exec_()
