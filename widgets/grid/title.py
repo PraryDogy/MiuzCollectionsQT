@@ -4,7 +4,7 @@ from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
-from cfg import cnf
+from cfg import cnf, PSD_TIFF
 from signals import signals_app
 from styles import Names, Themes
 from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
@@ -22,86 +22,51 @@ class CustomContext(ContextMenuBase):
 
         super().__init__(event=event)
         self.my_parent = parent
+        self.files_list = files_list
 
-        save_as_menu = ContextSubMenuBase(parent=self, title=cnf.lng.save_group_in)
-        self.addMenu(save_as_menu)
+        save_as_jpg = QAction(text=cnf.lng.save_group_in + "JPG", parent=self)
+        save_as_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=True))
+        self.addAction(save_as_jpg)
 
-        save_as_jpg = QAction(text="JPG", parent=self)
-        save_as_jpg.triggered.connect(lambda: self.save_as_jpg(files_list))
-        save_as_menu.addAction(save_as_jpg)
-
-        save_as_menu.addSeparator()
-
-        save_as_layers = QAction(text=cnf.lng.layers, parent=self)
-        save_as_layers.triggered.connect(lambda: self.save_as_tiffs(files_list))
-        save_as_menu.addAction(save_as_layers)
+        save_as_layers = QAction(text=cnf.lng.save_group_in + cnf.lng.layers, parent=self)
+        save_as_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=True))
+        self.addAction(save_as_layers)
 
         self.addSeparator()
 
-        save_menu = ContextSubMenuBase(parent=self, title=cnf.lng.save_group_downloads)
-        self.addMenu(save_menu)
+        save_jpg = QAction(text=cnf.lng.save_group_downloads + "JPG", parent=self)
+        save_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=False))
+        self.addAction(save_jpg)
 
-        save_jpg = QAction(text="JPG", parent=self)
-        save_jpg.triggered.connect(lambda: self.save_jpg(files_list))
-        save_menu.addAction(save_jpg)
 
-        save_menu.addSeparator()
+        save_layers = QAction(text=cnf.lng.save_group_downloads + cnf.lng.layers, parent=self)
+        save_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=False))
+        self.addAction(save_layers)
 
-        save_layers = QAction(text=cnf.lng.layers, parent=self)
-        save_layers.triggered.connect(lambda: self.save_tiffs(files_list))
-        save_menu.addAction(save_layers)
-        self.save_as_win = None
+    def save_cmd(self, is_layers: bool, save_as: bool):
 
-    def save_as_jpg(self, files_list: list):
         if MainUtils.smb_check():
-            dest = self.select_folder()
-            if dest:
-                self.copy_files(dest, files_list)
+
+            if is_layers:
+                images = [i for i in self.files_list if i.endswith(PSD_TIFF)]
+            else:
+                images = [i for i in self.files_list if not i.endswith(PSD_TIFF)]
+
+            if save_as:
+                self.dialog = QFileDialog()
+                Shared.dialog = self.dialog
+                self.dialog.setOption(QFileDialog.ShowDirsOnly, True)
+                dest = self.dialog.getExistingDirectory()
+            else:
+                dest = cnf.down_folder
+            
+            self.copy_files_cmd(dest, images)
+
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
 
-    def save_as_tiffs(self, files_list):
-        if MainUtils.smb_check():
-            dest = self.select_folder()
-            if dest:
-                self.find_tiffs(dest, files_list)
-        else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
-
-    def save_jpg(self, files_list: list):
-        if MainUtils.smb_check():
-            self.copy_files(cnf.down_folder, files_list)
-        else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
-
-    def save_tiffs(self, files_list: list):
-        if MainUtils.smb_check():
-            self.find_tiffs(cnf.down_folder, files_list)
-        else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
-        
-    def find_tiffs(self, dest: str, files_list: list):
-        tsk = ThreadFindTiffsMultiple(files_list)
-        tsk.finished.connect(lambda tiff_list: self.copy_files(dest, tiff_list))
-        tsk.can_remove.connect(tsk.remove_threads)
-
-        tsk.start()
-
-    def select_folder(self):
-        self.dialog = QFileDialog()
-        Shared.dialog = self.dialog
-        self.dialog.setOption(QFileDialog.ShowDirsOnly, True)
-        selected_folder = self.dialog.getExistingDirectory()
-
-        if selected_folder:
-            return selected_folder
-        return None
-
-    def copy_files(self, dest: str, files: list):
+    def copy_files_cmd(self, dest: str, files: list):
         files = [i for i in files if os.path.exists(i)]
 
         if len(files) == 0:

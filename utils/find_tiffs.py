@@ -105,57 +105,6 @@ class FindTiffBase:
             return ""
 
 
-# class FindTiffBase:
-#     def __init__(self, src: str):
-#         super().__init__()
-#         self.src = src
-
-#     def similar(self, jpg: str, tiff: str):
-#         return SequenceMatcher(None, jpg, tiff).ratio()
-
-#     def remove_punct(self, filename: str):
-#         filename, _ = os.path.splitext(p=filename)
-#         pattern = re.compile('[\W_]+')
-#         return re.sub(pattern, '', filename)
-
-#     def remove_stop_words(self, filename: str):
-#         for stop_word in cnf.stop_words:
-#             filename = re.sub(stop_word, '', filename, flags=re.IGNORECASE)
-#         return filename
-
-#     def get_result(self):
-#         root, jpg = os.path.split(self.src)
-#         jpg_no_ext, ext = os.path.splitext(jpg)
-#         jpg_no_ext = self.remove_punct(self.remove_stop_words(jpg_no_ext))
-
-#         files = {
-#             tiff_ext: tiff_ext.split(".")[0]
-#             for tiff_ext in os.listdir(root)
-#             if tiff_ext.lower().endswith((".tiff", ".tif", ".psd", ".psb"))
-#             }
-        
-#         files = {
-#             tiff_ext: self.remove_punct(self.remove_stop_words(tiff_ext))
-#             for tiff_ext in files
-#             }
-
-#         files_ratio = {
-#             tiff_ext: self.similar(jpg_no_ext, tiff_no_ext)
-#             for tiff_ext, tiff_no_ext in files.items()
-#             }
-        
-#         files_ratio = {
-#             os.path.join(root, k): v
-#             for k, v in files_ratio.items()
-#             if v > 0.85
-#             }
-        
-#         try:
-#             return max(files_ratio, key=files_ratio.get)
-#         except Exception:
-#             return ""
-
-
 class ThreadFindTiff(MyThread):
     finished = pyqtSignal(str)
     can_remove = pyqtSignal()
