@@ -385,10 +385,18 @@ class UpdateDb:
             conn.commit()
         conn.close()
 
-class Scaner(object):
+
+class ScanerThread(QThread):
+    finished = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
+    def run(self):
+        self.scaner = self.start_scan()
+        self.finished.emit()
+    
+    def start_scan(self):
         try:
             Shared.flag = True
 
@@ -429,17 +437,6 @@ class Scaner(object):
                 signals_app.progressbar_hide.emit()
             except RuntimeError as e:
                 MainUtils.print_err(parent=self, error=e)
-
-
-class ScanerThread(QThread):
-    finished = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-
-    def run(self):
-        self.scaner = Scaner()
-        self.finished.emit()
 
 
 class ScanerShedule(QObject):
