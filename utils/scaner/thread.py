@@ -255,8 +255,6 @@ class UpdateDb:
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
-        self.conn = Dbase.engine.connect()
-
         if images["insert"]:
             self.insert_db(images["insert"])
 
@@ -268,14 +266,11 @@ class UpdateDb:
         if images["update"]:
             self.update_db(images["update"])
 
-        self.conn.close()
-
     def insert_db(self, images: dict):
         counter = 0
+        conn = Dbase.engine.connect()
 
         for src, img_data in images.items():
-
-            print("insert", os.path.basename(src), counter)
 
             if not Shared.flag:
                 return
@@ -284,7 +279,9 @@ class UpdateDb:
             array_img = ImageUtils.read_image(src)
 
             if array_img is None:
-                print("error read image")
+                counter = 0
+                conn.commit()
+                conn = Dbase.engine.connect()         
                 continue
 
             array_img = ImageUtils.resize_min_aspect_ratio(array_img, cnf.THUMBSIZE)
@@ -304,22 +301,26 @@ class UpdateDb:
                     }
 
             stmt =  sqlalchemy.insert(ThumbsMd).values(values)
-            self.conn.execute(stmt)
+            conn.execute(stmt)
 
             counter += 1
 
             if counter == 10:
                 counter = 0
-                self.conn.commit()
-                self.conn = Dbase.engine.connect()
+                conn.commit()
+                conn = Dbase.engine.connect()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
 
+        if counter != 0:
+            conn.commit()
+        conn.close()
+
     def update_db(self, images: dict):
         counter = 0
+        conn = Dbase.engine.connect()
 
         for src, img_data in images.items():
-            print("update", os.path.basename(src))
 
             if not Shared.flag:
                 return
@@ -347,39 +348,45 @@ class UpdateDb:
                     }
 
             stmt =  sqlalchemy.update(ThumbsMd).values(values).where(ThumbsMd.src==src)
-            self.conn.execute(stmt)
+            conn.execute(stmt)
 
             counter += 1
 
             if counter == 10:
                 counter = 0
-                self.conn.commit()
-                self.conn = Dbase.engine.connect()
+                conn.commit()
+                conn = Dbase.engine.connect()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
+        
+        if counter != 0:
+            conn.commit()
+        conn.close()
 
     def delete_db(self, images: dict):
         counter = 0
+        conn = Dbase.engine.connect()
 
         for src, img_data in images.items():
-
-            print("delete", os.path.basename(src))
 
             if not Shared.flag:
                 return
 
             stmt =  sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
-            self.conn.execute(stmt)
+            conn.execute(stmt)
 
             counter += 1
 
             if counter == 10:
                 counter = 0
-                self.conn.commit()
-                self.conn = Dbase.engine.connect()
+                conn.commit()
+                conn = Dbase.engine.connect()
                 gui_signals_app.reload_thumbnails.emit()
                 gui_signals_app.reload_menu.emit()
 
+        if counter != 0:
+            conn.commit()
+        conn.close()
 
 class Scaner(object):
     def __init__(self):
