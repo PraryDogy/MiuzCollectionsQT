@@ -135,21 +135,20 @@ class DubFinder:
             conn.close()
 
 
-class FinderImages(dict):
+class ImageItem:
+    __slots__ = ["size", "created", "modified"]
+    def __init__(self, size: int, created: int, modified: int):
+        self.size = size
+        self.created = created
+        self.modified = modified
+
+
+class FinderImages:
     def __init__(self):
         super().__init__()
 
-        try:
-            self.run()
+    def get(self):
 
-        except (OSError, FileNotFoundError) as e:
-            MainUtils.print_err(parent=self, error=e)
-            Shared.flag = False
-
-        if not self:
-            Shared.flag = False
-
-    def run(self):
         collections = [
             os.path.join(cnf.coll_folder, i)
             for i in os.listdir(cnf.coll_folder)
@@ -160,36 +159,51 @@ class FinderImages(dict):
         if not collections:
             collections = [cnf.coll_folder]
 
+        finder_images: dict[str, ImageItem] = {}
         ln_colls = len(collections)
         step_value = 60 if ln_colls == 0 else 60 / ln_colls
 
-        for collection_walk in collections:
+        for collection in collections:
+
             try:
                 signals_app.progressbar_value.emit(step_value)
             except Exception as e:
                 MainUtils.print_err(parent=self, error=e)
 
-            for root, _, files in os.walk(top=collection_walk):
+            finder_images.update(self.walk_collection(collection))
 
-                if not Shared.flag:
+
+    def walk_collection(self, collection: str) -> dict[str, ImageItem]:
+
+        finder_images: dict[str, ImageItem] = {}
+
+        for root, _, files in os.walk(collection):
+
+            if not Shared.flag:
+                return
+
+            for file in files:
+
+                if not os.path.exists(cnf.coll_folder):
+                    Shared.flag = False
                     return
 
-                for file in files:
+                if file.endswith(IMG_EXT):
+                    src = os.path.join(root, file)
+                    item = self.get_image_item(src)
+                    if item:
+                        finder_images[src] = item
 
-                    if not os.path.exists(cnf.coll_folder):
-                        Shared.flag = False
-                        return
+        return finder_images
+    
+    def get_image_item(self, src: str) -> ImageItem:
+        try:
+            stats = os.stat(path=src)
+            return ImageItem(stats.st_size, stats.st_birthtime, stats.st_mtime)
+        except (FileNotFoundError) as e:
+            MainUtils.print_err(parent=self, error=e)
+            return None
 
-                    if file.endswith(IMG_EXT):
-                        
-                        src = os.path.join(root, file)
-                        file_stats = os.stat(path=src)
-
-                        self[src] = (
-                            int(file_stats.st_size),
-                            int(file_stats.st_birthtime),
-                            int(file_stats.st_mtime)
-                            )
 
 class DbImages(dict):
     def __init__(self):
@@ -407,6 +421,7 @@ class ScanerThread(QThread):
             self.migrate = Migrate()
 
             finder_images = FinderImages()
+            finder_images = finder_images.get()
             db_images = DbImages()
 
             if not finder_images:
