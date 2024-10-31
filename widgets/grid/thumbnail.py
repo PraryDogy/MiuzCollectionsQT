@@ -7,7 +7,8 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem
 from base_widgets import LayoutV
 from cfg import cnf
 from styles import Names, Themes
-from utils import ImageUtils, MainUtils
+from utils.main_utils import MainUtils
+from utils.image_utils import ImageUtils
 
 from ..context_img import ContextImg
 

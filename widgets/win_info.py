@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QAction, QLabel, QWidget
 from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
 from cfg import cnf
 from styles import Names, Themes
-from utils import MainUtils, get_image_size
+from utils.main_utils import MainUtils
+from utils.image_size import get_image_size
 
 
 class ImgInfoBase(dict):

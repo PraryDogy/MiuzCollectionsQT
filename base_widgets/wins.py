@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
 
 from cfg import cnf
 from styles import Names, Themes
-from utils import MainUtils
+from utils.main_utils import MainUtils
 
 from .layouts import LayoutH, LayoutV
 from .svg_btn import SvgBtn

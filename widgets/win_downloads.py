@@ -8,7 +8,7 @@ from base_widgets import (CustomProgressBar, LayoutH, LayoutV, SvgBtn,
                           WinStandartBase)
 from cfg import cnf
 from styles import Names, Themes
-from utils import MainUtils
+from utils.main_utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
 
 

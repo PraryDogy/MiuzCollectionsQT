@@ -10,8 +10,9 @@ from signals import signals_app
 
 
 class MainUtils:
-    @staticmethod
-    def smb_check() -> bool:
+
+    @classmethod
+    def smb_check(cls) -> bool:
         if not os.path.exists(cnf.coll_folder):
             for coll_folder in cnf.coll_folder_list:
                 if os.path.exists(coll_folder):
@@ -22,8 +23,8 @@ class MainUtils:
             return False
         return True
 
-    @staticmethod
-    def get_coll_name(src_path: str) -> str:
+    @classmethod
+    def get_coll_name(cls, src_path: str) -> str:
         coll = src_path.replace(cnf.coll_folder, "").strip(os.sep).split(os.sep)
 
         if len(coll) > 1:
@@ -31,8 +32,8 @@ class MainUtils:
         else:
             return cnf.coll_folder.strip(os.sep).split(os.sep)[-1]
     
-    @staticmethod
-    def clear_layout(layout: QVBoxLayout):
+    @classmethod
+    def clear_layout(cls, layout: QVBoxLayout):
         if layout:
             while layout.count():
                 item = layout.takeAt(0)
@@ -40,24 +41,24 @@ class MainUtils:
                 if widget:
                     widget.deleteLater()
                 else:
-                    MainUtils.clear_layout(item.layout())
+                    cls.clear_layout(item.layout())
 
-    @staticmethod
-    def get_mac_ver():
+    @classmethod
+    def get_mac_ver(cls):
         ver = platform.mac_ver()[0].split(".")
         if len(ver) >= 2:
             return float(f'{ver[0]}.{ver[1]}')
         else:
             return None
 
-    @staticmethod
-    def copy_text(text: str):
+    @classmethod
+    def copy_text(cls, text: str):
         text_bytes = text.encode('utf-8')
         subprocess.run(['pbcopy'], input=text_bytes, check=True)
         return True
 
-    @staticmethod
-    def paste_text() -> str:
+    @classmethod
+    def paste_text(cls) -> str:
         paste_result = subprocess.run(
             ['pbpaste'],
             capture_output=True,
@@ -66,17 +67,29 @@ class MainUtils:
             )
         return paste_result.stdout.strip()
     
-    @staticmethod
-    def get_app():
+    @classmethod
+    def get_app(cls):
         from app import app
         return app
     
-    @staticmethod
-    def get_main_win() -> QMainWindow:
-        return MainUtils.get_app().main_win
+    @classmethod
+    def get_main_win(cls) -> QMainWindow:
+        return cls.get_app().main_win
+    
+    @classmethod
+    def reveal_files(cls, files_list: list):
+        reveal_script = "applescripts/reveal_files.scpt"
+        command = ["osascript", reveal_script] + files_list
+        subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    @staticmethod
-    def print_err(parent: object, error: Exception):
+    def send_notification(cls, text: str):
+        if cnf.image_viewer:
+            signals_app.noti_img_view.emit(text)
+        else:
+            signals_app.noti_main.emit(text)
+
+    @classmethod
+    def print_err(cls, parent: object, error: Exception):
         tb = traceback.extract_tb(error.__traceback__)
         last_call = tb[-1]
         filepath = last_call.filename

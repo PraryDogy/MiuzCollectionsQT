@@ -6,18 +6,16 @@ from PyQt5.QtGui import (QDragEnterEvent, QDragLeaveEvent, QDropEvent, QIcon,
                          QKeyEvent, QResizeEvent)
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
                              QFileDialog, QFrame, QLabel, QPushButton,
-                             QVBoxLayout, QWidget)
+                             QVBoxLayout)
 
 from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import cnf
 from signals import signals_app
 from styles import Names, Themes
-from utils import MainUtils
+from utils.main_utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
-from utils.reveal_files import RevealFiles
-from utils.send_notification import SendNotification
-from widgets import (BarTop, MenuLeft, BarMacos, Notification, WidSearch,
-                     BarBottom, Thumbnails)
+from widgets import (BarBottom, BarMacos, BarTop, MenuLeft, Notification,
+                     Thumbnails, WidSearch)
 from widgets.win_smb import WinSmb
 
 
@@ -193,7 +191,7 @@ class WinMain(WinBase):
         return super().dropEvent(a0)
     
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
-        self.reveal_files = RevealFiles(files)
+        self.reveal_files = MainUtils.reveal_files(files)
         if len(cnf.copy_threads) == 0:
             signals_app.hide_downloads.emit()
         try:

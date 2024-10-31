@@ -7,7 +7,7 @@ from base_widgets import CustomProgressBar, LayoutH, SvgBtn
 from cfg import cnf
 from signals import signals_app
 from styles import Names, Themes
-from utils import MainUtils
+from utils.main_utils import MainUtils
 
 from .win_downloads import DownloadsWin
 from .win_settings import WinSettings

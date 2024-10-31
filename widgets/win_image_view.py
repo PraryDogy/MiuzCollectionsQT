@@ -11,7 +11,9 @@ from cfg import PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
 from signals import signals_app
 from styles import Names, Themes
-from utils import ImageUtils, MainUtils, MyThread
+from utils.main_utils import MainUtils
+from utils.my_thread import MyThread
+from utils.image_utils import ImageUtils
 
 from .context_img import ContextImg
 from .wid_notification import Notification

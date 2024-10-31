@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
 from base_widgets import ContextMenuBase
 from cfg import cnf
 from signals import signals_app
-from utils import MainUtils, RevealFiles, SendNotification, ThreadCopyFiles
+from utils.main_utils import MainUtils
+from utils.copy_files import ThreadCopyFiles
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -63,9 +64,9 @@ class ContextImg(ContextMenuBase):
     def reveal_cmd(self):
         if MainUtils.smb_check():
             if not os.path.exists(self.img_src):
-                SendNotification(cnf.lng.no_file)
+                MainUtils.send_notification(cnf.lng.no_file)
             else:
-                RevealFiles([self.img_src])
+                MainUtils.reveal_files([self.img_src])
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
@@ -94,7 +95,7 @@ class ContextImg(ContextMenuBase):
     def copy_files_cmd(self, dest: str, file: str):
 
         if not file or not os.path.exists(file):
-            SendNotification(cnf.lng.no_file)
+            MainUtils.send_notification(cnf.lng.no_file)
             return
 
         self.copy_task = ThreadCopyFiles(dest=dest, files=[file])
@@ -103,7 +104,7 @@ class ContextImg(ContextMenuBase):
         self.copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
-        self.reveal_files = RevealFiles(files)
+        self.reveal_files = MainUtils.reveal_files(files)
         if len(cnf.copy_threads) == 0:
             signals_app.hide_downloads.emit()
         try:

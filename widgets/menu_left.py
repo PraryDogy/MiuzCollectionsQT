@@ -13,7 +13,7 @@ from cfg import cnf
 from database import Dbase, ThumbsMd
 from signals import signals_app
 from styles import Names, Themes
-from utils import MainUtils
+from utils.main_utils import MainUtils
 
 from .win_smb import WinSmb
 

@@ -1,4 +1,4 @@
-from utils import ImageUtils
+from utils.image_utils import ImageUtils
 from database import Dbase, ThumbsMd
 import sqlalchemy
 import cv2

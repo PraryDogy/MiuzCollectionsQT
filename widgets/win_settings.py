@@ -12,8 +12,9 @@ from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
 from cfg import cnf
 from database import Dbase
-from signals import signals_app, signals_app
-from utils import MainUtils, Updater
+from signals import signals_app
+from utils.main_utils import MainUtils
+from utils.updater import Updater
 
 from .win_smb import WinSmb
 

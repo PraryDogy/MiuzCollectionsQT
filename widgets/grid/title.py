@@ -7,7 +7,8 @@ from base_widgets import ContextMenuBase
 from cfg import PSD_TIFF, cnf
 from signals import signals_app
 from styles import Names, Themes
-from utils import MainUtils, RevealFiles, SendNotification, ThreadCopyFiles
+from utils.main_utils import MainUtils
+from utils.copy_files import ThreadCopyFiles
 
 from ..win_smb import WinSmb
 
@@ -72,7 +73,7 @@ class CustomContext(ContextMenuBase):
         files = [i for i in files if os.path.exists(i)]
 
         if len(files) == 0:
-            SendNotification(cnf.lng.no_file)
+            MainUtils.send_notification(cnf.lng.no_file)
             return
 
         copy_task = ThreadCopyFiles(dest=dest, files=files)
@@ -81,7 +82,7 @@ class CustomContext(ContextMenuBase):
         copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
-        self.reveal_files = RevealFiles(files)
+        self.reveal_files = MainUtils.reveal_files(files)
         if len(cnf.copy_threads) == 0:
             signals_app.hide_downloads.emit()
         try:

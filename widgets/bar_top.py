@@ -6,7 +6,7 @@ from base_widgets import Btn, LayoutH
 from cfg import cnf
 from signals import signals_app
 from styles import Names, Themes
-from utils import MainUtils
+from utils.main_utils import MainUtils
 
 from .win_dates import WinDates
 
