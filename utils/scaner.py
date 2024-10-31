@@ -147,7 +147,8 @@ class FinderImages:
     def __init__(self):
         super().__init__()
 
-    def get(self):
+    def get(self) -> dict[str, ImageItem]:
+        finder_images: dict[str, ImageItem] = {}
 
         collections = [
             os.path.join(cnf.coll_folder, i)
@@ -159,7 +160,6 @@ class FinderImages:
         if not collections:
             collections = [cnf.coll_folder]
 
-        finder_images: dict[str, ImageItem] = {}
         ln_colls = len(collections)
         step_value = 60 if ln_colls == 0 else 60 / ln_colls
 
@@ -171,6 +171,8 @@ class FinderImages:
                 MainUtils.print_err(parent=self, error=e)
 
             finder_images.update(self.walk_collection(collection))
+
+        return finder_images
 
 
     def walk_collection(self, collection: str) -> dict[str, ImageItem]:
@@ -268,24 +270,26 @@ class CompareImages:
         return compared_result
 
 
-class UpdateDb:
+class DbUpdater:
     def __init__(self, compared_result: ComparedResult):
         super().__init__()
-
         self.compared_result = compared_result
+
+    def start(self):
+
         self.progressbar_value(70)
 
-        if compared_result.delete:
+        if self.compared_result.delete:
             self.delete_db()
 
         self.progressbar_value(80)
 
-        if compared_result.insert:
+        if self.compared_result.insert:
             self.insert_db()
 
         self.progressbar_value(90)
 
-        if compared_result.update:
+        if self.compared_result.update:
             self.update_db()
 
     def progressbar_value(self, value):
@@ -436,13 +440,18 @@ class ScanerThread(QThread):
 
             finder_images = FinderImages()
             finder_images = finder_images.get()
+
             db_images = DbImages()
+            db_images = db_images.get()
 
             if not finder_images:
                 return
 
-            images = CompareImages(finder_images, db_images)
-            self.update_db = UpdateDb(compared_result=images)
+            compared_res = CompareImages(finder_images, db_images)
+            compared_res = compared_res.get_result()
+
+            db_updater = DbUpdater(compared_result=compared_res)
+            db_updater.start()
 
             self.trash_remover = TrashRemover()
             self.dub_finder = DubFinder()
