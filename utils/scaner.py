@@ -18,32 +18,22 @@ class Shared:
 
 
 class Migrate:
+
     def start(self):
+
         conn = Dbase.engine.connect()
 
-        try:
-            q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
-            img_src, coll_name = conn.execute(q).first()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-            return
-        
-        try:
-            img_src: str
-            old_coll_folder = img_src.split(os.sep + coll_name + os.sep)[0]
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-            return
+        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
+        img_src, coll_name = conn.execute(q).first()
+    
+        img_src: str
+        old_coll_folder = img_src.split(os.sep + coll_name + os.sep)[0]
 
         if cnf.coll_folder == old_coll_folder:
             return
                 
-        try:
-            q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-            res = conn.execute(q).fetchall()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-            return
+        q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
+        res = conn.execute(q).fetchall()
         
         if len(res) == 0:
             return
@@ -53,7 +43,6 @@ class Migrate:
             for res_id, src in res
             ]
         
-
         for res_id, src in new_res:
             q = (
                 sqlalchemy.update(ThumbsMd)
@@ -62,11 +51,7 @@ class Migrate:
                 )
             conn.execute(q)
 
-        try:
-            conn.commit()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
+        conn.commit()
         conn.close()
         signals_app.reload_menu.emit()
         signals_app.reload_thumbnails.emit()
@@ -231,7 +216,7 @@ class ComparedResult:
         self.delete : dict[str, ImageItem]= {}
 
 
-class CompareImages:
+class ImageCompator:
     def __init__(self, finder_images: dict[str, ImageItem], db_images: dict[str, ImageItem]):
         super().__init__()
         self.finder_images = finder_images
@@ -434,8 +419,11 @@ class ScanerThread(QThread):
             except RuntimeError as e:
                 MainUtils.print_err(parent=self, error=e)
 
-            migrate = Migrate()
-            migrate.start()
+            try:
+                migrate = Migrate()
+                migrate.start()
+            except Exception as e:
+                MainUtils.print_err(parent=migrate, error=e)
 
             finder_images = FinderImages()
             finder_images = finder_images.get()
@@ -446,10 +434,10 @@ class ScanerThread(QThread):
             if not finder_images:
                 return
 
-            compared_res = CompareImages(finder_images, db_images)
-            compared_res = compared_res.get_result()
+            image_compator = ImageCompator(finder_images, db_images)
+            compared_res = image_compator.get_result()
 
-            db_updater = DbUpdater(compared_result=compared_res)
+            db_updater = DbUpdater(compared_res)
             db_updater.start()
 
             trash_remover = TrashRemover()
