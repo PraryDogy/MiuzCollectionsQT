@@ -27,6 +27,7 @@ class ImageUtils:
                 img = (img/256).astype(dtype="uint8")
             return img
         except (tifffile.TiffFileError, RuntimeError) as e:
+            print(path)
             cls.print_error(cls, e)
             return None
 
