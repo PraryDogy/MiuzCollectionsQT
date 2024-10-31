@@ -8,7 +8,7 @@ from signals import gui_signals_app
 from styles import Names, Themes
 from utils import MainUtils
 
-from ..win_dates import WinDates
+from .win_dates import WinDates
 
 BTN_W, BTN_H = 80, 28
 
@@ -79,7 +79,7 @@ class FilterBtn(Btn):
         return super().mouseReleaseEvent(ev)
 
 
-class FiltersBar(QFrame):
+class BarTop(QFrame):
     def __init__(self):
         super().__init__()
         self.setContentsMargins(5, 0, 5, 0)

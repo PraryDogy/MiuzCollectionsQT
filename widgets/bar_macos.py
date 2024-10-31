@@ -10,7 +10,7 @@ from cfg import cnf
 from signals import gui_signals_app
 from utils import MainUtils
 
-from ..win_settings import WinSettings
+from .win_settings import WinSettings
 
 
 class SelectableLabel(QLabel):
@@ -69,7 +69,7 @@ class AboutWin(WinSmallBase):
         self.content_layout.addWidget(lbl)
 
 
-class MacMenuBar(QMenuBar):
+class BarMacos(QMenuBar):
     def __init__(self):
         super().__init__()
         self.settings_win = None

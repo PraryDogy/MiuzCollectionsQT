@@ -16,8 +16,8 @@ from utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
 from utils.reveal_files import RevealFiles
 from utils.send_notification import SendNotification
-from widgets import (FiltersBar, LeftMenu, MacMenuBar, Notification, SearchBar,
-                     StBar, Thumbnails)
+from widgets import (BarTop, MenuLeft, BarMacos, Notification, WidSearch,
+                     BarBottom, Thumbnails)
 from widgets.win_smb import WinSmb
 
 
@@ -47,9 +47,9 @@ class RightWidget(QFrame):
 
         v_layout = LayoutV(self)
 
-        self.filters_bar = FiltersBar()
+        self.filters_bar = BarTop()
         self.thumbnails = Thumbnails()
-        self.st_bar = StBar()
+        self.st_bar = BarBottom()
 
         v_layout.addWidget(self.filters_bar)
         v_layout.addWidget(self.thumbnails)
@@ -76,7 +76,7 @@ class ContentWid(QFrame):
         super().__init__()
         h_layout = LayoutH(self)
 
-        self.left_menu = LeftMenu()
+        self.left_menu = MenuLeft()
         sep = QFrame()
         sep.setFixedWidth(1)
         sep.setObjectName(Names.separator)
@@ -99,10 +99,10 @@ class WinMain(WinBase):
         self.resize(cnf.root_g["aw"], cnf.root_g["ah"])
         self.center()
 
-        menubar = MacMenuBar()
+        menubar = BarMacos()
         self.setMenuBar(menubar)
 
-        search_bar = SearchBar()
+        search_bar = WidSearch()
         self.titlebar.add_r_wid(search_bar)
 
         self.set_title(self.check_coll())

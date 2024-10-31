@@ -1,10 +1,11 @@
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QWidget, QFrame
+import os
 
-from base_widgets import SvgBtn, LayoutV
+from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtWidgets import QFrame, QWidget
+
+from base_widgets import LayoutV, SvgBtn
 from signals import gui_signals_app
 from styles import Names, Themes
-import os
 
 
 class UpBtn(QFrame):

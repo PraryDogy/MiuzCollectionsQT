@@ -13,9 +13,9 @@ from signals import gui_signals_app, utils_signals_app
 from styles import Names, Themes
 from utils import ImageUtils, MainUtils, MyThread, get_image_size
 
-from ..image_context import ImageContext
-from ..notification import Notification
-from ..win_smb import WinSmb
+from .context_img import ContextImg
+from .wid_notification import Notification
+from .win_smb import WinSmb
 
 
 class Shared:
@@ -378,7 +378,7 @@ class WinImageView(WinImgViewBase):
         return super().keyPressEvent(ev)
 
     def contextMenuEvent(self, event: QContextMenuEvent | None) -> None:
-        self.image_context = ImageContext(parent=self, img_src=self.img_src, event=event)
+        self.image_context = ContextImg(parent=self, img_src=self.img_src, event=event)
         self.image_context.show_menu()
         return super().contextMenuEvent(event)
 

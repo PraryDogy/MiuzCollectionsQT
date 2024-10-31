@@ -5,12 +5,13 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
+from signals import gui_signals_app
 from styles import Names, Themes
 from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiffsMultiple)
 
 from ..win_smb import WinSmb
-from signals import gui_signals_app
+
 
 class Shared:
     dialog = None

@@ -3,7 +3,6 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QGraphicsDropShadowEffect, QLabel, QWidget
 
 from base_widgets import LayoutH
-from cfg import cnf
 from styles import Names, Themes
 
 

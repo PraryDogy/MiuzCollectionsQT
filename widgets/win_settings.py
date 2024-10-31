@@ -15,7 +15,7 @@ from database import Dbase
 from signals import gui_signals_app, utils_signals_app
 from utils import MainUtils, Updater
 
-from ..win_smb import WinSmb
+from .win_smb import WinSmb
 
 
 class BrowseColl(QWidget):

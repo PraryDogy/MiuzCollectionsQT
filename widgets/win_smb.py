@@ -1,8 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QLabel, QWidget, QSpacerItem
+from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, LayoutH, WinStandartBase, SvgBtn
+from base_widgets import Btn, LayoutH, SvgBtn, WinStandartBase
 from cfg import cnf
 
 

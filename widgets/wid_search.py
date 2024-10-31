@@ -1,10 +1,9 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
-
-from cfg import cnf
+from PyQt5.QtWidgets import QSpacerItem, QWidget
 
 from base_widgets import InputBase, LayoutH
+from cfg import cnf
 from signals import gui_signals_app
 
 
@@ -51,7 +50,7 @@ class SearchBarBase(InputBase):
         self.setPlaceholderText(cnf.lng.search)
 
 
-class SearchBar(QWidget):
+class WidSearch(QWidget):
     def __init__(self):
         super().__init__()
 

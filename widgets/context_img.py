@@ -2,7 +2,6 @@ import os
 from functools import partial
 
 from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
-from PyQt5.QtCore import pyqtSignal
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase
 from cfg import cnf
@@ -10,14 +9,14 @@ from signals import gui_signals_app
 from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
                    ThreadFindTiff)
 
-from ..win_info import WinInfo
-from ..win_smb import WinSmb
+from .win_info import WinInfo
+from .win_smb import WinSmb
 
 
 class Shared:
     file_dialog = None
 
-class ImageContext(ContextMenuBase):
+class ContextImg(ContextMenuBase):
     def __init__(self, img_src: str, event, parent: QWidget = None):
         super().__init__(event)
 
@@ -94,7 +93,7 @@ class ImageContext(ContextMenuBase):
             self.smb_win.show()
         
     def show_image_viewer(self, img_src: str):
-        from ..win_image_view import WinImageView
+        from .win_image_view import WinImageView
         self.win_img = WinImageView(parent=self.my_parent, img_src=img_src)
         self.win_img.show()
 

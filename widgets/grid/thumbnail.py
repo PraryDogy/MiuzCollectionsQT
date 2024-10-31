@@ -9,7 +9,7 @@ from cfg import cnf
 from styles import Names, Themes
 from utils import ImageUtils, MainUtils
 
-from ..image_context import ImageContext
+from ..context_img import ContextImg
 
 
 class NameLabel(QLabel):
@@ -127,7 +127,7 @@ class BaseThumb(QFrame):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.image_context = ImageContext(img_src=self.src, event=ev, parent=self)
+            self.image_context = ContextImg(img_src=self.src, event=ev, parent=self)
             self.image_context.add_preview_item()
             if cnf.curr_coll == cnf.ALL_COLLS:
                 self.image_context.add_show_coll_item(collection=self.coll)

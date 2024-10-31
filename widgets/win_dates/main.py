@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 from base_widgets import Btn, LayoutH, LayoutV, WinStandartBase
 from cfg import cnf
 from signals import gui_signals_app
-from utils import MainUtils
 
 from .date_utils import DateUtils
 from .input_wid import BaseDateInput
