@@ -203,23 +203,6 @@ class WinBase(QMainWindow, QObject):
         self.titlebar.btns.close_btn.setDisabled(True)
         self.titlebar.btns.close_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
 
-    # def focusOutEvent(self, a0: QFocusEvent | None) -> None:
-    #     print("focus_out")
-    #     self.titlebar.btns.close_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
-    #     self.titlebar.btns.max_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
-    #     self.titlebar.btns.min_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
-    #     return super().focusOutEvent(a0)
-
-    # def focusInEvent(self, a0: QFocusEvent | None) -> None:
-    #     print("focus_in")
-    #     imgs = ["images/close-1.svg", "images/min-1.svg", "images/max-1.svg"]
-    #     btns = self.titlebar.btns
-    #     btns = [btns.close_btn, btns.min_btn, btns.max_btn]
-    #     for bt, im in zip(btns, imgs):
-    #         if bt.isEnabled():
-    #             bt.set_icon(im)
-    #     return super().focusOutEvent(a0)
-
 
 class BaseBottomWid(QFrame):
     def __init__(self, left=10, top=10, right=10, bottom=10):

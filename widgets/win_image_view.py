@@ -7,11 +7,11 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
-from cfg import cnf
+from cfg import PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
-from signals import signals_app, signals_app
+from signals import signals_app
 from styles import Names, Themes
-from utils import ImageUtils, MainUtils, MyThread, get_image_size
+from utils import ImageUtils, MainUtils, MyThread
 
 from .context_img import ContextImg
 from .wid_notification import Notification
@@ -46,7 +46,10 @@ class LoadImageThread(MyThread):
             if self.img_src not in Shared.loaded_images:
 
                 img = ImageUtils.read_image(self.img_src)
-                img = ImageUtils.array_bgr_to_rgb(img)
+
+                if not self.img_src.endswith(PSD_TIFF):
+                    img = ImageUtils.array_bgr_to_rgb(img)
+
                 pixmap = ImageUtils.pixmap_from_array(img)
                 Shared.loaded_images[self.img_src] = pixmap
 
@@ -336,15 +339,11 @@ class WinImageView(WinImgViewBase):
         return text
 
     def set_image_title(self):
-        try:
-            w, h = get_image_size(self.img_src)
-        except Exception:
-            w, h = "?", "?"
         self.collection = MainUtils.get_coll_name(self.img_src)
         cut_coll = self.cut_text(MainUtils.get_coll_name(self.img_src))
         name = self.cut_text(os.path.basename(self.img_src))
 
-        self.set_title(f"{w}x{h} - {cut_coll} - {name}")
+        self.set_title(f"{cut_coll} - {name}")
 
     def button_switch_cmd(self, flag: str) -> None:
         if flag == "+":
