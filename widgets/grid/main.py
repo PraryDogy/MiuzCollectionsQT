@@ -205,7 +205,7 @@ class Thumbnails(QScrollArea):
 
         if isinstance(wid, (Thumbnail, SmallThumbnail)):
             from ..win_image_view import WinImageView
-            self.win_image_view = WinImageView(parent=self, img_src=wid.src)
+            self.win_image_view = WinImageView(parent=self, src=wid.src)
             self.win_image_view.show()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
@@ -215,7 +215,7 @@ class Thumbnails(QScrollArea):
             wid = self.cell_to_wid.get(self.curr_cell)
 
             if MainUtils.smb_check():
-                self.win_info = WinInfo(img_src=wid.src, parent=self)
+                self.win_info = WinInfo(src=wid.src, parent=self)
                 self.win_info.show()
             else:
                 self.smb_win = WinSmb(parent=self.my_parent)

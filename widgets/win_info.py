@@ -131,14 +131,14 @@ class RightLabel(BaseLabel):
 
 
 class WinInfo(WinStandartBase):
-    def __init__(self, img_src: str, parent: QWidget):
+    def __init__(self, src: str, parent: QWidget):
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min()
         self.disable_max()
         self.set_title(cnf.lng.info)
 
-        self.img_src = img_src
+        self.src = src
         self.l_ww = 100
         self.init_ui()
 
@@ -151,7 +151,7 @@ class WinInfo(WinStandartBase):
         info_wid.setLayout(info_layout)
         self.content_layout.addWidget(info_wid)
 
-        new_data = ImgInfo(img_src=self.img_src)
+        new_data = ImgInfo(img_src=self.src)
         
         for l_text, r_text in new_data.items():
             l_label = LeftLabel(text=l_text, ww=self.l_ww)

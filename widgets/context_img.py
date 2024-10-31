@@ -50,7 +50,7 @@ class ContextImg(ContextMenuBase):
 
     def show_info_win(self, img_src: str):
         if MainUtils.smb_check():
-            self.win_info = WinInfo(img_src=img_src, parent=self.my_parent)
+            self.win_info = WinInfo(src=img_src, parent=self.my_parent)
             self.win_info.show()
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
@@ -58,7 +58,7 @@ class ContextImg(ContextMenuBase):
         
     def show_image_viewer(self):
         from .win_image_view import WinImageView
-        self.win_img = WinImageView(parent=self.my_parent, img_src=self.img_src)
+        self.win_img = WinImageView(parent=self.my_parent, src=self.img_src)
         self.win_img.show()
 
     def reveal_cmd(self):

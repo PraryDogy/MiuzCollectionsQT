@@ -11,12 +11,13 @@ from cfg import PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
 from signals import signals_app
 from styles import Names, Themes
+from utils.image_utils import ImageUtils
 from utils.main_utils import MainUtils
 from utils.my_thread import MyThread
-from utils.image_utils import ImageUtils
 
 from .context_img import ContextImg
 from .wid_notification import Notification
+from .win_info import WinInfo
 from .win_smb import WinSmb
 
 
@@ -35,28 +36,28 @@ class ImageData:
 class LoadImageThread(MyThread):
     finished = pyqtSignal(object)
 
-    def __init__(self, img_src: str):
+    def __init__(self, src: str):
         super().__init__(parent=None)
-        self.img_src = img_src
+        self.src = src
 
     def run(self):
         try:
-            if not os.path.exists(self.img_src):
+            if not os.path.exists(self.src):
                 print("image viewer thread no connection")
                 return
 
-            if self.img_src not in Shared.loaded_images:
+            if self.src not in Shared.loaded_images:
 
-                img = ImageUtils.read_image(self.img_src)
+                img = ImageUtils.read_image(self.src)
 
-                if not self.img_src.endswith(PSD_TIFF):
+                if not self.src.endswith(PSD_TIFF):
                     img = ImageUtils.array_bgr_to_rgb(img)
 
                 pixmap = ImageUtils.pixmap_from_array(img)
-                Shared.loaded_images[self.img_src] = pixmap
+                Shared.loaded_images[self.src] = pixmap
 
             else:
-                pixmap = Shared.loaded_images.get(self.img_src)
+                pixmap = Shared.loaded_images.get(self.src)
 
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
@@ -65,7 +66,7 @@ class LoadImageThread(MyThread):
         if len(Shared.loaded_images) > 50:
             Shared.loaded_images.pop(next(iter(Shared.loaded_images)))
 
-        self.finished.emit(ImageData(self.img_src, pixmap.width(), pixmap))
+        self.finished.emit(ImageData(self.src, pixmap.width(), pixmap))
         self.remove_threads()
 
 
@@ -207,7 +208,7 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinImgViewBase):
-    def __init__(self, parent: QWidget, img_src: str):
+    def __init__(self, parent: QWidget, src: str):
 
         try:
             cnf.image_viewer.close()
@@ -220,7 +221,7 @@ class WinImageView(WinImgViewBase):
         self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
         self.installEventFilter(self)
 
-        self.img_src = img_src
+        self.src = src
         self.collection = None
         cnf.image_viewer = self
 
@@ -263,19 +264,19 @@ class WinImageView(WinImgViewBase):
             self.win_smb.show()
 
     def finalize_smb(self):
-        name = os.path.basename(self.img_src)
+        name = os.path.basename(self.src)
         for k, v in cnf.images.items():
             if name == v["filename"] and self.collection == v["collection"]:
-                self.img_src = k
+                self.src = k
                 self.load_image_thread()
                 return
                 
     def load_thumbnail(self):
-        if self.img_src not in Shared.loaded_images:
+        if self.src not in Shared.loaded_images:
             self.set_title(cnf.lng.loading)
 
             q = (sqlalchemy.select(ThumbsMd.img150)
-                .filter(ThumbsMd.src == self.img_src))
+                .filter(ThumbsMd.src == self.src))
             conn = Dbase.engine.connect()
 
             try:
@@ -292,12 +293,12 @@ class WinImageView(WinImgViewBase):
         self.load_image_thread()
 
     def load_image_thread(self):
-        img_thread = LoadImageThread(self.img_src)
+        img_thread = LoadImageThread(self.src)
         img_thread.finished.connect(self.load_image_finished)
         img_thread.start()
 
     def load_image_finished(self, data: ImageData):
-        if data.width == 0 or data.src != self.img_src:
+        if data.width == 0 or data.src != self.src:
             return
         
         if isinstance(data.pixmap, QPixmap):
@@ -323,15 +324,15 @@ class WinImageView(WinImgViewBase):
     def switch_image(self, offset):
         try:
             keys = list(cnf.images.keys())
-            current_index = keys.index(self.img_src)
+            current_index = keys.index(self.src)
         except Exception as e:
             keys = list(cnf.images.keys())
             current_index = 0
 
         total_images = len(cnf.images)
         new_index = (current_index + offset) % total_images
-        self.img_src = keys[new_index]
-        signals_app.select_new_wid.emit(self.img_src)
+        self.src = keys[new_index]
+        signals_app.select_new_wid.emit(self.src)
         self.load_thumbnail()
 
     def cut_text(self, text: str) -> str:
@@ -341,9 +342,9 @@ class WinImageView(WinImgViewBase):
         return text
 
     def set_image_title(self):
-        self.collection = MainUtils.get_coll_name(self.img_src)
-        cut_coll = self.cut_text(MainUtils.get_coll_name(self.img_src))
-        name = self.cut_text(os.path.basename(self.img_src))
+        self.collection = MainUtils.get_coll_name(self.src)
+        cut_coll = self.cut_text(MainUtils.get_coll_name(self.src))
+        name = self.cut_text(os.path.basename(self.src))
 
         self.set_title(f"{cut_coll} - {name}")
 
@@ -376,10 +377,18 @@ class WinImageView(WinImgViewBase):
         elif ev.key() == Qt.Key.Key_0:
             self.image_label.zoom_reset()
 
+        elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
+            if MainUtils.smb_check():
+                self.win_info = WinInfo(src=self.src, parent=self)
+                self.win_info.show()
+            else:
+                self.smb_win = WinSmb(parent=self.my_parent)
+                self.smb_win.show()
+
         return super().keyPressEvent(ev)
 
     def contextMenuEvent(self, event: QContextMenuEvent | None) -> None:
-        self.image_context = ContextImg(parent=self, img_src=self.img_src, event=event)
+        self.image_context = ContextImg(parent=self, src=self.src, event=event)
         self.image_context.show_menu()
         return super().contextMenuEvent(event)
 
