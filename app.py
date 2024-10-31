@@ -12,10 +12,10 @@ from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import cnf
 from signals import signals_app
 from styles import Names, Themes
-from utils.copy_files import ThreadCopyFiles
 from utils.main_utils import MainUtils
+from utils.copy_files import ThreadCopyFiles
 from widgets import (BarBottom, BarMacos, BarTop, MenuLeft, Notification,
-                     Thumbnails)
+                     Thumbnails, WidSearch)
 from widgets.win_smb import WinSmb
 
 
@@ -99,6 +99,9 @@ class WinMain(WinBase):
 
         menubar = BarMacos()
         self.setMenuBar(menubar)
+
+        search_bar = WidSearch()
+        self.titlebar.add_r_wid(search_bar)
 
         self.set_title(self.check_coll())
         signals_app.reload_title.connect(self.reload_title)
