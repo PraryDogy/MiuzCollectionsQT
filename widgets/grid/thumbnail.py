@@ -129,8 +129,6 @@ class BaseThumb(QFrame):
         try:
             self.image_context = ContextImg(img_src=self.src, event=ev, parent=self)
             self.image_context.add_preview_item()
-            if cnf.curr_coll == cnf.ALL_COLLS:
-                self.image_context.add_show_coll_item(collection=self.coll)
 
             self.select.emit(self.src)
             self.image_context.show_menu()

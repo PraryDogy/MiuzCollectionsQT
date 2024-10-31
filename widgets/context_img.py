@@ -3,18 +3,18 @@ from functools import partial
 
 from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
 
-from base_widgets import ContextMenuBase, ContextSubMenuBase
+from base_widgets import ContextMenuBase
 from cfg import cnf
 from signals import signals_app
-from utils import (MainUtils, RevealFiles, SendNotification, ThreadCopyFiles,
-                   ThreadFindTiff)
+from utils import MainUtils, RevealFiles, SendNotification, ThreadCopyFiles
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
 
 
 class Shared:
-    file_dialog = None
+    file_dialog: QFileDialog = None
+
 
 class ContextImg(ContextMenuBase):
     def __init__(self, img_src: str, event, parent: QWidget = None):
@@ -29,27 +29,21 @@ class ContextImg(ContextMenuBase):
 
         self.addSeparator()
 
-        self.reveal_menu = QAction(parent=self, text=cnf.lng.reveal_in_finder)
-        self.reveal_menu.triggered.connect(self.reveal_cmd)
-        self.addAction(self.reveal_menu)
+        reveal_action = QAction(parent=self, text=cnf.lng.reveal_in_finder)
+        reveal_action.triggered.connect(self.reveal_cmd)
+        self.addAction(reveal_action)
 
-        save_as_menu = QAction(parent=self, text=cnf.lng.save_image_in)
-        self.addAction(save_as_menu)
+        save_as_action = QAction(parent=self, text=cnf.lng.save_image_in)
+        save_as_action.triggered.connect(self.save_as_cmd)
+        self.addAction(save_as_action)
 
         save_menu = QAction(parent=self, text=cnf.lng.save_image_downloads)
+        save_menu.triggered.connect(self.save_cmd)
         self.addAction(save_menu)
 
     def add_preview_item(self):
         open_action = QAction(cnf.lng.view, self)
-        open_action.triggered.connect(
-            lambda: self.show_image_viewer(self.img_src)
-            )
-        self.addAction(open_action)
-        self.insertAction(self.info_action, open_action)
-
-    def add_show_coll_item(self, collection: str):
-        open_action = QAction(cnf.lng.open_collection, self)
-        open_action.triggered.connect(lambda: self.load_collection(collection=collection))
+        open_action.triggered.connect(self.show_image_viewer)
         self.addAction(open_action)
         self.insertAction(self.info_action, open_action)
 
@@ -61,9 +55,9 @@ class ContextImg(ContextMenuBase):
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
         
-    def show_image_viewer(self, img_src: str):
+    def show_image_viewer(self):
         from .win_image_view import WinImageView
-        self.win_img = WinImageView(parent=self.my_parent, img_src=img_src)
+        self.win_img = WinImageView(parent=self.my_parent, img_src=self.img_src)
         self.win_img.show()
 
     def reveal_cmd(self):
@@ -76,57 +70,29 @@ class ContextImg(ContextMenuBase):
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
 
-    def save_as_jpg(self, img_src: str):
+    def save_as_cmd(self):
         if MainUtils.smb_check():
-            dest = self.select_folder()
+
+            Shared.file_dialog = QFileDialog()
+            Shared.file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
+            dest = Shared.file_dialog.getExistingDirectory()
+
             if dest:
-                self.copy_file(dest=dest, file=img_src)
+                self.copy_files_cmd(dest=dest, file=self.img_src)
+
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
+            self.smb_win.show()   
 
-    def save_jpg(self, img_src: str):
+    def save_cmd(self):
         if MainUtils.smb_check():
-            self.copy_file(dest=cnf.down_folder, file=img_src)
+            self.copy_files_cmd(dest=cnf.down_folder, file=self.img_src)
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
-
-    def save_as_tiffs(self, img_src: str):
-        if MainUtils.smb_check():
-            dest = self.select_folder()
-            if dest:
-                self.find_tiffs(dest=dest, img_src=img_src)
-        else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
-
-    def save_tiffs(self, img_src: str):
-        if MainUtils.smb_check():
-            self.find_tiffs(dest=cnf.down_folder, img_src=img_src)
-        else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
-        
-    def find_tiffs(self, dest: str, img_src: str):
-        self.find_tiff_task = ThreadFindTiff(img_src)
-
-        self.find_tiff_task.finished.connect(lambda tiff: self.copy_file(dest, tiff))
-        self.find_tiff_task.can_remove.connect(self.find_tiff_task.remove_threads)
-
-        self.find_tiff_task.start()
-
-    def select_folder(self):
-        self.save_dialog = QFileDialog()
-        self.save_dialog.setOption(QFileDialog.ShowDirsOnly, True)
-        selected_folder = self.save_dialog.getExistingDirectory()
-        Shared.file_dialog = self.save_dialog
-
-        if selected_folder:
-            return selected_folder
-        return None
     
-    def copy_file(self, dest: str, file: str):
+    def copy_files_cmd(self, dest: str, file: str):
+
         if not file or not os.path.exists(file):
             SendNotification(cnf.lng.no_file)
             return
@@ -144,11 +110,3 @@ class ContextImg(ContextMenuBase):
             copy_task.remove_threads()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
-
-    def load_collection(self, collection: str):
-        cnf.curr_coll = collection
-        cnf.current_photo_limit = cnf.LIMIT
-        signals_app.reload_title.emit()
-        signals_app.scroll_top.emit()
-        signals_app.reload_menu.emit()
-        signals_app.reload_thumbnails.emit()
