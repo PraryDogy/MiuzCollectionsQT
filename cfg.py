@@ -9,7 +9,8 @@ from PyQt5.QtWidgets import QMainWindow
 
 from lang import Eng, Rus
 
-
+GRAY = "rgba(111, 111, 111, 0.5)"
+BLUE = "rgba(0, 122, 255, 1)"
 _IMG_EXT: tuple = (
     ".jpg", ".jpeg", ".jfif",
     ".tif", ".tiff",
@@ -21,7 +22,10 @@ IMG_EXT: tuple = tuple(
     for ext in _IMG_EXT
     for upper_ext in (ext, ext.upper())
     )
-PSD_TIFF: tuple = (".psd", ".psb", ".tiff", ".tif", ".PSD", ".PSB", ".TIFF", ".TIF")
+PSD_TIFF: tuple = (
+    ".psd", ".psb", ".tiff", ".tif",
+    ".PSD", ".PSB", ".TIFF", ".TIF"
+    )
 
 class Thumbnail(QObject):
     def __init__(self):
