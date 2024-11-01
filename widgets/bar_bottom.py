@@ -34,19 +34,15 @@ class ProgressBar(QWidget):
         layout.addWidget(self.progress_bar)
 
         signals_app.progressbar_value.connect(self.progressbar_value)
-        # self.setHidden(True)
 
     def progressbar_value(self, value: int):
         value = int(value)
         self.progress_bar.setValue(value)
 
         if self.progress_bar.value() >= 100:
-                self.progress_bar.setHidden(True)
+            self.progress_bar.hide()
         else:
-                print('show')
-                self.progress_bar.setHidden(False)
-
-        print(self.progress_bar.value())
+            self.progress_bar.show()
 
         
 class BaseSlider(QSlider):
