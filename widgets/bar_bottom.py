@@ -97,7 +97,13 @@ class CustomSlider(BaseSlider):
         self.setFixedWidth(80)
         self.setValue(cnf.curr_size_ind)
         self.valueChanged.connect(self.change_size)
+        signals_app.move_slider.connect(self.move_slider_cmd)
     
+    def move_slider_cmd(self, value: int):
+        self.setValue(value)
+        cnf.curr_size_ind = value
+        signals_app.resize_grid.emit()
+
     def change_size(self, value: int):
         self.setValue(value)
         cnf.curr_size_ind = value

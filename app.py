@@ -167,13 +167,13 @@ class WinMain(WinBase):
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if cnf.curr_size_ind < 3:
                     cnf.curr_size_ind += 1
-                    signals_app.resize_grid.emit()
+                    signals_app.move_slider.emit(cnf.curr_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if cnf.curr_size_ind > 0:
                     cnf.curr_size_ind -= 1
-                    signals_app.resize_grid.emit()
+                    signals_app.move_slider.emit(cnf.curr_size_ind)
 
     def dragEnterEvent(self, a0: QDragEnterEvent | None) -> None:
         if not a0.source() and a0.mimeData().hasUrls():
