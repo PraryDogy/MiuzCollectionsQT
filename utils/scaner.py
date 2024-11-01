@@ -135,7 +135,7 @@ class FinderImages:
             try:
                 signals_app.progressbar_value.emit(step_value)
             except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
+                ...
 
             try:
                 finder_images.update(self.walk_collection(collection))

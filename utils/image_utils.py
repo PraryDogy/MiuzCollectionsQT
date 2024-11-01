@@ -143,7 +143,7 @@ class ImageUtils:
             return None
 
     @classmethod
-    def crop_to_square(cls, image: np.ndarray | QPixmap) -> np.ndarray | None:
+    def crop_to_square(cls, image: np.ndarray | QPixmap) -> np.ndarray | QPixmap:
 
         if isinstance(image, np.ndarray):
             height, width = image.shape[:2]

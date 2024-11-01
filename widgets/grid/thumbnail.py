@@ -2,7 +2,7 @@ import os
 
 from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
 from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
-from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem
+from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutV
 from cfg import cnf
@@ -44,6 +44,8 @@ class BaseThumb(QFrame):
 
     def __init__(self, img: bytes, src: str, coll: str):
         super().__init__()
+        self.setObjectName(Names.thumbnail_normal)
+        self.setStyleSheet(Themes.current)
 
         self.img = ImageUtils.pixmap_from_bytes(img)
 
@@ -51,38 +53,38 @@ class BaseThumb(QFrame):
             self.img = QPixmap(500, 500)
             self.img.fill(QColor(128, 128, 128))
 
+        self.img = ImageUtils.crop_to_square(self.img)
+
         self.src = src
         self.coll = coll
         self.name = os.path.basename(src)
 
         self.row, self.col = 0, 0
 
-
+        mar = 5
         self.v_layout = LayoutV()
-        self.v_layout.setContentsMargins(0, 2, 0, 0)
+        self.v_layout.setSpacing(5)
+        self.v_layout.setContentsMargins(mar, mar, mar, mar)
         self.setLayout(self.v_layout)
 
-        self.setObjectName(Names.thumbnail_normal)
-        self.setStyleSheet(Themes.current)
-
-        self.v_layout.addSpacerItem(QSpacerItem(0, 7))
-
         self.img_label = QLabel()
-
-        pixmap = ImageUtils.pixmap_from_bytes(img)
-        pixmap = ImageUtils.crop_to_square(pixmap)
-
-        self.img_label.setPixmap(pixmap)
-
-        self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        fl = Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop
+        self.v_layout.addWidget(self.img_label, alignment=fl)
 
         self.setToolTip(
             f"{cnf.lng.collection}: {self.coll}\n"
             f"{cnf.lng.file_name}: {self.name}\n"
             )  
 
+        self.name_label = NameLabel(parent=self, filename=self.name, coll=coll)
+        self.name_label.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.v_layout.addWidget(self.name_label)
+
         self.setFixedWidth(cnf.THUMBSIZE + cnf.THUMBPAD)
         self.setMaximumHeight(cnf.THUMBSIZE + 75)
+
+
+        self.img_label.setPixmap(self.img)
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.src)
@@ -136,16 +138,11 @@ class BaseThumb(QFrame):
 class Thumbnail(BaseThumb):
     def __init__(self, img: bytes, src: str, coll: str):
         super().__init__(img, src, coll)
-   
-        self.title = NameLabel(parent=self, filename=self.name, coll=coll)
-        self.title.setContentsMargins(8, 5, 8, 7)
 
-        self.title.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.v_layout.addWidget(self.title)
     
     def selected_style(self):
         try:
-            for i in (self, self.title):
+            for i in (self, self.name_label):
                 i.setObjectName(Names.thumbnail_selected)
                 i.setStyleSheet(Themes.current)
         except RuntimeError:
@@ -153,7 +150,7 @@ class Thumbnail(BaseThumb):
 
     def regular_style(self):
         try:
-            for i in (self, self.title):
+            for i in (self, self.name_label):
                 i.setObjectName(Names.thumbnail_normal)
                 i.setStyleSheet(Themes.current)
         except RuntimeError:
