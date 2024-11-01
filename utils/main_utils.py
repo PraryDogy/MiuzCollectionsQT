@@ -82,6 +82,7 @@ class MainUtils:
         command = ["osascript", reveal_script] + files_list
         subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+    @classmethod
     def send_notification(cls, text: str):
         if cnf.image_viewer:
             signals_app.noti_img_view.emit(text)
