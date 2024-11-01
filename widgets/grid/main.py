@@ -203,6 +203,14 @@ class Thumbnails(QScrollArea):
             self.win_image_view.center_win(self)
             self.win_image_view.show()
 
+    def get_columns(self):
+        return max(self.ww // (THUMB_W[cnf.curr_size_ind] + (THUMB_MARGIN*2)), 1)
+
+    def resize_(self):
+        self.ww = self.width()
+        self.columns = self.get_columns()
+        self.reload_thumbnails()
+
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         wid: Thumbnail
 
@@ -247,11 +255,3 @@ class Thumbnails(QScrollArea):
         self.resize_timer.start(500)
         self.up_btn.setVisible(False)
         return super().resizeEvent(a0)
-
-    def get_columns(self):
-        return max(self.ww // (THUMB_W[cnf.curr_size_ind] + (THUMB_MARGIN*2)), 1)
-
-    def resize_(self):
-        self.ww = self.width()
-        self.columns = self.get_columns()
-        self.reload_thumbnails()
