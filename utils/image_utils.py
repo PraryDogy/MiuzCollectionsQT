@@ -141,6 +141,17 @@ class ImageUtils:
         except Exception as e:
             print("resize_min_aspect_ratio error:", e)
             return None
+        
+    @classmethod
+    def resize_max_aspect_ratio(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+        try:
+            h, w = image.shape[:2]
+            scale = size / min(h, w)
+            new_w, new_h = int(w * scale), int(h * scale)
+            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+        except Exception as e:
+            print("resize_min_aspect_ratio error:", e)
+            return None
 
     @classmethod
     def crop_to_square(cls, image: np.ndarray | QPixmap) -> np.ndarray | QPixmap:

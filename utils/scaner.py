@@ -283,7 +283,7 @@ class DbUpdater:
             if array_img is None:     
                 continue
 
-            array_img = ImageUtils.resize_min_aspect_ratio(array_img, cnf.THUMBSIZE)
+            array_img = ImageUtils.resize_max_aspect_ratio(array_img, cnf.IMG_SIZE)
 
             if src.endswith(PSD_TIFF):
                 array_img = ImageUtils.array_bgr_to_rgb(array_img)
@@ -330,7 +330,7 @@ class DbUpdater:
             if array_img is None:
                 continue
 
-            array_img = ImageUtils.resize_min_aspect_ratio(array_img, cnf.THUMBSIZE)
+            array_img = ImageUtils.resize_max_aspect_ratio(array_img, cnf.IMG_SIZE)
 
             if src.endswith(PSD_TIFF):
                 array_img = ImageUtils.array_bgr_to_rgb(array_img)

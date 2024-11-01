@@ -115,7 +115,7 @@ class Static:
     def __init__(self):
         super().__init__()
 
-        self.THUMBSIZE: int = 200
+        self.IMG_SIZE: int = 200
         self.THUMBPAD: int = 16
         self.LIMIT: int = 150
         self.ALL_COLLS: str = "miuzcollections_all"

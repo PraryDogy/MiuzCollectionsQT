@@ -241,11 +241,11 @@ class Thumbnails(QScrollArea):
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.up_btn.setVisible(False)
 
-        if abs(a0.size().width() - self.ww) >= cnf.THUMBSIZE - cnf.THUMBPAD - cnf.THUMBPAD:
+        if abs(a0.size().width() - self.ww) >= cnf.IMG_SIZE - cnf.THUMBPAD - cnf.THUMBPAD:
             self.ww = a0.size().width()
             self.columns = self.get_columns()
             self.reload_thumbnails()
         return super().resizeEvent(a0)
 
     def get_columns(self):
-        return max(self.width() // (cnf.THUMBSIZE + cnf.THUMBPAD), 1)
+        return max(self.width() // (cnf.IMG_SIZE + cnf.THUMBPAD), 1)

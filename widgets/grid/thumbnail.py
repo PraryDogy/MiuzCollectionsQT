@@ -80,8 +80,8 @@ class BaseThumb(QFrame):
         self.name_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addWidget(self.name_label)
 
-        self.setFixedWidth(cnf.THUMBSIZE + cnf.THUMBPAD)
-        self.setMaximumHeight(cnf.THUMBSIZE + 75)
+        self.setFixedWidth(cnf.IMG_SIZE + cnf.THUMBPAD)
+        self.setMaximumHeight(cnf.IMG_SIZE + 75)
 
 
         self.img_label.setPixmap(self.img)
