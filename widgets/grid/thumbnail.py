@@ -84,6 +84,21 @@ class BaseThumb(QFrame):
         pixmap = ImageUtils.pixmap_scale(self.img, PIXMAP_SIZE[cnf.curr_size_ind])
         self.img_label.setPixmap(pixmap)
 
+
+    def selected_style(self):
+        try:
+            self.setObjectName(Names.thumbnail_selected)
+            self.setStyleSheet(Themes.current)
+        except RuntimeError:
+            ...
+
+    def regular_style(self):
+        try:
+            self.setObjectName(Names.thumbnail_normal)
+            self.setStyleSheet(Themes.current)
+        except RuntimeError:
+            ...
+
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.src)
         signals_app.open_in_view.emit(self)
@@ -137,40 +152,7 @@ class Thumbnail(BaseThumb):
     def __init__(self, img: bytes, src: str, coll: str):
         super().__init__(img, src, coll)
 
-    
-    def selected_style(self):
-        try:
-            for i in (self, self.name_label):
-                i.setObjectName(Names.thumbnail_selected)
-                i.setStyleSheet(Themes.current)
-        except RuntimeError:
-            ...
-
-    def regular_style(self):
-        try:
-            for i in (self, self.name_label):
-                i.setObjectName(Names.thumbnail_normal)
-                i.setStyleSheet(Themes.current)
-        except RuntimeError:
-            ...
-
 
 class SmallThumbnail(BaseThumb):
     def __init__(self, img: bytes, src: str, coll: str):
         super().__init__(img, src, coll)
-        self.setContentsMargins(0, 0, 0, 8)
-        self.v_layout.setContentsMargins(0, 0, 0, 0)
-
-    def selected_style(self):
-        try:
-            self.setObjectName(Names.thumbnail_selected)
-            self.setStyleSheet(Themes.current)
-        except RuntimeError:
-            ...
-
-    def regular_style(self):
-        try:
-            self.setObjectName(Names.thumbnail_normal)
-            self.setStyleSheet(Themes.current)
-        except RuntimeError:
-            ...
