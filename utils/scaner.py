@@ -11,9 +11,16 @@ from .image_utils import ImageUtils
 from .main_utils import MainUtils
 
 
-class Storage:
+class ScanerUtils:
     can_scan = True
-    progress_value = 0
+
+    @classmethod
+    def progressbar_value(cls, value: int):
+        try:
+            signals_app.progressbar_value.emit(value)
+        except RuntimeError as e:
+            MainUtils.print_err(parent=cls, error=e)
+
 
 
 class Migrate:
@@ -137,14 +144,11 @@ class FinderImages:
 
         for collection in collections:
 
-            try:
-                signals_app.progressbar_value.emit(step_value)
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
+            ScanerUtils.progressbar_value(step_value)
 
             try:
                 finder_images.update(self.walk_collection(collection))
-            except TypeError:
+            except TypeError as e:
                 MainUtils.print_err(parent=self, error=e)
                 continue
 
@@ -157,13 +161,13 @@ class FinderImages:
 
         for root, _, files in os.walk(collection):
 
-            if not Storage.can_scan:
+            if not ScanerUtils.can_scan:
                 return
 
             for file in files:
 
                 if not os.path.exists(cnf.coll_folder):
-                    Storage.can_scan = False
+                    ScanerUtils.can_scan = False
                     return
 
                 if file.endswith(IMG_EXT):
@@ -221,7 +225,7 @@ class ImageCompator:
 
         for db_src, db_item in self.db_images.items():
 
-            if not Storage.can_scan:
+            if not ScanerUtils.can_scan:
                 return
 
             finder_item = self.finder_images.get(db_src)
@@ -231,7 +235,7 @@ class ImageCompator:
 
         for finder_src, finder_item in self.finder_images.items():
 
-            if not Storage.can_scan:
+            if not ScanerUtils.can_scan:
                 return
 
             db_item = self.db_images.get(finder_src)
@@ -253,27 +257,20 @@ class DbUpdater:
         self.compared_result = compared_result
 
     def start(self):
-
-        self.progressbar_value(70)
+        ScanerUtils.progressbar_value(70)
 
         if self.compared_result.delete:
             self.delete_db()
 
-        self.progressbar_value(80)
+        ScanerUtils.progressbar_value(70)
 
         if self.compared_result.insert:
             self.insert_db()
 
-        self.progressbar_value(90)
+        ScanerUtils.progressbar_value(70)
 
         if self.compared_result.update:
             self.update_db()
-
-    def progressbar_value(self, value):
-        try:
-            signals_app.progressbar_value.emit(90)
-        except RuntimeError as e:
-            MainUtils.print_err(parent=self, error=e)
 
     def insert_db(self):
         counter = 0
@@ -281,7 +278,7 @@ class DbUpdater:
 
         for src, image_item in self.compared_result.insert.items():
 
-            if not Storage.can_scan:
+            if not ScanerUtils.can_scan:
                 return
 
             array_img = ImageUtils.read_image(src)
@@ -327,7 +324,7 @@ class DbUpdater:
 
         for src, image_item in self.compared_result.update.items():
 
-            if not Storage.can_scan:
+            if not ScanerUtils.can_scan:
                 return
 
             array_img = ImageUtils.read_image(src)
@@ -372,7 +369,7 @@ class DbUpdater:
 
         for src, img_data in self.compared_result.delete.items():
 
-            if not Storage.can_scan:
+            if not ScanerUtils.can_scan:
                 return
 
             stmt =  sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
@@ -403,7 +400,7 @@ class ScanerThread(QThread):
         self.finished.emit()
     
     def start_scan(self):
-        Storage.can_scan = True
+        ScanerUtils.can_scan = True
 
         try:
             signals_app.progressbar_show.emit()
@@ -434,7 +431,7 @@ class ScanerThread(QThread):
             MainUtils.print_err(parent=trash_remover, error=e)
 
         Dbase.vacuum()
-        Storage.can_scan = True
+        ScanerUtils.can_scan = True
 
         try:
             signals_app.progressbar_hide.emit()
@@ -479,7 +476,7 @@ class ScanerShedule(QObject):
 
     def stop_thread(self):
         print("scaner manualy stoped from signals_app. You need emit scaner start signal")
-        Storage.can_scan = False
+        ScanerUtils.can_scan = False
         self.wait_timer.stop()
 
     def finalize_scan(self):
