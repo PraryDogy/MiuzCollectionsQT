@@ -101,7 +101,7 @@ class CustomSlider(BaseSlider):
     def change_size(self, value: int):
         self.setValue(value)
         cnf.curr_size_ind = value
-        signals_app.reload_thumbnails.emit()
+        signals_app.resize_grid.emit()
 
 
 class BarBottom(QFrame):

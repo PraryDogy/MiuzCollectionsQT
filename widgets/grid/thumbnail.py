@@ -17,14 +17,19 @@ from ..context_img import ContextImg
 class NameLabel(QLabel):
     def __init__(self, parent, name: str, coll: str):
         super().__init__(parent)
+        self.name = name
+        self.coll = coll
 
+    def set_text(self):
         max_row = TEXT_LENGTH[cnf.curr_size_ind]
-        name = f"{name[:max_row - 10]}...{name[-7:]}"
+        name = f"{self.name[:max_row - 10]}...{self.name[-7:]}"
 
-        if len(coll) > max_row:
-            cut_coll = coll[:max_row]
+        if len(self.coll) > max_row:
+            cut_coll = self.coll[:max_row]
             cut_coll = cut_coll[:-6]
-            coll = cut_coll + "..." + coll[-3:]
+            coll = cut_coll + "..." + self.coll[-3:]
+        else:
+            coll = self.coll
 
         self.setText(f"{coll}\n{name}")
 
@@ -83,6 +88,8 @@ class Thumbnail(QFrame):
 
         pixmap = ImageUtils.pixmap_scale(self.img, PIXMAP_SIZE[cnf.curr_size_ind])
         self.img_label.setPixmap(pixmap)
+
+        self.name_label.set_text()
 
 
     def selected_style(self):
