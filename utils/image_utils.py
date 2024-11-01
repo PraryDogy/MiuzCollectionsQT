@@ -139,23 +139,17 @@ class ImageUtils:
             aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
             transformMode=Qt.TransformationMode.SmoothTransformation
             )
-
-    @classmethod
-    def resize_min_aspect_ratio(cls, image: np.ndarray, size: int) -> np.ndarray | None:
-        try:
-            h, w = image.shape[:2]
-            scale = size / min(h, w)
-            new_w, new_h = int(w * scale), int(h * scale)
-            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
-        except Exception as e:
-            print("resize_min_aspect_ratio error:", e)
-            return None
         
     @classmethod
-    def resize_max_aspect_ratio(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+    def resize_max_aspect_ratio(cls, image: np.ndarray, size: int, is_max: bool = True) -> np.ndarray | None:
         try:
             h, w = image.shape[:2]
-            scale = size / max(h, w)
+
+            if is_max:
+                scale = size / max(h, w)
+            else:
+                scale = size / min(h, w)
+    
             new_w, new_h = int(w * scale), int(h * scale)
             return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
         except Exception as e:
