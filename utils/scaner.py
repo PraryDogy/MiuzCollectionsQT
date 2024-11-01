@@ -11,11 +11,12 @@ from signals import signals_app
 
 from .image_utils import ImageUtils
 from .main_utils import MainUtils
-
+import numpy as np
+from sqlalchemy import Insert, Delete, Update
 
 class ScanerUtils:
     can_scan = True
-    counter = 15
+    stmt_max_count = 15
     sleep_ = 0.2
 
     @classmethod
@@ -35,7 +36,7 @@ class ScanerUtils:
         return Dbase.engine.connect()
     
     @classmethod
-    def conn_commit_(cls, conn: Connection):
+    def conn_commit(cls, conn: Connection):
         conn.commit()
 
     @classmethod
@@ -80,7 +81,7 @@ class Migrate:
                 )
             conn.execute(q)
 
-        ScanerUtils.conn_commit_(conn)
+        ScanerUtils.conn_commit(conn)
         ScanerUtils.conn_close(conn)
         ScanerUtils.reload_gui()
 
@@ -98,7 +99,7 @@ class TrashRemover:
         if trash_img:
             q = (sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src.not_like(f"%{coll_folder}%")))
             conn.execute(q)
-            ScanerUtils.conn_commit_(conn)
+            ScanerUtils.conn_commit(conn)
             ScanerUtils.conn_close(conn)
 
 
@@ -195,9 +196,9 @@ class DbImages:
 
 class ComparedResult:
     def __init__(self):
-        self.insert_items: dict[str, ImageItem] = {}
-        self.update_items: dict[str, ImageItem] = {}
-        self.delete_items : dict[str, ImageItem]= {}
+        self.ins_items: dict[str, ImageItem] = {}
+        self.upd_items: dict[str, ImageItem] = {}
+        self.del_items : dict[str, ImageItem]= {}
 
 
 class ImageCompator:
@@ -217,7 +218,7 @@ class ImageCompator:
             in_finder = self.finder_images.get(db_src)
 
             if not in_finder:
-                result.delete_items[db_src] = db_item
+                result.del_items[db_src] = db_item
 
         for finder_src, finder_item in self.finder_images.items():
 
@@ -227,10 +228,10 @@ class ImageCompator:
             in_db = self.db_images.get(finder_src)
 
             if not in_db:
-                result.insert_items[finder_src] = finder_item
+                result.ins_items[finder_src] = finder_item
 
             elif not (finder_item.size, finder_item.modified) == (in_db.size, in_db.modified):
-                result.update_items[finder_src] = finder_item
+                result.upd_items[finder_src] = finder_item
 
         return result
 
@@ -239,41 +240,61 @@ class DbUpdater:
     def __init__(self, compared_result: ComparedResult):
         super().__init__()
         self.res = compared_result
+        self.flag_gel = "delete"
+        self.flag_ins = "insert"
+        self.flag_upd = "update"
 
     def start(self):
         ScanerUtils.progressbar_value(70)
 
-        if self.res.delete_items:
+        if self.res.del_items:
             self.delete_db()
+            self.modify_db(compared_items=self.res.del_items, flag=self.flag_gel)
 
         ScanerUtils.progressbar_value(80)
 
-        if self.res.insert_items:
-            self.insert_db()
+        if self.res.ins_items:
+            self.modify_db(compared_items=self.res.ins_items, flag=self.flag_ins)
 
         ScanerUtils.progressbar_value(90)
 
-        if self.res.update_items:
-            self.update_db()
+        if self.res.upd_items:
+            self.modify_db(compared_items=self.res.upd_items, flag=self.flag_upd)
 
-    def create_db_img(self, src: str = None) -> bytes | None:
+    def create_db_img(
+            self,
+            flag: str,
+            src: str
+            ) -> bytes | None:
 
-        if src is None:
+        if flag == self.flag_gel:
             return None
 
-        array_img = ImageUtils.read_image(src)
+        else:
+            array_img = ImageUtils.read_image(src)
 
-        if array_img is None:
-            return None
-        
-        array_img = ImageUtils.resize_max_aspect_ratio(array_img, DB_SIZE)
+            if isinstance(array_img, np.ndarray):
+                array_img = ImageUtils.resize_max_aspect_ratio(array_img, DB_SIZE)
 
-        if src.endswith(PSD_TIFF):
-            array_img = ImageUtils.array_bgr_to_rgb(array_img)
+                if src.endswith(PSD_TIFF):
+                    array_img = ImageUtils.array_bgr_to_rgb(array_img)
 
-        return ImageUtils.image_array_to_bytes(array_img)
-    
-    def get_insert_stmt(self, bytes_img: bytes, src: str, image_item: ImageItem):
+                return ImageUtils.image_array_to_bytes(array_img)
+
+            else:
+                return None
+  
+    def get_stmt(
+            self,
+            flag: str,
+            bytes_img: bytes,
+            src: str,
+            image_item: ImageItem
+            ) -> Delete | Insert | Update:
+
+        if flag == self.flag_gel:
+            return sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
+
         values = {
                 "img150": bytes_img,
                 "src": src,
@@ -282,109 +303,47 @@ class DbUpdater:
                 "modified": image_item.modified,
                 "collection": MainUtils.get_coll_name(src),
                 }
+        
+        if flag == self.flag_ins:
+            return sqlalchemy.insert(ThumbsMd).values(values) 
+           
+        else:
+            return sqlalchemy.update(ThumbsMd).values(values).where(ThumbsMd.src==src)
 
-        return sqlalchemy.insert(ThumbsMd).values(values)
-    
-    def get_update_stmt(self, bytes_img: bytes, src: str, image_item: ImageItem):
-        values = {
-                "img150": bytes_img,
-                "size": image_item.size,
-                "created": image_item.created,
-                "modified": image_item.modified,
-                "collection": MainUtils.get_coll_name(src),
-                }
-
-        return sqlalchemy.update(ThumbsMd).values(values).where(ThumbsMd.src==src)
-    
-    def get_delete_stmt(self, src: str):
-        return sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
-
-    def insert_db(self):
-        counter = 0
+    def modify_db(self, compared_items: dict[str, ImageItem], flag: str):
+        stmt_count = 0
         conn = ScanerUtils.conn_get()
 
-        for src, image_item in self.res.insert_items.items():
+        for src, image_item in compared_items.items():
 
             if not ScanerUtils.can_scan:
                 return
 
-            bytes_img = self.create_db_img(src)
+            bytes_img = self.create_db_img(flag=flag, src=src)
+            stmt = self.get_stmt(flag=flag, bytes_img=bytes_img, src=src, image_item=image_item)
 
-            if not bytes_img:
+            if flag == self.flag_gel:
+                conn.execute(stmt)
+
+            elif bytes_img is not None:
+                conn.execute(stmt)
+
+            else:
+                print("scaner > updater > byte img is None", src)
                 continue
 
-            stmt = self.get_insert_stmt(bytes_img, src, image_item)
-            conn.execute(stmt)
+            stmt_count += 1
 
-            counter += 1
+            if stmt_count == ScanerUtils.stmt_max_count:
+                stmt_count = 0
 
-            if counter == ScanerUtils.counter:
-                counter = 0
-
-                ScanerUtils.conn_commit_(conn)
-                ScanerUtils.reload_gui()
-                sleep(ScanerUtils.sleep_)
-                conn = ScanerUtils.conn_get()
-
-        if counter != 0:
-            ScanerUtils.conn_commit_(conn)
-        ScanerUtils.conn_close(conn)
-
-    def update_db(self):
-        counter = 0
-        conn = ScanerUtils.conn_get()
-
-        for src, image_item in self.res.update_items.items():
-
-            if not ScanerUtils.can_scan:
-                return
-
-            bytes_img = self.create_db_img(src)
-
-            if not bytes_img:
-                continue
-
-            stmt = self.get_update_stmt(bytes_img, src, image_item)
-            conn.execute(stmt)
-
-            counter += 1
-
-            if counter == ScanerUtils.counter:
-                counter = 0
-
-                ScanerUtils.conn_commit_(conn)
+                ScanerUtils.conn_commit(conn)
                 ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
                 conn = ScanerUtils.conn_get()
         
-        if counter != 0:
-            ScanerUtils.conn_commit_(conn)
-        ScanerUtils.conn_close(conn)
-
-    def delete_db(self):
-        counter = 0
-        conn = ScanerUtils.conn_get()
-
-        for src, img_data in self.res.delete_items.items():
-
-            if not ScanerUtils.can_scan:
-                return
-
-            stmt = self.get_delete_stmt(src)
-            conn.execute(stmt)
-
-            counter += 1
-
-            if counter == ScanerUtils.counter:
-                counter = 0
-
-                ScanerUtils.conn_commit_(conn)
-                ScanerUtils.reload_gui()
-                sleep(ScanerUtils.sleep_)
-                conn = ScanerUtils.conn_get()
-
-        if counter != 0:
-            ScanerUtils.conn_commit_(conn)
+        if stmt_count != 0:
+            ScanerUtils.conn_commit(conn)
         ScanerUtils.conn_close(conn)
 
 
