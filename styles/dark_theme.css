@@ -288,7 +288,7 @@
 }
 
 #thumbnail_selected {
-    background-color: rgba(46, 88, 203, 0.7);
+    background-color: rgba(46, 88, 203, 1.0);
     border-radius: 10px;
     color: #ffffff;
 }
