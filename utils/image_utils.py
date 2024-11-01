@@ -123,6 +123,15 @@ class ImageUtils:
         return img
 
     @classmethod
+    def bytes_to_image_array(cls, image_bytes: bytes) -> np.ndarray | None:
+        try:
+            image_array = np.frombuffer(image_bytes, dtype=np.uint8)
+            return cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+        except Exception as e:
+            print("bytes_to_image_array error:", e)
+            return None
+
+    @classmethod
     def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
         return pixmap.scaled(
             size,
@@ -146,11 +155,11 @@ class ImageUtils:
     def resize_max_aspect_ratio(cls, image: np.ndarray, size: int) -> np.ndarray | None:
         try:
             h, w = image.shape[:2]
-            scale = size / min(h, w)
+            scale = size / max(h, w)
             new_w, new_h = int(w * scale), int(h * scale)
             return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
         except Exception as e:
-            print("resize_min_aspect_ratio error:", e)
+            print("resize_max_aspect_ratio error:", e)
             return None
 
     @classmethod
