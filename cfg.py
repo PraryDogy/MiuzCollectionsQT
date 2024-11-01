@@ -95,7 +95,6 @@ class User:
         
         self.theme: str = "dark_theme"
         self.user_lng: str = "en"
-        self.small_view: str = True
         self.small_menu_view: str = True
 
         self.down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")

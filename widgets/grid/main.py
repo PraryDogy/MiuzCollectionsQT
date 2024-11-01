@@ -13,7 +13,7 @@ from ..win_smb import WinSmb
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .db_images import DbImages, DbImage
 from .limit_btn import LimitBtn
-from .thumbnail import SmallThumbnail, Thumbnail
+from .thumbnail import Thumbnail
 from .title import Title
 from .up_btn import UpBtn
 
@@ -34,9 +34,9 @@ class Thumbnails(QScrollArea):
         self.resize_timer.timeout.connect(self.resize_)
 
         self.curr_cell: tuple = (0, 0)
-        self.cell_to_wid: dict[tuple, Thumbnail | SmallThumbnail] = {}
-        self.path_to_wid: dict[str, Thumbnail | SmallThumbnail] = {}
-        self.ordered_widgets: list[Thumbnail | SmallThumbnail] = []
+        self.cell_to_wid: dict[tuple, Thumbnail] = {}
+        self.path_to_wid: dict[str, Thumbnail] = {}
+        self.ordered_widgets: list[Thumbnail] = []
 
         # Создаем фрейм для виджетов в области скролла
         self.scroll_area_widget = QWidget(parent=self)
@@ -132,13 +132,8 @@ class Thumbnails(QScrollArea):
 
         row, col = 0, 0
 
-        if cnf.small_view:
-            thumb = SmallThumbnail
-        else:
-            thumb = Thumbnail
-
         for db_image in db_images:
-            wid = thumb(img=db_image.img, src=db_image.src, coll=db_image.coll)
+            wid = Thumbnail(img=db_image.img, src=db_image.src, coll=db_image.coll)
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
 
             self.add_widget_data(wid, self.all_grids_row, col)
@@ -154,8 +149,8 @@ class Thumbnails(QScrollArea):
 
         self.thumbnails_layout.addWidget(grid_widget)
 
-    def select_new_widget(self, data: tuple | str | Thumbnail | SmallThumbnail):
-        if isinstance(data, (Thumbnail, SmallThumbnail)):
+    def select_new_widget(self, data: tuple | str | Thumbnail):
+        if isinstance(data, Thumbnail):
             coords = data.row, data.col
             new_wid = data
 
@@ -169,7 +164,7 @@ class Thumbnails(QScrollArea):
 
         prev_wid = self.cell_to_wid.get(self.curr_cell)
 
-        if isinstance(new_wid, (Thumbnail, SmallThumbnail)):
+        if isinstance(new_wid, Thumbnail):
             prev_wid.regular_style()
             new_wid.selected_style()
             self.curr_cell = coords
@@ -184,20 +179,20 @@ class Thumbnails(QScrollArea):
     def reset_selection(self):
         widget = self.cell_to_wid.get(self.curr_cell)
 
-        if isinstance(widget, (Thumbnail, SmallThumbnail)):
+        if isinstance(widget, Thumbnail):
             widget.regular_style()
             self.curr_cell: tuple = (0, 0)
 
-    def add_widget_data(self, wid: Thumbnail | SmallThumbnail, row: int, col: int):
+    def add_widget_data(self, wid: Thumbnail, row: int, col: int):
         wid.row, wid.col = row, col
         self.cell_to_wid[row, col] = wid
         self.path_to_wid[wid.src] = wid
         self.ordered_widgets.append(wid)
 
-    def open_in_view(self, wid: Thumbnail | SmallThumbnail):
+    def open_in_view(self, wid: Thumbnail):
         wid = self.path_to_wid.get(wid.src)
 
-        if isinstance(wid, (Thumbnail, SmallThumbnail)):
+        if isinstance(wid, Thumbnail):
             from ..win_image_view import WinImageView
             self.win_image_view = WinImageView(src=wid.src, path_to_wid=self.path_to_wid)
             self.win_image_view.center_win(self)

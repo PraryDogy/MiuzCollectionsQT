@@ -53,15 +53,6 @@ class ProgressBar(QWidget):
         self.hide()
 
         
-class SwitchView(SvgBtn):
-    def __init__(self, size: int, parent: QWidget = None):
-        icn = f"{cnf.theme}_{str(cnf.small_view).lower()}_view.svg"
-        super().__init__(icon_path=os.path.join("images", icn), size=size, parent=parent)
-
-    def switch_icon(self):
-        icn = f"{cnf.theme}_{str(cnf.small_view).lower()}_view.svg"
-        self.set_icon(icon_path=os.path.join("images", icn))
-
 
 class BarBottom(QFrame):
     def __init__(self):
@@ -94,13 +85,6 @@ class BarBottom(QFrame):
         signals_app.show_downloads.connect(self.downloads.show)
 
     
-        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
-
-        self.switch_view = SwitchView(size=20)
-        self.switch_view.mouseReleaseEvent = self.switch_view_cmd
-        self.h_layout.addWidget(self.switch_view)
-        self.switch_view.setToolTip(cnf.lng.view_mode)
-
         self.h_layout.addSpacerItem(QSpacerItem(15, 0))
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_switch.svg"), size=20)
@@ -156,7 +140,6 @@ class BarBottom(QFrame):
         self.sett_widget.set_icon(os.path.join("images", f"{cnf.theme}_settings.svg"))
         self.downloads.set_icon(os.path.join("images", f"{cnf.theme}_downloads.svg"))
         self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
-        self.switch_view.switch_icon()
 
         cnf.write_json_cfg()
 

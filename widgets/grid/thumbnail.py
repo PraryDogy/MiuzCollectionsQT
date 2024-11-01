@@ -29,7 +29,7 @@ class NameLabel(QLabel):
         self.setText(f"{coll}\n{name}")
 
 
-class BaseThumb(QFrame):
+class Thumbnail(QFrame):
     select = pyqtSignal(str)
 
     def __init__(self, img: bytes, src: str, coll: str):
@@ -146,13 +146,3 @@ class BaseThumb(QFrame):
             return super().contextMenuEvent(ev)
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
-
-
-class Thumbnail(BaseThumb):
-    def __init__(self, img: bytes, src: str, coll: str):
-        super().__init__(img, src, coll)
-
-
-class SmallThumbnail(BaseThumb):
-    def __init__(self, img: bytes, src: str, coll: str):
-        super().__init__(img, src, coll)
