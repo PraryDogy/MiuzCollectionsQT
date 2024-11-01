@@ -13,6 +13,7 @@ from .main_utils import MainUtils
 
 class Storage:
     can_scan = True
+    progress_value = 0
 
 
 class Migrate:
@@ -22,7 +23,13 @@ class Migrate:
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
-        img_src, coll_name = conn.execute(q).first()
+        res = conn.execute(q).first()
+
+        if res:
+            img_src, coll_name = res
+        else:
+            print("Migrate > can'l load row > no collection folder in db > it's ok")
+            return
     
         img_src: str
         old_coll_folder = img_src.split(os.sep + coll_name + os.sep)[0]
@@ -126,18 +133,19 @@ class FinderImages:
             collections = [cnf.coll_folder]
 
         ln_colls = len(collections)
-        step_value = 60 if ln_colls == 0 else 60 / ln_colls
+        step_value = int(60 if ln_colls == 0 else 60 / ln_colls)
 
         for collection in collections:
 
             try:
                 signals_app.progressbar_value.emit(step_value)
             except Exception as e:
-                ...
+                MainUtils.print_err(parent=self, error=e)
 
             try:
                 finder_images.update(self.walk_collection(collection))
             except TypeError:
+                MainUtils.print_err(parent=self, error=e)
                 continue
 
         return finder_images
@@ -227,11 +235,12 @@ class ImageCompator:
                 return
 
             db_item = self.db_images.get(finder_src)
-            b = (finder_item.size, finder_item.modified) == (db_item.size, db_item.modified)
 
             if not db_item:
                 compared_result.insert[finder_src] = finder_item
+                continue
 
+            b = (finder_item.size, finder_item.modified) == (db_item.size, db_item.modified)
             if db_item and not b:
                 compared_result.update[finder_src] = finder_item
 
@@ -270,12 +279,11 @@ class DbUpdater:
         counter = 0
         conn = Dbase.engine.connect()
 
-        for src, img_data in self.compared_result.insert.items():
+        for src, image_item in self.compared_result.insert.items():
 
             if not Storage.can_scan:
                 return
 
-            size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
 
             if array_img is None:     
@@ -291,9 +299,9 @@ class DbUpdater:
             values = {
                     "img150": bytes_img,
                     "src": src,
-                    "size": size,
-                    "created": created,
-                    "modified": modified,
+                    "size": image_item.size,
+                    "created": image_item.created,
+                    "modified": image_item.modified,
                     "collection": MainUtils.get_coll_name(src),
                     }
 
@@ -317,12 +325,11 @@ class DbUpdater:
         counter = 0
         conn = Dbase.engine.connect()
 
-        for src, img_data in self.compared_result.update.items():
+        for src, image_item in self.compared_result.update.items():
 
             if not Storage.can_scan:
                 return
 
-            size, created, modified = img_data
             array_img = ImageUtils.read_image(src)
 
             if array_img is None:
@@ -337,9 +344,9 @@ class DbUpdater:
 
             values = {
                     "img150": bytes_img,
-                    "size": size,
-                    "created": created,
-                    "modified": modified,
+                    "size": image_item.size,
+                    "created": image_item.created,
+                    "modified": image_item.modified,
                     "collection": MainUtils.get_coll_name(src),
                     }
 
@@ -403,11 +410,8 @@ class ScanerThread(QThread):
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
-        try:
-            migrate = Migrate()
-            migrate.start()
-        except Exception as e:
-            MainUtils.print_err(parent=migrate, error=e)
+        migrate = Migrate()
+        migrate.start()
 
         finder_images = FinderImages()
         finder_images = finder_images.get()
@@ -479,6 +483,7 @@ class ScanerShedule(QObject):
         self.wait_timer.stop()
 
     def finalize_scan(self):
+        print("scaner finished")
         try:
             self.scaner_thread.quit()
         except Exception as e:
