@@ -1,7 +1,9 @@
 import os
+from time import sleep
 
 import sqlalchemy
 from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
+from sqlalchemy import Connection
 
 from cfg import DB_SIZE, IMG_EXT, PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
@@ -9,7 +11,7 @@ from signals import signals_app
 
 from .image_utils import ImageUtils
 from .main_utils import MainUtils
-from time import sleep
+
 
 class ScanerUtils:
     can_scan = True
@@ -28,12 +30,21 @@ class ScanerUtils:
         signals_app.reload_menu.emit()
         signals_app.reload_thumbnails.emit()
 
+    @classmethod
+    def conn_get(cls):
+        return Dbase.engine.connect()
+    
+    @classmethod
+    def conn_commit_(cls, conn: Connection):
+        conn.commit()
+
+    def conn_close(cls, conn: Connection):
+        conn.close()
+
 
 class Migrate:
-
     def start(self):
-
-        conn = Dbase.engine.connect()
+        conn = ScanerUtils.conn_get()
 
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
         res: tuple[str, str] = conn.execute(q).first()
@@ -68,8 +79,8 @@ class Migrate:
                 )
             conn.execute(q)
 
-        conn.commit()
-        conn.close()
+        ScanerUtils.conn_commit_(conn)
+        ScanerUtils.conn_close(conn)
         ScanerUtils.reload_gui()
 
 
@@ -78,7 +89,7 @@ class TrashRemover:
     def start(self):
 
         coll_folder = os.sep + cnf.coll_folder.strip(os.sep) + os.sep
-        conn = Dbase.engine.connect()
+        conn = ScanerUtils.conn_get()
 
         q = (sqlalchemy.select(ThumbsMd.src).where(ThumbsMd.src.not_like(f"%{coll_folder}%")))
         trash_img = conn.execute(q).scalar() or None
@@ -86,36 +97,8 @@ class TrashRemover:
         if trash_img:
             q = (sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src.not_like(f"%{coll_folder}%")))
             conn.execute(q)
-            conn.commit()
-            conn.close()
-
-# class DubFinder:
-#     def start(self):
-#         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
-#         conn = Dbase.engine.connect()
-#         res = conn.execute(q).fetchall()
-
-#         dubs = defaultdict(list)
-
-#         for res_id, res_src in res:
-#             dubs[res_src].append(res_id)
-
-#         dubs = [
-#             x
-#             for k, v in dubs.items()
-#             for x in v[1:]
-#             if len(v) > 1
-#             ]
-
-#         if dubs:
-#             for dub_id in dubs:
-#                 q = sqlalchemy.delete(ThumbsMd).where(ThumbsMd.id==dub_id)
-#                 conn.execute(q)
-#             conn.commit()
-#             conn.close()
-#             return True
-        
-#         return False
+            ScanerUtils.conn_commit_(conn)
+            ScanerUtils.conn_close(conn)
 
 
 class ImageItem:
@@ -196,7 +179,7 @@ class DbImages:
         super().__init__()
 
     def get(self) -> dict[str, ImageItem]:
-        conn = Dbase.engine.connect()
+        conn = ScanerUtils.conn_get()
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created, ThumbsMd.modified)
         try:
             res = conn.execute(q).fetchall()
@@ -206,7 +189,7 @@ class DbImages:
                 }
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
-            conn.close()
+            ScanerUtils.conn_close(conn)
             return {}
 
 
@@ -278,7 +261,7 @@ class DbUpdater:
 
     def insert_db(self):
         counter = 0
-        conn = Dbase.engine.connect()
+        conn = ScanerUtils.conn_get()
 
         for src, image_item in self.compared_result.insert.items():
 
@@ -313,18 +296,18 @@ class DbUpdater:
 
             if counter == ScanerUtils.counter:
                 counter = 0
-                conn.commit()
-                conn = Dbase.engine.connect()
+                ScanerUtils.conn_commit_(conn)
+                conn = ScanerUtils.conn_get()
                 ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
 
         if counter != 0:
-            conn.commit()
-        conn.close()
+            ScanerUtils.conn_commit_(conn)
+        ScanerUtils.conn_close(conn)
 
     def update_db(self):
         counter = 0
-        conn = Dbase.engine.connect()
+        conn = ScanerUtils.conn_get()
 
         for src, image_item in self.compared_result.update.items():
 
@@ -358,18 +341,18 @@ class DbUpdater:
 
             if counter == ScanerUtils.counter:
                 counter = 0
-                conn.commit()
-                conn = Dbase.engine.connect()
+                ScanerUtils.conn_commit_(conn)
+                conn = ScanerUtils.conn_get()
                 ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
         
         if counter != 0:
-            conn.commit()
-        conn.close()
+            ScanerUtils.conn_commit_(conn)
+        ScanerUtils.conn_close(conn)
 
     def delete_db(self):
         counter = 0
-        conn = Dbase.engine.connect()
+        conn = ScanerUtils.conn_get()
 
         for src, img_data in self.compared_result.delete.items():
 
@@ -383,14 +366,14 @@ class DbUpdater:
 
             if counter == ScanerUtils.counter:
                 counter = 0
-                conn.commit()
-                conn = Dbase.engine.connect()
+                ScanerUtils.conn_commit_(conn)
+                conn = ScanerUtils.conn_get()
                 ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
 
         if counter != 0:
-            conn.commit()
-        conn.close()
+            ScanerUtils.conn_commit_(conn)
+        ScanerUtils.conn_close(conn)
 
 
 class ScanerThread(QThread):
