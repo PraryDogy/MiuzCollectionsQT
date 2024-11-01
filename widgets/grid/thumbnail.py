@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutV
-from cfg import PIXMAP_SIZE, TEXT_LENGTH, THUMBPAD, cnf
+from cfg import PIXMAP_SIZE, TEXT_LENGTH, THUMBPAD, cnf, THUMB_W
 from signals import signals_app
 from styles import Names, Themes
 from utils.image_utils import ImageUtils
@@ -15,24 +15,18 @@ from ..context_img import ContextImg
 
 
 class NameLabel(QLabel):
-    def __init__(self, parent, filename: str, coll: str):
+    def __init__(self, parent, name: str, coll: str):
         super().__init__(parent)
 
         max_row = TEXT_LENGTH[cnf.curr_size_ind]
-        name, ext = os.path.splitext(filename)
-        ext = ext.replace(".", "")
+        name = f"{name[:max_row - 10]}...{name[-7:]}"
 
         if len(coll) > max_row:
             cut_coll = coll[:max_row]
             cut_coll = cut_coll[:-6]
             coll = cut_coll + "..." + coll[-3:]
 
-        if len(name) >= max_row:
-            cut_name = name[:max_row]
-            cut_name = cut_name[:-6]
-            name = cut_name + "..." + name[-3:]
-
-        self.setText(f"{coll}\n{name}\n{ext}")
+        self.setText(f"{coll}\n{name}")
 
 
 class BaseThumb(QFrame):
@@ -55,7 +49,7 @@ class BaseThumb(QFrame):
 
         self.setToolTip(
             f"{cnf.lng.collection}: {self.coll}\n"
-            f"{cnf.lng.file_name}: {self.name}\n"
+            f"{cnf.lng.file_name}: {self.name}"
             )  
         
         self.row, self.col = 0, 0
@@ -70,20 +64,22 @@ class BaseThumb(QFrame):
         fl = Qt.AlignmentFlag.AlignCenter
         self.v_layout.addWidget(self.img_label, alignment=fl)
 
-        self.name_label = NameLabel(parent=self, filename=self.name, coll=coll)
-        self.v_layout.addWidget(self.name_label)
+        self.name_label = NameLabel(parent=self, name=self.name, coll=coll)
+        fl = Qt.AlignmentFlag.AlignCenter
+        self.name_label.setAlignment(fl)
+        self.v_layout.addWidget(self.name_label, alignment=fl)
 
         self.setup()
 
     def setup(self):
-        name_label_h = 48
-        main_h = PIXMAP_SIZE[cnf.curr_size_ind] + name_label_h + THUMBPAD + self.spacing
-        main_w = PIXMAP_SIZE[cnf.curr_size_ind] + THUMBPAD
+        name_label_h = 32
+        thumb_h = PIXMAP_SIZE[cnf.curr_size_ind] + name_label_h + THUMBPAD + self.spacing
+        thumb_w = THUMB_W[cnf.curr_size_ind] + THUMBPAD
 
         self.img_label.setFixedHeight(PIXMAP_SIZE[cnf.curr_size_ind])
-        self.name_label.setFixedSize(PIXMAP_SIZE[cnf.curr_size_ind], name_label_h)
+        self.name_label.setFixedHeight(name_label_h)
 
-        self.setFixedSize(main_w, main_h)
+        self.setFixedSize(thumb_w, thumb_h)
 
         pixmap = ImageUtils.pixmap_scale(self.img, PIXMAP_SIZE[cnf.curr_size_ind])
         self.img_label.setPixmap(pixmap)
