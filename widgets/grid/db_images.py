@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 from datetime import datetime
 
@@ -34,7 +35,23 @@ class DbImages:
             conn.close()
             return
 
-        thumbs_dict = defaultdict(list)
+        thumbs_dict = defaultdict(lambda: defaultdict(list))
+
+        # for img150, src, modified, coll in res:
+        #     modified = datetime.fromtimestamp(modified).strftime("%B %Y")
+        #     name, ext = os.path.splitext(src)
+        #     thumbs_dict[modified][name].append((img150, coll, ext))
+
+        # thumbs_dict: dict[str, list[DbImage]] = {
+        #     date: [
+        #         DbImage(img150, name + ext, coll)
+        #         for name, exts_list in files_by_name.items()
+        #         for img150, coll, ext in sorted(exts_list)
+        #         ]
+        #     for date, files_by_name in thumbs_dict.items()
+        #     }
+
+        thumbs_dict = defaultdict(list[DbImage])
 
         for img, src, modified, coll in res:
             modified = datetime.fromtimestamp(modified).date()
