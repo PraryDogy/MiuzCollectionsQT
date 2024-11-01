@@ -22,7 +22,6 @@ class ScanerUtils:
             MainUtils.print_err(parent=cls, error=e)
 
 
-
 class Migrate:
 
     def start(self):
