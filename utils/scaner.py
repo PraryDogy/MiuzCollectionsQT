@@ -38,6 +38,7 @@ class ScanerUtils:
     def conn_commit_(cls, conn: Connection):
         conn.commit()
 
+    @classmethod
     def conn_close(cls, conn: Connection):
         conn.close()
 
@@ -365,7 +366,7 @@ class DbUpdater:
             if not ScanerUtils.can_scan:
                 return
 
-            stmt =  self.get_delete_stmt(src)
+            stmt = self.get_delete_stmt(src)
             conn.execute(stmt)
 
             counter += 1
