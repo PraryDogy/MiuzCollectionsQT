@@ -113,49 +113,35 @@ class BarBottom(QFrame):
         self.setStyleSheet(Themes.current)
         
         self.h_layout = LayoutH(self)
+        self.h_layout.setSpacing(20)
+        self.h_layout.setContentsMargins(15, 0, 15, 0)
         self.init_ui()
         
         signals_app.reload_stbar.connect(self.reload_stbar)
 
     def init_ui(self):
-        self.h_layout.addStretch(1)
-
-        self.h_layout.addSpacerItem(QSpacerItem(10, 0))
+        self.h_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         self.progress_bar = ProgressBar()
-        self.h_layout.addWidget(self.progress_bar)
-
-        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
+        self.progress_bar.setFixedWidth(120)
+        self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.downloads = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_downloads.svg") , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
-        self.h_layout.addWidget(self.downloads)
-        self.downloads.setToolTip(cnf.lng.title_downloads)
         signals_app.hide_downloads.connect(self.downloads.hide)
         signals_app.show_downloads.connect(self.downloads.show)
-
-    
-        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
+        self.h_layout.addWidget(self.downloads, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_switch.svg"), size=20)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
-        self.h_layout.addWidget(self.switch_theme)
-        self.switch_theme.setToolTip(cnf.lng.set_theme)
-
-        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
+        self.h_layout.addWidget(self.switch_theme, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.sett_widget = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_settings.svg"), size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
-        self.h_layout.addWidget(self.sett_widget)
-        self.sett_widget.setToolTip(cnf.lng.settings)
-        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
+        self.h_layout.addWidget(self.sett_widget, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.custom_slider = CustomSlider()
-        self.h_layout.addWidget(self.custom_slider)
-        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
-   
-        # self.h_layout.addSpacerItem(QSpacerItem(15, 0))
-        self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.h_layout.addWidget(self.custom_slider, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.progress_bar.hide()
         self.downloads.hide()

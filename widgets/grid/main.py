@@ -120,7 +120,7 @@ class Thumbnails(QScrollArea):
 
     def create_image_grid(self, date: str, db_images: list[DbImage]):
         title_label = Title(title=date, db_images=db_images, width=self.width())
-        title_label.setContentsMargins(9, 0, 0, 0)
+        title_label.setContentsMargins(5, 0, 0, 10)
         self.thumbnails_layout.addWidget(title_label)
 
         grid_widget = QWidget()
