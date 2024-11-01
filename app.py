@@ -128,6 +128,24 @@ class WinMain(WinBase):
         y = (screen.height() - size.height()) // 2
         self.move(x, y)
 
+    def reload_title(self):
+        self.set_title(self.check_coll())
+
+    def check_coll(self) -> str:
+        if cnf.curr_coll == cnf.ALL_COLLS:
+            return cnf.lng.all_colls
+        else:
+            return cnf.curr_coll
+    
+    def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
+        self.reveal_files = MainUtils.reveal_files(files)
+        if len(cnf.copy_threads) == 0:
+            signals_app.hide_downloads.emit()
+        try:
+            copy_task.remove_threads()
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
     def mycloseEvent(self, event):
         self.titlebar.btns.nonfocused_icons()
         self.hide()
@@ -145,16 +163,17 @@ class WinMain(WinBase):
         elif a0.key() == Qt.Key.Key_Escape:
             a0.ignore()
 
-        # return super().keyPressEvent(a0)
+        elif a0.key() == Qt.Key.Key_Equal:
+            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+                if cnf.curr_size_ind < 3:
+                    cnf.curr_size_ind += 1
+                    signals_app.resize_grid.emit()
 
-    def reload_title(self):
-        self.set_title(self.check_coll())
-
-    def check_coll(self) -> str:
-        if cnf.curr_coll == cnf.ALL_COLLS:
-            return cnf.lng.all_colls
-        else:
-            return cnf.curr_coll
+        elif a0.key() == Qt.Key.Key_Minus:
+            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+                if cnf.curr_size_ind > 0:
+                    cnf.curr_size_ind -= 1
+                    signals_app.resize_grid.emit()
 
     def dragEnterEvent(self, a0: QDragEnterEvent | None) -> None:
         if not a0.source() and a0.mimeData().hasUrls():
@@ -189,15 +208,6 @@ class WinMain(WinBase):
             a0.acceptProposedAction()
 
         return super().dropEvent(a0)
-    
-    def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
-        self.reveal_files = MainUtils.reveal_files(files)
-        if len(cnf.copy_threads) == 0:
-            signals_app.hide_downloads.emit()
-        try:
-            copy_task.remove_threads()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
     
     def dragLeaveEvent(self, a0: QDragLeaveEvent | None) -> None:
         self.drop_widget.hide()
