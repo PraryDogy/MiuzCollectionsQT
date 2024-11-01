@@ -1,7 +1,9 @@
 import os
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSpacerItem, QWidget
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QMouseEvent, QWheelEvent
+from PyQt5.QtWidgets import (QApplication, QFrame, QLabel, QSlider,
+                             QSpacerItem, QWidget)
 
 from base_widgets import CustomProgressBar, LayoutH, SvgBtn
 from cfg import cnf
@@ -53,6 +55,54 @@ class ProgressBar(QWidget):
         self.hide()
 
         
+class BaseSlider(QSlider):
+    _clicked = pyqtSignal()
+
+    def __init__(self, orientation: Qt.Orientation, minimum: int, maximum: int):
+        super().__init__(orientation=orientation, minimum=minimum, maximum=maximum)
+
+        st = f"""
+            QSlider::groove:horizontal {{
+                border-radius: 1px;
+                height: 3px;
+                margin: 0px;
+                background-color: rgba(111, 111, 111, 0.5);
+            }}
+            QSlider::handle:horizontal {{
+                background-color: rgba(199, 199, 199, 1);
+                height: 10px;
+                width: 10px;
+                border-radius: 5px;
+                margin: -4px 0;
+                padding: -4px 0px;
+            }}
+            """
+
+        self.setStyleSheet(st)
+
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.button() == Qt.MouseButton.LeftButton:
+            super().mouseReleaseEvent(ev)
+        else:
+            ev.ignore()
+
+    def wheelEvent(self, e: QWheelEvent | None) -> None:
+        e.ignore()
+
+
+class CustomSlider(BaseSlider):
+
+    def __init__(self):
+        super().__init__(orientation=Qt.Orientation.Horizontal, minimum=0, maximum=3)
+        self.setFixedWidth(80)
+        self.setValue(cnf.curr_size_ind)
+        self.valueChanged.connect(self.change_size)
+    
+    def change_size(self, value: int):
+        self.setValue(value)
+        cnf.curr_size_ind = value
+        signals_app.reload_thumbnails.emit()
+
 
 class BarBottom(QFrame):
     def __init__(self):
@@ -98,6 +148,11 @@ class BarBottom(QFrame):
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
         self.sett_widget.setToolTip(cnf.lng.settings)
+        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
+
+        self.custom_slider = CustomSlider()
+        self.h_layout.addWidget(self.custom_slider)
+        self.h_layout.addSpacerItem(QSpacerItem(15, 0))
    
         self.h_layout.addSpacerItem(QSpacerItem(30, 0))
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
