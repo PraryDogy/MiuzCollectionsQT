@@ -50,40 +50,44 @@ class BaseThumb(QFrame):
         self.img = ImageUtils.pixmap_from_bytes(img)
 
         if not isinstance(self.img, QPixmap):
-            self.img = QPixmap(500, 500)
+            self.img = QPixmap(cnf.IMG_SIZE, cnf.IMG_SIZE)
             self.img.fill(QColor(128, 128, 128))
-
-        self.img = ImageUtils.crop_to_square(self.img)
 
         self.src = src
         self.coll = coll
         self.name = os.path.basename(src)
 
-        self.row, self.col = 0, 0
-
-        mar = 5
-        self.v_layout = LayoutV()
-        self.v_layout.setSpacing(5)
-        self.v_layout.setContentsMargins(mar, mar, mar, mar)
-        self.setLayout(self.v_layout)
-
-        self.img_label = QLabel()
-        fl = Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop
-        self.v_layout.addWidget(self.img_label, alignment=fl)
-
         self.setToolTip(
             f"{cnf.lng.collection}: {self.coll}\n"
             f"{cnf.lng.file_name}: {self.name}\n"
             )  
+        
+        self.row, self.col = 0, 0
+
+        self.spacing = 5
+        self.v_layout = LayoutV()
+        self.v_layout.setSpacing(self.spacing)
+        self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setLayout(self.v_layout)
+
+        self.img_label = QLabel()
+        fl = Qt.AlignmentFlag.AlignCenter
+        self.v_layout.addWidget(self.img_label, alignment=fl)
 
         self.name_label = NameLabel(parent=self, filename=self.name, coll=coll)
-        self.name_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addWidget(self.name_label)
 
-        self.setFixedWidth(cnf.IMG_SIZE + cnf.THUMBPAD)
-        self.setMaximumHeight(cnf.IMG_SIZE + 75)
+        self.setup()
 
+    def setup(self):
+        name_label_h = 48 # 3 строчки по 15 пикселей
+        main_h = cnf.IMG_SIZE + name_label_h + cnf.THUMBPAD + self.spacing
+        main_w = cnf.IMG_SIZE + cnf.THUMBPAD
 
+        self.img_label.setFixedHeight(cnf.IMG_SIZE)
+        self.name_label.setFixedHeight(name_label_h)
+
+        self.setFixedSize(main_w, main_h)
         self.img_label.setPixmap(self.img)
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
