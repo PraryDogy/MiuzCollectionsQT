@@ -32,8 +32,8 @@ class Signals(QObject):
     noti_main = pyqtSignal(str)
     noti_img_view = pyqtSignal(str)
 
-    move_to_wid = pyqtSignal(QObject)
     select_new_wid = pyqtSignal(str)
+    open_in_view = pyqtSignal(object)
 
     def __init__(self):
         super().__init__()

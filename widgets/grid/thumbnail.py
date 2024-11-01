@@ -9,7 +9,7 @@ from cfg import cnf
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 from utils.image_utils import ImageUtils
-
+from signals import signals_app
 from ..context_img import ContextImg
 
 
@@ -41,26 +41,26 @@ class NameLabel(QLabel):
 
 class BaseThumb(QFrame):
     select = pyqtSignal(str)
-    open_in_view = pyqtSignal(str)
 
-    def __init__(self, img: bytes, src: str, coll: str, images_date: str):
+    def __init__(self, img: bytes, src: str, coll: str):
         super().__init__()
 
-        self.row, self.col = 0, 0
+        self.img = ImageUtils.pixmap_from_bytes(img)
+
+        if not isinstance(self.img, QPixmap):
+            self.img = QPixmap(500, 500)
+            self.img.fill(QColor(128, 128, 128))
+
         self.src = src
         self.coll = coll
-        self.images_date = images_date
-        self.img_name = os.path.basename(src)
+        self.name = os.path.basename(src)
+
+        self.row, self.col = 0, 0
+
 
         self.v_layout = LayoutV()
         self.v_layout.setContentsMargins(0, 2, 0, 0)
         self.setLayout(self.v_layout)
-
-        cnf.images[src] = {
-            "widget": self,
-            "collection": coll,
-            "filename": self.img_name
-            }
 
         self.setObjectName(Names.thumbnail_normal)
         self.setStyleSheet(Themes.current)
@@ -72,9 +72,7 @@ class BaseThumb(QFrame):
         pixmap = ImageUtils.pixmap_from_bytes(img)
         pixmap = ImageUtils.crop_to_square(pixmap)
 
-        if not isinstance(pixmap, QPixmap):
-            pixmap = QPixmap(500, 500)
-            pixmap.fill(QColor(128, 128, 128))
+
 
         self.img_label.setPixmap(pixmap)
 
@@ -82,7 +80,7 @@ class BaseThumb(QFrame):
 
         self.setToolTip(
             f"{cnf.lng.collection}: {self.coll}\n"
-            f"{cnf.lng.file_name}: {self.img_name}\n"
+            f"{cnf.lng.file_name}: {self.name}\n"
             f"{self.images_date}"
             )  
 
@@ -91,7 +89,7 @@ class BaseThumb(QFrame):
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.src)
-        self.open_in_view.emit(self.src)
+        signals_app.open_in_view.emit(self)
         return super().mouseDoubleClickEvent(a0)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -140,12 +138,11 @@ class BaseThumb(QFrame):
 
 class Thumbnail(BaseThumb):
     select = pyqtSignal(str)
-    open_in_view = pyqtSignal(str)
 
     def __init__(self, img: bytes, src: str, coll: str, images_date: str):
         super().__init__(img, src, coll, images_date)
    
-        self.title = NameLabel(parent=self, filename=self.img_name, coll=coll)
+        self.title = NameLabel(parent=self, filename=self.name, coll=coll)
         self.title.setContentsMargins(8, 5, 8, 7)
 
         self.title.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -170,7 +167,6 @@ class Thumbnail(BaseThumb):
 
 class SmallThumbnail(BaseThumb):
     select = pyqtSignal(str)
-    open_in_view = pyqtSignal(str)
 
     def __init__(self, img: bytes, src: str, coll: str, images_date: str):
         super().__init__(img, src, coll, images_date)

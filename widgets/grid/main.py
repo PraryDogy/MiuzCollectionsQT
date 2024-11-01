@@ -49,15 +49,15 @@ class Thumbnails(QScrollArea):
         frame_layout.addWidget(thumbnails_wid)
 
         self.columns = self.get_columns()
-        self.init_ui()
+        self.create_grid_layout()
 
         frame_layout.addStretch(1)
         self.setWidget(self.scroll_area_widget)
 
         signals_app.reload_thumbnails.connect(self.reload_thumbnails)
         signals_app.scroll_top.connect(self.scroll_top)
-        signals_app.move_to_wid.connect(self.move_to_wid)
         signals_app.select_new_wid.connect(self.select_new_widget)
+        signals_app.open_in_view.connect(self.open_in_view)
 
     def checkScrollValue(self, value):
         self.up_btn.move(
@@ -70,25 +70,24 @@ class Thumbnails(QScrollArea):
     def scroll_top(self):
         self.verticalScrollBar().setValue(0)
 
-    def init_ui(self):
+    def create_grid_layout(self):
         thumbs_dict = DbImages()
         thumbs_dict = thumbs_dict.get()
-        cnf.images.clear()
+
+        self.curr_cell: tuple = (0, 0)
+        self.all_grids_row = 0
+        self.cell_to_wid.clear()
+        self.path_to_wid.clear()
+        self.ordered_widgets.clear()
 
         if thumbs_dict:
+
             above_thumbs = AboveThumbs(self.width())
             above_thumbs.setContentsMargins(9, 0, 0, 0)
             self.thumbnails_layout.addWidget(above_thumbs)
 
-            self.curr_cell: tuple = (0, 0)
-            # self.main_row, self.main_col = 0, 0
-            self.all_grids_row = 0
-            self.cell_to_wid.clear()
-            self.path_to_wid.clear()
-            self.ordered_widgets.clear()
-
             for date, db_images in thumbs_dict.items():
-                self.images_grid(date, db_images)
+                self.create_image_grid(date, db_images)
 
         else:
             no_images = AboveThumbsNoImages(self.width())
@@ -113,9 +112,9 @@ class Thumbnails(QScrollArea):
     def reload_thumbnails(self):
         MainUtils.clear_layout(self.thumbnails_layout)
         self.up_btn.deleteLater()
-        self.init_ui()
+        self.create_grid_layout()
 
-    def images_grid(self, date: str, db_images: list[DbImage]):
+    def create_image_grid(self, date: str, db_images: list[DbImage]):
         img_src_list = [db_image.src for db_image in db_images]
         title_label = Title(title=date, images=img_src_list, width=self.width())
         title_label.setContentsMargins(9, 0, 0, 0)
@@ -137,7 +136,6 @@ class Thumbnails(QScrollArea):
         for db_image in db_images:
             wid = thumb(img=db_image.img, src=db_image.src, coll=db_image.coll, images_date=date)
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
-            wid.open_in_view.connect(lambda src, w=wid: self.open_in_view(w))
 
             self.add_widget_data(wid, self.all_grids_row, col)
             grid_layout.addWidget(wid, row, col)
@@ -250,6 +248,3 @@ class Thumbnails(QScrollArea):
 
     def get_columns(self):
         return max(self.width() // (cnf.THUMBSIZE + cnf.THUMBPAD), 1)
-    
-    def move_to_wid(self, wid):
-        self.ensureWidgetVisible(wid)

@@ -21,8 +21,8 @@ from .win_info import WinInfo
 from .win_smb import WinSmb
 
 
-class Shared:
-    loaded_images: dict[str, QPixmap] = {}
+class Cache:
+    images: dict[str, QPixmap] = {}
 
 
 class ImageData:
@@ -46,7 +46,7 @@ class LoadImageThread(MyThread):
                 print("image viewer thread no connection")
                 return
 
-            if self.src not in Shared.loaded_images:
+            if self.src not in Cache.images:
 
                 img = ImageUtils.read_image(self.src)
 
@@ -54,17 +54,17 @@ class LoadImageThread(MyThread):
                     img = ImageUtils.array_bgr_to_rgb(img)
 
                 pixmap = ImageUtils.pixmap_from_array(img)
-                Shared.loaded_images[self.src] = pixmap
+                Cache.images[self.src] = pixmap
 
             else:
-                pixmap = Shared.loaded_images.get(self.src)
+                pixmap = Cache.images.get(self.src)
 
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
             pixmap = None
 
-        if len(Shared.loaded_images) > 50:
-            Shared.loaded_images.pop(next(iter(Shared.loaded_images)))
+        if len(Cache.images) > 50:
+            Cache.images.pop(next(iter(Cache.images)))
 
         self.finished.emit(ImageData(self.src, pixmap.width(), pixmap))
         self.remove_threads()
@@ -272,7 +272,7 @@ class WinImageView(WinImgViewBase):
                 return
                 
     def load_thumbnail(self):
-        if self.src not in Shared.loaded_images:
+        if self.src not in Cache.images:
             self.set_title(cnf.lng.loading)
 
             q = (sqlalchemy.select(ThumbsMd.img150)
@@ -306,7 +306,7 @@ class WinImageView(WinImgViewBase):
             self.set_image_title()
 
     def my_close(self, event):
-        Shared.loaded_images.clear()
+        Cache.images.clear()
         cnf.image_viewer = None
         self.close()
 

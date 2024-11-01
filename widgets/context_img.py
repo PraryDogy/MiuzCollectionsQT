@@ -57,9 +57,7 @@ class ContextImg(ContextMenuBase):
             self.smb_win.show()
         
     def show_image_viewer(self):
-        from .win_image_view import WinImageView
-        self.win_img = WinImageView(parent=self.my_parent, src=self.img_src)
-        self.win_img.show()
+        signals_app.open_in_view.emit(self.my_parent)
 
     def reveal_cmd(self):
         if MainUtils.smb_check():
