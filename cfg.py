@@ -27,6 +27,11 @@ PSD_TIFF: tuple = (
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
 
+DB_SIZE = 200
+PIXMAP_SIZE: list = [90, 130, 170, DB_SIZE]
+THUMBPAD: int = 15
+TEXT_LENGTH: list = [18, 23, 28, 33]
+
 class Thumbnail(QObject):
     def __init__(self):
         """
@@ -49,6 +54,7 @@ class User:
     
         self.coll_folder: str = "/Volumes/Shares/Collections"
         
+        self.curr_size_ind: int = 0
         self.curr_coll: str = "miuzcollections_all"
         self.cust_fltr_names: dict = {
             "prod": "1 IMG",
@@ -115,8 +121,6 @@ class Static:
     def __init__(self):
         super().__init__()
 
-        self.IMG_SIZE: int = 200
-        self.THUMBPAD: int = 16
         self.LIMIT: int = 150
         self.ALL_COLLS: str = "miuzcollections_all"
         self.MENU_W: int = 210

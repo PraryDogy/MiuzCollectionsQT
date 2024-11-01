@@ -3,7 +3,7 @@ from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
-from cfg import cnf
+from cfg import cnf, THUMBPAD, PIXMAP_SIZE
 from signals import signals_app
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -241,11 +241,11 @@ class Thumbnails(QScrollArea):
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.up_btn.setVisible(False)
 
-        if abs(a0.size().width() - self.ww) >= cnf.IMG_SIZE - cnf.THUMBPAD - cnf.THUMBPAD:
+        if abs(a0.size().width() - self.ww) >= PIXMAP_SIZE[cnf.curr_size_ind] - THUMBPAD - THUMBPAD:
             self.ww = a0.size().width()
             self.columns = self.get_columns()
             self.reload_thumbnails()
         return super().resizeEvent(a0)
 
     def get_columns(self):
-        return max(self.width() // (cnf.IMG_SIZE + cnf.THUMBPAD), 1)
+        return max(self.width() // (PIXMAP_SIZE[cnf.curr_size_ind] + THUMBPAD), 1)

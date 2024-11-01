@@ -178,3 +178,12 @@ class ImageUtils:
 
         else:
             return None
+
+    @classmethod
+    def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
+        return pixmap.scaled(
+            size,
+            size,
+            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+            transformMode=Qt.TransformationMode.SmoothTransformation
+            )

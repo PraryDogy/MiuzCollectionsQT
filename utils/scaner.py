@@ -1,11 +1,9 @@
 import os
-from collections import defaultdict
-from typing import Literal
 
 import sqlalchemy
 from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 
-from cfg import IMG_EXT, PSD_TIFF, cnf
+from cfg import DB_SIZE, IMG_EXT, PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
 from signals import signals_app
 
@@ -283,7 +281,7 @@ class DbUpdater:
             if array_img is None:     
                 continue
 
-            array_img = ImageUtils.resize_max_aspect_ratio(array_img, cnf.IMG_SIZE)
+            array_img = ImageUtils.resize_max_aspect_ratio(array_img, DB_SIZE)
 
             if src.endswith(PSD_TIFF):
                 array_img = ImageUtils.array_bgr_to_rgb(array_img)
@@ -330,7 +328,7 @@ class DbUpdater:
             if array_img is None:
                 continue
 
-            array_img = ImageUtils.resize_max_aspect_ratio(array_img, cnf.IMG_SIZE)
+            array_img = ImageUtils.resize_max_aspect_ratio(array_img, DB_SIZE)
 
             if src.endswith(PSD_TIFF):
                 array_img = ImageUtils.array_bgr_to_rgb(array_img)

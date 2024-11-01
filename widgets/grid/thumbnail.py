@@ -5,11 +5,12 @@ from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutV
-from cfg import cnf
-from styles import Names, Themes
-from utils.main_utils import MainUtils
-from utils.image_utils import ImageUtils
+from cfg import PIXMAP_SIZE, THUMBPAD, cnf
 from signals import signals_app
+from styles import Names, Themes
+from utils.image_utils import ImageUtils
+from utils.main_utils import MainUtils
+
 from ..context_img import ContextImg
 
 
@@ -50,7 +51,7 @@ class BaseThumb(QFrame):
         self.img = ImageUtils.pixmap_from_bytes(img)
 
         if not isinstance(self.img, QPixmap):
-            self.img = QPixmap(cnf.IMG_SIZE, cnf.IMG_SIZE)
+            self.img = QPixmap(PIXMAP_SIZE, PIXMAP_SIZE)
             self.img.fill(QColor(128, 128, 128))
 
         self.src = src
@@ -80,15 +81,17 @@ class BaseThumb(QFrame):
         self.setup()
 
     def setup(self):
-        name_label_h = 48 # 3 строчки по 15 пикселей
-        main_h = cnf.IMG_SIZE + name_label_h + cnf.THUMBPAD + self.spacing
-        main_w = cnf.IMG_SIZE + cnf.THUMBPAD
+        name_label_h = 48
+        main_h = PIXMAP_SIZE[cnf.curr_size_ind] + name_label_h + THUMBPAD + self.spacing
+        main_w = PIXMAP_SIZE[cnf.curr_size_ind] + THUMBPAD
 
-        self.img_label.setFixedHeight(cnf.IMG_SIZE)
+        self.img_label.setFixedHeight(PIXMAP_SIZE[cnf.curr_size_ind])
         self.name_label.setFixedHeight(name_label_h)
 
         self.setFixedSize(main_w, main_h)
-        self.img_label.setPixmap(self.img)
+
+        pixmap = ImageUtils.pixmap_scale(self.img, PIXMAP_SIZE[cnf.curr_size_ind])
+        self.img_label.setPixmap(pixmap)
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.src)
