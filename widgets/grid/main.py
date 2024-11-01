@@ -115,8 +115,8 @@ class Thumbnails(QScrollArea):
         self.create_grid_layout()
 
     def create_image_grid(self, date: str, db_images: list[DbImage]):
-        img_src_list = [db_image.src for db_image in db_images]
-        title_label = Title(title=date, images=img_src_list, width=self.width())
+        total = len(db_images)
+        title_label = Title(title=date, total=total, width=self.width())
         title_label.setContentsMargins(9, 0, 0, 0)
         self.thumbnails_layout.addWidget(title_label)
 
@@ -134,7 +134,7 @@ class Thumbnails(QScrollArea):
             thumb = Thumbnail
 
         for db_image in db_images:
-            wid = thumb(img=db_image.img, src=db_image.src, coll=db_image.coll, images_date=date)
+            wid = thumb(img=db_image.img, src=db_image.src, coll=db_image.coll)
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
 
             self.add_widget_data(wid, self.all_grids_row, col)
@@ -195,7 +195,8 @@ class Thumbnails(QScrollArea):
 
         if isinstance(wid, (Thumbnail, SmallThumbnail)):
             from ..win_image_view import WinImageView
-            self.win_image_view = WinImageView(parent=self, src=wid.src)
+            self.win_image_view = WinImageView(src=wid.src, path_to_wid=self.path_to_wid)
+            self.win_image_view.center_win(self)
             self.win_image_view.show()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

@@ -55,7 +55,6 @@ class Migrate:
         conn.close()
         signals_app.reload_menu.emit()
         signals_app.reload_thumbnails.emit()
-        signals_app.migrate_finished.emit()
 
 
 class TrashRemover:
@@ -138,7 +137,10 @@ class FinderImages:
             except Exception as e:
                 MainUtils.print_err(parent=self, error=e)
 
-            finder_images.update(self.walk_collection(collection))
+            try:
+                finder_images.update(self.walk_collection(collection))
+            except TypeError:
+                continue
 
         return finder_images
 

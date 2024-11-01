@@ -92,16 +92,14 @@ class CustomContext(ContextMenuBase):
 
 
 class Title(QLabel):
-    def __init__(self, title: str, images: list, width: int):
-
-        super().__init__(f"{title}. {cnf.lng.total}: {len(images)}")
+    def __init__(self, title: str, total: dict[str, QWidget], width: int):
+        super().__init__(f"{title}. {cnf.lng.total}: {total}")
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)
         self.setContentsMargins(0, 0, 0, 5)
         self.setObjectName(Names.th_title)
         self.setStyleSheet(Themes.current)
 
-        self.images = images
         self.my_context = None
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:

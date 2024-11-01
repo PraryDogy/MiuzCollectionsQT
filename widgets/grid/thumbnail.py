@@ -72,8 +72,6 @@ class BaseThumb(QFrame):
         pixmap = ImageUtils.pixmap_from_bytes(img)
         pixmap = ImageUtils.crop_to_square(pixmap)
 
-
-
         self.img_label.setPixmap(pixmap)
 
         self.v_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -81,7 +79,6 @@ class BaseThumb(QFrame):
         self.setToolTip(
             f"{cnf.lng.collection}: {self.coll}\n"
             f"{cnf.lng.file_name}: {self.name}\n"
-            f"{self.images_date}"
             )  
 
         self.setFixedWidth(cnf.THUMBSIZE + cnf.THUMBPAD)
@@ -137,10 +134,8 @@ class BaseThumb(QFrame):
 
 
 class Thumbnail(BaseThumb):
-    select = pyqtSignal(str)
-
-    def __init__(self, img: bytes, src: str, coll: str, images_date: str):
-        super().__init__(img, src, coll, images_date)
+    def __init__(self, img: bytes, src: str, coll: str):
+        super().__init__(img, src, coll)
    
         self.title = NameLabel(parent=self, filename=self.name, coll=coll)
         self.title.setContentsMargins(8, 5, 8, 7)
@@ -166,10 +161,8 @@ class Thumbnail(BaseThumb):
 
 
 class SmallThumbnail(BaseThumb):
-    select = pyqtSignal(str)
-
-    def __init__(self, img: bytes, src: str, coll: str, images_date: str):
-        super().__init__(img, src, coll, images_date)
+    def __init__(self, img: bytes, src: str, coll: str):
+        super().__init__(img, src, coll)
         self.setContentsMargins(0, 0, 0, 8)
         self.v_layout.setContentsMargins(0, 0, 0, 0)
 

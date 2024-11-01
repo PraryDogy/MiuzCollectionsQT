@@ -208,7 +208,7 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinImgViewBase):
-    def __init__(self, parent: QWidget, src: str):
+    def __init__(self, src: str, path_to_wid: dict[str, QWidget]):
 
         try:
             cnf.image_viewer.close()
@@ -222,6 +222,8 @@ class WinImageView(WinImgViewBase):
         self.installEventFilter(self)
 
         self.src = src
+        self.all_images = list(path_to_wid.keys())
+
         self.collection = None
         cnf.image_viewer = self
 
@@ -250,7 +252,6 @@ class WinImageView(WinImgViewBase):
 
         self.hide_all_buttons()
         self.setFocus()
-        self.center_win(parent=parent)
         self.load_thumbnail()
 
         QTimer.singleShot(300, self.smb_check_first)
@@ -259,18 +260,9 @@ class WinImageView(WinImgViewBase):
 
     def smb_check_first(self):
         if not MainUtils.smb_check():
-            signals_app.migrate_finished.connect(self.finalize_smb)
             self.win_smb = WinSmb(parent=self)
             self.win_smb.show()
 
-    def finalize_smb(self):
-        name = os.path.basename(self.src)
-        for k, v in cnf.images.items():
-            if name == v["filename"] and self.collection == v["collection"]:
-                self.src = k
-                self.load_image_thread()
-                return
-                
     def load_thumbnail(self):
         if self.src not in Cache.images:
             self.set_title(cnf.lng.loading)
@@ -323,15 +315,13 @@ class WinImageView(WinImgViewBase):
 
     def switch_image(self, offset):
         try:
-            keys = list(cnf.images.keys())
-            current_index = keys.index(self.src)
+            current_index = self.all_images.index(self.src)
         except Exception as e:
-            keys = list(cnf.images.keys())
             current_index = 0
 
-        total_images = len(cnf.images)
+        total_images = len(self.all_images)
         new_index = (current_index + offset) % total_images
-        self.src = keys[new_index]
+        self.src = self.all_images[new_index]
         signals_app.select_new_wid.emit(self.src)
         self.load_thumbnail()
 
