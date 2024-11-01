@@ -256,7 +256,11 @@ class DbUpdater:
         if self.res.update_items:
             self.update_db()
 
-    def create_db_img(self, src: str) -> bytes | None:
+    def create_db_img(self, src: str = None) -> bytes | None:
+
+        if src is None:
+            return None
+
         array_img = ImageUtils.read_image(src)
 
         if array_img is None:
