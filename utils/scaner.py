@@ -255,6 +255,45 @@ class DbUpdater:
         if self.res.update_items:
             self.update_db()
 
+    def create_db_img(self, src: str) -> bytes | None:
+        array_img = ImageUtils.read_image(src)
+
+        if array_img is None:
+            return None
+        
+        array_img = ImageUtils.resize_max_aspect_ratio(array_img, DB_SIZE)
+
+        if src.endswith(PSD_TIFF):
+            array_img = ImageUtils.array_bgr_to_rgb(array_img)
+
+        return ImageUtils.image_array_to_bytes(array_img)
+    
+    def get_insert_stmt(self, bytes_img: bytes, src: str, image_item: ImageItem):
+        values = {
+                "img150": bytes_img,
+                "src": src,
+                "size": image_item.size,
+                "created": image_item.created,
+                "modified": image_item.modified,
+                "collection": MainUtils.get_coll_name(src),
+                }
+
+        return sqlalchemy.insert(ThumbsMd).values(values)
+    
+    def get_update_stmt(self, bytes_img: bytes, src: str, image_item: ImageItem):
+        values = {
+                "img150": bytes_img,
+                "size": image_item.size,
+                "created": image_item.created,
+                "modified": image_item.modified,
+                "collection": MainUtils.get_coll_name(src),
+                }
+
+        return sqlalchemy.update(ThumbsMd).values(values).where(ThumbsMd.src==src)
+    
+    def get_delete_stmt(self, src: str):
+        return sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
+
     def insert_db(self):
         counter = 0
         conn = ScanerUtils.conn_get()
@@ -264,38 +303,23 @@ class DbUpdater:
             if not ScanerUtils.can_scan:
                 return
 
-            array_img = ImageUtils.read_image(src)
+            bytes_img = self.create_db_img(src)
 
-            if array_img is None:     
+            if not bytes_img:
                 continue
 
-            array_img = ImageUtils.resize_max_aspect_ratio(array_img, DB_SIZE)
-
-            if src.endswith(PSD_TIFF):
-                array_img = ImageUtils.array_bgr_to_rgb(array_img)
-
-            bytes_img = ImageUtils.image_array_to_bytes(array_img)
-
-            values = {
-                    "img150": bytes_img,
-                    "src": src,
-                    "size": image_item.size,
-                    "created": image_item.created,
-                    "modified": image_item.modified,
-                    "collection": MainUtils.get_coll_name(src),
-                    }
-
-            stmt =  sqlalchemy.insert(ThumbsMd).values(values)
+            stmt = self.get_insert_stmt(bytes_img, src, image_item)
             conn.execute(stmt)
 
             counter += 1
 
             if counter == ScanerUtils.counter:
                 counter = 0
+
                 ScanerUtils.conn_commit_(conn)
-                conn = ScanerUtils.conn_get()
                 ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
+                conn = ScanerUtils.conn_get()
 
         if counter != 0:
             ScanerUtils.conn_commit_(conn)
@@ -310,37 +334,23 @@ class DbUpdater:
             if not ScanerUtils.can_scan:
                 return
 
-            array_img = ImageUtils.read_image(src)
+            bytes_img = self.create_db_img(src)
 
-            if array_img is None:
+            if not bytes_img:
                 continue
 
-            array_img = ImageUtils.resize_max_aspect_ratio(array_img, DB_SIZE)
-
-            if src.endswith(PSD_TIFF):
-                array_img = ImageUtils.array_bgr_to_rgb(array_img)
-
-            bytes_img = ImageUtils.image_array_to_bytes(array_img)
-
-            values = {
-                    "img150": bytes_img,
-                    "size": image_item.size,
-                    "created": image_item.created,
-                    "modified": image_item.modified,
-                    "collection": MainUtils.get_coll_name(src),
-                    }
-
-            stmt =  sqlalchemy.update(ThumbsMd).values(values).where(ThumbsMd.src==src)
+            stmt = self.get_update_stmt(bytes_img, src, image_item)
             conn.execute(stmt)
 
             counter += 1
 
             if counter == ScanerUtils.counter:
                 counter = 0
+
                 ScanerUtils.conn_commit_(conn)
-                conn = ScanerUtils.conn_get()
                 ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
+                conn = ScanerUtils.conn_get()
         
         if counter != 0:
             ScanerUtils.conn_commit_(conn)
@@ -355,17 +365,18 @@ class DbUpdater:
             if not ScanerUtils.can_scan:
                 return
 
-            stmt =  sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
+            stmt =  self.get_delete_stmt(src)
             conn.execute(stmt)
 
             counter += 1
 
             if counter == ScanerUtils.counter:
                 counter = 0
+
                 ScanerUtils.conn_commit_(conn)
-                conn = ScanerUtils.conn_get()
                 ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
+                conn = ScanerUtils.conn_get()
 
         if counter != 0:
             ScanerUtils.conn_commit_(conn)
