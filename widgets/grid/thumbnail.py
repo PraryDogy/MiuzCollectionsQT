@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutV
-from cfg import PIXMAP_SIZE, THUMBPAD, cnf
+from cfg import PIXMAP_SIZE, TEXT_LENGTH, THUMBPAD, cnf
 from signals import signals_app
 from styles import Names, Themes
 from utils.image_utils import ImageUtils
@@ -18,7 +18,7 @@ class NameLabel(QLabel):
     def __init__(self, parent, filename: str, coll: str):
         super().__init__(parent)
 
-        max_row = 27
+        max_row = TEXT_LENGTH[cnf.curr_size_ind]
         name, ext = os.path.splitext(filename)
         ext = ext.replace(".", "")
 
