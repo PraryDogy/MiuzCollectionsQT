@@ -240,7 +240,7 @@ class DbUpdater:
     def __init__(self, compared_result: ComparedResult):
         super().__init__()
         self.res = compared_result
-        self.flag_gel = "delete"
+        self.flag_del = "delete"
         self.flag_ins = "insert"
         self.flag_upd = "update"
 
@@ -248,8 +248,7 @@ class DbUpdater:
         ScanerUtils.progressbar_value(70)
 
         if self.res.del_items:
-            self.delete_db()
-            self.modify_db(compared_items=self.res.del_items, flag=self.flag_gel)
+            self.modify_db(compared_items=self.res.del_items, flag=self.flag_del)
 
         ScanerUtils.progressbar_value(80)
 
@@ -267,7 +266,7 @@ class DbUpdater:
             src: str
             ) -> bytes | None:
 
-        if flag == self.flag_gel:
+        if flag == self.flag_del:
             return None
 
         else:
@@ -292,7 +291,7 @@ class DbUpdater:
             image_item: ImageItem
             ) -> Delete | Insert | Update:
 
-        if flag == self.flag_gel:
+        if flag == self.flag_del:
             return sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
 
         values = {
@@ -319,10 +318,12 @@ class DbUpdater:
             if not ScanerUtils.can_scan:
                 return
 
+            print(flag, src)
+
             bytes_img = self.create_db_img(flag=flag, src=src)
             stmt = self.get_stmt(flag=flag, bytes_img=bytes_img, src=src, image_item=image_item)
 
-            if flag == self.flag_gel:
+            if flag == self.flag_del:
                 conn.execute(stmt)
 
             elif bytes_img is not None:
@@ -338,7 +339,8 @@ class DbUpdater:
                 stmt_count = 0
 
                 ScanerUtils.conn_commit(conn)
-                ScanerUtils.reload_gui()
+                if flag != self.flag_del:
+                    ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
                 conn = ScanerUtils.conn_get()
         
