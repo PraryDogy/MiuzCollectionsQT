@@ -28,31 +28,25 @@ class ProgressBar(QWidget):
         layout.addItem(spacer)
 
         self.progress_bar = CustomProgressBar()
+        self.progress_bar.setMinimum(0)
+        self.progress_bar.setMaximum(100)
+        self.progress_bar.setValue(0)
         layout.addWidget(self.progress_bar)
 
         signals_app.progressbar_value.connect(self.progressbar_value)
-        signals_app.progressbar_show.connect(self.progressbar_show)
-        signals_app.progressbar_hide.connect(self.progressbar_hide)
+        # self.setHidden(True)
 
-        self.temp_value = 0
-        self.current_value = 0
+    def progressbar_value(self, value: int):
+        value = int(value)
+        self.progress_bar.setValue(value)
 
-    def progressbar_value(self, value):
-        self.temp_value += value
+        if self.progress_bar.value() >= 100:
+                self.progress_bar.setHidden(True)
+        else:
+                print('show')
+                self.progress_bar.setHidden(False)
 
-        if self.temp_value > 1:
-            self.current_value += round(self.temp_value)
-            self.temp_value = 0
-
-        self.progress_bar.setValue(self.current_value)
-
-    def progressbar_show(self):
-        self.current_value = 0
-        self.progress_bar.setValue(self.current_value)
-        self.show()
-
-    def progressbar_hide(self):
-        self.hide()
+        print(self.progress_bar.value())
 
         
 class BaseSlider(QSlider):
@@ -149,7 +143,6 @@ class BarBottom(QFrame):
         self.custom_slider = CustomSlider()
         self.h_layout.addWidget(self.custom_slider, alignment=Qt.AlignmentFlag.AlignRight)
 
-        self.progress_bar.hide()
         self.downloads.hide()
 
     def reload(self):

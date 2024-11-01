@@ -22,8 +22,6 @@ class Signals(QObject):
     set_focus_search = pyqtSignal()
 
     progressbar_value = pyqtSignal(object)
-    progressbar_show = pyqtSignal()
-    progressbar_hide = pyqtSignal()
 
     hide_downloads = pyqtSignal()
     show_downloads = pyqtSignal()

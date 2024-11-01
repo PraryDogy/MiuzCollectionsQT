@@ -28,8 +28,11 @@ class ScanerUtils:
 
     @classmethod
     def reload_gui(cls):
-        signals_app.reload_menu.emit()
-        signals_app.reload_thumbnails.emit()
+        try:
+            signals_app.reload_menu.emit()
+            signals_app.reload_thumbnails.emit()
+        except RuntimeError as e:
+            MainUtils.print_err(parent=cls, error=e)
 
     @classmethod
     def conn_get(cls):
@@ -130,7 +133,11 @@ class FinderImages:
             collections = [cnf.coll_folder]
 
         ln_colls = len(collections)
-        step_value = int(60 if ln_colls == 0 else 60 / ln_colls)
+        step_value = int(
+            60
+            if ln_colls == 0
+            else 60 / ln_colls
+            )
 
         for collection in collections:
 
@@ -246,19 +253,11 @@ class DbUpdater:
 
     def start(self):
         ScanerUtils.progressbar_value(70)
-
-        if self.res.del_items:
-            self.modify_db(compared_items=self.res.del_items, flag=self.flag_del)
-
+        self.modify_db(compared_items=self.res.del_items, flag=self.flag_del)
         ScanerUtils.progressbar_value(80)
-
-        if self.res.ins_items:
-            self.modify_db(compared_items=self.res.ins_items, flag=self.flag_ins)
-
+        self.modify_db(compared_items=self.res.ins_items, flag=self.flag_ins)
         ScanerUtils.progressbar_value(90)
-
-        if self.res.upd_items:
-            self.modify_db(compared_items=self.res.upd_items, flag=self.flag_upd)
+        self.modify_db(compared_items=self.res.upd_items, flag=self.flag_upd)
 
     def create_db_img(
             self,
@@ -318,8 +317,6 @@ class DbUpdater:
             if not ScanerUtils.can_scan:
                 return
 
-            print(flag, src)
-
             bytes_img = self.create_db_img(flag=flag, src=src)
             stmt = self.get_stmt(flag=flag, bytes_img=bytes_img, src=src, image_item=image_item)
 
@@ -362,11 +359,6 @@ class ScanerThread(QThread):
     def start_scan(self):
         ScanerUtils.can_scan = True
 
-        try:
-            signals_app.progressbar_show.emit()
-        except RuntimeError as e:
-            MainUtils.print_err(parent=self, error=e)
-
         migrate = Migrate()
         migrate.start()
 
@@ -389,15 +381,6 @@ class ScanerThread(QThread):
             trash_remover.start()
         except Exception as e:
             MainUtils.print_err(parent=trash_remover, error=e)
-
-        Dbase.vacuum()
-        ScanerUtils.can_scan = True
-
-        try:
-            signals_app.progressbar_hide.emit()
-            ScanerUtils.reload_gui()
-        except RuntimeError as e:
-            MainUtils.print_err(parent=self, error=e)
 
 
 class ScanerShedule(QObject):
@@ -439,11 +422,10 @@ class ScanerShedule(QObject):
 
     def finalize_scan(self):
         print("scaner finished")
-        try:
-            self.scaner_thread.quit()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
         self.scaner_thread = None
         self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)
 
+        Dbase.vacuum()
+        ScanerUtils.can_scan = True
+        ScanerUtils.progressbar_value(100)
+        ScanerUtils.reload_gui()
