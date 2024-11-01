@@ -51,7 +51,7 @@ class Thumbnail(QObject):
 class User:
     def __init__(self) -> None:
         super().__init__()
-        self.app_ver: str = "5.4.3"
+        self.app_ver: str = "5.6.0"
     
         self.coll_folder: str = "/Volumes/Shares/Collections"
         
