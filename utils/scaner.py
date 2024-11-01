@@ -194,9 +194,9 @@ class DbImages:
 
 class ComparedResult:
     def __init__(self):
-        self.insert: dict[str, ImageItem] = {}
-        self.update: dict[str, ImageItem] = {}
-        self.delete : dict[str, ImageItem]= {}
+        self.insert_items: dict[str, ImageItem] = {}
+        self.update_items: dict[str, ImageItem] = {}
+        self.delete_items : dict[str, ImageItem]= {}
 
 
 class ImageCompator:
@@ -206,63 +206,60 @@ class ImageCompator:
         self.db_images = db_images
 
     def get_result(self) -> ComparedResult:
-
-        compared_result = ComparedResult()
+        result = ComparedResult()
 
         for db_src, db_item in self.db_images.items():
 
             if not ScanerUtils.can_scan:
                 return
 
-            finder_item = self.finder_images.get(db_src)
+            in_finder = self.finder_images.get(db_src)
 
-            if not finder_item:
-                compared_result.delete[db_src] = db_item
+            if not in_finder:
+                result.delete_items[db_src] = db_item
 
         for finder_src, finder_item in self.finder_images.items():
 
             if not ScanerUtils.can_scan:
                 return
 
-            db_item = self.db_images.get(finder_src)
+            in_db = self.db_images.get(finder_src)
 
-            if not db_item:
-                compared_result.insert[finder_src] = finder_item
-                continue
+            if not in_db:
+                result.insert_items[finder_src] = finder_item
 
-            b = (finder_item.size, finder_item.modified) == (db_item.size, db_item.modified)
-            if db_item and not b:
-                compared_result.update[finder_src] = finder_item
+            elif not (finder_item.size, finder_item.modified) == (in_db.size, in_db.modified):
+                result.update_items[finder_src] = finder_item
 
-        return compared_result
+        return result
 
 
 class DbUpdater:
     def __init__(self, compared_result: ComparedResult):
         super().__init__()
-        self.compared_result = compared_result
+        self.res = compared_result
 
     def start(self):
         ScanerUtils.progressbar_value(70)
 
-        if self.compared_result.delete:
+        if self.res.delete_items:
             self.delete_db()
 
-        ScanerUtils.progressbar_value(70)
+        ScanerUtils.progressbar_value(80)
 
-        if self.compared_result.insert:
+        if self.res.insert_items:
             self.insert_db()
 
-        ScanerUtils.progressbar_value(70)
+        ScanerUtils.progressbar_value(90)
 
-        if self.compared_result.update:
+        if self.res.update_items:
             self.update_db()
 
     def insert_db(self):
         counter = 0
         conn = ScanerUtils.conn_get()
 
-        for src, image_item in self.compared_result.insert.items():
+        for src, image_item in self.res.insert_items.items():
 
             if not ScanerUtils.can_scan:
                 return
@@ -308,7 +305,7 @@ class DbUpdater:
         counter = 0
         conn = ScanerUtils.conn_get()
 
-        for src, image_item in self.compared_result.update.items():
+        for src, image_item in self.res.update_items.items():
 
             if not ScanerUtils.can_scan:
                 return
@@ -353,7 +350,7 @@ class DbUpdater:
         counter = 0
         conn = ScanerUtils.conn_get()
 
-        for src, img_data in self.compared_result.delete.items():
+        for src, img_data in self.res.delete_items.items():
 
             if not ScanerUtils.can_scan:
                 return
