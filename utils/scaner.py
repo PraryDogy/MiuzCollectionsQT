@@ -9,10 +9,12 @@ from signals import signals_app
 
 from .image_utils import ImageUtils
 from .main_utils import MainUtils
-
+from time import sleep
 
 class ScanerUtils:
     can_scan = True
+    counter = 15
+    sleep_ = 0.2
 
     @classmethod
     def progressbar_value(cls, value: int):
@@ -20,6 +22,11 @@ class ScanerUtils:
             signals_app.progressbar_value.emit(value)
         except RuntimeError as e:
             MainUtils.print_err(parent=cls, error=e)
+
+    @classmethod
+    def reload_gui(cls):
+        signals_app.reload_menu.emit()
+        signals_app.reload_thumbnails.emit()
 
 
 class Migrate:
@@ -63,8 +70,7 @@ class Migrate:
 
         conn.commit()
         conn.close()
-        signals_app.reload_menu.emit()
-        signals_app.reload_thumbnails.emit()
+        ScanerUtils.reload_gui()
 
 
 class TrashRemover:
@@ -305,12 +311,12 @@ class DbUpdater:
 
             counter += 1
 
-            if counter == 10:
+            if counter == ScanerUtils.counter:
                 counter = 0
                 conn.commit()
                 conn = Dbase.engine.connect()
-                signals_app.reload_thumbnails.emit()
-                signals_app.reload_menu.emit()
+                ScanerUtils.reload_gui()
+                sleep(ScanerUtils.sleep_)
 
         if counter != 0:
             conn.commit()
@@ -350,12 +356,12 @@ class DbUpdater:
 
             counter += 1
 
-            if counter == 10:
+            if counter == ScanerUtils.counter:
                 counter = 0
                 conn.commit()
                 conn = Dbase.engine.connect()
-                signals_app.reload_thumbnails.emit()
-                signals_app.reload_menu.emit()
+                ScanerUtils.reload_gui()
+                sleep(ScanerUtils.sleep_)
         
         if counter != 0:
             conn.commit()
@@ -375,12 +381,12 @@ class DbUpdater:
 
             counter += 1
 
-            if counter == 10:
+            if counter == ScanerUtils.counter:
                 counter = 0
                 conn.commit()
                 conn = Dbase.engine.connect()
-                signals_app.reload_thumbnails.emit()
-                signals_app.reload_menu.emit()
+                ScanerUtils.reload_gui()
+                sleep(ScanerUtils.sleep_)
 
         if counter != 0:
             conn.commit()
@@ -433,9 +439,7 @@ class ScanerThread(QThread):
 
         try:
             signals_app.progressbar_hide.emit()
-            signals_app.reload_menu.emit()
-            signals_app.reload_thumbnails.emit()
-            signals_app.progressbar_hide.emit()
+            ScanerUtils.reload_gui()
         except RuntimeError as e:
             MainUtils.print_err(parent=self, error=e)
 
