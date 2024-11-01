@@ -33,6 +33,7 @@ class Signals(QObject):
 
     select_new_wid = pyqtSignal(str)
     open_in_view = pyqtSignal(object)
+    resize_grid = pyqtSignal()
 
     def __init__(self):
         super().__init__()

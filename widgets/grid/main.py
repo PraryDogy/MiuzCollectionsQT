@@ -1,9 +1,11 @@
+from collections import defaultdict
+
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
-from cfg import cnf, THUMB_MARGIN, PIXMAP_SIZE, THUMB_W
+from cfg import THUMB_MARGIN, THUMB_W, cnf
 from signals import signals_app
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -11,7 +13,7 @@ from utils.main_utils import MainUtils
 from ..win_info import WinInfo
 from ..win_smb import WinSmb
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
-from .db_images import DbImages, DbImage
+from .db_images import DbImage, DbImages
 from .limit_btn import LimitBtn
 from .thumbnail import Thumbnail
 from .title import Title
@@ -31,12 +33,12 @@ class Thumbnails(QScrollArea):
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
-        self.resize_timer.timeout.connect(self.resize_)
+        self.resize_timer.timeout.connect(self.rearrange)
 
         self.curr_cell: tuple = (0, 0)
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.path_to_wid: dict[str, Thumbnail] = {}
-        self.ordered_widgets: list[Thumbnail] = []
+        self.current_widgets: dict[QGridLayout, list[Thumbnail]] = {}
 
         # Создаем фрейм для виджетов в области скролла
         self.scroll_area_widget = QWidget(parent=self)
@@ -62,6 +64,7 @@ class Thumbnails(QScrollArea):
         signals_app.scroll_top.connect(self.scroll_top)
         signals_app.select_new_wid.connect(self.select_new_widget)
         signals_app.open_in_view.connect(self.open_in_view)
+        signals_app.resize_grid.connect(self.resize_)
 
     def checkScrollValue(self, value):
         self.up_btn.move(
@@ -78,11 +81,8 @@ class Thumbnails(QScrollArea):
         thumbs_dict = DbImages()
         thumbs_dict = thumbs_dict.get()
 
-        self.curr_cell: tuple = (0, 0)
-        self.all_grids_row = 0
-        self.cell_to_wid.clear()
-        self.path_to_wid.clear()
-        self.ordered_widgets.clear()
+        self.reset_widget_data()
+        self.current_widgets.clear()
 
         if thumbs_dict:
 
@@ -126,6 +126,7 @@ class Thumbnails(QScrollArea):
 
         grid_widget = QWidget()
         grid_layout = QGridLayout()
+        self.current_widgets[grid_layout] = []
         grid_widget.setLayout(grid_layout)
         grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         grid_layout.setContentsMargins(0, 0, 0, 30)
@@ -137,6 +138,7 @@ class Thumbnails(QScrollArea):
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
 
             self.add_widget_data(wid, self.all_grids_row, col)
+            self.current_widgets[grid_layout].append(wid)
             grid_layout.addWidget(wid, row, col)
 
             col += 1
@@ -146,7 +148,6 @@ class Thumbnails(QScrollArea):
                 self.all_grids_row += 1
 
         self.all_grids_row += 1
-
         self.thumbnails_layout.addWidget(grid_widget)
 
     def select_new_widget(self, data: tuple | str | Thumbnail):
@@ -187,7 +188,12 @@ class Thumbnails(QScrollArea):
         wid.row, wid.col = row, col
         self.cell_to_wid[row, col] = wid
         self.path_to_wid[wid.src] = wid
-        self.ordered_widgets.append(wid)
+
+    def reset_widget_data(self):
+        self.curr_cell: tuple = (0, 0)
+        self.all_grids_row = 0
+        self.cell_to_wid.clear()
+        self.path_to_wid.clear()
 
     def open_in_view(self, wid: Thumbnail):
         wid = self.path_to_wid.get(wid.src)
@@ -202,9 +208,38 @@ class Thumbnails(QScrollArea):
         return max(self.ww // (THUMB_W[cnf.curr_size_ind] + (THUMB_MARGIN*2)), 1)
 
     def resize_(self):
+        for grid_layout, widgets in self.current_widgets.items():
+            for widget in widgets:
+                widget.setup()
+        self.rearrange()
+
+    def rearrange(self):
+
+        if not hasattr(self, "first_load"):
+            setattr(self, "first_load", True)
+            return
+
         self.ww = self.width()
         self.columns = self.get_columns()
-        self.reload_thumbnails()
+
+        self.reset_selection()
+        self.reset_widget_data()
+
+        for grid_layout, widgets in self.current_widgets.items():
+
+            row, col = 0, 0
+
+            for wid in widgets:
+                self.add_widget_data(wid, self.all_grids_row, col)
+                grid_layout.addWidget(wid, row, col)
+
+                col += 1
+                if col >= self.columns:
+                    col = 0
+                    row += 1
+                    self.all_grids_row += 1
+
+            self.all_grids_row += 1
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         wid: Thumbnail
