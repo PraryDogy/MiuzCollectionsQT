@@ -1,9 +1,9 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
-from cfg import cnf, THUMBPAD, PIXMAP_SIZE
+from cfg import cnf, THUMB_MARGIN, PIXMAP_SIZE, THUMB_W
 from signals import signals_app
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -28,6 +28,10 @@ class Thumbnails(QScrollArea):
         self.setObjectName(Names.th_scrollbar)
         self.setStyleSheet(Themes.current)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.resize_timer = QTimer(self)
+        self.resize_timer.setSingleShot(True)
+        self.resize_timer.timeout.connect(self.resize_)
 
         self.curr_cell: tuple = (0, 0)
         self.cell_to_wid: dict[tuple, Thumbnail | SmallThumbnail] = {}
@@ -239,13 +243,15 @@ class Thumbnails(QScrollArea):
         self.reset_selection()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        self.resize_timer.stop()
+        self.resize_timer.start(500)
         self.up_btn.setVisible(False)
-
-        if abs(a0.size().width() - self.ww) >= PIXMAP_SIZE[cnf.curr_size_ind] - THUMBPAD - THUMBPAD:
-            self.ww = a0.size().width()
-            self.columns = self.get_columns()
-            self.reload_thumbnails()
         return super().resizeEvent(a0)
 
     def get_columns(self):
-        return max(self.width() // (PIXMAP_SIZE[cnf.curr_size_ind] + THUMBPAD), 1)
+        return max(self.ww // (THUMB_W[cnf.curr_size_ind] + (THUMB_MARGIN*2)), 1)
+
+    def resize_(self):
+        self.ww = self.width()
+        self.columns = self.get_columns()
+        self.reload_thumbnails()

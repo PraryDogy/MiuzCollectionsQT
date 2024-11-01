@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutV
-from cfg import PIXMAP_SIZE, TEXT_LENGTH, THUMBPAD, cnf, THUMB_W
+from cfg import PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, cnf, THUMB_W
 from signals import signals_app
 from styles import Names, Themes
 from utils.image_utils import ImageUtils
@@ -73,8 +73,8 @@ class BaseThumb(QFrame):
 
     def setup(self):
         name_label_h = 32
-        thumb_h = PIXMAP_SIZE[cnf.curr_size_ind] + name_label_h + THUMBPAD + self.spacing
-        thumb_w = THUMB_W[cnf.curr_size_ind] + THUMBPAD
+        thumb_h = PIXMAP_SIZE[cnf.curr_size_ind] + name_label_h + THUMB_MARGIN + self.spacing
+        thumb_w = THUMB_W[cnf.curr_size_ind] + THUMB_MARGIN
 
         self.img_label.setFixedHeight(PIXMAP_SIZE[cnf.curr_size_ind])
         self.name_label.setFixedHeight(name_label_h)

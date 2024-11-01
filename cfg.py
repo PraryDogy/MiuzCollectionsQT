@@ -30,7 +30,7 @@ PSD_TIFF: tuple = (
 DB_SIZE = 200
 PIXMAP_SIZE: list = [90, 130, 170, DB_SIZE]
 THUMB_W: list = [110, 130, 170, DB_SIZE]
-THUMBPAD: int = 15
+THUMB_MARGIN: int = 15
 TEXT_LENGTH: list = [18, 20, 24, 33]
 
 class Thumbnail(QObject):
