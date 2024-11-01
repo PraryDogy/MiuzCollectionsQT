@@ -18,14 +18,14 @@ class Shared:
 
 
 class ContextImg(ContextMenuBase):
-    def __init__(self, img_src: str, event, parent: QWidget = None):
+    def __init__(self, src: str, event, parent: QWidget = None):
         super().__init__(event)
 
         self.my_parent = parent
-        self.img_src = img_src
+        self.src = src
         
         self.info_action = QAction(text=cnf.lng.info, parent=self)
-        self.info_action.triggered.connect(partial(self.show_info_win, img_src))
+        self.info_action.triggered.connect(partial(self.show_info_win, src))
         self.addAction(self.info_action)
 
         self.addSeparator()
@@ -61,10 +61,10 @@ class ContextImg(ContextMenuBase):
 
     def reveal_cmd(self):
         if MainUtils.smb_check():
-            if not os.path.exists(self.img_src):
+            if not os.path.exists(self.src):
                 MainUtils.send_notification(cnf.lng.no_file)
             else:
-                MainUtils.reveal_files([self.img_src])
+                MainUtils.reveal_files([self.src])
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
@@ -77,7 +77,7 @@ class ContextImg(ContextMenuBase):
             dest = Shared.file_dialog.getExistingDirectory()
 
             if dest:
-                self.copy_files_cmd(dest=dest, file=self.img_src)
+                self.copy_files_cmd(dest=dest, file=self.src)
 
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
@@ -85,7 +85,7 @@ class ContextImg(ContextMenuBase):
 
     def save_cmd(self):
         if MainUtils.smb_check():
-            self.copy_files_cmd(dest=cnf.down_folder, file=self.img_src)
+            self.copy_files_cmd(dest=cnf.down_folder, file=self.src)
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()

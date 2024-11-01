@@ -149,7 +149,7 @@ class Thumbnail(QFrame):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.image_context = ContextImg(img_src=self.src, event=ev, parent=self)
+            self.image_context = ContextImg(src=self.src, event=ev, parent=self)
             self.image_context.add_preview_item()
 
             self.select.emit(self.src)
