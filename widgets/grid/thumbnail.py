@@ -22,7 +22,11 @@ class NameLabel(QLabel):
 
     def set_text(self):
         max_row = TEXT_LENGTH[cnf.curr_size_ind]
-        name = f"{self.name[:max_row - 10]}...{self.name[-7:]}"
+
+        if len(self.name) >= max_row:
+            name = f"{self.name[:max_row - 10]}...{self.name[-7:]}"
+        else:
+            name = self.name
 
         if len(self.coll) > max_row:
             cut_coll = self.coll[:max_row]

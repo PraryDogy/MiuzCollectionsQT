@@ -119,8 +119,7 @@ class Thumbnails(QScrollArea):
         self.create_grid_layout()
 
     def create_image_grid(self, date: str, db_images: list[DbImage]):
-        total = len(db_images)
-        title_label = Title(title=date, total=total, width=self.width())
+        title_label = Title(title=date, db_images=db_images, width=self.width())
         title_label.setContentsMargins(9, 0, 0, 0)
         self.thumbnails_layout.addWidget(title_label)
 
@@ -205,7 +204,7 @@ class Thumbnails(QScrollArea):
             self.win_image_view.show()
 
     def get_columns(self):
-        return max(self.ww // (THUMB_W[cnf.curr_size_ind] + (THUMB_MARGIN*2)), 1)
+        return max(self.ww // (THUMB_W[cnf.curr_size_ind] + (THUMB_MARGIN)), 1)
 
     def resize_(self):
         for grid_layout, widgets in self.current_widgets.items():

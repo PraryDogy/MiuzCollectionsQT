@@ -1,5 +1,6 @@
 import os
 
+from .db_images import DbImage
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 
@@ -7,8 +8,8 @@ from base_widgets import ContextMenuBase
 from cfg import PSD_TIFF, cnf
 from signals import signals_app
 from styles import Names, Themes
-from utils.main_utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
+from utils.main_utils import MainUtils
 
 from ..win_smb import WinSmb
 
@@ -18,7 +19,7 @@ class Shared:
 
 
 class CustomContext(ContextMenuBase):
-    def __init__(self, parent: QWidget, files_list: list, event):
+    def __init__(self, parent: QWidget, files_list: list[DbImage], event):
 
         super().__init__(event=event)
         self.my_parent = parent
@@ -47,9 +48,9 @@ class CustomContext(ContextMenuBase):
         if MainUtils.smb_check():
 
             if is_layers:
-                images = [i for i in self.files_list if i.endswith(PSD_TIFF)]
+                images = [i.src for i in self.files_list if i.src.endswith(PSD_TIFF)]
             else:
-                images = [i for i in self.files_list if not i.endswith(PSD_TIFF)]
+                images = [i.src for i in self.files_list if not i.src.endswith(PSD_TIFF)]
 
             if save_as:
                 self.dialog = QFileDialog()
@@ -92,8 +93,9 @@ class CustomContext(ContextMenuBase):
 
 
 class Title(QLabel):
-    def __init__(self, title: str, total: dict[str, QWidget], width: int):
-        super().__init__(f"{title}. {cnf.lng.total}: {total}")
+    def __init__(self, title: str, db_images: list, width: int):
+        super().__init__(f"{title}. {cnf.lng.total}: {len(db_images)}")
+        self.images = db_images
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)
         self.setContentsMargins(0, 0, 0, 5)

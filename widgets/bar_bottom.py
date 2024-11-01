@@ -154,14 +154,11 @@ class BarBottom(QFrame):
         self.h_layout.addWidget(self.custom_slider)
         self.h_layout.addSpacerItem(QSpacerItem(15, 0))
    
-        self.h_layout.addSpacerItem(QSpacerItem(30, 0))
+        # self.h_layout.addSpacerItem(QSpacerItem(15, 0))
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.progress_bar.hide()
         self.downloads.hide()
-
-        # from PyQt5.QtCore import QTimer
-        # QTimer.singleShot(1500, self.downloads.show)
 
     def reload(self):
         signals_app.reload_thumbnails.emit()
