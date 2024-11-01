@@ -132,7 +132,7 @@ class Thumbnails(QScrollArea):
 
         row, col = 0, 0
 
-        for db_image in db_images:
+        for x, db_image in enumerate(db_images):
             wid = Thumbnail(img=db_image.img, src=db_image.src, coll=db_image.coll)
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
 
@@ -146,7 +146,9 @@ class Thumbnails(QScrollArea):
                 row += 1
                 self.all_grids_row += 1
 
-        self.all_grids_row += 1
+        if len(db_images) % self.columns != 0:
+            self.all_grids_row += 1
+
         self.thumbnails_layout.addWidget(grid_widget)
 
     def select_new_widget(self, data: tuple | str | Thumbnail):
@@ -238,7 +240,8 @@ class Thumbnails(QScrollArea):
                     row += 1
                     self.all_grids_row += 1
 
-            self.all_grids_row += 1
+            if len(widgets) % self.columns != 0:
+                self.all_grids_row += 1
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         wid: Thumbnail
