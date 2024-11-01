@@ -29,7 +29,7 @@ class Migrate:
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
-        res = conn.execute(q).first()
+        res: tuple[str, str] = conn.execute(q).first()
 
         if res:
             img_src, coll_name = res
@@ -37,7 +37,6 @@ class Migrate:
             print("Migrate > can'l load row > no collection folder in db > it's ok")
             return
     
-        img_src: str
         old_coll_folder = img_src.split(os.sep + coll_name + os.sep)[0]
 
         if cnf.coll_folder == old_coll_folder:
