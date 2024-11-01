@@ -18,14 +18,9 @@ class NameLabel(QLabel):
     def __init__(self, parent, filename: str, coll: str):
         super().__init__(parent)
 
-        self.filename = filename
-        self.coll = coll
         max_row = 27
-
-        coll = f"{cnf.lng.collection}: {coll}"
         name, ext = os.path.splitext(filename)
-        name = f"{cnf.lng.file_name}: {name}"
-        ext = f"{cnf.lng.type}: {ext.replace('.', '')}"
+        ext = ext.replace(".", "")
 
         if len(coll) > max_row:
             cut_coll = coll[:max_row]
@@ -86,7 +81,7 @@ class BaseThumb(QFrame):
         main_w = PIXMAP_SIZE[cnf.curr_size_ind] + THUMBPAD
 
         self.img_label.setFixedHeight(PIXMAP_SIZE[cnf.curr_size_ind])
-        self.name_label.setFixedHeight(name_label_h)
+        self.name_label.setFixedSize(PIXMAP_SIZE[cnf.curr_size_ind], name_label_h)
 
         self.setFixedSize(main_w, main_h)
 
