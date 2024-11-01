@@ -120,7 +120,8 @@ class FinderImages:
             os.path.join(cnf.coll_folder, i)
             for i in os.listdir(cnf.coll_folder)
             if os.path.isdir(os.path.join(cnf.coll_folder, i))
-            and i not in cnf.stop_colls
+            and
+            i not in cnf.stop_colls
             ]
 
         if not collections:
@@ -141,9 +142,7 @@ class FinderImages:
 
         return finder_images
 
-
     def walk_collection(self, collection: str) -> dict[str, ImageItem]:
-
         finder_images: dict[str, ImageItem] = {}
 
         for root, _, files in os.walk(collection):
@@ -169,7 +168,7 @@ class FinderImages:
         try:
             stats = os.stat(path=src)
             return ImageItem(stats.st_size, stats.st_birthtime, stats.st_mtime)
-        except (FileNotFoundError) as e:
+        except FileNotFoundError as e:
             MainUtils.print_err(parent=self, error=e)
             return None
 
