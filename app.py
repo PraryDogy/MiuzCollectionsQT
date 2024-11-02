@@ -14,6 +14,7 @@ from signals import signals_app
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
 from utils.main_utils import MainUtils
+from utils.scaner import ScanerShedule
 from widgets import (BarBottom, BarMacos, BarTop, MenuLeft, Notification,
                      Thumbnails, WidSearch)
 from widgets.win_smb import WinSmb
@@ -248,14 +249,15 @@ class App(QApplication):
         JsonData.write_config()
 
     def after_start(self):
-
         if not MainUtils.smb_check():
             from widgets.win_smb import WinSmb
 
             self.smb_win = WinSmb(parent=self.main_win)
             self.smb_win.show()
 
-        signals_app.scaner_start.emit()
+        else:
+            self.scaner = ScanerShedule()
+            signals_app.scaner_start.emit()
 
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)

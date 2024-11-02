@@ -37,13 +37,11 @@ if os.path.exists("lib"):
     print()
 
 
-from utils.scaner import ScanerShedule
 from database import Dbase
-
 Dbase.create_engine()
-scaner_app = ScanerShedule()
 
 from app import app
 app.exec_()
+
 # source deacivate
 # import app происходит только после активации os.environ plugin_path
