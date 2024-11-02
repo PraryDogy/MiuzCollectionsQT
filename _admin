@@ -3,7 +3,7 @@ import shutil
 
 import icnsutil
 
-from cfg import cnf
+from cfg import DB_FILE
 
 
 def convert():
@@ -17,7 +17,7 @@ def convert():
 
 
 def copy_db():
-    shutil.copyfile(src=cnf.db_file, dst="db.db")
+    shutil.copyfile(src=DB_FILE, dst="db.db")
 
 
 print()

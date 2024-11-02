@@ -79,7 +79,7 @@ class Thumbnail(QObject):
 class User:
     def __init__(self) -> None:
         super().__init__()
-        self.app_ver: str = "5.6.0"
+        self.app_ver: str = APP_VER
     
         self.coll_folder: str = "/Volumes/Shares/Collections"
         
@@ -181,7 +181,7 @@ class Config(User, Dymanic):
         data["coll_folder_list"] = self.coll_folder_list
         data["udpdate_file_paths"] = self.udpdate_file_paths
 
-        data["app_ver"] = self.app_ver
+        data["app_ver"] = APP_VER
 
         return data
 

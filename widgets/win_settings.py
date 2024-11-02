@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 
 from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
-from cfg import APP_SUPPORT_DIR, cnf
+from cfg import APP_SUPPORT_DIR, DB_FILE, cnf
 from database import Dbase
 from signals import signals_app
 from utils.main_utils import MainUtils
@@ -375,10 +375,10 @@ class WinSettings(WinStandartBase):
             # Dbase.clear_all_engines()
 
             QApplication.quit()
-            if os.path.exists(cnf.db_file):
-                os.remove(cnf.db_file)
+            if os.path.exists(DB_FILE):
+                os.remove(DB_FILE)
 
-            shutil.copyfile(src="db.db", dst=cnf.db_file)
+            shutil.copyfile(src="db.db", dst=DB_FILE)
             QProcess.startDetached(sys.executable, sys.argv)
 
             # gui_signals_app.reload_thumbnails.emit()

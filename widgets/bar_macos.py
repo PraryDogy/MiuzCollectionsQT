@@ -6,7 +6,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
 from base_widgets import ContextMenuBase, WinSmallBase
-from cfg import APP_NAME, cnf
+from cfg import APP_NAME, APP_VER, cnf
 from signals import signals_app
 from utils.main_utils import MainUtils
 
@@ -18,7 +18,7 @@ class SelectableLabel(QLabel):
         super().__init__(parent)
 
         txt = "\n".join([
-            f"Version {cnf.app_ver}",
+            f"Version {APP_VER}",
             "Developed by Evlosh",
             "email: evlosh@gmail.com",
             "telegram: evlosh",
