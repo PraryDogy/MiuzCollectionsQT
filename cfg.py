@@ -29,7 +29,7 @@ PSD_TIFF: tuple = (
 
 DB_SIZE = 200
 PIXMAP_SIZE: list = [90, 130, 170, DB_SIZE]
-THUMB_W: list = [110, 130, 170, DB_SIZE]
+THUMB_W: list = [110, 140, 170, DB_SIZE]
 THUMB_MARGIN: int = 15
 TEXT_LENGTH: list = [17, 20, 26, 31]
 
