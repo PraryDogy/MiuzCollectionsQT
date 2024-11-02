@@ -33,10 +33,7 @@ class TestWid(QFrame):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-        from widgets.win_downloads import DownloadsWin
-        win = DownloadsWin(parent=self)
-        win.center_win(parent=self)
-        win.show()
+        signals_app.progressbar_value.emit(50)
 
 
 class RightWidget(QFrame):
@@ -259,6 +256,10 @@ class App(QApplication):
             self.smb_win.show()
 
         signals_app.scaner_start.emit()
+
+        # self.test = TestWid()
+        # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
+        # self.test.show()
         
 
 Themes.set_theme(cnf.theme)
