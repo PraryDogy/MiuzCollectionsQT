@@ -36,7 +36,10 @@ class ProgressBar(QWidget):
         signals_app.progressbar_value.connect(self.progressbar_value)
 
     def progressbar_value(self, value: int):
-        value = int(value)
+
+        if not isinstance(value, int):
+            raise Exception ("widgets > bar_bottom > progress bar > set_value > value not int", value)
+
         self.progress_bar.setValue(value)
 
         if self.progress_bar.value() >= 100:
