@@ -17,5 +17,6 @@ q = q.values(
         "collection": "test"
     }
 )
-conn.execute(q)
-conn.commit()
+
+a = [1]
+print(len(a))

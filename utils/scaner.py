@@ -131,17 +131,16 @@ class FinderImages:
 
         if not collections:
             collections = [cnf.coll_folder]
+            step_value = 60
+        else:
+            step_value = round(60 / len(collections))
 
-        ln_colls = len(collections)
-        step_value = int(
-            60
-            if ln_colls == 0
-            else 60 / ln_colls
-            )
+        step_value_temp = 0
 
         for collection in collections:
-
-            ScanerUtils.progressbar_value(step_value)
+            
+            step_value_temp += step_value
+            ScanerUtils.progressbar_value(step_value_temp)
 
             try:
                 finder_images.update(self.walk_collection(collection))
