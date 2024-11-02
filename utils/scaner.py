@@ -259,7 +259,7 @@ class DbUpdater:
         ScanerUtils.progressbar_value(90)
         self.modify_db(compared_items=self.res.upd_items, flag=self.flag_upd)
 
-    def create_db_img(
+    def get_bytes_img(
             self,
             flag: str,
             src: str
@@ -317,7 +317,7 @@ class DbUpdater:
             if not ScanerUtils.can_scan:
                 return
 
-            bytes_img = self.create_db_img(flag=flag, src=src)
+            bytes_img = self.get_bytes_img(flag=flag, src=src)
             stmt = self.get_stmt(flag=flag, bytes_img=bytes_img, src=src, image_item=image_item)
 
             if flag == self.flag_del:
