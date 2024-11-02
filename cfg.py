@@ -4,13 +4,12 @@ import shutil
 from datetime import datetime
 from typing import Literal
 
-from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QMainWindow
 
 from lang import Eng, Rus
 
 APP_NAME: str = "MiuzCollections"
-APP_VER = "5.6.0"
+APP_VER = "5.6.1"
 
 APP_SUPPORT_DIR: str = os.path.join(
     os.path.expanduser("~"),
