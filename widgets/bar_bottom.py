@@ -42,7 +42,7 @@ class ProgressBar(QWidget):
 
         self.progress_bar.setValue(value)
 
-        if self.progress_bar.value() >= 100:
+        if self.progress_bar.value() == 100:
             self.progress_bar.hide()
         else:
             self.progress_bar.show()
