@@ -143,7 +143,12 @@ class FinderImages:
             ScanerUtils.progressbar_value(step_value_temp)
 
             try:
-                finder_images.update(self.walk_collection(collection))
+                walked = self.walk_collection(collection)
+                # if walked is None:
+                    # print(collection)
+                    # print(walked)
+                    # continue
+                finder_images.update(walked)
             except TypeError as e:
                 MainUtils.print_err(parent=self, error=e)
                 continue
@@ -156,13 +161,13 @@ class FinderImages:
         for root, _, files in os.walk(collection):
 
             if not ScanerUtils.can_scan:
-                return
+                return finder_images
 
             for file in files:
 
                 if not os.path.exists(JsonData.coll_folder):
                     ScanerUtils.can_scan = False
-                    return
+                    return finder_images
 
                 if file.endswith(IMG_EXT):
                     src = os.path.join(root, file)
@@ -219,7 +224,7 @@ class ImageCompator:
         for db_src, db_item in self.db_images.items():
 
             if not ScanerUtils.can_scan:
-                return
+                return result
 
             in_finder = self.finder_images.get(db_src)
 
@@ -229,7 +234,7 @@ class ImageCompator:
         for finder_src, finder_item in self.finder_images.items():
 
             if not ScanerUtils.can_scan:
-                return
+                return result
 
             in_db = self.db_images.get(finder_src)
 

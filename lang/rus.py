@@ -12,7 +12,7 @@ class Rus:
 		self.connect_sb06 = 'Подключите Studio/Photo'
 		self.copy = 'Копировать'
 		self.copy_all = 'Копировать все'
-		self.copy_path = 'Скопировать путь до файла'
+		self.copy_path = 'Скопировать путь'
 		self.copying = 'Копирую'
 		self.cust_fltr_names = {'prod': 'Имиджи', 'mod': 'Модели'}
 		self.cut = 'Вырезать'

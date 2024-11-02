@@ -36,23 +36,9 @@ class CustomContext(ContextMenuBase):
 
         self.addSeparator()
 
-        action_text = f"{Dynamic.lng.reveal} {Dynamic.lng.in_finder}"
-        reveal_menu = ContextSubMenuBase(parent=self, title=action_text)
-        self.addMenu(reveal_menu)
-
-        base_coll = QAction(text=Dynamic.lng.collection, parent=self)
-        base_coll.triggered.connect(lambda e: self.reveal_collection())
-        reveal_menu.addAction(base_coll)
-
-        reveal_menu.addSeparator()
-
-        prod_coll = QAction(text=Dynamic.lng.cust_fltr_names["prod"], parent=self)
-        prod_coll.triggered.connect(lambda e: self.reveal_collection("prod"))
-        reveal_menu.addAction(prod_coll)
-
-        mod_coll = QAction(text=Dynamic.lng.cust_fltr_names["mod"], parent=self)
-        mod_coll.triggered.connect(lambda e: self.reveal_collection("mod"))
-        reveal_menu.addAction(mod_coll)
+        reveal_coll = QAction(text=Dynamic.lng.reveal_in_finder, parent=self)
+        reveal_coll.triggered.connect(self.reveal_collection)
+        self.addAction(reveal_coll)
 
     def change_view(self):
         JsonData.small_menu_view = not JsonData.small_menu_view
@@ -64,40 +50,16 @@ class CustomContext(ContextMenuBase):
         signals_app.reload_menu.emit()
         signals_app.reload_thumbnails.emit()
 
-    def reveal_collection(self, flag: str = None):
+    def reveal_collection(self):
+        if self.true_name == ALL_COLLS:
+            coll = JsonData.coll_folder
+        else:
+            coll = os.path.join(JsonData.coll_folder, self.true_name)
+
         if MainUtils.smb_check():
-
-            if self.true_name == ALL_COLLS:
-                if os.path.exists(JsonData.coll_folder):
-                    subprocess.Popen(["open", JsonData.coll_folder])
-                    return
-
-            coll_path = os.path.join(JsonData.coll_folder, self.true_name)
-
-            if flag == "prod":
-                flag_path = os.path.join(coll_path, JsonData.cust_fltr_names[flag])
-                if os.path.exists(flag_path):
-                    subprocess.Popen(["open", flag_path])
-                    return
-                else:
-                    os.mkdir(flag_path)
-                    subprocess.Popen(["open", flag_path])
-                    return
-
-            if flag == "mod":
-                flag_path = os.path.join(coll_path, JsonData.cust_fltr_names[flag])
-                if os.path.exists(flag_path):
-                    subprocess.Popen(["open", flag_path])
-                    return
-                else:
-                    os.mkdir(flag_path)
-                    subprocess.Popen(["open", flag_path])
-                    return
-
-            if os.path.exists(coll_path):
-                subprocess.Popen(["open", coll_path])
+            if os.path.exists(coll):
+                subprocess.Popen(["open", coll])
                 return
-
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
