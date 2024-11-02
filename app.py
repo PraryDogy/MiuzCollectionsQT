@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
                              QVBoxLayout)
 
 from base_widgets import LayoutH, LayoutV, WinBase
-from cfg import ALL_COLLS, cnf, APP_NAME
+from cfg import ALL_COLLS, APP_NAME, Dynamic, JsonData
 from signals import signals_app
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
@@ -91,7 +91,7 @@ class WinMain(WinBase):
         self.setContentsMargins(0, 0, 0, 0)
         self.setFocus()
         self.setWindowTitle(APP_NAME)
-        self.resize(cnf.root_g["aw"], cnf.root_g["ah"])
+        self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.center()
 
         menubar = BarMacos()
@@ -106,7 +106,7 @@ class WinMain(WinBase):
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)
 
-        self.drop_widget = QLabel(parent=self.centralWidget(), text=cnf.lng.drop_to_collections)
+        self.drop_widget = QLabel(parent=self.centralWidget(), text=Dynamic.lng.drop_to_collections)
         self.drop_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.drop_widget.setObjectName(Names.drop_widget)
         self.drop_widget.setStyleSheet(Themes.current)
@@ -129,14 +129,14 @@ class WinMain(WinBase):
         self.set_title(self.check_coll())
 
     def check_coll(self) -> str:
-        if cnf.curr_coll == ALL_COLLS:
-            return cnf.lng.all_colls
+        if JsonData.curr_coll == ALL_COLLS:
+            return Dynamic.lng.all_colls
         else:
-            return cnf.curr_coll
+            return JsonData.curr_coll
     
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = MainUtils.reveal_files(files)
-        if len(cnf.copy_threads) == 0:
+        if len(Dynamic.copy_threads) == 0:
             signals_app.hide_downloads.emit()
         try:
             copy_task.remove_threads()
@@ -162,15 +162,15 @@ class WinMain(WinBase):
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if cnf.curr_size_ind < 3:
-                    cnf.curr_size_ind += 1
-                    signals_app.move_slider.emit(cnf.curr_size_ind)
+                if JsonData.curr_size_ind < 3:
+                    JsonData.curr_size_ind += 1
+                    signals_app.move_slider.emit(JsonData.curr_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if cnf.curr_size_ind > 0:
-                    cnf.curr_size_ind -= 1
-                    signals_app.move_slider.emit(cnf.curr_size_ind)
+                if JsonData.curr_size_ind > 0:
+                    JsonData.curr_size_ind -= 1
+                    signals_app.move_slider.emit(JsonData.curr_size_ind)
 
     def dragEnterEvent(self, a0: QDragEnterEvent | None) -> None:
         if not a0.source() and a0.mimeData().hasUrls():
@@ -189,9 +189,9 @@ class WinMain(WinBase):
                 self.win_smb.show()
                 return
 
-            directory = cnf.coll_folder
-            if cnf.curr_coll != ALL_COLLS:
-                directory = os.path.join(cnf.coll_folder, cnf.curr_coll)
+            directory = JsonData.coll_folder
+            if JsonData.curr_coll != ALL_COLLS:
+                directory = os.path.join(JsonData.coll_folder, JsonData.curr_coll)
 
 
             folder = QFileDialog.getExistingDirectory(self, directory=directory)
@@ -229,10 +229,10 @@ class App(QApplication):
         if a1.type() == QEvent.Type.ApplicationActivate:
             if self.main_win.isMinimized() or self.main_win.isHidden():
                 self.main_win.show()
-            if cnf.image_viewer:
-                if cnf.image_viewer.isMinimized() or cnf.image_viewer.isHidden():
-                        cnf.image_viewer.show()
-                        cnf.image_viewer.showNormal()
+            if Dynamic.image_viewer:
+                if Dynamic.image_viewer.isMinimized() or Dynamic.image_viewer.isHidden():
+                        Dynamic.image_viewer.show()
+                        Dynamic.image_viewer.showNormal()
 
         return super().eventFilter(a0, a1)
     
@@ -241,11 +241,11 @@ class App(QApplication):
 
         geo = self.main_win.geometry()
 
-        cnf.root_g.update(
+        JsonData.root_g.update(
             {"aw": geo.width(), "ah": geo.height()}
             )
 
-        cnf.write_json_cfg()
+        JsonData.write_config()
 
     def after_start(self):
 
@@ -262,5 +262,5 @@ class App(QApplication):
         # self.test.show()
         
 
-Themes.set_theme(cnf.theme)
+Themes.set_theme(JsonData.theme)
 app = App()

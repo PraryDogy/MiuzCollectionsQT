@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QFrame
 
 from base_widgets import Btn, LayoutH
-from cfg import cnf
+from cfg import Dynamic, JsonData
 from signals import signals_app
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -17,7 +17,7 @@ class DatesBtn(Btn):
     win_dates_opened = pyqtSignal()
 
     def __init__(self):
-        super().__init__(text=cnf.lng.dates)
+        super().__init__(text=Dynamic.lng.dates)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -69,9 +69,9 @@ class FilterBtn(Btn):
             self.set_blue_style()
 
         try:
-            cnf.cust_fltr_vals[self.key] = not cnf.cust_fltr_vals[self.key]
+            JsonData.cust_fltr_vals[self.key] = not JsonData.cust_fltr_vals[self.key]
         except KeyError:
-            cnf.sys_fltr_vals[self.key] = not cnf.sys_fltr_vals[self.key]
+            JsonData.sys_fltr_vals[self.key] = not JsonData.sys_fltr_vals[self.key]
 
         signals_app.reload_thumbnails.emit()
         signals_app.scroll_top.emit()
@@ -102,22 +102,22 @@ class BarTop(QFrame):
     def init_ui(self):
         self.filter_btns.clear()
 
-        for true_name, fake_name in cnf.lng.cust_fltr_names.items():
+        for true_name, fake_name in Dynamic.lng.cust_fltr_names.items():
             label = FilterBtn(text=fake_name, true_name=true_name)
             self.h_layout.addWidget(label)
 
-            if cnf.cust_fltr_vals[true_name]:
+            if JsonData.cust_fltr_vals[true_name]:
                 label.set_blue_style()
             else:
                 label.set_normal_style()
             
             self.filter_btns.append(label)
 
-        for true_name, fake_name in cnf.lng.sys_fltr_names.items():
+        for true_name, fake_name in Dynamic.lng.sys_fltr_names.items():
             label = FilterBtn(text=fake_name, true_name=true_name)
             self.h_layout.addWidget(label)
 
-            if cnf.sys_fltr_vals[true_name]:
+            if JsonData.sys_fltr_vals[true_name]:
                 label.set_blue_style()
             else:
                 label.set_normal_style()
@@ -128,7 +128,7 @@ class BarTop(QFrame):
         self.dates_btn.win_dates_opened.connect(self.open_win_dates)
         self.h_layout.addWidget(self.dates_btn)
 
-        if any((cnf.date_start, cnf.date_end)):
+        if any((Dynamic.date_start, Dynamic.date_end)):
             self.dates_btn.set_blue_style()
         else:
             self.dates_btn.set_normal_style()
@@ -145,11 +145,11 @@ class BarTop(QFrame):
             i: FilterBtn
             i.set_normal_style()
 
-        for i in cnf.cust_fltr_vals:
-            cnf.cust_fltr_vals[i] = False
+        for i in JsonData.cust_fltr_vals:
+            JsonData.cust_fltr_vals[i] = False
 
-        for i in cnf.sys_fltr_vals:
-            cnf.sys_fltr_vals[i] = False
+        for i in JsonData.sys_fltr_vals:
+            JsonData.sys_fltr_vals[i] = False
 
     def reload_filters(self):
         MainUtils.clear_layout(self.h_layout)

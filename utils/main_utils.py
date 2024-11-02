@@ -5,7 +5,7 @@ import traceback
 
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout
 
-from cfg import cnf
+from cfg import Dynamic, JsonData
 from signals import signals_app
 
 
@@ -13,10 +13,10 @@ class MainUtils:
 
     @classmethod
     def smb_check(cls) -> bool:
-        if not os.path.exists(cnf.coll_folder):
-            for coll_folder in cnf.coll_folder_list:
+        if not os.path.exists(JsonData.coll_folder):
+            for coll_folder in JsonData.coll_folder_list:
                 if os.path.exists(coll_folder):
-                    cnf.coll_folder = coll_folder
+                    JsonData.coll_folder = coll_folder
                     signals_app.scaner_stop.emit()
                     signals_app.scaner_start.emit()
                     return True
@@ -25,12 +25,12 @@ class MainUtils:
 
     @classmethod
     def get_coll_name(cls, src_path: str) -> str:
-        coll = src_path.replace(cnf.coll_folder, "").strip(os.sep).split(os.sep)
+        coll = src_path.replace(JsonData.coll_folder, "").strip(os.sep).split(os.sep)
 
         if len(coll) > 1:
             return coll[0]
         else:
-            return cnf.coll_folder.strip(os.sep).split(os.sep)[-1]
+            return JsonData.coll_folder.strip(os.sep).split(os.sep)[-1]
     
     @classmethod
     def clear_layout(cls, layout: QVBoxLayout):
@@ -84,7 +84,7 @@ class MainUtils:
 
     @classmethod
     def send_notification(cls, text: str):
-        if cnf.image_viewer:
+        if Dynamic.image_viewer:
             signals_app.noti_img_view.emit(text)
         else:
             signals_app.noti_main.emit(text)

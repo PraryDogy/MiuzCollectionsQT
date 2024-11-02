@@ -2,7 +2,7 @@ import os
 
 from PyQt5.QtCore import pyqtSignal
 
-from cfg import cnf
+from cfg import Dynamic
 
 from .main_utils import MainUtils
 from .my_thread import MyThread
@@ -24,7 +24,7 @@ class ThreadCopyFiles(MyThread):
         self.buffer_size = 1024*1024
         self.current_file = ""
 
-        cnf.copy_threads.append(self)
+        Dynamic.copy_threads.append(self)
 
     def run(self):
         copied_size = 0
@@ -47,7 +47,7 @@ class ThreadCopyFiles(MyThread):
                 self.value_changed.emit(100)
                 self.finished.emit(files_dests)
                 self.remove_threads()
-                cnf.copy_threads.remove(self)
+                Dynamic.copy_threads.remove(self)
                 return
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
@@ -81,7 +81,7 @@ class ThreadCopyFiles(MyThread):
         self.value_changed.emit(100)
         self.finished.emit(files_dests)
         self.remove_threads()
-        cnf.copy_threads.remove(self)
+        Dynamic.copy_threads.remove(self)
 
     def stop_copying(self):
         self.flag = False

@@ -7,7 +7,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
-from cfg import PSD_TIFF, cnf
+from cfg import PSD_TIFF, Dynamic, JsonData
 from database import Dbase, ThumbsMd
 from signals import signals_app
 from styles import Names, Themes
@@ -211,21 +211,21 @@ class WinImageView(WinImgViewBase):
     def __init__(self, src: str, path_to_wid: dict[str, QWidget]):
 
         try:
-            cnf.image_viewer.close()
+            Dynamic.image_viewer.close()
         except (AttributeError, RuntimeError) as e:
             pass
 
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setMinimumSize(QSize(500, 400))
-        self.resize(cnf.imgview_g["aw"], cnf.imgview_g["ah"])
+        self.resize(JsonData.imgview_g["aw"], JsonData.imgview_g["ah"])
         self.installEventFilter(self)
 
         self.src = src
         self.all_images = list(path_to_wid.keys())
 
         self.collection = None
-        cnf.image_viewer = self
+        Dynamic.image_viewer = self
 
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
@@ -265,7 +265,7 @@ class WinImageView(WinImgViewBase):
 
     def load_thumbnail(self):
         if self.src not in Cache.images:
-            self.set_title(cnf.lng.loading)
+            self.set_title(Dynamic.lng.loading)
 
             q = (sqlalchemy.select(ThumbsMd.img150)
                 .filter(ThumbsMd.src == self.src))
@@ -299,7 +299,7 @@ class WinImageView(WinImgViewBase):
 
     def my_close(self, event):
         Cache.images.clear()
-        cnf.image_viewer = None
+        Dynamic.image_viewer = None
         self.close()
 
 
@@ -394,7 +394,7 @@ class WinImageView(WinImgViewBase):
 
         self.notification.resize(a0.size().width() - 20, 30)
 
-        cnf.imgview_g.update({"aw": a0.size().width(), "ah": a0.size().height()})
+        JsonData.imgview_g.update({"aw": a0.size().width(), "ah": a0.size().height()})
 
         return super().resizeEvent(a0)
 

@@ -6,10 +6,10 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
-from cfg import cnf
+from cfg import Dynamic
 from styles import Names, Themes
-from utils.main_utils import MainUtils
 from utils.image_size import get_image_size
+from utils.main_utils import MainUtils
 
 
 class ImgInfoBase(dict):
@@ -29,22 +29,22 @@ class ImgInfoBase(dict):
             resol = f"{w}x{h}"
 
             filesize = round(os.path.getsize(filename=img_src) / (1024*1024), 2)
-            filesize = f"{filesize}{cnf.lng.mb}"
+            filesize = f"{filesize}{Dynamic.lng.mb}"
 
         except FileNotFoundError:
-            name = cnf.lng.no_connection
-            collection = cnf.lng.no_connection
-            filemod = cnf.lng.no_connection
-            resol = cnf.lng.no_connection
-            filesize = cnf.lng.no_connection
+            name = Dynamic.lng.no_connection
+            collection = Dynamic.lng.no_connection
+            filemod = Dynamic.lng.no_connection
+            resol = Dynamic.lng.no_connection
+            filesize = Dynamic.lng.no_connection
 
         self.update(
-            {cnf.lng.collection: collection,
-             cnf.lng.file_name: name,
-             cnf.lng.date_changed: filemod,
-             cnf.lng.resolution: resol,
-             cnf.lng.file_size: filesize,
-             cnf.lng.file_path: img_src}
+            {Dynamic.lng.collection: collection,
+             Dynamic.lng.file_name: name,
+             Dynamic.lng.date_changed: filemod,
+             Dynamic.lng.resolution: resol,
+             Dynamic.lng.file_size: filesize,
+             Dynamic.lng.file_path: img_src}
              )
 
 
@@ -96,16 +96,16 @@ class CustomContextRLabel(ContextMenuBase):
 
         selected_text = parent.selectedText().replace("\u2029", "")
         if selected_text:
-            label_text = f"{cnf.lng.copy} \"{selected_text}\""
+            label_text = f"{Dynamic.lng.copy} \"{selected_text}\""
             sel = QAction(text=label_text, parent=self)
             sel.triggered.connect(lambda: self.my_sel(text=selected_text))
         else:
-            sel = QAction(text=cnf.lng.copy, parent=self)
+            sel = QAction(text=Dynamic.lng.copy, parent=self)
         self.addAction(sel)
 
         self.addSeparator()
 
-        sel_all = QAction(text=cnf.lng.copy_all, parent=self)
+        sel_all = QAction(text=Dynamic.lng.copy_all, parent=self)
         sel_all.triggered.connect(self.my_sel_all)
         self.addAction(sel_all)
 
@@ -136,7 +136,7 @@ class WinInfo(WinStandartBase):
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min()
         self.disable_max()
-        self.set_title(cnf.lng.info)
+        self.set_title(Dynamic.lng.info)
 
         self.src = src
         self.l_ww = 100
@@ -166,7 +166,7 @@ class WinInfo(WinStandartBase):
         btn_layout = LayoutH()
         btns_wid.setLayout(btn_layout)
         self.content_layout.addWidget(btns_wid)
-        button = Btn(cnf.lng.close)
+        button = Btn(Dynamic.lng.close)
         button.mouseReleaseEvent = self.my_close
         btn_layout.addWidget(button)
 

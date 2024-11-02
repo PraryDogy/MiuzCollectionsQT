@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV
-from cfg import ALL_COLLS, LIMIT, cnf
+from cfg import ALL_COLLS, LIMIT, Dynamic, JsonData
 from signals import signals_app
 from styles import Names, Themes
 
@@ -12,15 +12,15 @@ BTN_W, BTN_H = 120, 28
 
 class ResetDatesBtn(QLabel):
     def __init__(self):
-        super().__init__(text=cnf.lng.reset_dates)
+        super().__init__(text=Dynamic.lng.reset_dates)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_dates_btn)
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.date_start, cnf.date_end = None, None
-        cnf.current_photo_limit = LIMIT
+        Dynamic.date_start, Dynamic.date_end = None, None
+        Dynamic.current_photo_limit = LIMIT
 
         signals_app.set_dates_btn_normal.emit()
         signals_app.reload_thumbnails.emit()
@@ -30,14 +30,14 @@ class ResetDatesBtn(QLabel):
 
 class ResetSearchBtn(QLabel):
     def __init__(self):
-        super().__init__(text=cnf.lng.reset_search)
+        super().__init__(text=Dynamic.lng.reset_search)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_search_btn)
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.current_photo_limit = LIMIT
+        Dynamic.current_photo_limit = LIMIT
 
         signals_app.clear_search.emit()
         signals_app.reload_thumbnails.emit()
@@ -47,14 +47,14 @@ class ResetSearchBtn(QLabel):
 
 class ResetFiltersBtn(QLabel):
     def __init__(self):
-        super().__init__(text=cnf.lng.show_all)
+        super().__init__(text=Dynamic.lng.show_all)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_filters_btn)
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.current_photo_limit = LIMIT
+        Dynamic.current_photo_limit = LIMIT
 
         signals_app.disable_filters.emit()
         signals_app.reload_thumbnails.emit()
@@ -64,16 +64,16 @@ class ResetFiltersBtn(QLabel):
 
 class ShowAllBtn(QLabel):
     def __init__(self):
-        super().__init__(text=cnf.lng.show_all)
+        super().__init__(text=Dynamic.lng.show_all)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_show_all_btn)
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.date_start, cnf.date_end = None, None
-        cnf.curr_coll = ALL_COLLS
-        cnf.current_photo_limit = LIMIT
+        Dynamic.date_start, Dynamic.date_end = None, None
+        JsonData.curr_coll = ALL_COLLS
+        Dynamic.current_photo_limit = LIMIT
 
         signals_app.clear_search.emit()
         signals_app.disable_filters.emit()
@@ -93,7 +93,7 @@ class AboveThumbsNoImages(QWidget):
         self.v_layout = LayoutV()
         self.setLayout(self.v_layout)
 
-        noimg_t = cnf.lng.no_photo
+        noimg_t = Dynamic.lng.no_photo
 
         title_label = QLabel(text=noimg_t)
         title_label.setFixedWidth(width - 20)
@@ -110,27 +110,27 @@ class AboveThumbsNoImages(QWidget):
         self.v_layout.addWidget(h_wid)
 
         merg_fltr_vals = {
-            **cnf.cust_fltr_vals,
-            **cnf.sys_fltr_vals
+            **JsonData.cust_fltr_vals,
+            **JsonData.sys_fltr_vals
             }
 
         merg_fltr_lng = {
-            **cnf.lng.cust_fltr_names,
-            **cnf.lng.sys_fltr_names
+            **Dynamic.lng.cust_fltr_names,
+            **Dynamic.lng.sys_fltr_names
             }
 
-        if cnf.search_widget_text:
-            noimg_t = (f"{cnf.lng.no_photo} {cnf.lng.with_name}: "
-                       f"{cnf.search_widget_text}")
+        if Dynamic.search_widget_text:
+            noimg_t = (f"{Dynamic.lng.no_photo} {Dynamic.lng.with_name}: "
+                       f"{Dynamic.search_widget_text}")
 
             title_label.setText(noimg_t)
 
             s_label = ResetSearchBtn()
             h_layout.addWidget(s_label)
 
-        elif any((cnf.date_start, cnf.date_end)):
-            noimg_t = (f"{cnf.lng.no_photo}: "
-                       f"{cnf.date_start_text} - {cnf.date_end_text}")
+        elif any((Dynamic.date_start, Dynamic.date_end)):
+            noimg_t = (f"{Dynamic.lng.no_photo}: "
+                       f"{Dynamic.date_start_text} - {Dynamic.date_end_text}")
 
             title_label.setText(noimg_t)
             h_layout.addWidget(ResetDatesBtn())
@@ -140,7 +140,7 @@ class AboveThumbsNoImages(QWidget):
                        for code_name, val in merg_fltr_vals.items()
                        if val)
             filters = ",  ".join(filters)
-            noimg_t = (f"{cnf.lng.no_photo_filter}: {filters}")
+            noimg_t = (f"{Dynamic.lng.no_photo_filter}: {filters}")
 
             title_label.setText(noimg_t)
             h_layout.addWidget(ResetFiltersBtn())
@@ -170,17 +170,17 @@ class AboveThumbs(QWidget):
         h_layout.setContentsMargins(0, 10, 0, 0)
         self.v_layout.addWidget(h_wid)
 
-        if any((cnf.date_start, cnf.date_end)):
+        if any((Dynamic.date_start, Dynamic.date_end)):
             label.setText(
-                f"{cnf.lng.photos_named_dates}: {cnf.date_start_text} - {cnf.date_end_text}"
+                f"{Dynamic.lng.photos_named_dates}: {Dynamic.date_start_text} - {Dynamic.date_end_text}"
                 )
             h_layout.addWidget(ResetDatesBtn())
 
             spacer = QSpacerItem(1, 10)
             self.v_layout.addSpacerItem(spacer)
 
-        elif cnf.search_widget_text:
-            label.setText(f"{cnf.lng.search}: {cnf.search_widget_text}")
+        elif Dynamic.search_widget_text:
+            label.setText(f"{Dynamic.lng.search}: {Dynamic.search_widget_text}")
             h_layout.addWidget(ResetSearchBtn())
             h_layout.addSpacerItem(QSpacerItem(1, 30))
 

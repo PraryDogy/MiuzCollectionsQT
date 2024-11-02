@@ -5,7 +5,7 @@ from PyQt5.QtGui import QCloseEvent, QFocusEvent, QKeyEvent, QMouseEvent, QResiz
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
-from cfg import cnf
+from cfg import JsonData
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 
@@ -193,15 +193,15 @@ class WinBase(QMainWindow, QObject):
 
     def disable_min(self):
         self.titlebar.btns.min_btn.setDisabled(True)
-        self.titlebar.btns.min_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
+        self.titlebar.btns.min_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
 
     def disable_max(self):
         self.titlebar.btns.max_btn.setDisabled(True)
-        self.titlebar.btns.max_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
+        self.titlebar.btns.max_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
 
     def disable_close(self):
         self.titlebar.btns.close_btn.setDisabled(True)
-        self.titlebar.btns.close_btn.set_icon(os.path.join("images", f"{cnf.theme}_gray.svg"))
+        self.titlebar.btns.close_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
 
 
 class BaseBottomWid(QFrame):

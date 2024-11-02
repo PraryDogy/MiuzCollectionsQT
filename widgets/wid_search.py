@@ -3,7 +3,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QSpacerItem, QWidget
 
 from base_widgets import InputBase, LayoutH
-from cfg import cnf
+from cfg import Dynamic
 from signals import signals_app
 
 
@@ -14,7 +14,7 @@ class SearchBarBase(InputBase):
         self.setFixedHeight(25)
 
         self.textChanged.connect(self.create_search)
-        self.setPlaceholderText(cnf.lng.search)
+        self.setPlaceholderText(Dynamic.lng.search)
 
         self.timer = QTimer(self)
         self.timer.setInterval(1000)
@@ -32,9 +32,9 @@ class SearchBarBase(InputBase):
 
     def create_search(self, new_text):
         if len(new_text) > 0:
-            cnf.search_widget_text = new_text
+            Dynamic.search_widget_text = new_text
         else:
-            cnf.search_widget_text = None
+            Dynamic.search_widget_text = None
 
         self.timer.stop()
         self.timer.start()
@@ -44,10 +44,10 @@ class SearchBarBase(InputBase):
 
     def clear_search(self):
         self.clear()
-        cnf.search_widget_text = None
+        Dynamic.search_widget_text = None
 
     def reload_search(self):
-        self.setPlaceholderText(cnf.lng.search)
+        self.setPlaceholderText(Dynamic.lng.search)
 
 
 class WidSearch(QWidget):

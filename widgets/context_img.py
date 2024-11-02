@@ -4,10 +4,10 @@ from functools import partial
 from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
 
 from base_widgets import ContextMenuBase
-from cfg import cnf
+from cfg import Dynamic, JsonData
 from signals import signals_app
-from utils.main_utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
+from utils.main_utils import MainUtils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -24,26 +24,26 @@ class ContextImg(ContextMenuBase):
         self.my_parent = parent
         self.src = src
         
-        self.info_action = QAction(text=cnf.lng.info, parent=self)
+        self.info_action = QAction(text=Dynamic.lng.info, parent=self)
         self.info_action.triggered.connect(partial(self.show_info_win, src))
         self.addAction(self.info_action)
 
         self.addSeparator()
 
-        reveal_action = QAction(parent=self, text=cnf.lng.reveal_in_finder)
+        reveal_action = QAction(parent=self, text=Dynamic.lng.reveal_in_finder)
         reveal_action.triggered.connect(self.reveal_cmd)
         self.addAction(reveal_action)
 
-        save_as_action = QAction(parent=self, text=cnf.lng.save_image_in)
+        save_as_action = QAction(parent=self, text=Dynamic.lng.save_image_in)
         save_as_action.triggered.connect(self.save_as_cmd)
         self.addAction(save_as_action)
 
-        save_menu = QAction(parent=self, text=cnf.lng.save_image_downloads)
+        save_menu = QAction(parent=self, text=Dynamic.lng.save_image_downloads)
         save_menu.triggered.connect(self.save_cmd)
         self.addAction(save_menu)
 
     def add_preview_item(self):
-        open_action = QAction(cnf.lng.view, self)
+        open_action = QAction(Dynamic.lng.view, self)
         open_action.triggered.connect(self.show_image_viewer)
         self.addAction(open_action)
         self.insertAction(self.info_action, open_action)
@@ -62,7 +62,7 @@ class ContextImg(ContextMenuBase):
     def reveal_cmd(self):
         if MainUtils.smb_check():
             if not os.path.exists(self.src):
-                MainUtils.send_notification(cnf.lng.no_file)
+                MainUtils.send_notification(Dynamic.lng.no_file)
             else:
                 MainUtils.reveal_files([self.src])
         else:
@@ -85,7 +85,7 @@ class ContextImg(ContextMenuBase):
 
     def save_cmd(self):
         if MainUtils.smb_check():
-            self.copy_files_cmd(dest=cnf.down_folder, file=self.src)
+            self.copy_files_cmd(dest=JsonData.down_folder, file=self.src)
         else:
             self.smb_win = WinSmb(parent=self.my_parent)
             self.smb_win.show()
@@ -93,7 +93,7 @@ class ContextImg(ContextMenuBase):
     def copy_files_cmd(self, dest: str, file: str):
 
         if not file or not os.path.exists(file):
-            MainUtils.send_notification(cnf.lng.no_file)
+            MainUtils.send_notification(Dynamic.lng.no_file)
             return
 
         self.copy_task = ThreadCopyFiles(dest=dest, files=[file])
@@ -103,7 +103,7 @@ class ContextImg(ContextMenuBase):
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = MainUtils.reveal_files(files)
-        if len(cnf.copy_threads) == 0:
+        if len(Dynamic.copy_threads) == 0:
             signals_app.hide_downloads.emit()
         try:
             copy_task.remove_threads()

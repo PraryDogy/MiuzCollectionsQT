@@ -7,7 +7,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
-from cfg import cnf
+from cfg import Dynamic
 from signals import signals_app
 
 
@@ -47,7 +47,7 @@ class BaseDateInput(InputBase):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(150)
-        self.setPlaceholderText(cnf.lng.d_m_y)
+        self.setPlaceholderText(Dynamic.lng.d_m_y)
         self.textChanged.connect(self.onTextChanged)
         self.date = None
 
@@ -87,7 +87,7 @@ class FiltersDateBtncolor:
 
     @staticmethod
     def date_based_color():
-        if not cnf.date_start:
+        if not Dynamic.date_start:
             signals_app.set_dates_btn_normal.emit()
         else:
             signals_app.set_dates_btn_blue.emit()
@@ -114,10 +114,10 @@ class TitleLabel(QLabel):
         self.setText(self.default_text)
 
     def get_named_weekday(self, date: datetime) -> str:
-        return cnf.lng.weekdays[str(date.weekday())]
+        return Dynamic.lng.weekdays[str(date.weekday())]
     
     def get_named_date(self, date: datetime) -> str:
-        month = cnf.lng.months_genitive_case[str(date.month)]
+        month = Dynamic.lng.months_genitive_case[str(date.month)]
         return f"{date.day} {month} {date.year}"
 
 
@@ -156,18 +156,18 @@ class BaseDateLayout(QWidget):
 
 class LeftDateWidget(BaseDateLayout):
     def __init__(self):
-        super().__init__(cnf.lng.start)
+        super().__init__(Dynamic.lng.start)
 
-        if cnf.date_start:
-            self.input.setText(DateUtils.date_to_text(cnf.date_start))
+        if Dynamic.date_start:
+            self.input.setText(DateUtils.date_to_text(Dynamic.date_start))
 
 
 class RightDateWidget(BaseDateLayout):
     def __init__(self):
-        super().__init__(cnf.lng.end)
+        super().__init__(Dynamic.lng.end)
 
-        if cnf.date_end:
-            self.input.setText(DateUtils.date_to_text(cnf.date_end))
+        if Dynamic.date_end:
+            self.input.setText(DateUtils.date_to_text(Dynamic.date_end))
 
 
 class WinDates(WinStandartBase):
@@ -177,17 +177,17 @@ class WinDates(WinStandartBase):
         FiltersDateBtncolor.set_border()
         self.disable_min()
         self.disable_max()
-        self.set_title(cnf.lng.dates)
+        self.set_title(Dynamic.lng.dates)
 
-        self.date_start = cnf.date_start
-        self.date_end = cnf.date_end
+        self.date_start = Dynamic.date_start
+        self.date_end = Dynamic.date_end
 
         self.init_ui()
         self.fit_size()
         self.center_win(parent=parent)
 
     def init_ui(self):
-        title_label = QLabel(cnf.lng.search_dates)
+        title_label = QLabel(Dynamic.lng.search_dates)
         title_label.setContentsMargins(0, 0, 0, 5)
         self.content_layout.addWidget(title_label)
 
@@ -217,14 +217,14 @@ class WinDates(WinStandartBase):
 
         buttons_layout.addStretch(1)
         buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.ok_label = Btn(cnf.lng.ok)
+        self.ok_label = Btn(Dynamic.lng.ok)
         self.ok_label.mouseReleaseEvent = self.ok_cmd
         buttons_layout.addWidget(self.ok_label)
 
         spacer_item = QSpacerItem(10, 1)
         buttons_layout.addItem(spacer_item)
 
-        cancel_label = Btn(cnf.lng.cancel)
+        cancel_label = Btn(Dynamic.lng.cancel)
         cancel_label.mouseReleaseEvent = self.cancel_cmd
         buttons_layout.addWidget(cancel_label)
         buttons_layout.addStretch(1)
@@ -243,7 +243,7 @@ class WinDates(WinStandartBase):
             self.ok_label.setDisabled(True)
 
     def named_date(self, date: datetime):
-        month = cnf.lng.months_genitive_case[str(date.month)]
+        month = Dynamic.lng.months_genitive_case[str(date.month)]
         return f"{date.day} {month} {date.year}"
 
     def ok_cmd(self, event):
@@ -257,11 +257,11 @@ class WinDates(WinStandartBase):
             self.date_end = self.date_start
             self.date_end = datetime.today().date()
 
-        cnf.date_start = self.date_start
-        cnf.date_end = self.date_end
+        Dynamic.date_start = self.date_start
+        Dynamic.date_end = self.date_end
 
-        cnf.date_start_text = self.named_date(date=cnf.date_start)
-        cnf.date_end_text = self.named_date(date=cnf.date_end)
+        Dynamic.date_start_text = self.named_date(date=Dynamic.date_start)
+        Dynamic.date_end_text = self.named_date(date=Dynamic.date_end)
 
         FiltersDateBtncolor.date_based_color()
         self.close()

@@ -62,144 +62,147 @@ BLUE = "rgba(0, 122, 255, 1)"
 
 
 class JsonData:
-    def __init__(self) -> None:
-        super().__init__()
+    app_ver: str = APP_VER
 
-        self.app_ver: str = APP_VER
+    coll_folder: str = "/Volumes/Shares/Collections"
     
-        self.coll_folder: str = "/Volumes/Shares/Collections"
-        
-        self.curr_size_ind: int = 0
-        self.curr_coll: str = ALL_COLLS
+    curr_size_ind: int = 0
+    curr_coll: str = ALL_COLLS
 
-        self.cust_fltr_names: dict = {
-            "prod": "1 IMG",
-            "mod": "2 Model IMG"
-            }
+    cust_fltr_names: dict = {
+        "prod": "1 IMG",
+        "mod": "2 Model IMG"
+        }
 
-        self.cust_fltr_vals: dict = {
-            "prod": False,
-            "mod": False
-            }    
-        
-        self.imgview_g: dict = {
-            "aw": 700,
-            "ah": 500
-            }
+    cust_fltr_vals: dict = {
+        "prod": False,
+        "mod": False
+        }    
+    
+    imgview_g: dict = {
+        "aw": 700,
+        "ah": 500
+        }
 
-        self.root_g: dict = {
-            "aw": 700,
-            "ah": 500
-            }
-        
-        self.scaner_minutes: int = 5
+    root_g: dict = {
+        "aw": 700,
+        "ah": 500
+        }
+    
+    scaner_minutes: int = 5
 
-        self.stop_colls: list = [
-            "_Archive_Commerce_Брендинг",
-            "Chosed",
-            "LEVIEV"
+    stop_colls: list = [
+        "_Archive_Commerce_Брендинг",
+        "Chosed",
+        "LEVIEV"
+        ]
+
+    stop_words: list = [
+        "копия",
+        "copy",
+        "1x1",
+        "preview",
+        "square"
+        ]
+
+    sys_fltr_vals: dict = {
+        "other" : False
+        }
+    
+    theme: str = "dark_theme"
+    user_lng: str = "en"
+    small_menu_view: str = True
+
+    down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
+
+    udpdate_file_paths = [
+        '/Volumes/Shares/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+        '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+        '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+        '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+        ]
+
+    coll_folder_list = [
+        '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
+        '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
+        '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
+        '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Ready',
+        '/Volumes/Shares/Collections',
+        '/Volumes/Shares-1/Collections',
+        '/Volumes/Shares-2/Collections',
+        '/Volumes/Shares-3/Collections'
+        ]
+
+    @classmethod
+    def get_data(cls):
+        return [
+            i for i in dir(cls)
+            if not i.startswith("__")
+            and
+            not callable(getattr(cls, i))
             ]
 
-        self.stop_words: list = [
-            "копия",
-            "copy",
-            "1x1",
-            "preview",
-            "square"
-            ]
+    @classmethod
+    def read_json_data(cls) -> dict:
 
-        self.sys_fltr_vals: dict = {
-            "other" : False
-            }
-        
-        self.theme: str = "dark_theme"
-        self.user_lng: str = "en"
-        self.small_menu_view: str = True
+        if os.path.exists(JSON_FILE):
+            with open(JSON_FILE, 'r') as f:
 
-        self.down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
+                try:
+                    json_data: dict = json.load(f)
+                
+                    for k, v in json_data.items():
+                        if hasattr(cls, k):
+                            setattr(cls, k, v)
 
-        self.udpdate_file_paths = [
-            '/Volumes/Shares/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-            '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-            '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-            '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-            ]
+                except json.JSONDecodeError:
+                    print("Ошибка чтения json")
+                    cls.write_config()
 
-        self.coll_folder_list = [
-            '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
-            '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
-            '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
-            '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Ready',
-            '/Volumes/Shares/Collections',
-            '/Volumes/Shares-1/Collections',
-            '/Volumes/Shares-2/Collections',
-            '/Volumes/Shares-3/Collections'
-            ]
+        else:
+            print("файла не существует")
+            cls.write_config()
 
+        cls.set_language(cls.user_lng)
 
-    def update_json(self, data: dict):        
-        data["scaner_minutes"] = 5
-
-        if "LEVIEV" not in data["stop_colls"]:
-            data["stop_colls"].append("LEVIEV")
-
-        data["coll_folder_list"] = self.coll_folder_list
-        data["udpdate_file_paths"] = self.udpdate_file_paths
-
-        data["app_ver"] = APP_VER
-
-        return data
-
-    def read_json_cfg(self):
-        with open(JSON_FILE, "r", encoding="utf8") as file:
-            data: dict = json.load(file)
-        
-        for k, v in data.items():
-            if hasattr(self, k):
-                if type(v) == dict:
-                    cnf_dict: dict = getattr(self, k)
-                    if v.keys() != cnf_dict.keys():
-                        v = cnf_dict
-
-                setattr(self, k, v)
-
-        self.set_language(self.user_lng)
-
-        if self.coll_folder not in self.coll_folder_list:
+        if cls.coll_folder not in cls.coll_folder_list:
             print("\ncoll folder в json не из coll folder list")
             print("исправь вручную json файл")
-            print("coll folder:\n", self.coll_folder)
-            print("coll folder list:\n", *[i + "\n" for i in self.coll_folder_list], "\n")
+            print("coll folder:\n", cls.coll_folder)
+            print("coll folder list:\n", *[i + "\n" for i in cls.coll_folder_list], "\n")
 
-    def write_json_cfg(self):
-        data = {
-            i: getattr(self, i)
-            for i in list(JsonData().__dict__)
+    @classmethod
+    def write_config(cls):
+        new_data: dict = {
+            attr: getattr(cls, attr)
+            for attr in cls.get_data()
             }
 
-        data = dict(sorted(data.items()))
-
         try:
-            with open(JSON_FILE, "w", encoding="utf8") as file:
-                json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
-        except FileNotFoundError:
-            self.check_app_dirs()
-            with open(JSON_FILE, "w", encoding="utf8") as file:
-                json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
+            with open(JSON_FILE, 'w') as f:
+                json.dump(new_data, f, indent=4, ensure_ascii=False)
+            return True
+        
+        except Exception as e:
+            print(e)
+            return False
 
-    def set_language(self, lang_name: Literal["ru", "en"]):
+    @classmethod
+    def set_language(cls, lang_name: Literal["ru", "en"]):
         if lang_name == "ru":
-            self.user_lng = "ru"
-            self.lng = Rus()
+            cls.user_lng = "ru"
+            Dynamic.lng = Rus()
 
         elif lang_name == "en":
-            self.user_lng = "en"
-            self.lng = Eng()
+            cls.user_lng = "en"
+            Dynamic.lng = Eng()
 
         else:
             raise Exception("cfg > set_language wrong lang_name arg")
 
-    def check_app_dirs(self):
+    @classmethod
+    def check_app_dirs(cls):
+
         os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
 
         if not os.path.exists(path="db.db"):
@@ -209,34 +212,23 @@ class JsonData:
             quit()
 
         if not os.path.exists(path=JSON_FILE):
-            self.write_json_cfg()
+            cls.write_config()
 
         if not os.path.exists(path=DB_FILE):
             shutil.copyfile(src="db.db", dst=DB_FILE)
 
 
-class Dymanic:
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.current_photo_limit: int = LIMIT
-
-        self.date_start: datetime = None
-        self.date_end: datetime = None
-
-        self.search_widget_text: str = None
-        self.date_start_text: str = "1 january 1991" # datetime as readable text
-        self.date_end_text: str = "31 december 1991" # datetime as readable text
-
-        self.lng: Eng = Eng()
-
-        self.image_viewer: QMainWindow = None
-
-        self.copy_threads: list = []
+class Dynamic:
+    current_photo_limit: int = LIMIT
+    date_start: datetime = None
+    date_end: datetime = None
+    search_widget_text: str = None
+    date_start_text: str = "1 january 1991" # datetime as readable text
+    date_end_text: str = "31 december 1991" # datetime as readable text
+    lng: Eng = Eng()
+    image_viewer: QMainWindow = None
+    copy_threads: list = []
 
 
-
-cnf = Config()
-cnf.check_app_dirs()
-cnf.read_json_cfg()
-cnf.write_json_cfg()
+JsonData.check_app_dirs()
+JsonData.read_json_data()

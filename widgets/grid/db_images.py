@@ -4,7 +4,7 @@ from datetime import datetime
 
 import sqlalchemy
 
-from cfg import ALL_COLLS, cnf
+from cfg import ALL_COLLS, Dynamic, JsonData
 from database import Dbase, ThumbsMd
 from utils.main_utils import MainUtils
 
@@ -56,18 +56,18 @@ class DbImages:
         for img, src, modified, coll in res:
             modified = datetime.fromtimestamp(modified).date()
 
-            if cnf.date_start or cnf.date_end:
-                modified = f"{cnf.date_start_text} - {cnf.date_end_text}"
+            if Dynamic.date_start or Dynamic.date_end:
+                modified = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
             else:
-                modified = f"{cnf.lng.months[str(modified.month)]} {modified.year}"
+                modified = f"{Dynamic.lng.months[str(modified.month)]} {modified.year}"
 
             thumbs_dict[modified].append(DbImage(img, src, coll))
 
         return thumbs_dict
 
     def _stamp_dates(self) -> tuple[datetime, datetime]:
-        start = datetime.combine(cnf.date_start, datetime.min.time())
-        end = datetime.combine(cnf.date_end, datetime.max.time().replace(microsecond=0))
+        start = datetime.combine(Dynamic.date_start, datetime.min.time())
+        end = datetime.combine(Dynamic.date_end, datetime.max.time().replace(microsecond=0))
         return datetime.timestamp(start), datetime.timestamp(end)
 
     def _get_stmt(self):
@@ -78,23 +78,23 @@ class DbImages:
             ThumbsMd.collection
             )
 
-        if cnf.search_widget_text:
-            search = cnf.search_widget_text.replace("\n", "").strip()
+        if Dynamic.search_widget_text:
+            search = Dynamic.search_widget_text.replace("\n", "").strip()
             q = q.filter(ThumbsMd.src.like(f"%{search}%"))
 
-        if cnf.curr_coll != ALL_COLLS:
-            q = q.filter(ThumbsMd.collection == cnf.curr_coll)
+        if JsonData.curr_coll != ALL_COLLS:
+            q = q.filter(ThumbsMd.collection == JsonData.curr_coll)
 
         filters = [
             ThumbsMd.src.like(f"%/{true_name}/%") 
-            for code_name, true_name in cnf.cust_fltr_names.items()
-            if cnf.cust_fltr_vals[code_name]
+            for code_name, true_name in JsonData.cust_fltr_names.items()
+            if JsonData.cust_fltr_vals[code_name]
         ]
 
         other_filter = [
             ThumbsMd.src.not_like(f"%/{true_name}/%") 
-            for code_name, true_name in cnf.cust_fltr_names.items() 
-            if cnf.sys_fltr_vals["other"]
+            for code_name, true_name in JsonData.cust_fltr_names.items() 
+            if JsonData.sys_fltr_vals["other"]
             ]
 
         if all((filters, other_filter)):
@@ -106,11 +106,11 @@ class DbImages:
         elif other_filter:
             q = q.filter(sqlalchemy.and_(*other_filter))
 
-        if any((cnf.date_start, cnf.date_end)):
+        if any((Dynamic.date_start, Dynamic.date_end)):
             t = self._stamp_dates()
             q = q.filter(ThumbsMd.modified > t[0])
             q = q.filter(ThumbsMd.modified < t[1])
 
-        q = q.limit(cnf.current_photo_limit)
+        q = q.limit(Dynamic.current_photo_limit)
         q = q.order_by(-ThumbsMd.modified)
         return q

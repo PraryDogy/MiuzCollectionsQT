@@ -1,18 +1,18 @@
 import os
 from time import sleep
 
+import numpy as np
 import sqlalchemy
 from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
-from sqlalchemy import Connection
+from sqlalchemy import Connection, Delete, Insert, Update
 
-from cfg import PIXMAP_SIZE_MAX, IMG_EXT, PSD_TIFF, cnf
+from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import Dbase, ThumbsMd
 from signals import signals_app
 
 from .image_utils import ImageUtils
 from .main_utils import MainUtils
-import numpy as np
-from sqlalchemy import Insert, Delete, Update
+
 
 class ScanerUtils:
     can_scan = True
@@ -62,7 +62,7 @@ class Migrate:
     
         old_coll_folder = img_src.split(os.sep + coll_name + os.sep)[0]
 
-        if cnf.coll_folder == old_coll_folder:
+        if JsonData.coll_folder == old_coll_folder:
             return
                 
         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
@@ -72,7 +72,7 @@ class Migrate:
             return
 
         new_res = [
-            (res_id, src.replace(old_coll_folder, cnf.coll_folder))
+            (res_id, src.replace(old_coll_folder, JsonData.coll_folder))
             for res_id, src in res
             ]
         
@@ -93,7 +93,7 @@ class TrashRemover:
 
     def start(self):
 
-        coll_folder = os.sep + cnf.coll_folder.strip(os.sep) + os.sep
+        coll_folder = os.sep + JsonData.coll_folder.strip(os.sep) + os.sep
         conn = ScanerUtils.conn_get()
 
         q = (sqlalchemy.select(ThumbsMd.src).where(ThumbsMd.src.not_like(f"%{coll_folder}%")))
@@ -122,15 +122,15 @@ class FinderImages:
         finder_images: dict[str, ImageItem] = {}
 
         collections = [
-            os.path.join(cnf.coll_folder, i)
-            for i in os.listdir(cnf.coll_folder)
-            if os.path.isdir(os.path.join(cnf.coll_folder, i))
+            os.path.join(JsonData.coll_folder, i)
+            for i in os.listdir(JsonData.coll_folder)
+            if os.path.isdir(os.path.join(JsonData.coll_folder, i))
             and
-            i not in cnf.stop_colls
+            i not in JsonData.stop_colls
             ]
 
         if not collections:
-            collections = [cnf.coll_folder]
+            collections = [JsonData.coll_folder]
             step_value = 60
         else:
             step_value = round(60 / len(collections))
@@ -160,7 +160,7 @@ class FinderImages:
 
             for file in files:
 
-                if not os.path.exists(cnf.coll_folder):
+                if not os.path.exists(JsonData.coll_folder):
                     ScanerUtils.can_scan = False
                     return
 
@@ -422,7 +422,7 @@ class ScanerShedule(QObject):
     def finalize_scan(self):
         print("scaner finished")
         self.scaner_thread = None
-        self.wait_timer.start(cnf.scaner_minutes * 60 * 1000)
+        self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
 
         Dbase.vacuum()
         ScanerUtils.can_scan = True

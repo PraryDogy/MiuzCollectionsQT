@@ -3,7 +3,7 @@ from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
-from cfg import MENU_W, THUMB_MARGIN, THUMB_W, cnf
+from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData
 from signals import signals_app
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -22,8 +22,8 @@ class Thumbnails(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
-        self.resize(cnf.root_g["aw"] - MENU_W, cnf.root_g["ah"])
-        self.ww = cnf.root_g["aw"] - MENU_W
+        self.resize(JsonData.root_g["aw"] - MENU_W, JsonData.root_g["ah"])
+        self.ww = JsonData.root_g["aw"] - MENU_W
         self.horizontalScrollBar().setDisabled(True)
         self.setObjectName(Names.th_scrollbar)
         self.setStyleSheet(Themes.current)
@@ -97,7 +97,7 @@ class Thumbnails(QScrollArea):
             self.thumbnails_layout.addWidget(no_images)
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
-        if ln_thumbs == cnf.current_photo_limit:
+        if ln_thumbs == Dynamic.current_photo_limit:
             h_wid = QWidget()
             h_layout = LayoutH()
             h_wid.setLayout(h_layout)
@@ -204,7 +204,7 @@ class Thumbnails(QScrollArea):
             self.win_image_view.show()
 
     def get_columns(self):
-        return max(self.ww // (THUMB_W[cnf.curr_size_ind] + (THUMB_MARGIN)), 1)
+        return max(self.ww // (THUMB_W[JsonData.curr_size_ind] + (THUMB_MARGIN)), 1)
 
     def resize_(self):
         for grid_layout, widgets in self.current_widgets.items():

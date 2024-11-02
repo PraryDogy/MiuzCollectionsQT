@@ -10,10 +10,9 @@ import subprocess
 import sys
 from datetime import datetime
 
-import icnsutil
 from setuptools import setup
 
-from cfg import APP_NAME, APP_VER, cnf
+from cfg import APP_NAME, APP_VER
 
 # ****************** DON'T CHANGE IT ******************
 

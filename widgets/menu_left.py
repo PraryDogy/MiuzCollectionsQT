@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase, LayoutH, LayoutV
-from cfg import ALL_COLLS, LIMIT, MENU_W, cnf
+from cfg import ALL_COLLS, LIMIT, MENU_W, Dynamic, JsonData
 from database import Dbase, ThumbsMd
 from signals import signals_app
 from styles import Names, Themes
@@ -25,41 +25,41 @@ class CustomContext(ContextMenuBase):
         self.my_parent = parent
         self.true_name = true_name
 
-        view_coll = QAction(text=cnf.lng.view, parent=self)
+        view_coll = QAction(text=Dynamic.lng.view, parent=self)
         view_coll.triggered.connect(lambda e: self.show_collection())
         self.addAction(view_coll)
 
-        t = cnf.lng.detail_menu if cnf.small_menu_view else cnf.lng.compact_menu
+        t = Dynamic.lng.detail_menu if JsonData.small_menu_view else Dynamic.lng.compact_menu
         view = QAction(text=t, parent=self)
         view.triggered.connect(lambda e: self.change_view())
         self.addAction(view)
 
         self.addSeparator()
 
-        action_text = f"{cnf.lng.reveal} {cnf.lng.in_finder}"
+        action_text = f"{Dynamic.lng.reveal} {Dynamic.lng.in_finder}"
         reveal_menu = ContextSubMenuBase(parent=self, title=action_text)
         self.addMenu(reveal_menu)
 
-        base_coll = QAction(text=cnf.lng.collection, parent=self)
+        base_coll = QAction(text=Dynamic.lng.collection, parent=self)
         base_coll.triggered.connect(lambda e: self.reveal_collection())
         reveal_menu.addAction(base_coll)
 
         reveal_menu.addSeparator()
 
-        prod_coll = QAction(text=cnf.lng.cust_fltr_names["prod"], parent=self)
+        prod_coll = QAction(text=Dynamic.lng.cust_fltr_names["prod"], parent=self)
         prod_coll.triggered.connect(lambda e: self.reveal_collection("prod"))
         reveal_menu.addAction(prod_coll)
 
-        mod_coll = QAction(text=cnf.lng.cust_fltr_names["mod"], parent=self)
+        mod_coll = QAction(text=Dynamic.lng.cust_fltr_names["mod"], parent=self)
         mod_coll.triggered.connect(lambda e: self.reveal_collection("mod"))
         reveal_menu.addAction(mod_coll)
 
     def change_view(self):
-        cnf.small_menu_view = not cnf.small_menu_view
+        JsonData.small_menu_view = not JsonData.small_menu_view
         signals_app.reload_menu.emit()
 
     def show_collection(self):
-        cnf.curr_coll = self.true_name
+        JsonData.curr_coll = self.true_name
         signals_app.reload_title.emit()
         signals_app.reload_menu.emit()
         signals_app.reload_thumbnails.emit()
@@ -68,14 +68,14 @@ class CustomContext(ContextMenuBase):
         if MainUtils.smb_check():
 
             if self.true_name == ALL_COLLS:
-                if os.path.exists(cnf.coll_folder):
-                    subprocess.Popen(["open", cnf.coll_folder])
+                if os.path.exists(JsonData.coll_folder):
+                    subprocess.Popen(["open", JsonData.coll_folder])
                     return
 
-            coll_path = os.path.join(cnf.coll_folder, self.true_name)
+            coll_path = os.path.join(JsonData.coll_folder, self.true_name)
 
             if flag == "prod":
-                flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
+                flag_path = os.path.join(coll_path, JsonData.cust_fltr_names[flag])
                 if os.path.exists(flag_path):
                     subprocess.Popen(["open", flag_path])
                     return
@@ -85,7 +85,7 @@ class CustomContext(ContextMenuBase):
                     return
 
             if flag == "mod":
-                flag_path = os.path.join(coll_path, cnf.cust_fltr_names[flag])
+                flag_path = os.path.join(coll_path, JsonData.cust_fltr_names[flag])
                 if os.path.exists(flag_path):
                     subprocess.Popen(["open", flag_path])
                     return
@@ -112,7 +112,7 @@ class CollectionBtn(QLabel):
         btn_w = MENU_W - 20 - 5
         self.setFixedSize(btn_w, 28)
 
-        if true_name == cnf.curr_coll:
+        if true_name == JsonData.curr_coll:
             self.setObjectName(Names.menu_btn_selected)
         else:
             self.setObjectName(Names.menu_btn)
@@ -125,8 +125,8 @@ class CollectionBtn(QLabel):
         return super().mouseReleaseEvent(ev)
 
     def load_collection(self):
-        cnf.curr_coll = self.true_name
-        cnf.current_photo_limit = LIMIT
+        JsonData.curr_coll = self.true_name
+        Dynamic.current_photo_limit = LIMIT
         signals_app.reload_title.emit()
         signals_app.scroll_top.emit()
         signals_app.reload_menu.emit()
@@ -162,7 +162,7 @@ class CollectionBtn(QLabel):
 
     def enterEvent(self, a0: QEvent | None) -> None:
         if self.true_name != ALL_COLLS:
-            self.setToolTip(f"{cnf.lng.collection}: {self.true_name}")
+            self.setToolTip(f"{Dynamic.lng.collection}: {self.true_name}")
         return super().enterEvent(a0)
 
 
@@ -191,13 +191,13 @@ class BaseLeftMenu(QScrollArea):
 
         main_btns_layout.setContentsMargins(0, 5, 0, 15)
 
-        label = CollectionBtn(parent=self, fake_name=cnf.lng.all_colls,
+        label = CollectionBtn(parent=self, fake_name=Dynamic.lng.all_colls,
                               true_name=ALL_COLLS)
         main_btns_layout.addWidget(label)
 
         self.v_layout.addWidget(btns_widget)
 
-        if cnf.small_menu_view:
+        if JsonData.small_menu_view:
             for letter, collections in self.load_colls_query().items():
                 for coll in collections:
                     label = CollectionBtn(parent=self, fake_name=coll["fake_name"], true_name=coll["true_name"])
@@ -219,7 +219,7 @@ class BaseLeftMenu(QScrollArea):
         self.v_layout.addStretch(1)
 
     def change_view(self):
-        cnf.small_menu_view = not cnf.small_menu_view
+        JsonData.small_menu_view = not JsonData.small_menu_view
         signals_app.reload_menu.emit()
 
     def load_colls_query(self) -> dict:

@@ -5,7 +5,8 @@ from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutV
-from cfg import PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, cnf, THUMB_W
+from cfg import (PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic,
+                 JsonData)
 from signals import signals_app
 from styles import Names, Themes
 from utils.image_utils import ImageUtils
@@ -21,7 +22,7 @@ class NameLabel(QLabel):
         self.coll = coll
 
     def set_text(self):
-        max_row = TEXT_LENGTH[cnf.curr_size_ind]
+        max_row = TEXT_LENGTH[JsonData.curr_size_ind]
 
         if len(self.name) >= max_row:
             name = f"{self.name[:max_row - 10]}...{self.name[-7:]}"
@@ -57,8 +58,8 @@ class Thumbnail(QFrame):
         self.name = os.path.basename(src)
 
         self.setToolTip(
-            f"{cnf.lng.collection}: {self.coll}\n"
-            f"{cnf.lng.file_name}: {self.name}"
+            f"{Dynamic.lng.collection}: {self.coll}\n"
+            f"{Dynamic.lng.file_name}: {self.name}"
             )  
         
         self.row, self.col = 0, 0
@@ -82,15 +83,15 @@ class Thumbnail(QFrame):
 
     def setup(self):
         name_label_h = 32
-        thumb_h = PIXMAP_SIZE[cnf.curr_size_ind] + name_label_h + THUMB_MARGIN + self.spacing
-        thumb_w = THUMB_W[cnf.curr_size_ind] + THUMB_MARGIN
+        thumb_h = PIXMAP_SIZE[JsonData.curr_size_ind] + name_label_h + THUMB_MARGIN + self.spacing
+        thumb_w = THUMB_W[JsonData.curr_size_ind] + THUMB_MARGIN
 
-        self.img_label.setFixedHeight(PIXMAP_SIZE[cnf.curr_size_ind])
+        self.img_label.setFixedHeight(PIXMAP_SIZE[JsonData.curr_size_ind])
         self.name_label.setFixedHeight(name_label_h)
 
         self.setFixedSize(thumb_w, thumb_h)
 
-        pixmap = ImageUtils.pixmap_scale(self.img, PIXMAP_SIZE[cnf.curr_size_ind])
+        pixmap = ImageUtils.pixmap_scale(self.img, PIXMAP_SIZE[JsonData.curr_size_ind])
         self.img_label.setPixmap(pixmap)
 
         self.name_label.set_text()

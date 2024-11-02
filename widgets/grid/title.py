@@ -1,17 +1,17 @@
 import os
 
-from .db_images import DbImage
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 
 from base_widgets import ContextMenuBase
-from cfg import PSD_TIFF, cnf
+from cfg import PSD_TIFF, Dynamic, JsonData
 from signals import signals_app
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
 from utils.main_utils import MainUtils
 
 from ..win_smb import WinSmb
+from .db_images import DbImage
 
 
 class Shared:
@@ -25,21 +25,21 @@ class CustomContext(ContextMenuBase):
         self.my_parent = parent
         self.files_list = files_list
 
-        save_jpg = QAction(text=cnf.lng.save_all_JPG, parent=self)
+        save_jpg = QAction(text=Dynamic.lng.save_all_JPG, parent=self)
         save_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=False))
         self.addAction(save_jpg)
 
-        save_layers = QAction(text=cnf.lng.save_all_layers, parent=self)
+        save_layers = QAction(text=Dynamic.lng.save_all_layers, parent=self)
         save_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=False))
         self.addAction(save_layers)
 
         self.addSeparator()
 
-        save_as_jpg = QAction(text=cnf.lng.save_all_JPG_as, parent=self)
+        save_as_jpg = QAction(text=Dynamic.lng.save_all_JPG_as, parent=self)
         save_as_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=True))
         self.addAction(save_as_jpg)
 
-        save_as_layers = QAction(text=cnf.lng.save_all_layers_as, parent=self)
+        save_as_layers = QAction(text=Dynamic.lng.save_all_layers_as, parent=self)
         save_as_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=True))
         self.addAction(save_as_layers)
 
@@ -62,7 +62,7 @@ class CustomContext(ContextMenuBase):
                     return
 
             else:
-                dest = cnf.down_folder
+                dest = JsonData.down_folder
             
             self.copy_files_cmd(dest, images)
 
@@ -74,7 +74,7 @@ class CustomContext(ContextMenuBase):
         files = [i for i in files if os.path.exists(i)]
 
         if len(files) == 0:
-            MainUtils.send_notification(cnf.lng.no_file)
+            MainUtils.send_notification(Dynamic.lng.no_file)
             return
 
         copy_task = ThreadCopyFiles(dest=dest, files=files)
@@ -84,7 +84,7 @@ class CustomContext(ContextMenuBase):
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = MainUtils.reveal_files(files)
-        if len(cnf.copy_threads) == 0:
+        if len(Dynamic.copy_threads) == 0:
             signals_app.hide_downloads.emit()
         try:
             copy_task.remove_threads()                
@@ -94,7 +94,7 @@ class CustomContext(ContextMenuBase):
 
 class Title(QLabel):
     def __init__(self, title: str, db_images: list, width: int):
-        super().__init__(f"{title}. {cnf.lng.total}: {len(db_images)}")
+        super().__init__(f"{title}. {Dynamic.lng.total}: {len(db_images)}")
         self.images = db_images
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)

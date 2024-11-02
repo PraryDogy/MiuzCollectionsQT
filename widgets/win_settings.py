@@ -10,8 +10,7 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 
 from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
-from cfg import APP_SUPPORT_DIR, DB_FILE, cnf
-from database import Dbase
+from cfg import APP_SUPPORT_DIR, DB_FILE, Dynamic, JsonData
 from signals import signals_app
 from utils.main_utils import MainUtils
 from utils.updater import Updater
@@ -27,13 +26,13 @@ class BrowseColl(QWidget):
         layout_h = LayoutH()
         self.setLayout(layout_h)
 
-        self.browse_btn = Btn(cnf.lng.browse)
+        self.browse_btn = Btn(Dynamic.lng.browse)
         self.browse_btn.mouseReleaseEvent = self.choose_folder
         layout_h.addWidget(self.browse_btn)
 
         layout_h.addSpacerItem(QSpacerItem(10, 0))
 
-        self.coll_path_label = QLabel(self.cut_text(cnf.coll_folder))
+        self.coll_path_label = QLabel(self.cut_text(JsonData.coll_folder))
         self.coll_path_label.setWordWrap(True)
         self.coll_path_label.setFixedHeight(35)
         layout_h.addWidget(self.coll_path_label)
@@ -45,11 +44,11 @@ class BrowseColl(QWidget):
         if self.new_coll_path:
             file_dialog.setDirectory(self.new_coll_path)
 
-        elif not os.path.exists(cnf.coll_folder):
-            file_dialog.setDirectory(cnf.down_folder)
+        elif not os.path.exists(JsonData.coll_folder):
+            file_dialog.setDirectory(JsonData.down_folder)
 
         else:
-            file_dialog.setDirectory(cnf.coll_folder)
+            file_dialog.setDirectory(JsonData.coll_folder)
 
         selected_folder = file_dialog.getExistingDirectory()
 
@@ -72,7 +71,7 @@ class CollFolderListInput(CustomTextEdit):
         h_bar = self.horizontalScrollBar()
         h_bar.setFixedHeight(0)
 
-        text = "\n".join(cnf.coll_folder_list)
+        text = "\n".join(JsonData.coll_folder_list)
         self.setText(text)
 
     def get_text(self):
@@ -93,7 +92,7 @@ class ChangeLang(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.lang = cnf.user_lng
+        self.lang = JsonData.user_lng
 
         layout_h = LayoutH()
         self.setLayout(layout_h)
@@ -104,7 +103,7 @@ class ChangeLang(QWidget):
 
         layout_h.addSpacerItem(QSpacerItem(10, 0))
 
-        self.lang_label = QLabel(cnf.lng.lang_label)
+        self.lang_label = QLabel(Dynamic.lng.lang_label)
         layout_h.addWidget(self.lang_label)
 
     def get_lng_text(self):
@@ -121,9 +120,9 @@ class ChangeLang(QWidget):
         self.pressed.emit()
 
     def finalize(self):
-        if self.lang != cnf.user_lng:
+        if self.lang != JsonData.user_lng:
 
-            cnf.set_language(self.lang)
+            JsonData.set_language(self.lang)
 
             signals_app.reload_menu.emit()
             signals_app.reload_stbar.emit()
@@ -146,13 +145,13 @@ class CustFilters(QWidget):
         left_wid.setLayout(self.v_left)
         layout_h.addWidget(left_wid)
 
-        self.prod_label = QLabel(cnf.lng.cust_fltr_names["prod"])
+        self.prod_label = QLabel(Dynamic.lng.cust_fltr_names["prod"])
         self.v_left.addWidget(self.prod_label)
 
         self.v_left.addSpacerItem(QSpacerItem(0, 10))
 
         self.prod_input = InputBase()
-        self.prod_input.insert(cnf.cust_fltr_names["prod"])
+        self.prod_input.insert(JsonData.cust_fltr_names["prod"])
         self.v_left.addWidget(self.prod_input)
 
         layout_h.addSpacerItem(QSpacerItem(10, 0))
@@ -162,13 +161,13 @@ class CustFilters(QWidget):
         r_wid.setLayout(self.v_right)
         layout_h.addWidget(r_wid)
 
-        self.mod_label = QLabel(cnf.lng.cust_fltr_names["mod"])
+        self.mod_label = QLabel(Dynamic.lng.cust_fltr_names["mod"])
         self.v_right.addWidget(self.mod_label)
 
         self.v_right.addSpacerItem(QSpacerItem(0, 10))
 
         self.mod_input = InputBase()
-        self.mod_input.insert(cnf.cust_fltr_names["mod"])
+        self.mod_input.insert(JsonData.cust_fltr_names["mod"])
         self.v_right.addWidget(self.mod_input)
 
     def get_inputs(self) -> dict:
@@ -185,13 +184,13 @@ class StopWords(QWidget):
         layout_v = LayoutV()
         self.setLayout(layout_v)
 
-        self.label = QLabel(cnf.lng.sett_stopwords)
+        self.label = QLabel(Dynamic.lng.sett_stopwords)
         layout_v.addWidget(self.label)
 
         layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.input = InputBase()
-        self.input.insert(", ".join(cnf.stop_words))
+        self.input.insert(", ".join(JsonData.stop_words))
         layout_v.addWidget(self.input)
 
     def get_stopwords(self):
@@ -206,13 +205,13 @@ class StopColls(QWidget):
         layout_v = LayoutV()
         self.setLayout(layout_v)
 
-        self.label = QLabel(cnf.lng.sett_stopcolls)
+        self.label = QLabel(Dynamic.lng.sett_stopcolls)
         layout_v.addWidget(self.label)
 
         layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.input = InputBase()
-        self.input.insert(", ".join(cnf.stop_colls))
+        self.input.insert(", ".join(JsonData.stop_colls))
         layout_v.addWidget(self.input)
 
     def get_stopcolls(self):
@@ -227,29 +226,29 @@ class UpdaterWidget(QWidget):
         self.v_layout = LayoutV()
         self.setLayout(self.v_layout)
 
-        self.btn = Btn(cnf.lng.download_update)
+        self.btn = Btn(Dynamic.lng.download_update)
         self.btn.setFixedWidth(150)
         self.btn.mouseReleaseEvent = self.update_btn_cmd
         self.v_layout.addWidget(self.btn)
 
     def update_btn_cmd(self, e):
         self.task = Updater()
-        self.btn.setText(cnf.lng.wait_update)
+        self.btn.setText(Dynamic.lng.wait_update)
         self.task.no_connection.connect(self.no_connection_win)
         self.task.finished.connect(self.finalize)
         self.task.start()
 
     def finalize(self):
-        self.btn.setText(cnf.lng.download_update)
+        self.btn.setText(Dynamic.lng.download_update)
 
     def no_connection_win(self):
-        QTimer.singleShot(1000, lambda: self.btn.setText(cnf.lng.download_update))
-        self.smb_win = WinSmb(parent=self, text=cnf.lng.connect_sb06)
+        QTimer.singleShot(1000, lambda: self.btn.setText(Dynamic.lng.download_update))
+        self.smb_win = WinSmb(parent=self, text=Dynamic.lng.connect_sb06)
         self.smb_win.show()
 
     def no_connection_btn_style(self):
-        self.btn.setText(cnf.lng.no_connection)
-        QTimer.singleShot(1500, lambda: self.btn.setText(cnf.lng.download_update))
+        self.btn.setText(Dynamic.lng.no_connection)
+        QTimer.singleShot(1500, lambda: self.btn.setText(Dynamic.lng.download_update))
 
 
 class ShowFiles(QWidget):
@@ -259,7 +258,7 @@ class ShowFiles(QWidget):
         self.v_layout = LayoutV()
         self.setLayout(self.v_layout)
 
-        self.btn = Btn(cnf.lng.show_app_support)
+        self.btn = Btn(Dynamic.lng.show_app_support)
         self.btn.setFixedWidth(150)
         self.btn.mouseReleaseEvent = self.btn_cmd
         self.v_layout.addWidget(self.btn)
@@ -277,7 +276,7 @@ class WinSettings(WinStandartBase):
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min()
         self.disable_max()
-        self.set_title(cnf.lng.settings)
+        self.set_title(Dynamic.lng.settings)
 
         QTimer.singleShot(10, self.init_ui)
         self.setFixedSize(420, 550)
@@ -306,7 +305,7 @@ class WinSettings(WinStandartBase):
         show_files = ShowFiles()
         h_layout.addWidget(show_files)
 
-        self.restore_db_btn = Btn(cnf.lng.restore_db)
+        self.restore_db_btn = Btn(Dynamic.lng.restore_db)
         self.restore_db_btn.setFixedWidth(150)
         self.content_layout.addWidget(self.restore_db_btn)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
@@ -324,7 +323,7 @@ class WinSettings(WinStandartBase):
         self.content_layout.addWidget(self.stopcolls)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
-        coll_folder_list_label = QLabel(text=cnf.lng.where_to_look_coll_folder)
+        coll_folder_list_label = QLabel(text=Dynamic.lng.where_to_look_coll_folder)
         self.content_layout.addWidget(coll_folder_list_label)
         self.content_layout.addSpacerItem(QSpacerItem(0, 10))
 
@@ -341,13 +340,13 @@ class WinSettings(WinStandartBase):
 
         btns_layout.addStretch(1)
 
-        self.ok_btn = Btn(cnf.lng.ok)
+        self.ok_btn = Btn(Dynamic.lng.ok)
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
         btns_layout.addWidget(self.ok_btn)
 
         btns_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.cancel_btn = Btn(cnf.lng.cancel)
+        self.cancel_btn = Btn(Dynamic.lng.cancel)
         self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
         btns_layout.addWidget(self.cancel_btn)
 
@@ -355,7 +354,7 @@ class WinSettings(WinStandartBase):
 
     def restore_db_cmd(self, e):
         setattr(self, "restore_flag", True)
-        self.restore_db_btn.setText(cnf.lng.press_ok)
+        self.restore_db_btn.setText(Dynamic.lng.press_ok)
         self.restore_db_btn.setDisabled(True)
 
     def reload_ui(self):
@@ -369,7 +368,7 @@ class WinSettings(WinStandartBase):
         scan_again = False
 
         coll_folder_list = self.coll_folder_list_input.get_text()
-        cnf.coll_folder_list = coll_folder_list
+        JsonData.coll_folder_list = coll_folder_list
 
         if hasattr(self, "restore_flag"):
             # Dbase.clear_all_engines()
@@ -384,15 +383,15 @@ class WinSettings(WinStandartBase):
             # gui_signals_app.reload_thumbnails.emit()
             # scan_again = True
 
-        if self.stopcolls.get_stopcolls() != cnf.stop_colls:
-            cnf.stop_colls = self.stopcolls.get_stopcolls()
+        if self.stopcolls.get_stopcolls() != JsonData.stop_colls:
+            JsonData.stop_colls = self.stopcolls.get_stopcolls()
             scan_again = True
 
         if scan_again:
             signals_app.scaner_stop.emit()
             signals_app.scaner_start.emit()
 
-        cnf.write_json_cfg()
+        JsonData.write_config()
         self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

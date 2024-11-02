@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QLabel, QScrollArea, QSpacerItem, QWidget
 
 from base_widgets import (CustomProgressBar, LayoutH, LayoutV, SvgBtn,
                           WinStandartBase)
-from cfg import cnf
+from cfg import JsonData, Dynamic
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
@@ -43,7 +43,7 @@ class Progresser(QWidget):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.close_btn = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_close.svg"), size=15)
+        self.close_btn = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_close.svg"), size=15)
         self.close_btn.mouseReleaseEvent = self.close_cmd
         h_layout.addWidget(self.close_btn)
 
@@ -61,7 +61,7 @@ class DownloadsWin(WinStandartBase):
         super().__init__(close_func=self.my_close)
         self.copy_threads: list = []
 
-        self.set_title(cnf.lng.title_downloads)
+        self.set_title(Dynamic.lng.title_downloads)
         self.disable_min()
         self.disable_max()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -97,7 +97,7 @@ class DownloadsWin(WinStandartBase):
 
     def add_progress_widgets(self):
         try:
-            for copy_task in cnf.copy_threads:
+            for copy_task in Dynamic.copy_threads:
 
                 if copy_task not in self.copy_threads and copy_task.isRunning():
                     t = self.cut_text(copy_task.get_current_file())
@@ -146,7 +146,7 @@ class DownloadsWin(WinStandartBase):
 
     def cut_text(self, text: str):
         name, ext = os.path.splitext(text)
-        name = f"{cnf.lng.copying} {name}"
+        name = f"{Dynamic.lng.copying} {name}"
         max_row = 27
 
         if len(name) >= max_row:

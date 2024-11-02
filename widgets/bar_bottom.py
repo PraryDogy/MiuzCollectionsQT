@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QLabel, QSlider,
                              QSpacerItem, QWidget)
 
 from base_widgets import CustomProgressBar, LayoutH, SvgBtn
-from cfg import cnf
+from cfg import JsonData
 from signals import signals_app
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -88,18 +88,18 @@ class CustomSlider(BaseSlider):
     def __init__(self):
         super().__init__(orientation=Qt.Orientation.Horizontal, minimum=0, maximum=3)
         self.setFixedWidth(80)
-        self.setValue(cnf.curr_size_ind)
+        self.setValue(JsonData.curr_size_ind)
         self.valueChanged.connect(self.change_size)
         signals_app.move_slider.connect(self.move_slider_cmd)
     
     def move_slider_cmd(self, value: int):
         self.setValue(value)
-        cnf.curr_size_ind = value
+        JsonData.curr_size_ind = value
         signals_app.resize_grid.emit()
 
     def change_size(self, value: int):
         self.setValue(value)
-        cnf.curr_size_ind = value
+        JsonData.curr_size_ind = value
         signals_app.resize_grid.emit()
 
 
@@ -125,17 +125,17 @@ class BarBottom(QFrame):
         self.progress_bar.setFixedWidth(120)
         self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignRight)
 
-        self.downloads = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_downloads.svg") , size=20)
+        self.downloads = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_downloads.svg") , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
         signals_app.hide_downloads.connect(self.downloads.hide)
         signals_app.show_downloads.connect(self.downloads.show)
         self.h_layout.addWidget(self.downloads, alignment=Qt.AlignmentFlag.AlignRight)
 
-        self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_switch.svg"), size=20)
+        self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_switch.svg"), size=20)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
         self.h_layout.addWidget(self.switch_theme, alignment=Qt.AlignmentFlag.AlignRight)
 
-        self.sett_widget = SvgBtn(icon_path=os.path.join("images", f"{cnf.theme}_settings.svg"), size=20)
+        self.sett_widget = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_settings.svg"), size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget, alignment=Qt.AlignmentFlag.AlignRight)
 
@@ -162,22 +162,22 @@ class BarBottom(QFrame):
             if widget.objectName()
             ]
                 
-        if cnf.theme == "dark_theme":
+        if JsonData.theme == "dark_theme":
             Themes.set_theme("light_theme")
-            cnf.theme = "light_theme"
+            JsonData.theme = "light_theme"
 
         else:
             Themes.set_theme("dark_theme")
-            cnf.theme = "dark_theme"
+            JsonData.theme = "dark_theme"
 
         for i in widgets:
             i.setStyleSheet(Themes.current)
 
-        self.sett_widget.set_icon(os.path.join("images", f"{cnf.theme}_settings.svg"))
-        self.downloads.set_icon(os.path.join("images", f"{cnf.theme}_downloads.svg"))
-        self.switch_theme.set_icon(os.path.join("images", f"{cnf.theme}_switch.svg"))
+        self.sett_widget.set_icon(os.path.join("images", f"{JsonData.theme}_settings.svg"))
+        self.downloads.set_icon(os.path.join("images", f"{JsonData.theme}_downloads.svg"))
+        self.switch_theme.set_icon(os.path.join("images", f"{JsonData.theme}_switch.svg"))
 
-        cnf.write_json_cfg()
+        JsonData.write_config()
 
     def open_downloads(self, e):
         self.downloads_win = DownloadsWin(parent=self)
@@ -189,7 +189,7 @@ class BarBottom(QFrame):
         self.settings.show()
 
     def switch_view_cmd(self, e):
-        cnf.small_view = not cnf.small_view
+        JsonData.small_view = not JsonData.small_view
         signals_app.reload_thumbnails.emit()
         self.switch_view.switch_icon()
-        cnf.write_json_cfg()
+        JsonData.write_config()
