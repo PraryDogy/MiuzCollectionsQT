@@ -1,11 +1,9 @@
-from collections import defaultdict
-
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
-from cfg import THUMB_MARGIN, THUMB_W, cnf
+from cfg import MENU_W, THUMB_MARGIN, THUMB_W, cnf
 from signals import signals_app
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -24,8 +22,8 @@ class Thumbnails(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
-        self.resize(cnf.root_g["aw"] - cnf.MENU_W, cnf.root_g["ah"])
-        self.ww = cnf.root_g["aw"] - cnf.MENU_W
+        self.resize(cnf.root_g["aw"] - MENU_W, cnf.root_g["ah"])
+        self.ww = cnf.root_g["aw"] - MENU_W
         self.horizontalScrollBar().setDisabled(True)
         self.setObjectName(Names.th_scrollbar)
         self.setStyleSheet(Themes.current)

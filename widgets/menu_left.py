@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase, LayoutH, LayoutV
-from cfg import cnf
+from cfg import ALL_COLLS, LIMIT, MENU_W, cnf
 from database import Dbase, ThumbsMd
 from signals import signals_app
 from styles import Names, Themes
@@ -67,7 +67,7 @@ class CustomContext(ContextMenuBase):
     def reveal_collection(self, flag: str = None):
         if MainUtils.smb_check():
 
-            if self.true_name == cnf.ALL_COLLS:
+            if self.true_name == ALL_COLLS:
                 if os.path.exists(cnf.coll_folder):
                     subprocess.Popen(["open", cnf.coll_folder])
                     return
@@ -109,7 +109,7 @@ class CollectionBtn(QLabel):
         self.true_name = true_name
         self.fake_name = fake_name
 
-        btn_w = cnf.MENU_W - 20 - 5
+        btn_w = MENU_W - 20 - 5
         self.setFixedSize(btn_w, 28)
 
         if true_name == cnf.curr_coll:
@@ -126,7 +126,7 @@ class CollectionBtn(QLabel):
 
     def load_collection(self):
         cnf.curr_coll = self.true_name
-        cnf.current_photo_limit = cnf.LIMIT
+        cnf.current_photo_limit = LIMIT
         signals_app.reload_title.emit()
         signals_app.scroll_top.emit()
         signals_app.reload_menu.emit()
@@ -161,7 +161,7 @@ class CollectionBtn(QLabel):
             MainUtils.print_err(parent=self, error=e)
 
     def enterEvent(self, a0: QEvent | None) -> None:
-        if self.true_name != cnf.ALL_COLLS:
+        if self.true_name != ALL_COLLS:
             self.setToolTip(f"{cnf.lng.collection}: {self.true_name}")
         return super().enterEvent(a0)
 
@@ -192,7 +192,7 @@ class BaseLeftMenu(QScrollArea):
         main_btns_layout.setContentsMargins(0, 5, 0, 15)
 
         label = CollectionBtn(parent=self, fake_name=cnf.lng.all_colls,
-                              true_name=cnf.ALL_COLLS)
+                              true_name=ALL_COLLS)
         main_btns_layout.addWidget(label)
 
         self.v_layout.addWidget(btns_widget)
@@ -252,7 +252,7 @@ class BaseLeftMenu(QScrollArea):
 class MenuLeft(QFrame):
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(cnf.MENU_W)
+        self.setFixedWidth(MENU_W)
 
         h_lay = LayoutH()
         self.setLayout(h_lay)

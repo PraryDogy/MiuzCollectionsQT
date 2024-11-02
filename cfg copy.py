@@ -9,43 +9,24 @@ from PyQt5.QtWidgets import QMainWindow
 
 from lang import Eng, Rus
 
-APP_NAME: str = "MiuzCollections"
-APP_VER = "5.6.0"
-
-APP_SUPPORT_DIR: str = os.path.join(
-    os.path.expanduser("~"),
-    "Library",
-    "Application Support",
-    APP_NAME + "QT"
-    )
-
-JSON_FILE: str = os.path.join(
-    APP_SUPPORT_DIR,
-    "cfg.json"
-    )
-
-DB_FILE: str = os.path.join(
-    APP_SUPPORT_DIR,
-    "db.db"
-    )
-
 _IMG_EXT: tuple = (
     ".jpg", ".jpeg", ".jfif",
     ".tif", ".tiff",
     ".psd", ".psb",
     ".png",
     )
-
 IMG_EXT: tuple = tuple(
     upper_ext
     for ext in _IMG_EXT
     for upper_ext in (ext, ext.upper())
     )
-
 PSD_TIFF: tuple = (
     ".psd", ".psb", ".tiff", ".tif",
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
+
+GRAY = "rgba(111, 111, 111, 0.5)"
+BLUE = "rgba(0, 122, 255, 1)"
 
 DB_SIZE = 200
 PIXMAP_SIZE: list = [90, 130, 170, DB_SIZE]
@@ -55,11 +36,6 @@ TEXT_LENGTH: list = [17, 20, 26, 31]
 
 LIMIT: int = 150
 ALL_COLLS: str = "miuzcollections_all"
-MENU_W: int = 210
-
-GRAY = "rgba(111, 111, 111, 0.5)"
-BLUE = "rgba(0, 122, 255, 1)"
-
 
 class Thumbnail(QObject):
     def __init__(self):
@@ -145,12 +121,18 @@ class User:
             '/Volumes/Shares-3/Collections'
             ]
 
+class Static:
+    def __init__(self):
+        super().__init__()
+
+        self.ALL_COLLS: str = "miuzcollections_all"
+        self.MENU_W: int = 210
 
 class Dymanic:
     def __init__(self) -> None:
         super().__init__()
 
-        self.current_photo_limit: int = LIMIT
+        self.current_photo_limit: int = self.LIMIT
 
         self.date_start: datetime = None
         self.date_end: datetime = None
@@ -166,12 +148,33 @@ class Dymanic:
 
         self.copy_threads: list = []
 
+class AppInfo:
+    def __init__(self):
+        super().__init__()
+        self.app_name: str = "MiuzCollections"
 
-class Config(User, Dymanic):
+
+class Config(User, Dymanic, Static, AppInfo):
     def __init__(self):
         super().__init__()
 
+        self.app_support_app_dir: str = os.path.join(
+            os.path.expanduser("~"),
+            "Library",
+            "Application Support",
+            f"{self.app_name}QT"
+            )
 
+        self.json_file: str = os.path.join(
+            self.app_support_app_dir,
+            "cfg.json"
+            )
+
+        self.db_file: str = os.path.join(
+            self.app_support_app_dir,
+            "db.db"
+            )
+        
     def update_json(self, data: dict):        
         data["scaner_minutes"] = 5
 
@@ -186,10 +189,10 @@ class Config(User, Dymanic):
         return data
 
     def read_json_cfg(self):
-        with open(JSON_FILE, "r", encoding="utf8") as file:
+        with open(self.json_file, "r", encoding="utf8") as file:
             data: dict = json.load(file)
 
-        if "app_ver" not in data or APP_VER != data["app_ver"]:
+        if "app_ver" not in data or self.app_ver != data["app_ver"]:
             data = self.update_json(data)
         
         for k, v in data.items():
@@ -219,11 +222,11 @@ class Config(User, Dymanic):
         data = dict(sorted(data.items()))
 
         try:
-            with open(JSON_FILE, "w", encoding="utf8") as file:
+            with open(self.json_file, "w", encoding="utf8") as file:
                 json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
         except FileNotFoundError:
             self.check_app_dirs()
-            with open(JSON_FILE, "w", encoding="utf8") as file:
+            with open(self.json_file, "w", encoding="utf8") as file:
                 json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
 
     def set_language(self, lang_name: Literal["ru", "en"]):
@@ -239,7 +242,7 @@ class Config(User, Dymanic):
             raise Exception("cfg > set_language wrong lang_name arg")
 
     def check_app_dirs(self):
-        os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
+        os.makedirs(name=self.app_support_app_dir, exist_ok=True)
 
         if not os.path.exists(path="db.db"):
             print("please, download db.db.zip from")
@@ -247,11 +250,11 @@ class Config(User, Dymanic):
             print("extract and move to project root directory")
             quit()
 
-        if not os.path.exists(path=JSON_FILE):
+        if not os.path.exists(path=self.json_file):
             self.write_json_cfg()
 
-        if not os.path.exists(path=DB_FILE):
-            shutil.copyfile(src="db.db", dst=DB_FILE)
+        if not os.path.exists(path=self.db_file):
+            shutil.copyfile(src="db.db", dst=self.db_file)
 
 cnf = Config()
 cnf.check_app_dirs()

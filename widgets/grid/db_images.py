@@ -4,7 +4,7 @@ from datetime import datetime
 
 import sqlalchemy
 
-from cfg import cnf
+from cfg import ALL_COLLS, cnf
 from database import Dbase, ThumbsMd
 from utils.main_utils import MainUtils
 
@@ -82,7 +82,7 @@ class DbImages:
             search = cnf.search_widget_text.replace("\n", "").strip()
             q = q.filter(ThumbsMd.src.like(f"%{search}%"))
 
-        if cnf.curr_coll != cnf.ALL_COLLS:
+        if cnf.curr_coll != ALL_COLLS:
             q = q.filter(ThumbsMd.collection == cnf.curr_coll)
 
         filters = [

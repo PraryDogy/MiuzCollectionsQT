@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV
-from cfg import cnf
+from cfg import ALL_COLLS, LIMIT, cnf
 from signals import signals_app
 from styles import Names, Themes
 
@@ -20,7 +20,7 @@ class ResetDatesBtn(QLabel):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.date_start, cnf.date_end = None, None
-        cnf.current_photo_limit = cnf.LIMIT
+        cnf.current_photo_limit = LIMIT
 
         signals_app.set_dates_btn_normal.emit()
         signals_app.reload_thumbnails.emit()
@@ -37,7 +37,7 @@ class ResetSearchBtn(QLabel):
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.current_photo_limit = cnf.LIMIT
+        cnf.current_photo_limit = LIMIT
 
         signals_app.clear_search.emit()
         signals_app.reload_thumbnails.emit()
@@ -54,7 +54,7 @@ class ResetFiltersBtn(QLabel):
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        cnf.current_photo_limit = cnf.LIMIT
+        cnf.current_photo_limit = LIMIT
 
         signals_app.disable_filters.emit()
         signals_app.reload_thumbnails.emit()
@@ -72,8 +72,8 @@ class ShowAllBtn(QLabel):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         cnf.date_start, cnf.date_end = None, None
-        cnf.curr_coll = cnf.ALL_COLLS
-        cnf.current_photo_limit = cnf.LIMIT
+        cnf.curr_coll = ALL_COLLS
+        cnf.current_photo_limit = LIMIT
 
         signals_app.clear_search.emit()
         signals_app.disable_filters.emit()

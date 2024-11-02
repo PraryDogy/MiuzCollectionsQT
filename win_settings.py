@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 
 from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
-from cfg import APP_SUPPORT_DIR, cnf
+from cfg import cnf
 from database import Dbase
 from signals import signals_app
 from utils.main_utils import MainUtils
@@ -266,7 +266,7 @@ class ShowFiles(QWidget):
 
     def btn_cmd(self, e):
         try:
-            subprocess.Popen(["open", APP_SUPPORT_DIR])
+            subprocess.Popen(["open", cnf.APP_SUPPORT_DIR])
         except Exception as e:
             print(e)
 

@@ -6,7 +6,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
 from base_widgets import ContextMenuBase, WinSmallBase
-from cfg import cnf
+from cfg import APP_NAME, cnf
 from signals import signals_app
 from utils.main_utils import MainUtils
 
@@ -55,7 +55,7 @@ class AboutWin(WinSmallBase):
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.disable_min()
         self.disable_max()
-        self.set_title(cnf.app_name)
+        self.set_title(APP_NAME)
         self.setFixedSize(280, 240)
 
         icon = QSvgWidget(os.path.join("icon", "icon.svg"))

@@ -9,11 +9,11 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
                              QVBoxLayout)
 
 from base_widgets import LayoutH, LayoutV, WinBase
-from cfg import cnf
+from cfg import ALL_COLLS, cnf, APP_NAME
 from signals import signals_app
 from styles import Names, Themes
-from utils.main_utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
+from utils.main_utils import MainUtils
 from widgets import (BarBottom, BarMacos, BarTop, MenuLeft, Notification,
                      Thumbnails, WidSearch)
 from widgets.win_smb import WinSmb
@@ -90,7 +90,7 @@ class WinMain(WinBase):
 
         self.setContentsMargins(0, 0, 0, 0)
         self.setFocus()
-        self.setWindowTitle(cnf.app_name)
+        self.setWindowTitle(APP_NAME)
         self.resize(cnf.root_g["aw"], cnf.root_g["ah"])
         self.center()
 
@@ -129,7 +129,7 @@ class WinMain(WinBase):
         self.set_title(self.check_coll())
 
     def check_coll(self) -> str:
-        if cnf.curr_coll == cnf.ALL_COLLS:
+        if cnf.curr_coll == ALL_COLLS:
             return cnf.lng.all_colls
         else:
             return cnf.curr_coll
@@ -190,7 +190,7 @@ class WinMain(WinBase):
                 return
 
             directory = cnf.coll_folder
-            if cnf.curr_coll != cnf.ALL_COLLS:
+            if cnf.curr_coll != ALL_COLLS:
                 directory = os.path.join(cnf.coll_folder, cnf.curr_coll)
 
 

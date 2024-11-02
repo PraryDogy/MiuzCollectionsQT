@@ -13,7 +13,7 @@ from datetime import datetime
 import icnsutil
 from setuptools import setup
 
-from cfg import cnf
+from cfg import cnf, APP_NAME
 
 # ****************** DON'T CHANGE IT ******************
 
@@ -67,7 +67,7 @@ def include_files(folder_name: str) -> list[str, list]:
 AUTHOR = "Evgeny Loshkarev"  # "Evgeny Loshkarev"
 SHORT_AUTHOR_NAME = "Evlosh" # "Evlosh"
 COMPANY = "MIUZ Diamonds" # "MIUZ Diamonds"
-APP_NAME = cnf.app_name
+APP_NAME = APP_NAME
 APP_VER = cnf.app_ver
 ICON_PATH = "icon/icon.icns" # "icon/icon.icns" or "icon.icns"
 MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES

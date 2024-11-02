@@ -1,7 +1,7 @@
 import sqlalchemy
 from sqlalchemy.orm import declarative_base
 
-from cfg import cnf
+from cfg import DB_FILE
 
 
 class Dbase:
@@ -11,7 +11,7 @@ class Dbase:
     @classmethod
     def create_engine(cls) -> sqlalchemy.Engine:
         cls.engine = sqlalchemy.create_engine(
-            "sqlite:////" + cnf.db_file,
+            "sqlite:////" + DB_FILE,
             connect_args={"check_same_thread": False},
             echo=False
             )
