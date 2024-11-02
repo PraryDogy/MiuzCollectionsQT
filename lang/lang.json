@@ -384,5 +384,9 @@
     "save_all_layers_as": [
         "Сохранить все слои как ...",
         "Save all layers as ..."
+    ],
+    "copy_path": [
+        "Скопировать путь до файла",
+        "Copy filepath"
     ]
 }

@@ -12,6 +12,7 @@ class Eng:
 		self.connect_sb06 = 'Connect Studio/Photo'
 		self.copy = 'Copy'
 		self.copy_all = 'Copy all'
+		self.copy_path = 'Copy filepath'
 		self.copying = 'Copying'
 		self.cust_fltr_names = {'prod': 'Product', 'mod': 'Models'}
 		self.cut = 'Cut'

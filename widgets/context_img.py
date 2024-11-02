@@ -30,6 +30,10 @@ class ContextImg(ContextMenuBase):
 
         self.addSeparator()
 
+        copy_action = QAction(parent=self, text=Dynamic.lng.copy_path)
+        copy_action.triggered.connect(lambda: MainUtils.copy_text(src))
+        self.addAction(copy_action)
+
         reveal_action = QAction(parent=self, text=Dynamic.lng.reveal_in_finder)
         reveal_action.triggered.connect(self.reveal_cmd)
         self.addAction(reveal_action)
