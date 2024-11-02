@@ -5,7 +5,7 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 from sqlalchemy import Connection
 
-from cfg import DB_SIZE, IMG_EXT, PSD_TIFF, cnf
+from cfg import PIXMAP_SIZE_MAX, IMG_EXT, PSD_TIFF, cnf
 from database import Dbase, ThumbsMd
 from signals import signals_app
 
@@ -271,7 +271,7 @@ class DbUpdater:
             array_img = ImageUtils.read_image(src)
 
             if isinstance(array_img, np.ndarray):
-                array_img = ImageUtils.resize_max_aspect_ratio(array_img, DB_SIZE)
+                array_img = ImageUtils.resize_max_aspect_ratio(array_img, PIXMAP_SIZE_MAX)
 
                 if src.endswith(PSD_TIFF):
                     array_img = ImageUtils.array_bgr_to_rgb(array_img)

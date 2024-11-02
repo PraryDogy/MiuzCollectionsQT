@@ -47,9 +47,9 @@ PSD_TIFF: tuple = (
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
 
-DB_SIZE = 200
-PIXMAP_SIZE: list = [90, 130, 170, DB_SIZE]
-THUMB_W: list = [110, 140, 170, DB_SIZE]
+PIXMAP_SIZE_MAX = 200
+PIXMAP_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
+THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
 THUMB_MARGIN: int = 15
 TEXT_LENGTH: list = [17, 20, 26, 31]
 
