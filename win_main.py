@@ -1,18 +1,11 @@
-import os
-import sys
-
-from PyQt5.QtCore import QEvent, QObject, Qt, QTimer
-from PyQt5.QtGui import (QCloseEvent, QDragEnterEvent, QDragLeaveEvent,
-                         QDropEvent, QIcon, QKeyEvent, QResizeEvent)
-from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
-                             QFileDialog, QFrame, QLabel, QPushButton,
-                             QVBoxLayout)
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QCloseEvent, QKeyEvent, QResizeEvent
+from PyQt5.QtWidgets import QDesktopWidget, QFrame, QPushButton, QVBoxLayout
 
 from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import ALL_COLLS, APP_NAME, Dynamic, JsonData
 from signals import signals_app
 from styles import Names, Themes
-from utils.copy_files import ThreadCopyFiles
 from utils.main_utils import MainUtils
 from utils.scaner import ScanerShedule
 from widgets import (BarBottom, BarMacos, BarTop, MenuLeft, Notification,
@@ -167,7 +160,6 @@ class WinMain(WinBase):
 
     def after_start(self):
         if not MainUtils.smb_check():
-            from widgets.win_smb import WinSmb
             self.smb_win = WinSmb(parent=self.main_win)
             self.smb_win.show()
         else:
@@ -177,21 +169,3 @@ class WinMain(WinBase):
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
         # self.test.show()
-
-
-class App(QApplication):
-    def __init__(self):
-        super().__init__(sys.argv)
-        if os.path.basename(os.path.dirname(__file__)) != "Resources":
-            self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
-
-        self.installEventFilter(self)
-        self.aboutToQuit.connect(lambda: signals_app.win_main_cmd.emit("exit"))
-
-    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
-        if a1.type() == QEvent.Type.ApplicationActivate:
-            signals_app.win_main_cmd.emit("show")
-        return super().eventFilter(a0, a1)
-
-
-Themes.set_theme(JsonData.theme)

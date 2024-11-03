@@ -225,7 +225,3 @@ class Dynamic:
     lng: Eng = Eng()
     image_viewer = None
     copy_threads: list = []
-
-
-JsonData.check_app_dirs()
-JsonData.read_json_data()
