@@ -9,8 +9,7 @@ from cfg import (PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic,
                  JsonData)
 from signals import signals_app
 from styles import Names, Themes
-from utils.image_utils import ImageUtils
-from utils.main_utils import MainUtils
+from utils.main_utils import ImageUtils, MainUtils
 
 from ..context_img import ContextImg
 

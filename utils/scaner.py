@@ -10,8 +10,7 @@ from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import Dbase, ThumbsMd
 from signals import signals_app
 
-from .image_utils import ImageUtils
-from .main_utils import MainUtils
+from .main_utils import MainUtils, ImageUtils
 
 
 class ScanerUtils:

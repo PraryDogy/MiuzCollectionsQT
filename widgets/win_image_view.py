@@ -11,8 +11,7 @@ from cfg import PSD_TIFF, Dynamic, JsonData
 from database import Dbase, ThumbsMd
 from signals import signals_app
 from styles import Names, Themes
-from utils.image_utils import ImageUtils
-from utils.main_utils import MainUtils
+from utils.main_utils import ImageUtils, MainUtils
 from utils.my_thread import MyThread
 
 from .context_img import ContextImg
