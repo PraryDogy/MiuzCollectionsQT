@@ -8,8 +8,7 @@ class Signals(QObject):
     reload_menu_left = pyqtSignal()
     reload_win_main_title = pyqtSignal()
 
-    search_wid_clear = pyqtSignal()
-    search_wid_focus = pyqtSignal()
+    wid_search_cmd = pyqtSignal(str)
 
     bar_top_reset_filters = pyqtSignal()
 

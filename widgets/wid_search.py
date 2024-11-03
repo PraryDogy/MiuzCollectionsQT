@@ -21,8 +21,15 @@ class SearchBarBase(InputBase):
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.delayed_search)
 
-        signals_app.search_wid_clear.connect(self.clear_search)
-        signals_app.search_wid_focus.connect(self.setFocus)
+        signals_app.wid_search_cmd.connect(self.wid_search_cmd)
+
+    def wid_search_cmd(self, flag: str):
+        if flag == "focus":
+            self.setFocus()
+        elif flag == "clear":
+            self.clear_search()
+        else:
+            raise Exception("widgets > wid search > wrong flag", flag)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:

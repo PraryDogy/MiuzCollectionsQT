@@ -39,7 +39,7 @@ class ResetSearchBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.search_wid_clear.emit()
+        signals_app.wid_search_cmd.emit("clear")
         signals_app.reload_grid_thumbnails.emit()
         signals_app.grid_thumbnails_to_top.emit()
         return super().mouseReleaseEvent(ev)
@@ -75,7 +75,7 @@ class ShowAllBtn(QLabel):
         JsonData.curr_coll = ALL_COLLS
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.search_wid_clear.emit()
+        signals_app.wid_search_cmd.emit("clear")
         signals_app.bar_top_reset_filters.emit()
 
         signals_app.reload_win_main_title.emit()

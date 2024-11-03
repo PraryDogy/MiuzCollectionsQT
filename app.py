@@ -136,7 +136,7 @@ class WinMain(WinBase):
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                signals_app.search_wid_focus.emit()
+                signals_app.wid_search_cmd.emit("focus")
 
         elif a0.key() == Qt.Key.Key_Escape:
             a0.ignore()
