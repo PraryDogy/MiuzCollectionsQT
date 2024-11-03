@@ -3,6 +3,7 @@ import subprocess
 import sys
 import traceback
 
+
 class System_:
 
     @classmethod
@@ -78,4 +79,4 @@ SignalsApp.init()
 Themes.set_theme(JsonData.theme)
 win_main = WinMain()
 win_main.show()
-app.exec_()
+app.exec()
