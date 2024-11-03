@@ -370,7 +370,7 @@ class WinImageView(WinImgViewBase):
                 self.win_info = WinInfo(src=self.src, parent=self)
                 self.win_info.show()
             else:
-                self.smb_win = WinSmb(parent=self.my_parent)
+                self.smb_win = WinSmb(parent=self)
                 self.smb_win.show()
 
         return super().keyPressEvent(ev)
