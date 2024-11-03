@@ -390,14 +390,19 @@ class ScanerThread(QThread):
 class ScanerShedule(QObject):
     def __init__(self):
         super().__init__()
-        signals_app.scaner_start.connect(self.prepare_thread)
-        signals_app.scaner_stop.connect(self.stop_thread)
+        signals_app.scaner_toggle.connect(self.scaner_toggle)
 
         self.wait_timer = QTimer(self)
         self.wait_timer.setSingleShot(True)
         self.wait_timer.timeout.connect(self.prepare_thread)
 
         self.scaner_thread = None
+
+    def scaner_toggle(self, flag: str):
+        if flag == "start":
+            self.prepare_thread()
+        else:
+            self.stop_thread()
 
     def prepare_thread(self):
         self.wait_timer.stop()

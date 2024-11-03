@@ -388,8 +388,8 @@ class WinSettings(WinStandartBase):
             scan_again = True
 
         if scan_again:
-            signals_app.scaner_stop.emit()
-            signals_app.scaner_start.emit()
+            signals_app.scaner_toggle.emit("")
+            signals_app.scaner_toggle.emit("start")
 
         JsonData.write_config()
         self.close()

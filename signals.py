@@ -2,8 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 
 class Signals(QObject):
-    scaner_start = pyqtSignal()
-    scaner_stop = pyqtSignal()
+    scaner_toggle = pyqtSignal(str)
 
     reload_thumbnails = pyqtSignal()
     reload_menu = pyqtSignal()
@@ -25,7 +24,7 @@ class Signals(QObject):
 
     progressbar_value = pyqtSignal(object)
 
-    btn_downloads_hide = pyqtSignal()
+    btn_downloads_hide = pyqtSignal(bool)
 
     noti_win_main = pyqtSignal(str)
     noti_win_img_view = pyqtSignal(str)

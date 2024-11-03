@@ -157,8 +157,7 @@ class WinMain(WinBase):
             self.on_exit()
 
     def on_exit(self):
-        print(1)
-        signals_app.scaner_stop.emit()
+        signals_app.scaner_toggle.emit("")
         geo = self.geometry()
         JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
         JsonData.write_config()
@@ -173,7 +172,7 @@ class WinMain(WinBase):
 
         else:
             self.scaner = ScanerShedule()
-            signals_app.scaner_start.emit()
+            signals_app.scaner_toggle.emit("start")
 
 
 class App(QApplication):
