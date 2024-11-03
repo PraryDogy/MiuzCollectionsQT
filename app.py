@@ -136,7 +136,7 @@ class WinMain(WinBase):
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                signals_app.set_focus_search.emit()
+                signals_app.search_wid_focus.emit()
 
         elif a0.key() == Qt.Key.Key_Escape:
             a0.ignore()
@@ -157,7 +157,7 @@ class WinMain(WinBase):
             self.on_exit()
 
     def on_exit(self):
-        signals_app.scaner_toggle.emit("")
+        signals_app.scaner_toggle.emit("stop")
         geo = self.geometry()
         JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
         JsonData.write_config()

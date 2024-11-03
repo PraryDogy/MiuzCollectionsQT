@@ -12,21 +12,17 @@ class Signals(QObject):
     reload_search_wid = pyqtSignal()
     reload_menubar = pyqtSignal()
 
+    search_wid_clear = pyqtSignal()
+    search_wid_focus = pyqtSignal()
+
     disable_filters = pyqtSignal()
-    clear_search = pyqtSignal()
     scroll_top = pyqtSignal()
-
+    
     dates_btn_style = pyqtSignal(str)
-
-    set_focus_search = pyqtSignal()
-
     progressbar_value = pyqtSignal(object)
-
     btn_downloads_hide = pyqtSignal(bool)
-
     noti_win_main = pyqtSignal(str)
     noti_win_img_view = pyqtSignal(str)
-
     thumbnail_select = pyqtSignal(str)
     win_img_view_open_in = pyqtSignal(object)
     grid_thumbnails_resize = pyqtSignal()

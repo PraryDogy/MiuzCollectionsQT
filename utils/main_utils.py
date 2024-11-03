@@ -17,7 +17,7 @@ class MainUtils:
             for coll_folder in JsonData.coll_folder_list:
                 if os.path.exists(coll_folder):
                     JsonData.coll_folder = coll_folder
-                    signals_app.scaner_toggle.emit("")
+                    signals_app.scaner_toggle.emit("stop")
                     signals_app.scaner_toggle.emit("start")
                     return True
             return False

@@ -401,8 +401,10 @@ class ScanerShedule(QObject):
     def scaner_toggle(self, flag: str):
         if flag == "start":
             self.prepare_thread()
-        else:
+        elif flag == "stop":
             self.stop_thread()
+        else:
+            raise Exception("utils > scaner > shedule > wrong flag", flag)
 
     def prepare_thread(self):
         self.wait_timer.stop()

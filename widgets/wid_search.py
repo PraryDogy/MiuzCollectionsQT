@@ -21,8 +21,8 @@ class SearchBarBase(InputBase):
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.delayed_search)
 
-        signals_app.clear_search.connect(self.clear_search)
-        signals_app.set_focus_search.connect(self.setFocus)
+        signals_app.search_wid_clear.connect(self.clear_search)
+        signals_app.search_wid_focus.connect(self.setFocus)
         signals_app.reload_search_wid.connect(self.reload_search)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
