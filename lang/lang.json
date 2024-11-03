@@ -388,5 +388,9 @@
     "copy_path": [
         "Скопировать путь",
         "Copy filepath"
+    ],
+    "apply": [
+        "Применить",
+        "Apply"
     ]
 }

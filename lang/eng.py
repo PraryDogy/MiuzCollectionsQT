@@ -2,6 +2,7 @@ class Eng:
 	def __init__(self):
 		super().__init__()
 		self.all_colls = 'All collections'
+		self.apply = 'Apply'
 		self.bar_menu = 'Menu'
 		self.browse = 'Browse'
 		self.cancel = 'Cancel'

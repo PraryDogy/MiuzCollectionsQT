@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 from PyQt5.QtCore import QProcess, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
                              QTextEdit, QWidget)
 
@@ -88,6 +88,8 @@ class CollFolderListInput(CustomTextEdit):
 
 
 class ChangeLang(QWidget):
+    _pressed = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.lang = JsonData.user_lng
@@ -117,7 +119,8 @@ class ChangeLang(QWidget):
 
         if self.lang != JsonData.user_lng:
             JsonData.dynamic_set_lang(self.lang)
-            setattr(self, "reload", True)
+            setattr(self, "flag", True)
+            self._pressed.emit()
 
 
 class CustFilters(QWidget):
@@ -257,6 +260,19 @@ class ShowFiles(QWidget):
             print(e)
 
 
+class RestoreBtn(Btn):
+    _pressed = pyqtSignal()
+
+    def __init__(self):
+        super().__init__(Dynamic.lng.restore_db)
+        self.setFixedWidth(150)
+
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        self._pressed.emit()
+        setattr(self, "flag", True)
+        return super().mouseReleaseEvent(ev)
+
+
 class WinSettings(WinStandartBase):
     def __init__(self, parent: QWidget):
         super().__init__(close_func=self.cancel_cmd)
@@ -276,6 +292,7 @@ class WinSettings(WinStandartBase):
 
     def init_ui(self):
         self.change_lang = ChangeLang()
+        self.change_lang._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lng.apply))
         self.content_layout.addWidget(self.change_lang)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
@@ -291,11 +308,10 @@ class WinSettings(WinStandartBase):
         show_files = ShowFiles()
         h_layout.addWidget(show_files)
 
-        self.restore_db_btn = Btn(Dynamic.lng.restore_db)
-        self.restore_db_btn.setFixedWidth(150)
+        self.restore_db_btn = RestoreBtn()
+        self.restore_db_btn._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lng.apply))
         self.content_layout.addWidget(self.restore_db_btn)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
-        self.restore_db_btn.mouseReleaseEvent = self.restore_db_cmd
 
         self.cust_filters = CustFilters()
         self.content_layout.addWidget(self.cust_filters)
@@ -327,21 +343,18 @@ class WinSettings(WinStandartBase):
         btns_layout.addStretch(1)
 
         self.ok_btn = Btn(Dynamic.lng.ok)
+        self.ok_btn.setFixedSize(90, self.ok_btn.height())
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
         btns_layout.addWidget(self.ok_btn)
 
         btns_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.cancel_btn = Btn(Dynamic.lng.cancel)
+        self.cancel_btn.setFixedSize(90, self.cancel_btn.height())
         self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
         btns_layout.addWidget(self.cancel_btn)
 
         btns_layout.addStretch(1)
-
-    def restore_db_cmd(self, e):
-        setattr(self, "restore_flag", True)
-        self.restore_db_btn.setText(Dynamic.lng.press_ok)
-        self.restore_db_btn.setDisabled(True)
 
     def reload_ui(self):
         MainUtils.clear_layout(self.content_layout)
@@ -354,14 +367,14 @@ class WinSettings(WinStandartBase):
         coll_folder_list = self.coll_folder_list_input.get_text()
         stop_colls = self.stopcolls.get_stopcolls()
 
-        if hasattr(self, "restore_flag"):
+        if hasattr(self.restore_db_btn, "flag"):
             print("settings restore db")
             JsonData.write_json_data()
             QApplication.quit()
             Dbase.copy_db_file()
             MainUtils.start_new_app()
 
-        elif hasattr(self.change_lang, "reload"):
+        elif hasattr(self.change_lang, "flag"):
             print("settings change lang")
             JsonData.write_json_data()
             QApplication.quit()

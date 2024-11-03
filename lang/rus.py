@@ -2,6 +2,7 @@ class Rus:
 	def __init__(self):
 		super().__init__()
 		self.all_colls = 'Все коллекции'
+		self.apply = 'Применить'
 		self.bar_menu = 'Меню'
 		self.browse = 'Обзор'
 		self.cancel = 'Отмена'
