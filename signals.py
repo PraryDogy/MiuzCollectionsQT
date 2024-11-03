@@ -10,7 +10,6 @@ class Signals(QObject):
     noti_win_img_view = pyqtSignal(str)
     progressbar_change_value = pyqtSignal(int)
     reload_menu_left = pyqtSignal()
-    scaner_toggle = pyqtSignal(str)
     slider_change_value = pyqtSignal(int)
     thumbnail_select = pyqtSignal(str)
     wid_search_cmd = pyqtSignal(str)

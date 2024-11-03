@@ -9,13 +9,14 @@ import traceback
 import cv2
 import numpy as np
 import psd_tools
-from PyQt5.QtCore import QByteArray, QObject, QProcess, Qt, QThread
+from PyQt5.QtCore import QByteArray, QObject, Qt, QThread
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout
 from tifffile import tifffile
 
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
+
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
@@ -222,8 +223,12 @@ class MainUtils:
             for coll_folder in JsonData.coll_folder_list:
                 if os.path.exists(coll_folder):
                     JsonData.coll_folder = coll_folder
-                    SignalsApp.all.scaner_toggle.emit("stop")
-                    SignalsApp.all.scaner_toggle.emit("start")
+
+                    # circular import
+                    from .scaner import Scaner
+                    Scaner.app.stop()
+                    Scaner.app.start()
+
                     return True
             return False
         else:

@@ -1,8 +1,7 @@
 import os
 import subprocess
-import sys
 
-from PyQt5.QtCore import QProcess, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
                              QTextEdit, QWidget)
@@ -13,6 +12,7 @@ from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
 from database import Dbase
 from signals import SignalsApp
 from utils.main_utils import MainUtils
+from utils.scaner import Scaner
 from utils.updater import Updater
 
 from .win_smb import WinSmb
@@ -383,8 +383,8 @@ class WinSettings(WinStandartBase):
         elif stop_colls != JsonData.stop_colls:
             print("settings update stop colls")
             JsonData.stop_colls = stop_colls
-            SignalsApp.all.scaner_toggle.emit("stop")
-            SignalsApp.all.scaner_toggle.emit("start")
+            Scaner.app.stop()
+            Scaner.app.start()
             JsonData.write_json_data()
 
         elif coll_folder_list != JsonData.coll_folder_list:

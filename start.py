@@ -55,6 +55,7 @@ from cfg import JsonData
 from database import Dbase
 from signals import SignalsApp
 from styles import Themes
+from utils.scaner import Scaner
 from widgets.win_main import WinMain
 
 
@@ -76,6 +77,7 @@ app = App(sys.argv)
 JsonData.init()
 Dbase.init()
 SignalsApp.init()
+Scaner.init()
 Themes.set_theme(JsonData.theme)
 win_main = WinMain()
 win_main.center()

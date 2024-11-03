@@ -295,16 +295,13 @@ class DbUpdater:
 
 
 class ScanerThread(QThread):
-    finished = pyqtSignal()
+    _finished = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
     def run(self):
-        self.scaner = self.start_scan()
-        self.finished.emit()
-    
-    def start_scan(self):
+
         ScanerUtils.can_scan = True
 
         finder_images = FinderImages()
@@ -321,57 +318,62 @@ class ScanerThread(QThread):
             db_updater = DbUpdater(compared_res)
             db_updater.start()
 
+        self._finished.emit()
+    
 
 class ScanerShedule(QObject):
     def __init__(self):
         super().__init__()
-        SignalsApp.all.scaner_toggle.connect(self.scaner_toggle)
 
         self.wait_timer = QTimer(self)
         self.wait_timer.setSingleShot(True)
-        self.wait_timer.timeout.connect(self.prepare_thread)
+        self.wait_timer.timeout.connect(self.start)
 
+        self.wait_sec = 15000
         self.scaner_thread = None
 
-    def scaner_toggle(self, flag: str):
-        if flag == "start":
-            self.prepare_thread()
-        elif flag == "stop":
-            self.stop_thread()
-        else:
-            raise Exception("utils > scaner > shedule > wrong flag", flag)
-
-    def prepare_thread(self):
+    def start(self):
         self.wait_timer.stop()
 
         if not MainUtils.smb_check():
-            print("scaner no smb")
-            self.wait_timer.start(15000)
+            print("scaner no smb, wait", self.wait_sec/1000, "sec")
+            self.wait_timer.start(self.wait_sec)
 
         elif self.scaner_thread:
-            print("scaner wait prev scaner finished")
-            self.wait_timer.start(15000)
+            print("prev scan not finished, wait", self.wait_sec/1000, "sec")
+            self.wait_timer.start(self.wait_sec)
 
         else:
             print("scaner started")
-            self.start_thread()
+            self.scaner_thread = ScanerThread()
+            self.scaner_thread._finished.connect(self.after_scan)
+            self.scaner_thread.start()
 
-    def start_thread(self):
-        self.scaner_thread = ScanerThread()
-        self.scaner_thread.finished.connect(self.finalize_scan)
-        self.scaner_thread.start()
-
-    def stop_thread(self):
-        print("scaner manualy stoped from SignalsApp.all. You need emit scaner start signal")
+    def stop(self):
+        print("scaner manualy stoped.")
         ScanerUtils.can_scan = False
         self.wait_timer.stop()
 
-    def finalize_scan(self):
-        print("scaner finished")
+    def after_scan(self):
+        print("scaner finished, new scan in", JsonData.scaner_minutes, "minutes")
         self.scaner_thread = None
         self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
-
         Dbase.vacuum()
-        ScanerUtils.can_scan = True
         ScanerUtils.progressbar_value(100)
         ScanerUtils.reload_gui()
+
+
+class Scaner:
+    app: ScanerShedule = None
+
+    @classmethod
+    def init(cls):
+        cls.app = ScanerShedule()
+
+    @classmethod
+    def start(cls):
+        cls.app.start()
+
+    @classmethod
+    def stop(cls):
+        cls.app.stop()

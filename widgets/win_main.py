@@ -4,11 +4,11 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
                              QWidget)
 
 from base_widgets import LayoutH, LayoutV, WinBase
-from cfg import ALL_COLLS, APP_NAME, Dynamic, JsonData
+from cfg import ALL_COLLS, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
-from utils.scaner import ScanerShedule
+from utils.scaner import Scaner
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -118,7 +118,7 @@ class WinMain(WinBase):
         a0.ignore()
 
     def on_exit(self):
-        SignalsApp.all.scaner_toggle.emit("stop")
+        Scaner.app.stop()
         geo = self.geometry()
         JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
         JsonData.write_json_data()
@@ -128,8 +128,7 @@ class WinMain(WinBase):
             self.smb_win = WinSmb(parent=self.main_win)
             self.smb_win.show()
         else:
-            self.scaner = ScanerShedule()
-            SignalsApp.all.scaner_toggle.emit("start")
+            Scaner.app.start()
 
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
