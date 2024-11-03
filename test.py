@@ -1,22 +1,21 @@
-from database import Dbase, ThumbsMd
-import sqlalchemy
+import os
+import subprocess
+
+APP_NAME = "MiuzCollections"
+ERROR_MSG = "HELLO"
+
+FILE_: str = os.path.join(
+    os.path.expanduser("~"),
+    "Library",
+    "Application Support",
+    APP_NAME + "QT",
+    "error.html"
+    )
+with open(FILE_, "w")as f:
+    f.write(ERROR_MSG)
 
 
-src = "/Volumes/Shares-1/Collections/0 Other/1 IMG/2020-02-12 20-44-30 (B,Radius4,Smoothing1).jpg"
-Dbase.init()
-conn =  Dbase.engine.connect()
+with open(FILE_, "w") as f:
+    f.write(ERROR_MSG)
 
-q = sqlalchemy.update(ThumbsMd).where(ThumbsMd.src == src)
-q = q.values(
-    {
-        "img150": b"",
-        "src": src,
-        "size": 0,
-        "created": 0,
-        "modified": 0,
-        "collection": "test"
-    }
-)
-
-a = [1]
-print(len(a))
+subprocess.run(["open", FILE_])

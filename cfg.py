@@ -143,7 +143,7 @@ class JsonData:
     def read_json_data(cls) -> dict:
 
         if os.path.exists(JSON_FILE):
-            with open(JSON_FILE, 'r') as f:
+            with open(JSON_FILE, 'r', encoding="utf-8") as f:
 
                 try:
                     json_data: dict = json.load(f)
@@ -176,7 +176,7 @@ class JsonData:
             }
 
         try:
-            with open(JSON_FILE, 'w') as f:
+            with open(JSON_FILE, 'w', encoding="utf-8") as f:
                 json.dump(new_data, f, indent=4, ensure_ascii=False)
             return True
         

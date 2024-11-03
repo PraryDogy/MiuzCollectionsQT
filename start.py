@@ -1,47 +1,37 @@
 import os
+import subprocess
 import sys
 import traceback
 
-# from PyQt5.QtWidgets import QMessageBox, QPushButton
+
+def catch_err(exc_type, exc_value, exc_traceback):
+
+    ERROR_MSG = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    APP_NAME: str = "MiuzCollections"
+
+    FILE_: str = os.path.join(
+        os.path.expanduser("~"),
+        "Library",
+        "Application Support",
+        APP_NAME + "QT",
+        "error.txt"
+        )
+
+    with open(FILE_, "w")as f:
+        f.write(ERROR_MSG)
+
+    subprocess.run(["open", FILE_])
 
 
-# def catch_err(exc_type, exc_value, exc_traceback):
-#     error_message = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-#     error_dialog(error_message)
+if os.path.exists("lib"): 
+    #lib folder appears when we pack this project to .app with py2app
+    plugin_path = "lib/python3.11/PyQt5/Qt5/plugins"
+    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
+    sys.excepthook = catch_err
+    print(f"plugin path enabled")
 
 
-# def error_dialog(error_message):
-#     error_dialog = QMessageBox()
-#     error_dialog.setIcon(QMessageBox.Critical)
-#     error_dialog.setWindowTitle("Error / Ошибка")
-
-#     tt = "\n".join(["Отправьте ошибку / Send error", "email: loshkarev@miuz.ru", "tg: evlosh"])
-#     error_dialog.setText(tt)
-#     error_dialog.setDetailedText(error_message)
-
-#     exit_button = QPushButton("Выход")
-#     exit_button.clicked.connect(QApplication.quit)
-#     error_dialog.addButton(exit_button, QMessageBox.ActionRole)
-
-#     error_dialog.exec_()
-
-
-# if os.path.exists("lib"): 
-#     #lib folder appears when we pack this project to .app with py2app
-#     ...
-#     plugin_path = "lib/python3.11/PyQt5/Qt5/plugins"
-#     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
-#     # sys.excepthook = catch_err
-#     print()
-#     print(f"plugin path enabled")
-#     print()
-
-
-import os
-from typing import List
-
-from PyQt5.QtCore import QEvent, QObject, QTimer
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtWidgets import QApplication
 
 from cfg import JsonData
@@ -52,18 +42,16 @@ from win_main import WinMain
 
 
 class App(QApplication):
-    def __init__(self, argv: List[str]) -> None:
+    def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
-
-        if os.path.basename(os.path.dirname(__file__)) != "Resources":
-            self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
 
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: SignalsApp.all.win_main_cmd.emit("exit"))
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            SignalsApp.all.win_main_cmd.emit("show")
+            if hasattr(SignalsApp.all, "win_main_cmd"):
+                SignalsApp.all.win_main_cmd.emit("show")
         return super().eventFilter(a0, a1)
 
 
