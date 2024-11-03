@@ -18,8 +18,7 @@ class Signals(QObject):
     thumbnail_select = pyqtSignal(str)
     wid_search_cmd = pyqtSignal(str)
     win_img_view_open_in = pyqtSignal(object)
-    win_main_show = pyqtSignal()
-    win_img_view_show = pyqtSignal()
+    win_main_cmd = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()

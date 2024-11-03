@@ -219,6 +219,7 @@ class WinImageView(WinImgViewBase):
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setMinimumSize(QSize(500, 400))
         self.resize(JsonData.imgview_g["aw"], JsonData.imgview_g["ah"])
+        self.disable_min()
         self.installEventFilter(self)
 
         self.src = src

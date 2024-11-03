@@ -105,11 +105,21 @@ class WinMain(WinBase):
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)
 
-        quit_action = QAction("Quit", self)
-        quit_action.triggered.connect(self.close)
+        # quit_action = QAction("Quit", self)
+        # quit_action.triggered.connect(self.close)
 
+        # self.installEventFilter(self)
+
+        signals_app.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
-        self.installEventFilter(self)
+
+    def win_main_cmd(self, flag: str):
+        if flag == "show":
+            self.show()
+        elif flag == "exit":
+            self.on_exit()
+        else: 
+            raise Exception("app > win main > wrong flag", flag)
 
     def center(self):
         screen = QDesktopWidget().screenGeometry()
@@ -153,26 +163,24 @@ class WinMain(WinBase):
                     JsonData.curr_size_ind -= 1
                     signals_app.slider_change_value.emit(JsonData.curr_size_ind)
 
-        elif a0.key() == Qt.Key.Key_Q:
-            self.on_exit()
-
     def on_exit(self):
         signals_app.scaner_toggle.emit("stop")
         geo = self.geometry()
         JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
         JsonData.write_config()
-        # QApplication.quit()
 
     def after_start(self):
         if not MainUtils.smb_check():
             from widgets.win_smb import WinSmb
-
             self.smb_win = WinSmb(parent=self.main_win)
             self.smb_win.show()
-
         else:
             self.scaner = ScanerShedule()
             signals_app.scaner_toggle.emit("start")
+
+        # self.test = TestWid()
+        # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
+        # self.test.show()
 
 
 class App(QApplication):
@@ -182,24 +190,12 @@ class App(QApplication):
             self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
 
         self.installEventFilter(self)
-        # self.aboutToQuit.connect(self.on_exit)
+        self.aboutToQuit.connect(lambda: signals_app.win_main_cmd.emit("exit"))
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            ...
-            # if self.main_win.isMinimized() or self.main_win.isHidden():
-            #     self.main_win.show()
-            # if Dynamic.image_viewer:
-            #     if Dynamic.image_viewer.isMinimized() or Dynamic.image_viewer.isHidden():
-            #             Dynamic.image_viewer.show()
-            #             Dynamic.image_viewer.showNormal()
-
+            signals_app.win_main_cmd.emit("show")
         return super().eventFilter(a0, a1)
-    
 
-        # self.test = TestWid()
-        # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
-        # self.test.show()
-        
 
 Themes.set_theme(JsonData.theme)
