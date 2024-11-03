@@ -8,7 +8,7 @@ class Signals(QObject):
     reload_menu = pyqtSignal()
     reload_filters_bar = pyqtSignal()
     reload_stbar = pyqtSignal()
-    reload_title = pyqtSignal()
+    reload_main_win_title = pyqtSignal()
     reload_search_wid = pyqtSignal()
     reload_menubar = pyqtSignal()
 

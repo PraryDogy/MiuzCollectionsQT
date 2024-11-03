@@ -100,7 +100,7 @@ class WinMain(WinBase):
         self.titlebar.add_r_wid(search_bar)
 
         self.set_title(self.get_coll())
-        signals_app.reload_title.connect(lambda: self.set_title(self.get_coll()))
+        signals_app.reload_main_win_title.connect(lambda: self.set_title(self.get_coll()))
 
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)

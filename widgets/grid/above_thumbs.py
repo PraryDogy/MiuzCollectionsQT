@@ -78,7 +78,7 @@ class ShowAllBtn(QLabel):
         signals_app.search_wid_clear.emit()
         signals_app.disable_filters.emit()
 
-        signals_app.reload_title.emit()
+        signals_app.reload_main_win_title.emit()
         signals_app.reload_thumbnails.emit()
         signals_app.reload_menu.emit()
 

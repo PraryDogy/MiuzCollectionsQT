@@ -128,7 +128,7 @@ class ChangeLang(QWidget):
             signals_app.reload_stbar.emit()
             signals_app.reload_filters_bar.emit()
             signals_app.reload_thumbnails.emit()
-            signals_app.reload_title.emit()
+            signals_app.reload_main_win_title.emit()
             signals_app.reload_search_wid.emit()
             signals_app.reload_menubar.emit()
 
