@@ -44,7 +44,6 @@ from PyQt5.QtCore import QEvent, QObject, QTimer
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
 
-# import app происходит только после активации os.environ plugin_path
 from cfg import JsonData
 from database import Dbase
 from signals import SignalsApp
@@ -56,16 +55,16 @@ class App(QApplication):
     def __init__(self, argv: List[str]) -> None:
         super().__init__(argv)
 
-        if os.path.basename(os.path.dirname(__file__)) != "Resources":
-            self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
+        # if os.path.basename(os.path.dirname(__file__)) != "Resources":
+            # self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
 
-        self.installEventFilter(self)
-        self.aboutToQuit.connect(lambda: SignalsApp.all.win_main_cmd.emit("exit"))
+        # self.installEventFilter(self)
+        # self.aboutToQuit.connect(lambda: SignalsApp.all.win_main_cmd.emit("exit"))
 
-    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
-        if a1.type() == QEvent.Type.ApplicationActivate:
-            SignalsApp.all.win_main_cmd.emit("show")
-        return super().eventFilter(a0, a1)
+    # def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
+        # if a1.type() == QEvent.Type.ApplicationActivate:
+            # SignalsApp.all.win_main_cmd.emit("show")
+        # return super().eventFilter(a0, a1)
 
 
 JsonData.check_app_dirs()

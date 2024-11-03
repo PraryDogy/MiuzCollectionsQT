@@ -220,8 +220,8 @@ class Dynamic:
     date_start: datetime = None
     date_end: datetime = None
     search_widget_text: str = None
-    date_start_text: str = "1 january 1991" # datetime as readable text
-    date_end_text: str = "31 december 1991" # datetime as readable text
-    lng: Eng = Eng()
+    date_start_text: str = None # 1 january 1991
+    date_end_text: str = None # 31 january 1991
+    lng: Eng | Rus = None
     image_viewer = None
     copy_threads: list = []
