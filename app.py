@@ -34,7 +34,7 @@ class TestWid(QFrame):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-        signals_app.progressbar_value.emit(50)
+        ...
 
 
 class RightWidget(QFrame):
@@ -100,7 +100,7 @@ class WinMain(WinBase):
         self.titlebar.add_r_wid(search_bar)
 
         self.set_title(self.get_coll())
-        signals_app.reload_main_win_title.connect(lambda: self.set_title(self.get_coll()))
+        signals_app.reload_win_main_title.connect(lambda: self.set_title(self.get_coll()))
 
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)

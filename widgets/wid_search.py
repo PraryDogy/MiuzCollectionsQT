@@ -23,7 +23,6 @@ class SearchBarBase(InputBase):
 
         signals_app.search_wid_clear.connect(self.clear_search)
         signals_app.search_wid_focus.connect(self.setFocus)
-        signals_app.reload_search_wid.connect(self.reload_search)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
@@ -40,14 +39,11 @@ class SearchBarBase(InputBase):
         self.timer.start()
 
     def delayed_search(self):
-        signals_app.reload_thumbnails.emit()
+        signals_app.reload_grid_thumbnails.emit()
 
     def clear_search(self):
         self.clear()
         Dynamic.search_widget_text = None
-
-    def reload_search(self):
-        self.setPlaceholderText(Dynamic.lng.search)
 
 
 class WidSearch(QWidget):

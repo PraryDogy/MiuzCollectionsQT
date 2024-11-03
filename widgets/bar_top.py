@@ -21,7 +21,7 @@ class DatesBtn(Btn):
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        signals_app.dates_btn_style.connect(self.dates_btn_style)
+        signals_app.btn_dates_style.connect(self.dates_btn_style)
 
     def dates_btn_style(self, flag: str):
         if flag == "blue":
@@ -81,8 +81,8 @@ class FilterBtn(Btn):
         except KeyError:
             JsonData.sys_fltr_vals[self.key] = not JsonData.sys_fltr_vals[self.key]
 
-        signals_app.reload_thumbnails.emit()
-        signals_app.scroll_top.emit()
+        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_to_top.emit()
 
         return super().mouseReleaseEvent(ev)
 
@@ -102,8 +102,7 @@ class BarTop(QFrame):
         self.filter_btns = []
         self.win_dates = None
 
-        signals_app.disable_filters.connect(self.disable_filters)
-        signals_app.reload_filters_bar.connect(self.reload_filters)
+        signals_app.bar_top_reset_filters.connect(self.disable_filters)
 
         self.init_ui()
 

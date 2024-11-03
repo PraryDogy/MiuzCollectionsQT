@@ -88,13 +88,13 @@ class FiltersDateBtncolor:
     @staticmethod
     def date_based_color():
         if not Dynamic.date_start:
-            signals_app.dates_btn_style.emit("normal")
+            signals_app.btn_dates_style.emit("normal")
         else:
-            signals_app.dates_btn_style.emit("blue")
+            signals_app.btn_dates_style.emit("blue")
 
     @staticmethod
     def set_border():
-        signals_app.dates_btn_style.emit("border")
+        signals_app.btn_dates_style.emit("border")
 
 
 class TitleLabel(QLabel):
@@ -266,7 +266,7 @@ class WinDates(WinStandartBase):
         FiltersDateBtncolor.date_based_color()
         self.close()
 
-        signals_app.reload_thumbnails.emit()
+        signals_app.reload_grid_thumbnails.emit()
 
     def cancel_cmd(self, event):
         FiltersDateBtncolor.date_based_color()

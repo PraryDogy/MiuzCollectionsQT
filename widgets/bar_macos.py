@@ -73,8 +73,6 @@ class BarMacos(QMenuBar):
     def __init__(self):
         super().__init__()
         self.settings_win = None
-        signals_app.reload_menubar.connect(self.reload_menubar)
-        
         self.init_ui()
 
     def init_ui(self):
@@ -103,7 +101,3 @@ class BarMacos(QMenuBar):
         self.about_win = AboutWin(self)
         self.about_win.center_win(self)
         self.about_win.show()
-
-    def reload_menubar(self):
-        self.mainMenu.deleteLater()
-        self.init_ui()

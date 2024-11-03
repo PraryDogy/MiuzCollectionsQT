@@ -22,9 +22,9 @@ class ResetDatesBtn(QLabel):
         Dynamic.date_start, Dynamic.date_end = None, None
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.dates_btn_style.emit("normal")
-        signals_app.reload_thumbnails.emit()
-        signals_app.scroll_top.emit()
+        signals_app.btn_dates_style.emit("normal")
+        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_to_top.emit()
         return super().mouseReleaseEvent(ev)
 
 
@@ -40,8 +40,8 @@ class ResetSearchBtn(QLabel):
         Dynamic.current_photo_limit = LIMIT
 
         signals_app.search_wid_clear.emit()
-        signals_app.reload_thumbnails.emit()
-        signals_app.scroll_top.emit()
+        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_to_top.emit()
         return super().mouseReleaseEvent(ev)
 
 
@@ -56,9 +56,9 @@ class ResetFiltersBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.disable_filters.emit()
-        signals_app.reload_thumbnails.emit()
-        signals_app.scroll_top.emit()
+        signals_app.bar_top_reset_filters.emit()
+        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_to_top.emit()
         return super().mouseReleaseEvent(ev)
 
 
@@ -76,13 +76,13 @@ class ShowAllBtn(QLabel):
         Dynamic.current_photo_limit = LIMIT
 
         signals_app.search_wid_clear.emit()
-        signals_app.disable_filters.emit()
+        signals_app.bar_top_reset_filters.emit()
 
-        signals_app.reload_main_win_title.emit()
-        signals_app.reload_thumbnails.emit()
-        signals_app.reload_menu.emit()
+        signals_app.reload_win_main_title.emit()
+        signals_app.reload_grid_thumbnails.emit()
+        signals_app.reload_menu_left.emit()
 
-        signals_app.scroll_top.emit()
+        signals_app.grid_thumbnails_to_top.emit()
         return super().mouseReleaseEvent(ev)
 
 

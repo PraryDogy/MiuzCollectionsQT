@@ -123,14 +123,7 @@ class ChangeLang(QWidget):
         if self.lang != JsonData.user_lng:
 
             JsonData.set_language(self.lang)
-
-            signals_app.reload_menu.emit()
-            signals_app.reload_stbar.emit()
-            signals_app.reload_filters_bar.emit()
-            signals_app.reload_thumbnails.emit()
-            signals_app.reload_main_win_title.emit()
-            signals_app.reload_search_wid.emit()
-            signals_app.reload_menubar.emit()
+            # ПЕРЕЗАГРУЗКА ПРИЛОЖУХИ
 
 
 class CustFilters(QWidget):

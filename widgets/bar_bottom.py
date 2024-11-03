@@ -115,8 +115,6 @@ class BarBottom(QFrame):
         self.h_layout.setSpacing(20)
         self.h_layout.setContentsMargins(15, 0, 15, 0)
         self.init_ui()
-        
-        signals_app.reload_stbar.connect(self.reload_stbar)
 
     def init_ui(self):
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -127,7 +125,7 @@ class BarBottom(QFrame):
 
         self.downloads = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_downloads.svg") , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
-        signals_app.btn_downloads_hide.connect(self.btn_downloads_hide)
+        signals_app.btn_downloads_toggle.connect(self.btn_downloads_toggle)
         self.h_layout.addWidget(self.downloads, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_switch.svg"), size=20)
@@ -143,21 +141,13 @@ class BarBottom(QFrame):
 
         self.downloads.hide()
 
-    def btn_downloads_hide(self, b: bool):
-        if b:
+    def btn_downloads_toggle(self, flag: str):
+        if flag == "hide":
             self.downloads.hide()
-        else:
+        elif flag == "show":
             self.downloads.show()
-
-    def reload(self):
-        signals_app.reload_thumbnails.emit()
-        signals_app.reload_menu.emit()
-        signals_app.reload_filters_bar.emit()
-        signals_app.reload_stbar.emit()
-
-    def reload_stbar(self):
-        MainUtils.clear_layout(self.h_layout)
-        self.init_ui()
+        else:
+            raise Exception("widgets >bar bottom > btn downloads > wrong flag", flag)
 
     def switch_theme_cmd(self, e):
         all_widgets = QApplication.allWidgets()
@@ -195,6 +185,6 @@ class BarBottom(QFrame):
 
     def switch_view_cmd(self, e):
         JsonData.small_view = not JsonData.small_view
-        signals_app.reload_thumbnails.emit()
+        signals_app.reload_grid_thumbnails.emit()
         self.switch_view.switch_icon()
         JsonData.write_config()
