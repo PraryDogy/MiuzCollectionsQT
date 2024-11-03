@@ -33,7 +33,7 @@ class ProgressBar(QWidget):
         self.progress_bar.setValue(0)
         layout.addWidget(self.progress_bar)
 
-        signals_app.progressbar_value.connect(self.progressbar_value)
+        signals_app.progressbar_change_value.connect(self.progressbar_value)
 
     def progressbar_value(self, value: int):
 
