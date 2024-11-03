@@ -87,15 +87,13 @@ class WinMain(WinBase):
         self.setContentsMargins(0, 0, 0, 0)
         self.setWindowTitle(APP_NAME)
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
-        self.center()
+        self.set_title(self.get_coll())
 
         menubar = BarMacos()
         self.setMenuBar(menubar)
 
         search_bar = WidSearch()
         self.titlebar.add_r_wid(search_bar)
-
-        self.set_title(self.get_coll())
 
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)
@@ -131,6 +129,24 @@ class WinMain(WinBase):
         self.hide()
         a0.ignore()
 
+    def on_exit(self):
+        SignalsApp.all.scaner_toggle.emit("stop")
+        geo = self.geometry()
+        JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
+        JsonData.write_json_data()
+
+    def after_start(self):
+        if not MainUtils.smb_check():
+            self.smb_win = WinSmb(parent=self.main_win)
+            self.smb_win.show()
+        else:
+            self.scaner = ScanerShedule()
+            SignalsApp.all.scaner_toggle.emit("start")
+
+        # self.test = TestWid()
+        # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
+        # self.test.show()
+
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
@@ -154,21 +170,3 @@ class WinMain(WinBase):
                 if JsonData.curr_size_ind > 0:
                     JsonData.curr_size_ind -= 1
                     SignalsApp.all.slider_change_value.emit(JsonData.curr_size_ind)
-
-    def on_exit(self):
-        SignalsApp.all.scaner_toggle.emit("stop")
-        geo = self.geometry()
-        JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
-        JsonData.write_json_data()
-
-    def after_start(self):
-        if not MainUtils.smb_check():
-            self.smb_win = WinSmb(parent=self.main_win)
-            self.smb_win.show()
-        else:
-            self.scaner = ScanerShedule()
-            SignalsApp.all.scaner_toggle.emit("start")
-
-        # self.test = TestWid()
-        # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
-        # self.test.show()
