@@ -300,7 +300,7 @@ class DbUpdater:
 
         values = {
                 "img150": bytes_img,
-                "src": src.replace(JsonData.curr_coll, ""),
+                "src": src.replace(JsonData.coll_folder, ""),
                 "size": image_item.size,
                 "created": image_item.created,
                 "modified": image_item.modified,
