@@ -214,6 +214,11 @@ class JsonData:
         if not os.path.exists(path=DB_FILE):
             shutil.copyfile(src="db.db", dst=DB_FILE)
 
+    @classmethod
+    def init(cls):
+        cls.check_app_dirs()
+        cls.read_json_data()
+
 
 class Dynamic:
     current_photo_limit: int = LIMIT
