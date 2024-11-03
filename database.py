@@ -66,8 +66,7 @@ class Dbase:
         res: bool = (list(i.name for i in tables) == db_tables)
 
         if not res:
-            print("Не соответствие таблиц, создаю новую дб")
-            os.remove(DB_FILE)
+            print("Несоответствие в имени таблицы и/или в количестве таблиц")
             return False
 
         for table in tables:
@@ -76,8 +75,7 @@ class Dbase:
             res = bool(db_clmns == clmns)
 
             if not res:
-                print(f"Не соответствие колонок в {table.name}, создаю новую дб")
-                os.remove(DB_FILE)
+                print(f"Несоответствие имени столбца в {table.name}")
                 return False
             
         return True
