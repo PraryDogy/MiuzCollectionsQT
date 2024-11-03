@@ -39,30 +39,27 @@ class TestWid(QFrame):
 class RightWidget(QFrame):
     def __init__(self):
         super().__init__()
-
-        v_layout = LayoutV(self)
+        v_layout = LayoutV()
+        self.setLayout(v_layout)
 
         self.filters_bar = BarTop()
-        self.thumbnails = Thumbnails()
-        self.st_bar = BarBottom()
-
         v_layout.addWidget(self.filters_bar)
+
+        self.thumbnails = Thumbnails()
         v_layout.addWidget(self.thumbnails)
+
+        self.st_bar = BarBottom()
         v_layout.addWidget(self.st_bar)
 
         self.notification = Notification(parent=self)
-        SignalsApp.all.noti_win_main.connect(self.notification.show_notify)
         self.notification.move(2, 2)
-        self.notification.resize(
-            self.thumbnails.width() - 6,
-            self.filters_bar.height() - 4
-            )
+        self.notification.hide()
+
+        SignalsApp.all.noti_win_main.connect(self.notification.show_notify)
         
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
-        self.notification.resize(
-            self.thumbnails.width() - 6,
-            self.filters_bar.height() - 4
-            )
+        w, h = self.thumbnails.width() - 6, self.filters_bar.height() - 5
+        self.notification.resize(w, h)
         return super().resizeEvent(a0)
 
 

@@ -234,6 +234,8 @@ class WinImageView(WinImgViewBase):
 
         self.notification = Notification(self.content_wid)
         self.notification.move(10, 2) # 10 left side, 10 right side, 2 top side
+        self.notification.hide()
+
         SignalsApp.all.noti_win_img_view.connect(self.notification.show_notify)
 
         self.prev_image_btn = PrevImageBtn(self.content_wid)
