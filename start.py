@@ -54,7 +54,7 @@ from cfg import JsonData
 from database import Dbase
 from signals import SignalsApp
 from styles import Themes
-from win_main import WinMain
+from widgets.win_main import WinMain
 
 
 class App(QApplication):

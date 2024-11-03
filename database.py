@@ -10,6 +10,7 @@ class Dbase:
 
     @classmethod
     def init(cls) -> sqlalchemy.Engine:
+
         cls.engine = sqlalchemy.create_engine(
             "sqlite:////" + DB_FILE,
             connect_args={"check_same_thread": False},
