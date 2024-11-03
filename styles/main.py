@@ -1,10 +1,10 @@
 class Themes:
     current = None
 
-    @staticmethod
-    def set_theme(name: str):
+    @classmethod
+    def set_theme(cls, name: str):
         with open(f"styles/{name}.css", mode="r", encoding="utf-8") as file:
-            Themes.current = file.read()
+            cls.current = file.read()
 
 
 class Names:

@@ -12,16 +12,16 @@ from signals import SignalsApp
 
 
 class DateUtils:
-    @staticmethod
-    def date_to_text(date: datetime):
+    @classmethod
+    def date_to_text(cls, date: datetime):
         return date.strftime("%d.%m.%Y")
 
-    @staticmethod
-    def add_or_subtract_days(date: datetime, days: int):
+    @classmethod
+    def add_or_subtract_days(cls, date: datetime, days: int):
         return date + timedelta(days=days)
     
-    @staticmethod
-    def text_to_datetime_date(text: str):
+    @classmethod
+    def text_to_datetime_date(cls, text: str):
         return datetime.strptime(text, "%d.%m.%Y").date()
 
 
@@ -85,15 +85,15 @@ class BaseDateInput(InputBase):
 
 class FiltersDateBtncolor:
 
-    @staticmethod
-    def date_based_color():
+    @classmethod
+    def date_based_color(cls):
         if not Dynamic.date_start:
             SignalsApp.all.btn_dates_style.emit("normal")
         else:
             SignalsApp.all.btn_dates_style.emit("blue")
 
-    @staticmethod
-    def set_border():
+    @classmethod
+    def set_border(cls):
         SignalsApp.all.btn_dates_style.emit("border")
 
 
