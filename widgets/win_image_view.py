@@ -40,22 +40,23 @@ class LoadImageThread(MyThread):
 
     def run(self):
         try:
-            if not os.path.exists(self.src):
-                print("image viewer thread no connection")
-                return
 
-            if self.src not in Cache.images:
+            full_src = JsonData.coll_folder + self.src
 
-                img = ImageUtils.read_image(self.src)
+            if not os.path.exists(full_src):
+                print("img viewer > load img thread > path not exists")
 
-                if not self.src.endswith(PSD_TIFF):
+            if full_src not in Cache.images:
+                img = ImageUtils.read_image(full_src)
+
+                if not full_src.endswith(PSD_TIFF):
                     img = ImageUtils.array_bgr_to_rgb(img)
 
                 pixmap = ImageUtils.pixmap_from_array(img)
-                Cache.images[self.src] = pixmap
+                Cache.images[full_src] = pixmap
 
             else:
-                pixmap = Cache.images.get(self.src)
+                pixmap = Cache.images.get(full_src)
 
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
@@ -265,7 +266,7 @@ class WinImageView(WinImgViewBase):
     def load_thumbnail(self):
         if self.src not in Cache.images:
             self.set_title(Dynamic.lng.loading)
-
+            small_src = self.src.replace(JsonData.coll_folder, "")
             q = (sqlalchemy.select(THUMBS.c.img150).where(THUMBS.c.src == self.src))
             conn = Dbase.engine.connect()
 
@@ -289,9 +290,9 @@ class WinImageView(WinImgViewBase):
 
     def load_image_finished(self, data: ImageData):
         if data.width == 0 or data.src != self.src:
-            return
+            print("img viewer load finished, but this image don't need, it's OK")
         
-        if isinstance(data.pixmap, QPixmap):
+        elif isinstance(data.pixmap, QPixmap):
             self.image_label.set_image(data.pixmap)
             self.set_image_title()
 

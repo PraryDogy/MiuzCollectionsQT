@@ -48,6 +48,7 @@ class ScanerUtils:
 
 class Migrate:
     def start(self):
+        return
         conn = ScanerUtils.conn_get()
 
         q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.collection)
@@ -91,6 +92,7 @@ class Migrate:
 class TrashRemover:
 
     def start(self):
+        return
 
         coll_folder = os.sep + JsonData.coll_folder.strip(os.sep) + os.sep
         conn = ScanerUtils.conn_get()
@@ -195,7 +197,7 @@ class DbImages:
         try:
             res = conn.execute(q).fetchall()
             return {
-                src: ImageItem(size, created, modified)
+                JsonData.coll_folder + src: ImageItem(size, created, modified)
                 for src, size, created, modified in res
                 }
         except Exception as e:
@@ -298,7 +300,7 @@ class DbUpdater:
 
         values = {
                 "img150": bytes_img,
-                "src": src,
+                "src": src.replace(JsonData.curr_coll, ""),
                 "size": image_item.size,
                 "created": image_item.created,
                 "modified": image_item.modified,

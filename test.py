@@ -1,28 +1,28 @@
-import sys
-from PyQt5 import QtCore, QtWidgets
+import os
+
+import sqlalchemy
+
+from cfg import JsonData
+from database import THUMBS, Dbase
+
+# JsonData.init()
+# Dbase.init()
+
+# src = "/Users/Morkowik/Desktop/Evgeny/sample images/small_images/image-licorice.jpg"
+
+# conn = Dbase.engine.connect()
+# q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.src)
+# res: list[tuple[int, str]] = conn.execute(q).fetchall()
+
+# for id, src in res:
+#     new_src = src.replace(JsonData.coll_folder, "")
+#     q = sqlalchemy.update(THUMBS).values(src=new_src).where(THUMBS.c.id == id)
+#     conn.execute(q)
+# conn.commit()
 
 
-def restart():
-    QtCore.QCoreApplication.quit()
-    status = QtCore.QProcess.startDetached(sys.executable, sys.argv)
-    print(status)
+src = "/Users/Morkowik/Desktop/Evgeny/sample images/big_images/2022-04-20 13-32-22.jpg"
 
+from utils.main_utils import ImageUtils
 
-def main():
-    app = QtWidgets.QApplication(sys.argv)
-
-    print("[PID]:", QtCore.QCoreApplication.applicationPid())
-
-    window = QtWidgets.QMainWindow()
-    window.show()
-
-    button = QtWidgets.QPushButton("Restart")
-    button.clicked.connect(restart)
-
-    window.setCentralWidget(button)
-
-    sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()
+img = ImageUtils.read_image(src)
