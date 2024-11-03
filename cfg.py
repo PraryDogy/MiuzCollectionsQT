@@ -147,20 +147,18 @@ class JsonData:
 
                 try:
                     json_data: dict = json.load(f)
-                
+
                     for k, v in json_data.items():
                         if hasattr(cls, k):
                             setattr(cls, k, v)
 
                 except json.JSONDecodeError:
                     print("Ошибка чтения json")
-                    cls.write_config()
+                    cls.write_json_data()
 
         else:
             print("файла не существует")
-            cls.write_config()
-
-        cls.dynamic_set_lang(cls.user_lng)
+            cls.write_json_data()
 
         if cls.coll_folder not in cls.coll_folder_list:
             print("\ncoll folder в json не из coll folder list")
@@ -169,20 +167,15 @@ class JsonData:
             print("coll folder list:\n", *[i + "\n" for i in cls.coll_folder_list], "\n")
 
     @classmethod
-    def write_config(cls):
+    def write_json_data(cls):
+
         new_data: dict = {
             attr: getattr(cls, attr)
             for attr in cls.get_data()
             }
 
-        try:
-            with open(JSON_FILE, 'w', encoding="utf-8") as f:
-                json.dump(new_data, f, indent=4, ensure_ascii=False)
-            return True
-        
-        except Exception as e:
-            print(e)
-            return False
+        with open(JSON_FILE, 'w', encoding="utf-8") as f:
+            json.dump(new_data, f, indent=4, ensure_ascii=False)
 
     @classmethod
     def dynamic_set_lang(cls, key_: Literal["ru", "en"]):
@@ -192,6 +185,7 @@ class JsonData:
         if key_ in data:
             Dynamic.lng = data.get(key_)()
             cls.user_lng = key_
+
         else:
             raise KeyError("cfg > dymamic set lang > no key", key_)
 
@@ -207,7 +201,7 @@ class JsonData:
             quit()
 
         if not os.path.exists(path=JSON_FILE):
-            cls.write_config()
+            cls.write_json_data()
 
         if not os.path.exists(path=DB_FILE):
             shutil.copyfile(src="db.db", dst=DB_FILE)
@@ -216,6 +210,7 @@ class JsonData:
     def init(cls):
         cls.check_app_dirs()
         cls.read_json_data()
+        cls.dynamic_set_lang(cls.user_lng)
 
 
 class Dynamic:

@@ -156,7 +156,7 @@ class WinMain(WinBase):
         SignalsApp.all.scaner_toggle.emit("stop")
         geo = self.geometry()
         JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
-        JsonData.write_config()
+        JsonData.write_json_data()
 
     def after_start(self):
         if not MainUtils.smb_check():

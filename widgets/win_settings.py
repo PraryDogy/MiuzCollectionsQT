@@ -384,7 +384,7 @@ class WinSettings(WinStandartBase):
             SignalsApp.all.scaner_toggle.emit("stop")
             SignalsApp.all.scaner_toggle.emit("start")
 
-        JsonData.write_config()
+        JsonData.write_json_data()
         self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

@@ -172,7 +172,7 @@ class BarBottom(QFrame):
         self.downloads.set_icon(os.path.join("images", f"{JsonData.theme}_downloads.svg"))
         self.switch_theme.set_icon(os.path.join("images", f"{JsonData.theme}_switch.svg"))
 
-        JsonData.write_config()
+        JsonData.write_json_data()
 
     def open_downloads(self, e):
         self.downloads_win = DownloadsWin(parent=self)
