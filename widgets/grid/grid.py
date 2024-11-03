@@ -18,7 +18,7 @@ from .title import Title
 from .up_btn import UpBtn
 
 
-class Thumbnails(QScrollArea):
+class Grid(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)

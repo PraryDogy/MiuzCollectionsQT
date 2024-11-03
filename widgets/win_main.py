@@ -13,7 +13,7 @@ from utils.scaner import Scaner
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
-from .grid.main import Thumbnails
+from .grid.grid import Grid
 from .menu_left import MenuLeft
 from .wid_notification import Notification
 from .wid_search import WidSearch
@@ -74,8 +74,8 @@ class WinMain(WinBase):
         right_lay.addWidget(self.bar_top)
         self.bar_top.resizeEvent = self.resize_noti_cmd
 
-        thumbnails = Thumbnails()
-        right_lay.addWidget(thumbnails)
+        grid = Grid()
+        right_lay.addWidget(grid)
 
         bar_bottom = BarBottom()
         right_lay.addWidget(bar_bottom)
@@ -86,7 +86,7 @@ class WinMain(WinBase):
 
         SignalsApp.all.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
-        thumbnails.setFocus()
+        grid.setFocus()
 
     def resize_noti_cmd(self, *args):
         w, h = self.bar_top.width(), self.bar_top.height()
