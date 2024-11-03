@@ -226,7 +226,8 @@ class MainUtils:
                     SignalsApp.all.scaner_toggle.emit("start")
                     return True
             return False
-        return True
+        else:
+            return True
 
     @classmethod
     def get_coll_name(cls, src_path: str) -> str:
