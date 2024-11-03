@@ -84,16 +84,13 @@ class CollectionBtn(QLabel):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
-            self.load_collection()
+            JsonData.curr_coll = self.true_name
+            Dynamic.current_photo_limit = LIMIT
+            signals_app.win_main_cmd.emit("set_title")
+            signals_app.reload_menu_left.emit()
+            signals_app.grid_thumbnails_cmd.emit("reload")
+            signals_app.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
-
-    def load_collection(self):
-        JsonData.curr_coll = self.true_name
-        Dynamic.current_photo_limit = LIMIT
-        signals_app.win_main_cmd.emit("set_title")
-        signals_app.reload_menu_left.emit()
-        signals_app.grid_thumbnails_cmd.emit("reload")
-        signals_app.grid_thumbnails_cmd.emit("to_top")
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
