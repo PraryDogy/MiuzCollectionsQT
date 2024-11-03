@@ -247,7 +247,7 @@ class DbUpdater:
                 "size": image_item.size,
                 "created": image_item.created,
                 "mod": image_item.mod,
-                "collection": MainUtils.get_coll_name(src),
+                "coll": MainUtils.get_coll_name(src),
                 }
         
         if flag == self.flag_ins:
