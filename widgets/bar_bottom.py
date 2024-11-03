@@ -30,7 +30,7 @@ class ProgressBar(QWidget):
         self.progress_bar = CustomProgressBar()
         self.progress_bar.setMinimum(0)
         self.progress_bar.setMaximum(100)
-        self.progress_bar.setValue(0)
+        self.progressbar_value(0)
         layout.addWidget(self.progress_bar)
 
         SignalsApp.all.progressbar_change_value.connect(self.progressbar_value)
@@ -42,7 +42,7 @@ class ProgressBar(QWidget):
 
         self.progress_bar.setValue(value)
 
-        if self.progress_bar.value() == 100:
+        if self.progress_bar.value() in (0, 100):
             self.progress_bar.hide()
         else:
             self.progress_bar.show()
