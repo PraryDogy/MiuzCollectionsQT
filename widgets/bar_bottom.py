@@ -95,12 +95,12 @@ class CustomSlider(BaseSlider):
     def move_slider_cmd(self, value: int):
         self.setValue(value)
         JsonData.curr_size_ind = value
-        signals_app.grid_thumbnails_resize.emit()
+        signals_app.grid_thumbnails_cmd.emit("resize")
 
     def change_size(self, value: int):
         self.setValue(value)
         JsonData.curr_size_ind = value
-        signals_app.grid_thumbnails_resize.emit()
+        signals_app.grid_thumbnails_cmd.emit("resize")
 
 
 class BarBottom(QFrame):
@@ -182,9 +182,3 @@ class BarBottom(QFrame):
     def sett_btn_cmd(self, e):
         self.settings = WinSettings(parent=self)
         self.settings.show()
-
-    def switch_view_cmd(self, e):
-        JsonData.small_view = not JsonData.small_view
-        signals_app.reload_grid_thumbnails.emit()
-        self.switch_view.switch_icon()
-        JsonData.write_config()

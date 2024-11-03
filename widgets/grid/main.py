@@ -58,11 +58,19 @@ class Thumbnails(QScrollArea):
         frame_layout.addStretch(1)
         self.setWidget(self.scroll_area_widget)
 
-        signals_app.reload_grid_thumbnails.connect(self.reload_thumbnails)
-        signals_app.grid_thumbnails_to_top.connect(self.scroll_top)
         signals_app.thumbnail_select.connect(self.select_new_widget)
+        signals_app.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
         signals_app.win_img_view_open_in.connect(self.open_in_view)
-        signals_app.grid_thumbnails_resize.connect(self.resize_)
+
+    def grid_thumbnails_cmd(self, flag: str):
+        if flag == "resize":
+            self.resize_()
+        elif flag == "to_top":
+            self.scroll_top()
+        elif flag == "reload":
+            self.reload_thumbnails()
+        else:
+            raise Exception("widgets > grid > main > wrong flag", flag)
 
     def checkScrollValue(self, value):
         self.up_btn.move(

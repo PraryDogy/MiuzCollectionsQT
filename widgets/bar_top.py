@@ -81,8 +81,8 @@ class FilterBtn(Btn):
         except KeyError:
             JsonData.sys_fltr_vals[self.key] = not JsonData.sys_fltr_vals[self.key]
 
-        signals_app.reload_grid_thumbnails.emit()
-        signals_app.grid_thumbnails_to_top.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
+        signals_app.grid_thumbnails_cmd.emit("to_top")
 
         return super().mouseReleaseEvent(ev)
 

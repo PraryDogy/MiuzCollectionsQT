@@ -22,5 +22,5 @@ class UpBtn(QFrame):
         v_layout.addWidget(self.svg)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        signals_app.grid_thumbnails_to_top.emit()
+        signals_app.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(a0)

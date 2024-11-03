@@ -266,7 +266,7 @@ class WinDates(WinStandartBase):
         FiltersDateBtncolor.date_based_color()
         self.close()
 
-        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
 
     def cancel_cmd(self, event):
         FiltersDateBtncolor.date_based_color()

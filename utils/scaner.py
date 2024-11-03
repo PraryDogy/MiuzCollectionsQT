@@ -30,7 +30,7 @@ class ScanerUtils:
     def reload_gui(cls):
         try:
             signals_app.reload_menu_left.emit()
-            signals_app.reload_grid_thumbnails.emit()
+            signals_app.grid_thumbnails_cmd.emit("reload")
         except RuntimeError as e:
             MainUtils.print_err(parent=cls, error=e)
 

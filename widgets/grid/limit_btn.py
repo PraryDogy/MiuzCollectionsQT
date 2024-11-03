@@ -14,5 +14,5 @@ class LimitBtn(Btn):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit += LIMIT
-        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
         return super().mouseReleaseEvent(ev)

@@ -48,7 +48,8 @@ class CustomContext(ContextMenuBase):
         JsonData.curr_coll = self.true_name
         signals_app.win_main_cmd.emit("set_title")
         signals_app.reload_menu_left.emit()
-        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_cmd.emit("to_top")
+        signals_app.grid_thumbnails_cmd.emit("reload")
 
     def reveal_collection(self):
         if self.true_name == ALL_COLLS:
@@ -90,9 +91,9 @@ class CollectionBtn(QLabel):
         JsonData.curr_coll = self.true_name
         Dynamic.current_photo_limit = LIMIT
         signals_app.win_main_cmd.emit("set_title")
-        signals_app.grid_thumbnails_to_top.emit()
         signals_app.reload_menu_left.emit()
-        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
+        signals_app.grid_thumbnails_cmd.emit("to_top")
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:

@@ -46,7 +46,7 @@ class SearchBarBase(InputBase):
         self.timer.start()
 
     def delayed_search(self):
-        signals_app.reload_grid_thumbnails.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
 
     def clear_search(self):
         self.clear()

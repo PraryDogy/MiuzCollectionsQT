@@ -23,8 +23,8 @@ class ResetDatesBtn(QLabel):
         Dynamic.current_photo_limit = LIMIT
 
         signals_app.btn_dates_style.emit("normal")
-        signals_app.reload_grid_thumbnails.emit()
-        signals_app.grid_thumbnails_to_top.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
+        signals_app.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -40,8 +40,8 @@ class ResetSearchBtn(QLabel):
         Dynamic.current_photo_limit = LIMIT
 
         signals_app.wid_search_cmd.emit("clear")
-        signals_app.reload_grid_thumbnails.emit()
-        signals_app.grid_thumbnails_to_top.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
+        signals_app.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -57,8 +57,8 @@ class ResetFiltersBtn(QLabel):
         Dynamic.current_photo_limit = LIMIT
 
         signals_app.bar_top_reset_filters.emit()
-        signals_app.reload_grid_thumbnails.emit()
-        signals_app.grid_thumbnails_to_top.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
+        signals_app.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -79,10 +79,10 @@ class ShowAllBtn(QLabel):
         signals_app.bar_top_reset_filters.emit()
 
         signals_app.win_main_cmd.emit("set_title")
-        signals_app.reload_grid_thumbnails.emit()
         signals_app.reload_menu_left.emit()
 
-        signals_app.grid_thumbnails_to_top.emit()
+        signals_app.grid_thumbnails_cmd.emit("reload")
+        signals_app.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
