@@ -80,3 +80,6 @@ Themes.set_theme(JsonData.theme)
 win_main = WinMain()
 win_main.show()
 app.exec()
+
+
+print("ТЕБЕ НУЖНО СОЗДАТЬ БАЗУ ДАННЫХ С НУЖНЫМИ КОЛОНКАМИ")
