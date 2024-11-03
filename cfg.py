@@ -2,9 +2,9 @@ import json
 import os
 import shutil
 from datetime import datetime
-from typing import Literal
 
 from lang import Eng, Rus
+from styles import Themes
 
 APP_NAME: str = "MiuzCollections"
 APP_VER = "5.6.1"
@@ -178,7 +178,8 @@ class JsonData:
             json.dump(new_data, f, indent=4, ensure_ascii=False)
 
     @classmethod
-    def dynamic_set_lang(cls, key_: Literal["ru", "en"]):
+    def dynamic_set_lang(cls, key_: str):
+        """ru, en"""
 
         data: dict[str, Rus | Eng] = {"ru": Rus, "en": Eng}
 
@@ -187,7 +188,7 @@ class JsonData:
             cls.user_lng = key_
 
         else:
-            raise KeyError("cfg > dymamic set lang > no key", key_)
+            raise KeyError("cfg > dymamic set lang > no key (ru, en)", key_)
 
     @classmethod
     def check_app_dirs(cls):
@@ -210,6 +211,7 @@ class JsonData:
     def init(cls):
         cls.check_app_dirs()
         cls.read_json_data()
+        Themes.set_theme(cls.theme)
         cls.dynamic_set_lang(cls.user_lng)
 
 

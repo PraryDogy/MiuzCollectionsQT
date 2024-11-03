@@ -86,6 +86,7 @@ class WinMain(WinBase):
 
         SignalsApp.all.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
+        thumbnails.setFocus()
 
     def resize_noti_cmd(self, *args):
         w, h = self.bar_top.width(), self.bar_top.height()
