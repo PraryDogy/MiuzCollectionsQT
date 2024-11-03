@@ -166,6 +166,9 @@ class JsonData:
             print("coll folder:\n", cls.coll_folder)
             print("coll folder list:\n", *[i + "\n" for i in cls.coll_folder_list], "\n")
 
+        if cls.app_ver != APP_VER:
+            print("Версии приложения не совпадают: json / внутренняя:", cls.app_ver, os.sep, APP_VER)
+
     @classmethod
     def write_json_data(cls):
 
