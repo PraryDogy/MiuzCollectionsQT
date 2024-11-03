@@ -85,9 +85,9 @@ class MainUtils:
     @classmethod
     def send_notification(cls, text: str):
         if Dynamic.image_viewer:
-            signals_app.noti_img_view.emit(text)
+            signals_app.noti_win_img_view.emit(text)
         else:
-            signals_app.noti_main.emit(text)
+            signals_app.noti_win_main.emit(text)
 
     @classmethod
     def print_err(cls, parent: object, error: Exception):

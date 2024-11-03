@@ -61,7 +61,7 @@ class ContextImg(ContextMenuBase):
             self.smb_win.show()
         
     def show_image_viewer(self):
-        signals_app.open_in_view.emit(self.my_parent)
+        signals_app.win_img_view_open_in.emit(self.my_parent)
 
     def reveal_cmd(self):
         if MainUtils.smb_check():
@@ -101,14 +101,14 @@ class ContextImg(ContextMenuBase):
             return
 
         self.copy_task = ThreadCopyFiles(dest=dest, files=[file])
-        signals_app.show_downloads.emit()
+        signals_app.btn_downloads_hide.emit(False)
         self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, files))
         self.copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = MainUtils.reveal_files(files)
         if len(Dynamic.copy_threads) == 0:
-            signals_app.hide_downloads.emit()
+            signals_app.btn_downloads_hide.emit(True)
         try:
             copy_task.remove_threads()
         except Exception as e:

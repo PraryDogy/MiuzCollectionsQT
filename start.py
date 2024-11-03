@@ -40,7 +40,10 @@ if os.path.exists("lib"):
 from database import Dbase
 Dbase.create_engine()
 
-from app import app
+from app import App, WinMain
+app = App()
+win_main = WinMain()
+win_main.show()
 app.exec_()
 
 # source deacivate

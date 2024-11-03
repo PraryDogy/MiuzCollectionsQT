@@ -16,23 +16,27 @@ class Signals(QObject):
     disable_filters = pyqtSignal()
     clear_search = pyqtSignal()
     scroll_top = pyqtSignal()
+
     set_dates_btn_blue_border = pyqtSignal()
     set_dates_btn_normal = pyqtSignal()
     set_dates_btn_blue = pyqtSignal()
+
     set_focus_search = pyqtSignal()
 
     progressbar_value = pyqtSignal(object)
 
-    hide_downloads = pyqtSignal()
-    show_downloads = pyqtSignal()
+    btn_downloads_hide = pyqtSignal()
 
-    noti_main = pyqtSignal(str)
-    noti_img_view = pyqtSignal(str)
+    noti_win_main = pyqtSignal(str)
+    noti_win_img_view = pyqtSignal(str)
 
-    select_new_wid = pyqtSignal(str)
-    open_in_view = pyqtSignal(object)
-    resize_grid = pyqtSignal()
-    move_slider = pyqtSignal(int)
+    thumbnail_select = pyqtSignal(str)
+    win_img_view_open_in = pyqtSignal(object)
+    grid_thumbnails_resize = pyqtSignal()
+    slider_change_value = pyqtSignal(int)
+
+    win_main_show = pyqtSignal()
+    win_img_view_show = pyqtSignal()
 
     def __init__(self):
         super().__init__()

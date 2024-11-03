@@ -4,8 +4,6 @@ import shutil
 from datetime import datetime
 from typing import Literal
 
-from PyQt5.QtWidgets import QMainWindow
-
 from lang import Eng, Rus
 
 APP_NAME: str = "MiuzCollections"
@@ -225,7 +223,7 @@ class Dynamic:
     date_start_text: str = "1 january 1991" # datetime as readable text
     date_end_text: str = "31 december 1991" # datetime as readable text
     lng: Eng = Eng()
-    image_viewer: QMainWindow = None
+    image_viewer = None
     copy_threads: list = []
 
 

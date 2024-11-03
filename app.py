@@ -2,8 +2,8 @@ import os
 import sys
 
 from PyQt5.QtCore import QEvent, QObject, Qt, QTimer
-from PyQt5.QtGui import (QDragEnterEvent, QDragLeaveEvent, QDropEvent, QIcon,
-                         QKeyEvent, QResizeEvent)
+from PyQt5.QtGui import (QCloseEvent, QDragEnterEvent, QDragLeaveEvent,
+                         QDropEvent, QIcon, QKeyEvent, QResizeEvent)
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
                              QFileDialog, QFrame, QLabel, QPushButton,
                              QVBoxLayout)
@@ -52,7 +52,7 @@ class RightWidget(QFrame):
         v_layout.addWidget(self.st_bar)
 
         self.notification = Notification(parent=self)
-        signals_app.noti_main.connect(self.notification.show_notify)
+        signals_app.noti_win_main.connect(self.notification.show_notify)
         self.notification.move(2, 2)
         self.notification.resize(
             self.thumbnails.width() - 6,
@@ -86,11 +86,9 @@ class ContentWid(QFrame):
 
 class WinMain(WinBase):
     def __init__(self):
-        # Themes.set_theme("dark_theme")
-        super().__init__(close_func=self.mycloseEvent)
+        super().__init__(close_func=self.my_close_event)
 
         self.setContentsMargins(0, 0, 0, 0)
-        self.setFocus()
         self.setWindowTitle(APP_NAME)
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.center()
@@ -101,23 +99,17 @@ class WinMain(WinBase):
         search_bar = WidSearch()
         self.titlebar.add_r_wid(search_bar)
 
-        self.set_title(self.check_coll())
-        signals_app.reload_title.connect(self.reload_title)
+        self.set_title(self.get_coll())
+        signals_app.reload_title.connect(lambda: self.set_title(self.get_coll()))
 
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)
 
-        self.drop_widget = QLabel(parent=self.centralWidget(), text=Dynamic.lng.drop_to_collections)
-        self.drop_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.drop_widget.setObjectName(Names.drop_widget)
-        self.drop_widget.setStyleSheet(Themes.current)
-        self.drop_widget.hide()
-
-        # что делать при выходе
         quit_action = QAction("Quit", self)
         quit_action.triggered.connect(self.close)
 
-        self.setAcceptDrops(True)
+        QTimer.singleShot(100, self.after_start)
+        self.installEventFilter(self)
 
     def center(self):
         screen = QDesktopWidget().screenGeometry()
@@ -126,33 +118,21 @@ class WinMain(WinBase):
         y = (screen.height() - size.height()) // 2
         self.move(x, y)
 
-    def reload_title(self):
-        self.set_title(self.check_coll())
-
-    def check_coll(self) -> str:
+    def get_coll(self) -> str:
         if JsonData.curr_coll == ALL_COLLS:
             return Dynamic.lng.all_colls
         else:
             return JsonData.curr_coll
     
-    def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
-        self.reveal_files = MainUtils.reveal_files(files)
-        if len(Dynamic.copy_threads) == 0:
-            signals_app.hide_downloads.emit()
-        try:
-            copy_task.remove_threads()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
-
-    def mycloseEvent(self, event):
+    def my_close_event(self, a0: QCloseEvent | None) -> None:
         self.titlebar.btns.nonfocused_icons()
         self.hide()
-        event.ignore()
+        a0.ignore()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                self.mycloseEvent(a0)
+                self.my_close_event(a0)
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
@@ -165,88 +145,24 @@ class WinMain(WinBase):
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if JsonData.curr_size_ind < 3:
                     JsonData.curr_size_ind += 1
-                    signals_app.move_slider.emit(JsonData.curr_size_ind)
+                    signals_app.slider_change_value.emit(JsonData.curr_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if JsonData.curr_size_ind > 0:
                     JsonData.curr_size_ind -= 1
-                    signals_app.move_slider.emit(JsonData.curr_size_ind)
+                    signals_app.slider_change_value.emit(JsonData.curr_size_ind)
 
-    def dragEnterEvent(self, a0: QDragEnterEvent | None) -> None:
-        if not a0.source() and a0.mimeData().hasUrls():
-            self.drop_widget.resize(self.width(), self.height())
-            self.drop_widget.show()
-            a0.acceptProposedAction()
-        return super().dragEnterEvent(a0)
+        elif a0.key() == Qt.Key.Key_Q:
+            self.on_exit()
 
-    def dropEvent(self, a0: QDropEvent | None) -> None:
-        if a0.mimeData().hasUrls():
-            files = [url.toLocalFile() for url in a0.mimeData().urls()]
-            self.drop_widget.hide()
-
-            if not MainUtils.smb_check():
-                self.win_smb = WinSmb(parent=self)
-                self.win_smb.show()
-                return
-
-            directory = JsonData.coll_folder
-            if JsonData.curr_coll != ALL_COLLS:
-                directory = os.path.join(JsonData.coll_folder, JsonData.curr_coll)
-
-
-            folder = QFileDialog.getExistingDirectory(self, directory=directory)
-
-            if folder:
-                self.copy_task = ThreadCopyFiles(dest=folder, files=files)
-                self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, files))
-                signals_app.show_downloads.emit()
-                self.copy_task.start()
-            
-            a0.acceptProposedAction()
-
-        return super().dropEvent(a0)
-    
-    def dragLeaveEvent(self, a0: QDragLeaveEvent | None) -> None:
-        self.drop_widget.hide()
-        return super().dragLeaveEvent(a0)
-        
-
-class App(QApplication):
-    def __init__(self):
-        super().__init__(sys.argv)
-        if os.path.basename(os.path.dirname(__file__)) != "Resources":
-            self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
-
-        self.main_win = WinMain()
-        self.main_win.show()
-
-        self.installEventFilter(self)
-        self.aboutToQuit.connect(self.on_exit)
-
-        QTimer.singleShot(100, self.after_start)
-
-    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
-        if a1.type() == QEvent.Type.ApplicationActivate:
-            if self.main_win.isMinimized() or self.main_win.isHidden():
-                self.main_win.show()
-            if Dynamic.image_viewer:
-                if Dynamic.image_viewer.isMinimized() or Dynamic.image_viewer.isHidden():
-                        Dynamic.image_viewer.show()
-                        Dynamic.image_viewer.showNormal()
-
-        return super().eventFilter(a0, a1)
-    
     def on_exit(self):
+        print(1)
         signals_app.scaner_stop.emit()
-
-        geo = self.main_win.geometry()
-
-        JsonData.root_g.update(
-            {"aw": geo.width(), "ah": geo.height()}
-            )
-
+        geo = self.geometry()
+        JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
         JsonData.write_config()
+        # QApplication.quit()
 
     def after_start(self):
         if not MainUtils.smb_check():
@@ -259,10 +175,32 @@ class App(QApplication):
             self.scaner = ScanerShedule()
             signals_app.scaner_start.emit()
 
+
+class App(QApplication):
+    def __init__(self):
+        super().__init__(sys.argv)
+        if os.path.basename(os.path.dirname(__file__)) != "Resources":
+            self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
+
+        self.installEventFilter(self)
+        # self.aboutToQuit.connect(self.on_exit)
+
+    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
+        if a1.type() == QEvent.Type.ApplicationActivate:
+            ...
+            # if self.main_win.isMinimized() or self.main_win.isHidden():
+            #     self.main_win.show()
+            # if Dynamic.image_viewer:
+            #     if Dynamic.image_viewer.isMinimized() or Dynamic.image_viewer.isHidden():
+            #             Dynamic.image_viewer.show()
+            #             Dynamic.image_viewer.showNormal()
+
+        return super().eventFilter(a0, a1)
+    
+
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
         # self.test.show()
         
 
 Themes.set_theme(JsonData.theme)
-app = App()

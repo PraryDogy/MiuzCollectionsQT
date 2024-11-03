@@ -90,17 +90,17 @@ class CustomSlider(BaseSlider):
         self.setFixedWidth(80)
         self.setValue(JsonData.curr_size_ind)
         self.valueChanged.connect(self.change_size)
-        signals_app.move_slider.connect(self.move_slider_cmd)
+        signals_app.slider_change_value.connect(self.move_slider_cmd)
     
     def move_slider_cmd(self, value: int):
         self.setValue(value)
         JsonData.curr_size_ind = value
-        signals_app.resize_grid.emit()
+        signals_app.grid_thumbnails_resize.emit()
 
     def change_size(self, value: int):
         self.setValue(value)
         JsonData.curr_size_ind = value
-        signals_app.resize_grid.emit()
+        signals_app.grid_thumbnails_resize.emit()
 
 
 class BarBottom(QFrame):
@@ -127,8 +127,7 @@ class BarBottom(QFrame):
 
         self.downloads = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_downloads.svg") , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
-        signals_app.hide_downloads.connect(self.downloads.hide)
-        signals_app.show_downloads.connect(self.downloads.show)
+        signals_app.btn_downloads_hide.connect(self.btn_downloads_hide)
         self.h_layout.addWidget(self.downloads, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_switch.svg"), size=20)
@@ -143,6 +142,12 @@ class BarBottom(QFrame):
         self.h_layout.addWidget(self.custom_slider, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.downloads.hide()
+
+    def btn_downloads_hide(self, b: bool):
+        if b:
+            self.downloads.hide()
+        else:
+            self.downloads.show()
 
     def reload(self):
         signals_app.reload_thumbnails.emit()

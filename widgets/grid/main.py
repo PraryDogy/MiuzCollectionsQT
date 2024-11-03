@@ -60,9 +60,9 @@ class Thumbnails(QScrollArea):
 
         signals_app.reload_thumbnails.connect(self.reload_thumbnails)
         signals_app.scroll_top.connect(self.scroll_top)
-        signals_app.select_new_wid.connect(self.select_new_widget)
-        signals_app.open_in_view.connect(self.open_in_view)
-        signals_app.resize_grid.connect(self.resize_)
+        signals_app.thumbnail_select.connect(self.select_new_widget)
+        signals_app.win_img_view_open_in.connect(self.open_in_view)
+        signals_app.grid_thumbnails_resize.connect(self.resize_)
 
     def checkScrollValue(self, value):
         self.up_btn.move(
