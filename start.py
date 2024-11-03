@@ -40,7 +40,7 @@ if os.path.exists("lib"):
 import os
 from typing import List
 
-from PyQt5.QtCore import QEvent, QObject
+from PyQt5.QtCore import QEvent, QObject, QTimer
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
 
@@ -70,14 +70,9 @@ class App(QApplication):
 
 JsonData.check_app_dirs()
 JsonData.read_json_data()
-
 Themes.set_theme(JsonData.theme)
-
 Dbase.create_engine()
-
 app = App(sys.argv)
-app = QApplication(sys.argv)
-
 win_main = WinMain()
 win_main.show()
 app.exec_()
