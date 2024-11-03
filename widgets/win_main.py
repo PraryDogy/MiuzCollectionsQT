@@ -43,9 +43,13 @@ class WinMain(WinBase):
 
         self.setContentsMargins(0, 0, 0, 0)
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
-        self.set_title(self.get_coll())
         self.setMenuBar(BarMacos())
         self.titlebar.add_r_wid(WidSearch())
+        self.set_title(
+            Dynamic.lng.all_colls
+            if JsonData.curr_coll == ALL_COLLS
+            else JsonData.curr_coll
+            )
 
         h_wid_main = QWidget()
         h_lay_main = LayoutH()
@@ -93,7 +97,11 @@ class WinMain(WinBase):
         elif flag == "exit":
             self.on_exit()
         elif flag == "set_title":
-            self.set_title(self.get_coll())
+            self.set_title(
+                Dynamic.lng.all_colls
+                if JsonData.curr_coll == ALL_COLLS
+                else JsonData.curr_coll
+                )
         else: 
             raise Exception("app > win main > wrong flag", flag)
 
@@ -103,12 +111,6 @@ class WinMain(WinBase):
         x = (screen.width() - size.width()) // 2
         y = (screen.height() - size.height()) // 2
         self.move(x, y)
-
-    def get_coll(self) -> str:
-        if JsonData.curr_coll == ALL_COLLS:
-            return Dynamic.lng.all_colls
-        else:
-            return JsonData.curr_coll
     
     def my_close_event(self, a0: QCloseEvent | None) -> None:
         self.titlebar.btns.nonfocused_icons()
