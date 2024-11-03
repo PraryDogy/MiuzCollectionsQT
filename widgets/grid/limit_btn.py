@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 
 from base_widgets import Btn
 from cfg import LIMIT, Dynamic
-from signals import signals_app
+from signals import SignalsApp
 
 
 class LimitBtn(Btn):
@@ -14,5 +14,5 @@ class LimitBtn(Btn):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit += LIMIT
-        signals_app.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
         return super().mouseReleaseEvent(ev)

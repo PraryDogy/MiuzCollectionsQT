@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
 from cfg import APP_SUPPORT_DIR, DB_FILE, Dynamic, JsonData
-from signals import signals_app
+from signals import SignalsApp
 from utils.main_utils import MainUtils
 from utils.updater import Updater
 
@@ -373,7 +373,7 @@ class WinSettings(WinStandartBase):
             shutil.copyfile(src="db.db", dst=DB_FILE)
             QProcess.startDetached(sys.executable, sys.argv)
 
-            # gui_signals_app.reload_thumbnails.emit()
+            # gui_SignalsApp.all.reload_thumbnails.emit()
             # scan_again = True
 
         if self.stopcolls.get_stopcolls() != JsonData.stop_colls:
@@ -381,8 +381,8 @@ class WinSettings(WinStandartBase):
             scan_again = True
 
         if scan_again:
-            signals_app.scaner_toggle.emit("stop")
-            signals_app.scaner_toggle.emit("start")
+            SignalsApp.all.scaner_toggle.emit("stop")
+            SignalsApp.all.scaner_toggle.emit("start")
 
         JsonData.write_config()
         self.close()

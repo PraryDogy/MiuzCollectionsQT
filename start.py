@@ -47,7 +47,7 @@ from PyQt5.QtWidgets import QApplication
 # import app происходит только после активации os.environ plugin_path
 from cfg import JsonData
 from database import Dbase
-from signals import signals_app
+from signals import SignalsApp
 from styles import Themes
 from win_main import WinMain
 
@@ -60,19 +60,20 @@ class App(QApplication):
             self.setWindowIcon(QIcon(os.path.join("icon", "icon.icns")))
 
         self.installEventFilter(self)
-        self.aboutToQuit.connect(lambda: signals_app.win_main_cmd.emit("exit"))
+        self.aboutToQuit.connect(lambda: SignalsApp.all.win_main_cmd.emit("exit"))
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            signals_app.win_main_cmd.emit("show")
+            SignalsApp.all.win_main_cmd.emit("show")
         return super().eventFilter(a0, a1)
 
 
 JsonData.check_app_dirs()
 JsonData.read_json_data()
 Themes.set_theme(JsonData.theme)
-Dbase.create_engine()
+Dbase.init()
 app = App(sys.argv)
+SignalsApp.init()
 win_main = WinMain()
 win_main.show()
 app.exec_()

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import LayoutH, LayoutV
 from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData
-from signals import signals_app
+from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 
@@ -58,9 +58,9 @@ class Thumbnails(QScrollArea):
         frame_layout.addStretch(1)
         self.setWidget(self.scroll_area_widget)
 
-        signals_app.thumbnail_select.connect(self.select_new_widget)
-        signals_app.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
-        signals_app.win_img_view_open_in.connect(self.open_in_view)
+        SignalsApp.all.thumbnail_select.connect(self.select_new_widget)
+        SignalsApp.all.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
+        SignalsApp.all.win_img_view_open_in.connect(self.open_in_view)
 
     def grid_thumbnails_cmd(self, flag: str):
         if flag == "resize":

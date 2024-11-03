@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QSpacerItem, QWidget
 
 from base_widgets import InputBase, LayoutH
 from cfg import Dynamic
-from signals import signals_app
+from signals import SignalsApp
 
 
 class SearchBarBase(InputBase):
@@ -21,7 +21,7 @@ class SearchBarBase(InputBase):
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.delayed_search)
 
-        signals_app.wid_search_cmd.connect(self.wid_search_cmd)
+        SignalsApp.all.wid_search_cmd.connect(self.wid_search_cmd)
 
     def wid_search_cmd(self, flag: str):
         if flag == "focus":
@@ -46,7 +46,7 @@ class SearchBarBase(InputBase):
         self.timer.start()
 
     def delayed_search(self):
-        signals_app.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
 
     def clear_search(self):
         self.clear()

@@ -9,7 +9,7 @@ class Dbase:
     engine: sqlalchemy.Engine = None
 
     @classmethod
-    def create_engine(cls) -> sqlalchemy.Engine:
+    def init(cls) -> sqlalchemy.Engine:
         cls.engine = sqlalchemy.create_engine(
             "sqlite:////" + DB_FILE,
             connect_args={"check_same_thread": False},

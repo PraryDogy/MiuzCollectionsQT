@@ -8,7 +8,7 @@ from sqlalchemy import Connection, Delete, Insert, Update
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import Dbase, ThumbsMd
-from signals import signals_app
+from signals import SignalsApp
 
 from .main_utils import MainUtils, ImageUtils
 
@@ -21,15 +21,15 @@ class ScanerUtils:
     @classmethod
     def progressbar_value(cls, value: int):
         try:
-            signals_app.progressbar_change_value.emit(value)
+            SignalsApp.all.progressbar_change_value.emit(value)
         except RuntimeError as e:
             MainUtils.print_err(parent=cls, error=e)
 
     @classmethod
     def reload_gui(cls):
         try:
-            signals_app.reload_menu_left.emit()
-            signals_app.grid_thumbnails_cmd.emit("reload")
+            SignalsApp.all.reload_menu_left.emit()
+            SignalsApp.all.grid_thumbnails_cmd.emit("reload")
         except RuntimeError as e:
             MainUtils.print_err(parent=cls, error=e)
 
@@ -389,7 +389,7 @@ class ScanerThread(QThread):
 class ScanerShedule(QObject):
     def __init__(self):
         super().__init__()
-        signals_app.scaner_toggle.connect(self.scaner_toggle)
+        SignalsApp.all.scaner_toggle.connect(self.scaner_toggle)
 
         self.wait_timer = QTimer(self)
         self.wait_timer.setSingleShot(True)
@@ -426,7 +426,7 @@ class ScanerShedule(QObject):
         self.scaner_thread.start()
 
     def stop_thread(self):
-        print("scaner manualy stoped from signals_app. You need emit scaner start signal")
+        print("scaner manualy stoped from SignalsApp.all. You need emit scaner start signal")
         ScanerUtils.can_scan = False
         self.wait_timer.stop()
 

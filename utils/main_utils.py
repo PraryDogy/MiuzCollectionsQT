@@ -15,7 +15,7 @@ from tifffile import tifffile
 
 from cfg import Dynamic, JsonData
 from database import *
-from signals import signals_app
+from signals import SignalsApp
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
@@ -202,8 +202,8 @@ class MainUtils:
             for coll_folder in JsonData.coll_folder_list:
                 if os.path.exists(coll_folder):
                     JsonData.coll_folder = coll_folder
-                    signals_app.scaner_toggle.emit("stop")
-                    signals_app.scaner_toggle.emit("start")
+                    SignalsApp.all.scaner_toggle.emit("stop")
+                    SignalsApp.all.scaner_toggle.emit("start")
                     return True
             return False
         return True
@@ -270,9 +270,9 @@ class MainUtils:
     @classmethod
     def send_notification(cls, text: str):
         if Dynamic.image_viewer:
-            signals_app.noti_win_img_view.emit(text)
+            SignalsApp.all.noti_win_img_view.emit(text)
         else:
-            signals_app.noti_win_main.emit(text)
+            SignalsApp.all.noti_win_main.emit(text)
 
     @classmethod
     def print_err(cls, parent: object, error: Exception):

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QDesktopWidget, QFrame, QPushButton, QVBoxLayout
 
 from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import ALL_COLLS, APP_NAME, Dynamic, JsonData
-from signals import signals_app
+from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 from utils.scaner import ScanerShedule
@@ -45,7 +45,7 @@ class RightWidget(QFrame):
         v_layout.addWidget(self.st_bar)
 
         self.notification = Notification(parent=self)
-        signals_app.noti_win_main.connect(self.notification.show_notify)
+        SignalsApp.all.noti_win_main.connect(self.notification.show_notify)
         self.notification.move(2, 2)
         self.notification.resize(
             self.thumbnails.width() - 6,
@@ -97,7 +97,7 @@ class WinMain(WinBase):
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)
 
-        signals_app.win_main_cmd.connect(self.win_main_cmd)
+        SignalsApp.all.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
 
     def win_main_cmd(self, flag: str):
@@ -135,7 +135,7 @@ class WinMain(WinBase):
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                signals_app.wid_search_cmd.emit("focus")
+                SignalsApp.all.wid_search_cmd.emit("focus")
 
         elif a0.key() == Qt.Key.Key_Escape:
             a0.ignore()
@@ -144,16 +144,16 @@ class WinMain(WinBase):
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if JsonData.curr_size_ind < 3:
                     JsonData.curr_size_ind += 1
-                    signals_app.slider_change_value.emit(JsonData.curr_size_ind)
+                    SignalsApp.all.slider_change_value.emit(JsonData.curr_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if JsonData.curr_size_ind > 0:
                     JsonData.curr_size_ind -= 1
-                    signals_app.slider_change_value.emit(JsonData.curr_size_ind)
+                    SignalsApp.all.slider_change_value.emit(JsonData.curr_size_ind)
 
     def on_exit(self):
-        signals_app.scaner_toggle.emit("stop")
+        SignalsApp.all.scaner_toggle.emit("stop")
         geo = self.geometry()
         JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
         JsonData.write_config()
@@ -164,7 +164,7 @@ class WinMain(WinBase):
             self.smb_win.show()
         else:
             self.scaner = ScanerShedule()
-            signals_app.scaner_toggle.emit("start")
+            SignalsApp.all.scaner_toggle.emit("start")
 
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)

@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QLabel, QSlider,
 
 from base_widgets import CustomProgressBar, LayoutH, SvgBtn
 from cfg import JsonData
-from signals import signals_app
+from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 
@@ -33,7 +33,7 @@ class ProgressBar(QWidget):
         self.progress_bar.setValue(0)
         layout.addWidget(self.progress_bar)
 
-        signals_app.progressbar_change_value.connect(self.progressbar_value)
+        SignalsApp.all.progressbar_change_value.connect(self.progressbar_value)
 
     def progressbar_value(self, value: int):
 
@@ -90,17 +90,17 @@ class CustomSlider(BaseSlider):
         self.setFixedWidth(80)
         self.setValue(JsonData.curr_size_ind)
         self.valueChanged.connect(self.change_size)
-        signals_app.slider_change_value.connect(self.move_slider_cmd)
+        SignalsApp.all.slider_change_value.connect(self.move_slider_cmd)
     
     def move_slider_cmd(self, value: int):
         self.setValue(value)
         JsonData.curr_size_ind = value
-        signals_app.grid_thumbnails_cmd.emit("resize")
+        SignalsApp.all.grid_thumbnails_cmd.emit("resize")
 
     def change_size(self, value: int):
         self.setValue(value)
         JsonData.curr_size_ind = value
-        signals_app.grid_thumbnails_cmd.emit("resize")
+        SignalsApp.all.grid_thumbnails_cmd.emit("resize")
 
 
 class BarBottom(QFrame):
@@ -125,7 +125,7 @@ class BarBottom(QFrame):
 
         self.downloads = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_downloads.svg") , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
-        signals_app.btn_downloads_toggle.connect(self.btn_downloads_toggle)
+        SignalsApp.all.btn_downloads_toggle.connect(self.btn_downloads_toggle)
         self.h_layout.addWidget(self.downloads, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_switch.svg"), size=20)

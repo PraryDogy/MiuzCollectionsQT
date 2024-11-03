@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
 from base_widgets import ContextMenuBase, ContextSubMenuBase, LayoutH, LayoutV
 from cfg import ALL_COLLS, LIMIT, MENU_W, Dynamic, JsonData
 from database import Dbase, ThumbsMd
-from signals import signals_app
+from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 
@@ -42,14 +42,14 @@ class CustomContext(ContextMenuBase):
 
     def change_view(self):
         JsonData.small_menu_view = not JsonData.small_menu_view
-        signals_app.reload_menu_left.emit()
+        SignalsApp.all.reload_menu_left.emit()
 
     def show_collection(self):
         JsonData.curr_coll = self.true_name
-        signals_app.win_main_cmd.emit("set_title")
-        signals_app.reload_menu_left.emit()
-        signals_app.grid_thumbnails_cmd.emit("to_top")
-        signals_app.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all.win_main_cmd.emit("set_title")
+        SignalsApp.all.reload_menu_left.emit()
+        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
 
     def reveal_collection(self):
         if self.true_name == ALL_COLLS:
@@ -86,10 +86,10 @@ class CollectionBtn(QLabel):
         if ev.button() == Qt.MouseButton.LeftButton:
             JsonData.curr_coll = self.true_name
             Dynamic.current_photo_limit = LIMIT
-            signals_app.win_main_cmd.emit("set_title")
-            signals_app.reload_menu_left.emit()
-            signals_app.grid_thumbnails_cmd.emit("reload")
-            signals_app.grid_thumbnails_cmd.emit("to_top")
+            SignalsApp.all.win_main_cmd.emit("set_title")
+            SignalsApp.all.reload_menu_left.emit()
+            SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+            SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
@@ -142,7 +142,7 @@ class BaseLeftMenu(QScrollArea):
         self.v_layout = LayoutV()
         scroll_widget.setLayout(self.v_layout)
         self.init_ui()
-        signals_app.reload_menu_left.connect(self.reload_menu)
+        SignalsApp.all.reload_menu_left.connect(self.reload_menu)
 
     def init_ui(self):
         btns_widget = QWidget()
@@ -180,7 +180,7 @@ class BaseLeftMenu(QScrollArea):
 
     def change_view(self):
         JsonData.small_menu_view = not JsonData.small_menu_view
-        signals_app.reload_menu_left.emit()
+        SignalsApp.all.reload_menu_left.emit()
 
     def load_colls_query(self) -> dict:
         menus = defaultdict(list)

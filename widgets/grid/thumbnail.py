@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 from base_widgets import LayoutV
 from cfg import (PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic,
                  JsonData)
-from signals import signals_app
+from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import ImageUtils, MainUtils
 
@@ -112,7 +112,7 @@ class Thumbnail(QFrame):
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.src)
-        signals_app.win_img_view_open_in.emit(self)
+        SignalsApp.all.win_img_view_open_in.emit(self)
         return super().mouseDoubleClickEvent(a0)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 
 from base_widgets import ContextMenuBase
 from cfg import PSD_TIFF, Dynamic, JsonData
-from signals import signals_app
+from signals import SignalsApp
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
 from utils.main_utils import MainUtils
@@ -78,14 +78,14 @@ class CustomContext(ContextMenuBase):
             return
 
         copy_task = ThreadCopyFiles(dest=dest, files=files)
-        signals_app.btn_downloads_toggle.emit("show")
+        SignalsApp.all.btn_downloads_toggle.emit("show")
         copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, files=files))
         copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = MainUtils.reveal_files(files)
         if len(Dynamic.copy_threads) == 0:
-            signals_app.btn_downloads_toggle.emit("hide")
+            SignalsApp.all.btn_downloads_toggle.emit("hide")
         try:
             copy_task.remove_threads()                
         except Exception as e:

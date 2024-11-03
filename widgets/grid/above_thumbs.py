@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV
 from cfg import ALL_COLLS, LIMIT, Dynamic, JsonData
-from signals import signals_app
+from signals import SignalsApp
 from styles import Names, Themes
 
 BTN_W, BTN_H = 120, 28
@@ -22,9 +22,9 @@ class ResetDatesBtn(QLabel):
         Dynamic.date_start, Dynamic.date_end = None, None
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.btn_dates_style.emit("normal")
-        signals_app.grid_thumbnails_cmd.emit("reload")
-        signals_app.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all.btn_dates_style.emit("normal")
+        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -39,9 +39,9 @@ class ResetSearchBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.wid_search_cmd.emit("clear")
-        signals_app.grid_thumbnails_cmd.emit("reload")
-        signals_app.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all.wid_search_cmd.emit("clear")
+        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -56,9 +56,9 @@ class ResetFiltersBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.bar_top_reset_filters.emit()
-        signals_app.grid_thumbnails_cmd.emit("reload")
-        signals_app.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all.bar_top_reset_filters.emit()
+        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -75,14 +75,14 @@ class ShowAllBtn(QLabel):
         JsonData.curr_coll = ALL_COLLS
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.wid_search_cmd.emit("clear")
-        signals_app.bar_top_reset_filters.emit()
+        SignalsApp.all.wid_search_cmd.emit("clear")
+        SignalsApp.all.bar_top_reset_filters.emit()
 
-        signals_app.win_main_cmd.emit("set_title")
-        signals_app.reload_menu_left.emit()
+        SignalsApp.all.win_main_cmd.emit("set_title")
+        SignalsApp.all.reload_menu_left.emit()
 
-        signals_app.grid_thumbnails_cmd.emit("reload")
-        signals_app.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
