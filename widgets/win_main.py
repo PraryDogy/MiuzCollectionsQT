@@ -47,40 +47,38 @@ class WinMain(WinBase):
         self.setMenuBar(BarMacos())
         self.titlebar.add_r_wid(WidSearch())
 
-        self.h_wid_main = QWidget()
-        self.h_lay_main = LayoutH()
-        self.h_wid_main.setLayout(self.h_lay_main)
-        self.central_layout.addWidget(self.h_wid_main)
+        h_wid_main = QWidget()
+        h_lay_main = LayoutH()
+        h_wid_main.setLayout(h_lay_main)
+        self.central_layout.addWidget(h_wid_main)
 
-        self.left_wid = MenuLeft()
-        self.h_lay_main.addWidget(self.left_wid)
+        left_wid = MenuLeft()
+        h_lay_main.addWidget(left_wid)
 
-        self.mid_wid = QFrame()
-        self.mid_wid.setFixedWidth(1)
-        self.mid_wid.setObjectName(Names.separator)
-        self.mid_wid.setStyleSheet(Themes.current)
-        self.h_lay_main.addWidget(self.mid_wid)
+        mid_wid = QFrame()
+        mid_wid.setFixedWidth(1)
+        mid_wid.setObjectName(Names.separator)
+        mid_wid.setStyleSheet(Themes.current)
+        h_lay_main.addWidget(mid_wid)
 
-        self.right_wid = QWidget()
-        self.h_lay_main.addWidget(self.right_wid)
-        self.right_lay = LayoutV()
-        self.right_wid.setLayout(self.right_lay)
+        right_wid = QWidget()
+        h_lay_main.addWidget(right_wid)
+        right_lay = LayoutV()
+        right_wid.setLayout(right_lay)
 
         self.bar_top = BarTop()
-        self.right_lay.addWidget(self.bar_top)
+        right_lay.addWidget(self.bar_top)
         self.bar_top.resizeEvent = self.resize_noti_cmd
 
-        self.thumbnails = Thumbnails()
-        self.right_lay.addWidget(self.thumbnails)
+        thumbnails = Thumbnails()
+        right_lay.addWidget(thumbnails)
 
-        self.bar_bottom = BarBottom()
-        self.right_lay.addWidget(self.bar_bottom)
+        bar_bottom = BarBottom()
+        right_lay.addWidget(bar_bottom)
 
-        self.noti = Notification(parent=self.right_wid)
+        self.noti = Notification(parent=right_wid)
         self.noti.move(2, 2)
         self.noti.hide()
-
-        QTimer.singleShot(2000, lambda: MainUtils.send_notification("123"))
 
         SignalsApp.all.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
