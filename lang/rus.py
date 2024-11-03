@@ -6,7 +6,7 @@ class Rus:
 		self.bar_menu = 'Меню'
 		self.browse = 'Обзор'
 		self.cancel = 'Отмена'
-		self.choose_coll_smb = 'Подключите Marketing/Design\nили Studio/Photo'
+		self.choose_coll_smb = "Возможные решения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках."
 		self.close = 'Закрыть'
 		self.collection = 'Коллекция'
 		self.compact_menu = 'Компактное меню'

@@ -24,7 +24,7 @@ class WinSmb(WinStandartBase):
         # self.disable_close()
 
         self.init_ui()
-        self.setFixedSize(300, 130)
+        self.setFixedSize(350, 170)
         self.center_win(parent=parent)
         self.setFocus()
 
@@ -59,5 +59,5 @@ class WinSmb(WinStandartBase):
         self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() == Qt.Key.Key_Return:
+        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
             self.close_cmd()

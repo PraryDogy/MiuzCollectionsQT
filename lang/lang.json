@@ -16,8 +16,8 @@
         "Cancel"
     ],
     "choose_coll_smb": [
-        "Подключите Marketing/Design\nили Studio/Photo",
-        "Connect Marketing/Design\nor Studio/Photo"
+        "Возможные решения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках.",
+        "Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings."
     ],
     "close": [
         "Закрыть",
@@ -32,7 +32,7 @@
         "Compact menu"
     ],
     "connect_sb06": [
-        "Подключите Studio/Photo",
+        "Подключитесь к Studio/Photo",
         "Connect Studio/Photo"
     ],
     "copy": [

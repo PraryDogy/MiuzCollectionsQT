@@ -6,7 +6,7 @@ class Eng:
 		self.bar_menu = 'Menu'
 		self.browse = 'Browse'
 		self.cancel = 'Cancel'
-		self.choose_coll_smb = 'Connect Marketing/Design\nor Studio/Photo'
+		self.choose_coll_smb = "Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings."
 		self.close = 'Close'
 		self.collection = 'Collection'
 		self.compact_menu = 'Compact menu'
