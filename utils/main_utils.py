@@ -3,18 +3,18 @@ import logging
 import os
 import platform
 import subprocess
+import sys
 import traceback
 
 import cv2
 import numpy as np
 import psd_tools
-from PyQt5.QtCore import QByteArray, Qt
+from PyQt5.QtCore import QByteArray, QProcess, Qt
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout
 from tifffile import tifffile
 
 from cfg import Dynamic, JsonData
-from database import *
 from signals import SignalsApp
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
@@ -251,16 +251,7 @@ class MainUtils:
             check=True
             )
         return paste_result.stdout.strip()
-    
-    @classmethod
-    def get_app(cls):
-        from start import app
-        return app
-    
-    @classmethod
-    def get_main_win(cls) -> QMainWindow:
-        return cls.get_app().main_win
-    
+        
     @classmethod
     def reveal_files(cls, files_list: list):
         reveal_script = "applescripts/reveal_files.scpt"
