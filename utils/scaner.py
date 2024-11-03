@@ -294,13 +294,15 @@ class DbUpdater:
             src: str,
             image_item: ImageItem
             ) -> Delete | Insert | Update:
+        
+        src = src.replace(JsonData.coll_folder, "")
 
         if flag == self.flag_del:
             return sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
 
         values = {
                 "img150": bytes_img,
-                "src": src.replace(JsonData.coll_folder, ""),
+                "src": src,
                 "size": image_item.size,
                 "created": image_item.created,
                 "modified": image_item.modified,
