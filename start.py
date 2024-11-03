@@ -71,6 +71,7 @@ class App(QApplication):
                 SignalsApp.all.win_main_cmd.emit("show")
         return super().eventFilter(a0, a1)
 
+
 print("ТЕБЕ НУЖНО СОЗДАТЬ БАЗУ ДАННЫХ С НУЖНЫМИ КОЛОНКАМИ")
 app = App(sys.argv)
 JsonData.init()
