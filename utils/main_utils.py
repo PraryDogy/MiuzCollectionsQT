@@ -266,6 +266,11 @@ class MainUtils:
             SignalsApp.all.noti_win_main.emit(text)
 
     @classmethod
+    def start_new_app(cls):
+        os.execl(sys.executable, sys.executable, *sys.argv)
+        # QProcess.startDetached(sys.executable, sys.argv)
+
+    @classmethod
     def print_err(cls, parent: object, error: Exception):
         tb = traceback.extract_tb(error.__traceback__)
 

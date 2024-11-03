@@ -359,13 +359,13 @@ class WinSettings(WinStandartBase):
             JsonData.write_json_data()
             QApplication.quit()
             Dbase.copy_db_file()
-            QProcess.startDetached(sys.executable, sys.argv)
+            MainUtils.start_new_app()
 
         elif hasattr(self.change_lang, "reload"):
             print("settings change lang")
             JsonData.write_json_data()
             QApplication.quit()
-            QProcess.startDetached(sys.executable, sys.argv)
+            MainUtils.start_new_app()
 
         elif stop_colls != JsonData.stop_colls:
             print("settings update stop colls")
