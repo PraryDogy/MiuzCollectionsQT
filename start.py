@@ -72,7 +72,7 @@ class App(QApplication):
         return super().eventFilter(a0, a1)
 
 
-print("ТЕБЕ НУЖНО СОЗДАТЬ БАЗУ ДАННЫХ С НУЖНЫМИ КОЛОНКАМИ")
+print("Прежде чем запустить приложение переименуй колонки в бд и сократи src")
 app = App(sys.argv)
 JsonData.init()
 Dbase.init()
