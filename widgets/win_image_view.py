@@ -41,22 +41,20 @@ class LoadImageThread(MyThread):
     def run(self):
         try:
 
-            full_src = JsonData.coll_folder + self.src
-
-            if not os.path.exists(full_src):
+            if not os.path.exists(self.src):
                 print("img viewer > load img thread > path not exists")
 
-            if full_src not in Cache.images:
-                img = ImageUtils.read_image(full_src)
+            if self.src not in Cache.images:
+                img = ImageUtils.read_image(self.src)
 
-                if not full_src.endswith(PSD_TIFF):
+                if not self.src.endswith(PSD_TIFF):
                     img = ImageUtils.array_bgr_to_rgb(img)
 
                 pixmap = ImageUtils.pixmap_from_array(img)
-                Cache.images[full_src] = pixmap
+                Cache.images[self.src] = pixmap
 
             else:
-                pixmap = Cache.images.get(full_src)
+                pixmap = Cache.images.get(self.src)
 
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
@@ -266,8 +264,9 @@ class WinImageView(WinImgViewBase):
     def load_thumbnail(self):
         if self.src not in Cache.images:
             self.set_title(Dynamic.lng.loading)
+            # преобразуем полный путь в относительный для работы в ДБ
             small_src = self.src.replace(JsonData.coll_folder, "")
-            q = (sqlalchemy.select(THUMBS.c.img150).where(THUMBS.c.src == self.src))
+            q = (sqlalchemy.select(THUMBS.c.img150).where(THUMBS.c.src == small_src))
             conn = Dbase.engine.connect()
 
             try:

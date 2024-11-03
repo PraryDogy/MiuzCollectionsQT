@@ -35,13 +35,12 @@ class DbImages:
             conn.close()
             return
 
-        thumbs_dict = defaultdict(lambda: defaultdict(list))
-
         thumbs_dict = defaultdict(list[DbImage])
 
         for img, src, modified, coll in res:
 
-            src = src.replace(JsonData.coll_folder, "")
+            # создаем полный путь из относительного из ДБ
+            src = JsonData.coll_folder + src
             modified = datetime.fromtimestamp(modified).date()
 
             if Dynamic.date_start or Dynamic.date_end:

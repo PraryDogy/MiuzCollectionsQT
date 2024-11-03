@@ -46,67 +46,6 @@ class ScanerUtils:
         conn.close()
 
 
-class Migrate:
-    def start(self):
-        return
-        conn = ScanerUtils.conn_get()
-
-        q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.collection)
-        res: tuple[str, str] = conn.execute(q).first()
-
-        if res:
-            img_src, coll_name = res
-        else:
-            print("Migrate > can'l load row > no collection folder in db > it's ok")
-            return
-    
-        old_coll_folder = img_src.split(os.sep + coll_name + os.sep)[0]
-
-        if JsonData.coll_folder == old_coll_folder:
-            return
-                
-        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.src)
-        res = conn.execute(q).fetchall()
-        
-        if len(res) == 0:
-            return
-
-        new_res = [
-            (res_id, src.replace(old_coll_folder, JsonData.coll_folder))
-            for res_id, src in res
-            ]
-        
-        for res_id, src in new_res:
-            q = (
-                sqlalchemy.update(THUMBS)
-                .values(src=src)
-                .where(THUMBS.c.id==res_id)
-                )
-            conn.execute(q)
-
-        ScanerUtils.conn_commit(conn)
-        ScanerUtils.conn_close(conn)
-        ScanerUtils.reload_gui()
-
-
-class TrashRemover:
-
-    def start(self):
-        return
-
-        coll_folder = os.sep + JsonData.coll_folder.strip(os.sep) + os.sep
-        conn = ScanerUtils.conn_get()
-
-        q = (sqlalchemy.select(THUMBS.c.src).where(THUMBS.c.src.not_like(f"%{coll_folder}%")))
-        trash_img = conn.execute(q).scalar() or None
-
-        if trash_img:
-            q = (sqlalchemy.delete(THUMBS).where(THUMBS.c.src.not_like(f"%{coll_folder}%")))
-            conn.execute(q)
-            ScanerUtils.conn_commit(conn)
-            ScanerUtils.conn_close(conn)
-
-
 class ImageItem:
     __slots__ = ["size", "created", "modified"]
     def __init__(self, size: int, created: int, modified: int):
@@ -196,6 +135,7 @@ class DbImages:
         q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.size, THUMBS.c.created, THUMBS.c.modified)
         try:
             res = conn.execute(q).fetchall()
+            # не забываем относительный путь ДБ преобразовать в полный
             return {
                 JsonData.coll_folder + src: ImageItem(size, created, modified)
                 for src, size, created, modified in res
@@ -295,6 +235,7 @@ class DbUpdater:
             image_item: ImageItem
             ) -> Delete | Insert | Update:
         
+        # преобразуем полный путь в относительный для работы с ДБ
         src = src.replace(JsonData.coll_folder, "")
 
         if flag == self.flag_del:
@@ -366,9 +307,6 @@ class ScanerThread(QThread):
     def start_scan(self):
         ScanerUtils.can_scan = True
 
-        migrate = Migrate()
-        migrate.start()
-
         finder_images = FinderImages()
         finder_images = finder_images.get()
 
@@ -382,12 +320,6 @@ class ScanerThread(QThread):
 
             db_updater = DbUpdater(compared_res)
             db_updater.start()
-
-        try:
-            trash_remover = TrashRemover()
-            trash_remover.start()
-        except Exception as e:
-            MainUtils.print_err(parent=trash_remover, error=e)
 
 
 class ScanerShedule(QObject):
