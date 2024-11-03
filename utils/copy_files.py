@@ -4,8 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from cfg import Dynamic
 
-from .main_utils import MainUtils
-from .my_thread import MyThread
+from .main_utils import MainUtils, MyThread
 
 
 class ThreadCopyFiles(MyThread):

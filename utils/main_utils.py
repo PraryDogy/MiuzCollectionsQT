@@ -9,7 +9,7 @@ import traceback
 import cv2
 import numpy as np
 import psd_tools
-from PyQt5.QtCore import QByteArray, QProcess, Qt
+from PyQt5.QtCore import QByteArray, QObject, QProcess, Qt, QThread
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout
 from tifffile import tifffile
@@ -20,6 +20,26 @@ from signals import SignalsApp
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
 psd_logger.setLevel(logging.CRITICAL)
+
+
+class Threads:
+    list = []
+
+
+class MyThread(QThread):
+    def __init__(self, parent: QObject):
+        super().__init__(parent=parent)
+        Threads.list.append(self)
+
+    def remove_threads(self):
+        """Remove dead threads"""
+        try:
+            for i in Threads.list:
+                i: QThread
+                if not i.isRunning():
+                    Threads.list.remove(i)
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
 
 
 class ImageUtils:

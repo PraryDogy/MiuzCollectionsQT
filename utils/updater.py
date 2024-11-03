@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData
 
-from .my_thread import MyThread
+from .main_utils import MyThread
 
 
 class UpdaterMain(QObject):

@@ -8,11 +8,10 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
 from cfg import PSD_TIFF, Dynamic, JsonData
-from database import Dbase, THUMBS
+from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import ImageUtils, MainUtils
-from utils.my_thread import MyThread
+from utils.main_utils import ImageUtils, MainUtils, MyThread
 
 from .context_img import ContextImg
 from .wid_notification import Notification
