@@ -267,8 +267,7 @@ class WinImageView(WinImgViewBase):
         if self.src not in Cache.images:
             self.set_title(Dynamic.lng.loading)
 
-            q = (sqlalchemy.select(THUMBS.c.img150)
-                .filter(THUMBS.c.src == self.src))
+            q = (sqlalchemy.select(THUMBS.c.img150).where(THUMBS.c.src == self.src))
             conn = Dbase.engine.connect()
 
             try:

@@ -6,5 +6,3 @@ raw db
 возможно сигналы и датабазу тоже
 
 .filter > .where
-
-utils get app

@@ -79,7 +79,7 @@ class Migrate:
             q = (
                 sqlalchemy.update(THUMBS)
                 .values(src=src)
-                .filter(THUMBS.c.id==res_id)
+                .where(THUMBS.c.id==res_id)
                 )
             conn.execute(q)
 

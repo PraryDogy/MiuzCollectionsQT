@@ -80,10 +80,10 @@ class DbImages:
 
         if Dynamic.search_widget_text:
             search = Dynamic.search_widget_text.replace("\n", "").strip()
-            q = q.filter(THUMBS.c.src.like(f"%{search}%"))
+            q = q.where(THUMBS.c.src.like(f"%{search}%"))
 
         if JsonData.curr_coll != ALL_COLLS:
-            q = q.filter(THUMBS.c.collection == JsonData.curr_coll)
+            q = q.where(THUMBS.c.collection == JsonData.curr_coll)
 
         filters = [
             THUMBS.c.src.like(f"%/{true_name}/%") 
@@ -100,16 +100,16 @@ class DbImages:
         if all((filters, other_filter)):
             filters = sqlalchemy.or_(*filters)
             other_filter = sqlalchemy.and_(*other_filter)
-            q = q.filter(sqlalchemy.or_(filters, other_filter))
+            q = q.where(sqlalchemy.or_(filters, other_filter))
         elif filters:
-            q = q.filter(sqlalchemy.or_(*filters))
+            q = q.where(sqlalchemy.or_(*filters))
         elif other_filter:
-            q = q.filter(sqlalchemy.and_(*other_filter))
+            q = q.where(sqlalchemy.and_(*other_filter))
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self._stamp_dates()
-            q = q.filter(THUMBS.c.modified > t[0])
-            q = q.filter(THUMBS.c.modified < t[1])
+            q = q.where(THUMBS.c.modified > t[0])
+            q = q.where(THUMBS.c.modified < t[1])
 
         q = q.limit(Dynamic.current_photo_limit)
         q = q.order_by(-THUMBS.c.modified)
