@@ -67,11 +67,11 @@ class App(QApplication):
         # return super().eventFilter(a0, a1)
 
 
+app = App(sys.argv)
 JsonData.check_app_dirs()
 JsonData.read_json_data()
 Themes.set_theme(JsonData.theme)
 Dbase.init()
-app = App(sys.argv)
 SignalsApp.init()
 win_main = WinMain()
 win_main.show()
