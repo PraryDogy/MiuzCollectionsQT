@@ -266,7 +266,7 @@ class WinImageView(WinImgViewBase):
             self.set_title(Dynamic.lng.loading)
             # преобразуем полный путь в относительный для работы в ДБ
             small_src = self.src.replace(JsonData.coll_folder, "")
-            q = (sqlalchemy.select(THUMBS.c.img150).where(THUMBS.c.src == small_src))
+            q = (sqlalchemy.select(THUMBS.c.img).where(THUMBS.c.src == small_src))
             conn = Dbase.engine.connect()
 
             try:

@@ -47,11 +47,11 @@ class ScanerUtils:
 
 
 class ImageItem:
-    __slots__ = ["size", "created", "modified"]
-    def __init__(self, size: int, created: int, modified: int):
+    __slots__ = ["size", "created", "mod"]
+    def __init__(self, size: int, created: int, mod: int):
         self.size = size
         self.created = created
-        self.modified = modified
+        self.mod = mod
 
 
 class FinderImages:
@@ -132,13 +132,13 @@ class DbImages:
 
     def get(self) -> dict[str, ImageItem]:
         conn = ScanerUtils.conn_get()
-        q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.size, THUMBS.c.created, THUMBS.c.modified)
+        q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.size, THUMBS.c.created, THUMBS.c.mod)
         try:
             res = conn.execute(q).fetchall()
             # не забываем относительный путь ДБ преобразовать в полный
             return {
-                JsonData.coll_folder + src: ImageItem(size, created, modified)
-                for src, size, created, modified in res
+                JsonData.coll_folder + src: ImageItem(size, created, mod)
+                for src, size, created, mod in res
                 }
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
@@ -182,7 +182,7 @@ class ImageCompator:
             if not in_db:
                 result.ins_items[finder_src] = finder_item
 
-            elif not (finder_item.size, finder_item.modified) == (in_db.size, in_db.modified):
+            elif not (finder_item.size, finder_item.mod) == (in_db.size, in_db.mod):
                 result.upd_items[finder_src] = finder_item
 
         return result
@@ -242,11 +242,11 @@ class DbUpdater:
             return sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
 
         values = {
-                "img150": bytes_img,
+                "img": bytes_img,
                 "src": src,
                 "size": image_item.size,
                 "created": image_item.created,
-                "modified": image_item.modified,
+                "mod": image_item.mod,
                 "collection": MainUtils.get_coll_name(src),
                 }
         

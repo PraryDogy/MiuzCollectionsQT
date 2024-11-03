@@ -37,18 +37,18 @@ class DbImages:
 
         thumbs_dict = defaultdict(list[DbImage])
 
-        for img, src, modified, coll in res:
+        for img, src, mod, coll in res:
 
             # создаем полный путь из относительного из ДБ
             src = JsonData.coll_folder + src
-            modified = datetime.fromtimestamp(modified).date()
+            mod = datetime.fromtimestamp(mod).date()
 
             if Dynamic.date_start or Dynamic.date_end:
-                modified = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
+                mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
             else:
-                modified = f"{Dynamic.lng.months[str(modified.month)]} {modified.year}"
+                mod = f"{Dynamic.lng.months[str(mod.month)]} {mod.year}"
 
-            thumbs_dict[modified].append(DbImage(img, src, coll))
+            thumbs_dict[mod].append(DbImage(img, src, coll))
 
         return thumbs_dict
 
@@ -59,10 +59,10 @@ class DbImages:
 
     def _get_stmt(self):
         q = sqlalchemy.select(
-            THUMBS.c.img150,
+            THUMBS.c.img,
             THUMBS.c.src,
-            THUMBS.c.modified,
-            THUMBS.c.collection
+            THUMBS.c.mod,
+            THUMBS.c.coll
             )
 
         if Dynamic.search_widget_text:
@@ -70,7 +70,7 @@ class DbImages:
             q = q.where(THUMBS.c.src.like(f"%{search}%"))
 
         if JsonData.curr_coll != ALL_COLLS:
-            q = q.where(THUMBS.c.collection == JsonData.curr_coll)
+            q = q.where(THUMBS.c.coll == JsonData.curr_coll)
 
         filters = [
             THUMBS.c.src.like(f"%/{true_name}/%") 
@@ -95,9 +95,9 @@ class DbImages:
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self._stamp_dates()
-            q = q.where(THUMBS.c.modified > t[0])
-            q = q.where(THUMBS.c.modified < t[1])
+            q = q.where(THUMBS.c.mod > t[0])
+            q = q.where(THUMBS.c.mod < t[1])
 
         q = q.limit(Dynamic.current_photo_limit)
-        q = q.order_by(-THUMBS.c.modified)
+        q = q.order_by(-THUMBS.c.mod)
         return q

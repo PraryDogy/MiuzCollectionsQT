@@ -185,7 +185,7 @@ class BaseLeftMenu(QScrollArea):
     def load_colls_query(self) -> dict:
         menus = defaultdict(list)
         
-        q = sqlalchemy.select(THUMBS.c.collection).distinct()
+        q = sqlalchemy.select(THUMBS.c.coll).distinct()
         conn = Dbase.engine.connect()
         try:
             res = (i[0] for i in conn.execute(q).fetchall() if i)
