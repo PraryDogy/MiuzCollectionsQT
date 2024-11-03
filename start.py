@@ -37,14 +37,12 @@ if os.path.exists("lib"):
     print()
 
 
-from database import Dbase
-Dbase.create_engine()
-
+# import app происходит только после активации os.environ plugin_path
 from app import App, WinMain
+from database import Dbase
+
+Dbase.create_engine()
 app = App()
 win_main = WinMain()
 win_main.show()
 app.exec_()
-
-# source deacivate
-# import app происходит только после активации os.environ plugin_path
