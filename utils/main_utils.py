@@ -17,7 +17,6 @@ from tifffile import tifffile
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 
-
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
 psd_logger.setLevel(logging.CRITICAL)
@@ -220,16 +219,13 @@ class MainUtils:
     @classmethod
     def smb_check(cls) -> bool:
         if not os.path.exists(JsonData.coll_folder):
+
             for coll_folder in JsonData.coll_folder_list:
                 if os.path.exists(coll_folder):
+
                     JsonData.coll_folder = coll_folder
-
-                    # circular import
-                    from .scaner import Scaner
-                    Scaner.app.stop()
-                    Scaner.app.start()
-
                     return True
+
             return False
         else:
             return True

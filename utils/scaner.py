@@ -7,10 +7,10 @@ from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 from sqlalchemy import Connection, Delete, Insert, Update
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
-from database import Dbase, THUMBS
+from database import THUMBS, Dbase
 from signals import SignalsApp
 
-from .main_utils import MainUtils, ImageUtils
+from .main_utils import ImageUtils, MainUtils
 
 
 class ScanerUtils:
@@ -336,11 +336,11 @@ class ScanerShedule(QObject):
         self.wait_timer.stop()
 
         if not MainUtils.smb_check():
-            print("scaner no smb, wait", self.wait_sec/1000, "sec")
+            print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 
         elif self.scaner_thread:
-            print("prev scan not finished, wait", self.wait_sec/1000, "sec")
+            print("prev scan not finished, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 
         else:

@@ -124,11 +124,11 @@ class WinMain(WinBase):
         JsonData.write_json_data()
 
     def after_start(self):
+        Scaner.app.start()
+
         if not MainUtils.smb_check():
-            self.smb_win = WinSmb(parent=self.main_win)
+            self.smb_win = WinSmb(parent=self)
             self.smb_win.show()
-        else:
-            Scaner.app.start()
 
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
