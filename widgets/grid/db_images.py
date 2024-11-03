@@ -5,7 +5,7 @@ from datetime import datetime
 import sqlalchemy
 
 from cfg import ALL_COLLS, Dynamic, JsonData
-from database import Dbase, ThumbsMd
+from database import Dbase, THUMBS
 from utils.main_utils import MainUtils
 
 
@@ -72,27 +72,27 @@ class DbImages:
 
     def _get_stmt(self):
         q = sqlalchemy.select(
-            ThumbsMd.img150,
-            ThumbsMd.src,
-            ThumbsMd.modified,
-            ThumbsMd.collection
+            THUMBS.c.img150,
+            THUMBS.c.src,
+            THUMBS.c.modified,
+            THUMBS.c.collection
             )
 
         if Dynamic.search_widget_text:
             search = Dynamic.search_widget_text.replace("\n", "").strip()
-            q = q.filter(ThumbsMd.src.like(f"%{search}%"))
+            q = q.filter(THUMBS.c.src.like(f"%{search}%"))
 
         if JsonData.curr_coll != ALL_COLLS:
-            q = q.filter(ThumbsMd.collection == JsonData.curr_coll)
+            q = q.filter(THUMBS.c.collection == JsonData.curr_coll)
 
         filters = [
-            ThumbsMd.src.like(f"%/{true_name}/%") 
+            THUMBS.c.src.like(f"%/{true_name}/%") 
             for code_name, true_name in JsonData.cust_fltr_names.items()
             if JsonData.cust_fltr_vals[code_name]
         ]
 
         other_filter = [
-            ThumbsMd.src.not_like(f"%/{true_name}/%") 
+            THUMBS.c.src.not_like(f"%/{true_name}/%") 
             for code_name, true_name in JsonData.cust_fltr_names.items() 
             if JsonData.sys_fltr_vals["other"]
             ]
@@ -108,9 +108,9 @@ class DbImages:
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self._stamp_dates()
-            q = q.filter(ThumbsMd.modified > t[0])
-            q = q.filter(ThumbsMd.modified < t[1])
+            q = q.filter(THUMBS.c.modified > t[0])
+            q = q.filter(THUMBS.c.modified < t[1])
 
         q = q.limit(Dynamic.current_photo_limit)
-        q = q.order_by(-ThumbsMd.modified)
+        q = q.order_by(-THUMBS.c.modified)
         return q

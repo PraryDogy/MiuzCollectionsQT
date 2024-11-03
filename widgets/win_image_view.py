@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
 from cfg import PSD_TIFF, Dynamic, JsonData
-from database import Dbase, ThumbsMd
+from database import Dbase, THUMBS
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import ImageUtils, MainUtils
@@ -267,8 +267,8 @@ class WinImageView(WinImgViewBase):
         if self.src not in Cache.images:
             self.set_title(Dynamic.lng.loading)
 
-            q = (sqlalchemy.select(ThumbsMd.img150)
-                .filter(ThumbsMd.src == self.src))
+            q = (sqlalchemy.select(THUMBS.c.img150)
+                .filter(THUMBS.c.src == self.src))
             conn = Dbase.engine.connect()
 
             try:

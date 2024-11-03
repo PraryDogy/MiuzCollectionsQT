@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 from sqlalchemy import Connection, Delete, Insert, Update
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
-from database import Dbase, ThumbsMd
+from database import Dbase, THUMBS
 from signals import SignalsApp
 
 from .main_utils import MainUtils, ImageUtils
@@ -50,7 +50,7 @@ class Migrate:
     def start(self):
         conn = ScanerUtils.conn_get()
 
-        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.collection)
+        q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.collection)
         res: tuple[str, str] = conn.execute(q).first()
 
         if res:
@@ -64,7 +64,7 @@ class Migrate:
         if JsonData.coll_folder == old_coll_folder:
             return
                 
-        q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
+        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.src)
         res = conn.execute(q).fetchall()
         
         if len(res) == 0:
@@ -77,9 +77,9 @@ class Migrate:
         
         for res_id, src in new_res:
             q = (
-                sqlalchemy.update(ThumbsMd)
-                .values({"src": src})
-                .filter(ThumbsMd.id==res_id)
+                sqlalchemy.update(THUMBS)
+                .values(src=src)
+                .filter(THUMBS.c.id==res_id)
                 )
             conn.execute(q)
 
@@ -95,11 +95,11 @@ class TrashRemover:
         coll_folder = os.sep + JsonData.coll_folder.strip(os.sep) + os.sep
         conn = ScanerUtils.conn_get()
 
-        q = (sqlalchemy.select(ThumbsMd.src).where(ThumbsMd.src.not_like(f"%{coll_folder}%")))
+        q = (sqlalchemy.select(THUMBS.c.src).where(THUMBS.c.src.not_like(f"%{coll_folder}%")))
         trash_img = conn.execute(q).scalar() or None
 
         if trash_img:
-            q = (sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src.not_like(f"%{coll_folder}%")))
+            q = (sqlalchemy.delete(THUMBS).where(THUMBS.c.src.not_like(f"%{coll_folder}%")))
             conn.execute(q)
             ScanerUtils.conn_commit(conn)
             ScanerUtils.conn_close(conn)
@@ -191,7 +191,7 @@ class DbImages:
 
     def get(self) -> dict[str, ImageItem]:
         conn = ScanerUtils.conn_get()
-        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created, ThumbsMd.modified)
+        q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.size, THUMBS.c.created, THUMBS.c.modified)
         try:
             res = conn.execute(q).fetchall()
             return {
@@ -294,7 +294,7 @@ class DbUpdater:
             ) -> Delete | Insert | Update:
 
         if flag == self.flag_del:
-            return sqlalchemy.delete(ThumbsMd).where(ThumbsMd.src==src)
+            return sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
 
         values = {
                 "img150": bytes_img,
@@ -306,10 +306,10 @@ class DbUpdater:
                 }
         
         if flag == self.flag_ins:
-            return sqlalchemy.insert(ThumbsMd).values(values) 
+            return sqlalchemy.insert(THUMBS).values(**values) 
            
         else:
-            return sqlalchemy.update(ThumbsMd).values(values).where(ThumbsMd.src==src)
+            return sqlalchemy.update(THUMBS).values(**values).where(THUMBS.c.src==src)
 
     def modify_db(self, compared_items: dict[str, ImageItem], flag: str):
         stmt_count = 0

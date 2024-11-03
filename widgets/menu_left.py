@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
 
 from base_widgets import ContextMenuBase, ContextSubMenuBase, LayoutH, LayoutV
 from cfg import ALL_COLLS, LIMIT, MENU_W, Dynamic, JsonData
-from database import Dbase, ThumbsMd
+from database import Dbase, THUMBS
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -185,7 +185,7 @@ class BaseLeftMenu(QScrollArea):
     def load_colls_query(self) -> dict:
         menus = defaultdict(list)
         
-        q = sqlalchemy.select(ThumbsMd.collection).distinct()
+        q = sqlalchemy.select(THUMBS.c.collection).distinct()
         conn = Dbase.engine.connect()
         try:
             res = (i[0] for i in conn.execute(q).fetchall() if i)
