@@ -8,9 +8,15 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 from utils.scaner import ScanerShedule
-from widgets import (BarBottom, BarMacos, BarTop, MenuLeft, Notification,
-                     Thumbnails, WidSearch)
-from widgets.win_smb import WinSmb
+
+from .bar_bottom import BarBottom
+from .bar_macos import BarMacos
+from .bar_top import BarTop
+from .grid.main import Thumbnails
+from .menu_left import MenuLeft
+from .wid_notification import Notification
+from .wid_search import WidSearch
+from .win_smb import WinSmb
 
 
 class TestWid(QFrame):
