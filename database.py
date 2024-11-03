@@ -1,16 +1,51 @@
+import os
+import shutil
+
 import sqlalchemy
-from sqlalchemy.orm import declarative_base
 
 from cfg import DB_FILE
 
+METADATA = sqlalchemy.MetaData()
+
+
+# class ThumbsMd(Dbase.base):
+#     __tablename__ = "thumbs"
+#     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+#     img150 = sqlalchemy.Column(sqlalchemy.LargeBinary)
+#     src = sqlalchemy.Column(sqlalchemy.Text, unique=True)
+#     size = sqlalchemy.Column(sqlalchemy.Integer)
+#     created = sqlalchemy.Column(sqlalchemy.Integer)
+#     modified = sqlalchemy.Column(sqlalchemy.Integer)
+#     collection = sqlalchemy.Column(sqlalchemy.Text)
+
+
+THUMBS = sqlalchemy.Table(
+    "thumbs", METADATA,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("img150", sqlalchemy.LargeBinary),
+    sqlalchemy.Column("src", sqlalchemy.Text, unique=True),
+    sqlalchemy.Column("size", sqlalchemy.Integer, comment="Размер"),
+    sqlalchemy.Column("created", sqlalchemy.Integer, comment="Дата созд."),
+    sqlalchemy.Column("modified", sqlalchemy.Integer, comment="Дата изм."),
+    sqlalchemy.Column("collection", sqlalchemy.Text),
+    )
 
 class Dbase:
-    base = declarative_base()
     engine: sqlalchemy.Engine = None
 
     @classmethod
     def init(cls) -> sqlalchemy.Engine:
+        cls.create_engine()
 
+        tables = [THUMBS]
+        check_tables = cls.check_tables(tables)
+
+        if not check_tables:
+            cls.copy_db_file()
+            cls.create_engine()
+
+    @classmethod
+    def create_engine(cls):
         cls.engine = sqlalchemy.create_engine(
             "sqlite:////" + DB_FILE,
             connect_args={"check_same_thread": False},
@@ -20,19 +55,36 @@ class Dbase:
     @classmethod
     def vacuum(cls):
         conn = cls.engine.connect()
-        try:
-            conn.execute(sqlalchemy.text("VACUUM"))
-            conn.commit()
-        finally:
-            conn.close()
+        conn.execute(sqlalchemy.text("VACUUM"))
+        conn.commit()
 
+    @classmethod
+    def check_tables(cls, tables: list):
+        inspector = sqlalchemy.inspect(cls.engine)
 
-class ThumbsMd(Dbase.base):
-    __tablename__ = "thumbs"
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    img150 = sqlalchemy.Column(sqlalchemy.LargeBinary)
-    src = sqlalchemy.Column(sqlalchemy.Text, unique=True)
-    size = sqlalchemy.Column(sqlalchemy.Integer)
-    created = sqlalchemy.Column(sqlalchemy.Integer)
-    modified = sqlalchemy.Column(sqlalchemy.Integer)
-    collection = sqlalchemy.Column(sqlalchemy.Text)
+        db_tables = inspector.get_table_names()
+        res: bool = (list(i.name for i in tables) == db_tables)
+
+        if not res:
+            print("Не соответствие таблиц, создаю новую дб")
+            os.remove(DB_FILE)
+            return False
+
+        for table in tables:
+            clmns = list(clmn.name for clmn in table.columns)
+            db_clmns = list(clmn.get("name") for clmn in inspector.get_columns(table.name))
+            res = bool(db_clmns == clmns)
+
+            if not res:
+                print(f"Не соответствие колонок в {table.name}, создаю новую дб")
+                os.remove(DB_FILE)
+                return False
+            
+        return True
+
+    @classmethod
+    def copy_db_file(cls):
+        if os.path.exists(DB_FILE):
+            os.remove(DB_FILE)
+
+        shutil.copyfile(src="db.db", dst=DB_FILE)

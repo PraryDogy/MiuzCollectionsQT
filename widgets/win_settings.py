@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import sys
 
@@ -10,7 +9,8 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 
 from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
                           WinStandartBase)
-from cfg import APP_SUPPORT_DIR, DB_FILE, Dynamic, JsonData
+from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
+from database import Dbase
 from signals import SignalsApp
 from utils.main_utils import MainUtils
 from utils.updater import Updater
@@ -88,8 +88,6 @@ class CollFolderListInput(CustomTextEdit):
 
 
 class ChangeLang(QWidget):
-    pressed = pyqtSignal()
-
     def __init__(self):
         super().__init__()
         self.lang = JsonData.user_lng
@@ -116,14 +114,10 @@ class ChangeLang(QWidget):
             self.lang = "ru"
 
         self.lang_btn.setText(self.get_lng_text())
-        self.finalize()
-        self.pressed.emit()
 
-    def finalize(self):
         if self.lang != JsonData.user_lng:
-
             JsonData.dynamic_set_lang(self.lang)
-            # ПЕРЕЗАГРУЗКА ПРИЛОЖУХИ
+            setattr(self, "reload", True)
 
 
 class CustFilters(QWidget):
@@ -284,7 +278,6 @@ class WinSettings(WinStandartBase):
         self.change_lang = ChangeLang()
         self.content_layout.addWidget(self.change_lang)
         self.content_layout.addSpacerItem(QSpacerItem(0, 30))
-        self.change_lang.pressed.connect(self.reload_ui)
 
         h_wid = QWidget()
         self.content_layout.addWidget(h_wid)
@@ -358,33 +351,34 @@ class WinSettings(WinStandartBase):
         self.close()
 
     def ok_cmd(self, e):
-        scan_again = False
-
         coll_folder_list = self.coll_folder_list_input.get_text()
-        JsonData.coll_folder_list = coll_folder_list
+        stop_colls = self.stopcolls.get_stopcolls()
 
         if hasattr(self, "restore_flag"):
-            # Dbase.clear_all_engines()
-
+            print("settings restore db")
+            JsonData.write_json_data()
             QApplication.quit()
-            if os.path.exists(DB_FILE):
-                os.remove(DB_FILE)
-
-            shutil.copyfile(src="db.db", dst=DB_FILE)
+            Dbase.copy_db_file()
             QProcess.startDetached(sys.executable, sys.argv)
 
-            # gui_SignalsApp.all.reload_thumbnails.emit()
-            # scan_again = True
+        elif hasattr(self.change_lang, "reload"):
+            print("settings change lang")
+            JsonData.write_json_data()
+            QApplication.quit()
+            QProcess.startDetached(sys.executable, sys.argv)
 
-        if self.stopcolls.get_stopcolls() != JsonData.stop_colls:
-            JsonData.stop_colls = self.stopcolls.get_stopcolls()
-            scan_again = True
-
-        if scan_again:
+        elif stop_colls != JsonData.stop_colls:
+            print("settings update stop colls")
+            JsonData.stop_colls = stop_colls
             SignalsApp.all.scaner_toggle.emit("stop")
             SignalsApp.all.scaner_toggle.emit("start")
+            JsonData.write_json_data()
 
-        JsonData.write_json_data()
+        elif coll_folder_list != JsonData.coll_folder_list:
+            print("settings update coll folder list")
+            JsonData.coll_folder_list = coll_folder_list
+            JsonData.write_json_data()
+
         self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
