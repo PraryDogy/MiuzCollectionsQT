@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, LayoutH, SvgBtn, WinStandartBase
@@ -6,10 +7,10 @@ from cfg import Dynamic
 
 
 class WinSmb(WinStandartBase):
-    finished = pyqtSignal()
+    _finished = pyqtSignal()
 
     def __init__(self, parent: QWidget, text: str = None):
-        super().__init__(close_func=self.cancel_cmd)
+        super().__init__(close_func=self.close_cmd)
 
         if text:
             self.my_text = text
@@ -31,12 +32,8 @@ class WinSmb(WinStandartBase):
         self.new_lang = None
         self.need_reset = None
 
-    def cancel_cmd(self, event):
-        self.finished.emit()
-        self.close()
-
-    def pass_btn_cmd(self, event):
-        self.finished.emit()
+    def close_cmd(self, *args):
+        self._finished.emit()
         self.close()
 
     def init_ui(self):
@@ -58,9 +55,9 @@ class WinSmb(WinStandartBase):
         self.content_layout.addSpacerItem(QSpacerItem(0, 10))
 
         self.ok_btn = Btn(Dynamic.lng.ok)
-        self.ok_btn.mouseReleaseEvent = self.pass_btn_cmd
+        self.ok_btn.mouseReleaseEvent = self.close_cmd
         self.content_layout.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-    # def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        # return
-        # return super().keyPressEvent(a0)
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Return:
+            self.close_cmd()

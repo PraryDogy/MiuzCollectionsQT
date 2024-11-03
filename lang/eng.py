@@ -61,7 +61,7 @@ class Eng:
 		self.search = 'Search'
 		self.search_dates = 'Searching for photos by dates.\nControl dates with up/down keys.'
 		self.set_theme = 'Theme'
-		self.sett_stopcolls = 'Hide collections'
+		self.sett_stopcolls = 'Ignore collections'
 		self.sett_stopwords = 'Ignore * in the file name when searching for tiff/psd'
 		self.settings = 'Settings'
 		self.show_about = 'Show about'

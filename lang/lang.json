@@ -266,8 +266,8 @@
         "Theme"
     ],
     "sett_stopcolls": [
-        "Скрыть коллекции",
-        "Hide collections"
+        "Игнорировать коллекции",
+        "Ignore collections"
     ],
     "sett_stopwords": [
         "Игнорировать * в имени файла при поиске tiff/psd",

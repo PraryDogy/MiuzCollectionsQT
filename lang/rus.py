@@ -61,7 +61,7 @@ class Rus:
 		self.search = 'Поиск'
 		self.search_dates = 'Поиск фотографий по датам.\nУправляйте датами с клавишами вверх/вниз.'
 		self.set_theme = 'Тема'
-		self.sett_stopcolls = 'Скрыть коллекции'
+		self.sett_stopcolls = 'Игнорировать коллекции'
 		self.sett_stopwords = 'Игнорировать * в имени файла при поиске tiff/psd'
 		self.settings = 'Настройки'
 		self.show_about = 'О приложении'

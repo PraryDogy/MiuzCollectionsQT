@@ -21,7 +21,7 @@ class ScanerUtils:
     @classmethod
     def progressbar_value(cls, value: int):
         try:
-            SignalsApp.all.progressbar_change_value.emit(value)
+            SignalsApp.all.progressbar_set_value.emit(value)
         except RuntimeError as e:
             MainUtils.print_err(parent=cls, error=e)
 

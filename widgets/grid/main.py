@@ -259,7 +259,7 @@ class Thumbnails(QScrollArea):
                 self.win_info = WinInfo(src=wid.src, parent=self)
                 self.win_info.show()
             else:
-                self.smb_win = WinSmb(parent=self.my_parent)
+                self.smb_win = WinSmb(parent=self)
                 self.smb_win.show()
 
         elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):

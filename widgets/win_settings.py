@@ -368,28 +368,30 @@ class WinSettings(WinStandartBase):
         stop_colls = self.stopcolls.get_stopcolls()
 
         if hasattr(self.restore_db_btn, "flag"):
-            print("settings restore db")
+            print("settings win restore db")
             JsonData.write_json_data()
             QApplication.quit()
             Dbase.copy_db_file()
             MainUtils.start_new_app()
 
         elif hasattr(self.change_lang, "flag"):
-            print("settings change lang")
+            print("settings win change lang")
             JsonData.write_json_data()
             QApplication.quit()
             MainUtils.start_new_app()
 
         elif stop_colls != JsonData.stop_colls:
-            print("settings update stop colls")
+            print("settings win stop colls updated")
             JsonData.stop_colls = stop_colls
             Scaner.app.stop()
             Scaner.app.start()
             JsonData.write_json_data()
 
         elif coll_folder_list != JsonData.coll_folder_list:
-            print("settings update coll folder list")
+            print("settings win coll folder list updated")
             JsonData.coll_folder_list = coll_folder_list
+            Scaner.app.stop()
+            Scaner.app.start()
             JsonData.write_json_data()
 
         self.close()

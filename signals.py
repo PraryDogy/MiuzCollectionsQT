@@ -8,7 +8,7 @@ class Signals(QObject):
     grid_thumbnails_cmd = pyqtSignal(str)
     noti_win_main = pyqtSignal(str)
     noti_win_img_view = pyqtSignal(str)
-    progressbar_change_value = pyqtSignal(int)
+    progressbar_set_value = pyqtSignal(int)
     reload_menu_left = pyqtSignal()
     slider_change_value = pyqtSignal(int)
     thumbnail_select = pyqtSignal(str)

@@ -19,10 +19,3 @@ from database import THUMBS, Dbase
 #     q = sqlalchemy.update(THUMBS).values(src=new_src).where(THUMBS.c.id == id)
 #     conn.execute(q)
 # conn.commit()
-
-
-src = "/Users/Morkowik/Desktop/Evgeny/sample images/big_images/2022-04-20 13-32-22.jpg"
-
-from utils.main_utils import ImageUtils
-
-img = ImageUtils.read_image(src)

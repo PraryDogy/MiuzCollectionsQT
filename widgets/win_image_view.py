@@ -32,7 +32,7 @@ class ImageData:
 
 
 class LoadImageThread(MyThread):
-    finished = pyqtSignal(object)
+    _finished = pyqtSignal(object)
 
     def __init__(self, src: str):
         super().__init__(parent=None)
@@ -40,10 +40,6 @@ class LoadImageThread(MyThread):
 
     def run(self):
         try:
-
-            if not os.path.exists(self.src):
-                print("img viewer > load img thread > path not exists")
-
             if self.src not in Cache.images:
                 img = ImageUtils.read_image(self.src)
 
@@ -63,7 +59,7 @@ class LoadImageThread(MyThread):
         if len(Cache.images) > 50:
             Cache.images.pop(next(iter(Cache.images)))
 
-        self.finished.emit(ImageData(self.src, pixmap.width(), pixmap))
+        self._finished.emit(ImageData(self.src, pixmap.width(), pixmap))
         self.remove_threads()
 
 
@@ -253,11 +249,11 @@ class WinImageView(WinImgViewBase):
         self.load_thumbnail()
 
         SignalsApp.all.noti_win_img_view.connect(self.notification.show_notify)
-        QTimer.singleShot(300, self.smb_check_first)
+        QTimer.singleShot(300, self.smb_check)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
 
-    def smb_check_first(self):
+    def smb_check(self):
         if not MainUtils.smb_check():
             self.win_smb = WinSmb(parent=self)
             self.win_smb.show()
@@ -281,11 +277,14 @@ class WinImageView(WinImgViewBase):
             pixmap.loadFromData(thumbnail)
             self.image_label.set_image(pixmap)
 
-        self.load_image_thread()
+        if MainUtils.smb_check():
+            self.load_image_thread()
+        else:
+            print("img viewer > path not exists", self.src)
 
     def load_image_thread(self):
         img_thread = LoadImageThread(self.src)
-        img_thread.finished.connect(self.load_image_finished)
+        img_thread._finished.connect(self.load_image_finished)
         img_thread.start()
 
     def load_image_finished(self, data: ImageData):

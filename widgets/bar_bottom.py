@@ -15,37 +15,29 @@ from .win_downloads import DownloadsWin
 from .win_settings import WinSettings
 
 
-class ProgressBar(QWidget):
+class ProgressBar(CustomProgressBar):
     def __init__(self):
         super().__init__()
+        self.setFixedWidth(100)
+        self.setMinimum(0)
+        self.setMaximum(100)
+        self.set_value(0)
+        SignalsApp.all.progressbar_set_value.connect(self.set_value)
 
-        layout = LayoutH(self)
-
-        self.title = QLabel()
-        layout.addWidget(self.title)
-
-        spacer = QSpacerItem(10, 0)
-        layout.addItem(spacer)
-
-        self.progress_bar = CustomProgressBar()
-        self.progress_bar.setMinimum(0)
-        self.progress_bar.setMaximum(100)
-        self.progressbar_value(0)
-        layout.addWidget(self.progress_bar)
-
-        SignalsApp.all.progressbar_change_value.connect(self.progressbar_value)
-
-    def progressbar_value(self, value: int):
+    def set_value(self, value: int):
 
         if not isinstance(value, int):
-            raise Exception ("widgets > bar_bottom > progress bar > set_value > value not int", value)
+            raise Exception ("widgets > bar_bottom > progress bar > value is not int:", type(value))
+        
+        elif value < 0 or value > 100:
+            raise Exception ("widgets > bar_bottom > progress bar > wrong value (0-100):", value)
 
-        self.progress_bar.setValue(value)
+        self.setValue(value)
 
-        if self.progress_bar.value() in (0, 100):
-            self.progress_bar.hide()
+        if self.value() in (0, 100):
+            self.hide()
         else:
-            self.progress_bar.show()
+            self.show()
 
         
 class BaseSlider(QSlider):
@@ -120,7 +112,6 @@ class BarBottom(QFrame):
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         self.progress_bar = ProgressBar()
-        self.progress_bar.setFixedWidth(120)
         self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.downloads = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_downloads.svg") , size=20)
