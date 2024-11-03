@@ -46,7 +46,7 @@ class CustomContext(ContextMenuBase):
 
     def show_collection(self):
         JsonData.curr_coll = self.true_name
-        signals_app.reload_win_main_title.emit()
+        signals_app.win_main_cmd.emit("set_title")
         signals_app.reload_menu_left.emit()
         signals_app.reload_grid_thumbnails.emit()
 
@@ -89,7 +89,7 @@ class CollectionBtn(QLabel):
     def load_collection(self):
         JsonData.curr_coll = self.true_name
         Dynamic.current_photo_limit = LIMIT
-        signals_app.reload_win_main_title.emit()
+        signals_app.win_main_cmd.emit("set_title")
         signals_app.grid_thumbnails_to_top.emit()
         signals_app.reload_menu_left.emit()
         signals_app.reload_grid_thumbnails.emit()

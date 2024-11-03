@@ -100,15 +100,9 @@ class WinMain(WinBase):
         self.titlebar.add_r_wid(search_bar)
 
         self.set_title(self.get_coll())
-        signals_app.reload_win_main_title.connect(lambda: self.set_title(self.get_coll()))
 
         content_wid = ContentWid()
         self.central_layout.addWidget(content_wid)
-
-        # quit_action = QAction("Quit", self)
-        # quit_action.triggered.connect(self.close)
-
-        # self.installEventFilter(self)
 
         signals_app.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
@@ -118,6 +112,8 @@ class WinMain(WinBase):
             self.show()
         elif flag == "exit":
             self.on_exit()
+        elif flag == "set_title":
+            self.set_title(self.get_coll())
         else: 
             raise Exception("app > win main > wrong flag", flag)
 

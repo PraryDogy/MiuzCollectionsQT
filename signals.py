@@ -12,7 +12,6 @@ class Signals(QObject):
     progressbar_change_value = pyqtSignal(int)
     reload_grid_thumbnails = pyqtSignal()
     reload_menu_left = pyqtSignal()
-    reload_win_main_title = pyqtSignal()
     scaner_toggle = pyqtSignal(str)
     slider_change_value = pyqtSignal(int)
     thumbnail_select = pyqtSignal(str)
