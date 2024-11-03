@@ -236,8 +236,6 @@ class WinImageView(WinImgViewBase):
         self.notification.move(10, 2) # 10 left side, 10 right side, 2 top side
         self.notification.hide()
 
-        SignalsApp.all.noti_win_img_view.connect(self.notification.show_notify)
-
         self.prev_image_btn = PrevImageBtn(self.content_wid)
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
 
@@ -254,6 +252,7 @@ class WinImageView(WinImgViewBase):
         self.setFocus()
         self.load_thumbnail()
 
+        SignalsApp.all.noti_win_img_view.connect(self.notification.show_notify)
         QTimer.singleShot(300, self.smb_check_first)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM

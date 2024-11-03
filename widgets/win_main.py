@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QCloseEvent, QKeyEvent, QResizeEvent
-from PyQt5.QtWidgets import QDesktopWidget, QFrame, QPushButton, QVBoxLayout
+from PyQt5.QtGui import QCloseEvent, QKeyEvent
+from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
+                             QWidget)
 
 from base_widgets import LayoutH, LayoutV, WinBase
 from cfg import ALL_COLLS, APP_NAME, Dynamic, JsonData
@@ -36,70 +37,57 @@ class TestWid(QFrame):
         ...
 
 
-class RightWidget(QFrame):
-    def __init__(self):
-        super().__init__()
-        v_layout = LayoutV()
-        self.setLayout(v_layout)
-
-        self.filters_bar = BarTop()
-        v_layout.addWidget(self.filters_bar)
-
-        self.thumbnails = Thumbnails()
-        v_layout.addWidget(self.thumbnails)
-
-        self.st_bar = BarBottom()
-        v_layout.addWidget(self.st_bar)
-
-        self.notification = Notification(parent=self)
-        self.notification.move(2, 2)
-        self.notification.hide()
-
-        SignalsApp.all.noti_win_main.connect(self.notification.show_notify)
-        
-    def resizeEvent(self, a0: QResizeEvent | None) -> None:
-        w, h = self.thumbnails.width() - 6, self.filters_bar.height() - 5
-        self.notification.resize(w, h)
-        return super().resizeEvent(a0)
-
-
-class ContentWid(QFrame):
-    def __init__(self):
-        super().__init__()
-        h_layout = LayoutH(self)
-
-        self.left_menu = MenuLeft()
-        sep = QFrame()
-        sep.setFixedWidth(1)
-        sep.setObjectName(Names.separator)
-        sep.setStyleSheet(Themes.current)
-        self.right_widget = RightWidget()
-
-        h_layout.addWidget(self.left_menu)
-        h_layout.addWidget(sep)
-        h_layout.addWidget(self.right_widget)
-
-
 class WinMain(WinBase):
     def __init__(self):
         super().__init__(close_func=self.my_close_event)
 
         self.setContentsMargins(0, 0, 0, 0)
-        self.setWindowTitle(APP_NAME)
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.set_title(self.get_coll())
+        self.setMenuBar(BarMacos())
+        self.titlebar.add_r_wid(WidSearch())
 
-        menubar = BarMacos()
-        self.setMenuBar(menubar)
+        self.h_wid_main = QWidget()
+        self.h_lay_main = LayoutH()
+        self.h_wid_main.setLayout(self.h_lay_main)
+        self.central_layout.addWidget(self.h_wid_main)
 
-        search_bar = WidSearch()
-        self.titlebar.add_r_wid(search_bar)
+        self.left_wid = MenuLeft()
+        self.h_lay_main.addWidget(self.left_wid)
 
-        content_wid = ContentWid()
-        self.central_layout.addWidget(content_wid)
+        self.mid_wid = QFrame()
+        self.mid_wid.setFixedWidth(1)
+        self.mid_wid.setObjectName(Names.separator)
+        self.mid_wid.setStyleSheet(Themes.current)
+        self.h_lay_main.addWidget(self.mid_wid)
+
+        self.right_wid = QWidget()
+        self.h_lay_main.addWidget(self.right_wid)
+        self.right_lay = LayoutV()
+        self.right_wid.setLayout(self.right_lay)
+
+        self.bar_top = BarTop()
+        self.right_lay.addWidget(self.bar_top)
+        self.bar_top.resizeEvent = self.resize_noti_cmd
+
+        self.thumbnails = Thumbnails()
+        self.right_lay.addWidget(self.thumbnails)
+
+        self.bar_bottom = BarBottom()
+        self.right_lay.addWidget(self.bar_bottom)
+
+        self.noti = Notification(parent=self.right_wid)
+        self.noti.move(2, 2)
+        self.noti.hide()
+
+        QTimer.singleShot(2000, lambda: MainUtils.send_notification("123"))
 
         SignalsApp.all.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
+
+    def resize_noti_cmd(self, *args):
+        w, h = self.bar_top.width(), self.bar_top.height()
+        self.noti.resize(w - 6, h - 6)
 
     def win_main_cmd(self, flag: str):
         if flag == "show":
@@ -146,7 +134,7 @@ class WinMain(WinBase):
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
         # self.test.show()
-
+    
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
