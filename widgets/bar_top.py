@@ -21,9 +21,17 @@ class DatesBtn(Btn):
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        signals_app.set_dates_btn_blue.connect(self.set_blue_style)
-        signals_app.set_dates_btn_normal.connect(self.set_normal_style)
-        signals_app.set_dates_btn_blue_border.connect(self.set_border_blue_style)
+        signals_app.dates_btn_style.connect(self.dates_btn_style)
+
+    def dates_btn_style(self, flag: str):
+        if flag == "blue":
+            self.set_blue_style()
+        elif flag == "normal":
+            self.set_normal_style()
+        elif flag == "border":
+            self.set_border_blue_style()
+        else:
+            raise Exception("widgets > bar_top > dates btn > wrong flag", flag)
 
     def set_normal_style(self):
         self.setObjectName(Names.dates_btn)

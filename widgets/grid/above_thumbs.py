@@ -22,7 +22,7 @@ class ResetDatesBtn(QLabel):
         Dynamic.date_start, Dynamic.date_end = None, None
         Dynamic.current_photo_limit = LIMIT
 
-        signals_app.set_dates_btn_normal.emit()
+        signals_app.dates_btn_style.emit("normal")
         signals_app.reload_thumbnails.emit()
         signals_app.scroll_top.emit()
         return super().mouseReleaseEvent(ev)

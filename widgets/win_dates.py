@@ -88,13 +88,13 @@ class FiltersDateBtncolor:
     @staticmethod
     def date_based_color():
         if not Dynamic.date_start:
-            signals_app.set_dates_btn_normal.emit()
+            signals_app.dates_btn_style.emit("normal")
         else:
-            signals_app.set_dates_btn_blue.emit()
+            signals_app.dates_btn_style.emit("blue")
 
     @staticmethod
     def set_border():
-        signals_app.set_dates_btn_blue_border.emit()
+        signals_app.dates_btn_style.emit("border")
 
 
 class TitleLabel(QLabel):

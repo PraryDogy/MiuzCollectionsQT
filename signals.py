@@ -16,9 +16,7 @@ class Signals(QObject):
     clear_search = pyqtSignal()
     scroll_top = pyqtSignal()
 
-    set_dates_btn_blue_border = pyqtSignal()
-    set_dates_btn_normal = pyqtSignal()
-    set_dates_btn_blue = pyqtSignal()
+    dates_btn_style = pyqtSignal(str)
 
     set_focus_search = pyqtSignal()
 
