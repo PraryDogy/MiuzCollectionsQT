@@ -160,7 +160,7 @@ class JsonData:
             print("файла не существует")
             cls.write_config()
 
-        cls.set_language(cls.user_lng)
+        cls.dynamic_set_lang(cls.user_lng)
 
         if cls.coll_folder not in cls.coll_folder_list:
             print("\ncoll folder в json не из coll folder list")
@@ -185,17 +185,15 @@ class JsonData:
             return False
 
     @classmethod
-    def set_language(cls, lang_name: Literal["ru", "en"]):
-        if lang_name == "ru":
-            cls.user_lng = "ru"
-            Dynamic.lng = Rus()
+    def dynamic_set_lang(cls, key_: Literal["ru", "en"]):
 
-        elif lang_name == "en":
-            cls.user_lng = "en"
-            Dynamic.lng = Eng()
+        data: dict[str, Rus | Eng] = {"ru": Rus, "en": Eng}
 
+        if key_ in data:
+            Dynamic.lng = data.get(key_)()
+            cls.user_lng = key_
         else:
-            raise Exception("cfg > set_language wrong lang_name arg")
+            raise KeyError("cfg > dymamic set lang > no key", key_)
 
     @classmethod
     def check_app_dirs(cls):

@@ -122,7 +122,7 @@ class ChangeLang(QWidget):
     def finalize(self):
         if self.lang != JsonData.user_lng:
 
-            JsonData.set_language(self.lang)
+            JsonData.dynamic_set_lang(self.lang)
             # ПЕРЕЗАГРУЗКА ПРИЛОЖУХИ
 
 
