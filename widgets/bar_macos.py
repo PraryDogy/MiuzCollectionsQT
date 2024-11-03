@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QContextMenuEvent
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
@@ -67,6 +67,11 @@ class AboutWin(WinSmallBase):
 
         lbl = SelectableLabel(self)
         self.content_layout.addWidget(lbl)
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):
+            self.deleteLater()
+        return super().keyPressEvent(a0)
 
 
 class BarMacos(QMenuBar):
