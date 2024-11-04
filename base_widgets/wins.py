@@ -98,18 +98,14 @@ class TitleBar(QFrame):
 
     def add_r_wid(self, wid: QWidget):
         self.main_layout.addWidget(wid)
-
-        self.title.setStyleSheet(
-            f"""
-            padding-left: {wid.width()}px;
-            """)
+        self.title.setStyleSheet(f"""padding-left: {wid.width()}px;""")
 
 
 class Manager:
     wins = []
 
 
-class WinBase(QMainWindow, QObject):
+class WinFrameless(QMainWindow, QObject):
     def __init__(self, close_func: callable, parent: QWidget = None):
         super().__init__(parent=parent)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
@@ -195,51 +191,41 @@ class WinBase(QMainWindow, QObject):
 
 
 class BaseBottomWid(QFrame):
-    def __init__(self, left=10, top=10, right=10, bottom=10):
+    def __init__(self):
         super().__init__()
-        self.setContentsMargins(left, top, right, bottom)
         self.setObjectName(Names.base_bottom_widget)
         self.setStyleSheet(Themes.current)
 
 
-class WinStandartBase(WinBase):
+class WinStandartBase(WinFrameless):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
         self.titlebar.setFixedHeight(28)
-
         self.content_wid = BaseBottomWid()
         self.central_layout.addWidget(self.content_wid)
-
         self.content_layout = LayoutVer()
         self.content_wid.setLayout(self.content_layout)
     
 
-class WinImgViewBase(WinBase):
+class WinImgViewBase(WinFrameless):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
-
         self.titlebar.setFixedHeight(28)
-
-        self.content_wid = BaseBottomWid(left=10, top=0, right=10, bottom=0)
+        self.content_wid = BaseBottomWid()
+        self.content_wid.setContentsMargins(10, 0, 10, 0)
         self.central_layout.addWidget(self.content_wid)
         self.content_wid.setObjectName("img_view_bg")
         self.content_wid.setStyleSheet(Themes.current)
-
         self.content_layout = LayoutVer()
         self.content_wid.setLayout(self.content_layout)
 
-    def bind_content_wid(self, func: callable):
-        self.content_wid.mouseReleaseEvent = func
 
-
-class WinSmallBase(WinBase):
+class WinSmallBase(WinFrameless):
     def __init__(self, close_func: callable):
         super().__init__(close_func)
-
         self.titlebar.setFixedHeight(28)
-
-        self.content_wid = BaseBottomWid(left=10, top=5, right=10, bottom=7)
+        self.content_wid = BaseBottomWid()
+        self.content_wid.setContentsMargins(10, 5, 10, 5)
         self.central_layout.addWidget(self.content_wid)
-
         self.content_layout = LayoutVer()
         self.content_wid.setLayout(self.content_layout)
