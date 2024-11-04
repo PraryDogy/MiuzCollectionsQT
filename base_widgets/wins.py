@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QEvent, QObject, QPoint, Qt
+from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
@@ -25,6 +25,8 @@ MAX_NONFOCUS = "max-1.svg"
 
 
 class TitleBtn(SvgBtn):
+    _clicked = pyqtSignal()
+
     def __init__(self, focused: str, nonfocused: str, size: int):
         self.focused = focused
         self.nonfocused = nonfocused
@@ -38,6 +40,9 @@ class TitleBtn(SvgBtn):
     def set_nonfocused(self):
         path = os.path.join(IMAGES_FOLDER, self.nonfocused)
         self.set_icon(path)
+
+    def mousePressEvent(self, a0: QMouseEvent | None) -> None:
+        self._clicked.emit()
 
 
 class TitleBtns(QWidget):
@@ -94,12 +99,12 @@ class TitleBar(QFrame):
         self.h_lay = LayoutHor()
         self.setLayout(self.h_lay)
 
-        self.btns = TitleBtns()
-        self.h_lay.addWidget(self.btns)
+        self.title_btns = TitleBtns()
+        self.h_lay.addWidget(self.title_btns)
 
         self.title = QLabel()
         self.h_lay.addWidget(self.title, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.h_lay.addSpacerItem(QSpacerItem(self.btns.width(), 0))
+        self.h_lay.addSpacerItem(QSpacerItem(self.title_btns.width(), 0))
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         self.old_pos = a0.globalPos()
@@ -117,7 +122,8 @@ class Manager:
 
 
 class WinFrameless(QMainWindow, QObject):
-    def __init__(self, close_func: callable, parent: QWidget = None):
+    def __init__(self, parent: QWidget = None):
+
         super().__init__(parent=parent)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -126,14 +132,15 @@ class WinFrameless(QMainWindow, QObject):
         central_widget.setContentsMargins(1, 1, 1, 1)
         central_widget.setObjectName(Names.central_widget)
         central_widget.setStyleSheet(Themes.current)
-
         self.setCentralWidget(central_widget)
-        self.central_layout_v = LayoutVer(central_widget)
+
+        self.central_layout_v = LayoutVer()
+        central_widget.setLayout(self.central_layout_v)
 
         self.titlebar = TitleBar(self)
-        self.titlebar.btns.max_btn.mouseReleaseEvent = self.toggle_fullscreen
-        self.titlebar.btns.min_btn.mouseReleaseEvent = self.show_minimized
-        self.titlebar.btns.close_btn.mouseReleaseEvent = close_func
+        self.titlebar.title_btns.min_btn._clicked.connect(self.show_minimized)
+        self.titlebar.title_btns.max_btn._clicked.connect(self.toggle_fullscreen)
+
         self.central_layout_v.addWidget(self.titlebar)
 
         self.gripSize = 16
@@ -144,6 +151,9 @@ class WinFrameless(QMainWindow, QObject):
             self.grips.append(grip)
 
         Manager.wins.append(self)
+
+    def close_btn_cmd(self, fn: callable):
+        self.titlebar.title_btns.close_btn._clicked.connect(fn)
 
     def center_relative_parent(self, parent: QWidget):
         try:
@@ -166,16 +176,16 @@ class WinFrameless(QMainWindow, QObject):
         self.titlebar.title.setText(text)
 
     def disable_min(self):
-        self.titlebar.btns.min_btn.setDisabled(True)
-        self.titlebar.btns.min_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
+        self.titlebar.title_btns.min_btn.setDisabled(True)
+        self.titlebar.title_btns.min_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
 
     def disable_max(self):
-        self.titlebar.btns.max_btn.setDisabled(True)
-        self.titlebar.btns.max_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
+        self.titlebar.title_btns.max_btn.setDisabled(True)
+        self.titlebar.title_btns.max_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
 
     def disable_close(self):
-        self.titlebar.btns.close_btn.setDisabled(True)
-        self.titlebar.btns.close_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
+        self.titlebar.title_btns.close_btn.setDisabled(True)
+        self.titlebar.title_btns.close_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:

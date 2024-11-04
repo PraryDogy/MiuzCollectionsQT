@@ -39,12 +39,13 @@ class TestWid(QFrame):
 
 class WinMain(WinFrameless):
     def __init__(self):
-        super().__init__(close_func=self.my_close_event)
+        super().__init__()
 
+        self.close_btn_cmd(self.hide_)
         self.setContentsMargins(0, 0, 0, 0)
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.setMenuBar(BarMacos())
-        # self.titlebar.add_r_wid(WidSearch())
+
         self.set_title(
             Dynamic.lng.all_colls
             if JsonData.curr_coll == ALL_COLLS
@@ -117,10 +118,8 @@ class WinMain(WinFrameless):
         y = (screen.height() - size.height()) // 2
         self.move(x, y)
     
-    def my_close_event(self, a0: QCloseEvent | None) -> None:
-        self.titlebar.btns.nonfocused_icons()
+    def hide_(self, *args):
         self.hide()
-        a0.ignore()
 
     def on_exit(self):
         Scaner.app.stop()
@@ -142,7 +141,7 @@ class WinMain(WinFrameless):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                self.my_close_event(a0)
+                self.hide_(a0)
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
