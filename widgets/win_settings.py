@@ -293,14 +293,14 @@ class WinSettings(WinStandartBase):
     def init_ui(self):
         self.change_lang = ChangeLang()
         self.change_lang._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lng.apply))
-        self.content_layout.addWidget(self.change_lang)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        self.content_layout_v.addWidget(self.change_lang)
+        self.content_layout_v.addSpacerItem(QSpacerItem(0, 30))
 
         h_wid = QWidget()
-        self.content_layout.addWidget(h_wid)
+        self.content_layout_v.addWidget(h_wid)
         h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 25))
+        self.content_layout_v.addSpacerItem(QSpacerItem(0, 25))
 
         self.update_wid = UpdaterWidget()
         h_layout.addWidget(self.update_wid)
@@ -310,35 +310,35 @@ class WinSettings(WinStandartBase):
 
         self.restore_db_btn = RestoreBtn()
         self.restore_db_btn._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lng.apply))
-        self.content_layout.addWidget(self.restore_db_btn)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        self.content_layout_v.addWidget(self.restore_db_btn)
+        self.content_layout_v.addSpacerItem(QSpacerItem(0, 30))
 
         self.cust_filters = CustFilters()
-        self.content_layout.addWidget(self.cust_filters)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        self.content_layout_v.addWidget(self.cust_filters)
+        self.content_layout_v.addSpacerItem(QSpacerItem(0, 30))
 
         # self.stopwords = StopWords()
         # self.content_layout.addWidget(self.stopwords)
         # self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.stopcolls = StopColls()
-        self.content_layout.addWidget(self.stopcolls)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        self.content_layout_v.addWidget(self.stopcolls)
+        self.content_layout_v.addSpacerItem(QSpacerItem(0, 30))
 
         coll_folder_list_label = QLabel(text=Dynamic.lng.where_to_look_coll_folder)
-        self.content_layout.addWidget(coll_folder_list_label)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 10))
+        self.content_layout_v.addWidget(coll_folder_list_label)
+        self.content_layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.coll_folder_list_input = CollFolderListInput()
-        self.content_layout.addWidget(self.coll_folder_list_input)
-        self.content_layout.addSpacerItem(QSpacerItem(0, 30))
+        self.content_layout_v.addWidget(self.coll_folder_list_input)
+        self.content_layout_v.addSpacerItem(QSpacerItem(0, 30))
 
-        self.content_layout.addStretch()
+        self.content_layout_v.addStretch()
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
         btns_wid.setLayout(btns_layout)
-        self.content_layout.addWidget(btns_wid)
+        self.content_layout_v.addWidget(btns_wid)
 
         btns_layout.addStretch(1)
 
@@ -357,7 +357,7 @@ class WinSettings(WinStandartBase):
         btns_layout.addStretch(1)
 
     def reload_ui(self):
-        MainUtils.clear_layout(self.content_layout)
+        MainUtils.clear_layout(self.content_layout_v)
         self.init_ui()
 
     def cancel_cmd(self, e):

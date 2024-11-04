@@ -150,7 +150,7 @@ class WinInfo(WinStandartBase):
         info_wid = QWidget()
         info_layout = LayoutHor()
         info_wid.setLayout(info_layout)
-        self.content_layout.addWidget(info_wid)
+        self.content_layout_v.addWidget(info_wid)
 
         new_data = ImgInfo(img_src=self.src)
         
@@ -166,7 +166,7 @@ class WinInfo(WinStandartBase):
         btns_wid = QWidget()
         btn_layout = LayoutHor()
         btns_wid.setLayout(btn_layout)
-        self.content_layout.addWidget(btns_wid)
+        self.content_layout_v.addWidget(btns_wid)
         button = Btn(Dynamic.lng.close)
         button.mouseReleaseEvent = self.my_close
         btn_layout.addWidget(button)

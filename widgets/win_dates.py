@@ -172,12 +172,13 @@ class RightDateWidget(BaseDateLayout):
 
 class WinDates(WinStandartBase):
     def __init__(self, parent: QWidget):
-        super().__init__(close_func=self.my_close)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        FiltersDateBtncolor.set_border()
+        super().__init__()
+        self.close_btn_cmd(self.cancel_cmd)
         self.min_btn_disable()
         self.max_btn_disable()
         self.set_titlebar_title(Dynamic.lng.dates)
+
+        FiltersDateBtncolor.set_border()
 
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
@@ -190,12 +191,12 @@ class WinDates(WinStandartBase):
     def init_ui(self):
         title_label = QLabel(Dynamic.lng.search_dates)
         title_label.setContentsMargins(0, 0, 0, 5)
-        self.content_layout.addWidget(title_label)
+        self.content_layout_v.addWidget(title_label)
 
         widget_wid = QWidget()
         widget_layout = LayoutHor()
         widget_wid.setLayout(widget_layout)
-        self.content_layout.addWidget(widget_wid)
+        self.content_layout_v.addWidget(widget_wid)
 
         self.left_date = LeftDateWidget()
         self.left_date.dateChangedSignal.connect(partial(self.date_change, "start"))
@@ -214,7 +215,7 @@ class WinDates(WinStandartBase):
         buttons_layout = LayoutHor()
         buttons_wid.setLayout(buttons_layout)
         buttons_layout.setContentsMargins(0, 10, 0, 0)
-        self.content_layout.addWidget(buttons_wid)
+        self.content_layout_v.addWidget(buttons_wid)
 
         buttons_layout.addStretch(1)
         buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -269,7 +270,7 @@ class WinDates(WinStandartBase):
 
         SignalsApp.all.grid_thumbnails_cmd.emit("reload")
 
-    def cancel_cmd(self, event):
+    def cancel_cmd(self, *args):
         FiltersDateBtncolor.date_based_color()
         self.close()
 
@@ -281,7 +282,3 @@ class WinDates(WinStandartBase):
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd(a0)
         return super().keyPressEvent(a0)
-
-    def my_close(self, event):
-        FiltersDateBtncolor.date_based_color()
-        self.close()

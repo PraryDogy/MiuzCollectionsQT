@@ -219,18 +219,24 @@ class BaseBottomWid(QFrame):
 
 
 class WinStandartBase(WinFrameless):
-    def __init__(self, close_func: callable):
-        super().__init__(close_func)
+    def __init__(self):
+        super().__init__()
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.titlebar.setFixedHeight(28)
+
         self.content_wid = BaseBottomWid()
+        self.content_wid.setContentsMargins(10, 10, 10, 10)
+
         self.central_layout_v.addWidget(self.content_wid)
-        self.content_layout = LayoutVer()
-        self.content_wid.setLayout(self.content_layout)
+        self.content_layout_v = LayoutVer()
+        self.content_wid.setLayout(self.content_layout_v)
     
 
 class WinImgViewBase(WinFrameless):
-    def __init__(self, close_func: callable):
-        super().__init__(close_func)
+    def __init__(self):
+        super().__init__()
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+
         self.titlebar.setFixedHeight(28)
         self.content_wid = BaseBottomWid()
         self.content_wid.setContentsMargins(10, 0, 10, 0)
@@ -242,8 +248,10 @@ class WinImgViewBase(WinFrameless):
 
 
 class WinSmallBase(WinFrameless):
-    def __init__(self, close_func: callable):
-        super().__init__(close_func)
+    def __init__(self):
+        super().__init__()
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+
         self.titlebar.setFixedHeight(28)
         self.content_wid = BaseBottomWid()
         self.content_wid.setContentsMargins(10, 5, 10, 5)

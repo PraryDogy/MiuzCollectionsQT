@@ -80,7 +80,7 @@ class DownloadsWin(WinStandartBase):
 
         self.v_layout = LayoutVer()
         self.scroll_widget.setLayout(self.v_layout)
-        self.content_layout.addWidget(self.scroll_area)
+        self.content_layout_v.addWidget(self.scroll_area)
 
         self.progress_wid = QWidget()
         self.progress_layout = LayoutVer()
