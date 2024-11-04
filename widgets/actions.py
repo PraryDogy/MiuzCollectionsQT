@@ -63,16 +63,24 @@ class OpenInfo(CustomAction):
 class CopyPath(CustomAction):
     def __init__(self, parent: QWidget, src: str):
         super().__init__(parent, src, Dynamic.lng.copy_path)
-        cmd_ = lambda: MainUtils.copy_text(text=self.src)
-        self.triggered.connect(cmd_)
+        self.triggered.connect(self.cmd)
 
+    def cmd(self, *args):
+        if MainUtils.smb_check():
+            MainUtils.copy_text(text=self.src)
+        else:
+            Shared.show_smb()
 
 class Reveal(CustomAction):
     def __init__(self, parent: QWidget, src: str):
         super().__init__(parent, src, Dynamic.lng.reveal_in_finder)
-        cmd_ = lambda: MainUtils.reveal_files([self.src])
-        self.triggered.connect(cmd_)
+        self.triggered.connect(self.cmd)
 
+    def cmd(self, *args):
+        if MainUtils.smb_check():
+            MainUtils.reveal_files([self.src])
+        else:
+            Shared.show_smb()
 
 class Save(CustomAction):
     def __init__(self, parent: QWidget, src: str, save_as: bool):
