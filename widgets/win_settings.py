@@ -117,7 +117,6 @@ class ChangeLang(QWidget):
         self.lang_btn.setText(self.get_lng_text())
 
         if self.lang != JsonData.lng_name:
-            JsonData.dynamic_set_lang(self.lang)
             setattr(self, "flag", True)
             self._pressed.emit()
 
@@ -376,6 +375,7 @@ class WinSettings(WinChild):
 
         elif hasattr(self.change_lang, "flag"):
             print("settings win change lang")
+            JsonData.dynamic_set_lang(self.change_lang.lang)
             JsonData.write_json_data()
             QApplication.quit()
             MainUtils.start_new_app()
