@@ -3,7 +3,7 @@ from datetime import datetime
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
-from PyQt5.QtWidgets import QAction, QLabel, QWidget
+from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
 from base_widgets import Btn, ContextCustom, LayoutHor
 from base_widgets.wins import WinChild
@@ -170,6 +170,103 @@ class WinInfo(WinChild):
         button = Btn(Dynamic.lng.close)
         button.mouseReleaseEvent = self.close_
         btn_layout.addWidget(button)
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close_(a0)
+        return super().keyPressEvent(a0)
+  
+    def close_(self, *args):
+        self.close()
+
+
+
+
+
+
+class Shared:
+    split_clmn = "***"
+
+
+class InfoText:
+    def __init__(self, src: str):
+        self.src = src
+
+    def get(self) -> list[str]:
+
+        data: list[str] = []
+
+        name = self.src.split(os.sep)[-1]
+        name = Dynamic.lng.file_name + Shared.split_clmn + name
+
+        src = Dynamic.lng.file_path + Shared.split_clmn + self.src
+
+        coll = MainUtils.get_coll_name(self.src)
+        coll = Dynamic.lng.collection + Shared.split_clmn + coll
+
+        for i in (name, src, coll):
+            data.append(i)
+
+        try:
+            filemod = datetime.fromtimestamp(os.path.getmtime(filename=self.src))
+            filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
+            filemod = Dynamic.lng.date_changed + Shared.split_clmn + filemod
+
+            w, h = get_image_size(self.src)
+            resol = f"{w}x{h}"
+            resol = Dynamic.lng.resolution + Shared.split_clmn + resol
+
+            filesize = round(os.path.getsize(filename=self.src) / (1024*1024), 2)
+            filesize = f"{filesize}{Dynamic.lng.mb}"
+            filesize = Dynamic.lng.file_size + Shared.split_clmn + filesize
+
+            for i in (filemod, resol, filesize):
+                data.append(i)
+
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+        return data
+
+
+class WinInfo(WinChild):
+    def __init__(self, src: str):
+        super().__init__()
+        self.close_btn_cmd(self.close_)
+        self.min_btn_disable()
+        self.max_btn_disable()
+        self.set_titlebar_title(Dynamic.lng.info)
+
+        self.src = src
+        self.l_ww = 100
+        self.init_ui()
+
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
+
+    def init_ui(self):
+        wid = QWidget()
+        self.content_lay_v.addWidget(wid)
+
+        grid = QGridLayout()
+        wid.setLayout(grid)
+
+        data = InfoText(self.src)
+        data = data.get()
+
+        row = 0
+
+        for i in data:
+            left, right = i.split(Shared.split_clmn)
+
+            left_lbl = QLabel(text=left)
+            right_lbl = QLabel(text=right)
+
+            grid.addWidget(left_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignRight)
+            grid.addWidget(right_lbl, row, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+
+            row += 1
+
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
