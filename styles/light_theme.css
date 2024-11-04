@@ -183,16 +183,6 @@
     border-radius: 15px;
 }
 
-#notification_font_color {
-    color: #ffffff;
-}
-
-#notification_widget {
-    background-color: #2e59cb;
-    border-radius: 8;
-    color: #ffffff;
-}
-
 #separator {
     background-color: #dbdbdb;
 }

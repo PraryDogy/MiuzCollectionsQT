@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QCloseEvent, QKeyEvent
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
                              QWidget)
 
@@ -16,7 +16,6 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
-from .wid_notification import Notification
 from .wid_search import WidSearch
 from .win_smb import WinSmb
 
@@ -79,7 +78,6 @@ class WinMain(WinFrameless):
 
         self.bar_top = BarTop()
         right_lay.addWidget(self.bar_top)
-        self.bar_top.resizeEvent = self.resize_noti_cmd
 
         grid = Grid()
         right_lay.addWidget(grid)
@@ -87,17 +85,9 @@ class WinMain(WinFrameless):
         bar_bottom = BarBottom()
         right_lay.addWidget(bar_bottom)
 
-        self.noti = Notification(parent=right_wid)
-        self.noti.move(2, 2)
-        self.noti.hide()
-
         SignalsApp.all.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
         grid.setFocus()
-
-    def resize_noti_cmd(self, *args):
-        w, h = self.bar_top.width(), self.bar_top.height()
-        self.noti.resize(w - 6, h - 6)
 
     def win_main_cmd(self, flag: str):
         if flag == "show":

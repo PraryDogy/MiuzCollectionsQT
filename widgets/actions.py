@@ -111,7 +111,6 @@ class Save(CustomAction):
     def copy_files_cmd(self, dest: str, file: str | list):
 
         if not file or not os.path.exists(file):
-            MainUtils.send_notification(Dynamic.lng.no_file)
             return
 
         if isinstance(file, str):

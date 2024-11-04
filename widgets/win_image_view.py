@@ -15,8 +15,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import ImageUtils, MainUtils, MyThread
 
-from .actions import CopyPath, OpenInfo, OpenInView, Reveal, Save
-from .wid_notification import Notification
+from .actions import CopyPath, OpenInfo, Reveal, Save
 from .win_info import WinInfo
 from .win_smb import WinSmb
 
@@ -235,10 +234,6 @@ class WinImageView(WinChild):
         self.image_label = ImageWidget()
         self.content_lay_v.addWidget(self.image_label)
 
-        self.notification = Notification(self.content_wid)
-        self.notification.move(10, 2) # 10 left side, 10 right side, 2 top side
-        self.notification.hide()
-
         self.prev_image_btn = PrevImageBtn(self.content_wid)
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
 
@@ -255,7 +250,6 @@ class WinImageView(WinChild):
         self.setFocus()
         self.load_thumbnail()
 
-        SignalsApp.all.noti_win_img_view.connect(self.notification.show_notify)
         QTimer.singleShot(300, self.smb_check)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
@@ -422,8 +416,6 @@ class WinImageView(WinChild):
         horizontal_center = a0.size().width() // 2 - self.zoom_btns.width() // 2
         bottom_window_side = a0.size().height() - self.zoom_btns.height()
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
-
-        self.notification.resize(a0.size().width() - 20, 30)
 
         JsonData.imgview_g.update({"aw": a0.size().width(), "ah": a0.size().height()})
 

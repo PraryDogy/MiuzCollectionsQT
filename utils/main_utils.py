@@ -281,13 +281,6 @@ class MainUtils:
         subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     @classmethod
-    def send_notification(cls, text: str):
-        if Dynamic.image_viewer:
-            SignalsApp.all.noti_win_img_view.emit(text)
-        else:
-            SignalsApp.all.noti_win_main.emit(text)
-
-    @classmethod
     def start_new_app(cls):
         os.execl(sys.executable, sys.executable, *sys.argv)
         # QProcess.startDetached(sys.executable, sys.argv)
