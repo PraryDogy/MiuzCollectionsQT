@@ -65,7 +65,6 @@ class WinDownloads(WinChild):
         self.set_titlebar_title(Dynamic.lng.title_downloads)
         self.min_btn_disable()
         self.max_btn_disable()
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setFixedSize(400, 420)
 
         self.scroll_area = QScrollArea()

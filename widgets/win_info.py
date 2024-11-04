@@ -133,8 +133,8 @@ class RightLabel(BaseLabel):
 
 class WinInfo(WinChild):
     def __init__(self, src: str, parent: QWidget):
-        super().__init__(close_func=self.my_close)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        super().__init__()
+        self.close_btn_cmd(self.close_)
         self.min_btn_disable()
         self.max_btn_disable()
         self.set_titlebar_title(Dynamic.lng.info)
@@ -169,13 +169,13 @@ class WinInfo(WinChild):
         btns_wid.setLayout(btn_layout)
         self.content_lay_v.addWidget(btns_wid)
         button = Btn(Dynamic.lng.close)
-        button.mouseReleaseEvent = self.my_close
+        button.mouseReleaseEvent = self.close_
         btn_layout.addWidget(button)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
-            self.my_close(a0)
+            self.close_(a0)
         return super().keyPressEvent(a0)
   
-    def my_close(self, event):
+    def close_(self, *args):
         self.close()
