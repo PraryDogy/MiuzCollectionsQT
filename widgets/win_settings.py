@@ -210,7 +210,8 @@ class UpdaterWidget(QWidget):
 
     def no_connection_win(self):
         QTimer.singleShot(1000, lambda: self.btn.setText(Dynamic.lng.download_update))
-        self.smb_win = WinSmb(text=Dynamic.lng.connect_sb06)
+        t = Dynamic.lng.connect_sb06
+        self.smb_win = WinSmb()
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
