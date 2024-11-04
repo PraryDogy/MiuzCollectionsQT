@@ -1,7 +1,7 @@
 import os
 
-from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QCloseEvent, QFocusEvent, QKeyEvent, QMouseEvent, QResizeEvent
+from PyQt5.QtCore import QEvent, QObject, QPoint, Qt
+from PyQt5.QtGui import QCloseEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
                              QSpacerItem, QWidget)
 
@@ -12,27 +12,54 @@ from utils.main_utils import MainUtils
 from .layouts import LayoutHor, LayoutVer
 from .svg_btn import SvgBtn
 
+IMAGES_FOLDER = "images"
+
+CLOSE_FOCUS = "close-2.svg"
+CLOSE_NONFOCUS = "close-1.svg"
+
+MIN_FOCUS = "min-2.svg"
+MIN_NONFOCUS = "min-1.svg"
+
+MAX_FOCUS = "max-2.svg"
+MAX_NONFOCUS = "max-1.svg"
+
+
+class TitleBtn(SvgBtn):
+    def __init__(self, focused: str, nonfocused: str, size: int):
+        self.focused = focused
+        self.nonfocused = nonfocused
+        path = os.path.join(IMAGES_FOLDER, self.nonfocused)
+        super().__init__(icon_path = path, size = size, parent=None)
+        
+    def focused(self):
+        path = os.path.join(IMAGES_FOLDER, self.focused)
+        self.set_icon(path)
+
+    def nonfocused(self):
+        path = os.path.join(IMAGES_FOLDER, self.nonfocused)
+        self.set_icon(path)
+
 
 class Btns(QWidget):
     def __init__(self):
         super().__init__()
 
-        btn_layout = LayoutHor()
-        btn_layout.setSpacing(10)
-        self.setLayout(btn_layout)
+        h_lay = LayoutHor()
+        h_lay.setSpacing(10)
+        self.setLayout(h_lay)
 
-        btn_layout.addSpacerItem(QSpacerItem(10, 0))
+        h_lay.addSpacerItem(QSpacerItem(10, 0))
 
-        self.close_btn = SvgBtn(os.path.join("images", "close-1.svg"), 13)
-        btn_layout.addWidget(self.close_btn)
+        self.close_btn = TitleBtn(CLOSE_FOCUS, CLOSE_NONFOCUS, 13)
+        h_lay.addWidget(self.close_btn)
 
-        self.min_btn = SvgBtn(os.path.join("images", "min-1.svg"), 13)
-        btn_layout.addWidget(self.min_btn)
+        self.min_btn = TitleBtn(MIN_FOCUS, MIN_NONFOCUS, 13)
+        h_lay.addWidget(self.min_btn)
 
-        self.max_btn = SvgBtn(os.path.join("images", "max-1.svg"), 13)
-        btn_layout.addWidget(self.max_btn)
+        self.max_btn = TitleBtn(MAX_FOCUS, MAX_NONFOCUS, 13)
+        h_lay.addWidget(self.max_btn)
 
-        btn_layout.addSpacerItem(QSpacerItem(10, 0))
+        h_lay.addSpacerItem(QSpacerItem(10, 0))
 
         self.adjustSize()
         self.setFixedWidth(self.width())
@@ -41,19 +68,19 @@ class Btns(QWidget):
 
     def focused_icons(self):
         if self.close_btn.isEnabled():
-            self.close_btn.set_icon(os.path.join("images", "close-2.svg"))
+            self.close_btn.focused()
 
         if self.min_btn.isEnabled():
-            self.min_btn.set_icon(os.path.join("images", "min-2.svg"))
-            self.max_btn.set_icon(os.path.join("images", "max-2.svg"))
+            self.min_btn.focused()
+            self.max_btn.focused()
 
     def nonfocused_icons(self):
         if self.close_btn.isEnabled():
-            self.close_btn.set_icon(os.path.join("images", "close-1.svg"))
+            self.close_btn.nonfocused()
 
         if self.min_btn.isEnabled():
-            self.min_btn.set_icon(os.path.join("images", "min-1.svg"))
-            self.max_btn.set_icon(os.path.join("images", "max-1.svg"))
+            self.min_btn.nonfocused()
+            self.max_btn.nonfocused()
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.Enter:
