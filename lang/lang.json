@@ -81,10 +81,6 @@
         "Скачать обновление",
         "Update app"
     ],
-    "drop_to_collections": [
-        "Скопировать файлы в коллекции",
-        "Copy files to Collections"
-    ],
     "end": [
         "Конец",
         "End"
@@ -261,17 +257,9 @@
         "Поиск фотографий по датам.\nУправляйте датами с клавишами вверх/вниз.",
         "Searching for photos by dates.\nControl dates with up/down keys."
     ],
-    "set_theme": [
-        "Тема",
-        "Theme"
-    ],
     "sett_stopcolls": [
         "Игнорировать коллекции",
         "Ignore collections"
-    ],
-    "sett_stopwords": [
-        "Игнорировать * в имени файла при поиске tiff/psd",
-        "Ignore * in the file name when searching for tiff/psd"
     ],
     "settings": [
         "Настройки",
@@ -317,17 +305,9 @@
         "Всего",
         "Total"
     ],
-    "type": [
-        "Тип",
-        "Type"
-    ],
     "view": [
         "Просмотр",
         "View"
-    ],
-    "view_mode": [
-        "Режим отображения",
-        "View mode"
     ],
     "wait_update": [
         "Подождите...",
@@ -364,10 +344,6 @@
     "restore_db": [
         "Восстановить БД",
         "Restore DB"
-    ],
-    "press_ok": [
-        "Нажмите ок",
-        "Press ok"
     ],
     "save_all_JPG": [
         "Сохранить все JPG",

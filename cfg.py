@@ -94,14 +94,6 @@ class JsonData:
         "LEVIEV"
         ]
 
-    stop_words: list = [
-        "копия",
-        "copy",
-        "1x1",
-        "preview",
-        "square"
-        ]
-
     sys_fltr_vals: dict = {
         "other" : False
         }

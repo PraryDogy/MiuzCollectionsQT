@@ -163,27 +163,6 @@ class CustFilters(QWidget):
             "prod": self.prod_input.text(),
             "mod": self.mod_input.text()
             }
-    
-
-class StopWords(QWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        layout_v = LayoutVer()
-        self.setLayout(layout_v)
-
-        self.label = QLabel(Dynamic.lng.sett_stopwords)
-        layout_v.addWidget(self.label)
-
-        layout_v.addSpacerItem(QSpacerItem(0, 10))
-
-        self.input = InputBase()
-        self.input.insert(", ".join(JsonData.stop_words))
-        layout_v.addWidget(self.input)
-
-    def get_stopwords(self):
-        text = self.input.text()
-        return [i.strip() for i in text.split(",")]
 
 
 class StopColls(QWidget):
@@ -315,10 +294,6 @@ class WinSettings(WinChild):
         self.cust_filters = CustFilters()
         self.content_lay_v.addWidget(self.cust_filters)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
-
-        # self.stopwords = StopWords()
-        # self.content_layout.addWidget(self.stopwords)
-        # self.content_layout.addSpacerItem(QSpacerItem(0, 30))
 
         self.stopcolls = StopColls()
         self.content_lay_v.addWidget(self.stopcolls)
