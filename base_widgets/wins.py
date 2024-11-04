@@ -31,16 +31,16 @@ class TitleBtn(SvgBtn):
         path = os.path.join(IMAGES_FOLDER, self.nonfocused)
         super().__init__(icon_path = path, size = size, parent=None)
         
-    def focused(self):
+    def set_focused(self):
         path = os.path.join(IMAGES_FOLDER, self.focused)
         self.set_icon(path)
 
-    def nonfocused(self):
+    def set_nonfocused(self):
         path = os.path.join(IMAGES_FOLDER, self.nonfocused)
         self.set_icon(path)
 
 
-class Btns(QWidget):
+class TitleBtns(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -50,13 +50,18 @@ class Btns(QWidget):
 
         h_lay.addSpacerItem(QSpacerItem(10, 0))
 
+        self.title_btns: list[TitleBtn] = []
+
         self.close_btn = TitleBtn(CLOSE_FOCUS, CLOSE_NONFOCUS, 13)
+        self.title_btns.append(self.close_btn)
         h_lay.addWidget(self.close_btn)
 
         self.min_btn = TitleBtn(MIN_FOCUS, MIN_NONFOCUS, 13)
+        self.title_btns.append(self.min_btn)
         h_lay.addWidget(self.min_btn)
 
         self.max_btn = TitleBtn(MAX_FOCUS, MAX_NONFOCUS, 13)
+        self.title_btns.append(self.max_btn)
         h_lay.addWidget(self.max_btn)
 
         h_lay.addSpacerItem(QSpacerItem(10, 0))
@@ -64,38 +69,24 @@ class Btns(QWidget):
         self.adjustSize()
         self.setFixedWidth(self.width())
 
-        self.installEventFilter(self)
-
-    def focused_icons(self):
-        if self.close_btn.isEnabled():
-            self.close_btn.focused()
-
-        if self.min_btn.isEnabled():
-            self.min_btn.focused()
-            self.max_btn.focused()
-
-    def nonfocused_icons(self):
-        if self.close_btn.isEnabled():
-            self.close_btn.nonfocused()
-
-        if self.min_btn.isEnabled():
-            self.min_btn.nonfocused()
-            self.max_btn.nonfocused()
-
-    def eventFilter(self, source, event):
-        if event.type() == QEvent.Enter:
-            self.focused_icons()
-
-        elif event.type() == QEvent.Leave:
-            self.nonfocused_icons()
-
-        return super().eventFilter(source, event)
+    def enterEvent(self, a0: QEvent | None) -> None:
+        for i in self.title_btns:
+            if i.isEnabled():
+                i.set_focused()
+    
+    def leaveEvent(self, a0: QEvent | None) -> None:
+        for i in self.title_btns:
+            if i.isEnabled():
+                i.set_nonfocused()
 
 
 class TitleBar(QFrame):
-    def __init__(self, win: QMainWindow):
-        super().__init__(win)
-        self.my_win = win
+    def __init__(self, parent: QMainWindow):
+        super().__init__(parent)
+
+        self.parent_ = parent
+        self.old_pos = self.pos()
+
         self.setFixedHeight(33)
         self.setObjectName(Names.title_bar)
         self.setStyleSheet(Themes.current)
@@ -103,28 +94,21 @@ class TitleBar(QFrame):
         self.h_lay = LayoutHor()
         self.setLayout(self.h_lay)
 
-        self.btns = Btns()
+        self.btns = TitleBtns()
         self.h_lay.addWidget(self.btns)
 
         self.title = QLabel()
         self.h_lay.addWidget(self.title, alignment=Qt.AlignmentFlag.AlignCenter)
         self.h_lay.addSpacerItem(QSpacerItem(self.btns.width(), 0))
 
-        self.oldPos = self.pos()
-        self.show()
-
-    def add_r_wid(self, wid: QWidget):
-        self.h_lay.addWidget(wid)
-        self.title.setStyleSheet(f"""padding-left: {wid.width()}px;""")
-
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
-        self.oldPos = a0.globalPos()
+        self.old_pos = a0.globalPos()
         return super().mousePressEvent(a0)
 
     def mouseMoveEvent(self, a0: QMouseEvent | None) -> None:
-        delta = QPoint(a0.globalPos() - self.oldPos)
-        self.my_win.move(self.my_win.x() + delta.x(), self.my_win.y() + delta.y())
-        self.oldPos = a0.globalPos()
+        delta = QPoint(a0.globalPos() - self.old_pos)
+        self.parent_.move(self.parent_.x() + delta.x(), self.parent_.y() + delta.y())
+        self.old_pos = a0.globalPos()
         return super().mouseMoveEvent(a0)
 
 
