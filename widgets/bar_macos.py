@@ -62,12 +62,12 @@ class AboutWin(WinChild):
         icon = QSvgWidget(os.path.join("icon", "icon.svg"))
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(150, 130)
-        self.content_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.content_lay_v.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.content_layout.addSpacerItem(QSpacerItem(0, 20))
+        self.content_lay_v.addSpacerItem(QSpacerItem(0, 20))
 
         lbl = SelectableLabel(self)
-        self.content_layout.addWidget(lbl)
+        self.content_lay_v.addWidget(lbl)
 
     def close_(self, *args):
         self.close()
@@ -107,6 +107,6 @@ class BarMacos(QMenuBar):
         self.win_settings.show()
 
     def open_about_window(self):
-        self.about_win = AboutWin(self)
+        self.about_win = AboutWin()
         self.about_win.center_relative_parent(self)
         self.about_win.show()
