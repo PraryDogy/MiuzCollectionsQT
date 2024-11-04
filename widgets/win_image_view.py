@@ -226,7 +226,7 @@ class WinImageView(WinImgViewBase):
         self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
         self.image_label = ImageWidget()
-        self.content_layout.addWidget(self.image_label)
+        self.content_layout_v.addWidget(self.image_label)
 
         self.notification = Notification(self.content_wid)
         self.notification.move(10, 2) # 10 left side, 10 right side, 2 top side

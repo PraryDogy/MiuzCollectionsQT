@@ -225,7 +225,7 @@ class WinStandartBase(WinFrameless):
         self.titlebar.setFixedHeight(28)
 
         self.content_wid = BaseBottomWid()
-        self.content_wid.setContentsMargins(10, 10, 10, 10)
+        self.content_wid.setContentsMargins(10, 5, 10, 5)
 
         self.central_layout_v.addWidget(self.content_wid)
         self.content_layout_v = LayoutVer()
@@ -243,18 +243,19 @@ class WinImgViewBase(WinFrameless):
         self.central_layout_v.addWidget(self.content_wid)
         self.content_wid.setObjectName("img_view_bg")
         self.content_wid.setStyleSheet(Themes.current)
-        self.content_layout = LayoutVer()
-        self.content_wid.setLayout(self.content_layout)
+        self.content_layout_v = LayoutVer()
+        self.content_wid.setLayout(self.content_layout_v)
 
 
 class WinSmallBase(WinFrameless):
     def __init__(self):
         super().__init__()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-
         self.titlebar.setFixedHeight(28)
-        self.content_wid = BaseBottomWid()
-        self.content_wid.setContentsMargins(10, 5, 10, 5)
-        self.central_layout_v.addWidget(self.content_wid)
+
+        self.content_wid_v = BaseBottomWid()
+        self.content_wid_v.setContentsMargins(10, 5, 10, 5)
+
+        self.central_layout_v.addWidget(self.content_wid_v)
         self.content_layout = LayoutVer()
-        self.content_wid.setLayout(self.content_layout)
+        self.content_wid_v.setLayout(self.content_layout)
