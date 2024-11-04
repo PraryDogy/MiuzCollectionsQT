@@ -134,9 +134,9 @@ class WinInfo(WinStandartBase):
     def __init__(self, src: str, parent: QWidget):
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.disable_min()
-        self.disable_max()
-        self.set_title(Dynamic.lng.info)
+        self.min_btn_disable()
+        self.max_btn_disable()
+        self.set_titlebar_title(Dynamic.lng.info)
 
         self.src = src
         self.l_ww = 100

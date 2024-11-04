@@ -46,7 +46,7 @@ class WinMain(WinFrameless):
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.setMenuBar(BarMacos())
 
-        self.set_title(
+        self.set_titlebar_title(
             Dynamic.lng.all_colls
             if JsonData.curr_coll == ALL_COLLS
             else JsonData.curr_coll
@@ -103,7 +103,7 @@ class WinMain(WinFrameless):
         elif flag == "exit":
             self.on_exit()
         elif flag == "set_title":
-            self.set_title(
+            self.set_titlebar_title(
                 Dynamic.lng.all_colls
                 if JsonData.curr_coll == ALL_COLLS
                 else JsonData.curr_coll

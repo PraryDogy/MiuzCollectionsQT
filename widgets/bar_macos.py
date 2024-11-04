@@ -53,9 +53,9 @@ class AboutWin(WinSmallBase):
         super().__init__(close_func=lambda e: self.deleteLater())
 
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.disable_min()
-        self.disable_max()
-        self.set_title(APP_NAME)
+        self.min_btn_disable()
+        self.max_btn_disable()
+        self.set_titlebar_title(APP_NAME)
         self.setFixedSize(280, 240)
 
         icon = QSvgWidget(os.path.join("icon", "icon.svg"))

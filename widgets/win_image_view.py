@@ -212,7 +212,7 @@ class WinImageView(WinImgViewBase):
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setMinimumSize(QSize(500, 400))
         self.resize(JsonData.imgview_g["aw"], JsonData.imgview_g["ah"])
-        self.disable_min()
+        self.min_btn_disable()
         self.installEventFilter(self)
 
         self.src = src
@@ -260,7 +260,7 @@ class WinImageView(WinImgViewBase):
 
     def load_thumbnail(self):
         if self.src not in Cache.images:
-            self.set_title(Dynamic.lng.loading)
+            self.set_titlebar_title(Dynamic.lng.loading)
             # преобразуем полный путь в относительный для работы в ДБ
             small_src = self.src.replace(JsonData.coll_folder, "")
             q = (sqlalchemy.select(THUMBS.c.img).where(THUMBS.c.src == small_src))
@@ -334,7 +334,7 @@ class WinImageView(WinImgViewBase):
         cut_coll = self.cut_text(MainUtils.get_coll_name(self.src))
         name = self.cut_text(os.path.basename(self.src))
 
-        self.set_title(f"{cut_coll} - {name}")
+        self.set_titlebar_title(f"{cut_coll} - {name}")
 
     def button_switch_cmd(self, flag: str) -> None:
         if flag == "+":

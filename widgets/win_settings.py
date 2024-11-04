@@ -277,9 +277,9 @@ class WinSettings(WinStandartBase):
     def __init__(self, parent: QWidget):
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.disable_min()
-        self.disable_max()
-        self.set_title(Dynamic.lng.settings)
+        self.min_btn_disable()
+        self.max_btn_disable()
+        self.set_titlebar_title(Dynamic.lng.settings)
 
         QTimer.singleShot(10, self.init_ui)
         self.setFixedSize(420, 550)

@@ -175,9 +175,9 @@ class WinDates(WinStandartBase):
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         FiltersDateBtncolor.set_border()
-        self.disable_min()
-        self.disable_max()
-        self.set_title(Dynamic.lng.dates)
+        self.min_btn_disable()
+        self.max_btn_disable()
+        self.set_titlebar_title(Dynamic.lng.dates)
 
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end

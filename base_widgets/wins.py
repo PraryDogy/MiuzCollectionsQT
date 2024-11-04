@@ -23,6 +23,8 @@ MIN_NONFOCUS = "min-1.svg"
 MAX_FOCUS = "max-2.svg"
 MAX_NONFOCUS = "max-1.svg"
 
+GRAY = "_gray.svg"
+
 
 class TitleBtn(SvgBtn):
     _clicked = pyqtSignal()
@@ -39,6 +41,11 @@ class TitleBtn(SvgBtn):
 
     def set_nonfocused(self):
         path = os.path.join(IMAGES_FOLDER, self.nonfocused)
+        self.set_icon(path)
+
+    def disable_(self):
+        path = os.path.join(IMAGES_FOLDER, JsonData.theme + GRAY)
+        self.setDisabled(True)
         self.set_icon(path)
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
@@ -143,17 +150,14 @@ class WinFrameless(QMainWindow, QObject):
 
         self.central_layout_v.addWidget(self.titlebar)
 
-        self.gripSize = 16
+        self.grip_size = 16
         self.grips = []
         for i in range(4):
             grip = QSizeGrip(self)
-            grip.resize(self.gripSize, self.gripSize)
+            grip.resize(self.grip_size, self.grip_size)
             self.grips.append(grip)
 
         Manager.wins.append(self)
-
-    def close_btn_cmd(self, fn: callable):
-        self.titlebar.title_btns.close_btn._clicked.connect(fn)
 
     def center_relative_parent(self, parent: QWidget):
         try:
@@ -172,20 +176,17 @@ class WinFrameless(QMainWindow, QObject):
     def show_minimized(self, *args):
         self.showMinimized()
 
-    def set_title(self, text):
+    def set_titlebar_title(self, text):
         self.titlebar.title.setText(text)
 
-    def disable_min(self):
-        self.titlebar.title_btns.min_btn.setDisabled(True)
-        self.titlebar.title_btns.min_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
+    def close_btn_cmd(self, fn: callable):
+        self.titlebar.title_btns.close_btn._clicked.connect(fn)
 
-    def disable_max(self):
-        self.titlebar.title_btns.max_btn.setDisabled(True)
-        self.titlebar.title_btns.max_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
+    def min_btn_disable(self):
+        self.titlebar.title_btns.min_btn.disable_()
 
-    def disable_close(self):
-        self.titlebar.title_btns.close_btn.setDisabled(True)
-        self.titlebar.title_btns.close_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
+    def max_btn_disable(self):
+        self.titlebar.title_btns.max_btn.disable_()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:
@@ -198,10 +199,10 @@ class WinFrameless(QMainWindow, QObject):
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         rect = self.rect()
-        self.grips[1].move(rect.right() - self.gripSize, 0)
+        self.grips[1].move(rect.right() - self.grip_size, 0)
         self.grips[2].move(
-            rect.right() - self.gripSize, rect.bottom() - self.gripSize)
-        self.grips[3].move(0, rect.bottom() - self.gripSize)
+            rect.right() - self.grip_size, rect.bottom() - self.grip_size)
+        self.grips[3].move(0, rect.bottom() - self.grip_size)
         return super().resizeEvent(a0)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

@@ -18,9 +18,9 @@ class WinSmb(WinStandartBase):
             self.my_text = Dynamic.lng.choose_coll_smb
 
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.set_title(Dynamic.lng.no_connection)
-        self.disable_min()
-        self.disable_max()
+        self.set_titlebar_title(Dynamic.lng.no_connection)
+        self.min_btn_disable()
+        self.max_btn_disable()
         # self.disable_close()
 
         self.init_ui()

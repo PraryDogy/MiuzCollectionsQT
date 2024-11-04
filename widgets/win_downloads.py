@@ -61,9 +61,9 @@ class DownloadsWin(WinStandartBase):
         super().__init__(close_func=self.my_close)
         self.copy_threads: list = []
 
-        self.set_title(Dynamic.lng.title_downloads)
-        self.disable_min()
-        self.disable_max()
+        self.set_titlebar_title(Dynamic.lng.title_downloads)
+        self.min_btn_disable()
+        self.max_btn_disable()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setFixedSize(400, 420)
 
