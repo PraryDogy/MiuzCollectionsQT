@@ -30,9 +30,6 @@ class CustomAction(QAction):
     def __init__(self, parent: QWidget, src: str, text: str):
         super().__init__(text=text)
 
-        if not isinstance(parent, QMainWindow):
-            parent = parent.window()
-
         self.src = src
         self.parent_ = parent
 
@@ -126,7 +123,3 @@ class Save(CustomAction):
             SignalsApp.all.btn_downloads_toggle.emit("hide")
 
         thread_.remove_threads()
-
-
-class ContextImg(ContextCustom):
-    ...

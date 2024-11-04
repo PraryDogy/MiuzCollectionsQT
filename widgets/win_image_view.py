@@ -7,6 +7,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
+from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
@@ -14,7 +15,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import ImageUtils, MainUtils, MyThread
 
-from .context_img import ContextImg
+from .actions import CopyPath, OpenInfo, OpenInView, Reveal, Save
 from .wid_notification import Notification
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -384,10 +385,33 @@ class WinImageView(WinChild):
 
         return super().keyPressEvent(ev)
 
-    def contextMenuEvent(self, event: QContextMenuEvent | None) -> None:
-        self.image_context = ContextImg(parent=self, src=self.src, event=event)
-        self.image_context.show_menu()
-        return super().contextMenuEvent(event)
+    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        try:
+            self.menu_ = ContextCustom(event=ev)
+
+            info = OpenInfo(parent=self, src=self.src)
+            self.menu_.addAction(info)
+
+            self.menu_.addSeparator()
+
+            copy = CopyPath(parent=self, src=self.src)
+            self.menu_.addAction(copy)
+
+            reveal = Reveal(parent=self, src=self.src)
+            self.menu_.addAction(reveal)
+
+            save_as = Save(parent=self, src=self.src, save_as=True)
+            self.menu_.addAction(save_as)
+
+            save = Save(parent=self, src=self.src, save_as=False)
+            self.menu_.addAction(save)
+
+            self.menu_.show_menu()
+
+            return super().contextMenuEvent(ev)
+
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2

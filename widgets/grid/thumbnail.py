@@ -11,7 +11,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import ImageUtils, MainUtils
 
-from ..context_img import OpenInView, OpenInfo, CopyPath, Reveal, Save
+from ..actions import OpenInView, OpenInfo, CopyPath, Reveal, Save
 from base_widgets.context import ContextCustom
 
 

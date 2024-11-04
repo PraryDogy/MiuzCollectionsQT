@@ -161,8 +161,7 @@ class WinFrameless(QMainWindow, QObject):
 
     def center_relative_parent(self, parent: QWidget | QMainWindow):
         if not isinstance(parent, QMainWindow):
-            print("is wid")
-            # parent = parent.window()
+            parent = parent.window()
 
         try:
             geo = self.geometry()
