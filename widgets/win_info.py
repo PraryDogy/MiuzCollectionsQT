@@ -249,24 +249,40 @@ class WinInfo(WinChild):
         self.content_lay_v.addWidget(wid)
 
         grid = QGridLayout()
+        grid.setSpacing(5)
+        grid.setContentsMargins(0, 0, 0, 0)
         wid.setLayout(grid)
 
         data = InfoText(self.src)
         data = data.get()
 
         row = 0
+        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
+        r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
 
         for i in data:
             left, right = i.split(Shared.split_clmn)
+            right = self.rows(right)
 
             left_lbl = QLabel(text=left)
             right_lbl = QLabel(text=right)
 
-            grid.addWidget(left_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignRight)
-            grid.addWidget(right_lbl, row, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+            grid.addWidget(left_lbl, row, 0, alignment=l_fl)
+            grid.addWidget(right_lbl, row, 1, alignment=r_fl)
 
             row += 1
 
+    def rows(self, text: str):
+        max_row = 38
+
+        if len(text) > max_row:
+            text = [
+                text[i:i + max_row]
+                for i in range(0, len(text), max_row)
+                ]
+            text = "\n".join(text)
+
+        return text
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
