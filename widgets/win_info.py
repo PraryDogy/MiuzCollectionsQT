@@ -132,7 +132,7 @@ class RightLabel(BaseLabel):
 
 
 class WinInfo(WinChild):
-    def __init__(self, src: str, parent: QWidget):
+    def __init__(self, src: str):
         super().__init__()
         self.close_btn_cmd(self.close_)
         self.min_btn_disable()
@@ -145,7 +145,6 @@ class WinInfo(WinChild):
 
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
-        self.center_relative_parent(parent)
 
     def init_ui(self):
         info_wid = QWidget()

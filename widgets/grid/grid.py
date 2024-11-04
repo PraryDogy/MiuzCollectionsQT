@@ -256,10 +256,12 @@ class Grid(QScrollArea):
             wid = self.cell_to_wid.get(self.curr_cell)
 
             if MainUtils.smb_check():
-                self.win_info = WinInfo(src=wid.src, parent=self)
+                self.win_info = WinInfo(src=wid.src)
+                self.win_info.center_relative_parent(self)
                 self.win_info.show()
             else:
-                self.smb_win = WinSmb(parent=self)
+                self.smb_win = WinSmb()
+                self.smb_win.center_relative_parent(self)
                 self.smb_win.show()
 
         elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):

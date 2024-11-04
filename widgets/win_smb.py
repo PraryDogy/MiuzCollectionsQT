@@ -10,7 +10,7 @@ from cfg import Dynamic
 class WinSmb(WinChild):
     _finished = pyqtSignal()
 
-    def __init__(self, parent: QWidget, text: str = None):
+    def __init__(self, text: str = None):
         super().__init__()
 
         if text:
@@ -22,11 +22,9 @@ class WinSmb(WinChild):
         self.set_titlebar_title(Dynamic.lng.no_connection)
         self.min_btn_disable()
         self.max_btn_disable()
-        # self.disable_close()
 
         self.init_ui()
         self.setFixedSize(350, 170)
-        self.center_relative_parent(parent=parent)
         self.setFocus()
 
         self.new_coll_path = None

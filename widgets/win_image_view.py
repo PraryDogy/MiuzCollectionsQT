@@ -261,7 +261,8 @@ class WinImageView(WinChild):
 
     def smb_check(self):
         if not MainUtils.smb_check():
-            self.win_smb = WinSmb(parent=self)
+            self.win_smb = WinSmb()
+            self.win_smb.center_relative_parent(self)
             self.win_smb.show()
 
     def load_thumbnail(self):
@@ -373,11 +374,13 @@ class WinImageView(WinChild):
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             if MainUtils.smb_check():
-                self.win_info = WinInfo(src=self.src, parent=self)
+                self.win_info = WinInfo(src=self.src)
+                self.win_info.center_relative_parent(self)
                 self.win_info.show()
             else:
-                self.smb_win = WinSmb(parent=self)
-                self.smb_win.show()
+                self.win_smb = WinSmb()
+                self.win_smb.center_relative_parent(self)
+                self.win_smb.show()
 
         return super().keyPressEvent(ev)
 

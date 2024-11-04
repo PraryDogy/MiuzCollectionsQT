@@ -172,7 +172,7 @@ class RightDateWidget(BaseDateLayout):
 
 
 class WinDates(WinChild):
-    def __init__(self, parent: QWidget):
+    def __init__(self):
         super().__init__()
         self.close_btn_cmd(self.cancel_cmd)
         self.min_btn_disable()
@@ -187,7 +187,6 @@ class WinDates(WinChild):
         self.init_ui()
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
-        self.center_relative_parent(parent=parent)
 
     def init_ui(self):
         title_label = QLabel(Dynamic.lng.search_dates)

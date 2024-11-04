@@ -19,10 +19,9 @@ class Shared:
 
 
 class CustomContext(ContextMenuBase):
-    def __init__(self, parent: QWidget, files_list: list[DbImage], event):
+    def __init__(self, files_list: list[DbImage], event):
 
         super().__init__(event=event)
-        self.my_parent = parent
         self.files_list = files_list
 
         save_jpg = QAction(text=Dynamic.lng.save_all_JPG, parent=self)
@@ -67,7 +66,8 @@ class CustomContext(ContextMenuBase):
             self.copy_files_cmd(dest, images)
 
         else:
-            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win = WinSmb()
+            self.smb_win.center_relative_parent(self)
             self.smb_win.show()
 
     def copy_files_cmd(self, dest: str, files: list):
@@ -106,7 +106,7 @@ class Title(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.my_context = CustomContext(parent=self, files_list=self.images, event=ev)
+            self.my_context = CustomContext(files_list=self.images, event=ev)
             self.my_context.show_menu()
             return super().contextMenuEvent(ev)
         except Exception as e:

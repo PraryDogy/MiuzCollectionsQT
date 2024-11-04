@@ -21,7 +21,7 @@ class ContextImg(ContextMenuBase):
     def __init__(self, src: str, event, parent: QWidget = None):
         super().__init__(event)
 
-        self.my_parent = parent
+        self.parent_ = parent
         self.src = src
         
         self.info_action = QAction(text=Dynamic.lng.info, parent=self)
@@ -54,14 +54,14 @@ class ContextImg(ContextMenuBase):
 
     def show_info_win(self, img_src: str):
         if MainUtils.smb_check():
-            self.win_info = WinInfo(src=img_src, parent=self.my_parent)
+            self.win_info = WinInfo(src=img_src)
+            self.win_info.center_relative_parent(self)
             self.win_info.show()
         else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
+            self.show_smb()
         
     def show_image_viewer(self):
-        SignalsApp.all.win_img_view_open_in.emit(self.my_parent)
+        SignalsApp.all.win_img_view_open_in.emit(self.parent_)
 
     def reveal_cmd(self):
         if MainUtils.smb_check():
@@ -70,8 +70,7 @@ class ContextImg(ContextMenuBase):
             else:
                 MainUtils.reveal_files([self.src])
         else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
+            self.show_smb()
 
     def save_as_cmd(self):
         if MainUtils.smb_check():
@@ -84,15 +83,13 @@ class ContextImg(ContextMenuBase):
                 self.copy_files_cmd(dest=dest, file=self.src)
 
         else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()   
+            self.show_smb()
 
     def save_cmd(self):
         if MainUtils.smb_check():
             self.copy_files_cmd(dest=JsonData.down_folder, file=self.src)
         else:
-            self.smb_win = WinSmb(parent=self.my_parent)
-            self.smb_win.show()
+            self.show_smb()
     
     def copy_files_cmd(self, dest: str, file: str):
 
@@ -113,3 +110,8 @@ class ContextImg(ContextMenuBase):
             copy_task.remove_threads()
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
+
+    def show_smb(self):
+        self.smb_win = WinSmb()
+        self.smb_win.center_relative_parent(self)
+        self.smb_win.show()

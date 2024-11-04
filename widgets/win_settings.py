@@ -232,7 +232,8 @@ class UpdaterWidget(QWidget):
 
     def no_connection_win(self):
         QTimer.singleShot(1000, lambda: self.btn.setText(Dynamic.lng.download_update))
-        self.smb_win = WinSmb(parent=self, text=Dynamic.lng.connect_sb06)
+        self.smb_win = WinSmb(text=Dynamic.lng.connect_sb06)
+        self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
     def no_connection_btn_style(self):
@@ -273,7 +274,7 @@ class RestoreBtn(Btn):
 
 
 class WinSettings(WinChild):
-    def __init__(self, parent: QWidget):
+    def __init__(self):
         super().__init__()
 
         self.close_btn_cmd(self.cancel_cmd)
@@ -283,7 +284,6 @@ class WinSettings(WinChild):
 
         QTimer.singleShot(10, self.init_ui)
         self.setFixedSize(420, 550)
-        self.center_relative_parent(parent)
         self.setFocus()
 
         self.new_coll_path = None

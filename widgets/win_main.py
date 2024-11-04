@@ -132,7 +132,8 @@ class WinMain(WinFrameless):
         Scaner.app.start()
 
         if not MainUtils.smb_check():
-            self.smb_win = WinSmb(parent=self)
+            self.smb_win = WinSmb()
+            self.smb_win.center_relative_parent(self)
             self.smb_win.show()
 
         # self.test = TestWid()

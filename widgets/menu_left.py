@@ -62,7 +62,8 @@ class CustomContext(ContextMenuBase):
                 subprocess.Popen(["open", coll])
                 return
         else:
-            self.smb_win = WinSmb(parent=self.my_parent)
+            self.smb_win = WinSmb()
+            self.smb_win.center_relative_parent(self)
             self.smb_win.show()
 
 

@@ -50,7 +50,7 @@ class SelectableLabel(QLabel):
 
 
 class AboutWin(WinChild):
-    def __init__(self, parent):
+    def __init__(self):
         super().__init__()
 
         self.close_btn_cmd(self.close_)
@@ -104,6 +104,7 @@ class BarMacos(QMenuBar):
 
     def open_settings_window(self):
         self.win_settings = WinSettings(self)
+        self.win_settings.center_relative_parent(self)
         self.win_settings.show()
 
     def open_about_window(self):

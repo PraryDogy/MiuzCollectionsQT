@@ -144,7 +144,8 @@ class BarTop(QFrame):
         self.setLayout(self.h_layout)
     
     def open_win_dates(self):
-        self.win_dates = WinDates(parent=self)
+        self.win_dates = WinDates()
+        self.win_dates.center_relative_parent(self)
         self.win_dates.show()
 
     def disable_filters(self):
