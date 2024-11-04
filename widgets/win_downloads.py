@@ -4,12 +4,12 @@ from functools import partial
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QScrollArea, QSpacerItem, QWidget
 
-from base_widgets import (CustomProgressBar, LayoutHor, LayoutVer, SvgBtn,
-                          WinStandart)
-from cfg import JsonData, Dynamic
+from base_widgets import CustomProgressBar, LayoutHor, LayoutVer, SvgBtn
+from base_widgets.wins import WinChild
+from cfg import Dynamic, JsonData
 from styles import Names, Themes
-from utils.main_utils import MainUtils
 from utils.copy_files import ThreadCopyFiles
+from utils.main_utils import MainUtils
 
 
 class Progresser(QWidget):
@@ -56,10 +56,10 @@ class Progresser(QWidget):
         self.progress_stop.emit()
 
 
-class WinDownloads(WinStandart):
+class WinDownloads(WinChild):
     def __init__(self):
         super().__init__()
-        self.copy_threads: list = []
+        self.copy_threads: list[ThreadCopyFiles] = []
 
         self.close_btn_cmd(self.close_)
         self.set_titlebar_title(Dynamic.lng.title_downloads)
@@ -81,7 +81,7 @@ class WinDownloads(WinStandart):
 
         self.v_layout = LayoutVer()
         self.scroll_widget.setLayout(self.v_layout)
-        self.content_layout_v.addWidget(self.scroll_area)
+        self.content_lay_v.addWidget(self.scroll_area)
 
         self.progress_wid = QWidget()
         self.progress_layout = LayoutVer()
@@ -100,7 +100,6 @@ class WinDownloads(WinStandart):
                     copy_wid = Progresser(text=t)
                     self.progress_layout.addWidget(copy_wid)
 
-                    copy_task: ThreadCopyFiles
                     self.copy_threads.append(copy_task)
 
                     copy_wid.progress_stop.connect(partial(self.stop_progress, copy_wid, copy_task))

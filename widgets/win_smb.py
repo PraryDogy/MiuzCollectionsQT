@@ -38,7 +38,7 @@ class WinSmb(WinStandart):
 
     def init_ui(self):
         h_wid = QWidget()
-        self.content_layout_v.addWidget(h_wid)
+        self.content_lay_v.addWidget(h_wid)
         h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
 
@@ -52,11 +52,11 @@ class WinSmb(WinStandart):
 
         h_layout.addStretch()
 
-        self.content_layout_v.addSpacerItem(QSpacerItem(0, 10))
+        self.content_lay_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.ok_btn = Btn(Dynamic.lng.ok)
         self.ok_btn.mouseReleaseEvent = self.close_cmd
-        self.content_layout_v.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.content_lay_v.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):

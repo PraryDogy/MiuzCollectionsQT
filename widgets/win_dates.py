@@ -6,7 +6,8 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, InputBase, LayoutHor, LayoutVer, WinStandart
+from base_widgets import Btn, InputBase, LayoutHor, LayoutVer
+from base_widgets.wins import WinChild
 from cfg import Dynamic
 from signals import SignalsApp
 
@@ -170,7 +171,7 @@ class RightDateWidget(BaseDateLayout):
             self.input.setText(DateUtils.date_to_text(Dynamic.date_end))
 
 
-class WinDates(WinStandart):
+class WinDates(WinChild):
     def __init__(self, parent: QWidget):
         super().__init__()
         self.close_btn_cmd(self.cancel_cmd)
@@ -191,12 +192,12 @@ class WinDates(WinStandart):
     def init_ui(self):
         title_label = QLabel(Dynamic.lng.search_dates)
         title_label.setContentsMargins(0, 0, 0, 5)
-        self.content_layout_v.addWidget(title_label)
+        self.content_lay_v.addWidget(title_label)
 
         widget_wid = QWidget()
         widget_layout = LayoutHor()
         widget_wid.setLayout(widget_layout)
-        self.content_layout_v.addWidget(widget_wid)
+        self.content_lay_v.addWidget(widget_wid)
 
         self.left_date = LeftDateWidget()
         self.left_date.dateChangedSignal.connect(partial(self.date_change, "start"))
@@ -215,7 +216,7 @@ class WinDates(WinStandart):
         buttons_layout = LayoutHor()
         buttons_wid.setLayout(buttons_layout)
         buttons_layout.setContentsMargins(0, 10, 0, 0)
-        self.content_layout_v.addWidget(buttons_wid)
+        self.content_lay_v.addWidget(buttons_wid)
 
         buttons_layout.addStretch(1)
         buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)

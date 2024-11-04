@@ -211,51 +211,41 @@ class WinFrameless(QMainWindow, QObject):
         return super().keyPressEvent(a0)
     
 
-class BaseBottomWid(QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setObjectName(Names.base_bottom_widget)
-        self.setStyleSheet(Themes.current)
+class WinChild(WinFrameless):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
 
-
-class WinStandart(WinFrameless):
-    def __init__(self):
-        super().__init__()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.titlebar.setFixedHeight(28)
 
-        self.content_wid = BaseBottomWid()
-        self.content_wid.setContentsMargins(10, 5, 10, 5)
-
+        # у этого виджета закруглены только нижние углы
+        self.content_wid = QFrame()
+        self.content_wid.setObjectName(Names.base_bottom_widget)
+        self.content_wid.setStyleSheet(Themes.current)
         self.central_layout_v.addWidget(self.content_wid)
-        self.content_layout_v = LayoutVer()
-        self.content_wid.setLayout(self.content_layout_v)
-    
 
-class WinImgView(WinFrameless):
+        self.content_lay_v = LayoutVer()
+        self.content_lay_v.setContentsMargins(10, 5, 10, 5)
+        self.content_wid.setLayout(self.content_lay_v)
+        
+
+# удалить
+class WinStandart(WinChild):
     def __init__(self):
         super().__init__()
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.titlebar.setFixedHeight(28)
 
-        self.content_wid = BaseBottomWid()
-        self.content_wid.setContentsMargins(10, 0, 10, 0)
-        self.central_layout_v.addWidget(self.content_wid)
+
+# удалить
+class WinSmall(WinChild):
+    def __init__(self):
+        super().__init__()
+
+
+class WinImgView(WinChild):
+    def __init__(self):
+        super().__init__()
+
+        self.content_lay_v.setContentsMargins(10, 0, 10, 0)
         self.content_wid.setObjectName("img_view_bg")
         self.content_wid.setStyleSheet(Themes.current)
-        self.content_layout_v = LayoutVer()
-        self.content_wid.setLayout(self.content_layout_v)
 
-
-class WinSmall(WinFrameless):
-    def __init__(self):
-        super().__init__()
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.titlebar.setFixedHeight(28)
-
-        self.content_wid_v = BaseBottomWid()
-        self.content_wid_v.setContentsMargins(10, 5, 10, 5)
-
-        self.central_layout_v.addWidget(self.content_wid_v)
-        self.content_layout = LayoutVer()
-        self.content_wid_v.setLayout(self.content_layout)
