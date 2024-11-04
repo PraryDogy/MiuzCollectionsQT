@@ -171,7 +171,7 @@ class WinInfo(WinChild):
         return text
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() == Qt.Key.Key_Escape:
+        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
             self.close_(a0)
         return super().keyPressEvent(a0)
   
