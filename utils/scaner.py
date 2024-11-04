@@ -3,14 +3,14 @@ from time import sleep
 
 import numpy as np
 import sqlalchemy
-from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from sqlalchemy import Connection, Delete, Insert, Update
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 
-from .main_utils import ImageUtils, MainUtils
+from .main_utils import ImageUtils, MainUtils, MyThread
 
 
 class ScanerUtils:
@@ -294,11 +294,11 @@ class DbUpdater:
         ScanerUtils.conn_close(conn)
 
 
-class ScanerThread(QThread):
+class ScanerThread(MyThread):
     _finished = pyqtSignal()
 
     def __init__(self):
-        super().__init__()
+        super().__init__(parent=None)
 
     def run(self):
 
@@ -319,6 +319,7 @@ class ScanerThread(QThread):
             db_updater.start()
 
         self._finished.emit()
+        self.remove_threads()
     
 
 class ScanerShedule(QObject):
