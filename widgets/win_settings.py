@@ -6,11 +6,10 @@ from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
                              QTextEdit, QWidget)
 
-from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer,
-                          WinStandart)
+from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
+from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
 from database import Dbase
-from signals import SignalsApp
 from utils.main_utils import MainUtils
 from utils.scaner import Scaner
 from utils.updater import Updater
@@ -273,10 +272,11 @@ class RestoreBtn(Btn):
         return super().mouseReleaseEvent(ev)
 
 
-class WinSettings(WinStandart):
+class WinSettings(WinChild):
     def __init__(self, parent: QWidget):
-        super().__init__(close_func=self.cancel_cmd)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        super().__init__()
+
+        self.close_btn_cmd(self.cancel_cmd)
         self.min_btn_disable()
         self.max_btn_disable()
         self.set_titlebar_title(Dynamic.lng.settings)
@@ -360,7 +360,7 @@ class WinSettings(WinStandart):
         MainUtils.clear_layout(self.content_lay_v)
         self.init_ui()
 
-    def cancel_cmd(self, e):
+    def cancel_cmd(self, *args):
         self.close()
 
     def ok_cmd(self, e):

@@ -6,7 +6,8 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
                          QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from base_widgets import LayoutHor, LayoutVer, SvgShadowed, WinImgView
+from base_widgets import LayoutHor, LayoutVer, SvgShadowed
+from base_widgets.wins import WinChild
 from cfg import PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
@@ -200,7 +201,7 @@ class NextImageBtn(SwitchImageBtn):
         super().__init__("next.svg", parent)
 
 
-class WinImageView(WinImgView):
+class WinImageView(WinChild):
     def __init__(self, src: str, path_to_wid: dict[str, QWidget]):
 
         try:
@@ -208,12 +209,17 @@ class WinImageView(WinImgView):
         except (AttributeError, RuntimeError) as e:
             pass
 
-        super().__init__(close_func=self.my_close)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        super().__init__()
+
+        self.close_btn_cmd(self.close_)
+        self.min_btn_disable()
         self.setMinimumSize(QSize(500, 400))
         self.resize(JsonData.imgview_g["aw"], JsonData.imgview_g["ah"])
-        self.min_btn_disable()
         self.installEventFilter(self)
+
+        self.content_lay_v.setContentsMargins(10, 0, 10, 0)
+        self.content_wid.setObjectName("img_view_bg")
+        self.content_wid.setStyleSheet(Themes.current)
 
         self.src = src
         self.all_images = list(path_to_wid.keys())
@@ -242,7 +248,7 @@ class WinImageView(WinImgView):
         self.zoom_btns.zoom_in.mouseReleaseEvent = lambda e: self.image_label.zoom_in()
         self.zoom_btns.zoom_out.mouseReleaseEvent = lambda e: self.image_label.zoom_out()
         self.zoom_btns.zoom_fit.mouseReleaseEvent = lambda e: self.image_label.zoom_reset()
-        self.zoom_btns.zoom_close.mouseReleaseEvent = self.my_close
+        self.zoom_btns.zoom_close.mouseReleaseEvent = self.close_
 
         self.hide_all_buttons()
         self.setFocus()
@@ -295,7 +301,7 @@ class WinImageView(WinImgView):
             self.image_label.set_image(data.pixmap)
             self.set_image_title()
 
-    def my_close(self, event):
+    def close_(self, *args):
         Cache.images.clear()
         Dynamic.image_viewer = None
         self.close()
@@ -354,7 +360,7 @@ class WinImageView(WinImgView):
             self.switch_image(1)
 
         elif ev.key() == Qt.Key.Key_Escape:
-            self.my_close(ev)
+            self.close_(ev)
 
         elif ev.key() == Qt.Key.Key_Equal:
             self.image_label.zoom_in()

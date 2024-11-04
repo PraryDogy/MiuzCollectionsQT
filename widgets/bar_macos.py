@@ -5,7 +5,8 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
-from base_widgets import ContextMenuBase, WinSmall
+from base_widgets import ContextMenuBase
+from base_widgets.wins import WinChild
 from cfg import APP_NAME, APP_VER, Dynamic
 from signals import SignalsApp
 from utils.main_utils import MainUtils
@@ -48,11 +49,11 @@ class SelectableLabel(QLabel):
         MainUtils.copy_text(self.selectedText())
 
 
-class AboutWin(WinSmall):
+class AboutWin(WinChild):
     def __init__(self, parent):
-        super().__init__(close_func=lambda e: self.deleteLater())
+        super().__init__()
 
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.close_btn_cmd(self.close_)
         self.min_btn_disable()
         self.max_btn_disable()
         self.set_titlebar_title(APP_NAME)
@@ -67,6 +68,9 @@ class AboutWin(WinSmall):
 
         lbl = SelectableLabel(self)
         self.content_layout.addWidget(lbl)
+
+    def close_(self, *args):
+        self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):

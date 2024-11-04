@@ -125,7 +125,7 @@ class TitleBar(QFrame):
 
 
 class Manager:
-    wins = []
+    wins: list[QMainWindow] = []
 
 
 class WinFrameless(QMainWindow, QObject):
@@ -227,25 +227,3 @@ class WinChild(WinFrameless):
         self.content_lay_v = LayoutVer()
         self.content_lay_v.setContentsMargins(10, 5, 10, 5)
         self.content_wid.setLayout(self.content_lay_v)
-        
-
-# удалить
-class WinStandart(WinChild):
-    def __init__(self):
-        super().__init__()
-
-
-# удалить
-class WinSmall(WinChild):
-    def __init__(self):
-        super().__init__()
-
-
-class WinImgView(WinChild):
-    def __init__(self):
-        super().__init__()
-
-        self.content_lay_v.setContentsMargins(10, 0, 10, 0)
-        self.content_wid.setObjectName("img_view_bg")
-        self.content_wid.setStyleSheet(Themes.current)
-

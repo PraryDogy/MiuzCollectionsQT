@@ -2,22 +2,23 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, LayoutHor, SvgBtn, WinStandart
+from base_widgets import Btn, LayoutHor, SvgBtn
+from base_widgets.wins import WinChild
 from cfg import Dynamic
 
 
-class WinSmb(WinStandart):
+class WinSmb(WinChild):
     _finished = pyqtSignal()
 
     def __init__(self, parent: QWidget, text: str = None):
-        super().__init__(close_func=self.close_cmd)
+        super().__init__()
 
         if text:
             self.my_text = text
         else:
             self.my_text = Dynamic.lng.choose_coll_smb
 
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.close_btn_cmd(self.close_)
         self.set_titlebar_title(Dynamic.lng.no_connection)
         self.min_btn_disable()
         self.max_btn_disable()
@@ -32,7 +33,7 @@ class WinSmb(WinStandart):
         self.new_lang = None
         self.need_reset = None
 
-    def close_cmd(self, *args):
+    def close_(self, *args):
         self._finished.emit()
         self.close()
 
@@ -55,9 +56,9 @@ class WinSmb(WinStandart):
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.ok_btn = Btn(Dynamic.lng.ok)
-        self.ok_btn.mouseReleaseEvent = self.close_cmd
+        self.ok_btn.mouseReleaseEvent = self.close_
         self.content_lay_v.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-            self.close_cmd()
+            self.close_()
