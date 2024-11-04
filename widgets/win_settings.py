@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
                              QTextEdit, QWidget)
 
 from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer,
-                          WinStandartBase)
+                          WinStandart)
 from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
 from database import Dbase
 from signals import SignalsApp
@@ -273,7 +273,7 @@ class RestoreBtn(Btn):
         return super().mouseReleaseEvent(ev)
 
 
-class WinSettings(WinStandartBase):
+class WinSettings(WinStandart):
     def __init__(self, parent: QWidget):
         super().__init__(close_func=self.cancel_cmd)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)

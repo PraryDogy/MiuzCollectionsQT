@@ -2,11 +2,11 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, LayoutHor, SvgBtn, WinStandartBase
+from base_widgets import Btn, LayoutHor, SvgBtn, WinStandart
 from cfg import Dynamic
 
 
-class WinSmb(WinStandartBase):
+class WinSmb(WinStandart):
     _finished = pyqtSignal()
 
     def __init__(self, parent: QWidget, text: str = None):

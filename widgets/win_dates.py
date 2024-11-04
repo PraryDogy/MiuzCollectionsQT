@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, InputBase, LayoutHor, LayoutVer, WinStandartBase
+from base_widgets import Btn, InputBase, LayoutHor, LayoutVer, WinStandart
 from cfg import Dynamic
 from signals import SignalsApp
 
@@ -170,7 +170,7 @@ class RightDateWidget(BaseDateLayout):
             self.input.setText(DateUtils.date_to_text(Dynamic.date_end))
 
 
-class WinDates(WinStandartBase):
+class WinDates(WinStandart):
     def __init__(self, parent: QWidget):
         super().__init__()
         self.close_btn_cmd(self.cancel_cmd)

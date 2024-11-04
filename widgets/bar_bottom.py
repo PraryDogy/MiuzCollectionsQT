@@ -11,7 +11,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 
-from .win_downloads import DownloadsWin
+from .win_downloads import WinDownloads
 from .win_settings import WinSettings
 
 
@@ -166,7 +166,7 @@ class BarBottom(QFrame):
         JsonData.write_json_data()
 
     def open_downloads(self, e):
-        self.downloads_win = DownloadsWin(parent=self)
+        self.downloads_win = WinDownloads()
         self.downloads_win.center_relative_parent(self)
         self.downloads_win.show()
 

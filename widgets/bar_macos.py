@@ -5,7 +5,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
-from base_widgets import ContextMenuBase, WinSmallBase
+from base_widgets import ContextMenuBase, WinSmall
 from cfg import APP_NAME, APP_VER, Dynamic
 from signals import SignalsApp
 from utils.main_utils import MainUtils
@@ -48,7 +48,7 @@ class SelectableLabel(QLabel):
         MainUtils.copy_text(self.selectedText())
 
 
-class AboutWin(WinSmallBase):
+class AboutWin(WinSmall):
     def __init__(self, parent):
         super().__init__(close_func=lambda e: self.deleteLater())
 

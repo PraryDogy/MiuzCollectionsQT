@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
-from base_widgets import Btn, ContextMenuBase, LayoutHor, WinStandartBase
+from base_widgets import Btn, ContextMenuBase, LayoutHor, WinStandart
 from cfg import Dynamic
 from styles import Names, Themes
 from utils.image_size import get_image_size
@@ -130,7 +130,7 @@ class RightLabel(BaseLabel):
         return super().contextMenuEvent(ev)
 
 
-class WinInfo(WinStandartBase):
+class WinInfo(WinStandart):
     def __init__(self, src: str, parent: QWidget):
         super().__init__(close_func=self.my_close)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)

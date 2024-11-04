@@ -6,7 +6,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
                          QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from base_widgets import LayoutHor, LayoutVer, SvgShadowed, WinImgViewBase
+from base_widgets import LayoutHor, LayoutVer, SvgShadowed, WinImgView
 from cfg import PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
@@ -200,7 +200,7 @@ class NextImageBtn(SwitchImageBtn):
         super().__init__("next.svg", parent)
 
 
-class WinImageView(WinImgViewBase):
+class WinImageView(WinImgView):
     def __init__(self, src: str, path_to_wid: dict[str, QWidget]):
 
         try:

@@ -218,7 +218,7 @@ class BaseBottomWid(QFrame):
         self.setStyleSheet(Themes.current)
 
 
-class WinStandartBase(WinFrameless):
+class WinStandart(WinFrameless):
     def __init__(self):
         super().__init__()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -232,7 +232,7 @@ class WinStandartBase(WinFrameless):
         self.content_wid.setLayout(self.content_layout_v)
     
 
-class WinImgViewBase(WinFrameless):
+class WinImgView(WinFrameless):
     def __init__(self):
         super().__init__()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -247,7 +247,7 @@ class WinImgViewBase(WinFrameless):
         self.content_wid.setLayout(self.content_layout_v)
 
 
-class WinSmallBase(WinFrameless):
+class WinSmall(WinFrameless):
     def __init__(self):
         super().__init__()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)

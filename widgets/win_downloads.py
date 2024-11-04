@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QScrollArea, QSpacerItem, QWidget
 
 from base_widgets import (CustomProgressBar, LayoutHor, LayoutVer, SvgBtn,
-                          WinStandartBase)
+                          WinStandart)
 from cfg import JsonData, Dynamic
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -56,11 +56,12 @@ class Progresser(QWidget):
         self.progress_stop.emit()
 
 
-class DownloadsWin(WinStandartBase):
-    def __init__(self, parent: QWidget):
-        super().__init__(close_func=self.my_close)
+class WinDownloads(WinStandart):
+    def __init__(self):
+        super().__init__()
         self.copy_threads: list = []
 
+        self.close_btn_cmd(self.close_)
         self.set_titlebar_title(Dynamic.lng.title_downloads)
         self.min_btn_disable()
         self.max_btn_disable()
@@ -89,11 +90,6 @@ class DownloadsWin(WinStandartBase):
         self.v_layout.addStretch()
 
         self.add_progress_widgets()
-
-        # for i in range(0, 10):
-        #     wid = Progresser(text="test")
-        #     self.progress_layout.addWidget(wid)
-        #     wid.set_value.emit(50)
 
     def add_progress_widgets(self):
         try:
@@ -158,7 +154,7 @@ class DownloadsWin(WinStandartBase):
 
         return name
 
-    def my_close(self, event):
+    def close_(self, *args):
         self.close()
 
     def set_value(self, value: int):
