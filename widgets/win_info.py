@@ -76,10 +76,22 @@ class InfoText:
             filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
             filemod = Dynamic.lng.date_changed + SPLIT_ + filemod
 
+            data.append(filemod)
+
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+        try:
             w, h = get_image_size(self.src)
             resol = f"{w}x{h}"
             resol = Dynamic.lng.resolution + SPLIT_ + resol
 
+            data.append(resol)
+
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
+
+        try:
             size_ = os.path.getsize(filename=self.src)
             size_ = round(size_ / (1024*1024), 2)
 
@@ -92,8 +104,10 @@ class InfoText:
 
             f_size = Dynamic.lng.file_size + SPLIT_ + f_size
 
-            for i in (filemod, resol, f_size):
-                data.append(i)
+            data.append(f_size)
+
+        except Exception as e:
+            MainUtils.print_err(parent=self, error=e)
 
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
