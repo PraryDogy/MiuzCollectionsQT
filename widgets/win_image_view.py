@@ -6,7 +6,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
                          QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from base_widgets import LayoutH, LayoutV, SvgShadowed, WinImgViewBase
+from base_widgets import LayoutHor, LayoutVer, SvgShadowed, WinImgViewBase
 from cfg import PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
@@ -151,7 +151,7 @@ class ZoomBtns(QFrame):
         self.setObjectName(Names.navi_zoom)
         self.setStyleSheet(Themes.current)
 
-        h_layout = LayoutH()
+        h_layout = LayoutHor()
         self.setLayout(h_layout)
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
@@ -183,7 +183,7 @@ class SwitchImageBtn(QFrame):
         self.setStyleSheet(Themes.current)
         self.setFixedSize(54, 54) # 27px border-radius, 27 * 2 for round shape
 
-        v_layout = LayoutV()
+        v_layout = LayoutVer()
         self.setLayout(v_layout)
 
         btn = SvgShadowed(os.path.join("images", icon_name), 50)

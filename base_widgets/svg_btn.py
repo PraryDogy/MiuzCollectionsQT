@@ -3,7 +3,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QWidget
 
-from .layouts import LayoutH
+from .layouts import LayoutHor
 
 
 class SvgBtn(QWidget):
@@ -14,7 +14,7 @@ class SvgBtn(QWidget):
         super().__init__(parent=parent)
         self.setStyleSheet(f"""background-color: transparent;""")
 
-        h_layout = LayoutH()
+        h_layout = LayoutHor()
         self.setLayout(h_layout)
 
         self.svg_btn = QSvgWidget()

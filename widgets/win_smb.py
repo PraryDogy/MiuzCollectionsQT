@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, LayoutH, SvgBtn, WinStandartBase
+from base_widgets import Btn, LayoutHor, SvgBtn, WinStandartBase
 from cfg import Dynamic
 
 
@@ -39,7 +39,7 @@ class WinSmb(WinStandartBase):
     def init_ui(self):
         h_wid = QWidget()
         self.content_layout.addWidget(h_wid)
-        h_layout = LayoutH()
+        h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
 
         icon_label = SvgBtn("images/warning.svg", 40)

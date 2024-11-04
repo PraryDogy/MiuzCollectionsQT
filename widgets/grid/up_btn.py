@@ -3,7 +3,7 @@ import os
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QFrame, QWidget
 
-from base_widgets import LayoutV, SvgBtn
+from base_widgets import LayoutVer, SvgBtn
 from signals import SignalsApp
 from styles import Names, Themes
 
@@ -15,7 +15,7 @@ class UpBtn(QFrame):
         self.setObjectName(Names.up_btn)
         self.setStyleSheet(Themes.current)
 
-        v_layout = LayoutV()
+        v_layout = LayoutVer()
         self.setLayout(v_layout)
 
         self.svg = SvgBtn(os.path.join("images", "up_new.svg"), 44)

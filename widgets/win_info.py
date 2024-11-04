@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
-from base_widgets import Btn, ContextMenuBase, LayoutH, WinStandartBase
+from base_widgets import Btn, ContextMenuBase, LayoutHor, WinStandartBase
 from cfg import Dynamic
 from styles import Names, Themes
 from utils.image_size import get_image_size
@@ -147,7 +147,7 @@ class WinInfo(WinStandartBase):
 
     def init_ui(self):
         info_wid = QWidget()
-        info_layout = LayoutH()
+        info_layout = LayoutHor()
         info_wid.setLayout(info_layout)
         self.content_layout.addWidget(info_wid)
 
@@ -163,7 +163,7 @@ class WinInfo(WinStandartBase):
             info_layout.addWidget(r_label)
 
         btns_wid = QWidget()
-        btn_layout = LayoutH()
+        btn_layout = LayoutHor()
         btns_wid.setLayout(btn_layout)
         self.content_layout.addWidget(btns_wid)
         button = Btn(Dynamic.lng.close)

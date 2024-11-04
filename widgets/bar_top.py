@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QFrame
 
-from base_widgets import Btn, LayoutH
+from base_widgets import Btn, LayoutHor
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
@@ -95,7 +95,7 @@ class BarTop(QFrame):
         self.setStyleSheet(Themes.current)
         self.setFixedHeight(34)
 
-        self.h_layout = LayoutH(self)
+        self.h_layout = LayoutHor(self)
         self.h_layout.setSpacing(0)
         self.h_layout.setContentsMargins(0, 0, 0, 0)
 

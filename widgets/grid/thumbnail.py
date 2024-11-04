@@ -4,7 +4,7 @@ from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
 from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
-from base_widgets import LayoutV
+from base_widgets import LayoutVer
 from cfg import (PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic,
                  JsonData)
 from signals import SignalsApp
@@ -64,7 +64,7 @@ class Thumbnail(QFrame):
         self.row, self.col = 0, 0
 
         self.spacing = 5
-        self.v_layout = LayoutV()
+        self.v_layout = LayoutVer()
         self.v_layout.setSpacing(self.spacing)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.v_layout)

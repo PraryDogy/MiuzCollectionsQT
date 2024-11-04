@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QSpacerItem, QWidget
 
-from base_widgets import InputBase, LayoutH
+from base_widgets import InputBase, LayoutHor
 from cfg import Dynamic
 from signals import SignalsApp
 
@@ -57,7 +57,7 @@ class WidSearch(QWidget):
     def __init__(self):
         super().__init__()
 
-        h_layout = LayoutH()
+        h_layout = LayoutHor()
         self.setLayout(h_layout)
 
         search = SearchBarBase()

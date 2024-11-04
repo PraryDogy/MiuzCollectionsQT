@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
-from base_widgets import Btn, InputBase, LayoutH, LayoutV, WinStandartBase
+from base_widgets import Btn, InputBase, LayoutHor, LayoutVer, WinStandartBase
 from cfg import Dynamic
 from signals import SignalsApp
 
@@ -127,7 +127,7 @@ class BaseDateLayout(QWidget):
     def __init__(self, title_label_text):
         super().__init__()
 
-        layout_v = LayoutV()
+        layout_v = LayoutVer()
         self.setLayout(layout_v)
 
         self.title_label = TitleLabel(title_label_text)
@@ -192,7 +192,7 @@ class WinDates(WinStandartBase):
         self.content_layout.addWidget(title_label)
 
         widget_wid = QWidget()
-        widget_layout = LayoutH()
+        widget_layout = LayoutHor()
         widget_wid.setLayout(widget_layout)
         self.content_layout.addWidget(widget_wid)
 
@@ -210,7 +210,7 @@ class WinDates(WinStandartBase):
         # ok cancel button
 
         buttons_wid = QWidget()
-        buttons_layout = LayoutH()
+        buttons_layout = LayoutHor()
         buttons_wid.setLayout(buttons_layout)
         buttons_layout.setContentsMargins(0, 10, 0, 0)
         self.content_layout.addWidget(buttons_wid)

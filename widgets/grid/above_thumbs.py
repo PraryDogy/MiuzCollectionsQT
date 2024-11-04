@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
-from base_widgets import LayoutH, LayoutV
+from base_widgets import LayoutHor, LayoutVer
 from cfg import ALL_COLLS, LIMIT, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
@@ -90,7 +90,7 @@ class AboveThumbsNoImages(QWidget):
     def __init__(self, width):
         super().__init__()
 
-        self.v_layout = LayoutV()
+        self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
         noimg_t = Dynamic.lng.no_photo
@@ -104,7 +104,7 @@ class AboveThumbsNoImages(QWidget):
         title_label.setStyleSheet(Themes.current)
 
         h_wid = QWidget()
-        h_layout = LayoutH()
+        h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
         h_layout.setContentsMargins(0, 10, 0, 0)
         self.v_layout.addWidget(h_wid)
@@ -153,7 +153,7 @@ class AboveThumbs(QWidget):
     def __init__(self, width):
         super().__init__()
 
-        self.v_layout = LayoutV()
+        self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
 
@@ -165,7 +165,7 @@ class AboveThumbs(QWidget):
         label.setStyleSheet(Themes.current)
 
         h_wid = QWidget()
-        h_layout = LayoutH()
+        h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
         h_layout.setContentsMargins(0, 10, 0, 0)
         self.v_layout.addWidget(h_wid)

@@ -3,7 +3,7 @@ from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
                              QWidget)
 
-from base_widgets import LayoutH, LayoutV, WinBase
+from base_widgets import LayoutHor, LayoutVer, WinBase
 from cfg import ALL_COLLS, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
@@ -52,7 +52,7 @@ class WinMain(WinBase):
             )
 
         h_wid_main = QWidget()
-        h_lay_main = LayoutH()
+        h_lay_main = LayoutHor()
         h_wid_main.setLayout(h_lay_main)
         self.central_layout.addWidget(h_wid_main)
 
@@ -67,7 +67,7 @@ class WinMain(WinBase):
 
         right_wid = QWidget()
         h_lay_main.addWidget(right_wid)
-        right_lay = LayoutV()
+        right_lay = LayoutVer()
         right_wid.setLayout(right_lay)
 
         self.bar_top = BarTop()

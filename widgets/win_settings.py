@@ -6,7 +6,7 @@ from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
                              QTextEdit, QWidget)
 
-from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutH, LayoutV,
+from base_widgets import (Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer,
                           WinStandartBase)
 from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
 from database import Dbase
@@ -23,7 +23,7 @@ class BrowseColl(QWidget):
         super().__init__()
         self.new_coll_path = None
 
-        layout_h = LayoutH()
+        layout_h = LayoutHor()
         self.setLayout(layout_h)
 
         self.browse_btn = Btn(Dynamic.lng.browse)
@@ -94,7 +94,7 @@ class ChangeLang(QWidget):
         super().__init__()
         self.lang = JsonData.user_lng
 
-        layout_h = LayoutH()
+        layout_h = LayoutHor()
         self.setLayout(layout_h)
 
         self.lang_btn = Btn(self.get_lng_text())
@@ -127,11 +127,11 @@ class CustFilters(QWidget):
     def __init__(self):
         super().__init__()
 
-        layout_h = LayoutH()
+        layout_h = LayoutHor()
         self.setLayout(layout_h)
 
         left_wid = QWidget()
-        self.v_left = LayoutV()
+        self.v_left = LayoutVer()
         left_wid.setLayout(self.v_left)
         layout_h.addWidget(left_wid)
 
@@ -147,7 +147,7 @@ class CustFilters(QWidget):
         layout_h.addSpacerItem(QSpacerItem(10, 0))
 
         r_wid = QWidget()
-        self.v_right = LayoutV()
+        self.v_right = LayoutVer()
         r_wid.setLayout(self.v_right)
         layout_h.addWidget(r_wid)
 
@@ -171,7 +171,7 @@ class StopWords(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        layout_v = LayoutV()
+        layout_v = LayoutVer()
         self.setLayout(layout_v)
 
         self.label = QLabel(Dynamic.lng.sett_stopwords)
@@ -192,7 +192,7 @@ class StopColls(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        layout_v = LayoutV()
+        layout_v = LayoutVer()
         self.setLayout(layout_v)
 
         self.label = QLabel(Dynamic.lng.sett_stopcolls)
@@ -213,7 +213,7 @@ class UpdaterWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.v_layout = LayoutV()
+        self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
         self.btn = Btn(Dynamic.lng.download_update)
@@ -245,7 +245,7 @@ class ShowFiles(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.v_layout = LayoutV()
+        self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
         self.btn = Btn(Dynamic.lng.show_app_support)
@@ -298,7 +298,7 @@ class WinSettings(WinStandartBase):
 
         h_wid = QWidget()
         self.content_layout.addWidget(h_wid)
-        h_layout = LayoutH()
+        h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
         self.content_layout.addSpacerItem(QSpacerItem(0, 25))
 
@@ -336,7 +336,7 @@ class WinSettings(WinStandartBase):
         self.content_layout.addStretch()
 
         btns_wid = QWidget()
-        btns_layout = LayoutH()
+        btns_layout = LayoutHor()
         btns_wid.setLayout(btns_layout)
         self.content_layout.addWidget(btns_wid)
 

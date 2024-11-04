@@ -157,7 +157,7 @@ class JsonData:
                     cls.write_json_data()
 
         else:
-            print("файла не существует")
+            print("файла не существует, устанавливаю настройки по умолчанию")
             cls.write_json_data()
 
         if cls.coll_folder not in cls.coll_folder_list:

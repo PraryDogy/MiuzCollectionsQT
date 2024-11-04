@@ -9,7 +9,7 @@ from cfg import JsonData
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 
-from .layouts import LayoutH, LayoutV
+from .layouts import LayoutHor, LayoutVer
 from .svg_btn import SvgBtn
 
 
@@ -17,7 +17,7 @@ class Btns(QWidget):
     def __init__(self):
         super().__init__()
 
-        btn_layout = LayoutH()
+        btn_layout = LayoutHor()
         btn_layout.setSpacing(10)
         self.setLayout(btn_layout)
 
@@ -73,7 +73,7 @@ class TitleBar(QFrame):
         self.setObjectName(Names.title_bar)
         self.setStyleSheet(Themes.current)
 
-        self.main_layout = LayoutH()
+        self.main_layout = LayoutHor()
         self.setLayout(self.main_layout)
 
         self.btns = Btns()
@@ -121,7 +121,7 @@ class WinBase(QMainWindow, QObject):
         central_widget.setStyleSheet(Themes.current)
 
         self.setCentralWidget(central_widget)
-        self.central_layout = LayoutV(central_widget)
+        self.central_layout = LayoutVer(central_widget)
 
         self.titlebar = TitleBar(self)
         self.titlebar.btns.max_btn.mouseReleaseEvent = self.toggle_fullscreen
@@ -210,7 +210,7 @@ class WinStandartBase(WinBase):
         self.content_wid = BaseBottomWid()
         self.central_layout.addWidget(self.content_wid)
 
-        self.content_layout = LayoutV()
+        self.content_layout = LayoutVer()
         self.content_wid.setLayout(self.content_layout)
     
 
@@ -225,7 +225,7 @@ class WinImgViewBase(WinBase):
         self.content_wid.setObjectName("img_view_bg")
         self.content_wid.setStyleSheet(Themes.current)
 
-        self.content_layout = LayoutV()
+        self.content_layout = LayoutVer()
         self.content_wid.setLayout(self.content_layout)
 
     def bind_content_wid(self, func: callable):
@@ -241,5 +241,5 @@ class WinSmallBase(WinBase):
         self.content_wid = BaseBottomWid(left=10, top=5, right=10, bottom=7)
         self.central_layout.addWidget(self.content_wid)
 
-        self.content_layout = LayoutV()
+        self.content_layout = LayoutVer()
         self.content_wid.setLayout(self.content_layout)

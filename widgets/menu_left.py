@@ -8,9 +8,9 @@ from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
-from base_widgets import ContextMenuBase, ContextSubMenuBase, LayoutH, LayoutV
+from base_widgets import ContextMenuBase, LayoutHor, LayoutVer
 from cfg import ALL_COLLS, LIMIT, MENU_W, Dynamic, JsonData
-from database import Dbase, THUMBS
+from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import MainUtils
@@ -139,14 +139,14 @@ class BaseLeftMenu(QScrollArea):
         scroll_widget.setStyleSheet(Themes.current)
         self.setWidget(scroll_widget)
 
-        self.v_layout = LayoutV()
+        self.v_layout = LayoutVer()
         scroll_widget.setLayout(self.v_layout)
         self.init_ui()
         SignalsApp.all.reload_menu_left.connect(self.reload_menu)
 
     def init_ui(self):
         btns_widget = QWidget()
-        main_btns_layout = LayoutV()
+        main_btns_layout = LayoutVer()
         btns_widget.setLayout(main_btns_layout)
 
         main_btns_layout.setContentsMargins(0, 5, 0, 15)
@@ -214,7 +214,7 @@ class MenuLeft(QFrame):
         super().__init__()
         self.setFixedWidth(MENU_W)
 
-        h_lay = LayoutH()
+        h_lay = LayoutHor()
         self.setLayout(h_lay)
 
         fake = QFrame()

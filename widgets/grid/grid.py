@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
-from base_widgets import LayoutH, LayoutV
+from base_widgets import LayoutHor, LayoutVer
 from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
@@ -44,10 +44,10 @@ class Grid(QScrollArea):
         self.scroll_area_widget.setStyleSheet(Themes.current)
         
         # Основной лейаут фрейма в области скролла
-        frame_layout = LayoutV(self.scroll_area_widget)
+        frame_layout = LayoutVer(self.scroll_area_widget)
 
         thumbnails_wid = QWidget()
-        self.thumbnails_layout = LayoutV()
+        self.thumbnails_layout = LayoutVer()
         thumbnails_wid.setLayout(self.thumbnails_layout)
         self.thumbnails_layout.setContentsMargins(5, 10, 5, 0)
         frame_layout.addWidget(thumbnails_wid)
@@ -107,7 +107,7 @@ class Grid(QScrollArea):
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
         if ln_thumbs == Dynamic.current_photo_limit:
             h_wid = QWidget()
-            h_layout = LayoutH()
+            h_layout = LayoutHor()
             h_wid.setLayout(h_layout)
             h_layout.setContentsMargins(0, 0, 0, 10)
             self.thumbnails_layout.addWidget(h_wid)

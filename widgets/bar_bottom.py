@@ -5,7 +5,7 @@ from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtWidgets import (QApplication, QFrame, QLabel, QSlider,
                              QSpacerItem, QWidget)
 
-from base_widgets import CustomProgressBar, LayoutH, SvgBtn
+from base_widgets import CustomProgressBar, LayoutHor, SvgBtn
 from cfg import JsonData
 from signals import SignalsApp
 from styles import Names, Themes
@@ -103,7 +103,7 @@ class BarBottom(QFrame):
         self.setObjectName(Names.st_bar_frame)
         self.setStyleSheet(Themes.current)
         
-        self.h_layout = LayoutH(self)
+        self.h_layout = LayoutHor(self)
         self.h_layout.setSpacing(20)
         self.h_layout.setContentsMargins(15, 0, 15, 0)
         self.init_ui()

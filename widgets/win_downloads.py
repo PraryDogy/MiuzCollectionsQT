@@ -4,7 +4,7 @@ from functools import partial
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QScrollArea, QSpacerItem, QWidget
 
-from base_widgets import (CustomProgressBar, LayoutH, LayoutV, SvgBtn,
+from base_widgets import (CustomProgressBar, LayoutHor, LayoutVer, SvgBtn,
                           WinStandartBase)
 from cfg import JsonData, Dynamic
 from styles import Names, Themes
@@ -20,7 +20,7 @@ class Progresser(QWidget):
     def __init__(self, text: str):
         super().__init__()
 
-        v_layout = LayoutV()
+        v_layout = LayoutVer()
         v_layout.setContentsMargins(10, 0, 20, 0)
         self.setLayout(v_layout)
 
@@ -32,7 +32,7 @@ class Progresser(QWidget):
 
         h_wid = QWidget()
         v_layout.addWidget(h_wid)
-        h_layout = LayoutH()
+        h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
 
 
@@ -78,12 +78,12 @@ class DownloadsWin(WinStandartBase):
         self.scroll_widget.setStyleSheet(Themes.current)
         self.scroll_area.setWidget(self.scroll_widget)
 
-        self.v_layout = LayoutV()
+        self.v_layout = LayoutVer()
         self.scroll_widget.setLayout(self.v_layout)
         self.content_layout.addWidget(self.scroll_area)
 
         self.progress_wid = QWidget()
-        self.progress_layout = LayoutV()
+        self.progress_layout = LayoutVer()
         self.progress_wid.setLayout(self.progress_layout)
         self.v_layout.addWidget(self.progress_wid)
         self.v_layout.addStretch()
