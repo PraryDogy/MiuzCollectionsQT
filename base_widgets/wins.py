@@ -236,8 +236,8 @@ class WinImgViewBase(WinFrameless):
     def __init__(self):
         super().__init__()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-
         self.titlebar.setFixedHeight(28)
+
         self.content_wid = BaseBottomWid()
         self.content_wid.setContentsMargins(10, 0, 10, 0)
         self.central_layout_v.addWidget(self.content_wid)
