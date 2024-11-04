@@ -5,4 +5,3 @@ from .layouts import LayoutHor, LayoutVer
 from .progressbar import CustomProgressBar
 from .svg_btn import SvgBtn, SvgShadowed
 from .text_edit import CustomTextEdit
-from .wins import WinFrameless, WinImgView, WinSmall, WinStandart

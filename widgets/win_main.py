@@ -3,7 +3,8 @@ from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
                              QWidget)
 
-from base_widgets import LayoutHor, LayoutVer, WinFrameless
+from base_widgets import LayoutHor, LayoutVer
+from base_widgets.wins import WinFrameless
 from cfg import ALL_COLLS, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
