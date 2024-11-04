@@ -69,7 +69,7 @@ class CopyPath(CustomAction):
         if MainUtils.smb_check():
             MainUtils.copy_text(text=self.src)
         else:
-            Shared.show_smb()
+            Shared.show_smb(self.parent_)
 
 class Reveal(CustomAction):
     def __init__(self, parent: QWidget, src: str):
@@ -80,7 +80,7 @@ class Reveal(CustomAction):
         if MainUtils.smb_check():
             MainUtils.reveal_files([self.src])
         else:
-            Shared.show_smb()
+            Shared.show_smb(self.parent_)
 
 class Save(CustomAction):
     def __init__(self, parent: QWidget, src: str, save_as: bool):
@@ -106,7 +106,7 @@ class Save(CustomAction):
             if dest:
                 self.copy_files_cmd(dest=dest, file=self.src)
         else:
-            Shared.show_smb()
+            Shared.show_smb(self.parent_)
 
     def copy_files_cmd(self, dest: str, file: str | list):
 

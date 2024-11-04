@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtGui import QContextMenuEvent
-from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
+from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QMainWindow, QWidget
 
 from base_widgets import ContextCustom
 from cfg import PSD_TIFF, Dynamic, JsonData
@@ -16,6 +16,16 @@ from .db_images import DbImage
 
 class Shared:
     dialog = None
+
+    @classmethod
+    def show_smb(cls, parent_: QWidget | QMainWindow):
+
+        if not isinstance(parent_, QMainWindow):
+            parent_ = parent_.window()
+
+        smb_win = WinSmb()
+        smb_win.center_relative_parent(parent_)
+        smb_win.show()
 
 
 class CustomContext(ContextCustom):
@@ -66,15 +76,18 @@ class CustomContext(ContextCustom):
             self.copy_files_cmd(dest, images)
 
         else:
-            self.smb_win = WinSmb()
-            self.smb_win.center_relative_parent(self)
-            self.smb_win.show()
+            Shared.show_smb(parent_=self)
 
     def copy_files_cmd(self, dest: str, files: list):
+        if MainUtils.smb_check():
+            self.copy_files_cmd_(dest, files)
+        else:
+            Shared.show_smb(parent_=self)
+
+    def copy_files_cmd_(self, dest: str, files: list):
         files = [i for i in files if os.path.exists(i)]
 
         if len(files) == 0:
-            MainUtils.send_notification(Dynamic.lng.no_file)
             return
 
         copy_task = ThreadCopyFiles(dest=dest, files=files)
