@@ -159,10 +159,14 @@ class WinFrameless(QMainWindow, QObject):
 
         Manager.wins.append(self)
 
-    def center_relative_parent(self, parent: QWidget):
+    def center_relative_parent(self, parent: QWidget | QMainWindow):
+        if not isinstance(parent, QMainWindow):
+            print("is wid")
+            # parent = parent.window()
+
         try:
             geo = self.geometry()
-            geo.moveCenter(parent.window().geometry().center())
+            geo.moveCenter(parent.geometry().center())
             self.setGeometry(geo)
         except (RuntimeError, Exception) as e:
             MainUtils.print_err(parent=self, error=e)

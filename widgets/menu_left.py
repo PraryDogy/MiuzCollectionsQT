@@ -8,7 +8,7 @@ from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
-from base_widgets import ContextMenuBase, LayoutHor, LayoutVer
+from base_widgets import ContextCustom, LayoutHor, LayoutVer
 from cfg import ALL_COLLS, LIMIT, MENU_W, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
@@ -18,7 +18,7 @@ from utils.main_utils import MainUtils
 from .win_smb import WinSmb
 
 
-class CustomContext(ContextMenuBase):
+class CustomContext(ContextCustom):
     def __init__(self, parent: QLabel, true_name: str, event: QContextMenuEvent):
         super().__init__(event=event)
 

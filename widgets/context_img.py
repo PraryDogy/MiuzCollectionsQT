@@ -1,9 +1,8 @@
 import os
-from functools import partial
 
-from PyQt5.QtWidgets import QAction, QFileDialog, QWidget
+from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QWidget
 
-from base_widgets import ContextMenuBase
+from base_widgets import ContextCustom
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from utils.copy_files import ThreadCopyFiles
@@ -14,104 +13,120 @@ from .win_smb import WinSmb
 
 
 class Shared:
-    file_dialog: QFileDialog = None
+    dialog: QFileDialog | None = None
+
+    @classmethod
+    def show_smb(cls, parent_: QWidget | QMainWindow):
+
+        if not isinstance(parent_, QMainWindow):
+            parent_ = parent_.window()
+
+        smb_win = WinSmb()
+        smb_win.center_relative_parent(parent_)
+        smb_win.show()
 
 
-class ContextImg(ContextMenuBase):
-    def __init__(self, src: str, event, parent: QWidget = None):
-        super().__init__(event)
+class CustomAction(QAction):
+    def __init__(self, parent: QWidget, src: str, text: str):
+        super().__init__(text=text)
 
-        self.parent_ = parent
+        if not isinstance(parent, QMainWindow):
+            parent = parent.window()
+
         self.src = src
-        
-        self.info_action = QAction(text=Dynamic.lng.info, parent=self)
-        self.info_action.triggered.connect(partial(self.show_info_win, src))
-        self.addAction(self.info_action)
+        self.parent_ = parent
 
-        self.addSeparator()
+    def cmd(self, *args, **kwargs):
+        print("context img > custom action > empty cmd")
 
-        copy_action = QAction(parent=self, text=Dynamic.lng.copy_path)
-        copy_action.triggered.connect(lambda: MainUtils.copy_text(src))
-        self.addAction(copy_action)
 
-        reveal_action = QAction(parent=self, text=Dynamic.lng.reveal_in_finder)
-        reveal_action.triggered.connect(self.reveal_cmd)
-        self.addAction(reveal_action)
+class OpenInView(CustomAction):
+    def __init__(self, parent: QWidget, src: str):
+        super().__init__(parent, src, Dynamic.lng.view)
+        self.triggered.connect(self.cmd)
 
-        save_as_action = QAction(parent=self, text=Dynamic.lng.save_image_in)
-        save_as_action.triggered.connect(self.save_as_cmd)
-        self.addAction(save_as_action)
-
-        save_menu = QAction(parent=self, text=Dynamic.lng.save_image_downloads)
-        save_menu.triggered.connect(self.save_cmd)
-        self.addAction(save_menu)
-
-    def add_preview_item(self):
-        open_action = QAction(Dynamic.lng.view, self)
-        open_action.triggered.connect(self.show_image_viewer)
-        self.addAction(open_action)
-        self.insertAction(self.info_action, open_action)
-
-    def show_info_win(self, img_src: str):
-        if MainUtils.smb_check():
-            self.win_info = WinInfo(src=img_src)
-            self.win_info.center_relative_parent(self)
-            self.win_info.show()
-        else:
-            self.show_smb()
-        
-    def show_image_viewer(self):
+    def cmd(self, *args):
         SignalsApp.all.win_img_view_open_in.emit(self.parent_)
 
-    def reveal_cmd(self):
+
+class OpenInfo(CustomAction):
+    def __init__(self, parent: QWidget, src: str):
+        super().__init__(parent, src, Dynamic.lng.info)
+        self.triggered.connect(self.cmd)
+
+    def cmd(self, *args):
         if MainUtils.smb_check():
-            if not os.path.exists(self.src):
-                MainUtils.send_notification(Dynamic.lng.no_file)
-            else:
-                MainUtils.reveal_files([self.src])
+            self.win_info = WinInfo(src=self.src)
+            self.win_info.center_relative_parent(self.parent_)
+            self.win_info.show()
         else:
-            self.show_smb()
+            Shared.show_smb(self.parent_)
 
-    def save_as_cmd(self):
+
+class CopyPath(CustomAction):
+    def __init__(self, parent: QWidget, src: str):
+        super().__init__(parent, src, Dynamic.lng.copy_path)
+        cmd_ = lambda: MainUtils.copy_text(text=self.src)
+        self.triggered.connect(cmd_)
+
+
+class Reveal(CustomAction):
+    def __init__(self, parent: QWidget, src: str):
+        super().__init__(parent, src, Dynamic.lng.reveal_in_finder)
+        cmd_ = lambda: MainUtils.reveal_files([self.src])
+        self.triggered.connect(cmd_)
+
+
+class Save(CustomAction):
+    def __init__(self, parent: QWidget, src: str, save_as: bool):
+
+        if save_as:
+            text: str = Dynamic.lng.save_image_in
+        else:
+            text: str = Dynamic.lng.save_image_downloads
+
+        super().__init__(parent, src, text)
+        self.triggered.connect(self.cmd)
+        self.save_as = save_as
+
+    def cmd(self):
         if MainUtils.smb_check():
-
-            Shared.file_dialog = QFileDialog()
-            Shared.file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
-            dest = Shared.file_dialog.getExistingDirectory()
+            if self.save_as:
+                Shared.dialog = QFileDialog()
+                Shared.dialog.setOption(QFileDialog.ShowDirsOnly, True)
+                dest = Shared.dialog.getExistingDirectory()
+            else:
+                dest = JsonData.down_folder
 
             if dest:
                 self.copy_files_cmd(dest=dest, file=self.src)
-
         else:
-            self.show_smb()
+            Shared.show_smb()
 
-    def save_cmd(self):
-        if MainUtils.smb_check():
-            self.copy_files_cmd(dest=JsonData.down_folder, file=self.src)
-        else:
-            self.show_smb()
-    
-    def copy_files_cmd(self, dest: str, file: str):
+    def copy_files_cmd(self, dest: str, file: str | list):
 
         if not file or not os.path.exists(file):
             MainUtils.send_notification(Dynamic.lng.no_file)
             return
 
-        self.copy_task = ThreadCopyFiles(dest=dest, files=[file])
-        SignalsApp.all.btn_downloads_toggle.emit("show")
-        self.copy_task.finished.connect(lambda files: self.copy_files_fin(self.copy_task, files))
-        self.copy_task.start()
+        if isinstance(file, str):
+            file = [file]
 
-    def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
-        self.reveal_files = MainUtils.reveal_files(files)
+        thread_ = ThreadCopyFiles(dest=dest, files=file)
+        SignalsApp.all.btn_downloads_toggle.emit("show")
+        cmd_ = lambda f: self.reveal_copied_files(thread_=thread_, files=f)
+        thread_._finished.connect(cmd_)
+        thread_.start()
+
+    def reveal_copied_files(self, thread_: ThreadCopyFiles, files: list):
+
+        MainUtils.reveal_files(files)
+
         if len(Dynamic.copy_threads) == 0:
             SignalsApp.all.btn_downloads_toggle.emit("hide")
-        try:
-            copy_task.remove_threads()
-        except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
 
-    def show_smb(self):
-        self.smb_win = WinSmb()
-        self.smb_win.center_relative_parent(self)
-        self.smb_win.show()
+        thread_.remove_threads()
+
+
+class ContextImg(ContextCustom):
+    ...

@@ -5,7 +5,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
-from base_widgets import ContextMenuBase
+from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import APP_NAME, APP_VER, Dynamic
 from signals import SignalsApp
@@ -30,7 +30,7 @@ class SelectableLabel(QLabel):
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        context_menu = ContextMenuBase(ev)
+        context_menu = ContextCustom(ev)
 
         copy_text = QAction(parent=context_menu, text=Dynamic.lng.copy)
         copy_text.triggered.connect(self.copy_text_md)

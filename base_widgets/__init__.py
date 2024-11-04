@@ -1,5 +1,5 @@
 from .btn import Btn
-from .context import ContextMenuBase, ContextSubMenuBase
+from .context import ContextCustom, ContextSubMenuBase
 from .input import InputBase
 from .layouts import LayoutHor, LayoutVer
 from .progressbar import CustomProgressBar

@@ -8,7 +8,7 @@ from .main_utils import MainUtils, MyThread
 
 
 class ThreadCopyFiles(MyThread):
-    finished = pyqtSignal(list)
+    _finished = pyqtSignal(list)
     value_changed = pyqtSignal(int)
     text_changed = pyqtSignal(str)
     stop = pyqtSignal()
@@ -34,7 +34,7 @@ class ThreadCopyFiles(MyThread):
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
             self.value_changed.emit(100)
-            self.finished.emit(files_dests)
+            self._finished.emit(files_dests)
             self.remove_threads()
             return
 
@@ -44,7 +44,7 @@ class ThreadCopyFiles(MyThread):
 
             if not self.flag:
                 self.value_changed.emit(100)
-                self.finished.emit(files_dests)
+                self._finished.emit(files_dests)
                 self.remove_threads()
                 Dynamic.copy_threads.remove(self)
                 return
@@ -78,7 +78,7 @@ class ThreadCopyFiles(MyThread):
                 break
         
         self.value_changed.emit(100)
-        self.finished.emit(files_dests)
+        self._finished.emit(files_dests)
         self.remove_threads()
         Dynamic.copy_threads.remove(self)
 

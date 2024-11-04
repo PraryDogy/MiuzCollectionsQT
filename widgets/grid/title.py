@@ -3,7 +3,7 @@ import os
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QWidget
 
-from base_widgets import ContextMenuBase
+from base_widgets import ContextCustom
 from cfg import PSD_TIFF, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
@@ -18,7 +18,7 @@ class Shared:
     dialog = None
 
 
-class CustomContext(ContextMenuBase):
+class CustomContext(ContextCustom):
     def __init__(self, files_list: list[DbImage], event):
 
         super().__init__(event=event)

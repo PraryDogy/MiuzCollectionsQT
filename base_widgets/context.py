@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QMenu
 from styles import Themes
 
 
-class ContextMenuBase(QMenu):
+class ContextCustom(QMenu):
     closed = pyqtSignal()
 
     def __init__(self, event: QContextMenuEvent):

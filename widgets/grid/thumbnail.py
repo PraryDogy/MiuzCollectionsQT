@@ -11,7 +11,8 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import ImageUtils, MainUtils
 
-from ..context_img import ContextImg
+from ..context_img import OpenInView, OpenInfo, CopyPath, Reveal, Save
+from base_widgets.context import ContextCustom
 
 
 class NameLabel(QLabel):
@@ -149,11 +150,32 @@ class Thumbnail(QFrame):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.image_context = ContextImg(src=self.src, event=ev, parent=self)
-            self.image_context.add_preview_item()
+            self.menu_ = ContextCustom(event=ev)
+
+            view = OpenInView(parent=self, src=self.src)
+            self.menu_.addAction(view)
+
+            info = OpenInfo(parent=self, src=self.src)
+            self.menu_.addAction(info)
+
+            self.menu_.addSeparator()
+
+            copy = CopyPath(parent=self, src=self.src)
+            self.menu_.addAction(copy)
+
+            reveal = Reveal(parent=self, src=self.src)
+            self.menu_.addAction(reveal)
+
+            save_as = Save(parent=self, src=self.src, save_as=True)
+            self.menu_.addAction(save_as)
+
+            save = Save(parent=self, src=self.src, save_as=False)
+            self.menu_.addAction(save)
 
             self.select.emit(self.src)
-            self.image_context.show_menu()
+            self.menu_.show_menu()
+
             return super().contextMenuEvent(ev)
+
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)

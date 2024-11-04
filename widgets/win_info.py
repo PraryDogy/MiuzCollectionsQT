@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
-from base_widgets import Btn, ContextMenuBase, LayoutHor
+from base_widgets import Btn, ContextCustom, LayoutHor
 from base_widgets.wins import WinChild
 from cfg import Dynamic
 from styles import Names, Themes
@@ -90,7 +90,7 @@ class LeftLabel(BaseLabel):
         self.contextMenuEvent = lambda event: None
 
 
-class CustomContextRLabel(ContextMenuBase):
+class CustomContextRLabel(ContextCustom):
     def __init__(self, parent: QLabel, event):
         super().__init__(event=event)
         self.my_parent = parent

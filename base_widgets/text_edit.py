@@ -5,10 +5,10 @@ from cfg import Dynamic
 from styles import Names, Themes
 from utils.main_utils import MainUtils
 
-from .context import ContextMenuBase
+from .context import ContextCustom
 
 
-class CustomContext(ContextMenuBase):
+class CustomContext(ContextCustom):
     def __init__(self, parent: QTextEdit, event):
         super().__init__(event=event)
         self.my_parent = parent
