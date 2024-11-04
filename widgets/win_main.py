@@ -43,7 +43,6 @@ class WinMain(WinFrameless):
         super().__init__()
 
         self.close_btn_cmd(self.hide_)
-        self.setContentsMargins(0, 0, 0, 0)
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.setMenuBar(BarMacos())
 
@@ -59,6 +58,7 @@ class WinMain(WinFrameless):
 
         h_wid_main = QWidget()
         h_lay_main = LayoutHor()
+        h_lay_main.setContentsMargins(0, 0, 0, 0)
         h_wid_main.setLayout(h_lay_main)
         self.central_layout_v.addWidget(h_wid_main)
 
@@ -74,6 +74,7 @@ class WinMain(WinFrameless):
         right_wid = QWidget()
         h_lay_main.addWidget(right_wid)
         right_lay = LayoutVer()
+        right_lay.setContentsMargins(0, 0, 0, 0)
         right_wid.setLayout(right_lay)
 
         self.bar_top = BarTop()
