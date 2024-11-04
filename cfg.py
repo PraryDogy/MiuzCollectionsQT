@@ -107,7 +107,7 @@ class JsonData:
         }
     
     theme: str = "dark_theme"
-    user_lng: str = "en"
+    lng_name: str = "en"
     small_menu_view: str = True
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -188,7 +188,7 @@ class JsonData:
 
         if key_ in data:
             Dynamic.lng = data.get(key_)()
-            cls.user_lng = key_
+            cls.lng_name = key_
 
         else:
             raise KeyError("cfg > dymamic set lang > no key (ru, en)", key_)
@@ -215,7 +215,7 @@ class JsonData:
         cls.check_app_dirs()
         cls.read_json_data()
         Themes.set_theme(cls.theme)
-        cls.dynamic_set_lang(cls.user_lng)
+        cls.dynamic_set_lang(cls.lng_name)
 
 
 class Dynamic:

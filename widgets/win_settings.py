@@ -91,7 +91,7 @@ class ChangeLang(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.lang = JsonData.user_lng
+        self.lang = JsonData.lng_name
 
         layout_h = LayoutHor()
         self.setLayout(layout_h)
@@ -116,7 +116,7 @@ class ChangeLang(QWidget):
 
         self.lang_btn.setText(self.get_lng_text())
 
-        if self.lang != JsonData.user_lng:
+        if self.lang != JsonData.lng_name:
             JsonData.dynamic_set_lang(self.lang)
             setattr(self, "flag", True)
             self._pressed.emit()
