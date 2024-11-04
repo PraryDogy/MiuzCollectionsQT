@@ -6,7 +6,7 @@ class Eng:
 		self.bar_menu = 'Menu'
 		self.browse = 'Browse'
 		self.cancel = 'Cancel'
-		self.choose_coll_smb = "Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings."
+		self.choose_coll_smb = 'Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings.'
 		self.close = 'Close'
 		self.collection = 'Collection'
 		self.compact_menu = 'Compact menu'
@@ -27,6 +27,7 @@ class Eng:
 		self.file_name = 'Filename'
 		self.file_path = 'Location'
 		self.file_size = 'Size'
+		self.gb = 'gb'
 		self.in_finder = 'in Finder'
 		self.info = 'Info'
 		self.lang_label = 'Language/Язык'

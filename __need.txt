@@ -1,3 +1,5 @@
 там где просто lambda e - сделай функцию с args
 lambda вынести в cmd
-инфо окно как в pseudo
+
+
+win info проверь гб и мб
