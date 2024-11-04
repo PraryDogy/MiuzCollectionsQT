@@ -44,17 +44,21 @@ class WinMain(WinFrameless):
         self.setContentsMargins(0, 0, 0, 0)
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.setMenuBar(BarMacos())
-        self.titlebar.add_r_wid(WidSearch())
+        # self.titlebar.add_r_wid(WidSearch())
         self.set_title(
             Dynamic.lng.all_colls
             if JsonData.curr_coll == ALL_COLLS
             else JsonData.curr_coll
             )
 
+        wid_search = WidSearch()
+        self.titlebar.h_lay.addWidget(wid_search)
+        self.titlebar.title.setStyleSheet(f"""padding-left: {wid_search.width()}px;""")
+
         h_wid_main = QWidget()
         h_lay_main = LayoutHor()
         h_wid_main.setLayout(h_lay_main)
-        self.central_layout.addWidget(h_wid_main)
+        self.central_layout_v.addWidget(h_wid_main)
 
         left_wid = MenuLeft()
         h_lay_main.addWidget(left_wid)

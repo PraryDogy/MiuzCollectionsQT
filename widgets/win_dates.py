@@ -183,8 +183,9 @@ class WinDates(WinStandartBase):
         self.date_end = Dynamic.date_end
 
         self.init_ui()
-        self.fit_size()
-        self.center_win(parent=parent)
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
+        self.center_relative_parent(parent=parent)
 
     def init_ui(self):
         title_label = QLabel(Dynamic.lng.search_dates)

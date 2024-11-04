@@ -283,7 +283,7 @@ class WinSettings(WinStandartBase):
 
         QTimer.singleShot(10, self.init_ui)
         self.setFixedSize(420, 550)
-        self.center_win(parent)
+        self.center_relative_parent(parent)
         self.setFocus()
 
         self.new_coll_path = None

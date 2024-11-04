@@ -142,8 +142,9 @@ class WinInfo(WinStandartBase):
         self.l_ww = 100
         self.init_ui()
 
-        self.fit_size()
-        self.center_win(parent)
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
+        self.center_relative_parent(parent)
 
     def init_ui(self):
         info_wid = QWidget()

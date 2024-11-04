@@ -25,7 +25,7 @@ class WinSmb(WinStandartBase):
 
         self.init_ui()
         self.setFixedSize(350, 170)
-        self.center_win(parent=parent)
+        self.center_relative_parent(parent=parent)
         self.setFocus()
 
         self.new_coll_path = None

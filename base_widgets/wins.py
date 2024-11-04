@@ -73,18 +73,22 @@ class TitleBar(QFrame):
         self.setObjectName(Names.title_bar)
         self.setStyleSheet(Themes.current)
 
-        self.main_layout = LayoutHor()
-        self.setLayout(self.main_layout)
+        self.h_lay = LayoutHor()
+        self.setLayout(self.h_lay)
 
         self.btns = Btns()
-        self.main_layout.addWidget(self.btns)
+        self.h_lay.addWidget(self.btns)
 
         self.title = QLabel()
-        self.main_layout.addWidget(self.title, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.main_layout.addSpacerItem(QSpacerItem(self.btns.width(), 0))
+        self.h_lay.addWidget(self.title, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.h_lay.addSpacerItem(QSpacerItem(self.btns.width(), 0))
 
         self.oldPos = self.pos()
         self.show()
+
+    def add_r_wid(self, wid: QWidget):
+        self.h_lay.addWidget(wid)
+        self.title.setStyleSheet(f"""padding-left: {wid.width()}px;""")
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         self.oldPos = a0.globalPos()
@@ -95,10 +99,6 @@ class TitleBar(QFrame):
         self.my_win.move(self.my_win.x() + delta.x(), self.my_win.y() + delta.y())
         self.oldPos = a0.globalPos()
         return super().mouseMoveEvent(a0)
-
-    def add_r_wid(self, wid: QWidget):
-        self.main_layout.addWidget(wid)
-        self.title.setStyleSheet(f"""padding-left: {wid.width()}px;""")
 
 
 class Manager:
@@ -117,13 +117,13 @@ class WinFrameless(QMainWindow, QObject):
         central_widget.setStyleSheet(Themes.current)
 
         self.setCentralWidget(central_widget)
-        self.central_layout = LayoutVer(central_widget)
+        self.central_layout_v = LayoutVer(central_widget)
 
         self.titlebar = TitleBar(self)
         self.titlebar.btns.max_btn.mouseReleaseEvent = self.toggle_fullscreen
-        self.titlebar.btns.min_btn.mouseReleaseEvent = lambda e: self.showMinimized()
+        self.titlebar.btns.min_btn.mouseReleaseEvent = self.show_minimized
         self.titlebar.btns.close_btn.mouseReleaseEvent = close_func
-        self.central_layout.addWidget(self.titlebar)
+        self.central_layout_v.addWidget(self.titlebar)
 
         self.gripSize = 16
         self.grips = []
@@ -134,7 +134,7 @@ class WinFrameless(QMainWindow, QObject):
 
         Manager.wins.append(self)
 
-    def center_win(self, parent: QWidget):
+    def center_relative_parent(self, parent: QWidget):
         try:
             geo = self.geometry()
             geo.moveCenter(parent.window().geometry().center())
@@ -142,15 +142,14 @@ class WinFrameless(QMainWindow, QObject):
         except (RuntimeError, Exception) as e:
             MainUtils.print_err(parent=self, error=e)
 
-    def fit_size(self):
-        self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
-
-    def toggle_fullscreen(self, event):
+    def toggle_fullscreen(self, *args):
         if self.isMaximized():
             self.showNormal()
         else:
             self.showMaximized()
+
+    def show_minimized(self, *args):
+        self.showMinimized()
 
     def set_title(self, text):
         self.titlebar.title.setText(text)
@@ -202,7 +201,7 @@ class WinStandartBase(WinFrameless):
         super().__init__(close_func)
         self.titlebar.setFixedHeight(28)
         self.content_wid = BaseBottomWid()
-        self.central_layout.addWidget(self.content_wid)
+        self.central_layout_v.addWidget(self.content_wid)
         self.content_layout = LayoutVer()
         self.content_wid.setLayout(self.content_layout)
     
@@ -213,7 +212,7 @@ class WinImgViewBase(WinFrameless):
         self.titlebar.setFixedHeight(28)
         self.content_wid = BaseBottomWid()
         self.content_wid.setContentsMargins(10, 0, 10, 0)
-        self.central_layout.addWidget(self.content_wid)
+        self.central_layout_v.addWidget(self.content_wid)
         self.content_wid.setObjectName("img_view_bg")
         self.content_wid.setStyleSheet(Themes.current)
         self.content_layout = LayoutVer()
@@ -226,6 +225,6 @@ class WinSmallBase(WinFrameless):
         self.titlebar.setFixedHeight(28)
         self.content_wid = BaseBottomWid()
         self.content_wid.setContentsMargins(10, 5, 10, 5)
-        self.central_layout.addWidget(self.content_wid)
+        self.central_layout_v.addWidget(self.content_wid)
         self.content_layout = LayoutVer()
         self.content_wid.setLayout(self.content_layout)
