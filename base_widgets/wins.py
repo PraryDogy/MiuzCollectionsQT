@@ -134,28 +134,6 @@ class WinFrameless(QMainWindow, QObject):
 
         Manager.wins.append(self)
 
-    def closeEvent(self, a0: QCloseEvent | None) -> None:
-        try:
-            Manager.wins.remove(self)
-            self.deleteLater()
-        except Exception as e:
-            pass
-
-        return super().closeEvent(a0)
-
-    def resizeEvent(self, a0: QResizeEvent | None) -> None:
-        rect = self.rect()
-        self.grips[1].move(rect.right() - self.gripSize, 0)
-        self.grips[2].move(
-            rect.right() - self.gripSize, rect.bottom() - self.gripSize)
-        self.grips[3].move(0, rect.bottom() - self.gripSize)
-        return super().resizeEvent(a0)
-
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() == Qt.Key.Key_Escape:
-            self.close()
-        return super().keyPressEvent(a0)
-    
     def center_win(self, parent: QWidget):
         try:
             geo = self.geometry()
@@ -189,6 +167,28 @@ class WinFrameless(QMainWindow, QObject):
         self.titlebar.btns.close_btn.setDisabled(True)
         self.titlebar.btns.close_btn.set_icon(os.path.join("images", f"{JsonData.theme}_gray.svg"))
 
+    def closeEvent(self, a0: QCloseEvent | None) -> None:
+        try:
+            Manager.wins.remove(self)
+            self.deleteLater()
+        except Exception as e:
+            pass
+
+        return super().closeEvent(a0)
+
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        rect = self.rect()
+        self.grips[1].move(rect.right() - self.gripSize, 0)
+        self.grips[2].move(
+            rect.right() - self.gripSize, rect.bottom() - self.gripSize)
+        self.grips[3].move(0, rect.bottom() - self.gripSize)
+        return super().resizeEvent(a0)
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close()
+        return super().keyPressEvent(a0)
+    
 
 class BaseBottomWid(QFrame):
     def __init__(self):
