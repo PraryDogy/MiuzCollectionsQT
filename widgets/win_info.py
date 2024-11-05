@@ -33,23 +33,15 @@ class RightLabel(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.menu_ = ContextCustom(event=ev)
 
-        selected_text = self.selectedText().replace("\n", "")
-        if selected_text:
-            label_text = f"{Dynamic.lng.copy} \"{selected_text}\""
-            sel = QAction(text=label_text, parent=self)
-            sel.triggered.connect(lambda: self.copy_selected(text=selected_text))
-        else:
-            sel = QAction(text=Dynamic.lng.copy, parent=self)
+        self.setSelection(0, len(self.text()))
+        text = self.text().replace("\n", "")
+
+        label_text = Dynamic.lng.copy
+        sel = QAction(text=label_text, parent=self)
+        sel.triggered.connect(lambda: self.copy_selected(text=text))
         self.menu_.addAction(sel)
 
-        self.menu_.addSeparator()
-
-        sel_all = QAction(text=Dynamic.lng.copy_all, parent=self)
-        sel_all.triggered.connect(self.copy_all)
-        self.menu_.addAction(sel_all)
-
         self.menu_.show_menu()
-        # return super().contextMenuEvent(ev)
 
 
 class InfoText:
