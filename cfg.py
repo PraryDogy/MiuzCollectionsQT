@@ -1,11 +1,13 @@
 import json
 import os
 import shutil
+import webbrowser
 from datetime import datetime
 
 from lang import Eng, Rus
 from styles import Themes
 
+LINK_DB = "https://disk.yandex.ru/d/gDnB5X9kGqjztA"
 APP_NAME: str = "MiuzCollections"
 APP_VER = "5.8.5"
 
@@ -191,9 +193,9 @@ class JsonData:
         os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
 
         if not os.path.exists(path="db.db"):
-            print("please, download db.db.zip from")
-            print("https://disk.yandex.ru/d/FmwEPA8nS3JsMw")
+            print("please, download db.db.zip")
             print("extract and move to project root directory")
+            webbrowser.open(LINK_DB)
             quit()
 
         if not os.path.exists(path=JSON_FILE):
