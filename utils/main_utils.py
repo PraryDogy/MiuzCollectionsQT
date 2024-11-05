@@ -10,6 +10,7 @@ import cv2
 import numpy as np
 import psd_tools
 from imagecodecs.imagecodecs import DelayedImportError
+from PIL import Image
 from PyQt5.QtCore import QByteArray, QObject, Qt, QThread
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QVBoxLayout
@@ -51,10 +52,20 @@ class ImageUtils:
             if str(object=img.dtype) != "uint8":
                 img = (img/256).astype(dtype="uint8")
             return img
-        # DelayedImportError обходит ошибку импорта lwz encode когда 
-        # проект уже упакован в приложение py2app
         except (Exception, tifffile.TiffFileError, RuntimeError, DelayedImportError) as e:
-            MainUtils.print_err(cls, e)
+            MainUtils.print_err(parent=cls, error=e)
+            print("try open tif with PIL")
+            return cls.read_tiff_pil(path)
+    
+    @classmethod
+    def read_tiff_pil(cls, path: str) -> np.ndarray | None:
+        try:
+            print("PIL: try open tif")
+            img: Image = Image.open(path)
+            # return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+            return np.array(img)
+        except Exception as e:
+            MainUtils.print_err(parent=cls, error=e)
             return None
 
     @classmethod
