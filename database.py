@@ -70,6 +70,7 @@ class Dbase:
 
     @classmethod
     def copy_db_file(cls):
+        print("Копирую новую предустановленную БД")
         if os.path.exists(DB_FILE):
             os.remove(DB_FILE)
 
