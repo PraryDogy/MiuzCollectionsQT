@@ -9,6 +9,7 @@ import traceback
 import cv2
 import numpy as np
 import psd_tools
+from imagecodecs.imagecodecs import DelayedImportError
 from PyQt5.QtCore import QByteArray, QObject, Qt, QThread
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QVBoxLayout
@@ -50,7 +51,9 @@ class ImageUtils:
             if str(object=img.dtype) != "uint8":
                 img = (img/256).astype(dtype="uint8")
             return img
-        except (tifffile.TiffFileError, RuntimeError) as e:
+        # DelayedImportError обходит ошибку импорта lwz encode когда 
+        # проект уже упакован в приложение py2app
+        except (Exception, tifffile.TiffFileError, RuntimeError, DelayedImportError) as e:
             MainUtils.print_err(cls, e)
             return None
 
