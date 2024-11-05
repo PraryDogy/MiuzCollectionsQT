@@ -92,7 +92,6 @@ BUNDLE_ID = f"com.{SHORT_AUTHOR_NAME}.{APP_NAME}" # DON'T CHANGE IT
 PY2APP = "py2app" # DON'T CHANGE IT
 
 OPTIONS = {
-    'includes': ['imagecodecs._shared', 'imagecodecs._imcd', 'imagecodecs', 'tifffile'],
     "iconfile": ICON_PATH,
     "plist": {
         "CFBundleName": APP_NAME,
@@ -106,6 +105,7 @@ OPTIONS = {
             }
             }
 
+OPTIONS['includes'] = ['imagecodecs._shared', 'imagecodecs._imcd', 'imagecodecs', 'tifffile']
 sys.argv.append(PY2APP)
 
 
