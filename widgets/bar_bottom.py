@@ -36,7 +36,7 @@ class ProgressBar(CustomProgressBar):
 
         if self.value() in (0, 100):
             self.hide()
-        else:
+        elif self.value() > 5:
             self.show()
 
         
