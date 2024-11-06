@@ -39,9 +39,15 @@ class ScanerUtils:
     
     @classmethod
     def conn_commit(cls, conn: Connection):
+
         if cls.can_scan:
             conn.commit()
-            ScanerUtils.reload_gui()
+
+            try:
+                SignalsApp.all.reload_menu_left.emit()
+                SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+            except RuntimeError as e:
+                MainUtils.print_err(parent=cls, error=e)
 
     @classmethod
     def conn_close(cls, conn: Connection):
