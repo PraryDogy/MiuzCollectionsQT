@@ -39,7 +39,9 @@ class ScanerUtils:
     
     @classmethod
     def conn_commit(cls, conn: Connection):
-        conn.commit()
+        if cls.can_scan:
+            conn.commit()
+            ScanerUtils.reload_gui()
 
     @classmethod
     def conn_close(cls, conn: Connection):
@@ -284,8 +286,6 @@ class DbUpdater:
                 stmt_count = 0
 
                 ScanerUtils.conn_commit(conn)
-                if flag != self.flag_del:
-                    ScanerUtils.reload_gui()
                 sleep(ScanerUtils.sleep_)
                 conn = ScanerUtils.conn_get()
         
@@ -361,7 +361,6 @@ class ScanerShedule(QObject):
         self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
         Dbase.vacuum()
         ScanerUtils.progressbar_value(100)
-        ScanerUtils.reload_gui()
 
 
 class Scaner:
