@@ -26,14 +26,6 @@ class ScanerUtils:
             MainUtils.print_err(parent=cls, error=e)
 
     @classmethod
-    def reload_gui(cls):
-        try:
-            SignalsApp.all.reload_menu_left.emit()
-            SignalsApp.all.grid_thumbnails_cmd.emit("reload")
-        except RuntimeError as e:
-            MainUtils.print_err(parent=cls, error=e)
-
-    @classmethod
     def conn_get(cls):
         return Dbase.engine.connect()
     
