@@ -37,13 +37,13 @@ class Dbase:
     @classmethod
     def create_engine(cls):
         cls.engine = sqlalchemy.create_engine(
-            "sqlite:////" + DB_FILE,
+            f"sqlite:///{DB_FILE}",
+            echo=False,
             connect_args={
-                "check_same_thread": False
-                
-                },
-            echo=False
-            )
+                "check_same_thread": False,
+                "timeout": 15
+                }
+                )
 
     @classmethod
     def enable_wal(cls):
