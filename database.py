@@ -32,14 +32,25 @@ class Dbase:
             cls.copy_db_file()
             cls.create_engine()
 
+        cls.enable_wal()
+
     @classmethod
     def create_engine(cls):
         cls.engine = sqlalchemy.create_engine(
             "sqlite:////" + DB_FILE,
-            connect_args={"check_same_thread": False},
+            connect_args={
+                "check_same_thread": False
+                
+                },
             echo=False
             )
-        
+
+    @classmethod
+    def enable_wal(cls):
+        with cls.engine.connect() as conn:
+            conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
+        print("database > wal enabled")
+
     @classmethod
     def vacuum(cls):
         conn = cls.engine.connect()
