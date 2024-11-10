@@ -1,3 +1,4 @@
+import hashlib
 import io
 import logging
 import os
@@ -16,8 +17,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QVBoxLayout
 from tifffile import tifffile
 
-from cfg import Dynamic, JsonData
-from signals import SignalsApp
+from cfg import HASH_DIR, JsonData
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
@@ -297,7 +297,32 @@ class MainUtils:
     @classmethod
     def start_new_app(cls):
         os.execl(sys.executable, sys.executable, *sys.argv)
-        # QProcess.startDetached(sys.executable, sys.argv)
+
+    @classmethod
+    def get_hash_path(cls, src: str) -> str:
+        new_name = hashlib.md5(src.encode('utf-8')).hexdigest() + ".jpg"
+        new_path = os.path.join(HASH_DIR, new_name[:2])
+        os.makedirs(new_path, exist_ok=True)
+        return os.path.join(new_path, new_name)
+    
+    @classmethod
+    def write_image_hash(cls, output_path: str, array_img: np.ndarray) -> bool:
+        try:
+            array_img = cv2.cvtColor(array_img, cv2.COLOR_RGB2BGR)
+            cv2.imwrite(output_path, array_img)
+            return True
+        except Exception as e:
+            cls.print_error(parent=cls, error=e)
+            return False
+        
+    @classmethod
+    def read_image_hash(cls, src: str) -> np.ndarray | None:
+        try:
+            array_img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+            return cv2.cvtColor(array_img, cv2.COLOR_BGR2RGB)
+        except Exception as e:
+            cls.print_error(parent=cls, error= e)
+            return None
 
     @classmethod
     def print_err(cls, parent: object, error: Exception):

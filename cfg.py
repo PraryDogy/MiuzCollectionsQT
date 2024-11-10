@@ -28,6 +28,11 @@ DB_FILE: str = os.path.join(
     "db.db"
     )
 
+HASH_DIR: str = os.path.join(
+    APP_SUPPORT_DIR,
+    "hashdir"
+    )
+
 _IMG_EXT: tuple = (
     ".jpg", ".jpeg", ".jfif",
     ".tif", ".tiff",
