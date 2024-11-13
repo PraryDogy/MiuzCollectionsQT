@@ -1,6 +1,5 @@
 import os
 from time import sleep
-from typing import List, NamedTuple
 
 import sqlalchemy
 import sqlalchemy.exc
@@ -179,8 +178,6 @@ class DbUpdater:
     def __init__(self, compared_result: ComparedResult):
         super().__init__()
         self.compared_result = compared_result
-        self.flag_del = "delete"
-        self.flag_ins = "insert"
 
         self.queries: list[Insert | Update | Delete] = []
         self.hash_images: list[tuple[str, ndarray]] = []
