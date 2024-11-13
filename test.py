@@ -1,8 +1,17 @@
-import os
+class Item:
+    def __init__(self, size, mod, created):
+        self.size: int = size
+        self.mod: int = mod
+        self.created: int = created
 
-import sqlalchemy
-import json
-from cfg import DB_FILE, JsonData, APP_SUPPORT_DIR
-from database import THUMBS, Dbase
-from utils.main_utils import ImageUtils, MainUtils
 
+items = []
+for i in range(0, 10):
+    item_ = Item(i, i, i)
+    items.append(item_)
+
+
+test = Item(3, 3, 3)
+
+if test in items:
+    print(1)

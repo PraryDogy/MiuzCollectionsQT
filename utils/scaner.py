@@ -48,28 +48,12 @@ class ScanerUtils:
         conn.close()
 
 
-# class ImageItem:
-#     __slots__ = ["src", "size", "created", "mod"]
-#     def __init__(self, src: str, size: int, created: int, mod: int):
-#         self.src = src
-#         self.size = size
-#         self.created = created
-#         self.mod = mod
-
-
-class ImageItem(NamedTuple):
-    src: str
-    size: int
-    created: int
-    modified: int
-
-
 class FinderImages:
     def __init__(self):
         super().__init__()
 
-    def get(self) -> list[ImageItem]:
-        finder_images: List[ImageItem] = []
+    def get(self) -> list[tuple[str, int, int, int]]:
+        finder_images: list[tuple[str, int, int, int]] = []
 
         collections = [
             os.path.join(JsonData.coll_folder, i)
@@ -100,8 +84,8 @@ class FinderImages:
                 continue
         return finder_images
 
-    def walk_collection(self, collection: str) -> list[tuple]:
-        finder_images: list[tuple] = []
+    def walk_collection(self, collection: str) -> list[tuple[str, int, int, int]]:
+        finder_images: list[tuple[str, int, int, int]] = []
 
         for root, _, files in os.walk(collection):
 
@@ -136,19 +120,25 @@ class DbImages:
         super().__init__()
 
     def get(self) -> list[tuple]:
-        conn = ScanerUtils.conn_get()
+        conn = Dbase.engine.connect()
+
         q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.size, THUMBS.c.created, THUMBS.c.mod)
+
         try:
-            res = conn.execute(q).fetchall()
             # не забываем относительный путь ДБ преобразовать в полный
-            return [
+            res = conn.execute(q).fetchall()
+            res = [
                 (JsonData.coll_folder + src, size, created, mod)
                 for src, size, created, mod in res
                 ]
-        except Exception as e:
+
+        except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.IntegrityError) as e:
+            conn.rollback()
             MainUtils.print_err(parent=self, error=e)
-            ScanerUtils.conn_close(conn)
-            return []
+            res = []
+
+        conn.close()
+        return res
 
 
 class ComparedResult:
