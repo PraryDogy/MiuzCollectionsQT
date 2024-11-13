@@ -295,6 +295,7 @@ class MainUtils:
             return ImageUtils.array_color(array_img, "BGR")
         except Exception as e:
             cls.print_err(parent=cls, error= e)
+            print("utils > can't read image hash")
             return None
 
     @classmethod

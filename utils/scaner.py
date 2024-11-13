@@ -35,11 +35,11 @@ class ScanerUtils:
                 conn.rollback()
                 return
 
-            try:
-                SignalsApp.all.reload_menu_left.emit()
-                SignalsApp.all.grid_thumbnails_cmd.emit("reload")
-            except RuntimeError as e:
-                MainUtils.print_err(parent=cls, error=e)
+            # try:
+            #     SignalsApp.all.reload_menu_left.emit()
+            #     SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+            # except RuntimeError as e:
+            #     MainUtils.print_err(parent=cls, error=e)
 
 
 class FinderImages:
@@ -206,15 +206,16 @@ class DbUpdater:
             except sqlalchemy.exc.OperationalError as e:
                 MainUtils.print_err(parent=self, error=e)
                 conn.rollback()
+                conn.close()
                 ok_ = False
                 break
             
-        ScanerUtils.conn_commit(conn)
-        conn.close()
-
         if ok_:
             for src, size, created, mod in self.compared_result.del_items:
                 os.remove(src)
+
+            ScanerUtils.conn_commit(conn)
+            conn.close()
 
     def get_small_img(self, src: str) -> ndarray | None:
         array_img = ImageUtils.read_image(src)
@@ -284,15 +285,16 @@ class DbUpdater:
             except sqlalchemy.exc.OperationalError as e:
                 MainUtils.print_err(parent=self, error=e)
                 conn.rollback()
+                conn.close()
                 ok_ = False
                 break
             
-        ScanerUtils.conn_commit(conn)
-        conn.close()
-
         if ok_:
             for hash_path, img_array in self.hash_images:
                 MainUtils.write_image_hash(hash_path, img_array)
+
+            ScanerUtils.conn_commit(conn)
+            conn.close()
 
 
 class ScanerThread(MyThread):
