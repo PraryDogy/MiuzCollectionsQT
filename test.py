@@ -15,5 +15,5 @@ for root, dir, files in os.walk(hash):
     for file in files:
         hash_len += 1
 
-print(images_len)
-print(hash_len)
+print("src", images_len)
+print("hash", hash_len)
