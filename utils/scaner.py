@@ -2,9 +2,9 @@ import os
 from time import sleep
 
 import sqlalchemy
-import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
+import sqlalchemy.exc
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
@@ -30,7 +30,8 @@ class ScanerUtils:
 
             try:
                 conn.commit()
-            except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError):
+            except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
+                MainUtils.print_err(parent=cls, error=e)
                 conn.rollback()
                 return
 
@@ -126,8 +127,8 @@ class DbImages:
                 ]
 
         except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.IntegrityError) as e:
-            conn.rollback()
             MainUtils.print_err(parent=self, error=e)
+            conn.rollback()
             res = []
 
         conn.close()
@@ -198,10 +199,12 @@ class DbUpdater:
             q = sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
             try:
                 conn.execute(q)
-            except sqlalchemy.exc.IntegrityError:
+            except sqlalchemy.exc.IntegrityError as e:
+                MainUtils.print_err(parent=self, error=e)
                 conn.rollback()
                 continue
-            except sqlalchemy.exc.OperationalError:
+            except sqlalchemy.exc.OperationalError as e:
+                MainUtils.print_err(parent=self, error=e)
                 conn.rollback()
                 ok_ = False
                 break
@@ -274,10 +277,12 @@ class DbUpdater:
         for query in self.insert_queries:
             try:
                 conn.execute(query)
-            except sqlalchemy.exc.IntegrityError:
+            except sqlalchemy.exc.IntegrityError as e:
+                MainUtils.print_err(parent=self, error=e)
                 conn.rollback()
                 continue
-            except sqlalchemy.exc.OperationalError:
+            except sqlalchemy.exc.OperationalError as e:
+                MainUtils.print_err(parent=self, error=e)
                 conn.rollback()
                 ok_ = False
                 break

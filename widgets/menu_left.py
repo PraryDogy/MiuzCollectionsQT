@@ -185,13 +185,18 @@ class BaseLeftMenu(QScrollArea):
 
     def load_colls_query(self) -> dict:
         menus = defaultdict(list)
-        
-        q = sqlalchemy.select(THUMBS.c.coll).distinct()
+
         conn = Dbase.engine.connect()
+        q = sqlalchemy.select(THUMBS.c.coll).distinct()
+
         try:
             res = (i[0] for i in conn.execute(q).fetchall() if i)
-        finally:
-            conn.close()
+        
+        except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
+            MainUtils.print_err(parent=self, error=e)
+            conn.rollback()
+
+        conn.close()
 
         for true_name in res:
             fake_name = true_name.lstrip("0123456789").strip()
