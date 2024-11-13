@@ -5,7 +5,6 @@ import sqlalchemy
 import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
-from sqlalchemy import Connection, Delete, Insert, Update
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
@@ -31,7 +30,7 @@ class ScanerUtils:
         return Dbase.engine.connect()
     
     @classmethod
-    def conn_commit(cls, conn: Connection):
+    def conn_commit(cls, conn: sqlalchemy.Connection):
 
         if cls.can_scan:
             conn.commit()
@@ -43,7 +42,7 @@ class ScanerUtils:
                 MainUtils.print_err(parent=cls, error=e)
 
     @classmethod
-    def conn_close(cls, conn: Connection):
+    def conn_close(cls, conn: sqlalchemy.Connection):
         conn.close()
 
 
@@ -179,7 +178,7 @@ class DbUpdater:
         super().__init__()
         self.compared_result = compared_result
 
-        self.queries: list[Insert | Update | Delete] = []
+        self.queries: list[sqlalchemy.Insert] = []
         self.hash_images: list[tuple[str, ndarray]] = []
 
     def run(self):
@@ -215,7 +214,7 @@ class DbUpdater:
             array_img = ImageUtils.array_color(array_img, "BGR")
         return array_img
 
-    def get_stmt(self, src: str, size, created, mod, hash_path: str) -> Insert:
+    def get_stmt(self, src: str, size, created, mod, hash_path: str) -> sqlalchemy.Insert:
         
         # преобразуем полный путь в относительный для работы с ДБ
         src = src.replace(JsonData.coll_folder, "")
