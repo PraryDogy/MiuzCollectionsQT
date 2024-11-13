@@ -1,5 +1,5 @@
 import os
-
+from cfg import IMG_EXT
 
 images = "/Users/Morkowik/Desktop/Evgeny/sample images"
 hash = "/Users/Morkowik/Library/Application Support/MiuzCollectionsQT/hashdir"
@@ -9,7 +9,8 @@ hash_len = 0
 
 for root, dir, files in os.walk(images):
     for file in files:
-        images_len += 1
+        if file.endswith(IMG_EXT):
+            images_len += 1
 
 for root, dir, files in os.walk(hash):
     for file in files:
