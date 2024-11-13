@@ -51,7 +51,7 @@ class DbImages:
             mod = datetime.fromtimestamp(mod).date()
             array_img = MainUtils.read_image_hash(hash_path)
 
-            if not array_img:
+            if array_img is not None:
                 print("db images > create dict > can't load image")
                 continue
             else:

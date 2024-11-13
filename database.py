@@ -31,7 +31,8 @@ class Dbase:
 
         if not check_tables:
             cls.copy_db_file()
-            cls.create_engine()
+            cls.init()
+            return
 
         cls.enable_wal()
 

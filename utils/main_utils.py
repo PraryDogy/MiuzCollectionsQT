@@ -285,7 +285,7 @@ class MainUtils:
             cv2.imwrite(output_path, array_img)
             return True
         except Exception as e:
-            cls.print_error(parent=cls, error=e)
+            cls.print_err(parent=cls, error=e)
             return False
         
     @classmethod
@@ -294,7 +294,7 @@ class MainUtils:
             array_img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
             return ImageUtils.array_color(array_img, "BGR")
         except Exception as e:
-            cls.print_error(parent=cls, error= e)
+            cls.print_err(parent=cls, error= e)
             return None
 
     @classmethod

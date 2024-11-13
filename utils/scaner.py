@@ -2,9 +2,9 @@ import os
 from time import sleep
 
 import sqlalchemy
+import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
-import sqlalchemy.exc
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
@@ -252,7 +252,7 @@ class DbUpdater:
             hash_path = MainUtils.get_hash_path(src)
             stmt = self.get_stmt(src, size, created, mod, hash_path)
 
-            if small_img:
+            if small_img is not None:
                 self.hash_images.append((hash_path, small_img))
                 self.insert_queries.append(stmt)
                 insert_count += 1
