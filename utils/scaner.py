@@ -135,13 +135,13 @@ class DbImages:
         return res
 
 
-class ComparedResult:
-    def __init__(self):
-        self.ins_items: list[tuple[str, int, int, int]] = []
-        self.del_items : list[tuple[str, int, int, int]] = []
+# class ComparedResult:
+#     def __init__(self):
+#         self.ins_items: list[tuple[str, int, int, int]] = []
+#         self.del_items : list[tuple[str, int, int, int]] = []
 
 
-class ImageCompator:
+class Compator:
     def __init__(
             self,
             finder_images: list[tuple[str, int, int, int]],
@@ -152,35 +152,35 @@ class ImageCompator:
         self.finder_images = finder_images
         self.db_images = db_images
 
-    def get_result(self) -> ComparedResult:
-        result = ComparedResult()
+        self.del_items = []
+        self.ins_items = []
 
+    def get_result(self):
         for db_item in self.db_images:
 
             if not ScanerUtils.can_scan:
-                return result
+                return
 
             if not db_item in self.finder_images:
-                result.del_items.append(db_item)
+                self.del_items.append(db_item)
 
         for finder_item in self.finder_images:
 
             if not ScanerUtils.can_scan:
-                return result
+                return
 
             if not finder_item in self.db_images:
-                result.ins_items.append(finder_item)
-
-        return result
+                self.ins_items.append(finder_item)
 
 
 class DbUpdater:
     stmt_max_count = 15
     sleep_ = 0.2
 
-    def __init__(self, compared_result: ComparedResult):
+    def __init__(self, del_items, ins_items):
         super().__init__()
-        self.compared_result = compared_result
+        self.del_items = del_items
+        self.ins_items = ins_items
 
         self.insert_queries: list[sqlalchemy.Insert] = []
         self.hash_images: list[tuple[str, ndarray]] = []
@@ -195,9 +195,10 @@ class DbUpdater:
         conn = Dbase.engine.connect()
         ok_ = True
 
-        for src, size, created, mod in self.compared_result.del_items:
+        for src, size, created, mod in self.del_items:
             q = sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
             try:
+                print("удаляю", q)
                 conn.execute(q)
             except sqlalchemy.exc.IntegrityError as e:
                 Utils.print_err(parent=self, error=e)
@@ -211,8 +212,9 @@ class DbUpdater:
                 break
             
         if ok_:
-            for src, size, created, mod in self.compared_result.del_items:
-                os.remove(src)
+            # for hash_path in hash_paths:
+            #     print("удаляю", hash_path)
+            #     os.remove(hash_path)
 
             ScanerUtils.conn_commit(conn)
             conn.close()
@@ -244,7 +246,7 @@ class DbUpdater:
     def insert_db(self):
         insert_count = 0
 
-        for src, size, created, mod in self.compared_result.ins_items:
+        for src, size, created, mod in self.ins_items:
 
             if not ScanerUtils.can_scan:
                 return
@@ -271,9 +273,6 @@ class DbUpdater:
         self.insert_cmd()
 
     def insert_cmd(self):
-        # итерация по инсертам вставка в дб
-        # если все ок то записываем фотки
-
         conn = Dbase.engine.connect()
         ok_ = True
 
@@ -317,10 +316,10 @@ class ScanerThread(MyThread):
             db_images = DbImages()
             db_images = db_images.get()
 
-            image_compator = ImageCompator(finder_images, db_images)
-            compared_res = image_compator.get_result()
+            compator = Compator(finder_images, db_images)
+            compator.get_result()
 
-            db_updater = DbUpdater(compared_res)
+            db_updater = DbUpdater(compator.del_items, compator.ins_items)
             db_updater.run()
 
         self._finished.emit()
