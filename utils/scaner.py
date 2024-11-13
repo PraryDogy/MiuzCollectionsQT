@@ -220,7 +220,7 @@ class DbUpdater:
                 array_img = ImageUtils.resize_max_aspect_ratio(array_img, PIXMAP_SIZE_MAX)
 
                 if src.endswith(PSD_TIFF):
-                    array_img = ImageUtils.array_bgr_to_rgb(array_img)
+                    array_img = ImageUtils.array_color(array_img, "BGR")
 
                 return ImageUtils.image_array_to_bytes(array_img)
 
@@ -370,8 +370,10 @@ class Scaner:
 
     @classmethod
     def start(cls):
+        return
         cls.app.start()
 
     @classmethod
     def stop(cls):
+        return
         cls.app.stop()

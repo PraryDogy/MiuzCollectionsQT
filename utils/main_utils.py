@@ -6,6 +6,7 @@ import platform
 import subprocess
 import sys
 import traceback
+from datetime import datetime
 
 import cv2
 import numpy as np
@@ -62,7 +63,6 @@ class ImageUtils:
         try:
             print("PIL: try open tif")
             img: Image = Image.open(path)
-            # return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
             return np.array(img)
         except Exception as e:
             MainUtils.print_err(parent=cls, error=e)
@@ -135,15 +135,20 @@ class ImageUtils:
         return img
     
     @classmethod
-    def array_bgr_to_rgb(cls, img: np.ndarray) -> np.ndarray:
-        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    def array_color(cls, img: np.ndarray, src: str) -> np.ndarray:
+        if src == "RGB":
+            return cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        elif src == "BGR":
+            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        else:
+            raise Exception("utils image utils wrong src", src)
 
-    @classmethod
-    def pixmap_from_bytes(cls, image: bytes) -> QPixmap | None:
-        ba = QByteArray(image)
-        pixmap = QPixmap()
-        pixmap.loadFromData(ba, "JPEG")
-        return pixmap
+    # @classmethod
+    # def pixmap_from_bytes(cls, image: bytes) -> QPixmap | None:
+    #     ba = QByteArray(image)
+    #     pixmap = QPixmap()
+    #     pixmap.loadFromData(ba, "JPEG")
+    #     return pixmap
     
     @classmethod
     def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
@@ -152,23 +157,23 @@ class ImageUtils:
         qimage = QImage(image.tobytes(), width, height, bytes_per_line, QImage.Format.Format_RGB888)
         return QPixmap.fromImage(qimage)
 
-    @classmethod
-    def image_array_to_bytes(cls, image: np.ndarray, quality: int = 80) -> bytes | None:
-        img = image
-        res, buffer = cv2.imencode(".jpeg", img, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
-        image_io = io.BytesIO()
-        image_io.write(buffer)
-        img = image_io.getvalue()
-        return img
+    # @classmethod
+    # def image_array_to_bytes(cls, image: np.ndarray, quality: int = 80) -> bytes | None:
+    #     img = image
+    #     res, buffer = cv2.imencode(".jpeg", img, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
+    #     image_io = io.BytesIO()
+    #     image_io.write(buffer)
+    #     img = image_io.getvalue()
+    #     return img
 
-    @classmethod
-    def bytes_to_image_array(cls, image_bytes: bytes) -> np.ndarray | None:
-        try:
-            image_array = np.frombuffer(image_bytes, dtype=np.uint8)
-            return cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-        except Exception as e:
-            print("bytes_to_image_array error:", e)
-            return None
+    # @classmethod
+    # def bytes_to_image_array(cls, image_bytes: bytes) -> np.ndarray | None:
+    #     try:
+    #         image_array = np.frombuffer(image_bytes, dtype=np.uint8)
+    #         return cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    #     except Exception as e:
+    #         print("bytes_to_image_array error:", e)
+    #         return None
 
     @classmethod
     def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
@@ -195,38 +200,6 @@ class ImageUtils:
             print("resize_max_aspect_ratio error:", e)
             return None
 
-    @classmethod
-    def crop_to_square(cls, image: np.ndarray | QPixmap) -> np.ndarray | QPixmap:
-
-        if isinstance(image, np.ndarray):
-            height, width = image.shape[:2]
-            min_dim = min(height, width)
-            start_x = (width - min_dim) // 2
-            start_y = (height - min_dim) // 2
-            return image[start_y:start_y + min_dim, start_x:start_x + min_dim]
-
-        elif isinstance(image, QPixmap):
-            w = image.width()
-            h = image.height()
-
-            side = min(w, h)
-            x_offset = (w - side) // 2
-            y_offset = (h - side) // 2
-            
-            return image.copy(x_offset, y_offset, side, side)
-
-        else:
-            return None
-
-    @classmethod
-    def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
-        return pixmap.scaled(
-            size,
-            size,
-            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-            transformMode=Qt.TransformationMode.SmoothTransformation
-            )
-    
 
 class MainUtils:
 
@@ -308,7 +281,7 @@ class MainUtils:
     @classmethod
     def write_image_hash(cls, output_path: str, array_img: np.ndarray) -> bool:
         try:
-            array_img = cv2.cvtColor(array_img, cv2.COLOR_RGB2BGR)
+            array_img = ImageUtils.array_color(array_img, "RGB")
             cv2.imwrite(output_path, array_img)
             return True
         except Exception as e:
@@ -319,10 +292,28 @@ class MainUtils:
     def read_image_hash(cls, src: str) -> np.ndarray | None:
         try:
             array_img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-            return cv2.cvtColor(array_img, cv2.COLOR_BGR2RGB)
+            return ImageUtils.array_color(array_img, "BGR")
         except Exception as e:
             cls.print_error(parent=cls, error= e)
             return None
+
+    @classmethod
+    def get_f_size(cls, bytes_size: int) -> str:
+        if bytes_size < 1024:
+            return f"{bytes_size} байт"
+        elif bytes_size < pow(1024,2):
+            return f"{round(bytes_size/1024, 2)} КБ"
+        elif bytes_size < pow(1024,3):
+            return f"{round(bytes_size/(pow(1024,2)), 2)} МБ"
+        elif bytes_size < pow(1024,4):
+            return f"{round(bytes_size/(pow(1024,3)), 2)} ГБ"
+        elif bytes_size < pow(1024,5):
+            return f"{round(bytes_size/(pow(1024,4)), 2)} ТБ"
+
+    @classmethod
+    def get_f_date(cls, timestamp_: int) -> str:
+        date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
+        return date.strftime("%d.%m.%Y %H:%M")
 
     @classmethod
     def print_err(cls, parent: object, error: Exception):

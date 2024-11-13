@@ -45,7 +45,7 @@ class LoadImageThread(MyThread):
                 img = ImageUtils.read_image(self.src)
 
                 if not self.src.endswith(PSD_TIFF):
-                    img = ImageUtils.array_bgr_to_rgb(img)
+                    img = ImageUtils.array_color(img, "BGR")
 
                 pixmap = ImageUtils.pixmap_from_array(img)
                 Cache.images[self.src] = pixmap
