@@ -1,18 +1,18 @@
-import os
 from collections import defaultdict
 from datetime import datetime
 
 import sqlalchemy
+from PyQt5.QtGui import QPixmap
 
 from cfg import ALL_COLLS, Dynamic, JsonData
-from database import Dbase, THUMBS
-from utils.main_utils import MainUtils
+from database import THUMBS, Dbase
+from utils.main_utils import ImageUtils, MainUtils
 
 
 class DbImage:
-    __slots__ = ["img", "src", "coll"]
-    def __init__(self, img: bytes, src: str, coll: str):
-        self.img = img
+    __slots__ = ["pixmap", "src", "coll"]
+    def __init__(self, pixmap: QPixmap, src: str, coll: str):
+        self.pixmap = pixmap
         self.src = src
         self.coll = coll
 
@@ -27,28 +27,42 @@ class DbImages:
     def _create_dict(self) -> dict[str, list[DbImage]]:
         conn = Dbase.engine.connect()
         stmt = self._get_stmt()
+        ok_ = True
 
         try:
-            res: list[ tuple[bytes, str, int, str] ] = conn.execute(stmt).fetchall()
-        except Exception as e:
+            res: list[ tuple[str, str, int, str] ] = conn.execute(stmt).fetchall()
+
+        except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.IntegrityError) as e:
             MainUtils.print_err(parent=self, error=e)
-            conn.close()
+            conn.rollback()
+            ok_ = False
+        
+        conn.close()
+
+        if not ok_:
             return
 
         thumbs_dict = defaultdict(list[DbImage])
 
-        for img, src, mod, coll in res:
+        for src, hash_path, mod, coll in res:
 
             # создаем полный путь из относительного из ДБ
             src = JsonData.coll_folder + src
             mod = datetime.fromtimestamp(mod).date()
+            array_img = MainUtils.read_image_hash(hash_path)
+
+            if not array_img:
+                print("db images > create dict > can't load image")
+                continue
+            else:
+                pixmap = ImageUtils.pixmap_from_array(array_img)
 
             if Dynamic.date_start or Dynamic.date_end:
                 mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
             else:
                 mod = f"{Dynamic.lng.months[str(mod.month)]} {mod.year}"
 
-            thumbs_dict[mod].append(DbImage(img, src, coll))
+            thumbs_dict[mod].append(DbImage(pixmap, src, coll))
 
         return thumbs_dict
 
@@ -59,8 +73,8 @@ class DbImages:
 
     def _get_stmt(self):
         q = sqlalchemy.select(
-            THUMBS.c.img,
             THUMBS.c.src,
+            THUMBS.c.hash_path,
             THUMBS.c.mod,
             THUMBS.c.coll
             )

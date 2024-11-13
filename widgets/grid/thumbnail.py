@@ -1,18 +1,18 @@
 import os
 
 from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
-from PyQt5.QtGui import QColor, QContextMenuEvent, QDrag, QMouseEvent, QPixmap
+from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutVer
+from base_widgets.context import ContextCustom
 from cfg import (PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic,
                  JsonData)
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.main_utils import ImageUtils, MainUtils
 
-from ..actions import OpenInView, OpenInfo, CopyPath, Reveal, Save
-from base_widgets.context import ContextCustom
+from ..actions import CopyPath, OpenInfo, OpenInView, Reveal, Save
 
 
 class NameLabel(QLabel):
@@ -42,16 +42,12 @@ class NameLabel(QLabel):
 class Thumbnail(QFrame):
     select = pyqtSignal(str)
 
-    def __init__(self, img: bytes, src: str, coll: str):
+    def __init__(self, pixmap: QPixmap, src: str, coll: str):
         super().__init__()
         self.setObjectName(Names.thumbnail_normal)
         self.setStyleSheet(Themes.current)
 
-        self.img = ImageUtils.pixmap_from_bytes(img)
-
-        if not isinstance(self.img, QPixmap):
-            self.img = QPixmap(PIXMAP_SIZE, PIXMAP_SIZE)
-            self.img.fill(QColor(128, 128, 128))
+        self.img = pixmap
 
         self.src = src
         self.coll = coll

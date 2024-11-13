@@ -2,14 +2,14 @@ import os
 
 import sqlalchemy
 from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
-                         QPaintEvent, QPixmap, QResizeEvent)
+from PyQt5.QtGui import (QColor, QContextMenuEvent, QKeyEvent, QMouseEvent,
+                         QPainter, QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import PSD_TIFF, Dynamic, JsonData
+from cfg import PIXMAP_SIZE, PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
@@ -286,7 +286,8 @@ class WinImageView(WinChild):
                 small_img = MainUtils.read_image_hash(hash_path)
                 pixmap = ImageUtils.pixmap_from_array(small_img)
             else:
-                pixmap = QPixmap(os.path.join("images", "thumb.jpg"))
+                pixmap = QPixmap(PIXMAP_SIZE, PIXMAP_SIZE)
+                pixmap.fill(QColor(128, 128, 128))
 
             self.image_label.set_image(pixmap)
 
