@@ -143,27 +143,27 @@ class Compator:
             ):
 
         super().__init__()
-        self.finder_images = finder_images
-        self.db_images = db_images
+        self._finder_images = finder_images
+        self._db_images = db_images
 
         self.del_items = []
         self.ins_items = []
 
     def get_result(self):
-        for db_item in self.db_images:
+        for db_item in self._db_images:
 
             if not ScanerUtils.can_scan:
                 return
 
-            if not db_item in self.finder_images:
+            if not db_item in self._finder_images:
                 self.del_items.append(db_item)
 
-        for finder_item in self.finder_images:
+        for finder_item in self._finder_images:
 
             if not ScanerUtils.can_scan:
                 return
 
-            if not finder_item in self.db_images:
+            if not finder_item in self._db_images:
                 self.ins_items.append(finder_item)
 
 
