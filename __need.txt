@@ -3,3 +3,5 @@ lambda вынести в cmd
 
 thumbs dict, load thumb - в треды
 тредпул и рунабле из preudo bridge
+
+проверка psd и tiff как работают по цвету щас
