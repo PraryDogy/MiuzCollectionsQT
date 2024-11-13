@@ -1,8 +1,6 @@
 import hashlib
-import io
 import logging
 import os
-import platform
 import subprocess
 import sys
 import traceback
@@ -13,9 +11,9 @@ import numpy as np
 import psd_tools
 from imagecodecs.imagecodecs import DelayedImportError
 from PIL import Image
-from PyQt5.QtCore import QByteArray, QObject, Qt, QThread
+from PyQt5.QtCore import QObject, Qt, QThread
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout, QApplication
 from tifffile import tifffile
 
 from cfg import HASH_DIR, JsonData
@@ -46,6 +44,37 @@ class MyThread(QThread):
 
 
 class Utils:
+
+    @classmethod
+    def print_err(cls, parent: object, error: Exception):
+        tb = traceback.extract_tb(error.__traceback__)
+
+        # Попробуем найти первую строчку стека, которая относится к вашему коду.
+        for trace in tb:
+            filepath = trace.filename
+            filename = os.path.basename(filepath)
+            
+            # Если файл - не стандартный модуль, считаем его основным
+            if not filepath.startswith("<") and filename != "site-packages":
+                line_number = trace.lineno
+                break
+        else:
+            # Если не нашли, то берем последний вызов
+            trace = tb[-1]
+            filepath = trace.filename
+            filename = os.path.basename(filepath)
+            line_number = trace.lineno
+
+        class_name = parent.__class__.__name__
+        error_message = str(error)
+
+        print()
+        print("#" * 100)
+        print(f"{filepath}:{line_number}")
+        print()
+        print("ERROR:", error_message)
+        print("#" * 100)
+        print()
 
     @classmethod
     def smb_check(cls) -> bool:
@@ -81,29 +110,24 @@ class Utils:
                 else:
                     cls.clear_layout(item.layout())
 
-    @classmethod
-    def get_mac_ver(cls):
-        ver = platform.mac_ver()[0].split(".")
-        if len(ver) >= 2:
-            return float(f'{ver[0]}.{ver[1]}')
-        else:
-            return None
 
     @classmethod
     def copy_text(cls, text: str):
-        text_bytes = text.encode('utf-8')
-        subprocess.run(['pbcopy'], input=text_bytes, check=True)
+        QApplication.clipboard().setText(text)
+        # text_bytes = text.encode('utf-8')
+        # subprocess.run(['pbcopy'], input=text_bytes, check=True)
         return True
 
     @classmethod
     def paste_text(cls) -> str:
-        paste_result = subprocess.run(
-            ['pbpaste'],
-            capture_output=True,
-            text=True,
-            check=True
-            )
-        return paste_result.stdout.strip()
+        # paste_result = subprocess.run(
+        #     ['pbpaste'],
+        #     capture_output=True,
+        #     text=True,
+        #     check=True
+        #     )
+        # return paste_result.stdout.strip()
+        return QApplication.clipboard().text()
         
     @classmethod
     def reveal_files(cls, files_list: list):
@@ -137,7 +161,7 @@ class Utils:
     def read_image_hash(cls, src: str) -> np.ndarray | None:
         try:
             array_img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-            return ImageUtils.array_color(array_img, "BGR")
+            return cls.array_color(array_img, "BGR")
         except Exception as e:
             # cls.print_err(parent=cls, error= e)
             print("utils > can't read image hash")
@@ -160,37 +184,6 @@ class Utils:
     def get_f_date(cls, timestamp_: int) -> str:
         date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
         return date.strftime("%d.%m.%Y %H:%M")
-
-    @classmethod
-    def print_err(cls, parent: object, error: Exception):
-        tb = traceback.extract_tb(error.__traceback__)
-
-        # Попробуем найти первую строчку стека, которая относится к вашему коду.
-        for trace in tb:
-            filepath = trace.filename
-            filename = os.path.basename(filepath)
-            
-            # Если файл - не стандартный модуль, считаем его основным
-            if not filepath.startswith("<") and filename != "site-packages":
-                line_number = trace.lineno
-                break
-        else:
-            # Если не нашли, то берем последний вызов
-            trace = tb[-1]
-            filepath = trace.filename
-            filename = os.path.basename(filepath)
-            line_number = trace.lineno
-
-        class_name = parent.__class__.__name__
-        error_message = str(error)
-
-        print()
-        print("#" * 100)
-        print(f"{filepath}:{line_number}")
-        print()
-        print("ERROR:", error_message)
-        print("#" * 100)
-        print()
 
     @classmethod
     def read_tiff(cls, path: str) -> np.ndarray | None:
