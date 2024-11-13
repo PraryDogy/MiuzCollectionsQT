@@ -5,6 +5,7 @@ from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
                          QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
+import sqlalchemy.exc
 
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
@@ -261,28 +262,39 @@ class WinImageView(WinChild):
             self.win_smb.show()
 
     def load_thumbnail(self):
+
         if self.src not in Cache.images:
             self.set_titlebar_title(Dynamic.lng.loading)
+
             # преобразуем полный путь в относительный для работы в ДБ
             small_src = self.src.replace(JsonData.coll_folder, "")
-            q = (sqlalchemy.select(THUMBS.c.img).where(THUMBS.c.src == small_src))
+
+            q = (sqlalchemy.select(THUMBS.c.hash_path).where(THUMBS.c.src == small_src))
             conn = Dbase.engine.connect()
+            ok_ = True
 
             try:
-                thumbnail = conn.execute(q).first()[0]
-                conn.close()
-            except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
-                return
+                hash_path = conn.execute(q).first()[0]
 
-            pixmap = QPixmap()
-            pixmap.loadFromData(thumbnail)
+            except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
+                MainUtils.print_err(parent=self, error=e)
+                conn.rollback()
+                ok_ = False
+
+            conn.close()
+
+            if ok_:
+                small_img = MainUtils.read_image_hash(hash_path)
+                pixmap = ImageUtils.pixmap_from_array(small_img)
+            else:
+                pixmap = QPixmap(os.path.join("images", "thumb.jpg"))
+
             self.image_label.set_image(pixmap)
 
         if MainUtils.smb_check():
             self.load_image_thread()
         else:
-            print("img viewer > path not exists", self.src)
+            print("img viewer > no smb", self.src)
 
     def load_image_thread(self):
         img_thread = LoadImageThread(self.src)
