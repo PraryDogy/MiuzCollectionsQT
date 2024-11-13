@@ -38,12 +38,10 @@ class DbImages:
             ok_ = False
         
         conn.close()
+        thumbs_dict = defaultdict(list[DbImage])
 
         if not ok_:
             return
-
-        thumbs_dict = defaultdict(list[DbImage])
-        # return thumbs_dict
 
         for src, hash_path, mod, coll in res:
 

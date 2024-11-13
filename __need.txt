@@ -1,5 +1,5 @@
 там где просто lambda e - сделай функцию с args
 lambda вынести в cmd
 
-
-win info проверь гб и мб
+thumbs dict, load thumb - в треды
+тредпул и рунабле из preudo bridge
