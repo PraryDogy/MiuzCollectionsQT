@@ -268,6 +268,8 @@ class DbUpdater:
                 self.insert_queries.clear()
                 self.hash_images.clear()
 
+        self.insert_cmd()
+
     def insert_cmd(self):
         # итерация по инсертам вставка в дб
         # если все ок то записываем фотки
