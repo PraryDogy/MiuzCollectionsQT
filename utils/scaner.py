@@ -135,12 +135,6 @@ class DbImages:
         return res
 
 
-# class ComparedResult:
-#     def __init__(self):
-#         self.ins_items: list[tuple[str, int, int, int]] = []
-#         self.del_items : list[tuple[str, int, int, int]] = []
-
-
 class Compator:
     def __init__(
             self,
