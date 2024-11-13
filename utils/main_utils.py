@@ -135,13 +135,13 @@ class ImageUtils:
         return img
     
     @classmethod
-    def array_color(cls, img: np.ndarray, src: str) -> np.ndarray:
-        if src == "RGB":
+    def array_color(cls, img: np.ndarray, flag: str) -> np.ndarray:
+        if flag == "RGB":
             return cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        elif src == "BGR":
+        elif flag == "BGR":
             return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         else:
-            raise Exception("utils image utils wrong src", src)
+            raise Exception("utils image utils wrong src", flag)
 
     # @classmethod
     # def pixmap_from_bytes(cls, image: bytes) -> QPixmap | None:
@@ -281,7 +281,7 @@ class MainUtils:
     @classmethod
     def write_image_hash(cls, output_path: str, array_img: np.ndarray) -> bool:
         try:
-            array_img = ImageUtils.array_color(array_img, "RGB")
+            # array_img = ImageUtils.array_color(array_img, "RGB")
             cv2.imwrite(output_path, array_img)
             return True
         except Exception as e:

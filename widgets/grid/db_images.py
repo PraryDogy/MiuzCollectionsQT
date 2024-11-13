@@ -43,6 +43,7 @@ class DbImages:
             return
 
         thumbs_dict = defaultdict(list[DbImage])
+        # return thumbs_dict
 
         for src, hash_path, mod, coll in res:
 
@@ -51,9 +52,9 @@ class DbImages:
             mod = datetime.fromtimestamp(mod).date()
             array_img = MainUtils.read_image_hash(hash_path)
 
-            if array_img is not None:
+            if array_img is None:
                 print("db images > create dict > can't load image")
-                continue
+                return thumbs_dict
             else:
                 pixmap = ImageUtils.pixmap_from_array(array_img)
 
