@@ -192,6 +192,7 @@ class DbUpdater:
         self.insert_db()
 
     def del_db(self):
+        return
         conn = Dbase.engine.connect()
         ok_ = True
 

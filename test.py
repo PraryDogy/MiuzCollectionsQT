@@ -1,17 +1,19 @@
-class Item:
-    def __init__(self, size, mod, created):
-        self.size: int = size
-        self.mod: int = mod
-        self.created: int = created
+import os
 
 
-items = []
-for i in range(0, 10):
-    item_ = Item(i, i, i)
-    items.append(item_)
+images = "/Users/Morkowik/Desktop/Evgeny/sample images"
+hash = "/Users/Morkowik/Library/Application Support/MiuzCollectionsQT/hashdir"
 
+images_len = 0
+hash_len = 0
 
-test = Item(3, 3, 3)
+for root, dir, files in os.walk(images):
+    for file in files:
+        images_len += 1
 
-if test in items:
-    print(1)
+for root, dir, files in os.walk(hash):
+    for file in files:
+        hash_len += 1
+
+print(images_len)
+print(hash_len)
