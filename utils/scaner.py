@@ -1,8 +1,10 @@
 import os
 from time import sleep
+from typing import List, NamedTuple
 
-import numpy as np
 import sqlalchemy
+import sqlalchemy.exc
+from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from sqlalchemy import Connection, Delete, Insert, Update
 
@@ -46,20 +48,28 @@ class ScanerUtils:
         conn.close()
 
 
-class ImageItem:
-    __slots__ = ["size", "created", "mod"]
-    def __init__(self, size: int, created: int, mod: int):
-        self.size = size
-        self.created = created
-        self.mod = mod
+# class ImageItem:
+#     __slots__ = ["src", "size", "created", "mod"]
+#     def __init__(self, src: str, size: int, created: int, mod: int):
+#         self.src = src
+#         self.size = size
+#         self.created = created
+#         self.mod = mod
+
+
+class ImageItem(NamedTuple):
+    src: str
+    size: int
+    created: int
+    modified: int
 
 
 class FinderImages:
     def __init__(self):
         super().__init__()
 
-    def get(self) -> dict[str, ImageItem]:
-        finder_images: dict[str, ImageItem] = {}
+    def get(self) -> list[ImageItem]:
+        finder_images: List[ImageItem] = []
 
         collections = [
             os.path.join(JsonData.coll_folder, i)
@@ -84,19 +94,14 @@ class FinderImages:
 
             try:
                 walked = self.walk_collection(collection)
-                # if walked is None:
-                    # print(collection)
-                    # print(walked)
-                    # continue
-                finder_images.update(walked)
+                finder_images.extend(walked)
             except TypeError as e:
                 MainUtils.print_err(parent=self, error=e)
                 continue
-
         return finder_images
 
-    def walk_collection(self, collection: str) -> dict[str, ImageItem]:
-        finder_images: dict[str, ImageItem] = {}
+    def walk_collection(self, collection: str) -> list[tuple]:
+        finder_images: list[tuple] = []
 
         for root, _, files in os.walk(collection):
 
@@ -113,14 +118,14 @@ class FinderImages:
                     src = os.path.join(root, file)
                     item = self.get_image_item(src)
                     if item:
-                        finder_images[src] = item
+                        finder_images.append(item)
 
         return finder_images
     
-    def get_image_item(self, src: str) -> ImageItem:
+    def get_image_item(self, src: str) -> tuple:
         try:
             stats = os.stat(path=src)
-            return ImageItem(stats.st_size, stats.st_birthtime, stats.st_mtime)
+            return (src, stats.st_size, stats.st_birthtime, stats.st_mtime)
         except FileNotFoundError as e:
             MainUtils.print_err(parent=self, error=e)
             return None
@@ -130,31 +135,30 @@ class DbImages:
     def __init__(self):
         super().__init__()
 
-    def get(self) -> dict[str, ImageItem]:
+    def get(self) -> list[tuple]:
         conn = ScanerUtils.conn_get()
         q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.size, THUMBS.c.created, THUMBS.c.mod)
         try:
             res = conn.execute(q).fetchall()
             # не забываем относительный путь ДБ преобразовать в полный
-            return {
-                JsonData.coll_folder + src: ImageItem(size, created, mod)
+            return [
+                (JsonData.coll_folder + src, size, created, mod)
                 for src, size, created, mod in res
-                }
+                ]
         except Exception as e:
             MainUtils.print_err(parent=self, error=e)
             ScanerUtils.conn_close(conn)
-            return {}
+            return []
 
 
 class ComparedResult:
     def __init__(self):
-        self.ins_items: dict[str, ImageItem] = {}
-        self.upd_items: dict[str, ImageItem] = {}
-        self.del_items : dict[str, ImageItem]= {}
+        self.ins_items: list[tuple] = []
+        self.del_items : list[tuple] = []
 
 
 class ImageCompator:
-    def __init__(self, finder_images: dict[str, ImageItem], db_images: dict[str, ImageItem]):
+    def __init__(self, finder_images: list[tuple], db_images: list[tuple]):
         super().__init__()
         self.finder_images = finder_images
         self.db_images = db_images
@@ -162,28 +166,21 @@ class ImageCompator:
     def get_result(self) -> ComparedResult:
         result = ComparedResult()
 
-        for db_src, db_item in self.db_images.items():
+        for db_item in self.db_images:
 
             if not ScanerUtils.can_scan:
                 return result
 
-            in_finder = self.finder_images.get(db_src)
+            if not db_item in self.finder_images:
+                result.del_items.append(db_item)
 
-            if not in_finder:
-                result.del_items[db_src] = db_item
-
-        for finder_src, finder_item in self.finder_images.items():
+        for finder_item in self.finder_images:
 
             if not ScanerUtils.can_scan:
                 return result
 
-            in_db = self.db_images.get(finder_src)
-
-            if not in_db:
-                result.ins_items[finder_src] = finder_item
-
-            elif not (finder_item.size, finder_item.mod) == (in_db.size, in_db.mod):
-                result.upd_items[finder_src] = finder_item
+            if not finder_item in self.db_images:
+                result.ins_items.append(finder_item)
 
         return result
 
@@ -191,92 +188,91 @@ class ImageCompator:
 class DbUpdater:
     def __init__(self, compared_result: ComparedResult):
         super().__init__()
-        self.res = compared_result
+        self.compared_result = compared_result
         self.flag_del = "delete"
         self.flag_ins = "insert"
-        self.flag_upd = "update"
 
-    def start(self):
+        self.queries: list[Insert | Update | Delete] = []
+        self.hash_images: list[tuple[str, ndarray]] = []
+
+    def run(self):
         ScanerUtils.progressbar_value(70)
-        self.modify_db(compared_items=self.res.del_items, flag=self.flag_del)
-        ScanerUtils.progressbar_value(80)
-        self.modify_db(compared_items=self.res.ins_items, flag=self.flag_ins)
+        self.del_db()
         ScanerUtils.progressbar_value(90)
-        self.modify_db(compared_items=self.res.upd_items, flag=self.flag_upd)
+        self.modify_db()
 
-    def get_bytes_img(
-            self,
-            flag: str,
-            src: str
-            ) -> bytes | None:
+    def del_db(self):
+        conn = Dbase.engine.connect()
 
-        if flag == self.flag_del:
-            return None
+        for src, size, created, mod in self.compared_result.del_items:
+            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
+            try:
+                conn.execute(q)
+            except sqlalchemy.exc.IntegrityError:
+                conn.rollback()
+                continue
+            except sqlalchemy.exc.OperationalError:
+                conn.rollback()
+                return
+            
+        conn.commit()
 
-        else:
-            array_img = ImageUtils.read_image(src)
+        for src, size, created, mod in self.compared_result.del_items:
+            os.remove(src)
 
-            if isinstance(array_img, np.ndarray):
-                array_img = ImageUtils.resize_max_aspect_ratio(array_img, PIXMAP_SIZE_MAX)
+    def get_small_img(self, src: str) -> ndarray | None:
+        array_img = ImageUtils.read_image(src)
+        array_img = ImageUtils.resize_max_aspect_ratio(array_img, PIXMAP_SIZE_MAX)
 
-                if src.endswith(PSD_TIFF):
-                    array_img = ImageUtils.array_color(array_img, "BGR")
+        if src.endswith(PSD_TIFF):
+            array_img = ImageUtils.array_color(array_img, "BGR")
+        return array_img
 
-                return ImageUtils.image_array_to_bytes(array_img)
-
-            else:
-                return None
-  
-    def get_stmt(
-            self,
-            flag: str,
-            bytes_img: bytes,
-            src: str,
-            image_item: ImageItem
-            ) -> Delete | Insert | Update:
+    def get_stmt(self, src: str, size, created, mod, hash_path: str) -> Insert:
         
         # преобразуем полный путь в относительный для работы с ДБ
         src = src.replace(JsonData.coll_folder, "")
 
-        if flag == self.flag_del:
-            return sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
-
         values = {
-                "img": bytes_img,
                 "src": src,
-                "size": image_item.size,
-                "created": image_item.created,
-                "mod": image_item.mod,
+                "hash_path": hash_path,
+                "size": size,
+                "created": created,
+                "mod": mod,
                 "coll": MainUtils.get_coll_name(src),
                 }
-        
-        if flag == self.flag_ins:
-            return sqlalchemy.insert(THUMBS).values(**values) 
-           
-        else:
-            return sqlalchemy.update(THUMBS).values(**values).where(THUMBS.c.src==src)
 
-    def modify_db(self, compared_items: dict[str, ImageItem], flag: str):
+        return sqlalchemy.insert(THUMBS).values(**values) 
+
+    def modify_db(self):
+
         stmt_count = 0
         conn = ScanerUtils.conn_get()
 
-        for src, image_item in compared_items.items():
+        for src, size, created, mod in self.compared_result.ins_items:
 
             if not ScanerUtils.can_scan:
                 return
 
-            bytes_img = self.get_bytes_img(flag=flag, src=src)
-            stmt = self.get_stmt(flag=flag, bytes_img=bytes_img, src=src, image_item=image_item)
+            small_img = self.get_small_img(src)
+            hash_path = MainUtils.get_hash_path(src)
+            stmt = self.get_stmt(src, size, created, mod, hash_path)
 
-            if flag == self.flag_del:
-                conn.execute(stmt)
+            self.queries.append(stmt)
 
-            elif bytes_img is not None:
-                conn.execute(stmt)
+            if small_img:
+                self.hash_images.append((hash_path, small_img))
 
-            else:
-                print("scaner > updater > byte img is None", src)
-                continue
+
+            # if flag == self.flag_del:
+            #     conn.execute(stmt)
+
+            # elif bytes_img is not None:
+            #     conn.execute(stmt)
+
+            # else:
+            #     print("scaner > updater > byte img is None", src)
+            #     continue
 
             stmt_count += 1
 
@@ -290,6 +286,11 @@ class DbUpdater:
         if stmt_count != 0:
             ScanerUtils.conn_commit(conn)
         ScanerUtils.conn_close(conn)
+
+    def insert_count_cmd(self):
+        # итерация по инсертам вставка в дб
+        # если все ок то записываем фотки
+        ...
 
 
 class ScanerThread(MyThread):
@@ -314,7 +315,7 @@ class ScanerThread(MyThread):
             compared_res = image_compator.get_result()
 
             db_updater = DbUpdater(compared_res)
-            db_updater.start()
+            db_updater.run()
 
         self._finished.emit()
         self.remove_threads()
