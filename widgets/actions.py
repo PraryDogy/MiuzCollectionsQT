@@ -6,7 +6,7 @@ from base_widgets import ContextCustom
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from utils.copy_files import ThreadCopyFiles
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -52,7 +52,7 @@ class OpenInfo(CustomAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if MainUtils.smb_check():
+        if Utils.smb_check():
             self.win_info = WinInfo(src=self.src)
             self.win_info.center_relative_parent(self.parent_)
             self.win_info.show()
@@ -66,8 +66,8 @@ class CopyPath(CustomAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if MainUtils.smb_check():
-            MainUtils.copy_text(text=self.src)
+        if Utils.smb_check():
+            Utils.copy_text(text=self.src)
         else:
             Shared.show_smb(self.parent_)
 
@@ -77,8 +77,8 @@ class Reveal(CustomAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if MainUtils.smb_check():
-            MainUtils.reveal_files([self.src])
+        if Utils.smb_check():
+            Utils.reveal_files([self.src])
         else:
             Shared.show_smb(self.parent_)
 
@@ -95,7 +95,7 @@ class Save(CustomAction):
         self.save_as = save_as
 
     def cmd(self):
-        if MainUtils.smb_check():
+        if Utils.smb_check():
             if self.save_as:
                 Shared.dialog = QFileDialog()
                 Shared.dialog.setOption(QFileDialog.ShowDirsOnly, True)
@@ -124,7 +124,7 @@ class Save(CustomAction):
 
     def reveal_copied_files(self, thread_: ThreadCopyFiles, files: list):
 
-        MainUtils.reveal_files(files)
+        Utils.reveal_files(files)
 
         if len(Dynamic.copy_threads) == 0:
             SignalsApp.all.btn_downloads_toggle.emit("hide")

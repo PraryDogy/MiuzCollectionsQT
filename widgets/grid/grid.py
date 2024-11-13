@@ -6,7 +6,7 @@ from base_widgets import LayoutHor, LayoutVer
 from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 from ..win_info import WinInfo
 from ..win_smb import WinSmb
@@ -120,7 +120,7 @@ class Grid(QScrollArea):
         self.scroll_area_widget.setFocus()
 
     def reload_thumbnails(self):
-        MainUtils.clear_layout(self.thumbnails_layout)
+        Utils.clear_layout(self.thumbnails_layout)
         self.up_btn.deleteLater()
         self.create_grid_layout()
 
@@ -255,7 +255,7 @@ class Grid(QScrollArea):
         if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
             wid = self.cell_to_wid.get(self.curr_cell)
 
-            if MainUtils.smb_check():
+            if Utils.smb_check():
                 self.win_info = WinInfo(src=wid.src)
                 self.win_info.center_relative_parent(self)
                 self.win_info.show()

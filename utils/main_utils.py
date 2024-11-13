@@ -42,166 +42,10 @@ class MyThread(QThread):
                 if not i.isRunning():
                     Threads.list.remove(i)
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
 
-class ImageUtils:
-    @classmethod
-    def read_tiff(cls, path: str) -> np.ndarray | None:
-        try:
-            img = tifffile.imread(files=path)[:,:,:3]
-            if str(object=img.dtype) != "uint8":
-                img = (img/256).astype(dtype="uint8")
-            return img
-        except (Exception, tifffile.TiffFileError, RuntimeError, DelayedImportError) as e:
-            MainUtils.print_err(parent=cls, error=e)
-            print("try open tif with PIL")
-            return cls.read_tiff_pil(path)
-    
-    @classmethod
-    def read_tiff_pil(cls, path: str) -> np.ndarray | None:
-        try:
-            print("PIL: try open tif")
-            img: Image = Image.open(path)
-            return np.array(img)
-        except Exception as e:
-            MainUtils.print_err(parent=cls, error=e)
-            return None
-
-    @classmethod
-    def read_psd(cls, path: str) -> np.ndarray | None:
-        try:
-            img = psd_tools.PSDImage.open(fp=path)
-            img = img.composite()
-
-            if img.mode == 'RGBA':
-                img = img.convert('RGB')
-            
-            img = np.array(img)
-            return img
-
-        except Exception as e:
-            MainUtils.print_err(cls, e)
-            return None
-            
-    @classmethod
-    def read_jpg(cls, path: str) -> np.ndarray | None:
-        try:
-            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-            return image
-        except (Exception, cv2.error) as e:
-            MainUtils.print_err(cls, e)
-            return None
-        
-    @classmethod
-    def read_png(cls, path: str) -> np.ndarray | None:
-        try:
-            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-            if image.shape[2] == 4:
-                alpha_channel = image[:, :, 3] / 255.0
-                rgb_channels = image[:, :, :3]
-                background_color = np.array([255, 255, 255], dtype=np.uint8)
-                background = np.full(rgb_channels.shape, background_color, dtype=np.uint8)
-                converted = (rgb_channels * alpha_channel[:, :, np.newaxis] + background * (1 - alpha_channel[:, :, np.newaxis])).astype(np.uint8)
-            else:
-                converted = image
-            return converted
-        
-        except Exception as e:
-            MainUtils.print_err(cls, e)
-            return None
-
-    @classmethod
-    def read_image(cls, src: str) -> np.ndarray | None:
-
-        src_lower: str = src.lower()
-
-        if src_lower.endswith((".psd", ".psb")):
-            img = cls.read_psd(src)
-
-        elif src_lower.endswith((".tiff", ".tif")):
-            img = cls.read_tiff(src)
-
-        elif src_lower.endswith((".jpg", ".jpeg", "jfif")):
-            img = cls.read_jpg(src)
-
-        elif src_lower.endswith((".png")):
-            img = cls.read_png(src)
-
-        else:
-            print("image utils > read img > none", src)
-            img = None
-
-        return img
-    
-    @classmethod
-    def array_color(cls, img: np.ndarray, flag: str) -> np.ndarray:
-        if flag == "RGB":
-            return cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        elif flag == "BGR":
-            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        else:
-            raise Exception("utils image utils wrong src", flag)
-
-    # @classmethod
-    # def pixmap_from_bytes(cls, image: bytes) -> QPixmap | None:
-    #     ba = QByteArray(image)
-    #     pixmap = QPixmap()
-    #     pixmap.loadFromData(ba, "JPEG")
-    #     return pixmap
-    
-    @classmethod
-    def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
-        height, width, channel = image.shape
-        bytes_per_line = channel * width
-        qimage = QImage(image.tobytes(), width, height, bytes_per_line, QImage.Format.Format_RGB888)
-        return QPixmap.fromImage(qimage)
-
-    # @classmethod
-    # def image_array_to_bytes(cls, image: np.ndarray, quality: int = 80) -> bytes | None:
-    #     img = image
-    #     res, buffer = cv2.imencode(".jpeg", img, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
-    #     image_io = io.BytesIO()
-    #     image_io.write(buffer)
-    #     img = image_io.getvalue()
-    #     return img
-
-    # @classmethod
-    # def bytes_to_image_array(cls, image_bytes: bytes) -> np.ndarray | None:
-    #     try:
-    #         image_array = np.frombuffer(image_bytes, dtype=np.uint8)
-    #         return cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-    #     except Exception as e:
-    #         print("bytes_to_image_array error:", e)
-    #         return None
-
-    @classmethod
-    def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
-        return pixmap.scaled(
-            size,
-            size,
-            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-            transformMode=Qt.TransformationMode.SmoothTransformation
-            )
-        
-    @classmethod
-    def resize_max_aspect_ratio(cls, image: np.ndarray, size: int, is_max: bool = True) -> np.ndarray | None:
-        try:
-            h, w = image.shape[:2]
-
-            if is_max:
-                scale = size / max(h, w)
-            else:
-                scale = size / min(h, w)
-    
-            new_w, new_h = int(w * scale), int(h * scale)
-            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
-        except Exception as e:
-            print("resize_max_aspect_ratio error:", e)
-            return None
-
-
-class MainUtils:
+class Utils:
 
     @classmethod
     def smb_check(cls) -> bool:
@@ -347,3 +191,132 @@ class MainUtils:
         print("ERROR:", error_message)
         print("#" * 100)
         print()
+
+    @classmethod
+    def read_tiff(cls, path: str) -> np.ndarray | None:
+        try:
+            img = tifffile.imread(files=path)[:,:,:3]
+            if str(object=img.dtype) != "uint8":
+                img = (img/256).astype(dtype="uint8")
+            return img
+        except (Exception, tifffile.TiffFileError, RuntimeError, DelayedImportError) as e:
+            Utils.print_err(parent=cls, error=e)
+            print("try open tif with PIL")
+            return cls.read_tiff_pil(path)
+    
+    @classmethod
+    def read_tiff_pil(cls, path: str) -> np.ndarray | None:
+        try:
+            print("PIL: try open tif")
+            img: Image = Image.open(path)
+            return np.array(img)
+        except Exception as e:
+            Utils.print_err(parent=cls, error=e)
+            return None
+
+    @classmethod
+    def read_psd(cls, path: str) -> np.ndarray | None:
+        try:
+            img = psd_tools.PSDImage.open(fp=path)
+            img = img.composite()
+
+            if img.mode == 'RGBA':
+                img = img.convert('RGB')
+            
+            img = np.array(img)
+            return img
+
+        except Exception as e:
+            Utils.print_err(cls, e)
+            return None
+            
+    @classmethod
+    def read_jpg(cls, path: str) -> np.ndarray | None:
+        try:
+            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+            return image
+        except (Exception, cv2.error) as e:
+            Utils.print_err(cls, e)
+            return None
+        
+    @classmethod
+    def read_png(cls, path: str) -> np.ndarray | None:
+        try:
+            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+            if image.shape[2] == 4:
+                alpha_channel = image[:, :, 3] / 255.0
+                rgb_channels = image[:, :, :3]
+                background_color = np.array([255, 255, 255], dtype=np.uint8)
+                background = np.full(rgb_channels.shape, background_color, dtype=np.uint8)
+                converted = (rgb_channels * alpha_channel[:, :, np.newaxis] + background * (1 - alpha_channel[:, :, np.newaxis])).astype(np.uint8)
+            else:
+                converted = image
+            return converted
+        
+        except Exception as e:
+            Utils.print_err(cls, e)
+            return None
+
+    @classmethod
+    def read_image(cls, src: str) -> np.ndarray | None:
+
+        src_lower: str = src.lower()
+
+        if src_lower.endswith((".psd", ".psb")):
+            img = cls.read_psd(src)
+
+        elif src_lower.endswith((".tiff", ".tif")):
+            img = cls.read_tiff(src)
+
+        elif src_lower.endswith((".jpg", ".jpeg", "jfif")):
+            img = cls.read_jpg(src)
+
+        elif src_lower.endswith((".png")):
+            img = cls.read_png(src)
+
+        else:
+            print("image utils > read img > none", src)
+            img = None
+
+        return img
+    
+    @classmethod
+    def array_color(cls, img: np.ndarray, flag: str) -> np.ndarray:
+        if flag == "RGB":
+            return cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        elif flag == "BGR":
+            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        else:
+            raise Exception("utils image utils wrong src", flag)
+    
+    @classmethod
+    def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
+        height, width, channel = image.shape
+        bytes_per_line = channel * width
+        qimage = QImage(image.tobytes(), width, height, bytes_per_line, QImage.Format.Format_RGB888)
+        return QPixmap.fromImage(qimage)
+
+    @classmethod
+    def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
+        return pixmap.scaled(
+            size,
+            size,
+            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+            transformMode=Qt.TransformationMode.SmoothTransformation
+            )
+        
+    @classmethod
+    def resize_max_aspect_ratio(cls, image: np.ndarray, size: int, is_max: bool = True) -> np.ndarray | None:
+        try:
+            h, w = image.shape[:2]
+
+            if is_max:
+                scale = size / max(h, w)
+            else:
+                scale = size / min(h, w)
+    
+            new_w, new_h = int(w * scale), int(h * scale)
+            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+        except Exception as e:
+            print("resize_max_aspect_ratio error:", e)
+            return None

@@ -10,7 +10,7 @@ from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
 from database import Dbase
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 from utils.scaner import Scaner
 from utils.updater import Updater
 
@@ -332,7 +332,7 @@ class WinSettings(WinChild):
         btns_layout.addStretch(1)
 
     def reload_ui(self):
-        MainUtils.clear_layout(self.content_lay_v)
+        Utils.clear_layout(self.content_lay_v)
         self.init_ui()
 
     def cancel_cmd(self, *args):
@@ -347,14 +347,14 @@ class WinSettings(WinChild):
             JsonData.write_json_data()
             QApplication.quit()
             Dbase.copy_db_file()
-            MainUtils.start_new_app()
+            Utils.start_new_app()
 
         elif hasattr(self.change_lang, "flag"):
             print("settings win change lang")
             JsonData.dynamic_set_lang(self.change_lang.lang)
             JsonData.write_json_data()
             QApplication.quit()
-            MainUtils.start_new_app()
+            Utils.start_new_app()
 
         elif stop_colls != JsonData.stop_colls:
             print("settings win stop colls updated")

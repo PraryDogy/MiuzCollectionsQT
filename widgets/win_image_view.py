@@ -13,7 +13,7 @@ from cfg import PIXMAP_SIZE, PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import ImageUtils, MainUtils, MyThread
+from utils.main_utils import Utils, MyThread
 
 from .actions import CopyPath, OpenInfo, Reveal, Save
 from .win_info import WinInfo
@@ -42,19 +42,19 @@ class LoadImageThread(MyThread):
     def run(self):
         try:
             if self.src not in Cache.images:
-                img = ImageUtils.read_image(self.src)
+                img = Utils.read_image(self.src)
 
                 if not self.src.endswith(PSD_TIFF):
-                    img = ImageUtils.array_color(img, "BGR")
+                    img = Utils.array_color(img, "BGR")
 
-                pixmap = ImageUtils.pixmap_from_array(img)
+                pixmap = Utils.pixmap_from_array(img)
                 Cache.images[self.src] = pixmap
 
             else:
                 pixmap = Cache.images.get(self.src)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
             pixmap = None
 
         if len(Cache.images) > 50:
@@ -255,7 +255,7 @@ class WinImageView(WinChild):
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
 
     def smb_check(self):
-        if not MainUtils.smb_check():
+        if not Utils.smb_check():
             self.win_smb = WinSmb()
             self.win_smb.center_relative_parent(self)
             self.win_smb.show()
@@ -276,22 +276,22 @@ class WinImageView(WinChild):
                 hash_path = conn.execute(q).first()[0]
 
             except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
-                MainUtils.print_err(parent=self, error=e)
+                Utils.print_err(parent=self, error=e)
                 conn.rollback()
                 ok_ = False
 
             conn.close()
 
             if ok_:
-                small_img = MainUtils.read_image_hash(hash_path)
-                pixmap = ImageUtils.pixmap_from_array(small_img)
+                small_img = Utils.read_image_hash(hash_path)
+                pixmap = Utils.pixmap_from_array(small_img)
             else:
                 pixmap = QPixmap(PIXMAP_SIZE, PIXMAP_SIZE)
                 pixmap.fill(QColor(128, 128, 128))
 
             self.image_label.set_image(pixmap)
 
-        if MainUtils.smb_check():
+        if Utils.smb_check():
             self.load_image_thread()
         else:
             print("img viewer > no smb", self.src)
@@ -344,8 +344,8 @@ class WinImageView(WinChild):
         return text
 
     def set_image_title(self):
-        self.collection = MainUtils.get_coll_name(self.src)
-        cut_coll = self.cut_text(MainUtils.get_coll_name(self.src))
+        self.collection = Utils.get_coll_name(self.src)
+        cut_coll = self.cut_text(Utils.get_coll_name(self.src))
         name = self.cut_text(os.path.basename(self.src))
 
         self.set_titlebar_title(f"{cut_coll} - {name}")
@@ -380,7 +380,7 @@ class WinImageView(WinChild):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            if MainUtils.smb_check():
+            if Utils.smb_check():
                 self.win_info = WinInfo(src=self.src)
                 self.win_info.center_relative_parent(self)
                 self.win_info.show()
@@ -417,7 +417,7 @@ class WinImageView(WinChild):
             return super().contextMenuEvent(ev)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2

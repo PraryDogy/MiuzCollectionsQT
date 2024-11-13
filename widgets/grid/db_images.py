@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap
 
 from cfg import ALL_COLLS, Dynamic, JsonData
 from database import THUMBS, Dbase
-from utils.main_utils import ImageUtils, MainUtils
+from utils.main_utils import Utils
 
 
 class DbImage:
@@ -33,7 +33,7 @@ class DbImages:
             res: list[ tuple[str, str, int, str] ] = conn.execute(stmt).fetchall()
 
         except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.IntegrityError) as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
             conn.rollback()
             ok_ = False
         
@@ -48,13 +48,13 @@ class DbImages:
             # создаем полный путь из относительного из ДБ
             src = JsonData.coll_folder + src
             mod = datetime.fromtimestamp(mod).date()
-            array_img = MainUtils.read_image_hash(hash_path)
+            array_img = Utils.read_image_hash(hash_path)
 
             if array_img is None:
                 print("db images > create dict > can't load image")
                 return thumbs_dict
             else:
-                pixmap = ImageUtils.pixmap_from_array(array_img)
+                pixmap = Utils.pixmap_from_array(array_img)
 
             if Dynamic.date_start or Dynamic.date_end:
                 mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"

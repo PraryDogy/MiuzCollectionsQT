@@ -9,7 +9,7 @@ from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import APP_NAME, APP_VER, Dynamic
 from signals import SignalsApp
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 from .win_settings import WinSettings
 
@@ -39,14 +39,14 @@ class SelectableLabel(QLabel):
         context_menu.addSeparator()
 
         select_all = QAction(parent=context_menu, text=Dynamic.lng.copy_all)
-        select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
+        select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
         context_menu.show_menu()
         return super().contextMenuEvent(ev)
 
     def copy_text_md(self):
-        MainUtils.copy_text(self.selectedText())
+        Utils.copy_text(self.selectedText())
 
 
 class AboutWin(WinChild):

@@ -8,7 +8,7 @@ from cfg import PSD_TIFF, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 from ..win_smb import WinSmb
 from .db_images import DbImage
@@ -54,7 +54,7 @@ class CustomContext(ContextCustom):
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
-        if MainUtils.smb_check():
+        if Utils.smb_check():
 
             if is_layers:
                 images = [i.src for i in self.files_list if i.src.endswith(PSD_TIFF)]
@@ -79,7 +79,7 @@ class CustomContext(ContextCustom):
             Shared.show_smb(parent_=self)
 
     def copy_files_cmd(self, dest: str, files: list):
-        if MainUtils.smb_check():
+        if Utils.smb_check():
             self.copy_files_cmd_(dest, files)
         else:
             Shared.show_smb(parent_=self)
@@ -96,13 +96,13 @@ class CustomContext(ContextCustom):
         copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
-        self.reveal_files = MainUtils.reveal_files(files)
+        self.reveal_files = Utils.reveal_files(files)
         if len(Dynamic.copy_threads) == 0:
             SignalsApp.all.btn_downloads_toggle.emit("hide")
         try:
             copy_task.remove_threads()                
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
 
 class Title(QLabel):
@@ -123,4 +123,4 @@ class Title(QLabel):
             self.my_context.show_menu()
             return super().contextMenuEvent(ev)
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)

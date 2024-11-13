@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QAction, QLineEdit
 
 from cfg import Dynamic
 from styles import Names, Themes
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 from .context import ContextCustom
 
@@ -28,15 +28,15 @@ class CustomContext(ContextCustom):
 
     def copy_selection(self):
         text = self.my_parent.selectedText()
-        MainUtils.copy_text(text)
+        Utils.copy_text(text)
 
     def cut_selection(self):
         text = self.my_parent.selectedText()
-        MainUtils.copy_text(text)
+        Utils.copy_text(text)
         self.my_parent.clear()
 
     def paste_text(self):
-        text = MainUtils.paste_text()
+        text = Utils.paste_text()
         self.my_parent.insert(text)
 
 

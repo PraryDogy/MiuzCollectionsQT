@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QFrame, QLabel, QMainWindow, QSizeGrip,
 
 from cfg import JsonData
 from styles import Names, Themes
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 from .layouts import LayoutHor, LayoutVer
 from .svg_btn import SvgBtn
@@ -168,7 +168,7 @@ class WinFrameless(QMainWindow, QObject):
             geo.moveCenter(parent.geometry().center())
             self.setGeometry(geo)
         except (RuntimeError, Exception) as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
     def toggle_fullscreen(self, *args):
         if self.isMaximized():

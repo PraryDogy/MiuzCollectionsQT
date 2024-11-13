@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from cfg import Dynamic
 
-from .main_utils import MainUtils, MyThread
+from .main_utils import Utils, MyThread
 
 
 class ThreadCopyFiles(MyThread):
@@ -32,7 +32,7 @@ class ThreadCopyFiles(MyThread):
         try:
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
             self.value_changed.emit(100)
             self._finished.emit(files_dests)
             self.remove_threads()
@@ -73,7 +73,7 @@ class ThreadCopyFiles(MyThread):
                         self.value_changed.emit(percent)
 
             except Exception as e:
-                MainUtils.print_err(parent=self, error=e)
+                Utils.print_err(parent=self, error=e)
                 self.remove_threads()
                 break
         

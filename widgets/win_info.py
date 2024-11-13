@@ -9,7 +9,7 @@ from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import Dynamic
 from utils.image_size import get_image_size
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 
 SPLIT_ = "***"
@@ -25,10 +25,10 @@ class RightLabel(QLabel):
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def copy_all(self):
-        MainUtils.copy_text(self.text().replace("\n", ""))
+        Utils.copy_text(self.text().replace("\n", ""))
 
     def copy_selected(self, text: str):
-        MainUtils.copy_text(text)
+        Utils.copy_text(text)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.menu_ = ContextCustom(event=ev)
@@ -57,7 +57,7 @@ class InfoText:
 
         src = Dynamic.lng.file_path + SPLIT_ + self.src
 
-        coll = MainUtils.get_coll_name(self.src)
+        coll = Utils.get_coll_name(self.src)
         coll = Dynamic.lng.collection + SPLIT_ + coll
 
         for i in (name, src, coll):
@@ -71,7 +71,7 @@ class InfoText:
             data.append(filemod)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
         try:
             w, h = get_image_size(self.src)
@@ -81,7 +81,7 @@ class InfoText:
             data.append(resol)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
         try:
             size_ = os.path.getsize(filename=self.src)
@@ -99,10 +99,10 @@ class InfoText:
             data.append(f_size)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
         return data
 

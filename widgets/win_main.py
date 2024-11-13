@@ -8,7 +8,7 @@ from base_widgets.wins import WinFrameless
 from cfg import ALL_COLLS, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 from utils.scaner import Scaner
 
 from .bar_bottom import BarBottom
@@ -122,7 +122,7 @@ class WinMain(WinFrameless):
     def after_start(self):
         Scaner.app.start()
 
-        if not MainUtils.smb_check():
+        if not Utils.smb_check():
             self.smb_win = WinSmb()
             self.smb_win.center_relative_parent(self)
             self.smb_win.show()

@@ -10,7 +10,7 @@ from cfg import (PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic,
                  JsonData)
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import ImageUtils, MainUtils
+from utils.main_utils import Utils
 
 from ..actions import CopyPath, OpenInfo, OpenInView, Reveal, Save
 
@@ -87,7 +87,7 @@ class Thumbnail(QFrame):
 
         self.setFixedSize(thumb_w, thumb_h)
 
-        pixmap = ImageUtils.pixmap_scale(self.img, PIXMAP_SIZE[JsonData.curr_size_ind])
+        pixmap = Utils.pixmap_scale(self.img, PIXMAP_SIZE[JsonData.curr_size_ind])
         self.img_label.setPixmap(pixmap)
 
         self.name_label.set_text()
@@ -174,4 +174,4 @@ class Thumbnail(QFrame):
             return super().contextMenuEvent(ev)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)

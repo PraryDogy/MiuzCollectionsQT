@@ -6,7 +6,7 @@ from base_widgets import Btn, LayoutHor
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 from .win_dates import WinDates
 
@@ -160,5 +160,5 @@ class BarTop(QFrame):
             JsonData.sys_fltr_vals[i] = False
 
     def reload_filters(self):
-        MainUtils.clear_layout(self.h_layout)
+        Utils.clear_layout(self.h_layout)
         self.init_ui()

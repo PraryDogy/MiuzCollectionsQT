@@ -9,7 +9,7 @@ from base_widgets.wins import WinChild
 from cfg import Dynamic, JsonData
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 
 class Progresser(QWidget):
@@ -109,7 +109,7 @@ class WinDownloads(WinChild):
             QTimer.singleShot(1000, self.add_progress_widgets)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
     def stop_progress(self, widget: Progresser, task: ThreadCopyFiles):
         task.stop.emit()
@@ -120,7 +120,7 @@ class WinDownloads(WinChild):
             widget.deleteLater()
             self.copy_threads.remove(task)
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
     
     def change_progress_text(self, widget: Progresser, text: str):
         text = self.cut_text(text)
@@ -159,4 +159,4 @@ class WinDownloads(WinChild):
         try:
             self.progress.setValue(value)
         except (Exception, RuntimeError) as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)

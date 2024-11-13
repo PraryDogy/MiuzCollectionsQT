@@ -13,7 +13,7 @@ from cfg import ALL_COLLS, LIMIT, MENU_W, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import MainUtils
+from utils.main_utils import Utils
 
 from .win_smb import WinSmb
 
@@ -57,7 +57,7 @@ class CustomContext(ContextCustom):
         else:
             coll = os.path.join(JsonData.coll_folder, self.true_name)
 
-        if MainUtils.smb_check():
+        if Utils.smb_check():
             if os.path.exists(coll):
                 subprocess.Popen(["open", coll])
                 return
@@ -109,7 +109,7 @@ class CollectionBtn(QLabel):
             return super().contextMenuEvent(ev)
 
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
     def closed_context(self):
         try:
@@ -119,7 +119,7 @@ class CollectionBtn(QLabel):
                 self.setObjectName(Names.menu_btn_selected)
             self.setStyleSheet(Themes.current)
         except Exception as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
 
     def enterEvent(self, a0: QEvent | None) -> None:
         if self.true_name != ALL_COLLS:
@@ -193,7 +193,7 @@ class BaseLeftMenu(QScrollArea):
             res = (i[0] for i in conn.execute(q).fetchall() if i)
         
         except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
-            MainUtils.print_err(parent=self, error=e)
+            Utils.print_err(parent=self, error=e)
             conn.rollback()
 
         conn.close()
@@ -211,7 +211,7 @@ class BaseLeftMenu(QScrollArea):
             }
 
     def reload_menu(self):
-        MainUtils.clear_layout(self.v_layout)
+        Utils.clear_layout(self.v_layout)
         self.init_ui()
 
 
