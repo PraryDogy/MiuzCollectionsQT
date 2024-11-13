@@ -15,8 +15,6 @@ from .main_utils import ImageUtils, MainUtils, MyThread
 
 class ScanerUtils:
     can_scan = True
-    stmt_max_count = 15
-    sleep_ = 0.2
 
     @classmethod
     def progressbar_value(cls, value: int):
@@ -26,24 +24,21 @@ class ScanerUtils:
             MainUtils.print_err(parent=cls, error=e)
 
     @classmethod
-    def conn_get(cls):
-        return Dbase.engine.connect()
-    
-    @classmethod
     def conn_commit(cls, conn: sqlalchemy.Connection):
 
         if cls.can_scan:
-            conn.commit()
+
+            try:
+                conn.commit()
+            except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError):
+                conn.rollback()
+                return
 
             try:
                 SignalsApp.all.reload_menu_left.emit()
                 SignalsApp.all.grid_thumbnails_cmd.emit("reload")
             except RuntimeError as e:
                 MainUtils.print_err(parent=cls, error=e)
-
-    @classmethod
-    def conn_close(cls, conn: sqlalchemy.Connection):
-        conn.close()
 
 
 class FinderImages:
@@ -104,7 +99,7 @@ class FinderImages:
 
         return finder_images
     
-    def get_image_item(self, src: str) -> tuple:
+    def get_image_item(self, src: str) -> list[tuple[str, int, int, int]]:
         try:
             stats = os.stat(path=src)
             return (src, stats.st_size, stats.st_birthtime, stats.st_mtime)
@@ -117,7 +112,7 @@ class DbImages:
     def __init__(self):
         super().__init__()
 
-    def get(self) -> list[tuple]:
+    def get(self) -> list[tuple[str, int, int, int]]:
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.size, THUMBS.c.created, THUMBS.c.mod)
@@ -141,12 +136,17 @@ class DbImages:
 
 class ComparedResult:
     def __init__(self):
-        self.ins_items: list[tuple] = []
-        self.del_items : list[tuple] = []
+        self.ins_items: list[tuple[str, int, int, int]] = []
+        self.del_items : list[tuple[str, int, int, int]] = []
 
 
 class ImageCompator:
-    def __init__(self, finder_images: list[tuple], db_images: list[tuple]):
+    def __init__(
+            self,
+            finder_images: list[tuple[str, int, int, int]],
+            db_images: list[tuple[str, int, int, int]]
+            ):
+
         super().__init__()
         self.finder_images = finder_images
         self.db_images = db_images
@@ -174,21 +174,25 @@ class ImageCompator:
 
 
 class DbUpdater:
+    stmt_max_count = 15
+    sleep_ = 0.2
+
     def __init__(self, compared_result: ComparedResult):
         super().__init__()
         self.compared_result = compared_result
 
-        self.queries: list[sqlalchemy.Insert] = []
+        self.insert_queries: list[sqlalchemy.Insert] = []
         self.hash_images: list[tuple[str, ndarray]] = []
 
     def run(self):
         ScanerUtils.progressbar_value(70)
         self.del_db()
         ScanerUtils.progressbar_value(90)
-        self.modify_db()
+        self.insert_db()
 
     def del_db(self):
         conn = Dbase.engine.connect()
+        ok_ = True
 
         for src, size, created, mod in self.compared_result.del_items:
             q = sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
@@ -199,12 +203,15 @@ class DbUpdater:
                 continue
             except sqlalchemy.exc.OperationalError:
                 conn.rollback()
-                return
+                ok_ = False
+                break
             
-        conn.commit()
+        ScanerUtils.conn_commit(conn)
+        conn.close()
 
-        for src, size, created, mod in self.compared_result.del_items:
-            os.remove(src)
+        if ok_:
+            for src, size, created, mod in self.compared_result.del_items:
+                os.remove(src)
 
     def get_small_img(self, src: str) -> ndarray | None:
         array_img = ImageUtils.read_image(src)
@@ -230,10 +237,8 @@ class DbUpdater:
 
         return sqlalchemy.insert(THUMBS).values(**values) 
 
-    def modify_db(self):
-
-        stmt_count = 0
-        conn = ScanerUtils.conn_get()
+    def insert_db(self):
+        insert_count = 0
 
         for src, size, created, mod in self.compared_result.ins_items:
 
@@ -244,39 +249,45 @@ class DbUpdater:
             hash_path = MainUtils.get_hash_path(src)
             stmt = self.get_stmt(src, size, created, mod, hash_path)
 
-            self.queries.append(stmt)
-
             if small_img:
                 self.hash_images.append((hash_path, small_img))
+                self.insert_queries.append(stmt)
+                insert_count += 1
 
+            else:
+                continue
 
-            # if flag == self.flag_del:
-            #     conn.execute(stmt)
+            if insert_count == DbUpdater.stmt_max_count:
+                insert_count = 0
+                self.insert_cmd()
+                sleep(DbUpdater.sleep_)
+                self.insert_queries.clear()
+                self.hash_images.clear()
 
-            # elif bytes_img is not None:
-            #     conn.execute(stmt)
-
-            # else:
-            #     print("scaner > updater > byte img is None", src)
-            #     continue
-
-            stmt_count += 1
-
-            if stmt_count == ScanerUtils.stmt_max_count:
-                stmt_count = 0
-
-                ScanerUtils.conn_commit(conn)
-                sleep(ScanerUtils.sleep_)
-                conn = ScanerUtils.conn_get()
-        
-        if stmt_count != 0:
-            ScanerUtils.conn_commit(conn)
-        ScanerUtils.conn_close(conn)
-
-    def insert_count_cmd(self):
+    def insert_cmd(self):
         # итерация по инсертам вставка в дб
         # если все ок то записываем фотки
-        ...
+
+        conn = Dbase.engine.connect()
+        ok_ = True
+
+        for query in self.insert_queries:
+            try:
+                conn.execute(query)
+            except sqlalchemy.exc.IntegrityError:
+                conn.rollback()
+                continue
+            except sqlalchemy.exc.OperationalError:
+                conn.rollback()
+                ok_ = False
+                break
+            
+        ScanerUtils.conn_commit(conn)
+        conn.close()
+
+        if ok_:
+            for hash_path, img_array in self.hash_images:
+                MainUtils.write_image_hash(hash_path, img_array)
 
 
 class ScanerThread(MyThread):
@@ -357,10 +368,8 @@ class Scaner:
 
     @classmethod
     def start(cls):
-        return
         cls.app.start()
 
     @classmethod
     def stop(cls):
-        return
         cls.app.stop()
