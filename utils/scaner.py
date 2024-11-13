@@ -113,57 +113,58 @@ class DbImages:
     def __init__(self):
         super().__init__()
 
-    def get(self) -> list[tuple[str, int, int, int]]:
+    def get(self) -> dict[str, tuple[str, int, int, int]]:
         conn = Dbase.engine.connect()
 
-        q = sqlalchemy.select(THUMBS.c.src, THUMBS.c.size, THUMBS.c.created, THUMBS.c.mod)
+        q = sqlalchemy.select(
+            THUMBS.c.hash_path,
+            THUMBS.c.src,
+            THUMBS.c.size,
+            THUMBS.c.created,
+            THUMBS.c.mod
+            )
 
-        try:
-            # не забываем относительный путь ДБ преобразовать в полный
-            res = conn.execute(q).fetchall()
-            res = [
-                (JsonData.coll_folder + src, size, created, mod)
-                for src, size, created, mod in res
-                ]
-
-        except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.IntegrityError) as e:
-            Utils.print_err(parent=self, error=e)
-            conn.rollback()
-            res = []
-
+        # не забываем относительный путь ДБ преобразовать в полный
+        res = conn.execute(q).fetchall()
         conn.close()
-        return res
+
+        return {
+            hash_path: (JsonData.coll_folder + src, size, created, mod)
+            for hash_path, src, size, created, mod in res
+            }
 
 
 class Compator:
     def __init__(
             self,
             finder_images: list[tuple[str, int, int, int]],
-            db_images: list[tuple[str, int, int, int]]
+            db_images: dict[str, tuple[str, int, int, int]]
             ):
 
         super().__init__()
         self._finder_images = finder_images
         self._db_images = db_images
 
-        self.del_items = []
-        self.ins_items = []
+        self.del_items: list[str] = []
+        self.ins_items: list[tuple[str, int, int, int]] = []
 
     def get_result(self):
-        for db_item in self._db_images:
+        for hash_path, db_item in self._db_images.items():
 
             if not ScanerUtils.can_scan:
                 return
 
             if not db_item in self._finder_images:
-                self.del_items.append(db_item)
+                self.del_items.append(hash_path)
+
+        _db_images = list(self._db_images.values())
 
         for finder_item in self._finder_images:
 
             if not ScanerUtils.can_scan:
                 return
 
-            if not finder_item in self._db_images:
+            if not finder_item in _db_images:
                 self.ins_items.append(finder_item)
 
 
@@ -171,7 +172,12 @@ class DbUpdater:
     stmt_max_count = 15
     sleep_ = 0.2
 
-    def __init__(self, del_items, ins_items):
+    def __init__(
+            self,
+            del_items: list[str],
+            ins_items: list[tuple[str, int, int, int]]
+            ):
+
         super().__init__()
         self.del_items = del_items
         self.ins_items = ins_items
@@ -186,14 +192,12 @@ class DbUpdater:
         self.insert_db()
 
     def del_db(self):
-        return
         conn = Dbase.engine.connect()
         ok_ = True
 
-        for src, size, created, mod in self.del_items:
-            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.src==src)
+        for hash_path in self.del_items:
+            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.hash_path==hash_path)
             try:
-                print("удаляю", q)
                 conn.execute(q)
             except sqlalchemy.exc.IntegrityError as e:
                 Utils.print_err(parent=self, error=e)
@@ -207,9 +211,8 @@ class DbUpdater:
                 break
             
         if ok_:
-            # for hash_path in hash_paths:
-            #     print("удаляю", hash_path)
-            #     os.remove(hash_path)
+            for hash_path in self.del_items:
+                os.remove(hash_path)
 
             ScanerUtils.conn_commit(conn)
             conn.close()
