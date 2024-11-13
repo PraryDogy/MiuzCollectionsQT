@@ -35,11 +35,11 @@ class ScanerUtils:
                 conn.rollback()
                 return
 
-            # try:
-            #     SignalsApp.all.reload_menu_left.emit()
-            #     SignalsApp.all.grid_thumbnails_cmd.emit("reload")
-            # except RuntimeError as e:
-            #     MainUtils.print_err(parent=cls, error=e)
+            try:
+                SignalsApp.all.reload_menu_left.emit()
+                SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+            except RuntimeError as e:
+                MainUtils.print_err(parent=cls, error=e)
 
 
 class FinderImages:
