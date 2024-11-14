@@ -20,10 +20,6 @@ from .win_info import WinInfo
 from .win_smb import WinSmb
 
 
-class Cache:
-    images: dict[str, QPixmap] = {}
-
-
 class ImageData:
     __slots__ = ["src", "width", "pixmap"]
     def __init__(self, src: str, width: int, pixmap: QPixmap):
@@ -37,6 +33,8 @@ class WorkerSignals(QObject):
 
 
 class LoadImageThread(URunnable):
+    images: dict[str, QPixmap] = {}
+
     def __init__(self, src: str):
         super().__init__()
         self.signals_ = WorkerSignals()
@@ -45,24 +43,24 @@ class LoadImageThread(URunnable):
     @URunnable.set_running_state
     def run(self):
         try:
-            if self.src not in Cache.images:
+            if self.src not in LoadImageThread.images:
                 img = Utils.read_image(self.src)
 
                 if not self.src.endswith(PSD_TIFF):
                     img = Utils.array_color(img, "BGR")
 
                 pixmap = Utils.pixmap_from_array(img)
-                Cache.images[self.src] = pixmap
+                LoadImageThread.images[self.src] = pixmap
 
             else:
-                pixmap = Cache.images.get(self.src)
+                pixmap = LoadImageThread.images.get(self.src)
 
         except Exception as e:
             Utils.print_err(parent=self, error=e)
             pixmap = None
 
-        if len(Cache.images) > 50:
-            Cache.images.pop(next(iter(Cache.images)))
+        if len(LoadImageThread.images) > 50:
+            LoadImageThread.images.pop(next(iter(LoadImageThread.images)))
 
         image_data = ImageData(self.src, pixmap.width(), pixmap)
         self.signals_.finished_.emit(image_data)
@@ -266,7 +264,7 @@ class WinImageView(WinChild):
 
     def load_thumbnail(self):
 
-        if self.src not in Cache.images:
+        if self.src not in LoadImageThread.images:
             self.set_titlebar_title(Dynamic.lng.loading)
 
             # преобразуем полный путь в относительный для работы в ДБ
@@ -314,7 +312,7 @@ class WinImageView(WinChild):
             self.set_image_title()
 
     def close_(self, *args):
-        Cache.images.clear()
+        LoadImageThread.images.clear()
         Dynamic.image_viewer = None
         self.close()
 
