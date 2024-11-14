@@ -34,6 +34,7 @@ class Dbase:
             return
 
         # cls.enable_wal()
+        cls.disable_wal()
 
     @classmethod
     def create_engine(cls):
@@ -51,6 +52,12 @@ class Dbase:
         with cls.engine.connect() as conn:
             conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
         print("database > wal enabled")
+
+    @classmethod
+    def disable_wal(cls):
+        with cls.engine.connect() as conn:
+            conn.execute(sqlalchemy.text("PRAGMA journal_mode=DELETE"))
+        print("database > wal disabled")
 
     @classmethod
     def vacuum(cls):
