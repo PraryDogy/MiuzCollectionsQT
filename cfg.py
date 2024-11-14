@@ -197,6 +197,7 @@ class JsonData:
     def check_app_dirs(cls):
 
         os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
+        os.makedirs(HASH_DIR, exist_ok=True)
 
         if not os.path.exists(path="db.db"):
             print("please, download db.db.zip")
