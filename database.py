@@ -33,7 +33,7 @@ class Dbase:
             cls.init()
             return
 
-        cls.enable_wal()
+        # cls.enable_wal()
 
     @classmethod
     def create_engine(cls):
