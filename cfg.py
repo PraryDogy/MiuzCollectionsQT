@@ -32,6 +32,7 @@ HASH_DIR: str = os.path.join(
     APP_SUPPORT_DIR,
     "hashdir"
     )
+PRELOADED_HASHDIR: str = "_hashdir"
 
 _IMG_EXT: tuple = (
     ".jpg", ".jpeg", ".jfif",
@@ -208,6 +209,22 @@ class JsonData:
 
         if not os.path.exists(path=DB_FILE):
             shutil.copyfile(src="db.db", dst=DB_FILE)
+
+    @classmethod
+    def copy_hashdir(cls):
+        if os.path.exists(HASH_DIR):
+            shutil.rmtree(HASH_DIR)
+
+        shutil.copytree(PRELOADED_HASHDIR, HASH_DIR)
+
+    @classmethod
+    def copy_db_file(cls):
+        print("Копирую новую предустановленную БД")
+        if os.path.exists(DB_FILE):
+            os.remove(DB_FILE)
+
+        shutil.copyfile(src="db.db", dst=DB_FILE)
+
 
     @classmethod
     def init(cls):

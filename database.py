@@ -1,9 +1,6 @@
-import os
-import shutil
-
 import sqlalchemy
 
-from cfg import DB_FILE
+from cfg import DB_FILE, JsonData
 
 METADATA = sqlalchemy.MetaData()
 
@@ -30,7 +27,8 @@ class Dbase:
         check_tables = cls.check_tables(tables)
 
         if not check_tables:
-            cls.copy_db_file()
+            JsonData.copy_db_file()
+            JsonData.copy_hashdir()
             cls.init()
             return
 
@@ -80,11 +78,3 @@ class Dbase:
                 return False
             
         return True
-
-    @classmethod
-    def copy_db_file(cls):
-        print("Копирую новую предустановленную БД")
-        if os.path.exists(DB_FILE):
-            os.remove(DB_FILE)
-
-        shutil.copyfile(src="db.db", dst=DB_FILE)
