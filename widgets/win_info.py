@@ -11,7 +11,6 @@ from cfg import Dynamic
 from utils.image_size import get_image_size
 from utils.utils import Utils
 
-
 SPLIT_ = "***"
 
 
