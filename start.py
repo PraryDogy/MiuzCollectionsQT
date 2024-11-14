@@ -72,12 +72,16 @@ class App(QApplication):
         return super().eventFilter(a0, a1)
 
 
-app = App(sys.argv)
 JsonData.init()
 Dbase.init()
+
+app = App(sys.argv)
+
 SignalsApp.init()
 Scaner.init()
+
 win_main = WinMain()
 win_main.center()
 win_main.show()
+
 app.exec()
