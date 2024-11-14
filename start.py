@@ -54,6 +54,7 @@ from PyQt5.QtWidgets import QApplication
 from cfg import JsonData
 from database import Dbase
 from signals import SignalsApp
+from utils.main_utils import UThreadPool
 from utils.scaner import Scaner
 from widgets.win_main import WinMain
 
@@ -77,6 +78,7 @@ Dbase.init()
 
 app = App(sys.argv)
 
+UThreadPool.init()
 SignalsApp.init()
 Scaner.init()
 

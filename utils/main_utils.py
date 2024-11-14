@@ -11,9 +11,9 @@ import numpy as np
 import psd_tools
 from imagecodecs.imagecodecs import DelayedImportError
 from PIL import Image
-from PyQt5.QtCore import QObject, Qt, QThread
+from PyQt5.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QVBoxLayout, QApplication
+from PyQt5.QtWidgets import QApplication, QVBoxLayout
 from tifffile import tifffile
 
 from cfg import HASH_DIR, JsonData
@@ -41,6 +41,31 @@ class MyThread(QThread):
                     Threads.list.remove(i)
         except Exception as e:
             Utils.print_err(parent=self, error=e)
+
+
+class UThreadPool:
+    pool: QThreadPool = None
+
+    @classmethod
+    def init(cls):
+        cls.pool = QThreadPool().globalInstance()
+
+
+class URunnable(QRunnable):
+    def __init__(self):
+        super().__init__()
+        self.should_run: bool = True
+        self.is_running: bool = False
+    
+    @staticmethod
+    def set_running_state(method: callable):
+
+        def wrapper(self, *args, **kwargs):
+            self._is_running = True
+            method(self, *args, **kwargs)
+            self._is_running = False
+
+        return wrapper
 
 
 class Utils:

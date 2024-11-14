@@ -4,13 +4,13 @@ from time import sleep
 import sqlalchemy
 import sqlalchemy.exc
 from numpy import ndarray
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal, QObject
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 
-from .main_utils import Utils, MyThread
+from .main_utils import MyThread, URunnable, UThreadPool, Utils
 
 
 class ScanerUtils:
@@ -307,12 +307,17 @@ class DbUpdater:
             conn.close()
 
 
-class ScanerThread(MyThread):
-    _finished = pyqtSignal()
+class WorkerSignals(QObject):
+    finished_ = pyqtSignal()
+
+
+class ScanerThread(URunnable):
 
     def __init__(self):
-        super().__init__(parent=None)
+        super().__init__()
+        self.signals_ = WorkerSignals()
 
+    @URunnable.set_running_state
     def run(self):
 
         ScanerUtils.can_scan = True
@@ -331,8 +336,7 @@ class ScanerThread(MyThread):
             db_updater = DbUpdater(compator.del_items, compator.ins_items)
             db_updater.run()
 
-        self._finished.emit()
-        self.remove_threads()
+        self.signals_.finished_.emit()
     
 
 class ScanerShedule(QObject):
@@ -360,8 +364,8 @@ class ScanerShedule(QObject):
         else:
             print("scaner started")
             self.scaner_thread = ScanerThread()
-            self.scaner_thread._finished.connect(self.after_scan)
-            self.scaner_thread.start()
+            self.scaner_thread.signals_.finished_.connect(self.after_scan)
+            UThreadPool.pool.start(self.scaner_thread)
 
     def stop(self):
         print("scaner manualy stoped.")
