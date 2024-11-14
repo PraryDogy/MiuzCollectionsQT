@@ -115,23 +115,13 @@ class Utils:
                 else:
                     cls.clear_layout(item.layout())
 
-
     @classmethod
     def copy_text(cls, text: str):
         QApplication.clipboard().setText(text)
-        # text_bytes = text.encode('utf-8')
-        # subprocess.run(['pbcopy'], input=text_bytes, check=True)
         return True
 
     @classmethod
     def paste_text(cls) -> str:
-        # paste_result = subprocess.run(
-        #     ['pbpaste'],
-        #     capture_output=True,
-        #     text=True,
-        #     check=True
-        #     )
-        # return paste_result.stdout.strip()
         return QApplication.clipboard().text()
         
     @classmethod
