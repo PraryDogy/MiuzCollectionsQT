@@ -120,7 +120,7 @@ class DbImages:
             THUMBS.c.hash_path,
             THUMBS.c.src,
             THUMBS.c.size,
-            THUMBS.c.created,
+            THUMBS.c.birth,
             THUMBS.c.mod
             )
 
@@ -129,8 +129,8 @@ class DbImages:
         conn.close()
 
         return {
-            hash_path: (JsonData.coll_folder + src, size, created, mod)
-            for hash_path, src, size, created, mod in res
+            hash_path: (JsonData.coll_folder + src, size, birth, mod)
+            for hash_path, src, size, birth, mod in res
             }
 
 
@@ -217,45 +217,51 @@ class DbUpdater:
             ScanerUtils.conn_commit(conn)
             conn.close()
 
-    def get_small_img(self, src: str) -> ndarray | None:
+    def get_small_img(self, src: str) -> tuple[ndarray, str] | None:
         array_img = Utils.read_image(src)
+
+        h_, w_ = array_img.shape[:2]
+        resol = f"{w_}x{h_}"
+
         array_img = Utils.resize_max_aspect_ratio(array_img, PIXMAP_SIZE_MAX)
 
         if src.endswith(PSD_TIFF):
             array_img = Utils.array_color(array_img, "BGR")
-        return array_img
 
-    def get_stmt(self, src: str, size, created, mod, hash_path: str) -> sqlalchemy.Insert:
-        
-        # преобразуем полный путь в относительный для работы с ДБ
-        src = src.replace(JsonData.coll_folder, "")
+        if array_img is not None:
+            return (array_img, resol)
 
-        values = {
-                "src": src,
-                "hash_path": hash_path,
-                "size": size,
-                "created": created,
-                "mod": mod,
-                "coll": Utils.get_coll_name(src),
-                }
-
-        return sqlalchemy.insert(THUMBS).values(**values) 
+        else:
+            return (None, None)
 
     def insert_db(self):
         insert_count = 0
 
-        for src, size, created, mod in self.ins_items:
+        for src, size, birth, mod in self.ins_items:
 
             if not ScanerUtils.can_scan:
                 return
 
-            small_img = self.get_small_img(src)
-            hash_path = Utils.get_hash_path(src)
-            stmt = self.get_stmt(src, size, created, mod, hash_path)
+            small_img, resol = self.get_small_img(src)
 
             if small_img is not None:
-                self.hash_images.append((hash_path, small_img))
+                hash_path = Utils.get_hash_path(src)
+
+                values = {
+                    "src": src.replace(JsonData.coll_folder, ""),
+                    "hash_path": hash_path,
+                    "size": size,
+                    "birth": birth,
+                    "mod": mod,
+                    "resol": resol,
+                    "coll": Utils.get_coll_name(src)
+                    }
+
+                stmt = sqlalchemy.insert(THUMBS).values(**values) 
                 self.insert_queries.append(stmt)
+
+                self.hash_images.append((hash_path, small_img))
+
                 insert_count += 1
 
             else:
