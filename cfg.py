@@ -220,6 +220,9 @@ class JsonData:
     @classmethod
     def copy_db_file(cls):
         print("Копирую новую предустановленную БД")
+
+        os.makedirs(HASH_DIR, exist_ok=True)
+
         if os.path.exists(DB_FILE):
             os.remove(DB_FILE)
 
