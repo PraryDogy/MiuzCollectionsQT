@@ -8,7 +8,7 @@ from cfg import PSD_TIFF, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
-from utils.main_utils import Utils
+from utils.main_utils import UThreadPool, Utils
 
 from ..win_smb import WinSmb
 from .db_images import DbImage
@@ -90,19 +90,17 @@ class CustomContext(ContextCustom):
         if len(files) == 0:
             return
 
+        cmd_ = lambda files: self.copy_files_fin(files=files)
         copy_task = ThreadCopyFiles(dest=dest, files=files)
-        SignalsApp.all_.btn_downloads_toggle.emit("show")
-        copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, files=files))
-        copy_task.start()
+        copy_task.signals_.finished_.connect(cmd_)
 
-    def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
+        SignalsApp.all_.btn_downloads_toggle.emit("show")
+        UThreadPool.pool.start(copy_task)
+
+    def copy_files_fin(self, files: list):
         self.reveal_files = Utils.reveal_files(files)
         if len(Dynamic.copy_threads) == 0:
             SignalsApp.all_.btn_downloads_toggle.emit("hide")
-        try:
-            copy_task.remove_threads()                
-        except Exception as e:
-            Utils.print_err(parent=self, error=e)
 
 
 class Title(QLabel):

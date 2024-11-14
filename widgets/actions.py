@@ -2,11 +2,10 @@ import os
 
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QWidget
 
-from base_widgets import ContextCustom
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from utils.copy_files import ThreadCopyFiles
-from utils.main_utils import Utils
+from utils.main_utils import UThreadPool, Utils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -116,17 +115,16 @@ class Save(CustomAction):
         if isinstance(file, str):
             file = [file]
 
+        cmd_ = lambda f: self.reveal_copied_files(files=f)
         thread_ = ThreadCopyFiles(dest=dest, files=file)
-        SignalsApp.all_.btn_downloads_toggle.emit("show")
-        cmd_ = lambda f: self.reveal_copied_files(thread_=thread_, files=f)
-        thread_._finished.connect(cmd_)
-        thread_.start()
+        thread_.signals_.finished_.connect(cmd_)
 
-    def reveal_copied_files(self, thread_: ThreadCopyFiles, files: list):
+        SignalsApp.all_.btn_downloads_toggle.emit("show")
+        UThreadPool.pool.start(thread_)
+
+    def reveal_copied_files(self, files: list):
 
         Utils.reveal_files(files)
 
         if len(Dynamic.copy_threads) == 0:
             SignalsApp.all_.btn_downloads_toggle.emit("hide")
-
-        thread_.remove_threads()

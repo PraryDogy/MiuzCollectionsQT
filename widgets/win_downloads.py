@@ -112,7 +112,7 @@ class WinDownloads(WinChild):
             Utils.print_err(parent=self, error=e)
 
     def stop_progress(self, widget: Progresser, task: ThreadCopyFiles):
-        task.stop.emit()
+        task.signals_.stop.emit()
         self.remove_progress(widget, task)
 
     def remove_progress(self, widget: Progresser, task: ThreadCopyFiles):
