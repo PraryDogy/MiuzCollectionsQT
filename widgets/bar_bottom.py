@@ -22,7 +22,7 @@ class ProgressBar(CustomProgressBar):
         self.setMinimum(0)
         self.setMaximum(100)
         self.set_value(0)
-        SignalsApp.all.progressbar_set_value.connect(self.set_value)
+        SignalsApp.all_.progressbar_set_value.connect(self.set_value)
 
     def set_value(self, value: int):
 
@@ -82,17 +82,17 @@ class CustomSlider(BaseSlider):
         self.setFixedWidth(80)
         self.setValue(JsonData.curr_size_ind)
         self.valueChanged.connect(self.change_size)
-        SignalsApp.all.slider_change_value.connect(self.move_slider_cmd)
+        SignalsApp.all_.slider_change_value.connect(self.move_slider_cmd)
     
     def move_slider_cmd(self, value: int):
         self.setValue(value)
         JsonData.curr_size_ind = value
-        SignalsApp.all.grid_thumbnails_cmd.emit("resize")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
 
     def change_size(self, value: int):
         self.setValue(value)
         JsonData.curr_size_ind = value
-        SignalsApp.all.grid_thumbnails_cmd.emit("resize")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
 
 
 class BarBottom(QFrame):
@@ -116,7 +116,7 @@ class BarBottom(QFrame):
 
         self.downloads = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_downloads.svg") , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
-        SignalsApp.all.btn_downloads_toggle.connect(self.btn_downloads_toggle)
+        SignalsApp.all_.btn_downloads_toggle.connect(self.btn_downloads_toggle)
         self.h_layout.addWidget(self.downloads, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_switch.svg"), size=20)

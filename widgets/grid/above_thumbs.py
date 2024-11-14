@@ -22,9 +22,9 @@ class ResetDatesBtn(QLabel):
         Dynamic.date_start, Dynamic.date_end = None, None
         Dynamic.current_photo_limit = LIMIT
 
-        SignalsApp.all.btn_dates_style.emit("normal")
-        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all_.btn_dates_style.emit("normal")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -39,9 +39,9 @@ class ResetSearchBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit = LIMIT
 
-        SignalsApp.all.wid_search_cmd.emit("clear")
-        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all_.wid_search_cmd.emit("clear")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -56,9 +56,9 @@ class ResetFiltersBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit = LIMIT
 
-        SignalsApp.all.bar_top_reset_filters.emit()
-        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all_.bar_top_reset_filters.emit()
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 
@@ -75,14 +75,14 @@ class ShowAllBtn(QLabel):
         JsonData.curr_coll = ALL_COLLS
         Dynamic.current_photo_limit = LIMIT
 
-        SignalsApp.all.wid_search_cmd.emit("clear")
-        SignalsApp.all.bar_top_reset_filters.emit()
+        SignalsApp.all_.wid_search_cmd.emit("clear")
+        SignalsApp.all_.bar_top_reset_filters.emit()
 
-        SignalsApp.all.win_main_cmd.emit("set_title")
-        SignalsApp.all.reload_menu_left.emit()
+        SignalsApp.all_.win_main_cmd.emit("set_title")
+        SignalsApp.all_.reload_menu_left.emit()
 
-        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
 

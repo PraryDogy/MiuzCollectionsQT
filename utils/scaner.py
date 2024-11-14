@@ -19,7 +19,7 @@ class ScanerUtils:
     @classmethod
     def progressbar_value(cls, value: int):
         try:
-            SignalsApp.all.progressbar_set_value.emit(value)
+            SignalsApp.all_.progressbar_set_value.emit(value)
         except RuntimeError as e:
             Utils.print_err(parent=cls, error=e)
 
@@ -36,8 +36,8 @@ class ScanerUtils:
                 return
 
             try:
-                SignalsApp.all.reload_menu_left.emit()
-                SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+                SignalsApp.all_.reload_menu_left.emit()
+                SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
             except RuntimeError as e:
                 Utils.print_err(parent=cls, error=e)
 

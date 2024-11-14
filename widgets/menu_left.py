@@ -42,14 +42,14 @@ class CustomContext(ContextCustom):
 
     def change_view(self):
         JsonData.small_menu_view = not JsonData.small_menu_view
-        SignalsApp.all.reload_menu_left.emit()
+        SignalsApp.all_.reload_menu_left.emit()
 
     def show_collection(self):
         JsonData.curr_coll = self.true_name
-        SignalsApp.all.win_main_cmd.emit("set_title")
-        SignalsApp.all.reload_menu_left.emit()
-        SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
-        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.win_main_cmd.emit("set_title")
+        SignalsApp.all_.reload_menu_left.emit()
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def reveal_collection(self):
         if self.true_name == ALL_COLLS:
@@ -87,10 +87,10 @@ class CollectionBtn(QLabel):
         if ev.button() == Qt.MouseButton.LeftButton:
             JsonData.curr_coll = self.true_name
             Dynamic.current_photo_limit = LIMIT
-            SignalsApp.all.win_main_cmd.emit("set_title")
-            SignalsApp.all.reload_menu_left.emit()
-            SignalsApp.all.grid_thumbnails_cmd.emit("reload")
-            SignalsApp.all.grid_thumbnails_cmd.emit("to_top")
+            SignalsApp.all_.win_main_cmd.emit("set_title")
+            SignalsApp.all_.reload_menu_left.emit()
+            SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+            SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(ev)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
@@ -143,7 +143,7 @@ class BaseLeftMenu(QScrollArea):
         self.v_layout = LayoutVer()
         scroll_widget.setLayout(self.v_layout)
         self.init_ui()
-        SignalsApp.all.reload_menu_left.connect(self.reload_menu)
+        SignalsApp.all_.reload_menu_left.connect(self.reload_menu)
 
     def init_ui(self):
         btns_widget = QWidget()
@@ -181,7 +181,7 @@ class BaseLeftMenu(QScrollArea):
 
     def change_view(self):
         JsonData.small_menu_view = not JsonData.small_menu_view
-        SignalsApp.all.reload_menu_left.emit()
+        SignalsApp.all_.reload_menu_left.emit()
 
     def load_colls_query(self) -> dict:
         menus = defaultdict(list)

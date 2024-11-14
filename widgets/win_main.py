@@ -85,7 +85,7 @@ class WinMain(WinFrameless):
         bar_bottom = BarBottom()
         right_lay.addWidget(bar_bottom)
 
-        SignalsApp.all.win_main_cmd.connect(self.win_main_cmd)
+        SignalsApp.all_.win_main_cmd.connect(self.win_main_cmd)
         QTimer.singleShot(100, self.after_start)
         grid.setFocus()
 
@@ -138,7 +138,7 @@ class WinMain(WinFrameless):
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                SignalsApp.all.wid_search_cmd.emit("focus")
+                SignalsApp.all_.wid_search_cmd.emit("focus")
 
         elif a0.key() == Qt.Key.Key_Escape:
             a0.ignore()
@@ -147,10 +147,10 @@ class WinMain(WinFrameless):
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if JsonData.curr_size_ind < 3:
                     JsonData.curr_size_ind += 1
-                    SignalsApp.all.slider_change_value.emit(JsonData.curr_size_ind)
+                    SignalsApp.all_.slider_change_value.emit(JsonData.curr_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if JsonData.curr_size_ind > 0:
                     JsonData.curr_size_ind -= 1
-                    SignalsApp.all.slider_change_value.emit(JsonData.curr_size_ind)
+                    SignalsApp.all_.slider_change_value.emit(JsonData.curr_size_ind)

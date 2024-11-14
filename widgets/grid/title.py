@@ -91,14 +91,14 @@ class CustomContext(ContextCustom):
             return
 
         copy_task = ThreadCopyFiles(dest=dest, files=files)
-        SignalsApp.all.btn_downloads_toggle.emit("show")
+        SignalsApp.all_.btn_downloads_toggle.emit("show")
         copy_task.finished.connect(lambda files: self.copy_files_fin(copy_task, files=files))
         copy_task.start()
 
     def copy_files_fin(self, copy_task: ThreadCopyFiles, files: list):
         self.reveal_files = Utils.reveal_files(files)
         if len(Dynamic.copy_threads) == 0:
-            SignalsApp.all.btn_downloads_toggle.emit("hide")
+            SignalsApp.all_.btn_downloads_toggle.emit("hide")
         try:
             copy_task.remove_threads()                
         except Exception as e:

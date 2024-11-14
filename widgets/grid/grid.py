@@ -58,9 +58,9 @@ class Grid(QScrollArea):
         frame_layout.addStretch(1)
         self.setWidget(self.scroll_area_widget)
 
-        SignalsApp.all.thumbnail_select.connect(self.select_new_widget)
-        SignalsApp.all.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
-        SignalsApp.all.win_img_view_open_in.connect(self.open_in_view)
+        SignalsApp.all_.thumbnail_select.connect(self.select_new_widget)
+        SignalsApp.all_.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
+        SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
 
     def grid_thumbnails_cmd(self, flag: str):
         if flag == "resize":

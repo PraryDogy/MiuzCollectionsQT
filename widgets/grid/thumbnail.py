@@ -109,7 +109,7 @@ class Thumbnail(QFrame):
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.src)
-        SignalsApp.all.win_img_view_open_in.emit(self)
+        SignalsApp.all_.win_img_view_open_in.emit(self)
         return super().mouseDoubleClickEvent(a0)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:

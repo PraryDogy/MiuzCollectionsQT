@@ -21,7 +21,7 @@ class SearchBarBase(InputBase):
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.delayed_search)
 
-        SignalsApp.all.wid_search_cmd.connect(self.wid_search_cmd)
+        SignalsApp.all_.wid_search_cmd.connect(self.wid_search_cmd)
 
     def wid_search_cmd(self, flag: str):
         if flag == "focus":
@@ -46,7 +46,7 @@ class SearchBarBase(InputBase):
         self.timer.start()
 
     def delayed_search(self):
-        SignalsApp.all.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def clear_search(self):
         self.clear()

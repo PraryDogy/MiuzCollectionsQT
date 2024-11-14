@@ -43,7 +43,7 @@ class OpenInView(CustomAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        SignalsApp.all.win_img_view_open_in.emit(self.parent_)
+        SignalsApp.all_.win_img_view_open_in.emit(self.parent_)
 
 
 class OpenInfo(CustomAction):
@@ -117,7 +117,7 @@ class Save(CustomAction):
             file = [file]
 
         thread_ = ThreadCopyFiles(dest=dest, files=file)
-        SignalsApp.all.btn_downloads_toggle.emit("show")
+        SignalsApp.all_.btn_downloads_toggle.emit("show")
         cmd_ = lambda f: self.reveal_copied_files(thread_=thread_, files=f)
         thread_._finished.connect(cmd_)
         thread_.start()
@@ -127,6 +127,6 @@ class Save(CustomAction):
         Utils.reveal_files(files)
 
         if len(Dynamic.copy_threads) == 0:
-            SignalsApp.all.btn_downloads_toggle.emit("hide")
+            SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
         thread_.remove_threads()

@@ -334,7 +334,7 @@ class WinImageView(WinChild):
         total_images = len(self.all_images)
         new_index = (current_index + offset) % total_images
         self.src = self.all_images[new_index]
-        SignalsApp.all.thumbnail_select.emit(self.src)
+        SignalsApp.all_.thumbnail_select.emit(self.src)
         self.load_thumbnail()
 
     def cut_text(self, text: str) -> str:
