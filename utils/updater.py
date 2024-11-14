@@ -6,12 +6,12 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData
 
-from .main_utils import MyThread
+from .main_utils import URunnable
 
 
 class UpdaterMain(QObject):
     no_connection = pyqtSignal()
-    finished = pyqtSignal()
+    finished_ = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -37,33 +37,29 @@ class UpdaterMain(QObject):
                 print(current_dir)
                 subprocess.run(["open", "-R", app_dir])
 
-                self.finished.emit()
+                self.finished_.emit()
                 return True
         
         self.no_connection.emit()
         return False
 
 
-class Updater(MyThread):
-    finished = pyqtSignal()
+class WorkerSignals(QObject):
+    no_connection = pyqtSignal()
+    finished_ = pyqtSignal()
+
+
+class Updater(URunnable):
+    finished_ = pyqtSignal()
     no_connection = pyqtSignal()
 
     def __init__(self):
-        super().__init__(parent=None)
+        super().__init__()
+        self.signals_ = WorkerSignals()
         self.task = None
 
     def run(self):
         self.task = UpdaterMain()
-        self.task.no_connection.connect(self.no_connection_cmd)
-        self.task.finished.connect(self.finished_cmd)
+        self.task.no_connection.connect(self.signals_.no_connection.emit)
+        self.task.finished_.connect(self.signals_.finished_.emit)
         self.task.go()
-        self.remove_threads()
-
-    def no_connection_cmd(self):
-        self.no_connection.emit()
-        self.remove_threads()
-
-    def finished_cmd(self):
-        self.finished.emit()
-        self.remove_threads()
-

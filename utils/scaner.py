@@ -4,13 +4,13 @@ from time import sleep
 import sqlalchemy
 import sqlalchemy.exc
 from numpy import ndarray
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal, QObject
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 
-from .main_utils import MyThread, URunnable, UThreadPool, Utils
+from .main_utils import URunnable, UThreadPool, Utils
 
 
 class ScanerUtils:

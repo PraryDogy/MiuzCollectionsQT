@@ -10,7 +10,7 @@ from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
 from database import Dbase
-from utils.main_utils import Utils
+from utils.main_utils import UThreadPool, Utils
 from utils.scaner import Scaner
 from utils.updater import Updater
 
@@ -201,23 +201,26 @@ class UpdaterWidget(QWidget):
     def update_btn_cmd(self, e):
         self.task = Updater()
         self.btn.setText(Dynamic.lng.wait_update)
-        self.task.no_connection.connect(self.no_connection_win)
-        self.task.finished.connect(self.finalize)
-        self.task.start()
+        self.task.signals_.no_connection.connect(self.no_connection_win)
+        self.task.signals_.finished_.connect(self.finalize)
+        UThreadPool.pool.start(self.task)
 
     def finalize(self):
         self.btn.setText(Dynamic.lng.download_update)
 
     def no_connection_win(self):
-        QTimer.singleShot(1000, lambda: self.btn.setText(Dynamic.lng.download_update))
-        t = Dynamic.lng.connect_sb06
+        cmd_ = lambda: self.btn.setText(Dynamic.lng.download_update)
+
+        QTimer.singleShot(1000, cmd_)
         self.smb_win = WinSmb()
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
     def no_connection_btn_style(self):
+        cmd_ = lambda: self.btn.setText(Dynamic.lng.download_update)
+
         self.btn.setText(Dynamic.lng.no_connection)
-        QTimer.singleShot(1500, lambda: self.btn.setText(Dynamic.lng.download_update))
+        QTimer.singleShot(1500, cmd_)
 
 
 class ShowFiles(QWidget):
