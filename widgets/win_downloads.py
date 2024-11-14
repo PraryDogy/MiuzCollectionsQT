@@ -102,16 +102,18 @@ class WinDownloads(WinChild):
                     self.progress_layout.addWidget(copy_wid)
 
                     self.copy_threads.append(copy_task)
-
-                    copy_wid.progress_stop.connect(partial(self.stop_progress, copy_wid, copy_task))
-                    copy_task.signals_.value_changed.connect(partial(self.change_progress_value, copy_wid))
-                    copy_task.signals_.text_changed.connect(partial(self.change_progress_text, copy_wid))
-                    copy_task.signals_.finished_.connect(partial(self.remove_progress, copy_wid, copy_task))
+                    self.connect_(copy_wid, copy_task)
 
             QTimer.singleShot(1000, self.add_progress_widgets)
 
         except Exception as e:
             Utils.print_err(parent=self, error=e)
+
+    def connect_(self, wid: Progresser, task: ThreadCopyFiles):
+        wid.progress_stop.connect(partial(self.stop_progress, wid, task))
+        task.signals_.value_changed.connect(partial(self.change_progress_value, wid))
+        task.signals_.text_changed.connect(partial(self.change_progress_text, wid))
+        task.signals_.finished_.connect(partial(self.remove_progress, wid, task))
 
     def stop_progress(self, widget: Progresser, task: ThreadCopyFiles):
         task.signals_.stop.emit()
