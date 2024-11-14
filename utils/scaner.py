@@ -170,7 +170,7 @@ class Compator:
 
 class DbUpdater:
     stmt_max_count = 15
-    sleep_ = 0.2
+    sleep_ = 0.0
 
     def __init__(
             self,
