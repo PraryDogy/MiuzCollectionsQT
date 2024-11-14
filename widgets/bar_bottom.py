@@ -9,7 +9,7 @@ from base_widgets import CustomProgressBar, LayoutHor, SvgBtn
 from cfg import JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 from .win_downloads import WinDownloads
 from .win_settings import WinSettings

@@ -13,7 +13,7 @@ from cfg import ALL_COLLS, LIMIT, MENU_W, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 from .win_smb import WinSmb
 

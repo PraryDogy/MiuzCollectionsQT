@@ -6,7 +6,7 @@ from base_widgets import Btn, LayoutHor
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 from .win_dates import WinDates
 

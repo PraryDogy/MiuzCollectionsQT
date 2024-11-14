@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap
 
 from cfg import ALL_COLLS, Dynamic, JsonData
 from database import THUMBS, Dbase
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 
 class DbImage:

@@ -9,7 +9,7 @@ from base_widgets.wins import WinChild
 from cfg import Dynamic, JsonData
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 
 class Progresser(QWidget):

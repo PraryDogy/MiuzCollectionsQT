@@ -10,7 +10,7 @@ from cfg import (PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic,
                  JsonData)
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 from ..actions import CopyPath, OpenInfo, OpenInView, Reveal, Save
 

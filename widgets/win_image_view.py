@@ -13,7 +13,7 @@ from cfg import PIXMAP_SIZE, PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import URunnable, UThreadPool, Utils
+from utils.utils import URunnable, UThreadPool, Utils
 
 from .actions import CopyPath, OpenInfo, Reveal, Save
 from .win_info import WinInfo

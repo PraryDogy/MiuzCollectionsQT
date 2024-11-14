@@ -10,7 +10,7 @@ from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 
-from .main_utils import URunnable, UThreadPool, Utils
+from .utils import URunnable, UThreadPool, Utils
 
 
 class ScanerUtils:

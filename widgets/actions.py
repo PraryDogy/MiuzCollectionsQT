@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QWidget
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from utils.copy_files import ThreadCopyFiles
-from utils.main_utils import UThreadPool, Utils
+from utils.utils import UThreadPool, Utils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb

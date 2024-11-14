@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData
 
-from .main_utils import URunnable
+from .utils import URunnable
 
 
 class UpdaterMain(QObject):

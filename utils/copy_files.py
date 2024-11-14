@@ -4,7 +4,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import Dynamic
 
-from .main_utils import URunnable, Utils
+from .utils import URunnable, Utils
 
 
 class WorkerSignals(QObject):

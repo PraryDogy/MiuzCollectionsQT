@@ -10,7 +10,7 @@ from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
 from database import Dbase
-from utils.main_utils import UThreadPool, Utils
+from utils.utils import UThreadPool, Utils
 from utils.scaner import Scaner
 from utils.updater import Updater
 

@@ -8,7 +8,7 @@ from base_widgets.wins import WinFrameless
 from cfg import ALL_COLLS, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import Utils
+from utils.utils import Utils
 from utils.scaner import Scaner
 
 from .bar_bottom import BarBottom

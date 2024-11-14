@@ -6,7 +6,7 @@ from base_widgets import LayoutHor, LayoutVer
 from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 from ..win_info import WinInfo
 from ..win_smb import WinSmb

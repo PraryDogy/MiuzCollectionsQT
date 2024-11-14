@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QAction, QLineEdit
 
 from cfg import Dynamic
 from styles import Names, Themes
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 from .context import ContextCustom
 

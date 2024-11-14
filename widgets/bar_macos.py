@@ -9,7 +9,7 @@ from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import APP_NAME, APP_VER, Dynamic
 from signals import SignalsApp
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 from .win_settings import WinSettings
 

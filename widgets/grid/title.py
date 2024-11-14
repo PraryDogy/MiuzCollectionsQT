@@ -8,7 +8,7 @@ from cfg import PSD_TIFF, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.copy_files import ThreadCopyFiles
-from utils.main_utils import UThreadPool, Utils
+from utils.utils import UThreadPool, Utils
 
 from ..win_smb import WinSmb
 from .db_images import DbImage

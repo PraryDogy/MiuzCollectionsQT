@@ -9,7 +9,7 @@ from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import Dynamic
 from utils.image_size import get_image_size
-from utils.main_utils import Utils
+from utils.utils import Utils
 
 
 SPLIT_ = "***"
