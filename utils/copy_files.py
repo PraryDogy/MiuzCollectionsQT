@@ -27,6 +27,7 @@ class ThreadCopyFiles(URunnable):
 
         Dynamic.copy_threads.append(self)
 
+    @URunnable.set_running_state
     def run(self):
         copied_size = 0
         files_dests = []

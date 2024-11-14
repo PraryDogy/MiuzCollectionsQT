@@ -23,26 +23,6 @@ psd_logger = logging.getLogger("psd_tools")
 psd_logger.setLevel(logging.CRITICAL)
 
 
-class Threads:
-    list = []
-
-
-class MyThread(QThread):
-    def __init__(self, parent: QObject):
-        super().__init__(parent=parent)
-        Threads.list.append(self)
-
-    def remove_threads(self):
-        """Remove dead threads"""
-        try:
-            for i in Threads.list:
-                i: QThread
-                if not i.isRunning():
-                    Threads.list.remove(i)
-        except Exception as e:
-            Utils.print_err(parent=self, error=e)
-
-
 class UThreadPool:
     pool: QThreadPool = None
 
@@ -61,9 +41,9 @@ class URunnable(QRunnable):
     def set_running_state(method: callable):
 
         def wrapper(self, *args, **kwargs):
-            self._is_running = True
+            self.is_running = True
             method(self, *args, **kwargs)
-            self._is_running = False
+            self.is_running = False
 
         return wrapper
 

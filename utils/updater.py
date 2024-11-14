@@ -58,6 +58,7 @@ class Updater(URunnable):
         self.signals_ = WorkerSignals()
         self.task = None
 
+    @URunnable.set_running_state
     def run(self):
         self.task = UpdaterMain()
         self.task.no_connection.connect(self.signals_.no_connection.emit)

@@ -13,7 +13,7 @@ from cfg import PIXMAP_SIZE, PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.main_utils import Utils, MyThread
+from utils.main_utils import URunnable, UThreadPool, Utils
 
 from .actions import CopyPath, OpenInfo, Reveal, Save
 from .win_info import WinInfo
@@ -32,13 +32,17 @@ class ImageData:
         self.pixmap = pixmap
 
 
-class LoadImageThread(MyThread):
-    _finished = pyqtSignal(object)
+class WorkerSignals(QObject):
+    finished_ = pyqtSignal(object)
 
+
+class LoadImageThread(URunnable):
     def __init__(self, src: str):
-        super().__init__(parent=None)
+        super().__init__()
+        self.signals_ = WorkerSignals()
         self.src = src
 
+    @URunnable.set_running_state
     def run(self):
         try:
             if self.src not in Cache.images:
@@ -60,8 +64,8 @@ class LoadImageThread(MyThread):
         if len(Cache.images) > 50:
             Cache.images.pop(next(iter(Cache.images)))
 
-        self._finished.emit(ImageData(self.src, pixmap.width(), pixmap))
-        self.remove_threads()
+        image_data = ImageData(self.src, pixmap.width(), pixmap)
+        self.signals_.finished_.emit(image_data)
 
 
 class ImageWidget(QLabel):
@@ -298,8 +302,8 @@ class WinImageView(WinChild):
 
     def load_image_thread(self):
         img_thread = LoadImageThread(self.src)
-        img_thread._finished.connect(self.load_image_finished)
-        img_thread.start()
+        img_thread.signals_.finished_.connect(self.load_image_finished)
+        UThreadPool.pool.start(img_thread)
 
     def load_image_finished(self, data: ImageData):
         if data.width == 0 or data.src != self.src:
