@@ -294,7 +294,7 @@ class Utils:
             )
         
     @classmethod
-    def resize_max_aspect_ratio(cls, image: np.ndarray, size: int, is_max: bool = True) -> np.ndarray | None:
+    def fit_to_thumb(cls, image: np.ndarray, size: int, is_max: bool = True) -> np.ndarray | None:
         try:
             h, w = image.shape[:2]
 

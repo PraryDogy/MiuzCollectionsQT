@@ -220,17 +220,22 @@ class DbUpdater:
     def get_small_img(self, src: str) -> tuple[ndarray, str] | None:
         array_img = Utils.read_image(src)
 
-        h_, w_ = array_img.shape[:2]
-        resol = f"{w_}x{h_}"
+        if array_img:
 
-        array_img = Utils.resize_max_aspect_ratio(array_img, PIXMAP_SIZE_MAX)
+            h_, w_ = array_img.shape[:2]
+            resol = f"{w_}x{h_}"
 
-        if src.endswith(PSD_TIFF):
-            array_img = Utils.array_color(array_img, "BGR")
+            array_img = Utils.fit_to_thumb(array_img, PIXMAP_SIZE_MAX)
 
-        if array_img is not None:
-            return (array_img, resol)
+            if src.endswith(PSD_TIFF):
+                array_img = Utils.array_color(array_img, "BGR")
 
+            if array_img is not None:
+                return (array_img, resol)
+
+            else:
+                return (None, None)
+        
         else:
             return (None, None)
 
