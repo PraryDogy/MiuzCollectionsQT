@@ -4,7 +4,8 @@ import shutil
 import webbrowser
 from datetime import datetime
 
-from lang import Eng, Rus
+from lang.eng import Eng
+from lang.rus import Rus
 from styles import Themes
 
 LINK_DB = "https://disk.yandex.ru/d/gDnB5X9kGqjztA"
