@@ -11,7 +11,7 @@ import numpy as np
 import psd_tools
 from imagecodecs.imagecodecs import DelayedImportError
 from PIL import Image
-from PyQt5.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool
+from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication, QVBoxLayout
 from tifffile import tifffile
@@ -89,13 +89,15 @@ class Utils:
             return True
 
     @classmethod
-    def get_coll_name(cls, src_path: str) -> str:
-        coll = src_path.replace(JsonData.coll_folder, "").strip(os.sep).split(os.sep)
+    def get_coll_name(cls, src: str) -> str:
+        coll = src.replace(JsonData.coll_folder, "")
+        coll = coll.strip(os.sep)
+        coll = coll.split(os.sep)
 
         if len(coll) > 1:
             return coll[0]
         else:
-            return JsonData.coll_folder.strip(os.sep).split(os.sep)[-1]
+            return os.path.basename(JsonData.coll_folder.strip(os.sep))
     
     @classmethod
     def clear_layout(cls, layout: QVBoxLayout):
