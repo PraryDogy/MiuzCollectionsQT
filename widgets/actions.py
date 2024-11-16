@@ -126,25 +126,20 @@ class FavTask(URunnable):
         conn.close()
 
 
-class AddFav(CustomAction):
+class FavAction(CustomAction):
     finished_ = pyqtSignal(bool)
 
-    def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lng.add_fav)
-        self.value = 1
+    def __init__(self, parent: QWidget, src: str, fav:  int):
 
-    def cmd_(self):
-        task = FavTask(self.src, self.value)
-        task.signals_.finished_.connect(self.finished_.emit)
-        UThreadPool.pool.start(task)
+        if fav == 0:
+            t = Dynamic.lng.add_fav
+            self.value = 1
 
+        elif fav == 1 or fav is None:
+            t = Dynamic.lng.del_fav
+            self.value = 0
 
-class DelFav(CustomAction):
-    finished_ = pyqtSignal(bool)
-
-    def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lng.del_fav)
-        self.value = 0
+        super().__init__(parent, src, t)
 
     def cmd_(self):
         task = FavTask(self.src, self.value)
