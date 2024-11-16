@@ -11,7 +11,6 @@ class Rus:
 		self.close = 'Закрыть'
 		self.collection = 'Коллекция'
 		self.compact_menu = 'Компактное меню'
-		self.connect_sb06 = 'Подключитесь к Studio/Photo'
 		self.copy = 'Копировать'
 		self.copy_all = 'Копировать все'
 		self.copy_path = 'Скопировать путь'
@@ -27,7 +26,6 @@ class Rus:
 		self.file_name = 'Имя файла'
 		self.file_path = 'Расположение'
 		self.file_size = 'Размер'
-		self.gb = 'гб'
 		self.in_finder = 'в Finder'
 		self.info = 'Инфо'
 		self.lang_label = 'Язык/Language'
@@ -37,7 +35,6 @@ class Rus:
 		self.months_genitive_case = {'1': 'января', '2': 'февраля', '3': 'марта', '4': 'апреля', '5': 'мая', '6': 'июня', '7': 'июля', '8': 'августа', '9': 'сентября', '10': 'октября', '11': 'ноября', '12': 'декабря'}
 		self.name = 'ru'
 		self.no_connection = 'Нет подключения'
-		self.no_file = 'Не могу найти файл(ы)'
 		self.no_photo = 'Нет фотографий'
 		self.no_photo_filter = 'Нет фотографий в категории'
 		self.ok = 'Ок'

@@ -11,7 +11,6 @@ class Eng:
 		self.close = 'Close'
 		self.collection = 'Collection'
 		self.compact_menu = 'Compact menu'
-		self.connect_sb06 = 'Connect Studio/Photo'
 		self.copy = 'Copy'
 		self.copy_all = 'Copy all'
 		self.copy_path = 'Copy filepath'
@@ -27,7 +26,6 @@ class Eng:
 		self.file_name = 'Filename'
 		self.file_path = 'Location'
 		self.file_size = 'Size'
-		self.gb = 'gb'
 		self.in_finder = 'in Finder'
 		self.info = 'Info'
 		self.lang_label = 'Language/Язык'
@@ -37,7 +35,6 @@ class Eng:
 		self.months_genitive_case = {'1': 'january', '2': 'february', '3': 'march', '4': 'april', '5': 'may', '6': 'june', '7': 'july', '8': 'august', '9': 'september', '10': 'october', '11': 'november', '12': 'december'}
 		self.name = 'en'
 		self.no_connection = 'No connection'
-		self.no_file = "Can't find the file(s)"
 		self.no_photo = 'No photos'
 		self.no_photo_filter = 'No photos in cathegory'
 		self.ok = 'Ok'

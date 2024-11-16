@@ -31,10 +31,6 @@
         "Компактное меню",
         "Compact menu"
     ],
-    "connect_sb06": [
-        "Подключитесь к Studio/Photo",
-        "Connect Studio/Photo"
-    ],
     "copy": [
         "Копировать",
         "Copy"
@@ -184,10 +180,6 @@
     "no_connection": [
         "Нет подключения",
         "No connection"
-    ],
-    "no_file": [
-        "Не могу найти файл(ы)",
-        "Can't find the file(s)"
     ],
     "no_photo": [
         "Нет фотографий",
@@ -368,10 +360,6 @@
     "apply": [
         "Применить",
         "Apply"
-    ],
-    "gb": [
-        "гб",
-        "gb"
     ],
     "reload_gui": [
         "Обновить",
