@@ -1,7 +1,15 @@
 {
+    "add_fav": [
+        "Добавить в избранное",
+        "Add to favorites"
+    ],
     "all_colls": [
         "Все коллекции",
         "All collections"
+    ],
+    "apply": [
+        "Применить",
+        "Apply"
     ],
     "bar_menu": [
         "Меню",
@@ -14,6 +22,10 @@
     "cancel": [
         "Отмена",
         "Cancel"
+    ],
+    "changed": [
+        "Изменен",
+        "Changed"
     ],
     "choose_coll_smb": [
         "Возможные решения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках.",
@@ -35,18 +47,22 @@
         "Копировать все",
         "Copy all"
     ],
+    "copy_path": [
+        "Скопировать путь",
+        "Copy filepath"
+    ],
     "copying": [
         "Копирую",
         "Copying"
     ],
     "cust_fltr_names": [
         {
-            "prod": "Имиджи",
-            "mod": "Модели"
+            "mod": "Модели",
+            "prod": "Имиджи"
         },
         {
-            "prod": "Product",
-            "mod": "Models"
+            "mod": "Models",
+            "prod": "Product"
         }
     ],
     "cut": [
@@ -61,6 +77,10 @@
         "Даты",
         "Dates"
     ],
+    "del_fav": [
+        "Удалить из избранного",
+        "Remove from favorites"
+    ],
     "detail_menu": [
         "Стандартное меню",
         "Standart menu"
@@ -72,6 +92,10 @@
     "end": [
         "Конец",
         "End"
+    ],
+    "fav_coll": [
+        "Избранное",
+        "Favorites"
     ],
     "file_name": [
         "Имя файла",
@@ -96,6 +120,9 @@
     "months": [
         {
             "1": "Январь",
+            "10": "Октябрь",
+            "11": "Ноябрь",
+            "12": "Декабрь",
             "2": "Февраль",
             "3": "Март",
             "4": "Апрель",
@@ -103,13 +130,13 @@
             "6": "Июнь",
             "7": "Июль",
             "8": "Август",
-            "9": "Сентябрь",
-            "10": "Октябрь",
-            "11": "Ноябрь",
-            "12": "Декабрь"
+            "9": "Сентябрь"
         },
         {
             "1": "January",
+            "10": "October",
+            "11": "November",
+            "12": "December",
             "2": "February",
             "3": "March",
             "4": "April",
@@ -117,15 +144,15 @@
             "6": "June",
             "7": "July",
             "8": "August",
-            "9": "September",
-            "10": "October",
-            "11": "November",
-            "12": "December"
+            "9": "September"
         }
     ],
     "months_genitive_case": [
         {
             "1": "января",
+            "10": "октября",
+            "11": "ноября",
+            "12": "декабря",
             "2": "февраля",
             "3": "марта",
             "4": "апреля",
@@ -133,13 +160,13 @@
             "6": "июня",
             "7": "июля",
             "8": "августа",
-            "9": "сентября",
-            "10": "октября",
-            "11": "ноября",
-            "12": "декабря"
+            "9": "сентября"
         },
         {
             "1": "january",
+            "10": "october",
+            "11": "november",
+            "12": "december",
             "2": "february",
             "3": "march",
             "4": "april",
@@ -147,10 +174,7 @@
             "6": "june",
             "7": "july",
             "8": "august",
-            "9": "september",
-            "10": "october",
-            "11": "november",
-            "12": "december"
+            "9": "september"
         }
     ],
     "name": [
@@ -189,6 +213,14 @@
         "Фото за даты",
         "Photo from"
     ],
+    "place": [
+        "Место",
+        "Place"
+    ],
+    "reload_gui": [
+        "Обновить",
+        "Update"
+    ],
     "reset": [
         "Сброс",
         "Reset"
@@ -201,6 +233,14 @@
         "Очистить поиск",
         "Reset search"
     ],
+    "resol": [
+        "Разрешение",
+        "Resolution"
+    ],
+    "restore_db": [
+        "Восстановить БД",
+        "Restore DB"
+    ],
     "reveal": [
         "Показать",
         "Reveal"
@@ -208,6 +248,22 @@
     "reveal_in_finder": [
         "Показать в Finder",
         "Reveal in Finder"
+    ],
+    "save_all_JPG": [
+        "Сохранить все JPG",
+        "Save all JPG"
+    ],
+    "save_all_JPG_as": [
+        "Сохранить все JPG как ...",
+        "Save all JPG as ..."
+    ],
+    "save_all_layers": [
+        "Сохранить все слои",
+        "Save all layers"
+    ],
+    "save_all_layers_as": [
+        "Сохранить все слои как ...",
+        "Save all layers as ..."
     ],
     "save_image_downloads": [
         "Сохранить в загрузки",
@@ -269,6 +325,10 @@
         "Всего",
         "Total"
     ],
+    "type_": [
+        "Тип",
+        "Type"
+    ],
     "view": [
         "Просмотр",
         "View"
@@ -304,65 +364,5 @@
     "with_name": [
         "с именем",
         "with name"
-    ],
-    "restore_db": [
-        "Восстановить БД",
-        "Restore DB"
-    ],
-    "save_all_JPG": [
-        "Сохранить все JPG",
-        "Save all JPG"
-    ],
-    "save_all_JPG_as": [
-        "Сохранить все JPG как ...",
-        "Save all JPG as ..."
-    ],
-    "save_all_layers": [
-        "Сохранить все слои",
-        "Save all layers"
-    ],
-    "save_all_layers_as": [
-        "Сохранить все слои как ...",
-        "Save all layers as ..."
-    ],
-    "copy_path": [
-        "Скопировать путь",
-        "Copy filepath"
-    ],
-    "apply": [
-        "Применить",
-        "Apply"
-    ],
-    "reload_gui": [
-        "Обновить",
-        "Update"
-    ],
-    "resol": [
-        "Разрешение",
-        "Resolution"
-    ],
-    "changed": [
-        "Изменен",
-        "Changed"
-    ],
-    "place": [
-        "Место",
-        "Place"
-    ],
-    "type_": [
-        "Тип",
-        "Type"
-    ],
-    "add_fav": [
-        "Добавить в избранное",
-        "Add to favorites"
-    ],
-    "del_fav": [
-        "Удалить из избранного",
-        "Remove from favorites"
-    ],
-    "fav_coll": [
-        "Избранное",
-        "Favorites"
     ]
 }
