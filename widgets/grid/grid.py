@@ -140,7 +140,14 @@ class Grid(QScrollArea):
         row, col = 0, 0
 
         for x, db_image in enumerate(db_images):
-            wid = Thumbnail(pixmap=db_image.pixmap, src=db_image.src, coll=db_image.coll)
+        
+            wid = Thumbnail(
+                pixmap=db_image.pixmap,
+                src=db_image.src,
+                coll=db_image.coll,
+                fav=db_image.fav
+                )
+
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
 
             self.add_widget_data(wid, self.all_grids_row, col)

@@ -97,7 +97,7 @@ class Reveal(CustomAction):
 
 
 class WorkerSignals(QObject):
-    finished_ = pyqtSignal(bool)
+    finished_ = pyqtSignal(int)
 
 
 class FavTask(URunnable):
@@ -117,17 +117,16 @@ class FavTask(URunnable):
         try:
             conn.execute(q)
             conn.commit()
-            self.signals_.finished_.emit(True)
+            self.signals_.finished_.emit(self.value)
         except Exception as e:
             Utils.print_err(error=e)
             conn.rollback()
-            self.signals_.finished_.emit(False)
 
         conn.close()
 
 
 class FavAction(CustomAction):
-    finished_ = pyqtSignal(bool)
+    finished_ = pyqtSignal(int)
 
     def __init__(self, parent: QWidget, src: str, fav:  int):
 
@@ -140,11 +139,12 @@ class FavAction(CustomAction):
             self.value = 0
 
         super().__init__(parent, src, t)
+        self.triggered.connect(self.cmd_)
 
     def cmd_(self):
-        task = FavTask(self.src, self.value)
-        task.signals_.finished_.connect(self.finished_.emit)
-        UThreadPool.pool.start(task)
+        self.task = FavTask(self.src, self.value)
+        self.task.signals_.finished_.connect(self.finished_.emit)
+        UThreadPool.pool.start(self.task)
 
 
 class Save(CustomAction):
@@ -156,10 +156,10 @@ class Save(CustomAction):
             text: str = Dynamic.lng.save_image_downloads
 
         super().__init__(parent, src, text)
-        self.triggered.connect(self.cmd)
+        self.triggered.connect(self.cmd_)
         self.save_as = save_as
 
-    def cmd(self):
+    def cmd_(self):
         if Utils.smb_check():
             if self.save_as:
                 Shared.dialog = QFileDialog()

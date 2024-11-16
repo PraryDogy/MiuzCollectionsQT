@@ -12,7 +12,8 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
 
-from ..actions import CopyPath, OpenInfo, OpenInView, Reveal, Save, ReloadGui
+from ..actions import (CopyPath, FavAction, OpenInfo, OpenInView, ReloadGui,
+                       Reveal, Save)
 
 
 class NameLabel(QLabel):
@@ -42,7 +43,7 @@ class NameLabel(QLabel):
 class Thumbnail(QFrame):
     select = pyqtSignal(str)
 
-    def __init__(self, pixmap: QPixmap, src: str, coll: str):
+    def __init__(self, pixmap: QPixmap, src: str, coll: str, fav: int):
         super().__init__()
         self.setObjectName(Names.thumbnail_normal)
         self.setStyleSheet(Themes.current)
@@ -51,7 +52,12 @@ class Thumbnail(QFrame):
 
         self.src = src
         self.coll = coll
-        self.name = os.path.basename(src)
+        self.fav = fav
+
+        if fav == 0:
+            self.name = os.path.basename(src)
+        elif fav == 1:
+            self.name = "*" + os.path.basename(src)
 
         self.setToolTip(
             f"{Dynamic.lng.collection}: {self.coll}\n"
@@ -107,6 +113,17 @@ class Thumbnail(QFrame):
         except RuntimeError:
             ...
 
+    def change_fav(self, value: int):
+        if value == 0:
+            self.fav = value
+            self.name = os.path.basename(self.src)
+        elif value == 1:
+            self.fav = value
+            self.name = "*" + os.path.basename(self.src)
+
+        self.name_label.name = self.name
+        self.name_label.set_text()
+
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.src)
         SignalsApp.all_.win_img_view_open_in.emit(self)
@@ -153,6 +170,10 @@ class Thumbnail(QFrame):
 
             info = OpenInfo(parent=self, src=self.src)
             menu_.addAction(info)
+
+            self.fav_action = FavAction(parent=self, src=self.src, fav=self.fav)
+            self.fav_action.finished_.connect(self.change_fav)
+            menu_.addAction(self.fav_action)
 
             menu_.addSeparator()
 
