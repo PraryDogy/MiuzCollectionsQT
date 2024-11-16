@@ -181,30 +181,23 @@ class LangAdmin:
 
     @classmethod
     def remove_empty_dirs(cls):
-        stop = ["env", ".git", "__pycache__"]
+        exclude = ["env", ".git", "__pycache__"]
         base_path = os.path.dirname(__file__)
 
-        dirs = [
-            os.path.join(base_path, i)
-            for i in os.listdir(base_path)
-            if os.path.isdir(os.path.join(base_path, i))
-            if i not in stop
-            ]
+        for root, dirs, files in os.walk(base_path):
 
+            dirs[:] = [d for d in dirs if d not in exclude]
 
-        for xx in dirs:
-            for root, _, files in os.walk(xx):
+            if (
+                all(filename.endswith('.pyc') for filename in files)
+                or
+                not files
+                ):
 
-                if (
-                    all(filename.endswith('.pyc') for filename in files)
-                    or
-                    not files
-                    ):
-
-                    try:
-                        shutil.rmtree(root)
-                        print(f"Удалена папка: {root.replace(base_path, '...')}")
-                    except Exception as e:
-                        print(f"Ошибка при удалении папки {root}: {e}")
+                try:
+                    shutil.rmtree(root)
+                    print(f"Удалена папка: {root.replace(base_path, '...')}")
+                except Exception as e:
+                    print(f"Ошибка при удалении папки {root}: {e}")
 
 LangAdmin.start()

@@ -1,48 +1,49 @@
 import os
-import traceback
+import ast
 
+exclude = ["env", "__pycache__"]
 
-class Utils:
-    @classmethod
-    def print_err(cls, error: Exception):
-        tb = traceback.extract_tb(error.__traceback__)
-
-        # Попробуем найти первую строчку стека, которая относится к вашему коду.
-        for trace in tb:
-            filepath = trace.filename
-            filename = os.path.basename(filepath)
-            
-            # Если файл - не стандартный модуль, считаем его основным
-            if not filepath.startswith("<") and filename != "site-packages":
-                line_number = trace.lineno
-                break
-        else:
-            # Если не нашли, то берем последний вызов
-            trace = tb[-1]
-            filepath = trace.filename
-            filename = os.path.basename(filepath)
-            line_number = trace.lineno
-
-        print(f"{filepath}:{line_number}")
-        print(error)
-
-
-class Test:
-    def test_two():
-        raise ZeroDivisionError
+def get_functions_from_files(directory):
+    functions = set()
     
-import sqlalchemy
+    for root, dirs, files in os.walk(directory):
 
-from database import THUMBS, Dbase
+        dirs[:] = [d for d in dirs if d not in exclude]
 
+        for file in files:
+            if file.endswith('.py'):
+                with open(os.path.join(root, file), 'r', encoding='utf-8') as f:
+                    tree = ast.parse(f.read(), filename=file)
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.FunctionDef):
+                            functions.add(node.name)
+    return functions
 
-class More:
-    def __init__(self):
-        try:
-            conn = Dbase.engine.connect()
-            q = sqlalchemy.select(THUMBS)
-            conn.execute(q)
-        except Exception as e:
-            Utils.print_err(error=e)
+def check_function_usage(directory, functions):
+    used_functions = set()
+    
+    for root, dirs, files in os.walk(directory):
 
-a = More()
+        dirs[:] = [d for d in dirs if d not in exclude]
+
+        for file in files:
+            if file.endswith('.py'):
+                with open(os.path.join(root, file), 'r', encoding='utf-8') as f:
+                    tree = ast.parse(f.read(), filename=file)
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+                            if node.func.id in functions:
+                                used_functions.add(node.func.id)
+    
+    unused_functions = functions - used_functions
+    return unused_functions
+
+directory_path = os.path.dirname(__file__)
+all_functions = get_functions_from_files(directory_path)
+# unused_functions = check_function_usage(directory_path, all_functions)
+
+# print("Неиспользованные функции:")
+# for func in unused_functions:
+    # print(func)
+
+print(all_functions)
