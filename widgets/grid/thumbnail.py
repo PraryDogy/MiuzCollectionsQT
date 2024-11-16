@@ -174,4 +174,4 @@ class Thumbnail(QFrame):
             return super().contextMenuEvent(ev)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)

@@ -140,7 +140,7 @@ class Utils:
             cv2.imwrite(output_path, array_img)
             return True
         except Exception as e:
-            # cls.print_err(parent=cls, error=e)
+            # cls.print_err(error=e)
             print("utils can't write img hash")
             return False
         
@@ -150,7 +150,7 @@ class Utils:
             array_img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
             return cls.array_color(array_img, "BGR")
         except Exception as e:
-            # cls.print_err(parent=cls, error= e)
+            # cls.print_err(error= e)
             print("utils > can't read image hash")
             return None
 
@@ -180,7 +180,7 @@ class Utils:
                 img = (img/256).astype(dtype="uint8")
             return img
         except (Exception, tifffile.TiffFileError, RuntimeError, DelayedImportError) as e:
-            Utils.print_err(parent=cls, error=e)
+            Utils.print_err(error=e)
             print("try open tif with PIL")
             return cls.read_tiff_pil(path)
     
@@ -191,7 +191,7 @@ class Utils:
             img: Image = Image.open(path)
             return np.array(img)
         except Exception as e:
-            Utils.print_err(parent=cls, error=e)
+            Utils.print_err(error=e)
             return None
 
     @classmethod
@@ -207,7 +207,7 @@ class Utils:
             return img
 
         except Exception as e:
-            Utils.print_err(cls, e)
+            Utils.print_err(error=e)
             return None
             
     @classmethod
@@ -216,7 +216,7 @@ class Utils:
             image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
             return image
         except (Exception, cv2.error) as e:
-            Utils.print_err(cls, e)
+            Utils.print_err(error=e)
             return None
         
     @classmethod
@@ -234,7 +234,7 @@ class Utils:
             return converted
         
         except Exception as e:
-            Utils.print_err(cls, e)
+            Utils.print_err(error=e)
             return None
 
     @classmethod

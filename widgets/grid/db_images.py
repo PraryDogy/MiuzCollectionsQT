@@ -33,7 +33,7 @@ class DbImages:
             res: list[ tuple[str, str, int, str] ] = conn.execute(stmt).fetchall()
 
         except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.IntegrityError) as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
             conn.rollback()
             ok_ = False
         

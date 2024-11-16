@@ -107,7 +107,7 @@ class WinDownloads(WinChild):
             QTimer.singleShot(1000, self.add_progress_widgets)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
     def connect_(self, wid: Progresser, task: ThreadCopyFiles):
         wid.progress_stop.connect(partial(self.stop_progress, wid, task))
@@ -124,7 +124,7 @@ class WinDownloads(WinChild):
             widget.deleteLater()
             self.copy_threads.remove(task)
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
     
     def change_progress_text(self, widget: Progresser, text: str):
         text = self.cut_text(text)
@@ -132,14 +132,14 @@ class WinDownloads(WinChild):
         try:
             widget.set_text.emit(text)
         except Exception as e:
-            # MainUtils.print_err(parent=self, error=e)
+            # MainUtils.print_err(error=e)
             pass
 
     def change_progress_value(self, widget: Progresser, value: int):
         try:
             widget.set_value.emit(value)
         except Exception as e:
-            # MainUtils.print_err(parent=self, error=e)
+            # MainUtils.print_err(error=e)
             pass
 
     def cut_text(self, text: str):
@@ -163,4 +163,4 @@ class WinDownloads(WinChild):
         try:
             self.progress.setValue(value)
         except (Exception, RuntimeError) as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)

@@ -109,7 +109,7 @@ class CollectionBtn(QLabel):
             return super().contextMenuEvent(ev)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
     def closed_context(self):
         try:
@@ -119,7 +119,7 @@ class CollectionBtn(QLabel):
                 self.setObjectName(Names.menu_btn_selected)
             self.setStyleSheet(Themes.current)
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
     def enterEvent(self, a0: QEvent | None) -> None:
         if self.true_name != ALL_COLLS:
@@ -193,7 +193,7 @@ class BaseLeftMenu(QScrollArea):
             res = (i[0] for i in conn.execute(q).fetchall() if i)
         
         except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
             conn.rollback()
 
         conn.close()

@@ -35,7 +35,7 @@ class ThreadCopyFiles(URunnable):
         try:
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
             self.signals_.value_changed.emit(100)
             self.signals_.finished_.emit(files_dests)
             self.remove_threads()
@@ -75,7 +75,7 @@ class ThreadCopyFiles(URunnable):
                         self.signals_.value_changed.emit(percent)
 
             except Exception as e:
-                Utils.print_err(parent=self, error=e)
+                Utils.print_err(error=e)
                 break
         
         self.signals_.value_changed.emit(100)

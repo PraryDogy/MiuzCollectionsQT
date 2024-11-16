@@ -168,7 +168,7 @@ class WinFrameless(QMainWindow, QObject):
             geo.moveCenter(parent.geometry().center())
             self.setGeometry(geo)
         except (RuntimeError, Exception) as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
     def toggle_fullscreen(self, *args):
         if self.isMaximized():

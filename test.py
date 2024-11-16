@@ -43,6 +43,6 @@ class More:
             q = sqlalchemy.select(THUMBS)
             conn.execute(q)
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
 a = More()

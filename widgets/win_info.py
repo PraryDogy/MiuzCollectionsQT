@@ -70,7 +70,7 @@ class InfoText:
             data.append(filemod)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
         try:
             w, h = get_image_size(self.src)
@@ -80,7 +80,7 @@ class InfoText:
             data.append(resol)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
         try:
             size_ = os.path.getsize(filename=self.src)
@@ -98,10 +98,10 @@ class InfoText:
             data.append(f_size)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
         return data
 

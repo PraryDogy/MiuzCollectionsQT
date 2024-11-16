@@ -21,7 +21,7 @@ class ScanerUtils:
         try:
             SignalsApp.all_.progressbar_set_value.emit(value)
         except RuntimeError as e:
-            Utils.print_err(parent=cls, error=e)
+            Utils.print_err(error=e)
 
     @classmethod
     def reload_gui(cls):
@@ -30,7 +30,7 @@ class ScanerUtils:
                 SignalsApp.all_.reload_menu_left.emit()
                 SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
             except RuntimeError as e:
-                Utils.print_err(parent=cls, error=e)
+                Utils.print_err(error=e)
 
 
 class FinderImages:
@@ -65,7 +65,7 @@ class FinderImages:
                 walked = self.walk_collection(collection)
                 finder_images.extend(walked)
             except TypeError as e:
-                Utils.print_err(parent=self, error=e)
+                Utils.print_err(error=e)
                 continue
         return finder_images
 
@@ -96,7 +96,7 @@ class FinderImages:
             stats = os.stat(path=src)
             return (src, stats.st_size, stats.st_birthtime, stats.st_mtime)
         except FileNotFoundError as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
             return None
 
 
@@ -191,11 +191,11 @@ class DbUpdater:
             try:
                 conn.execute(q)
             except sqlalchemy.exc.IntegrityError as e:
-                Utils.print_err(parent=self, error=e)
+                Utils.print_err(error=e)
                 conn.rollback()
                 continue
             except sqlalchemy.exc.OperationalError as e:
-                Utils.print_err(parent=self, error=e)
+                Utils.print_err(error=e)
                 conn.rollback()
                 conn.close()
                 ok_ = False
@@ -288,11 +288,11 @@ class DbUpdater:
             try:
                 conn.execute(query)
             except sqlalchemy.exc.IntegrityError as e:
-                Utils.print_err(parent=self, error=e)
+                Utils.print_err(error=e)
                 conn.rollback()
                 continue
             except sqlalchemy.exc.OperationalError as e:
-                Utils.print_err(parent=self, error=e)
+                Utils.print_err(error=e)
                 conn.rollback()
                 conn.close()
                 ok_ = False

@@ -56,7 +56,7 @@ class LoadImageThread(URunnable):
                 pixmap = LoadImageThread.images.get(self.src)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
             pixmap = None
 
         if len(LoadImageThread.images) > 50:
@@ -278,7 +278,7 @@ class WinImageView(WinChild):
                 hash_path = conn.execute(q).first()[0]
 
             except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
-                Utils.print_err(parent=self, error=e)
+                Utils.print_err(error=e)
                 conn.rollback()
                 ok_ = False
 
@@ -419,7 +419,7 @@ class WinImageView(WinChild):
             return super().contextMenuEvent(ev)
 
         except Exception as e:
-            Utils.print_err(parent=self, error=e)
+            Utils.print_err(error=e)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2
