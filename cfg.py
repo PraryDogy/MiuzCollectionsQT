@@ -166,9 +166,6 @@ class JsonData:
             print("coll folder:\n", cls.coll_folder)
             print("coll folder list:\n", *[i + "\n" for i in cls.coll_folder_list], "\n")
 
-        if cls.app_ver != APP_VER:
-            print("Версии приложения не совпадают: json / внутренняя:", cls.app_ver, os.sep, APP_VER)
-
     @classmethod
     def write_json_data(cls):
 
@@ -213,6 +210,8 @@ class JsonData:
 
     @classmethod
     def copy_hashdir(cls):
+        print("копирую предустановленную HASH_DIR")
+
         if os.path.exists(HASH_DIR):
             shutil.rmtree(HASH_DIR)
 
@@ -220,7 +219,7 @@ class JsonData:
 
     @classmethod
     def copy_db_file(cls):
-        print("Копирую новую предустановленную БД")
+        print("Копирую предустановленную БД")
 
         os.makedirs(HASH_DIR, exist_ok=True)
 
@@ -236,6 +235,16 @@ class JsonData:
         cls.read_json_data()
         Themes.set_theme(cls.theme)
         cls.dynamic_set_lang(cls.lng_name)
+        print(
+            "Json data init",
+            f"Версии: json/внутренняя: {cls.app_ver}/{APP_VER}",
+            "check app dirs ok",
+            "read json ok",
+            "set theme ok",
+            "set lang ok",
+            "",
+            sep="\n"
+            )
 
 
 class Dynamic:
