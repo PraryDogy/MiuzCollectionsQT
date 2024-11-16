@@ -21,7 +21,6 @@ class DbImage:
 
 class WorkerSignals(QObject):
     finished_ = pyqtSignal(list)
-    dict_ = pyqtSignal(dict)
 
 
 class LoadDbTask(URunnable):
@@ -99,7 +98,6 @@ class DbImages(QObject):
 
     def __init__(self):
         super().__init__()
-        self.signals_ = WorkerSignals()
 
     def get(self):
         self.create_task()
