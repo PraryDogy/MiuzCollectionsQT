@@ -3,7 +3,7 @@ import subprocess
 from collections import defaultdict
 
 import sqlalchemy
-from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
@@ -13,7 +13,7 @@ from cfg import ALL_COLLS, FAVS, LIMIT, MENU_W, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.utils import Utils
+from utils.utils import QThreadPool, URunnable, Utils
 
 from .win_smb import WinSmb
 
