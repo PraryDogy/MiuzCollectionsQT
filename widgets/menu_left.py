@@ -192,7 +192,7 @@ class BaseLeftMenu(QScrollArea):
         conn.close()
 
         if res:
-            res = (i[0] for i in conn.execute(q).fetchall() if i)
+            res = (i[0] for i in res if i)
         else:
             print("widgets > left menu > load db colls > row is empty")
             return menus
