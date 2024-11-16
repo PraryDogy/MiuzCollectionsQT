@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutVer
 from base_widgets.context import ContextCustom
-from cfg import (PIXMAP_SIZE, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic,
-                 JsonData)
+from cfg import (PIXMAP_SIZE, STAR_SYM, TEXT_LENGTH, THUMB_MARGIN, THUMB_W,
+                 Dynamic, JsonData)
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
@@ -57,7 +57,7 @@ class Thumbnail(QFrame):
         if fav == 0:
             self.name = os.path.basename(src)
         elif fav == 1:
-            self.name = "*" + os.path.basename(src)
+            self.name = STAR_SYM + os.path.basename(src)
 
         self.setToolTip(
             f"{Dynamic.lng.collection}: {self.coll}\n"
@@ -119,7 +119,7 @@ class Thumbnail(QFrame):
             self.name = os.path.basename(self.src)
         elif value == 1:
             self.fav = value
-            self.name = "*" + os.path.basename(self.src)
+            self.name = STAR_SYM + os.path.basename(self.src)
 
         self.name_label.name = self.name
         self.name_label.set_text()

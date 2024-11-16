@@ -66,7 +66,7 @@ FAVS: str = "miuzcollections_fav"
 
 GRAY = "rgba(111, 111, 111, 0.5)"
 BLUE = "rgba(0, 122, 255, 1)"
-
+STAR_SYM = "\U00002605" + " "
 
 class JsonData:
     app_ver: str = APP_VER
