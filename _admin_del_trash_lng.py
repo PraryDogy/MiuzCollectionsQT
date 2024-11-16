@@ -6,7 +6,7 @@ from lang import create_all_files
 
 class TrashKeys:
     def __init__(self, json_file: str):
-        exclude = ["_MACOSX", "cv2 backup", "env", "_pycache_"]
+        exclude = ["_MACOSX", "cv2 backup", "env", "_pycache_", "lang"]
         parrent = os.path.dirname(os.path.dirname(__file__))
         pyfiles = []
 

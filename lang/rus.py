@@ -18,7 +18,6 @@ class Rus:
 		self.cust_fltr_names = {'prod': 'Имиджи', 'mod': 'Модели'}
 		self.cut = 'Вырезать'
 		self.d_m_y = 'день.месяц.год'
-		self.date_changed = 'Дата изменения'
 		self.dates = 'Даты'
 		self.detail_menu = 'Стандартное меню'
 		self.download_update = 'Скачать обновление'

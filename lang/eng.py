@@ -18,7 +18,6 @@ class Eng:
 		self.cust_fltr_names = {'prod': 'Product', 'mod': 'Models'}
 		self.cut = 'Cut'
 		self.d_m_y = 'day.month.year'
-		self.date_changed = 'Date changed'
 		self.dates = 'Dates'
 		self.detail_menu = 'Standart menu'
 		self.download_update = 'Update app'
