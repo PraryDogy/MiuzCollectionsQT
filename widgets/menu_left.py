@@ -188,15 +188,14 @@ class BaseLeftMenu(QScrollArea):
 
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(THUMBS.c.coll).distinct()
-
-        try:
-            res = (i[0] for i in conn.execute(q).fetchall() if i)
-        
-        except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
-            Utils.print_err(error=e)
-            conn.rollback()
-
+        res = conn.execute(q).fetchall()
         conn.close()
+
+        if res:
+            res = (i[0] for i in conn.execute(q).fetchall() if i)
+        else:
+            print("widgets > left menu > load db colls > row is empty")
+            return menus
 
         for true_name in res:
             fake_name = true_name.lstrip("0123456789").strip()
