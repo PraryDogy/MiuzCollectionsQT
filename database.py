@@ -55,7 +55,6 @@ class Dbase:
             f"ehco: {cls._echo}",
             f"check same thread: {cls._same_thread}",
             f"timeout: {cls._timeout}",
-            "",
             sep="\n"
             )
 

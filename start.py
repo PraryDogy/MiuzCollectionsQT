@@ -66,6 +66,8 @@ class App(QApplication):
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: SignalsApp.all_.win_main_cmd.emit("exit"))
 
+        print("q application started")
+
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
             if hasattr(SignalsApp.all_, "win_main_cmd"):

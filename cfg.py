@@ -242,7 +242,6 @@ class JsonData:
             "read json ok",
             "set theme ok",
             "set lang ok",
-            "",
             sep="\n"
             )
 
