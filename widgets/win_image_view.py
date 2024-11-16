@@ -32,7 +32,29 @@ class WorkerSignals(QObject):
     finished_ = pyqtSignal(object)
 
 
-class LoadImageThread(URunnable):
+class LoadThumb(URunnable):
+    def __init__(self, src: str):
+        super().__init__()
+        self.signals_ = WorkerSignals()
+        self.src = src
+
+    def run(self):
+        small_src = self.src.replace(JsonData.coll_folder, "")
+
+        conn = Dbase.engine.connect()
+        q = (sqlalchemy.select(THUMBS.c.hash_path).where(THUMBS.c.src == small_src))
+        res = conn.execute(q).scalar()
+        conn.close()
+
+        if res:
+            small_img = Utils.read_image_hash(res)
+            pixmap = Utils.pixmap_from_array(small_img)
+        else:
+            pixmap = QPixmap(1, 1)
+            pixmap.fill(QColor(128, 128, 128))
+
+
+class LoadImage(URunnable):
     images: dict[str, QPixmap] = {}
 
     def __init__(self, src: str):
@@ -42,25 +64,26 @@ class LoadImageThread(URunnable):
 
     @URunnable.set_running_state
     def run(self):
-        try:
-            if self.src not in LoadImageThread.images:
-                img = Utils.read_image(self.src)
 
-                if not self.src.endswith(PSD_TIFF):
-                    img = Utils.array_color(img, "BGR")
+        if self.src not in LoadImage.images:
+            img = Utils.read_image(self.src)
 
-                pixmap = Utils.pixmap_from_array(img)
-                LoadImageThread.images[self.src] = pixmap
+            if not self.src.endswith(PSD_TIFF):
+                img = Utils.array_color(img, "BGR")
 
-            else:
-                pixmap = LoadImageThread.images.get(self.src)
+            pixmap = Utils.pixmap_from_array(img)
+            LoadImage.images[self.src] = pixmap
 
-        except Exception as e:
-            Utils.print_err(error=e)
-            pixmap = None
+        else:
+            pixmap = LoadImage.images.get(self.src)
 
-        if len(LoadImageThread.images) > 50:
-            LoadImageThread.images.pop(next(iter(LoadImageThread.images)))
+        if pixmap is None:
+            print("не могу загрузить крупное изображение")
+            pixmap = QPixmap(1, 1)
+            pixmap.fill(QColor(128, 128, 128))
+
+        if len(LoadImage.images) > 50:
+            LoadImage.images.pop(next(iter(LoadImage.images)))
 
         image_data = ImageData(self.src, pixmap.width(), pixmap)
         self.signals_.finished_.emit(image_data)
@@ -264,7 +287,7 @@ class WinImageView(WinChild):
 
     def load_thumbnail(self):
 
-        if self.src not in LoadImageThread.images:
+        if self.src not in LoadImage.images:
             self.set_titlebar_title(Dynamic.lng.loading)
 
             # преобразуем полный путь в относительный для работы в ДБ
@@ -290,7 +313,7 @@ class WinImageView(WinChild):
             print("img viewer > no smb", self.src)
 
     def load_image_thread(self):
-        img_thread = LoadImageThread(self.src)
+        img_thread = LoadImage(self.src)
         img_thread.signals_.finished_.connect(self.load_image_finished)
         UThreadPool.pool.start(img_thread)
 
@@ -303,7 +326,7 @@ class WinImageView(WinChild):
             self.set_image_title()
 
     def close_(self, *args):
-        LoadImageThread.images.clear()
+        LoadImage.images.clear()
         Dynamic.image_viewer = None
         self.close()
 
