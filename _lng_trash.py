@@ -6,8 +6,10 @@ from lang import create_all_files
 
 class TrashKeys:
     def __init__(self, json_file: str):
-        exclude = ["_MACOSX", "cv2 backup", "env", "_pycache_", "lang"]
+
+        exclude = ["_MACOSX", "env", "__pycache__", "lang"]
         parrent = os.path.dirname(os.path.dirname(__file__))
+
         pyfiles = []
 
         for root, dirs, files in os.walk(top=parrent, topdown=True):
@@ -16,35 +18,38 @@ class TrashKeys:
                 if file.endswith(".py"):
                     pyfiles.append(os.path.join(root, file))
 
-        json_data: dict = {}
-
         with open(json_file, "r", encoding="utf-8") as f:
             json_data: dict = json.load(f)
 
-        self.trash_keys = {i: 0 for i in json_data}
+        lng_keys = list(json_data.keys())
+        lng_keys.remove("name")
 
-        for py in pyfiles:
-            with open(file=py, mode="r") as py_f:
+        prefix = "Dynamic.lng."
+        lng_keys = {prefix + i: 0 for i in lng_keys}
+
+        for py_file in pyfiles:
+
+            with open(file=py_file, mode="r") as py_f:
                 py_text = py_f.read()
 
-                for lng_key in json_data:
+            for i in lng_keys.keys():
 
-                    if f"lng.{lng_key}" in py_text:
-                        self.trash_keys[lng_key] = +1
+                if i in py_text:
+                    lng_keys[i] += 1
 
-        self.trash_keys = [k for k, v in self.trash_keys.items() if v == 0]
-        self.trash_keys.remove("name")
+        lng_keys: list[str] = [k for k, v in lng_keys.items() if v == 0]
 
         print()
-        print("unused lang keys: ", self.trash_keys)
-        print("do you want to delete all this keys? 1 = yes, 2 = no")
+        print("unused lang keys: ", *lng_keys, sep="\n")
+        print("do you want to delete all this keys? 1 = yes")
         print()
 
-        res = int(input())
+        res = input()
 
-        if res == 1:
+        if res == "1":
 
-            for i in self.trash_keys:
+            for i in lng_keys:
+                i = i.replace(prefix, "")
                 json_data.pop(i)    
 
             with open(json_file, "w", encoding="utf-8") as f:
@@ -54,7 +59,7 @@ class TrashKeys:
 
             print("DONE remove trash keys")
 
-        else:
+        elif res != 1:
             print("canceled")
 
 TrashKeys("lang/lang.json")

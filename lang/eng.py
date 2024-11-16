@@ -8,7 +8,6 @@ class Eng:
 		self.cancel = 'Cancel'
 		self.changed = 'Changed'
 		self.choose_coll_smb = 'Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings.'
-		self.close = 'Close'
 		self.collection = 'Collection'
 		self.compact_menu = 'Compact menu'
 		self.copy = 'Copy'
@@ -23,13 +22,10 @@ class Eng:
 		self.download_update = 'Update app'
 		self.end = 'End'
 		self.file_name = 'Filename'
-		self.file_path = 'Location'
 		self.file_size = 'Size'
-		self.in_finder = 'in Finder'
 		self.info = 'Info'
 		self.lang_label = 'Language/Язык'
 		self.loading = 'Loading...'
-		self.mb = 'mb'
 		self.months = {'1': 'January', '2': 'February', '3': 'March', '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August', '9': 'September', '10': 'October', '11': 'November', '12': 'December'}
 		self.months_genitive_case = {'1': 'january', '2': 'february', '3': 'march', '4': 'april', '5': 'may', '6': 'june', '7': 'july', '8': 'august', '9': 'september', '10': 'october', '11': 'november', '12': 'december'}
 		self.name = 'en'
@@ -47,7 +43,6 @@ class Eng:
 		self.reset_dates = 'Dates reset'
 		self.reset_search = 'Reset search'
 		self.resol = 'Resolution'
-		self.resolution = 'Resolution'
 		self.restore_db = 'Restore DB'
 		self.reveal = 'Reveal'
 		self.reveal_in_finder = 'Reveal in Finder'
@@ -65,7 +60,6 @@ class Eng:
 		self.show_all = 'Show all'
 		self.show_app_support = 'Show files'
 		self.show_more = 'Show more'
-		self.smb_descr = 'Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Start'
 		self.sys_fltr_names = {'other': 'Other'}
 		self.title_downloads = 'Downloads'

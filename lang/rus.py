@@ -8,7 +8,6 @@ class Rus:
 		self.cancel = 'Отмена'
 		self.changed = 'Изменен'
 		self.choose_coll_smb = 'Возможные решения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках.'
-		self.close = 'Закрыть'
 		self.collection = 'Коллекция'
 		self.compact_menu = 'Компактное меню'
 		self.copy = 'Копировать'
@@ -23,13 +22,10 @@ class Rus:
 		self.download_update = 'Скачать обновление'
 		self.end = 'Конец'
 		self.file_name = 'Имя файла'
-		self.file_path = 'Расположение'
 		self.file_size = 'Размер'
-		self.in_finder = 'в Finder'
 		self.info = 'Инфо'
 		self.lang_label = 'Язык/Language'
 		self.loading = 'Загрузка...'
-		self.mb = 'мб'
 		self.months = {'1': 'Январь', '2': 'Февраль', '3': 'Март', '4': 'Апрель', '5': 'Май', '6': 'Июнь', '7': 'Июль', '8': 'Август', '9': 'Сентябрь', '10': 'Октябрь', '11': 'Ноябрь', '12': 'Декабрь'}
 		self.months_genitive_case = {'1': 'января', '2': 'февраля', '3': 'марта', '4': 'апреля', '5': 'мая', '6': 'июня', '7': 'июля', '8': 'августа', '9': 'сентября', '10': 'октября', '11': 'ноября', '12': 'декабря'}
 		self.name = 'ru'
@@ -47,7 +43,6 @@ class Rus:
 		self.reset_dates = 'Сбросить даты'
 		self.reset_search = 'Очистить поиск'
 		self.resol = 'Разрешение'
-		self.resolution = 'Разрешение'
 		self.restore_db = 'Восстановить БД'
 		self.reveal = 'Показать'
 		self.reveal_in_finder = 'Показать в Finder'
@@ -65,7 +60,6 @@ class Rus:
 		self.show_all = 'Показать все'
 		self.show_app_support = 'Показать файлы'
 		self.show_more = 'Позазать еще'
-		self.smb_descr = 'Коллекции недоступны.\nВозможные причины:\n\n- Нет подключения к интернету\n- Нет подключения к сетевому диску\n- Неправильно указано расположение коллекций\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh'
 		self.start = 'Начало'
 		self.sys_fltr_names = {'other': 'Остальное'}
 		self.title_downloads = 'Загрузки'

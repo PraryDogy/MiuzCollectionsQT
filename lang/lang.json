@@ -19,10 +19,6 @@
         "Возможные решения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках.",
         "Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings."
     ],
-    "close": [
-        "Закрыть",
-        "Close"
-    ],
     "collection": [
         "Коллекция",
         "Collection"
@@ -81,17 +77,9 @@
         "Имя файла",
         "Filename"
     ],
-    "file_path": [
-        "Расположение",
-        "Location"
-    ],
     "file_size": [
         "Размер",
         "Size"
-    ],
-    "in_finder": [
-        "в Finder",
-        "in Finder"
     ],
     "info": [
         "Инфо",
@@ -104,10 +92,6 @@
     "loading": [
         "Загрузка...",
         "Loading..."
-    ],
-    "mb": [
-        "мб",
-        "mb"
     ],
     "months": [
         {
@@ -217,10 +201,6 @@
         "Очистить поиск",
         "Reset search"
     ],
-    "resolution": [
-        "Разрешение",
-        "Resolution"
-    ],
     "reveal": [
         "Показать",
         "Reveal"
@@ -268,10 +248,6 @@
     "show_more": [
         "Позазать еще",
         "Show more"
-    ],
-    "smb_descr": [
-        "Коллекции недоступны.\nВозможные причины:\n\n- Нет подключения к интернету\n- Нет подключения к сетевому диску\n- Неправильно указано расположение коллекций\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh",
-        "Collections are not available.\nPossible reasons:\n\n- No internet connection\n- No connection to the network drive\n- Incorrect location of collections specified\n\nSupport: loshkarev@miuz.ru\nTelegram: evlosh"
     ],
     "start": [
         "Начало",
