@@ -257,7 +257,8 @@ class DbUpdater:
                     "birth": birth,
                     "mod": mod,
                     "resol": resol,
-                    "coll": Utils.get_coll_name(src)
+                    "coll": Utils.get_coll_name(src),
+                    "fav": 0
                     }
 
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
