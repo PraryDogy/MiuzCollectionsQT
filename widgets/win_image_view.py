@@ -53,6 +53,9 @@ class LoadThumb(URunnable):
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(128, 128, 128))
 
+        image_data = ImageData(self.src, pixmap.width(), pixmap)
+        self.signals_.finished_.emit(image_data)
+
 
 class LoadImage(URunnable):
     images: dict[str, QPixmap] = {}
@@ -290,29 +293,21 @@ class WinImageView(WinChild):
         if self.src not in LoadImage.images:
             self.set_titlebar_title(Dynamic.lng.loading)
 
-            # преобразуем полный путь в относительный для работы в ДБ
-            small_src = self.src.replace(JsonData.coll_folder, "")
+            task = LoadThumb(self.src)
+            task.signals_.finished_.connect(self.load_thumb_fin)
+            UThreadPool.pool.start(task)
 
-            conn = Dbase.engine.connect()
-            q = (sqlalchemy.select(THUMBS.c.hash_path).where(THUMBS.c.src == small_src))
-            res = conn.execute(q).scalar()
-            conn.close()
+    def load_thumb_fin(self, data: ImageData):
+        if data.src == self.src and data.width > 0:
+            self.image_label.set_image(data.pixmap)
 
-            if res:
-                small_img = Utils.read_image_hash(res)
-                pixmap = Utils.pixmap_from_array(small_img)
-            else:
-                pixmap = QPixmap(1, 1)
-                pixmap.fill(QColor(128, 128, 128))
-
-            self.image_label.set_image(pixmap)
-
-        if Utils.smb_check():
-            self.load_image_thread()
+            if Utils.smb_check():
+                self.load_image()
         else:
-            print("img viewer > no smb", self.src)
+            print("img viewer > no smb")
 
-    def load_image_thread(self):
+
+    def load_image(self):
         img_thread = LoadImage(self.src)
         img_thread.signals_.finished_.connect(self.load_image_finished)
         UThreadPool.pool.start(img_thread)
