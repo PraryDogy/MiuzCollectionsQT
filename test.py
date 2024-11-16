@@ -1,20 +1,48 @@
 import os
-from cfg import IMG_EXT
+import traceback
 
-images = "/Users/Morkowik/Desktop/Evgeny/sample images"
-hash = "/Users/Morkowik/Library/Application Support/MiuzCollectionsQT/hashdir"
 
-images_len = 0
-hash_len = 0
+class Utils:
+    @classmethod
+    def print_err(cls, error: Exception):
+        tb = traceback.extract_tb(error.__traceback__)
 
-# for root, dir, files in os.walk(images):
-#     for file in files:
-#         if file.endswith(IMG_EXT):
-#             images_len += 1
+        # Попробуем найти первую строчку стека, которая относится к вашему коду.
+        for trace in tb:
+            filepath = trace.filename
+            filename = os.path.basename(filepath)
+            
+            # Если файл - не стандартный модуль, считаем его основным
+            if not filepath.startswith("<") and filename != "site-packages":
+                line_number = trace.lineno
+                break
+        else:
+            # Если не нашли, то берем последний вызов
+            trace = tb[-1]
+            filepath = trace.filename
+            filename = os.path.basename(filepath)
+            line_number = trace.lineno
 
-# for root, dir, files in os.walk(hash):
-#     for file in files:
-#         hash_len += 1
+        print(f"{filepath}:{line_number}")
+        print(error)
 
-# print("src", images_len)
-# print("hash", hash_len)
+
+class Test:
+    def test_two():
+        raise ZeroDivisionError
+    
+import sqlalchemy
+
+from database import THUMBS, Dbase
+
+
+class More:
+    def __init__(self):
+        try:
+            conn = Dbase.engine.connect()
+            q = sqlalchemy.select(THUMBS)
+            conn.execute(q)
+        except Exception as e:
+            Utils.print_err(parent=self, error=e)
+
+a = More()

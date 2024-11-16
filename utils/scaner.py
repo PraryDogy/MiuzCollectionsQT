@@ -24,17 +24,8 @@ class ScanerUtils:
             Utils.print_err(parent=cls, error=e)
 
     @classmethod
-    def conn_commit(cls, conn: sqlalchemy.Connection):
-
+    def reload_gui(cls):
         if cls.can_scan:
-
-            try:
-                conn.commit()
-            except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
-                Utils.print_err(parent=cls, error=e)
-                conn.rollback()
-                return
-
             try:
                 SignalsApp.all_.reload_menu_left.emit()
                 SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
@@ -211,11 +202,14 @@ class DbUpdater:
                 break
             
         if ok_:
+
+            conn.commit()
+            conn.close()
+
             for hash_path in self.del_items:
                 os.remove(hash_path)
 
-            ScanerUtils.conn_commit(conn)
-            conn.close()
+            ScanerUtils.reload_gui()
 
     def get_small_img(self, src: str) -> tuple[ndarray, str] | None:
         array_img = Utils.read_image(src)
@@ -305,11 +299,13 @@ class DbUpdater:
                 break
             
         if ok_:
+            conn.commit()
+            conn.close()
+
             for hash_path, img_array in self.hash_images:
                 Utils.write_image_hash(hash_path, img_array)
 
-            ScanerUtils.conn_commit(conn)
-            conn.close()
+            ScanerUtils.reload_gui()
 
 
 class WorkerSignals(QObject):

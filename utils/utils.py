@@ -51,7 +51,7 @@ class URunnable(QRunnable):
 class Utils:
 
     @classmethod
-    def print_err(cls, parent: object, error: Exception):
+    def print_err(cls, error: Exception):
         tb = traceback.extract_tb(error.__traceback__)
 
         # Попробуем найти первую строчку стека, которая относится к вашему коду.
@@ -70,16 +70,8 @@ class Utils:
             filename = os.path.basename(filepath)
             line_number = trace.lineno
 
-        class_name = parent.__class__.__name__
-        error_message = str(error)
-
-        print()
-        print("#" * 100)
         print(f"{filepath}:{line_number}")
-        print()
-        print("ERROR:", error_message)
-        print("#" * 100)
-        print()
+        print(error)
 
     @classmethod
     def smb_check(cls) -> bool:
