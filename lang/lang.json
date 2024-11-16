@@ -360,5 +360,9 @@
     "del_fav": [
         "Удалить из избранного",
         "Remove from favorites"
+    ],
+    "fav_coll": [
+        "Избранное",
+        "Favorites"
     ]
 }

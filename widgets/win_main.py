@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
-from cfg import ALL_COLLS, Dynamic, JsonData
+from cfg import ALL_COLLS, Dynamic, JsonData, FAVS
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
@@ -90,16 +90,26 @@ class WinMain(WinFrameless):
         grid.setFocus()
 
     def win_main_cmd(self, flag: str):
+
         if flag == "show":
             self.show()
+
         elif flag == "exit":
             self.on_exit()
+
         elif flag == "set_title":
-            self.set_titlebar_title(
-                Dynamic.lng.all_colls
-                if JsonData.curr_coll == ALL_COLLS
-                else JsonData.curr_coll
-                )
+
+            if JsonData.curr_coll == ALL_COLLS:
+                t = Dynamic.lng.all_colls
+
+            elif JsonData.curr_coll == FAVS:
+                t = Dynamic.lng.fav_coll
+
+            else:
+                t = JsonData.curr_coll
+
+            self.set_titlebar_title(t)
+
         else: 
             raise Exception("app > win main > wrong flag", flag)
 

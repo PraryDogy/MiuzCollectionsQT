@@ -23,6 +23,7 @@ class Rus:
 		self.detail_menu = 'Стандартное меню'
 		self.download_update = 'Скачать обновление'
 		self.end = 'Конец'
+		self.fav_coll = 'Избранное'
 		self.file_name = 'Имя файла'
 		self.file_size = 'Размер'
 		self.info = 'Инфо'

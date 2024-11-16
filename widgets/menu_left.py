@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer
-from cfg import ALL_COLLS, LIMIT, MENU_W, Dynamic, JsonData
+from cfg import ALL_COLLS, FAVS, LIMIT, MENU_W, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
@@ -156,12 +156,20 @@ class BaseLeftMenu(QScrollArea):
                               true_name=ALL_COLLS)
         main_btns_layout.addWidget(label)
 
+        label = CollectionBtn(parent=self, fake_name=Dynamic.lng.fav_coll,
+                              true_name=FAVS)
+        main_btns_layout.addWidget(label)
+
         self.v_layout.addWidget(btns_widget)
 
         if JsonData.small_menu_view:
             for letter, collections in self.load_colls_query().items():
                 for coll in collections:
-                    label = CollectionBtn(parent=self, fake_name=coll["fake_name"], true_name=coll["true_name"])
+                    label = CollectionBtn(
+                        parent=self,
+                        fake_name=coll["fake_name"],
+                        true_name=coll["true_name"]
+                        )
                     self.v_layout.addWidget(label)
         else:
             for letter, collections in self.load_colls_query().items():
@@ -173,7 +181,11 @@ class BaseLeftMenu(QScrollArea):
                 self.v_layout.addWidget(test)
 
                 for coll in collections:
-                    label = CollectionBtn(parent=self, fake_name=coll["fake_name"], true_name=coll["true_name"])
+                    label = CollectionBtn(
+                        parent=self,
+                        fake_name=coll["fake_name"],
+                        true_name=coll["true_name"]
+                        )
                     self.v_layout.addWidget(label)
 
         self.v_layout.addSpacerItem(QSpacerItem(0, 5))

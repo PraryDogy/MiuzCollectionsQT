@@ -23,6 +23,7 @@ class Eng:
 		self.detail_menu = 'Standart menu'
 		self.download_update = 'Update app'
 		self.end = 'End'
+		self.fav_coll = 'Favorites'
 		self.file_name = 'Filename'
 		self.file_size = 'Size'
 		self.info = 'Info'

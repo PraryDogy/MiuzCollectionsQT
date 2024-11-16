@@ -78,11 +78,11 @@ class DbImages:
         q = q.limit(Dynamic.current_photo_limit)
         q = q.order_by(-THUMBS.c.mod)
 
-        if JsonData.curr_coll != ALL_COLLS:
-            q = q.where(THUMBS.c.coll == JsonData.curr_coll)
-
-        elif JsonData.curr_coll == FAVS:
+        if JsonData.curr_coll == FAVS:
             q = q.where(THUMBS.c.fav == 1)
+
+        elif JsonData.curr_coll != ALL_COLLS:
+            q = q.where(THUMBS.c.coll == JsonData.curr_coll)
 
         if Dynamic.search_widget_text:
             search = Dynamic.search_widget_text.replace("\n", "").strip()
