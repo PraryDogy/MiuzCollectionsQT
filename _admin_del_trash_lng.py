@@ -29,7 +29,6 @@ class TrashKeys:
 
                 for lng_key in json_data:
 
-                    # lng is cfg.Config.lng variable
                     if f"lng.{lng_key}" in py_text:
                         self.trash_keys[lng_key] = +1
 
