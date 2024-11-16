@@ -6,6 +6,7 @@ class Eng:
 		self.bar_menu = 'Menu'
 		self.browse = 'Browse'
 		self.cancel = 'Cancel'
+		self.changed = 'Changed'
 		self.choose_coll_smb = 'Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings.'
 		self.close = 'Close'
 		self.collection = 'Collection'
@@ -44,10 +45,12 @@ class Eng:
 		self.paste = 'Paste'
 		self.photo = 'Photo'
 		self.photos_named_dates = 'Photo from'
+		self.place = 'Place'
 		self.reload_gui = 'Update'
 		self.reset = 'Reset'
 		self.reset_dates = 'Dates reset'
 		self.reset_search = 'Reset search'
+		self.resol = 'Resolution'
 		self.resolution = 'Resolution'
 		self.restore_db = 'Restore DB'
 		self.reveal = 'Reveal'
@@ -71,6 +74,7 @@ class Eng:
 		self.sys_fltr_names = {'other': 'Other'}
 		self.title_downloads = 'Downloads'
 		self.total = 'Total'
+		self.type_ = 'Type'
 		self.view = 'View'
 		self.wait_update = 'Wait...'
 		self.weekdays = {'0': 'monday', '1': 'tuesday', '2': 'wednesday', '3': 'thursday', '4': 'friday', '5': 'saturday', '6': 'sunday'}

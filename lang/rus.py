@@ -6,6 +6,7 @@ class Rus:
 		self.bar_menu = 'Меню'
 		self.browse = 'Обзор'
 		self.cancel = 'Отмена'
+		self.changed = 'Изменен'
 		self.choose_coll_smb = 'Возможные решения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках.'
 		self.close = 'Закрыть'
 		self.collection = 'Коллекция'
@@ -44,10 +45,12 @@ class Rus:
 		self.paste = 'Вставить'
 		self.photo = 'Фото'
 		self.photos_named_dates = 'Фото за даты'
+		self.place = 'Место'
 		self.reload_gui = 'Обновить'
 		self.reset = 'Сброс'
 		self.reset_dates = 'Сбросить даты'
 		self.reset_search = 'Очистить поиск'
+		self.resol = 'Разрешение'
 		self.resolution = 'Разрешение'
 		self.restore_db = 'Восстановить БД'
 		self.reveal = 'Показать'
@@ -71,6 +74,7 @@ class Rus:
 		self.sys_fltr_names = {'other': 'Остальное'}
 		self.title_downloads = 'Загрузки'
 		self.total = 'Всего'
+		self.type_ = 'Тип'
 		self.view = 'Просмотр'
 		self.wait_update = 'Подождите...'
 		self.weekdays = {'0': 'понедельник', '1': 'вторник', '2': 'среда', '3': 'четверг', '4': 'пятница', '5': 'суббота', '6': 'воскресенье'}

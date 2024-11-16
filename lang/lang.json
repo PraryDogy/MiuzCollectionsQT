@@ -376,5 +376,21 @@
     "reload_gui": [
         "Обновить",
         "Update"
+    ],
+    "resol": [
+        "Разрешение",
+        "Resolution"
+    ],
+    "changed": [
+        "Изменен",
+        "Changed"
+    ],
+    "place": [
+        "Место",
+        "Place"
+    ],
+    "type_": [
+        "Тип",
+        "Type"
     ]
 }
