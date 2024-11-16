@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QWidget
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from utils.copy_files import ThreadCopyFiles
+from utils.scaner import Scaner
 from utils.utils import UThreadPool, Utils
 
 from .win_info import WinInfo
@@ -43,6 +44,16 @@ class OpenInView(CustomAction):
 
     def cmd(self, *args):
         SignalsApp.all_.win_img_view_open_in.emit(self.parent_)
+
+
+class ReloadGui(CustomAction):
+    def __init__(self, parent: QWidget, src: str):
+        super().__init__(parent, src, Dynamic.lng.reload_gui)
+        self.triggered.connect(self.cmd)
+
+    def cmd(self, *args):
+        Scaner.stop()
+        Scaner.start()
 
 
 class OpenInfo(CustomAction):

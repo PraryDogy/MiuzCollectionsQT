@@ -12,7 +12,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
 
-from ..actions import CopyPath, OpenInfo, OpenInView, Reveal, Save
+from ..actions import CopyPath, OpenInfo, OpenInView, Reveal, Save, ReloadGui
 
 
 class NameLabel(QLabel):
@@ -146,32 +146,37 @@ class Thumbnail(QFrame):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
-            self.menu_ = ContextCustom(event=ev)
+            menu_ = ContextCustom(event=ev)
 
             view = OpenInView(parent=self, src=self.src)
-            self.menu_.addAction(view)
+            menu_.addAction(view)
 
             info = OpenInfo(parent=self, src=self.src)
-            self.menu_.addAction(info)
+            menu_.addAction(info)
 
-            self.menu_.addSeparator()
+            menu_.addSeparator()
 
             copy = CopyPath(parent=self, src=self.src)
-            self.menu_.addAction(copy)
+            menu_.addAction(copy)
 
             reveal = Reveal(parent=self, src=self.src)
-            self.menu_.addAction(reveal)
+            menu_.addAction(reveal)
 
             save_as = Save(parent=self, src=self.src, save_as=True)
-            self.menu_.addAction(save_as)
+            menu_.addAction(save_as)
 
             save = Save(parent=self, src=self.src, save_as=False)
-            self.menu_.addAction(save)
+            menu_.addAction(save)
+
+            menu_.addSeparator()
+
+            reload = ReloadGui(parent=self, src=self.src)
+            menu_.addAction(reload)
 
             self.select.emit(self.src)
-            self.menu_.show_menu()
+            menu_.show_menu()
 
-            return super().contextMenuEvent(ev)
+            # return super().contextMenuEvent(ev)
 
         except Exception as e:
             Utils.print_err(error=e)

@@ -1,13 +1,14 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
-from base_widgets import LayoutHor, LayoutVer
+from base_widgets import ContextCustom, LayoutHor, LayoutVer
 from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
 
+from ..actions import ReloadGui
 from ..win_info import WinInfo
 from ..win_smb import WinSmb
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
@@ -295,3 +296,11 @@ class Grid(QScrollArea):
         self.resize_timer.start(500)
         self.up_btn.setVisible(False)
         return super().resizeEvent(a0)
+
+    def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
+        self.menu_ = ContextCustom(event=a0)
+
+        reload = ReloadGui(self.menu_, "")
+        self.menu_.addAction(reload)
+
+        self.menu_.show_menu()
