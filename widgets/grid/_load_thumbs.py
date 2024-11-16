@@ -10,11 +10,12 @@ from utils.utils import Utils
 
 
 class DbImage:
-    __slots__ = ["pixmap", "src", "coll"]
-    def __init__(self, pixmap: QPixmap, src: str, coll: str):
+    __slots__ = ["pixmap", "src", "coll", "fav"]
+    def __init__(self, pixmap: QPixmap, src: str, coll: str, fav: int):
         self.pixmap = pixmap
         self.src = src
         self.coll = coll
+        self.fav = fav
 
 
 class DbImages:
@@ -28,7 +29,7 @@ class DbImages:
 
         conn = Dbase.engine.connect()
         stmt = self._get_stmt()
-        res: list[ tuple[str, str, int, str] ] = conn.execute(stmt).fetchall()        
+        res: list[tuple[str, str, int, str, int]] = conn.execute(stmt).fetchall()        
         conn.close()
 
         thumbs_dict = defaultdict(list[DbImage])
@@ -36,7 +37,7 @@ class DbImages:
         if not res:
             return  {}
 
-        for src, hash_path, mod, coll in res:
+        for src, hash_path, mod, coll, fav in res:
 
             # создаем полный путь из относительного из ДБ
             src = JsonData.coll_folder + src
@@ -46,15 +47,17 @@ class DbImages:
             if array_img is None:
                 print("db images > create dict > can't load image")
                 return thumbs_dict
+
             else:
                 pixmap = Utils.pixmap_from_array(array_img)
 
             if Dynamic.date_start or Dynamic.date_end:
                 mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
+
             else:
                 mod = f"{Dynamic.lng.months[str(mod.month)]} {mod.year}"
 
-            thumbs_dict[mod].append(DbImage(pixmap, src, coll))
+            thumbs_dict[mod].append(DbImage(pixmap, src, coll, fav))
 
         return thumbs_dict
 
@@ -63,7 +66,7 @@ class DbImages:
         end = datetime.combine(Dynamic.date_end, datetime.max.time().replace(microsecond=0))
         return datetime.timestamp(start), datetime.timestamp(end)
 
-    def _get_stmt(self):
+    def _get_stmt(self) -> sqlalchemy.Select:
         q = sqlalchemy.select(
             THUMBS.c.src,
             THUMBS.c.hash_path,
