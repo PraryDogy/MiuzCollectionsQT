@@ -1,12 +1,15 @@
 import os
 
+import sqlalchemy
+from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QWidget
 
 from cfg import Dynamic, JsonData
+from database import THUMBS, Dbase
 from signals import SignalsApp
 from utils.copy_files import ThreadCopyFiles
 from utils.scaner import Scaner
-from utils.utils import UThreadPool, Utils
+from utils.utils import URunnable, UThreadPool, Utils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -91,6 +94,63 @@ class Reveal(CustomAction):
             Utils.reveal_files([self.src])
         else:
             Shared.show_smb(self.parent_)
+
+
+class WorkerSignals(QObject):
+    finished_ = pyqtSignal(bool)
+
+
+class FavTask(URunnable):
+    def __init__(self, src: str, value: int):
+        super().__init__()
+        self.signals_ = WorkerSignals()
+        self.src = src.replace(JsonData.coll_folder, "")
+        self.value = value
+
+    def run(self):
+        values = {"fav": self.value}
+        q = sqlalchemy.update(THUMBS).where(THUMBS.c.src==self.src)
+        q = q.values(**values)
+
+        conn = Dbase.engine.connect()
+
+        try:
+            conn.execute(q)
+            conn.commit()
+            self.signals_.finished_.emit(True)
+        except Exception as e:
+            Utils.print_err(error=e)
+            conn.rollback()
+            self.signals_.finished_.emit(False)
+
+        conn.close()
+
+
+class AddFav(CustomAction):
+    finished_ = pyqtSignal(bool)
+
+    def __init__(self, parent: QWidget, src: str):
+        super().__init__(parent, src, Dynamic.lng.add_fav)
+        self.value = 1
+
+    def cmd_(self):
+        task = FavTask(self.src, self.value)
+        task.signals_.finished_.connect(self.finished_.emit)
+        UThreadPool.pool.start(task)
+
+
+class DelFav(CustomAction):
+    finished_ = pyqtSignal(bool)
+
+    def __init__(self, parent: QWidget, src: str):
+        super().__init__(parent, src, Dynamic.lng.del_fav)
+        self.value = 0
+
+    def cmd_(self):
+        task = FavTask(self.src, self.value)
+        task.signals_.finished_.connect(self.finished_.emit)
+        UThreadPool.pool.start(task)
+
 
 class Save(CustomAction):
     def __init__(self, parent: QWidget, src: str, save_as: bool):

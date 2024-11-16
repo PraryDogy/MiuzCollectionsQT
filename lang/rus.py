@@ -1,6 +1,7 @@
 class Rus:
 	def __init__(self):
 		super().__init__()
+		self.add_fav = 'Добавить в избранное'
 		self.all_colls = 'Все коллекции'
 		self.apply = 'Применить'
 		self.bar_menu = 'Меню'
@@ -18,6 +19,7 @@ class Rus:
 		self.cut = 'Вырезать'
 		self.d_m_y = 'день.месяц.год'
 		self.dates = 'Даты'
+		self.del_fav = 'Удалить из избранного'
 		self.detail_menu = 'Стандартное меню'
 		self.download_update = 'Скачать обновление'
 		self.end = 'Конец'

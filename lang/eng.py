@@ -1,6 +1,7 @@
 class Eng:
 	def __init__(self):
 		super().__init__()
+		self.add_fav = 'Add to favorites'
 		self.all_colls = 'All collections'
 		self.apply = 'Apply'
 		self.bar_menu = 'Menu'
@@ -18,6 +19,7 @@ class Eng:
 		self.cut = 'Cut'
 		self.d_m_y = 'day.month.year'
 		self.dates = 'Dates'
+		self.del_fav = 'Remove from favorites'
 		self.detail_menu = 'Standart menu'
 		self.download_update = 'Update app'
 		self.end = 'End'

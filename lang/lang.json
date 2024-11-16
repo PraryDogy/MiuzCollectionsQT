@@ -352,5 +352,13 @@
     "type_": [
         "Тип",
         "Type"
+    ],
+    "add_fav": [
+        "Добавить в избранное",
+        "Add to favorites"
+    ],
+    "del_fav": [
+        "Удалить из избранного",
+        "Remove from favorites"
     ]
 }
