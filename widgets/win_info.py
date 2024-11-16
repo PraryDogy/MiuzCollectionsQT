@@ -11,85 +11,6 @@ from cfg import Dynamic, JsonData
 from database import THUMBS, Dbase
 from utils.utils import Utils
 
-SPLIT_ = "***"
-
-
-# class InfoTask:
-#     def __init__(self, src: str):
-#         super().__init__()
-#         self.src = src
-
-#     def get(self) -> dict[str, str| int]:
-#         conn = Dbase.engine.connect()
-
-#         cols = (
-#             CACHE.c.name, CACHE.c.type_, CACHE.c.src,
-#             CACHE.c.mod, CACHE.c.resol
-#             )
-
-#         q = sqlalchemy.select(*cols).where(CACHE.c.src==self.src)
-#         res = conn.execute(q).first()
-
-#         if res:
-#             return self.get_db_info(*res)
-
-#         else:
-#             return self.get_raw_info()
-
-#     def get_db_info(self, name, type_, src, mod, resol):
-
-#         res = {
-#             NAME_T: self.lined_text(name),
-#             TYPE_T: type_,
-#             SIZE_T: Utils.get_f_size(os.path.getsize(self.src)),
-#             SRC_T: self.lined_text(src),
-#             MOD_T: Utils.get_f_date(mod),
-#             RESOL_T: resol
-#             }
-
-#         return res
-
-
-#     def get_raw_info(self):
-#         is_file = os.path.isfile(self.src)
-
-#         type_ = (
-#             os.path.splitext(self.src)[-1]
-#             if is_file
-#             else
-#             FOLDER_TYPE
-#             )
-
-#         size_ = (
-#             Utils.get_f_size(os.path.getsize(self.src))
-#             if is_file
-#             else
-#             CALCULATING
-#             )
-
-#         res = {
-#             NAME_T: self.lined_text(os.path.basename(self.src)),
-#             TYPE_T: type_,
-#             SIZE_T: size_,
-#             SRC_T: self.lined_text(self.src),
-#             MOD_T: Utils.get_f_date(os.stat(self.src).st_mtime),
-#             # RESOL_T: resol
-#             }
-
-#         return res
-
-#     def lined_text(self, text: str):
-#         max_row = 38
-
-#         if len(text) > max_row:
-#             text = [
-#                 text[i:i + max_row]
-#                 for i in range(0, len(text), max_row)
-#                 ]
-#             return "\n".join(text)
-#         else:
-#             return text
-        
 
 class RightLabel(QLabel):
     def __init__(self, text: str):
@@ -132,6 +53,8 @@ class InfoTask:
 
         if res:
             return self.get_db_info(*res)
+        else:
+            return {}
    
     def get_db_info(self, size, mod, resol, coll):
 
