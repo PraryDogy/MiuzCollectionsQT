@@ -240,12 +240,12 @@ class JsonData:
         cls.dynamic_set_lang(cls.lng_name)
         print(
             "Json data init",
-            f"Версии: json/внутренняя: {cls.app_ver}/{APP_VER}",
+            f"версии: json/внутренняя: {cls.app_ver}/{APP_VER}",
             "check app dirs ok",
             "read json ok",
             "set theme ok",
             "set lang ok",
-            sep="\n"
+            sep=", "
             )
 
 

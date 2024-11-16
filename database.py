@@ -23,6 +23,7 @@ class Dbase:
     _timeout = 15
     _echo = False
     _same_thread = False
+    WAL_ = None
 
     @classmethod
     def init(cls) -> sqlalchemy.Engine:
@@ -37,8 +38,16 @@ class Dbase:
             cls.init()
             return
 
-        # cls.enable_wal()
-        cls.disable_wal()
+        cls.toggle_wal(False)
+
+        print(
+            f"database init",
+            f"ehco: {cls._echo}",
+            f"check same thread: {cls._same_thread}",
+            f"timeout: {cls._timeout}",
+            f"wal: {cls.WAL_}",
+            sep=", "
+            )
 
     @classmethod
     def create_engine(cls):
@@ -51,25 +60,15 @@ class Dbase:
                 }
                 )
         
-        print(
-            f"database",
-            f"ehco: {cls._echo}",
-            f"check same thread: {cls._same_thread}",
-            f"timeout: {cls._timeout}",
-            sep="\n"
-            )
-
     @classmethod
-    def enable_wal(cls):
+    def toggle_wal(cls, value: bool):
         with cls.engine.connect() as conn:
-            conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
-        print("wal enabled")
-
-    @classmethod
-    def disable_wal(cls):
-        with cls.engine.connect() as conn:
-            conn.execute(sqlalchemy.text("PRAGMA journal_mode=DELETE"))
-        print("wal disabled")
+            if value:
+                conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
+                cls.WAL_ = True
+            else:
+                conn.execute(sqlalchemy.text("PRAGMA journal_mode=DELETE"))
+                cls.WAL_ = False
 
     @classmethod
     def vacuum(cls):

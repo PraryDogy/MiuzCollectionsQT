@@ -24,4 +24,4 @@ class SignalsApp:
     @classmethod
     def init(cls):
         cls.all_ = Signals()
-        print("signals app started > ok")
+        print("signals app started")
