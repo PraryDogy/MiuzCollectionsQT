@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 
 LANG_DIR = "lang"
 LANG_JSON = os.path.join(LANG_DIR, "lang.json")
@@ -31,17 +32,20 @@ class LangAdmin:
         print("2 remove lang key")
         print("3 update py lang files by json")
         print("4 remove unused lang items")
+        print("5 remove empty folders and pyc files")
 
-        input_ = input()
+        user_input = input()
 
-        if input_ == "1":
+        if user_input == "1":
             cls.add_new_key()
-        elif input_ == "2":
+        elif user_input == "2":
             cls.remove_key()
-        elif input_ == "3":
+        elif user_input == "3":
             cls.update_py_files_with_json()
-        elif input_ == "4":
+        elif user_input == "4":
             cls.remove_unused_keys()
+        elif user_input == "5":
+            cls.remove_empty_dirs()
 
     @classmethod
     def add_new_key(cls):
@@ -175,5 +179,32 @@ class LangAdmin:
         else:
             print("canceled")
 
+    @classmethod
+    def remove_empty_dirs(cls):
+        stop = ["env", ".git", "__pycache__"]
+        base_path = os.path.dirname(__file__)
+
+        dirs = [
+            os.path.join(base_path, i)
+            for i in os.listdir(base_path)
+            if os.path.isdir(os.path.join(base_path, i))
+            if i not in stop
+            ]
+
+
+        for xx in dirs:
+            for root, _, files in os.walk(xx):
+
+                if (
+                    all(filename.endswith('.pyc') for filename in files)
+                    or
+                    not files
+                    ):
+
+                    try:
+                        shutil.rmtree(root)
+                        print(f"Удалена папка: {root.replace(base_path, '...')}")
+                    except Exception as e:
+                        print(f"Ошибка при удалении папки {root}: {e}")
 
 LangAdmin.start()
