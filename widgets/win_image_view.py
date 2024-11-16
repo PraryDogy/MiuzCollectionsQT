@@ -293,19 +293,20 @@ class WinImageView(WinChild):
         if self.src not in LoadImage.images:
             self.set_titlebar_title(Dynamic.lng.loading)
 
-            task = LoadThumb(self.src)
-            task.signals_.finished_.connect(self.load_thumb_fin)
-            UThreadPool.pool.start(task)
+        task = LoadThumb(self.src)
+        task.signals_.finished_.connect(self.load_thumb_fin)
+        UThreadPool.pool.start(task)
 
     def load_thumb_fin(self, data: ImageData):
-        if data.src == self.src and data.width > 0:
-            self.image_label.set_image(data.pixmap)
+        # if data.src == self.src and data.width > 0:
+        self.image_label.set_image(data.pixmap)
 
-            if Utils.smb_check():
-                self.load_image()
+        if Utils.smb_check():
+            print("load image")
+            self.load_image()
+
         else:
             print("img viewer > no smb")
-
 
     def load_image(self):
         img_thread = LoadImage(self.src)
