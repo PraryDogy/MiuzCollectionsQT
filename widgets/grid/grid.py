@@ -12,7 +12,7 @@ from ..actions import ReloadGui
 from ..win_info import WinInfo
 from ..win_smb import WinSmb
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
-from .db_images import DbImage, DbImages
+from ._load_thumbs import DbImage, DbImages
 from .limit_btn import LimitBtn
 from .thumbnail import Thumbnail
 from .title import Title

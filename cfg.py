@@ -60,6 +60,7 @@ TEXT_LENGTH: list = [17, 20, 25, 29]
 
 LIMIT: int = 150
 ALL_COLLS: str = "miuzcollections_all"
+FAVS: str = "miuzcollections_fav"
 MENU_W: int = 210
 
 GRAY = "rgba(111, 111, 111, 0.5)"

@@ -4,7 +4,7 @@ from datetime import datetime
 import sqlalchemy
 from PyQt5.QtGui import QPixmap
 
-from cfg import ALL_COLLS, Dynamic, JsonData
+from cfg import ALL_COLLS, Dynamic, JsonData, FAVS
 from database import THUMBS, Dbase
 from utils.utils import Utils
 
@@ -68,15 +68,22 @@ class DbImages:
             THUMBS.c.src,
             THUMBS.c.hash_path,
             THUMBS.c.mod,
-            THUMBS.c.coll
+            THUMBS.c.coll,
+            THUMBS.c.fav
             )
+
+        q = q.limit(Dynamic.current_photo_limit)
+        q = q.order_by(-THUMBS.c.mod)
+
+        if JsonData.curr_coll != ALL_COLLS:
+            q = q.where(THUMBS.c.coll == JsonData.curr_coll)
+
+        elif JsonData.curr_coll == FAVS:
+            q = q.where(THUMBS.c.fav == 1)
 
         if Dynamic.search_widget_text:
             search = Dynamic.search_widget_text.replace("\n", "").strip()
             q = q.where(THUMBS.c.src.like(f"%{search}%"))
-
-        if JsonData.curr_coll != ALL_COLLS:
-            q = q.where(THUMBS.c.coll == JsonData.curr_coll)
 
         filters = [
             THUMBS.c.src.like(f"%/{true_name}/%") 
@@ -94,8 +101,10 @@ class DbImages:
             filters = sqlalchemy.or_(*filters)
             other_filter = sqlalchemy.and_(*other_filter)
             q = q.where(sqlalchemy.or_(filters, other_filter))
+
         elif filters:
             q = q.where(sqlalchemy.or_(*filters))
+
         elif other_filter:
             q = q.where(sqlalchemy.and_(*other_filter))
 
@@ -104,6 +113,4 @@ class DbImages:
             q = q.where(THUMBS.c.mod > t[0])
             q = q.where(THUMBS.c.mod < t[1])
 
-        q = q.limit(Dynamic.current_photo_limit)
-        q = q.order_by(-THUMBS.c.mod)
         return q

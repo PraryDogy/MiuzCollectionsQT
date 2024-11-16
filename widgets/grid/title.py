@@ -11,7 +11,7 @@ from utils.copy_files import ThreadCopyFiles
 from utils.utils import UThreadPool, Utils
 
 from ..win_smb import WinSmb
-from .db_images import DbImage
+from ._load_thumbs import DbImage
 
 
 class Shared:
