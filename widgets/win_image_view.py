@@ -270,25 +270,16 @@ class WinImageView(WinChild):
             # преобразуем полный путь в относительный для работы в ДБ
             small_src = self.src.replace(JsonData.coll_folder, "")
 
-            q = (sqlalchemy.select(THUMBS.c.hash_path).where(THUMBS.c.src == small_src))
             conn = Dbase.engine.connect()
-            ok_ = True
-
-            try:
-                hash_path = conn.execute(q).first()[0]
-
-            except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.OperationalError) as e:
-                Utils.print_err(error=e)
-                conn.rollback()
-                ok_ = False
-
+            q = (sqlalchemy.select(THUMBS.c.hash_path).where(THUMBS.c.src == small_src))
+            res = conn.execute(q).scalar()
             conn.close()
 
-            if ok_:
-                small_img = Utils.read_image_hash(hash_path)
+            if res:
+                small_img = Utils.read_image_hash(res)
                 pixmap = Utils.pixmap_from_array(small_img)
             else:
-                pixmap = QPixmap(PIXMAP_SIZE, PIXMAP_SIZE)
+                pixmap = QPixmap(1, 1)
                 pixmap.fill(QColor(128, 128, 128))
 
             self.image_label.set_image(pixmap)

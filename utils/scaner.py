@@ -184,32 +184,31 @@ class DbUpdater:
 
     def del_db(self):
         conn = Dbase.engine.connect()
-        ok_ = True
 
         for hash_path in self.del_items:
             q = sqlalchemy.delete(THUMBS).where(THUMBS.c.hash_path==hash_path)
+
             try:
                 conn.execute(q)
+
             except sqlalchemy.exc.IntegrityError as e:
                 Utils.print_err(error=e)
                 conn.rollback()
                 continue
+
             except sqlalchemy.exc.OperationalError as e:
                 Utils.print_err(error=e)
                 conn.rollback()
                 conn.close()
-                ok_ = False
-                break
-            
-        if ok_:
+                return None
 
-            conn.commit()
-            conn.close()
+        conn.commit()
+        conn.close()
 
-            for hash_path in self.del_items:
-                os.remove(hash_path)
+        for hash_path in self.del_items:
+            os.remove(hash_path)
 
-            ScanerUtils.reload_gui()
+        ScanerUtils.reload_gui()
 
     def get_small_img(self, src: str) -> tuple[ndarray, str] | None:
         array_img = Utils.read_image(src)
@@ -282,30 +281,30 @@ class DbUpdater:
 
     def insert_cmd(self):
         conn = Dbase.engine.connect()
-        ok_ = True
 
         for query in self.insert_queries:
+
             try:
                 conn.execute(query)
+
             except sqlalchemy.exc.IntegrityError as e:
                 Utils.print_err(error=e)
                 conn.rollback()
                 continue
+
             except sqlalchemy.exc.OperationalError as e:
                 Utils.print_err(error=e)
                 conn.rollback()
                 conn.close()
-                ok_ = False
-                break
+                return None
             
-        if ok_:
-            conn.commit()
-            conn.close()
+        conn.commit()
+        conn.close()
 
-            for hash_path, img_array in self.hash_images:
-                Utils.write_image_hash(hash_path, img_array)
+        for hash_path, img_array in self.hash_images:
+            Utils.write_image_hash(hash_path, img_array)
 
-            ScanerUtils.reload_gui()
+        ScanerUtils.reload_gui()
 
 
 class WorkerSignals(QObject):

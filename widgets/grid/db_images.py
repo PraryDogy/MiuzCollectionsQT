@@ -24,24 +24,17 @@ class DbImages:
     def get(self) -> dict[str, list[DbImage]]:
         return self._create_dict()
 
-    def _create_dict(self) -> dict[str, list[DbImage]]:
+    def _create_dict(self) -> dict[str, list[DbImage]] | dict:
+
         conn = Dbase.engine.connect()
         stmt = self._get_stmt()
-        ok_ = True
-
-        try:
-            res: list[ tuple[str, str, int, str] ] = conn.execute(stmt).fetchall()
-
-        except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.IntegrityError) as e:
-            Utils.print_err(error=e)
-            conn.rollback()
-            ok_ = False
-        
+        res: list[ tuple[str, str, int, str] ] = conn.execute(stmt).fetchall()        
         conn.close()
+
         thumbs_dict = defaultdict(list[DbImage])
 
-        if not ok_:
-            return
+        if not res:
+            return  {}
 
         for src, hash_path, mod, coll in res:
 
