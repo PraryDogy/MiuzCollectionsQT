@@ -54,7 +54,7 @@ class Grid(QScrollArea):
         frame_layout.addWidget(thumbnails_wid)
 
         self.columns = self.get_columns()
-        self.create_grid_layout()
+        self.setup_grid_main()
 
         frame_layout.addStretch(1)
         self.setWidget(self.scroll_area_widget)
@@ -84,10 +84,12 @@ class Grid(QScrollArea):
     def scroll_top(self):
         self.verticalScrollBar().setValue(0)
 
-    def create_grid_layout(self):
-        thumbs_dict = DbImages()
-        thumbs_dict = thumbs_dict.get()
+    def setup_grid_main(self):
+        self.thumbs_dict = DbImages()
+        self.thumbs_dict.finished_.connect(self.setup_grid_fin)
+        self.thumbs_dict.get()
 
+    def setup_grid_fin(self, thumbs_dict: dict[str, list[DbImage]]):
         self.reset_widget_data()
         self.current_widgets.clear()
 
@@ -123,7 +125,7 @@ class Grid(QScrollArea):
     def reload_thumbnails(self):
         Utils.clear_layout(self.thumbnails_layout)
         self.up_btn.deleteLater()
-        self.create_grid_layout()
+        self.setup_grid_main()
 
     def create_image_grid(self, date: str, db_images: list[DbImage]):
         title_label = Title(title=date, db_images=db_images, width=self.width())
@@ -301,7 +303,8 @@ class Grid(QScrollArea):
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.resize_timer.stop()
         self.resize_timer.start(500)
-        self.up_btn.setVisible(False)
+        if hasattr(self, "up_btn"):
+            self.up_btn.setVisible(False)
         return super().resizeEvent(a0)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
