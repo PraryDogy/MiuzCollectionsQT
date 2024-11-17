@@ -150,7 +150,7 @@ class JsonData:
     other_ = {
         Eng.name_: "Other",
         Rus.name_: "Остальное",
-        "real": "",
+        "real": "other_flag",
         "value": False
         }
 

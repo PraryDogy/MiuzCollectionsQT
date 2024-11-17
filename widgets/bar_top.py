@@ -54,12 +54,12 @@ class DatesBtn(Btn):
 
 
 class FilterBtn(Btn):
-    def __init__(self, text: str, true_name: str):
+    def __init__(self, text: str, real: str):
         super().__init__(text=text)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.key = true_name
+        self.real = real
 
     def set_normal_style(self):
         self.setObjectName(Names.filter_btn)
@@ -77,15 +77,20 @@ class FilterBtn(Btn):
         if ev.button() != Qt.MouseButton.LeftButton:
             return
         
+        if self.real == JsonData.prod_.get("real"):
+            JsonData.prod_["value"] = not JsonData.prod_.get("value")
+
+        elif self.real == JsonData.model_.get("real"):
+            JsonData.model_["value"] = not JsonData.model_.get("value")
+
+        elif self.real == JsonData.other_.get("real"):
+            JsonData.model_["value"] = not JsonData.other_.get("value")
+        
         if self.objectName() == Names.filter_btn_selected:
             self.set_normal_style()
         else:
             self.set_blue_style()
 
-        try:
-            JsonData.cust_fltr_vals[self.key] = not JsonData.cust_fltr_vals[self.key]
-        except KeyError:
-            JsonData.sys_fltr_vals[self.key] = not JsonData.sys_fltr_vals[self.key]
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
@@ -143,7 +148,7 @@ class BarTop(QFrame):
 
             label = FilterBtn(
                 text=data.get(Dynamic.lng.name_),
-                true_name=data.get("real")
+                real=data.get("real")
                 )
 
             self.h_layout.addWidget(label)
