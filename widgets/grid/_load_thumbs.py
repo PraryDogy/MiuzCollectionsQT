@@ -74,23 +74,23 @@ class LoadDbTask(URunnable):
         
         if len(filter_values_) > 1:
 
+            and_filters = []
+
             # мы используем "and_", потому что уже есть условие
             # "where" в search text
             if JsonData.prod_.get("value"):
 
                 text_ = self.get_template(JsonData.prod_.get("real"))
-                q = q.where(
-                    sqlalchemy.and_(THUMBS.c.src.ilike(text_))
-                    )
+                prod_stmt = THUMBS.c.src.ilike(text_)
+                and_filters.append(prod_stmt)
                 
                 print("prod stmt")
 
             if JsonData.model_.get("value"):
 
                 text_ = self.get_template(JsonData.model_.get("real"))
-                q = q.where(
-                    sqlalchemy.and_(THUMBS.c.src.ilike(text_))
-                    )
+                model_stmt = THUMBS.c.src.ilike(text_)
+                and_filters.append(model_stmt)
                 
                 print("model stmt")
 
@@ -99,19 +99,20 @@ class LoadDbTask(URunnable):
             # ... И (src не содержит prod ИЛИ src не содержит model)
             if JsonData.other_.get("value"):
 
-                text_ = self.get_template(JsonData.prod_.get("real"))
-                prod_stmt = THUMBS.c.src.not_ilike(text_)
+                prod_text = self.get_template(JsonData.prod_.get("real"))
+                mod_text = self.get_template(JsonData.model_.get("real"))
 
-                text_ = self.get_template(JsonData.model_.get("real"))
-                mod_stmt = THUMBS.c.src.not_ilike(text_)
-
-                q = q.where(
-                    sqlalchemy.and_(sqlalchemy.or_(prod_stmt, mod_stmt))
+                other_stmt = sqlalchemy.or_(
+                    THUMBS.c.src.not_ilike(prod_text),
+                    THUMBS.c.src.not_ilike(mod_text)
                     )
-                
+                and_filters.append(other_stmt)
+
                 print("other stmt")
 
-
+            q = q.where(
+                sqlalchemy.and_(*and_filters)
+                )
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self.combine_dates()
