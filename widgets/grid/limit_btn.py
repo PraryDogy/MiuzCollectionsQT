@@ -8,7 +8,7 @@ from signals import SignalsApp
 
 class LimitBtn(Btn):
     def __init__(self):
-        super().__init__(text=Dynamic.lng.show_more)
+        super().__init__(text=Dynamic.lang.show_more)
         self.setFixedWidth(100)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 

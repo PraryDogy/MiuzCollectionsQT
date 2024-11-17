@@ -62,7 +62,7 @@ class WinDownloads(WinChild):
         self.copy_threads: list[ThreadCopyFiles] = []
 
         self.close_btn_cmd(self.close_)
-        self.set_titlebar_title(Dynamic.lng.title_downloads)
+        self.set_titlebar_title(Dynamic.lang.title_downloads)
         self.min_btn_disable()
         self.max_btn_disable()
         self.setFixedSize(400, 420)
@@ -144,7 +144,7 @@ class WinDownloads(WinChild):
 
     def cut_text(self, text: str):
         name, ext = os.path.splitext(text)
-        name = f"{Dynamic.lng.copying} {name}"
+        name = f"{Dynamic.lang.copying} {name}"
         max_row = 27
 
         if len(name) >= max_row:

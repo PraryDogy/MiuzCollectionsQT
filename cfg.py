@@ -99,7 +99,7 @@ class JsonData:
         ]
     
     theme: str = "dark_theme"
-    lng_name: str = Eng.lang_name
+    lang_name: str = Eng.lang_name
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
@@ -195,17 +195,17 @@ class JsonData:
     @classmethod
     def dynamic_set_lang(cls, key_: str):
         if key_ == Rus.lang_name:
-            Dynamic.lng = Rus
-            cls.lng_name = Rus.lang_name
+            Dynamic.lang = Rus
+            cls.lang_name = Rus.lang_name
 
         elif key_ == Eng.lang_name:
-            Dynamic.lng = Eng
-            cls.lng_name = Eng.lang_name
+            Dynamic.lang = Eng
+            cls.lang_name = Eng.lang_name
 
         else:
             print("cfg > set lang > неверный ключ, ставлю по умолчанию русский", key_)
-            Dynamic.lng = Rus
-            cls.lng_name = Rus.lang_name
+            Dynamic.lang = Rus
+            cls.lang_name = Rus.lang_name
 
     @classmethod
     def check_app_dirs(cls):
@@ -251,7 +251,7 @@ class JsonData:
         cls.check_app_dirs()
         cls.read_json_data()
         Themes.set_theme(cls.theme)
-        cls.dynamic_set_lang(cls.lng_name)
+        cls.dynamic_set_lang(cls.lang_name)
         print(
             "Json data init",
             f"версии: json/внутренняя: {cls.app_ver}/{APP_VER}",
@@ -270,6 +270,6 @@ class Dynamic:
     search_widget_text: str = None
     date_start_text: str = None # 1 january 1991
     date_end_text: str = None # 31 january 1991
-    lng: Eng | Rus = None
+    lang: Eng | Rus = None
     image_viewer = None
     copy_threads: list = []

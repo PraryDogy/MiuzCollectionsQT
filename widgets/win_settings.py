@@ -27,7 +27,7 @@ class BrowseColl(QWidget):
         layout_h = LayoutHor()
         self.setLayout(layout_h)
 
-        self.browse_btn = Btn(Dynamic.lng.browse)
+        self.browse_btn = Btn(Dynamic.lang.browse)
         self.browse_btn.mouseReleaseEvent = self.choose_folder
         layout_h.addWidget(self.browse_btn)
 
@@ -93,7 +93,7 @@ class ChangeLang(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.lang = JsonData.lng_name
+        self.lang_name = JsonData.lang_name
 
         layout_h = LayoutHor()
         self.setLayout(layout_h)
@@ -104,21 +104,21 @@ class ChangeLang(QWidget):
 
         layout_h.addSpacerItem(QSpacerItem(10, 0))
 
-        self.lang_label = QLabel(Dynamic.lng.lang_label)
+        self.lang_label = QLabel(Dynamic.lang.lang_label)
         layout_h.addWidget(self.lang_label)
 
     def get_lng_text(self):
-        return "🇷🇺 Ru" if self.lang == Rus.lang_name else "🇺🇸 En"
+        return "🇷🇺 Ru" if self.lang_name == Rus.lang_name else "🇺🇸 En"
           
     def lng_cmd(self, e):
-        if self.lang == Rus.lang_name:
-            self.lang = Eng.lang_name
+        if self.lang_name == Rus.lang_name:
+            self.lang_name = Eng.lang_name
         else:
-            self.lang = Rus.lang_name
+            self.lang_name = Rus.lang_name
 
         self.lang_btn.setText(self.get_lng_text())
 
-        if self.lang != JsonData.lng_name:
+        if self.lang_name != JsonData.lang_name:
             setattr(self, "flag", True)
             self._pressed.emit()
 
@@ -130,7 +130,7 @@ class StopColls(QWidget):
         layout_v = LayoutVer()
         self.setLayout(layout_v)
 
-        self.label = QLabel(Dynamic.lng.sett_stopcolls)
+        self.label = QLabel(Dynamic.lang.sett_stopcolls)
         layout_v.addWidget(self.label)
 
         layout_v.addSpacerItem(QSpacerItem(0, 10))
@@ -151,23 +151,23 @@ class UpdaterWidget(QWidget):
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
-        self.btn = Btn(Dynamic.lng.download_update)
+        self.btn = Btn(Dynamic.lang.download_update)
         self.btn.setFixedWidth(150)
         self.btn.mouseReleaseEvent = self.update_btn_cmd
         self.v_layout.addWidget(self.btn)
 
     def update_btn_cmd(self, e):
         self.task = Updater()
-        self.btn.setText(Dynamic.lng.wait_update)
+        self.btn.setText(Dynamic.lang.wait_update)
         self.task.signals_.no_connection.connect(self.no_connection_win)
         self.task.signals_.finished_.connect(self.finalize)
         UThreadPool.pool.start(self.task)
 
     def finalize(self):
-        self.btn.setText(Dynamic.lng.download_update)
+        self.btn.setText(Dynamic.lang.download_update)
 
     def no_connection_win(self):
-        cmd_ = lambda: self.btn.setText(Dynamic.lng.download_update)
+        cmd_ = lambda: self.btn.setText(Dynamic.lang.download_update)
 
         QTimer.singleShot(1000, cmd_)
         self.smb_win = WinSmb()
@@ -175,9 +175,9 @@ class UpdaterWidget(QWidget):
         self.smb_win.show()
 
     def no_connection_btn_style(self):
-        cmd_ = lambda: self.btn.setText(Dynamic.lng.download_update)
+        cmd_ = lambda: self.btn.setText(Dynamic.lang.download_update)
 
-        self.btn.setText(Dynamic.lng.no_connection)
+        self.btn.setText(Dynamic.lang.no_connection)
         QTimer.singleShot(1500, cmd_)
 
 
@@ -188,7 +188,7 @@ class ShowFiles(QWidget):
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
-        self.btn = Btn(Dynamic.lng.show_app_support)
+        self.btn = Btn(Dynamic.lang.show_app_support)
         self.btn.setFixedWidth(150)
         self.btn.mouseReleaseEvent = self.btn_cmd
         self.v_layout.addWidget(self.btn)
@@ -204,7 +204,7 @@ class RestoreBtn(Btn):
     _pressed = pyqtSignal()
 
     def __init__(self):
-        super().__init__(Dynamic.lng.restore_db)
+        super().__init__(Dynamic.lang.restore_db)
         self.setFixedWidth(150)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -220,7 +220,7 @@ class WinSettings(WinChild):
         self.close_btn_cmd(self.cancel_cmd)
         self.min_btn_disable()
         self.max_btn_disable()
-        self.set_titlebar_title(Dynamic.lng.settings)
+        self.set_titlebar_title(Dynamic.lang.settings)
 
         QTimer.singleShot(10, self.init_ui)
         self.setFixedSize(420, 500)
@@ -232,7 +232,7 @@ class WinSettings(WinChild):
 
     def init_ui(self):
         self.change_lang = ChangeLang()
-        self.change_lang._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lng.apply))
+        self.change_lang._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lang.apply))
         self.content_lay_v.addWidget(self.change_lang)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
 
@@ -249,7 +249,7 @@ class WinSettings(WinChild):
         h_layout.addWidget(show_files)
 
         self.restore_db_btn = RestoreBtn()
-        self.restore_db_btn._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lng.apply))
+        self.restore_db_btn._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lang.apply))
         self.content_lay_v.addWidget(self.restore_db_btn)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
 
@@ -257,7 +257,7 @@ class WinSettings(WinChild):
         self.content_lay_v.addWidget(self.stopcolls)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
 
-        coll_folder_list_label = QLabel(text=Dynamic.lng.where_to_look_coll_folder)
+        coll_folder_list_label = QLabel(text=Dynamic.lang.where_to_look_coll_folder)
         self.content_lay_v.addWidget(coll_folder_list_label)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 10))
 
@@ -274,14 +274,14 @@ class WinSettings(WinChild):
 
         btns_layout.addStretch(1)
 
-        self.ok_btn = Btn(Dynamic.lng.ok)
+        self.ok_btn = Btn(Dynamic.lang.ok)
         self.ok_btn.setFixedSize(90, self.ok_btn.height())
         self.ok_btn.mouseReleaseEvent = self.ok_cmd
         btns_layout.addWidget(self.ok_btn)
 
         btns_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.cancel_btn = Btn(Dynamic.lng.cancel)
+        self.cancel_btn = Btn(Dynamic.lang.cancel)
         self.cancel_btn.setFixedSize(90, self.cancel_btn.height())
         self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
         btns_layout.addWidget(self.cancel_btn)
@@ -304,7 +304,7 @@ class WinSettings(WinChild):
 
         elif hasattr(self.change_lang, "flag"):
             print("settings win change lang")
-            JsonData.dynamic_set_lang(self.change_lang.lang)
+            JsonData.dynamic_set_lang(self.change_lang.lang_name)
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()

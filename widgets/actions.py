@@ -49,7 +49,7 @@ class CustomAction(QAction):
 
 class OpenInView(CustomAction):
     def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lng.view)
+        super().__init__(parent, src, Dynamic.lang.view)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -58,7 +58,7 @@ class OpenInView(CustomAction):
 
 class ReloadGui(CustomAction):
     def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lng.reload_gui)
+        super().__init__(parent, src, Dynamic.lang.reload_gui)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -68,7 +68,7 @@ class ReloadGui(CustomAction):
 
 class OpenInfo(CustomAction):
     def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lng.info)
+        super().__init__(parent, src, Dynamic.lang.info)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -80,7 +80,7 @@ class OpenInfo(CustomAction):
 
 class CopyPath(CustomAction):
     def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lng.copy_path)
+        super().__init__(parent, src, Dynamic.lang.copy_path)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -91,7 +91,7 @@ class CopyPath(CustomAction):
 
 class Reveal(CustomAction):
     def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lng.reveal_in_finder)
+        super().__init__(parent, src, Dynamic.lang.reveal_in_finder)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -137,11 +137,11 @@ class FavAction(CustomAction):
     def __init__(self, parent: QWidget, src: str, fav:  int):
 
         if fav == 0:
-            t = Dynamic.lng.add_fav
+            t = Dynamic.lang.add_fav
             self.value = 1
 
         elif fav == 1 or fav is None:
-            t = Dynamic.lng.del_fav
+            t = Dynamic.lang.del_fav
             self.value = 0
 
         super().__init__(parent, src, t)
@@ -157,9 +157,9 @@ class Save(CustomAction):
     def __init__(self, parent: QWidget, src: str, save_as: bool):
 
         if save_as:
-            text: str = Dynamic.lng.save_image_in
+            text: str = Dynamic.lang.save_image_in
         else:
-            text: str = Dynamic.lng.save_image_downloads
+            text: str = Dynamic.lang.save_image_downloads
 
         super().__init__(parent, src, text)
         self.triggered.connect(self.cmd_)

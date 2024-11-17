@@ -291,7 +291,7 @@ class WinImageView(WinChild):
     def load_thumbnail(self):
 
         if self.src not in LoadImage.images:
-            self.set_titlebar_title(Dynamic.lng.loading)
+            self.set_titlebar_title(Dynamic.lang.loading)
 
         task = LoadThumb(self.src)
         task.signals_.finished_.connect(self.load_thumb_fin)

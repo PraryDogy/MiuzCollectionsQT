@@ -24,13 +24,13 @@ class CustomContext(ContextCustom):
         self.my_parent = parent
         self.true_name = true_name
 
-        view_coll = QAction(text=Dynamic.lng.view, parent=self)
+        view_coll = QAction(text=Dynamic.lang.view, parent=self)
         view_coll.triggered.connect(lambda e: self.show_collection())
         self.addAction(view_coll)
 
         self.addSeparator()
 
-        reveal_coll = QAction(text=Dynamic.lng.reveal_in_finder, parent=self)
+        reveal_coll = QAction(text=Dynamic.lang.reveal_in_finder, parent=self)
         reveal_coll.triggered.connect(self.reveal_collection)
         self.addAction(reveal_coll)
 
@@ -192,7 +192,7 @@ class BaseLeftMenu(QScrollArea):
 
         label = CollectionBtn(
             parent=self,
-            fake_name=Dynamic.lng.all_colls,
+            fake_name=Dynamic.lang.all_colls,
             true_name=ALL_COLLS
             )
 
@@ -200,7 +200,7 @@ class BaseLeftMenu(QScrollArea):
 
         label = CollectionBtn(
             parent=self,
-            fake_name=Dynamic.lng.fav_coll,
+            fake_name=Dynamic.lang.fav_coll,
             true_name=FAVS
             )
 

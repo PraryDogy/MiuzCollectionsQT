@@ -46,7 +46,7 @@ class WinMain(WinFrameless):
         self.setMenuBar(BarMacos())
 
         self.set_titlebar_title(
-            Dynamic.lng.all_colls
+            Dynamic.lang.all_colls
             if JsonData.curr_coll == ALL_COLLS
             else JsonData.curr_coll
             )
@@ -100,10 +100,10 @@ class WinMain(WinFrameless):
         elif flag == "set_title":
 
             if JsonData.curr_coll == ALL_COLLS:
-                t = Dynamic.lng.all_colls
+                t = Dynamic.lang.all_colls
 
             elif JsonData.curr_coll == FAVS:
-                t = Dynamic.lng.fav_coll
+                t = Dynamic.lang.fav_coll
 
             else:
                 t = JsonData.curr_coll

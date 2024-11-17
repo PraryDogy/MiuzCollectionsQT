@@ -34,21 +34,21 @@ class CustomContext(ContextCustom):
         super().__init__(event=event)
         self.files_list = files_list
 
-        save_jpg = QAction(text=Dynamic.lng.save_all_JPG, parent=self)
+        save_jpg = QAction(text=Dynamic.lang.save_all_JPG, parent=self)
         save_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=False))
         self.addAction(save_jpg)
 
-        save_layers = QAction(text=Dynamic.lng.save_all_layers, parent=self)
+        save_layers = QAction(text=Dynamic.lang.save_all_layers, parent=self)
         save_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=False))
         self.addAction(save_layers)
 
         self.addSeparator()
 
-        save_as_jpg = QAction(text=Dynamic.lng.save_all_JPG_as, parent=self)
+        save_as_jpg = QAction(text=Dynamic.lang.save_all_JPG_as, parent=self)
         save_as_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=True))
         self.addAction(save_as_jpg)
 
-        save_as_layers = QAction(text=Dynamic.lng.save_all_layers_as, parent=self)
+        save_as_layers = QAction(text=Dynamic.lang.save_all_layers_as, parent=self)
         save_as_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=True))
         self.addAction(save_as_layers)
 
@@ -105,7 +105,7 @@ class CustomContext(ContextCustom):
 
 class Title(QLabel):
     def __init__(self, title: str, db_images: list, width: int):
-        super().__init__(f"{title}. {Dynamic.lng.total}: {len(db_images)}")
+        super().__init__(f"{title}. {Dynamic.lang.total}: {len(db_images)}")
         self.images = db_images
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)

@@ -28,7 +28,7 @@ class RightLabel(QLabel):
         menu_ = ContextCustom(event=ev)
 
 
-        label_text = Dynamic.lng.copy
+        label_text = Dynamic.lang.copy
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(cmd_)
         menu_.addAction(sel)
@@ -69,13 +69,13 @@ class InfoTask(URunnable):
         _, type_ = os.path.splitext(name)
 
         res = {
-            Dynamic.lng.file_name: self.lined_text(name),
-            Dynamic.lng.type_: type_,
-            Dynamic.lng.file_size: Utils.get_f_size(size),
-            Dynamic.lng.place: self.lined_text(self.src),
-            Dynamic.lng.changed: Utils.get_f_date(mod),
-            Dynamic.lng.resol: resol,
-            Dynamic.lng.collection: coll
+            Dynamic.lang.file_name: self.lined_text(name),
+            Dynamic.lang.type_: type_,
+            Dynamic.lang.file_size: Utils.get_f_size(size),
+            Dynamic.lang.place: self.lined_text(self.src),
+            Dynamic.lang.changed: Utils.get_f_date(mod),
+            Dynamic.lang.resol: resol,
+            Dynamic.lang.collection: coll
             }
 
         return res
@@ -101,7 +101,7 @@ class WinInfo(WinChild):
         self.close_btn_cmd(self.close_)
         self.min_btn_disable()
         self.max_btn_disable()
-        self.set_titlebar_title(Dynamic.lng.info)
+        self.set_titlebar_title(Dynamic.lang.info)
         self.src = src
 
         self.init_ui()

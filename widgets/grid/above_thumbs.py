@@ -12,7 +12,7 @@ BTN_W, BTN_H = 120, 28
 
 class ResetDatesBtn(QLabel):
     def __init__(self):
-        super().__init__(text=Dynamic.lng.reset_dates)
+        super().__init__(text=Dynamic.lang.reset_dates)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_dates_btn)
@@ -30,7 +30,7 @@ class ResetDatesBtn(QLabel):
 
 class ResetSearchBtn(QLabel):
     def __init__(self):
-        super().__init__(text=Dynamic.lng.reset_search)
+        super().__init__(text=Dynamic.lang.reset_search)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_search_btn)
@@ -47,7 +47,7 @@ class ResetSearchBtn(QLabel):
 
 class ResetFiltersBtn(QLabel):
     def __init__(self):
-        super().__init__(text=Dynamic.lng.show_all)
+        super().__init__(text=Dynamic.lang.show_all)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_reset_filters_btn)
@@ -64,7 +64,7 @@ class ResetFiltersBtn(QLabel):
 
 class ShowAllBtn(QLabel):
     def __init__(self):
-        super().__init__(text=Dynamic.lng.show_all)
+        super().__init__(text=Dynamic.lang.show_all)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(Names.th_show_all_btn)
@@ -93,7 +93,7 @@ class AboveThumbsNoImages(QWidget):
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
-        noimg_t = Dynamic.lng.no_photo
+        noimg_t = Dynamic.lang.no_photo
 
         title_label = QLabel(text=noimg_t)
         title_label.setFixedWidth(width - 20)
@@ -116,7 +116,7 @@ class AboveThumbsNoImages(QWidget):
             ]
 
         if Dynamic.search_widget_text:
-            noimg_t = (f"{Dynamic.lng.no_photo} {Dynamic.lng.with_name}: "
+            noimg_t = (f"{Dynamic.lang.no_photo} {Dynamic.lang.with_name}: "
                        f"{Dynamic.search_widget_text}")
 
             title_label.setText(noimg_t)
@@ -125,7 +125,7 @@ class AboveThumbsNoImages(QWidget):
             h_layout.addWidget(s_label)
 
         elif any((Dynamic.date_start, Dynamic.date_end)):
-            noimg_t = (f"{Dynamic.lng.no_photo}: "
+            noimg_t = (f"{Dynamic.lang.no_photo}: "
                        f"{Dynamic.date_start_text} - {Dynamic.date_end_text}")
 
             title_label.setText(noimg_t)
@@ -134,13 +134,13 @@ class AboveThumbsNoImages(QWidget):
         elif enabled_filters:
     
             filters = [
-                data.get(Dynamic.lng.lang_name).lower()
+                data.get(Dynamic.lang.lang_name).lower()
                 for data in enabled_filters
                 ]
 
             filters = ", ".join(filters)
 
-            noimg_t = (f"{Dynamic.lng.no_photo_filter}: {filters}")
+            noimg_t = (f"{Dynamic.lang.no_photo_filter}: {filters}")
 
             title_label.setText(noimg_t)
             h_layout.addWidget(ResetFiltersBtn())
@@ -172,7 +172,7 @@ class AboveThumbs(QWidget):
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             label.setText(
-                f"{Dynamic.lng.photos_named_dates}: {Dynamic.date_start_text} - {Dynamic.date_end_text}"
+                f"{Dynamic.lang.photos_named_dates}: {Dynamic.date_start_text} - {Dynamic.date_end_text}"
                 )
             h_layout.addWidget(ResetDatesBtn())
 
@@ -180,7 +180,7 @@ class AboveThumbs(QWidget):
             self.v_layout.addSpacerItem(spacer)
 
         elif Dynamic.search_widget_text:
-            label.setText(f"{Dynamic.lng.search}: {Dynamic.search_widget_text}")
+            label.setText(f"{Dynamic.lang.search}: {Dynamic.search_widget_text}")
             h_layout.addWidget(ResetSearchBtn())
             h_layout.addSpacerItem(QSpacerItem(1, 30))
 

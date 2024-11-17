@@ -14,7 +14,7 @@ class SearchBarBase(InputBase):
         self.setFixedHeight(25)
 
         self.textChanged.connect(self.create_search)
-        self.setPlaceholderText(Dynamic.lng.search)
+        self.setPlaceholderText(Dynamic.lang.search)
 
         self.timer = QTimer(self)
         self.timer.setInterval(1000)

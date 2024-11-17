@@ -31,13 +31,13 @@ class SelectableLabel(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = ContextCustom(ev)
 
-        copy_text = QAction(parent=context_menu, text=Dynamic.lng.copy)
+        copy_text = QAction(parent=context_menu, text=Dynamic.lang.copy)
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Dynamic.lng.copy_all)
+        select_all = QAction(parent=context_menu, text=Dynamic.lang.copy_all)
         select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -83,15 +83,15 @@ class BarMacos(QMenuBar):
         self.init_ui()
 
     def init_ui(self):
-        self.mainMenu = QMenu(Dynamic.lng.bar_menu, self)
+        self.mainMenu = QMenu(Dynamic.lang.bar_menu, self)
 
         # Добавляем пункт "Открыть настройки"
-        actionSettings = QAction(Dynamic.lng.open_settings_window, self)
+        actionSettings = QAction(Dynamic.lang.open_settings_window, self)
         actionSettings.triggered.connect(self.open_settings_window)
         self.mainMenu.addAction(actionSettings)
 
         # Добавляем пункт "О приложении"
-        actionAbout = QAction(Dynamic.lng.show_about, self)
+        actionAbout = QAction(Dynamic.lang.show_about, self)
         actionAbout.triggered.connect(self.open_about_window)
         self.mainMenu.addAction(actionAbout)
 

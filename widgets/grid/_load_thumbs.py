@@ -183,7 +183,7 @@ class DbImages(QObject):
                 mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
 
             else:
-                mod = f"{Dynamic.lng.months[str(mod.month)]} {mod.year}"
+                mod = f"{Dynamic.lang.months[str(mod.month)]} {mod.year}"
 
             thumbs_dict[mod].append(DbImage(pixmap, src, coll, fav))
 
