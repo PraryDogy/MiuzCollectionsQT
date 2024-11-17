@@ -29,20 +29,11 @@ class CustomContext(ContextCustom):
         view_coll.triggered.connect(lambda e: self.show_collection())
         self.addAction(view_coll)
 
-        t = Dynamic.lng.detail_menu if JsonData.small_menu_view else Dynamic.lng.compact_menu
-        view = QAction(text=t, parent=self)
-        view.triggered.connect(lambda e: self.change_view())
-        self.addAction(view)
-
         self.addSeparator()
 
         reveal_coll = QAction(text=Dynamic.lng.reveal_in_finder, parent=self)
         reveal_coll.triggered.connect(self.reveal_collection)
         self.addAction(reveal_coll)
-
-    def change_view(self):
-        JsonData.small_menu_view = not JsonData.small_menu_view
-        SignalsApp.all_.reload_menu_left.emit()
 
     def show_collection(self):
         JsonData.curr_coll = self.true_name
@@ -159,41 +150,23 @@ class BaseLeftMenu(QScrollArea):
 
         self.main_layout.addWidget(btns_widget)
 
-        if JsonData.small_menu_view:
-            for letter, collections in self.load_colls_query().items():
-                for coll in collections:
-                    label = CollectionBtn(
-                        parent=self,
-                        fake_name=coll["fake_name"],
-                        true_name=coll["true_name"]
-                        )
-                    self.main_layout.addWidget(label)
-        else:
-            for letter, collections in self.load_colls_query().items():
+        menus = self.load_colls_query()
 
-                test = QLabel(text=letter)
-                test.setContentsMargins(6, 20, 0, 5)
-                test.setObjectName(Names.letter_btn)
-                test.setStyleSheet(Themes.current)
-                self.main_layout.addWidget(test)
+        for data in menus:
 
-                for coll in collections:
-                    label = CollectionBtn(
-                        parent=self,
-                        fake_name=coll["fake_name"],
-                        true_name=coll["true_name"]
-                        )
-                    self.main_layout.addWidget(label)
+            label = CollectionBtn(
+                parent=self,
+                fake_name=data.get("fake_name"),
+                true_name=data.get("true_name")
+                )
+
+            self.main_layout.addWidget(label)
 
         self.main_layout.addSpacerItem(QSpacerItem(0, 5))
         self.main_layout.addStretch(1)
 
-    def change_view(self):
-        JsonData.small_menu_view = not JsonData.small_menu_view
-        SignalsApp.all_.reload_menu_left.emit()
-
-    def load_colls_query(self) -> dict:
-        menus = defaultdict(list)
+    def load_colls_query(self) -> list[dict]:
+        menus: list[dict] = []
 
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(THUMBS.c.coll).distinct()
@@ -201,7 +174,8 @@ class BaseLeftMenu(QScrollArea):
         conn.close()
 
         if res:
-            res = (i[0] for i in res if i)
+            res: tuple[str] = (i[0] for i in res if i)
+
         else:
             print("widgets > left menu > load db colls > row is empty")
             return menus
@@ -209,14 +183,15 @@ class BaseLeftMenu(QScrollArea):
         for true_name in res:
             fake_name = true_name.lstrip("0123456789").strip()
             fake_name = fake_name if fake_name else true_name
-            letter = fake_name[0].capitalize()
 
-            menus[letter].append({"fake_name": fake_name, "true_name": true_name})
+            menus.append(
+                {
+                    "fake_name": fake_name,
+                    "true_name": true_name
+                }
+            )
 
-        return {
-            key: sorted(value, key=lambda x: x['fake_name'])
-            for key, value in sorted(menus.items())
-            }
+        return sorted(menus, key = lambda x: x["fake_name"])
 
     def reload_menu(self):
         self.init_ui()
