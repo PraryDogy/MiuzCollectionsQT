@@ -112,7 +112,9 @@ class FilterBtn(Btn):
     def __init__(self, data: dict):
         """cfg > dynamic_filters > item"""
 
-        # cfg > dynamic_filters > Eng.name_ | Rus.name_
+        # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
+        JsonData.dynamic_filters, JsonData.static_filter
+
         text = data.get(Dynamic.lng.name_)
         super().__init__(text=text)
 
@@ -120,6 +122,9 @@ class FilterBtn(Btn):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.data = data
+
+        # cfg > dynamic_filters > item > value
+        JsonData.dynamic_filters, JsonData.static_filter
 
         if self.data.get("value"):
             self.set_blue_style()
@@ -151,12 +156,16 @@ class FilterBtn(Btn):
         """flag: name | value"""
 
         if flag == "name":
-            # cfg > dynamic_filters > Eng.name_ | Rus.name_
+            # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
+            JsonData.dynamic_filters, JsonData.static_filter
+
             self.data[Dynamic.lng.name_] = text
             self.setText(text)
         
         elif flag == "value":
-            # cfg > dynamic_filters > "real"
+            # cfg > dynamic_filters > item > real
+            JsonData.dynamic_filters, JsonData.static_filter
+
             self.data["real"] = text
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
@@ -165,6 +174,9 @@ class FilterBtn(Btn):
             return
         
         self.data["value"] = not self.data.get("value")
+
+        # cfg > dynamic_filters > item > value
+        JsonData.dynamic_filters, JsonData.static_filter
 
         if self.data.get("value"):
             self.set_blue_style()
@@ -179,18 +191,24 @@ class FilterBtn(Btn):
         self.set_border_blue_style()
         menu_ = ContextCustom(ev)
 
-        # cfg > dynamic_filters > Eng.name_ | Rus.name_
+        # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
+        JsonData.dynamic_filters, JsonData.static_filter
+
         filter_name = self.data.get(Dynamic.lng.name_)
         set_name_cmd = lambda: self.rename_win("Имя фильтра", filter_name, "name")
         set_name = QAction(parent=menu_, text="Имя фильтра")
         set_name.triggered.connect(set_name_cmd)
         menu_.addAction(set_name)
 
-        # cfg > dynamic_filters > "real"
+        # cfg > dynamic_filters > item > real
+        JsonData.dynamic_filters, JsonData.static_filter
+
         filter_value = self.data.get("real")
         set_value_cmd = lambda: self.rename_win("Значение фильтра", filter_value, "value")
         set_value = QAction(parent=menu_, text="Значение фильтра")
         set_value.triggered.connect(set_value_cmd)
+
+        JsonData.static_filter
 
         if not self.data.get("real") == STATIC_FILTER_REAL_NAME:
             menu_.addAction(set_value)
