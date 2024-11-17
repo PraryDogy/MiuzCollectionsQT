@@ -8,7 +8,6 @@ class Eng:
 	changed = 'Changed'
 	choose_coll_smb = 'Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings.'
 	collection = 'Collection'
-	compact_menu = 'Compact menu'
 	copy = 'Copy'
 	copy_all = 'Copy all'
 	copy_path = 'Copy filepath'
@@ -17,7 +16,6 @@ class Eng:
 	d_m_y = 'day.month.year'
 	dates = 'Dates'
 	del_fav = 'Remove from favorites'
-	detail_menu = 'Standart menu'
 	download_update = 'Update app'
 	end = 'End'
 	fav_coll = 'Favorites'
@@ -30,7 +28,7 @@ class Eng:
 	loading = 'Loading...'
 	months = {'1': 'January', '10': 'October', '11': 'November', '12': 'December', '2': 'February', '3': 'March', '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August', '9': 'September'}
 	months_genitive_case = {'1': 'january', '10': 'october', '11': 'november', '12': 'december', '2': 'february', '3': 'march', '4': 'april', '5': 'may', '6': 'june', '7': 'july', '8': 'august', '9': 'september'}
-	lang_name = 'eng'
+	name_ = 'eng'
 	no_connection = 'No connection'
 	no_photo = 'No photos'
 	no_photo_filter = 'No photos in cathegory'
