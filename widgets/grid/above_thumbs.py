@@ -109,16 +109,6 @@ class AboveThumbsNoImages(QWidget):
         h_layout.setContentsMargins(0, 10, 0, 0)
         self.v_layout.addWidget(h_wid)
 
-        merg_fltr_vals = {
-            **JsonData.cust_fltr_vals,
-            **JsonData.sys_fltr_vals
-            }
-
-        merg_fltr_lng = {
-            **Dynamic.lng.cust_fltr_names,
-            **Dynamic.lng.sys_fltr_names
-            }
-
         enabled_filters = [
             data
             for data in (*JsonData.dynamic_filters, JsonData.static_filter)

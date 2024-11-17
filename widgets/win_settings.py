@@ -123,50 +123,6 @@ class ChangeLang(QWidget):
             self._pressed.emit()
 
 
-class CustFilters(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        layout_h = LayoutHor()
-        self.setLayout(layout_h)
-
-        left_wid = QWidget()
-        self.v_left = LayoutVer()
-        left_wid.setLayout(self.v_left)
-        layout_h.addWidget(left_wid)
-
-        self.prod_label = QLabel(Dynamic.lng.cust_fltr_names["prod"])
-        self.v_left.addWidget(self.prod_label)
-
-        self.v_left.addSpacerItem(QSpacerItem(0, 10))
-
-        self.prod_input = InputBase()
-        self.prod_input.insert(JsonData.cust_fltr_names["prod"])
-        self.v_left.addWidget(self.prod_input)
-
-        layout_h.addSpacerItem(QSpacerItem(10, 0))
-
-        r_wid = QWidget()
-        self.v_right = LayoutVer()
-        r_wid.setLayout(self.v_right)
-        layout_h.addWidget(r_wid)
-
-        self.mod_label = QLabel(Dynamic.lng.cust_fltr_names["mod"])
-        self.v_right.addWidget(self.mod_label)
-
-        self.v_right.addSpacerItem(QSpacerItem(0, 10))
-
-        self.mod_input = InputBase()
-        self.mod_input.insert(JsonData.cust_fltr_names["mod"])
-        self.v_right.addWidget(self.mod_input)
-
-    def get_inputs(self) -> dict:
-        return {
-            "prod": self.prod_input.text(),
-            "mod": self.mod_input.text()
-            }
-
-
 class StopColls(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -295,10 +251,6 @@ class WinSettings(WinChild):
         self.restore_db_btn = RestoreBtn()
         self.restore_db_btn._pressed.connect(lambda: self.ok_btn.setText(Dynamic.lng.apply))
         self.content_lay_v.addWidget(self.restore_db_btn)
-        self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
-
-        self.cust_filters = CustFilters()
-        self.content_lay_v.addWidget(self.cust_filters)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
 
         self.stopcolls = StopColls()

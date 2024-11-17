@@ -55,16 +55,6 @@
         "Копирую",
         "Copying"
     ],
-    "cust_fltr_names": [
-        {
-            "mod": "Модели",
-            "prod": "Имиджи"
-        },
-        {
-            "mod": "Models",
-            "prod": "Product"
-        }
-    ],
     "cut": [
         "Вырезать",
         "Cut"
@@ -308,14 +298,6 @@
     "start": [
         "Начало",
         "Start"
-    ],
-    "sys_fltr_names": [
-        {
-            "other": "Остальное"
-        },
-        {
-            "other": "Other"
-        }
     ],
     "title_downloads": [
         "Загрузки",

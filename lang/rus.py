@@ -13,7 +13,6 @@ class Rus:
 	copy_all = 'Копировать все'
 	copy_path = 'Скопировать путь'
 	copying = 'Копирую'
-	cust_fltr_names = {'mod': 'Модели', 'prod': 'Имиджи'}
 	cut = 'Вырезать'
 	d_m_y = 'день.месяц.год'
 	dates = 'Даты'
@@ -62,7 +61,6 @@ class Rus:
 	show_app_support = 'Показать файлы'
 	show_more = 'Позазать еще'
 	start = 'Начало'
-	sys_fltr_names = {'other': 'Остальное'}
 	title_downloads = 'Загрузки'
 	total = 'Всего'
 	type_ = 'Тип'

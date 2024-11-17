@@ -13,7 +13,6 @@ class Eng:
 	copy_all = 'Copy all'
 	copy_path = 'Copy filepath'
 	copying = 'Copying'
-	cust_fltr_names = {'mod': 'Models', 'prod': 'Product'}
 	cut = 'Cut'
 	d_m_y = 'day.month.year'
 	dates = 'Dates'
@@ -62,7 +61,6 @@ class Eng:
 	show_app_support = 'Show files'
 	show_more = 'Show more'
 	start = 'Start'
-	sys_fltr_names = {'other': 'Other'}
 	title_downloads = 'Downloads'
 	total = 'Total'
 	type_ = 'Type'
