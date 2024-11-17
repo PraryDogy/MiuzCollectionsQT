@@ -148,21 +148,7 @@ class JsonData:
             "value": False
         }
     ]
-
-    prod_ = {
-        Eng.name_: "Product",
-        Rus.name_: "Предметка",
-        "real": "1 IMG",
-        "value": False
-        }
-    
-    model_ = {
-        Eng.name_: "Model",
-        Rus.name_: "Модели",
-        "real": "2 MODEL IMG",
-        "value": False
-        }
-    
+  
     static_filter = {
         Eng.name_: "Other",
         Rus.name_: "Остальное",
