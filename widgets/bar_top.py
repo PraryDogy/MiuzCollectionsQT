@@ -77,14 +77,16 @@ class FilterBtn(Btn):
         if ev.button() != Qt.MouseButton.LeftButton:
             return
         
+        return
+        
         if self.real == JsonData.prod_.get("real"):
             JsonData.prod_["value"] = not JsonData.prod_.get("value")
 
         elif self.real == JsonData.model_.get("real"):
             JsonData.model_["value"] = not JsonData.model_.get("value")
 
-        elif self.real == JsonData.other_.get("real"):
-            JsonData.model_["value"] = not JsonData.other_.get("value")
+        elif self.real == JsonData.static_filter.get("real"):
+            JsonData.model_["value"] = not JsonData.static_filter.get("value")
         
         if self.objectName() == Names.filter_btn_selected:
             self.set_normal_style()
@@ -141,7 +143,7 @@ class BarTop(QFrame):
         filters: tuple[dict] = (
             JsonData.prod_,
             JsonData.model_,
-            JsonData.other_
+            JsonData.static_filter
             )
 
         for data in filters:

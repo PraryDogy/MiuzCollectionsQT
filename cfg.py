@@ -69,6 +69,7 @@ GRAY = "rgba(111, 111, 111, 0.5)"
 BLUE = "rgba(0, 122, 255, 1)"
 STAR_SYM = "\U00002605" + " "
 
+
 class JsonData:
     app_ver: str = APP_VER
 
@@ -133,6 +134,21 @@ class JsonData:
         '/Volumes/Shares-3/Collections'
         ]
 
+    dynamic_filters = [
+        {
+            Eng.name_: "Product",
+            Rus.name_: "Предметка",
+            "real": "1 IMG",
+            "value": False
+        },
+        {
+            Eng.name_: "Model",
+            Rus.name_: "Модели",
+            "real": "2 MODEL IMG",
+            "value": False
+        }
+    ]
+
     prod_ = {
         Eng.name_: "Product",
         Rus.name_: "Предметка",
@@ -147,7 +163,7 @@ class JsonData:
         "value": False
         }
     
-    other_ = {
+    static_filter = {
         Eng.name_: "Other",
         Rus.name_: "Остальное",
         "real": "other_flag",

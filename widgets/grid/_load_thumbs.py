@@ -69,7 +69,10 @@ class LoadDbTask(URunnable):
 
         filter_values_ = set(
             i.get("value")
-            for i in (JsonData.prod_, JsonData.model_, JsonData.other_)
+            for i in (
+                *JsonData.dynamic_filters,
+                JsonData.static_filter
+                )
             )
         
         # если ВСЕ фильтры включены или выключены, это будет равняться
@@ -79,26 +82,29 @@ class LoadDbTask(URunnable):
 
             and_filters = []
 
-            if JsonData.prod_.get("value"):
-                prod_text = self.get_template(JsonData.prod_.get("real"))
-                and_filters.append(
-                    THUMBS.c.src.ilike(prod_text)
-                    )
-                
-            if JsonData.model_.get("value"):
-                mod_text = self.get_template(JsonData.model_.get("real"))
-                and_filters.append(
-                    THUMBS.c.src.ilike(mod_text)
-                    )
+            for filter in JsonData.dynamic_filters:
+                if filter.get("value"):
+                    t = self.get_template(filter.get("real"))
 
-            if JsonData.other_.get("value"):
-                prod_text = self.get_template(JsonData.prod_.get("real"))
-                mod_text = self.get_template(JsonData.model_.get("real"))
-                other_stmt = sqlalchemy.and_(
-                    THUMBS.c.src.not_ilike(prod_text),
-                    THUMBS.c.src.not_ilike(mod_text)
+                    and_filters.append(
+                        THUMBS.c.src.ilike(t)
+                        )
+
+            if JsonData.static_filter.get("value"):
+
+                texts = [
+                    self.get_template(i.get("real"))
+                    for i in JsonData.dynamic_filters
+                    ]
+                
+                stmts = [
+                    THUMBS.c.src.not_ilike(i)
+                    for i in texts
+                    ]
+                
+                and_filters.append(
+                    sqlalchemy.and_(*stmts)
                     )
-                and_filters.append(other_stmt)
 
             # пример полного запроса: включен product и other фильтры:
             # остальной запрос БД > ГДЕ

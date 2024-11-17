@@ -1,19 +1,10 @@
-def get_stmt(self):
+from cfg import JsonData
 
-    q = sqlalchemy.select(
-        THUMBS.c.src,
-        THUMBS.c.hash_path,
-        THUMBS.c.mod,
-        THUMBS.c.coll,
-        THUMBS.c.fav
-        )
+JsonData.init()
 
-    q = q.limit(150)
-    q = q.order_by(-THUMBS.c.mod)
+filter_values_ = list(
+            i.get("value")
+            for i in (*JsonData.dynamic_filters, JsonData.static_filter)
+            )
 
-    prod_stmt = THUMBS.c.src.not_ilike("%/PROCUCT/%")
-    mod_stmt = THUMBS.c.src.not_ilike("%/MODEL/%")
-
-    q = q.where(
-        sqlalchemy.and_(sqlalchemy.or_(prod_stmt, mod_stmt))
-        )
+print(filter_values_)
