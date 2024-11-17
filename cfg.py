@@ -250,6 +250,7 @@ class JsonData:
             cls.app_ver = 1.0
 
         if APP_VER > float(cls.app_ver):
+            print("Пользовательская версия приложения ниже необходимой")
             cls.copy_indeed_files()
 
     @classmethod
