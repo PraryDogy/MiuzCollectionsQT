@@ -54,11 +54,11 @@ class LoadDbTask(URunnable):
             q = q.where(THUMBS.c.coll == JsonData.curr_coll)
 
         if Dynamic.search_widget_text:
-            text = Dynamic.search_widget_text.strip().replace("\n", "")
-            q = q.where(THUMBS.c.src.ilike(f"%{text}%"))
+            search = Dynamic.search_widget_text.replace("\n", "").strip()
+            q = q.where(THUMBS.c.src.like(f"%{search}%"))
 
         filters = [
-            THUMBS.c.src.ilike(f"%/{true_name}/%") 
+            THUMBS.c.src.like(f"%/{true_name}/%") 
             for code_name, true_name in JsonData.cust_fltr_names.items()
             if JsonData.cust_fltr_vals[code_name]
         ]
@@ -81,23 +81,15 @@ class LoadDbTask(URunnable):
             q = q.where(sqlalchemy.and_(*other_filter))
 
         if any((Dynamic.date_start, Dynamic.date_end)):
-            t = self.combine_dates()
+            t = self._stamp_dates()
             q = q.where(THUMBS.c.mod > t[0])
             q = q.where(THUMBS.c.mod < t[1])
 
         return q
 
-    def combine_dates(self) -> tuple[datetime, datetime]:
-        start = datetime.combine(
-            Dynamic.date_start,
-            datetime.min.time()
-            )
-
-        end = datetime.combine(
-            Dynamic.date_end,
-            datetime.max.time().replace(microsecond=0)
-            )
-
+    def _stamp_dates(self) -> tuple[datetime, datetime]:
+        start = datetime.combine(Dynamic.date_start, datetime.min.time())
+        end = datetime.combine(Dynamic.date_end, datetime.max.time().replace(microsecond=0))
         return datetime.timestamp(start), datetime.timestamp(end)
 
 
