@@ -8,9 +8,10 @@ from lang.eng import Eng
 from lang.rus import Rus
 from styles import Themes
 
+APP_VER = 5.85
+
 LINK_DB = "https://disk.yandex.ru/d/gDnB5X9kGqjztA"
 APP_NAME: str = "MiuzCollections"
-APP_VER = 5.85
 
 APP_SUPPORT_DIR: str = os.path.join(
     os.path.expanduser("~"),
@@ -76,7 +77,7 @@ STATIC_FILTER_REAL_NAME = "other_flag"
 
 
 class JsonData:
-    app_ver: str = APP_VER
+    app_ver: str = 0.0
 
     coll_folder: str = "/Volumes/Shares/Collections"
     
@@ -208,9 +209,15 @@ class JsonData:
     def check_app_dirs(cls):
 
         if not os.path.exists(APP_SUPPORT_DIR):
-
             os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
-            cls.copy_indeed_files()
+
+        if not os.path.exists(DB_FILE):
+            cls.copy_db_file()
+
+        if not os.path.exists(HASH_DIR):
+            cls.copy_hashdir()
+
+        if not os.path.exists(JSON_FILE):
             cls.write_json_data()
 
     @classmethod
@@ -251,15 +258,10 @@ class JsonData:
 
         if APP_VER > float(cls.app_ver):
             print("Пользовательская версия приложения ниже необходимой")
-            cls.copy_indeed_files()
-
-    @classmethod
-    def copy_indeed_files(cls):
-        print("копирую необходимые файлы")
-        cls.copy_db_file()
-        cls.copy_hashdir()
-        cls.app_ver = APP_VER
-        cls.write_json_data()
+            cls.copy_db_file()
+            cls.copy_hashdir()
+            cls.app_ver = APP_VER
+            cls.write_json_data()
 
     @classmethod
     def init(cls):
