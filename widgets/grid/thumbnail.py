@@ -58,11 +58,6 @@ class Thumbnail(QFrame):
             self.name = os.path.basename(src)
         elif fav == 1:
             self.name = STAR_SYM + os.path.basename(src)
-
-        self.setToolTip(
-            f"{Dynamic.lng.collection}: {self.coll}\n"
-            f"{Dynamic.lng.file_name}: {self.name}"
-            )  
         
         self.row, self.col = 0, 0
 
