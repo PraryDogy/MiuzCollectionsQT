@@ -29,12 +29,15 @@ class System_:
             "error.txt"
             )
         
-        os.makedirs(APP_SUPPORT, exist_ok=True)
+        script = "applescripts/error_msg.scpt"
+        subprocess.run(["osascript", script, SUMMARY_MSG])
 
-        with open(FILE_, "w")as f:
-            print(SUMMARY_MSG, file=f)
+        # os.makedirs(APP_SUPPORT, exist_ok=True)
 
-        subprocess.Popen(["open", FILE_])
+        # with open(FILE_, "w")as f:
+        #     print(SUMMARY_MSG, file=f)
+
+        # subprocess.Popen(["open", FILE_])
 
     @classmethod
     def set_plugin_path(cls) -> bool:
@@ -53,6 +56,7 @@ class System_:
 
 if System_.set_plugin_path():
     System_.set_excepthook()
+System_.set_excepthook()
 
 
 from PyQt5.QtCore import QEvent, QObject
