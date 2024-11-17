@@ -231,7 +231,7 @@ class JsonData:
             shutil.copytree(PRELOADED_HASHDIR, HASH_DIR)
 
         else:
-            t = "нет предустановленной HASH_DIR"
+            t = "нет предустановленной HASH_DIR: " + PRELOADED_HASHDIR
             raise Exception(t)
 
     @classmethod
@@ -246,7 +246,7 @@ class JsonData:
             shutil.copyfile(src="db.db", dst=DB_FILE)
 
         else:
-            t = "Нет предуставновленного DB_FILE"
+            t = "Нет предуставновленного DB_FILE: " + DB_FILE
             raise Exception(t)
 
     @classmethod
