@@ -132,8 +132,7 @@ class Utils:
             cv2.imwrite(output_path, array_img)
             return True
         except Exception as e:
-            # cls.print_err(error=e)
-            print("utils can't write img hash")
+            cls.print_err(error=e)
             return False
         
     @classmethod
@@ -142,8 +141,7 @@ class Utils:
             array_img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
             return cls.array_color(array_img, "BGR")
         except Exception as e:
-            # cls.print_err(error= e)
-            print("utils > can't read image hash")
+            cls.print_err(error=e)
             return None
 
     @classmethod

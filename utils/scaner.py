@@ -206,7 +206,10 @@ class DbUpdater:
         conn.close()
 
         for hash_path in self.del_items:
-            os.remove(hash_path)
+            try:
+                os.remove(hash_path)
+            except Exception as e:
+                Utils.print_err(error=e)
 
         if self.del_items:
             ScanerUtils.reload_gui()
