@@ -19,79 +19,48 @@ BTN_W, BTN_H = 80, 28
 
 
 class WinRename(WinChild):
-    def __init__(self, data: dict, flag: str):
-        """flag: name | value"""
+    finished_ = pyqtSignal(str)
 
+    def __init__(self, title: str, input_text: str):
         super().__init__(parent=None)
 
         self.min_btn_disable()
         self.max_btn_disable()
-        self.close_btn_cmd(self.cancel_cmd)
+        self.close_btn_cmd(self.close_cmd)
         self.content_lay_v.setSpacing(10)
         self.content_lay_v.setContentsMargins(10, 5, 10, 10)
 
-        self.data = data
-        self.flag = flag
+        title_label = QLabel(title)
+        self.content_lay_v.addWidget(title_label)
 
-        if flag == "name":
-            self.name_ui()
-        elif flag == "value":
-            self.value_ui()
+        self.input_wid = InputBase()
+        self.input_wid.setPlaceholderText(title)
+        self.input_wid.setText(input_text)
+        self.input_wid.selectAll()
+        self.input_wid.setFixedWidth(200)
+        self.content_lay_v.addWidget(self.input_wid)
 
         h_wid = QWidget()
         h_lay = LayoutHor()
         h_wid.setLayout(h_lay)
         self.content_lay_v.addWidget(h_wid)
 
-        self.ok_btn = Btn(text=Dynamic.lng.ok)
-        self.ok_btn.mouseReleaseEvent = self.ok_cmd
-        h_lay.addWidget(self.ok_btn)
+        ok_btn = Btn(text=Dynamic.lng.ok)
+        ok_btn.mouseReleaseEvent = self.ok_cmd
+        h_lay.addWidget(ok_btn)
 
         cancel_btn = Btn(text=Dynamic.lng.cancel)
-        cancel_btn.mouseReleaseEvent = self.cancel_cmd
+        cancel_btn.mouseReleaseEvent = self.close_cmd
         h_lay.addWidget(cancel_btn)
 
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
 
-    def name_ui(self):
-        title_ = "Задайте имя фильтра"
-        input_text = self.data.get(Dynamic.lng.name_)
-
-        title = QLabel(title_)
-        self.content_lay_v.addWidget(title)
-
-        self.input_wid = InputBase()
-        self.input_wid.setPlaceholderText(title_)
-        self.input_wid.setText(input_text)
-        self.input_wid.selectAll()
-        self.input_wid.setFixedWidth(200)
-        self.content_lay_v.addWidget(self.input_wid)
-
-    def value_ui(self):
-        title_ = "Задайте значение фильтра"
-        input_text = self.data.get("real")
-
-        title = QLabel(title_)
-        self.content_lay_v.addWidget(title)
-        
-        self.input_wid = InputBase()
-        self.input_wid.setPlaceholderText(title_)
-        self.input_wid.setText(input_text)
-        self.input_wid.selectAll()
-        self.input_wid.setFixedWidth(200)
-        self.content_lay_v.addWidget(self.input_wid)
-
     def ok_cmd(self, *args):
-        if self.flag == "name":
-            self.data[Dynamic.lng.name_] = self.input_wid.text()
+        self.finished_.emit(self.input_wid.text())
+        self.close_cmd()
 
-        elif self.flag == "value":
-            self.data["real"] = self.input_wid.text()
-
-        self.cancel_cmd()
-
-    def cancel_cmd(self, *args):
+    def close_cmd(self, *args):
         self.close()
 
 
@@ -135,7 +104,9 @@ class DatesBtn(Btn):
 
 class FilterBtn(Btn):
     def __init__(self, data: dict):
+        """cfg > dynamic_filters > item"""
 
+        # cfg > dynamic_filters > Eng.name_ | Rus.name_
         text = data.get(Dynamic.lng.name_)
         super().__init__(text=text)
 
@@ -161,11 +132,27 @@ class FilterBtn(Btn):
         self.setObjectName(Names.dates_btn_bordered)
         self.setStyleSheet(Themes.current)
 
-    def rename_win(self, flag: str):
+    def rename_win(self, title: str, input_text: str, flag: str):
         """flag: name | value"""
-        self.win_ = WinRename(data=self.data, flag=flag)
+
+        cmd_ = lambda text: self.finished_cmd(text, flag)
+        self.win_ = WinRename(title, input_text)
         self.win_.center_relative_parent(self)
+        self.win_.finished_.connect(cmd_)
         self.win_.show()
+
+    def finished_cmd(self, text: str, flag: str):
+        """flag: name | value"""
+
+        if flag == "name":
+            # cfg > dynamic_filters > Eng.name_ | Rus.name_
+            self.data[Dynamic.lng.name_] = text
+            self.setText(text)
+        
+        elif flag == "value":
+            # cfg > dynamic_filters > "real"
+            self.data["real"] = text
+            SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() != Qt.MouseButton.LeftButton:
@@ -186,15 +173,19 @@ class FilterBtn(Btn):
         self.set_border_blue_style()
         menu_ = ContextCustom(ev)
 
-        cmd_ = lambda: self.rename_win(flag="name")
-        one = QAction(parent=menu_, text="Задать имя")
-        one.triggered.connect(cmd_)
-        menu_.addAction(one)
+        # cfg > dynamic_filters > Eng.name_ | Rus.name_
+        filter_name = self.data.get(Dynamic.lng.name_)
+        set_name_cmd = lambda: self.rename_win("Имя фильтра", filter_name, "name")
+        set_name = QAction(parent=menu_, text="Имя фильтра")
+        set_name.triggered.connect(set_name_cmd)
+        menu_.addAction(set_name)
 
-        cmd_ = lambda: self.rename_win(flag="value")
-        two = QAction(parent=menu_, text="Задать значение")
-        two.triggered.connect(cmd_)
-        menu_.addAction(two)
+        # cfg > dynamic_filters > "real"
+        filter_value = self.data.get("real")
+        set_value_cmd = lambda: self.rename_win("Значение фильтра", filter_value, "value")
+        set_value = QAction(parent=menu_, text="Значение фильтра")
+        set_value.triggered.connect(set_value_cmd)
+        menu_.addAction(set_value)
 
         menu_.show_menu()
 
@@ -227,7 +218,6 @@ class BarTop(QFrame):
         self.filter_btns.clear()
 
         for data in (*JsonData.dynamic_filters, JsonData.static_filter):
-
             label = FilterBtn(data)
             self.filter_btns.append(label)
             self.h_layout.addWidget(label)
