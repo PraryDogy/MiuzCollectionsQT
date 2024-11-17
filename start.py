@@ -75,17 +75,20 @@ class App(QApplication):
         return super().eventFilter(a0, a1)
 
 
-JsonData.init()
-Dbase.init()
+print("сначала старым приложением закончи формирование ДБ")
+print("потом добавь колонку fav")
+print("потом заархивируй базу данных и hashdir и уже потом обновляй")
+# JsonData.init()
+# Dbase.init()
 
-app = App(sys.argv)
+# app = App(sys.argv)
 
-UThreadPool.init()
-SignalsApp.init()
-Scaner.init()
+# UThreadPool.init()
+# SignalsApp.init()
+# Scaner.init()
 
-win_main = WinMain()
-win_main.center()
-win_main.show()
+# win_main = WinMain()
+# win_main.center()
+# win_main.show()
 
-app.exec()
+# app.exec()
