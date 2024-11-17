@@ -119,6 +119,12 @@ class AboveThumbsNoImages(QWidget):
             **Dynamic.lng.sys_fltr_names
             }
 
+        enabled_filters = [
+            data
+            for data in (*JsonData.dynamic_filters, JsonData.static_filter)
+            if data.get("value")
+            ]
+
         if Dynamic.search_widget_text:
             noimg_t = (f"{Dynamic.lng.no_photo} {Dynamic.lng.with_name}: "
                        f"{Dynamic.search_widget_text}")
@@ -135,11 +141,15 @@ class AboveThumbsNoImages(QWidget):
             title_label.setText(noimg_t)
             h_layout.addWidget(ResetDatesBtn())
 
-        elif any(merg_fltr_vals.values()):
-            filters = (f"{merg_fltr_lng[code_name].lower()}"
-                       for code_name, val in merg_fltr_vals.items()
-                       if val)
-            filters = ",  ".join(filters)
+        elif enabled_filters:
+    
+            filters = [
+                data.get(Dynamic.lng.name_).lower()
+                for data in enabled_filters
+                ]
+
+            filters = ", ".join(filters)
+
             noimg_t = (f"{Dynamic.lng.no_photo_filter}: {filters}")
 
             title_label.setText(noimg_t)
