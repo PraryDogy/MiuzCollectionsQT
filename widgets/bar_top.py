@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QWidget, QLabel
 
 from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
 from base_widgets.wins import WinChild
-from cfg import Dynamic, JsonData
+from cfg import Dynamic, JsonData, STATIC_FILTER_REAL_NAME
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
@@ -185,7 +185,9 @@ class FilterBtn(Btn):
         set_value_cmd = lambda: self.rename_win("Значение фильтра", filter_value, "value")
         set_value = QAction(parent=menu_, text="Значение фильтра")
         set_value.triggered.connect(set_value_cmd)
-        menu_.addAction(set_value)
+
+        if not self.data.get("real") == STATIC_FILTER_REAL_NAME:
+            menu_.addAction(set_value)
 
         menu_.show_menu()
 

@@ -69,6 +69,8 @@ GRAY = "rgba(111, 111, 111, 0.5)"
 BLUE = "rgba(0, 122, 255, 1)"
 STAR_SYM = "\U00002605" + " "
 
+STATIC_FILTER_REAL_NAME = "other_flag"
+
 
 class JsonData:
     app_ver: str = APP_VER
@@ -138,7 +140,7 @@ class JsonData:
     static_filter = {
         Eng.name_: "Other",
         Rus.name_: "Остальное",
-        "real": "other_flag",
+        "real": STATIC_FILTER_REAL_NAME,
         "value": False
         }
 
