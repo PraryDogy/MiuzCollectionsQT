@@ -171,6 +171,10 @@ class JsonData:
                     cls.write_json_data()
                     cls.read_json_data()
                     return
+                
+            filters = json_data.get("dynamic_filters")
+            print(filters)
+            return
 
             for k, v in json_data.items():
                 if hasattr(cls, k):
