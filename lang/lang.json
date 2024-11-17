@@ -95,6 +95,14 @@
         "Размер",
         "Size"
     ],
+    "filter_name": [
+        "Имя фильтра",
+        "Filter name"
+    ],
+    "filter_value": [
+        "Значение фильтра",
+        "Filter value"
+    ],
     "info": [
         "Инфо",
         "Info"

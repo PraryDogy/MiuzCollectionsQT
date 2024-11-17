@@ -23,6 +23,8 @@ class Rus:
 	fav_coll = 'Избранное'
 	file_name = 'Имя файла'
 	file_size = 'Размер'
+	filter_name = 'Имя фильтра'
+	filter_value = 'Значение фильтра'
 	info = 'Инфо'
 	lang_label = 'Язык/Language'
 	loading = 'Загрузка...'

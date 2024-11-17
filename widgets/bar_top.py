@@ -1,13 +1,12 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QFrame, QWidget, QLabel
+from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 
 from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
 from base_widgets.wins import WinChild
-from cfg import Dynamic, JsonData, STATIC_FILTER_REAL_NAME
+from cfg import STATIC_FILTER_REAL_NAME, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.utils import Utils
 
 from .win_dates import WinDates
 
@@ -195,8 +194,8 @@ class FilterBtn(Btn):
         JsonData.dynamic_filters, JsonData.static_filter
 
         filter_name = self.data.get(Dynamic.lng.lang_name)
-        set_name_cmd = lambda: self.rename_win("Имя фильтра", filter_name, "name")
-        set_name = QAction(parent=menu_, text="Имя фильтра")
+        set_name_cmd = lambda: self.rename_win(Dynamic.lng.filter_name, filter_name, "name")
+        set_name = QAction(parent=menu_, text=Dynamic.lng.filter_name)
         set_name.triggered.connect(set_name_cmd)
         menu_.addAction(set_name)
 
@@ -204,8 +203,8 @@ class FilterBtn(Btn):
         JsonData.dynamic_filters, JsonData.static_filter
 
         filter_value = self.data.get("real")
-        set_value_cmd = lambda: self.rename_win("Значение фильтра", filter_value, "value")
-        set_value = QAction(parent=menu_, text="Значение фильтра")
+        set_value_cmd = lambda: self.rename_win(Dynamic.lng.filter_value, filter_value, "value")
+        set_value = QAction(parent=menu_, text=Dynamic.lng.filter_value)
         set_value.triggered.connect(set_value_cmd)
 
         JsonData.static_filter

@@ -23,6 +23,8 @@ class Eng:
 	fav_coll = 'Favorites'
 	file_name = 'Filename'
 	file_size = 'Size'
+	filter_name = 'Filter name'
+	filter_value = 'Filter value'
 	info = 'Info'
 	lang_label = 'Language/Язык'
 	loading = 'Loading...'
