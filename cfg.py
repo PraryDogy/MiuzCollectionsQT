@@ -208,7 +208,7 @@ class JsonData:
         data: dict[str, Rus | Eng] = {"ru": Rus, "en": Eng}
 
         if key_ in data:
-            Dynamic.lng = data.get(key_)()
+            Dynamic.lng = data.get(key_)
             cls.lng_name = key_
 
         else:
