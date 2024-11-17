@@ -77,16 +77,6 @@ class JsonData:
     
     curr_size_ind: int = 0
     curr_coll: str = ALL_COLLS
-
-    cust_fltr_names: dict = {
-        "prod": "1 IMG",
-        "mod": "2 Model IMG"
-        }
-
-    cust_fltr_vals: dict = {
-        "prod": False,
-        "mod": False
-        }    
     
     imgview_g: dict = {
         "aw": 700,
@@ -105,10 +95,6 @@ class JsonData:
         "Chosed",
         "LEVIEV"
         ]
-
-    sys_fltr_vals: dict = {
-        "other" : False
-        }
     
     theme: str = "dark_theme"
     lng_name: str = Eng.name_
