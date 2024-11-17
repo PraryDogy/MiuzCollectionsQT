@@ -49,16 +49,19 @@ class LoadDbTask(URunnable):
         q = q.order_by(-THUMBS.c.mod)
 
         if JsonData.curr_coll == FAVS:
+
             q = q.where(
                 THUMBS.c.fav == 1
                 )
 
         elif JsonData.curr_coll != ALL_COLLS:
+
             q = q.where(
                 THUMBS.c.coll == JsonData.curr_coll
                 )
 
         if Dynamic.search_widget_text:
+
             text = Dynamic.search_widget_text.strip().replace("\n", "")
             q = q.where(
                 THUMBS.c.src.ilike(f"%{text}%")
@@ -76,7 +79,6 @@ class LoadDbTask(URunnable):
             if JsonData.prod_.get("value"):
 
                 text_ = self.get_template(JsonData.prod_.get("real"))
-
                 q = q.where(
                     sqlalchemy.and_(THUMBS.c.src.ilike(text_))
                     )
@@ -103,9 +105,7 @@ class LoadDbTask(URunnable):
                     sqlalchemy.and_(sqlalchemy.or_(prod_stmt, mod_stmt))
                     )
                 
-                print(q)
-
-                # print("other")
+                print("other stmt")
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self.combine_dates()

@@ -1,46 +1,19 @@
-import sqlalchemy
+def get_stmt(self):
 
-from database import THUMBS, Dbase
-import os
+    q = sqlalchemy.select(
+        THUMBS.c.src,
+        THUMBS.c.hash_path,
+        THUMBS.c.mod,
+        THUMBS.c.coll,
+        THUMBS.c.fav
+        )
 
-class JsonData:
+    q = q.limit(150)
+    q = q.order_by(-THUMBS.c.mod)
 
-    some_var = "test"
+    prod_stmt = THUMBS.c.src.not_ilike("%/PROCUCT/%")
+    mod_stmt = THUMBS.c.src.not_ilike("%/MODEL/%")
 
-    prod_ = {
-        "en": "Product",
-        "ru": "Предметка",
-        "real": "1 IMG",
-        "value": False
-        }
-    
-    model_ = {
-        "en": "Model",
-        "ru": "Модели",
-        "real": "2 MODEL IMG",
-        "value": False
-        }
-    
-    other_ = {
-        "en": "Other",
-        "ru": "Остальное",
-        "real": "",
-        "value": True
-        }
-
-    @classmethod
-    def get_data(cls):
-        return [
-            i for i in dir(cls)
-            if not i.startswith("__")
-            and
-            not callable(getattr(cls, i))
-            ]
-
-
-all_ = set(
-    i.get("value")
-    for i in (JsonData.prod_, JsonData.model_, JsonData.other_)
-    )
-
-print(len(all_))
+    q = q.where(
+        sqlalchemy.and_(sqlalchemy.or_(prod_stmt, mod_stmt))
+        )
