@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 from datetime import datetime
 
@@ -48,37 +49,63 @@ class LoadDbTask(URunnable):
         q = q.order_by(-THUMBS.c.mod)
 
         if JsonData.curr_coll == FAVS:
-            q = q.where(THUMBS.c.fav == 1)
+            q = q.where(
+                THUMBS.c.fav == 1
+                )
 
         elif JsonData.curr_coll != ALL_COLLS:
-            q = q.where(THUMBS.c.coll == JsonData.curr_coll)
+            q = q.where(
+                THUMBS.c.coll == JsonData.curr_coll
+                )
 
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
-            q = q.where(THUMBS.c.src.ilike(f"%{text}%"))
+            q = q.where(
+                THUMBS.c.src.ilike(f"%{text}%")
+                )
 
-        filters = [
-            THUMBS.c.src.ilike(f"%/{true_name}/%") 
-            for code_name, true_name in JsonData.cust_fltr_names.items()
-            if JsonData.cust_fltr_vals[code_name]
-        ]
+        filter_values_ = set(
+            i.get("value")
+            for i in (JsonData.prod_, JsonData.model_, JsonData.other_)
+            )
+        
+        if len(filter_values_) > 1:
 
-        other_filter = [
-            THUMBS.c.src.not_like(f"%/{true_name}/%") 
-            for code_name, true_name in JsonData.cust_fltr_names.items() 
-            if JsonData.sys_fltr_vals["other"]
-            ]
+            # мы используем "and_", потому что уже есть условие
+            # "where" в search text
+            if JsonData.prod_.get("value"):
 
-        if all((filters, other_filter)):
-            filters = sqlalchemy.or_(*filters)
-            other_filter = sqlalchemy.and_(*other_filter)
-            q = q.where(sqlalchemy.or_(filters, other_filter))
+                text_ = self.get_template(JsonData.prod_.get("real"))
 
-        elif filters:
-            q = q.where(sqlalchemy.or_(*filters))
+                q = q.where(
+                    sqlalchemy.and_(THUMBS.c.src.ilike(text_))
+                    )
 
-        elif other_filter:
-            q = q.where(sqlalchemy.and_(*other_filter))
+            if JsonData.model_.get("value"):
+
+                text_ = self.get_template(JsonData.model_.get("real"))
+                q = q.where(
+                    sqlalchemy.and_(THUMBS.c.src.ilike(text_))
+                    )
+
+            # когда фильтр "остальное" включен
+            # мы ищем в SRC все, что не включает в себя prod ИЛИ model
+            # ... И (src не содержит prod ИЛИ src не содержит model)
+            if JsonData.other_.get("value"):
+
+                text_ = self.get_template(JsonData.prod_.get("real"))
+                prod_stmt = THUMBS.c.src.not_ilike(text_)
+
+                text_ = self.get_template(JsonData.model_.get("real"))
+                mod_stmt = THUMBS.c.src.not_ilike(text_)
+
+                q = q.where(
+                    sqlalchemy.and_(sqlalchemy.or_(prod_stmt, mod_stmt))
+                    )
+                
+                print(q)
+
+                # print("other")
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self.combine_dates()
@@ -86,6 +113,9 @@ class LoadDbTask(URunnable):
             q = q.where(THUMBS.c.mod < t[1])
 
         return q
+    
+    def get_template(self, text: str) -> str:
+        return "%" + os.sep + text + os.sep + "%"
 
     def combine_dates(self) -> tuple[datetime, datetime]:
         start = datetime.combine(

@@ -133,6 +133,27 @@ class JsonData:
         '/Volumes/Shares-3/Collections'
         ]
 
+    prod_ = {
+        "en": "Product",
+        "ru": "Предметка",
+        "real": "1 IMG",
+        "value": False
+        }
+    
+    model_ = {
+        "en": "Model",
+        "ru": "Модели",
+        "real": "2 MODEL IMG",
+        "value": False
+        }
+    
+    other_ = {
+        "en": "Other",
+        "ru": "Остальное",
+        "real": "",
+        "value": False
+        }
+
     @classmethod
     def get_data(cls):
         return [
