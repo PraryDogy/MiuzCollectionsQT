@@ -67,6 +67,10 @@ class FilterBtn(Btn):
         self.setObjectName(Names.filter_btn_selected)
         self.setStyleSheet(Themes.current)
 
+    def set_border_blue_style(self):
+        self.setObjectName(Names.dates_btn_bordered)
+        self.setStyleSheet(Themes.current)
+
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() != Qt.MouseButton.LeftButton:
             return
