@@ -32,8 +32,9 @@ class System_:
         os.makedirs(APP_SUPPORT, exist_ok=True)
 
         with open(FILE_, "w")as f:
-            f.write(SUMMARY_MSG)
-            subprocess.run(["open", FILE_])
+            print(SUMMARY_MSG, file=f)
+
+        subprocess.Popen(["open", FILE_])
 
     @classmethod
     def set_plugin_path(cls) -> bool:
