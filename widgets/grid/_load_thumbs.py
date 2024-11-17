@@ -29,6 +29,7 @@ class LoadDbTask(URunnable):
         super().__init__()
         self.signals_ = WorkerSignals()
 
+    @URunnable.set_running_state
     def run(self):
         conn = Dbase.engine.connect()
         stmt = self._get_stmt()

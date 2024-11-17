@@ -6,4 +6,4 @@ lambda вынести в cmd
 проверить скачивание обновы
 проверь остановку сканера выходом из приложения
 
-menu left, info, thumbs dict в urunnable
+info, в urunnable

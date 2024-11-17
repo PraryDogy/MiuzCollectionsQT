@@ -107,6 +107,7 @@ class FavTask(URunnable):
         self.src = src.replace(JsonData.coll_folder, "")
         self.value = value
 
+    @URunnable.set_running_state
     def run(self):
         values = {"fav": self.value}
         q = sqlalchemy.update(THUMBS).where(THUMBS.c.src==self.src)

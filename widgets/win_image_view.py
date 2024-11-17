@@ -38,6 +38,7 @@ class LoadThumb(URunnable):
         self.signals_ = WorkerSignals()
         self.src = src
 
+    @URunnable.set_running_state
     def run(self):
         small_src = self.src.replace(JsonData.coll_folder, "")
 

@@ -119,6 +119,7 @@ class LoadMenus(URunnable):
         super().__init__()
         self.signals_ = WorkerSignals()
 
+    @URunnable.set_running_state
     def run(self):
         menus = self.load_colls_query()
         self.signals_.finished_.emit(menus)
