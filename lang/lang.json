@@ -28,8 +28,8 @@
         "Changed"
     ],
     "choose_coll_smb": [
-        "Возможные решения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках.",
-        "Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings."
+        "Нет подключения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках.",
+        "No connection:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings."
     ],
     "collection": [
         "Коллекция",

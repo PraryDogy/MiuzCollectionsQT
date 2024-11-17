@@ -6,7 +6,7 @@ class Eng:
 	browse = 'Browse'
 	cancel = 'Cancel'
 	changed = 'Changed'
-	choose_coll_smb = 'Possible solutions:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings.'
+	choose_coll_smb = 'No connection:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings.'
 	collection = 'Collection'
 	copy = 'Copy'
 	copy_all = 'Copy all'
@@ -25,10 +25,10 @@ class Eng:
 	filter_value = 'Filter value'
 	info = 'Info'
 	lang_label = 'Language/Язык'
+	lang_name = 'eng'
 	loading = 'Loading...'
 	months = {'1': 'January', '10': 'October', '11': 'November', '12': 'December', '2': 'February', '3': 'March', '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August', '9': 'September'}
 	months_genitive_case = {'1': 'january', '10': 'october', '11': 'november', '12': 'december', '2': 'february', '3': 'march', '4': 'april', '5': 'may', '6': 'june', '7': 'july', '8': 'august', '9': 'september'}
-	lang_name = 'eng'
 	no_connection = 'No connection'
 	no_photo = 'No photos'
 	no_photo_filter = 'No photos in cathegory'
