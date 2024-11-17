@@ -1,10 +1,3 @@
-from cfg import JsonData
-
-JsonData.init()
-
-filter_values_ = list(
-            i.get("value")
-            for i in (*JsonData.dynamic_filters, JsonData.static_filter)
-            )
-
-print(filter_values_)
+from cfg import JsonData, JSON_FILE
+import json
+import os

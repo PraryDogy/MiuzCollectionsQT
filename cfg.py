@@ -173,8 +173,6 @@ class JsonData:
                     return
                 
             filters = json_data.get("dynamic_filters")
-            print(filters)
-            return
 
             for k, v in json_data.items():
                 if hasattr(cls, k):
