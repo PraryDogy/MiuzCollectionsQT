@@ -9,13 +9,13 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import PIXMAP_SIZE, PSD_TIFF, Dynamic, JsonData
+from cfg import PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
 
-from .actions import CopyPath, OpenInfo, OpenWins, Reveal, Save
+from .actions import CopyPath, OpenInfo, OpenWins, Reveal, Save, FavAction
 from .grid.thumbnail import Thumbnail
 from .win_smb import WinSmb
 
@@ -363,6 +363,11 @@ class WinImageView(WinChild):
         self.setFocus()
         self.image_label.setCursor(Qt.CursorShape.ArrowCursor)
 
+    def change_fav(self, value: int):
+        wid = Thumbnail.path_to_wid.get(self.src)
+        wid.change_fav(value)
+        self.set_image_title()
+
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
     def keyPressEvent(self, ev: QKeyEvent | None) -> None:
@@ -400,6 +405,11 @@ class WinImageView(WinChild):
 
             info = OpenInfo(parent=self, src=self.src)
             self.menu_.addAction(info)
+
+            wid = Thumbnail.path_to_wid.get(self.src)
+            self.fav_action = FavAction(parent=self, src=wid.src, fav=wid.fav)
+            self.fav_action.finished_.connect(self.change_fav)
+            self.menu_.addAction(self.fav_action)
 
             self.menu_.addSeparator()
 
