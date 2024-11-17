@@ -14,15 +14,22 @@ class System_:
         ERROR = traceback.format_exception(*args)
 
         SUMMARY_MSG = "\n".join([*ERROR, STARS, ABOUT])
-        APP_NAME: str = "MiuzCollections"
 
-        FILE_: str = os.path.join(
+        APP_NAME: str = "MiuzCollections" + "QT"
+
+        APP_SUPPORT = os.path.join(
             os.path.expanduser("~"),
             "Library",
-            "Application Support",
-            APP_NAME + "QT",
+            "Application Support"
+            )
+
+        FILE_: str = os.path.join(
+            APP_SUPPORT,
+            APP_NAME,
             "error.txt"
             )
+        
+        os.makedirs(APP_SUPPORT, exist_ok=True)
 
         with open(FILE_, "w")as f:
             f.write(SUMMARY_MSG)
@@ -74,14 +81,6 @@ class App(QApplication):
                 SignalsApp.all_.win_main_cmd.emit("show")
         return super().eventFilter(a0, a1)
 
-
-# print("сначала старым приложением закончи формирование ДБ")
-# print("потом добавь колонку fav")
-# print("потом заархивируй базу данных и hashdir и уже потом обновляй")
-
-# print("Нажми 1 если сделал это")
-# if input() != "1":
-#     exit()
 
 JsonData.init()
 Dbase.init()
