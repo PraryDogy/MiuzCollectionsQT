@@ -132,6 +132,12 @@ class JsonData:
             Rus.name_: "Модели",
             "real": "2 MODEL IMG",
             "value": False
+        },
+        {
+            Eng.name_: "Testing",
+            Rus.name_: "Тестинг",
+            "real": "TEST",
+            "value": False
         }
     ]
   
@@ -155,18 +161,20 @@ class JsonData:
     def read_json_data(cls) -> dict:
 
         if os.path.exists(JSON_FILE):
-            with open(JSON_FILE, 'r', encoding="utf-8") as f:
 
+            with open(JSON_FILE, 'r', encoding="utf-8") as f:
                 try:
                     json_data: dict = json.load(f)
-
-                    for k, v in json_data.items():
-                        if hasattr(cls, k):
-                            setattr(cls, k, v)
 
                 except json.JSONDecodeError:
                     print("Ошибка чтения json")
                     cls.write_json_data()
+                    cls.read_json_data()
+                    return
+
+            for k, v in json_data.items():
+                if hasattr(cls, k):
+                    setattr(cls, k, v)
 
         else:
             print("файла не существует, устанавливаю настройки по умолчанию")
