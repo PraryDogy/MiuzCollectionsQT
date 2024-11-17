@@ -79,7 +79,7 @@ class Utils:
         if (
             not os.path.exists(JsonData.coll_folder)
             or
-            JsonData.coll_folder not in (JsonData.coll_folder_list)
+            JsonData.coll_folder not in JsonData.coll_folder_list
             ):
 
             for coll_folder in JsonData.coll_folder_list:

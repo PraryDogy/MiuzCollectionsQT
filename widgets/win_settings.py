@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
@@ -8,7 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 
 from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
-from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
+from cfg import APP_SUPPORT_DIR, DB_FILE, HASH_DIR, Dynamic, JsonData
 from database import Dbase
 from lang.eng import Eng
 from lang.rus import Rus
@@ -299,7 +300,13 @@ class WinSettings(WinChild):
             print("settings win restore db")
             JsonData.write_json_data()
             QApplication.quit()
-            Dbase.copy_db_file()
+
+            if os.path.exists(DB_FILE):
+                os.remove(DB_FILE)
+
+            if os.path.exists(HASH_DIR):
+                shutil.rmtree(HASH_DIR)
+
             Utils.start_new_app()
 
         elif hasattr(self.change_lang, "flag"):
