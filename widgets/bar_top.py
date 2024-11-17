@@ -91,8 +91,8 @@ class FilterBtn(Btn):
         return super().mouseReleaseEvent(ev)
     
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        prev_name = self.objectName()
         self.set_border_blue_style()
-
         menu_ = ContextCustom(ev)
 
         one = QAction(parent=menu_, text="Задать имя")
@@ -103,7 +103,7 @@ class FilterBtn(Btn):
 
         menu_.show_menu()
 
-        if self.objectName() == Names.filter_btn_selected:
+        if prev_name == Names.filter_btn:
             self.set_normal_style()
         else:
             self.set_blue_style()
