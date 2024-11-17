@@ -208,7 +208,8 @@ class DbUpdater:
         for hash_path in self.del_items:
             os.remove(hash_path)
 
-        ScanerUtils.reload_gui()
+        if self.del_items:
+            ScanerUtils.reload_gui()
 
     def get_small_img(self, src: str) -> tuple[ndarray, str] | None:
         array_img = Utils.read_image(src)
@@ -305,7 +306,8 @@ class DbUpdater:
         for hash_path, img_array in self.hash_images:
             Utils.write_image_hash(hash_path, img_array)
 
-        ScanerUtils.reload_gui()
+        if self.hash_images:
+            ScanerUtils.reload_gui()
 
 
 class WorkerSignals(QObject):

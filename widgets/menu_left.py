@@ -161,7 +161,7 @@ class BaseLeftMenu(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.init_ui()
-        SignalsApp.all_.reload_menu_left.connect(self.reload_menu)
+        SignalsApp.all_.reload_menu_left.connect(self.init_ui)
 
     def init_ui(self):
         self.task_ = LoadMenus()
@@ -177,13 +177,12 @@ class BaseLeftMenu(QScrollArea):
         self.main_wid.setStyleSheet(Themes.current)
         self.setWidget(self.main_wid)
 
-        fl = Qt.AlignmentFlag.AlignTop
-        self.main_layout = LayoutVer()
-        self.main_layout.setAlignment(fl)
-        self.main_wid.setLayout(self.main_layout)
+        main_layout = LayoutVer()
+        main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.main_wid.setLayout(main_layout)
 
         btns_widget = QWidget()
-        self.main_layout.addWidget(btns_widget)
+        main_layout.addWidget(btns_widget)
 
         main_btns_layout = LayoutVer()
         btns_widget.setLayout(main_btns_layout)
@@ -214,12 +213,9 @@ class BaseLeftMenu(QScrollArea):
                 true_name=data.get("true_name")
                 )
 
-            self.main_layout.addWidget(label)
+            main_layout.addWidget(label)
 
-        self.main_layout.addSpacerItem(QSpacerItem(0, 5))
-
-    def reload_menu(self):
-        self.init_ui()
+        main_layout.addSpacerItem(QSpacerItem(0, 5))
 
 
 class MenuLeft(QFrame):
