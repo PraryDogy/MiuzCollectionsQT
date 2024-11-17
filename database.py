@@ -1,6 +1,7 @@
 import sqlalchemy
 
-from cfg import DB_FILE, JsonData
+from cfg import DB_FILE
+import os
 
 METADATA = sqlalchemy.MetaData()
 
@@ -34,7 +35,6 @@ class Dbase:
 
         if not check_tables:
             t = "пользовательская ДБ не прошла проверку"
-            print(t)
             raise Exception(t)
 
         cls.toggle_wal(False)
@@ -50,14 +50,18 @@ class Dbase:
 
     @classmethod
     def create_engine(cls):
-        cls.engine = sqlalchemy.create_engine(
-            f"sqlite:///{DB_FILE}",
-            echo=cls._echo,
-            connect_args={
-                "check_same_thread": cls._same_thread,
-                "timeout": cls._timeout
-                }
-                )
+        if os.path.exists(DB_FILE):
+            cls.engine = sqlalchemy.create_engine(
+                f"sqlite:///{DB_FILE}",
+                echo=cls._echo,
+                connect_args={
+                    "check_same_thread": cls._same_thread,
+                    "timeout": cls._timeout
+                    }
+                    )
+        else:
+            t = "Нет пользовательского файла DB_FILE"
+            raise Exception(t)
         
     @classmethod
     def toggle_wal(cls, value: bool):

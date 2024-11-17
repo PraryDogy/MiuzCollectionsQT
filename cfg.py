@@ -102,7 +102,7 @@ class JsonData:
         ]
     
     theme: str = "dark_theme"
-    lang_name: str = Eng.lang_name
+    lang_name: str = Rus.lang_name
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
@@ -175,14 +175,8 @@ class JsonData:
                     setattr(cls, k, v)
 
         else:
-            print("файла не существует, устанавливаю настройки по умолчанию")
+            print("JSON файла не существует, создаю файл по умолчанию")
             cls.write_json_data()
-
-        if cls.coll_folder not in cls.coll_folder_list:
-            print("\ncoll folder в json не из coll folder list")
-            print("исправь вручную json файл")
-            print("coll folder:\n", cls.coll_folder)
-            print("coll folder list:\n", *[i + "\n" for i in cls.coll_folder_list], "\n")
 
     @classmethod
     def write_json_data(cls):
@@ -213,20 +207,11 @@ class JsonData:
     @classmethod
     def check_app_dirs(cls):
 
-        os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
-        os.makedirs(HASH_DIR, exist_ok=True)
+        if not os.path.exists(APP_SUPPORT_DIR):
 
-        if not os.path.exists(path="db.db"):
-            print("please, download db.db.zip")
-            print("extract and move to project root directory")
-            webbrowser.open(LINK_DB)
-            quit()
-
-        if not os.path.exists(path=JSON_FILE):
+            os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
+            cls.copy_indeed_files()
             cls.write_json_data()
-
-        if not os.path.exists(path=DB_FILE):
-            shutil.copyfile(src="db.db", dst=DB_FILE)
 
     @classmethod
     def copy_hashdir(cls):
@@ -239,11 +224,12 @@ class JsonData:
             shutil.copytree(PRELOADED_HASHDIR, HASH_DIR)
 
         else:
-            print("нет предустановленной HASH_DIR, создаю пустую")
-            os.makedirs(HASH_DIR, exist_ok=True)
+            t = "нет предустановленной HASH_DIR"
+            raise Exception(t)
 
     @classmethod
     def copy_db_file(cls):
+
         if os.path.exists(DB_FILE):
             print("Удаляю пользовательский DB_FILE")
             os.remove(DB_FILE)
@@ -251,11 +237,10 @@ class JsonData:
         if os.path.exists(PRELOADED_DB):
             print("Копирую предустановленный DB_FILE")
             shutil.copyfile(src="db.db", dst=DB_FILE)
-        else:
-            print("Нет предуставновленного DB_FILE, создаю пустой")
 
-            with open(DB_FILE, "w"):
-                pass
+        else:
+            t = "Нет предуставновленного DB_FILE"
+            raise Exception(t)
 
     @classmethod
     def compare_versions(cls):
@@ -265,10 +250,10 @@ class JsonData:
             cls.app_ver = 1.0
 
         if APP_VER > float(cls.app_ver):
-            cls.custom()
+            cls.copy_indeed_files()
 
     @classmethod
-    def custom(cls):
+    def copy_indeed_files(cls):
         print("версия приложения выше чем пользовательская")
         cls.copy_db_file()
         cls.copy_hashdir()
