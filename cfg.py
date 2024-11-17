@@ -123,7 +123,7 @@ class JsonData:
     dynamic_filters = [
         {
             Eng.name_: "Product",
-            Rus.name_: "Предметка",
+            Rus.name_: "Продукт",
             "real": "1 IMG",
             "value": False
         },
@@ -172,8 +172,6 @@ class JsonData:
                     cls.read_json_data()
                     return
                 
-            filters = json_data.get("dynamic_filters")
-
             for k, v in json_data.items():
                 if hasattr(cls, k):
                     setattr(cls, k, v)

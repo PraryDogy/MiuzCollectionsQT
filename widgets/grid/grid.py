@@ -30,6 +30,8 @@ class Grid(QScrollArea):
         self.setStyleSheet(Themes.current)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
+        self.topleft = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
@@ -92,11 +94,9 @@ class Grid(QScrollArea):
         self.thumbnails_wid = QWidget()
         self.main_layout.addWidget(self.thumbnails_wid)
 
-        fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-
         self.thumbnails_layout = LayoutVer()
         self.thumbnails_layout.setContentsMargins(5, 10, 5, 0)
-        self.thumbnails_layout.setAlignment(fl)
+        self.thumbnails_layout.setAlignment(self.topleft)
 
         self.thumbnails_wid.setLayout(self.thumbnails_layout)
 
@@ -142,9 +142,8 @@ class Grid(QScrollArea):
         grid_widget = QWidget()
         self.thumbnails_layout.addWidget(grid_widget)
 
-        fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         grid_layout = QGridLayout()
-        grid_layout.setAlignment(fl)
+        grid_layout.setAlignment(self.topleft)
         grid_layout.setContentsMargins(0, 0, 0, 30)
         self.current_widgets[grid_layout] = []
 
