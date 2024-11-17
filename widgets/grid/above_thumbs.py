@@ -134,7 +134,7 @@ class AboveThumbsNoImages(QWidget):
         elif enabled_filters:
     
             filters = [
-                data.get(Dynamic.lng.name_).lower()
+                data.get(Dynamic.lng.lang_name).lower()
                 for data in enabled_filters
                 ]
 

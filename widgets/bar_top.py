@@ -115,7 +115,7 @@ class FilterBtn(Btn):
         # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
         JsonData.dynamic_filters, JsonData.static_filter
 
-        text = data.get(Dynamic.lng.name_)
+        text = data.get(Dynamic.lng.lang_name)
         super().__init__(text=text)
 
         self.setFixedSize(BTN_W, BTN_H)
@@ -159,7 +159,7 @@ class FilterBtn(Btn):
             # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
             JsonData.dynamic_filters, JsonData.static_filter
 
-            self.data[Dynamic.lng.name_] = text
+            self.data[Dynamic.lng.lang_name] = text
             self.setText(text)
         
         elif flag == "value":
@@ -194,7 +194,7 @@ class FilterBtn(Btn):
         # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
         JsonData.dynamic_filters, JsonData.static_filter
 
-        filter_name = self.data.get(Dynamic.lng.name_)
+        filter_name = self.data.get(Dynamic.lng.lang_name)
         set_name_cmd = lambda: self.rename_win("Имя фильтра", filter_name, "name")
         set_name = QAction(parent=menu_, text="Имя фильтра")
         set_name.triggered.connect(set_name_cmd)

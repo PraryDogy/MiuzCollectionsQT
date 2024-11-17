@@ -108,13 +108,13 @@ class ChangeLang(QWidget):
         layout_h.addWidget(self.lang_label)
 
     def get_lng_text(self):
-        return "🇷🇺 Ru" if self.lang == Rus.name_ else "🇺🇸 En"
+        return "🇷🇺 Ru" if self.lang == Rus.lang_name else "🇺🇸 En"
           
     def lng_cmd(self, e):
-        if self.lang == Rus.name_:
-            self.lang = Eng.name_
+        if self.lang == Rus.lang_name:
+            self.lang = Eng.lang_name
         else:
-            self.lang = Rus.name_
+            self.lang = Rus.lang_name
 
         self.lang_btn.setText(self.get_lng_text())
 

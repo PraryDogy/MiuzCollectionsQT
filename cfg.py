@@ -99,7 +99,7 @@ class JsonData:
         ]
     
     theme: str = "dark_theme"
-    lng_name: str = Eng.name_
+    lng_name: str = Eng.lang_name
     small_menu_view: str = True
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -124,22 +124,22 @@ class JsonData:
 
     dynamic_filters = [
         {
-            Eng.name_: "Product",
-            Rus.name_: "Продукт",
+            Eng.lang_name: "Product",
+            Rus.lang_name: "Продукт",
             "real": "1 IMG",
             "value": False
         },
         {
-            Eng.name_: "Model",
-            Rus.name_: "Модели",
+            Eng.lang_name: "Model",
+            Rus.lang_name: "Модели",
             "real": "2 MODEL IMG",
             "value": False
         }
     ]
   
     static_filter = {
-        Eng.name_: "Other",
-        Rus.name_: "Остальное",
+        Eng.lang_name: "Other",
+        Rus.lang_name: "Остальное",
         "real": STATIC_FILTER_REAL_NAME,
         "value": False
         }
@@ -195,18 +195,18 @@ class JsonData:
 
     @classmethod
     def dynamic_set_lang(cls, key_: str):
-        if key_ == Rus.name_:
+        if key_ == Rus.lang_name:
             Dynamic.lng = Rus
-            cls.lng_name = Rus.name_
+            cls.lng_name = Rus.lang_name
 
-        elif key_ == Eng.name_:
+        elif key_ == Eng.lang_name:
             Dynamic.lng = Eng
-            cls.lng_name = Eng.name_
+            cls.lng_name = Eng.lang_name
 
         else:
             print("cfg > set lang > неверный ключ, ставлю по умолчанию русский", key_)
             Dynamic.lng = Rus
-            cls.lng_name = Rus.name_
+            cls.lng_name = Rus.lang_name
 
     @classmethod
     def check_app_dirs(cls):
