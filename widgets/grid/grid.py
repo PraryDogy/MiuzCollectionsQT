@@ -40,28 +40,20 @@ class Grid(QScrollArea):
         self.current_widgets: dict[QGridLayout, list[Thumbnail]] = {}
 
         # Создаем фрейм для виджетов в области скролла
-        self.scroll_area_widget = QWidget(parent=self)
-        self.scroll_area_widget.setObjectName(Names.th_scroll_widget)
-        self.scroll_area_widget.setStyleSheet(Themes.current)
+        self.main_wid = QWidget(parent=self)
+        self.main_wid.setObjectName(Names.th_scroll_widget)
+        self.main_wid.setStyleSheet(Themes.current)
+        self.setWidget(self.main_wid)
         
-        # Основной лейаут фрейма в области скролла
-        frame_layout = LayoutVer(self.scroll_area_widget)
+        self.main_layout = LayoutVer(self.main_wid)
+        self.main_wid.setLayout(self.main_layout)
 
-        thumbnails_wid = QWidget()
-        self.thumbnails_layout = LayoutVer()
-        thumbnails_wid.setLayout(self.thumbnails_layout)
-        self.thumbnails_layout.setContentsMargins(5, 10, 5, 0)
-        frame_layout.addWidget(thumbnails_wid)
-
-        self.up_btn = UpBtn(self.scroll_area_widget)
+        self.up_btn = UpBtn(self.main_wid)
         self.up_btn.hide()
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         self.columns = self.get_columns()
         self.setup_grid_main()
-
-        frame_layout.addStretch(1)
-        self.setWidget(self.scroll_area_widget)
 
         SignalsApp.all_.thumbnail_select.connect(self.select_new_widget)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
@@ -90,14 +82,30 @@ class Grid(QScrollArea):
         self.verticalScrollBar().setValue(0)
 
     def setup_grid_main(self):
+        
+        if hasattr(self, "thumbnails_wid"):
+            self.thumbnails_wid.deleteLater()
+
+        self.reset_widget_data()
+        self.current_widgets.clear()
+
+        self.thumbnails_wid = QWidget()
+        self.main_layout.addWidget(self.thumbnails_wid)
+
+        fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+
+        self.thumbnails_layout = LayoutVer()
+        self.thumbnails_layout.setContentsMargins(5, 10, 5, 0)
+        self.thumbnails_layout.setAlignment(fl)
+
+        self.thumbnails_wid.setLayout(self.thumbnails_layout)
+
+
         self.thumbs_dict = DbImages()
         self.thumbs_dict.finished_.connect(self.setup_grid_fin)
         self.thumbs_dict.get()
 
     def setup_grid_fin(self, thumbs_dict: dict[str, list[DbImage]]):
-        self.reset_widget_data()
-        self.current_widgets.clear()
-
         if thumbs_dict:
 
             above_thumbs = AboveThumbs(self.width())
@@ -121,13 +129,10 @@ class Grid(QScrollArea):
             self.thumbnails_layout.addWidget(h_wid)
             h_layout.addWidget(LimitBtn())
 
-        self.scroll_area_widget.setFocus()
+        self.main_wid.setFocus()
 
     def reload_thumbnails(self):
-
         self.up_btn.hide()
-
-        Utils.clear_layout(self.thumbnails_layout)
         self.setup_grid_main()
 
     def create_image_grid(self, date: str, db_images: list[DbImage]):
@@ -136,11 +141,15 @@ class Grid(QScrollArea):
         self.thumbnails_layout.addWidget(title_label)
 
         grid_widget = QWidget()
+        self.thumbnails_layout.addWidget(grid_widget)
+
+        fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         grid_layout = QGridLayout()
-        self.current_widgets[grid_layout] = []
-        grid_widget.setLayout(grid_layout)
-        grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        grid_layout.setAlignment(fl)
         grid_layout.setContentsMargins(0, 0, 0, 30)
+        self.current_widgets[grid_layout] = []
+
+        grid_widget.setLayout(grid_layout)
 
         row, col = 0, 0
 
@@ -167,8 +176,6 @@ class Grid(QScrollArea):
 
         if len(db_images) % self.columns != 0:
             self.all_grids_row += 1
-
-        self.thumbnails_layout.addWidget(grid_widget)
 
     def select_new_widget(self, data: tuple | str | Thumbnail):
         if isinstance(data, Thumbnail):
