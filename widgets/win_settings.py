@@ -288,10 +288,6 @@ class WinSettings(WinChild):
 
         btns_layout.addStretch(1)
 
-    def reload_ui(self):
-        Utils.clear_layout(self.content_lay_v)
-        self.init_ui()
-
     def cancel_cmd(self, *args):
         self.close()
 

@@ -169,6 +169,3 @@ class BarTop(QFrame):
         for data in (*JsonData.dynamic_filters, JsonData.static_filter):
             data["value"] = False
 
-    def reload_filters(self):
-        Utils.clear_layout(self.h_layout)
-        self.init_ui()

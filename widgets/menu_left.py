@@ -91,7 +91,6 @@ class CollectionBtn(QLabel):
             SignalsApp.all_.reload_menu_left.emit()
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
             SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-        return super().mouseReleaseEvent(ev)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         try:
@@ -106,8 +105,6 @@ class CollectionBtn(QLabel):
             self.setStyleSheet(Themes.current)
             self.context_menu.show_menu()
 
-            return super().contextMenuEvent(ev)
-
         except Exception as e:
             Utils.print_err(error=e)
 
@@ -118,13 +115,9 @@ class CollectionBtn(QLabel):
             else:
                 self.setObjectName(Names.menu_btn_selected)
             self.setStyleSheet(Themes.current)
+
         except Exception as e:
             Utils.print_err(error=e)
-
-    def enterEvent(self, a0: QEvent | None) -> None:
-        if self.true_name != ALL_COLLS:
-            self.setToolTip(f"{Dynamic.lng.collection}: {self.true_name}")
-        return super().enterEvent(a0)
 
 
 class BaseLeftMenu(QScrollArea):
@@ -135,17 +128,21 @@ class BaseLeftMenu(QScrollArea):
         self.setStyleSheet(Themes.current)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-        scroll_widget = QWidget()
-        scroll_widget.setObjectName(Names.menu_scrollbar_qwidget)
-        scroll_widget.setStyleSheet(Themes.current)
-        self.setWidget(scroll_widget)
-
-        self.v_layout = LayoutVer()
-        scroll_widget.setLayout(self.v_layout)
         self.init_ui()
         SignalsApp.all_.reload_menu_left.connect(self.reload_menu)
 
     def init_ui(self):
+        if hasattr(self, "main_wid"):
+            self.main_wid.deleteLater()
+
+        self.main_wid = QWidget()
+        self.main_wid.setObjectName(Names.menu_scrollbar_qwidget)
+        self.main_wid.setStyleSheet(Themes.current)
+        self.setWidget(self.main_wid)
+
+        self.main_layout = LayoutVer()
+        self.main_wid.setLayout(self.main_layout)
+
         btns_widget = QWidget()
         main_btns_layout = LayoutVer()
         btns_widget.setLayout(main_btns_layout)
@@ -160,7 +157,7 @@ class BaseLeftMenu(QScrollArea):
                               true_name=FAVS)
         main_btns_layout.addWidget(label)
 
-        self.v_layout.addWidget(btns_widget)
+        self.main_layout.addWidget(btns_widget)
 
         if JsonData.small_menu_view:
             for letter, collections in self.load_colls_query().items():
@@ -170,7 +167,7 @@ class BaseLeftMenu(QScrollArea):
                         fake_name=coll["fake_name"],
                         true_name=coll["true_name"]
                         )
-                    self.v_layout.addWidget(label)
+                    self.main_layout.addWidget(label)
         else:
             for letter, collections in self.load_colls_query().items():
 
@@ -178,7 +175,7 @@ class BaseLeftMenu(QScrollArea):
                 test.setContentsMargins(6, 20, 0, 5)
                 test.setObjectName(Names.letter_btn)
                 test.setStyleSheet(Themes.current)
-                self.v_layout.addWidget(test)
+                self.main_layout.addWidget(test)
 
                 for coll in collections:
                     label = CollectionBtn(
@@ -186,10 +183,10 @@ class BaseLeftMenu(QScrollArea):
                         fake_name=coll["fake_name"],
                         true_name=coll["true_name"]
                         )
-                    self.v_layout.addWidget(label)
+                    self.main_layout.addWidget(label)
 
-        self.v_layout.addSpacerItem(QSpacerItem(0, 5))
-        self.v_layout.addStretch(1)
+        self.main_layout.addSpacerItem(QSpacerItem(0, 5))
+        self.main_layout.addStretch(1)
 
     def change_view(self):
         JsonData.small_menu_view = not JsonData.small_menu_view
@@ -222,7 +219,6 @@ class BaseLeftMenu(QScrollArea):
             }
 
     def reload_menu(self):
-        Utils.clear_layout(self.v_layout)
         self.init_ui()
 
 
