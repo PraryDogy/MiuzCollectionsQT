@@ -98,17 +98,6 @@ class Utils:
             return coll[0]
         else:
             return os.path.basename(JsonData.coll_folder.strip(os.sep))
-    
-    @classmethod
-    def clear_layout(cls, layout: QVBoxLayout):
-        if layout:
-            while layout.count():
-                item = layout.takeAt(0)
-                widget = item.widget()
-                if widget:
-                    widget.deleteLater()
-                else:
-                    cls.clear_layout(item.layout())
 
     @classmethod
     def copy_text(cls, text: str):
