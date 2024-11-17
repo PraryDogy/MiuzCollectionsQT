@@ -10,9 +10,11 @@ from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, Dynamic, JsonData
 from database import Dbase
-from utils.utils import UThreadPool, Utils
+from lang.eng import Eng
+from lang.rus import Rus
 from utils.scaner import Scaner
 from utils.updater import Updater
+from utils.utils import UThreadPool, Utils
 
 from .win_smb import WinSmb
 
@@ -106,13 +108,13 @@ class ChangeLang(QWidget):
         layout_h.addWidget(self.lang_label)
 
     def get_lng_text(self):
-        return "🇷🇺 Ru" if self.lang == "ru" else "🇺🇸 En"
+        return "🇷🇺 Ru" if self.lang == Rus.name_ else "🇺🇸 En"
           
     def lng_cmd(self, e):
-        if self.lang == "ru":
-            self.lang = "en"
+        if self.lang == Rus.name_:
+            self.lang = Eng.name_
         else:
-            self.lang = "ru"
+            self.lang = Rus.name_
 
         self.lang_btn.setText(self.get_lng_text())
 

@@ -203,16 +203,18 @@ class JsonData:
 
     @classmethod
     def dynamic_set_lang(cls, key_: str):
-        """ru, en"""
+        if key_ == Rus.name_:
+            Dynamic.lng = Rus
+            cls.lng_name = Rus.name_
 
-        data: dict[str, Rus | Eng] = {"ru": Rus, "en": Eng}
-
-        if key_ in data:
-            Dynamic.lng = data.get(key_)
-            cls.lng_name = key_
+        elif key_ == Eng.name_:
+            Dynamic.lng = Eng
+            cls.lng_name = Eng.name_
 
         else:
-            raise KeyError("cfg > dymamic set lang > no key (ru, en)", key_)
+            print("cfg > set lang > неверный ключ, ставлю по умолчанию русский", key_)
+            Dynamic.lng = Rus
+            cls.lng_name = Rus.name_
 
     @classmethod
     def check_app_dirs(cls):
