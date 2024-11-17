@@ -78,17 +78,22 @@ class App(QApplication):
 print("сначала старым приложением закончи формирование ДБ")
 print("потом добавь колонку fav")
 print("потом заархивируй базу данных и hashdir и уже потом обновляй")
-# JsonData.init()
-# Dbase.init()
 
-# app = App(sys.argv)
+print("Нажми 1 если сделал это")
+if input() != "1":
+    exit()
 
-# UThreadPool.init()
-# SignalsApp.init()
-# Scaner.init()
+JsonData.init()
+Dbase.init()
 
-# win_main = WinMain()
-# win_main.center()
-# win_main.show()
+app = App(sys.argv)
 
-# app.exec()
+UThreadPool.init()
+SignalsApp.init()
+Scaner.init()
+
+win_main = WinMain()
+win_main.center()
+win_main.show()
+
+app.exec()
