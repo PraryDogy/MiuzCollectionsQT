@@ -72,6 +72,9 @@ class LoadDbTask(URunnable):
             for i in (JsonData.prod_, JsonData.model_, JsonData.other_)
             )
         
+        # если ВСЕ фильтры включены или выключены, это будет равняться
+        # отсутствию фильтрации
+        # в ином случае выполняется фильтрация
         if len(filter_values_) > 1:
 
             and_filters = []
