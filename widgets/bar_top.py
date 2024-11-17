@@ -1,11 +1,10 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QFrame
+from PyQt5.QtWidgets import QAction, QFrame, QWidget, QLabel
 
-from base_widgets import Btn, ContextCustom, LayoutHor
+from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
+from base_widgets.wins import WinChild
 from cfg import Dynamic, JsonData
-from lang.eng import Eng
-from lang.rus import Rus
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
@@ -13,6 +12,52 @@ from utils.utils import Utils
 from .win_dates import WinDates
 
 BTN_W, BTN_H = 80, 28
+
+
+# ДОБАВЬ ВСЕ ОТСЮДА В ЯЗЫКИ
+
+
+
+class WinRename(WinChild):
+    def __init__(self, data: dict, parent: QWidget = None):
+        super().__init__(parent)
+
+        self.min_btn_disable()
+        self.max_btn_disable()
+        self.close_btn_cmd(self.cancel_cmd)
+        self.content_lay_v.setSpacing(10)
+        self.content_lay_v.setContentsMargins(10, 5, 10, 10)
+
+        self.data = data
+
+        title = QLabel("Задайте имя фильтра")
+        self.content_lay_v.addWidget(title)
+
+        text_ = data.get(Dynamic.lng.name_)
+        inp = InputBase()
+        inp.setPlaceholderText("Задайте имя фильтра")
+        inp.setText(text_)
+        inp.selectAll()
+        inp.setFixedWidth(200)
+        self.content_lay_v.addWidget(inp)
+
+        h_wid = QWidget()
+        h_lay = LayoutHor()
+        h_wid.setLayout(h_lay)
+        self.content_lay_v.addWidget(h_wid)
+
+        ok_btn = Btn(text=Dynamic.lng.ok)
+        h_lay.addWidget(ok_btn)
+
+        cancel_btn = Btn(text=Dynamic.lng.cancel)
+        cancel_btn.mouseReleaseEvent = self.cancel_cmd
+        h_lay.addWidget(cancel_btn)
+
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
+
+    def cancel_cmd(self, *args):
+        self.close()
 
 
 class DatesBtn(Btn):
@@ -81,6 +126,11 @@ class FilterBtn(Btn):
         self.setObjectName(Names.dates_btn_bordered)
         self.setStyleSheet(Themes.current)
 
+    def rename_win(self):
+        self.win_ = WinRename(data=self.data)
+        self.win_.center_relative_parent(self)
+        self.win_.show()
+
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() != Qt.MouseButton.LeftButton:
             return
@@ -94,8 +144,6 @@ class FilterBtn(Btn):
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-
-        # return super().mouseReleaseEvent(ev)
     
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         prev_name = self.objectName()
@@ -103,6 +151,7 @@ class FilterBtn(Btn):
         menu_ = ContextCustom(ev)
 
         one = QAction(parent=menu_, text="Задать имя")
+        one.triggered.connect(self.rename_win)
         menu_.addAction(one)
 
         two = QAction(parent=menu_, text="Задать значение")

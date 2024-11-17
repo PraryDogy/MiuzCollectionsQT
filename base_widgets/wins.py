@@ -183,6 +183,15 @@ class WinFrameless(QMainWindow, QObject):
         self.titlebar.title.setText(text)
 
     def close_btn_cmd(self, fn: callable):
+        """
+        do not pass ```self.close()```
+
+        example:
+        ```
+        def cancel_cmd(self, *args):
+            self.close()
+        ```
+        """
         self.titlebar.title_btns.close_btn._clicked.connect(fn)
 
     def min_btn_disable(self):
