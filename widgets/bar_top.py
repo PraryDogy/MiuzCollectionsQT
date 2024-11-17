@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import QAction, QFrame, QWidget, QLabel
 
 from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
@@ -62,6 +62,12 @@ class WinRename(WinChild):
 
     def close_cmd(self, *args):
         self.close()
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Return:
+            self.ok_cmd()
+        elif a0.key() == Qt.Key.Key_Escape:
+            self.close_cmd()
 
 
 class DatesBtn(Btn):
