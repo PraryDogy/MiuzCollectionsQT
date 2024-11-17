@@ -33,10 +33,9 @@ class Dbase:
         check_tables = cls.check_tables(tables)
 
         if not check_tables:
-            JsonData.copy_db_file()
-            JsonData.copy_hashdir()
-            cls.init()
-            return
+            t = "пользовательская ДБ не прошла проверку"
+            print(t)
+            raise Exception(t)
 
         cls.toggle_wal(False)
 

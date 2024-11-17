@@ -10,7 +10,7 @@ from styles import Themes
 
 LINK_DB = "https://disk.yandex.ru/d/gDnB5X9kGqjztA"
 APP_NAME: str = "MiuzCollections"
-APP_VER = "5.8.5"
+APP_VER = 5.85
 
 APP_SUPPORT_DIR: str = os.path.join(
     os.path.expanduser("~"),
@@ -29,11 +29,14 @@ DB_FILE: str = os.path.join(
     "db.db"
     )
 
+PRELOADED_DB = "db.db"
+
 HASH_DIR: str = os.path.join(
     APP_SUPPORT_DIR,
     "hashdir"
     )
-PRELOADED_HASHDIR: str = "_hashdir"
+
+PRELOADED_HASHDIR: str = "hashdir"
 
 _IMG_EXT: tuple = (
     ".jpg", ".jpeg", ".jfif",
@@ -227,34 +230,62 @@ class JsonData:
 
     @classmethod
     def copy_hashdir(cls):
-        print("копирую предустановленную HASH_DIR")
-
         if os.path.exists(HASH_DIR):
+            print("Удаляю пользовательскую HASH_DIR")
             shutil.rmtree(HASH_DIR)
 
-        shutil.copytree(PRELOADED_HASHDIR, HASH_DIR)
+        if os.path.exists(PRELOADED_HASHDIR):
+            print("копирую предустановленную HASH_DIR")
+            shutil.copytree(PRELOADED_HASHDIR, HASH_DIR)
+
+        else:
+            print("нет предустановленной HASH_DIR, создаю пустую")
+            os.makedirs(HASH_DIR, exist_ok=True)
 
     @classmethod
     def copy_db_file(cls):
-        print("Копирую предустановленную БД")
-
-        os.makedirs(HASH_DIR, exist_ok=True)
-
         if os.path.exists(DB_FILE):
+            print("Удаляю пользовательский DB_FILE")
             os.remove(DB_FILE)
 
-        shutil.copyfile(src="db.db", dst=DB_FILE)
+        if os.path.exists(PRELOADED_DB):
+            print("Копирую предустановленный DB_FILE")
+            shutil.copyfile(src="db.db", dst=DB_FILE)
+        else:
+            print("Нет предуставновленного DB_FILE, создаю пустой")
 
+            with open(DB_FILE, "w"):
+                pass
+
+    @classmethod
+    def compare_versions(cls):
+        try:
+            float(cls.app_ver)
+        except Exception:
+            cls.app_ver = 1.0
+
+        if APP_VER > float(cls.app_ver):
+            cls.custom()
+
+    @classmethod
+    def custom(cls):
+        print("версия приложения выше чем пользовательская")
+        cls.copy_db_file()
+        cls.copy_hashdir()
+        cls.app_ver = APP_VER
+        cls.write_json_data()
 
     @classmethod
     def init(cls):
         cls.check_app_dirs()
         cls.read_json_data()
-        Themes.set_theme(cls.theme)
+        cls.compare_versions()
+
         cls.dynamic_set_lang(cls.lang_name)
+        Themes.set_theme(cls.theme)
+
         print(
             "Json data init",
-            f"версии: json/внутренняя: {cls.app_ver}/{APP_VER}",
             "check app dirs ok",
             "read json ok",
             "set theme ok",
