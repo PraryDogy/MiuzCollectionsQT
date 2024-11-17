@@ -15,8 +15,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
 
-from .actions import CopyPath, OpenInfo, Reveal, Save
-from .win_info import WinInfo
+from .actions import CopyPath, OpenInfo, Reveal, Save, OpenWins
 from .win_smb import WinSmb
 
 
@@ -393,9 +392,7 @@ class WinImageView(WinChild):
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             if Utils.smb_check():
-                self.win_info = WinInfo(src=self.src)
-                self.win_info.center_relative_parent(self)
-                self.win_info.show()
+                OpenWins.info(self, self.src)
             else:
                 self.win_smb = WinSmb()
                 self.win_smb.center_relative_parent(self)

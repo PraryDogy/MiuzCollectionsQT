@@ -29,6 +29,13 @@ class Shared:
         smb_win.show()
 
 
+class OpenWins:
+
+    @classmethod
+    def info(cls, parent: QWidget, src: str):
+        WinInfo(parent, src)
+
+
 class CustomAction(QAction):
     def __init__(self, parent: QWidget, src: str, text: str):
         super().__init__(text=text)
@@ -66,9 +73,7 @@ class OpenInfo(CustomAction):
 
     def cmd(self, *args):
         if Utils.smb_check():
-            self.win_info = WinInfo(src=self.src)
-            self.win_info.center_relative_parent(self.parent_)
-            self.win_info.show()
+            OpenWins.info(self.parent_, self.src)
         else:
             Shared.show_smb(self.parent_)
 

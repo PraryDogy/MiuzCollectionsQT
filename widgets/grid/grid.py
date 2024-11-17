@@ -8,8 +8,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
 
-from ..actions import ReloadGui
-from ..win_info import WinInfo
+from ..actions import ReloadGui, OpenWins
 from ..win_smb import WinSmb
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from ._load_thumbs import DbImage, DbImages
@@ -274,9 +273,7 @@ class Grid(QScrollArea):
             wid = self.cell_to_wid.get(self.curr_cell)
 
             if Utils.smb_check():
-                self.win_info = WinInfo(src=wid.src)
-                self.win_info.center_relative_parent(self)
-                self.win_info.show()
+                OpenWins.info(self, wid.src)
             else:
                 self.smb_win = WinSmb()
                 self.smb_win.center_relative_parent(self)

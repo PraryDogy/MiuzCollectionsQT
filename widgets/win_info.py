@@ -1,7 +1,7 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
@@ -9,7 +9,7 @@ from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import Dynamic, JsonData
 from database import THUMBS, Dbase
-from utils.utils import Utils
+from utils.utils import URunnable, UThreadPool, Utils
 
 
 class RightLabel(QLabel):
@@ -36,11 +36,18 @@ class RightLabel(QLabel):
         menu_.show_menu()
 
 
-class InfoTask:
-    def __init__(self, src: str):
-        self.src = src
+class WorkerSignals(QObject):
+    finished_ = pyqtSignal(dict)
 
-    def get(self) -> dict[str, str]:
+
+class InfoTask(URunnable):
+    def __init__(self, src: str):
+        super().__init__()
+        self.src = src
+        self.signals_ = WorkerSignals()
+
+    @URunnable.set_running_state
+    def run(self):
         """имя тип размер место изменен разрешение коллекция"""
         conn = Dbase.engine.connect()
 
@@ -52,11 +59,11 @@ class InfoTask:
         conn.close()
 
         if res:
-            return self.get_db_info(*res)
+            self.signals_.finished_.emit(self.get_db_info(*res))
         else:
-            return {}
+            self.signals_.finished_.emit({})
    
-    def get_db_info(self, size, mod, resol, coll):
+    def get_db_info(self, size, mod, resol, coll) -> dict[str, str]:
 
         name = os.path.basename(self.src)
         _, type_ = os.path.splitext(name)
@@ -87,21 +94,24 @@ class InfoTask:
 
 
 class WinInfo(WinChild):
-    def __init__(self, src: str):
+    def __init__(self, parent: QWidget, src: str):
         super().__init__()
+        self.parent_ = parent
+
         self.close_btn_cmd(self.close_)
         self.min_btn_disable()
         self.max_btn_disable()
         self.set_titlebar_title(Dynamic.lng.info)
-
         self.src = src
-        self.l_ww = 100
+
         self.init_ui()
 
-        self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
-
     def init_ui(self):
+        self.task_ = InfoTask(self.src)
+        self.task_.signals_.finished_.connect(self.load_info_fin)
+        UThreadPool.pool.start(self.task_)
+
+    def load_info_fin(self, data: dict[str, str]):
         wid = QWidget()
         self.content_lay_v.addWidget(wid)
 
@@ -109,9 +119,6 @@ class WinInfo(WinChild):
         grid.setSpacing(5)
         grid.setContentsMargins(0, 0, 0, 0)
         wid.setLayout(grid)
-
-        data = InfoTask(self.src)
-        data = data.get()
 
         row = 0
         l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
@@ -125,6 +132,12 @@ class WinInfo(WinChild):
             grid.addWidget(right_lbl, row, 1, alignment=r_fl)
 
             row += 1
+
+        self.adjustSize()
+        self.setFixedSize(self.sizeHint().width(), self.sizeHint().height())
+
+        self.center_relative_parent(self.parent_)
+        self.show()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
