@@ -30,12 +30,12 @@ class UpdaterMain(QObject):
                 shutil.copy2(update_file_path, destination)
                 subprocess.run(["open", "-R", destination])
 
-                current_dir = os.path.dirname(__file__)
-                current_dir = current_dir.strip().split(os.sep)
-                current_dir = current_dir[:-5]
-                app_dir = os.path.join(os.sep, *current_dir)
-                print(current_dir)
-                subprocess.run(["open", "-R", app_dir])
+                # current_dir = os.path.dirname(__file__)
+                # current_dir = current_dir.strip().split(os.sep)
+                # current_dir = current_dir[:-5]
+                # app_dir = os.path.join(os.sep, *current_dir)
+                # print(current_dir)
+                # subprocess.run(["open", "-R", app_dir])
 
                 self.finished_.emit()
                 return True
