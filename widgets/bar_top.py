@@ -19,8 +19,10 @@ BTN_W, BTN_H = 80, 28
 
 
 class WinRename(WinChild):
-    def __init__(self, data: dict, parent: QWidget = None):
-        super().__init__(parent)
+    def __init__(self, data: dict, flag: str):
+        """flag: name | value"""
+
+        super().__init__(parent=None)
 
         self.min_btn_disable()
         self.max_btn_disable()
@@ -30,24 +32,18 @@ class WinRename(WinChild):
 
         self.data = data
 
-        title = QLabel("Задайте имя фильтра")
-        self.content_lay_v.addWidget(title)
-
-        text_ = data.get(Dynamic.lng.name_)
-        inp = InputBase()
-        inp.setPlaceholderText("Задайте имя фильтра")
-        inp.setText(text_)
-        inp.selectAll()
-        inp.setFixedWidth(200)
-        self.content_lay_v.addWidget(inp)
+        if flag == "name":
+            self.name_ui()
+        elif flag == "value":
+            self.value_ui()
 
         h_wid = QWidget()
         h_lay = LayoutHor()
         h_wid.setLayout(h_lay)
         self.content_lay_v.addWidget(h_wid)
 
-        ok_btn = Btn(text=Dynamic.lng.ok)
-        h_lay.addWidget(ok_btn)
+        self.ok_btn = Btn(text=Dynamic.lng.ok)
+        h_lay.addWidget(self.ok_btn)
 
         cancel_btn = Btn(text=Dynamic.lng.cancel)
         cancel_btn.mouseReleaseEvent = self.cancel_cmd
@@ -55,6 +51,34 @@ class WinRename(WinChild):
 
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
+
+    def name_ui(self):
+        title_ = "Задайте имя фильтра"
+        input_text = self.data.get(Dynamic.lng.name_)
+
+        title = QLabel(title_)
+        self.content_lay_v.addWidget(title)
+
+        self.input_wid = InputBase()
+        self.input_wid.setPlaceholderText(title_)
+        self.input_wid.setText(input_text)
+        self.input_wid.selectAll()
+        self.input_wid.setFixedWidth(200)
+        self.content_lay_v.addWidget(self.input_wid)
+
+    def value_ui(self):
+        title_ = "Задайте значение фильтра"
+        input_text = self.data.get("real")
+
+        title = QLabel(title_)
+        self.content_lay_v.addWidget(title)
+        
+        self.input_wid = InputBase()
+        self.input_wid.setPlaceholderText(title_)
+        self.input_wid.setText(input_text)
+        self.input_wid.selectAll()
+        self.input_wid.setFixedWidth(200)
+        self.content_lay_v.addWidget(self.input_wid)
 
     def cancel_cmd(self, *args):
         self.close()
@@ -126,8 +150,9 @@ class FilterBtn(Btn):
         self.setObjectName(Names.dates_btn_bordered)
         self.setStyleSheet(Themes.current)
 
-    def rename_win(self):
-        self.win_ = WinRename(data=self.data)
+    def rename_win(self, flag: str):
+        """flag: name | value"""
+        self.win_ = WinRename(data=self.data, flag=flag)
         self.win_.center_relative_parent(self)
         self.win_.show()
 
@@ -150,11 +175,14 @@ class FilterBtn(Btn):
         self.set_border_blue_style()
         menu_ = ContextCustom(ev)
 
+        cmd_ = lambda: self.rename_win(flag="name")
         one = QAction(parent=menu_, text="Задать имя")
-        one.triggered.connect(self.rename_win)
+        one.triggered.connect(cmd_)
         menu_.addAction(one)
 
+        cmd_ = lambda: self.rename_win(flag="value")
         two = QAction(parent=menu_, text="Задать значение")
+        two.triggered.connect(cmd_)
         menu_.addAction(two)
 
         menu_.show_menu()
