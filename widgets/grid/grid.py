@@ -100,7 +100,6 @@ class Grid(QScrollArea):
 
         self.thumbnails_wid.setLayout(self.thumbnails_layout)
 
-
         self.thumbs_dict = DbImages()
         self.thumbs_dict.finished_.connect(self.setup_grid_fin)
         self.thumbs_dict.get()
