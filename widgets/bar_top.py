@@ -31,6 +31,7 @@ class WinRename(WinChild):
         self.content_lay_v.setContentsMargins(10, 5, 10, 10)
 
         self.data = data
+        self.flag = flag
 
         if flag == "name":
             self.name_ui()
@@ -43,6 +44,7 @@ class WinRename(WinChild):
         self.content_lay_v.addWidget(h_wid)
 
         self.ok_btn = Btn(text=Dynamic.lng.ok)
+        self.ok_btn.mouseReleaseEvent = self.ok_cmd
         h_lay.addWidget(self.ok_btn)
 
         cancel_btn = Btn(text=Dynamic.lng.cancel)
@@ -79,6 +81,15 @@ class WinRename(WinChild):
         self.input_wid.selectAll()
         self.input_wid.setFixedWidth(200)
         self.content_lay_v.addWidget(self.input_wid)
+
+    def ok_cmd(self, *args):
+        if self.flag == "name":
+            self.data[Dynamic.lng.name_] = self.input_wid.text()
+
+        elif self.flag == "value":
+            self.data["real"] = self.input_wid.text()
+
+        self.cancel_cmd()
 
     def cancel_cmd(self, *args):
         self.close()
