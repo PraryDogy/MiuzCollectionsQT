@@ -254,7 +254,7 @@ class JsonData:
 
     @classmethod
     def copy_indeed_files(cls):
-        print("версия приложения выше чем пользовательская")
+        print("копирую необходимые файлы")
         cls.copy_db_file()
         cls.copy_hashdir()
         cls.app_ver = APP_VER
