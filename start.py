@@ -33,8 +33,7 @@ class System_:
 
         with open(FILE_, "w")as f:
             f.write(SUMMARY_MSG)
-
-        subprocess.run(["open", FILE_])
+            subprocess.run(["open", FILE_])
 
     @classmethod
     def set_plugin_path(cls) -> bool:
