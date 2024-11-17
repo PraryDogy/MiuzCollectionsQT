@@ -42,6 +42,7 @@ class NameLabel(QLabel):
 
 class Thumbnail(QFrame):
     select = pyqtSignal(str)
+    path_to_wid: dict[str, "Thumbnail"] = {}
 
     def __init__(self, pixmap: QPixmap, src: str, coll: str, fav: int):
         super().__init__()

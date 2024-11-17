@@ -37,7 +37,7 @@ class Grid(QScrollArea):
 
         self.curr_cell: tuple = (0, 0)
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
-        self.path_to_wid: dict[str, Thumbnail] = {}
+        Thumbnail.path_to_wid.clear()
         self.current_widgets: dict[QGridLayout, list[Thumbnail]] = {}
 
         # Создаем фрейм для виджетов в области скролла
@@ -184,7 +184,7 @@ class Grid(QScrollArea):
             new_wid = self.cell_to_wid.get(data)
 
         elif isinstance(data, str):
-            new_wid = self.path_to_wid.get(data)
+            new_wid = Thumbnail.path_to_wid.get(data)
             coords = new_wid.row, new_wid.col
 
         prev_wid = self.cell_to_wid.get(self.curr_cell)
@@ -211,20 +211,20 @@ class Grid(QScrollArea):
     def add_widget_data(self, wid: Thumbnail, row: int, col: int):
         wid.row, wid.col = row, col
         self.cell_to_wid[row, col] = wid
-        self.path_to_wid[wid.src] = wid
+        Thumbnail.path_to_wid[wid.src] = wid
 
     def reset_widget_data(self):
         self.curr_cell: tuple = (0, 0)
         self.all_grids_row = 0
         self.cell_to_wid.clear()
-        self.path_to_wid.clear()
+        Thumbnail.path_to_wid.clear()
 
     def open_in_view(self, wid: Thumbnail):
-        wid = self.path_to_wid.get(wid.src)
+        wid = Thumbnail.path_to_wid.get(wid.src)
 
         if isinstance(wid, Thumbnail):
             from ..win_image_view import WinImageView
-            self.win_image_view = WinImageView(src=wid.src, path_to_wid=self.path_to_wid)
+            self.win_image_view = WinImageView(src=wid.src)
             self.win_image_view.center_relative_parent(self)
             self.win_image_view.show()
 

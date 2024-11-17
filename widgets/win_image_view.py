@@ -15,7 +15,8 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
 
-from .actions import CopyPath, OpenInfo, Reveal, Save, OpenWins
+from .actions import CopyPath, OpenInfo, OpenWins, Reveal, Save
+from .grid.thumbnail import Thumbnail
 from .win_smb import WinSmb
 
 
@@ -230,7 +231,7 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinChild):
-    def __init__(self, src: str, path_to_wid: dict[str, QWidget]):
+    def __init__(self, src: str):
 
         try:
             Dynamic.image_viewer.close()
@@ -250,8 +251,7 @@ class WinImageView(WinChild):
         self.content_wid.setStyleSheet(Themes.current)
 
         self.src = src
-        self.path_to_wid = path_to_wid
-        self.all_images = list(path_to_wid.keys())
+        self.all_images = list(Thumbnail.path_to_wid.keys())
 
         self.collection = None
         Dynamic.image_viewer = self
@@ -349,17 +349,11 @@ class WinImageView(WinChild):
         SignalsApp.all_.thumbnail_select.emit(self.src)
         self.load_thumbnail()
 
-    def cut_text(self, text: str) -> str:
-        limit = 40
-        if len(text) > limit:
-            return text[:limit] + "..."
-        return text
-
     def set_image_title(self):
         self.collection = Utils.get_coll_name(self.src)
-        cut_coll = self.cut_text(Utils.get_coll_name(self.src))
-        wid = self.path_to_wid.get(self.src)
-        self.set_titlebar_title(f"{cut_coll} - {wid.name}")
+        coll = Utils.get_coll_name(self.src)
+        wid = Thumbnail.path_to_wid.get(self.src)
+        self.set_titlebar_title(f"{coll} - {wid.name}")
 
     def button_switch_cmd(self, flag: str) -> None:
         if flag == "+":
