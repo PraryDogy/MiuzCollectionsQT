@@ -1,9 +1,8 @@
 import os
 import subprocess
-from collections import defaultdict
 
 import sqlalchemy
-from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
+from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
@@ -13,7 +12,7 @@ from cfg import ALL_COLLS, FAVS, LIMIT, MENU_W, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.utils import QThreadPool, URunnable, Utils
+from utils.utils import URunnable, UThreadPool, Utils
 
 from .win_smb import WinSmb
 
@@ -111,59 +110,18 @@ class CollectionBtn(QLabel):
             Utils.print_err(error=e)
 
 
-class BaseLeftMenu(QScrollArea):
+class WorkerSignals(QObject):
+    finished_ = pyqtSignal(list)
+
+
+class LoadMenus(URunnable):
     def __init__(self):
         super().__init__()
-        self.setWidgetResizable(True)
-        self.setObjectName(Names.menu_scrollbar)
-        self.setStyleSheet(Themes.current)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.signals_ = WorkerSignals()
 
-        self.init_ui()
-        SignalsApp.all_.reload_menu_left.connect(self.reload_menu)
-
-    def init_ui(self):
-        if hasattr(self, "main_wid"):
-            self.main_wid.deleteLater()
-
-        self.main_wid = QWidget()
-        self.main_wid.setObjectName(Names.menu_scrollbar_qwidget)
-        self.main_wid.setStyleSheet(Themes.current)
-        self.setWidget(self.main_wid)
-
-        self.main_layout = LayoutVer()
-        self.main_wid.setLayout(self.main_layout)
-
-        btns_widget = QWidget()
-        main_btns_layout = LayoutVer()
-        btns_widget.setLayout(main_btns_layout)
-
-        main_btns_layout.setContentsMargins(0, 5, 0, 15)
-
-        label = CollectionBtn(parent=self, fake_name=Dynamic.lng.all_colls,
-                              true_name=ALL_COLLS)
-        main_btns_layout.addWidget(label)
-
-        label = CollectionBtn(parent=self, fake_name=Dynamic.lng.fav_coll,
-                              true_name=FAVS)
-        main_btns_layout.addWidget(label)
-
-        self.main_layout.addWidget(btns_widget)
-
+    def run(self):
         menus = self.load_colls_query()
-
-        for data in menus:
-
-            label = CollectionBtn(
-                parent=self,
-                fake_name=data.get("fake_name"),
-                true_name=data.get("true_name")
-                )
-
-            self.main_layout.addWidget(label)
-
-        self.main_layout.addSpacerItem(QSpacerItem(0, 5))
-        self.main_layout.addStretch(1)
+        self.signals_.finished_.emit(menus)
 
     def load_colls_query(self) -> list[dict]:
         menus: list[dict] = []
@@ -192,6 +150,73 @@ class BaseLeftMenu(QScrollArea):
             )
 
         return sorted(menus, key = lambda x: x["fake_name"])
+
+
+class BaseLeftMenu(QScrollArea):
+    def __init__(self):
+        super().__init__()
+        self.setWidgetResizable(True)
+        self.setObjectName(Names.menu_scrollbar)
+        self.setStyleSheet(Themes.current)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.init_ui()
+        SignalsApp.all_.reload_menu_left.connect(self.reload_menu)
+
+    def init_ui(self):
+        self.task_ = LoadMenus()
+        self.task_.signals_.finished_.connect(self.load_menus_fin)
+        UThreadPool.pool.start(self.task_)
+
+    def load_menus_fin(self, menus: list[dict]):
+        if hasattr(self, "main_wid"):
+            self.main_wid.deleteLater()
+
+        self.main_wid = QWidget()
+        self.main_wid.setObjectName(Names.menu_scrollbar_qwidget)
+        self.main_wid.setStyleSheet(Themes.current)
+        self.setWidget(self.main_wid)
+
+        fl = Qt.AlignmentFlag.AlignTop
+        self.main_layout = LayoutVer()
+        self.main_layout.setAlignment(fl)
+        self.main_wid.setLayout(self.main_layout)
+
+        btns_widget = QWidget()
+        self.main_layout.addWidget(btns_widget)
+
+        main_btns_layout = LayoutVer()
+        btns_widget.setLayout(main_btns_layout)
+
+        main_btns_layout.setContentsMargins(0, 5, 0, 15)
+
+        label = CollectionBtn(
+            parent=self,
+            fake_name=Dynamic.lng.all_colls,
+            true_name=ALL_COLLS
+            )
+
+        main_btns_layout.addWidget(label)
+
+        label = CollectionBtn(
+            parent=self,
+            fake_name=Dynamic.lng.fav_coll,
+            true_name=FAVS
+            )
+
+        main_btns_layout.addWidget(label)
+
+        for data in menus:
+
+            label = CollectionBtn(
+                parent=self,
+                fake_name=data.get("fake_name"),
+                true_name=data.get("true_name")
+                )
+
+            self.main_layout.addWidget(label)
+
+        self.main_layout.addSpacerItem(QSpacerItem(0, 5))
 
     def reload_menu(self):
         self.init_ui()

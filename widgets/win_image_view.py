@@ -302,7 +302,6 @@ class WinImageView(WinChild):
         self.image_label.set_image(data.pixmap)
 
         if Utils.smb_check():
-            print("load image")
             self.load_image()
 
         else:
