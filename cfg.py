@@ -132,12 +132,6 @@ class JsonData:
             Rus.name_: "Модели",
             "real": "2 MODEL IMG",
             "value": False
-        },
-        {
-            Eng.name_: "Testing",
-            Rus.name_: "Тестинг",
-            "real": "TEST",
-            "value": False
         }
     ]
   
