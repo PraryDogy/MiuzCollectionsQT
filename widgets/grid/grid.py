@@ -98,6 +98,8 @@ class Grid(QScrollArea):
         self.reset_widget_data()
         self.current_widgets.clear()
 
+        print(thumbs_dict)
+
         if thumbs_dict:
 
             above_thumbs = AboveThumbs(self.width())

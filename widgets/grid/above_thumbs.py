@@ -90,6 +90,8 @@ class AboveThumbsNoImages(QWidget):
     def __init__(self, width):
         super().__init__()
 
+        print("ypu are here")
+
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 

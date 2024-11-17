@@ -160,7 +160,8 @@ class DbImages(QObject):
         thumbs_dict = defaultdict(list[DbImage])
 
         if not res:
-            return  {}
+            self.finished_.emit(thumbs_dict)
+            return
 
         for src, hash_path, mod, coll, fav in res:
 
@@ -171,7 +172,8 @@ class DbImages(QObject):
 
             if array_img is None:
                 print("db images > create dict > can't load image")
-                return thumbs_dict
+                self.finished_.emit(thumbs_dict)
+                return
 
             else:
                 pixmap = Utils.pixmap_from_array(array_img)
