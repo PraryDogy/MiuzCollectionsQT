@@ -76,40 +76,31 @@ class LoadDbTask(URunnable):
 
             and_filters = []
 
-            # мы используем "and_", потому что уже есть условие
-            # "where" в search text
             if JsonData.prod_.get("value"):
-
-                text_ = self.get_template(JsonData.prod_.get("real"))
-                prod_stmt = THUMBS.c.src.ilike(text_)
-                and_filters.append(prod_stmt)
+                prod_text = self.get_template(JsonData.prod_.get("real"))
+                and_filters.append(
+                    THUMBS.c.src.ilike(prod_text)
+                    )
                 
-                print("prod stmt")
-
             if JsonData.model_.get("value"):
+                mod_text = self.get_template(JsonData.model_.get("real"))
+                and_filters.append(
+                    THUMBS.c.src.ilike(mod_text)
+                    )
 
-                text_ = self.get_template(JsonData.model_.get("real"))
-                model_stmt = THUMBS.c.src.ilike(text_)
-                and_filters.append(model_stmt)
-                
-                print("model stmt")
-
-            # когда фильтр "остальное" включен
-            # мы ищем в SRC все, что не включает в себя prod ИЛИ model
-            # ... И (src не содержит prod ИЛИ src не содержит model)
             if JsonData.other_.get("value"):
-
                 prod_text = self.get_template(JsonData.prod_.get("real"))
                 mod_text = self.get_template(JsonData.model_.get("real"))
-
                 other_stmt = sqlalchemy.and_(
                     THUMBS.c.src.not_ilike(prod_text),
                     THUMBS.c.src.not_ilike(mod_text)
                     )
                 and_filters.append(other_stmt)
 
-                print("other stmt")
-
+            # пример полного запроса: включен product и other фильтры:
+            # остальной запрос БД > ГДЕ
+            # ИЛИ src содержит product
+            # ИЛИ src НЕ содержит product И src НЕ содержит model
             q = q.where(
                 sqlalchemy.or_(*and_filters)
                 )
