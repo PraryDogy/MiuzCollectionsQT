@@ -102,7 +102,7 @@ class LoadDbTask(URunnable):
                 prod_text = self.get_template(JsonData.prod_.get("real"))
                 mod_text = self.get_template(JsonData.model_.get("real"))
 
-                other_stmt = sqlalchemy.or_(
+                other_stmt = sqlalchemy.and_(
                     THUMBS.c.src.not_ilike(prod_text),
                     THUMBS.c.src.not_ilike(mod_text)
                     )
@@ -111,7 +111,7 @@ class LoadDbTask(URunnable):
                 print("other stmt")
 
             q = q.where(
-                sqlalchemy.and_(*and_filters)
+                sqlalchemy.or_(*and_filters)
                 )
 
         if any((Dynamic.date_start, Dynamic.date_end)):
