@@ -94,15 +94,13 @@ class LangAdmin:
         file_text = ""
 
         classname = f"class {classname}:"
-        init_row = "\tdef __init__(self):"
-        super_row = f"\t\tsuper().__init__()"
 
-        for i in (classname, init_row, super_row):
-            file_text += i
-            file_text += "\n"
+        file_text += classname
+        file_text += "\n"
 
         for k, v in data.items():
-            file_text += f"\t\tself.{k} = {repr(v)}"
+            file_text += "\t"
+            file_text += f"{k} = {repr(v)}"
             file_text += "\n"
 
         with open(filename, "w") as new:
