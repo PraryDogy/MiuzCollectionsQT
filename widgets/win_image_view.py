@@ -250,6 +250,7 @@ class WinImageView(WinChild):
         self.content_wid.setStyleSheet(Themes.current)
 
         self.src = src
+        self.path_to_wid = path_to_wid
         self.all_images = list(path_to_wid.keys())
 
         self.collection = None
@@ -357,9 +358,8 @@ class WinImageView(WinChild):
     def set_image_title(self):
         self.collection = Utils.get_coll_name(self.src)
         cut_coll = self.cut_text(Utils.get_coll_name(self.src))
-        name = self.cut_text(os.path.basename(self.src))
-
-        self.set_titlebar_title(f"{cut_coll} - {name}")
+        wid = self.path_to_wid.get(self.src)
+        self.set_titlebar_title(f"{cut_coll} - {wid.name}")
 
     def button_switch_cmd(self, flag: str) -> None:
         if flag == "+":
