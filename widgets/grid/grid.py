@@ -123,8 +123,11 @@ class Grid(QScrollArea):
         self.scroll_area_widget.setFocus()
 
     def reload_thumbnails(self):
+
+        if hasattr(self, "up_btn"):
+            self.up_btn.deleteLater()
+
         Utils.clear_layout(self.thumbnails_layout)
-        self.up_btn.deleteLater()
         self.setup_grid_main()
 
     def create_image_grid(self, date: str, db_images: list[DbImage]):

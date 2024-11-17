@@ -82,6 +82,8 @@ class LoadDbTask(URunnable):
                 q = q.where(
                     sqlalchemy.and_(THUMBS.c.src.ilike(text_))
                     )
+                
+                print("prod stmt")
 
             if JsonData.model_.get("value"):
 
@@ -89,6 +91,8 @@ class LoadDbTask(URunnable):
                 q = q.where(
                     sqlalchemy.and_(THUMBS.c.src.ilike(text_))
                     )
+                
+                print("model stmt")
 
             # когда фильтр "остальное" включен
             # мы ищем в SRC все, что не включает в себя prod ИЛИ model
@@ -106,6 +110,8 @@ class LoadDbTask(URunnable):
                     )
                 
                 print("other stmt")
+
+
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self.combine_dates()
