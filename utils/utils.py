@@ -76,7 +76,11 @@ class Utils:
 
     @classmethod
     def smb_check(cls) -> bool:
-        if not os.path.exists(JsonData.coll_folder):
+        if (
+            not os.path.exists(JsonData.coll_folder)
+            or
+            JsonData.coll_folder not in (JsonData.coll_folder_list)
+            ):
 
             for coll_folder in JsonData.coll_folder_list:
                 if os.path.exists(coll_folder):
