@@ -14,30 +14,9 @@ class System_:
         ERROR = traceback.format_exception(*args)
 
         SUMMARY_MSG = "\n".join([*ERROR, STARS, ABOUT])
-
-        APP_NAME: str = "MiuzCollections" + "QT"
-
-        APP_SUPPORT = os.path.join(
-            os.path.expanduser("~"),
-            "Library",
-            "Application Support"
-            )
-
-        FILE_: str = os.path.join(
-            APP_SUPPORT,
-            APP_NAME,
-            "error.txt"
-            )
         
         script = "applescripts/error_msg.scpt"
         subprocess.run(["osascript", script, SUMMARY_MSG])
-
-        # os.makedirs(APP_SUPPORT, exist_ok=True)
-
-        # with open(FILE_, "w")as f:
-        #     print(SUMMARY_MSG, file=f)
-
-        # subprocess.Popen(["open", FILE_])
 
     @classmethod
     def set_plugin_path(cls) -> bool:
