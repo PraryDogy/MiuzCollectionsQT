@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QFrame
+from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
+from PyQt5.QtWidgets import QAction, QFrame
 
-from base_widgets import Btn, LayoutHor
+from base_widgets import Btn, ContextCustom, LayoutHor
 from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
@@ -89,6 +89,24 @@ class FilterBtn(Btn):
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
         return super().mouseReleaseEvent(ev)
+    
+    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        self.set_border_blue_style()
+
+        menu_ = ContextCustom(ev)
+
+        one = QAction(parent=menu_, text="Задать имя")
+        menu_.addAction(one)
+
+        two = QAction(parent=menu_, text="Задать значение")
+        menu_.addAction(two)
+
+        menu_.show_menu()
+
+        if self.objectName() == Names.filter_btn_selected:
+            self.set_normal_style()
+        else:
+            self.set_blue_style()
 
 
 class BarTop(QFrame):
