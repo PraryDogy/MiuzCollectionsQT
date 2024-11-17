@@ -7,3 +7,5 @@ lambda вынести в cmd
 проверь остановку сканера выходом из приложения
 
 menu left, info, thumbs dict в urunnable
+
+фильтры еще в above thumbs и настройках
