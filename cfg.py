@@ -134,22 +134,22 @@ class JsonData:
         ]
 
     prod_ = {
-        "en": "Product",
-        "ru": "Предметка",
+        Eng.name_: "Product",
+        Rus.name_: "Предметка",
         "real": "1 IMG",
         "value": False
         }
     
     model_ = {
-        "en": "Model",
-        "ru": "Модели",
+        Eng.name_: "Model",
+        Rus.name_: "Модели",
         "real": "2 MODEL IMG",
         "value": False
         }
     
     other_ = {
-        "en": "Other",
-        "ru": "Остальное",
+        Eng.name_: "Other",
+        Rus.name_: "Остальное",
         "real": "",
         "value": False
         }

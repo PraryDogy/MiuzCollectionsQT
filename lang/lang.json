@@ -177,9 +177,9 @@
             "9": "september"
         }
     ],
-    "name": [
-        "ru",
-        "en"
+    "name_": [
+        "rus",
+        "eng"
     ],
     "no_connection": [
         "Нет подключения",

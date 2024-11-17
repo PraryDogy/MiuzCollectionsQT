@@ -11,7 +11,7 @@ CLASS_ENG = "Eng"
 
 EXCLUDE = ["_MACOSX", "env", "__pycache__", "lang"]
 PREFIX = "Dynamic.lng."
-KEY_NAME = PREFIX + "name"
+KEY_NAME = PREFIX + "name_"
 
 class LangAdmin:
     JSON_DATA: dict = None

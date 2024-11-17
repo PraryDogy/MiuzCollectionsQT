@@ -31,7 +31,7 @@ class Eng:
 		self.loading = 'Loading...'
 		self.months = {'1': 'January', '10': 'October', '11': 'November', '12': 'December', '2': 'February', '3': 'March', '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August', '9': 'September'}
 		self.months_genitive_case = {'1': 'january', '10': 'october', '11': 'november', '12': 'december', '2': 'february', '3': 'march', '4': 'april', '5': 'may', '6': 'june', '7': 'july', '8': 'august', '9': 'september'}
-		self.name = 'en'
+		self.name_ = 'eng'
 		self.no_connection = 'No connection'
 		self.no_photo = 'No photos'
 		self.no_photo_filter = 'No photos in cathegory'

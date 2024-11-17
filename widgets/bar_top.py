@@ -131,27 +131,31 @@ class BarTop(QFrame):
     def init_ui(self):
         self.filter_btns.clear()
 
-        for true_name, fake_name in Dynamic.lng.cust_fltr_names.items():
-            label = FilterBtn(text=fake_name, true_name=true_name)
-            self.h_layout.addWidget(label)
+        filters = (JsonData.prod_, JsonData.model_, JsonData.other_)
 
-            if JsonData.cust_fltr_vals[true_name]:
-                label.set_blue_style()
-            else:
-                label.set_normal_style()
+        
+
+        # for true_name, fake_name in Dynamic.lng.cust_fltr_names.items():
+        #     label = FilterBtn(text=fake_name, true_name=true_name)
+        #     self.h_layout.addWidget(label)
+
+        #     if JsonData.cust_fltr_vals[true_name]:
+        #         label.set_blue_style()
+        #     else:
+        #         label.set_normal_style()
             
-            self.filter_btns.append(label)
+        #     self.filter_btns.append(label)
 
-        for true_name, fake_name in Dynamic.lng.sys_fltr_names.items():
-            label = FilterBtn(text=fake_name, true_name=true_name)
-            self.h_layout.addWidget(label)
+        # for true_name, fake_name in Dynamic.lng.sys_fltr_names.items():
+        #     label = FilterBtn(text=fake_name, true_name=true_name)
+        #     self.h_layout.addWidget(label)
 
-            if JsonData.sys_fltr_vals[true_name]:
-                label.set_blue_style()
-            else:
-                label.set_normal_style()
+        #     if JsonData.sys_fltr_vals[true_name]:
+        #         label.set_blue_style()
+        #     else:
+        #         label.set_normal_style()
 
-            self.filter_btns.append(label)
+        #     self.filter_btns.append(label)
 
         self.dates_btn = DatesBtn()
         self.dates_btn.win_dates_opened.connect(self.open_win_dates)
