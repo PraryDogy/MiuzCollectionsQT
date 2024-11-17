@@ -141,6 +141,7 @@ class BarTop(QFrame):
         for data in (*JsonData.dynamic_filters, JsonData.static_filter):
 
             label = FilterBtn(data)
+            self.filter_btns.append(label)
             self.h_layout.addWidget(label)
         
         self.dates_btn = DatesBtn()
@@ -165,11 +166,8 @@ class BarTop(QFrame):
             i: FilterBtn
             i.set_normal_style()
 
-        for i in JsonData.cust_fltr_vals:
-            JsonData.cust_fltr_vals[i] = False
-
-        for i in JsonData.sys_fltr_vals:
-            JsonData.sys_fltr_vals[i] = False
+        for data in (*JsonData.dynamic_filters, JsonData.static_filter):
+            data["value"] = False
 
     def reload_filters(self):
         Utils.clear_layout(self.h_layout)
