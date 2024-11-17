@@ -54,12 +54,20 @@ class DatesBtn(Btn):
 
 
 class FilterBtn(Btn):
-    def __init__(self, text: str, real: str):
+    def __init__(self, data: dict):
+
+        text = data.get(Dynamic.lng.name_)
         super().__init__(text=text)
+
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.real = real
+        self.data = data
+
+        if self.data.get("value"):
+            self.set_blue_style()
+        else:
+            self.set_normal_style()
 
     def set_normal_style(self):
         self.setObjectName(Names.filter_btn)
@@ -77,27 +85,17 @@ class FilterBtn(Btn):
         if ev.button() != Qt.MouseButton.LeftButton:
             return
         
-        return
-        
-        if self.real == JsonData.prod_.get("real"):
-            JsonData.prod_["value"] = not JsonData.prod_.get("value")
+        self.data["value"] = not self.data.get("value")
 
-        elif self.real == JsonData.model_.get("real"):
-            JsonData.model_["value"] = not JsonData.model_.get("value")
-
-        elif self.real == JsonData.static_filter.get("real"):
-            JsonData.model_["value"] = not JsonData.static_filter.get("value")
-        
-        if self.objectName() == Names.filter_btn_selected:
-            self.set_normal_style()
-        else:
+        if self.data.get("value"):
             self.set_blue_style()
-
+        else:
+            self.set_normal_style()
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
-        return super().mouseReleaseEvent(ev)
+        # return super().mouseReleaseEvent(ev)
     
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         prev_name = self.objectName()
@@ -140,25 +138,10 @@ class BarTop(QFrame):
     def init_ui(self):
         self.filter_btns.clear()
 
-        filters: tuple[dict] = (
-            JsonData.prod_,
-            JsonData.model_,
-            JsonData.static_filter
-            )
+        for data in (*JsonData.dynamic_filters, JsonData.static_filter):
 
-        for data in filters:
-
-            label = FilterBtn(
-                text=data.get(Dynamic.lng.name_),
-                real=data.get("real")
-                )
-
+            label = FilterBtn(data)
             self.h_layout.addWidget(label)
-
-            if data.get("value"):
-                label.set_blue_style()
-            else:
-                label.set_normal_style()
         
         self.dates_btn = DatesBtn()
         self.dates_btn.win_dates_opened.connect(self.open_win_dates)
