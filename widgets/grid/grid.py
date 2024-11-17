@@ -92,7 +92,6 @@ class Grid(QScrollArea):
         self.current_widgets.clear()
 
         self.thumbnails_wid = QWidget()
-        self.main_layout.addWidget(self.thumbnails_wid)
 
         self.thumbnails_layout = LayoutVer()
         self.thumbnails_layout.setContentsMargins(5, 10, 5, 0)
@@ -128,6 +127,7 @@ class Grid(QScrollArea):
             self.thumbnails_layout.addWidget(h_wid)
             h_layout.addWidget(LimitBtn())
 
+        self.main_layout.addWidget(self.thumbnails_wid)
         self.main_wid.setFocus()
 
     def reload_thumbnails(self):
