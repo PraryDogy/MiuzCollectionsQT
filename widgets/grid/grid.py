@@ -94,8 +94,6 @@ class Grid(QScrollArea):
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
 
-        print(ln_thumbs // LIMIT)
-
         if ln_thumbs // Dynamic.current_photo_limit == 0:
             h_wid = QWidget()
             h_layout = LayoutHor()

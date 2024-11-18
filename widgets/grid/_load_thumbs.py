@@ -46,7 +46,12 @@ class LoadDbTask(URunnable):
             THUMBS.c.fav
             )
 
-        q = q.limit(Dynamic.current_photo_limit)
+        if Dynamic.current_photo_limit > LIMIT:
+            offset = Dynamic.current_photo_limit
+        else:
+            offset = 0
+        
+        q = q.limit(LIMIT).offset(offset)
         q = q.order_by(-THUMBS.c.mod)
 
         if JsonData.curr_coll == FAVS:
