@@ -156,7 +156,6 @@ class BaseLeftMenu(QScrollArea):
         UThreadPool.pool.start(self.task_)
 
     def select_all_colls_cmd(self):
-        print(1)
         BaseLeftMenu.coll_btn.normal_style()
         self.all_colls_btn.selected_style()
         BaseLeftMenu.coll_btn = self.all_colls_btn
@@ -214,6 +213,8 @@ class BaseLeftMenu(QScrollArea):
             if i.true_name == JsonData.curr_coll:
                 i.selected_style()
                 BaseLeftMenu.coll_btn = i
+            else:
+                i.normal_style()
 
         for data in menus:
 
@@ -228,6 +229,8 @@ class BaseLeftMenu(QScrollArea):
             if coll_btn.true_name == JsonData.curr_coll:
                 coll_btn.selected_style()
                 BaseLeftMenu.coll_btn = coll_btn
+            else:
+                coll_btn.normal_style()
 
         main_layout.addSpacerItem(QSpacerItem(0, 5))
 
