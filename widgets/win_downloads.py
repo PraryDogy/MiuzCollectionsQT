@@ -8,7 +8,7 @@ from base_widgets import CustomProgressBar, LayoutHor, LayoutVer, SvgBtn
 from base_widgets.wins import WinChild
 from cfg import Dynamic, JsonData
 from styles import Names, Themes
-from utils.copy_files import ThreadCopyFiles
+from utils.copy_files import CopyFiles
 from utils.utils import Utils
 
 
@@ -59,7 +59,7 @@ class Progresser(QWidget):
 class WinDownloads(WinChild):
     def __init__(self):
         super().__init__()
-        self.copy_threads: list[ThreadCopyFiles] = []
+        self.copy_threads: list[CopyFiles] = []
 
         self.close_btn_cmd(self.close_)
         self.set_titlebar_title(Dynamic.lang.title_downloads)
@@ -92,9 +92,9 @@ class WinDownloads(WinChild):
 
     def add_progress_widgets(self):
         try:
-            for copy_task in Dynamic.copy_threads:
+            for copy_task in CopyFiles.current_threads:
 
-                copy_task: ThreadCopyFiles
+                copy_task: CopyFiles
 
                 if copy_task not in self.copy_threads and copy_task.isRunning():
                     t = self.cut_text(copy_task.get_current_file())
@@ -109,17 +109,17 @@ class WinDownloads(WinChild):
         except Exception as e:
             Utils.print_err(error=e)
 
-    def connect_(self, wid: Progresser, task: ThreadCopyFiles):
+    def connect_(self, wid: Progresser, task: CopyFiles):
         wid.progress_stop.connect(partial(self.stop_progress, wid, task))
         task.signals_.value_changed.connect(partial(self.change_progress_value, wid))
         task.signals_.text_changed.connect(partial(self.change_progress_text, wid))
         task.signals_.finished_.connect(partial(self.remove_progress, wid, task))
 
-    def stop_progress(self, widget: Progresser, task: ThreadCopyFiles):
+    def stop_progress(self, widget: Progresser, task: CopyFiles):
         task.signals_.stop.emit()
         self.remove_progress(widget, task)
 
-    def remove_progress(self, widget: Progresser, task: ThreadCopyFiles):
+    def remove_progress(self, widget: Progresser, task: CopyFiles):
         try:
             widget.deleteLater()
             self.copy_threads.remove(task)

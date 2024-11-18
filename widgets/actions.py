@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QWidget
 from cfg import Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
-from utils.copy_files import ThreadCopyFiles
+from utils.copy_files import CopyFiles
 from utils.scaner import Scaner
 from utils.utils import URunnable, UThreadPool, Utils
 
@@ -188,7 +188,7 @@ class Save(CustomAction):
             file = [file]
 
         cmd_ = lambda f: self.reveal_copied_files(files=f)
-        thread_ = ThreadCopyFiles(dest=dest, files=file)
+        thread_ = CopyFiles(dest=dest, files=file)
         thread_.signals_.finished_.connect(cmd_)
 
         SignalsApp.all_.btn_downloads_toggle.emit("show")
@@ -198,5 +198,5 @@ class Save(CustomAction):
 
         Utils.reveal_files(files)
 
-        if len(Dynamic.copy_threads) == 0:
+        if len(CopyFiles.current_threads) == 0:
             SignalsApp.all_.btn_downloads_toggle.emit("hide")

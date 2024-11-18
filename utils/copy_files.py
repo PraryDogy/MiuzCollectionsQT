@@ -2,8 +2,6 @@ import os
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import Dynamic
-
 from .utils import URunnable, Utils
 
 
@@ -14,7 +12,9 @@ class WorkerSignals(QObject):
     stop = pyqtSignal()
 
 
-class ThreadCopyFiles(URunnable):
+class CopyFiles(URunnable):
+    current_threads: list["CopyFiles"] = []
+
     def __init__(self, dest: str, files: list):
         super().__init__()
         self.signals_ = WorkerSignals()
@@ -25,7 +25,7 @@ class ThreadCopyFiles(URunnable):
         self.buffer_size = 1024*1024
         self.current_file = ""
 
-        Dynamic.copy_threads.append(self)
+        CopyFiles.current_threads.append(self)
 
     @URunnable.set_running_state
     def run(self):
@@ -48,7 +48,7 @@ class ThreadCopyFiles(URunnable):
             if not self.should_run:
                 self.signals_.value_changed.emit(100)
                 self.signals_.finished_.emit(files_dests)
-                Dynamic.copy_threads.remove(self)
+                CopyFiles.current_threads.remove(self)
                 return
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
@@ -80,7 +80,7 @@ class ThreadCopyFiles(URunnable):
         
         self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
-        Dynamic.copy_threads.remove(self)
+        CopyFiles.current_threads.remove(self)
 
     def stop_copying(self):
         self.should_run = False
