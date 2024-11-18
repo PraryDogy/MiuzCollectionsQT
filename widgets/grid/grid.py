@@ -54,7 +54,7 @@ class Grid(QScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         self.columns = self.get_columns()
-        self.setup_grid_main()
+        self.grids_widget_setup()
 
         SignalsApp.all_.thumbnail_select.connect(self.select_new_widget)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
@@ -90,7 +90,7 @@ class Grid(QScrollArea):
     def add_more_grids_fin(self, thumbs_dict: dict[str, list[DbImage]]):
         if thumbs_dict:
             for date, db_images in thumbs_dict.items():
-                self.create_image_grid(date, db_images)
+                self.one_grid_widget_setup(date, db_images)
 
         ln_thumbs = sum(
             len(lst)
@@ -101,42 +101,41 @@ class Grid(QScrollArea):
             limit_btn = LimitBtn()
             limit_btn._clicked.connect(self.add_more_grids)
             al = Qt.AlignmentFlag.AlignCenter
-            self.thumbnails_layout.addWidget(limit_btn, alignment=al)
+            self.grids_layout.addWidget(limit_btn, alignment=al)
 
-    def setup_grid_main(self):
+    def grids_widget_setup(self):
         
-        if hasattr(self, "thumbnails_wid"):
-            self.thumbnails_wid.deleteLater()
+        if hasattr(self, "grids_widget"):
+            self.grids_widget.deleteLater()
 
         self.reset_widget_data()
         self.current_widgets.clear()
 
-        self.thumbnails_wid = QWidget()
+        self.grids_widget = QWidget()
 
-        self.thumbnails_layout = LayoutVer()
-        self.thumbnails_layout.setContentsMargins(5, 10, 5, 10)
-        self.thumbnails_layout.setAlignment(self.topleft)
+        self.grids_layout = LayoutVer()
+        self.grids_layout.setContentsMargins(5, 10, 5, 10)
+        self.grids_layout.setAlignment(self.topleft)
+        self.grids_widget.setLayout(self.grids_layout)
 
-        self.thumbnails_wid.setLayout(self.thumbnails_layout)
+        self.task_ = DbImages()
+        self.task_.finished_.connect(self.grids_widget_setup_res)
+        self.task_.get()
 
-        self.thumbs_dict = DbImages()
-        self.thumbs_dict.finished_.connect(self.setup_grid_fin)
-        self.thumbs_dict.get()
-
-    def setup_grid_fin(self, thumbs_dict: dict[str, list[DbImage]]):
+    def grids_widget_setup_res(self, thumbs_dict: dict[str, list[DbImage]]):
         if thumbs_dict:
 
             above_thumbs = AboveThumbs(self.width())
             above_thumbs.setContentsMargins(9, 0, 0, 0)
-            self.thumbnails_layout.addWidget(above_thumbs)
+            self.grids_layout.addWidget(above_thumbs)
 
             for date, db_images in thumbs_dict.items():
-                self.create_image_grid(date, db_images)
+                self.one_grid_widget_setup(date, db_images)
 
         else:
             no_images = AboveThumbsNoImages(self.width())
             no_images.setContentsMargins(9, 0, 0, 0)
-            self.thumbnails_layout.addWidget(no_images)
+            self.grids_layout.addWidget(no_images)
 
         ln_thumbs = sum(
             len(lst)
@@ -147,22 +146,22 @@ class Grid(QScrollArea):
             limit_btn = LimitBtn()
             limit_btn._clicked.connect(self.add_more_grids)
             al = Qt.AlignmentFlag.AlignCenter
-            self.thumbnails_layout.addWidget(limit_btn, alignment=al)
+            self.grids_layout.addWidget(limit_btn, alignment=al)
 
-        self.main_layout.addWidget(self.thumbnails_wid)
+        self.main_layout.addWidget(self.grids_widget)
         self.main_wid.setFocus()
 
     def reload_thumbnails(self):
         self.up_btn.hide()
-        self.setup_grid_main()
+        self.grids_widget_setup()
 
-    def create_image_grid(self, date: str, db_images: list[DbImage]):
+    def one_grid_widget_setup(self, date: str, db_images: list[DbImage]):
         title_label = Title(title=date, db_images=db_images, width=self.width())
         title_label.setContentsMargins(5, 0, 0, 10)
-        self.thumbnails_layout.addWidget(title_label)
+        self.grids_layout.addWidget(title_label)
 
         grid_widget = QWidget()
-        self.thumbnails_layout.addWidget(grid_widget)
+        self.grids_layout.addWidget(grid_widget)
 
         grid_layout = QGridLayout()
         grid_layout.setAlignment(self.topleft)
