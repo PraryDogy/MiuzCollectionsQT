@@ -21,7 +21,8 @@ class ScanerUtils:
         try:
             SignalsApp.all_.progressbar_set_value.emit(value)
         except RuntimeError as e:
-            Utils.print_err(error=e)
+            pass
+            # Utils.print_err(error=e)
 
     @classmethod
     def reload_gui(cls):
@@ -342,7 +343,10 @@ class ScanerThread(URunnable):
             db_updater = DbUpdater(compator.del_items, compator.ins_items)
             db_updater.run()
 
-        self.signals_.finished_.emit()
+        try:
+            self.signals_.finished_.emit()
+        except RuntimeError:
+            pass
     
 
 class ScanerShedule(QObject):

@@ -136,11 +136,11 @@ class FavAction(CustomAction):
 
     def __init__(self, parent: QWidget, src: str, fav:  int):
 
-        if fav == 0:
+        if fav == 0 or fav is None:
             t = Dynamic.lang.add_fav
             self.value = 1
 
-        elif fav == 1 or fav is None:
+        elif fav == 1:
             t = Dynamic.lang.del_fav
             self.value = 0
 
