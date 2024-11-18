@@ -232,12 +232,6 @@ class NextImageBtn(SwitchImageBtn):
 
 class WinImageView(WinChild):
     def __init__(self, src: str):
-
-        try:
-            Dynamic.image_viewer.close()
-        except (AttributeError, RuntimeError) as e:
-            pass
-
         super().__init__()
 
         self.close_btn_cmd(self.close_)
@@ -254,7 +248,6 @@ class WinImageView(WinChild):
         self.all_images = list(Thumbnail.path_to_wid.keys())
 
         self.collection = None
-        Dynamic.image_viewer = self
 
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
@@ -323,7 +316,6 @@ class WinImageView(WinChild):
 
     def close_(self, *args):
         LoadImage.images.clear()
-        Dynamic.image_viewer = None
         self.close()
 
 

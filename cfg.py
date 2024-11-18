@@ -285,5 +285,4 @@ class Dynamic:
     date_start_text: str = None # 1 january 1991
     date_end_text: str = None # 31 january 1991
     lang: Eng | Rus = None
-    image_viewer = None
     copy_threads: list = []
