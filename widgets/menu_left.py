@@ -158,7 +158,6 @@ class BaseLeftMenu(QScrollArea):
         btn.selected_style()
         BaseLeftMenu.coll_btn = btn
 
-
     def task_finalize(self, menus: list[dict[str, str]]):
 
         if hasattr(self, "main_wid"):
