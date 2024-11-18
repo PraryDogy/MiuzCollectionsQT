@@ -3,7 +3,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer
-from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData
+from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData, LIMIT
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
@@ -92,6 +92,21 @@ class Grid(QScrollArea):
             for date, db_images in thumbs_dict.items():
                 self.create_image_grid(date, db_images)
 
+        ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
+
+        print(ln_thumbs // LIMIT)
+
+        if ln_thumbs // Dynamic.current_photo_limit == 0:
+            h_wid = QWidget()
+            h_layout = LayoutHor()
+            h_wid.setLayout(h_layout)
+            h_layout.setContentsMargins(0, 0, 0, 10)
+            self.thumbnails_layout.addWidget(h_wid)
+
+            limit_btn = LimitBtn()
+            limit_btn._clicked.connect(self.add_more_grids)
+            h_layout.addWidget(limit_btn)
+
     def setup_grid_main(self):
         
         if hasattr(self, "thumbnails_wid"):
@@ -129,10 +144,7 @@ class Grid(QScrollArea):
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
 
-        print(ln_thumbs, Dynamic.current_photo_limit)
-
-
-        if ln_thumbs == Dynamic.current_photo_limit:
+        if ln_thumbs == LIMIT:
             h_wid = QWidget()
             h_layout = LayoutHor()
             h_wid.setLayout(h_layout)
@@ -141,7 +153,7 @@ class Grid(QScrollArea):
 
             limit_btn = LimitBtn()
             limit_btn._clicked.connect(self.add_more_grids)
-            self.main_layout.addWidget(limit_btn)
+            h_layout.addWidget(limit_btn)
 
         self.main_layout.addWidget(self.thumbnails_wid)
         self.main_wid.setFocus()

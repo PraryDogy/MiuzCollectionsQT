@@ -17,3 +17,4 @@ class LimitBtn(Btn):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.current_photo_limit += LIMIT
         self._clicked.emit()
+        self.deleteLater()
