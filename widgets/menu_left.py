@@ -18,6 +18,8 @@ from .win_smb import WinSmb
 
 
 class CollectionBtn(QLabel):
+    pressed_ = pyqtSignal()
+
     def __init__(self, fake_name: str, true_name: str):
         super().__init__(text=fake_name)
         self.true_name = true_name
@@ -25,21 +27,6 @@ class CollectionBtn(QLabel):
 
         btn_w = MENU_LEFT_WIDTH - 20 - 5
         self.setFixedSize(btn_w, 28)
-
-        if true_name == JsonData.curr_coll:
-            self.setObjectName(Names.menu_btn_selected)
-        else:
-            self.setObjectName(Names.menu_btn)
-
-        self.setStyleSheet(Themes.current)
-
-    def show_collection(self, *args):
-        JsonData.curr_coll = self.true_name
-        Dynamic.grid_offset = 0
-        SignalsApp.all_.win_main_cmd.emit("set_title")
-        SignalsApp.all_.reload_menu_left.emit()
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
     def reveal_collection(self, *args):
 
@@ -57,16 +44,24 @@ class CollectionBtn(QLabel):
             self.smb_win.center_relative_parent(self.my_parent)
             self.smb_win.show()
 
+    def normal_style(self):
+        self.setObjectName(Names.menu_btn)
+        self.setStyleSheet(Themes.current)
+
+    def selected_style(self):
+        self.setObjectName(Names.menu_btn_selected)
+        self.setStyleSheet(Themes.current)
+
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
-            self.show_collection()
+            self.pressed_.emit()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
         menu_ = ContextCustom(event=ev)
 
         view_coll = QAction(text=Dynamic.lang.view, parent=self)
-        view_coll.triggered.connect(self.show_collection)
+        view_coll.triggered.connect(self.pressed_.emit)
         menu_.addAction(view_coll)
 
         menu_.addSeparator()
@@ -135,6 +130,8 @@ class LoadMenus(URunnable):
 
 
 class BaseLeftMenu(QScrollArea):
+    coll_btn: CollectionBtn
+
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
@@ -150,7 +147,20 @@ class BaseLeftMenu(QScrollArea):
         self.task_.signals_.finished_.connect(self.load_menus_fin)
         UThreadPool.pool.start(self.task_)
 
+    def collection_btn_cmd(self, btn: CollectionBtn):
+        JsonData.curr_coll = btn.true_name
+        Dynamic.grid_offset = 0
+        SignalsApp.all_.win_main_cmd.emit("set_title")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
+        BaseLeftMenu.coll_btn.normal_style()
+        btn.selected_style()
+        BaseLeftMenu.coll_btn = btn
+
+
     def load_menus_fin(self, menus: list[dict]):
+
         if hasattr(self, "main_wid"):
             self.main_wid.deleteLater()
 
@@ -171,28 +181,40 @@ class BaseLeftMenu(QScrollArea):
 
         main_btns_layout.setContentsMargins(0, 5, 0, 15)
 
-        label = CollectionBtn(
+        all_colls_btn = CollectionBtn(
             fake_name=Dynamic.lang.all_colls,
             true_name=NAME_ALL_COLLS
             )
+        cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
+        all_colls_btn.pressed_.connect(cmd_)
+        main_btns_layout.addWidget(all_colls_btn)
 
-        main_btns_layout.addWidget(label)
-
-        label = CollectionBtn(
+        favs_btn = CollectionBtn(
             fake_name=Dynamic.lang.fav_coll,
             true_name=NAME_FAVS
             )
+        cmd_ = lambda: self.collection_btn_cmd(favs_btn)
+        favs_btn.pressed_.connect(cmd_)
+        main_btns_layout.addWidget(favs_btn)
 
-        main_btns_layout.addWidget(label)
+        for i in (all_colls_btn, favs_btn):
+            if i.true_name == JsonData.curr_coll:
+                i.selected_style()
+                BaseLeftMenu.coll_btn = i
 
         for data in menus:
 
-            label = CollectionBtn(
+            coll_btn = CollectionBtn(
                 fake_name=data.get("fake_name"),
                 true_name=data.get("true_name")
                 )
+            cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
+            coll_btn.pressed_.connect(cmd_)
+            main_layout.addWidget(coll_btn)
 
-            main_layout.addWidget(label)
+            if coll_btn.true_name == JsonData.curr_coll:
+                coll_btn.selected_style()
+                BaseLeftMenu.coll_btn = coll_btn
 
         main_layout.addSpacerItem(QSpacerItem(0, 5))
 
