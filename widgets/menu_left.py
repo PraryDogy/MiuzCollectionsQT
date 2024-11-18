@@ -18,7 +18,7 @@ from .win_smb import WinSmb
 
 
 class CollectionBtn(QLabel):
-    def __init__(self, parent: QFrame, fake_name: str, true_name: str):
+    def __init__(self, fake_name: str, true_name: str):
         super().__init__(text=fake_name)
         self.true_name = true_name
         self.fake_name = fake_name
@@ -177,7 +177,6 @@ class BaseLeftMenu(QScrollArea):
         main_btns_layout.setContentsMargins(0, 5, 0, 15)
 
         label = CollectionBtn(
-            parent=self,
             fake_name=Dynamic.lang.all_colls,
             true_name=NAME_ALL_COLLS
             )
@@ -185,7 +184,6 @@ class BaseLeftMenu(QScrollArea):
         main_btns_layout.addWidget(label)
 
         label = CollectionBtn(
-            parent=self,
             fake_name=Dynamic.lang.fav_coll,
             true_name=NAME_FAVS
             )
@@ -195,7 +193,6 @@ class BaseLeftMenu(QScrollArea):
         for data in menus:
 
             label = CollectionBtn(
-                parent=self,
                 fake_name=data.get("fake_name"),
                 true_name=data.get("true_name")
                 )
