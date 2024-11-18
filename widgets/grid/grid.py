@@ -10,7 +10,7 @@ from utils.utils import UThreadPool, Utils
 
 from ..actions import OpenWins, ReloadGui
 from ..win_smb import WinSmb
-from ._load_thumbs import DbImage, DbImages
+from ._db_images import DbImage, DbImages
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .limit_btn import LimitBtn
 from .thumbnail import Thumbnail
