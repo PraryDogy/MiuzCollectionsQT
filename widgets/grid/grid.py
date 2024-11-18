@@ -64,7 +64,7 @@ class Grid(QScrollArea):
         if flag == "resize":
             self.resize_()
         elif flag == "to_top":
-            self.scroll_top()
+            self.verticalScrollBar().setValue(0)
         elif flag == "reload":
             self.setup_grids_widget()
         else:
@@ -78,9 +78,6 @@ class Grid(QScrollArea):
         if value > 0:
             self.up_btn.show()
             self.up_btn.raise_()
-
-    def scroll_top(self):
-        self.verticalScrollBar().setValue(0)
 
     def load_db_images(self, flag: str):
         """flag: first, more"""
