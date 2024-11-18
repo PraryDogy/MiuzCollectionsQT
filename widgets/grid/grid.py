@@ -135,7 +135,11 @@ class Grid(QScrollArea):
         self.main_wid.setFocus()
 
     def setup_single_grid(self, date: str, db_images: list[DbImage]):
-        title_label = Title(title=date, db_images=db_images, width=self.width())
+        title_label = Title(
+            title=date,
+            db_images=db_images,
+            width=self.width()
+            )
         title_label.setContentsMargins(5, 0, 0, 10)
         self.grids_layout.addWidget(title_label)
 
@@ -151,7 +155,7 @@ class Grid(QScrollArea):
 
         row, col = 0, 0
 
-        for x, db_image in enumerate(db_images):
+        for db_image in db_images:
         
             wid = Thumbnail(
                 pixmap=db_image.pixmap,
