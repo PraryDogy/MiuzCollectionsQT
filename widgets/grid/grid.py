@@ -54,7 +54,7 @@ class Grid(QScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         self.columns = self.get_columns()
-        self.grids_widget_setup()
+        self.setup_grids_widget()
 
         SignalsApp.all_.thumbnail_select.connect(self.select_new_widget)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
@@ -82,28 +82,7 @@ class Grid(QScrollArea):
     def scroll_top(self):
         self.verticalScrollBar().setValue(0)
 
-    def add_more_grids(self):
-        self.thumbs_dict = DbImages()
-        self.thumbs_dict.finished_.connect(self.add_more_grids_fin)
-        self.thumbs_dict.get()
-
-    def add_more_grids_fin(self, thumbs_dict: dict[str, list[DbImage]]):
-        if thumbs_dict:
-            for date, db_images in thumbs_dict.items():
-                self.one_grid_widget_setup(date, db_images)
-
-        ln_thumbs = sum(
-            len(lst)
-            for lst in thumbs_dict.values()
-            )
-
-        if ln_thumbs == GRID_LIMIT:
-            limit_btn = LimitBtn()
-            limit_btn._clicked.connect(self.add_more_grids)
-            al = Qt.AlignmentFlag.AlignCenter
-            self.grids_layout.addWidget(limit_btn, alignment=al)
-
-    def grids_widget_setup(self):
+    def setup_grids_widget(self):
         
         if hasattr(self, "grids_widget"):
             self.grids_widget.deleteLater()
@@ -118,18 +97,47 @@ class Grid(QScrollArea):
         self.grids_layout.setAlignment(self.topleft)
         self.grids_widget.setLayout(self.grids_layout)
 
+        self.load_db_images("first")
+
+    def load_db_images(self, flag: str):
+        """flag: first, more"""
+
+        if flag == "first":
+            cmd_ = lambda db_images: self.grids_widget_setup_res(db_images)
+        elif flag == "more":
+            cmd_ = lambda db_images: self.add_more_grids_fin(db_images)
+
         self.task_ = DbImages()
-        self.task_.finished_.connect(self.grids_widget_setup_res)
+        self.task_.finished_.connect(cmd_)
         self.task_.get()
 
-    def grids_widget_setup_res(self, thumbs_dict: dict[str, list[DbImage]]):
-        if thumbs_dict:
+    def add_more_grids_fin(self, db_images: dict[str, list[DbImage]]):
+        if db_images:
+            for date, db_images in db_images.items():
+                self.one_grid_widget_setup(date, db_images)
+
+        ln_thumbs = sum(
+            len(lst)
+            for lst in db_images.values()
+            )
+
+        if ln_thumbs == GRID_LIMIT:
+
+            al = Qt.AlignmentFlag.AlignCenter
+            cmd_ = lambda: self.load_db_images("more")
+
+            limit_btn = LimitBtn()
+            limit_btn._clicked.connect(cmd_)
+            self.grids_layout.addWidget(limit_btn, alignment=al)
+
+    def grids_widget_setup_res(self, db_images: dict[str, list[DbImage]]):
+        if db_images:
 
             above_thumbs = AboveThumbs(self.width())
             above_thumbs.setContentsMargins(9, 0, 0, 0)
             self.grids_layout.addWidget(above_thumbs)
 
-            for date, db_images in thumbs_dict.items():
+            for date, db_images in db_images.items():
                 self.one_grid_widget_setup(date, db_images)
 
         else:
@@ -139,13 +147,16 @@ class Grid(QScrollArea):
 
         ln_thumbs = sum(
             len(lst)
-            for lst in thumbs_dict.values()
+            for lst in db_images.values()
             )
 
         if ln_thumbs == GRID_LIMIT:
-            limit_btn = LimitBtn()
-            limit_btn._clicked.connect(self.add_more_grids)
+
+            cmd_ = lambda: self.load_db_images("more")
             al = Qt.AlignmentFlag.AlignCenter
+
+            limit_btn = LimitBtn()
+            limit_btn._clicked.connect(cmd_)
             self.grids_layout.addWidget(limit_btn, alignment=al)
 
         self.main_layout.addWidget(self.grids_widget)
@@ -153,7 +164,7 @@ class Grid(QScrollArea):
 
     def reload_thumbnails(self):
         self.up_btn.hide()
-        self.grids_widget_setup()
+        self.setup_grids_widget()
 
     def one_grid_widget_setup(self, date: str, db_images: list[DbImage]):
         title_label = Title(title=date, db_images=db_images, width=self.width())
