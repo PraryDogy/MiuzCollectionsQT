@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer
-from cfg import ALL_COLLS, GRID_LIMIT, Dynamic, JsonData
+from cfg import NAME_ALL_COLLS, GRID_LIMIT, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
 
@@ -20,7 +20,7 @@ class ResetDatesBtn(QLabel):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.date_start, Dynamic.date_end = None, None
-        Dynamic.grid_offset = GRID_LIMIT
+        Dynamic.grid_offset = 0
 
         SignalsApp.all_.btn_dates_style.emit("normal")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
@@ -37,7 +37,7 @@ class ResetSearchBtn(QLabel):
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        Dynamic.grid_offset = GRID_LIMIT
+        Dynamic.grid_offset = 0
 
         SignalsApp.all_.wid_search_cmd.emit("clear")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
@@ -54,7 +54,7 @@ class ResetFiltersBtn(QLabel):
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        Dynamic.grid_offset = GRID_LIMIT
+        Dynamic.grid_offset = 0
 
         SignalsApp.all_.bar_top_reset_filters.emit()
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
@@ -72,8 +72,8 @@ class ShowAllBtn(QLabel):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.date_start, Dynamic.date_end = None, None
-        JsonData.curr_coll = ALL_COLLS
-        Dynamic.grid_offset = GRID_LIMIT
+        JsonData.curr_coll = NAME_ALL_COLLS
+        Dynamic.grid_offset = 0
 
         SignalsApp.all_.wid_search_cmd.emit("clear")
         SignalsApp.all_.bar_top_reset_filters.emit()

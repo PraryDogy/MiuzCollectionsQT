@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 
 from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
 from base_widgets.wins import WinChild
-from cfg import STATIC_FILTER_REAL_NAME, Dynamic, JsonData
+from cfg import Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
 
@@ -209,7 +209,7 @@ class FilterBtn(Btn):
 
         JsonData.static_filter
 
-        if not self.data.get("real") == STATIC_FILTER_REAL_NAME:
+        if not self.data.get("real") == JsonData.static_filter.get("real"):
             menu_.addAction(set_value)
 
         menu_.show_menu()

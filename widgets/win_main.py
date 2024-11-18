@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
-from cfg import ALL_COLLS, Dynamic, JsonData, FAVS
+from cfg import NAME_ALL_COLLS, Dynamic, JsonData, NAME_FAVS
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
@@ -47,7 +47,7 @@ class WinMain(WinFrameless):
 
         self.set_titlebar_title(
             Dynamic.lang.all_colls
-            if JsonData.curr_coll == ALL_COLLS
+            if JsonData.curr_coll == NAME_ALL_COLLS
             else JsonData.curr_coll
             )
 
@@ -99,10 +99,10 @@ class WinMain(WinFrameless):
 
         elif flag == "set_title":
 
-            if JsonData.curr_coll == ALL_COLLS:
+            if JsonData.curr_coll == NAME_ALL_COLLS:
                 t = Dynamic.lang.all_colls
 
-            elif JsonData.curr_coll == FAVS:
+            elif JsonData.curr_coll == NAME_FAVS:
                 t = Dynamic.lang.fav_coll
 
             else:

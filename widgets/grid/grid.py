@@ -3,7 +3,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer
-from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData, GRID_LIMIT
+from cfg import MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, Dynamic, JsonData, GRID_LIMIT
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
@@ -22,8 +22,8 @@ class Grid(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
-        self.resize(JsonData.root_g["aw"] - MENU_W, JsonData.root_g["ah"])
-        self.ww = JsonData.root_g["aw"] - MENU_W
+        self.resize(JsonData.root_g["aw"] - MENU_LEFT_WIDTH, JsonData.root_g["ah"])
+        self.ww = JsonData.root_g["aw"] - MENU_LEFT_WIDTH
         self.horizontalScrollBar().setDisabled(True)
         self.setObjectName(Names.th_scrollbar)
         self.setStyleSheet(Themes.current)

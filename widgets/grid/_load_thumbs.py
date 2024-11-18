@@ -6,7 +6,7 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import ALL_COLLS, FAVS, Dynamic, JsonData, GRID_LIMIT
+from cfg import NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData, GRID_LIMIT
 from database import THUMBS, Dbase
 from utils.utils import URunnable, UThreadPool, Utils
 
@@ -45,22 +45,17 @@ class LoadDbTask(URunnable):
             THUMBS.c.coll,
             THUMBS.c.fav
             )
-
-        if Dynamic.grid_offset > GRID_LIMIT:
-            offset = Dynamic.grid_offset
-        else:
-            offset = 0
         
-        q = q.limit(GRID_LIMIT).offset(offset)
+        q = q.limit(GRID_LIMIT).offset(Dynamic.grid_offset)
         q = q.order_by(-THUMBS.c.mod)
 
-        if JsonData.curr_coll == FAVS:
+        if JsonData.curr_coll == NAME_FAVS:
 
             q = q.where(
                 THUMBS.c.fav == 1
                 )
 
-        elif JsonData.curr_coll != ALL_COLLS:
+        elif JsonData.curr_coll != NAME_ALL_COLLS:
 
             q = q.where(
                 THUMBS.c.coll == JsonData.curr_coll

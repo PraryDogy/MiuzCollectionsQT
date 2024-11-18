@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer
-from cfg import ALL_COLLS, FAVS, GRID_LIMIT, MENU_W, Dynamic, JsonData
+from cfg import NAME_ALL_COLLS, NAME_FAVS, GRID_LIMIT, MENU_LEFT_WIDTH, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
@@ -42,7 +42,7 @@ class CustomContext(ContextCustom):
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def reveal_collection(self):
-        if self.true_name == ALL_COLLS:
+        if self.true_name == NAME_ALL_COLLS:
             coll = JsonData.coll_folder
         else:
             coll = os.path.join(JsonData.coll_folder, self.true_name)
@@ -63,7 +63,7 @@ class CollectionBtn(QLabel):
         self.true_name = true_name
         self.fake_name = fake_name
 
-        btn_w = MENU_W - 20 - 5
+        btn_w = MENU_LEFT_WIDTH - 20 - 5
         self.setFixedSize(btn_w, 28)
 
         if true_name == JsonData.curr_coll:
@@ -76,7 +76,7 @@ class CollectionBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             JsonData.curr_coll = self.true_name
-            Dynamic.grid_offset = GRID_LIMIT
+            Dynamic.grid_offset = 0
             SignalsApp.all_.win_main_cmd.emit("set_title")
             SignalsApp.all_.reload_menu_left.emit()
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
@@ -193,7 +193,7 @@ class BaseLeftMenu(QScrollArea):
         label = CollectionBtn(
             parent=self,
             fake_name=Dynamic.lang.all_colls,
-            true_name=ALL_COLLS
+            true_name=NAME_ALL_COLLS
             )
 
         main_btns_layout.addWidget(label)
@@ -201,7 +201,7 @@ class BaseLeftMenu(QScrollArea):
         label = CollectionBtn(
             parent=self,
             fake_name=Dynamic.lang.fav_coll,
-            true_name=FAVS
+            true_name=NAME_FAVS
             )
 
         main_btns_layout.addWidget(label)
@@ -222,7 +222,7 @@ class BaseLeftMenu(QScrollArea):
 class MenuLeft(QFrame):
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(MENU_W)
+        self.setFixedWidth(MENU_LEFT_WIDTH)
 
         h_lay = LayoutHor()
         self.setLayout(h_lay)

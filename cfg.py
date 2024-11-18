@@ -9,9 +9,24 @@ from lang.rus import Rus
 from styles import Themes
 
 APP_VER = 5.85
-
-LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
 APP_NAME: str = "MiuzCollections"
+
+GRID_LIMIT: int = 10
+LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
+MENU_LEFT_WIDTH: int = 210
+NAME_ALL_COLLS: str = "miuzcollections_all"
+NAME_FAVS: str = "miuzcollections_fav"
+PRELOADED_DB = "db.db"
+PRELOADED_HASHDIR: str = "hashdir"
+RGBA_BLUE = "rgba(0, 122, 255, 1)"
+RGBA_GRAY = "rgba(111, 111, 111, 0.5)"
+STAR_SYM = "\U00002605" + " "
+
+PIXMAP_SIZE_MAX = 200
+THUMB_MARGIN: int = 15
+PIXMAP_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
+THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
+TEXT_LENGTH: list = [17, 20, 25, 29]
 
 APP_SUPPORT_DIR: str = os.path.join(
     os.path.expanduser("~"),
@@ -30,14 +45,10 @@ DB_FILE: str = os.path.join(
     "db.db"
     )
 
-PRELOADED_DB = "db.db"
-
 HASH_DIR: str = os.path.join(
     APP_SUPPORT_DIR,
     "hashdir"
     )
-
-PRELOADED_HASHDIR: str = "hashdir"
 
 _IMG_EXT: tuple = (
     ".jpg", ".jpeg", ".jfif",
@@ -57,24 +68,6 @@ PSD_TIFF: tuple = (
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
 
-PIXMAP_SIZE_MAX = 200
-PIXMAP_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
-THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
-THUMB_MARGIN: int = 15
-TEXT_LENGTH: list = [17, 20, 25, 29]
-
-GRID_LIMIT: int = 10
-MENU_W: int = 210
-
-ALL_COLLS: str = "miuzcollections_all"
-FAVS: str = "miuzcollections_fav"
-
-GRAY = "rgba(111, 111, 111, 0.5)"
-BLUE = "rgba(0, 122, 255, 1)"
-STAR_SYM = "\U00002605" + " "
-
-STATIC_FILTER_REAL_NAME = "other_flag"
-
 
 class JsonData:
     app_ver: str = 0.0
@@ -82,7 +75,7 @@ class JsonData:
     coll_folder: str = "/Volumes/Shares/Collections"
     
     curr_size_ind: int = 0
-    curr_coll: str = ALL_COLLS
+    curr_coll: str = NAME_ALL_COLLS
     
     imgview_g: dict = {
         "aw": 700,
@@ -143,7 +136,7 @@ class JsonData:
     static_filter = {
         Eng.lang_name: "Other",
         Rus.lang_name: "Остальное",
-        "real": STATIC_FILTER_REAL_NAME,
+        "real": "other_flag",
         "value": False
         }
 
