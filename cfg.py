@@ -10,7 +10,7 @@ from styles import Themes
 
 APP_VER = 5.85
 
-LINK_DB = "https://disk.yandex.ru/d/gDnB5X9kGqjztA"
+LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
 APP_NAME: str = "MiuzCollections"
 
 APP_SUPPORT_DIR: str = os.path.join(
@@ -232,6 +232,7 @@ class JsonData:
 
         else:
             t = "нет предустановленной HASH_DIR: " + PRELOADED_HASHDIR
+            webbrowser.open(LINK_DB)
             raise Exception(t)
 
     @classmethod
@@ -247,6 +248,7 @@ class JsonData:
 
         else:
             t = "Нет предуставновленного DB_FILE: " + DB_FILE
+            webbrowser.open(LINK_DB)
             raise Exception(t)
 
     @classmethod
