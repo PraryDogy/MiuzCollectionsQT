@@ -3,7 +3,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer
-from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData, LIMIT
+from cfg import MENU_W, THUMB_MARGIN, THUMB_W, Dynamic, JsonData, GRID_LIMIT
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
@@ -94,16 +94,11 @@ class Grid(QScrollArea):
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
 
-        if ln_thumbs // Dynamic.current_photo_limit == 0:
-            h_wid = QWidget()
-            h_layout = LayoutHor()
-            h_wid.setLayout(h_layout)
-            h_layout.setContentsMargins(0, 0, 0, 10)
-            self.thumbnails_layout.addWidget(h_wid)
-
+        if ln_thumbs // Dynamic.grid_offset == 0:
             limit_btn = LimitBtn()
             limit_btn._clicked.connect(self.add_more_grids)
-            h_layout.addWidget(limit_btn)
+            al = Qt.AlignmentFlag.AlignCenter
+            self.thumbnails_layout.addWidget(limit_btn, alignment=al)
 
     def setup_grid_main(self):
         
@@ -116,7 +111,7 @@ class Grid(QScrollArea):
         self.thumbnails_wid = QWidget()
 
         self.thumbnails_layout = LayoutVer()
-        self.thumbnails_layout.setContentsMargins(5, 10, 5, 0)
+        self.thumbnails_layout.setContentsMargins(5, 10, 5, 10)
         self.thumbnails_layout.setAlignment(self.topleft)
 
         self.thumbnails_wid.setLayout(self.thumbnails_layout)
@@ -142,16 +137,11 @@ class Grid(QScrollArea):
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
 
-        if ln_thumbs == LIMIT:
-            h_wid = QWidget()
-            h_layout = LayoutHor()
-            h_wid.setLayout(h_layout)
-            h_layout.setContentsMargins(0, 0, 0, 10)
-            self.thumbnails_layout.addWidget(h_wid)
-
+        if ln_thumbs == GRID_LIMIT:
             limit_btn = LimitBtn()
             limit_btn._clicked.connect(self.add_more_grids)
-            h_layout.addWidget(limit_btn)
+            al = Qt.AlignmentFlag.AlignCenter
+            self.thumbnails_layout.addWidget(limit_btn, alignment=al)
 
         self.main_layout.addWidget(self.thumbnails_wid)
         self.main_wid.setFocus()

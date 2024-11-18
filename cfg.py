@@ -63,7 +63,7 @@ THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
 THUMB_MARGIN: int = 15
 TEXT_LENGTH: list = [17, 20, 25, 29]
 
-LIMIT: int = 150
+GRID_LIMIT: int = 10
 MENU_W: int = 210
 
 ALL_COLLS: str = "miuzcollections_all"
@@ -285,7 +285,7 @@ class JsonData:
 
 
 class Dynamic:
-    current_photo_limit: int = LIMIT
+    grid_offset: int = 0
     date_start: datetime = None
     date_end: datetime = None
     search_widget_text: str = None

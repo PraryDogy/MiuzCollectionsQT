@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer
-from cfg import ALL_COLLS, FAVS, LIMIT, MENU_W, Dynamic, JsonData
+from cfg import ALL_COLLS, FAVS, GRID_LIMIT, MENU_W, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
@@ -76,7 +76,7 @@ class CollectionBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             JsonData.curr_coll = self.true_name
-            Dynamic.current_photo_limit = LIMIT
+            Dynamic.grid_offset = GRID_LIMIT
             SignalsApp.all_.win_main_cmd.emit("set_title")
             SignalsApp.all_.reload_menu_left.emit()
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")

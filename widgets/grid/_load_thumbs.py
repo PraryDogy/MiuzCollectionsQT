@@ -6,7 +6,7 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import ALL_COLLS, FAVS, Dynamic, JsonData, LIMIT
+from cfg import ALL_COLLS, FAVS, Dynamic, JsonData, GRID_LIMIT
 from database import THUMBS, Dbase
 from utils.utils import URunnable, UThreadPool, Utils
 
@@ -46,12 +46,12 @@ class LoadDbTask(URunnable):
             THUMBS.c.fav
             )
 
-        if Dynamic.current_photo_limit > LIMIT:
-            offset = Dynamic.current_photo_limit
+        if Dynamic.grid_offset > GRID_LIMIT:
+            offset = Dynamic.grid_offset
         else:
             offset = 0
         
-        q = q.limit(LIMIT).offset(offset)
+        q = q.limit(GRID_LIMIT).offset(offset)
         q = q.order_by(-THUMBS.c.mod)
 
         if JsonData.curr_coll == FAVS:
@@ -163,7 +163,7 @@ class DbImages(QObject):
             res: list[tuple[str, str, int, str, int]]
             ) -> dict[str, list[DbImage]] | dict:
         
-        res = res[-(LIMIT):]
+        res = res[-(GRID_LIMIT):]
 
         thumbs_dict = defaultdict(list[DbImage])
 
