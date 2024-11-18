@@ -8,53 +8,13 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer
-from cfg import NAME_ALL_COLLS, NAME_FAVS, GRID_LIMIT, MENU_LEFT_WIDTH, Dynamic, JsonData
+from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
 
 from .win_smb import WinSmb
-
-
-class CustomContext(ContextCustom):
-    def __init__(self, parent: QLabel, true_name: str, event: QContextMenuEvent):
-        super().__init__(event=event)
-
-        self.my_parent = parent
-        self.true_name = true_name
-
-        view_coll = QAction(text=Dynamic.lang.view, parent=self)
-        view_coll.triggered.connect(lambda e: self.show_collection())
-        self.addAction(view_coll)
-
-        self.addSeparator()
-
-        reveal_coll = QAction(text=Dynamic.lang.reveal_in_finder, parent=self)
-        reveal_coll.triggered.connect(self.reveal_collection)
-        self.addAction(reveal_coll)
-
-    def show_collection(self):
-        JsonData.curr_coll = self.true_name
-        SignalsApp.all_.win_main_cmd.emit("set_title")
-        SignalsApp.all_.reload_menu_left.emit()
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-
-    def reveal_collection(self):
-        if self.true_name == NAME_ALL_COLLS:
-            coll = JsonData.coll_folder
-        else:
-            coll = os.path.join(JsonData.coll_folder, self.true_name)
-
-        if Utils.smb_check():
-            if os.path.exists(coll):
-                subprocess.Popen(["open", coll])
-                return
-        else:
-            self.smb_win = WinSmb()
-            self.smb_win.center_relative_parent(self.my_parent)
-            self.smb_win.show()
 
 
 class CollectionBtn(QLabel):
@@ -73,6 +33,28 @@ class CollectionBtn(QLabel):
 
         self.setStyleSheet(Themes.current)
 
+    def show_collection(self):
+        JsonData.curr_coll = self.true_name
+        SignalsApp.all_.win_main_cmd.emit("set_title")
+        SignalsApp.all_.reload_menu_left.emit()
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+
+    def reveal_collection(self):
+        if self.true_name in (NAME_ALL_COLLS, NAME_FAVS):
+            coll = JsonData.coll_folder
+        else:
+            coll = os.path.join(JsonData.coll_folder, self.true_name)
+
+        if Utils.smb_check():
+            if os.path.exists(coll):
+                subprocess.Popen(["open", coll])
+                return
+        else:
+            self.smb_win = WinSmb()
+            self.smb_win.center_relative_parent(self.my_parent)
+            self.smb_win.show()
+
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             JsonData.curr_coll = self.true_name
@@ -83,31 +65,35 @@ class CollectionBtn(QLabel):
             SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        try:
-            self.context_menu = CustomContext(parent=self, true_name=self.true_name, event=ev)
-            self.context_menu.closed.connect(self.closed_context)
+        # menu = CustomContext(parent=self, true_name=self.true_name, event=ev)
+        # menu.closed.connect(self.closed_context)
 
-            if self.objectName() == Names.menu_btn:
-                self.setObjectName(Names.menu_btn_bordered)
-            else:
-                self.setObjectName(Names.menu_btn_selected_bordered)
+        menu_ = ContextCustom(event=ev)
 
-            self.setStyleSheet(Themes.current)
-            self.context_menu.show_menu()
+        view_coll = QAction(text=Dynamic.lang.view, parent=self)
+        view_coll.triggered.connect(lambda e: self.show_collection())
+        menu_.addAction(view_coll)
 
-        except Exception as e:
-            Utils.print_err(error=e)
+        menu_.addSeparator()
 
-    def closed_context(self):
-        try:
-            if self.objectName() == Names.menu_btn_bordered:
-                self.setObjectName(Names.menu_btn)
-            else:
-                self.setObjectName(Names.menu_btn_selected)
-            self.setStyleSheet(Themes.current)
+        reveal_coll = QAction(text=Dynamic.lang.reveal_in_finder, parent=self)
+        reveal_coll.triggered.connect(self.reveal_collection)
+        menu_.addAction(reveal_coll)
 
-        except Exception as e:
-            Utils.print_err(error=e)
+        if self.objectName() == Names.menu_btn:
+            self.setObjectName(Names.menu_btn_bordered)
+        else:
+            self.setObjectName(Names.menu_btn_selected_bordered)
+
+        self.setStyleSheet(Themes.current)
+
+        menu_.show_menu()
+
+        if self.objectName() == Names.menu_btn_bordered:
+            self.setObjectName(Names.menu_btn)
+        else:
+            self.setObjectName(Names.menu_btn_selected)
+        self.setStyleSheet(Themes.current)
 
 
 class WorkerSignals(QObject):
