@@ -82,6 +82,16 @@ class Grid(QScrollArea):
     def scroll_top(self):
         self.verticalScrollBar().setValue(0)
 
+    def add_more_grids(self):
+        self.thumbs_dict = DbImages()
+        self.thumbs_dict.finished_.connect(self.add_more_grids_fin)
+        self.thumbs_dict.get()
+
+    def add_more_grids_fin(self, thumbs_dict: dict[str, list[DbImage]]):
+        if thumbs_dict:
+            for date, db_images in thumbs_dict.items():
+                self.create_image_grid(date, db_images)
+
     def setup_grid_main(self):
         
         if hasattr(self, "thumbnails_wid"):
@@ -124,7 +134,10 @@ class Grid(QScrollArea):
             h_wid.setLayout(h_layout)
             h_layout.setContentsMargins(0, 0, 0, 10)
             self.thumbnails_layout.addWidget(h_wid)
-            h_layout.addWidget(LimitBtn())
+
+            limit_btn = LimitBtn()
+            limit_btn._clicked.connect(self.add_more_grids)
+            h_layout.addWidget(limit_btn)
 
         self.main_layout.addWidget(self.thumbnails_wid)
         self.main_wid.setFocus()

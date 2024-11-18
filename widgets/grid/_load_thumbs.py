@@ -6,7 +6,7 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import ALL_COLLS, FAVS, Dynamic, JsonData
+from cfg import ALL_COLLS, FAVS, Dynamic, JsonData, LIMIT
 from database import THUMBS, Dbase
 from utils.utils import URunnable, UThreadPool, Utils
 
@@ -157,6 +157,8 @@ class DbImages(QObject):
             self,
             res: list[tuple[str, str, int, str, int]]
             ) -> dict[str, list[DbImage]] | dict:
+        
+        res = res[-LIMIT:]
 
         thumbs_dict = defaultdict(list[DbImage])
 
