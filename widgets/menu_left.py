@@ -139,12 +139,12 @@ class BaseLeftMenu(QScrollArea):
         self.setStyleSheet(Themes.current)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-        self.init_ui()
-        SignalsApp.all_.reload_menu_left.connect(self.init_ui)
+        self.setup_task()
+        SignalsApp.all_.reload_menu_left.connect(self.setup_task)
 
-    def init_ui(self):
+    def setup_task(self):
         self.task_ = LoadMenus()
-        self.task_.signals_.finished_.connect(self.load_menus_fin)
+        self.task_.signals_.finished_.connect(self.task_finalize)
         UThreadPool.pool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollectionBtn):
@@ -159,7 +159,7 @@ class BaseLeftMenu(QScrollArea):
         BaseLeftMenu.coll_btn = btn
 
 
-    def load_menus_fin(self, menus: list[dict]):
+    def task_finalize(self, menus: list[dict[str, str]]):
 
         if hasattr(self, "main_wid"):
             self.main_wid.deleteLater()
