@@ -1,6 +1,6 @@
 import sqlalchemy
 
-from cfg import DB_FILE
+from cfg import DB_FILE, JsonData
 import os
 
 METADATA = sqlalchemy.MetaData()
@@ -34,8 +34,15 @@ class Dbase:
         check_tables = cls.check_tables(tables)
 
         if not check_tables:
+
+            JsonData.copy_db_file()
+            JsonData.copy_hashdir()
+
             t = "пользовательская ДБ не прошла проверку"
-            raise Exception(t)
+            print(t)
+
+            cls.init()
+            return
 
         cls.toggle_wal(False)
 
