@@ -111,7 +111,7 @@ class AboveThumbsNoImages(QWidget):
 
         enabled_filters = [
             data
-            for data in (*JsonData.dynamic_filters, JsonData.static_filter)
+            for data in (*JsonData.custom_filters, JsonData.system_filter)
             if data.get("value")
             ]
 

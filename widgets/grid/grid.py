@@ -2,16 +2,16 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
 
-from base_widgets import ContextCustom, LayoutHor, LayoutVer
-from cfg import MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, Dynamic, JsonData, GRID_LIMIT
+from base_widgets import ContextCustom, LayoutVer
+from cfg import GRID_LIMIT, MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.utils import Utils
+from utils.utils import UThreadPool, Utils
 
-from ..actions import ReloadGui, OpenWins
+from ..actions import OpenWins, ReloadGui
 from ..win_smb import WinSmb
-from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from ._load_thumbs import DbImage, DbImages
+from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .limit_btn import LimitBtn
 from .thumbnail import Thumbnail
 from .title import Title
@@ -88,8 +88,8 @@ class Grid(QScrollArea):
             cmd_ = lambda db_images: self.setup_more_grids(db_images)
 
         self.task_ = DbImages()
-        self.task_.finished_.connect(cmd_)
-        self.task_.get()
+        self.task_.signals_.finished_.connect(cmd_)
+        UThreadPool.pool.start(self.task_)
 
     def setup_grids_widget(self):
         

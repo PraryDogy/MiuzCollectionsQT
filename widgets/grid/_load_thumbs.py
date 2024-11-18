@@ -6,9 +6,9 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData, GRID_LIMIT
+from cfg import GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from database import THUMBS, Dbase
-from utils.utils import URunnable, UThreadPool, Utils
+from utils.utils import URunnable, Utils
 
 
 class DbImage:
@@ -21,21 +21,61 @@ class DbImage:
 
 
 class WorkerSignals(QObject):
-    finished_ = pyqtSignal(list)
+    finished_ = pyqtSignal(dict)
 
 
-class LoadDbTask(URunnable):
+class DbImages(URunnable):
     def __init__(self):
         super().__init__()
         self.signals_ = WorkerSignals()
 
     @URunnable.set_running_state
     def run(self):
+
         conn = Dbase.engine.connect()
         stmt = self._get_stmt()
         res: list[tuple[str, str, int, str, int]] = conn.execute(stmt).fetchall()        
         conn.close()
-        self.signals_.finished_.emit(res)
+
+        self.create_dict(res)
+
+    def create_dict(
+            self,
+            res: list[tuple[str, str, int, str, int]]
+            ) -> dict[str, list[DbImage]] | dict:
+        
+        res = res[-(GRID_LIMIT):]
+
+        thumbs_dict = defaultdict(list[DbImage])
+
+        if not res:
+            self.signals_.finished_.emit(thumbs_dict)
+            return
+
+        for src, hash_path, mod, coll, fav in res:
+
+            # создаем полный путь из относительного из ДБ
+            src = JsonData.coll_folder + src
+            mod = datetime.fromtimestamp(mod).date()
+            array_img = Utils.read_image_hash(hash_path)
+
+            if array_img is None:
+                print("db images > create dict > can't load image")
+                self.signals_.finished_.emit(thumbs_dict)
+                return
+
+            else:
+                pixmap = Utils.pixmap_from_array(array_img)
+
+            if Dynamic.date_start or Dynamic.date_end:
+                mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
+
+            else:
+                mod = f"{Dynamic.lang.months[str(mod.month)]} {mod.year}"
+
+            thumbs_dict[mod].append(DbImage(pixmap, src, coll, fav))
+
+        self.signals_.finished_.emit(thumbs_dict)
 
     def _get_stmt(self) -> sqlalchemy.Select:
         q = sqlalchemy.select(
@@ -71,8 +111,8 @@ class LoadDbTask(URunnable):
         filter_values_ = set(
             i.get("value")
             for i in (
-                *JsonData.dynamic_filters,
-                JsonData.static_filter
+                *JsonData.custom_filters,
+                JsonData.system_filter
                 )
             )
         
@@ -83,7 +123,7 @@ class LoadDbTask(URunnable):
 
             and_filters = []
 
-            for filter in JsonData.dynamic_filters:
+            for filter in JsonData.custom_filters:
                 if filter.get("value"):
                     t = self.get_template(filter.get("real"))
 
@@ -91,11 +131,11 @@ class LoadDbTask(URunnable):
                         THUMBS.c.src.ilike(t)
                         )
 
-            if JsonData.static_filter.get("value"):
+            if JsonData.system_filter.get("value"):
 
                 texts = [
                     self.get_template(i.get("real"))
-                    for i in JsonData.dynamic_filters
+                    for i in JsonData.custom_filters
                     ]
                 
                 stmts = [
@@ -137,56 +177,3 @@ class LoadDbTask(URunnable):
             )
 
         return datetime.timestamp(start), datetime.timestamp(end)
-
-
-class DbImages(QObject):
-    finished_ = pyqtSignal(dict)
-
-    def __init__(self):
-        super().__init__()
-
-    def get(self) -> dict[str, list[DbImage]] | dict:
-        self.create_task()
-
-    def create_task(self):
-        self.task_ = LoadDbTask()
-        self.task_.signals_.finished_.connect(self.create_dict)
-        UThreadPool.pool.start(self.task_)
-
-    def create_dict(
-            self,
-            res: list[tuple[str, str, int, str, int]]
-            ) -> dict[str, list[DbImage]] | dict:
-        
-        res = res[-(GRID_LIMIT):]
-
-        thumbs_dict = defaultdict(list[DbImage])
-
-        if not res:
-            self.finished_.emit(thumbs_dict)
-            return
-
-        for src, hash_path, mod, coll, fav in res:
-
-            # создаем полный путь из относительного из ДБ
-            src = JsonData.coll_folder + src
-            mod = datetime.fromtimestamp(mod).date()
-            array_img = Utils.read_image_hash(hash_path)
-
-            if array_img is None:
-                print("db images > create dict > can't load image")
-                self.finished_.emit(thumbs_dict)
-                return
-
-            else:
-                pixmap = Utils.pixmap_from_array(array_img)
-
-            if Dynamic.date_start or Dynamic.date_end:
-                mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
-
-            else:
-                mod = f"{Dynamic.lang.months[str(mod.month)]} {mod.year}"
-
-            thumbs_dict[mod].append(DbImage(pixmap, src, coll, fav))
-
-        self.finished_.emit(thumbs_dict)

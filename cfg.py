@@ -118,7 +118,7 @@ class JsonData:
         '/Volumes/Shares-3/Collections'
         ]
 
-    dynamic_filters = [
+    custom_filters = [
         {
             Eng.lang_name: "Product",
             Rus.lang_name: "Продукт",
@@ -133,7 +133,7 @@ class JsonData:
         }
     ]
   
-    static_filter = {
+    system_filter = {
         Eng.lang_name: "Other",
         Rus.lang_name: "Остальное",
         "real": "other_flag",
