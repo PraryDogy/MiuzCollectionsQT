@@ -55,7 +55,7 @@ class Thumbnail(QFrame):
         self.coll = coll
         self.fav = fav
 
-        if fav == 0:
+        if fav == 0 or fav is None:
             self.name = os.path.basename(src)
         elif fav == 1:
             self.name = STAR_SYM + os.path.basename(src)
