@@ -92,9 +92,12 @@ class Grid(QScrollArea):
             for date, db_images in thumbs_dict.items():
                 self.create_image_grid(date, db_images)
 
-        ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
+        ln_thumbs = sum(
+            len(lst)
+            for lst in thumbs_dict.values()
+            )
 
-        if ln_thumbs // Dynamic.grid_offset == 0:
+        if ln_thumbs == GRID_LIMIT:
             limit_btn = LimitBtn()
             limit_btn._clicked.connect(self.add_more_grids)
             al = Qt.AlignmentFlag.AlignCenter
@@ -135,7 +138,10 @@ class Grid(QScrollArea):
             no_images.setContentsMargins(9, 0, 0, 0)
             self.thumbnails_layout.addWidget(no_images)
 
-        ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
+        ln_thumbs = sum(
+            len(lst)
+            for lst in thumbs_dict.values()
+            )
 
         if ln_thumbs == GRID_LIMIT:
             limit_btn = LimitBtn()
