@@ -98,7 +98,7 @@ class CustomContext(ContextCustom):
         UThreadPool.pool.start(copy_task)
 
     def copy_files_fin(self, files: list):
-        self.reveal_files = Utils.reveal_files(files)
+        # self.reveal_files = Utils.reveal_files(files)
         if len(Dynamic.copy_threads) == 0:
             SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
@@ -119,6 +119,6 @@ class Title(QLabel):
         try:
             self.my_context = CustomContext(files_list=self.images, event=ev)
             self.my_context.show_menu()
-            return super().contextMenuEvent(ev)
+            # return super().contextMenuEvent(ev)
         except Exception as e:
             Utils.print_err(error=e)
