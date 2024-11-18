@@ -145,7 +145,7 @@ class DbImages(QObject):
     def __init__(self):
         super().__init__()
 
-    def get(self):
+    def get(self) -> dict[str, list[DbImage]] | dict:
         self.create_task()
 
     def create_task(self):
