@@ -128,6 +128,10 @@ class Grid(QScrollArea):
             self.thumbnails_layout.addWidget(no_images)
 
         ln_thumbs = sum(len(lst) for lst in thumbs_dict.values())
+
+        print(ln_thumbs, Dynamic.current_photo_limit)
+
+
         if ln_thumbs == Dynamic.current_photo_limit:
             h_wid = QWidget()
             h_layout = LayoutHor()
@@ -137,7 +141,7 @@ class Grid(QScrollArea):
 
             limit_btn = LimitBtn()
             limit_btn._clicked.connect(self.add_more_grids)
-            h_layout.addWidget(limit_btn)
+            self.main_layout.addWidget(limit_btn)
 
         self.main_layout.addWidget(self.thumbnails_wid)
         self.main_wid.setFocus()

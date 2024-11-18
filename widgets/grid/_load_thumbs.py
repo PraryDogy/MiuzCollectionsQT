@@ -158,7 +158,7 @@ class DbImages(QObject):
             res: list[tuple[str, str, int, str, int]]
             ) -> dict[str, list[DbImage]] | dict:
         
-        res = res[-LIMIT:]
+        res = res[-(LIMIT):]
 
         thumbs_dict = defaultdict(list[DbImage])
 
