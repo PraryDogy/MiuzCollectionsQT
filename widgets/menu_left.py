@@ -140,12 +140,26 @@ class BaseLeftMenu(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.setup_task()
-        SignalsApp.all_.reload_menu_left.connect(self.setup_task)
+        SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
+
+    def menu_left_cmd(self, flag: str):
+        """flag: reload, select_all_colls"""
+
+        if flag == "reload":
+            self.setup_task()
+        elif flag == "select_all_colls":
+            self.select_all_colls_cmd()
 
     def setup_task(self):
         self.task_ = LoadMenus()
         self.task_.signals_.finished_.connect(self.task_finalize)
         UThreadPool.pool.start(self.task_)
+
+    def select_all_colls_cmd(self):
+        print(1)
+        BaseLeftMenu.coll_btn.normal_style()
+        self.all_colls_btn.selected_style()
+        BaseLeftMenu.coll_btn = self.all_colls_btn
 
     def collection_btn_cmd(self, btn: CollectionBtn):
         JsonData.curr_coll = btn.true_name
@@ -180,13 +194,13 @@ class BaseLeftMenu(QScrollArea):
 
         main_btns_layout.setContentsMargins(0, 5, 0, 15)
 
-        all_colls_btn = CollectionBtn(
+        self.all_colls_btn = CollectionBtn(
             fake_name=Dynamic.lang.all_colls,
             true_name=NAME_ALL_COLLS
             )
-        cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
-        all_colls_btn.pressed_.connect(cmd_)
-        main_btns_layout.addWidget(all_colls_btn)
+        cmd_ = lambda: self.collection_btn_cmd(self.all_colls_btn)
+        self.all_colls_btn.pressed_.connect(cmd_)
+        main_btns_layout.addWidget(self.all_colls_btn)
 
         favs_btn = CollectionBtn(
             fake_name=Dynamic.lang.fav_coll,
@@ -196,7 +210,7 @@ class BaseLeftMenu(QScrollArea):
         favs_btn.pressed_.connect(cmd_)
         main_btns_layout.addWidget(favs_btn)
 
-        for i in (all_colls_btn, favs_btn):
+        for i in (self.all_colls_btn, favs_btn):
             if i.true_name == JsonData.curr_coll:
                 i.selected_style()
                 BaseLeftMenu.coll_btn = i

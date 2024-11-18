@@ -79,7 +79,7 @@ class ShowAllBtn(QLabel):
         SignalsApp.all_.bar_top_reset_filters.emit()
 
         SignalsApp.all_.win_main_cmd.emit("set_title")
-        SignalsApp.all_.reload_menu_left.emit()
+        SignalsApp.all_.menu_left_cmd.emit("select_all_colls")
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")

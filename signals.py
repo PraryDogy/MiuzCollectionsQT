@@ -7,7 +7,7 @@ class Signals(QObject):
     btn_downloads_toggle = pyqtSignal(str)
     grid_thumbnails_cmd = pyqtSignal(str)
     progressbar_set_value = pyqtSignal(int)
-    reload_menu_left = pyqtSignal()
+    menu_left_cmd = pyqtSignal(str)
     slider_change_value = pyqtSignal(int)
     thumbnail_select = pyqtSignal(str)
     wid_search_cmd = pyqtSignal(str)
