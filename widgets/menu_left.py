@@ -33,14 +33,16 @@ class CollectionBtn(QLabel):
 
         self.setStyleSheet(Themes.current)
 
-    def show_collection(self):
+    def show_collection(self, *args):
         JsonData.curr_coll = self.true_name
+        Dynamic.grid_offset = 0
         SignalsApp.all_.win_main_cmd.emit("set_title")
         SignalsApp.all_.reload_menu_left.emit()
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
-    def reveal_collection(self):
+    def reveal_collection(self, *args):
+
         if self.true_name in (NAME_ALL_COLLS, NAME_FAVS):
             coll = JsonData.coll_folder
         else:
@@ -57,21 +59,14 @@ class CollectionBtn(QLabel):
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
-            JsonData.curr_coll = self.true_name
-            Dynamic.grid_offset = 0
-            SignalsApp.all_.win_main_cmd.emit("set_title")
-            SignalsApp.all_.reload_menu_left.emit()
-            SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-            SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+            self.show_collection()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        # menu = CustomContext(parent=self, true_name=self.true_name, event=ev)
-        # menu.closed.connect(self.closed_context)
 
         menu_ = ContextCustom(event=ev)
 
         view_coll = QAction(text=Dynamic.lang.view, parent=self)
-        view_coll.triggered.connect(lambda e: self.show_collection())
+        view_coll.triggered.connect(self.show_collection)
         menu_.addAction(view_coll)
 
         menu_.addSeparator()
