@@ -11,7 +11,7 @@ from styles import Themes
 APP_VER = 5.85
 APP_NAME: str = "MiuzCollections"
 
-GRID_LIMIT: int = 10
+GRID_LIMIT: int = 150
 LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
 MENU_LEFT_WIDTH: int = 210
 NAME_ALL_COLLS: str = "miuzcollections_all"
