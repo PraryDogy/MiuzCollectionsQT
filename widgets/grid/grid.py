@@ -83,7 +83,7 @@ class Grid(QScrollArea):
         """flag: first, more"""
 
         if flag == "first":
-            cmd_ = lambda db_images: self.setup_all_grids(db_images)
+            cmd_ = lambda db_images: self.setup_db_images(db_images)
         elif flag == "more":
             cmd_ = lambda db_images: self.setup_more_grids(db_images)
 
@@ -109,7 +109,7 @@ class Grid(QScrollArea):
 
         self.load_db_images("first")
 
-    def setup_all_grids(self, db_images: dict[str, list[DbImage]]):
+    def setup_db_images(self, db_images: dict[str, list[DbImage]]):
 
         if db_images:
 

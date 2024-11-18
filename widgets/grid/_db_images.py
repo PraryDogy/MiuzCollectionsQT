@@ -26,6 +26,13 @@ class WorkerSignals(QObject):
 
 class DbImages(URunnable):
     def __init__(self):
+        """
+        returns
+        ```
+        {1 june 2024: [DbImage, ...], ...}
+        {1 june 2024 - 1 august 2024: [DbImage, ...], ...}
+        ```
+        """
         super().__init__()
         self.signals_ = WorkerSignals()
 
