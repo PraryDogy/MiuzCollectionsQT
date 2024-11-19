@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtGui import QContextMenuEvent
-from PyQt5.QtWidgets import QAction, QFileDialog, QLabel, QMainWindow, QWidget
+from PyQt5.QtWidgets import QAction, QLabel
 
 from base_widgets import ContextCustom
 from cfg import PSD_TIFF, Dynamic, JsonData
@@ -12,18 +12,6 @@ from utils.utils import UThreadPool, Utils
 
 from ..actions import OpenWins
 from ._db_images import DbImage
-
-
-class Shared:
-
-    @classmethod
-    def show_smb(cls, parent_: QWidget | QMainWindow):
-
-        if not isinstance(parent_, QMainWindow):
-            raise TypeError
-        
-        OpenWins.smb(parent_=parent_)
-
 
 
 class CustomContext(ContextCustom):
