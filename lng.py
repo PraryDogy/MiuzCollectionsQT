@@ -1,4 +1,7 @@
-class Lng:
+from cfg import JsonData
+
+
+class Lng_:
     add_fav = [
         "Добавить в избранное",
         "Add to favorites"
@@ -124,20 +127,64 @@ class Lng:
         "Loading..."
     ]
     months = [
-        [
-            "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
-        ],
-        [
-            "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-        ]
+        {
+            "1": "Январь",
+            "10": "Октябрь",
+            "11": "Ноябрь",
+            "12": "Декабрь",
+            "2": "Февраль",
+            "3": "Март",
+            "4": "Апрель",
+            "5": "Май",
+            "6": "Июнь",
+            "7": "Июль",
+            "8": "Август",
+            "9": "Сентябрь"
+        },
+        {
+            "1": "January",
+            "10": "October",
+            "11": "November",
+            "12": "December",
+            "2": "February",
+            "3": "March",
+            "4": "April",
+            "5": "May",
+            "6": "June",
+            "7": "July",
+            "8": "August",
+            "9": "September"
+        }
     ]
     months_genitive_case = [
-        [
-            "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"
-        ],
-        [
-            "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"
-        ]
+        {
+            "1": "января",
+            "10": "октября",
+            "11": "ноября",
+            "12": "декабря",
+            "2": "февраля",
+            "3": "марта",
+            "4": "апреля",
+            "5": "мая",
+            "6": "июня",
+            "7": "июля",
+            "8": "августа",
+            "9": "сентября"
+        },
+        {
+            "1": "january",
+            "10": "october",
+            "11": "november",
+            "12": "december",
+            "2": "february",
+            "3": "march",
+            "4": "april",
+            "5": "may",
+            "6": "june",
+            "7": "july",
+            "8": "august",
+            "9": "september"
+        }
     ]
     no_connection = [
         "Нет подключения",
@@ -149,7 +196,7 @@ class Lng:
     ]
     no_photo_filter = [
         "Нет фотографий в категории",
-        "No photos in category"
+        "No photos in cathegory"
     ]
     ok = [
         "Ок",
@@ -260,7 +307,7 @@ class Lng:
         "Show files"
     ]
     show_more = [
-        "Показать еще",
+        "Позазать еще",
         "Show more"
     ]
     start = [
@@ -288,12 +335,24 @@ class Lng:
         "Wait..."
     ]
     weekdays = [
-        [
-            "понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"
-        ],
-        [
-            "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
-        ]
+        {
+            "0": "понедельник",
+            "1": "вторник",
+            "2": "среда",
+            "3": "четверг",
+            "4": "пятница",
+            "5": "суббота",
+            "6": "воскресенье"
+        },
+        {
+            "0": "monday",
+            "1": "tuesday",
+            "2": "wednesday",
+            "3": "thursday",
+            "4": "friday",
+            "5": "saturday",
+            "6": "sunday"
+        }
     ]
     where_to_look_coll_folder = [
         "Где искать папку с коллекциями",
@@ -303,3 +362,12 @@ class Lng:
         "с именем",
         "with name"
     ]
+
+
+class Lng(Lng_):
+
+    @classmethod
+    def init(cls):
+        for k, v in Lng_.__dict__.items():
+            if isinstance(v, list):
+                setattr(cls, k, v[JsonData.lng_ind])
