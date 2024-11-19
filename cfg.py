@@ -206,10 +206,6 @@ class JsonData:
             json.dump(new_data, f, indent=4, ensure_ascii=False)
 
     @classmethod
-    def set_lang(cls, lng_ind: int):
-        cls.lng_ind = lng_ind
-
-    @classmethod
     def check_app_dirs(cls):
 
         if not os.path.exists(APP_SUPPORT_DIR):
@@ -276,8 +272,6 @@ class JsonData:
         cls.check_app_dirs()
         cls.read_json_data()
         cls.compare_versions()
-
-        cls.set_lang(cls.lng_ind)
         Themes.set_theme(cls.theme)
 
         print(
