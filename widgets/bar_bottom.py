@@ -43,7 +43,8 @@ from .win_settings import WinSettings
 class ProgressBar(QLabel):
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(100)
+        # self.setFixedWidth(150)
+        self.setAlignment(Qt.AlignmentFlag.AlignRight)
         SignalsApp.all_.progressbar_text.connect(self.setText)
 
 
@@ -120,20 +121,20 @@ class BarBottom(QFrame):
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         self.progress_bar = ProgressBar()
-        self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignRight)
+        self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         self.downloads = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_downloads.svg") , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
         SignalsApp.all_.btn_downloads_toggle.connect(self.btn_downloads_toggle)
-        self.h_layout.addWidget(self.downloads, alignment=Qt.AlignmentFlag.AlignRight)
+        self.h_layout.addWidget(self.downloads)
 
         self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_switch.svg"), size=20)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
-        self.h_layout.addWidget(self.switch_theme, alignment=Qt.AlignmentFlag.AlignRight)
+        self.h_layout.addWidget(self.switch_theme)
 
         self.sett_widget = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_settings.svg"), size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
-        self.h_layout.addWidget(self.sett_widget, alignment=Qt.AlignmentFlag.AlignRight)
+        self.h_layout.addWidget(self.sett_widget)
 
         self.custom_slider = CustomSlider()
         self.h_layout.addWidget(self.custom_slider, alignment=Qt.AlignmentFlag.AlignRight)
