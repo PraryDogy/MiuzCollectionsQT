@@ -72,7 +72,7 @@ class OpenInfoDb(QAction):
         if Utils.smb_check():
             OpenWins.info_db(parent_=self.win_, short_src=self.short_src)
         else:
-            OpenWins.smb(parent_=self.parent_)
+            OpenWins.smb(parent_=self.win_)
 
 
 class CopyPath(QAction):

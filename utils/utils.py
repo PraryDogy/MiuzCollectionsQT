@@ -78,6 +78,8 @@ class Utils:
     def smb_check(cls) -> bool:
         not_ok = False
 
+        return False
+
         if not os.path.exists(JsonData.coll_folder):
             not_ok = True
 
