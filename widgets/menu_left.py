@@ -134,6 +134,7 @@ class BaseLeftMenu(QScrollArea):
 
     def __init__(self):
         super().__init__()
+        self.selected_btn: CollectionBtn
         self.setWidgetResizable(True)
         self.setObjectName(Names.menu_scrollbar)
         self.setStyleSheet(Themes.current)
@@ -147,18 +148,19 @@ class BaseLeftMenu(QScrollArea):
 
         if flag == "reload":
             self.setup_task()
+
         elif flag == "select_all_colls":
-            self.select_all_colls_cmd()
+            self.selected_btn.normal_style()
+            self.all_colls_btn.selected_style()
+            self.selected_btn = self.all_colls_btn
+
+        else:
+            raise Exception("widgets > menu left > wrong flag", flag)
 
     def setup_task(self):
         self.task_ = LoadMenus()
         self.task_.signals_.finished_.connect(self.task_finalize)
         UThreadPool.pool.start(self.task_)
-
-    def select_all_colls_cmd(self):
-        BaseLeftMenu.coll_btn.normal_style()
-        self.all_colls_btn.selected_style()
-        BaseLeftMenu.coll_btn = self.all_colls_btn
 
     def collection_btn_cmd(self, btn: CollectionBtn):
         JsonData.curr_coll = btn.true_name
@@ -167,9 +169,9 @@ class BaseLeftMenu(QScrollArea):
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
-        BaseLeftMenu.coll_btn.normal_style()
+        self.selected_btn.normal_style()
         btn.selected_style()
-        BaseLeftMenu.coll_btn = btn
+        self.selected_btn = btn
 
     def task_finalize(self, menus: list[dict[str, str]]):
 
@@ -212,7 +214,7 @@ class BaseLeftMenu(QScrollArea):
         for i in (self.all_colls_btn, favs_btn):
             if i.true_name == JsonData.curr_coll:
                 i.selected_style()
-                BaseLeftMenu.coll_btn = i
+                self.selected_btn = i
             else:
                 i.normal_style()
 
@@ -228,7 +230,7 @@ class BaseLeftMenu(QScrollArea):
 
             if coll_btn.true_name == JsonData.curr_coll:
                 coll_btn.selected_style()
-                BaseLeftMenu.coll_btn = coll_btn
+                self.selected_btn = coll_btn
             else:
                 coll_btn.normal_style()
 
