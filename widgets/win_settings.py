@@ -10,8 +10,6 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, DB_FILE, HASH_DIR, JsonData
-from lang.eng import Eng
-from lang.rus import Rus
 from lng import Lng
 from utils.scaner import Scaner
 from utils.updater import Updater
@@ -94,7 +92,6 @@ class ChangeLang(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.lang_name = JsonData.lang_name
 
         layout_h = LayoutHor()
         self.setLayout(layout_h)

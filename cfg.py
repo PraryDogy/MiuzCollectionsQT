@@ -1,12 +1,9 @@
 import json
 import os
 import shutil
-import subprocess
 import webbrowser
 from datetime import datetime
 
-from lang.eng import Eng
-from lang.rus import Rus
 from styles import Themes
 
 APP_VER = 5.85
@@ -109,7 +106,6 @@ class JsonData:
         ]
     
     theme: str = "dark_theme"
-    lang_name: str = Rus.lang_name
     lng_ind = 0
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -279,7 +275,6 @@ class JsonData:
             "check app dirs ok",
             "read json ok",
             "set theme ok",
-            "set lang ok",
             sep=", "
             )
 
@@ -291,4 +286,3 @@ class Dynamic:
     search_widget_text: str = None
     date_start_text: str = None # 1 january 1991
     date_end_text: str = None # 31 january 1991
-    lang: Eng | Rus = None
