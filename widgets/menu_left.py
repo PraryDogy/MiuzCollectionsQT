@@ -110,11 +110,26 @@ class LoadMenus(URunnable):
         self.signals_ = WorkerSignals()
 
     @URunnable.set_running_state
-    def run(self):
+    def run(self) -> None:
+        """
+        Main execution method for the `LoadMenus` class. This method is part of `URunnable`, 
+        which inherits from `QRunnable`, and should be executed using `UThreadPool.pool.start`.
+        
+        `UThreadPool` is a subclass of `QThreadPool` that manages the execution of runnable objects.
+        
+        Loads collection data and emits the `finished_` signal with the result.
+        """
         menus = self.load_colls_query()
         self.signals_.finished_.emit(menus)
 
+
     def load_colls_query(self) -> list[dict]:
+        """
+        Queries the database to load distinct `THUMBS.c.coll`, processes them, 
+        and returns a list of dictionaries containing short and full `THUMBS.c.coll`.
+
+        :return: A sorted list of dictionaries with `short_name` and `coll_name` keys.
+        """
         menus: list[dict] = []
 
         conn = Dbase.engine.connect()
