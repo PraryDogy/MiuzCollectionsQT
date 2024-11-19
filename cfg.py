@@ -136,7 +136,7 @@ class JsonData:
 
     custom_filters = [
         {
-            "lang": [
+            "name": [
                 "Продукт",
                 "Product"
             ],
@@ -144,7 +144,7 @@ class JsonData:
             "value": False
         },
         {
-            "lang": [
+            "name": [
                 "Модели",
                 "Model"
             ],
@@ -154,7 +154,7 @@ class JsonData:
     ]
   
     system_filter = {
-        "lang": [
+        "name": [
             "Остальное",
             "Other"
         ],

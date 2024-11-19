@@ -113,9 +113,7 @@ class FilterBtn(Btn):
         """cfg > dynamic_filters > item"""
 
         # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-        text = data.get(Lng.lang_name)
-        print(text)
-        print(data)
+        text = data.get("name")[JsonData.lng_ind]
         super().__init__(text=text)
 
         self.setFixedSize(BTN_W, BTN_H)
