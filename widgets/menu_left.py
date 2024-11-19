@@ -192,7 +192,7 @@ class BaseLeftMenu(QScrollArea):
 
     def setup_task(self):
         self.task_ = LoadMenus()
-        self.task_.signals_.finished_.connect(self.task_finalize)
+        self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.pool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollectionBtn):
@@ -216,7 +216,7 @@ class BaseLeftMenu(QScrollArea):
         btn.selected_style()
         self.selected_btn = btn
 
-    def task_finalize(self, menus: list[dict[str, str]]):
+    def init_ui(self, menus: list[dict[str, str]]):
 
         if hasattr(self, "main_wid"):
             self.main_wid.deleteLater()
