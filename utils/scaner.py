@@ -49,7 +49,7 @@ class FinderImages:
             i not in JsonData.stop_colls
             ]
 
-        ln_ = len(collection)
+        ln_ = len(collections)
 
         for x, collection in enumerate(collections, start=1):
             
@@ -172,19 +172,20 @@ class DbUpdater:
         self.hash_images: list[tuple[str, ndarray]] = []
 
     def run(self):
-        ScanerUtils.progressbar_text(70)
         self.del_db()
-        ScanerUtils.progressbar_text(90)
         self.insert_db()
 
     def del_db(self):
         conn = Dbase.engine.connect()
+        ln_ = len(self.del_items)
 
-        for hash_path in self.del_items:
+        for x, hash_path in enumerate(self.del_items, start=1):
             q = sqlalchemy.delete(THUMBS).where(THUMBS.c.hash_path==hash_path)
 
             try:
                 conn.execute(q)
+                t = f"{Dynamic.lang.deleting} {x} {Dynamic.lang.from_} {ln_}"
+                ScanerUtils.progressbar_text(t)
 
             except sqlalchemy.exc.IntegrityError as e:
                 Utils.print_err(error=e)
@@ -302,7 +303,10 @@ class DbUpdater:
         conn.commit()
         conn.close()
 
-        for hash_path, img_array in self.hash_images:
+        ln_ = len(self.hash_images)
+        for x, (hash_path, img_array) in enumerate(self.hash_images, start=1):
+            t = f"{Dynamic.lang.adding} {x} {Dynamic.lang.from_} {ln_}"
+            ScanerUtils.progressbar_text(t)
             Utils.write_image_hash(hash_path, img_array)
 
         if self.hash_images:
@@ -382,7 +386,7 @@ class ScanerShedule(QObject):
         self.scaner_thread = None
         self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
         Dbase.vacuum()
-        ScanerUtils.progressbar_text(100)
+        ScanerUtils.progressbar_text("")
 
 
 class Scaner:
