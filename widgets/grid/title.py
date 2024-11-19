@@ -15,7 +15,6 @@ from ._db_images import DbImage
 
 
 class Shared:
-    dialog = None
 
     @classmethod
     def show_smb(cls, parent_: QWidget | QMainWindow):
@@ -69,10 +68,8 @@ class CustomContext(ContextCustom):
                     ]
 
             if save_as:
-                self.dialog = QFileDialog()
-                Shared.dialog = self.dialog
-                self.dialog.setOption(QFileDialog.ShowDirsOnly, True)
-                dest = self.dialog.getExistingDirectory()
+                dialog = OpenWins.dialog_dirs()
+                dest = dialog.getExistingDirectory()
 
                 if not dest:
                     return
@@ -83,13 +80,13 @@ class CustomContext(ContextCustom):
             self.copy_files_cmd(dest, images)
 
         else:
-            Shared.show_smb(parent_=self)
+            OpenWins.smb(self.window())
 
     def copy_files_cmd(self, dest: str, files: list):
         if Utils.smb_check():
             self.copy_files_cmd_(dest, files)
         else:
-            Shared.show_smb(parent_=self)
+            OpenWins.smb(self.window())
 
     def copy_files_cmd_(self, dest: str, files: list):
         files = [i for i in files if os.path.exists(i)]
