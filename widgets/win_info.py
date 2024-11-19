@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
 from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
 from database import THUMBS, Dbase
-from lng import Lng
+from lang import Lng
 from utils.utils import URunnable, UThreadPool, Utils
 
 

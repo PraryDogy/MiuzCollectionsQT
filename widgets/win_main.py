@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
 from cfg import NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.scaner import Scaner

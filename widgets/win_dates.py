@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 from base_widgets import Btn, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import Dynamic
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 
 

@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import APP_NAME, APP_VER
-from lng import Lng
+from lang import Lng
 from utils.utils import Utils
 
 from .win_settings import WinSettings

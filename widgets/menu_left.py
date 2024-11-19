@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
 from base_widgets import ContextCustom, LayoutVer
 from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from database import THUMBS, Dbase
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils

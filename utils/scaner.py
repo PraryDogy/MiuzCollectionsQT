@@ -8,7 +8,7 @@ from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 from cfg import BRANDS, IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 
 from .utils import URunnable, UThreadPool, Utils

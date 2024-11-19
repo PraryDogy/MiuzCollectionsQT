@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer
 from cfg import NAME_ALL_COLLS, Dynamic, JsonData
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 from styles import Names, Themes
 

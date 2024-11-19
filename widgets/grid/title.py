@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QAction, QLabel
 
 from base_widgets import ContextCustom
 from cfg import PSD_TIFF, Dynamic, JsonData
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.copy_files import CopyFiles

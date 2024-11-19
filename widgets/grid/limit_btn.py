@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 
 from base_widgets import Btn
 from cfg import GRID_LIMIT, Dynamic
-from lng import Lng
+from lang import Lng
 
 
 class LimitBtn(Btn):

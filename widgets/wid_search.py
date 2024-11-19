@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QSpacerItem, QWidget
 
 from base_widgets import InputBase, LayoutHor
 from cfg import Dynamic
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 
 

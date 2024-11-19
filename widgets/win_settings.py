@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, DB_FILE, HASH_DIR, JsonData
-from lng import Lng
+from lang import Lng
 from utils.scaner import Scaner
 from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
@@ -107,11 +107,11 @@ class ChangeLang(QWidget):
           
     def lng_cmd(self, e):
 
-        if JsonData.lng_ind == 0:
-            JsonData.lng_ind = 1
+        if JsonData.lang_ind == 0:
+            JsonData.lang_ind = 1
 
-        elif JsonData.lng_ind == 1:
-            JsonData.lng_ind = 0
+        elif JsonData.lang_ind == 1:
+            JsonData.lang_ind = 0
 
         self.lang_btn.setText(Lng.lang_name)
         setattr(self, "flag", True)

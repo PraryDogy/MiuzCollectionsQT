@@ -1,4 +1,4 @@
-from lng import Lng
+from lang import Lng
 
 
 # class LngRus(Lng):

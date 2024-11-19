@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QLabel, QScrollArea, QSpacerItem, QWidget
 from base_widgets import CustomProgressBar, LayoutHor, LayoutVer, SvgBtn
 from base_widgets.wins import WinChild
 from cfg import JsonData
-from lng import Lng
+from lang import Lng
 from styles import Names, Themes
 from utils.copy_files import CopyFiles
 from utils.utils import Utils

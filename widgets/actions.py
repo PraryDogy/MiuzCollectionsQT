@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu, QWidget
 
 from cfg import JsonData
 from database import THUMBS, Dbase
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
 from utils.scaner import Scaner

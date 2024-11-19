@@ -8,7 +8,7 @@ from PyQt5.QtGui import QPixmap
 
 from cfg import GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from database import THUMBS, Dbase
-from lng import Lng
+from lang import Lng
 from utils.utils import URunnable, Utils
 
 

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
 from base_widgets.wins import WinChild
 from cfg import Dynamic, JsonData
-from lng import Lng
+from lang import Lng
 from signals import SignalsApp
 from styles import Names, Themes
 
@@ -109,7 +109,7 @@ class FilterBtn(Btn):
         """cfg > dynamic_filters > item"""
 
         # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-        text = data.get("name")[JsonData.lng_ind]
+        text = data.get("name")[JsonData.lang_ind]
         super().__init__(text=text)
 
         self.setFixedSize(BTN_W, BTN_H)
@@ -149,7 +149,7 @@ class FilterBtn(Btn):
 
         if flag == "name":
             # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-            self.data["name"][JsonData.lng_ind] = text
+            self.data["name"][JsonData.lang_ind] = text
             self.setText(text)
         
         elif flag == "value":
@@ -177,7 +177,7 @@ class FilterBtn(Btn):
         self.set_border_blue_style()
         menu_ = ContextCustom(ev)
 
-        filter_name = self.data.get("name")[JsonData.lng_ind]
+        filter_name = self.data.get("name")[JsonData.lang_ind]
         set_name_cmd = lambda: self.rename_win(
             title=Lng.filter_rename_win_title,
             input_text=filter_name, 

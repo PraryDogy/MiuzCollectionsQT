@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, LayoutHor, SvgBtn
 from base_widgets.wins import WinChild
-from lng import Lng
+from lang import Lng
 
 
 class WinSmb(WinChild):

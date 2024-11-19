@@ -106,7 +106,7 @@ class JsonData:
         ]
     
     theme: str = "dark_theme"
-    lng_ind = 0
+    lang_ind = 0
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 

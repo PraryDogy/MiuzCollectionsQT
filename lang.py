@@ -370,4 +370,4 @@ class Lng(Lng_):
     def init(cls):
         for k, v in vars(Lng_).items():
             if isinstance(v, list):
-                setattr(cls, k, v[JsonData.lng_ind])
+                setattr(cls, k, v[JsonData.lang_ind])

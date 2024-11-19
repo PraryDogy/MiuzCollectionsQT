@@ -2,7 +2,7 @@ from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLineEdit
 
 from cfg import JsonData
-from lng import Lng
+from lang import Lng
 from styles import Names, Themes
 from utils.utils import Utils
 
