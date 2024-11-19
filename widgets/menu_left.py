@@ -240,11 +240,7 @@ class MenuLeft(QFrame):
         main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.main_wid.setLayout(main_layout)
 
-        btns_widget = QWidget()
-        main_layout.addWidget(btns_widget)
-
-        main_btns_layout = LayoutVer()
-        btns_widget.setLayout(main_btns_layout)
+        main_layout.addSpacerItem(QSpacerItem(0, 5))
 
         self.all_colls_btn = CollectionBtn(
             short_name=Dynamic.lang.all_colls,
@@ -252,7 +248,7 @@ class MenuLeft(QFrame):
             )
         cmd_ = lambda: self.collection_btn_cmd(self.all_colls_btn)
         self.all_colls_btn.pressed_.connect(cmd_)
-        main_btns_layout.addWidget(self.all_colls_btn)
+        main_layout.addWidget(self.all_colls_btn)
 
         favs_btn = CollectionBtn(
             short_name=Dynamic.lang.fav_coll,
@@ -260,7 +256,9 @@ class MenuLeft(QFrame):
             )
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
-        main_btns_layout.addWidget(favs_btn)
+        main_layout.addWidget(favs_btn)
+
+        main_layout.addSpacerItem(QSpacerItem(0, 10))
 
         for i in (self.all_colls_btn, favs_btn):
             if i.coll_name == JsonData.curr_coll:
