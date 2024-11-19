@@ -39,6 +39,25 @@ class ProgressBar(CustomProgressBar):
         elif self.value() > 5:
             self.show()
 
+# class ProgressBar(QLabel):
+    # def __init__(self):
+    #     super().__init__()
+    #     self.setFixedWidth(100)
+    #     SignalsApp.all_.progressbar_set_value.connect(self.set_value)
+
+    # def set_value(self, value: int):
+
+    #     if not isinstance(value, int):
+    #         raise Exception ("widgets > bar_bottom > progress bar > value is not int:", type(value))
+        
+    #     elif value < 0 or value > 100:
+    #         raise Exception ("widgets > bar_bottom > progress bar > wrong value (0-100):", value)
+
+    #     if self.value() in (0, 100):
+    #         self.hide()
+    #     elif self.value() > 5:
+    #         self.show()
+
         
 class BaseSlider(QSlider):
     _clicked = pyqtSignal()
