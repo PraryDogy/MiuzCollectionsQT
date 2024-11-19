@@ -41,9 +41,9 @@ class WorkerSignals(QObject):
 
 
 class InfoTask(URunnable):
-    def __init__(self, src: str):
+    def __init__(self, short_src: str):
         super().__init__()
-        self.src = src
+        self.short_src = short_src
         self.signals_ = WorkerSignals()
 
     @URunnable.set_running_state
@@ -51,9 +51,8 @@ class InfoTask(URunnable):
         """имя тип размер место изменен разрешение коллекция"""
         conn = Dbase.engine.connect()
 
-        short_src = self.src.replace(JsonData.coll_folder, "")
         cols = (THUMBS.c.size, THUMBS.c.mod, THUMBS.c.resol,THUMBS.c.coll)
-        q = sqlalchemy.select(*cols).where(THUMBS.c.src==short_src)
+        q = sqlalchemy.select(*cols).where(THUMBS.c.src==self.short_src)
 
         res = conn.execute(q).first()
         conn.close()
@@ -65,14 +64,14 @@ class InfoTask(URunnable):
    
     def get_db_info(self, size, mod, resol, coll) -> dict[str, str]:
 
-        name = os.path.basename(self.src)
+        name = os.path.basename(self.short_src)
         _, type_ = os.path.splitext(name)
 
         res = {
             Dynamic.lang.file_name: self.lined_text(name),
             Dynamic.lang.type_: type_,
             Dynamic.lang.file_size: Utils.get_f_size(size),
-            Dynamic.lang.place: self.lined_text(self.src),
+            Dynamic.lang.place: self.lined_text(self.short_src),
             Dynamic.lang.changed: Utils.get_f_date(mod),
             Dynamic.lang.resol: resol,
             Dynamic.lang.collection: coll
@@ -102,12 +101,12 @@ class WinInfo(WinChild):
         self.min_btn_disable()
         self.max_btn_disable()
         self.set_titlebar_title(Dynamic.lang.info)
-        self.src = src
+        self.short_src = src
 
         self.init_ui()
 
     def init_ui(self):
-        self.task_ = InfoTask(self.src)
+        self.task_ = InfoTask(self.short_src)
         self.task_.signals_.finished_.connect(self.load_info_fin)
         UThreadPool.pool.start(self.task_)
 
