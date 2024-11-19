@@ -113,9 +113,9 @@ class FilterBtn(Btn):
         """cfg > dynamic_filters > item"""
 
         # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-        JsonData.custom_filters, JsonData.system_filter
-
         text = data.get(Lng.lang_name)
+        print(text)
+        print(data)
         super().__init__(text=text)
 
         self.setFixedSize(BTN_W, BTN_H)
@@ -124,8 +124,6 @@ class FilterBtn(Btn):
         self.data = data
 
         # cfg > dynamic_filters > item > value
-        JsonData.custom_filters, JsonData.system_filter
-
         if self.data.get("value"):
             self.set_blue_style()
         else:
@@ -148,7 +146,7 @@ class FilterBtn(Btn):
 
         cmd_ = lambda text: self.finished_cmd(text, flag)
         self.win_ = WinRename(title, input_text)
-        self.win_.center_relative_parent(self)
+        self.win_.center_relative_parent(self.window())
         self.win_.finished_.connect(cmd_)
         self.win_.show()
 
@@ -157,15 +155,11 @@ class FilterBtn(Btn):
 
         if flag == "name":
             # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-            JsonData.custom_filters, JsonData.system_filter
-
             self.data[Lng.lang_name] = text
             self.setText(text)
         
         elif flag == "value":
             # cfg > dynamic_filters > item > real
-            JsonData.custom_filters, JsonData.system_filter
-
             self.data["real"] = text
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
@@ -176,8 +170,6 @@ class FilterBtn(Btn):
         self.data["value"] = not self.data.get("value")
 
         # cfg > dynamic_filters > item > value
-        JsonData.custom_filters, JsonData.system_filter
-
         if self.data.get("value"):
             self.set_blue_style()
         else:
@@ -192,8 +184,6 @@ class FilterBtn(Btn):
         menu_ = ContextCustom(ev)
 
         # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-        JsonData.custom_filters, JsonData.system_filter
-
         filter_name = self.data.get(Lng.lang_name)
         set_name_cmd = lambda: self.rename_win(Lng.filter_name, filter_name, "name")
         set_name = QAction(parent=menu_, text=Lng.filter_name)
@@ -201,8 +191,6 @@ class FilterBtn(Btn):
         menu_.addAction(set_name)
 
         # cfg > dynamic_filters > item > real
-        JsonData.custom_filters, JsonData.system_filter
-
         filter_value = self.data.get("real")
         set_value_cmd = lambda: self.rename_win(Lng.filter_value, filter_value, "value")
         set_value = QAction(parent=menu_, text=Lng.filter_value)

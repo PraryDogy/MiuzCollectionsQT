@@ -136,22 +136,28 @@ class JsonData:
 
     custom_filters = [
         {
-            Eng.lang_name: "Product",
-            Rus.lang_name: "Продукт",
+            "lang": [
+                "Продукт",
+                "Product"
+            ],
             "real": "1 IMG",
             "value": False
         },
         {
-            Eng.lang_name: "Model",
-            Rus.lang_name: "Модели",
+            "lang": [
+                "Модели",
+                "Model"
+            ],
             "real": "2 MODEL IMG",
             "value": False
         }
     ]
   
     system_filter = {
-        Eng.lang_name: "Other",
-        Rus.lang_name: "Остальное",
+        "lang": [
+            "Остальное",
+            "Other"
+        ],
         "real": "other_flag",
         "value": False
         }
