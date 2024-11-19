@@ -71,7 +71,9 @@ class InfoTask(URunnable):
             Dynamic.lang.file_name: self.lined_text(name),
             Dynamic.lang.type_: type_,
             Dynamic.lang.file_size: Utils.get_f_size(size),
-            Dynamic.lang.place: self.lined_text(self.short_src),
+            Dynamic.lang.place: self.lined_text(
+                Utils.get_full_src(self.short_src)
+                ),
             Dynamic.lang.changed: Utils.get_f_date(mod),
             Dynamic.lang.resol: resol,
             Dynamic.lang.collection: coll

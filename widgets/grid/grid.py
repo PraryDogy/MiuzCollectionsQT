@@ -298,9 +298,9 @@ class Grid(QScrollArea):
             wid = self.cell_to_wid.get(self.curr_cell)
 
             if Utils.smb_check():
-                OpenWins.info_db(self, wid.short_src)
+                OpenWins.info_db(self.window(), wid.short_src)
             else:
-                self.smb_win = OpenWins.smb(self.window())
+                OpenWins.smb(self.window())
 
         elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             wid = self.cell_to_wid.get(self.curr_cell)
