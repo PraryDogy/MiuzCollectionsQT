@@ -2,48 +2,25 @@ import os
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtWidgets import (QApplication, QFrame, QLabel, QSlider,
-                             QSpacerItem, QWidget)
+from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSlider
 
-from base_widgets import CustomProgressBar, LayoutHor, SvgBtn
+from base_widgets import LayoutHor, SvgBtn
 from cfg import JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.utils import Utils
 
 from .win_downloads import WinDownloads
 from .win_settings import WinSettings
 
-
-# class ProgressBar(CustomProgressBar):
-#     def __init__(self):
-#         super().__init__()
-#         self.setFixedWidth(100)
-#         self.setMinimum(0)
-#         self.setMaximum(100)
-#         self.set_value(0)
-#         SignalsApp.all_.progressbar_cmd.connect(self.set_value)
-
-#     def set_value(self, value: int):
-
-#         if not isinstance(value, int):
-#             raise Exception ("widgets > bar_bottom > progress bar > value is not int:", type(value))
-        
-#         elif value < 0 or value > 100:
-#             raise Exception ("widgets > bar_bottom > progress bar > wrong value (0-100):", value)
-
-#         self.setValue(value)
-
-#         if self.value() in (0, 100):
-#             self.hide()
-#         elif self.value() > 5:
-#             self.show()
+IMAGES_FOLDER = "images"
+DOWNLOAD_SVG = os.path.join(IMAGES_FOLDER, f"{JsonData.theme}_downloads.svg")
+SWITCH_THEME_SVG = os.path.join(IMAGES_FOLDER, f"{JsonData.theme}_switch.svg")
+SETTINGS_SVG = os.path.join(IMAGES_FOLDER, f"{JsonData.theme}_settings.svg")
 
 
 class ProgressBar(QLabel):
     def __init__(self):
         super().__init__()
-        # self.setFixedWidth(150)
         self.setAlignment(Qt.AlignmentFlag.AlignRight)
         SignalsApp.all_.progressbar_text.connect(self.setText)
 
@@ -123,16 +100,16 @@ class BarBottom(QFrame):
         self.progress_bar = ProgressBar()
         self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
 
-        self.downloads = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_downloads.svg") , size=20)
+        self.downloads = SvgBtn(icon_path=DOWNLOAD_SVG , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
         SignalsApp.all_.btn_downloads_toggle.connect(self.btn_downloads_toggle)
         self.h_layout.addWidget(self.downloads)
 
-        self.switch_theme = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_switch.svg"), size=20)
+        self.switch_theme = SvgBtn(SWITCH_THEME_SVG, size=20)
         self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
         self.h_layout.addWidget(self.switch_theme)
 
-        self.sett_widget = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_settings.svg"), size=20)
+        self.sett_widget = SvgBtn(SETTINGS_SVG, size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
 
@@ -168,9 +145,9 @@ class BarBottom(QFrame):
         for i in widgets:
             i.setStyleSheet(Themes.current)
 
-        self.sett_widget.set_icon(os.path.join("images", f"{JsonData.theme}_settings.svg"))
-        self.downloads.set_icon(os.path.join("images", f"{JsonData.theme}_downloads.svg"))
-        self.switch_theme.set_icon(os.path.join("images", f"{JsonData.theme}_switch.svg"))
+        self.sett_widget.set_icon(SETTINGS_SVG)
+        self.downloads.set_icon(DOWNLOAD_SVG)
+        self.switch_theme.set_icon(SWITCH_THEME_SVG)
 
         JsonData.write_json_data()
 
