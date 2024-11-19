@@ -86,8 +86,6 @@ class JsonData:
     app_ver: str = 1.0
 
     brand_ind = 0
-
-    coll_folder: str = "/Volumes/Shares/Collections"
     
     curr_size_ind: int = 0
     curr_coll: str = NAME_ALL_COLLS
@@ -132,6 +130,8 @@ class JsonData:
         '/Volumes/Shares-2/Collections',
         '/Volumes/Shares-3/Collections'
         ]
+
+    coll_folder: str = coll_folder_list[0]
 
     custom_filters = [
         {

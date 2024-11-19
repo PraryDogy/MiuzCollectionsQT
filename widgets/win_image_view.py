@@ -270,17 +270,20 @@ class WinImageView(WinChild):
 
         self.hide_all_buttons()
         self.setFocus()
-        self.load_thumbnail()
+        self.smb_check()
+        # self.load_thumbnail()
 
-        QTimer.singleShot(300, self.smb_check)
+        # QTimer.singleShot(300, self.smb_check)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
 
     def smb_check(self):
         if not Utils.smb_check():
-            self.win_smb = WinSmb()
+            self.load_thumbnail()
             self.win_smb.center_relative_parent(self)
             self.win_smb.show()
+
+        self.win_smb = WinSmb()
 
     def load_thumbnail(self):
 
@@ -292,12 +295,10 @@ class WinImageView(WinChild):
         UThreadPool.pool.start(task)
 
     def load_thumb_fin(self, data: ImageData):
-        # if data.src == self.src and data.width > 0:
         self.image_label.set_image(data.pixmap)
 
         if Utils.smb_check():
             self.load_image()
-
         else:
             print("img viewer > no smb")
 
