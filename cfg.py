@@ -206,19 +206,8 @@ class JsonData:
             json.dump(new_data, f, indent=4, ensure_ascii=False)
 
     @classmethod
-    def dynamic_set_lang(cls, key_: str):
-        if key_ == Rus.lang_name:
-            Dynamic.lang = Rus
-            cls.lang_name = Rus.lang_name
-
-        elif key_ == Eng.lang_name:
-            Dynamic.lang = Eng
-            cls.lang_name = Eng.lang_name
-
-        else:
-            print("cfg > set lang > неверный ключ, ставлю по умолчанию русский", key_)
-            Dynamic.lang = Rus
-            cls.lang_name = Rus.lang_name
+    def set_lang(cls, lng_ind: int):
+        cls.lng_ind = lng_ind
 
     @classmethod
     def check_app_dirs(cls):
@@ -288,7 +277,7 @@ class JsonData:
         cls.read_json_data()
         cls.compare_versions()
 
-        cls.dynamic_set_lang(cls.lang_name)
+        cls.set_lang(cls.lng_ind)
         Themes.set_theme(cls.theme)
 
         print(

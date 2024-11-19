@@ -99,7 +99,7 @@ class ChangeLang(QWidget):
         layout_h = LayoutHor()
         self.setLayout(layout_h)
 
-        self.lang_btn = Btn(self.get_lng_text())
+        self.lang_btn = Btn(Lng.lang_name)
         self.lang_btn.mouseReleaseEvent = self.lng_cmd
         layout_h.addWidget(self.lang_btn)
 
@@ -107,21 +107,18 @@ class ChangeLang(QWidget):
 
         self.lang_label = QLabel(Lng.lang_label)
         layout_h.addWidget(self.lang_label)
-
-    def get_lng_text(self):
-        return "🇷🇺 Ru" if self.lang_name == Rus.lang_name else "🇺🇸 En"
           
     def lng_cmd(self, e):
-        if self.lang_name == Rus.lang_name:
-            self.lang_name = Eng.lang_name
-        else:
-            self.lang_name = Rus.lang_name
 
-        self.lang_btn.setText(self.get_lng_text())
+        if JsonData.lng_ind == 0:
+            JsonData.lng_ind = 1
 
-        if self.lang_name != JsonData.lang_name:
-            setattr(self, "flag", True)
-            self._pressed.emit()
+        elif JsonData.lng_ind == 1:
+            JsonData.lng_ind = 0
+
+        self.lang_btn.setText(Lng.lang_name)
+        setattr(self, "flag", True)
+        self._pressed.emit()
 
 
 class StopColls(QWidget):
@@ -309,7 +306,6 @@ class WinSettings(WinChild):
 
         elif hasattr(self.change_lang, "flag"):
             print("settings win change lang")
-            JsonData.dynamic_set_lang(self.change_lang.lang_name)
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
