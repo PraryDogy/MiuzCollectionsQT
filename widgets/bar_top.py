@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
 from base_widgets.wins import WinChild
 from cfg import Dynamic, JsonData
-from lang import Lng
+from lang import Lang
 from signals import SignalsApp
 from styles import Names, Themes
 
@@ -41,11 +41,11 @@ class WinRename(WinChild):
         h_wid.setLayout(h_lay)
         self.content_lay_v.addWidget(h_wid)
 
-        ok_btn = Btn(text=Lng.ok)
+        ok_btn = Btn(text=Lang.ok)
         ok_btn.mouseReleaseEvent = self.ok_cmd
         h_lay.addWidget(ok_btn)
 
-        cancel_btn = Btn(text=Lng.cancel)
+        cancel_btn = Btn(text=Lang.cancel)
         cancel_btn.mouseReleaseEvent = self.close_cmd
         h_lay.addWidget(cancel_btn)
 
@@ -70,7 +70,7 @@ class DatesBtn(Btn):
     win_dates_opened = pyqtSignal()
 
     def __init__(self):
-        super().__init__(text=Lng.dates)
+        super().__init__(text=Lang.dates)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -179,23 +179,23 @@ class FilterBtn(Btn):
 
         filter_name = self.data.get("name")[JsonData.lang_ind]
         set_name_cmd = lambda: self.rename_win(
-            title=Lng.filter_rename_win_title,
+            title=Lang.filter_rename_win_title,
             input_text=filter_name, 
             flag="name"
             )
 
-        set_name = QAction(parent=menu_, text=Lng.filter_rename_win_title)
+        set_name = QAction(parent=menu_, text=Lang.filter_rename_win_title)
         set_name.triggered.connect(set_name_cmd)
         menu_.addAction(set_name)
 
         filter_value = self.data.get("real")
         set_value_cmd = lambda: self.rename_win(
-            Lng.filter_value,
+            Lang.filter_value,
             filter_value,
             "value"
             )
 
-        set_value = QAction(parent=menu_, text=Lng.filter_value)
+        set_value = QAction(parent=menu_, text=Lang.filter_value)
         set_value.triggered.connect(set_value_cmd)
 
         JsonData.system_filter

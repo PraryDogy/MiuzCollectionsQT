@@ -1,4 +1,4 @@
-from lang import Lng
+from lang import Lang
 
 
 # class LngRus(Lng):
@@ -15,4 +15,4 @@ from lang import Lng
 # print(lng_rus.add_fav)  # Выведет: "Добавить в избранное"
 # print(lng_rus.apply)    # Выведет: "Применить"
 
-print(Lng.type_)
+print(Lang.type_)

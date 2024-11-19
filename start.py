@@ -43,7 +43,7 @@ from PyQt5.QtWidgets import QApplication
 
 from cfg import JsonData
 from database import Dbase
-from lang import Lng
+from lang import Lang
 from signals import SignalsApp
 from utils.scaner import Scaner
 from utils.utils import UThreadPool
@@ -68,7 +68,7 @@ class App(QApplication):
 
 JsonData.init()
 Dbase.init()
-Lng.init()
+Lang.init()
 
 app = App(sys.argv)
 

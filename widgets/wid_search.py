@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QSpacerItem, QWidget
 
 from base_widgets import InputBase, LayoutHor
 from cfg import Dynamic
-from lang import Lng
+from lang import Lang
 from signals import SignalsApp
 
 
@@ -15,7 +15,7 @@ class SearchBarBase(InputBase):
         self.setFixedHeight(25)
 
         self.textChanged.connect(self.create_search)
-        self.setPlaceholderText(Lng.search)
+        self.setPlaceholderText(Lang.search)
 
         self.timer = QTimer(self)
         self.timer.setInterval(1000)

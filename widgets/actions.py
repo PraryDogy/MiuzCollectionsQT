@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu, QWidget
 
 from cfg import JsonData
 from database import THUMBS, Dbase
-from lang import Lng
+from lang import Lang
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
 from utils.scaner import Scaner
@@ -47,13 +47,13 @@ class OpenInView(QAction):
     _clicked = pyqtSignal()
 
     def __init__(self, parent_: QMenu):
-        super().__init__(parent=parent_, text=Lng.view)
+        super().__init__(parent=parent_, text=Lang.view)
         self.triggered.connect(self._clicked.emit)
 
 
 class ScanerRestart(QAction):
     def __init__(self, parent: QMenu):
-        super().__init__(parent=parent, text=Lng.reload_gui)
+        super().__init__(parent=parent, text=Lang.reload_gui)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -63,7 +63,7 @@ class ScanerRestart(QAction):
 
 class OpenInfoDb(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
-        super().__init__(parent=parent, text=Lng.info)
+        super().__init__(parent=parent, text=Lang.info)
         self.parent_ = parent
         self.win_ = win
         self.short_src = short_src
@@ -78,7 +78,7 @@ class OpenInfoDb(QAction):
 
 class CopyPath(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, full_src: str):
-        super().__init__(parent=parent, text=Lng.copy_path)
+        super().__init__(parent=parent, text=Lang.copy_path)
         self.parent_ = parent
         self.win_ = win
         self.full_src = full_src
@@ -93,7 +93,7 @@ class CopyPath(QAction):
 
 class Reveal(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, full_src: str):
-        super().__init__(parent=parent, text=Lng.reveal_in_finder)
+        super().__init__(parent=parent, text=Lang.reveal_in_finder)
         self.full_src = full_src
         self.parent_ = parent
         self.win_ = win
@@ -142,11 +142,11 @@ class FavActionDb(QAction):
     def __init__(self, parent: QMenu, short_src: str, fav_value:  int):
 
         if fav_value == 0 or fav_value is None:
-            t = Lng.add_fav
+            t = Lang.add_fav
             self.value = 1
 
         elif fav_value == 1:
-            t = Lng.del_fav
+            t = Lang.del_fav
             self.value = 0
 
         super().__init__(parent=parent, text=t)
@@ -163,9 +163,9 @@ class Save(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, full_src: str, save_as: bool):
 
         if save_as:
-            text: str = Lng.save_image_in
+            text: str = Lang.save_image_in
         else:
-            text: str = Lng.save_image_downloads
+            text: str = Lang.save_image_downloads
 
         super().__init__(parent=parent, text=text)
         self.triggered.connect(self.cmd_)

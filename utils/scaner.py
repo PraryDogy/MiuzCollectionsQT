@@ -8,7 +8,7 @@ from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 from cfg import BRANDS, IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
-from lang import Lng
+from lang import Lang
 from signals import SignalsApp
 
 from .utils import URunnable, UThreadPool, Utils
@@ -54,7 +54,7 @@ class FinderImages:
 
         for x, collection in enumerate(collections, start=1):
             
-            t = f"{Lng.collection} {x} {Lng.from_} {ln_}"
+            t = f"{Lang.collection} {x} {Lang.from_} {ln_}"
             ScanerUtils.progressbar_text(t)
 
             try:
@@ -185,7 +185,7 @@ class DbUpdater:
 
             try:
                 conn.execute(q)
-                t = f"{Lng.deleting} {x} {Lng.from_} {ln_}"
+                t = f"{Lang.deleting} {x} {Lang.from_} {ln_}"
                 ScanerUtils.progressbar_text(t)
 
             except sqlalchemy.exc.IntegrityError as e:
@@ -306,7 +306,7 @@ class DbUpdater:
 
         ln_ = len(self.hash_images)
         for x, (hash_path, img_array) in enumerate(self.hash_images, start=1):
-            t = f"{Lng.adding} {x} {Lng.from_} {ln_}"
+            t = f"{Lang.adding} {x} {Lang.from_} {ln_}"
             ScanerUtils.progressbar_text(t)
             Utils.write_image_hash(hash_path, img_array)
 

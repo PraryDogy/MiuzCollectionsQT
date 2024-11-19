@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 from base_widgets import Btn, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import Dynamic
-from lang import Lng
+from lang import Lang
 from signals import SignalsApp
 
 
@@ -49,7 +49,7 @@ class BaseDateInput(InputBase):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(150)
-        self.setPlaceholderText(Lng.d_m_y)
+        self.setPlaceholderText(Lang.d_m_y)
         self.textChanged.connect(self.onTextChanged)
         self.date = None
 
@@ -116,10 +116,10 @@ class TitleLabel(QLabel):
         self.setText(self.default_text)
 
     def get_named_weekday(self, date: datetime) -> str:
-        return Lng.weekdays[str(date.weekday())]
+        return Lang.weekdays[str(date.weekday())]
     
     def get_named_date(self, date: datetime) -> str:
-        month = Lng.months_genitive_case[str(date.month)]
+        month = Lang.months_genitive_case[str(date.month)]
         return f"{date.day} {month} {date.year}"
 
 
@@ -158,7 +158,7 @@ class BaseDateLayout(QWidget):
 
 class LeftDateWidget(BaseDateLayout):
     def __init__(self):
-        super().__init__(Lng.start)
+        super().__init__(Lang.start)
 
         if Dynamic.date_start:
             self.input.setText(DateUtils.date_to_text(Dynamic.date_start))
@@ -166,7 +166,7 @@ class LeftDateWidget(BaseDateLayout):
 
 class RightDateWidget(BaseDateLayout):
     def __init__(self):
-        super().__init__(Lng.end)
+        super().__init__(Lang.end)
 
         if Dynamic.date_end:
             self.input.setText(DateUtils.date_to_text(Dynamic.date_end))
@@ -178,7 +178,7 @@ class WinDates(WinChild):
         self.close_btn_cmd(self.cancel_cmd)
         self.min_btn_disable()
         self.max_btn_disable()
-        self.set_titlebar_title(Lng.dates)
+        self.set_titlebar_title(Lang.dates)
 
         FiltersDateBtncolor.set_border()
 
@@ -190,7 +190,7 @@ class WinDates(WinChild):
         self.setFixedSize(self.width(), self.height())
 
     def init_ui(self):
-        title_label = QLabel(Lng.search_dates)
+        title_label = QLabel(Lang.search_dates)
         title_label.setContentsMargins(0, 0, 0, 5)
         self.content_lay_v.addWidget(title_label)
 
@@ -220,14 +220,14 @@ class WinDates(WinChild):
 
         buttons_layout.addStretch(1)
         buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.ok_label = Btn(Lng.ok)
+        self.ok_label = Btn(Lang.ok)
         self.ok_label.mouseReleaseEvent = self.ok_cmd
         buttons_layout.addWidget(self.ok_label)
 
         spacer_item = QSpacerItem(10, 1)
         buttons_layout.addItem(spacer_item)
 
-        cancel_label = Btn(Lng.cancel)
+        cancel_label = Btn(Lang.cancel)
         cancel_label.mouseReleaseEvent = self.cancel_cmd
         buttons_layout.addWidget(cancel_label)
         buttons_layout.addStretch(1)
@@ -246,7 +246,7 @@ class WinDates(WinChild):
             self.ok_label.setDisabled(True)
 
     def named_date(self, date: datetime):
-        month = Lng.months_genitive_case[str(date.month)]
+        month = Lang.months_genitive_case[str(date.month)]
         return f"{date.day} {month} {date.year}"
 
     def ok_cmd(self, event):

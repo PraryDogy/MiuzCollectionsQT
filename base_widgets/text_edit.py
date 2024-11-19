@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QTextEdit
 
-from lang import Lng
+from lang import Lang
 from styles import Names, Themes
 from utils.utils import Utils
 
@@ -14,15 +14,15 @@ class CustomContext(ContextCustom):
         self.my_parent = parent
         self.setFixedWidth(120)
 
-        sel = QAction(text=Lng.cut, parent=self)
+        sel = QAction(text=Lang.cut, parent=self)
         sel.triggered.connect(self.cut_selection)
         self.addAction(sel)
 
-        sel_all = QAction(text=Lng.copy, parent=self)
+        sel_all = QAction(text=Lang.copy, parent=self)
         sel_all.triggered.connect(self.copy_selection)
         self.addAction(sel_all)
 
-        sel_all = QAction(text=Lng.paste, parent=self)
+        sel_all = QAction(text=Lang.paste, parent=self)
         sel_all.triggered.connect(self.paste_text)
         self.addAction(sel_all)
 
