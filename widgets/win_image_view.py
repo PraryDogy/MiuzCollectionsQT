@@ -9,23 +9,22 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import PSD_TIFF, Dynamic, JsonData
+from cfg import PSD_TIFF, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
 
-from .actions import CopyPath, OpenInfoDb, OpenWins, Reveal, Save, FavActionDb
+from .actions import CopyPath, FavActionDb, OpenInfoDb, OpenWins, Reveal, Save
 from .grid.thumbnail import Thumbnail
 from .win_smb import WinSmb
 
 
 class ImageData:
-    __slots__ = ["short_src", "width", "pixmap"]
-    def __init__(self, short_src: str, width: int, pixmap: QPixmap):
+    __slots__ = ["short_src", "pixmap"]
+    def __init__(self, short_src: str, pixmap: QPixmap):
         self.short_src = short_src
-        self.width = width
-        self.pixmap = pixmap
+        self.pixmap: QPixmap = pixmap
 
 
 class WorkerSignals(QObject):
@@ -56,7 +55,7 @@ class LoadThumb(URunnable):
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(128, 128, 128))
 
-        image_data = ImageData(self.short_src, pixmap.width(), pixmap)
+        image_data = ImageData(self.short_src, pixmap)
         self.signals_.finished_.emit(image_data)
 
 
@@ -78,20 +77,20 @@ class LoadImage(URunnable):
                 img = Utils.array_color(img, "BGR")
 
             if img is not None:
-                pixmap = Utils.pixmap_from_array(img)
-                LoadImage.images[self.short_src] = pixmap
+                self.pixmap = Utils.pixmap_from_array(img)
+                LoadImage.images[self.short_src] = self.pixmap
 
         else:
-            pixmap = LoadImage.images.get(self.short_src)
+            self.pixmap = LoadImage.images.get(self.short_src)
 
         if not hasattr(self, "pixmap"):
             print("не могу загрузить крупное изображение")
-            pixmap = QPixmap(0, 0)
+            self.pixmap = QPixmap(0, 0)
 
         if len(LoadImage.images) > 50:
             LoadImage.images.pop(next(iter(LoadImage.images)))
 
-        image_data = ImageData(self.short_src, pixmap.width(), pixmap)
+        image_data = ImageData(short_src=self.short_src, pixmap=self.pixmap)
         self.signals_.finished_.emit(image_data)
 
 
@@ -306,7 +305,7 @@ class WinImageView(WinChild):
         UThreadPool.pool.start(img_thread)
 
     def load_image_finished(self, data: ImageData):
-        if data.width == 0 or data.short_src != self.short_src:
+        if data.pixmap.width() == 0 or data.short_src != self.short_src:
             print("img viewer load finished, but this image don't need, it's OK")
         
         elif isinstance(data.pixmap, QPixmap):
