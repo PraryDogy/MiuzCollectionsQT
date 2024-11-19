@@ -126,7 +126,7 @@ class Thumbnail(QFrame):
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.src)
         SignalsApp.all_.win_img_view_open_in.emit(self)
-        return super().mouseDoubleClickEvent(a0)
+        # return super().mouseDoubleClickEvent(a0)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         self.select.emit(self.src)
@@ -152,7 +152,8 @@ class Thumbnail(QFrame):
         self.mime_data = QMimeData()
         self.drag.setPixmap(self.img_label.pixmap())
         
-        url = [QUrl.fromLocalFile(self.src)]
+        fullpath = Utils.get_fullpath(self.src)
+        url = [QUrl.fromLocalFile(fullpath)]
         self.mime_data.setUrls(url)
 
         self.drag.setMimeData(self.mime_data)
