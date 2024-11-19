@@ -116,6 +116,7 @@ class Utils:
         
     @classmethod
     def reveal_files(cls, files_list: list):
+        """list of FULL SRC"""
         reveal_script = "applescripts/reveal_files.scpt"
         command = ["osascript", reveal_script] + files_list
         subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

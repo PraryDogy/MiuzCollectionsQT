@@ -299,7 +299,7 @@ class Grid(QScrollArea):
             wid = self.cell_to_wid.get(self.curr_cell)
 
             if Utils.smb_check():
-                OpenWins.info(self, wid.short_src)
+                OpenWins.info_db(self, wid.short_src)
             else:
                 self.smb_win = WinSmb()
                 self.smb_win.center_relative_parent(self)

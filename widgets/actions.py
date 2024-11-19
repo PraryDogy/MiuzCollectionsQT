@@ -32,33 +32,23 @@ class Shared:
 class OpenWins:
 
     @classmethod
-    def info(cls, parent: QWidget, src: str):
-        WinInfo(parent, src)
+    def info_db(cls, parent: QWidget, short_src: str):
+        WinInfo(parent=parent, short_src=short_src)
 
 
-class CustomAction(QAction):
-    def __init__(self, parent: QWidget, src: str, text: str):
-        super().__init__(text=text)
-
-        self.src = src
-        self.parent_ = parent
-
-    def cmd(self, *args, **kwargs):
-        print("context img > custom action > empty cmd")
-
-
-class OpenInView(CustomAction):
+class OpenInView(QAction):
     def __init__(self, parent: QWidget, short_src: str):
-        super().__init__(parent, short_src, Dynamic.lang.view)
+        super().__init__(parent=parent, text=Dynamic.lang.view)
+        self.parent_ = parent
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
         SignalsApp.all_.win_img_view_open_in.emit(self.parent_)
 
 
-class ReloadGui(CustomAction):
+class ReloadGui(QAction):
     def __init__(self, parent: QWidget, full_src: str):
-        super().__init__(parent, full_src, Dynamic.lang.reload_gui)
+        super().__init__(parent=parent, text=Dynamic.lang.reload_gui)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -66,37 +56,44 @@ class ReloadGui(CustomAction):
         Scaner.start()
 
 
-class OpenInfoDb(CustomAction):
+class OpenInfoDb(QAction):
     def __init__(self, parent: QWidget, short_src: str):
-        super().__init__(parent, short_src, Dynamic.lang.info)
+        super().__init__(parent=parent, text=Dynamic.lang.info)
+        self.parent_ = parent
+        self.short_src = short_src
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
         if Utils.smb_check():
-            OpenWins.info(self.parent_, self.src)
+            OpenWins.info_db(parent=self.parent_, short_src=self.short_src)
         else:
             Shared.show_smb(self.parent_)
 
 
-class CopyPath(CustomAction):
+class CopyPath(QAction):
     def __init__(self, parent: QWidget, full_src: str):
-        super().__init__(parent, full_src, Dynamic.lang.copy_path)
+        super().__init__(parent=parent, text=Dynamic.lang.copy_path)
+        self.parent_ = parent
+        self.full_src = full_src
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
         if Utils.smb_check():
-            Utils.copy_text(text=self.src)
+            Utils.copy_text(text=self.full_src)
         else:
             Shared.show_smb(self.parent_)
 
-class Reveal(CustomAction):
+
+class Reveal(QAction):
     def __init__(self, parent: QWidget, full_src: str):
         super().__init__(parent, full_src, Dynamic.lang.reveal_in_finder)
+        self.full_src = full_src
+        self.parent_ = parent
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
         if Utils.smb_check():
-            Utils.reveal_files([self.src])
+            Utils.reveal_files([self.full_src])
         else:
             Shared.show_smb(self.parent_)
 
@@ -106,16 +103,16 @@ class WorkerSignals(QObject):
 
 
 class FavTask(URunnable):
-    def __init__(self, src: str, value: int):
+    def __init__(self, short_src: str, value: int):
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.src = src.replace(JsonData.coll_folder, "")
+        self.short_src = short_src
         self.value = value
 
     @URunnable.set_running_state
     def run(self):
         values = {"fav": self.value}
-        q = sqlalchemy.update(THUMBS).where(THUMBS.c.src==self.src)
+        q = sqlalchemy.update(THUMBS).where(THUMBS.c.src==self.short_src)
         q = q.values(**values)
 
         conn = Dbase.engine.connect()
@@ -131,7 +128,7 @@ class FavTask(URunnable):
         conn.close()
 
 
-class FavActionDb(CustomAction):
+class FavActionDb(QAction):
     finished_ = pyqtSignal(int)
 
     def __init__(self, parent: QWidget, short_src: str, fav_value:  int):
@@ -144,16 +141,17 @@ class FavActionDb(CustomAction):
             t = Dynamic.lang.del_fav
             self.value = 0
 
-        super().__init__(parent, short_src, t)
+        super().__init__(parent=parent, text=t)
         self.triggered.connect(self.cmd_)
+        self.short_src = short_src
 
     def cmd_(self):
-        self.task = FavTask(self.src, self.value)
+        self.task = FavTask(short_src=self.short_src, value=self.value)
         self.task.signals_.finished_.connect(self.finished_.emit)
         UThreadPool.pool.start(self.task)
 
 
-class Save(CustomAction):
+class Save(QAction):
     def __init__(self, parent: QWidget, full_src: str, save_as: bool):
 
         if save_as:
@@ -161,9 +159,10 @@ class Save(CustomAction):
         else:
             text: str = Dynamic.lang.save_image_downloads
 
-        super().__init__(parent, full_src, text)
+        super().__init__(parent=parent, text=text)
         self.triggered.connect(self.cmd_)
         self.save_as = save_as
+        self.full_src = full_src
 
     def cmd_(self):
         if Utils.smb_check():
@@ -175,20 +174,20 @@ class Save(CustomAction):
                 dest = JsonData.down_folder
 
             if dest:
-                self.copy_files_cmd(dest=dest, file=self.src)
+                self.copy_files_cmd(dest=dest, full_src=self.full_src)
         else:
             Shared.show_smb(self.parent_)
 
-    def copy_files_cmd(self, dest: str, file: str | list):
+    def copy_files_cmd(self, dest: str, full_src: str | list):
 
-        if not file or not os.path.exists(file):
+        if not full_src or not os.path.exists(full_src):
             return
 
-        if isinstance(file, str):
-            file = [file]
+        if isinstance(full_src, str):
+            full_src = [full_src]
 
         cmd_ = lambda f: self.reveal_copied_files(files=f)
-        thread_ = CopyFiles(dest=dest, files=file)
+        thread_ = CopyFiles(dest=dest, files=full_src)
         thread_.signals_.finished_.connect(cmd_)
 
         SignalsApp.all_.btn_downloads_toggle.emit("show")

@@ -93,7 +93,7 @@ class InfoTask(URunnable):
 
 
 class WinInfo(WinChild):
-    def __init__(self, parent: QWidget, src: str):
+    def __init__(self, parent: QWidget, short_src: str):
         super().__init__()
         self.parent_ = parent
 
@@ -101,7 +101,7 @@ class WinInfo(WinChild):
         self.min_btn_disable()
         self.max_btn_disable()
         self.set_titlebar_title(Dynamic.lang.info)
-        self.short_src = src
+        self.short_src = short_src
 
         self.init_ui()
 

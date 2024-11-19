@@ -379,7 +379,7 @@ class WinImageView(WinChild):
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             if Utils.smb_check():
-                OpenWins.info(self, self.src)
+                OpenWins.info_db(self, self.src)
             else:
                 self.win_smb = WinSmb()
                 self.win_smb.center_relative_parent(self)
