@@ -256,12 +256,19 @@ class Utils:
     
     @classmethod
     def array_color(cls, img: np.ndarray, flag: str) -> np.ndarray:
+
         if flag == "RGB":
-            return cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            colors = cv2.COLOR_RGB2BGR
         elif flag == "BGR":
-            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            colors = cv2.COLOR_BGR2RGB
         else:
-            raise Exception("utils image utils wrong src", flag)
+            raise Exception("utils image utils array color wrong flag", flag)
+        try:
+            return cv2.cvtColor(img, colors)
+        except Exception as e:
+            cls.print_err(error=e)
+                            
+
     
     @classmethod
     def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
