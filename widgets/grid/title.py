@@ -14,29 +14,17 @@ from ..actions import OpenWins
 from ._db_images import DbImage
 
 
-class CustomContext(ContextCustom):
-    def __init__(self, files_list: list[DbImage], event):
+class Title(QLabel):
+    def __init__(self, title: str, db_images: list[DbImage], width: int):
+        super().__init__(f"{title}. {Dynamic.lang.total}: {len(db_images)}")
+        self.db_images = db_images
+        self.setFixedWidth(width - 20)
+        self.setWordWrap(True)
+        self.setContentsMargins(0, 0, 0, 5)
+        self.setObjectName(Names.th_title)
+        self.setStyleSheet(Themes.current)
 
-        super().__init__(event=event)
-        self.files_list = files_list
-
-        save_jpg = QAction(text=Dynamic.lang.save_all_JPG, parent=self)
-        save_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=False))
-        self.addAction(save_jpg)
-
-        save_layers = QAction(text=Dynamic.lang.save_all_layers, parent=self)
-        save_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=False))
-        self.addAction(save_layers)
-
-        self.addSeparator()
-
-        save_as_jpg = QAction(text=Dynamic.lang.save_all_JPG_as, parent=self)
-        save_as_jpg.triggered.connect(lambda: self.save_cmd(is_layers=False, save_as=True))
-        self.addAction(save_as_jpg)
-
-        save_as_layers = QAction(text=Dynamic.lang.save_all_layers_as, parent=self)
-        save_as_layers.triggered.connect(lambda: self.save_cmd(is_layers=True, save_as=True))
-        self.addAction(save_as_layers)
+        self.my_context = None
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
@@ -45,13 +33,13 @@ class CustomContext(ContextCustom):
             if is_layers:
                 images = [
                     Utils.get_full_src(i.short_src)
-                    for i in self.files_list
+                    for i in self.db_images
                     if i.short_src.endswith(PSD_TIFF)
                     ]
             else:
                 images = [
                     Utils.get_full_src(i.short_src)
-                    for i in self.files_list
+                    for i in self.db_images
                     if not i.short_src.endswith(PSD_TIFF)
                     ]
 
@@ -94,23 +82,29 @@ class CustomContext(ContextCustom):
         if len(CopyFiles.current_threads) == 0:
             SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
-
-class Title(QLabel):
-    def __init__(self, title: str, db_images: list, width: int):
-        super().__init__(f"{title}. {Dynamic.lang.total}: {len(db_images)}")
-        self.images = db_images
-        self.setFixedWidth(width - 20)
-        self.setWordWrap(True)
-        self.setContentsMargins(0, 0, 0, 5)
-        self.setObjectName(Names.th_title)
-        self.setStyleSheet(Themes.current)
-
-        self.my_context = None
-
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        try:
-            self.my_context = CustomContext(files_list=self.images, event=ev)
-            self.my_context.show_menu()
-            # return super().contextMenuEvent(ev)
-        except Exception as e:
-            Utils.print_err(error=e)
+        menu_ = ContextCustom(ev)
+
+        cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
+        save_jpg = QAction(text=Dynamic.lang.save_all_JPG, parent=menu_)
+        save_jpg.triggered.connect(cmd_)
+        menu_.addAction(save_jpg)
+
+        lambda: self.save_cmd(is_layers=True, save_as=False)
+        save_layers = QAction(text=Dynamic.lang.save_all_layers, parent=menu_)
+        save_layers.triggered.connect(cmd_)
+        menu_.addAction(save_layers)
+
+        menu_.addSeparator()
+
+        cmd_ = lambda: self.save_cmd(is_layers=False, save_as=True)
+        save_as_jpg = QAction(text=Dynamic.lang.save_all_JPG_as, parent=menu_)
+        save_as_jpg.triggered.connect(cmd_)
+        menu_.addAction(save_as_jpg)
+
+        cmd_ = lambda: self.save_cmd(is_layers=True, save_as=True)
+        save_as_layers = QAction(text=Dynamic.lang.save_all_layers_as, parent=menu_)
+        save_as_layers.triggered.connect(cmd_)
+        menu_.addAction(save_as_layers)
+
+        menu_.show_menu()
