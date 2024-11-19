@@ -168,7 +168,7 @@ class MenuLeft(QFrame):
         self.setStyleSheet(Themes.current)
 
         scroll_layout = LayoutVer()
-        scroll_layout.setContentsMargins(10, 0, 0, 0)
+        scroll_layout.setContentsMargins(5, 0, 0, 5)
         self.setLayout(scroll_layout)
 
         self.selected_btn: CollectionBtn
