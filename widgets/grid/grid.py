@@ -302,7 +302,7 @@ class Grid(QScrollArea):
                 OpenWins.info_db(self, wid.short_src)
             else:
                 self.smb_win = WinSmb()
-                self.smb_win.center_relative_parent(self)
+                self.smb_win.center_relative_parent(self.window())
                 self.smb_win.show()
 
         elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):

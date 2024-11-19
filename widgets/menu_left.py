@@ -55,7 +55,7 @@ class CollectionBtn(QLabel):
                 return
         else:
             self.smb_win = WinSmb()
-            self.smb_win.center_relative_parent(self.my_parent)
+            self.smb_win.center_relative_parent(self.window())
             self.smb_win.show()
 
     def normal_style(self):

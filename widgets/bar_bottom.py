@@ -186,10 +186,10 @@ class BarBottom(QFrame):
 
     def open_downloads(self, e):
         self.downloads_win = WinDownloads()
-        self.downloads_win.center_relative_parent(self)
+        self.downloads_win.center_relative_parent(self.window())
         self.downloads_win.show()
 
     def sett_btn_cmd(self, e):
         self.settings = WinSettings()
-        self.settings.center_relative_parent(self)
+        self.settings.center_relative_parent(self.window())
         self.settings.show()

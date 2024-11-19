@@ -172,7 +172,7 @@ class UpdaterWidget(QWidget):
 
         QTimer.singleShot(1000, cmd_)
         self.smb_win = WinSmb()
-        self.smb_win.center_relative_parent(self)
+        self.smb_win.center_relative_parent(self.window())
         self.smb_win.show()
 
     def no_connection_btn_style(self):

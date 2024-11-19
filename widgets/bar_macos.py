@@ -102,10 +102,10 @@ class BarMacos(QMenuBar):
 
     def open_settings_window(self):
         self.win_settings = WinSettings(self)
-        self.win_settings.center_relative_parent(self)
+        self.win_settings.center_relative_parent(self.window())
         self.win_settings.show()
 
     def open_about_window(self):
         self.about_win = AboutWin()
-        self.about_win.center_relative_parent(self)
+        self.about_win.center_relative_parent(self.window())
         self.about_win.show()

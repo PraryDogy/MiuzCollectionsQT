@@ -3,7 +3,7 @@ import os
 import sqlalchemy
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
-from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
+from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
 
 from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
@@ -93,8 +93,12 @@ class InfoTask(URunnable):
 
 
 class WinInfo(WinChild):
-    def __init__(self, parent: QWidget, short_src: str):
+    def __init__(self, parent: QMainWindow, short_src: str):
         super().__init__()
+
+        if not isinstance(parent, QMainWindow):
+            raise TypeError
+
         self.parent_ = parent
 
         self.close_btn_cmd(self.close_)
