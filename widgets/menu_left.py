@@ -196,6 +196,16 @@ class BaseLeftMenu(QScrollArea):
         UThreadPool.pool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollectionBtn):
+        """
+        This is a command for `CollectionBtn`. It sets `curr_coll` based
+        on the button's `coll_name`, 
+        resets `grid_offset`, sets the window title, and reloads the image
+        grid according to the `curr_coll`.
+
+        :param btn: An instance of `CollectionBtn` representing the button
+        that was pressed.
+        """
+
         JsonData.curr_coll = btn.coll_name
         Dynamic.grid_offset = 0
         SignalsApp.all_.win_main_cmd.emit("set_title")
