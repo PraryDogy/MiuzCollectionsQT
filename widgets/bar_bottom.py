@@ -15,15 +15,23 @@ from .win_settings import WinSettings
 
 class SvgPaths:
     IMAGES_FOLDER = "images"
-    download_svg = os.path.join(IMAGES_FOLDER, f"{JsonData.theme}_downloads.svg")
-    switch_theme_svg = os.path.join(IMAGES_FOLDER, f"{JsonData.theme}_switch.svg")
-    settings_svg = os.path.join(IMAGES_FOLDER, f"{JsonData.theme}_settings.svg")
+    download_svg: str
+    switch_theme_svg: str
+    settings_svg: str
 
     @classmethod
     def update_(cls):
-        cls.download_svg = os.path.join(cls.IMAGES_FOLDER, f"{JsonData.theme}_downloads.svg")
-        cls.switch_theme_svg = os.path.join(cls.IMAGES_FOLDER, f"{JsonData.theme}_switch.svg")
-        cls.settings_svg = os.path.join(cls.IMAGES_FOLDER, f"{JsonData.theme}_settings.svg")
+        cls.download_svg = cls.images_path(f"{JsonData.theme}_downloads.svg")
+        cls.switch_theme_svg = cls.images_path(f"{JsonData.theme}_switch.svg")
+        cls.settings_svg = cls.images_path(f"{JsonData.theme}_settings.svg")
+    
+    @classmethod
+    def images_path(cls, src: str):
+        return os.path.join(
+            cls.IMAGES_FOLDER,
+            src
+            )
+
 
 
 class ProgressBar(QLabel):
@@ -107,6 +115,8 @@ class BarBottom(QFrame):
 
         self.progress_bar = ProgressBar()
         self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
+
+        SvgPaths.update_()
 
         self.downloads = SvgBtn(icon_path=SvgPaths.download_svg , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
