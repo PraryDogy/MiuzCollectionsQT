@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import subprocess
 import webbrowser
 from datetime import datetime
 
@@ -70,9 +71,9 @@ PRELOAD_DB: str = os.path.join(
     "db.db"
     )
 
-PRELOAD_HASHDIR: str = os.path.join(
+PRELOAD_HASHDIR_ZIP: str = os.path.join(
     PRELOAD_FOLDER,
-    "hashdir"
+    "hashdir.zip"
     )
 
 PSD_TIFF: tuple = (
@@ -233,12 +234,13 @@ class JsonData:
             print("Удаляю пользовательскую HASH_DIR")
             shutil.rmtree(HASH_DIR)
 
-        if os.path.exists(PRELOAD_HASHDIR):
+        if os.path.exists(PRELOAD_HASHDIR_ZIP):
             print("копирую предустановленную HASH_DIR")
-            shutil.copytree(PRELOAD_HASHDIR, HASH_DIR)
+            dest = shutil.copy2(PRELOAD_HASHDIR_ZIP, APP_SUPPORT_DIR)
+            shutil.unpack_archive(dest, APP_SUPPORT_DIR)
 
         else:
-            t = "нет предустановленной HASH_DIR: " + PRELOAD_HASHDIR
+            t = "нет предустановленной HASH_DIR: " + PRELOAD_HASHDIR_ZIP
             webbrowser.open(LINK_DB)
             raise Exception(t)
 
