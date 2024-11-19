@@ -195,10 +195,20 @@ class Thumbnail(QFrame):
             reveal = Reveal(parent=menu_, win=self.window(), full_src=full_src)
             menu_.addAction(reveal)
 
-            save_as = Save(parent=menu_, full_src=full_src, save_as=True)
+            save_as = Save(
+                parent=menu_,
+                win=self.window(),
+                full_src=full_src,
+                save_as=True
+                )
             menu_.addAction(save_as)
 
-            save = Save(parent=menu_, full_src=full_src, save_as=False)
+            save = Save(
+                parent=menu_,
+                win=self.window(),
+                full_src=full_src,
+                save_as=False
+                )
             menu_.addAction(save)
 
             menu_.addSeparator()

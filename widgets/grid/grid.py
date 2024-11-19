@@ -251,7 +251,7 @@ class Grid(QScrollArea):
         if isinstance(wid, Thumbnail):
             from ..win_image_view import WinImageView
             self.win_image_view = WinImageView(short_src=wid.short_src)
-            self.win_image_view.center_relative_parent(self)
+            self.win_image_view.center_relative_parent(self.window())
             self.win_image_view.show()
 
     def get_columns(self):
