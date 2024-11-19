@@ -21,9 +21,9 @@ from .win_smb import WinSmb
 
 
 class ImageData:
-    __slots__ = ["src", "width", "pixmap"]
-    def __init__(self, src: str, width: int, pixmap: QPixmap):
-        self.src = src
+    __slots__ = ["short_src", "width", "pixmap"]
+    def __init__(self, short_src: str, width: int, pixmap: QPixmap):
+        self.short_src = short_src
         self.width = width
         self.pixmap = pixmap
 
@@ -33,17 +33,19 @@ class WorkerSignals(QObject):
 
 
 class LoadThumb(URunnable):
-    def __init__(self, src: str):
+    def __init__(self, short_src: str):
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.src = src
+        self.short_src = short_src
 
     @URunnable.set_running_state
     def run(self):
-        small_src = self.src.replace(JsonData.coll_folder, "")
-
         conn = Dbase.engine.connect()
-        q = (sqlalchemy.select(THUMBS.c.hash_path).where(THUMBS.c.src == small_src))
+        q = sqlalchemy.select(
+            THUMBS.c.hash_path
+            ).where(
+                THUMBS.c.src == self.short_src
+                )
         res = conn.execute(q).scalar()
         conn.close()
 
@@ -54,33 +56,33 @@ class LoadThumb(URunnable):
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(128, 128, 128))
 
-        image_data = ImageData(self.src, pixmap.width(), pixmap)
+        image_data = ImageData(self.short_src, pixmap.width(), pixmap)
         self.signals_.finished_.emit(image_data)
 
 
 class LoadImage(URunnable):
     images: dict[str, QPixmap] = {}
 
-    def __init__(self, src: str):
+    def __init__(self, short_src: str):
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.src = src
+        self.short_src = short_src
 
     @URunnable.set_running_state
     def run(self):
 
-        if self.src not in LoadImage.images:
-            img = Utils.read_image(self.src)
+        if self.short_src not in LoadImage.images:
+            img = Utils.read_image(Utils.get_full_src(self.short_src))
 
-            if not self.src.endswith(PSD_TIFF):
+            if not self.short_src.endswith(PSD_TIFF):
                 img = Utils.array_color(img, "BGR")
 
             if img is not None:
                 pixmap = Utils.pixmap_from_array(img)
-                LoadImage.images[self.src] = pixmap
+                LoadImage.images[self.short_src] = pixmap
 
         else:
-            pixmap = LoadImage.images.get(self.src)
+            pixmap = LoadImage.images.get(self.short_src)
 
         if not hasattr(self, "pixmap"):
             print("не могу загрузить крупное изображение")
@@ -89,7 +91,7 @@ class LoadImage(URunnable):
         if len(LoadImage.images) > 50:
             LoadImage.images.pop(next(iter(LoadImage.images)))
 
-        image_data = ImageData(self.src, pixmap.width(), pixmap)
+        image_data = ImageData(self.short_src, pixmap.width(), pixmap)
         self.signals_.finished_.emit(image_data)
 
 
@@ -244,10 +246,10 @@ class WinImageView(WinChild):
         self.content_wid.setObjectName("img_view_bg")
         self.content_wid.setStyleSheet(Themes.current)
 
-        self.src = short_src
+        self.short_src = short_src
         self.all_images = list(Thumbnail.path_to_wid.keys())
 
-        self.collection = None
+
 
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
@@ -286,7 +288,7 @@ class WinImageView(WinChild):
     def load_thumbnail(self):
 
         self.set_image_title()
-        task = LoadThumb(self.src)
+        task = LoadThumb(short_src=self.short_src)
         task.signals_.finished_.connect(self.load_thumb_fin)
         UThreadPool.pool.start(task)
 
@@ -299,12 +301,12 @@ class WinImageView(WinChild):
             print("img viewer > no smb")
 
     def load_image(self):
-        img_thread = LoadImage(self.src)
+        img_thread = LoadImage(short_src=self.short_src)
         img_thread.signals_.finished_.connect(self.load_image_finished)
         UThreadPool.pool.start(img_thread)
 
     def load_image_finished(self, data: ImageData):
-        if data.width == 0 or data.src != self.src:
+        if data.width == 0 or data.short_src != self.short_src:
             print("img viewer load finished, but this image don't need, it's OK")
         
         elif isinstance(data.pixmap, QPixmap):
@@ -327,20 +329,23 @@ class WinImageView(WinChild):
 
     def switch_image(self, offset):
         try:
-            current_index = self.all_images.index(self.src)
+            current_index = self.all_images.index(self.short_src)
         except Exception as e:
             current_index = 0
 
         total_images = len(self.all_images)
         new_index = (current_index + offset) % total_images
-        self.src = self.all_images[new_index]
-        SignalsApp.all_.thumbnail_select.emit(self.src)
+        self.short_src = self.all_images[new_index]
+        SignalsApp.all_.thumbnail_select.emit(self.short_src)
         self.load_thumbnail()
 
     def set_image_title(self):
-        self.collection = Utils.get_coll_name(self.src)
-        coll = Utils.get_coll_name(self.src)
-        wid = Thumbnail.path_to_wid.get(self.src)
+
+        coll = Utils.get_coll_name(
+            full_src=Utils.get_full_src(self.short_src)
+            )
+
+        wid = Thumbnail.path_to_wid.get(self.short_src)
         self.set_titlebar_title(f"{coll} - {wid.name}")
 
     def button_switch_cmd(self, flag: str) -> None:
@@ -352,7 +357,7 @@ class WinImageView(WinChild):
         self.image_label.setCursor(Qt.CursorShape.ArrowCursor)
 
     def change_fav(self, value: int):
-        wid = Thumbnail.path_to_wid.get(self.src)
+        wid = Thumbnail.path_to_wid.get(self.short_src)
         wid.change_fav(value)
         self.set_image_title()
 
@@ -379,7 +384,7 @@ class WinImageView(WinChild):
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             if Utils.smb_check():
-                OpenWins.info_db(self, self.src)
+                OpenWins.info_db(self, self.short_src)
             else:
                 self.win_smb = WinSmb()
                 self.win_smb.center_relative_parent(self)
@@ -391,26 +396,35 @@ class WinImageView(WinChild):
         try:
             self.menu_ = ContextCustom(event=ev)
 
-            info = OpenInfoDb(parent=self.menu_, win=self, short_src=self.src)
+            info = OpenInfoDb(parent=self.menu_, win=self, short_src=self.short_src)
             self.menu_.addAction(info)
 
-            wid = Thumbnail.path_to_wid.get(self.src)
+            wid = Thumbnail.path_to_wid.get(self.short_src)
             self.fav_action = FavActionDb(parent=self.menu_, short_src=wid.short_src, fav_value=wid.fav_value)
             self.fav_action.finished_.connect(self.change_fav)
             self.menu_.addAction(self.fav_action)
 
             self.menu_.addSeparator()
 
-            copy = CopyPath(parent=self.menu_, win=self, full_src=self.src)
+            copy = CopyPath(parent=self.menu_, win=self, full_src=self.short_src)
             self.menu_.addAction(copy)
 
-            reveal = Reveal(parent=self.menu_, win=self.window(), full_src=self.src)
+            reveal = Reveal(parent=self.menu_, win=self.window(), full_src=self.short_src)
             self.menu_.addAction(reveal)
 
-            save_as = Save(parent=self.menu_, full_src=self.src, save_as=True)
+            save_as = Save(
+                parent=self.menu_, 
+                win=self,
+                full_src=self.short_src, save_as=True
+                )
             self.menu_.addAction(save_as)
 
-            save = Save(parent=self.menu_, full_src=self.src, save_as=False)
+            save = Save(
+                parent=self.menu_,
+                win=self,
+                full_src=self.short_src,
+                save_as=False
+                )
             self.menu_.addAction(save)
 
             self.menu_.show_menu()

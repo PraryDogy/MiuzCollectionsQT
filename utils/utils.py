@@ -78,7 +78,7 @@ class Utils:
     def smb_check(cls) -> bool:
         not_ok = False
 
-        return False
+        # return False
 
         if not os.path.exists(JsonData.coll_folder):
             not_ok = True
@@ -97,8 +97,8 @@ class Utils:
             return True
 
     @classmethod
-    def get_coll_name(cls, src: str) -> str:
-        coll = src.replace(JsonData.coll_folder, "")
+    def get_coll_name(cls, full_src: str) -> str:
+        coll = full_src.replace(JsonData.coll_folder, "")
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
