@@ -238,6 +238,7 @@ class JsonData:
             print("копирую предустановленную HASH_DIR")
             dest = shutil.copy2(PRELOAD_HASHDIR_ZIP, APP_SUPPORT_DIR)
             shutil.unpack_archive(dest, APP_SUPPORT_DIR)
+            os.remove(dest)
 
         else:
             t = "нет предустановленной HASH_DIR: " + PRELOAD_HASHDIR_ZIP
