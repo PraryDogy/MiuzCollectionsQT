@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
 
 from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import Dynamic, JsonData
+from cfg import Dynamic
 from database import THUMBS, Dbase
 from utils.utils import URunnable, UThreadPool, Utils
 
