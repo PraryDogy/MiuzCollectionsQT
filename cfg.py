@@ -16,8 +16,6 @@ LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
 MENU_LEFT_WIDTH: int = 210
 NAME_ALL_COLLS: str = "miuzcollections_all"
 NAME_FAVS: str = "miuzcollections_fav"
-PRELOADED_DB = "db.db"
-PRELOADED_HASHDIR: str = "hashdir"
 RGBA_BLUE = "rgba(0, 122, 255, 1)"
 RGBA_GRAY = "rgba(111, 111, 111, 0.5)"
 STAR_SYM = "\U00002605" + " "
@@ -61,6 +59,19 @@ IMG_EXT: tuple = tuple(
     upper_ext
     for ext in _IMG_EXT
     for upper_ext in (ext, ext.upper())
+    )
+
+
+PRELOAD_FOLDER: str = "_preload"
+
+PRELOAD_DB: str = os.path.join(
+    PRELOAD_FOLDER,
+    "db.db"
+    )
+
+PRELOAD_HASHDIR: str = os.path.join(
+    PRELOAD_FOLDER,
+    "hashdir"
     )
 
 PSD_TIFF: tuple = (
@@ -219,12 +230,12 @@ class JsonData:
             print("Удаляю пользовательскую HASH_DIR")
             shutil.rmtree(HASH_DIR)
 
-        if os.path.exists(PRELOADED_HASHDIR):
+        if os.path.exists(PRELOAD_HASHDIR):
             print("копирую предустановленную HASH_DIR")
-            shutil.copytree(PRELOADED_HASHDIR, HASH_DIR)
+            shutil.copytree(PRELOAD_HASHDIR, HASH_DIR)
 
         else:
-            t = "нет предустановленной HASH_DIR: " + PRELOADED_HASHDIR
+            t = "нет предустановленной HASH_DIR: " + PRELOAD_HASHDIR
             webbrowser.open(LINK_DB)
             raise Exception(t)
 
@@ -235,9 +246,9 @@ class JsonData:
             print("Удаляю пользовательский DB_FILE")
             os.remove(DB_FILE)
 
-        if os.path.exists(PRELOADED_DB):
+        if os.path.exists(PRELOAD_DB):
             print("Копирую предустановленный DB_FILE")
-            shutil.copyfile(src="db.db", dst=DB_FILE)
+            shutil.copyfile(src=PRELOAD_DB, dst=DB_FILE)
 
         else:
             t = "Нет предуставновленного DB_FILE: " + DB_FILE

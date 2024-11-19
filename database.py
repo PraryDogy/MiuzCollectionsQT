@@ -15,7 +15,8 @@ THUMBS = sqlalchemy.Table(
     sqlalchemy.Column("mod", sqlalchemy.Integer, comment="Дата изм."),
     sqlalchemy.Column("resol", sqlalchemy.TEXT, comment="1920x1080"),
     sqlalchemy.Column("coll", sqlalchemy.Text, comment="Имя коллекции"),
-    sqlalchemy.Column("fav", sqlalchemy.Integer)
+    sqlalchemy.Column("fav", sqlalchemy.Integer, comment="1 is fav else 0"),
+    sqlalchemy.Column("brand", sqlalchemy.TEXT, comment="miuz, panacea"),
     )
 
 
