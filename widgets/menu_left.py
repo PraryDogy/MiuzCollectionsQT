@@ -158,19 +158,31 @@ class LoadMenus(URunnable):
         return sorted(menus, key = lambda x: x["short_name"])
 
 
-class BaseLeftMenu(QScrollArea):
+class MenuLeft(QFrame):
     coll_btn: CollectionBtn
 
     def __init__(self):
         super().__init__()
-        self.selected_btn: CollectionBtn
-        self.setWidgetResizable(True)
-        self.setObjectName(Names.menu_scrollbar)
+        self.setFixedWidth(MENU_LEFT_WIDTH)
+        self.setObjectName("menu_fake_widget")
         self.setStyleSheet(Themes.current)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        scroll_layout = LayoutVer()
+        scroll_layout.setContentsMargins(10, 0, 0, 0)
+        self.setLayout(scroll_layout)
+
+        self.selected_btn: CollectionBtn
+        SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
+
+        self.scroll_area = QScrollArea()
+
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setObjectName(Names.menu_scrollbar)
+        self.scroll_area.setStyleSheet(Themes.current)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_layout.addWidget(self.scroll_area)
 
         self.setup_task()
-        SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
 
     def menu_left_cmd(self, flag: str):
         """
@@ -224,7 +236,7 @@ class BaseLeftMenu(QScrollArea):
         self.main_wid = QWidget()
         self.main_wid.setObjectName(Names.menu_scrollbar_qwidget)
         self.main_wid.setStyleSheet(Themes.current)
-        self.setWidget(self.main_wid)
+        self.scroll_area.setWidget(self.main_wid)
 
         main_layout = LayoutVer()
         main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -235,8 +247,6 @@ class BaseLeftMenu(QScrollArea):
 
         main_btns_layout = LayoutVer()
         btns_widget.setLayout(main_btns_layout)
-
-        main_btns_layout.setContentsMargins(0, 5, 0, 15)
 
         self.all_colls_btn = CollectionBtn(
             short_name=Dynamic.lang.all_colls,
@@ -278,21 +288,3 @@ class BaseLeftMenu(QScrollArea):
                 coll_btn.normal_style()
 
         main_layout.addSpacerItem(QSpacerItem(0, 5))
-
-
-class MenuLeft(QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setFixedWidth(MENU_LEFT_WIDTH)
-
-        h_lay = LayoutHor()
-        self.setLayout(h_lay)
-
-        fake = QFrame()
-        fake.setFixedWidth(10)
-        fake.setObjectName("menu_fake_widget")
-        fake.setStyleSheet(Themes.current)
-        h_lay.addWidget(fake)
-
-        menu = BaseLeftMenu()
-        h_lay.addWidget(menu)
