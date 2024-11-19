@@ -84,8 +84,7 @@ class LoadImage(URunnable):
 
         if not hasattr(self, "pixmap"):
             print("не могу загрузить крупное изображение")
-            pixmap = QPixmap(1, 1)
-            pixmap.fill(QColor(128, 128, 128))
+            pixmap = QPixmap(0, 0)
 
         if len(LoadImage.images) > 50:
             LoadImage.images.pop(next(iter(LoadImage.images)))
@@ -286,9 +285,7 @@ class WinImageView(WinChild):
 
     def load_thumbnail(self):
 
-        if self.src not in LoadImage.images:
-            self.set_titlebar_title(Dynamic.lang.loading)
-
+        self.set_image_title()
         task = LoadThumb(self.src)
         task.signals_.finished_.connect(self.load_thumb_fin)
         UThreadPool.pool.start(task)
@@ -312,7 +309,6 @@ class WinImageView(WinChild):
         
         elif isinstance(data.pixmap, QPixmap):
             self.image_label.set_image(data.pixmap)
-            self.set_image_title()
 
     def close_(self, *args):
         LoadImage.images.clear()
