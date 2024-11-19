@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutVer
 from base_widgets.context import ContextCustom
-from cfg import (PIXMAP_SIZE, STAR_SYM, TEXT_LENGTH, THUMB_MARGIN, THUMB_W,
-                 NAME_FAVS, JsonData)
+from cfg import (NAME_FAVS, PIXMAP_SIZE, STAR_SYM, TEXT_LENGTH, THUMB_MARGIN,
+                 THUMB_W, JsonData)
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
