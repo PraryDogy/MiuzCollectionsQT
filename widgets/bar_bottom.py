@@ -15,48 +15,37 @@ from .win_downloads import WinDownloads
 from .win_settings import WinSettings
 
 
-class ProgressBar(CustomProgressBar):
+# class ProgressBar(CustomProgressBar):
+#     def __init__(self):
+#         super().__init__()
+#         self.setFixedWidth(100)
+#         self.setMinimum(0)
+#         self.setMaximum(100)
+#         self.set_value(0)
+#         SignalsApp.all_.progressbar_cmd.connect(self.set_value)
+
+#     def set_value(self, value: int):
+
+#         if not isinstance(value, int):
+#             raise Exception ("widgets > bar_bottom > progress bar > value is not int:", type(value))
+        
+#         elif value < 0 or value > 100:
+#             raise Exception ("widgets > bar_bottom > progress bar > wrong value (0-100):", value)
+
+#         self.setValue(value)
+
+#         if self.value() in (0, 100):
+#             self.hide()
+#         elif self.value() > 5:
+#             self.show()
+
+
+class ProgressBar(QLabel):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(100)
-        self.setMinimum(0)
-        self.setMaximum(100)
-        self.set_value(0)
-        SignalsApp.all_.progressbar_set_value.connect(self.set_value)
+        SignalsApp.all_.progressbar_text.connect(self.setText)
 
-    def set_value(self, value: int):
-
-        if not isinstance(value, int):
-            raise Exception ("widgets > bar_bottom > progress bar > value is not int:", type(value))
-        
-        elif value < 0 or value > 100:
-            raise Exception ("widgets > bar_bottom > progress bar > wrong value (0-100):", value)
-
-        self.setValue(value)
-
-        if self.value() in (0, 100):
-            self.hide()
-        elif self.value() > 5:
-            self.show()
-
-# class ProgressBar(QLabel):
-    # def __init__(self):
-    #     super().__init__()
-    #     self.setFixedWidth(100)
-    #     SignalsApp.all_.progressbar_set_value.connect(self.set_value)
-
-    # def set_value(self, value: int):
-
-    #     if not isinstance(value, int):
-    #         raise Exception ("widgets > bar_bottom > progress bar > value is not int:", type(value))
-        
-    #     elif value < 0 or value > 100:
-    #         raise Exception ("widgets > bar_bottom > progress bar > wrong value (0-100):", value)
-
-    #     if self.value() in (0, 100):
-    #         self.hide()
-    #     elif self.value() > 5:
-    #         self.show()
 
         
 class BaseSlider(QSlider):

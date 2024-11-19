@@ -6,7 +6,7 @@ class Signals(QObject):
     btn_dates_style = pyqtSignal(str)
     btn_downloads_toggle = pyqtSignal(str)
     grid_thumbnails_cmd = pyqtSignal(str)
-    progressbar_set_value = pyqtSignal(int)
+    progressbar_text = pyqtSignal(str)
     menu_left_cmd = pyqtSignal(str)
     slider_change_value = pyqtSignal(int)
     thumbnail_select = pyqtSignal(str)

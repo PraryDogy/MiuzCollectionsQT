@@ -1,5 +1,6 @@
 class Rus:
 	add_fav = 'Добавить в избранное'
+	adding = 'Добавляю'
 	all_colls = 'Все коллекции'
 	apply = 'Применить'
 	bar_menu = 'Меню'
@@ -16,6 +17,7 @@ class Rus:
 	d_m_y = 'день.месяц.год'
 	dates = 'Даты'
 	del_fav = 'Удалить из избранного'
+	deleting = 'Удаляю'
 	download_update = 'Скачать обновление'
 	end = 'Конец'
 	fav_coll = 'Избранное'
@@ -23,6 +25,7 @@ class Rus:
 	file_size = 'Размер'
 	filter_name = 'Имя фильтра'
 	filter_value = 'Значение фильтра'
+	from_ = 'из'
 	info = 'Инфо'
 	lang_label = 'Язык/Language'
 	lang_name = 'rus'

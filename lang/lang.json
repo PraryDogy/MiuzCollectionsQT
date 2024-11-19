@@ -3,6 +3,10 @@
         "Добавить в избранное",
         "Add to favorites"
     ],
+    "adding": [
+        "Добавляю",
+        "Add"
+    ],
     "all_colls": [
         "Все коллекции",
         "All collections"
@@ -67,6 +71,10 @@
         "Удалить из избранного",
         "Remove from favorites"
     ],
+    "deleting": [
+        "Удаляю",
+        "Deleting"
+    ],
     "download_update": [
         "Скачать обновление",
         "Update app"
@@ -95,6 +103,10 @@
         "Значение фильтра",
         "Filter value"
     ],
+    "from_": [
+        "из",
+        "from"
+    ],
     "info": [
         "Инфо",
         "Info"
@@ -102,6 +114,10 @@
     "lang_label": [
         "Язык/Language",
         "Language/Язык"
+    ],
+    "lang_name": [
+        "rus",
+        "eng"
     ],
     "loading": [
         "Загрузка...",
@@ -166,10 +182,6 @@
             "8": "august",
             "9": "september"
         }
-    ],
-    "lang_name": [
-        "rus",
-        "eng"
     ],
     "no_connection": [
         "Нет подключения",

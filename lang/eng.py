@@ -1,5 +1,6 @@
 class Eng:
 	add_fav = 'Add to favorites'
+	adding = 'Add'
 	all_colls = 'All collections'
 	apply = 'Apply'
 	bar_menu = 'Menu'
@@ -16,6 +17,7 @@ class Eng:
 	d_m_y = 'day.month.year'
 	dates = 'Dates'
 	del_fav = 'Remove from favorites'
+	deleting = 'Deleting'
 	download_update = 'Update app'
 	end = 'End'
 	fav_coll = 'Favorites'
@@ -23,6 +25,7 @@ class Eng:
 	file_size = 'Size'
 	filter_name = 'Filter name'
 	filter_value = 'Filter value'
+	from_ = 'from'
 	info = 'Info'
 	lang_label = 'Language/Язык'
 	lang_name = 'eng'

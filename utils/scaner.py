@@ -6,7 +6,7 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from cfg import BRANDS, IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
+from cfg import BRANDS, IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData, Dynamic
 from database import THUMBS, Dbase
 from signals import SignalsApp
 
@@ -17,9 +17,9 @@ class ScanerUtils:
     can_scan = True
 
     @classmethod
-    def progressbar_value(cls, value: int):
+    def progressbar_text(cls, text: str):
         try:
-            SignalsApp.all_.progressbar_set_value.emit(value)
+            SignalsApp.all_.progressbar_text.emit(text)
         except RuntimeError as e:
             pass
             # Utils.print_err(error=e)
@@ -49,18 +49,12 @@ class FinderImages:
             i not in JsonData.stop_colls
             ]
 
-        if not collections:
-            collections = [JsonData.coll_folder]
-            step_value = 60
-        else:
-            step_value = round(60 / len(collections))
+        ln_ = len(collection)
 
-        step_value_temp = 0
-
-        for collection in collections:
+        for x, collection in enumerate(collections, start=1):
             
-            step_value_temp += step_value
-            ScanerUtils.progressbar_value(step_value_temp)
+            t = f"{Dynamic.lang.collection} {x} {Dynamic.lang.from_} {ln_}"
+            ScanerUtils.progressbar_text(t)
 
             try:
                 walked = self.walk_collection(collection)
@@ -178,9 +172,9 @@ class DbUpdater:
         self.hash_images: list[tuple[str, ndarray]] = []
 
     def run(self):
-        ScanerUtils.progressbar_value(70)
+        ScanerUtils.progressbar_text(70)
         self.del_db()
-        ScanerUtils.progressbar_value(90)
+        ScanerUtils.progressbar_text(90)
         self.insert_db()
 
     def del_db(self):
@@ -388,7 +382,7 @@ class ScanerShedule(QObject):
         self.scaner_thread = None
         self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
         Dbase.vacuum()
-        ScanerUtils.progressbar_value(100)
+        ScanerUtils.progressbar_text(100)
 
 
 class Scaner:
