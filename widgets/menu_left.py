@@ -174,7 +174,7 @@ class BaseLeftMenu(QScrollArea):
 
     def menu_left_cmd(self, flag: str):
         """
-        Handles the signal with a flag.
+        Handles the signal `SignalsApp.all_.menu_left_cmd` with a flag.
         
         :param flag: Allowed values are "one" and "two".
         """
