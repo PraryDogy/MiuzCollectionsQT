@@ -75,13 +75,14 @@ class LoadImage(URunnable):
             if not self.src.endswith(PSD_TIFF):
                 img = Utils.array_color(img, "BGR")
 
-            pixmap = Utils.pixmap_from_array(img)
-            LoadImage.images[self.src] = pixmap
+            if img is not None:
+                pixmap = Utils.pixmap_from_array(img)
+                LoadImage.images[self.src] = pixmap
 
         else:
             pixmap = LoadImage.images.get(self.src)
 
-        if pixmap is None:
+        if not hasattr(self, "pixmap"):
             print("не могу загрузить крупное изображение")
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(128, 128, 128))
