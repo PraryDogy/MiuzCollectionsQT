@@ -28,6 +28,8 @@ class Title(QLabel):
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
+        print(is_layers, save_as)
+
         if Utils.smb_check():
 
             if is_layers:
@@ -90,7 +92,7 @@ class Title(QLabel):
         save_jpg.triggered.connect(cmd_)
         menu_.addAction(save_jpg)
 
-        lambda: self.save_cmd(is_layers=True, save_as=False)
+        cmd_ = lambda: self.save_cmd(is_layers=True, save_as=False)
         save_layers = QAction(text=Dynamic.lang.save_all_layers, parent=menu_)
         save_layers.triggered.connect(cmd_)
         menu_.addAction(save_layers)
