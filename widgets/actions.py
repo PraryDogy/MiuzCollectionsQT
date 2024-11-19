@@ -18,11 +18,19 @@ from .win_smb import WinSmb
 class OpenWins:
 
     @classmethod
-    def info_db(cls, parent_: QWidget | QMainWindow, short_src: str):
+    def info_db(cls, parent_: QMainWindow, short_src: str):
+
+        if not isinstance(parent_, QMainWindow):
+            raise TypeError
+
         WinInfo(parent=parent_, short_src=short_src)
 
     @classmethod
-    def smb(cls, parent_: QWidget | QMainWindow):
+    def smb(cls, parent_: QMainWindow):
+
+        if not isinstance(parent_, QMainWindow):
+            raise TypeError
+
         smb_win = WinSmb()
         smb_win.center_relative_parent(parent_)
         smb_win.show()
@@ -37,13 +45,13 @@ class OpenWins:
 class OpenInView(QAction):
     _clicked = pyqtSignal()
 
-    def __init__(self, parent_: QMenu, short_src: str):
+    def __init__(self, parent_: QMenu):
         super().__init__(parent=parent_, text=Dynamic.lang.view)
         self.triggered.connect(self._clicked.emit)
 
 
 class ScanerRestart(QAction):
-    def __init__(self, parent: QMenu, full_src: str):
+    def __init__(self, parent: QMenu):
         super().__init__(parent=parent, text=Dynamic.lang.reload_gui)
         self.triggered.connect(self.cmd)
 
@@ -68,9 +76,10 @@ class OpenInfoDb(QAction):
 
 
 class CopyPath(QAction):
-    def __init__(self, parent: QMenu, full_src: str):
+    def __init__(self, parent: QMenu, win: QMainWindow, full_src: str):
         super().__init__(parent=parent, text=Dynamic.lang.copy_path)
         self.parent_ = parent
+        self.win_ = win
         self.full_src = full_src
         self.triggered.connect(self.cmd)
 
@@ -78,21 +87,22 @@ class CopyPath(QAction):
         if Utils.smb_check():
             Utils.copy_text(text=self.full_src)
         else:
-            OpenWins.smb(parent_=self.parent_)
+            OpenWins.smb(parent_=self.win_)
 
 
 class Reveal(QAction):
-    def __init__(self, parent: QMenu, full_src: str):
+    def __init__(self, parent: QMenu, win: QMainWindow, full_src: str):
         super().__init__(parent=parent, text=Dynamic.lang.reveal_in_finder)
         self.full_src = full_src
         self.parent_ = parent
+        self.win_ = win
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
         if Utils.smb_check():
             Utils.reveal_files([self.full_src])
         else:
-            OpenWins.smb(parent_=self.parent_)
+            OpenWins.smb(parent_=self.win_)
 
 
 class WorkerSignals(QObject):
@@ -149,7 +159,7 @@ class FavActionDb(QAction):
 
 
 class Save(QAction):
-    def __init__(self, parent: QMenu, full_src: str, save_as: bool):
+    def __init__(self, parent: QMenu, win: QMainWindow, full_src: str, save_as: bool):
 
         if save_as:
             text: str = Dynamic.lang.save_image_in
@@ -161,6 +171,7 @@ class Save(QAction):
         self.save_as = save_as
         self.full_src = full_src
         self.parent_ = parent
+        self.win_ = win
 
     def cmd_(self):
         if Utils.smb_check():
@@ -173,7 +184,7 @@ class Save(QAction):
             if dest:
                 self.copy_files_cmd(dest=dest, full_src=self.full_src)
         else:
-            OpenWins.smb(parent_=self.parent_)
+            OpenWins.smb(parent_=self.win_)
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
 

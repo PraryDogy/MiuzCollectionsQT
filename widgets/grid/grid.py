@@ -340,7 +340,7 @@ class Grid(QScrollArea):
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.menu_ = ContextCustom(event=a0)
 
-        reload = ScanerRestart(self.menu_, "")
+        reload = ScanerRestart(self.menu_)
         self.menu_.addAction(reload)
 
         self.menu_.show_menu()

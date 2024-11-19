@@ -166,7 +166,7 @@ class Thumbnail(QFrame):
             menu_ = ContextCustom(event=ev)
 
             cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
-            view = OpenInView(parent_=menu_, short_src=self.short_src)
+            view = OpenInView(parent_=menu_)
             view._clicked.connect(cmd_)
             menu_.addAction(view)
 
@@ -189,10 +189,10 @@ class Thumbnail(QFrame):
 
             full_src = Utils.get_full_src(self.short_src)
 
-            copy = CopyPath(parent=menu_, full_src=full_src)
+            copy = CopyPath(parent=menu_, win=self.window(), full_src=full_src)
             menu_.addAction(copy)
 
-            reveal = Reveal(parent=menu_, full_src=full_src)
+            reveal = Reveal(parent=menu_, win=self.window(), full_src=full_src)
             menu_.addAction(reveal)
 
             save_as = Save(parent=menu_, full_src=full_src, save_as=True)
@@ -203,7 +203,7 @@ class Thumbnail(QFrame):
 
             menu_.addSeparator()
 
-            reload = ScanerRestart(parent=menu_, full_src=full_src)
+            reload = ScanerRestart(parent=menu_)
             menu_.addAction(reload)
 
             self.select.emit(self.short_src)

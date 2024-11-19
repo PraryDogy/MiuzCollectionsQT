@@ -401,10 +401,10 @@ class WinImageView(WinChild):
 
             self.menu_.addSeparator()
 
-            copy = CopyPath(parent=self.menu_, full_src=self.src)
+            copy = CopyPath(parent=self.menu_, win=self, full_src=self.src)
             self.menu_.addAction(copy)
 
-            reveal = Reveal(parent=self.menu_, full_src=self.src)
+            reveal = Reveal(parent=self.menu_, win=self.window(), full_src=self.src)
             self.menu_.addAction(reveal)
 
             save_as = Save(parent=self.menu_, full_src=self.src, save_as=True)
