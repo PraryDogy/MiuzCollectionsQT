@@ -391,26 +391,26 @@ class WinImageView(WinChild):
         try:
             self.menu_ = ContextCustom(event=ev)
 
-            info = OpenInfoDb(parent=self, short_src=self.src)
+            info = OpenInfoDb(parent=self.menu_, win=self, short_src=self.src)
             self.menu_.addAction(info)
 
             wid = Thumbnail.path_to_wid.get(self.src)
-            self.fav_action = FavActionDb(parent=self, short_src=wid.short_src, fav_value=wid.fav_value)
+            self.fav_action = FavActionDb(parent=self.menu_, short_src=wid.short_src, fav_value=wid.fav_value)
             self.fav_action.finished_.connect(self.change_fav)
             self.menu_.addAction(self.fav_action)
 
             self.menu_.addSeparator()
 
-            copy = CopyPath(parent=self, full_src=self.src)
+            copy = CopyPath(parent=self.menu_, full_src=self.src)
             self.menu_.addAction(copy)
 
-            reveal = Reveal(parent=self, full_src=self.src)
+            reveal = Reveal(parent=self.menu_, full_src=self.src)
             self.menu_.addAction(reveal)
 
-            save_as = Save(parent=self, full_src=self.src, save_as=True)
+            save_as = Save(parent=self.menu_, full_src=self.src, save_as=True)
             self.menu_.addAction(save_as)
 
-            save = Save(parent=self, full_src=self.src, save_as=False)
+            save = Save(parent=self.menu_, full_src=self.src, save_as=False)
             self.menu_.addAction(save)
 
             self.menu_.show_menu()

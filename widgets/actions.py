@@ -18,7 +18,7 @@ from .win_smb import WinSmb
 class OpenWins:
 
     @classmethod
-    def info_db(cls, parent_: QWidget, short_src: str):
+    def info_db(cls, parent_: QWidget | QMainWindow, short_src: str):
         WinInfo(parent=parent_, short_src=short_src)
 
     @classmethod
@@ -53,15 +53,16 @@ class ScanerRestart(QAction):
 
 
 class OpenInfoDb(QAction):
-    def __init__(self, parent: QMenu, short_src: str):
+    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
         super().__init__(parent=parent, text=Dynamic.lang.info)
         self.parent_ = parent
+        self.win_ = win
         self.short_src = short_src
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
         if Utils.smb_check():
-            OpenWins.info_db(parent_=self.parent_, short_src=self.short_src)
+            OpenWins.info_db(parent_=self.win_, short_src=self.short_src)
         else:
             OpenWins.smb(parent_=self.parent_)
 

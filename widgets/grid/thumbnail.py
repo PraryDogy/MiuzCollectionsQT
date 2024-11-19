@@ -170,7 +170,11 @@ class Thumbnail(QFrame):
             view._clicked.connect(cmd_)
             menu_.addAction(view)
 
-            info = OpenInfoDb(parent=menu_, short_src=self.short_src)
+            info = OpenInfoDb(
+                parent=menu_,
+                win=self.window(),
+                short_src=self.short_src
+                )
             menu_.addAction(info)
 
             self.fav_action = FavActionDb(
