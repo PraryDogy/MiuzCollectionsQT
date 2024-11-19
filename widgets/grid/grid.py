@@ -159,7 +159,7 @@ class Grid(QScrollArea):
         
             wid = Thumbnail(
                 pixmap=db_image.pixmap,
-                src=db_image.src,
+                src=db_image.short_src,
                 coll=db_image.coll,
                 fav=db_image.fav
                 )

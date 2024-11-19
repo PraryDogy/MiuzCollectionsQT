@@ -12,10 +12,10 @@ from utils.utils import URunnable, Utils
 
 
 class DbImage:
-    __slots__ = ["pixmap", "src", "coll", "fav"]
-    def __init__(self, pixmap: QPixmap, src: str, coll: str, fav: int):
+    __slots__ = ["pixmap", "short_src", "coll", "fav"]
+    def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         self.pixmap = pixmap
-        self.src = src
+        self.short_src = short_src
         self.coll = coll
         self.fav = fav
 
@@ -59,7 +59,7 @@ class DbImages(URunnable):
             self.signals_.finished_.emit(thumbs_dict)
             return
 
-        for src, hash_path, mod, coll, fav in res:
+        for short_src, hash_path, mod, coll, fav in res:
 
             mod = datetime.fromtimestamp(mod).date()
             array_img = Utils.read_image_hash(hash_path)
@@ -78,7 +78,7 @@ class DbImages(URunnable):
             else:
                 mod = f"{Dynamic.lang.months[str(mod.month)]} {mod.year}"
 
-            thumbs_dict[mod].append(DbImage(pixmap, src, coll, fav))
+            thumbs_dict[mod].append(DbImage(pixmap, short_src, coll, fav))
 
         self.signals_.finished_.emit(thumbs_dict)
 
