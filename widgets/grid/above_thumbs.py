@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer
-from cfg import NAME_ALL_COLLS, GRID_LIMIT, Dynamic, JsonData
+from cfg import NAME_ALL_COLLS, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
 

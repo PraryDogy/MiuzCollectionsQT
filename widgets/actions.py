@@ -48,8 +48,8 @@ class CustomAction(QAction):
 
 
 class OpenInView(CustomAction):
-    def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lang.view)
+    def __init__(self, parent: QWidget, short_src: str):
+        super().__init__(parent, short_src, Dynamic.lang.view)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -57,8 +57,8 @@ class OpenInView(CustomAction):
 
 
 class ReloadGui(CustomAction):
-    def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lang.reload_gui)
+    def __init__(self, parent: QWidget, full_src: str):
+        super().__init__(parent, full_src, Dynamic.lang.reload_gui)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -66,9 +66,9 @@ class ReloadGui(CustomAction):
         Scaner.start()
 
 
-class OpenInfo(CustomAction):
-    def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lang.info)
+class OpenInfoDb(CustomAction):
+    def __init__(self, parent: QWidget, short_src: str):
+        super().__init__(parent, short_src, Dynamic.lang.info)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -79,8 +79,8 @@ class OpenInfo(CustomAction):
 
 
 class CopyPath(CustomAction):
-    def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lang.copy_path)
+    def __init__(self, parent: QWidget, full_src: str):
+        super().__init__(parent, full_src, Dynamic.lang.copy_path)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -90,8 +90,8 @@ class CopyPath(CustomAction):
             Shared.show_smb(self.parent_)
 
 class Reveal(CustomAction):
-    def __init__(self, parent: QWidget, src: str):
-        super().__init__(parent, src, Dynamic.lang.reveal_in_finder)
+    def __init__(self, parent: QWidget, full_src: str):
+        super().__init__(parent, full_src, Dynamic.lang.reveal_in_finder)
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -131,20 +131,20 @@ class FavTask(URunnable):
         conn.close()
 
 
-class FavAction(CustomAction):
+class FavActionDb(CustomAction):
     finished_ = pyqtSignal(int)
 
-    def __init__(self, parent: QWidget, src: str, fav:  int):
+    def __init__(self, parent: QWidget, short_src: str, fav_value:  int):
 
-        if fav == 0 or fav is None:
+        if fav_value == 0 or fav_value is None:
             t = Dynamic.lang.add_fav
             self.value = 1
 
-        elif fav == 1:
+        elif fav_value == 1:
             t = Dynamic.lang.del_fav
             self.value = 0
 
-        super().__init__(parent, src, t)
+        super().__init__(parent, short_src, t)
         self.triggered.connect(self.cmd_)
 
     def cmd_(self):
@@ -154,14 +154,14 @@ class FavAction(CustomAction):
 
 
 class Save(CustomAction):
-    def __init__(self, parent: QWidget, src: str, save_as: bool):
+    def __init__(self, parent: QWidget, full_src: str, save_as: bool):
 
         if save_as:
             text: str = Dynamic.lang.save_image_in
         else:
             text: str = Dynamic.lang.save_image_downloads
 
-        super().__init__(parent, src, text)
+        super().__init__(parent, full_src, text)
         self.triggered.connect(self.cmd_)
         self.save_as = save_as
 

@@ -305,7 +305,7 @@ class Utils:
             return None
         
     @classmethod
-    def get_fullpath(cls, src: str) -> str:
+    def get_full_src(cls, src: str) -> str:
         return JsonData.coll_folder + src
     
     @classmethod

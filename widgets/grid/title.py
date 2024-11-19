@@ -57,9 +57,17 @@ class CustomContext(ContextCustom):
         if Utils.smb_check():
 
             if is_layers:
-                images = [i.short_src for i in self.files_list if i.short_src.endswith(PSD_TIFF)]
+                images = [
+                    Utils.get_full_src(i.short_src)
+                    for i in self.files_list
+                    if i.short_src.endswith(PSD_TIFF)
+                    ]
             else:
-                images = [i.short_src for i in self.files_list if not i.short_src.endswith(PSD_TIFF)]
+                images = [
+                    Utils.get_full_src(i.short_src)
+                    for i in self.files_list
+                    if not i.short_src.endswith(PSD_TIFF)
+                    ]
 
             if save_as:
                 self.dialog = QFileDialog()

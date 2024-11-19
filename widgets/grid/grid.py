@@ -159,7 +159,7 @@ class Grid(QScrollArea):
         
             wid = Thumbnail(
                 pixmap=db_image.pixmap,
-                src=db_image.short_src,
+                short_src=db_image.short_src,
                 coll=db_image.coll,
                 fav=db_image.fav
                 )
@@ -237,7 +237,7 @@ class Grid(QScrollArea):
     def add_widget_data(self, wid: Thumbnail, row: int, col: int):
         wid.row, wid.col = row, col
         self.cell_to_wid[row, col] = wid
-        Thumbnail.path_to_wid[wid.src] = wid
+        Thumbnail.path_to_wid[wid.short_src] = wid
 
     def reset_widget_data(self):
         self.curr_cell: tuple = (0, 0)
@@ -246,11 +246,11 @@ class Grid(QScrollArea):
         Thumbnail.path_to_wid.clear()
 
     def open_in_view(self, wid: Thumbnail):
-        wid = Thumbnail.path_to_wid.get(wid.src)
+        wid = Thumbnail.path_to_wid.get(wid.short_src)
 
         if isinstance(wid, Thumbnail):
             from ..win_image_view import WinImageView
-            self.win_image_view = WinImageView(src=wid.src)
+            self.win_image_view = WinImageView(short_src=wid.short_src)
             self.win_image_view.center_relative_parent(self)
             self.win_image_view.show()
 
@@ -299,7 +299,7 @@ class Grid(QScrollArea):
             wid = self.cell_to_wid.get(self.curr_cell)
 
             if Utils.smb_check():
-                OpenWins.info(self, wid.src)
+                OpenWins.info(self, wid.short_src)
             else:
                 self.smb_win = WinSmb()
                 self.smb_win.center_relative_parent(self)

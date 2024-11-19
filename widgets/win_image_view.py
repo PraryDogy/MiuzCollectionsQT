@@ -15,7 +15,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
 
-from .actions import CopyPath, OpenInfo, OpenWins, Reveal, Save, FavAction
+from .actions import CopyPath, OpenInfoDb, OpenWins, Reveal, Save, FavActionDb
 from .grid.thumbnail import Thumbnail
 from .win_smb import WinSmb
 
@@ -231,7 +231,7 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinChild):
-    def __init__(self, src: str):
+    def __init__(self, short_src: str):
         super().__init__()
 
         self.close_btn_cmd(self.close_)
@@ -244,7 +244,7 @@ class WinImageView(WinChild):
         self.content_wid.setObjectName("img_view_bg")
         self.content_wid.setStyleSheet(Themes.current)
 
-        self.src = src
+        self.src = short_src
         self.all_images = list(Thumbnail.path_to_wid.keys())
 
         self.collection = None
@@ -391,26 +391,26 @@ class WinImageView(WinChild):
         try:
             self.menu_ = ContextCustom(event=ev)
 
-            info = OpenInfo(parent=self, src=self.src)
+            info = OpenInfoDb(parent=self, short_src=self.src)
             self.menu_.addAction(info)
 
             wid = Thumbnail.path_to_wid.get(self.src)
-            self.fav_action = FavAction(parent=self, src=wid.src, fav=wid.fav)
+            self.fav_action = FavActionDb(parent=self, short_src=wid.short_src, fav_value=wid.fav_value)
             self.fav_action.finished_.connect(self.change_fav)
             self.menu_.addAction(self.fav_action)
 
             self.menu_.addSeparator()
 
-            copy = CopyPath(parent=self, src=self.src)
+            copy = CopyPath(parent=self, full_src=self.src)
             self.menu_.addAction(copy)
 
-            reveal = Reveal(parent=self, src=self.src)
+            reveal = Reveal(parent=self, full_src=self.src)
             self.menu_.addAction(reveal)
 
-            save_as = Save(parent=self, src=self.src, save_as=True)
+            save_as = Save(parent=self, full_src=self.src, save_as=True)
             self.menu_.addAction(save_as)
 
-            save = Save(parent=self, src=self.src, save_as=False)
+            save = Save(parent=self, full_src=self.src, save_as=False)
             self.menu_.addAction(save)
 
             self.menu_.show_menu()

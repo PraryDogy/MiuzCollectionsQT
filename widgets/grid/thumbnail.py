@@ -12,7 +12,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
 
-from ..actions import (CopyPath, FavAction, OpenInfo, OpenInView, ReloadGui,
+from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, ReloadGui,
                        Reveal, Save)
 
 
@@ -44,21 +44,21 @@ class Thumbnail(QFrame):
     select = pyqtSignal(str)
     path_to_wid: dict[str, "Thumbnail"] = {}
 
-    def __init__(self, pixmap: QPixmap, src: str, coll: str, fav: int):
+    def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         super().__init__()
         self.setObjectName(Names.thumbnail_normal)
         self.setStyleSheet(Themes.current)
 
         self.img = pixmap
 
-        self.src = src
+        self.short_src = short_src
         self.coll = coll
-        self.fav = fav
+        self.fav_value = fav
 
         if fav == 0 or fav is None:
-            self.name = os.path.basename(src)
+            self.name = os.path.basename(short_src)
         elif fav == 1:
-            self.name = STAR_SYM + os.path.basename(src)
+            self.name = STAR_SYM + os.path.basename(short_src)
         
         self.row, self.col = 0, 0
 
@@ -111,11 +111,11 @@ class Thumbnail(QFrame):
 
     def change_fav(self, value: int):
         if value == 0:
-            self.fav = value
-            self.name = os.path.basename(self.src)
+            self.fav_value = value
+            self.name = os.path.basename(self.short_src)
         elif value == 1:
-            self.fav = value
-            self.name = STAR_SYM + os.path.basename(self.src)
+            self.fav_value = value
+            self.name = STAR_SYM + os.path.basename(self.short_src)
 
         self.name_label.name = self.name
         self.name_label.set_text()
@@ -124,12 +124,12 @@ class Thumbnail(QFrame):
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
-        self.select.emit(self.src)
+        self.select.emit(self.short_src)
         SignalsApp.all_.win_img_view_open_in.emit(self)
         # return super().mouseDoubleClickEvent(a0)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        self.select.emit(self.src)
+        self.select.emit(self.short_src)
 
         # return super().mouseReleaseEvent(ev)
 
@@ -147,12 +147,12 @@ class Thumbnail(QFrame):
         if distance < QApplication.startDragDistance():
             return
 
-        self.select.emit(self.src)
+        self.select.emit(self.short_src)
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
         self.drag.setPixmap(self.img_label.pixmap())
         
-        fullpath = Utils.get_fullpath(self.src)
+        fullpath = Utils.get_full_src(self.short_src)
         url = [QUrl.fromLocalFile(fullpath)]
         self.mime_data.setUrls(url)
 
@@ -165,36 +165,42 @@ class Thumbnail(QFrame):
         try:
             menu_ = ContextCustom(event=ev)
 
-            view = OpenInView(parent=self, src=self.src)
+            view = OpenInView(parent=self, short_src=self.short_src)
             menu_.addAction(view)
 
-            info = OpenInfo(parent=self, src=self.src)
+            info = OpenInfoDb(parent=self, short_src=self.short_src)
             menu_.addAction(info)
 
-            self.fav_action = FavAction(parent=self, src=self.src, fav=self.fav)
+            self.fav_action = FavActionDb(
+                parent=self,
+                short_src=self.short_src,
+                fav_value=self.fav_value
+                )
             self.fav_action.finished_.connect(self.change_fav)
             menu_.addAction(self.fav_action)
 
             menu_.addSeparator()
 
-            copy = CopyPath(parent=self, src=self.src)
+            full_src = Utils.get_full_src(self.short_src)
+
+            copy = CopyPath(parent=self, full_src=full_src)
             menu_.addAction(copy)
 
-            reveal = Reveal(parent=self, src=self.src)
+            reveal = Reveal(parent=self, full_src=full_src)
             menu_.addAction(reveal)
 
-            save_as = Save(parent=self, src=self.src, save_as=True)
+            save_as = Save(parent=self, full_src=full_src, save_as=True)
             menu_.addAction(save_as)
 
-            save = Save(parent=self, src=self.src, save_as=False)
+            save = Save(parent=self, full_src=full_src, save_as=False)
             menu_.addAction(save)
 
             menu_.addSeparator()
 
-            reload = ReloadGui(parent=self, src=self.src)
+            reload = ReloadGui(parent=self, full_src=full_src)
             menu_.addAction(reload)
 
-            self.select.emit(self.src)
+            self.select.emit(self.short_src)
             menu_.show_menu()
 
             # return super().contextMenuEvent(ev)

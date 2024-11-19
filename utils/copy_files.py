@@ -16,6 +16,7 @@ class CopyFiles(URunnable):
     current_threads: list["CopyFiles"] = []
 
     def __init__(self, dest: str, files: list):
+        "files: list of FULL SRC "
         super().__init__()
         self.signals_ = WorkerSignals()
         self.signals_.stop.connect(self.stop_copying)
