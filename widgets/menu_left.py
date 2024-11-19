@@ -20,20 +20,20 @@ from .win_smb import WinSmb
 class CollectionBtn(QLabel):
     pressed_ = pyqtSignal()
 
-    def __init__(self, fake_name: str, true_name: str):
-        super().__init__(text=fake_name)
-        self.true_name = true_name
-        self.fake_name = fake_name
+    def __init__(self, short_name: str, coll_name: str):
+        super().__init__(text=short_name)
+        self.coll_name = coll_name
+        self.fake_name = short_name
 
         btn_w = MENU_LEFT_WIDTH - 20 - 5
         self.setFixedSize(btn_w, 28)
 
     def reveal_collection(self, *args):
 
-        if self.true_name in (NAME_ALL_COLLS, NAME_FAVS):
+        if self.coll_name in (NAME_ALL_COLLS, NAME_FAVS):
             coll = JsonData.coll_folder
         else:
-            coll = os.path.join(JsonData.coll_folder, self.true_name)
+            coll = os.path.join(JsonData.coll_folder, self.coll_name)
 
         if Utils.smb_check():
             if os.path.exists(coll):
@@ -115,18 +115,18 @@ class LoadMenus(URunnable):
             print("widgets > left menu > load db colls > row is empty")
             return menus
 
-        for true_name in res:
-            fake_name = true_name.lstrip("0123456789").strip()
-            fake_name = fake_name if fake_name else true_name
+        for coll_name in res:
+            fake_name = coll_name.lstrip("0123456789").strip()
+            fake_name = fake_name if fake_name else coll_name
 
             menus.append(
                 {
-                    "fake_name": fake_name,
-                    "true_name": true_name
+                    "short_name": fake_name,
+                    "coll_name": coll_name
                 }
             )
 
-        return sorted(menus, key = lambda x: x["fake_name"])
+        return sorted(menus, key = lambda x: x["short_name"])
 
 
 class BaseLeftMenu(QScrollArea):
@@ -163,7 +163,7 @@ class BaseLeftMenu(QScrollArea):
         UThreadPool.pool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollectionBtn):
-        JsonData.curr_coll = btn.true_name
+        JsonData.curr_coll = btn.coll_name
         Dynamic.grid_offset = 0
         SignalsApp.all_.win_main_cmd.emit("set_title")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
@@ -196,23 +196,23 @@ class BaseLeftMenu(QScrollArea):
         main_btns_layout.setContentsMargins(0, 5, 0, 15)
 
         self.all_colls_btn = CollectionBtn(
-            fake_name=Dynamic.lang.all_colls,
-            true_name=NAME_ALL_COLLS
+            short_name=Dynamic.lang.all_colls,
+            coll_name=NAME_ALL_COLLS
             )
         cmd_ = lambda: self.collection_btn_cmd(self.all_colls_btn)
         self.all_colls_btn.pressed_.connect(cmd_)
         main_btns_layout.addWidget(self.all_colls_btn)
 
         favs_btn = CollectionBtn(
-            fake_name=Dynamic.lang.fav_coll,
-            true_name=NAME_FAVS
+            short_name=Dynamic.lang.fav_coll,
+            coll_name=NAME_FAVS
             )
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
         main_btns_layout.addWidget(favs_btn)
 
         for i in (self.all_colls_btn, favs_btn):
-            if i.true_name == JsonData.curr_coll:
+            if i.coll_name == JsonData.curr_coll:
                 i.selected_style()
                 self.selected_btn = i
             else:
@@ -221,14 +221,14 @@ class BaseLeftMenu(QScrollArea):
         for data in menus:
 
             coll_btn = CollectionBtn(
-                fake_name=data.get("fake_name"),
-                true_name=data.get("true_name")
+                short_name=data.get("short_name"),
+                coll_name=data.get("coll_name")
                 )
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
             coll_btn.pressed_.connect(cmd_)
             main_layout.addWidget(coll_btn)
 
-            if coll_btn.true_name == JsonData.curr_coll:
+            if coll_btn.coll_name == JsonData.curr_coll:
                 coll_btn.selected_style()
                 self.selected_btn = coll_btn
             else:
