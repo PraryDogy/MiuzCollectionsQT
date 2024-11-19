@@ -78,7 +78,7 @@ DATA_FILES = [
     include_files("applescripts"),
     include_files("styles"),
     include_files("icon"),
-    include_files("_preload")
+    include_files("_preload"),
     ]
 
 
