@@ -12,7 +12,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import Utils
 
-from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, ReloadGui,
+from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, ScanerRestart,
                        Reveal, Save)
 
 
@@ -165,14 +165,16 @@ class Thumbnail(QFrame):
         try:
             menu_ = ContextCustom(event=ev)
 
-            view = OpenInView(parent=self, short_src=self.short_src)
+            cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
+            view = OpenInView(parent_=menu_, short_src=self.short_src)
+            view._clicked.connect(cmd_)
             menu_.addAction(view)
 
-            info = OpenInfoDb(parent=self, short_src=self.short_src)
+            info = OpenInfoDb(parent=menu_, short_src=self.short_src)
             menu_.addAction(info)
 
             self.fav_action = FavActionDb(
-                parent=self,
+                parent=menu_,
                 short_src=self.short_src,
                 fav_value=self.fav_value
                 )
@@ -183,21 +185,21 @@ class Thumbnail(QFrame):
 
             full_src = Utils.get_full_src(self.short_src)
 
-            copy = CopyPath(parent=self, full_src=full_src)
+            copy = CopyPath(parent=menu_, full_src=full_src)
             menu_.addAction(copy)
 
-            reveal = Reveal(parent=self, full_src=full_src)
+            reveal = Reveal(parent=menu_, full_src=full_src)
             menu_.addAction(reveal)
 
-            save_as = Save(parent=self, full_src=full_src, save_as=True)
+            save_as = Save(parent=menu_, full_src=full_src, save_as=True)
             menu_.addAction(save_as)
 
-            save = Save(parent=self, full_src=full_src, save_as=False)
+            save = Save(parent=menu_, full_src=full_src, save_as=False)
             menu_.addAction(save)
 
             menu_.addSeparator()
 
-            reload = ReloadGui(parent=self, full_src=full_src)
+            reload = ScanerRestart(parent=menu_, full_src=full_src)
             menu_.addAction(reload)
 
             self.select.emit(self.short_src)

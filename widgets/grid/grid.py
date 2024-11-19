@@ -8,7 +8,7 @@ from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import UThreadPool, Utils
 
-from ..actions import OpenWins, ReloadGui
+from ..actions import OpenWins, ScanerRestart
 from ..win_smb import WinSmb
 from ._db_images import DbImage, DbImages
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
@@ -340,7 +340,7 @@ class Grid(QScrollArea):
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.menu_ = ContextCustom(event=a0)
 
-        reload = ReloadGui(self.menu_, "")
+        reload = ScanerRestart(self.menu_, "")
         self.menu_.addAction(reload)
 
         self.menu_.show_menu()

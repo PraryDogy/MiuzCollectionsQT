@@ -160,6 +160,7 @@ class WinFrameless(QMainWindow, QObject):
         Manager.wins.append(self)
 
     def center_relative_parent(self, parent: QWidget | QMainWindow):
+
         if not isinstance(parent, QMainWindow):
             parent = parent.window()
 
