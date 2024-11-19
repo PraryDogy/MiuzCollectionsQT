@@ -275,6 +275,7 @@ class WinImageView(WinChild):
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
 
     def on_load(self):
+
         if not Utils.smb_check():
             self.win_smb = WinSmb()
             self.win_smb.center_relative_parent(self)
