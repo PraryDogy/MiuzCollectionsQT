@@ -119,8 +119,8 @@ class Lng_:
         "Language/Язык"
     ]
     lang_name = [
-        "rus",
-        "eng"
+        "Русский",
+        "English"
     ]
     loading = [
         "Загрузка...",
