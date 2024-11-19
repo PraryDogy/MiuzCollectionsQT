@@ -21,14 +21,28 @@ class CollectionBtn(QLabel):
     pressed_ = pyqtSignal()
 
     def __init__(self, short_name: str, coll_name: str):
+        """
+        Initializes the CollectionBtn widget.
+
+        :param short_name: The short version of the collection name, stripped of initial digits and symbols.
+        :param coll_name: The full name of the collection.
+        """
+
         super().__init__(text=short_name)
         self.coll_name = coll_name
-        self.fake_name = short_name
+        self.short_name = short_name
 
         btn_w = MENU_LEFT_WIDTH - 20 - 5
         self.setFixedSize(btn_w, 28)
 
-    def reveal_collection(self, *args):
+    def reveal_collection(self, *args) -> None:
+        """
+        Opens the collection folder if it exists and SMB check passes, 
+        otherwise shows an SMB connection window.
+
+        :param args: Additional arguments (unused).
+        :return: None
+        """
 
         if self.coll_name in (NAME_ALL_COLLS, NAME_FAVS):
             coll = JsonData.coll_folder
