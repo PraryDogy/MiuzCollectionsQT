@@ -144,7 +144,11 @@ class BaseLeftMenu(QScrollArea):
         SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
 
     def menu_left_cmd(self, flag: str):
-        """flag: reload, select_all_colls"""
+        """
+        Handles the signal with a flag.
+        
+        :param flag: Allowed values are "one" and "two".
+        """
 
         if flag == "reload":
             self.setup_task()
