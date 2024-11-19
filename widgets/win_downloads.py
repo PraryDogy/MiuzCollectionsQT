@@ -96,7 +96,7 @@ class WinDownloads(WinChild):
 
                 copy_task: CopyFiles
 
-                if copy_task not in self.copy_threads and copy_task.isRunning():
+                if copy_task not in self.copy_threads and copy_task.is_running:
                     t = self.cut_text(copy_task.get_current_file())
                     copy_wid = Progresser(text=t)
                     self.progress_layout.addWidget(copy_wid)
