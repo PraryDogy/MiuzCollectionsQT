@@ -98,7 +98,7 @@ class Lng_:
         "Размер",
         "Size"
     ]
-    filter_name = [
+    filter_rename_win_title = [
         "Имя фильтра",
         "Filter name"
     ]

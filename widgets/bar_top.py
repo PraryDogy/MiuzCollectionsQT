@@ -14,10 +14,6 @@ from .win_dates import WinDates
 BTN_W, BTN_H = 80, 28
 
 
-# ДОБАВЬ ВСЕ ОТСЮДА В ЯЗЫКИ
-
-
-
 class WinRename(WinChild):
     finished_ = pyqtSignal(str)
 
@@ -153,7 +149,7 @@ class FilterBtn(Btn):
 
         if flag == "name":
             # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-            self.data[Lng.lang_name] = text
+            self.data["name"][JsonData.lng_ind] = text
             self.setText(text)
         
         elif flag == "value":
@@ -181,16 +177,24 @@ class FilterBtn(Btn):
         self.set_border_blue_style()
         menu_ = ContextCustom(ev)
 
-        # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-        filter_name = self.data.get(Lng.lang_name)
-        set_name_cmd = lambda: self.rename_win(Lng.filter_name, filter_name, "name")
-        set_name = QAction(parent=menu_, text=Lng.filter_name)
+        filter_name = self.data.get("name")[JsonData.lng_ind]
+        set_name_cmd = lambda: self.rename_win(
+            title=Lng.filter_rename_win_title,
+            input_text=filter_name, 
+            flag="name"
+            )
+
+        set_name = QAction(parent=menu_, text=Lng.filter_rename_win_title)
         set_name.triggered.connect(set_name_cmd)
         menu_.addAction(set_name)
 
-        # cfg > dynamic_filters > item > real
         filter_value = self.data.get("real")
-        set_value_cmd = lambda: self.rename_win(Lng.filter_value, filter_value, "value")
+        set_value_cmd = lambda: self.rename_win(
+            Lng.filter_value,
+            filter_value,
+            "value"
+            )
+
         set_value = QAction(parent=menu_, text=Lng.filter_value)
         set_value.triggered.connect(set_value_cmd)
 
