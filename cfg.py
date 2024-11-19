@@ -11,6 +11,7 @@ from styles import Themes
 APP_VER = 5.85
 APP_NAME: str = "MiuzCollections"
 
+BRANDS = ["miuz", "panacea"]
 GRID_LIMIT: int = 150
 LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
 MENU_LEFT_WIDTH: int = 210
@@ -81,7 +82,9 @@ PSD_TIFF: tuple = (
 
 
 class JsonData:
-    app_ver: str = 0.0
+    app_ver: str = 1.0
+
+    brand_ind = 0
 
     coll_folder: str = "/Volumes/Shares/Collections"
     

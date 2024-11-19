@@ -6,7 +6,7 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from cfg import IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
+from cfg import BRANDS, IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 
@@ -263,7 +263,8 @@ class DbUpdater:
                     "mod": mod,
                     "resol": resol,
                     "coll": Utils.get_coll_name(src),
-                    "fav": 0
+                    "fav": 0,
+                    "brand": BRANDS[JsonData.brand_ind]
                     }
 
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
