@@ -303,3 +303,11 @@ class Utils:
         except Exception as e:
             print("resize_max_aspect_ratio error:", e)
             return None
+        
+    @classmethod
+    def get_fullpath(cls, src: str) -> str:
+        return JsonData.coll_folder + src
+    
+    @classmethod
+    def get_shortpath(cls, src: str) -> str:
+        return src.replace(JsonData.coll_folder, "")

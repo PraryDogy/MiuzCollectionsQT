@@ -61,8 +61,6 @@ class DbImages(URunnable):
 
         for src, hash_path, mod, coll, fav in res:
 
-            # создаем полный путь из относительного из ДБ
-            src = JsonData.coll_folder + src
             mod = datetime.fromtimestamp(mod).date()
             array_img = Utils.read_image_hash(hash_path)
 
