@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
 from base_widgets.wins import WinChild
 from cfg import Dynamic, JsonData
+from lng import Lng
 from signals import SignalsApp
 from styles import Names, Themes
 
@@ -44,11 +45,11 @@ class WinRename(WinChild):
         h_wid.setLayout(h_lay)
         self.content_lay_v.addWidget(h_wid)
 
-        ok_btn = Btn(text=Dynamic.lang.ok)
+        ok_btn = Btn(text=Lng.ok)
         ok_btn.mouseReleaseEvent = self.ok_cmd
         h_lay.addWidget(ok_btn)
 
-        cancel_btn = Btn(text=Dynamic.lang.cancel)
+        cancel_btn = Btn(text=Lng.cancel)
         cancel_btn.mouseReleaseEvent = self.close_cmd
         h_lay.addWidget(cancel_btn)
 
@@ -73,7 +74,7 @@ class DatesBtn(Btn):
     win_dates_opened = pyqtSignal()
 
     def __init__(self):
-        super().__init__(text=Dynamic.lang.dates)
+        super().__init__(text=Lng.dates)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -114,7 +115,7 @@ class FilterBtn(Btn):
         # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
         JsonData.custom_filters, JsonData.system_filter
 
-        text = data.get(Dynamic.lang.lang_name)
+        text = data.get(Lng.lang_name)
         super().__init__(text=text)
 
         self.setFixedSize(BTN_W, BTN_H)
@@ -158,7 +159,7 @@ class FilterBtn(Btn):
             # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
             JsonData.custom_filters, JsonData.system_filter
 
-            self.data[Dynamic.lang.lang_name] = text
+            self.data[Lng.lang_name] = text
             self.setText(text)
         
         elif flag == "value":
@@ -193,9 +194,9 @@ class FilterBtn(Btn):
         # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
         JsonData.custom_filters, JsonData.system_filter
 
-        filter_name = self.data.get(Dynamic.lang.lang_name)
-        set_name_cmd = lambda: self.rename_win(Dynamic.lang.filter_name, filter_name, "name")
-        set_name = QAction(parent=menu_, text=Dynamic.lang.filter_name)
+        filter_name = self.data.get(Lng.lang_name)
+        set_name_cmd = lambda: self.rename_win(Lng.filter_name, filter_name, "name")
+        set_name = QAction(parent=menu_, text=Lng.filter_name)
         set_name.triggered.connect(set_name_cmd)
         menu_.addAction(set_name)
 
@@ -203,8 +204,8 @@ class FilterBtn(Btn):
         JsonData.custom_filters, JsonData.system_filter
 
         filter_value = self.data.get("real")
-        set_value_cmd = lambda: self.rename_win(Dynamic.lang.filter_value, filter_value, "value")
-        set_value = QAction(parent=menu_, text=Dynamic.lang.filter_value)
+        set_value_cmd = lambda: self.rename_win(Lng.filter_value, filter_value, "value")
+        set_value = QAction(parent=menu_, text=Lng.filter_value)
         set_value.triggered.connect(set_value_cmd)
 
         JsonData.system_filter

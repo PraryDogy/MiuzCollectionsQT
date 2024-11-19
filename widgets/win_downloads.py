@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import QLabel, QScrollArea, QSpacerItem, QWidget
 
 from base_widgets import CustomProgressBar, LayoutHor, LayoutVer, SvgBtn
 from base_widgets.wins import WinChild
-from cfg import Dynamic, JsonData
+from cfg import JsonData
+from lng import Lng
 from styles import Names, Themes
 from utils.copy_files import CopyFiles
 from utils.utils import Utils
@@ -62,7 +63,7 @@ class WinDownloads(WinChild):
         self.copy_threads: list[CopyFiles] = []
 
         self.close_btn_cmd(self.close_)
-        self.set_titlebar_title(Dynamic.lang.title_downloads)
+        self.set_titlebar_title(Lng.title_downloads)
         self.min_btn_disable()
         self.max_btn_disable()
         self.setFixedSize(400, 420)
@@ -144,7 +145,7 @@ class WinDownloads(WinChild):
 
     def cut_text(self, text: str):
         name, ext = os.path.splitext(text)
-        name = f"{Dynamic.lang.copying} {name}"
+        name = f"{Lng.copying} {name}"
         max_row = 27
 
         if len(name) >= max_row:

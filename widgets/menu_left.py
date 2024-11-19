@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
 from base_widgets import ContextCustom, LayoutVer
 from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from database import THUMBS, Dbase
+from lng import Lng
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
@@ -72,13 +73,13 @@ class CollectionBtn(QLabel):
 
         menu_ = ContextCustom(event=ev)
 
-        view_coll = QAction(text=Dynamic.lang.view, parent=self)
+        view_coll = QAction(text=Lng.view, parent=self)
         view_coll.triggered.connect(self.pressed_.emit)
         menu_.addAction(view_coll)
 
         menu_.addSeparator()
 
-        reveal_coll = QAction(text=Dynamic.lang.reveal_in_finder, parent=self)
+        reveal_coll = QAction(text=Lng.reveal_in_finder, parent=self)
         reveal_coll.triggered.connect(self.reveal_collection)
         menu_.addAction(reveal_coll)
 
@@ -243,7 +244,7 @@ class MenuLeft(QFrame):
         main_layout.addSpacerItem(QSpacerItem(0, 5))
 
         self.all_colls_btn = CollectionBtn(
-            short_name=Dynamic.lang.all_colls,
+            short_name=Lng.all_colls,
             coll_name=NAME_ALL_COLLS
             )
         cmd_ = lambda: self.collection_btn_cmd(self.all_colls_btn)
@@ -251,7 +252,7 @@ class MenuLeft(QFrame):
         main_layout.addWidget(self.all_colls_btn)
 
         favs_btn = CollectionBtn(
-            short_name=Dynamic.lang.fav_coll,
+            short_name=Lng.fav_coll,
             coll_name=NAME_FAVS
             )
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)

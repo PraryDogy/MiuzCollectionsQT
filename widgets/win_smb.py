@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import Btn, LayoutHor, SvgBtn
 from base_widgets.wins import WinChild
-from cfg import Dynamic
+from lng import Lng
 
 
 class WinSmb(WinChild):
@@ -16,10 +16,10 @@ class WinSmb(WinChild):
         if text:
             self.my_text = text
         else:
-            self.my_text = Dynamic.lang.choose_coll_smb
+            self.my_text = Lng.choose_coll_smb
 
         self.close_btn_cmd(self.close_)
-        self.set_titlebar_title(Dynamic.lang.no_connection)
+        self.set_titlebar_title(Lng.no_connection)
         self.min_btn_disable()
         self.max_btn_disable()
 
@@ -53,7 +53,7 @@ class WinSmb(WinChild):
 
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 10))
 
-        self.ok_btn = Btn(Dynamic.lang.ok)
+        self.ok_btn = Btn(Lng.ok)
         self.ok_btn.mouseReleaseEvent = self.close_
         self.content_lay_v.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 

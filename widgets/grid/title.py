@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QAction, QLabel
 
 from base_widgets import ContextCustom
 from cfg import PSD_TIFF, Dynamic, JsonData
+from lng import Lng
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.copy_files import CopyFiles
@@ -16,7 +17,7 @@ from ._db_images import DbImage
 
 class Title(QLabel):
     def __init__(self, title: str, db_images: list[DbImage], width: int):
-        super().__init__(f"{title}. {Dynamic.lang.total}: {len(db_images)}")
+        super().__init__(f"{title}. {Lng.total}: {len(db_images)}")
         self.db_images = db_images
         self.setFixedWidth(width - 20)
         self.setWordWrap(True)
@@ -88,24 +89,24 @@ class Title(QLabel):
         menu_ = ContextCustom(ev)
 
         cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
-        save_jpg = QAction(text=Dynamic.lang.save_all_JPG, parent=menu_)
+        save_jpg = QAction(text=Lng.save_all_JPG, parent=menu_)
         save_jpg.triggered.connect(cmd_)
         menu_.addAction(save_jpg)
 
         cmd_ = lambda: self.save_cmd(is_layers=True, save_as=False)
-        save_layers = QAction(text=Dynamic.lang.save_all_layers, parent=menu_)
+        save_layers = QAction(text=Lng.save_all_layers, parent=menu_)
         save_layers.triggered.connect(cmd_)
         menu_.addAction(save_layers)
 
         menu_.addSeparator()
 
         cmd_ = lambda: self.save_cmd(is_layers=False, save_as=True)
-        save_as_jpg = QAction(text=Dynamic.lang.save_all_JPG_as, parent=menu_)
+        save_as_jpg = QAction(text=Lng.save_all_JPG_as, parent=menu_)
         save_as_jpg.triggered.connect(cmd_)
         menu_.addAction(save_as_jpg)
 
         cmd_ = lambda: self.save_cmd(is_layers=True, save_as=True)
-        save_as_layers = QAction(text=Dynamic.lang.save_all_layers_as, parent=menu_)
+        save_as_layers = QAction(text=Lng.save_all_layers_as, parent=menu_)
         save_as_layers.triggered.connect(cmd_)
         menu_.addAction(save_as_layers)
 

@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
 
 from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import Dynamic
 from database import THUMBS, Dbase
+from lng import Lng
 from utils.utils import URunnable, UThreadPool, Utils
 
 
@@ -28,7 +28,7 @@ class RightLabel(QLabel):
         menu_ = ContextCustom(event=ev)
 
 
-        label_text = Dynamic.lang.copy
+        label_text = Lng.copy
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(cmd_)
         menu_.addAction(sel)
@@ -68,15 +68,15 @@ class InfoTask(URunnable):
         _, type_ = os.path.splitext(name)
 
         res = {
-            Dynamic.lang.file_name: self.lined_text(name),
-            Dynamic.lang.type_: type_,
-            Dynamic.lang.file_size: Utils.get_f_size(size),
-            Dynamic.lang.place: self.lined_text(
+            Lng.file_name: self.lined_text(name),
+            Lng.type_: type_,
+            Lng.file_size: Utils.get_f_size(size),
+            Lng.place: self.lined_text(
                 Utils.get_full_src(self.short_src)
                 ),
-            Dynamic.lang.changed: Utils.get_f_date(mod),
-            Dynamic.lang.resol: resol,
-            Dynamic.lang.collection: coll
+            Lng.changed: Utils.get_f_date(mod),
+            Lng.resol: resol,
+            Lng.collection: coll
             }
 
         return res
@@ -106,7 +106,7 @@ class WinInfo(WinChild):
         self.close_btn_cmd(self.close_)
         self.min_btn_disable()
         self.max_btn_disable()
-        self.set_titlebar_title(Dynamic.lang.info)
+        self.set_titlebar_title(Lng.info)
         self.short_src = short_src
 
         self.init_ui()

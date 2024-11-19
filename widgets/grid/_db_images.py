@@ -8,6 +8,7 @@ from PyQt5.QtGui import QPixmap
 
 from cfg import GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from database import THUMBS, Dbase
+from lng import Lng
 from utils.utils import URunnable, Utils
 
 
@@ -76,7 +77,7 @@ class DbImages(URunnable):
                 mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
 
             else:
-                mod = f"{Dynamic.lang.months[str(mod.month)]} {mod.year}"
+                mod = f"{Lng.months[str(mod.month)]} {mod.year}"
 
             thumbs_dict[mod].append(DbImage(pixmap, short_src, coll, fav))
 

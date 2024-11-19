@@ -1,4 +1,4 @@
-class Lang:
+class Lng:
     add_fav = [
         "Добавить в избранное",
         "Add to favorites"
@@ -303,4 +303,3 @@ class Lang:
         "с именем",
         "with name"
     ]
-...

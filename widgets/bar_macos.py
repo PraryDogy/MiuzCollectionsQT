@@ -7,7 +7,8 @@ from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
 from base_widgets import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import APP_NAME, APP_VER, Dynamic
+from cfg import APP_NAME, APP_VER
+from lng import Lng
 from utils.utils import Utils
 
 from .win_settings import WinSettings
@@ -31,13 +32,13 @@ class SelectableLabel(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = ContextCustom(ev)
 
-        copy_text = QAction(parent=context_menu, text=Dynamic.lang.copy)
+        copy_text = QAction(parent=context_menu, text=Lng.copy)
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Dynamic.lang.copy_all)
+        select_all = QAction(parent=context_menu, text=Lng.copy_all)
         select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -83,15 +84,15 @@ class BarMacos(QMenuBar):
         self.init_ui()
 
     def init_ui(self):
-        self.mainMenu = QMenu(Dynamic.lang.bar_menu, self)
+        self.mainMenu = QMenu(Lng.bar_menu, self)
 
         # Добавляем пункт "Открыть настройки"
-        actionSettings = QAction(Dynamic.lang.open_settings_window, self)
+        actionSettings = QAction(Lng.open_settings_window, self)
         actionSettings.triggered.connect(self.open_settings_window)
         self.mainMenu.addAction(actionSettings)
 
         # Добавляем пункт "О приложении"
-        actionAbout = QAction(Dynamic.lang.show_about, self)
+        actionAbout = QAction(Lng.show_about, self)
         actionAbout.triggered.connect(self.open_about_window)
         self.mainMenu.addAction(actionAbout)
 
