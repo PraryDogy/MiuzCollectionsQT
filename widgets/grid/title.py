@@ -10,7 +10,7 @@ from styles import Names, Themes
 from utils.copy_files import CopyFiles
 from utils.utils import UThreadPool, Utils
 
-from ..win_smb import WinSmb
+from ..actions import OpenWins
 from ._db_images import DbImage
 
 
@@ -21,11 +21,10 @@ class Shared:
     def show_smb(cls, parent_: QWidget | QMainWindow):
 
         if not isinstance(parent_, QMainWindow):
-            parent_ = parent_.window()
+            raise TypeError
+        
+        OpenWins.smb(parent_=parent_)
 
-        smb_win = WinSmb()
-        smb_win.center_relative_parent(parent_)
-        smb_win.show()
 
 
 class CustomContext(ContextCustom):

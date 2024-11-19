@@ -10,14 +10,13 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
 from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, DB_FILE, HASH_DIR, Dynamic, JsonData
-from database import Dbase
 from lang.eng import Eng
 from lang.rus import Rus
 from utils.scaner import Scaner
 from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
 
-from .win_smb import WinSmb
+from .actions import OpenWins
 
 
 class BrowseColl(QWidget):
@@ -171,9 +170,7 @@ class UpdaterWidget(QWidget):
         cmd_ = lambda: self.btn.setText(Dynamic.lang.download_update)
 
         QTimer.singleShot(1000, cmd_)
-        self.smb_win = WinSmb()
-        self.smb_win.center_relative_parent(self.window())
-        self.smb_win.show()
+        OpenWins.smb(self)
 
     def no_connection_btn_style(self):
         cmd_ = lambda: self.btn.setText(Dynamic.lang.download_update)

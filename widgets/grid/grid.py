@@ -9,7 +9,6 @@ from styles import Names, Themes
 from utils.utils import UThreadPool, Utils
 
 from ..actions import OpenWins, ScanerRestart
-from ..win_smb import WinSmb
 from ._db_images import DbImage, DbImages
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .limit_btn import LimitBtn
@@ -301,9 +300,7 @@ class Grid(QScrollArea):
             if Utils.smb_check():
                 OpenWins.info_db(self, wid.short_src)
             else:
-                self.smb_win = WinSmb()
-                self.smb_win.center_relative_parent(self.window())
-                self.smb_win.show()
+                self.smb_win = OpenWins.smb(self.window())
 
         elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             wid = self.cell_to_wid.get(self.curr_cell)

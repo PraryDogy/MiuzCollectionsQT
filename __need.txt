@@ -22,3 +22,5 @@ smb в опен винс
 
 short full path
 center relative parent
+
+поправить title

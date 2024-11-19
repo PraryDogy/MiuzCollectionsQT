@@ -17,7 +17,6 @@ from utils.utils import URunnable, UThreadPool, Utils
 
 from .actions import CopyPath, FavActionDb, OpenInfoDb, OpenWins, Reveal, Save
 from .grid.thumbnail import Thumbnail
-from .win_smb import WinSmb
 
 
 class ImageData:
@@ -278,9 +277,7 @@ class WinImageView(WinChild):
     def on_load(self):
 
         if not Utils.smb_check():
-            self.win_smb = WinSmb()
-            self.win_smb.center_relative_parent(self)
-            self.win_smb.show()
+            OpenWins.smb(self)
 
         self.load_thumbnail()
 
@@ -385,9 +382,7 @@ class WinImageView(WinChild):
             if Utils.smb_check():
                 OpenWins.info_db(self, self.short_src)
             else:
-                self.win_smb = WinSmb()
-                self.win_smb.center_relative_parent(self)
-                self.win_smb.show()
+                OpenWins.smb(self)
 
         return super().keyPressEvent(ev)
 

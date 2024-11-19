@@ -7,14 +7,14 @@ from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
                              QWidget)
 
-from base_widgets import ContextCustom, LayoutHor, LayoutVer
+from base_widgets import ContextCustom, LayoutVer
 from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
 from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
 
-from .win_smb import WinSmb
+from .actions import OpenWins
 
 
 class CollectionBtn(QLabel):
@@ -54,9 +54,7 @@ class CollectionBtn(QLabel):
                 subprocess.Popen(["open", coll])
                 return
         else:
-            self.smb_win = WinSmb()
-            self.smb_win.center_relative_parent(self.window())
-            self.smb_win.show()
+            OpenWins.smb(self.window())
 
     def normal_style(self):
         self.setObjectName(Names.menu_btn)

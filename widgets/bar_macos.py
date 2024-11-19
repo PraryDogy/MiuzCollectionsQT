@@ -101,7 +101,7 @@ class BarMacos(QMenuBar):
         self.setNativeMenuBar(True)
 
     def open_settings_window(self):
-        self.win_settings = WinSettings(self)
+        self.win_settings = WinSettings()
         self.win_settings.center_relative_parent(self.window())
         self.win_settings.show()
 

@@ -5,19 +5,19 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
-from cfg import NAME_ALL_COLLS, Dynamic, JsonData, NAME_FAVS
+from cfg import NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from signals import SignalsApp
 from styles import Names, Themes
-from utils.utils import Utils
 from utils.scaner import Scaner
+from utils.utils import Utils
 
+from .actions import OpenWins
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
 from .wid_search import WidSearch
-from .win_smb import WinSmb
 
 
 class TestWid(QFrame):
@@ -133,9 +133,7 @@ class WinMain(WinFrameless):
         Scaner.app.start()
 
         if not Utils.smb_check():
-            self.smb_win = WinSmb()
-            self.smb_win.center_relative_parent(self)
-            self.smb_win.show()
+            OpenWins.smb(self)
 
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
