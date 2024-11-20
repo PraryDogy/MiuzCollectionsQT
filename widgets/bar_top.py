@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 
 from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
 from base_widgets.wins import WinChild
-from cfg import Dynamic, JsonData
+from cfg import Dynamic, Filter, JsonData
 from lang import Lang
 from signals import SignalsApp
 from styles import Names, Themes
@@ -105,20 +105,14 @@ class DatesBtn(Btn):
 
 
 class FilterBtn(Btn):
-    def __init__(self, data: dict):
-        """cfg > dynamic_filters > item"""
+    def __init__(self, filter: Filter):
+        super().__init__(text=filter.names[JsonData.lang_ind])
 
-        # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-        text = data.get("name")[JsonData.lang_ind]
-        super().__init__(text=text)
-
+        self.filter = filter
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.data = data
-
-        # cfg > dynamic_filters > item > value
-        if self.data.get("value"):
+        if filter.value:
             self.set_blue_style()
         else:
             self.set_normal_style()
@@ -148,23 +142,21 @@ class FilterBtn(Btn):
         """flag: name | value"""
 
         if flag == "name":
-            # cfg > dynamic_filters > item > Eng.name_ | Rus.name_
-            self.data["name"][JsonData.lang_ind] = text
+            self.filter.names[JsonData.lang_ind] = text
             self.setText(text)
+            SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         
         elif flag == "value":
-            # cfg > dynamic_filters > item > real
-            self.data["real"] = text
+            self.filter.real = text
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() != Qt.MouseButton.LeftButton:
             return
         
-        self.data["value"] = not self.data.get("value")
+        self.filter.value = not self.filter.value
 
-        # cfg > dynamic_filters > item > value
-        if self.data.get("value"):
+        if self.filter.value:
             self.set_blue_style()
         else:
             self.set_normal_style()
@@ -177,10 +169,9 @@ class FilterBtn(Btn):
         self.set_border_blue_style()
         menu_ = ContextCustom(ev)
 
-        filter_name = self.data.get("name")[JsonData.lang_ind]
         set_name_cmd = lambda: self.rename_win(
             title=Lang.filter_rename_win_title,
-            input_text=filter_name, 
+            input_text=self.filter.names[JsonData.lang_ind], 
             flag="name"
             )
 
@@ -188,20 +179,15 @@ class FilterBtn(Btn):
         set_name.triggered.connect(set_name_cmd)
         menu_.addAction(set_name)
 
-        filter_value = self.data.get("real")
         set_value_cmd = lambda: self.rename_win(
-            Lang.filter_value,
-            filter_value,
-            "value"
+            title=Lang.filter_value,
+            input_text=self.filter.real,
+            flag="value"
             )
 
         set_value = QAction(parent=menu_, text=Lang.filter_value)
         set_value.triggered.connect(set_value_cmd)
-
-        JsonData.system_filter
-
-        if not self.data.get("real") == JsonData.system_filter.get("real"):
-            menu_.addAction(set_value)
+        menu_.addAction(set_value)
 
         menu_.show_menu()
 
@@ -233,8 +219,8 @@ class BarTop(QFrame):
     def init_ui(self):
         self.filter_btns.clear()
 
-        for data in (*JsonData.custom_filters, JsonData.system_filter):
-            label = FilterBtn(data)
+        for filter in Filter.filters:
+            label = FilterBtn(filter)
             self.filter_btns.append(label)
             self.h_layout.addWidget(label)
         
@@ -260,6 +246,5 @@ class BarTop(QFrame):
             i: FilterBtn
             i.set_normal_style()
 
-        for data in (*JsonData.custom_filters, JsonData.system_filter):
-            data["value"] = False
-
+        for filter in Filter.filters:
+            filter.value = False

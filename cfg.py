@@ -80,7 +80,7 @@ PSD_TIFF: tuple = (
 
 
 class Filter:
-    current: list["Filter"] = []
+    filters: list["Filter"] = []
     __slots__ = ["names", "real", "value"]
 
     def __init__(self, names: list, real: str, value: bool):
@@ -216,14 +216,14 @@ class JsonData:
     @classmethod
     def init_filters(cls):
         for i in cls.filters:
-            Filter.current.append(Filter(*i))
+            Filter.filters.append(Filter(*i))
 
     @classmethod
     def write_filters(cls) -> list[tuple[list, str, bool]]:
         """Convert `Filter` instances to list for json file"""
         cls.filters = [
             i.get_data()
-            for i in Filter.current
+            for i in Filter.filters
             ]
 
     @classmethod
