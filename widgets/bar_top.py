@@ -50,7 +50,17 @@ class DatesBtn(Btn):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             self.win_dates_opened.emit()
-        return super().mouseReleaseEvent(ev)
+        # return super().mouseReleaseEvent(ev)
+
+    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        menu_ = ContextCustom(ev)
+
+        toggle = QAction(parent=menu_, text=Lang.view)
+        toggle.triggered.connect(self.win_dates_opened.emit)
+        menu_.addAction(toggle)
+
+        self.set_border_blue_style()
+        menu_.show_menu()
 
 
 class FilterBtn(Btn):
