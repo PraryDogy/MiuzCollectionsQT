@@ -95,9 +95,9 @@ class FilterBtn(Btn):
         menu_ = ContextCustom(ev)
 
         if self.filter.value:
-            toggle = QAction(parent=menu_, text="disable")
+            toggle = QAction(parent=menu_, text=Lang.disable)
         else:
-            toggle = QAction(parent=menu_, text="enable")
+            toggle = QAction(parent=menu_, text=Lang.enable)
 
         toggle.triggered.connect(self.toggle_cmd)
         menu_.addAction(toggle)

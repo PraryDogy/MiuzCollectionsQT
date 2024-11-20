@@ -82,9 +82,17 @@ class Lang_:
         "Удаляю",
         "Deleting"
     ]
+    disable = [
+        "Выключить",
+        "Disable"
+    ]
     download_update = [
         "Скачать обновление",
         "Update app"
+    ]
+    enable = [
+        "Включить",
+        "Enable"
     ]
     end = [
         "Конец",
