@@ -78,6 +78,8 @@ PSD_TIFF: tuple = (
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
 
+SYSTEM_FILTER = "system_filter"
+
 
 class Filter:
     filters: list["Filter"] = []
@@ -175,7 +177,7 @@ class JsonData:
     filters = (
         (('Продукт', 'Product'), '1 IMG', False),
         (('Модели', 'Model'), '2 MODEL IMG', False),
-        (('Остальное', 'Other'), 'other_flag', False)
+        (('Остальное', 'Other'), SYSTEM_FILTER, False)
         )
 
     @classmethod
