@@ -79,6 +79,20 @@ PSD_TIFF: tuple = (
     )
 
 
+class Filter:
+    current: list["Filter"] = []
+    __slots__ = ["names", "real", "value"]
+
+    def __init__(self, names: list, real: str, value: bool):
+
+        self.names = names
+        self.real = real
+        self.value = value
+
+    def get_data(self):
+        return (self.names, self.real, self.value)
+    
+
 class JsonData:
     app_ver: str = 1.0
 
@@ -158,6 +172,12 @@ class JsonData:
         "value": False
         }
 
+    _filters_data = (
+        (('Продукт', 'Product'), '1 IMG', False),
+        (('Модели', 'Model'), '2 MODEL IMG', False),
+        (('Остальное', 'Other'), 'other_flag', False)
+        )
+
     @classmethod
     def get_data(cls):
         return [
@@ -193,6 +213,8 @@ class JsonData:
     @classmethod
     def write_json_data(cls):
 
+        cls.write_filters()
+
         new_data: dict = {
             attr: getattr(cls, attr)
             for attr in cls.get_data()
@@ -200,6 +222,18 @@ class JsonData:
 
         with open(JSON_FILE, 'w', encoding="utf-8") as f:
             json.dump(new_data, f, indent=4, ensure_ascii=False)
+
+    @classmethod
+    def init_filters(cls):
+        for i in cls._filters_data:
+            Filter.current.append(Filter(*i))
+
+    @classmethod
+    def write_filters(cls):
+        cls._filters_data = (
+            i.get_data()
+            for i in Filter.current
+            )
 
     @classmethod
     def check_app_dirs(cls):
@@ -267,6 +301,7 @@ class JsonData:
     def init(cls):
         cls.check_app_dirs()
         cls.read_json_data()
+        cls.init_filters()
         cls.compare_versions()
         Themes.set_theme(cls.theme)
 
