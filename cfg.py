@@ -78,22 +78,38 @@ PSD_TIFF: tuple = (
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
 
-SYSTEM_FILTER = "system_filter"
+FILTERS = (
+    {
+        "names": ("Продукт", "Product"),
+        "real": "1 IMG", 
+        "value": False,
+        "system": False
+    },
+    {
+        "names": ("Модели", "Model"),
+        "real": "1 MODEL IMG", 
+        "value": False,
+        "system": False
+    },
+    {
+        "names": ("Остальное", "Other"),
+        "real": None, 
+        "value": False,
+        "system": True
+    },
+)
 
 
 class Filter:
     filters: list["Filter"] = []
-    __slots__ = ["names", "real", "value"]
+    __slots__ = ["names", "real", "value", "system"]
 
-    def __init__(self, names: list, real: str, value: bool):
-
+    def __init__(self, names: list, real: str, value: bool, system: bool):
         self.names = names
         self.real = real
         self.value = value
+        self.system = system
 
-    def get_data(self):
-        return (self.names, self.real, self.value)
-    
 
 class JsonData:
     app_ver: str = APP_VER
@@ -174,12 +190,6 @@ class JsonData:
         "value": False
         }
 
-    filters = (
-        (('Продукт', 'Product'), '1 IMG', False),
-        (('Модели', 'Model'), '2 MODEL IMG', False),
-        (('Остальное', 'Other'), SYSTEM_FILTER, False)
-        )
-
     @classmethod
     def get_attributes(cls):
         return {
@@ -209,24 +219,20 @@ class JsonData:
 
     @classmethod
     def write_json_data(cls):
-
-        cls.write_filters()
-
         with open(JSON_FILE, 'w', encoding="utf-8") as f:
-            json.dump(cls.get_attributes(), f, indent=4, ensure_ascii=False)
+            json.dump(
+                obj=cls.get_attributes(),
+                fp=f,
+                indent=4,
+                ensure_ascii=False
+            )
 
     @classmethod
     def init_filters(cls):
-        for i in cls.filters:
-            Filter.filters.append(Filter(*i))
-
-    @classmethod
-    def write_filters(cls) -> list[tuple[list, str, bool]]:
-        """Convert `Filter` instances to list for json file"""
-        cls.filters = [
-            i.get_data()
-            for i in Filter.filters
-            ]
+        for i in FILTERS:
+            Filter.filters.append(
+                Filter(**i)
+            )
 
     @classmethod
     def check_app_dirs(cls):
@@ -262,7 +268,6 @@ class JsonData:
 
     @classmethod
     def copy_db_file(cls):
-
         if os.path.exists(DB_FILE):
             print("Удаляю пользовательский DB_FILE")
             os.remove(DB_FILE)

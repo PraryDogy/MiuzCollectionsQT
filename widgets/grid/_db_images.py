@@ -6,7 +6,8 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
+from cfg import (GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic, Filter,
+                 JsonData)
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, Utils
@@ -115,43 +116,54 @@ class DbImages(URunnable):
                 )
 
         filter_values_ = set(
-            i.get("value")
-            for i in (
-                *JsonData.custom_filters,
-                JsonData.system_filter
-                )
-            )
+            i.value
+            for i in Filter.filters
+        )
         
         # если ВСЕ фильтры включены или выключены, это будет равняться
         # отсутствию фильтрации
         # в ином случае выполняется фильтрация
         if len(filter_values_) > 1:
 
+            user_filters = [
+                i
+                for i in Filter.filters
+                if not i.system
+                and
+                i.value
+            ]
+
+            sys_filters = [
+                i
+                for i in Filter.filters
+                if i.system
+                and
+                i.value
+            ]
+
             and_filters = []
 
-            for filter in JsonData.custom_filters:
-                if filter.get("value"):
-                    t = self.get_template(filter.get("real"))
+            for filter in user_filters:
+                t = self.sql_like(filter.real)
 
-                    and_filters.append(
-                        THUMBS.c.src.ilike(t)
-                        )
+                and_filters.append(
+                    THUMBS.c.src.ilike(t)
+                )
 
-            if JsonData.system_filter.get("value"):
-
+            for filter in sys_filters:
                 texts = [
-                    self.get_template(i.get("real"))
-                    for i in JsonData.custom_filters
-                    ]
+                    self.sql_like(i.real)
+                    for i in user_filters
+                ]
                 
                 stmts = [
                     THUMBS.c.src.not_ilike(i)
                     for i in texts
-                    ]
+                ]
                 
                 and_filters.append(
                     sqlalchemy.and_(*stmts)
-                    )
+                )
 
             # пример полного запроса: включен product и other фильтры:
             # остальной запрос БД > ГДЕ
@@ -168,7 +180,7 @@ class DbImages(URunnable):
 
         return q
     
-    def get_template(self, text: str) -> str:
+    def sql_like(self, text: str) -> str:
         return "%" + os.sep + text + os.sep + "%"
 
     def combine_dates(self) -> tuple[datetime, datetime]:

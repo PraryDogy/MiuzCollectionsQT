@@ -14,57 +14,6 @@ from .win_dates import WinDates
 BTN_W, BTN_H = 80, 28
 
 
-class WinRename(WinChild):
-    finished_ = pyqtSignal(str)
-
-    def __init__(self, title: str, input_text: str):
-        super().__init__(parent=None)
-
-        self.min_btn_disable()
-        self.max_btn_disable()
-        self.close_btn_cmd(self.close_cmd)
-        self.content_lay_v.setSpacing(10)
-        self.content_lay_v.setContentsMargins(10, 5, 10, 10)
-
-        title_label = QLabel(title)
-        self.content_lay_v.addWidget(title_label)
-
-        self.input_wid = InputBase()
-        self.input_wid.setPlaceholderText(title)
-        self.input_wid.setText(input_text)
-        self.input_wid.selectAll()
-        self.input_wid.setFixedWidth(200)
-        self.content_lay_v.addWidget(self.input_wid)
-
-        h_wid = QWidget()
-        h_lay = LayoutHor()
-        h_wid.setLayout(h_lay)
-        self.content_lay_v.addWidget(h_wid)
-
-        ok_btn = Btn(text=Lang.ok)
-        ok_btn.mouseReleaseEvent = self.ok_cmd
-        h_lay.addWidget(ok_btn)
-
-        cancel_btn = Btn(text=Lang.cancel)
-        cancel_btn.mouseReleaseEvent = self.close_cmd
-        h_lay.addWidget(cancel_btn)
-
-        self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
-
-    def ok_cmd(self, *args):
-        self.finished_.emit(self.input_wid.text())
-        self.close_cmd()
-
-    def close_cmd(self, *args):
-        self.close()
-
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() == Qt.Key.Key_Return:
-            self.ok_cmd()
-        elif a0.key() == Qt.Key.Key_Escape:
-            self.close_cmd()
-
 
 class DatesBtn(Btn):
     win_dates_opened = pyqtSignal()
@@ -129,27 +78,6 @@ class FilterBtn(Btn):
         self.setObjectName(Names.dates_btn_bordered)
         self.setStyleSheet(Themes.current)
 
-    def rename_win(self, title: str, input_text: str, flag: str):
-        """flag: name | value"""
-
-        cmd_ = lambda text: self.finished_cmd(text, flag)
-        self.win_ = WinRename(title, input_text)
-        self.win_.center_relative_parent(self.window())
-        self.win_.finished_.connect(cmd_)
-        self.win_.show()
-
-    def finished_cmd(self, text: str, flag: str):
-        """flag: name | value"""
-
-        if flag == "name":
-            self.filter.names[JsonData.lang_ind] = text
-            self.setText(text)
-            SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        
-        elif flag == "value":
-            self.filter.real = text
-            SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() != Qt.MouseButton.LeftButton:
             return
@@ -169,25 +97,8 @@ class FilterBtn(Btn):
         self.set_border_blue_style()
         menu_ = ContextCustom(ev)
 
-        set_name_cmd = lambda: self.rename_win(
-            title=Lang.filter_rename_win_title,
-            input_text=self.filter.names[JsonData.lang_ind], 
-            flag="name"
-            )
-
-        set_name = QAction(parent=menu_, text=Lang.filter_rename_win_title)
-        set_name.triggered.connect(set_name_cmd)
-        menu_.addAction(set_name)
-
-        set_value_cmd = lambda: self.rename_win(
-            title=Lang.filter_value,
-            input_text=self.filter.real,
-            flag="value"
-            )
-
-        set_value = QAction(parent=menu_, text=Lang.filter_value)
-        set_value.triggered.connect(set_value_cmd)
-        menu_.addAction(set_value)
+        t = "Выбрать/отключить"
+        menu_.addAction(QAction(parent=menu_, text=t))
 
         menu_.show_menu()
 
