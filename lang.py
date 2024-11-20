@@ -2,6 +2,10 @@ from cfg import JsonData
 
 
 class Lang_:
+    _lang_name = [
+        "Русский",
+        "English"
+    ]
     add_fav = [
         "Добавить в избранное",
         "Add to favorites"
@@ -117,10 +121,6 @@ class Lang_:
     lang_label = [
         "Язык/Language",
         "Language/Язык"
-    ]
-    lang_name = [
-        "Русский",
-        "English"
     ]
     loading = [
         "Загрузка...",
@@ -368,6 +368,20 @@ class Lang(Lang_):
 
     @classmethod
     def init(cls):
+        """
+        Каждый аттрибут класса Lang_ это список из доступных языков.
+        lang_ind соответствует индексу из списка.
+        Когда lang_ind превышает возможный индекс, то индекс будет сброшен на 0.
+        Проверка по lang_name это просто проверка по любому аттрибуту.
+        """
+
+        max_ = len(Lang_._lang_name) - 1
+
+        if JsonData.lang_ind > max_:
+            print("lang > init")
+            print(f"lang_ind is {JsonData.lang_ind}, max is {max_}, set to 0")
+            JsonData.lang_ind = 0
+
         for k, v in vars(Lang_).items():
             if isinstance(v, list):
                 setattr(cls, k, v[JsonData.lang_ind])

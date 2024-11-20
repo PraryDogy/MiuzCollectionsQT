@@ -96,7 +96,7 @@ class ChangeLang(QWidget):
         layout_h = LayoutHor()
         self.setLayout(layout_h)
 
-        self.lang_btn = Btn(Lang.lang_name)
+        self.lang_btn = Btn(Lang._lang_name)
         self.lang_btn.mouseReleaseEvent = self.lng_cmd
         layout_h.addWidget(self.lang_btn)
 
@@ -106,17 +106,11 @@ class ChangeLang(QWidget):
         layout_h.addWidget(self.lang_label)
           
     def lng_cmd(self, e):
-
-        if JsonData.lang_ind == 0:
-            JsonData.lang_ind = 1
-
-        elif JsonData.lang_ind == 1:
-            JsonData.lang_ind = 0
-
-        Lang.init()
-        self.lang_btn.setText(Lang.lang_name)
-        setattr(self, "flag", True)
+        JsonData.lang_ind += 1
         self._pressed.emit()
+        Lang.init()
+        self.lang_btn.setText(Lang._lang_name)
+        setattr(self, "flag", True)
 
 
 class StopColls(QWidget):
