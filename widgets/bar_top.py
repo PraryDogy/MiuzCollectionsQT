@@ -47,20 +47,27 @@ class DatesBtn(Btn):
         self.setObjectName(Names.topbar_btn_bordered)
         self.setStyleSheet(Themes.current)
 
+    def open_win(self):
+        self.set_border_blue_style()
+        self.win_dates_opened.emit()
+
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
-            self.win_dates_opened.emit()
-        # return super().mouseReleaseEvent(ev)
+            self.open_win()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        prev = self.objectName()
+
         menu_ = ContextCustom(ev)
 
         toggle = QAction(parent=menu_, text=Lang.view)
-        toggle.triggered.connect(self.win_dates_opened.emit)
+        toggle.triggered.connect(self.open_win)
         menu_.addAction(toggle)
 
         self.set_border_blue_style()
         menu_.show_menu()
+        self.setObjectName(prev)
+        self.setStyleSheet(Themes.current)
 
 
 class FilterBtn(Btn):
@@ -119,6 +126,11 @@ class FilterBtn(Btn):
 
         self.set_border_style()
         menu_.show_menu()
+
+        if self.filter.value:
+            self.set_blue_style()
+        else:
+            self.set_normal_style()
 
 
 class BarTop(QFrame):
