@@ -74,14 +74,13 @@ class FilterBtn(Btn):
         self.setObjectName(Names.filter_btn_selected)
         self.setStyleSheet(Themes.current)
 
-    def set_border_blue_style(self):
-        self.setObjectName(Names.dates_btn_bordered)
-        self.setStyleSheet(Themes.current)
-
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() != Qt.MouseButton.LeftButton:
             return
+        else:
+            self.toggle_cmd()
         
+    def toggle_cmd(self):
         self.filter.value = not self.filter.value
 
         if self.filter.value:
@@ -93,19 +92,17 @@ class FilterBtn(Btn):
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
     
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        prev_name = self.objectName()
-        self.set_border_blue_style()
         menu_ = ContextCustom(ev)
 
-        t = "Выбрать/отключить"
-        menu_.addAction(QAction(parent=menu_, text=t))
+        if self.filter.value:
+            toggle = QAction(parent=menu_, text="disable")
+        else:
+            toggle = QAction(parent=menu_, text="enable")
+
+        toggle.triggered.connect(self.toggle_cmd)
+        menu_.addAction(toggle)
 
         menu_.show_menu()
-
-        if prev_name == Names.filter_btn:
-            self.set_normal_style()
-        else:
-            self.set_blue_style()
 
 
 class BarTop(QFrame):
