@@ -94,7 +94,7 @@ class Filter:
     
 
 class JsonData:
-    app_ver: str = 1.0
+    app_ver: str = APP_VER
 
     brand_ind = 0
     
@@ -172,20 +172,21 @@ class JsonData:
         "value": False
         }
 
-    _filters_data = (
+    filters = (
         (('Продукт', 'Product'), '1 IMG', False),
         (('Модели', 'Model'), '2 MODEL IMG', False),
         (('Остальное', 'Other'), 'other_flag', False)
         )
 
     @classmethod
-    def get_data(cls):
-        return [
-            i for i in dir(cls)
-            if not i.startswith("__")
+    def get_attributes(cls):
+        return {
+            k: v
+            for k, v in vars(cls).items()
+            if not k.startswith("__")
             and
-            not callable(getattr(cls, i))
-            ]
+            not callable(getattr(cls, k))
+            }
 
     @classmethod
     def read_json_data(cls) -> dict:
@@ -198,42 +199,32 @@ class JsonData:
 
                 except json.JSONDecodeError:
                     print("Ошибка чтения json")
-                    cls.write_json_data()
-                    cls.read_json_data()
-                    return
+                    json_data: dict = cls.get_attributes()
                 
             for k, v in json_data.items():
                 if hasattr(cls, k):
                     setattr(cls, k, v)
-
-        else:
-            print("JSON файла не существует, создаю файл по умолчанию")
-            cls.write_json_data()
 
     @classmethod
     def write_json_data(cls):
 
         cls.write_filters()
 
-        new_data: dict = {
-            attr: getattr(cls, attr)
-            for attr in cls.get_data()
-            }
-
         with open(JSON_FILE, 'w', encoding="utf-8") as f:
-            json.dump(new_data, f, indent=4, ensure_ascii=False)
+            json.dump(cls.get_attributes(), f, indent=4, ensure_ascii=False)
 
     @classmethod
     def init_filters(cls):
-        for i in cls._filters_data:
+        for i in cls.filters:
             Filter.current.append(Filter(*i))
 
     @classmethod
-    def write_filters(cls):
-        cls._filters_data = (
+    def write_filters(cls) -> list[tuple[list, str, bool]]:
+        """Convert `Filter` instances to list for json file"""
+        cls.filters = [
             i.get_data()
             for i in Filter.current
-            )
+            ]
 
     @classmethod
     def check_app_dirs(cls):
@@ -286,11 +277,11 @@ class JsonData:
     @classmethod
     def compare_versions(cls):
         try:
-            float(cls.app_ver)
+            json_app_ver = float(cls.app_ver)
         except Exception:
-            cls.app_ver = 1.0
+            json_app_ver = APP_VER
 
-        if APP_VER > float(cls.app_ver):
+        if APP_VER > json_app_ver:
             print("Пользовательская версия приложения ниже необходимой")
             cls.copy_db_file()
             cls.copy_hashdir()
@@ -301,8 +292,8 @@ class JsonData:
     def init(cls):
         cls.check_app_dirs()
         cls.read_json_data()
-        cls.init_filters()
         cls.compare_versions()
+        cls.init_filters()
         Themes.set_theme(cls.theme)
 
         print(
