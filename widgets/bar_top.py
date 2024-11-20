@@ -36,15 +36,15 @@ class DatesBtn(Btn):
             raise Exception("widgets > bar_top > dates btn > wrong flag", flag)
 
     def set_normal_style(self):
-        self.setObjectName(Names.dates_btn)
+        self.setObjectName(Names.topbar_btn)
         self.setStyleSheet(Themes.current)
 
     def set_blue_style(self):
-        self.setObjectName(Names.dates_btn_selected)
+        self.setObjectName(Names.topbar_btn_selected)
         self.setStyleSheet(Themes.current)
 
     def set_border_blue_style(self):
-        self.setObjectName(Names.dates_btn_bordered)
+        self.setObjectName(Names.topbar_btn_bordered)
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -67,15 +67,15 @@ class FilterBtn(Btn):
             self.set_normal_style()
 
     def set_normal_style(self):
-        self.setObjectName(Names.filter_btn)
+        self.setObjectName(Names.topbar_btn)
         self.setStyleSheet(Themes.current)
 
     def set_blue_style(self):
-        self.setObjectName(Names.filter_btn_selected)
+        self.setObjectName(Names.topbar_btn_selected)
         self.setStyleSheet(Themes.current)
 
     def set_border_style(self):
-        self.setObjectName(Names.dates_btn_bordered)
+        self.setObjectName(Names.topbar_btn_bordered)
         self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:

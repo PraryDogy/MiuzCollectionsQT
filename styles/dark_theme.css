@@ -57,7 +57,7 @@
     background: #525252;
 }
 
-#dates_btn {
+#topbar_btn {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid transparent;
@@ -65,7 +65,7 @@
     color: #ffffff;
 }
 
-#dates_btn_bordered {
+#topbar_btn_bordered {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid #2e59cb;
@@ -73,7 +73,7 @@
     color: #ffffff;
 }
 
-#dates_btn_selected {
+#topbar_btn_selected {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid transparent;
@@ -97,19 +97,6 @@
     border-bottom: 1px solid black;
 }
 
-#filter_btn {
-    background-color: #242424;
-    border-radius: 6;
-    margin-right: 5px;
-    color: #ffffff;
-}
-
-#filter_btn_selected {
-    background-color: #2e59cb;
-    border-radius: 6;
-    margin-right: 5px;
-    color: #ffffff;
-}
 
 #img_view_bg {
     background-color: #101010;

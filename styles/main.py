@@ -16,12 +16,9 @@ class Names:
     menu_scrollbar_qwidget = "menu_scrollbar_qwidget"
     menu_fake_widget = "menu_fake_widget"
 
-    dates_btn = "dates_btn"
-    dates_btn_selected = "dates_btn_selected"
-    dates_btn_bordered = "dates_btn_bordered"
-
-    filter_btn = "filter_btn"
-    filter_btn_selected = "filter_btn_selected"
+    topbar_btn = "topbar_btn"
+    topbar_btn_selected = "topbar_btn_selected"
+    topbar_btn_bordered = "topbar_btn_bordered"
 
     filter_bar_frame = "filter_bar_frame"
 
