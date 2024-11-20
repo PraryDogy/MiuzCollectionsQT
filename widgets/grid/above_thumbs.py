@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer
-from cfg import NAME_ALL_COLLS, Dynamic, JsonData
+from cfg import NAME_ALL_COLLS, Dynamic, JsonData, Filter
 from lang import Lang
 from signals import SignalsApp
 from styles import Names, Themes
@@ -111,9 +111,9 @@ class AboveThumbsNoImages(QWidget):
         self.v_layout.addWidget(h_wid)
 
         enabled_filters = [
-            data
-            for data in (*JsonData.custom_filters, JsonData.system_filter)
-            if data.get("value")
+            filter.names[JsonData.lang_ind]
+            for filter in Filter.filters
+            if filter.value
             ]
 
         if Dynamic.search_widget_text:
@@ -133,15 +133,10 @@ class AboveThumbsNoImages(QWidget):
             h_layout.addWidget(ResetDatesBtn())
 
         elif enabled_filters:
-    
-            filters = [
-                data.get(Lang._lang_name).lower()
-                for data in enabled_filters
-                ]
 
-            filters = ", ".join(filters)
+            enabled_filters = ", ".join(enabled_filters)
 
-            noimg_t = (f"{Lang.no_photo_filter}: {filters}")
+            noimg_t = (f"{Lang.no_photo_filter}: {enabled_filters}")
 
             title_label.setText(noimg_t)
             h_layout.addWidget(ResetFiltersBtn())

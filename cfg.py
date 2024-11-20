@@ -162,34 +162,6 @@ class JsonData:
 
     coll_folder: str = coll_folder_list[0]
 
-    custom_filters = [
-        {
-            "name": [
-                "Продукт",
-                "Product"
-            ],
-            "real": "1 IMG",
-            "value": False
-        },
-        {
-            "name": [
-                "Модели",
-                "Model"
-            ],
-            "real": "2 MODEL IMG",
-            "value": False
-        }
-    ]
-  
-    system_filter = {
-        "name": [
-            "Остальное",
-            "Other"
-        ],
-        "real": "other_flag",
-        "value": False
-        }
-
     @classmethod
     def get_attributes(cls):
         return {
