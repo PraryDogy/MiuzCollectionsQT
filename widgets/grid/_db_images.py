@@ -125,52 +125,47 @@ class DbImages(URunnable):
         # в ином случае выполняется фильтрация
         if len(filter_values_) > 1:
 
-            user_filters = [
-                i
-                for i in Filter.filters
-                if not i.system
-                and
-                i.value
-            ]
+            user_filters: list[Filter] = []
+            sys_filters: list[Filter] = []
+            and_queries: list[str] = []
 
-            sys_filters = [
-                i
-                for i in Filter.filters
-                if i.system
-                and
-                i.value
-            ]
-
-            and_filters = []
+            for i in Filter.filters:
+                if i.system:
+                    sys_filters.append(i)
+                else:
+                    user_filters.append(i)
 
             for filter in user_filters:
-                t = self.sql_like(filter.real)
+                if filter.value:
+                    t = self.sql_like(filter.real)
 
-                and_filters.append(
-                    THUMBS.c.src.ilike(t)
-                )
+                    and_queries.append(
+                        THUMBS.c.src.ilike(t)
+                    )
 
             for filter in sys_filters:
-                texts = [
-                    self.sql_like(i.real)
-                    for i in user_filters
-                ]
-                
-                stmts = [
-                    THUMBS.c.src.not_ilike(i)
-                    for i in texts
-                ]
-                
-                and_filters.append(
-                    sqlalchemy.and_(*stmts)
-                )
+                if filter.value:
+
+                    texts = [
+                        self.sql_like(i.real)
+                        for i in user_filters
+                    ]
+
+                    stmts = [
+                        THUMBS.c.src.not_ilike(i)
+                        for i in texts
+                    ]
+                    
+                    and_queries.append(
+                        sqlalchemy.and_(*stmts)
+                    )
 
             # пример полного запроса: включен product и other фильтры:
             # остальной запрос БД > ГДЕ
             # ИЛИ src содержит product
             # ИЛИ src НЕ содержит product И src НЕ содержит model
             q = q.where(
-                sqlalchemy.or_(*and_filters)
+                sqlalchemy.or_(*and_queries)
                 )
 
         if any((Dynamic.date_start, Dynamic.date_end)):

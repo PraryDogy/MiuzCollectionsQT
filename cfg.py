@@ -87,7 +87,7 @@ FILTERS = (
     },
     {
         "names": ("Модели", "Model"),
-        "real": "1 MODEL IMG", 
+        "real": "2 MODEL IMG", 
         "value": False,
         "system": False
     },
