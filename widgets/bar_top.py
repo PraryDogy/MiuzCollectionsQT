@@ -85,6 +85,7 @@ class FilterBtn(Btn):
             self.toggle_cmd()
         
     def toggle_cmd(self):
+        print("cmd")
         self.filter.value = not self.filter.value
 
         if self.filter.value:
@@ -106,6 +107,7 @@ class FilterBtn(Btn):
         toggle.triggered.connect(self.toggle_cmd)
         menu_.addAction(toggle)
 
+        self.set_border_style()
         menu_.show_menu()
 
 
