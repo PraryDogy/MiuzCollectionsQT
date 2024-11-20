@@ -14,8 +14,24 @@ from .win_dates import WinDates
 BTN_W, BTN_H = 80, 28
 
 
+class TopBarBtn(Btn):
+    def __init__(self, text: str):
+        super().__init__(text)
 
-class DatesBtn(Btn):
+    def set_normal_style(self):
+        self.setObjectName(Names.topbar_btn)
+        self.setStyleSheet(Themes.current)
+
+    def set_blue_style(self):
+        self.setObjectName(Names.topbar_btn_selected)
+        self.setStyleSheet(Themes.current)
+
+    def set_border_style(self):
+        self.setObjectName(Names.topbar_btn_bordered)
+        self.setStyleSheet(Themes.current)
+
+
+class DatesBtn(TopBarBtn):
     win_dates_opened = pyqtSignal()
 
     def __init__(self):
@@ -31,24 +47,12 @@ class DatesBtn(Btn):
         elif flag == "normal":
             self.set_normal_style()
         elif flag == "border":
-            self.set_border_blue_style()
+            self.set_border_style()
         else:
             raise Exception("widgets > bar_top > dates btn > wrong flag", flag)
 
-    def set_normal_style(self):
-        self.setObjectName(Names.topbar_btn)
-        self.setStyleSheet(Themes.current)
-
-    def set_blue_style(self):
-        self.setObjectName(Names.topbar_btn_selected)
-        self.setStyleSheet(Themes.current)
-
-    def set_border_blue_style(self):
-        self.setObjectName(Names.topbar_btn_bordered)
-        self.setStyleSheet(Themes.current)
-
     def open_win(self):
-        self.set_border_blue_style()
+        self.set_border_style()
         self.win_dates_opened.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -64,13 +68,13 @@ class DatesBtn(Btn):
         toggle.triggered.connect(self.open_win)
         menu_.addAction(toggle)
 
-        self.set_border_blue_style()
+        self.set_border_style()
         menu_.show_menu()
         self.setObjectName(prev)
         self.setStyleSheet(Themes.current)
 
 
-class FilterBtn(Btn):
+class FilterBtn(TopBarBtn):
     def __init__(self, filter: Filter):
         super().__init__(text=filter.names[JsonData.lang_ind])
 
@@ -82,24 +86,6 @@ class FilterBtn(Btn):
             self.set_blue_style()
         else:
             self.set_normal_style()
-
-    def set_normal_style(self):
-        self.setObjectName(Names.topbar_btn)
-        self.setStyleSheet(Themes.current)
-
-    def set_blue_style(self):
-        self.setObjectName(Names.topbar_btn_selected)
-        self.setStyleSheet(Themes.current)
-
-    def set_border_style(self):
-        self.setObjectName(Names.topbar_btn_bordered)
-        self.setStyleSheet(Themes.current)
-
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() != Qt.MouseButton.LeftButton:
-            return
-        else:
-            self.toggle_cmd()
         
     def toggle_cmd(self):
         print("cmd")
@@ -113,6 +99,12 @@ class FilterBtn(Btn):
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
     
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.button() != Qt.MouseButton.LeftButton:
+            return
+        else:
+            self.toggle_cmd()
+
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         menu_ = ContextCustom(ev)
 
