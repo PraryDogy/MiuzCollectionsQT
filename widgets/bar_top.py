@@ -63,6 +63,7 @@ class DatesBtn(TopBarBtn):
             self.open_win()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+
         menu_ = ContextCustom(ev)
 
         toggle = QAction(parent=menu_, text=Lang.view)
@@ -74,6 +75,8 @@ class DatesBtn(TopBarBtn):
 
         if self.set_style_cmd:
             self.set_style_cmd()
+        else:
+            self.set_normal_style()
 
 
 class FilterBtn(TopBarBtn):
