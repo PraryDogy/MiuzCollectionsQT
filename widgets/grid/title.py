@@ -85,8 +85,8 @@ class Title(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         menu_ = ContextCustom(ev)
 
-        self.setObjectName(Names.th_title_selected)
-        self.setStyleSheet(Themes.current)
+        # self.setObjectName(Names.th_title_selected)
+        # self.setStyleSheet(Themes.current)
 
         cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
         save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
@@ -112,5 +112,5 @@ class Title(QLabel):
 
         menu_.show_menu()
 
-        self.setObjectName(Names.th_title)
-        self.setStyleSheet(Themes.current)
+        # self.setObjectName(Names.th_title)
+        # self.setStyleSheet(Themes.current)
