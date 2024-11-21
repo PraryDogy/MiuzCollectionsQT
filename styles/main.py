@@ -29,6 +29,7 @@ class Names:
     th_reset_filters_btn = "th_reset_filters_btn"
     th_show_all_btn = "th_show_all_btn"
     th_title = "th_title"
+    th_title_selected = "th_title_selected"
     th_scrollbar = "th_scrollbar"
     th_scroll_widget = "th_scroll_widget"
 

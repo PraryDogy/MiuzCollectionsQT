@@ -1,7 +1,8 @@
 import os
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QContextMenuEvent
-from PyQt5.QtWidgets import QAction, QLabel
+from PyQt5.QtWidgets import QAction, QLabel, QSizePolicy
 
 from base_widgets import ContextCustom
 from cfg import PSD_TIFF, Dynamic, JsonData
@@ -17,19 +18,15 @@ from ._db_images import DbImage
 
 class Title(QLabel):
     def __init__(self, title: str, db_images: list[DbImage], width: int):
-        super().__init__(f"{title}. {Lang.total}: {len(db_images)}")
+        super().__init__(f"{title}. {Lang.total}: {len(db_images)} ")
         self.db_images = db_images
-        self.setFixedWidth(width - 20)
-        self.setWordWrap(True)
-        self.setContentsMargins(0, 0, 0, 5)
         self.setObjectName(Names.th_title)
         self.setStyleSheet(Themes.current)
-
-        self.my_context = None
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        self.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        # self.setContentsMargins(0, 20, 0 ,0)
 
     def save_cmd(self, is_layers: bool, save_as: bool):
-
-        print(is_layers, save_as)
 
         if Utils.smb_check():
 
@@ -88,6 +85,9 @@ class Title(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         menu_ = ContextCustom(ev)
 
+        self.setObjectName(Names.th_title_selected)
+        self.setStyleSheet(Themes.current)
+
         cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
         save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
         save_jpg.triggered.connect(cmd_)
@@ -111,3 +111,6 @@ class Title(QLabel):
         menu_.addAction(save_as_layers)
 
         menu_.show_menu()
+
+        self.setObjectName(Names.th_title)
+        self.setStyleSheet(Themes.current)

@@ -260,6 +260,14 @@
     color: #ffffff;
 }
 
+#th_title_selected {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: rgba(46, 88, 203, 1.0);
+    border-radius: 10px;
+}
+
 #thumbnail_normal {
     background-color: transparent;
 }
