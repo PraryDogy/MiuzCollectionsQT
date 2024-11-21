@@ -77,6 +77,8 @@ class Grid(QScrollArea):
         if value > 0:
             self.up_btn.show()
             self.up_btn.raise_()
+        elif value == 0:
+            self.up_btn.hide()
 
     def load_db_images(self, flag: str):
         """flag: first, more"""
