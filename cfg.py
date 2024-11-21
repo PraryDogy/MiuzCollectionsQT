@@ -78,27 +78,6 @@ PSD_TIFF: tuple = (
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
 
-FILTERS = (
-    {
-        "names": ("Продукт", "Product"),
-        "real": "1 IMG", 
-        "value": False,
-        "system": False
-    },
-    {
-        "names": ("Модели", "Model"),
-        "real": "2 MODEL IMG", 
-        "value": False,
-        "system": False
-    },
-    {
-        "names": ("Остальное", "Other"),
-        "real": None, 
-        "value": False,
-        "system": True
-    },
-)
-
 
 class Filter:
     filters: list["Filter"] = []
@@ -109,6 +88,14 @@ class Filter:
         self.real = real
         self.value = value
         self.system = system
+
+    def get_data(self):
+        return {
+            "names": self.names,
+            "real": self.real,
+            "value": self.value,
+            "system": self.system
+        }
 
 
 class JsonData:
@@ -162,18 +149,40 @@ class JsonData:
 
     coll_folder: str = coll_folder_list[0]
 
+    filters = [
+        {
+            "names": ("Продукт", "Product"),
+            "real": "1 IMG", 
+            "value": False,
+            "system": False
+        },
+        {
+            "names": ("Модели", "Model"),
+            "real": "2 MODEL IMG", 
+            "value": False,
+            "system": False
+        },
+        {
+            "names": ("Остальное", "Other"),
+            "real": None, 
+            "value": False,
+            "system": True
+        },
+    ]
+
     @classmethod
-    def get_attributes(cls):
+    def _get_data(cls):
+        """returns user attibutes and values"""
         return {
             k: v
             for k, v in vars(cls).items()
             if not k.startswith("__")
             and
             not callable(getattr(cls, k))
-            }
+        }
 
     @classmethod
-    def read_json_data(cls) -> dict:
+    def _read_json_data(cls) -> dict:
 
         if os.path.exists(JSON_FILE):
 
@@ -183,7 +192,7 @@ class JsonData:
 
                 except json.JSONDecodeError:
                     print("Ошибка чтения json")
-                    json_data: dict = cls.get_attributes()
+                    json_data: dict = cls._get_data()
                 
             for k, v in json_data.items():
                 if hasattr(cls, k):
@@ -191,24 +200,32 @@ class JsonData:
 
     @classmethod
     def write_json_data(cls):
+        cls.filters = cls._get_filters()
+
         with open(JSON_FILE, 'w', encoding="utf-8") as f:
             json.dump(
-                obj=cls.get_attributes(),
+                obj=cls._get_data(),
                 fp=f,
                 indent=4,
                 ensure_ascii=False
             )
 
     @classmethod
-    def init_filters(cls):
-        for i in FILTERS:
+    def _init_filters(cls):
+        for i in cls.filters:
             Filter.filters.append(
                 Filter(**i)
             )
 
     @classmethod
-    def check_app_dirs(cls):
+    def _get_filters(cls):
+        return [
+            i.get_data()
+            for i in Filter.filters
+        ]
 
+    @classmethod
+    def _check_app_dirs(cls):
         if not os.path.exists(APP_SUPPORT_DIR):
             os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
 
@@ -254,7 +271,7 @@ class JsonData:
             raise Exception(t)
 
     @classmethod
-    def compare_versions(cls):
+    def _compare_versions(cls):
         try:
             json_app_ver = float(cls.app_ver)
         except Exception:
@@ -269,10 +286,10 @@ class JsonData:
 
     @classmethod
     def init(cls):
-        cls.check_app_dirs()
-        cls.read_json_data()
-        cls.compare_versions()
-        cls.init_filters()
+        cls._check_app_dirs()
+        cls._read_json_data()
+        cls._compare_versions()
+        cls._init_filters()
         Themes.set_theme(cls.theme)
 
         print(
