@@ -4,6 +4,7 @@ from PyQt5.QtGui import QMouseEvent
 from base_widgets import Btn
 from cfg import GRID_LIMIT, Dynamic
 from lang import Lang
+from styles import Names, Themes
 
 
 class LimitBtn(Btn):
@@ -17,4 +18,7 @@ class LimitBtn(Btn):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.grid_offset += GRID_LIMIT
         self._clicked.emit()
-        self.deleteLater()
+        self.setDisabled(True)
+        self.setText("")
+        self.setObjectName(Names.thumbnail_normal)
+        self.setStyleSheet(Themes.current)
