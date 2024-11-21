@@ -98,15 +98,19 @@ class DbImages(URunnable):
 
         stmt_where: list = []
 
+        if Dynamic.search_widget_text:
+            text = Dynamic.search_widget_text.strip().replace("\n", "")
+            stmt_where.append(THUMBS.c.src.ilike(f"%{text}%"))
+
+            for i in stmt_where:
+                q = q.where(i)
+                return q
+
         if JsonData.curr_coll == NAME_FAVS:
             stmt_where.append(THUMBS.c.fav == 1)
 
         elif JsonData.curr_coll != NAME_ALL_COLLS:
             stmt_where.append(THUMBS.c.coll == JsonData.curr_coll)
-
-        if Dynamic.search_widget_text:
-            text = Dynamic.search_widget_text.strip().replace("\n", "")
-            stmt_where.append(THUMBS.c.src.ilike(f"%{text}%"))
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self.combine_dates()
