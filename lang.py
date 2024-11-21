@@ -39,8 +39,16 @@ class Lang_:
         "Changed"
     ]
     choose_coll_smb = [
-        "Нет подключения:\n- Подключитесь к /Marketing/Design или\n   к /Studio/Photo. \n- Добавьте новый путь к коллекциям\n   в настройках.",
-        "No connection:\n- Connect to /Marketing/Design or\n   to /Studio/Photo.\n- Add a new path to collections\n   in the settings."
+        "Нет подключения:\
+            \n- Подключитесь к /Marketing/Design или\
+            \n\tк /Studio/Photo.\
+            \n- Добавьте новый путь к коллекциям\
+            \n\tв настройках.",
+        "No connection:\
+            \n- Connect to /Marketing/Design or\
+            \n\tto /Studio/Photo.\
+            \n- Add a new path to collections\
+            \n\tin the settings."
     ]
     collection = [
         "Коллекция",
