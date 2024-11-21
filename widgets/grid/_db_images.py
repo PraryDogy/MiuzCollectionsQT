@@ -96,36 +96,28 @@ class DbImages(URunnable):
         q = q.limit(GRID_LIMIT).offset(Dynamic.grid_offset)
         q = q.order_by(-THUMBS.c.mod)
 
-        if JsonData.curr_coll == NAME_FAVS:
+        stmt_where: list = []
 
-            q = q.where(
-                THUMBS.c.fav == 1
-                )
+        if JsonData.curr_coll == NAME_FAVS:
+            stmt_where.append(THUMBS.c.fav == 1)
 
         elif JsonData.curr_coll != NAME_ALL_COLLS:
-
-            q = q.where(
-                THUMBS.c.coll == JsonData.curr_coll
-                )
+            stmt_where.append(THUMBS.c.coll == JsonData.curr_coll)
 
         if Dynamic.search_widget_text:
-
             text = Dynamic.search_widget_text.strip().replace("\n", "")
-            q = q.where(
-                THUMBS.c.src.ilike(f"%{text}%")
-                )
+            stmt_where.append(THUMBS.c.src.ilike(f"%{text}%"))
 
         filter_values_ = set(
             i.value
             for i in Filter.filters
         )
         
-        # если ВСЕ фильтры включены или выключены, это будет равняться
-        # отсутствию фильтрации
+        # если ВСЕ фильтры включены - это будет равняться отсутствию фильтров
         # в ином случае выполняется фильтрация
         if len(filter_values_) > 1:
 
-            user_filters: list[Filter] = []
+            non_sys_filters: list[Filter] = []
             sys_filters: list[Filter] = []
             and_queries: list[str] = []
 
@@ -133,9 +125,9 @@ class DbImages(URunnable):
                 if i.system:
                     sys_filters.append(i)
                 else:
-                    user_filters.append(i)
+                    non_sys_filters.append(i)
 
-            for filter in user_filters:
+            for filter in non_sys_filters:
                 if filter.value:
                     t = self.sql_like(filter.real)
 
@@ -148,7 +140,7 @@ class DbImages(URunnable):
 
                     texts = [
                         self.sql_like(i.real)
-                        for i in user_filters
+                        for i in non_sys_filters
                     ]
 
                     stmts = [
@@ -164,14 +156,15 @@ class DbImages(URunnable):
             # остальной запрос БД > ГДЕ
             # ИЛИ src содержит product
             # ИЛИ src НЕ содержит product И src НЕ содержит model
-            q = q.where(
-                sqlalchemy.or_(*and_queries)
-                )
+            stmt_where.append(sqlalchemy.or_(*and_queries))
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self.combine_dates()
-            q = q.where(THUMBS.c.mod > t[0])
-            q = q.where(THUMBS.c.mod < t[1])
+            stmt_where.append(THUMBS.c.mod > t[0])
+            stmt_where.append(THUMBS.c.mod < t[1])
+
+        for i in stmt_where:
+            q = q.where(i)
 
         return q
     

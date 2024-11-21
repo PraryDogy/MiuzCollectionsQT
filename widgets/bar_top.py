@@ -88,7 +88,6 @@ class FilterBtn(TopBarBtn):
             self.set_normal_style()
         
     def toggle_cmd(self):
-        print("cmd")
         self.filter.value = not self.filter.value
 
         if self.filter.value:
