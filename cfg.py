@@ -302,9 +302,9 @@ class JsonData:
 
 
 class Dynamic:
-    grid_offset: int = 0
     date_start: datetime = None
     date_end: datetime = None
-    search_widget_text: str = None
     date_start_text: str = None # 1 january 1991
     date_end_text: str = None # 31 january 1991
+    grid_offset: int = 0
+    search_widget_text: str = None
