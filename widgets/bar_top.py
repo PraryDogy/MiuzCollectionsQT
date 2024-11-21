@@ -38,16 +38,19 @@ class DatesBtn(TopBarBtn):
         super().__init__(text=Lang.dates)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
+        self.set_style_cmd: callable = None
         SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
 
     def dates_btn_style(self, flag: str):
         if flag == "blue":
             self.set_blue_style()
+            self.set_style_cmd = self.set_blue_style
         elif flag == "normal":
             self.set_normal_style()
+            self.set_style_cmd = self.set_normal_style
         elif flag == "border":
             self.set_border_style()
+            self.set_style_cmd = self.set_border_style
         else:
             raise Exception("widgets > bar_top > dates btn > wrong flag", flag)
 
@@ -60,8 +63,6 @@ class DatesBtn(TopBarBtn):
             self.open_win()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        prev = self.objectName()
-
         menu_ = ContextCustom(ev)
 
         toggle = QAction(parent=menu_, text=Lang.view)
@@ -70,8 +71,9 @@ class DatesBtn(TopBarBtn):
 
         self.set_border_style()
         menu_.show_menu()
-        self.setObjectName(prev)
-        self.setStyleSheet(Themes.current)
+
+        if self.set_style_cmd:
+            self.set_style_cmd()
 
 
 class FilterBtn(TopBarBtn):
