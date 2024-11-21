@@ -24,7 +24,7 @@ class WinSmb(WinChild):
         self.max_btn_disable()
 
         self.init_ui()
-        self.setFixedSize(350, 170)
+        self.setFixedSize(330, 150)
         self.setFocus()
 
         self.new_coll_path = None
