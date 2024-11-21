@@ -108,6 +108,11 @@ class DbImages(URunnable):
             text = Dynamic.search_widget_text.strip().replace("\n", "")
             stmt_where.append(THUMBS.c.src.ilike(f"%{text}%"))
 
+        if any((Dynamic.date_start, Dynamic.date_end)):
+            t = self.combine_dates()
+            stmt_where.append(THUMBS.c.mod > t[0])
+            stmt_where.append(THUMBS.c.mod < t[1])
+
         filter_values_ = set(
             i.value
             for i in Filter.filters
@@ -157,11 +162,6 @@ class DbImages(URunnable):
             # ИЛИ src содержит product
             # ИЛИ src НЕ содержит product И src НЕ содержит model
             stmt_where.append(sqlalchemy.or_(*and_queries))
-
-        if any((Dynamic.date_start, Dynamic.date_end)):
-            t = self.combine_dates()
-            stmt_where.append(THUMBS.c.mod > t[0])
-            stmt_where.append(THUMBS.c.mod < t[1])
 
         for i in stmt_where:
             q = q.where(i)
