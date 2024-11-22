@@ -42,7 +42,7 @@ class DbImages(URunnable):
     def run(self):
 
         conn = Dbase.engine.connect()
-        stmt = self._get_stmt()
+        stmt = self.get_stmt()
         res: list[tuple[str, str, int, str, int]] = conn.execute(stmt).fetchall()        
         conn.close()
 
@@ -84,7 +84,7 @@ class DbImages(URunnable):
 
         self.signals_.finished_.emit(thumbs_dict)
 
-    def _get_stmt(self) -> sqlalchemy.Select:
+    def get_stmt(self) -> sqlalchemy.Select:
         q = sqlalchemy.select(
             THUMBS.c.src,
             THUMBS.c.hash_path,
