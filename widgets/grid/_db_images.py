@@ -126,17 +126,11 @@ class DbImages(URunnable):
         # в ином случае выполняется фильтрация
         if len(filter_values_) > 1:
 
-            non_sys_filters: list[Filter] = []
-            sys_filters: list[Filter] = []
+
             and_queries: list[str] = []
+            user_filters, sys_filters = self.group_filters()
 
-            for i in Filter.filters:
-                if i.system:
-                    sys_filters.append(i)
-                else:
-                    non_sys_filters.append(i)
-
-            for filter in non_sys_filters:
+            for filter in user_filters:
                 if filter.value:
 
                     and_queries.append(
@@ -148,7 +142,7 @@ class DbImages(URunnable):
 
                     texts = [
                         f"%{os.sep}{i.real}{os.sep}%"
-                        for i in non_sys_filters
+                        for i in user_filters
                     ]
 
                     stmts = [
@@ -170,6 +164,18 @@ class DbImages(URunnable):
             q = q.where(i)
 
         return q
+
+    def group_filters(self) -> tuple[list[Filter], list[Filter]]:
+        user_filters: list[Filter] = []
+        sys_filters: list[Filter] = []
+
+        for i in Filter.filters:
+            if i.system:
+                sys_filters.append(i)
+            else:
+                user_filters.append(i)
+
+        return user_filters, sys_filters
 
     def combine_dates(self) -> tuple[datetime, datetime]:
         start = datetime.combine(
