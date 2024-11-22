@@ -138,17 +138,16 @@ class DbImages(URunnable):
 
             for filter in non_sys_filters:
                 if filter.value:
-                    t = self.sql_like(filter.real)
 
                     and_queries.append(
-                        THUMBS.c.src.ilike(t)
+                        THUMBS.c.src.ilike(f"%{os.sep}{filter.real}{os.sep}%")
                     )
 
             for filter in sys_filters:
                 if filter.value:
 
                     texts = [
-                        self.sql_like(i.real)
+                        f"%{os.sep}{i.real}{os.sep}%"
                         for i in non_sys_filters
                     ]
 
@@ -171,9 +170,6 @@ class DbImages(URunnable):
             q = q.where(i)
 
         return q
-    
-    def sql_like(self, text: str) -> str:
-        return "%" + os.sep + text + os.sep + "%"
 
     def combine_dates(self) -> tuple[datetime, datetime]:
         start = datetime.combine(
