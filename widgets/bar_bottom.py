@@ -34,11 +34,11 @@ class SvgPaths:
 
 
 
-class ProgressBar(QLabel):
-    def __init__(self):
-        super().__init__()
-        self.setAlignment(Qt.AlignmentFlag.AlignRight)
-        SignalsApp.all_.progressbar_text.connect(self.setText)
+# class ProgressBar(QLabel):
+#     def __init__(self):
+#         super().__init__()
+#         self.setAlignment(Qt.AlignmentFlag.AlignRight)
+#         SignalsApp.all_.progressbar_text.connect(self.setText)
 
 
         
@@ -113,8 +113,13 @@ class BarBottom(QFrame):
     def init_ui(self):
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        self.progress_bar = ProgressBar()
-        self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
+        self.progress_bar = QLabel(text="")
+        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignRight)
+        SignalsApp.all_.progressbar_text.connect(self.progress_bar.setText)
+        self.h_layout.addWidget(
+            self.progress_bar,
+            alignment=Qt.AlignmentFlag.AlignVCenter
+        )
 
         SvgPaths.update_()
 
