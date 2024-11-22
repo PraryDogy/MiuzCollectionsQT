@@ -13,7 +13,7 @@ from imagecodecs.imagecodecs import DelayedImportError
 from PIL import Image
 from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QApplication, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget
 from tifffile import tifffile
 
 from cfg import HASH_DIR, JsonData
@@ -314,3 +314,12 @@ class Utils:
     @classmethod
     def get_shortpath(cls, src: str) -> str:
         return src.replace(JsonData.coll_folder, "")
+
+    @classmethod
+    def change_style(cls, wid: QWidget, style: str):
+        if not wid.objectName():
+            raise Exception("no ObjectName")
+
+        wid.setProperty("class", style)
+        wid.style().unpolish(wid)
+        wid.style().polish(wid)   

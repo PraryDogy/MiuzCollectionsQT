@@ -22,15 +22,15 @@ class Title(QLabel):
     def __init__(self, title: str, db_images: list[DbImage], width: int):
         super().__init__(f"{title}. {Lang.total}: {len(db_images)}")
         self.db_images = db_images
-        self.setContentsMargins(3, 5, 3, 5)
-        self.setObjectName("th_title_new")
-        self.setProperty("class", "normal")
-        self.style().unpolish(self)
-        self.style().polish(self)   
+
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Preferred
             )
+
+        self.setContentsMargins(3, 5, 3, 5)
+        self.setObjectName("th_title_new")
+        Utils.change_style(self, "normal")
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
@@ -90,12 +90,9 @@ class Title(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.r_click.emit()
+        Utils.change_style(self, "selected")
 
         menu_ = ContextCustom(ev)
-
-        self.setProperty("class", "selected")
-        self.style().unpolish(self)
-        self.style().polish(self)
 
         cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
         save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
@@ -120,7 +117,22 @@ class Title(QLabel):
         menu_.addAction(save_as_layers)
 
         menu_.show_menu()
+        Utils.change_style(self, "normal")
 
-        self.setProperty("class", "normal")
-        self.style().unpolish(self)
-        self.style().polish(self)
+
+# единый css с таким стилем
+"""
+#th_title_new.selected {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: rgba(46, 88, 203, 1.0);
+    border-radius: 5px;
+}
+
+#th_title_new.normal {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #ffffff;
+}
+"""
