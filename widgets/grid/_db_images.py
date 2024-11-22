@@ -118,15 +118,23 @@ class DbImages(URunnable):
             stmt_where.append(THUMBS.c.mod < t[1])
 
         user_filters, sys_filters = self.group_filters()
-        stmt_where.append(self.user_filter_or(user_filters))
-        stmt_where.append(self.sys_filter_or(user_filters, sys_filters))
+        stmt_where.append(self.build_inclusion_condition(user_filters))
+        stmt_where.append(self.build_exclusion_condition(user_filters, sys_filters))
 
         for i in stmt_where:
             q = q.where(i)
 
         return q
     
-    def sys_filter_or(self, user_filters: list[Filter], sys_filters: list[Filter]):
+    def build_exclusion_condition(
+            self,
+            user_filters: list[Filter],
+            sys_filters: list[Filter]
+        ):
+        """
+        Формирует условие для исключения значений системных фильтров,
+        пересекающихся с пользовательскими.
+        """
         conditions = [
             THUMBS.c.src.not_ilike(f"%{os.sep}{user_filter.real}{os.sep}%")
             for sys_filter in sys_filters
@@ -135,7 +143,13 @@ class DbImages(URunnable):
         ]
         return sqlalchemy.or_(sqlalchemy.and_(*conditions))
 
-    def user_filter_or(self, user_filters: list[Filter]):
+    def build_inclusion_condition(
+            self,
+            user_filters: list[Filter]
+        ):
+        """
+        Формирует условие для включения значений пользовательских фильтров.
+        """
         conditions = [
             THUMBS.c.src.ilike(f"%{os.sep}{filter.real}{os.sep}%")
             for filter in user_filters
@@ -144,6 +158,20 @@ class DbImages(URunnable):
         return sqlalchemy.or_(*conditions)
 
     def group_filters(self) -> tuple[list[Filter], list[Filter]]:
+        """
+        Разделяет фильтры на пользовательские и системные.
+
+        Фильтры классифицируются на основе значения их атрибута `.system`:
+        - Если `.system == True`, фильтр добавляется в список системных
+        фильтров (`sys_filters`).
+        - Если `.system == False`, фильтр добавляется в список пользовательских
+        фильтров (`user_filters`).
+
+        Returns:
+            tuple[list[Filter], list[Filter]]:
+                - user_filters: Список пользовательских фильтров.
+                - sys_filters: Список системных фильтров.
+        """
         user_filters: list[Filter] = []
         sys_filters: list[Filter] = []
 
