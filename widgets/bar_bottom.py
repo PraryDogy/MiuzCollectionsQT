@@ -149,7 +149,10 @@ class BarBottom(QFrame):
         else:
             raise Exception("widgets >bar bottom > btn downloads > wrong flag", flag)
 
-    def switch_theme_cmd(self, e):
+    def switch_theme_cmd(self, e: QMouseEvent):
+        if not e.button() == Qt.MouseButton.LeftButton:
+            return
+
         all_widgets = QApplication.allWidgets()
         widgets = [
             widget
@@ -175,12 +178,14 @@ class BarBottom(QFrame):
 
         JsonData.write_json_data()
 
-    def open_downloads(self, e):
-        self.downloads_win = WinDownloads()
-        self.downloads_win.center_relative_parent(self.window())
-        self.downloads_win.show()
+    def open_downloads(self, e: QMouseEvent):
+        if e.button() == Qt.MouseButton.LeftButton:
+            self.downloads_win = WinDownloads()
+            self.downloads_win.center_relative_parent(self.window())
+            self.downloads_win.show()
 
-    def sett_btn_cmd(self, e):
-        self.settings = WinSettings()
-        self.settings.center_relative_parent(self.window())
-        self.settings.show()
+    def sett_btn_cmd(self, e: QMouseEvent):
+        if e.button() == Qt.MouseButton.LeftButton:
+            self.settings = WinSettings()
+            self.settings.center_relative_parent(self.window())
+            self.settings.show()
