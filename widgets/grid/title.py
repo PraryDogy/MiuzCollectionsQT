@@ -23,8 +23,10 @@ class Title(QLabel):
         super().__init__(f"{title}. {Lang.total}: {len(db_images)}")
         self.db_images = db_images
         self.setContentsMargins(3, 5, 3, 5)
-        self.setObjectName(Names.th_title)
-        self.setStyleSheet(Themes.current)
+        self.setObjectName("th_title_new")
+        self.setProperty("class", "normal")
+        self.style().unpolish(self)
+        self.style().polish(self)   
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Preferred
@@ -91,8 +93,9 @@ class Title(QLabel):
 
         menu_ = ContextCustom(ev)
 
-        self.setObjectName(Names.th_title_selected)
-        self.setStyleSheet(Themes.current)
+        self.setProperty("class", "selected")
+        self.style().unpolish(self)
+        self.style().polish(self)
 
         cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
         save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
@@ -118,5 +121,6 @@ class Title(QLabel):
 
         menu_.show_menu()
 
-        self.setObjectName(Names.th_title)
-        self.setStyleSheet(Themes.current)
+        self.setProperty("class", "normal")
+        self.style().unpolish(self)
+        self.style().polish(self)

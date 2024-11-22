@@ -268,6 +268,7 @@
     border-radius: 5px;
 }
 
+
 #thumbnail_normal {
     background-color: transparent;
 }
@@ -369,3 +370,18 @@ QProgressBar::chunk {
     background-color: #2e59cb;
     border-radius: 3px;
     }
+
+
+#th_title_new.selected {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: rgba(46, 88, 203, 1.0);
+    border-radius: 5px;
+}
+
+#th_title_new.normal {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #ffffff;
+}
