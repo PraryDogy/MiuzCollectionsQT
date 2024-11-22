@@ -117,53 +117,31 @@ class DbImages(URunnable):
             stmt_where.append(THUMBS.c.mod > t[0])
             stmt_where.append(THUMBS.c.mod < t[1])
 
-        filter_values_ = set(
-            i.value
-            for i in Filter.filters
-        )
-        
-        # если ВСЕ фильтры включены - это будет равняться отсутствию фильтров
-        # в ином случае выполняется фильтрация
-        if len(filter_values_) > 1:
-
-
-            and_queries: list[str] = []
-            user_filters, sys_filters = self.group_filters()
-
-            for filter in user_filters:
-                if filter.value:
-
-                    and_queries.append(
-                        THUMBS.c.src.ilike(f"%{os.sep}{filter.real}{os.sep}%")
-                    )
-
-            for filter in sys_filters:
-                if filter.value:
-
-                    texts = [
-                        f"%{os.sep}{i.real}{os.sep}%"
-                        for i in user_filters
-                    ]
-
-                    stmts = [
-                        THUMBS.c.src.not_ilike(i)
-                        for i in texts
-                    ]
-                    
-                    and_queries.append(
-                        sqlalchemy.and_(*stmts)
-                    )
-
-            # пример полного запроса: включен product и other фильтры:
-            # остальной запрос БД > ГДЕ
-            # ИЛИ src содержит product
-            # ИЛИ src НЕ содержит product И src НЕ содержит model
-            stmt_where.append(sqlalchemy.or_(*and_queries))
+        user_filters, sys_filters = self.group_filters()
+        stmt_where.append(self.user_filter_or(user_filters))
+        stmt_where.append(self.sys_filter_or(user_filters, sys_filters))
 
         for i in stmt_where:
             q = q.where(i)
 
         return q
+    
+    def sys_filter_or(self, user_filters: list[Filter], sys_filters: list[Filter]):
+        conditions = [
+            THUMBS.c.src.not_ilike(f"%{os.sep}{user_filter.real}{os.sep}%")
+            for sys_filter in sys_filters
+            for user_filter in user_filters
+            if sys_filter.value
+        ]
+        return sqlalchemy.or_(sqlalchemy.and_(*conditions))
+
+    def user_filter_or(self, user_filters: list[Filter]):
+        conditions = [
+            THUMBS.c.src.ilike(f"%{os.sep}{filter.real}{os.sep}%")
+            for filter in user_filters
+            if filter.value
+        ]
+        return sqlalchemy.or_(*conditions)
 
     def group_filters(self) -> tuple[list[Filter], list[Filter]]:
         user_filters: list[Filter] = []
@@ -174,7 +152,6 @@ class DbImages(URunnable):
                 sys_filters.append(i)
             else:
                 user_filters.append(i)
-
         return user_filters, sys_filters
 
     def combine_dates(self) -> tuple[datetime, datetime]:
