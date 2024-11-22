@@ -6,7 +6,7 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from cfg import BRANDS, IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, JsonData
+from cfg import BRANDS, IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, Dynamic, JsonData
 from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -31,6 +31,7 @@ class ScanerUtils:
             try:
                 SignalsApp.all_.menu_left_cmd.emit("reload")
                 SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+                Dynamic.grid_offset = 0
             except RuntimeError as e:
                 Utils.print_err(error=e)
 
