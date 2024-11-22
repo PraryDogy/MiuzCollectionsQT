@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLabel, QSizePolicy
 
@@ -17,14 +17,18 @@ from ._db_images import DbImage
 
 
 class Title(QLabel):
+    r_click = pyqtSignal()
+
     def __init__(self, title: str, db_images: list[DbImage], width: int):
-        super().__init__(f"{title}. {Lang.total}: {len(db_images)} ")
+        super().__init__(f"{title}. {Lang.total}: {len(db_images)}")
         self.db_images = db_images
+        self.setContentsMargins(3, 5, 3, 5)
         self.setObjectName(Names.th_title)
         self.setStyleSheet(Themes.current)
-        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
-        self.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        # self.setContentsMargins(0, 20, 0 ,0)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Fixed,
+            QSizePolicy.Policy.Preferred
+            )
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
@@ -83,10 +87,12 @@ class Title(QLabel):
             SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        self.r_click.emit()
+
         menu_ = ContextCustom(ev)
 
-        # self.setObjectName(Names.th_title_selected)
-        # self.setStyleSheet(Themes.current)
+        self.setObjectName(Names.th_title_selected)
+        self.setStyleSheet(Themes.current)
 
         cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
         save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
@@ -112,5 +118,5 @@ class Title(QLabel):
 
         menu_.show_menu()
 
-        # self.setObjectName(Names.th_title)
-        # self.setStyleSheet(Themes.current)
+        self.setObjectName(Names.th_title)
+        self.setStyleSheet(Themes.current)

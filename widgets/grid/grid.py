@@ -141,7 +141,8 @@ class Grid(QScrollArea):
             db_images=db_images,
             width=self.width()
             )
-        title_label.setContentsMargins(5, 0, 0, 10)
+        title_label.r_click.connect(self.reset_selection)
+        # title_label.setContentsMargins(5, 0, 0, 10)
         self.grids_layout.addWidget(title_label)
 
         grid_widget = QWidget()
@@ -337,6 +338,7 @@ class Grid(QScrollArea):
         return super().resizeEvent(a0)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
+        self.reset_selection()
         self.menu_ = ContextCustom(event=a0)
 
         reload = ScanerRestart(self.menu_)
