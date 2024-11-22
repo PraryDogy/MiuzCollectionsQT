@@ -118,8 +118,14 @@ class DbImages(URunnable):
             stmt_where.append(THUMBS.c.mod < t[1])
 
         user_filters, sys_filters = self.group_filters()
-        stmt_where.append(self.build_inclusion_condition(user_filters))
-        stmt_where.append(self.build_exclusion_condition(user_filters, sys_filters))
+    
+        stmt_where.append(
+            self.build_inclusion_condition(user_filters)
+        )
+    
+        stmt_where.append(
+            self.build_exclusion_condition(user_filters, sys_filters)
+        )
 
         for i in stmt_where:
             q = q.where(i)
@@ -132,8 +138,23 @@ class DbImages(URunnable):
             sys_filters: list[Filter]
         ):
         """
-        Формирует условие для исключения значений системных фильтров,
-        пересекающихся с пользовательскими.
+        Формирует SQLAlchemy условие для исключения строк, которые соответствуют
+        пользовательским фильтрам, если системный фильтр включён.
+
+        Условия строятся так:
+        - Для каждого активного системного фильтра (sys_filter.value == True) создаётся
+        группа условий, исключающих строки, соответствующие пользовательским фильтрам.
+        - Условия объединяются с помощью OR для всех активных системных фильтров.
+        - Внутри каждой группы пользовательские фильтры объединяются с помощью AND.
+
+        Args:
+            user_filters (list[Filter]): Список пользовательских фильтров (не системных).
+            sys_filters (list[Filter]): Список системных фильтров.
+
+        Returns:
+            sqlalchemy.sql.elements.BooleanClauseList:
+                Условие для исключения строк, соответствующих пересечению системных
+                и пользовательских фильтров.
         """
         conditions = [
             THUMBS.c.src.not_ilike(f"%{os.sep}{user_filter.real}{os.sep}%")
@@ -148,7 +169,21 @@ class DbImages(URunnable):
             user_filters: list[Filter]
         ):
         """
-        Формирует условие для включения значений пользовательских фильтров.
+        Формирует SQLAlchemy условие для включения строк, соответствующих
+        значениям пользовательских фильтров.
+
+        Условия строятся так:
+        - Для каждого активного пользовательского фильтра (filter.value == True)
+        создаётся выражение, проверяющее, что `src` содержит значение `filter.real`.
+        - Все условия объединяются с помощью OR.
+
+        Args:
+            user_filters (list[Filter]): Список пользовательских фильтров.
+
+        Returns:
+            sqlalchemy.sql.elements.BooleanClauseList:
+                Условие для включения строк, соответствующих хотя бы одному
+                из пользовательских фильтров.
         """
         conditions = [
             THUMBS.c.src.ilike(f"%{os.sep}{filter.real}{os.sep}%")
