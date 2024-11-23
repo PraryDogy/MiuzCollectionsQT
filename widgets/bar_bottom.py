@@ -2,13 +2,11 @@ import os
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSlider
+from PyQt5.QtWidgets import QFrame, QLabel, QSlider
 
 from base_widgets import LayoutHor, SvgBtn
 from cfg import JsonData
 from signals import SignalsApp
-# from styles import Names, Themes
-from utils.utils import Utils
 
 from .win_downloads import WinDownloads
 from .win_settings import WinSettings
