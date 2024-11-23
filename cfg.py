@@ -80,6 +80,22 @@ PSD_TIFF: tuple = (
 
 STYLES_CSS = "styles.css"
 
+NORMAL_STYLE = """
+    border: 2px solid transparent;
+"""
+
+SOLID_STYLE = """
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-color: rgb(46, 89, 203);
+    color: rgb(255, 255, 255);
+"""
+
+BORDER_STYLE = """
+    border-radius: 6px;
+    border: 2px solid rgb(46, 89, 203);
+"""
+
 
 class Filter:
     filters: list["Filter"] = []

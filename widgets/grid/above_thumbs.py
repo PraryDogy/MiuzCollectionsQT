@@ -1,69 +1,70 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
+from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
+                             QWidget)
 
 from base_widgets import LayoutHor, LayoutVer
 from cfg import NAME_ALL_COLLS, Dynamic, Filter, JsonData
 from lang import Lang
 from signals import SignalsApp
-from utils.utils import Utils
 
-BTN_W, BTN_H = 120, 28
+BTN_W = 120
 
 
-class ResetBtn(QLabel):
+class ResetBtn(QPushButton):
     def __init__(self, text: str):
         super().__init__(text=text)
 
-        self.setFixedSize(BTN_W, BTN_H)
+        self.setFixedWidth(BTN_W)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
 class ResetDatesBtn(ResetBtn):
     def __init__(self):
         super().__init__(text=Lang.reset_dates)
+        self.clicked.connect(self.cmd_)
 
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+    def cmd_(self, *args) -> None:
         Dynamic.date_start, Dynamic.date_end = None, None
         Dynamic.grid_offset = 0
 
         SignalsApp.all_.btn_dates_style.emit("normal")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-        return super().mouseReleaseEvent(ev)
 
 
 class ResetSearchBtn(ResetBtn):
     def __init__(self):
         super().__init__(text=Lang.reset_search)
+        self.clicked.connect(self.cmd_)
 
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+    def cmd_(self, *args) -> None:
         Dynamic.grid_offset = 0
 
         SignalsApp.all_.wid_search_cmd.emit("clear")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-        return super().mouseReleaseEvent(ev)
 
 
 class ResetFiltersBtn(ResetBtn):
     def __init__(self):
         super().__init__(text=Lang.show_all)
+        self.clicked.connect(self.cmd_)
 
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+    def cmd_(self, *args) -> None:
         Dynamic.grid_offset = 0
 
         SignalsApp.all_.bar_top_reset_filters.emit()
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-        return super().mouseReleaseEvent(ev)
 
 
 class ShowAllBtn(ResetBtn):
     def __init__(self):
         super().__init__(text=Lang.show_all)
+        self.clicked.connect(self.cmd_)
 
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+    def cmd_(self, *args) -> None:
         Dynamic.date_start, Dynamic.date_end = None, None
         JsonData.curr_coll = NAME_ALL_COLLS
         Dynamic.grid_offset = 0
@@ -76,7 +77,6 @@ class ShowAllBtn(ResetBtn):
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-        return super().mouseReleaseEvent(ev)
 
 
 class AboveThumbsNoImages(QWidget):

@@ -131,8 +131,8 @@ class WinMain(WinFrameless):
         if not Utils.smb_check():
             OpenWins.smb(self)
 
-        from .actions import OpenWins
-        OpenWins.smb(parent_=self)
+        # from .actions import OpenWins
+        # OpenWins.smb(parent_=self)
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
         # self.test.show()

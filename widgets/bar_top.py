@@ -3,7 +3,8 @@ from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextCustom, LayoutHor
-from cfg import Dynamic, Filter, JsonData
+from cfg import (BORDER_STYLE, NORMAL_STYLE, SOLID_STYLE, Dynamic, Filter,
+                 JsonData)
 from lang import Lang
 from signals import SignalsApp
 
@@ -11,24 +12,6 @@ from .wid_search import WidSearch
 from .win_dates import WinDates
 
 BTN_W, BTN_H = 80, 28
-
-
-NORMAL_STYLE = """
-    border: 2px solid transparent;
-"""
-
-
-SOLID_STYLE = """
-    border-radius: 6px;
-    border: 2px solid transparent;
-    background-color: rgb(46, 89, 203);
-    color: rgb(255, 255, 255);
-"""
-
-BORDER_STYLE = """
-    border-radius: 6px;
-    border: 2px solid rgb(46, 89, 203);
-"""
 
 
 class BarTopBtn(QLabel):

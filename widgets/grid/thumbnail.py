@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 
 from base_widgets import LayoutVer
 from base_widgets.context import ContextCustom
-from cfg import (NAME_FAVS, PIXMAP_SIZE, STAR_SYM, TEXT_LENGTH, THUMB_MARGIN,
-                 THUMB_W, JsonData)
+from cfg import (NAME_FAVS, NORMAL_STYLE, PIXMAP_SIZE, SOLID_STYLE, STAR_SYM,
+                 TEXT_LENGTH, THUMB_MARGIN, THUMB_W, JsonData)
 from signals import SignalsApp
 from utils.utils import Utils
 
@@ -45,6 +45,7 @@ class Thumbnail(QFrame):
 
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         super().__init__()
+        self.setStyleSheet(NORMAL_STYLE)
 
         self.img = pixmap
 
@@ -92,10 +93,10 @@ class Thumbnail(QFrame):
         self.name_label.set_text()
 
     def selected_style(self):
-        ...
+        self.setStyleSheet(SOLID_STYLE)
 
     def regular_style(self):
-        ...
+        self.setStyleSheet(NORMAL_STYLE)
 
     def change_fav(self, value: int):
         if value == 0:
