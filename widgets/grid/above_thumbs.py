@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
                              QWidget)
 
 from base_widgets import LayoutHor, LayoutVer
-from cfg import NAME_ALL_COLLS, Dynamic, Filter, JsonData
+from cfg import NAME_ALL_COLLS, TITLE_NORMAL, Dynamic, Filter, JsonData
 from lang import Lang
 from signals import SignalsApp
 
@@ -92,6 +92,7 @@ class AboveThumbsNoImages(QWidget):
         title_label.setFixedWidth(width - 20)
         title_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         title_label.setWordWrap(True)
+        title_label.setStyleSheet(TITLE_NORMAL)
         self.v_layout.addWidget(title_label)
 
         h_wid = QWidget()
@@ -147,6 +148,7 @@ class AboveThumbs(QWidget):
         self.v_layout.addWidget(label)
         label.setFixedWidth(width - 20)
         label.setWordWrap(True)
+        label.setStyleSheet(TITLE_NORMAL)
 
         h_wid = QWidget()
         h_layout = LayoutHor()

@@ -5,7 +5,7 @@ from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLabel, QSizePolicy
 
 from base_widgets import ContextCustom
-from cfg import NORMAL_STYLE, PSD_TIFF, SOLID_STYLE, JsonData
+from cfg import PSD_TIFF, TITLE_NORMAL, TITLE_SOLID, JsonData
 from lang import Lang
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
@@ -13,20 +13,6 @@ from utils.utils import UThreadPool, Utils
 
 from ..actions import OpenWins
 from ._db_images import DbImage
-
-TITLE_NORMAL = f"""
-    font-size: 18pt;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-    {NORMAL_STYLE}
-"""
-
-TITLE_SOLID = f"""
-    font-size: 18pt;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-    {SOLID_STYLE}
-"""
 
 
 class Title(QLabel):

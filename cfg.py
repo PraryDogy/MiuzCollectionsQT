@@ -94,6 +94,19 @@ BORDER_STYLE = """
     border: 2px solid rgb(46, 89, 203);
 """
 
+TITLE_NORMAL = f"""
+    font-size: 18pt;
+    font-weight: bold;
+    {NORMAL_STYLE}
+"""
+
+TITLE_SOLID = f"""
+    font-size: 18pt;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    {SOLID_STYLE}
+"""
+
 
 class Filter:
     filters: list["Filter"] = []
