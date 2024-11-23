@@ -16,12 +16,12 @@ class ResetBtn(QPushButton):
         super().__init__(text=text)
 
         self.setFixedWidth(BTN_W)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
 class ResetDatesBtn(ResetBtn):
     def __init__(self):
-        super().__init__(text=Lang.reset_dates)
+        super().__init__(text=Lang.show_all)
         self.clicked.connect(self.cmd_)
 
     def cmd_(self, *args) -> None:
@@ -35,7 +35,7 @@ class ResetDatesBtn(ResetBtn):
 
 class ResetSearchBtn(ResetBtn):
     def __init__(self):
-        super().__init__(text=Lang.reset_search)
+        super().__init__(text=Lang.show_all)
         self.clicked.connect(self.cmd_)
 
     def cmd_(self, *args) -> None:

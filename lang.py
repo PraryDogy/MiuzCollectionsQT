@@ -241,18 +241,6 @@ class Lang_:
         "Обновить",
         "Update"
     ]
-    reset = [
-        "Сброс",
-        "Reset"
-    ]
-    reset_dates = [
-        "Сбросить даты",
-        "Dates reset"
-    ]
-    reset_search = [
-        "Очистить поиск",
-        "Reset search"
-    ]
     resol = [
         "Разрешение",
         "Resolution"
