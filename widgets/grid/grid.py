@@ -168,13 +168,8 @@ class Grid(QScrollArea):
         self.main_wid.setFocus()
 
     def setup_single_grid(self, date: str, db_images: list[DbImage]):
-        title_label = Title(
-            title=date,
-            db_images=db_images,
-            width=self.width()
-            )
+        title_label = Title(title=date, db_images=db_images)
         title_label.r_click.connect(self.reset_selection)
-        # title_label.setContentsMargins(5, 0, 0, 10)
         self.grids_layout.addWidget(title_label)
 
         grid_widget = QWidget()

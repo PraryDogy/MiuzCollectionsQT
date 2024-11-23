@@ -18,7 +18,7 @@ from ._db_images import DbImage
 class Title(QLabel):
     r_click = pyqtSignal()
 
-    def __init__(self, title: str, db_images: list[DbImage], width: int):
+    def __init__(self, title: str, db_images: list[DbImage]):
         super().__init__(f"{title}. {Lang.total}: {len(db_images)}")
         self.db_images = db_images
 
@@ -27,7 +27,6 @@ class Title(QLabel):
             QSizePolicy.Policy.Preferred
             )
 
-        self.setContentsMargins(3, 5, 3, 5)
         self.setStyleSheet(TITLE_NORMAL)
 
     def save_cmd(self, is_layers: bool, save_as: bool):
