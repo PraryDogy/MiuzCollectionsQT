@@ -138,7 +138,7 @@ class WinFrameless(QMainWindow, QObject):
         central_widget = QWidget()
         central_widget.setContentsMargins(1, 1, 1, 1)
         central_widget.setObjectName("central_wid")
-        Utils.style(self)
+        Utils.style(central_widget)
         self.setCentralWidget(central_widget)
 
         self.central_layout_v = LayoutVer()
@@ -234,7 +234,7 @@ class WinChild(WinFrameless):
         # у этого виджета закруглены только нижние углы
         self.content_wid = QFrame()
         self.content_wid.setObjectName("content_wid")
-        Utils.style(self)
+        Utils.style(self.content_wid)
         self.central_layout_v.addWidget(self.content_wid)
 
         self.content_lay_v = LayoutVer()

@@ -153,7 +153,7 @@ class AboveThumbs(QWidget):
         label.setFixedWidth(width - 20)
         label.setWordWrap(True)
         label.setObjectName("title")
-        Utils.style(self, "normal")
+        Utils.style(label, "normal")
 
         h_wid = QWidget()
         h_layout = LayoutHor()
