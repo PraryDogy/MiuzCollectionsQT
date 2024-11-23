@@ -35,7 +35,7 @@ class DatesBtn(BarTopBtn):
     def __init__(self):
         super().__init__(text=Lang.dates)
         self.setFixedSize(BTN_W, BTN_H)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.set_style_cmd: callable = None
         SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
 
@@ -83,7 +83,7 @@ class FilterBtn(BarTopBtn):
 
         self.filter = filter
         self.setFixedSize(BTN_W, BTN_H)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         if filter.value:
             self.set_blue_style()

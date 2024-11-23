@@ -45,6 +45,7 @@ class InputBase(QLineEdit):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(28)
+        self.setStyleSheet("padding-left: 2px; padding-right: 2px;")
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.context_menu = CustomContext(parent=self, event=a0)
