@@ -294,7 +294,7 @@ class WinImageView(WinChild):
 
     def on_load(self):
 
-        if not Utils.smb_check():
+        if not Utils.smb_check(JsonData.brand_ind):
             OpenWins.smb(self)
 
         self.load_thumbnail()
@@ -309,7 +309,7 @@ class WinImageView(WinChild):
     def load_thumb_fin(self, data: ImageData):
         self.image_label.set_image(data.pixmap)
 
-        if Utils.smb_check():
+        if Utils.smb_check(JsonData.brand_ind):
             self.load_image()
         else:
             print("img viewer > no smb")
@@ -397,7 +397,7 @@ class WinImageView(WinChild):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            if Utils.smb_check():
+            if Utils.smb_check(JsonData.brand_ind):
                 OpenWins.info_db(self, self.short_src)
             else:
                 OpenWins.smb(self)

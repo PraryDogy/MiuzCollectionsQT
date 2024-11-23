@@ -48,7 +48,7 @@ class FinderImages:
             for i in os.listdir(JsonData.coll_folder)
             if os.path.isdir(os.path.join(JsonData.coll_folder, i))
             and
-            i not in JsonData.stop_colls
+            i not in JsonData.brand_stop_colls
             ]
 
         ln_ = len(collections)
@@ -364,7 +364,7 @@ class ScanerShedule(QObject):
     def start(self):
         self.wait_timer.stop()
 
-        if not Utils.smb_check():
+        if not Utils.smb_check(JsonData.brand_ind):
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 

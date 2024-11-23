@@ -47,7 +47,7 @@ class CollectionBtn(QLabel):
         else:
             coll = os.path.join(JsonData.coll_folder, self.coll_name)
 
-        if Utils.smb_check():
+        if Utils.smb_check(JsonData.brand_ind):
             if os.path.exists(coll):
                 subprocess.Popen(["open", coll])
                 return

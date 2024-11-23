@@ -70,7 +70,7 @@ class OpenInfoDb(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if Utils.smb_check():
+        if Utils.smb_check(JsonData.brand_ind):
             OpenWins.info_db(parent_=self.win_, short_src=self.short_src)
         else:
             OpenWins.smb(parent_=self.win_)
@@ -85,7 +85,7 @@ class CopyPath(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if Utils.smb_check():
+        if Utils.smb_check(JsonData.brand_ind):
             Utils.copy_text(text=self.full_src)
         else:
             OpenWins.smb(parent_=self.win_)
@@ -100,7 +100,7 @@ class Reveal(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if Utils.smb_check():
+        if Utils.smb_check(JsonData.brand_ind):
             Utils.reveal_files([self.full_src])
         else:
             OpenWins.smb(parent_=self.win_)
@@ -175,7 +175,7 @@ class Save(QAction):
         self.win_ = win
 
     def cmd_(self):
-        if Utils.smb_check():
+        if Utils.smb_check(JsonData.brand_ind):
             if self.save_as:
                 dialog = OpenWins.dialog_dirs()
                 dest = dialog.getExistingDirectory()

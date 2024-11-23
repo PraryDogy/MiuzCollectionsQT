@@ -149,11 +149,16 @@ class JsonData:
     
     scaner_minutes: int = 5
 
-    stop_colls: list = [
-        "_Archive_Commerce_Брендинг",
-        "Chosed",
-        "LEVIEV"
-        ]
+    brand_stop_colls: list = [
+        [
+            "_Archive_Commerce_Брендинг",
+            "Chosed",
+            "LEVIEV"
+        ],
+        [
+            "TEST",
+        ], 
+    ]
     
     lang_ind = 0
     brand_ind = 0
@@ -167,18 +172,22 @@ class JsonData:
         '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
         ]
 
-    coll_folder_list = [
-        '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
-        '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
-        '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
-        '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Ready',
-        '/Volumes/Shares/Collections',
-        '/Volumes/Shares-1/Collections',
-        '/Volumes/Shares-2/Collections',
-        '/Volumes/Shares-3/Collections'
-        ]
+    coll_folder_lst = [
+        # miuz coll folders
+        [
+            '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
+            '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
+            '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
+        ],
+        # panacea coll folders
+        [
+            '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready',
+            '/Volumes/Shares-1/Studio/Panacea/Photo/Art/Ready',
+            '/Volumes/Shares-2/Studio/Panacea/Photo/Art/Ready',
+            ]
+    ]
 
-    coll_folder: str = coll_folder_list[0]
+    coll_folder: str = coll_folder_lst[0][0]
 
     filters = [
         {

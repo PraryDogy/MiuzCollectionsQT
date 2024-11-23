@@ -128,7 +128,7 @@ class WinMain(WinFrameless):
     def after_start(self):
         Scaner.app.start()
 
-        if not Utils.smb_check():
+        if not Utils.smb_check(JsonData.brand_ind):
             OpenWins.smb(self)
 
         # from .actions import OpenWins

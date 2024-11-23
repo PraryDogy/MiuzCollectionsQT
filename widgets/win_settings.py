@@ -19,14 +19,14 @@ from .actions import OpenWins
 
 
 class CollFolderListInput(CustomTextEdit):
-    def __init__(self):
+    def __init__(self, brand_ind: int):
         super().__init__()
         self.setFixedHeight(130)
         self.setLineWrapMode(QTextEdit.NoWrap)
         h_bar = self.horizontalScrollBar()
         h_bar.setFixedHeight(0)
 
-        text = "\n".join(JsonData.coll_folder_list)
+        text = "\n".join(JsonData.coll_folder_lst[brand_ind])
         self.setText(text)
 
     def get_text(self):
@@ -70,8 +70,8 @@ class ChangeLang(QWidget):
 
 
 class StopColls(QWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, brand_ind: int):
+        super().__init__()
 
         layout_v = LayoutVer()
         self.setLayout(layout_v)
@@ -82,7 +82,7 @@ class StopColls(QWidget):
         layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.input = CustomInput()
-        self.input.insert(", ".join(JsonData.stop_colls))
+        self.input.insert(", ".join(JsonData.brand_stop_colls[brand_ind]))
         layout_v.addWidget(self.input)
 
     def get_stopcolls(self):
@@ -173,7 +173,7 @@ class BrandSett(QTabWidget):
         v_lay = LayoutVer()
         wid.setLayout(v_lay)
 
-        self.stopcolls = StopColls()
+        self.stopcolls = StopColls(brand_ind)
         v_lay.addWidget(self.stopcolls)
         v_lay.addSpacerItem(QSpacerItem(0, 30))
 
@@ -181,7 +181,7 @@ class BrandSett(QTabWidget):
         v_lay.addWidget(coll_folder_list_label)
         v_lay.addSpacerItem(QSpacerItem(0, 10))
 
-        self.coll_folder_list_input = CollFolderListInput()
+        self.coll_folder_list_input = CollFolderListInput(brand_ind)
         v_lay.addWidget(self.coll_folder_list_input)
         v_lay.addSpacerItem(QSpacerItem(0, 30))
 
