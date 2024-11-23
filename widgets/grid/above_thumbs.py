@@ -21,7 +21,7 @@ class ResetBtn(QPushButton):
 
 class ResetDatesBtn(ResetBtn):
     def __init__(self):
-        super().__init__(text=Lang.show_all)
+        super().__init__(text=Lang.reset)
         self.clicked.connect(self.cmd_)
 
     def cmd_(self, *args) -> None:
@@ -35,7 +35,7 @@ class ResetDatesBtn(ResetBtn):
 
 class ResetSearchBtn(ResetBtn):
     def __init__(self):
-        super().__init__(text=Lang.show_all)
+        super().__init__(text=Lang.reset)
         self.clicked.connect(self.cmd_)
 
     def cmd_(self, *args) -> None:
@@ -48,7 +48,7 @@ class ResetSearchBtn(ResetBtn):
 
 class ResetFiltersBtn(ResetBtn):
     def __init__(self):
-        super().__init__(text=Lang.show_all)
+        super().__init__(text=Lang.reset)
         self.clicked.connect(self.cmd_)
 
     def cmd_(self, *args) -> None:

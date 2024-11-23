@@ -241,6 +241,10 @@ class Lang_:
         "Обновить",
         "Update"
     ]
+    reset = [
+        "Сбросить",
+        "Reset"
+    ]
     resol = [
         "Разрешение",
         "Resolution"
