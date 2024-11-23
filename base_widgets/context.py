@@ -12,30 +12,9 @@ class ContextCustom(QMenu):
         self.ev = event
         super().__init__()
 
-        popup = Qt.WindowType.Popup
-        # он нужен???
-
-
-        flags = Qt.WindowType.FramelessWindowHint
-        self.setWindowFlags(flags)
-
     def show_menu(self):
         self.exec_(self.ev.globalPos())
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.closed.emit()
         return super().closeEvent(a0)
-
-
-class ContextSubMenuBase(QMenu):
-    def __init__(self, parent: QMenu, title: str):
-        super().__init__(parent=parent, title=title)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-
-        flags = Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint
-        flags = flags | Qt.WindowType.NoDropShadowWindowHint
-        self.setWindowFlags(flags)
-
-    def mousePressEvent(self, a0: QMouseEvent | None) -> None:
-        self.raise_()
-        return super().mousePressEvent(a0)
