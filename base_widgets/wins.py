@@ -152,17 +152,11 @@ class WinFrameless(QMainWindow):
         except (RuntimeError, Exception) as e:
             Utils.print_err(error=e)
 
-    def set_titlebar_title(self, text):
-        self.setWindowTitle(text)
+    def disable_min(self):
+        ...
 
-    def close_btn_cmd(self, fn: callable):
-        print("remove this")
-
-    def min_btn_disable(self):
-        print("remove this")
-
-    def max_btn_disable(self):
-        print("remove this")
+    def disable_max(self):
+        ...
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:

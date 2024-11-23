@@ -175,10 +175,7 @@ class RightDateWidget(BaseDateLayout):
 class WinDates(WinChild):
     def __init__(self):
         super().__init__()
-        self.close_btn_cmd(self.cancel_cmd)
-        self.min_btn_disable()
-        self.max_btn_disable()
-        self.set_titlebar_title(Lang.dates)
+        self.setWindowTitle(Lang.dates)
 
         FiltersDateBtncolor.set_border()
 

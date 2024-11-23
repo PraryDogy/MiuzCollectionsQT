@@ -18,10 +18,7 @@ class WinSmb(WinChild):
         else:
             self.my_text = Lang.choose_coll_smb
 
-        self.close_btn_cmd(self.close_)
-        self.set_titlebar_title(Lang.no_connection)
-        self.min_btn_disable()
-        self.max_btn_disable()
+        self.setWindowTitle(Lang.no_connection)
 
         self.init_ui()
         self.setFixedSize(330, 150)

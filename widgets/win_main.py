@@ -42,11 +42,10 @@ class WinMain(WinFrameless):
     def __init__(self):
         super().__init__()
 
-        self.close_btn_cmd(self.hide_)
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.setMenuBar(BarMacos())
 
-        self.set_titlebar_title(
+        self.setWindowTitle(
             Lang.all_colls
             if JsonData.curr_coll == NAME_ALL_COLLS
             else JsonData.curr_coll
@@ -107,7 +106,7 @@ class WinMain(WinFrameless):
             else:
                 t = JsonData.curr_coll
 
-            self.set_titlebar_title(t)
+            self.setWindowTitle(t)
 
         else: 
             raise Exception("app > win main > wrong flag", flag)

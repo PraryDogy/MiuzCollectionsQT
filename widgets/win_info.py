@@ -103,10 +103,7 @@ class WinInfo(WinChild):
 
         self.parent_ = parent
 
-        self.close_btn_cmd(self.close_)
-        self.min_btn_disable()
-        self.max_btn_disable()
-        self.set_titlebar_title(Lang.info)
+        self.setWindowTitle(Lang.info)
         self.short_src = short_src
 
         self.init_ui()

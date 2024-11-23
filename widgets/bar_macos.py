@@ -53,10 +53,7 @@ class AboutWin(WinChild):
     def __init__(self):
         super().__init__()
 
-        self.close_btn_cmd(self.close_)
-        self.min_btn_disable()
-        self.max_btn_disable()
-        self.set_titlebar_title(APP_NAME)
+        self.setWindowTitle(APP_NAME)
         self.setFixedSize(280, 240)
 
         icon = QSvgWidget(os.path.join("icon", "icon.svg"))

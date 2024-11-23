@@ -62,10 +62,7 @@ class WinDownloads(WinChild):
         super().__init__()
         self.copy_threads: list[CopyFiles] = []
 
-        self.close_btn_cmd(self.close_)
-        self.set_titlebar_title(Lang.title_downloads)
-        self.min_btn_disable()
-        self.max_btn_disable()
+        self.setWindowTitle(Lang.title_downloads)
         self.setFixedSize(400, 420)
 
         self.scroll_area = QScrollArea()

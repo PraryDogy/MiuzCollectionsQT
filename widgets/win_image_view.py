@@ -229,8 +229,6 @@ class WinImageView(WinChild):
     def __init__(self, short_src: str):
         super().__init__()
 
-        self.close_btn_cmd(self.close_)
-        self.min_btn_disable()
         self.setMinimumSize(QSize(500, 400))
         self.resize(JsonData.imgview_g["aw"], JsonData.imgview_g["ah"])
         self.installEventFilter(self)
@@ -335,7 +333,7 @@ class WinImageView(WinChild):
             )
 
         wid = Thumbnail.path_to_wid.get(self.short_src)
-        self.set_titlebar_title(f"{coll} - {wid.name}")
+        self.setWindowTitle(f"{coll} - {wid.name}")
 
     def button_switch_cmd(self, flag: str) -> None:
         if flag == "+":

@@ -176,7 +176,7 @@ class MenuLeft(QListWidget):
 
     def init_ui(self, menus: list[dict[str, str]]):
 
-        "удалить все виджеты"
+        self.clear()
 
         all_colls_btn = CollectionBtn(
             short_name=Lang.all_colls,
