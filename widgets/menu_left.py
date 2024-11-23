@@ -2,7 +2,7 @@ import os
 import subprocess
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, Qt, pyqtSignal
+from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
                              QScrollArea, QSpacerItem)
@@ -217,19 +217,7 @@ class MenuLeft(QListWidget):
 
     def init_ui(self, menus: list[dict[str, str]]):
 
-        # if hasattr(self, "main_wid"):
-            # self.main_wid.deleteLater()
-
-        # self.main_wid = QWidget()
-        # self.scroll_area.setWidget(self.main_wid)
-
-        # main_layout = LayoutVer()
-        # main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        # self.main_wid.setLayout(main_layout)
-
-        # main_layout.addSpacerItem(QSpacerItem(0, 5))
-
-
+        "удалить все виджеты"
 
         self.all_colls_btn = CollectionBtn(
             short_name=Lang.all_colls,
@@ -239,7 +227,7 @@ class MenuLeft(QListWidget):
         self.all_colls_btn.pressed_.connect(cmd_)
 
         list_item = QListWidgetItem()
-        list_item.setSizeHint(self.all_colls_btn.sizeHint())
+        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, 30))
         self.addItem(list_item)
         self.setItemWidget(list_item, self.all_colls_btn)
 
@@ -253,9 +241,17 @@ class MenuLeft(QListWidget):
         favs_btn.pressed_.connect(cmd_)
 
         list_item = QListWidgetItem()
-        list_item.setSizeHint(favs_btn.sizeHint())
+        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, 30))
         self.addItem(list_item)
         self.setItemWidget(list_item, favs_btn)
+
+        # fake_btn = QLabel("")
+        # fake_item = QListWidgetItem()
+        # fake_item.setSizeHint(fake_btn.sizeHint())
+        # fake_btn.setDisabled(True)
+        # fake_item.setFlags(fake_item.flags() & ~Qt.ItemIsSelectable & ~Qt.ItemIsEnabled)
+        # self.addItem(fake_item)
+        # self.setItemWidget(fake_item, fake_btn)
 
 
 
@@ -270,7 +266,7 @@ class MenuLeft(QListWidget):
             coll_btn.pressed_.connect(cmd_)
 
             list_item = QListWidgetItem()
-            list_item.setSizeHint(coll_btn.sizeHint())
+            list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, 30))
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
