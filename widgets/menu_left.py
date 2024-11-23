@@ -2,12 +2,11 @@ import os
 import subprocess
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal, QModelIndex
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
-                             QScrollArea, QSpacerItem)
+from PyQt5.QtWidgets import QAction, QLabel, QListWidget, QListWidgetItem
 
-from base_widgets import ContextCustom, LayoutVer
+from base_widgets import ContextCustom
 from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
 from database import THUMBS, Dbase
 from lang import Lang
@@ -55,21 +54,11 @@ class CollectionBtn(QLabel):
         else:
             OpenWins.smb(self.window())
 
-    def style_normal(self):
-        ...
-
-    def style_solid(self):
-        ...
-
-    def style_border(self):
-        ...
-
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             self.pressed_.emit()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-
         self.pressed_.emit()
         menu_ = ContextCustom(event=ev)
 
@@ -78,11 +67,6 @@ class CollectionBtn(QLabel):
         menu_.addAction(reveal_coll)
 
         menu_.show_menu()
-
-        if JsonData.curr_coll == self.coll_name:
-            ...
-        else:
-            ...
 
 
 class WorkerSignals(QObject):
@@ -149,10 +133,7 @@ class MenuLeft(QListWidget):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(MENU_LEFT_WIDTH)
-
-        self.selected_btn: CollectionBtn
         SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
-
         self.setup_task()
 
     def menu_left_cmd(self, flag: str):
@@ -166,11 +147,7 @@ class MenuLeft(QListWidget):
             self.setup_task()
 
         elif flag == "select_all_colls":
-            ...
-            print("select_all_colls")
-            # self.selected_btn.style_normal()
-            # self.all_colls_btn.style_solid()
-            # self.selected_btn = self.all_colls_btn
+            self.setCurrentRow(0)
 
         else:
             raise Exception("widgets > menu left > wrong flag", flag)
@@ -197,27 +174,20 @@ class MenuLeft(QListWidget):
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
-        # self.selected_btn.style_normal()
-        # btn.style_solid()
-        self.selected_btn = btn
-
     def init_ui(self, menus: list[dict[str, str]]):
 
         "удалить все виджеты"
 
-        self.all_colls_btn = CollectionBtn(
+        all_colls_btn = CollectionBtn(
             short_name=Lang.all_colls,
             coll_name=NAME_ALL_COLLS
             )
-        cmd_ = lambda: self.collection_btn_cmd(self.all_colls_btn)
-        self.all_colls_btn.pressed_.connect(cmd_)
-
-        list_item = QListWidgetItem()
-        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
-        self.addItem(list_item)
-        self.setItemWidget(list_item, self.all_colls_btn)
-
-
+        cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
+        all_colls_btn.pressed_.connect(cmd_)
+        all_colls_item = QListWidgetItem()
+        all_colls_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
+        self.addItem(all_colls_item)
+        self.setItemWidget(all_colls_item, all_colls_btn)
 
         favs_btn = CollectionBtn(
             short_name=Lang.fav_coll,
@@ -226,15 +196,22 @@ class MenuLeft(QListWidget):
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
 
-        list_item = QListWidgetItem()
-        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
-        self.addItem(list_item)
-        self.setItemWidget(list_item, favs_btn)
+        favs_item = QListWidgetItem()
+        favs_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
+        self.addItem(favs_item)
+        self.setItemWidget(favs_item, favs_btn)
 
         fake_item = QListWidgetItem()
-        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
+        fake_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_ // 2))
         fake_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
         self.addItem(fake_item)
+
+        if JsonData.curr_coll == NAME_ALL_COLLS:
+            self.setCurrentRow(self.row(all_colls_item))
+
+        elif JsonData.curr_coll == NAME_FAVS:
+            self.setCurrentRow(self.row(favs_item))
+
 
         for data in menus:
 
@@ -250,9 +227,5 @@ class MenuLeft(QListWidget):
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
-            if coll_btn.coll_name == JsonData.curr_coll:
-                coll_btn.style_solid()
-                self.selected_btn = coll_btn
-            else:
-                coll_btn.style_normal()
-
+            if JsonData.curr_coll == data.get("coll_name"):
+                self.setCurrentRow(self.row(list_item))
