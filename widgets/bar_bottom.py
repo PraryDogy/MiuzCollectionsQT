@@ -41,6 +41,10 @@ class SvgPaths:
 
     @classmethod
     def update_(cls):
+
+        if not Themes.current:
+            raise Exception("no theme")
+
         cls.download_svg = cls.images_path(f"{Themes.current}_downloads.svg")
         cls.switch_theme_svg = cls.images_path(f"{Themes.current}_switch.svg")
         cls.settings_svg = cls.images_path(f"{Themes.current}_settings.svg")
@@ -104,9 +108,12 @@ class CustomSlider(BaseSlider):
 class BarBottom(QWidget):
     def __init__(self):
         super().__init__()
+
         self.set_theme()
+        SvgPaths.update_()
+
         self.setFixedHeight(28)
-        
+
         self.h_layout = LayoutHor(self)
         self.h_layout.setSpacing(20)
         self.h_layout.setContentsMargins(15, 0, 15, 0)
@@ -122,8 +129,6 @@ class BarBottom(QWidget):
             self.progress_bar,
             alignment=Qt.AlignmentFlag.AlignVCenter
         )
-
-        SvgPaths.update_()
 
         self.downloads = SvgBtn(icon_path=SvgPaths.download_svg , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
@@ -148,11 +153,6 @@ class BarBottom(QWidget):
         else:
             raise Exception("widgets >bar bottom > btn downloads > wrong flag", flag)
 
-    def switch_theme_cmd(self, e: QMouseEvent):
-        SvgPaths.update_()
-        self.sett_widget.set_icon(SvgPaths.settings_svg)
-        self.downloads.set_icon(SvgPaths.download_svg)
-
     def open_downloads(self, e: QMouseEvent):
         if e.button() == Qt.MouseButton.LeftButton:
             self.downloads_win = WinDownloads()
@@ -165,14 +165,21 @@ class BarBottom(QWidget):
             self.settings.center_relative_parent(self.window())
             self.settings.show()
 
-    def event(self, a0: QEvent | None) -> bool:
-        if a0.type() == QEvent.PaletteChange:
-            self.set_theme()
-        return super().event(a0)
-
     def set_theme(self):
         palette = QApplication.palette()
         if palette.color(palette.Window).value() < 128:
             Themes.current = "dark"
         else:
             Themes.current = "light"
+
+    def change_icons(self):
+        SvgPaths.update_()
+        self.sett_widget.set_icon(SvgPaths.settings_svg)
+        self.downloads.set_icon(SvgPaths.download_svg)
+
+    def event(self, a0: QEvent | None) -> bool:
+        if a0.type() == QEvent.Type.PaletteChange:
+            self.set_theme()
+            SvgPaths.update_()
+            self.change_icons()
+        return super().event(a0)

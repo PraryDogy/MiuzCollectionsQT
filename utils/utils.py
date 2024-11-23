@@ -314,26 +314,3 @@ class Utils:
     @classmethod
     def get_shortpath(cls, src: str) -> str:
         return src.replace(JsonData.coll_folder, "")
-
-    @classmethod
-    def style(cls, wid: QWidget, style: str = None):
-        """
-        Applies stylesheet to widget with objectMame:
-        #widget_object_name.style.theme {...}
-        theme: dark/light
-        """
-        if not wid.objectName():
-            raise Exception("no objectName")
-
-        if style:
-            style = [style, JsonData.theme]
-            style = " ".join(style)
-        else:
-            style = JsonData.theme
-
-        try:
-            wid.setProperty("class", style)
-            wid.style().unpolish(wid)
-            wid.style().polish(wid)
-        except RuntimeError as e:
-            cls.print_err(error=e)
