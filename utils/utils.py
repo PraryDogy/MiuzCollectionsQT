@@ -81,6 +81,8 @@ class Utils:
         if not os.path.exists(JsonData.coll_folder):
             not_ok = True
 
+        print(brand_ind, JsonData.coll_folder)
+
         # elif JsonData.coll_folder in (JsonData.coll_folder_lst):
             # not_ok = True
 
