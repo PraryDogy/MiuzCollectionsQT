@@ -1,14 +1,13 @@
 import os
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLabel, QSizePolicy
 
 from base_widgets import ContextCustom
-from cfg import PSD_TIFF, Dynamic, JsonData
+from cfg import PSD_TIFF, JsonData
 from lang import Lang
 from signals import SignalsApp
-from styles import Names, Themes
 from utils.copy_files import CopyFiles
 from utils.utils import UThreadPool, Utils
 
@@ -29,7 +28,7 @@ class Title(QLabel):
             )
 
         self.setContentsMargins(3, 5, 3, 5)
-        self.setObjectName("th_title_new")
+        self.setObjectName("title")
         Utils.style(self, "normal")
 
     def save_cmd(self, is_layers: bool, save_as: bool):
@@ -90,7 +89,7 @@ class Title(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.r_click.emit()
-        Utils.style(self, "selected")
+        Utils.style(self, "solid")
 
         menu_ = ContextCustom(ev)
 
@@ -118,21 +117,3 @@ class Title(QLabel):
 
         menu_.show_menu()
         Utils.style(self, "normal")
-
-
-# единый css с таким стилем
-"""
-#th_title_new.selected {
-    font-size: 18pt;
-    font-weight: bold;
-    color: #ffffff;
-    background-color: rgba(46, 88, 203, 1.0);
-    border-radius: 5px;
-}
-
-#th_title_new.normal {
-    font-size: 18pt;
-    font-weight: bold;
-    color: #ffffff;
-}
-"""

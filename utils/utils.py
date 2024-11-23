@@ -331,6 +331,9 @@ class Utils:
         else:
             style = JsonData.theme
 
-        wid.setProperty("class", style)
-        wid.style().unpolish(wid)
-        wid.style().polish(wid)   
+        try:
+            wid.setProperty("class", style)
+            wid.style().unpolish(wid)
+            wid.style().polish(wid)
+        except RuntimeError as e:
+            cls.print_err(error=e)

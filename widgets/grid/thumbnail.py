@@ -9,11 +9,10 @@ from base_widgets.context import ContextCustom
 from cfg import (NAME_FAVS, PIXMAP_SIZE, STAR_SYM, TEXT_LENGTH, THUMB_MARGIN,
                  THUMB_W, JsonData)
 from signals import SignalsApp
-from styles import Names, Themes
 from utils.utils import Utils
 
-from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, ScanerRestart,
-                       Reveal, Save)
+from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, Reveal,
+                       Save, ScanerRestart)
 
 
 class NameLabel(QLabel):
@@ -46,8 +45,8 @@ class Thumbnail(QFrame):
 
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         super().__init__()
-        self.setObjectName(Names.thumbnail_normal)
-        self.setStyleSheet(Themes.current)
+        self.setObjectName("thumbnail")
+        Utils.style(self, "normal")
 
         self.img = pixmap
 
@@ -96,18 +95,10 @@ class Thumbnail(QFrame):
 
 
     def selected_style(self):
-        try:
-            self.setObjectName(Names.thumbnail_selected)
-            self.setStyleSheet(Themes.current)
-        except RuntimeError:
-            ...
+        Utils.style(self, "solid")
 
     def regular_style(self):
-        try:
-            self.setObjectName(Names.thumbnail_normal)
-            self.setStyleSheet(Themes.current)
-        except RuntimeError:
-            ...
+        Utils.style(self, "normal")
 
     def change_fav(self, value: int):
         if value == 0:
@@ -126,12 +117,9 @@ class Thumbnail(QFrame):
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.short_src)
         SignalsApp.all_.win_img_view_open_in.emit(self)
-        # return super().mouseDoubleClickEvent(a0)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         self.select.emit(self.short_src)
-
-        # return super().mouseReleaseEvent(ev)
 
     def mousePressEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:

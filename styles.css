@@ -252,11 +252,11 @@
 }
 
 
-#thumbnail.dark {
+#thumbnail.normal.dark {
     background-color: transparent;
 }
 
-#thumbnail.light {
+#thumbnail.normal.light {
     background-color: transparent;
 }
 

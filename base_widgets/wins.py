@@ -100,8 +100,8 @@ class TitleBar(QFrame):
         self.old_pos = self.pos()
 
         self.setFixedHeight(33)
-        self.setObjectName(Names.title_bar)
-        self.setStyleSheet(Themes.current)
+        self.setObjectName("title_bar")
+        Utils.style(self)
 
         self.h_lay = LayoutHor()
         self.setLayout(self.h_lay)
@@ -137,8 +137,8 @@ class WinFrameless(QMainWindow, QObject):
 
         central_widget = QWidget()
         central_widget.setContentsMargins(1, 1, 1, 1)
-        central_widget.setObjectName(Names.central_widget)
-        central_widget.setStyleSheet(Themes.current)
+        central_widget.setObjectName("central_wid")
+        Utils.style(self)
         self.setCentralWidget(central_widget)
 
         self.central_layout_v = LayoutVer()
@@ -233,8 +233,8 @@ class WinChild(WinFrameless):
 
         # у этого виджета закруглены только нижние углы
         self.content_wid = QFrame()
-        self.content_wid.setObjectName(Names.base_bottom_widget)
-        self.content_wid.setStyleSheet(Themes.current)
+        self.content_wid.setObjectName("content_wid")
+        Utils.style(self)
         self.central_layout_v.addWidget(self.content_wid)
 
         self.content_lay_v = LayoutVer()

@@ -4,7 +4,7 @@ from PyQt5.QtGui import QMouseEvent
 from base_widgets import Btn
 from cfg import GRID_LIMIT, Dynamic
 from lang import Lang
-from styles import Names, Themes
+from utils.utils import Utils
 
 
 class LimitBtn(Btn):
@@ -20,5 +20,5 @@ class LimitBtn(Btn):
         self._clicked.emit()
         self.setDisabled(True)
         self.setText("")
-        self.setObjectName(Names.thumbnail_normal)
-        self.setStyleSheet(Themes.current)
+        self.setObjectName("thumbnail")
+        Utils.style(self, "normal")

@@ -1,7 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
-from styles import Names, Themes
 from utils.utils import Utils
 
 

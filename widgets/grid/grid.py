@@ -24,8 +24,8 @@ class Grid(QScrollArea):
         self.resize(JsonData.root_g["aw"] - MENU_LEFT_WIDTH, JsonData.root_g["ah"])
         self.ww = JsonData.root_g["aw"] - MENU_LEFT_WIDTH
         self.horizontalScrollBar().setDisabled(True)
-        self.setObjectName(Names.th_scrollbar)
-        self.setStyleSheet(Themes.current)
+        # self.setObjectName(Names.th_scrollbar)
+        # self.setStyleSheet(Themes.current)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.topleft = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
@@ -41,8 +41,8 @@ class Grid(QScrollArea):
 
         # Создаем фрейм для виджетов в области скролла
         self.main_wid = QWidget(parent=self)
-        self.main_wid.setObjectName(Names.th_scroll_widget)
-        self.main_wid.setStyleSheet(Themes.current)
+        # self.main_wid.setObjectName(Names.th_scroll_widget)
+        # self.main_wid.setStyleSheet(Themes.current)
         self.setWidget(self.main_wid)
         
         self.main_layout = LayoutVer(self.main_wid)

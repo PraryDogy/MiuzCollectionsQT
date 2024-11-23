@@ -3,21 +3,28 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer
-from cfg import NAME_ALL_COLLS, Dynamic, JsonData, Filter
+from cfg import NAME_ALL_COLLS, Dynamic, Filter, JsonData
 from lang import Lang
 from signals import SignalsApp
-from styles import Names, Themes
+from utils.utils import Utils
 
 BTN_W, BTN_H = 120, 28
 
 
-class ResetDatesBtn(QLabel):
-    def __init__(self):
-        super().__init__(text=Lang.reset_dates)
+class ResetBtn(QLabel):
+    def __init__(self, text: str):
+        super().__init__(text=text)
+
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setObjectName(Names.th_reset_dates_btn)
-        self.setStyleSheet(Themes.current)
+
+        self.setObjectName("reset_btn")
+        Utils.style(self)
+
+
+class ResetDatesBtn(ResetBtn):
+    def __init__(self):
+        super().__init__(text=Lang.reset_dates)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.date_start, Dynamic.date_end = None, None
@@ -29,13 +36,9 @@ class ResetDatesBtn(QLabel):
         return super().mouseReleaseEvent(ev)
 
 
-class ResetSearchBtn(QLabel):
+class ResetSearchBtn(ResetBtn):
     def __init__(self):
         super().__init__(text=Lang.reset_search)
-        self.setFixedSize(BTN_W, BTN_H)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setObjectName(Names.th_reset_search_btn)
-        self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.grid_offset = 0
@@ -46,13 +49,9 @@ class ResetSearchBtn(QLabel):
         return super().mouseReleaseEvent(ev)
 
 
-class ResetFiltersBtn(QLabel):
+class ResetFiltersBtn(ResetBtn):
     def __init__(self):
         super().__init__(text=Lang.show_all)
-        self.setFixedSize(BTN_W, BTN_H)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setObjectName(Names.th_reset_filters_btn)
-        self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.grid_offset = 0
@@ -63,13 +62,9 @@ class ResetFiltersBtn(QLabel):
         return super().mouseReleaseEvent(ev)
 
 
-class ShowAllBtn(QLabel):
+class ShowAllBtn(ResetBtn):
     def __init__(self):
         super().__init__(text=Lang.show_all)
-        self.setFixedSize(BTN_W, BTN_H)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setObjectName(Names.th_show_all_btn)
-        self.setStyleSheet(Themes.current)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         Dynamic.date_start, Dynamic.date_end = None, None
@@ -101,8 +96,8 @@ class AboveThumbsNoImages(QWidget):
         title_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         title_label.setWordWrap(True)
         self.v_layout.addWidget(title_label)
-        title_label.setObjectName(Names.th_title)
-        title_label.setStyleSheet(Themes.current)
+        title_label.setObjectName("title")
+        Utils.style(self, "normal")
 
         h_wid = QWidget()
         h_layout = LayoutHor()
@@ -157,8 +152,8 @@ class AboveThumbs(QWidget):
         self.v_layout.addWidget(label)
         label.setFixedWidth(width - 20)
         label.setWordWrap(True)
-        label.setObjectName(Names.th_title)
-        label.setStyleSheet(Themes.current)
+        label.setObjectName("title")
+        Utils.style(self, "normal")
 
         h_wid = QWidget()
         h_layout = LayoutHor()
