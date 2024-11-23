@@ -78,6 +78,8 @@ PSD_TIFF: tuple = (
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
 
+STYLES_CSS = "styles.css"
+
 
 class Filter:
     filters: list["Filter"] = []
@@ -124,7 +126,7 @@ class JsonData:
         "LEVIEV"
         ]
     
-    theme: str = "dark_theme"
+    theme: str = "dark"
     lang_ind = 0
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -290,15 +292,6 @@ class JsonData:
         cls._read_json_data()
         cls._compare_versions()
         cls._init_filters()
-        Themes.set_theme(cls.theme)
-
-        print(
-            "Json data init",
-            "check app dirs ok",
-            "read json ok",
-            "set theme ok",
-            sep=", "
-            )
 
 
 class Dynamic:
@@ -308,4 +301,3 @@ class Dynamic:
     date_end_text: str = None # 31 january 1991
     grid_offset: int = 0
     search_widget_text: str = None
-    theme: str = "dark"

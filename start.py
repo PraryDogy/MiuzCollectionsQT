@@ -41,7 +41,7 @@ if System_.set_plugin_path():
 from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtWidgets import QApplication
 
-from cfg import JsonData
+from cfg import JsonData, STYLES_CSS
 from database import Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -57,7 +57,8 @@ class App(QApplication):
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: SignalsApp.all_.win_main_cmd.emit("exit"))
 
-        print("q application started")
+        with open(STYLES_CSS, "r", encoding="utf-8") as f:
+            self.setStyleSheet(f.read())
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
