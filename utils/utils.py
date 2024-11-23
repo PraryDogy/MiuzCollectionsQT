@@ -316,12 +316,15 @@ class Utils:
         return src.replace(JsonData.coll_folder, "")
 
     @classmethod
-    def style(cls, wid: QWidget, style: str):
+    def style(cls, wid: QWidget, style: str = None):
         if not wid.objectName():
             raise Exception("no ObjectName")
 
-        style = [style, JsonData.theme]
-        style = " ".join(style)
+        if style:
+            style = [style, JsonData.theme]
+            style = " ".join(style)
+        else:
+            style = JsonData.theme
 
         wid.setProperty("class", style)
         wid.style().unpolish(wid)
