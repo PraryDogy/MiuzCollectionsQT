@@ -242,7 +242,7 @@ class WinImageView(WinChild):
 
         self.content_lay_v.setContentsMargins(10, 0, 10, 0)
         self.content_wid.setObjectName("img_view")
-        Utils.style(self)
+        Utils.style(self.content_lay_v)
 
         self.short_src = short_src
         self.all_images = list(Thumbnail.path_to_wid.keys())

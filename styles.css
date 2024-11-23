@@ -346,6 +346,97 @@
     border-radius: 22px;
 }
 
+
+QMenu#context_menu.dark {
+    background-color: #333333;
+    border: 1px solid #5d5d5d;
+    border-radius: 8;
+    padding: 3px;
+    color: white;
+}
+
+QMenu#context_menu.dark::indicator {
+    height: 0px;
+}
+
+QMenu#context_menu.dark::item {
+    padding: 3 15 3 15;
+    color: #ffffff;
+}
+
+QMenu#context_menu.dark::item:selected {
+    padding: 3 15 3 15;
+    background: #2e59cb;
+    border-radius: 6;
+    color: #ffffff;
+}
+
+QMenu#context_menu.dark::right-arrow {
+    height: 0px;
+}
+
+
+/* for all context menus start */
+
+/* #context_menu.dark {
+    background-color: rgb(51, 51, 51);
+    border: 1px solid rgb(93, 93, 93);
+    border-radius: 8;
+    padding: 3px;
+    color: rgb(255, 255, 255);
+}
+
+#context_menu.light {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(179, 179, 179);
+    border-radius: 8;
+    padding: 3px;
+    color: rgb(255, 255, 255);
+}
+
+#context_menu::indicator.dark {
+    height: 0px;
+}
+
+#context_menu::indicator.light {
+    height: 0px;
+}
+
+#context_menu::item.dark {
+    padding: 3 15 3 15;
+    color: rgb(255, 255, 255);
+}
+
+#context_menu::item.light {
+    padding: 3 15 3 15;
+    color: rgb(61, 61, 61);
+}
+
+#context_menu::item:solid.dark {
+    padding: 3 15 3 15;
+    background: rgb(46, 89, 203);
+    border-radius: 6;
+    color: rgb(255, 255, 255);
+}
+
+#context_menu::item:solid.light {
+    padding: 3 15 3 15;
+    background: rgb(46, 89, 203);
+    color: rgb(255, 255, 255);
+    border-radius: 6;
+}
+
+#context_menu::right-arrow.dark {
+    height: 0px;
+}
+
+#context_menu::right-arrow.light {
+    height: 0px;
+} */
+
+/* for all context menus end */
+
+
 /* QLabel.dark {
     color: #ffffff;
 }

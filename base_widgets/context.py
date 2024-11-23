@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QCloseEvent, QMouseEvent, QContextMenuEvent
+from PyQt5.QtGui import QCloseEvent, QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import QMenu
 
-from styles import Themes
+from utils.utils import Utils
 
 
 class ContextCustom(QMenu):
@@ -11,11 +11,16 @@ class ContextCustom(QMenu):
     def __init__(self, event: QContextMenuEvent):
         self.ev = event
         super().__init__()
+
+
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         flags = Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint
         flags = flags | Qt.WindowType.NoDropShadowWindowHint
         self.setWindowFlags(flags)
+
+        self.setObjectName("context_menu")
+        Utils.style(self)
 
         self.setMinimumWidth(200)
     
