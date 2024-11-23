@@ -34,15 +34,6 @@ class SvgPaths:
             )
 
 
-
-# class ProgressBar(QLabel):
-#     def __init__(self):
-#         super().__init__()
-#         self.setAlignment(Qt.AlignmentFlag.AlignRight)
-#         SignalsApp.all_.progressbar_text.connect(self.setText)
-
-
-        
 class BaseSlider(QSlider):
     _clicked = pyqtSignal()
 
@@ -127,10 +118,6 @@ class BarBottom(QFrame):
         SignalsApp.all_.btn_downloads_toggle.connect(self.btn_downloads_toggle)
         self.h_layout.addWidget(self.downloads)
 
-        self.switch_theme = SvgBtn(SvgPaths.switch_theme_svg, size=20)
-        self.switch_theme.mouseReleaseEvent = self.switch_theme_cmd
-        self.h_layout.addWidget(self.switch_theme)
-
         self.sett_widget = SvgBtn(SvgPaths.settings_svg, size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
@@ -149,14 +136,9 @@ class BarBottom(QFrame):
             raise Exception("widgets >bar bottom > btn downloads > wrong flag", flag)
 
     def switch_theme_cmd(self, e: QMouseEvent):
-        return
-
         SvgPaths.update_()
         self.sett_widget.set_icon(SvgPaths.settings_svg)
         self.downloads.set_icon(SvgPaths.download_svg)
-        self.switch_theme.set_icon(SvgPaths.switch_theme_svg)
-
-        JsonData.write_json_data()
 
     def open_downloads(self, e: QMouseEvent):
         if e.button() == Qt.MouseButton.LeftButton:
