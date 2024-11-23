@@ -62,13 +62,13 @@
     border-bottom-right-radius: 10px;
 }
 
-#bar_top_base.dark {
+#bar_top.dark {
     background-color: rgb(36, 36, 36);
     border-radius: 0px;
     border-bottom: 1px solid rgb(0, 0, 0);
 }
 
-#bar_top_base.light {
+#bar_top.light {
     background-color: rgb(255, 255, 255);
     border-radius: 0px;
     border-bottom: 1px solid rgb(219, 219, 219);
@@ -288,7 +288,7 @@
     color: rgb(61, 61, 61);
 }
 
-#topbar_btn.dark {
+#bar_top_btn.normal.dark {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid transparent;
@@ -296,7 +296,7 @@
     color: rgb(255, 255, 255);
 }
 
-#topbar_btn.light {
+#bar_top_btn.normal.light {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid transparent;
@@ -304,7 +304,7 @@
     color: rgb(61, 61, 61);
 }
 
-#topbar_btn.border.dark {
+#bar_top_btn.border.dark {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid rgb(46, 89, 203);
@@ -312,7 +312,7 @@
     color: rgb(255, 255, 255);
 }
 
-#topbar_btn.border.light {
+#bar_top_btn.border.light {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid rgb(46, 89, 203);
@@ -320,7 +320,7 @@
     color: rgb(61, 61, 61);
 }
 
-#topbar_btn.solid.dark {
+#bar_top_btn.solid.dark {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid transparent;
@@ -328,7 +328,7 @@
     color: rgb(255, 255, 255);
 }
 
-#topbar_btn.solid.light {
+#bar_top_btn.solid.light {
     border-radius: 6;
     margin-right: 5px;
     border: 2px solid transparent;

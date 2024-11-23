@@ -7,7 +7,8 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSlider
 from base_widgets import LayoutHor, SvgBtn
 from cfg import JsonData
 from signals import SignalsApp
-from styles import Names, Themes
+# from styles import Names, Themes
+from utils.utils import Utils
 
 from .win_downloads import WinDownloads
 from .win_settings import WinSettings
@@ -102,8 +103,8 @@ class BarBottom(QFrame):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedHeight(28)
-        self.setObjectName(Names.st_bar_frame)
-        self.setStyleSheet(Themes.current)
+        self.setObjectName("bar_bottom")
+        Utils.style(self)
         
         self.h_layout = LayoutHor(self)
         self.h_layout.setSpacing(20)
@@ -154,22 +155,19 @@ class BarBottom(QFrame):
             return
 
         all_widgets = QApplication.allWidgets()
+
         widgets = [
             widget
             for widget in all_widgets
             if widget.objectName()
             ]
                 
-        if JsonData.theme == "dark_theme":
-            Themes.set_theme("light_theme")
-            JsonData.theme = "light_theme"
-
+        if JsonData.theme == "dark":
+            JsonData.theme = "light"
         else:
-            Themes.set_theme("dark_theme")
-            JsonData.theme = "dark_theme"
+            JsonData.theme = "dark"
 
-        for i in widgets:
-            i.setStyleSheet(Themes.current)
+        print("применяю тему типа")
 
         SvgPaths.update_()
         self.sett_widget.set_icon(SvgPaths.settings_svg)

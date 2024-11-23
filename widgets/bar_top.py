@@ -7,31 +7,29 @@ from base_widgets.wins import WinChild
 from cfg import Dynamic, Filter, JsonData
 from lang import Lang
 from signals import SignalsApp
-from styles import Names, Themes
+from utils.utils import Utils
 
 from .win_dates import WinDates
 
 BTN_W, BTN_H = 80, 28
 
 
-class TopBarBtn(Btn):
+class BarTopBtn(Btn):
     def __init__(self, text: str):
         super().__init__(text)
+        self.setObjectName("bar_top_btn")
 
     def set_normal_style(self):
-        self.setObjectName(Names.topbar_btn)
-        self.setStyleSheet(Themes.current)
+        Utils.style(self, "normal")
 
     def set_blue_style(self):
-        self.setObjectName(Names.topbar_btn_selected)
-        self.setStyleSheet(Themes.current)
+        Utils.style(self, "solid")
 
     def set_border_style(self):
-        self.setObjectName(Names.topbar_btn_bordered)
-        self.setStyleSheet(Themes.current)
+        Utils.style(self, "border")
 
 
-class DatesBtn(TopBarBtn):
+class DatesBtn(BarTopBtn):
     win_dates_opened = pyqtSignal()
 
     def __init__(self):
@@ -79,7 +77,7 @@ class DatesBtn(TopBarBtn):
             self.set_normal_style()
 
 
-class FilterBtn(TopBarBtn):
+class FilterBtn(BarTopBtn):
     def __init__(self, filter: Filter):
         super().__init__(text=filter.names[JsonData.lang_ind])
 
@@ -133,8 +131,8 @@ class BarTop(QFrame):
     def __init__(self):
         super().__init__()
         self.setContentsMargins(5, 0, 5, 0)
-        self.setObjectName(Names.filter_bar_frame)
-        self.setStyleSheet(Themes.current)
+        self.setObjectName("bar_top")
+        Utils.style(self)
         self.setFixedHeight(34)
 
         self.h_layout = LayoutHor(self)
