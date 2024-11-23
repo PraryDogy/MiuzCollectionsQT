@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCloseEvent, QContextMenuEvent, QKeyEvent
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
@@ -12,6 +12,8 @@ from lang import Lang
 from utils.utils import Utils
 
 from .win_settings import WinSettings
+
+ICON_SVG = os.path.join("icon", "icon.svg")
 
 
 class SelectableLabel(QLabel):
@@ -56,7 +58,7 @@ class AboutWin(WinChild):
         self.setWindowTitle(APP_NAME)
         self.setFixedSize(280, 240)
 
-        icon = QSvgWidget(os.path.join("icon", "icon.svg"))
+        icon = QSvgWidget(ICON_SVG)
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(150, 130)
         self.content_lay_v.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)

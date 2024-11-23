@@ -1,9 +1,8 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
+from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
+from PyQt5.QtWidgets import QAction, QWidget, QLabel
 
-from base_widgets import Btn, ContextCustom, InputBase, LayoutHor
-from base_widgets.wins import WinChild
+from base_widgets import ContextCustom, LayoutHor
 from cfg import Dynamic, Filter, JsonData
 from lang import Lang
 from signals import SignalsApp
@@ -14,19 +13,38 @@ from .win_dates import WinDates
 BTN_W, BTN_H = 80, 28
 
 
-class BarTopBtn(Btn):
+NORMAL_STYLE = """
+    border: 2px solid transparent;
+"""
+
+
+SOLID_STYLE = """
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-color: rgb(46, 89, 203);
+    color: rgb(255, 255, 255);
+"""
+
+BORDER_STYLE = """
+    border-radius: 6px;
+    border: 2px solid rgb(46, 89, 203);
+"""
+
+
+class BarTopBtn(QLabel):
     def __init__(self, text: str):
         super().__init__(text)
-        self.setObjectName("bar_top_btn")
+        self.setFixedSize(BTN_W, BTN_H)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def set_solid_style(self):
+        self.setStyleSheet(SOLID_STYLE)
 
     def set_normal_style(self):
-        ...
-
-    def set_blue_style(self):
-        ...
+        self.setStyleSheet(NORMAL_STYLE)
 
     def set_border_style(self):
-        ...
+        self.setStyleSheet(BORDER_STYLE)
 
 
 class DatesBtn(BarTopBtn):
@@ -34,15 +52,13 @@ class DatesBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(text=Lang.dates)
-        self.setFixedSize(BTN_W, BTN_H)
-        # self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.set_style_cmd: callable = None
         SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
 
     def dates_btn_style(self, flag: str):
         if flag == "blue":
-            self.set_blue_style()
-            self.set_style_cmd = self.set_blue_style
+            self.set_solid_style()
+            self.set_style_cmd = self.set_solid_style
         elif flag == "normal":
             self.set_normal_style()
             self.set_style_cmd = self.set_normal_style
@@ -82,11 +98,9 @@ class FilterBtn(BarTopBtn):
         super().__init__(text=filter.names[JsonData.lang_ind])
 
         self.filter = filter
-        self.setFixedSize(BTN_W, BTN_H)
-        # self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         if filter.value:
-            self.set_blue_style()
+            self.set_solid_style()
         else:
             self.set_normal_style()
         
@@ -94,7 +108,7 @@ class FilterBtn(BarTopBtn):
         self.filter.value = not self.filter.value
 
         if self.filter.value:
-            self.set_blue_style()
+            self.set_solid_style()
         else:
             self.set_normal_style()
 
@@ -122,24 +136,21 @@ class FilterBtn(BarTopBtn):
         menu_.show_menu()
 
         if self.filter.value:
-            self.set_blue_style()
+            self.set_solid_style()
         else:
             self.set_normal_style()
 
 
-class BarTop(QFrame):
+class BarTop(QWidget):
     def __init__(self):
         super().__init__()
-        self.setContentsMargins(5, 0, 5, 0)
-        self.setFixedHeight(34)
+        self.setFixedHeight(35)
 
-        self.h_layout = LayoutHor(self)
-        self.h_layout.setSpacing(0)
-        self.h_layout.setContentsMargins(0, 0, 0, 0)
+        self.h_layout = LayoutHor()
+        self.setLayout(self.h_layout)
 
         self.filter_btns = []
         self.win_dates = None
-
         SignalsApp.all_.bar_top_reset_filters.connect(self.disable_filters)
 
         self.init_ui()
@@ -157,7 +168,7 @@ class BarTop(QFrame):
         self.h_layout.addWidget(self.dates_btn)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
-            self.dates_btn.set_blue_style()
+            self.dates_btn.set_solid_style()
         else:
             self.dates_btn.set_normal_style()
 
