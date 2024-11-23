@@ -150,22 +150,14 @@ class LoadMenus(URunnable):
 
 
 class MenuLeft(QListWidget):
+    h_ = 30
+
     def __init__(self):
         super().__init__()
         self.setFixedWidth(MENU_LEFT_WIDTH)
 
         self.selected_btn: CollectionBtn
         SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
-
-        # scroll_layout = LayoutVer()
-        # scroll_layout.setContentsMargins(5, 0, 0, 5)
-        # self.setLayout(scroll_layout)
-
-        # self.scroll_area = QScrollArea()
-
-        # self.scroll_area.setWidgetResizable(True)
-        # self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # scroll_layout.addWidget(self.scroll_area)
 
         self.setup_task()
 
@@ -227,7 +219,7 @@ class MenuLeft(QListWidget):
         self.all_colls_btn.pressed_.connect(cmd_)
 
         list_item = QListWidgetItem()
-        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, 30))
+        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
         self.addItem(list_item)
         self.setItemWidget(list_item, self.all_colls_btn)
 
@@ -241,20 +233,14 @@ class MenuLeft(QListWidget):
         favs_btn.pressed_.connect(cmd_)
 
         list_item = QListWidgetItem()
-        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, 30))
+        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
         self.addItem(list_item)
         self.setItemWidget(list_item, favs_btn)
 
-        # fake_btn = QLabel("")
-        # fake_item = QListWidgetItem()
-        # fake_item.setSizeHint(fake_btn.sizeHint())
-        # fake_btn.setDisabled(True)
-        # fake_item.setFlags(fake_item.flags() & ~Qt.ItemIsSelectable & ~Qt.ItemIsEnabled)
-        # self.addItem(fake_item)
-        # self.setItemWidget(fake_item, fake_btn)
-
-
-
+        fake_item = QListWidgetItem()
+        list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
+        fake_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
+        self.addItem(fake_item)
 
         for data in menus:
 
@@ -266,7 +252,7 @@ class MenuLeft(QListWidget):
             coll_btn.pressed_.connect(cmd_)
 
             list_item = QListWidgetItem()
-            list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, 30))
+            list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
