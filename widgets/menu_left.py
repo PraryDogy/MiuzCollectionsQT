@@ -2,7 +2,7 @@ import os
 import subprocess
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal, QModelIndex
+from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QListWidget, QListWidgetItem
 
@@ -59,7 +59,7 @@ class CollectionBtn(QLabel):
             self.pressed_.emit()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        self.pressed_.emit()
+        QTimer.singleShot(100, self.pressed_.emit)
         menu_ = ContextCustom(event=ev)
 
         reveal_coll = QAction(text=Lang.reveal_in_finder, parent=self)
