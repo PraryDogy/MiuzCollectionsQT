@@ -136,22 +136,20 @@ class AboveThumbsNoImages(QWidget):
 
 
 class AboveThumbs(QWidget):
-    def __init__(self, width):
+    def __init__(self):
         super().__init__()
 
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
         title = QLabel()
-        title.setStyleSheet(TITLE_NORMAL + "background: red;")
+        title.setStyleSheet(TITLE_NORMAL)
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Preferred
             )
 
         self.v_layout.addWidget(title)
-        # label.setFixedWidth(width - 20)
-        # label.setWordWrap(True)
 
         h_wid = QWidget()
         h_layout = LayoutHor()

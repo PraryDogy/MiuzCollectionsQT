@@ -146,8 +146,11 @@ class Grid(QScrollArea):
 
         if db_images:
 
-            above_thumbs = AboveThumbs(self.width())
-            above_thumbs.setContentsMargins(9, 0, 0, 0)
+            above_thumbs = AboveThumbs()
+            above_thumbs.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Preferred
+                )
             self.grids_layout.addWidget(above_thumbs)
 
             ln_images = 0
