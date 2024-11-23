@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QGridLayout, QPushButton, QScrollArea,
-                             QWidget)
+                             QSizePolicy, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
 from cfg import (GRID_LIMIT, MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, Dynamic,
@@ -160,8 +160,11 @@ class Grid(QScrollArea):
                 self.add_limit_btn()
 
         else:
-            no_images = AboveThumbsNoImages(self.width())
-            no_images.setContentsMargins(9, 0, 0, 0)
+            no_images = AboveThumbsNoImages()
+            no_images.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Preferred
+                )
             self.grids_layout.addWidget(no_images)
 
         self.main_layout.addWidget(self.grids_widget)

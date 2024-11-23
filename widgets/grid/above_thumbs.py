@@ -80,20 +80,19 @@ class ShowAllBtn(ResetBtn):
 
 
 class AboveThumbsNoImages(QWidget):
-    def __init__(self, width):
+    def __init__(self):
         super().__init__()
 
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
-        noimg_t = Lang.no_photo
-
-        title_label = QLabel(text=noimg_t)
-        title_label.setFixedWidth(width - 20)
-        title_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        title_label.setWordWrap(True)
-        title_label.setStyleSheet(TITLE_NORMAL)
-        self.v_layout.addWidget(title_label)
+        title = QLabel(text=Lang.no_photo)
+        title.setStyleSheet(TITLE_NORMAL)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Fixed,
+            QSizePolicy.Policy.Preferred
+            )
+        self.v_layout.addWidget(title)
 
         h_wid = QWidget()
         h_layout = LayoutHor()
@@ -111,7 +110,7 @@ class AboveThumbsNoImages(QWidget):
             noimg_t = (f"{Lang.no_photo} {Lang.with_name}: "
                        f"{Dynamic.search_widget_text}")
 
-            title_label.setText(noimg_t)
+            title.setText(noimg_t)
 
             s_label = ResetSearchBtn()
             h_layout.addWidget(s_label)
@@ -120,7 +119,7 @@ class AboveThumbsNoImages(QWidget):
             noimg_t = (f"{Lang.no_photo}: "
                        f"{Dynamic.date_start_text} - {Dynamic.date_end_text}")
 
-            title_label.setText(noimg_t)
+            title.setText(noimg_t)
             h_layout.addWidget(ResetDatesBtn())
 
         elif enabled_filters:
@@ -129,7 +128,7 @@ class AboveThumbsNoImages(QWidget):
 
             noimg_t = (f"{Lang.no_photo_filter}: {enabled_filters}")
 
-            title_label.setText(noimg_t)
+            title.setText(noimg_t)
             h_layout.addWidget(ResetFiltersBtn())
         
         else:
@@ -143,12 +142,16 @@ class AboveThumbs(QWidget):
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
+        title = QLabel()
+        title.setStyleSheet(TITLE_NORMAL + "background: red;")
+        self.setSizePolicy(
+            QSizePolicy.Policy.Fixed,
+            QSizePolicy.Policy.Preferred
+            )
 
-        label = QLabel()
-        self.v_layout.addWidget(label)
-        label.setFixedWidth(width - 20)
-        label.setWordWrap(True)
-        label.setStyleSheet(TITLE_NORMAL)
+        self.v_layout.addWidget(title)
+        # label.setFixedWidth(width - 20)
+        # label.setWordWrap(True)
 
         h_wid = QWidget()
         h_layout = LayoutHor()
@@ -157,7 +160,7 @@ class AboveThumbs(QWidget):
         self.v_layout.addWidget(h_wid)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
-            label.setText(
+            title.setText(
                 f"{Lang.photos_named_dates}: {Dynamic.date_start_text} - {Dynamic.date_end_text}"
                 )
             h_layout.addWidget(ResetDatesBtn())
@@ -166,7 +169,7 @@ class AboveThumbs(QWidget):
             self.v_layout.addSpacerItem(spacer)
 
         elif Dynamic.search_widget_text:
-            label.setText(f"{Lang.search}: {Dynamic.search_widget_text}")
+            title.setText(f"{Lang.search}: {Dynamic.search_widget_text}")
             h_layout.addWidget(ResetSearchBtn())
             h_layout.addSpacerItem(QSpacerItem(1, 30))
 
