@@ -67,8 +67,8 @@ class WinMain(WinFrameless):
 
         mid_wid = QFrame()
         mid_wid.setFixedWidth(1)
-        mid_wid.setObjectName(Names.separator)
-        mid_wid.setStyleSheet(Themes.current)
+        mid_wid.setObjectName("sep")
+        Utils.style(self)
         h_lay_main.addWidget(mid_wid)
 
         right_wid = QWidget()

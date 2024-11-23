@@ -168,11 +168,11 @@
     border-radius: 15px;
 }
 
-#img_view_sep.dark {
+#sep.dark {
     background-color: rgb(0, 0, 0);
 }
 
-#img_view_sep.light {
+#sep.light {
     background-color: rgb(219, 219, 219);
 }
 
