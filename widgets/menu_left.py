@@ -4,10 +4,10 @@ import subprocess
 import sqlalchemy
 from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QLabel, QListWidget, QListWidgetItem
+from PyQt5.QtWidgets import QAction, QLabel, QListWidget, QListWidgetItem, QTabWidget
 
 from base_widgets import ContextCustom
-from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
+from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData, BRANDS
 from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -74,8 +74,9 @@ class WorkerSignals(QObject):
 
 
 class LoadMenus(URunnable):
-    def __init__(self):
+    def __init__(self, brand_ind: int):
         super().__init__()
+        self.brand_ind = brand_ind
         self.signals_ = WorkerSignals()
 
     @URunnable.set_running_state
@@ -102,7 +103,9 @@ class LoadMenus(URunnable):
         menus: list[dict] = []
 
         conn = Dbase.engine.connect()
-        q = sqlalchemy.select(THUMBS.c.coll).distinct()
+        q = sqlalchemy.select(THUMBS.c.coll)
+        q = q.where(THUMBS.c.brand == BRANDS[self.brand_ind])
+        q = q.distinct()
         res = conn.execute(q).fetchall()
         conn.close()
 
@@ -127,12 +130,12 @@ class LoadMenus(URunnable):
         return sorted(menus, key = lambda x: x["short_name"])
 
 
-class MenuLeft(QListWidget):
+class MenuLeftBase(QListWidget):
     h_ = 30
 
-    def __init__(self):
+    def __init__(self, brand_ind: int):
         super().__init__()
-        self.setFixedWidth(MENU_LEFT_WIDTH)
+        self.brand_ind = brand_ind
         SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
         self.setup_task()
 
@@ -153,7 +156,7 @@ class MenuLeft(QListWidget):
             raise Exception("widgets > menu left > wrong flag", flag)
 
     def setup_task(self):
-        self.task_ = LoadMenus()
+        self.task_ = LoadMenus(brand_ind=self.brand_ind)
         self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.pool.start(self.task_)
 
@@ -185,7 +188,7 @@ class MenuLeft(QListWidget):
         cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
         all_colls_btn.pressed_.connect(cmd_)
         all_colls_item = QListWidgetItem()
-        all_colls_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
+        all_colls_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeftBase.h_))
         self.addItem(all_colls_item)
         self.setItemWidget(all_colls_item, all_colls_btn)
 
@@ -197,12 +200,12 @@ class MenuLeft(QListWidget):
         favs_btn.pressed_.connect(cmd_)
 
         favs_item = QListWidgetItem()
-        favs_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
+        favs_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeftBase.h_))
         self.addItem(favs_item)
         self.setItemWidget(favs_item, favs_btn)
 
         fake_item = QListWidgetItem()
-        fake_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_ // 2))
+        fake_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeftBase.h_ // 2))
         fake_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
         self.addItem(fake_item)
 
@@ -223,9 +226,24 @@ class MenuLeft(QListWidget):
             coll_btn.pressed_.connect(cmd_)
 
             list_item = QListWidgetItem()
-            list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeft.h_))
+            list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeftBase.h_))
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
             if JsonData.curr_coll == data.get("coll_name"):
                 self.setCurrentRow(self.row(list_item))
+
+
+class MenuLeft(QTabWidget):
+    def __init__(self):
+        super().__init__()
+        self.setFixedWidth(MENU_LEFT_WIDTH)
+        self.tabBarClicked.connect(self.cmd_)
+
+        for i in BRANDS:
+            wid = MenuLeftBase(brand_ind=BRANDS.index(i))
+            self.addTab(wid, i)
+
+    def cmd_(self, index: int):
+        JsonData.brand_ind = index
+        print(index)

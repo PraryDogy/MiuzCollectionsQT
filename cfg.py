@@ -107,6 +107,8 @@ TITLE_SOLID = f"""
     {SOLID_STYLE}
 """
 
+BRANDS: list = ["miuz", "panacea"]
+
 
 class Filter:
     filters: list["Filter"] = []
@@ -154,6 +156,7 @@ class JsonData:
         ]
     
     lang_ind = 0
+    brand_ind = 0
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
