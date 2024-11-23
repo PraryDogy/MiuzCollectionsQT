@@ -44,6 +44,9 @@ class CustomContext(ContextCustom):
 
 class CustomTextEdit(QTextEdit):
     def __init__(self):
+        """
+        custom copy paste context
+        """
         super().__init__()
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:

@@ -94,7 +94,7 @@ class Lang_:
         "Disable"
     ]
     download_update = [
-        "Скачать обновление",
+        "Обновление",
         "Update app"
     ]
     enable = [

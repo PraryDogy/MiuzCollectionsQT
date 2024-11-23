@@ -39,7 +39,7 @@ class CustomContext(ContextCustom):
         self.my_parent.insert(text)
 
 
-class InputBase(QLineEdit):
+class CustomInput(QLineEdit):
     def __init__(self):
         """
         custom copy paste context menu

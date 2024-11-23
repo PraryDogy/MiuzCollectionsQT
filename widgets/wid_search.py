@@ -2,13 +2,13 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QSpacerItem, QWidget
 
-from base_widgets import InputBase, LayoutHor
+from base_widgets import CustomInput, LayoutHor
 from cfg import Dynamic
 from lang import Lang
 from signals import SignalsApp
 
 
-class SearchBarBase(InputBase):
+class SearchBarBase(CustomInput):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(150)

@@ -3,11 +3,11 @@ import shutil
 import subprocess
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import (QApplication, QFileDialog, QLabel, QSpacerItem,
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QSpacerItem,
                              QTextEdit, QWidget)
 
-from base_widgets import Btn, CustomTextEdit, InputBase, LayoutHor, LayoutVer
+from base_widgets import CustomTextEdit, CustomInput, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, DB_FILE, HASH_DIR, JsonData
 from lang import Lang
@@ -16,51 +16,6 @@ from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
 
 from .actions import OpenWins
-
-
-class BrowseColl(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.new_coll_path = None
-
-        layout_h = LayoutHor()
-        self.setLayout(layout_h)
-
-        self.browse_btn = Btn(Lang.browse)
-        self.browse_btn.mouseReleaseEvent = self.choose_folder
-        layout_h.addWidget(self.browse_btn)
-
-        layout_h.addSpacerItem(QSpacerItem(10, 0))
-
-        self.coll_path_label = QLabel(self.cut_text(JsonData.coll_folder))
-        self.coll_path_label.setWordWrap(True)
-        self.coll_path_label.setFixedHeight(35)
-        layout_h.addWidget(self.coll_path_label)
-
-    def choose_folder(self, e):
-        file_dialog = QFileDialog()
-        file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
-
-        if self.new_coll_path:
-            file_dialog.setDirectory(self.new_coll_path)
-
-        elif not os.path.exists(JsonData.coll_folder):
-            file_dialog.setDirectory(JsonData.down_folder)
-
-        else:
-            file_dialog.setDirectory(JsonData.coll_folder)
-
-        selected_folder = file_dialog.getExistingDirectory()
-
-        if selected_folder:
-            self.new_coll_path = selected_folder
-            self.coll_path_label.setText(self.cut_text(self.new_coll_path))
-
-    def cut_text(self, text: str, max_ln: int = 70):
-        if len(text) > max_ln:
-            return text[:max_ln] + "..."
-        else:
-            return text
 
 
 class CollFolderListInput(CustomTextEdit):
@@ -96,8 +51,9 @@ class ChangeLang(QWidget):
         layout_h = LayoutHor()
         self.setLayout(layout_h)
 
-        self.lang_btn = Btn(Lang._lang_name)
-        self.lang_btn.mouseReleaseEvent = self.lng_cmd
+        self.lang_btn = QPushButton(text=Lang._lang_name)
+        self.lang_btn.setFixedWidth(150)
+        self.lang_btn.clicked.connect(self.lng_cmd)
         layout_h.addWidget(self.lang_btn)
 
         layout_h.addSpacerItem(QSpacerItem(10, 0))
@@ -105,7 +61,7 @@ class ChangeLang(QWidget):
         self.lang_label = QLabel(Lang.lang_label)
         layout_h.addWidget(self.lang_label)
           
-    def lng_cmd(self, e):
+    def lng_cmd(self, *args):
         JsonData.lang_ind += 1
         self._pressed.emit()
         Lang.init()
@@ -125,7 +81,7 @@ class StopColls(QWidget):
 
         layout_v.addSpacerItem(QSpacerItem(0, 10))
 
-        self.input = InputBase()
+        self.input = CustomInput()
         self.input.insert(", ".join(JsonData.stop_colls))
         layout_v.addWidget(self.input)
 
@@ -141,12 +97,12 @@ class UpdaterWidget(QWidget):
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
-        self.btn = Btn(Lang.download_update)
+        self.btn = QPushButton(text=Lang.download_update)
         self.btn.setFixedWidth(150)
-        self.btn.mouseReleaseEvent = self.update_btn_cmd
+        self.btn.clicked.connect(self.update_btn_cmd)
         self.v_layout.addWidget(self.btn)
 
-    def update_btn_cmd(self, e):
+    def update_btn_cmd(self, *args):
         self.task = Updater()
         self.btn.setText(Lang.wait_update)
         self.task.signals_.no_connection.connect(self.no_connection_win)
@@ -176,29 +132,29 @@ class ShowFiles(QWidget):
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
-        self.btn = Btn(Lang.show_app_support)
+        self.btn = QPushButton(text=Lang.show_app_support)
         self.btn.setFixedWidth(150)
-        self.btn.mouseReleaseEvent = self.btn_cmd
+        self.btn.clicked.connect(self.btn_cmd)
         self.v_layout.addWidget(self.btn)
 
-    def btn_cmd(self, e):
+    def btn_cmd(self, *args):
         try:
             subprocess.Popen(["open", APP_SUPPORT_DIR])
         except Exception as e:
             print(e)
 
 
-class RestoreBtn(Btn):
+class RestoreBtn(QPushButton):
     _pressed = pyqtSignal()
 
     def __init__(self):
-        super().__init__(Lang.restore_db)
+        super().__init__(text=Lang.restore_db)
         self.setFixedWidth(150)
+        self.clicked.connect(self.cmd_)
 
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+    def cmd_(self, *args):
         self._pressed.emit()
         setattr(self, "flag", True)
-        return super().mouseReleaseEvent(ev)
 
 
 class WinSettings(WinChild):
@@ -208,7 +164,7 @@ class WinSettings(WinChild):
         self.setWindowTitle(Lang.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 500)
+        self.setFixedSize(420, 480)
         self.setFocus()
 
         self.new_coll_path = None
@@ -259,16 +215,16 @@ class WinSettings(WinChild):
 
         btns_layout.addStretch(1)
 
-        self.ok_btn = Btn(Lang.ok)
-        self.ok_btn.setFixedSize(90, self.ok_btn.height())
-        self.ok_btn.mouseReleaseEvent = self.ok_cmd
+        self.ok_btn = QPushButton(text=Lang.ok)
+        self.ok_btn.setFixedWidth(90)
+        self.ok_btn.clicked.connect(self.ok_cmd)
         btns_layout.addWidget(self.ok_btn)
 
         btns_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.cancel_btn = Btn(Lang.cancel)
-        self.cancel_btn.setFixedSize(90, self.cancel_btn.height())
-        self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
+        self.cancel_btn = QPushButton(text=Lang.cancel)
+        self.cancel_btn.setFixedWidth(90)
+        self.cancel_btn.clicked.connect(self.cancel_cmd)
         btns_layout.addWidget(self.cancel_btn)
 
         btns_layout.addStretch(1)
@@ -276,7 +232,7 @@ class WinSettings(WinChild):
     def cancel_cmd(self, *args):
         self.close()
 
-    def ok_cmd(self, e):
+    def ok_cmd(self, *args):
         coll_folder_list = self.coll_folder_list_input.get_text()
         stop_colls = self.stopcolls.get_stopcolls()
 

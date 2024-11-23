@@ -1,14 +1,13 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
                              QWidget)
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
-from cfg import NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
+from cfg import NAME_ALL_COLLS, NAME_FAVS, JsonData
 from lang import Lang
 from signals import SignalsApp
-from styles import Names, Themes
 from utils.scaner import Scaner
 from utils.utils import Utils
 
@@ -18,7 +17,6 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
-from .wid_search import WidSearch
 
 
 class TestWid(QFrame):
@@ -133,11 +131,15 @@ class WinMain(WinFrameless):
         if not Utils.smb_check():
             OpenWins.smb(self)
 
-        # from .actions import OpenWins
-        # OpenWins.smb(parent_=self)
+        from .actions import OpenWins
+        OpenWins.smb(parent_=self)
         # self.test = TestWid()
         # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
         # self.test.show()
+
+    def closeEvent(self, a0: QCloseEvent | None) -> None:
+        self.hide()
+        a0.ignore()
     
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_W:
