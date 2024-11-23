@@ -29,7 +29,6 @@ class CollectionBtn(QLabel):
         """
 
         super().__init__(text=short_name)
-        self.setObjectName("coll_btn")
         self.coll_name = coll_name
         self.short_name = short_name
 
@@ -58,13 +57,13 @@ class CollectionBtn(QLabel):
             OpenWins.smb(self.window())
 
     def style_normal(self):
-        Utils.style(self, "normal")
+        ...
 
     def style_solid(self):
-        Utils.style(self, "solid")
+        ...
 
     def style_border(self):
-        Utils.style(self, "border")
+        ...
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -84,14 +83,12 @@ class CollectionBtn(QLabel):
         reveal_coll.triggered.connect(self.reveal_collection)
         menu_.addAction(reveal_coll)
 
-        Utils.style(self, "border")
-
         menu_.show_menu()
 
         if JsonData.curr_coll == self.coll_name:
-            Utils.style(self, "solid")
+            ...
         else:
-            Utils.style(self, "normal")
+            ...
 
 
 class WorkerSignals(QObject):
@@ -158,8 +155,6 @@ class MenuLeft(QFrame):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(MENU_LEFT_WIDTH)
-        self.setObjectName("menu_left")
-        Utils.style(self)
 
         scroll_layout = LayoutVer()
         scroll_layout.setContentsMargins(5, 0, 0, 5)
@@ -171,8 +166,6 @@ class MenuLeft(QFrame):
         self.scroll_area = QScrollArea()
 
         self.scroll_area.setWidgetResizable(True)
-        # self.scroll_area.setObjectName(Names.menu_scrollbar)
-        # self.scroll_area.setStyleSheet(Themes.current)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll_layout.addWidget(self.scroll_area)
 
@@ -228,8 +221,6 @@ class MenuLeft(QFrame):
             self.main_wid.deleteLater()
 
         self.main_wid = QWidget()
-        self.main_wid.setObjectName("menu_left_inner")
-        Utils.style(self)
         self.scroll_area.setWidget(self.main_wid)
 
         main_layout = LayoutVer()

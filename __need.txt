@@ -5,26 +5,9 @@
 везде хранить бренд в индексах
 в cfg имена брендов в соответствии индексам
 Фильтр только слои или только jpg
-может улучшить стили?
 
-
-#th_title_selected.dark.style1 {
-    font-size: 18pt;
-    font-weight: bold;
-    color: #ffffff;
-    background-color: rgba(46, 88, 203, 1.0);
-    border-radius: 5px;
-}
-
-#th_title_selected.light.style1 {
-    font-size: 18pt;
-    font-weight: bold;
-    color: #000000;
-    background-color: rgba(255, 255, 255, 1.0);
-    border-radius: 5px;
-}
-
-widget.setObjectName("th_title_selected")  # Устанавливаем ID
-widget.setProperty("class", "dark style1")  # Устанавливаем классы
-widget.style().unpolish(widget)
-widget.style().polish(widget)
+в связи с удалением стилей
+титлебар не нужен
+кнопки закрытия не нужны, передача методов для закрыть - хз
+отключение кнопок теперь через флаги
+левое меню переделать..

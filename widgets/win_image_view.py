@@ -178,9 +178,6 @@ class ZoomBtns(QFrame):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
 
-        self.setObjectName("navi_zoom")
-        Utils.style(self)
-
         h_layout = LayoutHor()
         self.setLayout(h_layout)
 
@@ -209,8 +206,6 @@ class ZoomBtns(QFrame):
 class SwitchImageBtn(QFrame):
     def __init__(self, icon_name: str, parent: QWidget = None) -> None:
         super().__init__(parent)
-        self.setObjectName("navi_toggle")
-        Utils.style(self)
         self.setFixedSize(54, 54) # 27px border-radius, 27 * 2 for round shape
 
         v_layout = LayoutVer()
@@ -241,8 +236,6 @@ class WinImageView(WinChild):
         self.installEventFilter(self)
 
         self.content_lay_v.setContentsMargins(10, 0, 10, 0)
-        self.content_wid.setObjectName("img_view")
-        Utils.style(self.content_lay_v)
 
         self.short_src = short_src
         self.all_images = list(Thumbnail.path_to_wid.keys())

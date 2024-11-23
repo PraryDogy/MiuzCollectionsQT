@@ -19,9 +19,6 @@ class ContextCustom(QMenu):
         flags = flags | Qt.WindowType.NoDropShadowWindowHint
         self.setWindowFlags(flags)
 
-        self.setObjectName("context_menu")
-        Utils.style(self)
-
         self.setMinimumWidth(200)
     
     def show_menu(self):

@@ -9,6 +9,3 @@ class Btn(QLabel):
         super().__init__(text=text)
         self.setFixedSize(80, 28)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.setObjectName("base_btn")
-        Utils.style(wid=self)

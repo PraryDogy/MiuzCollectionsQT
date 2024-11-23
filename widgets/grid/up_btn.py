@@ -12,8 +12,6 @@ class UpBtn(QFrame):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.setFixedSize(44, 44)
-        self.setObjectName("up_btn")
-        Utils.style(self)
 
         v_layout = LayoutVer()
         self.setLayout(v_layout)

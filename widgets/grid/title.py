@@ -28,8 +28,6 @@ class Title(QLabel):
             )
 
         self.setContentsMargins(3, 5, 3, 5)
-        self.setObjectName("title")
-        Utils.style(self, "normal")
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
@@ -89,7 +87,6 @@ class Title(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.r_click.emit()
-        Utils.style(self, "solid")
 
         menu_ = ContextCustom(ev)
 
@@ -116,4 +113,3 @@ class Title(QLabel):
         menu_.addAction(save_as_layers)
 
         menu_.show_menu()
-        Utils.style(self, "normal")

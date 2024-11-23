@@ -20,13 +20,13 @@ class BarTopBtn(Btn):
         self.setObjectName("bar_top_btn")
 
     def set_normal_style(self):
-        Utils.style(self, "normal")
+        ...
 
     def set_blue_style(self):
-        Utils.style(self, "solid")
+        ...
 
     def set_border_style(self):
-        Utils.style(self, "border")
+        ...
 
 
 class DatesBtn(BarTopBtn):
@@ -131,8 +131,6 @@ class BarTop(QFrame):
     def __init__(self):
         super().__init__()
         self.setContentsMargins(5, 0, 5, 0)
-        self.setObjectName("bar_top")
-        Utils.style(self)
         self.setFixedHeight(34)
 
         self.h_layout = LayoutHor(self)

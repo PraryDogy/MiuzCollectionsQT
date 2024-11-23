@@ -45,8 +45,6 @@ class CustomContext(ContextCustom):
 class CustomTextEdit(QTextEdit):
     def __init__(self):
         super().__init__()
-        self.setObjectName("q_text_edit")
-        Utils.style(self)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.context_menu = CustomContext(parent=self, event=a0)

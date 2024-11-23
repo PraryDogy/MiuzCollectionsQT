@@ -18,9 +18,6 @@ class ResetBtn(QLabel):
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.setObjectName("reset_btn")
-        Utils.style(self)
-
 
 class ResetDatesBtn(ResetBtn):
     def __init__(self):
@@ -96,8 +93,6 @@ class AboveThumbsNoImages(QWidget):
         title_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         title_label.setWordWrap(True)
         self.v_layout.addWidget(title_label)
-        title_label.setObjectName("title")
-        Utils.style(self, "normal")
 
         h_wid = QWidget()
         h_layout = LayoutHor()
@@ -152,8 +147,6 @@ class AboveThumbs(QWidget):
         self.v_layout.addWidget(label)
         label.setFixedWidth(width - 20)
         label.setWordWrap(True)
-        label.setObjectName("title")
-        Utils.style(label, "normal")
 
         h_wid = QWidget()
         h_layout = LayoutHor()

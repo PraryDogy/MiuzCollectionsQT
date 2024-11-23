@@ -45,8 +45,6 @@ class Thumbnail(QFrame):
 
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         super().__init__()
-        self.setObjectName("thumbnail")
-        Utils.style(self, "normal")
 
         self.img = pixmap
 
@@ -93,12 +91,11 @@ class Thumbnail(QFrame):
 
         self.name_label.set_text()
 
-
     def selected_style(self):
-        Utils.style(self, "solid")
+        ...
 
     def regular_style(self):
-        Utils.style(self, "normal")
+        ...
 
     def change_fav(self, value: int):
         if value == 0:

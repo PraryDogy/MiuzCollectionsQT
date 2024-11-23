@@ -103,8 +103,6 @@ class BarBottom(QFrame):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedHeight(28)
-        self.setObjectName("bar_bottom")
-        Utils.style(self)
         
         self.h_layout = LayoutHor(self)
         self.h_layout.setSpacing(20)
@@ -151,23 +149,7 @@ class BarBottom(QFrame):
             raise Exception("widgets >bar bottom > btn downloads > wrong flag", flag)
 
     def switch_theme_cmd(self, e: QMouseEvent):
-        if not e.button() == Qt.MouseButton.LeftButton:
-            return
-
-        all_widgets = QApplication.allWidgets()
-
-        widgets = [
-            widget
-            for widget in all_widgets
-            if widget.objectName()
-            ]
-                
-        if JsonData.theme == "dark":
-            JsonData.theme = "light"
-        else:
-            JsonData.theme = "dark"
-
-        print("применяю тему типа")
+        return
 
         SvgPaths.update_()
         self.sett_widget.set_icon(SvgPaths.settings_svg)

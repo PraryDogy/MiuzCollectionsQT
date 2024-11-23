@@ -20,5 +20,3 @@ class LimitBtn(Btn):
         self._clicked.emit()
         self.setDisabled(True)
         self.setText("")
-        self.setObjectName("thumbnail")
-        Utils.style(self, "normal")

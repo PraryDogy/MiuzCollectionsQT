@@ -52,9 +52,9 @@ class WinMain(WinFrameless):
             else JsonData.curr_coll
             )
 
-        wid_search = WidSearch()
-        self.titlebar.h_lay.addWidget(wid_search)
-        self.titlebar.title.setStyleSheet(f"""padding-left: {wid_search.width()}px;""")
+        # wid_search = WidSearch()
+        # self.titlebar.h_lay.addWidget(wid_search)
+        # self.titlebar.title.setStyleSheet(f"""padding-left: {wid_search.width()}px;""")
 
         h_wid_main = QWidget()
         h_lay_main = LayoutHor()
@@ -67,8 +67,6 @@ class WinMain(WinFrameless):
 
         mid_wid = QFrame()
         mid_wid.setFixedWidth(1)
-        mid_wid.setObjectName("sep")
-        Utils.style(mid_wid)
         h_lay_main.addWidget(mid_wid)
 
         right_wid = QWidget()
