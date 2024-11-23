@@ -14,6 +14,20 @@ from utils.utils import UThreadPool, Utils
 from ..actions import OpenWins
 from ._db_images import DbImage
 
+TITLE_NORMAL = """
+    font-size: 18pt;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+"""
+
+TITLE_SOLID = """
+    font-size: 18pt;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    background-color: rgb(46, 88, 203);
+    border-radius: 7px;
+"""
+
 
 class Title(QLabel):
     r_click = pyqtSignal()
@@ -28,6 +42,7 @@ class Title(QLabel):
             )
 
         self.setContentsMargins(3, 5, 3, 5)
+        self.setStyleSheet(TITLE_NORMAL)
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
@@ -112,4 +127,6 @@ class Title(QLabel):
         save_as_layers.triggered.connect(cmd_)
         menu_.addAction(save_as_layers)
 
+        self.setStyleSheet(TITLE_SOLID)
         menu_.show_menu()
+        self.setStyleSheet(TITLE_NORMAL)
