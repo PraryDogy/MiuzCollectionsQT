@@ -12,12 +12,32 @@ from base_widgets.wins import WinChild
 from cfg import PSD_TIFF, JsonData
 from database import THUMBS, Dbase
 from signals import SignalsApp
-from styles import Names, Themes
 from utils.utils import URunnable, UThreadPool, Utils
 
 from .actions import CopyPath, FavActionDb, OpenInfoDb, OpenWins, Reveal, Save
 from .grid.thumbnail import Thumbnail
 
+IMG_VIEW_STYLE = """
+    background: black;
+"""
+
+ZOOM_STYLE = """
+    background-color: rgba(128, 128, 128, 0.40);
+    border-radius: 15px;
+"""
+
+NAVI_STYLE = """
+    background-color: rgba(128, 128, 128, 0.40);
+    border-radius: 27px;
+"""
+
+IMAGES = "images"
+ZOOM_OUT = os.path.join(IMAGES, "zoom_out.svg")
+ZOOM_IN = os.path.join(IMAGES, "zoom_in.svg")
+ZOOM_FIT = os.path.join(IMAGES, "zoom_fit.svg")
+CLOSE_ = os.path.join(IMAGES, "zoom_close.svg")
+PREV_ = os.path.join(IMAGES, "prev.svg")
+NEXT_ = os.path.join(IMAGES, "next.svg")
 
 class ImageData:
     __slots__ = ["short_src", "pixmap"]
@@ -177,25 +197,26 @@ class ImageWidget(QLabel):
 class ZoomBtns(QFrame):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
+        self.setStyleSheet(ZOOM_STYLE)
 
         h_layout = LayoutHor()
         self.setLayout(h_layout)
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
 
-        self.zoom_out = SvgShadowed(os.path.join("images", "zoom_out.svg"), 45)
+        self.zoom_out = SvgShadowed(ZOOM_OUT, 45)
         h_layout.addWidget(self.zoom_out)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_in = SvgShadowed(os.path.join("images", "zoom_in.svg"), 45)
+        self.zoom_in = SvgShadowed(ZOOM_IN, 45)
         h_layout.addWidget(self.zoom_in)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_fit = SvgShadowed(os.path.join("images", "zoom_fit.svg"), 45)
+        self.zoom_fit = SvgShadowed(ZOOM_FIT, 45)
         h_layout.addWidget(self.zoom_fit)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_close = SvgShadowed(os.path.join("images", "zoom_close.svg"), 45)
+        self.zoom_close = SvgShadowed(CLOSE_, 45)
         h_layout.addWidget(self.zoom_close)
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
@@ -204,25 +225,26 @@ class ZoomBtns(QFrame):
 
 
 class SwitchImageBtn(QFrame):
-    def __init__(self, icon_name: str, parent: QWidget = None) -> None:
+    def __init__(self, path: str, parent: QWidget = None) -> None:
         super().__init__(parent)
         self.setFixedSize(54, 54) # 27px border-radius, 27 * 2 for round shape
+        self.setStyleSheet(NAVI_STYLE)
 
         v_layout = LayoutVer()
         self.setLayout(v_layout)
 
-        btn = SvgShadowed(os.path.join("images", icon_name), 50)
+        btn = SvgShadowed(path, 50)
         v_layout.addWidget(btn)
 
 
 class PrevImageBtn(SwitchImageBtn):
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__("prev.svg", parent)
+        super().__init__(PREV_, parent)
 
 
 class NextImageBtn(SwitchImageBtn):
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__("next.svg", parent)
+        super().__init__(NEXT_, parent)
 
 
 class WinImageView(WinChild):
@@ -238,8 +260,6 @@ class WinImageView(WinChild):
         self.short_src = short_src
         self.all_images = list(Thumbnail.path_to_wid.keys())
 
-
-
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
         self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
@@ -254,9 +274,15 @@ class WinImageView(WinChild):
         self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
 
         self.zoom_btns = ZoomBtns(parent=self.content_wid)
-        self.zoom_btns.zoom_in.mouseReleaseEvent = lambda e: self.image_label.zoom_in()
-        self.zoom_btns.zoom_out.mouseReleaseEvent = lambda e: self.image_label.zoom_out()
-        self.zoom_btns.zoom_fit.mouseReleaseEvent = lambda e: self.image_label.zoom_reset()
+        self.zoom_btns.zoom_in.mouseReleaseEvent = (
+            lambda e: self.image_label.zoom_in()
+        )
+        self.zoom_btns.zoom_out.mouseReleaseEvent = (
+            lambda e: self.image_label.zoom_out()
+        )
+        self.zoom_btns.zoom_fit.mouseReleaseEvent = (
+            lambda e: self.image_label.zoom_reset()
+        )
         self.zoom_btns.zoom_close.mouseReleaseEvent = self.close_
 
         self.hide_all_buttons()

@@ -2,15 +2,25 @@ import os
 from functools import partial
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import QLabel, QScrollArea, QSpacerItem, QWidget
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
+                             QWidget)
 
-from base_widgets import CustomProgressBar, LayoutHor, LayoutVer, SvgBtn
+from base_widgets import LayoutHor, LayoutVer, SvgBtn
 from base_widgets.wins import WinChild
 from cfg import JsonData
 from lang import Lang
 from styles import Names, Themes
 from utils.copy_files import CopyFiles
 from utils.utils import Utils
+
+
+class CustomProgressBar(QProgressBar):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent=parent)
+        self.setTextVisible(False)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setFixedHeight(7)
 
 
 class Progresser(QWidget):
@@ -60,10 +70,11 @@ class Progresser(QWidget):
 class WinDownloads(WinChild):
     def __init__(self):
         super().__init__()
-        self.copy_threads: list[CopyFiles] = []
-
+        self.content_lay_v.setContentsMargins(0, 0, 0, 0)
         self.setWindowTitle(Lang.title_downloads)
         self.setFixedSize(400, 420)
+
+        self.copy_threads: list[CopyFiles] = []
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
@@ -82,7 +93,12 @@ class WinDownloads(WinChild):
         self.v_layout.addWidget(self.progress_wid)
         self.v_layout.addStretch()
 
-        self.add_progress_widgets()
+        for i in range(0, 10):
+            wid_ = Progresser(text="test")
+            self.progress_layout.addWidget(wid_)
+            wid_.set_value.emit(50)
+
+        # self.add_progress_widgets()
 
     def add_progress_widgets(self):
         try:
@@ -150,11 +166,13 @@ class WinDownloads(WinChild):
 
         return name
 
-    def close_(self, *args):
-        self.close()
-
     def set_value(self, value: int):
         try:
             self.progress.setValue(value)
         except (Exception, RuntimeError) as e:
             Utils.print_err(error=e)
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):
+            self.close()
+        return super().keyPressEvent(a0)

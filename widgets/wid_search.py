@@ -12,7 +12,7 @@ class SearchBarBase(InputBase):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(150)
-        self.setFixedHeight(25)
+        # self.setFixedHeight(25)
 
         self.textChanged.connect(self.create_search)
         self.setPlaceholderText(Lang.search)

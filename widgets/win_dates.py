@@ -4,7 +4,7 @@ from functools import partial
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget, QPushButton
 
 from base_widgets import Btn, InputBase, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
@@ -85,17 +85,17 @@ class BaseDateInput(InputBase):
         self.inputChangedSignal.emit()
 
 
-class FiltersDateBtncolor:
+class DatesBtn:
 
     @classmethod
-    def date_based_color(cls):
+    def base_styles(cls):
         if not Dynamic.date_start:
             SignalsApp.all_.btn_dates_style.emit("normal")
         else:
-            SignalsApp.all_.btn_dates_style.emit("blue")
+            SignalsApp.all_.btn_dates_style.emit("solid")
 
     @classmethod
-    def set_border(cls):
+    def border_style(cls):
         SignalsApp.all_.btn_dates_style.emit("border")
 
 
@@ -177,7 +177,7 @@ class WinDates(WinChild):
         super().__init__()
         self.setWindowTitle(Lang.dates)
 
-        FiltersDateBtncolor.set_border()
+        DatesBtn.border_style()
 
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
@@ -217,15 +217,18 @@ class WinDates(WinChild):
 
         buttons_layout.addStretch(1)
         buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.ok_label = Btn(Lang.ok)
-        self.ok_label.mouseReleaseEvent = self.ok_cmd
+
+        self.ok_label = QPushButton(text=Lang.ok)
+        self.ok_label.setFixedWidth(90)
+        self.ok_label.clicked.connect(self.ok_cmd)
         buttons_layout.addWidget(self.ok_label)
 
         spacer_item = QSpacerItem(10, 1)
         buttons_layout.addItem(spacer_item)
 
-        cancel_label = Btn(Lang.cancel)
-        cancel_label.mouseReleaseEvent = self.cancel_cmd
+        cancel_label = QPushButton(text=Lang.cancel)
+        self.ok_label.setFixedWidth(90)
+        cancel_label.clicked.connect(self.cancel_cmd)
         buttons_layout.addWidget(cancel_label)
         buttons_layout.addStretch(1)
 
@@ -246,7 +249,7 @@ class WinDates(WinChild):
         month = Lang.months_genitive_case[str(date.month)]
         return f"{date.day} {month} {date.year}"
 
-    def ok_cmd(self, event):
+    def ok_cmd(self, *args):
         if not any((self.date_start, self.date_end)):
             return
 
@@ -263,20 +266,21 @@ class WinDates(WinChild):
         Dynamic.date_start_text = self.named_date(date=Dynamic.date_start)
         Dynamic.date_end_text = self.named_date(date=Dynamic.date_end)
 
-        FiltersDateBtncolor.date_based_color()
+        DatesBtn.base_styles()
         self.close()
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def cancel_cmd(self, *args):
-        FiltersDateBtncolor.date_based_color()
+        DatesBtn.base_styles()
         self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
-            FiltersDateBtncolor.date_based_color()
+            DatesBtn.base_styles()
             self.close()
 
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd(a0)
+
         return super().keyPressEvent(a0)

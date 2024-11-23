@@ -2,7 +2,7 @@ import os
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtWidgets import QFrame, QLabel, QSlider
+from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 
 from base_widgets import LayoutHor, SvgBtn
 from cfg import JsonData
@@ -10,6 +10,23 @@ from signals import SignalsApp
 
 from .win_downloads import WinDownloads
 from .win_settings import WinSettings
+
+SLIDER_STYLE = """
+    QSlider::groove:horizontal {
+        border-radius: 1px;
+        height: 3px;
+        margin: 0px;
+        background-color: rgba(111, 111, 111, 0.5);
+    }
+    QSlider::handle:horizontal {
+        background-color: rgba(199, 199, 199, 1);
+        height: 10px;
+        width: 10px;
+        border-radius: 5px;
+        margin: -4px 0;
+        padding: -4px 0px;
+    }
+"""
 
 
 class SvgPaths:
@@ -36,26 +53,12 @@ class BaseSlider(QSlider):
     _clicked = pyqtSignal()
 
     def __init__(self, orientation: Qt.Orientation, minimum: int, maximum: int):
-        super().__init__(orientation=orientation, minimum=minimum, maximum=maximum)
-
-        st = f"""
-            QSlider::groove:horizontal {{
-                border-radius: 1px;
-                height: 3px;
-                margin: 0px;
-                background-color: rgba(111, 111, 111, 0.5);
-            }}
-            QSlider::handle:horizontal {{
-                background-color: rgba(199, 199, 199, 1);
-                height: 10px;
-                width: 10px;
-                border-radius: 5px;
-                margin: -4px 0;
-                padding: -4px 0px;
-            }}
-            """
-
-        self.setStyleSheet(st)
+        super().__init__(
+            orientation=orientation,
+            minimum=minimum,
+            maximum=maximum
+        )
+        self.setStyleSheet(SLIDER_STYLE)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -70,7 +73,11 @@ class BaseSlider(QSlider):
 class CustomSlider(BaseSlider):
 
     def __init__(self):
-        super().__init__(orientation=Qt.Orientation.Horizontal, minimum=0, maximum=3)
+        super().__init__(
+            orientation=Qt.Orientation.Horizontal,
+            minimum=0,
+            maximum=3
+        )
         self.setFixedWidth(80)
         self.setValue(JsonData.curr_size_ind)
         self.valueChanged.connect(self.change_size)
@@ -87,10 +94,12 @@ class CustomSlider(BaseSlider):
         SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
 
 
-class BarBottom(QFrame):
+# ОТСЛЕЖИВАТЬ СМЕНУ ТЕМЫ МАС
+
+
+class BarBottom(QWidget):
     def __init__(self):
         super().__init__()
-        self.setContentsMargins(0, 0, 0, 0)
         self.setFixedHeight(28)
         
         self.h_layout = LayoutHor(self)
@@ -123,9 +132,10 @@ class BarBottom(QFrame):
         self.custom_slider = CustomSlider()
         self.h_layout.addWidget(self.custom_slider, alignment=Qt.AlignmentFlag.AlignRight)
 
-        self.downloads.hide()
+        # self.downloads.hide()
 
     def btn_downloads_toggle(self, flag: str):
+        return
         if flag == "hide":
             self.downloads.hide()
         elif flag == "show":

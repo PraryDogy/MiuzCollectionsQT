@@ -1,13 +1,13 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QWidget, QLabel
+from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextCustom, LayoutHor
 from cfg import Dynamic, Filter, JsonData
 from lang import Lang
 from signals import SignalsApp
-from utils.utils import Utils
 
+from .wid_search import WidSearch
 from .win_dates import WinDates
 
 BTN_W, BTN_H = 80, 28
@@ -56,7 +56,7 @@ class DatesBtn(BarTopBtn):
         SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
 
     def dates_btn_style(self, flag: str):
-        if flag == "blue":
+        if flag == "solid":
             self.set_solid_style()
             self.set_style_cmd = self.set_solid_style
         elif flag == "normal":
@@ -161,19 +161,30 @@ class BarTop(QWidget):
         for filter in Filter.filters:
             label = FilterBtn(filter)
             self.filter_btns.append(label)
-            self.h_layout.addWidget(label)
+            self.h_layout.addWidget(
+                label,
+                alignment=Qt.AlignmentFlag.AlignLeft
+            )
         
         self.dates_btn = DatesBtn()
         self.dates_btn.win_dates_opened.connect(self.open_win_dates)
-        self.h_layout.addWidget(self.dates_btn)
+        self.h_layout.addWidget(
+            self.dates_btn,
+            alignment=Qt.AlignmentFlag.AlignLeft
+        )
+
+        self.h_layout.addStretch(1)
+
+        self.search_wid = WidSearch()
+        self.h_layout.addWidget(
+            self.search_wid,
+            alignment=Qt.AlignmentFlag.AlignRight
+        )
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             self.dates_btn.set_solid_style()
         else:
             self.dates_btn.set_normal_style()
-
-        self.h_layout.addStretch(1)
-        self.setLayout(self.h_layout)
     
     def open_win_dates(self):
         self.win_dates = WinDates()

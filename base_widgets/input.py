@@ -1,9 +1,7 @@
 from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLineEdit
 
-from cfg import JsonData
 from lang import Lang
-from styles import Names, Themes
 from utils.utils import Utils
 
 from .context import ContextCustom
@@ -43,6 +41,13 @@ class CustomContext(ContextCustom):
 
 class InputBase(QLineEdit):
     def __init__(self):
+        """
+        custom copy paste context menu
+
+        height 28
+
+        padding left right 2px
+        """
         super().__init__()
         self.setFixedHeight(28)
         self.setStyleSheet("padding-left: 2px; padding-right: 2px;")
