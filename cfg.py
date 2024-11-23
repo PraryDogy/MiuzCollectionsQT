@@ -4,8 +4,6 @@ import shutil
 import webbrowser
 from datetime import datetime
 
-from styles import Themes
-
 APP_VER = 5.85
 APP_NAME: str = "MiuzCollections"
 
@@ -142,7 +140,6 @@ class JsonData:
         "LEVIEV"
         ]
     
-    theme: str = "dark"
     lang_ind = 0
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")

@@ -1,9 +1,11 @@
+import os
+
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
-from PyQt5.QtWidgets import (QGridLayout, QPushButton, QScrollArea,
-                             QSizePolicy, QWidget)
+from PyQt5.QtWidgets import (QFrame, QGridLayout, QPushButton, QScrollArea,
+                             QWidget)
 
-from base_widgets import ContextCustom, LayoutVer
+from base_widgets import ContextCustom, LayoutVer, SvgBtn
 from cfg import (GRID_LIMIT, MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, Dynamic,
                  JsonData)
 from lang import Lang
@@ -15,8 +17,26 @@ from ._db_images import DbImage, DbImages
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .thumbnail import Thumbnail
 from .title import Title
-from .up_btn import UpBtn
 
+IMAGES = "images"
+UP_SVG = os.path.join(IMAGES, "up.svg")
+
+
+class UpBtn(QFrame):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+        self.setFixedSize(44, 44)
+
+        v_layout = LayoutVer()
+        self.setLayout(v_layout)
+
+        self.svg = SvgBtn(UP_SVG, 44)
+        v_layout.addWidget(self.svg)
+
+    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        return super().mouseReleaseEvent(a0)
+    
 
 class LimitBtn(QPushButton):
     _clicked =  pyqtSignal()

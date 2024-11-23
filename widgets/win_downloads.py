@@ -6,11 +6,9 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
                              QWidget)
 
-from base_widgets import LayoutHor, LayoutVer, SvgBtn
+from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
-from cfg import JsonData
 from lang import Lang
-from styles import Names, Themes
 from utils.copy_files import CopyFiles
 from utils.utils import Utils
 
@@ -54,7 +52,7 @@ class Progresser(QWidget):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.close_btn = SvgBtn(icon_path=os.path.join("images", f"{JsonData.theme}_close.svg"), size=15)
+        self.close_btn = QLabel(text="x")
         self.close_btn.mouseReleaseEvent = self.close_cmd
         h_layout.addWidget(self.close_btn)
 

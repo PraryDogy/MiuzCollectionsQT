@@ -1,8 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QProgressBar, QWidget
 
-from styles import Names, Themes
-
 
 class CustomProgressBar(QProgressBar):
     def __init__(self, parent: QWidget = None):

@@ -2,7 +2,6 @@ from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QTextEdit
 
 from lang import Lang
-from styles import Names, Themes
 from utils.utils import Utils
 
 from .context import ContextCustom

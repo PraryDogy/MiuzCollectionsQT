@@ -57,9 +57,6 @@ class App(QApplication):
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: SignalsApp.all_.win_main_cmd.emit("exit"))
 
-        with open(STYLES_CSS, "r", encoding="utf-8") as f:
-            self.setStyleSheet(f.read())
-
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
             if hasattr(SignalsApp.all_, "win_main_cmd"):

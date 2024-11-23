@@ -1,8 +1,8 @@
 import os
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtWidgets import QLabel, QSlider, QWidget
+from PyQt5.QtCore import QEvent, Qt, pyqtSignal
+from PyQt5.QtGui import QMouseEvent, QPalette, QWheelEvent
+from PyQt5.QtWidgets import QApplication, QLabel, QSlider, QWidget
 
 from base_widgets import LayoutHor, SvgBtn
 from cfg import JsonData
@@ -29,6 +29,10 @@ SLIDER_STYLE = """
 """
 
 
+class Themes:
+    current: str
+
+
 class SvgPaths:
     IMAGES_FOLDER = "images"
     download_svg: str
@@ -37,9 +41,9 @@ class SvgPaths:
 
     @classmethod
     def update_(cls):
-        cls.download_svg = cls.images_path(f"{JsonData.theme}_downloads.svg")
-        cls.switch_theme_svg = cls.images_path(f"{JsonData.theme}_switch.svg")
-        cls.settings_svg = cls.images_path(f"{JsonData.theme}_settings.svg")
+        cls.download_svg = cls.images_path(f"{Themes.current}_downloads.svg")
+        cls.switch_theme_svg = cls.images_path(f"{Themes.current}_switch.svg")
+        cls.settings_svg = cls.images_path(f"{Themes.current}_settings.svg")
     
     @classmethod
     def images_path(cls, src: str):
@@ -100,6 +104,7 @@ class CustomSlider(BaseSlider):
 class BarBottom(QWidget):
     def __init__(self):
         super().__init__()
+        self.set_theme()
         self.setFixedHeight(28)
         
         self.h_layout = LayoutHor(self)
@@ -159,3 +164,15 @@ class BarBottom(QWidget):
             self.settings = WinSettings()
             self.settings.center_relative_parent(self.window())
             self.settings.show()
+
+    def event(self, a0: QEvent | None) -> bool:
+        if a0.type() == QEvent.PaletteChange:
+            self.set_theme()
+        return super().event(a0)
+
+    def set_theme(self):
+        palette = QApplication.palette()
+        if palette.color(palette.Window).value() < 128:
+            Themes.current = "dark"
+        else:
+            Themes.current = "light"
