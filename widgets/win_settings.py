@@ -5,11 +5,11 @@ import subprocess
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QSpacerItem,
-                             QTextEdit, QWidget)
+                             QTextEdit, QWidget, QTabWidget)
 
 from base_widgets import CustomTextEdit, CustomInput, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
-from cfg import APP_SUPPORT_DIR, DB_FILE, HASH_DIR, JsonData
+from cfg import APP_SUPPORT_DIR, DB_FILE, HASH_DIR, JsonData, BRANDS
 from lang import Lang
 from utils.scaner import Scaner
 from utils.updater import Updater
@@ -157,6 +157,37 @@ class RestoreBtn(QPushButton):
         setattr(self, "flag", True)
 
 
+class BrandSett(QTabWidget):
+    def __init__(self):
+        super().__init__()
+
+        for i in BRANDS:
+            wid = self.ui(brand_ind=BRANDS.index(i))
+            self.addTab(wid, i)
+
+        self.setCurrentIndex(JsonData.brand_ind)
+
+    def ui(self, brand_ind: int):
+
+        wid = QWidget()
+        v_lay = LayoutVer()
+        wid.setLayout(v_lay)
+
+        self.stopcolls = StopColls()
+        v_lay.addWidget(self.stopcolls)
+        v_lay.addSpacerItem(QSpacerItem(0, 30))
+
+        coll_folder_list_label = QLabel(text=Lang.where_to_look_coll_folder)
+        v_lay.addWidget(coll_folder_list_label)
+        v_lay.addSpacerItem(QSpacerItem(0, 10))
+
+        self.coll_folder_list_input = CollFolderListInput()
+        v_lay.addWidget(self.coll_folder_list_input)
+        v_lay.addSpacerItem(QSpacerItem(0, 30))
+
+        return wid
+
+
 class WinSettings(WinChild):
     def __init__(self):
         super().__init__()
@@ -194,17 +225,8 @@ class WinSettings(WinChild):
         self.content_lay_v.addWidget(self.restore_db_btn)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
 
-        self.stopcolls = StopColls()
-        self.content_lay_v.addWidget(self.stopcolls)
-        self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
-
-        coll_folder_list_label = QLabel(text=Lang.where_to_look_coll_folder)
-        self.content_lay_v.addWidget(coll_folder_list_label)
-        self.content_lay_v.addSpacerItem(QSpacerItem(0, 10))
-
-        self.coll_folder_list_input = CollFolderListInput()
-        self.content_lay_v.addWidget(self.coll_folder_list_input)
-        self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
+        self.brand_sett = BrandSett()
+        self.content_lay_v.addWidget(self.brand_sett)
 
         self.content_lay_v.addStretch()
 
@@ -233,8 +255,8 @@ class WinSettings(WinChild):
         self.close()
 
     def ok_cmd(self, *args):
-        coll_folder_list = self.coll_folder_list_input.get_text()
-        stop_colls = self.stopcolls.get_stopcolls()
+        # coll_folder_list = self.coll_folder_list_input.get_text()
+        # stop_colls = self.stopcolls.get_stopcolls()
 
         if hasattr(self.restore_db_btn, "flag"):
             print("settings win restore db")
@@ -255,19 +277,19 @@ class WinSettings(WinChild):
             QApplication.quit()
             Utils.start_new_app()
 
-        elif stop_colls != JsonData.stop_colls:
-            print("settings win stop colls updated")
-            JsonData.stop_colls = stop_colls
-            Scaner.app.stop()
-            Scaner.app.start()
-            JsonData.write_json_data()
+        # elif stop_colls != JsonData.stop_colls:
+        #     print("settings win stop colls updated")
+        #     JsonData.stop_colls = stop_colls
+        #     Scaner.app.stop()
+        #     Scaner.app.start()
+        #     JsonData.write_json_data()
 
-        elif coll_folder_list != JsonData.coll_folder_list:
-            print("settings win coll folder list updated")
-            JsonData.coll_folder_list = coll_folder_list
-            Scaner.app.stop()
-            Scaner.app.start()
-            JsonData.write_json_data()
+        # elif coll_folder_list != JsonData.coll_folder_list:
+        #     print("settings win coll folder list updated")
+        #     JsonData.coll_folder_list = coll_folder_list
+        #     Scaner.app.stop()
+        #     Scaner.app.start()
+        #     JsonData.write_json_data()
 
         self.close()
 
