@@ -5,41 +5,17 @@ import subprocess
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QSpacerItem,
-                             QTextEdit, QWidget, QTabWidget)
+                             QTabWidget, QTextEdit, QWidget)
 
-from base_widgets import CustomTextEdit, CustomInput, LayoutHor, LayoutVer
+from base_widgets import CustomInput, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
-from cfg import APP_SUPPORT_DIR, DB_FILE, HASH_DIR, JsonData, BRANDS
+from cfg import APP_SUPPORT_DIR, BRANDS, DB_FILE, HASH_DIR, JsonData
 from lang import Lang
 from utils.scaner import Scaner
 from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
 
 from .actions import OpenWins
-
-
-class CollFolderListInput(CustomTextEdit):
-    def __init__(self, brand_ind: int):
-        super().__init__()
-        self.setFixedHeight(130)
-        self.setLineWrapMode(QTextEdit.NoWrap)
-        h_bar = self.horizontalScrollBar()
-        h_bar.setFixedHeight(0)
-
-        text = "\n".join(JsonData.coll_folder_lst[brand_ind])
-        self.setText(text)
-
-    def get_text(self):
-        text = self.toPlainText()
-        coll_folder_list = text.split("\n")
-
-
-        coll_folder_list = [
-            os.sep + i.strip().strip(os.sep)
-            for i in coll_folder_list
-            ]
-        
-        return coll_folder_list
 
 
 class ChangeLang(QWidget):
@@ -69,9 +45,35 @@ class ChangeLang(QWidget):
         setattr(self, "flag", True)
 
 
+class CollFolderListInput(CustomTextEdit):
+    def __init__(self, brand_ind: int):
+        super().__init__()
+        self.brand_ind = brand_ind
+
+        self.setFixedHeight(130)
+        self.setLineWrapMode(QTextEdit.NoWrap)
+        h_bar = self.horizontalScrollBar()
+        h_bar.setFixedHeight(0)
+
+        text = "\n".join(JsonData.coll_folder_lst[brand_ind])
+        self.setText(text)
+
+    def get_coll_folders_list(self):
+        text = self.toPlainText()
+        coll_folder_list = text.split("\n")
+
+        coll_folder_list = [
+            os.sep + i.strip().strip(os.sep)
+            for i in coll_folder_list
+            ]
+        
+        return coll_folder_list
+
+
 class StopColls(QWidget):
     def __init__(self, brand_ind: int):
         super().__init__()
+        self.brand_ind = brand_ind
 
         layout_v = LayoutVer()
         self.setLayout(layout_v)
@@ -89,6 +91,40 @@ class StopColls(QWidget):
         text = self.input.text()
         return [i.strip() for i in text.split(",")]
 
+
+class BrandSett(QTabWidget):
+    def __init__(self):
+        super().__init__()
+        self.stop_colls_wid: list[StopColls] = []
+        self.coll_folders_wid: list[CollFolderListInput] = []
+
+        for i in BRANDS:
+            wid = self.ui(brand_ind=BRANDS.index(i))
+            self.addTab(wid, i)
+
+        self.setCurrentIndex(JsonData.brand_ind)
+
+    def ui(self, brand_ind: int):
+        wid = QWidget()
+        v_lay = LayoutVer()
+        wid.setLayout(v_lay)
+
+        stopcolls = StopColls(brand_ind)
+        v_lay.addWidget(stopcolls)
+        v_lay.addSpacerItem(QSpacerItem(0, 30))
+        self.stop_colls_wid.append(stopcolls)
+
+        coll_folder_list_label = QLabel(text=Lang.where_to_look_coll_folder)
+        v_lay.addWidget(coll_folder_list_label)
+        v_lay.addSpacerItem(QSpacerItem(0, 10))
+
+        collfolders = CollFolderListInput(brand_ind)
+        v_lay.addWidget(collfolders)
+        v_lay.addSpacerItem(QSpacerItem(0, 30))
+        self.coll_folders_wid.append(collfolders)
+
+        return wid
+    
 
 class UpdaterWidget(QWidget):
     def __init__(self):
@@ -155,37 +191,6 @@ class RestoreBtn(QPushButton):
     def cmd_(self, *args):
         self._pressed.emit()
         setattr(self, "flag", True)
-
-
-class BrandSett(QTabWidget):
-    def __init__(self):
-        super().__init__()
-
-        for i in BRANDS:
-            wid = self.ui(brand_ind=BRANDS.index(i))
-            self.addTab(wid, i)
-
-        self.setCurrentIndex(JsonData.brand_ind)
-
-    def ui(self, brand_ind: int):
-
-        wid = QWidget()
-        v_lay = LayoutVer()
-        wid.setLayout(v_lay)
-
-        self.stopcolls = StopColls(brand_ind)
-        v_lay.addWidget(self.stopcolls)
-        v_lay.addSpacerItem(QSpacerItem(0, 30))
-
-        coll_folder_list_label = QLabel(text=Lang.where_to_look_coll_folder)
-        v_lay.addWidget(coll_folder_list_label)
-        v_lay.addSpacerItem(QSpacerItem(0, 10))
-
-        self.coll_folder_list_input = CollFolderListInput(brand_ind)
-        v_lay.addWidget(self.coll_folder_list_input)
-        v_lay.addSpacerItem(QSpacerItem(0, 30))
-
-        return wid
 
 
 class WinSettings(WinChild):
@@ -255,9 +260,6 @@ class WinSettings(WinChild):
         self.close()
 
     def ok_cmd(self, *args):
-        # coll_folder_list = self.coll_folder_list_input.get_text()
-        # stop_colls = self.stopcolls.get_stopcolls()
-
         if hasattr(self.restore_db_btn, "flag"):
             print("settings win restore db")
             JsonData.write_json_data()
@@ -277,19 +279,24 @@ class WinSettings(WinChild):
             QApplication.quit()
             Utils.start_new_app()
 
-        # elif stop_colls != JsonData.stop_colls:
-        #     print("settings win stop colls updated")
-        #     JsonData.stop_colls = stop_colls
-        #     Scaner.app.stop()
-        #     Scaner.app.start()
-        #     JsonData.write_json_data()
+        for i in self.brand_sett.coll_folders_wid:
+            coll_folders = i.get_coll_folders_list()
 
-        # elif coll_folder_list != JsonData.coll_folder_list:
-        #     print("settings win coll folder list updated")
-        #     JsonData.coll_folder_list = coll_folder_list
-        #     Scaner.app.stop()
-        #     Scaner.app.start()
-        #     JsonData.write_json_data()
+            if coll_folders != JsonData.coll_folder_lst[i.brand_ind]:
+                setattr(self, "restart", True)
+                JsonData.coll_folder_lst[i.brand_ind] = coll_folders
+
+        for i in self.brand_sett.stop_colls_wid:
+            stop_colls = i.get_stopcolls()
+
+            if stop_colls != JsonData.brand_stop_colls[i.brand_ind]:
+                setattr(self, "restart", True)
+                JsonData.brand_stop_colls[i.brand_ind] = stop_colls
+
+        if hasattr(self, "restart"):
+            JsonData.write_json_data()
+            QApplication.quit()
+            Utils.start_new_app()
 
         self.close()
 
