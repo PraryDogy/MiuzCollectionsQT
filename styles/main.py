@@ -39,15 +39,9 @@ class Names:
     st_bar_tiff = "st_bar_tiff"
     st_bar_tiff_sel = "st_bar_tiff_sel"
 
-    btn_jpg = "btn_jpg"
-    btn_jpg_selected = "btn_jpg_selected"
-    btn_tiff = "btn_tiff"
-    btn_tiff_selected = "btn_tiff_selected"
-
     navi_zoom = "navi_zoom"
     navi_switch = "navi_switch"
 
-    info_base_label = "info_base_label"
     smb_browse_btn = "smb_browse_btn"
     smb_browse_btn_selected = "smb_browse_btn_selected"
 
@@ -60,9 +54,6 @@ class Names:
     img_view_bg = "img_view_bg"
 
     up_btn = "up_btn"
-
-    drop_widget = "drop_widget"
-    letter_btn = "letter_btn"
 
     text_edit = "text_edit"
 
