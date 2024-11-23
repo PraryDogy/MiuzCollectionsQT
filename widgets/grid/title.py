@@ -30,7 +30,7 @@ class Title(QLabel):
 
         self.setContentsMargins(3, 5, 3, 5)
         self.setObjectName("th_title_new")
-        Utils.change_style(self, "normal")
+        Utils.style(self, "normal")
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
@@ -90,7 +90,7 @@ class Title(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.r_click.emit()
-        Utils.change_style(self, "selected")
+        Utils.style(self, "selected")
 
         menu_ = ContextCustom(ev)
 
@@ -117,7 +117,7 @@ class Title(QLabel):
         menu_.addAction(save_as_layers)
 
         menu_.show_menu()
-        Utils.change_style(self, "normal")
+        Utils.style(self, "normal")
 
 
 # единый css с таким стилем
