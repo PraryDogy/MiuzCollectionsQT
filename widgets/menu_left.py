@@ -135,6 +135,8 @@ class MenuLeftBase(QListWidget):
 
     def __init__(self, brand_ind: int):
         super().__init__()
+        self.horizontalScrollBar().setDisabled(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.brand_ind = brand_ind
         SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
         self.setup_task()
@@ -244,6 +246,13 @@ class MenuLeft(QTabWidget):
             wid = MenuLeftBase(brand_ind=BRANDS.index(i))
             self.addTab(wid, i)
 
+        self.setCurrentIndex(JsonData.brand_ind)
+
     def cmd_(self, index: int):
         JsonData.brand_ind = index
-        print(index)
+        JsonData.curr_coll = NAME_ALL_COLLS
+        Dynamic.grid_offset = 0
+
+        SignalsApp.all_.win_main_cmd.emit("set_title")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")

@@ -6,7 +6,7 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import (GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic, Filter,
+from cfg import (GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, BRANDS, Dynamic, Filter,
                  JsonData)
 from database import THUMBS, Dbase
 from lang import Lang
@@ -95,6 +95,7 @@ class DbImages(URunnable):
         
         q = q.limit(GRID_LIMIT).offset(Dynamic.grid_offset)
         q = q.order_by(-THUMBS.c.mod)
+        q = q.where(THUMBS.c.brand==BRANDS[JsonData.brand_ind])
 
         stmt_where: list = []
 
