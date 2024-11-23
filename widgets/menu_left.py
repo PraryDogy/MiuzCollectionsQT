@@ -29,11 +29,10 @@ class CollectionBtn(QLabel):
         """
 
         super().__init__(text=short_name)
+        self.setStyleSheet("padding-left: 5px;")
         self.coll_name = coll_name
         self.short_name = short_name
 
-        btn_w = MENU_LEFT_WIDTH - 20 - 5
-        self.setFixedSize(btn_w, 28)
 
     def reveal_collection(self, *args) -> None:
         """
@@ -71,13 +70,8 @@ class CollectionBtn(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
+        self.pressed_.emit()
         menu_ = ContextCustom(event=ev)
-
-        view_coll = QAction(text=Lang.view, parent=self)
-        view_coll.triggered.connect(self.pressed_.emit)
-        menu_.addAction(view_coll)
-
-        menu_.addSeparator()
 
         reveal_coll = QAction(text=Lang.reveal_in_finder, parent=self)
         reveal_coll.triggered.connect(self.reveal_collection)
