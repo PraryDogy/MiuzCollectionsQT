@@ -50,9 +50,9 @@ class WinFrameless(QMainWindow):
         try:
             Manager.wins.remove(self)
             self.deleteLater()
+            print("win removed")
         except Exception as e:
             pass
-
         return super().closeEvent(a0)
 
 

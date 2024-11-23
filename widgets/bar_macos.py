@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
+from PyQt5.QtGui import QCloseEvent, QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
@@ -66,12 +66,9 @@ class AboutWin(WinChild):
         lbl = SelectableLabel(self)
         self.content_lay_v.addWidget(lbl)
 
-    def close_(self, *args):
-        self.close()
-
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):
-            self.close_()
+            self.close()
 
 
 class BarMacos(QMenuBar):
