@@ -70,13 +70,13 @@ class WinDownloads(WinChild):
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setObjectName(Names.th_scrollbar)
-        self.scroll_area.setStyleSheet(Themes.current)
+        # self.scroll_area.setObjectName(Names.th_scrollbar)
+        # self.scroll_area.setStyleSheet(Themes.current)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.scroll_widget = QWidget()
-        self.scroll_widget.setObjectName(Names.th_scroll_widget)
-        self.scroll_widget.setStyleSheet(Themes.current)
+        # self.scroll_widget.setObjectName(Names.th_scroll_widget)
+        # self.scroll_widget.setStyleSheet(Themes.current)
         self.scroll_area.setWidget(self.scroll_widget)
 
         self.v_layout = LayoutVer()
