@@ -78,7 +78,7 @@ class Thumbnail(QFrame):
         self.setup()
 
     def setup(self):
-        name_label_h = 32
+        name_label_h = 35
         thumb_h = PIXMAP_SIZE[JsonData.curr_size_ind] + name_label_h + THUMB_MARGIN + self.spacing
         thumb_w = THUMB_W[JsonData.curr_size_ind] + THUMB_MARGIN
 

@@ -1,20 +1,37 @@
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
-from PyQt5.QtWidgets import QGridLayout, QScrollArea, QWidget
+from PyQt5.QtWidgets import (QGridLayout, QPushButton, QScrollArea,
+                             QSizePolicy, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer
-from cfg import GRID_LIMIT, MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, JsonData
+from cfg import (GRID_LIMIT, MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, Dynamic,
+                 JsonData)
+from lang import Lang
 from signals import SignalsApp
-from styles import Names, Themes
 from utils.utils import UThreadPool, Utils
 
 from ..actions import OpenWins, ScanerRestart
 from ._db_images import DbImage, DbImages
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
-from .limit_btn import LimitBtn
 from .thumbnail import Thumbnail
 from .title import Title
 from .up_btn import UpBtn
+
+
+class LimitBtn(QPushButton):
+    _clicked =  pyqtSignal()
+
+    def __init__(self):
+        super().__init__(text=Lang.show_more)
+        self.clicked.connect(self.cmd_)
+        self.setFixedWidth(110)
+
+    def cmd_(self, *args) -> None:
+        Dynamic.grid_offset += GRID_LIMIT
+        self._clicked.emit()
+        self.setDisabled(True)
+        self.setStyleSheet("background: transparent;")
+        self.setText("")
 
 
 class Grid(QScrollArea):
@@ -25,8 +42,6 @@ class Grid(QScrollArea):
         self.ww = JsonData.root_g["aw"] - MENU_LEFT_WIDTH
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
-        self.topleft = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
@@ -97,11 +112,12 @@ class Grid(QScrollArea):
         self.current_widgets.clear()
         self.up_btn.hide()
 
+        from PyQt5.QtWidgets import QFrame
         self.grids_widget = QWidget()
 
         self.grids_layout = LayoutVer()
         self.grids_layout.setContentsMargins(5, 10, 5, 10)
-        self.grids_layout.setAlignment(self.topleft)
+        self.grids_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.grids_widget.setLayout(self.grids_layout)
 
         self.load_db_images("first")
@@ -145,7 +161,7 @@ class Grid(QScrollArea):
         self.grids_layout.addWidget(grid_widget)
 
         grid_layout = QGridLayout()
-        grid_layout.setAlignment(self.topleft)
+        grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         grid_layout.setContentsMargins(0, 0, 0, 30)
         self.current_widgets[grid_layout] = []
 
