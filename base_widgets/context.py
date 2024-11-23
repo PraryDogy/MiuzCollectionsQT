@@ -12,15 +12,13 @@ class ContextCustom(QMenu):
         self.ev = event
         super().__init__()
 
+        popup = Qt.WindowType.Popup
+        # он нужен???
 
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-        flags = Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint
-        flags = flags | Qt.WindowType.NoDropShadowWindowHint
+        flags = Qt.WindowType.FramelessWindowHint
         self.setWindowFlags(flags)
 
-        self.setMinimumWidth(200)
-    
     def show_menu(self):
         self.exec_(self.ev.globalPos())
 
