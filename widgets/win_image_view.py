@@ -251,6 +251,7 @@ class WinImageView(WinChild):
     def __init__(self, short_src: str):
         super().__init__()
 
+        self.setStyleSheet(IMG_VIEW_STYLE)
         self.setMinimumSize(QSize(500, 400))
         self.resize(JsonData.imgview_g["aw"], JsonData.imgview_g["ah"])
         self.installEventFilter(self)
