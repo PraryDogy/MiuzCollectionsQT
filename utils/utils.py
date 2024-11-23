@@ -317,8 +317,13 @@ class Utils:
 
     @classmethod
     def style(cls, wid: QWidget, style: str = None):
+        """
+        Applies stylesheet to widget with objectMame:
+        #widget_object_name.style.theme {...}
+        theme: dark/light
+        """
         if not wid.objectName():
-            raise Exception("no ObjectName")
+            raise Exception("no objectName")
 
         if style:
             style = [style, JsonData.theme]

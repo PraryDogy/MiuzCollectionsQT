@@ -45,11 +45,9 @@ class CustomContext(ContextCustom):
 class CustomTextEdit(QTextEdit):
     def __init__(self):
         super().__init__()
-        self.setObjectName(Names.text_edit)
-        self.setStyleSheet(Themes.current)
+        self.setObjectName("q_text_edit")
+        Utils.style(self)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.context_menu = CustomContext(parent=self, event=a0)
         self.context_menu.show_menu()
-        return
-        return super().contextMenuEvent(a0)

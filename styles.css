@@ -346,7 +346,7 @@
     border-radius: 22px;
 }
 
-QLabel.dark {
+/* QLabel.dark {
     color: #ffffff;
 }
 
@@ -503,4 +503,4 @@ QScrollBar:vertical.light {
     width: 12px;
     padding: 2px;
 }
-
+ */

@@ -10,5 +10,3 @@ class CustomProgressBar(QProgressBar):
         self.setTextVisible(False)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setFixedHeight(7)
-        self.setObjectName(Names.progress)
-        self.setStyleSheet(Themes.current)
