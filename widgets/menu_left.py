@@ -4,8 +4,8 @@ import subprocess
 import sqlalchemy
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import (QAction, QFrame, QLabel, QScrollArea, QSpacerItem,
-                             QWidget)
+from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
+                             QScrollArea, QSpacerItem)
 
 from base_widgets import ContextCustom, LayoutVer
 from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
@@ -149,25 +149,23 @@ class LoadMenus(URunnable):
         return sorted(menus, key = lambda x: x["short_name"])
 
 
-class MenuLeft(QFrame):
-    coll_btn: CollectionBtn
-
+class MenuLeft(QListWidget):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(MENU_LEFT_WIDTH)
 
-        scroll_layout = LayoutVer()
-        scroll_layout.setContentsMargins(5, 0, 0, 5)
-        self.setLayout(scroll_layout)
-
         self.selected_btn: CollectionBtn
         SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
 
-        self.scroll_area = QScrollArea()
+        # scroll_layout = LayoutVer()
+        # scroll_layout.setContentsMargins(5, 0, 0, 5)
+        # self.setLayout(scroll_layout)
 
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        scroll_layout.addWidget(self.scroll_area)
+        # self.scroll_area = QScrollArea()
+
+        # self.scroll_area.setWidgetResizable(True)
+        # self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        # scroll_layout.addWidget(self.scroll_area)
 
         self.setup_task()
 
@@ -182,9 +180,11 @@ class MenuLeft(QFrame):
             self.setup_task()
 
         elif flag == "select_all_colls":
-            self.selected_btn.style_normal()
-            self.all_colls_btn.style_solid()
-            self.selected_btn = self.all_colls_btn
+            ...
+            print("select_all_colls")
+            # self.selected_btn.style_normal()
+            # self.all_colls_btn.style_solid()
+            # self.selected_btn = self.all_colls_btn
 
         else:
             raise Exception("widgets > menu left > wrong flag", flag)
@@ -211,23 +211,25 @@ class MenuLeft(QFrame):
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
-        self.selected_btn.style_normal()
-        btn.style_solid()
+        # self.selected_btn.style_normal()
+        # btn.style_solid()
         self.selected_btn = btn
 
     def init_ui(self, menus: list[dict[str, str]]):
 
-        if hasattr(self, "main_wid"):
-            self.main_wid.deleteLater()
+        # if hasattr(self, "main_wid"):
+            # self.main_wid.deleteLater()
 
-        self.main_wid = QWidget()
-        self.scroll_area.setWidget(self.main_wid)
+        # self.main_wid = QWidget()
+        # self.scroll_area.setWidget(self.main_wid)
 
-        main_layout = LayoutVer()
-        main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.main_wid.setLayout(main_layout)
+        # main_layout = LayoutVer()
+        # main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        # self.main_wid.setLayout(main_layout)
 
-        main_layout.addSpacerItem(QSpacerItem(0, 5))
+        # main_layout.addSpacerItem(QSpacerItem(0, 5))
+
+
 
         self.all_colls_btn = CollectionBtn(
             short_name=Lang.all_colls,
@@ -235,7 +237,13 @@ class MenuLeft(QFrame):
             )
         cmd_ = lambda: self.collection_btn_cmd(self.all_colls_btn)
         self.all_colls_btn.pressed_.connect(cmd_)
-        main_layout.addWidget(self.all_colls_btn)
+
+        list_item = QListWidgetItem()
+        list_item.setSizeHint(self.all_colls_btn.sizeHint())
+        self.addItem(list_item)
+        self.setItemWidget(list_item, self.all_colls_btn)
+
+
 
         favs_btn = CollectionBtn(
             short_name=Lang.fav_coll,
@@ -243,16 +251,14 @@ class MenuLeft(QFrame):
             )
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
-        main_layout.addWidget(favs_btn)
 
-        main_layout.addSpacerItem(QSpacerItem(0, 10))
+        list_item = QListWidgetItem()
+        list_item.setSizeHint(favs_btn.sizeHint())
+        self.addItem(list_item)
+        self.setItemWidget(list_item, favs_btn)
 
-        for i in (self.all_colls_btn, favs_btn):
-            if i.coll_name == JsonData.curr_coll:
-                i.style_solid()
-                self.selected_btn = i
-            else:
-                i.style_normal()
+
+
 
         for data in menus:
 
@@ -262,7 +268,11 @@ class MenuLeft(QFrame):
                 )
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
             coll_btn.pressed_.connect(cmd_)
-            main_layout.addWidget(coll_btn)
+
+            list_item = QListWidgetItem()
+            list_item.setSizeHint(coll_btn.sizeHint())
+            self.addItem(list_item)
+            self.setItemWidget(list_item, coll_btn)
 
             if coll_btn.coll_name == JsonData.curr_coll:
                 coll_btn.style_solid()
@@ -270,4 +280,3 @@ class MenuLeft(QFrame):
             else:
                 coll_btn.style_normal()
 
-        main_layout.addSpacerItem(QSpacerItem(0, 5))
