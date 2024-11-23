@@ -38,9 +38,13 @@ class WinFrameless(QMainWindow):
             Utils.print_err(error=e)
 
     def disable_min(self):
-        self.setWindowFlags(
-            Qt.WindowType.Window | Qt.WindowType.WindowCloseButtonHint
-            )
+        fl = Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint
+        fl = fl  | Qt.WindowType.WindowCloseButtonHint
+        self.setWindowFlags(fl)
+
+        # self.setWindowFlags(
+            # self.windowFlags() | Qt.WindowType.WindowCloseButtonHint
+            # )
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:
@@ -56,6 +60,7 @@ class WinChild(WinFrameless):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
+        self.disable_min()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         # у этого виджета закруглены только нижние углы
