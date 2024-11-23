@@ -142,10 +142,9 @@ class BarBottom(QWidget):
         self.custom_slider = CustomSlider()
         self.h_layout.addWidget(self.custom_slider, alignment=Qt.AlignmentFlag.AlignRight)
 
-        # self.downloads.hide()
+        self.downloads.hide()
 
     def btn_downloads_toggle(self, flag: str):
-        return
         if flag == "hide":
             self.downloads.hide()
         elif flag == "show":
