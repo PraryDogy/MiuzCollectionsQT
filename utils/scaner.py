@@ -79,11 +79,14 @@ class FinderImages:
 
             if not ScanerUtils.can_scan:
                 return finder_images
+            
+            elif not os.path.exists(self.coll_folder):
+                ScanerUtils.can_scan = False
+                return finder_images
 
             for file in files:
 
-                if not os.path.exists(self.coll_folder):
-                    ScanerUtils.can_scan = False
+                if not ScanerUtils.can_scan:
                     return finder_images
 
                 if file.endswith(IMG_EXT):
