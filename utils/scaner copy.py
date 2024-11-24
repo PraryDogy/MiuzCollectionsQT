@@ -48,7 +48,7 @@ class FinderImages:
             for i in os.listdir(JsonData.coll_folder)
             if os.path.isdir(os.path.join(JsonData.coll_folder, i))
             and
-            i not in JsonData.brand_stop_colls
+            i not in JsonData.stop_colls
             ]
 
         ln_ = len(collections)

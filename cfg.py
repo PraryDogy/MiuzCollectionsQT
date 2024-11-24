@@ -149,7 +149,7 @@ class JsonData:
     
     scaner_minutes: int = 5
 
-    brand_stop_colls: list = [
+    stop_colls: list[list[str]] = [
         [
             "_Archive_Commerce_Брендинг",
             "Chosed",
@@ -172,7 +172,7 @@ class JsonData:
         '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
         ]
 
-    coll_folder_lst = [
+    coll_folders: list[list[str]] = [
         # miuz coll folders
         [
             '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
@@ -187,7 +187,7 @@ class JsonData:
             ]
     ]
 
-    coll_folder: str = coll_folder_lst[0][0]
+    coll_folder: str = coll_folders[0][0]
 
     filters = [
         {

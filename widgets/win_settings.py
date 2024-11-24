@@ -55,7 +55,7 @@ class CollFolderListInput(CustomTextEdit):
         h_bar = self.horizontalScrollBar()
         h_bar.setFixedHeight(0)
 
-        text = "\n".join(JsonData.coll_folder_lst[brand_ind])
+        text = "\n".join(JsonData.coll_folders[brand_ind])
         self.setText(text)
 
     def get_coll_folders_list(self):
@@ -84,7 +84,7 @@ class StopColls(QWidget):
         layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.input = CustomInput()
-        self.input.insert(", ".join(JsonData.brand_stop_colls[brand_ind]))
+        self.input.insert(", ".join(JsonData.stop_colls[brand_ind]))
         layout_v.addWidget(self.input)
 
     def get_stopcolls(self):
@@ -282,16 +282,16 @@ class WinSettings(WinChild):
         for i in self.brand_sett.coll_folders_wid:
             coll_folders = i.get_coll_folders_list()
 
-            if coll_folders != JsonData.coll_folder_lst[i.brand_ind]:
+            if coll_folders != JsonData.coll_folders[i.brand_ind]:
                 setattr(self, "restart", True)
-                JsonData.coll_folder_lst[i.brand_ind] = coll_folders
+                JsonData.coll_folders[i.brand_ind] = coll_folders
 
         for i in self.brand_sett.stop_colls_wid:
             stop_colls = i.get_stopcolls()
 
-            if stop_colls != JsonData.brand_stop_colls[i.brand_ind]:
+            if stop_colls != JsonData.stop_colls[i.brand_ind]:
                 setattr(self, "restart", True)
-                JsonData.brand_stop_colls[i.brand_ind] = stop_colls
+                JsonData.stop_colls[i.brand_ind] = stop_colls
 
         if hasattr(self, "restart"):
             JsonData.write_json_data()

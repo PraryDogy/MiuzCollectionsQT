@@ -17,6 +17,8 @@ from .utils import URunnable, UThreadPool, Utils
 class ScanerUtils:
     can_scan: bool = True
     coll_folders: dict[str, str] = {}
+    curr_brand: str = None
+    curr_coll_folder: str = None
 
     @classmethod
     def progressbar_text(cls, text: str):
@@ -38,19 +40,22 @@ class ScanerUtils:
 
 
 class FinderImages:
-    def __init__(self):
+    def __init__(self, coll_folder: str, brand_ind: int):
         super().__init__()
+        self.coll_folder = coll_folder
+        self.brand_ind = brand_ind
 
     def get(self) -> list[tuple[str, int, int, int]]:
+
         finder_images: list[tuple[str, int, int, int]] = []
 
-        collections = [
-            os.path.join(JsonData.coll_folder, i)
-            for i in os.listdir(JsonData.coll_folder)
-            if os.path.isdir(os.path.join(JsonData.coll_folder, i))
-            and
-            i not in JsonData.brand_stop_colls
-            ]
+        collections = []
+
+        for i in os.listdir(self.coll_folder):
+            coll = os.path.join(self.coll_folder, i)
+            if os.path.isdir(coll):
+                if i not in JsonData.stop_colls[self.brand_ind]:
+                    collections.append(coll)
 
         ln_ = len(collections)
 
@@ -77,7 +82,7 @@ class FinderImages:
 
             for file in files:
 
-                if not os.path.exists(JsonData.coll_folder):
+                if not os.path.exists(self.coll_folder):
                     ScanerUtils.can_scan = False
                     return finder_images
 

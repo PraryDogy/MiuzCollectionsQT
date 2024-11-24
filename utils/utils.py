@@ -75,7 +75,7 @@ class Utils:
 
     @classmethod
     def get_coll_folder(cls, brand_ind: int) -> str | None:
-        for coll_folder in JsonData.coll_folder_lst[brand_ind]:
+        for coll_folder in JsonData.coll_folders[brand_ind]:
             if os.path.exists(coll_folder):
                 return coll_folder
         return None

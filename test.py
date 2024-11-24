@@ -17,7 +17,7 @@ class Test:
             # not_ok = True
 
         if not_ok:
-            for brand in JsonData.coll_folder_lst[brand_ind]:
+            for brand in JsonData.coll_folders[brand_ind]:
 
                 for coll_folder in brand:
                     if os.path.exists(coll_folder):
@@ -29,4 +29,4 @@ class Test:
             return True
         
 
-print(*JsonData.coll_folder_lst)
+print(*JsonData.coll_folders)
