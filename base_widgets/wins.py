@@ -16,7 +16,7 @@ class WinFrameless(QMainWindow):
         super().__init__(parent=parent)
 
         central_widget = QWidget()
-        central_widget.setContentsMargins(1, 1, 1, 1)
+        central_widget.setContentsMargins(0, 0, 0, 0)
         self.setCentralWidget(central_widget)
 
         self.central_layout_v = LayoutVer()
