@@ -257,7 +257,6 @@ class NextImageBtn(SwitchImageBtn):
 class WinImageView(WinChild):
     def __init__(self, short_src: str):
         super().__init__()
-        self.setWindowModality(Qt.WindowModality.NonModal)
 
         self.short_src_list = list(Thumbnail.path_to_wid.keys())
         self.short_src = short_src
