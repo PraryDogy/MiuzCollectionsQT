@@ -21,3 +21,4 @@ IMAGES_FOLDER в cfg
 
 utils short src full src переделать
 get_coll_name тоже
+что там с JsonData.collfolder
