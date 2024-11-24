@@ -15,8 +15,7 @@ from .utils import URunnable, UThreadPool, Utils
 
 
 class ScanerUtils:
-    can_scan: bool = True
-    coll_folders: list[str] = []
+    can_scan = True
 
     @classmethod
     def progressbar_text(cls, text: str):
@@ -364,14 +363,8 @@ class ScanerShedule(QObject):
 
     def start(self):
         self.wait_timer.stop()
-        ScanerUtils.coll_folders.clear()
 
-        for i in BRANDS:
-            coll_folder = Utils.get_coll_folder(BRANDS.index(i))
-            if coll_folder:
-                ScanerUtils.coll_folders.append(coll_folder)
-
-        if len(coll_folder) == 0:
+        if not Utils.get_coll_folder(JsonData.brand_ind):
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 
