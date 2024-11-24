@@ -82,7 +82,7 @@ class Utils:
 
     @classmethod
     def get_coll_name(cls, coll_folder: str, full_src: str) -> str:
-        coll = cls.get_shortpath(coll_folder, full_src)
+        coll = cls.get_short_src(coll_folder, full_src)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
@@ -296,5 +296,5 @@ class Utils:
         return coll_folder + short_src
     
     @classmethod
-    def get_shortpath(cls, coll_folder: str, full_src: str) -> str:
+    def get_short_src(cls, coll_folder: str, full_src: str) -> str:
         return full_src.replace(coll_folder, "")
