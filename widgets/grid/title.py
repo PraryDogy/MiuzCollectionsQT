@@ -31,17 +31,19 @@ class Title(QLabel):
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
-        if Utils.get_coll_folder(JsonData.brand_ind):
+        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+
+        if coll_folder:
 
             if is_layers:
                 images = [
-                    Utils.get_full_src(i.short_src)
+                    Utils.get_full_src(coll_folder, i.short_src)
                     for i in self.db_images
                     if i.short_src.endswith(PSD_TIFF)
                     ]
             else:
                 images = [
-                    Utils.get_full_src(i.short_src)
+                    Utils.get_full_src(coll_folder, i.short_src)
                     for i in self.db_images
                     if not i.short_src.endswith(PSD_TIFF)
                     ]

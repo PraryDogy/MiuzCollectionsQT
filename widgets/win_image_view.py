@@ -318,16 +318,16 @@ class WinImageView(WinChild):
         coll_folder = Utils.get_coll_folder()
 
         if coll_folder:
+            self.full_src = Utils.get_full_src(coll_folder, self.short_src)
             self.load_image(coll_folder=coll_folder)
 
         else:
             print("img viewer > no smb")
 
-    def load_image(self, coll_folder: str):
-        full_src = Utils.get_full_src(coll_folder, self.short_src)
-        cmd_ = lambda data: self.load_image_fin(data=data, full_src=full_src)
+    def load_image(self):
+        cmd_ = lambda data: self.load_image_fin(data=data, full_src=self.full_src)
 
-        img_thread = LoadImage(full_src=full_src)
+        img_thread = LoadImage(full_src=self.full_src)
         img_thread.signals_.finished_.connect(cmd_)
         UThreadPool.pool.start(img_thread)
 
@@ -402,10 +402,7 @@ class WinImageView(WinChild):
         self.wid.select.emit(self.short_src)
 
     def img_viewer_title(self):
-        full_src = Utils.get_full_src(self.short_src)
-        coll = Utils.get_coll_name(full_src=full_src)
-        name = os.path.basename(self.short_src)
-        self.setWindowTitle(f"{coll}: {name}")
+        self.setWindowTitle(f"{self.wid.collection}: {self.wid.name}")
 
     def button_switch_cmd(self, flag: str) -> None:
         if flag == "+":

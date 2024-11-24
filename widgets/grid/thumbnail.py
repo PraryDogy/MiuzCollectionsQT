@@ -50,7 +50,7 @@ class Thumbnail(QFrame):
         self.img = pixmap
 
         self.short_src = short_src
-        self.coll = coll
+        self.collection = coll
         self.fav_value = fav
 
         if fav == 0 or fav is None:
@@ -135,10 +135,7 @@ class Thumbnail(QFrame):
         
         coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
         if coll_folder:
-            full_src = Utils.get_full_src(
-                coll_folder=coll_folder,
-                short_src=self.short_src
-            )
+            full_src = Utils.get_full_src(coll_folder, self.short_src)
         else:
             return
 
