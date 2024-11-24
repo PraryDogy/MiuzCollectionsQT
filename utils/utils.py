@@ -107,7 +107,7 @@ class Utils:
         """list of FULL SRC"""
         command = ["osascript", REVEAL_SCPT] + files_list
         subprocess.Popen(
-            command,
+            args=command,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
@@ -167,7 +167,14 @@ class Utils:
             if str(object=img.dtype) != "uint8":
                 img = (img/256).astype(dtype="uint8")
             return img
-        except (Exception, tifffile.TiffFileError, RuntimeError, DelayedImportError) as e:
+
+        except (
+            Exception,
+            tifffile.TiffFileError,
+            RuntimeError,
+            DelayedImportError
+            ) as e:
+
             Utils.print_err(error=e)
             print("try open tif with PIL")
             return cls.read_tiff_pil(full_src)
@@ -266,7 +273,13 @@ class Utils:
     def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
         height, width, channel = image.shape
         bytes_per_line = channel * width
-        qimage = QImage(image.tobytes(), width, height, bytes_per_line, QImage.Format.Format_RGB888)
+        qimage = QImage(
+            data=image.tobytes(),
+            width=width, 
+            height=height,
+            bytesPerLine=bytes_per_line, 
+            format=QImage.Format.Format_RGB888
+        )
         return QPixmap.fromImage(qimage)
 
     @classmethod
@@ -279,17 +292,13 @@ class Utils:
             )
         
     @classmethod
-    def fit_to_thumb(cls, image: np.ndarray, size: int, is_max: bool = True) -> np.ndarray | None:
+    def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:
         try:
             h, w = image.shape[:2]
-
-            if is_max:
-                scale = size / max(h, w)
-            else:
-                scale = size / min(h, w)
-    
+            scale = size / max(h, w)
             new_w, new_h = int(w * scale), int(h * scale)
             return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
         except Exception as e:
             print("resize_max_aspect_ratio error:", e)
             return None
