@@ -104,16 +104,18 @@ class CopyPath(QAction):
 
 
 class Reveal(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, full_src: str):
+    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
         super().__init__(parent=parent, text=Lang.reveal_in_finder)
-        self.full_src = full_src
+        self.short_src = short_src
         self.parent_ = parent
         self.win_ = win
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if Utils.get_coll_folder(JsonData.brand_ind):
-            Utils.reveal_files([self.full_src])
+        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        if coll_folder:
+            full_src = Utils.get_full_src(coll_folder, self.short_src)
+            Utils.reveal_files([full_src])
         else:
             OpenWins.smb(parent_=self.win_)
 
@@ -172,7 +174,7 @@ class FavActionDb(QAction):
 
 
 class Save(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, full_src: str, save_as: bool):
+    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str, save_as: bool):
 
         if save_as:
             text: str = Lang.save_image_in
@@ -182,12 +184,16 @@ class Save(QAction):
         super().__init__(parent=parent, text=text)
         self.triggered.connect(self.cmd_)
         self.save_as = save_as
-        self.full_src = full_src
+        self.short_src = short_src
         self.parent_ = parent
         self.win_ = win
 
     def cmd_(self):
-        if Utils.get_coll_folder(JsonData.brand_ind):
+        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+
+        if coll_folder:
+            full_src = Utils.get_full_src(coll_folder, self.short_src)
+
             if self.save_as:
                 dialog = OpenWins.dialog_dirs()
                 dest = dialog.getExistingDirectory()
@@ -195,7 +201,7 @@ class Save(QAction):
                 dest = JsonData.down_folder
 
             if dest:
-                self.copy_files_cmd(dest=dest, full_src=self.full_src)
+                self.copy_files_cmd(dest=dest, full_src=full_src)
         else:
             OpenWins.smb(parent_=self.win_)
 

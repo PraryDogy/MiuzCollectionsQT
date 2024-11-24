@@ -444,7 +444,7 @@ class WinImageView(WinChild):
             if Utils.get_coll_folder(brand_ind=JsonData.brand_ind):
                 OpenWins.info_db(
                     parent_=self,
-                    short_src=self.wid.short_src
+                    short_src=self.short_src
                 )
             else:
                 OpenWins.smb(parent_=self)
@@ -458,13 +458,13 @@ class WinImageView(WinChild):
         info = OpenInfoDb(
             parent=self.menu_,
             win=self,
-            short_src=self.wid.short_src
+            short_src=self.short_src
         )
         self.menu_.addAction(info)
 
         self.fav_action = FavActionDb(
             parent=self.menu_,
-            short_src=self.wid.short_src,
+            short_src=self.short_src,
             fav_value=self.wid.fav_value
         )
         self.fav_action.finished_.connect(self.change_fav)
@@ -475,21 +475,21 @@ class WinImageView(WinChild):
         copy = CopyPath(
             parent=self.menu_,
             win=self,
-            short_src=self.wid.short_src
+            short_src=self.short_src
         )
         self.menu_.addAction(copy)
 
         reveal = Reveal(
             parent=self.menu_,
             win=self,
-            short_src=self.wid.short_src
+            short_src=self.short_src
         )
         self.menu_.addAction(reveal)
 
         save_as = Save(
             parent=self.menu_, 
             win=self,
-            short_src=self.wid.short_src,
+            short_src=self.short_src,
             save_as=True
         )
         self.menu_.addAction(save_as)
@@ -497,7 +497,7 @@ class WinImageView(WinChild):
         save = Save(
             parent=self.menu_,
             win=self,
-            short_src=self.wid.short_src,
+            short_src=self.short_src,
             save_as=False
             )
         self.menu_.addAction(save)
