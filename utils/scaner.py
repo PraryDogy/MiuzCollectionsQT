@@ -356,7 +356,6 @@ class ScanerThread(URunnable):
         for brand in ScanerUtils.brands:
             self.brand_scan(**brand)
 
-
     def brand_scan(self, brand_name: str, brand_ind: int, coll_folder: str):
 
         ScanerUtils.can_scan = True
