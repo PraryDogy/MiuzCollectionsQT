@@ -355,6 +355,7 @@ class ScanerThread(URunnable):
     def run(self):
         for brand in ScanerUtils.brands:
             self.brand_scan(**brand)
+            print("scaner started", brand.get("brand_name"))
 
     def brand_scan(self, brand_name: str, brand_ind: int, coll_folder: str):
 
@@ -431,7 +432,6 @@ class ScanerShedule(QObject):
             self.wait_timer.start(self.wait_sec)
 
         else:
-            print("scaner started")
             self.scaner_thread = ScanerThread()
             self.scaner_thread.signals_.finished_.connect(self.after_scan)
             UThreadPool.pool.start(self.scaner_thread)
