@@ -300,8 +300,8 @@ class WinImageView(WinChild):
 
 
     def first_load(self):
-
-        if not Utils.get_coll_folder(JsonData.brand_ind):
+        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+        if not coll_folder:
             OpenWins.smb(self)
 
         self.load_thumb()
@@ -315,7 +315,7 @@ class WinImageView(WinChild):
     def load_thumb_fin(self, data: ImageData):
         self.image_label.set_image(data.pixmap)
 
-        coll_folder = Utils.get_coll_folder()
+        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
 
         if coll_folder:
             self.full_src = Utils.get_full_src(coll_folder, self.short_src)
@@ -438,11 +438,17 @@ class WinImageView(WinChild):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            if Utils.get_coll_folder(brand_ind=JsonData.brand_ind):
+
+            coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+
+            if coll_folder:
+
                 OpenWins.info_db(
                     parent_=self,
-                    short_src=self.short_src
+                    short_src=self.short_src,
+                    coll_folder=coll_folder
                 )
+
             else:
                 OpenWins.smb(parent_=self)
 

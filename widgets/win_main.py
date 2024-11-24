@@ -119,7 +119,8 @@ class WinMain(WinFrameless):
     def after_start(self):
         Scaner.app.start()
 
-        if not Utils.get_coll_folder(JsonData.brand_ind):
+        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+        if not coll_folder:
             OpenWins.smb(self)
 
         # from .actions import OpenWins

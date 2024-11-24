@@ -47,12 +47,13 @@ class CollectionBtn(QLabel):
         else:
             coll = os.path.join(JsonData.coll_folder, self.coll_name)
 
-        if Utils.get_coll_folder(JsonData.brand_ind):
+        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+        if coll_folder:
             if os.path.exists(coll):
                 subprocess.Popen(["open", coll])
                 return
         else:
-            OpenWins.smb(self.window())
+            OpenWins.smb(parent_=self.window())
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
