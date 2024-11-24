@@ -104,7 +104,7 @@ TITLE_SOLID = f"""
     font-size: 18pt;
     font-weight: bold;
     color: rgb(255, 255, 255);
-    background: {SOLID_STYLE};
+    {SOLID_STYLE}
 """
 
 BRANDS: list = ["miuz", "panacea"]
