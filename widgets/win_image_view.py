@@ -294,7 +294,6 @@ class WinImageView(WinChild):
         self.zoom_btns.zoom_close.mouseReleaseEvent = self.close_
 
         self.hide_all_buttons()
-        self.setFocus()
         QTimer.singleShot(100, self.first_load)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
@@ -308,6 +307,7 @@ class WinImageView(WinChild):
         self.load_thumb()
 
     def load_thumb(self):
+        self.setFocus()
         self.img_viewer_title()
         task = LoadThumb(short_src=self.short_src)
         task.signals_.finished_.connect(self.load_thumb_fin)
@@ -410,7 +410,6 @@ class WinImageView(WinChild):
             self.switch_image(1)
         else:
             self.switch_image(-1)
-        self.setFocus()
         self.image_label.setCursor(Qt.CursorShape.ArrowCursor)
 
     def change_fav(self, value: int):
