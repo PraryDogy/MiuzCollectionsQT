@@ -257,7 +257,7 @@ class NextImageBtn(SwitchImageBtn):
 class WinImageView(WinChild):
     def __init__(self, short_src: str):
         super().__init__()
-        self.enable_min()
+        self.setWindowModality(Qt.WindowModality.NonModal)
 
         self.short_src_list = list(Thumbnail.path_to_wid.keys())
         self.short_src = short_src
@@ -355,15 +355,21 @@ class WinImageView(WinChild):
         self.next_image_btn.hide()
 
     def switch_image(self, offset):
-        current_index = self.short_src_list.index(self.short_src)
-        new_index = current_index + offset
+        # мы формируем актуальный список src из актуальной сетки изображений
+        self.short_src_list = list(Thumbnail.path_to_wid.keys())
         total_ = len(self.short_src_list)
 
-        if new_index > total_:
+        if self.short_src in self.short_src_list:
+            current_index = self.short_src_list.index(self.short_src)
+            new_index = current_index + offset
+        else:
             new_index = 0
 
+        if new_index == total_:
+            return
+
         elif new_index < 0:
-            new_index = total_
+            return
 
         # 
         # сетка = Thumbnail.path_to_wid = сетка thumbnails
@@ -372,7 +378,12 @@ class WinImageView(WinChild):
         # ищем новый src после или до предыдущего
         # так как мы сохранили список src сетки, то новый src будет найден
         # но не факт, что он уже есть в сетке
-        new_short_src = self.short_src_list[new_index]
+        try:
+            new_short_src = self.short_src_list[new_index]
+        except IndexError:
+            print(new_index)
+            print(len(self.short_src_list))
+            return
 
         # ищем виджет в актуальной сетке, которая могла обновиться в фоне
         new_wid = Thumbnail.path_to_wid.get(new_short_src)
@@ -383,7 +394,6 @@ class WinImageView(WinChild):
         # берем первый src из этого списка
         # и первый виджет из сетки
         if not new_wid:
-            self.short_src_list = list(Thumbnail.path_to_wid.keys())
             self.short_src = self.short_src_list[0]
             self.wid = Thumbnail.path_to_wid.get(self.short_src)
 
@@ -394,7 +404,6 @@ class WinImageView(WinChild):
         # то есть и src в списке src
         # поэтому берем ранее найденный src и виджет
         else:
-            self.short_src_list = list(Thumbnail.path_to_wid.keys())
             self.short_src = new_short_src
             self.wid = new_wid
 

@@ -20,3 +20,5 @@ up btn стиль
 Reload menu не работает
 Сделать stop coll как coll folders 
 Добавить place holder с примером через enter
+фильтры не хранить в json
+текущую коллекцию не хранить в json
