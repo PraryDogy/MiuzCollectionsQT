@@ -50,6 +50,7 @@ class CollFolderListInput(CustomTextEdit):
         super().__init__()
         self.brand_ind = brand_ind
 
+        self.setPlaceholderText("Коллекции, каждая с новой строки")
         self.setFixedHeight(130)
         self.setLineWrapMode(QTextEdit.NoWrap)
         h_bar = self.horizontalScrollBar()
@@ -65,6 +66,7 @@ class CollFolderListInput(CustomTextEdit):
         coll_folder_list = [
             os.sep + i.strip().strip(os.sep)
             for i in coll_folder_list
+            if i
             ]
         
         return coll_folder_list
@@ -84,6 +86,7 @@ class StopColls(QWidget):
         layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.input = CustomInput()
+        self.input.setPlaceholderText("Через запятую")
         self.input.insert(", ".join(JsonData.stop_colls[brand_ind]))
         layout_v.addWidget(self.input)
 
@@ -152,7 +155,7 @@ class UpdaterWidget(QWidget):
         cmd_ = lambda: self.btn.setText(Lang.download_update)
 
         QTimer.singleShot(1000, cmd_)
-        OpenWins.smb(self)
+        OpenWins.smb(self.window())
 
     def no_connection_btn_style(self):
         cmd_ = lambda: self.btn.setText(Lang.download_update)
@@ -210,11 +213,11 @@ class WinSettings(WinChild):
     def init_ui(self):
         self.change_lang = ChangeLang()
         self.change_lang._pressed.connect(lambda: self.ok_btn.setText(Lang.apply))
-        self.content_lay_v.addWidget(self.change_lang)
+        self.content_lay_v.addWidget(self.change_lang, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
 
         h_wid = QWidget()
-        self.content_lay_v.addWidget(h_wid)
+        self.content_lay_v.addWidget(h_wid, alignment=Qt.AlignmentFlag.AlignLeft)
         h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 25))
@@ -225,9 +228,18 @@ class WinSettings(WinChild):
         show_files = ShowFiles()
         h_layout.addWidget(show_files)
 
+
+        from PyQt5.QtWidgets import QHBoxLayout
+        test = QWidget()
+        self.content_lay_v.addWidget(test)
+        test_l = QHBoxLayout()
+        test_l.setContentsMargins(0, 0, 0, 0)
+        test.setLayout(test_l)
+
+        cmd_ = lambda: self.ok_btn.setText(Lang.apply)
         self.restore_db_btn = RestoreBtn()
-        self.restore_db_btn._pressed.connect(lambda: self.ok_btn.setText(Lang.apply))
-        self.content_lay_v.addWidget(self.restore_db_btn)
+        self.restore_db_btn._pressed.connect(cmd_)
+        test_l.addWidget(self.restore_db_btn, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
 
         self.brand_sett = BrandSett()
