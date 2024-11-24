@@ -34,26 +34,18 @@ class CollectionBtn(QLabel):
 
 
     def reveal_collection(self, *args) -> None:
-        """
-        Opens the collection folder if it exists and SMB check passes, 
-        otherwise shows an SMB connection window.
+        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
 
-        :param args: Additional arguments (unused).
-        :return: None
-        """
+        if not coll_folder:
+            OpenWins.smb(parent_=self.window())
+            return
 
         if self.coll_name in (NAME_ALL_COLLS, NAME_FAVS):
-            coll = JsonData.coll_folder
+            coll = coll_folder
         else:
-            coll = os.path.join(JsonData.coll_folder, self.coll_name)
+            coll = os.path.join(coll_folder, self.coll_name)
 
-        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
-        if coll_folder:
-            if os.path.exists(coll):
-                subprocess.Popen(["open", coll])
-                return
-        else:
-            OpenWins.smb(parent_=self.window())
+        subprocess.Popen(["open", coll])
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
