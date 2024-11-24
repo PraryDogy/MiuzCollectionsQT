@@ -13,8 +13,6 @@ LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
 MENU_LEFT_WIDTH: int = 210
 NAME_ALL_COLLS: str = "miuzcollections_all"
 NAME_FAVS: str = "miuzcollections_fav"
-RGBA_BLUE = "rgba(0, 122, 255, 1)"
-RGBA_GRAY = "rgba(111, 111, 111, 0.5)"
 STAR_SYM = "\U00002605" + " "
 
 PIXMAP_SIZE_MAX = 200
@@ -76,35 +74,37 @@ PSD_TIFF: tuple = (
     ".PSD", ".PSB", ".TIFF", ".TIF"
     )
 
-STYLES_CSS = "styles.css"
+RGB_BLUE = "rgb(46, 89, 203)"
+BORDER_INV = "2px solid transparent"
+BORDER_BLUE = f"2px solid {RGB_BLUE}"
 
-NORMAL_STYLE = """
-    border: 2px solid transparent;
+NORMAL_STYLE = f"""
+    border: {BORDER_INV};
 """
 
-SOLID_STYLE = """
+SOLID_STYLE = f"""
     border-radius: 6px;
-    border: 2px solid transparent;
-    background-color: rgb(46, 89, 203);
     color: rgb(255, 255, 255);
+    background: {RGB_BLUE};
+    border: {BORDER_INV};
 """
 
-BORDER_STYLE = """
+BORDERED_STYLE = f"""
     border-radius: 6px;
-    border: 2px solid rgb(46, 89, 203);
+    border: {BORDER_BLUE};
 """
 
 TITLE_NORMAL = f"""
     font-size: 18pt;
     font-weight: bold;
-    {NORMAL_STYLE}
+    border: {BORDER_INV};
 """
 
 TITLE_SOLID = f"""
     font-size: 18pt;
     font-weight: bold;
     color: rgb(255, 255, 255);
-    {SOLID_STYLE}
+    background: {SOLID_STYLE};
 """
 
 BRANDS: list = ["miuz", "panacea"]

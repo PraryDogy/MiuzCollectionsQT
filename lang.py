@@ -40,12 +40,10 @@ class Lang_:
     ]
     choose_coll_smb = [
         "- Подключитесь к диску с коллекциями\
-        \n\
         \n- Добавьте новый путь к коллекциям\
         \nв настройках.",
 
         "- Connect to disk with collections\
-        \n\
         \n- Add a new path to collections\
         \nin the settings."
     ]
@@ -290,8 +288,10 @@ class Lang_:
         "Search"
     ]
     search_dates = [
-        "Поиск фотографий по датам.\nУправляйте датами с клавишами вверх/вниз.",
-        "Searching for photos by dates.\nControl dates with up/down keys."
+        "Поиск фотографий по датам.\
+        \nУправляйте датами с клавишами вверх/вниз.",
+        "Searching for photos by dates.\
+        \nControl dates with up/down keys."
     ]
     sett_stopcolls = [
         "Игнорировать коллекции",

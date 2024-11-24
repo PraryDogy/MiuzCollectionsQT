@@ -333,7 +333,7 @@ class Grid(QScrollArea):
         if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
             wid = self.cell_to_wid.get(self.curr_cell)
 
-            if Utils.smb_check(JsonData.brand_ind):
+            if Utils.get_coll_folder(JsonData.brand_ind):
                 OpenWins.info_db(self.window(), wid.short_src)
             else:
                 OpenWins.smb(self.window())

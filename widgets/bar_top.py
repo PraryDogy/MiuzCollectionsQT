@@ -3,7 +3,7 @@ from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextCustom, LayoutHor
-from cfg import (BORDER_STYLE, NORMAL_STYLE, SOLID_STYLE, Dynamic, Filter,
+from cfg import (BORDERED_STYLE, NORMAL_STYLE, SOLID_STYLE, Dynamic, Filter,
                  JsonData)
 from lang import Lang
 from signals import SignalsApp
@@ -27,7 +27,7 @@ class BarTopBtn(QLabel):
         self.setStyleSheet(NORMAL_STYLE)
 
     def set_border_style(self):
-        self.setStyleSheet(BORDER_STYLE)
+        self.setStyleSheet(BORDERED_STYLE)
 
 
 class DatesBtn(BarTopBtn):

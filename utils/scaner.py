@@ -364,7 +364,7 @@ class ScanerShedule(QObject):
     def start(self):
         self.wait_timer.stop()
 
-        if not Utils.smb_check(JsonData.brand_ind):
+        if not Utils.get_coll_folder(JsonData.brand_ind):
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 

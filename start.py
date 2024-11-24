@@ -41,7 +41,7 @@ if System_.set_plugin_path():
 from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtWidgets import QApplication
 
-from cfg import JsonData, STYLES_CSS
+from cfg import JsonData
 from database import Dbase
 from lang import Lang
 from signals import SignalsApp

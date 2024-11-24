@@ -75,26 +75,11 @@ class Utils:
         print(error)
 
     @classmethod
-    def smb_check(cls, brand_ind: int) -> bool:
-        not_ok = False
-
-        if not os.path.exists(JsonData.coll_folder):
-            not_ok = True
-
-        print(brand_ind, JsonData.coll_folder)
-
-        # elif JsonData.coll_folder in (JsonData.coll_folder_lst):
-            # not_ok = True
-
-        if not_ok:
-            for coll_folder in JsonData.coll_folder_lst[brand_ind]:
-                if os.path.exists(coll_folder):
-                    JsonData.coll_folder = coll_folder
-                    return True
-                return False
-
-        else:
-            return True
+    def get_coll_folder(cls, brand_ind: int) -> str | None:
+        for coll_folder in JsonData.coll_folder_lst[brand_ind]:
+            if os.path.exists(coll_folder):
+                return coll_folder
+        return None
 
     @classmethod
     def get_coll_name(cls, full_src: str) -> str:

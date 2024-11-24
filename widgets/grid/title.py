@@ -31,7 +31,7 @@ class Title(QLabel):
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
-        if Utils.smb_check(JsonData.brand_ind):
+        if Utils.get_coll_folder(JsonData.brand_ind):
 
             if is_layers:
                 images = [
@@ -62,7 +62,7 @@ class Title(QLabel):
             OpenWins.smb(self.window())
 
     def copy_files_cmd(self, dest: str, files: list):
-        if Utils.smb_check(JsonData.brand_ind):
+        if Utils.get_coll_folder(JsonData.brand_ind):
             self.copy_files_cmd_(dest, files)
         else:
             OpenWins.smb(self.window())
