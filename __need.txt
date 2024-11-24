@@ -9,3 +9,6 @@ IMAGES_FOLDER в cfg
 
 
 База данных src не делать unique
+проблема с фильтрами
+coll_folder удалить
+up btn стиль

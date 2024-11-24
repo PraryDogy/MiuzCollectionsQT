@@ -393,10 +393,10 @@ class Lang(Lang_):
             if isinstance(v, list):
                 setattr(cls, k, v[JsonData.lang_ind])
 
-        if Filter.filters:
-            names_max = len(Filter.filters[0].names) - 1
-            if names_max != max_:
-                t = "You need add or remove names from cfg FILTERS"
-                raise Exception(t)
-        else:
-            raise Exception("You need add at least one filter to cfg FILTERS")
+        # if Filter.filters:
+        #     names_max = len(Filter.filters[0].names) - 1
+        #     if names_max != max_:
+        #         t = "You need add or remove names from cfg FILTERS"
+        #         raise Exception(t)
+        # else:
+        #     raise Exception("You need add at least one filter to cfg FILTERS")

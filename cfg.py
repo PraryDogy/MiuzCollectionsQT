@@ -191,19 +191,19 @@ class JsonData:
 
     filters = [
         {
-            "names": ("Продукт", "Product"),
+            "names": ["Продукт", "Product"],
             "real": "1 IMG", 
             "value": False,
             "system": False
         },
         {
-            "names": ("Модели", "Model"),
+            "names": ["Модели", "Model"],
             "real": "2 MODEL IMG", 
             "value": False,
             "system": False
         },
         {
-            "names": ("Остальное", "Other"),
+            "names": ["Остальное", "Other"],
             "real": None, 
             "value": False,
             "system": True
@@ -240,6 +240,7 @@ class JsonData:
 
     @classmethod
     def write_json_data(cls):
+        cls._init_filters()
         cls.filters = cls._get_filters()
 
         with open(JSON_FILE, 'w', encoding="utf-8") as f:
@@ -329,7 +330,6 @@ class JsonData:
         cls._check_app_dirs()
         cls._read_json_data()
         cls._compare_versions()
-        cls._init_filters()
 
 
 class Dynamic:
