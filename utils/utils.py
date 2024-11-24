@@ -81,15 +81,15 @@ class Utils:
         return None
 
     @classmethod
-    def get_coll_name(cls, full_src: str) -> str:
-        coll = full_src.replace(JsonData.coll_folder, "")
+    def get_coll_name(cls, coll_folder: str, full_src: str) -> str:
+        coll = cls.get_shortpath(coll_folder, full_src)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
         if len(coll) > 1:
             return coll[0]
         else:
-            return os.path.basename(JsonData.coll_folder.strip(os.sep))
+            return os.path.basename(coll_folder.strip(os.sep))
 
     @classmethod
     def copy_text(cls, text: str):
@@ -292,9 +292,9 @@ class Utils:
             return None
         
     @classmethod
-    def get_full_src(cls, src: str) -> str:
-        return JsonData.coll_folder + src
+    def get_full_src(cls, coll_folder: str, src: str) -> str:
+        return coll_folder + src
     
     @classmethod
-    def get_shortpath(cls, src: str) -> str:
-        return src.replace(JsonData.coll_folder, "")
+    def get_shortpath(cls, coll_folder: str, src: str) -> str:
+        return src.replace(coll_folder, "")
