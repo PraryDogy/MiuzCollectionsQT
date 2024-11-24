@@ -409,13 +409,14 @@ class ScanerShedule(QObject):
         self.wait_timer.stop()
         ScanerUtils.brands.clear()
 
-        for i in BRANDS:
-            coll_folder = Utils.get_coll_folder(BRANDS.index(i))
+        for brand_name in BRANDS:
+            brand_ind  = BRANDS.index(brand_name)
+            coll_folder = Utils.get_coll_folder(brand_ind=brand_ind)
 
             if coll_folder:
                 data = {
-                    "brand_name": i,
-                    "brand_ind": BRANDS.index(i),
+                    "brand_name": brand_name,
+                    "brand_ind": brand_ind,
                     "coll_folder": coll_folder
                 }
 
