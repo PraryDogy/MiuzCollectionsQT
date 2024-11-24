@@ -16,7 +16,7 @@ from .utils import URunnable, UThreadPool, Utils
 
 class ScanerUtils:
     can_scan: bool = True
-    coll_folders: list[str] = []
+    coll_folders: dict[str, str] = {}
 
     @classmethod
     def progressbar_text(cls, text: str):
@@ -368,10 +368,11 @@ class ScanerShedule(QObject):
 
         for i in BRANDS:
             coll_folder = Utils.get_coll_folder(BRANDS.index(i))
-            if coll_folder:
-                ScanerUtils.coll_folders.append(coll_folder)
 
-        if len(coll_folder) == 0:
+            if coll_folder:
+                ScanerUtils.coll_folders[i] = coll_folder
+
+        if not ScanerUtils.coll_folders:
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 
