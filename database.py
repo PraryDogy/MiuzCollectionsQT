@@ -47,6 +47,8 @@ class Dbase:
 
         cls.toggle_wal(False)
 
+        return
+
         print(
             f"database init",
             f"ehco: {cls._echo}",

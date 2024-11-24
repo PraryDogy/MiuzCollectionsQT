@@ -113,7 +113,8 @@ class LoadMenus(URunnable):
             res: tuple[str] = (i[0] for i in res if i)
 
         else:
-            print("widgets > left menu > load db colls > row is empty")
+            brand = BRANDS[self.brand_ind]
+            print(brand, "> left menu > load db colls > no data")
             return menus
 
         for coll_name in res:

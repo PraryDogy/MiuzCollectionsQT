@@ -29,7 +29,6 @@ class UThreadPool:
     @classmethod
     def init(cls):
         cls.pool = QThreadPool().globalInstance()
-        print("q thread pool started")
 
 
 class URunnable(QRunnable):
