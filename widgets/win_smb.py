@@ -29,7 +29,7 @@ class WinSmb(WinChild):
         self.setWindowTitle(Lang.no_connection)
 
         self.init_ui()
-        self.setFixedSize(330, 90)
+        self.setFixedSize(330, 100)
         self.setFocus()
 
     def init_ui(self):
