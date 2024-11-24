@@ -20,12 +20,17 @@ from .title import Title
 
 IMAGES = "images"
 UP_SVG = os.path.join(IMAGES, "up.svg")
+UP_STYLE = f"""
+    background: rgba(125, 125, 125, 0.5);
+    border-radius: 22px;
+"""
 
 
 class UpBtn(QFrame):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.setFixedSize(44, 44)
+        self.setStyleSheet(UP_STYLE)
 
         v_layout = LayoutVer()
         self.setLayout(v_layout)
