@@ -43,16 +43,6 @@ class WinMain(WinFrameless):
         self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
         self.setMenuBar(BarMacos())
 
-        self.setWindowTitle(
-            Lang.all_colls
-            if JsonData.curr_coll == NAME_ALL_COLLS
-            else JsonData.curr_coll
-            )
-
-        # wid_search = WidSearch()
-        # self.titlebar.h_lay.addWidget(wid_search)
-        # self.titlebar.title.setStyleSheet(f"""padding-left: {wid_search.width()}px;""")
-
         h_wid_main = QWidget()
         h_lay_main = LayoutHor()
         h_lay_main.setContentsMargins(0, 0, 0, 0)
@@ -82,6 +72,7 @@ class WinMain(WinFrameless):
         right_lay.addWidget(bar_bottom)
 
         SignalsApp.all_.win_main_cmd.connect(self.win_main_cmd)
+        SignalsApp.all_.win_main_cmd.emit("set_title")
         QTimer.singleShot(100, self.after_start)
         grid.setFocus()
 
