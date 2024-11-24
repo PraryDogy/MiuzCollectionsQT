@@ -257,6 +257,7 @@ class NextImageBtn(SwitchImageBtn):
 class WinImageView(WinChild):
     def __init__(self, short_src: str):
         super().__init__()
+        self.enable_min()
 
         self.short_src_list = list(Thumbnail.path_to_wid.keys())
         self.short_src = short_src
@@ -358,7 +359,7 @@ class WinImageView(WinChild):
         new_index = current_index + offset
         total_ = len(self.short_src_list)
 
-        if new_index > len(total_):
+        if new_index > total_:
             new_index = 0
 
         elif new_index < 0:

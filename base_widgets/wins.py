@@ -13,7 +13,6 @@ class Manager:
 
 class WinFrameless(QMainWindow):
     def __init__(self, parent: QWidget = None):
-
         super().__init__(parent=parent)
 
         central_widget = QWidget()
@@ -38,19 +37,19 @@ class WinFrameless(QMainWindow):
             Utils.print_err(error=e)
 
     def disable_min(self):
+        print("флаги не включены")
+        return
         fl = Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint
         fl = fl  | Qt.WindowType.WindowCloseButtonHint
         self.setWindowFlags(fl)
 
-        # self.setWindowFlags(
-            # self.windowFlags() | Qt.WindowType.WindowCloseButtonHint
-            # )
+    def enable_min(self):
+        self.setWindowFlag(Qt.WindowType.Widget)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:
             Manager.wins.remove(self)
             self.deleteLater()
-            print("win removed")
         except Exception as e:
             pass
         return super().closeEvent(a0)
