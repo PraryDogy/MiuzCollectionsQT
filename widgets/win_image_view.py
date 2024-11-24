@@ -94,7 +94,7 @@ class LoadImage(URunnable):
 
         if self.full_src not in LoadImage.images:
         
-            img = Utils.read_image(src=self.full_src)
+            img = Utils.read_image(full_src=self.full_src)
 
             if not self.full_src.endswith(PSD_TIFF):
                 img = Utils.array_color(img, "BGR")
@@ -319,7 +319,7 @@ class WinImageView(WinChild):
 
         if coll_folder:
             self.full_src = Utils.get_full_src(coll_folder, self.short_src)
-            self.load_image(coll_folder=coll_folder)
+            self.load_image()
 
         else:
             print("img viewer > no smb")

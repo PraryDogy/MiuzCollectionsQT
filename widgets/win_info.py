@@ -70,10 +70,7 @@ class InfoTask(URunnable):
         )
 
         full_src = self.lined_text(
-            Utils.get_full_src(
-                coll_folder=self.coll_folder,
-                short_src=self.short_src
-            )
+            Utils.get_full_src(self.coll_folder,self.short_src)
         )
 
         _, type_ = os.path.splitext(name)

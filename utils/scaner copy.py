@@ -250,7 +250,7 @@ class DbUpdater:
             small_img, resol = self.get_small_img(src)
 
             if small_img is not None:
-                hash_path = Utils.get_hash_path(src)
+                hash_path = Utils.create_hash_path(src)
 
                 values = {
                     "src": src.replace(JsonData.coll_folder, ""),

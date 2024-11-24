@@ -275,7 +275,7 @@ class DbUpdater:
             small_img, resol = self.get_small_img(full_src)
 
             if small_img is not None:
-                hash_path = Utils.get_hash_path(full_src)
+                hash_path = Utils.create_hash_path(full_src)
 
                 values = {
                     "src": Utils.get_short_src(self.coll_folder, full_src),
