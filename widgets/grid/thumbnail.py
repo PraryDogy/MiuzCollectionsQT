@@ -132,14 +132,22 @@ class Thumbnail(QFrame):
 
         if distance < QApplication.startDragDistance():
             return
+        
+        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        if coll_folder:
+            full_src = Utils.get_full_src(
+                coll_folder=coll_folder,
+                short_src=self.short_src
+            )
+        else:
+            return
 
         self.select.emit(self.short_src)
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
         self.drag.setPixmap(self.img_label.pixmap())
         
-        fullpath = Utils.get_full_src(self.short_src)
-        url = [QUrl.fromLocalFile(fullpath)]
+        url = [QUrl.fromLocalFile(full_src)]
         self.mime_data.setUrls(url)
 
         self.drag.setMimeData(self.mime_data)
@@ -148,64 +156,64 @@ class Thumbnail(QFrame):
         return super().mouseMoveEvent(a0)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        try:
-            menu_ = ContextCustom(event=ev)
+        menu_ = ContextCustom(event=ev)
 
-            cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
-            view = OpenInView(parent_=menu_)
-            view._clicked.connect(cmd_)
-            menu_.addAction(view)
+        cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
+        view = OpenInView(parent_=menu_)
+        view._clicked.connect(cmd_)
+        menu_.addAction(view)
 
-            info = OpenInfoDb(
-                parent=menu_,
-                win=self.window(),
-                short_src=self.short_src
-                )
-            menu_.addAction(info)
+        info = OpenInfoDb(
+            parent=menu_,
+            win=self.window(),
+            short_src=self.short_src
+            )
+        menu_.addAction(info)
 
-            self.fav_action = FavActionDb(
-                parent=menu_,
-                short_src=self.short_src,
-                fav_value=self.fav_value
-                )
-            self.fav_action.finished_.connect(self.change_fav)
-            menu_.addAction(self.fav_action)
+        self.fav_action = FavActionDb(
+            parent=menu_,
+            short_src=self.short_src,
+            fav_value=self.fav_value
+            )
+        self.fav_action.finished_.connect(self.change_fav)
+        menu_.addAction(self.fav_action)
 
-            menu_.addSeparator()
+        menu_.addSeparator()
 
-            full_src = Utils.get_full_src(self.short_src)
+        copy = CopyPath(
+            parent=menu_,
+            win=self.window(),
+            short_src=self.short_src
+        )
+        menu_.addAction(copy)
 
-            copy = CopyPath(parent=menu_, win=self.window(), full_src=full_src)
-            menu_.addAction(copy)
+        reveal = Reveal(
+            parent=menu_,
+            win=self.window(),
+            short_src=self.short_src
+        )
+        menu_.addAction(reveal)
 
-            reveal = Reveal(parent=menu_, win=self.window(), full_src=full_src)
-            menu_.addAction(reveal)
+        save_as = Save(
+            parent=menu_,
+            win=self.window(),
+            short_src=self.short_src,
+            save_as=True
+            )
+        menu_.addAction(save_as)
 
-            save_as = Save(
-                parent=menu_,
-                win=self.window(),
-                full_src=full_src,
-                save_as=True
-                )
-            menu_.addAction(save_as)
+        save = Save(
+            parent=menu_,
+            win=self.window(),
+            short_src=self.short_src,
+            save_as=False
+            )
+        menu_.addAction(save)
 
-            save = Save(
-                parent=menu_,
-                win=self.window(),
-                full_src=full_src,
-                save_as=False
-                )
-            menu_.addAction(save)
+        menu_.addSeparator()
 
-            menu_.addSeparator()
+        reload = ScanerRestart(parent=menu_)
+        menu_.addAction(reload)
 
-            reload = ScanerRestart(parent=menu_)
-            menu_.addAction(reload)
-
-            self.select.emit(self.short_src)
-            menu_.show_menu()
-
-            # return super().contextMenuEvent(ev)
-
-        except Exception as e:
-            Utils.print_err(error=e)
+        self.select.emit(self.short_src)
+        menu_.show_menu()

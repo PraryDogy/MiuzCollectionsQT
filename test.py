@@ -1,10 +1,14 @@
-brand_name = "panacea"
-deleting = "удаляю"
-x = 5
-from_ = "из"
-ln_ = 100
+test = [i for i in range(0, 50)]
 
-brand = brand_name.capitalize()
-t = f"{brand}: {deleting} {x} {from_} {ln_}"
+offset = -1
+current_index = 0
+new_index = current_index + offset
 
-print(t)
+if new_index > len(test):
+    new_index = 0
+
+elif new_index < 0:
+    new_index = len(test)
+
+
+print(new_index)

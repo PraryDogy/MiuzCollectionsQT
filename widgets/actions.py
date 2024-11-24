@@ -19,12 +19,16 @@ from .win_smb import WinSmb
 class OpenWins:
 
     @classmethod
-    def info_db(cls, parent_: QMainWindow, short_src: str):
+    def info_db(cls, parent_: QMainWindow, short_src: str, coll_folder: str):
 
         if not isinstance(parent_, QMainWindow):
             raise TypeError
 
-        WinInfo(parent=parent_, short_src=short_src)
+        WinInfo(
+            parent=parent_,
+            short_src=short_src,
+            coll_folder=coll_folder
+        )
 
     @classmethod
     def smb(cls, parent_: QMainWindow):
@@ -70,23 +74,31 @@ class OpenInfoDb(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if Utils.get_coll_folder(JsonData.brand_ind):
-            OpenWins.info_db(parent_=self.win_, short_src=self.short_src)
+        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        if coll_folder:
+            OpenWins.info_db(
+                parent_=self.win_,
+                short_src=self.short_src,
+                coll_folder=coll_folder    
+            )
         else:
             OpenWins.smb(parent_=self.win_)
 
 
 class CopyPath(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, full_src: str):
+    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
         super().__init__(parent=parent, text=Lang.copy_path)
         self.parent_ = parent
         self.win_ = win
-        self.full_src = full_src
+        self.short_src = short_src
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        if Utils.get_coll_folder(JsonData.brand_ind):
-            Utils.copy_text(text=self.full_src)
+        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+
+        if coll_folder:
+            full_src = Utils.get_full_src(coll_folder, self.short_src)
+            Utils.copy_text(text=full_src)
         else:
             OpenWins.smb(parent_=self.win_)
 

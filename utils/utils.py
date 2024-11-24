@@ -292,9 +292,9 @@ class Utils:
             return None
         
     @classmethod
-    def get_full_src(cls, coll_folder: str, src: str) -> str:
-        return coll_folder + src
+    def get_full_src(cls, coll_folder: str, short_src: str) -> str:
+        return coll_folder + short_src
     
     @classmethod
-    def get_shortpath(cls, coll_folder: str, src: str) -> str:
-        return src.replace(coll_folder, "")
+    def get_shortpath(cls, coll_folder: str, full_src: str) -> str:
+        return full_src.replace(coll_folder, "")

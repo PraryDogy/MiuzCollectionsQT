@@ -41,9 +41,10 @@ class WorkerSignals(QObject):
 
 
 class InfoTask(URunnable):
-    def __init__(self, short_src: str):
+    def __init__(self, short_src: str, coll_folder: str):
         super().__init__()
         self.short_src = short_src
+        self.coll_folder = coll_folder
         self.signals_ = WorkerSignals()
 
     @URunnable.set_running_state
@@ -64,17 +65,27 @@ class InfoTask(URunnable):
    
     def get_db_info(self, size, mod, resol, coll) -> dict[str, str]:
 
-        name = os.path.basename(self.short_src)
+        name = self.lined_text(
+            os.path.basename(self.short_src)
+        )
+
+        full_src = self.lined_text(
+            Utils.get_full_src(
+                coll_folder=self.coll_folder,
+                short_src=self.short_src
+            )
+        )
+
         _, type_ = os.path.splitext(name)
+        size = Utils.get_f_size(size)
+        mod = Utils.get_f_date(mod)
 
         res = {
-            Lang.file_name: self.lined_text(name),
+            Lang.file_name: name,
             Lang.type_: type_,
-            Lang.file_size: Utils.get_f_size(size),
-            Lang.place: self.lined_text(
-                Utils.get_full_src(self.short_src)
-                ),
-            Lang.changed: Utils.get_f_date(mod),
+            Lang.file_size: size,
+            Lang.place:full_src,
+            Lang.changed: mod,
             Lang.resol: resol,
             Lang.collection: coll
             }
@@ -95,21 +106,24 @@ class InfoTask(URunnable):
 
 
 class WinInfo(WinChild):
-    def __init__(self, parent: QMainWindow, short_src: str):
+    def __init__(self, parent: QMainWindow, short_src: str, coll_folder: str):
         super().__init__()
 
         if not isinstance(parent, QMainWindow):
             raise TypeError
 
-        self.parent_ = parent
-
         self.setWindowTitle(Lang.info)
+        self.parent_ = parent
         self.short_src = short_src
+        self.coll_folder = coll_folder
 
         self.init_ui()
 
     def init_ui(self):
-        self.task_ = InfoTask(self.short_src)
+        self.task_ = InfoTask(
+            short_src=self.short_src,
+            coll_folder=self.coll_folder
+        )
         self.task_.signals_.finished_.connect(self.load_info_fin)
         UThreadPool.pool.start(self.task_)
 
