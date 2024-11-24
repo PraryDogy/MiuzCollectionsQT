@@ -274,11 +274,11 @@ class Utils:
         height, width, channel = image.shape
         bytes_per_line = channel * width
         qimage = QImage(
-            data=image.tobytes(),
-            width=width, 
-            height=height,
-            bytesPerLine=bytes_per_line, 
-            format=QImage.Format.Format_RGB888
+            image.tobytes(),
+            width, 
+            height,
+            bytes_per_line, 
+            QImage.Format.Format_RGB888
         )
         return QPixmap.fromImage(qimage)
 
