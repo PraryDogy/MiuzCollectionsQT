@@ -257,6 +257,7 @@ class NextImageBtn(SwitchImageBtn):
 class WinImageView(WinChild):
     def __init__(self, short_src: str):
         super().__init__()
+        self.content_lay_v.setContentsMargins(0, 0, 0, 0)
 
         self.short_src_list = list(Thumbnail.path_to_wid.keys())
         self.short_src = short_src
