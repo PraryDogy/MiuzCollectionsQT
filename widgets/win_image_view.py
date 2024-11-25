@@ -257,7 +257,6 @@ class NextImageBtn(SwitchImageBtn):
 class WinImageView(WinChild):
     def __init__(self, short_src: str):
         super().__init__()
-        self.content_lay_v.setContentsMargins(0, 0, 0, 0)
 
         self.short_src_list = list(Thumbnail.path_to_wid.keys())
         self.short_src = short_src
@@ -273,15 +272,14 @@ class WinImageView(WinChild):
         self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
         self.image_label = ImageWidget()
-        self.content_lay_v.addWidget(self.image_label)
-
-        self.prev_image_btn = PrevImageBtn(self.content_wid)
+        self.central_layout.addWidget(self.image_label)
+        self.prev_image_btn = PrevImageBtn(self.centralWidget())
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
 
-        self.next_image_btn = NextImageBtn(self.content_wid)
+        self.next_image_btn = NextImageBtn(self.centralWidget())
         self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
 
-        self.zoom_btns = ZoomBtns(parent=self.content_wid)
+        self.zoom_btns = ZoomBtns(parent=self.centralWidget())
         self.zoom_btns.zoom_in.mouseReleaseEvent = (
             lambda e: self.image_label.zoom_in()
         )

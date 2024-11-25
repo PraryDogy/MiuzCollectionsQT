@@ -2,10 +2,10 @@ import os
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer, SvgBtn
-from base_widgets.wins import WinChild
+from base_widgets.wins import WinSystem
 from cfg import BRANDS, TITLE_NORMAL, JsonData
 from lang import Lang
 
@@ -17,7 +17,7 @@ TITLE_NORMAL = f"""
     border: 0px;
 """
 
-class WinSmb(WinChild):
+class WinSmb(WinSystem):
     def __init__(self, text: str = None):
         super().__init__()
 
@@ -34,7 +34,7 @@ class WinSmb(WinChild):
 
     def init_ui(self):
         h_wid = QWidget()
-        self.content_lay_v.addWidget(h_wid)
+        self.central_layout.addWidget(h_wid)
         h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
 

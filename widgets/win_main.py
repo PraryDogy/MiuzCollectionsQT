@@ -47,7 +47,7 @@ class WinMain(WinFrameless):
         h_lay_main = LayoutHor()
         h_lay_main.setContentsMargins(0, 0, 0, 0)
         h_wid_main.setLayout(h_lay_main)
-        self.central_layout_v.addWidget(h_wid_main)
+        self.central_layout.addWidget(h_wid_main)
 
         left_wid = MenuLeft()
         h_lay_main.addWidget(left_wid)

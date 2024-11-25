@@ -6,7 +6,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
 from base_widgets import ContextCustom
-from base_widgets.wins import WinChild
+from base_widgets.wins import WinSystem
 from cfg import APP_NAME, APP_VER
 from lang import Lang
 from utils.utils import Utils
@@ -51,7 +51,7 @@ class SelectableLabel(QLabel):
         Utils.copy_text(self.selectedText())
 
 
-class AboutWin(WinChild):
+class AboutWin(WinSystem):
     def __init__(self):
         super().__init__()
 
@@ -61,12 +61,12 @@ class AboutWin(WinChild):
         icon = QSvgWidget(ICON_SVG)
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(150, 130)
-        self.content_lay_v.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.content_lay_v.addSpacerItem(QSpacerItem(0, 20))
+        self.central_layout.addSpacerItem(QSpacerItem(0, 20))
 
         lbl = SelectableLabel(self)
-        self.content_lay_v.addWidget(lbl)
+        self.central_layout.addWidget(lbl)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):

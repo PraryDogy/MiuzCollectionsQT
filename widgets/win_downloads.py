@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import LayoutHor, LayoutVer
-from base_widgets.wins import WinChild
+from base_widgets.wins import WinSystem
 from lang import Lang
 from utils.copy_files import CopyFiles
 from utils.utils import Utils
@@ -65,10 +65,10 @@ class Progresser(QWidget):
         self.progress_stop.emit()
 
 
-class WinDownloads(WinChild):
+class WinDownloads(WinSystem):
     def __init__(self):
         super().__init__()
-        self.content_lay_v.setContentsMargins(0, 0, 0, 0)
+        self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.setWindowTitle(Lang.title_downloads)
         self.setFixedSize(400, 420)
 
@@ -83,7 +83,7 @@ class WinDownloads(WinChild):
 
         self.v_layout = LayoutVer()
         self.scroll_widget.setLayout(self.v_layout)
-        self.content_lay_v.addWidget(self.scroll_area)
+        self.central_layout.addWidget(self.scroll_area)
 
         self.progress_wid = QWidget()
         self.progress_layout = LayoutVer()

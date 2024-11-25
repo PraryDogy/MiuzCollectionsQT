@@ -5,10 +5,10 @@ import subprocess
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QPushButton,
-                             QSpacerItem, QTabWidget, QTextEdit, QWidget)
+                             QSpacerItem, QTabWidget, QWidget)
 
 from base_widgets import CustomInput, CustomTextEdit, LayoutHor, LayoutVer
-from base_widgets.wins import WinChild
+from base_widgets.wins import WinSystem
 from cfg import APP_SUPPORT_DIR, BRANDS, DB_FILE, HASH_DIR, JsonData
 from lang import Lang
 from utils.updater import Updater
@@ -172,10 +172,9 @@ class RestoreBd(QGroupBox):
         self.clicked_.emit()
 
 
-class WinSettings(WinChild):
+class WinSettings(WinSystem):
     def __init__(self):
         super().__init__()
-
         self.setWindowTitle(Lang.settings)
 
         QTimer.singleShot(10, self.init_ui)
@@ -183,27 +182,27 @@ class WinSettings(WinChild):
         self.setFocus()
 
     def init_ui(self):
-        self.content_lay_v.setSpacing(10)
+        self.central_layout.setSpacing(10)
 
         cmd_lang = lambda: self.ok_btn.setText(Lang.apply)
         self.change_lang = ChangeLang()
         self.change_lang.clicked_.connect(cmd_lang)
-        self.content_lay_v.addWidget(self.change_lang)
+        self.central_layout.addWidget(self.change_lang)
 
         self.second_group = SecondGroup()
-        self.content_lay_v.addWidget(self.second_group)
+        self.central_layout.addWidget(self.second_group)
 
         self.restore_bd = RestoreBd()
         self.restore_bd.clicked_.connect(self.ok_cmd)
-        self.content_lay_v.addWidget(self.restore_bd)
+        self.central_layout.addWidget(self.restore_bd)
 
         self.brand_sett = BrandSett()
-        self.content_lay_v.addWidget(self.brand_sett)
+        self.central_layout.addWidget(self.brand_sett)
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
         btns_wid.setLayout(btns_layout)
-        self.content_lay_v.addWidget(btns_wid)
+        self.central_layout.addWidget(btns_wid)
 
         btns_layout.addStretch(1)
 

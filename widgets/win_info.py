@@ -6,7 +6,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
 
 from base_widgets import ContextCustom
-from base_widgets.wins import WinChild
+from base_widgets.wins import WinSystem
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, UThreadPool, Utils
@@ -102,7 +102,7 @@ class InfoTask(URunnable):
             return text
 
 
-class WinInfo(WinChild):
+class WinInfo(WinSystem):
     def __init__(self, parent: QMainWindow, short_src: str, coll_folder: str):
         super().__init__()
 
@@ -126,7 +126,7 @@ class WinInfo(WinChild):
 
     def load_info_fin(self, data: dict[str, str]):
         wid = QWidget()
-        self.content_lay_v.addWidget(wid)
+        self.central_layout.addWidget(wid)
 
         grid = QGridLayout()
         grid.setSpacing(5)
