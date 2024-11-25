@@ -58,8 +58,9 @@ class FinderImages:
         ln_ = len(collections)
 
         for x, collection in enumerate(collections, start=1):
-            
-            t = f"{Lang.collection} {x} {Lang.from_} {ln_}"
+            brand = BRANDS[self.brand_ind]
+            coll: str = Lang.collection
+            t = f"{brand}: {coll.lower()} {x} {Lang.from_} {ln_}"
             ScanerUtils.progressbar_text(t)
 
             try:
@@ -212,7 +213,8 @@ class DbUpdater:
             try:
                 conn.execute(q)
                 brand = self.brand_name.capitalize()
-                t = f"{brand}: {Lang.deleting} {x} {Lang.from_} {ln_}"
+                deleting: str = Lang.deleting
+                t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {ln_}"
                 ScanerUtils.progressbar_text(t)
 
             except sqlalchemy.exc.IntegrityError as e:
@@ -333,7 +335,8 @@ class DbUpdater:
         ln_ = len(self.hash_images)
         for x, (hash_path, img_array) in enumerate(self.hash_images, start=1):
             brand = self.brand_name.capitalize()
-            t = f"{brand}: {Lang.adding} {x} {Lang.from_} {ln_}"
+            adding: str = Lang.adding
+            t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
             ScanerUtils.progressbar_text(t)
             Utils.write_image_hash(hash_path, img_array)
 
