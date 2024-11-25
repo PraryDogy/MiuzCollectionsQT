@@ -253,6 +253,10 @@ class WinSettings(WinChild):
 
             for brand_ind, wid in self.brand_sett.coll_folders_wid.items():
                 coll_folders = self.setup_lined_text(wid=wid)
+                coll_folders = [
+                    os.sep + i.strip().strip(os.sep)
+                    for i in coll_folders
+                ]
                 JsonData.coll_folders[brand_ind] = coll_folders            
 
             JsonData.write_json_data()
@@ -263,7 +267,7 @@ class WinSettings(WinChild):
 
     def setup_lined_text(self, wid: CustomTextEdit):
         return[
-            os.sep + i.strip().strip(os.sep)
+            i
             for i in wid.toPlainText().split("\n")
             if i
         ]
