@@ -11,8 +11,8 @@ BRANDS = ["miuz", "panacea"]
 GRID_LIMIT: int = 150
 LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
 MENU_LEFT_WIDTH: int = 210
-NAME_ALL_COLLS: str = "miuzcollections_all"
-NAME_FAVS: str = "miuzcollections_fav"
+NAME_ALL_COLLS: str = "___collections___"
+NAME_FAVS: str = "___favorites___"
 STAR_SYM = "\U00002605" + " "
 
 PIXMAP_SIZE_MAX = 200

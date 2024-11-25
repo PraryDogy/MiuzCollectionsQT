@@ -235,10 +235,12 @@ class MenuLeft(QTabWidget):
         super().__init__()
         self.setFixedWidth(MENU_LEFT_WIDTH)
         self.tabBarClicked.connect(self.cmd_)
+        self.menus: list[MenuLeftBase] = []
 
         for i in BRANDS:
             wid = MenuLeftBase(brand_ind=BRANDS.index(i))
             self.addTab(wid, i)
+            self.menus.append(wid)
 
         self.setCurrentIndex(JsonData.brand_ind)
 
@@ -246,6 +248,9 @@ class MenuLeft(QTabWidget):
         JsonData.brand_ind = index
         JsonData.curr_coll = NAME_ALL_COLLS
         Dynamic.grid_offset = 0
+
+        for i in self.menus:
+            i.setCurrentRow(0)
 
         SignalsApp.all_.win_main_cmd.emit("set_title")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
