@@ -255,6 +255,7 @@ class WinSettings(WinChild):
                 coll_folders = [
                     os.sep + i.strip().strip(os.sep)
                     for i in coll_folders
+                    if i
                 ]
                 JsonData.coll_folders[brand_ind] = coll_folders            
 
