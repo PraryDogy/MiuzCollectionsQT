@@ -4,35 +4,33 @@ import subprocess
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QSpacerItem,
-                             QTabWidget, QTextEdit, QWidget)
+from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QPushButton,
+                             QSpacerItem, QTabWidget, QTextEdit, QWidget)
 
 from base_widgets import CustomInput, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.wins import WinChild
 from cfg import APP_SUPPORT_DIR, BRANDS, DB_FILE, HASH_DIR, JsonData
 from lang import Lang
-from utils.scaner import Scaner
 from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
 
 from .actions import OpenWins
 
 
-class ChangeLang(QWidget):
+class ChangeLang(QGroupBox):
     _pressed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
         layout_h = LayoutHor()
+        layout_h.setSpacing(15)
         self.setLayout(layout_h)
 
         self.lang_btn = QPushButton(text=Lang._lang_name)
         self.lang_btn.setFixedWidth(150)
         self.lang_btn.clicked.connect(self.lng_cmd)
         layout_h.addWidget(self.lang_btn)
-
-        layout_h.addSpacerItem(QSpacerItem(10, 0))
 
         self.lang_label = QLabel(Lang.lang_label)
         layout_h.addWidget(self.lang_label)
@@ -43,6 +41,54 @@ class ChangeLang(QWidget):
         Lang.init()
         self.lang_btn.setText(Lang._lang_name)
         setattr(self, "flag", True)
+
+
+class SecondGroup(QGroupBox):
+    def __init__(self):
+        super().__init__()
+
+        h_layout = LayoutHor()
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        h_layout.setSpacing(15)
+        self.setLayout(h_layout)
+
+        self.updater_btn = QPushButton(text=Lang.download_update)
+        self.updater_btn.setFixedWidth(150)
+        self.updater_btn.clicked.connect(self.update_btn_cmd)
+        h_layout.addWidget(self.updater_btn)
+
+        self.show_files_btn = QPushButton(text=Lang.show_app_support)
+        self.show_files_btn.setFixedWidth(150)
+        self.show_files_btn.clicked.connect(self.show_files_cmd)
+        h_layout.addWidget(self.show_files_btn)
+
+    def show_files_cmd(self, *args):
+        try:
+            subprocess.Popen(["open", APP_SUPPORT_DIR])
+        except Exception as e:
+            print(e)
+
+    def update_btn_cmd(self, *args):
+        self.task = Updater()
+        self.updater_btn.setText(Lang.wait_update)
+        self.task.signals_.no_connection.connect(self.no_connection_win)
+        self.task.signals_.finished_.connect(self.finalize)
+        UThreadPool.pool.start(self.task)
+
+    def finalize(self):
+        self.updater_btn.setText(Lang.download_update)
+
+    def no_connection_win(self):
+        cmd_ = lambda: self.updater_btn.setText(Lang.download_update)
+
+        QTimer.singleShot(1000, cmd_)
+        OpenWins.smb(self.window())
+
+    def no_connection_btn_style(self):
+        cmd_ = lambda: self.updater_btn.setText(Lang.download_update)
+
+        self.updater_btn.setText(Lang.no_connection)
+        QTimer.singleShot(1500, cmd_)
 
 
 class CollFolderListInput(CustomTextEdit):
@@ -129,71 +175,24 @@ class BrandSett(QTabWidget):
         return wid
     
 
-class UpdaterWidget(QWidget):
+class RestoreBd(QGroupBox):
+    clicked_ = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
-        self.v_layout = LayoutVer()
-        self.setLayout(self.v_layout)
+        h_lay = LayoutHor()
+        h_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.setLayout(h_lay)
 
-        self.btn = QPushButton(text=Lang.download_update)
-        self.btn.setFixedWidth(150)
-        self.btn.clicked.connect(self.update_btn_cmd)
-        self.v_layout.addWidget(self.btn)
-
-    def update_btn_cmd(self, *args):
-        self.task = Updater()
-        self.btn.setText(Lang.wait_update)
-        self.task.signals_.no_connection.connect(self.no_connection_win)
-        self.task.signals_.finished_.connect(self.finalize)
-        UThreadPool.pool.start(self.task)
-
-    def finalize(self):
-        self.btn.setText(Lang.download_update)
-
-    def no_connection_win(self):
-        cmd_ = lambda: self.btn.setText(Lang.download_update)
-
-        QTimer.singleShot(1000, cmd_)
-        OpenWins.smb(self.window())
-
-    def no_connection_btn_style(self):
-        cmd_ = lambda: self.btn.setText(Lang.download_update)
-
-        self.btn.setText(Lang.no_connection)
-        QTimer.singleShot(1500, cmd_)
-
-
-class ShowFiles(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.v_layout = LayoutVer()
-        self.setLayout(self.v_layout)
-
-        self.btn = QPushButton(text=Lang.show_app_support)
-        self.btn.setFixedWidth(150)
-        self.btn.clicked.connect(self.btn_cmd)
-        self.v_layout.addWidget(self.btn)
-
-    def btn_cmd(self, *args):
-        try:
-            subprocess.Popen(["open", APP_SUPPORT_DIR])
-        except Exception as e:
-            print(e)
-
-
-class RestoreBtn(QPushButton):
-    _pressed = pyqtSignal()
-
-    def __init__(self):
-        super().__init__(text=Lang.restore_db)
-        self.setFixedWidth(150)
-        self.clicked.connect(self.cmd_)
+        self.restore_db_btn = QPushButton(Lang.restore_db)
+        self.restore_db_btn.setFixedWidth(150)
+        self.restore_db_btn.clicked.connect(self.cmd_)
+        h_lay.addWidget(self.restore_db_btn)
 
     def cmd_(self, *args):
-        self._pressed.emit()
         setattr(self, "flag", True)
+        self.clicked_.emit()
 
 
 class WinSettings(WinChild):
@@ -203,7 +202,7 @@ class WinSettings(WinChild):
         self.setWindowTitle(Lang.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 480)
+        self.setFixedSize(420, 500)
         self.setFocus()
 
         self.new_coll_path = None
@@ -211,41 +210,24 @@ class WinSettings(WinChild):
         self.need_reset = None
 
     def init_ui(self):
+        self.content_lay_v.setSpacing(10)
+
+        cmd_lang = lambda: self.ok_btn.setText(Lang.apply)
         self.change_lang = ChangeLang()
-        self.change_lang._pressed.connect(lambda: self.ok_btn.setText(Lang.apply))
-        self.content_lay_v.addWidget(self.change_lang, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
+        self.change_lang._pressed.connect(cmd_lang)
+        self.content_lay_v.addWidget(self.change_lang)
 
-        h_wid = QWidget()
-        self.content_lay_v.addWidget(h_wid, alignment=Qt.AlignmentFlag.AlignLeft)
-        h_layout = LayoutHor()
-        h_wid.setLayout(h_layout)
-        self.content_lay_v.addSpacerItem(QSpacerItem(0, 25))
+        self.second_group = SecondGroup()
+        self.content_lay_v.addWidget(self.second_group)
 
-        self.update_wid = UpdaterWidget()
-        h_layout.addWidget(self.update_wid)
-
-        show_files = ShowFiles()
-        h_layout.addWidget(show_files)
-
-
-        from PyQt5.QtWidgets import QHBoxLayout
-        test = QWidget()
-        self.content_lay_v.addWidget(test)
-        test_l = QHBoxLayout()
-        test_l.setContentsMargins(0, 0, 0, 0)
-        test.setLayout(test_l)
-
-        cmd_ = lambda: self.ok_btn.setText(Lang.apply)
-        self.restore_db_btn = RestoreBtn()
-        self.restore_db_btn._pressed.connect(cmd_)
-        test_l.addWidget(self.restore_db_btn, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.content_lay_v.addSpacerItem(QSpacerItem(0, 30))
+        self.restore_bd = RestoreBd()
+        self.restore_bd.clicked_.connect(self.ok_cmd)
+        self.content_lay_v.addWidget(self.restore_bd)
 
         self.brand_sett = BrandSett()
         self.content_lay_v.addWidget(self.brand_sett)
 
-        self.content_lay_v.addStretch()
+        # self.content_lay_v.addStretch()
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
