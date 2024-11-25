@@ -1,4 +1,4 @@
-from cfg import Filter, JsonData
+from cfg import JsonData
 
 
 class Lang_:
@@ -370,6 +370,11 @@ class Lang_:
         "with name"
     ]
 
+    from_new_row = [
+        "С новой строки",
+        "From the new row"
+    ]
+
 
 class Lang(Lang_):
 
@@ -392,11 +397,3 @@ class Lang(Lang_):
         for k, v in vars(Lang_).items():
             if isinstance(v, list):
                 setattr(cls, k, v[JsonData.lang_ind])
-
-        # if Filter.filters:
-        #     names_max = len(Filter.filters[0].names) - 1
-        #     if names_max != max_:
-        #         t = "You need add or remove names from cfg FILTERS"
-        #         raise Exception(t)
-        # else:
-        #     raise Exception("You need add at least one filter to cfg FILTERS")

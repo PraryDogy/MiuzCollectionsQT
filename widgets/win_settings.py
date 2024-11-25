@@ -115,8 +115,8 @@ class BrandSett(QTabWidget):
 
         stop_colls = "\n".join(JsonData.stop_colls[brand_ind])
         stop_colls_inp = CustomTextEdit()
+        stop_colls_inp.setPlaceholderText(Lang.from_new_row)
         stop_colls_inp.setPlainText(stop_colls)
-        stop_colls_inp.setLineWrapMode(QTextEdit.NoWrap)
         v_lay.addWidget(stop_colls_inp)
 
 
@@ -125,8 +125,8 @@ class BrandSett(QTabWidget):
 
         coll_folders = "\n".join(JsonData.coll_folders[brand_ind])
         coll_folders_inp = CustomTextEdit()
+        coll_folders_inp.setPlaceholderText(Lang.from_new_row)
         coll_folders_inp.setPlainText(coll_folders)
-        coll_folders_inp.setLineWrapMode(QTextEdit.NoWrap)
         v_lay.addWidget(coll_folders_inp)
 
         self.stop_colls_wid[brand_ind] = stop_colls_inp
