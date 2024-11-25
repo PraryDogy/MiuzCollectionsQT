@@ -113,34 +113,25 @@ class BrandSett(QTabWidget):
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         v_lay.addWidget(stop_colls_lbl)
 
-        stop_colls_inp = CustomInput()
-        stop_colls_inp.setPlaceholderText("Через запятую")
-        stop_colls_inp.insert(", ".join(JsonData.stop_colls[brand_ind]))
+        stop_colls = "\n".join(JsonData.stop_colls[brand_ind])
+        stop_colls_inp = CustomTextEdit()
+        stop_colls_inp.setPlainText(stop_colls)
+        stop_colls_inp.setLineWrapMode(QTextEdit.NoWrap)
         v_lay.addWidget(stop_colls_inp)
-
 
 
         coll_folders_lbl = QLabel(text=Lang.where_to_look_coll_folder)
         v_lay.addWidget(coll_folders_lbl)
 
+        coll_folders = "\n".join(JsonData.coll_folders[brand_ind])
         coll_folders_inp = CustomTextEdit()
-        coll_folders_inp.setPlaceholderText("Коллекции, каждая с новой строки")
+        coll_folders_inp.setPlainText(coll_folders)
         coll_folders_inp.setLineWrapMode(QTextEdit.NoWrap)
         v_lay.addWidget(coll_folders_inp)
 
-    
-        # h_bar = self.horizontalScrollBar()
-        # h_bar.setFixedHeight(0)
-        # coll_folders_inp.setFixedHeight(130)
-
-        text = "\n".join(JsonData.coll_folders[brand_ind])
-        coll_folders_inp.setText(text)
-
-        # v_lay.addStretch()
-
         self.stop_colls_wid[brand_ind] = stop_colls_inp
-        # self.coll_folders_wid.append(collfolders)
-
+        self.coll_folders_wid[brand_ind] = coll_folders_inp
+    
         return wid
     
     def get_stopcolls(self, wid: CustomInput):
