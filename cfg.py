@@ -4,8 +4,8 @@ import shutil
 import webbrowser
 from datetime import datetime
 
-APP_VER = 5.85
-APP_NAME: str = "MiuzCollections"
+APP_VER = 1.3
+APP_NAME: str = "Collections"
 BRANDS = ["miuz", "panacea"]
 
 GRID_LIMIT: int = 150
@@ -25,7 +25,7 @@ APP_SUPPORT_DIR: str = os.path.join(
     os.path.expanduser("~"),
     "Library",
     "Application Support",
-    APP_NAME + "QT"
+    APP_NAME
     )
 
 JSON_FILE: str = os.path.join(
