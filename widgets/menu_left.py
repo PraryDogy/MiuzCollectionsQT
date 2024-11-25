@@ -126,7 +126,7 @@ class LoadMenus(URunnable):
         return sorted(menus, key = lambda x: x["short_name"])
 
 
-class MenuLeftBase(QListWidget):
+class MenuTab(QListWidget):
     h_ = 30
 
     def __init__(self, brand_ind: int):
@@ -169,7 +169,7 @@ class MenuLeftBase(QListWidget):
         cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
         all_colls_btn.pressed_.connect(cmd_)
         all_colls_item = QListWidgetItem()
-        all_colls_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeftBase.h_))
+        all_colls_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(all_colls_item)
         self.setItemWidget(all_colls_item, all_colls_btn)
 
@@ -181,12 +181,12 @@ class MenuLeftBase(QListWidget):
         favs_btn.pressed_.connect(cmd_)
 
         favs_item = QListWidgetItem()
-        favs_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeftBase.h_))
+        favs_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(favs_item)
         self.setItemWidget(favs_item, favs_btn)
 
         fake_item = QListWidgetItem()
-        fake_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeftBase.h_ // 2))
+        fake_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuTab.h_ // 2))
         fake_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
         self.addItem(fake_item)
 
@@ -207,7 +207,7 @@ class MenuLeftBase(QListWidget):
             coll_btn.pressed_.connect(cmd_)
 
             list_item = QListWidgetItem()
-            list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuLeftBase.h_))
+            list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuTab.h_))
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
@@ -218,17 +218,24 @@ class MenuLeftBase(QListWidget):
 class MenuLeft(QTabWidget):
     def __init__(self):
         super().__init__()
+
         self.setFixedWidth(MENU_LEFT_WIDTH)
         self.tabBarClicked.connect(self.tab_cmd)
-        self.menus: list[MenuLeftBase] = []
+        self.menus: list[MenuTab] = []
+
+        self.init_ui()
+        SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
+
+    def init_ui(self):
+        self.clear()
+        self.menus.clear()
 
         for i in BRANDS:
-            wid = MenuLeftBase(brand_ind=BRANDS.index(i))
+            wid = MenuTab(brand_ind=BRANDS.index(i))
             self.addTab(wid, i)
-            self.menus.append(wid)
-
+            self.menus.append(wid)\
+        
         self.setCurrentIndex(JsonData.brand_ind)
-        SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
 
     def tab_cmd(self, index: int):
         JsonData.brand_ind = index
@@ -250,12 +257,7 @@ class MenuLeft(QTabWidget):
         """
 
         if flag == "reload":
-            self.menus.clear()
-            # как удалить вкладки в tabbar
-            for i in BRANDS:
-                wid = MenuLeftBase(brand_ind=BRANDS.index(i))
-                self.addTab(wid, i)
-                self.menus.append(wid)
+            self.init_ui()
 
         elif flag == "select_all_colls":
             for i in self.menus:
