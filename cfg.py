@@ -110,8 +110,8 @@ TITLE_SOLID = f"""
 BRANDS: list = ["miuz", "panacea"]
 
 
-class Filter:
-    filters: list["Filter"] = []
+class Filters:
+    current: list["Filters"] = []
     __slots__ = ["names", "real", "value", "system"]
 
     def __init__(self, names: list, real: str, value: bool, system: bool):
@@ -119,14 +119,32 @@ class Filter:
         self.real = real
         self.value = value
         self.system = system
+    
+    @classmethod
+    def init_filters(cls):
+        filters = [
+            {
+                "names": ["Продукт", "Product"],
+                "real": "1 IMG", 
+                "value": False,
+                "system": False
+            },
+            {
+                "names": ["Модели", "Model"],
+                "real": "2 MODEL IMG", 
+                "value": False,
+                "system": False
+            },
+            {
+                "names": ["Остальное", "Other"],
+                "real": None, 
+                "value": False,
+                "system": True
+            },
+        ]
 
-    def get_data(self):
-        return {
-            "names": self.names,
-            "real": self.real,
-            "value": self.value,
-            "system": self.system
-        }
+        for i in filters:
+            Filters.current.append(Filters(**i))
 
 
 class JsonData:
@@ -189,27 +207,6 @@ class JsonData:
 
     coll_folder: str = coll_folders[0][0]
 
-    filters = [
-        {
-            "names": ["Продукт", "Product"],
-            "real": "1 IMG", 
-            "value": False,
-            "system": False
-        },
-        {
-            "names": ["Модели", "Model"],
-            "real": "2 MODEL IMG", 
-            "value": False,
-            "system": False
-        },
-        {
-            "names": ["Остальное", "Other"],
-            "real": None, 
-            "value": False,
-            "system": True
-        },
-    ]
-
     @classmethod
     def _get_data(cls):
         """returns user attibutes and values"""
@@ -240,9 +237,6 @@ class JsonData:
 
     @classmethod
     def write_json_data(cls):
-        cls._init_filters()
-        cls.filters = cls._get_filters()
-
         with open(JSON_FILE, 'w', encoding="utf-8") as f:
             json.dump(
                 obj=cls._get_data(),
@@ -250,20 +244,6 @@ class JsonData:
                 indent=4,
                 ensure_ascii=False
             )
-
-    @classmethod
-    def _init_filters(cls):
-        for i in cls.filters:
-            Filter.filters.append(
-                Filter(**i)
-            )
-
-    @classmethod
-    def _get_filters(cls):
-        return [
-            i.get_data()
-            for i in Filter.filters
-        ]
 
     @classmethod
     def _check_app_dirs(cls):
@@ -330,6 +310,7 @@ class JsonData:
         cls._check_app_dirs()
         cls._read_json_data()
         cls._compare_versions()
+        Filters.init_filters()
 
 
 class Dynamic:

@@ -3,7 +3,7 @@ from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextCustom, LayoutHor
-from cfg import (BORDERED_STYLE, NORMAL_STYLE, SOLID_STYLE, Dynamic, Filter,
+from cfg import (BORDERED_STYLE, NORMAL_STYLE, SOLID_STYLE, Dynamic, Filters,
                  JsonData)
 from lang import Lang
 from signals import SignalsApp
@@ -77,7 +77,7 @@ class DatesBtn(BarTopBtn):
 
 
 class FilterBtn(BarTopBtn):
-    def __init__(self, filter: Filter):
+    def __init__(self, filter: Filters):
         super().__init__(text=filter.names[JsonData.lang_ind])
 
         self.filter = filter
@@ -141,7 +141,7 @@ class BarTop(QWidget):
     def init_ui(self):
         self.filter_btns.clear()
 
-        for filter in Filter.filters:
+        for filter in Filters.current:
             label = FilterBtn(filter)
             self.filter_btns.append(label)
             self.h_layout.addWidget(
@@ -179,5 +179,5 @@ class BarTop(QWidget):
             i: FilterBtn
             i.set_normal_style()
 
-        for filter in Filter.filters:
+        for filter in Filters.current:
             filter.value = False

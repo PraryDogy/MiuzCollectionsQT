@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
                              QWidget)
 
 from base_widgets import LayoutHor, LayoutVer
-from cfg import NAME_ALL_COLLS, TITLE_NORMAL, Dynamic, Filter, JsonData
+from cfg import NAME_ALL_COLLS, TITLE_NORMAL, Dynamic, Filters, JsonData
 from lang import Lang
 from signals import SignalsApp
 
@@ -102,7 +102,7 @@ class AboveThumbsNoImages(QWidget):
 
         enabled_filters = [
             filter.names[JsonData.lang_ind]
-            for filter in Filter.filters
+            for filter in Filters.current
             if filter.value
             ]
 
