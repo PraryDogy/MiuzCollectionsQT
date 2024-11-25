@@ -337,7 +337,10 @@ class WinImageView(WinChild):
             return
         
         elif isinstance(data.pixmap, QPixmap):
-            self.image_label.set_image(data.pixmap)
+            try:
+                self.image_label.set_image(data.pixmap)
+            except RuntimeError:
+                ...
 
     def close_(self, *args):
         LoadImage.images.clear()
