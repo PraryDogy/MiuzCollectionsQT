@@ -8,9 +8,9 @@ from .context import ContextCustom
 
 
 class CustomContext(ContextCustom):
-    def __init__(self, parent: QTextEdit, event):
+    def __init__(self, parent_: QTextEdit, event: QContextMenuEvent):
         super().__init__(event=event)
-        self.my_parent = parent
+        self.parent_ = parent_
         self.setFixedWidth(120)
 
         sel = QAction(text=Lang.cut, parent=self)
@@ -26,19 +26,19 @@ class CustomContext(ContextCustom):
         self.addAction(sel_all)
 
     def copy_selection(self):
-        cur = self.my_parent.textCursor()
+        cur = self.parent_.textCursor()
         text = cur.selectedText().strip()
         Utils.copy_text(text)
 
     def cut_selection(self):
-        cur = self.my_parent.textCursor()
+        cur = self.parent_.textCursor()
         text = cur.selectedText().strip()
         Utils.copy_text(text)
         cur.removeSelectedText()
 
     def paste_text(self):
         text = Utils.paste_text()
-        self.my_parent.insert(text)
+        self.parent_.setPlainText(text)
 
 
 class CustomTextEdit(QTextEdit):
@@ -49,5 +49,5 @@ class CustomTextEdit(QTextEdit):
         super().__init__()
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        self.context_menu = CustomContext(parent=self, event=a0)
+        self.context_menu = CustomContext(parent_=self, event=a0)
         self.context_menu.show_menu()

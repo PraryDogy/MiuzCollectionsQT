@@ -18,7 +18,7 @@ from .actions import OpenWins
 
 
 class ChangeLang(QGroupBox):
-    _pressed = pyqtSignal()
+    clicked_ = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -37,7 +37,7 @@ class ChangeLang(QGroupBox):
           
     def lng_cmd(self, *args):
         JsonData.lang_ind += 1
-        self._pressed.emit()
+        self.clicked_.emit()
         Lang.init()
         self.lang_btn.setText(Lang._lang_name)
         setattr(self, "flag", True)
@@ -91,89 +91,72 @@ class SecondGroup(QGroupBox):
         QTimer.singleShot(1500, cmd_)
 
 
-class CollFolderListInput(CustomTextEdit):
-    def __init__(self, brand_ind: int):
-        super().__init__()
-        self.brand_ind = brand_ind
-
-        self.setPlaceholderText("Коллекции, каждая с новой строки")
-        self.setFixedHeight(130)
-        self.setLineWrapMode(QTextEdit.NoWrap)
-        h_bar = self.horizontalScrollBar()
-        h_bar.setFixedHeight(0)
-
-        text = "\n".join(JsonData.coll_folders[brand_ind])
-        self.setText(text)
-
-    def get_coll_folders_list(self):
-        text = self.toPlainText()
-        coll_folder_list = text.split("\n")
-
-        coll_folder_list = [
-            os.sep + i.strip().strip(os.sep)
-            for i in coll_folder_list
-            if i
-            ]
-        
-        return coll_folder_list
-
-
-class StopColls(QWidget):
-    def __init__(self, brand_ind: int):
-        super().__init__()
-        self.brand_ind = brand_ind
-
-        layout_v = LayoutVer()
-        layout_v.setSpacing(10)
-        self.setLayout(layout_v)
-
-        self.label = QLabel(Lang.sett_stopcolls)
-        layout_v.addWidget(self.label)
-
-        self.input = CustomInput()
-        self.input.setPlaceholderText("Через запятую")
-        self.input.insert(", ".join(JsonData.stop_colls[brand_ind]))
-        layout_v.addWidget(self.input)
-
-    def get_stopcolls(self):
-        text = self.input.text()
-        return [i.strip() for i in text.split(",")]
-
-
 class BrandSett(QTabWidget):
     def __init__(self):
         super().__init__()
-        self.stop_colls_wid: list[StopColls] = []
-        self.coll_folders_wid: list[CollFolderListInput] = []
+        self.stop_colls_wid: dict[int, CustomInput] = {}
+        self.coll_folders_wid: dict[int, CustomTextEdit] = {}
 
         for i in BRANDS:
-            wid = self.ui(brand_ind=BRANDS.index(i))
+            wid = self.brand_sett_ui(brand_ind=BRANDS.index(i))
             self.addTab(wid, i)
 
         self.setCurrentIndex(JsonData.brand_ind)
 
-    def ui(self, brand_ind: int):
+    def brand_sett_ui(self, brand_ind: int):
         wid = QWidget()
         v_lay = LayoutVer()
+        v_lay.setSpacing(10)
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         wid.setLayout(v_lay)
 
-        stopcolls = StopColls(brand_ind)
-        v_lay.addWidget(stopcolls)
-        # v_lay.addSpacerItem(QSpacerItem(0, 30))
-        self.stop_colls_wid.append(stopcolls)
+        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
+        v_lay.addWidget(stop_colls_lbl)
 
-        coll_folder_list_label = QLabel(text=Lang.where_to_look_coll_folder)
-        v_lay.addWidget(coll_folder_list_label)
-        # v_lay.addSpacerItem(QSpacerItem(0, 10))
+        stop_colls_inp = CustomInput()
+        stop_colls_inp.setPlaceholderText("Через запятую")
+        stop_colls_inp.insert(", ".join(JsonData.stop_colls[brand_ind]))
+        v_lay.addWidget(stop_colls_inp)
 
-        collfolders = CollFolderListInput(brand_ind)
-        v_lay.addWidget(collfolders)
-        # v_lay.addSpacerItem(QSpacerItem(0, 30))
-        self.coll_folders_wid.append(collfolders)
+
+
+        coll_folders_lbl = QLabel(text=Lang.where_to_look_coll_folder)
+        v_lay.addWidget(coll_folders_lbl)
+
+        coll_folders_inp = CustomTextEdit()
+        coll_folders_inp.setPlaceholderText("Коллекции, каждая с новой строки")
+        coll_folders_inp.setLineWrapMode(QTextEdit.NoWrap)
+        v_lay.addWidget(coll_folders_inp)
+
+    
+        # h_bar = self.horizontalScrollBar()
+        # h_bar.setFixedHeight(0)
+        # coll_folders_inp.setFixedHeight(130)
+
+        text = "\n".join(JsonData.coll_folders[brand_ind])
+        coll_folders_inp.setText(text)
+
+        # v_lay.addStretch()
+
+        self.stop_colls_wid[brand_ind] = stop_colls_inp
+        # self.coll_folders_wid.append(collfolders)
 
         return wid
     
+    def get_stopcolls(self, wid: CustomInput):
+        return [
+            i.strip()
+            for i in wid.text().split(",")
+            if i
+            ]
+
+    def get_coll_folders_list(self, wid: CustomTextEdit):
+        return [
+            os.sep + i.strip().strip(os.sep)
+            for i in wid.toPlainText().split("\n")
+            if i
+            ]
+
 
 class RestoreBd(QGroupBox):
     clicked_ = pyqtSignal()
@@ -214,7 +197,7 @@ class WinSettings(WinChild):
 
         cmd_lang = lambda: self.ok_btn.setText(Lang.apply)
         self.change_lang = ChangeLang()
-        self.change_lang._pressed.connect(cmd_lang)
+        self.change_lang.clicked_.connect(cmd_lang)
         self.content_lay_v.addWidget(self.change_lang)
 
         self.second_group = SecondGroup()
