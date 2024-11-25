@@ -227,8 +227,6 @@ class WinSettings(WinChild):
         self.brand_sett = BrandSett()
         self.content_lay_v.addWidget(self.brand_sett)
 
-        # self.content_lay_v.addStretch()
-
         btns_wid = QWidget()
         btns_layout = LayoutHor()
         btns_wid.setLayout(btns_layout)
