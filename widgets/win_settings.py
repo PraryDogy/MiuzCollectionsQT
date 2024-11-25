@@ -36,12 +36,9 @@ class ChangeLang(QGroupBox):
         layout_h.addWidget(self.lang_label)
           
     def lng_cmd(self, *args):
-        JsonData.lang_ind += 1
+        self.lang_btn.setText(Lang._lang_name)
         self.clicked_.emit()
         setattr(self, "flag", True)
-
-        Lang.init()
-        self.lang_btn.setText(Lang._lang_name)
 
 
 class SecondGroup(QGroupBox):
@@ -211,14 +208,14 @@ class WinSettings(WinChild):
         btns_layout.addStretch(1)
 
         self.ok_btn = QPushButton(text=Lang.ok)
-        self.ok_btn.setFixedWidth(90)
+        self.ok_btn.setFixedWidth(100)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_layout.addWidget(self.ok_btn)
 
         btns_layout.addSpacerItem(QSpacerItem(10, 0))
 
         self.cancel_btn = QPushButton(text=Lang.cancel)
-        self.cancel_btn.setFixedWidth(90)
+        self.cancel_btn.setFixedWidth(100)
         self.cancel_btn.clicked.connect(self.cancel_cmd)
         btns_layout.addWidget(self.cancel_btn)
 
@@ -241,6 +238,8 @@ class WinSettings(WinChild):
             Utils.start_new_app()
 
         elif hasattr(self.change_lang, "flag"):
+            JsonData.lang_ind += 1
+            Lang.init()
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
