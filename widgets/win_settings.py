@@ -124,12 +124,11 @@ class StopColls(QWidget):
         self.brand_ind = brand_ind
 
         layout_v = LayoutVer()
+        layout_v.setSpacing(10)
         self.setLayout(layout_v)
 
         self.label = QLabel(Lang.sett_stopcolls)
         layout_v.addWidget(self.label)
-
-        layout_v.addSpacerItem(QSpacerItem(0, 10))
 
         self.input = CustomInput()
         self.input.setPlaceholderText("Через запятую")
