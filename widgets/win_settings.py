@@ -155,20 +155,21 @@ class BrandSett(QTabWidget):
     def ui(self, brand_ind: int):
         wid = QWidget()
         v_lay = LayoutVer()
+        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         wid.setLayout(v_lay)
 
         stopcolls = StopColls(brand_ind)
         v_lay.addWidget(stopcolls)
-        v_lay.addSpacerItem(QSpacerItem(0, 30))
+        # v_lay.addSpacerItem(QSpacerItem(0, 30))
         self.stop_colls_wid.append(stopcolls)
 
         coll_folder_list_label = QLabel(text=Lang.where_to_look_coll_folder)
         v_lay.addWidget(coll_folder_list_label)
-        v_lay.addSpacerItem(QSpacerItem(0, 10))
+        # v_lay.addSpacerItem(QSpacerItem(0, 10))
 
         collfolders = CollFolderListInput(brand_ind)
         v_lay.addWidget(collfolders)
-        v_lay.addSpacerItem(QSpacerItem(0, 30))
+        # v_lay.addSpacerItem(QSpacerItem(0, 30))
         self.coll_folders_wid.append(collfolders)
 
         return wid
