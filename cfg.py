@@ -153,7 +153,6 @@ class JsonData:
     brand_ind = 0
     
     curr_size_ind: int = 0
-    curr_coll: str = NAME_ALL_COLLS
     
     imgview_g: dict = {
         "aw": 700,
@@ -320,3 +319,4 @@ class Dynamic:
     date_end_text: str = None # 31 january 1991
     grid_offset: int = 0
     search_widget_text: str = None
+    curr_coll_name = NAME_ALL_COLLS

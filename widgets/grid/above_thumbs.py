@@ -1,5 +1,3 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
                              QWidget)
 
@@ -66,7 +64,7 @@ class ShowAllBtn(ResetBtn):
 
     def cmd_(self, *args) -> None:
         Dynamic.date_start, Dynamic.date_end = None, None
-        JsonData.curr_coll = NAME_ALL_COLLS
+        Dynamic.curr_coll_name = NAME_ALL_COLLS
         Dynamic.grid_offset = 0
 
         SignalsApp.all_.wid_search_cmd.emit("clear")

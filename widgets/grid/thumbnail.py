@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QFrame, QLabel
 from base_widgets import LayoutVer
 from base_widgets.context import ContextCustom
 from cfg import (NAME_FAVS, NORMAL_STYLE, PIXMAP_SIZE, SOLID_STYLE, STAR_SYM,
-                 TEXT_LENGTH, THUMB_MARGIN, THUMB_W, JsonData)
+                 TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic, JsonData)
 from signals import SignalsApp
 from utils.utils import Utils
 
@@ -109,7 +109,7 @@ class Thumbnail(QFrame):
         self.name_label.name = self.name
         self.name_label.set_text()
 
-        if value == 0 and JsonData.curr_coll == NAME_FAVS:
+        if value == 0 and Dynamic.curr_coll_name == NAME_FAVS:
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:

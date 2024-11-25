@@ -6,8 +6,8 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import (GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, BRANDS, Dynamic, Filters,
-                 JsonData)
+from cfg import (BRANDS, GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic,
+                 Filters, JsonData)
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, Utils
@@ -107,11 +107,11 @@ class DbImages(URunnable):
                 q = q.where(i)
                 return q
 
-        if JsonData.curr_coll == NAME_FAVS:
+        if Dynamic.curr_coll_name == NAME_FAVS:
             stmt_where.append(THUMBS.c.fav == 1)
 
-        elif JsonData.curr_coll != NAME_ALL_COLLS:
-            stmt_where.append(THUMBS.c.coll == JsonData.curr_coll)
+        elif Dynamic.curr_coll_name != NAME_ALL_COLLS:
+            stmt_where.append(THUMBS.c.coll == Dynamic.curr_coll_name)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             t = self.combine_dates()

@@ -2,12 +2,14 @@ import os
 import subprocess
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal, QTimer
+from PyQt5.QtCore import QObject, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QLabel, QListWidget, QListWidgetItem, QTabWidget
+from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
+                             QTabWidget)
 
 from base_widgets import ContextCustom
-from cfg import MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData, BRANDS
+from cfg import (BRANDS, MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic,
+                 JsonData)
 from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -167,7 +169,7 @@ class MenuLeftBase(QListWidget):
         that was pressed.
         """
 
-        JsonData.curr_coll = btn.coll_name
+        Dynamic.curr_coll_name = btn.coll_name
         Dynamic.grid_offset = 0
         SignalsApp.all_.win_main_cmd.emit("set_title")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
@@ -205,10 +207,10 @@ class MenuLeftBase(QListWidget):
         fake_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
         self.addItem(fake_item)
 
-        if JsonData.curr_coll == NAME_ALL_COLLS:
+        if Dynamic.curr_coll_name == NAME_ALL_COLLS:
             self.setCurrentRow(self.row(all_colls_item))
 
-        elif JsonData.curr_coll == NAME_FAVS:
+        elif Dynamic.curr_coll_name == NAME_FAVS:
             self.setCurrentRow(self.row(favs_item))
 
 
@@ -226,7 +228,7 @@ class MenuLeftBase(QListWidget):
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
-            if JsonData.curr_coll == data.get("coll_name"):
+            if Dynamic.curr_coll_name == data.get("coll_name"):
                 self.setCurrentRow(self.row(list_item))
 
 
@@ -246,7 +248,7 @@ class MenuLeft(QTabWidget):
 
     def cmd_(self, index: int):
         JsonData.brand_ind = index
-        JsonData.curr_coll = NAME_ALL_COLLS
+        Dynamic.curr_coll_name = NAME_ALL_COLLS
         Dynamic.grid_offset = 0
 
         for i in self.menus:
