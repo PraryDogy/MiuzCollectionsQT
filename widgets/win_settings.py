@@ -228,7 +228,7 @@ class WinSettings(WinChild):
         self.close()
 
     def ok_cmd(self, *args):
-        if hasattr(self.restore_db_btn, "flag"):
+        if hasattr(self.restore_bd, "flag"):
             JsonData.write_json_data()
             QApplication.quit()
 
@@ -245,7 +245,7 @@ class WinSettings(WinChild):
             QApplication.quit()
             Utils.start_new_app()
 
-        if hasattr(self.brand_sett, "flag"):
+        elif hasattr(self.brand_sett, "flag"):
 
             for brand_ind, wid in self.brand_sett.stop_colls_wid.items():
                 stop_colls = self.setup_lined_text(wid=wid)
