@@ -6,8 +6,8 @@ from datetime import datetime
 
 APP_VER = 5.85
 APP_NAME: str = "MiuzCollections"
-
 BRANDS = ["miuz", "panacea"]
+
 GRID_LIMIT: int = 150
 LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
 MENU_LEFT_WIDTH: int = 210
