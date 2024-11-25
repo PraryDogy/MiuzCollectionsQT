@@ -38,9 +38,10 @@ class ChangeLang(QGroupBox):
     def lng_cmd(self, *args):
         JsonData.lang_ind += 1
         self.clicked_.emit()
+        setattr(self, "flag", True)
+
         Lang.init()
         self.lang_btn.setText(Lang._lang_name)
-        setattr(self, "flag", True)
 
 
 class SecondGroup(QGroupBox):
@@ -94,7 +95,7 @@ class SecondGroup(QGroupBox):
 class BrandSett(QTabWidget):
     def __init__(self):
         super().__init__()
-        self.stop_colls_wid: dict[int, CustomInput] = {}
+        self.stop_colls_wid: dict[int, CustomTextEdit] = {}
         self.coll_folders_wid: dict[int, CustomTextEdit] = {}
 
         for i in BRANDS:
@@ -117,6 +118,7 @@ class BrandSett(QTabWidget):
         stop_colls_inp = CustomTextEdit()
         stop_colls_inp.setPlaceholderText(Lang.from_new_row)
         stop_colls_inp.setPlainText(stop_colls)
+        stop_colls_inp.textChanged.connect(self.text_changed)
         v_lay.addWidget(stop_colls_inp)
 
 
@@ -127,12 +129,16 @@ class BrandSett(QTabWidget):
         coll_folders_inp = CustomTextEdit()
         coll_folders_inp.setPlaceholderText(Lang.from_new_row)
         coll_folders_inp.setPlainText(coll_folders)
+        coll_folders_inp.textChanged.connect(self.text_changed)
         v_lay.addWidget(coll_folders_inp)
 
         self.stop_colls_wid[brand_ind] = stop_colls_inp
         self.coll_folders_wid[brand_ind] = coll_folders_inp
     
         return wid
+    
+    def text_changed(self):
+        setattr(self, "flag", True)
     
     def get_stopcolls(self, wid: CustomInput):
         return [
@@ -179,10 +185,6 @@ class WinSettings(WinChild):
         self.setFixedSize(420, 500)
         self.setFocus()
 
-        self.new_coll_path = None
-        self.new_lang = None
-        self.need_reset = None
-
     def init_ui(self):
         self.content_lay_v.setSpacing(10)
 
@@ -227,7 +229,6 @@ class WinSettings(WinChild):
 
     def ok_cmd(self, *args):
         if hasattr(self.restore_db_btn, "flag"):
-            print("settings win restore db")
             JsonData.write_json_data()
             QApplication.quit()
 
@@ -240,31 +241,32 @@ class WinSettings(WinChild):
             Utils.start_new_app()
 
         elif hasattr(self.change_lang, "flag"):
-            print("settings win change lang")
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
 
-        for i in self.brand_sett.coll_folders_wid:
-            coll_folders = i.get_coll_folders_list()
+        if hasattr(self.brand_sett, "flag"):
 
-            if coll_folders != JsonData.coll_folders[i.brand_ind]:
-                setattr(self, "restart", True)
-                JsonData.coll_folders[i.brand_ind] = coll_folders
+            for brand_ind, wid in self.brand_sett.stop_colls_wid.items():
+                stop_colls = self.setup_lined_text(wid=wid)
+                JsonData.stop_colls[brand_ind] = stop_colls
 
-        for i in self.brand_sett.stop_colls_wid:
-            stop_colls = i.get_stopcolls()
+            for brand_ind, wid in self.brand_sett.coll_folders_wid.items():
+                coll_folders = self.setup_lined_text(wid=wid)
+                JsonData.coll_folders[brand_ind] = coll_folders            
 
-            if stop_colls != JsonData.stop_colls[i.brand_ind]:
-                setattr(self, "restart", True)
-                JsonData.stop_colls[i.brand_ind] = stop_colls
-
-        if hasattr(self, "restart"):
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
 
         self.close()
+
+    def setup_lined_text(self, wid: CustomTextEdit):
+        return[
+            os.sep + i.strip().strip(os.sep)
+            for i in wid.toPlainText().split("\n")
+            if i
+        ]
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
