@@ -134,24 +134,7 @@ class MenuLeftBase(QListWidget):
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.brand_ind = brand_ind
-        SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
         self.setup_task()
-
-    def menu_left_cmd(self, flag: str):
-        """
-        Handles the signal `SignalsApp.all_.menu_left_cmd` with a flag.
-        
-        :param flag: Allowed values are "one" and "two".
-        """
-
-        if flag == "reload":
-            self.setup_task()
-
-        elif flag == "select_all_colls":
-            self.setCurrentRow(0)
-
-        else:
-            raise Exception("widgets > menu left > wrong flag", flag)
 
     def setup_task(self):
         self.task_ = LoadMenus(brand_ind=self.brand_ind)
@@ -236,7 +219,7 @@ class MenuLeft(QTabWidget):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(MENU_LEFT_WIDTH)
-        self.tabBarClicked.connect(self.cmd_)
+        self.tabBarClicked.connect(self.tab_cmd)
         self.menus: list[MenuLeftBase] = []
 
         for i in BRANDS:
@@ -245,8 +228,9 @@ class MenuLeft(QTabWidget):
             self.menus.append(wid)
 
         self.setCurrentIndex(JsonData.brand_ind)
+        SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
 
-    def cmd_(self, index: int):
+    def tab_cmd(self, index: int):
         JsonData.brand_ind = index
         Dynamic.curr_coll_name = NAME_ALL_COLLS
         Dynamic.grid_offset = 0
@@ -257,3 +241,25 @@ class MenuLeft(QTabWidget):
         SignalsApp.all_.win_main_cmd.emit("set_title")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
+    def menu_left_cmd(self, flag: str):
+        """
+        Handles the signal `SignalsApp.all_.menu_left_cmd` with a flag.
+        
+        :param flag: Allowed values are "one" and "two".
+        """
+
+        if flag == "reload":
+            self.menus.clear()
+            # как удалить вкладки в tabbar
+            for i in BRANDS:
+                wid = MenuLeftBase(brand_ind=BRANDS.index(i))
+                self.addTab(wid, i)
+                self.menus.append(wid)
+
+        elif flag == "select_all_colls":
+            for i in self.menus:
+                i.setCurrentRow(0)
+
+        else:
+            raise Exception("widgets > menu left > wrong flag", flag)
