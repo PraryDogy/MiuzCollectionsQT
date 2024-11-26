@@ -1,7 +1,8 @@
+import os
+
 import sqlalchemy
 
-from cfg import DB_FILE, JsonData
-import os
+from cfg import JsonData, Static
 
 METADATA = sqlalchemy.MetaData()
 
@@ -60,9 +61,9 @@ class Dbase:
 
     @classmethod
     def create_engine(cls):
-        if os.path.exists(DB_FILE):
+        if os.path.exists(Static.DB_FILE):
             cls.engine = sqlalchemy.create_engine(
-                f"sqlite:///{DB_FILE}",
+                f"sqlite:///{Static.DB_FILE}",
                 echo=cls._echo,
                 connect_args={
                     "check_same_thread": cls._same_thread,
