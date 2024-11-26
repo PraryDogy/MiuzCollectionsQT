@@ -16,7 +16,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
 
-from cfg import HASH_DIR, JsonData
+from cfg import HASH_DIR, JsonData, APP_SUPPORT_DIR
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
@@ -119,24 +119,34 @@ class Utils:
     @classmethod
     def create_hash_path(cls, full_src: str) -> str:
         new_name = hashlib.md5(full_src.encode('utf-8')).hexdigest() + ".jpg"
-        new_path = os.path.join(HASH_DIR, new_name[:2])
-        os.makedirs(new_path, exist_ok=True)
-        return os.path.join(new_path, new_name)
+        
+        new_folder = os.path.join(HASH_DIR, new_name[:2])
+        os.makedirs(new_folder, exist_ok=True)
+
+        return os.path.join(new_folder, new_name)
+
+    @classmethod
+    def get_short_hash_path(cls, full_hash_path: str):
+        return full_hash_path.replace(APP_SUPPORT_DIR, "")
     
     @classmethod
-    def write_image_hash(cls, hash_path: str, array_img: np.ndarray) -> bool:
+    def get_full_short_path(cls, short_hash_path: str):
+        return os.path.join(APP_SUPPORT_DIR, short_hash_path)
+
+    @classmethod
+    def write_image_hash(cls, full_hash_path: str, array_img: np.ndarray) -> bool:
         try:
             # array_img = ImageUtils.array_color(array_img, "RGB")
-            cv2.imwrite(hash_path, array_img)
+            cv2.imwrite(full_hash_path, array_img)
             return True
         except Exception as e:
             cls.print_err(error=e)
             return False
         
     @classmethod
-    def read_image_hash(cls, hash_path: str) -> np.ndarray | None:
+    def read_image_hash(cls, short_hash_path: str) -> np.ndarray | None:
         try:
-            array_img = cv2.imread(hash_path, cv2.IMREAD_UNCHANGED)
+            array_img = cv2.imread(short_hash_path, cv2.IMREAD_UNCHANGED)
             return cls.array_color(array_img, "BGR")
         except Exception as e:
             cls.print_err(error=e)

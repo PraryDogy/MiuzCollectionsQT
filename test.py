@@ -1,6 +1,6 @@
 from database import Dbase, THUMBS
 import sqlalchemy
-from cfg import JsonData
+from cfg import JsonData, APP_SUPPORT_DIR
 
 
 JsonData.init()
@@ -15,8 +15,8 @@ for id_, hash_path in res:
     values_ = {
         "id": id_,
         "hash_path": hash_path.replace(
-            "/Users/Loshkarev/Library/Application Support/MiuzCollectionsQT",
-            "/Users/Loshkarev/Library/Application Support/Collections"
+            APP_SUPPORT_DIR,
+            ""
         )
     }
 
