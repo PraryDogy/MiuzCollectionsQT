@@ -120,7 +120,7 @@ class Grid(QScrollArea):
         if hasattr(self, "grids_widget"):
             self.grids_widget.deleteLater()
 
-        self.reset_widget_data()
+        self.reset_thumbnails_data()
         self.current_widgets.clear()
         self.up_btn.hide()
 
@@ -186,7 +186,7 @@ class Grid(QScrollArea):
 
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
 
-            self.add_widget_data(wid, self.all_grids_row, col)
+            self.add_thumbnails_data(wid, self.all_grids_row, col)
             self.current_widgets[grid_layout].append(wid)
             grid_layout.addWidget(wid, row, col)
 
@@ -200,10 +200,14 @@ class Grid(QScrollArea):
             self.all_grids_row += 1
 
     def setup_more_grids(self, db_images: dict[str, list[DbImage]]):
-
         if db_images:
             for date, db_images in db_images.items():
                 self.setup_single_grid(date, db_images)
+
+    def select_prev_widget(self):
+        wid = Thumbnail.path_to_wid.get(self.curr_short_src)
+        if wid:
+            self.select_new_widget(wid)
 
     def select_new_widget(self, data: tuple | str | Thumbnail):
         if isinstance(data, Thumbnail):
@@ -243,17 +247,19 @@ class Grid(QScrollArea):
         if isinstance(widget, Thumbnail):
             widget.regular_style()
             self.curr_cell: tuple = (0, 0)
+            self.curr_short_src = None
 
             if isinstance(BarBottom.path_label, QLabel):
                 BarBottom.path_label.setText("")
 
-    def add_widget_data(self, wid: Thumbnail, row: int, col: int):
+    def add_thumbnails_data(self, wid: Thumbnail, row: int, col: int):
         wid.row, wid.col = row, col
         self.cell_to_wid[row, col] = wid
         Thumbnail.path_to_wid[wid.short_src] = wid
 
-    def reset_widget_data(self):
+    def reset_thumbnails_data(self):
         self.curr_cell: tuple = (0, 0)
+        self.curr_short_src = None
         self.all_grids_row = 0
         self.cell_to_wid.clear()
         Thumbnail.path_to_wid.clear()
@@ -286,14 +292,14 @@ class Grid(QScrollArea):
         self.ww = self.width()
         self.columns = self.get_columns()
 
-        self.reset_widget_data()
+        self.reset_thumbnails_data()
 
         for grid_layout, widgets in self.current_widgets.items():
 
             row, col = 0, 0
 
             for wid in widgets:
-                self.add_widget_data(wid, self.all_grids_row, col)
+                self.add_thumbnails_data(wid, self.all_grids_row, col)
                 grid_layout.addWidget(wid, row, col)
 
                 col += 1
