@@ -67,7 +67,7 @@ class DbImages(URunnable):
             array_img = Utils.read_image_hash(hash_path)
 
             if array_img is None:
-                print("db images > create dict > can't load image")
+                print("thumbnails db dict > scan't load image", short_src)
                 continue
 
             else:

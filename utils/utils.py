@@ -175,7 +175,8 @@ class Utils:
             DelayedImportError
             ) as e:
 
-            Utils.print_err(error=e)
+            # Utils.print_err(error=e)
+            print("read_tiff error")
             print("try open tif with PIL")
             return cls.read_tiff_pil(full_src)
     
@@ -186,7 +187,8 @@ class Utils:
             img: Image = Image.open(full_src)
             return np.array(img)
         except Exception as e:
-            Utils.print_err(error=e)
+            # Utils.print_err(error=e)
+            print("read_tiff_pil error")
             return None
 
     @classmethod
@@ -202,7 +204,8 @@ class Utils:
             return img
 
         except Exception as e:
-            Utils.print_err(error=e)
+            print("read_psd error")
+            # Utils.print_err(error=e)
             return None
             
     @classmethod
@@ -211,7 +214,8 @@ class Utils:
             image = cv2.imread(full_src, cv2.IMREAD_UNCHANGED)
             return image
         except (Exception, cv2.error) as e:
-            Utils.print_err(error=e)
+            # Utils.print_err(error=e)
+            print("read jpg error")
             return None
         
     @classmethod
@@ -229,7 +233,8 @@ class Utils:
             return converted
         
         except Exception as e:
-            Utils.print_err(error=e)
+            print("read png error")
+            # Utils.print_err(error=e)
             return None
 
     @classmethod
@@ -267,7 +272,8 @@ class Utils:
         try:
             return cv2.cvtColor(img, colors)
         except Exception as e:
-            cls.print_err(error=e)
+            print("array_color")
+            # cls.print_err(error=e)
 
     @classmethod
     def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
