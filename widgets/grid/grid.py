@@ -160,7 +160,7 @@ class Grid(QScrollArea):
 
     def setup_single_grid(self, date: str, db_images: list[DbImage]):
         title_label = Title(title=date, db_images=db_images)
-        title_label.r_click.connect(self.reset_selection)
+        # title_label.r_click.connect(self.reset_selection)
         self.grids_layout.addWidget(title_label)
 
         grid_widget = QWidget()
@@ -276,6 +276,7 @@ class Grid(QScrollArea):
         self.rearrange()
 
     def rearrange(self):
+        prev_short_src: str = self.cell_to_wid[self.curr_cell].short_src
 
         if not hasattr(self, "first_load"):
             setattr(self, "first_load", True)
@@ -284,7 +285,6 @@ class Grid(QScrollArea):
         self.ww = self.width()
         self.columns = self.get_columns()
 
-        self.reset_selection()
         self.reset_widget_data()
 
         for grid_layout, widgets in self.current_widgets.items():
@@ -303,6 +303,9 @@ class Grid(QScrollArea):
 
             if len(widgets) % self.columns != 0:
                 self.all_grids_row += 1
+
+        if Thumbnail.path_to_wid.get(prev_short_src):
+            self.select_new_widget(Thumbnail.path_to_wid.get(prev_short_src))
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         wid: Thumbnail
