@@ -286,24 +286,25 @@ class Grid(QScrollArea):
         for wid in self.grid_wid.findChildren((Thumbnail, Title)):
 
             if isinstance(wid, Title):
+                self.col = 0
+                self.row += 1
                 wid.row, wid.col = self.row, self.col
                 self.cell_to_wid[self.row, self.col] = wid
-                self.row += 1
                 self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
+                self.row += 1
 
-            else:
+            elif isinstance(wid, Thumbnail):
                 wid.row, wid.col = self.row, self.col
                 self.cell_to_wid[self.row, self.col] = wid
                 Thumbnail.path_to_wid[wid.short_src] = wid
-                self.col += 1
                 self.grid_lay.addWidget(wid, self.row, self.col)
+                self.col += 1
 
             if self.col >= max_col:
                 self.col = 0
                 self.row += 1        
-
         
-        # self.select_prev_widget()
+        self.select_prev_widget()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
