@@ -3,18 +3,19 @@ import os
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QScrollArea,
-                             QSizePolicy, QWidget, QSpacerItem)
+                             QSizePolicy, QSpacerItem, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
-from cfg import MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, JsonData, Dynamic, GRID_LIMIT
+from cfg import (GRID_LIMIT, MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, Dynamic,
+                 JsonData)
 from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
 
 from ..actions import OpenWins, ScanerRestart
 from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
-from .above_thumbs import FilterTitle, ErrorTitle
-from .cell_widgets import Thumbnail, Title
+from .above_thumbs import ErrorTitle, FilterTitle
+from .cell_widgets import CellWid, Thumbnail, Title
 
 IMAGES = "images"
 UP_SVG = os.path.join(IMAGES, "up.svg")
@@ -196,7 +197,7 @@ class Grid(QScrollArea):
     def reset_curr_cell(self):
         self.curr_cell = (0, 0)
 
-    def set_coords(self, wid: Thumbnail | Title):
+    def set_coords(self, wid: CellWid):
         coords = self.row, self.col
         self.cell_to_wid[coords] = wid
         wid.row, wid.col = coords

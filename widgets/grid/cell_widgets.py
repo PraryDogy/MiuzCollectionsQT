@@ -19,13 +19,23 @@ from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, OpenWins,
 from ._db_images import DbImage
 
 
-class Title(QLabel):
+class CellWid:
+    def __init__(self):
+        super().__init__()
+        self.row = 0
+        self.col = 0
+
+
+class Title(QLabel, CellWid):
     r_click = pyqtSignal()
 
     def __init__(self, title: str, db_images: list[DbImage]):
-        super().__init__(f"{title}. {Lang.total}: {len(db_images)}")
+        CellWid.__init__(self)
+        QLabel.__init__(
+            self,
+            text=f"{title}. {Lang.total}: {len(db_images)}"
+        )
         self.db_images = db_images
-        self.row, self.col = 0, 0
 
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
@@ -155,12 +165,13 @@ class NameLabel(QLabel):
         self.setText(f"{coll}\n{name}")
 
 
-class Thumbnail(QFrame):
+class Thumbnail(QFrame, CellWid):
     select = pyqtSignal(str)
     path_to_wid: dict[str, "Thumbnail"] = {}
 
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
-        super().__init__()
+        CellWid.__init__(self)
+        QFrame.__init__(self)
         self.setStyleSheet(NORMAL_STYLE)
 
         self.img = pixmap
@@ -173,8 +184,6 @@ class Thumbnail(QFrame):
             self.name = os.path.basename(short_src)
         elif fav == 1:
             self.name = STAR_SYM + os.path.basename(short_src)
-        
-        self.row, self.col = 0, 0
 
         self.spacing = 5
         self.v_layout = LayoutVer()
