@@ -78,13 +78,10 @@ class Grid(QScrollArea):
 
     def signals_cmd(self, flag: str):
         if flag == "resize":
-            ...
             self.resize_thumbnails()
         elif flag == "to_top":
-            ...
-            # self.verticalScrollBar().setValue(0)
+            self.verticalScrollBar().setValue(0)
         elif flag == "reload":
-            # self.create_main_widget()
             self.load_db_data(flag="first")
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)

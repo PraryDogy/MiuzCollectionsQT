@@ -89,16 +89,16 @@ class CustomSlider(BaseSlider):
         )
         self.setFixedWidth(80)
         self.setValue(JsonData.curr_size_ind)
-        self.valueChanged.connect(self.change_size)
+
+        self.valueChanged.connect(self.move_slider_cmd)
         SignalsApp.all_.slider_change_value.connect(self.move_slider_cmd)
     
     def move_slider_cmd(self, value: int):
+        # Отключаем сигнал valueChanged
+        self.blockSignals(True)
         self.setValue(value)
-        JsonData.curr_size_ind = value
-        SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
-
-    def change_size(self, value: int):
-        self.setValue(value)
+        # Включаем сигнал обратно
+        self.blockSignals(False)
         JsonData.curr_size_ind = value
         SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
 
