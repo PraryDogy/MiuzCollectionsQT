@@ -156,9 +156,7 @@ class Grid(QScrollArea):
         title = Title(title=date, db_images=db_images)
         title.r_click.connect(self.deselect_wid)
 
-        coords = self.row, self.col
-        self.set_curr_sell(coords, title)
-        self.set_wid_coords(coords, title)
+        self.set_coords(title)
 
         self.grid_lay.addWidget(title, self.row, self.col, 1, max_col)
         self.row += 1
@@ -173,10 +171,7 @@ class Grid(QScrollArea):
             )
             wid.select.connect(lambda w=wid: self.select_wid(w))
 
-            coords = self.row, self.col
-            self.set_curr_sell(coords, wid)
-            self.set_wid_coords(coords, wid)
-
+            self.set_coords(wid)
             Thumbnail.path_to_wid[wid.short_src] = wid
 
             self.grid_lay.addWidget(wid, self.row, self.col)
@@ -202,10 +197,9 @@ class Grid(QScrollArea):
     def reset_curr_cell(self):
         self.curr_cell = (0, 0)
 
-    def set_curr_sell(self, coords: tuple, wid: Thumbnail | Title):
+    def set_coords(self, wid: Thumbnail, Title):
+        coords = self.row, self.col
         self.cell_to_wid[coords] = wid
-
-    def set_wid_coords(self, coords: tuple, wid: Thumbnail | Title):
         wid.row, wid.col = coords
 
     def select_old_wid(self):
@@ -303,18 +297,14 @@ class Grid(QScrollArea):
                 self.col = 0
                 self.row += 1
 
-                coords = self.row, self.col
-                self.set_curr_sell(coords, wid)
-                self.set_wid_coords(coords, wid)
+                self.set_coords(wid)
 
                 self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
                 self.row += 1
 
             elif isinstance(wid, Thumbnail):
 
-                coords = self.row, self.col
-                self.set_curr_sell(coords, wid)
-                self.set_wid_coords(coords, wid)
+                self.set_coords(wid)
 
                 Thumbnail.path_to_wid[wid.short_src] = wid
                 self.grid_lay.addWidget(wid, self.row, self.col)

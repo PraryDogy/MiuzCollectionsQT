@@ -1,10 +1,13 @@
-offset = 0
+class Test:
+    def __init__(self):
+        super().__init__()
 
+        self.row = 0
+        self.col = 0
 
-curr = (10, 0)
-new = (9, 0)
+a = Test()
 
-if curr > new:
-    print("up")
-else:
-    print("bottom")
+coords = (4, 4)
+a.row, a.col = coords
+
+print(a.row, a.col)
