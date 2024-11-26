@@ -106,7 +106,7 @@ class Grid(QScrollArea):
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
 
-        if hasattr(self, "grid_widget"):
+        if hasattr(self, "grid_wid"):
             self.grid_wid.deleteLater()
 
         self.curr_cell: tuple = (0, 0)
@@ -127,10 +127,10 @@ class Grid(QScrollArea):
 
         if not db_images:
             no_images = ErrorTitle()
-            # no_images.setSizePolicy(
-            #     QSizePolicy.Policy.Expanding,
-            #     QSizePolicy.Policy.Preferred
-            #     )
+            no_images.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Preferred
+                )
             self.grid_lay.addWidget(no_images, self.row, self.col, 1, max_col)
             self.row += 1
             return
@@ -154,7 +154,6 @@ class Grid(QScrollArea):
         max_col = self.get_max_col()
 
         self.col = 0
-        self.row += 1
         title = Title(title=date, db_images=db_images)
         title.r_click.connect(self.reset_selection)
         title.row, title.col = self.row, self.col
