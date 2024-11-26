@@ -220,13 +220,21 @@ class Grid(QScrollArea):
             new_wid = Thumbnail.path_to_wid.get(data)
             coords = new_wid.row, new_wid.col
 
-        if isinstance(new_wid, Thumbnail | Title):
+        if isinstance(new_wid, Title):
+            if self.curr_cell > coords:
+                offset = -1
+            else:
+                offset = 1
+            
+            data = (data[0] + offset, data[1])
+            self.select_new_widget(data)
+
+        elif isinstance(new_wid, Thumbnail):
             self.reset_selection()
             new_wid.selected_style()
-            self.curr_cell = coords
             self.ensureWidgetVisible(new_wid)
 
-        if isinstance(new_wid, Thumbnail):
+            self.curr_cell = coords
             self.curr_short_src = new_wid.short_src
 
             if isinstance(BarBottom.path_label, QLabel):

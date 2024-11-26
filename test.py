@@ -1,27 +1,10 @@
-from database import Dbase, THUMBS
-import sqlalchemy
-from cfg import JsonData, APP_SUPPORT_DIR
+offset = 0
 
 
-JsonData.init()
-Dbase.init()
+curr = (10, 0)
+new = (9, 0)
 
-conn = Dbase.engine.connect()
-
-q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash)
-res = conn.execute(q).fetchall()
-
-for id_, hash_path in res:
-    values_ = {
-        "id": id_,
-        "short_hash": hash_path.replace(
-            APP_SUPPORT_DIR,
-            ""
-        )
-    }
-
-    q = sqlalchemy.update(THUMBS).where(THUMBS.c.id == id_).values(**values_)
-    conn.execute(q)
-
-conn.commit()
-conn.close()
+if curr > new:
+    print("up")
+else:
+    print("bottom")
