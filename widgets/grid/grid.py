@@ -204,11 +204,6 @@ class Grid(QScrollArea):
         self.cell_to_wid[coords] = wid
         wid.row, wid.col = coords
 
-    def select_old_wid(self):
-        wid = self.get_curr_cell()
-        if wid:
-            self.select_wid(wid)
-
     def clear_grid_data(self):
         self.cell_to_wid.clear()
         Thumbnail.path_to_wid.clear()
@@ -296,6 +291,15 @@ class Grid(QScrollArea):
             return
 
         self.ww = self.width()
+
+        wid = self.get_curr_cell()
+        if wid:
+            src = wid.short_src
+        else:
+            src = None
+
+        self.deselect_wid()
+        self.reset_curr_cell()
         self.clear_grid_data()
 
         max_col = self.get_max_col()
@@ -323,9 +327,10 @@ class Grid(QScrollArea):
             if self.col >= max_col:
                 self.col = 0
                 self.row += 1        
-        
-        self.select_old_wid()
 
+        if src:
+            self.select_wid(src)
+        
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if (
             a0.modifiers() == Qt.KeyboardModifier.ControlModifier
