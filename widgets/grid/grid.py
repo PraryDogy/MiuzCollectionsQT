@@ -93,22 +93,16 @@ class Grid(QScrollArea):
             Dynamic.grid_offset = 0
             cmd_ = lambda db_images: self.create_grid(db_images)
 
-            # удали потом
-            self.task_ = DbImages()
-            self.task_.signals_.finished_.connect(cmd_)
-            UThreadPool.pool.start(self.task_)
-
         elif flag == "more":
-            ...
-            # Dynamic.grid_offset += GRID_LIMIT
-            # cmd_ = lambda db_images: self.grid_more(db_images)
+            Dynamic.grid_offset += GRID_LIMIT
+            cmd_ = lambda db_images: self.grid_more(db_images)
         
         else: 
             raise Exception("wrong flag", flag)
 
-        # self.task_ = DbImages()
-        # self.task_.signals_.finished_.connect(cmd_)
-        # UThreadPool.pool.start(self.task_)
+        self.task_ = DbImages()
+        self.task_.signals_.finished_.connect(cmd_)
+        UThreadPool.pool.start(self.task_)
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
 
@@ -117,7 +111,6 @@ class Grid(QScrollArea):
 
         self.curr_cell: tuple = (0, 0)
         self.curr_short_src = None
-        # self.current_widgets.clear()
         self.cell_to_wid.clear()
         Thumbnail.path_to_wid.clear()
         self.up_btn.hide()
@@ -151,13 +144,14 @@ class Grid(QScrollArea):
         self.row += 1
 
         for date, db_images in db_images.items():
-            self.single_grid(date, db_images, max_col)
+            self.single_grid(date, db_images)
             self.row += 1
             self.col = 0
 
         # scroll_wid.setFocus()
 
-    def single_grid(self, date: str, db_images: list[DbImage], max_col: int):
+    def single_grid(self, date: str, db_images: list[DbImage]):
+        max_col = self.get_max_col()
 
         title = Title(title=date, db_images=db_images)
         title.r_click.connect(self.reset_selection)
@@ -191,7 +185,7 @@ class Grid(QScrollArea):
     def grid_more(self, db_images: dict[str, list[DbImage]]):
         if db_images:
             for date, db_images in db_images.items():
-                self.grid_single(date, db_images)
+                self.single_grid(date, db_images)
 
     def select_prev_widget(self):
         """
