@@ -225,10 +225,8 @@ class Grid(QScrollArea):
             new_wid = Thumbnail.path_to_wid.get(data)
             coords = new_wid.row, new_wid.col
 
-        prev_wid = self.cell_to_wid.get(self.curr_cell)
-
         if isinstance(new_wid, Thumbnail):
-            prev_wid.regular_style()
+            self.reset_selection()
             new_wid.selected_style()
 
             self.curr_cell = coords
@@ -239,12 +237,6 @@ class Grid(QScrollArea):
             if isinstance(BarBottom.path_label, QLabel):
                 t = f"{new_wid.collection}: {new_wid.name}"
                 BarBottom.path_label.setText(t)
-
-        else:
-            try:
-                prev_wid.selected_style()
-            except AttributeError:
-                pass
 
     def reset_selection(self):
         widget = Thumbnail.path_to_wid.get(self.curr_short_src)
