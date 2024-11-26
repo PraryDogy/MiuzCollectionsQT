@@ -60,19 +60,16 @@ class Grid(QScrollArea):
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         # self.current_widgets: dict[QGridLayout, list[Thumbnail]] = {}
 
-        # Создаем фрейм для виджетов в области скролла
-        self.main_wid = QWidget(parent=self)
-        self.setWidget(self.main_wid)
+        scroll_wid = QWidget(parent=self)
+        self.setWidget(scroll_wid)
         
-        self.main_layout = LayoutVer()
-        self.main_wid.setLayout(self.main_layout)
+        self.scroll_layout = LayoutVer()
+        scroll_wid.setLayout(self.scroll_layout)
 
-        self.up_btn = UpBtn(self.main_wid)
+        self.up_btn = UpBtn(scroll_wid)
         self.up_btn.hide()
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
-        # self.max_col = self.get_max_col()
-        # self.create_main_widget()
         self.signals_cmd(flag="reload")
 
         SignalsApp.all_.thumbnail_select.connect(self.select_new_widget)
@@ -82,7 +79,7 @@ class Grid(QScrollArea):
     def signals_cmd(self, flag: str):
         if flag == "resize":
             ...
-            # self.resize_thumbnails()
+            self.resize_thumbnails()
         elif flag == "to_top":
             ...
             # self.verticalScrollBar().setValue(0)
@@ -119,7 +116,7 @@ class Grid(QScrollArea):
     def create_grid(self, db_images: dict[str, list[DbImage]]):
 
         if hasattr(self, "grid_widget"):
-            self.grid_widget.deleteLater()
+            self.grid_wid.deleteLater()
 
         self.curr_cell: tuple = (0, 0)
         self.curr_short_src = None
@@ -128,12 +125,12 @@ class Grid(QScrollArea):
         Thumbnail.path_to_wid.clear()
         self.up_btn.hide()
 
-        grid_widget = QWidget()
-        self.main_layout.addWidget(grid_widget)
+        self.grid_wid = QWidget()
+        self.scroll_layout.addWidget(self.grid_wid)
 
         self.grid_lay = QGridLayout()
         self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-        grid_widget.setLayout(self.grid_lay)
+        self.grid_wid.setLayout(self.grid_lay)
 
         self.row, self.col = 0, 0
         max_col = self.get_max_col()
@@ -161,7 +158,7 @@ class Grid(QScrollArea):
             self.row += 1
             self.col = 0
 
-        # self.main_wid.setFocus()
+        # scroll_wid.setFocus()
 
     def single_grid(self, date: str, db_images: list[DbImage], max_col: int):
 
@@ -267,13 +264,14 @@ class Grid(QScrollArea):
 
     def resize_thumbnails(self):
         "изменение размера Thumbnail"
-        for grid_layout, widgets in self.current_widgets.items():
-            for widget in widgets:
-                widget.setup()
+        thumbnails = self.grid_wid.findChildren(Thumbnail)
+
+        for thumb in thumbnails:
+            thumb.setup()
+
         self.rearrange()
 
     def rearrange(self):
-        return
         "перетасовка сетки"
 
         if not hasattr(self, "first_load"):
@@ -281,36 +279,33 @@ class Grid(QScrollArea):
             return
 
         self.ww = self.width()
-        self.max_col = self.get_max_col()
-
-        # посколько это просто перетасовка
-        # то есть все те же виджеты что были но в другом порядке
-        self.all_grids_row = 0
         self.cell_to_wid.clear()
         Thumbnail.path_to_wid.clear()
 
-        for grid_layout, widgets in self.current_widgets.items():
+        max_col = self.get_max_col()
+        self.row, self.col = 0, 0
 
-            row, col = 0, 0
+        for wid in self.grid_wid.findChildren((Thumbnail, Title)):
 
-            for wid in widgets:
+            if isinstance(wid, Title):
+                wid.row, wid.col = self.row, self.col
+                self.cell_to_wid[self.row, self.col] = wid
+                self.row += 1
+                self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
 
-                wid.row, wid.col = row, col
-                self.cell_to_wid[row, col] = wid
+            else:
+                wid.row, wid.col = self.row, self.col
+                self.cell_to_wid[self.row, self.col] = wid
                 Thumbnail.path_to_wid[wid.short_src] = wid
+                self.col += 1
+                self.grid_lay.addWidget(wid, self.row, self.col)
 
-                grid_layout.addWidget(wid, row, col)
+            if self.col >= max_col:
+                self.col = 0
+                self.row += 1        
 
-                col += 1
-                if col >= self.max_col:
-                    col = 0
-                    row += 1
-                    self.all_grids_row += 1
-
-            if len(widgets) % self.max_col != 0:
-                self.all_grids_row += 1
         
-        self.select_prev_widget()
+        # self.select_prev_widget()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
