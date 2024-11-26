@@ -59,7 +59,6 @@ class Grid(QScrollArea):
         self.curr_short_src: str = None
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.current_widgets: dict[QGridLayout, list[Thumbnail]] = {}
-        Thumbnail.path_to_wid.clear()
 
         # Создаем фрейм для виджетов в области скролла
         self.main_wid = QWidget(parent=self)
@@ -73,19 +72,19 @@ class Grid(QScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         self.columns = self.get_columns()
-        self.setup_grids_widget()
+        self.create_main_widget()
 
         SignalsApp.all_.thumbnail_select.connect(self.select_new_widget)
-        SignalsApp.all_.grid_thumbnails_cmd.connect(self.grid_thumbnails_cmd)
+        SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
 
-    def grid_thumbnails_cmd(self, flag: str):
+    def signals_cmd(self, flag: str):
         if flag == "resize":
             self.resize_()
         elif flag == "to_top":
             self.verticalScrollBar().setValue(0)
         elif flag == "reload":
-            self.setup_grids_widget()
+            self.create_main_widget()
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)
 
@@ -101,21 +100,21 @@ class Grid(QScrollArea):
             self.up_btn.hide()
 
         if value == self.verticalScrollBar().maximum():
-            self.load_db_images("more")
+            self.load_db_data("more")
 
-    def load_db_images(self, flag: str):
+    def load_db_data(self, flag: str):
         """flag: first, more"""
 
         if flag == "first":
-            cmd_ = lambda db_images: self.setup_db_images(db_images)
+            cmd_ = lambda db_images: self.grid_first(db_images)
         elif flag == "more":
-            cmd_ = lambda db_images: self.setup_more_grids(db_images)
+            cmd_ = lambda db_images: self.grid_more(db_images)
 
         self.task_ = DbImages()
         self.task_.signals_.finished_.connect(cmd_)
         UThreadPool.pool.start(self.task_)
 
-    def setup_grids_widget(self):
+    def create_main_widget(self):
         
         if hasattr(self, "grids_widget"):
             self.grids_widget.deleteLater()
@@ -131,9 +130,9 @@ class Grid(QScrollArea):
         self.grids_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.grids_widget.setLayout(self.grids_layout)
 
-        self.load_db_images("first")
+        self.load_db_data("first")
 
-    def setup_db_images(self, db_images: dict[str, list[DbImage]]):
+    def grid_first(self, db_images: dict[str, list[DbImage]]):
 
         Dynamic.grid_offset = 0
 
@@ -147,7 +146,7 @@ class Grid(QScrollArea):
             self.grids_layout.addWidget(above_thumbs)
 
             for date, db_images in db_images.items():
-                self.setup_single_grid(date, db_images)
+                self.grid_single(date, db_images)
 
         else:
             no_images = AboveThumbsNoImages()
@@ -160,9 +159,9 @@ class Grid(QScrollArea):
         self.main_layout.addWidget(self.grids_widget)
         self.main_wid.setFocus()
 
-    def setup_single_grid(self, date: str, db_images: list[DbImage]):
+    def grid_single(self, date: str, db_images: list[DbImage]):
         title_label = Title(title=date, db_images=db_images)
-        # title_label.r_click.connect(self.reset_selection)
+        title_label.r_click.connect(self.reset_selection)
         self.grids_layout.addWidget(title_label)
 
         grid_widget = QWidget()
@@ -201,13 +200,16 @@ class Grid(QScrollArea):
         if len(db_images) % self.columns != 0:
             self.all_grids_row += 1
 
-    def setup_more_grids(self, db_images: dict[str, list[DbImage]]):
+    def grid_more(self, db_images: dict[str, list[DbImage]]):
         Dynamic.grid_offset += GRID_LIMIT
         if db_images:
             for date, db_images in db_images.items():
-                self.setup_single_grid(date, db_images)
+                self.grid_single(date, db_images)
 
     def select_prev_widget(self):
+        """
+        после изменения сетки попытаться найти виджет из предыдущей сетки
+        """
         wid = Thumbnail.path_to_wid.get(self.curr_short_src)
         if wid:
             self.select_new_widget(wid)
@@ -230,8 +232,10 @@ class Grid(QScrollArea):
         if isinstance(new_wid, Thumbnail):
             prev_wid.regular_style()
             new_wid.selected_style()
+
             self.curr_cell = coords
             self.curr_short_src = new_wid.short_src
+
             self.ensureWidgetVisible(new_wid)
 
             if isinstance(BarBottom.path_label, QLabel):
@@ -245,12 +249,12 @@ class Grid(QScrollArea):
                 pass
 
     def reset_selection(self):
-        widget = self.cell_to_wid.get(self.curr_cell)
+        widget = Thumbnail.path_to_wid.get(self.curr_short_src)
 
         if isinstance(widget, Thumbnail):
             widget.regular_style()
-            self.curr_cell: tuple = (0, 0)
-            self.curr_short_src = None
+            # self.curr_cell: tuple = (0, 0)
+            # self.curr_short_src = None
 
             if isinstance(BarBottom.path_label, QLabel):
                 BarBottom.path_label.setText("")
@@ -286,8 +290,6 @@ class Grid(QScrollArea):
         self.rearrange()
 
     def rearrange(self):
-        prev_short_src: str = self.cell_to_wid[self.curr_cell].short_src
-
         if not hasattr(self, "first_load"):
             setattr(self, "first_load", True)
             return
@@ -313,9 +315,6 @@ class Grid(QScrollArea):
 
             if len(widgets) % self.columns != 0:
                 self.all_grids_row += 1
-
-        if Thumbnail.path_to_wid.get(prev_short_src):
-            self.select_new_widget(Thumbnail.path_to_wid.get(prev_short_src))
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         wid: Thumbnail
