@@ -1,14 +1,28 @@
-test = [i for i in range(0, 50)]
+from PyQt5.QtWidgets import *
 
-offset = -1
-current_index = 0
-new_index = current_index + offset
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
 
-if new_index > len(test):
-    new_index = 0
+    def init_ui(self):
 
-elif new_index < 0:
-    new_index = len(test)
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.button = QPushButton("Change it!", self)
+        self.button.clicked.connect(self.change_label)
+        layout.addWidget(self.button)
+
+        self.label = QLabel(self)
+        self.label.setText("I'm going to change and get bigger!")
+        layout.addWidget(self.label)
+
+    def change_label(self):
+        self.label.setText("I'm bigger then I was before, unfortunately I'm not fully shown. Can you help me? :)")
 
 
-print(new_index)
+app = QApplication([])
+main = MainWindow()
+main.show()
+app.exec()
