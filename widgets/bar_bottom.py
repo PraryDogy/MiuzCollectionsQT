@@ -1,8 +1,9 @@
 import os
 
 from PyQt5.QtCore import QEvent, Qt, pyqtSignal
-from PyQt5.QtGui import QMouseEvent, QPalette, QWheelEvent
-from PyQt5.QtWidgets import QApplication, QLabel, QSlider, QWidget
+from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
+                         QWheelEvent)
+from PyQt5.QtWidgets import QApplication, QLabel, QSizePolicy, QSlider, QWidget
 
 from base_widgets import LayoutHor, SvgBtn
 from cfg import JsonData
@@ -102,6 +103,21 @@ class CustomSlider(BaseSlider):
         SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
 
 
+class MyLabel(QLabel):
+    def paintEvent(self, a0: QPaintEvent | None) -> None:
+        painter = QPainter(self)
+
+        metrics = QFontMetrics(self.font())
+        elided = metrics.elidedText(
+            self.text(),
+            Qt.TextElideMode.ElideNone,
+            self.width()
+        )
+
+        painter.drawText(self.rect(), self.alignment(), elided)
+        return super().paintEvent(a0)
+
+
 class BarBottom(QWidget):
     path_label: QLabel = None
 
@@ -119,8 +135,12 @@ class BarBottom(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        path_label = QLabel("")
-        self.h_layout.addWidget(path_label, alignment=Qt.AlignmentFlag.AlignLeft)
+        path_label = MyLabel("")
+        path_label.setMinimumWidth(1)
+        self.h_layout.addWidget(
+            path_label,
+            alignment=Qt.AlignmentFlag.AlignLeft
+        )
         BarBottom.path_label = path_label
 
         self.h_layout.addStretch()
