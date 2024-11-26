@@ -6,9 +6,7 @@ from PyQt5.QtWidgets import QAction, QApplication, QFrame, QLabel, QSizePolicy
 
 from base_widgets import ContextCustom, LayoutVer
 from base_widgets.context import ContextCustom
-from cfg import (NAME_FAVS, NORMAL_STYLE, PIXMAP_SIZE, PSD_TIFF, SOLID_STYLE,
-                 STAR_SYM, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, TITLE_NORMAL,
-                 TITLE_SOLID, Dynamic, JsonData)
+from cfg import Dynamic, JsonData, Static
 from lang import Lang
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
@@ -42,7 +40,7 @@ class Title(QLabel, CellWid):
             QSizePolicy.Policy.Preferred
             )
 
-        self.setStyleSheet(TITLE_NORMAL)
+        self.setStyleSheet(Static.TITLE_NORMAL)
 
     def save_cmd(self, is_layers: bool, save_as: bool):
 
@@ -54,13 +52,13 @@ class Title(QLabel, CellWid):
                 images = [
                     Utils.get_full_src(coll_folder, i.short_src)
                     for i in self.db_images
-                    if i.short_src.endswith(PSD_TIFF)
+                    if i.short_src.endswith(Static.PSD_TIFF)
                     ]
             else:
                 images = [
                     Utils.get_full_src(coll_folder, i.short_src)
                     for i in self.db_images
-                    if not i.short_src.endswith(PSD_TIFF)
+                    if not i.short_src.endswith(Static.PSD_TIFF)
                     ]
 
             if save_as:
@@ -104,10 +102,10 @@ class Title(QLabel, CellWid):
             SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
     def selected_style(self):
-        self.setStyleSheet(TITLE_SOLID)
+        self.setStyleSheet(Static.TITLE_SOLID)
 
     def regular_style(self):
-        self.setStyleSheet(TITLE_NORMAL)
+        self.setStyleSheet(Static.TITLE_NORMAL)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.r_click.emit()
@@ -148,7 +146,7 @@ class NameLabel(QLabel):
         self.coll = coll
 
     def set_text(self):
-        max_row = TEXT_LENGTH[JsonData.curr_size_ind]
+        max_row = Static.TEXT_LENGTH[JsonData.curr_size_ind]
 
         if len(self.name) >= max_row:
             name = f"{self.name[:max_row - 10]}...{self.name[-7:]}"
@@ -172,7 +170,7 @@ class Thumbnail(QFrame, CellWid):
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         CellWid.__init__(self)
         QFrame.__init__(self)
-        self.setStyleSheet(NORMAL_STYLE)
+        self.setStyleSheet(Static.NORMAL_STYLE)
 
         self.img = pixmap
         self.short_src = short_src
@@ -182,7 +180,7 @@ class Thumbnail(QFrame, CellWid):
         if fav == 0 or fav is None:
             self.name = os.path.basename(short_src)
         elif fav == 1:
-            self.name = STAR_SYM + os.path.basename(short_src)
+            self.name = Static.STAR_SYM + os.path.basename(short_src)
 
         self.spacing = 5
         self.v_layout = LayoutVer()
@@ -203,24 +201,24 @@ class Thumbnail(QFrame, CellWid):
 
     def setup(self):
         name_label_h = 35
-        thumb_h = PIXMAP_SIZE[JsonData.curr_size_ind] + name_label_h + THUMB_MARGIN + self.spacing
-        thumb_w = THUMB_W[JsonData.curr_size_ind] + THUMB_MARGIN
+        thumb_h = Static.PIXMAP_SIZE[JsonData.curr_size_ind] + name_label_h + Static.THUMB_MARGIN + self.spacing
+        thumb_w = Static.THUMB_W[JsonData.curr_size_ind] + Static.THUMB_MARGIN
 
-        self.img_label.setFixedHeight(PIXMAP_SIZE[JsonData.curr_size_ind])
+        self.img_label.setFixedHeight(Static.PIXMAP_SIZE[JsonData.curr_size_ind])
         self.name_label.setFixedHeight(name_label_h)
 
         self.setFixedSize(thumb_w, thumb_h)
 
-        pixmap = Utils.pixmap_scale(self.img, PIXMAP_SIZE[JsonData.curr_size_ind])
+        pixmap = Utils.pixmap_scale(self.img, Static.PIXMAP_SIZE[JsonData.curr_size_ind])
         self.img_label.setPixmap(pixmap)
 
         self.name_label.set_text()
 
     def selected_style(self):
-        self.setStyleSheet(SOLID_STYLE)
+        self.setStyleSheet(Static.SOLID_STYLE)
 
     def regular_style(self):
-        self.setStyleSheet(NORMAL_STYLE)
+        self.setStyleSheet(Static.NORMAL_STYLE)
 
     def change_fav(self, value: int):
         if value == 0:
@@ -228,12 +226,13 @@ class Thumbnail(QFrame, CellWid):
             self.name = os.path.basename(self.short_src)
         elif value == 1:
             self.fav_value = value
-            self.name = STAR_SYM + os.path.basename(self.short_src)
+            self.name = Static.STAR_SYM + os.path.basename(self.short_src)
 
         self.name_label.name = self.name
         self.name_label.set_text()
 
-        if value == 0 and Dynamic.curr_coll_name == NAME_FAVS:
+        # удаляем из избранного и если это избранные то обновляем сетку
+        if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:

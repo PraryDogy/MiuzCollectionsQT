@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
                              QWidget)
 
 from base_widgets import LayoutHor, LayoutVer
-from cfg import NAME_ALL_COLLS, TITLE_NORMAL, Dynamic, Filters, JsonData
+from cfg import Dynamic, Filters, JsonData, Static
 from lang import Lang
 from signals import SignalsApp
 
@@ -64,7 +64,7 @@ class ShowAllBtn(ResetBtn):
 
     def cmd_(self, *args) -> None:
         Dynamic.date_start, Dynamic.date_end = None, None
-        Dynamic.curr_coll_name = NAME_ALL_COLLS
+        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
 
         SignalsApp.all_.wid_search_cmd.emit("clear")
@@ -85,7 +85,7 @@ class ErrorTitle(QWidget):
         self.setLayout(self.v_layout)
 
         title = QLabel()
-        title.setStyleSheet(TITLE_NORMAL)
+        title.setStyleSheet(Static.TITLE_NORMAL)
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Preferred
@@ -140,7 +140,7 @@ class FilterTitle(QWidget):
         self.setLayout(self.v_layout)
 
         title = QLabel()
-        title.setStyleSheet(TITLE_NORMAL)
+        title.setStyleSheet(Static.TITLE_NORMAL)
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Preferred

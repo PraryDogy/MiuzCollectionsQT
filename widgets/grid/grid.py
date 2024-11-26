@@ -6,8 +6,7 @@ from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QScrollArea,
                              QSizePolicy, QSpacerItem, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
-from cfg import (GRID_LIMIT, MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, Dynamic,
-                 JsonData)
+from cfg import Dynamic, JsonData, Static
 from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
 
@@ -46,8 +45,8 @@ class Grid(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
-        self.resize(JsonData.root_g["aw"] - MENU_LEFT_WIDTH, JsonData.root_g["ah"])
-        self.ww = JsonData.root_g["aw"] - MENU_LEFT_WIDTH
+        self.resize(JsonData.root_g["aw"] - Static.MENU_LEFT_WIDTH, JsonData.root_g["ah"])
+        self.ww = JsonData.root_g["aw"] - Static.MENU_LEFT_WIDTH
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
@@ -94,7 +93,7 @@ class Grid(QScrollArea):
             cmd_ = lambda db_images: self.create_grid(db_images)
 
         elif flag == "more":
-            Dynamic.grid_offset += GRID_LIMIT
+            Dynamic.grid_offset += Static.GRID_LIMIT
             cmd_ = lambda db_images: self.grid_more(db_images)
         
         else: 
@@ -274,7 +273,7 @@ class Grid(QScrollArea):
 
     def get_max_col(self):
         return max(
-            self.ww // (THUMB_W[JsonData.curr_size_ind] + (THUMB_MARGIN)),
+            self.ww // (Static.THUMB_W[JsonData.curr_size_ind] + (Static.THUMB_MARGIN)),
             1
         )
 

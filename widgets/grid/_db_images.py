@@ -6,8 +6,7 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import (BRANDS, GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic,
-                 Filters, JsonData, APP_SUPPORT_DIR)
+from cfg import Dynamic, Filters, JsonData, Static
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, Utils
@@ -53,7 +52,7 @@ class DbImages(URunnable):
             res: list[tuple[str, str, int, str, int]]
             ) -> dict[str, list[DbImage]] | dict:
         
-        res = res[-(GRID_LIMIT):]
+        # res = res[-(Static.GRID_LIMIT):]
 
         thumbs_dict = defaultdict(list[DbImage])
 
@@ -93,9 +92,9 @@ class DbImages(URunnable):
             THUMBS.c.fav
             )
         
-        q = q.limit(GRID_LIMIT).offset(Dynamic.grid_offset)
+        q = q.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
         q = q.order_by(-THUMBS.c.mod)
-        q = q.where(THUMBS.c.brand==BRANDS[JsonData.brand_ind])
+        q = q.where(THUMBS.c.brand == Static.BRANDS[JsonData.brand_ind])
 
         stmt_where: list = []
 
@@ -107,10 +106,10 @@ class DbImages(URunnable):
                 q = q.where(i)
                 return q
 
-        if Dynamic.curr_coll_name == NAME_FAVS:
+        if Dynamic.curr_coll_name == Static.NAME_FAVS:
             stmt_where.append(THUMBS.c.fav == 1)
 
-        elif Dynamic.curr_coll_name != NAME_ALL_COLLS:
+        elif Dynamic.curr_coll_name != Static.NAME_ALL_COLLS:
             stmt_where.append(THUMBS.c.coll == Dynamic.curr_coll_name)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
