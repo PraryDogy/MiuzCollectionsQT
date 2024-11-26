@@ -201,6 +201,9 @@ class Grid(QScrollArea):
 
     def get_curr_cell(self):
         return self.cell_to_wid.get(self.curr_cell)
+    
+    def get_cell(self, coords: tuple):
+        return self.cell_to_wid.get(coords)
 
     def reset_curr_cell(self):
         self.curr_cell = (0, 0)
@@ -229,11 +232,15 @@ class Grid(QScrollArea):
 
         elif isinstance(data, tuple):
             coords = data
-            new_wid = self.cell_to_wid.get(data)
+            new_wid = self.get_cell(coords)
 
         elif isinstance(data, str):
             new_wid = Thumbnail.path_to_wid.get(data)
             coords = new_wid.row, new_wid.col
+
+        if not new_wid:
+            coords = (coords[0] + 1, 0)
+            new_wid = self.get_cell(coords)
 
         if isinstance(new_wid, Title):
             if self.curr_cell > coords:
