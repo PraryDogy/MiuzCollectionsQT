@@ -43,22 +43,6 @@ class UpBtn(QFrame):
         return super().mouseReleaseEvent(a0)
     
 
-class LimitBtn(QPushButton):
-    _clicked =  pyqtSignal()
-
-    def __init__(self):
-        super().__init__(text=Lang.show_more)
-        self.clicked.connect(self.cmd_)
-        self.setFixedWidth(110)
-
-    def cmd_(self, *args) -> None:
-        Dynamic.grid_offset += GRID_LIMIT
-        self._clicked.emit()
-        self.setDisabled(True)
-        self.setStyleSheet("background: transparent;")
-        self.setText("")
-
-
 class Grid(QScrollArea):
     def __init__(self):
         super().__init__()
@@ -116,6 +100,9 @@ class Grid(QScrollArea):
         elif value == 0:
             self.up_btn.hide()
 
+        if value == self.verticalScrollBar().maximum():
+            self.load_db_images("more")
+
     def load_db_images(self, flag: str):
         """flag: first, more"""
 
@@ -158,14 +145,8 @@ class Grid(QScrollArea):
                 )
             self.grids_layout.addWidget(above_thumbs)
 
-            ln_images = 0
-
             for date, db_images in db_images.items():
                 self.setup_single_grid(date, db_images)
-                ln_images += len(db_images)
-
-            if ln_images == GRID_LIMIT:
-                self.add_limit_btn()
 
         else:
             no_images = AboveThumbsNoImages()
@@ -222,23 +203,8 @@ class Grid(QScrollArea):
     def setup_more_grids(self, db_images: dict[str, list[DbImage]]):
 
         if db_images:
-
-            ln_images = 0
-            
             for date, db_images in db_images.items():
                 self.setup_single_grid(date, db_images)
-                ln_images += len(db_images)
-
-            if ln_images == GRID_LIMIT:
-                self.add_limit_btn()
-
-    def add_limit_btn(self):
-        al = Qt.AlignmentFlag.AlignCenter
-        cmd_ = lambda: self.load_db_images("more")
-
-        limit_btn = LimitBtn()
-        limit_btn._clicked.connect(cmd_)
-        self.grids_layout.addWidget(limit_btn, alignment=al)
 
     def select_new_widget(self, data: tuple | str | Thumbnail):
         if isinstance(data, Thumbnail):
