@@ -112,6 +112,9 @@ class Grid(QScrollArea):
         elif flag == "more":
             Dynamic.grid_offset += GRID_LIMIT
             cmd_ = lambda db_images: self.grid_more(db_images)
+        
+        else: 
+            raise Exception("wrong flag", flag)
 
         self.task_ = DbImages()
         self.task_.signals_.finished_.connect(cmd_)
