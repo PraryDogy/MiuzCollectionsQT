@@ -1,13 +1,4 @@
-class Test:
-    def __init__(self):
-        super().__init__()
-
-        self.row = 0
-        self.col = 0
-
-a = Test()
-
-coords = (4, 4)
-a.row, a.col = coords
-
-print(a.row, a.col)
+a = (3, 1)
+offset = (-1, 0)
+b = a + offset
+# b должен стать (2, 1)

@@ -325,10 +325,11 @@ class Grid(QScrollArea):
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if (
-            a0.modifiers() & Qt.KeyboardModifier.ControlModifier
+            a0.modifiers() == Qt.KeyboardModifier.ControlModifier
             and
             a0.key() == Qt.Key.Key_I
         ):
+
             wid = self.get_curr_cell()
             coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
 
@@ -341,25 +342,31 @@ class Grid(QScrollArea):
             else:
                 OpenWins.smb(self.window())
 
-        elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
+        elif a0.key() in (
+            Qt.Key.Key_Space, Qt.Key.Key_Return
+        ):
+
             wid = self.get_curr_cell()
             if wid:
                 self.open_in_view(wid)
 
-        elif a0.key() == Qt.Key.Key_Left:
-            coords = (self.curr_cell[0], self.curr_cell[1] - 1)
-            self.select_wid(coords)
+        elif a0.key() in (
+            Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down
+        ):
 
-        elif a0.key() == Qt.Key.Key_Right:
-            coords = (self.curr_cell[0], self.curr_cell[1] + 1)
-            self.select_wid(coords)
+            offsets = {
+                Qt.Key.Key_Left: (0, -1),
+                Qt.Key.Key_Right: (0, 1),
+                Qt.Key.Key_Up: (-1, 0),
+                Qt.Key.Key_Down: (1, 0)
+            }
 
-        elif a0.key() == Qt.Key.Key_Up:
-            coords = (self.curr_cell[0] - 1, self.curr_cell[1])
-            self.select_wid(coords)
+            offset = offsets.get(a0.key())
+            coords = (
+                self.curr_cell[0] + offset[0], 
+                self.curr_cell[1] + offset[1]
+            )
 
-        elif a0.key() == Qt.Key.Key_Down:
-            coords = (self.curr_cell[0] + 1, self.curr_cell[1])
             self.select_wid(coords)
         
         return super().keyPressEvent(a0)
