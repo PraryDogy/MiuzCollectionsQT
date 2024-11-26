@@ -175,7 +175,6 @@ class Thumbnail(QFrame, CellWid):
         self.setStyleSheet(NORMAL_STYLE)
 
         self.img = pixmap
-
         self.short_src = short_src
         self.collection = coll
         self.fav_value = fav
