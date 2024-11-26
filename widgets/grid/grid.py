@@ -80,7 +80,7 @@ class Grid(QScrollArea):
 
     def signals_cmd(self, flag: str):
         if flag == "resize":
-            self.resize_()
+            self.resize_thumbnails()
         elif flag == "to_top":
             self.verticalScrollBar().setValue(0)
         elif flag == "reload":
@@ -119,7 +119,7 @@ class Grid(QScrollArea):
         if hasattr(self, "grids_widget"):
             self.grids_widget.deleteLater()
 
-        self.reset_thumbnails_data()
+        self.reset_grids_info()
         self.current_widgets.clear()
         self.up_btn.hide()
 
@@ -264,9 +264,9 @@ class Grid(QScrollArea):
         self.cell_to_wid[row, col] = wid
         Thumbnail.path_to_wid[wid.short_src] = wid
 
-    def reset_thumbnails_data(self):
-        self.curr_cell: tuple = (0, 0)
-        self.curr_short_src = None
+    def reset_grids_info(self):
+        # self.curr_cell: tuple = (0, 0)
+        # self.curr_short_src = None
         self.all_grids_row = 0
         self.cell_to_wid.clear()
         Thumbnail.path_to_wid.clear()
@@ -283,13 +283,16 @@ class Grid(QScrollArea):
     def get_columns(self):
         return max(self.ww // (THUMB_W[JsonData.curr_size_ind] + (THUMB_MARGIN)), 1)
 
-    def resize_(self):
+    def resize_thumbnails(self):
+        "изменение размера Thumbnail"
         for grid_layout, widgets in self.current_widgets.items():
             for widget in widgets:
                 widget.setup()
         self.rearrange()
 
     def rearrange(self):
+        "перетасовка сетки"
+
         if not hasattr(self, "first_load"):
             setattr(self, "first_load", True)
             return
@@ -297,7 +300,7 @@ class Grid(QScrollArea):
         self.ww = self.width()
         self.columns = self.get_columns()
 
-        self.reset_thumbnails_data()
+        self.reset_grids_info()
 
         for grid_layout, widgets in self.current_widgets.items():
 
@@ -315,6 +318,8 @@ class Grid(QScrollArea):
 
             if len(widgets) % self.columns != 0:
                 self.all_grids_row += 1
+        
+        self.select_prev_widget()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
