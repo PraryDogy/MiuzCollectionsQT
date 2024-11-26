@@ -133,14 +133,15 @@ class Grid(QScrollArea):
                 )
             self.grid_lay.addWidget(no_images, self.row, self.col, 1, max_col)
             self.row += 1
+            no_images.setStyleSheet("background: red;")
             return
 
         filter_title = FilterTitle()
-        # above_thumbs.setSizePolicy(
-        #     QSizePolicy.Policy.Expanding,
-        #     QSizePolicy.Policy.Preferred
-        #     )
-        self.grid_lay.addWidget(filter_title, self.row, self.col,1,max_col)
+        filter_title.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred
+            )
+        self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
         self.row += 1
 
         for date, db_images in db_images.items():
