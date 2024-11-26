@@ -68,8 +68,7 @@ class DbImages(URunnable):
 
             if array_img is None:
                 print("db images > create dict > can't load image")
-                self.signals_.finished_.emit(thumbs_dict)
-                return
+                continue
 
             else:
                 pixmap = Utils.pixmap_from_array(array_img)
