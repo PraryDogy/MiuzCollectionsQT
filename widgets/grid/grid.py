@@ -153,6 +153,8 @@ class Grid(QScrollArea):
     def single_grid(self, date: str, db_images: list[DbImage]):
         max_col = self.get_max_col()
 
+        self.col = 0
+        self.row += 1
         title = Title(title=date, db_images=db_images)
         title.r_click.connect(self.reset_selection)
         title.row, title.col = self.row, self.col
