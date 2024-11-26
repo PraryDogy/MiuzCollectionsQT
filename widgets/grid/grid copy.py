@@ -13,7 +13,7 @@ from utils.utils import UThreadPool, Utils
 from ..actions import OpenWins, ScanerRestart
 from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
-from .above_thumbs import AboveThumbs, AboveThumbsNoImages
+from .above_thumbs import FilterTitle, ErrorTitle
 from .thumbnail import Thumbnail
 from .title import Title
 
@@ -134,7 +134,7 @@ class Grid(QScrollArea):
 
         if db_images:
 
-            above_thumbs = AboveThumbs()
+            above_thumbs = FilterTitle()
             above_thumbs.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Preferred
@@ -145,7 +145,7 @@ class Grid(QScrollArea):
                 self.grid_single(date, db_images)
 
         else:
-            no_images = AboveThumbsNoImages()
+            no_images = ErrorTitle()
             no_images.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Preferred

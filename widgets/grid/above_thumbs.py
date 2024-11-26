@@ -77,7 +77,7 @@ class ShowAllBtn(ResetBtn):
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
 
-class AboveThumbsNoImages(QWidget):
+class ErrorTitle(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -133,7 +133,7 @@ class AboveThumbsNoImages(QWidget):
             h_layout.addWidget(ShowAllBtn())
 
 
-class AboveThumbs(QWidget):
+class FilterTitle(QWidget):
     def __init__(self):
         super().__init__()
 
