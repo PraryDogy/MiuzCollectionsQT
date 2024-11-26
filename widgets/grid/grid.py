@@ -317,11 +317,8 @@ class Grid(QScrollArea):
                 self.all_grids_row += 1
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        wid: Thumbnail
-
         if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
-            wid = self.cell_to_wid.get(self.curr_cell)
-
+            wid = Thumbnail.path_to_wid.get(self.curr_short_src)
             coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
 
             if coll_folder:
@@ -334,7 +331,7 @@ class Grid(QScrollArea):
                 OpenWins.smb(self.window())
 
         elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
-            wid = self.cell_to_wid.get(self.curr_cell)
+            wid = Thumbnail.path_to_wid.get(self.curr_short_src)
             if wid:
                 self.open_in_view(wid)
 
