@@ -8,8 +8,7 @@ from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
                              QTabWidget)
 
 from base_widgets import ContextCustom
-from cfg import (BRANDS, MENU_LEFT_WIDTH, NAME_ALL_COLLS, NAME_FAVS, Dynamic,
-                 JsonData)
+from cfg import Dynamic, JsonData, Static
 from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -42,7 +41,7 @@ class CollectionBtn(QLabel):
             OpenWins.smb(parent_=self.window())
             return
 
-        if self.coll_name in (NAME_ALL_COLLS, NAME_FAVS):
+        if self.coll_name in (Static.NAME_ALL_COLLS, Static.NAME_FAVS):
             coll = coll_folder
         else:
             coll = os.path.join(coll_folder, self.coll_name)
@@ -99,7 +98,7 @@ class LoadMenus(URunnable):
 
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(THUMBS.c.coll)
-        q = q.where(THUMBS.c.brand == BRANDS[self.brand_ind])
+        q = q.where(THUMBS.c.brand == Static.BRANDS[self.brand_ind])
         q = q.distinct()
         res = conn.execute(q).fetchall()
         conn.close()
@@ -108,7 +107,7 @@ class LoadMenus(URunnable):
             res: tuple[str] = (i[0] for i in res if i)
 
         else:
-            brand = BRANDS[self.brand_ind]
+            brand = Static.BRANDS[self.brand_ind]
             print(brand, "> left menu > load db colls > no data")
             return menus
 
@@ -164,36 +163,36 @@ class MenuTab(QListWidget):
 
         all_colls_btn = CollectionBtn(
             short_name=Lang.all_colls,
-            coll_name=NAME_ALL_COLLS
+            coll_name=Static.NAME_ALL_COLLS
             )
         cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
         all_colls_btn.pressed_.connect(cmd_)
         all_colls_item = QListWidgetItem()
-        all_colls_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuTab.h_))
+        all_colls_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(all_colls_item)
         self.setItemWidget(all_colls_item, all_colls_btn)
 
         favs_btn = CollectionBtn(
             short_name=Lang.fav_coll,
-            coll_name=NAME_FAVS
+            coll_name=Static.NAME_FAVS
             )
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
 
         favs_item = QListWidgetItem()
-        favs_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuTab.h_))
+        favs_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(favs_item)
         self.setItemWidget(favs_item, favs_btn)
 
         fake_item = QListWidgetItem()
-        fake_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuTab.h_ // 2))
+        fake_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_ // 2))
         fake_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
         self.addItem(fake_item)
 
-        if Dynamic.curr_coll_name == NAME_ALL_COLLS:
+        if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
             self.setCurrentRow(self.row(all_colls_item))
 
-        elif Dynamic.curr_coll_name == NAME_FAVS:
+        elif Dynamic.curr_coll_name == Static.NAME_FAVS:
             self.setCurrentRow(self.row(favs_item))
 
 
@@ -207,7 +206,7 @@ class MenuTab(QListWidget):
             coll_btn.pressed_.connect(cmd_)
 
             list_item = QListWidgetItem()
-            list_item.setSizeHint(QSize(MENU_LEFT_WIDTH, MenuTab.h_))
+            list_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
@@ -219,7 +218,7 @@ class MenuLeft(QTabWidget):
     def __init__(self):
         super().__init__()
 
-        self.setFixedWidth(MENU_LEFT_WIDTH)
+        self.setFixedWidth(Static.MENU_LEFT_WIDTH)
         self.tabBarClicked.connect(self.tab_cmd)
         self.menus: list[MenuTab] = []
 
@@ -230,8 +229,8 @@ class MenuLeft(QTabWidget):
         self.clear()
         self.menus.clear()
 
-        for i in BRANDS:
-            wid = MenuTab(brand_ind=BRANDS.index(i))
+        for i in Static.BRANDS:
+            wid = MenuTab(brand_ind=Static.BRANDS.index(i))
             self.addTab(wid, i)
             self.menus.append(wid)\
         
@@ -239,7 +238,7 @@ class MenuLeft(QTabWidget):
 
     def tab_cmd(self, index: int):
         JsonData.brand_ind = index
-        Dynamic.curr_coll_name = NAME_ALL_COLLS
+        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
 
         for i in self.menus:

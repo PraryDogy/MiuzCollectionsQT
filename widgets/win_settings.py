@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QPushButton,
 
 from base_widgets import CustomInput, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.wins import WinSystem
-from cfg import APP_SUPPORT_DIR, BRANDS, DB_FILE, HASH_DIR, JsonData
+from cfg import JsonData, Static
 from lang import Lang
 from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
@@ -62,7 +62,7 @@ class SecondGroup(QGroupBox):
 
     def show_files_cmd(self, *args):
         try:
-            subprocess.Popen(["open", APP_SUPPORT_DIR])
+            subprocess.Popen(["open", Static.APP_SUPPORT_DIR])
         except Exception as e:
             print(e)
 
@@ -95,8 +95,8 @@ class BrandSett(QTabWidget):
         self.stop_colls_wid: dict[int, CustomTextEdit] = {}
         self.coll_folders_wid: dict[int, CustomTextEdit] = {}
 
-        for i in BRANDS:
-            wid = self.brand_sett_ui(brand_ind=BRANDS.index(i))
+        for i in Static.BRANDS:
+            wid = self.brand_sett_ui(brand_ind=Static.BRANDS.index(i))
             self.addTab(wid, i)
 
         self.setCurrentIndex(JsonData.brand_ind)
@@ -228,11 +228,11 @@ class WinSettings(WinSystem):
             JsonData.write_json_data()
             QApplication.quit()
 
-            if os.path.exists(DB_FILE):
-                os.remove(DB_FILE)
+            if os.path.exists(Static.DB_FILE):
+                os.remove(Static.DB_FILE)
 
-            if os.path.exists(HASH_DIR):
-                shutil.rmtree(HASH_DIR)
+            if os.path.exists(Static.HASH_DIR):
+                shutil.rmtree(Static.HASH_DIR)
 
             Utils.start_new_app()
 

@@ -9,9 +9,8 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import PSD_TIFF, JsonData
+from cfg import JsonData, Static
 from database import THUMBS, Dbase
-from signals import SignalsApp
 from utils.utils import URunnable, UThreadPool, Utils
 
 from .actions import CopyPath, FavActionDb, OpenInfoDb, OpenWins, Reveal, Save
@@ -97,7 +96,7 @@ class LoadImage(URunnable):
         
             img = Utils.read_image(full_src=self.full_src)
 
-            if not self.full_src.endswith(PSD_TIFF):
+            if not self.full_src.endswith(Static.PSD_TIFF):
                 img = Utils.array_color(img, "BGR")
 
             if img is not None:

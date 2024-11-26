@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
 from base_widgets import ContextCustom
 from base_widgets.wins import WinSystem
-from cfg import APP_NAME, APP_VER
+from cfg import Static
 from lang import Lang
 from utils.utils import Utils
 
@@ -21,7 +21,7 @@ class SelectableLabel(QLabel):
         super().__init__(parent)
 
         txt = "\n".join([
-            f"Version {APP_VER}",
+            f"Version {Static.APP_VER}",
             "Developed by Evlosh",
             "email: evlosh@gmail.com",
             "telegram: evlosh",
@@ -55,7 +55,7 @@ class AboutWin(WinSystem):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle(APP_NAME)
+        self.setWindowTitle(Static.APP_NAME)
         self.setFixedSize(280, 240)
 
         icon = QSvgWidget(ICON_SVG)

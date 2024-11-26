@@ -6,14 +6,14 @@ from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer, SvgBtn
 from base_widgets.wins import WinSystem
-from cfg import BRANDS, TITLE_NORMAL, JsonData
+from cfg import JsonData, Static
 from lang import Lang
 
 IMAGES = "images"
 WARNING_SVG = os.path.join(IMAGES, "warning.svg")
 
 TITLE_NORMAL = f"""
-    {TITLE_NORMAL}
+    {Static.TITLE_NORMAL}
     border: 0px;
 """
 
@@ -49,7 +49,7 @@ class WinSmb(WinSystem):
         v_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         v_wid.setLayout(v_lay)
 
-        brand: str = BRANDS[JsonData.brand_ind]
+        brand: str = Static.BRANDS[JsonData.brand_ind]
         title = QLabel(text=brand.capitalize())
         title.setStyleSheet(TITLE_NORMAL)
         v_lay.addWidget(title)

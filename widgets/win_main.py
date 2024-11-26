@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
-from cfg import NAME_ALL_COLLS, NAME_FAVS, Dynamic, JsonData
+from cfg import Static, Dynamic, JsonData
 from lang import Lang
 from signals import SignalsApp
 from utils.scaner import Scaner
@@ -86,10 +86,10 @@ class WinMain(WinFrameless):
 
         elif flag == "set_title":
 
-            if Dynamic.curr_coll_name == NAME_ALL_COLLS:
+            if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
                 t = Lang.all_colls
 
-            elif Dynamic.curr_coll_name == NAME_FAVS:
+            elif Dynamic.curr_coll_name == Static.NAME_FAVS:
                 t = Lang.fav_coll
 
             else:

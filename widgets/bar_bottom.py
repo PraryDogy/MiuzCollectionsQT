@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
                          QWheelEvent)
-from PyQt5.QtWidgets import QApplication, QLabel, QSizePolicy, QSlider, QWidget
+from PyQt5.QtWidgets import QApplication, QLabel, QSlider, QWidget
 
 from base_widgets import LayoutHor, SvgBtn
 from cfg import JsonData
