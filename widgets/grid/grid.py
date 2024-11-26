@@ -1,18 +1,17 @@
 import os
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
-from PyQt5.QtWidgets import (QFrame, QGridLayout, QPushButton, QScrollArea,
+from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QScrollArea,
                              QSizePolicy, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
-from cfg import (GRID_LIMIT, MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, Dynamic,
-                 JsonData)
-from lang import Lang
+from cfg import MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, JsonData
 from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
 
 from ..actions import OpenWins, ScanerRestart
+from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
 from .above_thumbs import AboveThumbs, AboveThumbsNoImages
 from .thumbnail import Thumbnail
@@ -227,6 +226,10 @@ class Grid(QScrollArea):
             self.curr_cell = coords
             self.ensureWidgetVisible(new_wid)
 
+            if isinstance(BarBottom.path_label, QLabel):
+                t = f"{new_wid.collection}: {new_wid.name}"
+                BarBottom.path_label.setText(t)
+
         else:
             try:
                 prev_wid.selected_style()
@@ -239,6 +242,9 @@ class Grid(QScrollArea):
         if isinstance(widget, Thumbnail):
             widget.regular_style()
             self.curr_cell: tuple = (0, 0)
+
+            if isinstance(BarBottom.path_label, QLabel):
+                BarBottom.path_label.setText("")
 
     def add_widget_data(self, wid: Thumbnail, row: int, col: int):
         wid.row, wid.col = row, col

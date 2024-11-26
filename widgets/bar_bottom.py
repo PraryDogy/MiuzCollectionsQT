@@ -106,6 +106,8 @@ class CustomSlider(BaseSlider):
 
 
 class BarBottom(QWidget):
+    path_label: QLabel = None
+
     def __init__(self):
         super().__init__()
 
@@ -120,27 +122,40 @@ class BarBottom(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.h_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
+        path_label = QLabel("")
+        self.h_layout.addWidget(path_label, alignment=Qt.AlignmentFlag.AlignLeft)
+        BarBottom.path_label = path_label
+
+        self.h_layout.addStretch()
 
         self.progress_bar = QLabel(text="")
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignRight)
         SignalsApp.all_.progressbar_text.connect(self.progress_bar.setText)
         self.h_layout.addWidget(
             self.progress_bar,
-            alignment=Qt.AlignmentFlag.AlignVCenter
+            alignment=Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight
         )
 
         self.downloads = SvgBtn(icon_path=SvgPaths.download_svg , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
         SignalsApp.all_.btn_downloads_toggle.connect(self.btn_downloads_toggle)
-        self.h_layout.addWidget(self.downloads)
+        self.h_layout.addWidget(
+            self.downloads,
+            alignment=Qt.AlignmentFlag.AlignRight
+        )
 
         self.sett_widget = SvgBtn(SvgPaths.settings_svg, size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
-        self.h_layout.addWidget(self.sett_widget)
+        self.h_layout.addWidget(
+            self.sett_widget,
+            alignment=Qt.AlignmentFlag.AlignRight
+        )
 
         self.custom_slider = CustomSlider()
-        self.h_layout.addWidget(self.custom_slider, alignment=Qt.AlignmentFlag.AlignRight)
+        self.h_layout.addWidget(
+            self.custom_slider,
+            alignment=Qt.AlignmentFlag.AlignRight
+        )
 
         self.downloads.hide()
 
