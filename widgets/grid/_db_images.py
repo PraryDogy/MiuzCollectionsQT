@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 from cfg import (BRANDS, GRID_LIMIT, NAME_ALL_COLLS, NAME_FAVS, Dynamic,
-                 Filters, JsonData)
+                 Filters, JsonData, APP_SUPPORT_DIR)
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, Utils
@@ -61,10 +61,11 @@ class DbImages(URunnable):
             self.signals_.finished_.emit(thumbs_dict)
             return
 
-        for short_src, hash_path, mod, coll, fav in res:
+        for short_src, short_hash_path, mod, coll, fav in res:
 
             mod = datetime.fromtimestamp(mod).date()
-            array_img = Utils.read_image_hash(hash_path)
+            full_hash_path = Utils.get_full_hash_path(short_hash_path)
+            array_img = Utils.read_image_hash(full_hash_path)
 
             if array_img is None:
                 print("thumbnails db dict > scan't load image", short_src)

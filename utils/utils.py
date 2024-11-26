@@ -131,7 +131,7 @@ class Utils:
     
     @classmethod
     def get_full_hash_path(cls, short_hash_path: str):
-        return os.path.join(APP_SUPPORT_DIR, short_hash_path)
+        return APP_SUPPORT_DIR + short_hash_path
 
     @classmethod
     def write_image_hash(cls, full_hash_path: str, array_img: np.ndarray) -> bool:
@@ -144,9 +144,9 @@ class Utils:
             return False
         
     @classmethod
-    def read_image_hash(cls, short_hash_path: str) -> np.ndarray | None:
+    def read_image_hash(cls, full_hash_path: str) -> np.ndarray | None:
         try:
-            array_img = cv2.imread(short_hash_path, cv2.IMREAD_UNCHANGED)
+            array_img = cv2.imread(full_hash_path, cv2.IMREAD_UNCHANGED)
             return cls.array_color(array_img, "BGR")
         except Exception as e:
             cls.print_err(error=e)

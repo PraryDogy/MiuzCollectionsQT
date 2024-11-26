@@ -64,11 +64,12 @@ class LoadThumb(URunnable):
             ).where(
                 THUMBS.c.src == self.short_src
                 )
-        res = conn.execute(q).scalar()
+        short_hash_path = conn.execute(q).scalar()
         conn.close()
 
-        if res:
-            small_img = Utils.read_image_hash(res)
+        if short_hash_path:
+            full_hash_path = Utils.get_full_hash_path(short_hash_path)
+            small_img = Utils.read_image_hash(full_hash_path)
             pixmap = Utils.pixmap_from_array(small_img)
         else:
             pixmap = QPixmap(1, 1)
