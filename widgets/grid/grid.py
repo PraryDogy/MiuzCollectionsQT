@@ -206,9 +206,6 @@ class Grid(QScrollArea):
         wid.row, wid.col = coords
 
     def select_old_wid(self):
-        """
-        после изменения сетки попытаться найти виджет из предыдущей сетки
-        """
         wid = self.get_curr_cell()
         if wid:
             self.select_wid(wid)
