@@ -87,7 +87,7 @@ class DbImages(URunnable):
     def get_stmt(self) -> sqlalchemy.Select:
         q = sqlalchemy.select(
             THUMBS.c.src,
-            THUMBS.c.hash_path,
+            THUMBS.c.short_hash,
             THUMBS.c.mod,
             THUMBS.c.coll,
             THUMBS.c.fav

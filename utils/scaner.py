@@ -114,7 +114,7 @@ class DbImages:
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(
-            THUMBS.c.hash_path,
+            THUMBS.c.short_hash,
             THUMBS.c.src,
             THUMBS.c.size,
             THUMBS.c.birth,
@@ -206,7 +206,7 @@ class DbUpdater:
             q = sqlalchemy.delete(
                 THUMBS
                 ).where(
-                    THUMBS.c.hash_path==short_hash_path
+                    THUMBS.c.short_hash==short_hash_path
                     )
 
             try:

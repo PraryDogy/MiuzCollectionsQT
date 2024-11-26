@@ -60,7 +60,7 @@ class LoadThumb(URunnable):
     def run(self):
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(
-            THUMBS.c.hash_path
+            THUMBS.c.short_hash
             ).where(
                 THUMBS.c.src == self.short_src
                 )

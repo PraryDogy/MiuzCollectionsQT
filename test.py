@@ -8,7 +8,7 @@ Dbase.init()
 
 conn = Dbase.engine.connect()
 
-q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.hash_path)
+q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash)
 res = conn.execute(q).fetchall()
 
 for id_, hash_path in res:
