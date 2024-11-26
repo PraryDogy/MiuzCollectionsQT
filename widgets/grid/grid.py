@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QScrollArea,
                              QSizePolicy, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
-from cfg import MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, JsonData
+from cfg import MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, JsonData, Dynamic, GRID_LIMIT
 from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
 
@@ -135,6 +135,8 @@ class Grid(QScrollArea):
 
     def setup_db_images(self, db_images: dict[str, list[DbImage]]):
 
+        Dynamic.grid_offset = 0
+
         if db_images:
 
             above_thumbs = AboveThumbs()
@@ -200,6 +202,7 @@ class Grid(QScrollArea):
             self.all_grids_row += 1
 
     def setup_more_grids(self, db_images: dict[str, list[DbImage]]):
+        Dynamic.grid_offset += GRID_LIMIT
         if db_images:
             for date, db_images in db_images.items():
                 self.setup_single_grid(date, db_images)

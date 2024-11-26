@@ -32,7 +32,6 @@ class ScanerUtils:
             try:
                 SignalsApp.all_.menu_left_cmd.emit("reload")
                 SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-                Dynamic.grid_offset = 0
             except RuntimeError as e:
                 Utils.print_err(error=e)
 
