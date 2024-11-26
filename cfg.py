@@ -4,110 +4,215 @@ import shutil
 import webbrowser
 from datetime import datetime
 
-APP_VER = 1.3
-APP_NAME: str = "Collections"
-BRANDS = ["miuz", "panacea"]
+# APP_VER = 1.3
+# APP_NAME: str = "Collections"
+# BRANDS = ["miuz", "panacea"]
 
-GRID_LIMIT: int = 150
-LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
-MENU_LEFT_WIDTH: int = 210
-NAME_ALL_COLLS: str = "___collections___"
-NAME_FAVS: str = "___favorites___"
-STAR_SYM = "\U00002605" + " "
+# GRID_LIMIT: int = 150
+# LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
+# MENU_LEFT_WIDTH: int = 210
+# NAME_ALL_COLLS: str = "___collections___"
+# NAME_FAVS: str = "___favorites___"
+# STAR_SYM = "\U00002605" + " "
 
-PIXMAP_SIZE_MAX = 200
-THUMB_MARGIN: int = 15
-PIXMAP_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
-THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
-TEXT_LENGTH: list = [17, 20, 25, 29]
+# PIXMAP_SIZE_MAX = 200
+# THUMB_MARGIN: int = 15
+# PIXMAP_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
+# THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
+# TEXT_LENGTH: list = [17, 20, 25, 29]
 
-APP_SUPPORT_DIR: str = os.path.join(
-    os.path.expanduser("~"),
-    "Library",
-    "Application Support",
-    APP_NAME
-    )
+# APP_SUPPORT_DIR: str = os.path.join(
+#     os.path.expanduser("~"),
+#     "Library",
+#     "Application Support",
+#     APP_NAME
+#     )
 
-JSON_FILE: str = os.path.join(
-    APP_SUPPORT_DIR,
-    "cfg.json"
-    )
+# JSON_FILE: str = os.path.join(
+#     APP_SUPPORT_DIR,
+#     "cfg.json"
+#     )
 
-DB_FILE: str = os.path.join(
-    APP_SUPPORT_DIR,
-    "db.db"
-    )
+# DB_FILE: str = os.path.join(
+#     APP_SUPPORT_DIR,
+#     "db.db"
+#     )
 
-HASH_DIR: str = os.path.join(
-    APP_SUPPORT_DIR,
-    "hashdir"
-    )
+# HASH_DIR: str = os.path.join(
+#     APP_SUPPORT_DIR,
+#     "hashdir"
+#     )
 
-_IMG_EXT: tuple = (
-    ".jpg", ".jpeg", ".jfif",
-    ".tif", ".tiff",
-    ".psd", ".psb",
-    ".png",
-    )
+# _IMG_EXT: tuple = (
+#     ".jpg", ".jpeg", ".jfif",
+#     ".tif", ".tiff",
+#     ".psd", ".psb",
+#     ".png",
+#     )
 
-IMG_EXT: tuple = tuple(
-    upper_ext
-    for ext in _IMG_EXT
-    for upper_ext in (ext, ext.upper())
-    )
+# IMG_EXT: tuple = tuple(
+#     upper_ext
+#     for ext in _IMG_EXT
+#     for upper_ext in (ext, ext.upper())
+#     )
 
 
-PRELOAD_FOLDER: str = "_preload"
+# PRELOAD_FOLDER: str = "_preload"
 
-PRELOAD_DB: str = os.path.join(
-    PRELOAD_FOLDER,
-    "db.db"
-    )
+# PRELOAD_DB: str = os.path.join(
+#     PRELOAD_FOLDER,
+#     "db.db"
+#     )
 
-PRELOAD_HASHDIR_ZIP: str = os.path.join(
-    PRELOAD_FOLDER,
-    "hashdir.zip"
-    )
+# PRELOAD_HASHDIR_ZIP: str = os.path.join(
+#     PRELOAD_FOLDER,
+#     "hashdir.zip"
+#     )
 
-PSD_TIFF: tuple = (
-    ".psd", ".psb", ".tiff", ".tif",
-    ".PSD", ".PSB", ".TIFF", ".TIF"
-    )
+# PSD_TIFF: tuple = (
+#     ".psd", ".psb", ".tiff", ".tif",
+#     ".PSD", ".PSB", ".TIFF", ".TIF"
+#     )
 
-RGB_BLUE = "rgb(46, 89, 203)"
-BORDER_INV = "2px solid transparent"
-BORDER_BLUE = f"2px solid {RGB_BLUE}"
+# RGB_BLUE = "rgb(46, 89, 203)"
+# BORDER_INV = "2px solid transparent"
+# BORDER_BLUE = f"2px solid {RGB_BLUE}"
 
-NORMAL_STYLE = f"""
-    border: {BORDER_INV};
-"""
+# NORMAL_STYLE = f"""
+#     border: {BORDER_INV};
+# """
 
-SOLID_STYLE = f"""
-    border-radius: 6px;
-    color: rgb(255, 255, 255);
-    background: {RGB_BLUE};
-    border: {BORDER_INV};
-"""
+# SOLID_STYLE = f"""
+#     border-radius: 6px;
+#     color: rgb(255, 255, 255);
+#     background: {RGB_BLUE};
+#     border: {BORDER_INV};
+# """
 
-BORDERED_STYLE = f"""
-    border-radius: 6px;
-    border: {BORDER_BLUE};
-"""
+# BORDERED_STYLE = f"""
+#     border-radius: 6px;
+#     border: {BORDER_BLUE};
+# """
 
-TITLE_NORMAL = f"""
-    font-size: 18pt;
-    font-weight: bold;
-    border: {BORDER_INV};
-"""
+# TITLE_NORMAL = f"""
+#     font-size: 18pt;
+#     font-weight: bold;
+#     border: {BORDER_INV};
+# """
 
-TITLE_SOLID = f"""
-    font-size: 18pt;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-    {SOLID_STYLE}
-"""
+# TITLE_SOLID = f"""
+#     font-size: 18pt;
+#     font-weight: bold;
+#     color: rgb(255, 255, 255);
+#     {SOLID_STYLE}
+# """
 
-BRANDS: list = ["miuz", "panacea"]
+# BRANDS: list = ["miuz", "panacea"]
+
+
+class Static:
+    APP_VER = 1.3
+    APP_NAME: str = "Collections"
+    BRANDS = ["miuz", "panacea"]
+
+    GRID_LIMIT: int = 150
+    LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
+    MENU_LEFT_WIDTH: int = 210
+    NAME_ALL_COLLS: str = "___collections___"
+    NAME_FAVS: str = "___favorites___"
+    STAR_SYM = "\U00002605" + " "
+
+    PIXMAP_SIZE_MAX = 200
+    THUMB_MARGIN: int = 15
+    PIXMAP_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
+    THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
+    TEXT_LENGTH: list = [17, 20, 25, 29]
+
+    APP_SUPPORT_DIR: str = os.path.join(
+        os.path.expanduser("~"),
+        "Library",
+        "Application Support",
+        APP_NAME
+        )
+
+    JSON_FILE: str = os.path.join(
+        APP_SUPPORT_DIR,
+        "cfg.json"
+        )
+
+    DB_FILE: str = os.path.join(
+        APP_SUPPORT_DIR,
+        "db.db"
+        )
+
+    HASH_DIR: str = os.path.join(
+        APP_SUPPORT_DIR,
+        "hashdir"
+        )
+
+    _IMG_EXT: tuple = (
+        ".jpg", ".jpeg", ".jfif",
+        ".tif", ".tiff",
+        ".psd", ".psb",
+        ".png",
+        )
+
+    IMG_EXT: tuple = tuple(
+        upper_ext
+        for ext in _IMG_EXT
+        for upper_ext in (ext, ext.upper())
+        )
+
+
+    PRELOAD_FOLDER: str = "_preload"
+
+    PRELOAD_DB: str = os.path.join(
+        PRELOAD_FOLDER,
+        "db.db"
+        )
+
+    PRELOAD_HASHDIR_ZIP: str = os.path.join(
+        PRELOAD_FOLDER,
+        "hashdir.zip"
+        )
+
+    PSD_TIFF: tuple = (
+        ".psd", ".psb", ".tiff", ".tif",
+        ".PSD", ".PSB", ".TIFF", ".TIF"
+        )
+
+    RGB_BLUE = "rgb(46, 89, 203)"
+    BORDER_INV = "2px solid transparent"
+    BORDER_BLUE = f"2px solid {RGB_BLUE}"
+
+    NORMAL_STYLE = f"""
+        border: {BORDER_INV};
+    """
+
+    SOLID_STYLE = f"""
+        border-radius: 6px;
+        color: rgb(255, 255, 255);
+        background: {RGB_BLUE};
+        border: {BORDER_INV};
+    """
+
+    BORDERED_STYLE = f"""
+        border-radius: 6px;
+        border: {BORDER_BLUE};
+    """
+
+    TITLE_NORMAL = f"""
+        font-size: 18pt;
+        font-weight: bold;
+        border: {BORDER_INV};
+    """
+
+    TITLE_SOLID = f"""
+        font-size: 18pt;
+        font-weight: bold;
+        color: rgb(255, 255, 255);
+        {SOLID_STYLE}
+    """
 
 
 class Filters:
@@ -148,7 +253,7 @@ class Filters:
 
 
 class JsonData:
-    app_ver: str = APP_VER
+    app_ver: str = Static.APP_VER
 
     brand_ind = 0
     
@@ -220,9 +325,9 @@ class JsonData:
     @classmethod
     def _read_json_data(cls) -> dict:
 
-        if os.path.exists(JSON_FILE):
+        if os.path.exists(Static.JSON_FILE):
 
-            with open(JSON_FILE, 'r', encoding="utf-8") as f:
+            with open(Static.JSON_FILE, 'r', encoding="utf-8") as f:
                 try:
                     json_data: dict = json.load(f)
 
@@ -236,7 +341,7 @@ class JsonData:
 
     @classmethod
     def write_json_data(cls):
-        with open(JSON_FILE, 'w', encoding="utf-8") as f:
+        with open(Static.JSON_FILE, 'w', encoding="utf-8") as f:
             json.dump(
                 obj=cls._get_data(),
                 fp=f,
@@ -246,48 +351,48 @@ class JsonData:
 
     @classmethod
     def _check_app_dirs(cls):
-        if not os.path.exists(APP_SUPPORT_DIR):
-            os.makedirs(name=APP_SUPPORT_DIR, exist_ok=True)
+        if not os.path.exists(Static.APP_SUPPORT_DIR):
+            os.makedirs(name=Static.APP_SUPPORT_DIR, exist_ok=True)
 
-        if not os.path.exists(DB_FILE):
+        if not os.path.exists(Static.DB_FILE):
             cls.copy_db_file()
 
-        if not os.path.exists(HASH_DIR):
+        if not os.path.exists(Static.HASH_DIR):
             cls.copy_hashdir()
 
-        if not os.path.exists(JSON_FILE):
+        if not os.path.exists(Static.JSON_FILE):
             cls.write_json_data()
 
     @classmethod
     def copy_hashdir(cls):
-        if os.path.exists(HASH_DIR):
+        if os.path.exists(Static.HASH_DIR):
             print("Удаляю пользовательскую HASH_DIR")
-            shutil.rmtree(HASH_DIR)
+            shutil.rmtree(Static.HASH_DIR)
 
-        if os.path.exists(PRELOAD_HASHDIR_ZIP):
+        if os.path.exists(Static.PRELOAD_HASHDIR_ZIP):
             print("копирую предустановленную HASH_DIR")
-            dest = shutil.copy2(PRELOAD_HASHDIR_ZIP, APP_SUPPORT_DIR)
-            shutil.unpack_archive(dest, APP_SUPPORT_DIR)
+            dest = shutil.copy2(Static.PRELOAD_HASHDIR_ZIP, Static.APP_SUPPORT_DIR)
+            shutil.unpack_archive(dest, Static.APP_SUPPORT_DIR)
             os.remove(dest)
 
         else:
-            t = "нет предустановленной HASH_DIR: " + PRELOAD_HASHDIR_ZIP
-            webbrowser.open(LINK_DB)
+            t = "нет предустановленной HASH_DIR: " + Static.PRELOAD_HASHDIR_ZIP
+            webbrowser.open(Static.LINK_DB)
             raise Exception(t)
 
     @classmethod
     def copy_db_file(cls):
-        if os.path.exists(DB_FILE):
+        if os.path.exists(Static.DB_FILE):
             print("Удаляю пользовательский DB_FILE")
-            os.remove(DB_FILE)
+            os.remove(Static.DB_FILE)
 
-        if os.path.exists(PRELOAD_DB):
+        if os.path.exists(Static.PRELOAD_DB):
             print("Копирую предустановленный DB_FILE")
-            shutil.copyfile(src=PRELOAD_DB, dst=DB_FILE)
+            shutil.copy2(Static.PRELOAD_DB, Static.APP_SUPPORT_DIR)
 
         else:
-            t = "Нет предуставновленного DB_FILE: " + DB_FILE
-            webbrowser.open(LINK_DB)
+            t = "Нет предуставновленного DB_FILE: " + Static.DB_FILE
+            webbrowser.open(Static.LINK_DB)
             raise Exception(t)
 
     @classmethod
@@ -295,13 +400,13 @@ class JsonData:
         try:
             json_app_ver = float(cls.app_ver)
         except Exception:
-            json_app_ver = APP_VER
+            json_app_ver = Static.APP_VER
 
-        if APP_VER > json_app_ver:
+        if Static.APP_VER > json_app_ver:
             print("Пользовательская версия приложения ниже необходимой")
             cls.copy_db_file()
             cls.copy_hashdir()
-            cls.app_ver = APP_VER
+            cls.app_ver = Static.APP_VER
             cls.write_json_data()
 
     @classmethod
@@ -319,4 +424,4 @@ class Dynamic:
     date_end_text: str = None # 31 january 1991
     grid_offset: int = 0
     search_widget_text: str = None
-    curr_coll_name = NAME_ALL_COLLS
+    curr_coll_name = Static.NAME_ALL_COLLS

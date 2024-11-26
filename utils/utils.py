@@ -16,7 +16,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
 
-from cfg import HASH_DIR, JsonData, APP_SUPPORT_DIR
+from cfg import JsonData, Static
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
@@ -120,23 +120,22 @@ class Utils:
     def create_full_hash_path(cls, full_src: str) -> str:
         new_name = hashlib.md5(full_src.encode('utf-8')).hexdigest() + ".jpg"
         
-        new_folder = os.path.join(HASH_DIR, new_name[:2])
+        new_folder = os.path.join(Static.HASH_DIR, new_name[:2])
         os.makedirs(new_folder, exist_ok=True)
 
         return os.path.join(new_folder, new_name)
 
     @classmethod
     def get_short_hash_path(cls, full_hash_path: str):
-        return full_hash_path.replace(APP_SUPPORT_DIR, "")
+        return full_hash_path.replace(Static.APP_SUPPORT_DIR, "")
     
     @classmethod
     def get_full_hash_path(cls, short_hash_path: str):
-        return APP_SUPPORT_DIR + short_hash_path
+        return Static.APP_SUPPORT_DIR + short_hash_path
 
     @classmethod
     def write_image_hash(cls, full_hash_path: str, array_img: np.ndarray) -> bool:
         try:
-            # array_img = ImageUtils.array_color(array_img, "RGB")
             cv2.imwrite(full_hash_path, array_img)
             return True
         except Exception as e:

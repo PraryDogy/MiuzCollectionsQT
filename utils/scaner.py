@@ -6,7 +6,7 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from cfg import BRANDS, IMG_EXT, PIXMAP_SIZE_MAX, PSD_TIFF, Dynamic, JsonData
+from cfg import Static, JsonData
 from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -57,7 +57,7 @@ class FinderImages:
         ln_ = len(collections)
 
         for x, collection in enumerate(collections, start=1):
-            brand = BRANDS[self.brand_ind]
+            brand = Static.BRANDS[self.brand_ind]
             coll: str = Lang.collection
             t = f"{brand}: {coll.lower()} {x} {Lang.from_} {ln_}"
             ScanerUtils.progressbar_text(t)
@@ -87,7 +87,7 @@ class FinderImages:
                 if not ScanerUtils.can_scan:
                     return finder_images
 
-                if file.endswith(IMG_EXT):
+                if file.endswith(Static.IMG_EXT):
                     src = os.path.join(root, file)
                     item = self.get_image_item(src)
                     if item:
@@ -246,9 +246,9 @@ class DbUpdater:
             h_, w_ = array_img.shape[:2]
             resol = f"{w_}x{h_}"
 
-            array_img = Utils.fit_to_thumb(array_img, PIXMAP_SIZE_MAX)
+            array_img = Utils.fit_to_thumb(array_img, Static.PIXMAP_SIZE_MAX)
 
-            if src.endswith(PSD_TIFF):
+            if src.endswith(Static.PSD_TIFF):
                 array_img = Utils.array_color(array_img, "BGR")
 
             if array_img is not None:
@@ -410,8 +410,8 @@ class ScanerShedule(QObject):
         self.wait_timer.stop()
         ScanerUtils.brands.clear()
 
-        for brand_name in BRANDS:
-            brand_ind  = BRANDS.index(brand_name)
+        for brand_name in Static.BRANDS:
+            brand_ind  = Static.BRANDS.index(brand_name)
             coll_folder = Utils.get_coll_folder(brand_ind=brand_ind)
 
             if coll_folder:
