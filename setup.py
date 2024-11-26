@@ -75,7 +75,6 @@ MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 DATA_FILES = [
     include_files("images"),
     include_files("applescripts"),
-    include_files("styles"),
     include_files("icon"),
     include_files("_preload"),
     ]
