@@ -128,13 +128,13 @@ class DbImages:
         conn.close()
 
         return {
-            hash_path: (
-                Utils.get_full_src(self.coll_folder, src),
+            short_hash_path: (
+                Utils.get_full_src(self.coll_folder, short_src),
                 size,
                 birth,
                 mod
             )
-            for hash_path, src, size, birth, mod in res
+            for short_hash_path, short_src, size, birth, mod in res
             }
 
 
@@ -153,13 +153,13 @@ class Compator:
         self.ins_items: list[tuple[str, int, int, int]] = []
 
     def get_result(self):
-        for hash_path, db_item in self._db_images.items():
+        for short_hash_path, db_item in self._db_images.items():
 
             if not ScanerUtils.can_scan:
                 return
 
             if not db_item in self._finder_images:
-                self.del_items.append(hash_path)
+                self.del_items.append(short_hash_path)
 
         _db_images = list(self._db_images.values())
 
@@ -202,11 +202,11 @@ class DbUpdater:
         conn = Dbase.engine.connect()
         ln_ = len(self.del_items)
 
-        for x, hash_path in enumerate(self.del_items, start=1):
+        for x, short_hash_path in enumerate(self.del_items, start=1):
             q = sqlalchemy.delete(
                 THUMBS
                 ).where(
-                    THUMBS.c.hash_path==hash_path
+                    THUMBS.c.hash_path==short_hash_path
                     )
 
             try:
@@ -230,9 +230,10 @@ class DbUpdater:
         conn.commit()
         conn.close()
 
-        for hash_path in self.del_items:
-            if os.path.exists(hash_path):
-                os.remove(hash_path)
+        for short_hash_path in self.del_items:
+            full_hash_path = Utils.get_full_hash_path(short_hash_path)
+            if os.path.exists(full_hash_path):
+                os.remove(full_hash_path)
 
         if self.del_items:
             ScanerUtils.reload_gui()
@@ -262,7 +263,6 @@ class DbUpdater:
     def insert_db(self):
         insert_count = 0
         counter = 0
-        ln = len(self.ins_items)
 
         for full_src, size, birth, mod in self.ins_items:
 
@@ -274,11 +274,11 @@ class DbUpdater:
             small_img, resol = self.get_small_img(full_src)
 
             if small_img is not None:
-                hash_path = Utils.create_hash_path(full_src)
+                full_hash_path = Utils.create_full_hash_path(full_src)
 
                 values = {
                     "src": Utils.get_short_src(self.coll_folder, full_src),
-                    "hash_path": hash_path,
+                    "hash_path": Utils.get_short_hash_path(full_hash_path),
                     "size": size,
                     "birth": birth,
                     "mod": mod,
@@ -291,7 +291,7 @@ class DbUpdater:
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
                 self.insert_queries.append(stmt)
 
-                self.hash_images.append((hash_path, small_img))
+                self.hash_images.append((full_hash_path, small_img))
 
                 insert_count += 1
 
@@ -330,12 +330,12 @@ class DbUpdater:
         conn.close()
 
         ln_ = len(self.hash_images)
-        for x, (hash_path, img_array) in enumerate(self.hash_images, start=1):
+        for x, (full_hash_path, img_array) in enumerate(self.hash_images, start=1):
             brand = self.brand_name.capitalize()
             adding: str = Lang.adding
             t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
             ScanerUtils.progressbar_text(t)
-            Utils.write_image_hash(hash_path, img_array)
+            Utils.write_image_hash(full_hash_path, img_array)
 
         if self.hash_images:
             ScanerUtils.reload_gui()

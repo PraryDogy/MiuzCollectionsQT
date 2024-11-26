@@ -117,7 +117,7 @@ class Utils:
         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @classmethod
-    def create_hash_path(cls, full_src: str) -> str:
+    def create_full_hash_path(cls, full_src: str) -> str:
         new_name = hashlib.md5(full_src.encode('utf-8')).hexdigest() + ".jpg"
         
         new_folder = os.path.join(HASH_DIR, new_name[:2])
@@ -130,7 +130,7 @@ class Utils:
         return full_hash_path.replace(APP_SUPPORT_DIR, "")
     
     @classmethod
-    def get_full_short_path(cls, short_hash_path: str):
+    def get_full_hash_path(cls, short_hash_path: str):
         return os.path.join(APP_SUPPORT_DIR, short_hash_path)
 
     @classmethod
