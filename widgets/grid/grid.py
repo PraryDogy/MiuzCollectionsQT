@@ -106,8 +106,11 @@ class Grid(QScrollArea):
         """flag: first, more"""
 
         if flag == "first":
+            Dynamic.grid_offset = 0
             cmd_ = lambda db_images: self.grid_first(db_images)
+
         elif flag == "more":
+            Dynamic.grid_offset += GRID_LIMIT
             cmd_ = lambda db_images: self.grid_more(db_images)
 
         self.task_ = DbImages()
@@ -125,6 +128,7 @@ class Grid(QScrollArea):
 
         self.current_widgets.clear()
         self.cell_to_wid.clear()
+
         Thumbnail.path_to_wid.clear()
 
         self.up_btn.hide()
@@ -138,8 +142,6 @@ class Grid(QScrollArea):
         self.load_db_data("first")
 
     def grid_first(self, db_images: dict[str, list[DbImage]]):
-
-        Dynamic.grid_offset = 0
 
         if db_images:
 
@@ -206,7 +208,6 @@ class Grid(QScrollArea):
             self.all_grids_row += 1
 
     def grid_more(self, db_images: dict[str, list[DbImage]]):
-        Dynamic.grid_offset += GRID_LIMIT
         if db_images:
             for date, db_images in db_images.items():
                 self.grid_single(date, db_images)
