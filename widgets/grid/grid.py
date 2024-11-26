@@ -56,9 +56,10 @@ class Grid(QScrollArea):
         self.resize_timer.timeout.connect(self.rearrange)
 
         self.curr_cell: tuple = (0, 0)
+        self.curr_short_src: str = None
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
-        Thumbnail.path_to_wid.clear()
         self.current_widgets: dict[QGridLayout, list[Thumbnail]] = {}
+        Thumbnail.path_to_wid.clear()
 
         # Создаем фрейм для виджетов в области скролла
         self.main_wid = QWidget(parent=self)
@@ -123,7 +124,6 @@ class Grid(QScrollArea):
         self.current_widgets.clear()
         self.up_btn.hide()
 
-        from PyQt5.QtWidgets import QFrame
         self.grids_widget = QWidget()
 
         self.grids_layout = LayoutVer()
@@ -224,6 +224,7 @@ class Grid(QScrollArea):
             prev_wid.regular_style()
             new_wid.selected_style()
             self.curr_cell = coords
+            self.curr_short_src = new_wid.short_src
             self.ensureWidgetVisible(new_wid)
 
             if isinstance(BarBottom.path_label, QLabel):
