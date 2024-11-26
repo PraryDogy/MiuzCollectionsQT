@@ -140,19 +140,19 @@ class Grid(QScrollArea):
         if db_images:
             max_col = self.get_max_col()
 
-            # above_thumbs = AboveThumbs()
-            # above_thumbs.setSizePolicy(
-            #     QSizePolicy.Policy.Expanding,
-            #     QSizePolicy.Policy.Preferred
-            #     )
-            # self.grid_layout.addWidget(
-            #     above_thumbs,
-            #     self.row,
-            #     self.col,
-            #     0,
-            #     max_col
-            # )
-            # self.row += 1
+            above_thumbs = AboveThumbs()
+            above_thumbs.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Preferred
+                )
+            self.grid_layout.addWidget(
+                above_thumbs,
+                self.row,
+                self.col,
+                1,
+                max_col
+            )
+            self.row += 1
 
 
             for date, db_images in db_images.items():
@@ -198,22 +198,28 @@ class Grid(QScrollArea):
                 self.row += 1
                 self.col = 0
 
-        # else:
-        #     no_images = AboveThumbsNoImages()
-        #     no_images.setSizePolicy(
-        #         QSizePolicy.Policy.Expanding,
-        #         QSizePolicy.Policy.Preferred
-        #         )
-        #     self.grids_layout.addWidget(no_images)
+        else:
+            no_images = AboveThumbsNoImages()
+            no_images.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Preferred
+                )
+            self.grid_layout.addWidget(
+                no_images,
+                self.row,
+                self.col,
+                1,
+                max_col
+            )
+            self.row += 1
 
-        # self.main_layout.addWidget(self.grids_widget)
-        # self.main_wid.setFocus()
+        self.main_layout.addWidget(self.grids_widget)
+        self.main_wid.setFocus()
 
-
-    # def grid_more(self, db_images: dict[str, list[DbImage]]):
-    #     if db_images:
-    #         for date, db_images in db_images.items():
-    #             self.grid_single(date, db_images)
+    def grid_more(self, db_images: dict[str, list[DbImage]]):
+        if db_images:
+            for date, db_images in db_images.items():
+                self.grid_single(date, db_images)
 
     def select_prev_widget(self):
         """
