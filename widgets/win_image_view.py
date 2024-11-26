@@ -15,7 +15,7 @@ from signals import SignalsApp
 from utils.utils import URunnable, UThreadPool, Utils
 
 from .actions import CopyPath, FavActionDb, OpenInfoDb, OpenWins, Reveal, Save
-from .grid.thumbnail import Thumbnail
+from .grid.cell_widgets import Thumbnail
 
 IMG_VIEW_STYLE = """
     background: black;

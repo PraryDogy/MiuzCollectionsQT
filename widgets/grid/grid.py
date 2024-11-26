@@ -14,8 +14,7 @@ from ..actions import OpenWins, ScanerRestart
 from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
 from .above_thumbs import FilterTitle, ErrorTitle
-from .thumbnail import Thumbnail
-from .title import Title
+from .cell_widgets import Thumbnail, Title
 
 IMAGES = "images"
 UP_SVG = os.path.join(IMAGES, "up.svg")
@@ -197,7 +196,7 @@ class Grid(QScrollArea):
     def reset_curr_cell(self):
         self.curr_cell = (0, 0)
 
-    def set_coords(self, wid: Thumbnail, Title):
+    def set_coords(self, wid: Thumbnail | Title):
         coords = self.row, self.col
         self.cell_to_wid[coords] = wid
         wid.row, wid.col = coords

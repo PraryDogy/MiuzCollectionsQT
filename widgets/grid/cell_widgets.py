@@ -2,17 +2,133 @@ import os
 
 from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent, QPixmap
-from PyQt5.QtWidgets import QApplication, QFrame, QLabel
+from PyQt5.QtWidgets import QAction, QApplication, QFrame, QLabel, QSizePolicy
 
-from base_widgets import LayoutVer
+from base_widgets import ContextCustom, LayoutVer
 from base_widgets.context import ContextCustom
-from cfg import (NAME_FAVS, NORMAL_STYLE, PIXMAP_SIZE, SOLID_STYLE, STAR_SYM,
-                 TEXT_LENGTH, THUMB_MARGIN, THUMB_W, Dynamic, JsonData)
+from cfg import (NAME_FAVS, NORMAL_STYLE, PIXMAP_SIZE, PSD_TIFF, SOLID_STYLE,
+                 STAR_SYM, TEXT_LENGTH, THUMB_MARGIN, THUMB_W, TITLE_NORMAL,
+                 TITLE_SOLID, Dynamic, JsonData)
+from lang import Lang
 from signals import SignalsApp
-from utils.utils import Utils
+from utils.copy_files import CopyFiles
+from utils.utils import UThreadPool, Utils
 
-from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, Reveal,
-                       Save, ScanerRestart)
+from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, OpenWins,
+                       Reveal, Save, ScanerRestart)
+from ._db_images import DbImage
+
+
+class Title(QLabel):
+    r_click = pyqtSignal()
+
+    def __init__(self, title: str, db_images: list[DbImage]):
+        super().__init__(f"{title}. {Lang.total}: {len(db_images)}")
+        self.db_images = db_images
+        self.row, self.col = 0, 0
+
+        self.setSizePolicy(
+            QSizePolicy.Policy.Fixed,
+            QSizePolicy.Policy.Preferred
+            )
+
+        self.setStyleSheet(TITLE_NORMAL)
+
+    def save_cmd(self, is_layers: bool, save_as: bool):
+
+        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+
+        if coll_folder:
+
+            if is_layers:
+                images = [
+                    Utils.get_full_src(coll_folder, i.short_src)
+                    for i in self.db_images
+                    if i.short_src.endswith(PSD_TIFF)
+                    ]
+            else:
+                images = [
+                    Utils.get_full_src(coll_folder, i.short_src)
+                    for i in self.db_images
+                    if not i.short_src.endswith(PSD_TIFF)
+                    ]
+
+            if save_as:
+                dialog = OpenWins.dialog_dirs()
+                dest = dialog.getExistingDirectory()
+
+                if not dest:
+                    return
+
+            else:
+                dest = JsonData.down_folder
+            
+            self.copy_files_cmd(dest, images)
+
+        else:
+            OpenWins.smb(self.window())
+
+    def copy_files_cmd(self, dest: str, files: list):
+        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+        if coll_folder:
+            self.copy_files_cmd_(dest, files)
+        else:
+            OpenWins.smb(self.window())
+
+    def copy_files_cmd_(self, dest: str, files: list):
+        files = [i for i in files if os.path.exists(i)]
+
+        if len(files) == 0:
+            return
+
+        cmd_ = lambda files: self.copy_files_fin(files=files)
+        copy_task = CopyFiles(dest=dest, files=files)
+        copy_task.signals_.finished_.connect(cmd_)
+
+        SignalsApp.all_.btn_downloads_toggle.emit("show")
+        UThreadPool.pool.start(copy_task)
+
+    def copy_files_fin(self, files: list):
+        self.reveal_files = Utils.reveal_files(files)
+        if len(CopyFiles.current_threads) == 0:
+            SignalsApp.all_.btn_downloads_toggle.emit("hide")
+
+    def selected_style(self):
+        self.setStyleSheet(TITLE_SOLID)
+
+    def regular_style(self):
+        self.setStyleSheet(TITLE_NORMAL)
+
+    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        self.r_click.emit()
+
+        menu_ = ContextCustom(ev)
+
+        cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
+        save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
+        save_jpg.triggered.connect(cmd_)
+        menu_.addAction(save_jpg)
+
+        cmd_ = lambda: self.save_cmd(is_layers=True, save_as=False)
+        save_layers = QAction(text=Lang.save_all_layers, parent=menu_)
+        save_layers.triggered.connect(cmd_)
+        menu_.addAction(save_layers)
+
+        menu_.addSeparator()
+
+        cmd_ = lambda: self.save_cmd(is_layers=False, save_as=True)
+        save_as_jpg = QAction(text=Lang.save_all_JPG_as, parent=menu_)
+        save_as_jpg.triggered.connect(cmd_)
+        menu_.addAction(save_as_jpg)
+
+        cmd_ = lambda: self.save_cmd(is_layers=True, save_as=True)
+        save_as_layers = QAction(text=Lang.save_all_layers_as, parent=menu_)
+        save_as_layers.triggered.connect(cmd_)
+        menu_.addAction(save_as_layers)
+
+        self.selected_style()
+        menu_.show_menu()
+        self.regular_style()
 
 
 class NameLabel(QLabel):
