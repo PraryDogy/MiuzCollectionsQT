@@ -264,9 +264,7 @@ class Grid(QScrollArea):
 
     def resize_thumbnails(self):
         "изменение размера Thumbnail"
-        thumbnails = self.grid_wid.findChildren(Thumbnail)
-
-        for thumb in thumbnails:
+        for thumb in self.grid_wid.findChildren(Thumbnail):
             thumb.setup()
 
         self.rearrange()
