@@ -64,15 +64,16 @@ class Grid(QScrollArea):
         self.main_wid = QWidget(parent=self)
         self.setWidget(self.main_wid)
         
-        self.main_layout = LayoutVer(self.main_wid)
+        self.main_layout = LayoutVer()
         self.main_wid.setLayout(self.main_layout)
 
         self.up_btn = UpBtn(self.main_wid)
         self.up_btn.hide()
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
-        self.columns = self.get_columns()
-        self.create_main_widget()
+        # self.max_col = self.get_max_col()
+        # self.create_main_widget()
+        self.signals_cmd(flag="reload")
 
         SignalsApp.all_.thumbnail_select.connect(self.select_new_widget)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
@@ -80,11 +81,14 @@ class Grid(QScrollArea):
 
     def signals_cmd(self, flag: str):
         if flag == "resize":
-            self.resize_thumbnails()
+            ...
+            # self.resize_thumbnails()
         elif flag == "to_top":
-            self.verticalScrollBar().setValue(0)
+            ...
+            # self.verticalScrollBar().setValue(0)
         elif flag == "reload":
-            self.create_main_widget()
+            # self.create_main_widget()
+            self.load_db_data(flag="first")
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)
 
@@ -93,116 +97,123 @@ class Grid(QScrollArea):
 
         if flag == "first":
             Dynamic.grid_offset = 0
-            cmd_ = lambda db_images: self.grid_first(db_images)
+            cmd_ = lambda db_images: self.create_grid(db_images)
+
+            # удали потом
+            self.task_ = DbImages()
+            self.task_.signals_.finished_.connect(cmd_)
+            UThreadPool.pool.start(self.task_)
 
         elif flag == "more":
-            Dynamic.grid_offset += GRID_LIMIT
-            cmd_ = lambda db_images: self.grid_more(db_images)
+            ...
+            # Dynamic.grid_offset += GRID_LIMIT
+            # cmd_ = lambda db_images: self.grid_more(db_images)
         
         else: 
             raise Exception("wrong flag", flag)
 
-        self.task_ = DbImages()
-        self.task_.signals_.finished_.connect(cmd_)
-        UThreadPool.pool.start(self.task_)
+        # self.task_ = DbImages()
+        # self.task_.signals_.finished_.connect(cmd_)
+        # UThreadPool.pool.start(self.task_)
 
-    def create_main_widget(self):
-        
-        if hasattr(self, "grids_widget"):
-            self.grids_widget.deleteLater()
+    def create_grid(self, db_images: dict[str, list[DbImage]]):
 
-        self.all_grids_row = 0
+        if hasattr(self, "grid_widget"):
+            self.grid_widget.deleteLater()
+
         self.curr_cell: tuple = (0, 0)
         self.curr_short_src = None
-
         self.current_widgets.clear()
         self.cell_to_wid.clear()
-
         Thumbnail.path_to_wid.clear()
-
         self.up_btn.hide()
 
-        self.grids_widget = QWidget()
-        self.grids_layout = LayoutVer()
-        self.grids_layout.setContentsMargins(5, 10, 5, 10)
-        self.grids_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.grids_widget.setLayout(self.grids_layout)
-
-        self.load_db_data(flag="first")
-
-    def grid_first(self, db_images: dict[str, list[DbImage]]):
-
-        if db_images:
-
-            above_thumbs = AboveThumbs()
-            above_thumbs.setSizePolicy(
-                QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Preferred
-                )
-            self.grids_layout.addWidget(above_thumbs)
-
-            for date, db_images in db_images.items():
-                self.grid_single(date, db_images)
-
-        else:
-            no_images = AboveThumbsNoImages()
-            no_images.setSizePolicy(
-                QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Preferred
-                )
-            self.grids_layout.addWidget(no_images)
-
-        self.main_layout.addWidget(self.grids_widget)
-        self.main_wid.setFocus()
-
-    def grid_single(self, date: str, db_images: list[DbImage]):
-        title_label = Title(title=date, db_images=db_images)
-        title_label.r_click.connect(self.reset_selection)
-        self.grids_layout.addWidget(title_label)
+        self.row, self.col = 0, 0
 
         grid_widget = QWidget()
-        self.grids_layout.addWidget(grid_widget)
+        self.main_layout.addWidget(grid_widget)
 
-        grid_layout = QGridLayout()
-        grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        grid_layout.setContentsMargins(0, 0, 0, 30)
-        self.current_widgets[grid_layout] = []
+        self.grid_layout = QGridLayout()
+        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        grid_widget.setLayout(self.grid_layout)
 
-        grid_widget.setLayout(grid_layout)
-
-        row, col = 0, 0
-
-        for db_image in db_images:
-        
-            wid = Thumbnail(
-                pixmap=db_image.pixmap,
-                short_src=db_image.short_src,
-                coll=db_image.coll,
-                fav=db_image.fav
-                )
-
-            wid.select.connect(lambda w=wid: self.select_new_widget(w))
-
-            wid.row, wid.col = row, col
-            self.cell_to_wid[row, col] = wid
-            Thumbnail.path_to_wid[wid.short_src] = wid
-
-            self.current_widgets[grid_layout].append(wid)
-            grid_layout.addWidget(wid, row, col)
-
-            col += 1
-            if col >= self.columns:
-                col = 0
-                row += 1
-                self.all_grids_row += 1
-
-        if len(db_images) % self.columns != 0:
-            self.all_grids_row += 1
-
-    def grid_more(self, db_images: dict[str, list[DbImage]]):
         if db_images:
+            max_col = self.get_max_col()
+
+            # above_thumbs = AboveThumbs()
+            # above_thumbs.setSizePolicy(
+            #     QSizePolicy.Policy.Expanding,
+            #     QSizePolicy.Policy.Preferred
+            #     )
+            # self.grid_layout.addWidget(
+            #     above_thumbs,
+            #     self.row,
+            #     self.col,
+            #     0,
+            #     max_col
+            # )
+            # self.row += 1
+
+
             for date, db_images in db_images.items():
-                self.grid_single(date, db_images)
+
+                title = Title(title=date, db_images=db_images)
+                title.r_click.connect(self.reset_selection)
+                self.grid_layout.addWidget(
+                    title,
+                    self.row,
+                    self.col,
+                    1,
+                    max_col
+                    )
+                
+                title.row, title.col = self.row, self.col
+                self.cell_to_wid[self.row, self.col] = title
+
+                self.row += 1
+
+                for db_image in db_images:
+
+                    wid = Thumbnail(
+                        pixmap=db_image.pixmap,
+                        short_src=db_image.short_src,
+                        coll=db_image.coll,
+                        fav=db_image.fav
+                        )
+
+                    wid.select.connect(lambda w=wid: self.select_new_widget(w))
+
+                    wid.row, wid.col = self.row, self.col
+                    self.cell_to_wid[self.row, self.col] = wid
+                    Thumbnail.path_to_wid[wid.short_src] = wid
+
+                    self.grid_layout.addWidget(wid, self.row, self.col)
+
+                    self.col += 1
+
+                    if self.col >= max_col:
+                        self.col = 0
+                        self.row += 1
+
+                self.row += 1
+                self.col = 0
+
+        # else:
+        #     no_images = AboveThumbsNoImages()
+        #     no_images.setSizePolicy(
+        #         QSizePolicy.Policy.Expanding,
+        #         QSizePolicy.Policy.Preferred
+        #         )
+        #     self.grids_layout.addWidget(no_images)
+
+        # self.main_layout.addWidget(self.grids_widget)
+        # self.main_wid.setFocus()
+
+
+    # def grid_more(self, db_images: dict[str, list[DbImage]]):
+    #     if db_images:
+    #         for date, db_images in db_images.items():
+    #             self.grid_single(date, db_images)
 
     def select_prev_widget(self):
         """
@@ -225,7 +236,11 @@ class Grid(QScrollArea):
             new_wid = Thumbnail.path_to_wid.get(data)
             coords = new_wid.row, new_wid.col
 
-        if isinstance(new_wid, Thumbnail):
+        if isinstance(new_wid, Title):
+            data = (new_wid.row + 1, new_wid.col)
+            self.select_new_widget(data)
+
+        elif isinstance(new_wid, Thumbnail):
             self.reset_selection()
             new_wid.selected_style()
 
@@ -256,7 +271,7 @@ class Grid(QScrollArea):
             self.win_image_view.center_relative_parent(self.window())
             self.win_image_view.show()
 
-    def get_columns(self):
+    def get_max_col(self):
         return max(
             self.ww // (THUMB_W[JsonData.curr_size_ind] + (THUMB_MARGIN)),
             1
@@ -270,6 +285,7 @@ class Grid(QScrollArea):
         self.rearrange()
 
     def rearrange(self):
+        return
         "перетасовка сетки"
 
         if not hasattr(self, "first_load"):
@@ -277,7 +293,7 @@ class Grid(QScrollArea):
             return
 
         self.ww = self.width()
-        self.columns = self.get_columns()
+        self.max_col = self.get_max_col()
 
         # посколько это просто перетасовка
         # то есть все те же виджеты что были но в другом порядке
@@ -298,12 +314,12 @@ class Grid(QScrollArea):
                 grid_layout.addWidget(wid, row, col)
 
                 col += 1
-                if col >= self.columns:
+                if col >= self.max_col:
                     col = 0
                     row += 1
                     self.all_grids_row += 1
 
-            if len(widgets) % self.columns != 0:
+            if len(widgets) % self.max_col != 0:
                 self.all_grids_row += 1
         
         self.select_prev_widget()

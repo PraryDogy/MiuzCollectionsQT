@@ -21,6 +21,7 @@ class Title(QLabel):
     def __init__(self, title: str, db_images: list[DbImage]):
         super().__init__(f"{title}. {Lang.total}: {len(db_images)}")
         self.db_images = db_images
+        self.row, self.col = 0, 0
 
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
