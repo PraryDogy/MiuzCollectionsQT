@@ -119,12 +119,17 @@ class Grid(QScrollArea):
         if hasattr(self, "grids_widget"):
             self.grids_widget.deleteLater()
 
-        self.reset_grids_info()
+        self.all_grids_row = 0
+        self.curr_cell: tuple = (0, 0)
+        self.curr_short_src = None
+
         self.current_widgets.clear()
+        self.cell_to_wid.clear()
+        Thumbnail.path_to_wid.clear()
+
         self.up_btn.hide()
 
         self.grids_widget = QWidget()
-
         self.grids_layout = LayoutVer()
         self.grids_layout.setContentsMargins(5, 10, 5, 10)
         self.grids_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -253,8 +258,6 @@ class Grid(QScrollArea):
 
         if isinstance(widget, Thumbnail):
             widget.regular_style()
-            # self.curr_cell: tuple = (0, 0)
-            # self.curr_short_src = None
 
             if isinstance(BarBottom.path_label, QLabel):
                 BarBottom.path_label.setText("")
@@ -265,8 +268,6 @@ class Grid(QScrollArea):
         Thumbnail.path_to_wid[wid.short_src] = wid
 
     def reset_grids_info(self):
-        # self.curr_cell: tuple = (0, 0)
-        # self.curr_short_src = None
         self.all_grids_row = 0
         self.cell_to_wid.clear()
         Thumbnail.path_to_wid.clear()
