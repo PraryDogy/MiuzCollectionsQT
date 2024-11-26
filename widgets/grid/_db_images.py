@@ -86,7 +86,7 @@ class DbImages(URunnable):
 
     def get_stmt(self) -> sqlalchemy.Select:
         q = sqlalchemy.select(
-            THUMBS.c.src,
+            THUMBS.c.short_src,
             THUMBS.c.short_hash,
             THUMBS.c.mod,
             THUMBS.c.coll,
@@ -101,7 +101,7 @@ class DbImages(URunnable):
 
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
-            stmt_where.append(THUMBS.c.src.ilike(f"%{text}%"))
+            stmt_where.append(THUMBS.c.short_src.ilike(f"%{text}%"))
 
             for i in stmt_where:
                 q = q.where(i)
@@ -158,7 +158,7 @@ class DbImages(URunnable):
                 и пользовательских фильтров.
         """
         conditions = [
-            THUMBS.c.src.not_ilike(f"%{os.sep}{user_filter.real}{os.sep}%")
+            THUMBS.c.short_src.not_ilike(f"%{os.sep}{user_filter.real}{os.sep}%")
             for sys_filter in sys_filters
             for user_filter in user_filters
             if sys_filter.value
@@ -187,7 +187,7 @@ class DbImages(URunnable):
                 из пользовательских фильтров.
         """
         conditions = [
-            THUMBS.c.src.ilike(f"%{os.sep}{filter.real}{os.sep}%")
+            THUMBS.c.short_src.ilike(f"%{os.sep}{filter.real}{os.sep}%")
             for filter in user_filters
             if filter.value
         ]

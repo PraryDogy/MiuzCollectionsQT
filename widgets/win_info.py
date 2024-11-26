@@ -53,7 +53,7 @@ class InfoTask(URunnable):
         conn = Dbase.engine.connect()
 
         cols = (THUMBS.c.size, THUMBS.c.mod, THUMBS.c.resol,THUMBS.c.coll)
-        q = sqlalchemy.select(*cols).where(THUMBS.c.src==self.short_src)
+        q = sqlalchemy.select(*cols).where(THUMBS.c.short_src==self.short_src)
 
         res = conn.execute(q).first()
         conn.close()

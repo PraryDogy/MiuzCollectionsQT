@@ -115,7 +115,7 @@ class DbImages:
 
         q = sqlalchemy.select(
             THUMBS.c.short_hash,
-            THUMBS.c.src,
+            THUMBS.c.short_src,
             THUMBS.c.size,
             THUMBS.c.birth,
             THUMBS.c.mod

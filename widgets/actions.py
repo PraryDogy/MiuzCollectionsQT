@@ -134,7 +134,7 @@ class FavTask(URunnable):
     @URunnable.set_running_state
     def run(self):
         values = {"fav": self.value}
-        q = sqlalchemy.update(THUMBS).where(THUMBS.c.src==self.short_src)
+        q = sqlalchemy.update(THUMBS).where(THUMBS.c.short_src==self.short_src)
         q = q.values(**values)
 
         conn = Dbase.engine.connect()

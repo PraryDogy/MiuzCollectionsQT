@@ -62,7 +62,7 @@ class LoadThumb(URunnable):
         q = sqlalchemy.select(
             THUMBS.c.short_hash
             ).where(
-                THUMBS.c.src == self.short_src
+                THUMBS.c.short_src == self.short_src
                 )
         short_hash_path = conn.execute(q).scalar()
         conn.close()

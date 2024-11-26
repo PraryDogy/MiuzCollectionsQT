@@ -8,8 +8,8 @@ METADATA = sqlalchemy.MetaData()
 THUMBS = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("src", sqlalchemy.Text),
-    sqlalchemy.Column("hash_path", sqlalchemy.Text, comment="Путь к маленькой картинке"),
+    sqlalchemy.Column("short_src", sqlalchemy.Text),
+    sqlalchemy.Column("short_hash", sqlalchemy.Text, comment="Путь к маленькой картинке"),
     sqlalchemy.Column("size", sqlalchemy.Integer, comment="Размер"),
     sqlalchemy.Column("birth", sqlalchemy.Integer, comment="Дата созд."),
     sqlalchemy.Column("mod", sqlalchemy.Integer, comment="Дата изм."),
