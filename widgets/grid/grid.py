@@ -88,20 +88,6 @@ class Grid(QScrollArea):
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)
 
-    def checkScrollValue(self, value):
-        self.up_btn.move(
-            self.width() - 60,
-            self.height() - 60 + value
-            )
-        if value > 0:
-            self.up_btn.show()
-            self.up_btn.raise_()
-        elif value == 0:
-            self.up_btn.hide()
-
-        if value == self.verticalScrollBar().maximum():
-            self.load_db_data("more")
-
     def load_db_data(self, flag: str):
         """flag: first, more"""
 
@@ -142,7 +128,7 @@ class Grid(QScrollArea):
         self.grids_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.grids_widget.setLayout(self.grids_layout)
 
-        self.load_db_data("first")
+        self.load_db_data(flag="first")
 
     def grid_first(self, db_images: dict[str, list[DbImage]]):
 
@@ -380,3 +366,17 @@ class Grid(QScrollArea):
         self.menu_.addAction(reload)
 
         self.menu_.show_menu()
+
+    def checkScrollValue(self, value):
+        self.up_btn.move(
+            self.width() - 60,
+            self.height() - 60 + value
+            )
+        if value > 0:
+            self.up_btn.show()
+            self.up_btn.raise_()
+        elif value == 0:
+            self.up_btn.hide()
+
+        if value == self.verticalScrollBar().maximum():
+            self.load_db_data(flag="more")
