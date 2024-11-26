@@ -324,7 +324,11 @@ class Grid(QScrollArea):
         self.select_old_wid()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.modifiers() & Qt.KeyboardModifier.ControlModifier and a0.key() == Qt.Key.Key_I:
+        if (
+            a0.modifiers() & Qt.KeyboardModifier.ControlModifier
+            and
+            a0.key() == Qt.Key.Key_I
+        ):
             wid = self.get_curr_cell()
             coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
 
