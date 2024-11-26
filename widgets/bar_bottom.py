@@ -102,9 +102,6 @@ class CustomSlider(BaseSlider):
         SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
 
 
-# ОТСЛЕЖИВАТЬ СМЕНУ ТЕМЫ МАС
-
-
 class BarBottom(QWidget):
     path_label: QLabel = None
 
