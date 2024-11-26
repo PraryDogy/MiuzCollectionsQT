@@ -277,8 +277,8 @@ class DbUpdater:
                 full_hash_path = Utils.create_full_hash_path(full_src)
 
                 values = {
-                    "src": Utils.get_short_src(self.coll_folder, full_src),
-                    "hash_path": Utils.get_short_hash_path(full_hash_path),
+                    "short_src": Utils.get_short_src(self.coll_folder, full_src),
+                    "short_hash": Utils.get_short_hash_path(full_hash_path),
                     "size": size,
                     "birth": birth,
                     "mod": mod,

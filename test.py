@@ -14,7 +14,7 @@ res = conn.execute(q).fetchall()
 for id_, hash_path in res:
     values_ = {
         "id": id_,
-        "hash_path": hash_path.replace(
+        "short_hash": hash_path.replace(
             APP_SUPPORT_DIR,
             ""
         )
