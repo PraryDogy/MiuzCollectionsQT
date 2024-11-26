@@ -183,7 +183,10 @@ class Grid(QScrollArea):
 
             wid.select.connect(lambda w=wid: self.select_new_widget(w))
 
-            self.add_thumbnails_data(wid, self.all_grids_row, col)
+            wid.row, wid.col = row, col
+            self.cell_to_wid[row, col] = wid
+            Thumbnail.path_to_wid[wid.short_src] = wid
+
             self.current_widgets[grid_layout].append(wid)
             grid_layout.addWidget(wid, row, col)
 
@@ -252,16 +255,6 @@ class Grid(QScrollArea):
             if isinstance(BarBottom.path_label, QLabel):
                 BarBottom.path_label.setText("")
 
-    def add_thumbnails_data(self, wid: Thumbnail, row: int, col: int):
-        wid.row, wid.col = row, col
-        self.cell_to_wid[row, col] = wid
-        Thumbnail.path_to_wid[wid.short_src] = wid
-
-    def reset_grids_info(self):
-        self.all_grids_row = 0
-        self.cell_to_wid.clear()
-        Thumbnail.path_to_wid.clear()
-
     def open_in_view(self, wid: Thumbnail):
         wid = Thumbnail.path_to_wid.get(wid.short_src)
 
@@ -272,7 +265,10 @@ class Grid(QScrollArea):
             self.win_image_view.show()
 
     def get_columns(self):
-        return max(self.ww // (THUMB_W[JsonData.curr_size_ind] + (THUMB_MARGIN)), 1)
+        return max(
+            self.ww // (THUMB_W[JsonData.curr_size_ind] + (THUMB_MARGIN)),
+            1
+        )
 
     def resize_thumbnails(self):
         "изменение размера Thumbnail"
@@ -291,14 +287,22 @@ class Grid(QScrollArea):
         self.ww = self.width()
         self.columns = self.get_columns()
 
-        self.reset_grids_info()
+        # посколько это просто перетасовка
+        # то есть все те же виджеты что были но в другом порядке
+        self.all_grids_row = 0
+        self.cell_to_wid.clear()
+        Thumbnail.path_to_wid.clear()
 
         for grid_layout, widgets in self.current_widgets.items():
 
             row, col = 0, 0
 
             for wid in widgets:
-                self.add_thumbnails_data(wid, self.all_grids_row, col)
+
+                wid.row, wid.col = row, col
+                self.cell_to_wid[row, col] = wid
+                Thumbnail.path_to_wid[wid.short_src] = wid
+
                 grid_layout.addWidget(wid, row, col)
 
                 col += 1
