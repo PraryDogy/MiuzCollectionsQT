@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QScrollArea,
-                             QSizePolicy, QWidget)
+                             QSizePolicy, QWidget, QSpacerItem)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
 from cfg import MENU_LEFT_WIDTH, THUMB_MARGIN, THUMB_W, JsonData, Dynamic, GRID_LIMIT
@@ -126,6 +126,10 @@ class Grid(QScrollArea):
         max_col = self.get_max_col()
 
         if not db_images:
+
+            spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
+            self.grid_lay.addItem(spacer, 0, 0)
+
             no_images = ErrorTitle()
             no_images.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
@@ -133,7 +137,6 @@ class Grid(QScrollArea):
                 )
             self.grid_lay.addWidget(no_images, self.row, self.col, 1, max_col)
             self.row += 1
-            no_images.setStyleSheet("background: red;")
             return
 
         filter_title = FilterTitle()
