@@ -89,6 +89,12 @@ class Title(QLabel):
         if len(CopyFiles.current_threads) == 0:
             SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
+    def selected_style(self):
+        self.setStyleSheet(TITLE_SOLID)
+
+    def regular_style(self):
+        self.setStyleSheet(TITLE_NORMAL)
+
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         self.r_click.emit()
 
@@ -116,6 +122,6 @@ class Title(QLabel):
         save_as_layers.triggered.connect(cmd_)
         menu_.addAction(save_as_layers)
 
-        self.setStyleSheet(TITLE_SOLID)
+        self.selected_style()
         menu_.show_menu()
-        self.setStyleSheet(TITLE_NORMAL)
+        self.regular_style()
