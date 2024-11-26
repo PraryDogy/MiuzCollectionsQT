@@ -84,8 +84,12 @@ class ErrorTitle(QWidget):
         self.v_layout = LayoutVer()
         self.setLayout(self.v_layout)
 
-        title = QLabel(text=Lang.no_photo)
+        title = QLabel()
         title.setStyleSheet(TITLE_NORMAL)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Fixed,
+            QSizePolicy.Policy.Preferred
+            )
         self.v_layout.addWidget(title)
 
         h_wid = QWidget()
@@ -141,13 +145,11 @@ class FilterTitle(QWidget):
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Preferred
             )
-
         self.v_layout.addWidget(title)
 
         h_wid = QWidget()
         h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
-        # h_layout.setContentsMargins(0, 10, 0, 0)
         self.v_layout.addWidget(h_wid)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
