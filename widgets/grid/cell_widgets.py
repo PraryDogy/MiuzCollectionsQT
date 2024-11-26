@@ -201,8 +201,22 @@ class Thumbnail(QFrame, CellWid):
 
     def setup(self):
         name_label_h = 35
-        thumb_h = Static.PIXMAP_SIZE[JsonData.curr_size_ind] + name_label_h + Static.THUMB_MARGIN + self.spacing
-        thumb_w = Static.THUMB_W[JsonData.curr_size_ind] + Static.THUMB_MARGIN
+
+        thumb_h = sum(
+            (
+            Static.PIXMAP_SIZE[JsonData.curr_size_ind],
+            name_label_h,
+            Static.THUMB_MARGIN,
+            self.spacing
+            )
+        )
+
+        thumb_w = sum(
+            (
+            Static.THUMB_W[JsonData.curr_size_ind],
+            Static.THUMB_MARGIN
+            )
+        )
 
         self.img_label.setFixedHeight(Static.PIXMAP_SIZE[JsonData.curr_size_ind])
         self.name_label.setFixedHeight(name_label_h)

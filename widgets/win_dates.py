@@ -263,8 +263,8 @@ class WinDates(WinSystem):
         Dynamic.date_start = self.date_start
         Dynamic.date_end = self.date_end
 
-        Dynamic.date_start_text = self.named_date(date=Dynamic.date_start)
-        Dynamic.date_end_text = self.named_date(date=Dynamic.date_end)
+        Dynamic.f_date_start = self.named_date(date=Dynamic.date_start)
+        Dynamic.f_date_end = self.named_date(date=Dynamic.date_end)
 
         DatesBtn.base_styles()
         self.close()

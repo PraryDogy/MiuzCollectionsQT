@@ -74,7 +74,7 @@ class DbImages(URunnable):
                 pixmap = Utils.pixmap_from_array(array_img)
 
             if Dynamic.date_start or Dynamic.date_end:
-                mod = f"{Dynamic.date_start_text} - {Dynamic.date_end_text}"
+                mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
 
             else:
                 mod = f"{Lang.months[str(mod.month)]} {mod.year}"

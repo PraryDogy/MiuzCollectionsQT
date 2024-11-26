@@ -114,7 +114,7 @@ class ErrorTitle(QWidget):
 
         elif any((Dynamic.date_start, Dynamic.date_end)):
             noimg_t = (f"{Lang.no_photo}: "
-                       f"{Dynamic.date_start_text} - {Dynamic.date_end_text}")
+                       f"{Dynamic.f_date_start} - {Dynamic.f_date_end}")
 
             title.setText(noimg_t)
             h_layout.addWidget(ResetDatesBtn())
@@ -154,7 +154,7 @@ class FilterTitle(QWidget):
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             title.setText(
-                f"{Lang.photos_named_dates}: {Dynamic.date_start_text} - {Dynamic.date_end_text}"
+                f"{Lang.photos_named_dates}: {Dynamic.f_date_start} - {Dynamic.f_date_end}"
                 )
             h_layout.addWidget(ResetDatesBtn())
 

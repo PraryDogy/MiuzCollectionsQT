@@ -315,8 +315,8 @@ class JsonData:
 class Dynamic:
     date_start: datetime = None
     date_end: datetime = None
-    date_start_text: str = None # 1 january 1991
-    date_end_text: str = None # 31 january 1991
+    f_date_start: str = None # 1 january 1991
+    f_date_end: str = None # 31 january 1991
     grid_offset: int = 0
     search_widget_text: str = None
     curr_coll_name = Static.NAME_ALL_COLLS
