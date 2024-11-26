@@ -227,20 +227,23 @@ class Grid(QScrollArea):
             new_wid = Thumbnail.path_to_wid.get(data)
             coords = new_wid.row, new_wid.col
 
+        # вычисляем это движение вверх или вниз
+        if self.curr_cell > coords:
+            offset = -1
+        else:
+            offset = 1
+
+        # если виджет по движению не найден, пробуем назначить новую строку
         if not new_wid:
-            coords = (coords[0] + 1, 0)
+            coords = (coords[0] + offset, 0)
             new_wid = self.get_cell(coords)
 
+        # если это заголовок, прибавляем/убавляем строку чтобы пропустить его
         if isinstance(new_wid, Title):
-            if self.curr_cell > coords:
-                offset = -1
-            else:
-                offset = 1
-            
-            data = (data[0] + offset, data[1])
-            self.select_wid(data)
+            coords = (data[0] + offset, data[1])
+            new_wid = self.get_cell(coords)
 
-        elif isinstance(new_wid, Thumbnail):
+        if isinstance(new_wid, Thumbnail):
             self.deselect_wid()
             new_wid.selected_style()
             self.ensureWidgetVisible(new_wid)
