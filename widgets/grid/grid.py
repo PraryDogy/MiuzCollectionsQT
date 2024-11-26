@@ -158,6 +158,14 @@ class Grid(QScrollArea):
 
         self.set_coords(title)
 
+        # fake_cells =[
+        #     (self.row, i)
+        #     for i in range(1, max_col)
+        #     ]
+        
+        # for i in fake_cells:
+        #     self.cell_to_wid[i] = title
+
         self.grid_lay.addWidget(title, self.row, self.col, 1, max_col)
         self.row += 1
 
