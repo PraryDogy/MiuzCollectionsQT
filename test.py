@@ -1,24 +1,27 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFontMetrics, QPainter
-from PyQt5.QtWidgets import QApplication, QLabel
+from database import Dbase, THUMBS
+import sqlalchemy
+from cfg import JsonData
 
 
-class MyLabel(QLabel):
-    def paintEvent(self, event):
-        painter = QPainter(self)
+JsonData.init()
+Dbase.init()
 
-        metrics = QFontMetrics(self.font())
-        elided = metrics.elidedText(self.text(), Qt.ElideRight, self.width())
+conn = Dbase.engine.connect()
 
-        painter.drawText(self.rect(), self.alignment(), elided)
+q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.hash_path)
+res = conn.execute(q).fetchall()
 
+for id_, hash_path in res:
+    values_ = {
+        "id": id_,
+        "hash_path": hash_path.replace(
+            "/Users/Loshkarev/Library/Application Support/MiuzCollectionsQT",
+            "/Users/Loshkarev/Library/Application Support/Collections"
+        )
+    }
 
-if __name__ == '__main__':
-    app = QApplication([])
+    q = sqlalchemy.update(THUMBS).where(THUMBS.c.id == id_).values(**values_)
+    conn.execute(q)
 
-    label = MyLabel()
-    label.setText('This is a really, long and poorly formatted runon sentence used to illustrate a point')
-    label.setWindowFlags(Qt.Dialog)
-    label.show()
-
-    app.exec_()
+conn.commit()
+conn.close()
