@@ -145,8 +145,6 @@ class Grid(QScrollArea):
 
         for date, db_images in db_images.items():
             self.single_grid(date, db_images)
-            self.row += 1
-            self.col = 0
 
         # scroll_wid.setFocus()
 
@@ -183,7 +181,11 @@ class Grid(QScrollArea):
                 self.col = 0
                 self.row += 1
 
+        self.row += 1
+        self.col = 0
+
     def grid_more(self, db_images: dict[str, list[DbImage]]):
+        self.row -= 1
         if db_images:
             for date, db_images in db_images.items():
                 self.single_grid(date, db_images)
