@@ -168,7 +168,7 @@ class Thumbnail(QFrame, CellWid):
     path_to_wid: dict[str, "Thumbnail"] = {}
 
     spacing = 5
-    name_label_h: int = 0
+    name_label_h: int = 35
     thumb_h: int = 0
     thumb_w: int = 0
 
@@ -205,7 +205,6 @@ class Thumbnail(QFrame, CellWid):
 
     @classmethod
     def calculate_size(cls):
-        cls.name_label_h = 35
 
         cls.thumb_h = sum(
             (
