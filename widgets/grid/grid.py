@@ -182,7 +182,7 @@ class Grid(QScrollArea):
         title = Title(title=date, db_images=db_images)
         title.r_click.connect(self.deselect_wid)
 
-        self.set_coords(title)
+        self.set_cell_coords(title)
 
         self.grid_lay.addWidget(title, self.row, self.col, 1, max_col)
         self.row += 1
@@ -197,8 +197,8 @@ class Grid(QScrollArea):
             )
             wid.select.connect(lambda w=wid: self.select_wid(w))
 
-            self.set_coords(wid)
-            Thumbnail.path_to_wid[wid.short_src] = wid
+            self.set_cell_coords(wid)
+            self.set_path_to_wid(wid)
 
             self.grid_lay.addWidget(wid, self.row, self.col)
 
@@ -229,10 +229,16 @@ class Grid(QScrollArea):
     def reset_curr_cell(self):
         self.curr_cell = (0, 0)
 
-    def set_coords(self, wid: CellWid):
+    def set_cell_coords(self, wid: CellWid):
         coords = self.row, self.col
         self.cell_to_wid[coords] = wid
         wid.row, wid.col = coords
+
+    def set_path_to_wid(self, wid: Thumbnail):
+        Thumbnail.path_to_wid[wid.short_src] = wid
+
+    def get_path_to_wid(self, src: str):
+        return Thumbnail.path_to_wid.get(src)
 
     def clear_grid_data(self):
         self.cell_to_wid.clear()
@@ -248,7 +254,7 @@ class Grid(QScrollArea):
             new_wid = self.get_cell(coords)
 
         elif isinstance(data, str):
-            new_wid = Thumbnail.path_to_wid.get(data)
+            new_wid = self.get_path_to_wid(src=data)
             coords = new_wid.row, new_wid.col
 
         # вычисляем это движение вверх или вниз
@@ -283,22 +289,20 @@ class Grid(QScrollArea):
         return None
 
     def deselect_wid(self):
-        wid = self.get_curr_cell()
 
+        wid = self.get_curr_cell()
         if isinstance(wid, Thumbnail | Title):
             wid.regular_style()
 
-        if isinstance(BarBottom.path_label, QLabel):
-            BarBottom.path_label.setText("")
+        assert isinstance(BarBottom.path_label, QLabel)
+        BarBottom.path_label.setText("")
 
     def open_in_view(self, wid: Thumbnail):
-        wid = Thumbnail.path_to_wid.get(wid.short_src)
-
-        if isinstance(wid, Thumbnail):
-            from ..win_image_view import WinImageView
-            self.win_image_view = WinImageView(short_src=wid.short_src)
-            self.win_image_view.center_relative_parent(self.window())
-            self.win_image_view.show()
+        assert isinstance(wid, Thumbnail)
+        from ..win_image_view import WinImageView
+        self.win_image_view = WinImageView(short_src=wid.short_src)
+        self.win_image_view.center_relative_parent(self.window())
+        self.win_image_view.show()
 
     def get_max_col(self):
         sm = sum(
@@ -343,16 +347,16 @@ class Grid(QScrollArea):
                 self.col = 0
                 self.row += 1
 
-                self.set_coords(wid)
+                self.set_cell_coords(wid)
 
                 self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
                 self.row += 1
 
             elif isinstance(wid, Thumbnail):
 
-                self.set_coords(wid)
+                self.set_cell_coords(wid)
 
-                Thumbnail.path_to_wid[wid.short_src] = wid
+                self.set_path_to_wid(wid)
                 self.grid_lay.addWidget(wid, self.row, self.col)
                 self.col += 1
 
