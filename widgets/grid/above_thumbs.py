@@ -86,10 +86,12 @@ class ErrorTitle(QWidget):
 
         title = QLabel()
         title.setStyleSheet(Static.TITLE_NORMAL)
+    
         self.setSizePolicy(
-            QSizePolicy.Policy.Fixed,
+            QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Preferred
-            )
+        )
+
         self.v_layout.addWidget(title)
 
         h_wid = QWidget()
@@ -142,9 +144,9 @@ class FilterTitle(QWidget):
         title = QLabel()
         title.setStyleSheet(Static.TITLE_NORMAL)
         self.setSizePolicy(
-            QSizePolicy.Policy.Fixed,
+            QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Preferred
-            )
+        )
         self.v_layout.addWidget(title)
 
         h_wid = QWidget()

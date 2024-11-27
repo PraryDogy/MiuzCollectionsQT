@@ -146,6 +146,7 @@ class Grid(QScrollArea):
         self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.grid_wid.setLayout(self.grid_lay)
 
+        # сбарсываем счет строчек и колонок
         self.row, self.col = 0, 0
         max_col = self.get_max_col()
 
@@ -155,20 +156,14 @@ class Grid(QScrollArea):
             self.grid_lay.addItem(spacer, 0, 0)
 
             no_images = ErrorTitle()
-            no_images.setSizePolicy(
-                QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Preferred
-                )
             self.grid_lay.addWidget(no_images, self.row, self.col, 1, max_col)
+            # добавляем новую строку так как это заголовок
             self.row += 1
             return
 
         filter_title = FilterTitle()
-        filter_title.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Preferred
-            )
         self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
+        # добавляем новую строку так как это заголовок
         self.row += 1
 
         Thumbnail.calculate_size()
@@ -178,13 +173,13 @@ class Grid(QScrollArea):
     def single_grid(self, date: str, db_images: list[DbImage]):
         max_col = self.get_max_col()
 
+        # сбрасываем колонку потому что title всего в колонке 0
         self.col = 0
         title = Title(title=date, db_images=db_images)
         title.r_click.connect(self.deselect_wid)
-
         self.set_cell_coords(title)
-
         self.grid_lay.addWidget(title, self.row, self.col, 1, max_col)
+        # прибавляем 1 строку после title
         self.row += 1
 
         for db_image in db_images:
@@ -196,18 +191,20 @@ class Grid(QScrollArea):
                 fav=db_image.fav
             )
             wid.select.connect(lambda w=wid: self.select_wid(w))
-
             self.set_cell_coords(wid)
             self.set_path_to_wid(wid)
-
             self.grid_lay.addWidget(wid, self.row, self.col)
 
+            # прибавляем колонку после установки виджета
             self.col += 1
 
+            # если достигнут максимум колонок, прибавляем строку и сброс колонки
             if self.col >= max_col:
                 self.col = 0
                 self.row += 1
 
+        # в конце мы добавляем строку и сбрасываем колонку как отсечку
+        # этой сетки от остальных
         self.row += 1
         self.col = 0
 
