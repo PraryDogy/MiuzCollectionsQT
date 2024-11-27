@@ -57,7 +57,7 @@ class CollectionBtn(QLabel):
             self.pressed_.emit()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        QTimer.singleShot(50, self.pressed_.emit)
+        # QTimer.singleShot(50, self.pressed_.emit)
         menu_ = ContextCustom(event=ev)
 
         reveal_coll = QAction(text=Lang.reveal_in_finder, parent=self)
