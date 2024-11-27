@@ -186,10 +186,6 @@ class Grid(QScrollArea):
         self.col = 0
 
     def grid_more(self, db_images: dict[str, list[DbImage]]):
-        # мы удаляем 1 строчку так как в конце single_grid мы прибавляем
-        # 1 строчку, соответственно после последней single_grid
-        # есть одна лишняя строка, которую мы и удаляем
-        self.row -= 1
         if db_images:
             for date, db_images in db_images.items():
                 self.single_grid(date, db_images)
