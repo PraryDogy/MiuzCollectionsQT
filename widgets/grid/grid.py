@@ -145,6 +145,7 @@ class Grid(QScrollArea):
         self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
         self.row += 1
 
+        Thumbnail.calculate_size()
         for date, db_images in db_images.items():
             self.single_grid(date, db_images)
 
@@ -278,6 +279,9 @@ class Grid(QScrollArea):
 
     def resize_thumbnails(self):
         "изменение размера Thumbnail"
+
+        Thumbnail.calculate_size()
+
         for thumb in self.grid_wid.findChildren(Thumbnail):
             thumb.setup()
 

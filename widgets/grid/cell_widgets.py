@@ -167,6 +167,11 @@ class Thumbnail(QFrame, CellWid):
     select = pyqtSignal(str)
     path_to_wid: dict[str, "Thumbnail"] = {}
 
+    spacing = 5
+    name_label_h: int = 0
+    thumb_h: int = 0
+    thumb_w: int = 0
+
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         CellWid.__init__(self)
         QFrame.__init__(self)
@@ -182,9 +187,8 @@ class Thumbnail(QFrame, CellWid):
         elif fav == 1:
             self.name = Static.STAR_SYM + os.path.basename(short_src)
 
-        self.spacing = 5
         self.v_layout = LayoutVer()
-        self.v_layout.setSpacing(self.spacing)
+        self.v_layout.setSpacing(Thumbnail.spacing)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.v_layout)
 
@@ -199,33 +203,32 @@ class Thumbnail(QFrame, CellWid):
 
         self.setup()
 
-    def setup(self):
-        name_label_h = 35
+    @classmethod
+    def calculate_size(cls):
+        cls.name_label_h = 35
 
-        thumb_h = sum(
+        cls.thumb_h = sum(
             (
             Static.PIXMAP_SIZE[JsonData.curr_size_ind],
-            name_label_h,
+            cls.name_label_h,
             Static.THUMB_MARGIN,
-            self.spacing
+            cls.spacing
             )
         )
 
-        thumb_w = sum(
+        cls.thumb_w = sum(
             (
             Static.THUMB_W[JsonData.curr_size_ind],
             Static.THUMB_MARGIN
             )
         )
 
+    def setup(self):
         self.img_label.setFixedHeight(Static.PIXMAP_SIZE[JsonData.curr_size_ind])
-        self.name_label.setFixedHeight(name_label_h)
-
-        self.setFixedSize(thumb_w, thumb_h)
-
+        self.name_label.setFixedHeight(Thumbnail.name_label_h)
+        self.setFixedSize(Thumbnail.thumb_w, Thumbnail.thumb_h)
         pixmap = Utils.pixmap_scale(self.img, Static.PIXMAP_SIZE[JsonData.curr_size_ind])
         self.img_label.setPixmap(pixmap)
-
         self.name_label.set_text()
 
     def selected_style(self):
