@@ -155,8 +155,8 @@ class Grid(QScrollArea):
             spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
             self.grid_lay.addItem(spacer, 0, 0)
 
-            no_images = ErrorTitle()
-            self.grid_lay.addWidget(no_images, self.row, self.col, 1, max_col)
+            error_title = ErrorTitle()
+            self.grid_lay.addWidget(error_title, self.row, self.col, 1, max_col)
             # добавляем новую строку так как это заголовок
             self.row += 1
             return
