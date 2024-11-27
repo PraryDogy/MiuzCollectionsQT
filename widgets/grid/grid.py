@@ -79,26 +79,6 @@ class Grid(QScrollArea):
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
 
-    def reselect_wid(func: callable):
-
-        def wrapper(self, *args, **kwargs):
-
-            assert isinstance(self, Grid)
-
-            wid = self.get_curr_cell()
-            src = wid.short_src if wid else None
-
-            func(self, *args, **kwargs)
-
-            if src:
-                wid = self.select_wid(src)  
-
-                if wid:
-                    coords = (wid.row, wid.col)
-                    self.set_curr_sell(coords)
-
-        return wrapper
-
     def signals_cmd(self, flag: str):
         if flag == "resize":
             self.resize_thumbnails()
@@ -135,8 +115,7 @@ class Grid(QScrollArea):
             self.grid_wid.deleteLater()
 
         self.deselect_wid()
-        self.reset_curr_cell()
-        self.clear_grid_data()
+        self.reset_grid_data()
         self.up_btn.hide()
 
         self.grid_wid = QWidget()
@@ -146,8 +125,6 @@ class Grid(QScrollArea):
         self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.grid_wid.setLayout(self.grid_lay)
 
-        # сбарсываем счет строчек и колонок
-        self.row, self.col = 0, 0
         max_col = self.get_max_col()
 
         if not db_images:
@@ -226,9 +203,6 @@ class Grid(QScrollArea):
     def get_cell(self, coords: tuple):
         return self.cell_to_wid.get(coords)
 
-    def reset_curr_cell(self):
-        self.curr_cell = (0, 0)
-
     def set_cell_coords(self, wid: CellWid):
         coords = self.row, self.col
         self.cell_to_wid[coords] = wid
@@ -240,9 +214,11 @@ class Grid(QScrollArea):
     def get_path_to_wid(self, src: str):
         return Thumbnail.path_to_wid.get(src)
 
-    def clear_grid_data(self):
+    def reset_grid_data(self):
         self.cell_to_wid.clear()
         Thumbnail.path_to_wid.clear()
+        self.row, self.col = 0, 0
+        self.curr_cell = (0, 0)
 
     def select_wid(self, data: tuple | str | Thumbnail):
         if isinstance(data, Thumbnail):
@@ -324,6 +300,26 @@ class Grid(QScrollArea):
 
         self.rearrange()
 
+    def reselect_wid(func: callable):
+
+        def wrapper(self, *args, **kwargs):
+
+            assert isinstance(self, Grid)
+
+            wid = self.get_curr_cell()
+            src = wid.short_src if wid else None
+
+            func(self, *args, **kwargs)
+
+            if src:
+                wid = self.select_wid(src)  
+
+                if wid:
+                    coords = (wid.row, wid.col)
+                    self.set_curr_sell(coords)
+
+        return wrapper
+
     @reselect_wid
     def rearrange(self):
         "перетасовка сетки"
@@ -332,33 +328,33 @@ class Grid(QScrollArea):
             setattr(self, "first_load", True)
             return
 
-        self.ww = self.width()
+        # высчитываем новый размер сетки и сбрасываем все данные прошлой сетки 
         self.deselect_wid()
-        self.reset_curr_cell()
-        self.clear_grid_data()
-
+        self.reset_grid_data()
+        self.ww = self.width()
         max_col = self.get_max_col()
-        self.row, self.col = 0, 0
 
         for wid in self.grid_wid.findChildren((Thumbnail, Title)):
 
             if isinstance(wid, Title):
+                # сбрасываем колонку и добавялем новую строчку
+                # чтобы обособить заголовок от предыдущих виджетов
                 self.col = 0
                 self.row += 1
-
                 self.set_cell_coords(wid)
-
                 self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
                 self.row += 1
+                # добавляем новую строку после заголовку
+                # для обособления
 
             elif isinstance(wid, Thumbnail):
-
                 self.set_cell_coords(wid)
-
                 self.set_path_to_wid(wid)
                 self.grid_lay.addWidget(wid, self.row, self.col)
                 self.col += 1
+                # добавляем колонку стандартно
 
+            # если максимум колонок то добавляем новую строчку
             if self.col >= max_col:
                 self.col = 0
                 self.row += 1        
