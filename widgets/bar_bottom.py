@@ -52,7 +52,7 @@ class SvgPaths:
     @classmethod
     def images_path(cls, src: str):
         return os.path.join(
-            Static.IMAGES_FOLDER,
+            Static.IMAGES,
             src
         )
 
