@@ -110,6 +110,8 @@ class Static:
         {SOLID_STYLE}
     """
 
+    IMAGES = "images"
+
 
 class Filters:
     current: list["Filters"] = []
@@ -204,8 +206,6 @@ class JsonData:
             '/Volumes/Shares-2/Studio/Panacea/Photo/Art/Ready',
             ]
     ]
-
-    coll_folder: str = coll_folders[0][0]
 
     @classmethod
     def _get_data(cls):

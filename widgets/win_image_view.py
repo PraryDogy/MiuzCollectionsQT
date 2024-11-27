@@ -30,13 +30,12 @@ NAVI_STYLE = """
     border-radius: 27px;
 """
 
-IMAGES = "images"
-ZOOM_OUT = os.path.join(IMAGES, "zoom_out.svg")
-ZOOM_IN = os.path.join(IMAGES, "zoom_in.svg")
-ZOOM_FIT = os.path.join(IMAGES, "zoom_fit.svg")
-CLOSE_ = os.path.join(IMAGES, "zoom_close.svg")
-PREV_ = os.path.join(IMAGES, "prev.svg")
-NEXT_ = os.path.join(IMAGES, "next.svg")
+ZOOM_OUT = os.path.join(Static.IMAGES, "zoom_out.svg")
+ZOOM_IN = os.path.join(Static.IMAGES, "zoom_in.svg")
+ZOOM_FIT = os.path.join(Static.IMAGES, "zoom_fit.svg")
+CLOSE_ = os.path.join(Static.IMAGES, "zoom_close.svg")
+PREV_ = os.path.join(Static.IMAGES, "prev.svg")
+NEXT_ = os.path.join(Static.IMAGES, "next.svg")
 
 class ImageData:
     __slots__ = ["src", "pixmap"]

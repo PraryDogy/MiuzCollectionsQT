@@ -6,7 +6,7 @@ from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
 from PyQt5.QtWidgets import QApplication, QLabel, QSlider, QWidget
 
 from base_widgets import LayoutHor, SvgBtn
-from cfg import JsonData
+from cfg import JsonData, Static
 from signals import SignalsApp
 
 from .win_downloads import WinDownloads
@@ -35,7 +35,6 @@ class Themes:
 
 
 class SvgPaths:
-    IMAGES_FOLDER = "images"
     download_svg: str
     switch_theme_svg: str
     settings_svg: str
@@ -53,9 +52,9 @@ class SvgPaths:
     @classmethod
     def images_path(cls, src: str):
         return os.path.join(
-            cls.IMAGES_FOLDER,
+            Static.IMAGES_FOLDER,
             src
-            )
+        )
 
 
 class BaseSlider(QSlider):

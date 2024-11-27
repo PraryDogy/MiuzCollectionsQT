@@ -17,8 +17,7 @@ from ._db_images import DbImage, DbImages
 from .above_thumbs import ErrorTitle, FilterTitle
 from .cell_widgets import CellWid, Thumbnail, Title
 
-IMAGES = "images"
-UP_SVG = os.path.join(IMAGES, "up.svg")
+UP_SVG = os.path.join(Static.IMAGES, "up.svg")
 UP_STYLE = f"""
     background: rgba(125, 125, 125, 0.5);
     border-radius: 22px;
