@@ -164,6 +164,7 @@ class MenuTab(QListWidget):
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
     def recents_cmd(self, *args):
+        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
         Dynamic.resents = True
 
