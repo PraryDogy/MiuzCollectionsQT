@@ -79,14 +79,23 @@ class Grid(QScrollArea):
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
 
-    def reselect_wid(func):
+    def reselect_wid(func: callable):
 
         def wrapper(self, *args, **kwargs):
+
+            assert isinstance(self, Grid)
+
             wid = self.get_curr_cell()
             src = wid.short_src if wid else None
-            func(self)
+
+            func(self, *args, **kwargs)
+
             if src:
-                self.select_wid(src)
+                wid = self.select_wid(src)  
+
+                if wid:
+                    coords = (wid.row, wid.col)
+                    self.set_curr_sell(coords)
 
         return wrapper
 
@@ -208,6 +217,9 @@ class Grid(QScrollArea):
             for date, db_images in db_images.items():
                 self.single_grid(date, db_images)
 
+    def set_curr_sell(self, coords: tuple):
+        self.curr_cell = coords
+
     def get_curr_cell(self):
         return self.cell_to_wid.get(self.curr_cell)
     
@@ -260,11 +272,15 @@ class Grid(QScrollArea):
             new_wid.selected_style()
             self.ensureWidgetVisible(new_wid)
 
-            self.curr_cell = coords
+            self.set_curr_sell(coords)
 
             if isinstance(BarBottom.path_label, QLabel):
                 t = f"{new_wid.collection}: {new_wid.name}"
                 BarBottom.path_label.setText(t)
+
+            return new_wid
+
+        return None
 
     def deselect_wid(self):
         wid = self.get_curr_cell()
@@ -294,6 +310,7 @@ class Grid(QScrollArea):
 
         return max(self.ww // sm, 1)
 
+    @reselect_wid
     def resize_thumbnails(self):
         "изменение размера Thumbnail"
 
