@@ -1,4 +1,5 @@
 import os
+from functools import wraps
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
@@ -77,6 +78,17 @@ class Grid(QScrollArea):
         SignalsApp.all_.thumbnail_select.connect(self.select_wid)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
+
+    def reselect_wid(func):
+
+        def wrapper(self, *args, **kwargs):
+            wid = self.get_curr_cell()
+            src = wid.short_src if wid else None
+            func(self)
+            if src:
+                self.select_wid(src)
+
+        return wrapper
 
     def signals_cmd(self, flag: str):
         if flag == "resize":
@@ -292,6 +304,7 @@ class Grid(QScrollArea):
 
         self.rearrange()
 
+    @reselect_wid
     def rearrange(self):
         "перетасовка сетки"
 
@@ -300,13 +313,6 @@ class Grid(QScrollArea):
             return
 
         self.ww = self.width()
-
-        wid = self.get_curr_cell()
-        if wid:
-            src = wid.short_src
-        else:
-            src = None
-
         self.deselect_wid()
         self.reset_curr_cell()
         self.clear_grid_data()
@@ -336,10 +342,7 @@ class Grid(QScrollArea):
             if self.col >= max_col:
                 self.col = 0
                 self.row += 1        
-
-        if src:
-            self.select_wid(src)
-        
+            
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if (
             a0.modifiers() == Qt.KeyboardModifier.ControlModifier
