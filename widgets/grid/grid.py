@@ -45,10 +45,15 @@ class Grid(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
-        self.resize(JsonData.root_g["aw"] - Static.MENU_LEFT_WIDTH, JsonData.root_g["ah"])
+        self.resize(
+            JsonData.root_g["aw"] - Static.MENU_LEFT_WIDTH,
+            JsonData.root_g["ah"]
+        )
         self.ww = JsonData.root_g["aw"] - Static.MENU_LEFT_WIDTH
         self.horizontalScrollBar().setDisabled(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
