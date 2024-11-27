@@ -205,7 +205,6 @@ class Thumbnail(QFrame, CellWid):
 
     @classmethod
     def calculate_size(cls):
-
         cls.thumb_h = sum(
             (
             Static.PIXMAP_SIZE[JsonData.curr_size_ind],
@@ -223,11 +222,23 @@ class Thumbnail(QFrame, CellWid):
         )
 
     def setup(self):
-        self.img_label.setFixedHeight(Static.PIXMAP_SIZE[JsonData.curr_size_ind])
-        self.name_label.setFixedHeight(Thumbnail.name_label_h)
-        self.setFixedSize(Thumbnail.thumb_w, Thumbnail.thumb_h)
-        pixmap = Utils.pixmap_scale(self.img, Static.PIXMAP_SIZE[JsonData.curr_size_ind])
-        self.img_label.setPixmap(pixmap)
+        self.img_label.setFixedHeight(
+            Static.PIXMAP_SIZE[JsonData.curr_size_ind]
+        )
+        self.name_label.setFixedHeight(
+            Thumbnail.name_label_h
+        )
+        self.setFixedSize(
+            Thumbnail.thumb_w,
+            Thumbnail.thumb_h
+        )
+        pixmap = Utils.pixmap_scale(
+            self.img,
+            Static.PIXMAP_SIZE[JsonData.curr_size_ind]
+        )
+        self.img_label.setPixmap(
+            pixmap
+        )
         self.name_label.set_text()
 
     def selected_style(self):
