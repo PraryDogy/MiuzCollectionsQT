@@ -41,8 +41,12 @@ class CollectionBtn(QLabel):
             OpenWins.smb(parent_=self.window())
             return
 
-        if self.coll_name in (Static.NAME_ALL_COLLS, Static.NAME_FAVS):
+        if self.coll_name in (
+            Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS
+        ):
+
             coll = coll_folder
+
         else:
             coll = os.path.join(coll_folder, self.coll_name)
 
@@ -153,6 +157,16 @@ class MenuTab(QListWidget):
 
         Dynamic.curr_coll_name = btn.coll_name
         Dynamic.grid_offset = 0
+        Dynamic.resents = False
+
+        SignalsApp.all_.win_main_cmd.emit("set_title")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
+    def recents_cmd(self, *args):
+        Dynamic.grid_offset = 0
+        Dynamic.resents = True
+
         SignalsApp.all_.win_main_cmd.emit("set_title")
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
@@ -161,6 +175,7 @@ class MenuTab(QListWidget):
 
         self.clear()
 
+        # ALL COLLECTIONS
         all_colls_btn = CollectionBtn(
             short_name=Lang.all_colls,
             coll_name=Static.NAME_ALL_COLLS
@@ -172,6 +187,7 @@ class MenuTab(QListWidget):
         self.addItem(all_colls_item)
         self.setItemWidget(all_colls_item, all_colls_btn)
 
+        # FAVORITES
         favs_btn = CollectionBtn(
             short_name=Lang.fav_coll,
             coll_name=Static.NAME_FAVS
@@ -184,6 +200,20 @@ class MenuTab(QListWidget):
         self.addItem(favs_item)
         self.setItemWidget(favs_item, favs_btn)
 
+
+        # RECENTS
+        recents_btn = CollectionBtn(
+            short_name=Lang.recents,
+            coll_name=Static.NAME_RECENTS
+            )
+        recents_btn.pressed_.connect(self.recents_cmd)
+
+        recents_item = QListWidgetItem()
+        recents_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
+        self.addItem(recents_item)
+        self.setItemWidget(recents_item, recents_btn)
+
+        # SPACER
         fake_item = QListWidgetItem()
         fake_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_ // 2))
         fake_item.setFlags(Qt.ItemFlag.ItemIsEnabled)

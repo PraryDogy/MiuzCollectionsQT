@@ -93,8 +93,12 @@ class DbImages(URunnable):
             )
         
         q = q.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
-        q = q.order_by(-THUMBS.c.mod)
         q = q.where(THUMBS.c.brand == Static.BRANDS[JsonData.brand_ind])
+
+        if Dynamic.resents:
+            q = q.order_by(-THUMBS.c.id)
+        else:
+            q = q.order_by(-THUMBS.c.mod)
 
         stmt_where: list = []
 

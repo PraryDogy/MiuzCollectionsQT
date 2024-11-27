@@ -375,6 +375,11 @@ class Lang_:
         "From the new row"
     ]
 
+    recents = [
+        "Недавние",
+        "Recents"
+    ]
+
 
 class Lang(Lang_):
 

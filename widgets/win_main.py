@@ -92,6 +92,9 @@ class WinMain(WinFrameless):
             elif Dynamic.curr_coll_name == Static.NAME_FAVS:
                 t = Lang.fav_coll
 
+            elif Dynamic.resents:
+                t = Lang.recents
+
             else:
                 t = Dynamic.curr_coll_name
 

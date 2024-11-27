@@ -15,6 +15,7 @@ class Static:
     MENU_LEFT_WIDTH: int = 210
     NAME_ALL_COLLS: str = "___collections___"
     NAME_FAVS: str = "___favorites___"
+    NAME_RECENTS: str = "___recents___"
     STAR_SYM = "\U00002605" + " "
 
     PIXMAP_SIZE_MAX = 200
@@ -320,3 +321,4 @@ class Dynamic:
     grid_offset: int = 0
     search_widget_text: str = None
     curr_coll_name = Static.NAME_ALL_COLLS
+    resents: bool = False
