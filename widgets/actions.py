@@ -234,10 +234,14 @@ class MenuTypes(QMenu):
 
         type_jpg = QAction(parent=self, text=Lang.type_jpg)
         type_jpg.setCheckable(True)
+        cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.TYPE_JPG)
+        type_jpg.triggered.connect(cmd_jpg)
         self.addAction(type_jpg)
 
         type_tiff = QAction(parent=self, text=Lang.type_tiff)
         type_tiff.setCheckable(True)
+        cmd_tiff = lambda: self.cmd_(action_=type_tiff, type_=Static.TYPE_TIFF)
+        type_tiff.triggered.connect(cmd_tiff)
         self.addAction(type_tiff)
 
         if Static.TYPE_JPG in JsonData.types:
@@ -253,3 +257,5 @@ class MenuTypes(QMenu):
         else:
             JsonData.types.add(type_)
             action_.setChecked(True)
+
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
