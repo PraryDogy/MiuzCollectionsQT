@@ -4,7 +4,7 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu, QWidget
 
-from cfg import JsonData
+from cfg import JsonData, Static
 from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -233,7 +233,23 @@ class MenuTypes(QMenu):
         super().__init__(parent=parent, title=Lang.type_show)
 
         type_jpg = QAction(parent=self, text=Lang.type_jpg)
+        type_jpg.setCheckable(True)
         self.addAction(type_jpg)
 
         type_tiff = QAction(parent=self, text=Lang.type_tiff)
+        type_tiff.setCheckable(True)
         self.addAction(type_tiff)
+
+        if Static.TYPE_JPG in JsonData.types:
+            type_jpg.setChecked(True)
+
+        if Static.TYPE_TIFF in JsonData.types:
+            type_tiff.setChecked(True)
+
+    def cmd_(self, action_: QAction, type_: str):
+        if type_ in JsonData.types:
+            JsonData.types.remove(type_)
+            action_.setChecked(False)
+        else:
+            JsonData.types.add(type_)
+            action_.setChecked(True)

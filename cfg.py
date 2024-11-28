@@ -111,6 +111,8 @@ class Static:
     """
 
     IMAGES = "images"
+    TYPE_JPG = "jpg"
+    TYPE_TIFF = "tiff"
 
 
 class Filters:
@@ -182,7 +184,7 @@ class JsonData:
     
     lang_ind = 0
     brand_ind = 0
-    types = {"jpg", "tiff"}
+    types = [Static.TYPE_JPG, Static.TYPE_TIFF]
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
