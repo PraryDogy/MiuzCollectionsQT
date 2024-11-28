@@ -51,16 +51,22 @@ class DbImages(URunnable):
             self,
             res: list[tuple[str, str, int, str, int]]
             ) -> dict[str, list[DbImage]] | dict:
-        
-        # res = res[-(Static.GRID_LIMIT):]
 
         thumbs_dict = defaultdict(list[DbImage])
+
+        if len(Dynamic.types) == 1:
+            exts_ = Dynamic.types[0]
+        else:
+            exts_ = Static.IMG_EXT
 
         if not res:
             self.signals_.finished_.emit(thumbs_dict)
             return
 
         for short_src, short_hash_path, mod, coll, fav in res:
+
+            if not short_src.endswith(exts_):
+                continue
 
             mod = datetime.fromtimestamp(mod).date()
             full_hash_path = Utils.get_full_hash_path(short_hash_path)
@@ -78,6 +84,14 @@ class DbImages(URunnable):
 
             else:
                 mod = f"{Lang.months[str(mod.month)]} {mod.year}"
+
+            # if len(Dynamic.types) == 1:
+
+            #     if Static.JPG_EXT in Dynamic.types:
+            #         ...
+
+            #     elif Static.LAYERS_EXT in Dynamic.types:
+            #         ...
 
             thumbs_dict[mod].append(DbImage(pixmap, short_src, coll, fav))
 

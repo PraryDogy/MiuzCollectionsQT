@@ -4,7 +4,7 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu, QWidget
 
-from cfg import JsonData, Static
+from cfg import Dynamic, JsonData, Static
 from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -234,28 +234,30 @@ class MenuTypes(QMenu):
 
         type_jpg = QAction(parent=self, text=Lang.type_jpg)
         type_jpg.setCheckable(True)
-        cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.TYPE_JPG)
+        cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.JPG_EXT)
         type_jpg.triggered.connect(cmd_jpg)
         self.addAction(type_jpg)
 
         type_tiff = QAction(parent=self, text=Lang.type_tiff)
         type_tiff.setCheckable(True)
-        cmd_tiff = lambda: self.cmd_(action_=type_tiff, type_=Static.TYPE_TIFF)
+        cmd_tiff = lambda: self.cmd_(action_=type_tiff, type_=Static.LAYERS_EXT)
         type_tiff.triggered.connect(cmd_tiff)
         self.addAction(type_tiff)
 
-        if Static.TYPE_JPG in JsonData.types:
+        if Static.JPG_EXT in Dynamic.types:
             type_jpg.setChecked(True)
 
-        if Static.TYPE_TIFF in JsonData.types:
+        if Static.LAYERS_EXT in Dynamic.types:
             type_tiff.setChecked(True)
 
     def cmd_(self, action_: QAction, type_: str):
-        if type_ in JsonData.types:
-            JsonData.types.remove(type_)
+
+        if type_ in Dynamic.types:
+            Dynamic.types.remove(type_)
             action_.setChecked(False)
+
         else:
-            JsonData.types.add(type_)
+            Dynamic.types.append(type_)
             action_.setChecked(True)
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")

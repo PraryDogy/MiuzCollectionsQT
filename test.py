@@ -1,4 +1,11 @@
-a = (3, 1)
-offset = (-1, 0)
-b = a + offset
-# b должен стать (2, 1)
+from cfg import Static
+
+dynamic = []
+
+
+if len(dynamic) == 1:
+    exts_ = dynamic[0]
+else:
+    exts_ = Static.IMG_EXT
+
+print(exts_, type(exts_))

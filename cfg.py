@@ -59,6 +59,17 @@ class Static:
         for upper_ext in (ext, ext.upper())
         )
 
+    LAYERS_EXT: tuple = (
+        ".psd", ".psb", ".tiff", ".tif",
+        ".PSD", ".PSB", ".TIFF", ".TIF"
+        )
+
+    JPG_EXT: tuple = (
+        ".jpg", ".jpeg", ".jfif",
+        ".JPG", ".JPEG", ".JFIF",
+        ".png",
+        ".PNG"
+        )
 
     PRELOAD_FOLDER: str = "_preload"
 
@@ -70,11 +81,6 @@ class Static:
     PRELOAD_HASHDIR_ZIP: str = os.path.join(
         PRELOAD_FOLDER,
         "hashdir.zip"
-        )
-
-    PSD_TIFF: tuple = (
-        ".psd", ".psb", ".tiff", ".tif",
-        ".PSD", ".PSB", ".TIFF", ".TIF"
         )
 
     RGB_BLUE = "rgb(46, 89, 203)"
@@ -111,8 +117,6 @@ class Static:
     """
 
     IMAGES = "images"
-    TYPE_JPG = "jpg"
-    TYPE_TIFF = "tiff"
 
 
 class Filters:
@@ -184,7 +188,6 @@ class JsonData:
     
     lang_ind = 0
     brand_ind = 0
-    types = [Static.TYPE_JPG, Static.TYPE_TIFF]
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
@@ -325,3 +328,4 @@ class Dynamic:
     search_widget_text: str = None
     curr_coll_name = Static.NAME_ALL_COLLS
     resents: bool = False
+    types = [Static.JPG_EXT, Static.LAYERS_EXT]

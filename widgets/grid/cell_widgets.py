@@ -52,13 +52,13 @@ class Title(QLabel, CellWid):
                 images = [
                     Utils.get_full_src(coll_folder, i.short_src)
                     for i in self.db_images
-                    if i.short_src.endswith(Static.PSD_TIFF)
+                    if i.short_src.endswith(Static.LAYERS_EXT)
                     ]
             else:
                 images = [
                     Utils.get_full_src(coll_folder, i.short_src)
                     for i in self.db_images
-                    if not i.short_src.endswith(Static.PSD_TIFF)
+                    if not i.short_src.endswith(Static.LAYERS_EXT)
                     ]
 
             if save_as:

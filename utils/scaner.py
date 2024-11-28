@@ -248,7 +248,7 @@ class DbUpdater:
 
             array_img = Utils.fit_to_thumb(array_img, Static.PIXMAP_SIZE_MAX)
 
-            if src.endswith(Static.PSD_TIFF):
+            if src.endswith(Static.LAYERS_EXT):
                 array_img = Utils.array_color(array_img, "BGR")
 
             if array_img is not None:
