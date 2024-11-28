@@ -380,6 +380,21 @@ class Lang_:
         "Recents"
     ]
 
+    type_jpg = [
+        "jpg",
+        "jpg"
+    ]
+
+    type_tiff = [
+        "tiff, psd",
+        "tiff, psd"
+    ]
+
+    type_show = [
+        "Показать",
+        "Showw"
+    ]
+
 
 class Lang(Lang_):
 

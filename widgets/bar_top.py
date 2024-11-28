@@ -123,27 +123,6 @@ class FilterBtn(BarTopBtn):
             self.set_normal_style()
 
 
-class ExtBtn(BarTopBtn):
-    def __init__(self):
-        super().__init__(text="Тип")
-
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        print("click")
-
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-
-        menu_ = ContextCustom(ev)
-
-        toggle = QAction(parent=menu_, text=Lang.view)
-        # toggle.triggered.connect(self.open_win)
-        menu_.addAction(toggle)
-
-        self.set_border_style()
-        menu_.show_menu()
-
-        self.set_normal_style()
-
-
 class BarTop(QWidget):
     def __init__(self):
         super().__init__()
@@ -175,9 +154,6 @@ class BarTop(QWidget):
             self.dates_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
         )
-
-        self.ext_btn = ExtBtn()
-        self.h_layout.addWidget(self.ext_btn)
 
         self.h_layout.addStretch(1)
 

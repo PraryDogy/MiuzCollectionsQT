@@ -13,7 +13,7 @@ from utils.copy_files import CopyFiles
 from utils.utils import UThreadPool, Utils
 
 from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, OpenWins,
-                       Reveal, Save, ScanerRestart)
+                       Reveal, Save, ScanerRestart, MenuTypes)
 from ._db_images import DbImage
 
 
@@ -133,6 +133,14 @@ class Title(QLabel, CellWid):
         save_as_layers = QAction(text=Lang.save_all_layers_as, parent=menu_)
         save_as_layers.triggered.connect(cmd_)
         menu_.addAction(save_as_layers)
+
+        menu_.addSeparator()
+
+        reload = ScanerRestart(parent=menu_)
+        menu_.addAction(reload)
+
+        types_ = MenuTypes(parent=menu_)
+        menu_.addMenu(types_)
 
         self.selected_style()
         menu_.show_menu()
@@ -361,6 +369,9 @@ class Thumbnail(QFrame, CellWid):
 
         reload = ScanerRestart(parent=menu_)
         menu_.addAction(reload)
+
+        types_ = MenuTypes(parent=menu_)
+        menu_.addMenu(types_)
 
         self.select.emit(self.short_src)
         menu_.show_menu()

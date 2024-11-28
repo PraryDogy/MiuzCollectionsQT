@@ -226,3 +226,14 @@ class Save(QAction):
 
         if len(CopyFiles.current_threads) == 0:
             SignalsApp.all_.btn_downloads_toggle.emit("hide")
+
+
+class MenuTypes(QMenu):
+    def __init__(self, parent: QMenu):
+        super().__init__(parent=parent, title=Lang.type_show)
+
+        type_jpg = QAction(parent=self, text=Lang.type_jpg)
+        self.addAction(type_jpg)
+
+        type_tiff = QAction(parent=self, text=Lang.type_tiff)
+        self.addAction(type_tiff)

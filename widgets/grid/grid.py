@@ -11,7 +11,7 @@ from cfg import Dynamic, JsonData, Static
 from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
 
-from ..actions import OpenWins, ScanerRestart
+from ..actions import MenuTypes, OpenWins, ScanerRestart
 from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
 from .above_thumbs import ErrorTitle, FilterTitle
@@ -417,6 +417,9 @@ class Grid(QScrollArea):
 
         reload = ScanerRestart(self.menu_)
         self.menu_.addAction(reload)
+
+        types_ = MenuTypes(parent=self.menu_)
+        self.menu_.addMenu(types_)
 
         self.menu_.show_menu()
 
