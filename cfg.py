@@ -182,6 +182,7 @@ class JsonData:
     
     lang_ind = 0
     brand_ind = 0
+    types = {"jpg", "tiff"}
 
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
