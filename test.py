@@ -51,29 +51,18 @@ class Test:
         return finder_images
     
     @timer_
-    # def find_files_with_extensions(self, directory):
-    #     result = []
-    #     stack = [directory]
-    #     while stack:
-    #         current_dir = stack.pop()
-    #         with os.scandir(current_dir) as entries:
-    #             for entry in entries:
-    #                 if entry.is_dir():
-    #                     stack.append(entry.path)
-    #                 elif entry.is_file() and any(entry.name.endswith(ext) for ext in IMG_EXT):
-    #                     result.append(entry.path)
-    #     return result
-
-    @timer_
-    def tree2list(self, directory: str) -> list:
-        tree = []
-        for i in os.scandir(directory):
-            if i.is_dir():
-                tree.append(i.path)
-                tree.extend(self.tree2list(i.path))
-            else:
-                tree.append(i.path)
-        return tree
+    def tree2list(self, directory):
+        result = []
+        stack = [directory]
+        while stack:
+            current_dir = stack.pop()
+            with os.scandir(current_dir) as entries:
+                for entry in entries:
+                    if entry.is_dir():
+                        stack.append(entry.path)
+                    elif entry.is_file() and any(entry.name.endswith(ext) for ext in IMG_EXT):
+                        result.append(entry.path)
+        return result
 
 
 src = "/Users/Morkowik/Desktop/Evgeny/_miuz"
