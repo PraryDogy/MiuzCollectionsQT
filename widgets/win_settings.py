@@ -16,6 +16,8 @@ from utils.utils import UThreadPool, Utils
 
 from .actions import OpenWins
 
+WIN_SIZE = (430, 550)
+
 
 class ChangeLang(QGroupBox):
     clicked_ = pyqtSignal()
@@ -23,18 +25,39 @@ class ChangeLang(QGroupBox):
     def __init__(self):
         super().__init__()
 
-        layout_h = LayoutHor()
-        layout_h.setSpacing(15)
-        self.setLayout(layout_h)
+        v_lay = LayoutVer()
+        self.setLayout(v_lay)
+
+        first_row_wid = QWidget()
+        first_row_lay = LayoutHor()
+        first_row_lay.setSpacing(15)
+        first_row_wid.setLayout(first_row_lay)
 
         self.lang_btn = QPushButton(text=Lang._lang_name)
         self.lang_btn.setFixedWidth(150)
         self.lang_btn.clicked.connect(self.lng_cmd)
-        layout_h.addWidget(self.lang_btn)
+        first_row_lay.addWidget(self.lang_btn)
 
         self.lang_label = QLabel(Lang.lang_label)
-        layout_h.addWidget(self.lang_label)
-          
+        first_row_lay.addWidget(self.lang_label)
+
+        sec_row_wid = QWidget()
+        sec_row_lay = LayoutHor()
+        sec_row_lay.setSpacing(15)
+        sec_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        sec_row_wid.setLayout(sec_row_lay)
+
+        self.restore_db_btn = QPushButton(Lang.restore_db)
+        self.restore_db_btn.setFixedWidth(150)
+        self.restore_db_btn.clicked.connect(self.cmd_)
+        sec_row_lay.addWidget(self.restore_db_btn)
+
+        descr = QLabel(text=Lang.restore_db_descr)
+        sec_row_lay.addWidget(descr)
+
+        v_lay.addWidget(first_row_wid)
+        v_lay.addWidget(sec_row_wid)
+
     def lng_cmd(self, *args):
 
         # костыль но что ж поделать
@@ -46,7 +69,9 @@ class ChangeLang(QGroupBox):
         self.clicked_.emit()
         setattr(self, "flag", True)
 
-
+    def cmd_(self, *args):
+        setattr(self, "flag", True)
+        self.clicked_.emit()
 
 
 class RestoreBd(QGroupBox):
@@ -207,7 +232,7 @@ class WinSettings(WinSystem):
         self.setWindowTitle(Lang.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(430, 530)
+        self.setFixedSize(*WIN_SIZE)
         self.setFocus()
 
     def init_ui(self):
