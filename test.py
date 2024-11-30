@@ -49,19 +49,22 @@ class Test:
                         finder_images.append(item)
 
         return finder_images
-    
+
     @timer_
-    def tree2list(self, directory):
+    def tree2list(self, directory: str) -> list[str]:
         result = []
         stack = [directory]
+        
         while stack:
             current_dir = stack.pop()
+            
             with os.scandir(current_dir) as entries:
                 for entry in entries:
                     if entry.is_dir():
                         stack.append(entry.path)
-                    elif entry.is_file() and any(entry.name.endswith(ext) for ext in IMG_EXT):
+                    elif entry.name.endswith(IMG_EXT):
                         result.append(entry.path)
+        
         return result
 
 
@@ -80,3 +83,4 @@ slower = max(times, key=times.get)
 offset = round(times.get(slower) / times.get(faster), 2)
 offset = f"{faster} is faster than {slower} in {offset} times"
 print(offset, sep="\n")
+print(len(walk[1]), len(scan_dir[1]))

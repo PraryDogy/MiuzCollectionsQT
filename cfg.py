@@ -46,18 +46,18 @@ class Static:
         "hashdir"
         )
 
-    _IMG_EXT: tuple = (
-        ".jpg", ".jpeg", ".jfif",
-        ".tif", ".tiff",
-        ".psd", ".psb",
-        ".png",
-        )
+    # _IMG_EXT: tuple = (
+    #     ".jpg", ".jpeg", ".jfif",
+    #     ".tif", ".tiff",
+    #     ".psd", ".psb",
+    #     ".png",
+    #     )
 
-    IMG_EXT: tuple = tuple(
-        upper_ext
-        for ext in _IMG_EXT
-        for upper_ext in (ext, ext.upper())
-        )
+    # IMG_EXT: tuple = tuple(
+    #     upper_ext
+    #     for ext in _IMG_EXT
+    #     for upper_ext in (ext, ext.upper())
+    #     )
 
     LAYERS_EXT: tuple = (
         ".psd", ".psb", ".tiff", ".tif",
@@ -70,6 +70,8 @@ class Static:
         ".png",
         ".PNG"
         )
+    
+    IMG_EXT = JPG_EXT + LAYERS_EXT
 
     PRELOAD_FOLDER: str = "_preload"
 
