@@ -15,6 +15,9 @@ IMG_EXT: tuple = tuple(
     for upper_ext in (ext, ext.upper())
     )
 
+TIMER = "timer"
+RES = "res"
+
 
 def timer_(func: callable):
 
@@ -22,7 +25,7 @@ def timer_(func: callable):
         start = time()
         res = func(*args, **kwargs)
         end = time() - start
-        return end, res
+        return {TIMER: end, RES: res}
 
     return wrapper
 
@@ -37,21 +40,22 @@ class Test:
             return None
         
     @timer_
-    def walk_collection(self, collection: str) -> list[tuple[str, int, int, int]]:
+    def walk_collection(self, collection: str) -> dict[str, str]:
         finder_images: list[tuple[str, int, int, int]] = []
 
         for root, _, files in os.walk(collection):
             for file in files:
                 if file.endswith(IMG_EXT):
                     src = os.path.join(root, file)
-                    item = self.get_image_item(src)
-                    if item:
-                        finder_images.append(item)
+                    stats = os.stat(src)
+                    data = (src, stats.st_size, stats.st_birthtime, stats.st_mtime)
+                    finder_images.append(data)
 
+        finder_images = sorted(finder_images)
         return finder_images
 
     @timer_
-    def tree2list(self, directory: str) -> list[str]:
+    def tree2list(self, directory: str) -> dict[str, str]:
         result = []
         stack = [directory]
         
@@ -63,8 +67,11 @@ class Test:
                     if entry.is_dir():
                         stack.append(entry.path)
                     elif entry.name.endswith(IMG_EXT):
-                        result.append(entry.path)
-        
+                        stats = entry.stat()
+                        data = (entry.path, stats.st_size, stats.st_birthtime, stats.st_mtime)
+                        result.append(data)
+
+        result = sorted(result)
         return result
 
 
@@ -74,8 +81,8 @@ walk = test.walk_collection(src)
 scan_dir = test.tree2list(src)
 
 times = {
-    "walk": walk[0],
-    "scandir": scan_dir[0]
+    "walk": walk.get(TIMER),
+    "scandir": scan_dir.get(TIMER)
 }
 
 faster = min(times, key=times.get)
@@ -83,4 +90,6 @@ slower = max(times, key=times.get)
 offset = round(times.get(slower) / times.get(faster), 2)
 offset = f"{faster} is faster than {slower} in {offset} times"
 print(offset, sep="\n")
-print(len(walk[1]), len(scan_dir[1]))
+
+print(scan_dir.get(RES)[0])
+print(walk.get(RES)[0])
