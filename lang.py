@@ -395,6 +395,21 @@ class Lang_:
         "Showw"
     ]
 
+    update_descr = [
+        "Скачать обновление с sb06",
+        "Download update from sb06"
+    ]
+
+    show_files = [
+        "Показать системные файлы в Finder",
+        "Show system files in Finder"
+    ]
+
+    restore_db_descr = [
+        "Сбросить все данные и настройки",
+        "Restore all data and settings"
+    ]
+
 
 class Lang(Lang_):
 

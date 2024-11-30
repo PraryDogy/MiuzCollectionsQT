@@ -47,7 +47,7 @@ class ChangeLang(QGroupBox):
         setattr(self, "flag", True)
 
 
-class SecondGroup(QGroupBox):
+class Updater(QGroupBox):
     def __init__(self):
         super().__init__()
 
@@ -61,16 +61,8 @@ class SecondGroup(QGroupBox):
         self.updater_btn.clicked.connect(self.update_btn_cmd)
         h_layout.addWidget(self.updater_btn)
 
-        self.show_files_btn = QPushButton(text=Lang.show_app_support)
-        self.show_files_btn.setFixedWidth(150)
-        self.show_files_btn.clicked.connect(self.show_files_cmd)
-        h_layout.addWidget(self.show_files_btn)
-
-    def show_files_cmd(self, *args):
-        try:
-            subprocess.Popen(["open", Static.APP_SUPPORT_DIR])
-        except Exception as e:
-            print(e)
+        self.descr = QLabel(text=Lang.update_descr)
+        h_layout.addWidget(self.descr)
 
     def update_btn_cmd(self, *args):
         self.task = Updater()
@@ -95,7 +87,33 @@ class SecondGroup(QGroupBox):
         QTimer.singleShot(1500, cmd_)
 
 
-class BrandSett(QTabWidget):
+class ShowFiles(QGroupBox):
+    clicked_ = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+        h_layout = LayoutHor()
+        h_layout.setSpacing(15)
+        self.setLayout(h_layout)
+
+        self.show_files_btn = QPushButton(text=Lang.show_app_support)
+        self.show_files_btn.setFixedWidth(150)
+        self.show_files_btn.clicked.connect(self.show_files_cmd)
+        h_layout.addWidget(self.show_files_btn)
+
+        self.lang_label = QLabel(Lang.show_files)
+        h_layout.addWidget(self.lang_label)
+
+    def show_files_cmd(self, *args):
+        try:
+            subprocess.Popen(["open", Static.APP_SUPPORT_DIR])
+        except Exception as e:
+            print(e)
+
+
+
+class BrandSettings(QTabWidget):
     def __init__(self):
         super().__init__()
         self.stop_colls_wid: dict[int, CustomTextEdit] = {}
@@ -164,14 +182,18 @@ class RestoreBd(QGroupBox):
     def __init__(self):
         super().__init__()
 
-        h_lay = LayoutHor()
-        h_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.setLayout(h_lay)
+        h_layout = LayoutHor()
+        h_layout.setSpacing(15)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.setLayout(h_layout)
 
         self.restore_db_btn = QPushButton(Lang.restore_db)
         self.restore_db_btn.setFixedWidth(150)
         self.restore_db_btn.clicked.connect(self.cmd_)
-        h_lay.addWidget(self.restore_db_btn)
+        h_layout.addWidget(self.restore_db_btn)
+
+        descr = QLabel(text=Lang.restore_db_descr)
+        h_layout.addWidget(descr)
 
     def cmd_(self, *args):
         setattr(self, "flag", True)
@@ -184,7 +206,7 @@ class WinSettings(WinSystem):
         self.setWindowTitle(Lang.settings)
 
         QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(420, 500)
+        self.setFixedSize(430, 530)
         self.setFocus()
 
     def init_ui(self):
@@ -195,14 +217,17 @@ class WinSettings(WinSystem):
         self.change_lang.clicked_.connect(cmd_lang)
         self.central_layout.addWidget(self.change_lang)
 
-        self.second_group = SecondGroup()
-        self.central_layout.addWidget(self.second_group)
-
         self.restore_bd = RestoreBd()
         self.restore_bd.clicked_.connect(self.ok_cmd)
         self.central_layout.addWidget(self.restore_bd)
 
-        self.brand_sett = BrandSett()
+        self.updater = Updater()
+        self.central_layout.addWidget(self.updater)
+
+        self.show_files = ShowFiles()
+        self.central_layout.addWidget(self.show_files)
+
+        self.brand_sett = BrandSettings()
         self.central_layout.addWidget(self.brand_sett)
 
         btns_wid = QWidget()
