@@ -36,7 +36,11 @@ class ChangeLang(QGroupBox):
         layout_h.addWidget(self.lang_label)
           
     def lng_cmd(self, *args):
-        self.lang_btn.setText(Lang._lang_name)
+        if self.lang_btn.text() == "Русский":
+            self.lang_btn.setText("English")
+        else:
+            self.lang_btn.setText("Русский")
+
         self.clicked_.emit()
         setattr(self, "flag", True)
 
