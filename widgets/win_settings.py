@@ -47,6 +47,32 @@ class ChangeLang(QGroupBox):
         setattr(self, "flag", True)
 
 
+
+
+class RestoreBd(QGroupBox):
+    clicked_ = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+        h_layout = LayoutHor()
+        h_layout.setSpacing(15)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.setLayout(h_layout)
+
+        self.restore_db_btn = QPushButton(Lang.restore_db)
+        self.restore_db_btn.setFixedWidth(150)
+        self.restore_db_btn.clicked.connect(self.cmd_)
+        h_layout.addWidget(self.restore_db_btn)
+
+        descr = QLabel(text=Lang.restore_db_descr)
+        h_layout.addWidget(descr)
+
+    def cmd_(self, *args):
+        setattr(self, "flag", True)
+        self.clicked_.emit()
+
+
 class Updater(QGroupBox):
     def __init__(self):
         super().__init__()
@@ -112,7 +138,6 @@ class ShowFiles(QGroupBox):
             print(e)
 
 
-
 class BrandSettings(QTabWidget):
     def __init__(self):
         super().__init__()
@@ -174,30 +199,6 @@ class BrandSettings(QTabWidget):
             for i in wid.toPlainText().split("\n")
             if i
             ]
-
-
-class RestoreBd(QGroupBox):
-    clicked_ = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-
-        h_layout = LayoutHor()
-        h_layout.setSpacing(15)
-        h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.setLayout(h_layout)
-
-        self.restore_db_btn = QPushButton(Lang.restore_db)
-        self.restore_db_btn.setFixedWidth(150)
-        self.restore_db_btn.clicked.connect(self.cmd_)
-        h_layout.addWidget(self.restore_db_btn)
-
-        descr = QLabel(text=Lang.restore_db_descr)
-        h_layout.addWidget(descr)
-
-    def cmd_(self, *args):
-        setattr(self, "flag", True)
-        self.clicked_.emit()
 
 
 class WinSettings(WinSystem):
