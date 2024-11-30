@@ -46,29 +46,14 @@ class Static:
         "hashdir"
         )
 
-    # _IMG_EXT: tuple = (
-    #     ".jpg", ".jpeg", ".jfif",
-    #     ".tif", ".tiff",
-    #     ".psd", ".psb",
-    #     ".png",
-    #     )
-
-    # IMG_EXT: tuple = tuple(
-    #     upper_ext
-    #     for ext in _IMG_EXT
-    #     for upper_ext in (ext, ext.upper())
-    #     )
-
     LAYERS_EXT: tuple = (
         ".psd", ".psb", ".tiff", ".tif",
         ".PSD", ".PSB", ".TIFF", ".TIF"
         )
 
     JPG_EXT: tuple = (
-        ".jpg", ".jpeg", ".jfif",
-        ".JPG", ".JPEG", ".JFIF",
-        ".png",
-        ".PNG"
+        ".jpg", ".jpeg", ".jfif", ".png",
+        ".JPG", ".JPEG", ".JFIF", ".PNG"
         )
     
     IMG_EXT = JPG_EXT + LAYERS_EXT
