@@ -5,6 +5,17 @@ from time import time
 from cfg import Static
 from utils.scaner import ScanerUtils
 
+def timer_(func: callable):
+
+    def wrapper(*args, **kwargs):
+        start = time()
+        res = func(*args, **kwargs)
+        end = time() - start
+        print(end)
+        return res
+
+    return wrapper
+
 
 class Test:
 
@@ -15,10 +26,8 @@ class Test:
         except FileNotFoundError as e:
             return None
         
-
+    @timer_
     def walk_collection(self, collection: str) -> list[tuple[str, int, int, int]]:
-        start = time()
-    
         finder_images: list[tuple[str, int, int, int]] = []
 
         for root, _, files in os.walk(collection):
@@ -37,14 +46,10 @@ class Test:
                     if item:
                         finder_images.append(item)
 
-        end = time() - start
-
-        return end
+        return finder_images
     
-
+    @timer_
     def pathlib_collection(self, collection: str) -> list[tuple[str, int, int, int]]:
-        start = time()
-
         finder_images: list[tuple[str, int, int, int]] = []
 
         for path in Path(collection).rglob("*"):
@@ -53,8 +58,8 @@ class Test:
 
                 finder_images.append((str(path), path.stat()))
 
-        end = time() - start
-        return end
+        
+        return finder_images
 
 
 
@@ -64,9 +69,9 @@ a = Test()
 walk = a.walk_collection(src)
 path_lib = a.pathlib_collection(src)
 
-res = min(walk, path_lib)
+# res = min(walk, path_lib)
 
-if res == walk:
-    print("walk faster")
-else:
-    print("path_lib faster")
+# if res == walk:
+#     print("walk faster")
+# else:
+#     print("path_lib faster")
