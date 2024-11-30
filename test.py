@@ -2,8 +2,19 @@ import os
 from pathlib import Path
 from time import time
 
-from cfg import Static
-from utils.scaner import ScanerUtils
+_IMG_EXT: tuple = (
+    ".jpg", ".jpeg", ".jfif",
+    ".tif", ".tiff",
+    ".psd", ".psb",
+    ".png",
+    )
+
+IMG_EXT: tuple = tuple(
+    upper_ext
+    for ext in _IMG_EXT
+    for upper_ext in (ext, ext.upper())
+    )
+
 
 def timer_(func: callable):
 
@@ -32,15 +43,9 @@ class Test:
 
         for root, _, files in os.walk(collection):
 
-            if not ScanerUtils.can_scan:
-                return finder_images
-
             for file in files:
 
-                if not ScanerUtils.can_scan:
-                    return finder_images
-
-                if file.endswith(Static.IMG_EXT):
+                if file.endswith(IMG_EXT):
                     src = os.path.join(root, file)
                     item = self.get_image_item(src)
                     if item:
@@ -54,7 +59,7 @@ class Test:
 
         for path in Path(collection).rglob("*"):
 
-            if path.suffix.lower() in Static.IMG_EXT:
+            if path.suffix.lower() in IMG_EXT:
 
                 finder_images.append((str(path), path.stat()))
 
@@ -68,10 +73,3 @@ a = Test()
 
 walk = a.walk_collection(src)
 path_lib = a.pathlib_collection(src)
-
-# res = min(walk, path_lib)
-
-# if res == walk:
-#     print("walk faster")
-# else:
-#     print("path_lib faster")
