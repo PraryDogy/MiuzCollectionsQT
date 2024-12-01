@@ -239,12 +239,12 @@ class DbUpdater:
 
         for x, short_hash in enumerate(del_items, start=1):
 
-            full_hash_path = Utils.get_full_hash_path(short_hash)
+            full_hash = Utils.get_full_hash(short_hash)
 
-            if os.path.exists(full_hash_path):
+            if os.path.exists(full_hash):
 
                 self.progressbar_text(text=Lang.deleting, x=x, total=total)
-                os.remove(full_hash_path)
+                os.remove(full_hash)
                 sleep(self.sleep_count)
 
         if total > 0:
@@ -272,10 +272,10 @@ class DbUpdater:
         else:
             return (None, None)
 
-    def get_values(self, full_src, full_hash_path, size, birth, mod, resol):
+    def get_values(self, full_src, full_hash, size, birth, mod, resol):
         return {
             "short_src": Utils.get_short_src(Brand.curr.collfolder, full_src),
-            "short_hash": Utils.get_short_hash(full_hash_path),
+            "short_hash": Utils.get_short_hash(full_hash),
             "size": size,
             "birth": birth,
             "mod": mod,
@@ -302,11 +302,11 @@ class DbUpdater:
 
             if small_img is not None:
 
-                full_hash_path = Utils.create_full_hash_path(full_src)
+                full_hash = Utils.create_full_hash(full_src)
 
                 values = self.get_values(
                     full_src=full_src,
-                    full_hash_path=full_hash_path,
+                    full_hash=full_hash,
                     size=size,
                     birth=birth, 
                     mod=mod,
@@ -314,7 +314,7 @@ class DbUpdater:
                 )
 
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
-                res[stmt] = (full_hash_path, small_img)
+                res[stmt] = (full_hash, small_img)
 
             else:
                 continue
@@ -347,10 +347,10 @@ class DbUpdater:
 
         total = len(queries)
 
-        for x, (full_hash_path, img_array) in enumerate(queries.values(), start=1):
+        for x, (full_hash, img_array) in enumerate(queries.values(), start=1):
 
             self.progressbar_text(text=Lang.adding, x=x, total=total)
-            Utils.write_image_hash(full_hash_path, img_array)
+            Utils.write_image_hash(full_hash, img_array)
             sleep(self.sleep_count)
 
         if total > 0:

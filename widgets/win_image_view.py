@@ -66,8 +66,8 @@ class LoadThumb(URunnable):
         conn.close()
 
         if short_hash:
-            full_hash_path = Utils.get_full_hash_path(short_hash)
-            small_img = Utils.read_image_hash(full_hash_path)
+            full_hash = Utils.get_full_hash(short_hash)
+            small_img = Utils.read_image_hash(full_hash)
             pixmap = Utils.pixmap_from_array(small_img)
         else:
             pixmap = QPixmap(1, 1)

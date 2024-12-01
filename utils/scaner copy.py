@@ -233,9 +233,9 @@ class DbUpdater:
         conn.close()
 
         for short_hash in self.del_items:
-            full_hash_path = Utils.get_full_hash_path(short_hash)
-            if os.path.exists(full_hash_path):
-                os.remove(full_hash_path)
+            full_hash = Utils.get_full_hash(short_hash)
+            if os.path.exists(full_hash):
+                os.remove(full_hash)
 
         if self.del_items:
             ScanerTools.reload_gui()
@@ -276,11 +276,11 @@ class DbUpdater:
             small_img, resol = self.get_small_img(full_src)
 
             if small_img is not None:
-                full_hash_path = Utils.create_full_hash_path(full_src)
+                full_hash = Utils.create_full_hash(full_src)
 
                 values = {
                     "short_src": Utils.get_short_src(Brand.curr.collfolder, full_src),
-                    "short_hash": Utils.get_short_hash(full_hash_path),
+                    "short_hash": Utils.get_short_hash(full_hash),
                     "size": size,
                     "birth": birth,
                     "mod": mod,
@@ -293,7 +293,7 @@ class DbUpdater:
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
                 self.insert_queries.append(stmt)
 
-                self.hash_images.append((full_hash_path, small_img))
+                self.hash_images.append((full_hash, small_img))
 
                 insert_count += 1
 
@@ -332,12 +332,12 @@ class DbUpdater:
         conn.close()
 
         ln_ = len(self.hash_images)
-        for x, (full_hash_path, img_array) in enumerate(self.hash_images, start=1):
+        for x, (full_hash, img_array) in enumerate(self.hash_images, start=1):
             brand = Brand.curr.name.capitalize()
             adding: str = Lang.adding
             t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
             ScanerTools.progressbar_text(t)
-            Utils.write_image_hash(full_hash_path, img_array)
+            Utils.write_image_hash(full_hash, img_array)
 
         if self.hash_images:
             ScanerTools.reload_gui()

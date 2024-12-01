@@ -117,7 +117,7 @@ class Utils:
         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @classmethod
-    def create_full_hash_path(cls, full_src: str) -> str:
+    def create_full_hash(cls, full_src: str) -> str:
         new_name = hashlib.md5(full_src.encode('utf-8')).hexdigest() + ".jpg"
         
         new_folder = os.path.join(Static.HASH_DIR, new_name[:2])
@@ -126,26 +126,26 @@ class Utils:
         return os.path.join(new_folder, new_name)
 
     @classmethod
-    def get_short_hash(cls, full_hash_path: str):
-        return full_hash_path.replace(Static.APP_SUPPORT_DIR, "")
+    def get_short_hash(cls, full_hash: str):
+        return full_hash.replace(Static.APP_SUPPORT_DIR, "")
     
     @classmethod
-    def get_full_hash_path(cls, short_hash: str):
+    def get_full_hash(cls, short_hash: str):
         return Static.APP_SUPPORT_DIR + short_hash
 
     @classmethod
-    def write_image_hash(cls, full_hash_path: str, array_img: np.ndarray) -> bool:
+    def write_image_hash(cls, full_hash: str, array_img: np.ndarray) -> bool:
         try:
-            cv2.imwrite(full_hash_path, array_img)
+            cv2.imwrite(full_hash, array_img)
             return True
         except Exception as e:
             cls.print_err(error=e)
             return False
         
     @classmethod
-    def read_image_hash(cls, full_hash_path: str) -> np.ndarray | None:
+    def read_image_hash(cls, full_hash: str) -> np.ndarray | None:
         try:
-            array_img = cv2.imread(full_hash_path, cv2.IMREAD_UNCHANGED)
+            array_img = cv2.imread(full_hash, cv2.IMREAD_UNCHANGED)
             return cls.array_color(array_img, "BGR")
         except Exception as e:
             cls.print_err(error=e)
