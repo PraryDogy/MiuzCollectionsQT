@@ -271,8 +271,9 @@ class DbUpdater:
         else:
             return (None, None)
 
-    def create_queries(self, ins_items: list[tuple[str, int, int, int]]) -> dict[sqlalchemy.Insert, tuple[str, ndarray]]:
-        res: dict = {}
+    def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
+
+        res: dict[sqlalchemy.Insert, tuple[str, ndarray]] = {}
 
         for full_src, size, birth, mod in ins_items:
 
