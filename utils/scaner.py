@@ -205,13 +205,11 @@ class DbUpdater:
         self.del_items = del_items
         self.ins_items = ins_items
 
-        self.insert_queries: list[sqlalchemy.Insert] = []
-        self.hash_images: list[tuple[str, ndarray]] = []
-
     def run(self):
         self.del_db()
-        self.insert_db()
-        self.insert_cmd()
+
+        queries = self.create_queries()
+        self.insert_cmd(queries=queries)
 
     def del_db(self):
         conn = Dbase.engine.connect()
@@ -278,7 +276,9 @@ class DbUpdater:
         else:
             return (None, None)
 
-    def insert_db(self):
+    def create_queries(self) -> dict[sqlalchemy.Insert, tuple[str, ndarray]]:
+        res: dict = {}
+
         for full_src, size, birth, mod in self.ins_items:
 
             if not ScanerTools.can_scan:
@@ -303,16 +303,17 @@ class DbUpdater:
                     }
 
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
-                self.insert_queries.append(stmt)
-                self.hash_images.append((full_hash_path, small_img))
+                res[stmt] = (full_hash_path, small_img)
 
             else:
                 continue
 
-    def insert_cmd(self):
+        return res
+
+    def insert_cmd(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
         conn = Dbase.engine.connect()
 
-        for query in self.insert_queries:
+        for query in queries.keys():
 
             try:
                 conn.execute(query)
@@ -331,9 +332,8 @@ class DbUpdater:
         conn.commit()
         conn.close()
 
-        ln_ = len(self.hash_images)
-
-        for x, (full_hash_path, img_array) in enumerate(self.hash_images, start=1):
+        ln_ = len(queries)
+        for x, (full_hash_path, img_array) in enumerate(queries.values(), start=1):
 
             brand = Brand.curr.name.capitalize()
             adding: str = Lang.adding
@@ -343,7 +343,7 @@ class DbUpdater:
 
             Utils.write_image_hash(full_hash_path, img_array)
 
-        if self.hash_images:
+        if queries:
             ScanerTools.reload_gui()
 
 
