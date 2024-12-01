@@ -66,7 +66,7 @@ class FinderImages:
         ln_ = len(collections)
 
         for x, collection in enumerate(collections, start=1):
-            brand = Brand.name
+            brand = Brand.curr.name
             coll: str = Lang.collection
             t = f"{brand}: {coll.lower()} {x} {Lang.from_} {ln_}"
             ScanerTools.progressbar_text(t)
