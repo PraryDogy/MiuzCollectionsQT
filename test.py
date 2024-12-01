@@ -71,7 +71,6 @@ class Test:
                         data = (entry.path, stats.st_size, stats.st_birthtime, stats.st_mtime)
                         result.append(data)
 
-        result = sorted(result)
         return result
 
 

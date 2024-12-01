@@ -80,37 +80,34 @@ class FinderImages:
         return finder_images
 
     def walk_collection(self, collection: str) -> list[tuple[str, int, int, int]]:
-        finder_images: list[tuple[str, int, int, int]] = []
 
-        for root, _, files in os.walk(collection):
+        result = []
+        stack = [collection]
+        
+        while stack:
 
-            if not ScanerTools.can_scan:
-                return finder_images
+            current_dir = stack.pop()
             
-            elif not os.path.exists(Brand.curr.collfolder):
-                ScanerTools.can_scan = False
-                return finder_images
+            with os.scandir(current_dir) as entries:
 
-            for file in files:
+                for entry in entries:
 
-                if not ScanerTools.can_scan:
-                    return finder_images
+                    if entry.is_dir():
+                        stack.append(entry.path)
 
-                if file.endswith(Static.IMG_EXT):
-                    src = os.path.join(root, file)
-                    item = self.get_image_item(src)
-                    if item:
-                        finder_images.append(item)
+                    elif entry.name.endswith(Static.IMG_EXT):
+                        stats = entry.stat()
 
-        return finder_images
-    
-    def get_image_item(self, src: str) -> list[tuple[str, int, int, int]]:
-        try:
-            stats = os.stat(path=src)
-            return (src, stats.st_size, stats.st_birthtime, stats.st_mtime)
-        except FileNotFoundError as e:
-            Utils.print_err(error=e)
-            return None
+                        data = (
+                            entry.path,
+                            stats.st_size,
+                            stats.st_birthtime,
+                            stats.st_mtime
+                        )
+
+                        result.append(data)
+
+        return result
 
 
 class DbImages:
