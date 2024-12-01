@@ -103,6 +103,13 @@ OPTIONS = {
             }
             }
 
+print("Скопировал hashdir и db.db из appsupport в корень проекта?")
+print("нажми 1 если да")
+
+if not input() == "1":
+    print("Отменено пользователем")
+    quit()
+
 sys.argv.append(PY2APP)
 
 try:
