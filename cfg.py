@@ -6,8 +6,14 @@ from datetime import datetime
 
 
 class Static:
+
     APP_VER = 1.3
     APP_NAME: str = "Collections"
+
+    # сколько папок с коллекциями программа будет анализировать
+    # для интеграции новой папки с коллекциями нужно
+    # добавить в BRANDS новое произвольное имя
+    # 
     BRANDS = ["miuz", "panacea"]
 
     GRID_LIMIT: int = 150
@@ -46,17 +52,6 @@ class Static:
         "hashdir"
         )
 
-    LAYERS_EXT: tuple = (
-        ".psd", ".psb", ".tiff", ".tif",
-        ".PSD", ".PSB", ".TIFF", ".TIF"
-        )
-
-    JPG_EXT: tuple = (
-        ".jpg", ".jpeg", ".jfif", ".png",
-        ".JPG", ".JPEG", ".JFIF", ".PNG"
-        )
-    
-    IMG_EXT = JPG_EXT + LAYERS_EXT
 
     PRELOAD_FOLDER: str = "_preload"
 
@@ -69,6 +64,18 @@ class Static:
         PRELOAD_FOLDER,
         "hashdir.zip"
         )
+
+    LAYERS_EXT: tuple = (
+        ".psd", ".psb", ".tiff", ".tif",
+        ".PSD", ".PSB", ".TIFF", ".TIF"
+        )
+
+    JPG_EXT: tuple = (
+        ".jpg", ".jpeg", ".jfif", ".png",
+        ".JPG", ".JPEG", ".JFIF", ".PNG"
+        )
+    
+    IMG_EXT = JPG_EXT + LAYERS_EXT
 
     RGB_BLUE = "rgb(46, 89, 203)"
     BORDER_INV = "2px solid transparent"
@@ -118,29 +125,26 @@ class Filters:
     
     @classmethod
     def init_filters(cls):
-        filters = [
-            {
-                "names": ["Продукт", "Product"],
-                "real": "1 IMG", 
-                "value": False,
-                "system": False
-            },
-            {
-                "names": ["Модели", "Model"],
-                "real": "2 MODEL IMG", 
-                "value": False,
-                "system": False
-            },
-            {
-                "names": ["Остальное", "Other"],
-                "real": None, 
-                "value": False,
-                "system": True
-            },
-        ]
-
-        for i in filters:
-            Filters.current.append(Filters(**i))
+        cls.current = [
+                    Filters(
+                        names=["Продукт", "Product"],
+                        real="1 IMG",
+                        value=False,
+                        system=False
+                    ),
+                    Filters(
+                        names=["Модели", "Model"], 
+                        real="2 MODEL IMG", 
+                        value=False, 
+                        system=False
+                    ),
+                    Filters(
+                        names=["Остальное", "Other"], 
+                        real=None, 
+                        value=False, 
+                        system=True
+                    ),
+                ]
 
 
 class JsonData:
