@@ -21,7 +21,7 @@ NEED_REBOOT = "___need_reboot___"
 
 
 class RebootableSettings(QGroupBox):
-    apply_settings = pyqtSignal()
+    apply = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -50,7 +50,7 @@ class RebootableSettings(QGroupBox):
 
         self.reset_btn = QPushButton(Lang.reset_all)
         self.reset_btn.setFixedWidth(150)
-        self.reset_btn.clicked.connect(lambda: self.cmd_(wid=self.reset_btn))
+        self.reset_btn.clicked.connect(self.reset_btn_cmd)
         sec_row_lay.addWidget(self.reset_btn)
 
         descr = QLabel(text=Lang.restore_db_descr)
@@ -60,8 +60,12 @@ class RebootableSettings(QGroupBox):
         v_lay.addWidget(sec_row_wid)
 
     def cmd_(self, wid: QWidget):
-        self.apply_settings.emit()
+        self.apply.emit()
         setattr(wid, NEED_REBOOT, True)
+
+    def reset_btn_cmd(self, *args):
+        self.lang_btn.setDisabled(True)
+        self.cmd_(wid=self.reset_btn)
 
     def lang_btn_cmd(self, *args):
         # костыль но что ж поделать
@@ -70,6 +74,7 @@ class RebootableSettings(QGroupBox):
         else:
             self.lang_btn.setText("Русский")
 
+        self.reset_btn.setDisabled(True)
         self.cmd_(wid=self.lang_btn)
 
 
@@ -131,7 +136,7 @@ class SimpleSettings(QGroupBox):
 
 
 class BrandSettings(QTabWidget):
-    _apply_settings = pyqtSignal()
+    apply = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -178,7 +183,7 @@ class BrandSettings(QTabWidget):
         return wid
     
     def text_changed(self):
-        self._apply_settings.emit()
+        self.apply.emit()
         setattr(self, NEED_REBOOT, True)
     
     def get_stopcolls(self, wid: CustomInput):
@@ -208,16 +213,23 @@ class WinSettings(WinSystem):
     def init_ui(self):
         self.central_layout.setSpacing(10)
 
-        self.rebootable_settings = RebootableSettings()
-        self.rebootable_settings.apply_settings.connect(self.ok_to_apply)
-        self.central_layout.addWidget(self.rebootable_settings)
+        self.rb_sett = RebootableSettings()
+        self.central_layout.addWidget(self.rb_sett)
 
-        self.simple_settings = SimpleSettings()
-        self.central_layout.addWidget(self.simple_settings)
+        self.smpl_sett = SimpleSettings()
+        self.central_layout.addWidget(self.smpl_sett)
 
-        self.brand_sett = BrandSettings()
-        self.brand_sett._apply_settings.connect(self.ok_to_apply)
-        self.central_layout.addWidget(self.brand_sett)
+        self.brnd_sett = BrandSettings()
+        self.central_layout.addWidget(self.brnd_sett)
+
+
+        rb_sett_cmd = lambda: self.cmd_(wid=self.brnd_sett)
+        self.rb_sett.apply.connect(rb_sett_cmd)
+
+        lock_rebootable = lambda: self.cmd_(wid=self.rb_sett)
+        self.brnd_sett.apply.connect(lock_rebootable)
+
+
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
@@ -235,20 +247,18 @@ class WinSettings(WinSystem):
 
         self.cancel_btn = QPushButton(text=Lang.cancel)
         self.cancel_btn.setFixedWidth(100)
-        self.cancel_btn.clicked.connect(self.cancel_cmd)
+        self.cancel_btn.clicked.connect(self.close)
         btns_layout.addWidget(self.cancel_btn)
 
         btns_layout.addStretch(1)
 
-    def ok_to_apply(self, *args):
+    def cmd_(self, wid: QWidget):
+        wid.setDisabled(True)
         self.ok_btn.setText(Lang.apply)
-
-    def cancel_cmd(self, *args):
-        self.close()
 
     def ok_cmd(self, *args):
 
-        if hasattr(self.rebootable_settings.reset_btn, NEED_REBOOT):
+        if hasattr(self.rb_sett.reset_btn, NEED_REBOOT):
 
             JsonData.write_json_data()
             QApplication.quit()
@@ -261,20 +271,20 @@ class WinSettings(WinSystem):
 
             Utils.start_new_app()
 
-        elif hasattr(self.rebootable_settings.lang_btn, NEED_REBOOT):
+        elif hasattr(self.rb_sett.lang_btn, NEED_REBOOT):
             JsonData.lang_ind += 1
             Lang.init()
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
 
-        elif hasattr(self.brand_sett, NEED_REBOOT):
+        elif hasattr(self.brnd_sett, NEED_REBOOT):
 
-            for brand_ind, wid in self.brand_sett.stop_colls_wid.items():
+            for brand_ind, wid in self.brnd_sett.stop_colls_wid.items():
                 stop_colls = self.new_row_list(wid=wid)
                 JsonData.stop_colls[brand_ind] = stop_colls
 
-            for brand_ind, wid in self.brand_sett.coll_folders_wid.items():
+            for brand_ind, wid in self.brnd_sett.coll_folders_wid.items():
                 coll_folders = self.new_row_list(wid=wid)
                 coll_folders = [
                     os.sep + i.strip().strip(os.sep)
