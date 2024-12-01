@@ -52,9 +52,6 @@ class Static:
     # Thumbnail > name_lbl > список макс. символов виджета
     TEXT_LENGTH: list = [17, 20, 25, 29]
 
-    assert len(IMG_LABEL_SIZE) == len(THUMB_W) == len(TEXT_LENGTH)
-
-
     # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ 
     APP_SUPPORT_DIR: str = os.path.join(
         os.path.expanduser("~"),
@@ -354,6 +351,8 @@ class JsonData:
     def init(cls):
         cls._check_dirs()
         cls._set_json_data()
+
+        assert len(Static.IMG_LABEL_SIZE) == len(Static.THUMB_W) == len(Static.TEXT_LENGTH)
         assert len(Static.BRANDS) == len(cls.stopcolls) == len(cls.collfolders)
 
         # если версии не совпадают то что то нужно сделать
