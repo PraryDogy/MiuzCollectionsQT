@@ -306,8 +306,6 @@ class DbUpdater:
                 self.insert_queries.append(stmt)
                 self.hash_images.append((full_hash_path, small_img))
 
-                # insert_count += 1
-
             else:
                 continue
 
