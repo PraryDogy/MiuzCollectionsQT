@@ -36,11 +36,23 @@ class Static:
     # для метки "избранное", произвольный
     STAR_SYM = "\U00002605" + " "
 
+    # макс. размер изображения, которое будет отпавляться в hashdir
     PIXMAP_SIZE_MAX = 200
+
+    # доп. площадь для widgets > grid > cell_wids > Thumbnail
+    # Thumbnail содержит pixmap, qlabel, qlabel
     THUMB_MARGIN: int = 15
-    PIXMAP_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
+
+    # Thumbnail > img_label размеры виджета
+    IMG_LABEL_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
+
+    # Thumbnail > список ширин виджета
     THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
+
+    # Thumbnail > name_lbl > список макс. символов виджета
     TEXT_LENGTH: list = [17, 20, 25, 29]
+
+    assert len(IMG_LABEL_SIZE) == len(THUMB_W) == len(TEXT_LENGTH)
 
     APP_SUPPORT_DIR: str = os.path.join(
         os.path.expanduser("~"),
