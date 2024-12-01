@@ -34,7 +34,6 @@ class Dbase:
     @classmethod
     def init(cls) -> sqlalchemy.Engine:
         cls.create_engine()
-        cls.check_tables([THUMBS])
         cls.toggle_wal(False)
 
     @classmethod
@@ -67,20 +66,3 @@ class Dbase:
         conn = cls.engine.connect()
         conn.execute(sqlalchemy.text("VACUUM"))
         conn.commit()
-
-    @classmethod
-    def check_tables(cls, tables: list):
-        inspector = sqlalchemy.inspect(cls.engine)
-
-        clmns = list(clmn.name for clmn in THUMBS.columns)
-        db_clmns = list(clmn.get("name") for clmn in inspector.get_columns(THUMBS.name))
-        res = bool(db_clmns == clmns)
-
-        if not res:
-            print(f"Несоответствие имени столбца в {THUMBS.name}")
-            remove_appsupport = True
-            
-        if remove_appsupport:
-            QApplication.quit()
-            shutil.rmtree(Static.APP_SUPPORT_DIR)
-            Utils.start_new_app()
