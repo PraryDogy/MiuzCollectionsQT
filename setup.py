@@ -16,6 +16,7 @@ from cfg import Static
 
 # ****************** DON'T CHANGE IT ******************
 
+
 def remove_trash():
 
     trash = ("build", ".eggs", "dist")
@@ -76,7 +77,6 @@ DATA_FILES = [
     include_files("images"),
     include_files("applescripts"),
     include_files("icon"),
-    include_files("_preload"),
     ]
 
 
@@ -103,12 +103,20 @@ OPTIONS = {
             }
             }
 
-print("Скопировал hashdir и db.db из appsupport в корень проекта?")
-print("нажми 1 если да")
+print("Нажми 1 чтобы создать приложение с кешем из ApplicationSupport")
 
-if not input() == "1":
-    print("Отменено пользователем")
-    quit()
+if input() == "1":
+
+    new_hashdir = shutil.make_archive(Static.HASH_DIR, "zip", Static.APP_SUPPORT_DIR)
+
+    DATA_FILES.append(
+        ('_preload', [new_hashdir, Static.DB_FILE])
+    )
+
+else:
+
+    new_hashdir = None
+    DATA_FILES.append(include_files("_preload"))
 
 sys.argv.append(PY2APP)
 
@@ -129,3 +137,7 @@ try:
 except Exception as e:
     print(e)
     remove_trash()
+
+
+if new_hashdir:
+    os.remove(new_hashdir)

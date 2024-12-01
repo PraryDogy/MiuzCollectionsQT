@@ -1,9 +1,6 @@
-from cfg import JsonData, Static
-import json
-
-with open(Static.JSON_FILE, "r") as f:
-    data: dict = json.load(f)
+from cfg import Static
+import shutil
 
 
-for k, v in data.items():
-    print(v, type(v))
+zp = shutil.make_archive(Static.HASH_DIR, "zip", Static.APP_SUPPORT_DIR)
+print(zp)
