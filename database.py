@@ -72,16 +72,6 @@ class Dbase:
     def check_tables(cls, tables: list):
         inspector = sqlalchemy.inspect(cls.engine)
 
-        db_tables = inspector.get_table_names()
-        res: bool = (list(i.name for i in tables) == db_tables)
-
-        remove_appsupport = False
-
-        if not res:
-            print("Несоответствие в имени таблицы и/или в количестве таблиц")
-            remove_appsupport = True
-
-
         clmns = list(clmn.name for clmn in THUMBS.columns)
         db_clmns = list(clmn.get("name") for clmn in inspector.get_columns(THUMBS.name))
         res = bool(db_clmns == clmns)
