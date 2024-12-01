@@ -95,8 +95,8 @@ class DbImages(URunnable):
         # но изображения нет
         # значит в БД есть запись о несуществующем изображении
         # удаляем эту запись из БД
-        print("error to load image from hash_path", short_hash)
-        print("removing from db..")
+        print("widgets > grid > _db_images > create_dict", short_hash)
+        print("can't load image from hash_path, removing from db..")
 
         conn = Dbase.engine.connect()
 
