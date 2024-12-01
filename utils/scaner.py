@@ -28,6 +28,7 @@ class Brand:
 
 class ScanerTools:
     can_scan: bool = True
+    sleep_count: float = 0.1
 
     @classmethod
     def progressbar_text(cls, text: str):
@@ -238,15 +239,18 @@ class DbUpdater:
 
         for short_hash_path in self.del_items:
 
-            brand = Brand.curr.name.capitalize()
-            deleting: str = Lang.deleting
-            t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {ln_}"
-            ScanerTools.progressbar_text(t)
-
             full_hash_path = Utils.get_full_hash_path(short_hash_path)
 
             if os.path.exists(full_hash_path):
+
+                brand = Brand.curr.name.capitalize()
+                deleting: str = Lang.deleting
+                t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {ln_}"
+                ScanerTools.progressbar_text(t)
+
                 os.remove(full_hash_path)
+                sleep(ScanerTools.sleep_count)
+
 
         if self.del_items:
             ScanerTools.reload_gui()
@@ -333,7 +337,6 @@ class DbUpdater:
         conn.commit()
         conn.close()
 
-        sleep_count = 0.1
         ln_ = len(self.hash_images)
 
         for x, (full_hash_path, img_array) in enumerate(self.hash_images, start=1):
@@ -342,7 +345,7 @@ class DbUpdater:
             adding: str = Lang.adding
             t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
             ScanerTools.progressbar_text(t)
-            sleep(sleep_count)
+            sleep(ScanerTools.sleep_count)
 
             Utils.write_image_hash(full_hash_path, img_array)
 
