@@ -81,14 +81,14 @@ class Dbase:
             print("Несоответствие в имени таблицы и/или в количестве таблиц")
             remove_appsupport = True
 
-        for table in tables:
-            clmns = list(clmn.name for clmn in table.columns)
-            db_clmns = list(clmn.get("name") for clmn in inspector.get_columns(table.name))
-            res = bool(db_clmns == clmns)
 
-            if not res:
-                print(f"Несоответствие имени столбца в {table.name}")
-                remove_appsupport = True
+        clmns = list(clmn.name for clmn in THUMBS.columns)
+        db_clmns = list(clmn.get("name") for clmn in inspector.get_columns(THUMBS.name))
+        res = bool(db_clmns == clmns)
+
+        if not res:
+            print(f"Несоответствие имени столбца в {THUMBS.name}")
+            remove_appsupport = True
             
         if remove_appsupport:
             QApplication.quit()
