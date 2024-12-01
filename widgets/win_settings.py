@@ -11,7 +11,7 @@ from base_widgets import CustomInput, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
 from lang import Lang
-from utils.updater import Updater
+from utils.updater import SimpleSettings
 from utils.utils import UThreadPool, Utils
 
 from .actions import OpenWins
@@ -19,7 +19,7 @@ from .actions import OpenWins
 WIN_SIZE = (430, 550)
 
 
-class ChangeLang(QGroupBox):
+class RebootableSettings(QGroupBox):
     clicked_ = pyqtSignal()
 
     def __init__(self):
@@ -35,7 +35,7 @@ class ChangeLang(QGroupBox):
 
         self.lang_btn = QPushButton(text=Lang._lang_name)
         self.lang_btn.setFixedWidth(150)
-        self.lang_btn.clicked.connect(self.lng_cmd)
+        self.lang_btn.clicked.connect(self.lang_btn_cmd)
         first_row_lay.addWidget(self.lang_btn)
 
         self.lang_label = QLabel(Lang.lang_label)
@@ -58,109 +58,75 @@ class ChangeLang(QGroupBox):
         v_lay.addWidget(first_row_wid)
         v_lay.addWidget(sec_row_wid)
 
-    def lng_cmd(self, *args):
+    def cmd_(self):
+        self.clicked_.emit()
+        setattr(self, "flag", True)
 
+    def lang_btn_cmd(self, *args):
         # костыль но что ж поделать
         if self.lang_btn.text() == "Русский":
             self.lang_btn.setText("English")
         else:
             self.lang_btn.setText("Русский")
 
-        self.clicked_.emit()
-        setattr(self, "flag", True)
-
-    def cmd_(self, *args):
-        setattr(self, "flag", True)
-        self.clicked_.emit()
+        self.cmd_()
 
 
-class RestoreBd(QGroupBox):
-    clicked_ = pyqtSignal()
-
+class SimpleSettings(QGroupBox):
     def __init__(self):
         super().__init__()
 
-        h_layout = LayoutHor()
-        h_layout.setSpacing(15)
-        h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.setLayout(h_layout)
+        v_lay = LayoutVer()
+        self.setLayout(v_lay)
 
-        self.restore_db_btn = QPushButton(Lang.restore_db)
-        self.restore_db_btn.setFixedWidth(150)
-        self.restore_db_btn.clicked.connect(self.cmd_)
-        h_layout.addWidget(self.restore_db_btn)
-
-        descr = QLabel(text=Lang.restore_db_descr)
-        h_layout.addWidget(descr)
-
-    def cmd_(self, *args):
-        setattr(self, "flag", True)
-        self.clicked_.emit()
-
-
-class Updater(QGroupBox):
-    def __init__(self):
-        super().__init__()
-
-        h_layout = LayoutHor()
-        h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        h_layout.setSpacing(15)
-        self.setLayout(h_layout)
+        first_row_wid = QWidget()
+        v_lay.addWidget(first_row_wid)
+        first_row_lay = LayoutHor()
+        first_row_lay.setSpacing(15)
+        first_row_wid.setLayout(first_row_lay)
 
         self.updater_btn = QPushButton(text=Lang.download_update)
         self.updater_btn.setFixedWidth(150)
-        self.updater_btn.clicked.connect(self.update_btn_cmd)
-        h_layout.addWidget(self.updater_btn)
+        self.updater_btn.clicked.connect(self.updater_btn_cmd)
+        first_row_lay.addWidget(self.updater_btn)
 
         self.descr = QLabel(text=Lang.update_descr)
-        h_layout.addWidget(self.descr)
+        first_row_lay.addWidget(self.descr)
 
-    def update_btn_cmd(self, *args):
-        self.task = Updater()
-        self.updater_btn.setText(Lang.wait_update)
-        self.task.signals_.no_connection.connect(self.no_connection_win)
-        self.task.signals_.finished_.connect(self.finalize)
-        UThreadPool.pool.start(self.task)
-
-    def finalize(self):
-        self.updater_btn.setText(Lang.download_update)
-
-    def no_connection_win(self):
-        cmd_ = lambda: self.updater_btn.setText(Lang.download_update)
-
-        QTimer.singleShot(1000, cmd_)
-        OpenWins.smb(self.window())
-
-    def no_connection_btn_style(self):
-        cmd_ = lambda: self.updater_btn.setText(Lang.download_update)
-
-        self.updater_btn.setText(Lang.no_connection)
-        QTimer.singleShot(1500, cmd_)
-
-
-class ShowFiles(QGroupBox):
-    clicked_ = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-
-        h_layout = LayoutHor()
-        h_layout.setSpacing(15)
-        self.setLayout(h_layout)
+        sec_row_wid = QWidget()
+        v_lay.addWidget(sec_row_wid)
+        sec_row_lay = LayoutHor()
+        sec_row_lay.setSpacing(15)
+        sec_row_wid.setLayout(sec_row_lay)
 
         self.show_files_btn = QPushButton(text=Lang.show_app_support)
         self.show_files_btn.setFixedWidth(150)
         self.show_files_btn.clicked.connect(self.show_files_cmd)
-        h_layout.addWidget(self.show_files_btn)
+        sec_row_lay.addWidget(self.show_files_btn)
 
         self.lang_label = QLabel(Lang.show_files)
-        h_layout.addWidget(self.lang_label)
+        sec_row_lay.addWidget(self.lang_label)
 
     def show_files_cmd(self, *args):
         try:
             subprocess.Popen(["open", Static.APP_SUPPORT_DIR])
         except Exception as e:
             print(e)
+
+    def updater_btn_cmd(self, *args):
+        self.task = SimpleSettings()
+        self.updater_btn.setText(Lang.wait_update)
+        self.task.signals_.no_connection.connect(self.updater_btn_smb)
+        self.task.signals_.finished_.connect(self.updater_btn_cmd_fin)
+        UThreadPool.pool.start(self.task)
+
+    def updater_btn_cmd_fin(self):
+        self.updater_btn.setText(Lang.download_update)
+
+    def updater_btn_smb(self):
+        cmd_ = lambda: self.updater_btn.setText(Lang.download_update)
+        QTimer.singleShot(1000, cmd_)
+        OpenWins.smb(self.window())
 
 
 class BrandSettings(QTabWidget):
@@ -239,19 +205,12 @@ class WinSettings(WinSystem):
         self.central_layout.setSpacing(10)
 
         cmd_lang = lambda: self.ok_btn.setText(Lang.apply)
-        self.change_lang = ChangeLang()
-        self.change_lang.clicked_.connect(cmd_lang)
-        self.central_layout.addWidget(self.change_lang)
+        self.rebootable_settings = RebootableSettings()
+        self.rebootable_settings.clicked_.connect(cmd_lang)
+        self.central_layout.addWidget(self.rebootable_settings)
 
-        self.restore_bd = RestoreBd()
-        self.restore_bd.clicked_.connect(self.ok_cmd)
-        self.central_layout.addWidget(self.restore_bd)
-
-        self.updater = Updater()
-        self.central_layout.addWidget(self.updater)
-
-        self.show_files = ShowFiles()
-        self.central_layout.addWidget(self.show_files)
+        self.simple_settimgs = SimpleSettings()
+        self.central_layout.addWidget(self.simple_settimgs)
 
         self.brand_sett = BrandSettings()
         self.central_layout.addWidget(self.brand_sett)
@@ -293,7 +252,7 @@ class WinSettings(WinSystem):
 
             Utils.start_new_app()
 
-        elif hasattr(self.change_lang, "flag"):
+        elif hasattr(self.rebootable_settings, "flag"):
             JsonData.lang_ind += 1
             Lang.init()
             JsonData.write_json_data()

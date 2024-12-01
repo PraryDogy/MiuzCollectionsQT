@@ -132,8 +132,8 @@ class Lang_:
         "Info"
     ]
     lang_label = [
-        "Язык/Language",
-        "Language/Язык"
+        "Язык / Language",
+        "Language / Язык"
     ]
     loading = [
         "Загрузка...",
@@ -248,8 +248,8 @@ class Lang_:
         "Resolution"
     ]
     restore_db = [
-        "Восстановить БД",
-        "Restore DB"
+        "Сбросить всё",
+        "Restore all"
     ]
     reveal = [
         "Показать",
