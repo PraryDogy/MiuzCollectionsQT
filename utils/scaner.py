@@ -195,28 +195,22 @@ class Compator:
 
 
 class DbUpdater:
-    def __init__(
-            self,
-            del_items: list[str],
-            ins_items: list[tuple[str, int, int, int]]
-            ):
+    def __init__(self, del_items: list[str], ins_items: list[tuple[str, int, int, int]]):
 
         super().__init__()
-        self.del_items = del_items
-        self.ins_items = ins_items
 
-    def run(self):
-        self.del_db()
+        self.del_db(del_items=del_items)
+        self.del_images(del_items=del_items)
 
-        queries = self.create_queries()
+        queries = self.create_queries(ins_items=ins_items)
         self.insert_db(queries=queries)
         self.insert_images(queries=queries)
 
-    def del_db(self):
-        conn = Dbase.engine.connect()
-        ln_ = len(self.del_items)
+    def del_db(self, del_items: list[str]):
 
-        for x, short_hash_path in enumerate(self.del_items, start=1):
+        conn = Dbase.engine.connect()
+
+        for short_hash_path in del_items:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==short_hash_path)
 
@@ -237,7 +231,11 @@ class DbUpdater:
         conn.commit()
         conn.close()
 
-        for short_hash_path in self.del_items:
+    def del_images(self, del_items: list[str]):
+
+        total = len(del_items)
+
+        for x, short_hash_path in enumerate(del_items, start=1):
 
             full_hash_path = Utils.get_full_hash_path(short_hash_path)
 
@@ -245,14 +243,14 @@ class DbUpdater:
 
                 brand = Brand.curr.name.capitalize()
                 deleting: str = Lang.deleting
-                t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {ln_}"
+                t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {total}"
                 ScanerTools.progressbar_text(t)
 
                 os.remove(full_hash_path)
                 sleep(ScanerTools.sleep_count)
 
 
-        if self.del_items:
+        if del_items:
             ScanerTools.reload_gui()
 
     def get_small_img(self, src: str) -> tuple[ndarray, str] | tuple[None, None]:
@@ -277,10 +275,10 @@ class DbUpdater:
         else:
             return (None, None)
 
-    def create_queries(self) -> dict[sqlalchemy.Insert, tuple[str, ndarray]]:
+    def create_queries(self, ins_items: list[tuple[str, int, int, int]]) -> dict[sqlalchemy.Insert, tuple[str, ndarray]]:
         res: dict = {}
 
-        for full_src, size, birth, mod in self.ins_items:
+        for full_src, size, birth, mod in ins_items:
 
             if not ScanerTools.can_scan:
                 return
@@ -387,11 +385,7 @@ class ScanerThread(URunnable):
             )
             compator.get_result()
 
-            db_updater = DbUpdater(
-                del_items=compator.del_items,
-                ins_items=compator.ins_items
-            )
-            db_updater.run()
+            DbUpdater(del_items=compator.del_items, ins_items=compator.ins_items)
 
         try:
             self.signals_.finished_.emit()
