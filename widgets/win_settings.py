@@ -159,7 +159,7 @@ class BrandSettings(QTabWidget):
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         v_lay.addWidget(stop_colls_lbl)
 
-        stop_colls = "\n".join(JsonData.stop_colls[brand_ind])
+        stop_colls = "\n".join(JsonData.stopcolls[brand_ind])
         stop_colls_inp = CustomTextEdit()
         stop_colls_inp.setPlaceholderText(Lang.from_new_row)
         stop_colls_inp.setPlainText(stop_colls)
@@ -282,7 +282,7 @@ class WinSettings(WinSystem):
 
             for brand_ind, wid in self.brnd_sett.stop_colls_wid.items():
                 stop_colls = self.new_row_list(wid=wid)
-                JsonData.stop_colls[brand_ind] = stop_colls
+                JsonData.stopcolls[brand_ind] = stop_colls
 
             for brand_ind, wid in self.brnd_sett.coll_folders_wid.items():
                 coll_folders = self.new_row_list(wid=wid)

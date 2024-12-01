@@ -15,14 +15,25 @@ class Static:
     # добавить в BRANDS новое произвольное имя
     # созависимые аттрибуты:
     # JsonData.collfolders, JsonData.stopcolls
+    # при инициации будет проверка на соответствие длин
     BRANDS = ["miuz", "panacea"]
 
+    # в сетке изображений может отображаться за раз 150 штук
     GRID_LIMIT: int = 150
+
+    # скачать системные файлы _preload
     LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
+
+    # ширина главного меню...
     MENU_LEFT_WIDTH: int = 210
+
+    # внутренние имена для "все коллекции", "избранное", "недавние"
+    # можно задавать произвольные имена
     NAME_ALL_COLLS: str = "___collections___"
     NAME_FAVS: str = "___favorites___"
     NAME_RECENTS: str = "___recents___"
+
+    # для метки "избранное", произвольный
     STAR_SYM = "\U00002605" + " "
 
     PIXMAP_SIZE_MAX = 200
@@ -166,15 +177,6 @@ class JsonData:
         }
     
     scaner_minutes: int = 5
-
-    stop_colls: list[list[str]] = [
-        [
-            "_Archive_Commerce_Брендинг",
-            "Chosed",
-            "LEVIEV"
-        ],
-        [], 
-    ]
     
     lang_ind = 0
     brand_ind = 0
@@ -187,6 +189,15 @@ class JsonData:
         '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
         '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
         ]
+
+    stopcolls: list[list[str]] = [
+        [
+            "_Archive_Commerce_Брендинг",
+            "Chosed",
+            "LEVIEV"
+        ],
+        [], 
+    ]
 
     collfolders: list[list[str]] = [
         # miuz coll folders
@@ -307,6 +318,7 @@ class JsonData:
         cls._read_json_data()
         cls._compare_versions()
         Filters.init_filters()
+        assert len(Static.BRANDS) == len(cls.stopcolls) == len(cls.collfolders)
 
 
 class Dynamic:
