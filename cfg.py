@@ -157,6 +157,10 @@ class Filters:
     
     @classmethod
     def init_filters(cls):
+        # длина names должна соответстовать количеству языков из 
+        # lang > Lang
+        # real это реальное имя папки по которой будет фильтрация
+        # system не трогать, всегда False
         cls.current = [
                     Filters(
                         names=["Продукт", "Product"],
@@ -180,27 +184,37 @@ class Filters:
 
 
 class JsonData:
+
+    # ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ ЕСЛИ ЕЩЕ НЕТ КОНФИГ ФАЙЛА В APP_SUPPORT
+
     app_ver: str = Static.APP_VER
 
+    # индекс соответствующий Static > BRANDS
     brand_ind = 0
-    
+
+    # индекс соответствующий STATIC > IMG_LABEL_SIZE
+    # от индекса зависит размер Thumbnail и всех его внутренних виджетов
     curr_size_ind: int = 0
+
+    # индекс соответствующий Lang
+    lang_ind = 0
     
+    # размер окна просмотра изображений
     imgview_g: dict = {
         "aw": 700,
         "ah": 500
         }
 
+    # размер главного окна
     root_g: dict = {
         "aw": 700,
         "ah": 500
         }
     
+    # как часто utils > scaner будет просматривать collfolders на изменения
     scaner_minutes: int = 5
     
-    lang_ind = 0
-    brand_ind = 0
-
+    # папка загрузки
     down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
 
     udpdate_file_paths = [
