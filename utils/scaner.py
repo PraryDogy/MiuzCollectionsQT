@@ -271,6 +271,19 @@ class DbUpdater:
         else:
             return (None, None)
 
+    def get_values(self, full_src, full_hash_path, size, birth, mod, resol):
+        return {
+            "short_src": Utils.get_short_src(Brand.curr.collfolder, full_src),
+            "short_hash": Utils.get_short_hash_path(full_hash_path),
+            "size": size,
+            "birth": birth,
+            "mod": mod,
+            "resol": resol,
+            "coll": Utils.get_coll_name(Brand.curr.collfolder, full_src),
+            "fav": 0,
+            "brand": Brand.curr.name
+        }
+
     def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
 
         res: dict[sqlalchemy.Insert, tuple[str, ndarray]] = {}
@@ -286,17 +299,14 @@ class DbUpdater:
 
                 full_hash_path = Utils.create_full_hash_path(full_src)
 
-                values = {
-                    "short_src": Utils.get_short_src(Brand.curr.collfolder, full_src),
-                    "short_hash": Utils.get_short_hash_path(full_hash_path),
-                    "size": size,
-                    "birth": birth,
-                    "mod": mod,
-                    "resol": resol,
-                    "coll": Utils.get_coll_name(Brand.curr.collfolder, full_src),
-                    "fav": 0,
-                    "brand": Brand.curr.name
-                    }
+                values = self.get_values(
+                    full_src=full_src,
+                    full_hash_path=full_hash_path,
+                    size=size,
+                    birth=birth, 
+                    mod=mod,
+                    resol=resol
+                )
 
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
                 res[stmt] = (full_hash_path, small_img)
