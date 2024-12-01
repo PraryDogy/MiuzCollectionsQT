@@ -98,7 +98,7 @@ class FinderImages:
 
     def get_progress_text(self, current: int, total: int) -> str:
         """Формирует текст для прогресс-бара."""
-        brand = Brand.curr.name
+        brand = Brand.curr.name.capitalize()
         collection_name = Lang.collection
         return f"{brand}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
