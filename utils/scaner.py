@@ -47,70 +47,82 @@ class ScanerTools:
                 Utils.print_err(error=e)
 
 
+import os
+from typing import List, Tuple
+
 class FinderImages:
     def __init__(self):
         super().__init__()
 
-    def get(self) -> list[tuple[str, int, int, int]]:
-
-        finder_images: list[tuple[str, int, int, int]] = []
-
-        collections = []
-
-        for i in os.listdir(Brand.curr.collfolder):
-            coll = os.path.join(Brand.curr.collfolder, i)
-            if os.path.isdir(coll):
-                if i not in JsonData.stopcolls[Brand.curr.ind]:
-                    collections.append(coll)
-
-        ln_ = len(collections)
-
-        for x, collection in enumerate(collections, start=1):
-            brand = Brand.curr.name
-            coll: str = Lang.collection
-            t = f"{brand}: {coll.lower()} {x} {Lang.from_} {ln_}"
-            ScanerTools.progressbar_text(t)
-
-            try:
-                walked = self.walk_collection(collection)
-                finder_images.extend(walked)
-            except TypeError as e:
-                Utils.print_err(error=e)
-                continue
+    def get(self) -> List[Tuple[str, int, int, int]]:
+        """Основной метод для поиска изображений в коллекциях."""
+        collections = self.get_collections()
+        finder_images = self.process_collections(collections)
         return finder_images
 
-    def walk_collection(self, collection: str) -> list[tuple[str, int, int, int]]:
+    def get_collections(self) -> List[str]:
+        """Получает список коллекций, исключая остановленные."""
+        collections = []
 
-        finder_images: list[tuple[str, int, int, int]] = []
+        for item in os.listdir(Brand.curr.collfolder):
+            coll_path = os.path.join(Brand.curr.collfolder, item)
+            if os.path.isdir(coll_path) and item not in JsonData.stopcolls[Brand.curr.ind]:
+                collections.append(coll_path)
 
+        return collections
+
+    def process_collections(self, collections: List[str]) -> List[Tuple[str, int, int, int]]:
+        """Обрабатывает список коллекций и находит изображения."""
+        finder_images = []
+        total_collections = len(collections)
+
+        for index, collection in enumerate(collections, start=1):
+            progress_text = self.get_progress_text(index, total_collections)
+            ScanerTools.progressbar_text(progress_text)
+
+            try:
+                walked_images = self.walk_collection(collection)
+                finder_images.extend(walked_images)
+            except TypeError as e:
+                Utils.print_err(error=e)
+
+        return finder_images
+
+    def get_progress_text(self, current: int, total: int) -> str:
+        """Формирует текст для прогресс-бара."""
+        brand = Brand.curr.name
+        collection_name = Lang.collection
+        return f"{brand}: {collection_name.lower()} {current} {Lang.from_} {total}"
+
+    def walk_collection(self, collection: str) -> List[Tuple[str, int, int, int]]:
+        """Рекурсивно обходит директорию и находит изображения."""
+        finder_images = []
         stack = [collection]
+
         while stack:
-
             current_dir = stack.pop()
-            
+
             with os.scandir(current_dir) as entries:
-
                 for entry in entries:
-
                     if not ScanerTools.can_scan:
                         return finder_images
 
                     if entry.is_dir():
                         stack.append(entry.path)
-
                     elif entry.name.endswith(Static.IMG_EXT):
-                        stats = entry.stat()
-
-                        data = (
-                            entry.path,
-                            stats.st_size,
-                            stats.st_birthtime,
-                            stats.st_mtime
-                        )
-
-                        finder_images.append(data)
+                        finder_images.append(self.get_file_data(entry))
 
         return finder_images
+
+    def get_file_data(self, entry: os.DirEntry) -> Tuple[str, int, int, int]:
+        """Получает данные файла."""
+        stats = entry.stat()
+        return (
+            entry.path,
+            stats.st_size,
+            stats.st_birthtime,
+            stats.st_mtime,
+        )
 
 
 class DbImages:
