@@ -26,7 +26,7 @@ class Brand:
         self.collfolder = collfolder
 
 
-class ScanerUtils:
+class ScanerTools:
     can_scan: bool = True
 
     @classmethod
@@ -69,7 +69,7 @@ class FinderImages:
             brand = Brand.name
             coll: str = Lang.collection
             t = f"{brand}: {coll.lower()} {x} {Lang.from_} {ln_}"
-            ScanerUtils.progressbar_text(t)
+            ScanerTools.progressbar_text(t)
 
             try:
                 walked = self.walk_collection(collection)
@@ -84,16 +84,16 @@ class FinderImages:
 
         for root, _, files in os.walk(collection):
 
-            if not ScanerUtils.can_scan:
+            if not ScanerTools.can_scan:
                 return finder_images
             
             elif not os.path.exists(Brand.curr.collfolder):
-                ScanerUtils.can_scan = False
+                ScanerTools.can_scan = False
                 return finder_images
 
             for file in files:
 
-                if not ScanerUtils.can_scan:
+                if not ScanerTools.can_scan:
                     return finder_images
 
                 if file.endswith(Static.IMG_EXT):
@@ -162,7 +162,7 @@ class Compator:
     def get_result(self):
         for short_hash_path, db_item in self._db_images.items():
 
-            if not ScanerUtils.can_scan:
+            if not ScanerTools.can_scan:
                 return
 
             if not db_item in self._finder_images:
@@ -172,7 +172,7 @@ class Compator:
 
         for finder_item in self._finder_images:
 
-            if not ScanerUtils.can_scan:
+            if not ScanerTools.can_scan:
                 return
 
             if not finder_item in _db_images:
@@ -216,7 +216,7 @@ class DbUpdater:
                 brand = Brand.curr.name.capitalize()
                 deleting: str = Lang.deleting
                 t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {ln_}"
-                ScanerUtils.progressbar_text(t)
+                ScanerTools.progressbar_text(t)
 
             except sqlalchemy.exc.IntegrityError as e:
                 Utils.print_err(error=e)
@@ -238,7 +238,7 @@ class DbUpdater:
                 os.remove(full_hash_path)
 
         if self.del_items:
-            ScanerUtils.reload_gui()
+            ScanerTools.reload_gui()
 
     def get_small_img(self, src: str) -> tuple[ndarray, str] | None:
         array_img = Utils.read_image(src)
@@ -268,7 +268,7 @@ class DbUpdater:
 
         for full_src, size, birth, mod in self.ins_items:
 
-            if not ScanerUtils.can_scan:
+            if not ScanerTools.can_scan:
                 return
             
             counter += 1
@@ -336,11 +336,11 @@ class DbUpdater:
             brand = Brand.curr.name.capitalize()
             adding: str = Lang.adding
             t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
-            ScanerUtils.progressbar_text(t)
+            ScanerTools.progressbar_text(t)
             Utils.write_image_hash(full_hash_path, img_array)
 
         if self.hash_images:
-            ScanerUtils.reload_gui()
+            ScanerTools.reload_gui()
 
 
 class WorkerSignals(QObject):
@@ -364,7 +364,7 @@ class ScanerThread(URunnable):
 
     def brand_scan(self):
 
-        ScanerUtils.can_scan = True
+        ScanerTools.can_scan = True
 
         finder_images = FinderImages()
         finder_images = finder_images.get()
@@ -440,7 +440,7 @@ class ScanerShedule(QObject):
 
     def stop(self):
         print("scaner manualy stoped.")
-        ScanerUtils.can_scan = False
+        ScanerTools.can_scan = False
         self.wait_timer.stop()
 
     def after_scan(self):
@@ -448,7 +448,7 @@ class ScanerShedule(QObject):
         self.scaner_thread = None
         self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
         Dbase.vacuum()
-        ScanerUtils.progressbar_text("")
+        ScanerTools.progressbar_text("")
 
 
 class Scaner:
