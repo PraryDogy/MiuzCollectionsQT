@@ -4,7 +4,7 @@ import subprocess
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import JsonData
+from cfg import Dynamic, JsonData
 
 from .utils import URunnable
 
@@ -22,7 +22,7 @@ class UpdaterMain(QObject):
             if os.path.exists(update_file_path):
 
                 zip_filename = os.path.basename(update_file_path)
-                destination = os.path.join(JsonData.down_folder, zip_filename)
+                destination = os.path.join(Dynamic.down_folder, zip_filename)
 
                 if os.path.exists(destination):
                     os.remove(destination)

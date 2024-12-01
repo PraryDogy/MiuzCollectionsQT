@@ -214,9 +214,6 @@ class JsonData:
     # как часто utils > scaner будет просматривать collfolders на изменения
     scaner_minutes: int = 5
     
-    # папка загрузки
-    down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
-
     udpdate_file_paths = [
         '/Volumes/Shares/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
         '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
@@ -365,3 +362,4 @@ class Dynamic:
     curr_coll_name = Static.NAME_ALL_COLLS
     resents: bool = False
     types = [Static.JPG_EXT, Static.LAYERS_EXT]
+    down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")

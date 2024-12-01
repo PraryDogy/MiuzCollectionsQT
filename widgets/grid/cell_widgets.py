@@ -69,7 +69,7 @@ class Title(QLabel, CellWid):
                     return
 
             else:
-                dest = JsonData.down_folder
+                dest = Dynamic.down_folder
             
             self.copy_files_cmd(dest, images)
 

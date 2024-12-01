@@ -198,7 +198,7 @@ class Save(QAction):
                 dialog = OpenWins.dialog_dirs()
                 dest = dialog.getExistingDirectory()
             else:
-                dest = JsonData.down_folder
+                dest = Dynamic.down_folder
 
             if dest:
                 self.copy_files_cmd(dest=dest, full_src=full_src)
