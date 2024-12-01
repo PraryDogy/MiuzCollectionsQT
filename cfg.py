@@ -54,6 +54,8 @@ class Static:
 
     assert len(IMG_LABEL_SIZE) == len(THUMB_W) == len(TEXT_LENGTH)
 
+
+    # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ 
     APP_SUPPORT_DIR: str = os.path.join(
         os.path.expanduser("~"),
         "Library",
@@ -89,6 +91,8 @@ class Static:
         "hashdir.zip"
         )
 
+
+    # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ 
     LAYERS_EXT: tuple = (
         ".psd", ".psb", ".tiff", ".tif",
         ".PSD", ".PSB", ".TIFF", ".TIF"
@@ -101,6 +105,8 @@ class Static:
     
     IMG_EXT = JPG_EXT + LAYERS_EXT
 
+
+    # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ 
     RGB_BLUE = "rgb(46, 89, 203)"
     BORDER_INV = "2px solid transparent"
     BORDER_BLUE = f"2px solid {RGB_BLUE}"
@@ -134,6 +140,8 @@ class Static:
         {SOLID_STYLE}
     """
 
+
+    # папка со всеми CVG
     IMAGES = "images"
 
 
