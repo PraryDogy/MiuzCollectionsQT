@@ -245,7 +245,7 @@ class JsonData:
         }
 
     @classmethod
-    def _read_json_data(cls) -> dict:
+    def _set_json_data(cls) -> dict:
 
         with open(Static.JSON_FILE, 'r', encoding="utf-8") as f:
 
@@ -267,12 +267,15 @@ class JsonData:
 
     @classmethod
     def write_json_data(cls):
+
         with open(Static.JSON_FILE, 'w', encoding="utf-8") as f:
+
             json.dump(
                 obj=cls._get_data(),
                 fp=f,
                 indent=4,
                 ensure_ascii=False
+
             )
 
     @classmethod
@@ -338,7 +341,7 @@ class JsonData:
     @classmethod
     def init(cls):
         cls._check_app_dirs()
-        cls._read_json_data()
+        cls._set_json_data()
         cls._compare_versions()
         Filters.init_filters()
         assert len(Static.BRANDS) == len(cls.stopcolls) == len(cls.collfolders)
