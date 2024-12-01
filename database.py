@@ -1,8 +1,11 @@
 import os
+import shutil
 
 import sqlalchemy
+from PyQt5.QtWidgets import QApplication
 
 from cfg import JsonData, Static
+from utils.utils import Utils
 
 METADATA = sqlalchemy.MetaData()
 
@@ -31,33 +34,8 @@ class Dbase:
     @classmethod
     def init(cls) -> sqlalchemy.Engine:
         cls.create_engine()
-
-        tables = [THUMBS]
-        check_tables = cls.check_tables(tables)
-
-        if not check_tables:
-
-            JsonData.copy_db_file()
-            JsonData.copy_hashdir()
-
-            t = "пользовательская ДБ не прошла проверку"
-            print(t)
-
-            cls.init()
-            return
-
+        cls.check_tables([THUMBS])
         cls.toggle_wal(False)
-
-        return
-
-        print(
-            f"database init",
-            f"ehco: {cls._echo}",
-            f"check same thread: {cls._same_thread}",
-            f"timeout: {cls._timeout}",
-            f"wal: {cls.WAL_}",
-            sep=", "
-            )
 
     @classmethod
     def create_engine(cls):
@@ -97,9 +75,11 @@ class Dbase:
         db_tables = inspector.get_table_names()
         res: bool = (list(i.name for i in tables) == db_tables)
 
+        remove_appsupport = False
+
         if not res:
             print("Несоответствие в имени таблицы и/или в количестве таблиц")
-            return False
+            remove_appsupport = True
 
         for table in tables:
             clmns = list(clmn.name for clmn in table.columns)
@@ -108,6 +88,9 @@ class Dbase:
 
             if not res:
                 print(f"Несоответствие имени столбца в {table.name}")
-                return False
+                remove_appsupport = True
             
-        return True
+        if remove_appsupport:
+            QApplication.quit()
+            shutil.rmtree(Static.APP_SUPPORT_DIR)
+            Utils.start_new_app()
