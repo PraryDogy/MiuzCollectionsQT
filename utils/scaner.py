@@ -6,8 +6,8 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from cfg import Static, JsonData
-from database import THUMBS, Dbase
+from cfg import JsonData, Static
+from database import CLMN_NAMES, THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
 
@@ -49,6 +49,7 @@ class ScanerTools:
 
 import os
 from typing import List, Tuple
+
 
 class FinderImages:
     def __init__(self):
@@ -285,6 +286,10 @@ class DbUpdater:
         }
 
     def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
+
+        values = self.get_values("", "", "", "", "", "")
+        values = list(values.keys())
+        assert CLMN_NAMES == values
 
         res: dict[sqlalchemy.Insert, tuple[str, ndarray]] = {}
 

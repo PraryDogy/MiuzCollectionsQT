@@ -23,6 +23,11 @@ THUMBS = sqlalchemy.Table(
     sqlalchemy.Column("brand", sqlalchemy.TEXT, comment="miuz, panacea"),
     )
 
+CLMN_NAMES = [
+    i.name
+    for i in THUMBS.columns
+][1:]
+
 
 class Dbase:
     engine: sqlalchemy.Engine = None

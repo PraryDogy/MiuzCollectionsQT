@@ -1,10 +1,19 @@
-from cfg import Static
-import shutil
-import os
+from database import THUMBS, Dbase, CLMN_NAMES
+import sqlalchemy
+from cfg import JsonData
 
-zp = shutil.make_archive(
-    Static.HASH_DIR,
-    "zip",
-    Static.APP_SUPPORT_DIR,
-    os.path.basename(Static.HASH_DIR)
-    )
+def get_values():
+    return {
+        "short_src": "",
+        "short_hash": "",
+        "size": "",
+        "birth": "",
+        "mod": "",
+        "resol": "",
+        "coll": "",
+        "fav": "",
+        "brand": ""
+    }
+
+
+assert CLMN_NAMES == list(get_values().keys())
