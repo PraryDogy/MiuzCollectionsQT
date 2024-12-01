@@ -90,6 +90,11 @@ class DbImages(URunnable):
         self.signals_.finished_.emit(thumbs_dict)
 
     def remove_db(self, short_hash: str):
+        # если в ДБ есть запись hash_path, по которому загружается изображение
+        # из finder > app_support > app > hash
+        # но изображения нет
+        # значит в БД есть запись о несуществующем изображении
+        # удаляем эту запись из БД
         print("error to load image from hash_path", short_hash)
         print("removing from db..")
 
