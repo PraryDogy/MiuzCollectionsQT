@@ -65,9 +65,13 @@ class FinderImages:
         collections = []
 
         for item in os.listdir(Brand.curr.collfolder):
+
             coll_path = os.path.join(Brand.curr.collfolder, item)
-            if os.path.isdir(coll_path) and item not in JsonData.stopcolls[Brand.curr.ind]:
-                collections.append(coll_path)
+
+            if os.path.isdir(coll_path):
+
+                if item not in JsonData.stopcolls[Brand.curr.ind]:
+                    collections.append(coll_path)
 
         return collections
 
@@ -77,12 +81,14 @@ class FinderImages:
         total_collections = len(collections)
 
         for index, collection in enumerate(collections, start=1):
+
             progress_text = self.get_progress_text(index, total_collections)
             ScanerTools.progressbar_text(progress_text)
 
             try:
                 walked_images = self.walk_collection(collection)
                 finder_images.extend(walked_images)
+
             except TypeError as e:
                 Utils.print_err(error=e)
 
