@@ -234,7 +234,7 @@ class JsonData:
     ]
 
     @classmethod
-    def _get_data(cls):
+    def _get_data(cls) -> dict[str, str]:
         """returns user attibutes and values"""
         return {
             k: v
@@ -254,7 +254,7 @@ class JsonData:
 
             except json.JSONDecodeError:
                 print("Ошибка чтения json")
-                json_data: dict = cls._get_data()
+                json_data = cls._get_data()
             
         for k, v in json_data.items():
 
