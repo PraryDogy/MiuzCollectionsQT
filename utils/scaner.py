@@ -210,6 +210,7 @@ class DbUpdater:
 
         queries = self.create_queries()
         self.insert_db(queries=queries)
+        self.insert_images(queries=queries)
 
     def del_db(self):
         conn = Dbase.engine.connect()
@@ -331,6 +332,8 @@ class DbUpdater:
             
         conn.commit()
         conn.close()
+
+    def insert_images(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
 
         ln_ = len(queries)
         for x, (full_hash_path, img_array) in enumerate(queries.values(), start=1):
