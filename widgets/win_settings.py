@@ -17,10 +17,11 @@ from utils.utils import UThreadPool, Utils
 from .actions import OpenWins
 
 WIN_SIZE = (430, 550)
+NEED_REBOOT = "___need_reboot___"
 
 
 class RebootableSettings(QGroupBox):
-    clicked_ = pyqtSignal()
+    apply_settings = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -47,10 +48,10 @@ class RebootableSettings(QGroupBox):
         sec_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_row_wid.setLayout(sec_row_lay)
 
-        self.restore_db_btn = QPushButton(Lang.restore_db)
-        self.restore_db_btn.setFixedWidth(150)
-        self.restore_db_btn.clicked.connect(self.cmd_)
-        sec_row_lay.addWidget(self.restore_db_btn)
+        self.reset_btn = QPushButton(Lang.reset_all)
+        self.reset_btn.setFixedWidth(150)
+        self.reset_btn.clicked.connect(lambda: self.cmd_(wid=self.reset_btn))
+        sec_row_lay.addWidget(self.reset_btn)
 
         descr = QLabel(text=Lang.restore_db_descr)
         sec_row_lay.addWidget(descr)
@@ -58,9 +59,9 @@ class RebootableSettings(QGroupBox):
         v_lay.addWidget(first_row_wid)
         v_lay.addWidget(sec_row_wid)
 
-    def cmd_(self):
-        self.clicked_.emit()
-        setattr(self, "flag", True)
+    def cmd_(self, wid: QWidget):
+        self.apply_settings.emit()
+        setattr(wid, NEED_REBOOT, True)
 
     def lang_btn_cmd(self, *args):
         # костыль но что ж поделать
@@ -69,7 +70,7 @@ class RebootableSettings(QGroupBox):
         else:
             self.lang_btn.setText("Русский")
 
-        self.cmd_()
+        self.cmd_(wid=self.lang_btn)
 
 
 class SimpleSettings(QGroupBox):
@@ -130,6 +131,8 @@ class SimpleSettings(QGroupBox):
 
 
 class BrandSettings(QTabWidget):
+    _apply_settings = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.stop_colls_wid: dict[int, CustomTextEdit] = {}
@@ -175,7 +178,8 @@ class BrandSettings(QTabWidget):
         return wid
     
     def text_changed(self):
-        setattr(self, "flag", True)
+        self._apply_settings.emit()
+        setattr(self, NEED_REBOOT, True)
     
     def get_stopcolls(self, wid: CustomInput):
         return [
@@ -184,7 +188,7 @@ class BrandSettings(QTabWidget):
             if i
             ]
 
-    def get_coll_folders_list(self, wid: CustomTextEdit):
+    def get_collfolders(self, wid: CustomTextEdit):
         return [
             os.sep + i.strip().strip(os.sep)
             for i in wid.toPlainText().split("\n")
@@ -204,15 +208,15 @@ class WinSettings(WinSystem):
     def init_ui(self):
         self.central_layout.setSpacing(10)
 
-        cmd_lang = lambda: self.ok_btn.setText(Lang.apply)
         self.rebootable_settings = RebootableSettings()
-        self.rebootable_settings.clicked_.connect(cmd_lang)
+        self.rebootable_settings.apply_settings.connect(self.ok_to_apply)
         self.central_layout.addWidget(self.rebootable_settings)
 
-        self.simple_settimgs = SimpleSettings()
-        self.central_layout.addWidget(self.simple_settimgs)
+        self.simple_settings = SimpleSettings()
+        self.central_layout.addWidget(self.simple_settings)
 
         self.brand_sett = BrandSettings()
+        self.brand_sett._apply_settings.connect(self.ok_to_apply)
         self.central_layout.addWidget(self.brand_sett)
 
         btns_wid = QWidget()
@@ -236,11 +240,16 @@ class WinSettings(WinSystem):
 
         btns_layout.addStretch(1)
 
+    def ok_to_apply(self, *args):
+        self.ok_btn.setText(Lang.apply)
+
     def cancel_cmd(self, *args):
         self.close()
 
     def ok_cmd(self, *args):
-        if hasattr(self.restore_bd, "flag"):
+
+        if hasattr(self.rebootable_settings.reset_btn, NEED_REBOOT):
+
             JsonData.write_json_data()
             QApplication.quit()
 
@@ -252,14 +261,14 @@ class WinSettings(WinSystem):
 
             Utils.start_new_app()
 
-        elif hasattr(self.rebootable_settings, "flag"):
+        elif hasattr(self.rebootable_settings.lang_btn, NEED_REBOOT):
             JsonData.lang_ind += 1
             Lang.init()
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
 
-        elif hasattr(self.brand_sett, "flag"):
+        elif hasattr(self.brand_sett, NEED_REBOOT):
 
             for brand_ind, wid in self.brand_sett.stop_colls_wid.items():
                 stop_colls = self.setup_lined_text(wid=wid)

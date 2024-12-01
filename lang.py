@@ -247,7 +247,7 @@ class Lang_:
         "Разрешение",
         "Resolution"
     ]
-    restore_db = [
+    reset_all = [
         "Сбросить всё",
         "Restore all"
     ]
