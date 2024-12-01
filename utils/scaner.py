@@ -28,7 +28,6 @@ class Brand:
 
 class ScanerUtils:
     can_scan: bool = True
-    brands: list[dict] = []
 
     @classmethod
     def progressbar_text(cls, text: str):
