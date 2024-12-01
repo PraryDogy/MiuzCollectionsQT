@@ -28,7 +28,6 @@ class Brand:
 
 class ScanerTools:
     can_scan: bool = True
-    sleep_count: float = 0.1
 
     @classmethod
     def progressbar_text(cls, text: str):
@@ -195,6 +194,8 @@ class Compator:
 
 
 class DbUpdater:
+    sleep_count: float = 0.1
+
     def __init__(self, del_items: list[str], ins_items: list[tuple[str, int, int, int]]):
 
         super().__init__()
@@ -247,7 +248,7 @@ class DbUpdater:
                 ScanerTools.progressbar_text(t)
 
                 os.remove(full_hash_path)
-                sleep(ScanerTools.sleep_count)
+                sleep(self.sleep_count)
 
 
         if del_items:
@@ -333,19 +334,21 @@ class DbUpdater:
 
     def insert_images(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
 
-        ln_ = len(queries)
+        total = len(queries)
+
         for x, (full_hash_path, img_array) in enumerate(queries.values(), start=1):
 
-            brand = Brand.curr.name.capitalize()
-            adding: str = Lang.adding
-            t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
-            ScanerTools.progressbar_text(t)
-            sleep(ScanerTools.sleep_count)
-
+            self.progressbar_text(text=Lang.adding, x=x, total=total)
             Utils.write_image_hash(full_hash_path, img_array)
+            sleep(self.sleep_count)
 
-        if queries:
+        if total > 0:
             ScanerTools.reload_gui()
+
+    def progressbar_text(self, text: str, x: int, total: int):
+        brand = Brand.curr.name.capitalize()
+        t = f"{brand}: {text.lower()} {x} {Lang.from_} {total}"
+        ScanerTools.progressbar_text(t)
 
 
 class WorkerSignals(QObject):
