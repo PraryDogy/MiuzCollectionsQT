@@ -126,12 +126,12 @@ class Utils:
         return os.path.join(new_folder, new_name)
 
     @classmethod
-    def get_short_hash_path(cls, full_hash_path: str):
+    def get_short_hash(cls, full_hash_path: str):
         return full_hash_path.replace(Static.APP_SUPPORT_DIR, "")
     
     @classmethod
-    def get_full_hash_path(cls, short_hash_path: str):
-        return Static.APP_SUPPORT_DIR + short_hash_path
+    def get_full_hash_path(cls, short_hash: str):
+        return Static.APP_SUPPORT_DIR + short_hash
 
     @classmethod
     def write_image_hash(cls, full_hash_path: str, array_img: np.ndarray) -> bool:

@@ -156,13 +156,13 @@ class DbImages:
         conn.close()
 
         return {
-            short_hash_path: (
+            short_hash: (
                 Utils.get_full_src(Brand.curr.collfolder, short_src),
                 size,
                 birth,
                 mod
             )
-            for short_hash_path, short_src, size, birth, mod in res
+            for short_hash, short_src, size, birth, mod in res
             }
 
 
@@ -181,10 +181,10 @@ class Compator:
         self.ins_items: list[tuple[str, int, int, int]] = []
 
     def get_result(self):
-        for short_hash_path, db_item in self._db_images.items():
+        for short_hash, db_item in self._db_images.items():
 
             if not db_item in self._finder_images:
-                self.del_items.append(short_hash_path)
+                self.del_items.append(short_hash)
 
         _db_images = list(self._db_images.values())
 
@@ -212,9 +212,9 @@ class DbUpdater:
 
         conn = Dbase.engine.connect()
 
-        for short_hash_path in del_items:
+        for short_hash in del_items:
             q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.short_hash==short_hash_path)
+            q = q.where(THUMBS.c.short_hash==short_hash)
 
             try:
                 conn.execute(q)
@@ -237,9 +237,9 @@ class DbUpdater:
 
         total = len(del_items)
 
-        for x, short_hash_path in enumerate(del_items, start=1):
+        for x, short_hash in enumerate(del_items, start=1):
 
-            full_hash_path = Utils.get_full_hash_path(short_hash_path)
+            full_hash_path = Utils.get_full_hash_path(short_hash)
 
             if os.path.exists(full_hash_path):
 
@@ -275,7 +275,7 @@ class DbUpdater:
     def get_values(self, full_src, full_hash_path, size, birth, mod, resol):
         return {
             "short_src": Utils.get_short_src(Brand.curr.collfolder, full_src),
-            "short_hash": Utils.get_short_hash_path(full_hash_path),
+            "short_hash": Utils.get_short_hash(full_hash_path),
             "size": size,
             "birth": birth,
             "mod": mod,

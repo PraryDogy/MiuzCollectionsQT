@@ -63,17 +63,19 @@ class DbImages(URunnable):
             self.signals_.finished_.emit(thumbs_dict)
             return
 
-        for short_src, short_hash_path, mod, coll, fav in res:
+        for short_src, short_hash, mod, coll, fav in res:
+
+            short_hash = "ffds/sdfsdf"
 
             if not short_src.endswith(exts_):
                 continue
 
             mod = datetime.fromtimestamp(mod).date()
-            full_hash_path = Utils.get_full_hash_path(short_hash_path)
+            full_hash_path = Utils.get_full_hash_path(short_hash)
             array_img = Utils.read_image_hash(full_hash_path)
 
             if array_img is None:
-                print("thumbnails db dict > scan't load image", short_src)
+                self.remove_db(short_hash=short_hash)
                 continue
 
             else:
@@ -88,6 +90,13 @@ class DbImages(URunnable):
             thumbs_dict[mod].append(DbImage(pixmap, short_src, coll, fav))
 
         self.signals_.finished_.emit(thumbs_dict)
+
+    def remove_db(self, short_hash: str):
+        print("error to load image from hash_path", short_hash)
+        # print("thumbnails db dict > scan't load image", short_src)
+
+        conn = Dbase.engine.connect()
+        q = sqlalchemy.delete(THUMBS).where(THUMBS.c.short_hash == short_hash)
 
     def get_stmt(self) -> sqlalchemy.Select:
         q = sqlalchemy.select(

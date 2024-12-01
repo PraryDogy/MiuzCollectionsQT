@@ -62,11 +62,11 @@ class LoadThumb(URunnable):
             ).where(
                 THUMBS.c.short_src == self.short_src
                 )
-        short_hash_path = conn.execute(q).scalar()
+        short_hash = conn.execute(q).scalar()
         conn.close()
 
-        if short_hash_path:
-            full_hash_path = Utils.get_full_hash_path(short_hash_path)
+        if short_hash:
+            full_hash_path = Utils.get_full_hash_path(short_hash)
             small_img = Utils.read_image_hash(full_hash_path)
             pixmap = Utils.pixmap_from_array(small_img)
         else:
