@@ -248,6 +248,7 @@ class JsonData:
     def _read_json_data(cls) -> dict:
 
         with open(Static.JSON_FILE, 'r', encoding="utf-8") as f:
+
             try:
                 json_data: dict = json.load(f)
 
