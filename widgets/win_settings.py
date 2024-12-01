@@ -271,11 +271,11 @@ class WinSettings(WinSystem):
         elif hasattr(self.brand_sett, NEED_REBOOT):
 
             for brand_ind, wid in self.brand_sett.stop_colls_wid.items():
-                stop_colls = self.setup_lined_text(wid=wid)
+                stop_colls = self.new_row_list(wid=wid)
                 JsonData.stop_colls[brand_ind] = stop_colls
 
             for brand_ind, wid in self.brand_sett.coll_folders_wid.items():
-                coll_folders = self.setup_lined_text(wid=wid)
+                coll_folders = self.new_row_list(wid=wid)
                 coll_folders = [
                     os.sep + i.strip().strip(os.sep)
                     for i in coll_folders
@@ -289,7 +289,7 @@ class WinSettings(WinSystem):
 
         self.close()
 
-    def setup_lined_text(self, wid: CustomTextEdit):
+    def new_row_list(self, wid: CustomTextEdit) -> list[str]:
         return[
             i
             for i in wid.toPlainText().split("\n")
