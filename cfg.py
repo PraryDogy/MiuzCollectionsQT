@@ -246,6 +246,7 @@ class JsonData:
 
     @classmethod
     def _read_json_data(cls) -> dict:
+
         with open(Static.JSON_FILE, 'r', encoding="utf-8") as f:
             try:
                 json_data: dict = json.load(f)
@@ -255,8 +256,13 @@ class JsonData:
                 json_data: dict = cls._get_data()
             
         for k, v in json_data.items():
+
             if hasattr(cls, k):
-                setattr(cls, k, v)
+
+                if type(v) == type(getattr(cls, k)):
+                    setattr(cls, k, v)
+                else:
+                    print("несоответствие типа")
 
     @classmethod
     def write_json_data(cls):
