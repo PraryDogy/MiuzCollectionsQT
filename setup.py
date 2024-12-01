@@ -107,6 +107,7 @@ print("Нажми 1 чтобы создать приложение с кешем
 
 if input() == "1":
     print("Создаю приложение с кешем ApplicationSupport")
+
     src = Static.HASH_DIR
     root = os.path.basename(Static.HASH_DIR)
     app_sup = Static.APP_SUPPORT_DIR
