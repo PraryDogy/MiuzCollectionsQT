@@ -81,9 +81,9 @@ class FinderImages:
 
     def walk_collection(self, collection: str) -> list[tuple[str, int, int, int]]:
 
-        result = []
+        finder_images: list[tuple[str, int, int, int]] = []
+
         stack = [collection]
-        
         while stack:
 
             current_dir = stack.pop()
@@ -91,6 +91,9 @@ class FinderImages:
             with os.scandir(current_dir) as entries:
 
                 for entry in entries:
+
+                    if not ScanerTools.can_scan:
+                        return finder_images
 
                     if entry.is_dir():
                         stack.append(entry.path)
@@ -105,9 +108,9 @@ class FinderImages:
                             stats.st_mtime
                         )
 
-                        result.append(data)
+                        finder_images.append(data)
 
-        return result
+        return finder_images
 
 
 class DbImages:
