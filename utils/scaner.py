@@ -242,16 +242,11 @@ class DbUpdater:
 
             if os.path.exists(full_hash_path):
 
-                brand = Brand.curr.name.capitalize()
-                deleting: str = Lang.deleting
-                t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {total}"
-                ScanerTools.progressbar_text(t)
-
+                self.progressbar_text(text=Lang.deleting, x=x, total=total)
                 os.remove(full_hash_path)
                 sleep(self.sleep_count)
 
-
-        if del_items:
+        if total > 0:
             ScanerTools.reload_gui()
 
     def get_small_img(self, src: str) -> tuple[ndarray, str] | tuple[None, None]:
