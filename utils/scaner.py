@@ -193,9 +193,6 @@ class Compator:
 
 
 class DbUpdater:
-    stmt_max_count = 15
-    sleep_ = 0.2
-
     def __init__(
             self,
             del_items: list[str],
@@ -336,6 +333,9 @@ class DbUpdater:
         conn.commit()
         conn.close()
 
+        max_count = 15
+        sleep_count = 0.2
+
         ln_ = len(self.hash_images)
 
         for x, (full_hash_path, img_array) in enumerate(self.hash_images, start=1):
@@ -349,6 +349,7 @@ class DbUpdater:
 
         if self.hash_images:
             ScanerTools.reload_gui()
+            sleep(sleep_count)
 
 
 class WorkerSignals(QObject):
