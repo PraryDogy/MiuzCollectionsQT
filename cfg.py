@@ -262,7 +262,7 @@ class JsonData:
                 if type(v) == type(getattr(cls, k)):
                     setattr(cls, k, v)
                 else:
-                    print("несоответствие типа")
+                    print("Несоответствие типа, ключ:", k)
 
     @classmethod
     def write_json_data(cls):
