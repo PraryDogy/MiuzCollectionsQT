@@ -296,16 +296,20 @@ class JsonData:
 
     @classmethod
     def copy_hashdir(cls):
+
+        # удаляем пользовательскую hashdir из ApplicationSupport
         if os.path.exists(Static.HASH_DIR):
             print("Удаляю пользовательскую HASH_DIR")
             shutil.rmtree(Static.HASH_DIR)
 
+        # копируем предустановленную hashdir в AppliactionSupport
         if os.path.exists(Static.PRELOAD_HASHDIR_ZIP):
             print("копирую предустановленную HASH_DIR")
             dest = shutil.copy2(Static.PRELOAD_HASHDIR_ZIP, Static.APP_SUPPORT_DIR)
             shutil.unpack_archive(dest, Static.APP_SUPPORT_DIR)
             os.remove(dest)
 
+        # если нет предустановленной то просим скачать и положить в корень проекта
         else:
             t = "нет предустановленной HASH_DIR: " + Static.PRELOAD_HASHDIR_ZIP
             webbrowser.open(Static.LINK_DB)
@@ -332,26 +336,30 @@ class JsonData:
             raise Exception(t)
 
     @classmethod
-    def _compare_versions(cls):
-        try:
-            json_app_ver = float(cls.app_ver)
-        except Exception:
-            json_app_ver = Static.APP_VER
+    def _compare_versions(cls) -> bool:
 
-        if Static.APP_VER > json_app_ver:
-            print("Пользовательская версия приложения ниже необходимой")
-            cls.copy_db_file()
-            cls.copy_hashdir()
-            cls.app_ver = Static.APP_VER
-            cls.write_json_data()
+        if not isinstance(cls.app_ver, float):
+            raise Exception("app_ver должна быть float")
+
+        elif cls.app_ver != Static.APP_VER:
+            return False
+        
+        else:
+            return True
+
 
     @classmethod
     def init(cls):
         cls._check_dirs()
         cls._set_json_data()
-        cls._compare_versions()
-        Filters.init_filters()
         assert len(Static.BRANDS) == len(cls.stopcolls) == len(cls.collfolders)
+
+        # если версии не совпадают то что то нужно сделать
+        # например копировать новые файлы или ...
+        cls._compare_versions()
+
+        # инициируем пользовательские фильтры
+        Filters.init_filters()
 
 
 class Dynamic:
