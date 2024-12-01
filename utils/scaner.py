@@ -256,7 +256,7 @@ class DbUpdater:
         if self.del_items:
             ScanerTools.reload_gui()
 
-    def get_small_img(self, src: str) -> tuple[ndarray, str] | None:
+    def get_small_img(self, src: str) -> tuple[ndarray, str] | tuple[None, None]:
         array_img = Utils.read_image(src)
 
         if array_img is not None:
