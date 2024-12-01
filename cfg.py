@@ -341,7 +341,9 @@ class JsonData:
         if not isinstance(cls.app_ver, float):
             raise Exception("app_ver должна быть float")
 
-        elif cls.app_ver != Static.APP_VER:
+        elif Static.APP_VER > cls.app_ver:
+            cls.app_ver = Static.APP_VER
+            print("Внутренняя версия выше json версии")
             return False
         
         else:

@@ -106,8 +106,10 @@ OPTIONS = {
 print("Нажми 1 чтобы создать приложение с кешем из ApplicationSupport")
 
 if input() == "1":
-
-    new_hashdir = shutil.make_archive(Static.HASH_DIR, "zip", Static.APP_SUPPORT_DIR)
+    src = Static.HASH_DIR
+    root = os.path.basename(Static.HASH_DIR)
+    app_sup = Static.APP_SUPPORT_DIR
+    new_hashdir = shutil.make_archive(src, "zip", app_sup, root)
 
     DATA_FILES.append(
         ('_preload', [new_hashdir, Static.DB_FILE])
