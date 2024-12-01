@@ -201,6 +201,10 @@ class DbUpdater:
 
         super().__init__()
 
+        values = self.get_values(*["" for i in range(0, 6)])
+        values = list(values.keys())
+        assert CLMN_NAMES == values
+
         self.del_db(del_items=del_items)
         self.del_images(del_items=del_items)
 
@@ -286,10 +290,6 @@ class DbUpdater:
         }
 
     def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
-
-        values = self.get_values("", "", "", "", "", "")
-        values = list(values.keys())
-        assert CLMN_NAMES == values
 
         res: dict[sqlalchemy.Insert, tuple[str, ndarray]] = {}
 
