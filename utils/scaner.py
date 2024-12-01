@@ -212,6 +212,7 @@ class DbUpdater:
     def run(self):
         self.del_db()
         self.insert_db()
+        self.insert_cmd()
 
     def del_db(self):
         conn = Dbase.engine.connect()
@@ -277,18 +278,19 @@ class DbUpdater:
 
     def insert_db(self):
         insert_count = 0
-        counter = 0
+        # counter = 0
 
         for full_src, size, birth, mod in self.ins_items:
 
             if not ScanerTools.can_scan:
                 return
             
-            counter += 1
+            # counter += 1
 
             small_img, resol = self.get_small_img(full_src)
 
             if small_img is not None:
+
                 full_hash_path = Utils.create_full_hash_path(full_src)
 
                 values = {
@@ -305,22 +307,12 @@ class DbUpdater:
 
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
                 self.insert_queries.append(stmt)
-
                 self.hash_images.append((full_hash_path, small_img))
 
-                insert_count += 1
+                # insert_count += 1
 
             else:
                 continue
-
-            if insert_count == DbUpdater.stmt_max_count:
-                insert_count = 0
-                self.insert_cmd()
-                sleep(DbUpdater.sleep_)
-                self.insert_queries.clear()
-                self.hash_images.clear()
-
-        self.insert_cmd()
 
     def insert_cmd(self):
         conn = Dbase.engine.connect()
