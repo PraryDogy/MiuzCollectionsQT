@@ -170,7 +170,7 @@ class BrandSettings(QTabWidget):
         coll_folders_lbl = QLabel(text=Lang.where_to_look_coll_folder)
         v_lay.addWidget(coll_folders_lbl)
 
-        coll_folders = "\n".join(JsonData.coll_folders[brand_ind])
+        coll_folders = "\n".join(JsonData.collfolders[brand_ind])
         coll_folders_inp = CustomTextEdit()
         coll_folders_inp.setPlaceholderText(Lang.from_new_row)
         coll_folders_inp.setPlainText(coll_folders)
@@ -291,7 +291,7 @@ class WinSettings(WinSystem):
                     for i in coll_folders
                     if i
                 ]
-                JsonData.coll_folders[brand_ind] = coll_folders            
+                JsonData.collfolders[brand_ind] = coll_folders            
 
             JsonData.write_json_data()
             QApplication.quit()

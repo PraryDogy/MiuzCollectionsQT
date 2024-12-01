@@ -13,7 +13,8 @@ class Static:
     # сколько папок с коллекциями программа будет анализировать
     # для интеграции новой папки с коллекциями нужно
     # добавить в BRANDS новое произвольное имя
-    # 
+    # созависимые аттрибуты:
+    # JsonData.collfolders, JsonData.stopcolls
     BRANDS = ["miuz", "panacea"]
 
     GRID_LIMIT: int = 150
@@ -172,9 +173,7 @@ class JsonData:
             "Chosed",
             "LEVIEV"
         ],
-        [
-            "TEST",
-        ], 
+        [], 
     ]
     
     lang_ind = 0
@@ -189,7 +188,7 @@ class JsonData:
         '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
         ]
 
-    coll_folders: list[list[str]] = [
+    collfolders: list[list[str]] = [
         # miuz coll folders
         [
             '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
