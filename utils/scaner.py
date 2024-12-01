@@ -92,6 +92,7 @@ class FinderImages:
             except TypeError as e:
                 Utils.print_err(error=e)
 
+        ScanerTools.progressbar_text(text="")
         return finder_images
 
     def get_progress_text(self, current: int, total: int) -> str:
@@ -347,11 +348,14 @@ class DbUpdater:
         conn.close()
 
         ln_ = len(self.hash_images)
+
         for x, (full_hash_path, img_array) in enumerate(self.hash_images, start=1):
+
             brand = Brand.curr.name.capitalize()
             adding: str = Lang.adding
             t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
             ScanerTools.progressbar_text(t)
+
             Utils.write_image_hash(full_hash_path, img_array)
 
         if self.hash_images:
