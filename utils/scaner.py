@@ -334,7 +334,6 @@ class DbUpdater:
         conn.close()
 
         sleep_count = 0.1
-
         ln_ = len(self.hash_images)
 
         for x, (full_hash_path, img_array) in enumerate(self.hash_images, start=1):
