@@ -85,14 +85,6 @@ class DbImages(URunnable):
             else:
                 mod = f"{Lang.months[str(mod.month)]} {mod.year}"
 
-            # if len(Dynamic.types) == 1:
-
-            #     if Static.JPG_EXT in Dynamic.types:
-            #         ...
-
-            #     elif Static.LAYERS_EXT in Dynamic.types:
-            #         ...
-
             thumbs_dict[mod].append(DbImage(pixmap, short_src, coll, fav))
 
         self.signals_.finished_.emit(thumbs_dict)
