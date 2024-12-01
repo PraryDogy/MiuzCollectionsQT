@@ -106,6 +106,7 @@ OPTIONS = {
 print("Нажми 1 чтобы создать приложение с кешем из ApplicationSupport")
 
 if input() == "1":
+    print("Создаю приложение с кешем ApplicationSupport")
     src = Static.HASH_DIR
     root = os.path.basename(Static.HASH_DIR)
     app_sup = Static.APP_SUPPORT_DIR
@@ -116,7 +117,7 @@ if input() == "1":
     )
 
 else:
-
+    print("Создаю приложение с пустым кешем")
     new_hashdir = None
     DATA_FILES.append(include_files("_preload"))
 
