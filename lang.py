@@ -409,6 +409,11 @@ class Lang_:
         "Сбросить все данные и настройки",
         "Restore all data and settings"
     ]
+    
+    preparing = [
+        "подготовка",
+        "preparing"
+    ]
 
 
 class Lang(Lang_):

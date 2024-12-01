@@ -93,7 +93,6 @@ class FinderImages:
             except TypeError as e:
                 Utils.print_err(error=e)
 
-        ScanerTools.progressbar_text(text="")
         return finder_images
 
     def get_progress_text(self, current: int, total: int) -> str:
@@ -136,6 +135,8 @@ class FinderImages:
 class DbImages:
     def __init__(self):
         super().__init__()
+        t = f"{Brand.curr.name.capitalize()}: {Lang.preparing}"
+        ScanerTools.progressbar_text(t)
 
     def get(self) -> dict[str, tuple[str, int, int, int]]:
         conn = Dbase.engine.connect()
