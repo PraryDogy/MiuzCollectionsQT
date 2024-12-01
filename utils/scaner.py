@@ -218,11 +218,8 @@ class DbUpdater:
         ln_ = len(self.del_items)
 
         for x, short_hash_path in enumerate(self.del_items, start=1):
-            q = sqlalchemy.delete(
-                THUMBS
-                ).where(
-                    THUMBS.c.short_hash==short_hash_path
-                    )
+            q = sqlalchemy.delete(THUMBS)
+            q = q.where(THUMBS.c.short_hash==short_hash_path)
 
             try:
                 conn.execute(q)
