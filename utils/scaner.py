@@ -14,6 +14,18 @@ from signals import SignalsApp
 from .utils import URunnable, UThreadPool, Utils
 
 
+class Brand:
+    all_: list["Brand"] = []
+
+    __slots__ = ["name", "ind", "collfolder"]
+
+    def __init__(self, name: str, ind: int, collfolder: str):
+        super().__init__()
+        self.name = name
+        self.ind = ind
+        self.collfolder = collfolder
+
+
 class ScanerUtils:
     can_scan: bool = True
     brands: list[dict] = []
@@ -408,22 +420,25 @@ class ScanerShedule(QObject):
 
     def start(self):
         self.wait_timer.stop()
-        ScanerUtils.brands.clear()
+        Brand.all_.clear()
 
         for brand_name in Static.BRANDS:
+
             brand_ind  = Static.BRANDS.index(brand_name)
             coll_folder = Utils.get_coll_folder(brand_ind=brand_ind)
 
             if coll_folder:
-                data = {
-                    "brand_name": brand_name,
-                    "brand_ind": brand_ind,
-                    "coll_folder": coll_folder
-                }
 
-                ScanerUtils.brands.append(data)
+                Brand.all_.append(
+                    Brand(
+                        name=brand_name,
+                        ind=brand_ind,
+                        collfolder=coll_folder
+                    )
+                )
 
-        if not ScanerUtils.brands:
+        if not Brand.all_:
+
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 
