@@ -65,8 +65,6 @@ class DbImages(URunnable):
 
         for short_src, short_hash, mod, coll, fav in res:
 
-            short_hash = "ffds/sdfsdf"
-
             if not short_src.endswith(exts_):
                 continue
 
@@ -93,10 +91,16 @@ class DbImages(URunnable):
 
     def remove_db(self, short_hash: str):
         print("error to load image from hash_path", short_hash)
-        # print("thumbnails db dict > scan't load image", short_src)
+        print("removing from db..")
 
         conn = Dbase.engine.connect()
-        q = sqlalchemy.delete(THUMBS).where(THUMBS.c.short_hash == short_hash)
+
+        q = sqlalchemy.delete(THUMBS)
+        q = q.where(THUMBS.c.short_hash == short_hash)
+
+        conn.execute(q)
+        conn.commit()
+        conn.close()
 
     def get_stmt(self) -> sqlalchemy.Select:
         q = sqlalchemy.select(
