@@ -209,7 +209,7 @@ class DbUpdater:
         self.del_db()
 
         queries = self.create_queries()
-        self.insert_cmd(queries=queries)
+        self.insert_db(queries=queries)
 
     def del_db(self):
         conn = Dbase.engine.connect()
@@ -310,7 +310,7 @@ class DbUpdater:
 
         return res
 
-    def insert_cmd(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
+    def insert_db(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
         conn = Dbase.engine.connect()
 
         for query in queries.keys():
