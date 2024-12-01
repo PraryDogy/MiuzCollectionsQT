@@ -34,16 +34,16 @@ class CustomTextEdit(QTextEdit):
         menu_ = ContextCustom(event=a0)
         menu_.setFixedWidth(120)
 
-        sel = QAction(text=Lang.cut, parent=self)
+        sel = QAction(text=Lang.cut, parent=menu_)
         sel.triggered.connect(self.cut_selection)
-        self.addAction(sel)
+        menu_.addAction(sel)
 
-        sel_all = QAction(text=Lang.copy, parent=self)
+        sel_all = QAction(text=Lang.copy, parent=menu_)
         sel_all.triggered.connect(self.copy_selection)
-        self.addAction(sel_all)
+        menu_.addAction(sel_all)
 
-        sel_all = QAction(text=Lang.paste, parent=self)
+        sel_all = QAction(text=Lang.paste, parent=menu_)
         sel_all.triggered.connect(self.paste_text)
-        self.addAction(sel_all)
+        menu_.addAction(sel_all)
 
         menu_.show_menu()
