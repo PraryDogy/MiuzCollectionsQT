@@ -341,6 +341,12 @@ class DbUpdater:
             ScanerTools.reload_gui()
 
     def progressbar_text(self, text: str, x: int, total: int):
+        """
+        text: `Lang.adding`, `Lang.deleting`
+        x: item of `enumerate`
+        total: `len`
+        """
+
         brand = Brand.curr.name.capitalize()
         t = f"{brand}: {text.lower()} {x} {Lang.from_} {total}"
         ScanerTools.progressbar_text(t)
