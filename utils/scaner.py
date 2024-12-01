@@ -16,7 +16,7 @@ from .utils import URunnable, UThreadPool, Utils
 
 class Brand:
     all_: list["Brand"] = []
-
+    curr: "Brand" = None
     __slots__ = ["name", "ind", "collfolder"]
 
     def __init__(self, name: str, ind: int, collfolder: str):
@@ -49,10 +49,8 @@ class ScanerUtils:
 
 
 class FinderImages:
-    def __init__(self, coll_folder: str, brand_ind: int):
+    def __init__(self):
         super().__init__()
-        self.coll_folder = coll_folder
-        self.brand_ind = brand_ind
 
     def get(self) -> list[tuple[str, int, int, int]]:
 
@@ -60,16 +58,16 @@ class FinderImages:
 
         collections = []
 
-        for i in os.listdir(self.coll_folder):
-            coll = os.path.join(self.coll_folder, i)
+        for i in os.listdir(Brand.curr.collfolder):
+            coll = os.path.join(Brand.curr.collfolder, i)
             if os.path.isdir(coll):
-                if i not in JsonData.stopcolls[self.brand_ind]:
+                if i not in JsonData.stopcolls[Brand.curr.ind]:
                     collections.append(coll)
 
         ln_ = len(collections)
 
         for x, collection in enumerate(collections, start=1):
-            brand = Static.BRANDS[self.brand_ind]
+            brand = Brand.name
             coll: str = Lang.collection
             t = f"{brand}: {coll.lower()} {x} {Lang.from_} {ln_}"
             ScanerUtils.progressbar_text(t)
@@ -90,7 +88,7 @@ class FinderImages:
             if not ScanerUtils.can_scan:
                 return finder_images
             
-            elif not os.path.exists(self.coll_folder):
+            elif not os.path.exists(Brand.curr.collfolder):
                 ScanerUtils.can_scan = False
                 return finder_images
 
@@ -117,10 +115,8 @@ class FinderImages:
 
 
 class DbImages:
-    def __init__(self, coll_folder: str, brand_name: str):
+    def __init__(self):
         super().__init__()
-        self.coll_folder = coll_folder
-        self.brand_name = brand_name
 
     def get(self) -> dict[str, tuple[str, int, int, int]]:
         conn = Dbase.engine.connect()
@@ -133,7 +129,7 @@ class DbImages:
             THUMBS.c.mod
             )
         
-        q = q.where(THUMBS.c.brand == self.brand_name)
+        q = q.where(THUMBS.c.brand == Brand.curr.name)
 
         # не забываем относительный путь ДБ преобразовать в полный
         res = conn.execute(q).fetchall()
@@ -141,7 +137,7 @@ class DbImages:
 
         return {
             short_hash_path: (
-                Utils.get_full_src(self.coll_folder, short_src),
+                Utils.get_full_src(Brand.curr.collfolder, short_src),
                 size,
                 birth,
                 mod
@@ -190,16 +186,11 @@ class DbUpdater:
 
     def __init__(
             self,
-            brand_name: str,
-            coll_folder: str,
             del_items: list[str],
             ins_items: list[tuple[str, int, int, int]]
             ):
 
         super().__init__()
-        self.brand_name = brand_name
-        self.coll_folder = coll_folder
-
         self.del_items = del_items
         self.ins_items = ins_items
 
@@ -223,7 +214,7 @@ class DbUpdater:
 
             try:
                 conn.execute(q)
-                brand = self.brand_name.capitalize()
+                brand = Brand.curr.name.capitalize()
                 deleting: str = Lang.deleting
                 t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {ln_}"
                 ScanerUtils.progressbar_text(t)
@@ -289,15 +280,15 @@ class DbUpdater:
                 full_hash_path = Utils.create_full_hash_path(full_src)
 
                 values = {
-                    "short_src": Utils.get_short_src(self.coll_folder, full_src),
+                    "short_src": Utils.get_short_src(Brand.curr.collfolder, full_src),
                     "short_hash": Utils.get_short_hash_path(full_hash_path),
                     "size": size,
                     "birth": birth,
                     "mod": mod,
                     "resol": resol,
-                    "coll": Utils.get_coll_name(self.coll_folder, full_src),
+                    "coll": Utils.get_coll_name(Brand.curr.collfolder, full_src),
                     "fav": 0,
-                    "brand": self.brand_name
+                    "brand": Brand.curr.name
                     }
 
                 stmt = sqlalchemy.insert(THUMBS).values(**values) 
@@ -343,7 +334,7 @@ class DbUpdater:
 
         ln_ = len(self.hash_images)
         for x, (full_hash_path, img_array) in enumerate(self.hash_images, start=1):
-            brand = self.brand_name.capitalize()
+            brand = Brand.curr.name.capitalize()
             adding: str = Lang.adding
             t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
             ScanerUtils.progressbar_text(t)
@@ -365,26 +356,23 @@ class ScanerThread(URunnable):
 
     @URunnable.set_running_state
     def run(self):
-        for brand in ScanerUtils.brands:
-            self.brand_scan(**brand)
-            print("scaner started", brand.get("brand_name"))
 
-    def brand_scan(self, brand_name: str, brand_ind: int, coll_folder: str):
+        for brand in Brand.all_:
+            Brand.curr = brand
+
+            self.brand_scan()
+            print("scaner started", Brand.curr.name)
+
+    def brand_scan(self):
 
         ScanerUtils.can_scan = True
 
-        finder_images = FinderImages(
-            coll_folder=coll_folder,
-            brand_ind=brand_ind
-        )
+        finder_images = FinderImages()
         finder_images = finder_images.get()
 
         if finder_images:
         
-            db_images = DbImages(
-                coll_folder=coll_folder,
-                brand_name=brand_name
-            )
+            db_images = DbImages()
             db_images = db_images.get()
 
             compator = Compator(
@@ -394,8 +382,6 @@ class ScanerThread(URunnable):
             compator.get_result()
 
             db_updater = DbUpdater(
-                brand_name=brand_name,
-                coll_folder=coll_folder,
                 del_items=compator.del_items,
                 ins_items=compator.ins_items
             )
@@ -420,7 +406,9 @@ class ScanerShedule(QObject):
 
     def start(self):
         self.wait_timer.stop()
+
         Brand.all_.clear()
+        Brand.curr = None
 
         for brand_name in Static.BRANDS:
 
