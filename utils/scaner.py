@@ -279,15 +279,10 @@ class DbUpdater:
             return (None, None)
 
     def insert_db(self):
-        insert_count = 0
-        # counter = 0
-
         for full_src, size, birth, mod in self.ins_items:
 
             if not ScanerTools.can_scan:
                 return
-            
-            # counter += 1
 
             small_img, resol = self.get_small_img(full_src)
 
