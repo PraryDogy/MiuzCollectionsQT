@@ -280,7 +280,8 @@ class JsonData:
             )
 
     @classmethod
-    def _check_app_dirs(cls):
+    def _check_dirs(cls):
+
         if not os.path.exists(Static.APP_SUPPORT_DIR):
             os.makedirs(name=Static.APP_SUPPORT_DIR, exist_ok=True)
 
@@ -312,14 +313,19 @@ class JsonData:
 
     @classmethod
     def copy_db_file(cls):
+
+        # удаляем пользовательный db.db из Application Support если он есть
         if os.path.exists(Static.DB_FILE):
             print("Удаляю пользовательский DB_FILE")
             os.remove(Static.DB_FILE)
 
+        # копируем предустановленный db.db если он есть
         if os.path.exists(Static.PRELOAD_DB):
             print("Копирую предустановленный DB_FILE")
             shutil.copy2(Static.PRELOAD_DB, Static.APP_SUPPORT_DIR)
 
+        # иначе просим скачать или создать пользовательский db.db 
+        # с таблицей database > THUMBS
         else:
             t = "Нет предуставновленного DB_FILE: " + Static.DB_FILE
             webbrowser.open(Static.LINK_DB)
@@ -341,7 +347,7 @@ class JsonData:
 
     @classmethod
     def init(cls):
-        cls._check_app_dirs()
+        cls._check_dirs()
         cls._set_json_data()
         cls._compare_versions()
         Filters.init_filters()
