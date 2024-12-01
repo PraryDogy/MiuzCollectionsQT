@@ -333,8 +333,7 @@ class DbUpdater:
         conn.commit()
         conn.close()
 
-        max_count = 15
-        sleep_count = 0.2
+        sleep_count = 0.1
 
         ln_ = len(self.hash_images)
 
@@ -344,12 +343,12 @@ class DbUpdater:
             adding: str = Lang.adding
             t = f"{brand}: {adding.lower()} {x} {Lang.from_} {ln_}"
             ScanerTools.progressbar_text(t)
+            sleep(sleep_count)
 
             Utils.write_image_hash(full_hash_path, img_array)
 
         if self.hash_images:
             ScanerTools.reload_gui()
-            sleep(sleep_count)
 
 
 class WorkerSignals(QObject):
