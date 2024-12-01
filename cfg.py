@@ -262,6 +262,7 @@ class JsonData:
 
                 if type(v) == type(getattr(cls, k)):
                     setattr(cls, k, v)
+
                 else:
                     print("Несоответствие типа, ключ:", k)
 
