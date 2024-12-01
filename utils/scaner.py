@@ -225,10 +225,6 @@ class DbUpdater:
 
             try:
                 conn.execute(q)
-                brand = Brand.curr.name.capitalize()
-                deleting: str = Lang.deleting
-                t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {ln_}"
-                ScanerTools.progressbar_text(t)
 
             except sqlalchemy.exc.IntegrityError as e:
                 Utils.print_err(error=e)
@@ -245,7 +241,14 @@ class DbUpdater:
         conn.close()
 
         for short_hash_path in self.del_items:
+
+            brand = Brand.curr.name.capitalize()
+            deleting: str = Lang.deleting
+            t = f"{brand}: {deleting.lower()} {x} {Lang.from_} {ln_}"
+            ScanerTools.progressbar_text(t)
+
             full_hash_path = Utils.get_full_hash_path(short_hash_path)
+
             if os.path.exists(full_hash_path):
                 os.remove(full_hash_path)
 
