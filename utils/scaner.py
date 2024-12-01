@@ -180,18 +180,12 @@ class Compator:
     def get_result(self):
         for short_hash_path, db_item in self._db_images.items():
 
-            if not ScanerTools.can_scan:
-                return
-
             if not db_item in self._finder_images:
                 self.del_items.append(short_hash_path)
 
         _db_images = list(self._db_images.values())
 
         for finder_item in self._finder_images:
-
-            if not ScanerTools.can_scan:
-                return
 
             if not finder_item in _db_images:
                 self.ins_items.append(finder_item)
