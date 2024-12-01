@@ -199,18 +199,6 @@ class JsonData:
     # индекс соответствующий Lang
     lang_ind = 0
     
-    # размер окна просмотра изображений
-    imgview_g: dict = {
-        "aw": 700,
-        "ah": 500
-        }
-
-    # размер главного окна
-    root_g: dict = {
-        "aw": 700,
-        "ah": 500
-        }
-    
     # как часто utils > scaner будет просматривать collfolders на изменения
     scaner_minutes: int = 5
     
@@ -361,5 +349,27 @@ class Dynamic:
     search_widget_text: str = None
     curr_coll_name = Static.NAME_ALL_COLLS
     resents: bool = False
-    types = [Static.JPG_EXT, Static.LAYERS_EXT]
-    down_folder: str = os.path.join(os.path.expanduser("~"), "Downloads")
+
+    # какие расширения отображать по умолчанию (и джепеги и послойники)
+    types = [
+        Static.JPG_EXT,
+        Static.LAYERS_EXT
+    ]
+
+    # стандартная папка загрузок
+    down_folder: str = os.path.join(
+        os.path.expanduser("~"),
+        "Downloads"
+    )
+
+    # размер окна просмотра изображений
+    imgview_g: dict = {
+        "aw": 700,
+        "ah": 500
+        }
+
+    # размер главного окна
+    root_g: dict = {
+        "aw": 700,
+        "ah": 500
+        }

@@ -46,10 +46,10 @@ class Grid(QScrollArea):
         super().__init__()
         self.setWidgetResizable(True)
         self.resize(
-            JsonData.root_g["aw"] - Static.MENU_LEFT_WIDTH,
-            JsonData.root_g["ah"]
+            Dynamic.root_g["aw"] - Static.MENU_LEFT_WIDTH,
+            Dynamic.root_g["ah"]
         )
-        self.ww = JsonData.root_g["aw"] - Static.MENU_LEFT_WIDTH
+        self.ww = Dynamic.root_g["aw"] - Static.MENU_LEFT_WIDTH
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff

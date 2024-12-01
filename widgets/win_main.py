@@ -40,7 +40,7 @@ class WinMain(WinFrameless):
     def __init__(self):
         super().__init__()
 
-        self.resize(JsonData.root_g["aw"], JsonData.root_g["ah"])
+        self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
         self.setMenuBar(BarMacos())
 
         h_wid_main = QWidget()
@@ -115,8 +115,6 @@ class WinMain(WinFrameless):
 
     def on_exit(self):
         Scaner.app.stop()
-        geo = self.geometry()
-        JsonData.root_g.update({"aw": geo.width(), "ah": geo.height()})
         JsonData.write_json_data()
 
     def after_start(self):

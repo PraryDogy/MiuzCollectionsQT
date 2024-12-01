@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import JsonData, Static
+from cfg import Dynamic, JsonData, Static
 from database import THUMBS, Dbase
 from utils.utils import URunnable, UThreadPool, Utils
 
@@ -263,7 +263,7 @@ class WinImageView(WinChild):
 
         self.setStyleSheet(IMG_VIEW_STYLE)
         self.setMinimumSize(QSize(500, 400))
-        self.resize(JsonData.imgview_g["aw"], JsonData.imgview_g["ah"])
+        self.resize(Dynamic.imgview_g["aw"], Dynamic.imgview_g["ah"])
         self.installEventFilter(self)
 
         self.mouse_move_timer = QTimer(self)
@@ -526,7 +526,7 @@ class WinImageView(WinChild):
         bottom_window_side = a0.size().height() - self.zoom_btns.height()
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
 
-        JsonData.imgview_g.update({"aw": a0.size().width(), "ah": a0.size().height()})
+        Dynamic.imgview_g.update({"aw": a0.size().width(), "ah": a0.size().height()})
 
         return super().resizeEvent(a0)
 
