@@ -74,7 +74,8 @@ class Test:
         return result
 
 
-src = "/Users/Morkowik/Desktop/Evgeny/_miuz"
+# src = "/Users/Morkowik/Desktop/Evgeny/_miuz"
+src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready"
 test = Test()
 walk = test.walk_collection(src)
 scan_dir = test.tree2list(src)
@@ -90,5 +91,5 @@ offset = round(times.get(slower) / times.get(faster), 2)
 offset = f"{faster} is faster than {slower} in {offset} times"
 print(offset, sep="\n")
 
-print(scan_dir.get(RES)[0])
-print(walk.get(RES)[0])
+# print(scan_dir.get(RES)[0])
+# print(walk.get(RES)[0])
