@@ -19,7 +19,7 @@ class Static:
     BRANDS = ["miuz", "panacea"]
 
     # в сетке изображений может отображаться за раз 150 штук
-    GRID_LIMIT: int = 150
+    GRID_LIMIT: int = 100
 
     # скачать системные файлы _preload
     LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
