@@ -279,7 +279,8 @@ class Grid(QScrollArea):
         sm = sum(
             (
                 Static.THUMB_W[JsonData.curr_size_ind],
-                Static.THUMB_MARGIN
+                Static.THUMB_MARGIN,
+                10
             )
         )
 
