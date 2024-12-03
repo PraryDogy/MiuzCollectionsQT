@@ -82,6 +82,7 @@ class WinDownloads(WinSystem):
         self.scroll_area.setWidget(self.scroll_widget)
 
         self.v_layout = LayoutVer()
+        self.v_layout.setContentsMargins(0, 10, 0, 10)
         self.scroll_widget.setLayout(self.v_layout)
         self.central_layout.addWidget(self.scroll_area)
 
