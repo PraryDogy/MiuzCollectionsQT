@@ -15,7 +15,7 @@ from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
-
+import rawpy
 from cfg import JsonData, Static
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
@@ -170,67 +170,77 @@ class Utils:
         return date.strftime("%d.%m.%Y %H:%M")
 
     @classmethod
-    def read_tiff(cls, full_src: str) -> np.ndarray | None:
+    def read_tiff_tifffile(cls, path: str) -> np.ndarray | None:
         try:
-            img = tifffile.imread(files=full_src)[:,:,:3]
+            img = tifffile.imread(files=path)[:,:,:3]
             if str(object=img.dtype) != "uint8":
                 img = (img/256).astype(dtype="uint8")
             return img
-
-        except (
-            Exception,
-            tifffile.TiffFileError,
-            RuntimeError,
-            DelayedImportError
-            ) as e:
-
-            # Utils.print_err(error=e)
-            print("read_tiff error")
+        except (Exception, tifffile.TiffFileError, RuntimeError, DelayedImportError) as e:
+            cls.print_error(cls, e)
             print("try open tif with PIL")
-            return cls.read_tiff_pil(full_src)
+            return cls.read_tiff_pil(path)
     
     @classmethod
-    def read_tiff_pil(cls, full_src: str) -> np.ndarray | None:
+    def read_tiff_pil(cls, path: str) -> np.ndarray | None:
         try:
             print("PIL: try open tif")
-            img: Image = Image.open(full_src)
+            img: Image = Image.open(path)
+            # return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
             return np.array(img)
         except Exception as e:
-            # Utils.print_err(error=e)
-            print("read_tiff_pil error")
+            Utils.print_error(parent=cls, error=e)
             return None
 
     @classmethod
-    def read_psd(cls, full_src: str) -> np.ndarray | None:
+    def read_psd_pil(cls, path: str) -> np.ndarray | None:
         try:
-            img = psd_tools.PSDImage.open(fp=full_src)
-            img = img.composite()
-
+            img = Image.open(path)
             if img.mode == 'RGBA':
                 img = img.convert('RGB')
-            
             img = np.array(img)
             return img
-
         except Exception as e:
-            print("read_psd error")
-            # Utils.print_err(error=e)
+            cls.print_error(cls, e)
             return None
-            
+            cls.read_psd_tools(path=path)
+
     @classmethod
-    def read_jpg(cls, full_src: str) -> np.ndarray | None:
+    def read_psd_tools(cls, path: str) -> np.ndarray | None:
         try:
-            image = cv2.imread(full_src, cv2.IMREAD_UNCHANGED)
-            return image
-        except (Exception, cv2.error) as e:
-            # Utils.print_err(error=e)
-            print("read jpg error")
+            img = psd_tools.PSDImage.open(fp=path)
+            img = img.composite()
+            if img.mode == 'RGBA':
+                img = img.convert('RGB')
+            img = np.array(img)
+            return img
+        except Exception as e:
+            cls.print_error(cls, e)
             return None
-        
+
     @classmethod
-    def read_png(cls, full_src: str) -> np.ndarray | None:
+    def read_png_pil(cls, path: str) -> np.ndarray | None:
         try:
-            image = cv2.imread(full_src, cv2.IMREAD_UNCHANGED)
+            img = Image.open(path)
+
+            if img.mode == "RGBA":
+                white_background = Image.new("RGBA", img.size, (255, 255, 255))
+                img = Image.alpha_composite(white_background, img)
+                img = img.convert("RGB")
+
+            img_array = np.array(img)
+
+            return img_array
+        except Exception as e:
+            cls.print_error(cls, e)
+            return None
+            cls.read_png_cv2(path)
+
+    @classmethod
+    def read_png_cv2(cls, path: str) -> np.ndarray | None:
+        try:
+            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # Чтение с альфа-каналом
+
             if image.shape[2] == 4:
                 alpha_channel = image[:, :, 3] / 255.0
                 rgb_channels = image[:, :, :3]
@@ -239,32 +249,53 @@ class Utils:
                 converted = (rgb_channels * alpha_channel[:, :, np.newaxis] + background * (1 - alpha_channel[:, :, np.newaxis])).astype(np.uint8)
             else:
                 converted = image
+
+            converted = cv2.cvtColor(converted, cv2.COLOR_BGR2RGB)
             return converted
-        
         except Exception as e:
-            print("read png error")
-            # Utils.print_err(error=e)
+            cls.print_error(cls, e)
+            return None
+
+    @classmethod
+    def read_jpg(cls, path: str) -> np.ndarray | None:
+        try:
+            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # Чтение с альфа-каналом
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            return image
+        except (Exception, cv2.error) as e:
+            cls.print_error(cls, e)
+            return None
+
+    @classmethod
+    def read_raw(cls, path: str) -> np.ndarray | None:
+        try:
+            img = rawpy.imread(path).postprocess()
+            # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            return img
+        except (rawpy._rawpy.LibRawDataError) as e:
+            cls.print_error(cls, e)
             return None
 
     @classmethod
     def read_image(cls, full_src: str) -> np.ndarray | None:
-
         src_lower: str = full_src.lower()
 
         if src_lower.endswith((".psd", ".psb")):
-            img = cls.read_psd(full_src)
+            img = cls.read_psd_pil(full_src)
 
         elif src_lower.endswith((".tiff", ".tif")):
-            img = cls.read_tiff(full_src)
+            img = cls.read_tiff_tifffile(full_src)
 
         elif src_lower.endswith((".jpg", ".jpeg", "jfif")):
             img = cls.read_jpg(full_src)
 
         elif src_lower.endswith((".png")):
-            img = cls.read_png(full_src)
+            img = cls.read_png_pil(full_src)
+
+        elif src_lower.endswith((".nef", ".cr2", ".cr3", ".arw", ".raf")):
+            img = cls.read_raw(full_src)
 
         else:
-            print("image utils > read img > none", full_src)
             img = None
 
         return img
