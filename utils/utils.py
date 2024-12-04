@@ -258,7 +258,7 @@ class Utils:
     def read_jpg(cls, path: str) -> np.ndarray | None:
         try:
             image = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # Чтение с альфа-каналом
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             return image
         except (Exception, cv2.error) as e:
             cls.print_error(cls, e)
