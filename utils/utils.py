@@ -203,7 +203,6 @@ class Utils:
         except Exception as e:
             cls.print_error(cls, e)
             return None
-            cls.read_psd_tools(path=path)
 
     @classmethod
     def read_psd_tools(cls, path: str) -> np.ndarray | None:
@@ -234,7 +233,6 @@ class Utils:
         except Exception as e:
             cls.print_error(cls, e)
             return None
-            cls.read_png_cv2(path)
 
     @classmethod
     def read_png_cv2(cls, path: str) -> np.ndarray | None:
@@ -283,6 +281,9 @@ class Utils:
         if src_lower.endswith((".psd", ".psb")):
             img = cls.read_psd_pil(full_src)
 
+            if img is None:
+                img = cls.read_psd_tools(full_src)
+
         elif src_lower.endswith((".tiff", ".tif")):
             img = cls.read_tiff_tifffile(full_src)
 
@@ -291,6 +292,9 @@ class Utils:
 
         elif src_lower.endswith((".png")):
             img = cls.read_png_pil(full_src)
+
+            if img is None:
+                img = cls.read_png_cv2(full_src)
 
         elif src_lower.endswith((".nef", ".cr2", ".cr3", ".arw", ".raf")):
             img = cls.read_raw(full_src)
