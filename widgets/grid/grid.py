@@ -144,19 +144,12 @@ class Grid(QScrollArea):
             self.row += 1
             return
 
-        # spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        # self.grid_lay.addItem(spacer, self.row, self.col)
-
         filter_title = FilterTitle()
-        filter_title.resize(30, self.width())
+        filter_title.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
+        self.row += 1
 
-        # self.col += 1
-        # spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        # self.grid_lay.addItem(spacer, self.row, self.col)
-
-        # self.col = 0
-        # self.row += 1
+        filter_title.setStyleSheet("background: red;")
 
         Thumbnail.calculate_size()
         for date, db_images in db_images.items():
