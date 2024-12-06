@@ -129,15 +129,24 @@ class Grid(QScrollArea):
         if not db_images:
 
             spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
-            self.grid_lay.addItem(spacer, 0, 0)
+            self.grid_lay.addItem(spacer, self.row, self.col)
 
+            self.col += 1
             error_title = ErrorTitle()
-            self.grid_lay.addWidget(error_title, self.row, self.col, 1, max_col)
+            error_title.setStyleSheet("background: red;")
+            self.grid_lay.addWidget(error_title, self.row, self.col)
             # добавляем новую строку так как это заголовок
+
+            self.col += 1
+            spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
+            self.grid_lay.addItem(spacer, self.row, self.col)
+
+            self.col = 0
             self.row += 1
             return
 
         filter_title = FilterTitle()
+        filter_title.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
         # добавляем новую строку так как это заголовок
         self.row += 1

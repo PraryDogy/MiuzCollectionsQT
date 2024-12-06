@@ -267,7 +267,10 @@ class WinSettings(WinSystem):
                 os.remove(Static.DB_FILE)
 
             if os.path.exists(Static.HASH_DIR):
-                shutil.rmtree(Static.HASH_DIR)
+                try:
+                    shutil.rmtree(Static.HASH_DIR)
+                except OSError:
+                    ...
 
             Utils.start_new_app()
 
