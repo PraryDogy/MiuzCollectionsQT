@@ -329,6 +329,19 @@ class Pixmap:
             transformMode=Qt.TransformationMode.SmoothTransformation
         )
 
+    @classmethod
+    def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+        try:
+            h, w = image.shape[:2]
+            scale = size / max(h, w)
+            new_w, new_h = int(w * scale), int(h * scale)
+            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+        except Exception as e:
+            print("resize_max_aspect_ratio error:", e)
+            return None
+        
+
 class Utils(Hash, Pixmap, ReadImage):
 
     @classmethod
@@ -389,18 +402,6 @@ class Utils(Hash, Pixmap, ReadImage):
     def get_f_date(cls, timestamp_: int) -> str:
         date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
         return date.strftime("%d.%m.%Y %H:%M")
-            
-    @classmethod
-    def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:
-        try:
-            h, w = image.shape[:2]
-            scale = size / max(h, w)
-            new_w, new_h = int(w * scale), int(h * scale)
-            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
-
-        except Exception as e:
-            print("resize_max_aspect_ratio error:", e)
-            return None
         
     @classmethod
     def get_full_src(cls, coll_folder: str, short_src: str) -> str:
