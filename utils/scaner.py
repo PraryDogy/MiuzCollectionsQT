@@ -263,21 +263,15 @@ class DbUpdater:
             ScanerTools.reload_gui()
 
     def get_small_img(self, src: str) -> tuple[ndarray, str] | tuple[None, None]:
+
         array_img = Utils.read_image(src)
+        array_img = Utils.fit_to_thumb(array_img, Static.PIXMAP_SIZE_MAX)
 
         if array_img is not None:
-
             h_, w_ = array_img.shape[:2]
             resol = f"{w_}x{h_}"
+            return (array_img, resol)
 
-            array_img = Utils.fit_to_thumb(array_img, Static.PIXMAP_SIZE_MAX)
-
-            if array_img is not None:
-                return (array_img, resol)
-
-            else:
-                return (None, None)
-        
         else:
             return (None, None)
 
