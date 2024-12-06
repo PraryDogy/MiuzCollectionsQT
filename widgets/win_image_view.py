@@ -113,7 +113,11 @@ class LoadImage(URunnable):
             src=self.full_src,
             pixmap=self.pixmap
         )
-        self.signals_.finished_.emit(image_data)
+
+        try:
+            self.signals_.finished_.emit(image_data)
+        except RuntimeError:
+            ...
 
 
 class ImageWidget(QLabel):
@@ -251,12 +255,15 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinChild):
+    count_limit = 10
+
     def __init__(self, short_src: str):
         super().__init__()
 
         self.short_src_list = list(Thumbnail.path_to_wid.keys())
         self.short_src = short_src
         self.wid = Thumbnail.path_to_wid.get(self.short_src)
+        self.task_count = 0
 
         self.setStyleSheet(IMG_VIEW_STYLE)
         self.setMinimumSize(QSize(500, 400))
@@ -321,6 +328,7 @@ class WinImageView(WinChild):
 
     def load_image(self):
         cmd_ = lambda data: self.load_image_fin(data=data, full_src=self.full_src)
+        self.task_count += 1
 
         img_thread = LoadImage(full_src=self.full_src)
         img_thread.signals_.finished_.connect(cmd_)
@@ -335,6 +343,8 @@ class WinImageView(WinChild):
                 self.image_label.set_image(data.pixmap)
             except RuntimeError:
                 ...
+
+        self.task_count -= 1
 
     def close_(self, *args):
         LoadImage.images.clear()
@@ -352,6 +362,9 @@ class WinImageView(WinChild):
         self.next_image_btn.hide()
 
     def switch_image(self, offset):
+        if self.task_count == WinImageView.count_limit:
+            return
+
         # мы формируем актуальный список src из актуальной сетки изображений
         self.short_src_list = list(Thumbnail.path_to_wid.keys())
         total_ = len(self.short_src_list)
