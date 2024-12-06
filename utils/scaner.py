@@ -212,13 +212,22 @@ class DbUpdater:
         self.insert_db(queries=queries)
         self.insert_images(queries=queries)
 
+    def get_dict_data(self, clas: object):
+        return {
+            k: v
+            for k, v in vars(clas).items()
+            if not k.startswith("__")
+            and
+            not callable(getattr(clas, k))
+        }
+
     def del_db(self, del_items: list[str]):
         if del_items:
-            print(Brand.curr)
-            print(Brand.all_)
-            print(JsonData.__dict__)
+            print(self.get_dict_data(Brand.curr))
+            print(self.get_dict_data(Brand.all))
+            print(self.get_dict_data(JsonData))
             from cfg import Dynamic
-            print(Dynamic.__dict__)
+            print(self.get_dict_data(Dynamic))
 
             print("do you want delete? press 1 to yes")
             user_inp = input()
