@@ -28,7 +28,7 @@ class WinSmb(WinSystem):
         self.setWindowTitle(Lang.no_connection)
 
         self.init_ui()
-        self.setFixedSize(330, 100)
+        self.setFixedSize(330, 80)
         self.setFocus()
 
     def init_ui(self):
@@ -50,7 +50,6 @@ class WinSmb(WinSystem):
 
         brand: str = Static.BRANDS[JsonData.brand_ind]
         title = QLabel(text=brand.capitalize())
-        title.setStyleSheet(TITLE_NORMAL)
         v_lay.addWidget(title)
 
         descr = QLabel(self.my_text)

@@ -11,7 +11,7 @@ from base_widgets import CustomInput, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
 from lang import Lang
-from utils.updater import SimpleSettings
+from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
 
 from .actions import OpenWins
@@ -120,7 +120,8 @@ class SimpleSettings(QGroupBox):
             print(e)
 
     def updater_btn_cmd(self, *args):
-        self.task = SimpleSettings()
+        ...
+        self.task = Updater()
         self.updater_btn.setText(Lang.wait_update)
         self.task.signals_.no_connection.connect(self.updater_btn_smb)
         self.task.signals_.finished_.connect(self.updater_btn_cmd_fin)

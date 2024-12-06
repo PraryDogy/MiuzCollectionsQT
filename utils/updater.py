@@ -42,7 +42,7 @@ class WorkerSignals(QObject):
     finished_ = pyqtSignal()
 
 
-class SimpleSettings(URunnable):
+class Updater(URunnable):
     finished_ = pyqtSignal()
     no_connection = pyqtSignal()
 
