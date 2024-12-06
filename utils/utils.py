@@ -410,3 +410,13 @@ class Utils(Hash, Pixmap, ReadImage):
     @classmethod
     def get_short_src(cls, coll_folder: str, full_src: str) -> str:
         return full_src.replace(coll_folder, "")
+
+    @classmethod
+    def rm_rf(cls, folder_path: str):
+        try:
+            subprocess.run(["rm", "-rf", folder_path], check=True)
+            print(f"Папка '{folder_path}' успешно удалена.")
+        except subprocess.CalledProcessError as e:
+            print(f"Ошибка удаления: {e}")
+        except Exception as e:
+            print(f"Неизвестная ошибка: {e}")

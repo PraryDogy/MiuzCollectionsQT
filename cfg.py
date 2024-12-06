@@ -297,7 +297,8 @@ class JsonData:
         # удаляем пользовательскую hashdir из ApplicationSupport
         if os.path.exists(Static.HASH_DIR):
             print("Удаляю пользовательскую HASH_DIR")
-            shutil.rmtree(Static.HASH_DIR)
+            from utils.utils import Utils
+            Utils.rm_rf(Static.HASH_DIR)
 
         # копируем предустановленную hashdir в AppliactionSupport
         if os.path.exists(Static.PRELOAD_HASHDIR_ZIP):
