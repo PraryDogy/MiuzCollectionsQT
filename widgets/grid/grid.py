@@ -133,7 +133,6 @@ class Grid(QScrollArea):
 
             self.col += 1
             error_title = ErrorTitle()
-            error_title.setStyleSheet("background: red;")
             self.grid_lay.addWidget(error_title, self.row, self.col)
             # добавляем новую строку так как это заголовок
 
@@ -147,7 +146,7 @@ class Grid(QScrollArea):
 
         filter_title = FilterTitle()
         filter_title.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
+        self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col + 1)
         # добавляем новую строку так как это заголовок
         self.row += 1
 
