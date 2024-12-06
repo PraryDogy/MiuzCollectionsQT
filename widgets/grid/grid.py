@@ -148,6 +148,7 @@ class Grid(QScrollArea):
         # self.grid_lay.addItem(spacer, self.row, self.col)
 
         filter_title = FilterTitle()
+        filter_title.resize(30, self.width())
         self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
 
         # self.col += 1
