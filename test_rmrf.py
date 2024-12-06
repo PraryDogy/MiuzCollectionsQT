@@ -1,4 +1,9 @@
-from utils.utils import Utils
-from cfg import JsonData, Static
+from typing import Literal
 
-Utils.rm_rf(Static.HASH_DIR)
+class Test:
+
+    def run(self, test: Literal["hello"]):
+        ...
+
+
+Test().run(test="hello")

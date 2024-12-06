@@ -10,14 +10,14 @@ from cfg import JsonData, Static
 from database import CLMN_NAMES, THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
-
+from typing import Literal
 from .utils import URunnable, UThreadPool, Utils
 
 
 class Brand:
     all_: list["Brand"] = []
     curr: "Brand" = None
-    # __slots__ = ["name", "ind", "collfolder"]
+    __slots__ = ["name", "ind", "collfolder"]
 
     def __init__(self, name: str, ind: int, collfolder: str):
         super().__init__()
@@ -35,7 +35,6 @@ class ScanerTools:
             SignalsApp.all_.progressbar_text.emit(text)
         except RuntimeError as e:
             pass
-            # Utils.print_err(error=e)
 
     @classmethod
     def reload_gui(cls):
@@ -47,21 +46,15 @@ class ScanerTools:
                 Utils.print_err(error=e)
 
 
-import os
-from typing import List, Tuple
-
-
 class FinderImages:
-    def __init__(self):
-        super().__init__()
 
-    def get(self) -> List[Tuple[str, int, int, int]]:
+    def run(self) -> list[tuple[str, int, int, int]]:
         """Основной метод для поиска изображений в коллекциях."""
         collections = self.get_collections()
         finder_images = self.process_collections(collections)
         return finder_images
 
-    def get_collections(self) -> List[str]:
+    def get_collections(self) -> list[str]:
         """Получает список коллекций, исключая остановленные."""
         collections = []
 
@@ -76,7 +69,11 @@ class FinderImages:
 
         return collections
 
-    def process_collections(self, collections: List[str]) -> List[Tuple[str, int, int, int]]:
+    def process_collections(
+            self,
+            collections: list[str]
+    ) -> list[tuple[str, int, int, int]]:
+
         """Обрабатывает список коллекций и находит изображения."""
         finder_images = []
         total_collections = len(collections)
@@ -101,27 +98,33 @@ class FinderImages:
         collection_name = Lang.collection
         return f"{brand}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
-    def walk_collection(self, collection: str) -> List[Tuple[str, int, int, int]]:
+    def walk_collection(self, coll: str) -> list[tuple[str, int, int, int]]:
         """Рекурсивно обходит директорию и находит изображения."""
         finder_images = []
-        stack = [collection]
+        stack = []
+        stack.append(coll)
 
         while stack:
             current_dir = stack.pop()
 
             with os.scandir(current_dir) as entries:
+
                 for entry in entries:
+
+                    # нельзя удалять
+                    # это прервет FinderImages, но не остальные классы
                     if not ScanerTools.can_scan:
                         return finder_images
 
                     if entry.is_dir():
                         stack.append(entry.path)
+
                     elif entry.name.endswith(Static.IMG_EXT):
                         finder_images.append(self.get_file_data(entry))
 
         return finder_images
 
-    def get_file_data(self, entry: os.DirEntry) -> Tuple[str, int, int, int]:
+    def get_file_data(self, entry: os.DirEntry) -> tuple[str, int, int, int]:
         """Получает данные файла."""
         stats = entry.stat()
         return (
@@ -133,12 +136,11 @@ class FinderImages:
 
 
 class DbImages:
-    def __init__(self):
-        super().__init__()
+
+    def run(self) -> dict[str, tuple[str, int, int, int]]:
         t = f"{Brand.curr.name.capitalize()}: {Lang.preparing}"
         ScanerTools.progressbar_text(t)
 
-    def get(self) -> dict[str, tuple[str, int, int, int]]:
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(
@@ -151,7 +153,8 @@ class DbImages:
         
         q = q.where(THUMBS.c.brand == Brand.curr.name)
 
-        # не забываем относительный путь ДБ преобразовать в полный
+        # не забываем относительный путь к изображению преобразовать в полный
+        # для сравнения с finder_items
         res = conn.execute(q).fetchall()
         conn.close()
 
@@ -163,37 +166,31 @@ class DbImages:
                 mod
             )
             for short_hash, short_src, size, birth, mod in res
-            }
+        }
 
 
 class Compator:
-    def __init__(
+
+    def run(
             self,
             finder_images: list[tuple[str, int, int, int]],
             db_images: dict[str, tuple[str, int, int, int]]
-            ):
+    ):
 
-        super().__init__()
-        self._finder_images = finder_images
-        self._db_images = db_images
+        del_items: list[str] = []
+        ins_items: list[tuple[str, int, int, int]] = []
 
-        self.del_items: list[str] = []
-        self.ins_items: list[tuple[str, int, int, int]] = []
+        for short_hash, db_item in db_images.items():
+            if not db_item in finder_images:
+                del_items.append(short_hash)
 
-    def get_result(self):
+        db_values = list(db_images.values())
 
-        for short_hash, db_item in self._db_images.items():
+        for finder_item in finder_images:
+            if not finder_item in db_values:
+                ins_items.append(finder_item)
 
-            if not db_item in self._finder_images:
-
-                self.del_items.append(short_hash)
-
-        _db_images = list(self._db_images.values())
-
-        for finder_item in self._finder_images:
-
-            if not finder_item in _db_images:
-                self.ins_items.append(finder_item)
+        return (del_items, ins_items)
 
 
 class DbUpdater:
@@ -219,6 +216,13 @@ class DbUpdater:
 
         for short_hash in del_items:
 
+            # нельзя удалять
+            # если удалить этот флаг, то когда флаг будет false,
+            # произойдет массовое удаление из БД
+            # так как FinderItems прерван данным флагом
+            # то есть Compator при сравнении с БД посчитает,
+            # что из Finder было удалено множество изображений
+            # и удалит их из БД
             if not ScanerTools.can_scan:
                 return
         
@@ -248,6 +252,7 @@ class DbUpdater:
 
         for x, short_hash in enumerate(del_items, start=1):
 
+            # не удалять
             if not ScanerTools.can_scan:
                 return
 
@@ -294,6 +299,7 @@ class DbUpdater:
 
         for full_src, size, birth, mod in ins_items:
 
+            # не удалять
             if not ScanerTools.can_scan:
                 return
 
@@ -325,6 +331,7 @@ class DbUpdater:
 
         for query in queries.keys():
 
+            # не удалять
             if not ScanerTools.can_scan:
                 return
 
@@ -351,6 +358,7 @@ class DbUpdater:
 
         for x, (full_hash, img_array) in enumerate(queries.values(), start=1):
 
+            # не удалять
             if not ScanerTools.can_scan:
                 return
 
@@ -397,20 +405,23 @@ class ScanerThread(URunnable):
         ScanerTools.can_scan = True
 
         finder_images = FinderImages()
-        finder_images = finder_images.get()
+        finder_images = finder_images.run()
 
         if finder_images:
         
             db_images = DbImages()
-            db_images = db_images.get()
+            db_images = db_images.run()
 
-            compator = Compator(
+            compator = Compator()
+            del_items, ins_items = compator.run(
                 finder_images=finder_images,
                 db_images=db_images
             )
-            compator.get_result()
 
-            DbUpdater(del_items=compator.del_items, ins_items=compator.ins_items)
+            DbUpdater(
+                del_items=del_items,
+                ins_items=ins_items
+            )
 
         try:
             self.signals_.finished_.emit()
