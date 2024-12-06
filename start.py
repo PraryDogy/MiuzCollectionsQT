@@ -41,8 +41,9 @@ if System_.set_plugin_path():
 
 from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QIcon
 
-from cfg import JsonData
+from cfg import JsonData, Static
 from database import Dbase
 from lang import Lang
 from signals import SignalsApp
@@ -54,6 +55,10 @@ from widgets.win_main import WinMain
 class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
+
+        icon_path = os.path.join(Static.IMAGES, "icon.icns")
+        icon = QIcon(icon_path)
+        self.setWindowIcon(icon)
 
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: SignalsApp.all_.win_main_cmd.emit("exit"))
