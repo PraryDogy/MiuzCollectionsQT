@@ -52,8 +52,16 @@ class InfoTask(URunnable):
         """имя тип размер место изменен разрешение коллекция"""
         conn = Dbase.engine.connect()
 
-        cols = (THUMBS.c.size, THUMBS.c.mod, THUMBS.c.resol,THUMBS.c.coll)
-        q = sqlalchemy.select(*cols).where(THUMBS.c.short_src==self.short_src)
+        cols = (
+            THUMBS.c.size,
+            THUMBS.c.mod,
+            THUMBS.c.resol,
+            THUMBS.c.coll,
+            THUMBS.c.short_hash
+        )
+
+        q = sqlalchemy.select(*cols)
+        q = q.where(THUMBS.c.short_src == self.short_src)
 
         res = conn.execute(q).first()
         conn.close()
@@ -63,7 +71,7 @@ class InfoTask(URunnable):
         else:
             self.signals_.finished_.emit({})
    
-    def get_db_info(self, size, mod, resol, coll) -> dict[str, str]:
+    def get_db_info(self, size, mod, resol, coll, short_hash) -> dict[str, str]:
 
         name = self.lined_text(
             os.path.basename(self.short_src)
@@ -71,6 +79,10 @@ class InfoTask(URunnable):
 
         full_src = self.lined_text(
             Utils.get_full_src(self.coll_folder,self.short_src)
+        )
+
+        full_hash = self.lined_text(
+            Utils.get_full_hash(short_hash)
         )
 
         _, type_ = os.path.splitext(name)
@@ -81,7 +93,8 @@ class InfoTask(URunnable):
             Lang.file_name: name,
             Lang.type_: type_,
             Lang.file_size: size,
-            Lang.place:full_src,
+            Lang.place: full_src,
+            Lang.hash_path: full_hash, 
             Lang.changed: mod,
             Lang.resol: resol,
             Lang.collection: coll

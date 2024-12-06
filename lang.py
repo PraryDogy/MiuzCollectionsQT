@@ -415,6 +415,10 @@ class Lang_:
         "preparing"
     ]
 
+    hash_path = [
+        "Данные",
+        "Data"
+    ]
 
 class Lang(Lang_):
 
