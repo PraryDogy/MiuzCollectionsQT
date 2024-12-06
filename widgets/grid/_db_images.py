@@ -149,13 +149,12 @@ class DbImages(URunnable):
 
         user_filters, sys_filters = self.group_filters()
     
-        stmt_where.append(
-            self.build_inclusion_condition(user_filters)
-        )
-    
-        stmt_where.append(
+        or_statements = sqlalchemy.or_(
+            *self.build_inclusion_condition(user_filters),
             self.build_exclusion_condition(user_filters, sys_filters)
         )
+
+        stmt_where.append(or_statements)
 
         for i in stmt_where:
             q = q.where(i)
@@ -166,7 +165,7 @@ class DbImages(URunnable):
             self,
             user_filters: list[Filters],
             sys_filters: list[Filters]
-        ):
+        ) -> sqlalchemy.ColumnElement:
         """
         Формирует SQLAlchemy условие для исключения строк, которые соответствуют
         пользовательским фильтрам, если системный фильтр включён.
@@ -192,12 +191,12 @@ class DbImages(URunnable):
             for user_filter in user_filters
             if sys_filter.value
         ]
-        return sqlalchemy.or_(sqlalchemy.and_(*conditions))
+        return sqlalchemy.and_(*conditions)
 
     def build_inclusion_condition(
             self,
             user_filters: list[Filters]
-        ):
+        ) -> list[sqlalchemy.BinaryExpression[bool]]:
         """
         Формирует SQLAlchemy условие для включения строк, соответствующих
         значениям пользовательских фильтров.
@@ -220,7 +219,7 @@ class DbImages(URunnable):
             for filter in user_filters
             if filter.value
         ]
-        return sqlalchemy.or_(*conditions)
+        return conditions
 
     def group_filters(self) -> tuple[list[Filters], list[Filters]]:
         """
