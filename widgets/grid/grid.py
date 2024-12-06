@@ -149,8 +149,6 @@ class Grid(QScrollArea):
         self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
         self.row += 1
 
-        filter_title.setStyleSheet("background: red;")
-
         Thumbnail.calculate_size()
         for date, db_images in db_images.items():
             self.single_grid(date, db_images)
