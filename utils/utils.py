@@ -9,13 +9,14 @@ from datetime import datetime
 import cv2
 import numpy as np
 import psd_tools
+import rawpy
 from imagecodecs.imagecodecs import DelayedImportError
 from PIL import Image
 from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
-import rawpy
+
 from cfg import JsonData, Static
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
@@ -24,6 +25,7 @@ psd_logger.setLevel(logging.CRITICAL)
 
 SCRIPTS = "applescripts"
 REVEAL_SCPT = os.path.join(SCRIPTS, "reveal_files.scpt")
+
 
 class UThreadPool:
     pool: QThreadPool = None
@@ -49,8 +51,7 @@ class URunnable(QRunnable):
 
         return wrapper
 
-
-class Utils:
+class Err:
 
     @classmethod
     def print_err(cls, error: Exception):
@@ -74,6 +75,261 @@ class Utils:
 
         print(f"{filepath}:{line_number}")
         print(error)
+
+
+class ReadImage(Err):
+
+    @classmethod
+    def read_tiff_tifffile(cls, path: str) -> np.ndarray | None:
+
+        errs = (
+            Exception,
+            tifffile.TiffFileError,
+            RuntimeError,
+            DelayedImportError
+        )
+
+        try:
+            img = tifffile.imread(files=path)
+            img = img[..., :3]
+
+            if str(object=img.dtype) != "uint8":
+                img = (img/256).astype(dtype="uint8")
+            return img
+
+        except errs as e:
+            return None
+    
+    @classmethod
+    def read_tiff_pil(cls, path: str) -> np.ndarray | None:
+
+        try:
+            img = Image.open(path)
+            img = img.convert("RGB")
+            img = np.array(img)
+            return img
+
+        except Exception as e:
+            return None
+
+    @classmethod
+    def read_psd_pil(cls, path: str) -> np.ndarray | None:
+
+        try:
+            img = Image.open(path)
+            img = img.convert("RGB")
+            img = np.array(img)
+            return img
+
+        except Exception as e:
+            return None
+
+    @classmethod
+    def read_psd_tools(cls, path: str) -> np.ndarray | None:
+
+        try:
+            img = psd_tools.PSDImage.open(fp=path)
+            img = img.composite()
+            img = np.array(img)
+            img = img[..., :3]
+            return img
+
+        except Exception as e:
+            return None
+
+    @classmethod
+    def read_png_pil(cls, path: str) -> np.ndarray | None:
+        try:
+            img = Image.open(path)
+
+            if img.mode == "RGBA":
+                white_background = Image.new("RGBA", img.size, (255, 255, 255))
+                img = Image.alpha_composite(white_background, img)
+
+            img = img.convert("RGB")
+            img = np.array(img)
+            return img
+
+        except Exception as e:
+            print("error read png pil", str)
+            return None
+
+    @classmethod
+    def read_png_cv2(cls, path: str) -> np.ndarray | None:
+        try:
+            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # Чтение с альфа-каналом
+
+            if image.shape[2] == 4:
+                alpha_channel = image[:, :, 3] / 255.0
+                rgb_channels = image[:, :, :3]
+                background_color = np.array([255, 255, 255], dtype=np.uint8)
+                background = np.full(
+                    rgb_channels.shape, background_color, dtype=np.uint8
+                )
+                converted = (
+                    rgb_channels * alpha_channel[:, :, np.newaxis] +
+                    background * (1 - alpha_channel[:, :, np.newaxis])
+                ).astype(np.uint8)
+
+            else:
+                converted = image
+
+            return converted
+
+        except Exception as e:
+            print("error read png cv2", path)
+            return None
+
+    @classmethod
+    def read_jpg_pil(cls, path: str) -> np.ndarray | None:
+
+        try:
+            img = Image.open(path)
+            img = np.array(img)
+            return img
+
+        except Exception as e:
+            return None
+
+    @classmethod
+    def read_jpg_cv2(cls, path: str) -> np.ndarray | None:
+
+        try:
+            return cv2.imread(path, cv2.IMREAD_UNCHANGED)
+
+        except (Exception, cv2.error) as e:
+            return None
+
+    @classmethod
+    def read_raw(cls, path: str) -> np.ndarray | None:
+        try:
+            return rawpy.imread(path).postprocess()
+
+        except rawpy._rawpy.LibRawDataError as e:
+            return None
+
+    @classmethod
+    def read_image(cls, full_src: str) -> np.ndarray | None:
+        _, ext = os.path.splitext(full_src)
+        ext = ext.lower()
+
+        data = {
+            ".psb": cls.read_psd_tools,
+            ".psd": cls.read_psd_tools,
+
+            ".tif": cls.read_tiff_tifffile,
+            ".tiff": cls.read_tiff_tifffile,
+
+            ".nef": cls.read_raw,
+            ".cr2": cls.read_raw,
+            ".cr3": cls.read_raw,
+            ".arw": cls.read_raw,
+            ".raf": cls.read_raw,
+
+            ".jpg": cls.read_jpg_pil,
+            ".jpeg": cls.read_jpg_pil,
+            "jfif": cls.read_jpg_pil,
+
+            ".png": cls.read_png_pil,
+        }
+
+        data_none = {
+            ".tif": cls.read_tiff_pil,
+            ".tiff": cls.read_tiff_pil,
+            ".psd": cls.read_psd_tools,
+            ".jpg": cls.read_jpg_cv2,
+            ".jpeg": cls.read_jpg_cv2,
+            "jfif": cls.read_jpg_cv2,
+            ".png": cls.read_png_cv2,
+        }
+
+        img = None
+
+        # если есть подходящее расширение то читаем файл
+        if data.get(ext):
+            img = data.get(ext)(full_src)
+
+        else:
+            return None
+
+        # если прочитать не удалось, то пытаемся прочесть запасными функциями
+        if img is None:
+            img = data_none.get(ext)
+
+        # либо None либо ndarray изображение
+        return img
+
+
+class Hash:
+
+    @classmethod
+    def create_full_hash(cls, full_src: str) -> str:
+        new_name = hashlib.md5(full_src.encode('utf-8')).hexdigest() + ".jpg"
+        
+        new_folder = os.path.join(Static.HASH_DIR, new_name[:2])
+        os.makedirs(new_folder, exist_ok=True)
+
+        return os.path.join(new_folder, new_name)
+
+    @classmethod
+    def get_short_hash(cls, full_hash: str):
+        return full_hash.replace(Static.APP_SUPPORT_DIR, "")
+    
+    @classmethod
+    def get_full_hash(cls, short_hash: str):
+        return Static.APP_SUPPORT_DIR + short_hash
+
+    @classmethod
+    def write_image_hash(cls, output_path: str, array_img: np.ndarray) -> bool:
+        try:
+            img = cv2.cvtColor(array_img, cv2.COLOR_BGR2RGB)
+            cv2.imwrite(output_path, img)
+            return True
+        except Exception as e:
+            print("error write image hash")
+            return False
+
+    @classmethod
+    def read_image_hash(cls, src: str) -> np.ndarray | None:
+        try:
+            img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        except Exception as e:
+            print("read img hash error:", src)
+            return None
+
+
+class Pixmap:
+
+    @classmethod
+    def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
+
+        if isinstance(image, np.ndarray) and QApplication.instance():
+            height, width, channel = image.shape
+            bytes_per_line = channel * width
+            qimage = QImage(
+                image.tobytes(),
+                width,
+                height,
+                bytes_per_line,
+                QImage.Format.Format_RGB888
+            )
+            return QPixmap.fromImage(qimage)
+
+        else:
+            return None
+
+    @classmethod
+    def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
+
+        return pixmap.scaled(
+            size,
+            size,
+            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+            transformMode=Qt.TransformationMode.SmoothTransformation
+        )
+
+class Utils(Hash, Pixmap, ReadImage):
 
     @classmethod
     def get_coll_folder(cls, brand_ind: int) -> str | None:
@@ -117,41 +373,6 @@ class Utils:
         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @classmethod
-    def create_full_hash(cls, full_src: str) -> str:
-        new_name = hashlib.md5(full_src.encode('utf-8')).hexdigest() + ".jpg"
-        
-        new_folder = os.path.join(Static.HASH_DIR, new_name[:2])
-        os.makedirs(new_folder, exist_ok=True)
-
-        return os.path.join(new_folder, new_name)
-
-    @classmethod
-    def get_short_hash(cls, full_hash: str):
-        return full_hash.replace(Static.APP_SUPPORT_DIR, "")
-    
-    @classmethod
-    def get_full_hash(cls, short_hash: str):
-        return Static.APP_SUPPORT_DIR + short_hash
-
-    @classmethod
-    def write_image_hash(cls, full_hash: str, array_img: np.ndarray) -> bool:
-        try:
-            cv2.imwrite(full_hash, array_img)
-            return True
-        except Exception as e:
-            cls.print_err(error=e)
-            return False
-        
-    @classmethod
-    def read_image_hash(cls, full_hash: str) -> np.ndarray | None:
-        try:
-            array_img = cv2.imread(full_hash, cv2.IMREAD_UNCHANGED)
-            return cls.array_color(array_img, "BGR")
-        except Exception as e:
-            cls.print_err(error=e)
-            return None
-
-    @classmethod
     def get_f_size(cls, bytes_size: int) -> str:
         if bytes_size < 1024:
             return f"{bytes_size} байт"
@@ -168,141 +389,6 @@ class Utils:
     def get_f_date(cls, timestamp_: int) -> str:
         date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
         return date.strftime("%d.%m.%Y %H:%M")
-
-    @classmethod
-    def read_tiff_tifffile(cls, path: str) -> np.ndarray | None:
-        try:
-            img = tifffile.imread(files=path)[:,:,:3]
-            if str(object=img.dtype) != "uint8":
-                img = (img/256).astype(dtype="uint8")
-            return img
-        except (Exception, tifffile.TiffFileError, RuntimeError, DelayedImportError) as e:
-            cls.print_error(cls, e)
-            print("try open tif with PIL")
-            return cls.read_tiff_pil(path)
-    
-    @classmethod
-    def read_tiff_pil(cls, path: str) -> np.ndarray | None:
-        try:
-            print("PIL: try open tif")
-            img: Image = Image.open(path)
-            # return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-            return np.array(img)
-        except Exception as e:
-            Utils.print_error(parent=cls, error=e)
-            return None
-
-    @classmethod
-    def read_psd_pil(cls, path: str) -> np.ndarray | None:
-        try:
-            img = Image.open(path)
-            if img.mode == 'RGBA':
-                img = img.convert('RGB')
-            img = np.array(img)
-            return img
-        except Exception as e:
-            cls.print_error(cls, e)
-            return None
-
-    @classmethod
-    def read_psd_tools(cls, path: str) -> np.ndarray | None:
-        try:
-            img = psd_tools.PSDImage.open(fp=path)
-            img = img.composite()
-            if img.mode == 'RGBA':
-                img = img.convert('RGB')
-            img = np.array(img)
-            return img
-        except Exception as e:
-            cls.print_error(cls, e)
-            return None
-
-    @classmethod
-    def read_png_pil(cls, path: str) -> np.ndarray | None:
-        try:
-            img = Image.open(path)
-
-            if img.mode == "RGBA":
-                white_background = Image.new("RGBA", img.size, (255, 255, 255))
-                img = Image.alpha_composite(white_background, img)
-                img = img.convert("RGB")
-
-            img_array = np.array(img)
-
-            return img_array
-        except Exception as e:
-            cls.print_error(cls, e)
-            return None
-
-    @classmethod
-    def read_png_cv2(cls, path: str) -> np.ndarray | None:
-        try:
-            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # Чтение с альфа-каналом
-
-            if image.shape[2] == 4:
-                alpha_channel = image[:, :, 3] / 255.0
-                rgb_channels = image[:, :, :3]
-                background_color = np.array([255, 255, 255], dtype=np.uint8)
-                background = np.full(rgb_channels.shape, background_color, dtype=np.uint8)
-                converted = (rgb_channels * alpha_channel[:, :, np.newaxis] + background * (1 - alpha_channel[:, :, np.newaxis])).astype(np.uint8)
-            else:
-                converted = image
-
-            converted = cv2.cvtColor(converted, cv2.COLOR_BGR2RGB)
-            return converted
-        except Exception as e:
-            cls.print_error(cls, e)
-            return None
-
-    @classmethod
-    def read_jpg(cls, path: str) -> np.ndarray | None:
-        try:
-            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # Чтение с альфа-каналом
-            # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            return image
-        except (Exception, cv2.error) as e:
-            cls.print_error(cls, e)
-            return None
-
-    @classmethod
-    def read_raw(cls, path: str) -> np.ndarray | None:
-        try:
-            img = rawpy.imread(path).postprocess()
-            # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-            return img
-        except (rawpy._rawpy.LibRawDataError) as e:
-            cls.print_error(cls, e)
-            return None
-
-    @classmethod
-    def read_image(cls, full_src: str) -> np.ndarray | None:
-        src_lower: str = full_src.lower()
-
-        if src_lower.endswith((".psd", ".psb")):
-            img = cls.read_psd_pil(full_src)
-
-            if img is None:
-                img = cls.read_psd_tools(full_src)
-
-        elif src_lower.endswith((".tiff", ".tif")):
-            img = cls.read_tiff_tifffile(full_src)
-
-        elif src_lower.endswith((".jpg", ".jpeg", "jfif")):
-            img = cls.read_jpg(full_src)
-
-        elif src_lower.endswith((".png")):
-            img = cls.read_png_pil(full_src)
-
-            if img is None:
-                img = cls.read_png_cv2(full_src)
-
-        elif src_lower.endswith((".nef", ".cr2", ".cr3", ".arw", ".raf")):
-            img = cls.read_raw(full_src)
-
-        else:
-            img = None
-
-        return img
     
     @classmethod
     def array_color(cls, img: np.ndarray, flag: str) -> np.ndarray:
@@ -316,30 +402,7 @@ class Utils:
         try:
             return cv2.cvtColor(img, colors)
         except Exception as e:
-            print("array_color")
-            # cls.print_err(error=e)
-
-    @classmethod
-    def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
-        height, width, channel = image.shape
-        bytes_per_line = channel * width
-        qimage = QImage(
-            image.tobytes(),
-            width, 
-            height,
-            bytes_per_line, 
-            QImage.Format.Format_RGB888
-        )
-        return QPixmap.fromImage(qimage)
-
-    @classmethod
-    def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
-        return pixmap.scaled(
-            size,
-            size,
-            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-            transformMode=Qt.TransformationMode.SmoothTransformation
-            )
+            print("error array_color")
         
     @classmethod
     def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:

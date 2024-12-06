@@ -95,8 +95,8 @@ class LoadImage(URunnable):
         
             img = Utils.read_image(full_src=self.full_src)
 
-            if not self.full_src.endswith(Static.LAYERS_EXT):
-                img = Utils.array_color(img, "BGR")
+            # if not self.full_src.endswith(Static.LAYERS_EXT):
+            #     img = Utils.array_color(img, "BGR")
 
             if img is not None:
                 self.pixmap = Utils.pixmap_from_array(img)
