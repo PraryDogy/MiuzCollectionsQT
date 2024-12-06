@@ -255,7 +255,7 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinChild):
-    count_limit = 10
+    task_count_limit = 10
 
     def __init__(self, short_src: str):
         super().__init__()
@@ -362,7 +362,7 @@ class WinImageView(WinChild):
         self.next_image_btn.hide()
 
     def switch_image(self, offset):
-        if self.task_count == WinImageView.count_limit:
+        if self.task_count == WinImageView.task_count_limit:
             return
 
         # мы формируем актуальный список src из актуальной сетки изображений
