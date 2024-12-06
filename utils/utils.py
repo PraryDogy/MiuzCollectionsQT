@@ -389,21 +389,7 @@ class Utils(Hash, Pixmap, ReadImage):
     def get_f_date(cls, timestamp_: int) -> str:
         date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
         return date.strftime("%d.%m.%Y %H:%M")
-    
-    @classmethod
-    def array_color(cls, img: np.ndarray, flag: str) -> np.ndarray:
-
-        if flag == "RGB":
-            colors = cv2.COLOR_RGB2BGR
-        elif flag == "BGR":
-            colors = cv2.COLOR_BGR2RGB
-        else:
-            raise Exception("utils image utils array color wrong flag", flag)
-        try:
-            return cv2.cvtColor(img, colors)
-        except Exception as e:
-            print("error array_color")
-        
+            
     @classmethod
     def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:
         try:
