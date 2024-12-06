@@ -17,7 +17,7 @@ from .utils import URunnable, UThreadPool, Utils
 class Brand:
     all_: list["Brand"] = []
     curr: "Brand" = None
-    __slots__ = ["name", "ind", "collfolder"]
+    # __slots__ = ["name", "ind", "collfolder"]
 
     def __init__(self, name: str, ind: int, collfolder: str):
         super().__init__()
@@ -126,9 +126,9 @@ class FinderImages:
         stats = entry.stat()
         return (
             entry.path,
-            stats.st_size,
-            stats.st_birthtime,
-            stats.st_mtime,
+            int(stats.st_size),
+            int(stats.st_birthtime),
+            int(stats.st_mtime),
         )
 
 
@@ -181,9 +181,23 @@ class Compator:
         self.ins_items: list[tuple[str, int, int, int]] = []
 
     def get_result(self):
+        
+
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+        finder_images = sorted(self._finder_images)
+        db_values = list(self._db_images.values())
+        db_values = sorted(db_values)
+
+        print(finder_images[0])
+        print(db_values[0])
+
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
         for short_hash, db_item in self._db_images.items():
 
             if not db_item in self._finder_images:
+
                 self.del_items.append(short_hash)
 
         _db_images = list(self._db_images.values())
@@ -223,19 +237,21 @@ class DbUpdater:
 
     def del_db(self, del_items: list[str]):
         if del_items:
-            from cfg import Dynamic
 
-            for i in (Brand.curr, Brand.all, JsonData, Dynamic):
-                data = self.get_dict_data(i)
-                print(data)
+            # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+            print(len(del_items))
 
             print("do you want delete? press 1 to yes")
             user_inp = input()
             if user_inp != "1":
                 print("don't delete")
+                from PyQt5.QtWidgets import QApplication
+                QApplication.exit()
+                quit()
                 return
 
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
         conn = Dbase.engine.connect()
 
