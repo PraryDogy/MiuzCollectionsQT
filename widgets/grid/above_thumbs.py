@@ -98,7 +98,7 @@ class ErrorTitle(QWidget):
         self.v_layout.addWidget(h_wid)
 
         enabled_filters = [
-            filter.names[JsonData.lang_ind]
+            filter.names[JsonData.lang_ind].lower()
             for filter in Filters.current
             if filter.value
             ]
@@ -171,6 +171,7 @@ class FilterTitle(QWidget):
             self.v_layout.addSpacerItem(spacer)
 
         elif Dynamic.search_widget_text:
+
             title.setText(f"{Lang.search}: {Dynamic.search_widget_text}")
             h_layout.addWidget(ResetSearchBtn())
             h_layout.addSpacerItem(QSpacerItem(1, 30))
