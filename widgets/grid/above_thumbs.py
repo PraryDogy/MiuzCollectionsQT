@@ -158,6 +158,7 @@ class FilterTitle(QWidget):
         self.v_layout.addWidget(h_wid)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
+
             t = [
                 f"{Lang.photos_named_dates}: ",
                 f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
