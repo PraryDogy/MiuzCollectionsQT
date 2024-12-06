@@ -98,6 +98,8 @@ class DbImages(URunnable):
         print("widgets > grid > _db_images > create_dict")
         print("can't load image from hash_path, removing from db..")
 
+        return
+
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.delete(THUMBS)
