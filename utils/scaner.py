@@ -181,18 +181,6 @@ class Compator:
         self.ins_items: list[tuple[str, int, int, int]] = []
 
     def get_result(self):
-        
-
-        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
-        finder_images = sorted(self._finder_images)
-        db_values = list(self._db_images.values())
-        db_values = sorted(db_values)
-
-        print(finder_images[0])
-        print(db_values[0])
-
-        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
         for short_hash, db_item in self._db_images.items():
 
@@ -226,36 +214,14 @@ class DbUpdater:
         self.insert_db(queries=queries)
         self.insert_images(queries=queries)
 
-    def get_dict_data(self, clas: object):
-        return {
-            k: v
-            for k, v in vars(clas).items()
-            if not k.startswith("__")
-            and
-            not callable(getattr(clas, k))
-        }
-
     def del_db(self, del_items: list[str]):
-        if del_items:
-
-            # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
-            print(len(del_items))
-
-            print("do you want delete? press 1 to yes")
-            user_inp = input()
-            if user_inp != "1":
-                print("don't delete")
-                from PyQt5.QtWidgets import QApplication
-                QApplication.exit()
-                quit()
-                return
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
         conn = Dbase.engine.connect()
 
         for short_hash in del_items:
+
+            if not ScanerTools.can_scan:
+                return
+        
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==short_hash)
 
@@ -281,6 +247,9 @@ class DbUpdater:
         total = len(del_items)
 
         for x, short_hash in enumerate(del_items, start=1):
+
+            if not ScanerTools.can_scan:
+                return
 
             full_hash = Utils.get_full_hash(short_hash)
 
@@ -362,6 +331,9 @@ class DbUpdater:
 
         for query in queries.keys():
 
+            if not ScanerTools.can_scan:
+                return
+
             try:
                 conn.execute(query)
 
@@ -384,6 +356,9 @@ class DbUpdater:
         total = len(queries)
 
         for x, (full_hash, img_array) in enumerate(queries.values(), start=1):
+
+            if not ScanerTools.can_scan:
+                return
 
             self.progressbar_text(text=Lang.adding, x=x, total=total)
             Utils.write_image_hash(full_hash, img_array)
