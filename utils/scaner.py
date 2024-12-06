@@ -223,11 +223,11 @@ class DbUpdater:
 
     def del_db(self, del_items: list[str]):
         if del_items:
-            print(self.get_dict_data(Brand.curr))
-            print(self.get_dict_data(Brand.all))
-            print(self.get_dict_data(JsonData))
             from cfg import Dynamic
-            print(self.get_dict_data(Dynamic))
+
+            for i in (Brand.curr, Brand.all, JsonData, Dynamic):
+                data = self.get_dict_data(i)
+                print(data)
 
             print("do you want delete? press 1 to yes")
             user_inp = input()
