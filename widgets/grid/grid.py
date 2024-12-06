@@ -144,11 +144,18 @@ class Grid(QScrollArea):
             self.row += 1
             return
 
+        # spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        # self.grid_lay.addItem(spacer, self.row, self.col)
+
         filter_title = FilterTitle()
-        filter_title.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col + 1)
-        # добавляем новую строку так как это заголовок
-        self.row += 1
+        self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
+
+        # self.col += 1
+        # spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        # self.grid_lay.addItem(spacer, self.row, self.col)
+
+        # self.col = 0
+        # self.row += 1
 
         Thumbnail.calculate_size()
         for date, db_images in db_images.items():
@@ -311,7 +318,7 @@ class Grid(QScrollArea):
             assert isinstance(self, Grid)
 
             wid = self.get_curr_cell()
-            src = wid.short_src if wid else None
+            src = wid.short_src if isinstance(wid, Thumbnail) else None
 
             func(self, *args, **kwargs)
 

@@ -213,6 +213,20 @@ class DbUpdater:
         self.insert_images(queries=queries)
 
     def del_db(self, del_items: list[str]):
+        if del_items:
+            print(Brand.curr)
+            print(Brand.all_)
+            print(JsonData.__dict__)
+            from cfg import Dynamic
+            print(Dynamic.__dict__)
+
+            print("do you want delete? press 1 to yes")
+            user_inp = input()
+            if user_inp != "1":
+                print("don't delete")
+                return
+
+
 
         conn = Dbase.engine.connect()
 
