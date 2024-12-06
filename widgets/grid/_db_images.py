@@ -251,11 +251,11 @@ class DbImages(URunnable):
         start = datetime.combine(
             Dynamic.date_start,
             datetime.min.time()
-            )
+        )
 
         end = datetime.combine(
             Dynamic.date_end,
             datetime.max.time().replace(microsecond=0)
-            )
+        )
 
         return datetime.timestamp(start), datetime.timestamp(end)
