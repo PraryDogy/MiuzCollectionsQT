@@ -12,9 +12,7 @@ BTN_W = 120
 class ResetBtn(QPushButton):
     def __init__(self, text: str):
         super().__init__(text=text)
-
         self.setFixedWidth(BTN_W)
-        # self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
 class ResetDatesBtn(ResetBtn):
@@ -106,31 +104,36 @@ class ErrorTitle(QWidget):
             ]
 
         if Dynamic.search_widget_text:
-            noimg_t = (f"{Lang.no_photo} {Lang.with_name}: "
-                       f"{Dynamic.search_widget_text}")
 
+            noimg_t = [
+                f"{Lang.no_photo} {Lang.with_name}: ",
+                f"{Dynamic.search_widget_text}"
+            ]
+            noimg_t = "".join(noimg_t)
             title.setText(noimg_t)
-
             s_label = ResetSearchBtn()
             h_layout.addWidget(s_label)
 
         elif any((Dynamic.date_start, Dynamic.date_end)):
-            noimg_t = (f"{Lang.no_photo}: "
-                       f"{Dynamic.f_date_start} - {Dynamic.f_date_end}")
 
+            noimg_t = [
+                f"{Lang.no_photo}: ",
+                f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
+            ]
+            noimg_t = "".join(noimg_t)
             title.setText(noimg_t)
             h_layout.addWidget(ResetDatesBtn())
 
         elif enabled_filters:
 
             enabled_filters = ", ".join(enabled_filters)
-
-            noimg_t = (f"{Lang.no_photo_filter}: {enabled_filters}")
-
+            noimg_t = f"{Lang.no_photo_filter}: {enabled_filters}"
             title.setText(noimg_t)
             h_layout.addWidget(ResetFiltersBtn())
         
         else:
+
+            title.setText(Lang.no_photo)
             h_layout.addWidget(ShowAllBtn())
 
 
