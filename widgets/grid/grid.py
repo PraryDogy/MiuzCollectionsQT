@@ -1,20 +1,19 @@
 import os
-from functools import wraps
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
-from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QScrollArea,
-                             QSizePolicy, QSpacerItem, QWidget)
+from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QPushButton,
+                             QScrollArea, QSizePolicy, QWidget)
 
-from base_widgets import ContextCustom, LayoutVer, SvgBtn
-from cfg import Dynamic, JsonData, Static
+from base_widgets import ContextCustom, LayoutHor, LayoutVer, SvgBtn
+from cfg import Dynamic, Filters, JsonData, Static
+from lang import Lang
 from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
 
 from ..actions import MenuTypes, OpenWins, ScanerRestart
 from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
-from .above_thumbs import ErrorTitle, FilterTitle
 from .cell_widgets import CellWid, Thumbnail, Title
 
 UP_SVG = os.path.join(Static.IMAGES, "up.svg")
@@ -22,6 +21,135 @@ UP_STYLE = f"""
     background: rgba(125, 125, 125, 0.5);
     border-radius: 22px;
 """
+BTN_W = 120
+
+
+class ResetBtn(QPushButton):
+    def __init__(self, text: str):
+        super().__init__(text=text)
+        self.setFixedWidth(BTN_W)
+
+
+class ResetDatesBtn(ResetBtn):
+    def __init__(self):
+        super().__init__(text=Lang.reset)
+        self.clicked.connect(self.cmd_)
+
+    def cmd_(self, *args) -> None:
+        Dynamic.date_start, Dynamic.date_end = None, None
+        Dynamic.grid_offset = 0
+
+        SignalsApp.all_.btn_dates_style.emit("normal")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
+
+class ResetSearchBtn(ResetBtn):
+    def __init__(self):
+        super().__init__(text=Lang.reset)
+        self.clicked.connect(self.cmd_)
+
+    def cmd_(self, *args) -> None:
+        Dynamic.grid_offset = 0
+
+        SignalsApp.all_.wid_search_cmd.emit("clear")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
+
+class ResetFiltersBtn(ResetBtn):
+    def __init__(self):
+        super().__init__(text=Lang.reset)
+        self.clicked.connect(self.cmd_)
+
+    def cmd_(self, *args) -> None:
+        Dynamic.grid_offset = 0
+
+        SignalsApp.all_.bar_top_reset_filters.emit()
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
+
+class ShowAllBtn(ResetBtn):
+    def __init__(self):
+        super().__init__(text=Lang.show_all)
+        self.clicked.connect(self.cmd_)
+
+    def cmd_(self, *args) -> None:
+        Dynamic.date_start, Dynamic.date_end = None, None
+        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
+        Dynamic.grid_offset = 0
+
+        SignalsApp.all_.wid_search_cmd.emit("clear")
+        SignalsApp.all_.bar_top_reset_filters.emit()
+
+        SignalsApp.all_.win_main_cmd.emit("set_title")
+        SignalsApp.all_.menu_left_cmd.emit("select_all_colls")
+
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
+
+class ErrorTitle(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred
+        )
+
+        self.v_layout = LayoutVer()
+        self.v_layout.setSpacing(5)
+        self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setLayout(self.v_layout)
+
+        title = QLabel()
+        title.setStyleSheet(Static.TITLE_NORMAL)
+        self.v_layout.addWidget(title)
+
+        h_wid = QWidget()
+        h_layout = LayoutHor()
+        h_wid.setLayout(h_layout)
+        self.v_layout.addWidget(h_wid)
+
+        enabled_filters = [
+            filter.names[JsonData.lang_ind].lower()
+            for filter in Filters.current
+            if filter.value
+            ]
+
+        if Dynamic.search_widget_text:
+
+            noimg_t = [
+                f"{Lang.no_photo} {Lang.with_name}: ",
+                f"{Dynamic.search_widget_text}"
+            ]
+            noimg_t = "".join(noimg_t)
+            title.setText(noimg_t)
+            h_layout.addWidget(ResetSearchBtn())
+
+        elif any((Dynamic.date_start, Dynamic.date_end)):
+
+            noimg_t = [
+                f"{Lang.no_photo}: ",
+                f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
+            ]
+            noimg_t = "".join(noimg_t)
+            title.setText(noimg_t)
+            h_layout.addWidget(ResetDatesBtn())
+
+        elif enabled_filters:
+
+            enabled_filters = ", ".join(enabled_filters)
+            noimg_t = f"{Lang.no_photo_filter}: {enabled_filters}"
+            title.setText(noimg_t)
+            h_layout.addWidget(ResetFiltersBtn())
+        
+        else:
+
+            title.setText(Lang.no_photo)
+            h_layout.addWidget(ShowAllBtn())
 
 
 class UpBtn(QFrame):
