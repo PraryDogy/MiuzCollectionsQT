@@ -1,5 +1,6 @@
 import os
-from functools import wraps
+from collections import defaultdict
+from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
@@ -25,7 +26,7 @@ UP_STYLE = f"""
 
 
 class UpBtn(QFrame):
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setFixedSize(44, 44)
         self.setStyleSheet(UP_STYLE)
@@ -59,18 +60,15 @@ class Grid(QScrollArea):
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
 
-        self.curr_cell: tuple = (0, 0)
-        self.cell_to_wid: dict[tuple, Thumbnail] = {}
+        # self.curr_cell: tuple = (0, 0)
+        # self.cell_to_wid: dict[tuple, Thumbnail] = {}
 
-        scroll_wid = QWidget(parent=self)
-        self.setWidget(scroll_wid)
-        
-        self.scroll_layout = LayoutVer()
-        scroll_wid.setLayout(self.scroll_layout)
+        # для rearrange чтобы перетасовывать сетку
+        self.grids: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
 
-        self.up_btn = UpBtn(scroll_wid)
-        self.up_btn.hide()
-        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
+        # для навигации по сетке клавишами, мышью и из ImgViewer
+        self.thumbs: list[Thumbnail] = []
+        self.current_thumb: Thumbnail = None
 
         self.signals_cmd(flag="reload")
 
@@ -78,7 +76,12 @@ class Grid(QScrollArea):
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
 
-    def signals_cmd(self, flag: str):
+        # parent неверный
+        self.up_btn = UpBtn(self)
+        self.up_btn.hide()
+        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
+
+    def signals_cmd(self, flag: Literal["resize", "to_top", "reload"]):
         if flag == "resize":
             self.resize_thumbnails()
         elif flag == "to_top":
@@ -90,8 +93,7 @@ class Grid(QScrollArea):
         
         self.setFocus()
 
-    def load_db_images(self, flag: str):
-        """flag: first, more"""
+    def load_db_images(self, flag: Literal["first", "more"]):
 
         if flag == "first":
             Dynamic.grid_offset = 0
@@ -110,62 +112,78 @@ class Grid(QScrollArea):
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
 
-        if hasattr(self, "grid_wid"):
-            self.grid_wid.deleteLater()
+        if hasattr(self, "main_wid"):
+            self.main_wid.deleteLater()
 
-        self.deselect_wid()
-        self.reset_grid_data()
-        self.up_btn.hide()
+        self.main_wid = QWidget()
+        self.setWidget(self.main_wid)
+        
+        self.main_lay = LayoutVer()
+        self.main_wid.setLayout(self.main_lay)
 
-        self.grid_wid = QWidget()
-        self.scroll_layout.addWidget(self.grid_wid)
+        self.reset_grids_data()
 
-        self.grid_lay = QGridLayout()
-        self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-        self.grid_wid.setLayout(self.grid_lay)
 
-        max_col = self.get_max_col()
+        # self.deselect_wid()
+        # self.reset_grid_data()
+        # self.up_btn.hide()
 
-        if not db_images:
+        # self.grid_wid = QWidget()
+        # self.main_lay.addWidget(self.grid_wid)
 
-            spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
-            self.grid_lay.addItem(spacer, self.row, self.col)
+        # self.grid_lay = QGridLayout()
+        # self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        # self.grid_wid.setLayout(self.grid_lay)
 
-            self.col += 1
-            error_title = ErrorTitle()
-            self.grid_lay.addWidget(error_title, self.row, self.col)
-            # добавляем новую строку так как это заголовок
+        # max_col = self.get_max_col()
 
-            self.col += 1
-            spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
-            self.grid_lay.addItem(spacer, self.row, self.col)
+        # if not db_images:
 
-            self.col = 0
-            self.row += 1
-            return
+        #     spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        #     self.grid_lay.addItem(spacer, self.row, self.col)
 
-        filter_title = FilterTitle()
-        filter_title.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
-        self.row += 1
+        #     self.col += 1
+        #     error_title = ErrorTitle()
+        #     self.grid_lay.addWidget(error_title, self.row, self.col)
+        #     # добавляем новую строку так как это заголовок
+
+        #     self.col += 1
+        #     spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        #     self.grid_lay.addItem(spacer, self.row, self.col)
+
+        #     self.col = 0
+        #     self.row += 1
+        #     return
+
+        # filter_title = FilterTitle()
+        # filter_title.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        # self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
+        # self.row += 1
 
         Thumbnail.calculate_size()
+
         for date, db_images in db_images.items():
             self.single_grid(date, db_images)
 
+        self.current_thumb = self.thumbs[0]
+
     def single_grid(self, date: str, db_images: list[DbImage]):
-        max_col = self.get_max_col()
 
-        # сбрасываем колонку потому что title всего в колонке 0
-        self.col = 0
         title = Title(title=date, db_images=db_images)
-        title.r_click.connect(self.deselect_wid)
-        self.set_cell_coords(title)
-        self.grid_lay.addWidget(title, self.row, self.col, 1, max_col)
-        # прибавляем 1 строку после title
-        self.row += 1
+        title.r_click.connect(self.deselect_current_thumb)
+        self.main_lay.addWidget(title)
 
-        for db_image in db_images:
+        grid_wid = QWidget()
+        self.main_lay.addWidget(grid_wid)
+
+        flags = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+        grid_lay = QGridLayout()
+        grid_lay.setAlignment(flags)
+        grid_wid.setLayout(grid_lay)
+
+        row, col = 0, 0
+
+        for x, db_image in enumerate(db_images):
 
             wid = Thumbnail(
                 pixmap=db_image.pixmap,
@@ -173,105 +191,70 @@ class Grid(QScrollArea):
                 coll=db_image.coll,
                 fav=db_image.fav
             )
+
             wid.select.connect(lambda w=wid: self.select_wid(w))
-            self.set_cell_coords(wid)
-            self.set_path_to_wid(wid)
-            self.grid_lay.addWidget(wid, self.row, self.col)
 
-            # прибавляем колонку после установки виджета
-            self.col += 1
+            self.add_to_path_to_wid(wid)
+            self.add_to_grids(grid=grid_lay, wid=wid)
 
-            # если достигнут максимум колонок, прибавляем строку и сброс колонки
-            if self.col >= max_col:
-                self.col = 0
-                self.row += 1
+            grid_lay.addWidget(wid, row, col)
 
-        # в конце мы добавляем строку и сбрасываем колонку как отсечку
-        # этой сетки от остальных
-        self.row += 1
-        self.col = 0
+            col += 1
+            if col >= self.max_col:
+                col = 0
+                row += 1
+
+    def add_to_grids(self, grid: QGridLayout, wid: Thumbnail):
+        self.grids[grid].append(wid)
+        self.thumbs.append(wid)
 
     def grid_more(self, db_images: dict[str, list[DbImage]]):
-        if db_images:
-            for date, db_images in db_images.items():
-                self.single_grid(date, db_images)
+        for date, db_images in db_images.items():
+            self.single_grid(date, db_images)
 
-    def set_curr_sell(self, coords: tuple):
-        self.curr_cell = coords
-
-    def get_curr_cell(self):
-        return self.cell_to_wid.get(self.curr_cell)
-    
-    def get_cell(self, coords: tuple):
-        return self.cell_to_wid.get(coords)
-
-    def set_cell_coords(self, wid: CellWid):
-        coords = self.row, self.col
-        self.cell_to_wid[coords] = wid
-        wid.row, wid.col = coords
-
-    def set_path_to_wid(self, wid: Thumbnail):
+    def add_to_path_to_wid(self, wid: Thumbnail):
         Thumbnail.path_to_wid[wid.short_src] = wid
 
-    def get_path_to_wid(self, src: str):
+    def get_from_path_to_wid(self, src: str):
         return Thumbnail.path_to_wid.get(src)
 
-    def reset_grid_data(self):
-        self.cell_to_wid.clear()
-        Thumbnail.path_to_wid.clear()
-        self.row, self.col = 0, 0
-        self.curr_cell = (0, 0)
+    def select_wid(self, obj: str | int | Thumbnail):
 
-    def select_wid(self, data: tuple | str | Thumbnail):
-        if isinstance(data, Thumbnail):
-            coords = data.row, data.col
-            new_wid = data
+        new_wid = None
 
-        elif isinstance(data, tuple):
-            coords = data
-            new_wid = self.get_cell(coords)
+        if isinstance(obj, str):
+            new_wid = self.get_from_path_to_wid(src=obj)
 
-        elif isinstance(data, str):
-            new_wid = self.get_path_to_wid(src=data)
-            coords = new_wid.row, new_wid.col
+        elif isinstance(obj, int):
 
-        # вычисляем это движение вверх или вниз
-        if self.curr_cell > coords:
-            offset = -1
-        else:
-            offset = 1
+            if len(self.thumbs) > obj > -1:
+                new_wid = self.thumbs[obj]
 
-        # если виджет по движению не найден, пробуем назначить новую строку
-        if not new_wid:
-            coords = (coords[0] + offset, 0)
-            new_wid = self.get_cell(coords)
-
-        # если это заголовок, прибавляем/убавляем строку чтобы пропустить его
-        if isinstance(new_wid, Title):
-            coords = (data[0] + offset, data[1])
-            new_wid = self.get_cell(coords)
-
-        if isinstance(new_wid, Thumbnail):
-            self.deselect_wid()
-            new_wid.selected_style()
+        if new_wid:
+            self.deselect_current_thumb()
+            self.set_current_thumb(new_wid)
+            self.select_current_thumb()
             self.ensureWidgetVisible(new_wid)
-
-            self.set_curr_sell(coords)
 
             if isinstance(BarBottom.path_label, QLabel):
                 t = f"{new_wid.collection}: {new_wid.name}"
                 BarBottom.path_label.setText(t)
 
-            return new_wid
+            # return new_wid
 
-        return None
+        # return None
 
-    def deselect_wid(self):
+    def get_current_thumb(self):
+        return self.current_thumb
 
-        wid = self.get_curr_cell()
-        if isinstance(wid, Thumbnail | Title):
-            wid.regular_style()
+    def set_current_thumb(self, thumb: Thumbnail):
+        self.current_thumb = thumb
 
+    def select_current_thumb(self):
+        self.current_thumb.selected_style()
+
+    def deselect_current_thumb(self):
+        self.current_thumb.regular_style()
         assert isinstance(BarBottom.path_label, QLabel)
         BarBottom.path_label.setText("")
 
@@ -298,70 +281,67 @@ class Grid(QScrollArea):
 
         Thumbnail.calculate_size()
 
-        for thumb in self.grid_wid.findChildren(Thumbnail):
-            thumb.setup()
+        for grid, wid_list in self.grids.items():
+
+            for wid in wid_list:
+                wid.setup()
 
         self.rearrange()
 
-    def reselect_wid(func: callable):
+    # def reselect_wid(func: callable):
 
-        def wrapper(self, *args, **kwargs):
+    #     def wrapper(self, *args, **kwargs):
 
-            assert isinstance(self, Grid)
+    #         assert isinstance(self, Grid)
 
-            wid = self.get_curr_cell()
-            src = wid.short_src if isinstance(wid, Thumbnail) else None
+    #         wid = self.get_curr_cell()
+    #         src = wid.short_src if isinstance(wid, Thumbnail) else None
 
-            func(self, *args, **kwargs)
+    #         func(self, *args, **kwargs)
 
-            if src:
-                wid = self.select_wid(src)  
+    #         if src:
+    #             wid = self.select_wid(src)  
 
-                if wid:
-                    coords = (wid.row, wid.col)
-                    self.set_curr_sell(coords)
+    #             if wid:
+    #                 coords = (wid.row, wid.col)
+    #                 self.set_curr_sell(coords)
 
-        return wrapper
+    #     return wrapper
 
-    @reselect_wid
+    def reset_grids_data(self):
+        self.max_col = self.get_max_col()
+        self.current_path = None
+        Thumbnail.path_to_wid.clear()
+
+    # @reselect_wid
     def rearrange(self):
-        "перетасовка сетки"
 
+        # запрещаем в первую загрузку делать rearrange
         if not hasattr(self, "first_load"):
             setattr(self, "first_load", True)
             return
 
-        # высчитываем новый размер сетки и сбрасываем все данные прошлой сетки 
-        self.deselect_wid()
-        self.reset_grid_data()
+        print("rearrange")
+
         self.ww = self.width()
-        max_col = self.get_max_col()
+        self.reset_grids_data()
 
-        for wid in self.grid_wid.findChildren((Thumbnail, Title)):
+        for grid_lay, thumb_list in self.grids.items():
 
-            if isinstance(wid, Title):
-                # сбрасываем колонку и добавялем новую строчку
-                # чтобы обособить заголовок от предыдущих виджетов
-                self.col = 0
-                self.row += 1
-                self.set_cell_coords(wid)
-                self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
-                self.row += 1
-                # добавляем новую строку после заголовку
-                # для обособления
+            row, col = 0, 0
 
-            elif isinstance(wid, Thumbnail):
-                self.set_cell_coords(wid)
-                self.set_path_to_wid(wid)
-                self.grid_lay.addWidget(wid, self.row, self.col)
-                self.col += 1
-                # добавляем колонку стандартно
+            for wid in thumb_list:
+                grid_lay.addWidget(wid, row, col)
 
-            # если максимум колонок то добавляем новую строчку
-            if self.col >= max_col:
-                self.col = 0
-                self.row += 1        
-            
+                self.add_to_path_to_wid(wid)
+
+                grid_lay.addWidget(wid, row, col)
+
+                col += 1
+                if col >= self.max_col:
+                    col = 0
+                    row += 1
+
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if (
             a0.modifiers() == Qt.KeyboardModifier.ControlModifier
@@ -393,25 +373,23 @@ class Grid(QScrollArea):
             Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down
         ):
 
-            offsets = {
-                Qt.Key.Key_Left: (0, -1),
-                Qt.Key.Key_Right: (0, 1),
-                Qt.Key.Key_Up: (-1, 0),
-                Qt.Key.Key_Down: (1, 0)
+            current_thumb = self.get_current_thumb()
+            current_ind = self.thumbs.index(current_thumb)
+
+            indexes = {
+                Qt.Key.Key_Left: current_ind - 1,
+                Qt.Key.Key_Right: current_ind + 1,
+                Qt.Key.Key_Up: current_ind - self.max_col,
+                Qt.Key.Key_Down: current_ind + self.max_col
             }
 
-            offset = offsets.get(a0.key())
-            coords = (
-                self.curr_cell[0] + offset[0], 
-                self.curr_cell[1] + offset[1]
-            )
-
-            self.select_wid(coords)
+            new_ind = indexes.get(a0.key())
+            self.select_wid(obj=new_ind)
         
         return super().keyPressEvent(a0)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        self.deselect_wid()
+        self.deselect_current_thumb()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.resize_timer.stop()
@@ -420,7 +398,7 @@ class Grid(QScrollArea):
         return super().resizeEvent(a0)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        self.deselect_wid()
+        self.deselect_current_thumb()
         self.menu_ = ContextCustom(event=a0)
 
         reload = ScanerRestart(self.menu_)

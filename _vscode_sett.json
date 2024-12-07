@@ -1,0 +1,7 @@
+{
+    "workbench.colorTheme": "GitHub Dark Default",
+    "editor.minimap.enabled": false,
+    "git.autofetch": true,
+    "editor.rulers": [79],
+    "python.analysis.typeCheckingMode": "strict"
+}

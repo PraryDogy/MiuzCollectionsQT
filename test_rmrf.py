@@ -1,9 +1,1 @@
-from typing import Literal
-
-class Test:
-
-    def run(self, test: Literal["hello"]):
-        ...
-
-
-Test().run(test="hello")
+# короче curr_cell и cells лучше, чем текущая навигация
