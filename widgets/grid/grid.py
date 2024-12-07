@@ -128,28 +128,10 @@ class Grid(QScrollArea):
 
         if not db_images:
 
-            # spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
-            # self.grid_lay.addItem(spacer, self.row, self.col)
-
-            self.col += 1
             error_title = ErrorTitle()
             self.grid_lay.addWidget(error_title, self.row, self.col)
-            # добавляем новую строку так как это заголовок
-
-            # self.col += 1
-            # spacer = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum)
-            # self.grid_lay.addItem(spacer, self.row, self.col)
-
-            self.col = 0
-            self.row += 1
 
         else:
-
-            filter_title = FilterTitle()
-            filter_title.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            self.grid_lay.addWidget(filter_title, self.row, self.col, 1, max_col)
-            self.row += 1
-
             Thumbnail.calculate_size()
             for date, db_images in db_images.items():
                 self.single_grid(date, db_images)
@@ -182,15 +164,19 @@ class Grid(QScrollArea):
             # прибавляем колонку после установки виджета
             self.col += 1
 
-            # если достигнут максимум колонок, прибавляем строку и сброс колонки
             if self.col >= max_col:
                 self.col = 0
                 self.row += 1
 
-        # в конце мы добавляем строку и сбрасываем колонку как отсечку
-        # этой сетки от остальных
-        self.row += 1
-        self.col = 0
+        if not len(db_images) % max_col == 0:
+            self.row += 1
+            self.col = 0
+
+        # 5 - любое число
+        # полная сетка: max_col = 5, последняя строка сетки = 5
+        # неполная сетка: max_col = 5, последняя строка сетки < 5
+        # при полной сетке новая строчка и сброс колонки добавляется в цикле
+        # при неполной сетке добавляется после цикла
 
     def grid_more(self, db_images: dict[str, list[DbImage]]):
         if db_images:
