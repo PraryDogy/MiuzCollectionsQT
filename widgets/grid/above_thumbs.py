@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
                              QWidget)
-
+from PyQt5.QtCore import Qt
 from base_widgets import LayoutHor, LayoutVer
 from cfg import Dynamic, Filters, JsonData, Static
 from lang import Lang
@@ -79,17 +79,18 @@ class ErrorTitle(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.v_layout = LayoutVer()
-        self.setLayout(self.v_layout)
-
-        title = QLabel()
-        title.setStyleSheet(Static.TITLE_NORMAL)
-    
         self.setSizePolicy(
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Preferred
         )
 
+        self.v_layout = LayoutVer()
+        self.v_layout.setSpacing(5)
+        self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setLayout(self.v_layout)
+
+        title = QLabel()
+        title.setStyleSheet(Static.TITLE_NORMAL)
         self.v_layout.addWidget(title)
 
         h_wid = QWidget()
@@ -111,8 +112,7 @@ class ErrorTitle(QWidget):
             ]
             noimg_t = "".join(noimg_t)
             title.setText(noimg_t)
-            s_label = ResetSearchBtn()
-            h_layout.addWidget(s_label)
+            h_layout.addWidget(ResetSearchBtn())
 
         elif any((Dynamic.date_start, Dynamic.date_end)):
 
@@ -141,15 +141,18 @@ class FilterTitle(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.v_layout = LayoutVer()
-        self.setLayout(self.v_layout)
-
-        title = QLabel()
-        title.setStyleSheet(Static.TITLE_NORMAL)
         self.setSizePolicy(
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Preferred
         )
+
+        self.v_layout = LayoutVer()
+        self.v_layout.setSpacing(5)
+        self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setLayout(self.v_layout)
+
+        title = QLabel()
+        title.setStyleSheet(Static.TITLE_NORMAL)
         self.v_layout.addWidget(title)
 
         h_wid = QWidget()
