@@ -1,8 +1,12 @@
+from typing import Literal
+
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextCustom, LayoutHor
+from base_widgets.svg_btn import SvgBtn
 from cfg import Dynamic, Filters, JsonData, Static
 from lang import Lang
 from signals import SignalsApp
@@ -18,6 +22,7 @@ class BarTopBtn(QLabel):
         super().__init__(text)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
     def set_solid_style(self):
         self.setStyleSheet(Static.SOLID_STYLE)
@@ -29,6 +34,35 @@ class BarTopBtn(QLabel):
         self.setStyleSheet(Static.BORDERED_STYLE)
 
 
+class ClearBtn(QSvgWidget):
+    def __init__(self, parent: BarTopBtn):
+        super().__init__(parent=parent)
+        self.setFixedSize(BTN_H // 2, BTN_H // 2)
+        self.load("images/clear.svg")
+        # self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def disable(self):
+        self.hide()
+        self.setDisabled(True)
+
+    def enable(self):
+        self.show()
+        self.setDisabled(False)
+
+    def mouseReleaseEvent(self, ev):
+        self.cmd_()
+
+    def cmd_(self, *args) -> None:
+        Dynamic.date_start, Dynamic.date_end = None, None
+        Dynamic.grid_offset = 0
+
+        SignalsApp.all_.btn_dates_style.emit("normal")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
+        print("cmd clear dates")
+
+
 class DatesBtn(BarTopBtn):
     win_dates_opened = pyqtSignal()
 
@@ -37,14 +71,25 @@ class DatesBtn(BarTopBtn):
         self.set_style_cmd: callable = None
         SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
 
-    def dates_btn_style(self, flag: str):
+        self.clear_btn = ClearBtn(parent=self)
+        self.clear_btn.move(BTN_W - 20, BTN_H // 4 + 1)
+        self.clear_btn.disable()
+        print(BTN_H // 2)
+
+
+    def dates_btn_style(self, flag: Literal["solid", "normal", "border"]):
         if flag == "solid":
+            self.clear_btn.enable()
             self.set_solid_style()
             self.set_style_cmd = self.set_solid_style
+
         elif flag == "normal":
+            self.clear_btn.disable()
             self.set_normal_style()
             self.set_style_cmd = self.set_normal_style
+
         elif flag == "border":
+            self.clear_btn.disable()
             self.set_border_style()
             self.set_style_cmd = self.set_border_style
         else:
@@ -67,6 +112,7 @@ class DatesBtn(BarTopBtn):
         menu_.addAction(toggle)
 
         self.set_border_style()
+
         menu_.show_menu()
 
         if self.set_style_cmd:
