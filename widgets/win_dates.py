@@ -40,7 +40,7 @@ class DatesTools:
         return datetime.strptime(text, "%d.%m.%Y").date()
 
 
-class BaseDateInput(ULineEdit):
+class DatesInput(ULineEdit):
     inputChangedSignal = pyqtSignal()
 
     def __init__(self):
@@ -134,7 +134,7 @@ class BaseDateLayout(QWidget):
         spacer_item = QSpacerItem(1, 5)
         layout_v.addSpacerItem(spacer_item)
 
-        self.input = BaseDateInput()
+        self.input = DatesInput()
         self.input.inputChangedSignal.connect(self.input_changed)
         layout_v.addWidget(self.input)
 
