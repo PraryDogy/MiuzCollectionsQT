@@ -10,7 +10,7 @@ psd_logger = logging.getLogger("psd_tools")
 psd_logger.setLevel(logging.CRITICAL)
 
 
-def psd_tools_channels(path: str):
+def read_psd(path: str):
     with open(path, 'rb') as psd_file:
 
         if psd_file.read(4) != b'8BPS':
@@ -45,7 +45,7 @@ images = [
 ]
 
 for i in images:
-    psd_tools_channels(i)
+    read_psd(i)
 
 
 # осталось добавить try except и готово
