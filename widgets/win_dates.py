@@ -258,31 +258,43 @@ class WinDates(WinSystem):
             new_date = self.right_date_wid.get_datetime_date()
             self.date_end = new_date
 
-        if new_date:
-            self.ok_btn.setDisabled(False)
-        else:
-            self.ok_btn.setDisabled(True)
-
     def named_date(self, date: datetime):
         month = Lang.months_genitive_case[str(date.month)]
         return f"{date.day} {month} {date.year}"
 
+    def reset_dates(self, *args):
+        Dynamic.date_start, Dynamic.date_end = None, None
+        Dynamic.f_date_start, Dynamic.f_date_end = None, None
+
+        Dynamic.grid_offset = 0
+
+        SignalsApp.all_.btn_dates_style.emit("normal")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
     def ok_cmd(self, *args):
-        if not any((self.date_start, self.date_end)):
-            return
-
-        elif not self.date_start:
-            return
-
-        elif not self.date_end:
-            self.date_end = self.date_start
+        if self.date_start and not self.date_end:
             self.date_end = datetime.today().date()
+            has_dates = True
 
-        Dynamic.date_start = self.date_start
-        Dynamic.date_end = self.date_end
+        elif self.date_start and self.date_end:
+            has_dates = True
+        
+        elif not self.date_start and not self.date_end:
+            has_dates = False
 
-        Dynamic.f_date_start = self.named_date(date=Dynamic.date_start)
-        Dynamic.f_date_end = self.named_date(date=Dynamic.date_end)
+        elif not self.date_start and self.date_end:
+            return
+
+        if has_dates:
+            Dynamic.date_start = self.date_start
+            Dynamic.date_end = self.date_end
+
+            Dynamic.f_date_start = self.named_date(date=Dynamic.date_start)
+            Dynamic.f_date_end = self.named_date(date=Dynamic.date_end)
+
+        else:
+            self.reset_dates()
 
         DatesTools.solid_or_normal_style()
         self.close()
