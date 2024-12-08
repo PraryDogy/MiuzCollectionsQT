@@ -12,20 +12,27 @@ psd_logger.setLevel(logging.CRITICAL)
 
 def psd_tools_channels(path: str):
     with open(path, 'rb') as psd_file:
+
+        if psd_file.read(4) != b'8BPS':
+            return None
+
         psd_file.seek(12)
         channels = int.from_bytes(psd_file.read(2), byteorder='big')
         psd_file.seek(0)
 
-        if channels > 3:
-            img = psd_tools.PSDImage.open(psd_file)
-            img = img.composite()
-        else:
-            img = Image.open(psd_file)
+        try:
+            if channels > 3:
+                img = psd_tools.PSDImage.open(psd_file)
+                img = img.composite()
 
-        img = np.array(img)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        cv2.imshow(os.path.basename(path), img)
-        cv2.waitKey(0)
+            else:
+                img = Image.open(psd_file)
+        
+        except Exception as e:
+            print("utils > error read psd", path)
+            return None
+
+        return np.array(img)
 
 
 
@@ -39,3 +46,6 @@ images = [
 
 for i in images:
     psd_tools_channels(i)
+
+
+# осталось добавить try except и готово
