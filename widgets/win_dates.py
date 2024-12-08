@@ -40,7 +40,7 @@ class DatesTools:
         return datetime.strptime(text, "%d.%m.%Y").date()
 
 
-class DatesInput(ULineEdit):
+class DatesLineEdit(ULineEdit):
     inputChangedSignal = pyqtSignal()
 
     def __init__(self):
@@ -95,7 +95,7 @@ class DatesInput(ULineEdit):
         return super().keyPressEvent(a0)
 
 
-class TitleLabel(QLabel):
+class DatesTitle(QLabel):
     def __init__(self, default_text: str):
         self.default_text = "\n" + default_text
 
@@ -119,32 +119,30 @@ class TitleLabel(QLabel):
         return f"{date.day} {month} {date.year}"
 
 
-class BaseDateLayout(QWidget):
+class DatesWid(QWidget):
     dateChangedSignal = pyqtSignal()
 
     def __init__(self, title_label_text):
         super().__init__()
 
-        layout_v = LayoutVer()
-        self.setLayout(layout_v)
+        v_lay = LayoutVer()
+        v_lay.setSpacing(5)
+        self.setLayout(v_lay)
 
-        self.title_label = TitleLabel(title_label_text)
-        layout_v.addWidget(self.title_label)
+        self.dates_title = DatesTitle(title_label_text)
+        v_lay.addWidget(self.dates_title)
 
-        spacer_item = QSpacerItem(1, 5)
-        layout_v.addSpacerItem(spacer_item)
-
-        self.input = DatesInput()
+        self.input = DatesLineEdit()
         self.input.inputChangedSignal.connect(self.input_changed)
-        layout_v.addWidget(self.input)
+        v_lay.addWidget(self.input)
 
     def input_changed(self):
         date = self.get_datetime_date()
 
         if date:
-            self.title_label.set_named_date_text(date)
+            self.dates_title.set_named_date_text(date)
         else:
-            self.title_label.set_default_text()
+            self.dates_title.set_default_text()
 
         self.dateChangedSignal.emit()
 
@@ -152,7 +150,7 @@ class BaseDateLayout(QWidget):
         return self.input.date
 
 
-class LeftDateWidget(BaseDateLayout):
+class LeftDateWidget(DatesWid):
     def __init__(self):
         super().__init__(Lang.start)
 
@@ -160,7 +158,7 @@ class LeftDateWidget(BaseDateLayout):
             self.input.setText(DatesTools.date_to_text(Dynamic.date_start))
 
 
-class RightDateWidget(BaseDateLayout):
+class RightDateWidget(DatesWid):
     def __init__(self):
         super().__init__(Lang.end)
 
