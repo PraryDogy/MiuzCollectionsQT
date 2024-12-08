@@ -112,10 +112,12 @@ class DatesTitle(QLabel):
         self.setText(self.default_text)
 
     def get_named_weekday(self, date: datetime) -> str:
-        return Lang.weekdays[str(date.weekday())]
+        day_number = str(date.weekday())
+        return Lang.weekdays[day_number]
     
     def get_named_date(self, date: datetime) -> str:
-        month = Lang.months_genitive_case[str(date.month)]
+        month_number = str(date.month)
+        month = Lang.months_genitive_case[month_number]
         return f"{date.day} {month} {date.year}"
 
 
