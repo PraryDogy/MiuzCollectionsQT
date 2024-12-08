@@ -1,0 +1,287 @@
+import re
+from datetime import datetime, timedelta
+from functools import partial
+
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
+
+from base_widgets import LayoutHor, LayoutVer
+from base_widgets.input import ULineEdit
+from base_widgets.wins import WinSystem
+from cfg import Dynamic
+from lang import Lang
+from signals import SignalsApp
+
+
+class DateUtils:
+    @classmethod
+    def date_to_text(cls, date: datetime):
+        return date.strftime("%d.%m.%Y")
+
+    @classmethod
+    def add_or_subtract_days(cls, date: datetime, days: int):
+        return date + timedelta(days=days)
+    
+    @classmethod
+    def text_to_datetime_date(cls, text: str):
+        return datetime.strptime(text, "%d.%m.%Y").date()
+
+
+class ReDate:
+    def __init__(self, text: str):
+        self.converted_text = None
+        t_reg = re.match(r"\d{,2}\W\d{,2}\W\d{4}", text)
+        if t_reg:
+            self.converted_text = re.sub("\W", ".", t_reg.group(0))
+
+
+class ConvertDate:
+    def __init__(self, text: str):
+        try:
+            self.date = DateUtils.text_to_datetime_date(text)
+        except (ValueError, TypeError):
+            self.date = None
+
+
+class BaseDateInput(ULineEdit):
+    inputChangedSignal = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.setFixedWidth(150)
+        self.setPlaceholderText(Lang.d_m_y)
+        self.textChanged.connect(self.onTextChanged)
+        self.date = None
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Up:
+            if self.date:
+                self.date = DateUtils.add_or_subtract_days(self.date, 1)
+                self.setText(DateUtils.date_to_text(self.date))
+            else:
+                self.date = datetime.today().date()
+                self.setText(DateUtils.date_to_text(self.date))
+
+        elif a0.key() == Qt.Key.Key_Down:
+            if self.date:
+                self.date = DateUtils.add_or_subtract_days(self.date, -1)
+                self.setText(DateUtils.date_to_text(self.date))
+            else:
+                self.date = datetime.today().date()
+                self.setText(DateUtils.date_to_text(self.date))
+
+        return super().keyPressEvent(a0)
+
+    def onTextChanged(self):
+        date_check = ReDate(self.text()).converted_text
+        new_date = ConvertDate(date_check).date
+
+        if new_date:
+            self.setText(date_check)
+            self.date = ConvertDate(date_check).date
+        else:
+            self.date = None
+
+        self.inputChangedSignal.emit()
+
+
+class DatesBtn:
+
+    @classmethod
+    def base_styles(cls):
+        if not Dynamic.date_start:
+            SignalsApp.all_.btn_dates_style.emit("normal")
+        else:
+            SignalsApp.all_.btn_dates_style.emit("solid")
+
+    @classmethod
+    def border_style(cls):
+        SignalsApp.all_.btn_dates_style.emit("border")
+
+
+class TitleLabel(QLabel):
+    def __init__(self, default_text: str):
+        self.default_text = "\n" + default_text
+
+        super().__init__(self.default_text)
+        self.setFixedWidth(150)
+
+    def set_named_date_text(self, date: datetime):
+        weekday = self.get_named_weekday(date).capitalize()
+        named_date = self.get_named_date(date)
+
+        self.setText(f"{weekday}:\n{named_date}")
+
+    def set_default_text(self):
+        self.setText(self.default_text)
+
+    def get_named_weekday(self, date: datetime) -> str:
+        return Lang.weekdays[str(date.weekday())]
+    
+    def get_named_date(self, date: datetime) -> str:
+        month = Lang.months_genitive_case[str(date.month)]
+        return f"{date.day} {month} {date.year}"
+
+
+class BaseDateLayout(QWidget):
+    dateChangedSignal = pyqtSignal()
+
+    def __init__(self, title_label_text):
+        super().__init__()
+
+        layout_v = LayoutVer()
+        self.setLayout(layout_v)
+
+        self.title_label = TitleLabel(title_label_text)
+        layout_v.addWidget(self.title_label)
+
+        spacer_item = QSpacerItem(1, 5)
+        layout_v.addSpacerItem(spacer_item)
+
+        self.input = BaseDateInput()
+        self.input.inputChangedSignal.connect(self.input_changed)
+        layout_v.addWidget(self.input)
+
+    def input_changed(self):
+        date = self.get_datetime_date()
+
+        if date:
+            self.title_label.set_named_date_text(date)
+        else:
+            self.title_label.set_default_text()
+
+        self.dateChangedSignal.emit()
+
+    def get_datetime_date(self):
+        return self.input.date
+
+
+class LeftDateWidget(BaseDateLayout):
+    def __init__(self):
+        super().__init__(Lang.start)
+
+        if Dynamic.date_start:
+            self.input.setText(DateUtils.date_to_text(Dynamic.date_start))
+
+
+class RightDateWidget(BaseDateLayout):
+    def __init__(self):
+        super().__init__(Lang.end)
+
+        if Dynamic.date_end:
+            self.input.setText(DateUtils.date_to_text(Dynamic.date_end))
+
+
+class WinDates(WinSystem):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(Lang.dates)
+
+        DatesBtn.border_style()
+
+        self.date_start = Dynamic.date_start
+        self.date_end = Dynamic.date_end
+
+        self.init_ui()
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
+
+    def init_ui(self):
+        title_label = QLabel(Lang.search_dates)
+        title_label.setContentsMargins(0, 0, 0, 5)
+        self.central_layout.addWidget(title_label)
+
+        widget_wid = QWidget()
+        widget_layout = LayoutHor()
+        widget_wid.setLayout(widget_layout)
+        self.central_layout.addWidget(widget_wid)
+
+        self.left_date = LeftDateWidget()
+        self.left_date.dateChangedSignal.connect(partial(self.date_change, "start"))
+        widget_layout.addWidget(self.left_date)
+
+        spacer_item = QSpacerItem(10, 1)
+        widget_layout.addItem(spacer_item)
+
+        self.right_date = RightDateWidget()
+        self.right_date.dateChangedSignal.connect(partial(self.date_change, "end"))
+        widget_layout.addWidget(self.right_date)
+
+        # ok cancel button
+
+        buttons_wid = QWidget()
+        buttons_layout = LayoutHor()
+        buttons_wid.setLayout(buttons_layout)
+        buttons_layout.setContentsMargins(0, 10, 0, 0)
+        self.central_layout.addWidget(buttons_wid)
+
+        buttons_layout.addStretch(1)
+        buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.ok_label = QPushButton(text=Lang.ok)
+        self.ok_label.setFixedWidth(90)
+        self.ok_label.clicked.connect(self.ok_cmd)
+        buttons_layout.addWidget(self.ok_label)
+
+        spacer_item = QSpacerItem(10, 1)
+        buttons_layout.addItem(spacer_item)
+
+        cancel_label = QPushButton(text=Lang.cancel)
+        self.ok_label.setFixedWidth(90)
+        cancel_label.clicked.connect(self.cancel_cmd)
+        buttons_layout.addWidget(cancel_label)
+        buttons_layout.addStretch(1)
+
+    def date_change(self, flag: str):
+        if flag == "start":
+            new_date = self.left_date.get_datetime_date()
+            self.date_start = new_date
+        else:
+            new_date = self.right_date.get_datetime_date()
+            self.date_end = new_date
+
+        if new_date:
+            self.ok_label.setDisabled(False)
+        else:
+            self.ok_label.setDisabled(True)
+
+    def named_date(self, date: datetime):
+        month = Lang.months_genitive_case[str(date.month)]
+        return f"{date.day} {month} {date.year}"
+
+    def ok_cmd(self, *args):
+        if not any((self.date_start, self.date_end)):
+            return
+
+        elif not self.date_start:
+            return
+
+        elif not self.date_end:
+            self.date_end = self.date_start
+            self.date_end = datetime.today().date()
+
+        Dynamic.date_start = self.date_start
+        Dynamic.date_end = self.date_end
+
+        Dynamic.f_date_start = self.named_date(date=Dynamic.date_start)
+        Dynamic.f_date_end = self.named_date(date=Dynamic.date_end)
+
+        DatesBtn.base_styles()
+        self.close()
+
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+
+    def cancel_cmd(self, *args):
+        DatesBtn.base_styles()
+        self.close()
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Escape:
+            DatesBtn.base_styles()
+            self.close()
+
+        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.ok_cmd(a0)
+
+        return super().keyPressEvent(a0)
