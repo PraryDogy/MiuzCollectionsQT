@@ -363,15 +363,15 @@ class Grid(QScrollArea):
         for wid in self.grid_wid.findChildren((Thumbnail, Title)):
 
             if isinstance(wid, Title):
-                # сбрасываем колонку и добавялем новую строчку
-                # чтобы обособить заголовок от предыдущих виджетов
+                # добавляем новую строку перед заголовком и сбрасываем колонку,
+                # так как заголовок обособлен отдельной строкой
                 self.col = 0
                 self.row += 1
                 self.set_cell_coords(wid)
                 self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
                 self.row += 1
-                # добавляем новую строку после заголовку
-                # для обособления
+                # добавляем новую строку после заголовка
+                # так как заголовок обособлен отдельной строкой
 
             elif isinstance(wid, Thumbnail):
                 self.set_cell_coords(wid)
