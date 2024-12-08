@@ -157,8 +157,6 @@ class Grid(QScrollArea):
         self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.grid_wid.setLayout(self.grid_lay)
 
-        max_col = self.get_max_col()
-
         if not db_images:
 
             error_title = NoImagesLabel()
@@ -167,17 +165,18 @@ class Grid(QScrollArea):
         else:
             Thumbnail.calculate_size()
             for date, db_images in db_images.items():
-                self.single_grid(date, db_images)
+                self.single_grid(
+                    date=date,
+                    db_images=db_images,
+                    max_col=self.get_max_col()
+                )
 
-    def single_grid(self, date: str, db_images: list[DbImage]):
-        max_col = self.get_max_col()
+    def single_grid(self, date: str, db_images: list[DbImage], max_col: int):
 
-        # сбрасываем колонку потому что title всего в колонке 0
-        self.col = 0
         title = Title(title=date, db_images=db_images)
         title.r_click.connect(self.deselect_wid)
         self.set_cell_coords(title)
-        self.grid_lay.addWidget(title, self.row, self.col, 1, max_col)
+        self.grid_lay.addWidget(title, self.row, self.col, 1, max_col + 1)
         # прибавляем 1 строку после title
         self.row += 1
 
@@ -214,7 +213,11 @@ class Grid(QScrollArea):
     def grid_more(self, db_images: dict[str, list[DbImage]]):
         if db_images:
             for date, db_images in db_images.items():
-                self.single_grid(date, db_images)
+                self.single_grid(
+                    date=date,
+                    db_images=db_images,
+                    max_col=self.get_max_col()
+                )
 
     def set_curr_sell(self, coords: tuple):
         self.curr_cell = coords
