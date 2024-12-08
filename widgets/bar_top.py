@@ -33,33 +33,15 @@ class BarTopBtn(QLabel):
         self.setStyleSheet(Static.BORDERED_STYLE)
 
 
-class ClearBtn(QSvgWidget):
-    def __init__(self, parent: BarTopBtn):
-        super().__init__(parent=parent)
-        self.setFixedSize(BTN_H // 2, BTN_H // 2)
-        self.load("images/clear.svg")
-        # self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    # def cmd_(self, *args) -> None:
+    #     Dynamic.date_start, Dynamic.date_end = None, None
+    #     Dynamic.grid_offset = 0
 
-    def disable(self):
-        self.hide()
-        self.setDisabled(True)
+    #     SignalsApp.all_.btn_dates_style.emit("normal")
+    #     SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+    #     SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
-    def enable(self):
-        self.show()
-        self.setDisabled(False)
-
-    def mouseReleaseEvent(self, ev):
-        self.cmd_()
-
-    def cmd_(self, *args) -> None:
-        Dynamic.date_start, Dynamic.date_end = None, None
-        Dynamic.grid_offset = 0
-
-        SignalsApp.all_.btn_dates_style.emit("normal")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-
-        print("cmd clear dates")
+    #     print("cmd clear dates")
 
 
 class DatesBtn(BarTopBtn):
@@ -71,25 +53,16 @@ class DatesBtn(BarTopBtn):
         self.set_style_cmd: callable = None
         SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
 
-        self.clear_btn = ClearBtn(parent=self)
-        self.clear_btn.move(BTN_W - 10, BTN_H // 4 + 1)
-        self.clear_btn.disable()
-        print(BTN_H // 2)
-
-
     def dates_btn_style(self, flag: Literal["solid", "normal", "border"]):
         if flag == "solid":
-            self.clear_btn.enable()
             self.set_solid_style()
             self.set_style_cmd = self.set_solid_style
 
         elif flag == "normal":
-            self.clear_btn.disable()
             self.set_normal_style()
             self.set_style_cmd = self.set_normal_style
 
         elif flag == "border":
-            self.clear_btn.disable()
             self.set_border_style()
             self.set_style_cmd = self.set_border_style
         else:

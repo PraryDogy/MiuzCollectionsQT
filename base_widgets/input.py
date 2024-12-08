@@ -1,17 +1,22 @@
+import os
+
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLineEdit
 
+from cfg import Dynamic, Static
 from lang import Lang
+from signals import SignalsApp
 from utils.utils import Utils
 
 from .context import ContextCustom
 
-
-class CustomContext(ContextCustom):
-    def __init__(self, parent: QLineEdit, event):
-        ...
-
-
+CLEAR_SVG = os.path.join(Static.IMAGES, "clear.svg")
+CLEAR_SIZE = 14
+INPUT_H = 28
+LEFT_PADDING = 2
+RIGHT_PADDING = 28
 
 
 class ULineEdit(QLineEdit):
@@ -22,8 +27,13 @@ class ULineEdit(QLineEdit):
         close btn onTextChanged
         """
         super().__init__()
-        self.setFixedHeight(28)
-        self.setStyleSheet("padding-left: 2px; padding-right: 2px;")
+        self.setFixedHeight(INPUT_H)
+        self.setStyleSheet(
+            f"""
+            padding-left: {LEFT_PADDING};
+            padding-right: {RIGHT_PADDING};
+            """
+        )
 
     def cut_selection(self, *args):
         text = self.selectedText()

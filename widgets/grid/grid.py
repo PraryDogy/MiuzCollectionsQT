@@ -44,19 +44,6 @@ class ResetDatesBtn(ResetBtn):
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
 
-class ResetSearchBtn(ResetBtn):
-    def __init__(self):
-        super().__init__(text=Lang.reset)
-        self.clicked.connect(self.cmd_)
-
-    def cmd_(self, *args) -> None:
-        Dynamic.grid_offset = 0
-
-        SignalsApp.all_.wid_search_cmd.emit("clear")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-
-
 class ResetFiltersBtn(ResetBtn):
     def __init__(self):
         super().__init__(text=Lang.reset)
@@ -66,26 +53,6 @@ class ResetFiltersBtn(ResetBtn):
         Dynamic.grid_offset = 0
 
         SignalsApp.all_.bar_top_reset_filters.emit()
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-
-
-class ShowAllBtn(ResetBtn):
-    def __init__(self):
-        super().__init__(text=Lang.show_all)
-        self.clicked.connect(self.cmd_)
-
-    def cmd_(self, *args) -> None:
-        Dynamic.date_start, Dynamic.date_end = None, None
-        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
-        Dynamic.grid_offset = 0
-
-        SignalsApp.all_.wid_search_cmd.emit("clear")
-        SignalsApp.all_.bar_top_reset_filters.emit()
-
-        SignalsApp.all_.win_main_cmd.emit("set_title")
-        SignalsApp.all_.menu_left_cmd.emit("select_all_colls")
-
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
@@ -119,17 +86,7 @@ class ErrorTitle(QWidget):
             if filter.value
             ]
 
-        if Dynamic.search_widget_text:
-
-            noimg_t = [
-                f"{Lang.no_photo} {Lang.with_name}: ",
-                f"{Dynamic.search_widget_text}"
-            ]
-            noimg_t = "".join(noimg_t)
-            title.setText(noimg_t)
-            h_layout.addWidget(ResetSearchBtn())
-
-        elif any((Dynamic.date_start, Dynamic.date_end)):
+        if any((Dynamic.date_start, Dynamic.date_end)):
 
             noimg_t = [
                 f"{Lang.no_photo}: ",
@@ -145,11 +102,6 @@ class ErrorTitle(QWidget):
             noimg_t = f"{Lang.no_photo_filter}: {enabled_filters}"
             title.setText(noimg_t)
             h_layout.addWidget(ResetFiltersBtn())
-        
-        else:
-
-            title.setText(Lang.no_photo)
-            h_layout.addWidget(ShowAllBtn())
 
 
 class UpBtn(QFrame):
