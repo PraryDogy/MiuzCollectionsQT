@@ -36,6 +36,9 @@ class ClearBtn(QSvgWidget):
     def mouseReleaseEvent(self, ev):
         self.clicked_.emit()
 
+    def enterEvent(self, a0):
+        self.setCursor(Qt.CursorShape.ArrowCursor)
+
 
 class WidSearch(ULineEdit):
     def __init__(self):
