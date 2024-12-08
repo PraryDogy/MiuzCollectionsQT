@@ -28,14 +28,6 @@ class DateUtils:
         return datetime.strptime(text, "%d.%m.%Y").date()
 
 
-class ReDate:
-    def __init__(self, text: str):
-        self.converted_text = None
-        t_reg = re.match(r"\d{,2}\W\d{,2}\W\d{4}", text)
-        if t_reg:
-            self.converted_text = re.sub("\W", ".", t_reg.group(0))
-
-
 class BaseDateInput(ULineEdit):
     inputChangedSignal = pyqtSignal()
 
@@ -71,8 +63,15 @@ class BaseDateInput(ULineEdit):
 
         return super().keyPressEvent(a0)
 
+    def re_date(self, text: str):
+        t_reg = re.match(r"\d{,2}\W\d{,2}\W\d{4}", text)
+        if t_reg:
+            return re.sub("\W", ".", t_reg.group(0))
+        else:
+            return None
+
     def onTextChanged(self):
-        date_check = ReDate(self.text()).converted_text
+        date_check = self.re_date(text=self.text())
         new_date = self.convert_date(date_check)
 
         if new_date:
