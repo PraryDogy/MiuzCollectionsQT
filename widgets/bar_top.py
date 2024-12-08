@@ -33,23 +33,11 @@ class BarTopBtn(QLabel):
         self.setStyleSheet(Static.BORDERED_STYLE)
 
 
-    # def cmd_(self, *args) -> None:
-    #     Dynamic.date_start, Dynamic.date_end = None, None
-    #     Dynamic.grid_offset = 0
-
-    #     SignalsApp.all_.btn_dates_style.emit("normal")
-    #     SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-    #     SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
-
-    #     print("cmd clear dates")
-
-
 class DatesBtn(BarTopBtn):
     win_dates_opened = pyqtSignal()
 
     def __init__(self):
         super().__init__(text=Lang.dates)
-        self.setFixedWidth(self.width() + 10)
         self.set_style_cmd: callable = None
         SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
 
