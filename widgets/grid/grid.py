@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
@@ -23,7 +24,7 @@ UP_STYLE = f"""
 """
 
 
-class ErrorTitle(QLabel):
+class NoImagesLabel(QLabel):
     def __init__(self):
         super().__init__()
 
@@ -112,7 +113,7 @@ class Grid(QScrollArea):
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
 
-    def signals_cmd(self, flag: str):
+    def signals_cmd(self, flag: Literal["resize", "to_top", "reload"]):
         if flag == "resize":
             self.resize_thumbnails()
         elif flag == "to_top":
@@ -124,9 +125,7 @@ class Grid(QScrollArea):
         
         self.setFocus()
 
-    def load_db_images(self, flag: str):
-        """flag: first, more"""
-
+    def load_db_images(self, flag: Literal["first", "more"]):
         if flag == "first":
             Dynamic.grid_offset = 0
             cmd_ = lambda db_images: self.create_grid(db_images)
@@ -162,7 +161,7 @@ class Grid(QScrollArea):
 
         if not db_images:
 
-            error_title = ErrorTitle()
+            error_title = NoImagesLabel()
             self.grid_lay.addWidget(error_title, self.row, self.col)
 
         else:
