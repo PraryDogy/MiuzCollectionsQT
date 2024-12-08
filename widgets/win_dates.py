@@ -232,18 +232,18 @@ class WinDates(WinSystem):
         btns_h_lay.addStretch(1)
         btns_h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.ok_label = QPushButton(text=Lang.ok)
-        self.ok_label.setFixedWidth(90)
-        self.ok_label.clicked.connect(self.ok_cmd)
-        btns_h_lay.addWidget(self.ok_label)
+        self.ok_btn = QPushButton(text=Lang.ok)
+        self.ok_btn.setFixedWidth(90)
+        self.ok_btn.clicked.connect(self.ok_cmd)
+        btns_h_lay.addWidget(self.ok_btn)
 
         spacer_item = QSpacerItem(10, 1)
         btns_h_lay.addItem(spacer_item)
 
-        cancel_label = QPushButton(text=Lang.cancel)
-        self.ok_label.setFixedWidth(90)
-        cancel_label.clicked.connect(self.cancel_cmd)
-        btns_h_lay.addWidget(cancel_label)
+        cancel_btn = QPushButton(text=Lang.cancel)
+        self.ok_btn.setFixedWidth(90)
+        cancel_btn.clicked.connect(self.cancel_cmd)
+        btns_h_lay.addWidget(cancel_btn)
         btns_h_lay.addStretch(1)
 
     def clear_btn_cmd(self, *args):
@@ -259,9 +259,9 @@ class WinDates(WinSystem):
             self.date_end = new_date
 
         if new_date:
-            self.ok_label.setDisabled(False)
+            self.ok_btn.setDisabled(False)
         else:
-            self.ok_label.setDisabled(True)
+            self.ok_btn.setDisabled(True)
 
     def named_date(self, date: datetime):
         month = Lang.months_genitive_case[str(date.month)]
