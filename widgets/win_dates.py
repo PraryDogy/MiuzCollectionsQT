@@ -139,6 +139,9 @@ class DatesWid(QWidget):
         self.input.inputChangedSignal.connect(self.input_changed)
         v_lay.addWidget(self.input)
 
+    def clear_input(self):
+        self.input.clear()
+
     def input_changed(self):
         date = self.get_datetime_date()
 
@@ -201,15 +204,16 @@ class WinDates(WinSystem):
         dates_h_lay.addItem(spacer_item)
 
         right_cmd = lambda: self.date_change(flag="end")
-        self.right_date = RightDateWidget()
-        self.right_date.dateChangedSignal.connect(right_cmd)
-        dates_h_lay.addWidget(self.right_date)
+        self.right_date_wid = RightDateWidget()
+        self.right_date_wid.dateChangedSignal.connect(right_cmd)
+        dates_h_lay.addWidget(self.right_date_wid)
 
         spacer_item = QSpacerItem(1, 5)
         self.central_layout.addItem(spacer_item)
 
         clear_btn = QPushButton(text="Очистить")
         clear_btn.setFixedWidth(100)
+        clear_btn.clicked.connect(self.clear_btn_cmd)
         self.central_layout.addWidget(
             clear_btn,
             alignment=Qt.AlignmentFlag.AlignCenter
@@ -242,12 +246,16 @@ class WinDates(WinSystem):
         btns_h_lay.addWidget(cancel_label)
         btns_h_lay.addStretch(1)
 
+    def clear_btn_cmd(self, *args):
+        for i in (self.left_date_wid, self.right_date_wid):
+            i.clear_input()
+
     def date_change(self, flag: Literal["start", "end"]):
         if flag == "start":
             new_date = self.left_date_wid.get_datetime_date()
             self.date_start = new_date
         else:
-            new_date = self.right_date.get_datetime_date()
+            new_date = self.right_date_wid.get_datetime_date()
             self.date_end = new_date
 
         if new_date:
