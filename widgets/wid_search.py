@@ -50,15 +50,15 @@ class WidSearch(ULineEdit):
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.delayed_search)
 
-        SignalsApp.all_.wid_search_cmd.connect(self.wid_search_cmd)
-
         self.clear_btn = ClearBtn(parent=self)
         self.clear_btn.clicked_.connect(self.clear_search)
-        self.clear_btn.enable()
+        self.clear_btn.disable()
         self.clear_btn.move(
             self.width() - CLEAR_SIZE - 8,
             INPUT_H // 4
         )
+
+        SignalsApp.all_.wid_search_cmd.connect(self.wid_search_cmd)
 
     def wid_search_cmd(self, flag: Literal["focus"]):
         if flag == "focus":
@@ -69,8 +69,10 @@ class WidSearch(ULineEdit):
     def create_search(self, new_text):
         if len(new_text) > 0:
             Dynamic.search_widget_text = new_text
+            self.clear_btn.enable()
         else:
             Dynamic.search_widget_text = None
+            self.clear_btn.disable()
 
         self.timer.stop()
         self.timer.start()
