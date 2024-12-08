@@ -27,8 +27,6 @@ class DatesTools:
     def border_style(cls):
         SignalsApp.all_.btn_dates_style.emit("border")
 
-
-class DateUtils:
     @classmethod
     def date_to_text(cls, date: datetime):
         return date.strftime("%d.%m.%Y")
@@ -54,7 +52,7 @@ class BaseDateInput(ULineEdit):
 
     def convert_date(self, text: str):
         try:
-            return DateUtils.text_to_datetime_date(text)
+            return DatesTools.text_to_datetime_date(text)
         except (ValueError, TypeError):
             return None
 
@@ -80,19 +78,19 @@ class BaseDateInput(ULineEdit):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Up:
             if self.date:
-                self.date = DateUtils.add_or_subtract_days(self.date, 1)
-                self.setText(DateUtils.date_to_text(self.date))
+                self.date = DatesTools.add_or_subtract_days(self.date, 1)
+                self.setText(DatesTools.date_to_text(self.date))
             else:
                 self.date = datetime.today().date()
-                self.setText(DateUtils.date_to_text(self.date))
+                self.setText(DatesTools.date_to_text(self.date))
 
         elif a0.key() == Qt.Key.Key_Down:
             if self.date:
-                self.date = DateUtils.add_or_subtract_days(self.date, -1)
-                self.setText(DateUtils.date_to_text(self.date))
+                self.date = DatesTools.add_or_subtract_days(self.date, -1)
+                self.setText(DatesTools.date_to_text(self.date))
             else:
                 self.date = datetime.today().date()
-                self.setText(DateUtils.date_to_text(self.date))
+                self.setText(DatesTools.date_to_text(self.date))
 
         return super().keyPressEvent(a0)
 
@@ -159,7 +157,7 @@ class LeftDateWidget(BaseDateLayout):
         super().__init__(Lang.start)
 
         if Dynamic.date_start:
-            self.input.setText(DateUtils.date_to_text(Dynamic.date_start))
+            self.input.setText(DatesTools.date_to_text(Dynamic.date_start))
 
 
 class RightDateWidget(BaseDateLayout):
@@ -167,7 +165,7 @@ class RightDateWidget(BaseDateLayout):
         super().__init__(Lang.end)
 
         if Dynamic.date_end:
-            self.input.setText(DateUtils.date_to_text(Dynamic.date_end))
+            self.input.setText(DatesTools.date_to_text(Dynamic.date_end))
 
 
 class WinDates(WinSystem):
