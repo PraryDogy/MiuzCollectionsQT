@@ -22,7 +22,6 @@ class BarTopBtn(QLabel):
         super().__init__(text)
         self.setFixedSize(BTN_W, BTN_H)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
     def set_solid_style(self):
         self.setStyleSheet(Static.SOLID_STYLE)
@@ -68,11 +67,12 @@ class DatesBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(text=Lang.dates)
+        self.setFixedWidth(self.width() + 10)
         self.set_style_cmd: callable = None
         SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
 
         self.clear_btn = ClearBtn(parent=self)
-        self.clear_btn.move(BTN_W - 20, BTN_H // 4 + 1)
+        self.clear_btn.move(BTN_W - 10, BTN_H // 4 + 1)
         self.clear_btn.disable()
         print(BTN_H // 2)
 
