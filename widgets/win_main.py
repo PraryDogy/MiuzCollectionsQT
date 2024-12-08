@@ -45,7 +45,7 @@ class WinMain(WinFrameless):
 
         h_wid_main = QWidget()
         h_lay_main = LayoutHor()
-        h_lay_main.setContentsMargins(0, 0, 0, 0)
+        h_lay_main.setContentsMargins(0, 0, 5, 0)
         h_wid_main.setLayout(h_lay_main)
         self.central_layout.addWidget(h_wid_main)
 
