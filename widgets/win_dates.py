@@ -36,14 +36,6 @@ class ReDate:
             self.converted_text = re.sub("\W", ".", t_reg.group(0))
 
 
-class ConvertDate:
-    def __init__(self, text: str):
-        try:
-            self.date = DateUtils.text_to_datetime_date(text)
-        except (ValueError, TypeError):
-            self.date = None
-
-
 class BaseDateInput(ULineEdit):
     inputChangedSignal = pyqtSignal()
 
@@ -53,6 +45,12 @@ class BaseDateInput(ULineEdit):
         self.setPlaceholderText(Lang.d_m_y)
         self.textChanged.connect(self.onTextChanged)
         self.date = None
+
+    def convert_date(self, text: str):
+        try:
+            return DateUtils.text_to_datetime_date(text)
+        except (ValueError, TypeError):
+            return None
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Up:
@@ -75,11 +73,11 @@ class BaseDateInput(ULineEdit):
 
     def onTextChanged(self):
         date_check = ReDate(self.text()).converted_text
-        new_date = ConvertDate(date_check).date
+        new_date = self.convert_date(date_check)
 
         if new_date:
             self.setText(date_check)
-            self.date = ConvertDate(date_check).date
+            self.date = self.convert_date(date_check)
         else:
             self.date = None
 
