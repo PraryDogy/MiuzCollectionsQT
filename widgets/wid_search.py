@@ -37,7 +37,7 @@ class ClearBtn(QSvgWidget):
         self.clicked_.emit()
 
 
-class SearchBarBase(ULineEdit):
+class WidSearch(ULineEdit):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(150)
@@ -89,17 +89,3 @@ class SearchBarBase(ULineEdit):
         if a0.key() == Qt.Key.Key_Escape:
             self.clearFocus()
         return super().keyPressEvent(a0)
-    
-
-class WidSearch(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        h_layout = LayoutHor()
-        self.setLayout(h_layout)
-
-        search = SearchBarBase()
-        h_layout.addWidget(search)
-        h_layout.addSpacerItem(QSpacerItem(5, 0))
-
-        self.setFixedWidth(search.width() + 5)
