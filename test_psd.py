@@ -11,11 +11,24 @@ psd_logger.setLevel(logging.CRITICAL)
 
 
 def psd_tools_channels(path: str):
-    img = Image.open(path)
-    img = np.array(img)
-    name = os.path.basename(path)
-    cv2.imshow(name, img)
-    cv2.waitKey(0)
+    with open(path, 'rb') as psd_file:
+        psd_file.seek(12)
+        channels = int.from_bytes(psd_file.read(2), byteorder='big')
+        psd_file.seek(0)
+
+        if channels > 3:
+            img = psd_tools.PSDImage.open(psd_file)
+            img = img.composite()
+        else:
+            img = Image.open(psd_file)
+
+        img = np.array(img)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        cv2.imshow(os.path.basename(path), img)
+        cv2.waitKey(0)
+
+
+
 
 src = "/Users/Morkowik/Desktop/Evgeny/_miuz/tiff_psd_images 2"
 images = [
