@@ -1,3 +1,5 @@
+from typing import Literal
+
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
@@ -5,7 +7,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
-from cfg import Static, Dynamic, JsonData
+from cfg import Dynamic, JsonData, Static
 from lang import Lang
 from signals import SignalsApp
 from utils.scaner import Scaner
@@ -76,7 +78,7 @@ class WinMain(WinFrameless):
         QTimer.singleShot(100, self.after_start)
         grid.setFocus()
 
-    def win_main_cmd(self, flag: str):
+    def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
         if flag == "show":
             self.show()

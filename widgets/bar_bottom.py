@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
@@ -175,7 +176,7 @@ class BarBottom(QWidget):
 
         self.downloads.hide()
 
-    def btn_downloads_toggle(self, flag: str):
+    def btn_downloads_toggle(self, flag: Literal["hide", "show"]):
         if flag == "hide":
             self.downloads.hide()
         elif flag == "show":

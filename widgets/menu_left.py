@@ -1,5 +1,6 @@
 import os
 import subprocess
+from typing import Literal
 
 import sqlalchemy
 from PyQt5.QtCore import QObject, QSize, Qt, QTimer, pyqtSignal
@@ -278,19 +279,11 @@ class MenuLeft(QTabWidget):
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
         SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
-    def menu_left_cmd(self, flag: str):
-        """
-        Handles the signal `SignalsApp.all_.menu_left_cmd` with a flag.
-        
-        :param flag: Allowed values are "one" and "two".
-        """
-
+    def menu_left_cmd(self, flag: Literal["reload", "select_all_colls"]):
         if flag == "reload":
             self.init_ui()
-
         elif flag == "select_all_colls":
             for i in self.menus:
                 i.setCurrentRow(0)
-
         else:
             raise Exception("widgets > menu left > wrong flag", flag)

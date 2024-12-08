@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 import sqlalchemy
 from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
@@ -424,7 +425,7 @@ class WinImageView(WinChild):
     def img_viewer_title(self):
         self.setWindowTitle(f"{self.wid.collection}: {self.wid.name}")
 
-    def button_switch_cmd(self, flag: str) -> None:
+    def button_switch_cmd(self, flag: Literal["+", "-"]) -> None:
         if flag == "+":
             self.switch_image(1)
         else:
