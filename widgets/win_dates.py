@@ -1,6 +1,7 @@
 import re
 from datetime import datetime, timedelta
 from functools import partial
+from typing import Literal
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
@@ -184,53 +185,66 @@ class WinDates(WinSystem):
 
     def init_ui(self):
         main_title = QLabel(Lang.search_dates)
-        main_title.setContentsMargins(0, 0, 0, 5)
         self.central_layout.addWidget(main_title)
 
-        widget_wid = QWidget()
-        widget_layout = LayoutHor()
-        widget_wid.setLayout(widget_layout)
-        self.central_layout.addWidget(widget_wid)
+        dates_h_wid = QWidget()
+        self.central_layout.addWidget(dates_h_wid)
+        dates_h_lay = LayoutHor()
+        dates_h_wid.setLayout(dates_h_lay)
 
-        self.left_date = LeftDateWidget()
-        self.left_date.dateChangedSignal.connect(partial(self.date_change, "start"))
-        widget_layout.addWidget(self.left_date)
+        left_cmd = lambda: self.date_change(flag="start")
+        self.left_date_wid = LeftDateWidget()
+        self.left_date_wid.dateChangedSignal.connect(left_cmd)
+        dates_h_lay.addWidget(self.left_date_wid)
 
         spacer_item = QSpacerItem(10, 1)
-        widget_layout.addItem(spacer_item)
+        dates_h_lay.addItem(spacer_item)
 
+        right_cmd = lambda: self.date_change(flag="end")
         self.right_date = RightDateWidget()
-        self.right_date.dateChangedSignal.connect(partial(self.date_change, "end"))
-        widget_layout.addWidget(self.right_date)
+        self.right_date.dateChangedSignal.connect(right_cmd)
+        dates_h_lay.addWidget(self.right_date)
 
-        # ok cancel button
+        spacer_item = QSpacerItem(1, 5)
+        self.central_layout.addItem(spacer_item)
 
-        buttons_wid = QWidget()
-        buttons_layout = LayoutHor()
-        buttons_wid.setLayout(buttons_layout)
-        buttons_layout.setContentsMargins(0, 10, 0, 0)
-        self.central_layout.addWidget(buttons_wid)
+        clear_btn = QPushButton(text="Очистить")
+        clear_btn.setFixedWidth(100)
+        self.central_layout.addWidget(
+            clear_btn,
+            alignment=Qt.AlignmentFlag.AlignCenter
+        )
 
-        buttons_layout.addStretch(1)
-        buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        spacer_item = QSpacerItem(1, 10)
+        self.central_layout.addItem(spacer_item)
+
+        # ok cancel button # ok cancel button # ok cancel button # ok cancel button
+
+        btns_h_wid = QWidget()
+        self.central_layout.addWidget(btns_h_wid)
+        btns_h_lay = LayoutHor()
+        btns_h_wid.setLayout(btns_h_lay)
+
+        btns_h_lay.addStretch(1)
+        btns_h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.ok_label = QPushButton(text=Lang.ok)
         self.ok_label.setFixedWidth(90)
         self.ok_label.clicked.connect(self.ok_cmd)
-        buttons_layout.addWidget(self.ok_label)
+        btns_h_lay.addWidget(self.ok_label)
 
         spacer_item = QSpacerItem(10, 1)
-        buttons_layout.addItem(spacer_item)
+        btns_h_lay.addItem(spacer_item)
 
         cancel_label = QPushButton(text=Lang.cancel)
         self.ok_label.setFixedWidth(90)
         cancel_label.clicked.connect(self.cancel_cmd)
-        buttons_layout.addWidget(cancel_label)
-        buttons_layout.addStretch(1)
+        btns_h_lay.addWidget(cancel_label)
+        btns_h_lay.addStretch(1)
 
-    def date_change(self, flag: str):
+    def date_change(self, flag: Literal["start", "end"]):
         if flag == "start":
-            new_date = self.left_date.get_datetime_date()
+            new_date = self.left_date_wid.get_datetime_date()
             self.date_start = new_date
         else:
             new_date = self.right_date.get_datetime_date()
