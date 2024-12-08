@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
@@ -7,7 +6,8 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QPushButton,
                              QSpacerItem, QTabWidget, QWidget)
 
-from base_widgets import CustomInput, CustomTextEdit, LayoutHor, LayoutVer
+from base_widgets import CustomTextEdit, LayoutHor, LayoutVer
+from base_widgets.input import ULineEdit
 from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
 from lang import Lang
@@ -187,7 +187,7 @@ class BrandSettings(QTabWidget):
         self.apply.emit()
         setattr(self, NEED_REBOOT, True)
     
-    def get_stopcolls(self, wid: CustomInput):
+    def get_stopcolls(self, wid: ULineEdit):
         return [
             i.strip()
             for i in wid.text().split(",")

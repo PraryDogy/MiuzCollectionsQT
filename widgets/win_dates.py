@@ -6,7 +6,8 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
-from base_widgets import CustomInput, LayoutHor, LayoutVer
+from base_widgets import LayoutHor, LayoutVer
+from base_widgets.input import ULineEdit
 from base_widgets.wins import WinSystem
 from cfg import Dynamic
 from lang import Lang
@@ -43,7 +44,7 @@ class ConvertDate:
             self.date = None
 
 
-class BaseDateInput(CustomInput):
+class BaseDateInput(ULineEdit):
     inputChangedSignal = pyqtSignal()
 
     def __init__(self):
