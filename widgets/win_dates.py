@@ -14,6 +14,20 @@ from lang import Lang
 from signals import SignalsApp
 
 
+class DatesTools:
+
+    @classmethod
+    def solid_or_normal_style(cls):
+        if not Dynamic.date_start:
+            SignalsApp.all_.btn_dates_style.emit("normal")
+        else:
+            SignalsApp.all_.btn_dates_style.emit("solid")
+
+    @classmethod
+    def border_style(cls):
+        SignalsApp.all_.btn_dates_style.emit("border")
+
+
 class DateUtils:
     @classmethod
     def date_to_text(cls, date: datetime):
@@ -44,25 +58,6 @@ class BaseDateInput(ULineEdit):
         except (ValueError, TypeError):
             return None
 
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() == Qt.Key.Key_Up:
-            if self.date:
-                self.date = DateUtils.add_or_subtract_days(self.date, 1)
-                self.setText(DateUtils.date_to_text(self.date))
-            else:
-                self.date = datetime.today().date()
-                self.setText(DateUtils.date_to_text(self.date))
-
-        elif a0.key() == Qt.Key.Key_Down:
-            if self.date:
-                self.date = DateUtils.add_or_subtract_days(self.date, -1)
-                self.setText(DateUtils.date_to_text(self.date))
-            else:
-                self.date = datetime.today().date()
-                self.setText(DateUtils.date_to_text(self.date))
-
-        return super().keyPressEvent(a0)
-
     def re_date(self, text: str):
         t_reg = re.match(r"\d{,2}\W\d{,2}\W\d{4}", text)
         if t_reg:
@@ -82,19 +77,24 @@ class BaseDateInput(ULineEdit):
 
         self.inputChangedSignal.emit()
 
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() == Qt.Key.Key_Up:
+            if self.date:
+                self.date = DateUtils.add_or_subtract_days(self.date, 1)
+                self.setText(DateUtils.date_to_text(self.date))
+            else:
+                self.date = datetime.today().date()
+                self.setText(DateUtils.date_to_text(self.date))
 
-class DatesBtn:
+        elif a0.key() == Qt.Key.Key_Down:
+            if self.date:
+                self.date = DateUtils.add_or_subtract_days(self.date, -1)
+                self.setText(DateUtils.date_to_text(self.date))
+            else:
+                self.date = datetime.today().date()
+                self.setText(DateUtils.date_to_text(self.date))
 
-    @classmethod
-    def base_styles(cls):
-        if not Dynamic.date_start:
-            SignalsApp.all_.btn_dates_style.emit("normal")
-        else:
-            SignalsApp.all_.btn_dates_style.emit("solid")
-
-    @classmethod
-    def border_style(cls):
-        SignalsApp.all_.btn_dates_style.emit("border")
+        return super().keyPressEvent(a0)
 
 
 class TitleLabel(QLabel):
@@ -175,7 +175,7 @@ class WinDates(WinSystem):
         super().__init__()
         self.setWindowTitle(Lang.dates)
 
-        DatesBtn.border_style()
+        DatesTools.border_style()
 
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
@@ -264,18 +264,18 @@ class WinDates(WinSystem):
         Dynamic.f_date_start = self.named_date(date=Dynamic.date_start)
         Dynamic.f_date_end = self.named_date(date=Dynamic.date_end)
 
-        DatesBtn.base_styles()
+        DatesTools.solid_or_normal_style()
         self.close()
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def cancel_cmd(self, *args):
-        DatesBtn.base_styles()
+        DatesTools.solid_or_normal_style()
         self.close()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
-            DatesBtn.base_styles()
+            DatesTools.solid_or_normal_style()
             self.close()
 
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
