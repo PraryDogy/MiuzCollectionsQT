@@ -183,9 +183,9 @@ class WinDates(WinSystem):
         self.setFixedSize(self.width(), self.height())
 
     def init_ui(self):
-        title_label = QLabel(Lang.search_dates)
-        title_label.setContentsMargins(0, 0, 0, 5)
-        self.central_layout.addWidget(title_label)
+        main_title = QLabel(Lang.search_dates)
+        main_title.setContentsMargins(0, 0, 0, 5)
+        self.central_layout.addWidget(main_title)
 
         widget_wid = QWidget()
         widget_layout = LayoutHor()
