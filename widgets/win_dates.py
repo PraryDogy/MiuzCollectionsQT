@@ -175,18 +175,12 @@ class RightDateWidget(DatesWid):
 class WinDates(WinSystem):
     def __init__(self):
         super().__init__()
+
         self.setWindowTitle(Lang.dates)
-
         DatesTools.border_style()
-
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
 
-        self.init_ui()
-        self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
-
-    def init_ui(self):
         main_title = QLabel(Lang.search_dates)
         self.central_layout.addWidget(main_title)
 
@@ -211,7 +205,7 @@ class WinDates(WinSystem):
         spacer_item = QSpacerItem(1, 5)
         self.central_layout.addItem(spacer_item)
 
-        clear_btn = QPushButton(text="Очистить")
+        clear_btn = QPushButton(text=Lang.reset)
         clear_btn.setFixedWidth(100)
         clear_btn.clicked.connect(self.clear_btn_cmd)
         self.central_layout.addWidget(
@@ -246,6 +240,20 @@ class WinDates(WinSystem):
         btns_h_lay.addWidget(cancel_btn)
         btns_h_lay.addStretch(1)
 
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
+
+    @classmethod
+    def reset_dates(cls, *args):
+        Dynamic.date_start, Dynamic.date_end = None, None
+        Dynamic.f_date_start, Dynamic.f_date_end = None, None
+
+        Dynamic.grid_offset = 0
+
+        SignalsApp.all_.btn_dates_style.emit("normal")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+
     def clear_btn_cmd(self, *args):
         for i in (self.left_date_wid, self.right_date_wid):
             i.clear_input()
@@ -261,16 +269,6 @@ class WinDates(WinSystem):
     def named_date(self, date: datetime):
         month = Lang.months_genitive_case[str(date.month)]
         return f"{date.day} {month} {date.year}"
-
-    def reset_dates(self, *args):
-        Dynamic.date_start, Dynamic.date_end = None, None
-        Dynamic.f_date_start, Dynamic.f_date_end = None, None
-
-        Dynamic.grid_offset = 0
-
-        SignalsApp.all_.btn_dates_style.emit("normal")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
 
     def ok_cmd(self, *args):
         if self.date_start and not self.date_end:

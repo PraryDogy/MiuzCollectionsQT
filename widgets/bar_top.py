@@ -72,6 +72,14 @@ class DatesBtn(BarTopBtn):
         toggle.triggered.connect(self.open_win)
         menu_.addAction(toggle)
 
+        reset_dates = QAction(parent=menu_, text=Lang.reset)
+        menu_.addAction(reset_dates)
+
+        if Dynamic.date_start:
+            reset_dates.triggered.connect(WinDates.reset_dates)
+        else:
+            reset_dates.setDisabled(True)
+
         self.set_border_style()
 
         menu_.show_menu()
