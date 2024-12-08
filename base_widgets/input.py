@@ -1,19 +1,11 @@
-import os
-
-from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent
-from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLineEdit
 
-from cfg import Dynamic, Static
 from lang import Lang
-from signals import SignalsApp
 from utils.utils import Utils
 
 from .context import ContextCustom
 
-CLEAR_SVG = os.path.join(Static.IMAGES, "clear.svg")
-CLEAR_SIZE = 14
 INPUT_H = 28
 LEFT_PADDING = 2
 RIGHT_PADDING = 28
@@ -21,10 +13,11 @@ RIGHT_PADDING = 28
 
 class ULineEdit(QLineEdit):
     def __init__(self):
-        """
-        custom copy paste context menu, height 28
-        padding left 2, padding right 2px
-        close btn onTextChanged
+        f"""
+        custom context menu
+        height 28
+        padding left 2
+        padding right 28
         """
         super().__init__()
         self.setFixedHeight(INPUT_H)
