@@ -31,7 +31,7 @@ class Title(QLabel, CellWid):
         CellWid.__init__(self)
         QLabel.__init__(
             self,
-            text=f"{title}. {Lang.total}: {len(db_images)}"
+            text=title
         )
         self.db_images = db_images
 
