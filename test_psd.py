@@ -2,4 +2,7 @@ from utils.utils import ReadImage
 
 import cv2
 
-src = "/Volumes/Macintosh HD/Users/Loshkarev/Desktop/ыа.tif"
+src = "/Users/Loshkarev/Desktop/ыа.psb"
+
+
+img = ReadImage.read_psd(path=src)

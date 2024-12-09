@@ -164,6 +164,7 @@ class ReadImage(Err):
             except Exception as e:
 
                 print("utils > error read psd", "src:", path, "channels: ", channels)
+                print(e)
                 return None
 
             return np.array(img)
