@@ -113,29 +113,46 @@ class ReadImage(Err):
             return None
 
     @classmethod
-    def read_psd_pil(cls, path: str) -> np.ndarray | None:
+    def read_psd(cls, path: str) -> np.ndarray | None:
 
-        try:
-            img = Image.open(path)
-            img = img.convert("RGB")
-            img = np.array(img)
-            return img
+        with open(path, "rb") as psd_file:
 
-        except Exception as e:
-            return None
+            # Проверяем, что файл имеет правильную подпись PSD/PSB:
+            # В начале файла (первые 4 байта) должна быть строка '8BPS', 
+            # которая является стандартной подписью для форматов PSD и PSB.
+            # Если подпись не совпадает, файл не является корректным PSD/PSB.
+            if psd_file.read(4) != b"8BPS":
+                return None
 
-    @classmethod
-    def read_psd_tools(cls, path: str) -> np.ndarray | None:
+            # Переходим к байту 12, где согласно спецификации PSD/PSB
+            # содержится число каналов изображения. Число каналов (2 байта)
+            # определяет, сколько цветовых и дополнительных каналов содержится в файле.
+            psd_file.seek(12)
 
-        try:
-            img = psd_tools.PSDImage.open(fp=path)
-            img = img.composite()
-            img = np.array(img)
-            img = img[..., :3]
-            return img
+            # Считываем число каналов (2 байта, big-endian формат,
+            # так как PSD/PSB используют этот порядок байтов).
+            channels = int.from_bytes(psd_file.read(2), byteorder="big")
 
-        except Exception as e:
-            return None
+            # Возвращаем указатель в начало файла (offset = 0),
+            # чтобы psd-tools или Pillow могли корректно прочитать файл с самого начала.
+            # Это важно, так как мы изменяли положение указателя для проверки структуры файла.
+            psd_file.seek(0)
+
+            try:
+
+                if channels > 3:
+                    img = psd_tools.PSDImage.open(psd_file)
+                    img = img.composite()
+                else:
+                    img = Image.open(psd_file)
+                    img = img.convert("RGB")
+
+            except Exception as e:
+
+                print("utils > error read psd", "src:", path, "channels: ", channels)
+                return None
+
+            return np.array(img)
 
     @classmethod
     def read_png_pil(cls, path: str) -> np.ndarray | None:
@@ -214,8 +231,8 @@ class ReadImage(Err):
         ext = ext.lower()
 
         data = {
-            ".psb": cls.read_psd_tools,
-            ".psd": cls.read_psd_tools,
+            ".psb": cls.read_psd,
+            ".psd": cls.read_psd,
 
             ".tif": cls.read_tiff_tifffile,
             ".tiff": cls.read_tiff_tifffile,
@@ -236,7 +253,6 @@ class ReadImage(Err):
         data_none = {
             ".tif": cls.read_tiff_pil,
             ".tiff": cls.read_tiff_pil,
-            ".psd": cls.read_psd_tools,
             ".jpg": cls.read_jpg_cv2,
             ".jpeg": cls.read_jpg_cv2,
             "jfif": cls.read_jpg_cv2,
