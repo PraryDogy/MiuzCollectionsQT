@@ -35,6 +35,8 @@ def read_psd(path: str) -> np.ndarray | None:
         # Это важно, так как мы изменяли положение указателя для проверки структуры файла.
         psd_file.seek(0)
 
+        print(channels, os.path.basename(path))
+
         try:
             if channels > 3:
                 img = psd_tools.PSDImage.open(psd_file)
@@ -50,15 +52,19 @@ def read_psd(path: str) -> np.ndarray | None:
 
 
 
-src = "/Users/Morkowik/Desktop/Evgeny/_miuz/tiff_psd_images 2"
+src = "/Users/Loshkarev/Desktop/TEST IMAGES/test big psd"
+
 images = [
     os.path.join(src, i)
     for i in os.listdir(src)
-    if i.endswith((".psd", ".psb"))
+    if i.lower().endswith((".psd", ".psb"))
 ]
 
 for i in images:
-    read_psd(i)
+    img = read_psd(i)
+
+    # cv2.imshow(i, img)
+    # cv2.waitKey(0)
 
 
 # осталось добавить try except и готово
