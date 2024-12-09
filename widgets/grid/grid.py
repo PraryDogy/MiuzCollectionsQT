@@ -177,8 +177,12 @@ class Grid(QScrollArea):
         title.r_click.connect(self.deselect_wid)
         self.set_cell_coords(title)
         self.grid_lay.addWidget(title, self.row, self.col, 1, max_col + 1)
-        # прибавляем 1 строку после title
+
+        self.col = 0
         self.row += 1
+
+        # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
+        add_last_row = False
 
         for db_image in db_images:
 
@@ -193,22 +197,24 @@ class Grid(QScrollArea):
             self.set_path_to_wid(wid)
             self.grid_lay.addWidget(wid, self.row, self.col)
 
-            # прибавляем колонку после установки виджета
             self.col += 1
+            add_last_row = True
 
-            if self.col >= max_col:
+            # Если достигли максимального количества столбцов:
+            # Сбрасываем индекс столбца.
+            # Переходим к следующей строке.
+            # Указываем, что текущая строка завершена.
+            if self.col >= max_col:  
                 self.col = 0
                 self.row += 1
+                add_last_row = False
 
-        if not len(db_images) % max_col == 0:
+        # Если после цикла остались элементы в неполной последней строке,
+        # переходим к следующей строке для корректного добавления
+        # новых элементов в будущем.
+        if add_last_row:
             self.row += 1
             self.col = 0
-
-        # 5 - любое число
-        # полная сетка: max_col = 5, последняя строка сетки = 5
-        # неполная сетка: max_col = 5, последняя строка сетки < 5
-        # при полной сетке новая строчка и сброс колонки добавляется в цикле
-        # при неполной сетке добавляется после цикла
 
     def grid_more(self, db_images: dict[str, list[DbImage]]):
         if db_images:
