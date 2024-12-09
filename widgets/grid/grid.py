@@ -468,7 +468,7 @@ class Grid(QScrollArea):
 
     def checkScrollValue(self, value):
         self.up_btn.move(
-            self.width() - 60,
+            self.width() - 65,
             self.height() - 60 + value
             )
         if value > 0:
