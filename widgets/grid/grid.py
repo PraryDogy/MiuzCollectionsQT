@@ -366,30 +366,36 @@ class Grid(QScrollArea):
         self.ww = self.width()
         max_col = self.get_max_col()
 
+        add_last_row = False
+
         for wid in self.grid_wid.findChildren((Thumbnail, Title)):
 
             if isinstance(wid, Title):
-                # добавляем новую строку перед заголовком и сбрасываем колонку,
-                # так как заголовок обособлен отдельной строкой
                 self.col = 0
                 self.row += 1
+
                 self.set_cell_coords(wid)
                 self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
+
+                self.col = 0
                 self.row += 1
-                # добавляем новую строку после заголовка
-                # так как заголовок обособлен отдельной строкой
 
             elif isinstance(wid, Thumbnail):
                 self.set_cell_coords(wid)
                 self.set_path_to_wid(wid)
                 self.grid_lay.addWidget(wid, self.row, self.col)
                 self.col += 1
-                # добавляем колонку стандартно
+                add_last_row = True
 
-            # если максимум колонок то добавляем новую строчку
+
             if self.col >= max_col:
+                add_last_row = False
                 self.col = 0
-                self.row += 1        
+                self.row += 1       
+
+        if add_last_row:
+            self.col = 0
+            self.row += 1 
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if (
