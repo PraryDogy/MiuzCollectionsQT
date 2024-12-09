@@ -1,9 +1,13 @@
-import psd_tools
 import logging
-from PIL import Image
+import os
+from time import time
+
 import cv2
 import numpy as np
-import os
+import psd_tools
+from PIL import Image
+
+from utils.utils import Utils
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
@@ -35,7 +39,7 @@ def read_psd(path: str) -> np.ndarray | None:
         # Это важно, так как мы изменяли положение указателя для проверки структуры файла.
         psd_file.seek(0)
 
-        print(channels, os.path.basename(path))
+        # print(channels, os.path.basename(path))
 
         try:
             if channels > 3:
@@ -62,11 +66,42 @@ images = [
 
 images = images[:30]
 
+
+
+
+start = time()
+
 for i in images:
     img = read_psd(i)
 
-    # cv2.imshow(i, img)
-    # cv2.waitKey(0)
+end = round(
+    time() - start, 2
+)
+print("combine", end)
 
 
-# осталось добавить try except и готово
+
+
+start = time()
+
+for i in images:
+    img = Utils.read_psd_pil(i)
+
+end = round(
+    time() - start, 2
+)
+print("pil", end)
+
+
+
+
+
+start = time()
+
+for i in images:
+    img = Utils.read_psd_tools(i)
+
+end = round(
+    time() - start, 2
+)
+print("psd tools", end)
