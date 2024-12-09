@@ -80,37 +80,46 @@ class Err:
 class ReadImage(Err):
 
     @classmethod
-    def read_tiff_tifffile(cls, path: str) -> np.ndarray | None:
+    def read_tiff(cls, path: str) -> np.ndarray | None:
 
-        errs = (
-            Exception,
+        errors = (
             tifffile.TiffFileError,
             RuntimeError,
-            DelayedImportError
+            DelayedImportError,
+            Exception
         )
 
         try:
+            # Оставляем только три канала (RGB)
             img = tifffile.imread(files=path)
             img = img[..., :3]
 
+            # Проверяем, соответствует ли тип данных изображения uint8.
+            # `uint8` — это 8-битный целочисленный формат данных, где значения
+            # пикселей лежат в диапазоне [0, 255].
+            # Большинство изображений в RGB используют именно этот формат
+            # для хранения данных.
+            # Если тип данных не `uint8`, требуется преобразование.
             if str(object=img.dtype) != "uint8":
-                img = (img/256).astype(dtype="uint8")
-            return img
 
-        except errs as e:
-            return None
-    
-    @classmethod
-    def read_tiff_pil(cls, path: str) -> np.ndarray | None:
+                # Если тип данных отличается, то предполагаем, что значения
+                # пикселей выходят за пределы диапазона [0, 255].
+                # Например, они могут быть в формате uint16 (диапазон [0, 65535]).
+                # Для преобразования выполняем нормализацию значений.
+                # Делим на 256, чтобы перевести диапазон [0, 65535] в [0, 255]:
+                # 65535 / 256 ≈ 255 (максимальное значение в uint8).
+                # Приводим типданных массива к uint8.
+                img = (img / 256).astype(dtype="uint8")  
 
-        try:
-            img = Image.open(path)
-            img = img.convert("RGB")
-            img = np.array(img)
-            return img
+        except errors:
+            try:
+                img = Image.open(path)
+                img = img.convert("RGB")
+                return np.array(img)
 
-        except Exception as e:
-            return None
+            except Exception:
+                return None
+
 
     @classmethod
     def read_psd(cls, path: str) -> np.ndarray | None:
@@ -155,7 +164,7 @@ class ReadImage(Err):
             return np.array(img)
 
     @classmethod
-    def read_png_pil(cls, path: str) -> np.ndarray | None:
+    def read_png(cls, path: str) -> np.ndarray | None:
         try:
             img = Image.open(path)
 
@@ -172,33 +181,7 @@ class ReadImage(Err):
             return None
 
     @classmethod
-    def read_png_cv2(cls, path: str) -> np.ndarray | None:
-        try:
-            image = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # Чтение с альфа-каналом
-
-            if image.shape[2] == 4:
-                alpha_channel = image[:, :, 3] / 255.0
-                rgb_channels = image[:, :, :3]
-                background_color = np.array([255, 255, 255], dtype=np.uint8)
-                background = np.full(
-                    rgb_channels.shape, background_color, dtype=np.uint8
-                )
-                converted = (
-                    rgb_channels * alpha_channel[:, :, np.newaxis] +
-                    background * (1 - alpha_channel[:, :, np.newaxis])
-                ).astype(np.uint8)
-
-            else:
-                converted = image
-
-            return converted
-
-        except Exception as e:
-            print("error read png cv2", path)
-            return None
-
-    @classmethod
-    def read_jpg_pil(cls, path: str) -> np.ndarray | None:
+    def read_jpg(cls, path: str) -> np.ndarray | None:
 
         try:
             img = Image.open(path)
@@ -206,15 +189,6 @@ class ReadImage(Err):
             return img
 
         except Exception as e:
-            return None
-
-    @classmethod
-    def read_jpg_cv2(cls, path: str) -> np.ndarray | None:
-
-        try:
-            return cv2.imread(path, cv2.IMREAD_UNCHANGED)
-
-        except (Exception, cv2.error) as e:
             return None
 
     @classmethod
@@ -234,8 +208,8 @@ class ReadImage(Err):
             ".psb": cls.read_psd,
             ".psd": cls.read_psd,
 
-            ".tif": cls.read_tiff_tifffile,
-            ".tiff": cls.read_tiff_tifffile,
+            ".tif": cls.read_tiff,
+            ".tiff": cls.read_tiff,
 
             ".nef": cls.read_raw,
             ".cr2": cls.read_raw,
@@ -243,38 +217,22 @@ class ReadImage(Err):
             ".arw": cls.read_raw,
             ".raf": cls.read_raw,
 
-            ".jpg": cls.read_jpg_pil,
-            ".jpeg": cls.read_jpg_pil,
-            "jfif": cls.read_jpg_pil,
+            ".jpg": cls.read_jpg,
+            ".jpeg": cls.read_jpg,
+            "jfif": cls.read_jpg,
 
-            ".png": cls.read_png_pil,
+            ".png": cls.read_png,
         }
 
-        data_none = {
-            ".tif": cls.read_tiff_pil,
-            ".tiff": cls.read_tiff_pil,
-            ".jpg": cls.read_jpg_cv2,
-            ".jpeg": cls.read_jpg_cv2,
-            "jfif": cls.read_jpg_cv2,
-            ".png": cls.read_png_cv2,
-        }
+        read_img_func = data.get(ext)
 
-        img = None
-
-        # если есть подходящее расширение то читаем файл
-        if data.get(ext):
-            img = data.get(ext)(full_src)
+        if read_img_func:
+            img = read_img_func(full_src)
 
         else:
-            return None
+            img = None
 
-        # если прочитать не удалось, то пытаемся прочесть запасными функциями
-        if img is None:
-            img = data_none.get(ext)
-
-        # либо None либо ndarray изображение
         return img
-
 
 class Hash:
 
