@@ -152,6 +152,8 @@ class ReadImage(Err):
             # Это важно, так как мы изменяли положение указателя для проверки структуры файла.
             psd_file.seek(0)
 
+            print(channels)
+
             try:
 
                 if channels > 3:
@@ -163,8 +165,8 @@ class ReadImage(Err):
 
             except Exception as e:
 
-                print("utils > error read psd", "src:", path, "channels: ", channels)
-                print(e)
+                # print("utils > error read psd", "src:", path, "channels: ", channels)
+                # print(e)
                 return None
 
             return np.array(img)
