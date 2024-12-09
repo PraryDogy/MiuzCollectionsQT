@@ -87,7 +87,10 @@ class DbImages(URunnable):
 
             thumbs_dict[mod].append(DbImage(pixmap, short_src, coll, fav))
 
-        self.signals_.finished_.emit(thumbs_dict)
+        try:
+            self.signals_.finished_.emit(thumbs_dict)
+        except RuntimeError:
+            ...
 
     def remove_db(self, short_hash: str):
         # если в ДБ есть запись hash_path, по которому загружается изображение

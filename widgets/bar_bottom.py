@@ -30,32 +30,8 @@ SLIDER_STYLE = """
     }
 """
 
-
-class Themes:
-    current: str
-
-
-class SvgPaths:
-    download_svg: str
-    switch_theme_svg: str
-    settings_svg: str
-
-    @classmethod
-    def update_(cls):
-
-        if not Themes.current:
-            raise Exception("no theme")
-
-        cls.download_svg = cls.images_path(f"{Themes.current}_downloads.svg")
-        cls.switch_theme_svg = cls.images_path(f"{Themes.current}_switch.svg")
-        cls.settings_svg = cls.images_path(f"{Themes.current}_settings.svg")
-    
-    @classmethod
-    def images_path(cls, src: str):
-        return os.path.join(
-            Static.IMAGES,
-            src
-        )
+DOWNLOADS_SVG = os.path.join(Static.IMAGES, "downloads.svg")
+SETTINGS_SVG = os.path.join(Static.IMAGES, "settings.svg")
 
 
 class BaseSlider(QSlider):
@@ -124,9 +100,6 @@ class BarBottom(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.set_theme()
-        SvgPaths.update_()
-
         self.setFixedHeight(28)
 
         self.h_layout = LayoutHor(self)
@@ -153,7 +126,7 @@ class BarBottom(QWidget):
             alignment=Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight
         )
 
-        self.downloads = SvgBtn(icon_path=SvgPaths.download_svg , size=20)
+        self.downloads = SvgBtn(icon_path=DOWNLOADS_SVG , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads
         SignalsApp.all_.btn_downloads_toggle.connect(self.btn_downloads_toggle)
         self.h_layout.addWidget(
@@ -161,7 +134,7 @@ class BarBottom(QWidget):
             alignment=Qt.AlignmentFlag.AlignRight
         )
 
-        self.sett_widget = SvgBtn(SvgPaths.settings_svg, size=20)
+        self.sett_widget = SvgBtn(SETTINGS_SVG, size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(
             self.sett_widget,
@@ -195,22 +168,3 @@ class BarBottom(QWidget):
             self.settings = WinSettings()
             self.settings.center_relative_parent(self.window())
             self.settings.show()
-
-    def set_theme(self):
-        palette = QApplication.palette()
-        if palette.color(palette.Window).value() < 128:
-            Themes.current = "dark"
-        else:
-            Themes.current = "light"
-
-    def change_icons(self):
-        SvgPaths.update_()
-        self.sett_widget.set_icon(SvgPaths.settings_svg)
-        self.downloads.set_icon(SvgPaths.download_svg)
-
-    def event(self, a0: QEvent | None) -> bool:
-        if a0.type() == QEvent.Type.PaletteChange:
-            self.set_theme()
-            SvgPaths.update_()
-            self.change_icons()
-        return super().event(a0)
