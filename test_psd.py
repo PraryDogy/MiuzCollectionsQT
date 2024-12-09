@@ -52,13 +52,15 @@ def read_psd(path: str) -> np.ndarray | None:
 
 
 
-src = "/Users/Loshkarev/Desktop/TEST IMAGES/test big psd"
+src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/4 Royal/1 IMG"
 
 images = [
     os.path.join(src, i)
     for i in os.listdir(src)
     if i.lower().endswith((".psd", ".psb"))
 ]
+
+images = images[:30]
 
 for i in images:
     img = read_psd(i)
