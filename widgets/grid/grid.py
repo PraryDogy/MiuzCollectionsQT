@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QPushButton,
                              QScrollArea, QSizePolicy, QWidget)
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer, SvgBtn
-from cfg import Dynamic, Filters, JsonData, Static
+from cfg import Dynamic, Filters, JsonData, Static, ThumbData
 from lang import Lang
 from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
@@ -312,8 +312,7 @@ class Grid(QScrollArea):
         self.win_image_view.show()
 
     def get_max_col(self):
-        # ДОБАВИТЬ ДОБАВИТЬ 
-        ...
+        return self.ww // ThumbData.THUMB_W[Dynamic.pixmap_size_ind]
 
     def resize_thumbnails(self):
         "изменение размера Thumbnail"

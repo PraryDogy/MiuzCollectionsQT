@@ -154,7 +154,8 @@ class NameLabel(QLabel):
         self.coll = coll
 
     def set_text(self):
-        # ДОБАВИТЬ ДЛИНУ СТРОКИ
+        ind = Dynamic.pixmap_size_ind
+        max_row = ThumbData.MAX_ROW[ind]
 
         if len(self.name) >= max_row:
             name = f"{self.name[:max_row - 10]}...{self.name[-7:]}"
@@ -175,9 +176,9 @@ class Thumbnail(QFrame, CellWid):
     select = pyqtSignal(str)
     path_to_wid: dict[str, "Thumbnail"] = {}
 
-    # ширина и высота рамки вокруг qpixmap
-    thumb_h: int = 0
-    thumb_w: int = 0
+    pixmap_size = 0
+    thumb_w = 0
+    thumb_h = 0
 
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         CellWid.__init__(self)
@@ -195,18 +196,23 @@ class Thumbnail(QFrame, CellWid):
             self.name = Static.STAR_SYM + os.path.basename(short_src)
 
         self.v_layout = LayoutVer()
-        # self.v_layout.setSpacing(Thumbnail.spacing)
-        self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.v_layout.setSpacing(ThumbData.SPACING)
+        self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self.v_layout)
 
-        self.img_label = QLabel()
-        fl = Qt.AlignmentFlag.AlignCenter
-        self.v_layout.addWidget(self.img_label, alignment=fl)
+        self.img_wid = QLabel()
+        self.img_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.v_layout.addWidget(
+            self.img_wid,
+            alignment=Qt.AlignmentFlag.AlignCenter
+        )
 
-        self.name_label = NameLabel(parent=self, name=self.name, coll=coll)
-        fl = Qt.AlignmentFlag.AlignCenter
-        self.name_label.setAlignment(fl)
-        self.v_layout.addWidget(self.name_label, alignment=fl)
+        self.text_wid = NameLabel(parent=self, name=self.name, coll=coll)
+        self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.v_layout.addWidget(
+            self.text_wid,
+            alignment=Qt.AlignmentFlag.AlignCenter
+        )
 
         self.setup()
 
@@ -216,11 +222,28 @@ class Thumbnail(QFrame, CellWid):
         cls.pixmap_size = ThumbData.PIXMAP_SIZE[ind]
         cls.thumb_w = ThumbData.THUMB_W[ind]
         cls.thumb_h = ThumbData.THUMB_H[ind]
-        cls.color_wid_h = ThumbData.COLOR_WID_H
 
     def setup(self):
-        # ДОБАВИТЬ
-        ...
+        # инициация текста
+        self.text_wid.set_text()
+
+        self.setFixedSize(
+            self.thumb_w,
+            self.thumb_h
+        )
+
+        # рамка вокруг pixmap при выделении Thumb
+        self.img_wid.setFixedSize(
+            self.pixmap_size + ThumbData.OFFSET,
+            self.pixmap_size + ThumbData.OFFSET
+        )
+
+        self.img_wid.setPixmap(
+            Utils.pixmap_scale(
+                pixmap=self.img,
+                size=self.pixmap_size
+            )
+        )
 
     def selected_style(self):
         self.setStyleSheet(Static.SOLID_STYLE)
@@ -236,8 +259,8 @@ class Thumbnail(QFrame, CellWid):
             self.fav_value = value
             self.name = Static.STAR_SYM + os.path.basename(self.short_src)
 
-        self.name_label.name = self.name
-        self.name_label.set_text()
+        self.text_wid.name = self.name
+        self.text_wid.set_text()
 
         # удаляем из избранного и если это избранные то обновляем сетку
         if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
@@ -273,7 +296,7 @@ class Thumbnail(QFrame, CellWid):
         self.select.emit(self.short_src)
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
-        self.drag.setPixmap(self.img_label.pixmap())
+        self.drag.setPixmap(self.img_wid.pixmap())
         
         url = [QUrl.fromLocalFile(full_src)]
         self.mime_data.setUrls(url)
