@@ -246,10 +246,12 @@ class Thumbnail(QFrame, CellWid):
         )
 
     def selected_style(self):
-        self.setStyleSheet(Static.SOLID_STYLE)
+        self.img_wid.setStyleSheet(Static.SOLID_STYLE)
+        self.text_wid.setStyleSheet(Static.SOLID_STYLE)
 
     def regular_style(self):
-        self.setStyleSheet(Static.NORMAL_STYLE)
+        self.img_wid.setStyleSheet(Static.NORMAL_STYLE)
+        self.text_wid.setStyleSheet(Static.NORMAL_STYLE)
 
     def change_fav(self, value: int):
         if value == 0:

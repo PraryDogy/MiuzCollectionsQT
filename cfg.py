@@ -27,7 +27,7 @@ class ThumbData:
     SPACING = 2
 
     # дополнительное пространство вокруг Pixmap
-    OFFSET = 6
+    OFFSET = 10
 
 
 class Static:
