@@ -403,4 +403,4 @@ class Dynamic:
 
     # индекс соответствующий STATIC > IMG_LABEL_SIZE
     # от индекса зависит размер Thumbnail и всех его внутренних виджетов
-    pixmap_size_ind: int = 0
+    thumb_size_ind: int = 0

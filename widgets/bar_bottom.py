@@ -64,7 +64,7 @@ class CustomSlider(BaseSlider):
             maximum=3
         )
         self.setFixedWidth(80)
-        self.setValue(Dynamic.pixmap_size_ind)
+        self.setValue(Dynamic.thumb_size_ind)
 
         self.valueChanged.connect(self.move_slider_cmd)
         SignalsApp.all_.slider_change_value.connect(self.move_slider_cmd)
@@ -75,7 +75,7 @@ class CustomSlider(BaseSlider):
         self.setValue(value)
         # Включаем сигнал обратно
         self.blockSignals(False)
-        Dynamic.pixmap_size_ind = value
+        Dynamic.thumb_size_ind = value
         SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
 
 

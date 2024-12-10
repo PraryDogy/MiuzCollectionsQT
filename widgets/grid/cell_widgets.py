@@ -154,7 +154,7 @@ class NameLabel(QLabel):
         self.coll = coll
 
     def set_text(self):
-        ind = Dynamic.pixmap_size_ind
+        ind = Dynamic.thumb_size_ind
         max_row = ThumbData.MAX_ROW[ind]
 
         if len(self.name) >= max_row:
@@ -218,7 +218,7 @@ class Thumbnail(QFrame, CellWid):
 
     @classmethod
     def calculate_size(cls):
-        ind = Dynamic.pixmap_size_ind
+        ind = Dynamic.thumb_size_ind
         cls.pixmap_size = ThumbData.PIXMAP_SIZE[ind]
         cls.thumb_w = ThumbData.THUMB_W[ind]
         cls.thumb_h = ThumbData.THUMB_H[ind]

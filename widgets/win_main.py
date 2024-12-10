@@ -150,12 +150,12 @@ class WinMain(WinFrameless):
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.pixmap_size_ind < 3:
-                    Dynamic.pixmap_size_ind += 1
-                    SignalsApp.all_.slider_change_value.emit(Dynamic.pixmap_size_ind)
+                if Dynamic.thumb_size_ind < 3:
+                    Dynamic.thumb_size_ind += 1
+                    SignalsApp.all_.slider_change_value.emit(Dynamic.thumb_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.pixmap_size_ind > 0:
-                    Dynamic.pixmap_size_ind -= 1
-                    SignalsApp.all_.slider_change_value.emit(Dynamic.pixmap_size_ind)
+                if Dynamic.thumb_size_ind > 0:
+                    Dynamic.thumb_size_ind -= 1
+                    SignalsApp.all_.slider_change_value.emit(Dynamic.thumb_size_ind)
