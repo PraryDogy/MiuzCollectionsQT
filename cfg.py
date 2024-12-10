@@ -5,6 +5,37 @@ import webbrowser
 from datetime import datetime
 
 
+class ThumbData:
+
+    # максимальный размер в пикселях по широкой стороне для кешируемого
+    # изображения в папку "hashdir" в AppliactionSupport
+    # кешированные изображения загружаются для отобажения в сетке виджетов
+    DB_PIXMAP_SIZE: int = 200
+
+    # ширина и высота Thumbnail
+    THUMB_H = [100, 125, 155, 170, 220]
+    THUMB_W = [120, 140, 140, 150, 185]
+
+
+    # шаг 20 пикселей
+    # максимальный размер в пикселях по широкой стороне для изображения
+    PIXMAP_SIZE: list = [50, 70, 100, 120, 170]
+
+    # шаг 7 пунктов
+    # текстовый виджет и цветовые метки не имеют ширины, но ширина ограничена
+    # количеством символов в тексте данных виджетов
+    TEXT_LENGTH: list = [17, 20, 20, 22, 27]
+
+    # виджет с цветовыми метками имеет только 1 строку высотой 16 пикселей
+    COLOR_WID_H = 16
+
+    # растояние между изображением, текстовым и цветовым виджетами
+    SPACING = 2
+
+    # дополнительное пространство вокруг Pixmap
+    OFFSET = 6
+
+
 class Static:
 
     APP_VER = 1.3
@@ -35,22 +66,6 @@ class Static:
 
     # для метки "избранное", произвольный
     STAR_SYM = "\U00002605" + " "
-
-    # макс. размер изображения, которое будет отпавляться в hashdir
-    PIXMAP_SIZE_MAX = 200
-
-    # доп. площадь для widgets > grid > cell_wids > Thumbnail
-    # Thumbnail содержит pixmap, qlabel, qlabel
-    THUMB_MARGIN: int = 15
-
-    # Thumbnail > img_label размеры виджета
-    IMG_LABEL_SIZE: list = [90, 130, 170, PIXMAP_SIZE_MAX]
-
-    # Thumbnail > список ширин виджета
-    THUMB_W: list = [110, 140, 170, PIXMAP_SIZE_MAX]
-
-    # Thumbnail > name_lbl > список макс. символов виджета
-    TEXT_LENGTH: list = [17, 20, 25, 29]
 
     # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ 
     APP_SUPPORT_DIR: str = os.path.join(
@@ -188,10 +203,6 @@ class JsonData:
 
     # индекс соответствующий Static > BRANDS
     brand_ind = 0
-
-    # индекс соответствующий STATIC > IMG_LABEL_SIZE
-    # от индекса зависит размер Thumbnail и всех его внутренних виджетов
-    curr_size_ind: int = 0
 
     # индекс соответствующий Lang
     lang_ind = 0
@@ -352,8 +363,6 @@ class JsonData:
     def init(cls):
         cls._check_dirs()
         cls._set_json_data()
-
-        assert len(Static.IMG_LABEL_SIZE) == len(Static.THUMB_W) == len(Static.TEXT_LENGTH)
         assert len(Static.BRANDS) == len(cls.stopcolls) == len(cls.collfolders)
 
         # если версии не совпадают то что то нужно сделать
@@ -397,3 +406,7 @@ class Dynamic:
         "aw": 700,
         "ah": 500
         }
+
+    # индекс соответствующий STATIC > IMG_LABEL_SIZE
+    # от индекса зависит размер Thumbnail и всех его внутренних виджетов
+    curr_size_ind: int = 0

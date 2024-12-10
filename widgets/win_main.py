@@ -150,12 +150,12 @@ class WinMain(WinFrameless):
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if JsonData.curr_size_ind < 3:
-                    JsonData.curr_size_ind += 1
-                    SignalsApp.all_.slider_change_value.emit(JsonData.curr_size_ind)
+                if Dynamic.curr_size_ind < 3:
+                    Dynamic.curr_size_ind += 1
+                    SignalsApp.all_.slider_change_value.emit(Dynamic.curr_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if JsonData.curr_size_ind > 0:
-                    JsonData.curr_size_ind -= 1
-                    SignalsApp.all_.slider_change_value.emit(JsonData.curr_size_ind)
+                if Dynamic.curr_size_ind > 0:
+                    Dynamic.curr_size_ind -= 1
+                    SignalsApp.all_.slider_change_value.emit(Dynamic.curr_size_ind)

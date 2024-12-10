@@ -1,16 +1,17 @@
 import os
 from time import sleep
+from typing import Literal
 
 import sqlalchemy
 import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from cfg import JsonData, Static
+from cfg import JsonData, Static, ThumbData
 from database import CLMN_NAMES, THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
-from typing import Literal
+
 from .utils import URunnable, UThreadPool, Utils
 
 
@@ -270,7 +271,7 @@ class DbUpdater:
     def get_small_img(self, src: str) -> tuple[ndarray, str] | tuple[None, None]:
 
         array_img = Utils.read_image(src)
-        array_img = Utils.fit_to_thumb(array_img, Static.PIXMAP_SIZE_MAX)
+        array_img = Utils.fit_to_thumb(array_img, ThumbData.DB_PIXMAP_SIZE)
 
         if array_img is not None:
             h_, w_ = array_img.shape[:2]

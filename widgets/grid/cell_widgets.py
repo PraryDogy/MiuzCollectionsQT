@@ -6,14 +6,14 @@ from PyQt5.QtWidgets import QAction, QApplication, QFrame, QLabel, QSizePolicy
 
 from base_widgets import ContextCustom, LayoutVer
 from base_widgets.context import ContextCustom
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
 from utils.utils import UThreadPool, Utils
 
-from ..actions import (CopyPath, FavActionDb, OpenInfoDb, OpenInView, OpenWins,
-                       Reveal, Save, ScanerRestart, MenuTypes)
+from ..actions import (CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
+                       OpenInView, OpenWins, Reveal, Save, ScanerRestart)
 from ._db_images import DbImage
 
 
@@ -154,7 +154,7 @@ class NameLabel(QLabel):
         self.coll = coll
 
     def set_text(self):
-        max_row = Static.TEXT_LENGTH[JsonData.curr_size_ind]
+        # ДОБАВИТЬ ДЛИНУ СТРОКИ
 
         if len(self.name) >= max_row:
             name = f"{self.name[:max_row - 10]}...{self.name[-7:]}"
@@ -175,8 +175,7 @@ class Thumbnail(QFrame, CellWid):
     select = pyqtSignal(str)
     path_to_wid: dict[str, "Thumbnail"] = {}
 
-    spacing = 5
-    name_label_h: int = 35
+    # ширина и высота рамки вокруг qpixmap
     thumb_h: int = 0
     thumb_w: int = 0
 
@@ -196,7 +195,7 @@ class Thumbnail(QFrame, CellWid):
             self.name = Static.STAR_SYM + os.path.basename(short_src)
 
         self.v_layout = LayoutVer()
-        self.v_layout.setSpacing(Thumbnail.spacing)
+        # self.v_layout.setSpacing(Thumbnail.spacing)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.v_layout)
 
@@ -213,41 +212,15 @@ class Thumbnail(QFrame, CellWid):
 
     @classmethod
     def calculate_size(cls):
-        cls.thumb_h = sum(
-            (
-            Static.IMG_LABEL_SIZE[JsonData.curr_size_ind],
-            cls.name_label_h,
-            Static.THUMB_MARGIN,
-            cls.spacing
-            )
-        )
-
-        cls.thumb_w = sum(
-            (
-            Static.THUMB_W[JsonData.curr_size_ind],
-            Static.THUMB_MARGIN
-            )
-        )
+        ind = Dynamic.pixmap_size_ind
+        cls.pixmap_size = ThumbData.PIXMAP_SIZE[ind]
+        cls.thumb_w = ThumbData.THUMB_W[ind]
+        cls.thumb_h = ThumbData.THUMB_H[ind]
+        cls.color_wid_h = ThumbData.COLOR_WID_H
 
     def setup(self):
-        self.img_label.setFixedHeight(
-            Static.IMG_LABEL_SIZE[JsonData.curr_size_ind]
-        )
-        self.name_label.setFixedHeight(
-            Thumbnail.name_label_h
-        )
-        self.setFixedSize(
-            Thumbnail.thumb_w,
-            Thumbnail.thumb_h
-        )
-        pixmap = Utils.pixmap_scale(
-            self.img,
-            Static.IMG_LABEL_SIZE[JsonData.curr_size_ind]
-        )
-        self.img_label.setPixmap(
-            pixmap
-        )
-        self.name_label.set_text()
+        # ДОБАВИТЬ
+        ...
 
     def selected_style(self):
         self.setStyleSheet(Static.SOLID_STYLE)

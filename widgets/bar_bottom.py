@@ -7,7 +7,7 @@ from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
 from PyQt5.QtWidgets import QApplication, QLabel, QSlider, QWidget
 
 from base_widgets import LayoutHor, SvgBtn
-from cfg import JsonData, Static
+from cfg import Dynamic, JsonData, Static
 from signals import SignalsApp
 
 from .win_downloads import WinDownloads
@@ -64,7 +64,7 @@ class CustomSlider(BaseSlider):
             maximum=3
         )
         self.setFixedWidth(80)
-        self.setValue(JsonData.curr_size_ind)
+        self.setValue(Dynamic.curr_size_ind)
 
         self.valueChanged.connect(self.move_slider_cmd)
         SignalsApp.all_.slider_change_value.connect(self.move_slider_cmd)
@@ -75,7 +75,7 @@ class CustomSlider(BaseSlider):
         self.setValue(value)
         # Включаем сигнал обратно
         self.blockSignals(False)
-        JsonData.curr_size_ind = value
+        Dynamic.curr_size_ind = value
         SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
 
 

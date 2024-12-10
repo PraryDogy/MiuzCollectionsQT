@@ -312,15 +312,8 @@ class Grid(QScrollArea):
         self.win_image_view.show()
 
     def get_max_col(self):
-        sm = sum(
-            (
-                Static.THUMB_W[JsonData.curr_size_ind],
-                Static.THUMB_MARGIN,
-                10
-            )
-        )
-
-        return max(self.ww // sm, 1)
+        # ДОБАВИТЬ ДОБАВИТЬ 
+        ...
 
     def resize_thumbnails(self):
         "изменение размера Thumbnail"
