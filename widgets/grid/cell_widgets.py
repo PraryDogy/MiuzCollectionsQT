@@ -147,30 +147,41 @@ class Title(QLabel, CellWid):
         self.regular_style()
 
 
-class NameLabel(QLabel):
+class TextWid(QLabel):
     def __init__(self, parent, name: str, coll: str):
         super().__init__(parent)
         self.name = name
         self.coll = coll
 
-    def set_text(self):
+    def set_text(self) -> list[str]:
+        name: str | list = self.name
         ind = Dynamic.thumb_size_ind
         max_row = ThumbData.MAX_ROW[ind]
+        lines: list[str] = []
 
-        if len(self.name) >= max_row:
-            name = f"{self.name[:max_row - 10]}...{self.name[-7:]}"
+        if len(name) > max_row:
+
+            first_line = name[:max_row]
+            second_line = name[max_row:]
+
+            if len(second_line) > max_row:
+
+                second_line = self.short_text(
+                    text=second_line,
+                    max_row=max_row
+                )
+
+            for i in (first_line, second_line):
+                lines.append(i)
+
         else:
-            name = self.name
+            name = lines.append(name)
 
-        if len(self.coll) > max_row:
-            cut_coll = self.coll[:max_row]
-            cut_coll = cut_coll[:-6]
-            coll = cut_coll + "..." + self.coll[-3:]
-        else:
-            coll = self.coll
+        self.setText("\n".join(lines))
 
-        self.setText(f"{coll}\n{name}")
-
+    def short_text(self, text: str, max_row: int):
+        return f"{text[:max_row - 10]}...{text[-7:]}"
+    
 
 class Thumbnail(QFrame, CellWid):
     select = pyqtSignal(str)
@@ -207,7 +218,7 @@ class Thumbnail(QFrame, CellWid):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-        self.text_wid = NameLabel(parent=self, name=self.name, coll=coll)
+        self.text_wid = TextWid(parent=self, name=self.name, coll=coll)
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(
             self.text_wid,
