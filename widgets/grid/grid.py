@@ -154,7 +154,10 @@ class Grid(QScrollArea):
         self.scroll_layout.addWidget(self.grid_wid)
 
         self.grid_lay = QGridLayout()
-        self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        self.grid_lay.setAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+        )
+        self.grid_lay.setSpacing(0)
         self.grid_wid.setLayout(self.grid_lay)
 
         if not db_images:
