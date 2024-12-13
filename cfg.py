@@ -60,6 +60,10 @@ class Static:
     # для метки "избранное", произвольный
     STAR_SYM = "\U00002605" + " "
 
+    # это символ новой строки в QLabel
+    PARAGRAPH_SEP = "\u2029"
+    LINE_FEED  = "\u000a"
+
     # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ 
     APP_SUPPORT_DIR: str = os.path.join(
         os.path.expanduser("~"),

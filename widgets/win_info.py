@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
 
 from base_widgets import ContextCustom
 from base_widgets.wins import WinSystem
+from cfg import Static
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, UThreadPool, Utils
@@ -21,17 +22,34 @@ class RightLabel(QLabel):
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+
         self.setSelection(0, len(self.text()))
-        text = self.text().replace("\n", "")
-        cmd_ = lambda: Utils.copy_text(text)
+
+        text = self.text()
+        text = text.replace(Static.PARAGRAPH_SEP, "")
+        text = text.replace(Static.LINE_FEED, "")
+
+        is_path = bool(
+            os.path.isdir(text)
+            or
+            os.path.isfile(text)
+        )
 
         menu_ = ContextCustom(event=ev)
 
-
         label_text = Lang.copy
         sel = QAction(text=label_text, parent=self)
-        sel.triggered.connect(cmd_)
+        sel.triggered.connect(lambda: Utils.copy_text(text))
         menu_.addAction(sel)
+
+        reveal = QAction(parent=menu_, text=Lang.reveal_in_finder)
+        reveal.triggered.connect(
+            lambda: Utils.reveal_files(files_list=[text])
+        )
+        menu_.addAction(reveal)
+
+        if not is_path:
+            reveal.setDisabled(True)
 
         menu_.show_menu()
 
