@@ -328,14 +328,16 @@ class WinImageView(WinChild):
             print("img viewer > no smb")
 
     def load_image(self):
-        cmd_ = lambda data: self.load_image_fin(data=data, full_src=self.full_src)
         self.task_count += 1
+        cmd_ = lambda data: self.load_image_fin(data=data, full_src=self.full_src)
 
         img_thread = LoadImage(full_src=self.full_src)
         img_thread.signals_.finished_.connect(cmd_)
         UThreadPool.pool.start(img_thread)
 
     def load_image_fin(self, data: ImageData, full_src: str):
+        self.task_count -= 1
+
         if data.pixmap.width() == 0 or data.src != full_src:
             return
         
@@ -344,8 +346,6 @@ class WinImageView(WinChild):
                 self.image_label.set_image(data.pixmap)
             except RuntimeError:
                 ...
-
-        self.task_count -= 1
 
     def close_(self, *args):
         LoadImage.images.clear()
