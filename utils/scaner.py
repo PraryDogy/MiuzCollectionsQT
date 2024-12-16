@@ -233,7 +233,7 @@ class DbUpdater:
             try:
                 conn.execute(q)
 
-            except sqlalchemy.exc.IntegrityError as e:
+            except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 Utils.print_err(error=e)
                 conn.rollback()
                 continue
