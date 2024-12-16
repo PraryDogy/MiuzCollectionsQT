@@ -19,7 +19,7 @@ from .cell_widgets import CellWid, Thumbnail, Title
 
 UP_SVG = os.path.join(Static.IMAGES, "up.svg")
 UP_STYLE = f"""
-    background: rgba(125, 125, 125, 0.5);
+    background: {Static.RGB_GRAY};
     border-radius: 22px;
 """
 

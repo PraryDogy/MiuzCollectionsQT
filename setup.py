@@ -90,7 +90,7 @@ PY2APP = "py2app" # DON'T CHANGE IT
 
 OPTIONS = {
     "iconfile": ICON_PATH,
-    "packages": ["PIL"],
+    # "packages": ["PIL"],
     "plist": {
         "CFBundleName": APP_NAME,
         "CFBundleShortVersionString": APP_VER,

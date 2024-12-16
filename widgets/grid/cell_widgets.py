@@ -258,7 +258,7 @@ class Thumbnail(QFrame, CellWid):
         )
 
     def selected_style(self):
-        self.img_wid.setStyleSheet(Static.SOLID_STYLE)
+        self.img_wid.setStyleSheet(Static.SOLID_GRAY_STYLE)
         self.text_wid.setStyleSheet(Static.SOLID_STYLE)
 
     def regular_style(self):

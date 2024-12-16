@@ -117,6 +117,7 @@ class Static:
 
     # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ 
     RGB_BLUE = "rgb(46, 89, 203)"
+    RGB_GRAY = "rgba(125, 125, 125, 0.5)"
     BORDER_INV = "2px solid transparent"
     BORDER_BLUE = f"2px solid {RGB_BLUE}"
 
@@ -128,6 +129,13 @@ class Static:
         border-radius: 6px;
         color: rgb(255, 255, 255);
         background: {RGB_BLUE};
+        border: {BORDER_INV};
+    """
+
+    SOLID_GRAY_STYLE = f"""
+        border-radius: 6px;
+        color: rgb(255, 255, 255);
+        background: {RGB_GRAY};
         border: {BORDER_INV};
     """
 
