@@ -53,6 +53,8 @@ class RightLabel(QLabel):
 
         menu_.show_menu()
 
+        self.setSelection(0, 0)
+
 
 class WorkerSignals(QObject):
     finished_ = pyqtSignal(dict)
