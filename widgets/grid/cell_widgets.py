@@ -226,7 +226,7 @@ class Thumbnail(QFrame, CellWid):
         )
 
         self.setup()
-        # self.setStyleSheet("background: gray;")
+        # self.setStyleSheet("background: red;")
 
     @classmethod
     def calculate_size(cls):

@@ -157,7 +157,7 @@ class Grid(QScrollArea):
         self.grid_lay.setAlignment(
             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         )
-        self.grid_lay.setSpacing(0)
+        self.grid_lay.setSpacing(Static.GRID_SPACING)
         self.grid_wid.setLayout(self.grid_lay)
 
         if not db_images:

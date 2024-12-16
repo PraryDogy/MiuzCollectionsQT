@@ -44,6 +44,7 @@ class Static:
 
     # в сетке изображений может отображаться за раз 150 штук
     GRID_LIMIT: int = 100
+    GRID_SPACING: int = 5
 
     # скачать системные файлы _preload
     LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
