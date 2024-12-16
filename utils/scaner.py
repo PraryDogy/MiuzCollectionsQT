@@ -339,7 +339,9 @@ class DbUpdater:
             try:
                 conn.execute(query)
 
-            except sqlalchemy.exc.IntegrityError as e:
+            # overflow error бывает прозникает когда пишет
+            # python integer too large to insert db
+            except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 Utils.print_err(error=e)
                 conn.rollback()
                 continue
