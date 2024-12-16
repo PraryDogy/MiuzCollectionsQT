@@ -23,7 +23,7 @@ psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
 psd_logger.setLevel(logging.CRITICAL)
 
-SCRIPTS = "applescripts"
+SCRIPTS = "scripts"
 REVEAL_SCPT = os.path.join(SCRIPTS, "reveal_files.scpt")
 
 
