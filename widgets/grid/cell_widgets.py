@@ -225,6 +225,13 @@ class Thumbnail(QFrame, CellWid):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
+        for i in (self.img_wid, self.text_wid):
+            i.mouseDoubleClickEvent = self.double_click_cmd
+            i.mouseReleaseEvent = self.release_cmd
+            i.mousePressEvent = self.press_cmd
+            i.mouseMoveEvent = self.move_cmd
+            i.contextMenuEvent = self.context_cmd
+
         self.setup()
         # self.setStyleSheet("background: red;")
 
@@ -280,19 +287,19 @@ class Thumbnail(QFrame, CellWid):
         if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
-    def mouseDoubleClickEvent(self, a0: QMouseEvent | None) -> None:
+    def double_click_cmd(self, a0: QMouseEvent | None) -> None:
         self.select.emit(self.short_src)
         SignalsApp.all_.win_img_view_open_in.emit(self)
 
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+    def release_cmd(self, ev: QMouseEvent | None) -> None:
         self.select.emit(self.short_src)
 
-    def mousePressEvent(self, a0: QMouseEvent | None) -> None:
+    def press_cmd(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
 
-    def mouseMoveEvent(self, a0: QMouseEvent | None) -> None:
+    def move_cmd(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.RightButton:
             return
 
@@ -320,7 +327,7 @@ class Thumbnail(QFrame, CellWid):
 
         return super().mouseMoveEvent(a0)
 
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+    def context_cmd(self, ev: QContextMenuEvent | None) -> None:
         menu_ = ContextCustom(event=ev)
 
         cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
