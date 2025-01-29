@@ -154,12 +154,16 @@ class ReadImage(Err):
 
             try:
 
-                if channels > 3:
-                    img = psd_tools.PSDImage.open(psd_file)
-                    img = img.composite()
-                else:
-                    img = Image.open(psd_file)
+                # if channels > 3:
+                #     img = psd_tools.PSDImage.open(psd_file)
+                #     img = img.composite()
+                #     print("psd tools")
+                # else:
+                #     print("PIL")
+                #     img = Image.open(psd_file)
 
+                img = psd_tools.PSDImage.open(psd_file)
+                img = img.composite()
                 img = img.convert("RGB")
                 return np.array(img)
 
