@@ -330,6 +330,10 @@ class DbUpdater:
     def insert_db(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
         conn = Dbase.engine.connect()
 
+        if queries is None:
+            ScanerTools.can_scan = False
+            return
+
         for query in queries.keys():
 
             # не удалять
@@ -356,6 +360,10 @@ class DbUpdater:
         conn.close()
 
     def insert_images(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
+
+        if queries is None:
+            ScanerTools.can_scan = False
+            return
 
         total = len(queries)
 
