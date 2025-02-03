@@ -181,7 +181,19 @@ class TextWid(QLabel):
 
     def short_text(self, text: str, max_row: int):
         return f"{text[:max_row - 10]}...{text[-7:]}"
+
+    def mouseReleaseEvent(self, ev):
+        return super().mouseReleaseEvent(ev)
     
+    
+class ImgWid(QLabel):
+    def __init__(self):
+        super().__init__()
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def mouseReleaseEvent(self, ev):
+        return super().mouseReleaseEvent(ev)
+
 
 class Thumbnail(QFrame, CellWid):
     select = pyqtSignal(str)
@@ -211,8 +223,7 @@ class Thumbnail(QFrame, CellWid):
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self.v_layout)
 
-        self.img_wid = QLabel()
-        self.img_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.img_wid = ImgWid()
         self.v_layout.addWidget(
             self.img_wid,
             alignment=Qt.AlignmentFlag.AlignCenter
@@ -225,12 +236,12 @@ class Thumbnail(QFrame, CellWid):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-        for i in (self.img_wid, self.text_wid):
-            i.mouseDoubleClickEvent = self.double_click_cmd
-            i.mouseReleaseEvent = self.release_cmd
-            i.mousePressEvent = self.press_cmd
-            i.mouseMoveEvent = self.move_cmd
-            i.contextMenuEvent = self.context_cmd
+        # for i in (self.img_wid, self.text_wid):
+        #     i.mouseDoubleClickEvent = self.double_click_cmd
+        #     i.mouseReleaseEvent = self.release_cmd
+        #     i.mousePressEvent = self.press_cmd
+        #     i.mouseMoveEvent = self.move_cmd
+        #     i.contextMenuEvent = self.context_cmd
 
         self.setup()
         # self.setStyleSheet("background: red;")

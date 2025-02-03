@@ -3,7 +3,7 @@ from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
-from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel, QPushButton,
+from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QScrollArea, QSizePolicy, QWidget)
 
 from base_widgets import ContextCustom, LayoutHor, LayoutVer, SvgBtn
@@ -15,7 +15,7 @@ from utils.utils import UThreadPool, Utils
 from ..actions import MenuTypes, OpenWins, ScanerRestart
 from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
-from .cell_widgets import CellWid, Thumbnail, Title
+from .cell_widgets import CellWid, ImgWid, TextWid, Thumbnail, Title
 
 UP_SVG = os.path.join(Static.IMAGES, "up.svg")
 UP_STYLE = f"""
@@ -90,11 +90,14 @@ class Grid(QScrollArea):
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
 
+        self.selected_widgets: list[Thumbnail] = []
+
+
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
 
-        self.curr_cell: tuple = (0, 0)
+        self.curr_cell: tuple = None
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
 
         scroll_wid = QWidget(parent=self)
@@ -252,7 +255,7 @@ class Grid(QScrollArea):
         self.cell_to_wid.clear()
         Thumbnail.path_to_wid.clear()
         self.row, self.col = 0, 0
-        self.curr_cell = (0, 0)
+        self.curr_cell = None
 
     def select_wid(self, data: tuple | str | Thumbnail):
         if isinstance(data, Thumbnail):
@@ -443,7 +446,39 @@ class Grid(QScrollArea):
         return super().keyPressEvent(a0)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        self.deselect_wid()
+
+        if a0.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+
+            if not self.selected_widgets:
+                print("select one")
+            else:
+                print("select more")
+
+
+        elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+            wid = QApplication.widgetAt(a0.globalPos())
+            if isinstance(wid, (ImgWid, TextWid)):
+                parent = wid.parent()
+                assert isinstance(parent, Thumbnail)
+
+                if parent in self.selected_widgets:
+                    self.selected_widgets.remove(parent)
+                    parent.regular_style()
+                else:
+                    self.selected_widgets.append(parent)
+                    parent.selected_style()
+
+        else:
+            for i in self.selected_widgets:
+                i.regular_style()
+            self.selected_widgets.clear()
+
+            wid = QApplication.widgetAt(a0.globalPos())
+            if isinstance(wid, (ImgWid, TextWid)):
+                parent = wid.parent()
+                assert isinstance(parent, Thumbnail)
+                parent.selected_style()
+                self.selected_widgets.append(parent)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.resize_timer.stop()
