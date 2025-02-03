@@ -450,6 +450,7 @@ class Grid(QScrollArea):
         if a0.modifiers() == Qt.KeyboardModifier.ShiftModifier:
 
             wid = QApplication.widgetAt(a0.globalPos())
+
             if isinstance(wid, (ImgWid, TextWid)):  
                 wid = wid.parent()
                 assert isinstance(wid, Thumbnail)
@@ -457,6 +458,7 @@ class Grid(QScrollArea):
             if not self.selected_widgets:
                 wid.selected_style()
                 self.selected_widgets.append(wid)
+                self.curr_cell = (wid.row, wid.col)
 
             else:
                 coords = list(self.cell_to_wid)
