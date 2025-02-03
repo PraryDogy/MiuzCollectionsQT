@@ -450,7 +450,13 @@ class Grid(QScrollArea):
         if a0.modifiers() == Qt.KeyboardModifier.ShiftModifier:
 
             if not self.selected_widgets:
-                print("select one")
+                wid = QApplication.widgetAt(a0.globalPos())
+                if isinstance(wid, (ImgWid, TextWid)):  
+                    parent = wid.parent()
+                    assert isinstance(parent, Thumbnail)
+                    parent.selected_style()
+                    self.selected_widgets.append(parent)
+
             else:
                 print("select more")
 
@@ -472,6 +478,7 @@ class Grid(QScrollArea):
             for i in self.selected_widgets:
                 i.regular_style()
             self.selected_widgets.clear()
+            self.curr_cell = None
 
             wid = QApplication.widgetAt(a0.globalPos())
             if isinstance(wid, (ImgWid, TextWid)):
@@ -479,6 +486,7 @@ class Grid(QScrollArea):
                 assert isinstance(parent, Thumbnail)
                 parent.selected_style()
                 self.selected_widgets.append(parent)
+                self.curr_cell = (parent.row, parent.col)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.resize_timer.stop()
