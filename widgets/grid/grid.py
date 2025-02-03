@@ -449,16 +449,35 @@ class Grid(QScrollArea):
 
         if a0.modifiers() == Qt.KeyboardModifier.ShiftModifier:
 
+            wid = QApplication.widgetAt(a0.globalPos())
+            if isinstance(wid, (ImgWid, TextWid)):  
+                wid = wid.parent()
+                assert isinstance(wid, Thumbnail)
+
             if not self.selected_widgets:
-                wid = QApplication.widgetAt(a0.globalPos())
-                if isinstance(wid, (ImgWid, TextWid)):  
-                    parent = wid.parent()
-                    assert isinstance(parent, Thumbnail)
-                    parent.selected_style()
-                    self.selected_widgets.append(parent)
+                wid.selected_style()
+                self.selected_widgets.append(wid)
 
             else:
-                print("select more")
+                coords = list(self.cell_to_wid)
+
+                if coords.index((wid.row, wid.col)) > coords.index(self.curr_cell):
+                    start = coords.index(self.curr_cell)
+                    end = coords.index((wid.row, wid.col))
+                    coords = coords[start : end + 1]
+
+                else:
+                    start = coords.index((wid.row, wid.col))
+                    end = coords.index(self.curr_cell)
+                    coords = coords[start : end]
+
+                for i in coords:
+
+                    wid_ = self.cell_to_wid.get(i)
+
+                    if wid_ not in self.selected_widgets:
+                        wid_.selected_style()
+                        self.selected_widgets.append(wid_)
 
 
         elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
