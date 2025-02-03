@@ -481,7 +481,6 @@ class Grid(QScrollArea):
                         wid_.selected_style()
                         self.selected_widgets.append(wid_)
 
-
         elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
             wid = QApplication.widgetAt(a0.globalPos())
             if isinstance(wid, (ImgWid, TextWid)):
