@@ -406,27 +406,26 @@ class Grid(QScrollArea):
             return None
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if (
-            a0.modifiers() == Qt.KeyboardModifier.ControlModifier
-            and
-            a0.key() == Qt.Key.Key_I
-        ):
 
-            wid = self.get_curr_cell()
-            coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        command = Qt.KeyboardModifier.ControlModifier
+        if a0.modifiers() == command and a0.key() == Qt.Key.Key_I:
 
-            if coll_folder:
-                OpenWins.info_db(
-                    parent_=self.window(), 
-                    short_src=wid.short_src,
-                    coll_folder=coll_folder
-                    )
-            else:
-                OpenWins.smb(self.window())
+            if self.selected_widgets:
+            
+                wid = self.selected_widgets[-1]
+                coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
 
-        elif a0.key() in (
-            Qt.Key.Key_Space, Qt.Key.Key_Return
-        ):
+                if coll_folder:
+                    OpenWins.info_db(
+                        parent_=self.window(), 
+                        short_src=wid.short_src,
+                        coll_folder=coll_folder
+                        )
+
+                else:
+                    OpenWins.smb(self.window())
+
+        elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
 
             wid = self.get_curr_cell()
             if wid:
