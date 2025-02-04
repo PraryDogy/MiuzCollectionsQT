@@ -395,7 +395,14 @@ class Grid(QScrollArea):
 
         if add_last_row:
             self.col = 0
-            self.row += 1 
+            self.row += 1
+    
+    def get_wid(self, a0: QMouseEvent) -> None | Thumbnail:
+        wid = QApplication.widgetAt(a0.globalPos())
+        if isinstance(wid, (ImgWid, TextWid)):
+            return wid.parent()
+        else:
+            return None
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if (
@@ -447,32 +454,54 @@ class Grid(QScrollArea):
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
 
+        if a0.button() != Qt.MouseButton.LeftButton:
+            return
+
+        clicked_wid = QApplication.widgetAt(a0.globalPos())
+    
+        if isinstance(clicked_wid, (ImgWid, TextWid)):
+            clicked_wid = clicked_wid.parent()
+
+        else:
+            clicked_wid = None
+
+        # клик по сетке
+        if not clicked_wid:
+
+            for i in self.selected_widgets:
+                i.regular_style()
+
+            self.selected_widgets.clear()
+            self.curr_cell = None
+            return
+
         if a0.modifiers() == Qt.KeyboardModifier.ShiftModifier:
 
-            wid = QApplication.widgetAt(a0.globalPos())
-
-            if isinstance(wid, (ImgWid, TextWid)):  
-                wid = wid.parent()
-                assert isinstance(wid, Thumbnail)
-
+            # шифт клик: если не было выделенных виджетов
             if not self.selected_widgets:
-                wid.selected_style()
-                self.selected_widgets.append(wid)
-                self.curr_cell = (wid.row, wid.col)
 
+                clicked_wid.selected_style()
+                self.selected_widgets.append(clicked_wid)
+                self.curr_cell = (clicked_wid.row, clicked_wid.col)
+
+            # шифт клик: если уже был выделен один / несколько виджетов
             else:
+
                 coords = list(self.cell_to_wid)
 
-                if coords.index((wid.row, wid.col)) > coords.index(self.curr_cell):
+                # шифт клик: слева направо (по возрастанию)
+                if coords.index((clicked_wid.row, clicked_wid.col)) > coords.index(self.curr_cell):
                     start = coords.index(self.curr_cell)
-                    end = coords.index((wid.row, wid.col))
+                    end = coords.index((clicked_wid.row, clicked_wid.col))
                     coords = coords[start : end + 1]
 
+                # шифт клик: справа налево (по убыванию)
                 else:
-                    start = coords.index((wid.row, wid.col))
+                    start = coords.index((clicked_wid.row, clicked_wid.col))
                     end = coords.index(self.curr_cell)
                     coords = coords[start : end]
 
+                # выделяем виджеты по срезу координат coords
                 for i in coords:
 
                     wid_ = self.cell_to_wid.get(i)
@@ -482,31 +511,27 @@ class Grid(QScrollArea):
                         self.selected_widgets.append(wid_)
 
         elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-            wid = QApplication.widgetAt(a0.globalPos())
-            if isinstance(wid, (ImgWid, TextWid)):
-                parent = wid.parent()
-                assert isinstance(parent, Thumbnail)
 
-                if parent in self.selected_widgets:
-                    self.selected_widgets.remove(parent)
-                    parent.regular_style()
-                else:
-                    self.selected_widgets.append(parent)
-                    parent.selected_style()
+            # комманд клик: был выделен виджет, снять выделение
+            if clicked_wid in self.selected_widgets:
+                self.selected_widgets.remove(clicked_wid)
+                clicked_wid.regular_style()
+
+            # комманд клик: виджет не был виделен, выделить
+            else:
+                self.selected_widgets.append(clicked_wid)
+                clicked_wid.selected_style()
 
         else:
+            
             for i in self.selected_widgets:
                 i.regular_style()
-            self.selected_widgets.clear()
-            self.curr_cell = None
 
-            wid = QApplication.widgetAt(a0.globalPos())
-            if isinstance(wid, (ImgWid, TextWid)):
-                parent = wid.parent()
-                assert isinstance(parent, Thumbnail)
-                parent.selected_style()
-                self.selected_widgets.append(parent)
-                self.curr_cell = (parent.row, parent.col)
+            self.selected_widgets.clear()
+
+            self.curr_cell = (clicked_wid.row, clicked_wid.col)
+            self.selected_widgets.append(clicked_wid)
+            clicked_wid.selected_style()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.resize_timer.stop()
@@ -515,16 +540,23 @@ class Grid(QScrollArea):
         return super().resizeEvent(a0)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        self.deselect_wid()
-        self.menu_ = ContextCustom(event=a0)
+        wid = QApplication.widgetAt(a0.globalPos())
 
-        reload = ScanerRestart(self.menu_)
-        self.menu_.addAction(reload)
+        if isinstance(wid, (TextWid, ImgWid)):
+            ...
 
-        types_ = MenuTypes(parent=self.menu_)
-        self.menu_.addMenu(types_)
+        else:
 
-        self.menu_.show_menu()
+            self.deselect_wid()
+            self.menu_ = ContextCustom(event=a0)
+
+            reload = ScanerRestart(self.menu_)
+            self.menu_.addAction(reload)
+
+            types_ = MenuTypes(parent=self.menu_)
+            self.menu_.addMenu(types_)
+
+            self.menu_.show_menu()
 
     def checkScrollValue(self, value):
         self.up_btn.move(
