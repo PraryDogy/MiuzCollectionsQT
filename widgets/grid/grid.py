@@ -96,6 +96,7 @@ class Grid(QScrollArea):
         self.selected_widgets: list[Thumbnail] = []
         self.delete_later_widgets: list[QWidget] = []
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
+        self.row, self.col = 0, 0
 
         self.curr_cell: tuple = None
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
@@ -119,7 +120,7 @@ class Grid(QScrollArea):
 
         self.signals_cmd(flag="reload")
 
-        SignalsApp.all_.thumbnail_select.connect(self.select_wid)
+        # SignalsApp.all_.thumbnail_select.connect(self.select_wid)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
 
@@ -209,10 +210,13 @@ class Grid(QScrollArea):
             )
 
             self.rearraged_widgets[grid_lay].append(wid)
-
             Thumbnail.path_to_wid[wid.short_src] = wid
+            self.cell_to_wid[self.row, self.col] = wid
             grid_lay.addWidget(wid, row, col)
+
+            self.col += 1
             col += 1
+
             add_last_row = True
 
             # Если достигли максимального количества столбцов:
@@ -220,14 +224,20 @@ class Grid(QScrollArea):
             # Переходим к следующей строке.
             # Указываем, что текущая строка завершена.
             if col >= max_col:  
+
                 col = 0
+                self.col = 0
+
                 row += 1
+                self.row += 1
+
                 add_last_row = False
 
         # Если после цикла остались элементы в неполной последней строке,
         # переходим к следующей строке для корректного добавления
         # новых элементов в будущем.
         if add_last_row:
+            self.row += 1
             row += 1
             col = 0
 
@@ -240,85 +250,9 @@ class Grid(QScrollArea):
                     db_images=db_images,
                     max_col=self.get_max_col()
                 )
-
-    def set_curr_sell(self, coords: tuple):
-        self.curr_cell = coords
-
-    def get_curr_cell(self):
-        return self.cell_to_wid.get(self.curr_cell)
     
-    def get_cell(self, coords: tuple):
-        return self.cell_to_wid.get(coords)
-
-    def set_cell_coords(self, wid: CellWid):
-        coords = self.row, self.col
-        self.cell_to_wid[coords] = wid
-        wid.row, wid.col = coords
-
-    def set_path_to_wid(self, wid: Thumbnail):
-        Thumbnail.path_to_wid[wid.short_src] = wid
-
-    def get_path_to_wid(self, src: str):
-        return Thumbnail.path_to_wid.get(src)
-
-    def reset_grid_data(self):
-        self.cell_to_wid.clear()
-        Thumbnail.path_to_wid.clear()
-        self.row, self.col = 0, 0
-        self.curr_cell = None
-
-    def select_wid(self, data: tuple | str | Thumbnail):
-        if isinstance(data, Thumbnail):
-            coords = data.row, data.col
-            new_wid = data
-
-        elif isinstance(data, tuple):
-            coords = data
-            new_wid = self.get_cell(coords)
-
-        elif isinstance(data, str):
-            new_wid = self.get_path_to_wid(src=data)
-            coords = new_wid.row, new_wid.col
-
-        # вычисляем это движение вверх или вниз
-        if self.curr_cell > coords:
-            offset = -1
-        else:
-            offset = 1
-
-        # если виджет по движению не найден, пробуем назначить новую строку
-        if not new_wid:
-            coords = (coords[0] + offset, 0)
-            new_wid = self.get_cell(coords)
-
-        # если это заголовок, прибавляем/убавляем строку чтобы пропустить его
-        if isinstance(new_wid, Title):
-            coords = (data[0] + offset, data[1])
-            new_wid = self.get_cell(coords)
-
-        if isinstance(new_wid, Thumbnail):
-            self.deselect_wid()
-            new_wid.set_frame()
-            self.ensureWidgetVisible(new_wid)
-
-            self.set_curr_sell(coords)
-
-            if isinstance(BarBottom.path_label, QLabel):
-                t = f"{new_wid.collection}: {new_wid.name}"
-                BarBottom.path_label.setText(t)
-
-            return new_wid
-
-        return None
-
-    def deselect_wid(self):
-
-        wid = self.get_curr_cell()
-        if isinstance(wid, Thumbnail | Title):
-            wid.set_no_frame()
-
-        assert isinstance(BarBottom.path_label, QLabel)
-        BarBottom.path_label.setText("")
+    # assert isinstance(BarBottom.path_label, QLabel)
+    # BarBottom.path_label.setText("")
 
     def open_in_view(self, wid: Thumbnail):
         assert isinstance(wid, Thumbnail)
@@ -350,29 +284,47 @@ class Grid(QScrollArea):
             return
 
         Thumbnail.path_to_wid.clear()
+        self.cell_to_wid.clear()
+
         self.ww = self.width()
         max_col = self.get_max_col()
         add_last_row = False
-        row, col = 0, 0
+
+        self.row, self.coll = 0, 0
 
         for grid_lay, grid_widgets in self.rearraged_widgets.items():
+
+            row, col = 0, 0
 
             for wid in grid_widgets:
 
                 Thumbnail.path_to_wid[wid.short_src] = wid
+                self.cell_to_wid[self.row, self.col] = wid
                 grid_lay.addWidget(wid, row, col)
+
                 col += 1
+                self.col += 1
+
                 add_last_row = True
 
                 if col >= max_col:
+
                     add_last_row = False
+
+                    self.col = 0
                     col = 0
+
+                    self.row += 1
                     row += 1       
 
             if add_last_row:
+
+                self.col = 0
                 col = 0
+
+                self.row += 1
                 row += 1
-    
+
     def get_wid(self, a0: QMouseEvent) -> None | Thumbnail:
         wid = QApplication.widgetAt(a0.globalPos())
         if isinstance(wid, (ImgWid, TextWid)):
