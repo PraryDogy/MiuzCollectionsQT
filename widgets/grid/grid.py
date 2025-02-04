@@ -287,13 +287,12 @@ class Grid(QScrollArea):
             return
 
         Thumbnail.path_to_wid.clear()
-        self.cell_to_wid.clear()
+        self.cell_to_wid: dict[tuple, Thumbnail] = {}
+        self.row, self.coll = 0, 0
 
         self.ww = self.width()
         max_col = self.get_max_col()
         add_last_row = False
-
-        self.row, self.coll = 0, 0
 
         for grid_lay, grid_widgets in self.rearraged_widgets.items():
 
