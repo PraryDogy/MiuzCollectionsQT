@@ -519,6 +519,11 @@ class Grid(QScrollArea):
                 clicked_wid.set_frame()
                 self.selected_widgets.append(clicked_wid)
 
+            urls = [
+                i.short_src
+                for i in self.selected_widgets
+            ]
+
             cmd_ = lambda: self.open_in_view(wid=clicked_wid)
             view = OpenInView(parent_=self.menu_)
             view._clicked.connect(cmd_)
@@ -558,7 +563,7 @@ class Grid(QScrollArea):
             save_as = Save(
                 parent=self.menu_,
                 win=self.window(),
-                short_src=clicked_wid.short_src,
+                short_src=urls,
                 save_as=True
                 )
             self.menu_.addAction(save_as)
@@ -566,7 +571,7 @@ class Grid(QScrollArea):
             save = Save(
                 parent=self.menu_,
                 win=self.window(),
-                short_src=clicked_wid.short_src,
+                short_src=urls,
                 save_as=False
                 )
             self.menu_.addAction(save)

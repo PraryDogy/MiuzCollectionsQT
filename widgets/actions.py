@@ -181,10 +181,16 @@ class Save(QAction):
         else:
             text: str = Lang.save_image_downloads
 
+        if isinstance(short_src, list):
+            text = f"{text} ({len(short_src)})"
+        else:
+            text = f"{text} (1)"
+            short_src = [short_src]
+
         super().__init__(parent=parent, text=text)
         self.triggered.connect(self.cmd_)
         self.save_as = save_as
-        self.short_src = short_src
+        self.short_src: list = short_src
         self.parent_ = parent
         self.win_ = win
 
@@ -192,11 +198,16 @@ class Save(QAction):
         coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
 
         if coll_folder:
-            full_src = Utils.get_full_src(coll_folder, self.short_src)
+
+            full_src = [
+                Utils.get_full_src(coll_folder, url)
+                for url in self.short_src
+            ]
 
             if self.save_as:
                 dialog = OpenWins.dialog_dirs()
                 dest = dialog.getExistingDirectory()
+
             else:
                 dest = Dynamic.down_folder
 
@@ -206,12 +217,6 @@ class Save(QAction):
             OpenWins.smb(parent_=self.win_)
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
-
-        if not full_src or not os.path.exists(full_src):
-            return
-
-        if isinstance(full_src, str):
-            full_src = [full_src]
 
         cmd_ = lambda f: self.reveal_copied_files(files=f)
         thread_ = CopyFiles(dest=dest, files=full_src)
