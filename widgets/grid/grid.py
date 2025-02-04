@@ -12,7 +12,8 @@ from lang import Lang
 from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
 
-from ..actions import MenuTypes, OpenWins, ScanerRestart
+from ..actions import (CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
+                       OpenInView, OpenWins, Reveal, Save, ScanerRestart)
 from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
 from .cell_widgets import CellWid, ImgWid, TextWid, Thumbnail, Title
@@ -553,7 +554,82 @@ class Grid(QScrollArea):
             self.menu_.addMenu(types_)
 
         else:
-            ...
+
+            if not self.selected_widgets:
+
+                clicked_wid.set_frame()
+                self.selected_widgets.append(clicked_wid)
+                self.curr_cell = (clicked_wid.row, clicked_wid.col)
+
+            elif clicked_wid not in self.selected_widgets:
+
+                for i in self.selected_widgets:
+                    i.set_no_frame()
+                self.selected_widgets.clear()
+
+                clicked_wid.set_frame()
+                self.selected_widgets.append(clicked_wid)
+                self.curr_cell = (clicked_wid.row, clicked_wid.col)
+
+            # cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
+            view = OpenInView(parent_=self.menu_)
+            # view._clicked.connect(cmd_)
+            self.menu_.addAction(view)
+
+            info = OpenInfoDb(
+                parent=self.menu_,
+                win=self.window(),
+                short_src=clicked_wid.short_src
+                )
+            self.menu_.addAction(info)
+
+            self.fav_action = FavActionDb(
+                parent=self.menu_,
+                short_src=clicked_wid.short_src,
+                fav_value=clicked_wid.fav_value
+                )
+            # self.fav_action.finished_.connect(self.change_fav)
+            self.menu_.addAction(self.fav_action)
+
+            self.menu_.addSeparator()
+
+            copy = CopyPath(
+                parent=self.menu_,
+                win=self.window(),
+                short_src=clicked_wid.short_src
+            )
+            self.menu_.addAction(copy)
+
+            reveal = Reveal(
+                parent=self.menu_,
+                win=self.window(),
+                short_src=clicked_wid.short_src
+            )
+            self.menu_.addAction(reveal)
+
+            save_as = Save(
+                parent=self.menu_,
+                win=self.window(),
+                short_src=clicked_wid.short_src,
+                save_as=True
+                )
+            self.menu_.addAction(save_as)
+
+            save = Save(
+                parent=self.menu_,
+                win=self.window(),
+                short_src=clicked_wid.short_src,
+                save_as=False
+                )
+            self.menu_.addAction(save)
+
+            self.menu_.addSeparator()
+
+            reload = ScanerRestart(parent=self.menu_)
+            self.menu_.addAction(reload)
+
+            types_ = MenuTypes(parent=self.menu_)
+            self.menu_.addMenu(types_)
 
         self.menu_.show_menu()
 

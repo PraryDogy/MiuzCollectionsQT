@@ -42,109 +42,114 @@ class Title(QLabel, CellWid):
 
         self.setStyleSheet(Static.TITLE_NORMAL)
 
-    def save_cmd(self, is_layers: bool, save_as: bool):
+    # def save_cmd(self, is_layers: bool, save_as: bool):
 
-        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+    #     coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
 
-        if coll_folder:
+    #     if coll_folder:
 
-            if is_layers:
-                images = [
-                    Utils.get_full_src(coll_folder, i.short_src)
-                    for i in self.db_images
-                    if i.short_src.endswith(Static.LAYERS_EXT)
-                    ]
-            else:
-                images = [
-                    Utils.get_full_src(coll_folder, i.short_src)
-                    for i in self.db_images
-                    if not i.short_src.endswith(Static.LAYERS_EXT)
-                    ]
+    #         if is_layers:
+    #             images = [
+    #                 Utils.get_full_src(coll_folder, i.short_src)
+    #                 for i in self.db_images
+    #                 if i.short_src.endswith(Static.LAYERS_EXT)
+    #                 ]
+    #         else:
+    #             images = [
+    #                 Utils.get_full_src(coll_folder, i.short_src)
+    #                 for i in self.db_images
+    #                 if not i.short_src.endswith(Static.LAYERS_EXT)
+    #                 ]
 
-            if save_as:
-                dialog = OpenWins.dialog_dirs()
-                dest = dialog.getExistingDirectory()
+    #         if save_as:
+    #             dialog = OpenWins.dialog_dirs()
+    #             dest = dialog.getExistingDirectory()
 
-                if not dest:
-                    return
+    #             if not dest:
+    #                 return
 
-            else:
-                dest = Dynamic.down_folder
+    #         else:
+    #             dest = Dynamic.down_folder
             
-            self.copy_files_cmd(dest, images)
+    #         self.copy_files_cmd(dest, images)
 
-        else:
-            OpenWins.smb(self.window())
+    #     else:
+    #         OpenWins.smb(self.window())
 
-    def copy_files_cmd(self, dest: str, files: list):
-        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
-        if coll_folder:
-            self.copy_files_cmd_(dest, files)
-        else:
-            OpenWins.smb(self.window())
+    # def copy_files_cmd(self, dest: str, files: list):
+    #     coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+    #     if coll_folder:
+    #         self.copy_files_cmd_(dest, files)
+    #     else:
+    #         OpenWins.smb(self.window())
 
-    def copy_files_cmd_(self, dest: str, files: list):
-        files = [i for i in files if os.path.exists(i)]
+    # def copy_files_cmd_(self, dest: str, files: list):
+    #     files = [i for i in files if os.path.exists(i)]
 
-        if len(files) == 0:
-            return
+    #     if len(files) == 0:
+    #         return
 
-        cmd_ = lambda files: self.copy_files_fin(files=files)
-        copy_task = CopyFiles(dest=dest, files=files)
-        copy_task.signals_.finished_.connect(cmd_)
+    #     cmd_ = lambda files: self.copy_files_fin(files=files)
+    #     copy_task = CopyFiles(dest=dest, files=files)
+    #     copy_task.signals_.finished_.connect(cmd_)
 
-        SignalsApp.all_.btn_downloads_toggle.emit("show")
-        UThreadPool.pool.start(copy_task)
+    #     SignalsApp.all_.btn_downloads_toggle.emit("show")
+    #     UThreadPool.pool.start(copy_task)
 
-    def copy_files_fin(self, files: list):
-        self.reveal_files = Utils.reveal_files(files)
-        if len(CopyFiles.current_threads) == 0:
-            SignalsApp.all_.btn_downloads_toggle.emit("hide")
+    # def copy_files_fin(self, files: list):
+    #     self.reveal_files = Utils.reveal_files(files)
+    #     if len(CopyFiles.current_threads) == 0:
+    #         SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
-    def selected_style(self):
+    def set_frame(self):
+        return
         self.setStyleSheet(Static.TITLE_SOLID)
 
-    def regular_style(self):
+    def set_no_frame(self):
+        return
         self.setStyleSheet(Static.TITLE_NORMAL)
+    
+    def contextMenuEvent(self, ev):
+        return super().contextMenuEvent(ev)
 
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        self.r_click.emit()
+    # def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+    #     self.r_click.emit()
 
-        menu_ = ContextCustom(ev)
+    #     menu_ = ContextCustom(ev)
 
-        cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
-        save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
-        save_jpg.triggered.connect(cmd_)
-        menu_.addAction(save_jpg)
+    #     cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
+    #     save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
+    #     save_jpg.triggered.connect(cmd_)
+    #     menu_.addAction(save_jpg)
 
-        cmd_ = lambda: self.save_cmd(is_layers=True, save_as=False)
-        save_layers = QAction(text=Lang.save_all_layers, parent=menu_)
-        save_layers.triggered.connect(cmd_)
-        menu_.addAction(save_layers)
+    #     cmd_ = lambda: self.save_cmd(is_layers=True, save_as=False)
+    #     save_layers = QAction(text=Lang.save_all_layers, parent=menu_)
+    #     save_layers.triggered.connect(cmd_)
+    #     menu_.addAction(save_layers)
 
-        menu_.addSeparator()
+    #     menu_.addSeparator()
 
-        cmd_ = lambda: self.save_cmd(is_layers=False, save_as=True)
-        save_as_jpg = QAction(text=Lang.save_all_JPG_as, parent=menu_)
-        save_as_jpg.triggered.connect(cmd_)
-        menu_.addAction(save_as_jpg)
+    #     cmd_ = lambda: self.save_cmd(is_layers=False, save_as=True)
+    #     save_as_jpg = QAction(text=Lang.save_all_JPG_as, parent=menu_)
+    #     save_as_jpg.triggered.connect(cmd_)
+    #     menu_.addAction(save_as_jpg)
 
-        cmd_ = lambda: self.save_cmd(is_layers=True, save_as=True)
-        save_as_layers = QAction(text=Lang.save_all_layers_as, parent=menu_)
-        save_as_layers.triggered.connect(cmd_)
-        menu_.addAction(save_as_layers)
+    #     cmd_ = lambda: self.save_cmd(is_layers=True, save_as=True)
+    #     save_as_layers = QAction(text=Lang.save_all_layers_as, parent=menu_)
+    #     save_as_layers.triggered.connect(cmd_)
+    #     menu_.addAction(save_as_layers)
 
-        menu_.addSeparator()
+    #     menu_.addSeparator()
 
-        reload = ScanerRestart(parent=menu_)
-        menu_.addAction(reload)
+    #     reload = ScanerRestart(parent=menu_)
+    #     menu_.addAction(reload)
 
-        types_ = MenuTypes(parent=menu_)
-        menu_.addMenu(types_)
+    #     types_ = MenuTypes(parent=menu_)
+    #     menu_.addMenu(types_)
 
-        self.selected_style()
-        menu_.show_menu()
-        self.regular_style()
+    #     self.set_frame()
+    #     menu_.show_menu()
+    #     self.set_no_frame()
 
 
 class TextWid(QLabel):
