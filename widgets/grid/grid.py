@@ -201,6 +201,7 @@ class Grid(QScrollArea):
         # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
         add_last_row = False
         row, col = 0, 0
+        self.col = 0
 
         for db_image in db_images:
 
@@ -297,6 +298,7 @@ class Grid(QScrollArea):
         for grid_lay, grid_widgets in self.rearraged_widgets.items():
 
             row, col = 0, 0
+            self.col = 0
 
             for wid in grid_widgets:
 
@@ -376,12 +378,21 @@ class Grid(QScrollArea):
                 wid = self.selected_widgets[-1]
 
                 offset = offsets.get(a0.key())
+
                 coords = (
                     wid.row + offset[0], 
                     wid.col + offset[1]
                 )
 
                 wid = self.cell_to_wid.get(coords)
+                
+                if wid is None:
+
+                    coords = (
+                        coords[0] + offset[0], 
+                        coords[1] + offset[1]
+                    )
+                    wid = self.cell_to_wid.get(coords)
 
                 if wid and isinstance(wid, Thumbnail):
                     for i in self.selected_widgets:
@@ -389,6 +400,7 @@ class Grid(QScrollArea):
                     self.selected_widgets.clear()
                     self.selected_widgets.append(wid)
                     wid.set_frame()
+                    self.ensureWidgetVisible(wid)
 
                 else:
                     return
