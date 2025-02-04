@@ -2,8 +2,9 @@ import os
 from collections import defaultdict
 from typing import Literal
 
-from PyQt5.QtCore import QObject, Qt, QTimer
-from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
+from PyQt5.QtCore import QMimeData, QObject, Qt, QTimer, QUrl, pyqtSignal
+from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
+                         QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QScrollArea, QSizePolicy, QWidget)
 
@@ -82,6 +83,7 @@ class Grid(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
+        self.setAcceptDrops(True)
         self.resize(
             Dynamic.root_g["aw"] - Static.MENU_LEFT_WIDTH,
             Dynamic.root_g["ah"]
@@ -614,3 +616,44 @@ class Grid(QScrollArea):
             self.selected_widgets.append(clicked_wid)
 
             self.open_in_view(wid=clicked_wid)
+
+    def mousePressEvent(self, a0):
+        if a0.button() == Qt.MouseButton.LeftButton:
+            self.drag_start_position = a0.pos()
+        return super().mousePressEvent(a0)
+    
+    def mouseMoveEvent(self, a0):
+
+        distance = (a0.pos() - self.drag_start_position).manhattanLength()
+
+        if distance < QApplication.startDragDistance():
+            return
+        
+        
+        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+
+        if coll_folder:
+
+            urls = [
+                Utils.get_full_src(coll_folder, i.short_src)
+                for i in self.selected_widgets
+            ]
+
+        else:
+            return
+
+        self.drag = QDrag(self)
+        self.mime_data = QMimeData()
+        # self.drag.setPixmap(self.selected_widgets[0].pixmap())
+        
+        urls = [
+            QUrl.fromLocalFile(i)
+            for i in urls
+            ]
+
+        self.mime_data.setUrls(urls)
+
+        self.drag.setMimeData(self.mime_data)
+        self.drag.exec_(Qt.DropAction.CopyAction)
+
+        return super().mouseMoveEvent(a0)

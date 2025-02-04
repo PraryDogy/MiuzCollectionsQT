@@ -202,35 +202,35 @@ class Thumbnail(QFrame, CellWid):
         if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
-    def press_cmd(self, a0: QMouseEvent | None) -> None:
-        if a0.button() == Qt.MouseButton.LeftButton:
-            self.drag_start_position = a0.pos()
-        return super().mousePressEvent(a0)
+    # def press_cmd(self, a0: QMouseEvent | None) -> None:
+    #     if a0.button() == Qt.MouseButton.LeftButton:
+    #         self.drag_start_position = a0.pos()
+    #     return super().mousePressEvent(a0)
 
-    def move_cmd(self, a0: QMouseEvent | None) -> None:
-        if a0.button() == Qt.MouseButton.RightButton:
-            return
+    # def move_cmd(self, a0: QMouseEvent | None) -> None:
+    #     if a0.button() == Qt.MouseButton.RightButton:
+    #         return
 
-        distance = (a0.pos() - self.drag_start_position).manhattanLength()
+    #     distance = (a0.pos() - self.drag_start_position).manhattanLength()
 
-        if distance < QApplication.startDragDistance():
-            return
+    #     if distance < QApplication.startDragDistance():
+    #         return
         
-        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
-        if coll_folder:
-            full_src = Utils.get_full_src(coll_folder, self.short_src)
-        else:
-            return
+    #     coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+    #     if coll_folder:
+    #         full_src = Utils.get_full_src(coll_folder, self.short_src)
+    #     else:
+    #         return
 
-        self.select.emit(self.short_src)
-        self.drag = QDrag(self)
-        self.mime_data = QMimeData()
-        self.drag.setPixmap(self.img_wid.pixmap())
+    #     self.select.emit(self.short_src)
+    #     self.drag = QDrag(self)
+    #     self.mime_data = QMimeData()
+    #     self.drag.setPixmap(self.img_wid.pixmap())
         
-        url = [QUrl.fromLocalFile(full_src)]
-        self.mime_data.setUrls(url)
+    #     url = [QUrl.fromLocalFile(full_src)]
+    #     self.mime_data.setUrls(url)
 
-        self.drag.setMimeData(self.mime_data)
-        self.drag.exec_(Qt.DropAction.CopyAction)
+    #     self.drag.setMimeData(self.mime_data)
+    #     self.drag.exec_(Qt.DropAction.CopyAction)
 
-        return super().mouseMoveEvent(a0)
+    #     return super().mouseMoveEvent(a0)
