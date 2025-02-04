@@ -104,8 +104,15 @@ class CopyPath(QAction):
 
 
 class Reveal(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
-        super().__init__(parent=parent, text=Lang.reveal_in_finder)
+    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str | list):
+
+        if isinstance(short_src, list):
+            text = f"{Lang.reveal_in_finder} ({len(short_src)})"
+        else:
+            text = f"{Lang.reveal_in_finder} (1)"
+            short_src = [short_src]
+
+        super().__init__(parent=parent, text=text)
         self.short_src = short_src
         self.parent_ = parent
         self.win_ = win
@@ -114,8 +121,11 @@ class Reveal(QAction):
     def cmd(self, *args):
         coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
         if coll_folder:
-            full_src = Utils.get_full_src(coll_folder, self.short_src)
-            Utils.reveal_files([full_src])
+            full_src = [
+                Utils.get_full_src(coll_folder, i)
+                for i in self.short_src
+            ]
+            Utils.reveal_files(files_list=full_src)
         else:
             OpenWins.smb(parent_=self.win_)
 

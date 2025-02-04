@@ -256,8 +256,8 @@ class Lang_:
         "Reveal"
     ]
     reveal_in_finder = [
-        "Показать в Finder",
-        "Reveal in Finder"
+        "Показать выбранные объекты в Finder",
+        "Reveal selected objects in Finder"
     ]
     save_all_JPG = [
         "Сохранить все JPG",

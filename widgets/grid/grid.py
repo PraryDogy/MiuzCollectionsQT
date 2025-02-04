@@ -556,7 +556,7 @@ class Grid(QScrollArea):
             reveal = Reveal(
                 parent=self.menu_,
                 win=self.window(),
-                short_src=clicked_wid.short_src
+                short_src=urls
             )
             self.menu_.addAction(reveal)
 
