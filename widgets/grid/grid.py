@@ -644,7 +644,9 @@ class Grid(QScrollArea):
 
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
-        # self.drag.setPixmap(self.selected_widgets[0].pixmap())
+        img = os.path.join(Static.IMAGES, "img.svg")
+        img = QPixmap(img).scaled(60, 60)
+        self.drag.setPixmap(img)
         
         urls = [
             QUrl.fromLocalFile(i)
