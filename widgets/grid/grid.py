@@ -351,12 +351,6 @@ class Grid(QScrollArea):
             if self.selected_widgets:
             
                 wid = self.selected_widgets[-1]
-                for i in self.selected_widgets:
-                    i.set_no_frame()
-                self.selected_widgets.clear()
-                self.selected_widgets.append(wid)
-                wid.set_frame()
-
                 coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
 
                 if coll_folder:
@@ -373,11 +367,6 @@ class Grid(QScrollArea):
 
             if self.selected_widgets:
                 wid = self.selected_widgets[-1]
-                for i in self.selected_widgets:
-                    i.set_no_frame()
-                self.selected_widgets.clear()
-                self.selected_widgets.append(wid)
-                wid.set_frame()
                 self.open_in_view(wid=wid)
 
         elif a0.key() in offsets:
