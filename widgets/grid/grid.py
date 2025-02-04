@@ -98,7 +98,6 @@ class Grid(QScrollArea):
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.row, self.col = 0, 0
-        self.curr_cell: tuple = None
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
@@ -156,10 +155,11 @@ class Grid(QScrollArea):
         for wid in self.delete_later_widgets:
             wid.deleteLater()
 
-        self.selected_widgets.clear()
-        self.delete_later_widgets.clear()
-        self.rearraged_widgets.clear()
-        self.cell_to_wid.clear()
+        self.selected_widgets: list[Thumbnail] = []
+        self.delete_later_widgets: list[QWidget] = []
+        self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
+        self.cell_to_wid: dict[tuple, Thumbnail] = {}
+        self.row, self.col = 0, 0
 
         if not db_images:
 
@@ -421,7 +421,6 @@ class Grid(QScrollArea):
                 i.set_no_frame()
 
             self.selected_widgets.clear()
-            self.curr_cell = None
             return
 
         if a0.modifiers() == Qt.KeyboardModifier.ShiftModifier:
@@ -431,7 +430,6 @@ class Grid(QScrollArea):
 
                 clicked_wid.set_frame()
                 self.selected_widgets.append(clicked_wid)
-                self.curr_cell = (clicked_wid.row, clicked_wid.col)
 
             # шифт клик: если уже был выделен один / несколько виджетов
             else:
@@ -479,7 +477,6 @@ class Grid(QScrollArea):
 
             self.selected_widgets.clear()
 
-            self.curr_cell = (clicked_wid.row, clicked_wid.col)
             self.selected_widgets.append(clicked_wid)
             clicked_wid.set_frame()
 
@@ -500,7 +497,6 @@ class Grid(QScrollArea):
                 i.set_no_frame()
 
             self.selected_widgets.clear()
-            self.curr_cell = None
 
             reload = ScanerRestart(parent=self.menu_)
             self.menu_.addAction(reload)
@@ -514,7 +510,6 @@ class Grid(QScrollArea):
 
                 clicked_wid.set_frame()
                 self.selected_widgets.append(clicked_wid)
-                self.curr_cell = (clicked_wid.row, clicked_wid.col)
 
             elif clicked_wid not in self.selected_widgets:
 
@@ -524,7 +519,6 @@ class Grid(QScrollArea):
 
                 clicked_wid.set_frame()
                 self.selected_widgets.append(clicked_wid)
-                self.curr_cell = (clicked_wid.row, clicked_wid.col)
 
             # cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
             view = OpenInView(parent_=self.menu_)
