@@ -408,6 +408,14 @@ class Grid(QScrollArea):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
         command = Qt.KeyboardModifier.ControlModifier
+
+        offsets = {
+            Qt.Key.Key_Left: (0, -1),
+            Qt.Key.Key_Right: (0, 1),
+            Qt.Key.Key_Up: (-1, 0),
+            Qt.Key.Key_Down: (1, 0)
+        }
+
         if a0.modifiers() == command and a0.key() == Qt.Key.Key_I:
 
             if self.selected_widgets:
@@ -442,16 +450,7 @@ class Grid(QScrollArea):
                 wid.set_frame()
                 self.open_in_view(wid=wid)
 
-        elif a0.key() in (
-            Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down
-        ):
-
-            offsets = {
-                Qt.Key.Key_Left: (0, -1),
-                Qt.Key.Key_Right: (0, 1),
-                Qt.Key.Key_Up: (-1, 0),
-                Qt.Key.Key_Down: (1, 0)
-            }
+        elif a0.key() in offsets:
 
             offset = offsets.get(a0.key())
             coords = (
