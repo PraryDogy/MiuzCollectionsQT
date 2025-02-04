@@ -1,7 +1,8 @@
 import os
+from collections import defaultdict
 from typing import Literal
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import QObject, Qt, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QScrollArea, QSizePolicy, QWidget)
@@ -85,6 +86,7 @@ class Grid(QScrollArea):
             Dynamic.root_g["aw"] - Static.MENU_LEFT_WIDTH,
             Dynamic.root_g["ah"]
         )
+        self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.ww = Dynamic.root_g["aw"] - Static.MENU_LEFT_WIDTH
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(
@@ -92,22 +94,26 @@ class Grid(QScrollArea):
         )
 
         self.selected_widgets: list[Thumbnail] = []
+        self.delete_later_widgets: list[QWidget] = []
+        self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
 
+        self.curr_cell: tuple = None
+        self.cell_to_wid: dict[tuple, Thumbnail] = {}
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
 
-        self.curr_cell: tuple = None
-        self.cell_to_wid: dict[tuple, Thumbnail] = {}
-
-        scroll_wid = QWidget(parent=self)
-        self.setWidget(scroll_wid)
+        self.scroll_wid = QWidget(parent=self)
+        self.setWidget(self.scroll_wid)
         
         self.scroll_layout = LayoutVer()
-        scroll_wid.setLayout(self.scroll_layout)
+        self.scroll_wid.setLayout(self.scroll_layout)
+        self.scroll_layout.setAlignment(
+            Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
+        )
 
-        self.up_btn = UpBtn(scroll_wid)
+        self.up_btn = UpBtn(self.scroll_wid)
         self.up_btn.hide()
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
@@ -147,30 +153,22 @@ class Grid(QScrollArea):
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
 
-        if hasattr(self, "grid_wid"):
-            self.grid_wid.deleteLater()
+        for wid in self.delete_later_widgets:
+            wid.deleteLater()
 
-        self.deselect_wid()
-        self.reset_grid_data()
-        self.up_btn.hide()
-
-        self.grid_wid = QWidget()
-        self.scroll_layout.addWidget(self.grid_wid)
-
-        self.grid_lay = QGridLayout()
-        self.grid_lay.setAlignment(
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        )
-        self.grid_lay.setSpacing(Static.GRID_SPACING)
-        self.grid_wid.setLayout(self.grid_lay)
+        self.delete_later_widgets.clear()
+        self.rearraged_widgets.clear()
 
         if not db_images:
 
             error_title = NoImagesLabel()
-            self.grid_lay.addWidget(error_title, self.row, self.col)
+            self.delete_later_widgets.append(error_title)
+            self.scroll_layout.addWidget(error_title)
 
         else:
+
             Thumbnail.calculate_size()
+
             for date, db_images in db_images.items():
                 self.single_grid(
                     date=date,
@@ -178,18 +176,28 @@ class Grid(QScrollArea):
                     max_col=self.get_max_col()
                 )
 
+            spacer = QWidget()
+            self.delete_later_widgets.append(spacer)
+            self.scroll_layout.addWidget(spacer)
+
     def single_grid(self, date: str, db_images: list[DbImage], max_col: int):
 
         title = Title(title=date, db_images=db_images)
-        title.r_click.connect(self.deselect_wid)
-        # self.set_cell_coords(title)
-        self.grid_lay.addWidget(title, self.row, self.col, 1, max_col + 1)
+        self.delete_later_widgets.append(title)
+        self.scroll_layout.addWidget(title)
 
-        self.col = 0
-        self.row += 1
+        grid_wid = QWidget()
+        self.delete_later_widgets.append(grid_wid)
+        self.scroll_layout.addWidget(grid_wid)
+
+        grid_lay = QGridLayout()
+        grid_lay.setContentsMargins(0, 0, 0, 0)
+        grid_lay.setSpacing(0)
+        grid_wid.setLayout(grid_lay)
 
         # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
         add_last_row = False
+        row, col = 0, 0
 
         for db_image in db_images:
 
@@ -199,31 +207,32 @@ class Grid(QScrollArea):
                 coll=db_image.coll,
                 fav=db_image.fav
             )
-            wid.select.connect(lambda w=wid: self.select_wid(w))
-            self.set_cell_coords(wid)
-            self.set_path_to_wid(wid)
-            self.grid_lay.addWidget(wid, self.row, self.col)
 
-            self.col += 1
+            self.rearraged_widgets[grid_lay].append(wid)
+
+            Thumbnail.path_to_wid[wid.short_src] = wid
+            grid_lay.addWidget(wid, row, col)
+            col += 1
             add_last_row = True
 
             # Если достигли максимального количества столбцов:
             # Сбрасываем индекс столбца.
             # Переходим к следующей строке.
             # Указываем, что текущая строка завершена.
-            if self.col >= max_col:  
-                self.col = 0
-                self.row += 1
+            if col >= max_col:  
+                col = 0
+                row += 1
                 add_last_row = False
 
         # Если после цикла остались элементы в неполной последней строке,
         # переходим к следующей строке для корректного добавления
         # новых элементов в будущем.
         if add_last_row:
-            self.row += 1
-            self.col = 0
+            row += 1
+            col = 0
 
     def grid_more(self, db_images: dict[str, list[DbImage]]):
+        return
         if db_images:
             for date, db_images in db_images.items():
                 self.single_grid(
@@ -333,27 +342,6 @@ class Grid(QScrollArea):
 
         self.rearrange()
 
-    def reselect_wid(func: callable):
-
-        def wrapper(self, *args, **kwargs):
-
-            assert isinstance(self, Grid)
-
-            wid = self.get_curr_cell()
-            src = wid.short_src if isinstance(wid, Thumbnail) else None
-
-            func(self, *args, **kwargs)
-
-            if src:
-                wid = self.select_wid(src)  
-
-                if wid:
-                    coords = (wid.row, wid.col)
-                    self.set_curr_sell(coords)
-
-        return wrapper
-
-    @reselect_wid
     def rearrange(self):
         "перетасовка сетки"
 
@@ -361,42 +349,29 @@ class Grid(QScrollArea):
             setattr(self, "first_load", True)
             return
 
-        # высчитываем новый размер сетки и сбрасываем все данные прошлой сетки 
-        self.deselect_wid()
-        self.reset_grid_data()
+        Thumbnail.path_to_wid.clear()
         self.ww = self.width()
         max_col = self.get_max_col()
-
         add_last_row = False
+        row, col = 0, 0
 
-        for wid in self.grid_wid.findChildren((Thumbnail, Title)):
+        for grid_lay, grid_widgets in self.rearraged_widgets.items():
 
-            if isinstance(wid, Title):
-                self.col = 0
-                self.row += 1
+            for wid in grid_widgets:
 
-                # self.set_cell_coords(wid)
-                self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
-
-                self.col = 0
-                self.row += 1
-
-            elif isinstance(wid, Thumbnail):
-                self.set_cell_coords(wid)
-                self.set_path_to_wid(wid)
-                self.grid_lay.addWidget(wid, self.row, self.col)
-                self.col += 1
+                Thumbnail.path_to_wid[wid.short_src] = wid
+                grid_lay.addWidget(wid, row, col)
+                col += 1
                 add_last_row = True
 
+                if col >= max_col:
+                    add_last_row = False
+                    col = 0
+                    row += 1       
 
-            if self.col >= max_col:
-                add_last_row = False
-                self.col = 0
-                self.row += 1       
-
-        if add_last_row:
-            self.col = 0
-            self.row += 1
+            if add_last_row:
+                col = 0
+                row += 1
     
     def get_wid(self, a0: QMouseEvent) -> None | Thumbnail:
         wid = QApplication.widgetAt(a0.globalPos())
