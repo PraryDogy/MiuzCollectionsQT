@@ -212,6 +212,7 @@ class Grid(QScrollArea):
             self.rearraged_widgets[grid_lay].append(wid)
             Thumbnail.path_to_wid[wid.short_src] = wid
             self.cell_to_wid[self.row, self.col] = wid
+            wid.row, wid.col = self.row, self.col
             grid_lay.addWidget(wid, row, col)
 
             self.col += 1
@@ -300,6 +301,7 @@ class Grid(QScrollArea):
 
                 Thumbnail.path_to_wid[wid.short_src] = wid
                 self.cell_to_wid[self.row, self.col] = wid
+                wid.row, wid.col = self.row, self.col
                 grid_lay.addWidget(wid, row, col)
 
                 col += 1
@@ -433,17 +435,18 @@ class Grid(QScrollArea):
             else:
 
                 coords = list(self.cell_to_wid)
+                start_pos = (self.selected_widgets[-1].row, self.selected_widgets[-1].col)
 
                 # шифт клик: слева направо (по возрастанию)
-                if coords.index((clicked_wid.row, clicked_wid.col)) > coords.index(self.curr_cell):
-                    start = coords.index(self.curr_cell)
+                if coords.index((clicked_wid.row, clicked_wid.col)) > coords.index(start_pos):
+                    start = coords.index(start_pos)
                     end = coords.index((clicked_wid.row, clicked_wid.col))
                     coords = coords[start : end + 1]
 
                 # шифт клик: справа налево (по убыванию)
                 else:
                     start = coords.index((clicked_wid.row, clicked_wid.col))
-                    end = coords.index(self.curr_cell)
+                    end = coords.index(start_pos)
                     coords = coords[start : end]
 
                 # выделяем виджеты по срезу координат coords
