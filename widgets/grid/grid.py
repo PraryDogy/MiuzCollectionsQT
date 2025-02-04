@@ -182,7 +182,7 @@ class Grid(QScrollArea):
 
         title = Title(title=date, db_images=db_images)
         title.r_click.connect(self.deselect_wid)
-        self.set_cell_coords(title)
+        # self.set_cell_coords(title)
         self.grid_lay.addWidget(title, self.row, self.col, 1, max_col + 1)
 
         self.col = 0
@@ -375,7 +375,7 @@ class Grid(QScrollArea):
                 self.col = 0
                 self.row += 1
 
-                self.set_cell_coords(wid)
+                # self.set_cell_coords(wid)
                 self.grid_lay.addWidget(wid, self.row, self.col, 1, max_col)
 
                 self.col = 0
@@ -452,9 +452,12 @@ class Grid(QScrollArea):
 
         elif a0.key() in offsets:
 
+            print(self.cell_to_wid)
+
             if self.selected_widgets:
 
                 wid = self.selected_widgets[-1]
+
                 offset = offsets.get(a0.key())
                 coords = (
                     wid.row + offset[0], 
@@ -462,12 +465,16 @@ class Grid(QScrollArea):
                 )
 
                 wid = self.cell_to_wid.get(coords)
-                if wid:
+
+                if wid and isinstance(wid, Thumbnail):
                     for i in self.selected_widgets:
                         i.set_no_frame()
                     self.selected_widgets.clear()
                     self.selected_widgets.append(wid)
                     wid.set_frame()
+
+                else:
+                    return
 
         return super().keyPressEvent(a0)
 
