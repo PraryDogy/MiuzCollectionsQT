@@ -96,10 +96,9 @@ class Grid(QScrollArea):
         self.selected_widgets: list[Thumbnail] = []
         self.delete_later_widgets: list[QWidget] = []
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
-        self.row, self.col = 0, 0
-
-        self.curr_cell: tuple = None
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
+        self.row, self.col = 0, 0
+        self.curr_cell: tuple = None
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
@@ -157,8 +156,10 @@ class Grid(QScrollArea):
         for wid in self.delete_later_widgets:
             wid.deleteLater()
 
+        self.selected_widgets.clear()
         self.delete_later_widgets.clear()
         self.rearraged_widgets.clear()
+        self.cell_to_wid.clear()
 
         if not db_images:
 
@@ -194,6 +195,7 @@ class Grid(QScrollArea):
         grid_lay = QGridLayout()
         grid_lay.setContentsMargins(0, 0, 0, 0)
         grid_lay.setSpacing(0)
+        grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         grid_wid.setLayout(grid_lay)
 
         # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
