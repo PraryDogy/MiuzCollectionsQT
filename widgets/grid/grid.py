@@ -452,14 +452,23 @@ class Grid(QScrollArea):
 
         elif a0.key() in offsets:
 
-            offset = offsets.get(a0.key())
-            coords = (
-                self.curr_cell[0] + offset[0], 
-                self.curr_cell[1] + offset[1]
-            )
+            if self.selected_widgets:
 
-            self.select_wid(coords)
-        
+                wid = self.selected_widgets[-1]
+                offset = offsets.get(a0.key())
+                coords = (
+                    wid.row + offset[0], 
+                    wid.col + offset[1]
+                )
+
+                wid = self.cell_to_wid.get(coords)
+                if wid:
+                    for i in self.selected_widgets:
+                        i.set_no_frame()
+                    self.selected_widgets.clear()
+                    self.selected_widgets.append(wid)
+                    wid.set_frame()
+
         return super().keyPressEvent(a0)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
