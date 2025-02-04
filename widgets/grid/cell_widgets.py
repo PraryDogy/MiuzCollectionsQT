@@ -1,19 +1,14 @@
 import os
 
 from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QDrag, QMouseEvent, QPixmap
-from PyQt5.QtWidgets import QAction, QApplication, QFrame, QLabel, QSizePolicy
+from PyQt5.QtGui import QDrag, QMouseEvent, QPixmap
+from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSizePolicy
 
-from base_widgets import ContextCustom, LayoutVer
-from base_widgets.context import ContextCustom
+from base_widgets import LayoutVer
 from cfg import Dynamic, JsonData, Static, ThumbData
-from lang import Lang
 from signals import SignalsApp
-from utils.copy_files import CopyFiles
-from utils.utils import UThreadPool, Utils
+from utils.utils import Utils
 
-from ..actions import (CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
-                       OpenInView, OpenWins, Reveal, Save, ScanerRestart)
 from ._db_images import DbImage
 
 
@@ -42,114 +37,14 @@ class Title(QLabel, CellWid):
 
         self.setStyleSheet(Static.TITLE_NORMAL)
 
-    # def save_cmd(self, is_layers: bool, save_as: bool):
-
-    #     coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
-
-    #     if coll_folder:
-
-    #         if is_layers:
-    #             images = [
-    #                 Utils.get_full_src(coll_folder, i.short_src)
-    #                 for i in self.db_images
-    #                 if i.short_src.endswith(Static.LAYERS_EXT)
-    #                 ]
-    #         else:
-    #             images = [
-    #                 Utils.get_full_src(coll_folder, i.short_src)
-    #                 for i in self.db_images
-    #                 if not i.short_src.endswith(Static.LAYERS_EXT)
-    #                 ]
-
-    #         if save_as:
-    #             dialog = OpenWins.dialog_dirs()
-    #             dest = dialog.getExistingDirectory()
-
-    #             if not dest:
-    #                 return
-
-    #         else:
-    #             dest = Dynamic.down_folder
-            
-    #         self.copy_files_cmd(dest, images)
-
-    #     else:
-    #         OpenWins.smb(self.window())
-
-    # def copy_files_cmd(self, dest: str, files: list):
-    #     coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
-    #     if coll_folder:
-    #         self.copy_files_cmd_(dest, files)
-    #     else:
-    #         OpenWins.smb(self.window())
-
-    # def copy_files_cmd_(self, dest: str, files: list):
-    #     files = [i for i in files if os.path.exists(i)]
-
-    #     if len(files) == 0:
-    #         return
-
-    #     cmd_ = lambda files: self.copy_files_fin(files=files)
-    #     copy_task = CopyFiles(dest=dest, files=files)
-    #     copy_task.signals_.finished_.connect(cmd_)
-
-    #     SignalsApp.all_.btn_downloads_toggle.emit("show")
-    #     UThreadPool.pool.start(copy_task)
-
-    # def copy_files_fin(self, files: list):
-    #     self.reveal_files = Utils.reveal_files(files)
-    #     if len(CopyFiles.current_threads) == 0:
-    #         SignalsApp.all_.btn_downloads_toggle.emit("hide")
-
     def set_frame(self):
         return
-        self.setStyleSheet(Static.TITLE_SOLID)
 
     def set_no_frame(self):
         return
-        self.setStyleSheet(Static.TITLE_NORMAL)
     
     def contextMenuEvent(self, ev):
         return super().contextMenuEvent(ev)
-
-    # def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-    #     self.r_click.emit()
-
-    #     menu_ = ContextCustom(ev)
-
-    #     cmd_ = lambda: self.save_cmd(is_layers=False, save_as=False)
-    #     save_jpg = QAction(text=Lang.save_all_JPG, parent=menu_)
-    #     save_jpg.triggered.connect(cmd_)
-    #     menu_.addAction(save_jpg)
-
-    #     cmd_ = lambda: self.save_cmd(is_layers=True, save_as=False)
-    #     save_layers = QAction(text=Lang.save_all_layers, parent=menu_)
-    #     save_layers.triggered.connect(cmd_)
-    #     menu_.addAction(save_layers)
-
-    #     menu_.addSeparator()
-
-    #     cmd_ = lambda: self.save_cmd(is_layers=False, save_as=True)
-    #     save_as_jpg = QAction(text=Lang.save_all_JPG_as, parent=menu_)
-    #     save_as_jpg.triggered.connect(cmd_)
-    #     menu_.addAction(save_as_jpg)
-
-    #     cmd_ = lambda: self.save_cmd(is_layers=True, save_as=True)
-    #     save_as_layers = QAction(text=Lang.save_all_layers_as, parent=menu_)
-    #     save_as_layers.triggered.connect(cmd_)
-    #     menu_.addAction(save_as_layers)
-
-    #     menu_.addSeparator()
-
-    #     reload = ScanerRestart(parent=menu_)
-    #     menu_.addAction(reload)
-
-    #     types_ = MenuTypes(parent=menu_)
-    #     menu_.addMenu(types_)
-
-    #     self.set_frame()
-    #     menu_.show_menu()
-    #     self.set_no_frame()
 
 
 class TextWid(QLabel):
@@ -340,69 +235,3 @@ class Thumbnail(QFrame, CellWid):
         self.drag.exec_(Qt.DropAction.CopyAction)
 
         return super().mouseMoveEvent(a0)
-
-    def context_cmd(self, ev: QContextMenuEvent | None) -> None:
-        menu_ = ContextCustom(event=ev)
-
-        cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
-        view = OpenInView(parent_=menu_)
-        view._clicked.connect(cmd_)
-        menu_.addAction(view)
-
-        info = OpenInfoDb(
-            parent=menu_,
-            win=self.window(),
-            short_src=self.short_src
-            )
-        menu_.addAction(info)
-
-        self.fav_action = FavActionDb(
-            parent=menu_,
-            short_src=self.short_src,
-            fav_value=self.fav_value
-            )
-        self.fav_action.finished_.connect(self.change_fav)
-        menu_.addAction(self.fav_action)
-
-        menu_.addSeparator()
-
-        copy = CopyPath(
-            parent=menu_,
-            win=self.window(),
-            short_src=self.short_src
-        )
-        menu_.addAction(copy)
-
-        reveal = Reveal(
-            parent=menu_,
-            win=self.window(),
-            short_src=self.short_src
-        )
-        menu_.addAction(reveal)
-
-        save_as = Save(
-            parent=menu_,
-            win=self.window(),
-            short_src=self.short_src,
-            save_as=True
-            )
-        menu_.addAction(save_as)
-
-        save = Save(
-            parent=menu_,
-            win=self.window(),
-            short_src=self.short_src,
-            save_as=False
-            )
-        menu_.addAction(save)
-
-        menu_.addSeparator()
-
-        reload = ScanerRestart(parent=menu_)
-        menu_.addAction(reload)
-
-        types_ = MenuTypes(parent=menu_)
-        menu_.addMenu(types_)
-
-        self.select.emit(self.short_src)
-        menu_.show_menu()
