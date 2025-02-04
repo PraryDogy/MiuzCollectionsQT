@@ -519,9 +519,9 @@ class Grid(QScrollArea):
                 clicked_wid.set_frame()
                 self.selected_widgets.append(clicked_wid)
 
-            # cmd_ = lambda: SignalsApp.all_.win_img_view_open_in.emit(self)
+            cmd_ = lambda: self.open_in_view(wid=clicked_wid)
             view = OpenInView(parent_=self.menu_)
-            # view._clicked.connect(cmd_)
+            view._clicked.connect(cmd_)
             self.menu_.addAction(view)
 
             info = OpenInfoDb(
@@ -536,7 +536,7 @@ class Grid(QScrollArea):
                 short_src=clicked_wid.short_src,
                 fav_value=clicked_wid.fav_value
                 )
-            # self.fav_action.finished_.connect(self.change_fav)
+            self.fav_action.finished_.connect(clicked_wid.change_fav)
             self.menu_.addAction(self.fav_action)
 
             self.menu_.addSeparator()
