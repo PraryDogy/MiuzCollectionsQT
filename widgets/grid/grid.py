@@ -274,8 +274,8 @@ class Grid(QScrollArea):
 
         Thumbnail.calculate_size()
 
-        for thumb in self.grid_wid.findChildren(Thumbnail):
-            thumb.setup()
+        for path, wid in Thumbnail.path_to_wid.items():
+            wid.setup()
 
         self.rearrange()
 
