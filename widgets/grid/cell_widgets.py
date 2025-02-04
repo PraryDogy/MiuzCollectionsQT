@@ -88,6 +88,9 @@ class TextWid(QLabel):
     def contextMenuEvent(self, ev):
         return super().contextMenuEvent(ev)
     
+    def mouseDoubleClickEvent(self, a0):
+        return super().mouseDoubleClickEvent(a0)
+    
     
 class ImgWid(QLabel):
     def __init__(self):
@@ -99,6 +102,9 @@ class ImgWid(QLabel):
     
     def contextMenuEvent(self, ev):
         return super().contextMenuEvent(ev)
+    
+    def mouseDoubleClickEvent(self, a0):
+        return super().mouseDoubleClickEvent(a0)
 
 
 class Thumbnail(QFrame, CellWid):
@@ -195,13 +201,6 @@ class Thumbnail(QFrame, CellWid):
         # удаляем из избранного и если это избранные то обновляем сетку
         if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-
-    def double_click_cmd(self, a0: QMouseEvent | None) -> None:
-        self.select.emit(self.short_src)
-        SignalsApp.all_.win_img_view_open_in.emit(self)
-
-    def release_cmd(self, ev: QMouseEvent | None) -> None:
-        self.select.emit(self.short_src)
 
     def press_cmd(self, a0: QMouseEvent | None) -> None:
         if a0.button() == Qt.MouseButton.LeftButton:

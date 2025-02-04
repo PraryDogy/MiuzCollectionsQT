@@ -599,3 +599,18 @@ class Grid(QScrollArea):
 
         if value == self.verticalScrollBar().maximum():
             self.load_db_images(flag="more")
+
+    def mouseDoubleClickEvent(self, a0):
+        clicked_wid = self.get_wid(a0=a0)
+
+        if clicked_wid:
+
+            for i in self.selected_widgets:
+                i.set_no_frame()
+
+            self.selected_widgets.clear()
+            
+            clicked_wid.set_frame()
+            self.selected_widgets.append(clicked_wid)
+
+            self.open_in_view(wid=clicked_wid)
