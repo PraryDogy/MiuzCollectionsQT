@@ -185,6 +185,9 @@ class TextWid(QLabel):
     def mouseReleaseEvent(self, ev):
         return super().mouseReleaseEvent(ev)
     
+    def contextMenuEvent(self, ev):
+        return super().contextMenuEvent(ev)
+    
     
 class ImgWid(QLabel):
     def __init__(self):
@@ -193,6 +196,9 @@ class ImgWid(QLabel):
 
     def mouseReleaseEvent(self, ev):
         return super().mouseReleaseEvent(ev)
+    
+    def contextMenuEvent(self, ev):
+        return super().contextMenuEvent(ev)
 
 
 class Thumbnail(QFrame, CellWid):
@@ -235,14 +241,6 @@ class Thumbnail(QFrame, CellWid):
             self.text_wid,
             alignment=Qt.AlignmentFlag.AlignCenter
         )
-
-        # for i in (self.img_wid, self.text_wid):
-        #     i.mouseDoubleClickEvent = self.double_click_cmd
-        #     i.mouseReleaseEvent = self.release_cmd
-        #     i.mousePressEvent = self.press_cmd
-        #     i.mouseMoveEvent = self.move_cmd
-        #     i.contextMenuEvent = self.context_cmd
-
         self.setup()
         # self.setStyleSheet("background: red;")
 
@@ -275,11 +273,11 @@ class Thumbnail(QFrame, CellWid):
             )
         )
 
-    def selected_style(self):
+    def set_frame(self):
         self.img_wid.setStyleSheet(Static.SOLID_GRAY_STYLE)
         self.text_wid.setStyleSheet(Static.SOLID_STYLE)
 
-    def regular_style(self):
+    def set_no_frame(self):
         self.img_wid.setStyleSheet(Static.NORMAL_STYLE)
         self.text_wid.setStyleSheet(Static.NORMAL_STYLE)
 

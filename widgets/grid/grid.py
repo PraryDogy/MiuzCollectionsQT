@@ -288,7 +288,7 @@ class Grid(QScrollArea):
 
         if isinstance(new_wid, Thumbnail):
             self.deselect_wid()
-            new_wid.selected_style()
+            new_wid.set_frame()
             self.ensureWidgetVisible(new_wid)
 
             self.set_curr_sell(coords)
@@ -305,7 +305,7 @@ class Grid(QScrollArea):
 
         wid = self.get_curr_cell()
         if isinstance(wid, Thumbnail | Title):
-            wid.regular_style()
+            wid.set_no_frame()
 
         assert isinstance(BarBottom.path_label, QLabel)
         BarBottom.path_label.setText("")
@@ -457,19 +457,13 @@ class Grid(QScrollArea):
         if a0.button() != Qt.MouseButton.LeftButton:
             return
 
-        clicked_wid = QApplication.widgetAt(a0.globalPos())
-    
-        if isinstance(clicked_wid, (ImgWid, TextWid)):
-            clicked_wid = clicked_wid.parent()
-
-        else:
-            clicked_wid = None
+        clicked_wid: Thumbnail | None = self.get_wid(a0=a0)
 
         # клик по сетке
         if not clicked_wid:
 
             for i in self.selected_widgets:
-                i.regular_style()
+                i.set_no_frame()
 
             self.selected_widgets.clear()
             self.curr_cell = None
@@ -480,7 +474,7 @@ class Grid(QScrollArea):
             # шифт клик: если не было выделенных виджетов
             if not self.selected_widgets:
 
-                clicked_wid.selected_style()
+                clicked_wid.set_frame()
                 self.selected_widgets.append(clicked_wid)
                 self.curr_cell = (clicked_wid.row, clicked_wid.col)
 
@@ -507,7 +501,7 @@ class Grid(QScrollArea):
                     wid_ = self.cell_to_wid.get(i)
 
                     if wid_ not in self.selected_widgets:
-                        wid_.selected_style()
+                        wid_.set_frame()
                         self.selected_widgets.append(wid_)
 
         elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
@@ -515,23 +509,23 @@ class Grid(QScrollArea):
             # комманд клик: был выделен виджет, снять выделение
             if clicked_wid in self.selected_widgets:
                 self.selected_widgets.remove(clicked_wid)
-                clicked_wid.regular_style()
+                clicked_wid.set_no_frame()
 
             # комманд клик: виджет не был виделен, выделить
             else:
                 self.selected_widgets.append(clicked_wid)
-                clicked_wid.selected_style()
+                clicked_wid.set_frame()
 
         else:
             
             for i in self.selected_widgets:
-                i.regular_style()
+                i.set_no_frame()
 
             self.selected_widgets.clear()
 
             self.curr_cell = (clicked_wid.row, clicked_wid.col)
             self.selected_widgets.append(clicked_wid)
-            clicked_wid.selected_style()
+            clicked_wid.set_frame()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.resize_timer.stop()
@@ -540,23 +534,28 @@ class Grid(QScrollArea):
         return super().resizeEvent(a0)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        wid = QApplication.widgetAt(a0.globalPos())
 
-        if isinstance(wid, (TextWid, ImgWid)):
-            ...
+        self.menu_ = ContextCustom(event=a0)
+        clicked_wid = self.get_wid(a0=a0)
 
-        else:
+        if not clicked_wid:
 
-            self.deselect_wid()
-            self.menu_ = ContextCustom(event=a0)
+            for i in self.selected_widgets:
+                i.set_no_frame()
 
-            reload = ScanerRestart(self.menu_)
+            self.selected_widgets.clear()
+            self.curr_cell = None
+
+            reload = ScanerRestart(parent=self.menu_)
             self.menu_.addAction(reload)
 
             types_ = MenuTypes(parent=self.menu_)
             self.menu_.addMenu(types_)
 
-            self.menu_.show_menu()
+        else:
+            ...
+
+        self.menu_.show_menu()
 
     def checkScrollValue(self, value):
         self.up_btn.move(
