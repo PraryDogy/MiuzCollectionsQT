@@ -276,12 +276,12 @@ class Lang_:
         "Save all layers as ..."
     ]
     save_image_downloads = [
-        "Сохранить в загрузки",
-        "Save to Downloads"
+        "Сохранить выбранные объекты в загрузки",
+        "Save selected objects to Downloads"
     ]
     save_image_in = [
-        "Сохранить как...",
-        "Save as..."
+        "Сохранить выбранные объекты как",
+        "Save selected objects as"
     ]
     search = [
         "Поиск",

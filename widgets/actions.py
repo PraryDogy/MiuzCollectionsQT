@@ -174,7 +174,7 @@ class FavActionDb(QAction):
 
 
 class Save(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str, save_as: bool):
+    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str | list, save_as: bool):
 
         if save_as:
             text: str = Lang.save_image_in
