@@ -263,7 +263,7 @@ class Grid(QScrollArea):
 
     def get_max_col(self):
         return self.ww // (
-            ThumbData.THUMB_W[Dynamic.thumb_size_ind] + ThumbData.OFFSET 
+            ThumbData.THUMB_W[Dynamic.thumb_size_ind] # + ThumbData.OFFSET 
             )
 
     def resize_thumbnails(self):
@@ -378,8 +378,6 @@ class Grid(QScrollArea):
                 self.open_in_view(wid=wid)
 
         elif a0.key() in offsets:
-
-            print(self.cell_to_wid)
 
             if self.selected_widgets:
 
