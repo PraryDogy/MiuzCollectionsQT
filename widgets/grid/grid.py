@@ -246,7 +246,6 @@ class Grid(QScrollArea):
             col = 0
 
     def grid_more(self, db_images: dict[str, list[DbImage]]):
-        return
         if db_images:
             for date, db_images in db_images.items():
                 self.single_grid(
