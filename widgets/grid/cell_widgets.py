@@ -148,7 +148,7 @@ class Thumbnail(QFrame, CellWid):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
         self.setup()
-        # self.setStyleSheet("background: red;")
+        # self.setStyleSheet("background: BLACK;")
 
     @classmethod
     def calculate_size(cls):
