@@ -298,6 +298,11 @@ class JsonData:
     @classmethod
     def _check_dirs(cls):
 
+        if not os.path.exists(Static.PRELOAD_FOLDER):
+            t = "скачайте _preload.zip и распакуйте в корень проекта"
+            webbrowser.open(Static.LINK_DB)
+            raise Exception(t)
+
         if not os.path.exists(Static.APP_SUPPORT_DIR):
             os.makedirs(name=Static.APP_SUPPORT_DIR, exist_ok=True)
 
@@ -365,7 +370,6 @@ class JsonData:
         
         else:
             return True
-
 
     @classmethod
     def init(cls):
