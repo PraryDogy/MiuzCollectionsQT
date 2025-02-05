@@ -95,7 +95,7 @@ app = App(sys.argv)
 
 UThreadPool.init()
 SignalsApp.init()
-# Scaner.init()
+Scaner.init()
 
 win_main = WinMain()
 win_main.center()
