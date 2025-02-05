@@ -157,6 +157,7 @@ class Grid(QScrollArea):
         for wid in self.delete_later_widgets:
             wid.deleteLater()
 
+        Thumbnail.path_to_wid.clear()
         self.selected_widgets: list[Thumbnail] = []
         self.delete_later_widgets: list[QWidget] = []
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
