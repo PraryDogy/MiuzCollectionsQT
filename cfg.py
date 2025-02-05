@@ -47,7 +47,7 @@ class Static:
     GRID_SPACING: int = 5
 
     # скачать системные файлы _preload
-    LINK_DB = "https://disk.yandex.ru/d/TVofkvNe9pLt8g"
+    LINK_DB = "https://disk.yandex.ru/d/XKf6xaqzL6om9w"
 
     # ширина главного меню...
     MENU_LEFT_WIDTH: int = 210
@@ -328,7 +328,7 @@ class JsonData:
 
         # если нет предустановленной то просим скачать и положить в корень проекта
         else:
-            t = "нет предустановленной HASH_DIR: " + Static.PRELOAD_HASHDIR_ZIP
+            t = "скачайте _preload.zip и распакуйте в корень проекта"
             webbrowser.open(Static.LINK_DB)
             raise Exception(t)
 
@@ -348,7 +348,7 @@ class JsonData:
         # иначе просим скачать или создать пользовательский db.db 
         # с таблицей database > THUMBS
         else:
-            t = "Нет предуставновленного DB_FILE: " + Static.DB_FILE
+            t = "скачайте _preload.zip и распакуйте в корень проекта"
             webbrowser.open(Static.LINK_DB)
             raise Exception(t)
 
