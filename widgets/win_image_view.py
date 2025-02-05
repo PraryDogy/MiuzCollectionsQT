@@ -257,6 +257,7 @@ class NextImageBtn(SwitchImageBtn):
 
 class WinImageView(WinChild):
     task_count_limit = 10
+    switch_image_sig = pyqtSignal(object)
 
     def __init__(self, short_src: str):
         super().__init__()
@@ -419,8 +420,7 @@ class WinImageView(WinChild):
             self.wid = new_wid
 
         self.load_thumb()
-        # SignalsApp.all_.thumbnail_select.emit(self.short_src)
-        self.wid.select.emit(self.short_src)
+        self.switch_image_sig.emit(self.short_src)
 
     def img_viewer_title(self):
         self.setWindowTitle(f"{self.wid.collection}: {self.wid.name}")

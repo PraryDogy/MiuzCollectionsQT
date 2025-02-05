@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QMimeData, Qt, QUrl, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QEvent
 from PyQt5.QtGui import QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSizePolicy
 
@@ -96,6 +96,16 @@ class ImgWid(QLabel):
     def __init__(self):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def test(self):
+        ev = QMouseEvent(
+            QEvent.Type.MouseButtonRelease,
+            self.cursor().pos(),
+            Qt.MouseButton.LeftButton,
+            Qt.MouseButton.LeftButton,
+            Qt.KeyboardModifier.NoModifier
+        )
+        super().mouseReleaseEvent(ev)
 
     def mouseReleaseEvent(self, ev):
         return super().mouseReleaseEvent(ev)
@@ -201,36 +211,3 @@ class Thumbnail(QFrame, CellWid):
         # удаляем из избранного и если это избранные то обновляем сетку
         if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
             SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-
-    # def press_cmd(self, a0: QMouseEvent | None) -> None:
-    #     if a0.button() == Qt.MouseButton.LeftButton:
-    #         self.drag_start_position = a0.pos()
-    #     return super().mousePressEvent(a0)
-
-    # def move_cmd(self, a0: QMouseEvent | None) -> None:
-    #     if a0.button() == Qt.MouseButton.RightButton:
-    #         return
-
-    #     distance = (a0.pos() - self.drag_start_position).manhattanLength()
-
-    #     if distance < QApplication.startDragDistance():
-    #         return
-        
-    #     coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
-    #     if coll_folder:
-    #         full_src = Utils.get_full_src(coll_folder, self.short_src)
-    #     else:
-    #         return
-
-    #     self.select.emit(self.short_src)
-    #     self.drag = QDrag(self)
-    #     self.mime_data = QMimeData()
-    #     self.drag.setPixmap(self.img_wid.pixmap())
-        
-    #     url = [QUrl.fromLocalFile(full_src)]
-    #     self.mime_data.setUrls(url)
-
-    #     self.drag.setMimeData(self.mime_data)
-    #     self.drag.exec_(Qt.DropAction.CopyAction)
-
-    #     return super().mouseMoveEvent(a0)

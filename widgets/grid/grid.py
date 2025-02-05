@@ -260,11 +260,31 @@ class Grid(QScrollArea):
     # BarBottom.path_label.setText("")
 
     def open_in_view(self, wid: Thumbnail):
+
         assert isinstance(wid, Thumbnail)
         from ..win_image_view import WinImageView
+
         self.win_image_view = WinImageView(short_src=wid.short_src)
         self.win_image_view.center_relative_parent(self.window())
+
+        self.win_image_view.switch_image_sig.connect(
+            lambda img_path: self.select_viewed_image(path=img_path)
+        )
+
         self.win_image_view.show()
+
+    def select_viewed_image(self, path: str):
+        wid = Thumbnail.path_to_wid.get(path)
+
+        if wid:
+
+            for i in self.selected_widgets:
+                i.set_no_frame()
+
+            self.selected_widgets.clear()
+
+            wid.set_frame()
+            self.selected_widgets.append(wid)
 
     def get_max_col(self):
         return self.ww // (
@@ -409,6 +429,8 @@ class Grid(QScrollArea):
         return super().keyPressEvent(a0)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
+
+        print(a0)
 
         if a0.button() != Qt.MouseButton.LeftButton:
             return
