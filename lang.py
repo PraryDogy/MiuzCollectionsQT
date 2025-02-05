@@ -259,22 +259,6 @@ class Lang_:
         "Показать выбранные объекты в Finder",
         "Reveal selected objects in Finder"
     ]
-    save_all_JPG = [
-        "Сохранить все JPG",
-        "Save all JPG"
-    ]
-    save_all_JPG_as = [
-        "Сохранить все JPG как ...",
-        "Save all JPG as ..."
-    ]
-    save_all_layers = [
-        "Сохранить все слои",
-        "Save all layers"
-    ]
-    save_all_layers_as = [
-        "Сохранить все слои как ...",
-        "Save all layers as ..."
-    ]
     save_image_downloads = [
         "Сохранить выбранные объекты в загрузки",
         "Save selected objects to Downloads"
@@ -362,8 +346,8 @@ class Lang_:
         }
     ]
     where_to_look_coll_folder = [
-        "Где искать папку с коллекциями",
-        "Where to look for a collections folder"
+        "Расположение коллекций (по одному в строке)",
+        "Collection locations (one per line)"
     ]
     with_name = [
         "с именем",

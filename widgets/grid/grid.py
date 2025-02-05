@@ -430,8 +430,6 @@ class Grid(QScrollArea):
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
 
-        print(a0)
-
         if a0.button() != Qt.MouseButton.LeftButton:
             return
 
