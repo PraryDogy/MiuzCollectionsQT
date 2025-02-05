@@ -107,7 +107,7 @@ class LoadImage(URunnable):
             print("не могу загрузить крупное изображение")
             self.pixmap = QPixmap(0, 0)
 
-        if len(LoadImage.images) > 50:
+        if len(LoadImage.images) > Static.CACHED_IMAGES_COUNT:
             LoadImage.images.pop(next(iter(LoadImage.images)))
 
         image_data = ImageData(
