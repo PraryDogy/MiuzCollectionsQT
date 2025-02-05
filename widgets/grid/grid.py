@@ -256,9 +256,6 @@ class Grid(QScrollArea):
                     max_col=self.get_max_col()
                 )
     
-    # assert isinstance(BarBottom.path_label, QLabel)
-    # BarBottom.path_label.setText("")
-
     def open_in_view(self, wid: Thumbnail):
 
         assert isinstance(wid, Thumbnail)
@@ -679,3 +676,6 @@ class Grid(QScrollArea):
         self.drag.exec_(Qt.DropAction.CopyAction)
 
         return super().mouseMoveEvent(a0)
+
+    # assert isinstance(BarBottom.path_label, QLabel)
+    # BarBottom.path_label.setText("")

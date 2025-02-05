@@ -278,8 +278,8 @@ class Lang_:
         \nControl dates with up/down keys."
     ]
     sett_stopcolls = [
-        "Игнорировать коллекции",
-        "Ignore collections"
+        "Игнорировать коллекции (по одной в строке)",
+        "Ignore collections (one per line)"
     ]
     settings = [
         "Настройки",
