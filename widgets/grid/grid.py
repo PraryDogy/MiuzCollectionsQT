@@ -150,8 +150,7 @@ class Grid(QScrollArea):
         self.selected_widgets: list[Thumbnail] = []
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
-        self.row, self.col = 0, 0
-
+        self.global_row = 0
         Thumbnail.path_to_wid.clear()
     
         if not db_images:
@@ -190,7 +189,7 @@ class Grid(QScrollArea):
         # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
         add_last_row = False
         row, col = 0, 0
-        self.col = 0
+
 
         for db_image in db_images:
 
@@ -203,11 +202,9 @@ class Grid(QScrollArea):
 
             self.rearraged_widgets[grid_lay].append(wid)
             Thumbnail.path_to_wid[wid.short_src] = wid
-            self.cell_to_wid[self.row, self.col] = wid
-            wid.row, wid.col = self.row, self.col
+            self.cell_to_wid[self.global_row, col] = wid
+            wid.row, wid.col = self.global_row, col
             grid_lay.addWidget(wid, row, col)
-
-            self.col += 1
             col += 1
 
             add_last_row = True
@@ -219,10 +216,9 @@ class Grid(QScrollArea):
             if col >= max_col:  
 
                 col = 0
-                self.col = 0
 
                 row += 1
-                self.row += 1
+                self.global_row += 1
 
                 add_last_row = False
 
@@ -230,7 +226,7 @@ class Grid(QScrollArea):
         # переходим к следующей строке для корректного добавления
         # новых элементов в будущем.
         if add_last_row:
-            self.row += 1
+            self.global_row += 1
             row += 1
             col = 0
 
@@ -294,7 +290,7 @@ class Grid(QScrollArea):
 
         Thumbnail.path_to_wid.clear()
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
-        self.row, self.coll = 0, 0
+        self.global_row = 0
 
         max_col = self.get_max_col()
         add_last_row = False
@@ -302,17 +298,15 @@ class Grid(QScrollArea):
         for grid_lay, grid_widgets in self.rearraged_widgets.items():
 
             row, col = 0, 0
-            self.col = 0
 
             for wid in grid_widgets:
 
                 Thumbnail.path_to_wid[wid.short_src] = wid
-                self.cell_to_wid[self.row, self.col] = wid
-                wid.row, wid.col = self.row, self.col
+                self.cell_to_wid[self.global_row, col] = wid
+                wid.row, wid.col = self.global_row, col
                 grid_lay.addWidget(wid, row, col)
 
                 col += 1
-                self.col += 1
 
                 add_last_row = True
 
@@ -320,18 +314,16 @@ class Grid(QScrollArea):
 
                     add_last_row = False
 
-                    self.col = 0
                     col = 0
 
-                    self.row += 1
+                    self.global_row += 1
                     row += 1       
 
             if add_last_row:
 
-                self.col = 0
                 col = 0
 
-                self.row += 1
+                self.global_row += 1
                 row += 1
 
     def get_wid(self, a0: QMouseEvent) -> None | Thumbnail:
