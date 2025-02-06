@@ -25,7 +25,10 @@ UP_STYLE = f"""
     background: {Static.RGB_GRAY};
     border-radius: 22px;
 """
-
+FIRST_LOAD = "first_load"
+MORE = "more"
+FIRST = "first"
+TO_TOP = "to_top"
 
 class NoImagesLabel(QLabel):
     def __init__(self):
@@ -75,7 +78,7 @@ class UpBtn(QFrame):
         v_layout.addWidget(self.svg)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.all_.grid_thumbnails_cmd.emit(TO_TOP)
         return super().mouseReleaseEvent(a0)
     
 
@@ -97,9 +100,6 @@ class Grid(QScrollArea):
 
         # выделенные мышкой или клавиатурой виджеты
         self.selected_widgets: list[Thumbnail] = []
-
-        # основные виджеты для удаления при перезагрузке сетки
-        self.delete_later_widgets: list[QWidget] = []
 
         # только виджеты Thumbnail для перераспределения в сетке
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
@@ -128,24 +128,24 @@ class Grid(QScrollArea):
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
 
-    def signals_cmd(self, flag: Literal["resize", "to_top", "reload"]):
+    def signals_cmd(self, flag: str):
         if flag == "resize":
             self.resize_thumbnails()
-        elif flag == "to_top":
+        elif flag == TO_TOP:
             self.verticalScrollBar().setValue(0)
         elif flag == "reload":
-            self.load_db_images(flag="first")
+            self.load_db_images(flag=FIRST)
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)
         
         self.setFocus()
 
-    def load_db_images(self, flag: Literal["first", "more"]):
-        if flag == "first":
+    def load_db_images(self, flag: str):
+        if flag == FIRST:
             Dynamic.grid_offset = 0
             cmd_ = lambda db_images: self.create_grid(db_images)
 
-        elif flag == "more":
+        elif flag == MORE:
             Dynamic.grid_offset += Static.GRID_LIMIT
             cmd_ = lambda db_images: self.grid_more(db_images)
         
@@ -158,9 +158,6 @@ class Grid(QScrollArea):
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
 
-        # for wid in self.delete_later_widgets:
-            # wid.deleteLater()
-
         for wid in self.scroll_wid.findChildren(QWidget):
             wid.deleteLater()
 
@@ -170,7 +167,6 @@ class Grid(QScrollArea):
 
         Thumbnail.path_to_wid.clear()
         self.selected_widgets: list[Thumbnail] = []
-        self.delete_later_widgets: list[QWidget] = []
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.row, self.col = 0, 0
@@ -178,7 +174,6 @@ class Grid(QScrollArea):
         if not db_images:
 
             error_title = NoImagesLabel()
-            self.delete_later_widgets.append(error_title)
             self.scroll_layout.addWidget(error_title)
 
         else:
@@ -193,17 +188,14 @@ class Grid(QScrollArea):
                 )
 
             spacer = QWidget()
-            self.delete_later_widgets.append(spacer)
             self.scroll_layout.addWidget(spacer)
 
     def single_grid(self, date: str, db_images: list[DbImage], max_col: int):
 
         title = Title(title=date, db_images=db_images)
-        self.delete_later_widgets.append(title)
         self.scroll_layout.addWidget(title)
 
         grid_wid = QWidget()
-        self.delete_later_widgets.append(grid_wid)
         self.scroll_layout.addWidget(grid_wid)
 
         grid_lay = QGridLayout()
@@ -313,8 +305,8 @@ class Grid(QScrollArea):
     def rearrange(self):
         "перетасовка сетки"
 
-        if not hasattr(self, "first_load"):
-            setattr(self, "first_load", True)
+        if not hasattr(self, FIRST_LOAD):
+            setattr(self, FIRST_LOAD, False)
             return
 
         Thumbnail.path_to_wid.clear()
@@ -512,8 +504,8 @@ class Grid(QScrollArea):
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
 
-        if not hasattr(self, "first_load"):
-            setattr(self, "first_load", True)
+        if not hasattr(self, FIRST_LOAD):
+            setattr(self, FIRST_LOAD, False)
             return
 
         self.resize_timer.stop()
@@ -634,7 +626,7 @@ class Grid(QScrollArea):
             self.up_btn.hide()
 
         if value == self.verticalScrollBar().maximum():
-            self.load_db_images(flag="more")
+            self.load_db_images(flag=MORE)
 
     def mouseDoubleClickEvent(self, a0):
         clicked_wid = self.get_wid(a0=a0)
