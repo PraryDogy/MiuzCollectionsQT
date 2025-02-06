@@ -95,10 +95,18 @@ class Grid(QScrollArea):
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
 
+        # выделенные мышкой или клавиатурой виджеты
         self.selected_widgets: list[Thumbnail] = []
+
+        # основные виджеты для удаления при перезагрузке сетки
         self.delete_later_widgets: list[QWidget] = []
+
+        # только виджеты Thumbnail для перераспределения в сетке
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
+
+        # координаты виджетов Thumbnail
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
+
         self.row, self.col = 0, 0
 
         self.resize_timer = QTimer(self)
@@ -113,10 +121,6 @@ class Grid(QScrollArea):
         self.scroll_layout.setAlignment(
             Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
         )
-
-        self.up_btn = UpBtn(self.scroll_wid)
-        self.up_btn.hide()
-        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         self.signals_cmd(flag="reload")
 
@@ -154,8 +158,15 @@ class Grid(QScrollArea):
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
 
-        for wid in self.delete_later_widgets:
+        # for wid in self.delete_later_widgets:
+            # wid.deleteLater()
+
+        for wid in self.scroll_wid.findChildren(QWidget):
             wid.deleteLater()
+
+        self.up_btn = UpBtn(self.scroll_wid)
+        self.up_btn.hide()
+        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         Thumbnail.path_to_wid.clear()
         self.selected_widgets: list[Thumbnail] = []
@@ -500,6 +511,11 @@ class Grid(QScrollArea):
             clicked_wid.set_frame()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
+
+        if not hasattr(self, "first_load"):
+            setattr(self, "first_load", True)
+            return
+
         self.resize_timer.stop()
         self.resize_timer.start(500)
         self.up_btn.hide()
