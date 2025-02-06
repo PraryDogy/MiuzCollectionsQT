@@ -87,12 +87,7 @@ class Grid(QScrollArea):
         super().__init__()
         self.setWidgetResizable(True)
         self.setAcceptDrops(True)
-        self.resize(
-            Dynamic.root_g["aw"] - Static.MENU_LEFT_WIDTH,
-            Dynamic.root_g["ah"]
-        )
         self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-        self.ww = Dynamic.root_g["aw"] - Static.MENU_LEFT_WIDTH
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
@@ -111,11 +106,9 @@ class Grid(QScrollArea):
             Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
         )
 
-        self.signals_cmd(flag="reload")
-
-        # SignalsApp.all_.thumbnail_select.connect(self.select_wid)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
+        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
 
     def signals_cmd(self, flag: str):
         if flag == "resize":
@@ -278,7 +271,7 @@ class Grid(QScrollArea):
             self.selected_widgets.append(wid)
 
     def get_max_col(self):
-        return self.ww // (
+        return self.width() // (
             ThumbData.THUMB_W[Dynamic.thumb_size_ind] # + ThumbData.OFFSET 
             )
 
@@ -303,7 +296,6 @@ class Grid(QScrollArea):
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.row, self.coll = 0, 0
 
-        self.ww = self.width()
         max_col = self.get_max_col()
         add_last_row = False
 
