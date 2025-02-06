@@ -148,7 +148,7 @@ class Grid(QScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         self.selected_widgets: list[Thumbnail] = []
-        self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
+        self.grid_widgets: list[QGridLayout] = []
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.global_row = 0
         Thumbnail.path_to_wid.clear()
@@ -179,6 +179,7 @@ class Grid(QScrollArea):
 
         grid_wid = QWidget()
         self.scroll_layout.addWidget(grid_wid)
+        self.grid_widgets.append(grid_wid)
 
         grid_lay = QGridLayout()
         grid_lay.setContentsMargins(0, 0, 0, 40)
@@ -200,7 +201,6 @@ class Grid(QScrollArea):
                 fav=db_image.fav
             )
 
-            self.rearraged_widgets[grid_lay].append(wid)
             Thumbnail.path_to_wid[wid.short_src] = wid
             self.cell_to_wid[self.global_row, col] = wid
             wid.row, wid.col = self.global_row, col
@@ -295,11 +295,12 @@ class Grid(QScrollArea):
         max_col = self.get_max_col()
         add_last_row = False
 
-        for grid_lay, grid_widgets in self.rearraged_widgets.items():
+        for grid_wid in self.grid_widgets:
 
             row, col = 0, 0
+            grid_lay = grid_wid.layout()
 
-            for wid in grid_widgets:
+            for wid in grid_wid.findChildren(Thumbnail):
 
                 Thumbnail.path_to_wid[wid.short_src] = wid
                 self.cell_to_wid[self.global_row, col] = wid
