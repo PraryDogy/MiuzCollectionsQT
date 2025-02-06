@@ -181,7 +181,7 @@ class Grid(QScrollArea):
         self.scroll_layout.addWidget(grid_wid)
 
         grid_lay = QGridLayout()
-        grid_lay.setContentsMargins(0, 0, 0, 0)
+        grid_lay.setContentsMargins(0, 0, 0, 40)
         grid_lay.setSpacing(Static.IMAGES_GRID_SPACING)
         grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         grid_wid.setLayout(grid_lay)
@@ -289,7 +289,7 @@ class Grid(QScrollArea):
             return
 
         Thumbnail.path_to_wid.clear()
-        self.cell_to_wid: dict[tuple, Thumbnail] = {}
+        self.cell_to_wid.clear()
         self.global_row = 0
 
         max_col = self.get_max_col()
