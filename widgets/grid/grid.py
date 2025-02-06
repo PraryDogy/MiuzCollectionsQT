@@ -98,17 +98,6 @@ class Grid(QScrollArea):
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
 
-        # выделенные мышкой или клавиатурой виджеты
-        self.selected_widgets: list[Thumbnail] = []
-
-        # только виджеты Thumbnail для перераспределения в сетке
-        self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
-
-        # координаты виджетов Thumbnail
-        self.cell_to_wid: dict[tuple, Thumbnail] = {}
-
-        self.row, self.col = 0, 0
-
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
@@ -165,12 +154,13 @@ class Grid(QScrollArea):
         self.up_btn.hide()
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
-        Thumbnail.path_to_wid.clear()
         self.selected_widgets: list[Thumbnail] = []
         self.rearraged_widgets: dict[QGridLayout, list[Thumbnail]] = defaultdict(list)
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.row, self.col = 0, 0
 
+        Thumbnail.path_to_wid.clear()
+    
         if not db_images:
 
             error_title = NoImagesLabel()
