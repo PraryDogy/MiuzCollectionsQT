@@ -257,14 +257,8 @@ class Grid(QScrollArea):
         wid = Thumbnail.path_to_wid.get(path)
 
         if wid:
-
-            for i in self.selected_widgets:
-                i.set_no_frame()
-
-            self.selected_widgets.clear()
-
-            wid.set_frame()
-            self.selected_widgets.append(wid)
+            self.clear_selected_widgets()
+            self.add_and_select_widget(wid=wid)
 
     def get_max_col(self):
         return self.width() // (
@@ -327,12 +321,22 @@ class Grid(QScrollArea):
                 self.global_row += 1
                 row += 1
 
-    def get_wid(self, a0: QMouseEvent) -> None | Thumbnail:
+    def get_wid_under_mouse(self, a0: QMouseEvent) -> None | Thumbnail:
         wid = QApplication.widgetAt(a0.globalPos())
         if isinstance(wid, (ImgWid, TextWid)):
             return wid.parent()
         else:
             return None
+        
+    def clear_selected_widgets(self):
+        for i in self.selected_widgets:
+            i.set_no_frame()
+        self.selected_widgets.clear()
+
+    def add_and_select_widget(self, wid: Thumbnail):
+        if isinstance(wid, Thumbnail):
+            self.selected_widgets.append(wid)
+            wid.set_frame()
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -392,11 +396,8 @@ class Grid(QScrollArea):
                     wid = self.cell_to_wid.get(coords)
 
                 if wid and isinstance(wid, Thumbnail):
-                    for i in self.selected_widgets:
-                        i.set_no_frame()
-                    self.selected_widgets.clear()
-                    self.selected_widgets.append(wid)
-                    wid.set_frame()
+                    self.clear_selected_widgets()
+                    self.add_and_select_widget(wid=wid)
                     self.ensureWidgetVisible(wid)
 
                 else:
@@ -409,15 +410,11 @@ class Grid(QScrollArea):
         if a0.button() != Qt.MouseButton.LeftButton:
             return
 
-        clicked_wid: Thumbnail | None = self.get_wid(a0=a0)
+        clicked_wid: Thumbnail | None = self.get_wid_under_mouse(a0=a0)
 
         # клик по сетке
         if not clicked_wid:
-
-            for i in self.selected_widgets:
-                i.set_no_frame()
-
-            self.selected_widgets.clear()
+            self.clear_selected_widgets()
             return
 
         if a0.modifiers() == Qt.KeyboardModifier.ShiftModifier:
@@ -425,8 +422,7 @@ class Grid(QScrollArea):
             # шифт клик: если не было выделенных виджетов
             if not self.selected_widgets:
 
-                clicked_wid.set_frame()
-                self.selected_widgets.append(clicked_wid)
+                self.add_and_select_widget(wid=clicked_wid)
 
             # шифт клик: если уже был выделен один / несколько виджетов
             else:
@@ -452,8 +448,7 @@ class Grid(QScrollArea):
                     wid_ = self.cell_to_wid.get(i)
 
                     if wid_ not in self.selected_widgets:
-                        wid_.set_frame()
-                        self.selected_widgets.append(wid_)
+                        self.add_and_select_widget(wid=wid_)
 
         elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
 
@@ -464,18 +459,11 @@ class Grid(QScrollArea):
 
             # комманд клик: виджет не был виделен, выделить
             else:
-                self.selected_widgets.append(clicked_wid)
-                clicked_wid.set_frame()
+                self.add_and_select_widget(wid=clicked_wid)
 
         else:
-            
-            for i in self.selected_widgets:
-                i.set_no_frame()
-
-            self.selected_widgets.clear()
-
-            self.selected_widgets.append(clicked_wid)
-            clicked_wid.set_frame()
+            self.clear_selected_widgets()
+            self.add_and_select_widget(wid=clicked_wid)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
 
@@ -491,14 +479,10 @@ class Grid(QScrollArea):
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
 
         self.menu_ = ContextCustom(event=a0)
-        clicked_wid = self.get_wid(a0=a0)
+        clicked_wid = self.get_wid_under_mouse(a0=a0)
 
         if not clicked_wid:
-
-            for i in self.selected_widgets:
-                i.set_no_frame()
-
-            self.selected_widgets.clear()
+            self.clear_selected_widgets()
 
             reload = ScanerRestart(parent=self.menu_)
             self.menu_.addAction(reload)
@@ -510,17 +494,12 @@ class Grid(QScrollArea):
 
             if not self.selected_widgets:
 
-                clicked_wid.set_frame()
-                self.selected_widgets.append(clicked_wid)
+                self.add_and_select_widget(wid=clicked_wid)
 
             elif clicked_wid not in self.selected_widgets:
-
-                for i in self.selected_widgets:
-                    i.set_no_frame()
-                self.selected_widgets.clear()
-
-                clicked_wid.set_frame()
-                self.selected_widgets.append(clicked_wid)
+                
+                self.clear_selected_widgets()
+                self.add_and_select_widget(wid=clicked_wid)
 
             urls = [
                 i.short_src
@@ -604,30 +583,17 @@ class Grid(QScrollArea):
             self.load_db_images(flag=MORE)
 
     def mouseDoubleClickEvent(self, a0):
-        clicked_wid = self.get_wid(a0=a0)
+        clicked_wid = self.get_wid_under_mouse(a0=a0)
 
         if clicked_wid:
-
-            for i in self.selected_widgets:
-                i.set_no_frame()
-
-            self.selected_widgets.clear()
-            
-            clicked_wid.set_frame()
-            self.selected_widgets.append(clicked_wid)
-
+            self.clear_selected_widgets()
+            self.add_and_select_widget(wid=clicked_wid)
             self.open_in_view(wid=clicked_wid)
 
     def mousePressEvent(self, a0):
-        if a0.button() == Qt.MouseButton.LeftButton:
-
-            if not self.selected_widgets:
-                wid = self.get_wid(a0=a0)
-                if wid:
-                    wid.set_frame()
-                    self.selected_widgets.append(wid)
-
-            self.drag_start_position = a0.pos()
+        if a0.button() != Qt.MouseButton.LeftButton:
+            return
+        self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
     
     def mouseMoveEvent(self, a0):
@@ -637,6 +603,11 @@ class Grid(QScrollArea):
         if distance < QApplication.startDragDistance():
             return
         
+        wid = self.get_wid_under_mouse(a0=a0)
+
+        if wid and wid not in self.selected_widgets:
+            self.clear_selected_widgets()
+            self.add_and_select_widget(wid=wid)
         
         coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
 
