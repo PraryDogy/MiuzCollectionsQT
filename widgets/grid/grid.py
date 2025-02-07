@@ -481,23 +481,25 @@ class Grid(QScrollArea):
         self.menu_ = ContextCustom(event=a0)
         clicked_wid = self.get_wid_under_mouse(a0=a0)
 
+        # клик по пустому пространству
         if not clicked_wid:
             self.clear_selected_widgets()
-
             reload = ScanerRestart(parent=self.menu_)
             self.menu_.addAction(reload)
-
             types_ = MenuTypes(parent=self.menu_)
             self.menu_.addMenu(types_)
 
+        # клик по виджету
         else:
 
+            # если не было выделено ни одного виджет ранее
+            # то выделяем кликнутый
             if not self.selected_widgets:
-
                 self.add_and_select_widget(wid=clicked_wid)
 
+            # если есть выделенные виджеты, но кликнутый виджет не выделены
+            # то снимаем выделение с других и выделяем кликнутый
             elif clicked_wid not in self.selected_widgets:
-                
                 self.clear_selected_widgets()
                 self.add_and_select_widget(wid=clicked_wid)
 
