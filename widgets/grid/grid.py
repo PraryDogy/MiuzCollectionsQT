@@ -620,6 +620,13 @@ class Grid(QScrollArea):
 
     def mousePressEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
+
+            if not self.selected_widgets:
+                wid = self.get_wid(a0=a0)
+                if wid:
+                    wid.set_frame()
+                    self.selected_widgets.append(wid)
+
             self.drag_start_position = a0.pos()
         return super().mousePressEvent(a0)
     
