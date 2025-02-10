@@ -1,5 +1,9 @@
 from utils.utils import Utils
 
 
+src = "/Users/Loshkarev/Desktop/R2018-MLN-0258.psd"
+a = Utils.read_image(full_src=src)
 
-a = Utils.read_image(full_src="/Users/Loshkarev/Desktop/1027.psd")
+import cv2
+cv2.imshow("123", a)
+cv2.waitKey(0)
