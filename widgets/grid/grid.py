@@ -232,10 +232,10 @@ class Grid(QScrollArea):
 
     def grid_more(self, db_images: dict[str, list[DbImage]]):
         if db_images:
-            for date, db_images in db_images.items():
+            for date, db_images_list in db_images.items():
                 self.single_grid(
                     date=date,
-                    db_images=db_images,
+                    db_images=db_images_list,
                     max_col=self.get_max_col()
                 )
     
