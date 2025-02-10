@@ -29,6 +29,8 @@ FIRST_LOAD = "first_load"
 MORE = "more"
 FIRST = "first"
 TO_TOP = "to_top"
+RELOAD = "reload"
+RESIZE = "resize"
 
 class NoImagesLabel(QLabel):
     def __init__(self):
@@ -109,14 +111,14 @@ class Grid(QScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.grid_thumbnails_cmd.emit(RELOAD)
 
     def signals_cmd(self, flag: str):
-        if flag == "resize":
+        if flag == RESIZE:
             self.resize_thumbnails()
         elif flag == TO_TOP:
             self.verticalScrollBar().setValue(0)
-        elif flag == "reload":
+        elif flag == RELOAD:
             self.load_db_images(flag=FIRST)
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)
@@ -124,8 +126,6 @@ class Grid(QScrollArea):
         self.setFocus()
 
     def load_db_images(self, flag: str):
-
-        print(flag)
 
         if flag == FIRST:
             Dynamic.grid_offset = 0
