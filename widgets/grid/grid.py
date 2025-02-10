@@ -106,6 +106,7 @@ class Grid(QScrollArea):
             Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
         )
 
+        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
         SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
@@ -123,6 +124,9 @@ class Grid(QScrollArea):
         self.setFocus()
 
     def load_db_images(self, flag: str):
+
+        print(flag)
+
         if flag == FIRST:
             Dynamic.grid_offset = 0
             cmd_ = lambda db_images: self.create_grid(db_images)
@@ -133,7 +137,7 @@ class Grid(QScrollArea):
         
         else: 
             raise Exception("wrong flag", flag)
-
+        
         self.task_ = DbImages()
         self.task_.signals_.finished_.connect(cmd_)
         UThreadPool.pool.start(self.task_)
@@ -145,7 +149,6 @@ class Grid(QScrollArea):
 
         self.up_btn = UpBtn(self.scroll_wid)
         self.up_btn.hide()
-        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         self.selected_widgets: list[Thumbnail] = []
         self.grid_widgets: list[QGridLayout] = []
