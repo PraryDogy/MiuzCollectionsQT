@@ -162,10 +162,10 @@ class Grid(QScrollArea):
 
             Thumbnail.calculate_size()
 
-            for date, db_images in db_images.items():
+            for date, db_images_list in db_images.items():
                 self.single_grid(
                     date=date,
-                    db_images=db_images,
+                    db_images=db_images_list,
                     max_col=self.get_max_col()
                 )
 
