@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QSlider, QWidget
 
 from base_widgets import LayoutHor, SvgBtn
 from cfg import Dynamic, JsonData, Static
+from lang import Lang
 from signals import SignalsApp
 
 from .win_downloads import WinDownloads
@@ -95,7 +96,6 @@ class MyLabel(QLabel):
 
 
 class BarBottom(QWidget):
-    path_label: QLabel = None
 
     def __init__(self):
         super().__init__()
@@ -107,14 +107,13 @@ class BarBottom(QWidget):
         self.h_layout.setContentsMargins(15, 0, 15, 0)
         self.init_ui()
 
+        SignalsApp.all_.bar_bottom_filters.connect(self.toggle_types)
+
     def init_ui(self):
-        path_label = MyLabel("")
-        path_label.setMinimumWidth(1)
-        self.h_layout.addWidget(
-            path_label,
-            alignment=Qt.AlignmentFlag.AlignLeft
-        )
-        BarBottom.path_label = path_label
+
+        t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
+        self.filter_label = QLabel(text=t)
+        self.h_layout.addWidget(self.filter_label)
 
         self.h_layout.addStretch()
 
@@ -148,6 +147,25 @@ class BarBottom(QWidget):
         )
 
         self.downloads.hide()
+
+    def toggle_types(self):
+        types = []
+
+        if Static.JPG_EXT in Dynamic.types:
+            types.append(Lang.type_jpg)
+
+        if Static.LAYERS_EXT in Dynamic.types:
+            types.append(Lang.type_tiff)
+
+        if not types:
+            types = [
+                Lang.type_jpg,
+                Lang.type_tiff
+            ]
+
+        types = ", ".join(types)
+        t = f"{Lang.type_show}: {types}"
+        self.filter_label.setText(t)
 
     def btn_downloads_toggle(self, flag: Literal["hide", "show"]):
         if flag == "hide":

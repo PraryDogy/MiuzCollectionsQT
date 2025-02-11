@@ -376,7 +376,7 @@ class Lang_:
 
     type_show = [
         "Показать",
-        "Showw"
+        "Show"
     ]
 
     update_descr = [

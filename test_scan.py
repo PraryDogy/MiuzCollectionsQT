@@ -1,9 +1,5 @@
-from utils.utils import Utils
+a = ["sdf", "sdfwgfs"]
 
+b = ",".join(a)
 
-src = "/Users/Loshkarev/Desktop/R2018-MLN-0258.psd"
-a = Utils.read_image(full_src=src)
-
-import cv2
-cv2.imshow("123", a)
-cv2.waitKey(0)
+print(b)

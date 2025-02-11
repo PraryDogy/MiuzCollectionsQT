@@ -276,3 +276,4 @@ class MenuTypes(QMenu):
             action_.setChecked(True)
 
         SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.all_.bar_bottom_filters.emit()
