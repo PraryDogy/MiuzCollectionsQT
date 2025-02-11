@@ -43,6 +43,7 @@ class WinMain(WinFrameless):
         super().__init__()
 
         self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
+        self.setMinimumWidth(750)
         self.setMenuBar(BarMacos())
 
         h_wid_main = QWidget()
