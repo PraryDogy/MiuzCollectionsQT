@@ -1,16 +1,17 @@
 import os
 from typing import Literal
 
-from PyQt5.QtCore import QEvent, Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QPoint
 from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
                          QWheelEvent)
-from PyQt5.QtWidgets import QApplication, QLabel, QSlider, QWidget
+from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 
 from base_widgets import LayoutHor, SvgBtn
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Static
 from lang import Lang
 from signals import SignalsApp
 
+from .actions import MenuTypes
 from .win_downloads import WinDownloads
 from .win_settings import WinSettings
 
@@ -113,6 +114,7 @@ class BarBottom(QWidget):
 
         t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
         self.filter_label = QLabel(text=t)
+        self.filter_label.mouseReleaseEvent = self.menu_types
         self.h_layout.addWidget(self.filter_label)
 
         self.h_layout.addStretch()
@@ -166,6 +168,22 @@ class BarBottom(QWidget):
         types = ", ".join(types)
         t = f"{Lang.type_show}: {types}"
         self.filter_label.setText(t)
+
+    def menu_types(self, *args):
+        menu_ = MenuTypes(parent=self.filter_label)
+
+        widget_rect = self.filter_label.rect()
+        menu_size = menu_.sizeHint()
+
+        centered = QPoint(
+            menu_size.width() // 2,
+            menu_size.height() + self.height() // 2
+        )
+
+        menu_center_top = self.filter_label.mapToGlobal(widget_rect.center()) - centered
+
+        menu_.move(menu_center_top)
+        menu_.exec_()
 
     def btn_downloads_toggle(self, flag: Literal["hide", "show"]):
         if flag == "hide":
