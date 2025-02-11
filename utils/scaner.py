@@ -139,9 +139,7 @@ class FinderImages:
 class DbImages:
 
     def run(self) -> dict[str, tuple[str, int, int, int]]:
-        t = f"{Brand.curr.name.capitalize()}: {Lang.preparing}"
-        ScanerTools.progressbar_text(t)
-
+        ScanerTools.progressbar_text("")
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(

@@ -124,7 +124,7 @@ class BarBottom(QWidget):
         SignalsApp.all_.progressbar_text.connect(self.progress_bar.setText)
         self.h_layout.addWidget(
             self.progress_bar,
-            alignment=Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight
+            alignment=Qt.AlignmentFlag.AlignVCenter
         )
 
         self.downloads = SvgBtn(icon_path=DOWNLOADS_SVG , size=20)
@@ -132,20 +132,17 @@ class BarBottom(QWidget):
         SignalsApp.all_.btn_downloads_toggle.connect(self.btn_downloads_toggle)
         self.h_layout.addWidget(
             self.downloads,
-            alignment=Qt.AlignmentFlag.AlignRight
         )
 
         self.sett_widget = SvgBtn(SETTINGS_SVG, size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(
             self.sett_widget,
-            alignment=Qt.AlignmentFlag.AlignRight
         )
 
         self.custom_slider = CustomSlider()
         self.h_layout.addWidget(
             self.custom_slider,
-            alignment=Qt.AlignmentFlag.AlignRight
         )
 
         self.downloads.hide()

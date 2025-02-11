@@ -278,8 +278,8 @@ class Lang_:
         \nControl dates with up/down keys."
     ]
     sett_stopcolls = [
-        "Игнорировать коллекции (по одной в строке)",
-        "Ignore collections (one per line)"
+        "Игнорировать коллекции",
+        "Ignore collections"
     ]
     settings = [
         "Настройки",
@@ -346,8 +346,8 @@ class Lang_:
         }
     ]
     where_to_look_coll_folder = [
-        "Расположение коллекций (по одному в строке)",
-        "Collection locations (one per line)"
+        "Расположение коллекций",
+        "Collection locations"
     ]
     with_name = [
         "с именем",
@@ -380,8 +380,8 @@ class Lang_:
     ]
 
     update_descr = [
-        "Скачать обновление с sb06",
-        "Download update from sb06"
+        "Скачать обновление",
+        "Download update"
     ]
 
     show_files = [
