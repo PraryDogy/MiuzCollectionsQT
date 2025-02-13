@@ -349,7 +349,7 @@ class WinImageView(WinChild):
                 ...
 
     def close_(self, *args):
-        # LoadImage.images.clear()
+        LoadImage.images.clear()
         self.close()
 
 
