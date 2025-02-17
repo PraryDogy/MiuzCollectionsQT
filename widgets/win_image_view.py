@@ -262,6 +262,7 @@ class NextImageBtn(SwitchImageBtn):
 class WinImageView(WinChild):
     task_count_limit = 10
     switch_image_sig = pyqtSignal(object)
+    closed_ = pyqtSignal()
 
     def __init__(self, short_src: str):
         super().__init__()

@@ -1,14 +1,13 @@
+import gc
 import os
-from collections import defaultdict
-from typing import Literal
 
-from PyQt5.QtCore import QMimeData, QObject, Qt, QTimer, QUrl, pyqtSignal
+from PyQt5.QtCore import QMimeData, Qt, QTimer, QUrl
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QScrollArea, QSizePolicy, QWidget)
 
-from base_widgets import ContextCustom, LayoutHor, LayoutVer, SvgBtn
+from base_widgets import ContextCustom, LayoutVer, SvgBtn
 from cfg import Dynamic, Filters, JsonData, Static, ThumbData
 from lang import Lang
 from signals import SignalsApp
@@ -16,9 +15,8 @@ from utils.utils import UThreadPool, Utils
 
 from ..actions import (CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
                        OpenInView, OpenWins, Reveal, Save, ScanerRestart)
-from ..bar_bottom import BarBottom
 from ._db_images import DbImage, DbImages
-from .cell_widgets import CellWid, ImgWid, TextWid, Thumbnail, Title
+from .cell_widgets import ImgWid, TextWid, Thumbnail, Title
 
 UP_SVG = os.path.join(Static.IMAGES, "up.svg")
 UP_STYLE = f"""
@@ -254,7 +252,16 @@ class Grid(QScrollArea):
             lambda img_path: self.select_viewed_image(path=img_path)
         )
 
+        self.win_image_view.closed_.connect(
+            lambda: self.img_view_closed(win=self.win_image_view)
+        )
+
         self.win_image_view.show()
+
+    def img_view_closed(self, win: QWidget):
+
+        del win
+        gc.collect()
 
     def select_viewed_image(self, path: str):
         wid = Thumbnail.path_to_wid.get(path)
