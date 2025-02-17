@@ -13,7 +13,7 @@ from lang import Lang
 from signals import SignalsApp
 
 from .utils import URunnable, UThreadPool, Utils
-
+import gc
 
 class Brand:
     all_: list["Brand"] = []
@@ -268,8 +268,11 @@ class DbUpdater:
 
     def get_small_img(self, src: str) -> tuple[ndarray, str] | tuple[None, None]:
 
-        array_img = Utils.read_image(src)
-        array_img = Utils.fit_to_thumb(array_img, ThumbData.DB_PIXMAP_SIZE)
+        array_img_src = Utils.read_image(src)
+        array_img = Utils.fit_to_thumb(array_img_src, ThumbData.DB_PIXMAP_SIZE)
+
+        del array_img_src
+        gc.collect()
 
         if array_img is not None:
             h_, w_ = array_img.shape[:2]

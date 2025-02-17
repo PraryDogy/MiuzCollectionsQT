@@ -1,3 +1,4 @@
+import gc
 import os
 from typing import Literal
 
@@ -99,6 +100,9 @@ class LoadImage(URunnable):
             if img is not None:
                 self.pixmap = Utils.pixmap_from_array(img)
                 LoadImage.images[self.full_src] = self.pixmap
+            
+            del img
+            gc.collect()
 
         else:
             self.pixmap = LoadImage.images.get(self.full_src)
