@@ -1,3 +1,4 @@
+import gc
 import os
 from collections import defaultdict
 from datetime import datetime
@@ -78,6 +79,9 @@ class DbImages(URunnable):
 
             else:
                 pixmap = Utils.pixmap_from_array(array_img)
+
+            del array_img
+            gc.collect()
 
             if Dynamic.date_start or Dynamic.date_end:
                 mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
