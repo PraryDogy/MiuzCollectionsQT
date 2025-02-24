@@ -11,7 +11,7 @@ import numpy as np
 import psd_tools
 import rawpy
 from imagecodecs.imagecodecs import DelayedImportError
-from PIL import Image
+from PIL import ExifTags, Image
 from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
@@ -220,9 +220,34 @@ class ReadImage(Err):
     @classmethod
     def read_raw(cls, path: str) -> np.ndarray | None:
         try:
-            return rawpy.imread(path).postprocess()
+            with rawpy.imread(path) as raw:
+                thumb = raw.extract_thumb()
 
-        except rawpy._rawpy.LibRawDataError as e:
+            if thumb.format == rawpy.ThumbFormat.JPEG:
+                img = Image.open(io.BytesIO(thumb.data))
+                img = img.convert("RGB")
+
+            elif thumb.format == rawpy.ThumbFormat.BITMAP:
+                img = Image.fromarray(thumb.data)
+
+            assert isinstance(img, Image.Image)
+
+            exif = img._getexif()
+
+            if exif:
+                for tag, value in exif.items():
+                    if ExifTags.TAGS.get(tag) == "Orientation":
+                        if value == 3:
+                            img = img.rotate(180, expand=True)
+                        elif value == 6:
+                            img = img.rotate(270, expand=True)
+                        elif value == 8:
+                            img = img.rotate(90, expand=True)
+                        break
+
+            return np.array(img)
+
+        except (Exception, rawpy._rawpy.LibRawDataError) as e:
             return None
 
     @classmethod
