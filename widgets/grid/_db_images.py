@@ -81,7 +81,7 @@ class DbImages(URunnable):
                 pixmap = Utils.pixmap_from_array(array_img)
 
             del array_img
-            gc.collect()
+            # gc.collect()
 
             if Dynamic.date_start or Dynamic.date_end:
                 mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
