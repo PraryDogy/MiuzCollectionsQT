@@ -70,6 +70,7 @@ class LoadThumb(URunnable):
         if short_hash:
             full_hash = Utils.get_full_hash(short_hash)
             small_img = Utils.read_image_hash(full_hash)
+            small_img = Utils.desaturate_image(image=small_img, factor=0.2)
             pixmap = Utils.pixmap_from_array(small_img)
         else:
             pixmap = QPixmap(1, 1)
@@ -98,6 +99,7 @@ class LoadImage(URunnable):
             img = Utils.read_image(full_src=self.full_src)
 
             if img is not None:
+                img = Utils.desaturate_image(image=img, factor=0.2)
                 self.pixmap = Utils.pixmap_from_array(img)
                 LoadImage.images[self.full_src] = self.pixmap
             
