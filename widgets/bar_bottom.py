@@ -105,7 +105,7 @@ class BarBottom(QWidget):
 
         self.h_layout = LayoutHor(self)
         self.h_layout.setSpacing(20)
-        self.h_layout.setContentsMargins(2, 0, 15, 0)
+        self.h_layout.setContentsMargins(13, 0, 15, 0)
         self.init_ui()
 
         SignalsApp.all_.bar_bottom_filters.connect(self.toggle_types)
