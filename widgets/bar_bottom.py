@@ -102,6 +102,7 @@ class FilterBtn(QLabel):
         t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
         super().__init__(text=t)
         self.setObjectName("filter_btn")
+        self.setFixedWidth(150)
         self.set_normal_style()
 
     def set_normal_style(self):
@@ -129,9 +130,9 @@ class FilterBtn(QLabel):
         self.set_normal_style()
 
     def mouseReleaseEvent(self, ev):
-        self.set_solid_style()
-        self.menu_types()
-        # return super().mouseReleaseEvent(ev)
+        if ev.button() == Qt.MouseButton.LeftButton:
+            self.set_solid_style()
+            self.menu_types()
 
 
 class BarBottom(QWidget):
@@ -143,7 +144,7 @@ class BarBottom(QWidget):
 
         self.h_layout = LayoutHor(self)
         self.h_layout.setSpacing(20)
-        self.h_layout.setContentsMargins(9, 0, 15, 0)
+        self.h_layout.setContentsMargins(0, 0, 15, 0)
         self.init_ui()
 
         SignalsApp.all_.bar_bottom_filters.connect(self.toggle_types)
