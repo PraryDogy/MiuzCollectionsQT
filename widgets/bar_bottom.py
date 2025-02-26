@@ -96,6 +96,44 @@ class MyLabel(QLabel):
         return super().paintEvent(a0)
 
 
+class FilterBtn(QLabel):
+
+    def __init__(self):
+        t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
+        super().__init__(text=t)
+        self.setObjectName("filter_btn")
+        self.set_normal_style()
+
+    def set_normal_style(self):
+        self.setStyleSheet(f"#filter_btn {{{Static.NORMAL_STYLE}}}")
+
+    def set_solid_style(self):
+        self.setStyleSheet(f"#filter_btn {{{Static.SOLID_STYLE}}}")
+
+    def menu_types(self, *args):
+        menu_ = MenuTypes(parent=self)
+
+        widget_rect = self.rect()
+        menu_size = menu_.sizeHint()
+
+        centered = QPoint(
+            menu_size.width() // 2,
+            menu_size.height() + self.height() // 2
+        )
+
+        menu_center_top = self.mapToGlobal(widget_rect.center()) - centered
+
+        menu_.move(menu_center_top)
+        menu_.exec_()
+        
+        self.set_normal_style()
+
+    def mouseReleaseEvent(self, ev):
+        self.set_solid_style()
+        self.menu_types()
+        # return super().mouseReleaseEvent(ev)
+
+
 class BarBottom(QWidget):
 
     def __init__(self):
@@ -105,16 +143,14 @@ class BarBottom(QWidget):
 
         self.h_layout = LayoutHor(self)
         self.h_layout.setSpacing(20)
-        self.h_layout.setContentsMargins(13, 0, 15, 0)
+        self.h_layout.setContentsMargins(9, 0, 15, 0)
         self.init_ui()
 
         SignalsApp.all_.bar_bottom_filters.connect(self.toggle_types)
 
     def init_ui(self):
 
-        t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
-        self.filter_label = QLabel(text=t)
-        self.filter_label.mouseReleaseEvent = self.menu_types
+        self.filter_label = FilterBtn()
         self.h_layout.addWidget(self.filter_label)
 
         self.h_layout.addStretch()
@@ -165,22 +201,6 @@ class BarBottom(QWidget):
         types = ", ".join(types)
         t = f"{Lang.type_show}: {types}"
         self.filter_label.setText(t)
-
-    def menu_types(self, *args):
-        menu_ = MenuTypes(parent=self.filter_label)
-
-        widget_rect = self.filter_label.rect()
-        menu_size = menu_.sizeHint()
-
-        centered = QPoint(
-            menu_size.width() // 2,
-            menu_size.height() + self.height() // 2
-        )
-
-        menu_center_top = self.filter_label.mapToGlobal(widget_rect.center()) - centered
-
-        menu_.move(menu_center_top)
-        menu_.exec_()
 
     def btn_downloads_toggle(self, flag: Literal["hide", "show"]):
         if flag == "hide":

@@ -372,6 +372,17 @@ class Pixmap:
 class Utils(Hash, Pixmap, ReadImage):
 
     @classmethod
+    def desaturate_image(cls, image: np.ndarray, factor=0.2):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        return cv2.addWeighted(
+            image,
+            1 - factor,
+            cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR),
+            factor,
+            0
+        )
+
+    @classmethod
     def get_coll_folder(cls, brand_ind: int) -> str | None:
         for coll_folder in JsonData.collfolders[brand_ind]:
             if os.path.exists(coll_folder):
