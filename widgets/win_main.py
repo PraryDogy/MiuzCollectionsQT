@@ -56,7 +56,7 @@ class WinMain(WinFrameless):
         h_lay_main.addWidget(left_wid)
 
         mid_wid = QFrame()
-        mid_wid.setFixedWidth(1)
+        mid_wid.setFixedWidth(5)
         h_lay_main.addWidget(mid_wid)
 
         right_wid = QWidget()
