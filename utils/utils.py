@@ -16,7 +16,7 @@ from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
-
+import io
 from cfg import JsonData, Static
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
