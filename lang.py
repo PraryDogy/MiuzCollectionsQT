@@ -404,6 +404,11 @@ class Lang_:
         "Data"
     ]
 
+    calculating = [
+        "Вычисляю",
+        "Calculating"
+    ]
+
 class Lang(Lang_):
 
     @classmethod

@@ -138,7 +138,7 @@ class FilterBtn(QLabel):
         self.set_border_style()
         menu = ContextCustom(event=ev)
 
-        view_action = QAction(parent=menu, text="Просмотр")
+        view_action = QAction(parent=menu, text=Lang.view)
         view_action.triggered.connect(self.menu_types)
         menu.addAction(view_action)
 

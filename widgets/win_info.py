@@ -12,6 +12,8 @@ from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, UThreadPool, Utils
 
+MAX_ROW = 50
+
 
 class RightLabel(QLabel):
     def __init__(self, text: str):
@@ -58,6 +60,7 @@ class RightLabel(QLabel):
 
 class WorkerSignals(QObject):
     finished_ = pyqtSignal(dict)
+    finished_resol = pyqtSignal(str)
 
 
 class InfoTask(URunnable):
@@ -75,7 +78,7 @@ class InfoTask(URunnable):
         cols = (
             THUMBS.c.size,
             THUMBS.c.mod,
-            THUMBS.c.resol,
+            # THUMBS.c.resol,
             THUMBS.c.coll,
             THUMBS.c.short_hash
         )
@@ -91,7 +94,7 @@ class InfoTask(URunnable):
         else:
             self.signals_.finished_.emit({})
    
-    def get_db_info(self, size, mod, resol, coll, short_hash) -> dict[str, str]:
+    def get_db_info(self, size, mod, coll, short_hash) -> dict[str, str]:
 
         name = self.lined_text(
             os.path.basename(self.short_src)
@@ -116,23 +119,37 @@ class InfoTask(URunnable):
             Lang.place: full_src,
             Lang.hash_path: full_hash, 
             Lang.changed: mod,
-            Lang.resol: resol,
+            Lang.resol: Lang.calculating,
             Lang.collection: coll
             }
 
         return res
 
     def lined_text(self, text: str):
-        max_row = 38
-
-        if len(text) > max_row:
+        if len(text) > MAX_ROW:
             text = [
-                text[i:i + max_row]
-                for i in range(0, len(text), max_row)
+                text[i:i + MAX_ROW]
+                for i in range(0, len(text), MAX_ROW)
                 ]
             return "\n".join(text)
         else:
             return text
+
+
+class ResolTask(URunnable):
+    def __init__(self, full_src: str):
+        super().__init__()
+        self.full_src = full_src
+        self.signals_ = WorkerSignals()
+
+    @URunnable.set_running_state
+    def run(self):
+        img_array = Utils.read_image(full_src=self.full_src)
+
+        if img_array is not None and len(img_array.shape) > 1:
+            h, w = img_array.shape[0], img_array.shape[1]
+            text = f"{w}x{h}"
+            self.signals_.finished_resol.emit(text)
 
 
 class WinInfo(WinSystem):
@@ -184,6 +201,20 @@ class WinInfo(WinSystem):
 
         self.center_relative_parent(self.parent_)
         self.show()
+
+        r_labels = [i for i in self.findChildren(RightLabel)]
+        resol_label = r_labels[6]
+        full_src_label = r_labels[3]
+        full_src = full_src_label.text().strip().replace("\n", "")
+        
+        resol_task = ResolTask(full_src=full_src)
+        resol_task.signals_.finished_resol.connect(
+            lambda resol: self.finished_resol_task(wid=resol_label, resol=resol)
+        )
+        UThreadPool.pool.start(resol_task)
+
+    def finished_resol_task(self, wid: RightLabel, resol: str):
+        wid.setText(resol)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
