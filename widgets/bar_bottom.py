@@ -1,12 +1,12 @@
 import os
 from typing import Literal
 
-from PyQt5.QtCore import Qt, pyqtSignal, QPoint
+from PyQt5.QtCore import QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
                          QWheelEvent)
-from PyQt5.QtWidgets import QLabel, QSlider, QWidget
+from PyQt5.QtWidgets import QAction, QLabel, QSlider, QWidget
 
-from base_widgets import LayoutHor, SvgBtn
+from base_widgets import ContextCustom, LayoutHor, SvgBtn
 from cfg import Dynamic, Static
 from lang import Lang
 from signals import SignalsApp
@@ -111,7 +111,12 @@ class FilterBtn(QLabel):
     def set_solid_style(self):
         self.setStyleSheet(f"#filter_btn {{{Static.SOLID_STYLE}}}")
 
+    def set_border_style(self):
+        self.setStyleSheet(f"#filter_btn {{{Static.BORDERED_STYLE}}}")
+
     def menu_types(self, *args):
+        self.set_solid_style()
+
         menu_ = MenuTypes(parent=self)
 
         widget_rect = self.rect()
@@ -129,9 +134,21 @@ class FilterBtn(QLabel):
         
         self.set_normal_style()
 
+    def contextMenuEvent(self, ev):
+        self.set_border_style()
+        menu = ContextCustom(event=ev)
+
+        view_action = QAction(parent=menu, text="Просмотр")
+        view_action.triggered.connect(self.menu_types)
+        menu.addAction(view_action)
+
+        menu.show_menu()
+        self.set_normal_style()
+        
+        return super().contextMenuEvent(ev)
+
     def mouseReleaseEvent(self, ev):
         if ev.button() == Qt.MouseButton.LeftButton:
-            self.set_solid_style()
             self.menu_types()
 
 
