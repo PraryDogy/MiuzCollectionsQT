@@ -1,11 +1,12 @@
 import os
 import subprocess
+from collections import defaultdict
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QSize
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QListWidget,
-                             QListWidgetItem, QPushButton, QSpacerItem,
-                             QTabWidget, QWidget, QAction)
+from PyQt5.QtWidgets import (QAction, QApplication, QGroupBox, QLabel,
+                             QListWidget, QListWidgetItem, QPushButton,
+                             QSpacerItem, QTabWidget, QWidget)
 
 from base_widgets import ContextCustom, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.input import ULineEdit
@@ -19,6 +20,8 @@ from .actions import OpenWins
 
 WIN_SIZE = (430, 550)
 NEED_REBOOT = "___need_reboot___"
+STOP_COLLS = "STOP_COLLS"
+COLL_FOLDERS = "COLL_FOLDERS"
 
 
 class RebootableSettings(QGroupBox):
@@ -137,6 +140,57 @@ class SimpleSettings(QGroupBox):
         OpenWins.smb(self.window())
 
 
+class BrandList(QListWidget):
+    h_ = 25
+    changed = pyqtSignal()
+
+    def __init__(self, brand_index: int, items_list: list[str]):
+        super().__init__()
+        self.horizontalScrollBar().setDisabled(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.contextMenuEvent = self.list_item_context
+        self.brand_index = brand_index
+
+        for i in items_list[brand_index]:
+            item_ = QListWidgetItem(i)
+            item_.setSizeHint(QSize(self.width(), BrandList.h_))
+            item_.item_name = i
+            self.addItem(item_)
+
+    def list_item_context(self, ev):
+        menu = ContextCustom(event=ev)
+
+        add_item = QAction(parent=menu, text=Lang.add_)
+        menu.addAction(add_item)
+
+        wid = self.itemAt(ev.pos())
+        if wid:
+            del_item = QAction(parent=menu, text=Lang.del_)
+            del_item.triggered.connect(self.del_item_cmd)
+            menu.addAction(del_item)
+
+        menu.show_menu()
+
+    def mouseReleaseEvent(self, e):
+        wid = self.itemAt(e.pos())
+        if not wid:
+            self.clearSelection()
+
+        return super().mouseReleaseEvent(e)
+
+    def del_item_cmd(self):
+        self.changed.emit()
+        selected_item = self.currentItem()
+        row = self.row(selected_item)
+        self.takeItem(row)
+
+    def get_texts(self):
+        return [
+            self.item(i).text()
+            for i in range(self.count())
+        ]
+
+
 class BrandSettings(QTabWidget):
     apply = pyqtSignal()
     h_ = 25
@@ -162,69 +216,16 @@ class BrandSettings(QTabWidget):
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         v_lay.addWidget(stop_colls_lbl)
 
-        stop_colls_list = QListWidget()
-        stop_colls_list.horizontalScrollBar().setDisabled(True)
-        stop_colls_list.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        cmd = lambda ev: self.list_item_context(q_list=stop_colls_list, ev=ev)
-        stop_colls_list.contextMenuEvent = cmd
+        stop_colls_list = BrandList(brand_index=brand_ind, items_list=JsonData.stopcolls)
+        stop_colls_list.changed.connect(self.text_changed)
         v_lay.addWidget(stop_colls_list)
 
-        for i in JsonData.stopcolls[brand_ind]:
-            stop_colls_item = QListWidgetItem(i)
-            stop_colls_item.setSizeHint(QSize(self.width(), BrandSettings.h_))
-            stop_colls_item.item_name = i
-            stop_colls_list.addItem(stop_colls_item)
-
-
-        # stop_colls = "\n".join(JsonData.stopcolls[brand_ind])
-        # stop_colls_inp = CustomTextEdit()
-        # stop_colls_inp.setPlaceholderText(Lang.from_new_row)
-        # stop_colls_inp.setPlainText(stop_colls)
-        # stop_colls_inp.textChanged.connect(self.text_changed)
-        # v_lay.addWidget(stop_colls_inp)
-
-
-        coll_folders_lbl = QLabel(text=Lang.where_to_look_coll_folder)
-        v_lay.addWidget(coll_folders_lbl)
-
-        # coll_folders = "\n".join(JsonData.collfolders[brand_ind])
-        # coll_folders_inp = CustomTextEdit()
-        # coll_folders_inp.setPlaceholderText(Lang.from_new_row)
-        # coll_folders_inp.setPlainText(coll_folders)
-        # coll_folders_inp.textChanged.connect(self.text_changed)
-        # v_lay.addWidget(coll_folders_inp)
-
-        # self.stop_colls_wid[brand_ind] = stop_colls_inp
-        # self.coll_folders_wid[brand_ind] = coll_folders_inp
-
-        coll_folders_list = QListWidget()
-        coll_folders_list.horizontalScrollBar().setDisabled(True)
-        coll_folders_list.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        cmd = lambda ev: self.list_item_context(q_list=coll_folders_list, ev=ev)
-        coll_folders_list.contextMenuEvent = cmd
+        coll_folders_list = BrandList(brand_index=brand_ind, items_list=JsonData.collfolders)
+        coll_folders_list.changed.connect(self.text_changed)
         v_lay.addWidget(coll_folders_list)
-
-        for i in JsonData.collfolders[brand_ind]:
-            coll_folders_item = QListWidgetItem(i)
-            coll_folders_item.setSizeHint(QSize(self.width(), BrandSettings.h_))
-            coll_folders_item.item_name = i
-            coll_folders_list.addItem(coll_folders_item)
 
         return wid
     
-    def list_item_context(self, q_list: QListWidget, ev):
-        menu = ContextCustom(event=ev)
-
-        add_item = QAction(parent=menu, text=Lang.add_)
-        menu.addAction(add_item)
-
-        wid = q_list.itemAt(ev.pos())
-        if wid:
-            del_item = QAction(parent=menu, text=Lang.del_)
-            menu.addAction(del_item)
-
-        menu.show_menu()
-
     def text_changed(self):
         self.apply.emit()
         setattr(self, NEED_REBOOT, True)
@@ -323,18 +324,17 @@ class WinSettings(WinSystem):
 
         elif hasattr(self.brnd_sett, NEED_REBOOT):
 
-            for brand_ind, wid in self.brnd_sett.stop_colls_wid.items():
-                stop_colls = self.new_row_list(wid=wid)
-                JsonData.stopcolls[brand_ind] = stop_colls
+            brands = defaultdict(list)
+            for i in self.brnd_sett.findChildren(BrandList):
+                brands[i.brand_index].append(i.get_texts())
 
-            for brand_ind, wid in self.brnd_sett.coll_folders_wid.items():
-                coll_folders = self.new_row_list(wid=wid)
-                coll_folders = [
-                    os.sep + i.strip().strip(os.sep)
-                    for i in coll_folders
-                    if i
-                ]
-                JsonData.collfolders[brand_ind] = coll_folders            
+            for brand_ind, lists in brands.items():
+
+                new_stop_colls = lists[0]
+                new_coll_folders = lists[1]
+
+                JsonData.stopcolls[brand_ind] = new_stop_colls
+                JsonData.collfolders[brand_ind] = new_coll_folders
 
             JsonData.write_json_data()
             QApplication.quit()
