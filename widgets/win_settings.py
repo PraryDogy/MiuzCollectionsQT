@@ -141,14 +141,16 @@ class SimpleSettings(QGroupBox):
 
 
 class AddBrandWindow(WinSystem):
+    clicked_ = pyqtSignal(str)
+
     def __init__(self):
         super().__init__()
         self.setFixedSize(300, 80)
         self.central_layout.setSpacing(10)
 
-        text_edit = ULineEdit()
-        text_edit.setPlaceholderText(Lang.paste_text)
-        self.central_layout.addWidget(text_edit)
+        self.text_edit = ULineEdit()
+        self.text_edit.setPlaceholderText(Lang.paste_text)
+        self.central_layout.addWidget(self.text_edit)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -160,6 +162,7 @@ class AddBrandWindow(WinSystem):
         h_lay.addStretch()
 
         ok_btn = QPushButton(text=Lang.ok)
+        ok_btn.clicked.connect(self.ok_cmd)
         ok_btn.setFixedWidth(90)
         h_lay.addWidget(ok_btn)
 
@@ -169,6 +172,13 @@ class AddBrandWindow(WinSystem):
         h_lay.addWidget(can_btn)
 
         h_lay.addStretch()
+
+    def ok_cmd(self):
+        text = self.text_edit.text().replace("\n", "").strip()
+
+        if text:
+            self.clicked_.emit(text)
+            self.close()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
