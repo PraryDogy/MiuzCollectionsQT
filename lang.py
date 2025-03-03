@@ -10,6 +10,10 @@ class Lang_:
         "Добавить в избранное",
         "Add to favorites"
     ]
+    add_ = [
+        "Добавить",
+        "Add"
+    ]
     adding = [
         "Добавляю",
         "Add"
