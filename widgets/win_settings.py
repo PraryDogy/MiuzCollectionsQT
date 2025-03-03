@@ -280,6 +280,9 @@ class BrandSettings(QTabWidget):
         stop_colls_list.changed.connect(self.list_changed)
         v_lay.addWidget(stop_colls_list)
 
+        coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
+        v_lay.addWidget(coll_folders_label)
+
         coll_folders_list = BrandList(brand_index=brand_ind, items_list=JsonData.collfolders)
         coll_folders_list.changed.connect(self.list_changed)
         v_lay.addWidget(coll_folders_list)
