@@ -217,32 +217,18 @@ class BrandSettings(QTabWidget):
         v_lay.addWidget(stop_colls_lbl)
 
         stop_colls_list = BrandList(brand_index=brand_ind, items_list=JsonData.stopcolls)
-        stop_colls_list.changed.connect(self.text_changed)
+        stop_colls_list.changed.connect(self.list_changed)
         v_lay.addWidget(stop_colls_list)
 
         coll_folders_list = BrandList(brand_index=brand_ind, items_list=JsonData.collfolders)
-        coll_folders_list.changed.connect(self.text_changed)
+        coll_folders_list.changed.connect(self.list_changed)
         v_lay.addWidget(coll_folders_list)
 
         return wid
     
-    def text_changed(self):
+    def list_changed(self):
         self.apply.emit()
         setattr(self, NEED_REBOOT, True)
-    
-    def get_stopcolls(self, wid: ULineEdit):
-        return [
-            i.strip()
-            for i in wid.text().split(",")
-            if i
-            ]
-
-    def get_collfolders(self, wid: CustomTextEdit):
-        return [
-            os.sep + i.strip().strip(os.sep)
-            for i in wid.toPlainText().split("\n")
-            if i
-            ]
 
 
 class WinSettings(WinSystem):
@@ -272,8 +258,6 @@ class WinSettings(WinSystem):
 
         lock_rebootable = lambda: self.cmd_(wid=self.rb_sett)
         self.brnd_sett.apply.connect(lock_rebootable)
-
-
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
