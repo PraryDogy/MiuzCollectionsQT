@@ -323,8 +323,15 @@ class WinSettings(WinSystem):
             Utils.start_new_app()
 
         elif hasattr(self.brnd_sett, NEED_REBOOT):
+            # всего у нас 4 виджета BrandList
+            # мы создаем словарик, где ключом будет BrandList.brand_index
+            # а значением будет список списков
+            # где 0 элемент это стоп слова, а 1 это пути к папке коллекций
+            # получается следующий вид
+            # Индекс_бренда: стоп слова (список), пути к папке коллекций(список)
 
             brands = defaultdict(list)
+
             for i in self.brnd_sett.findChildren(BrandList):
                 brands[i.brand_index].append(i.get_texts())
 
