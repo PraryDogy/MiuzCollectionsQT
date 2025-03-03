@@ -83,6 +83,10 @@ class Lang_:
         "Удалить из избранного",
         "Remove from favorites"
     ]
+    del_ = [
+        "Удалить",
+        "Remove"
+    ]
     deleting = [
         "Удаляю",
         "Deleting"

@@ -3,10 +3,11 @@ import subprocess
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QPushButton,
-                             QSpacerItem, QTabWidget, QWidget)
+from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QListWidget,
+                             QListWidgetItem, QPushButton, QSpacerItem,
+                             QTabWidget, QWidget, QAction)
 
-from base_widgets import CustomTextEdit, LayoutHor, LayoutVer
+from base_widgets import ContextCustom, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.input import ULineEdit
 from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
@@ -160,29 +161,51 @@ class BrandSettings(QTabWidget):
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         v_lay.addWidget(stop_colls_lbl)
 
-        stop_colls = "\n".join(JsonData.stopcolls[brand_ind])
-        stop_colls_inp = CustomTextEdit()
-        stop_colls_inp.setPlaceholderText(Lang.from_new_row)
-        stop_colls_inp.setPlainText(stop_colls)
-        stop_colls_inp.textChanged.connect(self.text_changed)
-        v_lay.addWidget(stop_colls_inp)
+        q_list = QListWidget()
+        cmd = lambda ev: self.list_item_context(q_list=q_list, ev=ev)
+        q_list.contextMenuEvent = cmd
+        v_lay.addWidget(q_list)
+
+        for i in JsonData.stopcolls[brand_ind]:
+            item = QListWidgetItem(i)
+            item.item_name = i
+            q_list.addItem(item)
 
 
-        coll_folders_lbl = QLabel(text=Lang.where_to_look_coll_folder)
-        v_lay.addWidget(coll_folders_lbl)
+        # stop_colls = "\n".join(JsonData.stopcolls[brand_ind])
+        # stop_colls_inp = CustomTextEdit()
+        # stop_colls_inp.setPlaceholderText(Lang.from_new_row)
+        # stop_colls_inp.setPlainText(stop_colls)
+        # stop_colls_inp.textChanged.connect(self.text_changed)
+        # v_lay.addWidget(stop_colls_inp)
 
-        coll_folders = "\n".join(JsonData.collfolders[brand_ind])
-        coll_folders_inp = CustomTextEdit()
-        coll_folders_inp.setPlaceholderText(Lang.from_new_row)
-        coll_folders_inp.setPlainText(coll_folders)
-        coll_folders_inp.textChanged.connect(self.text_changed)
-        v_lay.addWidget(coll_folders_inp)
 
-        self.stop_colls_wid[brand_ind] = stop_colls_inp
-        self.coll_folders_wid[brand_ind] = coll_folders_inp
+        # coll_folders_lbl = QLabel(text=Lang.where_to_look_coll_folder)
+        # v_lay.addWidget(coll_folders_lbl)
+
+        # coll_folders = "\n".join(JsonData.collfolders[brand_ind])
+        # coll_folders_inp = CustomTextEdit()
+        # coll_folders_inp.setPlaceholderText(Lang.from_new_row)
+        # coll_folders_inp.setPlainText(coll_folders)
+        # coll_folders_inp.textChanged.connect(self.text_changed)
+        # v_lay.addWidget(coll_folders_inp)
+
+        # self.stop_colls_wid[brand_ind] = stop_colls_inp
+        # self.coll_folders_wid[brand_ind] = coll_folders_inp
     
         return wid
     
+    def list_item_context(self, q_list: QListWidget, ev):
+        wid = q_list.itemAt(ev.pos())
+
+        if wid:
+            menu = ContextCustom(event=ev)
+
+            del_item = QAction(parent=menu, text=Lang.del_)
+            menu.addAction(del_item)
+
+            menu.show_menu()
+
     def text_changed(self):
         self.apply.emit()
         setattr(self, NEED_REBOOT, True)
