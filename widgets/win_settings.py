@@ -226,10 +226,10 @@ class BrandList(QListWidget):
         return super().mouseReleaseEvent(e)
 
     def del_item_cmd(self):
-        self.changed.emit()
         selected_item = self.currentItem()
         row = self.row(selected_item)
         self.takeItem(row)
+        self.changed.emit()
 
     def get_texts(self):
         return [
@@ -239,8 +239,16 @@ class BrandList(QListWidget):
 
     def add_item_cmd(self):
         win = AddBrandWindow()
+        win.clicked_.connect(self.add_item_fin)
         win.center_relative_parent(parent=self.window())
         win.show()
+
+    def add_item_fin(self, text: str):
+        item_ = QListWidgetItem(text)
+        item_.setSizeHint(QSize(self.width(), BrandList.h_))
+        item_.item_name = text
+        self.addItem(item_)
+        self.changed.emit()
 
 
 class BrandSettings(QTabWidget):
