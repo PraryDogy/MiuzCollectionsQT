@@ -231,6 +231,10 @@ class Lang_:
         "Вставить",
         "Paste"
     ]
+    paste_text = [
+        "Вставьте текст",
+        "Insert text"
+    ]
     photo = [
         "Фото",
         "Photo"

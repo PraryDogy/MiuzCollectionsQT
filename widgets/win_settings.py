@@ -140,6 +140,42 @@ class SimpleSettings(QGroupBox):
         OpenWins.smb(self.window())
 
 
+class AddBrandWindow(WinSystem):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(300, 80)
+        self.central_layout.setSpacing(10)
+
+        text_edit = ULineEdit()
+        text_edit.setPlaceholderText(Lang.paste_text)
+        self.central_layout.addWidget(text_edit)
+
+        h_wid = QWidget()
+        self.central_layout.addWidget(h_wid)
+
+        h_lay = LayoutHor()
+        h_lay.setSpacing(10)
+        h_wid.setLayout(h_lay)
+
+        h_lay.addStretch()
+
+        ok_btn = QPushButton(text=Lang.ok)
+        ok_btn.setFixedWidth(90)
+        h_lay.addWidget(ok_btn)
+
+        can_btn = QPushButton(text=Lang.cancel)
+        can_btn.clicked.connect(self.close)
+        can_btn.setFixedWidth(90)
+        h_lay.addWidget(can_btn)
+
+        h_lay.addStretch()
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close()
+        return super().keyPressEvent(a0)
+
+
 class BrandList(QListWidget):
     h_ = 25
     changed = pyqtSignal()
@@ -161,6 +197,7 @@ class BrandList(QListWidget):
         menu = ContextCustom(event=ev)
 
         add_item = QAction(parent=menu, text=Lang.add_)
+        add_item.triggered.connect(self.add_item_cmd)
         menu.addAction(add_item)
 
         wid = self.itemAt(ev.pos())
@@ -189,6 +226,11 @@ class BrandList(QListWidget):
             self.item(i).text()
             for i in range(self.count())
         ]
+
+    def add_item_cmd(self):
+        win = AddBrandWindow()
+        win.center_relative_parent(parent=self.window())
+        win.show()
 
 
 class BrandSettings(QTabWidget):

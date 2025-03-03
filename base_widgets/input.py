@@ -41,7 +41,7 @@ class ULineEdit(QLineEdit):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.menu_ = ContextCustom(event=a0)
-        self.setFixedWidth(120)
+        self.menu_.setFixedWidth(120)
 
         sel = QAction(text=Lang.cut, parent=self.menu_)
         sel.triggered.connect(self.cut_selection)
