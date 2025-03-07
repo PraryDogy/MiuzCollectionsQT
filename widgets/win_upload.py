@@ -12,6 +12,7 @@ from database import THUMBS, Dbase
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
 from utils.utils import UThreadPool, Utils
+from lang import Lang
 
 from .menu_left import CollectionBtn, MenuLeft
 
@@ -21,6 +22,7 @@ class WinUpload(WinSystem):
 
     def __init__(self, urls: list[str]):
         super().__init__()
+        self.setWindowTitle(Lang.title_downloads)
         self.resize(Static.MENU_LEFT_WIDTH, Dynamic.root_g.get("ah"))
         self.current_submenu: QListWidget = None
         self.coll_path: str = None
@@ -73,8 +75,7 @@ class WinUpload(WinSystem):
             if i.is_dir()
         ]
 
-        if subfolders:
-            self.create_submenu(subfolders=subfolders)
+        self.create_submenu(subfolders=subfolders)
 
     def del_submenu(self):
         if self.current_submenu is not None:
@@ -96,6 +97,15 @@ class WinUpload(WinSystem):
         self.current_submenu.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.h_lay.addWidget(self.current_submenu)
 
+        wid = QLabel(os.path.basename(self.coll_path))
+        wid.setStyleSheet("padding-left: 5px;")
+        cmd_ = lambda e, : self.list_widget_item_cmd(entry=self.coll_path)
+        wid.mouseReleaseEvent = cmd_
+        list_item = QListWidgetItem()
+        list_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, WinUpload.h_))
+        self.current_submenu.addItem(list_item)
+        self.current_submenu.setItemWidget(list_item, wid)
+
         for entry_ in subfolders:
 
             wid = QLabel(entry_.name)
@@ -106,12 +116,13 @@ class WinUpload(WinSystem):
             self.current_submenu.addItem(list_item)
             self.current_submenu.setItemWidget(list_item, wid)
 
-    def list_widget_item_cmd(self, entry: os.DirEntry):
-        dest = entry.path
-        self.copy_files_cmd(dest=dest, full_src=self.urls)
+    def list_widget_item_cmd(self, entry: os.DirEntry | str):
+        if isinstance(entry, str):
+            dest = entry
+        else:
+            dest = entry.path
 
-        # else:
-            # OpenWins.smb(parent_=self.win_)
+        self.copy_files_cmd(dest=dest, full_src=self.urls)
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
 
