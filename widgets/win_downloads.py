@@ -154,7 +154,7 @@ class WinDownloads(WinSystem):
     def cut_text(self, text: str):
         name, ext = os.path.splitext(text)
         name = f"{Lang.copying} {name}"
-        max_row = 27
+        max_row = 45
 
         if len(name) >= max_row:
             cut_name = name[:max_row]
