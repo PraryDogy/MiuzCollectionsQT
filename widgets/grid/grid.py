@@ -615,6 +615,12 @@ class Grid(QScrollArea):
         if distance < QApplication.startDragDistance():
             return
 
+        wid = self.get_wid_under_mouse(a0=a0)
+
+        if wid and wid not in self.selected_widgets:
+            self.clear_selected_widgets()
+            self.add_and_select_widget(wid=wid)
+
         coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
         if coll_folder:
             urls = [
@@ -624,12 +630,6 @@ class Grid(QScrollArea):
         else:
             urls = []
 
-        wid = self.get_wid_under_mouse(a0=a0)
-
-        if wid and wid not in self.selected_widgets:
-            self.clear_selected_widgets()
-            self.add_and_select_widget(wid=wid)
-        
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
         img = os.path.join(Static.IMAGES, "img.svg")
