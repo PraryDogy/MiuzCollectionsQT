@@ -318,8 +318,8 @@ class Lang_:
         "Start"
     ]
     title_downloads = [
-        "Загрузки",
-        "Downloads"
+        "Передача файлов",
+        "Files transfer"
     ]
     total = [
         "Всего",
