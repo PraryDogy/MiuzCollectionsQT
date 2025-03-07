@@ -1,3 +1,4 @@
+import os
 from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
@@ -175,7 +176,9 @@ class WinMain(WinFrameless):
         urls: list[str] = [
             i.toLocalFile()
             for i in a0.mimeData().urls()
+            if os.path.isfile(i.toLocalFile())
         ]
+        
 
         self.win_upload = WinUpload(urls=urls)
         self.win_upload.center_relative_parent(parent=self)
