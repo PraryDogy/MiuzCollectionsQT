@@ -614,25 +614,22 @@ class Grid(QScrollArea):
 
         if distance < QApplication.startDragDistance():
             return
-        
+
+        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        if coll_folder:
+            urls = [
+                Utils.get_full_src(coll_folder, i.short_src)
+                for i in self.selected_widgets
+            ]
+        else:
+            urls = []
+
         wid = self.get_wid_under_mouse(a0=a0)
 
         if wid and wid not in self.selected_widgets:
             self.clear_selected_widgets()
             self.add_and_select_widget(wid=wid)
         
-        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
-
-        if coll_folder:
-
-            urls = [
-                Utils.get_full_src(coll_folder, i.short_src)
-                for i in self.selected_widgets
-            ]
-
-        else:
-            return
-
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
         img = os.path.join(Static.IMAGES, "img.svg")
@@ -645,9 +642,11 @@ class Grid(QScrollArea):
             ]
 
         self.mime_data.setUrls(urls)
-
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.DropAction.CopyAction)
+
+        if not urls:
+            OpenWins.smb(parent_=self.window())
 
         return super().mouseMoveEvent(a0)
 
