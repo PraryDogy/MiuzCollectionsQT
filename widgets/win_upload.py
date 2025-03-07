@@ -1,4 +1,6 @@
 
+import os
+
 import sqlalchemy
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
@@ -7,7 +9,7 @@ from cfg import Dynamic
 from database import THUMBS, Dbase
 from utils.utils import URunnable, Utils
 
-from .menu_left import MenuLeft, CollectionBtn
+from .menu_left import CollectionBtn, MenuLeft
 
 
 class WorkerSignals(QObject):
@@ -68,7 +70,17 @@ class WinUpload(WinSystem):
         print(args)
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
-        self.resize(self.menu_left.width() * 2, self.height())
 
-        coll_path = Utils.get_coll_folder(brand_ind=coll_btn.brand_ind)
-        print(coll_path)
+        root = Utils.get_coll_folder(brand_ind=coll_btn.brand_ind)
+        coll_path = os.path.join(root, coll_btn.coll_name)
+
+        subfolders: list[os.DirEntry] = [
+            i
+            for i in os.scandir(coll_path)
+            if i.is_dir()
+        ]
+
+        if subfolders:
+            self.resize(self.menu_left.width() * 2, self.height())
+
+        print(subfolders)
