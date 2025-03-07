@@ -12,6 +12,7 @@ from lang import Lang
 from signals import SignalsApp
 from utils.scaner import Scaner
 from utils.utils import Utils
+from widgets.win_upload import WinUpload
 
 from .actions import OpenWins
 from .bar_bottom import BarBottom
@@ -41,6 +42,8 @@ class TestWid(QFrame):
 class WinMain(WinFrameless):
     def __init__(self):
         super().__init__()
+
+        self.setAcceptDrops(True)
 
         self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
         self.setMinimumWidth(750)
@@ -78,10 +81,6 @@ class WinMain(WinFrameless):
         SignalsApp.all_.win_main_cmd.emit("set_title")
         QTimer.singleShot(100, self.after_start)
         grid.setFocus()
-
-        from widgets.win_upload import WinUpload
-        self.win_upload = WinUpload()
-        QTimer.singleShot(500, lambda: self.win_upload.show())
 
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
@@ -164,3 +163,22 @@ class WinMain(WinFrameless):
                 if Dynamic.thumb_size_ind > 0:
                     Dynamic.thumb_size_ind -= 1
                     SignalsApp.all_.slider_change_value.emit(Dynamic.thumb_size_ind)
+
+    def dragEnterEvent(self, a0):
+        if a0.mimeData().hasUrls():
+            a0.acceptProposedAction()
+
+        return super().dragEnterEvent(a0)
+    
+    def dropEvent(self, a0):
+
+        urls: list[str] = [
+            i.toLocalFile()
+            for i in a0.mimeData().urls()
+        ]
+
+        self.win_upload = WinUpload(urls=urls)
+        self.win_upload.center_relative_parent(parent=self)
+        self.win_upload.show()
+
+        return super().dropEvent(a0)

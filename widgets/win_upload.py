@@ -2,55 +2,50 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal
+from PyQt5.QtCore import QObject, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
 
+from base_widgets.layouts import LayoutHor
 from base_widgets.wins import WinSystem
-from cfg import Dynamic
+from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from utils.utils import URunnable, Utils
 
 from .menu_left import CollectionBtn, MenuLeft
 
 
-class WorkerSignals(QObject):
-    finished_ = pyqtSignal()
-
-
-class CollectionsTask(URunnable):
-    def __init__(self):
-        super().__init__()
-        self.signals_ = WorkerSignals()
-
-    @URunnable.set_running_state
-    def run(self):
-        conn = Dbase.engine.connect()
-        q = sqlalchemy.select(THUMBS.c.coll).distinct()
-        res = conn.execute(q).fetchall()
-        res = [i[0] for i in res]
-        conn.close()
-        # print(res)
-
-
 class WinUpload(WinSystem):
-    def __init__(self):
+    h_ = 30
+
+    def __init__(self, urls: list[str]):
         super().__init__()
+        self.resize(Static.MENU_LEFT_WIDTH, Dynamic.root_g.get("ah"))
+        self.current_submenu: QListWidget = None
+        self.coll_path: str = None
+        self.urls = urls
+
+        self.h_wid = QWidget()
+        self.central_layout.addWidget(self.h_wid)
+
+        self.h_lay = LayoutHor()
+        self.h_lay.setSpacing(10)
+        self.h_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.h_wid.setLayout(self.h_lay)
 
         self.menu_left = MenuLeft()
         self.menu_left.tabBarClicked.disconnect()
-        self.central_layout.addWidget(self.menu_left)
+        self.menu_left.tabBarClicked.connect(self.tab_bar_cmd)
+        self.h_lay.addWidget(self.menu_left)
         self.check_coll_btns()
-
-        self.resize(self.menu_left.width(), Dynamic.root_g.get("ah"))
 
     def check_coll_btns(self):
         any_tab = self.menu_left.menus[0]
         if len(any_tab.coll_btns) == 0:
             QTimer.singleShot(300, self.check_coll_btns)
         else:
-            self.main()
+            self.setup_coll_btns()
 
-    def main(self):
-        
+    def setup_coll_btns(self):
         for menu in self.menu_left.menus:
 
             disabled_btns = menu.coll_btns[:3]
@@ -68,15 +63,53 @@ class WinUpload(WinSystem):
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
 
         root = Utils.get_coll_folder(brand_ind=coll_btn.brand_ind)
-        coll_path = os.path.join(root, coll_btn.coll_name)
+        self.coll_path = os.path.join(root, coll_btn.coll_name)
 
         subfolders: list[os.DirEntry] = [
             i
-            for i in os.scandir(coll_path)
+            for i in os.scandir(self.coll_path)
             if i.is_dir()
         ]
 
         if subfolders:
-            self.resize(self.menu_left.width() * 2, self.height())
+            self.create_submenu(subfolders=subfolders)
 
-        print(subfolders)
+    def del_submenu(self):
+        if self.current_submenu is not None:
+            self.current_submenu.deleteLater()
+            self.current_submenu = None
+
+    def tab_bar_cmd(self, index: int):
+        self.del_submenu()
+        self.menu_left.setCurrentIndex(index)
+        QTimer.singleShot(100, lambda: self.resize(Static.MENU_LEFT_WIDTH, self.height()))
+
+    def create_submenu(self, subfolders: list[os.DirEntry]):
+        
+        self.resize(Static.MENU_LEFT_WIDTH * 2, self.height())
+
+        self.del_submenu()
+        self.current_submenu = QListWidget()
+        self.current_submenu.horizontalScrollBar().setDisabled(True)
+        self.current_submenu.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.h_lay.addWidget(self.current_submenu)
+
+        for entry_ in subfolders:
+
+            wid = QLabel(entry_.name)
+            wid.setStyleSheet("padding-left: 5px;")
+            wid.mouseReleaseEvent = lambda e, entry=entry_: self.upload_files(entry=entry)
+
+            list_item = QListWidgetItem()
+            list_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, WinUpload.h_))
+            self.current_submenu.addItem(list_item)
+            self.current_submenu.setItemWidget(list_item, wid)
+
+    def upload_files(self, entry: os.DirEntry):
+        dest = entry.path
+        print(dest, self.urls)
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close()
+        return super().keyPressEvent(a0)
