@@ -166,12 +166,13 @@ class WinMain(WinFrameless):
                     SignalsApp.all_.slider_change_value.emit(Dynamic.thumb_size_ind)
 
     def dragEnterEvent(self, a0):
-        if a0.mimeData().hasUrls():
-            a0.acceptProposedAction()
-
+        a0.acceptProposedAction()
         return super().dragEnterEvent(a0)
     
     def dropEvent(self, a0):
+
+        if not a0.mimeData().hasUrls() or a0.source() is not None:
+            return
 
         coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
         if not coll_folder:
