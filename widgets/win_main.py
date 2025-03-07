@@ -173,6 +173,11 @@ class WinMain(WinFrameless):
     
     def dropEvent(self, a0):
 
+        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+        if not coll_folder:
+            OpenWins.smb(self)
+            return
+
         urls: list[str] = [
             i.toLocalFile()
             for i in a0.mimeData().urls()
