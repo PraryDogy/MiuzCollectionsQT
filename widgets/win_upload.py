@@ -37,7 +37,6 @@ class WinUpload(WinSystem):
 
         self.menu_left = MenuLeft()
         self.menu_left.tabBarClicked.disconnect()
-        # self.menu_left.tabBarClicked.connect(self.tab_clicked)
         self.central_layout.addWidget(self.menu_left)
         self.check_coll_btns()
 
@@ -65,9 +64,6 @@ class WinUpload(WinSystem):
                 i.brand_ind = menu.brand_ind
                 cmd_ = lambda coll_btn=i: self.coll_btn_cmd(coll_btn=coll_btn)
                 i.pressed_.connect(cmd_)
-
-    def tab_clicked(self, *args):
-        print(args)
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
 
