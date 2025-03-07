@@ -5,6 +5,7 @@ from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QListWidgetItem
 
 from base_widgets.wins import WinSystem
+from cfg import Dynamic
 from database import THUMBS, Dbase
 from utils.utils import URunnable, UThreadPool
 
@@ -35,8 +36,12 @@ class WinUpload(WinSystem):
         super().__init__()
 
         self.menu_left = MenuLeft()
+        self.menu_left.tabBarClicked.disconnect()
+        self.menu_left.tabBarClicked.connect(self.tab_clicked)
         self.central_layout.addWidget(self.menu_left)
         self.check_coll_btns()
+
+        self.resize(self.menu_left.width(), Dynamic.root_g.get("ah"))
 
     def check_coll_btns(self):
         any_tab = self.menu_left.menus[0]
@@ -56,4 +61,8 @@ class WinUpload(WinSystem):
                 i.setDisabled(True)
 
             for i in coll_btns:
+                i.pressed_.disconnect()
                 i.pressed_.connect(lambda tt=i.text(): print(tt))
+
+    def tab_clicked(self, *args):
+        print(args)
