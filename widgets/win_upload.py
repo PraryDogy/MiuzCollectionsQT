@@ -9,7 +9,9 @@ from base_widgets.layouts import LayoutHor
 from base_widgets.wins import WinSystem
 from cfg import Dynamic, Static
 from database import THUMBS, Dbase
-from utils.utils import URunnable, Utils
+from signals import SignalsApp
+from utils.copy_files import CopyFiles
+from utils.utils import UThreadPool, Utils
 
 from .menu_left import CollectionBtn, MenuLeft
 
@@ -98,16 +100,36 @@ class WinUpload(WinSystem):
 
             wid = QLabel(entry_.name)
             wid.setStyleSheet("padding-left: 5px;")
-            wid.mouseReleaseEvent = lambda e, entry=entry_: self.upload_files(entry=entry)
-
+            wid.mouseReleaseEvent = lambda e, entry=entry_: self.list_widget_item_cmd(entry=entry)
             list_item = QListWidgetItem()
             list_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, WinUpload.h_))
             self.current_submenu.addItem(list_item)
             self.current_submenu.setItemWidget(list_item, wid)
 
-    def upload_files(self, entry: os.DirEntry):
+    def list_widget_item_cmd(self, entry: os.DirEntry):
         dest = entry.path
-        print(dest, self.urls)
+        self.copy_files_cmd(dest=dest, full_src=self.urls)
+
+        # else:
+            # OpenWins.smb(parent_=self.win_)
+
+    def copy_files_cmd(self, dest: str, full_src: str | list):
+
+        cmd_ = lambda f: self.reveal_copied_files(files=f)
+        thread_ = CopyFiles(dest=dest, files=full_src)
+        thread_.signals_.finished_.connect(cmd_)
+
+        SignalsApp.all_.btn_downloads_toggle.emit("show")
+        UThreadPool.pool.start(thread_)
+
+        self.close()
+
+    def reveal_copied_files(self, files: list):
+
+        Utils.reveal_files(files)
+
+        if len(CopyFiles.current_threads) == 0:
+            SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
