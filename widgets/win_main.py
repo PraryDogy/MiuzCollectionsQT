@@ -178,7 +178,6 @@ class WinMain(WinFrameless):
             for i in a0.mimeData().urls()
             if os.path.isfile(i.toLocalFile())
         ]
-        
 
         self.win_upload = WinUpload(urls=urls)
         self.win_upload.center_relative_parent(parent=self)
