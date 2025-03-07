@@ -1,5 +1,6 @@
 import os
 import subprocess
+from collections import defaultdict
 from typing import Literal
 
 import sqlalchemy
@@ -137,6 +138,7 @@ class MenuTab(QListWidget):
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.brand_ind = brand_ind
+        self.coll_btns: list[CollectionBtn] = []
         self.setup_task()
 
     def setup_task(self):
@@ -187,6 +189,7 @@ class MenuTab(QListWidget):
         all_colls_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(all_colls_item)
         self.setItemWidget(all_colls_item, all_colls_btn)
+        self.coll_btns.append(all_colls_btn)
 
         # FAVORITES
         favs_btn = CollectionBtn(
@@ -195,12 +198,11 @@ class MenuTab(QListWidget):
             )
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
-
         favs_item = QListWidgetItem()
         favs_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(favs_item)
         self.setItemWidget(favs_item, favs_btn)
-
+        self.coll_btns.append(favs_btn)
 
         # RECENTS
         recents_btn = CollectionBtn(
@@ -208,11 +210,11 @@ class MenuTab(QListWidget):
             coll_name=Static.NAME_RECENTS
             )
         recents_btn.pressed_.connect(self.recents_cmd)
-
         recents_item = QListWidgetItem()
         recents_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(recents_item)
         self.setItemWidget(recents_item, recents_btn)
+        self.coll_btns.append(recents_btn)
 
         # SPACER
         fake_item = QListWidgetItem()
@@ -244,6 +246,8 @@ class MenuTab(QListWidget):
             if Dynamic.curr_coll_name == data.get("coll_name"):
                 self.setCurrentRow(self.row(list_item))
 
+            self.coll_btns.append(coll_btn)
+
 
 class MenuLeft(QTabWidget):
     def __init__(self):
@@ -261,9 +265,10 @@ class MenuLeft(QTabWidget):
         self.menus.clear()
 
         for i in Static.BRANDS:
-            wid = MenuTab(brand_ind=Static.BRANDS.index(i))
+            brand_ind = Static.BRANDS.index(i)
+            wid = MenuTab(brand_ind=brand_ind)
             self.addTab(wid, i)
-            self.menus.append(wid)\
+            self.menus.append(wid)
         
         self.setCurrentIndex(JsonData.brand_ind)
 

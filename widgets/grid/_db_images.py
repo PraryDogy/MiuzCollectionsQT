@@ -97,6 +97,7 @@ class DbImages(URunnable):
             ...
 
     def remove_db(self, short_hash: str):
+        return
         # если в ДБ есть запись hash_path, по которому загружается изображение
         # из finder > app_support > app > hash
         # но изображения нет

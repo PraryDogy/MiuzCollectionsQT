@@ -79,6 +79,11 @@ class WinMain(WinFrameless):
         QTimer.singleShot(100, self.after_start)
         grid.setFocus()
 
+        from widgets.win_upload import WinUpload
+        self.win_upload = WinUpload()
+        self.win_upload.resize(300, 300)
+        QTimer.singleShot(500, lambda: self.win_upload.show())
+
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
         if flag == "show":
