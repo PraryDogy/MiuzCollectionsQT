@@ -46,4 +46,14 @@ class WinUpload(WinSystem):
             self.main()
 
     def main(self):
-        ...
+        
+        for menu in self.menu_left.menus:
+
+            disabled_btns = menu.coll_btns[:3]
+            coll_btns = menu.coll_btns[3:]
+            
+            for i in disabled_btns:
+                i.setDisabled(True)
+
+            for i in coll_btns:
+                i.pressed_.connect(lambda tt=i.text(): print(tt))
