@@ -59,14 +59,14 @@ class FinderImages:
         """Получает список коллекций, исключая остановленные."""
         collections = []
 
-        for item in os.listdir(Brand.curr.collfolder):
-
-            coll_path = os.path.join(Brand.curr.collfolder, item)
-
-            if os.path.isdir(coll_path):
-
-                if item not in JsonData.stopcolls[Brand.curr.ind]:
-                    collections.append(coll_path)
+        try:
+            for item in os.listdir(Brand.curr.collfolder):
+                coll_path = os.path.join(Brand.curr.collfolder, item)
+                if os.path.isdir(coll_path):
+                    if item not in JsonData.stopcolls[Brand.curr.ind]:
+                        collections.append(coll_path)
+        except FileNotFoundError:
+            ...
 
         return collections
 
