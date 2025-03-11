@@ -49,11 +49,13 @@ class ScanerTools:
 
 class FinderImages:
 
-    def run(self) -> list[tuple[str, int, int, int]]:
+    def run(self) -> list[tuple[str, int, int, int]] | None:
         """Основной метод для поиска изображений в коллекциях."""
         collections = self.get_collections()
-        finder_images = self.process_collections(collections)
-        return finder_images
+        if collections:
+            return self.process_collections(collections)
+        else:
+            return None
 
     def get_collections(self) -> list[str]:
         """Получает список коллекций, исключая остановленные."""
@@ -80,7 +82,7 @@ class FinderImages:
         total_collections = len(collections)
 
         for index, collection in enumerate(collections, start=1):
-
+            
             progress_text = self.get_progress_text(index, total_collections)
             ScanerTools.progressbar_text(progress_text)
 
@@ -419,7 +421,7 @@ class ScanerThread(URunnable):
         finder_images = FinderImages()
         finder_images = finder_images.run()
 
-        if finder_images:
+        if finder_images is not None:
         
             db_images = DbImages()
             db_images = db_images.run()
@@ -449,11 +451,16 @@ class ScanerShedule(QObject):
         self.wait_timer.setSingleShot(True)
         self.wait_timer.timeout.connect(self.start)
 
-        self.wait_sec = 15000
+        self.wait_sec = 30000
         self.scaner_thread = None
 
     def start(self):
         self.wait_timer.stop()
+
+        if self.scaner_thread:
+            print("prev scan not finished, wait", self.wait_sec//1000, "sec")
+            self.wait_timer.start(self.wait_sec)
+            return
 
         Brand.all_.clear()
         Brand.curr = None
@@ -476,10 +483,6 @@ class ScanerShedule(QObject):
         if not Brand.all_:
 
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
-            self.wait_timer.start(self.wait_sec)
-
-        elif self.scaner_thread:
-            print("prev scan not finished, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 
         else:

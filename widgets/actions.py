@@ -1,7 +1,7 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu, QWidget
 
 from cfg import Dynamic, JsonData, Static
@@ -62,7 +62,7 @@ class ScanerRestart(QAction):
 
     def cmd(self, *args):
         Scaner.stop()
-        Scaner.start()
+        QTimer.singleShot(5000, Scaner.start)
 
 
 class OpenInfoDb(QAction):
