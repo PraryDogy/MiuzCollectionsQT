@@ -164,6 +164,7 @@ class BarBottom(QWidget):
         self.h_layout.setContentsMargins(0, 0, 15, 0)
         self.init_ui()
 
+        self.downloads_win = None
         SignalsApp.all_.bar_bottom_filters.connect(self.toggle_types)
         SignalsApp.all_.win_downloads_open.connect(self.open_downloads_win)
         SignalsApp.all_.win_downloads_close.connect(self.close_downloads_win)
@@ -235,13 +236,17 @@ class BarBottom(QWidget):
             self.open_downloads_win()
 
     def open_downloads_win(self):
-        self.downloads_win = WinDownloads()
-        self.downloads_win.center_relative_parent(self.window())
-        self.downloads_win.show()
+        if self.downloads_win is None:
+            self.downloads_win = WinDownloads()
+            self.downloads_win.center_relative_parent(self.window())
+            self.downloads_win.show()
 
     def close_downloads_win(self):
-        if hasattr(self, "downloads_win"):
+        try:
             self.downloads_win.close()
+        except Exception:
+            ...
+        self.downloads_win = None
 
     def sett_btn_cmd(self, e: QMouseEvent):
         if e.button() == Qt.MouseButton.LeftButton:
