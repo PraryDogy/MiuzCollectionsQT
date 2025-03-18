@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import QObject, pyqtSignal
-
+from signals import SignalsApp
 from .utils import URunnable, Utils
 
 
@@ -30,6 +30,9 @@ class CopyFiles(URunnable):
 
     @URunnable.set_running_state
     def run(self):
+
+        SignalsApp.all_.win_downloads_open.emit()
+
         copied_size = 0
         files_dests = []
 
@@ -39,6 +42,7 @@ class CopyFiles(URunnable):
             Utils.print_err(error=e)
             self.signals_.value_changed.emit(100)
             self.signals_.finished_.emit(files_dests)
+            SignalsApp.all_.win_downloads_close.emit()
             self.remove_threads()
             return
 
@@ -49,6 +53,7 @@ class CopyFiles(URunnable):
             if not self.should_run:
                 self.signals_.value_changed.emit(100)
                 self.signals_.finished_.emit(files_dests)
+                SignalsApp.all_.win_downloads_close.emit()
                 CopyFiles.current_threads.remove(self)
                 return
 
@@ -81,6 +86,7 @@ class CopyFiles(URunnable):
         
         self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
+        SignalsApp.all_.win_downloads_close.emit()
         CopyFiles.current_threads.remove(self)
 
     def stop_copying(self):
