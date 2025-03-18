@@ -238,8 +238,12 @@ class BarBottom(QWidget):
     def open_downloads_win(self):
         if self.downloads_win is None:
             self.downloads_win = WinDownloads()
+            self.downloads_win.closed.connect(self.downloads_win_closed)
             self.downloads_win.center_relative_parent(self.window())
             self.downloads_win.show()
+
+    def downloads_win_closed(self, *args):
+        self.downloads_win = None
 
     def close_downloads_win(self):
         try:

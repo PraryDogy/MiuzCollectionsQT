@@ -66,6 +66,8 @@ class Progresser(QWidget):
 
 
 class WinDownloads(WinSystem):
+    closed = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.central_layout.setContentsMargins(0, 0, 0, 0)
@@ -175,3 +177,7 @@ class WinDownloads(WinSystem):
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):
             self.close()
         return super().keyPressEvent(a0)
+    
+    def closeEvent(self, a0):
+        self.closed.emit()
+        return super().closeEvent(a0)
