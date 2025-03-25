@@ -14,6 +14,7 @@ class WorkerSignals(QObject):
 
 class CopyFiles(URunnable):
     current_threads: list["CopyFiles"] = []
+    old_threads: list[list[str]] = []
 
     def __init__(self, dest: str, files: list):
         "files: list of FULL SRC "
@@ -55,6 +56,7 @@ class CopyFiles(URunnable):
                 self.signals_.finished_.emit(files_dests)
                 SignalsApp.all_.win_downloads_close.emit()
                 CopyFiles.current_threads.remove(self)
+                CopyFiles.old_threads.append(files_dests)
                 return
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
@@ -87,6 +89,7 @@ class CopyFiles(URunnable):
         self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
         SignalsApp.all_.win_downloads_close.emit()
+        CopyFiles.old_threads.append(files_dests)
         CopyFiles.current_threads.remove(self)
 
     def stop_copying(self):

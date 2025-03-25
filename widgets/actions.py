@@ -228,13 +228,8 @@ class Save(QAction):
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
 
-        cmd_ = lambda f: self.reveal_copied_files(files=f)
         thread_ = CopyFiles(dest=dest, files=full_src)
-        thread_.signals_.finished_.connect(cmd_)
         UThreadPool.pool.start(thread_)
-
-    def reveal_copied_files(self, files: list):
-        Utils.reveal_files(files)
 
 
 class MenuTypes(QMenu):
