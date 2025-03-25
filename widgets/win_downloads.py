@@ -18,77 +18,24 @@ MAX_ROW = 45
 SVG_SIZE = 16
 
 
-class CustomProgressBar(QProgressBar):
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent=parent)
-        self.setTextVisible(False)
-        self.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        self.setFixedHeight(6)
-
-
-class Progresser(QWidget):
-    set_value = pyqtSignal(int)
-    set_text = pyqtSignal(str)
-    progress_stop = pyqtSignal()
-
-    def __init__(self, text: str):
-        super().__init__()
-
-        v_layout = LayoutVer()
-        v_layout.setContentsMargins(10, 0, 20, 0)
-        self.setLayout(v_layout)
-
-        self.copy_label = QLabel(text=text, parent=self)
-        v_layout.addWidget(self.copy_label)
-        self.set_text.connect(self.set_text_label)
-
-        v_layout.addSpacerItem(QSpacerItem(0, 10))
-
-        h_wid = QWidget()
-        v_layout.addWidget(h_wid)
-        h_layout = LayoutHor()
-        h_wid.setLayout(h_layout)
-        h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-
-        self.progress = CustomProgressBar(parent=self)
-        self.progress.setValue(0)
-        h_layout.addWidget(self.progress)
-        self.set_value.connect(lambda v: self.progress.setValue(v))
-
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
-
-        icon_path = os.path.join(Static.IMAGES, "clear.svg")
-        self.close_btn = SvgBtn(icon_path=icon_path, size=SVG_SIZE)
-        self.close_btn.mouseReleaseEvent = self.close_cmd
-        h_layout.addWidget(self.close_btn)
-
-        v_layout.addSpacerItem(QSpacerItem(0, 20))
-
-    def set_text_label(self, text: str):
-        self.copy_label.setText(text)
-
-    def close_cmd(self, e):
-        self.progress_stop.emit()
-
-
-class OldProgresser(QWidget):
-    remove_pressed = pyqtSignal()
+class BaseDownloadsItem(QWidget):
+    stop_btn_pressed = pyqtSignal()
 
     def __init__(self, files: list[str]):
         super().__init__()
-        self.files = files
 
         v_layout = LayoutVer()
         v_layout.setContentsMargins(10, 0, 20, 0)
         self.setLayout(v_layout)
+
+        self.text_label = QLabel()
+        v_layout.addWidget(self.text_label)
 
         copy_text = ", ".join([os.path.basename(i) for i in files])
         max_line = MAX_ROW
         if len(copy_text) > max_line:
             copy_text = copy_text[:max_line] + "..."
-
-        self.copy_label = QLabel(text=copy_text, parent=self)
-        v_layout.addWidget(self.copy_label)
+        self.text_label.setText(copy_text)
 
         v_layout.addSpacerItem(QSpacerItem(0, 10))
 
@@ -97,22 +44,37 @@ class OldProgresser(QWidget):
         h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
 
-        self.progress = CustomProgressBar(parent=self)
-        self.progress.setValue(100)
-        h_layout.addWidget(self.progress)
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setTextVisible(False)
+        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.progress_bar.setFixedHeight(6)
+        h_layout.addWidget(self.progress_bar)
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
         icon_path = os.path.join(Static.IMAGES, "clear.svg")
-        self.close_btn = SvgBtn(icon_path=icon_path, size=SVG_SIZE)
-        self.close_btn.mouseReleaseEvent = self.remove_cmd
-        h_layout.addWidget(self.close_btn)
+        self.stop_btn = SvgBtn(icon_path=icon_path, size=SVG_SIZE)
+        self.stop_btn.mouseReleaseEvent = self.stop_cmd
+        h_layout.addWidget(self.stop_btn)
 
         v_layout.addSpacerItem(QSpacerItem(0, 20))
 
-    def remove_cmd(self, a0: QMouseEvent):
+    def stop_cmd(self, a0: QMouseEvent):
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.remove_pressed.emit()
+            self.stop_btn_pressed.emit()
+
+
+class CurrentDownloadsItem(BaseDownloadsItem):
+    def __init__(self, files: list[str]):
+        super().__init__(files=files)
+        self.progress_bar.setValue(0)
+
+
+class OldDownloadsItem(BaseDownloadsItem):
+    def __init__(self, files: list[str]):
+        super().__init__(files=files)
+        self.files = files
+        self.progress_bar.setValue(100)
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
@@ -129,7 +91,7 @@ class WinDownloads(WinSystem):
         self.setWindowTitle(Lang.title_downloads)
         self.setFixedSize(400, 420)
 
-        self.copy_files_list: list[CopyFiles] = []
+        self.download_items: list[CopyFiles] = []
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
@@ -158,89 +120,33 @@ class WinDownloads(WinSystem):
 
     def add_progress_widgets(self):
         try:
-            for copy_files in CopyFiles.current_threads:
-
-                assert isinstance(copy_files, CopyFiles)
-
-                if copy_files not in self.copy_files_list:
-                    if copy_files.is_running:
-                        t = self.cut_text(copy_files.get_current_file())
-                        copy_wid = Progresser(text=t)
-                        self.progress_layout.addWidget(copy_wid)
-
-                        self.copy_files_list.append(copy_files)
-                        self.connect_(copy_wid, copy_files)
-
-                    else:
-                        ...
-
-            for files_list in CopyFiles.old_threads:
-                if files_list not in self.copy_files_list:
-                    old_ = OldProgresser(files_list)
-                    cmd = lambda: self.remove_old_copy_files(old_, files_list)
-                    old_.remove_pressed.connect(cmd)
-                    self.progress_layout.addWidget(old_)
-                    self.copy_files_list.append(files_list)
-
-            QTimer.singleShot(1000, self.add_progress_widgets)
-
+            self.main_actions()
         except Exception as e:
-            Utils.print_err(error=e)
+            print("win downloads.py > add_progress_widgets error", e)
 
-    def remove_old_copy_files(self, wid: OldProgresser, files_list: list[str]):
-        CopyFiles.old_threads.remove(files_list)
-        wid.deleteLater()
+    def main_actions(self):
 
-    def connect_(self, wid: Progresser, task: CopyFiles):
-        wid.progress_stop.connect(partial(self.stop_progress, wid, task))
-        task.signals_.value_changed.connect(partial(self.change_progress_value, wid))
-        task.signals_.text_changed.connect(partial(self.change_progress_text, wid))
+        for thread in CopyFiles.current_threads:
 
-    def stop_progress(self, widget: Progresser, task: CopyFiles):
-        task.signals_.stop.emit()
-        self.remove_progress(widget, task)
+            if thread not in self.download_items:
+                if thread.is_running:
+                    item = CurrentDownloadsItem(files=thread.files)
+                    item.stop_btn_pressed.connect(lambda: thread.signals_.stop.emit())
+                    item.stop_btn_pressed.connect(item.deleteLater)
+                    thread.signals_.value_changed.connect(item.progress_bar.setValue)
+                    self.progress_layout.addWidget(item)
+                    self.download_items.append(thread)
 
-    def remove_progress(self, widget: Progresser, task: CopyFiles):
-        try:
-            widget.deleteLater()
-            self.copy_files_list.remove(task)
-        except Exception as e:
-            Utils.print_err(error=e)
-    
-    def change_progress_text(self, widget: Progresser, text: str):
-        text = self.cut_text(text)
+        for files_list in CopyFiles.list_of_file_lists:
+            if files_list not in self.download_items:
+                item = OldDownloadsItem(files=files_list)
+                one = lambda: CopyFiles.list_of_file_lists.remove(files_list)
+                item.stop_btn_pressed.connect(one)
+                item.stop_btn_pressed.connect(item.deleteLater)
+                self.progress_layout.addWidget(item)
+                self.download_items.append(files_list)
 
-        try:
-            widget.set_text.emit(text)
-        except Exception as e:
-            # MainUtils.print_err(error=e)
-            pass
-
-    def change_progress_value(self, widget: Progresser, value: int):
-        try:
-            widget.set_value.emit(value)
-        except Exception as e:
-            # MainUtils.print_err(error=e)
-            pass
-
-    def cut_text(self, text: str):
-        name, ext = os.path.splitext(text)
-        name = f"{Lang.copying} {name}"
-
-        if len(name) >= MAX_ROW:
-            cut_name = name[:MAX_ROW]
-            cut_name = cut_name[:-6]
-            name = cut_name + "..." + name[-3:] + ext
-        else:
-            name = name + ext
-
-        return name
-
-    def set_value(self, value: int):
-        try:
-            self.progress.setValue(value)
-        except (Exception, RuntimeError) as e:
-            Utils.print_err(error=e)
+        QTimer.singleShot(1000, self.add_progress_widgets)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):

@@ -8,13 +8,12 @@ from .utils import URunnable, Utils
 class WorkerSignals(QObject):
     finished_ = pyqtSignal(list)
     value_changed = pyqtSignal(int)
-    text_changed = pyqtSignal(str)
     stop = pyqtSignal()
 
 
 class CopyFiles(URunnable):
     current_threads: list["CopyFiles"] = []
-    old_threads: list[list[str]] = []
+    list_of_file_lists: list[list[str]] = []
 
     def __init__(self, dest: str, files: list):
         "files: list of FULL SRC "
@@ -44,7 +43,8 @@ class CopyFiles(URunnable):
             self.signals_.value_changed.emit(100)
             self.signals_.finished_.emit(files_dests)
             SignalsApp.all_.win_downloads_close.emit()
-            self.remove_threads()
+            CopyFiles.list_of_file_lists.append(files_dests)
+            CopyFiles.current_threads.remove(self)
             return
 
         self.signals_.value_changed.emit(0)
@@ -52,36 +52,23 @@ class CopyFiles(URunnable):
         for file_path in self.files:
 
             if not self.should_run:
-                self.signals_.value_changed.emit(100)
-                self.signals_.finished_.emit(files_dests)
-                SignalsApp.all_.win_downloads_close.emit()
-                CopyFiles.current_threads.remove(self)
-                CopyFiles.old_threads.append(files_dests)
-                return
+                break
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             files_dests.append(dest_path)
             root, filename = os.path.split(file_path)
-            self.signals_.text_changed.emit(filename)
             self.current_file = filename
 
             try:
-
                 with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
-
                     while self.should_run:
-
                         buf = fsrc.read(self.buffer_size)
-
                         if not buf:
                             break
-
                         fdest.write(buf)
                         copied_size += len(buf)
                         percent = int((copied_size / total_size) * 100)
-
                         self.signals_.value_changed.emit(percent)
-
             except Exception as e:
                 Utils.print_err(error=e)
                 break
@@ -89,7 +76,7 @@ class CopyFiles(URunnable):
         self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
         SignalsApp.all_.win_downloads_close.emit()
-        CopyFiles.old_threads.append(files_dests)
+        CopyFiles.list_of_file_lists.append(files_dests)
         CopyFiles.current_threads.remove(self)
 
     def stop_copying(self):
