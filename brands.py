@@ -2,6 +2,14 @@ class Brand:
     current: int = 0
     brands_list: list["Brand"] = []
 
+    # имена соответствуют аттрибутам класса Brand: coll_folders и stop_colls
+    # нельзя менять
+    var_name = "name"
+    var_coll_folders = "coll_folders"
+    var_stop_colls = "stop_colls"
+
+    __slots__ = [var_name, var_coll_folders, var_stop_colls]
+
     def __init__(self, name: str, coll_folders: list[str], stop_colls: list[str]):
         super().__init__()
         self.name = name
