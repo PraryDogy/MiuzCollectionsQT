@@ -1,39 +1,24 @@
+import gc
 import os
 from time import sleep
-from typing import Literal
 
 import sqlalchemy
 import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
+from brands import Brand
 from cfg import JsonData, Static, ThumbData
 from database import CLMN_NAMES, THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
-from brands import Brand
 
 from .utils import URunnable, UThreadPool, Utils
-import gc
-
-class ScanerBrand:
-    all_: list["ScanerBrand"] = []
-    curr: "ScanerBrand" = None
-    __slots__ = ["name", "ind", "collfolder"]
-
-    def __init__(self, name: str, ind: int, collfolder: str):
-        super().__init__()
-        self.name = name
-        self.ind = ind
-        self.collfolder = collfolder
-
-
-class BrandManager:
-    temp_selected: Brand
-
 
 
 class ScanerTools:
+    current_brand: Brand
+    avaiable_brands: list[Brand] = []
     can_scan: bool = True
 
     @classmethod
@@ -68,11 +53,14 @@ class FinderImages:
         collections = []
 
         try:
-            for item in os.listdir(ScanerBrand.curr.collfolder):
-                coll_path = os.path.join(ScanerBrand.curr.collfolder, item)
-                if os.path.isdir(coll_path):
-                    if item not in JsonData.stopcolls[ScanerBrand.curr.ind]:
-                        collections.append(coll_path)
+            coll_folder = ScanerTools.current_brand.coll_folder_path
+            stop_colls = ScanerTools.current_brand.stop_colls
+
+            for item in os.listdir(coll_folder):
+                item_path = os.path.join(coll_folder, item)
+                if os.path.isdir(item_path) and item not in stop_colls:
+                    collections.append(item_path)
+
         except FileNotFoundError:
             ...
 
@@ -103,7 +91,7 @@ class FinderImages:
 
     def get_progress_text(self, current: int, total: int) -> str:
         """Формирует текст для прогресс-бара."""
-        brand = ScanerBrand.curr.name.capitalize()
+        brand = ScanerTools.current_brand.name.capitalize()
         collection_name = Lang.collection
         return f"{brand}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
@@ -158,16 +146,17 @@ class DbImages:
             THUMBS.c.mod
             )
         
-        q = q.where(THUMBS.c.brand == ScanerBrand.curr.name)
+        q = q.where(THUMBS.c.brand == ScanerTools.current_brand.name)
 
         # не забываем относительный путь к изображению преобразовать в полный
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
         conn.close()
+        coll_folder = ScanerTools.current_brand.coll_folder_path
 
         return {
             short_hash: (
-                Utils.get_full_src(ScanerBrand.curr.collfolder, short_src),
+                Utils.get_full_src(coll_folder, short_src),
                 size,
                 birth,
                 mod
@@ -291,16 +280,17 @@ class DbUpdater:
             return (None, None)
 
     def get_values(self, full_src, full_hash, size, birth, mod, resol):
+        coll_folder = ScanerTools.current_brand.coll_folder_path
         return {
-            "short_src": Utils.get_short_src(ScanerBrand.curr.collfolder, full_src),
+            "short_src": Utils.get_short_src(coll_folder, full_src),
             "short_hash": Utils.get_short_hash(full_hash),
             "size": size,
             "birth": birth,
             "mod": mod,
             "resol": resol,
-            "coll": Utils.get_coll_name(ScanerBrand.curr.collfolder, full_src),
+            "coll": Utils.get_coll_name(coll_folder, full_src),
             "fav": 0,
-            "brand": ScanerBrand.curr.name
+            "brand": ScanerTools.current_brand.name
         }
 
     def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
@@ -396,7 +386,7 @@ class DbUpdater:
         total: `len`
         """
 
-        brand = ScanerBrand.curr.name.capitalize()
+        brand = ScanerTools.current_brand.name.capitalize()
         t = f"{brand}: {text.lower()} {x} {Lang.from_} {total}"
         ScanerTools.progressbar_text(t)
 
@@ -413,17 +403,13 @@ class ScanerThread(URunnable):
 
     @URunnable.set_running_state
     def run(self):
-
-        for brand in ScanerBrand.all_:
-            ScanerBrand.curr = brand
-
+        for brand in ScanerTools.avaiable_brands:
+            ScanerTools.current_brand = brand
             self.brand_scan()
-            print("scaner started", ScanerBrand.curr.name)
+            print("scaner started", brand.name)
 
     def brand_scan(self):
-
         ScanerTools.can_scan = True
-
         finder_images = FinderImages()
         finder_images = finder_images.run()
 
@@ -468,26 +454,16 @@ class ScanerShedule(QObject):
             self.wait_timer.start(self.wait_sec)
             return
 
-        ScanerBrand.all_.clear()
-        ScanerBrand.curr = None
+        ScanerTools.avaiable_brands.clear()
+        ScanerTools.current_brand = None
         
-        for brand_item in Brand.brands_list:
-
-            brand_ind  = Brand.brands_list.index(brand_item)
-            coll_folder = Utils.brand_coll_folder(brand_ind=brand_ind)
-
+        for brand in Brand.brands_list:
+            coll_folder = Utils.get_brand_coll_folder(brand=brand)
             if coll_folder:
+                brand.coll_folder_path = coll_folder
+                ScanerTools.avaiable_brands.append(brand)
 
-                ScanerBrand.all_.append(
-                    ScanerBrand(
-                        name=brand_item.name,
-                        ind=brand_ind,
-                        collfolder=coll_folder
-                    )
-                )
-
-        if not ScanerBrand.all_:
-
+        if not ScanerTools.avaiable_brands:
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 

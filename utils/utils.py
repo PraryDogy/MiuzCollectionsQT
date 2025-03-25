@@ -391,6 +391,13 @@ class Utils(Hash, Pixmap, ReadImage):
         return None
 
     @classmethod
+    def get_brand_coll_folder(cls, brand: Brand):
+        for coll_folder in brand.coll_folders:
+            if os.path.exists(coll_folder):
+                return coll_folder
+        return None
+
+    @classmethod
     def get_coll_name(cls, coll_folder: str, full_src: str) -> str:
         coll = cls.get_short_src(coll_folder, full_src)
         coll = coll.strip(os.sep)

@@ -13,7 +13,7 @@ class Brand:
         self.name = name
         self.coll_folders = coll_folders
         self.stop_colls = stop_colls
-        self.coll_folder: str
+        self.coll_folder_path: str
         Brand.brands_list.append(self)
 
     @classmethod
