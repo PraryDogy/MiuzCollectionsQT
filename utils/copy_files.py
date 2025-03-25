@@ -19,12 +19,9 @@ class CopyFiles(URunnable):
         "files: list of FULL SRC "
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.signals_.stop.connect(self.stop_copying)
-
+        self.signals_.stop.connect(self.stop_cmd)
         self.files = files
         self.dest = dest
-        self.buffer_size = 1024*1024
-        self.current_file = ""
 
         CopyFiles.current_threads.append(self)
 
@@ -40,11 +37,7 @@ class CopyFiles(URunnable):
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
             Utils.print_err(error=e)
-            self.signals_.value_changed.emit(100)
-            self.signals_.finished_.emit(files_dests)
-            SignalsApp.all_.win_downloads_close.emit()
-            CopyFiles.list_of_file_lists.append(files_dests)
-            CopyFiles.current_threads.remove(self)
+            self.finalize(files_dests=files_dests)
             return
 
         self.signals_.value_changed.emit(0)
@@ -57,12 +50,11 @@ class CopyFiles(URunnable):
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             files_dests.append(dest_path)
             root, filename = os.path.split(file_path)
-            self.current_file = filename
 
             try:
                 with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
                     while self.should_run:
-                        buf = fsrc.read(self.buffer_size)
+                        buf = fsrc.read(1024*1024)
                         if not buf:
                             break
                         fdest.write(buf)
@@ -73,14 +65,16 @@ class CopyFiles(URunnable):
                 Utils.print_err(error=e)
                 break
         
+        self.finalize(files_dests=files_dests)
+
+    def stop_cmd(self):
+        self.should_run = False
+
+    def finalize(self, files_dests: list[str]):
+
         self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
         SignalsApp.all_.win_downloads_close.emit()
+
         CopyFiles.list_of_file_lists.append(files_dests)
         CopyFiles.current_threads.remove(self)
-
-    def stop_copying(self):
-        self.should_run = False
-
-    def get_current_file(self):
-        return self.current_file
