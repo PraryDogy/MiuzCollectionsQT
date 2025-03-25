@@ -3,7 +3,7 @@ import os
 import shutil
 import webbrowser
 from datetime import datetime
-
+from brands import Brand
 
 class ThumbData:
 
@@ -244,6 +244,14 @@ class JsonData:
     def write_json_data(cls):
 
         with open(Static.JSON_FILE, 'w', encoding="utf-8") as f:
+
+            data = cls._get_data()
+            brands = {
+                brand.name: brand.coll_folders
+                for brand in Brand.brands_list
+            }
+
+            data.update(brands)
 
             json.dump(
                 obj=cls._get_data(),

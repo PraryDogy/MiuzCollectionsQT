@@ -13,7 +13,7 @@ from signals import SignalsApp
 from utils.copy_files import CopyFiles
 from utils.utils import UThreadPool, Utils
 from lang import Lang
-
+from brands import Brand
 from .menu_left import CollectionBtn, MenuLeft
 
 
@@ -66,7 +66,7 @@ class WinUpload(WinSystem):
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
 
-        root = Utils.get_coll_folder()
+        root = Utils.get_coll_folder(brand_ind=Brand.current)
         self.coll_path = os.path.join(root, coll_btn.coll_name)
 
         subfolders: list[os.DirEntry] = [

@@ -128,8 +128,9 @@ class DbImages(URunnable):
             THUMBS.c.fav
             )
         
+        brand_name = Brand.brands_list[Brand.current].name
         q = q.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
-        q = q.where(THUMBS.c.brand == Brand.brands_list[Brand.current])
+        q = q.where(THUMBS.c.brand == brand_name)
 
         if Dynamic.resents:
             q = q.order_by(-THUMBS.c.id)

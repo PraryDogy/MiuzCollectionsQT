@@ -149,7 +149,11 @@ class ResolTask(URunnable):
         if img_array is not None and len(img_array.shape) > 1:
             h, w = img_array.shape[0], img_array.shape[1]
             text = f"{w}x{h}"
-            self.signals_.finished_resol.emit(text)
+
+            try:
+                self.signals_.finished_resol.emit(text)
+            except RuntimeError:
+                ...
 
 
 class WinInfo(WinSystem):

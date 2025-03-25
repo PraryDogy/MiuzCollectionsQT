@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
+from brands import Brand
 from cfg import Dynamic, JsonData, Static
 from lang import Lang
 from signals import SignalsApp
@@ -121,13 +122,13 @@ class WinMain(WinFrameless):
         self.hide()
 
     def on_exit(self):
-        Scaner.app.stop()
+        Scaner.stop()
         JsonData.write_json_data()
 
     def after_start(self):
-        Scaner.app.start()
+        Scaner.start()
 
-        coll_folder = Utils.get_coll_folder()
+        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
         if not coll_folder:
             OpenWins.smb(self)
 
@@ -174,7 +175,7 @@ class WinMain(WinFrameless):
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
 
-        coll_folder = Utils.get_coll_folder()
+        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
         if not coll_folder:
             OpenWins.smb(self)
             return

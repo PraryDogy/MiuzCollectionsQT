@@ -37,7 +37,7 @@ class CollectionBtn(QLabel):
 
 
     def reveal_collection(self, *args) -> None:
-        coll_folder = Utils.get_coll_folder()
+        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
 
         if not coll_folder:
             OpenWins.smb(parent_=self.window())
@@ -102,8 +102,9 @@ class LoadMenus(URunnable):
         menus: list[dict] = []
 
         conn = Dbase.engine.connect()
+        brand_name = Brand.brands_list[self.brand_ind].name
         q = sqlalchemy.select(THUMBS.c.coll)
-        q = q.where(THUMBS.c.brand == Brand.brands_list[self.brand_ind])
+        q = q.where(THUMBS.c.brand == brand_name)
         q = q.distinct()
         res = conn.execute(q).fetchall()
         conn.close()
@@ -112,8 +113,7 @@ class LoadMenus(URunnable):
             res: tuple[str] = (i[0] for i in res if i)
 
         else:
-            brand = Brand.brands_list[self.brand_ind]
-            print(brand, "> left menu > load db colls > no data")
+            print(brand_name, "> left menu > load db colls > no data")
             return menus
 
         for coll_name in res:
@@ -267,7 +267,7 @@ class MenuLeft(QTabWidget):
         for i in Brand.brands_list:
             brand_ind = Brand.brands_list.index(i)
             wid = MenuTab(brand_ind=brand_ind)
-            self.addTab(wid, i)
+            self.addTab(wid, i.name)
             self.menus.append(wid)
         
         self.setCurrentIndex(Brand.current)

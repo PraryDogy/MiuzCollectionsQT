@@ -262,7 +262,7 @@ class BrandSettings(QTabWidget):
 
         for i in Brand.brands_list:
             wid = self.brand_sett_ui(brand_ind=Brand.brands_list.index(i))
-            self.addTab(wid, i)
+            self.addTab(wid, i.name)
 
         self.setCurrentIndex(Brand.current)
 
@@ -354,11 +354,7 @@ class WinSettings(WinSystem):
             JsonData.write_json_data()
             QApplication.quit()
 
-            if os.path.exists(Static.DB_FILE):
-                os.remove(Static.DB_FILE)
-
-            if os.path.exists(Static.HASH_DIR):
-                Utils.rm_rf(Static.HASH_DIR)
+            Utils.rm_rf(folder_path=Static.APP_SUPPORT_DIR)
 
             Utils.start_new_app()
 
