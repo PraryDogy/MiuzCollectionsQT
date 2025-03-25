@@ -31,7 +31,7 @@ class ThumbData:
 
 class Static:
 
-    APP_VER = 1.6
+    APP_VER = 1.7
     APP_NAME: str = "Collections"
 
     # сколько папок с коллекциями программа будет анализировать
