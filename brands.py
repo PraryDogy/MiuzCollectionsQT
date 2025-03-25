@@ -1,19 +1,20 @@
 NAME = "name"
 COLL_FOLDERS = "coll_folders"
 STOP_COLLS = "stop_colls"
+COLL_FOLDER_PATH = "coll_folder_path"
 
 class Brand:
     selected: "Brand"
     current: int = 0
     brands_list: list["Brand"] = []
-    __slots__ = [NAME, COLL_FOLDERS, STOP_COLLS]
+    __slots__ = [NAME, COLL_FOLDERS, STOP_COLLS, COLL_FOLDER_PATH]
 
     def __init__(self, name: str, coll_folders: list[str], stop_colls: list[str]):
         super().__init__()
         self.name = name
         self.coll_folders = coll_folders
         self.stop_colls = stop_colls
-        self.coll_folder_path: str
+        self.coll_folder_path: str = None
         Brand.brands_list.append(self)
 
     @classmethod

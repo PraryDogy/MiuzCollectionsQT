@@ -393,6 +393,7 @@ class Utils(Hash, Pixmap, ReadImage):
     @classmethod
     def get_brand_coll_folder(cls, brand: Brand):
         for coll_folder in brand.coll_folders:
+            print(coll_folder)
             if os.path.exists(coll_folder):
                 return coll_folder
         return None
