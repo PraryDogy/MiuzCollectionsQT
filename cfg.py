@@ -183,30 +183,6 @@ class JsonData:
         '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
         ]
 
-    stopcolls: list[list[str]] = [
-        [
-            "_Archive_Commerce_Брендинг",
-            "Chosed",
-            "LEVIEV"
-        ],
-        [], 
-    ]
-
-    collfolders: list[list[str]] = [
-        # miuz coll folders
-        [
-            '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
-            '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
-            '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
-        ],
-        # panacea coll folders
-        [
-            '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready',
-            '/Volumes/Shares-1/Studio/Panacea/Photo/Art/Ready',
-            '/Volumes/Shares-2/Studio/Panacea/Photo/Art/Ready',
-            ]
-    ]
-
     @classmethod
     def _get_data(cls) -> dict[str, str]:
         """returns user attibutes and values"""

@@ -190,14 +190,14 @@ class BrandList(QListWidget):
     h_ = 25
     changed = pyqtSignal()
 
-    def __init__(self, brand_index: int, items_list: list[str]):
+    def __init__(self, brand: Brand, items: list[str]):
         super().__init__()
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.contextMenuEvent = self.list_item_context
-        self.brand_index = brand_index
+        self.brand = brand
 
-        for i in items_list[brand_index]:
+        for i in items:
             item_ = QListWidgetItem(i)
             item_.setSizeHint(QSize(self.width(), BrandList.h_))
             item_.item_name = i
@@ -251,6 +251,16 @@ class BrandList(QListWidget):
         self.changed.emit()
 
 
+class StopColls(BrandList):
+    def __init__(self, brand, items):
+        super().__init__(brand, items)
+
+
+class CollFolders(BrandList):
+    def __init__(self, brand, items):
+        super().__init__(brand, items)
+
+
 class BrandSettings(QTabWidget):
     apply = pyqtSignal()
     h_ = 25
@@ -260,13 +270,13 @@ class BrandSettings(QTabWidget):
         self.stop_colls_wid: dict[int, CustomTextEdit] = {}
         self.coll_folders_wid: dict[int, CustomTextEdit] = {}
 
-        for i in Brand.brands_list:
-            wid = self.brand_sett_ui(brand_ind=Brand.brands_list.index(i))
-            self.addTab(wid, i.name)
+        for brand in Brand.brands_list:
+            wid = self.brand_sett_ui(brand=brand)
+            self.addTab(wid, brand.name)
 
         self.setCurrentIndex(0)
 
-    def brand_sett_ui(self, brand_ind: int):
+    def brand_sett_ui(self, brand: Brand):
         wid = QWidget()
         v_lay = LayoutVer()
         v_lay.setSpacing(10)
@@ -276,14 +286,14 @@ class BrandSettings(QTabWidget):
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         v_lay.addWidget(stop_colls_lbl)
 
-        stop_colls_list = BrandList(brand_index=brand_ind, items_list=JsonData.stopcolls)
+        stop_colls_list = StopColls(brand=brand, items=brand.stop_colls)
         stop_colls_list.changed.connect(self.list_changed)
         v_lay.addWidget(stop_colls_list)
 
         coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
         v_lay.addWidget(coll_folders_label)
 
-        coll_folders_list = BrandList(brand_index=brand_ind, items_list=JsonData.collfolders)
+        coll_folders_list = CollFolders(brand=brand, items=brand.coll_folders)
         coll_folders_list.changed.connect(self.list_changed)
         v_lay.addWidget(coll_folders_list)
 
@@ -312,15 +322,15 @@ class WinSettings(WinSystem):
         self.smpl_sett = SimpleSettings()
         self.central_layout.addWidget(self.smpl_sett)
 
-        self.brnd_sett = BrandSettings()
-        self.central_layout.addWidget(self.brnd_sett)
+        self.brand_sett = BrandSettings()
+        self.central_layout.addWidget(self.brand_sett)
 
 
-        rb_sett_cmd = lambda: self.cmd_(wid=self.brnd_sett)
+        rb_sett_cmd = lambda: self.cmd_(wid=self.brand_sett)
         self.rb_sett.apply.connect(rb_sett_cmd)
 
         lock_rebootable = lambda: self.cmd_(wid=self.rb_sett)
-        self.brnd_sett.apply.connect(lock_rebootable)
+        self.brand_sett.apply.connect(lock_rebootable)
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
@@ -365,26 +375,12 @@ class WinSettings(WinSystem):
             QApplication.quit()
             Utils.start_new_app()
 
-        elif hasattr(self.brnd_sett, NEED_REBOOT):
-            # всего у нас 4 виджета BrandList
-            # мы создаем словарик, где ключом будет BrandList.brand_index
-            # а значением будет список списков
-            # где 0 элемент это стоп слова, а 1 это пути к папке коллекций
-            # получается следующий вид
-            # Индекс_бренда: стоп слова (список), пути к папке коллекций(список)
+        elif hasattr(self.brand_sett, NEED_REBOOT):
+            for i in self.brand_sett.findChildren(CollFolders):
+                i.brand.coll_folders = i.get_texts()
 
-            brands = defaultdict(list)
-
-            for i in self.brnd_sett.findChildren(BrandList):
-                brands[i.brand_index].append(i.get_texts())
-
-            for brand_ind, lists in brands.items():
-
-                new_stop_colls = lists[0]
-                new_coll_folders = lists[1]
-
-                JsonData.stopcolls[brand_ind] = new_stop_colls
-                JsonData.collfolders[brand_ind] = new_coll_folders
+            for i in self.brand_sett.findChildren(StopColls):
+                i.brand.stop_colls = i.get_texts()
 
             JsonData.write_json_data()
             QApplication.quit()
