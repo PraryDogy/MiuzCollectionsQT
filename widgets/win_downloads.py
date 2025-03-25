@@ -8,19 +8,22 @@ from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinSystem
+from base_widgets.svg_btn import SvgBtn
 from lang import Lang
+from cfg import Static
 from utils.copy_files import CopyFiles
 from utils.utils import Utils
 
 MAX_ROW = 45
+SVG_SIZE = 16
 
 
 class CustomProgressBar(QProgressBar):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent=parent)
         self.setTextVisible(False)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setFixedHeight(7)
+        self.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.setFixedHeight(6)
 
 
 class Progresser(QWidget):
@@ -45,7 +48,7 @@ class Progresser(QWidget):
         v_layout.addWidget(h_wid)
         h_layout = LayoutHor()
         h_wid.setLayout(h_layout)
-
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.progress = CustomProgressBar(parent=self)
         self.progress.setValue(0)
@@ -54,7 +57,8 @@ class Progresser(QWidget):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.close_btn = QLabel(text="x")
+        icon_path = os.path.join(Static.IMAGES, "clear.svg")
+        self.close_btn = SvgBtn(icon_path=icon_path, size=SVG_SIZE)
         self.close_btn.mouseReleaseEvent = self.close_cmd
         h_layout.addWidget(self.close_btn)
 
@@ -84,7 +88,6 @@ class OldProgresser(QWidget):
             copy_text = copy_text[:max_line] + "..."
 
         self.copy_label = QLabel(text=copy_text, parent=self)
-        self.copy_label.mouseReleaseEvent = self.reveal_cmd
         v_layout.addWidget(self.copy_label)
 
         v_layout.addSpacerItem(QSpacerItem(0, 10))
@@ -95,13 +98,13 @@ class OldProgresser(QWidget):
         h_wid.setLayout(h_layout)
 
         self.progress = CustomProgressBar(parent=self)
-        self.progress.mouseReleaseEvent = self.reveal_cmd
         self.progress.setValue(100)
         h_layout.addWidget(self.progress)
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.close_btn = QLabel(text="x")
+        icon_path = os.path.join(Static.IMAGES, "clear.svg")
+        self.close_btn = SvgBtn(icon_path=icon_path, size=SVG_SIZE)
         self.close_btn.mouseReleaseEvent = self.remove_cmd
         h_layout.addWidget(self.close_btn)
 
@@ -111,7 +114,7 @@ class OldProgresser(QWidget):
         if a0.button() == Qt.MouseButton.LeftButton:
             self.remove_pressed.emit()
 
-    def reveal_cmd(self, a0: QMouseEvent):
+    def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
             Utils.reveal_files(files_list=self.files)
         return super().mouseReleaseEvent(a0)
@@ -146,10 +149,10 @@ class WinDownloads(WinSystem):
         self.v_layout.addWidget(self.progress_wid)
         self.v_layout.addStretch()
 
-        # for i in range(0, 2):
-        #     wid_ = Progresser(text="test")
-        #     self.progress_layout.addWidget(wid_)
-        #     wid_.set_value.emit(50)
+        for i in range(0, 3):
+            test = Progresser(text='123')
+            test.progress.setValue(50)
+            self.progress_layout.addWidget(test)
 
         self.add_progress_widgets()
 
