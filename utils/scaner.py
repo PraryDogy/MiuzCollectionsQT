@@ -469,7 +469,7 @@ class ScanerShedule(QObject):
         for brand_item in Brand.brands_list:
 
             brand_ind  = Brand.brands_list.index(brand_item)
-            coll_folder = Utils.get_coll_folder(brand_ind=brand_ind)
+            coll_folder = Utils.brand_coll_folder(brand_ind=brand_ind)
 
             if coll_folder:
 

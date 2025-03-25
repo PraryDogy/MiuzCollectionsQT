@@ -128,7 +128,7 @@ class WinMain(WinFrameless):
     def after_start(self):
         Scaner.start()
 
-        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
         if not coll_folder:
             OpenWins.smb(self)
 
@@ -175,7 +175,7 @@ class WinMain(WinFrameless):
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
 
-        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
         if not coll_folder:
             OpenWins.smb(self)
             return

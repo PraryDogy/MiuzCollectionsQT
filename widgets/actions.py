@@ -73,7 +73,7 @@ class OpenInfoDb(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
         if coll_folder:
             OpenWins.info_db(
                 parent_=self.win_,
@@ -93,7 +93,7 @@ class CopyPath(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
 
         if coll_folder:
             full_src = Utils.get_full_src(coll_folder, self.short_src)
@@ -118,7 +118,7 @@ class Reveal(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
         if coll_folder:
             full_src = [
                 Utils.get_full_src(coll_folder, i)
@@ -204,7 +204,7 @@ class Save(QAction):
         self.win_ = win
 
     def cmd_(self):
-        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
 
         if coll_folder:
 

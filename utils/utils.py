@@ -384,7 +384,7 @@ class Utils(Hash, Pixmap, ReadImage):
         )
 
     @classmethod
-    def get_coll_folder(cls, brand_ind: int) -> str | None:
+    def brand_coll_folder(cls, brand_ind: int) -> str | None:
         for coll_folder in JsonData.collfolders[brand_ind]:
             if os.path.exists(coll_folder):
                 return coll_folder

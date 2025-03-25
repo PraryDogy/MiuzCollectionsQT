@@ -37,7 +37,7 @@ class CollectionBtn(QLabel):
 
 
     def reveal_collection(self, *args) -> None:
-        coll_folder = Utils.get_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
 
         if not coll_folder:
             OpenWins.smb(parent_=self.window())
