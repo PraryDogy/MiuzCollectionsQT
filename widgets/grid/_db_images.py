@@ -12,6 +12,7 @@ from filters import Filter
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, Utils
+from brands import Brand
 
 
 class DbImage:
@@ -128,7 +129,7 @@ class DbImages(URunnable):
             )
         
         q = q.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
-        q = q.where(THUMBS.c.brand == Static.BRANDS[JsonData.brand_ind])
+        q = q.where(THUMBS.c.brand == Brand.brands_list[Brand.current])
 
         if Dynamic.resents:
             q = q.order_by(-THUMBS.c.id)

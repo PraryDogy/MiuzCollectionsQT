@@ -11,6 +11,7 @@ from cfg import JsonData, Static, ThumbData
 from database import CLMN_NAMES, THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
+from brands import Brand as BaseBrand
 
 from .utils import URunnable, UThreadPool, Utils
 import gc
@@ -464,11 +465,11 @@ class ScanerShedule(QObject):
 
         Brand.all_.clear()
         Brand.curr = None
+        
+        for brand_name in BaseBrand.brands_list:
 
-        for brand_name in Static.BRANDS:
-
-            brand_ind  = Static.BRANDS.index(brand_name)
-            coll_folder = Utils.get_coll_folder(brand_ind=brand_ind)
+            brand_ind  = BaseBrand.brands_list.index(brand_name)
+            coll_folder = Utils.get_coll_folder()
 
             if coll_folder:
 

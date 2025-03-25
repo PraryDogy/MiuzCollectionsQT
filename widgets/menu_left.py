@@ -15,7 +15,7 @@ from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
 from utils.utils import URunnable, UThreadPool, Utils
-
+from brands import Brand
 from .actions import OpenWins
 
 
@@ -37,7 +37,7 @@ class CollectionBtn(QLabel):
 
 
     def reveal_collection(self, *args) -> None:
-        coll_folder = Utils.get_coll_folder(brand_ind=JsonData.brand_ind)
+        coll_folder = Utils.get_coll_folder()
 
         if not coll_folder:
             OpenWins.smb(parent_=self.window())
@@ -103,7 +103,7 @@ class LoadMenus(URunnable):
 
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(THUMBS.c.coll)
-        q = q.where(THUMBS.c.brand == Static.BRANDS[self.brand_ind])
+        q = q.where(THUMBS.c.brand == Brand.brands_list[self.brand_ind])
         q = q.distinct()
         res = conn.execute(q).fetchall()
         conn.close()
@@ -112,7 +112,7 @@ class LoadMenus(URunnable):
             res: tuple[str] = (i[0] for i in res if i)
 
         else:
-            brand = Static.BRANDS[self.brand_ind]
+            brand = Brand.brands_list[self.brand_ind]
             print(brand, "> left menu > load db colls > no data")
             return menus
 
@@ -264,16 +264,16 @@ class MenuLeft(QTabWidget):
         self.clear()
         self.menus.clear()
 
-        for i in Static.BRANDS:
-            brand_ind = Static.BRANDS.index(i)
+        for i in Brand.brands_list:
+            brand_ind = Brand.brands_list.index(i)
             wid = MenuTab(brand_ind=brand_ind)
             self.addTab(wid, i)
             self.menus.append(wid)
         
-        self.setCurrentIndex(JsonData.brand_ind)
+        self.setCurrentIndex(Brand.current)
 
     def tab_cmd(self, index: int):
-        JsonData.brand_ind = index
+        Brand.current = index
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
 

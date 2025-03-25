@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
 import io
 from cfg import JsonData, Static
+from brands import Brand
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")
@@ -383,8 +384,8 @@ class Utils(Hash, Pixmap, ReadImage):
         )
 
     @classmethod
-    def get_coll_folder(cls, brand_ind: int) -> str | None:
-        for coll_folder in JsonData.collfolders[brand_ind]:
+    def get_coll_folder(cls) -> str | None:
+        for coll_folder in JsonData.collfolders[Brand.current]:
             if os.path.exists(coll_folder):
                 return coll_folder
         return None

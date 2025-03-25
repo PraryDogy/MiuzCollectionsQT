@@ -40,7 +40,6 @@ class Static:
     # созависимые аттрибуты:
     # JsonData.collfolders, JsonData.stopcolls
     # при инициации будет проверка на соответствие длин
-    BRANDS = ["miuz", "panacea"]
 
     # в сетке изображений может отображаться за раз 150 штук
     GRID_LIMIT: int = 100
@@ -170,9 +169,6 @@ class JsonData:
     # ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ ЕСЛИ ЕЩЕ НЕТ КОНФИГ ФАЙЛА В APP_SUPPORT
 
     app_ver: str = Static.APP_VER
-
-    # индекс соответствующий Static > BRANDS
-    brand_ind = 0
 
     # индекс соответствующий Lang
     lang_ind = 0
@@ -337,7 +333,6 @@ class JsonData:
     def init(cls):
         cls._check_dirs()
         cls._set_json_data()
-        assert len(Static.BRANDS) == len(cls.stopcolls) == len(cls.collfolders)
 
         # если версии не совпадают то что то нужно сделать
         # например копировать новые файлы или ...

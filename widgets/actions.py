@@ -1,7 +1,5 @@
-import os
-
 import sqlalchemy
-from PyQt5.QtCore import QObject, pyqtSignal, QTimer
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu, QWidget
 
 from cfg import Dynamic, JsonData, Static
@@ -14,6 +12,7 @@ from utils.utils import URunnable, UThreadPool, Utils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
+from brands import Brand
 
 
 class OpenWins:
@@ -74,7 +73,7 @@ class OpenInfoDb(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        coll_folder = Utils.get_coll_folder()
         if coll_folder:
             OpenWins.info_db(
                 parent_=self.win_,
@@ -94,7 +93,7 @@ class CopyPath(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        coll_folder = Utils.get_coll_folder()
 
         if coll_folder:
             full_src = Utils.get_full_src(coll_folder, self.short_src)
@@ -119,7 +118,7 @@ class Reveal(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        coll_folder = Utils.get_coll_folder()
         if coll_folder:
             full_src = [
                 Utils.get_full_src(coll_folder, i)
@@ -205,7 +204,7 @@ class Save(QAction):
         self.win_ = win
 
     def cmd_(self):
-        coll_folder = Utils.get_coll_folder(JsonData.brand_ind)
+        coll_folder = Utils.get_coll_folder()
 
         if coll_folder:
 

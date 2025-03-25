@@ -15,7 +15,7 @@ from cfg import JsonData, Static
 from lang import Lang
 from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
-
+from brands import Brand
 from .actions import OpenWins
 
 WIN_SIZE = (430, 550)
@@ -260,11 +260,11 @@ class BrandSettings(QTabWidget):
         self.stop_colls_wid: dict[int, CustomTextEdit] = {}
         self.coll_folders_wid: dict[int, CustomTextEdit] = {}
 
-        for i in Static.BRANDS:
-            wid = self.brand_sett_ui(brand_ind=Static.BRANDS.index(i))
+        for i in Brand.brands_list:
+            wid = self.brand_sett_ui(brand_ind=Brand.brands_list.index(i))
             self.addTab(wid, i)
 
-        self.setCurrentIndex(JsonData.brand_ind)
+        self.setCurrentIndex(Brand.current)
 
     def brand_sett_ui(self, brand_ind: int):
         wid = QWidget()

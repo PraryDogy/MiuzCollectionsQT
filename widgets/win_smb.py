@@ -48,10 +48,6 @@ class WinSmb(WinSystem):
         v_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         v_wid.setLayout(v_lay)
 
-        brand: str = Static.BRANDS[JsonData.brand_ind]
-        title = QLabel(text=brand.capitalize())
-        v_lay.addWidget(title)
-
         descr = QLabel(self.my_text)
         v_lay.addWidget(descr)
 
