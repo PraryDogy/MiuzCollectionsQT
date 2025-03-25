@@ -74,7 +74,7 @@ class WinDownloads(WinSystem):
         self.setWindowTitle(Lang.title_downloads)
         self.setFixedSize(400, 420)
 
-        self.copy_threads: list[CopyFiles] = []
+        self.copy_files_list: list[CopyFiles] = []
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
@@ -103,17 +103,21 @@ class WinDownloads(WinSystem):
 
     def add_progress_widgets(self):
         try:
-            for copy_task in CopyFiles.current_threads:
+            for copy_files in CopyFiles.current_threads:
 
-                copy_task: CopyFiles
+                assert isinstance(copy_files, CopyFiles)
 
-                if copy_task not in self.copy_threads and copy_task.is_running:
-                    t = self.cut_text(copy_task.get_current_file())
-                    copy_wid = Progresser(text=t)
-                    self.progress_layout.addWidget(copy_wid)
+                if copy_files not in self.copy_files_list:
+                    if copy_files.is_running:
+                        t = self.cut_text(copy_files.get_current_file())
+                        copy_wid = Progresser(text=t)
+                        self.progress_layout.addWidget(copy_wid)
 
-                    self.copy_threads.append(copy_task)
-                    self.connect_(copy_wid, copy_task)
+                        self.copy_files_list.append(copy_files)
+                        self.connect_(copy_wid, copy_files)
+
+                    else:
+                        ...
 
             QTimer.singleShot(1000, self.add_progress_widgets)
 
@@ -133,7 +137,7 @@ class WinDownloads(WinSystem):
     def remove_progress(self, widget: Progresser, task: CopyFiles):
         try:
             widget.deleteLater()
-            self.copy_threads.remove(task)
+            self.copy_files_list.remove(task)
         except Exception as e:
             Utils.print_err(error=e)
     

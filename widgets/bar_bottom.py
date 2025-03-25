@@ -185,24 +185,15 @@ class BarBottom(QWidget):
         )
 
         self.downloads = SvgBtn(icon_path=DOWNLOADS_SVG , size=20)
-        self.downloads.mouseReleaseEvent = self.open_downloads
-        SignalsApp.all_.btn_downloads_toggle.connect(self.btn_downloads_toggle)
-        self.h_layout.addWidget(
-            self.downloads,
-        )
+        self.downloads.mouseReleaseEvent = self.open_downloads_cmd
+        self.h_layout.addWidget(self.downloads)
 
         self.sett_widget = SvgBtn(SETTINGS_SVG, size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
-        self.h_layout.addWidget(
-            self.sett_widget,
-        )
+        self.h_layout.addWidget(self.sett_widget)
 
         self.custom_slider = CustomSlider()
-        self.h_layout.addWidget(
-            self.custom_slider,
-        )
-
-        self.downloads.hide()
+        self.h_layout.addWidget(self.custom_slider)
 
     def toggle_types(self):
         types = []
@@ -223,15 +214,7 @@ class BarBottom(QWidget):
         t = f"{Lang.type_show}: {types}"
         self.filter_label.setText(t)
 
-    def btn_downloads_toggle(self, flag: Literal["hide", "show"]):
-        if flag == "hide":
-            self.downloads.hide()
-        elif flag == "show":
-            self.downloads.show()
-        else:
-            raise Exception("widgets >bar bottom > btn downloads > wrong flag", flag)
-
-    def open_downloads(self, e: QMouseEvent):
+    def open_downloads_cmd(self, e: QMouseEvent):
         if e.button() == Qt.MouseButton.LeftButton:
             self.open_downloads_win()
 

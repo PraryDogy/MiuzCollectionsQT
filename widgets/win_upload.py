@@ -129,18 +129,12 @@ class WinUpload(WinSystem):
         cmd_ = lambda f: self.reveal_copied_files(files=f)
         thread_ = CopyFiles(dest=dest, files=full_src)
         thread_.signals_.finished_.connect(cmd_)
-
-        SignalsApp.all_.btn_downloads_toggle.emit("show")
         UThreadPool.pool.start(thread_)
 
         self.close()
 
     def reveal_copied_files(self, files: list):
-
         Utils.reveal_files(files)
-
-        if len(CopyFiles.current_threads) == 0:
-            SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:

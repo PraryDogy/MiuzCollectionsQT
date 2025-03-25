@@ -231,16 +231,10 @@ class Save(QAction):
         cmd_ = lambda f: self.reveal_copied_files(files=f)
         thread_ = CopyFiles(dest=dest, files=full_src)
         thread_.signals_.finished_.connect(cmd_)
-
-        SignalsApp.all_.btn_downloads_toggle.emit("show")
         UThreadPool.pool.start(thread_)
 
     def reveal_copied_files(self, files: list):
-
         Utils.reveal_files(files)
-
-        if len(CopyFiles.current_threads) == 0:
-            SignalsApp.all_.btn_downloads_toggle.emit("hide")
 
 
 class MenuTypes(QMenu):
