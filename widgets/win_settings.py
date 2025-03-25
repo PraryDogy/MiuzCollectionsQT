@@ -264,7 +264,7 @@ class BrandSettings(QTabWidget):
             wid = self.brand_sett_ui(brand_ind=Brand.brands_list.index(i))
             self.addTab(wid, i.name)
 
-        self.setCurrentIndex(Brand.current)
+        self.setCurrentIndex(0)
 
     def brand_sett_ui(self, brand_ind: int):
         wid = QWidget()

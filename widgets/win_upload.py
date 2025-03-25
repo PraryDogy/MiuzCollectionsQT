@@ -66,7 +66,7 @@ class WinUpload(WinSystem):
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
 
-        root = Utils.brand_coll_folder(brand_ind=Brand.current)
+        root = Utils.get_brand_coll_folder(brand=Brand.current)
         self.coll_path = os.path.join(root, coll_btn.coll_name)
 
         subfolders: list[os.DirEntry] = [

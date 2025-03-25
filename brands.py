@@ -4,7 +4,7 @@ STOP_COLLS = "stop_colls"
 COLL_FOLDER_PATH = "coll_folder_path"
 
 class Brand:
-    current: int = 0
+    current: "Brand" = None
     brands_list: list["Brand"] = []
     __slots__ = [NAME, COLL_FOLDERS, STOP_COLLS, COLL_FOLDER_PATH]
 
@@ -15,6 +15,10 @@ class Brand:
         self.stop_colls = stop_colls
         self.coll_folder_path: str = None
         Brand.brands_list.append(self)
+
+    @classmethod
+    def init(cls):
+        Brand.current = Brand.brands_list[0]
 
     @classmethod
     def get_data(cls):

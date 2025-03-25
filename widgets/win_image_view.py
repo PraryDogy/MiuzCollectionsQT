@@ -311,7 +311,7 @@ class WinImageView(WinChild):
 
 
     def first_load(self):
-        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
         if not coll_folder:
             OpenWins.smb(self)
 
@@ -327,7 +327,7 @@ class WinImageView(WinChild):
     def load_thumb_fin(self, data: ImageData):
         self.image_label.set_image(data.pixmap)
 
-        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
 
         if coll_folder:
             self.full_src = Utils.get_full_src(coll_folder, self.short_src)
@@ -467,7 +467,7 @@ class WinImageView(WinChild):
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
 
-            coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
+            coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
 
             if coll_folder:
 

@@ -365,7 +365,7 @@ class Grid(QScrollArea):
             if self.selected_widgets:
             
                 wid = self.selected_widgets[-1]
-                coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
+                coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
 
                 if coll_folder:
                     OpenWins.info_db(
@@ -622,7 +622,7 @@ class Grid(QScrollArea):
             self.clear_selected_widgets()
             self.add_and_select_widget(wid=wid)
 
-        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
+        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
         if coll_folder:
             urls = [
                 Utils.get_full_src(coll_folder, i.short_src)

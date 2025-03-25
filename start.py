@@ -67,7 +67,7 @@ from signals import SignalsApp
 from utils.scaner import Scaner
 from utils.utils import UThreadPool
 from widgets.win_main import WinMain
-
+from brands import Brand
 
 class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
@@ -90,6 +90,7 @@ class App(QApplication):
 JsonData.init()
 Dbase.init()
 Lang.init()
+Brand.init()
 
 app = App(sys.argv)
 

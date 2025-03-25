@@ -37,8 +37,7 @@ class CollectionBtn(QLabel):
 
 
     def reveal_collection(self, *args) -> None:
-        coll_folder = Utils.brand_coll_folder(brand_ind=Brand.current)
-
+        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
         if not coll_folder:
             OpenWins.smb(parent_=self.window())
             return
@@ -270,10 +269,10 @@ class MenuLeft(QTabWidget):
             self.addTab(wid, i.name)
             self.menus.append(wid)
         
-        self.setCurrentIndex(Brand.current)
+        self.setCurrentIndex(0)
 
     def tab_cmd(self, index: int):
-        Brand.current = index
+        Brand.current = Brand.brands_list[index]
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
 
