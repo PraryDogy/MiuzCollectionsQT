@@ -195,7 +195,7 @@ class BrandList(QListWidget):
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.contextMenuEvent = self.list_item_context
-        self.brand = brand
+        self.brand_instance = brand
 
         for i in items:
             item_ = QListWidgetItem(i)
@@ -322,15 +322,14 @@ class WinSettings(WinSystem):
         self.smpl_sett = SimpleSettings()
         self.central_layout.addWidget(self.smpl_sett)
 
-        self.brand_sett = BrandSettings()
-        self.central_layout.addWidget(self.brand_sett)
+        self.brand_settings = BrandSettings()
+        self.central_layout.addWidget(self.brand_settings)
 
-
-        rb_sett_cmd = lambda: self.cmd_(wid=self.brand_sett)
+        rb_sett_cmd = lambda: self.cmd_(wid=self.brand_settings)
         self.rb_sett.apply.connect(rb_sett_cmd)
 
         lock_rebootable = lambda: self.cmd_(wid=self.rb_sett)
-        self.brand_sett.apply.connect(lock_rebootable)
+        self.brand_settings.apply.connect(lock_rebootable)
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
@@ -375,12 +374,12 @@ class WinSettings(WinSystem):
             QApplication.quit()
             Utils.start_new_app()
 
-        elif hasattr(self.brand_sett, NEED_REBOOT):
-            for i in self.brand_sett.findChildren(CollFolders):
-                i.brand.coll_folders = i.get_texts()
+        elif hasattr(self.brand_settings, NEED_REBOOT):
+            for i in self.brand_settings.findChildren(CollFolders):
+                i.brand_instance.coll_folders = i.get_texts()
 
-            for i in self.brand_sett.findChildren(StopColls):
-                i.brand.stop_colls = i.get_texts()
+            for i in self.brand_settings.findChildren(StopColls):
+                i.brand_instance.stop_colls = i.get_texts()
 
             JsonData.write_json_data()
             QApplication.quit()
