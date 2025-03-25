@@ -3,6 +3,7 @@ COLL_FOLDERS = "coll_folders"
 STOP_COLLS = "stop_colls"
 
 class Brand:
+    selected: "Brand"
     current: int = 0
     brands_list: list["Brand"] = []
     __slots__ = [NAME, COLL_FOLDERS, STOP_COLLS]

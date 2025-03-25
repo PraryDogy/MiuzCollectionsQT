@@ -28,6 +28,11 @@ class ScanerBrand:
         self.collfolder = collfolder
 
 
+class BrandManager:
+    temp_selected: Brand
+
+
+
 class ScanerTools:
     can_scan: bool = True
 
