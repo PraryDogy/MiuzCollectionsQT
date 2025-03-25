@@ -231,47 +231,20 @@ class JsonData:
                 json_data = cls._get_data()
             
         for k, v in json_data.items():
-
             if hasattr(cls, k):
-
                 if type(v) == type(getattr(cls, k)):
                     setattr(cls, k, v)
-
                 else:
                     print("Несоответствие типа, ключ:", k)
 
-        for brand in Brand.brands_list:
-
-            # в json словарике информация о брендах хранится в формате:
-            # имя_бренда: {var_coll_folders: [str], var_stop_colls: [str]}
-
-            brand_data: dict = json_data.get(brand.name)
-            coll_folders = brand_data.get(Brand.var_coll_folders)
-            stop_colls = brand_data.get(Brand.var_stop_colls)
-            brand.coll_folders = coll_folders
-            brand.stop_colls = stop_colls
-
-        for i in Brand.brands_list:
-            print(i.stop_colls)
+        Brand.setup_brands(json_data=json_data)
 
     @classmethod
     def write_json_data(cls):
 
         with open(Static.JSON_FILE, 'w', encoding="utf-8") as f:
-
             data = cls._get_data()
-
-            # в json словарике информация о брендах хранится в формате:
-            # имя_бренда: {var_coll_folders: [str], var_stop_colls: [str]}
-
-            brands = {
-                brand.name: {
-                    Brand.var_coll_folders: brand.coll_folders,
-                    Brand.var_stop_colls: brand.stop_colls
-                    }
-                for brand in Brand.brands_list
-            }
-
+            brands = Brand.get_data()
             data.update(brands)
 
             json.dump(

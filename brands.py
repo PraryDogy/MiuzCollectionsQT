@@ -1,22 +1,40 @@
+NAME = "name"
+COLL_FOLDERS = "coll_folders"
+STOP_COLLS = "stop_colls"
+
 class Brand:
     current: int = 0
     brands_list: list["Brand"] = []
-
-    # имена соответствуют аттрибутам класса Brand: coll_folders и stop_colls
-    # нельзя менять
-    var_name = "name"
-    var_coll_folders = "coll_folders"
-    var_stop_colls = "stop_colls"
-
-    __slots__ = [var_name, var_coll_folders, var_stop_colls]
+    __slots__ = [NAME, COLL_FOLDERS, STOP_COLLS]
 
     def __init__(self, name: str, coll_folders: list[str], stop_colls: list[str]):
         super().__init__()
         self.name = name
         self.coll_folders = coll_folders
         self.stop_colls = stop_colls
-
         Brand.brands_list.append(self)
+
+    @classmethod
+    def get_data(cls):
+        return {
+            brand.name: {
+                COLL_FOLDERS: brand.coll_folders,
+                STOP_COLLS: brand.stop_colls
+            }
+            for brand in Brand.brands_list
+        }
+    
+    @classmethod
+    def setup_brands(cls, json_data: dict):
+        for brand in Brand.brands_list:
+            new_data: dict = json_data.get(brand.name)
+            if new_data:
+                brand.coll_folders = new_data.get(COLL_FOLDERS)
+                brand.stop_colls = new_data.get(STOP_COLLS)
+
+        # for brand in Brand.brands_list:
+        #     print(brand.stop_colls)
+        #     print(brand.coll_folders)
 
 Brand(
     name="miuz",
