@@ -149,10 +149,10 @@ class WinDownloads(WinSystem):
         self.v_layout.addWidget(self.progress_wid)
         self.v_layout.addStretch()
 
-        for i in range(0, 3):
-            test = Progresser(text='123')
-            test.progress.setValue(50)
-            self.progress_layout.addWidget(test)
+        # for i in range(0, 3):
+        #     test = Progresser(text='123')
+        #     test.progress.setValue(50)
+        #     self.progress_layout.addWidget(test)
 
         self.add_progress_widgets()
 
