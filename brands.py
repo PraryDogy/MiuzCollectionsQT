@@ -4,7 +4,6 @@ STOP_COLLS = "stop_colls"
 COLL_FOLDER_PATH = "coll_folder_path"
 
 class Brand:
-    selected: "Brand"
     current: int = 0
     brands_list: list["Brand"] = []
     __slots__ = [NAME, COLL_FOLDERS, STOP_COLLS, COLL_FOLDER_PATH]
