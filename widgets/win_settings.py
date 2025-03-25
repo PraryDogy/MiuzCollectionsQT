@@ -231,7 +231,7 @@ class BrandList(QListWidget):
         self.takeItem(row)
         self.changed.emit()
 
-    def get_texts(self):
+    def get_items(self):
         return [
             self.item(i).text()
             for i in range(self.count())
@@ -376,10 +376,10 @@ class WinSettings(WinSystem):
 
         elif hasattr(self.brand_settings, NEED_REBOOT):
             for i in self.brand_settings.findChildren(CollFolders):
-                i.brand_instance.coll_folders = i.get_texts()
+                i.brand_instance.coll_folders = i.get_items()
 
             for i in self.brand_settings.findChildren(StopColls):
-                i.brand_instance.stop_colls = i.get_texts()
+                i.brand_instance.stop_colls = i.get_items()
 
             JsonData.write_json_data()
             QApplication.quit()
