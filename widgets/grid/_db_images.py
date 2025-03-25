@@ -7,7 +7,8 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import Dynamic, Filters, JsonData, Static
+from cfg import Dynamic, JsonData, Static
+from filters import Filter
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, Utils
@@ -171,8 +172,8 @@ class DbImages(URunnable):
     
     def build_exclusion_condition(
             self,
-            user_filters: list[Filters],
-            sys_filters: list[Filters]
+            user_filters: list[Filter],
+            sys_filters: list[Filter]
         ) -> sqlalchemy.ColumnElement:
         """
         Формирует SQLAlchemy условие для исключения строк, которые соответствуют
@@ -203,7 +204,7 @@ class DbImages(URunnable):
 
     def build_inclusion_condition(
             self,
-            user_filters: list[Filters]
+            user_filters: list[Filter]
         ) -> list[sqlalchemy.BinaryExpression[bool]]:
         """
         Формирует SQLAlchemy условие для включения строк, соответствующих
@@ -229,7 +230,7 @@ class DbImages(URunnable):
         ]
         return conditions
 
-    def group_filters(self) -> tuple[list[Filters], list[Filters]]:
+    def group_filters(self) -> tuple[list[Filter], list[Filter]]:
         """
         Разделяет фильтры на пользовательские и системные.
 
@@ -244,10 +245,10 @@ class DbImages(URunnable):
                 - user_filters: Список пользовательских фильтров.
                 - sys_filters: Список системных фильтров.
         """
-        user_filters: list[Filters] = []
-        sys_filters: list[Filters] = []
+        user_filters: list[Filter] = []
+        sys_filters: list[Filter] = []
 
-        for i in Filters.current:
+        for i in Filter.filters_list:
             if i.system:
                 sys_filters.append(i)
             else:

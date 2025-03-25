@@ -165,44 +165,6 @@ class Static:
     IMAGES_GRID_SPACING = 2
 
 
-class Filters:
-    current: list["Filters"] = []
-    __slots__ = ["names", "real", "value", "system"]
-
-    def __init__(self, names: list, real: str, value: bool, system: bool):
-        self.names = names
-        self.real = real
-        self.value = value
-        self.system = system
-    
-    @classmethod
-    def init_filters(cls):
-        # длина names должна соответстовать количеству языков из 
-        # lang > Lang
-        # real это реальное имя папки по которой будет фильтрация
-        # system не трогать, всегда False
-        cls.current = [
-                    Filters(
-                        names=["Продукт", "Product"],
-                        real="1 IMG",
-                        value=False,
-                        system=False
-                    ),
-                    Filters(
-                        names=["Модели", "Model"], 
-                        real="2 MODEL IMG", 
-                        value=False, 
-                        system=False
-                    ),
-                    Filters(
-                        names=["Остальное", "Other"], 
-                        real=None, 
-                        value=False, 
-                        system=True
-                    ),
-                ]
-
-
 class JsonData:
 
     # ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ ЕСЛИ ЕЩЕ НЕТ КОНФИГ ФАЙЛА В APP_SUPPORT
@@ -380,9 +342,6 @@ class JsonData:
         # если версии не совпадают то что то нужно сделать
         # например копировать новые файлы или ...
         cls._compare_versions()
-
-        # инициируем пользовательские фильтры
-        Filters.init_filters()
 
 
 class Dynamic:

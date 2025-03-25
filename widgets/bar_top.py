@@ -6,8 +6,8 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextCustom, LayoutHor
-from base_widgets.svg_btn import SvgBtn
-from cfg import Dynamic, Filters, JsonData, Static
+from cfg import Dynamic, JsonData, Static
+from filters import Filter
 from lang import Lang
 from signals import SignalsApp
 
@@ -91,7 +91,7 @@ class DatesBtn(BarTopBtn):
 
 
 class FilterBtn(BarTopBtn):
-    def __init__(self, filter: Filters):
+    def __init__(self, filter: Filter):
         super().__init__(text=filter.names[JsonData.lang_ind])
 
         self.filter = filter
@@ -155,7 +155,7 @@ class BarTop(QWidget):
     def init_ui(self):
         self.filter_btns.clear()
 
-        for filter in Filters.current:
+        for filter in Filter.filters_list:
             label = FilterBtn(filter)
             self.filter_btns.append(label)
             self.h_layout.addWidget(
@@ -193,5 +193,5 @@ class BarTop(QWidget):
             i: FilterBtn
             i.set_normal_style()
 
-        for filter in Filters.current:
+        for filter in Filter.filters_list:
             filter.value = False

@@ -8,9 +8,10 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QScrollArea, QSizePolicy, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
-from cfg import Dynamic, Filters, JsonData, Static, ThumbData
+from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from signals import SignalsApp
+from filters import Filter
 from utils.utils import UThreadPool, Utils
 
 from ..actions import (CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
@@ -43,7 +44,7 @@ class NoImagesLabel(QLabel):
 
         enabled_filters = [
             filter.names[JsonData.lang_ind].lower()
-            for filter in Filters.current
+            for filter in Filter.filters_list
             if filter.value
             ]
 
