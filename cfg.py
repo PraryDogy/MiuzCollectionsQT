@@ -220,7 +220,7 @@ class JsonData:
 
         with open(Static.JSON_FILE, 'w', encoding="utf-8") as f:
             data = cls._get_data()
-            brands = Brand.get_data()
+            brands = Brand.get_brands_data()
             data.update(brands)
 
             json.dump(

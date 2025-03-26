@@ -21,7 +21,8 @@ class Brand:
         Brand.current = Brand.brands_list[0]
 
     @classmethod
-    def get_data(cls):
+    def get_brands_data(cls):
+        """возвращает данные о брендах в виде словаря"""
         return {
             brand.name: {
                 COLL_FOLDERS: brand.coll_folders,
@@ -38,9 +39,6 @@ class Brand:
                 brand.coll_folders = new_data.get(COLL_FOLDERS)
                 brand.stop_colls = new_data.get(STOP_COLLS)
 
-        # for brand in Brand.brands_list:
-        #     print(brand.stop_colls)
-        #     print(brand.coll_folders)
 
 Brand(
     name="miuz",
