@@ -150,13 +150,19 @@ class WinDownloads(WinSystem):
         for files_list in CopyFiles.list_of_file_lists:
             if files_list not in self.download_items:
                 item = OldDownloadsItem(files=files_list)
-                one = lambda: CopyFiles.list_of_file_lists.remove(files_list)
+                one = lambda: self.remove_from_file_lists(files_list=files_list)
                 item.stop_btn_pressed.connect(one)
                 item.stop_btn_pressed.connect(item.deleteLater)
                 self.progress_layout.addWidget(item)
                 self.download_items.append(files_list)
 
         QTimer.singleShot(1000, self.add_progress_widgets)
+
+    def remove_from_file_lists(self, files_list: list[str]):
+        try:
+            CopyFiles.list_of_file_lists.remove(files_list)
+        except Exception:
+            ...
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):
