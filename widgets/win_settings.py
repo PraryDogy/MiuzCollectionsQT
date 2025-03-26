@@ -316,8 +316,8 @@ class WinSettings(WinSystem):
     def init_ui(self):
         self.central_layout.setSpacing(10)
 
-        self.rb_sett = RebootableSettings()
-        self.central_layout.addWidget(self.rb_sett)
+        self.rebootable_settings = RebootableSettings()
+        self.central_layout.addWidget(self.rebootable_settings)
 
         self.smpl_sett = SimpleSettings()
         self.central_layout.addWidget(self.smpl_sett)
@@ -326,9 +326,9 @@ class WinSettings(WinSystem):
         self.central_layout.addWidget(self.brand_settings)
 
         rb_sett_cmd = lambda: self.cmd_(wid=self.brand_settings)
-        self.rb_sett.apply.connect(rb_sett_cmd)
+        self.rebootable_settings.apply.connect(rb_sett_cmd)
 
-        lock_rebootable = lambda: self.cmd_(wid=self.rb_sett)
+        lock_rebootable = lambda: self.cmd_(wid=self.rebootable_settings)
         self.brand_settings.apply.connect(lock_rebootable)
 
         btns_wid = QWidget()
@@ -358,16 +358,13 @@ class WinSettings(WinSystem):
 
     def ok_cmd(self, *args):
 
-        if hasattr(self.rb_sett.reset_btn, NEED_REBOOT):
-
+        if hasattr(self.rebootable_settings.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
             QApplication.quit()
-
             Utils.rm_rf(folder_path=Static.APP_SUPPORT_DIR)
-
             Utils.start_new_app()
 
-        elif hasattr(self.rb_sett.lang_btn, NEED_REBOOT):
+        elif hasattr(self.rebootable_settings.lang_btn, NEED_REBOOT):
             JsonData.lang_ind += 1
             Lang.init()
             JsonData.write_json_data()
