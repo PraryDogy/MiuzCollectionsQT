@@ -28,7 +28,8 @@ class UpdaterMain(QObject):
                     os.remove(destination)
 
                 shutil.copy2(update_file_path, destination)
-                subprocess.run(["open", "-R", destination])
+                # subprocess.run(["open", "-R", destination])
+                subprocess.run(["open", destination])
 
                 self.finished_.emit()
                 return True
