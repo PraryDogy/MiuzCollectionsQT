@@ -35,7 +35,6 @@ class CollectionBtn(QLabel):
         self.coll_name = coll_name
         self.short_name = short_name
 
-
     def reveal_collection(self, *args) -> None:
         coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
         if not coll_folder:
@@ -269,7 +268,8 @@ class MenuLeft(QTabWidget):
             self.addTab(wid, i.name)
             self.menus.append(wid)
         
-        self.setCurrentIndex(0)
+        current_index = Brand.brands_list.index(Brand.current)
+        self.setCurrentIndex(current_index)
 
     def tab_cmd(self, index: int):
         Brand.current = Brand.brands_list[index]
