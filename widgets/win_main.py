@@ -79,8 +79,8 @@ class WinMain(WinFrameless):
         bar_bottom = BarBottom()
         right_lay.addWidget(bar_bottom)
 
-        SignalsApp.all_.win_main_cmd.connect(self.win_main_cmd)
-        SignalsApp.all_.win_main_cmd.emit("set_title")
+        SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
+        SignalsApp.instance.win_main_cmd.emit("set_title")
         QTimer.singleShot(100, self.after_start)
         grid.setFocus()
 
@@ -148,7 +148,7 @@ class WinMain(WinFrameless):
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                SignalsApp.all_.wid_search_cmd.emit("focus")
+                SignalsApp.instance.wid_search_cmd.emit("focus")
 
         elif a0.key() == Qt.Key.Key_Escape:
             a0.ignore()
@@ -157,13 +157,13 @@ class WinMain(WinFrameless):
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if Dynamic.thumb_size_ind < 3:
                     Dynamic.thumb_size_ind += 1
-                    SignalsApp.all_.slider_change_value.emit(Dynamic.thumb_size_ind)
+                    SignalsApp.instance.slider_change_value.emit(Dynamic.thumb_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if Dynamic.thumb_size_ind > 0:
                     Dynamic.thumb_size_ind -= 1
-                    SignalsApp.all_.slider_change_value.emit(Dynamic.thumb_size_ind)
+                    SignalsApp.instance.slider_change_value.emit(Dynamic.thumb_size_ind)
 
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()

@@ -28,7 +28,7 @@ class CopyFiles(URunnable):
     @URunnable.set_running_state
     def run(self):
 
-        SignalsApp.all_.win_downloads_open.emit()
+        SignalsApp.instance.win_downloads_open.emit()
 
         copied_size = 0
         files_dests = []
@@ -74,7 +74,7 @@ class CopyFiles(URunnable):
 
         self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
-        SignalsApp.all_.win_downloads_close.emit()
+        SignalsApp.instance.win_downloads_close.emit()
 
         CopyFiles.list_of_file_lists.append(files_dests)
         CopyFiles.current_threads.remove(self)

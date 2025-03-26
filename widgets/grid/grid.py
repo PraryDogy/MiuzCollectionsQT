@@ -79,7 +79,7 @@ class UpBtn(QFrame):
         v_layout.addWidget(self.svg)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        SignalsApp.all_.grid_thumbnails_cmd.emit(TO_TOP)
+        SignalsApp.instance.grid_thumbnails_cmd.emit(TO_TOP)
         return super().mouseReleaseEvent(a0)
     
 
@@ -108,9 +108,9 @@ class Grid(QScrollArea):
         )
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
-        SignalsApp.all_.grid_thumbnails_cmd.connect(self.signals_cmd)
-        SignalsApp.all_.win_img_view_open_in.connect(self.open_in_view)
-        SignalsApp.all_.grid_thumbnails_cmd.emit(RELOAD)
+        SignalsApp.instance.grid_thumbnails_cmd.connect(self.signals_cmd)
+        SignalsApp.instance.win_img_view_open_in.connect(self.open_in_view)
+        SignalsApp.instance.grid_thumbnails_cmd.emit(RELOAD)
 
     def signals_cmd(self, flag: str):
         if flag == RESIZE:

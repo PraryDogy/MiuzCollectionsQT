@@ -210,4 +210,4 @@ class Thumbnail(QFrame, CellWid):
 
         # удаляем из избранного и если это избранные то обновляем сетку
         if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
-            SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")

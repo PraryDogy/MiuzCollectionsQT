@@ -24,7 +24,7 @@ class ScanerTools:
     @classmethod
     def progressbar_text(cls, text: str):
         try:
-            SignalsApp.all_.progressbar_text.emit(text)
+            SignalsApp.instance.progressbar_text.emit(text)
         except RuntimeError as e:
             pass
 
@@ -32,8 +32,8 @@ class ScanerTools:
     def reload_gui(cls):
         if cls.can_scan:
             try:
-                SignalsApp.all_.menu_left_cmd.emit("reload")
-                SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+                SignalsApp.instance.menu_left_cmd.emit("reload")
+                SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
             except RuntimeError as e:
                 Utils.print_err(error=e)
 

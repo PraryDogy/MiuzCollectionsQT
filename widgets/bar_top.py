@@ -39,7 +39,7 @@ class DatesBtn(BarTopBtn):
     def __init__(self):
         super().__init__(text=Lang.dates)
         self.set_style_cmd: callable = None
-        SignalsApp.all_.btn_dates_style.connect(self.dates_btn_style)
+        SignalsApp.instance.btn_dates_style.connect(self.dates_btn_style)
 
     def dates_btn_style(self, flag: Literal["solid", "normal", "border"]):
         if flag == "solid":
@@ -109,8 +109,8 @@ class FilterBtn(BarTopBtn):
         else:
             self.set_normal_style()
 
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
     
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() != Qt.MouseButton.LeftButton:
@@ -148,7 +148,7 @@ class BarTop(QWidget):
 
         self.filter_btns = []
         self.win_dates = None
-        SignalsApp.all_.bar_top_reset_filters.connect(self.disable_filters)
+        SignalsApp.instance.bar_top_reset_filters.connect(self.disable_filters)
 
         self.init_ui()
 

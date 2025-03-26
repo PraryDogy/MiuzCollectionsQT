@@ -78,12 +78,12 @@ class App(QApplication):
         self.setWindowIcon(icon)
 
         self.installEventFilter(self)
-        self.aboutToQuit.connect(lambda: SignalsApp.all_.win_main_cmd.emit("exit"))
+        self.aboutToQuit.connect(lambda: SignalsApp.instance.win_main_cmd.emit("exit"))
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            if hasattr(SignalsApp.all_, "win_main_cmd"):
-                SignalsApp.all_.win_main_cmd.emit("show")
+            if hasattr(SignalsApp.instance, "win_main_cmd"):
+                SignalsApp.instance.win_main_cmd.emit("show")
         return super().eventFilter(a0, a1)
 
 

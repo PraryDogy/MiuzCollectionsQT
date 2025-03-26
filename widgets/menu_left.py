@@ -159,18 +159,18 @@ class MenuTab(QListWidget):
         Dynamic.grid_offset = 0
         Dynamic.resents = False
 
-        SignalsApp.all_.win_main_cmd.emit("set_title")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.instance.win_main_cmd.emit("set_title")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
 
     def recents_cmd(self, *args):
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
         Dynamic.resents = True
 
-        SignalsApp.all_.win_main_cmd.emit("set_title")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.instance.win_main_cmd.emit("set_title")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
 
     def init_ui(self, menus: list[dict[str, str]]):
 
@@ -256,7 +256,7 @@ class MenuLeft(QTabWidget):
         self.menus: list[MenuTab] = []
 
         self.init_ui()
-        SignalsApp.all_.menu_left_cmd.connect(self.menu_left_cmd)
+        SignalsApp.instance.menu_left_cmd.connect(self.menu_left_cmd)
 
     def init_ui(self):
         self.clear()
@@ -279,9 +279,9 @@ class MenuLeft(QTabWidget):
         for i in self.menus:
             i.setCurrentRow(0)
 
-        SignalsApp.all_.win_main_cmd.emit("set_title")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.instance.win_main_cmd.emit("set_title")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
 
     def menu_left_cmd(self, flag: Literal["reload", "select_all_colls"]):
         if flag == "reload":

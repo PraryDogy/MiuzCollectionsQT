@@ -20,13 +20,13 @@ class DatesTools:
     @classmethod
     def solid_or_normal_style(cls):
         if not Dynamic.date_start:
-            SignalsApp.all_.btn_dates_style.emit("normal")
+            SignalsApp.instance.btn_dates_style.emit("normal")
         else:
-            SignalsApp.all_.btn_dates_style.emit("solid")
+            SignalsApp.instance.btn_dates_style.emit("solid")
 
     @classmethod
     def border_style(cls):
-        SignalsApp.all_.btn_dates_style.emit("border")
+        SignalsApp.instance.btn_dates_style.emit("border")
 
     @classmethod
     def date_to_text(cls, date: datetime):
@@ -250,9 +250,9 @@ class WinDates(WinSystem):
 
         Dynamic.grid_offset = 0
 
-        SignalsApp.all_.btn_dates_style.emit("normal")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.instance.btn_dates_style.emit("normal")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
 
     def clear_btn_cmd(self, *args):
         for i in (self.left_date_wid, self.right_date_wid):
@@ -297,7 +297,7 @@ class WinDates(WinSystem):
         DatesTools.solid_or_normal_style()
         self.close()
 
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
     def cancel_cmd(self, *args):
         DatesTools.solid_or_normal_style()

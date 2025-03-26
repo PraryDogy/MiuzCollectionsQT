@@ -69,7 +69,7 @@ class CustomSlider(BaseSlider):
         self.setValue(Dynamic.thumb_size_ind)
 
         self.valueChanged.connect(self.move_slider_cmd)
-        SignalsApp.all_.slider_change_value.connect(self.move_slider_cmd)
+        SignalsApp.instance.slider_change_value.connect(self.move_slider_cmd)
     
     def move_slider_cmd(self, value: int):
         # Отключаем сигнал valueChanged
@@ -78,7 +78,7 @@ class CustomSlider(BaseSlider):
         # Включаем сигнал обратно
         self.blockSignals(False)
         Dynamic.thumb_size_ind = value
-        SignalsApp.all_.grid_thumbnails_cmd.emit("resize")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("resize")
 
 
 class MyLabel(QLabel):
@@ -165,9 +165,9 @@ class BarBottom(QWidget):
         self.init_ui()
 
         self.downloads_win = None
-        SignalsApp.all_.bar_bottom_filters.connect(self.toggle_types)
-        SignalsApp.all_.win_downloads_open.connect(self.open_downloads_win)
-        SignalsApp.all_.win_downloads_close.connect(self.close_downloads_win)
+        SignalsApp.instance.bar_bottom_filters.connect(self.toggle_types)
+        SignalsApp.instance.win_downloads_open.connect(self.open_downloads_win)
+        SignalsApp.instance.win_downloads_close.connect(self.close_downloads_win)
 
     def init_ui(self):
 
@@ -178,7 +178,7 @@ class BarBottom(QWidget):
 
         self.progress_bar = QLabel(text="")
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignRight)
-        SignalsApp.all_.progressbar_text.connect(self.progress_bar.setText)
+        SignalsApp.instance.progressbar_text.connect(self.progress_bar.setText)
         self.h_layout.addWidget(
             self.progress_bar,
             alignment=Qt.AlignmentFlag.AlignVCenter

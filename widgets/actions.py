@@ -60,6 +60,7 @@ class ScanerRestart(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
+        SignalsApp.instance.progressbar_text.emit(Lang.preparing.capitalize())
         Scaner.stop()
         QTimer.singleShot(5000, Scaner.start)
 
@@ -263,5 +264,5 @@ class MenuTypes(QMenu):
             Dynamic.types.append(type_)
             action_.setChecked(True)
 
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.bar_bottom_filters.emit()
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.bar_bottom_filters.emit()

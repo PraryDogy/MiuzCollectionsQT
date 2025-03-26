@@ -61,7 +61,7 @@ class WidSearch(ULineEdit):
             INPUT_H // 4
         )
 
-        SignalsApp.all_.wid_search_cmd.connect(self.wid_search_cmd)
+        SignalsApp.instance.wid_search_cmd.connect(self.wid_search_cmd)
 
     def wid_search_cmd(self, flag: Literal["focus"]):
         if flag == "focus":
@@ -81,14 +81,14 @@ class WidSearch(ULineEdit):
         self.timer.start()
 
     def delayed_search(self):
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
     def clear_search(self):
         self.clear()
         Dynamic.search_widget_text = None
         Dynamic.grid_offset = 0
-        SignalsApp.all_.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.all_.grid_thumbnails_cmd.emit("to_top")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:

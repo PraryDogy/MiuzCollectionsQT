@@ -21,8 +21,8 @@ class Signals(QObject):
 
 
 class SignalsApp:
-    all_: Signals = None
+    instance: Signals = None
 
     @classmethod
     def init(cls):
-        cls.all_ = Signals()
+        cls.instance = Signals()
