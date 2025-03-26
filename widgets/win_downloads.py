@@ -141,7 +141,8 @@ class WinDownloads(WinSystem):
             if thread not in self.download_items:
                 if thread.is_running:
                     item = CurrentDownloadsItem(files=thread.files)
-                    item.stop_btn_pressed.connect(lambda: thread.signals_.stop.emit())
+                    one = lambda: self.remove_from_file_lists(download_item=thread)
+                    item.stop_btn_pressed.connect(one)
                     item.stop_btn_pressed.connect(item.deleteLater)
                     thread.signals_.value_changed.connect(item.progress_bar.setValue)
                     self.progress_layout.addWidget(item)
@@ -150,7 +151,7 @@ class WinDownloads(WinSystem):
         for files_list in CopyFiles.list_of_file_lists:
             if files_list not in self.download_items:
                 item = OldDownloadsItem(files=files_list)
-                one = lambda: self.remove_from_file_lists(files_list=files_list)
+                one = lambda: self.remove_from_file_lists(download_item=files_list)
                 item.stop_btn_pressed.connect(one)
                 item.stop_btn_pressed.connect(item.deleteLater)
                 self.progress_layout.addWidget(item)
@@ -158,9 +159,13 @@ class WinDownloads(WinSystem):
 
         QTimer.singleShot(1000, self.add_progress_widgets)
 
-    def remove_from_file_lists(self, files_list: list[str]):
+    def remove_from_file_lists(self, download_item: list[str] | CopyFiles):
         try:
-            CopyFiles.list_of_file_lists.remove(files_list)
+            self.download_items.remove(download_item)
+            if isinstance(download_item, list):
+                CopyFiles.list_of_file_lists.remove(download_item)
+            elif isinstance(download_item, CopyFiles):
+                download_item.signals_.stop.emit()
         except Exception:
             ...
 
