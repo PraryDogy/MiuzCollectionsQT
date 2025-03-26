@@ -75,6 +75,12 @@ class OldDownloadsItem(BaseDownloadsItem):
         super().__init__(files=files)
         self.files = files
         self.progress_bar.setValue(100)
+        self.progress_bar.setStyleSheet("""
+            QProgressBar::chunk {
+                background-color: #357227;
+                border-radius: 3px;
+            }
+        """)
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
@@ -112,8 +118,12 @@ class WinDownloads(WinSystem):
         self.v_layout.addStretch()
 
         # for i in range(0, 3):
-        #     test = Progresser(text='123')
-        #     test.progress.setValue(50)
+        #     test = CurrentDownloadsItem([])
+        #     test.progress_bar.setValue(50)
+        #     self.progress_layout.addWidget(test)
+
+        # for i in range(0, 3):
+        #     test = OldDownloadsItem([])
         #     self.progress_layout.addWidget(test)
 
         self.add_progress_widgets()
