@@ -372,10 +372,10 @@ class WinSettings(WinSystem):
             Utils.start_new_app()
 
         elif hasattr(self.brand_settings, NEED_REBOOT):
-            for i in self.brand_settings.findChildren(CollFolders):
+            for i in self.findChildren(CollFolders):
                 i.brand_instance.coll_folders = i.get_items()
 
-            for i in self.brand_settings.findChildren(StopColls):
+            for i in self.findChildren(StopColls):
                 i.brand_instance.stop_colls = i.get_items()
 
             JsonData.write_json_data()
