@@ -316,19 +316,19 @@ class WinSettings(WinSystem):
     def init_ui(self):
         self.central_layout.setSpacing(10)
 
-        self.rebootable_settings = RebootableSettings()
-        self.central_layout.addWidget(self.rebootable_settings)
+        rebootable_settings = RebootableSettings()
+        self.central_layout.addWidget(rebootable_settings)
 
-        self.smpl_sett = SimpleSettings()
-        self.central_layout.addWidget(self.smpl_sett)
+        simple_settings = SimpleSettings()
+        self.central_layout.addWidget(simple_settings)
 
         self.brand_settings = BrandSettings()
         self.central_layout.addWidget(self.brand_settings)
 
-        rb_sett_cmd = lambda: self.cmd_(wid=self.brand_settings)
-        self.rebootable_settings.apply.connect(rb_sett_cmd)
+        rb_sett_cmd = lambda: self.apply_settings(wid=self.brand_settings)
+        rebootable_settings.apply.connect(rb_sett_cmd)
 
-        lock_rebootable = lambda: self.cmd_(wid=self.rebootable_settings)
+        lock_rebootable = lambda: self.apply_settings(wid=rebootable_settings)
         self.brand_settings.apply.connect(lock_rebootable)
 
         btns_wid = QWidget()
@@ -345,33 +345,35 @@ class WinSettings(WinSystem):
 
         btns_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.cancel_btn = QPushButton(text=Lang.cancel)
-        self.cancel_btn.setFixedWidth(100)
-        self.cancel_btn.clicked.connect(self.close)
-        btns_layout.addWidget(self.cancel_btn)
+        cancel_btn = QPushButton(text=Lang.cancel)
+        cancel_btn.setFixedWidth(100)
+        cancel_btn.clicked.connect(self.close)
+        btns_layout.addWidget(cancel_btn)
 
         btns_layout.addStretch(1)
 
-    def cmd_(self, wid: QWidget):
+    def apply_settings(self, wid: QWidget):
         wid.setDisabled(True)
         self.ok_btn.setText(Lang.apply)
 
     def ok_cmd(self, *args):
+        rebootable = self.findChildren(RebootableSettings)[0]
+        brand_settings = self.findChildren(BrandSettings)[0]
 
-        if hasattr(self.rebootable_settings.reset_btn, NEED_REBOOT):
+        if hasattr(rebootable.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
             QApplication.quit()
             Utils.rm_rf(folder_path=Static.APP_SUPPORT_DIR)
             Utils.start_new_app()
 
-        elif hasattr(self.rebootable_settings.lang_btn, NEED_REBOOT):
+        elif hasattr(rebootable.lang_btn, NEED_REBOOT):
             JsonData.lang_ind += 1
             Lang.init()
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
 
-        elif hasattr(self.brand_settings, NEED_REBOOT):
+        elif hasattr(brand_settings, NEED_REBOOT):
             for i in self.findChildren(CollFolders):
                 i.brand_instance.coll_folders = i.get_items()
 
