@@ -23,11 +23,10 @@ class CopyFiles(URunnable):
         self.files = files
         self.dest = dest
 
-        CopyFiles.current_threads.append(self)
-
     @URunnable.set_running_state
     def run(self):
 
+        CopyFiles.current_threads.append(self)
         SignalsApp.instance.win_downloads_open.emit()
 
         copied_size = 0
@@ -49,7 +48,6 @@ class CopyFiles(URunnable):
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             files_dests.append(dest_path)
-            root, filename = os.path.split(file_path)
 
             try:
                 with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
