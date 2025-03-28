@@ -377,6 +377,11 @@ class Grid(QScrollArea):
                 else:
                     OpenWins.smb(self.window())
 
+        elif a0.modifiers() == command and a0.key() == Qt.Key.Key_A:
+            for i in Thumbnail.path_to_wid.values():
+                i.set_frame()
+                self.selected_widgets.append(i)
+
         elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
 
             if self.selected_widgets:
