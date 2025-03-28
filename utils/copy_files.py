@@ -70,9 +70,11 @@ class CopyFiles(URunnable):
 
     def finalize(self, files_dests: list[str]):
 
-        self.signals_.value_changed.emit(100)
-        self.signals_.finished_.emit(files_dests)
-        SignalsApp.instance.win_downloads_close.emit()
+        try:
+            self.signals_.value_changed.emit(100)
+            self.signals_.finished_.emit(files_dests)
+        except RuntimeError:
+            ...
 
         CopyFiles.list_of_file_lists.append(files_dests)
         CopyFiles.current_threads.remove(self)

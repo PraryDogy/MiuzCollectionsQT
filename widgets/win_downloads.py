@@ -24,6 +24,9 @@ class BaseDownloadsItem(QWidget):
     def __init__(self, files: list[str]):
         super().__init__()
 
+        t = "\n".join(os.path.basename(i) for i in files)
+        self.setToolTip(t)
+
         v_layout = LayoutVer()
         v_layout.setContentsMargins(10, 0, 20, 0)
         self.setLayout(v_layout)
@@ -144,6 +147,8 @@ class WinDownloads(WinSystem):
                     one = lambda: self.remove_from_file_lists(download_item=thread)
                     item.stop_btn_pressed.connect(one)
                     item.stop_btn_pressed.connect(item.deleteLater)
+                    thread.signals_.finished_.connect(one)
+                    thread.signals_.finished_.connect(item.deleteLater)
                     thread.signals_.value_changed.connect(item.progress_bar.setValue)
                     self.progress_layout.addWidget(item)
                     self.download_items.append(thread)
