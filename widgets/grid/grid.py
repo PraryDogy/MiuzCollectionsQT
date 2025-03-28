@@ -642,7 +642,9 @@ class Grid(QScrollArea):
             for i in urls
             ]
 
-        self.mime_data.setUrls(urls)
+        if urls:
+            self.mime_data.setUrls(urls)
+
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.DropAction.CopyAction)
 
