@@ -13,9 +13,10 @@ from base_widgets.input import ULineEdit
 from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
 from lang import Lang
+from main_folders import MainFolder
 from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
-from main_folders import MainFolder
+
 from .actions import OpenWins
 
 WIN_SIZE = (430, 550)
@@ -303,6 +304,15 @@ class MainFolderTab(QTabWidget):
     def list_changed(self):
         self.apply.emit()
         setattr(self, NEED_REBOOT, True)
+
+    def contextMenuEvent(self, a0):
+        menu = ContextCustom(event=a0)
+
+        add_main_folder = QAction(parent=menu, text="Добавить папку")
+        menu.addAction(add_main_folder)
+
+        menu.show_menu()
+        return super().contextMenuEvent(a0)
 
 
 class WinSettings(WinSystem):
