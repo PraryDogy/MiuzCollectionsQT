@@ -151,7 +151,11 @@ class WinMain(WinFrameless):
                 SignalsApp.instance.wid_search_cmd.emit("focus")
 
         elif a0.key() == Qt.Key.Key_Escape:
-            a0.ignore()
+            if self.isFullScreen():
+                self.showNormal()
+                self.raise_()
+            else:
+                a0.ignore()
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:

@@ -454,7 +454,11 @@ class WinImageView(WinChild):
             self.switch_image(1)
 
         elif ev.key() == Qt.Key.Key_Escape:
-            self.close_(ev)
+            if self.isFullScreen():
+                self.showNormal()
+                self.raise_()
+            else:
+                self.close_(ev)
 
         elif ev.key() == Qt.Key.Key_Equal:
             self.image_label.zoom_in()
