@@ -272,16 +272,16 @@ class Lang_:
         "Reveal"
     ]
     reveal_in_finder = [
-        "Показать выбранные объекты в Finder",
-        "Reveal selected objects in Finder"
+        "Показать в Finder",
+        "Reveal in Finder"
     ]
     save_image_downloads = [
-        "Сохранить выбранные объекты в загрузки",
-        "Save selected objects to Downloads"
+        "Сохранить в загрузки",
+        "Save to Downloads"
     ]
     save_image_in = [
-        "Сохранить выбранные объекты как",
-        "Save selected objects as"
+        "Сохранить как",
+        "Save as"
     ]
     search = [
         "Поиск",
