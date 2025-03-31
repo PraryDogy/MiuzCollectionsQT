@@ -18,7 +18,7 @@ from utils.utils import UThreadPool, Utils
 
 from .actions import OpenWins
 
-WIN_SIZE = (430, 550)
+WIN_SIZE = (430, 580)
 NEED_REBOOT = "___need_reboot___"
 STOP_COLLS = "STOP_COLLS"
 COLL_FOLDERS = "COLL_FOLDERS"
@@ -399,9 +399,15 @@ class AddMainFolder(QGroupBox):
     def __init__(self):
         super().__init__()
 
+        v_lay = LayoutVer()
+        self.setLayout(v_lay)
+
+        first_row = QWidget()
+        v_lay.addWidget(first_row)
+
         h_lay = LayoutHor()
         h_lay.setSpacing(15)
-        self.setLayout(h_lay)
+        first_row.setLayout(h_lay)
 
         add_btn = QPushButton(Lang.add_)
         add_btn.mouseReleaseEvent = self.add_btn_cmd
@@ -410,6 +416,21 @@ class AddMainFolder(QGroupBox):
 
         descr = QLabel(Lang.add_main_folder)
         h_lay.addWidget(descr)
+
+        second_row = QWidget()
+        v_lay.addWidget(second_row)
+
+        second_lay = LayoutHor()
+        second_lay.setSpacing(15)
+        second_row.setLayout(second_lay)
+
+        remove_btn = QPushButton(Lang.delete)
+        remove_btn.setFixedWidth(150)
+        second_lay.addWidget(remove_btn)
+
+        remove_descr = QLabel("Удалить папку с коллекциями")
+        second_lay.addWidget(remove_descr)
+
 
     def add_btn_cmd(self, *args):
         self.win = AddMainFolderWin()

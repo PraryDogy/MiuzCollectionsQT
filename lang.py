@@ -444,6 +444,16 @@ class Lang_:
         "New collections folder"
     ]
 
+    delete = [
+        "Удалить",
+        "Remove"
+    ]
+
+    delete_main_folder = [
+        "Удалить папку с коллекциями",
+        "Remove collections folder"
+    ]
+
 class Lang(Lang_):
 
     @classmethod
