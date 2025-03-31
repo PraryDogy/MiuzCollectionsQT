@@ -7,7 +7,7 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from brands import Brand
+from main_folders import MainFolder
 from cfg import JsonData, Static, ThumbData
 from database import CLMN_NAMES, THUMBS, Dbase
 from lang import Lang
@@ -17,8 +17,8 @@ from .utils import URunnable, UThreadPool, Utils
 
 
 class ScanerTools:
-    current_brand: Brand
-    avaiable_brands: list[Brand] = []
+    current_main_folder: MainFolder
+    avaiable_main_folders: list[MainFolder] = []
     can_scan: bool = True
 
     @classmethod
@@ -53,8 +53,8 @@ class FinderImages:
         collections = []
 
         try:
-            coll_folder = ScanerTools.current_brand.coll_folder_path
-            stop_colls = ScanerTools.current_brand.stop_colls
+            coll_folder = ScanerTools.current_main_folder.current_path
+            stop_colls = ScanerTools.current_main_folder.stop_list
 
             for item in os.listdir(coll_folder):
                 item_path = os.path.join(coll_folder, item)
@@ -91,9 +91,9 @@ class FinderImages:
 
     def get_progress_text(self, current: int, total: int) -> str:
         """Формирует текст для прогресс-бара."""
-        brand = ScanerTools.current_brand.name.capitalize()
+        main_folder = ScanerTools.current_main_folder.name.capitalize()
         collection_name = Lang.collection
-        return f"{brand}: {collection_name.lower()} {current} {Lang.from_} {total}"
+        return f"{main_folder}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
     def walk_collection(self, coll: str) -> list[tuple[str, int, int, int]]:
         """Рекурсивно обходит директорию и находит изображения."""
@@ -146,13 +146,13 @@ class DbImages:
             THUMBS.c.mod
             )
         
-        q = q.where(THUMBS.c.brand == ScanerTools.current_brand.name)
+        q = q.where(THUMBS.c.brand == ScanerTools.current_main_folder.name)
 
         # не забываем относительный путь к изображению преобразовать в полный
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
         conn.close()
-        coll_folder = ScanerTools.current_brand.coll_folder_path
+        coll_folder = ScanerTools.current_main_folder.current_path
 
         return {
             short_hash: (
@@ -280,7 +280,7 @@ class DbUpdater:
             return (None, None)
 
     def get_values(self, full_src, full_hash, size, birth, mod, resol):
-        coll_folder = ScanerTools.current_brand.coll_folder_path
+        coll_folder = ScanerTools.current_main_folder.current_path
         return {
             "short_src": Utils.get_short_src(coll_folder, full_src),
             "short_hash": Utils.get_short_hash(full_hash),
@@ -290,7 +290,7 @@ class DbUpdater:
             "resol": resol,
             "coll": Utils.get_coll_name(coll_folder, full_src),
             "fav": 0,
-            "brand": ScanerTools.current_brand.name
+            "brand": ScanerTools.current_main_folder.name
         }
 
     def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
@@ -386,8 +386,8 @@ class DbUpdater:
         total: `len`
         """
 
-        brand = ScanerTools.current_brand.name.capitalize()
-        t = f"{brand}: {text.lower()} {x} {Lang.from_} {total}"
+        main_folder = ScanerTools.current_main_folder.name.capitalize()
+        t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
         ScanerTools.progressbar_text(t)
 
 
@@ -403,12 +403,12 @@ class ScanerThread(URunnable):
 
     @URunnable.set_running_state
     def run(self):
-        for brand in ScanerTools.avaiable_brands:
-            ScanerTools.current_brand = brand
-            self.brand_scan()
-            print("scaner started", brand.name)
+        for main_folder in ScanerTools.avaiable_main_folders:
+            ScanerTools.current_main_folder = main_folder
+            self.main_folder_scan()
+            print("scaner started", main_folder.name)
 
-    def brand_scan(self):
+    def main_folder_scan(self):
         ScanerTools.can_scan = True
         finder_images = FinderImages()
         finder_images = finder_images.run()
@@ -454,16 +454,16 @@ class ScanerShedule(QObject):
             self.wait_timer.start(self.wait_sec)
             return
 
-        ScanerTools.avaiable_brands.clear()
-        ScanerTools.current_brand = None
-        
-        for brand in Brand.brands_list:
-            coll_folder = Utils.get_brand_coll_folder(brand=brand)
-            if coll_folder:
-                brand.coll_folder_path = coll_folder
-                ScanerTools.avaiable_brands.append(brand)
+        ScanerTools.avaiable_main_folders.clear()
+        ScanerTools.current_main_folder = None
 
-        if not ScanerTools.avaiable_brands:
+        for main_folder in MainFolder.list_:
+            main_folder_path = Utils.get_main_folder_path(main_folder=main_folder)
+            if main_folder_path:
+                main_folder.current_path = main_folder_path
+                ScanerTools.avaiable_main_folders.append(main_folder)
+
+        if not ScanerTools.avaiable_main_folders:
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 

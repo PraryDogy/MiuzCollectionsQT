@@ -12,7 +12,7 @@ from utils.utils import URunnable, UThreadPool, Utils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
-from brands import Brand
+from main_folders import MainFolder
 
 
 class OpenWins:
@@ -74,7 +74,7 @@ class OpenInfoDb(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
+        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
         if coll_folder:
             OpenWins.info_db(
                 parent_=self.win_,
@@ -94,7 +94,7 @@ class CopyPath(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
+        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
 
         if coll_folder:
             full_src = Utils.get_full_src(coll_folder, self.short_src)
@@ -119,7 +119,7 @@ class Reveal(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
+        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
         if coll_folder:
             full_src = [
                 Utils.get_full_src(coll_folder, i)
@@ -205,7 +205,7 @@ class Save(QAction):
         self.win_ = win
 
     def cmd_(self):
-        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
+        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
 
         if coll_folder:
 

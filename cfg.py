@@ -3,7 +3,7 @@ import os
 import shutil
 import webbrowser
 from datetime import datetime
-from brands import Brand
+from main_folders import MainFolder
 
 class ThumbData:
 
@@ -33,13 +33,6 @@ class Static:
 
     APP_VER = 1.8
     APP_NAME: str = "Collections"
-
-    # сколько папок с коллекциями программа будет анализировать
-    # для интеграции новой папки с коллекциями нужно
-    # добавить в BRANDS новое произвольное имя
-    # созависимые аттрибуты:
-    # JsonData.collfolders, JsonData.stopcolls
-    # при инициации будет проверка на соответствие длин
 
     # в сетке изображений может отображаться за раз 150 штук
     GRID_LIMIT: int = 100
@@ -184,7 +177,7 @@ class JsonData:
         ]
 
     @classmethod
-    def _get_data(cls) -> dict[str, str]:
+    def get_data(cls) -> dict[str, str]:
         """returns user attibutes and values"""
         return {
             k: v
@@ -195,7 +188,7 @@ class JsonData:
         }
 
     @classmethod
-    def _set_json_data(cls) -> dict:
+    def setup_json_data(cls) -> dict:
 
         with open(Static.JSON_FILE, 'r', encoding="utf-8") as f:
 
@@ -204,7 +197,7 @@ class JsonData:
 
             except json.JSONDecodeError:
                 print("Ошибка чтения json")
-                json_data = cls._get_data()
+                json_data = cls.get_data()
             
         for k, v in json_data.items():
             if hasattr(cls, k):
@@ -213,15 +206,15 @@ class JsonData:
                 else:
                     print("Несоответствие типа, ключ:", k)
 
-        Brand.setup_brands(json_data=json_data)
+        MainFolder.setup_main_folders(json_data=json_data)
 
     @classmethod
     def write_json_data(cls):
 
         with open(Static.JSON_FILE, 'w', encoding="utf-8") as f:
-            data = cls._get_data()
-            brands = Brand.get_brands_data()
-            data.update(brands)
+            data = cls.get_data()
+            main_folders = MainFolder.get_data()
+            data.update(main_folders)
 
             json.dump(
                 obj=data,
@@ -232,7 +225,7 @@ class JsonData:
             )
 
     @classmethod
-    def _check_dirs(cls):
+    def check_dirs(cls):
 
         if not os.path.exists(Static.PRELOAD_FOLDER):
             t = "скачайте _preload.zip и распакуйте в корень проекта"
@@ -309,8 +302,8 @@ class JsonData:
 
     @classmethod
     def init(cls):
-        cls._check_dirs()
-        cls._set_json_data()
+        cls.check_dirs()
+        cls.setup_json_data()
 
         # если версии не совпадают то что то нужно сделать
         # например копировать новые файлы или ...

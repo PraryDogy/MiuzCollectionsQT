@@ -15,7 +15,7 @@ from cfg import JsonData, Static
 from lang import Lang
 from utils.updater import Updater
 from utils.utils import UThreadPool, Utils
-from brands import Brand
+from main_folders import MainFolder
 from .actions import OpenWins
 
 WIN_SIZE = (430, 550)
@@ -140,7 +140,7 @@ class SimpleSettings(QGroupBox):
         OpenWins.smb(self.window())
 
 
-class AddBrandWindow(WinSystem):
+class ItemWindow(WinSystem):
     clicked_ = pyqtSignal(str)
 
     def __init__(self):
@@ -186,20 +186,20 @@ class AddBrandWindow(WinSystem):
         return super().keyPressEvent(a0)
 
 
-class BrandList(QListWidget):
+class BaseListWidget(QListWidget):
     h_ = 25
     changed = pyqtSignal()
 
-    def __init__(self, brand: Brand, items: list[str]):
+    def __init__(self, main_folder: MainFolder, items: list[str]):
         super().__init__()
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.contextMenuEvent = self.list_item_context
-        self.brand_instance = brand
+        self.main_folder_instance = main_folder
 
         for i in items:
             item_ = QListWidgetItem(i)
-            item_.setSizeHint(QSize(self.width(), BrandList.h_))
+            item_.setSizeHint(QSize(self.width(), BaseListWidget.h_))
             item_.item_name = i
             self.addItem(item_)
 
@@ -238,30 +238,30 @@ class BrandList(QListWidget):
         ]
 
     def add_item_cmd(self):
-        win = AddBrandWindow()
+        win = ItemWindow()
         win.clicked_.connect(self.add_item_fin)
         win.center_relative_parent(parent=self.window())
         win.show()
 
     def add_item_fin(self, text: str):
         item_ = QListWidgetItem(text)
-        item_.setSizeHint(QSize(self.width(), BrandList.h_))
+        item_.setSizeHint(QSize(self.width(), BaseListWidget.h_))
         item_.item_name = text
         self.addItem(item_)
         self.changed.emit()
 
 
-class StopColls(BrandList):
-    def __init__(self, brand, items):
-        super().__init__(brand, items)
+class StopColls(BaseListWidget):
+    def __init__(self, main_folder, items):
+        super().__init__(main_folder, items)
 
 
-class CollFolders(BrandList):
-    def __init__(self, brand, items):
-        super().__init__(brand, items)
+class CollFolders(BaseListWidget):
+    def __init__(self, main_folder, items):
+        super().__init__(main_folder, items)
 
 
-class BrandSettings(QTabWidget):
+class MainFolderTab(QTabWidget):
     apply = pyqtSignal()
     h_ = 25
 
@@ -270,14 +270,14 @@ class BrandSettings(QTabWidget):
         self.stop_colls_wid: dict[int, CustomTextEdit] = {}
         self.coll_folders_wid: dict[int, CustomTextEdit] = {}
 
-        for brand in Brand.brands_list:
-            wid = self.brand_sett_ui(brand=brand)
-            self.addTab(wid, brand.name)
+        for main_folder in MainFolder.list_:
+            wid = self.tab_ui(main_folder=main_folder)
+            self.addTab(wid, main_folder.name)
 
-        current_index = Brand.brands_list.index(Brand.current)
+        current_index = MainFolder.list_.index(MainFolder.current)
         self.setCurrentIndex(current_index)
 
-    def brand_sett_ui(self, brand: Brand):
+    def tab_ui(self, main_folder: MainFolder):
         wid = QWidget()
         v_lay = LayoutVer()
         v_lay.setSpacing(10)
@@ -287,14 +287,14 @@ class BrandSettings(QTabWidget):
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         v_lay.addWidget(stop_colls_lbl)
 
-        stop_colls_list = StopColls(brand=brand, items=brand.stop_colls)
+        stop_colls_list = StopColls(main_folder=main_folder, items=main_folder.stop_list)
         stop_colls_list.changed.connect(self.list_changed)
         v_lay.addWidget(stop_colls_list)
 
         coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
         v_lay.addWidget(coll_folders_label)
 
-        coll_folders_list = CollFolders(brand=brand, items=brand.coll_folders)
+        coll_folders_list = CollFolders(main_folder=main_folder, items=main_folder.paths)
         coll_folders_list.changed.connect(self.list_changed)
         v_lay.addWidget(coll_folders_list)
 
@@ -323,14 +323,14 @@ class WinSettings(WinSystem):
         simple_settings = SimpleSettings()
         self.central_layout.addWidget(simple_settings)
 
-        self.brand_settings = BrandSettings()
-        self.central_layout.addWidget(self.brand_settings)
+        self.main_folder_tab = MainFolderTab()
+        self.central_layout.addWidget(self.main_folder_tab)
 
-        rb_sett_cmd = lambda: self.apply_settings(wid=self.brand_settings)
+        rb_sett_cmd = lambda: self.apply_settings(wid=self.main_folder_tab)
         rebootable_settings.apply.connect(rb_sett_cmd)
 
         lock_rebootable = lambda: self.apply_settings(wid=rebootable_settings)
-        self.brand_settings.apply.connect(lock_rebootable)
+        self.main_folder_tab.apply.connect(lock_rebootable)
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
@@ -359,7 +359,7 @@ class WinSettings(WinSystem):
 
     def ok_cmd(self, *args):
         rebootable = self.findChildren(RebootableSettings)[0]
-        brand_settings = self.findChildren(BrandSettings)[0]
+        main_folder_tab = self.findChildren(MainFolderTab)[0]
 
         if hasattr(rebootable.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
@@ -374,12 +374,12 @@ class WinSettings(WinSystem):
             QApplication.quit()
             Utils.start_new_app()
 
-        elif hasattr(brand_settings, NEED_REBOOT):
+        elif hasattr(main_folder_tab, NEED_REBOOT):
             for i in self.findChildren(CollFolders):
-                i.brand_instance.coll_folders = i.get_items()
+                i.main_folder_instance.paths = i.get_items()
 
             for i in self.findChildren(StopColls):
-                i.brand_instance.stop_colls = i.get_items()
+                i.main_folder_instance.stop_list = i.get_items()
 
             JsonData.write_json_data()
             QApplication.quit()

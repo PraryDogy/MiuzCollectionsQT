@@ -12,7 +12,7 @@ from filters import Filter
 from database import THUMBS, Dbase
 from lang import Lang
 from utils.utils import URunnable, Utils
-from brands import Brand
+from main_folders import MainFolder
 
 
 class DbImage:
@@ -128,9 +128,9 @@ class DbImages(URunnable):
             THUMBS.c.fav
             )
         
-        brand_name = Brand.current.name
+        main_folder_name = MainFolder.current.name
         q = q.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
-        q = q.where(THUMBS.c.brand == brand_name)
+        q = q.where(THUMBS.c.brand == main_folder_name)
 
         if Dynamic.resents:
             q = q.order_by(-THUMBS.c.id)

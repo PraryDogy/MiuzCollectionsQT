@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer, SvgBtn
 from base_widgets.wins import WinSystem
-from brands import Brand
+from main_folders import MainFolder
 from cfg import Static
 from lang import Lang
 
@@ -24,9 +24,9 @@ class WinSmb(WinSystem):
         if text:
             self.my_text = text
         else:
-            self.my_text = f"{Brand.current.name.capitalize()}:\n{Lang.choose_coll_smb}"
+            self.my_text = f"{MainFolder.current.name.capitalize()}:\n{Lang.choose_coll_smb}"
 
-        self.setWindowTitle(f"{Brand.current.name.capitalize()}: {Lang.no_connection.lower()}")
+        self.setWindowTitle(f"{MainFolder.current.name.capitalize()}: {Lang.no_connection.lower()}")
 
         self.init_ui()
         self.setFixedSize(330, 80)

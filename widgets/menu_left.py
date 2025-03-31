@@ -15,7 +15,7 @@ from database import THUMBS, Dbase
 from lang import Lang
 from signals import SignalsApp
 from utils.utils import URunnable, UThreadPool, Utils
-from brands import Brand
+from main_folders import MainFolder
 from .actions import OpenWins
 
 
@@ -34,9 +34,10 @@ class CollectionBtn(QLabel):
         self.setStyleSheet("padding-left: 5px;")
         self.coll_name = coll_name
         self.short_name = short_name
+        self.main_folder_index: int = 0 # для win_upload
 
     def reveal_collection(self, *args) -> None:
-        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
+        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
         if not coll_folder:
             OpenWins.smb(parent_=self.window())
             return
@@ -71,9 +72,9 @@ class WorkerSignals(QObject):
 
 
 class LoadMenus(URunnable):
-    def __init__(self, brand_ind: int):
+    def __init__(self, main_folder_index: int):
         super().__init__()
-        self.brand_ind = brand_ind
+        self.main_folder_index = main_folder_index
         self.signals_ = WorkerSignals()
 
     @URunnable.set_running_state
@@ -100,9 +101,9 @@ class LoadMenus(URunnable):
         menus: list[dict] = []
 
         conn = Dbase.engine.connect()
-        brand_name = Brand.brands_list[self.brand_ind].name
+        main_folder_name = MainFolder.list_[self.main_folder_index].name
         q = sqlalchemy.select(THUMBS.c.coll)
-        q = q.where(THUMBS.c.brand == brand_name)
+        q = q.where(THUMBS.c.brand == main_folder_name)
         q = q.distinct()
         res = conn.execute(q).fetchall()
         conn.close()
@@ -111,7 +112,7 @@ class LoadMenus(URunnable):
             res: tuple[str] = (i[0] for i in res if i)
 
         else:
-            print(brand_name, "> left menu > load db colls > no data")
+            print(main_folder_name, "> left menu > load db colls > no data")
             return menus
 
         for coll_name in res:
@@ -131,16 +132,16 @@ class LoadMenus(URunnable):
 class MenuTab(QListWidget):
     h_ = 30
 
-    def __init__(self, brand_ind: int):
+    def __init__(self, main_folder_index: int):
         super().__init__()
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.brand_ind = brand_ind
+        self.main_folder_index = main_folder_index
         self.coll_btns: list[CollectionBtn] = []
         self.setup_task()
 
     def setup_task(self):
-        self.task_ = LoadMenus(brand_ind=self.brand_ind)
+        self.task_ = LoadMenus(main_folder_index=self.main_folder_index)
         self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.pool.start(self.task_)
 
@@ -262,17 +263,17 @@ class MenuLeft(QTabWidget):
         self.clear()
         self.menus.clear()
 
-        for i in Brand.brands_list:
-            brand_ind = Brand.brands_list.index(i)
-            wid = MenuTab(brand_ind=brand_ind)
+        for i in MainFolder.list_:
+            main_folder_index = MainFolder.list_.index(i)
+            wid = MenuTab(main_folder_index=main_folder_index)
             self.addTab(wid, i.name)
             self.menus.append(wid)
         
-        current_index = Brand.brands_list.index(Brand.current)
+        current_index = MainFolder.list_.index(MainFolder.current)
         self.setCurrentIndex(current_index)
 
     def tab_cmd(self, index: int):
-        Brand.current = Brand.brands_list[index]
+        MainFolder.current = MainFolder.list_[index]
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
 

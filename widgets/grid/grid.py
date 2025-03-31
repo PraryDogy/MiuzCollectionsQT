@@ -13,7 +13,7 @@ from lang import Lang
 from signals import SignalsApp
 from filters import Filter
 from utils.utils import UThreadPool, Utils
-from brands import Brand
+from main_folders import MainFolder
 from ..actions import (CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
                        OpenInView, OpenWins, Reveal, Save, ScanerRestart)
 from ._db_images import DbImage, DbImages
@@ -365,7 +365,7 @@ class Grid(QScrollArea):
             if self.selected_widgets:
             
                 wid = self.selected_widgets[-1]
-                coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
+                coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
 
                 if coll_folder:
                     OpenWins.info_db(
@@ -627,7 +627,7 @@ class Grid(QScrollArea):
             self.clear_selected_widgets()
             self.add_and_select_widget(wid=wid)
 
-        coll_folder = Utils.get_brand_coll_folder(brand=Brand.current)
+        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
         if coll_folder:
             urls = [
                 Utils.get_full_src(coll_folder, i.short_src)
