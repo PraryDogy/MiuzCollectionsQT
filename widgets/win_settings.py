@@ -23,6 +23,8 @@ NEED_REBOOT = "___need_reboot___"
 STOP_COLLS = "STOP_COLLS"
 COLL_FOLDERS = "COLL_FOLDERS"
 LIST_ITEM_H = 25
+REMOVE_MAIN_FOLDER_NAME = "REMOVE_MAIN_FOLDER_NAME"
+ADD_NEW_MAIN_FOLDER = "ADD_NEW_MAIN_FOLDER"
 
 class RebootableSettings(QGroupBox):
     apply = pyqtSignal()
@@ -313,7 +315,7 @@ class TabsWidget(QTabWidget):
 
 
 class AddMainFolderWin(WinSystem):
-    ok_pressed = pyqtSignal()
+    ok_pressed = pyqtSignal(object)
 
     def __init__(self):
         super().__init__()
@@ -378,9 +380,7 @@ class AddMainFolderWin(WinSystem):
                 stop_list=stop_list
             )
 
-            MainFolder.list_.append(new_main_folder)
-
-            self.ok_pressed.emit()
+            self.ok_pressed.emit(new_main_folder)
             self.close()
 
     def keyPressEvent(self, a0):
@@ -392,7 +392,7 @@ class AddMainFolderWin(WinSystem):
     
 
 class RemoveMainFolderWin(WinSystem):
-    ok_pressed = pyqtSignal()
+    ok_pressed = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -439,10 +439,10 @@ class RemoveMainFolderWin(WinSystem):
             text = label.text()
             for main_folder in MainFolder.list_:
                 if main_folder.name == text:
-                    MainFolder.list_.remove(main_folder)
+                    self.ok_pressed.emit(text)
+                    self.close()
                     break
-            self.ok_pressed.emit()
-            self.close()
+
     
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
@@ -452,7 +452,7 @@ class RemoveMainFolderWin(WinSystem):
         return super().keyPressEvent(a0)
 
 
-class AddMainFolder(QGroupBox):
+class MainFolderWid(QGroupBox):
     need_lock_widgets = pyqtSignal()
 
     def __init__(self):
@@ -496,8 +496,8 @@ class AddMainFolder(QGroupBox):
 
         # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
         # произошла перезагрузка приложения
-        self.win.ok_pressed.connect(lambda: setattr(self, NEED_REBOOT, True))
-
+        self.win.ok_pressed.connect(lambda obj: setattr(self, NEED_REBOOT, True))
+        self.win.ok_pressed.connect(lambda obj: setattr(self, ADD_NEW_MAIN_FOLDER, obj))
         # сигнал нужен, чтобы при нажатии на "ок" в окне AddMainFolderWin
         # остальные виджеты окна настроек были заблокированы
         self.win.ok_pressed.connect(self.need_lock_widgets.emit)
@@ -509,13 +509,15 @@ class AddMainFolder(QGroupBox):
 
         # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
         # произошла перезагрузка приложения
-        self.win.ok_pressed.connect(lambda: setattr(self, NEED_REBOOT, True))
+        self.win.ok_pressed.connect(lambda text: setattr(self, NEED_REBOOT, True))
+        self.win.ok_pressed.connect(lambda text: setattr(self, REMOVE_MAIN_FOLDER_NAME, text))
 
         # сигнал нужен, чтобы при нажатии на "ок" в окне AddMainFolderWin
         # остальные виджеты окна настроек были заблокированы
         self.win.ok_pressed.connect(self.need_lock_widgets.emit)
         self.win.center_relative_parent(parent=self.window())
         self.win.show()
+
 
 class WinSettings(WinSystem):
     def __init__(self):
@@ -536,7 +538,7 @@ class WinSettings(WinSystem):
         simple_settings = SimpleSettings()
         self.central_layout.addWidget(simple_settings)
 
-        add_main_folder = AddMainFolder()
+        add_main_folder = MainFolderWid()
         add_main_folder.need_lock_widgets.connect(self.lock_widgets)
         self.central_layout.addWidget(add_main_folder)
 
@@ -577,9 +579,9 @@ class WinSettings(WinSystem):
         self.ok_btn.setText(Lang.apply)
 
     def ok_cmd(self, *args):
-        rebootable = self.findChildren(RebootableSettings)[0]
-        main_folder_tab = self.findChildren(TabsWidget)[0]
-        add_main_folder = self.findChildren(AddMainFolder)[0]
+        rebootable = self.findChild(RebootableSettings)
+        main_folder_tab = self.findChild(TabsWidget)
+        main_folder_wid = self.findChild(MainFolderWid)
 
         if hasattr(rebootable.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
@@ -594,7 +596,16 @@ class WinSettings(WinSystem):
             QApplication.quit()
             Utils.start_new_app()
 
-        elif hasattr(add_main_folder, NEED_REBOOT):
+        elif hasattr(main_folder_wid, NEED_REBOOT):
+
+            if hasattr(main_folder_wid, REMOVE_MAIN_FOLDER_NAME):
+                for i in MainFolder.list_:
+                    if i.name == getattr(main_folder_wid, REMOVE_MAIN_FOLDER_NAME):
+                        MainFolder.list_.remove(i)
+
+            elif hasattr(main_folder_wid, ADD_NEW_MAIN_FOLDER):
+                MainFolder.list_.append(getattr(main_folder_wid, ADD_NEW_MAIN_FOLDER))
+
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
