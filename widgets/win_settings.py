@@ -410,6 +410,7 @@ class RemoveMainFolderWin(WinSystem):
             item = QListWidgetItem(list_widget)
             item.setSizeHint(QSize(self.width(), LIST_ITEM_H))
             label = QLabel(main_folder.name)
+            label.setStyleSheet("padding-left: 2px;")
             list_widget.addItem(item)
             list_widget.setItemWidget(item, label)
 
@@ -443,7 +444,6 @@ class RemoveMainFolderWin(WinSystem):
                     self.close()
                     break
 
-    
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.close()
