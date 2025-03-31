@@ -80,8 +80,6 @@ class App(QApplication):
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: SignalsApp.instance.win_main_cmd.emit("exit"))
 
-        print(argv)
-
         if argv[-1] == "noscan":
             Scaner.start = lambda: print("scaner disabled")
             Scaner.stop = lambda: print("scaner disabled")
