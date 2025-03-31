@@ -494,10 +494,8 @@ class Scaner:
 
     @classmethod
     def start(cls):
-        # return
         cls.app.start()
 
     @classmethod
     def stop(cls):
-        # return
         cls.app.stop()

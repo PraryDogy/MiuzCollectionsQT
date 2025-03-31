@@ -80,6 +80,12 @@ class App(QApplication):
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: SignalsApp.instance.win_main_cmd.emit("exit"))
 
+        print(argv)
+
+        if argv[-1] == "noscan":
+            Scaner.start = lambda: print("scaner disabled")
+            Scaner.stop = lambda: print("scaner disabled")
+
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
             if hasattr(SignalsApp.instance, "win_main_cmd"):
