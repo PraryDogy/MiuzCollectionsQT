@@ -145,6 +145,7 @@ class AddItemWindow(WinSystem):
     def __init__(self):
         super().__init__()
         self.setFixedSize(300, 80)
+        self.setWindowTitle(Lang.paste_text)
         self.central_layout.setSpacing(10)
 
         self.text_edit = ULineEdit()
@@ -174,7 +175,6 @@ class AddItemWindow(WinSystem):
 
     def ok_cmd(self):
         text = self.text_edit.text().replace("\n", "").strip()
-
         if text:
             self.clicked_.emit(text)
             self.close()
@@ -182,6 +182,8 @@ class AddItemWindow(WinSystem):
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.close()
+        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.ok_cmd()
         return super().keyPressEvent(a0)
 
 
@@ -318,6 +320,8 @@ class AddMainFolderWin(WinSystem):
     def __init__(self):
         super().__init__()
 
+        self.setWindowTitle(Lang.add_main_folder_title)
+
         self.setFixedSize(450, 400)
         self.central_layout.setSpacing(10)
 
@@ -382,9 +386,10 @@ class AddMainFolderWin(WinSystem):
             self.close()
 
     def keyPressEvent(self, a0):
-
         if a0.key() == Qt.Key.Key_Escape:
             self.close()
+        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.ok_cmd()
         return super().keyPressEvent(a0)
 
 

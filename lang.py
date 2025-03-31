@@ -439,6 +439,10 @@ class Lang_:
         "Name of collections folder"
     ]
 
+    add_main_folder_title = [
+        "Новая папка с коллекциями",
+        "New collections folder"
+    ]
 
 class Lang(Lang_):
 
