@@ -1,6 +1,5 @@
 import os
 import subprocess
-from collections import defaultdict
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
@@ -125,7 +124,6 @@ class SimpleSettings(QGroupBox):
             print(e)
 
     def updater_btn_cmd(self, *args):
-        ...
         self.task = Updater()
         self.updater_btn.setText(Lang.wait_update)
         self.task.signals_.no_connection.connect(self.updater_btn_smb)
@@ -141,7 +139,60 @@ class SimpleSettings(QGroupBox):
         OpenWins.smb(self.window())
 
 
+class AddMainFolderWin(WinSystem):
+    ok_pressed = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+        self.setFixedSize(370, 150)
+        self.central_layout.setSpacing(10)
+
+        descr_widget = QLabel(Lang.add_main_folder_descr)
+        self.central_layout.addWidget(descr_widget)
+
+        self.name_wid = ULineEdit()
+        self.name_wid.setPlaceholderText(Lang.set_name_main_folder)
+        self.central_layout.addWidget(self.name_wid)
+
+        h_wid = QWidget()
+        self.central_layout.addWidget(h_wid)
+
+        h_lay = LayoutHor()
+        h_lay.setSpacing(10)
+        h_wid.setLayout(h_lay)
+
+        h_lay.addStretch()
+
+        ok_btn = QPushButton(Lang.ok)
+        ok_btn.clicked.connect(self.ok_cmd)
+        ok_btn.setFixedWidth(90)
+        h_lay.addWidget(ok_btn)
+
+        cancel_btn = QPushButton(Lang.cancel)
+        cancel_btn.clicked.connect(self.close)
+        cancel_btn.setFixedWidth(90)
+        h_lay.addWidget(cancel_btn)
+
+        h_lay.addStretch()
+
+        self.central_layout.addWidget
+
+    def ok_cmd(self):
+        if self.name_wid.text():
+            self.ok_pressed.emit()
+            self.close()
+
+    def keyPressEvent(self, a0):
+
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close()
+        return super().keyPressEvent(a0)
+
+
 class AddMainFolder(QGroupBox):
+    need_lock_widgets = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
@@ -150,11 +201,25 @@ class AddMainFolder(QGroupBox):
         self.setLayout(h_lay)
 
         add_btn = QPushButton(Lang.add_)
+        add_btn.mouseReleaseEvent = self.add_btn_cmd
         add_btn.setFixedWidth(150)
         h_lay.addWidget(add_btn)
 
         descr = QLabel(Lang.add_main_folder)
         h_lay.addWidget(descr)
+
+    def add_btn_cmd(self, *args):
+        self.win = AddMainFolderWin()
+
+        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
+        # произошла перезагрузка приложения
+        self.win.ok_pressed.connect(lambda: setattr(self, NEED_REBOOT, True))
+
+        # сигнал нужен, чтобы при нажатии на "ок" в окне AddMainFolderWin
+        # остальные виджеты окна настроек были заблокированы
+        self.win.ok_pressed.connect(self.need_lock_widgets.emit)
+        self.win.center_relative_parent(parent=self.window())
+        self.win.show()
 
 
 class ItemWindow(WinSystem):
@@ -279,7 +344,7 @@ class CollFolders(BaseListWidget):
 
 
 class MainFolderTab(QTabWidget):
-    apply = pyqtSignal()
+    need_lock_widgets = pyqtSignal()
     h_ = 25
 
     def __init__(self):
@@ -318,7 +383,11 @@ class MainFolderTab(QTabWidget):
         return wid
     
     def list_changed(self):
-        self.apply.emit()
+        # сигнал нужен, чтобы остальные виджеты окна настроек были заблокированы
+        self.need_lock_widgets.emit()
+
+        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
+        # произошла перезагрузка приложения
         setattr(self, NEED_REBOOT, True)
 
 
@@ -335,19 +404,19 @@ class WinSettings(WinSystem):
         self.central_layout.setSpacing(10)
 
         rebootable_settings = RebootableSettings()
+        rebootable_settings.apply.connect(self.lock_widgets)
         self.central_layout.addWidget(rebootable_settings)
 
         simple_settings = SimpleSettings()
         self.central_layout.addWidget(simple_settings)
 
         add_main_folder = AddMainFolder()
+        add_main_folder.need_lock_widgets.connect(self.lock_widgets)
         self.central_layout.addWidget(add_main_folder)
 
-        self.main_folder_tab = MainFolderTab()
-        self.central_layout.addWidget(self.main_folder_tab)
-
-        rebootable_settings.apply.connect(self.apply_settings)
-        self.main_folder_tab.apply.connect(self.apply_settings)
+        main_folder_tab = MainFolderTab()
+        main_folder_tab.need_lock_widgets.connect(self.lock_widgets)
+        self.central_layout.addWidget(main_folder_tab)
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
@@ -370,7 +439,7 @@ class WinSettings(WinSystem):
 
         btns_layout.addStretch(1)
 
-    def apply_settings(self, *args):
+    def lock_widgets(self, *args):
 
         widgets: list[QWidget] = self.centralWidget().children()
         widgets.pop(-1)
@@ -384,6 +453,7 @@ class WinSettings(WinSystem):
     def ok_cmd(self, *args):
         rebootable = self.findChildren(RebootableSettings)[0]
         main_folder_tab = self.findChildren(MainFolderTab)[0]
+        add_main_folder = self.findChildren(AddMainFolder)[0]
 
         if hasattr(rebootable.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
@@ -394,6 +464,11 @@ class WinSettings(WinSystem):
         elif hasattr(rebootable.lang_btn, NEED_REBOOT):
             JsonData.lang_ind += 1
             Lang.init()
+            JsonData.write_json_data()
+            QApplication.quit()
+            Utils.start_new_app()
+
+        elif hasattr(add_main_folder, NEED_REBOOT):
             JsonData.write_json_data()
             QApplication.quit()
             Utils.start_new_app()

@@ -169,11 +169,11 @@ class JsonData:
     # как часто utils > scaner будет просматривать collfolders на изменения
     scaner_minutes: int = 5
     
-    udpdate_file_paths = [
-        '/Volumes/Shares/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-        '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-        '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
-        '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/MiuzCollections.zip',
+    udpdate_file_paths_ = [
+        '/Volumes/Shares/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
+        '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
+        '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
+        '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
         ]
 
     @classmethod

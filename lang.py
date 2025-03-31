@@ -425,6 +425,21 @@ class Lang_:
         "Calculating"
     ]
 
+    add_main_folder_descr = [
+        "Задайте имя папки с коллекциями\n"
+        "Нажмите ок и добавьте в расположениe коллекций\n"
+        "путь к папке с коллекциями",
+        "Set the name of the folder with collections\n"
+        "Click OK and add the path to the folder\n"
+        "with collections to the collection location"
+    ]
+
+    set_name_main_folder = [
+        "Задайте имя папки с коллекциями",
+        "Set the name of collections folder"
+    ]
+
+
 class Lang(Lang_):
 
     @classmethod

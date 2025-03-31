@@ -17,7 +17,7 @@ class UpdaterMain(QObject):
         super().__init__()
 
     def go(self):
-        for update_file_path in JsonData.udpdate_file_paths:
+        for update_file_path in JsonData.udpdate_file_paths_:
 
             if os.path.exists(update_file_path):
 
