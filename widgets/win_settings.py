@@ -396,8 +396,9 @@ class RemoveMainFolderWin(WinSystem):
 
     def __init__(self):
         super().__init__()
+        self.setWindowTitle(Lang.delete_main_folder)
 
-        self.setFixedSize(300, 300)
+        self.setFixedSize(330, 300)
         self.central_layout.setSpacing(5)
 
         list_widget = QListWidget(self)
@@ -447,7 +448,7 @@ class RemoveMainFolderWin(WinSystem):
         if a0.key() == Qt.Key.Key_Escape:
             self.close()
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-            ...
+            self.ok_cmd()
         return super().keyPressEvent(a0)
 
 
