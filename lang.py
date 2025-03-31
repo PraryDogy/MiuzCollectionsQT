@@ -426,17 +426,17 @@ class Lang_:
     ]
 
     add_main_folder_descr = [
-        "Задайте имя папки с коллекциями\n"
-        "Нажмите ок и добавьте в расположениe коллекций\n"
-        "путь к папке с коллекциями",
+        "Имя папки с коллекциями: произвольно\n"
+        "Игнорировать коллекции: необязательно к заполнению\n"
+        "Расположение коллекций: добавьте путь к папке с коллекциями",
         "Set the name of the folder with collections\n"
         "Click OK and add the path to the folder\n"
         "with collections to the collection location"
     ]
 
     set_name_main_folder = [
-        "Задайте имя папки с коллекциями",
-        "Set the name of collections folder"
+        "Имя папки с коллекциями",
+        "Name of collections folder"
     ]
 
 

@@ -139,7 +139,7 @@ class SimpleSettings(QGroupBox):
         OpenWins.smb(self.window())
 
 
-class ItemWindow(WinSystem):
+class AddItemWindow(WinSystem):
     clicked_ = pyqtSignal(str)
 
     def __init__(self):
@@ -241,7 +241,7 @@ class ListWidget(QListWidget):
         ]
 
     def add_item_cmd(self):
-        win = ItemWindow()
+        win = AddItemWindow()
         win.clicked_.connect(self.add_item_fin)
         win.center_relative_parent(parent=self.window())
         win.show()
@@ -318,7 +318,7 @@ class AddMainFolderWin(WinSystem):
     def __init__(self):
         super().__init__()
 
-        self.setFixedSize(370, 400)
+        self.setFixedSize(450, 400)
         self.central_layout.setSpacing(10)
 
         descr_widget = QLabel(Lang.add_main_folder_descr)
