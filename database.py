@@ -32,20 +32,6 @@ THUMBS = sqlalchemy.Table(
     sqlalchemy.Column(ThumbColumns.BRAND, sqlalchemy.Text, comment="miuz, panacea"),
 )
 
-# THUMBS = sqlalchemy.Table(
-#     "thumbs", METADATA,
-#     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-#     sqlalchemy.Column("short_src", sqlalchemy.Text),
-#     sqlalchemy.Column("short_hash", sqlalchemy.Text, comment="Путь к маленькой картинке"),
-#     sqlalchemy.Column("size", sqlalchemy.Integer, comment="Размер"),
-#     sqlalchemy.Column("birth", sqlalchemy.Integer, comment="Дата созд."),
-#     sqlalchemy.Column("mod", sqlalchemy.Integer, comment="Дата изм."),
-#     sqlalchemy.Column("resol", sqlalchemy.TEXT, comment="1920x1080"),
-#     sqlalchemy.Column("coll", sqlalchemy.Text, comment="Имя коллекции"),
-#     sqlalchemy.Column("fav", sqlalchemy.Integer, comment="1 is fav else 0"),
-#     sqlalchemy.Column("brand", sqlalchemy.TEXT, comment="miuz, panacea"),
-#     )
-
 
 class Dbase:
     engine: sqlalchemy.Engine = None

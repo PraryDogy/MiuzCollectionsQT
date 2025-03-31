@@ -255,9 +255,16 @@ class DbUpdater:
 
             if os.path.exists(full_hash):
 
-                self.progressbar_text(text=Lang.deleting, x=x, total=total)
-                os.remove(full_hash)
-                sleep(self.sleep_count)
+                try:
+                    self.progressbar_text(text=Lang.deleting, x=x, total=total)
+                    os.remove(full_hash)
+                    folder = os.path.dirname(full_hash)
+                    if not os.listdir(folder):
+                        os.rmdir(folder)
+                    sleep(self.sleep_count)
+                except Exception as e:
+                    Utils.print_err(error=e)
+                    continue
 
         if total > 0:
             ScanerTools.reload_gui()
@@ -391,6 +398,82 @@ class DbUpdater:
         ScanerTools.progressbar_text(t)
 
 
+class MainFolderRemover:
+    """Удаляет изображения из hashdir и записи БД, если MainFolder больше не в списке"""
+
+    @classmethod
+    def run(cls):
+        conn = Dbase.engine.connect()
+        q = sqlalchemy.select(THUMBS.c.brand).distinct()
+        res = conn.execute(q).fetchall()
+        db_main_folders = [
+            i[0]
+            for i in res
+        ]
+        app_main_folders = [
+            i.name
+            for i in MainFolder.list_
+        ]
+        removed_main_folders = [
+            i
+            for i in db_main_folders
+            if i not in app_main_folders
+        ]
+
+        for i in removed_main_folders:
+            rows = cls.get_rows(main_folder_name=i, conn=conn)
+            cls.remove_images(rows=rows)
+            cls.remove_rows(rows=rows, conn=conn)
+    
+    @classmethod
+    def get_rows(cls, main_folder_name: str, conn: sqlalchemy.Connection):
+        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash)
+        q = q.where(THUMBS.c.brand == main_folder_name)
+        res = conn.execute(q).fetchall()
+        res = [
+            (id_, Utils.get_full_hash(short_hash=short_hash))
+            for id_, short_hash in res
+        ]
+        return res
+    
+    @classmethod
+    def remove_images(cls, rows: list[tuple[int, str]]):
+        total = len(rows)
+
+        for x, (id_, image_path) in enumerate(rows):
+            try:
+                os.remove(image_path)
+                folder = os.path.dirname(image_path)
+                if not os.listdir(folder):
+                    os.rmdir(folder)
+                t = f"{Lang.deleting}: {x} {Lang.from_} {total}"
+                ScanerTools.progressbar_text(text=t)
+            except Exception as e:
+                Utils.print_err(error=e)
+                continue
+
+    @classmethod
+    def remove_rows(cls, rows: list[tuple[int, str]], conn: sqlalchemy.Connection):
+        for id_, image_path in rows:
+            q = sqlalchemy.delete(THUMBS)
+            q = q.where(THUMBS.c.id == id_)
+
+            try:
+                conn.execute(q)
+            except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
+                Utils.print_err(error=e)
+                conn.rollback()
+                continue
+
+            except sqlalchemy.exc.OperationalError as e:
+                Utils.print_err(error=e)
+                conn.rollback()
+                conn.close()
+                return None
+            
+        conn.commit()
+        conn.close()
+
 class WorkerSignals(QObject):
     finished_ = pyqtSignal()
 
@@ -410,6 +493,7 @@ class ScanerThread(URunnable):
 
     def main_folder_scan(self):
         ScanerTools.can_scan = True
+        MainFolderRemover.run()
         finder_images = FinderImages()
         finder_images = finder_images.run()
 
@@ -433,6 +517,7 @@ class ScanerThread(URunnable):
             self.signals_.finished_.emit()
         except RuntimeError:
             pass
+        
     
 
 class ScanerShedule(QObject):
