@@ -53,7 +53,7 @@ class MainFolder:
             # мы очищаем список от установленных по умолчанию main_folders
             MainFolder.list_.clear()
 
-
+        # устанавливаем папки из json данных
         for main_folder_name, data in json_main_folders.items():
             data: dict
             paths = data.get(PATHS)
@@ -66,6 +66,11 @@ class MainFolder:
             )
 
             MainFolder.list_.append(item)
+
+        # удаляем папки, которых нет в json данных
+        for main_folder in MainFolder.list_:
+            if main_folder.name not in json_main_folders:
+                MainFolder.list_.remove(main_folder)
 
 
 miuz = MainFolder(
