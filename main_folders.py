@@ -39,6 +39,7 @@ class MainFolder:
                 main_folder.paths = new_data.get(PATHS)
                 main_folder.stop_list = new_data.get(STOP_LIST)
 
+
 MainFolder(
     name="miuz",
     paths=[
