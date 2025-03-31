@@ -141,6 +141,22 @@ class SimpleSettings(QGroupBox):
         OpenWins.smb(self.window())
 
 
+class AddMainFolder(QGroupBox):
+    def __init__(self):
+        super().__init__()
+
+        h_lay = LayoutHor()
+        h_lay.setSpacing(15)
+        self.setLayout(h_lay)
+
+        add_btn = QPushButton(Lang.add_)
+        add_btn.setFixedWidth(150)
+        h_lay.addWidget(add_btn)
+
+        descr = QLabel(Lang.add_main_folder)
+        h_lay.addWidget(descr)
+
+
 class ItemWindow(WinSystem):
     clicked_ = pyqtSignal(str)
 
@@ -305,15 +321,6 @@ class MainFolderTab(QTabWidget):
         self.apply.emit()
         setattr(self, NEED_REBOOT, True)
 
-    def contextMenuEvent(self, a0):
-        menu = ContextCustom(event=a0)
-
-        add_main_folder = QAction(parent=menu, text="Добавить папку")
-        menu.addAction(add_main_folder)
-
-        menu.show_menu()
-        return super().contextMenuEvent(a0)
-
 
 class WinSettings(WinSystem):
     def __init__(self):
@@ -333,14 +340,14 @@ class WinSettings(WinSystem):
         simple_settings = SimpleSettings()
         self.central_layout.addWidget(simple_settings)
 
+        add_main_folder = AddMainFolder()
+        self.central_layout.addWidget(add_main_folder)
+
         self.main_folder_tab = MainFolderTab()
         self.central_layout.addWidget(self.main_folder_tab)
 
-        rb_sett_cmd = lambda: self.apply_settings(wid=self.main_folder_tab)
-        rebootable_settings.apply.connect(rb_sett_cmd)
-
-        lock_rebootable = lambda: self.apply_settings(wid=rebootable_settings)
-        self.main_folder_tab.apply.connect(lock_rebootable)
+        rebootable_settings.apply.connect(self.apply_settings)
+        self.main_folder_tab.apply.connect(self.apply_settings)
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
@@ -363,8 +370,15 @@ class WinSettings(WinSystem):
 
         btns_layout.addStretch(1)
 
-    def apply_settings(self, wid: QWidget):
-        wid.setDisabled(True)
+    def apply_settings(self, *args):
+
+        widgets: list[QWidget] = self.centralWidget().children()
+        widgets.pop(-1)
+        widgets.pop(0)
+
+        for i in widgets:
+            i.setDisabled(True)
+
         self.ok_btn.setText(Lang.apply)
 
     def ok_cmd(self, *args):
