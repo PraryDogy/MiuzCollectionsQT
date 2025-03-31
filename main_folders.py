@@ -2,6 +2,7 @@ NAME = "name"
 PATHS = "paths"
 STOP_LIST = "stop_list"
 CURRENT_PATH = "current_path"
+MAIN_FOLDERS = "main_folders"
 
 class MainFolder:
     current: "MainFolder" = None
@@ -24,11 +25,13 @@ class MainFolder:
     def get_data(cls):
         """возвращает данные о брендах в виде словаря"""
         return {
-            main_folder.name: {
-                PATHS: main_folder.paths,
-                STOP_LIST: main_folder.stop_list
+            MAIN_FOLDERS: {
+                main_folder.name: {
+                    PATHS: main_folder.paths,
+                    STOP_LIST: main_folder.stop_list
+                }
+                for main_folder in MainFolder.list_
             }
-            for main_folder in MainFolder.list_
         }
     
     @classmethod
