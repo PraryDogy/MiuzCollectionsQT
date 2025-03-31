@@ -139,13 +139,186 @@ class SimpleSettings(QGroupBox):
         OpenWins.smb(self.window())
 
 
+class ItemWindow(WinSystem):
+    clicked_ = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(300, 80)
+        self.central_layout.setSpacing(10)
+
+        self.text_edit = ULineEdit()
+        self.text_edit.setPlaceholderText(Lang.paste_text)
+        self.central_layout.addWidget(self.text_edit)
+
+        h_wid = QWidget()
+        self.central_layout.addWidget(h_wid)
+
+        h_lay = LayoutHor()
+        h_lay.setSpacing(10)
+        h_wid.setLayout(h_lay)
+
+        h_lay.addStretch()
+
+        ok_btn = QPushButton(text=Lang.ok)
+        ok_btn.clicked.connect(self.ok_cmd)
+        ok_btn.setFixedWidth(90)
+        h_lay.addWidget(ok_btn)
+
+        can_btn = QPushButton(text=Lang.cancel)
+        can_btn.clicked.connect(self.close)
+        can_btn.setFixedWidth(90)
+        h_lay.addWidget(can_btn)
+
+        h_lay.addStretch()
+
+    def ok_cmd(self):
+        text = self.text_edit.text().replace("\n", "").strip()
+
+        if text:
+            self.clicked_.emit(text)
+            self.close()
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close()
+        return super().keyPressEvent(a0)
+
+
+class ListWidget(QListWidget):
+    h_ = 25
+    changed = pyqtSignal()
+
+    def __init__(self, main_folder: MainFolder, items: list[str]):
+        super().__init__()
+        self.horizontalScrollBar().setDisabled(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.contextMenuEvent = self.list_item_context
+
+        if not main_folder or not items:
+            return
+
+        self.main_folder_instance = main_folder
+
+        for i in items:
+            item_ = QListWidgetItem(i)
+            item_.setSizeHint(QSize(self.width(), ListWidget.h_))
+            item_.item_name = i
+            self.addItem(item_)
+
+    def list_item_context(self, ev):
+        menu = ContextCustom(event=ev)
+
+        add_item = QAction(parent=menu, text=Lang.add_)
+        add_item.triggered.connect(self.add_item_cmd)
+        menu.addAction(add_item)
+
+        wid = self.itemAt(ev.pos())
+        if wid:
+            del_item = QAction(parent=menu, text=Lang.del_)
+            del_item.triggered.connect(self.del_item_cmd)
+            menu.addAction(del_item)
+
+        menu.show_menu()
+
+    def mouseReleaseEvent(self, e):
+        wid = self.itemAt(e.pos())
+        if not wid:
+            self.clearSelection()
+
+        return super().mouseReleaseEvent(e)
+
+    def del_item_cmd(self):
+        selected_item = self.currentItem()
+        row = self.row(selected_item)
+        self.takeItem(row)
+        self.changed.emit()
+
+    def get_items(self):
+        return [
+            self.item(i).text()
+            for i in range(self.count())
+        ]
+
+    def add_item_cmd(self):
+        win = ItemWindow()
+        win.clicked_.connect(self.add_item_fin)
+        win.center_relative_parent(parent=self.window())
+        win.show()
+
+    def add_item_fin(self, text: str):
+        item_ = QListWidgetItem(text)
+        item_.setSizeHint(QSize(self.width(), ListWidget.h_))
+        item_.item_name = text
+        self.addItem(item_)
+        self.changed.emit()
+
+
+class StopList(ListWidget):
+    def __init__(self, main_folder, items):
+        super().__init__(main_folder, items)
+
+
+class MainFoldersPaths(ListWidget):
+    def __init__(self, main_folder, items):
+        super().__init__(main_folder, items)
+
+
+class TabsWidget(QTabWidget):
+    need_lock_widgets = pyqtSignal()
+    h_ = 25
+
+    def __init__(self):
+        super().__init__()
+        self.stop_colls_wid: dict[int, CustomTextEdit] = {}
+        self.coll_folders_wid: dict[int, CustomTextEdit] = {}
+
+        for main_folder in MainFolder.list_:
+            wid = self.tab_ui(main_folder=main_folder)
+            self.addTab(wid, main_folder.name)
+
+        current_index = MainFolder.list_.index(MainFolder.current)
+        self.setCurrentIndex(current_index)
+
+    def tab_ui(self, main_folder: MainFolder):
+        wid = QWidget()
+        v_lay = LayoutVer()
+        v_lay.setSpacing(10)
+        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
+        wid.setLayout(v_lay)
+
+        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
+        v_lay.addWidget(stop_colls_lbl)
+
+        stop_colls_list = StopList(main_folder=main_folder, items=main_folder.stop_list)
+        stop_colls_list.changed.connect(self.list_changed)
+        v_lay.addWidget(stop_colls_list)
+
+        coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
+        v_lay.addWidget(coll_folders_label)
+
+        coll_folders_list = MainFoldersPaths(main_folder=main_folder, items=main_folder.paths)
+        coll_folders_list.changed.connect(self.list_changed)
+        v_lay.addWidget(coll_folders_list)
+
+        return wid
+    
+    def list_changed(self):
+        # сигнал нужен, чтобы остальные виджеты окна настроек были заблокированы
+        self.need_lock_widgets.emit()
+
+        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
+        # произошла перезагрузка приложения
+        setattr(self, NEED_REBOOT, True)
+
+
 class AddMainFolderWin(WinSystem):
     ok_pressed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
-        self.setFixedSize(370, 150)
+        self.setFixedSize(370, 400)
         self.central_layout.setSpacing(10)
 
         descr_widget = QLabel(Lang.add_main_folder_descr)
@@ -154,6 +327,18 @@ class AddMainFolderWin(WinSystem):
         self.name_wid = ULineEdit()
         self.name_wid.setPlaceholderText(Lang.set_name_main_folder)
         self.central_layout.addWidget(self.name_wid)
+
+        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
+        self.central_layout.addWidget(stop_colls_lbl)
+
+        stop_list_wid = StopList(None, None)
+        self.central_layout.addWidget(stop_list_wid)
+
+        coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
+        self.central_layout.addWidget(coll_folders_label)
+
+        stop_list_wid = MainFoldersPaths(None, None)
+        self.central_layout.addWidget(stop_list_wid)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -222,175 +407,6 @@ class AddMainFolder(QGroupBox):
         self.win.show()
 
 
-class ItemWindow(WinSystem):
-    clicked_ = pyqtSignal(str)
-
-    def __init__(self):
-        super().__init__()
-        self.setFixedSize(300, 80)
-        self.central_layout.setSpacing(10)
-
-        self.text_edit = ULineEdit()
-        self.text_edit.setPlaceholderText(Lang.paste_text)
-        self.central_layout.addWidget(self.text_edit)
-
-        h_wid = QWidget()
-        self.central_layout.addWidget(h_wid)
-
-        h_lay = LayoutHor()
-        h_lay.setSpacing(10)
-        h_wid.setLayout(h_lay)
-
-        h_lay.addStretch()
-
-        ok_btn = QPushButton(text=Lang.ok)
-        ok_btn.clicked.connect(self.ok_cmd)
-        ok_btn.setFixedWidth(90)
-        h_lay.addWidget(ok_btn)
-
-        can_btn = QPushButton(text=Lang.cancel)
-        can_btn.clicked.connect(self.close)
-        can_btn.setFixedWidth(90)
-        h_lay.addWidget(can_btn)
-
-        h_lay.addStretch()
-
-    def ok_cmd(self):
-        text = self.text_edit.text().replace("\n", "").strip()
-
-        if text:
-            self.clicked_.emit(text)
-            self.close()
-
-    def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
-            self.close()
-        return super().keyPressEvent(a0)
-
-
-class BaseListWidget(QListWidget):
-    h_ = 25
-    changed = pyqtSignal()
-
-    def __init__(self, main_folder: MainFolder, items: list[str]):
-        super().__init__()
-        self.horizontalScrollBar().setDisabled(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.contextMenuEvent = self.list_item_context
-        self.main_folder_instance = main_folder
-
-        for i in items:
-            item_ = QListWidgetItem(i)
-            item_.setSizeHint(QSize(self.width(), BaseListWidget.h_))
-            item_.item_name = i
-            self.addItem(item_)
-
-    def list_item_context(self, ev):
-        menu = ContextCustom(event=ev)
-
-        add_item = QAction(parent=menu, text=Lang.add_)
-        add_item.triggered.connect(self.add_item_cmd)
-        menu.addAction(add_item)
-
-        wid = self.itemAt(ev.pos())
-        if wid:
-            del_item = QAction(parent=menu, text=Lang.del_)
-            del_item.triggered.connect(self.del_item_cmd)
-            menu.addAction(del_item)
-
-        menu.show_menu()
-
-    def mouseReleaseEvent(self, e):
-        wid = self.itemAt(e.pos())
-        if not wid:
-            self.clearSelection()
-
-        return super().mouseReleaseEvent(e)
-
-    def del_item_cmd(self):
-        selected_item = self.currentItem()
-        row = self.row(selected_item)
-        self.takeItem(row)
-        self.changed.emit()
-
-    def get_items(self):
-        return [
-            self.item(i).text()
-            for i in range(self.count())
-        ]
-
-    def add_item_cmd(self):
-        win = ItemWindow()
-        win.clicked_.connect(self.add_item_fin)
-        win.center_relative_parent(parent=self.window())
-        win.show()
-
-    def add_item_fin(self, text: str):
-        item_ = QListWidgetItem(text)
-        item_.setSizeHint(QSize(self.width(), BaseListWidget.h_))
-        item_.item_name = text
-        self.addItem(item_)
-        self.changed.emit()
-
-
-class StopColls(BaseListWidget):
-    def __init__(self, main_folder, items):
-        super().__init__(main_folder, items)
-
-
-class CollFolders(BaseListWidget):
-    def __init__(self, main_folder, items):
-        super().__init__(main_folder, items)
-
-
-class MainFolderTab(QTabWidget):
-    need_lock_widgets = pyqtSignal()
-    h_ = 25
-
-    def __init__(self):
-        super().__init__()
-        self.stop_colls_wid: dict[int, CustomTextEdit] = {}
-        self.coll_folders_wid: dict[int, CustomTextEdit] = {}
-
-        for main_folder in MainFolder.list_:
-            wid = self.tab_ui(main_folder=main_folder)
-            self.addTab(wid, main_folder.name)
-
-        current_index = MainFolder.list_.index(MainFolder.current)
-        self.setCurrentIndex(current_index)
-
-    def tab_ui(self, main_folder: MainFolder):
-        wid = QWidget()
-        v_lay = LayoutVer()
-        v_lay.setSpacing(10)
-        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
-        wid.setLayout(v_lay)
-
-        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
-        v_lay.addWidget(stop_colls_lbl)
-
-        stop_colls_list = StopColls(main_folder=main_folder, items=main_folder.stop_list)
-        stop_colls_list.changed.connect(self.list_changed)
-        v_lay.addWidget(stop_colls_list)
-
-        coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
-        v_lay.addWidget(coll_folders_label)
-
-        coll_folders_list = CollFolders(main_folder=main_folder, items=main_folder.paths)
-        coll_folders_list.changed.connect(self.list_changed)
-        v_lay.addWidget(coll_folders_list)
-
-        return wid
-    
-    def list_changed(self):
-        # сигнал нужен, чтобы остальные виджеты окна настроек были заблокированы
-        self.need_lock_widgets.emit()
-
-        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
-        # произошла перезагрузка приложения
-        setattr(self, NEED_REBOOT, True)
-
-
 class WinSettings(WinSystem):
     def __init__(self):
         super().__init__()
@@ -414,7 +430,7 @@ class WinSettings(WinSystem):
         add_main_folder.need_lock_widgets.connect(self.lock_widgets)
         self.central_layout.addWidget(add_main_folder)
 
-        main_folder_tab = MainFolderTab()
+        main_folder_tab = TabsWidget()
         main_folder_tab.need_lock_widgets.connect(self.lock_widgets)
         self.central_layout.addWidget(main_folder_tab)
 
@@ -452,7 +468,7 @@ class WinSettings(WinSystem):
 
     def ok_cmd(self, *args):
         rebootable = self.findChildren(RebootableSettings)[0]
-        main_folder_tab = self.findChildren(MainFolderTab)[0]
+        main_folder_tab = self.findChildren(TabsWidget)[0]
         add_main_folder = self.findChildren(AddMainFolder)[0]
 
         if hasattr(rebootable.reset_btn, NEED_REBOOT):
@@ -474,10 +490,10 @@ class WinSettings(WinSystem):
             Utils.start_new_app()
 
         elif hasattr(main_folder_tab, NEED_REBOOT):
-            for i in self.findChildren(CollFolders):
+            for i in self.findChildren(MainFoldersPaths):
                 i.main_folder_instance.paths = i.get_items()
 
-            for i in self.findChildren(StopColls):
+            for i in self.findChildren(StopList):
                 i.main_folder_instance.stop_list = i.get_items()
 
             JsonData.write_json_data()
