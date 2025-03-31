@@ -1,32 +1,50 @@
 import os
-import shutil
 
 import sqlalchemy
-from PyQt5.QtWidgets import QApplication
 
-from cfg import JsonData, Static
-from utils.utils import Utils
+from cfg import Static
 
 METADATA = sqlalchemy.MetaData()
 
+class ThumbColumns:
+    ID = "id"
+    SHORT_SRC = "short_src"
+    SHORT_HASH = "short_hash"
+    SIZE = "size"
+    BIRTH = "birth"
+    MOD = "mod"
+    RESOL = "resol"
+    COLL = "coll"
+    FAV = "fav"
+    BRAND = "brand"
+
 THUMBS = sqlalchemy.Table(
     "thumbs", METADATA,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("short_src", sqlalchemy.Text),
-    sqlalchemy.Column("short_hash", sqlalchemy.Text, comment="Путь к маленькой картинке"),
-    sqlalchemy.Column("size", sqlalchemy.Integer, comment="Размер"),
-    sqlalchemy.Column("birth", sqlalchemy.Integer, comment="Дата созд."),
-    sqlalchemy.Column("mod", sqlalchemy.Integer, comment="Дата изм."),
-    sqlalchemy.Column("resol", sqlalchemy.TEXT, comment="1920x1080"),
-    sqlalchemy.Column("coll", sqlalchemy.Text, comment="Имя коллекции"),
-    sqlalchemy.Column("fav", sqlalchemy.Integer, comment="1 is fav else 0"),
-    sqlalchemy.Column("brand", sqlalchemy.TEXT, comment="miuz, panacea"),
-    )
+    sqlalchemy.Column(ThumbColumns.ID, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ThumbColumns.SHORT_SRC, sqlalchemy.Text),
+    sqlalchemy.Column(ThumbColumns.SHORT_HASH, sqlalchemy.Text, comment="Путь к маленькой картинке"),
+    sqlalchemy.Column(ThumbColumns.SIZE, sqlalchemy.Integer, comment="Размер"),
+    sqlalchemy.Column(ThumbColumns.BIRTH, sqlalchemy.Integer, comment="Дата созд."),
+    sqlalchemy.Column(ThumbColumns.MOD, sqlalchemy.Integer, comment="Дата изм."),
+    sqlalchemy.Column(ThumbColumns.RESOL, sqlalchemy.Text, comment="1920x1080"),
+    sqlalchemy.Column(ThumbColumns.COLL, sqlalchemy.Text, comment="Имя коллекции"),
+    sqlalchemy.Column(ThumbColumns.FAV, sqlalchemy.Integer, comment="1 is fav else 0"),
+    sqlalchemy.Column(ThumbColumns.BRAND, sqlalchemy.Text, comment="miuz, panacea"),
+)
 
-CLMN_NAMES = [
-    i.name
-    for i in THUMBS.columns
-][1:]
+# THUMBS = sqlalchemy.Table(
+#     "thumbs", METADATA,
+#     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+#     sqlalchemy.Column("short_src", sqlalchemy.Text),
+#     sqlalchemy.Column("short_hash", sqlalchemy.Text, comment="Путь к маленькой картинке"),
+#     sqlalchemy.Column("size", sqlalchemy.Integer, comment="Размер"),
+#     sqlalchemy.Column("birth", sqlalchemy.Integer, comment="Дата созд."),
+#     sqlalchemy.Column("mod", sqlalchemy.Integer, comment="Дата изм."),
+#     sqlalchemy.Column("resol", sqlalchemy.TEXT, comment="1920x1080"),
+#     sqlalchemy.Column("coll", sqlalchemy.Text, comment="Имя коллекции"),
+#     sqlalchemy.Column("fav", sqlalchemy.Integer, comment="1 is fav else 0"),
+#     sqlalchemy.Column("brand", sqlalchemy.TEXT, comment="miuz, panacea"),
+#     )
 
 
 class Dbase:

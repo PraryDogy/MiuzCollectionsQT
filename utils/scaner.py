@@ -9,7 +9,7 @@ from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 from main_folders import MainFolder
 from cfg import JsonData, Static, ThumbData
-from database import CLMN_NAMES, THUMBS, Dbase
+from database import THUMBS, Dbase, ThumbColumns
 from lang import Lang
 from signals import SignalsApp
 
@@ -198,7 +198,6 @@ class DbUpdater:
 
         values = self.get_values(*["" for i in range(0, 6)])
         values = list(values.keys())
-        assert CLMN_NAMES == values
 
         self.del_db(del_items=del_items)
         self.del_images(del_items=del_items)
@@ -282,27 +281,29 @@ class DbUpdater:
     def get_values(self, full_src, full_hash, size, birth, mod, resol):
         coll_folder = ScanerTools.current_main_folder.current_path
         return {
-            "short_src": Utils.get_short_src(coll_folder, full_src),
-            "short_hash": Utils.get_short_hash(full_hash),
-            "size": size,
-            "birth": birth,
-            "mod": mod,
-            "resol": resol,
-            "coll": Utils.get_coll_name(coll_folder, full_src),
-            "fav": 0,
-            "brand": ScanerTools.current_main_folder.name
+            ThumbColumns.SHORT_SRC: Utils.get_short_src(coll_folder, full_src),
+            ThumbColumns.SHORT_HASH: Utils.get_short_hash(full_hash),
+            ThumbColumns.SIZE: size,
+            ThumbColumns.BIRTH: birth,
+            ThumbColumns.MOD: mod,
+            ThumbColumns.RESOL: resol,
+            ThumbColumns.COLL: Utils.get_coll_name(coll_folder, full_src),
+            ThumbColumns.FAV: 0,
+            ThumbColumns.BRAND: ScanerTools.current_main_folder.name
         }
 
     def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
 
         res: dict[sqlalchemy.Insert, tuple[str, ndarray]] = {}
+        total = len(ins_items)
 
-        for full_src, size, birth, mod in ins_items:
+        for x, (full_src, size, birth, mod) in enumerate(ins_items, start=1):
 
             # не удалять
             if not ScanerTools.can_scan:
                 return
 
+            self.progressbar_text(text=Lang.adding, x=x, total=total)
             small_img, resol = self.get_small_img(full_src)
 
             if small_img is not None:
@@ -366,13 +367,12 @@ class DbUpdater:
 
         total = len(queries)
 
-        for x, (full_hash, img_array) in enumerate(queries.values(), start=1):
+        for full_hash, img_array in queries.values():
 
             # не удалять
             if not ScanerTools.can_scan:
                 return
 
-            self.progressbar_text(text=Lang.adding, x=x, total=total)
             Utils.write_image_hash(full_hash, img_array)
             sleep(self.sleep_count)
 
