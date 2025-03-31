@@ -364,7 +364,18 @@ class AddMainFolderWin(WinSystem):
         self.central_layout.addWidget
 
     def ok_cmd(self):
-        if self.name_wid.text():
+        name_of_main_folder = self.findChild(ULineEdit).text()
+        main_folders_paths = self.findChild(MainFoldersPaths).get_items()
+        stop_list = self.findChild(StopList).get_items()
+
+        if name_of_main_folder and main_folders_paths:
+
+            MainFolder(
+                name=name_of_main_folder,
+                paths=main_folders_paths,
+                stop_list=stop_list
+            )
+
             self.ok_pressed.emit()
             self.close()
 
