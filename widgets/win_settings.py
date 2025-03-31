@@ -22,7 +22,7 @@ WIN_SIZE = (430, 580)
 NEED_REBOOT = "___need_reboot___"
 STOP_COLLS = "STOP_COLLS"
 COLL_FOLDERS = "COLL_FOLDERS"
-
+LIST_ITEM_H = 25
 
 class RebootableSettings(QGroupBox):
     apply = pyqtSignal()
@@ -187,8 +187,7 @@ class AddItemWindow(WinSystem):
         return super().keyPressEvent(a0)
 
 
-class ListWidget(QListWidget):
-    h_ = 25
+class BaseListWidget(QListWidget):
     changed = pyqtSignal()
 
     def __init__(self, main_folder: MainFolder, items: list[str]):
@@ -204,7 +203,7 @@ class ListWidget(QListWidget):
 
         for i in items:
             item_ = QListWidgetItem(i)
-            item_.setSizeHint(QSize(self.width(), ListWidget.h_))
+            item_.setSizeHint(QSize(self.width(), LIST_ITEM_H))
             item_.item_name = i
             self.addItem(item_)
 
@@ -250,25 +249,24 @@ class ListWidget(QListWidget):
 
     def add_item_fin(self, text: str):
         item_ = QListWidgetItem(text)
-        item_.setSizeHint(QSize(self.width(), ListWidget.h_))
+        item_.setSizeHint(QSize(self.width(), LIST_ITEM_H))
         item_.item_name = text
         self.addItem(item_)
         self.changed.emit()
 
 
-class StopList(ListWidget):
+class StopList(BaseListWidget):
     def __init__(self, main_folder, items):
         super().__init__(main_folder, items)
 
 
-class MainFoldersPaths(ListWidget):
+class MainFoldersPaths(BaseListWidget):
     def __init__(self, main_folder, items):
         super().__init__(main_folder, items)
 
 
 class TabsWidget(QTabWidget):
     need_lock_widgets = pyqtSignal()
-    h_ = 25
 
     def __init__(self):
         super().__init__()
@@ -391,6 +389,66 @@ class AddMainFolderWin(WinSystem):
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd()
         return super().keyPressEvent(a0)
+    
+
+class RemoveMainFolderWin(WinSystem):
+    ok_pressed = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+        self.setFixedSize(300, 300)
+        self.central_layout.setSpacing(5)
+
+        list_widget = QListWidget(self)
+        list_widget.horizontalScrollBar().setDisabled(True)
+        list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.central_layout.addWidget(list_widget)
+
+        for main_folder in MainFolder.list_:
+            item = QListWidgetItem(list_widget)
+            item.setSizeHint(QSize(self.width(), LIST_ITEM_H))
+            label = QLabel(main_folder.name)
+            list_widget.addItem(item)
+            list_widget.setItemWidget(item, label)
+
+        h_wid = QWidget()
+        self.central_layout.addWidget(h_wid)
+        h_lay = LayoutHor()
+        h_lay.setSpacing(10)
+        h_wid.setLayout(h_lay)
+
+        h_lay.addStretch()
+        ok_btn = QPushButton(text=Lang.ok)
+        ok_btn.setFixedWidth(90)
+        ok_btn.clicked.connect(self.ok_cmd)
+        h_lay.addWidget(ok_btn)
+
+        cancel_btn = QPushButton(text=Lang.cancel)
+        cancel_btn.setFixedWidth(90)
+        cancel_btn.clicked.connect(self.close)
+        h_lay.addWidget(cancel_btn)
+        h_lay.addStretch()
+
+    def ok_cmd(self):
+        list_widget = self.findChild(QListWidget)
+        selected_item = list_widget.currentItem()
+        if selected_item:
+            label = list_widget.itemWidget(selected_item)
+            text = label.text()
+            for main_folder in MainFolder.list_:
+                if main_folder.name == text:
+                    MainFolder.list_.remove(main_folder)
+                    break
+            self.ok_pressed.emit()
+            self.close()
+    
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close()
+        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            ...
+        return super().keyPressEvent(a0)
 
 
 class AddMainFolder(QGroupBox):
@@ -425,12 +483,12 @@ class AddMainFolder(QGroupBox):
         second_row.setLayout(second_lay)
 
         remove_btn = QPushButton(Lang.delete)
+        remove_btn.clicked.connect(self.remove_btn_cmd)
         remove_btn.setFixedWidth(150)
         second_lay.addWidget(remove_btn)
 
-        remove_descr = QLabel("Удалить папку с коллекциями")
+        remove_descr = QLabel(Lang.delete_main_folder)
         second_lay.addWidget(remove_descr)
-
 
     def add_btn_cmd(self, *args):
         self.win = AddMainFolderWin()
@@ -445,6 +503,18 @@ class AddMainFolder(QGroupBox):
         self.win.center_relative_parent(parent=self.window())
         self.win.show()
 
+    def remove_btn_cmd(self, *args):
+        self.win = RemoveMainFolderWin()
+
+        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
+        # произошла перезагрузка приложения
+        self.win.ok_pressed.connect(lambda: setattr(self, NEED_REBOOT, True))
+
+        # сигнал нужен, чтобы при нажатии на "ок" в окне AddMainFolderWin
+        # остальные виджеты окна настроек были заблокированы
+        self.win.ok_pressed.connect(self.need_lock_widgets.emit)
+        self.win.center_relative_parent(parent=self.window())
+        self.win.show()
 
 class WinSettings(WinSystem):
     def __init__(self):
