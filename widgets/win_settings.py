@@ -370,11 +370,13 @@ class AddMainFolderWin(WinSystem):
 
         if name_of_main_folder and main_folders_paths:
 
-            MainFolder(
+            new_main_folder = MainFolder(
                 name=name_of_main_folder,
                 paths=main_folders_paths,
                 stop_list=stop_list
             )
+
+            MainFolder.list_.append(new_main_folder)
 
             self.ok_pressed.emit()
             self.close()
