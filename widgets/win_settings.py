@@ -393,12 +393,11 @@ class AddMainFolderWin(WinSystem):
         return super().keyPressEvent(a0)
     
 
-class RemoveMainFolderWin(WinSystem):
+class RemoveRenameWin(WinSystem):
     ok_pressed = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lang.delete_main_folder)
 
         self.setFixedSize(330, 300)
         self.central_layout.setSpacing(5)
@@ -423,10 +422,10 @@ class RemoveMainFolderWin(WinSystem):
         h_wid.setLayout(h_lay)
 
         h_lay.addStretch()
-        ok_btn = QPushButton(text=Lang.ok)
-        ok_btn.setFixedWidth(90)
-        ok_btn.clicked.connect(self.ok_cmd)
-        h_lay.addWidget(ok_btn)
+        self.ok_btn = QPushButton(text=Lang.ok)
+        self.ok_btn.clicked.connect(self.ok_cmd)
+        self.ok_btn.setFixedWidth(90)
+        h_lay.addWidget(self.ok_btn)
 
         cancel_btn = QPushButton(text=Lang.cancel)
         cancel_btn.setFixedWidth(90)
@@ -435,10 +434,14 @@ class RemoveMainFolderWin(WinSystem):
         h_lay.addStretch()
 
     def ok_cmd(self):
-        list_widget = self.findChild(QListWidget)
+        list_widget: QListWidget = self.findChild(QListWidget)
+
+        if not list_widget.selectedItems():
+            return
+
         selected_item = list_widget.currentItem()
         if selected_item:
-            label = list_widget.itemWidget(selected_item)
+            label: QLabel = list_widget.itemWidget(selected_item)
             text = label.text()
             for main_folder in MainFolder.list_:
                 if main_folder.name == text:
@@ -452,6 +455,18 @@ class RemoveMainFolderWin(WinSystem):
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd()
         return super().keyPressEvent(a0)
+
+
+class RemoveWin(RemoveRenameWin):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(Lang.delete_main_folder)
+
+
+class RenameWin(RemoveRenameWin):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(Lang.rename)
 
 
 class MainFolderWid(QGroupBox):
@@ -493,6 +508,21 @@ class MainFolderWid(QGroupBox):
         remove_descr = QLabel(Lang.delete_main_folder)
         second_lay.addWidget(remove_descr)
 
+        third_row = QWidget()
+        v_lay.addWidget(third_row)
+
+        third_lay = LayoutHor()
+        third_lay.setSpacing(15)
+        third_row.setLayout(third_lay)
+
+        remove_btn = QPushButton(Lang.rename)
+        remove_btn.clicked.connect(self.rename_btn_cmd)
+        remove_btn.setFixedWidth(150)
+        third_lay.addWidget(remove_btn)
+
+        remove_descr = QLabel(Lang.rename_main_folder)
+        third_lay.addWidget(remove_descr)
+
     def add_btn_cmd(self, *args):
         self.win = AddMainFolderWin()
 
@@ -507,7 +537,7 @@ class MainFolderWid(QGroupBox):
         self.win.show()
 
     def remove_btn_cmd(self, *args):
-        self.win = RemoveMainFolderWin()
+        self.win = RemoveWin()
 
         # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
         # произошла перезагрузка приложения
@@ -520,6 +550,20 @@ class MainFolderWid(QGroupBox):
         self.win.center_relative_parent(parent=self.window())
         self.win.show()
 
+    def rename_btn_cmd(self, *args):
+        self.win = RenameWin()
+
+        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
+        # произошла перезагрузка приложения
+        self.win.ok_pressed.connect(lambda t: print(t))
+        # self.win.ok_pressed.connect(lambda text: setattr(self, NEED_REBOOT, True))
+        # self.win.ok_pressed.connect(lambda text: setattr(self, REMOVE_MAIN_FOLDER_NAME, text))
+
+        # сигнал нужен, чтобы при нажатии на "ок" в окне AddMainFolderWin
+        # остальные виджеты окна настроек были заблокированы
+        # self.win.ok_pressed.connect(self.need_lock_widgets.emit)
+        self.win.center_relative_parent(parent=self.window())
+        self.win.show()
 
 class WinSettings(WinSystem):
     def __init__(self):

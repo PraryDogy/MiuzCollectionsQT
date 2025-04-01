@@ -454,6 +454,16 @@ class Lang_:
         "Remove collections folder"
     ]
 
+    rename = [
+        "Переименовать",
+        "Rename"
+    ]
+
+    rename_main_folder = [
+        "Переименовать папку с коллекциями",
+        "Rename collections folder"
+    ]
+
 class Lang(Lang_):
 
     @classmethod
