@@ -27,9 +27,6 @@ UP_STYLE = f"""
 FIRST_LOAD = "first_load"
 MORE = "more"
 FIRST = "first"
-TO_TOP = "to_top"
-RELOAD = "reload"
-RESIZE = "resize"
 
 class NoImagesLabel(QLabel):
     def __init__(self):
@@ -79,7 +76,7 @@ class UpBtn(QFrame):
         v_layout.addWidget(self.svg)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        SignalsApp.instance.grid_thumbnails_cmd.emit(TO_TOP)
+        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
         return super().mouseReleaseEvent(a0)
     
 
@@ -109,15 +106,14 @@ class Grid(QScrollArea):
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
         SignalsApp.instance.grid_thumbnails_cmd.connect(self.signals_cmd)
-        SignalsApp.instance.win_img_view_open_in.connect(self.open_in_view)
-        SignalsApp.instance.grid_thumbnails_cmd.emit(RELOAD)
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
     def signals_cmd(self, flag: str):
-        if flag == RESIZE:
+        if flag == "resize":
             self.resize_thumbnails()
-        elif flag == TO_TOP:
+        elif flag == "to_top":
             self.verticalScrollBar().setValue(0)
-        elif flag == RELOAD:
+        elif flag == "reload":
             self.load_db_images(flag=FIRST)
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)
