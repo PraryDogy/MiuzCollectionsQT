@@ -10,16 +10,12 @@ class MainFolder:
     __slots__ = [NAME, PATHS, STOP_LIST, CURRENT_PATH]
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str]):
+
         super().__init__()
         self.name = name
         self.paths = paths
         self.stop_list = stop_list
         self.current_path: str = None # этот аттрибут нужен для сканера
-
-        # при переименовании папки коллекций задается фейковое имя
-        # потому что подгрузка изображений из БД зависит от изначально
-        # заданого имени (так как оно записывается в БД как колонка brand)
-        self.fake_name: str = None 
 
     @classmethod
     def init(cls):

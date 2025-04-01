@@ -88,7 +88,11 @@ class LoadMenus(URunnable):
         Loads collection data and emits the `finished_` signal with the result.
         """
         menus = self.load_colls_query()
-        self.signals_.finished_.emit(menus)
+
+        try:
+            self.signals_.finished_.emit(menus)
+        except RuntimeError as e:
+            Utils.print_err(error=e)
 
 
     def load_colls_query(self) -> list[dict]:
