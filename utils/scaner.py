@@ -544,6 +544,12 @@ class ScanerShedule(QObject):
 
         for main_folder in MainFolder.list_:
             main_folder_path = Utils.get_main_folder_path(main_folder=main_folder)
+
+            # if main_folder_path.startswith("/User"):
+            #     volumes = [i for i in os.listdir("/Volumes")]
+            #     macintosh_hd = volumes[0]
+            #     main_folder_path = "/Volumes/" + macintosh_hd + main_folder_path
+
             if main_folder_path:
                 main_folder.current_path = main_folder_path
                 ScanerTools.avaiable_main_folders.append(main_folder)
