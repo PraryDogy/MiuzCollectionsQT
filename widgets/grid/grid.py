@@ -498,6 +498,7 @@ class Grid(QScrollArea):
             self.clear_selected_widgets()
             reload = ScanerRestart(parent=self.menu_)
             self.menu_.addAction(reload)
+            self.menu_.addSeparator()
             types_ = MenuTypes(parent=self.menu_)
             self.menu_.addMenu(types_)
 
@@ -571,14 +572,6 @@ class Grid(QScrollArea):
                 save_as=False
                 )
             self.menu_.addAction(save)
-
-            self.menu_.addSeparator()
-
-            reload = ScanerRestart(parent=self.menu_)
-            self.menu_.addAction(reload)
-
-            types_ = MenuTypes(parent=self.menu_)
-            self.menu_.addMenu(types_)
 
         self.menu_.show_menu()
 
