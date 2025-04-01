@@ -260,11 +260,13 @@ class BaseListWidget(QListWidget):
 class StopList(BaseListWidget):
     def __init__(self, main_folder, items):
         super().__init__(main_folder, items)
+        self.main_folder_instance = main_folder
 
 
 class MainFoldersPaths(BaseListWidget):
     def __init__(self, main_folder, items):
         super().__init__(main_folder, items)
+        self.main_folder_instance = main_folder
 
 
 class TabsWidget(QTabWidget):
