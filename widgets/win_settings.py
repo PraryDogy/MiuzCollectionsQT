@@ -25,6 +25,7 @@ COLL_FOLDERS = "COLL_FOLDERS"
 LIST_ITEM_H = 25
 REMOVE_MAIN_FOLDER_NAME = "REMOVE_MAIN_FOLDER_NAME"
 ADD_NEW_MAIN_FOLDER = "ADD_NEW_MAIN_FOLDER"
+RENAME_MAIN_FOLDER = "RENAME_MAIN_FOLDER"
 
 class RebootableSettings(QGroupBox):
     apply = pyqtSignal()
@@ -469,6 +470,57 @@ class RenameWin(RemoveRenameWin):
         self.setWindowTitle(Lang.rename)
 
 
+class NewNameWin(WinSystem):
+    ok_pressed = pyqtSignal(tuple)
+
+    def __init__(self, main_folder_name: str):
+        super().__init__()
+        self.setWindowTitle(Lang.rename)
+        self.setFixedSize(250, 80)
+
+        self.main_folder_name = main_folder_name
+
+        self.input_wid = ULineEdit()
+        self.input_wid.setText(main_folder_name)
+        self.input_wid.setPlaceholderText(Lang.paste_text)
+        self.central_layout.addWidget(self.input_wid)
+
+        h_wid = QWidget()
+        self.central_layout.addWidget(h_wid)
+        h_lay = LayoutHor()
+        h_wid.setLayout(h_lay)
+
+        h_wid = QWidget()
+        self.central_layout.addWidget(h_wid)
+        h_lay = LayoutHor()
+        h_lay.setSpacing(10)
+        h_wid.setLayout(h_lay)
+
+        h_lay.addStretch()
+        self.ok_btn = QPushButton(text=Lang.ok)
+        self.ok_btn.clicked.connect(self.ok_cmd)
+        self.ok_btn.setFixedWidth(90)
+        h_lay.addWidget(self.ok_btn)
+
+        cancel_btn = QPushButton(text=Lang.cancel)
+        cancel_btn.setFixedWidth(90)
+        cancel_btn.clicked.connect(self.close)
+        h_lay.addWidget(cancel_btn)
+        h_lay.addStretch()
+
+    def ok_cmd(self):
+        new_folder_name = self.input_wid.text().strip()
+
+        if new_folder_name:
+            self.ok_pressed.emit((self.main_folder_name, new_folder_name))
+            self.close()
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close()
+        return super().keyPressEvent(a0)
+
+
 class MainFolderWid(QGroupBox):
     need_lock_widgets = pyqtSignal()
 
@@ -555,7 +607,7 @@ class MainFolderWid(QGroupBox):
 
         # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
         # произошла перезагрузка приложения
-        self.win.ok_pressed.connect(lambda t: print(t))
+        self.win.ok_pressed.connect(self.new_name_win)
         # self.win.ok_pressed.connect(lambda text: setattr(self, NEED_REBOOT, True))
         # self.win.ok_pressed.connect(lambda text: setattr(self, REMOVE_MAIN_FOLDER_NAME, text))
 
@@ -564,6 +616,25 @@ class MainFolderWid(QGroupBox):
         # self.win.ok_pressed.connect(self.need_lock_widgets.emit)
         self.win.center_relative_parent(parent=self.window())
         self.win.show()
+
+    def new_name_win(self, text: str):
+        self.win = NewNameWin(main_folder_name=text)
+        self.win.center_relative_parent(parent=self.window())
+
+        self.win.ok_pressed.connect(
+            lambda old_new_name: setattr(self, NEED_REBOOT, True)
+        )
+
+        self.win.ok_pressed.connect(
+            lambda old_new_name: setattr(self, RENAME_MAIN_FOLDER, old_new_name)
+        )
+
+        # сигнал нужен, чтобы при нажатии на "ок" в окне AddMainFolderWin
+        # остальные виджеты окна настроек были заблокированы
+        self.win.ok_pressed.connect(self.need_lock_widgets.emit)
+
+        self.win.show()
+
 
 class WinSettings(WinSystem):
     def __init__(self):
@@ -655,6 +726,13 @@ class WinSettings(WinSystem):
 
             elif hasattr(main_folder_wid, ADD_NEW_MAIN_FOLDER):
                 MainFolder.list_.append(getattr(main_folder_wid, ADD_NEW_MAIN_FOLDER))
+
+            elif hasattr(main_folder_wid, RENAME_MAIN_FOLDER):
+                old_name, new_name = getattr(main_folder_wid, RENAME_MAIN_FOLDER)
+
+                for i in MainFolder.list_:
+                    if i.name == old_name:
+                        i.name = new_name
 
             JsonData.write_json_data()
             QApplication.quit()
