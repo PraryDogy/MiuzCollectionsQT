@@ -1,1 +1,8 @@
-src = "/Users/Loshkarev/Library/Application Support/Collections/hashdir/32/321aea0d8a9bde5af212d33734e6d129.jpg"
+import os
+
+
+a = "/Users/Loshkarev/Desktop/Примеры камней"
+
+
+for dirname in os.scandir(a):
+    print(dirname.path)

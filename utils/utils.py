@@ -323,7 +323,7 @@ class Hash:
             img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
             return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         except Exception as e:
-            print("read img hash error:", src)
+            # print("read img hash error:", src)
             return None
 
 

@@ -54,12 +54,11 @@ class FinderImages:
 
         try:
             coll_folder = ScanerTools.current_main_folder.current_path
-            stop_colls = ScanerTools.current_main_folder.stop_list
+            stop_list = ScanerTools.current_main_folder.stop_list
 
-            for item in os.listdir(coll_folder):
-                item_path = os.path.join(coll_folder, item)
-                if os.path.isdir(item_path) and item not in stop_colls:
-                    collections.append(item_path)
+            for item in os.scandir(coll_folder):
+                if item.is_dir() and item.name not in stop_list:
+                    collections.append(item.path)
 
         except FileNotFoundError:
             ...
@@ -86,6 +85,10 @@ class FinderImages:
 
             except TypeError as e:
                 Utils.print_err(error=e)
+
+        # for i in os.scandir(ScanerTools.current_main_folder.current_path):
+        #     if i.name.endswith(Static.IMG_EXT):
+        #         finder_images.append(self.get_file_data(entry=i))
 
         return finder_images
 
@@ -497,6 +500,9 @@ class ScanerThread(URunnable):
         finder_images = FinderImages()
         finder_images = finder_images.run()
 
+        if ScanerTools.current_main_folder.name == "Neuro":
+            print(finder_images)
+
         if finder_images is not None:
         
             db_images = DbImages()
@@ -518,7 +524,6 @@ class ScanerThread(URunnable):
         except RuntimeError:
             pass
         
-    
 
 class ScanerShedule(QObject):
     def __init__(self):
@@ -544,11 +549,6 @@ class ScanerShedule(QObject):
 
         for main_folder in MainFolder.list_:
             main_folder_path = Utils.get_main_folder_path(main_folder=main_folder)
-
-            # if main_folder_path.startswith("/User"):
-            #     volumes = [i for i in os.listdir("/Volumes")]
-            #     macintosh_hd = volumes[0]
-            #     main_folder_path = "/Volumes/" + macintosh_hd + main_folder_path
 
             if main_folder_path:
                 main_folder.current_path = main_folder_path
