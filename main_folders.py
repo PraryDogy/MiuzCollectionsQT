@@ -16,6 +16,11 @@ class MainFolder:
         self.stop_list = stop_list
         self.current_path: str = None # этот аттрибут нужен для сканера
 
+        # при переименовании папки коллекций задается фейковое имя
+        # потому что подгрузка изображений из БД зависит от изначально
+        # заданого имени (так как оно записывается в БД как колонка brand)
+        self.fake_name: str = None 
+
     @classmethod
     def init(cls):
         if MainFolder.list_:
