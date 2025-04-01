@@ -575,6 +575,10 @@ class WinSettings(WinSystem):
         widgets.pop(-1)
         widgets.pop(0)
 
+        # при добавлении 4 виджета, а при удалении 5
+        if len(widgets) == 5:
+            widgets.pop(-1)
+
         for i in widgets:
             i.setDisabled(True)
 
