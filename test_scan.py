@@ -1,60 +1,36 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTabBar, QVBoxLayout, QWidget, QPushButton, QMenu
-from PyQt5.QtCore import Qt
-import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QMenu, QMenuBar, QLabel
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setFixedSize(300, 100)  # Фиксированное окно шириной 300px
 
-        # Создаем центральный виджет и layout
-        central_widget = QWidget(self)
-        self.setCentralWidget(central_widget)
+        self.setWindowTitle("QTabWidget with QMenu")
+        self.setGeometry(100, 100, 600, 400)
 
-        layout = QVBoxLayout(central_widget)
+        tab_widget = QTabWidget(self)
+        self.setCentralWidget(tab_widget)
 
-        self.tab_bar = QTabBar(self)
+        first = QLabel("first tab")
+        tab_widget.addTab(first, "first")
 
-        self.show_tabs_button = QPushButton("Показать все вкладки", self)
-        self.show_tabs_button.setVisible(False)
-        self.show_tabs_button.clicked.connect(self.show_all_tabs)
+        test = QWidget()
+        tab_widget.addTab(test, "test")
 
-        layout.addWidget(self.tab_bar)
-        layout.addWidget(self.show_tabs_button)
+        # # Создание QMenu
+        # menu = QMenu(self)
+        # menu.addAction("Action 1")
+        # menu.addAction("Action 2")
+        # menu.addAction("Action 3")
 
-        self.tabs = []
+        # def show_menu():
+        #     menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
 
-    def add_tab(self, tab_name):
+        # button.clicked.connect(show_menu)
+        # layout.addWidget(button)
 
-        if len(self.tabs) >= 3:
-            self.show_tabs_button.setVisible(True)
-        else:
-            self.tab_bar.addTab(tab_name)
+        # tab_widget.addTab(menu_tab, "Menu Tab")
 
-        self.tabs.append(tab_name)
-
-    def show_all_tabs(self):
-        menu = QMenu(self)
-        for tab in self.tabs:
-            action = menu.addAction(tab)
-            # action.triggered.connect(
-            #     lambda checked, tab=tab: self.switch_to_tab(tab)
-            # )
-        menu.exec_(self.show_tabs_button.mapToGlobal(self.show_tabs_button.rect().bottomLeft()))
-
-    def switch_to_tab(self, tab_name):
-        # Можно добавить логику для переключения на вкладку по имени
-        index = self.tabs.index(tab_name)
-        self.tab_bar.setCurrentIndex(index)
-
-app = QApplication(sys.argv)
+app = QApplication([])
 window = MainWindow()
-
-# Добавляем вкладки
-window.add_tab("Вкладка 1")
-window.add_tab("Вкладка 2")
-window.add_tab("Вкладка 3")
-window.add_tab("Вкладка 4")
-
 window.show()
-sys.exit(app.exec_())
+app.exec_()

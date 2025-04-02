@@ -1,13 +1,12 @@
 import os
 import subprocess
-from collections import defaultdict
 from typing import Literal
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
-                             QTabWidget)
+                             QTabWidget, QMenu, QPushButton)
 
 from base_widgets import ContextCustom
 from cfg import Dynamic, JsonData, Static
@@ -267,7 +266,20 @@ class MenuLeft(QTabWidget):
         self.clear()
         self.menus.clear()
 
-        for i in MainFolder.list_:
+        if len(MainFolder.list_) > 2:
+            tabs = MainFolder.list_[:2]
+
+            btn = QPushButton(parent=self, text=">")
+            btn.setFixedWidth(40)
+            btn.clicked.connect(lambda: self.show_menu(btn=btn))
+            x, y = Static.MENU_LEFT_WIDTH - 40, -4
+            btn.move(x, y)
+            btn.show()
+
+        else:
+            tabs = MainFolder.list_
+
+        for i in tabs:
             main_folder_index = MainFolder.list_.index(i)
             wid = MenuTab(main_folder_index=main_folder_index)
             self.addTab(wid, i.name)
@@ -275,6 +287,18 @@ class MenuLeft(QTabWidget):
         
         current_index = MainFolder.list_.index(MainFolder.current)
         self.setCurrentIndex(current_index)
+
+    def show_menu(self, btn: QPushButton):
+        menu = QMenu(self)
+        action1 = QAction("Опция 1", self)
+        action2 = QAction("Опция 2", self)
+        
+        # Добавляем действия в меню
+        menu.addAction(action1)
+        menu.addAction(action2)
+
+        # Отображаем меню
+        menu.exec_(btn.mapToGlobal(btn.rect().bottomLeft()))
 
     def tab_cmd(self, index: int):
         MainFolder.current = MainFolder.list_[index]
