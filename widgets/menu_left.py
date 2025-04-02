@@ -301,8 +301,3 @@ class MenuLeft(QTabWidget):
                 i.setCurrentRow(0)
         else:
             raise Exception("widgets > menu left > wrong flag", flag)
-
-
-    def resizeEvent(self, a0):
-        print(a0.size().width())
-        return super().resizeEvent(a0)
