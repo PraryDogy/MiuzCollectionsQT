@@ -612,9 +612,13 @@ class Grid(QScrollArea):
 
         wid = self.get_wid_under_mouse(a0=a0)
 
+        if wid is None:
+            return
+
         if wid and wid not in self.selected_widgets:
             self.clear_selected_widgets()
             self.add_and_select_widget(wid=wid)
+            QTimer.singleShot(100, wid.set_frame)
 
         coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
         if coll_folder:
