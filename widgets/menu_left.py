@@ -252,16 +252,21 @@ class MenuTab(QListWidget):
             self.coll_btns.append(coll_btn)
 
 
-class MenuLeftBase(QTabWidget):
+class MenuLeft(QTabWidget):
     def __init__(self):
         super().__init__()
 
-        # self.setFixedWidth(Static.MENU_LEFT_WIDTH)
         self.tabBarClicked.connect(self.tab_cmd)
         self.menu_tabs_list: list[MenuTab] = []
 
         self.init_ui()
         SignalsApp.instance.menu_left_cmd.connect(self.menu_left_cmd)
+
+        # получаем ширину, основанную на компоновке вкладок основного виджета
+        # передаем ширину в глобальную переменную
+        wid = self.widget(0)
+        Static.MENU_LEFT_WIDTH = wid.sizeHint().width()
+        self.setFixedWidth(Static.MENU_LEFT_WIDTH)
 
     def init_ui(self):
         self.clear()
@@ -297,21 +302,3 @@ class MenuLeftBase(QTabWidget):
         else:
             raise Exception("widgets > menu left > wrong flag", flag)
 
-
-class MenuLeft(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setFixedWidth(Static.MENU_LEFT_WIDTH)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        self.scroll_area = QScrollArea(self)
-        self.scroll_area.setWidgetResizable(True)
-
-        self.menu_left_base = MenuLeftBase()
-        self.scroll_area.setWidget(self.menu_left_base)
-
-        layout.addWidget(self.scroll_area)
-        self.setLayout(layout)
