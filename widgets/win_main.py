@@ -103,6 +103,8 @@ class WinMain(WinFrameless):
 
         elif flag == "set_title":
 
+            main_folder = MainFolder.current.name.capitalize()
+
             if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
                 t = Lang.all_colls
 
@@ -114,6 +116,8 @@ class WinMain(WinFrameless):
 
             if Dynamic.resents:
                 t = Lang.recents
+
+            t = f"{main_folder}: {t}"
 
             self.setWindowTitle(t)
 
