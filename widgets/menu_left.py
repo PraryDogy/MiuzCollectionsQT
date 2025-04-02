@@ -6,15 +6,16 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
-                             QTabWidget, QMenu, QPushButton)
+                             QScrollArea, QTabWidget, QVBoxLayout, QWidget)
 
 from base_widgets import ContextCustom
 from cfg import Dynamic, JsonData, Static
 from database import THUMBS, Dbase
 from lang import Lang
+from main_folders import MainFolder
 from signals import SignalsApp
 from utils.utils import URunnable, UThreadPool, Utils
-from main_folders import MainFolder
+
 from .actions import OpenWins
 
 
@@ -251,61 +252,36 @@ class MenuTab(QListWidget):
             self.coll_btns.append(coll_btn)
 
 
-class MenuLeft(QTabWidget):
+class MenuLeftBase(QTabWidget):
     def __init__(self):
         super().__init__()
 
-        self.setFixedWidth(Static.MENU_LEFT_WIDTH)
+        # self.setFixedWidth(Static.MENU_LEFT_WIDTH)
         self.tabBarClicked.connect(self.tab_cmd)
-        self.menus: list[MenuTab] = []
+        self.menu_tabs_list: list[MenuTab] = []
 
         self.init_ui()
         SignalsApp.instance.menu_left_cmd.connect(self.menu_left_cmd)
 
     def init_ui(self):
         self.clear()
-        self.menus.clear()
+        self.menu_tabs_list.clear()
 
-        if len(MainFolder.list_) > 2:
-            tabs = MainFolder.list_[:2]
-
-            btn = QPushButton(parent=self, text=">")
-            btn.setFixedWidth(40)
-            btn.clicked.connect(lambda: self.show_menu(btn=btn))
-            x, y = Static.MENU_LEFT_WIDTH - 40, -4
-            btn.move(x, y)
-            btn.show()
-
-        else:
-            tabs = MainFolder.list_
-
-        for i in tabs:
+        for i in MainFolder.list_:
             main_folder_index = MainFolder.list_.index(i)
             wid = MenuTab(main_folder_index=main_folder_index)
             self.addTab(wid, i.name)
-            self.menus.append(wid)
-        
+            self.menu_tabs_list.append(wid)
+       
         current_index = MainFolder.list_.index(MainFolder.current)
         self.setCurrentIndex(current_index)
-
-    def show_menu(self, btn: QPushButton):
-        menu = QMenu(self)
-        action1 = QAction("Опция 1", self)
-        action2 = QAction("Опция 2", self)
-        
-        # Добавляем действия в меню
-        menu.addAction(action1)
-        menu.addAction(action2)
-
-        # Отображаем меню
-        menu.exec_(btn.mapToGlobal(btn.rect().bottomLeft()))
 
     def tab_cmd(self, index: int):
         MainFolder.current = MainFolder.list_[index]
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
 
-        for i in self.menus:
+        for i in self.menu_tabs_list:
             i.setCurrentRow(0)
 
         SignalsApp.instance.win_main_cmd.emit("set_title")
@@ -316,7 +292,26 @@ class MenuLeft(QTabWidget):
         if flag == "reload":
             self.init_ui()
         elif flag == "select_all_colls":
-            for i in self.menus:
+            for i in self.menu_tabs_list:
                 i.setCurrentRow(0)
         else:
             raise Exception("widgets > menu left > wrong flag", flag)
+
+
+class MenuLeft(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setFixedWidth(Static.MENU_LEFT_WIDTH)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)
+
+        self.menu_left_base = MenuLeftBase()
+        self.scroll_area.setWidget(self.menu_left_base)
+
+        layout.addWidget(self.scroll_area)
+        self.setLayout(layout)

@@ -1,36 +1,39 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QMenu, QMenuBar, QLabel
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QLabel, QVBoxLayout, QWidget, QScrollArea
 
-class MainWindow(QMainWindow):
+class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("QTabWidget with QMenu")
-        self.setGeometry(100, 100, 600, 400)
+        # Создание QTabWidget
+        self.tab_widget = QTabWidget(self)
+        self.setCentralWidget(self.tab_widget)
 
-        tab_widget = QTabWidget(self)
-        self.setCentralWidget(tab_widget)
+        # Добавление вкладок с QLabel
+        for i in range(20):
+            label = QLabel(f"Контент вкладки {i+1}")
+            tab_widget = QWidget()
+            layout = QVBoxLayout()
+            layout.addWidget(label)
+            tab_widget.setLayout(layout)
+            self.tab_widget.addTab(tab_widget, f"Вкладка {i+1}")
 
-        first = QLabel("first tab")
-        tab_widget.addTab(first, "first")
+        # Настройка прокручиваемых вкладок
+        self.tab_widget.setTabBarAutoHide(False)
+        self.tab_widget.setTabsClosable(False)
 
-        test = QWidget()
-        tab_widget.addTab(test, "test")
+        # Оборачиваем QTabWidget в QScrollArea для прокрутки
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(self.tab_widget)
+        self.setCentralWidget(scroll_area)
 
-        # # Создание QMenu
-        # menu = QMenu(self)
-        # menu.addAction("Action 1")
-        # menu.addAction("Action 2")
-        # menu.addAction("Action 3")
+        # Настройка окна
+        self.setWindowTitle("QTabWidget с прокруткой")
+        self.setGeometry(100, 100, 300, 200)
 
-        # def show_menu():
-        #     menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
-
-        # button.clicked.connect(show_menu)
-        # layout.addWidget(button)
-
-        # tab_widget.addTab(menu_tab, "Menu Tab")
-
-app = QApplication([])
-window = MainWindow()
-window.show()
-app.exec_()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MyWindow()
+    window.show()
+    sys.exit(app.exec_())

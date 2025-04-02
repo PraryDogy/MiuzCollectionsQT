@@ -43,14 +43,14 @@ class WinUpload(WinSystem):
         self.check_coll_btns()
 
     def check_coll_btns(self):
-        any_tab = self.menu_left.menus[0]
+        any_tab = self.menu_left.menu_tabs_list[0]
         if len(any_tab.coll_btns) == 0:
             QTimer.singleShot(300, self.check_coll_btns)
         else:
             self.setup_coll_btns()
 
     def setup_coll_btns(self):
-        for menu in self.menu_left.menus:
+        for menu in self.menu_left.menu_tabs_list:
 
             disabled_btns = menu.coll_btns[:3]
             coll_btns = menu.coll_btns[3:]
