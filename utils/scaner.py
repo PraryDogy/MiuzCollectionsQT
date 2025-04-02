@@ -49,7 +49,6 @@ class FinderImages:
             return None
 
     def get_collections(self) -> list[str]:
-        """Получает список коллекций, исключая остановленные."""
         collections = []
 
         try:
@@ -60,21 +59,23 @@ class FinderImages:
                 if item.is_dir() and item.name not in stop_list:
                     collections.append(item.path)
 
+            # Добавляем корневую папку в конец списка коллекций (подпапок),
+            # чтобы сканер мог найти изображения как в корневой папке,
+            # так и в подпапках. Например:
+            # - .../root/img.jpg — изображение в корневой папке
+            # - .../root/collection/img.jpg — изображение в подпапке
+            collections.append(ScanerTools.current_main_folder.current_path)
+
         except FileNotFoundError:
             ...
 
         return collections
 
-    def process_collections(
-            self,
-            collections: list[str]
-    ) -> list[tuple[str, int, int, int]]:
-
-        """Обрабатывает список коллекций и находит изображения."""
+    def process_collections(self, collections: list[str]) -> list[tuple[str, int, int, int]]:
         finder_images = []
         total_collections = len(collections)
 
-        for index, collection in enumerate(collections, start=1):
+        for index, collection in enumerate(collections[:-1], start=1):
             
             progress_text = self.get_progress_text(index, total_collections)
             ScanerTools.progressbar_text(progress_text)
@@ -86,9 +87,12 @@ class FinderImages:
             except TypeError as e:
                 Utils.print_err(error=e)
 
-        # for i in os.scandir(ScanerTools.current_main_folder.current_path):
-        #     if i.name.endswith(Static.IMG_EXT):
-        #         finder_images.append(self.get_file_data(entry=i))
+        # Сканируем корневую папку без рекурсии в подпапки,
+        # чтобы найти изображения непосредственно в корневой папке.
+        # В функции get_collections корневая папка добавляется в конец списка коллекций.
+        for i in os.scandir(collections[-1]):
+            if i.name.endswith(Static.IMG_EXT):
+                finder_images.append(self.get_file_data(entry=i))
 
         return finder_images
 
