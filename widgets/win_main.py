@@ -88,6 +88,11 @@ class WinMain(WinFrameless):
         splitter.setStretchFactor(1, 1)
         splitter.setSizes([Static.MENU_LEFT_WIDTH, self.width() - Static.MENU_LEFT_WIDTH])
 
+        SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
+        SignalsApp.instance.win_main_cmd.emit("set_title")
+        QTimer.singleShot(100, self.after_start)
+        grid.setFocus()
+
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
         if flag == "show":
