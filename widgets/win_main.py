@@ -4,7 +4,7 @@ from typing import Literal
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
-                             QWidget)
+                             QWidget, QSplitter)
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
@@ -57,19 +57,21 @@ class WinMain(WinFrameless):
         h_wid_main.setLayout(h_lay_main)
         self.central_layout.addWidget(h_wid_main)
 
+        # Создаем QSplitter
+        splitter = QSplitter(Qt.Horizontal)
+
+        # Левый виджет (MenuLeft)
         left_wid = MenuLeft()
-        h_lay_main.addWidget(left_wid)
+        splitter.addWidget(left_wid)
 
-        mid_wid = QFrame()
-        mid_wid.setFixedWidth(5)
-        h_lay_main.addWidget(mid_wid)
-
+        # Правый виджет
         right_wid = QWidget()
-        h_lay_main.addWidget(right_wid)
+        splitter.addWidget(right_wid)
         right_lay = LayoutVer()
         right_lay.setContentsMargins(0, 0, 0, 0)
         right_wid.setLayout(right_lay)
 
+        # Добавляем элементы в правую панель
         self.bar_top = BarTop()
         right_lay.addWidget(self.bar_top)
 
@@ -79,10 +81,10 @@ class WinMain(WinFrameless):
         bar_bottom = BarBottom()
         right_lay.addWidget(bar_bottom)
 
-        SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
-        SignalsApp.instance.win_main_cmd.emit("set_title")
-        QTimer.singleShot(100, self.after_start)
-        grid.setFocus()
+        # Добавляем splitter в основной layout
+        h_lay_main.addWidget(splitter)
+
+        splitter.setSizes([Static.MENU_LEFT_WIDTH, right_wid.width()])
 
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 

@@ -262,12 +262,6 @@ class MenuLeft(QTabWidget):
         self.init_ui()
         SignalsApp.instance.menu_left_cmd.connect(self.menu_left_cmd)
 
-        # получаем ширину, основанную на компоновке вкладок основного виджета
-        # передаем ширину в глобальную переменную
-        wid = self.widget(0)
-        Static.MENU_LEFT_WIDTH = wid.sizeHint().width()
-        self.setFixedWidth(Static.MENU_LEFT_WIDTH)
-
     def init_ui(self):
         self.clear()
         self.menu_tabs_list.clear()
