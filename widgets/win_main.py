@@ -84,7 +84,9 @@ class WinMain(WinFrameless):
         # Добавляем splitter в основной layout
         h_lay_main.addWidget(splitter)
 
-        splitter.setSizes([Static.MENU_LEFT_WIDTH, right_wid.width()])
+
+        left_width = 200
+        splitter.setSizes([left_width, Dynamic.root_g["aw"] - left_width])
 
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
