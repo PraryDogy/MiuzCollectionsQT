@@ -92,7 +92,12 @@ class FinderImages:
         # В функции get_collections корневая папка добавляется в конец списка коллекций.
         for i in os.scandir(collections[-1]):
             if i.name.endswith(Static.IMG_EXT):
-                finder_images.append(self.get_file_data(entry=i))
+                try:
+                    file_data = self.get_file_data(entry=i)
+                    finder_images.append(file_data)
+                except OSError as e:
+                    print("scaner > FinderImages > get file data", e)
+                    continue
 
         return finder_images
 
