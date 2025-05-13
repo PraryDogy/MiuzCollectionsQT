@@ -97,6 +97,9 @@ class WinUpload(WinSystem):
         self.current_submenu.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.h_lay.addWidget(self.current_submenu)
 
+        self.current_submenu.setFixedHeight(self.current_submenu.height() - 10)
+        self.current_submenu.move(self.current_submenu.x(), self.current_submenu.y() + 5)
+
         wid = QLabel(os.path.basename(self.coll_path))
         wid.setStyleSheet("padding-left: 5px;")
         cmd_ = lambda e, : self.list_widget_item_cmd(entry=self.coll_path)
