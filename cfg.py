@@ -119,14 +119,14 @@ class Static:
     """
 
     SOLID_STYLE = f"""
-        border-radius: 6px;
+        border-radius: 7px;
         color: rgb(255, 255, 255);
         background: {RGB_BLUE};
         border: {BORDER_INV};
     """
 
     SOLID_GRAY_STYLE = f"""
-        border-radius: 6px;
+        border-radius: 10px;
         color: rgb(255, 255, 255);
         background: {RGB_GRAY};
         border: {BORDER_INV};
