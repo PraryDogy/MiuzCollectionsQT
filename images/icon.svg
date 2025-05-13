@@ -27,8 +27,8 @@
 <feBlend mode="normal" in2="shape" result="effect1_innerShadow_28627_58"/>
 </filter>
 <linearGradient id="paint0_linear_28627_58" x1="256" y1="50" x2="256" y2="462" gradientUnits="userSpaceOnUse">
-<stop stop-color="#122136"/>
-<stop offset="1" stop-color="#0D1724"/>
+<stop stop-color="#1A1F27"/>
+<stop offset="1" stop-color="#0A1017"/>
 </linearGradient>
 <linearGradient id="paint1_linear_28627_58" x1="256" y1="81" x2="256" y2="431" gradientUnits="userSpaceOnUse">
 <stop stop-color="#2A60A7" stop-opacity="0.62"/>

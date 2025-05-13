@@ -200,7 +200,7 @@ class Grid(QScrollArea):
                 coll=db_image.coll,
                 fav=db_image.fav
             )
-
+            wid.set_no_frame()
             Thumbnail.path_to_wid[wid.short_src] = wid
             self.cell_to_wid[self.global_row, col] = wid
             wid.row, wid.col = self.global_row, col
