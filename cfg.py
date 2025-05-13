@@ -13,14 +13,14 @@ class ThumbData:
 
     # ширина и высота Thumbnail
     THUMB_H = [115, 135, 160, 230]
-    THUMB_W = [140, 140, 180, 230]
+    THUMB_W = [145, 145, 180, 230]
 
     # максимальный размер в пикселях по широкой стороне для изображения
     # должен быть меньше высоты и ширины Thumb
     PIXMAP_SIZE: list = [60, 80, 100, 170]
 
     # ширина текстового виджета ограничивается количеством символов на строку
-    MAX_ROW: list = [17, 17, 22, 30]
+    MAX_ROW: list = [17, 17, 22, 27]
 
     # растояние между изображением и текстовым виджетом
     SPACING = 2
@@ -116,6 +116,8 @@ class Static:
 
     NORMAL_STYLE = f"""
         border: {BORDER_INV};
+        padding-left: 2px;
+        padding-right: 2px;
     """
 
     SOLID_STYLE = f"""
@@ -123,6 +125,8 @@ class Static:
         color: rgb(255, 255, 255);
         background: {RGB_BLUE};
         border: {BORDER_INV};
+        padding-left: 2px;
+        padding-right: 2px;
     """
 
     SOLID_GRAY_STYLE = f"""
