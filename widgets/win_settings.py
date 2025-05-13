@@ -2,7 +2,8 @@ import os
 import subprocess
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QGroupBox, QLabel,
                              QListWidget, QListWidgetItem, QPushButton,
                              QSpacerItem, QTabWidget, QWidget)
@@ -25,6 +26,7 @@ COLL_FOLDERS = "COLL_FOLDERS"
 LIST_ITEM_H = 25
 REMOVE_MAIN_FOLDER_NAME = "REMOVE_MAIN_FOLDER_NAME"
 ADD_NEW_MAIN_FOLDER = "ADD_NEW_MAIN_FOLDER"
+ICON_SVG = os.path.join(Static.IMAGES, "icon.svg")
 
 class RebootableSettings(QGroupBox):
     apply = pyqtSignal()
@@ -525,14 +527,65 @@ class MainFolderWid(QGroupBox):
         self.win.show()
 
 
+class SelectableLabel(QLabel):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        txt = "\n".join([
+            f"Version {Static.APP_VER}",
+            "Developed by Evlosh",
+            "email: evlosh@gmail.com",
+            "telegram: evlosh",
+            ])
+        
+        self.setText(txt)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.setCursor(Qt.CursorShape.IBeamCursor)
+
+    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        context_menu = ContextCustom(ev)
+
+        copy_text = QAction(parent=context_menu, text=Lang.copy)
+        copy_text.triggered.connect(self.copy_text_md)
+        context_menu.addAction(copy_text)
+
+        context_menu.addSeparator()
+
+        select_all = QAction(parent=context_menu, text=Lang.copy_all)
+        select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
+        context_menu.addAction(select_all)
+
+        context_menu.show_menu()
+        return super().contextMenuEvent(ev)
+
+    def copy_text_md(self):
+        Utils.copy_text(self.selectedText())
+
+
+class AboutWin(QGroupBox):
+    def __init__(self):
+        super().__init__()
+        h_lay = LayoutHor()
+        self.setLayout(h_lay)
+
+        icon = QSvgWidget(ICON_SVG)
+        icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+        icon.setFixedSize(85, 85)
+        h_lay.addWidget(icon)
+
+        h_lay.addSpacerItem(QSpacerItem(0, 20))
+
+        lbl = SelectableLabel(self)
+        h_lay.addWidget(lbl)
+
+
 class WinSettings(WinSystem):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lang.settings)
 
-        QTimer.singleShot(10, self.init_ui)
-        self.setFixedSize(*WIN_SIZE)
-        self.setFocus()
+        self.init_ui()
+        self.setFixedSize(490, 530)
 
     def init_ui(self):
         self.central_layout.setSpacing(10)
@@ -551,6 +604,9 @@ class WinSettings(WinSystem):
         main_folder_tab = TabsWidget()
         main_folder_tab.need_lock_widgets.connect(self.lock_widgets)
         self.central_layout.addWidget(main_folder_tab)
+
+        about_wid = AboutWin()
+        self.central_layout.addWidget(about_wid)
 
         btns_wid = QWidget()
         btns_layout = LayoutHor()
