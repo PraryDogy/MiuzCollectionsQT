@@ -310,8 +310,8 @@ class Lang_:
         "Show all"
     ]
     show_app_support = [
-        "Показать файлы",
-        "Show files"
+        "Показать",
+        "Show"
     ]
     show_more = [
         "Позазать еще",

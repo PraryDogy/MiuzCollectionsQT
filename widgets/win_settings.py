@@ -41,7 +41,7 @@ class RebootableSettings(QGroupBox):
         first_row_wid.setLayout(first_row_lay)
 
         self.lang_btn = QPushButton(text=Lang._lang_name)
-        self.lang_btn.setFixedWidth(150)
+        self.lang_btn.setFixedWidth(115)
         self.lang_btn.clicked.connect(self.lang_btn_cmd)
         first_row_lay.addWidget(self.lang_btn)
 
@@ -54,8 +54,8 @@ class RebootableSettings(QGroupBox):
         sec_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_row_wid.setLayout(sec_row_lay)
 
-        self.reset_btn = QPushButton(Lang.reset_all)
-        self.reset_btn.setFixedWidth(150)
+        self.reset_btn = QPushButton(Lang.reset)
+        self.reset_btn.setFixedWidth(115)
         self.reset_btn.clicked.connect(self.reset_btn_cmd)
         sec_row_lay.addWidget(self.reset_btn)
 
@@ -98,7 +98,7 @@ class SimpleSettings(QGroupBox):
         first_row_wid.setLayout(first_row_lay)
 
         self.updater_btn = QPushButton(text=Lang.download_update)
-        self.updater_btn.setFixedWidth(150)
+        self.updater_btn.setFixedWidth(115)
         self.updater_btn.clicked.connect(self.updater_btn_cmd)
         first_row_lay.addWidget(self.updater_btn)
 
@@ -112,7 +112,7 @@ class SimpleSettings(QGroupBox):
         sec_row_wid.setLayout(sec_row_lay)
 
         self.show_files_btn = QPushButton(text=Lang.show_app_support)
-        self.show_files_btn.setFixedWidth(150)
+        self.show_files_btn.setFixedWidth(115)
         self.show_files_btn.clicked.connect(self.show_files_cmd)
         sec_row_lay.addWidget(self.show_files_btn)
 
@@ -476,7 +476,7 @@ class MainFolderWid(QGroupBox):
 
         add_btn = QPushButton(Lang.add_)
         add_btn.mouseReleaseEvent = self.add_btn_cmd
-        add_btn.setFixedWidth(150)
+        add_btn.setFixedWidth(115)
         h_lay.addWidget(add_btn)
 
         descr = QLabel(Lang.add_main_folder)
@@ -491,7 +491,7 @@ class MainFolderWid(QGroupBox):
 
         remove_btn = QPushButton(Lang.delete)
         remove_btn.clicked.connect(self.remove_btn_cmd)
-        remove_btn.setFixedWidth(150)
+        remove_btn.setFixedWidth(115)
         second_lay.addWidget(remove_btn)
 
         remove_descr = QLabel(Lang.delete_main_folder)
