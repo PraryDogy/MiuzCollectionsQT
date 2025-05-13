@@ -25,16 +25,16 @@ class RightLabel(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
-        self.setSelection(0, len(self.text()))
-
-        text = self.text()
+        text = self.selectedText()
         text = text.replace(Static.PARAGRAPH_SEP, "")
         text = text.replace(Static.LINE_FEED, "")
 
+        full_text = self.text().replace(Static.PARAGRAPH_SEP, "").replace(Static.LINE_FEED, "")
+
         is_path = bool(
-            os.path.isdir(text)
+            os.path.isdir(full_text)
             or
-            os.path.isfile(text)
+            os.path.isfile(full_text)
         )
 
         menu_ = ContextCustom(event=ev)
@@ -46,7 +46,7 @@ class RightLabel(QLabel):
 
         reveal = QAction(parent=menu_, text=Lang.reveal_in_finder)
         reveal.triggered.connect(
-            lambda: Utils.reveal_files(files_list=[text])
+            lambda: Utils.reveal_files(files_list=[full_text])
         )
         menu_.addAction(reveal)
 
