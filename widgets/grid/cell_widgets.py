@@ -177,12 +177,12 @@ class Thumbnail(QFrame, CellWid):
 
     def set_frame(self):
         self.img_wid.setStyleSheet(Static.SOLID_GRAY_STYLE)
-        text_style = Static.SOLID_STYLE + "font-size: 11pt;"
+        text_style = Static.SOLID_STYLE + "font-size: 11px;"
         self.text_wid.setStyleSheet(text_style)
 
     def set_no_frame(self):
         self.img_wid.setStyleSheet(Static.NORMAL_STYLE)
-        text_style = Static.NORMAL_STYLE + "font-size: 11pt;"
+        text_style = Static.NORMAL_STYLE + "font-size: 11px;"
         self.text_wid.setStyleSheet(text_style)
 
     def change_fav(self, value: int):
