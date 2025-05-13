@@ -2,7 +2,7 @@ import os
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget, QPushButton
 
 from base_widgets import LayoutHor, LayoutVer, SvgBtn
 from base_widgets.wins import WinSystem
@@ -24,13 +24,13 @@ class WinSmb(WinSystem):
         if text:
             self.my_text = text
         else:
-            self.my_text = f"{MainFolder.current.name.capitalize()}:\n{Lang.choose_coll_smb}"
+            self.my_text = f"{Lang.choose_coll_smb}"
 
         self.setWindowTitle(f"{MainFolder.current.name.capitalize()}: {Lang.no_connection.lower()}")
 
+        self.central_layout.setContentsMargins(0, 10, 0, 0)
         self.init_ui()
-        self.setFixedSize(330, 80)
-        self.setFocus()
+        self.setFixedSize(320, 90)
 
     def init_ui(self):
         h_wid = QWidget()
@@ -51,6 +51,11 @@ class WinSmb(WinSystem):
 
         descr = QLabel(self.my_text)
         v_lay.addWidget(descr)
+
+        ok_btn = QPushButton(text=Lang.ok)
+        ok_btn.setFixedWidth(90)
+        ok_btn.clicked.connect(self.close)
+        self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
