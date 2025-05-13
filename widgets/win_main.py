@@ -41,6 +41,13 @@ class TestWid(QFrame):
         ...
 
 
+class USep(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setStyleSheet("background: rgba(0, 0, 0, 0.2)")
+        self.setFixedHeight(1)
+
+
 class WinMain(WinFrameless):
     def __init__(self):
         super().__init__()
@@ -75,8 +82,15 @@ class WinMain(WinFrameless):
         self.bar_top = BarTop()
         right_lay.addWidget(self.bar_top)
 
+
+        sep_upper = USep()
+        right_lay.addWidget(sep_upper)
+
         grid = Grid()
         right_lay.addWidget(grid)
+
+        sep_bottom = USep()
+        right_lay.addWidget(sep_bottom)
 
         bar_bottom = BarBottom()
         right_lay.addWidget(bar_bottom)

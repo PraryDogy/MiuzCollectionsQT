@@ -91,6 +91,7 @@ class Grid(QScrollArea):
         self.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
+        self.setStyleSheet("QScrollArea { border: none; }")
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
