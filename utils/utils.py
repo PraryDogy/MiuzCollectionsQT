@@ -53,9 +53,8 @@ class URunnable(QRunnable):
         return wrapper
 
 class Err:
-
     @classmethod
-    def print_err(cls, error: Exception):
+    def print_error(cls, error: Exception):
         tb = traceback.extract_tb(error.__traceback__)
 
         # Попробуем найти первую строчку стека, которая относится к вашему коду.
@@ -74,8 +73,8 @@ class Err:
             filename = os.path.basename(filepath)
             line_number = trace.lineno
 
-        print(f"{filepath}:{line_number}")
-        print(error)
+        print("Error:", str(error), f"{filepath}:{line_number}")
+        return str(error)
 
 
 class ReadImage(Err):
