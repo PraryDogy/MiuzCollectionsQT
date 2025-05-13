@@ -486,7 +486,7 @@ class Grid(QScrollArea):
             return
 
         self.resize_timer.stop()
-        self.resize_timer.start(500)
+        self.resize_timer.start(10)
         self.up_btn.hide()
         return super().resizeEvent(a0)
 
