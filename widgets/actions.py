@@ -1,7 +1,7 @@
 import sqlalchemy
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu, QWidget
-
+import os
 from cfg import Dynamic, JsonData, Static
 from database import THUMBS, Dbase
 from lang import Lang
@@ -99,6 +99,25 @@ class CopyPath(QAction):
         if coll_folder:
             full_src = Utils.get_full_src(coll_folder, self.short_src)
             Utils.copy_text(text=full_src)
+        else:
+            OpenWins.smb(parent_=self.win_)
+
+
+class CopyName(QAction):
+    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
+        super().__init__(parent=parent, text=Lang.copy_name)
+        self.parent_ = parent
+        self.win_ = win
+        self.short_src = short_src
+        self.triggered.connect(self.cmd)
+
+    def cmd(self, *args):
+        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
+
+        if coll_folder:
+            name = os.path.basename(self.short_src)
+            name, _ = os.path.splitext(name)
+            Utils.copy_text(name)
         else:
             OpenWins.smb(parent_=self.win_)
 

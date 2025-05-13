@@ -464,6 +464,11 @@ class Lang_:
         "Rename collections folder"
     ]
 
+    copy_name = [
+        "Скопировать имя",
+        "Copy filename"
+    ]
+
 class Lang(Lang_):
 
     @classmethod

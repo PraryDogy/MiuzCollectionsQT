@@ -11,12 +11,13 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
-from main_folders import MainFolder
 from cfg import Dynamic, JsonData, Static
 from database import THUMBS, Dbase
+from main_folders import MainFolder
 from utils.utils import URunnable, UThreadPool, Utils
 
-from .actions import CopyPath, FavActionDb, OpenInfoDb, OpenWins, Reveal, Save
+from .actions import (CopyName, CopyPath, FavActionDb, OpenInfoDb, OpenWins,
+                      Reveal, Save)
 from .grid.cell_widgets import Thumbnail
 
 IMG_VIEW_STYLE = """
@@ -513,6 +514,13 @@ class WinImageView(WinChild):
             short_src=self.short_src
         )
         self.menu_.addAction(copy)
+
+        copy_name = CopyName(
+            parent=self.menu_,
+            win=self,
+            short_src=self.short_src
+        )
+        self.menu_.addAction(copy_name)
 
         reveal = Reveal(
             parent=self.menu_,

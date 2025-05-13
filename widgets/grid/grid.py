@@ -9,12 +9,13 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
 from cfg import Dynamic, JsonData, Static, ThumbData
-from lang import Lang
-from signals import SignalsApp
 from filters import Filter
-from utils.utils import UThreadPool, Utils
+from lang import Lang
 from main_folders import MainFolder
-from ..actions import (CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
+from signals import SignalsApp
+from utils.utils import UThreadPool, Utils
+
+from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
                        OpenInView, OpenWins, Reveal, Save, ScanerRestart)
 from ._db_images import DbImage, DbImages
 from .cell_widgets import ImgWid, TextWid, Thumbnail, Title
@@ -549,6 +550,13 @@ class Grid(QScrollArea):
                 short_src=clicked_wid.short_src
             )
             self.menu_.addAction(copy)
+
+            copy_name = CopyName(
+                parent=self.menu_,
+                win=self.window(),
+                short_src=clicked_wid.short_src
+            )
+            self.menu_.addAction(copy_name)
 
             reveal = Reveal(
                 parent=self.menu_,
