@@ -7,7 +7,7 @@ from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
 from PyQt5.QtWidgets import QAction, QLabel, QSlider, QWidget
 
 from base_widgets import ContextCustom, LayoutHor, SvgBtn
-from cfg import Dynamic, Static
+from cfg import Dynamic, Static, ThumbData
 from lang import Lang
 from signals import SignalsApp
 
@@ -63,7 +63,7 @@ class CustomSlider(BaseSlider):
         super().__init__(
             orientation=Qt.Orientation.Horizontal,
             minimum=0,
-            maximum=3
+            maximum=len(ThumbData.PIXMAP_SIZE) - 1
         )
         self.setFixedWidth(80)
         self.setValue(Dynamic.thumb_size_ind)

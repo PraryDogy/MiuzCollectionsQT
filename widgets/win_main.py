@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
 from main_folders import MainFolder
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from signals import SignalsApp
 from utils.scaner import Scaner
@@ -186,7 +186,7 @@ class WinMain(WinFrameless):
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.thumb_size_ind < 3:
+                if Dynamic.thumb_size_ind < len(ThumbData.PIXMAP_SIZE) - 1:
                     Dynamic.thumb_size_ind += 1
                     SignalsApp.instance.slider_change_value.emit(Dynamic.thumb_size_ind)
 
