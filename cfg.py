@@ -139,6 +139,8 @@ class Static:
     BORDERED_STYLE = f"""
         border-radius: 6px;
         border: {BORDER_BLUE};
+        padding-left: 2px;
+        padding-right: 2px;
     """
 
     TITLE_NORMAL = f"""
