@@ -121,6 +121,7 @@ class Thumbnail(QFrame, CellWid):
     select = pyqtSignal(str)
     path_to_wid: dict[str, "Thumbnail"] = {}
 
+    img_frame_size = 0
     pixmap_size = 0
     thumb_w = 0
     thumb_h = 0
@@ -146,12 +147,8 @@ class Thumbnail(QFrame, CellWid):
         self.setLayout(self.v_layout)
 
         self.img_wid = ImgWid()
-        self.v_layout.addWidget(
-            self.img_wid,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
-
-        self.text_wid = TextWid(parent=self, name=self.name, coll=coll)
+        self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.text_wid = TextWid(self, self.name, coll)
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(
             self.text_wid,
@@ -164,6 +161,7 @@ class Thumbnail(QFrame, CellWid):
     def calculate_size(cls):
         ind = Dynamic.thumb_size_ind
         cls.pixmap_size = ThumbData.PIXMAP_SIZE[ind]
+        cls.img_frame_size = Thumbnail.pixmap_size + ThumbData.OFFSET
         cls.thumb_w = ThumbData.THUMB_W[ind]
         cls.thumb_h = ThumbData.THUMB_H[ind]
 
@@ -171,23 +169,11 @@ class Thumbnail(QFrame, CellWid):
         # инициация текста
         self.text_wid.set_text()
 
-        self.setFixedSize(
-            self.thumb_w,
-            self.thumb_h
-        )
+        self.setFixedSize(Thumbnail.thumb_w, Thumbnail.thumb_h)
 
         # рамка вокруг pixmap при выделении Thumb
-        self.img_wid.setFixedSize(
-            self.pixmap_size + ThumbData.OFFSET,
-            self.pixmap_size + ThumbData.OFFSET
-        )
-
-        self.img_wid.setPixmap(
-            Utils.pixmap_scale(
-                pixmap=self.img,
-                size=self.pixmap_size
-            )
-        )
+        self.img_wid.setFixedSize(Thumbnail.pixmap_size + ThumbData.OFFSET, Thumbnail.pixmap_size + ThumbData.OFFSET)
+        self.img_wid.setPixmap(Utils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
         self.img_wid.setStyleSheet(Static.SOLID_GRAY_STYLE)
