@@ -82,6 +82,7 @@ class CustomSlider(BaseSlider):
 
 
 class FilterBtn(QLabel):
+    obj_name = "filter_btn"
 
     def __init__(self):
         t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
@@ -91,13 +92,16 @@ class FilterBtn(QLabel):
         self.set_normal_style()
 
     def set_normal_style(self):
-        self.setStyleSheet(f"#filter_btn {{{Static.NORMAL_STYLE}}}")
+        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.NORMAL_STYLE}}}")
 
     def set_solid_style(self):
-        self.setStyleSheet(f"#filter_btn {{{Static.SOLID_STYLE}}}")
+        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.SOLID_STYLE}}}")
 
     def set_border_style(self):
-        self.setStyleSheet(f"#filter_btn {{{Static.BORDERED_STYLE}}}")
+        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.BORDERED_STYLE}}}")
+
+    def set_enter_style(self):
+        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.SOLID_GRAY_STYLE}}}")
 
     def menu_types(self, *args):
         self.set_solid_style()
@@ -118,6 +122,15 @@ class FilterBtn(QLabel):
         menu_.exec_()
         
         self.set_normal_style()
+
+    def enterEvent(self, a0):
+        self.old_style = self.styleSheet()
+        self.set_enter_style()
+        return super().enterEvent(a0)
+    
+    def leaveEvent(self, a0):
+        self.setStyleSheet(self.old_style)
+        return super().leaveEvent(a0)
 
     def contextMenuEvent(self, ev):
         self.set_border_style()

@@ -134,6 +134,8 @@ class Static:
         color: rgb(255, 255, 255);
         background: {RGB_GRAY};
         border: {BORDER_INV};
+        padding-left: 2px;
+        padding-right: 2px;
     """
 
     BORDERED_STYLE = f"""
