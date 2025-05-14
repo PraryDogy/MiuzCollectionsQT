@@ -59,6 +59,10 @@ class Lang_:
         "Коллекция",
         "Collection"
     ]
+    collections = [
+        "Коллекции",
+        "Collections"
+    ]
     copy = [
         "Копировать",
         "Copy"
@@ -150,6 +154,10 @@ class Lang_:
     loading = [
         "Загрузка...",
         "Loading..."
+    ]
+    main = [
+        "Основные",
+        "Main"
     ]
     months = [
         {
@@ -302,8 +310,8 @@ class Lang_:
         "Settings"
     ]
     show_about = [
-        "О приложении",
-        "Show about"
+        "Сведения",
+        "About"
     ]
     show_all = [
         "Показать все",

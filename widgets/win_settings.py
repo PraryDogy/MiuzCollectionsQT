@@ -6,7 +6,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QGroupBox, QLabel,
                              QListWidget, QListWidgetItem, QPushButton,
-                             QSpacerItem, QTabWidget, QWidget)
+                             QSpacerItem, QTabWidget, QWidget, QTabWidget)
 
 from base_widgets import ContextCustom, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.input import ULineEdit
@@ -585,29 +585,56 @@ class WinSettings(WinSystem):
         self.setWindowTitle(Lang.settings)
 
         self.init_ui()
-        self.setFixedSize(490, 530)
+        self.first_tab()
+        self.second_tab()
+        self.btns_wid()
+        self.setFixedSize(420, 430)
 
     def init_ui(self):
+        self.tabs_wid = QTabWidget()
+        self.tabs_wid.tabBarClicked.connect(lambda: self.setFocus())
+        self.central_layout.addWidget(self.tabs_wid)
+        self.central_layout.setContentsMargins(5, 10, 5, 5)
         self.central_layout.setSpacing(10)
+
+    def first_tab(self):
+        v_wid = QWidget()
+        v_lay = LayoutVer()
+        v_lay.setSpacing(10)
+        v_wid.setLayout(v_lay)
 
         rebootable_settings = RebootableSettings()
         rebootable_settings.apply.connect(self.lock_widgets)
-        self.central_layout.addWidget(rebootable_settings)
+        v_lay.addWidget(rebootable_settings)
 
         simple_settings = SimpleSettings()
-        self.central_layout.addWidget(simple_settings)
+        v_lay.addWidget(simple_settings)
+
+        about_wid = AboutWin()
+        v_lay.addWidget(about_wid)
+
+        v_lay.addStretch()
+
+        self.tabs_wid.addTab(v_wid, Lang.main)
+
+    def second_tab(self):
+        v_wid = QWidget()
+        v_lay = LayoutVer()
+        v_lay.setSpacing(10)
+        v_wid.setLayout(v_lay)
 
         add_main_folder = MainFolderWid()
         add_main_folder.need_lock_widgets.connect(self.lock_widgets)
-        self.central_layout.addWidget(add_main_folder)
+        v_lay.addWidget(add_main_folder)
 
         main_folder_tab = TabsWidget()
         main_folder_tab.need_lock_widgets.connect(self.lock_widgets)
-        self.central_layout.addWidget(main_folder_tab)
+        v_lay.addWidget(main_folder_tab)
 
-        about_wid = AboutWin()
-        self.central_layout.addWidget(about_wid)
+        v_lay.addStretch()
+        self.tabs_wid.addTab(v_wid, Lang.collections)
 
+    def btns_wid(self):
         btns_wid = QWidget()
         btns_layout = LayoutHor()
         btns_wid.setLayout(btns_layout)
