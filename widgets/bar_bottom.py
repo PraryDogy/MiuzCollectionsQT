@@ -81,21 +81,6 @@ class CustomSlider(BaseSlider):
         SignalsApp.instance.grid_thumbnails_cmd.emit("resize")
 
 
-class MyLabel(QLabel):
-    def paintEvent(self, a0: QPaintEvent | None) -> None:
-        painter = QPainter(self)
-
-        metrics = QFontMetrics(self.font())
-        elided = metrics.elidedText(
-            self.text(),
-            Qt.TextElideMode.ElideNone,
-            self.width()
-        )
-
-        painter.drawText(self.rect(), self.alignment(), elided)
-        return super().paintEvent(a0)
-
-
 class FilterBtn(QLabel):
 
     def __init__(self):
