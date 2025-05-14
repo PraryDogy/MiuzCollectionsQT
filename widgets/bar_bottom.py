@@ -2,9 +2,8 @@ import os
 from typing import Literal
 
 from PyQt5.QtCore import QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import (QFontMetrics, QMouseEvent, QPainter, QPaintEvent,
-                         QWheelEvent)
-from PyQt5.QtWidgets import QAction, QLabel, QSlider, QWidget
+from PyQt5.QtGui import QMouseEvent, QWheelEvent
+from PyQt5.QtWidgets import QAction, QLabel, QSlider, QWidget, QFrame
 
 from base_widgets import ContextCustom, LayoutHor, SvgBtn
 from cfg import Dynamic, Static, ThumbData
@@ -150,6 +149,39 @@ class FilterBtn(QLabel):
             self.menu_types()
 
 
+class SvgBtn_(QFrame):
+    def __init__(self, icon_path, size, parent = None):
+        super().__init__(parent)
+
+        v_lay = LayoutHor()
+        self.setLayout(v_lay)
+        self.layout().setContentsMargins(2, 1, 2, 1)
+        self.svg_btn = SvgBtn(icon_path, size, parent)
+        self.layout().addWidget(self.svg_btn)
+        self.setStyleSheet(self.normal_style())
+        self.adjustSize()
+
+    def solid_style(self):
+        style = f"""
+        background: {Static.RGB_GRAY};
+        border-radius: 6px;
+        """
+        return style
+
+    def normal_style(self):
+        style = f"""
+        background: transparent;
+        """
+        return style
+
+    def enterEvent(self, a0):
+        self.setStyleSheet(self.solid_style())
+        return super().enterEvent(a0)
+
+    def leaveEvent(self, a0):
+        self.setStyleSheet(self.normal_style())
+        return super().leaveEvent(a0)
+
 class BarBottom(QWidget):
 
     def __init__(self):
@@ -182,11 +214,11 @@ class BarBottom(QWidget):
             alignment=Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.downloads = SvgBtn(icon_path=DOWNLOADS_SVG , size=20)
+        self.downloads = SvgBtn_(icon_path=DOWNLOADS_SVG , size=20)
         self.downloads.mouseReleaseEvent = self.open_downloads_cmd
         self.h_layout.addWidget(self.downloads)
 
-        self.sett_widget = SvgBtn(SETTINGS_SVG, size=20)
+        self.sett_widget = SvgBtn_(SETTINGS_SVG, size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
 
