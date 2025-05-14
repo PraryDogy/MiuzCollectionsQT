@@ -26,11 +26,12 @@ class WinSmb(WinSystem):
         else:
             self.my_text = f"{Lang.choose_coll_smb}"
 
-        self.setWindowTitle(f"{MainFolder.current.name.capitalize()}: {Lang.no_connection.lower()}")
+        self.setWindowTitle(f"{Lang.no_connection}")
 
         self.central_layout.setContentsMargins(0, 10, 0, 0)
+        self.central_layout.setSpacing(10)
         self.init_ui()
-        self.setFixedSize(320, 90)
+        self.setFixedSize(320, 95)
 
     def init_ui(self):
         h_wid = QWidget()
