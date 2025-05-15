@@ -32,6 +32,12 @@ THUMBS = sqlalchemy.Table(
     sqlalchemy.Column(ThumbColumns.BRAND, sqlalchemy.Text, comment="miuz, panacea"),
 )
 
+DIRS = sqlalchemy.Table(
+    "dirs", METADATA,
+    sqlalchemy.Column(ThumbColumns.ID, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ThumbColumns.SHORT_SRC, sqlalchemy.Text),
+    sqlalchemy.Column(ThumbColumns.SIZE, sqlalchemy.Integer, comment="Размер"),
+)
 
 class Dbase:
     engine: sqlalchemy.Engine = None
@@ -56,6 +62,7 @@ class Dbase:
                     "timeout": cls._timeout
                     }
                     )
+            METADATA.create_all(cls.engine)
         else:
             t = "Нет пользовательского файла DB_FILE"
             raise Exception(t)
