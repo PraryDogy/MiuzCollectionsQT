@@ -36,7 +36,7 @@ DIRS = sqlalchemy.Table(
     "dirs", METADATA,
     sqlalchemy.Column(ThumbColumns.ID, sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column(ThumbColumns.SHORT_SRC, sqlalchemy.Text),
-    sqlalchemy.Column(ThumbColumns.SIZE, sqlalchemy.Integer, comment="Размер"),
+    sqlalchemy.Column(ThumbColumns.MOD, sqlalchemy.Integer),
 )
 
 class Dbase:
