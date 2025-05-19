@@ -93,20 +93,6 @@ class Static:
         "hashdir.zip"
         )
 
-
-    # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ 
-    LAYERS_EXT: tuple = (
-        ".psd", ".psb", ".tiff", ".tif",
-        ".PSD", ".PSB", ".TIFF", ".TIF"
-        )
-
-    JPG_EXT: tuple = (
-        ".jpg", ".jpeg", ".jfif", ".png",
-        ".JPG", ".JPEG", ".JFIF", ".PNG"
-        )
-    
-    IMG_EXT = JPG_EXT + LAYERS_EXT
-
     ext_jpeg = (
         ".jpg", ".JPG",
         ".jpeg", ".JPEG",
@@ -173,6 +159,14 @@ class Static:
         *ext_raw,
         *ext_video,
     )
+
+    # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ 
+    LAYERS_EXT: tuple = (
+        *ext_psd,
+        *ext_tiff,
+        )
+    
+    IMG_EXT = ext_jpeg + LAYERS_EXT
 
     # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ 
     RGB_BLUE = "rgb(46, 89, 203)"
