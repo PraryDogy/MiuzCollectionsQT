@@ -257,7 +257,7 @@ class MenuTypes(QMenu):
 
         type_jpg = QAction(parent=self, text=Lang.type_jpg)
         type_jpg.setCheckable(True)
-        cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.JPG_EXT)
+        cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.ext_jpeg)
         type_jpg.triggered.connect(cmd_jpg)
         self.addAction(type_jpg)
 
@@ -267,7 +267,7 @@ class MenuTypes(QMenu):
         type_tiff.triggered.connect(cmd_tiff)
         self.addAction(type_tiff)
 
-        if Static.JPG_EXT in Dynamic.types:
+        if Static.ext_jpeg in Dynamic.types:
             type_jpg.setChecked(True)
 
         if Static.LAYERS_EXT in Dynamic.types:
