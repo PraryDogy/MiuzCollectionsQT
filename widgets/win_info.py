@@ -144,7 +144,7 @@ class ResolTask(URunnable):
 
     @URunnable.set_running_state
     def run(self):
-        img_array = Utils.read_image(full_src=self.full_src)
+        img_array = Utils.read_image(self.full_src)
 
         if img_array is not None and len(img_array.shape) > 1:
             h, w = img_array.shape[0], img_array.shape[1]

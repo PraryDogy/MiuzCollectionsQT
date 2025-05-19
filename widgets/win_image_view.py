@@ -98,7 +98,7 @@ class LoadImage(URunnable):
 
         if self.full_src not in LoadImage.images:
         
-            img = Utils.read_image(full_src=self.full_src)
+            img = Utils.read_image(self.full_src)
 
             if img is not None:
                 img = Utils.desaturate_image(image=img, factor=0.2)
