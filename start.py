@@ -65,7 +65,7 @@ from database import Dbase
 from lang import Lang
 from signals import SignalsApp
 from utils.scaner import Scaner
-from utils.utils import UThreadPool
+from utils.utils import UThreadPool, ReadImage
 from widgets.win_main import WinMain
 from main_folders import MainFolder
 
@@ -95,6 +95,7 @@ JsonData.init()
 Dbase.init()
 Lang.init()
 MainFolder.init()
+ReadImage.init_read_dict(Static)
 
 app = App(sys.argv)
 

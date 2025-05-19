@@ -52,9 +52,11 @@ class URunnable(QRunnable):
 
         return wrapper
 
+
 class Err:
     @classmethod
     def print_error(cls, error: Exception):
+        LIMIT_ = 200
         tb = traceback.extract_tb(error.__traceback__)
 
         # Попробуем найти первую строчку стека, которая относится к вашему коду.
@@ -73,218 +75,183 @@ class Err:
             filename = os.path.basename(filepath)
             line_number = trace.lineno
 
-        print("Error:", str(error), f"{filepath}:{line_number}")
-        return str(error)
+        msg = str(error)
+        if msg.startswith("[Errno"):
+            msg = msg.split("]", 1)[-1].strip()
+
+        print(f"\n{type(error).__name__}: {msg}\n{filepath}:{line_number}\n")
+        return msg
 
 
-class ReadImage(Err):
+class ReadImage:
+    read_any_dict = {}
+
+    @classmethod
+    def init_read_dict(cls, cfg: Static):
+        """
+        В Static должны содержаться данные о расширениях
+        """
+        for ext in cfg.ext_psd:
+            cls.read_any_dict[ext] = cls.read_psb
+        for ext in cfg.ext_tiff:
+            cls.read_any_dict[ext] = cls.read_tiff
+        for ext in cfg.ext_raw:
+            cls.read_any_dict[ext] = cls.read_raw
+        for ext in cfg.ext_jpeg:
+            cls.read_any_dict[ext] = cls.read_jpg
+        for ext in cfg.ext_png:
+            cls.read_any_dict[ext] = cls.read_png
+        for ext in cfg.ext_video:
+            cls.read_any_dict[ext] = cls.read_movie
+
+        for i in cfg.ext_all:
+            if i not in ReadImage.read_any_dict:
+                raise Exception (f"utils > ReadImage > init_read_dict: не инициирован {i}")
 
     @classmethod
     def read_tiff(cls, path: str) -> np.ndarray | None:
-
-        errors = (
-            tifffile.TiffFileError,
-            RuntimeError,
-            DelayedImportError,
-            Exception
-        )
-
         try:
-            # Оставляем только три канала (RGB)
-            img = tifffile.imread(files=path)
-            img = img[..., :3]
-
-            # Проверяем, соответствует ли тип данных изображения uint8.
-            # `uint8` — это 8-битный целочисленный формат данных, где значения
-            # пикселей лежат в диапазоне [0, 255].
-            # Большинство изображений в RGB используют именно этот формат
-            # для хранения данных.
-            # Если тип данных не `uint8`, требуется преобразование.
-            if str(object=img.dtype) != "uint8":
-
-                # Если тип данных отличается, то предполагаем, что значения
-                # пикселей выходят за пределы диапазона [0, 255].
-                # Например, они могут быть в формате uint16 (диапазон [0, 65535]).
-                # Для преобразования выполняем нормализацию значений.
-                # Делим на 256, чтобы перевести диапазон [0, 65535] в [0, 255]:
-                # 65535 / 256 ≈ 255 (максимальное значение в uint8).
-                # Приводим типданных массива к uint8.
-                img = (img / 256).astype(dtype="uint8")
-
+            img = tifffile.imread(path)
+            # Проверяем, что изображение трёхмерное
+            if img.ndim == 3:
+                channels = min(img.shape)
+                channels_index = img.shape.index(channels)
+                # Транспонируем, если каналы на первом месте
+                if channels_index == 0:
+                    img = img.transpose(1, 2, 0)
+                # Ограничиваем количество каналов до 3
+                if channels > 3:
+                    img = img[:, :, :3]
+                # Преобразуем в uint8, если тип другой
+                if str(img.dtype) != "uint8":
+                    img = (img / 256).astype(dtype="uint8")
+            # Если изображение уже 2D, просто показываем его
+            elif img.ndim == 2:
+                img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
             return img
-
-        except errors as e:
-
-            print("error read tiff", path, e)
-
+        except (tifffile.TiffFileError, RuntimeError, DelayedImportError, Exception) as e: 
+            Err.print_error(e)
             try:
                 img = Image.open(path)
                 img = img.convert("RGB")
-                return np.array(img)
-
-            except Exception:
-                return None
-
-
-    @classmethod
-    def read_psd(cls, path: str) -> np.ndarray | None:
-
-        with open(path, "rb") as psd_file:
-
-            # Проверяем, что файл имеет правильную подпись PSD/PSB:
-            # В начале файла (первые 4 байта) должна быть строка '8BPS', 
-            # которая является стандартной подписью для форматов PSD и PSB.
-            # Если подпись не совпадает, файл не является корректным PSD/PSB.
-            if psd_file.read(4) != b"8BPS":
-                return None
-
-            # Переходим к байту 12, где согласно спецификации PSD/PSB
-            # содержится число каналов изображения. Число каналов (2 байта)
-            # определяет, сколько цветовых и дополнительных каналов содержится в файле.
-            psd_file.seek(12)
-
-            # Считываем число каналов (2 байта, big-endian формат,
-            # так как PSD/PSB используют этот порядок байтов).
-            channels = int.from_bytes(psd_file.read(2), byteorder="big")
-
-            # Возвращаем указатель в начало файла (offset = 0),
-            # чтобы psd-tools или Pillow могли корректно прочитать файл с самого начала.
-            # Это важно, так как мы изменяли положение указателя для проверки структуры файла.
-            psd_file.seek(0)
-
-            try:
-
-                # if channels > 3:
-                #     img = psd_tools.PSDImage.open(psd_file)
-                #     img = img.composite()
-                #     print("psd tools")
-                # else:
-                #     print("PIL")
-                #     img = Image.open(psd_file)
-
-                img = psd_tools.PSDImage.open(psd_file)
-                img = img.composite()
-                img = img.convert("RGB")
-                print("here")
-                return np.array(img)
-
+                array_img = np.array(img)
+                img.close()
+                return array_img
             except Exception as e:
-
-                print("utils > error read psd", "src:", path)
-                print(e)
+                Err.print_error(e)
                 return None
-        
+                    
     @classmethod
     def read_psb(cls, path: str):
-
         try:
             img = psd_tools.PSDImage.open(path)
             img = img.composite()
             img = img.convert("RGB")
-            return np.array(img)
-
+            array_img = np.array(img)
+            return array_img
         except Exception as e:
-            print("utils > error read psd", "src:", path)
-            print(e)
+            Err.print_error(e)
             return None
 
     @classmethod
     def read_png(cls, path: str) -> np.ndarray | None:
         try:
             img = Image.open(path)
-
             if img.mode == "RGBA":
                 white_background = Image.new("RGBA", img.size, (255, 255, 255))
                 img = Image.alpha_composite(white_background, img)
-
             img = img.convert("RGB")
-            img = np.array(img)
-            return img
-
+            array_img = np.array(img)
+            img.close()
+            return array_img
         except Exception as e:
-            print("error read png pil", str)
+            Err.print_error(e)
             return None
 
     @classmethod
     def read_jpg(cls, path: str) -> np.ndarray | None:
-
         try:
             img = Image.open(path)
             img = img.convert("RGB")
-            img = np.array(img)
-            return img
-
+            array_img = np.array(img)
+            img.close()
+            return array_img
         except Exception as e:
+            Err.print_error(e)
             return None
 
     @classmethod
     def read_raw(cls, path: str) -> np.ndarray | None:
         try:
+            # https://github.com/letmaik/rawpy
+            # Извлечение встроенного эскиза/превью из RAW-файла и преобразование в изображение:
+            # Открываем RAW-файл с помощью rawpy
             with rawpy.imread(path) as raw:
+                # Извлекаем встроенный эскиз (thumbnail)
                 thumb = raw.extract_thumb()
-
+            # Проверяем формат извлечённого эскиза
             if thumb.format == rawpy.ThumbFormat.JPEG:
+                # Если это JPEG — открываем как изображение через BytesIO
                 img = Image.open(io.BytesIO(thumb.data))
+                # Конвертируем в RGB (на случай, если изображение не в RGB)
                 img = img.convert("RGB")
-
             elif thumb.format == rawpy.ThumbFormat.BITMAP:
-                img = Image.fromarray(thumb.data)
-
-            assert isinstance(img, Image.Image)
-
-            exif = img._getexif()
-
-            if exif:
-                for tag, value in exif.items():
-                    if ExifTags.TAGS.get(tag) == "Orientation":
-                        if value == 3:
-                            img = img.rotate(180, expand=True)
-                        elif value == 6:
-                            img = img.rotate(270, expand=True)
-                        elif value == 8:
-                            img = img.rotate(90, expand=True)
-                        break
-
-            return np.array(img)
-
+                # Если формат BITMAP — создаём изображение из массива
+                img: Image.Image = Image.fromarray(thumb.data)
+            try:
+                exif = img.getexif()
+                orientation_tag = 274  # Код тега Orientation
+                if orientation_tag in exif:
+                    orientation = exif[orientation_tag]
+                    # Коррекция поворота на основе EXIF-ориентации
+                    if orientation == 3:
+                        img = img.rotate(180, expand=True)
+                    elif orientation == 6:
+                        img = img.rotate(270, expand=True)
+                    elif orientation == 8:
+                        img = img.rotate(90, expand=True)
+            except Exception as e:
+                Err.print_error(e)
+            array_img = np.array(img)
+            img.close()
+            return array_img
         except (Exception, rawpy._rawpy.LibRawDataError) as e:
+            Err.print_error(e)
             return None
 
     @classmethod
-    def read_image(cls, full_src: str) -> np.ndarray | None:
-        _, ext = os.path.splitext(full_src)
+    def read_movie(cls, path: str, time_sec=1) -> np.ndarray | None:
+        try:
+            cap = cv2.VideoCapture(path)
+            cap.set(cv2.CAP_PROP_POS_MSEC, time_sec * 1000)
+            success, frame = cap.read()
+            cap.release()
+            if success:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                return frame
+            else:
+                return None
+        except Exception as e:
+            Err.print_error(e)
+            return None
+
+    @classmethod
+    def read_any(cls, path: str) -> np.ndarray | None:
+        ...
+
+    @classmethod
+    def read_image(cls, path: str) -> np.ndarray | None:
+        _, ext = os.path.splitext(path)
         ext = ext.lower()
 
-        data = {
-            ".psb": cls.read_psb,
-            # ".psd": cls.read_psd,
-            ".psd": cls.read_psb,
+        fn = ReadImage.read_any_dict.get(ext)
 
-            ".tif": cls.read_tiff,
-            ".tiff": cls.read_tiff,
-
-            ".nef": cls.read_raw,
-            ".cr2": cls.read_raw,
-            ".cr3": cls.read_raw,
-            ".arw": cls.read_raw,
-            ".raf": cls.read_raw,
-
-            ".jpg": cls.read_jpg,
-            ".jpeg": cls.read_jpg,
-            "jfif": cls.read_jpg,
-
-            ".png": cls.read_png,
-        }
-
-        read_img_func = data.get(ext)
-
-        if read_img_func:
-            img = read_img_func(full_src)
+        if fn:
+            cls.read_any = fn
+            return cls.read_any(path)
 
         else:
-            img = None
-
-        return img
+            return None
 
 
 class Hash:
