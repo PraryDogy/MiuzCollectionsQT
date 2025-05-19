@@ -173,7 +173,7 @@ class FavTask(URunnable):
             conn.commit()
             self.signals_.finished_.emit(self.value)
         except Exception as e:
-            Utils.print_err(error=e)
+            Utils.print_error(e)
             conn.rollback()
 
         conn.close()

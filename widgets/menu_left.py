@@ -92,7 +92,7 @@ class LoadMenus(URunnable):
         try:
             self.signals_.finished_.emit(menus)
         except RuntimeError as e:
-            Utils.print_err(error=e)
+            Utils.print_error(e)
 
 
     def load_colls_query(self) -> list[dict]:

@@ -228,7 +228,7 @@ class BarBottom(QWidget):
     def toggle_types(self):
         types = []
 
-        if Static.JPG_EXT in Dynamic.types:
+        if Static.ext_jpeg in Dynamic.types:
             types.append(Lang.type_jpg)
 
         if Static.LAYERS_EXT in Dynamic.types:

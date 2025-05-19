@@ -35,7 +35,7 @@ class ScanerTools:
                 SignalsApp.instance.menu_left_cmd.emit("reload")
                 SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
             except RuntimeError as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
 
 
 class FinderImages:
@@ -85,7 +85,7 @@ class FinderImages:
                 finder_images.extend(walked_images)
 
             except TypeError as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
 
         # Сканируем корневую папку без рекурсии в подпапки,
         # чтобы найти изображения непосредственно в корневой папке.
@@ -240,12 +240,12 @@ class DbUpdater:
                 conn.execute(q)
 
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
                 conn.rollback()
                 continue
 
             except sqlalchemy.exc.OperationalError as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
                 conn.rollback()
                 conn.close()
                 return None
@@ -275,7 +275,7 @@ class DbUpdater:
                         os.rmdir(folder)
                     sleep(self.sleep_count)
                 except Exception as e:
-                    Utils.print_err(error=e)
+                    Utils.print_error(e)
                     continue
 
         if total > 0:
@@ -365,12 +365,12 @@ class DbUpdater:
             # overflow error бывает прозникает когда пишет
             # python integer too large to insert db
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
                 conn.rollback()
                 continue
 
             except sqlalchemy.exc.OperationalError as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
                 conn.rollback()
                 conn.close()
                 return None
@@ -461,7 +461,7 @@ class MainFolderRemover:
                 t = f"{Lang.deleting}: {x} {Lang.from_} {total}"
                 ScanerTools.progressbar_text(text=t)
             except Exception as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
                 continue
 
     @classmethod
@@ -473,12 +473,12 @@ class MainFolderRemover:
             try:
                 conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
                 conn.rollback()
                 continue
 
             except sqlalchemy.exc.OperationalError as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
                 conn.rollback()
                 conn.close()
                 return None

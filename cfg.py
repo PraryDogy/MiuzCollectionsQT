@@ -390,7 +390,7 @@ class Dynamic:
 
     # какие расширения отображать по умолчанию (и джепеги и послойники)
     types = [
-        Static.JPG_EXT,
+        Static.ext_jpeg,
         Static.LAYERS_EXT
     ]
 

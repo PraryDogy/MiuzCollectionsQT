@@ -35,7 +35,7 @@ class CopyFiles(URunnable):
         try:
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
-            Utils.print_err(error=e)
+            Utils.print_error(e)
             self.finalize(files_dests=files_dests)
             return
 
@@ -60,7 +60,7 @@ class CopyFiles(URunnable):
                         percent = int((copied_size / total_size) * 100)
                         self.signals_.value_changed.emit(percent)
             except Exception as e:
-                Utils.print_err(error=e)
+                Utils.print_error(e)
                 break
         
         self.finalize(files_dests=files_dests)

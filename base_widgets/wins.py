@@ -34,7 +34,7 @@ class WinFrameless(QMainWindow):
             geo.moveCenter(parent.geometry().center())
             self.setGeometry(geo)
         except (RuntimeError, Exception) as e:
-            Utils.print_err(error=e)
+            Utils.print_error(e)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:
