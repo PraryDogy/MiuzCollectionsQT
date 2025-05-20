@@ -116,7 +116,6 @@ class Grid(QScrollArea):
         self.origin_pos = QPoint()
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         self.wid_under_mouse: Thumbnail = None
-        self.selection_mode: bool = False
 
     def signals_cmd(self, flag: str):
         if flag == "resize":
@@ -431,9 +430,32 @@ class Grid(QScrollArea):
         if a0.button() != Qt.MouseButton.LeftButton:
             return
 
-        if self.selection_mode:
+        if self.rubberBand.isVisible():
+            rect = QRect(self.origin_pos, a0.pos()).normalized()
             self.rubberBand.hide()
-            self.selection_mode = False
+            ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
+            x = 10
+
+            for wid in self.cell_to_wid.values():
+                wid_rect = wid.geometry().adjusted(x, x, -x, -x)
+                intersects = rect.intersects(wid_rect)
+
+                if intersects:
+                    if ctrl:
+                        if wid in self.selected_widgets:
+                            wid.set_no_frame()
+                            self.selected_widgets.remove(wid)
+                        else:
+                            wid.set_frame()
+                            self.selected_widgets.append(wid)
+                    else:
+                        if wid not in self.selected_widgets:
+                            wid.set_frame()
+                            self.selected_widgets.append(wid)
+                else:
+                    if not ctrl and wid in self.selected_widgets:
+                        wid.set_no_frame()
+                        self.selected_widgets.remove(wid)
             return
 
         self.wid_under_mouse = self.get_wid_under_mouse(a0)
@@ -618,10 +640,8 @@ class Grid(QScrollArea):
 
     def mousePressEvent(self, a0):
         self.wid_under_mouse = self.get_wid_under_mouse(a0)
-        self.already_processed_wid: list[Thumbnail] = []
         if a0.button() == Qt.MouseButton.LeftButton:
             self.origin_pos = a0.pos()
-            self.selection_mode = False
             if self.wid_under_mouse is None:
                 self.rubberBand.setGeometry(QRect(self.origin_pos, QSize()))
                 self.rubberBand.show()
@@ -637,43 +657,9 @@ class Grid(QScrollArea):
         if distance < QApplication.startDragDistance():
             return
 
-        self.selection_mode = True 
-
         if self.rubberBand.isVisible():
             rect = QRect(self.origin_pos, a0.pos()).normalized()
             self.rubberBand.setGeometry(rect)
-            ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
-            grid_wid = QApplication.widgetAt(a0.globalPos())
-
-            if isinstance(grid_wid, Thumbnail):
-                grid_wid = grid_wid.parent()
-
-            elif isinstance(grid_wid, (TextWid, ImgWid)):
-                grid_wid = grid_wid.parent().parent()
-
-            thumbs = grid_wid.findChildren(Thumbnail)
-
-            for wid in thumbs:
-
-                if wid in self.already_processed_wid:
-                    continue
-
-                intersects = rect.intersects(wid.geometry())
-                if intersects:
-                    self.already_processed_wid.append(wid)
-                    if ctrl:
-                        if wid in self.selected_widgets:
-                            wid.set_no_frame()
-                            self.selected_widgets.remove(wid)
-                        else:
-                            self.add_and_select_widget(wid)
-                    else:
-                        if wid not in self.selected_widgets:
-                            self.add_and_select_widget(wid)
-                else:
-                    if not ctrl and wid in self.selected_widgets:
-                        wid.set_no_frame()
-                        self.selected_widgets.remove(wid)
             return
 
         if self.wid_under_mouse and self.wid_under_mouse not in self.selected_widgets:
