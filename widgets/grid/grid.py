@@ -1,11 +1,14 @@
 import gc
 import os
 
-from PyQt5.QtCore import QMimeData, Qt, QTimer, QUrl
+from PyQt5.QtCore import (QMimeData, QObject, QPoint, QRect, QSize, Qt, QTimer,
+                          QUrl, pyqtSignal)
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QScrollArea, QSizePolicy, QWidget)
+                             QRubberBand, QScrollArea, QSizePolicy, QSplitter,
+                             QVBoxLayout, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
 from cfg import Dynamic, JsonData, Static, ThumbData
@@ -109,6 +112,11 @@ class Grid(QScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
         SignalsApp.instance.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+
+        self.origin_pos = QPoint()
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
+        self.wid_under_mouse: Thumbnail = None
+        self.selection_mode: bool = False
 
     def signals_cmd(self, flag: str):
         if flag == "resize":
@@ -420,14 +428,18 @@ class Grid(QScrollArea):
         return super().keyPressEvent(a0)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-
         if a0.button() != Qt.MouseButton.LeftButton:
             return
 
-        clicked_wid: Thumbnail | None = self.get_wid_under_mouse(a0=a0)
+        if self.selection_mode:
+            self.rubberBand.hide()
+            self.selection_mode = False
+            return
+
+        self.wid_under_mouse = self.get_wid_under_mouse(a0)
 
         # клик по сетке
-        if not clicked_wid:
+        if not self.wid_under_mouse:
             self.clear_selected_widgets()
             return
 
@@ -436,7 +448,7 @@ class Grid(QScrollArea):
             # шифт клик: если не было выделенных виджетов
             if not self.selected_widgets:
 
-                self.add_and_select_widget(wid=clicked_wid)
+                self.add_and_select_widget(self.wid_under_mouse)
 
             # шифт клик: если уже был выделен один / несколько виджетов
             else:
@@ -445,14 +457,14 @@ class Grid(QScrollArea):
                 start_pos = (self.selected_widgets[-1].row, self.selected_widgets[-1].col)
 
                 # шифт клик: слева направо (по возрастанию)
-                if coords.index((clicked_wid.row, clicked_wid.col)) > coords.index(start_pos):
+                if coords.index((self.wid_under_mouse.row, self.wid_under_mouse.col)) > coords.index(start_pos):
                     start = coords.index(start_pos)
-                    end = coords.index((clicked_wid.row, clicked_wid.col))
+                    end = coords.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
                     coords = coords[start : end + 1]
 
                 # шифт клик: справа налево (по убыванию)
                 else:
-                    start = coords.index((clicked_wid.row, clicked_wid.col))
+                    start = coords.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
                     end = coords.index(start_pos)
                     coords = coords[start : end]
 
@@ -467,17 +479,17 @@ class Grid(QScrollArea):
         elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
 
             # комманд клик: был выделен виджет, снять выделение
-            if clicked_wid in self.selected_widgets:
-                self.selected_widgets.remove(clicked_wid)
-                clicked_wid.set_no_frame()
+            if self.wid_under_mouse in self.selected_widgets:
+                self.selected_widgets.remove(self.wid_under_mouse)
+                self.wid_under_mouse.set_no_frame()
 
             # комманд клик: виджет не был виделен, выделить
             else:
-                self.add_and_select_widget(wid=clicked_wid)
+                self.add_and_select_widget(self.wid_under_mouse)
 
         else:
             self.clear_selected_widgets()
-            self.add_and_select_widget(wid=clicked_wid)
+            self.add_and_select_widget(self.wid_under_mouse)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
 
@@ -599,35 +611,58 @@ class Grid(QScrollArea):
             self.load_db_images(flag=MORE)
 
     def mouseDoubleClickEvent(self, a0):
-        clicked_wid = self.get_wid_under_mouse(a0=a0)
-
-        if clicked_wid:
+        if self.wid_under_mouse:
             self.clear_selected_widgets()
-            self.add_and_select_widget(wid=clicked_wid)
-            self.open_in_view(wid=clicked_wid)
+            self.add_and_select_widget(self.wid_under_mouse)
+            self.open_in_view(self.wid_under_mouse)
 
     def mousePressEvent(self, a0):
-        if a0.button() != Qt.MouseButton.LeftButton:
-            return
-        self.drag_start_position = a0.pos()
+        self.wid_under_mouse = self.get_wid_under_mouse(a0)
+        if a0.button() == Qt.MouseButton.LeftButton:
+            self.origin_pos = a0.pos()
+            self.selection_mode = False
+            if self.wid_under_mouse is None:
+                self.rubberBand.setGeometry(QRect(self.origin_pos, QSize()))
+                self.rubberBand.show()
         return super().mousePressEvent(a0)
     
     def mouseMoveEvent(self, a0):
-
-        distance = (a0.pos() - self.drag_start_position).manhattanLength()
+        try:
+            distance = (a0.pos() - self.origin_pos).manhattanLength()
+        except AttributeError as e:
+            Utils.print_error(e)
+            return
 
         if distance < QApplication.startDragDistance():
             return
 
-        wid = self.get_wid_under_mouse(a0=a0)
+        self.selection_mode = True 
 
-        if wid is None:
+        if self.rubberBand.isVisible():
+            rect = QRect(self.origin_pos, a0.pos()).normalized()
+            self.rubberBand.setGeometry(rect)
+
+            ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
+
+            for grid_lay in self.grid_widgets:
+                for path_, wid in Thumbnail.path_to_wid.items():
+                    intersects = rect.intersects(wid.geometry())
+
+                    if intersects:
+                        if wid not in self.selected_widgets:
+                            self.add_and_select_widget(wid)
+                            print("add wid", wid.name)
+                    else:
+                        if not ctrl:
+                            if wid in self.selected_widgets:
+                                wid.set_no_frame()
+                                self.selected_widgets.remove(wid)
             return
 
-        if wid and wid not in self.selected_widgets:
+        if self.wid_under_mouse and self.wid_under_mouse not in self.selected_widgets:
             self.clear_selected_widgets()
-            self.add_and_select_widget(wid=wid)
-            QTimer.singleShot(100, wid.set_frame)
+            self.add_and_select_widget(self.wid_under_mouse)
+            QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
         coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
         if coll_folder:
@@ -656,9 +691,6 @@ class Grid(QScrollArea):
         self.drag.exec_(Qt.DropAction.CopyAction)
 
         if not urls:
-            OpenWins.smb(parent_=self.window())
+            OpenWins.smb(self.window())
 
         return super().mouseMoveEvent(a0)
-
-    # assert isinstance(BarBottom.path_label, QLabel)
-    # BarBottom.path_label.setText("")
