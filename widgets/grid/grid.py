@@ -644,19 +644,28 @@ class Grid(QScrollArea):
 
             ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
 
-            for grid_lay in self.grid_widgets:
-                for path_, wid in Thumbnail.path_to_wid.items():
-                    intersects = rect.intersects(wid.geometry())
+            grid_wid = QApplication.widgetAt(a0.globalPos())
 
-                    if intersects:
-                        if wid not in self.selected_widgets:
-                            self.add_and_select_widget(wid)
-                            print("add wid", wid.name)
-                    else:
-                        if not ctrl:
-                            if wid in self.selected_widgets:
-                                wid.set_no_frame()
-                                self.selected_widgets.remove(wid)
+            if isinstance(grid_wid, Thumbnail):
+                grid_wid = grid_wid.parent()
+
+            elif isinstance(grid_wid, (TextWid, ImgWid)):
+                grid_wid = grid_wid.parent().parent()
+
+            thumbs = grid_wid.findChildren(Thumbnail)
+
+            for wid in thumbs:
+                intersects = rect.intersects(wid.geometry())
+
+                if intersects:
+                    if wid not in self.selected_widgets:
+                        self.add_and_select_widget(wid)
+                        # print("add wid", wid.name)
+                else:
+                    if not ctrl:
+                        if wid in self.selected_widgets:
+                            wid.set_no_frame()
+                            self.selected_widgets.remove(wid)
             return
 
         if self.wid_under_mouse and self.wid_under_mouse not in self.selected_widgets:
