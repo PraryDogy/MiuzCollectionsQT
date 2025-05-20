@@ -618,6 +618,7 @@ class Grid(QScrollArea):
 
     def mousePressEvent(self, a0):
         self.wid_under_mouse = self.get_wid_under_mouse(a0)
+        self.already_processed_wid: list[Thumbnail] = []
         if a0.button() == Qt.MouseButton.LeftButton:
             self.origin_pos = a0.pos()
             self.selection_mode = False
@@ -641,9 +642,7 @@ class Grid(QScrollArea):
         if self.rubberBand.isVisible():
             rect = QRect(self.origin_pos, a0.pos()).normalized()
             self.rubberBand.setGeometry(rect)
-
             ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
-
             grid_wid = QApplication.widgetAt(a0.globalPos())
 
             if isinstance(grid_wid, Thumbnail):
@@ -655,17 +654,26 @@ class Grid(QScrollArea):
             thumbs = grid_wid.findChildren(Thumbnail)
 
             for wid in thumbs:
-                intersects = rect.intersects(wid.geometry())
 
+                if wid in self.already_processed_wid:
+                    continue
+
+                intersects = rect.intersects(wid.geometry())
                 if intersects:
-                    if wid not in self.selected_widgets:
-                        self.add_and_select_widget(wid)
-                        # print("add wid", wid.name)
-                else:
-                    if not ctrl:
+                    self.already_processed_wid.append(wid)
+                    if ctrl:
                         if wid in self.selected_widgets:
                             wid.set_no_frame()
                             self.selected_widgets.remove(wid)
+                        else:
+                            self.add_and_select_widget(wid)
+                    else:
+                        if wid not in self.selected_widgets:
+                            self.add_and_select_widget(wid)
+                else:
+                    if not ctrl and wid in self.selected_widgets:
+                        wid.set_no_frame()
+                        self.selected_widgets.remove(wid)
             return
 
         if self.wid_under_mouse and self.wid_under_mouse not in self.selected_widgets:
