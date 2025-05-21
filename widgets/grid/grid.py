@@ -637,12 +637,8 @@ class Grid(QScrollArea):
             self.open_in_view(self.wid_under_mouse)
 
     def mousePressEvent(self, a0):
+        self.origin_pos = a0.pos()
         self.wid_under_mouse = self.get_wid_under_mouse(a0)
-        if a0.button() == Qt.MouseButton.LeftButton:
-            self.origin_pos = a0.pos()
-            if self.wid_under_mouse is None:
-                self.rubberBand.setGeometry(QRect(self.origin_pos, QSize()))
-                self.rubberBand.show()
         return super().mousePressEvent(a0)
     
     def mouseMoveEvent(self, a0):
@@ -654,6 +650,10 @@ class Grid(QScrollArea):
 
         if distance < QApplication.startDragDistance():
             return
+
+        if self.wid_under_mouse is None and not self.rubberBand.isVisible():
+            self.rubberBand.setGeometry(QRect(self.origin_pos, QSize()))
+            self.rubberBand.show()
 
         if self.rubberBand.isVisible():
             rect = QRect(self.origin_pos, a0.pos()).normalized()
