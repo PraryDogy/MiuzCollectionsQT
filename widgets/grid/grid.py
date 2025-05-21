@@ -455,7 +455,6 @@ class Grid(QScrollArea):
                         wid.set_no_frame()
                         self.selected_widgets.remove(wid)
             return
-            return
 
         self.wid_under_mouse = self.get_wid_under_mouse(a0)
 
