@@ -436,26 +436,32 @@ class Grid(QScrollArea):
             ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
             x = 10
 
-            for wid in self.cell_to_wid.values():
-                wid_rect = wid.geometry().adjusted(x, x, -x, -x)
-                intersects = rect.intersects(wid_rect)
+            for grid_wid in self.grid_widgets:
 
-                if intersects:
-                    if ctrl:
-                        if wid in self.selected_widgets:
-                            wid.set_no_frame()
-                            self.selected_widgets.remove(wid)
+                grid_wid_rect = grid_wid.geometry().adjusted(x, x, -x, -x)
+                grid_intersects = rect.intersects(grid_wid_rect)
+                if grid_intersects:
+
+                    for wid in grid_wid.findChildren(Thumbnail):
+                        top_left = wid.mapTo(self, QPoint(0, 0))
+                        wid_rect = QRect(top_left, wid.size())
+                        if rect.intersects(wid_rect):
+                            if ctrl:
+                                if wid in self.selected_widgets:
+                                    wid.set_no_frame()
+                                    self.selected_widgets.remove(wid)
+                                else:
+                                    wid.set_frame()
+                                    self.selected_widgets.append(wid)
+                            else:
+                                if wid not in self.selected_widgets:
+                                    wid.set_frame()
+                                    self.selected_widgets.append(wid)
                         else:
-                            wid.set_frame()
-                            self.selected_widgets.append(wid)
-                    else:
-                        if wid not in self.selected_widgets:
-                            wid.set_frame()
-                            self.selected_widgets.append(wid)
-                else:
-                    if not ctrl and wid in self.selected_widgets:
-                        wid.set_no_frame()
-                        self.selected_widgets.remove(wid)
+                            if not ctrl and wid in self.selected_widgets:
+                                wid.set_no_frame()
+                                self.selected_widgets.remove(wid)
+                    return
             return
 
         self.wid_under_mouse = self.get_wid_under_mouse(a0)
