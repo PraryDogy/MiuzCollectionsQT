@@ -268,9 +268,10 @@ class WinImageView(WinChild):
     switch_image_sig = pyqtSignal(object)
     closed_ = pyqtSignal()
 
-    def __init__(self, short_src: str, path_to_wid: dict[str, Thumbnail]):
+    def __init__(self, short_src: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
 
+        self.is_selection = is_selection
         self.path_to_wid = path_to_wid
         self.short_src_list = list(path_to_wid.keys())
         self.short_src = short_src
@@ -428,7 +429,14 @@ class WinImageView(WinChild):
             self.wid = new_wid
 
         self.load_thumb()
-        self.switch_image_sig.emit(self.short_src)
+
+        # если был выделен один виджет для просмотра, значит мы просматриваем
+        # все виджеты в сетке и, по мере пролистывания изображений,
+        # выделяем просматриваемый виджет
+        # но если было выбрано для просмотра х число виджетов, мы не 
+        # снимаем с них выделение
+        if not self.is_selection:
+            self.switch_image_sig.emit(self.short_src)
 
     def img_viewer_title(self):
         self.setWindowTitle(f"{self.wid.collection}: {self.wid.name}")

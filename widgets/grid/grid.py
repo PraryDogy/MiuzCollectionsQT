@@ -253,10 +253,12 @@ class Grid(QScrollArea):
 
         if len(self.selected_widgets) == 1:
             path_to_wid = Thumbnail.path_to_wid
+            is_selection = False
         else:
             path_to_wid = {i.short_src: i for i in self.selected_widgets}
+            is_selection = True
 
-        self.win_image_view = WinImageView(wid.short_src, path_to_wid)
+        self.win_image_view = WinImageView(wid.short_src, path_to_wid, is_selection)
         self.win_image_view.center_relative_parent(self.window())
 
         self.win_image_view.switch_image_sig.connect(
