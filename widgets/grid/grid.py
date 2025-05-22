@@ -251,15 +251,20 @@ class Grid(QScrollArea):
         assert isinstance(wid, Thumbnail)
         from ..win_image_view import WinImageView
 
-        self.win_image_view = WinImageView(short_src=wid.short_src)
+        if len(self.selected_widgets) == 1:
+            path_to_wid = Thumbnail.path_to_wid
+        else:
+            path_to_wid = {i.short_src: i for i in self.selected_widgets}
+
+        self.win_image_view = WinImageView(wid.short_src, path_to_wid)
         self.win_image_view.center_relative_parent(self.window())
 
         self.win_image_view.switch_image_sig.connect(
-            lambda img_path: self.select_viewed_image(path=img_path)
+            lambda img_path: self.select_viewed_image(img_path)
         )
 
         self.win_image_view.closed_.connect(
-            lambda: self.img_view_closed(win=self.win_image_view)
+            lambda: self.img_view_closed(self.win_image_view)
         )
 
         self.win_image_view.show()

@@ -268,12 +268,13 @@ class WinImageView(WinChild):
     switch_image_sig = pyqtSignal(object)
     closed_ = pyqtSignal()
 
-    def __init__(self, short_src: str):
+    def __init__(self, short_src: str, path_to_wid: dict[str, Thumbnail]):
         super().__init__()
 
-        self.short_src_list = list(Thumbnail.path_to_wid.keys())
+        self.path_to_wid = path_to_wid
+        self.short_src_list = list(path_to_wid.keys())
         self.short_src = short_src
-        self.wid = Thumbnail.path_to_wid.get(self.short_src)
+        self.wid = path_to_wid.get(self.short_src)
         self.task_count = 0
 
         self.setStyleSheet(IMG_VIEW_STYLE)
@@ -377,7 +378,7 @@ class WinImageView(WinChild):
             return
 
         # мы формируем актуальный список src из актуальной сетки изображений
-        self.short_src_list = list(Thumbnail.path_to_wid.keys())
+        self.short_src_list = list(self.path_to_wid.keys())
         total_ = len(self.short_src_list)
 
         if self.short_src in self.short_src_list:
@@ -407,7 +408,7 @@ class WinImageView(WinChild):
             return
 
         # ищем виджет в актуальной сетке, которая могла обновиться в фоне
-        new_wid = Thumbnail.path_to_wid.get(new_short_src)
+        new_wid = self.path_to_wid.get(new_short_src)
 
         # если виджет не найден в сетке
         # значит сетка обновилась в фоне с новыми виджетами
@@ -416,7 +417,7 @@ class WinImageView(WinChild):
         # и первый виджет из сетки
         if not new_wid:
             self.short_src = self.short_src_list[0]
-            self.wid = Thumbnail.path_to_wid.get(self.short_src)
+            self.wid = self.path_to_wid.get(self.short_src)
 
         # если виджет найден, тоне факт, что список src актуален
         # то есть сетка все равно могла быть перетасована
