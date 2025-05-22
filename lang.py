@@ -477,6 +477,16 @@ class Lang_:
         "Copy filename"
     ]
 
+    attention = [
+        "Внимание!",
+        "Warning!"
+    ]
+
+    move_to_trash = [
+        "Переместить в корзину",
+        "Move to trash"
+    ]
+
 class Lang(Lang_):
 
     @classmethod
