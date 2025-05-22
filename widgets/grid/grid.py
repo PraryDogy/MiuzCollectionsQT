@@ -321,6 +321,9 @@ class Grid(QScrollArea):
 
             for wid in grid_wid.findChildren(Thumbnail):
 
+                if "R2018-RLF-0267" in wid.short_src:
+                    print(111)
+
                 Thumbnail.path_to_wid[wid.short_src] = wid
                 self.cell_to_wid[self.global_row, col] = wid
                 wid.row, wid.col = self.global_row, col
@@ -372,7 +375,16 @@ class Grid(QScrollArea):
 
         self.rem_win = RemoveFilesWin(urls)
         self.rem_win.center_relative_parent(self.window())
+        self.rem_win.finished_.connect(lambda urls: self.remove_finished(self.selected_widgets.copy()))
         self.rem_win.show()
+
+    def remove_finished(self, widgets: list[Thumbnail]):
+        for i in widgets:
+            Thumbnail.path_to_wid.pop(i.short_src)
+            self.cell_to_wid.pop((i.row, i.col))
+            self.selected_widgets.remove(i)
+            i.deleteLater()
+        self.rearrange()
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -634,11 +646,11 @@ class Grid(QScrollArea):
                 )
             self.menu_.addAction(save)
 
-            self.menu_.addSeparator()
+            # self.menu_.addSeparator()
 
-            rem = RemoveFiles(self.menu_, len(self.selected_widgets))
-            rem.triggered.connect(self.remove_files)
-            self.menu_.addAction(rem)
+            # rem = RemoveFiles(self.menu_, len(self.selected_widgets))
+            # rem.triggered.connect(self.remove_files)
+            # self.menu_.addAction(rem)
 
         self.menu_.show_menu()
 
