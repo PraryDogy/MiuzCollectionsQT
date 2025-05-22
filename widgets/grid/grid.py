@@ -19,7 +19,9 @@ from signals import SignalsApp
 from utils.utils import UThreadPool, Utils
 
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
-                       OpenInView, OpenWins, Reveal, Save, ScanerRestart)
+                       OpenInView, OpenWins, RemoveFiles, Reveal, Save,
+                       ScanerRestart)
+from ..win_remove_files import RemoveFilesWin
 from ._db_images import DbImage, DbImages
 from .cell_widgets import ImgWid, TextWid, Thumbnail, Title
 
@@ -360,6 +362,17 @@ class Grid(QScrollArea):
         if isinstance(wid, Thumbnail):
             self.selected_widgets.append(wid)
             wid.set_frame()
+
+    def remove_files(self):
+        coll_folder = Utils.get_main_folder_path(MainFolder.current)
+        urls = [
+            Utils.get_full_src(coll_folder, i.short_src)
+            for i in self.selected_widgets
+        ]
+
+        self.rem_win = RemoveFilesWin(urls)
+        self.rem_win.center_relative_parent(self.window())
+        self.rem_win.show()
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -620,6 +633,12 @@ class Grid(QScrollArea):
                 save_as=False
                 )
             self.menu_.addAction(save)
+
+            self.menu_.addSeparator()
+
+            rem = RemoveFiles(self.menu_, len(self.selected_widgets))
+            rem.triggered.connect(self.remove_files)
+            self.menu_.addAction(rem)
 
         self.menu_.show_menu()
 

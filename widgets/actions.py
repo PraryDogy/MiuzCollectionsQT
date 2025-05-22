@@ -285,3 +285,9 @@ class MenuTypes(QMenu):
 
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
         SignalsApp.instance.bar_bottom_filters.emit()
+
+
+class RemoveFiles(QAction):
+    def __init__(self, parent: QMenu, total: int):
+        text_ = f"{Lang.delete} ({total})"
+        super().__init__(text_, parent)
