@@ -379,7 +379,6 @@ class WinImageView(WinChild):
 
         # мы формируем актуальный список src из актуальной сетки изображений
         self.short_src_list = list(self.path_to_wid.keys())
-        total_ = len(self.short_src_list)
 
         if self.short_src in self.short_src_list:
             current_index = self.short_src_list.index(self.short_src)
@@ -387,11 +386,11 @@ class WinImageView(WinChild):
         else:
             new_index = 0
 
-        if new_index == total_:
-            return
+        if new_index == len(self.short_src_list):
+            new_index = 0
 
         elif new_index < 0:
-            return
+            new_index = len(self.short_src_list) - 1
 
         # 
         # сетка = Thumbnail.path_to_wid = сетка thumbnails
@@ -402,9 +401,8 @@ class WinImageView(WinChild):
         # но не факт, что он уже есть в сетке
         try:
             new_short_src = self.short_src_list[new_index]
-        except IndexError:
-            print(new_index)
-            print(len(self.short_src_list))
+        except IndexError as e:
+            print(e)
             return
 
         # ищем виджет в актуальной сетке, которая могла обновиться в фоне
