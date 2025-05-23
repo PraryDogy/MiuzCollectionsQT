@@ -39,6 +39,9 @@ class ScanerTools:
 
 
 class FinderImages:
+    def __init__(self, main_folder: MainFolder):
+        super().__init__()
+        self.main_folder = main_folder
 
     def run(self) -> list[tuple[str, int, int, int]] | None:
         """Основной метод для поиска изображений в коллекциях."""
@@ -52,20 +55,17 @@ class FinderImages:
         collections = []
 
         try:
-            coll_folder = ScanerTools.current_main_folder.get_current_path()
-            ScanerTools.current_main_folder.set_current_path(coll_folder)
-            stop_list = ScanerTools.current_main_folder.stop_list
-
-            for item in os.scandir(coll_folder):
-                if item.is_dir() and item.name not in stop_list:
-                    collections.append(item.path)
+            for item in os.scandir(self.main_folder.get_current_path()):
+                if item.is_dir():
+                    if item.name not in self.main_folder.stop_list:
+                        collections.append(item.path)
 
             # Добавляем корневую папку в конец списка коллекций (подпапок),
             # чтобы сканер мог найти изображения как в корневой папке,
             # так и в подпапках. Например:
             # - .../root/img.jpg — изображение в корневой папке
             # - .../root/collection/img.jpg — изображение в подпапке
-            collections.append(ScanerTools.current_main_folder.current_path)
+            collections.append(self.main_folder.get_current_path())
 
         except FileNotFoundError:
             ...
@@ -104,7 +104,7 @@ class FinderImages:
 
     def get_progress_text(self, current: int, total: int) -> str:
         """Формирует текст для прогресс-бара."""
-        main_folder = ScanerTools.current_main_folder.name.capitalize()
+        main_folder = self.main_folder.name.capitalize()
         collection_name = Lang.collection
         return f"{main_folder}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
@@ -146,6 +146,9 @@ class FinderImages:
 
 
 class DbImages:
+    def __init__(self, main_folder: MainFolder):
+        super().__init__()
+        self.main_folder = main_folder
 
     def run(self) -> dict[str, tuple[str, int, int, int]]:
         ScanerTools.progressbar_text("")
@@ -159,13 +162,13 @@ class DbImages:
             THUMBS.c.mod
             )
         
-        q = q.where(THUMBS.c.brand == ScanerTools.current_main_folder.name)
+        q = q.where(THUMBS.c.brand == self.main_folder.name)
 
         # не забываем относительный путь к изображению преобразовать в полный
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
         conn.close()
-        coll_folder = ScanerTools.current_main_folder.current_path
+        coll_folder = self.main_folder.get_current_path()
 
         return {
             short_hash: (
@@ -180,11 +183,7 @@ class DbImages:
 
 class Compator:
 
-    def run(
-            self,
-            finder_images: list[tuple[str, int, int, int]],
-            db_images: dict[str, tuple[str, int, int, int]]
-    ):
+    def run(self, finder_images: list, db_images: dict):
 
         del_items: list[str] = []
         ins_items: list[tuple[str, int, int, int]] = []
@@ -499,26 +498,20 @@ class ScanerThread(URunnable):
 
     @URunnable.set_running_state
     def run(self):
-        for main_folder in ScanerTools.avaiable_main_folders:
-            ScanerTools.current_main_folder = main_folder
-            print(ScanerTools.current_main_folder)
-            print(main_folder)
-            continue
-            self.main_folder_scan()
-            print("scaner started", main_folder.name)
+        for main_folder in MainFolder.list_:
+            if main_folder.is_avaiable():
+                self.main_folder_scan(main_folder)
+                print("scaner started", main_folder.name)
 
-    def main_folder_scan(self):
+    def main_folder_scan(self, main_folder: MainFolder):
         ScanerTools.can_scan = True
         MainFolderRemover.run()
-        finder_images = FinderImages()
+        finder_images = FinderImages(main_folder)
         finder_images = finder_images.run()
-
-        if ScanerTools.current_main_folder.name == "Neuro":
-            print(finder_images)
 
         if finder_images is not None:
         
-            db_images = DbImages()
+            db_images = DbImages(main_folder)
             db_images = db_images.run()
 
             compator = Compator()
@@ -557,16 +550,14 @@ class ScanerShedule(QObject):
             self.wait_timer.start(self.wait_sec)
             return
 
-        ScanerTools.avaiable_main_folders.clear()
-        ScanerTools.current_main_folder = None
+        avaibility = False
 
         for main_folder in MainFolder.list_:
-            main_folder_path = main_folder.get_current_path()
-            if main_folder_path:
-                main_folder = main_folder.set_current_path(main_folder_path)
-                ScanerTools.avaiable_main_folders.append(main_folder)
-
-        if not ScanerTools.avaiable_main_folders:
+            main_folder.set_current_path()
+            if main_folder.is_avaiable():
+                avaibility = True
+    
+        if not avaibility:
             print("scaner no smb, wait", self.wait_sec//1000, "sec")
             self.wait_timer.start(self.wait_sec)
 

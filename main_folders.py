@@ -19,13 +19,27 @@ class MainFolder:
         self.stop_list = stop_list
         self.current_path: str = None # этот аттрибут нужен для сканера
 
-    def set_current_path(self, path: str):
-        self.current_path = path
-
+    def is_avaiable(self):
+        """
+        Если есть доступный путь к MainFolder, возвращает True
+        """
+        if self.current_path:
+            return True
+        return False
+    
     def get_current_path(self):
+        return self.current_path
+
+    def set_current_path(self):
+        """
+        Проверяет доступность пути к MainFolder
+        Устанавливает current_path: доступный путь к MainFolder или None
+        """
         for i in self.paths:
-            if os.path.exists(i):
-                return i
+            if os.path.exists:
+                self.current_path = i
+                return True
+        self.current_path = None
         return None
 
     @classmethod
