@@ -4,9 +4,10 @@ from time import time
 import sqlalchemy
 
 from cfg import JsonData
-from database import DIRS, Dbase, ClmNames
+from database import DIRS, THUMBS, ClmNames, Dbase
+from main_folders import MainFolder, miuz, panacea
 from utils.utils import Utils
-from main_folders import MainFolder, panacea, miuz
+
 
 class Dirs:
 
@@ -105,6 +106,21 @@ class Dirs:
             Utils.print_error(e)
             conn.rollback()
 
+
+class Images:
+    @classmethod
+    def get_images_dir(cls, conn: sqlalchemy.Connection, short_src: str, main_folder_name: str):
+        """
+        Загружает изображения, соответствующие директории
+        """
+
+        stmt = sqlalchemy.select(THUMBS.c.short_src)
+        stmt = stmt.where(THUMBS.c.short_src.like(f"{short_src}/%"))
+        # stmt = stmt.where(sqlalchemy.not_(THUMBS.c.short_src.like(f"{short_src}/%/%")))
+        stmt = stmt.where(THUMBS.c.brand == main_folder_name)
+        return conn.execute(stmt).fetchall()
+
+
 coll_folder = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready"
 src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/52 Florance"
 
@@ -117,23 +133,33 @@ Dbase.create_engine()
 conn = Dbase.engine.connect()
 JsonData.init()
 
-for main_folder in MainFolder.list_[1:]:
-    coll_folder = main_folder.set_current_path()
-    if main_folder.is_avaiable():
-        finder_dirs = Dirs.get_finder_dirs(main_folder.current_path)
-        if finder_dirs:
-            db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
-            del_dirs = Dirs.get_del_dirs(finder_dirs, db_dirs)
-            new_dirs = Dirs.get_new_dirs(finder_dirs, db_dirs)
+# for main_folder in MainFolder.list_[1:]:
+#     coll_folder = main_folder.set_current_path()
+#     if main_folder.is_avaiable():
+#         finder_dirs = Dirs.get_finder_dirs(main_folder.current_path)
+#         if finder_dirs:
+#             db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
+#             del_dirs = Dirs.get_del_dirs(finder_dirs, db_dirs)
+#             new_dirs = Dirs.get_new_dirs(finder_dirs, db_dirs)
 
-            if del_dirs:
-                Dirs.execute_del_dirs(conn, del_dirs, main_folder.name)
-                print("del dirs", del_dirs)
 
-            if new_dirs:
-                Dirs.execute_new_dirs(conn, new_dirs, main_folder.name)
-                print("new dirs", new_dirs)
 
-        break
+#             # это нужно будет делать в самом конце, когда уже просканены 
+#             # изображения
+#             if del_dirs:
+#                 Dirs.execute_del_dirs(conn, del_dirs, main_folder.name)
+#                 print("del dirs", del_dirs)
+
+#             if new_dirs:
+#                 Dirs.execute_new_dirs(conn, new_dirs, main_folder.name)
+#                 print("new dirs", new_dirs)
+
+#         break
+
+a = Images.get_images_dir(conn, "/42 Amalia", "panacea")
+
+
+for i in a:
+    print(i)
 
 conn.close()
