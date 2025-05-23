@@ -74,7 +74,8 @@ class OpenInfoDb(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
+        coll_folder = MainFolder.current.get_current_path()
+        
         if coll_folder:
             OpenWins.info_db(
                 parent_=self.win_,

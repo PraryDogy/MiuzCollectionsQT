@@ -52,7 +52,8 @@ class FinderImages:
         collections = []
 
         try:
-            coll_folder = ScanerTools.current_main_folder.current_path
+            coll_folder = ScanerTools.current_main_folder.get_current_path()
+            ScanerTools.current_main_folder.set_current_path(coll_folder)
             stop_list = ScanerTools.current_main_folder.stop_list
 
             for item in os.scandir(coll_folder):
@@ -500,6 +501,9 @@ class ScanerThread(URunnable):
     def run(self):
         for main_folder in ScanerTools.avaiable_main_folders:
             ScanerTools.current_main_folder = main_folder
+            print(ScanerTools.current_main_folder)
+            print(main_folder)
+            continue
             self.main_folder_scan()
             print("scaner started", main_folder.name)
 
@@ -557,10 +561,9 @@ class ScanerShedule(QObject):
         ScanerTools.current_main_folder = None
 
         for main_folder in MainFolder.list_:
-            main_folder_path = Utils.get_main_folder_path(main_folder=main_folder)
-
+            main_folder_path = main_folder.get_current_path()
             if main_folder_path:
-                main_folder.current_path = main_folder_path
+                main_folder = main_folder.set_current_path(main_folder_path)
                 ScanerTools.avaiable_main_folders.append(main_folder)
 
         if not ScanerTools.avaiable_main_folders:

@@ -29,13 +29,6 @@ class MainFolder:
         return None
 
     @classmethod
-    def init(cls):
-        if MainFolder.list_:
-            MainFolder.current = MainFolder.list_[0]
-        else:
-            print("MainFolder.list_ пуст")
-
-    @classmethod
     def get_data(cls):
         """возвращает данные о брендах в виде словаря"""
         data = {
@@ -47,13 +40,11 @@ class MainFolder:
                 for main_folder in MainFolder.list_
             }
         }
-
         return data
     
     @classmethod
-    def setup_main_folders(cls, json_data: dict):
+    def init(cls, json_data: dict):
         json_main_folders: dict = json_data.get(MAIN_FOLDERS)
-
         if not json_main_folders:
             # если в json нет данных, мы останавливаем извлечение данных
             # из json, оставляя список MainFolder.list_ по умолчанию
@@ -83,6 +74,8 @@ class MainFolder:
         for main_folder in MainFolder.list_:
             if main_folder.name not in json_main_folders:
                 MainFolder.list_.remove(main_folder)
+
+        MainFolder.current = MainFolder.list_[0]
 
 
 miuz = MainFolder(

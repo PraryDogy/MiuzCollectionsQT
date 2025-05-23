@@ -243,6 +243,8 @@ class JsonData:
         '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
         '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
         ]
+    
+    main_folders: dict[str, dict] = {}
 
     @classmethod
     def get_data(cls) -> dict[str, str]:
@@ -273,8 +275,6 @@ class JsonData:
                     setattr(cls, k, v)
                 else:
                     print("Несоответствие типа, ключ:", k)
-
-        MainFolder.setup_main_folders(json_data=json_data)
 
     @classmethod
     def write_json_data(cls):

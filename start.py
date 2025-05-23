@@ -94,7 +94,7 @@ class App(QApplication):
 JsonData.init()
 Dbase.init()
 Lang.init()
-MainFolder.init()
+MainFolder.init(JsonData.get_data())
 ReadImage.init_read_dict(Static)
 
 app = App(sys.argv)
