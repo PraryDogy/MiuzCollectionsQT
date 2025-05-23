@@ -182,23 +182,36 @@ class DbImages:
 
 
 class Compator:
+    def __init__(self, finder_images: list, db_images: list):
+        super().__init__()
+        self.finder_images = finder_images
+        self.db_images = db_images
 
-    def run(self, finder_images: list, db_images: dict):
+    def run(self):
+        finder_set = set(self.finder_images)
+        db_values = set(self.db_images.values())
 
-        del_items: list[str] = []
-        ins_items: list[tuple[str, int, int, int]] = []
+        del_items = [k for k, v in self.db_images.items() if v not in finder_set]
+        ins_items = list(finder_set - db_values)
 
-        for short_hash, db_item in db_images.items():
-            if not db_item in finder_images:
-                del_items.append(short_hash)
+        return del_items, ins_items
+    
+    # def run(self, finder_images: list, db_images: dict):
 
-        db_values = list(db_images.values())
+    #     del_items: list[str] = []
+    #     ins_items: list[tuple[str, int, int, int]] = []
 
-        for finder_item in finder_images:
-            if not finder_item in db_values:
-                ins_items.append(finder_item)
+    #     for short_hash, db_item in db_images.items():
+    #         if not db_item in finder_images:
+    #             del_items.append(short_hash)
 
-        return (del_items, ins_items)
+    #     db_values = list(db_images.values())
+
+    #     for finder_item in finder_images:
+    #         if not finder_item in db_values:
+    #             ins_items.append(finder_item)
+
+    #     return (del_items, ins_items)
 
 
 class DbUpdater:
@@ -486,6 +499,7 @@ class MainFolderRemover:
         conn.commit()
         conn.close()
 
+
 class WorkerSignals(QObject):
     finished_ = pyqtSignal()
 
@@ -514,16 +528,10 @@ class ScanerThread(URunnable):
             db_images = DbImages(main_folder)
             db_images = db_images.run()
 
-            compator = Compator()
-            del_items, ins_items = compator.run(
-                finder_images=finder_images,
-                db_images=db_images
-            )
+            compator = Compator(finder_images, db_images)
+            del_items, ins_items = compator.run()
 
-            DbUpdater(
-                del_items=del_items,
-                ins_items=ins_items
-            )
+            DbUpdater(del_items, ins_items)
 
         try:
             self.signals_.finished_.emit()
