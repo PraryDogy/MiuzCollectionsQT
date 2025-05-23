@@ -60,7 +60,7 @@ class DbImages(URunnable):
         if len(Dynamic.types) == 1:
             exts_ = Dynamic.types[0]
         else:
-            exts_ = Static.IMG_EXT
+            exts_ = Static.ext_all
 
         if not res:
             self.signals_.finished_.emit(thumbs_dict)

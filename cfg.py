@@ -160,13 +160,7 @@ class Static:
         *ext_video,
     )
 
-    # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ 
-    LAYERS_EXT: tuple = (
-        *ext_psd,
-        *ext_tiff,
-        )
-    
-    IMG_EXT = ext_jpeg + LAYERS_EXT
+    # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ     
 
     # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ 
     RGB_BLUE = "rgb(46, 89, 203)"
@@ -394,10 +388,7 @@ class Dynamic:
     resents: bool = False
 
     # какие расширения отображать по умолчанию (и джепеги и послойники)
-    types = [
-        Static.ext_jpeg,
-        Static.LAYERS_EXT
-    ]
+    types = [Static.ext_all]
 
     # стандартная папка загрузок
     down_folder: str = os.path.join(

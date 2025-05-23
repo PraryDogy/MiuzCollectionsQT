@@ -90,7 +90,7 @@ class FinderImages:
         # чтобы найти изображения непосредственно в корневой папке.
         # В функции get_collections корневая папка добавляется в конец списка коллекций.
         for i in os.scandir(collections[-1]):
-            if i.name.endswith(Static.IMG_EXT):
+            if i.name.endswith(Static.ext_all):
                 try:
                     file_data = self.get_file_data(entry=i)
                     finder_images.append(file_data)
@@ -127,7 +127,7 @@ class FinderImages:
                     if entry.is_dir():
                         stack.append(entry.path)
 
-                    elif entry.name.endswith(Static.IMG_EXT):
+                    elif entry.name.endswith(Static.ext_all):
                         finder_images.append(self.get_file_data(entry))
 
         return finder_images
