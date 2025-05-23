@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+import sqlalchemy
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                              QWidget)
@@ -8,8 +9,10 @@ from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
 from base_widgets.svg_btn import SvgBtn
 from base_widgets.wins import WinSystem
 from cfg import Static
+from database import THUMBS, Dbase
 from lang import Lang
-from utils.utils import Err, URunnable, UThreadPool
+from main_folders import MainFolder
+from utils.utils import Err, URunnable, UThreadPool, Utils
 
 WARNING_SVG = os.path.join(Static.IMAGES, "warning.svg")
 SCRIPTS = "scripts"
@@ -27,6 +30,7 @@ class RemoveFilesTask(URunnable):
 
     def run(self):
         try:
+            self.remove_from_db()
             command = ["osascript", REMOVE_FILES_SCPT] + self.urls
             subprocess.run(command)
         except Exception as e:
@@ -35,6 +39,35 @@ class RemoveFilesTask(URunnable):
             self.signals_.finished_.emit()
         except RuntimeError as e:
             Err.print_error(e)
+
+    def remove_from_db(self):
+        MainFolder.current.set_current_path()
+        coll_folder = MainFolder.current.get_current_path()
+
+        if coll_folder:
+            Dbase.create_engine()
+            conn = Dbase.engine.connect()
+            for i in self.urls:
+                short_src = Utils.get_short_src(coll_folder, i)
+                q = sqlalchemy.delete(THUMBS)
+                q = q.where(THUMBS.c.short_src == short_src)
+                q = q.where(THUMBS.c.brand == MainFolder.current.name)
+
+                try:
+                    conn.execute(q)
+                except Exception as e:
+                    Utils.print_error(e)
+                    conn.rollback()
+                    continue
+        
+            try:
+                conn.commit()
+            except Exception as e:
+                Utils.print_error(e)
+                conn.rollback()
+
+        conn.close()
+
 
 
 class RemoveFilesWin(WinSystem):

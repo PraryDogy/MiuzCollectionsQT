@@ -377,12 +377,7 @@ class Grid(QScrollArea):
         self.rem_win.show()
 
     def remove_finished(self, widgets: list[Thumbnail]):
-        for i in widgets:
-            Thumbnail.path_to_wid.pop(i.short_src)
-            self.cell_to_wid.pop((i.row, i.col))
-            self.selected_widgets.remove(i)
-            i.deleteLater()
-        self.rearrange()
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -645,11 +640,11 @@ class Grid(QScrollArea):
                 )
             self.menu_.addAction(save)
 
-            # self.menu_.addSeparator()
+            self.menu_.addSeparator()
 
-            # rem = RemoveFiles(self.menu_, len(self.selected_widgets))
-            # rem.triggered.connect(self.remove_files)
-            # self.menu_.addAction(rem)
+            rem = RemoveFiles(self.menu_, len(self.selected_widgets))
+            rem.triggered.connect(self.remove_files)
+            self.menu_.addAction(rem)
 
         self.menu_.show_menu()
 
