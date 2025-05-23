@@ -60,6 +60,9 @@ class MainFolder:
     def init(cls, json_data: dict):
         json_main_folders: dict = json_data.get(MAIN_FOLDERS)
         if not json_main_folders:
+            MainFolder.list_.append(miuz)
+            MainFolder.list_.append(panacea)
+            MainFolder.current = MainFolder.list_[0]
             # если в json нет данных, мы останавливаем извлечение данных
             # из json, оставляя список MainFolder.list_ по умолчанию
             # данные берутся из классов, определенных ниже
@@ -116,6 +119,3 @@ panacea = MainFolder(
     stop_list=[
     ]
 )
-
-MainFolder.list_.append(miuz)
-MainFolder.list_.append(panacea)
