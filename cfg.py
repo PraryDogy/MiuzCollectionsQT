@@ -244,6 +244,10 @@ class JsonData:
         '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
         ]
     
+    # при чтении json файла происходит проверка: если в json файле
+    # есть аттрибут, которого нет в JsonData, то он будет удален
+    # а нам нужно, чтобы main_folders из файла main_folders
+    # продолжал существовать в json файле
     main_folders: dict[str, dict] = {}
 
     @classmethod
