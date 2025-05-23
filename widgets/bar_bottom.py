@@ -87,8 +87,10 @@ class FilterBtn(QLabel):
         t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
         super().__init__(text=t)
         self.setObjectName("filter_btn")
-        self.setFixedWidth(150)
+        # self.setFixedWidth(150)
         self.set_normal_style()
+
+        self.adjustSize()
 
     def set_normal_style(self):
         self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.NORMAL_STYLE}}}")
@@ -243,6 +245,7 @@ class BarBottom(QWidget):
         types = ", ".join(types)
         t = f"{Lang.type_show}: {types}"
         self.filter_label.setText(t)
+        self.filter_label.adjustSize()
 
     def open_downloads_cmd(self, e: QMouseEvent):
         if e.button() == Qt.MouseButton.LeftButton:

@@ -389,8 +389,8 @@ class Lang_:
     ]
 
     type_jpg = [
-        "jpg",
-        "jpg"
+        "jpg, png",
+        "jpg, png",
     ]
 
     type_tiff = [

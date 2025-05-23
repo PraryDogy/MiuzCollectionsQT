@@ -187,7 +187,7 @@ class Static:
     """
 
     SOLID_STYLE = f"""
-        border-radius: 5px;
+        border-radius: 7px;
         color: rgb(255, 255, 255);
         background: {RGB_BLUE};
         border: {BORDER_INV};
