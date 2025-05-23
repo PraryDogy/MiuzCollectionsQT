@@ -2,6 +2,7 @@ import os
 from time import time
 
 import sqlalchemy
+from sqlalchemy import func
 
 from cfg import JsonData
 from database import DIRS, THUMBS, ClmNames, Dbase
@@ -108,17 +109,53 @@ class Dirs:
 
 
 class Images:
-    @classmethod
-    def get_images_dir(cls, conn: sqlalchemy.Connection, short_src: str, main_folder_name: str):
-        """
-        Загружает изображения, соответствующие директории
-        """
+    def __init__(self, conn: sqlalchemy.Connection, short_src: str, main_folder: MainFolder):
+        super().__init__()
+        self.conn = conn
+        self.short_src = short_src
+        self.main_folder = main_folder
 
-        stmt = sqlalchemy.select(THUMBS.c.short_src)
-        stmt = stmt.where(THUMBS.c.short_src.like(f"{short_src}/%"))
-        # stmt = stmt.where(sqlalchemy.not_(THUMBS.c.short_src.like(f"{short_src}/%/%")))
-        stmt = stmt.where(THUMBS.c.brand == main_folder_name)
+    def get_db_images(self):
+        """
+        Загружает изображения, соответствующие директории,
+        исключая поддиректории
+        """
+        sep_count = self.short_src.count(os.sep) + 1
+        no_sep = func.replace(THUMBS.c.short_src, "/", "")
+        sep_count_expr = (func.length(THUMBS.c.short_src) - func.length(no_sep))
+
+        stmt = sqlalchemy.select(
+            THUMBS.c.short_hash,
+            THUMBS.c.short_src,
+            THUMBS.c.size,
+            THUMBS.c.birth,
+            THUMBS.c.mod
+            )
+        
+        stmt = stmt.where(
+            THUMBS.c.short_src.like(f"{self.short_src}/%"),
+            sep_count_expr == sep_count,
+            THUMBS.c.brand == self.main_folder.name
+        )
+
         return conn.execute(stmt).fetchall()
+    
+    def get_finder_images(self):
+        finder_images = []
+
+        for i in os.scandir(self.main_folder.get_current_path()):
+            ...
+
+
+    def get_file_data(self, entry: os.DirEntry) -> tuple[str, int, int, int]:
+        """Получает данные файла."""
+        stats = entry.stat()
+        return (
+            entry.path,
+            int(stats.st_size),
+            int(stats.st_birthtime),
+            int(stats.st_mtime),
+        )
 
 
 coll_folder = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready"
@@ -156,10 +193,10 @@ JsonData.init()
 
 #         break
 
-a = Images.get_images_dir(conn, "/42 Amalia", "panacea")
+a = Images.get_db_images(conn, "/42 Amalia/1 IMG", "miuz")
 
 
 for i in a:
-    print(i)
+    print(i[0])
 
 conn.close()
