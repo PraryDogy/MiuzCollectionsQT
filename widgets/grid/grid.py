@@ -321,9 +321,6 @@ class Grid(QScrollArea):
 
             for wid in grid_wid.findChildren(Thumbnail):
 
-                if "R2018-RLF-0267" in wid.short_src:
-                    print(111)
-
                 Thumbnail.path_to_wid[wid.short_src] = wid
                 self.cell_to_wid[self.global_row, col] = wid
                 wid.row, wid.col = self.global_row, col
