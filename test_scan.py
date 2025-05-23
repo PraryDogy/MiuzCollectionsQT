@@ -11,16 +11,21 @@ from main_folders import MainFolder, panacea, miuz
 class Dirs:
 
     @classmethod
-    def get_dirs(cls, main_folder_path: str):
-        dirs: dict[str, int] = {}
+    def get_finder_dirs(cls, main_folder_path: str):
+        dirs: list[tuple[str, int]] = []
         stack = [main_folder_path]
 
         while stack:
             current = stack.pop()
             for i in os.scandir(current):
                 if i.is_dir():
-                    dirs[Utils.get_short_src(main_folder_path, i.path)] =  int(i.stat().st_mtime)
-                    stack.append(i)
+                    stack.append(i.path)
+                    dirs.append(
+                        (
+                            Utils.get_short_src(main_folder_path, i.path),
+                            int(i.stat().st_mtime)
+                        )
+                    )
 
         return dirs
 
@@ -29,36 +34,37 @@ class Dirs:
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod)
         q = q.where(DIRS.c.brand==main_folder_name)
         res = conn.execute(q).fetchall()
-        return {
-            short_src: mod
+        return [
+            (short_src, mod)
             for short_src, mod in res
-        }
+        ]
     
     @classmethod
-    def get_del_dirs(cls, dirs: dict, db_dirs: dict):
+    def get_del_dirs(cls, finder_dirs: list, db_dirs: list):
         del_dirs = []
 
-        for short_src, mod in db_dirs.items():
-            
-            if short_src not in dirs:
-                ...
+        for short_src, mod in db_dirs:
+            if (short_src, mod) not in finder_dirs:
+                del_dirs.append((short_src, mod))
 
         return del_dirs
 
     @classmethod
-    def get_new_dirs(cls, dirs: dict, db_dirs: dict):
+    def get_new_dirs(cls, finder_dirs: dict, db_dirs: dict):
         new_dirs = []
 
-        for i in dirs:
+        for i in finder_dirs:
             if i not in db_dirs:
                 new_dirs.append(i)
 
         return new_dirs
     
     @classmethod
-    def execute_del_dirs(cls, conn: sqlalchemy.Connection, del_dirs):
+    def execute_del_dirs(cls, conn: sqlalchemy.Connection, del_dirs: list, main_folder_name: str):
         for short_src, mod in del_dirs:
-            q = sqlalchemy.delete(Dirs).where(Dirs.c.short_src == short_src)
+            q = sqlalchemy.delete(DIRS)
+            q = q.where(DIRS.c.short_src == short_src)
+            q = q.where(DIRS.c.brand == main_folder_name)
 
             try:
                 conn.execute(q)
@@ -74,12 +80,13 @@ class Dirs:
             conn.rollback()
 
     @classmethod
-    def execute_new_dirs(cls, conn: sqlalchemy.Connection, del_dirs):
-        for short_src, mod in del_dirs:
+    def execute_new_dirs(cls, conn: sqlalchemy.Connection, new_dirs: list, main_folder_name: str):
+        for short_src, mod in new_dirs:
 
             values = {
                 ClmNames.SHORT_SRC: short_src,
-                ClmNames.MOD: mod
+                ClmNames.MOD: mod,
+                ClmNames.BRAND: main_folder_name
             }
 
 
@@ -110,12 +117,23 @@ Dbase.create_engine()
 conn = Dbase.engine.connect()
 JsonData.init()
 
-for main_folder in MainFolder.list_:
+for main_folder in MainFolder.list_[1:]:
     coll_folder = main_folder.set_current_path()
     if main_folder.is_avaiable():
-        finder_dirs = Dirs.get_dirs(main_folder.current_path)
-        # db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
-        # print(db_dirs)
-        print(finder_dirs)
+        finder_dirs = Dirs.get_finder_dirs(main_folder.current_path)
+        if finder_dirs:
+            db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
+            del_dirs = Dirs.get_del_dirs(finder_dirs, db_dirs)
+            new_dirs = Dirs.get_new_dirs(finder_dirs, db_dirs)
+
+            if del_dirs:
+                Dirs.execute_del_dirs(conn, del_dirs, main_folder.name)
+                print("del dirs", del_dirs)
+
+            if new_dirs:
+                Dirs.execute_new_dirs(conn, new_dirs, main_folder.name)
+                print("new dirs", new_dirs)
+
+        break
 
 conn.close()
