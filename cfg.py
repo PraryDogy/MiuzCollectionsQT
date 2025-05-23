@@ -258,7 +258,7 @@ class JsonData:
         }
 
     @classmethod
-    def setup_json_data(cls) -> dict:
+    def read_json_data(cls) -> dict:
 
         with open(Static.JSON_FILE, 'r', encoding="utf-8") as f:
 
@@ -371,7 +371,7 @@ class JsonData:
     @classmethod
     def init(cls):
         cls.check_dirs()
-        cls.setup_json_data()
+        cls.read_json_data()
 
         # если версии не совпадают то что то нужно сделать
         # например копировать новые файлы или ...
