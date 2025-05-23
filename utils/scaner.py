@@ -17,8 +17,6 @@ from .utils import URunnable, UThreadPool, Utils
 
 
 class ScanerTools:
-    current_main_folder: MainFolder
-    avaiable_main_folders: list[MainFolder] = []
     can_scan: bool = True
 
     @classmethod
@@ -217,19 +215,17 @@ class Compator:
 class DbUpdater:
     sleep_count: float = 0.1
 
-    def __init__(self, del_items: list[str], ins_items: list[tuple[str, int, int, int]]):
+    def __init__(self, del_items: list, ins_items: list, main_folder: MainFolder):
 
         super().__init__()
+        self.main_folder = main_folder
 
-        values = self.get_values(*["" for i in range(0, 6)])
-        values = list(values.keys())
+        self.del_db(del_items)
+        self.del_images(del_items)
 
-        self.del_db(del_items=del_items)
-        self.del_images(del_items=del_items)
-
-        queries = self.create_queries(ins_items=ins_items)
-        self.insert_db(queries=queries)
-        self.insert_images(queries=queries)
+        queries = self.create_queries(ins_items)
+        self.insert_db(queries)
+        self.insert_images(queries)
 
     def del_db(self, del_items: list[str]):
         conn = Dbase.engine.connect()
@@ -281,7 +277,7 @@ class DbUpdater:
             if os.path.exists(full_hash):
 
                 try:
-                    self.progressbar_text(text=Lang.deleting, x=x, total=total)
+                    self.progressbar_text(Lang.deleting, x, total)
                     os.remove(full_hash)
                     folder = os.path.dirname(full_hash)
                     if not os.listdir(folder):
@@ -311,7 +307,7 @@ class DbUpdater:
             return (None, None)
 
     def get_values(self, full_src, full_hash, size, birth, mod, resol):
-        coll_folder = ScanerTools.current_main_folder.current_path
+        coll_folder = self.main_folder.get_current_path()
         return {
             ClmNames.SHORT_SRC: Utils.get_short_src(coll_folder, full_src),
             ClmNames.SHORT_HASH: Utils.get_short_hash(full_hash),
@@ -321,7 +317,7 @@ class DbUpdater:
             ClmNames.RESOL: resol,
             ClmNames.COLL: Utils.get_coll_name(coll_folder, full_src),
             ClmNames.FAV: 0,
-            ClmNames.BRAND: ScanerTools.current_main_folder.name
+            ClmNames.BRAND: self.main_folder.name
         }
 
     def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
@@ -335,7 +331,7 @@ class DbUpdater:
             if not ScanerTools.can_scan:
                 return
 
-            self.progressbar_text(text=Lang.adding, x=x, total=total)
+            self.progressbar_text(Lang.adding, x, total)
             small_img, resol = self.get_small_img(full_src)
 
             if small_img is not None:
@@ -418,7 +414,7 @@ class DbUpdater:
         total: `len`
         """
 
-        main_folder = ScanerTools.current_main_folder.name.capitalize()
+        main_folder = self.main_folder.name.capitalize()
         t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
         ScanerTools.progressbar_text(t)
 
