@@ -37,6 +37,7 @@ class CollectionBtn(QLabel):
         self.main_folder_index: int = 0 # для win_upload
 
     def reveal_collection(self, *args) -> None:
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if not coll_folder:
             OpenWins.smb(parent_=self.window())

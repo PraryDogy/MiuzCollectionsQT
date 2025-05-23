@@ -74,6 +74,7 @@ class OpenInfoDb(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         
         if coll_folder:
@@ -95,6 +96,7 @@ class CopyPath(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
@@ -113,6 +115,7 @@ class CopyName(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
@@ -139,6 +142,7 @@ class Reveal(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             full_src = [
@@ -225,6 +229,7 @@ class Save(QAction):
         self.win_ = win
 
     def cmd_(self):
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:

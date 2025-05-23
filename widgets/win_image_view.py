@@ -314,6 +314,7 @@ class WinImageView(WinChild):
 
 
     def first_load(self):
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if not coll_folder:
             OpenWins.smb(self)
@@ -329,7 +330,7 @@ class WinImageView(WinChild):
 
     def load_thumb_fin(self, data: ImageData):
         self.image_label.set_image(data.pixmap)
-
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
@@ -478,7 +479,7 @@ class WinImageView(WinChild):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-
+            MainFolder.current.set_current_path()
             coll_folder = MainFolder.current.get_current_path()
 
             if coll_folder:

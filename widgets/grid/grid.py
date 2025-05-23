@@ -364,6 +364,7 @@ class Grid(QScrollArea):
             wid.set_frame()
 
     def remove_files(self):
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         urls = [
             Utils.get_full_src(coll_folder, i.short_src)
@@ -399,6 +400,7 @@ class Grid(QScrollArea):
             if self.selected_widgets:
             
                 wid = self.selected_widgets[-1]
+                MainFolder.current.set_current_path()
                 coll_folder = MainFolder.current.get_current_path()
 
                 if coll_folder:
@@ -700,6 +702,7 @@ class Grid(QScrollArea):
             self.add_and_select_widget(self.wid_under_mouse)
             QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
+        MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             urls = [
