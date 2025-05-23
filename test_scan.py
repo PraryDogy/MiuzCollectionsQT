@@ -11,9 +11,9 @@ from main_folders import MainFolder
 class Dirs:
 
     @classmethod
-    def get_dirs(cls, coll_folder: str, dir: str):
+    def get_dirs(cls, main_folder_path: str):
         dirs: dict[str, int] = {}
-        stack = [dir]
+        stack = [main_folder_path]
 
         while stack:
             current = stack.pop()
@@ -25,10 +25,9 @@ class Dirs:
         return dirs
 
     @classmethod
-    def get_db_dirs(cls):
-        Dbase.create_engine()
-        conn = Dbase.engine.connect()
+    def get_db_dirs(cls, conn: sqlalchemy.Connection, main_folder_name: str):
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod)
+        q = q.where(DIRS.c.brand==main_folder_name)
         res = conn.execute(q).fetchall()
         return {
             short_src: mod
@@ -106,5 +105,11 @@ Dbase.create_engine()
 conn = Dbase.engine.connect()
 JsonData.init()
 
-for i in MainFolder.list_:
-    print(i.name)
+for main_folder in MainFolder.list_:
+    coll_folder = Utils.get_main_folder_path(main_folder)
+    main_folder.set_current_path(coll_folder)
+    finder_dirs = Dirs.get_dirs(main_folder.current_path)
+    db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
+    print(db_dirs)
+
+conn.close()

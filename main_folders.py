@@ -17,6 +17,9 @@ class MainFolder:
         self.stop_list = stop_list
         self.current_path: str = None # этот аттрибут нужен для сканера
 
+    def set_current_path(self, path: str):
+        self.current_path = path
+
     @classmethod
     def init(cls):
         if MainFolder.list_:
