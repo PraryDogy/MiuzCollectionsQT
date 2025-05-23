@@ -1,3 +1,5 @@
+import os
+
 NAME = "name"
 PATHS = "paths"
 STOP_LIST = "stop_list"
@@ -19,6 +21,12 @@ class MainFolder:
 
     def set_current_path(self, path: str):
         self.current_path = path
+
+    def get_current_path(self):
+        for i in self.paths:
+            if os.path.exists(i):
+                return i
+        return None
 
     @classmethod
     def init(cls):
