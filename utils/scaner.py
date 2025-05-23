@@ -216,14 +216,17 @@ class DbUpdater:
     sleep_count: float = 0.1
 
     def __init__(self, del_items: list, ins_items: list, main_folder: MainFolder):
-
         super().__init__()
         self.main_folder = main_folder
+        self.del_items = del_items
+        self.ins_items = ins_items
 
-        self.del_db(del_items)
-        self.del_images(del_items)
+    def run(self):
 
-        queries = self.create_queries(ins_items)
+        self.del_db(self.del_items)
+        self.del_images(self.del_items)
+
+        queries = self.create_queries(self.ins_items)
         self.insert_db(queries)
         self.insert_images(queries)
 
@@ -527,7 +530,8 @@ class ScanerThread(URunnable):
             compator = Compator(finder_images, db_images)
             del_items, ins_items = compator.run()
 
-            DbUpdater(del_items, ins_items)
+            db_updater = DbUpdater(del_items, ins_items, main_folder)
+            db_updater.run()
 
         try:
             self.signals_.finished_.emit()
