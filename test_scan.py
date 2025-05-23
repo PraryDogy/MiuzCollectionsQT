@@ -6,7 +6,7 @@ import sqlalchemy
 from cfg import JsonData
 from database import DIRS, Dbase, ClmNames
 from utils.utils import Utils
-from main_folders import MainFolder
+from main_folders import MainFolder, panacea, miuz
 
 class Dirs:
 
@@ -19,7 +19,7 @@ class Dirs:
             current = stack.pop()
             for i in os.scandir(current):
                 if i.is_dir():
-                    dirs[Utils.get_short_src(coll_folder, i.path)] =  int(i.stat().st_mtime)
+                    dirs[Utils.get_short_src(main_folder_path, i.path)] =  int(i.stat().st_mtime)
                     stack.append(i)
 
         return dirs
@@ -101,15 +101,21 @@ class Dirs:
 coll_folder = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready"
 src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/52 Florance"
 
+
+MainFolder.list_.append(miuz)
+MainFolder.list_.append(panacea)
+MainFolder.current = MainFolder.list_[0]
+
 Dbase.create_engine()
 conn = Dbase.engine.connect()
 JsonData.init()
 
 for main_folder in MainFolder.list_:
-    coll_folder = Utils.get_main_folder_path(main_folder)
-    main_folder.set_current_path(coll_folder)
-    finder_dirs = Dirs.get_dirs(main_folder.current_path)
-    db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
-    print(db_dirs)
+    coll_folder = main_folder.set_current_path()
+    if main_folder.is_avaiable():
+        finder_dirs = Dirs.get_dirs(main_folder.current_path)
+        # db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
+        # print(db_dirs)
+        print(finder_dirs)
 
 conn.close()

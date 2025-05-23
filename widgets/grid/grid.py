@@ -364,7 +364,7 @@ class Grid(QScrollArea):
             wid.set_frame()
 
     def remove_files(self):
-        coll_folder = Utils.get_main_folder_path(MainFolder.current)
+        coll_folder = MainFolder.current.get_current_path()
         urls = [
             Utils.get_full_src(coll_folder, i.short_src)
             for i in self.selected_widgets
@@ -399,7 +399,7 @@ class Grid(QScrollArea):
             if self.selected_widgets:
             
                 wid = self.selected_widgets[-1]
-                coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
+                coll_folder = MainFolder.current.get_current_path()
 
                 if coll_folder:
                     OpenWins.info_db(
@@ -700,7 +700,7 @@ class Grid(QScrollArea):
             self.add_and_select_widget(self.wid_under_mouse)
             QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
-        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
+        coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             urls = [
                 Utils.get_full_src(coll_folder, i.short_src)

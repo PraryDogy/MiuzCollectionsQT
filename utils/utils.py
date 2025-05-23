@@ -350,22 +350,15 @@ class Utils(Hash, Pixmap, ReadImage, Err):
         )
 
     @classmethod
-    def get_main_folder_path(cls, main_folder: MainFolder):
-        for coll_folder in main_folder.paths:
-            if os.path.exists(coll_folder):
-                return coll_folder
-        return None
-
-    @classmethod
-    def get_coll_name(cls, coll_folder: str, full_src: str) -> str:
-        coll = cls.get_short_src(coll_folder, full_src)
+    def get_coll_name(cls, main_folder_path: str, full_src: str) -> str:
+        coll = cls.get_short_src(main_folder_path, full_src)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
         if len(coll) > 1:
             return coll[0]
         else:
-            return os.path.basename(coll_folder.strip(os.sep))
+            return os.path.basename(main_folder_path.strip(os.sep))
 
     @classmethod
     def copy_text(cls, text: str):
@@ -409,12 +402,12 @@ class Utils(Hash, Pixmap, ReadImage, Err):
         return date.strftime("%d.%m.%Y %H:%M")
         
     @classmethod
-    def get_full_src(cls, coll_folder: str, short_src: str) -> str:
-        return coll_folder + short_src
+    def get_full_src(cls, main_folder_path: str, short_src: str) -> str:
+        return main_folder_path + short_src
     
     @classmethod
-    def get_short_src(cls, coll_folder: str, full_src: str) -> str:
-        return full_src.replace(coll_folder, "")
+    def get_short_src(cls, main_folder_path: str, full_src: str) -> str:
+        return full_src.replace(main_folder_path, "")
 
     @classmethod
     def rm_rf(cls, folder_path: str):

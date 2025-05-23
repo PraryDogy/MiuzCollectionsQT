@@ -95,7 +95,7 @@ class CopyPath(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
+        coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
             full_src = Utils.get_full_src(coll_folder, self.short_src)
@@ -113,7 +113,7 @@ class CopyName(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
+        coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
             name = os.path.basename(self.short_src)
@@ -139,7 +139,7 @@ class Reveal(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
+        coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             full_src = [
                 Utils.get_full_src(coll_folder, i)
@@ -225,7 +225,7 @@ class Save(QAction):
         self.win_ = win
 
     def cmd_(self):
-        coll_folder = Utils.get_main_folder_path(main_folder=MainFolder.current)
+        coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
 
