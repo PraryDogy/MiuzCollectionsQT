@@ -261,36 +261,22 @@ class MenuTypes(QMenu):
     def __init__(self, parent: QMenu):
         super().__init__(parent=parent, title=Lang.type_show)
 
-        non_layers_ext = [
-            *Static.ext_jpeg,
-            *Static.ext_png,
-            *Static.ext_raw,
-            *Static.ext_video
-        ]
-
-        layers_ext = [
-            *Static.ext_psd,
-            *Static.ext_tiff
-        ]
-
         type_jpg = QAction(parent=self, text=Lang.type_jpg)
         type_jpg.setCheckable(True)
-        cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=non_layers_ext)
+        cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.ext_non_layers)
         type_jpg.triggered.connect(cmd_jpg)
         self.addAction(type_jpg)
 
-
-
         type_tiff = QAction(parent=self, text=Lang.type_tiff)
         type_tiff.setCheckable(True)
-        cmd_tiff = lambda: self.cmd_(action_=type_tiff, type_=layers_ext)
+        cmd_tiff = lambda: self.cmd_(action_=type_tiff, type_=Static.ext_layers)
         type_tiff.triggered.connect(cmd_tiff)
         self.addAction(type_tiff)
 
-        if non_layers_ext in Dynamic.types:
+        if Static.ext_non_layers in Dynamic.types:
             type_jpg.setChecked(True)
 
-        if layers_ext in Dynamic.types:
+        if Static.ext_layers in Dynamic.types:
             type_tiff.setChecked(True)
 
     def cmd_(self, action_: QAction, type_: str):
