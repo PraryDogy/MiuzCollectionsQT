@@ -336,7 +336,7 @@ class Pixmap:
             return None
         
 
-class Utils(Hash, Pixmap, ReadImage):
+class Utils(Hash, Pixmap, ReadImage, Err):
 
     @classmethod
     def desaturate_image(cls, image: np.ndarray, factor=0.2):

@@ -3,9 +3,10 @@ from time import time
 
 import sqlalchemy
 
-from database import DIRS, Dbase, ThumbColumns
+from cfg import JsonData
+from database import DIRS, Dbase, ClmNames
 from utils.utils import Utils
-
+from main_folders import MainFolder
 
 class Dirs:
 
@@ -78,8 +79,8 @@ class Dirs:
         for short_src, mod in del_dirs:
 
             values = {
-                ThumbColumns.SHORT_SRC: short_src,
-                ThumbColumns.MOD: mod
+                ClmNames.SHORT_SRC: short_src,
+                ClmNames.MOD: mod
             }
 
 
@@ -103,20 +104,7 @@ src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/52 Florance"
 
 Dbase.create_engine()
 conn = Dbase.engine.connect()
+JsonData.init()
 
-dirs = Dirs.get_dirs(coll_folder, src)
-db_dirs = Dirs.get_db_dirs()
-# del_dirs = Dirs.get_del_dirs(dirs, db_dirs)
-# new_dirs = Dirs.get_new_dirs(dirs, del_dirs)
-# Dirs.execute_del_dirs(conn, del_dirs)
-
-
-print(dirs)
-print(db_dirs)
-
-
-# if new_dirs:
-    # print(new_dirs)
-    # Dirs.execute_new_dirs(conn, new_dirs)
-
-conn.close()
+for i in MainFolder.list_:
+    print(i.name)

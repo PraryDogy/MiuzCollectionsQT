@@ -9,7 +9,7 @@ from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 from main_folders import MainFolder
 from cfg import JsonData, Static, ThumbData
-from database import THUMBS, Dbase, ThumbColumns
+from database import THUMBS, Dbase, ClmNames
 from lang import Lang
 from signals import SignalsApp
 
@@ -300,15 +300,15 @@ class DbUpdater:
     def get_values(self, full_src, full_hash, size, birth, mod, resol):
         coll_folder = ScanerTools.current_main_folder.current_path
         return {
-            ThumbColumns.SHORT_SRC: Utils.get_short_src(coll_folder, full_src),
-            ThumbColumns.SHORT_HASH: Utils.get_short_hash(full_hash),
-            ThumbColumns.SIZE: size,
-            ThumbColumns.BIRTH: birth,
-            ThumbColumns.MOD: mod,
-            ThumbColumns.RESOL: resol,
-            ThumbColumns.COLL: Utils.get_coll_name(coll_folder, full_src),
-            ThumbColumns.FAV: 0,
-            ThumbColumns.BRAND: ScanerTools.current_main_folder.name
+            ClmNames.SHORT_SRC: Utils.get_short_src(coll_folder, full_src),
+            ClmNames.SHORT_HASH: Utils.get_short_hash(full_hash),
+            ClmNames.SIZE: size,
+            ClmNames.BIRTH: birth,
+            ClmNames.MOD: mod,
+            ClmNames.RESOL: resol,
+            ClmNames.COLL: Utils.get_coll_name(coll_folder, full_src),
+            ClmNames.FAV: 0,
+            ClmNames.BRAND: ScanerTools.current_main_folder.name
         }
 
     def create_queries(self, ins_items: list[tuple[str, int, int, int]]):

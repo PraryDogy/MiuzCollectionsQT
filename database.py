@@ -3,10 +3,11 @@ import os
 import sqlalchemy
 
 from cfg import Static
+from utils.utils import Utils
 
 METADATA = sqlalchemy.MetaData()
 
-class ThumbColumns:
+class ClmNames:
     ID = "id"
     SHORT_SRC = "short_src"
     SHORT_HASH = "short_hash"
@@ -18,25 +19,27 @@ class ThumbColumns:
     FAV = "fav"
     BRAND = "brand"
 
+
 THUMBS = sqlalchemy.Table(
     "thumbs", METADATA,
-    sqlalchemy.Column(ThumbColumns.ID, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ThumbColumns.SHORT_SRC, sqlalchemy.Text),
-    sqlalchemy.Column(ThumbColumns.SHORT_HASH, sqlalchemy.Text, comment="Путь к маленькой картинке"),
-    sqlalchemy.Column(ThumbColumns.SIZE, sqlalchemy.Integer, comment="Размер"),
-    sqlalchemy.Column(ThumbColumns.BIRTH, sqlalchemy.Integer, comment="Дата созд."),
-    sqlalchemy.Column(ThumbColumns.MOD, sqlalchemy.Integer, comment="Дата изм."),
-    sqlalchemy.Column(ThumbColumns.RESOL, sqlalchemy.Text, comment="1920x1080"),
-    sqlalchemy.Column(ThumbColumns.COLL, sqlalchemy.Text, comment="Имя коллекции"),
-    sqlalchemy.Column(ThumbColumns.FAV, sqlalchemy.Integer, comment="1 is fav else 0"),
-    sqlalchemy.Column(ThumbColumns.BRAND, sqlalchemy.Text, comment="miuz, panacea"),
+    sqlalchemy.Column(ClmNames.ID, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ClmNames.SHORT_SRC, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.SHORT_HASH, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.SIZE, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.BIRTH, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.MOD, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.RESOL, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.COLL, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.FAV, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.BRAND, sqlalchemy.Text),
 )
 
 DIRS = sqlalchemy.Table(
     "dirs", METADATA,
-    sqlalchemy.Column(ThumbColumns.ID, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ThumbColumns.SHORT_SRC, sqlalchemy.Text),
-    sqlalchemy.Column(ThumbColumns.MOD, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.ID, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ClmNames.SHORT_SRC, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.MOD, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.BRAND, sqlalchemy.Text),
 )
 
 class Dbase:
@@ -63,9 +66,28 @@ class Dbase:
                     }
                     )
             METADATA.create_all(cls.engine)
+
+            conn = cls.engine.connect()
+            check = cls.check_table(DIRS, conn)
+            if not check:
+                DIRS.drop(cls.engine)
+                METADATA.create_all(cls.engine)
+            
         else:
             t = "Нет пользовательского файла DB_FILE"
             raise Exception(t)
+        
+    @classmethod
+    def check_table(cls, table: sqlalchemy.Table, conn: sqlalchemy.Connection) -> bool:
+        try:
+            if not cls.engine.dialect.has_table(conn, table.name):
+                return False
+            q = sqlalchemy.select(table)
+            conn.execute(q).first()
+            return True
+        except Exception as e:
+            Utils.print_error(e)
+            return False
         
     @classmethod
     def toggle_wal(cls, value: bool):
