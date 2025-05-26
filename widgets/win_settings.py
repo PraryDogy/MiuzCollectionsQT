@@ -308,8 +308,8 @@ class TabsWidget(QTabWidget):
 
         stop_colls_list = StopList(main_folder, main_folder.stop_list)
         stop_colls_list.changed.connect(self.list_changed)
+        add_btn_one.clicked.connect(stop_colls_list.add_item_cmd)
         v_lay.addWidget(stop_colls_list)
-
 
         h_wid_two = QWidget()
         v_lay.addWidget(h_wid_two)
