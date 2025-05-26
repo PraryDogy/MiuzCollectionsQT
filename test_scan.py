@@ -42,7 +42,7 @@ class Dirs:
         ]
     
     @classmethod
-    def get_del_dirs(cls, finder_dirs: list, db_dirs: list):
+    def get_removed_dirs(cls, finder_dirs: list, db_dirs: list):
         del_dirs = []
 
         for short_src, mod in db_dirs:
@@ -170,16 +170,14 @@ Dbase.create_engine()
 conn = Dbase.engine.connect()
 JsonData.init()
 
-# for main_folder in MainFolder.list_[1:]:
-#     coll_folder = main_folder.set_current_path()
-#     if main_folder.is_avaiable():
-#         finder_dirs = Dirs.get_finder_dirs(main_folder.current_path)
-#         if finder_dirs:
-#             db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
-#             del_dirs = Dirs.get_del_dirs(finder_dirs, db_dirs)
-#             new_dirs = Dirs.get_new_dirs(finder_dirs, db_dirs)
-
-
+for main_folder in MainFolder.list_:
+    coll_folder = main_folder.set_current_path()
+    if main_folder.is_avaiable():
+        finder_dirs = Dirs.get_finder_dirs(main_folder.current_path)
+        if finder_dirs:
+            db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
+            removed_dirs = Dirs.get_removed_dirs(finder_dirs, db_dirs)
+            new_dirs = Dirs.get_new_dirs(finder_dirs, db_dirs)
 
 #             # это нужно будет делать в самом конце, когда уже просканены 
 #             # изображения
@@ -193,10 +191,8 @@ JsonData.init()
 
 #         break
 
-a = Images.get_db_images(conn, "/42 Amalia/1 IMG", "miuz")
+# a = Images.get_db_images(conn, "/42 Amalia/1 IMG", "miuz")
 
 
-for i in a:
-    print(i[0])
 
 conn.close()
