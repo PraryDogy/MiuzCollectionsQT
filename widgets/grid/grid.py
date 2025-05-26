@@ -462,9 +462,18 @@ class Grid(QScrollArea):
             ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
 
             for wid in self.cell_to_wid.values():
-                top_left = wid.mapTo(self, QPoint(0, 0))
-                wid_rect = QRect(top_left, wid.size())
-                if rect.intersects(wid_rect):
+                
+                widgets = wid.findChildren((TextWid, ImgWid))
+
+                intersects = False
+                for child in widgets:
+                    top_left = child.mapTo(self, QPoint(0, 0))
+                    child_rect = QRect(top_left, child.size())
+                    if rect.intersects(child_rect):
+                        intersects = True
+                        break
+
+                if intersects:
                     if ctrl:
                         if wid in self.selected_widgets:
                             wid.set_no_frame()
