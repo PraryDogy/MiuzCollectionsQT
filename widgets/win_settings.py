@@ -358,16 +358,39 @@ class AddMainFolderWin(WinSystem):
         self.name_wid.setPlaceholderText(Lang.set_name_main_folder)
         self.central_layout.addWidget(self.name_wid)
 
+
+        h_wid_one = QWidget()
+        self.central_layout.addWidget(h_wid_one)
+        h_lay_one = LayoutHor()
+        h_lay_one.setSpacing(15)
+        h_wid_one.setLayout(h_lay_one)
+
+        add_btn_one = QPushButton(Lang.add_)
+        add_btn_one.setFixedWidth(115)
+        h_lay_one.addWidget(add_btn_one)
+
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
-        self.central_layout.addWidget(stop_colls_lbl)
+        h_lay_one.addWidget(stop_colls_lbl)
 
         stop_list_wid = StopList(None, None)
+        add_btn_one.clicked.connect(stop_list_wid.add_item_cmd)
         self.central_layout.addWidget(stop_list_wid)
 
+        h_wid_two = QWidget()
+        self.central_layout.addWidget(h_wid_two)
+        h_lay_two = LayoutHor()
+        h_lay_two.setSpacing(15)
+        h_wid_two.setLayout(h_lay_two)
+
+        add_btn_two = QPushButton(Lang.add_)
+        add_btn_two.setFixedWidth(115)
+        h_lay_two.addWidget(add_btn_two)
+
         coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
-        self.central_layout.addWidget(coll_folders_label)
+        h_lay_two.addWidget(coll_folders_label)
 
         stop_list_wid = MainFoldersPaths(None, None)
+        add_btn_two.clicked.connect(stop_list_wid.add_item_cmd)
         self.central_layout.addWidget(stop_list_wid)
 
         h_wid = QWidget()
