@@ -326,6 +326,7 @@ class TabsWidget(QTabWidget):
 
         coll_folders_list = MainFoldersPaths(main_folder, main_folder.paths)
         coll_folders_list.changed.connect(self.list_changed)
+        add_btn_two.clicked.connect(coll_folders_list.add_item_cmd)
         v_lay.addWidget(coll_folders_list)
 
         return wid
