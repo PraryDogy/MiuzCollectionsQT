@@ -43,13 +43,13 @@ class FinderImages:
 
     def run(self) -> list[tuple[str, int, int, int]] | None:
         """Основной метод для поиска изображений в коллекциях."""
-        collections = self.get_collections()
+        collections = self.get_subdirs()
         if collections:
-            return self.process_collections(collections)
+            return self.process_subdirs(collections)
         else:
             return None
 
-    def get_collections(self) -> list[str]:
+    def get_subdirs(self) -> list[str]:
         collections = []
 
         try:
@@ -70,17 +70,17 @@ class FinderImages:
 
         return collections
 
-    def process_collections(self, collections: list[str]) -> list[tuple[str, int, int, int]]:
+    def process_subdirs(self, subdirs: list[str]) -> list[tuple[str, int, int, int]]:
         finder_images = []
-        total_collections = len(collections)
+        subrirs_count = len(subdirs)
 
-        for index, collection in enumerate(collections[:-1], start=1):
+        for index, subdir in enumerate(subdirs[:-1], start=1):
             
-            progress_text = self.get_progress_text(index, total_collections)
+            progress_text = self.get_progress_text(index, subrirs_count)
             ScanerTools.progressbar_text(progress_text)
 
             try:
-                walked_images = self.walk_collection(collection)
+                walked_images = self.walk_subdir(subdir)
                 finder_images.extend(walked_images)
 
             except TypeError as e:
@@ -89,10 +89,10 @@ class FinderImages:
         # Сканируем корневую папку без рекурсии в подпапки,
         # чтобы найти изображения непосредственно в корневой папке.
         # В функции get_collections корневая папка добавляется в конец списка коллекций.
-        for i in os.scandir(collections[-1]):
+        for i in os.scandir(subdirs[-1]):
             if i.name.endswith(Static.ext_all):
                 try:
-                    file_data = self.get_file_data(entry=i)
+                    file_data = self.get_file_data(i)
                     finder_images.append(file_data)
                 except OSError as e:
                     print("scaner > FinderImages > get file data", e)
@@ -106,7 +106,7 @@ class FinderImages:
         collection_name = Lang.collection
         return f"{main_folder}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
-    def walk_collection(self, coll: str) -> list[tuple[str, int, int, int]]:
+    def walk_subdir(self, coll: str) -> list[tuple[str, int, int, int]]:
         """Рекурсивно обходит директорию и находит изображения."""
         finder_images = []
         stack = []
