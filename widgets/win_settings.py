@@ -679,17 +679,8 @@ class WinSettings(WinSystem):
         btns_layout.addStretch(1)
 
     def lock_widgets(self, *args):
-
-        widgets: list[QWidget] = self.centralWidget().children()
-        widgets.pop(-1)
-        widgets.pop(0)
-
-        # при добавлении 4 виджета, а при удалении 5
-        if len(widgets) == 5:
-            widgets.pop(-1)
-
-        for i in widgets:
-            i.setDisabled(True)
+        tab = self.findChild(QTabWidget)
+        tab.setDisabled(True)
 
         self.ok_btn.setText(Lang.apply)
 
