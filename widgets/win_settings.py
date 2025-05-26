@@ -293,17 +293,38 @@ class TabsWidget(QTabWidget):
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         wid.setLayout(v_lay)
 
-        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
-        v_lay.addWidget(stop_colls_lbl)
+        h_wid_one = QWidget()
+        v_lay.addWidget(h_wid_one)
+        h_lay_one = LayoutHor()
+        h_lay_one.setSpacing(15)
+        h_wid_one.setLayout(h_lay_one)
 
-        stop_colls_list = StopList(main_folder=main_folder, items=main_folder.stop_list)
+        add_btn_one = QPushButton(Lang.add_)
+        add_btn_one.setFixedWidth(115)
+        h_lay_one.addWidget(add_btn_one)
+
+        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
+        h_lay_one.addWidget(stop_colls_lbl)
+
+        stop_colls_list = StopList(main_folder, main_folder.stop_list)
         stop_colls_list.changed.connect(self.list_changed)
         v_lay.addWidget(stop_colls_list)
 
-        coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
-        v_lay.addWidget(coll_folders_label)
 
-        coll_folders_list = MainFoldersPaths(main_folder=main_folder, items=main_folder.paths)
+        h_wid_two = QWidget()
+        v_lay.addWidget(h_wid_two)
+        h_lay_two = LayoutHor()
+        h_lay_two.setSpacing(15)
+        h_wid_two.setLayout(h_lay_two)
+
+        add_btn_two = QPushButton(Lang.add_)
+        add_btn_two.setFixedWidth(115)
+        h_lay_two.addWidget(add_btn_two)
+
+        coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
+        h_lay_two.addWidget(coll_folders_label)
+
+        coll_folders_list = MainFoldersPaths(main_folder, main_folder.paths)
         coll_folders_list.changed.connect(self.list_changed)
         v_lay.addWidget(coll_folders_list)
 
