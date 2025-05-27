@@ -7,10 +7,10 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from main_folders import MainFolder
 from cfg import JsonData, Static, ThumbData
-from database import THUMBS, Dbase, ClmNames
+from database import THUMBS, ClmNames, Dbase
 from lang import Lang
+from main_folders import MainFolder
 from signals import SignalsApp
 
 from .utils import URunnable, UThreadPool, Utils

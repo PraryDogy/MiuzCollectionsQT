@@ -3,17 +3,16 @@ from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
-from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QVBoxLayout,
-                             QWidget, QSplitter)
+from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
+                             QVBoxLayout, QWidget)
 
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
-from main_folders import MainFolder
 from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
+from main_folders import MainFolder
 from signals import SignalsApp
 from utils.scaner import Scaner
-from utils.utils import Utils
 from widgets.win_upload import WinUpload
 
 from .actions import OpenWins

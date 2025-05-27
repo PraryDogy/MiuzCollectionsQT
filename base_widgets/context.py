@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QCloseEvent, QContextMenuEvent, QMouseEvent
+from PyQt5.QtGui import QCloseEvent, QContextMenuEvent
 from PyQt5.QtWidgets import QMenu
 
 

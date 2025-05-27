@@ -1,9 +1,10 @@
 import json
 import os
 import shutil
-import webbrowser
 from datetime import datetime
+
 from main_folders import MainFolder
+
 
 class ThumbData:
 
@@ -306,9 +307,7 @@ class JsonData:
     def check_dirs(cls):
 
         if not os.path.exists(Static.PRELOAD_FOLDER):
-            t = "скачайте _preload.zip и распакуйте в корень проекта"
-            webbrowser.open(Static.LINK_DB)
-            raise Exception(t)
+            raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
 
         if not os.path.exists(Static.APP_SUPPORT_DIR):
             os.makedirs(name=Static.APP_SUPPORT_DIR, exist_ok=True)
@@ -340,9 +339,7 @@ class JsonData:
 
         # если нет предустановленной то просим скачать и положить в корень проекта
         else:
-            t = "скачайте _preload.zip и распакуйте в корень проекта"
-            webbrowser.open(Static.LINK_DB)
-            raise Exception(t)
+            raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
 
     @classmethod
     def copy_db_file(cls):
@@ -360,9 +357,7 @@ class JsonData:
         # иначе просим скачать или создать пользовательский db.db 
         # с таблицей database > THUMBS
         else:
-            t = "скачайте _preload.zip и распакуйте в корень проекта"
-            webbrowser.open(Static.LINK_DB)
-            raise Exception(t)
+            raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
 
     @classmethod
     def _compare_versions(cls) -> bool:

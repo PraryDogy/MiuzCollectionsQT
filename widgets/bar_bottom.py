@@ -1,9 +1,8 @@
 import os
-from typing import Literal
 
 from PyQt5.QtCore import QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtWidgets import QAction, QLabel, QSlider, QWidget, QFrame
+from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSlider, QWidget
 
 from base_widgets import ContextCustom, LayoutHor, SvgBtn
 from cfg import Dynamic, Static, ThumbData

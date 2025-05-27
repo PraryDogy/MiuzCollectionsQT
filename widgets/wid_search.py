@@ -4,9 +4,8 @@ from typing import Literal
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QLineEdit, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QLineEdit
 
-from base_widgets import LayoutHor
 from base_widgets.input import ULineEdit
 from cfg import Dynamic, Static
 from lang import Lang

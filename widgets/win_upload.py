@@ -1,19 +1,17 @@
 
 import os
 
-import sqlalchemy
-from PyQt5.QtCore import QObject, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, QTimer
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
 
 from base_widgets.layouts import LayoutHor
 from base_widgets.wins import WinSystem
 from cfg import Dynamic, Static
-from database import THUMBS, Dbase
-from signals import SignalsApp
-from utils.copy_files import CopyFiles
-from utils.utils import UThreadPool, Utils
 from lang import Lang
 from main_folders import MainFolder
+from utils.copy_files import CopyFiles
+from utils.utils import UThreadPool
+
 from .menu_left import CollectionBtn, MenuLeft
 
 

@@ -2,11 +2,10 @@ import os
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget, QPushButton
+from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer, SvgBtn
 from base_widgets.wins import WinSystem
-from main_folders import MainFolder
 from cfg import Static
 from lang import Lang
 

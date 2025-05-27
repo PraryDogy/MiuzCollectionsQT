@@ -1,14 +1,11 @@
 import gc
 import os
 
-from PyQt5.QtCore import (QMimeData, QObject, QPoint, QRect, QSize, Qt, QTimer,
-                          QUrl, pyqtSignal)
+from PyQt5.QtCore import QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
-from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QRubberBand, QScrollArea, QSizePolicy, QSplitter,
-                             QVBoxLayout, QWidget)
+                             QRubberBand, QScrollArea, QSizePolicy, QWidget)
 
 from base_widgets import ContextCustom, LayoutVer, SvgBtn
 from cfg import Dynamic, JsonData, Static, ThumbData

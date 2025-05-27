@@ -1,6 +1,5 @@
 import re
 from datetime import datetime, timedelta
-from functools import partial
 from typing import Literal
 
 from PyQt5.QtCore import Qt, pyqtSignal

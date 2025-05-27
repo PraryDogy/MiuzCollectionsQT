@@ -6,10 +6,10 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
-                             QScrollArea, QTabWidget, QVBoxLayout, QWidget)
+                             QTabWidget)
 
 from base_widgets import ContextCustom
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder

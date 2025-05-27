@@ -1,10 +1,13 @@
+import os
+
 import sqlalchemy
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
-from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu, QWidget
-import os
-from cfg import Dynamic, JsonData, Static
+from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
+
+from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from lang import Lang
+from main_folders import MainFolder
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
 from utils.scaner import Scaner
@@ -12,7 +15,6 @@ from utils.utils import URunnable, UThreadPool, Utils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
-from main_folders import MainFolder
 
 
 class OpenWins:

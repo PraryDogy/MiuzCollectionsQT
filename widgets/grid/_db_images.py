@@ -1,4 +1,3 @@
-import gc
 import os
 from collections import defaultdict
 from datetime import datetime
@@ -7,12 +6,12 @@ import sqlalchemy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from cfg import Dynamic, JsonData, Static
-from filters import Filter
+from cfg import Dynamic, Static
 from database import THUMBS, Dbase
+from filters import Filter
 from lang import Lang
-from utils.utils import URunnable, Utils
 from main_folders import MainFolder
+from utils.utils import URunnable, Utils
 
 
 class DbImage:

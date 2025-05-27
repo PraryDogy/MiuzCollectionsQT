@@ -1,11 +1,11 @@
 import os
 
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent
-from PyQt5.QtGui import QDrag, QMouseEvent, QPixmap
-from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QSizePolicy
+from PyQt5.QtGui import QMouseEvent, QPixmap
+from PyQt5.QtWidgets import QFrame, QLabel, QSizePolicy
 
 from base_widgets import LayoutVer
-from cfg import Dynamic, JsonData, Static, ThumbData
+from cfg import Dynamic, Static, ThumbData
 from signals import SignalsApp
 from utils.utils import Utils
 

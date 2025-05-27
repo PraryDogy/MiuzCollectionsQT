@@ -1,5 +1,4 @@
 import os
-from functools import partial
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QMouseEvent
@@ -7,10 +6,10 @@ from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
                              QWidget)
 
 from base_widgets import LayoutHor, LayoutVer
-from base_widgets.wins import WinSystem
 from base_widgets.svg_btn import SvgBtn
-from lang import Lang
+from base_widgets.wins import WinSystem
 from cfg import Static
+from lang import Lang
 from utils.copy_files import CopyFiles
 from utils.utils import Utils
 

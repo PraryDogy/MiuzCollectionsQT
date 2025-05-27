@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from main_folders import MainFolder
 from utils.utils import URunnable, UThreadPool, Utils

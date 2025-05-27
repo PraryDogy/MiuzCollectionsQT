@@ -1,4 +1,5 @@
 import hashlib
+import io
 import logging
 import os
 import subprocess
@@ -11,14 +12,13 @@ import numpy as np
 import psd_tools
 import rawpy
 from imagecodecs.imagecodecs import DelayedImportError
-from PIL import ExifTags, Image
+from PIL import Image
 from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
-import io
-from cfg import JsonData, Static
-from main_folders import MainFolder
+
+from cfg import Static
 
 psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
 psd_logger = logging.getLogger("psd_tools")

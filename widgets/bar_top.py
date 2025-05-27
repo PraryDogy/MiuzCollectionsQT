@@ -2,7 +2,6 @@ from typing import Literal
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextCustom, LayoutHor
