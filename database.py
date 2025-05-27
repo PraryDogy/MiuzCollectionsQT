@@ -101,6 +101,9 @@ class Dbase:
 
     @classmethod
     def vacuum(cls):
-        conn = cls.engine.connect()
-        conn.execute(sqlalchemy.text("VACUUM"))
-        conn.commit()
+        try:
+            conn = cls.engine.connect()
+            conn.execute(sqlalchemy.text("VACUUM"))
+            conn.commit()
+        except sqlalchemy.exc.TimeoutError as e:
+            Utils.print_error(e)
