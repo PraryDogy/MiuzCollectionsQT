@@ -231,6 +231,8 @@ class DbUpdater:
         self.insert_db(queries)
         self.insert_images(queries)
 
+        ScanerTools.progressbar_text("")
+
     def del_db(self):
         conn = Dbase.engine.connect()
 
