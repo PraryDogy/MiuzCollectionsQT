@@ -80,14 +80,6 @@ class LoadMenus(URunnable):
         self.signals_ = WorkerSignals()
 
     def task(self) -> None:
-        """
-        Main execution method for the `LoadMenus` class. This method is part of `URunnable`, 
-        which inherits from `QRunnable`, and should be executed using `UThreadPool.pool.start`.
-        
-        `UThreadPool` is a subclass of `QThreadPool` that manages the execution of runnable objects.
-        
-        Loads collection data and emits the `finished_` signal with the result.
-        """
         menus = self.load_colls_query()
 
         try:

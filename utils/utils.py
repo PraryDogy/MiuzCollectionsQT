@@ -28,31 +28,6 @@ SCRIPTS = "scripts"
 REVEAL_SCPT = os.path.join(SCRIPTS, "reveal_files.scpt")
 
 
-class UThreadPool:
-    pool: QThreadPool = None
-
-    @classmethod
-    def init(cls):
-        cls.pool = QThreadPool().globalInstance()
-
-
-class URunnable(QRunnable):
-    def __init__(self):
-        super().__init__()
-        self.should_run: bool = True
-        self.is_running: bool = False
-    
-    @staticmethod
-    def set_running_state(method: callable):
-
-        def wrapper(self, *args, **kwargs):
-            self.is_running = True
-            method(self, *args, **kwargs)
-            self.is_running = False
-
-        return wrapper
-
-
 class Err:
     @classmethod
     def print_error(cls, error: Exception):
