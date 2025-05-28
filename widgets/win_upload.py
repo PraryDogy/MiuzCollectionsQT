@@ -15,8 +15,61 @@ from utils.copy_files import CopyFiles
 from utils.scaner import DbUpdater
 from utils.utils import Utils
 
-from ._runnable import UThreadPool
+from ._runnable import URunnable, UThreadPool
 from .menu_left import CollectionBtn, MenuLeft
+
+
+class DbUpdaterFast(URunnable):
+    def __init__(self, urls: list[str]):
+        super().__init__()
+        self.urls = urls
+
+    def task(self):
+
+        MainFolder.current.set_current_path()
+        if not MainFolder.current.get_current_path():
+            return
+
+        short_urls: list[str] = []
+
+        for url in self.urls:
+            coll_folder = MainFolder.current.get_current_path()
+            short_src = Utils.get_short_src(coll_folder, url)
+            short_urls.append(short_src)
+
+        del_items = self.get_del_items(short_urls)
+        ins_items = self.get_ins_items()
+
+        db_updater = DbUpdater(del_items, ins_items, MainFolder.current)
+        db_updater.run()
+
+    def get_ins_items(self):
+        ins_items: list[str] = []
+
+        for url in self.urls:
+            try:
+                stats = os.stat(url)    
+            except Exception as e:
+                Utils.print_error(e)
+                return
+
+            data = (url, stats.st_size, stats.st_birthtime, stats.st_mtime)
+            ins_items.append(data)
+        
+        return ins_items
+
+    def get_del_items(self, short_urls: list[str]) -> list[int]:
+        conn = Dbase.engine.connect()
+        q = sqlalchemy.select(THUMBS.c.short_hash).where(
+            sqlalchemy.and_(
+                THUMBS.c.short_src.in_(short_urls),
+                THUMBS.c.brand == MainFolder.current.name
+            )
+        )
+        try:
+            return conn.execute(q).scalars().all()
+        finally:
+            conn.close()
 
 
 class WinUpload(WinSystem):
@@ -136,50 +189,8 @@ class WinUpload(WinSystem):
         self.close()
 
     def copy_finished(self, urls: list[str]):
-
-        MainFolder.current.set_current_path()
-        if not MainFolder.current.get_current_path():
-            return
-
-        short_urls: list[str] = []
-
-        for url in urls:
-            coll_folder = MainFolder.current.get_current_path()
-            short_src = Utils.get_short_src(coll_folder, url)
-            short_urls.append(short_src)
-
-        ins_items: list[str] = []
-
-        for url in urls:
-            try:
-                stats = os.stat(url)    
-            except Exception as e:
-                Utils.print_error(e)
-                return
-
-            data = (url, stats.st_size, stats.st_birthtime, stats.st_mtime)
-            ins_items.append(data)
-
-        del_items = self.get_db_short_src(short_urls)
-
-        db_updater = DbUpdater(del_items, ins_items, MainFolder.current)
-        db_updater.run()
-
-    def get_db_short_src(self, short_urls: list[str]) -> list[int]:
-        conn = Dbase.engine.connect()
-        q = sqlalchemy.select(THUMBS.c.short_hash).where(
-            sqlalchemy.and_(
-                THUMBS.c.short_src.in_(short_urls),
-                THUMBS.c.brand == MainFolder.current.name
-            )
-        )
-        try:
-            return conn.execute(q).scalars().all()
-        finally:
-            conn.close()
-
-    def insert_new_images(self, short_urls: list[str]):
-        ...
+        self.update_task = DbUpdaterFast(urls)
+        UThreadPool.start(self.update_task)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
