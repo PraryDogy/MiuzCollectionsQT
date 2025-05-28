@@ -36,13 +36,6 @@ class NoImagesLabel(QLabel):
     def __init__(self):
         super().__init__()
 
-        self.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Preferred
-        )
-
-        self.setStyleSheet(Static.TITLE_NORMAL)
-
         enabled_filters = [
             filter.names[JsonData.lang_ind].lower()
             for filter in Filter.filters_list
@@ -55,16 +48,18 @@ class NoImagesLabel(QLabel):
                 f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             ]
             noimg_t = "".join(noimg_t)
-            self.setText(noimg_t)
 
         elif enabled_filters:
             enabled_filters = ", ".join(enabled_filters)
             noimg_t = f"{Lang.no_photo}: {enabled_filters}"
-            self.setText(noimg_t)
 
         elif Dynamic.search_widget_text:
             noimg_t = f"{Lang.no_photo}: {Dynamic.search_widget_text}"
-            self.setText(noimg_t)
+        
+        else:
+            noimg_t = Lang.no_photo
+
+        self.setText(noimg_t)
 
 
 class UpBtn(QFrame):
@@ -100,7 +95,7 @@ class Grid(QScrollArea):
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
 
-        self.scroll_wid = QWidget(parent=self)
+        self.scroll_wid = QWidget()
         self.setWidget(self.scroll_wid)
         
         self.scroll_layout = LayoutVer()
@@ -163,7 +158,7 @@ class Grid(QScrollArea):
         if not db_images:
 
             error_title = NoImagesLabel()
-            self.scroll_layout.addWidget(error_title)
+            self.scroll_layout.addWidget(error_title, alignment=Qt.AlignmentFlag.AlignCenter)
 
         else:
 
