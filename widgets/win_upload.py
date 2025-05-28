@@ -148,9 +148,22 @@ class WinUpload(WinSystem):
             short_src = Utils.get_short_src(coll_folder, url)
             short_urls.append(short_src)
 
+        ins_items: list[str] = []
+
+        for url in urls:
+            try:
+                stats = os.stat(url)    
+            except Exception as e:
+                Utils.print_error(e)
+                return
+
+            data = (url, stats.st_size, stats.st_birthtime, stats.st_mtime)
+            ins_items.append(data)
+
         del_items = self.get_db_short_src(short_urls)
 
-        print(del_items)
+        db_updater = DbUpdater(del_items, ins_items, MainFolder.current)
+        db_updater.run()
 
     def get_db_short_src(self, short_urls: list[str]) -> list[int]:
         conn = Dbase.engine.connect()

@@ -225,9 +225,9 @@ class DbUpdater:
     def run(self):
 
         self.del_db()
-        self.del_images(self.del_items)
+        self.del_images()
 
-        queries = self.create_queries(self.ins_items)
+        queries = self.create_queries()
         self.insert_db(queries)
         self.insert_images(queries)
 
@@ -330,12 +330,12 @@ class DbUpdater:
             ClmNames.BRAND: self.main_folder.name
         }
 
-    def create_queries(self, ins_items: list[tuple[str, int, int, int]]):
+    def create_queries(self):
 
         res: dict[sqlalchemy.Insert, tuple[str, ndarray]] = {}
-        total = len(ins_items)
+        total = len(self.ins_items)
 
-        for x, (full_src, size, birth, mod) in enumerate(ins_items, start=1):
+        for x, (full_src, size, birth, mod) in enumerate(self.ins_items, start=1):
 
             # не удалять
             if not ScanerTools.can_scan:
