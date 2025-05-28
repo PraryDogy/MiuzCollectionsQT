@@ -100,9 +100,6 @@ class Grid(QScrollArea):
         
         self.scroll_layout = LayoutVer()
         self.scroll_wid.setLayout(self.scroll_layout)
-        self.scroll_layout.setAlignment(
-            Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
-        )
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
         SignalsApp.instance.grid_thumbnails_cmd.connect(self.signals_cmd)
@@ -156,11 +153,14 @@ class Grid(QScrollArea):
         Thumbnail.path_to_wid.clear()
     
         if not db_images:
-
+            self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
             error_title = NoImagesLabel()
             self.scroll_layout.addWidget(error_title, alignment=Qt.AlignmentFlag.AlignCenter)
 
         else:
+            self.scroll_layout.setAlignment(
+                Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
+            )
 
             Thumbnail.calculate_size()
 
