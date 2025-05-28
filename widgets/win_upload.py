@@ -10,8 +10,8 @@ from cfg import Dynamic, Static
 from lang import Lang
 from main_folders import MainFolder
 from utils.copy_files import CopyFiles
-from utils.utils import UThreadPool
 
+from ._runnable import UThreadPool
 from .menu_left import CollectionBtn, MenuLeft
 
 
@@ -127,7 +127,7 @@ class WinUpload(WinSystem):
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
         thread_ = CopyFiles(dest=dest, files=full_src)
-        UThreadPool.pool.start(thread_)
+        UThreadPool.start(thread_)
         self.close()
 
     def keyPressEvent(self, a0):

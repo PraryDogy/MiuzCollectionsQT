@@ -13,8 +13,9 @@ from filters import Filter
 from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
-from utils.utils import UThreadPool, Utils
+from utils.utils import Utils
 
+from .._runnable import UThreadPool
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
                        OpenInView, OpenWins, RemoveFiles, Reveal, Save,
                        ScanerRestart)
@@ -143,7 +144,7 @@ class Grid(QScrollArea):
         
         self.task_ = DbImages()
         self.task_.signals_.finished_.connect(cmd_)
-        UThreadPool.pool.start(self.task_)
+        UThreadPool.start(self.task_)
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
 

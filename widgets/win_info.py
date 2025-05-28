@@ -10,7 +10,9 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from database import THUMBS, Dbase
 from lang import Lang
-from utils.utils import URunnable, UThreadPool, Utils
+from utils.utils import Utils
+
+from ._runnable import URunnable, UThreadPool
 
 MAX_ROW = 50
 
@@ -70,8 +72,7 @@ class InfoTask(URunnable):
         self.coll_folder = coll_folder
         self.signals_ = WorkerSignals()
 
-    @URunnable.set_running_state
-    def run(self):
+    def task(self):
         """имя тип размер место изменен разрешение коллекция"""
         conn = Dbase.engine.connect()
 
@@ -142,8 +143,7 @@ class ResolTask(URunnable):
         self.full_src = full_src
         self.signals_ = WorkerSignals()
 
-    @URunnable.set_running_state
-    def run(self):
+    def task(self):
         img_array = Utils.read_image(self.full_src)
 
         if img_array is not None and len(img_array.shape) > 1:
@@ -176,7 +176,7 @@ class WinInfo(WinSystem):
             coll_folder=self.coll_folder
         )
         self.task_.signals_.finished_.connect(self.load_info_fin)
-        UThreadPool.pool.start(self.task_)
+        UThreadPool.start(self.task_)
 
     def load_info_fin(self, data: dict[str, str]):
         wid = QWidget()
@@ -215,7 +215,7 @@ class WinInfo(WinSystem):
         resol_task.signals_.finished_resol.connect(
             lambda resol: self.finished_resol_task(wid=resol_label, resol=resol)
         )
-        UThreadPool.pool.start(resol_task)
+        UThreadPool.start(resol_task)
 
     def finished_resol_task(self, wid: RightLabel, resol: str):
         wid.setText(resol)

@@ -57,17 +57,19 @@ else:
 
 
 from PyQt5.QtCore import QEvent, QObject
-from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication
 
 from cfg import JsonData, Static
 from database import Dbase
 from lang import Lang
+from main_folders import MainFolder
 from signals import SignalsApp
 from utils.scaner import Scaner
-from utils.utils import UThreadPool, ReadImage
+from utils.utils import ReadImage
+from widgets._runnable import UThreadPool
 from widgets.win_main import WinMain
-from main_folders import MainFolder
+
 
 class App(QApplication):
     def __init__(self, argv: list[str]) -> None:

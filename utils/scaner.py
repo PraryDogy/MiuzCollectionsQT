@@ -12,8 +12,9 @@ from database import THUMBS, ClmNames, Dbase
 from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
+from widgets._runnable import URunnable, UThreadPool
 
-from .utils import URunnable, UThreadPool, Utils
+from .utils import Utils
 
 
 class ScanerTools:
@@ -509,8 +510,7 @@ class ScanerThread(URunnable):
         super().__init__()
         self.signals_ = WorkerSignals()
 
-    @URunnable.set_running_state
-    def run(self):
+    def task(self):
         for main_folder in MainFolder.list_:
             if main_folder.is_avaiable():
                 self.main_folder_scan(main_folder)
@@ -572,7 +572,7 @@ class ScanerShedule(QObject):
         else:
             self.scaner_thread = ScanerThread()
             self.scaner_thread.signals_.finished_.connect(self.after_scan)
-            UThreadPool.pool.start(self.scaner_thread)
+            UThreadPool.start(self.scaner_thread)
 
     def stop(self):
         print("scaner manualy stoped.")

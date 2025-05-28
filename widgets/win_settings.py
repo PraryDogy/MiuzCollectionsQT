@@ -6,7 +6,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QGroupBox, QLabel,
                              QListWidget, QListWidgetItem, QPushButton,
-                             QSpacerItem, QTabWidget, QWidget, QTabWidget)
+                             QSpacerItem, QTabWidget, QWidget)
 
 from base_widgets import ContextCustom, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.input import ULineEdit
@@ -15,8 +15,9 @@ from cfg import JsonData, Static
 from lang import Lang
 from main_folders import MainFolder
 from utils.updater import Updater
-from utils.utils import UThreadPool, Utils
+from utils.utils import Utils
 
+from ._runnable import UThreadPool
 from .actions import OpenWins
 
 WIN_SIZE = (430, 580)
@@ -132,7 +133,7 @@ class SimpleSettings(QGroupBox):
         self.updater_btn.setText(Lang.wait_update)
         self.task.signals_.no_connection.connect(self.updater_btn_smb)
         self.task.signals_.finished_.connect(self.updater_btn_cmd_fin)
-        UThreadPool.pool.start(self.task)
+        UThreadPool.start(self.task)
 
     def updater_btn_cmd_fin(self):
         self.updater_btn.setText(Lang.download_update)

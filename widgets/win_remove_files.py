@@ -12,7 +12,9 @@ from cfg import Static
 from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
-from utils.utils import Err, URunnable, UThreadPool, Utils
+from utils.utils import Err, Utils
+
+from ._runnable import URunnable, UThreadPool
 
 WARNING_SVG = os.path.join(Static.IMAGES, "warning.svg")
 SCRIPTS = "scripts"
@@ -28,7 +30,7 @@ class RemoveFilesTask(URunnable):
         self.signals_ = WorkerSignals()
         self.urls = urls
 
-    def run(self):
+    def task(self):
         try:
             self.remove_from_db()
             command = ["osascript", REMOVE_FILES_SCPT] + self.urls
@@ -115,7 +117,7 @@ class RemoveFilesWin(WinSystem):
     def cmd_(self, *args):
         self.task_ = RemoveFilesTask(self.urls)
         self.task_.signals_.finished_.connect(self.finalize)
-        UThreadPool.pool.start(self.task_)
+        UThreadPool.start(self.task_)
 
     def finalize(self, *args):
         self.finished_.emit(self.urls)

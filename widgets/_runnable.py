@@ -44,6 +44,6 @@ class UThreadPool:
         cls.pool = QThreadPool.globalInstance()
 
     @classmethod
-    def start(cls, runnable: QRunnable):
+    def start(cls, runnable: URunnable):
         cls.tasks.append(runnable)
         cls.pool.start(runnable)

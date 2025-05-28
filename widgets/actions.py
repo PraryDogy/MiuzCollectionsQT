@@ -11,8 +11,9 @@ from main_folders import MainFolder
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
 from utils.scaner import Scaner
-from utils.utils import URunnable, UThreadPool, Utils
+from utils.utils import Utils
 
+from ._runnable import URunnable, UThreadPool
 from .win_info import WinInfo
 from .win_smb import WinSmb
 
@@ -167,8 +168,7 @@ class FavTask(URunnable):
         self.short_src = short_src
         self.value = value
 
-    @URunnable.set_running_state
-    def run(self):
+    def task(self):
         values = {"fav": self.value}
         q = sqlalchemy.update(THUMBS).where(THUMBS.c.short_src==self.short_src)
         q = q.values(**values)
@@ -206,7 +206,7 @@ class FavActionDb(QAction):
     def cmd_(self):
         self.task = FavTask(short_src=self.short_src, value=self.value)
         self.task.signals_.finished_.connect(self.finished_.emit)
-        UThreadPool.pool.start(self.task)
+        UThreadPool.start(self.task)
 
 
 class Save(QAction):
@@ -256,7 +256,7 @@ class Save(QAction):
     def copy_files_cmd(self, dest: str, full_src: str | list):
 
         thread_ = CopyFiles(dest=dest, files=full_src)
-        UThreadPool.pool.start(thread_)
+        UThreadPool.start(thread_)
 
 
 class MenuTypes(QMenu):

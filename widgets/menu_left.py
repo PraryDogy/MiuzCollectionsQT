@@ -14,8 +14,9 @@ from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
-from utils.utils import URunnable, UThreadPool, Utils
+from utils.utils import Utils
 
+from ._runnable import URunnable, UThreadPool
 from .actions import OpenWins
 
 
@@ -78,8 +79,7 @@ class LoadMenus(URunnable):
         self.main_folder_index = main_folder_index
         self.signals_ = WorkerSignals()
 
-    @URunnable.set_running_state
-    def run(self) -> None:
+    def task(self) -> None:
         """
         Main execution method for the `LoadMenus` class. This method is part of `URunnable`, 
         which inherits from `QRunnable`, and should be executed using `UThreadPool.pool.start`.
@@ -148,7 +148,7 @@ class MenuTab(QListWidget):
     def setup_task(self):
         self.task_ = LoadMenus(main_folder_index=self.main_folder_index)
         self.task_.signals_.finished_.connect(self.init_ui)
-        UThreadPool.pool.start(self.task_)
+        UThreadPool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollectionBtn):
         """

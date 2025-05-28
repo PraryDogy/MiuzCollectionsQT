@@ -5,8 +5,7 @@ import subprocess
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import Dynamic, JsonData
-
-from .utils import URunnable
+from widgets._runnable import URunnable
 
 
 class UpdaterMain(QObject):
@@ -50,11 +49,10 @@ class Updater(URunnable):
     def __init__(self):
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.task = None
+        self.task_ = None
 
-    @URunnable.set_running_state
-    def run(self):
-        self.task = UpdaterMain()
-        self.task.no_connection.connect(self.signals_.no_connection.emit)
-        self.task.finished_.connect(self.signals_.finished_.emit)
-        self.task.go()
+    def task(self):
+        self.task_ = UpdaterMain()
+        self.task_.no_connection.connect(self.signals_.no_connection.emit)
+        self.task_.finished_.connect(self.signals_.finished_.emit)
+        self.task_.go()

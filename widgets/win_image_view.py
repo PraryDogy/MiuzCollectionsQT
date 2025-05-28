@@ -14,8 +14,9 @@ from base_widgets.wins import WinChild
 from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from main_folders import MainFolder
-from utils.utils import URunnable, UThreadPool, Utils
+from utils.utils import Utils
 
+from ._runnable import URunnable, UThreadPool
 from .actions import (CopyName, CopyPath, FavActionDb, OpenInfoDb, OpenWins,
                       Reveal, Save)
 from .grid.cell_widgets import Thumbnail
@@ -58,8 +59,7 @@ class LoadThumb(URunnable):
         self.signals_ = WorkerSignals()
         self.short_src = short_src
 
-    @URunnable.set_running_state
-    def run(self):
+    def task(self):
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(
             THUMBS.c.short_hash
@@ -93,8 +93,7 @@ class LoadImage(URunnable):
         self.signals_ = WorkerSignals()
         self.full_src = full_src
 
-    @URunnable.set_running_state
-    def run(self):
+    def task(self):
 
         if self.full_src not in LoadImage.images:
         
@@ -326,7 +325,7 @@ class WinImageView(WinChild):
         self.img_viewer_title()
         task = LoadThumb(short_src=self.short_src)
         task.signals_.finished_.connect(self.load_thumb_fin)
-        UThreadPool.pool.start(task)
+        UThreadPool.start(task)
 
     def load_thumb_fin(self, data: ImageData):
         self.image_label.set_image(data.pixmap)
@@ -346,7 +345,7 @@ class WinImageView(WinChild):
 
         img_thread = LoadImage(full_src=self.full_src)
         img_thread.signals_.finished_.connect(cmd_)
-        UThreadPool.pool.start(img_thread)
+        UThreadPool.start(img_thread)
 
     def load_image_fin(self, data: ImageData, full_src: str):
         self.task_count -= 1

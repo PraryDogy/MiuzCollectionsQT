@@ -1,8 +1,11 @@
 import os
 
 from PyQt5.QtCore import QObject, pyqtSignal
+
 from signals import SignalsApp
-from .utils import URunnable, Utils
+from widgets._runnable import URunnable
+
+from .utils import Utils
 
 
 class WorkerSignals(QObject):
@@ -23,8 +26,7 @@ class CopyFiles(URunnable):
         self.files = files
         self.dest = dest
 
-    @URunnable.set_running_state
-    def run(self):
+    def task(self):
 
         CopyFiles.current_threads.append(self)
         SignalsApp.instance.win_downloads_open.emit()

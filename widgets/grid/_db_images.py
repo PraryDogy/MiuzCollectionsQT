@@ -11,7 +11,9 @@ from database import THUMBS, Dbase
 from filters import Filter
 from lang import Lang
 from main_folders import MainFolder
-from utils.utils import URunnable, Utils
+from utils.utils import Utils
+
+from .._runnable import URunnable
 
 
 class DbImage:
@@ -39,8 +41,7 @@ class DbImages(URunnable):
         super().__init__()
         self.signals_ = WorkerSignals()
 
-    @URunnable.set_running_state
-    def run(self):
+    def task(self):
 
         conn = Dbase.engine.connect()
         stmt = self.get_stmt()
