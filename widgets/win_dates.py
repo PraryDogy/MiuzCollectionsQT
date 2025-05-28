@@ -24,10 +24,6 @@ class DatesTools:
             SignalsApp.instance.btn_dates_style.emit("solid")
 
     @classmethod
-    def border_style(cls):
-        SignalsApp.instance.btn_dates_style.emit("border")
-
-    @classmethod
     def date_to_text(cls, date: datetime):
         return date.strftime("%d.%m.%Y")
 
@@ -176,7 +172,6 @@ class WinDates(WinSystem):
         super().__init__()
 
         self.setWindowTitle(Lang.dates)
-        DatesTools.border_style()
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
 

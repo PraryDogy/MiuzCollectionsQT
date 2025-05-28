@@ -28,65 +28,30 @@ class BarTopBtn(QLabel):
     def set_normal_style(self):
         self.setStyleSheet(Static.NORMAL_STYLE)
 
-    def set_border_style(self):
-        self.setStyleSheet(Static.BORDERED_STYLE)
-
 
 class DatesBtn(BarTopBtn):
     win_dates_opened = pyqtSignal()
 
     def __init__(self):
         super().__init__(text=Lang.dates)
-        self.set_style_cmd: callable = None
         SignalsApp.instance.btn_dates_style.connect(self.dates_btn_style)
 
     def dates_btn_style(self, flag: Literal["solid", "normal", "border"]):
         if flag == "solid":
             self.set_solid_style()
-            self.set_style_cmd = self.set_solid_style
 
         elif flag == "normal":
             self.set_normal_style()
-            self.set_style_cmd = self.set_normal_style
 
-        elif flag == "border":
-            self.set_border_style()
-            self.set_style_cmd = self.set_border_style
         else:
             raise Exception("widgets > bar_top > dates btn > wrong flag", flag)
 
     def open_win(self):
-        self.set_border_style()
         self.win_dates_opened.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             self.open_win()
-
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-
-        menu_ = ContextCustom(ev)
-
-        toggle = QAction(parent=menu_, text=Lang.view)
-        toggle.triggered.connect(self.open_win)
-        menu_.addAction(toggle)
-
-        reset_dates = QAction(parent=menu_, text=Lang.reset)
-        menu_.addAction(reset_dates)
-
-        if Dynamic.date_start:
-            reset_dates.triggered.connect(WinDates.reset_dates)
-        else:
-            reset_dates.setDisabled(True)
-
-        self.set_border_style()
-
-        menu_.show_menu()
-
-        if self.set_style_cmd:
-            self.set_style_cmd()
-        else:
-            self.set_normal_style()
 
 
 class FilterBtn(BarTopBtn):
@@ -116,25 +81,6 @@ class FilterBtn(BarTopBtn):
             return
         else:
             self.toggle_cmd()
-
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        menu_ = ContextCustom(ev)
-
-        if self.filter.value:
-            toggle = QAction(parent=menu_, text=Lang.disable)
-        else:
-            toggle = QAction(parent=menu_, text=Lang.enable)
-
-        toggle.triggered.connect(self.toggle_cmd)
-        menu_.addAction(toggle)
-
-        self.set_border_style()
-        menu_.show_menu()
-
-        if self.filter.value:
-            self.set_solid_style()
-        else:
-            self.set_normal_style()
 
 
 class BarTop(QWidget):
