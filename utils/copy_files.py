@@ -18,13 +18,14 @@ class CopyFiles(URunnable):
     current_threads: list["CopyFiles"] = []
     list_of_file_lists: list[list[str]] = []
 
-    def __init__(self, dest: str, files: list):
+    def __init__(self, dest: str, files: list, is_upload: bool):
         "files: list of FULL SRC "
         super().__init__()
         self.signals_ = WorkerSignals()
         self.signals_.stop.connect(self.stop_cmd)
         self.files = files
         self.dest = dest
+        self.is_upload = is_upload
 
     def task(self):
 

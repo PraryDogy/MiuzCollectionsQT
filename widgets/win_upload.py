@@ -126,7 +126,7 @@ class WinUpload(WinSystem):
         self.copy_files_cmd(dest=dest, full_src=self.urls)
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
-        thread_ = CopyFiles(dest=dest, files=full_src)
+        thread_ = CopyFiles(dest, full_src, True)
         UThreadPool.start(thread_)
         self.close()
 
