@@ -263,7 +263,12 @@ class DbUpdater:
                 conn.close()
                 return None
 
-        conn.commit()
+        try:
+            conn.commit()
+        except Exception as e:
+            Utils.print_error(e)
+            conn.rollback()
+
         conn.close()
 
     def del_images(self, del_items: list[str]):
@@ -387,8 +392,13 @@ class DbUpdater:
                 conn.rollback()
                 conn.close()
                 return None
-            
-        conn.commit()
+        
+        try:
+            conn.commit()
+        except Exception as e:
+            Utils.print_error(e)
+            conn.rollback()
+
         conn.close()
 
     def insert_images(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
@@ -446,9 +456,11 @@ class MainFolderRemover:
         ]
 
         for i in removed_main_folders:
-            rows = cls.get_rows(main_folder_name=i, conn=conn)
-            cls.remove_images(rows=rows)
-            cls.remove_rows(rows=rows, conn=conn)
+            rows = cls.get_rows(i, conn)
+            cls.remove_images(rows)
+            cls.remove_rows(rows, conn)
+        
+        conn.close()
     
     @classmethod
     def get_rows(cls, main_folder_name: str, conn: sqlalchemy.Connection):

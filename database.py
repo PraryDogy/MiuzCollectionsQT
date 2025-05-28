@@ -72,6 +72,8 @@ class Dbase:
             if not check:
                 DIRS.drop(cls.engine)
                 METADATA.create_all(cls.engine)
+
+            conn.close()
             
         else:
             t = "Нет пользовательского файла DB_FILE"
@@ -91,19 +93,23 @@ class Dbase:
         
     @classmethod
     def toggle_wal(cls, value: bool):
-        with cls.engine.connect() as conn:
-            if value:
-                conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
-                cls.WAL_ = True
-            else:
-                conn.execute(sqlalchemy.text("PRAGMA journal_mode=DELETE"))
-                cls.WAL_ = False
+        conn = cls.engine.connect()
+        if value:
+            conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
+            cls.WAL_ = True
+        else:
+            conn.execute(sqlalchemy.text("PRAGMA journal_mode=DELETE"))
+            cls.WAL_ = False
+        conn.close()
 
     @classmethod
     def vacuum(cls):
+        conn = cls.engine.connect()
+
         try:
-            conn = cls.engine.connect()
             conn.execute(sqlalchemy.text("VACUUM"))
             conn.commit()
-        except sqlalchemy.exc.TimeoutError as e:
+        except Exception as e:
             Utils.print_error(e)
+
+        conn.close()

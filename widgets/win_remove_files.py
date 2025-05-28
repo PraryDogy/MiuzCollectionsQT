@@ -68,7 +68,7 @@ class RemoveFilesTask(URunnable):
                 Utils.print_error(e)
                 conn.rollback()
 
-        conn.close()
+            conn.close()
 
 
 
