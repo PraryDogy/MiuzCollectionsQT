@@ -1,6 +1,7 @@
 
 import os
 
+import sqlalchemy
 from PyQt5.QtCore import QSize, Qt, QTimer
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
 
@@ -11,6 +12,7 @@ from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
 from utils.copy_files import CopyFiles
+from utils.utils import Utils
 
 from ._runnable import UThreadPool
 from .menu_left import CollectionBtn, MenuLeft
@@ -128,8 +130,61 @@ class WinUpload(WinSystem):
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
         thread_ = CopyFiles(dest, full_src)
+        thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
         UThreadPool.start(thread_)
         self.close()
+
+    def copy_finished(self, urls: list[str]):
+
+        MainFolder.current.set_current_path()
+        if not MainFolder.current.get_current_path():
+            return
+
+        short_urls: list[str] = []
+
+        for url in urls:
+            coll_folder = MainFolder.current.get_current_path()
+            short_src = Utils.get_short_src(coll_folder, url)
+            short_urls.append(short_src)
+
+        id_list = self.get_remove_ids(short_urls)
+        if id_list:
+            self.remove_db_images(id_list)
+
+    def get_remove_ids(self, short_urls: list[str]) -> list[int]:
+        conn = Dbase.engine.connect()
+        q = sqlalchemy.select(THUMBS.c.id).where(
+            sqlalchemy.and_(
+                THUMBS.c.short_src.in_(short_urls),
+                THUMBS.c.brand == MainFolder.current.name
+            )
+        )
+        try:
+            return conn.execute(q).scalars().all()
+        finally:
+            conn.close()
+
+    def remove_db_images(self, id_list: list[int]):
+        conn = Dbase.engine.connect()
+
+        for id_ in id_list:
+            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.id == id_)
+            try:
+                conn.execute(q)
+            except Exception as e:
+                Utils.print_error(e)
+                conn.rollback()
+                continue
+
+        try:
+            conn.commit()
+        except Exception as e:
+            Utils.print_error(e)
+
+        conn.close()
+
+    def insert_new_images(self):
+        ...
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:

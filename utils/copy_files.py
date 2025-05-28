@@ -65,7 +65,7 @@ class CopyFiles(URunnable):
                 Utils.print_error(e)
                 break
         
-        self.finalize(files_dests=files_dests)
+        self.finalize(files_dests)
 
     def stop_cmd(self):
         self.set_should_run(False)
