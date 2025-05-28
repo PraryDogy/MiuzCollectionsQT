@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
 from base_widgets.layouts import LayoutHor
 from base_widgets.wins import WinSystem
 from cfg import Dynamic, Static
+from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
 from utils.copy_files import CopyFiles
@@ -126,7 +127,7 @@ class WinUpload(WinSystem):
         self.copy_files_cmd(dest=dest, full_src=self.urls)
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
-        thread_ = CopyFiles(dest, full_src, True)
+        thread_ = CopyFiles(dest, full_src)
         UThreadPool.start(thread_)
         self.close()
 

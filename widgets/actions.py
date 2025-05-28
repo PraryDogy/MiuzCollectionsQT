@@ -254,7 +254,7 @@ class Save(QAction):
             OpenWins.smb(parent_=self.win_)
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
-        thread_ = CopyFiles(dest, full_src, False)
+        thread_ = CopyFiles(dest, full_src)
         UThreadPool.start(thread_)
 
 

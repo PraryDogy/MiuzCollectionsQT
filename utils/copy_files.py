@@ -18,14 +18,13 @@ class CopyFiles(URunnable):
     current_threads: list["CopyFiles"] = []
     list_of_file_lists: list[list[str]] = []
 
-    def __init__(self, dest: str, files: list, is_upload: bool):
+    def __init__(self, dest: str, files: list):
         "files: list of FULL SRC "
         super().__init__()
         self.signals_ = WorkerSignals()
         self.signals_.stop.connect(self.stop_cmd)
         self.files = files
         self.dest = dest
-        self.is_upload = is_upload
 
     def task(self):
 
@@ -75,9 +74,8 @@ class CopyFiles(URunnable):
 
         try:
             self.signals_.value_changed.emit(100)
-            self.signals_.finished_.emit(files_dests)
         except RuntimeError:
             ...
-
+        self.signals_.finished_.emit(files_dests)
         CopyFiles.list_of_file_lists.append(files_dests)
         CopyFiles.current_threads.remove(self)
