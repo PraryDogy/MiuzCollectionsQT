@@ -183,7 +183,7 @@ class WinUpload(WinSystem):
 
         conn.close()
 
-    def insert_new_images(self):
+    def insert_new_images(self, short_urls: list[str]):
         ...
 
     def keyPressEvent(self, a0):
