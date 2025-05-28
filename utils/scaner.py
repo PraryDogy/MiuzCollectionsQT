@@ -224,17 +224,17 @@ class DbUpdater:
 
     def run(self):
 
-        self.del_db(self.del_items)
+        self.del_db()
         self.del_images(self.del_items)
 
         queries = self.create_queries(self.ins_items)
         self.insert_db(queries)
         self.insert_images(queries)
 
-    def del_db(self, del_items: list[str]):
+    def del_db(self):
         conn = Dbase.engine.connect()
 
-        for short_hash in del_items:
+        for short_hash in self.del_items:
 
             # нельзя удалять
             # если удалить этот флаг, то когда флаг будет false,
@@ -272,11 +272,11 @@ class DbUpdater:
 
         conn.close()
 
-    def del_images(self, del_items: list[str]):
+    def del_images(self):
 
-        total = len(del_items)
+        total = len(self.del_items)
 
-        for x, short_hash in enumerate(del_items, start=1):
+        for x, short_hash in enumerate(self.del_items, start=1):
 
             # не удалять
             if not ScanerTools.can_scan:

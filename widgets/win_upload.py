@@ -12,6 +12,7 @@ from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
 from utils.copy_files import CopyFiles
+from utils.scaner import DbUpdater
 from utils.utils import Utils
 
 from ._runnable import UThreadPool
@@ -147,13 +148,13 @@ class WinUpload(WinSystem):
             short_src = Utils.get_short_src(coll_folder, url)
             short_urls.append(short_src)
 
-        id_list = self.get_remove_ids(short_urls)
-        if id_list:
-            self.remove_db_images(id_list)
+        del_items = self.get_db_short_src(short_urls)
 
-    def get_remove_ids(self, short_urls: list[str]) -> list[int]:
+        print(del_items)
+
+    def get_db_short_src(self, short_urls: list[str]) -> list[int]:
         conn = Dbase.engine.connect()
-        q = sqlalchemy.select(THUMBS.c.id).where(
+        q = sqlalchemy.select(THUMBS.c.short_hash).where(
             sqlalchemy.and_(
                 THUMBS.c.short_src.in_(short_urls),
                 THUMBS.c.brand == MainFolder.current.name
@@ -163,25 +164,6 @@ class WinUpload(WinSystem):
             return conn.execute(q).scalars().all()
         finally:
             conn.close()
-
-    def remove_db_images(self, id_list: list[int]):
-        conn = Dbase.engine.connect()
-
-        for id_ in id_list:
-            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.id == id_)
-            try:
-                conn.execute(q)
-            except Exception as e:
-                Utils.print_error(e)
-                conn.rollback()
-                continue
-
-        try:
-            conn.commit()
-        except Exception as e:
-            Utils.print_error(e)
-
-        conn.close()
 
     def insert_new_images(self, short_urls: list[str]):
         ...
