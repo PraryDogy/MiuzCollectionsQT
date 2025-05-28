@@ -248,6 +248,7 @@ class DbUpdater:
         
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==short_hash)
+            q = q.where(THUMBS.c.brand==self.main_folder.name)
 
             try:
                 conn.execute(q)
