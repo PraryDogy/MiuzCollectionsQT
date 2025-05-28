@@ -141,8 +141,8 @@ class WinDownloads(WinSystem):
         for thread in CopyFiles.current_threads:
 
             if thread not in self.download_items:
-                if thread.is_running:
-                    item = CurrentDownloadsItem(files=thread.files)
+                if not thread.is_finished():
+                    item = CurrentDownloadsItem(thread.files)
                     one = lambda: self.remove_from_file_lists(download_item=thread)
                     item.stop_btn_pressed.connect(one)
                     item.stop_btn_pressed.connect(item.deleteLater)
