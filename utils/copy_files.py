@@ -45,7 +45,7 @@ class CopyFiles(URunnable):
 
         for file_path in self.files:
 
-            if not self.should_run:
+            if not self.is_should_run():
                 break
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
@@ -53,7 +53,7 @@ class CopyFiles(URunnable):
 
             try:
                 with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
-                    while self.should_run:
+                    while self.is_should_run():
                         buf = fsrc.read(1024*1024)
                         if not buf:
                             break
@@ -68,7 +68,7 @@ class CopyFiles(URunnable):
         self.finalize(files_dests=files_dests)
 
     def stop_cmd(self):
-        self.should_run = False
+        self.set_should_run(False)
 
     def finalize(self, files_dests: list[str]):
 
