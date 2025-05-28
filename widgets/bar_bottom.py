@@ -123,28 +123,6 @@ class FilterBtn(QLabel):
         
         self.set_normal_style()
 
-    def enterEvent(self, a0):
-        self.old_style = self.styleSheet()
-        self.set_enter_style()
-        return super().enterEvent(a0)
-    
-    def leaveEvent(self, a0):
-        self.setStyleSheet(self.old_style)
-        return super().leaveEvent(a0)
-
-    def contextMenuEvent(self, ev):
-        self.set_border_style()
-        menu = ContextCustom(event=ev)
-
-        view_action = QAction(parent=menu, text=Lang.view)
-        view_action.triggered.connect(self.menu_types)
-        menu.addAction(view_action)
-
-        menu.show_menu()
-        self.set_normal_style()
-        
-        return super().contextMenuEvent(ev)
-
     def mouseReleaseEvent(self, ev):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.menu_types()
@@ -174,14 +152,6 @@ class SvgBtn_(QFrame):
         background: transparent;
         """
         return style
-
-    def enterEvent(self, a0):
-        self.setStyleSheet(self.solid_style())
-        return super().enterEvent(a0)
-
-    def leaveEvent(self, a0):
-        self.setStyleSheet(self.normal_style())
-        return super().leaveEvent(a0)
 
 class BarBottom(QWidget):
 

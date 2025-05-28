@@ -59,15 +59,6 @@ class CollectionBtn(QLabel):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.pressed_.emit()
 
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        menu_ = ContextCustom(event=ev)
-
-        reveal_coll = QAction(text=Lang.reveal_in_finder, parent=self)
-        reveal_coll.triggered.connect(self.reveal_collection)
-        menu_.addAction(reveal_coll)
-
-        menu_.show_menu()
-
 
 class WorkerSignals(QObject):
     finished_ = pyqtSignal(list)
@@ -243,6 +234,10 @@ class MenuTab(QListWidget):
                 self.setCurrentRow(self.row(list_item))
 
             self.coll_btns.append(coll_btn)
+
+    def contextMenuEvent(self, a0):
+        a0.ignore()
+        return super().contextMenuEvent(a0)
 
 
 class MenuLeft(QTabWidget):
