@@ -36,7 +36,7 @@ class MainFolder:
         Устанавливает current_path: доступный путь к MainFolder или None
         """
         for i in self.paths:
-            if os.path.exists:
+            if os.path.exists(i):
                 self.current_path = i
                 return True
         self.current_path = None
