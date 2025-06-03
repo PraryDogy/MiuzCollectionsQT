@@ -101,6 +101,8 @@ class Grid(QScrollArea):
         self.scroll_layout = LayoutVer()
         self.scroll_wid.setLayout(self.scroll_layout)
 
+        self.col_count: int = 0
+
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
         SignalsApp.instance.grid_thumbnails_cmd.connect(self.signals_cmd)
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
@@ -163,18 +165,18 @@ class Grid(QScrollArea):
             )
 
             Thumbnail.calculate_size()
+            self.col_count = self.get_max_col()
 
             for date, db_images_list in db_images.items():
                 self.single_grid(
                     date=date,
-                    db_images=db_images_list,
-                    max_col=self.get_max_col()
+                    db_images=db_images_list
                 )
 
             spacer = QWidget()
             self.scroll_layout.addWidget(spacer)
 
-    def single_grid(self, date: str, db_images: list[DbImage], max_col: int):
+    def single_grid(self, date: str, db_images: list[DbImage]):
 
         title = Title(title=date, db_images=db_images)
         self.scroll_layout.addWidget(title)
@@ -215,7 +217,7 @@ class Grid(QScrollArea):
             # Сбрасываем индекс столбца.
             # Переходим к следующей строке.
             # Указываем, что текущая строка завершена.
-            if col >= max_col:  
+            if col >= self.col_count:  
 
                 col = 0
 
@@ -304,7 +306,7 @@ class Grid(QScrollArea):
         self.cell_to_wid.clear()
         self.global_row = 0
 
-        max_col = self.get_max_col()
+        self.col_count = self.get_max_col()
         add_last_row = False
 
         for grid_wid in self.grid_widgets:
@@ -323,7 +325,7 @@ class Grid(QScrollArea):
 
                 add_last_row = True
 
-                if col >= max_col:
+                if col >= self.col_count:
 
                     add_last_row = False
 
@@ -376,7 +378,7 @@ class Grid(QScrollArea):
 
         command = Qt.KeyboardModifier.ControlModifier
 
-        offsets = {
+        KEY_NAVI = {
             Qt.Key.Key_Left: (0, -1),
             Qt.Key.Key_Right: (0, 1),
             Qt.Key.Key_Up: (-1, 0),
@@ -412,36 +414,72 @@ class Grid(QScrollArea):
                 wid = self.selected_widgets[-1]
                 self.open_in_view(wid=wid)
 
-        elif a0.key() in offsets:
+        elif a0.key() in KEY_NAVI:
+            offset = KEY_NAVI.get(a0.key())
 
-            if self.selected_widgets:
+            # если не выделено ни одного виджета
+            if not self.selected_widgets:
+                self.wid_under_mouse = self.cell_to_wid.get((0, 0))
+            else:
+                self.wid_under_mouse = self.selected_widgets[-1]
 
-                wid = self.selected_widgets[-1]
+            # если нет даже первого виджета значит сетка пуста
+            if not self.wid_under_mouse:
+                return
 
-                offset = offsets.get(a0.key())
+            coords = (
+                self.wid_under_mouse.row + offset[0], 
+                self.wid_under_mouse.col + offset[1]
+            )
 
-                coords = (
-                    wid.row + offset[0], 
-                    wid.col + offset[1]
-                )
+            next_wid = self.cell_to_wid.get(coords)
 
-                wid = self.cell_to_wid.get(coords)
-                
-                if wid is None:
-
+            if next_wid is None:
+                if a0.key() == Qt.Key.Key_Right:
                     coords = (
-                        coords[0] + offset[0], 
-                        coords[1] + offset[1]
+                        self.wid_under_mouse.row + 1, 
+                        0
                     )
-                    wid = self.cell_to_wid.get(coords)
+                elif a0.key() == Qt.Key.Key_Left:
+                    coords = (
+                        self.wid_under_mouse.row - 1,
+                        self.col_count - 1
+                    )
+                next_wid = self.cell_to_wid.get(coords)
 
-                if wid and isinstance(wid, Thumbnail):
-                    self.clear_selected_widgets()
-                    self.add_and_select_widget(wid=wid)
-                    self.ensureWidgetVisible(wid)
+            if next_wid:
+                self.clear_selected_widgets()
+                self.add_and_select_widget(next_wid)
+                self.ensureWidgetVisible(next_wid)
+                self.wid_under_mouse = next_wid
 
-                else:
-                    return
+            # if self.selected_widgets:
+            #     wid = self.selected_widgets[-1]
+            #     offset = offsets.get(a0.key())
+            #     coords = (
+            #         wid.row + offset[0], 
+            #         wid.col + offset[1]
+            #     )
+            #     next_wid = self.cell_to_wid.get(coords)
+                
+            #     if next_wid is None:
+            #         if a0.key() == Qt.Key.Key_Right:
+            #             ...
+            #         elif a0.key() == Qt.Key.Key_Left:
+            #             ...
+            #         coords = (
+            #             coords[0] + offset[0], 
+            #             coords[1] + offset[1]
+            #         )
+            #         next_wid = self.cell_to_wid.get(coords)
+
+                # if wid and isinstance(wid, Thumbnail):
+                #     self.clear_selected_widgets()
+                #     self.add_and_select_widget(wid=wid)
+                #     self.ensureWidgetVisible(wid)
+
+                # else:
+                #     return
 
         return super().keyPressEvent(a0)
 
