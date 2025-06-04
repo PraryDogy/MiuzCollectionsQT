@@ -239,8 +239,7 @@ class Grid(QScrollArea):
             for date, db_images_list in db_images.items():
                 self.single_grid(
                     date=date,
-                    db_images=db_images_list,
-                    max_col=self.get_max_col()
+                    db_images=db_images_list
                 )
     
     def open_in_view(self, wid: Thumbnail):
