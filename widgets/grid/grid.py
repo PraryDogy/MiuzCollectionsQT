@@ -453,34 +453,6 @@ class Grid(QScrollArea):
                 self.ensureWidgetVisible(next_wid)
                 self.wid_under_mouse = next_wid
 
-            # if self.selected_widgets:
-            #     wid = self.selected_widgets[-1]
-            #     offset = offsets.get(a0.key())
-            #     coords = (
-            #         wid.row + offset[0], 
-            #         wid.col + offset[1]
-            #     )
-            #     next_wid = self.cell_to_wid.get(coords)
-                
-            #     if next_wid is None:
-            #         if a0.key() == Qt.Key.Key_Right:
-            #             ...
-            #         elif a0.key() == Qt.Key.Key_Left:
-            #             ...
-            #         coords = (
-            #             coords[0] + offset[0], 
-            #             coords[1] + offset[1]
-            #         )
-            #         next_wid = self.cell_to_wid.get(coords)
-
-                # if wid and isinstance(wid, Thumbnail):
-                #     self.clear_selected_widgets()
-                #     self.add_and_select_widget(wid=wid)
-                #     self.ensureWidgetVisible(wid)
-
-                # else:
-                #     return
-
         return super().keyPressEvent(a0)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
