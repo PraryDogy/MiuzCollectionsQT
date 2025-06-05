@@ -37,6 +37,7 @@ class RebootableSettings(QGroupBox):
         super().__init__()
 
         v_lay = LayoutVer()
+        v_lay.setSpacing(5)
         self.setLayout(v_lay)
 
         first_row_wid = QWidget()
@@ -93,6 +94,7 @@ class SimpleSettings(QGroupBox):
         super().__init__()
 
         v_lay = LayoutVer()
+        v_lay.setSpacing(5)
         self.setLayout(v_lay)
 
         first_row_wid = QWidget()
@@ -514,6 +516,7 @@ class MainFolderWid(QGroupBox):
         super().__init__()
 
         v_lay = LayoutVer()
+        v_lay.setSpacing(5)
         self.setLayout(v_lay)
 
         first_row = QWidget()
