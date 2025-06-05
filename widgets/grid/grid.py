@@ -108,7 +108,8 @@ class Grid(QScrollArea):
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
         self.origin_pos = QPoint()
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.scroll_wid)
+
         self.wid_under_mouse: Thumbnail = None
 
     def signals_cmd(self, flag: str):
@@ -141,8 +142,10 @@ class Grid(QScrollArea):
         UThreadPool.start(self.task_)
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
-
-        for wid in self.scroll_wid.findChildren(QWidget):
+        widgets = self.scroll_wid.findChildren(QWidget)
+        if self.rubberBand in widgets:
+            widgets.remove(self.rubberBand)
+        for wid in widgets:
             wid.deleteLater()
 
         self.up_btn = UpBtn(self.scroll_wid)
@@ -699,7 +702,9 @@ class Grid(QScrollArea):
             self.rubberBand.show()
 
         if self.rubberBand.isVisible():
-            rect = QRect(self.origin_pos, a0.pos()).normalized()
+            origin = self.origin_pos
+            current = a0.pos()
+            rect = QRect(origin, current).normalized()
             self.rubberBand.setGeometry(rect)
             return
 
