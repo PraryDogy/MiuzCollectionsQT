@@ -93,6 +93,7 @@ class WinMain(WinFrameless):
         right_lay.addWidget(sep_bottom)
 
         bar_bottom = BarBottom()
+        bar_bottom.theme_changed.connect(grid.reload_rubber)
         right_lay.addWidget(bar_bottom)
 
         # Добавляем splitter в основной layout

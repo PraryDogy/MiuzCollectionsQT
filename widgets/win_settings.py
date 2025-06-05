@@ -685,9 +685,7 @@ class SvgFrame(QFrame):
 
 
 class Themes(QGroupBox):
-    system_text = "Авто"
-    dark_text = "Темная"
-    light_text = "Светлая"
+    theme_changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -701,15 +699,15 @@ class Themes(QGroupBox):
 
         self.system_theme = SvgFrame(
             os.path.join(Static.IMAGES, "system_theme.svg"),
-            self.system_text
+            Lang.theme_auto
         )
         self.dark_theme = SvgFrame(
             os.path.join(Static.IMAGES,"dark_theme.svg"),
-            self.dark_text
+            Lang.theme_dark
         )
         self.light_theme = SvgFrame(
             os.path.join(Static.IMAGES,"light_theme.svg"),
-            self.light_text
+            Lang.theme_light
         )
 
         for f in (self.system_theme, self.dark_theme, self.light_theme):
@@ -736,6 +734,7 @@ class Themes(QGroupBox):
             JsonData.dark_mode = False
 
         ThemeChanger.start()
+        self.theme_changed.emit()
 
     def set_selected(self, selected_frame: SvgFrame):
         for f in self.frames:
@@ -743,6 +742,8 @@ class Themes(QGroupBox):
 
 
 class WinSettings(WinSystem):
+    theme_changed = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lang.settings)
@@ -774,6 +775,7 @@ class WinSettings(WinSystem):
         v_lay.addWidget(simple_settings)
 
         themes = Themes()
+        themes.theme_changed.connect(self.theme_changed.emit)
         v_lay.addWidget(themes)
 
         about_wid = AboutWin()

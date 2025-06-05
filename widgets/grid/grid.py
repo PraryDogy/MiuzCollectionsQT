@@ -141,6 +141,11 @@ class Grid(QScrollArea):
         self.task_.signals_.finished_.connect(cmd_)
         UThreadPool.start(self.task_)
 
+    def reload_rubber(self):
+        print("reload runner")
+        self.rubberBand.deleteLater()
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.scroll_wid)
+
     def create_grid(self, db_images: dict[str, list[DbImage]]):
         widgets = self.scroll_wid.findChildren(QWidget)
         if self.rubberBand in widgets:

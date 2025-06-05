@@ -154,6 +154,7 @@ class SvgBtn_(QFrame):
         return style
 
 class BarBottom(QWidget):
+    theme_changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -241,4 +242,6 @@ class BarBottom(QWidget):
         if e.button() == Qt.MouseButton.LeftButton:
             self.settings = WinSettings()
             self.settings.center_relative_parent(self.window())
+            self.settings.theme_changed.connect(self.theme_changed.emit)
             self.settings.show()
+    

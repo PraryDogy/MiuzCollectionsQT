@@ -487,6 +487,21 @@ class Lang_:
         "Move to trash"
     ]
 
+    theme_auto = [
+        "Авто",
+        "Auto"
+    ]
+
+    theme_dark = [
+        "Темная",
+        "Dark"
+    ]
+
+    theme_light = [
+        "Светлая",
+        "Light"
+    ]
+
 class Lang(Lang_):
 
     @classmethod
