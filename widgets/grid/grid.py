@@ -142,7 +142,6 @@ class Grid(QScrollArea):
         UThreadPool.start(self.task_)
 
     def reload_rubber(self):
-        print("reload runner")
         self.rubberBand.deleteLater()
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.scroll_wid)
 
