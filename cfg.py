@@ -240,6 +240,8 @@ class JsonData:
 
     # индекс соответствующий Lang
     lang_ind = 0
+
+    dark_mode = None
     
     # как часто utils > scaner будет просматривать collfolders на изменения
     scaner_minutes: int = 5

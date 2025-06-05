@@ -4,7 +4,7 @@ import subprocess
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QGroupBox, QLabel,
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QListWidget, QListWidgetItem, QPushButton,
                              QSpacerItem, QTabWidget, QWidget)
 
@@ -625,6 +625,120 @@ class AboutWin(QGroupBox):
         h_lay.addWidget(lbl)
 
 
+class SvgFrame(QFrame):
+    clicked = pyqtSignal()
+
+    def __init__(self, svg_path: str, label_text: str):
+        super().__init__()
+        v_lay = LayoutVer()
+        self.setLayout(v_lay)
+
+        self.svg_container = QFrame()
+        self.svg_container.setObjectName("svg_container")
+        self.svg_container.setStyleSheet(self.regular_style())
+        v_lay.addWidget(self.svg_container)
+
+        svg_lay = LayoutVer()
+        self.svg_container.setLayout(svg_lay)
+
+        self.svg_widget = QSvgWidget(svg_path)
+        self.svg_widget.setFixedSize(50, 50)
+        svg_lay.addWidget(self.svg_widget)
+
+        label = QLabel(label_text)
+        label.setAlignment(Qt.AlignCenter)
+        v_lay.addWidget(label)
+
+    def regular_style(self):
+        return """
+            #svg_container {
+                border: 2px solid transparent;
+                border-radius: 10px;
+            }
+        """
+
+    def border_style(self):
+        return """
+            #svg_container {
+                border: 2px solid #007aff;
+                border-radius: 10px;
+            }
+        """
+
+    def selected(self, enable=True):
+        if enable:
+            self.svg_container.setStyleSheet(
+                self.border_style()
+            )
+        else:
+            self.svg_container.setStyleSheet(
+                self.regular_style()
+            )
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+
+
+class Themes(QGroupBox):
+    system_text = "Авто"
+    dark_text = "Темная"
+    light_text = "Светлая"
+    theme_changed = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        h_lay = LayoutHor()
+        h_lay.setContentsMargins(10, 10, 10, 10)
+        h_lay.setSpacing(20)
+        h_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.setLayout(h_lay)
+
+        self.frames = []
+
+        self.system_theme = SvgFrame(
+            os.path.join(Static.IMAGES, "system_theme.svg"),
+            self.system_text
+        )
+        self.dark_theme = SvgFrame(
+            os.path.join(Static.IMAGES,"dark_theme.svg"),
+            self.dark_text
+        )
+        self.light_theme = SvgFrame(
+            os.path.join(Static.IMAGES,"light_theme.svg"),
+            self.light_text
+        )
+
+        for f in (self.system_theme, self.dark_theme, self.light_theme):
+            h_lay.addWidget(f)
+            self.frames.append(f)
+            f.clicked.connect(self.on_frame_clicked)
+
+        if JsonData.dark_mode is None:
+            self.set_selected(self.system_theme)
+        elif JsonData.dark_mode:
+            self.set_selected(self.dark_theme)
+        else:
+            self.set_selected(self.light_theme)
+
+    def on_frame_clicked(self):
+        sender: SvgFrame = self.sender()
+        self.set_selected(sender)
+
+        if sender == self.system_theme:
+            JsonData.dark_mode = None
+        elif sender == self.dark_theme:
+            JsonData.dark_mode = True
+        elif sender == self.light_theme:
+            JsonData.dark_mode = False
+
+        self.theme_changed.emit()
+
+    def set_selected(self, selected_frame: SvgFrame):
+        for f in self.frames:
+            f.selected(f is selected_frame)
+
+
 class WinSettings(WinSystem):
     def __init__(self):
         super().__init__()
@@ -634,7 +748,7 @@ class WinSettings(WinSystem):
         self.first_tab()
         self.second_tab()
         self.btns_wid()
-        self.setFixedSize(420, 430)
+        self.setFixedSize(420, 460)
 
     def init_ui(self):
         self.tabs_wid = QTabWidget()
@@ -655,6 +769,9 @@ class WinSettings(WinSystem):
 
         simple_settings = SimpleSettings()
         v_lay.addWidget(simple_settings)
+
+        themes = Themes()
+        v_lay.addWidget(themes)
 
         about_wid = AboutWin()
         v_lay.addWidget(about_wid)
