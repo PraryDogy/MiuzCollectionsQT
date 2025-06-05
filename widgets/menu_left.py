@@ -204,10 +204,10 @@ class MenuTab(QListWidget):
         self.coll_btns.append(recents_btn)
 
         # SPACER
-        fake_item = QListWidgetItem()
-        fake_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_ // 2))
-        fake_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
-        self.addItem(fake_item)
+        spacer = QListWidgetItem()
+        spacer.setSizeHint(QSize(0, MenuTab.h_ // 2))  # 10 — высота отступа
+        spacer.setFlags(Qt.NoItemFlags)   # не кликабелен
+        self.addItem(spacer)
 
         if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
             self.setCurrentRow(self.row(all_colls_item))
