@@ -14,6 +14,7 @@ from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
 from lang import Lang
 from main_folders import MainFolder
+from paletes import ThemeChanger
 from utils.updater import Updater
 from utils.utils import Utils
 
@@ -684,7 +685,6 @@ class Themes(QGroupBox):
     system_text = "Авто"
     dark_text = "Темная"
     light_text = "Светлая"
-    theme_changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -732,7 +732,7 @@ class Themes(QGroupBox):
         elif sender == self.light_theme:
             JsonData.dark_mode = False
 
-        self.theme_changed.emit()
+        ThemeChanger.start()
 
     def set_selected(self, selected_frame: SvgFrame):
         for f in self.frames:

@@ -11,6 +11,7 @@ from base_widgets.wins import WinFrameless
 from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from main_folders import MainFolder
+from paletes import ThemeChanger
 from signals import SignalsApp
 from utils.scaner import Scaner
 from widgets.win_upload import WinUpload
@@ -100,6 +101,8 @@ class WinMain(WinFrameless):
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
         splitter.setSizes([Static.MENU_LEFT_WIDTH, self.width() - Static.MENU_LEFT_WIDTH])
+
+        ThemeChanger.start()
 
         SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
         SignalsApp.instance.win_main_cmd.emit("set_title")
