@@ -98,6 +98,7 @@ Dbase.init()
 Lang.init()
 MainFolder.init(JsonData.get_data())
 ReadImage.init_read_dict(Static)
+JsonData.write_json_data()
 
 app = App(sys.argv)
 

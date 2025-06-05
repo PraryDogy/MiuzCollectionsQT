@@ -379,7 +379,6 @@ class JsonData:
     def init(cls):
         cls.check_dirs()
         cls.read_json_data()
-        cls.write_json_data()
 
         # если версии не совпадают то что то нужно сделать
         # например копировать новые файлы или ...
