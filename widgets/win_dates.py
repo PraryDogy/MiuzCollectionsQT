@@ -93,7 +93,7 @@ class DatesLineEdit(ULineEdit):
 
 class DatesTitle(QLabel):
     def __init__(self, default_text: str):
-        self.default_text = "\n" + default_text
+        self.default_text = default_text
 
         super().__init__(self.default_text)
         self.setFixedWidth(150)
@@ -124,7 +124,7 @@ class DatesWid(QWidget):
         super().__init__()
 
         v_lay = LayoutVer()
-        v_lay.setSpacing(5)
+        v_lay.setSpacing(10)
         self.setLayout(v_lay)
 
         self.dates_title = DatesTitle(title_label_text)
@@ -153,7 +153,7 @@ class DatesWid(QWidget):
 
 class LeftDateWidget(DatesWid):
     def __init__(self):
-        super().__init__(Lang.start)
+        super().__init__(f"{Lang.weekday_}\n{Lang.start_date}")
 
         if Dynamic.date_start:
             self.input.setText(DatesTools.date_to_text(Dynamic.date_start))
@@ -161,7 +161,7 @@ class LeftDateWidget(DatesWid):
 
 class RightDateWidget(DatesWid):
     def __init__(self):
-        super().__init__(Lang.end)
+        super().__init__(f"{Lang.weekday_}\n{Lang.end_date}")
 
         if Dynamic.date_end:
             self.input.setText(DatesTools.date_to_text(Dynamic.date_end))
@@ -175,12 +175,16 @@ class WinDates(WinSystem):
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
 
+        self.central_layout.setSpacing(10)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
+
         main_title = QLabel(Lang.search_dates)
         self.central_layout.addWidget(main_title)
 
         dates_h_wid = QWidget()
         self.central_layout.addWidget(dates_h_wid)
         dates_h_lay = LayoutHor()
+        dates_h_lay.setSpacing(10)
         dates_h_wid.setLayout(dates_h_lay)
 
         left_cmd = lambda: self.date_change(flag="start")
@@ -188,16 +192,10 @@ class WinDates(WinSystem):
         self.left_date_wid.dateChangedSignal.connect(left_cmd)
         dates_h_lay.addWidget(self.left_date_wid)
 
-        spacer_item = QSpacerItem(10, 1)
-        dates_h_lay.addItem(spacer_item)
-
         right_cmd = lambda: self.date_change(flag="end")
         self.right_date_wid = RightDateWidget()
         self.right_date_wid.dateChangedSignal.connect(right_cmd)
         dates_h_lay.addWidget(self.right_date_wid)
-
-        spacer_item = QSpacerItem(1, 5)
-        self.central_layout.addItem(spacer_item)
 
         clear_btn = QPushButton(text=Lang.reset)
         clear_btn.setFixedWidth(100)
@@ -206,9 +204,6 @@ class WinDates(WinSystem):
             clear_btn,
             alignment=Qt.AlignmentFlag.AlignCenter
         )
-
-        spacer_item = QSpacerItem(1, 10)
-        self.central_layout.addItem(spacer_item)
 
         # ok cancel button # ok cancel button # ok cancel button # ok cancel button
 
@@ -235,7 +230,7 @@ class WinDates(WinSystem):
         btns_h_lay.addStretch(1)
 
         self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
+        # self.setFixedSize(self.width(), self.height())
 
     @classmethod
     def reset_dates(cls, *args):

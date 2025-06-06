@@ -502,6 +502,21 @@ class Lang_:
         "Light"
     ]
 
+    start_date = [
+        "Дата начала",
+        "Start date"
+    ]
+
+    end_date = [
+        "Дата окончания",
+        "End date"
+    ]
+
+    weekday_ = [
+        "День недели",
+        "Weekday"
+    ]
+
 class Lang(Lang_):
 
     @classmethod
