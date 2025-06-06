@@ -517,6 +517,16 @@ class Lang_:
         "Weekday"
     ]
 
+    scan_every = [
+        "Искать новые изобажения каждые",
+        "Search for new images every"
+    ]
+
+    mins = [
+        "минут",
+        "minutes"
+    ]
+
 class Lang(Lang_):
 
     @classmethod

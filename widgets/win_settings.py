@@ -6,7 +6,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QListWidget, QListWidgetItem, QPushButton,
-                             QSpacerItem, QTabWidget, QWidget)
+                             QSpacerItem, QSpinBox, QTabWidget, QWidget)
 
 from base_widgets import ContextCustom, CustomTextEdit, LayoutHor, LayoutVer
 from base_widgets.input import ULineEdit
@@ -741,6 +741,31 @@ class Themes(QGroupBox):
             f.selected(f is selected_frame)
 
 
+class ScanTime(QGroupBox):
+    def __init__(self):
+        super().__init__()
+
+        layout = LayoutHor(self)
+        layout.setContentsMargins(5, 0, 5, 0)
+        layout.setSpacing(10)
+        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        label = QLabel(Lang.scan_every, self)
+        layout.addWidget(label)
+
+        self.spin = QSpinBox(self)
+        self.spin.setFixedWidth(90)
+        self.spin.setMinimum(1)
+        self.spin.setMaximum(60)
+        self.spin.setSuffix(f" {Lang.mins}")
+        self.spin.setValue(JsonData.scaner_minutes)
+        self.spin.valueChanged.connect(self.change_scan_time)
+        layout.addWidget(self.spin)
+
+    def change_scan_time(self, value: int):
+        JsonData.scaner_minutes = value
+
+
 class WinSettings(WinSystem):
     theme_changed = pyqtSignal()
 
@@ -752,7 +777,9 @@ class WinSettings(WinSystem):
         self.first_tab()
         self.second_tab()
         self.btns_wid()
-        self.setFixedSize(420, 460)
+        self.setFixedWidth(420)
+
+        self.scaner_minutes = JsonData.scaner_minutes
 
     def init_ui(self):
         self.tabs_wid = QTabWidget()
@@ -795,6 +822,9 @@ class WinSettings(WinSystem):
         add_main_folder.need_lock_widgets.connect(self.lock_widgets)
         v_lay.addWidget(add_main_folder)
 
+        scan_wid = ScanTime()
+        v_lay.addWidget(scan_wid)
+
         main_folder_tab = TabsWidget()
         main_folder_tab.need_lock_widgets.connect(self.lock_widgets)
         v_lay.addWidget(main_folder_tab)
@@ -834,6 +864,9 @@ class WinSettings(WinSystem):
         rebootable = self.findChild(RebootableSettings)
         main_folder_tab = self.findChild(TabsWidget)
         main_folder_wid = self.findChild(MainFolderWid)
+
+        if self.scaner_minutes != JsonData.scaner_minutes:
+            JsonData.write_json_data()
 
         if hasattr(rebootable.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
