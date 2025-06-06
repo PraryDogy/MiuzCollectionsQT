@@ -27,10 +27,10 @@ class WinSmb(WinSystem):
 
         self.setWindowTitle(f"{Lang.no_connection}")
 
-        self.central_layout.setContentsMargins(0, 10, 0, 0)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
         self.init_ui()
-        self.setFixedSize(320, 95)
+        self.adjustSize()
 
     def init_ui(self):
         h_wid = QWidget()
