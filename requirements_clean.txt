@@ -12,7 +12,7 @@ lazy_loader
 macholib
 modulegraph
 networkx
-numpy
+numpy==1.25.2
 opencv-python
 packaging
 pillow
