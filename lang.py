@@ -518,7 +518,7 @@ class Lang_:
     ]
 
     scan_every = [
-        "Искать новые изобажения каждые",
+        "Искать новые изображения каждые",
         "Search for new images every"
     ]
 
