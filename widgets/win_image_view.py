@@ -20,6 +20,8 @@ from ._runnable import URunnable, UThreadPool
 from .actions import (CopyName, CopyPath, FavActionDb, OpenInfoWin, OpenWins,
                       Reveal, Save)
 from .grid.cell_widgets import Thumbnail
+from .win_info import WinInfo
+from .win_smb import WinSmb
 
 IMG_VIEW_STYLE = """
     background: black;
@@ -316,7 +318,7 @@ class WinImageView(WinChild):
         MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if not coll_folder:
-            OpenWins.smb(self)
+            self.open_smb_win()
 
         self.load_thumb()
 
@@ -452,6 +454,17 @@ class WinImageView(WinChild):
         self.wid.change_fav(value)
         self.img_viewer_title()
 
+    def open_info_win_delayed(self):
+        self.info_win.adjustSize()
+        self.info_win.center_relative_parent(self)
+        self.info_win.show()
+
+    def open_smb_win(self):
+        self.smb_win = WinSmb()
+        self.smb_win.adjustSize()
+        self.smb_win.center_relative_parent(self)
+        self.smb_win.show()
+
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
     def keyPressEvent(self, ev: QKeyEvent | None) -> None:
@@ -480,17 +493,12 @@ class WinImageView(WinChild):
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             MainFolder.current.set_current_path()
             coll_folder = MainFolder.current.get_current_path()
-
             if coll_folder:
-
-                OpenWins.info_db(
-                    parent_=self,
-                    short_src=self.short_src,
-                    coll_folder=coll_folder
-                )
-
+                full_src = Utils.get_full_src(coll_folder, self.short_src)
+                self.info_win = WinInfo(full_src)
+                self.info_win.finished_.connect(self.open_info_win_delayed)
             else:
-                OpenWins.smb(parent_=self)
+                self.open_smb_win()
 
         return super().keyPressEvent(ev)
 
