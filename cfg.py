@@ -221,8 +221,7 @@ class Static:
     """
 
     # папка со всеми CVG
-    IMAGES = "images"
-    CACHED_IMAGES_COUNT = 50
+    images_dir = "images"
 
 
 class JsonData:

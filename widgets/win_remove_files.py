@@ -16,7 +16,7 @@ from utils.utils import Err, Utils
 
 from ._runnable import URunnable, UThreadPool
 
-WARNING_SVG = os.path.join(Static.IMAGES, "warning.svg")
+WARNING_SVG = os.path.join(Static.images_dir, "warning.svg")
 SCRIPTS = "scripts"
 REMOVE_FILES_SCPT = os.path.join(SCRIPTS, "remove_files.scpt")
 

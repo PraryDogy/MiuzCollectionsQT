@@ -30,8 +30,8 @@ SLIDER_STYLE = """
     }
 """
 
-DOWNLOADS_SVG = os.path.join(Static.IMAGES, "downloads.svg")
-SETTINGS_SVG = os.path.join(Static.IMAGES, "settings.svg")
+DOWNLOADS_SVG = os.path.join(Static.images_dir, "downloads.svg")
+SETTINGS_SVG = os.path.join(Static.images_dir, "settings.svg")
 
 
 class BaseSlider(QSlider):

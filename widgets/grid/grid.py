@@ -24,7 +24,7 @@ from ..win_smb import WinSmb
 from ._db_images import DbImage, DbImages
 from .cell_widgets import ImgWid, TextWid, Thumbnail, Title
 
-UP_SVG = os.path.join(Static.IMAGES, "up.svg")
+UP_SVG = os.path.join(Static.images_dir, "up.svg")
 UP_STYLE = f"""
     background: {Static.RGB_GRAY};
     border-radius: 22px;
@@ -736,7 +736,7 @@ class Grid(QScrollArea):
 
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
-        img = os.path.join(Static.IMAGES, "copy_files.png")
+        img = os.path.join(Static.images_dir, "copy_files.png")
         img = QPixmap(img)
         self.drag.setPixmap(img)
         

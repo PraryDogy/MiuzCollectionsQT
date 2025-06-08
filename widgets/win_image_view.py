@@ -36,12 +36,12 @@ NAVI_STYLE = """
     border-radius: 27px;
 """
 
-ZOOM_OUT = os.path.join(Static.IMAGES, "zoom_out.svg")
-ZOOM_IN = os.path.join(Static.IMAGES, "zoom_in.svg")
-ZOOM_FIT = os.path.join(Static.IMAGES, "zoom_fit.svg")
-CLOSE_ = os.path.join(Static.IMAGES, "zoom_close.svg")
-PREV_ = os.path.join(Static.IMAGES, "prev.svg")
-NEXT_ = os.path.join(Static.IMAGES, "next.svg")
+ZOOM_OUT = os.path.join(Static.images_dir, "zoom_out.svg")
+ZOOM_IN = os.path.join(Static.images_dir, "zoom_in.svg")
+ZOOM_FIT = os.path.join(Static.images_dir, "zoom_fit.svg")
+CLOSE_ = os.path.join(Static.images_dir, "zoom_close.svg")
+PREV_ = os.path.join(Static.images_dir, "prev.svg")
+NEXT_ = os.path.join(Static.images_dir, "next.svg")
 
 class ImageData:
     __slots__ = ["src", "pixmap"]
@@ -88,6 +88,7 @@ class LoadThumb(URunnable):
 
 class LoadImage(URunnable):
     images: dict[str, QPixmap] = {}
+    max_images_count = 50
 
     def __init__(self, full_src: str):
         super().__init__()
@@ -115,7 +116,7 @@ class LoadImage(URunnable):
             print("не могу загрузить крупное изображение")
             self.pixmap = QPixmap(0, 0)
 
-        if len(LoadImage.images) > Static.CACHED_IMAGES_COUNT:
+        if len(LoadImage.images) > self.max_images_count:
             LoadImage.images.pop(next(iter(LoadImage.images)))
 
         image_data = ImageData(

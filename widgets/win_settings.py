@@ -28,7 +28,7 @@ COLL_FOLDERS = "COLL_FOLDERS"
 LIST_ITEM_H = 25
 REMOVE_MAIN_FOLDER_NAME = "REMOVE_MAIN_FOLDER_NAME"
 ADD_NEW_MAIN_FOLDER = "ADD_NEW_MAIN_FOLDER"
-ICON_SVG = os.path.join(Static.IMAGES, "icon.svg")
+ICON_SVG = os.path.join(Static.images_dir, "icon.svg")
 
 class RebootableSettings(QGroupBox):
     apply = pyqtSignal()
@@ -706,15 +706,15 @@ class Themes(QGroupBox):
         self.frames = []
 
         self.system_theme = SvgFrame(
-            os.path.join(Static.IMAGES, "system_theme.svg"),
+            os.path.join(Static.images_dir, "system_theme.svg"),
             Lang.theme_auto
         )
         self.dark_theme = SvgFrame(
-            os.path.join(Static.IMAGES,"dark_theme.svg"),
+            os.path.join(Static.images_dir,"dark_theme.svg"),
             Lang.theme_dark
         )
         self.light_theme = SvgFrame(
-            os.path.join(Static.IMAGES,"light_theme.svg"),
+            os.path.join(Static.images_dir,"light_theme.svg"),
             Lang.theme_light
         )
 

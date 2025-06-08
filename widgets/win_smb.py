@@ -9,7 +9,7 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 
-WARNING_SVG = os.path.join(Static.IMAGES, "warning.svg")
+WARNING_SVG = os.path.join(Static.images_dir, "warning.svg")
 
 TITLE_NORMAL = f"""
     {Static.TITLE_NORMAL}

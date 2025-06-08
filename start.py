@@ -75,7 +75,7 @@ class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
 
-        icon_path = os.path.join(Static.IMAGES, "icon.icns")
+        icon_path = os.path.join(Static.images_dir, "icon.icns")
         icon = QIcon(icon_path)
         self.setWindowIcon(icon)
 
