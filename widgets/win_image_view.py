@@ -17,8 +17,7 @@ from main_folders import MainFolder
 from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
-from .actions import (CopyName, CopyPath, FavActionDb, OpenInfoWin, OpenWins,
-                      Reveal, Save)
+from .actions import CopyName, CopyPath, FavActionDb, OpenInfoWin, Reveal, Save
 from .grid.cell_widgets import Thumbnail
 from .win_info import WinInfo
 from .win_smb import WinSmb

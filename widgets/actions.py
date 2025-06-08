@@ -18,30 +18,13 @@ from .win_info import WinInfo
 from .win_smb import WinSmb
 
 
-class OpenWins:
-
+class SmbWin:
     @classmethod
-    def info_db(cls, parent_: QMainWindow, full_src: str):
-        win = WinInfo(full_src)
-        win.adjustSize()
-        win.center_relative_parent(parent_)
-        win.show()
-
-    @classmethod
-    def smb(cls, parent_: QMainWindow):
-
-        if not isinstance(parent_, QMainWindow):
-            raise TypeError
-
+    def show(cls, parent_: QMainWindow):
         smb_win = WinSmb()
+        smb_win.adjustSize()
         smb_win.center_relative_parent(parent_)
         smb_win.show()
-
-    @classmethod
-    def dialog_dirs(cls):
-        dialog = QFileDialog()
-        dialog.setOption(QFileDialog.ShowDirsOnly, True)
-        return dialog
 
 
 class OpenInView(QAction):
@@ -106,7 +89,7 @@ class CopyPath(QAction):
             full_src = Utils.get_full_src(coll_folder, self.short_src)
             Utils.copy_text(text=full_src)
         else:
-            OpenWins.smb(parent_=self.win_)
+            SmbWin.show(self.win_)
 
 
 class CopyName(QAction):
@@ -126,7 +109,7 @@ class CopyName(QAction):
             name, _ = os.path.splitext(name)
             Utils.copy_text(name)
         else:
-            OpenWins.smb(parent_=self.win_)
+            SmbWin.show(self.win_)
 
 
 class Reveal(QAction):
@@ -154,7 +137,7 @@ class Reveal(QAction):
             ]
             Utils.reveal_files(files_list=full_src)
         else:
-            OpenWins.smb(parent_=self.win_)
+            SmbWin.show(self.win_)
 
 
 class WorkerSignals(QObject):
@@ -242,7 +225,7 @@ class Save(QAction):
             ]
 
             if self.save_as:
-                dialog = OpenWins.dialog_dirs()
+                dialog = QFileDialog()
                 dest = dialog.getExistingDirectory()
 
             else:
@@ -251,7 +234,7 @@ class Save(QAction):
             if dest:
                 self.copy_files_cmd(dest=dest, full_src=full_src)
         else:
-            OpenWins.smb(parent_=self.win_)
+            SmbWin.show(self.win_)
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
         thread_ = CopyFiles(dest, full_src)

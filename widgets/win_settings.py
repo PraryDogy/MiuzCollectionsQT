@@ -19,7 +19,7 @@ from utils.updater import Updater
 from utils.utils import Utils
 
 from ._runnable import UThreadPool
-from .actions import OpenWins
+from .win_smb import WinSmb
 
 WIN_SIZE = (430, 580)
 NEED_REBOOT = "___need_reboot___"
@@ -144,7 +144,10 @@ class SimpleSettings(QGroupBox):
     def updater_btn_smb(self):
         cmd_ = lambda: self.updater_btn.setText(Lang.download_update)
         QTimer.singleShot(1000, cmd_)
-        OpenWins.smb(self.window())
+        self.smb_win = WinSmb()
+        self.smb_win.adjustSize()
+        self.smb_win.center_relative_parent(self.window())
+        self.smb_win.show()
 
 
 class AddItemWindow(WinSystem):

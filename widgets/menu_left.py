@@ -4,11 +4,9 @@ from typing import Literal
 
 import sqlalchemy
 from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
-                             QTabWidget)
+from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QTabWidget
 
-from base_widgets import ContextCustom
 from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from lang import Lang
@@ -17,7 +15,7 @@ from signals import SignalsApp
 from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
-from .actions import OpenWins
+from .win_smb import WinSmb
 
 
 class CollectionBtn(QLabel):
@@ -41,7 +39,10 @@ class CollectionBtn(QLabel):
         MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if not coll_folder:
-            OpenWins.smb(parent_=self.window())
+            self.smb_win = WinSmb()
+            self.smb_win.adjustSize()
+            self.smb_win.center_relative_parent(self.window())
+            self.smb_win.show()
             return
 
         if self.coll_name in (

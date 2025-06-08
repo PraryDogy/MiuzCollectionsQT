@@ -16,12 +16,12 @@ from signals import SignalsApp
 from utils.scaner import Scaner
 from widgets.win_upload import WinUpload
 
-from .actions import OpenWins
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
+from .win_smb import WinSmb
 
 
 class TestWid(QFrame):
@@ -160,13 +160,13 @@ class WinMain(WinFrameless):
         MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if not coll_folder:
-            OpenWins.smb(self)
+            self.open_smb_win()
 
-        # from .actions import OpenWins
-        # OpenWins.smb(parent_=self)
-        # self.test = TestWid()
-        # self.test.setWindowModality(Qt.WindowModality.ApplicationModal)
-        # self.test.show()
+    def open_smb_win(self):
+        self.smb_win = WinSmb()
+        self.smb_win.adjustSize()
+        self.smb_win.center_relative_parent(self)
+        self.smb_win.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
@@ -211,7 +211,7 @@ class WinMain(WinFrameless):
         MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if not coll_folder:
-            OpenWins.smb(self)
+            self.open_smb_win()
             return
 
         urls: list[str] = [

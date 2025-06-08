@@ -14,14 +14,13 @@ from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
 from utils.utils import Utils
-from ..win_smb import WinSmb
 
 from .._runnable import UThreadPool
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, OpenInfoWin,
-                       OpenInView, OpenWins, RemoveFiles, Reveal, Save,
-                       ScanerRestart)
+                       OpenInView, RemoveFiles, Reveal, Save, ScanerRestart)
 from ..win_info import WinInfo
 from ..win_remove_files import RemoveFilesWin
+from ..win_smb import WinSmb
 from ._db_images import DbImage, DbImages
 from .cell_widgets import ImgWid, TextWid, Thumbnail, Title
 
@@ -749,6 +748,9 @@ class Grid(QScrollArea):
         self.drag.exec_(Qt.DropAction.CopyAction)
 
         if not urls:
-            OpenWins.smb(self.window())
+            self.win_smb = WinSmb()
+            self.win_smb.adjustSize()
+            self.win_smb.center_relative_parent(self.window())
+            self.win_smb.show()
 
         return super().mouseMoveEvent(a0)
