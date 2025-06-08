@@ -14,11 +14,13 @@ from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
 from utils.utils import Utils
+from ..win_smb import WinSmb
 
 from .._runnable import UThreadPool
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, OpenInfoWin,
                        OpenInView, OpenWins, RemoveFiles, Reveal, Save,
                        ScanerRestart)
+from ..win_info import WinInfo
 from ..win_remove_files import RemoveFilesWin
 from ._db_images import DbImage, DbImages
 from .cell_widgets import ImgWid, TextWid, Thumbnail, Title
@@ -379,6 +381,11 @@ class Grid(QScrollArea):
 
     def remove_finished(self, widgets: list[Thumbnail]):
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+
+    def open_info_win_delayed(self):
+        self.info_win.adjustSize()
+        self.info_win.center_relative_parent(self.window())
+        self.info_win.show()
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -392,22 +399,19 @@ class Grid(QScrollArea):
         }
 
         if a0.modifiers() == command and a0.key() == Qt.Key.Key_I:
-
             if self.selected_widgets:
-            
                 wid = self.selected_widgets[-1]
                 MainFolder.current.set_current_path()
                 coll_folder = MainFolder.current.get_current_path()
-
                 if coll_folder:
                     full_src = Utils.get_full_src(coll_folder, wid.short_src)
-                    OpenWins.info_db(
-                        parent_=self.window(), 
-                        short_src=wid.short_src,
-                        )
-
+                    self.info_win = WinInfo(full_src)
+                    self.info_win.finished_.connect(self.open_info_win_delayed)
                 else:
-                    OpenWins.smb(self.window())
+                    self.smb_win = WinSmb()
+                    self.smb_win.adjustSize()
+                    self.smb_win.center_relative_parent(self.window())
+                    self.smb_win.show()
 
         elif a0.modifiers() == command and a0.key() == Qt.Key.Key_A:
             for i in Thumbnail.path_to_wid.values():
