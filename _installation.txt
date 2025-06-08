@@ -5,9 +5,6 @@ pip install numpy==1.25.2
 !!! Установи перед тем, как устанавливать остальное
 pip install aggdraw --prefer-binary
 
-
-pip install -r requirements_clean.txt
-или
 pip install -r requirements.txt
 
 в setup.py добавь:
