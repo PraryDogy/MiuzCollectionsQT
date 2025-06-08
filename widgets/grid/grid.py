@@ -615,11 +615,12 @@ class Grid(QScrollArea):
             view._clicked.connect(cmd_)
             self.menu_.addAction(view)
 
+
             info = OpenInfoWin(
                 parent=self.menu_,
                 win=self.window(),
-                short_src=clicked_wid.short_src
-                )
+                urls=urls
+            )
             self.menu_.addAction(info)
 
             self.fav_action = FavActionDb(

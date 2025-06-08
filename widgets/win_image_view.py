@@ -508,7 +508,7 @@ class WinImageView(WinChild):
         info = OpenInfoWin(
             parent=self.menu_,
             win=self,
-            short_src=self.short_src
+            urls=self.short_src
         )
         self.menu_.addAction(info)
 
