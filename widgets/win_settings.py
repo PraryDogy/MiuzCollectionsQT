@@ -858,9 +858,6 @@ class WinSettings(WinSystem):
         btns_layout.addStretch(1)
 
     def lock_widgets(self, *args):
-        tab = self.findChild(QTabWidget)
-        tab.setDisabled(True)
-
         self.ok_btn.setText(Lang.apply)
 
     def ok_cmd(self, *args):
