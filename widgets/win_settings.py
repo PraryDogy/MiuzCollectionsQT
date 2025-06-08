@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
@@ -17,13 +17,7 @@ from main_folders import MainFolder
 from paletes import ThemeChanger
 from utils.utils import Utils
 
-from ._runnable import UThreadPool
-from .win_smb import WinSmb
-
-WIN_SIZE = (430, 580)
 NEED_REBOOT = "___need_reboot___"
-STOP_COLLS = "STOP_COLLS"
-COLL_FOLDERS = "COLL_FOLDERS"
 LIST_ITEM_H = 25
 REMOVE_MAIN_FOLDER_NAME = "REMOVE_MAIN_FOLDER_NAME"
 ADD_NEW_MAIN_FOLDER = "ADD_NEW_MAIN_FOLDER"
@@ -215,7 +209,7 @@ class BaseListWidget(QListWidget):
         wid = self.itemAt(e.pos())
         if not wid:
             self.clearSelection()
-
+            self.setCurrentIndex(QModelIndex())
         return super().mouseReleaseEvent(e)
 
     def del_item_cmd(self):
