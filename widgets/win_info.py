@@ -1,7 +1,6 @@
 import os
 
-import sqlalchemy
-from PyQt5.QtCore import QObject, Qt, pyqtSignal
+from PyQt5.QtCore import QObject, Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
 
@@ -63,7 +62,7 @@ class Selectable(QLabel):
 
 class WorkerSignals(QObject):
     finished_ = pyqtSignal(dict)
-    finished_resol = pyqtSignal(str)
+    delayed_info = pyqtSignal(str)
 
 
 class SingleImgInfo(URunnable):
@@ -90,15 +89,24 @@ class SingleImgInfo(URunnable):
                 Lang.place: self.lined_text(self.full_src),
                 Lang.hash_path: self.lined_text(full_hash),
                 Lang.changed: mod,
+                Lang.collection: self.lined_text(coll),
                 Lang.resol: Lang.calculating,
-                Lang.collection: self.lined_text(coll)
                 }
             
             self.signals_.finished_.emit(res)
+
+            res = self.get_img_resol(self.full_src)
+            if res:
+                self.signals_.delayed_info.emit(res)
         
         except Exception as e:
             Utils.print_error(e)
-            self.signals_.finished_.emit({})
+            res = {
+                Lang.file_name: self.lined_text(os.path.basename(self.full_src)),
+                Lang.place: self.lined_text(self.full_src),
+                Lang.type_: self.lined_text(os.path.splitext(self.full_src)[0])
+                }
+            self.signals_.finished_.emit(res)
    
     def get_img_resol(self, src: str):
         img_ = Utils.read_image(src)
@@ -106,7 +114,7 @@ class SingleImgInfo(URunnable):
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"
         else:
-            return "-"
+            return ""
 
     def lined_text(self, text: str):
         if len(text) > MAX_ROW:
@@ -117,6 +125,29 @@ class SingleImgInfo(URunnable):
             return "\n".join(text)
         else:
             return text
+        
+
+class MultipleImgInfo(URunnable):
+    def __init__(self, urls: list[str]):
+        super().__init__()
+        self.urls = urls
+        self.signals_ = WorkerSignals()
+    
+    def task(self):
+        res = {
+            Lang.total: str(len(self.urls)),
+            Lang.file_size: self.get_total_size()
+        }
+        self.signals_.finished_.emit(res)
+
+    def get_total_size(self):
+        total = 0
+        for i in self.urls:
+            stats = os.stat(i)
+            size_ = stats.st_size
+            total += size_
+
+        return Utils.get_f_size(total)
 
 
 class WinInfo(WinSystem):
@@ -127,56 +158,66 @@ class WinInfo(WinSystem):
         self.setWindowTitle(Lang.info)
         self.full_src = full_src
 
+        wid = QWidget()
+        self.central_layout.addWidget(wid)
+
+        self.grid_lay = QGridLayout()
+        self.grid_lay.setSpacing(5)
+        self.grid_lay.setContentsMargins(0, 0, 0, 0)
+        wid.setLayout(self.grid_lay)
+
         if isinstance(self.full_src, str):
             if os.path.isfile(self.full_src):
                 self.single_img()
             else:
                 print("info dir")
         else:
-            print("multiple info")
+            self.multiple_img()
 
     def single_img(self):
         self.task_ = SingleImgInfo(self.full_src)
-        self.task_.signals_.finished_.connect(self.single_img_fin)
+        self.task_.signals_.finished_.connect(lambda data: self.single_img_fin(data))
         UThreadPool.start(self.task_)
 
-    def single_img_fin(self, data: dict[str, str]):
-        wid = QWidget()
-        self.central_layout.addWidget(wid)
+    def multiple_img(self):
+        self.task_ = MultipleImgInfo(self.full_src)
+        self.task_.signals_.finished_.connect(lambda data: self.multiple_img_fin(data))
+        UThreadPool.start(self.task_)
 
-        grid = QGridLayout()
-        grid.setSpacing(5)
-        grid.setContentsMargins(0, 0, 0, 0)
-        wid.setLayout(grid)
-
+    def multiple_img_fin(self, data: dict[str, str]):
+        self.setFixedSize(200, 50)
         row = 0
         l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-
         for left_t, right_t in data.items():
-            left_lbl = QLabel(text=left_t)
-            right_lbl = Selectable(text=right_t)
-
-            grid.addWidget(left_lbl, row, 0, alignment=l_fl)
-            grid.addWidget(right_lbl, row, 1, alignment=r_fl)
-
+            left_lbl = QLabel(left_t)
+            right_lbl = Selectable(right_t)
+            self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
+            self.grid_lay.addWidget(right_lbl, row, 1, alignment=r_fl)
             row += 1
 
-        r_labels = [i for i in self.findChildren(Selectable)]
-        resol_label = r_labels[6]
-        full_src_label = r_labels[3]
-        full_src = full_src_label.text().strip().replace("\n", "")
-        
-        resol_task = SingleImgInfo(self.full_src)
-        resol_task.signals_.finished_resol.connect(
-            lambda resol: self.finished_resol_task(wid=resol_label, resol=resol)
-        )
-        UThreadPool.start(resol_task)
+        self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
 
+        self.last_label = self.findChildren(QLabel)[-1]
+        cmd = lambda text: self.last_label.setText(text)
+        self.task_.signals_.delayed_info.connect(cmd)
         self.finished_.emit()
 
-    def finished_resol_task(self, wid: Selectable, resol: str):
-        wid.setText(resol)
+    def single_img_fin(self, data: dict[str, str]):
+        row = 0
+        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
+        r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+        for left_t, right_t in data.items():
+            left_lbl = QLabel(left_t)
+            right_lbl = Selectable(right_t)
+            self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
+            self.grid_lay.addWidget(right_lbl, row, 1, alignment=r_fl)
+            row += 1
+
+        self.last_label = self.findChildren(QLabel)[-1]
+        cmd = lambda text: self.last_label.setText(text)
+        self.task_.signals_.delayed_info.connect(cmd)
+        self.finished_.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
