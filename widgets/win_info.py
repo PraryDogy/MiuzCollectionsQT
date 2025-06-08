@@ -122,18 +122,25 @@ class SingleImgInfo(URunnable):
 class WinInfo(WinSystem):
     finished_ = pyqtSignal()
 
-    def __init__(self, full_src: str):
+    def __init__(self, full_src: str | list[str]):
         super().__init__()
         self.setWindowTitle(Lang.info)
         self.full_src = full_src
-        self.init_ui()
 
-    def init_ui(self):
+        if isinstance(self.full_src, str):
+            if os.path.isfile(self.full_src):
+                self.single_img()
+            else:
+                print("info dir")
+        else:
+            print("multiple info")
+
+    def single_img(self):
         self.task_ = SingleImgInfo(self.full_src)
-        self.task_.signals_.finished_.connect(self.load_info_fin)
+        self.task_.signals_.finished_.connect(self.single_img_fin)
         UThreadPool.start(self.task_)
 
-    def load_info_fin(self, data: dict[str, str]):
+    def single_img_fin(self, data: dict[str, str]):
         wid = QWidget()
         self.central_layout.addWidget(wid)
 
