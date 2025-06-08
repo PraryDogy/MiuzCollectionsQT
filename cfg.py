@@ -176,13 +176,13 @@ class Static:
     border_transparent = "2px solid transparent"
     border_blue = f"2px solid {blue_color}"
 
-    NORMAL_STYLE = f"""
+    border_transparent_style = f"""
         border: {border_transparent};
         padding-left: 2px;
         padding-right: 2px;
     """
 
-    SOLID_STYLE = f"""
+    blue_bg_style = f"""
         border-radius: 7px;
         color: rgb(255, 255, 255);
         background: {blue_color};

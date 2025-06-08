@@ -23,10 +23,10 @@ class BarTopBtn(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def set_solid_style(self):
-        self.setStyleSheet(Static.SOLID_STYLE)
+        self.setStyleSheet(Static.blue_bg_style)
 
     def set_normal_style(self):
-        self.setStyleSheet(Static.NORMAL_STYLE)
+        self.setStyleSheet(Static.border_transparent_style)
 
 
 class DatesBtn(BarTopBtn):

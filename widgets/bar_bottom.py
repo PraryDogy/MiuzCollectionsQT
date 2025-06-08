@@ -92,10 +92,10 @@ class FilterBtn(QLabel):
         self.adjustSize()
 
     def set_normal_style(self):
-        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.NORMAL_STYLE}}}")
+        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.border_transparent_style}}}")
 
     def set_solid_style(self):
-        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.SOLID_STYLE}}}")
+        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.blue_bg_style}}}")
 
     def menu_types(self, *args):
         self.set_solid_style()

@@ -143,7 +143,7 @@ class Thumbnail(QFrame, CellWid):
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         CellWid.__init__(self)
         QFrame.__init__(self)
-        self.setStyleSheet(Static.NORMAL_STYLE)
+        self.setStyleSheet(Static.border_transparent_style)
 
         self.img = pixmap
         self.short_src = short_src
@@ -191,12 +191,12 @@ class Thumbnail(QFrame, CellWid):
 
     def set_frame(self):
         self.img_wid.setStyleSheet(self.style_)
-        text_style = Static.SOLID_STYLE + "font-size: 11px;"
+        text_style = Static.blue_bg_style + "font-size: 11px;"
         self.text_wid.setStyleSheet(text_style)
 
     def set_no_frame(self):
-        self.img_wid.setStyleSheet(Static.NORMAL_STYLE)
-        text_style = Static.NORMAL_STYLE + "font-size: 11px;"
+        self.img_wid.setStyleSheet(Static.border_transparent_style)
+        text_style = Static.border_transparent_style + "font-size: 11px;"
         self.text_wid.setStyleSheet(text_style)
 
     def change_fav(self, value: int):
