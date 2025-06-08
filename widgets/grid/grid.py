@@ -399,11 +399,19 @@ class Grid(QScrollArea):
 
         if a0.modifiers() == command and a0.key() == Qt.Key.Key_I:
             if self.selected_widgets:
-                wid = self.selected_widgets[-1]
+
                 MainFolder.current.set_current_path()
                 coll_folder = MainFolder.current.get_current_path()
                 if coll_folder:
-                    full_src = Utils.get_full_src(coll_folder, wid.short_src)
+                    if len(self.selected_widgets) > 1:
+                        full_src = [
+                            Utils.get_full_src(coll_folder, i.short_src)
+                            for i in self.selected_widgets
+                        ]
+                    else:
+                        wid = self.selected_widgets[0]
+                        full_src = Utils.get_full_src(coll_folder, wid.short_src)
+
                     self.info_win = WinInfo(full_src)
                     self.info_win.finished_.connect(self.open_info_win_delayed)
                 else:
