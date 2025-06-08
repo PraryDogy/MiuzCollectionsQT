@@ -172,7 +172,7 @@ class Static:
 
     # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ 
     blue_color = "rgb(46, 89, 203)"
-    RGB_GRAY = "rgba(125, 125, 125, 0.5)"
+    gray_color = "rgba(125, 125, 125, 0.5)"
     border_transparent = "2px solid transparent"
     border_blue = f"2px solid {blue_color}"
 
@@ -187,22 +187,6 @@ class Static:
         color: rgb(255, 255, 255);
         background: {blue_color};
         border: {border_transparent};
-        padding-left: 2px;
-        padding-right: 2px;
-    """
-
-    SOLID_GRAY_STYLE = f"""
-        border-radius: 7px;
-        color: rgb(255, 255, 255);
-        background: {RGB_GRAY};
-        border: {border_transparent};
-        padding-left: 2px;
-        padding-right: 2px;
-    """
-
-    BORDERED_STYLE = f"""
-        border-radius: 6px;
-        border: {border_blue};
         padding-left: 2px;
         padding-right: 2px;
     """

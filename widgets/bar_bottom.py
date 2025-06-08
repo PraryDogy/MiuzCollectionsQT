@@ -97,12 +97,6 @@ class FilterBtn(QLabel):
     def set_solid_style(self):
         self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.SOLID_STYLE}}}")
 
-    def set_border_style(self):
-        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.BORDERED_STYLE}}}")
-
-    def set_enter_style(self):
-        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.SOLID_GRAY_STYLE}}}")
-
     def menu_types(self, *args):
         self.set_solid_style()
 
@@ -142,7 +136,7 @@ class SvgBtn_(QFrame):
 
     def solid_style(self):
         style = f"""
-        background: {Static.RGB_GRAY};
+        background: {Static.gray_color};
         border-radius: 6px;
         """
         return style

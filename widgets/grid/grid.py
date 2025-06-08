@@ -26,7 +26,7 @@ from .cell_widgets import ImgWid, TextWid, Thumbnail, Title
 
 UP_SVG = os.path.join(Static.images_dir, "up.svg")
 UP_STYLE = f"""
-    background: {Static.RGB_GRAY};
+    background: {Static.gray_color};
     border-radius: 22px;
 """
 FIRST_LOAD = "first_load"

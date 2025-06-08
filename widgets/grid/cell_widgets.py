@@ -131,6 +131,15 @@ class Thumbnail(QFrame, CellWid):
     thumb_w = 0
     thumb_h = 0
 
+    style_ = f"""
+        border-radius: 7px;
+        color: rgb(255, 255, 255);
+        background: {Static.gray_color};
+        border: {Static.border_transparent};
+        padding-left: 2px;
+        padding-right: 2px;
+    """
+
     def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
         CellWid.__init__(self)
         QFrame.__init__(self)
@@ -181,7 +190,7 @@ class Thumbnail(QFrame, CellWid):
         self.img_wid.setPixmap(Utils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
-        self.img_wid.setStyleSheet(Static.SOLID_GRAY_STYLE)
+        self.img_wid.setStyleSheet(self.style_)
         text_style = Static.SOLID_STYLE + "font-size: 11px;"
         self.text_wid.setStyleSheet(text_style)
 
