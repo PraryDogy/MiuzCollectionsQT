@@ -65,6 +65,27 @@ class WorkerSignals(QObject):
     delayed_info = pyqtSignal(str)
 
 
+class Tools:
+    @classmethod
+    def get_img_resol(cls, src: str):
+        img_ = Utils.read_image(src)
+        if img_ is not None and len(img_.shape) > 1:
+            h, w = img_.shape[0], img_.shape[1]
+            return f"{w}x{h}"
+        else:
+            return ""
+
+    @classmethod
+    def lined_text(cls, text: str):
+        if len(text) > MAX_ROW:
+            text = [
+                text[i:i + MAX_ROW]
+                for i in range(0, len(text), MAX_ROW)
+                ]
+            return "\n".join(text)
+        else:
+            return text
+
 class SingleImgInfo(URunnable):
     def __init__(self, url: str):
         super().__init__()
@@ -83,48 +104,30 @@ class SingleImgInfo(URunnable):
             full_hash = Utils.create_full_hash(self.url)
 
             res = {
-                Lang.file_name: self.lined_text(name),
+                Lang.file_name: Tools.lined_text(name),
                 Lang.type_: type_,
                 Lang.file_size: size,
-                Lang.place: self.lined_text(self.url),
-                Lang.hash_path: self.lined_text(full_hash),
+                Lang.place: Tools.lined_text(self.url),
+                Lang.hash_path: Tools.lined_text(full_hash),
                 Lang.changed: mod,
-                Lang.collection: self.lined_text(coll),
+                Lang.collection: Tools.lined_text(coll),
                 Lang.resol: Lang.calculating,
                 }
             
             self.signals_.finished_.emit(res)
 
-            res = self.get_img_resol(self.url)
+            res = Tools.get_img_resol(self.url)
             if res:
                 self.signals_.delayed_info.emit(res)
         
         except Exception as e:
             Utils.print_error(e)
             res = {
-                Lang.file_name: self.lined_text(os.path.basename(self.url)),
-                Lang.place: self.lined_text(self.url),
-                Lang.type_: self.lined_text(os.path.splitext(self.url)[0])
+                Lang.file_name: Tools.lined_text(os.path.basename(self.url)),
+                Lang.place: Tools.lined_text(self.url),
+                Lang.type_: Tools.lined_text(os.path.splitext(self.url)[0])
                 }
             self.signals_.finished_.emit(res)
-   
-    def get_img_resol(self, src: str):
-        img_ = Utils.read_image(src)
-        if img_ is not None and len(img_.shape) > 1:
-            h, w = img_.shape[0], img_.shape[1]
-            return f"{w}x{h}"
-        else:
-            return ""
-
-    def lined_text(self, text: str):
-        if len(text) > MAX_ROW:
-            text = [
-                text[i:i + MAX_ROW]
-                for i in range(0, len(text), MAX_ROW)
-                ]
-            return "\n".join(text)
-        else:
-            return text
         
 
 class MultipleImgInfo(URunnable):
@@ -134,7 +137,18 @@ class MultipleImgInfo(URunnable):
         self.signals_ = WorkerSignals()
     
     def task(self):
+        names = [
+            os.path.basename(i)
+            for i in self.urls
+        ]
+        names = names[:10]
+        names = ", ".join(names)
+        names = Tools.lined_text(names)
+        if len(self.urls) > 10:
+            names = names + ", ..."
+
         res = {
+            Lang.file_name: names,
             Lang.total: str(len(self.urls)),
             Lang.file_size: self.get_total_size()
         }
@@ -185,7 +199,6 @@ class WinInfo(WinSystem):
         UThreadPool.start(self.task_)
 
     def multiple_img_fin(self, data: dict[str, str]):
-        self.setFixedSize(200, 50)
         row = 0
         l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
