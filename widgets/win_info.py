@@ -200,7 +200,7 @@ class WinInfo(WinSystem):
 
     def multiple_img_fin(self, data: dict[str, str]):
         row = 0
-        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
+        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         for left_t, right_t in data.items():
             left_lbl = QLabel(left_t)
@@ -218,7 +218,7 @@ class WinInfo(WinSystem):
 
     def single_img_fin(self, data: dict[str, str]):
         row = 0
-        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
+        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         for left_t, right_t in data.items():
             left_lbl = QLabel(left_t)
