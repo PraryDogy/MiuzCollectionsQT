@@ -11,10 +11,6 @@ from lang import Lang
 
 WARNING_SVG = os.path.join(Static.images_dir, "warning.svg")
 
-TITLE_NORMAL = f"""
-    {Static.TITLE_NORMAL}
-    border: 0px;
-"""
 
 class WinSmb(WinSystem):
     def __init__(self, text: str = None):

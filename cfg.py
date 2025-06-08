@@ -171,13 +171,13 @@ class Static:
     # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ     
 
     # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ 
-    RGB_BLUE = "rgb(46, 89, 203)"
+    blue_color = "rgb(46, 89, 203)"
     RGB_GRAY = "rgba(125, 125, 125, 0.5)"
-    BORDER_INV = "2px solid transparent"
-    BORDER_BLUE = f"2px solid {RGB_BLUE}"
+    border_transparent = "2px solid transparent"
+    border_blue = f"2px solid {blue_color}"
 
     NORMAL_STYLE = f"""
-        border: {BORDER_INV};
+        border: {border_transparent};
         padding-left: 2px;
         padding-right: 2px;
     """
@@ -185,8 +185,8 @@ class Static:
     SOLID_STYLE = f"""
         border-radius: 7px;
         color: rgb(255, 255, 255);
-        background: {RGB_BLUE};
-        border: {BORDER_INV};
+        background: {blue_color};
+        border: {border_transparent};
         padding-left: 2px;
         padding-right: 2px;
     """
@@ -195,29 +195,16 @@ class Static:
         border-radius: 7px;
         color: rgb(255, 255, 255);
         background: {RGB_GRAY};
-        border: {BORDER_INV};
+        border: {border_transparent};
         padding-left: 2px;
         padding-right: 2px;
     """
 
     BORDERED_STYLE = f"""
         border-radius: 6px;
-        border: {BORDER_BLUE};
+        border: {border_blue};
         padding-left: 2px;
         padding-right: 2px;
-    """
-
-    TITLE_NORMAL = f"""
-        font-size: 18pt;
-        font-weight: bold;
-        border: {BORDER_INV};
-    """
-
-    TITLE_SOLID = f"""
-        font-size: 18pt;
-        font-weight: bold;
-        color: rgb(255, 255, 255);
-        {SOLID_STYLE}
     """
 
     # папка со всеми CVG

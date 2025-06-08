@@ -21,6 +21,11 @@ class CellWid:
 
 class Title(QLabel, CellWid):
     r_click = pyqtSignal()
+    style_ = f"""
+        font-size: 18pt;
+        font-weight: bold;
+        border: {Static.border_transparent};
+    """
 
     def __init__(self, title: str, db_images: list[DbImage]):
         CellWid.__init__(self)
@@ -35,7 +40,7 @@ class Title(QLabel, CellWid):
             QSizePolicy.Policy.Preferred
             )
 
-        self.setStyleSheet(Static.TITLE_NORMAL)
+        self.setStyleSheet(self.style_)
 
     def set_frame(self):
         return
