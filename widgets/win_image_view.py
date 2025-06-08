@@ -17,7 +17,7 @@ from main_folders import MainFolder
 from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
-from .actions import (CopyName, CopyPath, FavActionDb, OpenInfoDb, OpenWins,
+from .actions import (CopyName, CopyPath, FavActionDb, OpenInfoWin, OpenWins,
                       Reveal, Save)
 from .grid.cell_widgets import Thumbnail
 
@@ -498,7 +498,7 @@ class WinImageView(WinChild):
 
         self.menu_ = ContextCustom(event=ev)
 
-        info = OpenInfoDb(
+        info = OpenInfoWin(
             parent=self.menu_,
             win=self,
             short_src=self.short_src

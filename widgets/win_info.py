@@ -10,6 +10,7 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from database import THUMBS, Dbase
 from lang import Lang
+from main_folders import MainFolder
 from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
@@ -17,7 +18,7 @@ from ._runnable import URunnable, UThreadPool
 MAX_ROW = 50
 
 
-class RightLabel(QLabel):
+class Selectable(QLabel):
     def __init__(self, text: str):
         super().__init__(text)
 
@@ -57,7 +58,7 @@ class RightLabel(QLabel):
 
         menu_.show_menu()
 
-        self.setSelection(0, 0)
+        # self.setSelection(0, 0)
 
 
 class WorkerSignals(QObject):
@@ -65,66 +66,47 @@ class WorkerSignals(QObject):
     finished_resol = pyqtSignal(str)
 
 
-class InfoTask(URunnable):
-    def __init__(self, short_src: str, coll_folder: str):
+class SingleImgInfo(URunnable):
+    def __init__(self, full_src: str):
         super().__init__()
-        self.short_src = short_src
-        self.coll_folder = coll_folder
+        self.full_src = full_src
         self.signals_ = WorkerSignals()
 
     def task(self):
-        """имя тип размер место изменен разрешение коллекция"""
-        conn = Dbase.engine.connect()
+        coll_folder = MainFolder.current.current_path
+        try:
+            name = os.path.basename(self.full_src)
+            _, type_ = os.path.splitext(name)
+            stats = os.stat(self.full_src)
+            size = Utils.get_f_size(stats.st_size)
+            mod = Utils.get_f_date(stats.st_mtime)
+            coll = Utils.get_coll_name(coll_folder, self.full_src)
+            full_hash = Utils.create_full_hash(self.full_src)
 
-        cols = (
-            THUMBS.c.size,
-            THUMBS.c.mod,
-            # THUMBS.c.resol,
-            THUMBS.c.coll,
-            THUMBS.c.short_hash
-        )
-
-        q = sqlalchemy.select(*cols)
-        q = q.where(THUMBS.c.short_src == self.short_src)
-
-        res = conn.execute(q).first()
-        conn.close()
-
-        if res:
-            self.signals_.finished_.emit(self.get_db_info(*res))
-        else:
+            res = {
+                Lang.file_name: self.lined_text(name),
+                Lang.type_: type_,
+                Lang.file_size: size,
+                Lang.place: self.lined_text(self.full_src),
+                Lang.hash_path: self.lined_text(full_hash),
+                Lang.changed: mod,
+                Lang.resol: Lang.calculating,
+                Lang.collection: self.lined_text(coll)
+                }
+            
+            self.signals_.finished_.emit(res)
+        
+        except Exception as e:
+            Utils.print_error(e)
             self.signals_.finished_.emit({})
    
-    def get_db_info(self, size, mod, coll, short_hash) -> dict[str, str]:
-
-        name = self.lined_text(
-            os.path.basename(self.short_src)
-        )
-
-        full_src = self.lined_text(
-            Utils.get_full_src(self.coll_folder,self.short_src)
-        )
-
-        full_hash = self.lined_text(
-            Utils.get_full_hash(short_hash)
-        )
-
-        _, type_ = os.path.splitext(name)
-        size = Utils.get_f_size(size)
-        mod = Utils.get_f_date(mod)
-
-        res = {
-            Lang.file_name: name,
-            Lang.type_: type_,
-            Lang.file_size: size,
-            Lang.place: full_src,
-            Lang.hash_path: full_hash, 
-            Lang.changed: mod,
-            Lang.resol: Lang.calculating,
-            Lang.collection: coll
-            }
-
-        return res
+    def get_img_resol(self, src: str):
+        img_ = Utils.read_image(src)
+        if img_ is not None and len(img_.shape) > 1:
+            h, w = img_.shape[0], img_.shape[1]
+            return f"{w}x{h}"
+        else:
+            return "-"
 
     def lined_text(self, text: str):
         if len(text) > MAX_ROW:
@@ -137,44 +119,17 @@ class InfoTask(URunnable):
             return text
 
 
-class ResolTask(URunnable):
+class WinInfo(WinSystem):
+    finished_ = pyqtSignal()
+
     def __init__(self, full_src: str):
         super().__init__()
-        self.full_src = full_src
-        self.signals_ = WorkerSignals()
-
-    def task(self):
-        img_array = Utils.read_image(self.full_src)
-
-        if img_array is not None and len(img_array.shape) > 1:
-            h, w = img_array.shape[0], img_array.shape[1]
-            text = f"{w}x{h}"
-
-            try:
-                self.signals_.finished_resol.emit(text)
-            except RuntimeError:
-                ...
-
-
-class WinInfo(WinSystem):
-    def __init__(self, parent: QMainWindow, short_src: str, coll_folder: str):
-        super().__init__()
-
-        if not isinstance(parent, QMainWindow):
-            raise TypeError
-
         self.setWindowTitle(Lang.info)
-        self.parent_ = parent
-        self.short_src = short_src
-        self.coll_folder = coll_folder
-
+        self.full_src = full_src
         self.init_ui()
 
     def init_ui(self):
-        self.task_ = InfoTask(
-            short_src=self.short_src,
-            coll_folder=self.coll_folder
-        )
+        self.task_ = SingleImgInfo(self.full_src)
         self.task_.signals_.finished_.connect(self.load_info_fin)
         UThreadPool.start(self.task_)
 
@@ -193,31 +148,27 @@ class WinInfo(WinSystem):
 
         for left_t, right_t in data.items():
             left_lbl = QLabel(text=left_t)
-            right_lbl = RightLabel(text=right_t)
+            right_lbl = Selectable(text=right_t)
 
             grid.addWidget(left_lbl, row, 0, alignment=l_fl)
             grid.addWidget(right_lbl, row, 1, alignment=r_fl)
 
             row += 1
 
-        self.adjustSize()
-        self.setFixedSize(self.sizeHint().width(), self.sizeHint().height())
-
-        self.center_relative_parent(self.parent_)
-        self.show()
-
-        r_labels = [i for i in self.findChildren(RightLabel)]
+        r_labels = [i for i in self.findChildren(Selectable)]
         resol_label = r_labels[6]
         full_src_label = r_labels[3]
         full_src = full_src_label.text().strip().replace("\n", "")
         
-        resol_task = ResolTask(full_src=full_src)
+        resol_task = SingleImgInfo(self.full_src)
         resol_task.signals_.finished_resol.connect(
             lambda resol: self.finished_resol_task(wid=resol_label, resol=resol)
         )
         UThreadPool.start(resol_task)
 
-    def finished_resol_task(self, wid: RightLabel, resol: str):
+        self.finished_.emit()
+
+    def finished_resol_task(self, wid: Selectable, resol: str):
         wid.setText(resol)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

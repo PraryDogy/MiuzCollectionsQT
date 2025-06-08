@@ -21,16 +21,11 @@ from .win_smb import WinSmb
 class OpenWins:
 
     @classmethod
-    def info_db(cls, parent_: QMainWindow, short_src: str, coll_folder: str):
-
-        if not isinstance(parent_, QMainWindow):
-            raise TypeError
-
-        WinInfo(
-            parent=parent_,
-            short_src=short_src,
-            coll_folder=coll_folder
-        )
+    def info_db(cls, parent_: QMainWindow, full_src: str):
+        win = WinInfo(full_src)
+        win.adjustSize()
+        win.center_relative_parent(parent_)
+        win.show()
 
     @classmethod
     def smb(cls, parent_: QMainWindow):
@@ -68,7 +63,7 @@ class ScanerRestart(QAction):
         QTimer.singleShot(5000, Scaner.start)
 
 
-class OpenInfoDb(QAction):
+class OpenInfoWin(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
         super().__init__(parent=parent, text=Lang.info)
         self.parent_ = parent
@@ -81,14 +76,19 @@ class OpenInfoDb(QAction):
         coll_folder = MainFolder.current.get_current_path()
         
         if coll_folder:
-            OpenWins.info_db(
-                parent_=self.win_,
-                short_src=self.short_src,
-                coll_folder=coll_folder    
-            )
+            full_src = Utils.get_full_src(coll_folder, self.short_src)
+            self.win = WinInfo(full_src)
+            self.win.finished_.connect(self.open_delayed)
         else:
-            OpenWins.smb(parent_=self.win_)
+            self.win = WinSmb()
+            self.win.adjustSize()
+            self.win.center_relative_parent(self.win_)
+            self.win.show()
 
+    def open_delayed(self):
+        self.win.adjustSize()
+        self.win.center_relative_parent(self.win_)
+        self.win.show()
 
 class CopyPath(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):

@@ -16,7 +16,7 @@ from signals import SignalsApp
 from utils.utils import Utils
 
 from .._runnable import UThreadPool
-from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, OpenInfoDb,
+from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, OpenInfoWin,
                        OpenInView, OpenWins, RemoveFiles, Reveal, Save,
                        ScanerRestart)
 from ..win_remove_files import RemoveFilesWin
@@ -400,10 +400,10 @@ class Grid(QScrollArea):
                 coll_folder = MainFolder.current.get_current_path()
 
                 if coll_folder:
+                    full_src = Utils.get_full_src(coll_folder, wid.short_src)
                     OpenWins.info_db(
                         parent_=self.window(), 
                         short_src=wid.short_src,
-                        coll_folder=coll_folder
                         )
 
                 else:
@@ -604,7 +604,7 @@ class Grid(QScrollArea):
             view._clicked.connect(cmd_)
             self.menu_.addAction(view)
 
-            info = OpenInfoDb(
+            info = OpenInfoWin(
                 parent=self.menu_,
                 win=self.window(),
                 short_src=clicked_wid.short_src
