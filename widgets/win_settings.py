@@ -231,6 +231,11 @@ class BaseListWidget(QListWidget):
             del_item.triggered.connect(self.del_item_cmd)
             menu.addAction(del_item)
 
+            copy_text = QAction(parent=menu, text=Lang.copy)
+            cmd = lambda: Utils.copy_text(wid.text())
+            copy_text.triggered.connect(cmd)
+            menu.addAction(copy_text)
+
         menu.show_menu()
 
     def mouseReleaseEvent(self, e):
