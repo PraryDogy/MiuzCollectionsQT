@@ -46,8 +46,8 @@ class ScanerRestart(QAction):
         QTimer.singleShot(5000, Scaner.start)
 
 
-class OpenInfoWin(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, urls: str | list[str]):
+class WinInfoAction(QAction):
+    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
         super().__init__(parent=parent, text=Lang.info)
         self.parent_ = parent
         self.win_ = win
@@ -58,15 +58,11 @@ class OpenInfoWin(QAction):
         MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
-            if len(self.urls) == 1:
-                full_src = Utils.get_full_src(coll_folder, self.urls[0])
-            else:
-                full_src = [
+            self.urls = [
                     Utils.get_full_src(coll_folder, i)
                     for i in self.urls
-                ]
-
-            self.win = WinInfo(full_src)
+            ]
+            self.win = WinInfo(self.urls)
             self.win.finished_.connect(self.open_delayed)
         else:
             self.win = WinSmb()

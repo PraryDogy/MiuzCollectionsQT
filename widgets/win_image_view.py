@@ -17,7 +17,7 @@ from main_folders import MainFolder
 from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
-from .actions import CopyName, CopyPath, FavActionDb, OpenInfoWin, Reveal, Save
+from .actions import CopyName, CopyPath, FavActionDb, WinInfoAction, Reveal, Save
 from .grid.cell_widgets import Thumbnail
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -494,7 +494,8 @@ class WinImageView(WinChild):
             coll_folder = MainFolder.current.get_current_path()
             if coll_folder:
                 full_src = Utils.get_full_src(coll_folder, self.short_src)
-                self.info_win = WinInfo(full_src)
+                urls = [full_src]
+                self.info_win = WinInfo(urls)
                 self.info_win.finished_.connect(self.open_info_win_delayed)
             else:
                 self.open_smb_win()
@@ -504,11 +505,12 @@ class WinImageView(WinChild):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
         self.menu_ = ContextCustom(event=ev)
+        urls = [self.short_src]
 
-        info = OpenInfoWin(
+        info = WinInfoAction(
             parent=self.menu_,
             win=self,
-            urls=self.short_src
+            urls=urls
         )
         self.menu_.addAction(info)
 

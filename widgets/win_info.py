@@ -66,27 +66,27 @@ class WorkerSignals(QObject):
 
 
 class SingleImgInfo(URunnable):
-    def __init__(self, full_src: str):
+    def __init__(self, url: str):
         super().__init__()
-        self.full_src = full_src
+        self.url = url
         self.signals_ = WorkerSignals()
 
     def task(self):
         coll_folder = MainFolder.current.current_path
         try:
-            name = os.path.basename(self.full_src)
+            name = os.path.basename(self.url)
             _, type_ = os.path.splitext(name)
-            stats = os.stat(self.full_src)
+            stats = os.stat(self.url)
             size = Utils.get_f_size(stats.st_size)
             mod = Utils.get_f_date(stats.st_mtime)
-            coll = Utils.get_coll_name(coll_folder, self.full_src)
-            full_hash = Utils.create_full_hash(self.full_src)
+            coll = Utils.get_coll_name(coll_folder, self.url)
+            full_hash = Utils.create_full_hash(self.url)
 
             res = {
                 Lang.file_name: self.lined_text(name),
                 Lang.type_: type_,
                 Lang.file_size: size,
-                Lang.place: self.lined_text(self.full_src),
+                Lang.place: self.lined_text(self.url),
                 Lang.hash_path: self.lined_text(full_hash),
                 Lang.changed: mod,
                 Lang.collection: self.lined_text(coll),
@@ -95,16 +95,16 @@ class SingleImgInfo(URunnable):
             
             self.signals_.finished_.emit(res)
 
-            res = self.get_img_resol(self.full_src)
+            res = self.get_img_resol(self.url)
             if res:
                 self.signals_.delayed_info.emit(res)
         
         except Exception as e:
             Utils.print_error(e)
             res = {
-                Lang.file_name: self.lined_text(os.path.basename(self.full_src)),
-                Lang.place: self.lined_text(self.full_src),
-                Lang.type_: self.lined_text(os.path.splitext(self.full_src)[0])
+                Lang.file_name: self.lined_text(os.path.basename(self.url)),
+                Lang.place: self.lined_text(self.url),
+                Lang.type_: self.lined_text(os.path.splitext(self.url)[0])
                 }
             self.signals_.finished_.emit(res)
    
@@ -153,10 +153,10 @@ class MultipleImgInfo(URunnable):
 class WinInfo(WinSystem):
     finished_ = pyqtSignal()
 
-    def __init__(self, full_src: str | list[str]):
+    def __init__(self, urls: list[str]):
         super().__init__()
         self.setWindowTitle(Lang.info)
-        self.full_src = full_src
+        self.urls = urls
 
         wid = QWidget()
         self.central_layout.addWidget(wid)
@@ -166,8 +166,8 @@ class WinInfo(WinSystem):
         self.grid_lay.setContentsMargins(0, 0, 0, 0)
         wid.setLayout(self.grid_lay)
 
-        if isinstance(self.full_src, str):
-            if os.path.isfile(self.full_src):
+        if len(self.urls) == 1:
+            if os.path.isfile(self.urls[0]):
                 self.single_img()
             else:
                 print("info dir")
@@ -175,12 +175,12 @@ class WinInfo(WinSystem):
             self.multiple_img()
 
     def single_img(self):
-        self.task_ = SingleImgInfo(self.full_src)
+        self.task_ = SingleImgInfo(self.urls[0])
         self.task_.signals_.finished_.connect(lambda data: self.single_img_fin(data))
         UThreadPool.start(self.task_)
 
     def multiple_img(self):
-        self.task_ = MultipleImgInfo(self.full_src)
+        self.task_ = MultipleImgInfo(self.urls)
         self.task_.signals_.finished_.connect(lambda data: self.multiple_img_fin(data))
         UThreadPool.start(self.task_)
 
