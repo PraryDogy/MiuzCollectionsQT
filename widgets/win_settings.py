@@ -15,7 +15,6 @@ from cfg import JsonData, Static
 from lang import Lang
 from main_folders import MainFolder
 from paletes import ThemeChanger
-from utils.updater import Updater
 from utils.utils import Utils
 
 from ._runnable import UThreadPool
@@ -103,14 +102,6 @@ class SimpleSettings(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.updater_btn = QPushButton(text=Lang.download_update)
-        self.updater_btn.setFixedWidth(115)
-        self.updater_btn.clicked.connect(self.updater_btn_cmd)
-        first_row_lay.addWidget(self.updater_btn)
-
-        self.descr = QLabel(text=Lang.update_descr)
-        first_row_lay.addWidget(self.descr)
-
         sec_row_wid = QWidget()
         v_lay.addWidget(sec_row_wid)
         sec_row_lay = LayoutHor()
@@ -130,24 +121,6 @@ class SimpleSettings(QGroupBox):
             subprocess.Popen(["open", Static.APP_SUPPORT_DIR])
         except Exception as e:
             print(e)
-
-    def updater_btn_cmd(self, *args):
-        self.task = Updater()
-        self.updater_btn.setText(Lang.wait_update)
-        self.task.signals_.no_connection.connect(self.updater_btn_smb)
-        self.task.signals_.finished_.connect(self.updater_btn_cmd_fin)
-        UThreadPool.start(self.task)
-
-    def updater_btn_cmd_fin(self):
-        self.updater_btn.setText(Lang.download_update)
-
-    def updater_btn_smb(self):
-        cmd_ = lambda: self.updater_btn.setText(Lang.download_update)
-        QTimer.singleShot(1000, cmd_)
-        self.smb_win = WinSmb()
-        self.smb_win.adjustSize()
-        self.smb_win.center_relative_parent(self.window())
-        self.smb_win.show()
 
 
 class AddItemWindow(WinSystem):

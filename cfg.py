@@ -209,13 +209,6 @@ class JsonData:
     # как часто utils > scaner будет просматривать collfolders на изменения
     scaner_minutes: int = 5
     
-    udpdate_file_paths_ = [
-        '/Volumes/Shares/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
-        '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
-        '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
-        '/Volumes/Shares-3/Studio/MIUZ/Photo/Art/Raw/2024/soft/Collections.zip',
-        ]
-    
     # при чтении json файла происходит проверка: если в json файле
     # есть аттрибут, которого нет в JsonData, то он будет удален
     # а нам нужно, чтобы main_folders из файла main_folders
