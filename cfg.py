@@ -225,11 +225,9 @@ class Static:
         {SOLID_STYLE}
     """
 
-
     # папка со всеми CVG
     IMAGES = "images"
     CACHED_IMAGES_COUNT = 50
-    IMAGES_GRID_SPACING = 2
 
 
 class JsonData:

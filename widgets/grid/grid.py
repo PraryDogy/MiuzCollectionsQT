@@ -195,7 +195,7 @@ class Grid(QScrollArea):
 
         grid_lay = QGridLayout()
         grid_lay.setContentsMargins(0, 0, 0, 40)
-        grid_lay.setSpacing(Static.IMAGES_GRID_SPACING)
+        grid_lay.setSpacing(2)
         grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         grid_wid.setLayout(grid_lay)
 
