@@ -168,7 +168,7 @@ class RightDateWidget(DatesWid):
 
 
 class WinDates(WinSystem):
-    date_wid_width = 200
+    date_wid_width = 150
 
     def __init__(self):
         super().__init__()
