@@ -80,6 +80,12 @@ class UpBtn(QFrame):
         return super().mouseReleaseEvent(a0)
     
 
+class GridWidget(QWidget):
+    def __init__(self, name: str):
+        super().__init__()
+        self.name = name
+
+
 class Grid(QScrollArea):
     def __init__(self):
         super().__init__()
@@ -185,11 +191,10 @@ class Grid(QScrollArea):
             self.scroll_layout.addWidget(spacer)
 
     def single_grid(self, date: str, db_images: list[DbImage]):
-
-        title = Title(title=date, db_images=db_images)
+        title = Title(date)
         self.scroll_layout.addWidget(title)
 
-        grid_wid = QWidget()
+        grid_wid = GridWidget(date)
         self.scroll_layout.addWidget(grid_wid)
         self.grid_widgets.append(grid_wid)
 

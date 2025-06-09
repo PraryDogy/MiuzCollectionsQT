@@ -27,14 +27,9 @@ class Title(QLabel, CellWid):
         border: {Static.border_transparent};
     """
 
-    def __init__(self, title: str, db_images: list[DbImage]):
+    def __init__(self, title: str):
         CellWid.__init__(self)
-        QLabel.__init__(
-            self,
-            text=title
-        )
-        self.db_images = db_images
-
+        QLabel.__init__(self, text=title)
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Preferred
