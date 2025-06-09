@@ -41,7 +41,6 @@ class DatesLineEdit(ULineEdit):
 
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(150)
         self.setPlaceholderText(Lang.d_m_y)
         self.textChanged.connect(self.onTextChanged)
         self.date = None
@@ -96,13 +95,12 @@ class DatesTitle(QLabel):
         self.default_text = default_text
 
         super().__init__(self.default_text)
-        self.setFixedWidth(150)
 
     def set_named_date_text(self, date: datetime):
-        weekday = self.get_named_weekday(date).capitalize()
+        weekday = self.get_named_weekday(date)
         named_date = self.get_named_date(date)
-
-        self.setText(f"{weekday}:\n{named_date}")
+        text = f"{named_date}, {weekday}"
+        self.setText(text)
 
     def set_default_text(self):
         self.setText(self.default_text)
@@ -120,7 +118,7 @@ class DatesTitle(QLabel):
 class DatesWid(QWidget):
     dateChangedSignal = pyqtSignal()
 
-    def __init__(self, title_label_text):
+    def __init__(self, title_label_text: str):
         super().__init__()
 
         v_lay = LayoutVer()
@@ -153,7 +151,8 @@ class DatesWid(QWidget):
 
 class LeftDateWidget(DatesWid):
     def __init__(self):
-        super().__init__(f"{Lang.weekday_}\n{Lang.start_date}")
+        text = Lang.start_date
+        super().__init__(text)
 
         if Dynamic.date_start:
             self.input.setText(DatesTools.date_to_text(Dynamic.date_start))
@@ -161,13 +160,16 @@ class LeftDateWidget(DatesWid):
 
 class RightDateWidget(DatesWid):
     def __init__(self):
-        super().__init__(f"{Lang.weekday_}\n{Lang.end_date}")
+        text = Lang.end_date
+        super().__init__(text)
 
         if Dynamic.date_end:
             self.input.setText(DatesTools.date_to_text(Dynamic.date_end))
 
 
 class WinDates(WinSystem):
+    date_wid_width = 200
+
     def __init__(self):
         super().__init__()
 
@@ -189,11 +191,13 @@ class WinDates(WinSystem):
 
         left_cmd = lambda: self.date_change(flag="start")
         self.left_date_wid = LeftDateWidget()
+        self.left_date_wid.setFixedWidth(self.date_wid_width)
         self.left_date_wid.dateChangedSignal.connect(left_cmd)
         dates_h_lay.addWidget(self.left_date_wid)
 
         right_cmd = lambda: self.date_change(flag="end")
         self.right_date_wid = RightDateWidget()
+        self.right_date_wid.setFixedWidth(self.date_wid_width)
         self.right_date_wid.dateChangedSignal.connect(right_cmd)
         dates_h_lay.addWidget(self.right_date_wid)
 
