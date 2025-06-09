@@ -107,7 +107,7 @@ class DatesTitle(QLabel):
 
     def get_named_weekday(self, date: datetime) -> str:
         day_number = str(date.weekday())
-        return Lang.weekdays[day_number]
+        return Lang.weekdays_short[day_number]
     
     def get_named_date(self, date: datetime) -> str:
         month_number = str(date.month)

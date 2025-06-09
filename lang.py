@@ -369,6 +369,27 @@ class Lang_:
             "6": "sunday"
         }
     ]
+    weekdays_short = [
+        {
+            "0": "пн",
+            "1": "вт",
+            "2": "ср",
+            "3": "чт",
+            "4": "пт",
+            "5": "сб",
+            "6": "вс"
+        },
+        {
+            "0": "mon",
+            "1": "tue",
+            "2": "wed",
+            "3": "thu",
+            "4": "fri",
+            "5": "sat",
+            "6": "sun"
+        }
+    ]
+
     where_to_look_coll_folder = [
         "Расположение коллекций",
         "Collection locations"
