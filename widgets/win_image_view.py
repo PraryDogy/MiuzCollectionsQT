@@ -5,7 +5,8 @@ from typing import Literal
 import sqlalchemy
 from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import (QColor, QContextMenuEvent, QKeyEvent, QMouseEvent,
-                         QPainter, QPaintEvent, QPixmap, QResizeEvent)
+                         QPainter, QPaintEvent, QPixmap, QPixmapCache,
+                         QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
@@ -17,7 +18,8 @@ from main_folders import MainFolder
 from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
-from .actions import CopyName, CopyPath, FavActionDb, WinInfoAction, Reveal, Save
+from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
+                      WinInfoAction)
 from .grid.cell_widgets import Thumbnail
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -128,6 +130,12 @@ class LoadImage(URunnable):
             self.signals_.finished_.emit(image_data)
         except RuntimeError:
             ...
+
+        # === очищаем ссылки
+        del self.pixmap
+        self.signals_ = None
+        gc.collect()
+        QPixmapCache.clear()
 
 
 class ImageWidget(QLabel):
@@ -343,9 +351,9 @@ class WinImageView(WinChild):
 
     def load_image(self):
         self.task_count += 1
-        cmd_ = lambda data: self.load_image_fin(data=data, full_src=self.full_src)
+        cmd_ = lambda data: self.load_image_fin(data, self.full_src)
 
-        img_thread = LoadImage(full_src=self.full_src)
+        img_thread = LoadImage(self.full_src)
         img_thread.signals_.finished_.connect(cmd_)
         UThreadPool.start(img_thread)
 
@@ -589,3 +597,7 @@ class WinImageView(WinChild):
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.hide_all_buttons()
         return super().leaveEvent(a0)
+
+    def closeEvent(self, a0):
+        LoadImage.images.clear()
+        return super().closeEvent(a0)
