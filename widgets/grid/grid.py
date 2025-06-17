@@ -268,6 +268,7 @@ class Grid(QScrollArea):
             is_selection = True
 
         self.win_image_view = WinImageView(wid.short_src, path_to_wid, is_selection)
+        self.win_image_view.closed_.connect(lambda: gc.collect())
         self.win_image_view.center_relative_parent(self.window())
 
         self.win_image_view.switch_image_sig.connect(

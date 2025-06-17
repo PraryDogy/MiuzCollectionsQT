@@ -599,10 +599,12 @@ class WinImageView(WinChild):
         self.cached_images.clear()
         QPixmapCache.clear()
         gc.collect()
+        self.closed_.emit()
         return super().closeEvent(a0)
     
     def deleteLater(self):
         self.cached_images.clear()
         QPixmapCache.clear()
         gc.collect()
+        self.closed_.emit()
         return super().deleteLater()
