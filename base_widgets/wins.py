@@ -39,10 +39,16 @@ class WinFrameless(QMainWindow):
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:
             Manager.wins.remove(self)
-            self.deleteLater()
         except Exception as e:
             pass
         return super().closeEvent(a0)
+    
+    def deleteLater(self):
+        try:
+            Manager.wins.remove(self)
+        except Exception as e:
+            pass
+        return super().deleteLater()
 
 
 class WinSystem(WinFrameless):
