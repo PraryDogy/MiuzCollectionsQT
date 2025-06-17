@@ -181,3 +181,7 @@ class WinDownloads(WinSystem):
     def closeEvent(self, a0):
         self.closed.emit()
         return super().closeEvent(a0)
+    
+    def deleteLater(self):
+        self.closed.emit()
+        return super().deleteLater()

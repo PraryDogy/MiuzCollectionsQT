@@ -1,10 +1,9 @@
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QCloseEvent, QContextMenuEvent
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QMenu
 
 
 class ContextCustom(QMenu):
-    closed = pyqtSignal()
 
     def __init__(self, event: QContextMenuEvent):
         self.ev = event
@@ -12,10 +11,6 @@ class ContextCustom(QMenu):
 
     def show_menu(self):
         self.exec_(self.ev.globalPos())
-
-    def closeEvent(self, a0: QCloseEvent | None) -> None:
-        self.closed.emit()
-        return super().closeEvent(a0)
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.RightButton:
