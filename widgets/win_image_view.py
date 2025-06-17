@@ -100,17 +100,11 @@ class LoadImage(URunnable):
     def task(self):
 
         if self.full_src not in self.cached_images:
-        
             img = Utils.read_image(self.full_src)
-
             if img is not None:
                 img = Utils.desaturate_image(image=img, factor=0.2)
                 self.pixmap = Utils.pixmap_from_array(img)
                 self.cached_images[self.full_src] = self.pixmap
-            
-            del img
-            gc.collect()
-
         else:
             self.pixmap = self.cached_images.get(self.full_src)
 
