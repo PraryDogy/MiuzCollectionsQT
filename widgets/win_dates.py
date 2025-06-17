@@ -288,18 +288,18 @@ class WinDates(WinSystem):
             self.reset_dates()
 
         DatesTools.solid_or_normal_style()
-        self.close()
+        self.deleteLater()
 
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
     def cancel_cmd(self, *args):
         DatesTools.solid_or_normal_style()
-        self.close()
+        self.deleteLater()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
             DatesTools.solid_or_normal_style()
-            self.close()
+            self.deleteLater()
 
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd(a0)

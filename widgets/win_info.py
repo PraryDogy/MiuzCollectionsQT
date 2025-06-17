@@ -238,4 +238,4 @@ class WinInfo(WinSystem):
         return super().keyPressEvent(a0)
   
     def close_(self, *args):
-        self.close()
+        self.deleteLater()

@@ -227,7 +227,7 @@ class BarBottom(QWidget):
 
     def close_downloads_win(self):
         try:
-            self.downloads_win.close()
+            self.downloads_win.deleteLater()
         except Exception:
             ...
         self.downloads_win = None

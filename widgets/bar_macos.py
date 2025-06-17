@@ -69,7 +69,7 @@ class AboutWin(WinSystem):
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):
-            self.close()
+            self.deleteLater()
 
 
 class BarMacos(QMenuBar):

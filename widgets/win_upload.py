@@ -186,7 +186,7 @@ class WinUpload(WinSystem):
         thread_ = CopyFiles(dest, full_src)
         thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
         UThreadPool.start(thread_)
-        self.close()
+        self.deleteLater()
 
     def copy_finished(self, urls: list[str]):
         self.update_task = DbUpdaterFast(urls)
@@ -194,5 +194,5 @@ class WinUpload(WinSystem):
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
-            self.close()
+            self.deleteLater()
         return super().keyPressEvent(a0)

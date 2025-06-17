@@ -155,11 +155,11 @@ class AddItemWindow(WinSystem):
         text = self.text_edit.text().replace("\n", "").strip()
         if text:
             self.clicked_.emit(text)
-            self.close()
+            self.deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
-            self.close()
+            self.deleteLater()
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd()
         return super().keyPressEvent(a0)
@@ -409,11 +409,11 @@ class AddMainFolderWin(WinSystem):
             )
 
             self.ok_pressed.emit(new_main_folder)
-            self.close()
+            self.deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
-            self.close()
+            self.deleteLater()
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd()
         return super().keyPressEvent(a0)
@@ -473,12 +473,12 @@ class RemoveWin(WinSystem):
             for main_folder in MainFolder.list_:
                 if main_folder.name == text:
                     self.ok_pressed.emit(text)
-                    self.close()
+                    self.deleteLater()
                     break
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
-            self.close()
+            self.deleteLater()
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd()
         return super().keyPressEvent(a0)
@@ -878,7 +878,7 @@ class WinSettings(WinSystem):
             QApplication.quit()
             Utils.start_new_app()
 
-        self.close()
+        self.deleteLater()
 
     def new_row_list(self, wid: CustomTextEdit) -> list[str]:
         return[
@@ -889,7 +889,7 @@ class WinSettings(WinSystem):
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
-            self.close()
+            self.deleteLater()
 
         elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_cmd(a0)

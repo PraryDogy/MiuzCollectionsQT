@@ -306,7 +306,7 @@ class WinImageView(WinChild):
         self.zoom_btns.zoom_fit.mouseReleaseEvent = (
             lambda e: self.image_label.zoom_reset()
         )
-        self.zoom_btns.zoom_close.mouseReleaseEvent = self.close_
+        self.zoom_btns.zoom_close.mouseReleaseEvent = lambda e: self.deleteLater()
 
         self.hide_all_buttons()
         QTimer.singleShot(100, self.first_load)
@@ -360,11 +360,6 @@ class WinImageView(WinChild):
                 self.image_label.set_image(data.pixmap)
             except RuntimeError:
                 ...
-
-    def close_(self, *args):
-        LoadImage.images.clear()
-        self.close()
-
 
 # GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
 
@@ -467,6 +462,10 @@ class WinImageView(WinChild):
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
+    def deleteLater(self):
+        LoadImage.images.clear()
+        return super().deleteLater()
+
     def keyPressEvent(self, ev: QKeyEvent | None) -> None:
         if ev.key() == Qt.Key.Key_Left:
             self.switch_image(-1)
@@ -479,7 +478,7 @@ class WinImageView(WinChild):
                 self.showNormal()
                 self.raise_()
             else:
-                self.close_(ev)
+                self.deleteLater(ev)
 
         elif ev.key() == Qt.Key.Key_Equal:
             self.image_label.zoom_in()
