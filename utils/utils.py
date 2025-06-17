@@ -59,29 +59,6 @@ class Err:
 
 
 class ReadImage:
-    read_any_dict = {}
-
-    @classmethod
-    def init_read_dict(cls, cfg: Static):
-        """
-        В Static должны содержаться данные о расширениях
-        """
-        for ext in cfg.ext_psd:
-            cls.read_any_dict[ext] = cls.read_psb
-        for ext in cfg.ext_tiff:
-            cls.read_any_dict[ext] = cls.read_tiff
-        for ext in cfg.ext_raw:
-            cls.read_any_dict[ext] = cls.read_raw
-        for ext in cfg.ext_jpeg:
-            cls.read_any_dict[ext] = cls.read_jpg
-        for ext in cfg.ext_png:
-            cls.read_any_dict[ext] = cls.read_png
-        for ext in cfg.ext_video:
-            cls.read_any_dict[ext] = cls.read_movie
-
-        for i in cfg.ext_all:
-            if i not in ReadImage.read_any_dict:
-                raise Exception (f"utils > ReadImage > init_read_dict: не инициирован {i}")
 
     @classmethod
     def read_tiff(cls, path: str) -> np.ndarray | None:
@@ -150,6 +127,7 @@ class ReadImage:
             img = img.convert("RGB")
             array_img = np.array(img)
             img.close()
+
             return array_img
         except Exception as e:
             Err.print_error(e)
@@ -219,7 +197,26 @@ class ReadImage:
         _, ext = os.path.splitext(path)
         ext = ext.lower()
 
-        fn = ReadImage.read_any_dict.get(ext)
+        read_any_dict: dict[str, callable] = {}
+
+        for i in Static.ext_psd:
+            read_any_dict[i] = cls.read_psb
+        for i in Static.ext_tiff:
+            read_any_dict[i] = cls.read_tiff
+        for i in Static.ext_raw:
+            read_any_dict[i] = cls.read_raw
+        for i in Static.ext_jpeg:
+            read_any_dict[i] = cls.read_jpg
+        for i in Static.ext_png:
+            read_any_dict[i] = cls.read_png
+        for i in Static.ext_video:
+            read_any_dict[i] = cls.read_movie
+
+        for i in Static.ext_all:
+            if i not in read_any_dict:
+                raise Exception (f"utils > ReadImage > init_read_dict: не инициирован {i}")
+
+        fn = read_any_dict.get(ext)
 
         if fn:
             cls.read_any = fn
