@@ -273,7 +273,6 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinChild):
-    cached_images: dict[str, QPixmap] = {}
     task_count_limit = 10
     switch_image_sig = pyqtSignal(object)
     closed_ = pyqtSignal()
@@ -281,6 +280,7 @@ class WinImageView(WinChild):
     def __init__(self, short_src: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
 
+        self.cached_images: dict[str, QPixmap] = {}
         self.is_selection = is_selection
         self.path_to_wid = path_to_wid
         self.short_src_list = list(path_to_wid.keys())
