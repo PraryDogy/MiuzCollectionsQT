@@ -89,37 +89,37 @@ class LoadThumb(URunnable):
 
 
 class LoadImage(URunnable):
-    images: dict[str, QPixmap] = {}
     max_images_count = 50
 
-    def __init__(self, full_src: str):
+    def __init__(self, full_src: str, cached_images: dict[str, QPixmap]):
         super().__init__()
         self.signals_ = WorkerSignals()
         self.full_src = full_src
+        self.cached_images = cached_images
 
     def task(self):
 
-        if self.full_src not in LoadImage.images:
+        if self.full_src not in self.cached_images:
         
             img = Utils.read_image(self.full_src)
 
             if img is not None:
                 img = Utils.desaturate_image(image=img, factor=0.2)
                 self.pixmap = Utils.pixmap_from_array(img)
-                LoadImage.images[self.full_src] = self.pixmap
+                self.cached_images[self.full_src] = self.pixmap
             
             del img
             gc.collect()
 
         else:
-            self.pixmap = LoadImage.images.get(self.full_src)
+            self.pixmap = self.cached_images.get(self.full_src)
 
         if not hasattr(self, "pixmap"):
             print("не могу загрузить крупное изображение")
             self.pixmap = QPixmap(0, 0)
 
-        if len(LoadImage.images) > self.max_images_count:
-            LoadImage.images.pop(next(iter(LoadImage.images)))
+        if len(self.cached_images) > self.max_images_count:
+            self.cached_images.pop(next(iter(self.cached_images)))
 
         image_data = ImageData(
             src=self.full_src,
@@ -273,6 +273,7 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(WinChild):
+    cached_images: dict[str, QPixmap] = {}
     task_count_limit = 10
     switch_image_sig = pyqtSignal(object)
     closed_ = pyqtSignal()
@@ -353,7 +354,7 @@ class WinImageView(WinChild):
         self.task_count += 1
         cmd_ = lambda data: self.load_image_fin(data, self.full_src)
 
-        img_thread = LoadImage(self.full_src)
+        img_thread = LoadImage(self.full_src, self.cached_images)
         img_thread.signals_.finished_.connect(cmd_)
         UThreadPool.start(img_thread)
 
@@ -470,10 +471,6 @@ class WinImageView(WinChild):
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
-    def deleteLater(self):
-        LoadImage.images.clear()
-        return super().deleteLater()
-
     def keyPressEvent(self, ev: QKeyEvent | None) -> None:
         if ev.key() == Qt.Key.Key_Left:
             self.switch_image(-1)
@@ -486,7 +483,7 @@ class WinImageView(WinChild):
                 self.showNormal()
                 self.raise_()
             else:
-                self.deleteLater(ev)
+                self.deleteLater()
 
         elif ev.key() == Qt.Key.Key_Equal:
             self.image_label.zoom_in()
@@ -599,5 +596,13 @@ class WinImageView(WinChild):
         return super().leaveEvent(a0)
 
     def closeEvent(self, a0):
-        LoadImage.images.clear()
+        self.cached_images.clear()
+        QPixmapCache.clear()
+        gc.collect()
         return super().closeEvent(a0)
+    
+    def deleteLater(self):
+        self.cached_images.clear()
+        QPixmapCache.clear()
+        gc.collect()
+        return super().deleteLater()
