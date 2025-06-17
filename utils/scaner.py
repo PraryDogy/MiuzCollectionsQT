@@ -1,7 +1,7 @@
 import gc
 import os
 from time import sleep
-
+import gc
 import sqlalchemy
 import sqlalchemy.exc
 from numpy import ndarray
@@ -166,6 +166,7 @@ class DbImages:
         # не забываем относительный путь к изображению преобразовать в полный
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
+        
         conn.close()
         coll_folder = self.main_folder.get_current_path()
 
@@ -536,6 +537,7 @@ class ScanerThread(URunnable):
         MainFolderRemover.run()
         finder_images = FinderImages(main_folder)
         finder_images = finder_images.run()
+        gc.collect()
 
         if finder_images is not None:
         
