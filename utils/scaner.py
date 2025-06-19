@@ -457,7 +457,6 @@ class UpdateDbTask(URunnable):
             new_records = self.new_records()
             db_updater = DbUpdater(exist_records, new_records, MainFolder.current)
             db_updater.run()
-
             SignalsApp.instance.menu_left_cmd.emit("reload")
             SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 

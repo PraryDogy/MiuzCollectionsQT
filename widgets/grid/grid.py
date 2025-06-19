@@ -159,6 +159,7 @@ class Grid(QScrollArea):
         for wid in widgets:
             wid.deleteLater()
 
+        self.reload_rubber()
         self.up_btn = UpBtn(self.scroll_wid)
         self.up_btn.hide()
 
