@@ -114,6 +114,7 @@ class Dbase:
 
         conn.close()
 
+    @classmethod
     def get_exist_records(cls, urls: list[str]) -> list[str]:
         """
         urls: список из short_src   
@@ -125,9 +126,34 @@ class Dbase:
         for i in urls:
             q = sqlalchemy.select(THUMBS)
             q = q.where(THUMBS.c.short_src == i)
-            res = conn.execute(q).scalar or None
+            res = conn.execute(q).scalar() or None
             if res:
                 new_urls.append(i)
         
         conn.close()
         return new_urls
+    
+    @classmethod
+    def remove_records(cls, urls: list[str]) -> None:
+        """
+        urls: список из short_src   
+        """
+        conn = cls.engine.connect()
+        for i in urls:
+            q = sqlalchemy.delete(THUMBS)
+            q = q.where(THUMBS.c.short_src == i)
+
+            try:
+                conn.execute(q)
+            except Exception as e:
+                Utils.print_error(e)
+                conn.rollback()
+                continue
+        
+        try:
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            Utils.print_error(e)
+
+        conn.close()

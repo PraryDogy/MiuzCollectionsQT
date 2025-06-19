@@ -1,7 +1,7 @@
 import os
 from typing import Literal
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import QObject, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
@@ -26,6 +26,30 @@ from .grid.grid import Grid
 from .menu_left import MenuLeft
 from .win_smb import WinSmb
 from .win_upload import WinUpload
+
+
+class Signals(QObject):
+    finished_ = pyqtSignal()
+
+
+class UpdateDbTask(URunnable):
+    def __init__(self, urls: list[str]):
+        super().__init__()
+        self.signals_ = Signals()
+        self.urls = urls
+
+    def task(self):
+        MainFolder.current.check_avaiability()
+        if MainFolder.current.get_current_path():
+            short_urls = [
+                Utils.get_short_src(MainFolder.current.get_current_path(), i)
+                for i in self.urls
+            ]
+            exist_records = Dbase.get_exist_records(short_urls)
+            Dbase.remove_records(exist_records)
+
+        # print(self.urls)
+        # print(exist_records)
 
 
 class TestWid(QFrame):
@@ -172,19 +196,14 @@ class WinMain(WinFrameless):
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
-    def upload_cmd(self, dest: str, urls: list[str]):
+    def upload_task_cmd(self, dest: str, urls: list[str]):
         thread_ = CopyFiles(dest, urls, False)
-        thread_.signals_.finished_.connect(lambda urls: self.upload_finished(urls))
+        thread_.signals_.finished_.connect(lambda urls: self.upload_task_finished(urls))
         UThreadPool.start(thread_)
 
-    def upload_finished(self, urls: list[str]):
-        MainFolder.check_avaiability()
-        if MainFolder.get_current_path():
-            short_urls = [
-                Utils.get_short_src()
-                for i in urls
-            ]
-            exist_records = Dbase.get_exist_records(urls)
+    def upload_task_finished(self, urls: list[str]):
+        self.upload_task = UpdateDbTask(urls)
+        UThreadPool.start(self.upload_task)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
@@ -239,7 +258,7 @@ class WinMain(WinFrameless):
         ]
 
         self.win_upload = WinUpload(urls)
-        self.win_upload.finished_.connect(lambda dest: self.upload_cmd(dest, urls))
+        self.win_upload.finished_.connect(lambda dest: self.upload_task_cmd(dest, urls))
         self.win_upload.center_relative_parent(self)
         self.win_upload.show()
 

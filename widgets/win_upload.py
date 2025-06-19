@@ -214,6 +214,7 @@ class WinUpload(WinSystem):
             dest = entry.path
 
         self.finished_.emit(dest)
+        self.deleteLater()
 
         # self.copy_files_cmd(dest=dest, full_src=self.urls)
 
