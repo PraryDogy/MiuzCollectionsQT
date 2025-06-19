@@ -13,8 +13,9 @@ from lang import Lang
 from main_folders import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
+from utils.copy_files import CopyFiles
 from utils.scaner import Scaner
-from widgets.win_upload import WinUpload
+from widgets._runnable import URunnable, UThreadPool
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -22,6 +23,7 @@ from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
 from .win_smb import WinSmb
+from .win_upload import WinUpload
 
 
 class TestWid(QFrame):
@@ -168,6 +170,11 @@ class WinMain(WinFrameless):
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
+    def copy_files_cmd(self, dest: str, urls: list[str]):
+        thread_ = CopyFiles(dest, urls, False)
+        thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
+        UThreadPool.start(thread_)
+
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
         a0.ignore()
@@ -221,6 +228,7 @@ class WinMain(WinFrameless):
         ]
 
         self.win_upload = WinUpload(urls)
+        self.win_upload.finished_.connect(lambda dest: self.copy_files_cmd(dest, urls))
         self.win_upload.center_relative_parent(self)
         self.win_upload.show()
 

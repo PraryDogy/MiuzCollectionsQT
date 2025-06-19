@@ -2,7 +2,7 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal, QObject
+from PyQt5.QtCore import QObject, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
 
 from base_widgets.layouts import LayoutHor
@@ -11,7 +11,6 @@ from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
-from utils.copy_files import CopyFiles
 from utils.scaner import DbUpdater
 from utils.utils import Utils
 
@@ -106,7 +105,7 @@ class DbUpdaterSetup(URunnable):
 
 class WinUpload(WinSystem):
     h_ = 30
-    finished_ = pyqtSignal()
+    finished_ = pyqtSignal(str)
 
     def __init__(self, urls: list[str], is_filemove: bool = False):
         super().__init__()
@@ -214,25 +213,27 @@ class WinUpload(WinSystem):
         else:
             dest = entry.path
 
-        self.copy_files_cmd(dest=dest, full_src=self.urls)
+        self.finished_.emit(dest)
 
-    def copy_files_cmd(self, dest: str, full_src: str | list):
-        thread_ = CopyFiles(dest, full_src, self.is_filemove)
-        thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
-        UThreadPool.start(thread_)
-        self.hide()
+        # self.copy_files_cmd(dest=dest, full_src=self.urls)
 
-    def copy_finished(self, urls: list[str]):
-        if self.is_filemove:
-            self.update_task = DbUpdaterSetup(urls, self.urls)
-        else:
-            self.update_task = DbUpdaterSetup(urls)
-        self.update_task.signals_.finished_.connect(self.db_updater_finished)
-        UThreadPool.start(self.update_task)
+    # def copy_files_cmd(self, dest: str, full_src: str | list):
+    #     thread_ = CopyFiles(dest, full_src, self.is_filemove)
+    #     thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
+    #     UThreadPool.start(thread_)
+    #     self.hide()
 
-    def db_updater_finished(self):
-        self.finished_.emit()
-        self.deleteLater()
+    # def copy_finished(self, urls: list[str]):
+    #     if self.is_filemove:
+    #         self.update_task = DbUpdaterSetup(urls, self.urls)
+    #     else:
+    #         self.update_task = DbUpdaterSetup(urls)
+    #     self.update_task.signals_.finished_.connect(self.db_updater_finished)
+    #     UThreadPool.start(self.update_task)
+
+    # def db_updater_finished(self):
+    #     self.finished_.emit()
+    #     self.deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
