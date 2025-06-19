@@ -12,6 +12,7 @@ from cfg import Static
 from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
+from utils.scaner import FileUpdater
 from utils.utils import Err, Utils
 
 from ._runnable import URunnable, UThreadPool
@@ -32,7 +33,7 @@ class RemoveFilesTask(URunnable):
 
     def task(self):
         try:
-            self.remove_from_db()
+            self.remove_thumbs()
             command = ["osascript", REMOVE_FILES_SCPT] + self.img_path_list
             subprocess.run(command)
         except Exception as e:
@@ -42,34 +43,41 @@ class RemoveFilesTask(URunnable):
         except RuntimeError as e:
             Err.print_error(e)
 
-    def remove_from_db(self):
+    def remove_thumbs(self):
         MainFolder.current.check_avaiability()
         main_folder_path = MainFolder.current.get_current_path()
-
-        if main_folder_path:
-            Dbase.create_engine()
-            conn = Dbase.engine.connect()
-            for i in self.img_path_list:
-                rel_img_path = Utils.get_rel_img_path(main_folder_path, i)
-                q = sqlalchemy.delete(THUMBS)
-                q = q.where(THUMBS.c.short_src == rel_img_path)
-                q = q.where(THUMBS.c.brand == MainFolder.current.name)
-
-                try:
-                    conn.execute(q)
-                except Exception as e:
-                    Utils.print_error(e)
-                    conn.rollback()
-                    continue
-        
+        if not main_folder_path:
+            return
+        Dbase.create_engine()
+        conn = Dbase.engine.connect()
+        for img_path in self.img_path_list:
+            thumb_path = Utils.create_thumb_path(img_path)
             try:
-                conn.commit()
+                os.remove(thumb_path)
+                parent = os.path.dirname(thumb_path)
+                if not os.listdir(parent):
+                    os.rmdir(parent)
+            except Exception as e:
+                Utils.print_error(e)
+                continue
+
+            rel_img_path = Utils.get_rel_img_path(main_folder_path, img_path)
+            q = sqlalchemy.delete(THUMBS)
+            q = q.where(THUMBS.c.short_src == rel_img_path)
+            q = q.where(THUMBS.c.brand == MainFolder.current.name)
+            try:
+                conn.execute(q)
             except Exception as e:
                 Utils.print_error(e)
                 conn.rollback()
+                continue
+        try:
+            conn.commit()
+        except Exception as e:
+            Utils.print_error(e)
+            conn.rollback()
 
-            conn.close()
-
+        conn.close()
 
 
 class RemoveFilesWin(WinSystem):
