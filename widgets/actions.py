@@ -314,5 +314,13 @@ class MoveFiles(QAction):
             self.upload_win.center_relative_parent(self.win_)
             self.upload_win.show()
 
-    def move_finished(self):
-        self.update_task = UpdateDbTask
+    def move_files_cmd(self, dest: str, urls: list[str]):
+        thread_ = CopyFiles(dest, urls, True)
+        thread_.signals_.finished_.connect(lambda urls: self.move_finished(urls))
+        UThreadPool.start(thread_)
+
+    def move_finished(self, urls: list[str]):
+        new_urls = urls
+        old_urls = self.url
+        self.update_task = UpdateDbTask(new_urls, old_urls)
+        UThreadPool.start(self.update_task)

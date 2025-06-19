@@ -19,7 +19,10 @@ class CopyFiles(URunnable):
     list_of_file_lists: list[list[str]] = []
 
     def __init__(self, dest: str, files: list, move_files: bool):
-        "files: list of FULL SRC "
+        """
+        если move_files установить на True, то исходные файлы будут удалены
+        по законам перемещения
+        """
         super().__init__()
         self.signals_ = WorkerSignals()
         self.signals_.stop.connect(self.stop_cmd)
