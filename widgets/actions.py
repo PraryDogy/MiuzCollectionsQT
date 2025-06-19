@@ -309,15 +309,10 @@ class MoveFiles(QAction):
                 for i in self.urls
             ]
 
-            self.upload_win = WinUpload(urls)
-            self.upload_win.finished_.connect(self.remove_old_files)
+            self.upload_win = WinUpload(urls, True)
+            self.upload_win.finished_.connect(self.move_finished)
             self.upload_win.center_relative_parent(self.win_)
             self.upload_win.show()
 
-    def remove_old_files(self):
-        self.remove_files_task = RemoveFilesTask(self.urls)
-        self.remove_files_task.signals_.finished_.connect(self.remove_finished)
-        UThreadPool.start(self.remove_files_task)
-
-    def remove_finished(self):
+    def move_finished(self):
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")

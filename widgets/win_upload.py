@@ -82,13 +82,14 @@ class WinUpload(WinSystem):
     h_ = 30
     finished_ = pyqtSignal()
 
-    def __init__(self, urls: list[str]):
+    def __init__(self, urls: list[str], is_filemove: bool = False):
         super().__init__()
         self.setWindowTitle(Lang.title_downloads)
         self.resize(Static.MENU_LEFT_WIDTH, Dynamic.root_g.get("ah"))
         self.current_submenu: QListWidget = None
         self.coll_path: str = None
         self.urls = urls
+        self.is_filemove = is_filemove
 
         self.h_wid = QWidget()
         self.central_layout.addWidget(self.h_wid)
@@ -190,7 +191,7 @@ class WinUpload(WinSystem):
         self.copy_files_cmd(dest=dest, full_src=self.urls)
 
     def copy_files_cmd(self, dest: str, full_src: str | list):
-        thread_ = CopyFiles(dest, full_src)
+        thread_ = CopyFiles(dest, full_src, self.is_filemove)
         thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
         UThreadPool.start(thread_)
         self.hide()

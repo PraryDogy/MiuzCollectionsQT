@@ -18,13 +18,14 @@ class CopyFiles(URunnable):
     current_threads: list["CopyFiles"] = []
     list_of_file_lists: list[list[str]] = []
 
-    def __init__(self, dest: str, files: list):
+    def __init__(self, dest: str, files: list, is_filemove: bool = False):
         "files: list of FULL SRC "
         super().__init__()
         self.signals_ = WorkerSignals()
         self.signals_.stop.connect(self.stop_cmd)
         self.files = files
         self.dest = dest
+        self.is_move = is_filemove
 
     def task(self):
 
@@ -61,6 +62,8 @@ class CopyFiles(URunnable):
                         copied_size += len(buf)
                         percent = int((copied_size / total_size) * 100)
                         self.signals_.value_changed.emit(percent)
+                if self.is_move:
+                    os.remove(file_path)
             except Exception as e:
                 Utils.print_error(e)
                 break
