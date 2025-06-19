@@ -24,7 +24,7 @@ class Dirs:
                     stack.append(i.path)
                     dirs.append(
                         (
-                            Utils.get_short_src(main_folder_path, i.path),
+                            Utils.get_short_img_path(main_folder_path, i.path),
                             int(i.stat().st_mtime)
                         )
                     )

@@ -50,7 +50,7 @@ class RemoveFilesTask(URunnable):
             Dbase.create_engine()
             conn = Dbase.engine.connect()
             for i in self.urls:
-                short_src = Utils.get_short_src(coll_folder, i)
+                short_src = Utils.get_short_img_path(coll_folder, i)
                 q = sqlalchemy.delete(THUMBS)
                 q = q.where(THUMBS.c.short_src == short_src)
                 q = q.where(THUMBS.c.brand == MainFolder.current.name)

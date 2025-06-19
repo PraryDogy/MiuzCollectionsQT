@@ -52,23 +52,19 @@ class FinderImages:
 
     def get_subdirs(self) -> list[str]:
         collections = []
-
         try:
             for item in os.scandir(self.main_folder.get_current_path()):
                 if item.is_dir():
                     if item.name not in self.main_folder.stop_list:
                         collections.append(item.path)
-
             # Добавляем корневую папку в конец списка коллекций (подпапок),
             # чтобы сканер мог найти изображения как в корневой папке,
             # так и в подпапках. Например:
             # - .../root/img.jpg — изображение в корневой папке
             # - .../root/collection/img.jpg — изображение в подпапке
             collections.append(self.main_folder.get_current_path())
-
         except FileNotFoundError:
             ...
-
         return collections
 
     def process_subdirs(self, subdirs: list[str]) -> list[tuple[str, int, int, int]]:
@@ -76,14 +72,11 @@ class FinderImages:
         subrirs_count = len(subdirs)
 
         for index, subdir in enumerate(subdirs[:-1], start=1):
-            
             progress_text = self.get_progress_text(index, subrirs_count)
             ScanerTools.progressbar_text(progress_text)
-
             try:
                 walked_images = self.walk_subdir(subdir)
                 finder_images.extend(walked_images)
-
             except TypeError as e:
                 Utils.print_error(e)
 
@@ -98,7 +91,6 @@ class FinderImages:
                 except OSError as e:
                     print("scaner > FinderImages > get file data", e)
                     continue
-
         return finder_images
 
     def get_progress_text(self, current: int, total: int) -> str:
@@ -112,25 +104,18 @@ class FinderImages:
         finder_images = []
         stack = []
         stack.append(coll)
-
         while stack:
             current_dir = stack.pop()
-
             with os.scandir(current_dir) as entries:
-
                 for entry in entries:
-
                     # нельзя удалять
                     # это прервет FinderImages, но не остальные классы
                     if not ScanerTools.can_scan:
                         return finder_images
-
                     if entry.is_dir():
                         stack.append(entry.path)
-
                     elif entry.name.endswith(Static.ext_all):
                         finder_images.append(self.get_file_data(entry))
-
         return finder_images
 
     def get_file_data(self, entry: os.DirEntry) -> tuple[str, int, int, int]:
@@ -160,16 +145,12 @@ class DbImages:
             THUMBS.c.birth,
             THUMBS.c.mod
             )
-        
         q = q.where(THUMBS.c.brand == self.main_folder.name)
-
         # не забываем относительный путь к изображению преобразовать в полный
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
-        
         conn.close()
         coll_folder = self.main_folder.get_current_path()
-
         return {
             short_hash: (
                 Utils.get_full_src(coll_folder, short_src),
@@ -190,41 +171,117 @@ class Compator:
     def run(self):
         finder_set = set(self.finder_images)
         db_values = set(self.db_images.values())
-
         del_items = [k for k, v in self.db_images.items() if v not in finder_set]
         ins_items = list(finder_set - db_values)
-
         return del_items, ins_items
 
 
-class DbUpdater:
-    sleep_count: float = 0.1
+class FileUpdater:
+    sleep_count = 0.1
 
-    def __init__(self, del_items: list, ins_items: list, main_folder: MainFolder):
+    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
-        del_items: список url файлов из short_hash  
-        ins_items: список (полный url, size, birth, mod)
-        run
+        del_items: [rel_thumb_path, ...]    
+        new_items: [(img_path, size, birth, mod), ...]  
+        run() to start  
+        """
+        super().__init__()
+        self.del_items = del_items
+        self.new_items = new_items
+        self.main_folder = main_folder
+
+    def run(self):
+        del_items = self.run_del_items()
+        new_items = self.run_new_items()
+        ScanerTools.progressbar_text("")
+        return del_items, new_items
+
+    def progressbar_text(self, text: str, x: int, total: int):
+        """
+        text: `Lang.adding`, `Lang.deleting`
+        x: item of `enumerate`
+        total: `len`
+        """
+        main_folder = self.main_folder.name.capitalize()
+        t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
+        ScanerTools.progressbar_text(t)
+
+    def run_del_items(self):
+        new_del_items = []
+        total = len(self.del_items)
+        for x, rel_thumb_path in enumerate(self.del_items, start=1):
+            if not ScanerTools.can_scan:
+                return
+            thumb_path = Utils.get_thumb_path(rel_thumb_path)
+            if os.path.exists(thumb_path):
+                self.progressbar_text(Lang.deleting, x, total)
+                try:
+                    os.remove(thumb_path)
+                    folder = os.path.dirname(thumb_path)
+                    if not os.listdir(folder):
+                        os.rmdir(folder)
+                    new_del_items.append(rel_thumb_path)
+                    sleep(self.sleep_count)
+                except Exception as e:
+                    Utils.print_error(e)
+                    continue
+        if total > 0:
+            ScanerTools.reload_gui()
+        return new_del_items
+
+    def create_thumb(self, src: str) -> ndarray | None:
+        img = Utils.read_image(src)
+        thumb = Utils.fit_to_thumb(img, ThumbData.DB_PIXMAP_SIZE)
+        del img
+        gc.collect()
+        if isinstance(thumb, ndarray):
+            return thumb
+        else:
+            return None
+
+    def run_new_items(self):
+        new_new_items = []
+        if self.new_items is None:
+            ScanerTools.can_scan = False
+            return
+        total = len(self.new_items)
+        for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
+            if not ScanerTools.can_scan:
+                return
+            self.progressbar_text(Lang.adding, x, total)
+            try:
+                thumb = self.create_thumb(img_path)
+                thumb_path = Utils.create_thumb_path(img_path)
+                Utils.write_thumb(thumb_path, thumb)
+                new_new_items.append((img_path, size, birth, mod))
+                sleep(self.sleep_count)
+            except Exception as e:
+                Utils.print_error(e)
+                continue
+        if total > 0:
+            ScanerTools.reload_gui()
+        return new_new_items
+
+
+class DbUpdater:
+    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
+        """
+        del_items: [rel_thumb_path, ...]    
+        new_items: [(full_src, size, birth, mod), ...]      
+        run() to start  
         """
         super().__init__()
         self.main_folder = main_folder
         self.del_items = del_items
-        self.ins_items = ins_items
+        self.new_items = new_items
 
     def run(self):
-        self.del_db()
-        self.del_images()
+        self.run_del_items()
+        self.run_new_items()
 
-        queries = self.create_queries()
-        self.insert_db(queries)
-        self.insert_images(queries)
-
-        ScanerTools.progressbar_text("")
-
-    def del_db(self):
+    def run_del_items(self):
         conn = Dbase.engine.connect()
-        for short_hash in self.del_items:
-
+        for rel_thumb_path in self.del_items:
             # нельзя удалять
             # если удалить этот флаг, то когда флаг будет false,
             # произойдет массовое удаление из БД
@@ -234,193 +291,73 @@ class DbUpdater:
             # и удалит их из БД
             if not ScanerTools.can_scan:
                 return
-        
             q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.short_hash==short_hash)
+            q = q.where(THUMBS.c.short_hash==rel_thumb_path)
             q = q.where(THUMBS.c.brand==self.main_folder.name)
-
             try:
                 conn.execute(q)
-
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 Utils.print_error(e)
                 conn.rollback()
                 continue
-
             except sqlalchemy.exc.OperationalError as e:
                 Utils.print_error(e)
                 conn.rollback()
                 conn.close()
                 return None
-
         try:
             conn.commit()
         except Exception as e:
             Utils.print_error(e)
             conn.rollback()
-
         conn.close()
 
-    def del_images(self):
-
-        total = len(self.del_items)
-
-        for x, short_hash in enumerate(self.del_items, start=1):
-
-            # не удалять
-            if not ScanerTools.can_scan:
-                return
-
-            full_hash = Utils.get_full_hash(short_hash)
-
-            if os.path.exists(full_hash):
-
-                try:
-                    self.progressbar_text(Lang.deleting, x, total)
-                    os.remove(full_hash)
-                    folder = os.path.dirname(full_hash)
-                    if not os.listdir(folder):
-                        os.rmdir(folder)
-                    sleep(self.sleep_count)
-                except Exception as e:
-                    Utils.print_error(e)
-                    continue
-
-        if total > 0:
-            ScanerTools.reload_gui()
-
-    def get_small_img(self, src: str) -> tuple[ndarray, str] | tuple[None, None]:
-
-        array_img_src = Utils.read_image(src)
-        array_img = Utils.fit_to_thumb(array_img_src, ThumbData.DB_PIXMAP_SIZE)
-
-        del array_img_src
-        gc.collect()
-
-        if array_img is not None:
-            h_, w_ = array_img.shape[:2]
-            resol = f"{w_}x{h_}"
-            return (array_img, resol)
-
-        else:
-            return (None, None)
-
-    def get_values(self, full_src, full_hash, size, birth, mod, resol):
+    def run_new_items(self):
+        self.main_folder.check_avaiability()
         coll_folder = self.main_folder.get_current_path()
-        return {
-            ClmNames.SHORT_SRC: Utils.get_short_src(coll_folder, full_src),
-            ClmNames.SHORT_HASH: Utils.get_short_hash(full_hash),
-            ClmNames.SIZE: size,
-            ClmNames.BIRTH: birth,
-            ClmNames.MOD: mod,
-            ClmNames.RESOL: resol,
-            ClmNames.COLL: Utils.get_coll_name(coll_folder, full_src),
-            ClmNames.FAV: 0,
-            ClmNames.BRAND: self.main_folder.name
-        }
-
-    def create_queries(self):
-
-        res: dict[sqlalchemy.Insert, tuple[str, ndarray]] = {}
-        total = len(self.ins_items)
-
-        for x, (full_src, size, birth, mod) in enumerate(self.ins_items, start=1):
-
-            # не удалять
-            if not ScanerTools.can_scan:
-                return
-
-            self.progressbar_text(Lang.adding, x, total)
-            small_img, resol = self.get_small_img(full_src)
-
-            if small_img is not None:
-
-                full_hash = Utils.create_full_hash(full_src)
-
-                values = self.get_values(
-                    full_src=full_src,
-                    full_hash=full_hash,
-                    size=size,
-                    birth=birth, 
-                    mod=mod,
-                    resol=resol
-                )
-
-                stmt = sqlalchemy.insert(THUMBS).values(**values) 
-                res[stmt] = (full_hash, small_img)
-
-            else:
-                continue
-
-        return res
-
-    def insert_db(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
-        conn = Dbase.engine.connect()
-
-        if queries is None:
+        if not coll_folder:
             ScanerTools.can_scan = False
             return
 
-        for query in queries.keys():
-
+        conn = Dbase.engine.connect()
+        for full_src, size, birth, mod in self.new_items:
             # не удалять
             if not ScanerTools.can_scan:
                 return
-
+            small_img_path = Utils.create_thumb_path(full_src)
+            short_img_path = Utils.get_short_img_path(coll_folder, full_src)
+            short_small_img_path = Utils.get_rel_thumb_path(small_img_path)
+            coll_name = Utils.get_coll_name(coll_folder, full_src)
+            values = {
+                ClmNames.SHORT_SRC: short_img_path,
+                ClmNames.SHORT_HASH: short_small_img_path,
+                ClmNames.SIZE: size,
+                ClmNames.BIRTH: birth,
+                ClmNames.MOD: mod,
+                ClmNames.RESOL: "",
+                ClmNames.COLL: coll_name,
+                ClmNames.FAV: 0,
+                ClmNames.BRAND: self.main_folder.name
+            }
+            stmt = sqlalchemy.insert(THUMBS).values(**values) 
             try:
-                conn.execute(query)
-
+                conn.execute(stmt)
             # overflow error бывает прозникает когда пишет
             # python integer too large to insert db
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 Utils.print_error(e)
                 conn.rollback()
                 continue
-
             except sqlalchemy.exc.OperationalError as e:
                 Utils.print_error(e)
                 conn.rollback()
-                conn.close()
-                return None
-        
+                break
         try:
             conn.commit()
         except Exception as e:
             Utils.print_error(e)
             conn.rollback()
-
         conn.close()
-
-    def insert_images(self, queries: dict[sqlalchemy.Insert, tuple[str, ndarray]]):
-
-        if queries is None:
-            ScanerTools.can_scan = False
-            return
-
-        total = len(queries)
-
-        for full_hash, img_array in queries.values():
-
-            # не удалять
-            if not ScanerTools.can_scan:
-                return
-
-            Utils.write_image_hash(full_hash, img_array)
-            sleep(self.sleep_count)
-
-        if total > 0:
-            ScanerTools.reload_gui()
-
-    def progressbar_text(self, text: str, x: int, total: int):
-        """
-        text: `Lang.adding`, `Lang.deleting`
-        x: item of `enumerate`
-        total: `len`
-        """
-
-        main_folder = self.main_folder.name.capitalize()
-        t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
-        ScanerTools.progressbar_text(t)
 
 
 class UpdateDbTask(URunnable):
@@ -443,7 +380,7 @@ class UpdateDbTask(URunnable):
         MainFolder.current.check_avaiability()
         if MainFolder.current.get_current_path():
             short_urls = [
-                Utils.get_short_src(MainFolder.current.get_current_path(), i)
+                Utils.get_short_img_path(MainFolder.current.get_current_path(), i)
                 for i in self.urls
             ]
 
@@ -451,7 +388,7 @@ class UpdateDbTask(URunnable):
 
             if self.remove_records:
                 for i in self.remove_records:
-                    short_src = Utils.get_short_src(MainFolder.current.get_current_path(), i)
+                    short_src = Utils.get_short_img_path(MainFolder.current.get_current_path(), i)
                     exist_records.append(short_src)
 
             new_records = self.new_records()
@@ -508,7 +445,7 @@ class MainFolderRemover:
         q = q.where(THUMBS.c.brand == main_folder_name)
         res = conn.execute(q).fetchall()
         res = [
-            (id_, Utils.get_full_hash(short_hash=short_hash))
+            (id_, Utils.get_thumb_path(rel_thumb_path=short_hash))
             for id_, short_hash in res
         ]
         return res
@@ -557,7 +494,6 @@ class WorkerSignals(QObject):
 
 
 class ScanerThread(URunnable):
-
     def __init__(self):
         super().__init__()
         self.signals_ = WorkerSignals()
@@ -581,9 +517,12 @@ class ScanerThread(URunnable):
             db_images = db_images.run()
 
             compator = Compator(finder_images, db_images)
-            del_items, ins_items = compator.run()
+            del_items, new_items = compator.run()
 
-            db_updater = DbUpdater(del_items, ins_items, main_folder)
+            file_updater = FileUpdater(del_items, new_items, main_folder)
+            del_items, new_items = file_updater.run()
+
+            db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.run()
 
         try:

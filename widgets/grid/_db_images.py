@@ -72,8 +72,8 @@ class DbImages(URunnable):
                 continue
 
             mod = datetime.fromtimestamp(mod).date()
-            full_hash = Utils.get_full_hash(short_hash)
-            array_img = Utils.read_image_hash(full_hash)
+            full_hash = Utils.get_thumb_path(short_hash)
+            array_img = Utils.read_thumb(full_hash)
 
             if array_img is None:
                 self.remove_db(short_hash=short_hash)

@@ -73,8 +73,8 @@ class LoadThumb(URunnable):
         conn.close()
 
         if short_hash:
-            full_hash = Utils.get_full_hash(short_hash)
-            small_img = Utils.read_image_hash(full_hash)
+            full_hash = Utils.get_thumb_path(short_hash)
+            small_img = Utils.read_thumb(full_hash)
             small_img = Utils.desaturate_image(image=small_img, factor=0.2)
             pixmap = Utils.pixmap_from_array(small_img)
         else:

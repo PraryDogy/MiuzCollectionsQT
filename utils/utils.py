@@ -226,39 +226,36 @@ class ReadImage:
             return None
 
 
-class Hash:
-
+class Thumb:
     @classmethod
-    def create_full_hash(cls, full_src: str) -> str:
-        new_name = hashlib.md5(full_src.encode('utf-8')).hexdigest() + ".jpg"
-        
+    def create_thumb_path(cls, img_path: str) -> str:
+        new_name = hashlib.md5(img_path.encode('utf-8')).hexdigest() + ".jpg"
         new_folder = os.path.join(Static.HASH_DIR, new_name[:2])
         os.makedirs(new_folder, exist_ok=True)
-
         return os.path.join(new_folder, new_name)
 
     @classmethod
-    def get_short_hash(cls, full_hash: str):
-        return full_hash.replace(Static.APP_SUPPORT_DIR, "")
+    def get_rel_thumb_path(cls, thumb_path: str):
+        return thumb_path.replace(Static.APP_SUPPORT_DIR, "")
     
     @classmethod
-    def get_full_hash(cls, short_hash: str):
-        return Static.APP_SUPPORT_DIR + short_hash
+    def get_thumb_path(cls, rel_thumb_path: str):
+        return Static.APP_SUPPORT_DIR + rel_thumb_path
 
     @classmethod
-    def write_image_hash(cls, output_path: str, array_img: np.ndarray) -> bool:
+    def write_thumb(cls, thumb_path: str, thumb: np.ndarray) -> bool:
         try:
-            img = cv2.cvtColor(array_img, cv2.COLOR_BGR2RGB)
-            cv2.imwrite(output_path, img)
+            img = cv2.cvtColor(thumb, cv2.COLOR_BGR2RGB)
+            cv2.imwrite(thumb_path, img)
             return True
         except Exception as e:
             print("error write image hash")
             return False
 
     @classmethod
-    def read_image_hash(cls, src: str) -> np.ndarray | None:
+    def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
         try:
-            img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+            img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
             return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         except Exception as e:
             # print("read img hash error:", src)
@@ -308,7 +305,7 @@ class Pixmap:
             return None
         
 
-class Utils(Hash, Pixmap, ReadImage, Err):
+class Utils(Thumb, Pixmap, ReadImage, Err):
 
     @classmethod
     def desaturate_image(cls, image: np.ndarray, factor=0.2):
@@ -323,7 +320,7 @@ class Utils(Hash, Pixmap, ReadImage, Err):
 
     @classmethod
     def get_coll_name(cls, main_folder_path: str, full_src: str) -> str:
-        coll = cls.get_short_src(main_folder_path, full_src)
+        coll = cls.get_short_img_path(main_folder_path, full_src)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
@@ -378,7 +375,7 @@ class Utils(Hash, Pixmap, ReadImage, Err):
         return main_folder_path + short_src
     
     @classmethod
-    def get_short_src(cls, main_folder_path: str, full_src: str) -> str:
+    def get_short_img_path(cls, main_folder_path: str, full_src: str) -> str:
         return full_src.replace(main_folder_path, "")
 
     @classmethod
