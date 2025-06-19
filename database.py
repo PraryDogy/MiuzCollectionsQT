@@ -157,3 +157,42 @@ class Dbase:
             Utils.print_error(e)
 
         conn.close()
+
+    @classmethod
+    def insert_records(cls, records: list) -> None:
+        """
+        records: short_src, short_hash, size, birth, mod, collname, main_folder_name
+        """
+
+        conn = cls.engine.connect()
+
+        for short_src, short_hash, size, birth, mod, collname, main_folder_name in records:
+
+            values = {
+                ClmNames.SHORT_SRC: short_src,
+                ClmNames.SHORT_HASH: short_hash,
+                ClmNames.SIZE: size,
+                ClmNames.BIRTH: birth,
+                ClmNames.MOD: mod,
+                ClmNames.RESOL: "none", # мы больше не записываем разрешение в БД
+                ClmNames.COLL: collname,
+                ClmNames.FAV: 0,
+                ClmNames.BRAND: main_folder_name
+            }
+
+            q = sqlalchemy.insert(**values)
+
+            try:
+                conn.execute(q)
+            except Exception as e:
+                Utils.print_error(e)
+                conn.rollback()
+                continue
+        
+        try:
+            conn.commit()
+        except Exception as e:
+            Utils.print_error(e)
+            conn.rollback()
+
+        conn.close()
