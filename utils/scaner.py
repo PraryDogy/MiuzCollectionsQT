@@ -325,7 +325,7 @@ class DbUpdater:
             if not ScanerTools.can_scan:
                 return
             small_img_path = Utils.create_thumb_path(full_src)
-            short_img_path = Utils.get_short_img_path(coll_folder, full_src)
+            short_img_path = Utils.get_rel_img_path(coll_folder, full_src)
             rel_thumb_path = Utils.get_rel_thumb_path(small_img_path)
             coll_name = Utils.get_coll_name(coll_folder, full_src)
             values = {
@@ -380,7 +380,7 @@ class UpdateDbTask(URunnable):
         MainFolder.current.check_avaiability()
         if MainFolder.current.get_current_path():
             short_urls = [
-                Utils.get_short_img_path(MainFolder.current.get_current_path(), i)
+                Utils.get_rel_img_path(MainFolder.current.get_current_path(), i)
                 for i in self.urls
             ]
 
@@ -388,8 +388,8 @@ class UpdateDbTask(URunnable):
 
             if self.remove_records:
                 for i in self.remove_records:
-                    short_src = Utils.get_short_img_path(MainFolder.current.get_current_path(), i)
-                    exist_records.append(short_src)
+                    rel_img_path = Utils.get_rel_img_path(MainFolder.current.get_current_path(), i)
+                    exist_records.append(rel_img_path)
 
             new_records = self.new_records()
             db_updater = DbUpdater(exist_records, new_records, MainFolder.current)

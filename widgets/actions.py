@@ -154,15 +154,15 @@ class WorkerSignals(QObject):
 
 
 class FavTask(URunnable):
-    def __init__(self, short_src: str, value: int):
+    def __init__(self, rel_img_path: str, value: int):
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.short_src = short_src
+        self.rel_img_path = rel_img_path
         self.value = value
 
     def task(self):
         values = {"fav": self.value}
-        q = sqlalchemy.update(THUMBS).where(THUMBS.c.short_src==self.short_src)
+        q = sqlalchemy.update(THUMBS).where(THUMBS.c.short_src==self.rel_img_path)
         q = q.values(**values)
 
         conn = Dbase.engine.connect()
@@ -181,7 +181,7 @@ class FavTask(URunnable):
 class FavActionDb(QAction):
     finished_ = pyqtSignal(int)
 
-    def __init__(self, parent: QMenu, short_src: str, fav_value:  int):
+    def __init__(self, parent: QMenu, rel_img_path: str, fav_value:  int):
 
         if fav_value == 0 or fav_value is None:
             t = Lang.add_fav
@@ -193,32 +193,26 @@ class FavActionDb(QAction):
 
         super().__init__(parent=parent, text=t)
         self.triggered.connect(self.cmd_)
-        self.short_src = short_src
+        self.rel_img_path = rel_img_path
 
     def cmd_(self):
-        self.task = FavTask(short_src=self.short_src, value=self.value)
+        self.task = FavTask(self.rel_img_path, self.value)
         self.task.signals_.finished_.connect(self.finished_.emit)
         UThreadPool.start(self.task)
 
 
 class Save(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str | list, save_as: bool):
-
+    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str], save_as: bool):
         if save_as:
             text: str = Lang.save_image_in
         else:
             text: str = Lang.save_image_downloads
-
-        if isinstance(short_src, list):
-            text = f"{text} ({len(short_src)})"
-        else:
-            text = f"{text} (1)"
-            short_src = [short_src]
+        text = f"{text} ({len(urls)})"
 
         super().__init__(parent=parent, text=text)
         self.triggered.connect(self.cmd_)
         self.save_as = save_as
-        self.short_src: list = short_src
+        self.urls = urls
         self.parent_ = parent
         self.win_ = win
 
@@ -229,8 +223,8 @@ class Save(QAction):
         if coll_folder:
 
             full_src = [
-                Utils.get_img_path(coll_folder, url)
-                for url in self.short_src
+                Utils.get_img_path(coll_folder, rel_img_path)
+                for rel_img_path in self.urls
             ]
 
             if self.save_as:

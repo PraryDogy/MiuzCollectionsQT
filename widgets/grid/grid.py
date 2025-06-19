@@ -627,7 +627,7 @@ class Grid(QScrollArea):
 
             self.fav_action = FavActionDb(
                 parent=self.menu_,
-                short_src=clicked_wid.short_src,
+                rel_img_path=clicked_wid.short_src,
                 fav_value=clicked_wid.fav_value
                 )
             self.fav_action.finished_.connect(clicked_wid.change_fav)

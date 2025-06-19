@@ -508,7 +508,7 @@ class WinImageView(WinChild):
 
         self.fav_action = FavActionDb(
             parent=self.menu_,
-            short_src=self.rel_img_path,
+            rel_img_path=self.rel_img_path,
             fav_value=self.wid.fav_value
         )
         self.fav_action.finished_.connect(self.change_fav)
@@ -525,10 +525,10 @@ class WinImageView(WinChild):
         reveal = Reveal(self.menu_, self, [self.rel_img_path])
         self.menu_.addAction(reveal)
 
-        save_as = Save(self.menu_, self, self.rel_img_path, True)
+        save_as = Save(self.menu_, self, [self.rel_img_path], True)
         self.menu_.addAction(save_as)
 
-        save = Save(self.menu_, self, self.rel_img_path, False)
+        save = Save(self.menu_, self, [self.rel_img_path], False)
         self.menu_.addAction(save)
 
         self.menu_.show_menu()

@@ -320,7 +320,7 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
 
     @classmethod
     def get_coll_name(cls, main_folder_path: str, full_src: str) -> str:
-        coll = cls.get_short_img_path(main_folder_path, full_src)
+        coll = cls.get_rel_img_path(main_folder_path, full_src)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
@@ -371,11 +371,11 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
         return date.strftime("%d.%m.%Y %H:%M")
         
     @classmethod
-    def get_img_path(cls, main_folder_path: str, short_src: str) -> str:
-        return main_folder_path + short_src
+    def get_img_path(cls, main_folder_path: str, rel_img_path: str) -> str:
+        return main_folder_path + rel_img_path
     
     @classmethod
-    def get_short_img_path(cls, main_folder_path: str, full_src: str) -> str:
+    def get_rel_img_path(cls, main_folder_path: str, full_src: str) -> str:
         return full_src.replace(main_folder_path, "")
 
     @classmethod
