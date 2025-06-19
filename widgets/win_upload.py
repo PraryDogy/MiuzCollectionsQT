@@ -36,15 +36,8 @@ class DbUpdaterSetup(URunnable):
         if not MainFolder.current.get_current_path():
             return
 
-        short_urls: list[str] = []
-        coll_folder = MainFolder.current.get_current_path()
-
-        for url in self.urls:
-            short_src = Utils.get_short_src(coll_folder, url)
-            short_urls.append(short_src)
-
-        del_items = self.get_del_items(short_urls)
-        ins_items = self.get_ins_items()
+        del_items = self.get_exist_records()
+        ins_items = self.get_new_records()
 
         # в remove_url помещаются те url, которые нужно просто удалить 
         # из базы данных
@@ -61,22 +54,35 @@ class DbUpdaterSetup(URunnable):
         db_updater.run()
         self.signals_.finished_.emit()
 
-    def get_ins_items(self):
+    def get_new_records(self):
+        """
+        DbUpdater принимает список файлов для новых записей в базе данных
+        в следующем виде: (полный url файла, размер, создание, изменение)
+        """
         ins_items: list[str] = []
-
         for url in self.urls:
             try:
                 stats = os.stat(url)    
             except Exception as e:
                 Utils.print_error(e)
                 return
-
             data = (url, stats.st_size, stats.st_birthtime, stats.st_mtime)
             ins_items.append(data)
-        
         return ins_items
 
-    def get_del_items(self, short_urls: list[str]) -> list[int]:
+    def get_exist_records(self) -> list[int]:
+        """
+        После того, как мы загрузили файлы на сетевой диск,
+        нам нужно обновить записи о файлах в базе данных.
+        Мы не используем функцию sqlalchemy.update, вместо этого используем
+        delete + insert, поэтому мы вычленяем из списка url те, которые уже 
+        есть в базе данных, чтобы удалить их
+        """
+        coll_folder = MainFolder.current.get_current_path()
+        short_urls = [
+            Utils.get_short_src(coll_folder, i)
+            for i in self.urls
+        ]
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(THUMBS.c.short_hash).where(
             sqlalchemy.and_(
