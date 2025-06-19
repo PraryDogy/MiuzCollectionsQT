@@ -267,7 +267,7 @@ class DbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
         del_items: [rel_thumb_path, ...]    
-        new_items: [(full_src, size, birth, mod), ...]      
+        new_items: [(img_path, size, birth, mod), ...]      
         run() to start  
         """
         super().__init__()
@@ -320,14 +320,14 @@ class DbUpdater:
             return
 
         conn = Dbase.engine.connect()
-        for full_src, size, birth, mod in self.new_items:
+        for img_path, size, birth, mod in self.new_items:
             # не удалять
             if not ScanerTools.can_scan:
                 return
-            small_img_path = Utils.create_thumb_path(full_src)
-            short_img_path = Utils.get_rel_img_path(coll_folder, full_src)
+            small_img_path = Utils.create_thumb_path(img_path)
+            short_img_path = Utils.get_rel_img_path(coll_folder, img_path)
             rel_thumb_path = Utils.get_rel_thumb_path(small_img_path)
-            coll_name = Utils.get_coll_name(coll_folder, full_src)
+            coll_name = Utils.get_coll_name(coll_folder, img_path)
             values = {
                 ClmNames.SHORT_SRC: short_img_path,
                 ClmNames.SHORT_HASH: rel_thumb_path,

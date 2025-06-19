@@ -319,8 +319,8 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
         )
 
     @classmethod
-    def get_coll_name(cls, main_folder_path: str, full_src: str) -> str:
-        coll = cls.get_rel_img_path(main_folder_path, full_src)
+    def get_coll_name(cls, main_folder_path: str, img_src: str) -> str:
+        coll = cls.get_rel_img_path(main_folder_path, img_src)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
@@ -375,8 +375,8 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
         return main_folder_path + rel_img_path
     
     @classmethod
-    def get_rel_img_path(cls, main_folder_path: str, full_src: str) -> str:
-        return full_src.replace(main_folder_path, "")
+    def get_rel_img_path(cls, main_folder_path: str, img_src: str) -> str:
+        return img_src.replace(main_folder_path, "")
 
     @classmethod
     def rm_rf(cls, folder_path: str):

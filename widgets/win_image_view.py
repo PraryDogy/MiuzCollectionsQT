@@ -347,9 +347,9 @@ class WinImageView(WinChild):
         img_thread.signals_.finished_.connect(cmd_)
         UThreadPool.start(img_thread)
 
-    def load_image_fin(self, data: ImageData, full_src: str):
+    def load_image_fin(self, data: ImageData, img_path: str):
         self.task_count -= 1
-        if data.pixmap.width() == 0 or data.img_path != full_src:
+        if data.pixmap.width() == 0 or data.img_path != img_path:
             return
         elif isinstance(data.pixmap, QPixmap):
             try:
@@ -485,8 +485,8 @@ class WinImageView(WinChild):
             MainFolder.current.check_avaiability()
             coll_folder = MainFolder.current.get_current_path()
             if coll_folder:
-                full_src = Utils.get_img_path(coll_folder, self.rel_img_path)
-                urls = [full_src]
+                img_path = Utils.get_img_path(coll_folder, self.rel_img_path)
+                urls = [img_path]
                 self.info_win = WinInfo(urls)
                 self.info_win.finished_.connect(self.open_info_win_delayed)
             else:

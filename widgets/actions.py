@@ -219,28 +219,23 @@ class Save(QAction):
     def cmd_(self):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
-
         if coll_folder:
-
-            full_src = [
+            img_path_list = [
                 Utils.get_img_path(coll_folder, rel_img_path)
                 for rel_img_path in self.urls
             ]
-
             if self.save_as:
                 dialog = QFileDialog()
                 dest = dialog.getExistingDirectory()
-
             else:
                 dest = Dynamic.down_folder
-
             if dest:
-                self.copy_files_cmd(dest=dest, full_src=full_src)
+                self.copy_files_cmd(dest, img_path_list)
         else:
             SmbWin.show(self.win_)
 
-    def copy_files_cmd(self, dest: str, full_src: str | list):
-        thread_ = CopyFiles(dest, full_src)
+    def copy_files_cmd(self, dest: str, img_src_list: list):
+        thread_ = CopyFiles(dest, img_src_list)
         UThreadPool.start(thread_)
 
 

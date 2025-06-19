@@ -124,26 +124,6 @@ class WinUpload(WinSystem):
         self.finished_.emit(dest)
         self.deleteLater()
 
-        # self.copy_files_cmd(dest=dest, full_src=self.urls)
-
-    # def copy_files_cmd(self, dest: str, full_src: str | list):
-    #     thread_ = CopyFiles(dest, full_src, self.is_filemove)
-    #     thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
-    #     UThreadPool.start(thread_)
-    #     self.hide()
-
-    # def copy_finished(self, urls: list[str]):
-    #     if self.is_filemove:
-    #         self.update_task = DbUpdaterSetup(urls, self.urls)
-    #     else:
-    #         self.update_task = DbUpdaterSetup(urls)
-    #     self.update_task.signals_.finished_.connect(self.db_updater_finished)
-    #     UThreadPool.start(self.update_task)
-
-    # def db_updater_finished(self):
-    #     self.finished_.emit()
-    #     self.deleteLater()
-
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()

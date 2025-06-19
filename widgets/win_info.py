@@ -48,7 +48,7 @@ class Selectable(QLabel):
 
         reveal = QAction(parent=menu_, text=Lang.reveal_in_finder)
         reveal.triggered.connect(
-            lambda: Utils.reveal_files(files_list=[full_text])
+            lambda: Utils.reveal_files([full_text])
         )
         menu_.addAction(reveal)
 
