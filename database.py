@@ -116,7 +116,7 @@ class Dbase:
 
     def get_exist_records(cls, urls: list[str]) -> list[str]:
         """
-        urls: список из short_src
+        urls: список из short_src   
         возвращает: список из short_src, которые есть в БД
         """
         conn = cls.engine.connect()

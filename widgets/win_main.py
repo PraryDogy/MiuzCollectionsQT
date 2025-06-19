@@ -9,12 +9,14 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
 from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
 from cfg import Dynamic, JsonData, Static, ThumbData
+from database import Dbase
 from lang import Lang
 from main_folders import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
 from utils.scaner import Scaner
+from utils.utils import Utils
 from widgets._runnable import URunnable, UThreadPool
 
 from .bar_bottom import BarBottom
@@ -159,7 +161,7 @@ class WinMain(WinFrameless):
 
     def after_start(self):
         Scaner.start()
-        MainFolder.current.set_current_path()
+        MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         if not coll_folder:
             self.open_smb_win()
@@ -170,10 +172,19 @@ class WinMain(WinFrameless):
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
-    def copy_files_cmd(self, dest: str, urls: list[str]):
+    def upload_cmd(self, dest: str, urls: list[str]):
         thread_ = CopyFiles(dest, urls, False)
-        thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
+        thread_.signals_.finished_.connect(lambda urls: self.upload_finished(urls))
         UThreadPool.start(thread_)
+
+    def upload_finished(self, urls: list[str]):
+        MainFolder.check_avaiability()
+        if MainFolder.get_current_path():
+            short_urls = [
+                Utils.get_short_src()
+                for i in urls
+            ]
+            exist_records = Dbase.get_exist_records(urls)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
@@ -215,7 +226,7 @@ class WinMain(WinFrameless):
 
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
-        MainFolder.current.set_current_path()
+        MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         if not coll_folder:
             self.open_smb_win()
@@ -228,7 +239,7 @@ class WinMain(WinFrameless):
         ]
 
         self.win_upload = WinUpload(urls)
-        self.win_upload.finished_.connect(lambda dest: self.copy_files_cmd(dest, urls))
+        self.win_upload.finished_.connect(lambda dest: self.upload_cmd(dest, urls))
         self.win_upload.center_relative_parent(self)
         self.win_upload.show()
 

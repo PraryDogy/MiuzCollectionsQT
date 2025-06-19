@@ -565,7 +565,7 @@ class ScanerShedule(QObject):
         avaibility = False
 
         for main_folder in MainFolder.list_:
-            main_folder.set_current_path()
+            main_folder.check_avaiability()
             if main_folder.is_avaiable():
                 avaibility = True
     

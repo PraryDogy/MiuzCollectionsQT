@@ -30,7 +30,7 @@ class MainFolder:
     def get_current_path(self):
         return self.current_path
 
-    def set_current_path(self):
+    def check_avaiability(self):
         """
         Проверяет доступность пути к MainFolder
         Устанавливает current_path: доступный путь к MainFolder или None

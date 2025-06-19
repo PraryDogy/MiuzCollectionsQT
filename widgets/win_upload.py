@@ -31,7 +31,7 @@ class DbUpdaterSetup(URunnable):
 
     def task(self):
 
-        MainFolder.current.set_current_path()
+        MainFolder.current.check_avaiability()
         if not MainFolder.current.get_current_path():
             return
 
@@ -153,7 +153,7 @@ class WinUpload(WinSystem):
                 i.pressed_.connect(cmd_)
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
-        MainFolder.current.set_current_path()
+        MainFolder.current.check_avaiability()
         root = MainFolder.current.get_current_path()
         self.coll_path = os.path.join(root, coll_btn.coll_name)
 

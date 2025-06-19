@@ -171,7 +171,7 @@ conn = Dbase.engine.connect()
 JsonData.init()
 
 for main_folder in MainFolder.list_:
-    coll_folder = main_folder.set_current_path()
+    coll_folder = main_folder.check_avaiability()
     if main_folder.is_avaiable():
         finder_dirs = Dirs.get_finder_dirs(main_folder.current_path)
         if finder_dirs:

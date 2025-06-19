@@ -43,7 +43,7 @@ class RemoveFilesTask(URunnable):
             Err.print_error(e)
 
     def remove_from_db(self):
-        MainFolder.current.set_current_path()
+        MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
