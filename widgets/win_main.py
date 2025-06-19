@@ -231,7 +231,7 @@ class WinMain(WinFrameless):
             if os.path.isfile(i.toLocalFile())
         ]
 
-        self.win_upload = WinUpload(urls)
+        self.win_upload = WinUpload()
         self.win_upload.finished_.connect(lambda dest: self.upload_task_cmd(dest, urls))
         self.win_upload.center_relative_parent(self)
         self.win_upload.show()

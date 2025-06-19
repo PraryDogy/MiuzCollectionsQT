@@ -107,14 +107,12 @@ class WinUpload(WinSystem):
     h_ = 30
     finished_ = pyqtSignal(str)
 
-    def __init__(self, urls: list[str], is_filemove: bool = False):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle(Lang.title_downloads)
         self.resize(Static.MENU_LEFT_WIDTH, Dynamic.root_g.get("ah"))
         self.current_submenu: QListWidget = None
         self.coll_path: str = None
-        self.urls = urls
-        self.is_filemove = is_filemove
 
         self.h_wid = QWidget()
         self.central_layout.addWidget(self.h_wid)

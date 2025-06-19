@@ -304,23 +304,26 @@ class MoveFiles(QAction):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
-            urls = [
+            self.urls = [
                 Utils.get_full_src(coll_folder, i)
                 for i in self.urls
             ]
-
-            self.upload_win = WinUpload(urls, True)
-            self.upload_win.finished_.connect(self.move_finished)
+            self.upload_win = WinUpload()
+            self.upload_win.finished_.connect(lambda dest: self.move_files_cmd(dest))
             self.upload_win.center_relative_parent(self.win_)
             self.upload_win.show()
 
-    def move_files_cmd(self, dest: str, urls: list[str]):
-        thread_ = CopyFiles(dest, urls, True)
-        thread_.signals_.finished_.connect(lambda urls: self.move_finished(urls))
+    def move_files_cmd(self, dest: str):
+        thread_ = CopyFiles(dest, self.urls, True)
+        thread_.signals_.finished_.connect(lambda new_urls: self.move_finished(new_urls))
         UThreadPool.start(thread_)
 
-    def move_finished(self, urls: list[str]):
-        new_urls = urls
-        old_urls = self.url
-        self.update_task = UpdateDbTask(new_urls, old_urls)
+    def move_finished(self, new_urls: list[str]):
+        if isinstance(new_urls, str):
+            new_urls = [new_urls]
+
+        self.update_task = UpdateDbTask(new_urls, self.urls)
         UThreadPool.start(self.update_task)
+
+        # print(new_urls)
+        # print(self.urls)

@@ -31,7 +31,6 @@ class CopyFiles(URunnable):
         self.move_files = move_files
 
     def task(self):
-
         CopyFiles.current_threads.append(self)
         SignalsApp.instance.win_downloads_open.emit()
 
@@ -42,7 +41,7 @@ class CopyFiles(URunnable):
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
             Utils.print_error(e)
-            self.finalize(files_dests=files_dests)
+            self.finalize(files_dests)
             return
 
         self.signals_.value_changed.emit(0)
@@ -77,7 +76,6 @@ class CopyFiles(URunnable):
         self.set_should_run(False)
 
     def finalize(self, files_dests: list[str]):
-
         try:
             self.signals_.value_changed.emit(100)
         except RuntimeError:
