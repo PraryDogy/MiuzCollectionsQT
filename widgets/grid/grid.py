@@ -374,9 +374,9 @@ class Grid(QScrollArea):
 
     def remove_files(self):
         MainFolder.current.check_avaiability()
-        coll_folder = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.get_current_path()
         img_path_list = [
-            Utils.get_img_path(coll_folder, i.rel_img_path)
+            Utils.get_img_path(main_folder_path, i.rel_img_path)
             for i in self.selected_widgets
         ]
 
@@ -408,10 +408,10 @@ class Grid(QScrollArea):
             if self.selected_widgets:
 
                 MainFolder.current.check_avaiability()
-                coll_folder = MainFolder.current.get_current_path()
-                if coll_folder:
+                main_folder_path = MainFolder.current.get_current_path()
+                if main_folder_path:
                     img_path_list = [
-                        Utils.get_img_path(coll_folder, i.rel_img_path)
+                        Utils.get_img_path(main_folder_path, i.rel_img_path)
                         for i in self.selected_widgets
                     ]
                     self.info_win = WinInfo(img_path_list)
@@ -705,10 +705,10 @@ class Grid(QScrollArea):
             QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
         MainFolder.current.check_avaiability()
-        coll_folder = MainFolder.current.get_current_path()
-        if coll_folder:
+        main_folder_path = MainFolder.current.get_current_path()
+        if main_folder_path:
             img_path_list = [
-                Utils.get_img_path(coll_folder, i.rel_img_path)
+                Utils.get_img_path(main_folder_path, i.rel_img_path)
                 for i in self.selected_widgets
             ]
         else:

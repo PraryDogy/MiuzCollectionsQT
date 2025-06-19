@@ -160,8 +160,8 @@ class WinMain(WinFrameless):
     def after_start(self):
         Scaner.start()
         MainFolder.current.check_avaiability()
-        coll_folder = MainFolder.current.get_current_path()
-        if not coll_folder:
+        main_folder_path = MainFolder.current.get_current_path()
+        if not main_folder_path:
             self.open_smb_win()
 
     def open_smb_win(self):
@@ -219,8 +219,8 @@ class WinMain(WinFrameless):
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
         MainFolder.current.check_avaiability()
-        coll_folder = MainFolder.current.get_current_path()
-        if not coll_folder:
+        main_folder_path = MainFolder.current.get_current_path()
+        if not main_folder_path:
             self.open_smb_win()
             return
 

@@ -44,13 +44,13 @@ class RemoveFilesTask(URunnable):
 
     def remove_from_db(self):
         MainFolder.current.check_avaiability()
-        coll_folder = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.get_current_path()
 
-        if coll_folder:
+        if main_folder_path:
             Dbase.create_engine()
             conn = Dbase.engine.connect()
             for i in self.img_path_list:
-                rel_img_path = Utils.get_rel_img_path(coll_folder, i)
+                rel_img_path = Utils.get_rel_img_path(main_folder_path, i)
                 q = sqlalchemy.delete(THUMBS)
                 q = q.where(THUMBS.c.short_src == rel_img_path)
                 q = q.where(THUMBS.c.brand == MainFolder.current.name)

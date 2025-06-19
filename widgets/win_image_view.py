@@ -317,8 +317,8 @@ class WinImageView(WinChild):
 
     def first_load(self):
         MainFolder.current.check_avaiability()
-        coll_folder = MainFolder.current.get_current_path()
-        if not coll_folder:
+        main_folder_path = MainFolder.current.get_current_path()
+        if not main_folder_path:
             self.open_smb_win()
 
         self.load_thumb()
@@ -483,9 +483,9 @@ class WinImageView(WinChild):
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             MainFolder.current.check_avaiability()
-            coll_folder = MainFolder.current.get_current_path()
-            if coll_folder:
-                img_path = Utils.get_img_path(coll_folder, self.rel_img_path)
+            main_folder_path = MainFolder.current.get_current_path()
+            if main_folder_path:
+                img_path = Utils.get_img_path(main_folder_path, self.rel_img_path)
                 img_path_list = [img_path]
                 self.info_win = WinInfo(img_path_list)
                 self.info_win.finished_.connect(self.open_info_win_delayed)

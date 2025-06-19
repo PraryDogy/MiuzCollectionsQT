@@ -150,10 +150,10 @@ class DbImages:
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
         conn.close()
-        coll_folder = self.main_folder.get_current_path()
+        main_folder_path = self.main_folder.get_current_path()
         return {
             rel_thumb_path: (
-                Utils.get_img_path(coll_folder, rel_img_path),
+                Utils.get_img_path(main_folder_path, rel_img_path),
                 size,
                 birth,
                 mod
@@ -314,8 +314,8 @@ class DbUpdater:
 
     def run_new_items(self):
         self.main_folder.check_avaiability()
-        coll_folder = self.main_folder.get_current_path()
-        if not coll_folder:
+        main_folder_path = self.main_folder.get_current_path()
+        if not main_folder_path:
             ScanerTools.can_scan = False
             return
 
@@ -325,9 +325,9 @@ class DbUpdater:
             if not ScanerTools.can_scan:
                 return
             small_img_path = Utils.create_thumb_path(img_path)
-            short_img_path = Utils.get_rel_img_path(coll_folder, img_path)
+            short_img_path = Utils.get_rel_img_path(main_folder_path, img_path)
             rel_thumb_path = Utils.get_rel_thumb_path(small_img_path)
-            coll_name = Utils.get_coll_name(coll_folder, img_path)
+            coll_name = Utils.get_coll_name(main_folder_path, img_path)
             values = {
                 ClmNames.SHORT_SRC: short_img_path,
                 ClmNames.SHORT_HASH: rel_thumb_path,

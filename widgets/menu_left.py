@@ -37,8 +37,8 @@ class CollectionBtn(QLabel):
 
     def reveal_collection(self, *args) -> None:
         MainFolder.current.check_avaiability()
-        coll_folder = MainFolder.current.get_current_path()
-        if not coll_folder:
+        main_folder_path = MainFolder.current.get_current_path()
+        if not main_folder_path:
             self.smb_win = WinSmb()
             self.smb_win.adjustSize()
             self.smb_win.center_relative_parent(self.window())
@@ -49,10 +49,10 @@ class CollectionBtn(QLabel):
             Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS
         ):
 
-            coll = coll_folder
+            coll = main_folder_path
 
         else:
-            coll = os.path.join(coll_folder, self.coll_name)
+            coll = os.path.join(main_folder_path, self.coll_name)
 
         subprocess.Popen(["open", coll])
 
