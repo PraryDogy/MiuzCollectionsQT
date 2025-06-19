@@ -108,7 +108,7 @@ class SingleImgInfo(URunnable):
                 Lang.type_: type_,
                 Lang.file_size: size,
                 Lang.place: Tools.lined_text(self.url),
-                Lang.hash_path: Tools.lined_text(full_hash),
+                Lang.thumb_path: Tools.lined_text(full_hash),
                 Lang.changed: mod,
                 Lang.collection: Tools.lined_text(coll),
                 Lang.resol: Lang.calculating,

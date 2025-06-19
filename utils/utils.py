@@ -230,7 +230,7 @@ class Thumb:
     @classmethod
     def create_thumb_path(cls, img_path: str) -> str:
         new_name = hashlib.md5(img_path.encode('utf-8')).hexdigest() + ".jpg"
-        new_folder = os.path.join(Static.HASH_DIR, new_name[:2])
+        new_folder = os.path.join(Static.THUMBS_DIR, new_name[:2])
         os.makedirs(new_folder, exist_ok=True)
         return os.path.join(new_folder, new_name)
 
@@ -249,7 +249,7 @@ class Thumb:
             cv2.imwrite(thumb_path, img)
             return True
         except Exception as e:
-            print("error write image hash")
+            Utils.print_error(e)
             return False
 
     @classmethod
@@ -371,7 +371,7 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
         return date.strftime("%d.%m.%Y %H:%M")
         
     @classmethod
-    def get_full_src(cls, main_folder_path: str, short_src: str) -> str:
+    def get_img_path(cls, main_folder_path: str, short_src: str) -> str:
         return main_folder_path + short_src
     
     @classmethod

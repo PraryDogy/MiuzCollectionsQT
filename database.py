@@ -9,12 +9,12 @@ METADATA = sqlalchemy.MetaData()
 
 class ClmNames:
     ID = "id"
-    SHORT_SRC = "short_src"
-    SHORT_HASH = "short_hash"
+    SHORT_SRC = "short_src" #relative img path
+    SHORT_HASH = "short_hash" #relative thumb path
     SIZE = "size"
     BIRTH = "birth"
     MOD = "mod"
-    RESOL = "resol"
+    RESOL = "resol" #ignore
     COLL = "coll"
     FAV = "fav"
     BRAND = "brand"
@@ -23,12 +23,12 @@ class ClmNames:
 THUMBS = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column(ClmNames.ID, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmNames.SHORT_SRC, sqlalchemy.Text),
-    sqlalchemy.Column(ClmNames.SHORT_HASH, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.SHORT_SRC, sqlalchemy.Text, comment="relative img path"),
+    sqlalchemy.Column(ClmNames.SHORT_HASH, sqlalchemy.Text, comment="relative thumb path"),
     sqlalchemy.Column(ClmNames.SIZE, sqlalchemy.Integer),
     sqlalchemy.Column(ClmNames.BIRTH, sqlalchemy.Integer),
     sqlalchemy.Column(ClmNames.MOD, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.RESOL, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.RESOL, sqlalchemy.Text, comment="ignore"),
     sqlalchemy.Column(ClmNames.COLL, sqlalchemy.Text),
     sqlalchemy.Column(ClmNames.FAV, sqlalchemy.Integer),
     sqlalchemy.Column(ClmNames.BRAND, sqlalchemy.Text),

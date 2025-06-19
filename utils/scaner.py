@@ -139,7 +139,7 @@ class DbImages:
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(
-            THUMBS.c.short_hash,
+            THUMBS.c.short_hash, # relative thumb path
             THUMBS.c.short_src,
             THUMBS.c.size,
             THUMBS.c.birth,
@@ -152,13 +152,13 @@ class DbImages:
         conn.close()
         coll_folder = self.main_folder.get_current_path()
         return {
-            short_hash: (
-                Utils.get_full_src(coll_folder, short_src),
+            rel_thumb_path: (
+                Utils.get_img_path(coll_folder, rel_img_path),
                 size,
                 birth,
                 mod
             )
-            for short_hash, short_src, size, birth, mod in res
+            for rel_thumb_path, rel_img_path, size, birth, mod in res
         }
 
 
@@ -326,11 +326,11 @@ class DbUpdater:
                 return
             small_img_path = Utils.create_thumb_path(full_src)
             short_img_path = Utils.get_short_img_path(coll_folder, full_src)
-            short_small_img_path = Utils.get_rel_thumb_path(small_img_path)
+            rel_thumb_path = Utils.get_rel_thumb_path(small_img_path)
             coll_name = Utils.get_coll_name(coll_folder, full_src)
             values = {
                 ClmNames.SHORT_SRC: short_img_path,
-                ClmNames.SHORT_HASH: short_small_img_path,
+                ClmNames.SHORT_HASH: rel_thumb_path,
                 ClmNames.SIZE: size,
                 ClmNames.BIRTH: birth,
                 ClmNames.MOD: mod,
@@ -441,12 +441,12 @@ class MainFolderRemover:
     
     @classmethod
     def get_rows(cls, main_folder_name: str, conn: sqlalchemy.Connection):
-        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash)
+        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
         q = q.where(THUMBS.c.brand == main_folder_name)
         res = conn.execute(q).fetchall()
         res = [
-            (id_, Utils.get_thumb_path(rel_thumb_path=short_hash))
-            for id_, short_hash in res
+            (id_, Utils.get_thumb_path(rel_thumb_path))
+            for id_, rel_thumb_path in res
         ]
         return res
     

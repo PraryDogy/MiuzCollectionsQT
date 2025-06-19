@@ -110,8 +110,8 @@ print("Нажми 1 чтобы создать приложение с кешем
 if input() == "1":
     print("Создаю приложение с кешем ApplicationSupport")
 
-    src = Static.HASH_DIR
-    root = os.path.basename(Static.HASH_DIR)
+    src = Static.THUMBS_DIR
+    root = os.path.basename(Static.THUMBS_DIR)
     app_sup = Static.APP_SUPPORT_DIR
     new_hashdir = shutil.make_archive(src, "zip", app_sup, root)
 

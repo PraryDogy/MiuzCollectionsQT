@@ -444,7 +444,7 @@ class Lang_:
         "preparing"
     ]
 
-    hash_path = [
+    thumb_path = [
         "Данные",
         "Data"
     ]

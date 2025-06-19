@@ -72,7 +72,7 @@ class Static:
         "db.db"
         )
 
-    HASH_DIR: str = os.path.join(
+    THUMBS_DIR: str = os.path.join(
         APP_SUPPORT_DIR,
         "hashdir"
         )
@@ -84,7 +84,7 @@ class Static:
         "db.db"
         )
 
-    PRELOAD_HASHDIR_ZIP: str = os.path.join(
+    PRELOAD_THUMBS_ZIP: str = os.path.join(
         PRELOAD_FOLDER,
         "hashdir.zip"
         )
@@ -270,25 +270,25 @@ class JsonData:
         if not os.path.exists(Static.DB_FILE):
             cls.copy_db_file()
 
-        if not os.path.exists(Static.HASH_DIR):
-            cls.copy_hashdir()
+        if not os.path.exists(Static.THUMBS_DIR):
+            cls.copy_preloaded_thumbs()
 
         if not os.path.exists(Static.JSON_FILE):
             cls.write_json_data()
 
     @classmethod
-    def copy_hashdir(cls):
+    def copy_preloaded_thumbs(cls):
 
         # удаляем пользовательскую hashdir из ApplicationSupport
-        if os.path.exists(Static.HASH_DIR):
+        if os.path.exists(Static.THUMBS_DIR):
             print("Удаляю пользовательскую HASH_DIR")
             from utils.utils import Utils
-            Utils.rm_rf(Static.HASH_DIR)
+            Utils.rm_rf(Static.THUMBS_DIR)
 
         # копируем предустановленную hashdir в AppliactionSupport
-        if os.path.exists(Static.PRELOAD_HASHDIR_ZIP):
+        if os.path.exists(Static.PRELOAD_THUMBS_ZIP):
             print("копирую предустановленную HASH_DIR")
-            dest = shutil.copy2(Static.PRELOAD_HASHDIR_ZIP, Static.APP_SUPPORT_DIR)
+            dest = shutil.copy2(Static.PRELOAD_THUMBS_ZIP, Static.APP_SUPPORT_DIR)
             shutil.unpack_archive(dest, Static.APP_SUPPORT_DIR)
             os.remove(dest)
 

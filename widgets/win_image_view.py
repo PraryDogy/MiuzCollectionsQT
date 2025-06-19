@@ -47,8 +47,8 @@ NEXT_ = os.path.join(Static.images_dir, "next.svg")
 
 class ImageData:
     __slots__ = ["src", "pixmap"]
-    def __init__(self, src: str, pixmap: QPixmap):
-        self.src = src
+    def __init__(self, img_path: str, pixmap: QPixmap):
+        self.src = img_path
         self.pixmap: QPixmap = pixmap
 
 
@@ -57,56 +57,52 @@ class WorkerSignals(QObject):
 
 
 class LoadThumb(URunnable):
-    def __init__(self, short_src: str):
+    def __init__(self, rel_img_path: str):
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.short_src = short_src
+        self.rel_img_path = rel_img_path
 
     def task(self):
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(
-            THUMBS.c.short_hash
+            THUMBS.c.short_hash #rel thumb path
             ).where(
-                THUMBS.c.short_src == self.short_src
+                THUMBS.c.short_src == self.rel_img_path
                 )
-        short_hash = conn.execute(q).scalar()
+        rel_thumb_path = conn.execute(q).scalar()
         conn.close()
 
-        if short_hash:
-            full_hash = Utils.get_thumb_path(short_hash)
-            small_img = Utils.read_thumb(full_hash)
-            small_img = Utils.desaturate_image(image=small_img, factor=0.2)
-            pixmap = Utils.pixmap_from_array(small_img)
+        if rel_thumb_path:
+            thumb_path = Utils.get_thumb_path(rel_thumb_path)
+            thumb = Utils.read_thumb(thumb_path)
+            thumb = Utils.desaturate_image(thumb, 0.2)
+            pixmap = Utils.pixmap_from_array(thumb)
         else:
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(128, 128, 128))
 
-        image_data = ImageData(
-            src=self.short_src,
-            pixmap=pixmap
-        )
+        image_data = ImageData(self.rel_img_path, pixmap)
         self.signals_.finished_.emit(image_data)
 
 
 class LoadImage(URunnable):
     max_images_count = 50
 
-    def __init__(self, full_src: str, cached_images: dict[str, QPixmap]):
+    def __init__(self, img_path: str, cached_images: dict[str, QPixmap]):
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.full_src = full_src
+        self.img_path = img_path
         self.cached_images = cached_images
 
     def task(self):
-
-        if self.full_src not in self.cached_images:
-            img = Utils.read_image(self.full_src)
+        if self.img_path not in self.cached_images:
+            img = Utils.read_image(self.img_path)
             if img is not None:
-                img = Utils.desaturate_image(image=img, factor=0.2)
+                img = Utils.desaturate_image(img, 0.2)
                 self.pixmap = Utils.pixmap_from_array(img)
-                self.cached_images[self.full_src] = self.pixmap
+                self.cached_images[self.img_path] = self.pixmap
         else:
-            self.pixmap = self.cached_images.get(self.full_src)
+            self.pixmap = self.cached_images.get(self.img_path)
 
         if not hasattr(self, "pixmap"):
             print("не могу загрузить крупное изображение")
@@ -115,10 +111,7 @@ class LoadImage(URunnable):
         if len(self.cached_images) > self.max_images_count:
             self.cached_images.pop(next(iter(self.cached_images)))
 
-        image_data = ImageData(
-            src=self.full_src,
-            pixmap=self.pixmap
-        )
+        image_data = ImageData(self.img_path, self.pixmap)
 
         try:
             self.signals_.finished_.emit(image_data)
@@ -271,15 +264,15 @@ class WinImageView(WinChild):
     switch_image_sig = pyqtSignal(object)
     closed_ = pyqtSignal()
 
-    def __init__(self, short_src: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
+    def __init__(self, rel_img_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
 
         self.cached_images: dict[str, QPixmap] = {}
         self.is_selection = is_selection
         self.path_to_wid = path_to_wid
-        self.short_src_list = list(path_to_wid.keys())
-        self.short_src = short_src
-        self.wid = path_to_wid.get(self.short_src)
+        self.rel_img_path_list = list(path_to_wid.keys())
+        self.rel_img_path = rel_img_path
+        self.wid = path_to_wid.get(self.rel_img_path)
         self.task_count = 0
 
         self.setStyleSheet(IMG_VIEW_STYLE)
@@ -328,7 +321,7 @@ class WinImageView(WinChild):
     def load_thumb(self):
         self.setFocus()
         self.img_viewer_title()
-        task = LoadThumb(short_src=self.short_src)
+        task = LoadThumb(rel_img_path=self.rel_img_path)
         task.signals_.finished_.connect(self.load_thumb_fin)
         UThreadPool.start(task)
 
@@ -336,19 +329,16 @@ class WinImageView(WinChild):
         self.image_label.set_image(data.pixmap)
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
-
         if coll_folder:
-            self.full_src = Utils.get_full_src(coll_folder, self.short_src)
+            self.img_path = Utils.get_img_path(coll_folder, self.rel_img_path)
             self.load_image()
-
         else:
             print("img viewer > no smb")
 
     def load_image(self):
         self.task_count += 1
-        cmd_ = lambda data: self.load_image_fin(data, self.full_src)
-
-        img_thread = LoadImage(self.full_src, self.cached_images)
+        cmd_ = lambda data: self.load_image_fin(data, self.img_path)
+        img_thread = LoadImage(self.img_path, self.cached_images)
         img_thread.signals_.finished_.connect(cmd_)
         UThreadPool.start(img_thread)
 
@@ -379,19 +369,19 @@ class WinImageView(WinChild):
             return
 
         # мы формируем актуальный список src из актуальной сетки изображений
-        self.short_src_list = list(self.path_to_wid.keys())
+        self.rel_img_path_list = list(self.path_to_wid.keys())
 
-        if self.short_src in self.short_src_list:
-            current_index = self.short_src_list.index(self.short_src)
+        if self.rel_img_path in self.rel_img_path_list:
+            current_index = self.rel_img_path_list.index(self.rel_img_path)
             new_index = current_index + offset
         else:
             new_index = 0
 
-        if new_index == len(self.short_src_list):
+        if new_index == len(self.rel_img_path_list):
             new_index = 0
 
         elif new_index < 0:
-            new_index = len(self.short_src_list) - 1
+            new_index = len(self.rel_img_path_list) - 1
 
         # 
         # сетка = Thumbnail.path_to_wid = сетка thumbnails
@@ -401,7 +391,7 @@ class WinImageView(WinChild):
         # так как мы сохранили список src сетки, то новый src будет найден
         # но не факт, что он уже есть в сетке
         try:
-            new_short_src = self.short_src_list[new_index]
+            new_short_src = self.rel_img_path_list[new_index]
         except IndexError as e:
             print(e)
             return
@@ -415,8 +405,8 @@ class WinImageView(WinChild):
         # берем первый src из этого списка
         # и первый виджет из сетки
         if not new_wid:
-            self.short_src = self.short_src_list[0]
-            self.wid = self.path_to_wid.get(self.short_src)
+            self.rel_img_path = self.rel_img_path_list[0]
+            self.wid = self.path_to_wid.get(self.rel_img_path)
 
         # если виджет найден, тоне факт, что список src актуален
         # то есть сетка все равно могла быть перетасована
@@ -425,7 +415,7 @@ class WinImageView(WinChild):
         # то есть и src в списке src
         # поэтому берем ранее найденный src и виджет
         else:
-            self.short_src = new_short_src
+            self.rel_img_path = new_short_src
             self.wid = new_wid
 
         self.load_thumb()
@@ -436,7 +426,7 @@ class WinImageView(WinChild):
         # но если было выбрано для просмотра х число виджетов, мы не 
         # снимаем с них выделение
         if not self.is_selection:
-            self.switch_image_sig.emit(self.short_src)
+            self.switch_image_sig.emit(self.rel_img_path)
 
     def img_viewer_title(self):
         self.setWindowTitle(f"{self.wid.collection}: {self.wid.name}")
@@ -492,7 +482,7 @@ class WinImageView(WinChild):
             MainFolder.current.check_avaiability()
             coll_folder = MainFolder.current.get_current_path()
             if coll_folder:
-                full_src = Utils.get_full_src(coll_folder, self.short_src)
+                full_src = Utils.get_img_path(coll_folder, self.rel_img_path)
                 urls = [full_src]
                 self.info_win = WinInfo(urls)
                 self.info_win.finished_.connect(self.open_info_win_delayed)
@@ -504,7 +494,7 @@ class WinImageView(WinChild):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
         self.menu_ = ContextCustom(event=ev)
-        urls = [self.short_src]
+        urls = [self.rel_img_path]
 
         info = WinInfoAction(
             parent=self.menu_,
@@ -515,7 +505,7 @@ class WinImageView(WinChild):
 
         self.fav_action = FavActionDb(
             parent=self.menu_,
-            short_src=self.short_src,
+            short_src=self.rel_img_path,
             fav_value=self.wid.fav_value
         )
         self.fav_action.finished_.connect(self.change_fav)
@@ -523,19 +513,19 @@ class WinImageView(WinChild):
 
         self.menu_.addSeparator()
 
-        copy = CopyPath(self.menu_, self, [self.short_src])
+        copy = CopyPath(self.menu_, self, [self.rel_img_path])
         self.menu_.addAction(copy)
 
-        copy_name = CopyName(self.menu_, self, [self.short_src])
+        copy_name = CopyName(self.menu_, self, [self.rel_img_path])
         self.menu_.addAction(copy_name)
 
-        reveal = Reveal(self.menu_, self, [self.short_src])
+        reveal = Reveal(self.menu_, self, [self.rel_img_path])
         self.menu_.addAction(reveal)
 
-        save_as = Save(self.menu_, self, self.short_src, True)
+        save_as = Save(self.menu_, self, self.rel_img_path, True)
         self.menu_.addAction(save_as)
 
-        save = Save(self.menu_, self, self.short_src, False)
+        save = Save(self.menu_, self, self.rel_img_path, False)
         self.menu_.addAction(save)
 
         self.menu_.show_menu()

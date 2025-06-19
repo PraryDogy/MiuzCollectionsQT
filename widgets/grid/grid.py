@@ -376,7 +376,7 @@ class Grid(QScrollArea):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         urls = [
-            Utils.get_full_src(coll_folder, i.short_src)
+            Utils.get_img_path(coll_folder, i.short_src)
             for i in self.selected_widgets
         ]
 
@@ -411,7 +411,7 @@ class Grid(QScrollArea):
                 coll_folder = MainFolder.current.get_current_path()
                 if coll_folder:
                     urls = [
-                        Utils.get_full_src(coll_folder, i.short_src)
+                        Utils.get_img_path(coll_folder, i.short_src)
                         for i in self.selected_widgets
                     ]
                     self.info_win = WinInfo(urls)
@@ -716,7 +716,7 @@ class Grid(QScrollArea):
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             urls = [
-                Utils.get_full_src(coll_folder, i.short_src)
+                Utils.get_img_path(coll_folder, i.short_src)
                 for i in self.selected_widgets
             ]
         else:

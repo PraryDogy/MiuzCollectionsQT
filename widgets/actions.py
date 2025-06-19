@@ -61,7 +61,7 @@ class WinInfoAction(QAction):
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             self.urls = [
-                    Utils.get_full_src(coll_folder, i)
+                    Utils.get_img_path(coll_folder, i)
                     for i in self.urls
             ]
             self.win = WinInfo(self.urls)
@@ -94,7 +94,7 @@ class CopyPath(QAction):
         if coll_folder:
             urls: list[str] = []
             for i in self.urls:
-                i = Utils.get_full_src(coll_folder, i)
+                i = Utils.get_img_path(coll_folder, i)
                 urls.append(i)
             urls = "\n".join(urls)
             Utils.copy_text(urls)
@@ -141,7 +141,7 @@ class Reveal(QAction):
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             urls = [
-                Utils.get_full_src(coll_folder, i)
+                Utils.get_img_path(coll_folder, i)
                 for i in self.urls
             ]
             Utils.reveal_files(urls)
@@ -229,7 +229,7 @@ class Save(QAction):
         if coll_folder:
 
             full_src = [
-                Utils.get_full_src(coll_folder, url)
+                Utils.get_img_path(coll_folder, url)
                 for url in self.short_src
             ]
 
@@ -305,7 +305,7 @@ class MoveFiles(QAction):
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             self.urls = [
-                Utils.get_full_src(coll_folder, i)
+                Utils.get_img_path(coll_folder, i)
                 for i in self.urls
             ]
             self.upload_win = WinUpload()
