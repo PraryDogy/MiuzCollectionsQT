@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 
 import sqlalchemy
+from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
@@ -66,24 +67,19 @@ class DbImages(URunnable):
             self.signals_.finished_.emit(thumbs_dict)
             return
 
-        for short_src, short_hash, mod, coll, fav in res:
+        for rel_img_path, rel_thumb_path, mod, coll, fav in res:
 
-            if not short_src.endswith(exts_):
+            if not rel_img_path.endswith(exts_):
                 continue
 
             mod = datetime.fromtimestamp(mod).date()
-            full_hash = Utils.get_thumb_path(short_hash)
-            array_img = Utils.read_thumb(full_hash)
+            thumb_path = Utils.get_thumb_path(rel_thumb_path)
+            thumb = Utils.read_thumb(thumb_path)
 
-            if array_img is None:
-                self.remove_db(short_hash=short_hash)
-                continue
-
+            if isinstance(thumb, ndarray):
+                pixmap = Utils.pixmap_from_array(thumb)
             else:
-                pixmap = Utils.pixmap_from_array(array_img)
-
-            del array_img
-            # gc.collect()
+                continue
 
             if Dynamic.date_start or Dynamic.date_end:
                 mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
@@ -91,38 +87,17 @@ class DbImages(URunnable):
             else:
                 mod = f"{Lang.months[str(mod.month)]} {mod.year}"
 
-            thumbs_dict[mod].append(DbImage(pixmap, short_src, coll, fav))
+            thumbs_dict[mod].append(DbImage(pixmap, rel_img_path, coll, fav))
 
         try:
             self.signals_.finished_.emit(thumbs_dict)
         except RuntimeError:
             ...
 
-    def remove_db(self, short_hash: str):
-        return
-        # если в ДБ есть запись hash_path, по которому загружается изображение
-        # из finder > app_support > app > hash
-        # но изображения нет
-        # значит в БД есть запись о несуществующем изображении
-        # удаляем эту запись из БД
-        print("widgets > grid > _db_images > create_dict")
-        print("can't load image from hash_path, removing from db..")
-
-        return
-
-        conn = Dbase.engine.connect()
-
-        q = sqlalchemy.delete(THUMBS)
-        q = q.where(THUMBS.c.short_hash == short_hash)
-
-        conn.execute(q)
-        conn.commit()
-        conn.close()
-
     def get_stmt(self) -> sqlalchemy.Select:
         q = sqlalchemy.select(
-            THUMBS.c.short_src,
-            THUMBS.c.short_hash,
+            THUMBS.c.short_src, # rel img path
+            THUMBS.c.short_hash, # rel thumb path
             THUMBS.c.mod,
             THUMBS.c.coll,
             THUMBS.c.fav

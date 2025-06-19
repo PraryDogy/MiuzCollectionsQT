@@ -101,14 +101,14 @@ class SingleImgInfo(URunnable):
             size = Utils.get_f_size(stats.st_size)
             mod = Utils.get_f_date(stats.st_mtime)
             coll = Utils.get_coll_name(coll_folder, self.url)
-            full_hash = Utils.create_thumb_path(self.url)
+            thumb_path = Utils.create_thumb_path(self.url)
 
             res = {
                 Lang.file_name: Tools.lined_text(name),
                 Lang.type_: type_,
                 Lang.file_size: size,
                 Lang.place: Tools.lined_text(self.url),
-                Lang.thumb_path: Tools.lined_text(full_hash),
+                Lang.thumb_path: Tools.lined_text(thumb_path),
                 Lang.changed: mod,
                 Lang.collection: Tools.lined_text(coll),
                 Lang.resol: Lang.calculating,
