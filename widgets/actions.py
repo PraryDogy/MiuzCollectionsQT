@@ -75,12 +75,14 @@ class WinInfoAction(QAction):
         self.win.center_relative_parent(self.win_)
         self.win.show()
 
+
 class CopyPath(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
-        super().__init__(parent=parent, text=Lang.copy_path)
+    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
+        text = f"{Lang.copy_path} ({len(urls)})"
+        super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
-        self.short_src = short_src
+        self.urls = urls
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -88,18 +90,23 @@ class CopyPath(QAction):
         coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
-            full_src = Utils.get_full_src(coll_folder, self.short_src)
-            Utils.copy_text(text=full_src)
+            urls: list[str] = []
+            for i in self.urls:
+                i = Utils.get_full_src(coll_folder, i)
+                urls.append(i)
+            urls = "\n".join(urls)
+            Utils.copy_text(urls)
         else:
             SmbWin.show(self.win_)
 
 
 class CopyName(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str):
-        super().__init__(parent=parent, text=Lang.copy_name)
+    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
+        text = f"{Lang.copy_name} ({len(urls)})"
+        super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
-        self.short_src = short_src
+        self.urls = urls
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -107,24 +114,22 @@ class CopyName(QAction):
         coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
-            name = os.path.basename(self.short_src)
-            name, _ = os.path.splitext(name)
-            Utils.copy_text(name)
+            names: list[str] = []
+            for i in self.urls:
+                i = os.path.basename(i)
+                i, _ = os.path.splitext(i)
+                names.append(i)
+            names = "\n".join(names)
+            Utils.copy_text(names)
         else:
             SmbWin.show(self.win_)
 
 
 class Reveal(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, short_src: str | list):
-
-        if isinstance(short_src, list):
-            text = f"{Lang.reveal_in_finder} ({len(short_src)})"
-        else:
-            text = f"{Lang.reveal_in_finder} (1)"
-            short_src = [short_src]
-
+    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
+        text = f"{Lang.reveal_in_finder} ({len(urls)})"
         super().__init__(parent=parent, text=text)
-        self.short_src = short_src
+        self.urls = urls
         self.parent_ = parent
         self.win_ = win
         self.triggered.connect(self.cmd)
@@ -133,11 +138,11 @@ class Reveal(QAction):
         MainFolder.current.set_current_path()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
-            full_src = [
+            urls = [
                 Utils.get_full_src(coll_folder, i)
-                for i in self.short_src
+                for i in self.urls
             ]
-            Utils.reveal_files(files_list=full_src)
+            Utils.reveal_files(urls)
         else:
             SmbWin.show(self.win_)
 

@@ -523,41 +523,19 @@ class WinImageView(WinChild):
 
         self.menu_.addSeparator()
 
-        copy = CopyPath(
-            parent=self.menu_,
-            win=self,
-            short_src=self.short_src
-        )
+        copy = CopyPath(self.menu_, self, [self.short_src])
         self.menu_.addAction(copy)
 
-        copy_name = CopyName(
-            parent=self.menu_,
-            win=self,
-            short_src=self.short_src
-        )
+        copy_name = CopyName(self.menu_, self, [self.short_src])
         self.menu_.addAction(copy_name)
 
-        reveal = Reveal(
-            parent=self.menu_,
-            win=self,
-            short_src=self.short_src
-        )
+        reveal = Reveal(self.menu_, self, [self.short_src])
         self.menu_.addAction(reveal)
 
-        save_as = Save(
-            parent=self.menu_, 
-            win=self,
-            short_src=self.short_src,
-            save_as=True
-        )
+        save_as = Save(self.menu_, self, self.short_src, True)
         self.menu_.addAction(save_as)
 
-        save = Save(
-            parent=self.menu_,
-            win=self,
-            short_src=self.short_src,
-            save_as=False
-            )
+        save = Save(self.menu_, self, self.short_src, False)
         self.menu_.addAction(save)
 
         self.menu_.show_menu()

@@ -634,41 +634,19 @@ class Grid(QScrollArea):
 
             self.menu_.addSeparator()
 
-            copy = CopyPath(
-                parent=self.menu_,
-                win=self.window(),
-                short_src=clicked_wid.short_src
-            )
+            copy = CopyPath(self.menu_, self.window(), urls)
             self.menu_.addAction(copy)
 
-            copy_name = CopyName(
-                parent=self.menu_,
-                win=self.window(),
-                short_src=clicked_wid.short_src
-            )
+            copy_name = CopyName(self.menu_, self.window(), urls)
             self.menu_.addAction(copy_name)
 
-            reveal = Reveal(
-                parent=self.menu_,
-                win=self.window(),
-                short_src=urls
-            )
+            reveal = Reveal( self.menu_, self.window(), urls)
             self.menu_.addAction(reveal)
 
-            save_as = Save(
-                parent=self.menu_,
-                win=self.window(),
-                short_src=urls,
-                save_as=True
-                )
+            save_as = Save(self.menu_, self.window(), urls, True)
             self.menu_.addAction(save_as)
 
-            save = Save(
-                parent=self.menu_,
-                win=self.window(),
-                short_src=urls,
-                save_as=False
-                )
+            save = Save( self.menu_, self.window(), urls, False)
             self.menu_.addAction(save)
 
             self.menu_.addSeparator()
