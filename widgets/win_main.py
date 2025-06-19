@@ -29,9 +29,17 @@ from .win_upload import WinUpload
 
 
 class UpdateDbTask(URunnable):
-    def __init__(self, urls: list[str]):
+    def __init__(self, urls: list[str], remove_records: list[str]):
+        """
+        urls: список путей к файлам, которые необходимо добавить в базу данных  
+        и сохранить их хеши в папке ApplicationSupport.
+
+        remove_records: список путей к файлам, чьи записи нужно удалить  
+        из базы данных.
+        """
         super().__init__()
         self.urls = urls
+        self.remove_records = remove_records
 
     def task(self):
         MainFolder.current.check_avaiability()
@@ -42,6 +50,12 @@ class UpdateDbTask(URunnable):
             ]
 
             exist_records = Dbase.get_exist_records(short_urls)
+
+            if self.remove_records:
+                for i in self.remove_records:
+                    short_src = Utils.get_short_src(MainFolder.current.get_current_path(), i)
+                    exist_records.append(short_src)
+
             new_records = self.new_records()
             db_updater = DbUpdater(exist_records, new_records, MainFolder.current)
             db_updater.run()
@@ -212,7 +226,7 @@ class WinMain(WinFrameless):
         UThreadPool.start(thread_)
 
     def upload_task_finished(self, urls: list[str]):
-        self.upload_task = UpdateDbTask(urls)
+        self.upload_task = UpdateDbTask(urls, [])
         UThreadPool.start(self.upload_task)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
