@@ -202,7 +202,7 @@ class DbUpdater:
 
     def __init__(self, del_items: list, ins_items: list, main_folder: MainFolder):
         """
-        del_items: список url файлов из short_hash
+        del_items: список url файлов из short_hash  
         ins_items: список (полный url, size, birth, mod)
         """
         super().__init__()
@@ -211,7 +211,6 @@ class DbUpdater:
         self.ins_items = ins_items
 
     def run(self):
-
         self.del_db()
         self.del_images()
 
@@ -223,7 +222,6 @@ class DbUpdater:
 
     def del_db(self):
         conn = Dbase.engine.connect()
-
         for short_hash in self.del_items:
 
             # нельзя удалять

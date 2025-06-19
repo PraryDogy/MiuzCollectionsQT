@@ -15,7 +15,7 @@ from main_folders import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
-from utils.scaner import Scaner
+from utils.scaner import DbUpdater, Scaner
 from utils.utils import Utils
 from widgets._runnable import URunnable, UThreadPool
 
@@ -45,12 +45,21 @@ class UpdateDbTask(URunnable):
                 Utils.get_short_src(MainFolder.current.get_current_path(), i)
                 for i in self.urls
             ]
+
             exist_records = Dbase.get_exist_records(short_urls)
-            Dbase.remove_records(exist_records)
+            new_records = self.new_records()
+            DbUpdater(exist_records, new_records)
 
-        # print(self.urls)
-        # print(exist_records)
-
+    def new_records(self):
+        new_urls: list = []
+        for i in self.urls:
+            try:
+                stats = os.stat(i)
+                new_urls.append(i, stats.st_size, stats.st_birthtime, stats.st_mtime)
+            except Exception as e:
+                Utils.print_error(e)
+                continue
+        return new_urls
 
 class TestWid(QFrame):
     def __init__(self, parent=None):
