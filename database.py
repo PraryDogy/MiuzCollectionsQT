@@ -113,3 +113,21 @@ class Dbase:
             Utils.print_error(e)
 
         conn.close()
+
+    def get_exist_records(cls, urls: list[str]) -> list[str]:
+        """
+        urls: список из short_src
+        возвращает: список из short_src, которые есть в БД
+        """
+        conn = cls.engine.connect()
+        new_urls: list[str] = []
+
+        for i in urls:
+            q = sqlalchemy.select(THUMBS)
+            q = q.where(THUMBS.c.short_src == i)
+            res = conn.execute(q).scalar or None
+            if res:
+                new_urls.append(i)
+        
+        conn.close()
+        return new_urls
