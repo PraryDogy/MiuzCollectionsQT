@@ -181,6 +181,8 @@ class FileUpdater:
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
+        Удаляет thumbs из hashdir   
+        Добавляет thumbs в hashdir  
         del_items: [rel_thumb_path, ...]    
         new_items: [(img_path, size, birth, mod), ...]  
         run() to start  
@@ -190,7 +192,12 @@ class FileUpdater:
         self.new_items = new_items
         self.main_folder = main_folder
 
-    def run(self):
+    def run(self) -> tuple[list, list]:
+        """
+        Возвращает:     
+        del_items: [rel_thumb_path, ...]    
+        new_items: [(img_path, size, birth, mod), ...]  
+        """
         del_items = self.run_del_items()
         new_items = self.run_new_items()
         ScanerTools.progressbar_text("")
@@ -266,6 +273,8 @@ class FileUpdater:
 class DbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
+        Удаляет записи thumbs из бд   
+        Добавляет записи thumbs в бд
         del_items: [rel_thumb_path, ...]    
         new_items: [(img_path, size, birth, mod), ...]      
         run() to start  

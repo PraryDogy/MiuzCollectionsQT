@@ -1,7 +1,6 @@
 import os
 import subprocess
 
-import sqlalchemy
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                              QWidget)
@@ -9,10 +8,9 @@ from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
 from base_widgets.svg_btn import SvgBtn
 from base_widgets.wins import WinSystem
 from cfg import Static
-from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
-from utils.scaner import FileUpdater
+from utils.scaner import DbUpdater, FileUpdater
 from utils.utils import Err, Utils
 
 from ._runnable import URunnable, UThreadPool
@@ -43,42 +41,26 @@ class RemoveFilesTask(URunnable):
         except RuntimeError as e:
             Err.print_error(e)
 
-    def remove_thumbs(self):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
-        if not main_folder_path:
-            return
-        Dbase.create_engine()
-        conn = Dbase.engine.connect()
-        for img_path in self.img_path_list:
-            thumb_path = Utils.create_thumb_path(img_path)
-            try:
-                os.remove(thumb_path)
-                parent = os.path.dirname(thumb_path)
-                if not os.listdir(parent):
-                    os.rmdir(parent)
-            except Exception as e:
-                Utils.print_error(e)
-                continue
+    def remove_thumbs(self):      
+        thumb_path_list = [
+            Utils.create_thumb_path(img_path)
+            for img_path in self.img_path_list
+        ]
+        rel_thumb_path_list = [
+            Utils.get_rel_thumb_path(thumb_path)
+            for thumb_path in thumb_path_list
+        ]
 
-            rel_img_path = Utils.get_rel_img_path(main_folder_path, img_path)
-            q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.short_src == rel_img_path)
-            q = q.where(THUMBS.c.brand == MainFolder.current.name)
-            try:
-                conn.execute(q)
-            except Exception as e:
-                Utils.print_error(e)
-                conn.rollback()
-                continue
-        try:
-            conn.commit()
-        except Exception as e:
-            Utils.print_error(e)
-            conn.rollback()
-
-        conn.close()
-
+        main_folder = MainFolder.current
+        
+        # new_items пустой так как мы только удаляем thumbs из hashdir
+        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder)
+        del_items, new_items = file_updater.run()
+        
+        # new_items пустой так как мы только удаляем thumbs из бд
+        db_updater = DbUpdater(del_items, [], main_folder)
+        db_updater.run()
+        
 
 class RemoveFilesWin(WinSystem):
     finished_ = pyqtSignal(list)
