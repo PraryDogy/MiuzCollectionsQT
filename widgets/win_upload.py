@@ -39,20 +39,28 @@ class DbUpdaterSetup(URunnable):
         del_items = self.get_exist_records()
         ins_items = self.get_new_records()
 
-        # в remove_url помещаются те url, которые нужно просто удалить 
-        # из базы данных
-        hashes: list[str] = []
         if self.remove_urls:
-            for i in self.remove_urls:
-                # создаем short_hash необходимый для DbUpdater
-                hash_ = Utils.create_full_hash(i)
-                short_hash = Utils.get_short_hash(hash_)
-                hashes.append(short_hash)
-            del_items.extend(hashes)
+            del_items.extend(self.get_remove_records())
 
         db_updater = DbUpdater(del_items, ins_items, MainFolder.current)
         db_updater.run()
         self.signals_.finished_.emit()
+
+    def get_remove_records(self):
+        """
+        В приложении доступна функция "переместить" которая перемещает файлы
+        из одной директории в другую. Необходимо удалить из базы данных
+        записи об исходной директории файла, для этого подготавливаем список
+        для DbUpdater, который принимает список для удаления из short_hash
+        """
+        hashes: list[str] = []
+        if self.remove_urls:
+            for i in self.remove_urls:
+                hash_ = Utils.create_full_hash(i)
+                short_hash = Utils.get_short_hash(hash_)
+                hashes.append(short_hash)
+
+        return hashes
 
     def get_new_records(self):
         """
