@@ -204,6 +204,7 @@ class DbUpdater:
         """
         del_items: список url файлов из short_hash  
         ins_items: список (полный url, size, birth, mod)
+        run
         """
         super().__init__()
         self.main_folder = main_folder

@@ -48,18 +48,24 @@ class UpdateDbTask(URunnable):
 
             exist_records = Dbase.get_exist_records(short_urls)
             new_records = self.new_records()
-            DbUpdater(exist_records, new_records)
+            db_updater = DbUpdater(exist_records, new_records, MainFolder.current)
+            db_updater.run()
+
+            SignalsApp.instance.menu_left_cmd.emit("reload")
+            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
     def new_records(self):
         new_urls: list = []
         for i in self.urls:
             try:
                 stats = os.stat(i)
-                new_urls.append(i, stats.st_size, stats.st_birthtime, stats.st_mtime)
+                data = (i, stats.st_size, stats.st_birthtime, stats.st_mtime)
+                new_urls.append(data)
             except Exception as e:
                 Utils.print_error(e)
                 continue
         return new_urls
+
 
 class TestWid(QFrame):
     def __init__(self, parent=None):
