@@ -24,9 +24,10 @@ class WorkerSignals(QObject):
 
 
 class DbUpdaterFast(URunnable):
-    def __init__(self, urls: list[str]):
+    def __init__(self, urls: list[str], remove_urls: list[str] = None):
         super().__init__()
         self.urls = urls
+        self.remove_urls = remove_urls
         self.signals_ = WorkerSignals()
 
     def task(self):
@@ -36,14 +37,22 @@ class DbUpdaterFast(URunnable):
             return
 
         short_urls: list[str] = []
+        coll_folder = MainFolder.current.get_current_path()
 
         for url in self.urls:
-            coll_folder = MainFolder.current.get_current_path()
             short_src = Utils.get_short_src(coll_folder, url)
             short_urls.append(short_src)
 
         del_items = self.get_del_items(short_urls)
         ins_items = self.get_ins_items()
+
+        hashes: list[str] = []
+        if self.remove_urls:
+            for i in self.remove_urls:
+                hash_ = Utils.create_full_hash(i)
+                short_hash = Utils.get_short_hash(hash_)
+                hashes.append(short_hash)
+            del_items.extend(hashes)
 
         db_updater = DbUpdater(del_items, ins_items, MainFolder.current)
         db_updater.run()
@@ -197,7 +206,10 @@ class WinUpload(WinSystem):
         self.hide()
 
     def copy_finished(self, urls: list[str]):
-        self.update_task = DbUpdaterFast(urls)
+        if self.is_filemove:
+            self.update_task = DbUpdaterFast(urls, self.urls)
+        else:
+            self.update_task = DbUpdaterFast(urls)
         self.update_task.signals_.finished_.connect(self.db_updater_finished)
         UThreadPool.start(self.update_task)
 
