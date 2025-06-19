@@ -135,20 +135,20 @@ class Thumbnail(QFrame, CellWid):
         padding-right: 2px;
     """
 
-    def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
+    def __init__(self, pixmap: QPixmap, rel_img_path: str, coll_name: str, fav: int):
         CellWid.__init__(self)
         QFrame.__init__(self)
         self.setStyleSheet(Static.border_transparent_style)
 
         self.img = pixmap
-        self.short_src = short_src
-        self.collection = coll
+        self.rel_img_path = rel_img_path
+        self.collection = coll_name
         self.fav_value = fav
 
         if fav == 0 or fav is None:
-            self.name = os.path.basename(short_src)
+            self.name = os.path.basename(rel_img_path)
         elif fav == 1:
-            self.name = Static.STAR_SYM + os.path.basename(short_src)
+            self.name = Static.STAR_SYM + os.path.basename(rel_img_path)
 
         self.v_layout = LayoutVer()
         self.v_layout.setSpacing(ThumbData.SPACING)
@@ -157,7 +157,7 @@ class Thumbnail(QFrame, CellWid):
 
         self.img_wid = ImgWid()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.text_wid = TextWid(self, self.name, coll)
+        self.text_wid = TextWid(self, self.name, coll_name)
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(
             self.text_wid,
@@ -197,10 +197,10 @@ class Thumbnail(QFrame, CellWid):
     def change_fav(self, value: int):
         if value == 0:
             self.fav_value = value
-            self.name = os.path.basename(self.short_src)
+            self.name = os.path.basename(self.rel_img_path)
         elif value == 1:
             self.fav_value = value
-            self.name = Static.STAR_SYM + os.path.basename(self.short_src)
+            self.name = Static.STAR_SYM + os.path.basename(self.rel_img_path)
 
         self.text_wid.name = self.name
         self.text_wid.set_text()

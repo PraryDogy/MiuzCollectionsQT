@@ -394,13 +394,13 @@ class WinImageView(WinChild):
         # так как мы сохранили список src сетки, то новый src будет найден
         # но не факт, что он уже есть в сетке
         try:
-            new_short_src = self.rel_img_path_list[new_index]
+            rel_img_path = self.rel_img_path_list[new_index]
         except IndexError as e:
             print(e)
             return
 
         # ищем виджет в актуальной сетке, которая могла обновиться в фоне
-        new_wid = self.path_to_wid.get(new_short_src)
+        new_wid = self.path_to_wid.get(rel_img_path)
 
         # если виджет не найден в сетке
         # значит сетка обновилась в фоне с новыми виджетами
@@ -418,7 +418,7 @@ class WinImageView(WinChild):
         # то есть и src в списке src
         # поэтому берем ранее найденный src и виджет
         else:
-            self.rel_img_path = new_short_src
+            self.rel_img_path = rel_img_path
             self.wid = new_wid
 
         self.load_thumb()

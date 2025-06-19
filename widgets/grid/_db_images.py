@@ -18,11 +18,11 @@ from .._runnable import URunnable
 
 
 class DbImage:
-    __slots__ = ["pixmap", "short_src", "coll", "fav"]
-    def __init__(self, pixmap: QPixmap, short_src: str, coll: str, fav: int):
+    __slots__ = ["pixmap", "rel_img_path", "coll_name", "fav"]
+    def __init__(self, pixmap: QPixmap, rel_img_path: str, coll: str, fav: int):
         self.pixmap = pixmap
-        self.short_src = short_src
-        self.coll = coll
+        self.rel_img_path = rel_img_path
+        self.coll_name = coll
         self.fav = fav
 
 

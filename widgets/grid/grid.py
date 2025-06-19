@@ -214,12 +214,12 @@ class Grid(QScrollArea):
 
             wid = Thumbnail(
                 pixmap=db_image.pixmap,
-                short_src=db_image.short_src,
-                coll=db_image.coll,
+                rel_img_path=db_image.rel_img_path,
+                coll_name=db_image.coll_name,
                 fav=db_image.fav
             )
             wid.set_no_frame()
-            Thumbnail.path_to_wid[wid.short_src] = wid
+            Thumbnail.path_to_wid[wid.rel_img_path] = wid
             self.cell_to_wid[self.global_row, col] = wid
             wid.row, wid.col = self.global_row, col
             grid_lay.addWidget(wid, row, col)
@@ -265,10 +265,10 @@ class Grid(QScrollArea):
             path_to_wid = Thumbnail.path_to_wid
             is_selection = False
         else:
-            path_to_wid = {i.short_src: i for i in self.selected_widgets}
+            path_to_wid = {i.rel_img_path: i for i in self.selected_widgets}
             is_selection = True
 
-        self.win_image_view = WinImageView(wid.short_src, path_to_wid, is_selection)
+        self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
         self.win_image_view.closed_.connect(lambda: gc.collect())
         self.win_image_view.center_relative_parent(self.window())
 
@@ -330,7 +330,7 @@ class Grid(QScrollArea):
 
             for wid in grid_wid.findChildren(Thumbnail):
 
-                Thumbnail.path_to_wid[wid.short_src] = wid
+                Thumbnail.path_to_wid[wid.rel_img_path] = wid
                 self.cell_to_wid[self.global_row, col] = wid
                 wid.row, wid.col = self.global_row, col
                 grid_lay.addWidget(wid, row, col)
@@ -376,7 +376,7 @@ class Grid(QScrollArea):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         urls = [
-            Utils.get_img_path(coll_folder, i.short_src)
+            Utils.get_img_path(coll_folder, i.rel_img_path)
             for i in self.selected_widgets
         ]
 
@@ -411,7 +411,7 @@ class Grid(QScrollArea):
                 coll_folder = MainFolder.current.get_current_path()
                 if coll_folder:
                     urls = [
-                        Utils.get_img_path(coll_folder, i.short_src)
+                        Utils.get_img_path(coll_folder, i.rel_img_path)
                         for i in self.selected_widgets
                     ]
                     self.info_win = WinInfo(urls)
@@ -608,7 +608,7 @@ class Grid(QScrollArea):
                 self.add_and_select_widget(wid=clicked_wid)
 
             urls = [
-                i.short_src
+                i.rel_img_path
                 for i in self.selected_widgets
             ]
 
@@ -627,7 +627,7 @@ class Grid(QScrollArea):
 
             self.fav_action = FavActionDb(
                 parent=self.menu_,
-                rel_img_path=clicked_wid.short_src,
+                rel_img_path=clicked_wid.rel_img_path,
                 fav_value=clicked_wid.fav_value
                 )
             self.fav_action.finished_.connect(clicked_wid.change_fav)
@@ -716,7 +716,7 @@ class Grid(QScrollArea):
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
             urls = [
-                Utils.get_img_path(coll_folder, i.short_src)
+                Utils.get_img_path(coll_folder, i.rel_img_path)
                 for i in self.selected_widgets
             ]
         else:
