@@ -15,7 +15,9 @@ from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
 from .win_info import WinInfo
+from .win_remove_files import RemoveFilesTask
 from .win_smb import WinSmb
+from .win_upload import WinUpload
 
 
 class SmbWin:
@@ -288,3 +290,34 @@ class RemoveFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
         text_ = f"{Lang.delete} ({total})"
         super().__init__(text_, parent)
+
+
+class MoveFiles(QAction):
+    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
+        text = f"{Lang.move_files} ({len(urls)})"
+        super().__init__(text=text, parent=parent)
+        self.triggered.connect(self.cmd)
+        self.urls = urls
+        self.win_ = win
+
+    def cmd(self):
+        MainFolder.current.set_current_path()
+        coll_folder = MainFolder.current.get_current_path()
+        if coll_folder:
+            urls = [
+                Utils.get_full_src(coll_folder, i)
+                for i in self.urls
+            ]
+
+            self.upload_win = WinUpload(urls)
+            self.upload_win.finished_.connect(self.remove_old_files)
+            self.upload_win.center_relative_parent(self.win_)
+            self.upload_win.show()
+
+    def remove_old_files(self):
+        self.remove_files_task = RemoveFilesTask(self.urls)
+        self.remove_files_task.signals_.finished_.connect(self.remove_finished)
+        UThreadPool.start(self.remove_files_task)
+
+    def remove_finished(self):
+        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")

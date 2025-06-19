@@ -2,7 +2,7 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QSize, Qt, QTimer
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal, QObject
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
 
 from base_widgets.layouts import LayoutHor
@@ -19,10 +19,15 @@ from ._runnable import URunnable, UThreadPool
 from .menu_left import CollectionBtn, MenuLeft
 
 
+class WorkerSignals(QObject):
+    finished_ = pyqtSignal()
+
+
 class DbUpdaterFast(URunnable):
     def __init__(self, urls: list[str]):
         super().__init__()
         self.urls = urls
+        self.signals_ = WorkerSignals()
 
     def task(self):
 
@@ -42,6 +47,7 @@ class DbUpdaterFast(URunnable):
 
         db_updater = DbUpdater(del_items, ins_items, MainFolder.current)
         db_updater.run()
+        self.signals_.finished_.emit()
 
     def get_ins_items(self):
         ins_items: list[str] = []
@@ -74,6 +80,7 @@ class DbUpdaterFast(URunnable):
 
 class WinUpload(WinSystem):
     h_ = 30
+    finished_ = pyqtSignal()
 
     def __init__(self, urls: list[str]):
         super().__init__()
@@ -186,11 +193,16 @@ class WinUpload(WinSystem):
         thread_ = CopyFiles(dest, full_src)
         thread_.signals_.finished_.connect(lambda urls: self.copy_finished(urls))
         UThreadPool.start(thread_)
-        self.deleteLater()
+        self.hide()
 
     def copy_finished(self, urls: list[str]):
         self.update_task = DbUpdaterFast(urls)
+        self.update_task.signals_.finished_.connect(self.db_updater_finished)
         UThreadPool.start(self.update_task)
+
+    def db_updater_finished(self):
+        self.finished_.emit()
+        self.deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:

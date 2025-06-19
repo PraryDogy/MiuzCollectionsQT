@@ -220,8 +220,8 @@ class WinMain(WinFrameless):
             if os.path.isfile(i.toLocalFile())
         ]
 
-        self.win_upload = WinUpload(urls=urls)
-        self.win_upload.center_relative_parent(parent=self)
+        self.win_upload = WinUpload(urls)
+        self.win_upload.center_relative_parent(self)
         self.win_upload.show()
 
         return super().dropEvent(a0)

@@ -17,7 +17,7 @@ from utils.utils import Utils
 
 from .._runnable import UThreadPool
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, WinInfoAction,
-                       OpenInView, RemoveFiles, Reveal, Save, ScanerRestart)
+                       OpenInView, RemoveFiles, Reveal, Save, ScanerRestart, MoveFiles)
 from ..win_info import WinInfo
 from ..win_remove_files import RemoveFilesWin
 from ..win_smb import WinSmb
@@ -381,10 +381,10 @@ class Grid(QScrollArea):
 
         self.rem_win = RemoveFilesWin(urls)
         self.rem_win.center_relative_parent(self.window())
-        self.rem_win.finished_.connect(lambda urls: self.remove_finished(self.selected_widgets.copy()))
+        self.rem_win.finished_.connect(lambda urls: self.remove_finished())
         self.rem_win.show()
 
-    def remove_finished(self, widgets: list[Thumbnail]):
+    def remove_finished(self):
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
     def open_info_win_delayed(self):
@@ -640,16 +640,19 @@ class Grid(QScrollArea):
             copy_name = CopyName(self.menu_, self.window(), urls)
             self.menu_.addAction(copy_name)
 
-            reveal = Reveal( self.menu_, self.window(), urls)
+            reveal = Reveal(self.menu_, self.window(), urls)
             self.menu_.addAction(reveal)
 
             save_as = Save(self.menu_, self.window(), urls, True)
             self.menu_.addAction(save_as)
 
-            save = Save( self.menu_, self.window(), urls, False)
+            save = Save(self.menu_, self.window(), urls, False)
             self.menu_.addAction(save)
 
             self.menu_.addSeparator()
+
+            move_files = MoveFiles(self.menu_, self.window(), urls)
+            self.menu_.addAction(move_files)
 
             rem = RemoveFiles(self.menu_, len(self.selected_widgets))
             rem.triggered.connect(self.remove_files)

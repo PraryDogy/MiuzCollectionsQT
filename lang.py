@@ -548,6 +548,11 @@ class Lang_:
         "minutes"
     ]
 
+    move_files = [
+        "Переместить",
+        "Move files"
+    ]
+
 class Lang(Lang_):
 
     @classmethod
