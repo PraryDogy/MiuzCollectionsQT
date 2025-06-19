@@ -423,6 +423,57 @@ class DbUpdater:
         ScanerTools.progressbar_text(t)
 
 
+class UpdateDbTask(URunnable):
+    def __init__(self, urls: list[str], remove_records: list[str]):
+        """
+        urls: список путей к файлам, которые необходимо добавить в базу данных  
+        и сохранить их хеши в папке ApplicationSupport.
+
+        remove_records: список путей к файлам, чьи записи нужно удалить  
+        из базы данных.
+
+        отвечает за полный цикл добавления / удаления записей в базу данных
+        и за создание хешированных изображений в ApplicationSupport
+        """
+        super().__init__()
+        self.urls = urls
+        self.remove_records = remove_records
+
+    def task(self):
+        MainFolder.current.check_avaiability()
+        if MainFolder.current.get_current_path():
+            short_urls = [
+                Utils.get_short_src(MainFolder.current.get_current_path(), i)
+                for i in self.urls
+            ]
+
+            exist_records = Dbase.get_exist_records(short_urls)
+
+            if self.remove_records:
+                for i in self.remove_records:
+                    short_src = Utils.get_short_src(MainFolder.current.get_current_path(), i)
+                    exist_records.append(short_src)
+
+            new_records = self.new_records()
+            db_updater = DbUpdater(exist_records, new_records, MainFolder.current)
+            db_updater.run()
+
+            SignalsApp.instance.menu_left_cmd.emit("reload")
+            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+
+    def new_records(self):
+        new_urls: list = []
+        for i in self.urls:
+            try:
+                stats = os.stat(i)
+                data = (i, stats.st_size, stats.st_birthtime, stats.st_mtime)
+                new_urls.append(data)
+            except Exception as e:
+                Utils.print_error(e)
+                continue
+        return new_urls
+    
+
 class MainFolderRemover:
     """Удаляет изображения из hashdir и записи БД, если MainFolder больше не в списке"""
 
