@@ -10,12 +10,11 @@ from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
-from utils.scaner import Scaner, UpdateDbTask
+from utils.scaner import Scaner
 from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
 from .win_info import WinInfo
-from .win_remove_files import RemoveFilesTask
 from .win_smb import WinSmb
 from .win_upload import WinUpload
 
@@ -311,8 +310,5 @@ class MoveFiles(QAction):
         if isinstance(new_urls, str):
             new_urls = [new_urls]
 
-        self.update_task = UpdateDbTask(new_urls, self.urls)
-        UThreadPool.start(self.update_task)
-
-        # print(new_urls)
-        # print(self.urls)
+        print("файлы ПЕРЕМЕЩЕНЫ, но нужно обновить БД")
+        print("а лучше отдельный тред для удаления файлов")

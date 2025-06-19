@@ -229,8 +229,8 @@ class FileUpdater:
             ScanerTools.reload_gui()
         return new_del_items
 
-    def create_thumb(self, src: str) -> ndarray | None:
-        img = Utils.read_image(src)
+    def create_thumb(self, img_path: str) -> ndarray | None:
+        img = Utils.read_image(img_path)
         thumb = Utils.fit_to_thumb(img, ThumbData.DB_PIXMAP_SIZE)
         del img
         gc.collect()
@@ -359,56 +359,6 @@ class DbUpdater:
             conn.rollback()
         conn.close()
 
-
-class UpdateDbTask(URunnable):
-    def __init__(self, urls: list[str], remove_records: list[str]):
-        """
-        urls: список путей к файлам, которые необходимо добавить в базу данных  
-        и сохранить их хеши в папке ApplicationSupport.
-
-        remove_records: список путей к файлам, чьи записи нужно удалить  
-        из базы данных.
-
-        отвечает за добавление/удаление записей в базу данных и
-        за создание/удаление хешированных изображений в ApplicationSupport
-        """
-        super().__init__()
-        self.urls = urls
-        self.remove_records = remove_records
-
-    def task(self):
-        MainFolder.current.check_avaiability()
-        if MainFolder.current.get_current_path():
-            short_urls = [
-                Utils.get_rel_img_path(MainFolder.current.get_current_path(), i)
-                for i in self.urls
-            ]
-
-            exist_records = Dbase.get_exist_records(short_urls)
-
-            if self.remove_records:
-                for i in self.remove_records:
-                    rel_img_path = Utils.get_rel_img_path(MainFolder.current.get_current_path(), i)
-                    exist_records.append(rel_img_path)
-
-            new_records = self.new_records()
-            db_updater = DbUpdater(exist_records, new_records, MainFolder.current)
-            db_updater.run()
-            SignalsApp.instance.menu_left_cmd.emit("reload")
-            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-
-    def new_records(self):
-        new_urls: list = []
-        for i in self.urls:
-            try:
-                stats = os.stat(i)
-                data = (i, stats.st_size, stats.st_birthtime, stats.st_mtime)
-                new_urls.append(data)
-            except Exception as e:
-                Utils.print_error(e)
-                continue
-        return new_urls
-    
 
 class MainFolderRemover:
     """Удаляет изображения из hashdir и записи БД, если MainFolder больше не в списке"""

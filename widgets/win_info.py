@@ -67,8 +67,8 @@ class WorkerSignals(QObject):
 
 class Tools:
     @classmethod
-    def get_img_resol(cls, src: str):
-        img_ = Utils.read_image(src)
+    def get_img_resol(cls, img_src: str):
+        img_ = Utils.read_image(img_src)
         if img_ is not None and len(img_.shape) > 1:
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"

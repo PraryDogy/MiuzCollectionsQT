@@ -14,7 +14,7 @@ from main_folders import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
-from utils.scaner import Scaner, UpdateDbTask
+from utils.scaner import Scaner
 from widgets._runnable import UThreadPool
 
 from .bar_bottom import BarBottom
@@ -176,8 +176,7 @@ class WinMain(WinFrameless):
         UThreadPool.start(thread_)
 
     def upload_task_finished(self, urls: list[str]):
-        self.upload_task = UpdateDbTask(urls, [])
-        UThreadPool.start(self.upload_task)
+        print("файлы скопированы но дальше надо обновить бд")
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()

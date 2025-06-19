@@ -189,12 +189,12 @@ class ReadImage:
             return None
 
     @classmethod
-    def read_any(cls, path: str) -> np.ndarray | None:
+    def read_any(cls, img_src: str) -> np.ndarray | None:
         ...
 
     @classmethod
-    def read_image(cls, path: str) -> np.ndarray | None:
-        _, ext = os.path.splitext(path)
+    def read_image(cls, img_src: str) -> np.ndarray | None:
+        _, ext = os.path.splitext(img_src)
         ext = ext.lower()
 
         read_any_dict: dict[str, callable] = {}
@@ -220,7 +220,7 @@ class ReadImage:
 
         if fn:
             cls.read_any = fn
-            return cls.read_any(path)
+            return cls.read_any(img_src)
 
         else:
             return None
@@ -258,7 +258,7 @@ class Thumb:
             img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
             return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         except Exception as e:
-            # print("read img hash error:", src)
+            Utils.print_error(e)
             return None
 
 
@@ -339,9 +339,8 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
         return QApplication.clipboard().text()
         
     @classmethod
-    def reveal_files(cls, files_list: list[str]):
-        """list of FULL SRC"""
-        command = ["osascript", REVEAL_SCPT] + files_list
+    def reveal_files(cls, img_src_list: list[str]):
+        command = ["osascript", REVEAL_SCPT] + img_src_list
         subprocess.Popen(
             command,
             stdout=subprocess.DEVNULL,
