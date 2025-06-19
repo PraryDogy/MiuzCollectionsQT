@@ -28,14 +28,9 @@ from .win_smb import WinSmb
 from .win_upload import WinUpload
 
 
-class Signals(QObject):
-    finished_ = pyqtSignal()
-
-
 class UpdateDbTask(URunnable):
     def __init__(self, urls: list[str]):
         super().__init__()
-        self.signals_ = Signals()
         self.urls = urls
 
     def task(self):
