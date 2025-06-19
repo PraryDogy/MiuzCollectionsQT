@@ -10,7 +10,7 @@ from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
 from utils.copy_files import CopyFiles
-from utils.scaner import Scaner
+from utils.scaner import Scaner, UpdateDbTask
 from utils.utils import Utils
 
 from ._runnable import URunnable, UThreadPool
@@ -315,4 +315,4 @@ class MoveFiles(QAction):
             self.upload_win.show()
 
     def move_finished(self):
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        self.update_task = UpdateDbTask
