@@ -86,7 +86,7 @@ class OldDownloadsItem(BaseDownloadsItem):
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            Utils.reveal_files(img_src_list=self.files)
+            Utils.reveal_files(img_path_list=self.files)
         return super().mouseReleaseEvent(a0)
 
 

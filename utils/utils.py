@@ -61,9 +61,9 @@ class Err:
 class ReadImage:
 
     @classmethod
-    def read_tiff(cls, path: str) -> np.ndarray | None:
+    def read_tiff(cls, img_path: str) -> np.ndarray | None:
         try:
-            img = tifffile.imread(path)
+            img = tifffile.imread(img_path)
             # Проверяем, что изображение трёхмерное
             if img.ndim == 3:
                 channels = min(img.shape)
@@ -84,7 +84,7 @@ class ReadImage:
         except (tifffile.TiffFileError, RuntimeError, DelayedImportError, Exception) as e: 
             Err.print_error(e)
             try:
-                img = Image.open(path)
+                img = Image.open(img_path)
                 img = img.convert("RGB")
                 array_img = np.array(img)
                 img.close()
@@ -94,9 +94,9 @@ class ReadImage:
                 return None
                     
     @classmethod
-    def read_psb(cls, path: str):
+    def read_psb(cls, img_path: str):
         try:
-            img = psd_tools.PSDImage.open(path)
+            img = psd_tools.PSDImage.open(img_path)
             img = img.composite()
             img = img.convert("RGB")
             array_img = np.array(img)
@@ -106,9 +106,9 @@ class ReadImage:
             return None
 
     @classmethod
-    def read_png(cls, path: str) -> np.ndarray | None:
+    def read_png(cls, img_path: str) -> np.ndarray | None:
         try:
-            img = Image.open(path)
+            img = Image.open(img_path)
             if img.mode == "RGBA":
                 white_background = Image.new("RGBA", img.size, (255, 255, 255))
                 img = Image.alpha_composite(white_background, img)
@@ -121,9 +121,9 @@ class ReadImage:
             return None
 
     @classmethod
-    def read_jpg(cls, path: str) -> np.ndarray | None:
+    def read_jpg(cls, img_path: str) -> np.ndarray | None:
         try:
-            img = Image.open(path)
+            img = Image.open(img_path)
             img = img.convert("RGB")
             array_img = np.array(img)
             img.close()
@@ -134,12 +134,12 @@ class ReadImage:
             return None
 
     @classmethod
-    def read_raw(cls, path: str) -> np.ndarray | None:
+    def read_raw(cls, img_path: str) -> np.ndarray | None:
         try:
             # https://github.com/letmaik/rawpy
             # Извлечение встроенного эскиза/превью из RAW-файла и преобразование в изображение:
             # Открываем RAW-файл с помощью rawpy
-            with rawpy.imread(path) as raw:
+            with rawpy.imread(img_path) as raw:
                 # Извлекаем встроенный эскиз (thumbnail)
                 thumb = raw.extract_thumb()
             # Проверяем формат извлечённого эскиза
@@ -189,12 +189,12 @@ class ReadImage:
             return None
 
     @classmethod
-    def read_any(cls, img_src: str) -> np.ndarray | None:
+    def read_any(cls, img_path: str) -> np.ndarray | None:
         ...
 
     @classmethod
-    def read_image(cls, img_src: str) -> np.ndarray | None:
-        _, ext = os.path.splitext(img_src)
+    def read_image(cls, img_path: str) -> np.ndarray | None:
+        _, ext = os.path.splitext(img_path)
         ext = ext.lower()
 
         read_any_dict: dict[str, callable] = {}
@@ -220,7 +220,7 @@ class ReadImage:
 
         if fn:
             cls.read_any = fn
-            return cls.read_any(img_src)
+            return cls.read_any(img_path)
 
         else:
             return None
@@ -319,8 +319,8 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
         )
 
     @classmethod
-    def get_coll_name(cls, main_folder_path: str, img_src: str) -> str:
-        coll = cls.get_rel_img_path(main_folder_path, img_src)
+    def get_coll_name(cls, main_folder_path: str, img_path: str) -> str:
+        coll = cls.get_rel_img_path(main_folder_path, img_path)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
@@ -339,8 +339,8 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
         return QApplication.clipboard().text()
         
     @classmethod
-    def reveal_files(cls, img_src_list: list[str]):
-        command = ["osascript", REVEAL_SCPT] + img_src_list
+    def reveal_files(cls, img_path_list: list[str]):
+        command = ["osascript", REVEAL_SCPT] + img_path_list
         subprocess.Popen(
             command,
             stdout=subprocess.DEVNULL,
@@ -374,8 +374,8 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
         return main_folder_path + rel_img_path
     
     @classmethod
-    def get_rel_img_path(cls, main_folder_path: str, img_src: str) -> str:
-        return img_src.replace(main_folder_path, "")
+    def get_rel_img_path(cls, main_folder_path: str, img_path: str) -> str:
+        return img_path.replace(main_folder_path, "")
 
     @classmethod
     def rm_rf(cls, folder_path: str):

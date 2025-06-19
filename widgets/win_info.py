@@ -67,8 +67,8 @@ class WorkerSignals(QObject):
 
 class Tools:
     @classmethod
-    def get_img_resol(cls, img_src: str):
-        img_ = Utils.read_image(img_src)
+    def get_img_resol(cls, img_path: str):
+        img_ = Utils.read_image(img_path)
         if img_ is not None and len(img_.shape) > 1:
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"
@@ -93,14 +93,15 @@ class SingleImgInfo(URunnable):
         self.signals_ = WorkerSignals()
 
     def task(self):
-        coll_folder = MainFolder.current.current_path
+        MainFolder.current.check_avaiability()
+        mail_folder_path = MainFolder.current.get_current_path()
         try:
             name = os.path.basename(self.url)
             _, type_ = os.path.splitext(name)
             stats = os.stat(self.url)
             size = Utils.get_f_size(stats.st_size)
             mod = Utils.get_f_date(stats.st_mtime)
-            coll = Utils.get_coll_name(coll_folder, self.url)
+            coll = Utils.get_coll_name(mail_folder_path, self.url)
             thumb_path = Utils.create_thumb_path(self.url)
 
             res = {

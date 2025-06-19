@@ -233,8 +233,8 @@ class Save(QAction):
         else:
             SmbWin.show(self.win_)
 
-    def copy_files_cmd(self, dest: str, img_src_list: list):
-        thread_ = CopyFiles(dest, img_src_list)
+    def copy_files_cmd(self, dest: str, img_path_list: list):
+        thread_ = CopyFiles(dest, img_path_list)
         UThreadPool.start(thread_)
 
 
