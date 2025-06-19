@@ -23,7 +23,7 @@ class WorkerSignals(QObject):
     finished_ = pyqtSignal()
 
 
-class DbUpdaterFast(URunnable):
+class DbUpdaterSetup(URunnable):
     def __init__(self, urls: list[str], remove_urls: list[str] = None):
         super().__init__()
         self.urls = urls
@@ -46,9 +46,12 @@ class DbUpdaterFast(URunnable):
         del_items = self.get_del_items(short_urls)
         ins_items = self.get_ins_items()
 
+        # в remove_url помещаются те url, которые нужно просто удалить 
+        # из базы данных
         hashes: list[str] = []
         if self.remove_urls:
             for i in self.remove_urls:
+                # создаем short_hash необходимый для DbUpdater
                 hash_ = Utils.create_full_hash(i)
                 short_hash = Utils.get_short_hash(hash_)
                 hashes.append(short_hash)
@@ -207,9 +210,9 @@ class WinUpload(WinSystem):
 
     def copy_finished(self, urls: list[str]):
         if self.is_filemove:
-            self.update_task = DbUpdaterFast(urls, self.urls)
+            self.update_task = DbUpdaterSetup(urls, self.urls)
         else:
-            self.update_task = DbUpdaterFast(urls)
+            self.update_task = DbUpdaterSetup(urls)
         self.update_task.signals_.finished_.connect(self.db_updater_finished)
         UThreadPool.start(self.update_task)
 

@@ -218,6 +218,10 @@ class DbUpdater:
     sleep_count: float = 0.1
 
     def __init__(self, del_items: list, ins_items: list, main_folder: MainFolder):
+        """
+        del_items: список url файлов из short_hash
+        ins_items: список (полный url, size, birth, mod)
+        """
         super().__init__()
         self.main_folder = main_folder
         self.del_items = del_items
