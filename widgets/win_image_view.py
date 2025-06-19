@@ -45,11 +45,16 @@ CLOSE_ = os.path.join(Static.images_dir, "zoom_close.svg")
 PREV_ = os.path.join(Static.images_dir, "prev.svg")
 NEXT_ = os.path.join(Static.images_dir, "next.svg")
 
+
 class ImageData:
-    __slots__ = ["src", "pixmap"]
+    __slots__ = ["img_path", "pixmap"]
     def __init__(self, img_path: str, pixmap: QPixmap):
-        self.src = img_path
-        self.pixmap: QPixmap = pixmap
+        """
+        img path может быть как полный так и относительный
+        img_path / rel_img_path
+        """
+        self.img_path = img_path
+        self.pixmap = pixmap
 
 
 class WorkerSignals(QObject):
@@ -321,16 +326,16 @@ class WinImageView(WinChild):
     def load_thumb(self):
         self.setFocus()
         self.img_viewer_title()
-        task = LoadThumb(rel_img_path=self.rel_img_path)
+        task = LoadThumb(self.rel_img_path)
         task.signals_.finished_.connect(self.load_thumb_fin)
         UThreadPool.start(task)
 
     def load_thumb_fin(self, data: ImageData):
         self.image_label.set_image(data.pixmap)
         MainFolder.current.check_avaiability()
-        coll_folder = MainFolder.current.get_current_path()
-        if coll_folder:
-            self.img_path = Utils.get_img_path(coll_folder, self.rel_img_path)
+        main_folder_path = MainFolder.current.get_current_path()
+        if main_folder_path:
+            self.img_path = Utils.get_img_path(main_folder_path, self.rel_img_path)
             self.load_image()
         else:
             print("img viewer > no smb")
@@ -344,10 +349,8 @@ class WinImageView(WinChild):
 
     def load_image_fin(self, data: ImageData, full_src: str):
         self.task_count -= 1
-
-        if data.pixmap.width() == 0 or data.src != full_src:
+        if data.pixmap.width() == 0 or data.img_path != full_src:
             return
-        
         elif isinstance(data.pixmap, QPixmap):
             try:
                 self.image_label.set_image(data.pixmap)
