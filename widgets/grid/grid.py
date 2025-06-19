@@ -115,7 +115,7 @@ class Grid(QScrollArea):
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
         self.origin_pos = QPoint()
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.scroll_wid)
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
 
         self.wid_under_mouse: Thumbnail = None
 
@@ -150,7 +150,7 @@ class Grid(QScrollArea):
 
     def reload_rubber(self):
         self.rubberBand.deleteLater()
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.scroll_wid)
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
 
     def create_grid(self, db_images: dict[str, list[DbImage]]):
         widgets = self.scroll_wid.findChildren(QWidget)
