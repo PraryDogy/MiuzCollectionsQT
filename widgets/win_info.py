@@ -132,32 +132,32 @@ class SingleImgInfo(URunnable):
         
 
 class MultipleImgInfo(URunnable):
-    def __init__(self, urls: list[str]):
+    def __init__(self, img_path_list: list[str]):
         super().__init__()
-        self.urls = urls
+        self.img_path_list = img_path_list
         self.signals_ = WorkerSignals()
     
     def task(self):
         names = [
             os.path.basename(i)
-            for i in self.urls
+            for i in self.img_path_list
         ]
         names = names[:10]
         names = ", ".join(names)
         names = Tools.lined_text(names)
-        if len(self.urls) > 10:
+        if len(self.img_path_list) > 10:
             names = names + ", ..."
 
         res = {
             Lang.file_name: names,
-            Lang.total: str(len(self.urls)),
+            Lang.total: str(len(self.img_path_list)),
             Lang.file_size: self.get_total_size()
         }
         self.signals_.finished_.emit(res)
 
     def get_total_size(self):
         total = 0
-        for i in self.urls:
+        for i in self.img_path_list:
             stats = os.stat(i)
             size_ = stats.st_size
             total += size_
@@ -168,10 +168,10 @@ class MultipleImgInfo(URunnable):
 class WinInfo(WinSystem):
     finished_ = pyqtSignal()
 
-    def __init__(self, urls: list[str]):
+    def __init__(self, img_path_list: list[str]):
         super().__init__()
         self.setWindowTitle(Lang.info)
-        self.urls = urls
+        self.img_path_list = img_path_list
 
         wid = QWidget()
         self.central_layout.addWidget(wid)
@@ -181,8 +181,8 @@ class WinInfo(WinSystem):
         self.grid_lay.setContentsMargins(0, 0, 0, 0)
         wid.setLayout(self.grid_lay)
 
-        if len(self.urls) == 1:
-            if os.path.isfile(self.urls[0]):
+        if len(self.img_path_list) == 1:
+            if os.path.isfile(self.img_path_list[0]):
                 self.single_img()
             else:
                 print("info dir")
@@ -190,12 +190,12 @@ class WinInfo(WinSystem):
             self.multiple_img()
 
     def single_img(self):
-        self.task_ = SingleImgInfo(self.urls[0])
+        self.task_ = SingleImgInfo(self.img_path_list[0])
         self.task_.signals_.finished_.connect(lambda data: self.single_img_fin(data))
         UThreadPool.start(self.task_)
 
     def multiple_img(self):
-        self.task_ = MultipleImgInfo(self.urls)
+        self.task_ = MultipleImgInfo(self.img_path_list)
         self.task_.signals_.finished_.connect(lambda data: self.multiple_img_fin(data))
         UThreadPool.start(self.task_)
 

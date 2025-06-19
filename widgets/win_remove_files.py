@@ -25,15 +25,15 @@ class WorkerSignals(QObject):
 
 
 class RemoveFilesTask(URunnable):
-    def __init__(self, urls: list[str]):
+    def __init__(self, img_path_list: list[str]):
         super().__init__()
         self.signals_ = WorkerSignals()
-        self.urls = urls
+        self.img_path_list = img_path_list
 
     def task(self):
         try:
             self.remove_from_db()
-            command = ["osascript", REMOVE_FILES_SCPT] + self.urls
+            command = ["osascript", REMOVE_FILES_SCPT] + self.img_path_list
             subprocess.run(command)
         except Exception as e:
             Err.print_error(e)
@@ -49,7 +49,7 @@ class RemoveFilesTask(URunnable):
         if coll_folder:
             Dbase.create_engine()
             conn = Dbase.engine.connect()
-            for i in self.urls:
+            for i in self.img_path_list:
                 rel_img_path = Utils.get_rel_img_path(coll_folder, i)
                 q = sqlalchemy.delete(THUMBS)
                 q = q.where(THUMBS.c.short_src == rel_img_path)
@@ -76,10 +76,10 @@ class RemoveFilesWin(WinSystem):
     finished_ = pyqtSignal(list)
     svg_size = 50
 
-    def __init__(self, urls: list[str]):
+    def __init__(self, img_path_list: list[str]):
         super().__init__()
         self.setWindowTitle(Lang.attention)
-        self.urls = urls
+        self.img_path_list = img_path_list
 
         first_row_wid = QWidget()
         self.central_layout.addWidget(first_row_wid)
@@ -90,7 +90,7 @@ class RemoveFilesWin(WinSystem):
         warn = SvgBtn(WARNING_SVG, RemoveFilesWin.svg_size)
         first_row_lay.addWidget(warn)
 
-        t = f"{Lang.move_to_trash} ({len(urls)})?"
+        t = f"{Lang.move_to_trash} ({len(img_path_list)})?"
         question = QLabel(text=t)
         first_row_lay.addWidget(question)
 
@@ -115,12 +115,12 @@ class RemoveFilesWin(WinSystem):
         self.adjustSize()
 
     def cmd_(self, *args):
-        self.task_ = RemoveFilesTask(self.urls)
+        self.task_ = RemoveFilesTask(self.img_path_list)
         self.task_.signals_.finished_.connect(self.finalize)
         UThreadPool.start(self.task_)
 
     def finalize(self, *args):
-        self.finished_.emit(self.urls)
+        self.finished_.emit(self.img_path_list)
         del self.task_
         self.deleteLater()
 

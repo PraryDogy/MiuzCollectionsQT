@@ -170,12 +170,12 @@ class WinMain(WinFrameless):
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
-    def upload_task_cmd(self, dest: str, urls: list[str]):
-        thread_ = CopyFiles(dest, urls, False)
-        thread_.signals_.finished_.connect(lambda urls: self.upload_task_finished(urls))
+    def upload_task_cmd(self, dest: str, img_path_list: list[str]):
+        thread_ = CopyFiles(dest, img_path_list, False)
+        thread_.signals_.finished_.connect(lambda new_img_path_list: self.upload_task_finished(new_img_path_list))
         UThreadPool.start(thread_)
 
-    def upload_task_finished(self, urls: list[str]):
+    def upload_task_finished(self, img_path_list: list[str]):
         print("файлы скопированы но дальше надо обновить бд")
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
@@ -224,14 +224,14 @@ class WinMain(WinFrameless):
             self.open_smb_win()
             return
 
-        urls: list[str] = [
+        img_path_list: list[str] = [
             i.toLocalFile()
             for i in a0.mimeData().urls()
             if os.path.isfile(i.toLocalFile())
         ]
 
         self.win_upload = WinUpload()
-        self.win_upload.finished_.connect(lambda dest: self.upload_task_cmd(dest, urls))
+        self.win_upload.finished_.connect(lambda dest: self.upload_task_cmd(dest, img_path_list))
         self.win_upload.center_relative_parent(self)
         self.win_upload.show()
 

@@ -375,14 +375,14 @@ class Grid(QScrollArea):
     def remove_files(self):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
-        urls = [
+        img_path_list = [
             Utils.get_img_path(coll_folder, i.rel_img_path)
             for i in self.selected_widgets
         ]
 
-        self.rem_win = RemoveFilesWin(urls)
+        self.rem_win = RemoveFilesWin(img_path_list)
         self.rem_win.center_relative_parent(self.window())
-        self.rem_win.finished_.connect(lambda urls: self.remove_finished())
+        self.rem_win.finished_.connect(lambda img_path_list: self.remove_finished())
         self.rem_win.show()
 
     def remove_finished(self):
@@ -410,11 +410,11 @@ class Grid(QScrollArea):
                 MainFolder.current.check_avaiability()
                 coll_folder = MainFolder.current.get_current_path()
                 if coll_folder:
-                    urls = [
+                    img_path_list = [
                         Utils.get_img_path(coll_folder, i.rel_img_path)
                         for i in self.selected_widgets
                     ]
-                    self.info_win = WinInfo(urls)
+                    self.info_win = WinInfo(img_path_list)
                     self.info_win.finished_.connect(self.open_info_win_delayed)
                 else:
                     self.smb_win = WinSmb()
@@ -607,52 +607,44 @@ class Grid(QScrollArea):
                 self.clear_selected_widgets()
                 self.add_and_select_widget(wid=clicked_wid)
 
-            urls = [
+            rel_img_path_list = [
                 i.rel_img_path
                 for i in self.selected_widgets
             ]
 
             cmd_ = lambda: self.open_in_view(wid=clicked_wid)
-            view = OpenInView(parent_=self.menu_)
+            view = OpenInView(self.menu_)
             view._clicked.connect(cmd_)
             self.menu_.addAction(view)
 
 
-            info = WinInfoAction(
-                parent=self.menu_,
-                win=self.window(),
-                urls=urls
-            )
+            info = WinInfoAction(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(info)
 
-            self.fav_action = FavActionDb(
-                parent=self.menu_,
-                rel_img_path=clicked_wid.rel_img_path,
-                fav_value=clicked_wid.fav_value
-                )
+            self.fav_action = FavActionDb(self.menu_, clicked_wid.rel_img_path, clicked_wid.fav_value)
             self.fav_action.finished_.connect(clicked_wid.change_fav)
             self.menu_.addAction(self.fav_action)
 
             self.menu_.addSeparator()
 
-            copy = CopyPath(self.menu_, self.window(), urls)
+            copy = CopyPath(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(copy)
 
-            copy_name = CopyName(self.menu_, self.window(), urls)
+            copy_name = CopyName(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(copy_name)
 
-            reveal = Reveal(self.menu_, self.window(), urls)
+            reveal = Reveal(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(reveal)
 
-            save_as = Save(self.menu_, self.window(), urls, True)
+            save_as = Save(self.menu_, self.window(), rel_img_path_list, True)
             self.menu_.addAction(save_as)
 
-            save = Save(self.menu_, self.window(), urls, False)
+            save = Save(self.menu_, self.window(), rel_img_path_list, False)
             self.menu_.addAction(save)
 
             self.menu_.addSeparator()
 
-            move_files = MoveFiles(self.menu_, self.window(), urls)
+            move_files = MoveFiles(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(move_files)
 
             rem = RemoveFiles(self.menu_, len(self.selected_widgets))
@@ -715,12 +707,12 @@ class Grid(QScrollArea):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
-            urls = [
+            img_path_list = [
                 Utils.get_img_path(coll_folder, i.rel_img_path)
                 for i in self.selected_widgets
             ]
         else:
-            urls = []
+            img_path_list = []
 
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
@@ -728,18 +720,18 @@ class Grid(QScrollArea):
         img = QPixmap(img)
         self.drag.setPixmap(img)
         
-        urls = [
+        img_path_list = [
             QUrl.fromLocalFile(i)
-            for i in urls
+            for i in img_path_list
             ]
 
-        if urls:
-            self.mime_data.setUrls(urls)
+        if img_path_list:
+            self.mime_data.setUrls(img_path_list)
 
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.DropAction.CopyAction)
 
-        if not urls:
+        if not img_path_list:
             self.win_smb = WinSmb()
             self.win_smb.adjustSize()
             self.win_smb.center_relative_parent(self.window())

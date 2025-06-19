@@ -486,8 +486,8 @@ class WinImageView(WinChild):
             coll_folder = MainFolder.current.get_current_path()
             if coll_folder:
                 img_path = Utils.get_img_path(coll_folder, self.rel_img_path)
-                urls = [img_path]
-                self.info_win = WinInfo(urls)
+                img_path_list = [img_path]
+                self.info_win = WinInfo(img_path_list)
                 self.info_win.finished_.connect(self.open_info_win_delayed)
             else:
                 self.open_smb_win()
@@ -497,20 +497,12 @@ class WinImageView(WinChild):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
         self.menu_ = ContextCustom(event=ev)
-        urls = [self.rel_img_path]
+        rel_img_path_list = [self.rel_img_path]
 
-        info = WinInfoAction(
-            parent=self.menu_,
-            win=self,
-            urls=urls
-        )
+        info = WinInfoAction(self.menu_, self, rel_img_path_list)
         self.menu_.addAction(info)
 
-        self.fav_action = FavActionDb(
-            parent=self.menu_,
-            rel_img_path=self.rel_img_path,
-            fav_value=self.wid.fav_value
-        )
+        self.fav_action = FavActionDb(self.menu_, self.rel_img_path, self.wid.fav_value)
         self.fav_action.finished_.connect(self.change_fav)
         self.menu_.addAction(self.fav_action)
 

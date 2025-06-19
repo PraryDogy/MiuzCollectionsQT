@@ -48,22 +48,22 @@ class ScanerRestart(QAction):
 
 
 class WinInfoAction(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
+    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
         super().__init__(parent=parent, text=Lang.info)
         self.parent_ = parent
         self.win_ = win
-        self.urls = urls
+        self.rel_img_path_list = rel_img_path_list
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
-            self.urls = [
+            self.rel_img_path_list = [
                     Utils.get_img_path(coll_folder, i)
-                    for i in self.urls
+                    for i in self.rel_img_path_list
             ]
-            self.win = WinInfo(self.urls)
+            self.win = WinInfo(self.rel_img_path_list)
             self.win.finished_.connect(self.open_delayed)
         else:
             self.win = WinSmb()
@@ -78,12 +78,12 @@ class WinInfoAction(QAction):
 
 
 class CopyPath(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
-        text = f"{Lang.copy_path} ({len(urls)})"
+    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
+        text = f"{Lang.copy_path} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
-        self.urls = urls
+        self.rel_img_path_list = rel_img_path_list
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -91,23 +91,23 @@ class CopyPath(QAction):
         coll_folder = MainFolder.current.get_current_path()
 
         if coll_folder:
-            urls: list[str] = []
-            for i in self.urls:
+            img_path_list: list[str] = []
+            for i in self.rel_img_path_list:
                 i = Utils.get_img_path(coll_folder, i)
-                urls.append(i)
-            urls = "\n".join(urls)
-            Utils.copy_text(urls)
+                img_path_list.append(i)
+            img_path_list = "\n".join(img_path_list)
+            Utils.copy_text(img_path_list)
         else:
             SmbWin.show(self.win_)
 
 
 class CopyName(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
-        text = f"{Lang.copy_name} ({len(urls)})"
+    def __init__(self, parent: QMenu, win: QMainWindow, img_path_list: list[str]):
+        text = f"{Lang.copy_name} ({len(img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
-        self.urls = urls
+        self.img_path_list = img_path_list
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
@@ -116,7 +116,7 @@ class CopyName(QAction):
 
         if coll_folder:
             names: list[str] = []
-            for i in self.urls:
+            for i in self.img_path_list:
                 i = os.path.basename(i)
                 i, _ = os.path.splitext(i)
                 names.append(i)
@@ -127,10 +127,10 @@ class CopyName(QAction):
 
 
 class Reveal(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
-        text = f"{Lang.reveal_in_finder} ({len(urls)})"
+    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
+        text = f"{Lang.reveal_in_finder} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
-        self.urls = urls
+        self.rel_img_path_list = rel_img_path_list
         self.parent_ = parent
         self.win_ = win
         self.triggered.connect(self.cmd)
@@ -139,11 +139,11 @@ class Reveal(QAction):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
-            urls = [
+            img_path_list = [
                 Utils.get_img_path(coll_folder, i)
-                for i in self.urls
+                for i in self.rel_img_path_list
             ]
-            Utils.reveal_files(urls)
+            Utils.reveal_files(img_path_list)
         else:
             SmbWin.show(self.win_)
 
@@ -201,17 +201,17 @@ class FavActionDb(QAction):
 
 
 class Save(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str], save_as: bool):
+    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str], save_as: bool):
         if save_as:
             text: str = Lang.save_image_in
         else:
             text: str = Lang.save_image_downloads
-        text = f"{text} ({len(urls)})"
+        text = f"{text} ({len(rel_img_path_list)})"
 
         super().__init__(parent=parent, text=text)
         self.triggered.connect(self.cmd_)
         self.save_as = save_as
-        self.urls = urls
+        self.rel_img_path_list = rel_img_path_list
         self.parent_ = parent
         self.win_ = win
 
@@ -221,7 +221,7 @@ class Save(QAction):
         if coll_folder:
             img_path_list = [
                 Utils.get_img_path(coll_folder, rel_img_path)
-                for rel_img_path in self.urls
+                for rel_img_path in self.rel_img_path_list
             ]
             if self.save_as:
                 dialog = QFileDialog()
@@ -281,20 +281,20 @@ class RemoveFiles(QAction):
 
 
 class MoveFiles(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, urls: list[str]):
-        text = f"{Lang.move_files} ({len(urls)})"
+    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
+        text = f"{Lang.move_files} ({len(rel_img_path_list)})"
         super().__init__(text=text, parent=parent)
         self.triggered.connect(self.cmd)
-        self.urls = urls
+        self.img_path_list = rel_img_path_list
         self.win_ = win
 
     def cmd(self):
         MainFolder.current.check_avaiability()
         coll_folder = MainFolder.current.get_current_path()
         if coll_folder:
-            self.urls = [
+            self.img_path_list = [
                 Utils.get_img_path(coll_folder, i)
-                for i in self.urls
+                for i in self.img_path_list
             ]
             self.upload_win = WinUpload()
             self.upload_win.finished_.connect(lambda dest: self.move_files_cmd(dest))
@@ -302,13 +302,13 @@ class MoveFiles(QAction):
             self.upload_win.show()
 
     def move_files_cmd(self, dest: str):
-        thread_ = CopyFiles(dest, self.urls, True)
-        thread_.signals_.finished_.connect(lambda new_urls: self.move_finished(new_urls))
+        thread_ = CopyFiles(dest, self.img_path_list, True)
+        thread_.signals_.finished_.connect(lambda new_img_path_list: self.move_finished(new_img_path_list))
         UThreadPool.start(thread_)
 
-    def move_finished(self, new_urls: list[str]):
-        if isinstance(new_urls, str):
-            new_urls = [new_urls]
+    def move_finished(self, new_img_path_list: list[str]):
+        if isinstance(new_img_path_list, str):
+            new_img_path_list = [new_img_path_list]
 
         print("файлы ПЕРЕМЕЩЕНЫ, но нужно обновить БД")
         print("а лучше отдельный тред для удаления файлов")
