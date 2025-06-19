@@ -195,23 +195,6 @@ class Compator:
         ins_items = list(finder_set - db_values)
 
         return del_items, ins_items
-    
-    # def run(self, finder_images: list, db_images: dict):
-
-    #     del_items: list[str] = []
-    #     ins_items: list[tuple[str, int, int, int]] = []
-
-    #     for short_hash, db_item in db_images.items():
-    #         if not db_item in finder_images:
-    #             del_items.append(short_hash)
-
-    #     db_values = list(db_images.values())
-
-    #     for finder_item in finder_images:
-    #         if not finder_item in db_values:
-    #             ins_items.append(finder_item)
-
-    #     return (del_items, ins_items)
 
 
 class DbUpdater:
