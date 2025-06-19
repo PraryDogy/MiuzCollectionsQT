@@ -182,7 +182,7 @@ class DbImages:
 
 
 class Compator:
-    def __init__(self, finder_images: list, db_images: list):
+    def __init__(self, finder_images: dict, db_images: dictr):
         super().__init__()
         self.finder_images = finder_images
         self.db_images = db_images
