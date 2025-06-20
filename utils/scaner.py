@@ -322,21 +322,15 @@ class DbUpdater:
         conn.close()
 
     def run_new_items(self):
-        self.main_folder.check_avaiability()
-        main_folder_path = self.main_folder.get_current_path()
-        if not main_folder_path:
-            ScanerTools.can_scan = False
-            return
-
         conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
             # не удалять
             if not ScanerTools.can_scan:
                 return
             small_img_path = Utils.create_thumb_path(img_path)
-            short_img_path = Utils.get_rel_img_path(main_folder_path, img_path)
+            short_img_path = Utils.get_rel_img_path(self.main_folder.get_current_path(), img_path)
             rel_thumb_path = Utils.get_rel_thumb_path(small_img_path)
-            coll_name = Utils.get_coll_name(main_folder_path, img_path)
+            coll_name = Utils.get_coll_name(self.main_folder.get_current_path(), img_path)
             values = {
                 ClmNames.SHORT_SRC: short_img_path,
                 ClmNames.SHORT_HASH: rel_thumb_path,
@@ -470,7 +464,7 @@ class ScanerThread(URunnable):
 
     def task(self):
         for main_folder in MainFolder.list_:
-            if main_folder.is_avaiable():
+            if main_folder.is_avaiable___():
                 self.main_folder_scan(main_folder)
                 print("scaner started", main_folder.name)
 
@@ -518,8 +512,7 @@ class ScanerShedule(QObject):
         avaibility = False
 
         for main_folder in MainFolder.list_:
-            main_folder.check_avaiability()
-            if main_folder.is_avaiable():
+            if main_folder.is_available():
                 avaibility = True
     
         if not avaibility:

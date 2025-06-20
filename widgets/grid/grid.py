@@ -373,8 +373,7 @@ class Grid(QScrollArea):
             wid.set_frame()
 
     def remove_files(self):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
         img_path_list = [
             Utils.get_img_path(main_folder_path, i.rel_img_path)
             for i in self.selected_widgets
@@ -406,9 +405,7 @@ class Grid(QScrollArea):
 
         if a0.modifiers() == command and a0.key() == Qt.Key.Key_I:
             if self.selected_widgets:
-
-                MainFolder.current.check_avaiability()
-                main_folder_path = MainFolder.current.get_current_path()
+                main_folder_path = MainFolder.current.is_available()
                 if main_folder_path:
                     img_path_list = [
                         Utils.get_img_path(main_folder_path, i.rel_img_path)
@@ -704,8 +701,7 @@ class Grid(QScrollArea):
             self.add_and_select_widget(self.wid_under_mouse)
             QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
                 Utils.get_img_path(main_folder_path, i.rel_img_path)

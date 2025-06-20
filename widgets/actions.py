@@ -56,8 +56,7 @@ class WinInfoAction(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             self.rel_img_path_list = [
                     Utils.get_img_path(main_folder_path, i)
@@ -87,8 +86,7 @@ class CopyPath(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
 
         if main_folder_path:
             img_path_list: list[str] = []
@@ -111,9 +109,7 @@ class CopyName(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
-
+        main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             names: list[str] = []
             for i in self.img_path_list:
@@ -136,8 +132,7 @@ class Reveal(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
                 Utils.get_img_path(main_folder_path, i)
@@ -216,8 +211,7 @@ class Save(QAction):
         self.win_ = win
 
     def cmd_(self):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
                 Utils.get_img_path(main_folder_path, rel_img_path)
@@ -289,8 +283,7 @@ class MoveFiles(QAction):
         self.win_ = win
 
     def cmd(self):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             self.img_path_list = [
                 Utils.get_img_path(main_folder_path, i)

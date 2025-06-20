@@ -93,8 +93,7 @@ class SingleImgInfo(URunnable):
         self.signals_ = WorkerSignals()
 
     def task(self):
-        MainFolder.current.check_avaiability()
-        mail_folder_path = MainFolder.current.get_current_path()
+        mail_folder_path = MainFolder.current.is_available()
         try:
             name = os.path.basename(self.url)
             _, type_ = os.path.splitext(name)

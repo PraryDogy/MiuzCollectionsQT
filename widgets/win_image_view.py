@@ -316,8 +316,7 @@ class WinImageView(WinChild):
 
 
     def first_load(self):
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
         if not main_folder_path:
             self.open_smb_win()
 
@@ -332,8 +331,7 @@ class WinImageView(WinChild):
 
     def load_thumb_fin(self, data: ImageData):
         self.image_label.set_image(data.pixmap)
-        MainFolder.current.check_avaiability()
-        main_folder_path = MainFolder.current.get_current_path()
+        main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             self.img_path = Utils.get_img_path(main_folder_path, self.rel_img_path)
             self.load_image()
@@ -482,8 +480,7 @@ class WinImageView(WinChild):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            MainFolder.current.check_avaiability()
-            main_folder_path = MainFolder.current.get_current_path()
+            main_folder_path = MainFolder.current.is_available()
             if main_folder_path:
                 img_path = Utils.get_img_path(main_folder_path, self.rel_img_path)
                 img_path_list = [img_path]

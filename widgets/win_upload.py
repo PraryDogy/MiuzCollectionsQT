@@ -61,17 +61,15 @@ class WinUpload(WinSystem):
                 i.pressed_.connect(cmd_)
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
-        MainFolder.current.check_avaiability()
-        root = MainFolder.current.get_current_path()
-        self.coll_path = os.path.join(root, coll_btn.coll_name)
-
-        subfolders: list[os.DirEntry] = [
-            i
-            for i in os.scandir(self.coll_path)
-            if i.is_dir()
-        ]
-
-        self.create_submenu(subfolders=subfolders)
+        main_folder_path = MainFolder.current.is_available()
+        if main_folder_path:
+            self.coll_path = os.path.join(main_folder_path, coll_btn.coll_name)
+            subfolders: list[os.DirEntry] = [
+                i
+                for i in os.scandir(self.coll_path)
+                if i.is_dir()
+            ]
+            self.create_submenu(subfolders=subfolders)
 
     def del_submenu(self):
         if self.current_submenu is not None:
