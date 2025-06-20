@@ -11,7 +11,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .scaner import (Compator, DbImages, DbUpdater, FileUpdater, FinderImages,
+from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater, FinderImages,
                      MainFolderRemover)
 from .utils import Utils
 

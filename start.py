@@ -65,7 +65,7 @@ from database import Dbase
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.scaner import Scaner
+from utils.scaner_utils import Scaner
 from utils.tasks import UThreadPool
 from widgets.win_main import WinMain
 

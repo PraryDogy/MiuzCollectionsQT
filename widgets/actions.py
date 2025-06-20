@@ -8,7 +8,7 @@ from cfg import Dynamic, Static
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.scaner import Scaner
+from utils.scaner_utils import Scaner
 from utils.tasks import CopyFilesTask, FavTask, UThreadPool
 from utils.utils import Utils
 
