@@ -507,25 +507,42 @@ class ScanerTask(URunnable):
     short_timer = 15000
 
     def __init__(self):
+        """
+        Cканирует доступные MainFolder.     
+        Если нет доступных MainFolder, запускает таймер и проверяет каждые  
+        15 секунд на доступность MainFolder.    
+        Сканирование можно прервать: ScanerTask.cancel_scaner()
+        """
         super().__init__()
         self.signals_ = ScanerSignals()
         self.scan_helper = ScanHelper()
 
     def task(self):
-        self.shedule()
 
-    def shedule(self):
+
+        if not self.scan_helper.get_can_scan():
+            self.signals_.finished_.emit()
+            return
+
         main_folders = [
             i.is_available()
             for i in MainFolder.list_
         ]
+
         if not main_folders:
             QTimer.singleShot(self.short_timer, self.shedule)
             return
+
         for i in main_folders:
-                print("scaner started", i.name)
-                self.main_folder_scan(i)
-                print("scaner finished", i.name)
+            print("scaner started", i.name)
+            self.main_folder_scan(i)
+            gc.collect()
+            print("scaner finished", i.name)
+
+        self.signals_.finished_.emit()
+    
+    def cancel_scaner(self):
+        self.scan_helper.set_can_scan(False)
 
     def main_folder_scan(self, main_folder: MainFolder):
         main_folder_remover = MainFolderRemover()
@@ -541,8 +558,3 @@ class ScanerTask(URunnable):
             del_items, new_items = file_updater.run()
             db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.run()
-        try:
-            gc.collect()
-            self.signals_.finished_.emit()
-        except RuntimeError:
-            pass
