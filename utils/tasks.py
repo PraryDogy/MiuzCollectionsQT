@@ -1,5 +1,6 @@
 import gc
 import os
+import subprocess
 
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal
 from PyQt5.QtGui import QColor, QPixmap, QPixmapCache
@@ -10,6 +11,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
+from .scaner import DbUpdater, FileUpdater
 from .utils import Utils
 
 
@@ -408,3 +410,48 @@ class MultipleImgInfo(URunnable):
             return "\n".join(text)
         else:
             return text
+
+
+class RemoveFilesSignals(QObject):
+    finished_ = pyqtSignal()
+
+
+class RemoveFilesTask(URunnable):
+    scpt = os.path.join("scripts", "remove_files.scpt")
+
+    def __init__(self, img_path_list: list[str]):
+        super().__init__()
+        self.signals_ = RemoveFilesSignals()
+        self.img_path_list = img_path_list
+
+    def task(self):
+        try:
+            self.remove_thumbs()
+            command = ["osascript", self.scpt] + self.img_path_list
+            subprocess.run(command)
+        except Exception as e:
+            Utils.print_error(e)
+        try:
+            self.signals_.finished_.emit()
+        except RuntimeError as e:
+            Utils.print_error(e)
+
+    def remove_thumbs(self):      
+        thumb_path_list = [
+            Utils.create_thumb_path(img_path)
+            for img_path in self.img_path_list
+        ]
+        rel_thumb_path_list = [
+            Utils.get_rel_thumb_path(thumb_path)
+            for thumb_path in thumb_path_list
+        ]
+
+        main_folder = MainFolder.current
+        
+        # new_items пустой так как мы только удаляем thumbs из hashdir
+        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder)
+        del_items, new_items = file_updater.run()
+        
+        # new_items пустой так как мы только удаляем thumbs из бд
+        db_updater = DbUpdater(del_items, [], main_folder)
+        db_updater.run()

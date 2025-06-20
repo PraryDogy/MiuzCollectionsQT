@@ -1,7 +1,6 @@
 import os
-import subprocess
 
-from PyQt5.QtCore import QObject, Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                              QWidget)
 
@@ -9,59 +8,11 @@ from base_widgets.svg_btn import SvgBtn
 from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
-from main_folder import MainFolder
-from utils.scaner import DbUpdater, FileUpdater
-from utils.tasks import URunnable, UThreadPool
-from utils.utils import Err, Utils
+from utils.tasks import RemoveFilesTask, UThreadPool
 
-WARNING_SVG = os.path.join(Static.images_dir, "warning.svg")
-SCRIPTS = "scripts"
-REMOVE_FILES_SCPT = os.path.join(SCRIPTS, "remove_files.scpt")
-
-class WorkerSignals(QObject):
-    finished_ = pyqtSignal()
-
-
-class RemoveFilesTask(URunnable):
-    def __init__(self, img_path_list: list[str]):
-        super().__init__()
-        self.signals_ = WorkerSignals()
-        self.img_path_list = img_path_list
-
-    def task(self):
-        try:
-            self.remove_thumbs()
-            command = ["osascript", REMOVE_FILES_SCPT] + self.img_path_list
-            subprocess.run(command)
-        except Exception as e:
-            Err.print_error(e)
-        try:
-            self.signals_.finished_.emit()
-        except RuntimeError as e:
-            Err.print_error(e)
-
-    def remove_thumbs(self):      
-        thumb_path_list = [
-            Utils.create_thumb_path(img_path)
-            for img_path in self.img_path_list
-        ]
-        rel_thumb_path_list = [
-            Utils.get_rel_thumb_path(thumb_path)
-            for thumb_path in thumb_path_list
-        ]
-
-        main_folder = MainFolder.current
-        
-        # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder)
-        del_items, new_items = file_updater.run()
-        
-        # new_items пустой так как мы только удаляем thumbs из бд
-        db_updater = DbUpdater(del_items, [], main_folder)
-        db_updater.run()
-        
 
 class RemoveFilesWin(WinSystem):
+    warning_svg = os.path.join(Static.images_dir, "warning.svg")
     finished_ = pyqtSignal(list)
     svg_size = 50
 
@@ -76,7 +27,7 @@ class RemoveFilesWin(WinSystem):
         first_row_lay.setContentsMargins(0, 0, 0, 0)
         first_row_wid.setLayout(first_row_lay)
 
-        warn = SvgBtn(WARNING_SVG, RemoveFilesWin.svg_size)
+        warn = SvgBtn(self.warning_svg, RemoveFilesWin.svg_size)
         first_row_lay.addWidget(warn)
 
         t = f"{Lang.move_to_trash} ({len(img_path_list)})?"
