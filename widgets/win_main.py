@@ -13,9 +13,8 @@ from lang import Lang
 from main_folder import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
-from utils.tasks import CopyFilesTask
 from utils.scaner import Scaner
-from utils.tasks import UThreadPool
+from utils.tasks import CopyFilesTask, UploadFilesTask, UThreadPool
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -170,12 +169,14 @@ class WinMain(WinFrameless):
         self.smb_win.show()
 
     def upload_task_cmd(self, dest: str, img_path_list: list[str]):
-        thread_ = CopyFilesTask(dest, img_path_list, False)
-        thread_.signals_.finished_.connect(lambda new_img_path_list: self.upload_task_finished(new_img_path_list))
-        UThreadPool.start(thread_)
+        copy_files_task = CopyFilesTask(dest, img_path_list, False)
+        cmd = lambda img_path_list: self.upload_task_finished(img_path_list)
+        copy_files_task.signals_.finished_.connect(cmd)
+        UThreadPool.start(copy_files_task)
 
     def upload_task_finished(self, img_path_list: list[str]):
-        print("файлы скопированы но дальше надо обновить бд")
+        upload_files_task = UploadFilesTask(img_path_list)
+        UThreadPool.start(upload_files_task)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
