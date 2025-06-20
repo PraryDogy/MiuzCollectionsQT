@@ -2,20 +2,17 @@ import gc
 import os
 from typing import Literal
 
-import sqlalchemy
 from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import (QColor, QContextMenuEvent, QKeyEvent, QMouseEvent,
-                         QPainter, QPaintEvent, QPixmap, QPixmapCache,
-                         QResizeEvent)
+from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
+                         QPaintEvent, QPixmap, QPixmapCache, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import Dynamic, Static
-from database import THUMBS, Dbase
 from main_folder import MainFolder
-from utils.tasks import URunnable, UThreadPool
+from utils.tasks import LoadImage, LoadThumb, UThreadPool
 from utils.utils import Utils
 
 from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
@@ -44,88 +41,6 @@ ZOOM_FIT = os.path.join(Static.images_dir, "zoom_fit.svg")
 CLOSE_ = os.path.join(Static.images_dir, "zoom_close.svg")
 PREV_ = os.path.join(Static.images_dir, "prev.svg")
 NEXT_ = os.path.join(Static.images_dir, "next.svg")
-
-
-class ImageData:
-    __slots__ = ["img_path", "pixmap"]
-    def __init__(self, img_path: str, pixmap: QPixmap):
-        """
-        img path может быть как полный так и относительный
-        img_path / rel_img_path
-        """
-        self.img_path = img_path
-        self.pixmap = pixmap
-
-
-class WorkerSignals(QObject):
-    finished_ = pyqtSignal(object)
-
-
-class LoadThumb(URunnable):
-    def __init__(self, rel_img_path: str):
-        super().__init__()
-        self.signals_ = WorkerSignals()
-        self.rel_img_path = rel_img_path
-
-    def task(self):
-        conn = Dbase.engine.connect()
-        q = sqlalchemy.select(THUMBS.c.short_hash) #rel thumb path
-        q = q.where(THUMBS.c.short_src == self.rel_img_path)
-        q = q.where(THUMBS.c.brand == MainFolder.current.name)
-        rel_thumb_path = conn.execute(q).scalar()
-        conn.close()
-
-        if rel_thumb_path:
-            thumb_path = Utils.get_thumb_path(rel_thumb_path)
-            thumb = Utils.read_thumb(thumb_path)
-            thumb = Utils.desaturate_image(thumb, 0.2)
-            pixmap = Utils.pixmap_from_array(thumb)
-        else:
-            pixmap = QPixmap(1, 1)
-            pixmap.fill(QColor(128, 128, 128))
-
-        image_data = ImageData(self.rel_img_path, pixmap)
-        self.signals_.finished_.emit(image_data)
-
-
-class LoadImage(URunnable):
-    max_images_count = 50
-
-    def __init__(self, img_path: str, cached_images: dict[str, QPixmap]):
-        super().__init__()
-        self.signals_ = WorkerSignals()
-        self.img_path = img_path
-        self.cached_images = cached_images
-
-    def task(self):
-        if self.img_path not in self.cached_images:
-            img = Utils.read_image(self.img_path)
-            if img is not None:
-                img = Utils.desaturate_image(img, 0.2)
-                self.pixmap = Utils.pixmap_from_array(img)
-                self.cached_images[self.img_path] = self.pixmap
-        else:
-            self.pixmap = self.cached_images.get(self.img_path)
-
-        if not hasattr(self, "pixmap"):
-            print("не могу загрузить крупное изображение")
-            self.pixmap = QPixmap(0, 0)
-
-        if len(self.cached_images) > self.max_images_count:
-            self.cached_images.pop(next(iter(self.cached_images)))
-
-        image_data = ImageData(self.img_path, self.pixmap)
-
-        try:
-            self.signals_.finished_.emit(image_data)
-        except RuntimeError:
-            ...
-
-        # === очищаем ссылки
-        del self.pixmap
-        self.signals_ = None
-        gc.collect()
-        QPixmapCache.clear()
 
 
 class ImageWidget(QLabel):
@@ -327,10 +242,13 @@ class WinImageView(WinChild):
         task.signals_.finished_.connect(self.load_thumb_fin)
         UThreadPool.start(task)
 
-    def load_thumb_fin(self, data: ImageData):
-        self.image_label.set_image(data.pixmap)
+    def load_thumb_fin(self, data: tuple[str, QPixmap]):
+        rel_img_path, pixmap = data
+        self.image_label.set_image(pixmap)
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
+            print(main_folder_path, self.rel_img_path)
+            return
             self.img_path = Utils.get_img_path(main_folder_path, self.rel_img_path)
             self.load_image()
         else:
@@ -343,13 +261,14 @@ class WinImageView(WinChild):
         img_thread.signals_.finished_.connect(cmd_)
         UThreadPool.start(img_thread)
 
-    def load_image_fin(self, data: ImageData, img_path: str):
+    def load_image_fin(self, data: tuple[str, QPixmap], current_img_path: str):
+        old_img_path, pixmap = data
         self.task_count -= 1
-        if data.pixmap.width() == 0 or data.img_path != img_path:
+        if pixmap.width() == 0 or old_img_path != current_img_path:
             return
-        elif isinstance(data.pixmap, QPixmap):
+        elif isinstance(pixmap, QPixmap):
             try:
-                self.image_label.set_image(data.pixmap)
+                self.image_label.set_image(pixmap)
             except RuntimeError:
                 ...
 

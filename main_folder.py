@@ -27,11 +27,11 @@ class MainFolder:
         Проверяет и устанавливает путь к MainFolder.    
         Возвращает доступный путь к MainFolder или None
         """
+        self._curr_path = None
         for i in self.paths:
             if os.path.exists(i):
                 self._curr_path = i
-                return self.current
-        self._curr_path = None
+                break        
         return self._curr_path
 
     @classmethod
