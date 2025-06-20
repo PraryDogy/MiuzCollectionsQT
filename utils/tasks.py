@@ -11,8 +11,8 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater, FinderImages,
-                     MainFolderRemover)
+from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
+                           FinderImages, MainFolderRemover, ScanHelper)
 from .utils import Utils
 
 
@@ -507,7 +507,7 @@ class ScanerTask(URunnable):
     def __init__(self):
         super().__init__()
         self.signals_ = ScanerSignals()
-        self.can_scan = True
+        self.scan_helper = ScanHelper()
 
     def task(self):
         for main_folder in MainFolder.list_:
@@ -518,7 +518,7 @@ class ScanerTask(URunnable):
     def main_folder_scan(self, main_folder: MainFolder):
         main_folder_remover = MainFolderRemover()
         main_folder_remover.run()
-        finder_images = FinderImages(main_folder, self.can_scan)
+        finder_images = FinderImages(main_folder, self.scan_helper)
         finder_images = finder_images.run()
         gc.collect()
         if isinstance(finder_images, list):

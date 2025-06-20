@@ -1,24 +1,30 @@
 import gc
 import os
 from time import sleep
-import gc
+
 import sqlalchemy
 import sqlalchemy.exc
 from numpy import ndarray
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from cfg import JsonData, Static, ThumbData
+from cfg import Static, ThumbData
 from database import THUMBS, ClmNames, Dbase
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import URunnable, UThreadPool
 
 from .utils import Utils
 
 
-class ScanerTools:
-    can_scan: bool = True
+class ScanHelper:
+    def __init__(self):
+        super().__init__()
+        self._can_scan = True
+
+    def set_can_scan(self, value: bool):
+        self._can_scan = value
+
+    def get_can_scan(self):
+        return self._can_scan
 
     @classmethod
     def progressbar_text(cls, text: str):
@@ -37,10 +43,10 @@ class ScanerTools:
 
 
 class FinderImages:
-    def __init__(self, main_folder: MainFolder, can_scan: bool):
+    def __init__(self, main_folder: MainFolder, scan_helper: ScanHelper):
         super().__init__()
         self.main_folder = main_folder
-        self.can_scan = can_scan
+        self.scan_helper = scan_helper
 
     def run(self) -> list[tuple[str, int, int, int]] | None:
         """Основной метод для поиска изображений в коллекциях."""
@@ -73,7 +79,7 @@ class FinderImages:
 
         for index, subdir in enumerate(subdirs[:-1], start=1):
             progress_text = self.get_progress_text(index, subrirs_count)
-            ScanerTools.progressbar_text(progress_text)
+            ScanHelper.progressbar_text(progress_text)
             try:
                 walked_images = self.walk_subdir(subdir)
                 finder_images.extend(walked_images)
@@ -110,7 +116,7 @@ class FinderImages:
                 for entry in entries:
                     # нельзя удалять
                     # это прервет FinderImages, но не остальные классы
-                    if not self.can_scan:
+                    if not self.scan_helper.get_can_scan():
                         return finder_images
                     if entry.is_dir():
                         stack.append(entry.path)
@@ -135,7 +141,7 @@ class DbImages:
         self.main_folder = main_folder
 
     def run(self) -> dict[str, tuple[str, int, int, int]]:
-        ScanerTools.progressbar_text("")
+        ScanHelper.progressbar_text("")
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(
@@ -207,7 +213,7 @@ class FileUpdater:
         """
         del_items = self.run_del_items()
         new_items = self.run_new_items()
-        ScanerTools.progressbar_text("")
+        ScanHelper.progressbar_text("")
         return del_items, new_items
 
     def progressbar_text(self, text: str, x: int, total: int):
@@ -218,7 +224,7 @@ class FileUpdater:
         """
         main_folder = self.main_folder.name.capitalize()
         t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
-        ScanerTools.progressbar_text(t)
+        ScanHelper.progressbar_text(t)
 
     def run_del_items(self):
         new_del_items = []
@@ -240,7 +246,7 @@ class FileUpdater:
                     Utils.print_error(e)
                     continue
         if total > 0:
-            ScanerTools.reload_gui()
+            ScanHelper.reload_gui()
         return new_del_items
 
     def create_thumb(self, img_path: str) -> ndarray | None:
@@ -273,7 +279,7 @@ class FileUpdater:
                 Utils.print_error(e)
                 continue
         if total > 0:
-            ScanerTools.reload_gui()
+            ScanHelper.reload_gui()
         return new_new_items
 
 
@@ -436,7 +442,7 @@ class MainFolderRemover:
                 if not os.listdir(folder):
                     os.rmdir(folder)
                 t = f"{Lang.deleting}: {x} {Lang.from_} {total}"
-                ScanerTools.progressbar_text(t)
+                ScanHelper.progressbar_text(t)
             except Exception as e:
                 Utils.print_error(e)
                 continue
