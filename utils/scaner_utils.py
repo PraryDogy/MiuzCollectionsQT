@@ -64,16 +64,23 @@ class FinderImages:
     def run(self) -> list | None:
         """
         Возвращает все изображения из MainFolder    
-        [(img_path, size, birth_time, mod_time), ...]   
+        [(img_path, size, birth_time, mod_time), ...]
+        Если не найдено ни одного изображения, вернет None и установит
+        ScanHelper.can_scan на False
         ---     
-        При любой неизвестной ошибке флаг ScanHelper будет установлен на False,     
+        При любой неизвестной ошибке ScanHelper.can_scan установит на False,     
         Чтобы последующие действия не привели к массовому удалению фотографий.      
         Смотри сообщение в начале файла.
         Возвращает None
         """
         try:
             collections = self.get_main_folder_subdirs()
-            return self.process_subdirs(collections)
+            finder_images = self.process_subdirs(collections)
+            if finder_images:
+                return finder_images
+            else:
+                self.scan_helper.set_can_scan(False)
+                return None
         except Exception as e:
             self.scan_helper.set_can_scan(False)
             return None
