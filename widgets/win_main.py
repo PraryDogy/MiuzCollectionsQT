@@ -11,7 +11,6 @@ from base_widgets.wins import WinFrameless
 from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from main_folder import MainFolder
-from paletes import ThemeChanger
 from signals import SignalsApp
 from utils.tasks import CopyFilesTask, ScanerTask, UploadFilesTask, UThreadPool
 
@@ -49,11 +48,9 @@ class USep(QFrame):
 
 
 class WinMain(WinFrameless):
-    def __init__(self):
+    def __init__(self, argv: list[str]):
         super().__init__()
-
         self.setAcceptDrops(True)
-
         self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
         self.setMinimumWidth(750)
         self.setMenuBar(BarMacos())
@@ -108,7 +105,9 @@ class WinMain(WinFrameless):
         SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
         SignalsApp.instance.win_main_cmd.emit("set_title")
 
-        # QTimer.singleShot(100, self.after_start)
+        if argv[-1] != "noscan":
+            self.scaner_task = ScanerTask()
+            UThreadPool.start(self.scaner_task)
 
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
@@ -152,13 +151,8 @@ class WinMain(WinFrameless):
         self.hide()
 
     def on_exit(self):
+        self.scaner_task.cancel()
         JsonData.write_json_data()
-
-    # def after_start(self):
-    #     Scaner.start()
-    #     main_folder_path = MainFolder.current.is_available()
-    #     if not main_folder_path:
-    #         self.open_smb_win()
 
     def open_smb_win(self):
         self.smb_win = WinSmb()

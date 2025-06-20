@@ -518,15 +518,14 @@ class ScanerTask(URunnable):
         self.scan_helper = ScanHelper()
 
     def task(self):
-
-
         if not self.scan_helper.get_can_scan():
             self.signals_.finished_.emit()
             return
 
         main_folders = [
-            i.is_available()
+            i
             for i in MainFolder.list_
+            if i.is_available()
         ]
 
         if not main_folders:
@@ -541,7 +540,7 @@ class ScanerTask(URunnable):
 
         self.signals_.finished_.emit()
     
-    def cancel_scaner(self):
+    def cancel(self):
         self.scan_helper.set_can_scan(False)
 
     def main_folder_scan(self, main_folder: MainFolder):

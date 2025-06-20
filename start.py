@@ -73,7 +73,11 @@ from widgets.win_main import WinMain
 class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
-
+        JsonData.init()
+        Dbase.init()
+        Lang.init()
+        MainFolder.init(JsonData.get_data())
+        JsonData.write_json_data()
         UThreadPool.init()
         SignalsApp.init()
         ThemeChanger.start()
@@ -82,28 +86,17 @@ class App(QApplication):
         icon = QIcon(icon_path)
         self.setWindowIcon(icon)
 
-        self.win_main = WinMain()
+        self.win_main = WinMain(argv)
         self.win_main.center()
         self.win_main.show()
 
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: self.win_main.win_main_cmd("exit"))
 
-        # if argv[-1] == "noscan":
-        #     Scaner.start = lambda: print("scaner disabled")
-        #     Scaner.stop = lambda: print("scaner disabled")
-
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
             self.win_main.win_main_cmd("show")
         return super().eventFilter(a0, a1)
-
-
-JsonData.init()
-Dbase.init()
-Lang.init()
-MainFolder.init(JsonData.get_data())
-JsonData.write_json_data()
 
 app = App(sys.argv)
 app.exec()
