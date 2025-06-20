@@ -29,12 +29,11 @@ class ScanerTools:
 
     @classmethod
     def reload_gui(cls):
-        if cls.can_scan:
-            try:
-                SignalsApp.instance.menu_left_cmd.emit("reload")
-                SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-            except RuntimeError as e:
-                Utils.print_error(e)
+        try:
+            SignalsApp.instance.menu_left_cmd.emit("reload")
+            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        except RuntimeError as e:
+            Utils.print_error(e)
 
 
 class FinderImages:
@@ -490,64 +489,64 @@ class ScanerTask(URunnable):
             pass
         
 
-class ScanerShedule(QObject):
-    def __init__(self):
-        super().__init__()
+# class ScanerShedule(QObject):
+#     def __init__(self):
+#         super().__init__()
 
-        self.wait_timer = QTimer(self)
-        self.wait_timer.setSingleShot(True)
-        self.wait_timer.timeout.connect(self.start)
+#         self.wait_timer = QTimer(self)
+#         self.wait_timer.setSingleShot(True)
+#         self.wait_timer.timeout.connect(self.start)
 
-        self.wait_sec = 30000
-        self.scaner_thread = None
+#         self.wait_sec = 30000
+#         self.scaner_thread = None
 
-    def start(self):
-        self.wait_timer.stop()
+#     def start(self):
+#         self.wait_timer.stop()
 
-        if self.scaner_thread:
-            print("prev scan not finished, wait", self.wait_sec//1000, "sec")
-            self.wait_timer.start(self.wait_sec)
-            return
+#         if self.scaner_thread:
+#             print("prev scan not finished, wait", self.wait_sec//1000, "sec")
+#             self.wait_timer.start(self.wait_sec)
+#             return
 
-        avaibility = False
+#         avaibility = False
 
-        for main_folder in MainFolder.list_:
-            if main_folder.is_available():
-                avaibility = True
+#         for main_folder in MainFolder.list_:
+#             if main_folder.is_available():
+#                 avaibility = True
     
-        if not avaibility:
-            print("scaner no smb, wait", self.wait_sec//1000, "sec")
-            self.wait_timer.start(self.wait_sec)
+#         if not avaibility:
+#             print("scaner no smb, wait", self.wait_sec//1000, "sec")
+#             self.wait_timer.start(self.wait_sec)
 
-        else:
-            self.scaner_thread = ScanerTask()
-            self.scaner_thread.signals_.finished_.connect(self.after_scan)
-            UThreadPool.start(self.scaner_thread)
+#         else:
+#             self.scaner_thread = ScanerTask()
+#             self.scaner_thread.signals_.finished_.connect(self.after_scan)
+#             UThreadPool.start(self.scaner_thread)
 
-    def stop(self):
-        print("scaner manualy stoped.")
-        ScanerTools.can_scan = False
-        self.wait_timer.stop()
+#     def stop(self):
+#         print("scaner manualy stoped.")
+#         ScanerTools.can_scan = False
+#         self.wait_timer.stop()
 
-    def after_scan(self):
-        print("scaner finished, new scan in", JsonData.scaner_minutes, "minutes")
-        self.scaner_thread = None
-        self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
-        Dbase.vacuum()
-        ScanerTools.progressbar_text("")
+#     def after_scan(self):
+#         print("scaner finished, new scan in", JsonData.scaner_minutes, "minutes")
+#         self.scaner_thread = None
+#         self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
+#         Dbase.vacuum()
+#         ScanerTools.progressbar_text("")
 
 
-class Scaner:
-    app: ScanerShedule = None
+# class Scaner:
+#     app: ScanerShedule = None
 
-    @classmethod
-    def init(cls):
-        cls.app = ScanerShedule()
+#     @classmethod
+#     def init(cls):
+#         cls.app = ScanerShedule()
 
-    @classmethod
-    def start(cls):
-        cls.app.start()
+#     @classmethod
+#     def start(cls):
+#         cls.app.start()
 
-    @classmethod
-    def stop(cls):
-        cls.app.stop()
+#     @classmethod
+#     def stop(cls):
+#         cls.app.stop()
