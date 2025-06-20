@@ -13,11 +13,12 @@ from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
+from utils.tasks import UThreadPool
 from utils.utils import Utils
 
-from .._runnable import UThreadPool
-from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, WinInfoAction,
-                       OpenInView, RemoveFiles, Reveal, Save, ScanerRestart, MoveFiles)
+from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
+                       OpenInView, RemoveFiles, Reveal, Save, ScanerRestart,
+                       WinInfoAction)
 from ..win_info import WinInfo
 from ..win_remove_files import RemoveFilesWin
 from ..win_smb import WinSmb

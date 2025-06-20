@@ -66,8 +66,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 from utils.scaner import Scaner
-from utils.utils import ReadImage
-from widgets._runnable import UThreadPool
+from utils.tasks import UThreadPool
 from widgets.win_main import WinMain
 
 

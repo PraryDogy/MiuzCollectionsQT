@@ -3,13 +3,13 @@ import os
 NAME = "name"
 PATHS = "paths"
 STOP_LIST = "stop_list"
-CURRENT_PATH = "current_path"
+_CURR_PATH = "_curr_path"
 MAIN_FOLDERS = "main_folders"
 
 class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
-    __slots__ = [NAME, PATHS, STOP_LIST, CURRENT_PATH]
+    __slots__ = [NAME, PATHS, STOP_LIST, _CURR_PATH]
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str]):
 

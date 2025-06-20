@@ -12,7 +12,7 @@ from database import THUMBS, Dbase
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import URunnable, UThreadPool
+from utils.tasks import LoadCollectionsTask, UThreadPool
 from utils.utils import Utils
 
 from .win_smb import WinSmb
@@ -60,63 +60,6 @@ class CollectionBtn(QLabel):
             self.pressed_.emit()
 
 
-class WorkerSignals(QObject):
-    finished_ = pyqtSignal(list)
-
-
-class LoadMenus(URunnable):
-    def __init__(self, main_folder_index: int):
-        super().__init__()
-        self.main_folder_index = main_folder_index
-        self.signals_ = WorkerSignals()
-
-    def task(self) -> None:
-        menus = self.load_colls_query()
-
-        try:
-            self.signals_.finished_.emit(menus)
-        except RuntimeError as e:
-            Utils.print_error(e)
-
-
-    def load_colls_query(self) -> list[dict]:
-        """
-        Queries the database to load distinct `THUMBS.c.coll`, processes them, 
-        and returns a list of dictionaries containing short and full `THUMBS.c.coll`.
-
-        :return: A sorted list of dictionaries with `short_name` and `coll_name` keys.
-        """
-        menus: list[dict] = []
-
-        conn = Dbase.engine.connect()
-        main_folder_name = MainFolder.list_[self.main_folder_index].name
-        q = sqlalchemy.select(THUMBS.c.coll)
-        q = q.where(THUMBS.c.brand == main_folder_name)
-        q = q.distinct()
-        res = conn.execute(q).fetchall()
-        conn.close()
-
-        if res:
-            res: tuple[str] = (i[0] for i in res if i)
-
-        else:
-            print(main_folder_name, "> left menu > load db colls > no data")
-            return menus
-
-        for coll_name in res:
-            fake_name = coll_name.lstrip("0123456789").strip()
-            fake_name = fake_name if fake_name else coll_name
-
-            menus.append(
-                {
-                    "short_name": fake_name,
-                    "coll_name": coll_name
-                }
-            )
-
-        return sorted(menus, key = lambda x: x["short_name"])
-
-
 class MenuTab(QListWidget):
     h_ = 30
 
@@ -129,7 +72,8 @@ class MenuTab(QListWidget):
         self.setup_task()
 
     def setup_task(self):
-        self.task_ = LoadMenus(main_folder_index=self.main_folder_index)
+        main_folder = MainFolder.list_[self.main_folder_index]
+        self.task_ = LoadCollectionsTask(main_folder)
         self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.start(self.task_)
 

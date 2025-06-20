@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal
-from sqlalchemy import update
+from sqlalchemy import update, select
 
 from database import THUMBS, Dbase
 from main_folder import MainFolder
@@ -161,3 +161,53 @@ class FavTask(URunnable):
             Utils.print_error(e)
             conn.rollback()
         conn.close()
+
+
+class MenuSignals(QObject):
+    finished_ = pyqtSignal(list)
+
+
+class LoadCollectionsTask(URunnable):
+    def __init__(self, main_folder: MainFolder):
+        super().__init__()
+        self.main_folder = main_folder
+        self.signals_ = MenuSignals()
+
+    def task(self) -> None:
+        menus = self.get_collections_list()
+        try:
+            self.signals_.finished_.emit(menus)
+        except RuntimeError as e:
+            Utils.print_error(e)
+
+    def get_collections_list(self) -> list[dict]:
+        """
+        Queries the database to load distinct `THUMBS.c.coll`, processes them, 
+        and returns a list of dictionaries containing short and full `THUMBS.c.coll`.
+
+        :return: A sorted list of dictionaries with `short_name` and `coll_name` keys.
+        """
+
+        conn = Dbase.engine.connect()
+        q = select(THUMBS.c.coll)
+        q = q.where(THUMBS.c.brand == self.main_folder.name)
+        q = q.distinct()
+        res = conn.execute(q).fetchall()
+        conn.close()
+
+        if not res:
+            return list()
+
+        menus: list[dict] = []
+
+        for row in res:
+            coll_name: str = row[0]
+            fake_name = coll_name.lstrip("0123456789").strip()
+            fake_name = fake_name if fake_name else coll_name
+            menus.append(
+                {
+                    "short_name": fake_name,
+                    "coll_name": coll_name
+                }
+            )
+        return sorted(menus, key = lambda x: x["short_name"])

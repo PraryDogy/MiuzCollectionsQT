@@ -15,7 +15,7 @@ from paletes import ThemeChanger
 from signals import SignalsApp
 from utils.tasks import CopyFilesTask
 from utils.scaner import Scaner
-from widgets._runnable import UThreadPool
+from utils.tasks import UThreadPool
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
