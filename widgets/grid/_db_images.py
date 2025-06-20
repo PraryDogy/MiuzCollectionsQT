@@ -103,9 +103,8 @@ class DbImages(URunnable):
             THUMBS.c.fav
             )
         
-        main_folder_name = MainFolder.current.name
         q = q.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
-        q = q.where(THUMBS.c.brand == main_folder_name)
+        q = q.where(THUMBS.c.brand == MainFolder.current.name)
 
         if Dynamic.resents:
             q = q.order_by(-THUMBS.c.id)

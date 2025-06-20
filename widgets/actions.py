@@ -156,7 +156,9 @@ class FavTask(URunnable):
 
     def task(self):
         values = {"fav": self.value}
-        q = sqlalchemy.update(THUMBS).where(THUMBS.c.short_src==self.rel_img_path)
+        q = sqlalchemy.update(THUMBS)
+        q = q.where(THUMBS.c.short_src == self.rel_img_path)
+        q = q.where(THUMBS.c.brand == MainFolder.current.name)
         q = q.values(**values)
 
         conn = Dbase.engine.connect()

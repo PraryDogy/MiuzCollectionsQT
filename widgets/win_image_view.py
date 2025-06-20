@@ -69,11 +69,9 @@ class LoadThumb(URunnable):
 
     def task(self):
         conn = Dbase.engine.connect()
-        q = sqlalchemy.select(
-            THUMBS.c.short_hash #rel thumb path
-            ).where(
-                THUMBS.c.short_src == self.rel_img_path
-                )
+        q = sqlalchemy.select(THUMBS.c.short_hash) #rel thumb path
+        q = q.where(THUMBS.c.short_src == self.rel_img_path)
+        q = q.where(THUMBS.c.brand == MainFolder.current.name)
         rel_thumb_path = conn.execute(q).scalar()
         conn.close()
 
