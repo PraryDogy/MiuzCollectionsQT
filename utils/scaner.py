@@ -453,14 +453,14 @@ class MainFolderRemover:
             Utils.print_error(e)
 
 
-class Signals(QObject):
+class ScanerSignals(QObject):
     finished_ = pyqtSignal()
 
 
-class ScanerThread(URunnable):
+class ScanerTask(URunnable):
     def __init__(self):
         super().__init__()
-        self.signals_ = Signals()
+        self.signals_ = ScanerSignals()
 
     def task(self):
         for main_folder in MainFolder.list_:
@@ -520,7 +520,7 @@ class ScanerShedule(QObject):
             self.wait_timer.start(self.wait_sec)
 
         else:
-            self.scaner_thread = ScanerThread()
+            self.scaner_thread = ScanerTask()
             self.scaner_thread.signals_.finished_.connect(self.after_scan)
             UThreadPool.start(self.scaner_thread)
 
