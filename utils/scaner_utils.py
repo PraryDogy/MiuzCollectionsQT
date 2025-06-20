@@ -268,7 +268,7 @@ class FileUpdater:
         total = len(self.del_items)
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
             if not self.scan_helper.get_can_scan():
-                return
+                break
             thumb_path = Utils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
                 self.progressbar_text(Lang.deleting, x, total)
@@ -298,13 +298,10 @@ class FileUpdater:
 
     def run_new_items(self):
         new_new_items = []
-        if not self.new_items:
-            self.scan_helper.set_can_scan(False)
-            return
         total = len(self.new_items)
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
             if not self.scan_helper.get_can_scan():
-                return
+                break
             self.progressbar_text(Lang.adding, x, total)
             try:
                 thumb = self.create_thumb(img_path)

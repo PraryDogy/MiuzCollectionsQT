@@ -519,7 +519,10 @@ class ScanerTask(URunnable):
 
     def task(self):
         if not self.scan_helper.get_can_scan():
-            self.signals_.finished_.emit()
+            try:
+                self.signals_.finished_.emit()
+            except RuntimeError as e:
+                ...
             return
 
         main_folders = [
@@ -538,7 +541,10 @@ class ScanerTask(URunnable):
             gc.collect()
             print("scaner finished", i.name)
 
-        self.signals_.finished_.emit()
+        try:
+            self.signals_.finished_.emit()
+        except RuntimeError as e:
+            ...
     
     def cancel(self):
         self.scan_helper.set_can_scan(False)
