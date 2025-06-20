@@ -420,6 +420,10 @@ class RemoveFilesTask(URunnable):
     scpt = os.path.join("scripts", "remove_files.scpt")
 
     def __init__(self, img_path_list: list[str]):
+        """
+        Удаляет изображения из hashdir
+        Удаляет записи об изображениях из бд
+        """
         super().__init__()
         self.signals_ = RemoveFilesSignals()
         self.img_path_list = img_path_list
@@ -455,3 +459,40 @@ class RemoveFilesTask(URunnable):
         # new_items пустой так как мы только удаляем thumbs из бд
         db_updater = DbUpdater(del_items, [], main_folder)
         db_updater.run()
+
+
+class UploadFilesSignals(QObject):
+    finished_ = pyqtSignal()
+
+
+class UploadFilesTask(URunnable):
+    def __init__(self, img_path_list: list):
+        """
+        Записывает на диск в hashdir изображения
+        Делает записи в бд о загруженных изображениях
+        """
+        super().__init__()
+        self.img_path_list = img_path_list
+        self.signals_ = UploadFilesSignals()
+
+    def task(self):
+        img_with_stats_list = []
+        for img_path in self.img_path_list:
+            try:
+                stat = os.stat(img_path)
+            except Exception as e:
+                Utils.print_error(e)
+                continue
+            size, birth, mod = stat.st_size, stat.st_birthtime, stat.st_mtime
+            data = (img_path, size, birth, mod)
+            img_with_stats_list.append(data)
+        # del_items пустой, так как нас интересует только добавление в БД
+        file_updater = FileUpdater([], img_with_stats_list, MainFolder.current)
+        del_items, new_items = file_updater.run()
+        # del_items пустой, так как нас интересуют только новые изображения
+        db_updater = DbUpdater([], new_items, MainFolder.current)
+        db_updater.run()
+        try:
+            self.signals_.finished_.emit()
+        except RuntimeError as e:
+            Utils.print_error(e)
