@@ -504,16 +504,27 @@ class ScanerSignals(QObject):
 
 
 class ScanerTask(URunnable):
+    short_timer = 15000
+
     def __init__(self):
         super().__init__()
         self.signals_ = ScanerSignals()
         self.scan_helper = ScanHelper()
 
     def task(self):
-        for main_folder in MainFolder.list_:
-            if main_folder.is_available():
-                self.main_folder_scan(main_folder)
-                print("scaner started", main_folder.name)
+        self.shedule()
+
+    def shedule(self):
+        main_folders = [
+            i.is_available()
+            for i in MainFolder.list_
+        ]
+        if not main_folders:
+            QTimer.singleShot(self.short_timer, self.shedule)
+            return
+        for i in main_folders:
+                self.main_folder_scan(i)
+                print("scaner started", i.name)
 
     def main_folder_scan(self, main_folder: MainFolder):
         main_folder_remover = MainFolderRemover()
