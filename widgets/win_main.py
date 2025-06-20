@@ -108,9 +108,16 @@ class WinMain(WinFrameless):
         self.scaner_task = ScanerTask()
 
         if argv[-1] != "noscan":
-            UThreadPool.start(self.scaner_task)
+            self.start_scaner_task()
         else:
             print("scaner disabled")
+
+    def restart_scaner_task(self):
+        self.scaner_task.signals_.finished_.connect(self.start_scaner_task)
+        self.scaner_task.cancel()
+
+    def start_scaner_task(self):
+        UThreadPool.start(self.scaner_task)
 
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 

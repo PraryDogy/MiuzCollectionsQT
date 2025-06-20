@@ -518,13 +518,6 @@ class ScanerTask(URunnable):
         self.scan_helper = ScanHelper()
 
     def task(self):
-        if not self.scan_helper.get_can_scan():
-            try:
-                self.signals_.finished_.emit()
-            except RuntimeError as e:
-                ...
-            return
-
         main_folders = [
             i
             for i in MainFolder.list_
