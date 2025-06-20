@@ -13,7 +13,7 @@ from lang import Lang
 from main_folder import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
-from utils.tasks import CopyFiles
+from utils.tasks import CopyFilesTask
 from utils.scaner import Scaner
 from widgets._runnable import UThreadPool
 
@@ -170,7 +170,7 @@ class WinMain(WinFrameless):
         self.smb_win.show()
 
     def upload_task_cmd(self, dest: str, img_path_list: list[str]):
-        thread_ = CopyFiles(dest, img_path_list, False)
+        thread_ = CopyFilesTask(dest, img_path_list, False)
         thread_.signals_.finished_.connect(lambda new_img_path_list: self.upload_task_finished(new_img_path_list))
         UThreadPool.start(thread_)
 

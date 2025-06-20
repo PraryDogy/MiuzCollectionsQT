@@ -10,7 +10,7 @@ from base_widgets.svg_btn import SvgBtn
 from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
-from utils.tasks import CopyFiles
+from utils.tasks import CopyFilesTask
 from utils.utils import Utils
 
 MAX_ROW = 45
@@ -99,7 +99,7 @@ class WinDownloads(WinSystem):
         self.setWindowTitle(Lang.title_downloads)
         self.setFixedSize(400, 420)
 
-        self.download_items: list[CopyFiles] = []
+        self.download_items: list[CopyFilesTask] = []
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
@@ -138,7 +138,7 @@ class WinDownloads(WinSystem):
 
     def main_actions(self):
 
-        for thread in CopyFiles.current_threads:
+        for thread in CopyFilesTask.current_threads:
 
             if thread not in self.download_items:
                 if not thread.is_finished():
@@ -152,7 +152,7 @@ class WinDownloads(WinSystem):
                     self.progress_layout.addWidget(item)
                     self.download_items.append(thread)
 
-        for files_list in CopyFiles.list_of_file_lists:
+        for files_list in CopyFilesTask.list_of_file_lists:
             if files_list not in self.download_items:
                 item = OldDownloadsItem(files=files_list)
                 one = lambda: self.remove_from_file_lists(download_item=files_list)
@@ -163,12 +163,12 @@ class WinDownloads(WinSystem):
 
         QTimer.singleShot(1000, self.add_progress_widgets)
 
-    def remove_from_file_lists(self, download_item: list[str] | CopyFiles):
+    def remove_from_file_lists(self, download_item: list[str] | CopyFilesTask):
         try:
             self.download_items.remove(download_item)
             if isinstance(download_item, list):
-                CopyFiles.list_of_file_lists.remove(download_item)
-            elif isinstance(download_item, CopyFiles):
+                CopyFilesTask.list_of_file_lists.remove(download_item)
+            elif isinstance(download_item, CopyFilesTask):
                 download_item.signals_.stop.emit()
         except Exception:
             ...

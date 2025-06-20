@@ -1,16 +1,15 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal
+from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 
 from cfg import Dynamic, Static
-from database import THUMBS, Dbase
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 from utils.scaner import Scaner
-from utils.tasks import CopyFiles, URunnable, UThreadPool
+from utils.tasks import CopyFilesTask, FavTask, UThreadPool
 from utils.utils import Utils
 
 from .win_info import WinInfo
@@ -201,7 +200,7 @@ class Save(QAction):
             SmbWin.show(self.win_)
 
     def copy_files_cmd(self, dest: str, img_path_list: list):
-        thread_ = CopyFiles(dest, img_path_list)
+        thread_ = CopyFilesTask(dest, img_path_list)
         UThreadPool.start(thread_)
 
 
@@ -268,7 +267,7 @@ class MoveFiles(QAction):
             self.upload_win.show()
 
     def move_files_cmd(self, dest: str):
-        thread_ = CopyFiles(dest, self.img_path_list, True)
+        thread_ = CopyFilesTask(dest, self.img_path_list, True)
         thread_.signals_.finished_.connect(lambda new_img_path_list: self.move_finished(new_img_path_list))
         UThreadPool.start(thread_)
 

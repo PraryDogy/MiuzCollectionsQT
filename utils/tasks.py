@@ -64,8 +64,8 @@ class CopyFilesSignals(QObject):
     stop = pyqtSignal()
 
 
-class CopyFiles(URunnable):
-    current_threads: list["CopyFiles"] = []
+class CopyFilesTask(URunnable):
+    current_threads: list["CopyFilesTask"] = []
     list_of_file_lists: list[list[str]] = []
 
     def __init__(self, dest: str, files: list, move_files: bool):
@@ -81,7 +81,7 @@ class CopyFiles(URunnable):
         self.move_files = move_files
 
     def task(self):
-        CopyFiles.current_threads.append(self)
+        CopyFilesTask.current_threads.append(self)
         SignalsApp.instance.win_downloads_open.emit()
 
         copied_size = 0
@@ -131,8 +131,8 @@ class CopyFiles(URunnable):
         except RuntimeError:
             ...
         self.signals_.finished_.emit(files_dests)
-        CopyFiles.list_of_file_lists.append(files_dests)
-        CopyFiles.current_threads.remove(self)
+        CopyFilesTask.list_of_file_lists.append(files_dests)
+        CopyFilesTask.current_threads.remove(self)
 
 
 class FavSignals(QObject):
@@ -152,9 +152,7 @@ class FavTask(URunnable):
         q = q.where(THUMBS.c.short_src == self.rel_img_path)
         q = q.where(THUMBS.c.brand == MainFolder.current.name)
         q = q.values(**values)
-
         conn = Dbase.engine.connect()
-
         try:
             conn.execute(q)
             conn.commit()
@@ -162,5 +160,4 @@ class FavTask(URunnable):
         except Exception as e:
             Utils.print_error(e)
             conn.rollback()
-
         conn.close()
