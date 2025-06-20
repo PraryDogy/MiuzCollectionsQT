@@ -523,25 +523,26 @@ class ScanerTask(URunnable):
             QTimer.singleShot(self.short_timer, self.shedule)
             return
         for i in main_folders:
-                self.main_folder_scan(i)
                 print("scaner started", i.name)
+                self.main_folder_scan(i)
+                print("scaner finished", i.name)
 
     def main_folder_scan(self, main_folder: MainFolder):
         main_folder_remover = MainFolderRemover()
         main_folder_remover.run()
         finder_images = FinderImages(main_folder, self.scan_helper)
         finder_images = finder_images.run()
-        gc.collect()
-        if isinstance(finder_images, list):
+        if finder_images and self.scan_helper.get_can_scan():
             db_images = DbImages(main_folder)
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
             file_updater = FileUpdater(del_items, new_items, main_folder, self.scan_helper)
             del_items, new_items = file_updater.run()
-            db_updater = DbUpdater(del_items, new_items, main_folder, self.scan_helper)
+            db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.run()
         try:
+            gc.collect()
             self.signals_.finished_.emit()
         except RuntimeError:
             pass

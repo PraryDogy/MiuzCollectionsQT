@@ -14,6 +14,16 @@ from signals import SignalsApp
 
 from .utils import Utils
 
+"""
+Важно:
+FinderImages собирает все изображения в main_folder,
+которые будут сравниваться со всеми изображениями из DbImages.
+и если FinderImages будет прерван каким-либо образом,
+то будет сравнение всех изображений из DbImages только с частью
+изображений FinderImages, а остальные будут считаться удаленными.
+Чтобы избежать этого, у нас есть флаг can_scan в ScanHelper.
+"""
+
 
 class ScanHelper:
     def __init__(self):
@@ -44,36 +54,54 @@ class ScanHelper:
 
 class FinderImages:
     def __init__(self, main_folder: MainFolder, scan_helper: ScanHelper):
+        """
+        run() to start
+        """
         super().__init__()
         self.main_folder = main_folder
         self.scan_helper = scan_helper
 
-    def run(self) -> list[tuple[str, int, int, int]] | None:
-        """Основной метод для поиска изображений в коллекциях."""
-        collections = self.get_subdirs()
-        if collections:
+    def run(self) -> list | None:
+        """
+        Возвращает все изображения из MainFolder    
+        [(img_path, size, birth_time, mod_time), ...]   
+        ---     
+        При любой неизвестной ошибке флаг ScanHelper будет установлен на False,     
+        Чтобы последующие действия не привели к массовому удалению фотографий.      
+        Смотри сообщение в начале файла.
+        Возвращает None
+        """
+        try:
+            collections = self.get_main_folder_subdirs()
             return self.process_subdirs(collections)
-        else:
+        except Exception as e:
+            self.scan_helper.set_can_scan(False)
             return None
 
-    def get_subdirs(self) -> list[str]:
+    def get_main_folder_subdirs(self) -> list[str]:
+        """
+        Возвращает список подпапок MainFolder и путь MainFolder.    
+        То есть для последующего сканирования у нас будет список:   
+        [/path/to/MainFolder/sub_dir, ..., /path/to/MainFolder]     
+        """
         collections = []
-        try:
-            for item in os.scandir(self.main_folder.get_current_path()):
-                if item.is_dir():
-                    if item.name not in self.main_folder.stop_list:
-                        collections.append(item.path)
-            # Добавляем корневую папку в конец списка коллекций (подпапок),
-            # чтобы сканер мог найти изображения как в корневой папке,
-            # так и в подпапках. Например:
-            # - .../root/img.jpg — изображение в корневой папке
-            # - .../root/collection/img.jpg — изображение в подпапке
-            collections.append(self.main_folder.get_current_path())
-        except FileNotFoundError:
-            ...
+        for item in os.scandir(self.main_folder.get_current_path()):
+            if item.is_dir():
+                if item.name not in self.main_folder.stop_list:
+                    collections.append(item.path)
+        # Добавляем корневую папку в конец списка коллекций (подпапок),
+        # чтобы сканер мог найти изображения как в корневой папке,
+        # так и в подпапках. Например:
+        # - .../root/img.jpg — изображение в корневой папке
+        # - .../root/collection/img.jpg — изображение в подпапке
+        collections.append(self.main_folder.get_current_path())
         return collections
 
-    def process_subdirs(self, subdirs: list[str]) -> list[tuple[str, int, int, int]]:
+    def process_subdirs(self, subdirs: list[str]) -> list:
+        """
+        Возвращает все изображения из MainFolder    
+        [(img_path, size, birth_time, mod_time), ...]   
+        """
         finder_images = []
         subrirs_count = len(subdirs)
 
@@ -211,6 +239,8 @@ class FileUpdater:
         del_items: [rel_thumb_path, ...]    
         new_items: [(img_path, size, birth, mod), ...]  
         """
+        if not self.scan_helper.get_can_scan():
+            return ([], [])
         del_items = self.run_del_items()
         new_items = self.run_new_items()
         ScanHelper.progressbar_text("")
@@ -261,7 +291,7 @@ class FileUpdater:
 
     def run_new_items(self):
         new_new_items = []
-        if self.new_items is None:
+        if not self.new_items:
             self.scan_helper.set_can_scan(False)
             return
         total = len(self.new_items)
@@ -284,13 +314,7 @@ class FileUpdater:
 
 
 class DbUpdater:
-    def __init__(
-            self,
-            del_items: list,
-            new_items: list,
-            main_folder: MainFolder,
-            scan_helper: ScanHelper
-        ):
+    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
         Удаляет записи thumbs из бд   
         Добавляет записи thumbs в бд
@@ -302,7 +326,6 @@ class DbUpdater:
         self.main_folder = main_folder
         self.del_items = del_items
         self.new_items = new_items
-        self.scan_helper = scan_helper
 
     def run(self):
         self.run_del_items()
@@ -311,15 +334,6 @@ class DbUpdater:
     def run_del_items(self):
         conn = Dbase.engine.connect()
         for rel_thumb_path in self.del_items:
-            # нельзя удалять
-            # если удалить этот флаг, то когда флаг будет false,
-            # произойдет массовое удаление из БД
-            # так как FinderItems прерван данным флагом
-            # то есть Compator при сравнении с БД посчитает,
-            # что из Finder было удалено множество изображений
-            # и удалит их из БД
-            if not self.scan_helper.get_can_scan():
-                return
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
             q = q.where(THUMBS.c.brand==self.main_folder.name)
@@ -344,9 +358,6 @@ class DbUpdater:
     def run_new_items(self):
         conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
-            # не удалять
-            if not self.scan_helper.get_can_scan():
-                return
             small_img_path = Utils.create_thumb_path(img_path)
             short_img_path = Utils.get_rel_img_path(self.main_folder.get_current_path(), img_path)
             rel_thumb_path = Utils.get_rel_thumb_path(small_img_path)
