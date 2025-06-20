@@ -1,19 +1,15 @@
 import os
 
-from PyQt5.QtCore import QObject, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
-from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
+from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
 from base_widgets import ContextCustom
 from base_widgets.wins import WinSystem
 from cfg import Static
-from database import THUMBS, Dbase
 from lang import Lang
-from main_folder import MainFolder
-from utils.tasks import URunnable, UThreadPool
+from utils.tasks import MultipleImgInfo, SingleImgInfo, UThreadPool
 from utils.utils import Utils
-
-MAX_ROW = 50
 
 
 class Selectable(QLabel):
@@ -55,112 +51,6 @@ class Selectable(QLabel):
             reveal.setDisabled(True)
 
         menu_.show_menu()
-
-        # self.setSelection(0, 0)
-
-
-class WorkerSignals(QObject):
-    finished_ = pyqtSignal(dict)
-    delayed_info = pyqtSignal(str)
-
-
-class Tools:
-    @classmethod
-    def get_img_resol(cls, img_path: str):
-        img_ = Utils.read_image(img_path)
-        if img_ is not None and len(img_.shape) > 1:
-            h, w = img_.shape[0], img_.shape[1]
-            return f"{w}x{h}"
-        else:
-            return ""
-
-    @classmethod
-    def lined_text(cls, text: str):
-        if len(text) > MAX_ROW:
-            text = [
-                text[i:i + MAX_ROW]
-                for i in range(0, len(text), MAX_ROW)
-                ]
-            return "\n".join(text)
-        else:
-            return text
-
-class SingleImgInfo(URunnable):
-    def __init__(self, url: str):
-        super().__init__()
-        self.url = url
-        self.signals_ = WorkerSignals()
-
-    def task(self):
-        mail_folder_path = MainFolder.current.is_available()
-        try:
-            name = os.path.basename(self.url)
-            _, type_ = os.path.splitext(name)
-            stats = os.stat(self.url)
-            size = Utils.get_f_size(stats.st_size)
-            mod = Utils.get_f_date(stats.st_mtime)
-            coll = Utils.get_coll_name(mail_folder_path, self.url)
-            thumb_path = Utils.create_thumb_path(self.url)
-
-            res = {
-                Lang.file_name: Tools.lined_text(name),
-                Lang.type_: type_,
-                Lang.file_size: size,
-                Lang.place: Tools.lined_text(self.url),
-                Lang.thumb_path: Tools.lined_text(thumb_path),
-                Lang.changed: mod,
-                Lang.collection: Tools.lined_text(coll),
-                Lang.resol: Lang.calculating,
-                }
-            
-            self.signals_.finished_.emit(res)
-
-            res = Tools.get_img_resol(self.url)
-            if res:
-                self.signals_.delayed_info.emit(res)
-        
-        except Exception as e:
-            Utils.print_error(e)
-            res = {
-                Lang.file_name: Tools.lined_text(os.path.basename(self.url)),
-                Lang.place: Tools.lined_text(self.url),
-                Lang.type_: Tools.lined_text(os.path.splitext(self.url)[0])
-                }
-            self.signals_.finished_.emit(res)
-        
-
-class MultipleImgInfo(URunnable):
-    def __init__(self, img_path_list: list[str]):
-        super().__init__()
-        self.img_path_list = img_path_list
-        self.signals_ = WorkerSignals()
-    
-    def task(self):
-        names = [
-            os.path.basename(i)
-            for i in self.img_path_list
-        ]
-        names = names[:10]
-        names = ", ".join(names)
-        names = Tools.lined_text(names)
-        if len(self.img_path_list) > 10:
-            names = names + ", ..."
-
-        res = {
-            Lang.file_name: names,
-            Lang.total: str(len(self.img_path_list)),
-            Lang.file_size: self.get_total_size()
-        }
-        self.signals_.finished_.emit(res)
-
-    def get_total_size(self):
-        total = 0
-        for i in self.img_path_list:
-            stats = os.stat(i)
-            size_ = stats.st_size
-            total += size_
-
-        return Utils.get_f_size(total)
 
 
 class WinInfo(WinSystem):

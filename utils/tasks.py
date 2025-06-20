@@ -6,6 +6,7 @@ from PyQt5.QtGui import QColor, QPixmap, QPixmapCache
 from sqlalchemy import select, update
 
 from database import THUMBS, Dbase
+from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
@@ -290,3 +291,120 @@ class LoadImage(URunnable):
         self.signals_ = None
         gc.collect()
         QPixmapCache.clear()
+
+
+
+
+class ImgInfoSignals(QObject):
+    finished_ = pyqtSignal(dict)
+    delayed_info = pyqtSignal(str)
+
+
+class SingleImgInfo(URunnable):
+    max_row = 50
+
+    def __init__(self, url: str):
+        super().__init__()
+        self.url = url
+        self.signals_ = ImgInfoSignals()
+
+    def task(self):
+        mail_folder_path = MainFolder.current.is_available()
+        try:
+            name = os.path.basename(self.url)
+            _, type_ = os.path.splitext(name)
+            stats = os.stat(self.url)
+            size = Utils.get_f_size(stats.st_size)
+            mod = Utils.get_f_date(stats.st_mtime)
+            coll = Utils.get_coll_name(mail_folder_path, self.url)
+            thumb_path = Utils.create_thumb_path(self.url)
+
+            res = {
+                Lang.file_name: self.lined_text(name),
+                Lang.type_: type_,
+                Lang.file_size: size,
+                Lang.place: self.lined_text(self.url),
+                Lang.thumb_path: self.lined_text(thumb_path),
+                Lang.changed: mod,
+                Lang.collection: self.lined_text(coll),
+                Lang.resol: Lang.calculating,
+                }
+            
+            self.signals_.finished_.emit(res)
+
+            res = self.get_img_resol(self.url)
+            if res:
+                self.signals_.delayed_info.emit(res)
+        
+        except Exception as e:
+            Utils.print_error(e)
+            res = {
+                Lang.file_name: self.lined_text(os.path.basename(self.url)),
+                Lang.place: self.lined_text(self.url),
+                Lang.type_: self.lined_text(os.path.splitext(self.url)[0])
+                }
+            self.signals_.finished_.emit(res)
+
+    def get_img_resol(self, img_path: str):
+        img_ = Utils.read_image(img_path)
+        if img_ is not None and len(img_.shape) > 1:
+            h, w = img_.shape[0], img_.shape[1]
+            return f"{w}x{h}"
+        else:
+            return ""
+
+    def lined_text(self, text: str):
+        if len(text) > self.max_row:
+            text = [
+                text[i:i + self.max_row]
+                for i in range(0, len(text), self.max_row)
+                ]
+            return "\n".join(text)
+        else:
+            return text
+
+
+class MultipleImgInfo(URunnable):
+    max_row = 50
+
+    def __init__(self, img_path_list: list[str]):
+        super().__init__()
+        self.img_path_list = img_path_list
+        self.signals_ = ImgInfoSignals()
+    
+    def task(self):
+        names = [
+            os.path.basename(i)
+            for i in self.img_path_list
+        ]
+        names = names[:10]
+        names = ", ".join(names)
+        names = self.lined_text(names)
+        if len(self.img_path_list) > 10:
+            names = names + ", ..."
+
+        res = {
+            Lang.file_name: names,
+            Lang.total: str(len(self.img_path_list)),
+            Lang.file_size: self.get_total_size()
+        }
+        self.signals_.finished_.emit(res)
+
+    def get_total_size(self):
+        total = 0
+        for i in self.img_path_list:
+            stats = os.stat(i)
+            size_ = stats.st_size
+            total += size_
+
+        return Utils.get_f_size(total)
+
+    def lined_text(self, text: str):
+        if len(text) > self.max_row:
+            text = [
+                text[i:i + self.max_row]
+                for i in range(0, len(text), self.max_row)
+                ]
+            return "\n".join(text)
+        else:
+            return text
