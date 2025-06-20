@@ -6,6 +6,7 @@ from PyQt5.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal
 from PyQt5.QtGui import QColor, QPixmap, QPixmapCache
 from sqlalchemy import select, update
 
+from cfg import JsonData
 from database import THUMBS, Dbase
 from lang import Lang
 from main_folder import MainFolder
@@ -505,6 +506,7 @@ class ScanerSignals(QObject):
 
 class ScanerTask(URunnable):
     short_timer = 15000
+    long_timer = JsonData.scaner_minutes * 60 * 1000
 
     def __init__(self):
         """
@@ -533,7 +535,7 @@ class ScanerTask(URunnable):
             self.main_folder_scan(i)
             gc.collect()
             print("scaner finished", i.name)
-
+            
         try:
             self.signals_.finished_.emit()
         except RuntimeError as e:

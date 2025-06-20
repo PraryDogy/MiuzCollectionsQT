@@ -106,18 +106,22 @@ class WinMain(WinFrameless):
         SignalsApp.instance.win_main_cmd.emit("set_title")
 
         self.scaner_task = ScanerTask()
+        self.scaner_task.signals_.finished_.connect(self.start_scaner_delayed)
 
         if argv[-1] != "noscan":
-            self.start_scaner_task()
+            self.start_scaner()
         else:
             print("scaner disabled")
 
-    def restart_scaner_task(self):
-        self.scaner_task.signals_.finished_.connect(self.start_scaner_task)
-        self.scaner_task.cancel()
+    def start_scaner_delayed(self):
+        QTimer.singleShot(JsonData.scaner_minutes, self.start_scaner)
 
-    def start_scaner_task(self):
+    def start_scaner(self):
         UThreadPool.start(self.scaner_task)
+
+    def restar_scaner(self):
+        old_minutes = JsonData.scaner_minutes
+        self.scaner_task.cancel()
 
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
