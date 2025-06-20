@@ -247,8 +247,6 @@ class WinImageView(WinChild):
         self.image_label.set_image(pixmap)
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
-            print(main_folder_path, self.rel_img_path)
-            return
             self.img_path = Utils.get_img_path(main_folder_path, self.rel_img_path)
             self.load_image()
         else:
