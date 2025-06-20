@@ -1,7 +1,10 @@
 import os
 
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal
+from sqlalchemy import update
 
+from database import THUMBS, Dbase
+from main_folder import MainFolder
 from signals import SignalsApp
 
 from .utils import Utils
@@ -55,7 +58,7 @@ class UThreadPool:
         cls.pool.start(runnable)
 
 
-class WorkerSignals(QObject):
+class CopyFilesSignals(QObject):
     finished_ = pyqtSignal(list)
     value_changed = pyqtSignal(int)
     stop = pyqtSignal()
@@ -67,11 +70,11 @@ class CopyFiles(URunnable):
 
     def __init__(self, dest: str, files: list, move_files: bool):
         """
-        если move_files установить на True, то исходные файлы будут удалены
+        Если move_files установить на True, то исходные файлы будут удалены
         по законам перемещения
         """
         super().__init__()
-        self.signals_ = WorkerSignals()
+        self.signals_ = CopyFilesSignals()
         self.signals_.stop.connect(self.stop_cmd)
         self.files = files
         self.dest = dest
@@ -130,3 +133,34 @@ class CopyFiles(URunnable):
         self.signals_.finished_.emit(files_dests)
         CopyFiles.list_of_file_lists.append(files_dests)
         CopyFiles.current_threads.remove(self)
+
+
+class FavSignals(QObject):
+    finished_ = pyqtSignal(int)
+
+
+class FavTask(URunnable):
+    def __init__(self, rel_img_path: str, value: int):
+        super().__init__()
+        self.signals_ = FavSignals()
+        self.rel_img_path = rel_img_path
+        self.value = value
+
+    def task(self):
+        values = {"fav": self.value}
+        q = update(THUMBS)
+        q = q.where(THUMBS.c.short_src == self.rel_img_path)
+        q = q.where(THUMBS.c.brand == MainFolder.current.name)
+        q = q.values(**values)
+
+        conn = Dbase.engine.connect()
+
+        try:
+            conn.execute(q)
+            conn.commit()
+            self.signals_.finished_.emit(self.value)
+        except Exception as e:
+            Utils.print_error(e)
+            conn.rollback()
+
+        conn.close()

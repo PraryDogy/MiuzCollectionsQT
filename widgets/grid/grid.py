@@ -11,7 +11,7 @@ from base_widgets import ContextCustom, LayoutVer, SvgBtn
 from cfg import Dynamic, JsonData, Static, ThumbData
 from filters import Filter
 from lang import Lang
-from main_folders import MainFolder
+from main_folder import MainFolder
 from signals import SignalsApp
 from utils.utils import Utils
 

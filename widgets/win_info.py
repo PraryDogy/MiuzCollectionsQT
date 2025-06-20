@@ -9,7 +9,7 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from database import THUMBS, Dbase
 from lang import Lang
-from main_folders import MainFolder
+from main_folder import MainFolder
 from utils.tasks import URunnable, UThreadPool
 from utils.utils import Utils
 

@@ -13,7 +13,7 @@ from base_widgets.input import ULineEdit
 from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
 from lang import Lang
-from main_folders import MainFolder
+from main_folder import MainFolder
 from paletes import ThemeChanger
 from utils.utils import Utils
 

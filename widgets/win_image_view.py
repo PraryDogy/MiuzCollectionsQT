@@ -14,7 +14,7 @@ from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import Dynamic, Static
 from database import THUMBS, Dbase
-from main_folders import MainFolder
+from main_folder import MainFolder
 from utils.tasks import URunnable, UThreadPool
 from utils.utils import Utils
 

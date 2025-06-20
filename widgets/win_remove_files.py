@@ -9,7 +9,7 @@ from base_widgets.svg_btn import SvgBtn
 from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
-from main_folders import MainFolder
+from main_folder import MainFolder
 from utils.scaner import DbUpdater, FileUpdater
 from utils.tasks import URunnable, UThreadPool
 from utils.utils import Err, Utils

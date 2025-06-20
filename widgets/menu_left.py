@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QTabWidget
 from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from lang import Lang
-from main_folders import MainFolder
+from main_folder import MainFolder
 from signals import SignalsApp
 from utils.tasks import URunnable, UThreadPool
 from utils.utils import Utils

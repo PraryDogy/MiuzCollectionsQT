@@ -10,7 +10,7 @@ from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from cfg import JsonData, Static, ThumbData
 from database import THUMBS, ClmNames, Dbase
 from lang import Lang
-from main_folders import MainFolder
+from main_folder import MainFolder
 from signals import SignalsApp
 from utils.tasks import URunnable, UThreadPool
 

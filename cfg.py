@@ -3,7 +3,7 @@ import os
 import shutil
 from datetime import datetime
 
-from main_folders import MainFolder
+from main_folder import MainFolder
 
 
 class ThumbData:

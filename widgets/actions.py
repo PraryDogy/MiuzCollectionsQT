@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 from cfg import Dynamic, Static
 from database import THUMBS, Dbase
 from lang import Lang
-from main_folders import MainFolder
+from main_folder import MainFolder
 from signals import SignalsApp
 from utils.scaner import Scaner
 from utils.tasks import CopyFiles, URunnable, UThreadPool
@@ -142,35 +142,7 @@ class Reveal(QAction):
             SmbWin.show(self.win_)
 
 
-class WorkerSignals(QObject):
-    finished_ = pyqtSignal(int)
 
-
-class FavTask(URunnable):
-    def __init__(self, rel_img_path: str, value: int):
-        super().__init__()
-        self.signals_ = WorkerSignals()
-        self.rel_img_path = rel_img_path
-        self.value = value
-
-    def task(self):
-        values = {"fav": self.value}
-        q = sqlalchemy.update(THUMBS)
-        q = q.where(THUMBS.c.short_src == self.rel_img_path)
-        q = q.where(THUMBS.c.brand == MainFolder.current.name)
-        q = q.values(**values)
-
-        conn = Dbase.engine.connect()
-
-        try:
-            conn.execute(q)
-            conn.commit()
-            self.signals_.finished_.emit(self.value)
-        except Exception as e:
-            Utils.print_error(e)
-            conn.rollback()
-
-        conn.close()
 
 
 class FavActionDb(QAction):

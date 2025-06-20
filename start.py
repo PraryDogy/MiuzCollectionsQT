@@ -63,7 +63,7 @@ from PyQt5.QtWidgets import QApplication
 from cfg import JsonData, Static
 from database import Dbase
 from lang import Lang
-from main_folders import MainFolder
+from main_folder import MainFolder
 from signals import SignalsApp
 from utils.scaner import Scaner
 from utils.utils import ReadImage
