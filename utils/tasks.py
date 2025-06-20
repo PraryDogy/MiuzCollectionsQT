@@ -526,9 +526,9 @@ class ScanerTask(URunnable):
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
-            file_updater = FileUpdater(del_items, new_items, main_folder)
+            file_updater = FileUpdater(del_items, new_items, main_folder, self.scan_helper)
             del_items, new_items = file_updater.run()
-            db_updater = DbUpdater(del_items, new_items, main_folder)
+            db_updater = DbUpdater(del_items, new_items, main_folder, self.scan_helper)
             db_updater.run()
         try:
             self.signals_.finished_.emit()

@@ -190,7 +190,7 @@ class FileUpdater:
             del_items: list,
             new_items: list,
             main_folder: MainFolder,
-            can_scan: bool
+            scan_helper: ScanHelper
         ):
         """
         Удаляет thumbs из hashdir   
@@ -203,7 +203,7 @@ class FileUpdater:
         self.del_items = del_items
         self.new_items = new_items
         self.main_folder = main_folder
-        self.can_scan = can_scan
+        self.scan_helper = scan_helper
 
     def run(self) -> tuple[list, list]:
         """
@@ -230,7 +230,7 @@ class FileUpdater:
         new_del_items = []
         total = len(self.del_items)
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
-            if not self.can_scan:
+            if not self.scan_helper.get_can_scan():
                 return
             thumb_path = Utils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
@@ -262,11 +262,11 @@ class FileUpdater:
     def run_new_items(self):
         new_new_items = []
         if self.new_items is None:
-            self.can_scan = False
+            self.scan_helper.set_can_scan(False)
             return
         total = len(self.new_items)
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
-            if not self.can_scan:
+            if not self.scan_helper.get_can_scan():
                 return
             self.progressbar_text(Lang.adding, x, total)
             try:
@@ -289,7 +289,7 @@ class DbUpdater:
             del_items: list,
             new_items: list,
             main_folder: MainFolder,
-            can_scan: bool
+            scan_helper: ScanHelper
         ):
         """
         Удаляет записи thumbs из бд   
@@ -302,7 +302,7 @@ class DbUpdater:
         self.main_folder = main_folder
         self.del_items = del_items
         self.new_items = new_items
-        self.can_scan = can_scan
+        self.scan_helper = scan_helper
 
     def run(self):
         self.run_del_items()
@@ -318,7 +318,7 @@ class DbUpdater:
             # то есть Compator при сравнении с БД посчитает,
             # что из Finder было удалено множество изображений
             # и удалит их из БД
-            if not self.can_scan:
+            if not self.scan_helper.get_can_scan():
                 return
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
@@ -345,7 +345,7 @@ class DbUpdater:
         conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
             # не удалять
-            if not self.can_scan:
+            if not self.scan_helper.get_can_scan():
                 return
             small_img_path = Utils.create_thumb_path(img_path)
             short_img_path = Utils.get_rel_img_path(self.main_folder.get_current_path(), img_path)
