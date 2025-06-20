@@ -13,7 +13,7 @@ from lang import Lang
 from main_folders import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
-from utils.copy_files import CopyFiles
+from utils.tasks import CopyFiles
 from utils.scaner import Scaner
 from widgets._runnable import UThreadPool
 

@@ -9,11 +9,10 @@ from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
-from utils.copy_files import CopyFiles
 from utils.scaner import Scaner
+from utils.tasks import CopyFiles, URunnable, UThreadPool
 from utils.utils import Utils
 
-from ._runnable import URunnable, UThreadPool
 from .win_info import WinInfo
 from .win_smb import WinSmb
 from .win_upload import WinUpload

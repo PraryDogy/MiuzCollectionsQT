@@ -12,7 +12,7 @@ from database import THUMBS, ClmNames, Dbase
 from lang import Lang
 from main_folders import MainFolder
 from signals import SignalsApp
-from widgets._runnable import URunnable, UThreadPool
+from utils.tasks import URunnable, UThreadPool
 
 from .utils import Utils
 

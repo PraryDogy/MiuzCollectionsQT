@@ -11,9 +11,8 @@ from cfg import Static
 from lang import Lang
 from main_folders import MainFolder
 from utils.scaner import DbUpdater, FileUpdater
+from utils.tasks import URunnable, UThreadPool
 from utils.utils import Err, Utils
-
-from ._runnable import URunnable, UThreadPool
 
 WARNING_SVG = os.path.join(Static.images_dir, "warning.svg")
 SCRIPTS = "scripts"

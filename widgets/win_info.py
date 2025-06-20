@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QObject, Qt, pyqtSignal, QTimer
+from PyQt5.QtCore import QObject, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QMainWindow, QWidget
 
@@ -10,9 +10,8 @@ from cfg import Static
 from database import THUMBS, Dbase
 from lang import Lang
 from main_folders import MainFolder
+from utils.tasks import URunnable, UThreadPool
 from utils.utils import Utils
-
-from ._runnable import URunnable, UThreadPool
 
 MAX_ROW = 50
 
