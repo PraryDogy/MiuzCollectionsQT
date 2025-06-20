@@ -370,12 +370,22 @@ class DbUpdater:
 
 
 class MainFolderRemover:
-    """Удаляет изображения из hashdir и записи БД, если MainFolder больше не в списке"""
-    @classmethod
-    def run(cls):
-        conn = Dbase.engine.connect()
+    def __init__(self):
+        """
+        Сверяет список экземпляров класса MainFolder в бд (THUMBS.c.brand)     
+        со списком MainFolder в приложении.     
+        Удаляет весь контент MainFolder, если MainFolder больще нет в бд:   
+        - изображения thumbs из hashdir в ApplicationSupport    
+        - записи в базе данных
+
+        Вызови run для работы
+        """
+        super().__init__()
+        self.conn = Dbase.engine.connect()
+
+    def run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
-        res = conn.execute(q).fetchall()
+        res = self.conn.execute(q).fetchall()
         db_main_folders = [
             i[0]
             for i in res
@@ -389,29 +399,28 @@ class MainFolderRemover:
             for i in db_main_folders
             if i not in app_main_folders
         ]
+        for main_folder in removed_main_folders:
+            rows = self.get_rows(main_folder)
+            self.remove_images(rows)
+            self.remove_rows(rows)
 
-        for i in removed_main_folders:
-            rows = cls.get_rows(i, conn)
-            cls.remove_images(rows)
-            cls.remove_rows(rows, conn)
+        self.conn.close()
         
-        conn.close()
-    
-    @classmethod
-    def get_rows(cls, main_folder_name: str, conn: sqlalchemy.Connection):
+    def get_rows(self, main_folder: MainFolder):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
-        q = q.where(THUMBS.c.brand == main_folder_name)
-        res = conn.execute(q).fetchall()
+        q = q.where(THUMBS.c.brand == main_folder.name)
+        res = self.conn.execute(q).fetchall()
         res = [
             (id_, Utils.get_thumb_path(rel_thumb_path))
             for id_, rel_thumb_path in res
         ]
         return res
-    
-    @classmethod
-    def remove_images(cls, rows: list[tuple[int, str]]):
-        total = len(rows)
 
+    def remove_images(self, rows: list):
+        """
+        rows: [(row id int, thumb path), ...]
+        """
+        total = len(rows)
         for x, (id_, image_path) in enumerate(rows):
             try:
                 os.remove(image_path)
@@ -419,32 +428,35 @@ class MainFolderRemover:
                 if not os.listdir(folder):
                     os.rmdir(folder)
                 t = f"{Lang.deleting}: {x} {Lang.from_} {total}"
-                ScanerTools.progressbar_text(text=t)
+                ScanerTools.progressbar_text(t)
             except Exception as e:
                 Utils.print_error(e)
                 continue
 
-    @classmethod
-    def remove_rows(cls, rows: list[tuple[int, str]], conn: sqlalchemy.Connection):
-        for id_, image_path in rows:
+    def remove_rows(self, rows: list):
+        """
+        rows: [(row id int, thumb path), ...]
+        """
+        for id_, thumb_path in rows:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.id == id_)
 
             try:
-                conn.execute(q)
+                self.conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 Utils.print_error(e)
-                conn.rollback()
+                self.conn.rollback()
                 continue
 
             except sqlalchemy.exc.OperationalError as e:
                 Utils.print_error(e)
-                conn.rollback()
-                conn.close()
-                return None
-            
-        conn.commit()
-        conn.close()
+                self.conn.rollback()
+                break
+        try:
+            self.conn.commit()
+        except Exception as e:
+            self.conn.rollback()
+            Utils.print_error(e)
 
 
 class Signals(QObject):
@@ -464,25 +476,20 @@ class ScanerThread(URunnable):
 
     def main_folder_scan(self, main_folder: MainFolder):
         ScanerTools.can_scan = True
-        MainFolderRemover.run()
+        main_folder_remover = MainFolderRemover()
+        main_folder_remover.run()
         finder_images = FinderImages(main_folder)
         finder_images = finder_images.run()
         gc.collect()
-
-        if finder_images is not None:
-        
+        if isinstance(finder_images, list):
             db_images = DbImages(main_folder)
             db_images = db_images.run()
-
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
-
             file_updater = FileUpdater(del_items, new_items, main_folder)
             del_items, new_items = file_updater.run()
-
             db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.run()
-
         try:
             self.signals_.finished_.emit()
         except RuntimeError:
