@@ -371,7 +371,6 @@ class DbUpdater:
 
 class MainFolderRemover:
     """Удаляет изображения из hashdir и записи БД, если MainFolder больше не в списке"""
-
     @classmethod
     def run(cls):
         conn = Dbase.engine.connect()
@@ -448,14 +447,14 @@ class MainFolderRemover:
         conn.close()
 
 
-class WorkerSignals(QObject):
+class Signals(QObject):
     finished_ = pyqtSignal()
 
 
 class ScanerThread(URunnable):
     def __init__(self):
         super().__init__()
-        self.signals_ = WorkerSignals()
+        self.signals_ = Signals()
 
     def task(self):
         for main_folder in MainFolder.list_:
