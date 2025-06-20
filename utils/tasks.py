@@ -11,7 +11,8 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .scaner import DbUpdater, FileUpdater
+from .scaner import (Compator, DbImages, DbUpdater, FileUpdater, FinderImages,
+                     MainFolderRemover)
 from .utils import Utils
 
 
@@ -496,3 +497,40 @@ class UploadFilesTask(URunnable):
             self.signals_.finished_.emit()
         except RuntimeError as e:
             Utils.print_error(e)
+
+
+class ScanerSignals(QObject):
+    finished_ = pyqtSignal()
+
+
+class ScanerTask(URunnable):
+    def __init__(self):
+        super().__init__()
+        self.signals_ = ScanerSignals()
+        self.can_scan = True
+
+    def task(self):
+        for main_folder in MainFolder.list_:
+            if main_folder.is_available():
+                self.main_folder_scan(main_folder)
+                print("scaner started", main_folder.name)
+
+    def main_folder_scan(self, main_folder: MainFolder):
+        main_folder_remover = MainFolderRemover()
+        main_folder_remover.run()
+        finder_images = FinderImages(main_folder, self.can_scan)
+        finder_images = finder_images.run()
+        gc.collect()
+        if isinstance(finder_images, list):
+            db_images = DbImages(main_folder)
+            db_images = db_images.run()
+            compator = Compator(finder_images, db_images)
+            del_items, new_items = compator.run()
+            file_updater = FileUpdater(del_items, new_items, main_folder)
+            del_items, new_items = file_updater.run()
+            db_updater = DbUpdater(del_items, new_items, main_folder)
+            db_updater.run()
+        try:
+            self.signals_.finished_.emit()
+        except RuntimeError:
+            pass

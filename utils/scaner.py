@@ -37,9 +37,10 @@ class ScanerTools:
 
 
 class FinderImages:
-    def __init__(self, main_folder: MainFolder):
+    def __init__(self, main_folder: MainFolder, can_scan: bool):
         super().__init__()
         self.main_folder = main_folder
+        self.can_scan = can_scan
 
     def run(self) -> list[tuple[str, int, int, int]] | None:
         """Основной метод для поиска изображений в коллекциях."""
@@ -109,7 +110,7 @@ class FinderImages:
                 for entry in entries:
                     # нельзя удалять
                     # это прервет FinderImages, но не остальные классы
-                    if not ScanerTools.can_scan:
+                    if not self.can_scan:
                         return finder_images
                     if entry.is_dir():
                         stack.append(entry.path)
@@ -178,7 +179,13 @@ class Compator:
 class FileUpdater:
     sleep_count = 0.1
 
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
+    def __init__(
+            self,
+            del_items: list,
+            new_items: list,
+            main_folder: MainFolder,
+            can_scan: bool
+        ):
         """
         Удаляет thumbs из hashdir   
         Добавляет thumbs в hashdir  
@@ -190,6 +197,7 @@ class FileUpdater:
         self.del_items = del_items
         self.new_items = new_items
         self.main_folder = main_folder
+        self.can_scan = can_scan
 
     def run(self) -> tuple[list, list]:
         """
@@ -216,7 +224,7 @@ class FileUpdater:
         new_del_items = []
         total = len(self.del_items)
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
-            if not ScanerTools.can_scan:
+            if not self.can_scan:
                 return
             thumb_path = Utils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
@@ -248,11 +256,11 @@ class FileUpdater:
     def run_new_items(self):
         new_new_items = []
         if self.new_items is None:
-            ScanerTools.can_scan = False
+            self.can_scan = False
             return
         total = len(self.new_items)
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
-            if not ScanerTools.can_scan:
+            if not self.can_scan:
                 return
             self.progressbar_text(Lang.adding, x, total)
             try:
@@ -270,7 +278,13 @@ class FileUpdater:
 
 
 class DbUpdater:
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
+    def __init__(
+            self,
+            del_items: list,
+            new_items: list,
+            main_folder: MainFolder,
+            can_scan: bool
+        ):
         """
         Удаляет записи thumbs из бд   
         Добавляет записи thumbs в бд
@@ -282,6 +296,7 @@ class DbUpdater:
         self.main_folder = main_folder
         self.del_items = del_items
         self.new_items = new_items
+        self.can_scan = can_scan
 
     def run(self):
         self.run_del_items()
@@ -297,7 +312,7 @@ class DbUpdater:
             # то есть Compator при сравнении с БД посчитает,
             # что из Finder было удалено множество изображений
             # и удалит их из БД
-            if not ScanerTools.can_scan:
+            if not self.can_scan:
                 return
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
@@ -324,7 +339,7 @@ class DbUpdater:
         conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
             # не удалять
-            if not ScanerTools.can_scan:
+            if not self.can_scan:
                 return
             small_img_path = Utils.create_thumb_path(img_path)
             short_img_path = Utils.get_rel_img_path(self.main_folder.get_current_path(), img_path)
@@ -452,41 +467,9 @@ class MainFolderRemover:
             Utils.print_error(e)
 
 
-class ScanerSignals(QObject):
-    finished_ = pyqtSignal()
 
 
-class ScanerTask(URunnable):
-    def __init__(self):
-        super().__init__()
-        self.signals_ = ScanerSignals()
 
-    def task(self):
-        for main_folder in MainFolder.list_:
-            if main_folder.is_available():
-                self.main_folder_scan(main_folder)
-                print("scaner started", main_folder.name)
-
-    def main_folder_scan(self, main_folder: MainFolder):
-        ScanerTools.can_scan = True
-        main_folder_remover = MainFolderRemover()
-        main_folder_remover.run()
-        finder_images = FinderImages(main_folder)
-        finder_images = finder_images.run()
-        gc.collect()
-        if isinstance(finder_images, list):
-            db_images = DbImages(main_folder)
-            db_images = db_images.run()
-            compator = Compator(finder_images, db_images)
-            del_items, new_items = compator.run()
-            file_updater = FileUpdater(del_items, new_items, main_folder)
-            del_items, new_items = file_updater.run()
-            db_updater = DbUpdater(del_items, new_items, main_folder)
-            db_updater.run()
-        try:
-            self.signals_.finished_.emit()
-        except RuntimeError:
-            pass
         
 
 # class ScanerShedule(QObject):
