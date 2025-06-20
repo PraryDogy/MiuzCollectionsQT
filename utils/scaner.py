@@ -464,7 +464,7 @@ class ScanerThread(URunnable):
 
     def task(self):
         for main_folder in MainFolder.list_:
-            if main_folder.is_avaiable___():
+            if main_folder.is_available():
                 self.main_folder_scan(main_folder)
                 print("scaner started", main_folder.name)
 
