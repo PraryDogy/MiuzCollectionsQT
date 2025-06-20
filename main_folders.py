@@ -39,6 +39,7 @@ class MainFolder:
             if os.path.exists(i):
                 self.current_path = i
                 return True
+            
         self.current_path = None
         return None
 
