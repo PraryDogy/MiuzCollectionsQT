@@ -13,8 +13,7 @@ from lang import Lang
 from main_folder import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
-from utils.scaner_utils import Scaner
-from utils.tasks import CopyFilesTask, UploadFilesTask, UThreadPool
+from utils.tasks import CopyFilesTask, ScanerTask, UploadFilesTask, UThreadPool
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -104,12 +103,12 @@ class WinMain(WinFrameless):
         splitter.setStretchFactor(1, 1)
         splitter.setSizes([Static.MENU_LEFT_WIDTH, self.width() - Static.MENU_LEFT_WIDTH])
 
-        ThemeChanger.start()
+        grid.setFocus()
 
         SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
         SignalsApp.instance.win_main_cmd.emit("set_title")
-        QTimer.singleShot(100, self.after_start)
-        grid.setFocus()
+
+        # QTimer.singleShot(100, self.after_start)
 
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
@@ -153,14 +152,13 @@ class WinMain(WinFrameless):
         self.hide()
 
     def on_exit(self):
-        Scaner.stop()
         JsonData.write_json_data()
 
-    def after_start(self):
-        Scaner.start()
-        main_folder_path = MainFolder.current.is_available()
-        if not main_folder_path:
-            self.open_smb_win()
+    # def after_start(self):
+    #     Scaner.start()
+    #     main_folder_path = MainFolder.current.is_available()
+    #     if not main_folder_path:
+    #         self.open_smb_win()
 
     def open_smb_win(self):
         self.smb_win = WinSmb()

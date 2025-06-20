@@ -64,8 +64,8 @@ from cfg import JsonData, Static
 from database import Dbase
 from lang import Lang
 from main_folder import MainFolder
+from paletes import ThemeChanger
 from signals import SignalsApp
-from utils.scaner_utils import Scaner
 from utils.tasks import UThreadPool
 from widgets.win_main import WinMain
 
@@ -74,21 +74,28 @@ class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
 
+        UThreadPool.init()
+        SignalsApp.init()
+        ThemeChanger.start()
+
         icon_path = os.path.join(Static.images_dir, "icon.icns")
         icon = QIcon(icon_path)
         self.setWindowIcon(icon)
 
-        self.installEventFilter(self)
-        self.aboutToQuit.connect(lambda: SignalsApp.instance.win_main_cmd.emit("exit"))
+        self.win_main = WinMain()
+        self.win_main.center()
+        self.win_main.show()
 
-        if argv[-1] == "noscan":
-            Scaner.start = lambda: print("scaner disabled")
-            Scaner.stop = lambda: print("scaner disabled")
+        self.installEventFilter(self)
+        self.aboutToQuit.connect(lambda: self.win_main.win_main_cmd("exit"))
+
+        # if argv[-1] == "noscan":
+        #     Scaner.start = lambda: print("scaner disabled")
+        #     Scaner.stop = lambda: print("scaner disabled")
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            if hasattr(SignalsApp.instance, "win_main_cmd"):
-                SignalsApp.instance.win_main_cmd.emit("show")
+            self.win_main.win_main_cmd("show")
         return super().eventFilter(a0, a1)
 
 
@@ -96,17 +103,7 @@ JsonData.init()
 Dbase.init()
 Lang.init()
 MainFolder.init(JsonData.get_data())
-# ReadImage.init_read_dict(Static)
 JsonData.write_json_data()
 
 app = App(sys.argv)
-
-UThreadPool.init()
-SignalsApp.init()
-Scaner.init()
-
-win_main = WinMain()
-win_main.center()
-win_main.show()
-
 app.exec()
