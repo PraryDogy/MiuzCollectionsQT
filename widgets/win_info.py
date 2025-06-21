@@ -9,7 +9,7 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 from utils.tasks import MultipleImgInfo, SingleImgInfo
-from utils.utils import UThreadPool, Utils
+from utils.main import UThreadPool, Utils
 
 
 class Selectable(QLabel):

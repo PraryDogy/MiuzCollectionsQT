@@ -12,7 +12,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .utils import TaskState, Utils
+from .main import TaskState, Utils
 
 """
 Важно:

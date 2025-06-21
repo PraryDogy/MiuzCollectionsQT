@@ -14,7 +14,7 @@ from signals import SignalsApp
 
 from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
                            FinderImages, MainFolderRemover, ScanHelper)
-from .utils import URunnable, Utils
+from .main import URunnable, Utils
 
 
 class CopyFilesSignals(QObject):

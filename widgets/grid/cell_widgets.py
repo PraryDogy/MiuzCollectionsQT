@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSizePolicy
 from base_widgets import LayoutVer
 from cfg import Dynamic, Static, ThumbData
 from signals import SignalsApp
-from utils.utils import Utils
+from utils.main import Utils
 
 from ._db_images import DbImage
 

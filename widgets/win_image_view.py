@@ -13,7 +13,7 @@ from base_widgets.wins import WinChild
 from cfg import Dynamic, Static
 from main_folder import MainFolder
 from utils.tasks import LoadImage, LoadThumb
-from utils.utils import UThreadPool, Utils
+from utils.main import UThreadPool, Utils
 
 from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
                       WinInfoAction)

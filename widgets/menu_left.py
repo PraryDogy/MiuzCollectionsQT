@@ -12,7 +12,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 from utils.tasks import LoadCollectionsTask
-from utils.utils import UThreadPool
+from utils.main import UThreadPool
 
 from .win_smb import WinSmb
 

@@ -11,7 +11,7 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 from utils.tasks import CopyFilesTask
-from utils.utils import Utils
+from utils.main import Utils
 
 MAX_ROW = 45
 SVG_SIZE = 16

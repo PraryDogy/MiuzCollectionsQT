@@ -13,7 +13,7 @@ from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
 from utils.tasks import URunnable
-from utils.utils import Utils
+from utils.main import Utils
 
 
 class DbImage:

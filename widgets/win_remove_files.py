@@ -9,7 +9,7 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 from utils.tasks import RemoveFilesTask
-from utils.utils import UThreadPool
+from utils.main import UThreadPool
 
 
 class RemoveFilesWin(WinSystem):

@@ -9,7 +9,7 @@ from base_widgets import ContextCustom
 from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
-from utils.utils import Utils
+from utils.main import Utils
 
 from .win_settings import WinSettings
 

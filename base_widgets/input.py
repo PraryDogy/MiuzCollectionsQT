@@ -2,7 +2,7 @@ from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLineEdit
 
 from lang import Lang
-from utils.utils import Utils
+from utils.main import Utils
 
 from .context import ContextCustom
 
