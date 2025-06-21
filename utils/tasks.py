@@ -17,6 +17,13 @@ from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
 from .utils import Utils
 
 
+class Flag:
+    __slots__ = ["should_run"]
+    def __init__(self):
+        super().__init__()
+        self.should_run = True
+
+
 class URunnable(QRunnable):
     def __init__(self):
         """
