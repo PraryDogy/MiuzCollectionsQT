@@ -185,35 +185,28 @@ class WinMain(WinFrameless):
         
         if self.scaner_timer.isActive():
             self.scaner_timer.stop()
+
+        # флаг finished у сканера не срабатывает, поэтому немедленно вызываем
+        # старт сканера
+        self.start_scaner_task()
     
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
-
         if flag == "show":
             self.show()
-
         elif flag == "exit":
             self.on_exit()
-
         elif flag == "set_title":
-
             main_folder = MainFolder.current.name.capitalize()
-
             if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
                 t = Lang.all_colls
-
             elif Dynamic.curr_coll_name == Static.NAME_FAVS:
                 t = Lang.fav_coll
-
             else:
                 t = Dynamic.curr_coll_name
-
             if Dynamic.resents:
                 t = Lang.recents
-
             t = f"{main_folder}: {t}"
-
             self.setWindowTitle(t)
-
         else: 
             raise Exception("app > win main > wrong flag", flag)
 
