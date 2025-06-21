@@ -27,9 +27,24 @@ FinderImages собирает все изображения в main_folder,
 
 # это описательный класс, чтобы не импортировать его из tasks с круговым импортом
 # данный класс передается в некоторые классы в этом файле из файла tasks
-class StopFlag:
-    def should_run(self) -> bool: ...
-    def set_should_run(self, value: bool): ...
+class TaskState:
+    __slots__ = ["_should_run", "_finished"]
+
+    def __init__(self, value=True, finished=False):
+        self._should_run = value
+        self._finished = finished
+
+    def should_run(self):
+        return self._should_run
+    
+    def set_should_run(self, value: bool):
+        self._should_run = value
+
+    def set_finished(self, value: bool):
+        self._finished = False
+
+    def finished(self):
+        return self._finished
 
 
 class ScanHelper:
@@ -50,13 +65,13 @@ class ScanHelper:
 
 
 class FinderImages:
-    def __init__(self, main_folder: MainFolder, stop_flag: StopFlag):
+    def __init__(self, main_folder: MainFolder, task_state: TaskState):
         """
         run() to start
         """
         super().__init__()
         self.main_folder = main_folder
-        self.stop_flag = stop_flag
+        self.task_state = task_state
 
     def run(self) -> list | None:
         """
@@ -76,10 +91,10 @@ class FinderImages:
             if finder_images:
                 return finder_images
             else:
-                self.stop_flag.set_should_run(False)
+                self.task_state.set_should_run(False)
                 return None
         except Exception as e:
-            self.stop_flag.set_should_run(False)
+            self.task_state.set_should_run(False)
             return None
 
     def get_main_folder_subdirs(self) -> list[str]:
@@ -148,7 +163,7 @@ class FinderImages:
                 for entry in entries:
                     # нельзя удалять
                     # это прервет FinderImages, но не остальные классы
-                    if not self.stop_flag.should_run():
+                    if not self.task_state.should_run():
                         return finder_images
                     if entry.is_dir():
                         stack.append(entry.path)
@@ -217,7 +232,7 @@ class Compator:
 class FileUpdater:
     sleep_count = 0.1
 
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, stop_flag: StopFlag):
+    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
         Удаляет thumbs из hashdir   
         Добавляет thumbs в hashdir  
@@ -229,7 +244,7 @@ class FileUpdater:
         self.del_items = del_items
         self.new_items = new_items
         self.main_folder = main_folder
-        self.stop_flag = stop_flag
+        self.task_state = task_state
 
     def run(self) -> tuple[list, list]:
         """
@@ -237,7 +252,7 @@ class FileUpdater:
         del_items: [rel_thumb_path, ...]    
         new_items: [(img_path, size, birth, mod), ...]  
         """
-        if not self.stop_flag.should_run():
+        if not self.task_state.should_run():
             return ([], [])
         del_items = self.run_del_items()
         new_items = self.run_new_items()
@@ -258,7 +273,7 @@ class FileUpdater:
         new_del_items = []
         total = len(self.del_items)
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
-            if not self.stop_flag.should_run():
+            if not self.task_state.should_run():
                 break
             thumb_path = Utils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
@@ -291,7 +306,7 @@ class FileUpdater:
         new_new_items = []
         total = len(self.new_items)
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
-            if not self.stop_flag.should_run():
+            if not self.task_state.should_run():
                 break
             self.progressbar_text(Lang.adding, x, total)
             try:

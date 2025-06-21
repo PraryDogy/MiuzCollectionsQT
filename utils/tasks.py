@@ -17,17 +17,24 @@ from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
 from .utils import Utils
 
 
-class StopFlag:
-    __slots__ = ["_value"]
+class TaskState:
+    __slots__ = ["_should_run", "_finished"]
 
-    def __init__(self, value=True):
-        self._value = value
+    def __init__(self, value=True, finished=False):
+        self._should_run = value
+        self._finished = finished
 
     def should_run(self):
-        return self._value
+        return self._should_run
     
     def set_should_run(self, value: bool):
-        self._value = value
+        self._should_run = value
+
+    def set_finished(self, value: bool):
+        self._finished = False
+
+    def finished(self):
+        return self._finished
 
 
 class URunnable(QRunnable):
@@ -37,20 +44,13 @@ class URunnable(QRunnable):
         Не переопределяйте run().
         """
         super().__init__()
-        self.stop_flag = StopFlag(True)
-        self._finished = False
-    
-    def set_finished(self, value: bool):
-        self._finished = value
-
-    def is_finished(self):
-        return self._finished
+        self.task_state = TaskState()
     
     def run(self):
         try:
             self.task()
         finally:
-            self.set_finished(True)
+            self.task_state.set_finished(True)
             if self in UThreadPool.tasks:
                 QTimer.singleShot(5000, lambda: UThreadPool.tasks.remove(self))
 
@@ -111,7 +111,7 @@ class CopyFilesTask(URunnable):
 
         for file_path in self.files:
             
-            if not self.stop_flag.should_run():
+            if not self.task_state.should_run():
                 break
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
@@ -119,7 +119,7 @@ class CopyFilesTask(URunnable):
 
             try:
                 with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
-                    while self.stop_flag.should_run():
+                    while self.task_state.should_run():
                         buf = fsrc.read(1024*1024)
                         if not buf:
                             break
@@ -456,7 +456,7 @@ class RemoveFilesTask(URunnable):
         main_folder = MainFolder.current
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder, self.stop_flag)
+        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder, self.task_state)
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
@@ -490,7 +490,7 @@ class UploadFilesTask(URunnable):
             data = (img_path, size, birth, mod)
             img_with_stats_list.append(data)
         # del_items пустой, так как нас интересует только добавление в БД
-        file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.stop_flag)
+        file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.task_state)
         del_items, new_items = file_updater.run()
         # del_items пустой, так как нас интересуют только новые изображения
         db_updater = DbUpdater([], new_items, MainFolder.current)
@@ -586,14 +586,14 @@ class ScanerTask(URunnable):
 
         main_folder_remover = MainFolderRemover()
         main_folder_remover.run()
-        finder_images = FinderImages(main_folder, self.stop_flag)
+        finder_images = FinderImages(main_folder, self.task_state)
         finder_images = finder_images.run()
-        if finder_images and self.stop_flag.should_run():
+        if finder_images and self.task_state.should_run():
             db_images = DbImages(main_folder)
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
-            file_updater = FileUpdater(del_items, new_items, main_folder, self.stop_flag)
+            file_updater = FileUpdater(del_items, new_items, main_folder, self.task_state)
             del_items, new_items = file_updater.run()
             db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.run()

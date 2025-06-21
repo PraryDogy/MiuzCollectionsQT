@@ -142,7 +142,7 @@ class WinMain(WinFrameless):
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
             UThreadPool.start(self.scaner_task)
 
-        elif self.scaner_task.is_finished():
+        elif self.scaner_task.task_state.finished():
             self.scaner_task = None
             self.start_scaner_task()
 
@@ -239,7 +239,7 @@ class WinMain(WinFrameless):
         и их можно остановить обычным способом — через set_should_run(False).
         """
         for i in UThreadPool.tasks:
-                i.stop_flag.set_should_run(False)
+            i.task_state.set_should_run(False)
         JsonData.write_json_data()
 
     def open_smb_win(self):
