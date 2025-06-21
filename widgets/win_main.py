@@ -222,13 +222,21 @@ class WinMain(WinFrameless):
 
     def on_exit(self):
         """
-        ScanerTask, UploadFilesTask, RemoveFilesTask
-        Эти задачи нельзя отменить стандартными средствами URunnable
-        set_should_run(False), так как они включают в себя подклассы.
-        Поэтому у данных задач есть scan_helper, где можно установить
-        set_can_scan(False).
-        Остальные задачи URunnable, например CopyFilesTask, можно отменить
-        set_should_run(False)
+        Задачи ScanerTask, UploadFilesTask и RemoveFilesTask нельзя корректно остановить
+        через стандартный метод URunnable.set_should_run(False), потому что они включают
+        в себя подклассы, которым передаётся копия флага, а не ссылка на него.
+
+        То есть, если в родительском классе изменить self.should_run = False,
+        это не повлияет на флаг во вложенных объектах, так как они получили
+        примитив (bool), а не ссылку.
+
+        Для этих задач используется отдельный объект scan_helper,
+        через который можно управлять флагом по ссылке — вызов
+        scan_helper.set_can_scan(False) корректно остановит выполнение
+        как родительской, так и вложенных задач.
+
+        Остальные задачи, такие как CopyFilesTask, не содержат вложенных компонентов,
+        и их можно остановить обычным способом — через set_should_run(False).
         """
         for i in UThreadPool.tasks:
             types_ = (ScanerTask, UploadFilesTask, RemoveFilesTask)
