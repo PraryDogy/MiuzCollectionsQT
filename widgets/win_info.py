@@ -8,8 +8,8 @@ from base_widgets import ContextCustom
 from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
-from utils.tasks import MultipleImgInfo, SingleImgInfo, UThreadPool
-from utils.utils import Utils
+from utils.tasks import MultipleImgInfo, SingleImgInfo
+from utils.utils import UThreadPool, Utils
 
 
 class Selectable(QLabel):

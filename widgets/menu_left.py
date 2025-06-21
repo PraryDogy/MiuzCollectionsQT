@@ -3,17 +3,16 @@ import subprocess
 from typing import Literal
 
 import sqlalchemy
-from PyQt5.QtCore import QObject, QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QTabWidget
 
 from cfg import Dynamic, Static
-from database import THUMBS, Dbase
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import LoadCollectionsTask, UThreadPool
-from utils.utils import Utils
+from utils.tasks import LoadCollectionsTask
+from utils.utils import UThreadPool
 
 from .win_smb import WinSmb
 

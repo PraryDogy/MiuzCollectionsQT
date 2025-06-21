@@ -14,62 +14,7 @@ from signals import SignalsApp
 
 from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
                            FinderImages, MainFolderRemover, ScanHelper)
-from .utils import Utils
-
-
-class TaskState:
-    __slots__ = ["_should_run", "_finished"]
-
-    def __init__(self, value=True, finished=False):
-        self._should_run = value
-        self._finished = finished
-
-    def should_run(self):
-        return self._should_run
-    
-    def set_should_run(self, value: bool):
-        self._should_run = value
-
-    def set_finished(self, value: bool):
-        self._finished = False
-
-    def finished(self):
-        return self._finished
-
-
-class URunnable(QRunnable):
-    def __init__(self):
-        """
-        Переопределите метод task().
-        Не переопределяйте run().
-        """
-        super().__init__()
-        self.task_state = TaskState()
-    
-    def run(self):
-        try:
-            self.task()
-        finally:
-            self.task_state.set_finished(True)
-            if self in UThreadPool.tasks:
-                QTimer.singleShot(5000, lambda: UThreadPool.tasks.remove(self))
-
-    def task(self):
-        raise NotImplementedError("Переопредели метод task() в подклассе.")
-    
-
-class UThreadPool:
-    pool: QThreadPool = None
-    tasks: list[URunnable] = []
-
-    @classmethod
-    def init(cls):
-        cls.pool = QThreadPool.globalInstance()
-
-    @classmethod
-    def start(cls, runnable: URunnable):
-        cls.tasks.append(runnable)
-        cls.pool.start(runnable)
+from .utils import URunnable, Utils
 
 
 class CopyFilesSignals(QObject):

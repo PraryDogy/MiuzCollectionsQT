@@ -13,7 +13,7 @@ import psd_tools
 import rawpy
 from imagecodecs.imagecodecs import DelayedImportError
 from PIL import Image
-from PyQt5.QtCore import QRunnable, Qt, QThreadPool
+from PyQt5.QtCore import QRunnable, Qt, QThreadPool, QTimer
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
@@ -386,3 +386,58 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
             print(f"Ошибка удаления: {e}")
         except Exception as e:
             print(f"Неизвестная ошибка: {e}")
+
+
+class TaskState:
+    __slots__ = ["_should_run", "_finished"]
+
+    def __init__(self, value=True, finished=False):
+        self._should_run = value
+        self._finished = finished
+
+    def should_run(self):
+        return self._should_run
+    
+    def set_should_run(self, value: bool):
+        self._should_run = value
+
+    def set_finished(self, value: bool):
+        self._finished = False
+
+    def finished(self):
+        return self._finished
+
+
+class URunnable(QRunnable):
+    def __init__(self):
+        """
+        Переопределите метод task().
+        Не переопределяйте run().
+        """
+        super().__init__()
+        self.task_state = TaskState()
+    
+    def run(self):
+        try:
+            self.task()
+        finally:
+            self.task_state.set_finished(True)
+            if self in UThreadPool.tasks:
+                QTimer.singleShot(5000, lambda: UThreadPool.tasks.remove(self))
+
+    def task(self):
+        raise NotImplementedError("Переопредели метод task() в подклассе.")
+    
+
+class UThreadPool:
+    pool: QThreadPool = None
+    tasks: list[URunnable] = []
+
+    @classmethod
+    def init(cls):
+        cls.pool = QThreadPool.globalInstance()
+
+    @classmethod
+    def start(cls, runnable: URunnable):
+        cls.tasks.append(runnable)
+        cls.pool.start(runnable)

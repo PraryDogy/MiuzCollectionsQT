@@ -12,7 +12,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .utils import Utils
+from .utils import TaskState, Utils
 
 """
 Важно:
@@ -23,28 +23,6 @@ FinderImages собирает все изображения в main_folder,
 изображений FinderImages, а остальные будут считаться удаленными.
 Чтобы избежать этого, у нас есть флаг can_scan в ScanHelper.
 """
-
-
-# это описательный класс, чтобы не импортировать его из tasks с круговым импортом
-# данный класс передается в некоторые классы в этом файле из файла tasks
-class TaskState:
-    __slots__ = ["_should_run", "_finished"]
-
-    def __init__(self, value=True, finished=False):
-        self._should_run = value
-        self._finished = finished
-
-    def should_run(self):
-        return self._should_run
-    
-    def set_should_run(self, value: bool):
-        self._should_run = value
-
-    def set_finished(self, value: bool):
-        self._finished = False
-
-    def finished(self):
-        return self._finished
 
 
 class ScanHelper:
@@ -492,71 +470,3 @@ class MainFolderRemover:
         except Exception as e:
             self.conn.rollback()
             Utils.print_error(e)
-
-
-
-
-
-        
-
-# class ScanerShedule(QObject):
-#     def __init__(self):
-#         super().__init__()
-
-#         self.wait_timer = QTimer(self)
-#         self.wait_timer.setSingleShot(True)
-#         self.wait_timer.timeout.connect(self.start)
-
-#         self.wait_sec = 30000
-#         self.scaner_thread = None
-
-#     def start(self):
-#         self.wait_timer.stop()
-
-#         if self.scaner_thread:
-#             print("prev scan not finished, wait", self.wait_sec//1000, "sec")
-#             self.wait_timer.start(self.wait_sec)
-#             return
-
-#         avaibility = False
-
-#         for main_folder in MainFolder.list_:
-#             if main_folder.is_available():
-#                 avaibility = True
-    
-#         if not avaibility:
-#             print("scaner no smb, wait", self.wait_sec//1000, "sec")
-#             self.wait_timer.start(self.wait_sec)
-
-#         else:
-#             self.scaner_thread = ScanerTask()
-#             self.scaner_thread.signals_.finished_.connect(self.after_scan)
-#             UThreadPool.start(self.scaner_thread)
-
-#     def stop(self):
-#         print("scaner manualy stoped.")
-#         ScanerTools.can_scan = False
-#         self.wait_timer.stop()
-
-#     def after_scan(self):
-#         print("scaner finished, new scan in", JsonData.scaner_minutes, "minutes")
-#         self.scaner_thread = None
-#         self.wait_timer.start(JsonData.scaner_minutes * 60 * 1000)
-#         Dbase.vacuum()
-#         ScanerTools.progressbar_text("")
-
-
-# class Scaner:
-#     app: ScanerShedule = None
-
-#     @classmethod
-#     def init(cls):
-#         cls.app = ScanerShedule()
-
-#     @classmethod
-#     def start(cls):
-#         cls.app.start()
-
-#     @classmethod
-#     def stop(cls):
-#         cls.app.stop()

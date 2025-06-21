@@ -12,7 +12,8 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import CopyFilesTask, ScanerTask, UploadFilesTask, UThreadPool, RemoveFilesTask
+from utils.tasks import CopyFilesTask, ScanerTask, UploadFilesTask
+from utils.utils import UThreadPool
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos

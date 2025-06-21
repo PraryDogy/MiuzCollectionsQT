@@ -8,8 +8,8 @@ from cfg import Dynamic, Static
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import CopyFilesTask, FavTask, ScanerTask, UThreadPool
-from utils.utils import Utils
+from utils.tasks import CopyFilesTask, FavTask
+from utils.utils import UThreadPool, Utils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb

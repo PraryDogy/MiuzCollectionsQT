@@ -1,7 +1,8 @@
 import gc
 import os
 
-from PyQt5.QtCore import QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl, pyqtSignal
+from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
+                          pyqtSignal)
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
@@ -13,8 +14,7 @@ from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import UThreadPool
-from utils.utils import Utils
+from utils.utils import UThreadPool, Utils
 
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
                        OpenInView, RemoveFiles, Reveal, Save, ScanerRestart,
