@@ -86,6 +86,7 @@ class WinMain(WinFrameless):
         right_lay.addWidget(sep_upper)
 
         grid = Grid()
+        grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         right_lay.addWidget(grid)
 
         sep_bottom = USep()

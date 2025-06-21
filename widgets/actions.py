@@ -36,12 +36,6 @@ class OpenInView(QAction):
 class ScanerRestart(QAction):
     def __init__(self, parent: QMenu):
         super().__init__(parent=parent, text=Lang.reload_gui)
-        self.triggered.connect(self.cmd)
-
-    def cmd(self, *args):
-        SignalsApp.instance.progressbar_text.emit(Lang.preparing.capitalize())
-        Scaner.stop()
-        QTimer.singleShot(5000, Scaner.start)
 
 
 class WinInfoAction(QAction):

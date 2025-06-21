@@ -1,7 +1,7 @@
 import gc
 import os
 
-from PyQt5.QtCore import QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl
+from PyQt5.QtCore import QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl, pyqtSignal
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
@@ -88,6 +88,8 @@ class GridWidget(QWidget):
 
 
 class Grid(QScrollArea):
+    restart_scaner = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)
@@ -129,22 +131,17 @@ class Grid(QScrollArea):
             self.load_db_images(flag=FIRST)
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)
-        
         self.setFocus()
 
     def load_db_images(self, flag: str):
-
         if flag == FIRST:
             Dynamic.grid_offset = 0
             cmd_ = lambda db_images: self.create_grid(db_images)
-
         elif flag == MORE:
             Dynamic.grid_offset += Static.GRID_LIMIT
             cmd_ = lambda db_images: self.grid_more(db_images)
-        
         else: 
             raise Exception("wrong flag", flag)
-        
         self.task_ = DbImages()
         self.task_.signals_.finished_.connect(cmd_)
         UThreadPool.start(self.task_)
@@ -159,60 +156,44 @@ class Grid(QScrollArea):
             widgets.remove(self.rubberBand)
         for wid in widgets:
             wid.deleteLater()
-
         self.reload_rubber()
         self.up_btn = UpBtn(self.scroll_wid)
         self.up_btn.hide()
-
         self.selected_widgets: list[Thumbnail] = []
         self.grid_widgets: list[QGridLayout] = []
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.global_row = 0
         Thumbnail.path_to_wid.clear()
-    
         if not db_images:
             self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
             error_title = NoImagesLabel()
             self.scroll_layout.addWidget(error_title, alignment=Qt.AlignmentFlag.AlignCenter)
-
         else:
             self.scroll_layout.setAlignment(
                 Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
             )
-
             Thumbnail.calculate_size()
             self.col_count = self.get_max_col()
-
             for date, db_images_list in db_images.items():
-                self.single_grid(
-                    date=date,
-                    db_images=db_images_list
-                )
-
+                self.single_grid(date, db_images_list)
             spacer = QWidget()
             self.scroll_layout.addWidget(spacer)
 
     def single_grid(self, date: str, db_images: list[DbImage]):
         title = Title(date)
         self.scroll_layout.addWidget(title)
-
         grid_wid = GridWidget(date)
         self.scroll_layout.addWidget(grid_wid)
         self.grid_widgets.append(grid_wid)
-
         grid_lay = QGridLayout()
         grid_lay.setContentsMargins(0, 0, 0, 40)
         grid_lay.setSpacing(2)
         grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         grid_wid.setLayout(grid_lay)
-
         # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
         add_last_row = False
         row, col = 0, 0
-
-
         for db_image in db_images:
-
             wid = Thumbnail(
                 pixmap=db_image.pixmap,
                 rel_img_path=db_image.rel_img_path,
@@ -225,22 +206,16 @@ class Grid(QScrollArea):
             wid.row, wid.col = self.global_row, col
             grid_lay.addWidget(wid, row, col)
             col += 1
-
             add_last_row = True
-
             # Если достигли максимального количества столбцов:
             # Сбрасываем индекс столбца.
             # Переходим к следующей строке.
             # Указываем, что текущая строка завершена.
             if col >= self.col_count:  
-
                 col = 0
-
                 row += 1
                 self.global_row += 1
-
                 add_last_row = False
-
         # Если после цикла остались элементы в неполной последней строке,
         # переходим к следующей строке для корректного добавления
         # новых элементов в будущем.
@@ -252,23 +227,17 @@ class Grid(QScrollArea):
     def grid_more(self, db_images: dict[str, list[DbImage]]):
         if db_images:
             for date, db_images_list in db_images.items():
-                self.single_grid(
-                    date=date,
-                    db_images=db_images_list
-                )
+                self.single_grid(date, db_images_list)
     
     def open_in_view(self, wid: Thumbnail):
-
         assert isinstance(wid, Thumbnail)
         from ..win_image_view import WinImageView
-
         if len(self.selected_widgets) == 1:
             path_to_wid = Thumbnail.path_to_wid
             is_selection = False
         else:
             path_to_wid = {i.rel_img_path: i for i in self.selected_widgets}
             is_selection = True
-
         self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
         self.win_image_view.closed_.connect(lambda: gc.collect())
         self.win_image_view.center_relative_parent(self.window())
@@ -276,83 +245,58 @@ class Grid(QScrollArea):
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.select_viewed_image(img_path)
         )
-
         self.win_image_view.closed_.connect(
             lambda: self.img_view_closed(self.win_image_view)
         )
-
         self.win_image_view.show()
 
     def img_view_closed(self, win: QWidget):
-
         del win
         gc.collect()
 
     def select_viewed_image(self, path: str):
         wid = Thumbnail.path_to_wid.get(path)
-
         if wid:
             self.clear_selected_widgets()
             self.add_and_select_widget(wid=wid)
 
     def get_max_col(self):
-        return self.width() // (
-            ThumbData.THUMB_W[Dynamic.thumb_size_ind] # + ThumbData.OFFSET 
-            )
+        return self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_ind])
 
     def resize_thumbnails(self):
         "изменение размера Thumbnail"
-
         Thumbnail.calculate_size()
-
         for path, wid in Thumbnail.path_to_wid.items():
             wid.setup()
-
         self.rearrange()
 
     def rearrange(self):
         "перетасовка сетки"
-
         if not hasattr(self, FIRST_LOAD):
             setattr(self, FIRST_LOAD, False)
             return
-
         Thumbnail.path_to_wid.clear()
         self.cell_to_wid.clear()
         self.global_row = 0
-
         self.col_count = self.get_max_col()
         add_last_row = False
-
         for grid_wid in self.grid_widgets:
-
             row, col = 0, 0
             grid_lay = grid_wid.layout()
-
             for wid in grid_wid.findChildren(Thumbnail):
-
                 Thumbnail.path_to_wid[wid.rel_img_path] = wid
                 self.cell_to_wid[self.global_row, col] = wid
                 wid.row, wid.col = self.global_row, col
                 grid_lay.addWidget(wid, row, col)
-
                 col += 1
-
                 add_last_row = True
-
                 if col >= self.col_count:
-
                     add_last_row = False
-
                     col = 0
-
                     self.global_row += 1
                     row += 1       
-
             if add_last_row:
-
                 col = 0
-
                 self.global_row += 1
                 row += 1
 
@@ -379,7 +323,6 @@ class Grid(QScrollArea):
             Utils.get_img_path(main_folder_path, i.rel_img_path)
             for i in self.selected_widgets
         ]
-
         self.rem_win = RemoveFilesWin(img_path_list)
         self.rem_win.center_relative_parent(self.window())
         self.rem_win.finished_.connect(lambda img_path_list: self.remove_finished())
@@ -586,6 +529,7 @@ class Grid(QScrollArea):
         if not clicked_wid:
             self.clear_selected_widgets()
             reload = ScanerRestart(parent=self.menu_)
+            reload.triggered.connect(lambda: self.restart_scaner.emit())
             self.menu_.addAction(reload)
             self.menu_.addSeparator()
             types_ = MenuTypes(parent=self.menu_)
