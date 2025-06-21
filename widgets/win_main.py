@@ -48,6 +48,8 @@ class USep(QFrame):
 
 
 class WinMain(WinFrameless):
+    argv_flag = "noscan"
+
     def __init__(self, argv: list[str]):
         super().__init__()
         self.setAcceptDrops(True)
@@ -110,7 +112,9 @@ class WinMain(WinFrameless):
         self.scaner_timer.timeout.connect(self.start_scaner_task)
         self.scaner_task: ScanerTask | None = None
         self.scaner_task_canceled = False
-        self.start_scaner_task()
+
+        if argv[-1] != self.argv_flag:
+            self.start_scaner_task()
 
     def start_scaner_task(self):
         """
@@ -223,7 +227,8 @@ class WinMain(WinFrameless):
         self.hide()
 
     def on_exit(self):
-        self.scaner_task.cancel()
+        if self.scaner_task:
+            self.scaner_task.cancel()
         JsonData.write_json_data()
 
     def open_smb_win(self):
