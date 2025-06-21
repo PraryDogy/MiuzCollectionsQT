@@ -12,7 +12,7 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import CopyFilesTask, ScanerTask, UploadFilesTask, UThreadPool
+from utils.tasks import CopyFilesTask, ScanerTask, UploadFilesTask, UThreadPool, RemoveFilesTask
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -108,7 +108,7 @@ class WinMain(WinFrameless):
         SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
         SignalsApp.instance.win_main_cmd.emit("set_title")
 
-        self.scaner_timer = QTimer()
+        self.scaner_timer = QTimer(self)
         self.scaner_timer.setSingleShot(True)
         self.scaner_timer.timeout.connect(self.start_scaner_task)
         self.scaner_task: ScanerTask | None = None
@@ -181,7 +181,7 @@ class WinMain(WinFrameless):
         """
         if self.scaner_task:
             self.scaner_task_canceled = True
-            self.scaner_task.cancel()
+            self.scaner_task.scan_helper.set_can_scan(False)
         
         if self.scaner_timer.isActive():
             self.scaner_timer.stop()
@@ -221,8 +221,10 @@ class WinMain(WinFrameless):
         self.hide()
 
     def on_exit(self):
-        if self.scaner_task:
-            self.scaner_task.cancel()
+        for i in UThreadPool.tasks:
+            types_ = (ScanerTask, UploadFilesTask, RemoveFilesTask)
+            if isinstance(i, types_):
+                i.scan_helper.set_can_scan(False)
         JsonData.write_json_data()
 
     def open_smb_win(self):

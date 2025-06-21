@@ -539,20 +539,6 @@ class ScanerTask(URunnable):
         except RuntimeError as e:
             ...
     
-    def cancel(self):
-        """
-        Прерывает выполнение сканера, устанавливая флаг `can_scan` в False.
-
-        Флаг `can_scan` находится в ScanerHelper и используется для управления  
-        выполнением вложенных циклов во вспомогательных компонентах сканера:    
-        - FinderImages — отвечает за поиск изображений в файловой системе.  
-        - FileUpdater — записывает миниатюры изображений в директорию hashdir.  
-
-        После установки флага в False, все операции, зависящие от can_scan, 
-        завершатся как можно раньше.
-        """
-        self.scan_helper.set_can_scan(False)
-
     def main_folder_scan(self, main_folder: MainFolder):
         """
         Выполняет полную синхронизацию содержимого указанной папки MainFolder
