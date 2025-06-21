@@ -82,7 +82,6 @@ class CopyFilesTask(URunnable):
         """
         super().__init__()
         self.signals_ = CopyFilesSignals()
-        self.signals_.stop.connect(self.stop_cmd)
         self.files = files
         self.dest = dest
         self.move_files = move_files
@@ -128,9 +127,6 @@ class CopyFilesTask(URunnable):
                 break
         
         self.finalize(files_dests)
-
-    def stop_cmd(self):
-        self.set_should_run(False)
 
     def finalize(self, files_dests: list[str]):
         try:
@@ -295,8 +291,6 @@ class LoadImage(URunnable):
         self.signals_ = None
         gc.collect()
         QPixmapCache.clear()
-
-
 
 
 class ImgInfoSignals(QObject):

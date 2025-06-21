@@ -225,6 +225,8 @@ class WinMain(WinFrameless):
             types_ = (ScanerTask, UploadFilesTask, RemoveFilesTask)
             if isinstance(i, types_):
                 i.scan_helper.set_can_scan(False)
+            elif isinstance(i, CopyFilesTask):
+                i.set_should_run(False)
         JsonData.write_json_data()
 
     def open_smb_win(self):
