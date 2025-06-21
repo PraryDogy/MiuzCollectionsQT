@@ -25,6 +25,11 @@ FinderImages собирает все изображения в main_folder,
 """
 
 
+class Flag:
+    def get_value(self) -> bool: ...
+    def set_value(self, value: bool): ...
+
+
 class ScanHelper:
     def __init__(self):
         super().__init__()
