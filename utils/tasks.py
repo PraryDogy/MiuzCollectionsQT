@@ -18,10 +18,16 @@ from .utils import Utils
 
 
 class Flag:
-    __slots__ = ["should_run"]
-    def __init__(self):
-        super().__init__()
-        self.should_run = True
+    __slots__ = ["_value"]
+
+    def __init__(self, value=True):
+        self._value = value
+
+    def get_value(self):
+        return self._value
+    
+    def set_value(self, value: bool):
+        self._value = value
 
 
 class URunnable(QRunnable):
@@ -31,14 +37,14 @@ class URunnable(QRunnable):
         Не переопределяйте run().
         """
         super().__init__()
-        self._should_run = True
+        self._flag = Flag(True)
         self._finished = False
 
     def is_should_run(self):
-        return self._should_run
+        return self._flag.get_value()
     
     def set_should_run(self, value: bool):
-        self._should_run = value
+        self._flag.set_value(value)
 
     def set_finished(self, value: bool):
         self._finished = value
