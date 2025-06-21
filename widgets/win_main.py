@@ -105,24 +105,60 @@ class WinMain(WinFrameless):
         SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
         SignalsApp.instance.win_main_cmd.emit("set_title")
 
-        self.scaner_task = ScanerTask()
-        self.scaner_task.signals_.finished_.connect(self.start_scaner_delayed)
+        self.scaner_timer = QTimer()
+        self.scaner_timer.setSingleShot(True)
+        self.scaner_timer.timeout.connect(self.start_scaner_task)
+        self.scaner_task: ScanerTask | None = None
+        self.start_scaner_task()
 
-        if argv[-1] != "noscan":
-            self.start_scaner()
+    def start_scaner_task(self):
+        """
+        Логика работы сканера:
+
+        1. Первый запуск или завершён предыдущий:
+        - Если self.scaner_task == None:
+            - Создаётся новый ScanerTask.
+            - Подключается слот on_scaner_finished к сигналу завершения задачи.
+            - Задача запускается в пуле потоков.
+        
+        2. Повторный запуск после завершения:
+        - Если задача завершена (self.scaner_task.is_finished()):
+            - self.scaner_task сбрасывается в None.
+            - Метод вызывается повторно, что приведёт к пункту 1.
+        
+        3. Задача ещё выполняется:
+        - Используется QTimer.singleShot(3000, ...) для повторной проверки
+            через 3 секунды (без создания конфликта с основным таймером).
+
+        Дополнительно:
+        - После завершения задачи (в on_scaner_finished) запускается основной 
+        таймер self.scaner_timer на JsonData.scaner_minutes минут.
+        - По истечении этого таймера вызывается повторно start_scaner_task().
+
+        Таким образом реализован бесконечный цикл:
+        [выполнение задачи] → [пауза scaner_minutes] → [следующая задача],
+        с периодической проверкой статуса при долгой задаче.
+        """
+
+        if self.scaner_task is None:
+            self.scaner_task = ScanerTask()
+            self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
+            UThreadPool.start(self.scaner_task)
+
+        elif self.scaner_task.is_finished():
+            self.scaner_task = None
+            self.start_scaner_task()
+
         else:
-            print("scaner disabled")
+            QTimer.singleShot(3000, self.start_scaner_task)
 
-    def start_scaner_delayed(self):
-        QTimer.singleShot(JsonData.scaner_minutes, self.start_scaner)
+    def on_scaner_finished(self):
+        self.scaner_timer.start(JsonData.scaner_minutes * 60 * 1000)
 
-    def start_scaner(self):
-        UThreadPool.start(self.scaner_task)
-
-    def restar_scaner(self):
-        old_minutes = JsonData.scaner_minutes
-        self.scaner_task.cancel()
-
+    def restart_scaner_task(self):
+        if self.scaner_task:
+            self.scaner_task.cancel()
+    
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
 
         if flag == "show":
