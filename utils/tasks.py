@@ -429,6 +429,7 @@ class RemoveFilesTask(URunnable):
         super().__init__()
         self.signals_ = RemoveFilesSignals()
         self.img_path_list = img_path_list
+        self.scan_helper = ScanHelper()
 
     def task(self):
         try:
@@ -455,7 +456,7 @@ class RemoveFilesTask(URunnable):
         main_folder = MainFolder.current
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder)
+        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder, self.scan_helper)
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
@@ -476,6 +477,7 @@ class UploadFilesTask(URunnable):
         super().__init__()
         self.img_path_list = img_path_list
         self.signals_ = UploadFilesSignals()
+        self.scan_helper = ScanHelper()
 
     def task(self):
         img_with_stats_list = []
@@ -489,7 +491,7 @@ class UploadFilesTask(URunnable):
             data = (img_path, size, birth, mod)
             img_with_stats_list.append(data)
         # del_items пустой, так как нас интересует только добавление в БД
-        file_updater = FileUpdater([], img_with_stats_list, MainFolder.current)
+        file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.scan_helper)
         del_items, new_items = file_updater.run()
         # del_items пустой, так как нас интересуют только новые изображения
         db_updater = DbUpdater([], new_items, MainFolder.current)

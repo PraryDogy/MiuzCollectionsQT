@@ -64,6 +64,10 @@ class WinUpload(WinSystem):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             self.coll_path = os.path.join(main_folder_path, coll_btn.coll_name)
+            # поправка на корневой каталог
+            # может получиться путь/к/коллекциям/коллекциям
+            if coll_btn.coll_name == os.path.basename(main_folder_path):
+                self.coll_path = main_folder_path
             subfolders: list[os.DirEntry] = [
                 i
                 for i in os.scandir(self.coll_path)
