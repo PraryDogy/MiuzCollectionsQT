@@ -24,20 +24,20 @@ class URunnable(QRunnable):
         Не переопределяйте run().
         """
         super().__init__()
-        self.should_run__ = True
-        self.finished__ = False
+        self._should_run = True
+        self._finished = False
 
     def is_should_run(self):
-        return self.should_run__
+        return self._should_run
     
     def set_should_run(self, value: bool):
-        self.should_run__ = value
+        self._should_run = value
 
     def set_finished(self, value: bool):
-        self.finished__ = value
+        self._finished = value
 
     def is_finished(self):
-        return self.finished__
+        return self._finished
     
     def run(self):
         try:
@@ -525,10 +525,6 @@ class ScanerTask(URunnable):
             for i in MainFolder.list_
             if i.is_available()
         ]
-
-        if not main_folders:
-            QTimer.singleShot(self.short_timer, self.shedule)
-            return
 
         for i in main_folders:
             print("scaner started", i.name)
