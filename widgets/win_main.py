@@ -221,6 +221,15 @@ class WinMain(WinFrameless):
         self.hide()
 
     def on_exit(self):
+        """
+        ScanerTask, UploadFilesTask, RemoveFilesTask
+        Эти задачи нельзя отменить стандартными средствами URunnable
+        set_should_run(False), так как они включают в себя подклассы.
+        Поэтому у данных задач есть scan_helper, где можно установить
+        set_can_scan(False).
+        Остальные задачи URunnable, например CopyFilesTask, можно отменить
+        set_should_run(False)
+        """
         for i in UThreadPool.tasks:
             types_ = (ScanerTask, UploadFilesTask, RemoveFilesTask)
             if isinstance(i, types_):
