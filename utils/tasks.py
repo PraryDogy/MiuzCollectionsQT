@@ -17,16 +17,16 @@ from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
 from .utils import Utils
 
 
-class Flag:
+class StopFlag:
     __slots__ = ["_value"]
 
     def __init__(self, value=True):
         self._value = value
 
-    def get_value(self):
+    def is_should_run(self):
         return self._value
     
-    def set_value(self, value: bool):
+    def set_should_run(self, value: bool):
         self._value = value
 
 
@@ -37,14 +37,14 @@ class URunnable(QRunnable):
         Не переопределяйте run().
         """
         super().__init__()
-        self._flag = Flag(True)
+        self._stop_flag = StopFlag(True)
         self._finished = False
 
     def is_should_run(self):
-        return self._flag.get_value()
+        return self._stop_flag.is_should_run()
     
     def set_should_run(self, value: bool):
-        self._flag.set_value(value)
+        self._stop_flag.set_should_run(value)
 
     def set_finished(self, value: bool):
         self._finished = value
@@ -116,7 +116,7 @@ class CopyFilesTask(URunnable):
         self.signals_.value_changed.emit(0)
 
         for file_path in self.files:
-
+            
             if not self.is_should_run():
                 break
 
