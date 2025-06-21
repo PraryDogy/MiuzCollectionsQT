@@ -239,11 +239,7 @@ class WinMain(WinFrameless):
         и их можно остановить обычным способом — через set_should_run(False).
         """
         for i in UThreadPool.tasks:
-            types_ = (ScanerTask, UploadFilesTask, RemoveFilesTask)
-            if isinstance(i, types_):
-                i.scan_helper.set_can_scan(False)
-            elif isinstance(i, CopyFilesTask):
-                i.set_should_run(False)
+                i.stop_flag.set_should_run(False)
         JsonData.write_json_data()
 
     def open_smb_win(self):

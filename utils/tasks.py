@@ -39,13 +39,7 @@ class URunnable(QRunnable):
         super().__init__()
         self.stop_flag = StopFlag(True)
         self._finished = False
-
-    def should_run(self):
-        return self.stop_flag.should_run()
     
-    def set_should_run(self, value: bool):
-        self.stop_flag.set_should_run(value)
-
     def set_finished(self, value: bool):
         self._finished = value
 
@@ -117,7 +111,7 @@ class CopyFilesTask(URunnable):
 
         for file_path in self.files:
             
-            if not self.should_run():
+            if not self.stop_flag.should_run():
                 break
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
@@ -125,7 +119,7 @@ class CopyFilesTask(URunnable):
 
             try:
                 with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
-                    while self.should_run():
+                    while self.stop_flag.should_run():
                         buf = fsrc.read(1024*1024)
                         if not buf:
                             break
