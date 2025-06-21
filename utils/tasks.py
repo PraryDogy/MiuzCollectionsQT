@@ -23,7 +23,7 @@ class StopFlag:
     def __init__(self, value=True):
         self._value = value
 
-    def is_should_run(self):
+    def should_run(self):
         return self._value
     
     def set_should_run(self, value: bool):
@@ -37,14 +37,14 @@ class URunnable(QRunnable):
         Не переопределяйте run().
         """
         super().__init__()
-        self._stop_flag = StopFlag(True)
+        self.stop_flag = StopFlag(True)
         self._finished = False
 
-    def is_should_run(self):
-        return self._stop_flag.is_should_run()
+    def should_run(self):
+        return self.stop_flag.should_run()
     
     def set_should_run(self, value: bool):
-        self._stop_flag.set_should_run(value)
+        self.stop_flag.set_should_run(value)
 
     def set_finished(self, value: bool):
         self._finished = value
@@ -117,7 +117,7 @@ class CopyFilesTask(URunnable):
 
         for file_path in self.files:
             
-            if not self.is_should_run():
+            if not self.should_run():
                 break
 
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
@@ -125,7 +125,7 @@ class CopyFilesTask(URunnable):
 
             try:
                 with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
-                    while self.is_should_run():
+                    while self.should_run():
                         buf = fsrc.read(1024*1024)
                         if not buf:
                             break
@@ -436,7 +436,6 @@ class RemoveFilesTask(URunnable):
         super().__init__()
         self.signals_ = RemoveFilesSignals()
         self.img_path_list = img_path_list
-        self.scan_helper = ScanHelper()
 
     def task(self):
         try:
@@ -463,7 +462,7 @@ class RemoveFilesTask(URunnable):
         main_folder = MainFolder.current
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder, self.scan_helper)
+        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder, self.stop_flag)
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
@@ -484,7 +483,6 @@ class UploadFilesTask(URunnable):
         super().__init__()
         self.img_path_list = img_path_list
         self.signals_ = UploadFilesSignals()
-        self.scan_helper = ScanHelper()
 
     def task(self):
         img_with_stats_list = []
@@ -498,7 +496,7 @@ class UploadFilesTask(URunnable):
             data = (img_path, size, birth, mod)
             img_with_stats_list.append(data)
         # del_items пустой, так как нас интересует только добавление в БД
-        file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.scan_helper)
+        file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.stop_flag)
         del_items, new_items = file_updater.run()
         # del_items пустой, так как нас интересуют только новые изображения
         db_updater = DbUpdater([], new_items, MainFolder.current)
@@ -594,14 +592,14 @@ class ScanerTask(URunnable):
 
         main_folder_remover = MainFolderRemover()
         main_folder_remover.run()
-        finder_images = FinderImages(main_folder, self.scan_helper)
+        finder_images = FinderImages(main_folder, self.stop_flag)
         finder_images = finder_images.run()
-        if finder_images and self.scan_helper.get_can_scan():
+        if finder_images and self.stop_flag.should_run():
             db_images = DbImages(main_folder)
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
-            file_updater = FileUpdater(del_items, new_items, main_folder, self.scan_helper)
+            file_updater = FileUpdater(del_items, new_items, main_folder, self.stop_flag)
             del_items, new_items = file_updater.run()
             db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.run()
