@@ -406,11 +406,11 @@ class RemoveFilesTask(URunnable):
         # new_items пустой так как мы только удаляем thumbs из hashdir
         file_updater = FileUpdater(rel_thumb_path_list, [], main_folder, self.task_state)
         file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
-        file_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
         db_updater = DbUpdater(del_items, [], main_folder)
+        db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         db_updater.run()
 
 
@@ -445,10 +445,10 @@ class UploadFilesTask(URunnable):
         # del_items пустой, так как нас интересует только добавление в БД
         file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.task_state)
         file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
-        file_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         del_items, new_items = file_updater.run()
         # del_items пустой, так как нас интересуют только новые изображения
         db_updater = DbUpdater([], new_items, MainFolder.current)
+        db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         db_updater.run()
         try:
             self.signals_.finished_.emit()
@@ -554,7 +554,7 @@ class ScanerTask(URunnable):
             del_items, new_items = compator.run()
             file_updater = FileUpdater(del_items, new_items, main_folder, self.task_state)
             file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
-            file_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
             del_items, new_items = file_updater.run()
             db_updater = DbUpdater(del_items, new_items, main_folder)
+            db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
             db_updater.run()

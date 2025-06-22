@@ -215,13 +215,12 @@ class Compator:
 class FileUpdater(QObject):
     sleep_count = 0.1
     progress_text = pyqtSignal(str)
-    reload_gui = pyqtSignal()
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
         Запуск: run()   
-        Сигналы: progress_text(str), reload_gui()   
+        Сигналы: progress_text(str)
         
         Принимает:  
         del_items: [rel_thumb_path, ...]    
@@ -280,8 +279,6 @@ class FileUpdater(QObject):
                 except Exception as e:
                     Utils.print_error(e)
                     continue
-        if total > 0:
-            self.reload_gui.emit()
         return new_del_items
 
     def create_thumb(self, img_path: str) -> ndarray | None:
@@ -310,16 +307,17 @@ class FileUpdater(QObject):
             except Exception as e:
                 Utils.print_error(e)
                 continue
-        if total > 0:
-            self.reload_gui.emit()
         return new_new_items
 
 
-class DbUpdater:
+class DbUpdater(QObject):
+    reload_gui = pyqtSignal()
+
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
+        Сигналы: reload_gui()
 
         Принимает:  
         - del_items: [rel_thumb_path, ...]       
@@ -358,6 +356,9 @@ class DbUpdater:
             conn.rollback()
         conn.close()
 
+        if len(self.del_items) > 0:
+            self.reload_gui.emit()
+
     def run_new_items(self):
         conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
@@ -395,6 +396,9 @@ class DbUpdater:
             Utils.print_error(e)
             conn.rollback()
         conn.close()
+
+        if len(self.new_items) > 0:
+            self.reload_gui.emit()
 
 
 class MainFolderRemover(QObject):
