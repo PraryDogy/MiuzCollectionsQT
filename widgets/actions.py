@@ -240,33 +240,6 @@ class RemoveFiles(QAction):
 
 
 class MoveFiles(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
+    def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
         text = f"{Lang.move_files} ({len(rel_img_path_list)})"
         super().__init__(text=text, parent=parent)
-        self.triggered.connect(self.cmd)
-        self.img_path_list = rel_img_path_list
-        self.win_ = win
-
-    def cmd(self):
-        main_folder_path = MainFolder.current.is_available()
-        if main_folder_path:
-            self.img_path_list = [
-                MainUtils.get_img_path(main_folder_path, i)
-                for i in self.img_path_list
-            ]
-            self.upload_win = WinUpload()
-            self.upload_win.finished_.connect(lambda dest: self.move_files_cmd(dest))
-            self.upload_win.center_relative_parent(self.win_)
-            self.upload_win.show()
-
-    def move_files_cmd(self, dest: str):
-        thread_ = CopyFilesTask(dest, self.img_path_list, True)
-        thread_.signals_.finished_.connect(lambda new_img_path_list: self.move_finished(new_img_path_list))
-        UThreadPool.start(thread_)
-
-    def move_finished(self, new_img_path_list: list[str]):
-        if isinstance(new_img_path_list, str):
-            new_img_path_list = [new_img_path_list]
-
-        print("файлы ПЕРЕМЕЩЕНЫ, но нужно обновить БД")
-        print("а лучше отдельный тред для удаления файлов")

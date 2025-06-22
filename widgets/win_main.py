@@ -13,7 +13,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 from utils.main import UThreadPool
-from utils.tasks import (CopyFilesTask, RemoveFilesTask, ScanerTask,
+from utils.tasks import (CopyFilesTask, MainUtils, RemoveFilesTask, ScanerTask,
                          UploadFilesTask)
 
 from .bar_bottom import BarBottom
@@ -21,6 +21,7 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
+from .win_remove_files import RemoveFilesWin
 from .win_smb import WinSmb
 from .win_upload import WinUpload
 
@@ -88,7 +89,7 @@ class WinMain(WinFrameless):
 
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
-        self.grid.remove_files.connect(lambda img_path_list: self.remove_task_cmd(img_path_list))
+        self.grid.remove_files.connect(lambda rel_img_path_list: self.open_remove_files_win(rel_img_path_list))
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -233,6 +234,26 @@ class WinMain(WinFrameless):
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
+    def open_remove_files_win(self, rel_img_path_list: list):
+        main_folder_path = MainFolder.current.is_available()
+        if main_folder_path:
+            img_path_list = [
+                MainUtils.get_img_path(main_folder_path, i)
+                for i in rel_img_path_list
+            ]
+            self.rem_win = RemoveFilesWin(img_path_list)
+            self.rem_win.center_relative_parent(self.window())
+            self.rem_win.finished_.connect(lambda: self.remove_task_cmd(img_path_list))
+            self.rem_win.show()
+        else:
+            self.open_smb_win()
+    
+    def remove_task_cmd(self, img_path_list: list[str]):
+        remove_files_task = RemoveFilesTask(img_path_list)
+        remove_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
+        remove_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
+        UThreadPool.start(remove_files_task)
+
     def upload_task_cmd(self, dest: str, img_path_list: list[str]):
         copy_files_task = CopyFilesTask(dest, img_path_list, False)
         cmd = lambda img_path_list: self.upload_task_finished(img_path_list)
@@ -244,12 +265,6 @@ class WinMain(WinFrameless):
         upload_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
         upload_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
         UThreadPool.start(upload_files_task)
-    
-    def remove_task_cmd(self, img_path_list: list[str]):
-        remove_files_task = RemoveFilesTask(img_path_list)
-        remove_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-        remove_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
-        UThreadPool.start(remove_files_task)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()

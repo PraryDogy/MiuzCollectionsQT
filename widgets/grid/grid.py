@@ -318,20 +318,6 @@ class Grid(QScrollArea):
             self.selected_widgets.append(wid)
             wid.set_frame()
 
-    def remove_files_win(self):
-        main_folder_path = MainFolder.current.is_available()
-        img_path_list = [
-            MainUtils.get_img_path(main_folder_path, i.rel_img_path)
-            for i in self.selected_widgets
-        ]
-        self.rem_win = RemoveFilesWin(img_path_list)
-        self.rem_win.center_relative_parent(self.window())
-        self.rem_win.finished_.connect(lambda: self.remove_files.emit(img_path_list))
-        self.rem_win.show()
-
-    def remove_finished(self):
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-
     def open_info_win_delayed(self):
         self.info_win.adjustSize()
         self.info_win.center_relative_parent(self.window())
@@ -587,11 +573,12 @@ class Grid(QScrollArea):
 
             self.menu_.addSeparator()
 
-            move_files = MoveFiles(self.menu_, self.window(), rel_img_path_list)
+            move_files = MoveFiles(self.menu_, rel_img_path_list)
+            # move_files.triggered.connect(lambda: self.remove_files.emit(rel_img_path_list))
             self.menu_.addAction(move_files)
 
             rem = RemoveFiles(self.menu_, len(self.selected_widgets))
-            rem.triggered.connect(self.remove_files_win)
+            rem.triggered.connect(lambda: self.remove_files.emit(rel_img_path_list))
             self.menu_.addAction(rem)
 
         self.menu_.show_menu()
