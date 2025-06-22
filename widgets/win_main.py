@@ -122,7 +122,6 @@ class WinMain(WinFrameless):
     def start_scaner_task(self):
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
-            self.scaner_task_canceled = False
             print("scaner is none, start new task", self.scaner_task)
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
             self.scaner_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
@@ -139,6 +138,7 @@ class WinMain(WinFrameless):
             QTimer.singleShot(3000, self.start_scaner_task)
 
     def on_scaner_finished(self):
+        self.scaner_timer.stop()
         if self.scaner_task_canceled:
             print("scaner sig finished, task canceled", self.scaner_task)
             self.scaner_task_canceled = False
@@ -149,11 +149,17 @@ class WinMain(WinFrameless):
 
     def restart_scaner_task(self):
         print("restart pressed")
-        if self.scaner_task:
+        if not self.scaner_task.task_state.finished():
+            # если задача не закончена, прерываем ее
             self.scaner_task.task_state.set_should_run(False)
-        self.scaner_task_canceled = True
-        self.scaner_timer.stop()
-        self.start_scaner_task()
+            # ставим флаг, по сигналу finished задача запустила короткий таймер
+            # на перезапуск сканера
+            self.scaner_task_canceled = True
+        else:
+            # если задача закончена, значит стоит долгий таймер
+            self.scaner_timer.stop()
+            # если задача закончена, немедленно запускаем новый сканер
+            self.scaner_timer.start(1000)
 
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
         if flag == "show":
