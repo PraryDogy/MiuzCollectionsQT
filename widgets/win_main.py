@@ -243,18 +243,28 @@ class WinMain(WinFrameless):
             ]
             self.rem_win = RemoveFilesWin(img_path_list)
             self.rem_win.center_relative_parent(self.window())
-            self.rem_win.finished_.connect(lambda: self.remove_task_cmd(img_path_list))
+            self.rem_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
             self.rem_win.show()
         else:
             self.open_smb_win()
     
-    def remove_task_cmd(self, img_path_list: list[str]):
+    def remove_task_start(self, img_path_list: list[str]):
         remove_files_task = RemoveFilesTask(img_path_list)
         remove_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
         remove_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
         UThreadPool.start(remove_files_task)
 
-    def upload_task_cmd(self, dest: str, img_path_list: list[str]):
+    def opem_upload_win(self, img_path_list: list):
+        main_folder_path = MainFolder.current.is_available()
+        if main_folder_path:
+            self.win_upload = WinUpload()
+            self.win_upload.finished_.connect(lambda dest: self.upload_task_start(dest, img_path_list))
+            self.win_upload.center_relative_parent(self)
+            self.win_upload.show()
+        else:
+            self.open_smb_win()
+
+    def upload_task_start(self, dest: str, img_path_list: list[str]):
         copy_files_task = CopyFilesTask(dest, img_path_list, False)
         cmd = lambda img_path_list: self.upload_task_finished(img_path_list)
         copy_files_task.signals_.finished_.connect(cmd)
@@ -317,9 +327,6 @@ class WinMain(WinFrameless):
             if os.path.isfile(i.toLocalFile())
         ]
 
-        self.win_upload = WinUpload()
-        self.win_upload.finished_.connect(lambda dest: self.upload_task_cmd(dest, img_path_list))
-        self.win_upload.center_relative_parent(self)
-        self.win_upload.show()
+        self.opem_upload_win(img_path_list)
 
         return super().dropEvent(a0)
