@@ -82,20 +82,19 @@ class WinMain(WinFrameless):
         self.bar_top = BarTop()
         right_lay.addWidget(self.bar_top)
 
-
         sep_upper = USep()
         right_lay.addWidget(sep_upper)
 
-        grid = Grid()
-        grid.restart_scaner.connect(lambda: self.restart_scaner_task())
-        right_lay.addWidget(grid)
+        self.grid = Grid()
+        self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
+        right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
         right_lay.addWidget(sep_bottom)
 
-        bar_bottom = BarBottom()
-        bar_bottom.theme_changed.connect(grid.reload_rubber)
-        right_lay.addWidget(bar_bottom)
+        self.bar_bottom = BarBottom()
+        self.bar_bottom.theme_changed.connect(self.grid.reload_rubber)
+        right_lay.addWidget(self.bar_bottom)
 
         # Добавляем splitter в основной layout
         h_lay_main.addWidget(splitter)
@@ -104,7 +103,7 @@ class WinMain(WinFrameless):
         splitter.setStretchFactor(1, 1)
         splitter.setSizes([Static.MENU_LEFT_WIDTH, self.width() - Static.MENU_LEFT_WIDTH])
 
-        grid.setFocus()
+        self.grid.setFocus()
 
         SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
         SignalsApp.instance.win_main_cmd.emit("set_title")
@@ -141,6 +140,8 @@ class WinMain(WinFrameless):
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
+            self.scaner_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
+            self.scaner_task.signals_.reload_gui.connect(lambda: self.reload_gui())
             UThreadPool.start(self.scaner_task)
 
         elif self.scaner_task.task_state.finished():
@@ -220,6 +221,12 @@ class WinMain(WinFrameless):
     
     def hide_(self, *args):
         self.hide()
+
+    def set_progress_text(self, text: str):
+        self.bar_bottom.progress_bar.setText(text)
+
+    def reload_gui(self):
+        self.grid.signals_cmd("reload")
 
     def on_exit(self):
         """
