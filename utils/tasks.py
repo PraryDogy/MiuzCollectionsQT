@@ -448,6 +448,8 @@ class UploadFilesTask(URunnable):
 
 class ScanerSignals(QObject):
     finished_ = pyqtSignal()
+    progress_text = pyqtSignal(str)
+    reload_gui = pyqtSignal()
 
 
 class ScanerTask(URunnable):
@@ -530,15 +532,20 @@ class ScanerTask(URunnable):
         """
 
         main_folder_remover = MainFolderRemover()
+        main_folder_remover.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
         main_folder_remover.run()
         finder_images = FinderImages(main_folder, self.task_state)
+        finder_images.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
         finder_images = finder_images.run()
         if finder_images and self.task_state.should_run():
             db_images = DbImages(main_folder)
+            db_images.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
             file_updater = FileUpdater(del_items, new_items, main_folder, self.task_state)
+            file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
+            file_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
             del_items, new_items = file_updater.run()
             db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.run()
