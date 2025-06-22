@@ -183,7 +183,7 @@ class WinMain(WinFrameless):
         """
         if self.scaner_task:
             self.scaner_task_canceled = True
-            self.scaner_task.scan_helper.set_can_scan(False)
+            self.scaner_task.task_state.set_should_run(False)
         
         if self.scaner_timer.isActive():
             self.scaner_timer.stop()
@@ -229,23 +229,6 @@ class WinMain(WinFrameless):
         self.grid.signals_cmd("reload")
 
     def on_exit(self):
-        """
-        Задачи ScanerTask, UploadFilesTask и RemoveFilesTask нельзя корректно остановить
-        через стандартный метод URunnable.set_should_run(False), потому что они включают
-        в себя подклассы, которым передаётся копия флага, а не ссылка на него.
-
-        То есть, если в родительском классе изменить self.should_run = False,
-        это не повлияет на флаг во вложенных объектах, так как они получили
-        примитив (bool), а не ссылку.
-
-        Для этих задач используется отдельный объект scan_helper,
-        через который можно управлять флагом по ссылке — вызов
-        scan_helper.set_can_scan(False) корректно остановит выполнение
-        как родительской, так и вложенных задач.
-
-        Остальные задачи, такие как CopyFilesTask, не содержат вложенных компонентов,
-        и их можно остановить обычным способом — через set_should_run(False).
-        """
         for i in UThreadPool.tasks:
             i.task_state.set_should_run(False)
         JsonData.write_json_data()
