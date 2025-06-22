@@ -411,6 +411,8 @@ class RemoveFilesTask(URunnable):
 
 class UploadFilesSignals(QObject):
     finished_ = pyqtSignal()
+    progress_text = pyqtSignal(str)
+    reload_gui = pyqtSignal()
 
 
 class UploadFilesTask(URunnable):
@@ -436,6 +438,8 @@ class UploadFilesTask(URunnable):
             img_with_stats_list.append(data)
         # del_items пустой, так как нас интересует только добавление в БД
         file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.task_state)
+        file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
+        file_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         del_items, new_items = file_updater.run()
         # del_items пустой, так как нас интересуют только новые изображения
         db_updater = DbUpdater([], new_items, MainFolder.current)
@@ -465,7 +469,6 @@ class ScanerTask(URunnable):
         """
         super().__init__()
         self.signals_ = ScanerSignals()
-        self.scan_helper = ScanHelper()
 
     def task(self):
         main_folders = [

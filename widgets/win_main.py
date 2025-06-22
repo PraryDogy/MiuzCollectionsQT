@@ -247,6 +247,8 @@ class WinMain(WinFrameless):
 
     def upload_task_finished(self, img_path_list: list[str]):
         upload_files_task = UploadFilesTask(img_path_list)
+        upload_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
+        upload_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
         UThreadPool.start(upload_files_task)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
