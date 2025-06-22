@@ -122,38 +122,32 @@ class WinMain(WinFrameless):
     def start_scaner_task(self):
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
-            print("scaner is none, start new task", self.scaner_task)
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
             self.scaner_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
             self.scaner_task.signals_.reload_gui.connect(lambda: self.reload_gui())
             UThreadPool.start(self.scaner_task)
 
         elif self.scaner_task.task_state.finished():
-            print("scaner state finished, set scaner none", self.scaner_task)
             self.scaner_task = None
             self.start_scaner_task()
 
         else:
-            print("scaner not finished and not none, wait", self.scaner_task)
             QTimer.singleShot(3000, self.start_scaner_task)
 
     def on_scaner_finished(self):
         self.scaner_timer.stop()
         if self.scaner_task_canceled:
-            print("scaner sig finished, task canceled", self.scaner_task)
             self.scaner_task_canceled = False
             self.scaner_timer.start(1000)
         else:
-            print("long timer", self.scaner_task)
             self.scaner_timer.start(JsonData.scaner_minutes * 60 * 1000)
 
     def restart_scaner_task(self):
-        print("restart pressed")
         if not self.scaner_task.task_state.finished():
             # если задача не закончена, прерываем ее
             self.scaner_task.task_state.set_should_run(False)
-            # ставим флаг, по сигналу finished задача запустила короткий таймер
-            # на перезапуск сканера
+            # ставим флаг,чтобы on_scaner_finished запустил короткий таймер
+            # прерванная задача завершится и запустит короткий таймер
             self.scaner_task_canceled = True
         else:
             # если задача закончена, значит стоит долгий таймер
