@@ -89,6 +89,7 @@ class GridWidget(QWidget):
 
 class Grid(QScrollArea):
     restart_scaner = pyqtSignal()
+    remove_files = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -317,7 +318,7 @@ class Grid(QScrollArea):
             self.selected_widgets.append(wid)
             wid.set_frame()
 
-    def remove_files(self):
+    def remove_files_win(self):
         main_folder_path = MainFolder.current.is_available()
         img_path_list = [
             Utils.get_img_path(main_folder_path, i.rel_img_path)
@@ -325,7 +326,7 @@ class Grid(QScrollArea):
         ]
         self.rem_win = RemoveFilesWin(img_path_list)
         self.rem_win.center_relative_parent(self.window())
-        self.rem_win.finished_.connect(lambda img_path_list: self.remove_finished())
+        self.rem_win.finished_.connect(lambda: self.remove_files.emit(img_path_list))
         self.rem_win.show()
 
     def remove_finished(self):
@@ -590,7 +591,7 @@ class Grid(QScrollArea):
             self.menu_.addAction(move_files)
 
             rem = RemoveFiles(self.menu_, len(self.selected_widgets))
-            rem.triggered.connect(self.remove_files)
+            rem.triggered.connect(self.remove_files_win)
             self.menu_.addAction(rem)
 
         self.menu_.show_menu()

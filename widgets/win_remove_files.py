@@ -14,7 +14,7 @@ from utils.main import UThreadPool
 
 class RemoveFilesWin(WinSystem):
     warning_svg = os.path.join(Static.images_dir, "warning.svg")
-    finished_ = pyqtSignal(list)
+    finished_ = pyqtSignal()
     svg_size = 50
 
     def __init__(self, img_path_list: list[str]):
@@ -31,7 +31,7 @@ class RemoveFilesWin(WinSystem):
         warn = SvgBtn(self.warning_svg, RemoveFilesWin.svg_size)
         first_row_lay.addWidget(warn)
 
-        t = f"{Lang.move_to_trash} ({len(img_path_list)})?"
+        t = f"{Lang.move_to_trash} ({len(self.img_path_list)})?"
         question = QLabel(text=t)
         first_row_lay.addWidget(question)
 
@@ -56,13 +56,7 @@ class RemoveFilesWin(WinSystem):
         self.adjustSize()
 
     def cmd_(self, *args):
-        self.task_ = RemoveFilesTask(self.img_path_list)
-        self.task_.signals_.finished_.connect(self.finalize)
-        UThreadPool.start(self.task_)
-
-    def finalize(self, *args):
-        self.finished_.emit(self.img_path_list)
-        del self.task_
+        self.finished_.emit()
         self.deleteLater()
 
     def keyPressEvent(self, a0):
