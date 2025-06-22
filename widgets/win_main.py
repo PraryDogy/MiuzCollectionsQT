@@ -120,80 +120,41 @@ class WinMain(WinFrameless):
             self.start_scaner_task()
 
     def start_scaner_task(self):
-        """
-        Логика работы сканера:
-
-        1. Первый запуск или завершён предыдущий:
-        - Если self.scaner_task == None:
-            - Создаётся новый ScanerTask.
-            - Подключается слот on_scaner_finished к сигналу завершения задачи.
-            - Задача запускается в пуле потоков.
-        
-        2. Повторный запуск после завершения:
-        - Если задача завершена (self.scaner_task.is_finished()):
-            - self.scaner_task сбрасывается в None.
-            - Метод вызывается повторно, что приведёт к пункту 1.
-        
-        3. Задача ещё выполняется:
-        - Используется QTimer.singleShot(3000, ...) для повторной проверки
-            через 3 секунды (без создания конфликта с основным таймером).
-        """
-
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
+            self.scaner_task_canceled = False
+            print("scaner is none, start new task", self.scaner_task)
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
             self.scaner_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
             self.scaner_task.signals_.reload_gui.connect(lambda: self.reload_gui())
             UThreadPool.start(self.scaner_task)
 
         elif self.scaner_task.task_state.finished():
+            print("scaner state finished, set scaner none", self.scaner_task)
             self.scaner_task = None
             self.start_scaner_task()
 
         else:
+            print("scaner not finished and not none, wait", self.scaner_task)
             QTimer.singleShot(3000, self.start_scaner_task)
 
     def on_scaner_finished(self):
-        """
-        Обработка завершения задачи сканера.
-
-        - Если задача была отменена через restart_scaner_task (флаг scaner_task_canceled == True):
-        - Сбрасывает флаг.
-        - Запускает таймер self.scaner_timer с короткой задержкой (1 секунда) для немедленного 
-            повторного запуска сканера.
-
-        - Если задача завершилась штатно:
-        - Запускает таймер self.scaner_timer на заданное пользователем время (scaner_minutes),
-            после которого будет запущен следующий цикл сканирования.
-        """
         if self.scaner_task_canceled:
+            print("scaner sig finished, task canceled", self.scaner_task)
             self.scaner_task_canceled = False
             self.scaner_timer.start(1000)
         else:
+            print("long timer", self.scaner_task)
             self.scaner_timer.start(JsonData.scaner_minutes * 60 * 1000)
 
     def restart_scaner_task(self):
-        """
-        Прерывает текущую задачу сканера (если есть) и подготавливает её к немедленному
-        повторному запуску.
-
-        - Устанавливает флаг scaner_task_canceled в True, чтобы on_scaner_finished запустил таймер
-        с минимальной задержкой.
-        - Вызывает cancel() текущей задачи, чтобы прервать её выполнение.
-        - Если основной таймер self.scaner_timer уже запущен, останавливает его, чтобы избежать
-        нежелательной задержки перед следующим запуском.
-        """
+        print("restart pressed")
         if self.scaner_task:
-            self.scaner_task_canceled = True
             self.scaner_task.task_state.set_should_run(False)
-        
-        if self.scaner_timer.isActive():
-            self.scaner_timer.stop()
-
-        # флаг finished у сканера не срабатывает, поэтому немедленно вызываем
-        # старт сканера
+        self.scaner_task_canceled = True
+        self.scaner_timer.stop()
         self.start_scaner_task()
-    
+
     def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
         if flag == "show":
             self.show()

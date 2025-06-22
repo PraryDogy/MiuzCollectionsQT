@@ -402,7 +402,7 @@ class TaskState:
         self._should_run = value
 
     def set_finished(self, value: bool):
-        self._finished = False
+        self._finished = value
 
     def finished(self):
         return self._finished

@@ -484,10 +484,10 @@ class ScanerTask(URunnable):
         ]
 
         for i in main_folders:
-            print("scaner started", i.name)
+            # print("scaner started", i.name)
             self.main_folder_scan(i)
             gc.collect()
-            print("scaner finished", i.name)
+            # print("scaner finished", i.name)
             
         try:
             self.signals_.finished_.emit()

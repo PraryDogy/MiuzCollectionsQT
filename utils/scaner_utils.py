@@ -77,6 +77,10 @@ class FinderImages(QObject):
         subrirs_count = len(subdirs)
 
         for index, subdir in enumerate(subdirs[:-1], start=1):
+            import time
+            time.sleep(0.5)
+            if not self.task_state.should_run():
+                return finder_images
             text = self.get_progress_text(index, subrirs_count)
             self.progress_text.emit(text)
             try:
