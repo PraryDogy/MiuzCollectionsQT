@@ -371,8 +371,9 @@ class RemoveFilesTask(URunnable):
 
     def __init__(self, img_path_list: list[str]):
         """
-        Удаляет изображения из hashdir
-        Удаляет записи об изображениях из бд
+        Удаляет изображения из hashdir, удаляет записи об изображениях из бд.   
+        Запуск: UThreadPool.start   
+        Сигналы: finished_(), progress_text(str), reload_gui()
         """
         super().__init__()
         self.signals_ = RemoveFilesSignals()
@@ -422,8 +423,9 @@ class UploadFilesSignals(QObject):
 class UploadFilesTask(URunnable):
     def __init__(self, img_path_list: list):
         """
-        Записывает на диск в hashdir изображения
-        Делает записи в бд о загруженных изображениях
+        Удаляет изображения из hashdir, удаляет записи об изображениях из бд.   
+        Запуск: UThreadPool.start   
+        Сигналы: finished_(), progress_text(str), reload_gui()
         """
         super().__init__()
         self.img_path_list = img_path_list

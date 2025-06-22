@@ -89,7 +89,7 @@ class GridWidget(QWidget):
 
 class Grid(QScrollArea):
     restart_scaner = pyqtSignal()
-    remove_files = pyqtSignal()
+    remove_files = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()

@@ -12,8 +12,9 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import CopyFilesTask, ScanerTask, UploadFilesTask
 from utils.main import UThreadPool
+from utils.tasks import (CopyFilesTask, RemoveFilesTask, ScanerTask,
+                         UploadFilesTask)
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -250,6 +251,12 @@ class WinMain(WinFrameless):
         upload_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
         upload_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
         UThreadPool.start(upload_files_task)
+    
+    def remove_task_cmd(self, img_path_list: list[str]):
+        remove_files_task = RemoveFilesTask(img_path_list)
+        remove_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
+        remove_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
+        UThreadPool.start(remove_files_task)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()

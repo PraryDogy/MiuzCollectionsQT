@@ -411,8 +411,14 @@ class TaskState:
 class URunnable(QRunnable):
     def __init__(self):
         """
-        Переопределите метод task().
-        Не переопределяйте run().
+        Внимание:   
+        Не переопределяйте метод self.run() как в QRunnable, переопределите
+        метод self.task()
+
+        self.task_state:
+        - для управления QRunnable.
+        - Можно остановить задачу self.task_state.set_should_run(False)
+        - По завершению задачи self.task_state.finished() вернет True
         """
         super().__init__()
         self.task_state = TaskState()
@@ -439,5 +445,8 @@ class UThreadPool:
 
     @classmethod
     def start(cls, runnable: URunnable):
+        """
+        Запускает URunnable, добавляет в список UThreadPool.tasks
+        """
         cls.tasks.append(runnable)
         cls.pool.start(runnable)
