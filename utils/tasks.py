@@ -2,7 +2,7 @@ import gc
 import os
 import subprocess
 
-from PyQt5.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QColor, QPixmap, QPixmapCache
 from sqlalchemy import select, update
 
@@ -12,9 +12,9 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
-                           FinderImages, MainFolderRemover, ScanHelper)
 from .main import URunnable, Utils
+from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
+                           FinderImages, MainFolderRemover)
 
 
 class CopyFilesSignals(QObject):
