@@ -362,6 +362,8 @@ class MultipleImgInfo(URunnable):
 
 class RemoveFilesSignals(QObject):
     finished_ = pyqtSignal()
+    progress_text = pyqtSignal(str)
+    reload_gui = pyqtSignal()
 
 
 class RemoveFilesTask(URunnable):
@@ -402,6 +404,8 @@ class RemoveFilesTask(URunnable):
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
         file_updater = FileUpdater(rel_thumb_path_list, [], main_folder, self.task_state)
+        file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
+        file_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
