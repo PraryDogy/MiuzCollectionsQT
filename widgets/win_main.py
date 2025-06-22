@@ -120,21 +120,42 @@ class WinMain(WinFrameless):
             self.start_scaner_task()
 
     def start_scaner_task(self):
+        """
+        Инициализирует и запускает задачу сканирования ScanerTask.
+
+        Если задача ещё не была создана (self.scaner_task is None), создаётся новая задача,
+        подключаются её сигналы к соответствующим обработчикам, и она отправляется на выполнение
+        в пользовательский пул потоков (UThreadPool).
+
+        Если текущая задача уже завершена, объект self.scaner_task сбрасывается в None и метод
+        рекурсивно вызывает сам себя для запуска новой задачи.
+
+        Если задача ещё выполняется, метод откладывает повторную попытку запуска на 3 секунды
+        с помощью QTimer.singleShot.
+        """
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
             self.scaner_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
             self.scaner_task.signals_.reload_gui.connect(lambda: self.reload_gui())
             UThreadPool.start(self.scaner_task)
-
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
             self.start_scaner_task()
-
         else:
             QTimer.singleShot(3000, self.start_scaner_task)
 
     def on_scaner_finished(self):
+        """
+        Обрабатывает завершение текущей задачи сканирования.
+
+        Если задача была остановлена вручную (флаг self.scaner_task_canceled установлен в True),
+        запускается короткий таймер на 1 секунду для быстрого перезапуска сканирования.
+
+        Если задача завершилась штатно, запускается длительный таймер с интервалом, заданным
+        в JsonData.scaner_minutes (в минутах, конвертированных в миллисекунды), для
+        следующего автоматического запуска сканирования.
+        """
         self.scaner_timer.stop()
         if self.scaner_task_canceled:
             self.scaner_task_canceled = False
@@ -143,6 +164,16 @@ class WinMain(WinFrameless):
             self.scaner_timer.start(JsonData.scaner_minutes * 60 * 1000)
 
     def restart_scaner_task(self):
+        """
+        Прерывает текущую задачу сканирования и инициирует её перезапуск.
+
+        Если текущая задача ещё не завершена, устанавливается флаг отмены (self.scaner_task_canceled = True),
+        и флаг состояния задачи переводится в "не должно выполняться" с помощью set_should_run(False).
+        После завершения текущей задачи метод on_scaner_finished запустит короткий таймер.
+
+        Если задача уже завершена, активный таймер останавливается, и запускается короткий таймер на 1 секунду
+        для немедленного запуска новой задачи сканирования.
+        """
         if not self.scaner_task.task_state.finished():
             # если задача не закончена, прерываем ее
             self.scaner_task.task_state.set_should_run(False)
