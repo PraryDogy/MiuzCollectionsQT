@@ -88,6 +88,7 @@ class WinMain(WinFrameless):
 
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
+        self.grid.remove_files.connect(lambda img_path_list: self.remove_task_cmd(img_path_list))
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
