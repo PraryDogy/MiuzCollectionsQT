@@ -196,7 +196,7 @@ class ImgUtils:
             return None
 
 
-class Thumb:
+class ThumbUtils:
     @classmethod
     def create_thumb_path(cls, img_path: str) -> str:
         new_name = hashlib.md5(img_path.encode('utf-8')).hexdigest() + ".jpg"
@@ -275,7 +275,7 @@ class Pixmap:
         )
 
 
-class MainUtils(Thumb, Pixmap, ImgUtils):
+class MainUtils(ThumbUtils, Pixmap, ImgUtils):
 
     @classmethod
     def desaturate_image(cls, image: np.ndarray, factor=0.2):

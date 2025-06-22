@@ -12,8 +12,8 @@ from database import THUMBS, Dbase
 from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
+from utils.main import MainUtils, ThumbUtils
 from utils.tasks import URunnable
-from utils.main import MainUtils
 
 
 class DbImage:
@@ -72,8 +72,8 @@ class DbImages(URunnable):
                 continue
 
             mod = datetime.fromtimestamp(mod).date()
-            thumb_path = MainUtils.get_thumb_path(rel_thumb_path)
-            thumb = MainUtils.read_thumb(thumb_path)
+            thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
+            thumb = ThumbUtils.read_thumb(thumb_path)
 
             if isinstance(thumb, ndarray):
                 pixmap = MainUtils.pixmap_from_array(thumb)

@@ -12,7 +12,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .main import URunnable, MainUtils
+from .main import ImgUtils, MainUtils, URunnable, ThumbUtils
 from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
                            FinderImages, MainFolderRemover)
 
@@ -190,8 +190,8 @@ class LoadThumb(URunnable):
         conn.close()
 
         if rel_thumb_path:
-            thumb_path = MainUtils.get_thumb_path(rel_thumb_path)
-            thumb = MainUtils.read_thumb(thumb_path)
+            thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
+            thumb = ThumbUtils.read_thumb(thumb_path)
             thumb = MainUtils.desaturate_image(thumb, 0.2)
             pixmap = MainUtils.pixmap_from_array(thumb)
         else:
@@ -216,7 +216,7 @@ class LoadImage(URunnable):
 
     def task(self):
         if self.img_path not in self.cached_images:
-            img = MainUtils.read_image(self.img_path)
+            img = ImgUtils.read_image(self.img_path)
             if img is not None:
                 img = MainUtils.desaturate_image(img, 0.2)
                 self.pixmap = MainUtils.pixmap_from_array(img)
@@ -267,7 +267,7 @@ class SingleImgInfo(URunnable):
             size = MainUtils.get_f_size(stats.st_size)
             mod = MainUtils.get_f_date(stats.st_mtime)
             coll = MainUtils.get_coll_name(mail_folder_path, self.url)
-            thumb_path = MainUtils.create_thumb_path(self.url)
+            thumb_path = ThumbUtils.create_thumb_path(self.url)
 
             res = {
                 Lang.file_name: self.lined_text(name),
@@ -296,7 +296,7 @@ class SingleImgInfo(URunnable):
             self.signals_.finished_.emit(res)
 
     def get_img_resol(self, img_path: str):
-        img_ = MainUtils.read_image(img_path)
+        img_ = ImgUtils.read_image(img_path)
         if img_ is not None and len(img_.shape) > 1:
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"
@@ -393,11 +393,11 @@ class RemoveFilesTask(URunnable):
 
     def remove_thumbs(self):      
         thumb_path_list = [
-            MainUtils.create_thumb_path(img_path)
+            ThumbUtils.create_thumb_path(img_path)
             for img_path in self.img_path_list
         ]
         rel_thumb_path_list = [
-            MainUtils.get_rel_thumb_path(thumb_path)
+            ThumbUtils.get_rel_thumb_path(thumb_path)
             for thumb_path in thumb_path_list
         ]
 

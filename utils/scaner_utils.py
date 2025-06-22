@@ -11,7 +11,7 @@ from database import THUMBS, ClmNames, Dbase
 from lang import Lang
 from main_folder import MainFolder
 
-from .main import ImgUtils, TaskState, Thumb, MainUtils
+from .main import ImgUtils, TaskState, ThumbUtils, MainUtils
 
 
 class FinderImages(QObject):
@@ -264,7 +264,7 @@ class FileUpdater(QObject):
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
             if not self.task_state.should_run():
                 break
-            thumb_path = MainUtils.get_thumb_path(rel_thumb_path)
+            thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
                 self.progressbar_text(Lang.deleting, x, total)
                 try:
@@ -280,7 +280,7 @@ class FileUpdater(QObject):
 
     def create_thumb(self, img_path: str) -> ndarray | None:
         img = ImgUtils.read_image(img_path)
-        thumb = Thumb.fit_to_thumb(img, ThumbData.DB_PIXMAP_SIZE)
+        thumb = ThumbUtils.fit_to_thumb(img, ThumbData.DB_PIXMAP_SIZE)
         del img
         gc.collect()
         if isinstance(thumb, ndarray):
@@ -297,8 +297,8 @@ class FileUpdater(QObject):
             self.progressbar_text(Lang.adding, x, total)
             try:
                 thumb = self.create_thumb(img_path)
-                thumb_path = MainUtils.create_thumb_path(img_path)
-                MainUtils.write_thumb(thumb_path, thumb)
+                thumb_path = ThumbUtils.create_thumb_path(img_path)
+                ThumbUtils.write_thumb(thumb_path, thumb)
                 new_new_items.append((img_path, size, birth, mod))
             except Exception as e:
                 MainUtils.print_error()
@@ -358,9 +358,9 @@ class DbUpdater(QObject):
     def run_new_items(self):
         conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
-            small_img_path = MainUtils.create_thumb_path(img_path)
+            small_img_path = ThumbUtils.create_thumb_path(img_path)
             short_img_path = MainUtils.get_rel_img_path(self.main_folder.get_current_path(), img_path)
-            rel_thumb_path = MainUtils.get_rel_thumb_path(small_img_path)
+            rel_thumb_path = ThumbUtils.get_rel_thumb_path(small_img_path)
             coll_name = MainUtils.get_coll_name(self.main_folder.get_current_path(), img_path)
             values = {
                 ClmNames.SHORT_SRC: short_img_path,
@@ -444,7 +444,7 @@ class MainFolderRemover(QObject):
         q = q.where(THUMBS.c.brand == main_folder.name)
         res = self.conn.execute(q).fetchall()
         res = [
-            (id_, MainUtils.get_thumb_path(rel_thumb_path))
+            (id_, ThumbUtils.get_thumb_path(rel_thumb_path))
             for id_, rel_thumb_path in res
         ]
         return res
