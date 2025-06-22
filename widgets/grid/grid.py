@@ -90,6 +90,7 @@ class GridWidget(QWidget):
 class Grid(QScrollArea):
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
+    move_files = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -574,7 +575,7 @@ class Grid(QScrollArea):
             self.menu_.addSeparator()
 
             move_files = MoveFiles(self.menu_, rel_img_path_list)
-            # move_files.triggered.connect(lambda: self.remove_files.emit(rel_img_path_list))
+            move_files.triggered.connect(lambda: self.move_files.emit(rel_img_path_list))
             self.menu_.addAction(move_files)
 
             rem = RemoveFiles(self.menu_, len(self.selected_widgets))

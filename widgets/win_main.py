@@ -90,6 +90,7 @@ class WinMain(WinFrameless):
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_path_list: self.open_remove_files_win(rel_img_path_list))
+        self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -234,6 +235,43 @@ class WinMain(WinFrameless):
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()
 
+    def open_filemove_win(self, rel_img_path_list: list):
+        main_folder_path = MainFolder.current.is_available()
+        if main_folder_path:
+            img_path_list = [
+                MainUtils.get_img_path(main_folder_path, i)
+                for i in rel_img_path_list
+            ]
+            filemove_win = WinUpload()
+            filemove_win.center_relative_parent(self.window())
+            cmd = lambda dest: self.filemove_task_start(dest, img_path_list)
+            filemove_win.finished_.connect(cmd)
+            filemove_win.show()
+        else:
+            self.open_smb_win()
+
+    def filemove_task_start(self, dest: str, img_path_list: list):
+        # файлы будут скопированы в папку назначения и удалены из исходной папки
+        is_movefiles = True
+        copy_task = CopyFilesTask(dest, img_path_list, is_movefiles)
+        cmd = lambda new_img_path_list: self.filemove_task_fin(img_path_list, new_img_path_list)
+        copy_task.signals_.finished_.connect(cmd)
+        UThreadPool.start(copy_task)
+        
+    def filemove_task_fin(self, img_path_list: list, new_img_path_list: list):
+        remove_task = RemoveFilesTask(img_path_list)
+        cmd = lambda: self.filemove_task_fin_sec(new_img_path_list)
+        remove_task.signals_.finished_.connect(cmd)
+        remove_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
+        remove_task.signals_.reload_gui.connect(lambda: self.reload_gui())
+        UThreadPool.start(remove_task)
+
+    def filemove_task_fin_sec(self, new_img_path_list: list):
+        upload_task = UploadFilesTask(new_img_path_list)
+        upload_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
+        upload_task.signals_.reload_gui.connect(lambda: self.reload_gui())
+        UThreadPool.start(upload_task)
+
     def open_remove_files_win(self, rel_img_path_list: list):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
@@ -241,10 +279,10 @@ class WinMain(WinFrameless):
                 MainUtils.get_img_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
-            self.rem_win = RemoveFilesWin(img_path_list)
-            self.rem_win.center_relative_parent(self.window())
-            self.rem_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
-            self.rem_win.show()
+            rem_win = RemoveFilesWin(img_path_list)
+            rem_win.center_relative_parent(self.window())
+            rem_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
+            rem_win.show()
         else:
             self.open_smb_win()
     
@@ -254,13 +292,13 @@ class WinMain(WinFrameless):
         remove_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
         UThreadPool.start(remove_files_task)
 
-    def opem_upload_win(self, img_path_list: list):
+    def ope_upload_win(self, img_path_list: list):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
-            self.win_upload = WinUpload()
-            self.win_upload.finished_.connect(lambda dest: self.upload_task_start(dest, img_path_list))
-            self.win_upload.center_relative_parent(self)
-            self.win_upload.show()
+            win_upload = WinUpload()
+            win_upload.finished_.connect(lambda dest: self.upload_task_start(dest, img_path_list))
+            win_upload.center_relative_parent(self)
+            win_upload.show()
         else:
             self.open_smb_win()
 
@@ -327,6 +365,6 @@ class WinMain(WinFrameless):
             if os.path.isfile(i.toLocalFile())
         ]
 
-        self.opem_upload_win(img_path_list)
+        self.ope_upload_win(img_path_list)
 
         return super().dropEvent(a0)
