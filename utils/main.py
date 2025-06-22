@@ -195,6 +195,17 @@ class ImgUtils:
         else:
             return None
 
+    @classmethod
+    def desaturate_image(cls, image: np.ndarray, factor=0.2):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        return cv2.addWeighted(
+            image,
+            1 - factor,
+            cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR),
+            factor,
+            0
+        )
+
 
 class ThumbUtils:
     @classmethod
@@ -244,11 +255,10 @@ class ThumbUtils:
             return None
 
 
-class Pixmap:
+class PixmapUtils:
 
     @classmethod
     def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
-
         if isinstance(image, np.ndarray) and QApplication.instance():
             height, width, channel = image.shape
             bytes_per_line = channel * width
@@ -260,13 +270,11 @@ class Pixmap:
                 QImage.Format.Format_RGB888
             )
             return QPixmap.fromImage(qimage)
-
         else:
             return None
 
     @classmethod
     def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
-
         return pixmap.scaled(
             size,
             size,
@@ -275,18 +283,7 @@ class Pixmap:
         )
 
 
-class MainUtils(ThumbUtils, Pixmap, ImgUtils):
-
-    @classmethod
-    def desaturate_image(cls, image: np.ndarray, factor=0.2):
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        return cv2.addWeighted(
-            image,
-            1 - factor,
-            cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR),
-            factor,
-            0
-        )
+class MainUtils:
 
     @classmethod
     def get_coll_name(cls, main_folder_path: str, img_path: str) -> str:

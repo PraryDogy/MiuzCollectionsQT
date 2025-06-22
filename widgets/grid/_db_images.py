@@ -12,7 +12,7 @@ from database import THUMBS, Dbase
 from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
-from utils.main import MainUtils, ThumbUtils
+from utils.main import MainUtils, PixmapUtils, ThumbUtils
 from utils.tasks import URunnable
 
 
@@ -76,7 +76,7 @@ class DbImages(URunnable):
             thumb = ThumbUtils.read_thumb(thumb_path)
 
             if isinstance(thumb, ndarray):
-                pixmap = MainUtils.pixmap_from_array(thumb)
+                pixmap = PixmapUtils.pixmap_from_array(thumb)
             else:
                 continue
 

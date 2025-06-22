@@ -12,7 +12,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .main import ImgUtils, MainUtils, URunnable, ThumbUtils
+from .main import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
 from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
                            FinderImages, MainFolderRemover)
 
@@ -192,8 +192,8 @@ class LoadThumb(URunnable):
         if rel_thumb_path:
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             thumb = ThumbUtils.read_thumb(thumb_path)
-            thumb = MainUtils.desaturate_image(thumb, 0.2)
-            pixmap = MainUtils.pixmap_from_array(thumb)
+            thumb = ImgUtils.desaturate_image(thumb, 0.2)
+            pixmap = PixmapUtils.pixmap_from_array(thumb)
         else:
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(128, 128, 128))
@@ -218,8 +218,8 @@ class LoadImage(URunnable):
         if self.img_path not in self.cached_images:
             img = ImgUtils.read_image(self.img_path)
             if img is not None:
-                img = MainUtils.desaturate_image(img, 0.2)
-                self.pixmap = MainUtils.pixmap_from_array(img)
+                img = ImgUtils.desaturate_image(img, 0.2)
+                self.pixmap = PixmapUtils.pixmap_from_array(img)
                 self.cached_images[self.img_path] = self.pixmap
         else:
             self.pixmap = self.cached_images.get(self.img_path)
