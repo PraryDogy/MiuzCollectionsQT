@@ -251,9 +251,7 @@ class WinMain(WinFrameless):
             self.open_smb_win()
 
     def filemove_task_start(self, dest: str, img_path_list: list):
-        # файлы будут скопированы в папку назначения и удалены из исходной папки
-        is_movefiles = True
-        copy_task = CopyFilesTask(dest, img_path_list, is_movefiles)
+        copy_task = CopyFilesTask(dest, img_path_list)
         cmd = lambda new_img_path_list: self.filemove_task_fin(img_path_list, new_img_path_list)
         copy_task.signals_.finished_.connect(cmd)
         UThreadPool.start(copy_task)
@@ -303,7 +301,7 @@ class WinMain(WinFrameless):
             self.open_smb_win()
 
     def upload_task_start(self, dest: str, img_path_list: list[str]):
-        copy_files_task = CopyFilesTask(dest, img_path_list, False)
+        copy_files_task = CopyFilesTask(dest, img_path_list)
         cmd = lambda img_path_list: self.upload_task_finished(img_path_list)
         copy_files_task.signals_.finished_.connect(cmd)
         UThreadPool.start(copy_files_task)

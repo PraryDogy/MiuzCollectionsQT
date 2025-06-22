@@ -27,7 +27,7 @@ class CopyFilesTask(URunnable):
     current_threads: list["CopyFilesTask"] = []
     list_of_file_lists: list[list[str]] = []
 
-    def __init__(self, dest: str, files: list, move_files: bool):
+    def __init__(self, dest: str, files: list):
         """
         Если move_files установить на True, то исходные файлы будут удалены
         по законам перемещения
@@ -36,7 +36,6 @@ class CopyFilesTask(URunnable):
         self.signals_ = CopyFilesSignals()
         self.files = files
         self.dest = dest
-        self.move_files = move_files
 
     def task(self):
         CopyFilesTask.current_threads.append(self)
@@ -72,8 +71,6 @@ class CopyFilesTask(URunnable):
                         copied_size += len(buf)
                         percent = int((copied_size / total_size) * 100)
                         self.signals_.value_changed.emit(percent)
-                if self.move_files:
-                    os.remove(file_path)
             except Exception as e:
                 MainUtils.print_error()
                 break
@@ -371,7 +368,8 @@ class RemoveFilesTask(URunnable):
 
     def __init__(self, img_path_list: list[str]):
         """
-        Удаляет изображения из hashdir, удаляет записи об изображениях из бд.   
+        Удаляет изображения.
+        Удаляет миниатюры из hashdir, удаляет записи об изображениях из бд.   
         Запуск: UThreadPool.start   
         Сигналы: finished_(), progress_text(str), reload_gui()
         """
