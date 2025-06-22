@@ -28,37 +28,7 @@ SCRIPTS = "scripts"
 REVEAL_SCPT = os.path.join(SCRIPTS, "reveal_files.scpt")
 
 
-class Err:
-    @classmethod
-    def print_error(cls, error: Exception):
-        LIMIT_ = 200
-        tb = traceback.extract_tb(error.__traceback__)
-
-        # Попробуем найти первую строчку стека, которая относится к вашему коду.
-        for trace in tb:
-            filepath = trace.filename
-            filename = os.path.basename(filepath)
-            
-            # Если файл - не стандартный модуль, считаем его основным
-            if not filepath.startswith("<") and filename != "site-packages":
-                line_number = trace.lineno
-                break
-        else:
-            # Если не нашли, то берем последний вызов
-            trace = tb[-1]
-            filepath = trace.filename
-            filename = os.path.basename(filepath)
-            line_number = trace.lineno
-
-        msg = str(error)
-        if msg.startswith("[Errno"):
-            msg = msg.split("]", 1)[-1].strip()
-
-        print(f"\n{type(error).__name__}: {msg}\n{filepath}:{line_number}\n")
-        return msg
-
-
-class ReadImage:
+class ImgUtils:
 
     @classmethod
     def read_tiff(cls, img_path: str) -> np.ndarray | None:
@@ -82,7 +52,7 @@ class ReadImage:
                 img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
             return img
         except (tifffile.TiffFileError, RuntimeError, DelayedImportError, Exception) as e: 
-            Err.print_error(e)
+            MainUtils.print_error()
             try:
                 img = Image.open(img_path)
                 img = img.convert("RGB")
@@ -90,7 +60,7 @@ class ReadImage:
                 img.close()
                 return array_img
             except Exception as e:
-                Err.print_error(e)
+                MainUtils.print_error()
                 return None
                     
     @classmethod
@@ -102,7 +72,7 @@ class ReadImage:
             array_img = np.array(img)
             return array_img
         except Exception as e:
-            Err.print_error(e)
+            MainUtils.print_error()
             return None
 
     @classmethod
@@ -117,7 +87,7 @@ class ReadImage:
             img.close()
             return array_img
         except Exception as e:
-            Err.print_error(e)
+            MainUtils.print_error()
             return None
 
     @classmethod
@@ -130,7 +100,7 @@ class ReadImage:
 
             return array_img
         except Exception as e:
-            Err.print_error(e)
+            MainUtils.print_error()
             return None
 
     @classmethod
@@ -164,12 +134,12 @@ class ReadImage:
                     elif orientation == 8:
                         img = img.rotate(90, expand=True)
             except Exception as e:
-                Err.print_error(e)
+                MainUtils.print_error()
             array_img = np.array(img)
             img.close()
             return array_img
         except (Exception, rawpy._rawpy.LibRawDataError) as e:
-            Err.print_error(e)
+            MainUtils.print_error()
             return None
 
     @classmethod
@@ -185,7 +155,7 @@ class ReadImage:
             else:
                 return None
         except Exception as e:
-            Err.print_error(e)
+            MainUtils.print_error()
             return None
 
     @classmethod
@@ -249,7 +219,7 @@ class Thumb:
             cv2.imwrite(thumb_path, img)
             return True
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
             return False
 
     @classmethod
@@ -258,7 +228,19 @@ class Thumb:
             img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
             return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
+            return None
+
+    @classmethod
+    def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+        try:
+            h, w = image.shape[:2]
+            scale = size / max(h, w)
+            new_w, new_h = int(w * scale), int(h * scale)
+            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+        except Exception as e:
+            print("resize_max_aspect_ratio error:", e)
             return None
 
 
@@ -292,20 +274,8 @@ class Pixmap:
             transformMode=Qt.TransformationMode.SmoothTransformation
         )
 
-    @classmethod
-    def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:
-        try:
-            h, w = image.shape[:2]
-            scale = size / max(h, w)
-            new_w, new_h = int(w * scale), int(h * scale)
-            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
-        except Exception as e:
-            print("resize_max_aspect_ratio error:", e)
-            return None
-        
-
-class Utils(Thumb, Pixmap, ReadImage, Err):
+class MainUtils(Thumb, Pixmap, ImgUtils):
 
     @classmethod
     def desaturate_image(cls, image: np.ndarray, factor=0.2):
@@ -386,6 +356,12 @@ class Utils(Thumb, Pixmap, ReadImage, Err):
             print(f"Ошибка удаления: {e}")
         except Exception as e:
             print(f"Неизвестная ошибка: {e}")
+
+    @classmethod
+    def print_error(cls):
+        print()
+        print(traceback.format_exc())
+        print()
 
 
 class TaskState:

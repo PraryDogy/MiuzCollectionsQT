@@ -2,7 +2,7 @@ from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QTextEdit
 
 from lang import Lang
-from utils.main import Utils
+from utils.main import MainUtils
 
 from .context import ContextCustom
 
@@ -17,16 +17,16 @@ class CustomTextEdit(QTextEdit):
     def copy_selection(self):
         cur = self.parent_.textCursor()
         text = cur.selectedText().strip()
-        Utils.copy_text(text)
+        MainUtils.copy_text(text)
 
     def cut_selection(self):
         cur = self.parent_.textCursor()
         text = cur.selectedText().strip()
-        Utils.copy_text(text)
+        MainUtils.copy_text(text)
         cur.removeSelectedText()
 
     def paste_text(self):
-        text = Utils.paste_text()
+        text = MainUtils.paste_text()
         new_text = self.toPlainText() + text
         self.setPlainText(new_text)
 

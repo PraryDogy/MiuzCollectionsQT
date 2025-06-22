@@ -3,7 +3,7 @@ import os
 import sqlalchemy
 
 from cfg import Static
-from utils.main import Utils
+from utils.main import MainUtils
 
 METADATA = sqlalchemy.MetaData()
 
@@ -88,7 +88,7 @@ class Dbase:
             conn.execute(q).first()
             return True
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
             return False
         
     @classmethod
@@ -110,6 +110,6 @@ class Dbase:
             conn.execute(sqlalchemy.text("VACUUM"))
             conn.commit()
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
 
         conn.close()

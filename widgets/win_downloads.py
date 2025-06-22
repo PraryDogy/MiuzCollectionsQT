@@ -11,7 +11,7 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 from utils.tasks import CopyFilesTask
-from utils.main import Utils
+from utils.main import MainUtils
 
 MAX_ROW = 45
 SVG_SIZE = 16
@@ -86,7 +86,7 @@ class OldDownloadsItem(BaseDownloadsItem):
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            Utils.reveal_files(img_path_list=self.files)
+            MainUtils.reveal_files(img_path_list=self.files)
         return super().mouseReleaseEvent(a0)
 
 

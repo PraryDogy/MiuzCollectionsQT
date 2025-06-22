@@ -15,7 +15,7 @@ from cfg import JsonData, Static
 from lang import Lang
 from main_folder import MainFolder
 from paletes import ThemeChanger
-from utils.main import Utils
+from utils.main import MainUtils
 
 NEED_REBOOT = "___need_reboot___"
 LIST_ITEM_H = 25
@@ -199,7 +199,7 @@ class BaseListWidget(QListWidget):
             menu.addAction(del_item)
 
             copy_text = QAction(parent=menu, text=Lang.copy)
-            cmd = lambda: Utils.copy_text(wid.text())
+            cmd = lambda: MainUtils.copy_text(wid.text())
             copy_text.triggered.connect(cmd)
             menu.addAction(copy_text)
 
@@ -577,14 +577,14 @@ class SelectableLabel(QLabel):
         context_menu.addSeparator()
 
         select_all = QAction(parent=context_menu, text=Lang.copy_all)
-        select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
+        select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
         context_menu.show_menu()
         return super().contextMenuEvent(ev)
 
     def copy_text_md(self):
-        Utils.copy_text(self.selectedText())
+        MainUtils.copy_text(self.selectedText())
 
 
 class AboutWin(QGroupBox):
@@ -843,15 +843,15 @@ class WinSettings(WinSystem):
         if hasattr(rebootable.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
             QApplication.quit()
-            Utils.rm_rf(folder_path=Static.APP_SUPPORT_DIR)
-            Utils.start_new_app()
+            MainUtils.rm_rf(folder_path=Static.APP_SUPPORT_DIR)
+            MainUtils.start_new_app()
 
         elif hasattr(rebootable.lang_btn, NEED_REBOOT):
             JsonData.lang_ind += 1
             Lang.init()
             JsonData.write_json_data()
             QApplication.quit()
-            Utils.start_new_app()
+            MainUtils.start_new_app()
 
         elif hasattr(main_folder_wid, NEED_REBOOT):
 
@@ -865,7 +865,7 @@ class WinSettings(WinSystem):
 
             JsonData.write_json_data()
             QApplication.quit()
-            Utils.start_new_app()
+            MainUtils.start_new_app()
 
         elif hasattr(main_folder_tab, NEED_REBOOT):
             for i in self.findChildren(MainFoldersPaths):
@@ -876,7 +876,7 @@ class WinSettings(WinSystem):
 
             JsonData.write_json_data()
             QApplication.quit()
-            Utils.start_new_app()
+            MainUtils.start_new_app()
 
         self.deleteLater()
 

@@ -9,7 +9,7 @@ from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 from utils.tasks import MultipleImgInfo, SingleImgInfo
-from utils.main import UThreadPool, Utils
+from utils.main import UThreadPool, MainUtils
 
 
 class Selectable(QLabel):
@@ -38,12 +38,12 @@ class Selectable(QLabel):
 
         label_text = Lang.copy
         sel = QAction(text=label_text, parent=self)
-        sel.triggered.connect(lambda: Utils.copy_text(text))
+        sel.triggered.connect(lambda: MainUtils.copy_text(text))
         menu_.addAction(sel)
 
         reveal = QAction(parent=menu_, text=Lang.reveal_in_finder)
         reveal.triggered.connect(
-            lambda: Utils.reveal_files([full_text])
+            lambda: MainUtils.reveal_files([full_text])
         )
         menu_.addAction(reveal)
 

@@ -9,7 +9,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 from utils.tasks import CopyFilesTask, FavTask
-from utils.main import UThreadPool, Utils
+from utils.main import UThreadPool, MainUtils
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
@@ -50,7 +50,7 @@ class WinInfoAction(QAction):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             self.rel_img_path_list = [
-                    Utils.get_img_path(main_folder_path, i)
+                    MainUtils.get_img_path(main_folder_path, i)
                     for i in self.rel_img_path_list
             ]
             self.win = WinInfo(self.rel_img_path_list)
@@ -82,10 +82,10 @@ class CopyPath(QAction):
         if main_folder_path:
             img_path_list: list[str] = []
             for i in self.rel_img_path_list:
-                i = Utils.get_img_path(main_folder_path, i)
+                i = MainUtils.get_img_path(main_folder_path, i)
                 img_path_list.append(i)
             img_path_list = "\n".join(img_path_list)
-            Utils.copy_text(img_path_list)
+            MainUtils.copy_text(img_path_list)
         else:
             SmbWin.show(self.win_)
 
@@ -108,7 +108,7 @@ class CopyName(QAction):
                 i, _ = os.path.splitext(i)
                 names.append(i)
             names = "\n".join(names)
-            Utils.copy_text(names)
+            MainUtils.copy_text(names)
         else:
             SmbWin.show(self.win_)
 
@@ -126,10 +126,10 @@ class Reveal(QAction):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
-                Utils.get_img_path(main_folder_path, i)
+                MainUtils.get_img_path(main_folder_path, i)
                 for i in self.rel_img_path_list
             ]
-            Utils.reveal_files(img_path_list)
+            MainUtils.reveal_files(img_path_list)
         else:
             SmbWin.show(self.win_)
 
@@ -179,7 +179,7 @@ class Save(QAction):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
-                Utils.get_img_path(main_folder_path, rel_img_path)
+                MainUtils.get_img_path(main_folder_path, rel_img_path)
                 for rel_img_path in self.rel_img_path_list
             ]
             if self.save_as:
@@ -251,7 +251,7 @@ class MoveFiles(QAction):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             self.img_path_list = [
-                Utils.get_img_path(main_folder_path, i)
+                MainUtils.get_img_path(main_folder_path, i)
                 for i in self.img_path_list
             ]
             self.upload_win = WinUpload()

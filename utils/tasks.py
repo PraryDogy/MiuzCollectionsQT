@@ -12,7 +12,7 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .main import URunnable, Utils
+from .main import URunnable, MainUtils
 from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
                            FinderImages, MainFolderRemover)
 
@@ -48,7 +48,7 @@ class CopyFilesTask(URunnable):
         try:
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
             self.finalize(files_dests)
             return
 
@@ -75,7 +75,7 @@ class CopyFilesTask(URunnable):
                 if self.move_files:
                     os.remove(file_path)
             except Exception as e:
-                Utils.print_error(e)
+                MainUtils.print_error()
                 break
         
         self.finalize(files_dests)
@@ -113,7 +113,7 @@ class FavTask(URunnable):
             conn.commit()
             self.signals_.finished_.emit(self.value)
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
             conn.rollback()
         conn.close()
 
@@ -133,7 +133,7 @@ class LoadCollectionsTask(URunnable):
         try:
             self.signals_.finished_.emit(menus)
         except RuntimeError as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
 
     def get_collections_list(self) -> list[dict]:
         """
@@ -190,10 +190,10 @@ class LoadThumb(URunnable):
         conn.close()
 
         if rel_thumb_path:
-            thumb_path = Utils.get_thumb_path(rel_thumb_path)
-            thumb = Utils.read_thumb(thumb_path)
-            thumb = Utils.desaturate_image(thumb, 0.2)
-            pixmap = Utils.pixmap_from_array(thumb)
+            thumb_path = MainUtils.get_thumb_path(rel_thumb_path)
+            thumb = MainUtils.read_thumb(thumb_path)
+            thumb = MainUtils.desaturate_image(thumb, 0.2)
+            pixmap = MainUtils.pixmap_from_array(thumb)
         else:
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(128, 128, 128))
@@ -216,10 +216,10 @@ class LoadImage(URunnable):
 
     def task(self):
         if self.img_path not in self.cached_images:
-            img = Utils.read_image(self.img_path)
+            img = MainUtils.read_image(self.img_path)
             if img is not None:
-                img = Utils.desaturate_image(img, 0.2)
-                self.pixmap = Utils.pixmap_from_array(img)
+                img = MainUtils.desaturate_image(img, 0.2)
+                self.pixmap = MainUtils.pixmap_from_array(img)
                 self.cached_images[self.img_path] = self.pixmap
         else:
             self.pixmap = self.cached_images.get(self.img_path)
@@ -264,10 +264,10 @@ class SingleImgInfo(URunnable):
             name = os.path.basename(self.url)
             _, type_ = os.path.splitext(name)
             stats = os.stat(self.url)
-            size = Utils.get_f_size(stats.st_size)
-            mod = Utils.get_f_date(stats.st_mtime)
-            coll = Utils.get_coll_name(mail_folder_path, self.url)
-            thumb_path = Utils.create_thumb_path(self.url)
+            size = MainUtils.get_f_size(stats.st_size)
+            mod = MainUtils.get_f_date(stats.st_mtime)
+            coll = MainUtils.get_coll_name(mail_folder_path, self.url)
+            thumb_path = MainUtils.create_thumb_path(self.url)
 
             res = {
                 Lang.file_name: self.lined_text(name),
@@ -287,7 +287,7 @@ class SingleImgInfo(URunnable):
                 self.signals_.delayed_info.emit(res)
         
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
             res = {
                 Lang.file_name: self.lined_text(os.path.basename(self.url)),
                 Lang.place: self.lined_text(self.url),
@@ -296,7 +296,7 @@ class SingleImgInfo(URunnable):
             self.signals_.finished_.emit(res)
 
     def get_img_resol(self, img_path: str):
-        img_ = Utils.read_image(img_path)
+        img_ = MainUtils.read_image(img_path)
         if img_ is not None and len(img_.shape) > 1:
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"
@@ -347,7 +347,7 @@ class MultipleImgInfo(URunnable):
             size_ = stats.st_size
             total += size_
 
-        return Utils.get_f_size(total)
+        return MainUtils.get_f_size(total)
 
     def lined_text(self, text: str):
         if len(text) > self.max_row:
@@ -385,19 +385,19 @@ class RemoveFilesTask(URunnable):
             command = ["osascript", self.scpt] + self.img_path_list
             subprocess.run(command)
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
         try:
             self.signals_.finished_.emit()
         except RuntimeError as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
 
     def remove_thumbs(self):      
         thumb_path_list = [
-            Utils.create_thumb_path(img_path)
+            MainUtils.create_thumb_path(img_path)
             for img_path in self.img_path_list
         ]
         rel_thumb_path_list = [
-            Utils.get_rel_thumb_path(thumb_path)
+            MainUtils.get_rel_thumb_path(thumb_path)
             for thumb_path in thumb_path_list
         ]
 
@@ -437,7 +437,7 @@ class UploadFilesTask(URunnable):
             try:
                 stat = os.stat(img_path)
             except Exception as e:
-                Utils.print_error(e)
+                MainUtils.print_error()
                 continue
             size, birth, mod = stat.st_size, stat.st_birthtime, stat.st_mtime
             data = (img_path, size, birth, mod)
@@ -453,7 +453,7 @@ class UploadFilesTask(URunnable):
         try:
             self.signals_.finished_.emit()
         except RuntimeError as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
 
 
 class ScanerSignals(QObject):

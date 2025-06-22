@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSizePolicy
 from base_widgets import LayoutVer
 from cfg import Dynamic, Static, ThumbData
 from signals import SignalsApp
-from utils.main import Utils
+from utils.main import MainUtils
 
 from ._db_images import DbImage
 
@@ -182,7 +182,7 @@ class Thumbnail(QFrame, CellWid):
 
         # рамка вокруг pixmap при выделении Thumb
         self.img_wid.setFixedSize(Thumbnail.pixmap_size + ThumbData.OFFSET, Thumbnail.pixmap_size + ThumbData.OFFSET)
-        self.img_wid.setPixmap(Utils.pixmap_scale(self.img, self.pixmap_size))
+        self.img_wid.setPixmap(MainUtils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
         self.img_wid.setStyleSheet(self.style_)

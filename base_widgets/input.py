@@ -2,7 +2,7 @@ from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QLineEdit
 
 from lang import Lang
-from utils.main import Utils
+from utils.main import MainUtils
 
 from .context import ContextCustom
 
@@ -30,13 +30,13 @@ class ULineEdit(QLineEdit):
 
     def cut_selection(self, *args):
         text = self.selectedText()
-        Utils.copy_text(text)
+        MainUtils.copy_text(text)
 
         new_text = self.text().replace(text, "")
         self.setText(new_text)
 
     def paste_text(self, *args):
-        text = Utils.paste_text()
+        text = MainUtils.paste_text()
         self.insert(text)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
@@ -49,7 +49,7 @@ class ULineEdit(QLineEdit):
 
         sel_all = QAction(text=Lang.copy, parent=self.menu_)
         sel_all.triggered.connect(
-            lambda: Utils.copy_text(self.selectedText())
+            lambda: MainUtils.copy_text(self.selectedText())
         )
         self.menu_.addAction(sel_all)
 

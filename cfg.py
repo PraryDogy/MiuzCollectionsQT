@@ -282,8 +282,8 @@ class JsonData:
         # удаляем пользовательскую hashdir из ApplicationSupport
         if os.path.exists(Static.THUMBS_DIR):
             print("Удаляю пользовательскую HASH_DIR")
-            from utils.main import Utils
-            Utils.rm_rf(Static.THUMBS_DIR)
+            from utils.main import MainUtils
+            MainUtils.rm_rf(Static.THUMBS_DIR)
 
         # копируем предустановленную hashdir в AppliactionSupport
         if os.path.exists(Static.PRELOAD_THUMBS_ZIP):

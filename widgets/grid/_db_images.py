@@ -13,7 +13,7 @@ from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
 from utils.tasks import URunnable
-from utils.main import Utils
+from utils.main import MainUtils
 
 
 class DbImage:
@@ -72,11 +72,11 @@ class DbImages(URunnable):
                 continue
 
             mod = datetime.fromtimestamp(mod).date()
-            thumb_path = Utils.get_thumb_path(rel_thumb_path)
-            thumb = Utils.read_thumb(thumb_path)
+            thumb_path = MainUtils.get_thumb_path(rel_thumb_path)
+            thumb = MainUtils.read_thumb(thumb_path)
 
             if isinstance(thumb, ndarray):
-                pixmap = Utils.pixmap_from_array(thumb)
+                pixmap = MainUtils.pixmap_from_array(thumb)
             else:
                 continue
 

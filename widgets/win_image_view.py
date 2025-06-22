@@ -13,7 +13,7 @@ from base_widgets.wins import WinChild
 from cfg import Dynamic, Static
 from main_folder import MainFolder
 from utils.tasks import LoadImage, LoadThumb
-from utils.main import UThreadPool, Utils
+from utils.main import UThreadPool, MainUtils
 
 from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
                       WinInfoAction)
@@ -247,7 +247,7 @@ class WinImageView(WinChild):
         self.image_label.set_image(pixmap)
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
-            self.img_path = Utils.get_img_path(main_folder_path, self.rel_img_path)
+            self.img_path = MainUtils.get_img_path(main_folder_path, self.rel_img_path)
             self.load_image()
         else:
             print("img viewer > no smb")
@@ -397,7 +397,7 @@ class WinImageView(WinChild):
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             main_folder_path = MainFolder.current.is_available()
             if main_folder_path:
-                img_path = Utils.get_img_path(main_folder_path, self.rel_img_path)
+                img_path = MainUtils.get_img_path(main_folder_path, self.rel_img_path)
                 img_path_list = [img_path]
                 self.info_win = WinInfo(img_path_list)
                 self.info_win.finished_.connect(self.open_info_win_delayed)

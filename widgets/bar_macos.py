@@ -9,7 +9,7 @@ from base_widgets import ContextCustom
 from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
-from utils.main import Utils
+from utils.main import MainUtils
 
 from .win_settings import WinSettings
 
@@ -40,14 +40,14 @@ class SelectableLabel(QLabel):
         context_menu.addSeparator()
 
         select_all = QAction(parent=context_menu, text=Lang.copy_all)
-        select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
+        select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
         context_menu.show_menu()
         return super().contextMenuEvent(ev)
 
     def copy_text_md(self):
-        Utils.copy_text(self.selectedText())
+        MainUtils.copy_text(self.selectedText())
 
 
 class AboutWin(WinSystem):

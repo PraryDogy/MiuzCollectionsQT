@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow, QWidget
 
-from utils.main import Utils
+from utils.main import MainUtils
 
 from .layouts import LayoutVer
 
@@ -34,7 +34,7 @@ class WinFrameless(QMainWindow):
             geo.moveCenter(parent.geometry().center())
             self.setGeometry(geo)
         except (RuntimeError, Exception) as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:

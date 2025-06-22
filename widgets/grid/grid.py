@@ -14,7 +14,7 @@ from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.main import UThreadPool, Utils
+from utils.main import UThreadPool, MainUtils
 
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
                        OpenInView, RemoveFiles, Reveal, Save, ScanerRestart,
@@ -321,7 +321,7 @@ class Grid(QScrollArea):
     def remove_files_win(self):
         main_folder_path = MainFolder.current.is_available()
         img_path_list = [
-            Utils.get_img_path(main_folder_path, i.rel_img_path)
+            MainUtils.get_img_path(main_folder_path, i.rel_img_path)
             for i in self.selected_widgets
         ]
         self.rem_win = RemoveFilesWin(img_path_list)
@@ -353,7 +353,7 @@ class Grid(QScrollArea):
                 main_folder_path = MainFolder.current.is_available()
                 if main_folder_path:
                     img_path_list = [
-                        Utils.get_img_path(main_folder_path, i.rel_img_path)
+                        MainUtils.get_img_path(main_folder_path, i.rel_img_path)
                         for i in self.selected_widgets
                     ]
                     self.info_win = WinInfo(img_path_list)
@@ -625,7 +625,7 @@ class Grid(QScrollArea):
         try:
             distance = (a0.pos() - self.origin_pos).manhattanLength()
         except AttributeError as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
             return
 
         if distance < QApplication.startDragDistance():
@@ -650,7 +650,7 @@ class Grid(QScrollArea):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
-                Utils.get_img_path(main_folder_path, i.rel_img_path)
+                MainUtils.get_img_path(main_folder_path, i.rel_img_path)
                 for i in self.selected_widgets
             ]
         else:

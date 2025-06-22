@@ -7,7 +7,7 @@ from sqlalchemy import func
 from cfg import JsonData
 from database import DIRS, THUMBS, ClmNames, Dbase
 from main_folder import MainFolder, miuz, panacea
-from utils.main import Utils
+from utils.main import MainUtils
 
 
 class Dirs:
@@ -24,7 +24,7 @@ class Dirs:
                     stack.append(i.path)
                     dirs.append(
                         (
-                            Utils.get_short_img_path(main_folder_path, i.path),
+                            MainUtils.get_short_img_path(main_folder_path, i.path),
                             int(i.stat().st_mtime)
                         )
                     )
@@ -71,14 +71,14 @@ class Dirs:
             try:
                 conn.execute(q)
             except Exception as e:
-                Utils.print_error(e)
+                MainUtils.print_error()
                 conn.rollback()
                 continue
         
         try:
             conn.commit()
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
             conn.rollback()
 
     @classmethod
@@ -97,14 +97,14 @@ class Dirs:
             try:
                 conn.execute(q)
             except Exception as e:
-                Utils.print_error(e)
+                MainUtils.print_error()
                 conn.rollback()
                 continue
         
         try:
             conn.commit()
         except Exception as e:
-            Utils.print_error(e)
+            MainUtils.print_error()
             conn.rollback()
 
 
