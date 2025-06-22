@@ -5,64 +5,38 @@ from time import sleep
 import sqlalchemy
 import sqlalchemy.exc
 from numpy import ndarray
+from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import Static, ThumbData
 from database import THUMBS, ClmNames, Dbase
 from lang import Lang
 from main_folder import MainFolder
-from signals import SignalsApp
 
 from .main import TaskState, Utils
 
-"""
-Важно:
-FinderImages собирает все изображения в main_folder,
-которые будут сравниваться со всеми изображениями из DbImages.
-и если FinderImages будет прерван каким-либо образом,
-то будет сравнение всех изображений из DbImages только с частью
-изображений FinderImages, а остальные будут считаться удаленными.
-Чтобы избежать этого, у нас есть флаг can_scan в ScanHelper.
-"""
 
+class FinderImages(QObject):
+    progress_text = pyqtSignal(str)
 
-class ScanHelper:
-    @classmethod
-    def progressbar_text(cls, text: str):
-        try:
-            SignalsApp.instance.progressbar_text.emit(text)
-        except RuntimeError as e:
-            pass
-
-    @classmethod
-    def reload_gui(cls):
-        try:
-            SignalsApp.instance.menu_left_cmd.emit("reload")
-            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-        except RuntimeError as e:
-            Utils.print_error(e)
-
-
-class FinderImages:
     def __init__(self, main_folder: MainFolder, task_state: TaskState):
         """
-        run() to start
+        Запуск: run()   
+        Сигналы: progress_text(str)     
+
+        Возвращает все изображения, найденные в MainFolder    
+        [(img_path, size, birth_time, mod_time), ...]   
+        Если не найдено ни одного изображения, вернет None и установит
+        TaskState.should_run на False
+
+        При любой неизвестной ошибке TaskState.should_run будет установлен на False,     
+        чтобы последующие действия не привели к массовому удалению фотографий.      
+        Возвращает None
         """
         super().__init__()
         self.main_folder = main_folder
         self.task_state = task_state
 
     def run(self) -> list | None:
-        """
-        Возвращает все изображения из MainFolder    
-        [(img_path, size, birth_time, mod_time), ...]
-        Если не найдено ни одного изображения, вернет None и установит
-        ScanHelper.can_scan на False
-        ---     
-        При любой неизвестной ошибке ScanHelper.can_scan установит на False,     
-        Чтобы последующие действия не привели к массовому удалению фотографий.      
-        Смотри сообщение в начале файла.
-        Возвращает None
-        """
         try:
             collections = self.get_main_folder_subdirs()
             finder_images = self.process_subdirs(collections)
@@ -103,8 +77,8 @@ class FinderImages:
         subrirs_count = len(subdirs)
 
         for index, subdir in enumerate(subdirs[:-1], start=1):
-            progress_text = self.get_progress_text(index, subrirs_count)
-            ScanHelper.progressbar_text(progress_text)
+            text = self.get_progress_text(index, subrirs_count)
+            self.progress_text.emit(text)
             try:
                 walked_images = self.walk_subdir(subdir)
                 finder_images.extend(walked_images)
@@ -160,13 +134,22 @@ class FinderImages:
         )
 
 
-class DbImages:
+class DbImages(QObject):
+    progress_text = pyqtSignal(str)
+
     def __init__(self, main_folder: MainFolder):
+        """
+        Запуск: run()   
+        Сигналы: progress_text(str)     
+
+        Возвращает записи из бд, относящиеся к MainFolder:  
+        {rel thumb path: (img path, size, birth time, mod time), ...}   
+        """
         super().__init__()
         self.main_folder = main_folder
 
-    def run(self) -> dict[str, tuple[str, int, int, int]]:
-        ScanHelper.progressbar_text("")
+    def run(self) -> dict:
+        self.progress_text.emit("")
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(
@@ -195,11 +178,29 @@ class DbImages:
 
 class Compator:
     def __init__(self, finder_images: dict, db_images: dict):
+        """
+        Сравнивает данные об изображениях FinderImages и DbImages.  
+        del_items: нет в FinderImages и есть в DbImages     
+        new_items: есть в FinderImages и нет в DbImages
+
+        Принимает:      
+        finder_images: [(img_path, size, birth_time, mod_time), ...]    
+        db_images:  {rel thumb path: (img path, size, birth time, mod time), ...}
+
+        Возвращает:
+        del_items: [rel thumb path, ...]    
+        new_items: [(img_path, size, birth, mod), ...]
+        """
         super().__init__()
         self.finder_images = finder_images
         self.db_images = db_images
 
     def run(self):
+        """
+        Возвращает:
+        del_items: [rel thumb path, ...]    
+        new_items: [(img_path, size, birth, mod), ...]
+        """
         finder_set = set(self.finder_images)
         db_values = set(self.db_images.values())
         del_items = [k for k, v in self.db_images.items() if v not in finder_set]
@@ -207,16 +208,25 @@ class Compator:
         return del_items, ins_items
 
 
-class FileUpdater:
+class FileUpdater(QObject):
     sleep_count = 0.1
+    progress_text = pyqtSignal(str)
+    reload_gui = pyqtSignal()
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
-        Удаляет thumbs из hashdir   
-        Добавляет thumbs в hashdir  
+        Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
+        Запуск: run()   
+        Сигналы: progress_text(str), reload_gui()   
+        
+        Принимает:  
         del_items: [rel_thumb_path, ...]    
         new_items: [(img_path, size, birth, mod), ...]  
-        run() to start  
+
+
+        Возвращает:     
+        del_items: [rel_thumb_path, ...]    
+        new_items: [(img_path, size, birth, mod), ...]  
         """
         super().__init__()
         self.del_items = del_items
@@ -234,7 +244,7 @@ class FileUpdater:
             return ([], [])
         del_items = self.run_del_items()
         new_items = self.run_new_items()
-        ScanHelper.progressbar_text("")
+        self.progress_text.emit("")
         return del_items, new_items
 
     def progressbar_text(self, text: str, x: int, total: int):
@@ -245,7 +255,7 @@ class FileUpdater:
         """
         main_folder = self.main_folder.name.capitalize()
         t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
-        ScanHelper.progressbar_text(t)
+        self.progress_text.emit(t)
 
     def run_del_items(self):
         new_del_items = []
@@ -267,7 +277,7 @@ class FileUpdater:
                     Utils.print_error(e)
                     continue
         if total > 0:
-            ScanHelper.reload_gui()
+            self.reload_gui.emit()
         return new_del_items
 
     def create_thumb(self, img_path: str) -> ndarray | None:
@@ -297,18 +307,19 @@ class FileUpdater:
                 Utils.print_error(e)
                 continue
         if total > 0:
-            ScanHelper.reload_gui()
+            self.reload_gui.emit()
         return new_new_items
 
 
 class DbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
-        Удаляет записи thumbs из бд   
-        Добавляет записи thumbs в бд
-        del_items: [rel_thumb_path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]      
-        run() to start  
+        Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
+        Запуск: run()  
+
+        Принимает:  
+        - del_items: [rel_thumb_path, ...]       
+        - new_items: [(img_path, size, birth, mod), ...]          
         """
         super().__init__()
         self.main_folder = main_folder
@@ -382,9 +393,14 @@ class DbUpdater:
         conn.close()
 
 
-class MainFolderRemover:
+class MainFolderRemover(QObject):
+    progress_text = pyqtSignal(str)
+
     def __init__(self):
         """
+        Запуск: run()   
+        Сигналы: progress_text(str)
+
         Сверяет список экземпляров класса MainFolder в бд (THUMBS.c.brand)     
         со списком MainFolder в приложении.     
         Удаляет весь контент MainFolder, если MainFolder больще нет в бд:   
@@ -441,7 +457,7 @@ class MainFolderRemover:
                 if not os.listdir(folder):
                     os.rmdir(folder)
                 t = f"{Lang.deleting}: {x} {Lang.from_} {total}"
-                ScanHelper.progressbar_text(t)
+                self.progress_text.emit(t)
             except Exception as e:
                 Utils.print_error(e)
                 continue
