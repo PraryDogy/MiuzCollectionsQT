@@ -1,6 +1,5 @@
 import gc
 import os
-from time import sleep
 
 import sqlalchemy
 import sqlalchemy.exc
@@ -77,8 +76,8 @@ class FinderImages(QObject):
         subrirs_count = len(subdirs)
 
         for index, subdir in enumerate(subdirs[:-1], start=1):
-            import time
-            time.sleep(0.5)
+            # import time
+            # time.sleep(0.5)
             if not self.task_state.should_run():
                 return finder_images
             text = self.get_progress_text(index, subrirs_count)
@@ -213,7 +212,6 @@ class Compator:
 
 
 class FileUpdater(QObject):
-    sleep_count = 0.1
     progress_text = pyqtSignal(str)
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
@@ -275,7 +273,6 @@ class FileUpdater(QObject):
                     if not os.listdir(folder):
                         os.rmdir(folder)
                     new_del_items.append(rel_thumb_path)
-                    sleep(self.sleep_count)
                 except Exception as e:
                     Utils.print_error(e)
                     continue
@@ -303,7 +300,6 @@ class FileUpdater(QObject):
                 thumb_path = Utils.create_thumb_path(img_path)
                 Utils.write_thumb(thumb_path, thumb)
                 new_new_items.append((img_path, size, birth, mod))
-                sleep(self.sleep_count)
             except Exception as e:
                 Utils.print_error(e)
                 continue
