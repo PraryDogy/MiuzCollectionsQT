@@ -193,24 +193,10 @@ class Static:
 
 
 class JsonData:
-
-    # ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ ЕСЛИ ЕЩЕ НЕТ КОНФИГ ФАЙЛА В APP_SUPPORT
-
     app_ver: str = Static.APP_VER
-
-    # индекс соответствующий Lang
     lang_ind = 0
-
     dark_mode = None
-    
-    # как часто utils > scaner будет просматривать collfolders на изменения
     scaner_minutes: int = 5
-    
-    # при чтении json файла происходит проверка: если в json файле
-    # есть аттрибут, которого нет в JsonData, то он будет удален
-    # а нам нужно, чтобы main_folders из файла main_folders
-    # продолжал существовать в json файле
-    main_folders: dict[str, dict] = {}
 
     @classmethod
     def get_data(cls) -> dict[str, str]:
@@ -225,16 +211,12 @@ class JsonData:
 
     @classmethod
     def read_json_data(cls) -> dict:
-
         with open(Static.JSON_FILE, 'r', encoding="utf-8") as f:
-
             try:
                 json_data: dict = json.load(f)
-
             except json.JSONDecodeError:
                 print("Ошибка чтения json")
                 json_data = cls.get_data()
-            
         for k, v in json_data.items():
             if hasattr(cls, k):
                 setattr(cls, k, v)
