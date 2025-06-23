@@ -228,6 +228,7 @@ class WinMain(WinFrameless):
         for i in UThreadPool.tasks:
             i.task_state.set_should_run(False)
         JsonData.write_json_data()
+        MainFolder.write_json_data()
 
     def open_dates_win(self):
         dates_win = WinDates()

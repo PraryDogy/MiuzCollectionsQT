@@ -46,7 +46,7 @@ class UPallete:
 class ThemeChanger:
 
     @classmethod
-    def start(cls):
+    def init(cls):
         app: QApplication = QApplication.instance()
         if JsonData.dark_mode is None:
             app.setPalette(QPalette())

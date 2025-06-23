@@ -708,7 +708,7 @@ class Themes(QGroupBox):
         elif sender == self.light_theme:
             JsonData.dark_mode = False
 
-        ThemeChanger.start()
+        ThemeChanger.init()
         self.theme_changed.emit()
 
     def set_selected(self, selected_frame: SvgFrame):
@@ -861,6 +861,7 @@ class WinSettings(WinSystem):
             elif hasattr(main_folder_wid, ADD_NEW_MAIN_FOLDER):
                 MainFolder.list_.append(getattr(main_folder_wid, ADD_NEW_MAIN_FOLDER))
             JsonData.write_json_data()
+            MainFolder.write_json_data()
             restart_app = True
 
         elif hasattr(main_folder_tab, NEED_REBOOT):

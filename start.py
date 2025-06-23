@@ -73,14 +73,22 @@ from widgets.win_main import WinMain
 class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
-        JsonData.init()
-        Dbase.init()
-        Lang.init()
-        MainFolder.init()
+
+        classes = [
+            JsonData,
+            Dbase,
+            Lang,
+            MainFolder,
+            UThreadPool,
+            SignalsApp,
+            ThemeChanger,
+        ]
+
+        for cls in classes:
+            cls.init()
+
         JsonData.write_json_data()
-        UThreadPool.init()
-        SignalsApp.init()
-        ThemeChanger.start()
+        MainFolder.write_json_data()
 
         icon_path = os.path.join(Static.images_dir, "icon.icns")
         icon = QIcon(icon_path)
