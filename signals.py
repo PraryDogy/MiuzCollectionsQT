@@ -2,7 +2,6 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 
 class Signals(QObject):
-    bar_top_reset_filters = pyqtSignal()
     btn_dates_style = pyqtSignal(str)
     grid_thumbnails_cmd = pyqtSignal(str)
     progressbar_text = pyqtSignal(str)

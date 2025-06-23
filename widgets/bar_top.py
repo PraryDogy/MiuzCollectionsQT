@@ -87,14 +87,10 @@ class BarTop(QWidget):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(35)
-
         self.h_layout = LayoutHor()
         self.setLayout(self.h_layout)
-
         self.filter_btns = []
         self.win_dates = None
-        SignalsApp.instance.bar_top_reset_filters.connect(self.disable_filters)
-
         self.init_ui()
 
     def init_ui(self):
@@ -132,11 +128,3 @@ class BarTop(QWidget):
         self.win_dates = WinDates()
         self.win_dates.center_relative_parent(self.window())
         self.win_dates.show()
-
-    def disable_filters(self):
-        for i in self.filter_btns:
-            i: FilterBtn
-            i.set_normal_style()
-
-        for filter in Filter.filters_list:
-            filter.value = False
