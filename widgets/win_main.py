@@ -13,8 +13,8 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 from utils.main import UThreadPool
-from utils.tasks import (CopyFilesTask, MainUtils, RemoveFilesTask, ScanerTask,
-                         UploadFilesTask)
+from utils.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
+                         RemoveFilesTask, ScanerTask, UploadFilesTask)
 
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -251,7 +251,6 @@ class WinMain(WinFrameless):
             self.open_smb_win()
 
     def filemove_task_start(self, dest: str, img_path_list: list):
-        from utils.tasks import MoveFilesTask
         task = MoveFilesTask(dest, img_path_list)
         task.reload_gui.connect(lambda: self.reload_gui())
         task.set_progress_text.connect(lambda text: self.set_progress_text(text))
