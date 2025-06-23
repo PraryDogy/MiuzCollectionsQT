@@ -138,7 +138,7 @@ class WinDownloads(WinSystem):
 
     def main_actions(self):
 
-        for thread in CopyFilesTask.current_threads:
+        for thread in CopyFilesTask.list_:
 
             if thread not in self.download_items:
                 if not thread.task_state.finished():

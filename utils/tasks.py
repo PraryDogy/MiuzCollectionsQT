@@ -12,7 +12,8 @@ from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
 
-from .main import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
+from .main import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
+                   UThreadPool)
 from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
                            FinderImages, MainFolderRemover)
 
@@ -24,13 +25,15 @@ class CopyFilesSignals(QObject):
 
 
 class CopyFilesTask(URunnable):
-    current_threads: list["CopyFilesTask"] = []
+    list_: list["CopyFilesTask"] = []
     list_of_file_lists: list[list[str]] = []
 
     def __init__(self, dest: str, files: list):
         """
-        Если move_files установить на True, то исходные файлы будут удалены
-        по законам перемещения
+        Список задач по копированию: CopyFilesTask  
+        Копирует файлы в новую директорую.  
+        Добавляется в список задач по копированию.  
+        Удаляется из списка задач по копированию по готовности.    
         """
         super().__init__()
         self.signals_ = CopyFilesSignals()
@@ -38,7 +41,7 @@ class CopyFilesTask(URunnable):
         self.dest = dest
 
     def task(self):
-        CopyFilesTask.current_threads.append(self)
+        CopyFilesTask.list_.append(self)
         SignalsApp.instance.win_downloads_open.emit()
 
         copied_size = 0
@@ -48,7 +51,7 @@ class CopyFilesTask(URunnable):
             total_size = sum(os.path.getsize(file) for file in self.files)
         except Exception as e:
             MainUtils.print_error()
-            self.finalize(files_dests)
+            self.copy_files_finished(files_dests)
             return
 
         self.signals_.value_changed.emit(0)
@@ -75,16 +78,13 @@ class CopyFilesTask(URunnable):
                 MainUtils.print_error()
                 break
         
-        self.finalize(files_dests)
+        self.copy_files_finished(files_dests)
 
-    def finalize(self, files_dests: list[str]):
-        try:
-            self.signals_.value_changed.emit(100)
-        except RuntimeError:
-            ...
+    def copy_files_finished(self, files_dests: list[str]):
+        self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
         CopyFilesTask.list_of_file_lists.append(files_dests)
-        CopyFilesTask.current_threads.remove(self)
+        CopyFilesTask.list_.remove(self)
 
 
 class FavSignals(QObject):
@@ -556,3 +556,51 @@ class ScanerTask(URunnable):
             db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
             db_updater.run()
+
+
+class MoveFilesTask(QObject):
+    set_progress_text = pyqtSignal(str)
+    reload_gui = pyqtSignal()
+
+    def __init__(self, dest: str, img_path_list: list):
+        """
+        Старт: вызов метода run()   
+        Сигналы: set_progress_text(str), reload_gui()   
+        - Копирует файлы в новую директорию
+        - Удаляет файлы из исходной директории
+        - Делает записи в hashdir и в базу данных
+        """
+        super().__init__()
+        self.dest = dest
+        self.img_path_list = img_path_list
+
+    def run(self):
+        self.start_copy_task()
+
+    def start_copy_task(self):
+        """
+        Копирует файлы в заданную директорию.
+        """
+        copy_task = CopyFilesTask(self.dest, self.img_path_list)
+        cmd = lambda new_img_path_list: self.start_remove_task(self.img_path_list, new_img_path_list)
+        copy_task.signals_.finished_.connect(cmd)
+        UThreadPool.start(copy_task)
+
+    def start_remove_task(self, img_path_list: list, new_img_path_list: list):
+        """
+        Удаляет исходные файлы (перемещение из исходной директории).
+        """
+        remove_task = RemoveFilesTask(img_path_list)
+        cmd = lambda: self.start_upload_task(new_img_path_list)
+        remove_task.signals_.finished_.connect(cmd)
+        remove_task.signals_.progress_text.connect(lambda text: self.set_progress_text.emit(text))
+        UThreadPool.start(remove_task)
+
+    def start_upload_task(self, new_img_path_list: list):
+        """
+        Загружает в hadhdir миниатюры и делает записи в базу данных.
+        """
+        upload_task = UploadFilesTask(new_img_path_list)
+        upload_task.signals_.progress_text.connect(lambda text: self.set_progress_text.emit(text))
+        upload_task.signals_.reload_gui.connect(lambda: self.reload_gui.emit())
+        UThreadPool.start(upload_task)

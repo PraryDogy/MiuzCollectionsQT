@@ -251,24 +251,11 @@ class WinMain(WinFrameless):
             self.open_smb_win()
 
     def filemove_task_start(self, dest: str, img_path_list: list):
-        copy_task = CopyFilesTask(dest, img_path_list)
-        cmd = lambda new_img_path_list: self.filemove_task_fin(img_path_list, new_img_path_list)
-        copy_task.signals_.finished_.connect(cmd)
-        UThreadPool.start(copy_task)
-        
-    def filemove_task_fin(self, img_path_list: list, new_img_path_list: list):
-        remove_task = RemoveFilesTask(img_path_list)
-        cmd = lambda: self.filemove_task_fin_sec(new_img_path_list)
-        remove_task.signals_.finished_.connect(cmd)
-        remove_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-        remove_task.signals_.reload_gui.connect(lambda: self.reload_gui())
-        UThreadPool.start(remove_task)
-
-    def filemove_task_fin_sec(self, new_img_path_list: list):
-        upload_task = UploadFilesTask(new_img_path_list)
-        upload_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-        upload_task.signals_.reload_gui.connect(lambda: self.reload_gui())
-        UThreadPool.start(upload_task)
+        from utils.tasks import MoveFilesTask
+        task = MoveFilesTask(dest, img_path_list)
+        task.reload_gui.connect(lambda: self.reload_gui())
+        task.set_progress_text.connect(lambda text: self.set_progress_text(text))
+        task.run()
 
     def open_remove_files_win(self, rel_img_path_list: list):
         main_folder_path = MainFolder.current.is_available()
