@@ -21,6 +21,7 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
+from .win_downloads import WinDownloads
 from .win_remove_files import RemoveFilesWin
 from .win_smb import WinSmb
 from .win_upload import WinUpload
@@ -291,12 +292,18 @@ class WinMain(WinFrameless):
         cmd = lambda img_path_list: self.upload_task_finished(img_path_list)
         copy_files_task.signals_.finished_.connect(cmd)
         UThreadPool.start(copy_files_task)
+        self.open_downloads_win()
 
     def upload_task_finished(self, img_path_list: list[str]):
         upload_files_task = UploadFilesTask(img_path_list)
         upload_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
         upload_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
         UThreadPool.start(upload_files_task)
+
+    def open_downloads_win(self):
+        down_win = WinDownloads()
+        down_win.center_relative_parent(self)
+        down_win.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()

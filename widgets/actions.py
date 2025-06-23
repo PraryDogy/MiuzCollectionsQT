@@ -193,6 +193,7 @@ class Save(QAction):
             SmbWin.show(self.win_)
 
     def copy_files_cmd(self, dest: str, img_path_list: list):
+        # ПЕРЕМЕСТИТЬ В МАИН ВИН
         thread_ = CopyFilesTask(dest, img_path_list)
         UThreadPool.start(thread_)
 

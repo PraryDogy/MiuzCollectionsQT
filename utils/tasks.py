@@ -10,7 +10,6 @@ from cfg import JsonData
 from database import THUMBS, Dbase
 from lang import Lang
 from main_folder import MainFolder
-from signals import SignalsApp
 
 from .main import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
                    UThreadPool)
@@ -65,7 +64,6 @@ class CopyFilesTask(URunnable):
 
     def task(self):
         CopyFilesTask.list_.append(self)
-        SignalsApp.instance.win_downloads_open.emit()
 
         copied_size = 0
         files_dests = []
