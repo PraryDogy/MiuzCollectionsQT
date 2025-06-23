@@ -1,19 +1,18 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QTimer, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 
 from cfg import Dynamic, Static
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import CopyFilesTask, FavTask
-from utils.main import UThreadPool, MainUtils
+from utils.main import MainUtils, UThreadPool
+from utils.tasks import FavTask
 
 from .win_info import WinInfo
 from .win_smb import WinSmb
-from .win_upload import WinUpload
 
 
 class SmbWin:
@@ -134,9 +133,6 @@ class Reveal(QAction):
             SmbWin.show(self.win_)
 
 
-
-
-
 class FavActionDb(QAction):
     finished_ = pyqtSignal(int)
 
@@ -192,7 +188,7 @@ class Save(QAction):
                 dest = dialog.getExistingDirectory()
             else:
                 dest = Dynamic.down_folder
-            if dest:
+            if dest and os.path.isdir(dest):
                 self.save_files_finalize(dest, img_path_list)
         else:
             SmbWin.show(self.win_)

@@ -302,7 +302,6 @@ class WinMain(WinFrameless):
         UThreadPool.start(upload_files_task)
 
     def save_files_task(self, dest: str, img_path_list: list):
-        print(dest, img_path_list)
         copy_files_task = CopyFilesTask(dest, img_path_list)
         UThreadPool.start(copy_files_task)
         self.open_downloads_win()
