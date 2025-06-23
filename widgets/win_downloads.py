@@ -138,7 +138,7 @@ class WinDownloads(WinSystem):
 
     def main_actions(self):
 
-        for thread in CopyFilesTask.list_:
+        for thread in CopyFilesTask.get_current_tasks():
 
             if thread not in self.download_items:
                 if not thread.task_state.finished():
@@ -152,7 +152,7 @@ class WinDownloads(WinSystem):
                     self.progress_layout.addWidget(item)
                     self.download_items.append(thread)
 
-        for files_list in CopyFilesTask.list_of_file_lists:
+        for files_list in CopyFilesTask.copied_files():
             if files_list not in self.download_items:
                 item = OldDownloadsItem(files=files_list)
                 one = lambda: self.remove_from_file_lists(download_item=files_list)
@@ -167,7 +167,7 @@ class WinDownloads(WinSystem):
         try:
             self.download_items.remove(download_item)
             if isinstance(download_item, list):
-                CopyFilesTask.list_of_file_lists.remove(download_item)
+                CopyFilesTask.copied_files.remove(download_item)
             elif isinstance(download_item, CopyFilesTask):
                 download_item.signals_.stop.emit()
         except Exception:

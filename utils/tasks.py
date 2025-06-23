@@ -26,7 +26,7 @@ class CopyFilesSignals(QObject):
 
 class CopyFilesTask(URunnable):
     list_: list["CopyFilesTask"] = []
-    list_of_file_lists: list[list[str]] = []
+    copied_files_: list[list[str]] = []
 
     def __init__(self, dest: str, files: list):
         """
@@ -39,6 +39,29 @@ class CopyFilesTask(URunnable):
         self.signals_ = CopyFilesSignals()
         self.files = files
         self.dest = dest
+
+    @classmethod
+    def get_current_tasks(cls):
+        """
+        Возвращает список действующих задач CopyFilesTask
+        """
+        return CopyFilesTask.list_
+    
+    @classmethod
+    def copied_files(cls):
+        """
+        Возвращает список списков с путями к уже скопированным файлам.
+
+        Формат:
+            [
+                [<путь_к_файлу1>, <путь_к_файлу2>],  # скопированные файлы одной задачи
+                ...
+            ]
+
+        Каждая задача CopyFilesTask после успешного копирования добавляет
+        список путей своих скопированных файлов в общий список copied_files_.
+        """
+        return CopyFilesTask.copied_files_
 
     def task(self):
         CopyFilesTask.list_.append(self)
@@ -83,7 +106,7 @@ class CopyFilesTask(URunnable):
     def copy_files_finished(self, files_dests: list[str]):
         self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
-        CopyFilesTask.list_of_file_lists.append(files_dests)
+        CopyFilesTask.copied_files.append(files_dests)
         CopyFilesTask.list_.remove(self)
 
 
