@@ -21,7 +21,6 @@ from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
 class CopyFilesSignals(QObject):
     finished_ = pyqtSignal(list)
     value_changed = pyqtSignal(int)
-    stop = pyqtSignal()
 
 
 class CopyFilesTask(URunnable):
@@ -30,10 +29,12 @@ class CopyFilesTask(URunnable):
 
     def __init__(self, dest: str, files: list):
         """
-        Список задач по копированию: CopyFilesTask  
         Копирует файлы в новую директорую.  
         Добавляется в список задач по копированию.  
         Удаляется из списка задач по копированию по готовности.    
+        Сигналы:
+        - finished(список путей к скопированным файлам)
+        - value_changed(0-100, для передачи в QProgressBar)
         """
         super().__init__()
         self.signals_ = CopyFilesSignals()
@@ -43,23 +44,18 @@ class CopyFilesTask(URunnable):
     @classmethod
     def get_current_tasks(cls):
         """
-        Возвращает список действующих задач CopyFilesTask
+        Возвращает список действующих задач CopyFilesTask:   
+        Сигналы:
+        - finished(список путей к скопированным файлам)
+        - value_changed(0-100, для передачи в QProgressBar)
         """
         return CopyFilesTask.list_
     
     @classmethod
     def copied_files(cls):
         """
-        Возвращает список списков с путями к уже скопированным файлам.
-
-        Формат:
-            [
-                [<путь_к_файлу1>, <путь_к_файлу2>],  # скопированные файлы одной задачи
-                ...
-            ]
-
-        Каждая задача CopyFilesTask после успешного копирования добавляет
-        список путей своих скопированных файлов в общий список copied_files_.
+        Возвращает список списков с путями к уже скопированным файлам.  
+        Формат:[[<путь_к_файлу1>, <путь_к_файлу2>],...]
         """
         return CopyFilesTask.copied_files_
 
