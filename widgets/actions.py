@@ -161,7 +161,12 @@ class FavActionDb(QAction):
 
 
 class Save(QAction):
+    save_files = pyqtSignal(tuple)
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str], save_as: bool):
+        """
+        Сигналы:
+        - save_files: (папка назначения, список файлов для копирования)
+        """
         if save_as:
             text: str = Lang.save_image_in
         else:
@@ -169,13 +174,13 @@ class Save(QAction):
         text = f"{text} ({len(rel_img_path_list)})"
 
         super().__init__(parent=parent, text=text)
-        self.triggered.connect(self.cmd_)
+        self.triggered.connect(self.save_files_cmd)
         self.save_as = save_as
         self.rel_img_path_list = rel_img_path_list
         self.parent_ = parent
         self.win_ = win
 
-    def cmd_(self):
+    def save_files_cmd(self):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
@@ -188,14 +193,13 @@ class Save(QAction):
             else:
                 dest = Dynamic.down_folder
             if dest:
-                self.copy_files_cmd(dest, img_path_list)
+                self.save_files_finalize(dest, img_path_list)
         else:
             SmbWin.show(self.win_)
 
-    def copy_files_cmd(self, dest: str, img_path_list: list):
-        # ПЕРЕМЕСТИТЬ В МАИН ВИН
-        thread_ = CopyFilesTask(dest, img_path_list)
-        UThreadPool.start(thread_)
+    def save_files_finalize(self, dest: str, img_path_list: list):
+        data = (dest, img_path_list)
+        self.save_files.emit(data)
 
 
 class MenuTypes(QMenu):

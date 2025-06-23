@@ -92,6 +92,7 @@ class WinMain(WinFrameless):
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_path_list: self.open_remove_files_win(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
+        self.grid.save_files.connect(lambda data: self.save_files_task(*data))
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -299,6 +300,12 @@ class WinMain(WinFrameless):
         upload_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
         upload_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
         UThreadPool.start(upload_files_task)
+
+    def save_files_task(self, dest: str, img_path_list: list):
+        print(dest, img_path_list)
+        copy_files_task = CopyFilesTask(dest, img_path_list)
+        UThreadPool.start(copy_files_task)
+        self.open_downloads_win()
 
     def open_downloads_win(self):
         down_win = WinDownloads()

@@ -102,7 +102,7 @@ class CopyFilesTask(URunnable):
         self.copy_files_finished(files_dests)
 
     def copy_files_finished(self, files_dests: list[str]):
-        self.signals_.value_changed.emit(100)
+         self.signals_.value_changed.emit(100)
         self.signals_.finished_.emit(files_dests)
         CopyFilesTask.copied_files_.append(files_dests)
         CopyFilesTask.list_.remove(self)

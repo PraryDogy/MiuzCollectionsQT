@@ -91,6 +91,7 @@ class Grid(QScrollArea):
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
     move_files = pyqtSignal(list)
+    save_files = pyqtSignal(tuple)
 
     def __init__(self):
         super().__init__()
@@ -567,9 +568,11 @@ class Grid(QScrollArea):
             self.menu_.addAction(reveal)
 
             save_as = Save(self.menu_, self.window(), rel_img_path_list, True)
+            save_as.save_files.connect(lambda data: self.save_files.emit(data))
             self.menu_.addAction(save_as)
 
             save = Save(self.menu_, self.window(), rel_img_path_list, False)
+            save.save_files.connect(lambda data: self.save_files.emit(data))
             self.menu_.addAction(save)
 
             self.menu_.addSeparator()
