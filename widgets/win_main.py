@@ -85,6 +85,8 @@ class WinMain(WinFrameless):
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
         self.bar_top.open_dates_win.connect(lambda: self.open_dates_win())
+        self.bar_top.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.bar_top.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         right_lay.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -102,9 +104,9 @@ class WinMain(WinFrameless):
         right_lay.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
-        self.bar_bottom.reload_thumbnails.connect(lambda: self.reload_thumbnails())
+        self.bar_bottom.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
         self.bar_bottom.theme_changed.connect(self.grid.reload_rubber)
-        self.bar_bottom.resize_thumbnails.connect(lambda: self.resize_thumbnails())
+        self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
         right_lay.addWidget(self.bar_bottom)
 
         # Добавляем splitter в основной layout
@@ -145,8 +147,8 @@ class WinMain(WinFrameless):
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
-            self.scaner_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-            self.scaner_task.signals_.reload_gui.connect(lambda: self.reload_thumbnails())
+            self.scaner_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
+            self.scaner_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
@@ -221,18 +223,6 @@ class WinMain(WinFrameless):
         x = (screen.width() - size.width()) // 2
         y = (screen.height() - size.height()) // 2
         self.move(x, y)
-    
-    def hide_(self, *args):
-        self.hide()
-
-    def set_progress_text(self, text: str):
-        self.bar_bottom.progress_bar.setText(text)
-
-    def reload_thumbnails(self):
-        self.grid.reload_thumbnails()
-
-    def resize_thumbnails(self):
-        self.grid.resize_thumbnails()
 
     def on_exit(self):
         for i in UThreadPool.tasks:
@@ -269,8 +259,8 @@ class WinMain(WinFrameless):
 
     def filemove_task_start(self, dest: str, img_path_list: list):
         task = MoveFilesTask(dest, img_path_list)
-        task.reload_gui.connect(lambda: self.reload_thumbnails())
-        task.set_progress_text.connect(lambda text: self.set_progress_text(text))
+        task.reload_gui.connect(lambda: self.grid.reload_thumbnails())
+        task.set_progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
         task.run()
 
     def open_remove_files_win(self, rel_img_path_list: list):
@@ -289,8 +279,8 @@ class WinMain(WinFrameless):
     
     def remove_task_start(self, img_path_list: list[str]):
         remove_files_task = RemoveFilesTask(img_path_list)
-        remove_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-        remove_files_task.signals_.reload_gui.connect(lambda: self.reload_thumbnails())
+        remove_files_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
+        remove_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
         UThreadPool.start(remove_files_task)
 
     def ope_upload_win(self, img_path_list: list):
@@ -312,8 +302,8 @@ class WinMain(WinFrameless):
 
     def upload_task_finished(self, img_path_list: list[str]):
         upload_files_task = UploadFilesTask(img_path_list)
-        upload_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-        upload_files_task.signals_.reload_gui.connect(lambda: self.reload_thumbnails())
+        upload_files_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
+        upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
         UThreadPool.start(upload_files_task)
 
     def save_files_task(self, dest: str, img_path_list: list):
@@ -333,7 +323,7 @@ class WinMain(WinFrameless):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                self.hide_(a0)
+                self.hide()
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:

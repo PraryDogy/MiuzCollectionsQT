@@ -44,6 +44,9 @@ class DatesBtn(BarTopBtn):
 
 
 class FilterBtn(BarTopBtn):
+    reload_thumbnails = pyqtSignal()
+    scroll_to_top = pyqtSignal()
+
     def __init__(self, filter: Filter):
         super().__init__(text=filter.names[JsonData.lang_ind])
 
@@ -62,8 +65,8 @@ class FilterBtn(BarTopBtn):
         else:
             self.set_normal_style()
 
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+        self.reload_thumbnails.emit()
+        self.scroll_to_top.emit()
     
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() != Qt.MouseButton.LeftButton:
@@ -74,6 +77,8 @@ class FilterBtn(BarTopBtn):
 
 class BarTop(QWidget):
     open_dates_win = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
+    scroll_to_top = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -89,6 +94,8 @@ class BarTop(QWidget):
 
         for filter in Filter.filters_list:
             label = FilterBtn(filter)
+            label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
+            label.scroll_to_top.connect(lambda: self.scroll_to_top.emit())
             self.filter_btns.append(label)
             self.h_layout.addWidget(
                 label,
