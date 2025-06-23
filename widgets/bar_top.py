@@ -92,7 +92,7 @@ class BarTop(QWidget):
     def init_ui(self):
         self.filter_btns.clear()
 
-        for filter in Filter.filters_list:
+        for filter in Filter.list_:
             label = FilterBtn(filter)
             label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
             label.scroll_to_top.connect(lambda: self.scroll_to_top.emit())

@@ -40,7 +40,7 @@ class NoImagesLabel(QLabel):
 
         enabled_filters = [
             filter.names[JsonData.lang_ind].lower()
-            for filter in Filter.filters_list
+            for filter in Filter.list_
             if filter.value
             ]
 

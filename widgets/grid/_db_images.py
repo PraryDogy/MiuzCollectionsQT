@@ -223,7 +223,7 @@ class DbImages(URunnable):
         user_filters: list[Filter] = []
         sys_filters: list[Filter] = []
 
-        for i in Filter.filters_list:
+        for i in Filter.list_:
             if i.system:
                 sys_filters.append(i)
             else:
