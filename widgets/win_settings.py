@@ -836,49 +836,45 @@ class WinSettings(WinSystem):
         rebootable = self.findChild(RebootableSettings)
         main_folder_tab = self.findChild(TabsWidget)
         main_folder_wid = self.findChild(MainFolderWid)
-
+        restart_app = False
+        
         if self.scaner_minutes != JsonData.scaner_minutes:
             JsonData.write_json_data()
-
+            restart_app = True
+            
         if hasattr(rebootable.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
-            QApplication.quit()
             MainUtils.rm_rf(Static.APP_SUPPORT_DIR)
-            MainUtils.start_new_app()
+            restart_app = True
 
         elif hasattr(rebootable.lang_btn, NEED_REBOOT):
             JsonData.lang_ind += 1
             Lang.init()
             JsonData.write_json_data()
-            QApplication.quit()
-            MainUtils.start_new_app()
+            restart_app = True
 
         elif hasattr(main_folder_wid, NEED_REBOOT):
-
             if hasattr(main_folder_wid, REMOVE_MAIN_FOLDER_NAME):
                 for i in MainFolder.list_:
                     if i.name == getattr(main_folder_wid, REMOVE_MAIN_FOLDER_NAME):
                         MainFolder.list_.remove(i)
-
             elif hasattr(main_folder_wid, ADD_NEW_MAIN_FOLDER):
                 MainFolder.list_.append(getattr(main_folder_wid, ADD_NEW_MAIN_FOLDER))
-
             JsonData.write_json_data()
-            QApplication.quit()
-            MainUtils.start_new_app()
+            restart_app = True
 
         elif hasattr(main_folder_tab, NEED_REBOOT):
             for i in self.findChildren(MainFoldersPaths):
                 i.main_folder_instance.paths = i.get_items()
-
             for i in self.findChildren(StopList):
                 i.main_folder_instance.stop_list = i.get_items()
-
             JsonData.write_json_data()
-            QApplication.quit()
-            MainUtils.start_new_app()
+            restart_app = True
 
         self.deleteLater()
+        if restart_app:
+            QApplication.quit()
+            MainUtils.start_new_app()
 
     def new_row_list(self, wid: CustomTextEdit) -> list[str]:
         return[
