@@ -10,6 +10,7 @@ class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
     __slots__ = [NAME, PATHS, STOP_LIST, _CURR_PATH]
+    json_key = "main_folders"
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str]):
 
@@ -44,7 +45,7 @@ class MainFolder:
         {"main_folders": [("Some Name", ["/path/1", "/path/2"], ["tmp", "cache"])]}
         """
         data = {
-            "main_folders": [
+            MainFolder.json_key: [
                 [i.name, i.paths, i.stop_list]
                 for i in MainFolder.list_
             ]
@@ -56,7 +57,7 @@ class MainFolder:
         """
         структуру смотри в get_data
         """
-        main_folders: list = json_data.get("main_folders")
+        main_folders: list = json_data.get(MainFolder.json_key)
         if not main_folders:
             MainFolder.list_ = cls.default_main_folders()
             MainFolder.current = MainFolder.list_[0]
