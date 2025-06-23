@@ -843,7 +843,7 @@ class WinSettings(WinSystem):
         if hasattr(rebootable.reset_btn, NEED_REBOOT):
             JsonData.write_json_data()
             QApplication.quit()
-            MainUtils.rm_rf(folder_path=Static.APP_SUPPORT_DIR)
+            MainUtils.rm_rf(Static.APP_SUPPORT_DIR)
             MainUtils.start_new_app()
 
         elif hasattr(rebootable.lang_btn, NEED_REBOOT):
