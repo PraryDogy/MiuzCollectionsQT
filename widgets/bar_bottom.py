@@ -177,7 +177,6 @@ class BarBottom(QWidget):
         self.init_ui()
 
         self.downloads_win = None
-        SignalsApp.instance.bar_bottom_filters.connect(self.toggle_types)
         SignalsApp.instance.win_downloads_open.connect(self.open_downloads_win)
         SignalsApp.instance.win_downloads_close.connect(self.close_downloads_win)
 
