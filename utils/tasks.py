@@ -29,12 +29,16 @@ class CopyFilesTask(URunnable):
 
     def __init__(self, dest: str, files: list):
         """
-        Копирует файлы в новую директорую.  
-        Добавляется в список задач по копированию.  
-        Удаляется из списка задач по копированию по готовности.    
+        Копирует файлы в новую директорию.
+
+        Поведение:
+        - Добавляется в список активных задач CopyFilesTask.list_
+        - По завершении удаляется из этого списка
+        - Список путей скопированных файлов добавляется в CopyFilesTask.copied_files
+
         Сигналы:
-        - finished(список путей к скопированным файлам)
-        - value_changed(0-100, для передачи в QProgressBar)
+        - finished(list[str]) — список скопированных файлов
+        - value_changed(int) — значение от 0 до 100 для QProgressBar
         """
         super().__init__()
         self.signals_ = CopyFilesSignals()
@@ -597,11 +601,17 @@ class MoveFilesTask(QObject):
 
     def __init__(self, dest: str, img_path_list: list):
         """
-        Старт: вызов метода run()   
-        Сигналы: set_progress_text(str), reload_gui()   
+        Важно: это QObject, не URunnable. Объединяет несколько URunnable-задач.
+
+        Старт: вызов run()  
+        Сигналы: 
+        - set_progress_text(str)
+        - reload_gui()
+
+        Действия:
         - Копирует файлы в новую директорию
-        - Удаляет файлы из исходной директории
-        - Делает записи в hashdir и в базу данных
+        - Удаляет исходные файлы
+        - Обновляет hashdir и базу данных
         """
         super().__init__()
         self.dest = dest
