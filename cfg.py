@@ -229,7 +229,6 @@ class JsonData:
 
     @classmethod
     def check_dirs(cls):
-
         if not os.path.exists(Static.PRELOAD_FOLDER):
             raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
 
@@ -240,14 +239,13 @@ class JsonData:
             cls.copy_db_file()
 
         if not os.path.exists(Static.THUMBS_DIR):
-            cls.copy_preloaded_thumbs()
+            cls.copy_hashdir()
 
         if not os.path.exists(Static.JSON_FILE):
             cls.write_json_data()
 
     @classmethod
-    def copy_preloaded_thumbs(cls):
-
+    def copy_hashdir(cls):
         # удаляем пользовательскую hashdir из ApplicationSupport
         if os.path.exists(Static.THUMBS_DIR):
             print("Удаляю пользовательскую HASH_DIR")
@@ -267,7 +265,6 @@ class JsonData:
 
     @classmethod
     def copy_db_file(cls):
-
         # удаляем пользовательный db.db из Application Support если он есть
         if os.path.exists(Static.DB_FILE):
             print("Удаляю пользовательский DB_FILE")
@@ -285,25 +282,12 @@ class JsonData:
 
     @classmethod
     def _compare_versions(cls) -> bool:
-
-        if not isinstance(cls.app_ver, float):
-            raise Exception("app_ver должна быть float")
-
-        elif Static.APP_VER > cls.app_ver:
-            cls.app_ver = Static.APP_VER
-            print("Внутренняя версия выше json версии")
-            return False
-        
-        else:
-            return True
+        ...
 
     @classmethod
     def init(cls):
         cls.check_dirs()
         cls.read_json_data()
-
-        # если версии не совпадают то что то нужно сделать
-        # например копировать новые файлы или ...
         cls._compare_versions()
 
 
