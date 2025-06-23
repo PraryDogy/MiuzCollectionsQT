@@ -56,6 +56,7 @@ class BaseSlider(QSlider):
 
 
 class CustomSlider(BaseSlider):
+    resize_thumbnails = pyqtSignal()
 
     def __init__(self):
         super().__init__(
@@ -76,7 +77,7 @@ class CustomSlider(BaseSlider):
         # Включаем сигнал обратно
         self.blockSignals(False)
         Dynamic.thumb_size_ind = value
-        SignalsApp.instance.grid_thumbnails_cmd.emit("resize")
+        self.resize_thumbnails.emit()
 
 
 class FilterBtn(QLabel):
@@ -160,6 +161,7 @@ class SvgBtn_(QFrame):
 class BarBottom(QWidget):
     theme_changed = pyqtSignal()
     reload_thumbnails = pyqtSignal()
+    resize_thumbnails = pyqtSignal()
 
     def __init__(self):
         """
@@ -206,6 +208,7 @@ class BarBottom(QWidget):
         self.h_layout.addWidget(self.sett_widget)
 
         self.custom_slider = CustomSlider()
+        self.custom_slider.resize_thumbnails.connect(lambda: self.resize_thumbnails.emit())
         self.h_layout.addWidget(self.custom_slider)
 
     def toggle_types(self):

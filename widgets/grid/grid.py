@@ -92,7 +92,6 @@ class Grid(QScrollArea):
     remove_files = pyqtSignal(list)
     move_files = pyqtSignal(list)
     save_files = pyqtSignal(tuple)
-    reload_thumbnails = pyqtSignal()
     update_bottom_bar = pyqtSignal()
 
     def __init__(self):
@@ -128,6 +127,9 @@ class Grid(QScrollArea):
         self.wid_under_mouse: Thumbnail = None
 
     def signals_cmd(self, flag: str):
+        """
+        resize, to_top, reload
+        """
         if flag == "resize":
             self.resize_thumbnails()
         elif flag == "to_top":
@@ -137,6 +139,12 @@ class Grid(QScrollArea):
         else:
             raise Exception("widgets > grid > main > wrong flag", flag)
         self.setFocus()
+
+    def reload_thumbnails(self):
+        self.load_db_images(flag=FIRST)
+
+    def scroll_to_top(self):
+        self.verticalScrollBar().setValue(0)
 
     def load_db_images(self, flag: str):
         if flag == FIRST:
@@ -524,7 +532,7 @@ class Grid(QScrollArea):
             self.menu_.addAction(reload)
             self.menu_.addSeparator()
             types_ = MenuTypes(parent=self.menu_)
-            types_.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
+            types_.reload_thumbnails.connect(lambda: self.reload_thumbnails_())
             types_.update_bottom_bar.connect(lambda: self.update_bottom_bar.emit())
             self.menu_.addMenu(types_)
 

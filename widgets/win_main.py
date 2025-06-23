@@ -95,7 +95,6 @@ class WinMain(WinFrameless):
         self.grid.remove_files.connect(lambda rel_img_path_list: self.open_remove_files_win(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
         self.grid.save_files.connect(lambda data: self.save_files_task(*data))
-        self.grid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         right_lay.addWidget(self.grid)
 
@@ -105,6 +104,7 @@ class WinMain(WinFrameless):
         self.bar_bottom = BarBottom()
         self.bar_bottom.reload_thumbnails.connect(lambda: self.reload_thumbnails())
         self.bar_bottom.theme_changed.connect(self.grid.reload_rubber)
+        self.bar_bottom.resize_thumbnails.connect(lambda: self.resize_thumbnails())
         right_lay.addWidget(self.bar_bottom)
 
         # Добавляем splitter в основной layout
@@ -229,7 +229,10 @@ class WinMain(WinFrameless):
         self.bar_bottom.progress_bar.setText(text)
 
     def reload_thumbnails(self):
-        self.grid.signals_cmd("reload")
+        self.grid.reload_thumbnails()
+
+    def resize_thumbnails(self):
+        self.grid.resize_thumbnails()
 
     def on_exit(self):
         for i in UThreadPool.tasks:
