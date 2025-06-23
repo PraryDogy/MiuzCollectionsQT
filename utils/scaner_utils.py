@@ -85,8 +85,9 @@ class FinderImages(QObject):
             try:
                 walked_images = self.walk_subdir(subdir)
                 finder_images.extend(walked_images)
-            except TypeError as e:
+            except Exception as e:
                 MainUtils.print_error()
+                continue
 
         # Сканируем корневую папку без рекурсии в подпапки,
         # чтобы найти изображения непосредственно в корневой папке.
@@ -96,8 +97,8 @@ class FinderImages(QObject):
                 try:
                     file_data = self.get_file_data(i)
                     finder_images.append(file_data)
-                except OSError as e:
-                    print("scaner > FinderImages > get file data", e)
+                except Exception as e:
+                    MainUtils.print_error()
                     continue
         return finder_images
 
