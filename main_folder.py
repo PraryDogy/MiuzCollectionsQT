@@ -36,78 +36,59 @@ class MainFolder:
 
     @classmethod
     def get_data(cls):
-        """возвращает данные о брендах в виде словаря"""
+        """
+        Возвращает данные основных папок в виде словаря.
+        Формат:
+        {"main_folders": [(имя: str, пути: list[str], стоп-слова: list[str]), ...]}
+        Пример:
+        {"main_folders": [("Some Name", ["/path/1", "/path/2"], ["tmp", "cache"])]}
+        """
         data = {
-            MAIN_FOLDERS: {
-                main_folder.name: {
-                    PATHS: main_folder.paths,
-                    STOP_LIST: main_folder.stop_list
-                }
-                for main_folder in MainFolder.list_
-            }
+            "main_folders": [
+                [i.name, i.paths, i.stop_list]
+                for i in MainFolder.list_
+            ]
         }
         return data
     
     @classmethod
     def init(cls, json_data: dict):
-        json_main_folders: dict = json_data.get(MAIN_FOLDERS)
-        if not json_main_folders:
-            MainFolder.list_.append(miuz)
-            MainFolder.list_.append(panacea)
+        """
+        структуру смотри в get_data
+        """
+        main_folders: list = json_data.get("main_folders")
+        if not main_folders:
+            MainFolder.list_ = cls.default_main_folders()
             MainFolder.current = MainFolder.list_[0]
-            # если в json нет данных, мы останавливаем извлечение данных
-            # из json, оставляя список MainFolder.list_ по умолчанию
-            # данные берутся из классов, определенных ниже
             return
-
         else:
-            # в случае, если в json есть данные о папках main_folders
-            # мы очищаем список от установленных по умолчанию main_folders
             MainFolder.list_.clear()
+            for name, path_list, stop_list in main_folders:
+                item = MainFolder(name, path_list, stop_list)
+                MainFolder.list_.append(item)
+            MainFolder.current = MainFolder.list_[0]
+    
+    @classmethod
+    def default_main_folders(cls):
+        miuz_paths = [
+            '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
+            '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
+            '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
+        ]
+        miuz_stop = [
+            "_Archive_Commerce_Брендинг",
+            "Chosed",
+            "LEVIEV",
+        ]
 
-        # устанавливаем папки из json данных
-        for main_folder_name, data in json_main_folders.items():
-            data: dict
-            paths = data.get(PATHS)
-            stop_list = data.get(STOP_LIST)
+        panacea_paths = [
+            '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready',
+            '/Volumes/Shares-1/Studio/Panacea/Photo/Art/Ready',
+            '/Volumes/Shares-2/Studio/Panacea/Photo/Art/Ready',
+        ]
 
-            item = MainFolder(
-                name=main_folder_name,
-                paths=paths,
-                stop_list=stop_list
-            )
+        return [
+            MainFolder("miuz", miuz_paths, miuz_stop),
+            MainFolder("panacea", panacea_paths, []),
+        ]
 
-            MainFolder.list_.append(item)
-
-        # удаляем папки, которых нет в json данных
-        for main_folder in MainFolder.list_:
-            if main_folder.name not in json_main_folders:
-                MainFolder.list_.remove(main_folder)
-
-        MainFolder.current = MainFolder.list_[0]
-
-
-miuz = MainFolder(
-    name="miuz",
-    paths=[
-        '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
-        '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
-        '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
-    ],
-    stop_list=[
-        "_Archive_Commerce_Брендинг",
-        "Chosed",
-        "LEVIEV"
-    ]
-)
-
-panacea = MainFolder(
-    name="panacea",
-    paths=[
-        '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready',
-        '/Volumes/Shares-1/Studio/Panacea/Photo/Art/Ready',
-        '/Volumes/Shares-2/Studio/Panacea/Photo/Art/Ready',
-    ],
-    stop_list=[
-    ]
-)
