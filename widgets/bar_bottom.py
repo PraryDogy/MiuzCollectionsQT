@@ -81,8 +81,16 @@ class CustomSlider(BaseSlider):
 
 class FilterBtn(QLabel):
     obj_name = "filter_btn"
+    reload_thumbnails = pyqtSignal()
+    update_bottom_bar = pyqtSignal()
 
     def __init__(self):
+        """
+        Сигналы:
+        - reload_thumbnails()
+        # - update_bottom_bar()
+        """
+
         t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
         super().__init__(text=t)
         self.setObjectName("filter_btn")
@@ -101,6 +109,8 @@ class FilterBtn(QLabel):
         self.set_solid_style()
 
         menu_ = MenuTypes(parent=self)
+        menu_.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
+        menu_.update_bottom_bar.connect(lambda: self.update_bottom_bar.emit())
 
         widget_rect = self.rect()
         menu_size = menu_.sizeHint()
@@ -149,8 +159,14 @@ class SvgBtn_(QFrame):
 
 class BarBottom(QWidget):
     theme_changed = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
 
     def __init__(self):
+        """
+        Сигналы:
+        - reload_thumbnails()
+        - theme_changed()
+        """
         super().__init__()
 
         self.setFixedHeight(28)
@@ -168,6 +184,8 @@ class BarBottom(QWidget):
     def init_ui(self):
 
         self.filter_label = FilterBtn()
+        self.filter_label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
+        self.filter_label.update_bottom_bar.connect(lambda: self.toggle_types())
         self.h_layout.addWidget(self.filter_label)
 
         self.h_layout.addStretch()

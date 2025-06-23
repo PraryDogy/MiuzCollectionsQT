@@ -93,12 +93,15 @@ class WinMain(WinFrameless):
         self.grid.remove_files.connect(lambda rel_img_path_list: self.open_remove_files_win(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
         self.grid.save_files.connect(lambda data: self.save_files_task(*data))
+        self.grid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
+        self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
         right_lay.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
+        self.bar_bottom.reload_thumbnails.connect(lambda: self.reload_thumbnails())
         self.bar_bottom.theme_changed.connect(self.grid.reload_rubber)
         right_lay.addWidget(self.bar_bottom)
 
@@ -141,7 +144,7 @@ class WinMain(WinFrameless):
             self.scaner_task = ScanerTask()
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
             self.scaner_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-            self.scaner_task.signals_.reload_gui.connect(lambda: self.reload_gui())
+            self.scaner_task.signals_.reload_gui.connect(lambda: self.reload_thumbnails())
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
@@ -223,7 +226,7 @@ class WinMain(WinFrameless):
     def set_progress_text(self, text: str):
         self.bar_bottom.progress_bar.setText(text)
 
-    def reload_gui(self):
+    def reload_thumbnails(self):
         self.grid.signals_cmd("reload")
 
     def on_exit(self):
@@ -254,7 +257,7 @@ class WinMain(WinFrameless):
 
     def filemove_task_start(self, dest: str, img_path_list: list):
         task = MoveFilesTask(dest, img_path_list)
-        task.reload_gui.connect(lambda: self.reload_gui())
+        task.reload_gui.connect(lambda: self.reload_thumbnails())
         task.set_progress_text.connect(lambda text: self.set_progress_text(text))
         task.run()
 
@@ -275,7 +278,7 @@ class WinMain(WinFrameless):
     def remove_task_start(self, img_path_list: list[str]):
         remove_files_task = RemoveFilesTask(img_path_list)
         remove_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-        remove_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
+        remove_files_task.signals_.reload_gui.connect(lambda: self.reload_thumbnails())
         UThreadPool.start(remove_files_task)
 
     def ope_upload_win(self, img_path_list: list):
@@ -298,7 +301,7 @@ class WinMain(WinFrameless):
     def upload_task_finished(self, img_path_list: list[str]):
         upload_files_task = UploadFilesTask(img_path_list)
         upload_files_task.signals_.progress_text.connect(lambda text: self.set_progress_text(text))
-        upload_files_task.signals_.reload_gui.connect(lambda: self.reload_gui())
+        upload_files_task.signals_.reload_gui.connect(lambda: self.reload_thumbnails())
         UThreadPool.start(upload_files_task)
 
     def save_files_task(self, dest: str, img_path_list: list):

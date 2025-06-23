@@ -199,7 +199,15 @@ class Save(QAction):
 
 
 class MenuTypes(QMenu):
+    reload_thumbnails = pyqtSignal()
+    update_bottom_bar = pyqtSignal()
+
     def __init__(self, parent: QMenu):
+        """
+        Сигналы:
+        - reload_thumbnails()
+        - update_bottom_bar()
+        """
         super().__init__(parent=parent, title=Lang.type_show)
 
         type_jpg = QAction(parent=self, text=Lang.type_jpg)
@@ -229,9 +237,8 @@ class MenuTypes(QMenu):
         else:
             Dynamic.types.append(type_)
             action_.setChecked(True)
-
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.instance.bar_bottom_filters.emit()
+        self.reload_thumbnails.emit()
+        self.update_bottom_bar.emit()
 
 
 class RemoveFiles(QAction):

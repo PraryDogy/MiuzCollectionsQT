@@ -92,6 +92,8 @@ class Grid(QScrollArea):
     remove_files = pyqtSignal(list)
     move_files = pyqtSignal(list)
     save_files = pyqtSignal(tuple)
+    reload_thumbnails = pyqtSignal()
+    update_bottom_bar = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -522,6 +524,8 @@ class Grid(QScrollArea):
             self.menu_.addAction(reload)
             self.menu_.addSeparator()
             types_ = MenuTypes(parent=self.menu_)
+            types_.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
+            types_.update_bottom_bar.connect(lambda: self.update_bottom_bar.emit())
             self.menu_.addMenu(types_)
 
         # клик по виджету
