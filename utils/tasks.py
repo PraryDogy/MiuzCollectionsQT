@@ -398,9 +398,8 @@ class RemoveFilesTask(URunnable):
 
     def task(self):
         try:
-            self.remove_thumbs()
-            command = ["osascript", self.scpt] + self.img_path_list
-            subprocess.run(command)
+            img_path_list = self.remove_files()
+            self.remove_thumbs(img_path_list)
         except Exception as e:
             MainUtils.print_error()
         try:
@@ -408,10 +407,27 @@ class RemoveFilesTask(URunnable):
         except RuntimeError as e:
             MainUtils.print_error()
 
-    def remove_thumbs(self):      
+    def remove_files(self):
+        """
+        Удаляет файлы.  
+        Возвращает список успешно удаленных файлов.
+        """
+        files: list = []
+        for i in self.img_path_list:
+            try:
+                os.remove(i)
+                files.append(i)
+            except Exception as e:
+                MainUtils.print_error()
+        return files
+
+    def remove_thumbs(self, img_path_list: list):
+        """
+        Удаляет из hashdir и из базы данных.
+        """      
         thumb_path_list = [
             ThumbUtils.create_thumb_path(img_path)
-            for img_path in self.img_path_list
+            for img_path in img_path_list
         ]
         rel_thumb_path_list = [
             ThumbUtils.get_rel_thumb_path(thumb_path)
@@ -440,7 +456,7 @@ class UploadFilesSignals(QObject):
 class UploadFilesTask(URunnable):
     def __init__(self, img_path_list: list):
         """
-        Удаляет изображения из hashdir, удаляет записи об изображениях из бд.   
+        Добавляет изображения из hashdir, добавляет записи об изображениях из бд.   
         Запуск: UThreadPool.start   
         Сигналы: finished_(), progress_text(str), reload_gui()
         """
