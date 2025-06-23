@@ -30,24 +30,13 @@ class BarTopBtn(QLabel):
 
 
 class DatesBtn(BarTopBtn):
-    win_dates_opened = pyqtSignal()
+    open_dates_win = pyqtSignal()
 
     def __init__(self):
         super().__init__(text=Lang.dates)
-        SignalsApp.instance.btn_dates_style.connect(self.dates_btn_style)
-
-    def dates_btn_style(self, flag: Literal["solid", "normal", "border"]):
-        if flag == "solid":
-            self.set_solid_style()
-
-        elif flag == "normal":
-            self.set_normal_style()
-
-        else:
-            raise Exception("widgets > bar_top > dates btn > wrong flag", flag)
 
     def open_win(self):
-        self.win_dates_opened.emit()
+        self.open_dates_win.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -84,6 +73,8 @@ class FilterBtn(BarTopBtn):
 
 
 class BarTop(QWidget):
+    open_dates_win = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setFixedHeight(35)
@@ -105,7 +96,7 @@ class BarTop(QWidget):
             )
         
         self.dates_btn = DatesBtn()
-        self.dates_btn.win_dates_opened.connect(self.open_win_dates)
+        self.dates_btn.open_dates_win.connect(lambda: self.open_dates_win.emit())
         self.h_layout.addWidget(
             self.dates_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
@@ -124,7 +115,3 @@ class BarTop(QWidget):
         else:
             self.dates_btn.set_normal_style()
     
-    def open_win_dates(self):
-        self.win_dates = WinDates()
-        self.win_dates.center_relative_parent(self.window())
-        self.win_dates.show()

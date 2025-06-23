@@ -15,14 +15,6 @@ from signals import SignalsApp
 
 
 class DatesTools:
-
-    @classmethod
-    def solid_or_normal_style(cls):
-        if not Dynamic.date_start:
-            SignalsApp.instance.btn_dates_style.emit("normal")
-        else:
-            SignalsApp.instance.btn_dates_style.emit("solid")
-
     @classmethod
     def date_to_text(cls, date: datetime):
         return date.strftime("%d.%m.%Y")
@@ -169,6 +161,8 @@ class RightDateWidget(DatesWid):
 
 class WinDates(WinSystem):
     date_wid_width = 150
+    dates_btn_solid = pyqtSignal()
+    dates_btn_normal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -236,16 +230,16 @@ class WinDates(WinSystem):
         self.adjustSize()
         # self.setFixedSize(self.width(), self.height())
 
-    @classmethod
-    def reset_dates(cls, *args):
-        Dynamic.date_start, Dynamic.date_end = None, None
-        Dynamic.f_date_start, Dynamic.f_date_end = None, None
+    # @classmethod
+    # def reset_dates(cls, *args):
+    #     Dynamic.date_start, Dynamic.date_end = None, None
+    #     Dynamic.f_date_start, Dynamic.f_date_end = None, None
 
-        Dynamic.grid_offset = 0
+    #     Dynamic.grid_offset = 0
 
-        SignalsApp.instance.btn_dates_style.emit("normal")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+    #     SignalsApp.instance.btn_dates_style.emit("normal")
+    #     SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+    #     SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
 
     def clear_btn_cmd(self, *args):
         for i in (self.left_date_wid, self.right_date_wid):
@@ -280,14 +274,17 @@ class WinDates(WinSystem):
         if has_dates:
             Dynamic.date_start = self.date_start
             Dynamic.date_end = self.date_end
-
             Dynamic.f_date_start = self.named_date(date=Dynamic.date_start)
             Dynamic.f_date_end = self.named_date(date=Dynamic.date_end)
-
+            self.dates_btn_solid.emit()
         else:
-            self.reset_dates()
+            Dynamic.date_start, Dynamic.date_end = None, None
+            Dynamic.f_date_start, Dynamic.f_date_end = None, None
+            Dynamic.grid_offset = 0
+            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+            SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+            self.dates_btn_normal.emit()
 
-        DatesTools.solid_or_normal_style()
         self.deleteLater()
 
         SignalsApp.instance.grid_thumbnails_cmd.emit("reload")

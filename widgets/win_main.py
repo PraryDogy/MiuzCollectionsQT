@@ -21,6 +21,7 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
+from .win_dates import WinDates
 from .win_downloads import WinDownloads
 from .win_remove_files import RemoveFilesWin
 from .win_smb import WinSmb
@@ -83,6 +84,7 @@ class WinMain(WinFrameless):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
+        self.bar_top.open_dates_win.connect(lambda: self.open_dates_win())
         right_lay.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -234,11 +236,18 @@ class WinMain(WinFrameless):
             i.task_state.set_should_run(False)
         JsonData.write_json_data()
 
+    def open_dates_win(self):
+        dates_win = WinDates()
+        dates_win.center_relative_parent(self)
+        dates_win.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
+        dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
+        dates_win.show()
+
     def open_smb_win(self):
-        self.smb_win = WinSmb()
-        self.smb_win.adjustSize()
-        self.smb_win.center_relative_parent(self)
-        self.smb_win.show()
+        smb_win = WinSmb()
+        smb_win.adjustSize()
+        smb_win.center_relative_parent(self)
+        smb_win.show()
 
     def open_filemove_win(self, rel_img_path_list: list):
         main_folder_path = MainFolder.current.is_available()
