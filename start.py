@@ -76,7 +76,7 @@ class App(QApplication):
         JsonData.init()
         Dbase.init()
         Lang.init()
-        MainFolder.init(JsonData.get_data())
+        MainFolder.init()
         JsonData.write_json_data()
         UThreadPool.init()
         SignalsApp.init()

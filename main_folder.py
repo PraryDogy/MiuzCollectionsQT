@@ -1,4 +1,6 @@
 import os
+import json
+from cfg import Static
 
 NAME = "name"
 PATHS = "paths"
@@ -9,8 +11,8 @@ MAIN_FOLDERS = "main_folders"
 class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
+    json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
     __slots__ = [NAME, PATHS, STOP_LIST, _CURR_PATH]
-    json_key = "main_folders"
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str]):
 
@@ -35,39 +37,32 @@ class MainFolder:
                 break        
         return self._curr_path
 
-    @classmethod
-    def get_data(cls):
-        """
-        Возвращает данные основных папок в виде словаря.
-        Формат:
-        {"main_folders": [(имя: str, пути: list[str], стоп-слова: list[str]), ...]}
-        Пример:
-        {"main_folders": [("Some Name", ["/path/1", "/path/2"], ["tmp", "cache"])]}
-        """
-        data = {
-            MainFolder.json_key: [
-                [i.name, i.paths, i.stop_list]
-                for i in MainFolder.list_
-            ]
-        }
-        return data
+    def get_data(self):
+        return [self.name, self.paths, self.stop_list]
     
     @classmethod
-    def init(cls, json_data: dict):
-        """
-        структуру смотри в get_data
-        """
-        main_folders: list = json_data.get(MainFolder.json_key)
-        if not main_folders:
-            MainFolder.list_ = cls.default_main_folders()
-            MainFolder.current = MainFolder.list_[0]
-            return
+    def init(cls):
+
+        if not os.path.exists(MainFolder.json_file):
+            data = cls.default_main_folders()
+            with open(MainFolder.json_file, "w") as f:
+                f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
         else:
-            MainFolder.list_.clear()
-            for name, path_list, stop_list in main_folders:
-                item = MainFolder(name, path_list, stop_list)
-                MainFolder.list_.append(item)
-            MainFolder.current = MainFolder.list_[0]
+            with open(MainFolder.json_file, "r") as f:
+                data = json.loads(f.read())
+
+        MainFolder.list_ = [MainFolder(*item) for item in data]
+        MainFolder.current = MainFolder.list_[0]
+
+    @classmethod
+    def write_json_data(cls):
+        data = [
+            i.get_data()
+            for i in MainFolder.list_
+        ]
+        with open(MainFolder.json_file, "w") as f:
+            f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
+
     
     @classmethod
     def default_main_folders(cls):
@@ -89,7 +84,7 @@ class MainFolder:
         ]
 
         return [
-            MainFolder("miuz", miuz_paths, miuz_stop),
-            MainFolder("panacea", panacea_paths, []),
+            ["miuz", miuz_paths, miuz_stop],
+            ["panacea", panacea_paths, [] ]
         ]
 

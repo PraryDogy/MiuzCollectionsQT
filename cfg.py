@@ -3,9 +3,6 @@ import os
 import shutil
 from datetime import datetime
 
-from main_folder import MainFolder
-
-
 class ThumbData:
 
     # максимальный размер в пикселях по широкой стороне
@@ -244,19 +241,9 @@ class JsonData:
 
     @classmethod
     def write_json_data(cls):
-
         with open(Static.JSON_FILE, 'w', encoding="utf-8") as f:
             data = cls.get_data()
-            main_folders = MainFolder.get_data()
-            data.update(main_folders)
-
-            json.dump(
-                obj=data,
-                fp=f,
-                indent=4,
-                ensure_ascii=False
-
-            )
+            json.dump(obj=data, fp=f, indent=4, ensure_ascii=False)
 
     @classmethod
     def check_dirs(cls):
