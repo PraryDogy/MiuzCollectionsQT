@@ -383,8 +383,6 @@ class RemoveFilesSignals(QObject):
 
 
 class RemoveFilesTask(URunnable):
-    scpt = os.path.join("scripts", "remove_files.scpt")
-
     def __init__(self, img_path_list: list[str]):
         """
         Удаляет изображения.
