@@ -47,7 +47,6 @@ class MainFolder:
     @classmethod
     def init(cls):
         validate = cls.validate_data()
-
         if validate is None:
             if os.path.exists(MainFolder.json_file):
                 os.remove(MainFolder.json_file)
