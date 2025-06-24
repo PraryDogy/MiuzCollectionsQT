@@ -21,6 +21,7 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid.grid import Grid
 from .menu_left import MenuLeft
+from .remove_all_win import RemoveAllWin
 from .win_dates import WinDates
 from .win_downloads import WinDownloads
 from .win_remove_files import RemoveFilesWin
@@ -149,6 +150,7 @@ class WinMain(WinFrameless):
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
             self.scaner_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
             self.scaner_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
+            self.scaner_task.signals_.remove_all_win.connect(lambda: self.open_remove_all_win())
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
@@ -316,6 +318,11 @@ class WinMain(WinFrameless):
         down_win = WinDownloads()
         down_win.center_relative_parent(self)
         down_win.show()
+
+    def open_remove_all_win(self):
+        rem_win = RemoveAllWin()
+        rem_win.center_relative_parent(self)
+        rem_win.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
