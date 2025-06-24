@@ -1,10 +1,10 @@
 import gc
 import os
-import subprocess
 
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QColor, QPixmap, QPixmapCache
-from sqlalchemy import delete, select, update
+from sqlalchemy import select, update
+from time import sleep
 
 from cfg import JsonData
 from database import THUMBS, Dbase
@@ -13,8 +13,8 @@ from main_folder import MainFolder
 
 from .main import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
                    UThreadPool)
-from .scaner_utils import (Compator, DbImages, DbUpdater, HashdirUpdater,
-                           FinderImages, MainFolderRemover)
+from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
+                           HashdirUpdater, Inspector, MainFolderRemover)
 
 
 class CopyFilesSignals(QObject):
@@ -516,6 +516,7 @@ class ScanerSignals(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
+    remove_all_win = pyqtSignal()
 
 
 class ScanerTask(URunnable):
@@ -531,6 +532,8 @@ class ScanerTask(URunnable):
         """
         super().__init__()
         self.signals_ = ScanerSignals()
+        self.pause_flag = False
+        self.user_canceled_scan = False
 
     def task(self):
         main_folders = [
@@ -608,12 +611,31 @@ class ScanerTask(URunnable):
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
+
+            inspector = Inspector(del_items, main_folder)
+            is_remove_all = inspector.is_remove_all()
+            if is_remove_all:
+                self.pause_flag = True
+                self.signals_.remove_all_win.emit()
+                while self.pause_flag:
+                    sleep(1)
+                if self.user_canceled_scan:
+                    return
+
             file_updater = HashdirUpdater(del_items, new_items, main_folder, self.task_state)
             file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
             del_items, new_items = file_updater.run()
             db_updater = DbUpdater(del_items, new_items, main_folder)
             db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
             db_updater.run()
+
+    def accept_remove_all(self):
+        self.user_canceled_scan = False
+        self.pause_flag = False
+
+    def cancel_remove_all(self):
+        self.user_canceled_scan = True
+        self.pause_flag = False
 
 
 class MoveFilesTask(QObject):

@@ -200,16 +200,38 @@ class Compator:
         self.db_images = db_images
 
     def run(self):
-        """
-        Возвращает:
-        del_items: [rel thumb path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]
-        """
         finder_set = set(self.finder_images)
         db_values = set(self.db_images.values())
         del_items = [k for k, v in self.db_images.items() if v not in finder_set]
         ins_items = list(finder_set - db_values)
         return del_items, ins_items
+
+
+class Inspector(QObject):
+    def __init__(self, del_items: list, main_folder: MainFolder):
+        """
+        del_items: [rel thumb path, ...]    
+        старт: вызов run()  
+        Сравнивает количество записей в базе данных, соответствующие входщему MainFolder    
+        Если количество удаляемых записей и записей в БД совпадает,     
+        значит сканер пытается удалить все связанное с MainFolder       
+        Возможно, это происходит по ошибке, которую не удалось отследить        
+        при разработке.     
+        По сути это заглушка для безопасности.
+        """
+        super().__init__()
+        self.del_items = del_items
+        self.main_folder = main_folder
+    
+    def is_remove_all(self):
+        conn = Dbase.engine.connect()
+        q = sqlalchemy.select(sqlalchemy.func.count())
+        q = q.where(THUMBS.c.brand == self.main_folder.name)
+        result = conn.execute(q).scalar()
+        conn.close()
+        if len(self.del_items) == result:
+            return True
+        return None
 
 
 class HashdirUpdater(QObject):
