@@ -490,8 +490,8 @@ class UploadFilesTask(URunnable):
             rel_thumb_path = ThumbUtils.get_rel_thumb_path(thumb_path)
             rel_thumb_path_list.append(rel_thumb_path)
 
-            
-        file_updater = HashdirUpdater(rel_thumb_path_list, img_with_stats_list, MainFolder.current, self.task_state)
+        args = (rel_thumb_path_list, img_with_stats_list, MainFolder.current, self.task_state)
+        file_updater = HashdirUpdater(*args)
         file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
         rel_thumb_path_list, new_items = file_updater.run()
 
