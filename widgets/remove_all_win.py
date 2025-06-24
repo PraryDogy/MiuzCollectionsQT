@@ -17,6 +17,9 @@ class RemoveAllWin(WinSystem):
     svg_size = 50
 
     def __init__(self, img_path_list: list[str]):
+        """
+        Сигналы: ok_pressed, cancel_pressed
+        """
         super().__init__()
         self.setWindowTitle(Lang.attention)
         self.img_path_list = img_path_list

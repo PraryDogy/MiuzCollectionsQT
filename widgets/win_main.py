@@ -321,6 +321,8 @@ class WinMain(WinFrameless):
 
     def open_remove_all_win(self):
         rem_win = RemoveAllWin()
+        rem_win.ok_pressed.connect(lambda: self.scaner_task.accept_remove_all())
+        rem_win.cancel_pressed.connect(lambda: self.scaner_task.cancel_remove_all())
         rem_win.center_relative_parent(self)
         rem_win.show()
 
