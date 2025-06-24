@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                              QWidget)
 
@@ -16,6 +16,7 @@ class RemoveAllWin(WinSystem):
     ok_pressed = pyqtSignal()
     cancel_pressed = pyqtSignal()
     svg_size = 50
+    seconds = 30
 
     def __init__(self, main_folder: MainFolder):
         """
@@ -59,6 +60,11 @@ class RemoveAllWin(WinSystem):
         h_lay.addWidget(can_btn)
 
         self.adjustSize()
+
+        self.timer = QTimer(self)
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.cancel_cmd)
+        self.timer.start(self.seconds * 1000)
 
     def ok_cmd(self):
         self.ok_pressed.emit()
