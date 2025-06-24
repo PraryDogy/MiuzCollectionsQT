@@ -4,7 +4,7 @@ import subprocess
 
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QColor, QPixmap, QPixmapCache
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 
 from cfg import JsonData
 from database import THUMBS, Dbase
@@ -465,6 +465,8 @@ class UploadFilesTask(URunnable):
         self.signals_ = UploadFilesSignals()
 
     def task(self):
+        self.remove_exists_rows()
+
         img_with_stats_list = []
         for img_path in self.img_path_list:
             try:
@@ -475,6 +477,8 @@ class UploadFilesTask(URunnable):
             size, birth, mod = stat.st_size, stat.st_birthtime, stat.st_mtime
             data = (img_path, size, birth, mod)
             img_with_stats_list.append(data)
+
+            
         # del_items пустой, так как нас интересует только добавление в БД
         file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.task_state)
         file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
@@ -487,6 +491,27 @@ class UploadFilesTask(URunnable):
             self.signals_.finished_.emit()
         except RuntimeError as e:
             MainUtils.print_error()
+    
+    def remove_exists_rows(self):
+        main_folder_path = MainFolder.current.get_current_path()
+        rel_img_path_list = [
+            MainUtils.get_rel_img_path(main_folder_path, i)
+            for i in self.img_path_list
+        ]
+        conn = Dbase.engine.connect()
+        q = select(THUMBS.c.id).where(THUMBS.c.short_src.in_(rel_img_path_list))
+        res = conn.execute(q).scalars().all()
+
+        q = delete(THUMBS).where(THUMBS.c.id.in_(res))
+
+        try:
+            conn.execute(q)
+            conn.commit()
+        except Exception as e:
+            MainUtils.print_error()
+            conn.rollback()
+        finally:
+            conn.close()
 
 
 class ScanerSignals(QObject):
