@@ -483,8 +483,13 @@ class UploadFilesTask(URunnable):
         file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.task_state)
         file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
         del_items, new_items = file_updater.run()
-        # del_items пустой, так как нас интересуют только новые изображения
-        db_updater = DbUpdater([], new_items, MainFolder.current)
+
+        del_items = [
+            ThumbUtils.get_rel_thumb_path(ThumbUtils.create_thumb_path(i))
+            for i in self.img_path_list
+        ]
+
+        db_updater = DbUpdater(del_items, new_items, MainFolder.current)
         db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         db_updater.run()
         try:
