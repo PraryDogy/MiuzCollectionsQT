@@ -16,13 +16,12 @@ class RemoveAllWin(WinSystem):
     cancel_pressed = pyqtSignal()
     svg_size = 50
 
-    def __init__(self, img_path_list: list[str]):
+    def __init__(self):
         """
         Сигналы: ok_pressed, cancel_pressed
         """
         super().__init__()
         self.setWindowTitle(Lang.attention)
-        self.img_path_list = img_path_list
 
         first_row_wid = QWidget()
         self.central_layout.addWidget(first_row_wid)
@@ -46,12 +45,12 @@ class RemoveAllWin(WinSystem):
         h_wid.setLayout(h_lay)
 
         ok_btn = QPushButton(Lang.ok)
-        ok_btn.clicked.connect(self.cmd_)
+        ok_btn.clicked.connect(self.ok_cmd)
         ok_btn.setFixedWidth(90)
         h_lay.addWidget(ok_btn)
 
         can_btn = QPushButton(Lang.cancel)
-        can_btn.clicked.connect(self.deleteLater)
+        can_btn.clicked.connect(self.cancel_cmd)
         can_btn.setFixedWidth(90)
         h_lay.addWidget(can_btn)
 

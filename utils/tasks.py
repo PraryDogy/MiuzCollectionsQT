@@ -615,12 +615,16 @@ class ScanerTask(URunnable):
             inspector = Inspector(del_items, main_folder)
             is_remove_all = inspector.is_remove_all()
             if is_remove_all:
+                print("remove all")
                 self.pause_flag = True
                 self.signals_.remove_all_win.emit()
                 while self.pause_flag:
+                    print("wait user")
                     sleep(1)
                 if self.user_canceled_scan:
+                    print("user canceled scan")
                     return
+            print("is not remove all or user accepted remove all")
 
             file_updater = HashdirUpdater(del_items, new_items, main_folder, self.task_state)
             file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
