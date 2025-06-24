@@ -29,6 +29,9 @@ class MainFolder:
     def get_current_path(self):
         return self._curr_path
 
+    def get_data(self):
+        return [self.name, self.paths, self.stop_list]
+
     def is_available(self) -> str | None:
         """
         Проверяет и устанавливает путь к MainFolder.    
@@ -41,9 +44,6 @@ class MainFolder:
                 break        
         return self._curr_path
 
-    def get_data(self):
-        return [self.name, self.paths, self.stop_list]
-    
     @classmethod
     def init(cls):
         validate = cls.validate_data()
@@ -95,14 +95,10 @@ class MainFolder:
 
     @classmethod
     def write_json_data(cls):
-        data = [
-            i.get_data()
-            for i in MainFolder.list_
-        ]
+        data = [i.get_data() for i in MainFolder.list_]
         with open(MainFolder.json_file, "w") as f:
             f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
 
-    
     @classmethod
     def default_main_folders(cls):
         miuz_paths = [
