@@ -5,39 +5,34 @@ import traceback
 from cfg import Static
 
 
-class Slots:
-    name = "name"
-    paths = "paths"
-    stop_list = "stop_list"
-    _curr_path = "_curr_path"
-
-
 class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
-    __slots__ = [Slots.name, Slots.paths, Slots.stop_list, Slots._curr_path]
+    __slots__ = ["name", "paths", "stop_list", "_curr_path"]
 
-    def __init__(self, name: str, paths: list[str], stop_list: list[str]):
-
+    def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str = ""):
         super().__init__()
         self.name = name
         self.paths = paths
         self.stop_list = stop_list
-        self._curr_path: str = None # этот аттрибут нужен для сканера
+        self._curr_path: str = curr_path
     
     def get_current_path(self):
         return self._curr_path
-
+    
     def get_data(self):
-        return [self.name, self.paths, self.stop_list]
+        return [getattr(self, i) for i in self.__slots__]
+    
+    def get_types(self):
+        return [type(getattr(self, i))for i in self.__slots__]
 
     def is_available(self) -> str | None:
         """
         Проверяет и устанавливает путь к MainFolder.    
         Возвращает доступный путь к MainFolder или None
         """
-        self._curr_path = None
+        self._curr_path = ""
         for i in self.paths:
             if os.path.exists(i):
                 self._curr_path = i
@@ -62,6 +57,7 @@ class MainFolder:
 
     @classmethod
     def validate_data(cls) -> list | None:
+
         try:
             with open(MainFolder.json_file, "r") as f:
                 data: list[list] = json.load(f)
@@ -71,7 +67,8 @@ class MainFolder:
                 print("ожидается list, получен: ", type(data).__name__)
                 return None            
 
-            cls_types = [str, list, list]
+            test = MainFolder("name", ["paths", ], ["stop list", ])
+            cls_types = test.get_types()
 
             for idx, main_folder in enumerate(data):
                 json_types = [type(i) for i in main_folder]
@@ -120,6 +117,6 @@ class MainFolder:
 
         return [
             ["miuz", miuz_paths, miuz_stop],
-            ["panacea", panacea_paths, [] ]
+            ["panacea", panacea_paths, []]
         ]
 
