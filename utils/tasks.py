@@ -455,25 +455,32 @@ class UploadFilesSignals(QObject):
 
 class UploadFilesTask(URunnable):
     def __init__(self, img_path_list: list):
-        """
-        Добавляет изображения из hashdir, добавляет записи об изображениях из бд.   
+        """ 
         Запуск: UThreadPool.start   
         Сигналы: finished_(), progress_text(str), reload_gui()
+
+        Подготавливает списки `del_items` и `new_items` для `FileUpdater` и `DbUpdater`.
+
+        Механизм реализует корректное обновление записей в базе данных и миниатюр в `hashdir`
+        в случае, если файл был заменён на новый с тем же именем. Пример:
+
+        - В папке уже есть файл `1.jpg`
+        - Пользователь копирует новый `1.jpg` в ту же папку через `CopyFilesTask`
+        - Старый `1.jpg` автоматически заменяется
+        - Однако в базе данных и `hashdir` остаются данные о старом файле
+        - Поэтому:
+        - старая запись из БД удаляется
+        - старая миниатюра удаляется из `hashdir`
+        - создаются новые запись и миниатюра для нового файла
+
+        Это необходимо, чтобы избежать конфликтов и дубликатов, так как новый файл с тем же именем
+        является другим объектом (другой хеш, размер и т.п.).
         """
         super().__init__()
         self.img_path_list = img_path_list
         self.signals_ = UploadFilesSignals()
 
     def task(self):
-        """
-        Подготовливает списки del_items и new_items для FileUpdater и DbUpdater.    
-        Удаляет уже существующие записи в бд и миниатюры в hadhdir.
-        Это необходимо, потому что UploadFilesTask является продолжением
-        CopyFilesTask. 
-        CopyFilesTask копирует файлы в заданную директорию, заменяя файлы
-        без запроса.
-        В тоже время записи в бд
-        """
         img_with_stats_list = []
         rel_thumb_path_list = []
         for img_path in self.img_path_list:
