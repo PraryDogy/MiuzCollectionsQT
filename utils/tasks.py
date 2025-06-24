@@ -13,7 +13,7 @@ from main_folder import MainFolder
 
 from .main import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
                    UThreadPool)
-from .scaner_utils import (Compator, DbImages, DbUpdater, FileUpdater,
+from .scaner_utils import (Compator, DbImages, DbUpdater, HashdirUpdater,
                            FinderImages, MainFolderRemover)
 
 
@@ -437,7 +437,7 @@ class RemoveFilesTask(URunnable):
         main_folder = MainFolder.current
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = FileUpdater(rel_thumb_path_list, [], main_folder, self.task_state)
+        file_updater = HashdirUpdater(rel_thumb_path_list, [], main_folder, self.task_state)
         file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
         del_items, new_items = file_updater.run()
         
@@ -465,9 +465,17 @@ class UploadFilesTask(URunnable):
         self.signals_ = UploadFilesSignals()
 
     def task(self):
-        self.remove_exists_rows()
-
+        """
+        Подготовливает списки del_items и new_items для FileUpdater и DbUpdater.    
+        Удаляет уже существующие записи в бд и миниатюры в hadhdir.
+        Это необходимо, потому что UploadFilesTask является продолжением
+        CopyFilesTask. 
+        CopyFilesTask копирует файлы в заданную директорию, заменяя файлы
+        без запроса.
+        В тоже время записи в бд
+        """
         img_with_stats_list = []
+        rel_thumb_path_list = []
         for img_path in self.img_path_list:
             try:
                 stat = os.stat(img_path)
@@ -478,18 +486,16 @@ class UploadFilesTask(URunnable):
             data = (img_path, size, birth, mod)
             img_with_stats_list.append(data)
 
+            thumb_path = ThumbUtils.create_thumb_path(img_path)
+            rel_thumb_path = ThumbUtils.get_rel_thumb_path(thumb_path)
+            rel_thumb_path_list.append(rel_thumb_path)
+
             
-        # del_items пустой, так как нас интересует только добавление в БД
-        file_updater = FileUpdater([], img_with_stats_list, MainFolder.current, self.task_state)
+        file_updater = HashdirUpdater(rel_thumb_path_list, img_with_stats_list, MainFolder.current, self.task_state)
         file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
-        del_items, new_items = file_updater.run()
+        rel_thumb_path_list, new_items = file_updater.run()
 
-        del_items = [
-            ThumbUtils.get_rel_thumb_path(ThumbUtils.create_thumb_path(i))
-            for i in self.img_path_list
-        ]
-
-        db_updater = DbUpdater(del_items, new_items, MainFolder.current)
+        db_updater = DbUpdater(rel_thumb_path_list, new_items, MainFolder.current)
         db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         db_updater.run()
         try:
@@ -497,25 +503,6 @@ class UploadFilesTask(URunnable):
         except RuntimeError as e:
             MainUtils.print_error()
     
-    def remove_exists_rows(self):
-        main_folder_path = MainFolder.current.get_current_path()
-        rel_img_path_list = [
-            MainUtils.get_rel_img_path(main_folder_path, i)
-            for i in self.img_path_list
-        ]
-        conn = Dbase.engine.connect()
-        q = select(THUMBS.c.id).where(THUMBS.c.short_src.in_(rel_img_path_list))
-        res = conn.execute(q).scalars().all()
-        q = delete(THUMBS).where(THUMBS.c.id.in_(res))
-        try:
-            conn.execute(q)
-            conn.commit()
-        except Exception as e:
-            MainUtils.print_error()
-            conn.rollback()
-        finally:
-            conn.close()
-
 
 class ScanerSignals(QObject):
     finished_ = pyqtSignal()
@@ -613,7 +600,7 @@ class ScanerTask(URunnable):
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
-            file_updater = FileUpdater(del_items, new_items, main_folder, self.task_state)
+            file_updater = HashdirUpdater(del_items, new_items, main_folder, self.task_state)
             file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
             del_items, new_items = file_updater.run()
             db_updater = DbUpdater(del_items, new_items, main_folder)

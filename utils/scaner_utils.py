@@ -212,7 +212,7 @@ class Compator:
         return del_items, ins_items
 
 
-class FileUpdater(QObject):
+class HashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
