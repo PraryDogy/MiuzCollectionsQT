@@ -12,6 +12,15 @@ class MainFolder:
     __slots__ = ["name", "paths", "stop_list", "_curr_path"]
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str = ""):
+        """
+        curr_path (str): Актуальный, проверенный путь к папке из списка `paths`.
+
+        Использование:
+        - При инициализации из JSON по умолчанию curr_path будет пустым.
+        - Значение устанавливается при вызове метода is_available(), который
+          проверяет наличие путей из `paths` на диске.
+        - Может быть передано явно, если известен корректный путь.
+        """
         super().__init__()
         self.name = name
         self.paths = paths
