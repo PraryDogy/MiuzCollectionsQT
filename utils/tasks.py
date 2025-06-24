@@ -501,9 +501,7 @@ class UploadFilesTask(URunnable):
         conn = Dbase.engine.connect()
         q = select(THUMBS.c.id).where(THUMBS.c.short_src.in_(rel_img_path_list))
         res = conn.execute(q).scalars().all()
-
         q = delete(THUMBS).where(THUMBS.c.id.in_(res))
-
         try:
             conn.execute(q)
             conn.commit()
