@@ -67,19 +67,23 @@ class MainFolder:
                 data: list[list] = json.load(f)
 
             if not isinstance(data, list):
-                print("MainFolders json: общий тип не соответствует list")
+                print("Ошибка в файле main_folders.json)")
+                print("ожидается list, получен: ", type(data).__name__)
                 return None            
 
             cls_types = [str, list, list]
 
-            for main_folder in data:
+            for idx, main_folder in enumerate(data):
+                json_types = [type(i) for i in main_folder]
+
                 if len(cls_types) != len(main_folder):
-                    print("MainFolders json: длина элемента MainFolder не соответсвует нужной длине")
+                    print(f"Ошибка в элементе [{idx}] файла main_folders.json")
+                    print(f"ожидается длина {len(cls_types)}, получена длина {len(main_folder)}")
                     return None
 
-            for main_folder in data:
-                if cls_types != [type(i) for i in main_folder]:
-                    print("MainFolders json: тип элементов MainFolder не соответсвует нужным типам")
+                elif cls_types != json_types:
+                    print(f"Ошибка в элементе [{idx}] файла main_folders.json")
+                    print(f"ожидается {cls_types}, получен {json_types}")
                     return None
 
             return True
