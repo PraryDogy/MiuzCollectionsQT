@@ -1,18 +1,22 @@
-import os
 import json
+import os
+import traceback
+
 from cfg import Static
 
-NAME = "name"
-PATHS = "paths"
-STOP_LIST = "stop_list"
-_CURR_PATH = "_curr_path"
-MAIN_FOLDERS = "main_folders"
+
+class Slots:
+    name = "name"
+    paths = "paths"
+    stop_list = "stop_list"
+    _curr_path = "_curr_path"
+
 
 class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
-    __slots__ = [NAME, PATHS, STOP_LIST, _CURR_PATH]
+    __slots__ = [Slots.name, Slots.paths, Slots.stop_list, Slots._curr_path]
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str]):
 
@@ -42,8 +46,11 @@ class MainFolder:
     
     @classmethod
     def init(cls):
+        validate = cls.validate_data()
 
-        if not os.path.exists(MainFolder.json_file):
+        if validate is None:
+            if os.path.exists(MainFolder.json_file):
+                os.remove(MainFolder.json_file)
             data = cls.default_main_folders()
             with open(MainFolder.json_file, "w") as f:
                 f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
@@ -53,6 +60,35 @@ class MainFolder:
 
         MainFolder.list_ = [MainFolder(*item) for item in data]
         MainFolder.current = MainFolder.list_[0]
+
+    @classmethod
+    def validate_data(cls) -> list | None:
+        try:
+            with open(MainFolder.json_file, "r") as f:
+                data: list[list] = json.load(f)
+
+            if not isinstance(data, list):
+                print("MainFolders json: общий тип не соответствует list")
+                return None            
+
+            cls_types = [str, list, list]
+
+            for main_folder in data:
+                if len(cls_types) != len(main_folder):
+                    print("MainFolders json: длина элемента MainFolder не соответсвует нужной длине")
+                    return None
+
+            for main_folder in data:
+                if cls_types != [type(i) for i in main_folder]:
+                    print("MainFolders json: тип элементов MainFolder не соответсвует нужным типам")
+                    return None
+
+            return True
+        except Exception as e:
+            print()
+            print(traceback.format_exc())
+            print()
+            return None
 
     @classmethod
     def write_json_data(cls):
