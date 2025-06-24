@@ -8,6 +8,7 @@ from base_widgets.svg_btn import SvgBtn
 from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
+from main_folder import MainFolder
 
 
 class RemoveAllWin(WinSystem):
@@ -16,12 +17,13 @@ class RemoveAllWin(WinSystem):
     cancel_pressed = pyqtSignal()
     svg_size = 50
 
-    def __init__(self):
+    def __init__(self, main_folder: MainFolder):
         """
         Сигналы: ok_pressed, cancel_pressed
         """
         super().__init__()
         self.setWindowTitle(Lang.attention)
+        self.central_layout.setSpacing(5)
 
         first_row_wid = QWidget()
         self.central_layout.addWidget(first_row_wid)
@@ -32,9 +34,11 @@ class RemoveAllWin(WinSystem):
         warn = SvgBtn(self.warning_svg, self.svg_size)
         first_row_lay.addWidget(warn)
 
-        t = f"Вы хотите удалить все файлы?"
-        question = QLabel(text=t)
-        first_row_lay.addWidget(question)
+        title = f"{Lang.collections}: {main_folder.name}\n"
+        descr = Lang.remove_all_descr    
+        t = title + descr
+        lbl = QLabel(t)
+        first_row_lay.addWidget(lbl)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)

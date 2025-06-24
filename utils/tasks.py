@@ -516,7 +516,7 @@ class ScanerSignals(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
-    remove_all_win = pyqtSignal()
+    remove_all_win = pyqtSignal(object)
 
 
 class ScanerTask(URunnable):
@@ -525,10 +525,7 @@ class ScanerTask(URunnable):
 
     def __init__(self):
         """
-        Cканирует доступные MainFolder.     
-        Если нет доступных MainFolder, запускает таймер и проверяет каждые  
-        15 секунд на доступность MainFolder.    
-        Сканирование можно прервать: ScanerTask.cancel_scaner()
+        Сигналы: finished_, progress_text(str), reload_gui, remove_all_win(MainWin)
         """
         super().__init__()
         self.signals_ = ScanerSignals()
@@ -615,12 +612,19 @@ class ScanerTask(URunnable):
             inspector = Inspector(del_items, main_folder)
             is_remove_all = inspector.is_remove_all()
             if is_remove_all:
+                total_sec = 180
                 print("remove all")
                 self.pause_flag = True
-                self.signals_.remove_all_win.emit()
+                self.signals_.remove_all_win.emit(main_folder)
+                counter = 0
                 while self.pause_flag:
                     print("wait user")
                     sleep(1)
+                    counter += 1
+                    if counter >= total_sec:
+                        print(f"auto cancel after {total_sec} seconds")
+                        self.cancel_remove_all()
+                        break
                 if self.user_canceled_scan:
                     print("user canceled scan")
                     return

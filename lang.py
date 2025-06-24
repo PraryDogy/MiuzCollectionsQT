@@ -553,6 +553,21 @@ class Lang_:
         "Move files"
     ]
 
+    remove_all_descr = [
+        (
+            "Вы собираетесь удалить все файлы.\n"
+            "Это может быть результатом ошибки,\n"
+            "которая приведёт к полной потере данных.\n"
+            "Вы уверены, что хотите продолжить?"
+        ),
+        (
+            "You are about to delete all files.\n"
+            "This may be caused by error\n"
+            "and could result in complete data loss.\n"
+            "Are you sure you want to continue?"
+        ),
+    ]
+
 class Lang(Lang_):
 
     @classmethod
@@ -574,3 +589,4 @@ class Lang(Lang_):
         for k, v in vars(Lang_).items():
             if isinstance(v, list):
                 setattr(cls, k, v[JsonData.lang_ind])
+    
