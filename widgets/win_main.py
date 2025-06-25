@@ -377,6 +377,7 @@ class WinMain(WinFrameless):
             if os.path.isfile(i.toLocalFile())
         ]
 
-        self.ope_upload_win(img_path_list)
+        if img_path_list:
+            self.ope_upload_win(img_path_list)
 
         return super().dropEvent(a0)
