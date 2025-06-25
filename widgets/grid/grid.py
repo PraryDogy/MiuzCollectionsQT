@@ -6,21 +6,20 @@ from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QRubberBand, QScrollArea, QSizePolicy, QWidget)
+                             QRubberBand, QScrollArea, QWidget)
 
-from ._base_widgets import UMenu, UVBoxLayout, SvgBtn
 from cfg import Dynamic, JsonData, Static, ThumbData
-from system.filters import Filter
 from lang import Lang
-from system.main_folder import MainFolder
 from signals import SignalsApp
-from system.utils import UThreadPool, MainUtils
+from system.filters import Filter
+from system.main_folder import MainFolder
+from system.utils import MainUtils, UThreadPool
 
+from .._base_widgets import SvgBtn, UMenu, UVBoxLayout
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
                        OpenInView, RemoveFiles, Reveal, Save, ScanerRestart,
                        WinInfoAction)
 from ..win_info import WinInfo
-from ..win_remove_files import RemoveFilesWin
 from ..win_warn import WinWarn
 from ._db_images import DbImage, DbImages
 from .cell_widgets import ImgWid, TextWid, Thumbnail, Title

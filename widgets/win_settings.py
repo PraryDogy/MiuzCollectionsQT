@@ -14,7 +14,7 @@ from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
 
-from ._base_widgets import (UTextEdit, UHBoxLayout, ULineEdit, UMenu,
+from ._base_widgets import (UHBoxLayout, ULineEdit, UMenu, UTextEdit,
                             UVBoxLayout, WinSystem)
 
 NEED_REBOOT = "___need_reboot___"
@@ -877,7 +877,7 @@ class WinSettings(WinSystem):
             QApplication.quit()
             MainUtils.start_new_app()
 
-    def new_row_list(self, wid: CustomTextEdit) -> list[str]:
+    def new_row_list(self, wid: UTextEdit) -> list[str]:
         return[
             i
             for i in wid.toPlainText().split("\n")

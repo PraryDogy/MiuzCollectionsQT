@@ -4,10 +4,11 @@ from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QFrame, QLabel, QSizePolicy
 
-from ._base_widgets import UVBoxLayout
 from cfg import Dynamic, Static, ThumbData
 from signals import SignalsApp
-from system.utils import MainUtils, PixmapUtils
+from system.utils import PixmapUtils
+
+from .._base_widgets import UVBoxLayout
 
 
 class CellWid:
