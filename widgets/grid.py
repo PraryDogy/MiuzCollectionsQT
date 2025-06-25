@@ -13,15 +13,15 @@ from signals import SignalsApp
 from system.filters import Filter
 from system.lang import Lang
 from system.main_folder import MainFolder
+from system.tasks import DbImage, DbImages
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
-from .._base_widgets import SvgBtn, UMenu, UVBoxLayout
-from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
-                       OpenInView, RemoveFiles, Reveal, Save, ScanerRestart,
-                       WinInfoAction)
-from ..win_info import WinInfo
-from ..win_warn import WinWarn
-from ._db_images import DbImage, DbImages
+from ._base_widgets import SvgBtn, UMenu, UVBoxLayout
+from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
+                      OpenInView, RemoveFiles, Reveal, Save, ScanerRestart,
+                      WinInfoAction)
+from .win_info import WinInfo
+from .win_warn import WinWarn
 
 UP_SVG = os.path.join(Static.images_dir, "up.svg")
 UP_STYLE = f"""
@@ -441,7 +441,7 @@ class Grid(QScrollArea):
     
     def open_in_view(self, wid: Thumbnail):
         assert isinstance(wid, Thumbnail)
-        from ..win_image_view import WinImageView
+        from .win_image_view import WinImageView
         if len(self.selected_widgets) == 1:
             path_to_wid = Thumbnail.path_to_wid
             is_selection = False

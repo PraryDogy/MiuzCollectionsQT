@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
-from system.lang import Lang
 from signals import SignalsApp
+from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, ScanerTask, UploadFilesTask)
@@ -18,7 +18,7 @@ from ._base_widgets import UHBoxLayout, UVBoxLayout, WinFrameless
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
-from .grid.grid import Grid
+from .grid import Grid
 from .menu_left import MenuLeft
 from .win_dates import WinDates
 from .win_downloads import WinDownloads
