@@ -61,6 +61,9 @@ class CollectionBtn(QLabel):
 
 class MenuTab(QListWidget):
     h_ = 30
+    scroll_to_top = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
+    set_window_title = pyqtSignal()
 
     def __init__(self, main_folder_index: int):
         super().__init__()
@@ -91,18 +94,18 @@ class MenuTab(QListWidget):
         Dynamic.grid_offset = 0
         Dynamic.resents = False
 
-        SignalsApp.instance.win_main_cmd.emit("set_title")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+        self.set_window_title.emit()
+        self.reload_thumbnails.emit()
+        self.scroll_to_top.emit()
 
     def recents_cmd(self, *args):
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
         Dynamic.resents = True
 
-        SignalsApp.instance.win_main_cmd.emit("set_title")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+        self.set_window_title.emit()
+        self.reload_thumbnails.emit()
+        self.scroll_to_top.emit()
 
     def init_ui(self, menus: list[dict[str, str]]):
 
@@ -184,6 +187,10 @@ class MenuTab(QListWidget):
 
 
 class MenuLeft(QTabWidget):
+    set_window_title = pyqtSignal()
+    scroll_to_top = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
+    
     def __init__(self):
         super().__init__()
         self.tabBarClicked.connect(self.tab_cmd)
@@ -198,6 +205,9 @@ class MenuLeft(QTabWidget):
         for i in MainFolder.list_:
             main_folder_index = MainFolder.list_.index(i)
             wid = MenuTab(main_folder_index=main_folder_index)
+            wid.set_window_title.connect(lambda: self.set_window_title.emit())
+            wid.scroll_to_top.connect(lambda: self.scroll_to_top.emit())
+            wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
             self.addTab(wid, i.name)
             self.menu_tabs_list.append(wid)
        
@@ -212,9 +222,9 @@ class MenuLeft(QTabWidget):
         for i in self.menu_tabs_list:
             i.setCurrentRow(0)
 
-        SignalsApp.instance.win_main_cmd.emit("set_title")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+        self.set_window_title.emit()
+        self.reload_thumbnails.emit()
+        self.scroll_to_top.emit()
 
     def menu_left_cmd(self, flag: Literal["reload", "select_all_colls"]):
         if flag == "reload":

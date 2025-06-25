@@ -72,6 +72,9 @@ class WinMain(WinFrameless):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
+        self.left_menu.set_window_title.connect(lambda: self.win_main_cmd("set_title"))
+        self.left_menu.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.left_menu.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
