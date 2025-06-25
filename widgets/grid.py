@@ -139,6 +139,7 @@ class ImgWid(QLabel):
 
 
 class Thumbnail(QFrame, CellWid):
+    reload_thumbnails = pyqtSignal()
     select = pyqtSignal(str)
     path_to_wid: dict[str, "Thumbnail"] = {}
 
@@ -228,7 +229,7 @@ class Thumbnail(QFrame, CellWid):
 
         # удаляем из избранного и если это избранные то обновляем сетку
         if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
-            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+            self.reload_thumbnails.emit()
 
 
 class NoImagesLabel(QLabel):
@@ -262,6 +263,8 @@ class NoImagesLabel(QLabel):
 
 
 class UpBtn(QFrame):
+    scroll_to_top = pyqtSignal()
+
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.setFixedSize(44, 44)
@@ -274,7 +277,8 @@ class UpBtn(QFrame):
         v_layout.addWidget(self.svg)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+        if a0.button() == Qt.MouseButton.LeftButton:
+            self.scroll_to_top.emit()
         return super().mouseReleaseEvent(a0)
     
 
@@ -316,7 +320,7 @@ class Grid(QScrollArea):
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
         SignalsApp.instance.grid_thumbnails_cmd.connect(self.signals_cmd)
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        self.reload_thumbnails()
 
         self.origin_pos = QPoint()
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
@@ -368,6 +372,7 @@ class Grid(QScrollArea):
             wid.deleteLater()
         self.reload_rubber()
         self.up_btn = UpBtn(self.scroll_wid)
+        self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
         self.up_btn.hide()
         self.selected_widgets: list[Thumbnail] = []
         self.grid_widgets: list[QGridLayout] = []
@@ -411,6 +416,7 @@ class Grid(QScrollArea):
                 fav=db_image.fav
             )
             wid.set_no_frame()
+            wid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
             Thumbnail.path_to_wid[wid.rel_img_path] = wid
             self.cell_to_wid[self.global_row, col] = wid
             wid.row, wid.col = self.global_row, col
