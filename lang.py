@@ -573,6 +573,11 @@ class Lang_:
         "Only files can be uploaded."
     ]
 
+    continue_ = [
+        "Продолжить",
+        "Continue"
+    ]
+
 class Lang(Lang_):
 
     @classmethod

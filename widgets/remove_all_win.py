@@ -49,14 +49,14 @@ class RemoveAllWin(WinSystem):
         h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         h_wid.setLayout(h_lay)
 
-        ok_btn = QPushButton(Lang.ok)
+        ok_btn = QPushButton(Lang.continue_)
         ok_btn.clicked.connect(self.ok_cmd)
-        ok_btn.setFixedWidth(90)
+        ok_btn.setFixedWidth(110)
         h_lay.addWidget(ok_btn)
 
         can_btn = QPushButton(Lang.cancel)
         can_btn.clicked.connect(self.cancel_cmd)
-        can_btn.setFixedWidth(90)
+        can_btn.setFixedWidth(110)
         h_lay.addWidget(can_btn)
 
         self.adjustSize()

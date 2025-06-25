@@ -232,6 +232,7 @@ class Inspector(QObject):
         q = q.where(THUMBS.c.brand == self.main_folder.name)
         result = conn.execute(q).scalar()
         conn.close()
+        return True
         if len(self.del_items) == result:
             return True
         return None
