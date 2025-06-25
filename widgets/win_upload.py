@@ -8,7 +8,7 @@ from base_widgets.layouts import LayoutHor
 from base_widgets.wins import WinSystem
 from cfg import Dynamic, Static
 from lang import Lang
-from main_folder import MainFolder
+from system.main_folder import MainFolder
 
 from .menu_left import CollectionBtn, MenuLeft
 

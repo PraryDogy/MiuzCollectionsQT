@@ -13,8 +13,8 @@ from base_widgets.input import ULineEdit
 from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
 from lang import Lang
-from main_folder import MainFolder
-from paletes import ThemeChanger
+from system.main_folder import MainFolder
+from system.paletes import ThemeChanger
 from system.utils import MainUtils
 
 NEED_REBOOT = "___need_reboot___"

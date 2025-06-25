@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
 from base_widgets import ContextCustom, LayoutHor
 from cfg import Dynamic, JsonData, Static
-from filters import Filter
+from system.filters import Filter
 from lang import Lang
 from signals import SignalsApp
 

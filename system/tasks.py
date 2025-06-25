@@ -7,9 +7,9 @@ from sqlalchemy import select, update
 from time import sleep
 
 from cfg import JsonData
-from database import THUMBS, Dbase
+from system.database import THUMBS, Dbase
 from lang import Lang
-from main_folder import MainFolder
+from system.main_folder import MainFolder
 
 from .utils import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
                    UThreadPool)

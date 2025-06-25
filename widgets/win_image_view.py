@@ -11,7 +11,7 @@ from base_widgets import LayoutHor, LayoutVer, SvgShadowed
 from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import Dynamic, Static
-from main_folder import MainFolder
+from system.main_folder import MainFolder
 from system.tasks import LoadImage, LoadThumb
 from system.utils import UThreadPool, MainUtils
 

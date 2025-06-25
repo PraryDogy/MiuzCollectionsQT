@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QTabWidget
 
 from cfg import Dynamic, Static
 from lang import Lang
-from main_folder import MainFolder
+from system.main_folder import MainFolder
 from signals import SignalsApp
 from system.tasks import LoadCollectionsTask
 from system.utils import UThreadPool

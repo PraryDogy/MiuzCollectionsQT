@@ -8,10 +8,10 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 from cfg import Dynamic, Static
-from database import THUMBS, Dbase
-from filters import Filter
+from system.database import THUMBS, Dbase
+from system.filters import Filter
 from lang import Lang
-from main_folder import MainFolder
+from system.main_folder import MainFolder
 from system.utils import MainUtils, PixmapUtils, ThumbUtils
 from system.tasks import URunnable
 

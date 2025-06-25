@@ -5,8 +5,8 @@ import sqlalchemy
 from sqlalchemy import func
 
 from cfg import JsonData
-from database import DIRS, THUMBS, ClmNames, Dbase
-from main_folder import MainFolder, miuz, panacea
+from system.database import DIRS, THUMBS, ClmNames, Dbase
+from system.main_folder import MainFolder, miuz, panacea
 from system.utils import MainUtils
 
 

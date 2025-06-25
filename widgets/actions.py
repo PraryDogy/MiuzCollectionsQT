@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 
 from cfg import Dynamic, Static
 from lang import Lang
-from main_folder import MainFolder
+from system.main_folder import MainFolder
 from signals import SignalsApp
 from system.utils import MainUtils, UThreadPool
 from system.tasks import FavTask

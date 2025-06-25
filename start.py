@@ -61,10 +61,10 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
 
 from cfg import JsonData, Static
-from database import Dbase
+from system.database import Dbase
 from lang import Lang
-from main_folder import MainFolder
-from paletes import ThemeChanger
+from system.main_folder import MainFolder
+from system.paletes import ThemeChanger
 from signals import SignalsApp
 from system.utils import UThreadPool
 from widgets.win_main import WinMain

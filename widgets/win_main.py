@@ -10,7 +10,7 @@ from base_widgets import LayoutHor, LayoutVer
 from base_widgets.wins import WinFrameless
 from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
-from main_folder import MainFolder
+from system.main_folder import MainFolder
 from signals import SignalsApp
 from system.utils import UThreadPool
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
