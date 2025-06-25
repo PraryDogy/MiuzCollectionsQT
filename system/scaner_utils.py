@@ -232,7 +232,6 @@ class Inspector(QObject):
         q = q.where(THUMBS.c.brand == self.main_folder.name)
         result = conn.execute(q).scalar()
         conn.close()
-        return True
         if len(self.del_items) == result:
             return True
         return None
@@ -445,30 +444,18 @@ class MainFolderRemover(QObject):
 
     def run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
-        res = self.conn.execute(q).fetchall()
-        db_main_folders = [
-            i[0]
-            for i in res
-        ]
-        app_main_folders = [
-            i.name
-            for i in MainFolder.list_
-        ]
-        removed_main_folders = [
-            i
-            for i in db_main_folders
-            if i not in app_main_folders
-        ]
-        for main_folder in removed_main_folders:
-            rows = self.get_rows(main_folder)
+        db_main_folders = self.conn.execute(q).scalars().all()
+        app_main_folders = [i.name for i in MainFolder.list_]
+        del_main_folders = [i for i in db_main_folders if i not in app_main_folders]
+        for i in del_main_folders:
+            rows = self.get_rows(i)
             self.remove_images(rows)
             self.remove_rows(rows)
-
         self.conn.close()
         
-    def get_rows(self, main_folder: MainFolder):
+    def get_rows(self, main_folder_name):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
-        q = q.where(THUMBS.c.brand == main_folder.name)
+        q = q.where(THUMBS.c.brand == main_folder_name)
         res = self.conn.execute(q).fetchall()
         res = [
             (id_, ThumbUtils.get_thumb_path(rel_thumb_path))
