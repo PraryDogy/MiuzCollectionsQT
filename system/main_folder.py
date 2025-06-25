@@ -71,8 +71,6 @@ class MainFolder:
     def init(cls):
         validate = cls.validate_data()
         if validate is None:
-            if os.path.exists(MainFolder.json_file):
-                os.remove(MainFolder.json_file)
             data = cls.default_main_folders()
             with open(MainFolder.json_file, "w") as f:
                 f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
@@ -85,8 +83,10 @@ class MainFolder:
 
     @classmethod
     def validate_data(cls) -> list | None:
-
         try:
+            if not os.path.exists(MainFolder.json_file):
+                return None
+
             with open(MainFolder.json_file, "r") as f:
                 data: list[list] = json.load(f)
 

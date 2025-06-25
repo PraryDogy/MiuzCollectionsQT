@@ -450,7 +450,7 @@ class MainFolderRemover(QObject):
         for i in del_main_folders:
             rows = self.get_rows(i)
             self.remove_images(rows)
-            # self.remove_rows(rows)
+            self.remove_rows(rows)
         self.conn.close()
         
     def get_rows(self, main_folder_name):
@@ -468,16 +468,17 @@ class MainFolderRemover(QObject):
         rows: [(row id int, thumb path), ...]
         """
         total = len(rows)
-        print(rows)
-        return
         for x, (id_, image_path) in enumerate(rows):
             try:
-                os.remove(image_path)
-                folder = os.path.dirname(image_path)
-                if not os.listdir(folder):
-                    os.rmdir(folder)
                 t = f"{Lang.deleting}: {x} {Lang.from_} {total}"
                 self.progress_text.emit(t)
+
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+                folder = os.path.dirname(image_path)
+                if os.path.exists(folder) and not os.listdir(folder):
+                    os.rmdir(folder)
+
             except Exception as e:
                 MainUtils.print_error()
                 continue

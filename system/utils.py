@@ -240,7 +240,7 @@ class ThumbUtils:
                 img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
                 return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             else:
-                print("system > read_thumb > изображения не существует")
+                # print("system > read_thumb > изображения не существует")
                 return None
         except Exception as e:
             MainUtils.print_error()
