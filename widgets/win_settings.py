@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QSpacerItem, QSpinBox, QTabWidget, QWidget)
 
 from cfg import JsonData, Static
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils

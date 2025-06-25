@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSlider, QWidget
 
 from ._base_widgets import UMenu, UHBoxLayout, SvgBtn
 from cfg import Dynamic, Static, ThumbData
-from lang import Lang
+from system.lang import Lang
 from signals import SignalsApp
 
 from .actions import MenuTypes

@@ -8,7 +8,7 @@ from time import sleep
 
 from cfg import JsonData
 from system.database import THUMBS, Dbase
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 
 from .utils import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,

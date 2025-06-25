@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QAction, QLabel, QWidget
 from ._base_widgets import UMenu, UHBoxLayout
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filter
-from lang import Lang
+from system.lang import Lang
 from signals import SignalsApp
 
 from .wid_search import WidSearch

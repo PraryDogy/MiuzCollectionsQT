@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                              QWidget)
 
 from cfg import Static
-from lang import Lang
+from system.lang import Lang
 
 from ._base_widgets import SvgBtn, WinSystem
 

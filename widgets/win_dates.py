@@ -7,7 +7,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
 from cfg import Dynamic
-from lang import Lang
+from system.lang import Lang
 from signals import SignalsApp
 
 from ._base_widgets import UHBoxLayout, ULineEdit, UVBoxLayout, WinSystem

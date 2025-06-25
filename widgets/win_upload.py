@@ -5,7 +5,7 @@ from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
 
 from cfg import Dynamic, Static
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 
 from ._base_widgets import UHBoxLayout, WinSystem

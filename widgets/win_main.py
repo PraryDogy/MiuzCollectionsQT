@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
-from lang import Lang
+from system.lang import Lang
 from signals import SignalsApp
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,

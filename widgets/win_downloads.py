@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
                              QWidget)
 
 from cfg import Static
-from lang import Lang
+from system.lang import Lang
 from system.tasks import CopyFilesTask
 from system.utils import MainUtils
 

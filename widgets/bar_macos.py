@@ -6,7 +6,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
 from cfg import Static
-from lang import Lang
+from system.lang import Lang
 from system.utils import MainUtils
 
 from ._base_widgets import UMenu, WinSystem

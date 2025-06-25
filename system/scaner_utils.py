@@ -8,7 +8,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import Static, ThumbData
 from system.database import THUMBS, ClmNames, Dbase
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 
 from .utils import ImgUtils, TaskState, ThumbUtils, MainUtils

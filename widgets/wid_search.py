@@ -7,7 +7,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLineEdit
 
 from cfg import Dynamic, Static
-from lang import Lang
+from system.lang import Lang
 from signals import SignalsApp
 
 from ._base_widgets import ULineEdit

@@ -8,7 +8,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from cfg import Dynamic, Static
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadImage, LoadThumb
 from system.utils import MainUtils, UThreadPool

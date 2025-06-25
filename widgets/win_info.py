@@ -5,7 +5,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
 from cfg import Static
-from lang import Lang
+from system.lang import Lang
 from system.tasks import MultipleImgInfo, SingleImgInfo
 from system.utils import MainUtils, UThreadPool
 

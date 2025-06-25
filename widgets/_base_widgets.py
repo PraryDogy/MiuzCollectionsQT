@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QAction, QGraphicsDropShadowEffect, QHBoxLayout,
                              QLineEdit, QMainWindow, QMenu, QTextEdit,
                              QVBoxLayout, QWidget)
 
-from lang import Lang
+from system.lang import Lang
 from system.utils import MainUtils
 
 

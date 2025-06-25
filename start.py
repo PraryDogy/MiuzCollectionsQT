@@ -62,7 +62,7 @@ from PyQt5.QtWidgets import QApplication
 
 from cfg import JsonData, Static
 from system.database import Dbase
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from signals import SignalsApp

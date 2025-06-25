@@ -8,7 +8,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QTabWidget
 
 from cfg import Dynamic, Static
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 from signals import SignalsApp
 from system.tasks import LoadCollectionsTask

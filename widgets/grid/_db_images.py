@@ -10,7 +10,7 @@ from PyQt5.QtGui import QPixmap
 from cfg import Dynamic, Static
 from system.database import THUMBS, Dbase
 from system.filters import Filter
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 from system.utils import MainUtils, PixmapUtils, ThumbUtils
 from system.tasks import URunnable

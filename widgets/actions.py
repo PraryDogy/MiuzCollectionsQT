@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 
 from cfg import Dynamic, Static
-from lang import Lang
+from system.lang import Lang
 from system.main_folder import MainFolder
 from signals import SignalsApp
 from system.utils import MainUtils, UThreadPool
