@@ -12,16 +12,11 @@ from lang import Lang
 WARNING_SVG = os.path.join(Static.images_dir, "warning.svg")
 
 
-class WinSmb(WinSystem):
-    def __init__(self, text: str = None):
+class WinWarn(WinSystem):
+    def __init__(self, title: str, text: str):
         super().__init__()
-
-        if text:
-            self.my_text = text
-        else:
-            self.my_text = f"{Lang.choose_coll_smb}"
-
-        self.setWindowTitle(f"{Lang.no_connection}")
+        self.setWindowTitle(title)
+        self.my_text = text
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)

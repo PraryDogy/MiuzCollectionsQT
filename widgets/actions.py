@@ -12,13 +12,13 @@ from utils.main import MainUtils, UThreadPool
 from utils.tasks import FavTask
 
 from .win_info import WinInfo
-from .win_smb import WinSmb
+from .win_warn import WinWarn
 
 
 class SmbWin:
     @classmethod
     def show(cls, parent_: QMainWindow):
-        smb_win = WinSmb()
+        smb_win = WinWarn(Lang.no_connection, Lang.choose_coll_smb)
         smb_win.adjustSize()
         smb_win.center_relative_parent(parent_)
         smb_win.show()
@@ -55,7 +55,7 @@ class WinInfoAction(QAction):
             self.win = WinInfo(self.rel_img_path_list)
             self.win.finished_.connect(self.open_delayed)
         else:
-            self.win = WinSmb()
+            self.win = WinWarn(Lang.no_connection, Lang.choose_coll_smb)
             self.win.adjustSize()
             self.win.center_relative_parent(self.win_)
             self.win.show()

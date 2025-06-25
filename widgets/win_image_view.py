@@ -19,7 +19,8 @@ from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
                       WinInfoAction)
 from .grid.cell_widgets import Thumbnail
 from .win_info import WinInfo
-from .win_smb import WinSmb
+from .win_warn import WinWarn
+from lang import Lang
 
 IMG_VIEW_STYLE = """
     background: black;
@@ -364,7 +365,7 @@ class WinImageView(WinChild):
         self.info_win.show()
 
     def open_smb_win(self):
-        self.smb_win = WinSmb()
+        self.smb_win = WinWarn(Lang.no_connection, Lang.choose_coll_smb)
         self.smb_win.adjustSize()
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()

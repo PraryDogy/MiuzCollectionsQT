@@ -25,7 +25,7 @@ from .remove_all_win import RemoveAllWin
 from .win_dates import WinDates
 from .win_downloads import WinDownloads
 from .win_remove_files import RemoveFilesWin
-from .win_smb import WinSmb
+from .win_warn import WinWarn
 from .win_upload import WinUpload
 
 
@@ -239,8 +239,8 @@ class WinMain(WinFrameless):
         dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
         dates_win.show()
 
-    def open_smb_win(self):
-        smb_win = WinSmb()
+    def open_warn_win(self, title: str, text: str):
+        smb_win = WinWarn(title, text)
         smb_win.adjustSize()
         smb_win.center_relative_parent(self)
         smb_win.show()
@@ -258,7 +258,7 @@ class WinMain(WinFrameless):
             filemove_win.finished_.connect(cmd)
             filemove_win.show()
         else:
-            self.open_smb_win()
+            self.open_warn_win(Lang.no_connection, Lang.choose_coll_smb)
 
     def filemove_task_start(self, dest: str, img_path_list: list):
         task = MoveFilesTask(dest, img_path_list)
@@ -278,7 +278,7 @@ class WinMain(WinFrameless):
             rem_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
             rem_win.show()
         else:
-            self.open_smb_win()
+            self.open_warn_win(Lang.no_connection, Lang.choose_coll_smb)
     
     def remove_task_start(self, img_path_list: list[str]):
         remove_files_task = RemoveFilesTask(img_path_list)
@@ -286,7 +286,7 @@ class WinMain(WinFrameless):
         remove_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
         UThreadPool.start(remove_files_task)
 
-    def ope_upload_win(self, img_path_list: list):
+    def open_upload_win(self, img_path_list: list):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             win_upload = WinUpload()
@@ -294,7 +294,7 @@ class WinMain(WinFrameless):
             win_upload.center_relative_parent(self)
             win_upload.show()
         else:
-            self.open_smb_win()
+            self.open_warn_win(Lang.no_connection, Lang.choose_coll_smb)
 
     def upload_task_start(self, dest: str, img_path_list: list[str]):
         copy_files_task = CopyFilesTask(dest, img_path_list)
@@ -368,16 +368,21 @@ class WinMain(WinFrameless):
             return
         main_folder_path = MainFolder.current.is_available()
         if not main_folder_path:
-            self.open_smb_win()
+            self.open_warn_win(Lang.no_connection, Lang.choose_coll_smb)
             return
 
         img_path_list: list[str] = [
             i.toLocalFile()
             for i in a0.mimeData().urls()
-            if os.path.isfile(i.toLocalFile())
+            # if os.path.isfile(i.toLocalFile())
         ]
 
+        for i in img_path_list:
+            if os.path.isdir(i):
+                self.open_warn_win("Нельзя перетаскивать папки")
+                return
+
         if img_path_list:
-            self.ope_upload_win(img_path_list)
+            self.open_upload_win(img_path_list)
 
         return super().dropEvent(a0)

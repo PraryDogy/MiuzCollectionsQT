@@ -21,7 +21,7 @@ from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
                        WinInfoAction)
 from ..win_info import WinInfo
 from ..win_remove_files import RemoveFilesWin
-from ..win_smb import WinSmb
+from ..win_warn import WinWarn
 from ._db_images import DbImage, DbImages
 from .cell_widgets import ImgWid, TextWid, Thumbnail, Title
 
@@ -357,7 +357,7 @@ class Grid(QScrollArea):
                     self.info_win = WinInfo(img_path_list)
                     self.info_win.finished_.connect(self.open_info_win_delayed)
                 else:
-                    self.smb_win = WinSmb()
+                    self.smb_win = WinWarn(Lang.no_connection, Lang.choose_coll_smb)
                     self.smb_win.adjustSize()
                     self.smb_win.center_relative_parent(self.window())
                     self.smb_win.show()
@@ -677,7 +677,7 @@ class Grid(QScrollArea):
         self.drag.exec_(Qt.DropAction.CopyAction)
 
         if not img_path_list:
-            self.win_smb = WinSmb()
+            self.win_smb = WinWarn(Lang.no_connection, Lang.choose_coll_smb)
             self.win_smb.adjustSize()
             self.win_smb.center_relative_parent(self.window())
             self.win_smb.show()
