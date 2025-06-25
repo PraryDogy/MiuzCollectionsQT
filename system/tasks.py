@@ -11,7 +11,7 @@ from database import THUMBS, Dbase
 from lang import Lang
 from main_folder import MainFolder
 
-from .main import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
+from .utils import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
                    UThreadPool)
 from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
                            HashdirUpdater, Inspector, MainFolderRemover)

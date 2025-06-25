@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow, QWidget
 
-from utils.main import MainUtils
+from system.utils import MainUtils
 
 from .layouts import LayoutVer
 

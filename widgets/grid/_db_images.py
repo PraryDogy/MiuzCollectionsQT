@@ -12,8 +12,8 @@ from database import THUMBS, Dbase
 from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
-from utils.main import MainUtils, PixmapUtils, ThumbUtils
-from utils.tasks import URunnable
+from system.utils import MainUtils, PixmapUtils, ThumbUtils
+from system.tasks import URunnable
 
 
 class DbImage:

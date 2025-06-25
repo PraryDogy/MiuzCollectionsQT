@@ -10,8 +10,8 @@ from base_widgets.svg_btn import SvgBtn
 from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
-from utils.tasks import CopyFilesTask
-from utils.main import MainUtils
+from system.tasks import CopyFilesTask
+from system.utils import MainUtils
 
 MAX_ROW = 45
 SVG_SIZE = 16

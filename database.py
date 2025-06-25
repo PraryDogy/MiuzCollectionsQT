@@ -3,7 +3,7 @@ import os
 import sqlalchemy
 
 from cfg import Static
-from utils.main import MainUtils
+from system.utils import MainUtils
 
 METADATA = sqlalchemy.MetaData()
 

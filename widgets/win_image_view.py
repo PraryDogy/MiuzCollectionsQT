@@ -12,8 +12,8 @@ from base_widgets.context import ContextCustom
 from base_widgets.wins import WinChild
 from cfg import Dynamic, Static
 from main_folder import MainFolder
-from utils.tasks import LoadImage, LoadThumb
-from utils.main import UThreadPool, MainUtils
+from system.tasks import LoadImage, LoadThumb
+from system.utils import UThreadPool, MainUtils
 
 from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
                       WinInfoAction)

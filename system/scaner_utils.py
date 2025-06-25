@@ -11,7 +11,7 @@ from database import THUMBS, ClmNames, Dbase
 from lang import Lang
 from main_folder import MainFolder
 
-from .main import ImgUtils, TaskState, ThumbUtils, MainUtils
+from .utils import ImgUtils, TaskState, ThumbUtils, MainUtils
 
 
 class FinderImages(QObject):

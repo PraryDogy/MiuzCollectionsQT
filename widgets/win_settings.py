@@ -15,7 +15,7 @@ from cfg import JsonData, Static
 from lang import Lang
 from main_folder import MainFolder
 from paletes import ThemeChanger
-from utils.main import MainUtils
+from system.utils import MainUtils
 
 NEED_REBOOT = "___need_reboot___"
 LIST_ITEM_H = 25

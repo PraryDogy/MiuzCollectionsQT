@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSizePolicy
 from base_widgets import LayoutVer
 from cfg import Dynamic, Static, ThumbData
 from signals import SignalsApp
-from utils.main import MainUtils, PixmapUtils
+from system.utils import MainUtils, PixmapUtils
 
 
 class CellWid:

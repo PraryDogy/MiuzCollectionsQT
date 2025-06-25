@@ -7,7 +7,7 @@ from sqlalchemy import func
 from cfg import JsonData
 from database import DIRS, THUMBS, ClmNames, Dbase
 from main_folder import MainFolder, miuz, panacea
-from utils.main import MainUtils
+from system.utils import MainUtils
 
 
 class Dirs:

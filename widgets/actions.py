@@ -8,8 +8,8 @@ from cfg import Dynamic, Static
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.main import MainUtils, UThreadPool
-from utils.tasks import FavTask
+from system.utils import MainUtils, UThreadPool
+from system.tasks import FavTask
 
 from .win_info import WinInfo
 from .win_warn import WinWarn

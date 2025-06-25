@@ -14,7 +14,7 @@ from filters import Filter
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.main import UThreadPool, MainUtils
+from system.utils import UThreadPool, MainUtils
 
 from ..actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
                        OpenInView, RemoveFiles, Reveal, Save, ScanerRestart,

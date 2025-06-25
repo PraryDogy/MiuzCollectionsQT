@@ -12,8 +12,8 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.main import UThreadPool
-from utils.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
+from system.utils import UThreadPool
+from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                          RemoveFilesTask, ScanerTask, UploadFilesTask)
 
 from .bar_bottom import BarBottom

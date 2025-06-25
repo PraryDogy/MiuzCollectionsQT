@@ -11,8 +11,8 @@ from cfg import Dynamic, Static
 from lang import Lang
 from main_folder import MainFolder
 from signals import SignalsApp
-from utils.tasks import LoadCollectionsTask
-from utils.main import UThreadPool
+from system.tasks import LoadCollectionsTask
+from system.utils import UThreadPool
 
 from .win_warn import WinWarn
 

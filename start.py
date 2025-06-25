@@ -66,7 +66,7 @@ from lang import Lang
 from main_folder import MainFolder
 from paletes import ThemeChanger
 from signals import SignalsApp
-from utils.main import UThreadPool
+from system.utils import UThreadPool
 from widgets.win_main import WinMain
 
 
