@@ -72,7 +72,7 @@ class WinMain(WinFrameless):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.set_window_title.connect(lambda: self.win_main_cmd("set_title"))
+        self.left_menu.set_window_title.connect(lambda: self.set_window_title())
         self.left_menu.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         splitter.addWidget(self.left_menu)
@@ -199,26 +199,19 @@ class WinMain(WinFrameless):
             self.scaner_timer.stop()
             # если задача закончена, немедленно запускаем новый сканер
             self.scaner_timer.start(1000)
-
-    def win_main_cmd(self, flag: Literal["show", "exit", "set_title"]):
-        if flag == "show":
-            self.show()
-        elif flag == "exit":
-            self.on_exit()
-        elif flag == "set_title":
-            main_folder = MainFolder.current.name.capitalize()
-            if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-                t = Lang.all_colls
-            elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-                t = Lang.fav_coll
-            else:
-                t = Dynamic.curr_coll_name
-            if Dynamic.resents:
-                t = Lang.recents
-            t = f"{main_folder}: {t}"
-            self.setWindowTitle(t)
-        else: 
-            raise Exception("app > win main > wrong flag", flag)
+        
+    def set_window_title(self):
+        main_folder = MainFolder.current.name.capitalize()
+        if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
+            t = Lang.all_colls
+        elif Dynamic.curr_coll_name == Static.NAME_FAVS:
+            t = Lang.fav_coll
+        else:
+            t = Dynamic.curr_coll_name
+        if Dynamic.resents:
+            t = Lang.recents
+        t = f"{main_folder}: {t}"
+        self.setWindowTitle(t)
 
     def center(self):
         screen = QDesktopWidget().screenGeometry()

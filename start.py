@@ -99,11 +99,11 @@ class App(QApplication):
         self.win_main.show()
 
         self.installEventFilter(self)
-        self.aboutToQuit.connect(lambda: self.win_main.win_main_cmd("exit"))
+        self.aboutToQuit.connect(lambda: self.win_main.on_exit())
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            self.win_main.win_main_cmd("show")
+            self.win_main.show()
         return super().eventFilter(a0, a1)
 
 app = App(sys.argv)
