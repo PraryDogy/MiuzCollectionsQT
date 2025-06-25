@@ -186,10 +186,8 @@ class MenuTab(QListWidget):
 class MenuLeft(QTabWidget):
     def __init__(self):
         super().__init__()
-
         self.tabBarClicked.connect(self.tab_cmd)
         self.menu_tabs_list: list[MenuTab] = []
-
         self.init_ui()
         SignalsApp.instance.menu_left_cmd.connect(self.menu_left_cmd)
 

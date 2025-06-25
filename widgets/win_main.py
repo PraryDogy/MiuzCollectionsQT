@@ -72,8 +72,8 @@ class WinMain(WinFrameless):
         splitter = QSplitter(Qt.Horizontal)
 
         # Левый виджет (MenuLeft)
-        left_wid = MenuLeft()
-        splitter.addWidget(left_wid)
+        self.left_menu = MenuLeft()
+        splitter.addWidget(self.left_menu)
 
         # Правый виджет
         right_wid = QWidget()
@@ -149,6 +149,7 @@ class WinMain(WinFrameless):
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
             self.scaner_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
             self.scaner_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
+            self.scaner_task.signals_.reload_gui.connect(lambda: self.left_menu.init_ui())
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
