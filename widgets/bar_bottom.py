@@ -4,7 +4,7 @@ from PyQt5.QtCore import QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSlider, QWidget
 
-from base_widgets import ContextCustom, LayoutHor, SvgBtn
+from ._base_widgets import UMenu, UHBoxLayout, SvgBtn
 from cfg import Dynamic, Static, ThumbData
 from lang import Lang
 from signals import SignalsApp
@@ -137,7 +137,7 @@ class SvgBtn_(QFrame):
     def __init__(self, icon_path, size, parent = None):
         super().__init__(parent)
 
-        v_lay = LayoutHor()
+        v_lay = UHBoxLayout()
         self.setLayout(v_lay)
         self.layout().setContentsMargins(2, 1, 2, 1)
         self.svg_btn = SvgBtn(icon_path, size, parent)
@@ -173,7 +173,7 @@ class BarBottom(QWidget):
 
         self.setFixedHeight(28)
 
-        self.h_layout = LayoutHor(self)
+        self.h_layout = UHBoxLayout(self)
         self.h_layout.setSpacing(20)
         self.h_layout.setContentsMargins(0, 0, 15, 0)
         self.init_ui()

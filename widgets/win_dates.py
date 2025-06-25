@@ -6,12 +6,11 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
-from base_widgets import LayoutHor, LayoutVer
-from base_widgets.input import ULineEdit
-from base_widgets.wins import WinSystem
 from cfg import Dynamic
 from lang import Lang
 from signals import SignalsApp
+
+from ._base_widgets import UHBoxLayout, ULineEdit, UVBoxLayout, WinSystem
 
 
 class DatesTools:
@@ -113,7 +112,7 @@ class DatesWid(QWidget):
     def __init__(self, title_label_text: str):
         super().__init__()
 
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         v_lay.setSpacing(10)
         self.setLayout(v_lay)
 
@@ -179,7 +178,7 @@ class WinDates(WinSystem):
 
         dates_h_wid = QWidget()
         self.central_layout.addWidget(dates_h_wid)
-        dates_h_lay = LayoutHor()
+        dates_h_lay = UHBoxLayout()
         dates_h_lay.setSpacing(10)
         dates_h_wid.setLayout(dates_h_lay)
 
@@ -207,7 +206,7 @@ class WinDates(WinSystem):
 
         btns_h_wid = QWidget()
         self.central_layout.addWidget(btns_h_wid)
-        btns_h_lay = LayoutHor()
+        btns_h_lay = UHBoxLayout()
         btns_h_wid.setLayout(btns_h_lay)
 
         btns_h_lay.addStretch(1)

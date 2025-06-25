@@ -4,12 +4,12 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
-from base_widgets import ContextCustom
-from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 from system.tasks import MultipleImgInfo, SingleImgInfo
-from system.utils import UThreadPool, MainUtils
+from system.utils import MainUtils, UThreadPool
+
+from ._base_widgets import UMenu, WinSystem
 
 
 class Selectable(QLabel):
@@ -34,7 +34,7 @@ class Selectable(QLabel):
             os.path.isfile(full_text)
         )
 
-        menu_ = ContextCustom(event=ev)
+        menu_ = UMenu(event=ev)
 
         label_text = Lang.copy
         sel = QAction(text=label_text, parent=self)

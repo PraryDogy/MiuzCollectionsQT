@@ -6,10 +6,11 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLineEdit
 
-from base_widgets.input import ULineEdit
 from cfg import Dynamic, Static
 from lang import Lang
 from signals import SignalsApp
+
+from ._base_widgets import ULineEdit
 
 CLEAR_SVG = os.path.join(Static.images_dir, "clear.svg")
 CLEAR_SIZE = 14

@@ -4,10 +4,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
-from base_widgets import LayoutHor, LayoutVer, SvgBtn
-from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
+
+from ._base_widgets import SvgBtn, UHBoxLayout, UVBoxLayout, WinSystem
 
 WARNING_SVG = os.path.join(Static.images_dir, "warning.svg")
 
@@ -26,7 +26,7 @@ class WinWarn(WinSystem):
     def init_ui(self):
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
-        h_layout = LayoutHor()
+        h_layout = UHBoxLayout()
         h_wid.setLayout(h_layout)
 
         warning = SvgBtn(WARNING_SVG, 40)
@@ -36,7 +36,7 @@ class WinWarn(WinSystem):
 
         v_wid = QWidget()
         h_layout.addWidget(v_wid)
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         v_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         v_wid.setLayout(v_lay)
 

@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QWidget
 
-from base_widgets import ContextCustom, LayoutHor
+from ._base_widgets import UMenu, UHBoxLayout
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filter
 from lang import Lang
@@ -83,7 +83,7 @@ class BarTop(QWidget):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(35)
-        self.h_layout = LayoutHor()
+        self.h_layout = UHBoxLayout()
         self.setLayout(self.h_layout)
         self.filter_btns = []
         self.win_dates = None

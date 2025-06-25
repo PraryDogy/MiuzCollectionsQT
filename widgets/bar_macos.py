@@ -5,12 +5,11 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
-from base_widgets import ContextCustom
-from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 from system.utils import MainUtils
 
+from ._base_widgets import UMenu, WinSystem
 from .win_settings import WinSettings
 
 ICON_SVG = os.path.join(Static.images_dir, "icon.svg")
@@ -31,7 +30,7 @@ class SelectableLabel(QLabel):
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        context_menu = ContextCustom(ev)
+        context_menu = UMenu(ev)
 
         copy_text = QAction(parent=context_menu, text=Lang.copy)
         copy_text.triggered.connect(self.copy_text_md)

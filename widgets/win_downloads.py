@@ -5,13 +5,12 @@ from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
                              QWidget)
 
-from base_widgets import LayoutHor, LayoutVer
-from base_widgets.svg_btn import SvgBtn
-from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
 from system.tasks import CopyFilesTask
 from system.utils import MainUtils
+
+from ._base_widgets import SvgBtn, UHBoxLayout, UVBoxLayout, WinSystem
 
 MAX_ROW = 45
 SVG_SIZE = 16
@@ -26,7 +25,7 @@ class BaseDownloadsItem(QWidget):
         t = "\n".join(os.path.basename(i) for i in files)
         self.setToolTip(t)
 
-        v_layout = LayoutVer()
+        v_layout = UVBoxLayout()
         v_layout.setContentsMargins(10, 0, 20, 0)
         self.setLayout(v_layout)
 
@@ -43,7 +42,7 @@ class BaseDownloadsItem(QWidget):
 
         h_wid = QWidget()
         v_layout.addWidget(h_wid)
-        h_layout = LayoutHor()
+        h_layout = UHBoxLayout()
         h_wid.setLayout(h_layout)
 
         self.progress_bar = QProgressBar()
@@ -108,13 +107,13 @@ class WinDownloads(WinSystem):
         self.scroll_widget = QWidget()
         self.scroll_area.setWidget(self.scroll_widget)
 
-        self.v_layout = LayoutVer()
+        self.v_layout = UVBoxLayout()
         self.v_layout.setContentsMargins(0, 10, 0, 10)
         self.scroll_widget.setLayout(self.v_layout)
         self.central_layout.addWidget(self.scroll_area)
 
         self.progress_wid = QWidget()
-        self.progress_layout = LayoutVer()
+        self.progress_layout = UVBoxLayout()
         self.progress_wid.setLayout(self.progress_layout)
         self.v_layout.addWidget(self.progress_wid)
         self.v_layout.addStretch()

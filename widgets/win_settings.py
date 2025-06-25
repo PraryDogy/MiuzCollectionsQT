@@ -8,14 +8,14 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QListWidget, QListWidgetItem, QPushButton,
                              QSpacerItem, QSpinBox, QTabWidget, QWidget)
 
-from base_widgets import ContextCustom, CustomTextEdit, LayoutHor, LayoutVer
-from base_widgets.input import ULineEdit
-from base_widgets.wins import WinSystem
 from cfg import JsonData, Static
 from lang import Lang
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
+
+from ._base_widgets import (UTextEdit, UHBoxLayout, ULineEdit, UMenu,
+                            UVBoxLayout, WinSystem)
 
 NEED_REBOOT = "___need_reboot___"
 LIST_ITEM_H = 25
@@ -29,12 +29,12 @@ class RebootableSettings(QGroupBox):
     def __init__(self):
         super().__init__()
 
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
         self.setLayout(v_lay)
 
         first_row_wid = QWidget()
-        first_row_lay = LayoutHor()
+        first_row_lay = UHBoxLayout()
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
@@ -47,7 +47,7 @@ class RebootableSettings(QGroupBox):
         first_row_lay.addWidget(self.lang_label)
 
         sec_row_wid = QWidget()
-        sec_row_lay = LayoutHor()
+        sec_row_lay = UHBoxLayout()
         sec_row_lay.setSpacing(15)
         sec_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_row_wid.setLayout(sec_row_lay)
@@ -86,19 +86,19 @@ class SimpleSettings(QGroupBox):
     def __init__(self):
         super().__init__()
 
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
         self.setLayout(v_lay)
 
         first_row_wid = QWidget()
         v_lay.addWidget(first_row_wid)
-        first_row_lay = LayoutHor()
+        first_row_lay = UHBoxLayout()
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
         sec_row_wid = QWidget()
         v_lay.addWidget(sec_row_wid)
-        sec_row_lay = LayoutHor()
+        sec_row_lay = UHBoxLayout()
         sec_row_lay.setSpacing(15)
         sec_row_wid.setLayout(sec_row_lay)
 
@@ -133,7 +133,7 @@ class AddItemWindow(WinSystem):
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
 
-        h_lay = LayoutHor()
+        h_lay = UHBoxLayout()
         h_lay.setSpacing(10)
         h_wid.setLayout(h_lay)
 
@@ -186,7 +186,7 @@ class BaseListWidget(QListWidget):
             self.addItem(item_)
 
     def list_item_context(self, ev):
-        menu = ContextCustom(event=ev)
+        menu = UMenu(event=ev)
 
         add_item = QAction(parent=menu, text=Lang.add_)
         add_item.triggered.connect(self.add_item_cmd)
@@ -255,8 +255,8 @@ class TabsWidget(QTabWidget):
 
     def __init__(self):
         super().__init__()
-        self.stop_colls_wid: dict[int, CustomTextEdit] = {}
-        self.coll_folders_wid: dict[int, CustomTextEdit] = {}
+        self.stop_colls_wid: dict[int, UTextEdit] = {}
+        self.coll_folders_wid: dict[int, UTextEdit] = {}
 
         for main_folder in MainFolder.list_:
             wid = self.tab_ui(main_folder=main_folder)
@@ -267,14 +267,14 @@ class TabsWidget(QTabWidget):
 
     def tab_ui(self, main_folder: MainFolder):
         wid = QWidget()
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         v_lay.setSpacing(10)
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         wid.setLayout(v_lay)
 
         h_wid_one = QWidget()
         v_lay.addWidget(h_wid_one)
-        h_lay_one = LayoutHor()
+        h_lay_one = UHBoxLayout()
         h_lay_one.setSpacing(15)
         h_wid_one.setLayout(h_lay_one)
 
@@ -292,7 +292,7 @@ class TabsWidget(QTabWidget):
 
         h_wid_two = QWidget()
         v_lay.addWidget(h_wid_two)
-        h_lay_two = LayoutHor()
+        h_lay_two = UHBoxLayout()
         h_lay_two.setSpacing(15)
         h_wid_two.setLayout(h_lay_two)
 
@@ -340,7 +340,7 @@ class AddMainFolderWin(WinSystem):
 
         h_wid_one = QWidget()
         self.central_layout.addWidget(h_wid_one)
-        h_lay_one = LayoutHor()
+        h_lay_one = UHBoxLayout()
         h_lay_one.setSpacing(15)
         h_wid_one.setLayout(h_lay_one)
 
@@ -357,7 +357,7 @@ class AddMainFolderWin(WinSystem):
 
         h_wid_two = QWidget()
         self.central_layout.addWidget(h_wid_two)
-        h_lay_two = LayoutHor()
+        h_lay_two = UHBoxLayout()
         h_lay_two.setSpacing(15)
         h_wid_two.setLayout(h_lay_two)
 
@@ -375,7 +375,7 @@ class AddMainFolderWin(WinSystem):
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
 
-        h_lay = LayoutHor()
+        h_lay = UHBoxLayout()
         h_lay.setSpacing(10)
         h_wid.setLayout(h_lay)
 
@@ -444,7 +444,7 @@ class RemoveWin(WinSystem):
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
-        h_lay = LayoutHor()
+        h_lay = UHBoxLayout()
         h_lay.setSpacing(10)
         h_wid.setLayout(h_lay)
 
@@ -490,14 +490,14 @@ class MainFolderWid(QGroupBox):
     def __init__(self):
         super().__init__()
 
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
         self.setLayout(v_lay)
 
         first_row = QWidget()
         v_lay.addWidget(first_row)
 
-        h_lay = LayoutHor()
+        h_lay = UHBoxLayout()
         h_lay.setSpacing(15)
         first_row.setLayout(h_lay)
 
@@ -512,7 +512,7 @@ class MainFolderWid(QGroupBox):
         second_row = QWidget()
         v_lay.addWidget(second_row)
 
-        second_lay = LayoutHor()
+        second_lay = UHBoxLayout()
         second_lay.setSpacing(15)
         second_row.setLayout(second_lay)
 
@@ -568,7 +568,7 @@ class SelectableLabel(QLabel):
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        context_menu = ContextCustom(ev)
+        context_menu = UMenu(ev)
 
         copy_text = QAction(parent=context_menu, text=Lang.copy)
         copy_text.triggered.connect(self.copy_text_md)
@@ -590,7 +590,7 @@ class SelectableLabel(QLabel):
 class AboutWin(QGroupBox):
     def __init__(self):
         super().__init__()
-        h_lay = LayoutHor()
+        h_lay = UHBoxLayout()
         self.setLayout(h_lay)
 
         icon = QSvgWidget(ICON_SVG)
@@ -609,7 +609,7 @@ class SvgFrame(QFrame):
 
     def __init__(self, svg_path: str, label_text: str):
         super().__init__()
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         self.setLayout(v_lay)
 
         self.svg_container = QFrame()
@@ -617,7 +617,7 @@ class SvgFrame(QFrame):
         self.svg_container.setStyleSheet(self.regular_style())
         v_lay.addWidget(self.svg_container)
 
-        svg_lay = LayoutVer()
+        svg_lay = UVBoxLayout()
         self.svg_container.setLayout(svg_lay)
 
         self.svg_widget = QSvgWidget(svg_path)
@@ -664,7 +664,7 @@ class Themes(QGroupBox):
 
     def __init__(self):
         super().__init__()
-        h_lay = LayoutHor()
+        h_lay = UHBoxLayout()
         h_lay.setContentsMargins(10, 10, 10, 10)
         h_lay.setSpacing(20)
         h_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -720,7 +720,7 @@ class ScanTime(QGroupBox):
     def __init__(self):
         super().__init__()
 
-        layout = LayoutHor(self)
+        layout = UHBoxLayout(self)
         layout.setContentsMargins(5, 0, 5, 0)
         layout.setSpacing(10)
         layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -765,7 +765,7 @@ class WinSettings(WinSystem):
 
     def first_tab(self):
         v_wid = QWidget()
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         v_lay.setSpacing(10)
         v_wid.setLayout(v_lay)
 
@@ -789,7 +789,7 @@ class WinSettings(WinSystem):
 
     def second_tab(self):
         v_wid = QWidget()
-        v_lay = LayoutVer()
+        v_lay = UVBoxLayout()
         v_lay.setSpacing(10)
         v_wid.setLayout(v_lay)
 
@@ -809,7 +809,7 @@ class WinSettings(WinSystem):
 
     def btns_wid(self):
         btns_wid = QWidget()
-        btns_layout = LayoutHor()
+        btns_layout = UHBoxLayout()
         btns_wid.setLayout(btns_layout)
         self.central_layout.addWidget(btns_wid)
 

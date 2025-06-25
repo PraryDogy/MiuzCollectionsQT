@@ -4,12 +4,11 @@ import os
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
 
-from base_widgets.layouts import LayoutHor
-from base_widgets.wins import WinSystem
 from cfg import Dynamic, Static
 from lang import Lang
 from system.main_folder import MainFolder
 
+from ._base_widgets import UHBoxLayout, WinSystem
 from .menu_left import CollectionBtn, MenuLeft
 
 
@@ -27,7 +26,7 @@ class WinUpload(WinSystem):
         self.h_wid = QWidget()
         self.central_layout.addWidget(self.h_wid)
 
-        self.h_lay = LayoutHor()
+        self.h_lay = UHBoxLayout()
         self.h_lay.setSpacing(10)
         self.h_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.h_wid.setLayout(self.h_lay)

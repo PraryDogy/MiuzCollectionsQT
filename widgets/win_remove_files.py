@@ -4,10 +4,10 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                              QWidget)
 
-from base_widgets.svg_btn import SvgBtn
-from base_widgets.wins import WinSystem
 from cfg import Static
 from lang import Lang
+
+from ._base_widgets import SvgBtn, WinSystem
 
 
 class RemoveFilesWin(WinSystem):

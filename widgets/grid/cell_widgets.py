@@ -4,7 +4,7 @@ from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QFrame, QLabel, QSizePolicy
 
-from base_widgets import LayoutVer
+from ._base_widgets import UVBoxLayout
 from cfg import Dynamic, Static, ThumbData
 from signals import SignalsApp
 from system.utils import MainUtils, PixmapUtils
@@ -148,7 +148,7 @@ class Thumbnail(QFrame, CellWid):
         elif fav == 1:
             self.name = Static.STAR_SYM + os.path.basename(rel_img_path)
 
-        self.v_layout = LayoutVer()
+        self.v_layout = UVBoxLayout()
         self.v_layout.setSpacing(ThumbData.SPACING)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self.v_layout)

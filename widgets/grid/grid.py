@@ -8,7 +8,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QRubberBand, QScrollArea, QSizePolicy, QWidget)
 
-from base_widgets import ContextCustom, LayoutVer, SvgBtn
+from ._base_widgets import UMenu, UVBoxLayout, SvgBtn
 from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import Filter
 from lang import Lang
@@ -70,7 +70,7 @@ class UpBtn(QFrame):
         self.setFixedSize(44, 44)
         self.setStyleSheet(UP_STYLE)
 
-        v_layout = LayoutVer()
+        v_layout = UVBoxLayout()
         self.setLayout(v_layout)
 
         self.svg = SvgBtn(UP_SVG, 44)
@@ -112,7 +112,7 @@ class Grid(QScrollArea):
         self.scroll_wid = QWidget()
         self.setWidget(self.scroll_wid)
         
-        self.scroll_layout = LayoutVer()
+        self.scroll_layout = UVBoxLayout()
         self.scroll_wid.setLayout(self.scroll_layout)
 
         self.col_count: int = 0
@@ -521,7 +521,7 @@ class Grid(QScrollArea):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
 
-        self.menu_ = ContextCustom(event=a0)
+        self.menu_ = UMenu(event=a0)
         clicked_wid = self.get_wid_under_mouse(a0=a0)
 
         # клик по пустому пространству

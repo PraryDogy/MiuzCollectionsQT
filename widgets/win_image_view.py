@@ -7,20 +7,19 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
                          QPaintEvent, QPixmap, QPixmapCache, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from base_widgets import LayoutHor, LayoutVer, SvgShadowed
-from base_widgets.context import ContextCustom
-from base_widgets.wins import WinChild
 from cfg import Dynamic, Static
+from lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadImage, LoadThumb
-from system.utils import UThreadPool, MainUtils
+from system.utils import MainUtils, UThreadPool
 
+from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
+                            WinChild)
 from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
                       WinInfoAction)
 from .grid.cell_widgets import Thumbnail
 from .win_info import WinInfo
 from .win_warn import WinWarn
-from lang import Lang
 
 IMG_VIEW_STYLE = """
     background: black;
@@ -130,7 +129,7 @@ class ZoomBtns(QFrame):
         super().__init__(parent)
         self.setStyleSheet(ZOOM_STYLE)
 
-        h_layout = LayoutHor()
+        h_layout = UHBoxLayout()
         self.setLayout(h_layout)
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
@@ -161,7 +160,7 @@ class SwitchImageBtn(QFrame):
         self.setFixedSize(54, 54) # 27px border-radius, 27 * 2 for round shape
         self.setStyleSheet(NAVI_STYLE)
 
-        v_layout = LayoutVer()
+        v_layout = UVBoxLayout()
         self.setLayout(v_layout)
 
         btn = SvgShadowed(path, 50)
@@ -409,7 +408,7 @@ class WinImageView(WinChild):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
-        self.menu_ = ContextCustom(event=ev)
+        self.menu_ = UMenu(event=ev)
         rel_img_path_list = [self.rel_img_path]
 
         info = WinInfoAction(self.menu_, self, rel_img_path_list)

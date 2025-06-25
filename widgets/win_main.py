@@ -6,8 +6,6 @@ from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
-from base_widgets import LayoutHor, LayoutVer
-from base_widgets.wins import WinFrameless
 from cfg import Dynamic, JsonData, Static, ThumbData
 from lang import Lang
 from signals import SignalsApp
@@ -16,6 +14,7 @@ from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, ScanerTask, UploadFilesTask)
 from system.utils import UThreadPool
 
+from ._base_widgets import UHBoxLayout, UVBoxLayout, WinFrameless
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -63,7 +62,7 @@ class WinMain(WinFrameless):
         self.setMenuBar(BarMacos())
 
         h_wid_main = QWidget()
-        h_lay_main = LayoutHor()
+        h_lay_main = UHBoxLayout()
         h_lay_main.setContentsMargins(0, 0, 5, 0)
         h_wid_main.setLayout(h_lay_main)
         self.central_layout.addWidget(h_wid_main)
@@ -78,7 +77,7 @@ class WinMain(WinFrameless):
         # Правый виджет
         right_wid = QWidget()
         splitter.addWidget(right_wid)
-        right_lay = LayoutVer()
+        right_lay = UVBoxLayout()
         right_lay.setContentsMargins(0, 0, 0, 0)
         right_wid.setLayout(right_lay)
 
