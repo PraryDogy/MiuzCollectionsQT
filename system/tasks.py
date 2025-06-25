@@ -691,7 +691,7 @@ class MoveFilesTask(QObject):
         UThreadPool.start(upload_task)
 
 
-class DbImage:
+class LoadDbImagesItem:
     __slots__ = ["pixmap", "rel_img_path", "coll_name", "fav"]
     def __init__(self, pixmap: QPixmap, rel_img_path: str, coll: str, fav: int):
         self.pixmap = pixmap
@@ -700,11 +700,11 @@ class DbImage:
         self.fav = fav
 
 
-class WorkerSignals(QObject):
+class LoadDbImagesSignals(QObject):
     finished_ = pyqtSignal(dict)
 
 
-class DbImages(URunnable):
+class LoadDbImagesTask(URunnable):
     def __init__(self):
         """
         returns
@@ -714,7 +714,7 @@ class DbImages(URunnable):
         ```
         """
         super().__init__()
-        self.signals_ = WorkerSignals()
+        self.signals_ = LoadDbImagesSignals()
 
     def task(self):
 
@@ -728,9 +728,9 @@ class DbImages(URunnable):
     def create_dict(
             self,
             res: list[tuple[str, str, int, str, int]]
-            ) -> dict[str, list[DbImage]] | dict:
+            ) -> dict[str, list[LoadDbImagesItem]] | dict:
 
-        thumbs_dict = defaultdict(list[DbImage])
+        thumbs_dict = defaultdict(list[LoadDbImagesItem])
 
         if len(Dynamic.types) == 1:
             exts_ = Dynamic.types[0]
@@ -761,7 +761,7 @@ class DbImages(URunnable):
             else:
                 mod = f"{Lang.months[str(mod.month)]} {mod.year}"
 
-            thumbs_dict[mod].append(DbImage(pixmap, rel_img_path, coll, fav))
+            thumbs_dict[mod].append(LoadDbImagesItem(pixmap, rel_img_path, coll, fav))
 
         try:
             self.signals_.finished_.emit(thumbs_dict)

@@ -13,7 +13,7 @@ from signals import SignalsApp
 from system.filters import Filter
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.tasks import DbImage, DbImages
+from system.tasks import LoadDbImagesItem, LoadDbImagesTask
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout
@@ -356,7 +356,7 @@ class Grid(QScrollArea):
             cmd_ = lambda db_images: self.grid_more(db_images)
         else: 
             raise Exception("wrong flag", flag)
-        self.task_ = DbImages()
+        self.task_ = LoadDbImagesTask()
         self.task_.signals_.finished_.connect(cmd_)
         UThreadPool.start(self.task_)
 
@@ -364,7 +364,7 @@ class Grid(QScrollArea):
         self.rubberBand.deleteLater()
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
 
-    def create_grid(self, db_images: dict[str, list[DbImage]]):
+    def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
         widgets = self.scroll_wid.findChildren(QWidget)
         if self.rubberBand in widgets:
             widgets.remove(self.rubberBand)
@@ -394,7 +394,7 @@ class Grid(QScrollArea):
             spacer = QWidget()
             self.scroll_layout.addWidget(spacer)
 
-    def single_grid(self, date: str, db_images: list[DbImage]):
+    def single_grid(self, date: str, db_images: list[LoadDbImagesItem]):
         title = Title(date)
         self.scroll_layout.addWidget(title)
         grid_wid = GridWidget(date)
@@ -440,7 +440,7 @@ class Grid(QScrollArea):
             row += 1
             col = 0
 
-    def grid_more(self, db_images: dict[str, list[DbImage]]):
+    def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
         if db_images:
             for date, db_images_list in db_images.items():
                 self.single_grid(date, db_images_list)
