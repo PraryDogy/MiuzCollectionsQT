@@ -599,6 +599,7 @@ class ScanerTask(URunnable):
         main_folder_remover = MainFolderRemover()
         main_folder_remover.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
         main_folder_remover.run()
+
         finder_images = FinderImages(main_folder, self.task_state)
         finder_images.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
         finder_images = finder_images.run()
@@ -612,12 +613,16 @@ class ScanerTask(URunnable):
             inspector = Inspector(del_items, main_folder)
             is_remove_all = inspector.is_remove_all()
             if is_remove_all:
-                self.pause_flag = True
-                self.signals_.remove_all_win.emit(main_folder)
-                while self.pause_flag:
-                    sleep(1)
-                if self.user_canceled_scan:
-                    return
+                print("scaner > обнаружена попытка массового удаления фотографий")
+                print("в папке:", main_folder.name, main_folder.get_current_path())
+                return
+
+                # self.pause_flag = True
+                # self.signals_.remove_all_win.emit(main_folder)
+                # while self.pause_flag:
+                #     sleep(1)
+                # if self.user_canceled_scan:
+                #     return
 
             file_updater = HashdirUpdater(del_items, new_items, main_folder, self.task_state)
             file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))

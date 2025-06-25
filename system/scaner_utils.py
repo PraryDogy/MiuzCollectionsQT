@@ -450,7 +450,7 @@ class MainFolderRemover(QObject):
         for i in del_main_folders:
             rows = self.get_rows(i)
             self.remove_images(rows)
-            self.remove_rows(rows)
+            # self.remove_rows(rows)
         self.conn.close()
         
     def get_rows(self, main_folder_name):
@@ -468,6 +468,8 @@ class MainFolderRemover(QObject):
         rows: [(row id int, thumb path), ...]
         """
         total = len(rows)
+        print(rows)
+        return
         for x, (id_, image_path) in enumerate(rows):
             try:
                 os.remove(image_path)

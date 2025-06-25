@@ -236,8 +236,12 @@ class ThumbUtils:
     @classmethod
     def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
         try:
-            img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
-            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            if os.path.exists(thumb_path):
+                img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
+                return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            else:
+                print("system > read_thumb > изображения не существует")
+                return None
         except Exception as e:
             MainUtils.print_error()
             return None
