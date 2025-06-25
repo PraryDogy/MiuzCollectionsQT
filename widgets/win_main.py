@@ -379,7 +379,7 @@ class WinMain(WinFrameless):
 
         for i in img_path_list:
             if os.path.isdir(i):
-                self.open_warn_win("Нельзя перетаскивать папки")
+                self.open_warn_win(Lang.attention, Lang.drop_only_files)
                 return
 
         if img_path_list:

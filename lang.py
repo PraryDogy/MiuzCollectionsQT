@@ -568,6 +568,11 @@ class Lang_:
         ),
     ]
 
+    drop_only_files = [
+        "Можно загружать только файлы.",
+        "Only files can be uploaded."
+    ]
+
 class Lang(Lang_):
 
     @classmethod
