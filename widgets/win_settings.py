@@ -837,7 +837,6 @@ class WinSettings(WinSystem):
         scan_wid.new_scan_time.connect(lambda value: self.set_scan_time(value))
         v_lay.addWidget(scan_wid)
 
-        # ДОПИЛИВАТЬ
         main_folder_tab = EditMainFoldersWid()
         cmd = lambda main_folder_copy: self.main_folder_changed_cmd(main_folder_copy)
         main_folder_tab.edit_main_folder.connect(cmd)
