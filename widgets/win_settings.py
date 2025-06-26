@@ -166,16 +166,19 @@ class AddItemWindow(WinSystem):
 class BaseListWidget(QListWidget):
     changed = pyqtSignal()
 
-    def __init__(self, main_folder: MainFolder, items: list[str]):
+    def __init__(self, main_folder: MainFolder, is_stop_list: bool):
         super().__init__()
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.contextMenuEvent = self.list_item_context
 
-        if not main_folder or not items:
-            return
+        self.main_folder = main_folder
+        self.is_stop_list = is_stop_list
 
-        self.main_folder_instance = main_folder
+        if self.is_stop_list:
+            items = self.main_folder.stop_list
+        else:
+            item_ = self.main_folder.paths
 
         for i in items:
             item_ = QListWidgetItem(i)
@@ -236,18 +239,6 @@ class BaseListWidget(QListWidget):
         self.changed.emit()
 
 
-class StopList(BaseListWidget):
-    def __init__(self, main_folder: MainFolder, items):
-        super().__init__(main_folder, items)
-        self.main_folder = main_folder
-
-
-class MainFoldersPaths(BaseListWidget):
-    def __init__(self, main_folder, items):
-        super().__init__(main_folder, items)
-        self.main_folder = main_folder
-
-
 class EditMainFoldersWid(QTabWidget):
     need_reboot = pyqtSignal()
 
@@ -257,7 +248,7 @@ class EditMainFoldersWid(QTabWidget):
         self.coll_folders_wid: dict[int, UTextEdit] = {}
 
         for main_folder in MainFolder.list_:
-            wid = self.tab_ui(main_folder=main_folder)
+            wid = self.tab_ui(main_folder)
             self.addTab(wid, main_folder.name)
 
         current_index = MainFolder.list_.index(MainFolder.current)
@@ -276,16 +267,16 @@ class EditMainFoldersWid(QTabWidget):
         h_lay_one.setSpacing(15)
         h_wid_one.setLayout(h_lay_one)
 
-        add_btn_one = QPushButton(Lang.add_)
-        add_btn_one.setFixedWidth(115)
-        h_lay_one.addWidget(add_btn_one)
+        add_stop_coll_btn = QPushButton(Lang.add_)
+        add_stop_coll_btn.setFixedWidth(115)
+        h_lay_one.addWidget(add_stop_coll_btn)
 
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         h_lay_one.addWidget(stop_colls_lbl)
 
         stop_colls_list = StopList(main_folder, main_folder.stop_list)
         stop_colls_list.changed.connect(self.list_changed)
-        add_btn_one.clicked.connect(stop_colls_list.add_item_cmd)
+        add_stop_coll_btn.clicked.connect(stop_colls_list.add_item_cmd)
         v_lay.addWidget(stop_colls_list)
 
         h_wid_two = QWidget()
@@ -415,7 +406,7 @@ class AddMainFolderWin(WinSystem):
         return super().keyPressEvent(a0)
     
 
-class RemoveWin(WinSystem):
+class RemoveMainFolderWin(WinSystem):
     del_main_folder = pyqtSignal(object)
 
     def __init__(self):
@@ -531,7 +522,7 @@ class MainFolderWid(QGroupBox):
         self.win.show()
 
     def remove_btn_cmd(self, *args):
-        self.win = RemoveWin()
+        self.win = RemoveMainFolderWin()
         self.win.del_main_folder.connect(lambda main_folder: self.del_main_folder.emit(main_folder))
         self.win.center_relative_parent(parent=self.window())
         self.win.show()
