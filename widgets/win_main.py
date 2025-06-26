@@ -60,6 +60,7 @@ class WinMain(WinFrameless):
         self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
         self.setMinimumWidth(750)
         self.setMenuBar(BarMacos())
+        self.set_window_title()
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -119,9 +120,6 @@ class WinMain(WinFrameless):
         splitter.setSizes([Static.MENU_LEFT_WIDTH, self.width() - Static.MENU_LEFT_WIDTH])
 
         self.grid.setFocus()
-
-        SignalsApp.instance.win_main_cmd.connect(self.win_main_cmd)
-        SignalsApp.instance.win_main_cmd.emit("set_title")
 
         self.scaner_timer = QTimer(self)
         self.scaner_timer.setSingleShot(True)
@@ -231,6 +229,8 @@ class WinMain(WinFrameless):
         dates_win.center_relative_parent(self)
         dates_win.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
         dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
+        dates_win.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        dates_win.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         dates_win.show()
 
     def open_warn_win(self, title: str, text: str):

@@ -41,6 +41,9 @@ class ClearBtn(QSvgWidget):
 
 
 class WidSearch(ULineEdit):
+    reload_thumbnails = pyqtSignal()
+    scroll_to_top = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setFixedWidth(150)
@@ -81,14 +84,14 @@ class WidSearch(ULineEdit):
         self.timer.start()
 
     def delayed_search(self):
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
+        self.reload_thumbnails.emit()
 
     def clear_search(self):
         self.clear()
         Dynamic.search_widget_text = None
         Dynamic.grid_offset = 0
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-        SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+        self.reload_thumbnails.emit()
+        self.scroll_to_top.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:

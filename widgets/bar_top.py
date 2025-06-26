@@ -1,17 +1,13 @@
-from typing import Literal
-
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QMouseEvent
-from PyQt5.QtWidgets import QAction, QLabel, QWidget
+from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtWidgets import QLabel, QWidget
 
-from ._base_widgets import UMenu, UHBoxLayout
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filter
 from system.lang import Lang
-from signals import SignalsApp
 
+from ._base_widgets import UHBoxLayout
 from .wid_search import WidSearch
-from .win_dates import WinDates
 
 BTN_W, BTN_H = 80, 28
 
@@ -112,6 +108,8 @@ class BarTop(QWidget):
         self.h_layout.addStretch(1)
 
         self.search_wid = WidSearch()
+        self.search_wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
+        self.search_wid.scroll_to_top.connect(lambda: self.scroll_to_top.emit())
         self.h_layout.addWidget(
             self.search_wid,
             alignment=Qt.AlignmentFlag.AlignRight

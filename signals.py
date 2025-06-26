@@ -2,12 +2,10 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 
 class Signals(QObject):
-    grid_thumbnails_cmd = pyqtSignal(str)
     progressbar_text = pyqtSignal(str)
     menu_left_cmd = pyqtSignal(str)
     slider_change_value = pyqtSignal(int)
     wid_search_cmd = pyqtSignal(str)
-    win_main_cmd = pyqtSignal(str)
     win_downloads_open = pyqtSignal()
     win_downloads_close = pyqtSignal()
 

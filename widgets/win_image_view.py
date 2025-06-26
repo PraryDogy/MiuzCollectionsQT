@@ -17,7 +17,7 @@ from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
                             WinChild)
 from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
                       WinInfoAction)
-from .grid.cell_widgets import Thumbnail
+from .grid import Thumbnail
 from .win_info import WinInfo
 from .win_warn import WinWarn
 

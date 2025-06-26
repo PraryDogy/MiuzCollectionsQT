@@ -301,10 +301,13 @@ class Grid(QScrollArea):
         self.setAcceptDrops(True)
         self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.horizontalScrollBar().setDisabled(True)
-        self.setHorizontalScrollBarPolicy(
-            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
-        )
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setStyleSheet("QScrollArea { border: none; }")
+        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
+
+        self.col_count: int = 0
+        self.wid_under_mouse: Thumbnail = None
+        self.origin_pos = QPoint()
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
@@ -316,53 +319,33 @@ class Grid(QScrollArea):
         self.scroll_layout = UVBoxLayout()
         self.scroll_wid.setLayout(self.scroll_layout)
 
-        self.col_count: int = 0
-
-        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
-        SignalsApp.instance.grid_thumbnails_cmd.connect(self.signals_cmd)
+        self.load_rubber()
         self.reload_thumbnails()
-
-        self.origin_pos = QPoint()
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
-
-        self.wid_under_mouse: Thumbnail = None
-
-    def signals_cmd(self, flag: str):
-        """
-        resize, to_top, reload
-        """
-        if flag == "resize":
-            self.resize_thumbnails()
-        elif flag == "to_top":
-            self.verticalScrollBar().setValue(0)
-        elif flag == "reload":
-            self.load_db_images(flag=FIRST)
-        else:
-            raise Exception("widgets > grid > main > wrong flag", flag)
-        self.setFocus()
-
-    def reload_thumbnails(self):
-        self.load_db_images(flag=FIRST)
 
     def scroll_to_top(self):
         self.verticalScrollBar().setValue(0)
 
-    def load_db_images(self, flag: str):
-        if flag == FIRST:
-            Dynamic.grid_offset = 0
-            cmd_ = lambda db_images: self.create_grid(db_images)
-        elif flag == MORE:
-            Dynamic.grid_offset += Static.GRID_LIMIT
-            cmd_ = lambda db_images: self.grid_more(db_images)
-        else: 
-            raise Exception("wrong flag", flag)
+    def reload_thumbnails(self):
+        Dynamic.grid_offset = 0
+        cmd_ = lambda db_images: self.create_grid(db_images)
+        self.start_load_db_images_task(cmd_)
+
+    def load_more_thumbnails(self):
+        Dynamic.grid_offset += Static.GRID_LIMIT
+        cmd_ = lambda db_images: self.grid_more(db_images)
+        self.start_load_db_images_task(cmd_)
+
+    def start_load_db_images_task(self, on_finish_cmd: callable):
         self.task_ = LoadDbImagesTask()
-        self.task_.signals_.finished_.connect(cmd_)
+        self.task_.signals_.finished_.connect(on_finish_cmd)
         UThreadPool.start(self.task_)
+
+    def load_rubber(self):
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
 
     def reload_rubber(self):
         self.rubberBand.deleteLater()
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
+        self.load_rubber()
 
     def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
         widgets = self.scroll_wid.findChildren(QWidget)
@@ -814,7 +797,7 @@ class Grid(QScrollArea):
             self.up_btn.hide()
 
         if value == self.verticalScrollBar().maximum():
-            self.load_db_images(flag=MORE)
+            self.load_more_thumbnails()
 
     def mouseDoubleClickEvent(self, a0):
         if self.wid_under_mouse:

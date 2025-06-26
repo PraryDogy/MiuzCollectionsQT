@@ -162,6 +162,8 @@ class WinDates(WinSystem):
     date_wid_width = 150
     dates_btn_solid = pyqtSignal()
     dates_btn_normal = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
+    scroll_to_top = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -227,18 +229,6 @@ class WinDates(WinSystem):
         btns_h_lay.addStretch(1)
 
         self.adjustSize()
-        # self.setFixedSize(self.width(), self.height())
-
-    # @classmethod
-    # def reset_dates(cls, *args):
-    #     Dynamic.date_start, Dynamic.date_end = None, None
-    #     Dynamic.f_date_start, Dynamic.f_date_end = None, None
-
-    #     Dynamic.grid_offset = 0
-
-    #     SignalsApp.instance.btn_dates_style.emit("normal")
-    #     SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-    #     SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
 
     def clear_btn_cmd(self, *args):
         for i in (self.left_date_wid, self.right_date_wid):
@@ -275,18 +265,18 @@ class WinDates(WinSystem):
             Dynamic.date_end = self.date_end
             Dynamic.f_date_start = self.named_date(date=Dynamic.date_start)
             Dynamic.f_date_end = self.named_date(date=Dynamic.date_end)
+            self.reload_thumbnails.emit()
+            self.scroll_to_top.emit()
             self.dates_btn_solid.emit()
         else:
             Dynamic.date_start, Dynamic.date_end = None, None
             Dynamic.f_date_start, Dynamic.f_date_end = None, None
             Dynamic.grid_offset = 0
-            SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
-            SignalsApp.instance.grid_thumbnails_cmd.emit("to_top")
+            self.reload_thumbnails.emit()
+            self.scroll_to_top.emit()
             self.dates_btn_normal.emit()
 
         self.deleteLater()
-
-        SignalsApp.instance.grid_thumbnails_cmd.emit("reload")
 
     def cancel_cmd(self, *args):
         self.dates_btn_normal.emit()
