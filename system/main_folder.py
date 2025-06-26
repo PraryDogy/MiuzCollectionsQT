@@ -83,10 +83,10 @@ class MainFolder:
         validate = cls.validate_data()
         if validate is None:
             data = cls.default_main_folders()
-            with open(MainFolder.json_file, "w") as f:
+            with open(MainFolder.json_file, "w", encoding='utf-8') as f:
                 f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
         else:
-            with open(MainFolder.json_file, "r") as f:
+            with open(MainFolder.json_file, "r", encoding='utf-8') as f:
                 data = json.loads(f.read())
 
         MainFolder.list_ = [MainFolder(*item) for item in data]
@@ -98,7 +98,7 @@ class MainFolder:
             if not os.path.exists(MainFolder.json_file):
                 return None
 
-            with open(MainFolder.json_file, "r") as f:
+            with open(MainFolder.json_file, "r", encoding='utf-8') as f:
                 data: list[list] = json.load(f)
 
             if not isinstance(data, list):
@@ -132,7 +132,7 @@ class MainFolder:
     @classmethod
     def write_json_data(cls):
         data = [i.get_data() for i in MainFolder.list_]
-        with open(MainFolder.json_file, "w") as f:
+        with open(MainFolder.json_file, "w", encoding='utf-8') as f:
             f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
 
     @classmethod
