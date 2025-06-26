@@ -369,6 +369,9 @@ class AddMainFolderWin(WinSystem):
         stop_list_wid = MainFolderItemsWid(self.new_main_folder, True)
         self.central_layout.addWidget(stop_list_wid)
 
+        cmd = lambda: stop_list_wid.open_add_row_win()
+        first_add_btn.clicked.connect(cmd)
+
         sec_row = QWidget()
         self.central_layout.addWidget(sec_row)
         sec_row_lay = UHBoxLayout()
@@ -379,11 +382,14 @@ class AddMainFolderWin(WinSystem):
         sec_add_btn.setFixedWidth(115)
         sec_row_lay.addWidget(sec_add_btn)
 
-        sec_desct_lbl = QLabel(Lang.where_to_look_coll_folder)
-        sec_row_lay.addWidget(sec_desct_lbl)
+        sec_descr_lbl = QLabel(Lang.where_to_look_coll_folder)
+        sec_row_lay.addWidget(sec_descr_lbl)
 
         paths_list_wid = MainFolderItemsWid(self.new_main_folder, False)
         self.central_layout.addWidget(paths_list_wid)
+
+        cmd = lambda: paths_list_wid.open_add_row_win()
+        sec_add_btn.clicked.connect(cmd)
 
         btns_wid = QWidget()
         self.central_layout.addWidget(btns_wid)
