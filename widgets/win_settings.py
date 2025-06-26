@@ -248,7 +248,7 @@ class MainFoldersPaths(BaseListWidget):
         self.main_folder = main_folder
 
 
-class TabsWidget(QTabWidget):
+class EditMainFoldersWid(QTabWidget):
     need_reboot = pyqtSignal()
 
     def __init__(self):
@@ -701,7 +701,7 @@ class Themes(QGroupBox):
             f.selected(f is selected_frame)
 
 
-class ScanTime(QGroupBox):
+class ScanTimeWid(QGroupBox):
     new_scan_time = pyqtSignal(int)
 
     def __init__(self):
@@ -818,12 +818,12 @@ class WinSettings(WinSystem):
 
         v_lay.addWidget(main_folder_wid)
 
-        scan_wid = ScanTime()
+        scan_wid = ScanTimeWid()
         scan_wid.new_scan_time.connect(lambda value: self.set_scan_time(value))
         v_lay.addWidget(scan_wid)
 
         # ДОПИЛИВАТЬ
-        main_folder_tab = TabsWidget()
+        main_folder_tab = EditMainFoldersWid()
         v_lay.addWidget(main_folder_tab)
 
         v_lay.addStretch()
@@ -850,7 +850,6 @@ class WinSettings(WinSystem):
         btns_layout.addWidget(cancel_btn)
 
         btns_layout.addStretch(1)
-
 
     def ok_cmd(self, *args):
         restart_app = False
