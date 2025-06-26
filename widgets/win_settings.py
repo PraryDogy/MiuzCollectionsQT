@@ -202,7 +202,7 @@ class MainFolderItemsWid(QListWidget):
         menu = UMenu(event=ev)
 
         add_item = QAction(parent=menu, text=Lang.add_)
-        add_item.triggered.connect(self.open_add_row_window)
+        add_item.triggered.connect(self.open_add_row_win)
         menu.addAction(add_item)
 
         wid = self.itemAt(ev.pos())
@@ -238,7 +238,7 @@ class MainFolderItemsWid(QListWidget):
         self.takeItem(row)
         self.main_folder_changed.emit()
 
-    def open_add_row_window(self):
+    def open_add_row_win(self):
         win = AddRowWindow()
         win.finished_.connect(self.add_row_fin)
         win.center_relative_parent(self.window())
@@ -304,6 +304,9 @@ class EditMainFoldersWid(QTabWidget):
         stop_colls_list.main_folder_changed.connect(cmd)
         v_lay.addWidget(stop_colls_list)
 
+        cmd = lambda: stop_colls_list.open_add_row_win()
+        add_stop_coll_btn.clicked.connect(cmd)
+
         h_wid_two = QWidget()
         v_lay.addWidget(h_wid_two)
         h_lay_two = UHBoxLayout()
@@ -322,6 +325,8 @@ class EditMainFoldersWid(QTabWidget):
         coll_folders_list.main_folder_changed.connect(cmd)
         v_lay.addWidget(coll_folders_list)
 
+        cmd = lambda: coll_folders_list.open_add_row_win()
+        add_btn_two.clicked.connect(cmd)
         return wid
 
 

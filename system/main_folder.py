@@ -45,6 +45,9 @@ class MainFolder:
         self.paths = paths
         self.stop_list = stop_list
         self._curr_path: str = curr_path
+
+    def set_name(self, value: str):
+        self.name = value
     
     def get_instance_copy(self):
         return MainFolder(
