@@ -2,7 +2,6 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 
 class Signals(QObject):
-    progressbar_text = pyqtSignal(str)
     menu_left_cmd = pyqtSignal(str)
     slider_change_value = pyqtSignal(int)
     wid_search_cmd = pyqtSignal(str)

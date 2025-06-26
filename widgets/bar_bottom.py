@@ -193,7 +193,6 @@ class BarBottom(QWidget):
 
         self.progress_bar = QLabel(text="")
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignRight)
-        SignalsApp.instance.progressbar_text.connect(self.progress_bar.setText)
         self.h_layout.addWidget(
             self.progress_bar,
             alignment=Qt.AlignmentFlag.AlignVCenter
