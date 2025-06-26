@@ -74,7 +74,7 @@ class FinderImages(QObject):
         - Если task_state.should_run() возвращает False, процесс прерывается.
         """
         finder_images = []
-        subdirs, rootdir = subdirs[:-1], subdirs[-1]
+        *subdirs, rootdir = subdirs
         subrirs_count = len(subdirs)
 
         for index, subdir in enumerate(subdirs, start=1):
@@ -129,7 +129,7 @@ class FinderImages(QObject):
                     finder_images.append(self.get_file_data(entry))
         return finder_images
 
-    def get_file_data(self, entry: os.DirEntry) -> tuple[str, int, int, int]:
+    def get_file_data(self, entry: os.DirEntry) -> tuple:
         """
         Возвращает информацию о файле: (путь, размер, время создания, время изменения).
         """
