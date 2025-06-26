@@ -140,7 +140,7 @@ class ImgWid(QLabel):
 class TextAdvancedWid(QLabel):
     def __init__(self, text: str):
         super().__init__()
-        self.setText(text)
+        self.setText(self.short_text(text))
         self.blue_color = "#6199E4"
         self.setStyleSheet(
             f"""
@@ -148,6 +148,12 @@ class TextAdvancedWid(QLabel):
             color: {self.blue_color};
             """
         )
+
+    def short_text(self, text: str, max_row: int = 18):
+        if len(text) >= max_row:
+            return f"{text[:max_row - 10]}...{text[-7:]}"
+        else:
+            return text
 
 
 class Thumbnail(QFrame, CellWid):
