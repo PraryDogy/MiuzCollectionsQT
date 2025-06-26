@@ -257,12 +257,12 @@ class MainFolderItemsWid(QListWidget):
 
 
 class EditMainFoldersWid(QTabWidget):
-    main_folder_changed = pyqtSignal(object)
+    edit_main_folder = pyqtSignal(object)
 
     def __init__(self):
         """
         Сигналы:
-        - main_folder_changed (object): сигнал об изменении копии объекта MainFolder. Сигнал означает,
+        - edit_main_folder (object): сигнал об изменении копии объекта MainFolder. Сигнал означает,
         что нужно обновить соответствующий объект MainFolder в списке MainFolder.list_.
 
         Описание:
@@ -300,7 +300,7 @@ class EditMainFoldersWid(QTabWidget):
         h_lay_one.addWidget(stop_colls_lbl)
 
         stop_colls_list = MainFolderItemsWid(main_folder_copy, True)
-        cmd = lambda: self.main_folder_changed.emit(main_folder_copy)
+        cmd = lambda: self.edit_main_folder.emit(main_folder_copy)
         stop_colls_list.main_folder_changed.connect(cmd)
         v_lay.addWidget(stop_colls_list)
 
@@ -318,7 +318,7 @@ class EditMainFoldersWid(QTabWidget):
         h_lay_two.addWidget(coll_folders_label)
 
         coll_folders_list = MainFolderItemsWid(main_folder_copy, False)
-        cmd = lambda: self.main_folder_changed.emit(main_folder_copy)
+        cmd = lambda: self.edit_main_folder.emit(main_folder_copy)
         coll_folders_list.main_folder_changed.connect(cmd)
         v_lay.addWidget(coll_folders_list)
 
@@ -326,90 +326,85 @@ class EditMainFoldersWid(QTabWidget):
 
 
 class AddMainFolderWin(WinSystem):
-    new_main_folder = pyqtSignal(object)
+    add_main_folder = pyqtSignal(object)
 
     def __init__(self):
         """
-        Сигналы: new_main_folder(MainFolder)
+        Сигналы: add_main_folder(MainFolder)
         """
         super().__init__()
-
-        self.empty_main_folder = MainFolder("", [], [], "")
-
         self.setWindowTitle(Lang.add_main_folder_title)
-
         self.setFixedSize(450, 400)
         self.central_layout.setSpacing(10)
+        self.new_main_folder = MainFolder("", [], [], "")
 
         descr_widget = QLabel(Lang.add_main_folder_descr)
         self.central_layout.addWidget(descr_widget)
 
-        self.name_wid = ULineEdit()
-        self.name_wid.setPlaceholderText(Lang.set_name_main_folder)
-        self.name_wid.textChanged.connect(lambda text: self.on_name_changed(text))
-        self.central_layout.addWidget(self.name_wid)
+        self.main_folder_name = ULineEdit()
+        self.main_folder_name.setPlaceholderText(Lang.set_name_main_folder)
+        self.main_folder_name.textChanged.connect(lambda text: self.on_name_changed(text))
+        self.central_layout.addWidget(self.main_folder_name)
 
-        h_wid_one = QWidget()
-        self.central_layout.addWidget(h_wid_one)
-        h_lay_one = UHBoxLayout()
-        h_lay_one.setSpacing(15)
-        h_wid_one.setLayout(h_lay_one)
+        first_row = QWidget()
+        self.central_layout.addWidget(first_row)
+        first_row_lay = UHBoxLayout()
+        first_row_lay.setSpacing(15)
+        first_row.setLayout(first_row_lay)
 
-        add_btn_one = QPushButton(Lang.add_)
-        add_btn_one.setFixedWidth(115)
-        h_lay_one.addWidget(add_btn_one)
+        first_add_btn = QPushButton(Lang.add_)
+        first_add_btn.setFixedWidth(115)
+        first_row_lay.addWidget(first_add_btn)
 
-        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
-        h_lay_one.addWidget(stop_colls_lbl)
+        first_descr_lbl = QLabel(Lang.sett_stopcolls)
+        first_row_lay.addWidget(first_descr_lbl)
 
-        stop_list_wid = MainFolderItemsWid(self.empty_main_folder, True)
+        stop_list_wid = MainFolderItemsWid(self.new_main_folder, True)
         self.central_layout.addWidget(stop_list_wid)
 
-        h_wid_two = QWidget()
-        self.central_layout.addWidget(h_wid_two)
-        h_lay_two = UHBoxLayout()
-        h_lay_two.setSpacing(15)
-        h_wid_two.setLayout(h_lay_two)
+        sec_row = QWidget()
+        self.central_layout.addWidget(sec_row)
+        sec_row_lay = UHBoxLayout()
+        sec_row_lay.setSpacing(15)
+        sec_row.setLayout(sec_row_lay)
 
-        add_btn_two = QPushButton(Lang.add_)
-        add_btn_two.setFixedWidth(115)
-        h_lay_two.addWidget(add_btn_two)
+        sec_add_btn = QPushButton(Lang.add_)
+        sec_add_btn.setFixedWidth(115)
+        sec_row_lay.addWidget(sec_add_btn)
 
-        coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
-        h_lay_two.addWidget(coll_folders_label)
+        sec_desct_lbl = QLabel(Lang.where_to_look_coll_folder)
+        sec_row_lay.addWidget(sec_desct_lbl)
 
-        paths_list_wid = MainFolderItemsWid(self.empty_main_folder, False)
+        paths_list_wid = MainFolderItemsWid(self.new_main_folder, False)
         self.central_layout.addWidget(paths_list_wid)
 
-        h_wid = QWidget()
-        self.central_layout.addWidget(h_wid)
+        btns_wid = QWidget()
+        self.central_layout.addWidget(btns_wid)
 
-        h_lay = UHBoxLayout()
-        h_lay.setSpacing(10)
-        h_wid.setLayout(h_lay)
+        btns_lay = UHBoxLayout()
+        btns_lay.setSpacing(10)
+        btns_wid.setLayout(btns_lay)
 
-        h_lay.addStretch()
+        btns_lay.addStretch()
 
         ok_btn = QPushButton(Lang.ok)
         ok_btn.clicked.connect(self.ok_cmd)
         ok_btn.setFixedWidth(90)
-        h_lay.addWidget(ok_btn)
+        btns_lay.addWidget(ok_btn)
 
         cancel_btn = QPushButton(Lang.cancel)
         cancel_btn.clicked.connect(self.close)
         cancel_btn.setFixedWidth(90)
-        h_lay.addWidget(cancel_btn)
+        btns_lay.addWidget(cancel_btn)
 
-        h_lay.addStretch()
-
-        self.central_layout.addWidget
+        btns_lay.addStretch()
 
     def on_name_changed(self, text: str):
-        self.empty_main_folder.name = text
+        self.new_main_folder.name = text
 
     def ok_cmd(self):
-        if self.empty_main_folder.name and self.empty_main_folder.paths:
-            self.new_main_folder.emit(self.empty_main_folder)
+        if self.new_main_folder.name and self.new_main_folder.paths:
+            self.add_main_folder.emit(self.new_main_folder)
             self.deleteLater()
 
     def keyPressEvent(self, a0):
@@ -441,6 +436,7 @@ class RemoveMainFolderWin(WinSystem):
         for main_folder in MainFolder.list_:
             item = QListWidgetItem(list_widget)
             item.setSizeHint(QSize(self.width(), LIST_ITEM_H))
+            item.main_folder = main_folder
             label = QLabel(main_folder.name)
             label.setStyleSheet("padding-left: 2px;")
             list_widget.addItem(item)
@@ -472,13 +468,9 @@ class RemoveMainFolderWin(WinSystem):
 
         selected_item = list_widget.currentItem()
         if selected_item:
-            label: QLabel = list_widget.itemWidget(selected_item)
-            text = label.text()
-            for main_folder in MainFolder.list_:
-                if main_folder.name == text:
-                    self.del_main_folder.emit(main_folder)
-                    self.deleteLater()
-                    break
+            main_folder: MainFolder = selected_item.main_folder
+            self.del_main_folder.emit(main_folder)
+            self.deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
@@ -531,7 +523,7 @@ class MainFolderWid(QGroupBox):
 
     def add_btn_cmd(self, *args):
         self.win = AddMainFolderWin()
-        self.win.new_main_folder.connect(lambda main_folder: self.new_main_folder.emit(main_folder))
+        self.win.add_main_folder.connect(lambda main_folder: self.new_main_folder.emit(main_folder))
         self.win.center_relative_parent(parent=self.window())
         self.win.show()
 
@@ -835,7 +827,7 @@ class WinSettings(WinSystem):
         # ДОПИЛИВАТЬ
         main_folder_tab = EditMainFoldersWid()
         cmd = lambda main_folder_copy: self.main_folder_changed_cmd(main_folder_copy)
-        main_folder_tab.main_folder_changed.connect(cmd)
+        main_folder_tab.edit_main_folder.connect(cmd)
         v_lay.addWidget(main_folder_tab)
 
         v_lay.addStretch()
