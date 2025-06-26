@@ -2,13 +2,12 @@ import os
 
 from PyQt5.QtCore import QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSlider, QWidget
+from PyQt5.QtWidgets import QFrame, QLabel, QSlider, QWidget
 
-from ._base_widgets import UMenu, UHBoxLayout, SvgBtn
 from cfg import Dynamic, Static, ThumbData
 from system.lang import Lang
-from signals import SignalsApp
 
+from ._base_widgets import SvgBtn, UHBoxLayout
 from .actions import MenuTypes
 from .win_downloads import WinDownloads
 from .win_settings import WinSettings
@@ -178,8 +177,6 @@ class BarBottom(QWidget):
         self.init_ui()
 
         self.downloads_win = None
-        SignalsApp.instance.win_downloads_open.connect(self.open_downloads_win)
-        SignalsApp.instance.win_downloads_close.connect(self.close_downloads_win)
 
     def init_ui(self):
 

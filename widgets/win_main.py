@@ -1,5 +1,4 @@
 import os
-from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
@@ -7,7 +6,6 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
-from signals import SignalsApp
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,

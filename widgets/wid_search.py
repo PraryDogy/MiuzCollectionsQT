@@ -1,5 +1,4 @@
 import os
-from typing import Literal
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
@@ -8,7 +7,6 @@ from PyQt5.QtWidgets import QLineEdit
 
 from cfg import Dynamic, Static
 from system.lang import Lang
-from signals import SignalsApp
 
 from ._base_widgets import ULineEdit
 

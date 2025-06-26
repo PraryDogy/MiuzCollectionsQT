@@ -2,7 +2,6 @@ import os
 import subprocess
 from typing import Literal
 
-import sqlalchemy
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QTabWidget
@@ -10,7 +9,6 @@ from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QTabWidget
 from cfg import Dynamic, Static
 from system.lang import Lang
 from system.main_folder import MainFolder
-from signals import SignalsApp
 from system.tasks import LoadCollectionsTask
 from system.utils import UThreadPool
 

@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QRubberBand, QScrollArea, QSizePolicy, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
-from signals import SignalsApp
 from system.filters import Filter
 from system.lang import Lang
 from system.main_folder import MainFolder
