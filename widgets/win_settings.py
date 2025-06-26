@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 
 from PyQt5.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
@@ -236,15 +237,15 @@ class BaseListWidget(QListWidget):
 
 
 class StopList(BaseListWidget):
-    def __init__(self, main_folder, items):
+    def __init__(self, main_folder: MainFolder, items):
         super().__init__(main_folder, items)
-        self.main_folder_instance = main_folder
+        self.main_folder = main_folder
 
 
 class MainFoldersPaths(BaseListWidget):
     def __init__(self, main_folder, items):
         super().__init__(main_folder, items)
-        self.main_folder_instance = main_folder
+        self.main_folder = main_folder
 
 
 class TabsWidget(QTabWidget):
@@ -821,8 +822,8 @@ class WinSettings(WinSystem):
         scan_wid.new_scan_time.emit(lambda value: self.set_scan_time(value))
         v_lay.addWidget(scan_wid)
 
+        # ДОПИЛИВАТЬ
         main_folder_tab = TabsWidget()
-        main_folder_tab.need_lock_widgets.connect(self.need_reboot_cmd)
         v_lay.addWidget(main_folder_tab)
 
         v_lay.addStretch()
@@ -850,54 +851,43 @@ class WinSettings(WinSystem):
 
         btns_layout.addStretch(1)
 
-    def need_reboot_cmd(self, *args):
-        self.ok_btn.setText(Lang.apply)
-        self.need_reboot = True
 
     def ok_cmd(self, *args):
-        rebootable = self.findChild(RebootableSettings)
-        main_folder_tab = self.findChild(TabsWidget)
-        main_folder_wid = self.findChild(MainFolderWid)
         restart_app = False
-        
-        if self.scan_time != JsonData.scaner_minutes:
-            JsonData.write_json_data()
-            restart_app = True
-            
-        if hasattr(rebootable.reset_data_btn, NEED_REBOOT):
-            JsonData.write_json_data()
-            MainUtils.rm_rf(Static.APP_SUPPORT_DIR)
-            restart_app = True
 
-        elif hasattr(rebootable.lang_btn, NEED_REBOOT):
-            JsonData.lang_ind += 1
-            Lang.init()
-            JsonData.write_json_data()
+        if self.new_main_folders:
             restart_app = True
+            for i in self.new_main_folders:
+                MainFolder.list_.append(i)
 
-        elif hasattr(main_folder_wid, NEED_REBOOT):
-            if hasattr(main_folder_wid, REMOVE_MAIN_FOLDER_NAME):
+        if self.del_main_folders:
+            restart_app = True
+            for del_main_f in self.del_main_folders:
                 for i in MainFolder.list_:
-                    if i.name == getattr(main_folder_wid, REMOVE_MAIN_FOLDER_NAME):
+                    if del_main_f.name == i.name:
                         MainFolder.list_.remove(i)
-            elif hasattr(main_folder_wid, ADD_NEW_MAIN_FOLDER):
-                MainFolder.list_.append(getattr(main_folder_wid, ADD_NEW_MAIN_FOLDER))
-            JsonData.write_json_data()
-            MainFolder.write_json_data()
-            restart_app = True
 
-        elif hasattr(main_folder_tab, NEED_REBOOT):
-            for i in self.findChildren(MainFoldersPaths):
-                i.main_folder_instance.paths = i.get_items()
-            for i in self.findChildren(StopList):
-                i.main_folder_instance.stop_list = i.get_items()
-            JsonData.write_json_data()
+        if self.new_lang:
             restart_app = True
+            JsonData.lang_ind = self.new_lang
 
-        self.deleteLater()
+        if self.scan_time:
+            restart_app = True
+            JsonData.scaner_minutes = self.scan_time
+
+        if self.reset_data:
+            restart_app = True
+            shutil.rmtree(Static.APP_SUPPORT_DIR)
+
         if restart_app:
+            self.hide()
+            MainFolder.write_json_data()
+            JsonData.write_json_data()
             QApplication.quit()
             MainUtils.start_new_app()
+        else:
+            self.deleteLater()
+
 
     def new_row_list(self, wid: UTextEdit) -> list[str]:
         return[
