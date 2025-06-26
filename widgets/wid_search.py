@@ -64,14 +64,6 @@ class WidSearch(ULineEdit):
             INPUT_H // 4
         )
 
-        SignalsApp.instance.wid_search_cmd.connect(self.wid_search_cmd)
-
-    def wid_search_cmd(self, flag: Literal["focus"]):
-        if flag == "focus":
-            self.setFocus()
-        else:
-            raise Exception("widgets > wid search > wrong flag", flag)
-
     def create_search(self, new_text):
         if len(new_text) > 0:
             Dynamic.search_widget_text = new_text
