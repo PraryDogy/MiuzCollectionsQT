@@ -17,16 +17,21 @@ from system.utils import MainUtils
 from ._base_widgets import (UHBoxLayout, ULineEdit, UMenu, UTextEdit,
                             UVBoxLayout, WinSystem)
 
-NEED_REBOOT = "___need_reboot___"
 LIST_ITEM_H = 25
-REMOVE_MAIN_FOLDER_NAME = "REMOVE_MAIN_FOLDER_NAME"
-ADD_NEW_MAIN_FOLDER = "ADD_NEW_MAIN_FOLDER"
 ICON_SVG = os.path.join(Static.images_dir, "icon.svg")
 
+
 class RebootableSettings(QGroupBox):
-    apply = pyqtSignal()
+    reset_data = pyqtSignal()
+    new_lang = pyqtSignal(int)
 
     def __init__(self):
+        """
+        Сигналы:
+        - reset_data() сброс всех настроек приложения
+        - new_lang(0 или 1): system > lang > _Lang._lang_name. 
+        0 это русский язык, 1 это английский
+        """
         super().__init__()
 
         v_lay = UVBoxLayout()
@@ -52,10 +57,10 @@ class RebootableSettings(QGroupBox):
         sec_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_row_wid.setLayout(sec_row_lay)
 
-        self.reset_btn = QPushButton(Lang.reset)
-        self.reset_btn.setFixedWidth(115)
-        self.reset_btn.clicked.connect(self.reset_btn_cmd)
-        sec_row_lay.addWidget(self.reset_btn)
+        self.reset_data_btn = QPushButton(Lang.reset)
+        self.reset_data_btn.setFixedWidth(115)
+        self.reset_data_btn.clicked.connect(lambda: self.reset_data.emit())
+        sec_row_lay.addWidget(self.reset_data_btn)
 
         descr = QLabel(text=Lang.restore_db_descr)
         sec_row_lay.addWidget(descr)
@@ -63,23 +68,15 @@ class RebootableSettings(QGroupBox):
         v_lay.addWidget(first_row_wid)
         v_lay.addWidget(sec_row_wid)
 
-    def cmd_(self, wid: QWidget):
-        self.apply.emit()
-        setattr(wid, NEED_REBOOT, True)
-
-    def reset_btn_cmd(self, *args):
-        self.lang_btn.setDisabled(True)
-        self.cmd_(wid=self.reset_btn)
-
     def lang_btn_cmd(self, *args):
-        # костыль но что ж поделать
         if self.lang_btn.text() == "Русский":
-            self.lang_btn.setText("English")
+            _lang_name = "English" 
+            self.lang_btn.setText(_lang_name)
+            self.new_lang.emit(1) # соответствует system > lang > _lang_name
         else:
-            self.lang_btn.setText("Русский")
-
-        self.reset_btn.setDisabled(True)
-        self.cmd_(wid=self.lang_btn)
+            _lang_name = "Русский"
+            self.lang_btn.setText(_lang_name)
+            self.new_lang.emit(0)  # соответствует system > lang > _lang_name
 
 
 class SimpleSettings(QGroupBox):
@@ -251,7 +248,7 @@ class MainFoldersPaths(BaseListWidget):
 
 
 class TabsWidget(QTabWidget):
-    need_lock_widgets = pyqtSignal()
+    need_reboot = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -311,18 +308,16 @@ class TabsWidget(QTabWidget):
         return wid
     
     def list_changed(self):
-        # сигнал нужен, чтобы остальные виджеты окна настроек были заблокированы
-        self.need_lock_widgets.emit()
-
-        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
-        # произошла перезагрузка приложения
-        setattr(self, NEED_REBOOT, True)
+        self.need_reboot.emit()
 
 
 class AddMainFolderWin(WinSystem):
-    ok_pressed = pyqtSignal(object)
+    new_main_folder = pyqtSignal(object)
 
     def __init__(self):
+        """
+        Сигналы: new_main_folder(MainFolder)
+        """
         super().__init__()
 
         self.setWindowTitle(Lang.add_main_folder_title)
@@ -408,7 +403,7 @@ class AddMainFolderWin(WinSystem):
                 stop_list=stop_list
             )
 
-            self.ok_pressed.emit(new_main_folder)
+            self.new_main_folder.emit(new_main_folder)
             self.deleteLater()
 
     def keyPressEvent(self, a0):
@@ -420,9 +415,12 @@ class AddMainFolderWin(WinSystem):
     
 
 class RemoveWin(WinSystem):
-    ok_pressed = pyqtSignal(str)
+    del_main_folder = pyqtSignal(object)
 
     def __init__(self):
+        """
+        Сигналы: del_main_folder(MainFolder)
+        """
         super().__init__()
         self.setWindowTitle(Lang.delete_main_folder)
 
@@ -472,7 +470,7 @@ class RemoveWin(WinSystem):
             text = label.text()
             for main_folder in MainFolder.list_:
                 if main_folder.name == text:
-                    self.ok_pressed.emit(text)
+                    self.del_main_folder.emit(main_folder)
                     self.deleteLater()
                     break
 
@@ -485,7 +483,8 @@ class RemoveWin(WinSystem):
 
 
 class MainFolderWid(QGroupBox):
-    need_lock_widgets = pyqtSignal()
+    new_main_folder = pyqtSignal(object)
+    del_main_folder = pyqtSignal(object)
 
     def __init__(self):
         super().__init__()
@@ -526,28 +525,13 @@ class MainFolderWid(QGroupBox):
 
     def add_btn_cmd(self, *args):
         self.win = AddMainFolderWin()
-
-        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
-        # произошла перезагрузка приложения
-        self.win.ok_pressed.connect(lambda obj: setattr(self, NEED_REBOOT, True))
-        self.win.ok_pressed.connect(lambda obj: setattr(self, ADD_NEW_MAIN_FOLDER, obj))
-        # сигнал нужен, чтобы при нажатии на "ок" в окне AddMainFolderWin
-        # остальные виджеты окна настроек были заблокированы
-        self.win.ok_pressed.connect(self.need_lock_widgets.emit)
+        self.win.new_main_folder.connect(lambda main_folder: self.new_main_folder.emit(main_folder))
         self.win.center_relative_parent(parent=self.window())
         self.win.show()
 
     def remove_btn_cmd(self, *args):
         self.win = RemoveWin()
-
-        # аттрибут нужен, чтобы при нажатии на "ок" в главном окне настроек
-        # произошла перезагрузка приложения
-        self.win.ok_pressed.connect(lambda text: setattr(self, NEED_REBOOT, True))
-        self.win.ok_pressed.connect(lambda text: setattr(self, REMOVE_MAIN_FOLDER_NAME, text))
-
-        # сигнал нужен, чтобы при нажатии на "ок" в окне AddMainFolderWin
-        # остальные виджеты окна настроек были заблокированы
-        self.win.ok_pressed.connect(self.need_lock_widgets.emit)
+        self.win.del_main_folder.connect(lambda main_folder: self.del_main_folder.emit(main_folder))
         self.win.center_relative_parent(parent=self.window())
         self.win.show()
 
@@ -717,7 +701,12 @@ class Themes(QGroupBox):
 
 
 class ScanTime(QGroupBox):
+    new_scan_time = pyqtSignal(int)
+
     def __init__(self):
+        """
+        Сигналы: new_scan_time(int)
+        """
         super().__init__()
 
         layout = UHBoxLayout(self)
@@ -738,7 +727,7 @@ class ScanTime(QGroupBox):
         layout.addWidget(self.spin)
 
     def change_scan_time(self, value: int):
-        JsonData.scaner_minutes = value
+        self.new_scan_time.emit(value)
 
 
 class WinSettings(WinSystem):
@@ -747,6 +736,11 @@ class WinSettings(WinSystem):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lang.settings)
+        self.new_main_folders: list[MainFolder] = []
+        self.del_main_folders: list[MainFolder] = []
+        self.reset_data = False
+        self.new_lang = None
+        self.scan_time = None
 
         self.init_ui()
         self.first_tab()
@@ -754,7 +748,28 @@ class WinSettings(WinSystem):
         self.btns_wid()
         self.setFixedWidth(420)
 
-        self.scaner_minutes = JsonData.scaner_minutes
+    def reset_data_cmd(self):
+        self.reset_data = True
+        self.set_apply_btn()
+
+    def new_lang_cmd(self, value: int):
+        self.new_lang = value
+        self.set_apply_btn()
+
+    def add_new_main_folder(self, main_folder: MainFolder):
+        self.new_main_folders.append(main_folder)
+        self.set_apply_btn()
+
+    def del_new_main_folder(self, main_folder: MainFolder):
+        self.del_main_folders.append(main_folder)
+        self.set_apply_btn()
+
+    def set_scan_time(self, value: int):
+        self.scan_time = value
+
+    def set_apply_btn(self):
+        self.ok_btn.setText(Lang.apply)
+        self.set_apply_btn()
 
     def init_ui(self):
         self.tabs_wid = QTabWidget()
@@ -769,9 +784,10 @@ class WinSettings(WinSystem):
         v_lay.setSpacing(10)
         v_wid.setLayout(v_lay)
 
-        rebootable_settings = RebootableSettings()
-        rebootable_settings.apply.connect(self.lock_widgets)
-        v_lay.addWidget(rebootable_settings)
+        rebootable_sett = RebootableSettings()
+        rebootable_sett.new_lang.connect(lambda value: self.new_lang_cmd(value))
+        rebootable_sett.reset_data.connect(lambda: self.reset_data_cmd())
+        v_lay.addWidget(rebootable_sett)
 
         simple_settings = SimpleSettings()
         v_lay.addWidget(simple_settings)
@@ -793,15 +809,20 @@ class WinSettings(WinSystem):
         v_lay.setSpacing(10)
         v_wid.setLayout(v_lay)
 
-        add_main_folder = MainFolderWid()
-        add_main_folder.need_lock_widgets.connect(self.lock_widgets)
-        v_lay.addWidget(add_main_folder)
+        main_folder_wid = MainFolderWid()
+        add_cmd = lambda main_folder: self.add_new_main_folder(main_folder)
+        del_cmd = lambda main_folder: self.del_new_main_folder(main_folder)
+        main_folder_wid.new_main_folder.connect(add_cmd)
+        main_folder_wid.del_main_folder.connect(del_cmd)
+
+        v_lay.addWidget(main_folder_wid)
 
         scan_wid = ScanTime()
+        scan_wid.new_scan_time.emit(lambda value: self.set_scan_time(value))
         v_lay.addWidget(scan_wid)
 
         main_folder_tab = TabsWidget()
-        main_folder_tab.need_lock_widgets.connect(self.lock_widgets)
+        main_folder_tab.need_lock_widgets.connect(self.need_reboot_cmd)
         v_lay.addWidget(main_folder_tab)
 
         v_lay.addStretch()
@@ -829,8 +850,9 @@ class WinSettings(WinSystem):
 
         btns_layout.addStretch(1)
 
-    def lock_widgets(self, *args):
+    def need_reboot_cmd(self, *args):
         self.ok_btn.setText(Lang.apply)
+        self.need_reboot = True
 
     def ok_cmd(self, *args):
         rebootable = self.findChild(RebootableSettings)
@@ -838,11 +860,11 @@ class WinSettings(WinSystem):
         main_folder_wid = self.findChild(MainFolderWid)
         restart_app = False
         
-        if self.scaner_minutes != JsonData.scaner_minutes:
+        if self.scan_time != JsonData.scaner_minutes:
             JsonData.write_json_data()
             restart_app = True
             
-        if hasattr(rebootable.reset_btn, NEED_REBOOT):
+        if hasattr(rebootable.reset_data_btn, NEED_REBOOT):
             JsonData.write_json_data()
             MainUtils.rm_rf(Static.APP_SUPPORT_DIR)
             restart_app = True

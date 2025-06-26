@@ -1,7 +1,7 @@
 from cfg import JsonData
 
 
-class Lang_:
+class _Lang:
     _lang_name = [
         "Русский",
         "English"
@@ -578,7 +578,7 @@ class Lang_:
         "Continue"
     ]
 
-class Lang(Lang_):
+class Lang(_Lang):
 
     @classmethod
     def init(cls):
@@ -589,14 +589,14 @@ class Lang(Lang_):
         Проверка по lang_name это просто проверка по любому аттрибуту.
         """
 
-        max_ = len(Lang_._lang_name) - 1
+        max_ = len(_Lang._lang_name) - 1
 
         if JsonData.lang_ind > max_:
             print("lang > init")
             print(f"lang_ind is {JsonData.lang_ind}, max is {max_}, set to 0")
             JsonData.lang_ind = 0
 
-        for k, v in vars(Lang_).items():
+        for k, v in vars(_Lang).items():
             if isinstance(v, list):
                 setattr(cls, k, v[JsonData.lang_ind])
     
