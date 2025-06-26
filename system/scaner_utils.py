@@ -37,7 +37,7 @@ class FinderImages(QObject):
 
     def run(self) -> list | None:
         try:
-            collections = self.get_main_folder_subdirs()
+            collections = self.collect_scan_dirs()
             finder_images = self.process_subdirs(collections)
             if finder_images:
                 return finder_images
@@ -48,36 +48,36 @@ class FinderImages(QObject):
             self.task_state.set_should_run(False)
             return None
 
-    def get_main_folder_subdirs(self) -> list[str]:
+    def collect_scan_dirs(self) -> list[str]:
         """
-        Возвращает список подпапок MainFolder и путь MainFolder.    
-        То есть для последующего сканирования у нас будет список:   
-        [/path/to/MainFolder/sub_dir, ..., /path/to/MainFolder]     
+        Возвращает список путей для сканирования:
+        - все подпапки текущей директории MainFolder, кроме тех, что в stop_list
+        - сам путь MainFolder в конце списка
         """
         collections = []
         for item in os.scandir(self.main_folder.get_current_path()):
-            if item.is_dir():
-                if item.name not in self.main_folder.stop_list:
-                    collections.append(item.path)
-        # Добавляем корневую папку в конец списка коллекций (подпапок),
-        # чтобы сканер мог найти изображения как в корневой папке,
-        # так и в подпапках. Например:
-        # - .../root/img.jpg — изображение в корневой папке
-        # - .../root/collection/img.jpg — изображение в подпапке
+            if item.is_dir() and item.name not in self.main_folder.stop_list:
+                collections.append(item.path)
         collections.append(self.main_folder.get_current_path())
         return collections
 
     def process_subdirs(self, subdirs: list[str]) -> list:
         """
-        Возвращает все изображения из MainFolder    
-        [(img_path, size, birth_time, mod_time), ...]   
+        Обрабатывает переданные директории и собирает информацию об изображениях.
+
+        Возвращает список кортежей с данными файлов:
+        [(img_path, size, birth_time, mod_time), ...]
+
+        - Все подпапки (кроме последней) сканируются рекурсивно.
+        - Последняя папка (корневая) сканируется только на наличие изображений в ней самой.
+        - Прогресс отображается через сигнал progress_text.
+        - Если task_state.should_run() возвращает False, процесс прерывается.
         """
         finder_images = []
+        subdirs, rootdir = subdirs[:-1], subdirs[-1]
         subrirs_count = len(subdirs)
 
-        for index, subdir in enumerate(subdirs[:-1], start=1):
-            # import time
-            # time.sleep(0.5)
+        for index, subdir in enumerate(subdirs, start=1):
             if not self.task_state.should_run():
                 return finder_images
             text = self.get_progress_text(index, subrirs_count)
@@ -89,10 +89,7 @@ class FinderImages(QObject):
                 MainUtils.print_error()
                 continue
 
-        # Сканируем корневую папку без рекурсии в подпапки,
-        # чтобы найти изображения непосредственно в корневой папке.
-        # В функции get_collections корневая папка добавляется в конец списка коллекций.
-        for i in os.scandir(subdirs[-1]):
+        for i in os.scandir(rootdir):
             if i.name.endswith(Static.ext_all):
                 try:
                     file_data = self.get_file_data(i)
@@ -103,32 +100,39 @@ class FinderImages(QObject):
         return finder_images
 
     def get_progress_text(self, current: int, total: int) -> str:
-        """Формирует текст для прогресс-бара."""
+        """
+        Формирует строку для отображения прогресса обработки:
+        Пример: "Miuz (MainFolder.name): коллекция 3 из 10"
+        """
         main_folder = self.main_folder.name.capitalize()
         collection_name = Lang.collection
         return f"{main_folder}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
-    def walk_subdir(self, coll: str) -> list[tuple[str, int, int, int]]:
-        """Рекурсивно обходит директорию и находит изображения."""
+    def walk_subdir(self, subdir: str) -> list[tuple]:
+        """
+        Рекурсивно обходит поддиректории и собирает данные об изображениях.
+
+        Возвращает:
+        - Список кортежей: [(путь, размер, дата_создания, дата_модификации), ...]
+        - Прерывается, если task_state.should_run() вернёт False.
+        """
         finder_images = []
-        stack = []
-        stack.append(coll)
+        stack = [subdir]
         while stack:
             current_dir = stack.pop()
-            with os.scandir(current_dir) as entries:
-                for entry in entries:
-                    # нельзя удалять
-                    # это прервет FinderImages, но не остальные классы
-                    if not self.task_state.should_run():
-                        return finder_images
-                    if entry.is_dir():
-                        stack.append(entry.path)
-                    elif entry.name.endswith(Static.ext_all):
-                        finder_images.append(self.get_file_data(entry))
+            for entry in os.scandir(current_dir):
+                if not self.task_state.should_run():
+                    return finder_images
+                if entry.is_dir():
+                    stack.append(entry.path)
+                elif entry.name.endswith(Static.ext_all):
+                    finder_images.append(self.get_file_data(entry))
         return finder_images
 
     def get_file_data(self, entry: os.DirEntry) -> tuple[str, int, int, int]:
-        """Получает данные файла."""
+        """
+        Возвращает информацию о файле: (путь, размер, время создания, время изменения).
+        """
         stats = entry.stat()
         return (
             entry.path,
