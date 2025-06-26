@@ -207,14 +207,16 @@ class MainFolderItemsWid(QListWidget):
 
         wid = self.itemAt(ev.pos())
         if wid:
-            del_item = QAction(parent=menu, text=Lang.del_)
-            del_item.triggered.connect(self.del_item_cmd)
-            menu.addAction(del_item)
-
             copy_text = QAction(parent=menu, text=Lang.copy)
             cmd = lambda: MainUtils.copy_text(wid.text())
             copy_text.triggered.connect(cmd)
             menu.addAction(copy_text)
+
+            menu.addSeparator()
+        
+            del_item = QAction(parent=menu, text=Lang.del_)
+            del_item.triggered.connect(self.del_item_cmd)
+            menu.addAction(del_item)
 
         menu.show_menu()
 
