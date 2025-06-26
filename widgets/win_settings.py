@@ -767,10 +767,10 @@ class WinSettings(WinSystem):
 
     def set_scan_time(self, value: int):
         self.scan_time = value
+        self.set_apply_btn()
 
     def set_apply_btn(self):
         self.ok_btn.setText(Lang.apply)
-        self.set_apply_btn()
 
     def init_ui(self):
         self.tabs_wid = QTabWidget()
@@ -819,7 +819,7 @@ class WinSettings(WinSystem):
         v_lay.addWidget(main_folder_wid)
 
         scan_wid = ScanTime()
-        scan_wid.new_scan_time.emit(lambda value: self.set_scan_time(value))
+        scan_wid.new_scan_time.connect(lambda value: self.set_scan_time(value))
         v_lay.addWidget(scan_wid)
 
         # ДОПИЛИВАТЬ
@@ -876,10 +876,10 @@ class WinSettings(WinSystem):
             JsonData.scaner_minutes = self.scan_time
 
         if self.reset_data:
-            restart_app = True
             shutil.rmtree(Static.APP_SUPPORT_DIR)
-
-        if restart_app:
+            QApplication.quit()
+            MainUtils.start_new_app()
+        elif restart_app:
             self.hide()
             MainFolder.write_json_data()
             JsonData.write_json_data()
