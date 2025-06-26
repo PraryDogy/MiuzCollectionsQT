@@ -14,7 +14,6 @@ from system.lang import Lang
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
-
 from ._base_widgets import (UHBoxLayout, ULineEdit, UMenu, UTextEdit,
                             UVBoxLayout, WinSystem)
 
@@ -115,10 +114,13 @@ class SimpleSettings(QGroupBox):
             print(e)
 
 
-class AddItemWindow(WinSystem):
-    clicked_ = pyqtSignal(str)
+class AddRowWindow(WinSystem):
+    finished_ = pyqtSignal(str)
 
     def __init__(self):
+        """
+        Сигналы: finished_(str), возвращает текст из поля ввода
+        """
         super().__init__()
         self.setFixedSize(300, 80)
         self.setWindowTitle(Lang.paste_text)
@@ -152,7 +154,7 @@ class AddItemWindow(WinSystem):
     def ok_cmd(self):
         text = self.text_edit.text().replace("\n", "").strip()
         if text:
-            self.clicked_.emit(text)
+            self.finished_.emit(text)
             self.deleteLater()
 
     def keyPressEvent(self, a0):
@@ -163,22 +165,32 @@ class AddItemWindow(WinSystem):
         return super().keyPressEvent(a0)
 
 
-class BaseListWidget(QListWidget):
-    changed = pyqtSignal()
+class MainFolderItemsWid(QListWidget):
+    main_folder_changed = pyqtSignal()
 
-    def __init__(self, main_folder: MainFolder, is_stop_list: bool):
+    def __init__(self, main_folder_copy: MainFolder, is_stop_list: bool):
+        """
+        Сигналы:
+        - main_folder_changed (): сигнал об изменении копии объекта MainFolder. Сигнал означает,
+        что нужно обновить соответствующий объект MainFolder в списке MainFolder.list_.
+
+        Описание:
+        - Виджет работает с копией объекта MainFolder, а не с оригиналом. Это необходимо для того,
+        чтобы изменения в объекте применялись только после нажатия "ОК" в окне настроек.
+        Если пользователь нажимает "Отмена", оригинальный MainFolder остаётся без изменений.
+        """
         super().__init__()
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.contextMenuEvent = self.list_item_context
 
-        self.main_folder = main_folder
+        self.main_folder_copy = main_folder_copy
         self.is_stop_list = is_stop_list
 
         if self.is_stop_list:
-            items = self.main_folder.stop_list
+            items = self.main_folder_copy.stop_list
         else:
-            item_ = self.main_folder.paths
+            items = self.main_folder_copy.paths
 
         for i in items:
             item_ = QListWidgetItem(i)
@@ -190,7 +202,7 @@ class BaseListWidget(QListWidget):
         menu = UMenu(event=ev)
 
         add_item = QAction(parent=menu, text=Lang.add_)
-        add_item.triggered.connect(self.add_item_cmd)
+        add_item.triggered.connect(self.open_add_row_window)
         menu.addAction(add_item)
 
         wid = self.itemAt(ev.pos())
@@ -216,45 +228,58 @@ class BaseListWidget(QListWidget):
     def del_item_cmd(self):
         selected_item = self.currentItem()
         row = self.row(selected_item)
+        row_text = selected_item.text()
+
+        if self.is_stop_list:
+            self.main_folder_copy.stop_list.remove(row_text)
+        else:
+            self.main_folder_copy.paths.remove(row_text)
+
         self.takeItem(row)
-        self.changed.emit()
+        self.main_folder_changed.emit()
 
-    def get_items(self):
-        return [
-            self.item(i).text()
-            for i in range(self.count())
-        ]
-
-    def add_item_cmd(self):
-        win = AddItemWindow()
-        win.clicked_.connect(self.add_item_fin)
-        win.center_relative_parent(parent=self.window())
+    def open_add_row_window(self):
+        win = AddRowWindow()
+        win.finished_.connect(self.add_row_fin)
+        win.center_relative_parent(self.window())
         win.show()
 
-    def add_item_fin(self, text: str):
+    def add_row_fin(self, text: str):
         item_ = QListWidgetItem(text)
         item_.setSizeHint(QSize(self.width(), LIST_ITEM_H))
         item_.item_name = text
         self.addItem(item_)
-        self.changed.emit()
+        if self.is_stop_list:
+            self.main_folder_copy.stop_list.append(text)
+        else:
+            self.main_folder_copy.paths.append(text)
+        self.main_folder_changed.emit()
 
 
 class EditMainFoldersWid(QTabWidget):
-    need_reboot = pyqtSignal()
+    main_folder_changed = pyqtSignal(object)
 
     def __init__(self):
+        """
+        Сигналы:
+        - main_folder_changed (object): сигнал об изменении копии объекта MainFolder. Сигнал означает,
+        что нужно обновить соответствующий объект MainFolder в списке MainFolder.list_.
+
+        Описание:
+        - Виджет работает с копией объекта MainFolder, а не с оригиналом. Это необходимо для того,
+        чтобы изменения в объекте применялись только после нажатия "ОК" в окне настроек.
+        Если пользователь нажимает "Отмена", оригинальный MainFolder остаётся без изменений.
+        """
         super().__init__()
         self.stop_colls_wid: dict[int, UTextEdit] = {}
         self.coll_folders_wid: dict[int, UTextEdit] = {}
 
-        for main_folder in MainFolder.list_:
-            wid = self.tab_ui(main_folder)
-            self.addTab(wid, main_folder.name)
+        for x in MainFolder.list_:
+            main_folder_copy = x.get_instance_copy()
+            wid = self.tab_ui(main_folder_copy)
+            self.addTab(wid, main_folder_copy.name)
 
-        current_index = MainFolder.list_.index(MainFolder.current)
-        self.setCurrentIndex(current_index)
-
-    def tab_ui(self, main_folder: MainFolder):
+    def tab_ui(self, main_folder_copy: MainFolder):
         wid = QWidget()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(10)
@@ -274,9 +299,9 @@ class EditMainFoldersWid(QTabWidget):
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         h_lay_one.addWidget(stop_colls_lbl)
 
-        stop_colls_list = StopList(main_folder, main_folder.stop_list)
-        stop_colls_list.changed.connect(self.list_changed)
-        add_stop_coll_btn.clicked.connect(stop_colls_list.add_item_cmd)
+        stop_colls_list = MainFolderItemsWid(main_folder_copy, True)
+        cmd = lambda: self.main_folder_changed.emit(main_folder_copy)
+        stop_colls_list.main_folder_changed.connect(cmd)
         v_lay.addWidget(stop_colls_list)
 
         h_wid_two = QWidget()
@@ -292,15 +317,12 @@ class EditMainFoldersWid(QTabWidget):
         coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
         h_lay_two.addWidget(coll_folders_label)
 
-        coll_folders_list = MainFoldersPaths(main_folder, main_folder.paths)
-        coll_folders_list.changed.connect(self.list_changed)
-        add_btn_two.clicked.connect(coll_folders_list.add_item_cmd)
+        coll_folders_list = MainFolderItemsWid(main_folder_copy, False)
+        cmd = lambda: self.main_folder_changed.emit(main_folder_copy)
+        coll_folders_list.main_folder_changed.connect(cmd)
         v_lay.addWidget(coll_folders_list)
 
         return wid
-    
-    def list_changed(self):
-        self.need_reboot.emit()
 
 
 class AddMainFolderWin(WinSystem):
@@ -730,6 +752,7 @@ class WinSettings(WinSystem):
         self.setWindowTitle(Lang.settings)
         self.new_main_folders: list[MainFolder] = []
         self.del_main_folders: list[MainFolder] = []
+        self.changed_main_folders: set[MainFolder] = set()
         self.reset_data = False
         self.new_lang = None
         self.scan_time = None
@@ -758,6 +781,10 @@ class WinSettings(WinSystem):
 
     def set_scan_time(self, value: int):
         self.scan_time = value
+        self.set_apply_btn()
+
+    def main_folder_changed_cmd(self, main_folder_copy: MainFolder):
+        self.changed_main_folders.add(main_folder_copy)
         self.set_apply_btn()
 
     def set_apply_btn(self):
@@ -815,6 +842,8 @@ class WinSettings(WinSystem):
 
         # ДОПИЛИВАТЬ
         main_folder_tab = EditMainFoldersWid()
+        cmd = lambda main_folder_copy: self.main_folder_changed_cmd(main_folder_copy)
+        main_folder_tab.main_folder_changed.connect(cmd)
         v_lay.addWidget(main_folder_tab)
 
         v_lay.addStretch()
@@ -856,6 +885,12 @@ class WinSettings(WinSystem):
                 for i in MainFolder.list_:
                     if del_main_f.name == i.name:
                         MainFolder.list_.remove(i)
+
+        if self.changed_main_folders:
+            for ch_main_folder in self.changed_main_folders:
+                for main_folder in MainFolder.list_:
+                    if ch_main_folder.name == main_folder.name:
+                        ...
 
         if self.new_lang:
             restart_app = True
