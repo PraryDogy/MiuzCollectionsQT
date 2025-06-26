@@ -67,10 +67,9 @@ class CustomSlider(BaseSlider):
         self.setFixedWidth(80)
         self.setValue(Dynamic.thumb_size_ind)
 
-        self.valueChanged.connect(self.move_slider_cmd)
-        SignalsApp.instance.slider_change_value.connect(self.move_slider_cmd)
+        self.valueChanged.connect(self.move_)
     
-    def move_slider_cmd(self, value: int):
+    def move_(self, value: int):
         # Отключаем сигнал valueChanged
         self.blockSignals(True)
         self.setValue(value)
@@ -206,9 +205,9 @@ class BarBottom(QWidget):
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
 
-        self.custom_slider = CustomSlider()
-        self.custom_slider.resize_thumbnails.connect(lambda: self.resize_thumbnails.emit())
-        self.h_layout.addWidget(self.custom_slider)
+        self.slider = CustomSlider()
+        self.slider.resize_thumbnails.connect(lambda: self.resize_thumbnails.emit())
+        self.h_layout.addWidget(self.slider)
 
     def toggle_types(self):
         types = []

@@ -196,7 +196,6 @@ class MenuLeft(QTabWidget):
         self.tabBarClicked.connect(self.tab_cmd)
         self.menu_tabs_list: list[MenuTab] = []
         self.init_ui()
-        SignalsApp.instance.menu_left_cmd.connect(self.menu_left_cmd)
 
     def init_ui(self):
         self.clear()

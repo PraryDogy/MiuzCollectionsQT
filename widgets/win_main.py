@@ -337,13 +337,13 @@ class WinMain(WinFrameless):
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if Dynamic.thumb_size_ind < len(ThumbData.PIXMAP_SIZE) - 1:
                     Dynamic.thumb_size_ind += 1
-                    SignalsApp.instance.slider_change_value.emit(Dynamic.thumb_size_ind)
+                    self.bar_bottom.slider.move_(Dynamic.thumb_size_ind)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if Dynamic.thumb_size_ind > 0:
                     Dynamic.thumb_size_ind -= 1
-                    SignalsApp.instance.slider_change_value.emit(Dynamic.thumb_size_ind)
+                    self.bar_bottom.slider.move_(Dynamic.thumb_size_ind)
 
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()
