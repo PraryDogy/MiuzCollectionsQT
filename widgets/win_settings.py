@@ -334,6 +334,8 @@ class AddMainFolderWin(WinSystem):
         """
         super().__init__()
 
+        self.empty_main_folder = MainFolder("", [], [], "")
+
         self.setWindowTitle(Lang.add_main_folder_title)
 
         self.setFixedSize(450, 400)
@@ -344,8 +346,8 @@ class AddMainFolderWin(WinSystem):
 
         self.name_wid = ULineEdit()
         self.name_wid.setPlaceholderText(Lang.set_name_main_folder)
+        self.name_wid.textChanged.connect(lambda text: self.on_name_changed(text))
         self.central_layout.addWidget(self.name_wid)
-
 
         h_wid_one = QWidget()
         self.central_layout.addWidget(h_wid_one)
@@ -360,8 +362,7 @@ class AddMainFolderWin(WinSystem):
         stop_colls_lbl = QLabel(Lang.sett_stopcolls)
         h_lay_one.addWidget(stop_colls_lbl)
 
-        stop_list_wid = StopList(None, None)
-        add_btn_one.clicked.connect(stop_list_wid.add_item_cmd)
+        stop_list_wid = MainFolderItemsWid(self.empty_main_folder, True)
         self.central_layout.addWidget(stop_list_wid)
 
         h_wid_two = QWidget()
@@ -377,9 +378,8 @@ class AddMainFolderWin(WinSystem):
         coll_folders_label = QLabel(Lang.where_to_look_coll_folder)
         h_lay_two.addWidget(coll_folders_label)
 
-        stop_list_wid = MainFoldersPaths(None, None)
-        add_btn_two.clicked.connect(stop_list_wid.add_item_cmd)
-        self.central_layout.addWidget(stop_list_wid)
+        paths_list_wid = MainFolderItemsWid(self.empty_main_folder, False)
+        self.central_layout.addWidget(paths_list_wid)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -404,20 +404,12 @@ class AddMainFolderWin(WinSystem):
 
         self.central_layout.addWidget
 
+    def on_name_changed(self, text: str):
+        self.empty_main_folder.name = text
+
     def ok_cmd(self):
-        name_of_main_folder = self.findChild(ULineEdit).text()
-        main_folders_paths = self.findChild(MainFoldersPaths).get_items()
-        stop_list = self.findChild(StopList).get_items()
-
-        if name_of_main_folder and main_folders_paths:
-
-            new_main_folder = MainFolder(
-                name=name_of_main_folder,
-                paths=main_folders_paths,
-                stop_list=stop_list
-            )
-
-            self.new_main_folder.emit(new_main_folder)
+        if self.empty_main_folder.name and self.empty_main_folder.paths:
+            self.new_main_folder.emit(self.empty_main_folder)
             self.deleteLater()
 
     def keyPressEvent(self, a0):
@@ -881,16 +873,17 @@ class WinSettings(WinSystem):
 
         if self.del_main_folders:
             restart_app = True
-            for del_main_f in self.del_main_folders:
-                for i in MainFolder.list_:
-                    if del_main_f.name == i.name:
-                        MainFolder.list_.remove(i)
+            names_to_delete = {f.name for f in self.del_main_folders}
+            MainFolder.list_ = [f for f in MainFolder.list_ if f.name not in names_to_delete]
 
         if self.changed_main_folders:
-            for ch_main_folder in self.changed_main_folders:
-                for main_folder in MainFolder.list_:
-                    if ch_main_folder.name == main_folder.name:
-                        ...
+            restart_app = True
+            name_to_folder = {f.name: f for f in self.changed_main_folders}
+            for f in MainFolder.list_:
+                if f.name in name_to_folder:
+                    ch = name_to_folder[f.name]
+                    f.paths = ch.paths
+                    f.stop_list = ch.stop_list
 
         if self.new_lang:
             restart_app = True
