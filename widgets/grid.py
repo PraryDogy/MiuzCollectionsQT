@@ -137,6 +137,19 @@ class ImgWid(QLabel):
         return super().mouseDoubleClickEvent(a0)
 
 
+class TextAdvancedWid(QLabel):
+    def __init__(self, text: str):
+        super().__init__()
+        self.setText(text)
+        self.blue_color = "#6199E4"
+        self.setStyleSheet(
+            f"""
+            font-size: {11}px;
+            color: {self.blue_color};
+            """
+        )
+
+
 class Thumbnail(QFrame, CellWid):
     reload_thumbnails = pyqtSignal()
     select = pyqtSignal(str)
@@ -180,12 +193,13 @@ class Thumbnail(QFrame, CellWid):
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
         self.text_wid = TextWid(self, self.name, coll_name)
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.v_layout.addWidget(
-            self.text_wid,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
+        self.v_layout.addWidget(self.text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.text_adv = TextAdvancedWid(self.collection)
+        self.v_layout.addWidget(self.text_adv, alignment=Qt.AlignmentFlag.AlignCenter)
+
         self.setup()
-        # self.setStyleSheet("background: BLACK;")
+
 
     @classmethod
     def calculate_size(cls):
