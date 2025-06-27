@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QRubberBand, QScrollArea, QSizePolicy, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
-from system.filters import UserFilter
+from system.filters import SystemFilter, UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadDbImagesItem, LoadDbImagesTask
@@ -17,8 +17,8 @@ from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout
 from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
-                      OpenInView, RemoveFiles, ShowInFinder, Save, ScanerRestart,
-                      WinInfoAction)
+                      OpenInView, RemoveFiles, Save, ScanerRestart,
+                      ShowInFinder, WinInfoAction)
 from .win_info import WinInfo
 from .win_warn import WinWarn
 
@@ -264,6 +264,15 @@ class NoImagesLabel(QLabel):
             for filter in UserFilter.list_
             if filter.value
             ]
+        
+        if SystemFilter.value:
+            enabled_filters.append(
+                SystemFilter.lang_names[JsonData.lang_ind].lower()
+            )
+
+        if enabled_filters:
+            enabled_filters = ", ".join(enabled_filters)
+            noimg_t = f"{Lang.no_photo}: {enabled_filters}"
 
         if Dynamic.date_start:
             noimg_t = [
@@ -272,9 +281,6 @@ class NoImagesLabel(QLabel):
             ]
             noimg_t = "".join(noimg_t)
 
-        elif enabled_filters:
-            enabled_filters = ", ".join(enabled_filters)
-            noimg_t = f"{Lang.no_photo}: {enabled_filters}"
 
         elif Dynamic.search_widget_text:
             noimg_t = f"{Lang.no_photo}: {Dynamic.search_widget_text}"

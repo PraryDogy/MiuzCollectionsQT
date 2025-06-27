@@ -48,7 +48,7 @@ class FilterBtn(BarTopBtn):
 
         self.filter = filter
 
-        if filter.value:
+        if self.filter.value:
             self.set_solid_style()
         else:
             self.set_normal_style()
@@ -93,11 +93,14 @@ class BarTop(QWidget):
             label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
             label.scroll_to_top.connect(lambda: self.scroll_to_top.emit())
             self.filter_btns.append(label)
-            self.h_layout.addWidget(
-                label,
-                alignment=Qt.AlignmentFlag.AlignLeft
-            )
+            self.h_layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignLeft)
         
+        label = FilterBtn(SystemFilter)
+        label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
+        label.scroll_to_top.connect(lambda: self.scroll_to_top.emit())
+        self.filter_btns.append(label)
+        self.h_layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignLeft)
+
         self.dates_btn = DatesBtn()
         self.dates_btn.open_dates_win.connect(lambda: self.open_dates_win.emit())
         self.h_layout.addWidget(

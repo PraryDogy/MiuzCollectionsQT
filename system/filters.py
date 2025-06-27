@@ -1,11 +1,11 @@
-from lang import Lang
+from .lang import Lang
 
 
 class UserFilter:
     list_: list["UserFilter"] = []
     __slots__ = ["lang_names", "dir_name", "value"]
 
-    def __init__(self, lang_names: list, dir_name: str, value: bool):
+    def __init__(self, lang_names: list[str], dir_name: str, value: bool):
         """
         Аргументы:
         - lang_names (list[str]): Названия фильтра (на русском и английском).    
