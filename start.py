@@ -62,6 +62,7 @@ from PyQt5.QtWidgets import QApplication
 
 from cfg import JsonData, Static
 from system.database import Dbase
+from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
@@ -73,20 +74,18 @@ class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
 
-        classes = [
-            JsonData,
-            Dbase,
-            Lang,
-            MainFolder,
-            UThreadPool,
-            ThemeChanger,
-        ]
+        JsonData.init()
+        Dbase.init()
+        Lang.init()
+        MainFolder.init()
+        UserFilter.init()
+        UThreadPool.init()
+        ThemeChanger.init()
 
-        for cls in classes:
-            cls.init()
 
         JsonData.write_json_data()
         MainFolder.write_json_data()
+        UserFilter.write_json_data()
 
         icon_path = os.path.join(Static.images_dir, "icon.icns")
         icon = QIcon(icon_path)
