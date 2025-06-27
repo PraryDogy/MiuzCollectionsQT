@@ -203,14 +203,14 @@ class WinFrameless(QMainWindow):
         try:
             Manager.wins.remove(self)
         except Exception as e:
-            pass
+            MainUtils.print_error()
         return super().closeEvent(a0)
     
     def deleteLater(self):
         try:
             Manager.wins.remove(self)
         except Exception as e:
-            pass
+            MainUtils.print_error()
         return super().deleteLater()
 
 

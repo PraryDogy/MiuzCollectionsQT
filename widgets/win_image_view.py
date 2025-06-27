@@ -364,7 +364,7 @@ class WinImageView(WinChild):
         self.info_win.show()
 
     def open_smb_win(self):
-        self.smb_win = WinWarn(Lang.no_connection, Lang.choose_coll_smb)
+        self.smb_win = WinWarn(Lang.no_connection, Lang.no_connection_descr)
         self.smb_win.adjustSize()
         self.smb_win.center_relative_parent(self)
         self.smb_win.show()

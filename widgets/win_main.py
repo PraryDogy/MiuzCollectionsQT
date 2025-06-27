@@ -250,7 +250,7 @@ class WinMain(WinFrameless):
             filemove_win.finished_.connect(cmd)
             filemove_win.show()
         else:
-            self.open_warn_win(Lang.no_connection, Lang.choose_coll_smb)
+            self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
 
     def filemove_task_start(self, dest: str, img_path_list: list):
         task = MoveFilesTask(dest, img_path_list)
@@ -270,7 +270,7 @@ class WinMain(WinFrameless):
             rem_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
             rem_win.show()
         else:
-            self.open_warn_win(Lang.no_connection, Lang.choose_coll_smb)
+            self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
     
     def remove_task_start(self, img_path_list: list[str]):
         remove_files_task = RemoveFilesTask(img_path_list)
@@ -286,7 +286,7 @@ class WinMain(WinFrameless):
             win_upload.center_relative_parent(self)
             win_upload.show()
         else:
-            self.open_warn_win(Lang.no_connection, Lang.choose_coll_smb)
+            self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
 
     def upload_task_start(self, dest: str, img_path_list: list[str]):
         copy_files_task = CopyFilesTask(dest, img_path_list)
@@ -353,7 +353,7 @@ class WinMain(WinFrameless):
             return
         main_folder_path = MainFolder.current.is_available()
         if not main_folder_path:
-            self.open_warn_win(Lang.no_connection, Lang.choose_coll_smb)
+            self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
             return
 
         img_path_list: list[str] = [

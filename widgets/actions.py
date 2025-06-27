@@ -17,10 +17,10 @@ from .win_warn import WinWarn
 class SmbWin:
     @classmethod
     def show(cls, parent_: QMainWindow):
-        smb_win = WinWarn(Lang.no_connection, Lang.choose_coll_smb)
-        smb_win.adjustSize()
-        smb_win.center_relative_parent(parent_)
-        smb_win.show()
+        cls.smb_win = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+        cls.smb_win.adjustSize()
+        cls.smb_win.center_relative_parent(parent_)
+        cls.smb_win.show()
 
 
 class OpenInView(QAction):
@@ -54,10 +54,7 @@ class WinInfoAction(QAction):
             self.win = WinInfo(self.rel_img_path_list)
             self.win.finished_.connect(self.open_delayed)
         else:
-            self.win = WinWarn(Lang.no_connection, Lang.choose_coll_smb)
-            self.win.adjustSize()
-            self.win.center_relative_parent(self.win_)
-            self.win.show()
+            SmbWin.show(self.win_)
 
     def open_delayed(self):
         self.win.adjustSize()
