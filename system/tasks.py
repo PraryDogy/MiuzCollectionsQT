@@ -707,27 +707,18 @@ class LoadDbImagesSignals(QObject):
 
 class LoadDbImagesTask(URunnable):
     def __init__(self):
-        """
-        returns
-        ```
-        {1 june 2024: [DbImage, ...], ...}
-        {1 june 2024 - 1 august 2024: [DbImage, ...], ...}
-        ```
-        """
         super().__init__()
         self.signals_ = LoadDbImagesSignals()
+        self.conn = Dbase.engine.connect()
 
     def task(self):
-
-        conn = Dbase.engine.connect()
         stmt = self.get_stmt()
-        res: list[tuple] = conn.execute(stmt).fetchall()        
-        conn.close()
+        res: list[tuple] = self.conn.execute(stmt).fetchall()        
 
+        self.conn.close()
         self.create_dict(res)
 
     def create_dict(self, res: list[tuple]) -> dict[str, list[LoadDbImagesItem]] | dict:
-
         thumbs_dict = defaultdict(list[LoadDbImagesItem])
 
         if len(Dynamic.types) == 1:
@@ -740,7 +731,7 @@ class LoadDbImagesTask(URunnable):
             return
 
         for rel_img_path, rel_thumb_path, mod, coll, fav in res:
-
+            rel_img_path: str
             if not rel_img_path.endswith(exts_):
                 continue
 
@@ -767,7 +758,7 @@ class LoadDbImagesTask(URunnable):
             ...
 
     def get_stmt(self) -> sqlalchemy.Select:
-        q = sqlalchemy.select(
+        stmt = sqlalchemy.select(
             THUMBS.c.short_src, # rel img path
             THUMBS.c.short_hash, # rel thumb path
             THUMBS.c.mod,
@@ -775,34 +766,29 @@ class LoadDbImagesTask(URunnable):
             THUMBS.c.fav
             )
         
-        q = q.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
-        q = q.where(THUMBS.c.brand == MainFolder.current.name)
+        stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
+        stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
         if Dynamic.resents:
-            q = q.order_by(-THUMBS.c.id)
+            stmt = stmt.order_by(-THUMBS.c.id)
         else:
-            q = q.order_by(-THUMBS.c.mod)
-
-        stmt_where: list = []
+            stmt = stmt.order_by(-THUMBS.c.mod)
 
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
-            stmt_where.append(THUMBS.c.short_src.ilike(f"%{text}%"))
-
-            for i in stmt_where:
-                q = q.where(i)
-                return q
+            stmt = stmt.where(THUMBS.c.short_src.ilike(f"%{text}%"))
+            return stmt
 
         if Dynamic.curr_coll_name == Static.NAME_FAVS:
-            stmt_where.append(THUMBS.c.fav == 1)
+            stmt = stmt.where(THUMBS.c.fav == 1)
 
         elif Dynamic.curr_coll_name != Static.NAME_ALL_COLLS:
-            stmt_where.append(THUMBS.c.coll == Dynamic.curr_coll_name)
+            stmt = stmt.where(THUMBS.c.coll == Dynamic.curr_coll_name)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
-            t = self.combine_dates()
-            stmt_where.append(THUMBS.c.mod > t[0])
-            stmt_where.append(THUMBS.c.mod < t[1])
+            start, end = self.combine_dates(Dynamic.date_start, Dynamic.date_end)
+            stmt = stmt.where(THUMBS.c.mod > start)
+            stmt = stmt.where(THUMBS.c.mod < end)
 
         user_filters, sys_filters = self.group_filters()
     
@@ -814,9 +800,9 @@ class LoadDbImagesTask(URunnable):
         stmt_where.append(or_statements)
 
         for i in stmt_where:
-            q = q.where(i)
+            stmt = stmt.where(i)
 
-        return q
+        return stmt
     
     def build_exclusion_condition(
             self,
@@ -903,15 +889,13 @@ class LoadDbImagesTask(URunnable):
                 user_filters.append(i)
         return user_filters, sys_filters
 
-    def combine_dates(self) -> tuple[datetime, datetime]:
-        start = datetime.combine(
-            Dynamic.date_start,
-            datetime.min.time()
-        )
-
-        end = datetime.combine(
-            Dynamic.date_end,
-            datetime.max.time().replace(microsecond=0)
-        )
-
+    def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:
+        """
+        Объединяет даты `Dynamic.date_start` и `Dynamic.date_end` с минимальным и максимальным временем суток 
+        соответственно (00:00:00 и 23:59:59), и возвращает кортеж меток времени (timestamp).
+        Возвращает:
+        - Кортеж timestamp (начало, конец).
+        """
+        start = datetime.combine(date_start, datetime.min.time())
+        end = datetime.combine(date_end, datetime.max.time().replace(microsecond=0))
         return datetime.timestamp(start), datetime.timestamp(end)
