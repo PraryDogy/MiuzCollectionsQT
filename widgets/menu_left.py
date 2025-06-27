@@ -54,9 +54,17 @@ class CollectionBtn(QLabel):
 
     def contextMenuEvent(self, ev):
         self.context_menu = UMenu(ev)
+
+        preview = QAction(Lang.view, self.context_menu)
+        preview.triggered.connect(lambda: self.pressed_.emit())
+        self.context_menu.addAction(preview)
+
+        self.context_menu.addSeparator()
+
         show_in_finder = QAction(Lang.reveal_in_finder, self.context_menu)
         show_in_finder.triggered.connect(lambda: self.reveal_cmd())
         self.context_menu.addAction(show_in_finder)
+
         self.context_menu.show_()
         return super().contextMenuEvent(ev)
 
