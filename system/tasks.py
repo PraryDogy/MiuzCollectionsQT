@@ -794,22 +794,27 @@ class LoadDbImagesTask(URunnable):
         if len(all_values) == 1:
             return stmt
     
-        include_conditions = []
-        for i in UserFilter.list_:
-            if i.value:
-                incl_condition = self.get_include_condition(i.dir_name)
-                include_conditions.append(incl_condition)
+        include_conditions = [
+            self.get_include_condition(i.dir_name)
+            for i in UserFilter.list_
+            if i.value
+        ]
 
-        if include_conditions:
+        exclude_conditions = [
+            self.get_exclude_condition(i.dir_name)
+            for i in UserFilter.list_
+        ]
+
+        if include_conditions and SystemFilter.value:
+            stmt = stmt.where(sqlalchemy.or_(
+                sqlalchemy.or_(*include_conditions),
+                sqlalchemy.and_(*exclude_conditions)
+            ))
+
+        elif include_conditions:
             stmt = stmt.where(sqlalchemy.or_(*include_conditions))
 
-        exclude_conditions = []
-        if SystemFilter.value:
-            for i in UserFilter.list_:
-                exc_condition = self.get_exclude_condition(i.dir_name)
-                exclude_conditions.append(exc_condition)
-
-        if exclude_conditions:
+        elif SystemFilter.value:
             stmt = stmt.where(sqlalchemy.and_(*exclude_conditions))
 
         return stmt
