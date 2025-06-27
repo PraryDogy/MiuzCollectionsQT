@@ -42,17 +42,10 @@ class CollectionBtn(QLabel):
             self.win_warn.adjustSize()
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
-            return
-
-        if self.coll_name in (
-            Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS
-        ):
-
+        elif self.coll_name in (Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS):
             coll = main_folder_path
-
         else:
             coll = os.path.join(main_folder_path, self.coll_name)
-
         subprocess.Popen(["open", coll])
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
