@@ -816,7 +816,7 @@ class LoadDbImagesTask(URunnable):
 
     def get_exclude_condition(self, dir_name: str):
         """
-        Формирует условие AND для исключения всех путей, содержащих любую из папок фильтров.
+        Формирует условие для исключения всех путей, содержащих любую из папок фильтров.
         """
         return THUMBS.c.short_src.not_ilike(f"%/{dir_name}/%")
 
