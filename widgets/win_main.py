@@ -12,7 +12,7 @@ from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, ScanerTask, UploadFilesTask)
 from system.utils import UThreadPool
 
-from ._base_widgets import UHBoxLayout, UVBoxLayout, WinFrameless
+from ._base_widgets import UHBoxLayout, UVBoxLayout, UMainWindow
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -49,7 +49,7 @@ class USep(QFrame):
         self.setFixedHeight(1)
 
 
-class WinMain(WinFrameless):
+class WinMain(UMainWindow):
     argv_flag = "noscan"
 
     def __init__(self, argv: list[str]):

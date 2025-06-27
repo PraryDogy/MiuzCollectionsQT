@@ -174,7 +174,7 @@ class Manager:
     wins: list[QMainWindow] = []
 
 
-class WinFrameless(QMainWindow):
+class UMainWindow(QMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent=parent)
 
@@ -214,19 +214,27 @@ class WinFrameless(QMainWindow):
         return super().deleteLater()
 
 
-class WinSystem(WinFrameless):
+class WinSystem(UMainWindow):
     def __init__(self, parent: QWidget = None):
+        """
+        Окно с пользовательскими флагами отображения:
+        - Модальность: блокирует другие окна приложения (ApplicationModal)
+        - Заголовок с кнопкой закрытия, остальные кнопки неактивны
+        - Внутренние отступы центрального layout'а: (10, 5, 10, 5)
+        """
         super().__init__(parent)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-
         fl = Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint
         fl = fl  | Qt.WindowType.WindowCloseButtonHint
         self.setWindowFlags(fl)
-
         self.central_layout.setContentsMargins(10, 5, 10, 5)
 
 
-class WinChild(WinFrameless):
+class WinChild(UMainWindow):
     def __init__(self, parent: QWidget = None):
+        """
+        Окно с пользовательскими флагами отображения:
+        - Модальность: блокирует другие окна приложения (ApplicationModal)
+        """
         super().__init__(parent)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
