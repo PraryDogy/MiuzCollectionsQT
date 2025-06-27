@@ -176,7 +176,7 @@ class BarBottom(QWidget):
         self.h_layout.setContentsMargins(0, 0, 15, 0)
         self.init_ui()
 
-        self.downloads_win = None
+        self.win_downloads = None
 
     def init_ui(self):
 
@@ -231,26 +231,26 @@ class BarBottom(QWidget):
             self.open_downloads_win()
 
     def open_downloads_win(self):
-        if self.downloads_win is None:
-            self.downloads_win = WinDownloads()
-            self.downloads_win.closed.connect(self.downloads_win_closed)
-            self.downloads_win.center_relative_parent(self.window())
-            self.downloads_win.show()
+        if self.win_downloads is None:
+            self.win_downloads = WinDownloads()
+            self.win_downloads.closed.connect(self.downloads_win_closed)
+            self.win_downloads.center_relative_parent(self.window())
+            self.win_downloads.show()
 
     def downloads_win_closed(self, *args):
-        self.downloads_win = None
+        self.win_downloads = None
 
     def close_downloads_win(self):
         try:
-            self.downloads_win.deleteLater()
+            self.win_downloads.deleteLater()
         except Exception:
             ...
-        self.downloads_win = None
+        self.win_downloads = None
 
     def sett_btn_cmd(self, e: QMouseEvent):
         if e.button() == Qt.MouseButton.LeftButton:
-            self.settings = WinSettings()
-            self.settings.center_relative_parent(self.window())
-            self.settings.theme_changed.connect(self.theme_changed.emit)
-            self.settings.show()
+            self.win_settings = WinSettings()
+            self.win_settings.center_relative_parent(self.window())
+            self.win_settings.theme_changed.connect(self.theme_changed.emit)
+            self.win_settings.show()
     

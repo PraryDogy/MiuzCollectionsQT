@@ -241,10 +241,10 @@ class MainFolderItemsWid(QListWidget):
         self.main_folder_changed.emit()
 
     def open_add_row_win(self):
-        win = AddRowWindow()
-        win.finished_.connect(self.add_row_fin)
-        win.center_relative_parent(self.window())
-        win.show()
+        self.add_row_win = AddRowWindow()
+        self.add_row_win.finished_.connect(self.add_row_fin)
+        self.add_row_win.center_relative_parent(self.window())
+        self.add_row_win.show()
 
     def add_row_fin(self, text: str):
         item_ = QListWidgetItem(text)
@@ -535,16 +535,18 @@ class MainFolderWid(QGroupBox):
         second_lay.addWidget(remove_descr)
 
     def add_btn_cmd(self, *args):
-        self.win = AddMainFolderWin()
-        self.win.add_main_folder.connect(lambda main_folder: self.new_main_folder.emit(main_folder))
-        self.win.center_relative_parent(parent=self.window())
-        self.win.show()
+        self.add_main_folder_win = AddMainFolderWin()
+        cmd = lambda main_folder: self.new_main_folder.emit(main_folder)
+        self.add_main_folder_win.add_main_folder.connect(cmd)
+        self.add_main_folder_win.center_relative_parent(parent=self.window())
+        self.add_main_folder_win.show()
 
     def remove_btn_cmd(self, *args):
-        self.win = RemoveMainFolderWin()
-        self.win.del_main_folder.connect(lambda main_folder: self.del_main_folder.emit(main_folder))
-        self.win.center_relative_parent(parent=self.window())
-        self.win.show()
+        self.remove_main_folder_win = RemoveMainFolderWin()
+        cmd = lambda main_folder: self.del_main_folder.emit(main_folder)
+        self.remove_main_folder_win.del_main_folder.connect(cmd)
+        self.remove_main_folder_win.center_relative_parent(parent=self.window())
+        self.remove_main_folder_win.show()
 
 
 class SelectableLabel(QLabel):

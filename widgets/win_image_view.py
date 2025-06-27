@@ -359,15 +359,15 @@ class WinImageView(WinChild):
         self.img_viewer_title()
 
     def open_info_win_delayed(self):
-        self.info_win.adjustSize()
-        self.info_win.center_relative_parent(self)
-        self.info_win.show()
+        self.win_info.adjustSize()
+        self.win_info.center_relative_parent(self)
+        self.win_info.show()
 
     def open_smb_win(self):
-        self.smb_win = WinWarn(Lang.no_connection, Lang.no_connection_descr)
-        self.smb_win.adjustSize()
-        self.smb_win.center_relative_parent(self)
-        self.smb_win.show()
+        self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+        self.win_warn.adjustSize()
+        self.win_warn.center_relative_parent(self)
+        self.win_warn.show()
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
@@ -399,8 +399,8 @@ class WinImageView(WinChild):
             if main_folder_path:
                 img_path = MainUtils.get_img_path(main_folder_path, self.rel_img_path)
                 img_path_list = [img_path]
-                self.info_win = WinInfo(img_path_list)
-                self.info_win.finished_.connect(self.open_info_win_delayed)
+                self.win_info = WinInfo(img_path_list)
+                self.win_info.finished_.connect(self.open_info_win_delayed)
             else:
                 self.open_smb_win()
 

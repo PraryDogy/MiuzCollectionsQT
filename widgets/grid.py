@@ -543,9 +543,9 @@ class Grid(QScrollArea):
             wid.set_frame()
 
     def open_info_win_delayed(self):
-        self.info_win.adjustSize()
-        self.info_win.center_relative_parent(self.window())
-        self.info_win.show()
+        self.win_info.adjustSize()
+        self.win_info.center_relative_parent(self.window())
+        self.win_info.show()
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -566,13 +566,13 @@ class Grid(QScrollArea):
                         MainUtils.get_img_path(main_folder_path, i.rel_img_path)
                         for i in self.selected_widgets
                     ]
-                    self.info_win = WinInfo(img_path_list)
-                    self.info_win.finished_.connect(self.open_info_win_delayed)
+                    self.win_info = WinInfo(img_path_list)
+                    self.win_info.finished_.connect(self.open_info_win_delayed)
                 else:
-                    self.smb_win = WinWarn(Lang.no_connection, Lang.no_connection_descr)
-                    self.smb_win.adjustSize()
-                    self.smb_win.center_relative_parent(self.window())
-                    self.smb_win.show()
+                    self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+                    self.win_warn.adjustSize()
+                    self.win_warn.center_relative_parent(self.window())
+                    self.win_warn.show()
 
         elif a0.modifiers() == command and a0.key() == Qt.Key.Key_A:
             for i in Thumbnail.path_to_wid.values():

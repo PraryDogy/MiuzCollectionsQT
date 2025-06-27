@@ -223,19 +223,19 @@ class WinMain(UMainWindow):
         MainFolder.write_json_data()
 
     def open_dates_win(self):
-        dates_win = WinDates()
-        dates_win.center_relative_parent(self)
-        dates_win.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
-        dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
-        dates_win.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        dates_win.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
-        dates_win.show()
+        self.win_dates = WinDates()
+        self.win_dates.center_relative_parent(self)
+        self.win_dates.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
+        self.win_dates.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
+        self.win_dates.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.win_dates.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
+        self.win_dates.show()
 
     def open_warn_win(self, title: str, text: str):
-        smb_win = WinWarn(title, text)
-        smb_win.adjustSize()
-        smb_win.center_relative_parent(self)
-        smb_win.show()
+        self.win_warn = WinWarn(title, text)
+        self.win_warn.adjustSize()
+        self.win_warn.center_relative_parent(self)
+        self.win_warn.show()
 
     def open_filemove_win(self, rel_img_path_list: list):
         main_folder_path = MainFolder.current.is_available()
@@ -244,11 +244,11 @@ class WinMain(UMainWindow):
                 MainUtils.get_img_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
-            filemove_win = WinUpload()
-            filemove_win.center_relative_parent(self.window())
+            self.upload_win = WinUpload()
+            self.upload_win.center_relative_parent(self.window())
             cmd = lambda dest: self.filemove_task_start(dest, img_path_list)
-            filemove_win.finished_.connect(cmd)
-            filemove_win.show()
+            self.upload_win.finished_.connect(cmd)
+            self.upload_win.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
 
@@ -265,10 +265,10 @@ class WinMain(UMainWindow):
                 MainUtils.get_img_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
-            rem_win = RemoveFilesWin(img_path_list)
-            rem_win.center_relative_parent(self.window())
-            rem_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
-            rem_win.show()
+            self.remove_files_win = RemoveFilesWin(img_path_list)
+            self.remove_files_win.center_relative_parent(self.window())
+            self.remove_files_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
+            self.remove_files_win.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
     
@@ -281,10 +281,10 @@ class WinMain(UMainWindow):
     def open_upload_win(self, img_path_list: list):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
-            win_upload = WinUpload()
-            win_upload.finished_.connect(lambda dest: self.upload_task_start(dest, img_path_list))
-            win_upload.center_relative_parent(self)
-            win_upload.show()
+            self.upload_win = WinUpload()
+            self.upload_win.finished_.connect(lambda dest: self.upload_task_start(dest, img_path_list))
+            self.upload_win.center_relative_parent(self)
+            self.upload_win.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
 
@@ -307,9 +307,9 @@ class WinMain(UMainWindow):
         self.open_downloads_win()
 
     def open_downloads_win(self):
-        down_win = WinDownloads()
-        down_win.center_relative_parent(self)
-        down_win.show()
+        self.win_downloads = WinDownloads()
+        self.win_downloads.center_relative_parent(self)
+        self.win_downloads.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()

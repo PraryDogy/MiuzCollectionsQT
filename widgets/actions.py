@@ -17,10 +17,10 @@ from .win_warn import WinWarn
 class SmbWin:
     @classmethod
     def show(cls, parent_: QMainWindow):
-        cls.smb_win = WinWarn(Lang.no_connection, Lang.no_connection_descr)
-        cls.smb_win.adjustSize()
-        cls.smb_win.center_relative_parent(parent_)
-        cls.smb_win.show()
+        cls.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+        cls.win_warn.adjustSize()
+        cls.win_warn.center_relative_parent(parent_)
+        cls.win_warn.show()
 
 
 class OpenInView(QAction):
@@ -51,15 +51,15 @@ class WinInfoAction(QAction):
                     MainUtils.get_img_path(main_folder_path, i)
                     for i in self.rel_img_path_list
             ]
-            self.win = WinInfo(self.rel_img_path_list)
-            self.win.finished_.connect(self.open_delayed)
+            self.win_info = WinInfo(self.rel_img_path_list)
+            self.win_info.finished_.connect(self.open_delayed)
         else:
             SmbWin.show(self.win_)
 
     def open_delayed(self):
-        self.win.adjustSize()
-        self.win.center_relative_parent(self.win_)
-        self.win.show()
+        self.win_info.adjustSize()
+        self.win_info.center_relative_parent(self.win_)
+        self.win_info.show()
 
 
 class CopyPath(QAction):

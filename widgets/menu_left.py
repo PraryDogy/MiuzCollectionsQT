@@ -35,10 +35,10 @@ class CollectionBtn(QLabel):
     def reveal_collection(self, *args) -> None:
         main_folder_path = MainFolder.current.is_available()
         if not main_folder_path:
-            self.smb_win = WinWarn(Lang.no_connection, Lang.no_connection_descr)
-            self.smb_win.adjustSize()
-            self.smb_win.center_relative_parent(self.window())
-            self.smb_win.show()
+            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_warn.adjustSize()
+            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.show()
             return
 
         if self.coll_name in (
