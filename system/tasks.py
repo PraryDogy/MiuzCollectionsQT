@@ -810,7 +810,7 @@ class LoadDbImagesTask(URunnable):
                 exclude_conditions.append(exc_condition)
 
         if exclude_conditions:
-            stmt = sqlalchemy.where(sqlalchemy.and_(*exclude_conditions))
+            stmt = stmt.where(sqlalchemy.and_(*exclude_conditions))
 
         return stmt
 
