@@ -168,15 +168,7 @@ class Thumbnail(QFrame, CellWid):
     pixmap_size = 0
     thumb_w = 0
     thumb_h = 0
-
-    style_ = f"""
-        border-radius: 7px;
-        color: rgb(255, 255, 255);
-        background: {Static.gray_color};
-        border: {Static.border_transparent};
-        padding-left: 2px;
-        padding-right: 2px;
-    """
+    corner = 0
 
     def __init__(self, pixmap: QPixmap, rel_img_path: str, coll_name: str, fav: int, f_mod: str):
         CellWid.__init__(self)
@@ -210,7 +202,6 @@ class Thumbnail(QFrame, CellWid):
 
         self.setup()
 
-
     @classmethod
     def calculate_size(cls):
         ind = Dynamic.thumb_size_ind
@@ -218,6 +209,7 @@ class Thumbnail(QFrame, CellWid):
         cls.img_frame_size = Thumbnail.pixmap_size + ThumbData.OFFSET
         cls.thumb_w = ThumbData.THUMB_W[ind]
         cls.thumb_h = ThumbData.THUMB_H[ind]
+        cls.corner = ThumbData.CORNER[ind]
 
     def setup(self):
         # инициация текста
@@ -230,7 +222,15 @@ class Thumbnail(QFrame, CellWid):
         self.img_wid.setPixmap(PixmapUtils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
-        self.img_wid.setStyleSheet(self.style_)
+        style_ = f"""
+            border-radius: {Thumbnail.corner}px;
+            color: rgb(255, 255, 255);
+            background: {Static.gray_color};
+            border: {Static.border_transparent};
+            padding-left: 2px;
+            padding-right: 2px;
+        """
+        self.img_wid.setStyleSheet(style_)
         text_style = Static.blue_bg_style + "font-size: 11px;"
         self.text_wid.setStyleSheet(text_style)
 
