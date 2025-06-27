@@ -788,33 +788,37 @@ class LoadDbImagesTask(URunnable):
             start, end = self.combine_dates(Dynamic.date_start, Dynamic.date_end)
             stmt = stmt.where(THUMBS.c.mod > start)
             stmt = stmt.where(THUMBS.c.mod < end)
+
+        all_values = {i.value for i in UserFilter.list_} | {SystemFilter.value}
+
+        if len(all_values) == 1:
+            return stmt
     
         include_conditions = []
-        for filt in UserFilter.list_:
-            if filt.value:
-                condition = self.get_include_condition(filt.dir_name)
-                include_conditions.append(condition)
+        for i in UserFilter.list_:
+            if i.value:
+                incl_condition = self.get_include_condition(i.dir_name)
+                include_conditions.append(incl_condition)
 
         if include_conditions:
             stmt = stmt.where(sqlalchemy.or_(*include_conditions))
 
-        # Если системный фильтр активен — добавляем исключающие условия (AND)
+        exclude_conditions = []
         if SystemFilter.value:
-            exclude_condition = self.get_exclude_conditions(UserFilter.list_)
-            stmt = stmt.where(exclude_condition)
+            for i in UserFilter.list_:
+                exc_condition = self.get_exclude_condition(i.dir_name)
+                exclude_conditions.append(exc_condition)
+
+        if exclude_conditions:
+            stmt = sqlalchemy.where(sqlalchemy.and_(*exclude_conditions))
 
         return stmt
 
-    def get_exclude_conditions(self, filter_list: list[UserFilter]):
+    def get_exclude_condition(self, dir_name: str):
         """
         Формирует условие AND для исключения всех путей, содержащих любую из папок фильтров.
         """
-        return sqlalchemy.and_(
-            *[
-                THUMBS.c.short_src.not_ilike(f"%/{i.dir_name}/%")
-                for i in filter_list
-            ]
-        )
+        return THUMBS.c.short_src.not_ilike(f"%/{dir_name}/%")
 
     def get_include_condition(self, dir_name: str):
         """
