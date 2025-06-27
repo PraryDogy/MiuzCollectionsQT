@@ -10,7 +10,7 @@ class ThumbData:
     DB_PIXMAP_SIZE: int = 200
 
     # ширина и высота Thumbnail
-    THUMB_H = [140, 175, 260]
+    THUMB_H = [150, 185, 270]
     THUMB_W = [150, 190, 240]
 
     # максимальный размер в пикселях по широкой стороне для изображения
@@ -29,7 +29,7 @@ class ThumbData:
 
 class Static:
 
-    APP_VER = 1.95
+    APP_VER = 2.11
     APP_NAME: str = "Collections"
 
     # в сетке изображений может отображаться за раз 150 штук
