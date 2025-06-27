@@ -4,7 +4,8 @@ from typing import Literal
 
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QTabWidget
+from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
+                             QTabWidget)
 
 from cfg import Dynamic, Static
 from system.lang import Lang
@@ -12,6 +13,8 @@ from system.main_folder import MainFolder
 from system.tasks import LoadCollectionsTask
 from system.utils import UThreadPool
 
+from ._base_widgets import UMenu
+from .actions import ShowInFinder
 from .win_warn import WinWarn
 
 
@@ -32,7 +35,7 @@ class CollectionBtn(QLabel):
         self.short_name = short_name
         self.main_folder_index: int = 0 # для win_upload
 
-    def reveal_collection(self, *args) -> None:
+    def reveal_cmd(self, *args) -> None:
         main_folder_path = MainFolder.current.is_available()
         if not main_folder_path:
             self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
@@ -55,6 +58,14 @@ class CollectionBtn(QLabel):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             self.pressed_.emit()
+
+    def contextMenuEvent(self, ev):
+        self.context_menu = UMenu(ev)
+        show_in_finder = QAction(Lang.reveal_in_finder, self.context_menu)
+        show_in_finder.triggered.connect(lambda: self.reveal_cmd())
+        self.context_menu.addAction(show_in_finder)
+        self.context_menu.show_()
+        return super().contextMenuEvent(ev)
 
 
 class MenuTab(QListWidget):

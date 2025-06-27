@@ -17,7 +17,7 @@ from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout
 from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
-                      OpenInView, RemoveFiles, Reveal, Save, ScanerRestart,
+                      OpenInView, RemoveFiles, ShowInFinder, Save, ScanerRestart,
                       WinInfoAction)
 from .win_info import WinInfo
 from .win_warn import WinWarn
@@ -788,7 +788,7 @@ class Grid(QScrollArea):
             copy_name = CopyName(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(copy_name)
 
-            reveal = Reveal(self.menu_, self.window(), rel_img_path_list)
+            reveal = ShowInFinder(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(reveal)
 
             save_as = Save(self.menu_, self.window(), rel_img_path_list, True)
@@ -809,7 +809,7 @@ class Grid(QScrollArea):
             rem.triggered.connect(lambda: self.remove_files.emit(rel_img_path_list))
             self.menu_.addAction(rem)
 
-        self.menu_.show_menu()
+        self.menu_.show_()
 
     def checkScrollValue(self, value):
         self.up_btn.move(

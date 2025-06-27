@@ -15,7 +15,7 @@ from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
                             WinChild)
-from .actions import (CopyName, CopyPath, FavActionDb, Reveal, Save,
+from .actions import (CopyName, CopyPath, FavActionDb, ShowInFinder, Save,
                       WinInfoAction)
 from .grid import Thumbnail
 from .win_info import WinInfo
@@ -426,7 +426,7 @@ class WinImageView(WinChild):
         copy_name = CopyName(self.menu_, self, [self.rel_img_path])
         self.menu_.addAction(copy_name)
 
-        reveal = Reveal(self.menu_, self, [self.rel_img_path])
+        reveal = ShowInFinder(self.menu_, self, [self.rel_img_path])
         self.menu_.addAction(reveal)
 
         save_as = Save(self.menu_, self, [self.rel_img_path], True)
@@ -435,7 +435,7 @@ class WinImageView(WinChild):
         save = Save(self.menu_, self, [self.rel_img_path], False)
         self.menu_.addAction(save)
 
-        self.menu_.show_menu()
+        self.menu_.show_()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2

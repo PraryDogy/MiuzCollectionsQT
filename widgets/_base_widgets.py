@@ -28,7 +28,7 @@ class UMenu(QMenu):
         self.ev = event
         super().__init__()
 
-    def show_menu(self):
+    def show_(self):
         self.exec_(self.ev.globalPos())
 
     def mouseReleaseEvent(self, a0):
@@ -87,7 +87,7 @@ class ULineEdit(QLineEdit):
         sel_all.triggered.connect(self.paste_text)
         self.menu_.addAction(sel_all)
 
-        self.menu_.show_menu()
+        self.menu_.show_()
 
 
 class SvgBtn(QWidget):
@@ -167,7 +167,7 @@ class UTextEdit(QTextEdit):
         sel_all.triggered.connect(self.paste_text)
         menu_.addAction(sel_all)
 
-        menu_.show_menu()
+        menu_.show_()
 
 
 class Manager:

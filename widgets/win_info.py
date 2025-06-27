@@ -50,7 +50,7 @@ class Selectable(QLabel):
         if not is_path:
             reveal.setDisabled(True)
 
-        menu_.show_menu()
+        menu_.show_()
 
 
 class WinInfo(WinSystem):

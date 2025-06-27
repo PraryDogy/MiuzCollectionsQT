@@ -108,7 +108,7 @@ class CopyName(QAction):
             SmbWin.show(self.win_)
 
 
-class Reveal(QAction):
+class ShowInFinder(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
         text = f"{Lang.reveal_in_finder} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
