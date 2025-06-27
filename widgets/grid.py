@@ -491,6 +491,8 @@ class Grid(QScrollArea):
         Thumbnail.calculate_size()
         for path, wid in Thumbnail.path_to_wid.items():
             wid.setup()
+        for i in self.selected_widgets:
+            i.set_frame()
         self.rearrange()
 
     def rearrange(self):
