@@ -29,8 +29,8 @@ class SystemFilter:
         Используется для определения записей, не попавших ни под один явно заданный фильтр.
         Должен быть один на систему — предотвращает конфликты логики фильтрации.
         """
-        self.lang_names = Lang.system_filter
-        self.value = False
+        self.lang_names: list[str] = Lang.system_filter
+        self.value: bool = False
 
 
 UserFilter.register(UserFilter(["Продукт", "Product"], "1 IMG", False))

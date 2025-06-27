@@ -2,7 +2,6 @@ import gc
 import os
 from collections import defaultdict
 from datetime import datetime
-from time import sleep
 
 import sqlalchemy
 from numpy import ndarray
@@ -13,7 +12,7 @@ from sqlalchemy import select, update
 from cfg import Dynamic, JsonData, Static
 
 from .database import THUMBS, Dbase
-from .filters import UserFilter
+from .filters import SystemFilter, UserFilter
 from .lang import Lang
 from .main_folder import MainFolder
 from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
@@ -790,57 +789,38 @@ class LoadDbImagesTask(URunnable):
             stmt = stmt.where(THUMBS.c.mod > start)
             stmt = stmt.where(THUMBS.c.mod < end)
     
-        include = self.get_include_conditions()
-        exclude = self.get_exclude_conditions()
+        include_conditions = []
+        for filt in UserFilter.list_:
+            if filt.value:
+                condition = self.get_include_condition(filt.dir_name)
+                include_conditions.append(condition)
 
-        if include:
-            stmt = stmt.where(sqlalchemy.or_(*include))
+        if include_conditions:
+            stmt = stmt.where(sqlalchemy.or_(*include_conditions))
 
-        if exclude:
-            stmt = stmt.where(sqlalchemy.and_(*exclude))
+        # Если системный фильтр активен — добавляем исключающие условия (AND)
+        if SystemFilter.value:
+            exclude_condition = self.get_exclude_conditions(UserFilter.list_)
+            stmt = stmt.where(exclude_condition)
 
         return stmt
-    
-    def get_exclude_conditions(self) -> list:
-        """
-        Формирует запрос в базу данных:
-        ```
-        [
-            и THUMBS.c.short_src не соответствует UserFilter.dir_name,
-            и THUMBS.c.short_src не соответствует UserFilter.dir_name,
-            ...
-        ]
-        ```
 
-        Используется для исключения всех записей, путь которых содержит любую из папок фильтров.
-        Учитываются все фильтры из UserFilter.list_ независимо от их флага value.
+    def get_exclude_conditions(self, filter_list: list[UserFilter]):
+        """
+        Формирует условие AND для исключения всех путей, содержащих любую из папок фильтров.
         """
         return sqlalchemy.and_(
-            [
+            *[
                 THUMBS.c.short_src.not_ilike(f"%/{i.dir_name}/%")
-                for i in UserFilter.list_
+                for i in filter_list
             ]
         )
 
-    def get_include_conditions(self) -> list:
+    def get_include_condition(self, dir_name: str):
         """
-        Формирует запрос в базу данных:
-        ```
-        [
-            или THUMBS.c.short_src соответствует UserFilter.dir_name,
-            или THUMBS.c.short_src соответствует UserFilter.dir_name,
-            ...
-        ]
-        ```
-
-        Учитываются только фильтры, у которых value == True.
-        Используется для отбора записей, содержащих указанные папки.
+        Формирует условие для включения путей, содержащих указанную папку.
         """
-        return [
-            THUMBS.c.short_src.ilike(f"%/{filter.dir_name}/%")
-            for filter in UserFilter.list_
-            if filter.value
-        ]
+        return THUMBS.c.short_src.ilike(f"%/{dir_name}/%")
 
 
     def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:

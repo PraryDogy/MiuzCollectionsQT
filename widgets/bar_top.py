@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QWidget
 
 from cfg import Dynamic, JsonData, Static
-from system.filters import UserFilter
+from system.filters import SystemFilter, UserFilter
 from system.lang import Lang
 
 from ._base_widgets import UHBoxLayout
