@@ -338,9 +338,12 @@ class MainUtils:
             return f"{round(bytes_size/(pow(1024,4)), 2)} ТБ"
 
     @classmethod
-    def get_f_date(cls, timestamp_: int) -> str:
+    def get_f_date(cls, timestamp_: int, date_only: bool = False) -> str:
         date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
-        return date.strftime("%d.%m.%Y %H:%M")
+        if date_only:
+            return date.strftime("%d.%m.%Y")
+        else:
+            return date.strftime("%d.%m.%Y %H:%M")
         
     @classmethod
     def get_img_path(cls, main_folder_path: str, rel_img_path: str) -> str:

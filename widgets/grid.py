@@ -138,9 +138,12 @@ class ImgWid(QLabel):
 
 
 class TextAdvancedWid(QLabel):
-    def __init__(self, text: str):
+    def __init__(self, wid: "Thumbnail"):
         super().__init__()
-        self.setText(self.short_text(text))
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        first_row = self.short_text(wid.collection)
+        text = "\n".join((first_row, wid.f_mod))
+        self.setText(text)
         self.blue_color = "#6199E4"
         self.setStyleSheet(
             f"""
@@ -175,7 +178,7 @@ class Thumbnail(QFrame, CellWid):
         padding-right: 2px;
     """
 
-    def __init__(self, pixmap: QPixmap, rel_img_path: str, coll_name: str, fav: int):
+    def __init__(self, pixmap: QPixmap, rel_img_path: str, coll_name: str, fav: int, f_mod: str):
         CellWid.__init__(self)
         QFrame.__init__(self)
         self.setStyleSheet(Static.border_transparent_style)
@@ -184,6 +187,7 @@ class Thumbnail(QFrame, CellWid):
         self.rel_img_path = rel_img_path
         self.collection = coll_name
         self.fav_value = fav
+        self.f_mod = f_mod
 
         if fav == 0 or fav is None:
             self.name = os.path.basename(rel_img_path)
@@ -201,7 +205,7 @@ class Thumbnail(QFrame, CellWid):
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(self.text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.text_adv = TextAdvancedWid(self.collection)
+        self.text_adv = TextAdvancedWid(self)
         self.v_layout.addWidget(self.text_adv, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setup()
@@ -415,7 +419,8 @@ class Grid(QScrollArea):
                 pixmap=db_image.pixmap,
                 rel_img_path=db_image.rel_img_path,
                 coll_name=db_image.coll_name,
-                fav=db_image.fav
+                fav=db_image.fav,
+                f_mod=db_image.f_mod
             )
             wid.set_no_frame()
             wid.reload_thumbnails.connect(lambda: self.reload_thumbnails())

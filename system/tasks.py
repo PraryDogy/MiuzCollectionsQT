@@ -692,12 +692,13 @@ class MoveFilesTask(QObject):
 
 
 class LoadDbImagesItem:
-    __slots__ = ["pixmap", "rel_img_path", "coll_name", "fav"]
-    def __init__(self, pixmap: QPixmap, rel_img_path: str, coll: str, fav: int):
+    __slots__ = ["pixmap", "rel_img_path", "coll_name", "fav", "f_mod"]
+    def __init__(self, pixmap: QPixmap, rel_img_path: str, coll: str, fav: int, f_mod: str):
         self.pixmap = pixmap
         self.rel_img_path = rel_img_path
         self.coll_name = coll
         self.fav = fav
+        self.f_mod = f_mod
 
 
 class LoadDbImagesSignals(QObject):
@@ -720,15 +721,12 @@ class LoadDbImagesTask(URunnable):
 
         conn = Dbase.engine.connect()
         stmt = self.get_stmt()
-        res: list[tuple[str, str, int, str, int]] = conn.execute(stmt).fetchall()        
+        res: list[tuple] = conn.execute(stmt).fetchall()        
         conn.close()
 
         self.create_dict(res)
 
-    def create_dict(
-            self,
-            res: list[tuple[str, str, int, str, int]]
-            ) -> dict[str, list[LoadDbImagesItem]] | dict:
+    def create_dict(self, res: list[tuple]) -> dict[str, list[LoadDbImagesItem]] | dict:
 
         thumbs_dict = defaultdict(list[LoadDbImagesItem])
 
@@ -746,7 +744,7 @@ class LoadDbImagesTask(URunnable):
             if not rel_img_path.endswith(exts_):
                 continue
 
-            mod = datetime.fromtimestamp(mod).date()
+            f_mod = datetime.fromtimestamp(mod).date()
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             thumb = ThumbUtils.read_thumb(thumb_path)
 
@@ -756,12 +754,12 @@ class LoadDbImagesTask(URunnable):
                 continue
 
             if Dynamic.date_start or Dynamic.date_end:
-                mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
+                f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
 
             else:
-                mod = f"{Lang.months[str(mod.month)]} {mod.year}"
+                f_mod = f"{Lang.months[str(f_mod.month)]} {f_mod.year}"
 
-            thumbs_dict[mod].append(LoadDbImagesItem(pixmap, rel_img_path, coll, fav))
+            thumbs_dict[f_mod].append(LoadDbImagesItem(pixmap, rel_img_path, coll, fav, f_mod))
 
         try:
             self.signals_.finished_.emit(thumbs_dict)
