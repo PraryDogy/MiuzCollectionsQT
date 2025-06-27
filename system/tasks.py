@@ -790,8 +790,8 @@ class LoadDbImagesTask(URunnable):
             stmt = stmt.where(THUMBS.c.mod > start)
             stmt = stmt.where(THUMBS.c.mod < end)
     
-        include = self.include_stmt()
-        exclude = self.exclude_stmt()
+        include = self.get_include_conditions()
+        exclude = self.get_exclude_conditions()
 
         if include:
             stmt = stmt.where(sqlalchemy.or_(*include))
