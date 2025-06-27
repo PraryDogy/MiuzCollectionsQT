@@ -13,7 +13,7 @@ from sqlalchemy import select, update
 from cfg import Dynamic, JsonData, Static
 
 from .database import THUMBS, Dbase
-from .filters import Filter
+from .filters import UserFilter
 from .lang import Lang
 from .main_folder import MainFolder
 from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
@@ -789,105 +789,59 @@ class LoadDbImagesTask(URunnable):
             start, end = self.combine_dates(Dynamic.date_start, Dynamic.date_end)
             stmt = stmt.where(THUMBS.c.mod > start)
             stmt = stmt.where(THUMBS.c.mod < end)
-
-        user_filters, sys_filters = self.group_filters()
     
-        or_statements = sqlalchemy.or_(
-            *self.build_inclusion_condition(user_filters),
-            self.build_exclusion_condition(user_filters, sys_filters)
-        )
+        include = self.include_stmt()
+        exclude = self.exclude_stmt()
 
-        stmt_where.append(or_statements)
+        if include:
+            stmt = stmt.where(sqlalchemy.or_(*include))
 
-        for i in stmt_where:
-            stmt = stmt.where(i)
+        if exclude:
+            stmt = stmt.where(sqlalchemy.and_(*exclude))
 
         return stmt
     
-    def build_exclusion_condition(
-            self,
-            user_filters: list[Filter],
-            sys_filters: list[Filter]
-        ) -> sqlalchemy.ColumnElement:
+    def get_exclude_conditions(self) -> list:
         """
-        Формирует SQLAlchemy условие для исключения строк, которые соответствуют
-        пользовательским фильтрам, если системный фильтр включён.
-
-        Условия строятся так:
-        - Для каждого активного системного фильтра (sys_filter.value == True) создаётся
-        группа условий, исключающих строки, соответствующие пользовательским фильтрам.
-        - Условия объединяются с помощью OR для всех активных системных фильтров.
-        - Внутри каждой группы пользовательские фильтры объединяются с помощью AND.
-
-        Args:
-            user_filters (list[Filter]): Список пользовательских фильтров (не системных).
-            sys_filters (list[Filter]): Список системных фильтров.
-
-        Returns:
-            sqlalchemy.sql.elements.BooleanClauseList:
-                Условие для исключения строк, соответствующих пересечению системных
-                и пользовательских фильтров.
-        """
-        conditions = [
-            THUMBS.c.short_src.not_ilike(f"%{os.sep}{user_filter.real}{os.sep}%")
-            for sys_filter in sys_filters
-            for user_filter in user_filters
-            if sys_filter.value
+        Формирует запрос в базу данных:
+        ```
+        [
+            и THUMBS.c.short_src не соответствует UserFilter.dir_name,
+            и THUMBS.c.short_src не соответствует UserFilter.dir_name,
+            ...
         ]
-        return sqlalchemy.and_(*conditions)
+        ```
 
-    def build_inclusion_condition(
-            self,
-            user_filters: list[Filter]
-        ) -> list[sqlalchemy.BinaryExpression[bool]]:
+        Используется для исключения всех записей, путь которых содержит любую из папок фильтров.
+        Учитываются все фильтры из UserFilter.list_ независимо от их флага value.
         """
-        Формирует SQLAlchemy условие для включения строк, соответствующих
-        значениям пользовательских фильтров.
+        return sqlalchemy.and_(
+            [
+                THUMBS.c.short_src.not_ilike(f"%/{i.dir_name}/%")
+                for i in UserFilter.list_
+            ]
+        )
 
-        Условия строятся так:
-        - Для каждого активного пользовательского фильтра (filter.value == True)
-        создаётся выражение, проверяющее, что `src` содержит значение `filter.real`.
-        - Все условия объединяются с помощью OR.
-
-        Args:
-            user_filters (list[Filter]): Список пользовательских фильтров.
-
-        Returns:
-            sqlalchemy.sql.elements.BooleanClauseList:
-                Условие для включения строк, соответствующих хотя бы одному
-                из пользовательских фильтров.
+    def get_include_conditions(self) -> list:
         """
-        conditions = [
-            THUMBS.c.short_src.ilike(f"%{os.sep}{filter.real}{os.sep}%")
-            for filter in user_filters
+        Формирует запрос в базу данных:
+        ```
+        [
+            или THUMBS.c.short_src соответствует UserFilter.dir_name,
+            или THUMBS.c.short_src соответствует UserFilter.dir_name,
+            ...
+        ]
+        ```
+
+        Учитываются только фильтры, у которых value == True.
+        Используется для отбора записей, содержащих указанные папки.
+        """
+        return [
+            THUMBS.c.short_src.ilike(f"%/{filter.dir_name}/%")
+            for filter in UserFilter.list_
             if filter.value
         ]
-        return conditions
 
-    def group_filters(self) -> tuple[list[Filter], list[Filter]]:
-        """
-        Разделяет фильтры на пользовательские и системные.
-
-        Фильтры классифицируются на основе значения их атрибута `.system`:
-        - Если `.system == True`, фильтр добавляется в список системных
-        фильтров (`sys_filters`).
-        - Если `.system == False`, фильтр добавляется в список пользовательских
-        фильтров (`user_filters`).
-
-        Returns:
-            tuple[list[Filter], list[Filter]]:
-                - user_filters: Список пользовательских фильтров.
-                - sys_filters: Список системных фильтров.
-        """
-        user_filters: list[Filter] = []
-        sys_filters: list[Filter] = []
-
-        for i in Filter.list_:
-            if i.system:
-                sys_filters.append(i)
-            else:
-                user_filters.append(i)
-        return user_filters, sys_filters
 
     def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:
         """

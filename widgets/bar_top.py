@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QWidget
 
 from cfg import Dynamic, JsonData, Static
-from system.filters import Filter
+from system.filters import UserFilter
 from system.lang import Lang
 
 from ._base_widgets import UHBoxLayout
@@ -43,8 +43,8 @@ class FilterBtn(BarTopBtn):
     reload_thumbnails = pyqtSignal()
     scroll_to_top = pyqtSignal()
 
-    def __init__(self, filter: Filter):
-        super().__init__(text=filter.names[JsonData.lang_ind])
+    def __init__(self, filter: UserFilter):
+        super().__init__(text=filter.lang_names[JsonData.lang_ind])
 
         self.filter = filter
 
@@ -88,7 +88,7 @@ class BarTop(QWidget):
     def init_ui(self):
         self.filter_btns.clear()
 
-        for filter in Filter.list_:
+        for filter in UserFilter.list_:
             label = FilterBtn(filter)
             label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
             label.scroll_to_top.connect(lambda: self.scroll_to_top.emit())

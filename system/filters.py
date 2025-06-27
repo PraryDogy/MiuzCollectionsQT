@@ -1,34 +1,38 @@
-class Filter:
-    list_: list["Filter"] = []
-    __slots__ = ["names", "real", "value", "system"]
+from lang import Lang
 
-    def __init__(self, names: list, real: str, value: bool, system: bool):
+
+class UserFilter:
+    list_: list["UserFilter"] = []
+    __slots__ = ["lang_names", "dir_name", "value"]
+
+    def __init__(self, lang_names: list, dir_name: str, value: bool):
         """
-        Создаёт фильтр.
-
         Аргументы:
-        - names (list[str]): Названия фильтра (например, на русском и английском).    
-        - real (str | None): Имя папки, к которой относится фильтр. None — для системных фильтров.    
+        - lang_names (list[str]): Названия фильтра (на русском и английском).    
+        - dir_name (str): Имя папки, к которой относится фильтр.
         - value (bool): Активен ли фильтр.    
-        - system (bool): Системный фильтр.    
-
-        Если system=True — из бд загружаются записи, не подходящие под обычные фильтры.    
-        Пример: system=True → загружаются записи, не относящиеся к "Продукт" и "Модели".  
- 
-        Примечание:     
-        Системный фильтр должен быть только один, например "Остальное".     
-        Это гарантирует корректную логику фильтрации:   
-        он определяет, какие записи не подпадают ни под один обычный фильтр.    
-        Несколько системных фильтров могут конфликтовать друг с другом,     
-        нарушая смысл "всё остальное".
         """
-        self.names = names
-        self.real = real
+        self.lang_names = lang_names
+        self.dir_name = dir_name
         self.value = value
-        self.system = system
-        Filter.list_.append(self)
+    
+    @classmethod
+    def register(cls, filter_: "UserFilter") -> None:
+        cls.list_.append(filter_)
 
 
-Filter(["Продукт", "Product"], "1 IMG", False, False)
-Filter(["Модели", "Model"], "2 MODEL IMG", False, False)
-Filter(["Остальное", "Other"], None, False, True)
+class SystemFilter:
+    def __init__(self):
+        """
+        Системный фильтр — фильтрует записи, не подходящие ни под один обычный фильтр.
+
+        Используется для определения записей, не попавших ни под один явно заданный фильтр.
+        Должен быть один на систему — предотвращает конфликты логики фильтрации.
+        """
+        self.lang_names = Lang.system_filter
+        self.value = False
+
+
+UserFilter.register(UserFilter(["Продукт", "Product"], "1 IMG", False))
+UserFilter.register(UserFilter(["Модели", "Model"], "2 MODEL IMG", False))
+

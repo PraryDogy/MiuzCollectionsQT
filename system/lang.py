@@ -578,6 +578,11 @@ class _Lang:
         "Continue"
     ]
 
+    system_filter = [
+        "Остальное",
+        "Other"
+    ]
+
 class Lang(_Lang):
 
     @classmethod

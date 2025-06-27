@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
                              QRubberBand, QScrollArea, QSizePolicy, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
-from system.filters import Filter
+from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadDbImagesItem, LoadDbImagesTask
@@ -260,8 +260,8 @@ class NoImagesLabel(QLabel):
         super().__init__()
 
         enabled_filters = [
-            filter.names[JsonData.lang_ind].lower()
-            for filter in Filter.list_
+            filter.lang_names[JsonData.lang_ind].lower()
+            for filter in UserFilter.list_
             if filter.value
             ]
 
