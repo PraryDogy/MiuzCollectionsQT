@@ -827,13 +827,13 @@ class WinSettings(WinSystem):
         v_lay.setSpacing(10)
         v_wid.setLayout(v_lay)
 
-        main_folder_wid = MainFolderWid()
+        self.main_folder_wid = MainFolderWid()
         add_cmd = lambda main_folder: self.add_new_main_folder(main_folder)
         del_cmd = lambda main_folder: self.del_new_main_folder(main_folder)
-        main_folder_wid.new_main_folder.connect(add_cmd)
-        main_folder_wid.del_main_folder.connect(del_cmd)
+        self.main_folder_wid.new_main_folder.connect(add_cmd)
+        self.main_folder_wid.del_main_folder.connect(del_cmd)
 
-        v_lay.addWidget(main_folder_wid)
+        v_lay.addWidget(self.main_folder_wid)
 
         scan_wid = ScanTimeWid()
         scan_wid.new_scan_time.connect(lambda value: self.set_scan_time(value))

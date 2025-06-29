@@ -172,3 +172,7 @@ class MainFolder:
             ]
         ]
 
+    @classmethod
+    def set_miuz_folders(cls):
+        data = cls.miuz_main_folders()
+        MainFolder.list_ = [MainFolder(*item) for item in data]

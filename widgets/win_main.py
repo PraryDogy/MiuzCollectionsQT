@@ -12,15 +12,17 @@ from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, ScanerTask, UploadFilesTask)
 from system.utils import UThreadPool
 
-from ._base_widgets import UHBoxLayout, UVBoxLayout, UMainWindow
+from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
+from .first_load_win import WinFirstLoad
 from .grid import Grid
 from .menu_left import MenuLeft
 from .win_dates import WinDates
 from .win_downloads import WinDownloads
 from .win_remove_files import RemoveFilesWin
+from .win_settings import WinSettings
 from .win_upload import WinUpload
 from .win_warn import WinWarn
 
@@ -127,6 +129,26 @@ class WinMain(UMainWindow):
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
+
+        if MainFolder.is_first_load:
+            QTimer.singleShot(100, self.open_first_load)
+
+    def open_first_load(self):
+        self.win_first = WinFirstLoad()
+        self.win_first.no_pressed.connect(self.no_pressed)
+        self.win_first.center_relative_parent(self)
+        self.win_first.show()
+
+    def yes_pressed(self):
+        ...
+
+    def no_pressed(self):
+        self.settings_win = WinSettings()
+        self.settings_win.center_relative_parent(self)
+        self.settings_win.show()
+        self.settings_win.tabs_wid.setCurrentIndex(1)
+        cmd = lambda: self.settings_win.main_folder_wid.add_btn_cmd()
+        QTimer.singleShot(100, cmd)
 
     def start_scaner_task(self):
         """
