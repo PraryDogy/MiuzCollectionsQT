@@ -161,4 +161,12 @@ class MainFolder:
             ["miuz", miuz_paths, miuz_stop],
             ["panacea", panacea_paths, []]
         ]
+    
+    @classmethod
+    def example_main_folder(cls):
+        return [
+            "Имя (Name)",
+            ["путь/к/папке/с/коллекциями", "path/to/collections/folder"],
+            ["коллекция 1", "коллекция 2", "collection 1", "collection 2"]
+        ]
 
