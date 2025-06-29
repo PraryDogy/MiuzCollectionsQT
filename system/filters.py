@@ -8,6 +8,7 @@ from .utils import MainUtils
 
 
 class UserFilter:
+    first_load = False
     list_: list["UserFilter"] = []
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "user_filters.json")
     __slots__ = ["lang_names", "dir_name", "value"]
@@ -33,14 +34,18 @@ class UserFilter:
     def init(cls):
         validate = cls.validate_data()
         if validate is None:
-            data = cls.default_user_filters()
-            with open(UserFilter.json_file, "w", encoding='utf-8') as f:
-                f.write(json.dumps(obj=data, indent=4, ensure_ascii=False))
+            cls.first_load = True
+            data = []
         else:
             with open(UserFilter.json_file, "r", encoding='utf-8') as f:
                 data = json.loads(f.read())
-
         UserFilter.list_ = [UserFilter(*item) for item in data]
+
+    @classmethod
+    def set_miuz_filters(cls):
+        data = cls.default_user_filters()
+        with open(UserFilter.json_file, "w", encoding='utf-8') as f:
+            f.write(json.dumps(obj=data, indent=4, ensure_ascii=False))
 
     @classmethod
     def validate_data(cls) -> list | None:

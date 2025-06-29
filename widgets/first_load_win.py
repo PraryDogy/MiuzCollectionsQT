@@ -14,9 +14,9 @@ class WinFirstLoad(WinSystem):
     yes_pressed = pyqtSignal()
     no_pressed = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, question: str):
         super().__init__()
-        self.setWindowTitle("Первый запуск")
+        self.question = question
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
@@ -30,8 +30,7 @@ class WinFirstLoad(WinSystem):
         v_lay = UVBoxLayout()
         v_wid.setLayout(v_lay)
 
-        t = "Вы из MiuzDiamonds/Panacea?\nНажмите да, и приложение установит настройки"
-        lbl_descr = QLabel(t)
+        lbl_descr = QLabel(self.question)
         v_lay.addWidget(lbl_descr)
 
         btn_wid = QWidget()

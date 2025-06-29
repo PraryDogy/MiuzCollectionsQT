@@ -135,7 +135,7 @@ class WinMain(UMainWindow):
             QTimer.singleShot(100, self.open_first_load)
 
     def open_first_load(self):
-        self.win_first = WinFirstLoad()
+        self.win_first = WinFirstLoad("Вы из MIUZ / Panacea?")
         self.win_first.no_pressed.connect(self.no_pressed)
         self.win_first.yes_pressed.connect(self.yes_pressed)
         self.win_first.center_relative_parent(self)
