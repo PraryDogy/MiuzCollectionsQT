@@ -27,8 +27,8 @@ class _Lang:
         "All collections"
     ]
     apply = [
-        "Применить",
-        "Apply"
+        "Перезапуск",
+        "Restart app"
     ]
     bar_menu = [
         "Меню",

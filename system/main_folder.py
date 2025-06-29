@@ -91,15 +91,20 @@ class MainFolder:
             with open(MainFolder.json_file, "r", encoding='utf-8') as f:
                 data = json.loads(f.read())
 
-        # Если пользователь добавил свою MainFolder, удаляем exmaple main folder
-        # Если же в файле все еще только exmaple main folder, то ставим флаг на True
+        # Если пользователь добавил свою MainFolder, удаляем example main folder
         if len(data) > 1:
             for i in data:
                 if i == cls.example_main_folders()[0]:
                     data.remove(i)
-        else:
+        # Если же в файле все еще только example main folder, то ставим флаг на True
+        elif len(data) == 1:
             if data[0] == cls.example_main_folders()[0]:
                 cls.is_first_load = True
+        # Если файл пустой, то добавляем example main folder и ставим флаг на True
+        # Файл может быть пустым, если пользователь удалил все main folder
+        elif len(data) == 0:
+            data = cls.example_main_folders()
+            cls.is_first_load = True
 
         MainFolder.list_ = [MainFolder(*item) for item in data]
         if MainFolder.list_:
