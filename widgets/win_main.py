@@ -136,11 +136,14 @@ class WinMain(UMainWindow):
     def open_first_load(self):
         self.win_first = WinFirstLoad()
         self.win_first.no_pressed.connect(self.no_pressed)
+        self.win_first.yes_pressed.connect(self.yes_pressed)
         self.win_first.center_relative_parent(self)
         self.win_first.show()
 
     def yes_pressed(self):
-        ...
+        MainFolder.set_miuz_folders()
+        MainFolder.write_json_data()
+        MainUtils.start_new_app()
 
     def no_pressed(self):
         self.settings_win = WinSettings()
