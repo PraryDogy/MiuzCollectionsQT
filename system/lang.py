@@ -606,8 +606,13 @@ class _Lang:
     ]
 
     win_manual = [
-        "Помощь",
+        "Справка",
         "Help"
+    ]
+
+    win_manual_descr = [
+        "Показать окно справки",
+        "Show help window"
     ]
 
     back = ["Назад", "Back"]

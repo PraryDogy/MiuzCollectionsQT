@@ -10,9 +10,7 @@ from system.lang import Lang
 from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
 
 
-class WinManual(WinSystem):
-    yes_pressed = pyqtSignal()
-    no_pressed = pyqtSignal()
+class WinHelp(WinSystem):
 
     def __init__(self):
         super().__init__()

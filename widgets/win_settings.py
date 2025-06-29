@@ -14,8 +14,10 @@ from system.lang import Lang
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
+
 from ._base_widgets import (UHBoxLayout, ULineEdit, UMenu, UTextEdit,
                             UVBoxLayout, WinSystem)
+from .win_help import WinHelp
 
 LIST_ITEM_H = 25
 ICON_SVG = os.path.join(Static.images_dir, "icon.svg")
@@ -93,18 +95,26 @@ class SimpleSettings(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
+        self.show_files_btn = QPushButton(text=Lang.show_app_support)
+        self.show_files_btn.setFixedWidth(115)
+        self.show_files_btn.clicked.connect(self.show_files_cmd)
+        first_row_lay.addWidget(self.show_files_btn)
+
+        self.lang_label = QLabel(Lang.show_files)
+        first_row_lay.addWidget(self.lang_label)
+
         sec_row_wid = QWidget()
         v_lay.addWidget(sec_row_wid)
         sec_row_lay = UHBoxLayout()
         sec_row_lay.setSpacing(15)
         sec_row_wid.setLayout(sec_row_lay)
 
-        self.show_files_btn = QPushButton(text=Lang.show_app_support)
-        self.show_files_btn.setFixedWidth(115)
-        self.show_files_btn.clicked.connect(self.show_files_cmd)
-        sec_row_lay.addWidget(self.show_files_btn)
+        self.help_btn = QPushButton(text=Lang.win_manual)
+        self.help_btn.setFixedWidth(115)
+        self.help_btn.clicked.connect(self.show_help)
+        sec_row_lay.addWidget(self.help_btn)
 
-        self.lang_label = QLabel(Lang.show_files)
+        self.lang_label = QLabel(Lang.win_manual_descr)
         sec_row_lay.addWidget(self.lang_label)
 
     def show_files_cmd(self, *args):
@@ -112,6 +122,11 @@ class SimpleSettings(QGroupBox):
             subprocess.Popen(["open", Static.APP_SUPPORT_DIR])
         except Exception as e:
             print(e)
+
+    def show_help(self, *args):
+        self.help_win = WinHelp()
+        self.help_win.center_relative_parent(self.window())
+        self.help_win.show()
 
 
 class AddRowWindow(WinSystem):
@@ -891,7 +906,7 @@ class WinSettings(WinSystem):
                     f.paths = ch.paths
                     f.stop_list = ch.stop_list
 
-        if self.new_lang:
+        if self.new_lang in (0, 1):
             restart_app = True
             JsonData.lang_ind = self.new_lang
 
@@ -903,6 +918,7 @@ class WinSettings(WinSystem):
             shutil.rmtree(Static.APP_SUPPORT_DIR)
             QApplication.quit()
             MainUtils.start_new_app()
+
         elif restart_app:
             self.hide()
             MainFolder.write_json_data()

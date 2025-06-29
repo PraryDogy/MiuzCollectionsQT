@@ -128,13 +128,14 @@ class WinMain(UMainWindow):
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
 
-        QTimer.singleShot(200, self.open_manual)
-
-    def open_manual(self):
-        from .win_manual import WinManual
-        self.win_manual = WinManual()
-        self.win_manual.center_relative_parent(self)
-        self.win_manual.show()
+        QTimer.singleShot(100, self.check_connection)
+            
+    def check_connection(self):
+        main_folder = MainFolder.current.is_available()
+        if not main_folder:
+            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_warn.center_relative_parent(self)
+            self.win_warn.show()
 
     def start_scaner_task(self):
         """
