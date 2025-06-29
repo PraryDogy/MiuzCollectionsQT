@@ -82,7 +82,7 @@ class MainFolder:
     def init(cls):
         validate = cls.validate_data()
         if validate is None:
-            data = cls.default_main_folders()
+            data = cls.miuz_main_folders()
             with open(MainFolder.json_file, "w", encoding='utf-8') as f:
                 f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
         else:
@@ -90,7 +90,8 @@ class MainFolder:
                 data = json.loads(f.read())
 
         MainFolder.list_ = [MainFolder(*item) for item in data]
-        MainFolder.current = MainFolder.list_[0]
+        if MainFolder.list_:
+            MainFolder.current = MainFolder.list_[0]
 
     @classmethod
     def validate_data(cls) -> list | None:
@@ -136,7 +137,7 @@ class MainFolder:
             f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
 
     @classmethod
-    def default_main_folders(cls):
+    def miuz_main_folders(cls):
         miuz_paths = [
             '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
             '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
