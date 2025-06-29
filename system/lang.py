@@ -585,10 +585,12 @@ class _Lang:
 
     page_one = [
         "Папка с коллекциями:\
-        \nПапка, содержащая вложенные папки с изображениями.",
+        \n- Папка, содержащая вложенные папки с изображениями.\
+        \n- Папка с изображениями.",
 
         "Collections folder:\
-        \nA folder containing subfolders with images."
+        \n- A folder containing subfolders with images.\
+        \n- A folder with images.",
     ]
 
     page_two = [
@@ -602,6 +604,14 @@ class _Lang:
         \n- Models: images in folder 2 MODEL IMG\
         \n- Other: everything not related to the filters",
     ]
+
+    win_manual = [
+        "Помощь",
+        "Help"
+    ]
+
+    back = ["Назад", "Back"]
+    next = ["Далее", "Next"]
 
 class Lang(_Lang):
 

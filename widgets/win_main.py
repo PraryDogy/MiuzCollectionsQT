@@ -131,8 +131,8 @@ class WinMain(UMainWindow):
         QTimer.singleShot(200, self.open_manual)
 
     def open_manual(self):
-        from .win_manual import WinFirstLoad
-        self.win_manual = WinFirstLoad("test")
+        from .win_manual import WinManual
+        self.win_manual = WinManual()
         self.win_manual.center_relative_parent(self)
         self.win_manual.show()
 

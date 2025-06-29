@@ -1,22 +1,22 @@
 import os
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QLabel, QPushButton, QWidget
 
 from cfg import JsonData, Static
 from system.lang import Lang
 
-from ._base_widgets import SvgBtn, UHBoxLayout, UVBoxLayout, WinSystem
+from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
 
 
-class WinFirstLoad(WinSystem):
+class WinManual(WinSystem):
     yes_pressed = pyqtSignal()
     no_pressed = pyqtSignal()
 
-    def __init__(self, question: str):
+    def __init__(self):
         super().__init__()
+        self.setWindowTitle(Lang.win_manual)
         self.central_layout.setContentsMargins(10, 5, 10, 5)
         self.central_layout.setSpacing(5)
 
@@ -65,12 +65,12 @@ class WinFirstLoad(WinSystem):
 
         btn_lay.addStretch()
 
-        self.prev_btn = QPushButton("Назад")
+        self.prev_btn = QPushButton(Lang.back)
         self.prev_btn.clicked.connect(self.prev_page)
         self.prev_btn.setFixedWidth(100)
         btn_lay.addWidget(self.prev_btn)
 
-        self.next_btn = QPushButton("Далее")
+        self.next_btn = QPushButton(Lang.next)
         self.next_btn.clicked.connect(self.next_page)
         self.next_btn.setFixedWidth(100)
         btn_lay.addWidget(self.next_btn)
