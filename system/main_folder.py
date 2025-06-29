@@ -12,7 +12,7 @@ class MainFolder:
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
     __slots__ = ["name", "paths", "stop_list", "_curr_path"]
 
-    def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str = ""):
+    def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str):
         """
         curr_path (str): Актуальный, проверенный путь к папке из списка `paths`.
 
@@ -84,12 +84,22 @@ class MainFolder:
         validate = cls.validate_data()
         if validate is None:
             cls.is_first_load = True
-            data = cls.example_main_folder()
+            data = cls.example_main_folders()
             with open(MainFolder.json_file, "w", encoding='utf-8') as f:
                 f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
         else:
             with open(MainFolder.json_file, "r", encoding='utf-8') as f:
                 data = json.loads(f.read())
+
+        # Если пользователь добавил свою MainFolder, удаляем exmaple main folder
+        # Если же в файле все еще только exmaple main folder, то ставим флаг на True
+        if len(data) > 1:
+            for i in data:
+                if i == cls.example_main_folders()[0]:
+                    data.remove(i)
+        else:
+            if data[0] == cls.example_main_folders()[0]:
+                cls.is_first_load = True
 
         MainFolder.list_ = [MainFolder(*item) for item in data]
         if MainFolder.list_:
@@ -109,7 +119,7 @@ class MainFolder:
                 print("ожидается list, получен: ", type(data).__name__)
                 return None            
 
-            test = MainFolder("name", ["paths", ], ["stop list", ])
+            test = MainFolder("name", ["paths", ], ["stop list", ], "")
             cls_types = test.get_types()
 
             for idx, main_folder in enumerate(data):
@@ -158,17 +168,18 @@ class MainFolder:
         ]
 
         return [
-            ["miuz", miuz_paths, miuz_stop],
-            ["panacea", panacea_paths, []]
+            ["miuz", miuz_paths, miuz_stop, ""],
+            ["panacea", panacea_paths, [], ""]
         ]
     
     @classmethod
-    def example_main_folder(cls):
+    def example_main_folders(cls):
         return [
             [
                 "Имя (Name)",
                 ["путь/к/папке/с/коллекциями", "path/to/collections/folder"],
-                ["коллекция 1", "коллекция 2", "collection 1", "collection 2"]
+                ["коллекция 1", "коллекция 2", "collection 1", "collection 2"],
+                ""
             ]
         ]
 
