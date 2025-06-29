@@ -44,10 +44,8 @@ class WinFirstLoad(WinSystem):
         descr = QLabel(text)
         v_lay.addWidget(descr)
 
-        svg = self.get_svg_name(page_num)
+        svg = f"example {page_num} {JsonData.lang_ind}.svg"
         svg = os.path.join(Static.images_dir, svg)
-
-        print(svg)
 
         svg_wid = QSvgWidget()
         svg_wid.load(svg)
@@ -64,9 +62,10 @@ class WinFirstLoad(WinSystem):
 
         btn_lay.addStretch()
 
-        self.back_btn = QPushButton("Назад")
-        self.back_btn.setFixedWidth(100)
-        btn_lay.addWidget(self.back_btn)
+        self.prev_btn = QPushButton("Назад")
+        self.prev_btn.clicked.connect(self.prev_page)
+        self.prev_btn.setFixedWidth(100)
+        btn_lay.addWidget(self.prev_btn)
 
         self.next_btn = QPushButton("Далее")
         self.next_btn.clicked.connect(self.next_page)
@@ -81,15 +80,29 @@ class WinFirstLoad(WinSystem):
         self.current_page += 1
         if self.current_page > self.max_pages:
             self.current_page -= 1
-            self.next_btn.setDisabled(True)
-        else:
-            self.dynamic_wid.deleteLater()
-            new_wid = self.page_list[self.current_page]
-            self.dynamic_wid = new_wid()
-            self.central_layout.insertWidget(1, self.dynamic_wid)
 
-    def get_svg_name(self, number: int):
-        return f"example {number} {JsonData.lang_ind}.svg"
+        if self.current_page == self.max_pages:
+            self.next_btn.setDisabled(True)
+
+        self.prev_btn.setDisabled(False)
+        self.dynamic_wid.deleteLater()
+        new_wid = self.page_list[self.current_page]
+        self.dynamic_wid = new_wid()
+        self.central_layout.insertWidget(1, self.dynamic_wid)
+
+    def prev_page(self):
+        self.current_page -= 1
+        if self.current_page < 0:
+            self.current_page += 1
+
+        if self.current_page == 0:
+            self.prev_btn.setDisabled(True)
+
+        self.next_btn.setDisabled(False)
+        self.dynamic_wid.deleteLater()
+        new_wid = self.page_list[self.current_page]
+        self.dynamic_wid = new_wid()
+        self.central_layout.insertWidget(1, self.dynamic_wid)
     
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
