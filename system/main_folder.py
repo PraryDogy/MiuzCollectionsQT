@@ -83,8 +83,13 @@ class MainFolder(QObject):
 
     @classmethod
     def init(cls):
+        """
+        Если это первая загрузка, вернет True, в иных случаях None
+        """
+        is_first_load = None
         validate = cls.validate_data()
         if validate is None:
+            is_first_load = True
             data = cls.example_main_folder()
             with open(MainFolder.json_file, "w", encoding='utf-8') as f:
                 f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
@@ -95,6 +100,9 @@ class MainFolder(QObject):
         MainFolder.list_ = [MainFolder(*item) for item in data]
         if MainFolder.list_:
             MainFolder.current = MainFolder.list_[0]
+        
+        return is_first_load
+
 
     @classmethod
     def validate_data(cls) -> list | None:

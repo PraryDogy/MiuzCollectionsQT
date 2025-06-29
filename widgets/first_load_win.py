@@ -10,11 +10,10 @@ from system.lang import Lang
 from ._base_widgets import SvgBtn, UHBoxLayout, UVBoxLayout, WinSystem
 
 
-class WinWarn(WinSystem):
-    def __init__(self, title: str, text: str):
+class WinFirstLoad(WinSystem):
+    def __init__(self):
         super().__init__()
-        self.setWindowTitle(title)
-        self.my_text = text
+        self.setWindowTitle("Первый запуск")
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
