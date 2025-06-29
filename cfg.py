@@ -254,6 +254,8 @@ class JsonData:
 
     @classmethod
     def make_internal_files(cls):
+        print("Создаю пустую базу данных")
+        print("Создаю пустую hashdir")
         os.makedirs(Static.PRELOAD_NAME, exist_ok=True)
         open(Static.PRELOAD_DB, "w").close()
 
