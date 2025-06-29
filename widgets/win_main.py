@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
@@ -141,6 +142,8 @@ class WinMain(UMainWindow):
         self.win_first.show()
 
     def yes_pressed(self):
+        os.remove(Static.APP_SUPPORT_DB)
+        shutil.rmtree(Static.APP_SUPPORT_HASHDIR)
         MainFolder.set_miuz_folders()
         MainFolder.write_json_data()
         MainUtils.start_new_app()
