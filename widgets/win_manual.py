@@ -34,6 +34,7 @@ class WinFirstLoad(WinSystem):
         self.dynamic_wid = self.page_list[0]()
         self.central_layout.insertWidget(0, self.dynamic_wid)
         self.adjustSize()
+        self.setFixedSize(480, 320)
 
     def create_page(self, text: str, page_num: int):
         v_wid = QWidget()
@@ -51,6 +52,8 @@ class WinFirstLoad(WinSystem):
         svg_wid.load(svg)
         svg_wid.setFixedSize(svg_wid.sizeHint())
         v_lay.addWidget(svg_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        v_lay.addStretch()
 
         return v_wid
 
