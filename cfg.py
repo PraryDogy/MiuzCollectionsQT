@@ -53,6 +53,9 @@ class Static:
     PARAGRAPH_SEP = "\u2029"
     LINE_FEED  = "\u000a"
 
+    HASHDIR_NAME = "hashdir"
+    PRELOAD_NAME: str = "_preload"
+
     # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ 
     APP_SUPPORT_DIR: str = os.path.join(
         os.path.expanduser("~"),
@@ -73,23 +76,21 @@ class Static:
 
     APP_SUPPORT_HASHDIR: str = os.path.join(
         APP_SUPPORT_DIR,
-        "hashdir"
+        HASHDIR_NAME
         )
 
-    PRELOAD_FOLDER: str = "_preload"
-
     PRELOAD_DB: str = os.path.join(
-        PRELOAD_FOLDER,
+        PRELOAD_NAME,
         "db.db"
         )
 
     PRELOAD_HASHDIR: str = os.path.join(
-        PRELOAD_FOLDER,
-        "hashdir"
+        PRELOAD_NAME,
+        HASHDIR_NAME
         )
 
     PRELOAD_HASHDIR_ZIP: str = os.path.join(
-        PRELOAD_FOLDER,
+        PRELOAD_NAME,
         "hashdir.zip"
         )
 
@@ -236,7 +237,7 @@ class JsonData:
 
     @classmethod
     def check_dirs(cls):
-        if not os.path.exists(Static.PRELOAD_FOLDER):
+        if not os.path.exists(Static.PRELOAD_NAME):
             raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
             
 
@@ -254,11 +255,19 @@ class JsonData:
 
     @classmethod
     def make_internal_files(cls):
-        os.makedirs(Static.PRELOAD_FOLDER, exist_ok=True)
-        os.makedirs(Static.PRELOAD_HASHDIR, exist_ok=True)
-        db_file = open(Static.PRELOAD_DB, "w")
-        db_file.close()
+        os.makedirs(Static.PRELOAD_NAME, exist_ok=True)
+        open(Static.PRELOAD_DB, "w").close()
 
+        os.makedirs(Static.PRELOAD_HASHDIR, exist_ok=True)
+        dummy_file = os.path.join(Static.PRELOAD_HASHDIR, 'dummy.keep')
+        open(dummy_file, 'a').close()
+
+        shutil.make_archive(
+            base_name=Static.PRELOAD_HASHDIR.replace(".zip", ""), 
+            format="zip",
+            root_dir=Static.PRELOAD_NAME
+        )
+        # shutil.rmtree(Static.PRELOAD_HASHDIR)
 
     @classmethod
     def copy_hashdir(cls):
