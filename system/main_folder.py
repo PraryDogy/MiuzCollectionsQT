@@ -7,11 +7,12 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from cfg import Static
 
 
-class MainFolder:
+class MainFolder(QObject):
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
     __slots__ = ["name", "paths", "stop_list", "_curr_path"]
+    is_first_load = pyqtSignal()
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str = ""):
         """
@@ -84,7 +85,7 @@ class MainFolder:
     def init(cls):
         validate = cls.validate_data()
         if validate is None:
-            data = cls.miuz_main_folders()
+            data = cls.example_main_folder()
             with open(MainFolder.json_file, "w", encoding='utf-8') as f:
                 f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
         else:
@@ -165,8 +166,10 @@ class MainFolder:
     @classmethod
     def example_main_folder(cls):
         return [
-            "Имя (Name)",
-            ["путь/к/папке/с/коллекциями", "path/to/collections/folder"],
-            ["коллекция 1", "коллекция 2", "collection 1", "collection 2"]
+            [
+                "Имя (Name)",
+                ["путь/к/папке/с/коллекциями", "path/to/collections/folder"],
+                ["коллекция 1", "коллекция 2", "collection 1", "collection 2"]
+            ]
         ]
 
