@@ -583,6 +583,26 @@ class _Lang:
         "Other"
     ]
 
+    page_one_sec = [
+        "Папка с коллекциями:\
+        \nПапка, содержащая вложенные папки с изображениями.",
+
+        "Collections folder:\
+        \nA folder containing subfolders with images."
+    ]
+
+    page_two = [
+        "Фильтры:\
+        \n- Продукт: изображения в папке 1 IMG\
+        \n- Модели: изображения в папке 2 MODEL IMG\
+        \n- Остальное: все, что не относится к фильтрам",
+
+        "Filters:\
+        \n- Product: images in folder 1 IMG\
+        \n- Models: images in folder 2 MODEL IMG\
+        \n- Other: everything not related to the filters",
+    ]
+
 class Lang(_Lang):
 
     @classmethod

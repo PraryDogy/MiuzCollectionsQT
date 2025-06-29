@@ -128,6 +128,14 @@ class WinMain(UMainWindow):
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
 
+        QTimer.singleShot(200, self.open_manual)
+
+    def open_manual(self):
+        from .win_manual import WinFirstLoad
+        self.win_manual = WinFirstLoad("test")
+        self.win_manual.center_relative_parent(self)
+        self.win_manual.show()
+
     def start_scaner_task(self):
         """
         Инициализирует и запускает задачу сканирования ScanerTask.
