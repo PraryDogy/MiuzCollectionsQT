@@ -238,8 +238,7 @@ class JsonData:
     @classmethod
     def check_dirs(cls):
         if not os.path.exists(Static.PRELOAD_NAME):
-            raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
-            
+            cls.make_internal_files()
 
         if not os.path.exists(Static.APP_SUPPORT_DIR):
             os.makedirs(name=Static.APP_SUPPORT_DIR, exist_ok=True)
@@ -263,11 +262,12 @@ class JsonData:
         open(dummy_file, 'a').close()
 
         shutil.make_archive(
-            base_name=Static.PRELOAD_HASHDIR.replace(".zip", ""), 
+            base_name=os.path.join(Static.PRELOAD_NAME, Static.HASHDIR_NAME), 
             format="zip",
-            root_dir=Static.PRELOAD_NAME
+            root_dir=Static.PRELOAD_NAME,
+            base_dir=Static.HASHDIR_NAME
         )
-        # shutil.rmtree(Static.PRELOAD_HASHDIR)
+        shutil.rmtree(Static.PRELOAD_HASHDIR)
 
     @classmethod
     def copy_hashdir(cls):
