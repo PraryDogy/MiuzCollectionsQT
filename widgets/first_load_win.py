@@ -26,6 +26,7 @@ class WinFirstLoad(WinSystem):
     def init_ui(self):
         v_wid = QWidget()
         self.central_layout.addWidget(v_wid)
+        self.central_layout.setContentsMargins(10, 5, 10, 5)
         v_lay = UVBoxLayout()
         v_wid.setLayout(v_lay)
 
@@ -36,23 +37,30 @@ class WinFirstLoad(WinSystem):
         btn_wid = QWidget()
         v_lay.addWidget(btn_wid)
         btn_lay = UHBoxLayout()
+        btn_lay.setSpacing(10)
         btn_wid.setLayout(btn_lay)
 
         btn_lay.addStretch()
 
         btn_yes = QPushButton("Да")
-        btn_yes.clicked.connect(self.yes_pressed.emit)
+        btn_yes.clicked.connect(self.yes_cmd)
         btn_yes.setFixedWidth(100)
         btn_lay.addWidget(btn_yes)
 
         btn_no = QPushButton("Нет")
-        btn_no.clicked.connect(self.no_pressed.emit)
+        btn_no.clicked.connect(self.no_cmd)
         btn_no.setFixedWidth(100)
         btn_lay.addWidget(btn_no)
 
         btn_lay.addStretch()
 
+    def yes_cmd(self):
+        self.yes_pressed.emit()
+        self.deleteLater()
 
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-            self.deleteLater()
+    def no_cmd(self):
+        self.no_pressed.emit()
+        self.deleteLater()
+
+    def closeEvent(self, a0):
+        a0.ignore()
