@@ -61,17 +61,17 @@ class Static:
         APP_NAME
         )
 
-    JSON_FILE: str = os.path.join(
+    APP_SUPPORT_JSON_DATA: str = os.path.join(
         APP_SUPPORT_DIR,
         "cfg.json"
         )
 
-    DB_FILE: str = os.path.join(
+    APP_SUPPORT_DB: str = os.path.join(
         APP_SUPPORT_DIR,
         "db.db"
         )
 
-    THUMBS_DIR: str = os.path.join(
+    APP_SUPPORT_HASHDIR: str = os.path.join(
         APP_SUPPORT_DIR,
         "hashdir"
         )
@@ -83,7 +83,12 @@ class Static:
         "db.db"
         )
 
-    PRELOAD_THUMBS_ZIP: str = os.path.join(
+    PRELOAD_HASHDIR: str = os.path.join(
+        PRELOAD_FOLDER,
+        "hashdir"
+        )
+
+    PRELOAD_HASHDIR_ZIP: str = os.path.join(
         PRELOAD_FOLDER,
         "hashdir.zip"
         )
@@ -213,7 +218,7 @@ class JsonData:
 
     @classmethod
     def read_json_data(cls) -> dict:
-        with open(Static.JSON_FILE, 'r', encoding="utf-8") as f:
+        with open(Static.APP_SUPPORT_JSON_DATA, 'r', encoding="utf-8") as f:
             try:
                 json_data: dict = json.load(f)
             except json.JSONDecodeError:
@@ -225,7 +230,7 @@ class JsonData:
 
     @classmethod
     def write_json_data(cls):
-        with open(Static.JSON_FILE, 'w', encoding="utf-8") as f:
+        with open(Static.APP_SUPPORT_JSON_DATA, 'w', encoding="utf-8") as f:
             data = cls.get_data()
             json.dump(obj=data, fp=f, indent=4, ensure_ascii=False)
 
@@ -233,30 +238,39 @@ class JsonData:
     def check_dirs(cls):
         if not os.path.exists(Static.PRELOAD_FOLDER):
             raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
+            
 
         if not os.path.exists(Static.APP_SUPPORT_DIR):
             os.makedirs(name=Static.APP_SUPPORT_DIR, exist_ok=True)
 
-        if not os.path.exists(Static.DB_FILE):
+        if not os.path.exists(Static.APP_SUPPORT_DB):
             cls.copy_db_file()
 
-        if not os.path.exists(Static.THUMBS_DIR):
+        if not os.path.exists(Static.APP_SUPPORT_HASHDIR):
             cls.copy_hashdir()
 
-        if not os.path.exists(Static.JSON_FILE):
+        if not os.path.exists(Static.APP_SUPPORT_JSON_DATA):
             cls.write_json_data()
+
+    @classmethod
+    def make_internal_files(cls):
+        os.makedirs(Static.PRELOAD_FOLDER, exist_ok=True)
+        os.makedirs(Static.PRELOAD_HASHDIR, exist_ok=True)
+        db_file = open(Static.PRELOAD_DB, "w")
+        db_file.close()
+
 
     @classmethod
     def copy_hashdir(cls):
         # удаляем пользовательскую hashdir из ApplicationSupport
-        if os.path.exists(Static.THUMBS_DIR):
+        if os.path.exists(Static.APP_SUPPORT_HASHDIR):
             print("Удаляю пользовательскую HASH_DIR")
-            shutil.rmtree(Static.THUMBS_DIR)
+            shutil.rmtree(Static.APP_SUPPORT_HASHDIR)
 
         # копируем предустановленную hashdir в AppliactionSupport
-        if os.path.exists(Static.PRELOAD_THUMBS_ZIP):
+        if os.path.exists(Static.PRELOAD_HASHDIR_ZIP):
             print("копирую предустановленную HASH_DIR")
-            dest = shutil.copy2(Static.PRELOAD_THUMBS_ZIP, Static.APP_SUPPORT_DIR)
+            dest = shutil.copy2(Static.PRELOAD_HASHDIR_ZIP, Static.APP_SUPPORT_DIR)
             shutil.unpack_archive(dest, Static.APP_SUPPORT_DIR)
             os.remove(dest)
 
@@ -267,9 +281,9 @@ class JsonData:
     @classmethod
     def copy_db_file(cls):
         # удаляем пользовательный db.db из Application Support если он есть
-        if os.path.exists(Static.DB_FILE):
+        if os.path.exists(Static.APP_SUPPORT_DB):
             print("Удаляю пользовательский DB_FILE")
-            os.remove(Static.DB_FILE)
+            os.remove(Static.APP_SUPPORT_DB)
 
         # копируем предустановленный db.db если он есть
         if os.path.exists(Static.PRELOAD_DB):

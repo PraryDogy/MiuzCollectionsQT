@@ -110,13 +110,13 @@ print("Нажми 1 чтобы создать приложение с кешем
 if input() == "1":
     print("Создаю приложение с кешем ApplicationSupport")
 
-    src = Static.THUMBS_DIR
-    root = os.path.basename(Static.THUMBS_DIR)
+    src = Static.APP_SUPPORT_HASHDIR
+    root = os.path.basename(Static.APP_SUPPORT_HASHDIR)
     app_sup = Static.APP_SUPPORT_DIR
     new_hashdir = shutil.make_archive(src, "zip", app_sup, root)
 
     DATA_FILES.append(
-        ('_preload', [new_hashdir, Static.DB_FILE])
+        ('_preload', [new_hashdir, Static.APP_SUPPORT_DB])
     )
 
 else:

@@ -1,6 +1,4 @@
-a = [1, 2, 3, 4, 5]
+from cfg import JsonData
 
 
-*a, last = a
-
-print(a, last)
+JsonData.make_internal_files()

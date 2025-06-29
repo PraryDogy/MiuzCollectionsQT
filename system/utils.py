@@ -211,7 +211,7 @@ class ThumbUtils:
     @classmethod
     def create_thumb_path(cls, img_path: str) -> str:
         new_name = hashlib.md5(img_path.encode('utf-8')).hexdigest() + ".jpg"
-        new_folder = os.path.join(Static.THUMBS_DIR, new_name[:2])
+        new_folder = os.path.join(Static.APP_SUPPORT_HASHDIR, new_name[:2])
         os.makedirs(new_folder, exist_ok=True)
         return os.path.join(new_folder, new_name)
 
