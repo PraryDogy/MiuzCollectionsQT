@@ -1,8 +1,5 @@
-import json
 import os
-import traceback
 
-import jsonschema
 from pydantic import BaseModel
 
 from cfg import Static

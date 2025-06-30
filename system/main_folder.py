@@ -1,10 +1,7 @@
-import json
 import os
-import traceback
 
-import jsonschema
 from pydantic import BaseModel
-from utils import JsonUtils
+from .utils import JsonUtils
 
 from cfg import Static
 
