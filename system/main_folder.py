@@ -8,12 +8,18 @@ from pydantic import BaseModel
 from cfg import Static
 
 
+class MainFolderModel(BaseModel):
+    name: str
+    paths: list[str]
+    stop_list: list[str]
+    curr_path: str
+
+
 class MainFolder:
-    is_first_load = None
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
-    __slots__ = ["name", "paths", "stop_list", "_curr_path"]
+    __slots__ = ["name", "paths", "stop_list", "curr_path"]
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str):
         """
@@ -48,10 +54,7 @@ class MainFolder:
         self.name = name
         self.paths = paths
         self.stop_list = stop_list
-        self._curr_path: str = curr_path
-
-    def set_name(self, value: str):
-        self.name = value
+        self.curr_path: str = curr_path
     
     def get_instance_copy(self):
         return MainFolder(
@@ -62,28 +65,30 @@ class MainFolder:
         )
 
     def get_current_path(self):
-        return self._curr_path
+        return self.curr_path
     
     def get_data(self):
-        return [getattr(self, i) for i in self.__slots__]
+        return {
+            i: getattr(self, i)
+            for i in self.__slots__   
+        }
     
     def is_available(self) -> str | None:
         """
         Проверяет и устанавливает путь к MainFolder.    
         Возвращает доступный путь к MainFolder или None
         """
-        self._curr_path = ""
+        self.curr_path = ""
         for i in self.paths:
             if os.path.exists(i):
-                self._curr_path = i
+                self.curr_path = i
                 break        
-        return self._curr_path
+        return self.curr_path
 
     @classmethod
     def init(cls):
         validate = cls.validate_data()
         if validate is None:
-            cls.is_first_load = True
             data = cls.miuz_main_folders()
             with open(MainFolder.json_file, "w", encoding='utf-8') as f:
                 f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
@@ -103,14 +108,14 @@ class MainFolder:
             with open(MainFolder.json_file, "r", encoding='utf-8') as f:
                 data: list[list] = json.load(f)
 
-            if not data:
+            if len(data) == 0:
                 print("Список MainFolder в main_folders.json пуст")
                 print("Устанавливаю список по умолчанию")
-                return None   
-
-            else:
-                shema = cls.get_shema()
-                jsonschema.validate(data, shema)
+                return None
+            
+            shema = MainFolderModel.model_json_schema()
+            for i in data:
+                jsonschema.validate(i, shema)
 
             return True
 
@@ -119,26 +124,6 @@ class MainFolder:
             print(traceback.format_exc())
             print()
             return None
-
-    @classmethod
-    def get_shema(cls):
-        """
-        Если что-либо меняется в классе, не забудь обновлять схему.
-        """
-        return {
-            "type": "array",
-            "items": {
-                "type": "array",
-                "minItems": 4,
-                "maxItems": 4,
-                "items": [
-                    {"type": "string"},
-                    {"type": "array", "items": {"type": "string"}},
-                    {"type": "array", "items": {"type": "string"}},
-                    {"type": "string"}
-                ]
-            }
-        }
 
     @classmethod
     def write_json_data(cls):
@@ -169,19 +154,3 @@ class MainFolder:
             ["miuz", miuz_paths, miuz_stop, ""],
             ["panacea", panacea_paths, [], ""]
         ]
-    
-    @classmethod
-    def example_main_folders(cls):
-        return [
-            [
-                "Имя (Name)",
-                ["путь/к/папке/с/коллекциями", "path/to/collections/folder"],
-                ["коллекция 1", "коллекция 2", "collection 1", "collection 2"],
-                ""
-            ]
-        ]
-
-    @classmethod
-    def set_miuz_folders(cls):
-        data = cls.miuz_main_folders()
-        MainFolder.list_ = [MainFolder(*item) for item in data]
