@@ -264,7 +264,6 @@ class JsonData:
             print(traceback.format_exc())
             return None
 
-
     @classmethod
     def check_dirs(cls):
         if not os.path.exists(Static.PRELOAD_NAME):
