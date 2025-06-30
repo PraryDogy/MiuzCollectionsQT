@@ -107,6 +107,11 @@ class MainFolder:
                 print("Ошибка в файле main_folders.json)")
                 print("ожидается list, получен: ", type(data).__name__)
                 return None            
+            
+            elif not data:
+                print("Список MainFolder в main_folders.json пуст")
+                print("Устанавливаю список по умолчанию")
+                return None   
 
             test = MainFolder("name", ["paths", ], ["stop list", ], "")
             cls_types = test.get_types()
