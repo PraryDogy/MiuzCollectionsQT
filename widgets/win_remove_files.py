@@ -11,7 +11,7 @@ from ._base_widgets import SvgBtn, WinSystem
 
 
 class RemoveFilesWin(WinSystem):
-    warning_svg = os.path.join(Static.images_dir, "warning.svg")
+    warning_svg = os.path.join(Static.INNER_IMAGES, "warning.svg")
     finished_ = pyqtSignal()
     svg_size = 50
 

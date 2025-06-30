@@ -10,7 +10,7 @@ from system.lang import Lang
 
 from ._base_widgets import ULineEdit
 
-CLEAR_SVG = os.path.join(Static.images_dir, "clear.svg")
+CLEAR_SVG = os.path.join(Static.INNER_IMAGES, "clear.svg")
 CLEAR_SIZE = 14
 INPUT_H = 28
 

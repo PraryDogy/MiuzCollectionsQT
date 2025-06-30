@@ -12,7 +12,7 @@ from system.utils import MainUtils
 from ._base_widgets import UMenu, WinSystem
 from .win_settings import WinSettings
 
-ICON_SVG = os.path.join(Static.images_dir, "icon.svg")
+ICON_SVG = os.path.join(Static.INNER_IMAGES, "icon.svg")
 
 class SelectableLabel(QLabel):
     def __init__(self, parent):

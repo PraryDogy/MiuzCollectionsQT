@@ -53,7 +53,7 @@ class BaseDownloadsItem(QWidget):
 
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        icon_path = os.path.join(Static.images_dir, "clear.svg")
+        icon_path = os.path.join(Static.INNER_IMAGES, "clear.svg")
         self.stop_btn = SvgBtn(icon_path=icon_path, size=SVG_SIZE)
         self.stop_btn.mouseReleaseEvent = self.stop_cmd
         h_layout.addWidget(self.stop_btn)

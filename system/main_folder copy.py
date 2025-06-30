@@ -2,8 +2,6 @@ import json
 import os
 import traceback
 
-import jsonschema
-
 from cfg import Static
 
 
@@ -105,13 +103,31 @@ class MainFolder:
             with open(MainFolder.json_file, "r", encoding='utf-8') as f:
                 data: list[list] = json.load(f)
 
-            if not data:
+            if not isinstance(data, list):
+                print("Ошибка в файле main_folders.json)")
+                print("ожидается list, получен: ", type(data).__name__)
+                return None            
+            
+            elif not data:
                 print("Список MainFolder в main_folders.json пуст")
                 print("Устанавливаю список по умолчанию")
                 return None   
 
-            else:
-                ...
+            test = MainFolder("name", ["paths", ], ["stop list", ], "")
+            cls_types = test.get_types()
+
+            for idx, main_folder in enumerate(data):
+                json_types = [type(i) for i in main_folder]
+
+                if len(cls_types) != len(main_folder):
+                    print(f"Ошибка в элементе [{idx}] файла main_folders.json")
+                    print(f"ожидается длина {len(cls_types)}, получена длина {len(main_folder)}")
+                    return None
+
+                elif cls_types != json_types:
+                    print(f"Ошибка в элементе [{idx}] файла main_folders.json")
+                    print(f"ожидается {cls_types}, получен {json_types}")
+                    return None
 
             return True
         except Exception as e:

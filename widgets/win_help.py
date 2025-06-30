@@ -44,7 +44,7 @@ class WinHelp(WinSystem):
         v_lay.addWidget(descr)
 
         svg = f"example {page_num} {JsonData.lang_ind}.svg"
-        svg = os.path.join(Static.images_dir, svg)
+        svg = os.path.join(Static.INNER_IMAGES, svg)
 
         svg_wid = QSvgWidget()
         svg_wid.load(svg)

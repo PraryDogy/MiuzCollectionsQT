@@ -35,12 +35,12 @@ NAVI_STYLE = """
     border-radius: 27px;
 """
 
-ZOOM_OUT = os.path.join(Static.images_dir, "zoom_out.svg")
-ZOOM_IN = os.path.join(Static.images_dir, "zoom_in.svg")
-ZOOM_FIT = os.path.join(Static.images_dir, "zoom_fit.svg")
-CLOSE_ = os.path.join(Static.images_dir, "zoom_close.svg")
-PREV_ = os.path.join(Static.images_dir, "prev.svg")
-NEXT_ = os.path.join(Static.images_dir, "next.svg")
+ZOOM_OUT = os.path.join(Static.INNER_IMAGES, "zoom_out.svg")
+ZOOM_IN = os.path.join(Static.INNER_IMAGES, "zoom_in.svg")
+ZOOM_FIT = os.path.join(Static.INNER_IMAGES, "zoom_fit.svg")
+CLOSE_ = os.path.join(Static.INNER_IMAGES, "zoom_close.svg")
+PREV_ = os.path.join(Static.INNER_IMAGES, "prev.svg")
+NEXT_ = os.path.join(Static.INNER_IMAGES, "next.svg")
 
 
 class ImageWidget(QLabel):

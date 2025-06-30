@@ -22,7 +22,7 @@ from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
 from .win_info import WinInfo
 from .win_warn import WinWarn
 
-UP_SVG = os.path.join(Static.images_dir, "up.svg")
+UP_SVG = os.path.join(Static.INNER_IMAGES, "up.svg")
 UP_STYLE = f"""
     background: {Static.gray_color};
     border-radius: 22px;
@@ -879,7 +879,7 @@ class Grid(QScrollArea):
 
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
-        img = os.path.join(Static.images_dir, "copy_files.png")
+        img = os.path.join(Static.INNER_IMAGES, "copy_files.png")
         img = QPixmap(img)
         self.drag.setPixmap(img)
         

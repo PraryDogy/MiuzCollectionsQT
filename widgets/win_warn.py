@@ -9,7 +9,7 @@ from system.lang import Lang
 
 from ._base_widgets import SvgBtn, UHBoxLayout, UVBoxLayout, WinSystem
 
-WARNING_SVG = os.path.join(Static.images_dir, "warning.svg")
+WARNING_SVG = os.path.join(Static.INNER_IMAGES, "warning.svg")
 
 
 class WinWarn(WinSystem):

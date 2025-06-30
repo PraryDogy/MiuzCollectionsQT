@@ -20,7 +20,7 @@ from ._base_widgets import (UHBoxLayout, ULineEdit, UMenu, UTextEdit,
 from .win_help import WinHelp
 
 LIST_ITEM_H = 25
-ICON_SVG = os.path.join(Static.images_dir, "icon.svg")
+ICON_SVG = os.path.join(Static.INNER_IMAGES, "icon.svg")
 
 
 class RebootableSettings(QGroupBox):
@@ -685,15 +685,15 @@ class Themes(QGroupBox):
         self.frames = []
 
         self.system_theme = SvgFrame(
-            os.path.join(Static.images_dir, "system_theme.svg"),
+            os.path.join(Static.INNER_IMAGES, "system_theme.svg"),
             Lang.theme_auto
         )
         self.dark_theme = SvgFrame(
-            os.path.join(Static.images_dir,"dark_theme.svg"),
+            os.path.join(Static.INNER_IMAGES,"dark_theme.svg"),
             Lang.theme_dark
         )
         self.light_theme = SvgFrame(
-            os.path.join(Static.images_dir,"light_theme.svg"),
+            os.path.join(Static.INNER_IMAGES,"light_theme.svg"),
             Lang.theme_light
         )
 

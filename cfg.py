@@ -55,6 +55,8 @@ class Static:
 
     HASHDIR_NAME = "hashdir"
     PRELOAD_NAME: str = "_preload"
+    INNER_IMAGES = "images"
+    INNER_SHEMA = "shema"
 
     # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ 
     APP_SUPPORT_DIR: str = os.path.join(
@@ -195,9 +197,6 @@ class Static:
         padding-left: 2px;
         padding-right: 2px;
     """
-
-    # папка со всеми CVG
-    images_dir = "images"
 
 
 class JsonData:

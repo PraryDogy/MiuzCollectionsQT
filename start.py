@@ -87,7 +87,7 @@ class App(QApplication):
         MainFolder.write_json_data()
         UserFilter.write_json_data()
 
-        icon_path = os.path.join(Static.images_dir, "icon.icns")
+        icon_path = os.path.join(Static.INNER_IMAGES, "icon.icns")
         icon = QIcon(icon_path)
         self.setWindowIcon(icon)
 
