@@ -47,6 +47,10 @@ class UserFilter:
 
         UserFilter.list_ = [UserFilter(*list(i.values())) for i in data]
 
+    def write_json_data(cls):
+        data = [i.get_data() for i in UserFilter.list_]
+        JsonUtils.write_json_data(UserFilter.json_file, data)
+
     @classmethod
     def default_user_filters(cls) -> list[str]:
         """
