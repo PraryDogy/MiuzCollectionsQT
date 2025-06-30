@@ -4,6 +4,7 @@ import traceback
 
 import jsonschema
 from pydantic import BaseModel
+from utils import JsonUtils
 
 from cfg import Static
 
@@ -87,41 +88,20 @@ class MainFolder:
 
     @classmethod
     def init(cls):
-        validate = cls.validate_data()
+        validate = JsonUtils.validate_data(MainFolder.json_file, MainFolderModel)
         if validate is None:
             data: list[dict] = cls.miuz_main_folders()
-            with open(MainFolder.json_file, "w", encoding='utf-8') as f:
-                f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
+            JsonUtils.write_json_data(MainFolder.json_file, data)
         else:
-            with open(MainFolder.json_file, "r", encoding='utf-8') as f:
-                data: list[dict] = json.loads(f.read())
+            data: list[dict] = JsonUtils.read_json_data(MainFolder.json_file)
 
         MainFolder.list_ = [MainFolder(*list(i.values())) for i in data]
         MainFolder.current = MainFolder.list_[0]
 
     @classmethod
-    def validate_data(cls) -> list | None:
-        try:
-            with open(MainFolder.json_file, "r", encoding='utf-8') as f:
-                data: list[list] = json.load(f)
-            
-            shema = MainFolderModel.model_json_schema()
-            for i in data:
-                jsonschema.validate(i, shema)
-
-            return True
-
-        except Exception as e:
-            print()
-            print(traceback.format_exc())
-            print()
-            return None
-
-    @classmethod
     def write_json_data(cls):
         data = [i.get_data() for i in MainFolder.list_]
-        with open(MainFolder.json_file, "w", encoding='utf-8') as f:
-            f.write(json.dumps(obj=data, indent=2, ensure_ascii=False))
+        JsonUtils.write_json_data(MainFolder.json_file, data)
 
     @classmethod
     def miuz_main_folders(cls):

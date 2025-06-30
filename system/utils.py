@@ -1,5 +1,6 @@
 import hashlib
 import io
+import json
 import logging
 import os
 import subprocess
@@ -8,11 +9,13 @@ import traceback
 from datetime import datetime
 
 import cv2
+import jsonschema
 import numpy as np
 import psd_tools
 import rawpy
 from imagecodecs.imagecodecs import DelayedImportError
 from PIL import Image
+from pydantic import BaseModel
 from PyQt5.QtCore import QRunnable, Qt, QThreadPool, QTimer
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
@@ -368,6 +371,51 @@ class MainUtils:
         print()
         print(traceback.format_exc())
         print()
+
+
+class JsonUtils:
+
+    @classmethod
+    def validate_data(cls, json_file: str, base_model: BaseModel):
+        """
+        Ожидается, что JSON-файл состоит из списка словарей.
+        """
+        try:
+            with open(json_file, "r", encoding='utf-8') as f:
+                data: list[dict] = json.load(f)
+            shema = base_model.model_json_schema()
+            for i in data:
+                jsonschema.validate(i, shema)
+            return True
+        except Exception as e:
+            MainUtils.print_error()
+            return None
+        
+    @classmethod
+    def write_json_data(cls, json_file: str, data: list[dict]) -> bool | None:
+        """
+        Ожидается, что data состоит из списка словарей.
+        Возвращает True при успешной записи, None при ошибке
+        """
+        try:
+            with open(json_file, "w", encoding='utf-8') as f:
+                f.write(json.dumps(obj=data, indent=4, ensure_ascii=False))
+            return True
+        except Exception:
+            MainUtils.print_error()
+            return None
+
+    @classmethod
+    def read_json_data(cls, json_file: str) -> list[dict] | None:
+        """
+        Возвращает список словарей
+        """
+        try:
+            with open(json_file, "r", encoding='utf-8') as f:
+                return json.loads(f.read())
+        except Exception:
+            MainUtils.print_error()
+            return None
 
 
 class TaskState:
