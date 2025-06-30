@@ -383,9 +383,16 @@ class JsonUtils:
         try:
             with open(json_file, "r", encoding='utf-8') as f:
                 data: list[dict] = json.load(f)
-            shema = base_model.model_json_schema()
-            for i in data:
-                jsonschema.validate(i, shema)
+
+            schema = base_model.model_json_schema()
+            for idx, item in enumerate(data):
+                try:
+                    jsonschema.validate(item, schema)
+                except jsonschema.ValidationError as ve:
+                    path = ".".join(str(p) for p in ve.path)
+                    print(f"JsonUtils.validate_data error: '{path}': {ve.message}")
+                    print(json_file)
+                    return None
             return True
         except Exception as e:
             MainUtils.print_error()
