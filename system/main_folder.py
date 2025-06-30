@@ -3,6 +3,7 @@ import os
 import traceback
 
 import jsonschema
+from pydantic import BaseModel
 
 from cfg import Static
 
@@ -66,9 +67,6 @@ class MainFolder:
     def get_data(self):
         return [getattr(self, i) for i in self.__slots__]
     
-    def get_types(self):
-        return [type(getattr(self, i))for i in self.__slots__]
-
     def is_available(self) -> str | None:
         """
         Проверяет и устанавливает путь к MainFolder.    
@@ -111,14 +109,36 @@ class MainFolder:
                 return None   
 
             else:
-                ...
+                shema = cls.get_shema()
+                jsonschema.validate(data, shema)
 
             return True
+
         except Exception as e:
             print()
             print(traceback.format_exc())
             print()
             return None
+
+    @classmethod
+    def get_shema(cls):
+        """
+        Если что-либо меняется в классе, не забудь обновлять схему.
+        """
+        return {
+            "type": "array",
+            "items": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                    {"type": "array", "items": {"type": "string"}},
+                    {"type": "string"}
+                ]
+            }
+        }
 
     @classmethod
     def write_json_data(cls):
