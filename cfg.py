@@ -266,23 +266,20 @@ class JsonData:
 
     @classmethod
     def check_dirs(cls):
-        if not os.path.exists(Static.PRELOAD_NAME):
+        if not all(os.path.exists(p) for p in (
+            Static.PRELOAD_NAME,
+            Static.PRELOAD_HASHDIR_ZIP,
+            Static.PRELOAD_DB
+        )):
             cls.make_internal_files()
 
-        elif not os.path.exists(Static.PRELOAD_HASHDIR_ZIP):
-            cls.make_internal_files()
-        
-        elif not os.path.exists(Static.PRELOAD_DB):
-            cls.make_internal_files()
-
-        if not os.path.exists(Static.APP_SUPPORT_DIR):
-            os.makedirs(name=Static.APP_SUPPORT_DIR, exist_ok=True)
+        os.makedirs(Static.APP_SUPPORT_DIR, exist_ok=True)
 
         if not os.path.exists(Static.APP_SUPPORT_DB):
-            cls.copy_db_file()
+            cls.copy_preload_db()
 
         if not os.path.exists(Static.APP_SUPPORT_HASHDIR):
-            cls.copy_hashdir()
+            cls.copy_preload_hashdir_zip()
 
         if not os.path.exists(Static.APP_SUPPORT_JSON_DATA):
             cls.write_json_data()
@@ -307,7 +304,7 @@ class JsonData:
         shutil.rmtree(Static.PRELOAD_HASHDIR)
 
     @classmethod
-    def copy_hashdir(cls):
+    def copy_preload_hashdir_zip(cls):
         # удаляем пользовательскую hashdir из ApplicationSupport
         if os.path.exists(Static.APP_SUPPORT_HASHDIR):
             print("Удаляю пользовательскую HASH_DIR")
@@ -319,7 +316,7 @@ class JsonData:
         os.remove(dest)
 
     @classmethod
-    def copy_db_file(cls):
+    def copy_preload_db(cls):
         # удаляем пользовательный db.db из Application Support если он есть
         if os.path.exists(Static.APP_SUPPORT_DB):
             print("Удаляю пользовательский DB_FILE")
