@@ -269,6 +269,12 @@ class JsonData:
         if not os.path.exists(Static.PRELOAD_NAME):
             cls.make_internal_files()
 
+        elif not os.path.exists(Static.PRELOAD_HASHDIR_ZIP):
+            cls.make_internal_files()
+        
+        elif not os.path.exists(Static.PRELOAD_DB):
+            cls.make_internal_files()
+
         if not os.path.exists(Static.APP_SUPPORT_DIR):
             os.makedirs(name=Static.APP_SUPPORT_DIR, exist_ok=True)
 
@@ -307,16 +313,10 @@ class JsonData:
             print("Удаляю пользовательскую HASH_DIR")
             shutil.rmtree(Static.APP_SUPPORT_HASHDIR)
 
-        # копируем предустановленную hashdir в AppliactionSupport
-        if os.path.exists(Static.PRELOAD_HASHDIR_ZIP):
-            print("копирую предустановленную HASH_DIR")
-            dest = shutil.copy2(Static.PRELOAD_HASHDIR_ZIP, Static.APP_SUPPORT_DIR)
-            shutil.unpack_archive(dest, Static.APP_SUPPORT_DIR)
-            os.remove(dest)
-
-        # если нет предустановленной то просим скачать и положить в корень проекта
-        else:
-            raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
+        print("копирую предустановленную HASH_DIR")
+        dest = shutil.copy2(Static.PRELOAD_HASHDIR_ZIP, Static.APP_SUPPORT_DIR)
+        shutil.unpack_archive(dest, Static.APP_SUPPORT_DIR)
+        os.remove(dest)
 
     @classmethod
     def copy_db_file(cls):
@@ -325,15 +325,8 @@ class JsonData:
             print("Удаляю пользовательский DB_FILE")
             os.remove(Static.APP_SUPPORT_DB)
 
-        # копируем предустановленный db.db если он есть
-        if os.path.exists(Static.PRELOAD_DB):
-            print("Копирую предустановленный DB_FILE")
-            shutil.copy2(Static.PRELOAD_DB, Static.APP_SUPPORT_DIR)
-
-        # иначе просим скачать или создать пользовательский db.db 
-        # с таблицей database > THUMBS
-        else:
-            raise Exception("нет папки _preload в проекте (db.db, hashdir.zip)")
+        print("Копирую предустановленный DB_FILE")
+        shutil.copy2(Static.PRELOAD_DB, Static.APP_SUPPORT_DIR)
 
     @classmethod
     def _compare_versions(cls) -> bool:
