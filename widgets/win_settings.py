@@ -702,11 +702,11 @@ class Themes(QGroupBox):
             self.frames.append(f)
             f.clicked.connect(self.on_frame_clicked)
 
-        if JsonData.dark_mode is None:
+        if JsonData.dark_mode == 0:
             self.set_selected(self.system_theme)
-        elif JsonData.dark_mode:
+        elif JsonData.dark_mode == 1:
             self.set_selected(self.dark_theme)
-        else:
+        elif JsonData.dark_mode == 2:
             self.set_selected(self.light_theme)
 
     def on_frame_clicked(self):
@@ -714,11 +714,11 @@ class Themes(QGroupBox):
         self.set_selected(sender)
 
         if sender == self.system_theme:
-            JsonData.dark_mode = None
+            JsonData.dark_mode = 0
         elif sender == self.dark_theme:
-            JsonData.dark_mode = True
+            JsonData.dark_mode = 1
         elif sender == self.light_theme:
-            JsonData.dark_mode = False
+            JsonData.dark_mode = 2
 
         ThemeChanger.init()
         self.theme_changed.emit()

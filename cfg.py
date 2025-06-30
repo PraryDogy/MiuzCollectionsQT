@@ -1,7 +1,12 @@
 import json
 import os
 import shutil
+import traceback
 from datetime import datetime
+
+import jsonschema
+from pydantic import BaseModel
+
 
 class ThumbData:
 
@@ -31,7 +36,7 @@ class ThumbData:
 
 class Static:
 
-    APP_VER = 2.11
+    APP_VER = "2.11"
     APP_NAME: str = "Collections"
 
     # в сетке изображений может отображаться за раз 150 штук
@@ -198,10 +203,17 @@ class Static:
     """
 
 
+class JsonDataModel(BaseModel):
+    app_ver: str
+    lang_ind: int
+    dark_mode: int
+    scaner_minutes: int
+
+
 class JsonData:
     app_ver: str = Static.APP_VER
     lang_ind = 0
-    dark_mode = None
+    dark_mode = 0
     scaner_minutes: int = 5
 
     @classmethod
@@ -216,22 +228,42 @@ class JsonData:
         }
 
     @classmethod
-    def read_json_data(cls) -> dict:
-        with open(Static.APP_SUPPORT_JSON_DATA, 'r', encoding="utf-8") as f:
-            try:
-                json_data: dict = json.load(f)
-            except json.JSONDecodeError:
-                print("Ошибка чтения json")
-                json_data = cls.get_data()
-        for k, v in json_data.items():
-            if hasattr(cls, k):
-                setattr(cls, k, v)
+    def set_json_data(cls) -> dict:
+        json_data = cls.validate_json_data()
+        if json_data:
+            for k, v in json_data.items():
+                if hasattr(cls, k):
+                    setattr(cls, k, v)
+        else:
+            json_data = cls.get_data()
+            cls.write_json_data()
 
     @classmethod
     def write_json_data(cls):
         with open(Static.APP_SUPPORT_JSON_DATA, 'w', encoding="utf-8") as f:
             data = cls.get_data()
             json.dump(obj=data, fp=f, indent=4, ensure_ascii=False)
+
+    @classmethod
+    def validate_json_data(cls):
+        try:
+            with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding='utf-8') as f:
+                json_data: dict = json.load(f)
+            schema = JsonDataModel.model_json_schema()
+            try:
+                jsonschema.validate(json_data, schema)
+            except jsonschema.ValidationError as ve:
+                path = ".".join(str(p) for p in ve.path)
+                print()
+                print(f"JsonUtils.validate_data error: '{path}': {ve.message}")
+                print(Static.APP_SUPPORT_JSON_DATA)
+                print()
+                return None
+            return json_data
+        except Exception as e:
+            print(traceback.format_exc())
+            return None
+
 
     @classmethod
     def check_dirs(cls):
@@ -311,7 +343,7 @@ class JsonData:
     @classmethod
     def init(cls):
         cls.check_dirs()
-        cls.read_json_data()
+        cls.set_json_data()
         cls._compare_versions()
 
 
