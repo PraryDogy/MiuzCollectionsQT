@@ -102,16 +102,8 @@ class MainFolder:
     @classmethod
     def validate_data(cls) -> list | None:
         try:
-            if not os.path.exists(MainFolder.json_file):
-                return None
-
             with open(MainFolder.json_file, "r", encoding='utf-8') as f:
                 data: list[list] = json.load(f)
-
-            if len(data) == 0:
-                print("Список MainFolder в main_folders.json пуст")
-                print("Устанавливаю список по умолчанию")
-                return None
             
             shema = MainFolderModel.model_json_schema()
             for i in data:
