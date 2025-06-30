@@ -48,12 +48,12 @@ class ThemeChanger:
     @classmethod
     def init(cls):
         app: QApplication = QApplication.instance()
-        if JsonData.dark_mode is None:
+        if JsonData.dark_mode == 0:
             app.setPalette(QPalette())
             app.setStyle("macintosh")
-        elif JsonData.dark_mode:
+        elif JsonData.dark_mode == 1:
             app.setPalette(UPallete.dark())
             app.setStyle("Fusion")
-        else:
+        elif JsonData.dark_mode == 2:
             app.setPalette(UPallete.light())
             app.setStyle("Fusion")
