@@ -253,7 +253,7 @@ class MainFolderItemsWid(QListWidget):
             self.main_folder_copy.paths.remove(row_text)
 
         self.takeItem(row)
-        self.main_folder_changed.emit()
+        self.changed.emit()
 
     def open_add_row_win(self):
         self.add_row_win = AddRowWindow()
@@ -270,7 +270,7 @@ class MainFolderItemsWid(QListWidget):
             self.main_folder_copy.stop_list.append(text)
         else:
             self.main_folder_copy.paths.append(text)
-        self.main_folder_changed.emit()
+        self.changed.emit()
 
 
 class EditMainFoldersWid(QTabWidget):
@@ -444,11 +444,11 @@ class AddMainFolderWin(WinSystem):
     
 
 class RemoveMainFolderWin(WinSystem):
-    del_main_folder = pyqtSignal(object)
+    changed = pyqtSignal(object)
 
     def __init__(self, main_folder_list_copy: list[MainFolder]):
         """
-        Сигналы: del_main_folder(MainFolder)
+        Сигналы: changed(MainFolder)
         """
         super().__init__()
         self.setWindowTitle(Lang.delete_main_folder)
@@ -498,7 +498,7 @@ class RemoveMainFolderWin(WinSystem):
         selected_item = list_widget.currentItem()
         if selected_item:
             main_folder: MainFolder = selected_item.main_folder
-            self.del_main_folder.emit(main_folder)
+            self.changed.emit(main_folder)
             self.deleteLater()
 
     def keyPressEvent(self, a0):
@@ -553,15 +553,15 @@ class MainFolderWid(QGroupBox):
 
     def add_btn_cmd(self, *args):
         self.add_main_folder_win = AddMainFolderWin()
-        cmd = lambda main_folder: self.new_main_folder.emit(main_folder)
+        cmd = lambda main_folder: self.add_new_main_folder(main_folder)
         self.add_main_folder_win.add_main_folder.connect(cmd)
         self.add_main_folder_win.center_relative_parent(parent=self.window())
         self.add_main_folder_win.show()
 
     def remove_btn_cmd(self, *args):
-        self.remove_main_folder_win = RemoveMainFolderWin()
-        cmd = lambda main_folder: self.del_main_folder.emit(main_folder)
-        self.remove_main_folder_win.del_main_folder.connect(cmd)
+        self.remove_main_folder_win = RemoveMainFolderWin(self.main_folder_list_copy)
+        cmd = lambda main_folder: self.remove_btn_cmd(main_folder)
+        self.remove_main_folder_win.changed.connect(cmd)
         self.remove_main_folder_win.center_relative_parent(parent=self.window())
         self.remove_main_folder_win.show()
 
@@ -889,24 +889,9 @@ class WinSettings(WinSystem):
     def ok_cmd(self, *args):
         restart_app = False
 
-        if self.new_main_folders:
+        if self.main_folder_list_changed:
             restart_app = True
-            for i in self.new_main_folders:
-                MainFolder.list_.append(i)
-
-        if self.del_main_folders:
-            restart_app = True
-            names_to_delete = {f.name for f in self.del_main_folders}
-            MainFolder.list_ = [f for f in MainFolder.list_ if f.name not in names_to_delete]
-
-        if self.changed_main_folders:
-            restart_app = True
-            name_to_folder = {f.name: f for f in self.changed_main_folders}
-            for f in MainFolder.list_:
-                if f.name in name_to_folder:
-                    ch = name_to_folder[f.name]
-                    f.paths = ch.paths
-                    f.stop_list = ch.stop_list
+            MainFolder.list_ = self.main_folder_list_copy
 
         if self.new_lang in (0, 1):
             restart_app = True
