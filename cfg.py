@@ -208,7 +208,6 @@ class JsonDataModel(BaseModel):
     lang_ind: int
     dark_mode: int
     scaner_minutes: int
-    test: str = "hello"
 
 
 class JsonData:
@@ -216,7 +215,6 @@ class JsonData:
     lang_ind = 0
     dark_mode = 0
     scaner_minutes: int = 5
-    test: str = "hello"
 
     @classmethod
     def get_data(cls) -> dict[str, str]:
