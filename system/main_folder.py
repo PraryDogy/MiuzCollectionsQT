@@ -112,10 +112,12 @@ class MainFolder:
                 with open(cls.json_file, "r", encoding="utf-8") as f:
                     json_data: dict = json.load(f)
                     validated = MainFolderListModel(**json_data)
-                    cls.list_ = [
+                    MainFolder.list_ = [
                         cls.from_model(m)
                         for m in validated.main_folder_list
                     ]
+                    if len(MainFolder.list_) == 0:
+                        raise Exception("MainFolder.list_ пуст")
             except Exception as e:
                 MainFolderErrors.was = True
                 MainUtils.print_error()
