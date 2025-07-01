@@ -491,6 +491,10 @@ class RemoveMainFolderWin(WinSystem):
         h_lay.addWidget(cancel_btn)
         h_lay.addStretch()
 
+        if len(self.main_folder_list_copy) == 1:
+            list_widget.setDisabled(True)
+            self.ok_btn.setDisabled(True)
+
     def ok_cmd(self):
         list_widget: QListWidget = self.findChild(QListWidget)
 
