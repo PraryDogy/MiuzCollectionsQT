@@ -3,19 +3,23 @@ import os
 from pydantic import BaseModel
 
 from cfg import Static
-
+import json
 from .utils import JsonUtils
-
+import traceback
 
 class MainFolderErrors:
     list_: list[dict] = []
 
 
-class MainFolderModel(BaseModel):
+class MainFolderItemModel(BaseModel):
     name: str
     paths: list[str]
     stop_list: list[str]
     curr_path: str
+
+
+class MainFolderListModel(BaseModel):
+    main_folder_list: list[MainFolderItemModel]
 
 
 class MainFolder:
@@ -69,13 +73,7 @@ class MainFolder:
 
     def get_current_path(self):
         return self.curr_path
-    
-    def get_data(self):
-        return {
-            i: getattr(self, i)
-            for i in self.__slots__   
-        }
-    
+        
     def is_available(self) -> str | None:
         """
         Проверяет и устанавливает путь к MainFolder.    
@@ -88,33 +86,48 @@ class MainFolder:
                 break        
         return self.curr_path
 
-    @classmethod
-    def init(cls):
-        json_data: list[dict] = JsonUtils.read_json_data(MainFolder.json_file)
-
-        valid_json = (
-            json_data is not None
-            and isinstance(json_data, list)
-            and all(isinstance(item, dict) for item in json_data)
+    def to_model(self) -> MainFolderItemModel:
+        return MainFolderItemModel(
+            name=self.name,
+            paths=self.paths,
+            stop_list=self.stop_list,
+            curr_path=self.curr_path
         )
 
-        if not valid_json:
-            MainFolder.list_ = cls.miuz_main_folders()
-            return
+    @classmethod
+    def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
+        return cls(
+            name=model.name,
+            paths=model.paths,
+            stop_list=model.stop_list,
+            curr_path=model.curr_path
+        )
 
-        schema = MainFolderModel.model_json_schema()
-        for json_main_folder in json_data:
-            if JsonUtils.validate_data(json_main_folder, schema):
-                main_folder = MainFolder(**json_main_folder)
-                MainFolder.list_.append(main_folder)
-            else:
-                MainFolderErrors.list_.append(json_main_folder)
+    @classmethod
+    def init(cls):
+        if not os.path.exists(cls.json_file):
+            cls.list_ = cls.miuz_main_folders
+        else:
+            try:
+                with open(cls.json_file, "r", encoding="utf-8") as f:
+                    json_data = json.load(f)
+                    validated = MainFolderListModel(**json_data)
+                    cls.list_ = [
+                        cls.from_model(m)
+                        for m in validated.main_folder_list
+                    ]
+            except Exception as e:
+                print(e)
+                cls.list_ = cls.miuz_main_folders()
+
         MainFolder.current = MainFolder.list_[0]
 
     @classmethod
     def write_json_data(cls):
-        data = [i.get_data() for i in MainFolder.list_]
-        JsonUtils.write_json_data(MainFolder.json_file, data)
+        lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
+        data = MainFolderListModel(main_folder_list=lst)
+        with open(cls.json_file, "w", encoding="utf-8") as f:
+            f.write(json.dumps(data.model_dump(), indent=4, ensure_ascii=False))
 
     @classmethod
     def miuz_main_folders(cls) -> list["MainFolder"]:
