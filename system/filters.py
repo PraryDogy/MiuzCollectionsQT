@@ -51,7 +51,7 @@ class UserFilter:
         )
 
         if not valid_json:
-            UserFilter.list_ = cls.miuz_main_folders()
+            UserFilter.list_ = cls.default_user_filters()
             cls.write_json_data()
             return
 
@@ -63,6 +63,7 @@ class UserFilter:
             else:
                 UserFilterErrors.list_.append(json_user_filter)
 
+    @classmethod
     def write_json_data(cls):
         data = [i.get_data() for i in UserFilter.list_]
         JsonUtils.write_json_data(UserFilter.json_file, data)

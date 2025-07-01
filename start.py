@@ -77,7 +77,7 @@ class App(QApplication):
         JsonData.init()
         Dbase.init()
         Lang.init()
-        main_folder = MainFolder.init()
+        MainFolder.init()
         UserFilter.init()
         UThreadPool.init()
         ThemeChanger.init()
@@ -85,6 +85,7 @@ class App(QApplication):
 
         JsonData.write_json_data()
         MainFolder.write_json_data()
+        UserFilter.write_json_data()
 
         icon_path = os.path.join(Static.INNER_IMAGES, "icon.icns")
         icon = QIcon(icon_path)

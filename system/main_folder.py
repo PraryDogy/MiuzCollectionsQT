@@ -110,7 +110,6 @@ class MainFolder:
                 MainFolder.list_.append(main_folder)
             else:
                 MainFolderErrors.list_.append(json_main_folder)
-
         MainFolder.current = MainFolder.list_[0]
 
     @classmethod
