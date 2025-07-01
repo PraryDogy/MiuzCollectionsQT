@@ -8,6 +8,10 @@ from .lang import Lang
 from .utils import JsonUtils
 
 
+class UserFilterErrors:
+    list_: list[dict] = []
+
+
 class UserFilterModel(BaseModel):
     lang_names: list[str]
     dir_name: str
@@ -38,14 +42,26 @@ class UserFilter:
 
     @classmethod
     def init(cls):
-        validate = JsonUtils.validate_data(UserFilter.json_file, UserFilterModel)
-        if validate is None:
-            data: list[dict] = cls.default_user_filters()
-            JsonUtils.write_json_data(UserFilter.json_file, data)
-        else:
-            data = JsonUtils.read_json_data(UserFilter.json_file)
+        json_data: list[dict] = JsonUtils.read_json_data(UserFilter.json_file)
 
-        UserFilter.list_ = [UserFilter(*list(i.values())) for i in data]
+        valid_json = (
+            json_data is not None
+            and isinstance(json_data, list)
+            and all(isinstance(item, dict) for item in json_data)
+        )
+
+        if not valid_json:
+            UserFilter.list_ = cls.miuz_main_folders()
+            cls.write_json_data()
+            return
+
+        schema = UserFilterModel.model_json_schema()
+        for json_user_filter in json_data:
+            if JsonUtils.validate_data(json_user_filter, schema):
+                user_filter = UserFilter(**json_user_filter)
+                UserFilter.list_.append(user_filter)
+            else:
+                UserFilterErrors.list_.append(json_user_filter)
 
     def write_json_data(cls):
         data = [i.get_data() for i in UserFilter.list_]
