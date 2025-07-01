@@ -181,7 +181,7 @@ class AddRowWindow(WinSystem):
 
 
 class MainFolderItemsWid(QListWidget):
-    main_folder_changed = pyqtSignal()
+    changed = pyqtSignal()
 
     def __init__(self, main_folder_copy: MainFolder, is_stop_list: bool):
         """
@@ -274,13 +274,14 @@ class MainFolderItemsWid(QListWidget):
 
 
 class EditMainFoldersWid(QTabWidget):
-    edit_main_folder = pyqtSignal(object)
+    changed = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, main_folder_list_copy: list[MainFolder]):
         """
         Сигналы:
-        - edit_main_folder (object): сигнал об изменении копии объекта MainFolder. Сигнал означает,
-        что нужно обновить соответствующий объект MainFolder в списке MainFolder.list_.
+        - edit_main_folder (object): сигнал об изменении копии MainFolder.list_.
+        если в окне настроек будет нажато "ок", то копия MainFolder.list_ заменит
+        текущий MainFolder.list_
 
         Описание:
         - Виджет работает с копией объекта MainFolder, а не с оригиналом. Это необходимо для того,
@@ -288,13 +289,14 @@ class EditMainFoldersWid(QTabWidget):
         Если пользователь нажимает "Отмена", оригинальный MainFolder остаётся без изменений.
         """
         super().__init__()
+        self.main_folder_list_copy = main_folder_list_copy
+
         self.stop_colls_wid: dict[int, UTextEdit] = {}
         self.coll_folders_wid: dict[int, UTextEdit] = {}
 
-        for x in MainFolder.list_:
-            main_folder_copy = x.get_instance_copy()
-            wid = self.tab_ui(main_folder_copy)
-            self.addTab(wid, main_folder_copy.name)
+        for x in self.main_folder_list_copy:
+            wid = self.tab_ui(x)
+            self.addTab(wid, x.name)
 
     def tab_ui(self, main_folder_copy: MainFolder):
         wid = QWidget()
@@ -317,8 +319,7 @@ class EditMainFoldersWid(QTabWidget):
         h_lay_one.addWidget(stop_colls_lbl)
 
         stop_colls_list = MainFolderItemsWid(main_folder_copy, True)
-        cmd = lambda: self.edit_main_folder.emit(main_folder_copy)
-        stop_colls_list.main_folder_changed.connect(cmd)
+        stop_colls_list.changed.connect(lambda: self.changed.emit())
         v_lay.addWidget(stop_colls_list)
 
         cmd = lambda: stop_colls_list.open_add_row_win()
@@ -338,8 +339,7 @@ class EditMainFoldersWid(QTabWidget):
         h_lay_two.addWidget(coll_folders_label)
 
         coll_folders_list = MainFolderItemsWid(main_folder_copy, False)
-        cmd = lambda: self.edit_main_folder.emit(main_folder_copy)
-        coll_folders_list.main_folder_changed.connect(cmd)
+        coll_folders_list.changed.connect(lambda: self.changed.emit())
         v_lay.addWidget(coll_folders_list)
 
         cmd = lambda: coll_folders_list.open_add_row_win()
@@ -446,22 +446,23 @@ class AddMainFolderWin(WinSystem):
 class RemoveMainFolderWin(WinSystem):
     del_main_folder = pyqtSignal(object)
 
-    def __init__(self):
+    def __init__(self, main_folder_list_copy: list[MainFolder]):
         """
         Сигналы: del_main_folder(MainFolder)
         """
         super().__init__()
         self.setWindowTitle(Lang.delete_main_folder)
-
         self.setFixedSize(330, 300)
         self.central_layout.setSpacing(5)
+
+        self.main_folder_list_copy = main_folder_list_copy
 
         list_widget = QListWidget(self)
         list_widget.horizontalScrollBar().setDisabled(True)
         list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.central_layout.addWidget(list_widget)
 
-        for main_folder in MainFolder.list_:
+        for main_folder in self.main_folder_list_copy:
             item = QListWidgetItem(list_widget)
             item.setSizeHint(QSize(self.width(), LIST_ITEM_H))
             item.main_folder = main_folder
@@ -509,11 +510,12 @@ class RemoveMainFolderWin(WinSystem):
 
 
 class MainFolderWid(QGroupBox):
-    new_main_folder = pyqtSignal(object)
-    del_main_folder = pyqtSignal(object)
+    changed = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, main_folder_list_copy: list[MainFolder]):
         super().__init__()
+
+        self.main_folder_list_copy = main_folder_list_copy
 
         v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
@@ -562,6 +564,14 @@ class MainFolderWid(QGroupBox):
         self.remove_main_folder_win.del_main_folder.connect(cmd)
         self.remove_main_folder_win.center_relative_parent(parent=self.window())
         self.remove_main_folder_win.show()
+
+    def add_new_main_folder(self, main_folder: MainFolder):
+        self.main_folder_list_copy.append(main_folder)
+        self.changed.emit()
+
+    def remove_main_folder(self, main_folder: MainFolder):
+        self.main_folder_list_copy.remove(main_folder)
+        self.changed.emit()
 
 
 class SelectableLabel(QLabel):
@@ -766,10 +776,15 @@ class WinSettings(WinSystem):
         self.setWindowTitle(Lang.settings)
         self.new_main_folders: list[MainFolder] = []
         self.del_main_folders: list[MainFolder] = []
-        self.changed_main_folders: set[MainFolder] = set()
         self.reset_data = False
         self.new_lang = None
         self.scan_time = None
+
+        self.main_folder_list_changed = False
+        self.main_folder_list_copy = [
+            i.get_instance_copy()
+            for i in MainFolder.list_
+        ]
 
         self.init_ui()
         self.first_tab()
@@ -785,20 +800,12 @@ class WinSettings(WinSystem):
         self.new_lang = value
         self.set_apply_btn()
 
-    def add_new_main_folder(self, main_folder: MainFolder):
-        self.new_main_folders.append(main_folder)
-        self.set_apply_btn()
-
-    def del_new_main_folder(self, main_folder: MainFolder):
-        self.del_main_folders.append(main_folder)
-        self.set_apply_btn()
-
     def set_scan_time(self, value: int):
         self.scan_time = value
         self.set_apply_btn()
 
-    def main_folder_changed_cmd(self, main_folder_copy: MainFolder):
-        self.changed_main_folders.add(main_folder_copy)
+    def main_folder_list_changed_cmd(self):
+        self.main_folder_list_changed = True
         self.set_apply_btn()
 
     def set_apply_btn(self):
@@ -842,21 +849,16 @@ class WinSettings(WinSystem):
         v_lay.setSpacing(10)
         v_wid.setLayout(v_lay)
 
-        self.main_folder_wid = MainFolderWid()
-        add_cmd = lambda main_folder: self.add_new_main_folder(main_folder)
-        del_cmd = lambda main_folder: self.del_new_main_folder(main_folder)
-        self.main_folder_wid.new_main_folder.connect(add_cmd)
-        self.main_folder_wid.del_main_folder.connect(del_cmd)
-
+        self.main_folder_wid = MainFolderWid(self.main_folder_list_copy)
+        self.main_folder_wid.changed.connect(lambda: self.main_folder_list_changed_cmd())
         v_lay.addWidget(self.main_folder_wid)
 
         scan_wid = ScanTimeWid()
         scan_wid.new_scan_time.connect(lambda value: self.set_scan_time(value))
         v_lay.addWidget(scan_wid)
 
-        main_folder_tab = EditMainFoldersWid()
-        cmd = lambda main_folder_copy: self.main_folder_changed_cmd(main_folder_copy)
-        main_folder_tab.edit_main_folder.connect(cmd)
+        main_folder_tab = EditMainFoldersWid(self.main_folder_list_copy)
+        main_folder_tab.changed.connect(lambda: self.main_folder_list_changed_cmd())
         v_lay.addWidget(main_folder_tab)
 
         v_lay.addStretch()
