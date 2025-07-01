@@ -232,8 +232,7 @@ class JsonData:
         json_data = cls.validate_json_data()
         if json_data:
             for k, v in json_data.items():
-                if hasattr(cls, k):
-                    setattr(cls, k, v)
+                setattr(cls, k, v)
         else:
             json_data = cls.get_data()
             cls.write_json_data()
@@ -246,23 +245,16 @@ class JsonData:
 
     @classmethod
     def validate_json_data(cls):
-        try:
-            with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding='utf-8') as f:
-                json_data: dict = json.load(f)
-            schema = JsonDataModel.model_json_schema()
-            try:
-                jsonschema.validate(json_data, schema)
-            except jsonschema.ValidationError as ve:
-                path = ".".join(str(p) for p in ve.path)
-                print()
-                print(f"JsonUtils.validate_data error: '{path}': {ve.message}")
-                print(Static.APP_SUPPORT_JSON_DATA)
-                print()
-                return None
-            return json_data
-        except Exception as e:
-            print(traceback.format_exc())
+        if not os.path.exists(Static.APP_SUPPORT_JSON_DATA):
             return None
+        with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding='utf-8') as f:
+            json_data: dict = json.load(f)
+            try:
+                return JsonDataModel(**json_data)
+            except Exception:
+                print(traceback.format_exc())
+                return None
+
 
     @classmethod
     def check_dirs(cls):
