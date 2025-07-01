@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
-from system.filters import UserFilterErrors
+from system.filters import UserFilter, UserFilterErrors
 from system.lang import Lang
 from system.main_folder import MainFolder, MainFolderErrors
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
@@ -260,6 +260,7 @@ class WinMain(UMainWindow):
             i.task_state.set_should_run(False)
         JsonData.write_json_data()
         MainFolder.write_json_data()
+        UserFilter.write_json_data()
 
     def open_dates_win(self):
         self.win_dates = WinDates()

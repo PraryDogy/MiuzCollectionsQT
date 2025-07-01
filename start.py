@@ -82,7 +82,6 @@ class App(QApplication):
         UThreadPool.init()
         ThemeChanger.init()
 
-
         JsonData.write_json_data()
         MainFolder.write_json_data()
         UserFilter.write_json_data()

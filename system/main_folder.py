@@ -100,7 +100,6 @@ class MainFolder:
 
         if not valid_json:
             MainFolder.list_ = cls.miuz_main_folders()
-            cls.write_json_data()
             return
 
         schema = MainFolderModel.model_json_schema()
@@ -118,7 +117,7 @@ class MainFolder:
         JsonUtils.write_json_data(MainFolder.json_file, data)
 
     @classmethod
-    def miuz_main_folders(cls):
+    def miuz_main_folders(cls) -> list["MainFolder"]:
         miuz = MainFolder(
             "miuz",
             [

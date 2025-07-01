@@ -52,7 +52,6 @@ class UserFilter:
 
         if not valid_json:
             UserFilter.list_ = cls.default_user_filters()
-            cls.write_json_data()
             return
 
         schema = UserFilterModel.model_json_schema()
@@ -69,7 +68,7 @@ class UserFilter:
         JsonUtils.write_json_data(UserFilter.json_file, data)
 
     @classmethod
-    def default_user_filters(cls) -> list[str]:
+    def default_user_filters(cls) -> list["UserFilter"]:
         """
         Возвращает список словарей
         """
@@ -86,7 +85,7 @@ class UserFilter:
             False,
         )
 
-        return [product.get_data(), model.get_data()]
+        return [product, model]
 
 
 class SystemFilter:
