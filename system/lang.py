@@ -618,6 +618,9 @@ class _Lang:
     back = ["Назад", "Back"]
     next = ["Далее", "Next"]
 
+    error = ["Ошибка", "Error"]
+    read_file_error = ["Ошибка чтения файла", "Error file read"]
+
 class Lang(_Lang):
 
     @classmethod

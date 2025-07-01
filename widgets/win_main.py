@@ -1,3 +1,4 @@
+import json
 import os
 
 from PyQt5.QtCore import Qt, QTimer
@@ -6,8 +7,9 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
+from system.filters import UserFilterErrors
 from system.lang import Lang
-from system.main_folder import MainFolder
+from system.main_folder import MainFolder, MainFolderErrors
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, ScanerTask, UploadFilesTask)
 from system.utils import UThreadPool
@@ -22,7 +24,7 @@ from .win_dates import WinDates
 from .win_downloads import WinDownloads
 from .win_remove_files import RemoveFilesWin
 from .win_upload import WinUpload
-from .win_warn import WinWarn
+from .win_warn import WinError, WinWarn
 
 
 class TestWid(QFrame):
@@ -129,6 +131,8 @@ class WinMain(UMainWindow):
             self.start_scaner_task()
 
         QTimer.singleShot(100, self.check_connection)
+        QTimer.singleShot(200, self.check_main_folders)
+        QTimer.singleShot(300, self.check_user_filters)
             
     def check_connection(self):
         main_folder = MainFolder.current.is_available()
@@ -136,6 +140,32 @@ class WinMain(UMainWindow):
             self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
             self.win_warn.center_relative_parent(self)
             self.win_warn.show()
+
+    def check_main_folders(self):
+        if MainFolderErrors.list_:
+            text = "\n".join(
+                json.dumps(i, indent=4, ensure_ascii=False)
+                for i in MainFolderErrors.list_
+            )
+            title = f"{Lang.read_file_error} main_folder.json\n"
+            text = "\n".join((title, text))
+
+            self.win_folder_error = WinError(Lang.error, text)
+            self.win_folder_error.center_relative_parent(self)
+            self.win_folder_error.show()
+
+    def check_user_filters(self):
+        if UserFilterErrors.list_:
+            text = "\n".join(
+                json.dumps(i, indent=4, ensure_ascii=False)
+                for i in UserFilterErrors.list_
+            )
+            title = f"{Lang.read_file_error} user_filters.json\n"
+            text = "\n".join((title, text))
+
+            self.win_filter_error = WinError(Lang.error, text)
+            self.win_filter_error.center_relative_parent(self)
+            self.win_filter_error.show()
 
     def start_scaner_task(self):
         """
