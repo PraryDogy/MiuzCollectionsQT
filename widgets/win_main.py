@@ -142,14 +142,9 @@ class WinMain(UMainWindow):
             self.win_warn.show()
 
     def check_main_folders(self):
-        if MainFolderErrors.list_:
-            text = "\n".join(
-                json.dumps(i, indent=4, ensure_ascii=False)
-                for i in MainFolderErrors.list_
-            )
+        if MainFolderErrors.was:
             title = f"{Lang.read_file_error} main_folder.json\n"
-            text = "\n".join((title, text))
-
+            text = "main_folder.json восстановлен до базового"
             self.win_folder_error = WinError(Lang.error, text)
             self.win_folder_error.center_relative_parent(self)
             self.win_folder_error.show()

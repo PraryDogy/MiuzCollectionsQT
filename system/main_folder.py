@@ -1,14 +1,14 @@
+import json
 import os
 
 from pydantic import BaseModel
+from .utils import MainUtils
 
 from cfg import Static
-import json
-from .utils import JsonUtils
-import traceback
+
 
 class MainFolderErrors:
-    list_: list[dict] = []
+    was = False
 
 
 class MainFolderItemModel(BaseModel):
@@ -87,6 +87,12 @@ class MainFolder:
         return self.curr_path
 
     def to_model(self) -> MainFolderItemModel:
+        """
+        Преобразует экземпляр MainFolder в объект модели MainFolderItemModel 
+        для сериализации или валидации.
+        
+        :return: Экземпляр MainFolderItemModel с текущими данными.
+        """
         return MainFolderItemModel(
             name=self.name,
             paths=self.paths,
@@ -96,6 +102,12 @@ class MainFolder:
 
     @classmethod
     def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
+        """
+        Создаёт экземпляр MainFolder из объекта модели MainFolderItemModel.
+
+        :param model: Объект MainFolderItemModel.
+        :return: Экземпляр MainFolder.
+        """
         return cls(
             name=model.name,
             paths=model.paths,
@@ -105,29 +117,44 @@ class MainFolder:
 
     @classmethod
     def init(cls):
+        """
+        Инициализирует список папок `cls.list_`.
+
+        - Если JSON-файл отсутствует — используется предустановленный список.
+        - Если файл есть — загружает и валидирует данные из него.
+        - В случае ошибки — используется предустановленный список.
+        Устанавливает текущую активную папку в `MainFolder.current`.
+        """
         if not os.path.exists(cls.json_file):
-            cls.list_ = cls.miuz_main_folders
+            cls.list_ = cls.miuz_main_folders()
         else:
             try:
                 with open(cls.json_file, "r", encoding="utf-8") as f:
-                    json_data = json.load(f)
+                    json_data: dict = json.load(f)
                     validated = MainFolderListModel(**json_data)
                     cls.list_ = [
                         cls.from_model(m)
                         for m in validated.main_folder_list
                     ]
             except Exception as e:
-                print(e)
+                MainUtils.print_error()
                 cls.list_ = cls.miuz_main_folders()
 
         MainFolder.current = MainFolder.list_[0]
 
     @classmethod
     def write_json_data(cls):
+        """
+        Сохраняет текущий список `cls.list_` в JSON-файл, предварительно 
+        сериализовав его через модель MainFolderListModel.
+
+        Использует `ensure_ascii=False` для сохранения Unicode-символов (например, кириллицы).
+        """
         lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
         data = MainFolderListModel(main_folder_list=lst)
         with open(cls.json_file, "w", encoding="utf-8") as f:
             f.write(json.dumps(data.model_dump(), indent=4, ensure_ascii=False))
+
 
     @classmethod
     def miuz_main_folders(cls) -> list["MainFolder"]:
