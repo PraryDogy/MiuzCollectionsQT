@@ -137,6 +137,7 @@ class MainFolder:
                         for m in validated.main_folder_list
                     ]
             except Exception as e:
+                MainFolderErrors.was = True
                 MainUtils.print_error()
                 cls.list_ = cls.miuz_main_folders()
 
