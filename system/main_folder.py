@@ -87,31 +87,23 @@ class MainFolder:
     @classmethod
     def init(cls):
         json_data: list[dict] = JsonUtils.read_json_data(MainFolder.json_file)
-        json_data_valid = True
 
-        if not json_data:
-            json_data_valid = False
+        valid_json = (
+            json_data is not None
+            and isinstance(json_data, list)
+            and all(isinstance(item, dict) for item in json_data)
+        )
 
-        elif not isinstance(json_data, list):
-            json_data_valid = False
-
-        elif not all(isinstance(item, dict) for item in json_data):
-            json_data_valid = False
-
-        elif len(json_data) == 0:
-            json_data_valid = False
-
-        if not json_data_valid:
+        if not valid_json:
             MainFolder.list_ = cls.miuz_main_folders()
             cls.write_json_data()
+            return
 
-        else:
-            for json_main_folder in json_data:
-                schema = MainFolderModel.model_json_schema()
-                valid = JsonUtils.validate_data(json_main_folder, schema)
-                if valid:
-                    main_folder = MainFolder(**json_main_folder)
-                    MainFolder.list_.append(main_folder)
+        schema = MainFolderModel.model_json_schema()
+        for json_main_folder in json_data:
+            if JsonUtils.validate_data(json_main_folder, schema):
+                main_folder = MainFolder(**json_main_folder)
+                MainFolder.list_.append(main_folder)
 
         MainFolder.current = MainFolder.list_[0]
 
