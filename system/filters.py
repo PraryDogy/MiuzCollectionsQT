@@ -58,16 +58,15 @@ class UserFilter:
     def init(cls):
         if not os.path.exists(UserFilter.json_file):
             UserFilter.list_ = cls.default_user_filters()
-
+            return
         try:
             with open(UserFilter.json_file, "r", encoding="utf-8") as f:
                 json_data: dict = json.load(f)
                 validated = UserFilterListModel(**json_data)
-                cls.list_ = [
+                UserFilter.list_ = [
                     cls.from_model(i)
                     for i in validated.user_filter_list
                 ]
-
         except Exception:
             UserFilterErrors.was = True
             MainUtils.print_error()
