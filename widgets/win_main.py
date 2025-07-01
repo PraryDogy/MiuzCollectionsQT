@@ -24,7 +24,7 @@ from .win_dates import WinDates
 from .win_downloads import WinDownloads
 from .win_remove_files import RemoveFilesWin
 from .win_upload import WinUpload
-from .win_warn import WinError, WinWarn
+from .win_warn import WinWarn
 
 
 class TestWid(QFrame):
