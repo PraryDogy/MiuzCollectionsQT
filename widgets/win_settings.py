@@ -348,17 +348,18 @@ class EditMainFoldersWid(QTabWidget):
 
 
 class AddMainFolderWin(WinSystem):
-    add_main_folder = pyqtSignal(object)
+    changed = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, main_folder_list_copy: list[MainFolder]):
         """
-        Сигналы: add_main_folder(MainFolder)
+        Сигналы: changed()
         """
         super().__init__()
         self.setWindowTitle(Lang.add_main_folder_title)
         self.setFixedSize(450, 400)
         self.central_layout.setSpacing(10)
         self.new_main_folder = MainFolder("", [], [], "")
+        self.main_folder_list_copy = main_folder_list_copy
 
         descr_widget = QLabel(Lang.add_main_folder_descr)
         self.central_layout.addWidget(descr_widget)
@@ -432,7 +433,8 @@ class AddMainFolderWin(WinSystem):
 
     def ok_cmd(self):
         if self.new_main_folder.name and self.new_main_folder.paths:
-            self.add_main_folder.emit(self.new_main_folder)
+            self.main_folder_list_copy.append(self.new_main_folder)
+            self.changed.emit()
             self.deleteLater()
 
     def keyPressEvent(self, a0):
@@ -444,11 +446,11 @@ class AddMainFolderWin(WinSystem):
     
 
 class RemoveMainFolderWin(WinSystem):
-    changed = pyqtSignal(object)
+    changed = pyqtSignal()
 
     def __init__(self, main_folder_list_copy: list[MainFolder]):
         """
-        Сигналы: changed(MainFolder)
+        Сигналы: changed()
         """
         super().__init__()
         self.setWindowTitle(Lang.delete_main_folder)
@@ -498,7 +500,8 @@ class RemoveMainFolderWin(WinSystem):
         selected_item = list_widget.currentItem()
         if selected_item:
             main_folder: MainFolder = selected_item.main_folder
-            self.changed.emit(main_folder)
+            self.main_folder_list_copy.remove(main_folder)
+            self.changed.emit()
             self.deleteLater()
 
     def keyPressEvent(self, a0):
@@ -552,26 +555,16 @@ class MainFolderWid(QGroupBox):
         second_lay.addWidget(remove_descr)
 
     def add_btn_cmd(self, *args):
-        self.add_main_folder_win = AddMainFolderWin()
-        cmd = lambda main_folder: self.add_new_main_folder(main_folder)
-        self.add_main_folder_win.add_main_folder.connect(cmd)
+        self.add_main_folder_win = AddMainFolderWin(self.main_folder_list_copy)
+        self.add_main_folder_win.changed.connect(lambda: self.changed.emit())
         self.add_main_folder_win.center_relative_parent(parent=self.window())
         self.add_main_folder_win.show()
 
     def remove_btn_cmd(self, *args):
         self.remove_main_folder_win = RemoveMainFolderWin(self.main_folder_list_copy)
-        cmd = lambda main_folder: self.remove_btn_cmd(main_folder)
-        self.remove_main_folder_win.changed.connect(cmd)
+        self.remove_main_folder_win.changed.connect(lambda: self.changed.emit())
         self.remove_main_folder_win.center_relative_parent(parent=self.window())
         self.remove_main_folder_win.show()
-
-    def add_new_main_folder(self, main_folder: MainFolder):
-        self.main_folder_list_copy.append(main_folder)
-        self.changed.emit()
-
-    def remove_main_folder(self, main_folder: MainFolder):
-        self.main_folder_list_copy.remove(main_folder)
-        self.changed.emit()
 
 
 class SelectableLabel(QLabel):
