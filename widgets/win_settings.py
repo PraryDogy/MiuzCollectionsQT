@@ -495,6 +495,8 @@ class RemoveMainFolderWin(WinSystem):
             list_widget.setDisabled(True)
             self.ok_btn.setDisabled(True)
 
+        self.setFocus()
+
     def ok_cmd(self):
         list_widget: QListWidget = self.findChild(QListWidget)
 
