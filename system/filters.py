@@ -1,3 +1,4 @@
+import json
 import os
 
 from pydantic import BaseModel
@@ -5,17 +6,21 @@ from pydantic import BaseModel
 from cfg import Static
 
 from .lang import Lang
-from .utils import JsonUtils
+from .utils import JsonUtils, MainUtils
 
 
 class UserFilterErrors:
     list_: list[dict] = []
 
 
-class UserFilterModel(BaseModel):
+class UserFilterItemModel(BaseModel):
     lang_names: list[str]
     dir_name: str
     value: bool
+
+
+class UserFilterListModel(BaseModel):
+    user_filter_list: list[UserFilterItemModel]
 
 
 class UserFilter:
@@ -39,40 +44,49 @@ class UserFilter:
             i: getattr(self, i)
             for i in self.__slots__
         }
+    
+    def to_model(self) -> UserFilterItemModel:
+        return UserFilterItemModel(
+            lang_names=self.lang_names,
+            dir_name=self.dir_name,
+            value=self.value
+        )
+    
+    @classmethod
+    def from_model(cls, model: UserFilterItemModel) -> "UserFilter":
+        return UserFilter(
+            lang_names=model.lang_names,
+            dir_name=model.dir_name,
+            value=model.value
+        )
 
     @classmethod
     def init(cls):
-        json_data: list[dict] = JsonUtils.read_json_data(UserFilter.json_file)
-
-        valid_json = (
-            json_data is not None
-            and isinstance(json_data, list)
-            and all(isinstance(item, dict) for item in json_data)
-        )
-
-        if not valid_json:
+        if not os.path.exists(UserFilter.json_file):
             UserFilter.list_ = cls.default_user_filters()
-            return
 
-        schema = UserFilterModel.model_json_schema()
-        for json_user_filter in json_data:
-            if JsonUtils.validate_data(json_user_filter, schema):
-                user_filter = UserFilter(**json_user_filter)
-                UserFilter.list_.append(user_filter)
-            else:
-                UserFilterErrors.list_.append(json_user_filter)
+        try:
+            with open(UserFilter.json_file, "r", encoding="utf-8") as f:
+                json_data: dict = json.load(f)
+                validated = UserFilterListModel(**json_data)
+                cls.list_ = [
+                    cls.from_model(i)
+                    for i in validated.user_filter_list
+                ]
+
+        except Exception:
+            MainUtils.print_error()
+            UserFilter.list_ = cls.default_user_filters()
 
     @classmethod
     def write_json_data(cls):
-        data = [i.get_data() for i in UserFilter.list_]
-        JsonUtils.write_json_data(UserFilter.json_file, data)
+        lst: list[UserFilterItemModel] = [item.to_model() for item in cls.list_]
+        data = UserFilterListModel(user_filter_list=lst)
+        with open(cls.json_file, "w", encoding="utf-8") as f:
+            f.write(json.dumps(data.model_dump(), indent=4, ensure_ascii=False))
 
     @classmethod
     def default_user_filters(cls) -> list["UserFilter"]:
-        """
-        Возвращает список словарей
-        """
-
         product = UserFilter(
             ["Продукт", "Product"],
             "1 IMG",
