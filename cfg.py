@@ -217,31 +217,25 @@ class JsonData:
     scaner_minutes: int = 5
 
     @classmethod
-    def get_data(cls) -> dict[str, str]:
-        """returns user attibutes and values"""
-        return {
-            k: v
-            for k, v in vars(cls).items()
-            if not k.startswith("__")
-            and
-            not callable(getattr(cls, k))
-        }
-
-    @classmethod
     def set_json_data(cls) -> dict:
         json_data = cls.validate_json_data()
         if json_data:
             for k, v in json_data.model_dump().items():
                 setattr(cls, k, v)
         else:
-            json_data = cls.get_data()
             cls.write_json_data()
 
     @classmethod
     def write_json_data(cls):
-        with open(Static.APP_SUPPORT_JSON_DATA, 'w', encoding="utf-8") as f:
-            data = cls.get_data()
-            json.dump(obj=data, fp=f, indent=4, ensure_ascii=False)
+        data = JsonDataModel(
+            app_ver=cls.app_ver,
+            lang_ind=cls.lang_ind,
+            dark_mode=cls.dark_mode,
+            scaner_minutes=cls.scaner_minutes,
+        )
+        dict_data = data.model_dump()
+        with open(Static.APP_SUPPORT_JSON_DATA, "w", encoding="utf-8") as f:
+            json.dump(dict_data, f, indent=4, ensure_ascii=False)
 
     @classmethod
     def validate_json_data(cls):
