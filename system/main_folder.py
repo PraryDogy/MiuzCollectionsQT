@@ -7,6 +7,10 @@ from cfg import Static
 from .utils import JsonUtils
 
 
+class MainFolderErrors:
+    list_: list[dict] = []
+
+
 class MainFolderModel(BaseModel):
     name: str
     paths: list[str]
@@ -104,6 +108,8 @@ class MainFolder:
             if JsonUtils.validate_data(json_main_folder, schema):
                 main_folder = MainFolder(**json_main_folder)
                 MainFolder.list_.append(main_folder)
+            else:
+                MainFolderErrors.list_.append(json_main_folder)
 
         MainFolder.current = MainFolder.list_[0]
 
