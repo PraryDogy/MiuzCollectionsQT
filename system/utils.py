@@ -376,34 +376,20 @@ class MainUtils:
 class JsonUtils:
 
     @classmethod
-    def validate_data(cls, json_file: str, base_model: BaseModel):
-        """
-        Ожидается, что JSON-файл состоит из списка словарей.
-        """
+    def validate_data(cls, data: dict, schema: dict):
         try:
-            with open(json_file, "r", encoding='utf-8') as f:
-                data: list[dict] = json.load(f)
-
-            schema = base_model.model_json_schema()
-            for idx, item in enumerate(data):
-                try:
-                    jsonschema.validate(item, schema)
-                except jsonschema.ValidationError as ve:
-                    path = ".".join(str(p) for p in ve.path)
-                    print(f"JsonUtils.validate_data error: '{path}': {ve.message}")
-                    print(json_file)
-                    return None
-            return True
-        except Exception as e:
-            MainUtils.print_error()
+            jsonschema.validate(data, schema)
+        except jsonschema.ValidationError as ve:
+            path = ".".join(str(p) for p in ve.path)
+            print()
+            print(f"JsonUtils.validate_data error: '{path}': {ve.message}")
+            print(data)
+            print()
             return None
+        return True
         
     @classmethod
     def write_json_data(cls, json_file: str, data: list[dict]) -> bool | None:
-        """
-        Ожидается, что data состоит из списка словарей.
-        Возвращает True при успешной записи, None при ошибке
-        """
         try:
             with open(json_file, "w", encoding='utf-8') as f:
                 f.write(json.dumps(obj=data, indent=4, ensure_ascii=False))
@@ -414,9 +400,6 @@ class JsonUtils:
 
     @classmethod
     def read_json_data(cls, json_file: str) -> list[dict] | None:
-        """
-        Возвращает список словарей
-        """
         try:
             with open(json_file, "r", encoding='utf-8') as f:
                 return json.loads(f.read())

@@ -1,9 +1,10 @@
 import os
 
 from pydantic import BaseModel
-from .utils import JsonUtils
 
 from cfg import Static
+
+from .utils import JsonUtils
 
 
 class MainFolderModel(BaseModel):
@@ -85,14 +86,33 @@ class MainFolder:
 
     @classmethod
     def init(cls):
-        validate = JsonUtils.validate_data(MainFolder.json_file, MainFolderModel)
-        if validate is None:
-            data: list[dict] = cls.miuz_main_folders()
-            JsonUtils.write_json_data(MainFolder.json_file, data)
-        else:
-            data: list[dict] = JsonUtils.read_json_data(MainFolder.json_file)
+        json_data: list[dict] = JsonUtils.read_json_data(MainFolder.json_file)
+        json_data_valid = True
 
-        MainFolder.list_ = [MainFolder(*list(i.values())) for i in data]
+        if not json_data:
+            json_data_valid = False
+
+        elif not isinstance(json_data, list):
+            json_data_valid = False
+
+        elif not all(isinstance(item, dict) for item in json_data):
+            json_data_valid = False
+
+        elif len(json_data) == 0:
+            json_data_valid = False
+
+        if not json_data_valid:
+            MainFolder.list_ = cls.miuz_main_folders()
+            cls.write_json_data()
+
+        else:
+            for json_main_folder in json_data:
+                schema = MainFolderModel.model_json_schema()
+                valid = JsonUtils.validate_data(json_main_folder, schema)
+                if valid:
+                    main_folder = MainFolder(**json_main_folder)
+                    MainFolder.list_.append(main_folder)
+
         MainFolder.current = MainFolder.list_[0]
 
     @classmethod
@@ -129,4 +149,4 @@ class MainFolder:
             ""
         )
 
-        return [miuz.get_data(), panacea.get_data()]
+        return [miuz, panacea]
