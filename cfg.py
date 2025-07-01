@@ -208,6 +208,7 @@ class JsonDataModel(BaseModel):
     lang_ind: int
     dark_mode: int
     scaner_minutes: int
+    test: str = "hello"
 
 
 class JsonData:
@@ -215,6 +216,7 @@ class JsonData:
     lang_ind = 0
     dark_mode = 0
     scaner_minutes: int = 5
+    test: str = "hello"
 
     @classmethod
     def get_data(cls) -> dict[str, str]:
@@ -231,7 +233,7 @@ class JsonData:
     def set_json_data(cls) -> dict:
         json_data = cls.validate_json_data()
         if json_data:
-            for k, v in json_data.items():
+            for k, v in json_data.model_dump().items():
                 setattr(cls, k, v)
         else:
             json_data = cls.get_data()
