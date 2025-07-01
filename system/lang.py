@@ -617,9 +617,17 @@ class _Lang:
 
     back = ["Назад", "Back"]
     next = ["Далее", "Next"]
-
     error = ["Ошибка", "Error"]
-    read_file_error = ["Ошибка чтения файла", "Error file read"]
+
+    read_file_error = [
+        "Ошибка чтения файла",
+        "Error file read"
+    ]
+
+    restored_by_default = [
+        "восстановлен по умолчанию.",
+        "restored by default."
+    ]
 
 class Lang(_Lang):
 

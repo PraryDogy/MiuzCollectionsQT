@@ -6,11 +6,11 @@ from pydantic import BaseModel
 from cfg import Static
 
 from .lang import Lang
-from .utils import JsonUtils, MainUtils
+from .utils import MainUtils
 
 
 class UserFilterErrors:
-    list_: list[dict] = []
+    was: bool = False
 
 
 class UserFilterItemModel(BaseModel):
@@ -38,13 +38,7 @@ class UserFilter:
         self.lang_names = lang_names
         self.dir_name = dir_name
         self.value = value
-    
-    def get_data(self):
-        return {
-            i: getattr(self, i)
-            for i in self.__slots__
-        }
-    
+
     def to_model(self) -> UserFilterItemModel:
         return UserFilterItemModel(
             lang_names=self.lang_names,
@@ -75,6 +69,7 @@ class UserFilter:
                 ]
 
         except Exception:
+            UserFilterErrors.was = True
             MainUtils.print_error()
             UserFilter.list_ = cls.default_user_filters()
 

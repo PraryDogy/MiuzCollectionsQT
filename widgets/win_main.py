@@ -143,22 +143,19 @@ class WinMain(UMainWindow):
 
     def check_main_folders(self):
         if MainFolderErrors.was:
-            title = f"{Lang.read_file_error} main_folder.json\n"
-            text = "main_folder.json восстановлен до базового"
-            self.win_folder_error = WinError(Lang.error, text)
+            title = f"{Lang.read_file_error} main_folder.json"
+            text = f"main_folder.json {Lang.restored_by_default}"
+            text = "\n".join((title, text))
+            self.win_folder_error = WinWarn(Lang.error, text)
             self.win_folder_error.center_relative_parent(self)
             self.win_folder_error.show()
 
     def check_user_filters(self):
-        if UserFilterErrors.list_:
-            text = "\n".join(
-                json.dumps(i, indent=4, ensure_ascii=False)
-                for i in UserFilterErrors.list_
-            )
-            title = f"{Lang.read_file_error} user_filters.json\n"
+        if UserFilterErrors.was:
+            title = f"{Lang.read_file_error} user_filters.json"
+            text = f"user_filters.json {Lang.restored_by_default}"
             text = "\n".join((title, text))
-
-            self.win_filter_error = WinError(Lang.error, text)
+            self.win_filter_error = WinWarn(Lang.error, text)
             self.win_filter_error.center_relative_parent(self)
             self.win_filter_error.show()
 
