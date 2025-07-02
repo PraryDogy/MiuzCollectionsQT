@@ -48,6 +48,14 @@ class UserFilter:
         )
 
     @classmethod
+    def from_model(cls, model: UserFilterItemModel) -> "UserFilter":
+        return UserFilter(
+            lang_names=model.lang_names,
+            dir_name=model.dir_name,
+            value=model.value
+        )
+
+    @classmethod
     def do_backup(cls):
         if not os.path.exists(Static.APP_SUPPORT_BACKUP):
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
@@ -71,9 +79,16 @@ class UserFilter:
             f.write(data)
 
     @classmethod
+    def get_backups(cls):
+        return [
+            entry
+            for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
+            if entry.is_file() and "user_filters" in entry.name
+        ]
+
+    @classmethod
     def remove_backups(cls):
-        entries = [entry for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
-                if entry.is_file() and "user_filters" in entry.name]
+        entries = cls.get_backups()
         entries.sort(key=lambda e: e.stat().st_mtime, reverse=True)
         to_delete = entries[20:]
         for entry in to_delete:
@@ -83,18 +98,9 @@ class UserFilter:
                 continue
 
     @classmethod
-    def from_model(cls, model: UserFilterItemModel) -> "UserFilter":
-        return UserFilter(
-            lang_names=model.lang_names,
-            dir_name=model.dir_name,
-            value=model.value
-        )
-
-    @classmethod
     def init(cls):
         if not os.path.exists(UserFilter.json_file):
-            UserFilter.list_ = cls.default_user_filters()
-            return
+            raise Exception ("Файла user_filters.json не существует")
         try:
             with open(UserFilter.json_file, "r", encoding="utf-8") as f:
                 json_data: dict = json.load(f)
@@ -104,9 +110,12 @@ class UserFilter:
                     for i in validated.user_filter_list
                 ]
         except Exception:
-            UserFilterErrors.was = True
             MainUtils.print_error()
-            UserFilter.list_ = cls.default_user_filters()
+            if cls.get_backups():
+                UserFilterErrors.was = True
+            else:
+                UserFilter.list_ = cls.default_user_filters()
+            
 
     @classmethod
     def validate(cls, json_data: dict):

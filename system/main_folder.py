@@ -97,6 +97,15 @@ class MainFolder:
         )
 
     @classmethod
+    def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
+        return MainFolder(
+            name=model.name,
+            paths=model.paths,
+            stop_list=model.stop_list,
+            curr_path=model.curr_path
+        )
+
+    @classmethod
     def do_backup(cls):
         if not os.path.exists(Static.APP_SUPPORT_BACKUP):
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
@@ -120,9 +129,16 @@ class MainFolder:
             f.write(data)
 
     @classmethod
+    def get_backups(cls):
+        return [
+            entry
+            for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
+            if entry.is_file() and "main_folders" in entry.name
+        ]
+
+    @classmethod
     def remove_backups(cls):
-        entries = [entry for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
-                if entry.is_file() and "main_folders" in entry.name]
+        entries = cls.get_backups()
         entries.sort(key=lambda e: e.stat().st_mtime, reverse=True)
         to_delete = entries[20:]
         for entry in to_delete:
@@ -132,18 +148,9 @@ class MainFolder:
                 continue
 
     @classmethod
-    def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
-        return MainFolder(
-            name=model.name,
-            paths=model.paths,
-            stop_list=model.stop_list,
-            curr_path=model.curr_path
-        )
-
-    @classmethod
     def init(cls):
         if not os.path.exists(cls.json_file):
-            MainFolder.list_ = cls.miuz_main_folders()
+            raise Exception ("Файла main_folders.json не существует")
         else:
             try:
                 with open(cls.json_file, "r", encoding="utf-8") as f:
@@ -158,8 +165,12 @@ class MainFolder:
                     else:
                         MainFolder.current = MainFolder.list_[0]
             except Exception as e:
-                MainFolderErrors.was = True
                 MainUtils.print_error()
+                if cls.get_backups():
+                    MainFolderErrors.was = True
+                else:
+                    MainFolder.list_ = cls.miuz_main_folders()
+                    MainFolder.current = MainFolder.list_[0]
 
     @classmethod
     def write_json_data(cls):
