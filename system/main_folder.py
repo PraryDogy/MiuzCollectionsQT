@@ -1,10 +1,12 @@
 import json
 import os
+from datetime import datetime
 
 from pydantic import BaseModel
-from .utils import MainUtils
 
 from cfg import Static
+
+from .utils import MainUtils
 
 
 class MainFolderErrors:
@@ -20,20 +22,6 @@ class MainFolderItemModel(BaseModel):
 
 class MainFolderListModel(BaseModel):
     main_folder_list: list[MainFolderItemModel]
-
-
-class MainFolder:
-    current: "MainFolder" = None
-    list_: list["MainFolder"] = []
-    json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
-    __slots__ = ["name", "paths", "stop_list", "curr_path"]
-
-    def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str):
-        super().__init__()
-        self.name = name
-        self.paths = paths
-        self.stop_list = stop_list
-        self.curr_path: str = curr_path
 
 
 class MainFolder:
@@ -107,6 +95,16 @@ class MainFolder:
             stop_list=self.stop_list,
             curr_path=self.curr_path
         )
+
+    @classmethod
+    def do_backup(cls):
+        if not os.path.exists(Static.APP_SUPPORT_BACKUP):
+            os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
+        lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
+        data = MainFolderListModel(main_folder_list=lst)
+        backup_path = os.path.join(Static.APP_SUPPORT_BACKUP, "main_folders.json")
+        with open(backup_path, "w", encoding="utf-8") as f:
+            f.write(json.dumps(data.model_dump(), indent=4, ensure_ascii=False))
 
     @classmethod
     def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
