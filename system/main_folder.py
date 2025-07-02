@@ -150,7 +150,8 @@ class MainFolder:
     @classmethod
     def init(cls):
         if not os.path.exists(cls.json_file):
-            raise Exception ("Файла main_folders.json не существует")
+            MainFolder.list_ = cls.miuz_main_folders()
+            MainFolder.current = MainFolder.list_[0]
         else:
             try:
                 with open(cls.json_file, "r", encoding="utf-8") as f:

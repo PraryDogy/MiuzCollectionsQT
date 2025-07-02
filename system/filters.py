@@ -100,23 +100,23 @@ class UserFilter:
     @classmethod
     def init(cls):
         if not os.path.exists(UserFilter.json_file):
-            raise Exception ("Файла user_filters.json не существует")
-        try:
-            with open(UserFilter.json_file, "r", encoding="utf-8") as f:
-                json_data: dict = json.load(f)
-                validated = cls.validate(json_data)
-                UserFilter.list_ = [
-                    cls.from_model(i)
-                    for i in validated.user_filter_list
-                ]
-        except Exception:
-            MainUtils.print_error()
-            if cls.get_backups():
-                UserFilterErrors.was = True
-            else:
-                UserFilter.list_ = cls.default_user_filters()
+            UserFilter.list_ = cls.default_user_filters()
+        else"
+            try:
+                with open(UserFilter.json_file, "r", encoding="utf-8") as f:
+                    json_data: dict = json.load(f)
+                    validated = cls.validate(json_data)
+                    UserFilter.list_ = [
+                        cls.from_model(i)
+                        for i in validated.user_filter_list
+                    ]
+            except Exception:
+                MainUtils.print_error()
+                if cls.get_backups():
+                    UserFilterErrors.was = True
+                else:
+                    UserFilter.list_ = cls.default_user_filters()
             
-
     @classmethod
     def validate(cls, json_data: dict):
         return UserFilterListModel(**json_data)
