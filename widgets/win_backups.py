@@ -130,9 +130,9 @@ class WinBackups(WinSystem):
 
     def init_ui(self):
         if self.backup_type == BackupType.main_folder:
-            text = f"\n{Lang.choose_backup} main_folders.json"
+            text = f"{Lang.choose_backup} main_folders.json"
         else:
-            text = f"\n{Lang.choose_backup} user_filters.json"
+            text = f"{Lang.choose_backup} user_filters.json"
 
         descr = QLabel(text)
         self.central_layout.addWidget(descr)
