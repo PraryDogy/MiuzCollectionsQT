@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -45,7 +46,25 @@ class UserFilter:
             dir_name=self.dir_name,
             value=self.value
         )
-    
+
+    @classmethod
+    def do_backup(cls):
+        if not os.path.exists(Static.APP_SUPPORT_BACKUP):
+            os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
+
+        now = datetime.now().replace(microsecond=0)
+        now = now.strftime("%Y-%m-%d %H-%M-%S") 
+        
+        filename = f"{now} user_filters.json"
+        filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
+
+        lst: list[UserFilterItemModel] = [item.to_model() for item in cls.list_]
+        data = UserFilterListModel(main_folder_list=lst)
+        data = data.model_dump()
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(json.dumps(data, indent=4, ensure_ascii=False))
+
     @classmethod
     def from_model(cls, model: UserFilterItemModel) -> "UserFilter":
         return UserFilter(
