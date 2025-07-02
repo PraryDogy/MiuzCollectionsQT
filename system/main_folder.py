@@ -147,6 +147,8 @@ class MainFolder:
     @classmethod
     def write_json_data(cls):
         if not cls.list_:
+            print("Ошибка записи main_folder > MainFolter > write json data")
+            print("MainFolder.list_ пуст")
             return
         lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
         data = MainFolderListModel(main_folder_list=lst)
