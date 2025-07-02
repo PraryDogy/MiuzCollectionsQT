@@ -142,6 +142,9 @@ class WinMain(UMainWindow):
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
         
+        QTimer.singleShot(100, self.main_folder_check)
+        
+    def main_folder_check(self):
         main_folder = MainFolder.current.is_available()
         if not main_folder:
             self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
