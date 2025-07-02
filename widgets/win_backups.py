@@ -119,20 +119,20 @@ class WinBackups(WinSystem):
 
     def __init__(self, backup_type: BackupType, can_close: bool = False):
         super().__init__()
-        self.setWindowTitle(Lang.read_file_error)
+        self.setWindowTitle(Lang.choose_backup)
         self.backup_type = backup_type
         self.can_close = can_close
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
         self.init_ui()
-        self.setFixedSize(350, 400)
+        self.setFixedSize(370, 400)
 
     def init_ui(self):
         if self.backup_type == BackupType.main_folder:
-            text = f"{Lang.read_file_error} main_folder.json\n{Lang.choose_backup}"
+            text = f"\n{Lang.choose_backup} main_folders.json"
         else:
-            text = f"{Lang.read_file_error} user_filrters.json\n{Lang.choose_backup}"
+            text = f"\n{Lang.choose_backup} user_filters.json"
 
         descr = QLabel(text)
         self.central_layout.addWidget(descr)

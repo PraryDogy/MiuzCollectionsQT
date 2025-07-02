@@ -625,8 +625,8 @@ class _Lang:
     ]
 
     choose_backup = [
-        "Выберите файл резервной копии.",
-        "Choose backup file."
+        "Выберите файл резервной копии",
+        "Choose backup file"
     ]
 
     restore = [

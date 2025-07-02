@@ -141,7 +141,7 @@ class UTextEdit(QTextEdit):
         MainUtils.copy_text(text)
 
     def cut_selection(self):
-        cur = self.parent_.textCursor()
+        cur = self.textCursor()
         text = cur.selectedText().strip()
         MainUtils.copy_text(text)
         cur.removeSelectedText()
