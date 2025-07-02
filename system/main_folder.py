@@ -107,12 +107,14 @@ class MainFolder:
         filename = f"{now} main_folders.json"
         filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
 
-        lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
-        data = MainFolderListModel(main_folder_list=lst)
-        data = data.model_dump()
+        cls.write_json_data()
 
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data, indent=4, ensure_ascii=False))
+        # lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
+        # data = MainFolderListModel(main_folder_list=lst)
+        # data = data.model_dump()
+
+        # with open(filepath, "w", encoding="utf-8") as f:
+        #     f.write(json.dumps(data, indent=4, ensure_ascii=False))
 
     @classmethod
     def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
@@ -152,8 +154,9 @@ class MainFolder:
             return
         lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
         data = MainFolderListModel(main_folder_list=lst)
+        data = data.model_dump()
         with open(cls.json_file, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data.model_dump(), indent=4, ensure_ascii=False))
+            f.write(json.dumps(data), indent=4, ensure_ascii=False)
 
     @classmethod
     def validate(cls, json_data: dict):
