@@ -80,14 +80,15 @@ class UListWidgetItem(QListWidgetItem):
 
 
 class ULabel(QLabel):
-    def __init__(self, dir_item: os.DirEntry):
+    def __init__(self, dir_item: os.DirEntry, backup_type: BackupType):
         super().__init__()
         self.dir_item = dir_item
+        self.backup_type = backup_type
         self.setText(self.dir_item.name)
         self.setStyleSheet("padding-left: 2px;")
 
     def open_view_win(self):
-        self.view_win = ViewBackupWin(self.dir_item)
+        self.view_win = ViewBackupWin(self.dir_item, self.backup_type)
         self.view_win.adjustSize()
         self.view_win.center_relative_parent(self.window())
         self.view_win.show()
@@ -137,7 +138,7 @@ class WinBackups(WinSystem):
 
         for dir_item in validated_list:
             item = UListWidgetItem(self.list_widget)
-            label = ULabel(dir_item)
+            label = ULabel(dir_item, self.backup_type)
             self.list_widget.addItem(item)
             self.list_widget.setItemWidget(item, label)
 

@@ -138,12 +138,13 @@ class MainFolder:
                     ]
                     if len(MainFolder.list_) == 0:
                         raise Exception("MainFolder.list_ пуст")
+                    else:
+                        MainFolder.current = MainFolder.list_[0]
             except Exception as e:
                 MainFolderErrors.was = True
                 MainUtils.print_error()
-                cls.list_ = cls.miuz_main_folders()
+                # cls.list_ = cls.miuz_main_folders()
 
-        MainFolder.current = MainFolder.list_[0]
 
     @classmethod
     def write_json_data(cls):

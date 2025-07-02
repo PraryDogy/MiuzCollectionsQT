@@ -20,6 +20,7 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
+from .win_backups import BackupType, WinBackups
 from .win_dates import WinDates
 from .win_downloads import WinDownloads
 from .win_remove_files import RemoveFilesWin
@@ -60,6 +61,11 @@ class WinMain(UMainWindow):
         self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
         self.setMinimumWidth(750)
         self.setMenuBar(BarMacos())
+
+        if self.check_errors():
+            QTimer.singleShot(100, lambda: self.check_errors_timer(argv))
+            return
+
         self.set_window_title()
 
         h_wid_main = QWidget()
@@ -126,29 +132,34 @@ class WinMain(UMainWindow):
         self.scaner_timer.timeout.connect(self.start_scaner_task)
         self.scaner_task: ScanerTask | None = None
         self.scaner_task_canceled = False
-
-        if argv[-1] != self.argv_flag:
-            self.start_scaner_task()
-
-        QTimer.singleShot(100, self.check_connection)
-        QTimer.singleShot(200, self.check_main_folders)
-        QTimer.singleShot(300, self.check_user_filters)
-
-        QTimer.singleShot(100, self.open_backup_win)
-            
-    def open_backup_win(self):
-        from .win_backups import WinBackups
-        self.win_backups = WinBackups("main_folders")
+     
+    def open_backup_win(self, backup_type: BackupType):
+        self.win_backups = WinBackups(backup_type)
         self.win_backups.center_relative_parent(self)
         self.win_backups.show()
 
+    def check_errors(self):
+        if MainFolderErrors.was or UserFilterErrors.was:
+            return True
+        else:
+            return False
 
-    def check_connection(self):
-        main_folder = MainFolder.current.is_available()
-        if not main_folder:
-            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
-            self.win_warn.center_relative_parent(self)
-            self.win_warn.show()
+    def check_errors_timer(self, argv: list):
+        if MainFolderErrors.was:
+            self.open_backup_win(BackupType.main_folder)
+            return True
+        elif UserFilterErrors.was:
+            self.open_backup_win(BackupType.user_filter)
+            return True
+        elif argv[-1] != self.argv_flag:
+            self.start_scaner_task()
+
+            main_folder = MainFolder.current.is_available()
+            if not main_folder:
+                self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+                self.win_warn.center_relative_parent(self)
+                self.win_warn.show()
+            return False
 
     def check_main_folders(self):
         if MainFolderErrors.was:
