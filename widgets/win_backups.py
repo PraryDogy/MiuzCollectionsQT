@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Literal
 
@@ -9,10 +10,10 @@ from PyQt5.QtWidgets import (QLabel, QListWidget, QListWidgetItem, QPushButton,
 from cfg import Static
 from system.lang import Lang
 from system.main_folder import MainFolder
-import json
-from ._base_widgets import (SvgBtn, UHBoxLayout, UTextEdit, UVBoxLayout,
-                            WinSystem)
 
+from ._base_widgets import (SvgBtn, UHBoxLayout, UMenu, UTextEdit, UVBoxLayout,
+                            WinSystem)
+from .actions import OpenInView
 
 class ViewBackupWin(WinSystem):
     def __init__(self, dir_item = os.DirEntry):
@@ -76,6 +77,17 @@ class ULabel(QLabel):
     def mouseDoubleClickEvent(self, a0):
         self.open_view_win()
         return super().mouseDoubleClickEvent(a0)
+    
+    def contextMenuEvent(self, ev):
+        self.cont_menu = UMenu(ev)
+
+        view = OpenInView(self.cont_menu)
+        view._clicked.connect(self.open_view_win)
+        self.cont_menu.addAction(view)
+
+        self.cont_menu.show_()
+
+        return super().contextMenuEvent(ev)
 
 
 class WinBackups(WinSystem):
@@ -111,14 +123,10 @@ class WinBackups(WinSystem):
 
         ok_btn = QPushButton(text=Lang.ok)
         ok_btn.setFixedWidth(90)
-        ok_btn.clicked.connect(self.close)
+        ok_btn.clicked.connect(self.ok_cmd)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setFocus()
-
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-            self.deleteLater()
 
     def validate_backup_list(self, backup_list: os.DirEntry) -> list[os.DirEntry]:
         validated_list: list[os.DirEntry] = []
@@ -140,3 +148,12 @@ class WinBackups(WinSystem):
             for i in os.scandir(Static.APP_SUPPORT_BACKUP)
             if self.type in i.name
         ]
+    
+    def ok_cmd(self):
+        "закрыавмем апп"
+        "копируем выбранный бекап файл в директорию"
+        "стартуем новый аапп"
+        self.deleteLater()
+    
+    def closeEvent(self, a0):
+        a0.ignore()
