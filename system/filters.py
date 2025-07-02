@@ -62,7 +62,7 @@ class UserFilter:
         try:
             with open(UserFilter.json_file, "r", encoding="utf-8") as f:
                 json_data: dict = json.load(f)
-                validated = UserFilterListModel(**json_data)
+                validated = cls.validate(json_data)
                 UserFilter.list_ = [
                     cls.from_model(i)
                     for i in validated.user_filter_list
@@ -71,6 +71,10 @@ class UserFilter:
             UserFilterErrors.was = True
             MainUtils.print_error()
             UserFilter.list_ = cls.default_user_filters()
+
+    @classmethod
+    def validate(cls, json_data: dict):
+        return UserFilterListModel(**json_data)
 
     @classmethod
     def write_json_data(cls):

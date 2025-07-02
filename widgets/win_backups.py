@@ -97,6 +97,8 @@ class ULabel(QLabel):
 
 class WinBackups(WinSystem):
     list_item_h = 25
+    main_folders_type = "main_folders"
+    user_filters_type = "user_filters"
 
     def __init__(self, type: Literal["main_folders", "user_filters"]):
         super().__init__()
@@ -140,7 +142,12 @@ class WinBackups(WinSystem):
             try:
                 with open(i.path, "r", encoding="utf-8") as f:
                     json_data: dict = json.load(f)
-                    MainFolder.validate(json_data)
+
+                    if self.type == self.main_folders_type:
+                        MainFolder.validate(json_data)
+                    else:
+                        UserFilter.validate(json_data)
+
                     validated_list.append(i)
             except Exception as e:
                 continue
@@ -163,7 +170,7 @@ class WinBackups(WinSystem):
         u_label: ULabel = self.list_widget.itemWidget(item)
         dir_item = u_label.dir_item
 
-        if self.type == "main_folder":
+        if self.type == self.main_folders_type:
             old_file = MainFolder.json_file
         else:
             old_file = UserFilter.json_file
