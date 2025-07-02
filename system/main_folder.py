@@ -29,6 +29,20 @@ class MainFolder:
     __slots__ = ["name", "paths", "stop_list", "curr_path"]
 
     def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str):
+        super().__init__()
+        self.name = name
+        self.paths = paths
+        self.stop_list = stop_list
+        self.curr_path: str = curr_path
+
+
+class MainFolder:
+    current: "MainFolder" = None
+    list_: list["MainFolder"] = []
+    json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
+    __slots__ = ["name", "paths", "stop_list", "curr_path"]
+
+    def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str):
         """
         curr_path (str): Актуальный, проверенный путь к папке из списка `paths`.
 
