@@ -132,6 +132,25 @@ class WinMain(UMainWindow):
         self.scaner_timer.timeout.connect(self.start_scaner_task)
         self.scaner_task: ScanerTask | None = None
         self.scaner_task_canceled = False
+
+        self.backup_timer = QTimer(self)
+        self.backup_timer.timeout.connect(lambda: self.do_backup())
+        self.backup_timer.start(10 * 60 * 1000)
+
+        self.do_backup()
+
+        if argv[-1] != self.argv_flag:
+            self.start_scaner_task()
+        
+        main_folder = MainFolder.current.is_available()
+        if not main_folder:
+            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_warn.center_relative_parent(self)
+            self.win_warn.show()
+
+    def do_backup(self):
+        MainFolder.do_backup()
+        UserFilter.do_backup()
      
     def open_backup_win(self, backup_type: BackupType):
         self.win_backups = WinBackups(backup_type)
@@ -144,18 +163,11 @@ class WinMain(UMainWindow):
         else:
             return False
 
-    def check_errors_timer(self, argv: list):
+    def check_errors_timer(self):
         if MainFolderErrors.was:
             self.open_backup_win(BackupType.main_folder)
         elif UserFilterErrors.was:
             self.open_backup_win(BackupType.user_filter)
-        elif argv[-1] != self.argv_flag:
-            self.start_scaner_task()
-            main_folder = MainFolder.current.is_available()
-            if not main_folder:
-                self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
-                self.win_warn.center_relative_parent(self)
-                self.win_warn.show()
 
     def start_scaner_task(self):
         """
