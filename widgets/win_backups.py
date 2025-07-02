@@ -1,19 +1,24 @@
 import json
 import os
+import shutil
 from typing import Literal
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import (QLabel, QListWidget, QListWidgetItem, QPushButton,
-                             QSpacerItem, QWidget)
+from PyQt5.QtWidgets import (QApplication, QLabel, QListWidget,
+                             QListWidgetItem, QPushButton, QSpacerItem,
+                             QWidget)
 
 from cfg import Static
 from system.lang import Lang
 from system.main_folder import MainFolder
+from system.filters import UserFilter
+from system.utils import MainUtils
 
 from ._base_widgets import (SvgBtn, UHBoxLayout, UMenu, UTextEdit, UVBoxLayout,
                             WinSystem)
 from .actions import OpenInView
+
 
 class ViewBackupWin(WinSystem):
     def __init__(self, dir_item = os.DirEntry):
@@ -121,10 +126,10 @@ class WinBackups(WinSystem):
             self.list_widget.addItem(item)
             self.list_widget.setItemWidget(item, label)
 
-        ok_btn = QPushButton(text=Lang.ok)
-        ok_btn.setFixedWidth(90)
-        ok_btn.clicked.connect(self.ok_cmd)
-        self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        apply_btn = QPushButton(text=Lang.apply)
+        apply_btn.setFixedWidth(90)
+        apply_btn.clicked.connect(self.apply_cmd)
+        self.central_layout.addWidget(apply_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setFocus()
 
@@ -149,16 +154,28 @@ class WinBackups(WinSystem):
             if self.type in i.name
         ]
     
-    def ok_cmd(self):
+    def apply_cmd(self):
         item = self.list_widget.currentItem()
+
+        if item is None:
+            return
+
         u_label: ULabel = self.list_widget.itemWidget(item)
         dir_item = u_label.dir_item
 
+        if self.type == "main_folder":
+            old_file = MainFolder.json_file
+        else:
+            old_file = UserFilter.json_file
 
-        "закрыавмем апп"
-        "копируем выбранный бекап файл в директорию"
-        "стартуем новый аапп"
-        self.deleteLater()
+        os.remove(old_file)
+        shutil.copyfile(dir_item.path, old_file)
+
+        self.hide()
+
+        QApplication.quit()
+        MainUtils.start_new_app()
     
     def closeEvent(self, a0):
-        a0.ignore()
+        # a0.ignore()
+        ...
