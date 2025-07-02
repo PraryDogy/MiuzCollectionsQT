@@ -133,7 +133,16 @@ class WinMain(UMainWindow):
         QTimer.singleShot(100, self.check_connection)
         QTimer.singleShot(200, self.check_main_folders)
         QTimer.singleShot(300, self.check_user_filters)
+
+        QTimer.singleShot(100, self.open_backup_win)
             
+    def open_backup_win(self):
+        from .win_backups import WinBackups
+        self.win_backups = WinBackups("main_folders")
+        self.win_backups.center_relative_parent(self)
+        self.win_backups.show()
+
+
     def check_connection(self):
         main_folder = MainFolder.current.is_available()
         if not main_folder:

@@ -131,7 +131,7 @@ class MainFolder:
             try:
                 with open(cls.json_file, "r", encoding="utf-8") as f:
                     json_data: dict = json.load(f)
-                    validated = MainFolderListModel(**json_data)
+                    validated = cls.validate(json_data)
                     MainFolder.list_ = [
                         cls.from_model(m)
                         for m in validated.main_folder_list
@@ -152,6 +152,9 @@ class MainFolder:
         with open(cls.json_file, "w", encoding="utf-8") as f:
             f.write(json.dumps(data.model_dump(), indent=4, ensure_ascii=False))
 
+    @classmethod
+    def validate(cls, json_data: dict):
+        return MainFolderListModel(**json_data)
 
     @classmethod
     def miuz_main_folders(cls) -> list["MainFolder"]:
