@@ -14,26 +14,12 @@ from ._base_widgets import (SvgBtn, UHBoxLayout, UTextEdit, UVBoxLayout,
                             WinSystem)
 
 
-class MainFolderLabel(QLabel):
-    def __init__(self, main_folder: MainFolder):
-        super().__init__()
-        self.main_folder = main_folder
-
-        rows = [
-            self.main_folder.name,
-            *self.main_folder.paths,
-            *self.main_folder.stop_list
-        ]
-
-        text = "\n".join(rows)
-
-        self.setText(text)
-
-
 class ViewBackupWin(WinSystem):
     def __init__(self, dir_item = os.DirEntry):
         super().__init__()
         self.dir_item = dir_item
+        self.central_layout.setSpacing(0)
+        self.setWindowTitle(self.dir_item.name)
 
         with open(self.dir_item.path, "r", encoding="utf-8") as f:
             json_data: dict = json.load(f)
@@ -43,11 +29,27 @@ class ViewBackupWin(WinSystem):
                 for m in validated.main_folder_list
             ]
 
-        for main_folder in main_folder_list:
-            lbl = MainFolderLabel(main_folder)
-            self.central_layout.addWidget(lbl)
+        text_edit = UTextEdit()
+        self.central_layout.addWidget(text_edit)
         
-        self.adjustSize()
+        general_rows = []
+        for main_folder in main_folder_list:
+            rows = [
+                main_folder.name,
+                *main_folder.paths,
+                *main_folder.stop_list,
+            ]
+            for i in rows:
+                general_rows.append(i)
+            general_rows.append("\n")
+        text_edit.setText("\n".join(general_rows))
+
+        self.setFixedSize(400, 400)
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
 
 
 class UListWidgetItem(QListWidgetItem):
