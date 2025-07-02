@@ -51,6 +51,7 @@ class UserFilter:
     def do_backup(cls):
         if not os.path.exists(Static.APP_SUPPORT_BACKUP):
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
+        cls.remove_backups()
 
         now = datetime.now().replace(microsecond=0)
         now = now.strftime("%Y-%m-%d %H-%M-%S") 
@@ -64,11 +65,10 @@ class UserFilter:
         lst: list[UserFilterItemModel] = [item.to_model() for item in cls.list_]
         data = UserFilterListModel(user_filter_list=lst)
         data = data.model_dump()
-
-        cls.remove_backups()
+        data = json.dumps(data, indent=4, ensure_ascii=False)
 
         with open(filepath, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data, indent=4, ensure_ascii=False))
+            f.write(data)
 
     @classmethod
     def remove_backups(cls):
@@ -120,8 +120,9 @@ class UserFilter:
             return
         lst: list[UserFilterItemModel] = [item.to_model() for item in cls.list_]
         data = UserFilterListModel(user_filter_list=lst)
+        data = json.dumps(data.model_dump(), indent=4, ensure_ascii=False)
         with open(cls.json_file, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data.model_dump(), indent=4, ensure_ascii=False))
+            f.write(data)
 
     @classmethod
     def default_user_filters(cls) -> list["UserFilter"]:

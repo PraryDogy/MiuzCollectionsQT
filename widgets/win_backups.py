@@ -37,30 +37,33 @@ class ViewBackupWin(WinSystem):
             json_data: dict = json.load(f)
             if self.backup_type == BackupType.main_folder:
                 validated = MainFolder.validate(json_data)
-                main_folder_list = [
+                items_list = [
                     MainFolder.from_model(m)
                     for m in validated.main_folder_list
                 ]
             else:
                 validated = UserFilter.validate(json_data)
-                main_folder_list = [
+                items_list = [
                     UserFilter.from_model(m)
-                    for m in validated.main_folder_list
+                    for m in validated.user_filter_list
                 ]
 
         text_edit = UTextEdit()
         self.central_layout.addWidget(text_edit)
         
         general_rows = []
-        for main_folder in main_folder_list:
-            rows = [
-                main_folder.name,
-                *main_folder.paths,
-                *main_folder.stop_list,
-            ]
-            for i in rows:
-                general_rows.append(i)
-            general_rows.append("\n")
+
+        if self.backup_type == BackupType.main_folder:
+            for item in items_list:
+                rows = [item.name, *item.paths, *item.stop_list]
+                general_rows.extend(rows)
+                general_rows.append("")  # пустая строка вместо "\n"
+        else:
+            for item in items_list:
+                rows = [*item.lang_names, item.dir_name, str(item.value)]
+                general_rows.extend(rows)
+                general_rows.append("")
+
         text_edit.setText("\n".join(general_rows))
 
         self.setFixedSize(400, 400)

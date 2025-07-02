@@ -100,6 +100,7 @@ class MainFolder:
     def do_backup(cls):
         if not os.path.exists(Static.APP_SUPPORT_BACKUP):
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
+        cls.remove_backups()
 
         now = datetime.now().replace(microsecond=0)
         now = now.strftime("%Y-%m-%d %H-%M-%S") 
@@ -113,11 +114,10 @@ class MainFolder:
         lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
         data = MainFolderListModel(main_folder_list=lst)
         data = data.model_dump()
-
-        cls.remove_backups()
+        data = json.dumps(data, indent=4, ensure_ascii=False)
 
         with open(filepath, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data, indent=4, ensure_ascii=False))
+            f.write(data)
 
     @classmethod
     def remove_backups(cls):
@@ -170,8 +170,9 @@ class MainFolder:
         lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
         data = MainFolderListModel(main_folder_list=lst)
         data = data.model_dump()
+        data = json.dumps(data, indent=4, ensure_ascii=False)
         with open(cls.json_file, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data), indent=4, ensure_ascii=False)
+            f.write(data)
 
     @classmethod
     def validate(cls, json_data: dict):
