@@ -107,14 +107,15 @@ class MainFolder:
         filename = f"{now} main_folders.json"
         filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
 
-        cls.write_json_data()
+        if not MainFolder.list_:
+            return
 
-        # lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
-        # data = MainFolderListModel(main_folder_list=lst)
-        # data = data.model_dump()
+        lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
+        data = MainFolderListModel(main_folder_list=lst)
+        data = data.model_dump()
 
-        # with open(filepath, "w", encoding="utf-8") as f:
-        #     f.write(json.dumps(data, indent=4, ensure_ascii=False))
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(json.dumps(data, indent=4, ensure_ascii=False))
 
     @classmethod
     def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
