@@ -62,8 +62,8 @@ class WinMain(UMainWindow):
         self.setMinimumWidth(750)
         self.setMenuBar(BarMacos())
 
-        if self.check_errors():
-            QTimer.singleShot(100, lambda: self.check_errors_timer(argv))
+        if self.json_errors():
+            QTimer.singleShot(100, lambda: self.json_errors_delayed())
             return
 
         self.set_window_title()
@@ -157,13 +157,13 @@ class WinMain(UMainWindow):
         self.win_backups.center_relative_parent(self)
         self.win_backups.show()
 
-    def check_errors(self):
+    def json_errors(self):
         if MainFolderErrors.was or UserFilterErrors.was:
             return True
         else:
             return False
 
-    def check_errors_timer(self):
+    def json_errors_delayed(self):
         if MainFolderErrors.was:
             self.open_backup_win(BackupType.main_folder)
         elif UserFilterErrors.was:
