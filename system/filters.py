@@ -100,7 +100,7 @@ class UserFilter:
     @classmethod
     def init(cls):
         if not os.path.exists(UserFilter.json_file):
-            UserFilter.list_ = cls.default_user_filters()
+            cls.set_default_filters()
         else:
             try:
                 with open(UserFilter.json_file, "r", encoding="utf-8") as f:
@@ -115,7 +115,7 @@ class UserFilter:
                 if cls.get_backups():
                     UserFilterErrors.was = True
                 else:
-                    UserFilter.list_ = cls.default_user_filters()
+                    cls.set_default_filters()
             
     @classmethod
     def validate(cls, json_data: dict):
@@ -134,7 +134,7 @@ class UserFilter:
             f.write(data)
 
     @classmethod
-    def default_user_filters(cls) -> list["UserFilter"]:
+    def set_default_filters(cls) -> list["UserFilter"]:
         product = UserFilter(
             ["Продукт", "Product"],
             "1 IMG",
@@ -147,7 +147,7 @@ class UserFilter:
             False,
         )
 
-        return [product, model]
+        cls.list_ = [product, model]
 
 
 class SystemFilter:
