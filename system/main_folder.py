@@ -100,11 +100,17 @@ class MainFolder:
     def do_backup(cls):
         if not os.path.exists(Static.APP_SUPPORT_BACKUP):
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
+
+        now = datetime.now().replace(microsecond=0)
+        filename = f"{now} main_folders.json"
+        filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
+
         lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
         data = MainFolderListModel(main_folder_list=lst)
-        backup_path = os.path.join(Static.APP_SUPPORT_BACKUP, "main_folders.json")
-        with open(backup_path, "w", encoding="utf-8") as f:
-            f.write(json.dumps(data.model_dump(), indent=4, ensure_ascii=False))
+        data = data.model_dump()
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(json.dumps(data, indent=4, ensure_ascii=False))
 
     @classmethod
     def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
