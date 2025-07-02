@@ -810,7 +810,7 @@ class WinSettings(WinSystem):
         self.first_tab()
         self.second_tab()
         self.btns_wid()
-        self.setFixedSize(420, 500)
+        self.setFixedSize(420, 540)
 
     def reset_data_cmd(self):
         self.reset_data = True
