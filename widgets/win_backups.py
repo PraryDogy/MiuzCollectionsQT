@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from enum import Enum
 from typing import Literal
 
 from PyQt5.QtCore import QSize, Qt
@@ -10,30 +11,42 @@ from PyQt5.QtWidgets import (QApplication, QLabel, QListWidget,
                              QWidget)
 
 from cfg import Static
+from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.filters import UserFilter
 from system.utils import MainUtils
 
-from ._base_widgets import (SvgBtn, UHBoxLayout, UMenu, UTextEdit, UVBoxLayout,
-                            WinSystem)
+from ._base_widgets import UMenu, UTextEdit, WinSystem
 from .actions import OpenInView
 
 
+class BackupType(str, Enum):
+    main_folder = "main_folder"
+    user_filter = "user_filter"
+
+
 class ViewBackupWin(WinSystem):
-    def __init__(self, dir_item = os.DirEntry):
+    def __init__(self, dir_item: os.DirEntry, backup_type: BackupType):
         super().__init__()
         self.dir_item = dir_item
+        self.backup_type = backup_type
         self.central_layout.setSpacing(0)
         self.setWindowTitle(self.dir_item.name)
 
         with open(self.dir_item.path, "r", encoding="utf-8") as f:
             json_data: dict = json.load(f)
-            validated = MainFolder.validate(json_data)
-            main_folder_list = [
-                MainFolder.from_model(m)
-                for m in validated.main_folder_list
-            ]
+            if self.backup_type == BackupType.main_folder:
+                validated = MainFolder.validate(json_data)
+                main_folder_list = [
+                    MainFolder.from_model(m)
+                    for m in validated.main_folder_list
+                ]
+            else:
+                validated = UserFilter.validate(json_data)
+                main_folder_list = [
+                    UserFilter.from_model(m)
+                    for m in validated.main_folder_list
+                ]
 
         text_edit = UTextEdit()
         self.central_layout.addWidget(text_edit)
@@ -100,9 +113,9 @@ class WinBackups(WinSystem):
     main_folders_type = "main_folders"
     user_filters_type = "user_filters"
 
-    def __init__(self, type: Literal["main_folders", "user_filters"]):
+    def __init__(self, backup_type: BackupType):
         super().__init__()
-        self.type = type
+        self.backup_type = backup_type
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
@@ -143,7 +156,7 @@ class WinBackups(WinSystem):
                 with open(i.path, "r", encoding="utf-8") as f:
                     json_data: dict = json.load(f)
 
-                    if self.type == self.main_folders_type:
+                    if self.backup_type == BackupType.main_folder:
                         MainFolder.validate(json_data)
                     else:
                         UserFilter.validate(json_data)
@@ -158,7 +171,7 @@ class WinBackups(WinSystem):
         return [
             i
             for i in os.scandir(Static.APP_SUPPORT_BACKUP)
-            if self.type in i.name
+            if self.backup_type in i.name
         ]
     
     def apply_cmd(self):
@@ -170,7 +183,7 @@ class WinBackups(WinSystem):
         u_label: ULabel = self.list_widget.itemWidget(item)
         dir_item = u_label.dir_item
 
-        if self.type == self.main_folders_type:
+        if self.backup_type == BackupType.main_folder:
             old_file = MainFolder.json_file
         else:
             old_file = UserFilter.json_file
