@@ -17,6 +17,7 @@ from system.utils import MainUtils
 
 from ._base_widgets import (UHBoxLayout, ULineEdit, UMenu, UTextEdit,
                             UVBoxLayout, WinSystem)
+from .win_backups import BackupType, WinBackups
 from .win_help import WinHelp
 
 LIST_ITEM_H = 25
@@ -560,6 +561,26 @@ class MainFolderWid(QGroupBox):
         remove_descr = QLabel(Lang.delete_main_folder)
         second_lay.addWidget(remove_descr)
 
+        third_row = QWidget()
+        v_lay.addWidget(third_row)
+
+        third_lay = UHBoxLayout()
+        third_lay.setSpacing(15)
+        third_row.setLayout(third_lay)
+
+        restore_btn = QPushButton(Lang.restore)
+        restore_btn.clicked.connect(self.open_backup_win)
+        restore_btn.setFixedWidth(115)
+        third_lay.addWidget(restore_btn)
+
+        restore_descr = QLabel(Lang.restore_main_folder)
+        third_lay.addWidget(restore_descr)
+
+    def open_backup_win(self):
+        self.backup_win = WinBackups(BackupType.main_folder, True)
+        self.backup_win.center_relative_parent(self.window())
+        self.backup_win.show()
+
     def add_btn_cmd(self, *args):
         self.add_main_folder_win = AddMainFolderWin(self.main_folder_list_copy)
         self.add_main_folder_win.changed.connect(lambda: self.changed.emit())
@@ -789,7 +810,7 @@ class WinSettings(WinSystem):
         self.first_tab()
         self.second_tab()
         self.btns_wid()
-        self.setFixedWidth(420)
+        self.setFixedSize(420, 500)
 
     def reset_data_cmd(self):
         self.reset_data = True

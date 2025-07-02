@@ -629,6 +629,16 @@ class _Lang:
         "Choose backup file."
     ]
 
+    restore = [
+        "Восстановить",
+        "Restore"
+    ]
+
+    restore_main_folder = [
+        "Восстановить предыдущие настройки",
+        "Restore previous settings"
+    ]
+
 class Lang(_Lang):
 
     @classmethod

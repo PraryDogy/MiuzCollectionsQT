@@ -117,10 +117,11 @@ class WinBackups(WinSystem):
     main_folders_type = "main_folders"
     user_filters_type = "user_filters"
 
-    def __init__(self, backup_type: BackupType):
+    def __init__(self, backup_type: BackupType, can_close: bool = False):
         super().__init__()
         self.setWindowTitle(Lang.read_file_error)
         self.backup_type = backup_type
+        self.can_close = can_close
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
@@ -208,5 +209,6 @@ class WinBackups(WinSystem):
         MainUtils.start_new_app()
     
     def closeEvent(self, a0):
-        # a0.ignore()
+        if not self.can_close:
+            a0.ignore()
         ...
