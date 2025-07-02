@@ -217,16 +217,18 @@ class JsonData:
 
     @classmethod
     def validate_json_data(cls):
-        if not os.path.exists(Static.APP_SUPPORT_JSON_DATA):
+        path = Static.APP_SUPPORT_JSON_DATA
+        if not os.path.exists(path):
             return None
-        with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding='utf-8') as f:
-            json_data: dict = json.load(f)
-            try:
-                return JsonDataModel(**json_data)
-            except Exception:
-                print(traceback.format_exc())
-                return None
 
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return JsonDataModel(**data)
+        except Exception:
+            print("Ошибка валидации JSON:")
+            print(traceback.format_exc())
+            return None
 
     @classmethod
     def check_dirs(cls):
