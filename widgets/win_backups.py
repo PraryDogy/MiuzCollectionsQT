@@ -153,7 +153,6 @@ class WinBackups(WinSystem):
             self.list_widget.setItemWidget(item, label)
 
         apply_btn = QPushButton(text=Lang.apply)
-        apply_btn.setFixedWidth(90)
         apply_btn.clicked.connect(self.apply_cmd)
         self.central_layout.addWidget(apply_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -212,3 +211,8 @@ class WinBackups(WinSystem):
         if not self.can_close:
             a0.ignore()
         ...
+
+    def keyPressEvent(self, a0):
+        if self.can_close and a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
