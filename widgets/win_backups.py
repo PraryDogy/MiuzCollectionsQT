@@ -106,20 +106,20 @@ class WinBackups(WinSystem):
         descr = QLabel("Выберите резервную копию")
         self.central_layout.addWidget(descr)
 
-        list_widget = QListWidget(self)
-        list_widget.horizontalScrollBar().setDisabled(True)
-        list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.central_layout.addWidget(list_widget)
+        self.list_widget = QListWidget(self)
+        self.list_widget.horizontalScrollBar().setDisabled(True)
+        self.list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.central_layout.addWidget(self.list_widget)
 
         backups = self.get_backup_list()
         validated_list = self.validate_backup_list(backups)
         validated_list = sorted(validated_list, key=lambda d: d.stat().st_mtime, reverse=True)
 
         for dir_item in validated_list:
-            item = UListWidgetItem(list_widget)
+            item = UListWidgetItem(self.list_widget)
             label = ULabel(dir_item)
-            list_widget.addItem(item)
-            list_widget.setItemWidget(item, label)
+            self.list_widget.addItem(item)
+            self.list_widget.setItemWidget(item, label)
 
         ok_btn = QPushButton(text=Lang.ok)
         ok_btn.setFixedWidth(90)
@@ -150,6 +150,11 @@ class WinBackups(WinSystem):
         ]
     
     def ok_cmd(self):
+        item = self.list_widget.currentItem()
+        u_label: ULabel = self.list_widget.itemWidget(item)
+        dir_item = u_label.dir_item
+
+
         "закрыавмем апп"
         "копируем выбранный бекап файл в директорию"
         "стартуем новый аапп"
