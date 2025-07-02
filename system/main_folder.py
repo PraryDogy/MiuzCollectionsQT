@@ -114,8 +114,22 @@ class MainFolder:
         data = MainFolderListModel(main_folder_list=lst)
         data = data.model_dump()
 
+        cls.remove_backups()
+
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(json.dumps(data, indent=4, ensure_ascii=False))
+
+    @classmethod
+    def remove_backups(cls):
+        entries = [entry for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
+                if entry.is_file() and "main_folders" in entry.name]
+        entries.sort(key=lambda e: e.stat().st_mtime, reverse=True)
+        to_delete = entries[20:]
+        for entry in to_delete:
+            try:
+                os.remove(entry.path)
+            except Exception as ex:
+                continue
 
     @classmethod
     def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
