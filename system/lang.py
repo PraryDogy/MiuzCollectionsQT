@@ -624,9 +624,9 @@ class _Lang:
         "Error file read"
     ]
 
-    restored_by_default = [
-        "восстановлен по умолчанию.",
-        "restored by default."
+    choose_backup = [
+        "Выберите файл резервной копии.",
+        "Choose backup file."
     ]
 
 class Lang(_Lang):

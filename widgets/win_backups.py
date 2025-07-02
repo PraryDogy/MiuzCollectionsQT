@@ -116,6 +116,7 @@ class WinBackups(WinSystem):
 
     def __init__(self, backup_type: BackupType):
         super().__init__()
+        self.setWindowTitle(Lang.read_file_error)
         self.backup_type = backup_type
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
@@ -124,7 +125,12 @@ class WinBackups(WinSystem):
         self.setFixedSize(350, 400)
 
     def init_ui(self):
-        descr = QLabel("Выберите резервную копию")
+        if self.backup_type == BackupType.main_folder:
+            text = f"{Lang.read_file_error} main_folder.json\n{Lang.choose_backup}"
+        else:
+            text = f"{Lang.read_file_error} user_filrters.json\n{Lang.choose_backup}"
+
+        descr = QLabel(text)
         self.central_layout.addWidget(descr)
 
         self.list_widget = QListWidget(self)
@@ -163,6 +169,7 @@ class WinBackups(WinSystem):
                         UserFilter.validate(json_data)
 
                     validated_list.append(i)
+
             except Exception as e:
                 continue
 

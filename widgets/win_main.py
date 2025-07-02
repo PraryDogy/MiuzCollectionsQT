@@ -147,37 +147,15 @@ class WinMain(UMainWindow):
     def check_errors_timer(self, argv: list):
         if MainFolderErrors.was:
             self.open_backup_win(BackupType.main_folder)
-            return True
         elif UserFilterErrors.was:
             self.open_backup_win(BackupType.user_filter)
-            return True
         elif argv[-1] != self.argv_flag:
             self.start_scaner_task()
-
             main_folder = MainFolder.current.is_available()
             if not main_folder:
                 self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
                 self.win_warn.center_relative_parent(self)
                 self.win_warn.show()
-            return False
-
-    def check_main_folders(self):
-        if MainFolderErrors.was:
-            title = f"{Lang.read_file_error} main_folder.json"
-            text = f"main_folder.json {Lang.restored_by_default}"
-            text = "\n".join((title, text))
-            self.win_folder_error = WinWarn(Lang.error, text)
-            self.win_folder_error.center_relative_parent(self)
-            self.win_folder_error.show()
-
-    def check_user_filters(self):
-        if UserFilterErrors.was:
-            title = f"{Lang.read_file_error} user_filters.json"
-            text = f"user_filters.json {Lang.restored_by_default}"
-            text = "\n".join((title, text))
-            self.win_filter_error = WinWarn(Lang.error, text)
-            self.win_filter_error.center_relative_parent(self)
-            self.win_filter_error.show()
 
     def start_scaner_task(self):
         """
