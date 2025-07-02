@@ -102,6 +102,8 @@ class MainFolder:
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
 
         now = datetime.now().replace(microsecond=0)
+        now = now.strftime("%Y-%m-%d %H-%M-%S") 
+        
         filename = f"{now} main_folders.json"
         filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
 

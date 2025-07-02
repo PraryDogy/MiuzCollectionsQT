@@ -1,6 +1,9 @@
 from system.utils import MainUtils
-import datetime
+from datetime import datetime
 
 
 
-print(datetime.datetime.now().replace(microsecond=0))
+now = datetime.now().replace(microsecond=0)
+now = now.strftime("%Y-%m-%d %H-%M-%S") 
+
+print(now)
