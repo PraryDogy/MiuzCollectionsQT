@@ -150,8 +150,7 @@ class MainFolder:
     @classmethod
     def init(cls):
         if not os.path.exists(cls.json_file):
-            MainFolder.list_ = cls.miuz_main_folders()
-            MainFolder.current = MainFolder.list_[0]
+            cls.set_default_main_folders()
         else:
             try:
                 with open(cls.json_file, "r", encoding="utf-8") as f:
@@ -170,8 +169,7 @@ class MainFolder:
                 if cls.get_backups():
                     MainFolderErrors.was = True
                 else:
-                    MainFolder.list_ = cls.miuz_main_folders()
-                    MainFolder.current = MainFolder.list_[0]
+                    cls.set_default_main_folders()
 
     @classmethod
     def write_json_data(cls):
@@ -191,7 +189,7 @@ class MainFolder:
         return MainFolderListModel(**json_data)
 
     @classmethod
-    def miuz_main_folders(cls) -> list["MainFolder"]:
+    def set_default_main_folders(cls) -> list["MainFolder"]:
         miuz = MainFolder(
             "miuz",
             [
@@ -219,4 +217,5 @@ class MainFolder:
             ""
         )
 
-        return [miuz, panacea]
+        cls.list_ = [miuz, panacea]
+        cls.current = cls.list_[0]

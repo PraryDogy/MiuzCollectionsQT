@@ -123,10 +123,6 @@ class UserFilter:
 
     @classmethod
     def write_json_data(cls):
-        if not cls.list_:
-            print("Ошибка записи filters > UserFilter > write json data")
-            print("UserFilter.list_ пуст")
-            return
         lst: list[UserFilterItemModel] = [item.to_model() for item in cls.list_]
         data = UserFilterListModel(user_filter_list=lst)
         data = json.dumps(data.model_dump(), indent=4, ensure_ascii=False)
