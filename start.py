@@ -82,14 +82,6 @@ class App(QApplication):
         UThreadPool.init()
         ThemeChanger.init()
 
-        JsonData.write_json_data()
-
-
-        MainFolder.write_json_data()
-        MainFolder.do_backup()
-
-        UserFilter.write_json_data()
-
         icon_path = os.path.join(Static.INNER_IMAGES, "icon.icns")
         icon = QIcon(icon_path)
         self.setWindowIcon(icon)

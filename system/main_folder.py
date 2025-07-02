@@ -143,11 +143,11 @@ class MainFolder:
             except Exception as e:
                 MainFolderErrors.was = True
                 MainUtils.print_error()
-                # cls.list_ = cls.miuz_main_folders()
-
 
     @classmethod
     def write_json_data(cls):
+        if not cls.list_:
+            return
         lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
         data = MainFolderListModel(main_folder_list=lst)
         with open(cls.json_file, "w", encoding="utf-8") as f:
