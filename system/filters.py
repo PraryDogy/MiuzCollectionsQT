@@ -101,7 +101,7 @@ class UserFilter:
     def init(cls):
         if not os.path.exists(UserFilter.json_file):
             UserFilter.list_ = cls.default_user_filters()
-        else"
+        else:
             try:
                 with open(UserFilter.json_file, "r", encoding="utf-8") as f:
                     json_data: dict = json.load(f)
