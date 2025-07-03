@@ -118,9 +118,9 @@ class WinBackups(WinSystem):
 
     def init_ui(self):
         if self.backup_type == BackupType.main_folder:
-            text = f"{Lang.main_folder}\n{Lang.choose_backup}"
+            text = f"{Lang.read_file_error}: {Lang.main_folder}\n{Lang.choose_backup}"
         else:
-            text = f"{Lang.user_filter}\n{Lang.choose_backup}"
+            text = f"{Lang.read_file_error}: {Lang.user_filter}\n{Lang.choose_backup}"
 
         descr = QLabel(text)
         self.central_layout.addWidget(descr)
