@@ -123,23 +123,23 @@ class MainFolder:
             f.write(data)
 
     @classmethod
-    def get_backups(cls):
+    def get_backups(cls) -> list[os.DirEntry]:
         return [
-            entry
-            for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
+            entry for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
             if entry.is_file() and "main_folders" in entry.name
         ]
 
     @classmethod
     def remove_backups(cls, backups: list[os.DirEntry], limit: int = 20):
-        if len(backups) > limit:
-            backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
-            to_delete = backups[limit:]
-            for entry in to_delete:
-                try:
-                    os.remove(entry.path)
-                except Exception as ex:
-                    continue
+        if len(backups) <= limit:
+            return
+
+        backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
+        for entry in backups[limit:]:
+            try:
+                os.remove(entry.path)
+            except Exception:
+                pass  # Можно логировать, если нужно
 
     @classmethod
     def init(cls):
