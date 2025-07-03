@@ -54,28 +54,23 @@ class UserFilter:
 
     @classmethod
     def do_backup(cls):
-        if not os.path.exists(Static.APP_SUPPORT_BACKUP):
-            os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
+        os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
 
         backups = cls.get_backups()
         cls.remove_backups(backups)
 
-        now = datetime.now().replace(microsecond=0)
-        now = now.strftime("%Y-%m-%d %H-%M-%S") 
-        
-        filename = f"{now} user_filters.json"
-        filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
-
         if not cls.list_:
             return
 
-        lst: list[UserFilterItemModel] = [item.to_model() for item in cls.list_]
-        data = UserFilterListModel(user_filter_list=lst)
-        data = data.model_dump()
-        data = json.dumps(data, indent=4, ensure_ascii=False)
+        timestamp = datetime.now().replace(microsecond=0).strftime("%Y-%m-%d %H-%M-%S")
+        filename = f"{timestamp} user_filters.json"
+        filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
+
+        models = [item.to_model() for item in cls.list_]
+        data = UserFilterListModel(user_filter_list=models).model_dump()
 
         with open(filepath, "w", encoding="utf-8") as f:
-            f.write(data)
+            json.dump(data, f, indent=4, ensure_ascii=False)
 
     @classmethod
     def get_backups(cls):
@@ -87,34 +82,36 @@ class UserFilter:
 
     @classmethod
     def remove_backups(cls, backups: list[os.DirEntry], limit: int = 20):
-        if len(backups) > limit:
-            backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
-            to_delete = backups[20:]
-            for entry in to_delete:
-                try:
-                    os.remove(entry.path)
-                except Exception as ex:
-                    continue
+        if len(backups) <= limit:
+            return
+
+        backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
+        for entry in backups[limit:]:
+            try:
+                os.remove(entry.path)
+            except Exception:
+                pass  # логировать при необходимости
 
     @classmethod
     def init(cls):
         if not os.path.exists(cls.json_file):
             cls.set_default_filters()
-        else:
-            try:
-                with open(cls.json_file, "r", encoding="utf-8") as f:
-                    json_data: dict = json.load(f)
-                    validated = cls.validate(json_data)
-                    cls.list_ = [
-                        cls.from_model(i)
-                        for i in validated.user_filter_list
-                    ]
-            except Exception:
-                MainUtils.print_error()
-                if cls.get_backups():
-                    cls.validation_failed = True
-                else:
-                    cls.set_default_filters()
+            return
+
+        try:
+            with open(cls.json_file, "r", encoding="utf-8") as f:
+                json_data: dict = json.load(f)
+                user_filter_list_model = cls.validate(json_data)
+                cls.list_ = [
+                    cls.from_model(i)
+                    for i in user_filter_list_model.user_filter_list
+                ]
+        except Exception:
+            MainUtils.print_error()
+            if cls.get_backups():
+                cls.validation_failed = True
+            else:
+                cls.set_default_filters()
             
     @classmethod
     def validate(cls, json_data: dict):
