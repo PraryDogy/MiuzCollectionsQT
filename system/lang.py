@@ -639,6 +639,16 @@ class _Lang:
         "Restore previous settings"
     ]
 
+    main_folder = [
+        "Папка с коллекциями",
+        "Collections folder"
+    ]
+
+    user_filter = [
+        "Пользовательские фильтры",
+        "User filters"
+    ]
+
 class Lang(_Lang):
 
     @classmethod
