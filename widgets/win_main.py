@@ -137,12 +137,11 @@ class WinMain(UMainWindow):
         self.backup_timer.timeout.connect(lambda: self.do_backup())
         self.backup_timer.start(10 * 60 * 1000)
 
-        self.do_backup()
+        QTimer.singleShot(100, self.main_folder_check)
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
         
-        QTimer.singleShot(100, self.main_folder_check)
         
     def main_folder_check(self):
         main_folder = MainFolder.current.is_available()
