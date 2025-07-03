@@ -173,15 +173,14 @@ class MainFolder:
     @classmethod
     def write_json_data(cls):
         if not cls.list_:
-            print("Ошибка записи main_folder > MainFolter > write json data")
-            print("MainFolder.list_ пуст")
+            print("Ошибка записи main_folder > MainFolder > write_json_data")
             return
-        lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
-        data = MainFolderListModel(main_folder_list=lst)
-        data = data.model_dump()
-        data = json.dumps(data, indent=4, ensure_ascii=False)
+
+        models = [item.to_model() for item in cls.list_]
+        data = MainFolderListModel(main_folder_list=models).model_dump()
+
         with open(cls.json_file, "w", encoding="utf-8") as f:
-            f.write(data)
+            json.dump(data, f, indent=4, ensure_ascii=False)
 
     @classmethod
     def validate(cls, json_data: dict):
