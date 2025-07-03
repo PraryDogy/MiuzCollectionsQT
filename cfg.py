@@ -190,44 +190,39 @@ class JsonDataModel(BaseModel):
 
 class JsonData:
     app_ver: str = Static.APP_VER
-    lang_ind = 0
-    dark_mode = 0
+    lang_ind: int = 0
+    dark_mode: int = 0
     scaner_minutes: int = 5
 
     @classmethod
-    def set_json_data(cls) -> dict:
-        json_data = cls.validate_json_data()
-        if json_data:
-            for k, v in json_data.model_dump().items():
-                setattr(cls, k, v)
+    def set_json_data(cls) -> None:
+        model = cls.load_json_data()
+        if model:
+            cls.app_ver = model.app_ver
+            cls.lang_ind = model.lang_ind
+            cls.dark_mode = model.dark_mode
+            cls.scaner_minutes = model.scaner_minutes
         else:
             cls.write_json_data()
 
     @classmethod
-    def write_json_data(cls):
-        data = JsonDataModel(
+    def write_json_data(cls) -> None:
+        model = JsonDataModel(
             app_ver=cls.app_ver,
             lang_ind=cls.lang_ind,
             dark_mode=cls.dark_mode,
             scaner_minutes=cls.scaner_minutes,
         )
-        dict_data = data.model_dump()
         with open(Static.APP_SUPPORT_JSON_DATA, "w", encoding="utf-8") as f:
-            json.dump(dict_data, f, indent=4, ensure_ascii=False)
+            json.dump(model.model_dump(), f, indent=4, ensure_ascii=False)
 
     @classmethod
-    def validate_json_data(cls):
-        path = Static.APP_SUPPORT_JSON_DATA
-        if not os.path.exists(path):
-            return None
-
+    def load_json_data(cls) -> JsonDataModel | None:
         try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return JsonDataModel(**data)
-        except Exception:
-            print("Ошибка валидации JSON:")
-            print(traceback.format_exc())
+            with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as f:
+                return JsonDataModel(**json.load(f))
+        except Exception as e:
+            print("Ошибка при загрузке JSON:", e)
             return None
 
     @classmethod
