@@ -2,13 +2,13 @@
 import os
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import QLabel, QListWidget, QListWidgetItem, QWidget
+from PyQt5.QtWidgets import QLabel, QListWidget, QWidget
 
 from cfg import Dynamic, Static
 from system.lang import Lang
 from system.main_folder import MainFolder
 
-from ._base_widgets import UHBoxLayout, WinSystem
+from ._base_widgets import UHBoxLayout, UListWidgetItem, WinSystem
 from .menu_left import CollectionBtn, MenuLeft
 
 
@@ -101,8 +101,7 @@ class WinUpload(WinSystem):
         wid.setStyleSheet("padding-left: 5px;")
         cmd_ = lambda e, : self.list_widget_item_cmd(entry=self.coll_path)
         wid.mouseReleaseEvent = cmd_
-        list_item = QListWidgetItem()
-        list_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, WinUpload.h_))
+        list_item = UListWidgetItem(self.current_submenu)
         self.current_submenu.addItem(list_item)
         self.current_submenu.setItemWidget(list_item, wid)
 
@@ -111,8 +110,7 @@ class WinUpload(WinSystem):
             wid = QLabel(entry_.name)
             wid.setStyleSheet("padding-left: 5px;")
             wid.mouseReleaseEvent = lambda e, entry=entry_: self.list_widget_item_cmd(entry=entry)
-            list_item = QListWidgetItem()
-            list_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, WinUpload.h_))
+            list_item = UListWidgetItem(self.current_submenu)
             self.current_submenu.addItem(list_item)
             self.current_submenu.setItemWidget(list_item, wid)
 

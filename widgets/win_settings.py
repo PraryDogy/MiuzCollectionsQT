@@ -1,13 +1,14 @@
+import copy
 import os
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QModelIndex, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
-                             QListWidget, QListWidgetItem, QPushButton,
-                             QSpacerItem, QSpinBox, QTabWidget, QWidget)
+                             QListWidget, QPushButton, QSpacerItem, QSpinBox,
+                             QTabWidget, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lang
@@ -15,13 +16,10 @@ from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
 
-from ._base_widgets import (UHBoxLayout, ULineEdit, UMenu, UTextEdit,
-                            UVBoxLayout, WinSystem)
+from ._base_widgets import (UHBoxLayout, ULineEdit, UListWidgetItem, UMenu,
+                            UTextEdit, UVBoxLayout, WinSystem)
 from .win_backups import BackupType, WinBackups
 from .win_help import WinHelp
-
-LIST_ITEM_H = 25
-ICON_SVG = os.path.join(Static.INNER_IMAGES, "icon.svg")
 
 
 class RebootableSettings(QGroupBox):
@@ -209,9 +207,7 @@ class MainFolderItemsWid(QListWidget):
             items = self.main_folder_copy.paths
 
         for i in items:
-            item_ = QListWidgetItem(i)
-            item_.setSizeHint(QSize(self.width(), LIST_ITEM_H))
-            item_.item_name = i
+            item_ = UListWidgetItem(parent=self, item_name=i)
             self.addItem(item_)
 
     def list_item_context(self, ev):
@@ -263,9 +259,7 @@ class MainFolderItemsWid(QListWidget):
         self.add_row_win.show()
 
     def add_row_fin(self, text: str):
-        item_ = QListWidgetItem(text)
-        item_.setSizeHint(QSize(self.width(), LIST_ITEM_H))
-        item_.item_name = text
+        item_ = UListWidgetItem(parent=self, item_name=text)
         self.addItem(item_)
         if self.is_stop_list:
             self.main_folder_copy.stop_list.append(text)
@@ -466,8 +460,7 @@ class RemoveMainFolderWin(WinSystem):
         self.central_layout.addWidget(list_widget)
 
         for main_folder in self.main_folder_list_copy:
-            item = QListWidgetItem(list_widget)
-            item.setSizeHint(QSize(self.width(), LIST_ITEM_H))
+            item = UListWidgetItem(list_widget)
             item.main_folder = main_folder
             label = QLabel(main_folder.name)
             label.setStyleSheet("padding-left: 2px;")
@@ -630,12 +623,14 @@ class SelectableLabel(QLabel):
 
 
 class AboutWin(QGroupBox):
+    icon_svg = os.path.join(Static.INNER_IMAGES, "icon.svg")
+
     def __init__(self):
         super().__init__()
         h_lay = UHBoxLayout()
         self.setLayout(h_lay)
 
-        icon = QSvgWidget(ICON_SVG)
+        icon = QSvgWidget(self.icon_svg)
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(85, 85)
         h_lay.addWidget(icon)
@@ -801,10 +796,7 @@ class WinSettings(WinSystem):
         self.scan_time = None
 
         self.main_folder_list_changed = False
-        self.main_folder_list_copy = [
-            i.get_instance_copy()
-            for i in MainFolder.list_
-        ]
+        self.main_folder_list_copy = copy.deepcopy(MainFolder.list_)
 
         self.init_ui()
         self.first_tab()

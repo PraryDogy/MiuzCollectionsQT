@@ -65,14 +65,6 @@ class MainFolder:
         self.stop_list = stop_list
         self.curr_path: str = curr_path
     
-    def get_instance_copy(self):
-        return MainFolder(
-            name=self.name,
-            paths=self.paths.copy(),
-            stop_list=self.stop_list.copy(),
-            curr_path=""
-        )
-
     def get_current_path(self):
         return self.curr_path
         

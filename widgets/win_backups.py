@@ -2,13 +2,9 @@ import json
 import os
 import shutil
 from enum import Enum
-from typing import Literal
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import (QApplication, QLabel, QListWidget,
-                             QListWidgetItem, QPushButton, QSpacerItem,
-                             QWidget)
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QLabel, QListWidget, QPushButton
 
 from cfg import Static
 from system.filters import UserFilter
@@ -16,7 +12,7 @@ from system.lang import Lang
 from system.main_folder import MainFolder
 from system.utils import MainUtils
 
-from ._base_widgets import UMenu, UTextEdit, WinSystem
+from ._base_widgets import UListWidgetItem, UMenu, UTextEdit, WinSystem
 from .actions import OpenInView
 
 
@@ -72,14 +68,6 @@ class ViewBackupWin(WinSystem):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
-
-
-class UListWidgetItem(QListWidgetItem):
-    hh = 25
-
-    def __init__(self, parent: QListWidget):
-        super().__init__(parent)
-        self.setSizeHint(QSize(parent.width(), self.hh))
 
 
 class ULabel(QLabel):

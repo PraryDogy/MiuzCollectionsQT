@@ -1,9 +1,10 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QGraphicsDropShadowEffect, QHBoxLayout,
-                             QLineEdit, QMainWindow, QMenu, QTextEdit,
-                             QVBoxLayout, QWidget)
+                             QLineEdit, QListWidget, QListWidgetItem,
+                             QMainWindow, QMenu, QTextEdit, QVBoxLayout,
+                             QWidget)
 
 from system.lang import Lang
 from system.utils import MainUtils
@@ -238,3 +239,14 @@ class WinChild(UMainWindow):
         """
         super().__init__(parent)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+
+class UListWidgetItem(QListWidgetItem):
+    def __init__(self, parent: QListWidget, height: int = 30, item_name: str = None):
+        """
+        - height: 30
+        - width: parent (QListWidget) width 
+        """
+        super().__init__()
+        self.setSizeHint(QSize(parent.width(), height))
+        self.item_name = item_name

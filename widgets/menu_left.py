@@ -4,8 +4,7 @@ from typing import Literal
 
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import (QAction, QLabel, QListWidget, QListWidgetItem,
-                             QTabWidget)
+from PyQt5.QtWidgets import QAction, QLabel, QListWidget, QTabWidget
 
 from cfg import Dynamic, Static
 from system.lang import Lang
@@ -13,8 +12,7 @@ from system.main_folder import MainFolder
 from system.tasks import LoadCollectionsTask
 from system.utils import UThreadPool
 
-from ._base_widgets import UMenu
-from .actions import ShowInFinder
+from ._base_widgets import UListWidgetItem, UMenu
 from .win_warn import WinWarn
 
 
@@ -42,6 +40,7 @@ class CollectionBtn(QLabel):
             self.win_warn.adjustSize()
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
+            return
         elif self.coll_name in (Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS):
             coll = main_folder_path
         else:
@@ -128,8 +127,8 @@ class MenuTab(QListWidget):
             )
         cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
         all_colls_btn.pressed_.connect(cmd_)
-        all_colls_item = QListWidgetItem()
-        all_colls_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
+        all_colls_item = UListWidgetItem(self)
+        # all_colls_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(all_colls_item)
         self.setItemWidget(all_colls_item, all_colls_btn)
         self.coll_btns.append(all_colls_btn)
@@ -141,8 +140,8 @@ class MenuTab(QListWidget):
             )
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
-        favs_item = QListWidgetItem()
-        favs_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
+        favs_item = UListWidgetItem(self)
+        # favs_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(favs_item)
         self.setItemWidget(favs_item, favs_btn)
         self.coll_btns.append(favs_btn)
@@ -153,14 +152,14 @@ class MenuTab(QListWidget):
             coll_name=Static.NAME_RECENTS
             )
         recents_btn.pressed_.connect(self.recents_cmd)
-        recents_item = QListWidgetItem()
-        recents_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
+        recents_item = UListWidgetItem(self)
+        # recents_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(recents_item)
         self.setItemWidget(recents_item, recents_btn)
         self.coll_btns.append(recents_btn)
 
         # SPACER
-        spacer = QListWidgetItem()
+        spacer = UListWidgetItem(self)
         spacer.setSizeHint(QSize(0, MenuTab.h_ // 2))  # 10 — высота отступа
         spacer.setFlags(Qt.NoItemFlags)   # не кликабелен
         self.addItem(spacer)
@@ -181,8 +180,8 @@ class MenuTab(QListWidget):
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
             coll_btn.pressed_.connect(cmd_)
 
-            list_item = QListWidgetItem()
-            list_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
+            list_item = UListWidgetItem(self)
+            # list_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
