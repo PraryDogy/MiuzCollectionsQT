@@ -17,11 +17,10 @@ WARNING_SVG = os.path.join(Static.INNER_IMAGES, "warning.svg")
 
 
 class WinWarn(WinSystem):
-    def __init__(self, title: str, text: str, restart_app: bool = False):
+    def __init__(self, title: str, text: str):
         super().__init__()
         self.setWindowTitle(title)
         self.my_text = text
-        self.restart_app = restart_app
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
@@ -48,22 +47,10 @@ class WinWarn(WinSystem):
         descr = QLabel(self.my_text)
         v_lay.addWidget(descr)
 
-        if not self.restart_app:
-            ok_btn = QPushButton(text=Lang.ok)
-            ok_btn.setFixedWidth(90)
-            ok_btn.clicked.connect(self.close)
-            self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-        else:
-            restart_btn = QPushButton(text=Lang.restart_app)
-            restart_btn.clicked.connect(self.restart_app_cmd)
-            self.central_layout.addWidget(restart_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-
-    def restart_app_cmd(self):
-        self.hide()
-        MainFolder.write_json_data()
-        JsonData.write_json_data()
-        QApplication.quit()
-        MainUtils.start_new_app()
+        ok_btn = QPushButton(text=Lang.ok)
+        ok_btn.setFixedWidth(90)
+        ok_btn.clicked.connect(self.close)
+        self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
