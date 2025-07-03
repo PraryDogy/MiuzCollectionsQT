@@ -56,7 +56,9 @@ class UserFilter:
     def do_backup(cls):
         if not os.path.exists(Static.APP_SUPPORT_BACKUP):
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
-        cls.remove_backups()
+
+        backups = cls.get_backups()
+        cls.remove_backups(backups)
 
         now = datetime.now().replace(microsecond=0)
         now = now.strftime("%Y-%m-%d %H-%M-%S") 
@@ -84,15 +86,15 @@ class UserFilter:
         ]
 
     @classmethod
-    def remove_backups(cls):
-        entries = cls.get_backups()
-        entries.sort(key=lambda e: e.stat().st_mtime, reverse=True)
-        to_delete = entries[20:]
-        for entry in to_delete:
-            try:
-                os.remove(entry.path)
-            except Exception as ex:
-                continue
+    def remove_backups(cls, backups: list[os.DirEntry], limit: int = 20):
+        if len(backups) > limit:
+            backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
+            to_delete = backups[20:]
+            for entry in to_delete:
+                try:
+                    os.remove(entry.path)
+                except Exception as ex:
+                    continue
 
     @classmethod
     def init(cls):
