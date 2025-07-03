@@ -64,7 +64,7 @@ class UserFilter:
         filename = f"{now} user_filters.json"
         filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
 
-        if not UserFilter.list_:
+        if not cls.list_:
             return
 
         lst: list[UserFilterItemModel] = [item.to_model() for item in cls.list_]
@@ -96,14 +96,14 @@ class UserFilter:
 
     @classmethod
     def init(cls):
-        if not os.path.exists(UserFilter.json_file):
+        if not os.path.exists(cls.json_file):
             cls.set_default_filters()
         else:
             try:
-                with open(UserFilter.json_file, "r", encoding="utf-8") as f:
+                with open(cls.json_file, "r", encoding="utf-8") as f:
                     json_data: dict = json.load(f)
                     validated = cls.validate(json_data)
-                    UserFilter.list_ = [
+                    cls.list_ = [
                         cls.from_model(i)
                         for i in validated.user_filter_list
                     ]
