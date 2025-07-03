@@ -166,7 +166,6 @@ class MainFolder:
             if cls.get_backups():
                 cls.validation_failed = True
             else:
-                cls.used_defaults = True
                 cls.set_default_main_folders()
 
     @classmethod

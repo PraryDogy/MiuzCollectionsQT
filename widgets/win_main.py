@@ -162,7 +162,6 @@ class WinMain(UMainWindow):
     def check_validation(self):
         return any([
             MainFolder.validation_failed,
-            MainFolder.used_defaults,
             UserFilterErrors.was
         ])
 
