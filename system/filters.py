@@ -119,11 +119,11 @@ class UserFilter:
 
     @classmethod
     def write_json_data(cls):
-        lst: list[UserFilterItemModel] = [item.to_model() for item in cls.list_]
-        data = UserFilterListModel(user_filter_list=lst)
-        data = json.dumps(data.model_dump(), indent=4, ensure_ascii=False)
+        data = UserFilterListModel(
+            user_filter_list=[i.to_model() for i in cls.list_]
+        )
         with open(cls.json_file, "w", encoding="utf-8") as f:
-            f.write(data)
+            json.dump(data.model_dump(), f, indent=4, ensure_ascii=False)
 
     @classmethod
     def set_default_filters(cls) -> list["UserFilter"]:
