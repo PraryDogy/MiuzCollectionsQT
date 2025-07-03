@@ -109,7 +109,12 @@ class MainFolder:
     def do_backup(cls):
         if not os.path.exists(Static.APP_SUPPORT_BACKUP):
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
-        cls.remove_backups()
+
+        if not MainFolder.list_:
+            return
+
+        backups = cls.get_backups()
+        cls.remove_backups(backups)
 
         now = datetime.now().replace(microsecond=0)
         now = now.strftime("%Y-%m-%d %H-%M-%S") 
@@ -117,14 +122,11 @@ class MainFolder:
         filename = f"{now} main_folders.json"
         filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
 
-        if not MainFolder.list_:
-            return
-
-        lst: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
-        data = MainFolderListModel(main_folder_list=lst)
+        item_list: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
+        data = MainFolderListModel(main_folder_list=item_list)
         data = data.model_dump()
         data = json.dumps(data, indent=4, ensure_ascii=False)
-
+ 
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(data)
 
@@ -137,10 +139,9 @@ class MainFolder:
         ]
 
     @classmethod
-    def remove_backups(cls):
-        entries = cls.get_backups()
-        entries.sort(key=lambda e: e.stat().st_mtime, reverse=True)
-        to_delete = entries[20:]
+    def remove_backups(cls, backups: list[os.DirEntry]):
+        backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
+        to_delete = backups[20:]
         for entry in to_delete:
             try:
                 os.remove(entry.path)
