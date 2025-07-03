@@ -24,6 +24,7 @@ class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
     validation_failed: bool = False
+    used_defaults: bool = False
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
     __slots__ = ["name", "paths", "stop_list", "curr_path"]
 
@@ -165,6 +166,7 @@ class MainFolder:
             if cls.get_backups():
                 cls.validation_failed = True
             else:
+                cls.used_defaults = True
                 cls.set_default_main_folders()
 
     @classmethod
