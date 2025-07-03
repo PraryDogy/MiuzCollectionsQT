@@ -131,14 +131,15 @@ class MainFolder:
         ]
 
     @classmethod
-    def remove_backups(cls, backups: list[os.DirEntry]):
-        backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
-        to_delete = backups[20:]
-        for entry in to_delete:
-            try:
-                os.remove(entry.path)
-            except Exception as ex:
-                continue
+    def remove_backups(cls, backups: list[os.DirEntry], limit: int = 20):
+        if len(backups) > limit:
+            backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
+            to_delete = backups[limit:]
+            for entry in to_delete:
+                try:
+                    os.remove(entry.path)
+                except Exception as ex:
+                    continue
 
     @classmethod
     def init(cls):
