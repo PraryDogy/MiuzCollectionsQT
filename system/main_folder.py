@@ -145,25 +145,30 @@ class MainFolder:
     def init(cls):
         if not os.path.exists(cls.json_file):
             cls.set_default_main_folders()
-        else:
-            try:
-                with open(cls.json_file, "r", encoding="utf-8") as f:
-                    json_data: dict = json.load(f)
-                    validated = cls.validate(json_data)
-                    cls.list_ = [
-                        cls.from_model(m)
-                        for m in validated.main_folder_list
-                    ]
-                    if len(cls.list_) == 0:
-                        raise Exception("MainFolder.list_ пуст")
-                    else:
-                        cls.current = cls.list_[0]
-            except Exception as e:
-                MainUtils.print_error()
-                if cls.get_backups():
-                    MainFolderErrors.was = True
-                else:
-                    cls.set_default_main_folders()
+            return
+
+        try:
+            with open(cls.json_file, "r", encoding="utf-8") as f:
+                json_data: dict = json.load(f)
+
+            main_folder_list_model = cls.validate(json_data)
+            cls.list_ = [
+                cls.from_model(m)
+                for m in main_folder_list_model.main_folder_list
+            ]
+
+            if not cls.list_:
+                raise ValueError("MainFolder.list_ пуст после валидации")
+
+            cls.current = cls.list_[0]
+
+        except Exception:
+            MainUtils.print_error()
+
+            if cls.get_backups():
+                MainFolderErrors.was = True
+            else:
+                cls.set_default_main_folders()
 
     @classmethod
     def write_json_data(cls):
