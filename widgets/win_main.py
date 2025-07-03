@@ -60,8 +60,8 @@ class WinMain(UMainWindow):
         self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
         self.setMinimumWidth(750)
 
-        if self.check_validation():
-            QTimer.singleShot(100, self.check_validation_finished)
+        if any([MainFolder.validation_failed, UserFilter.validation_failed]):
+            QTimer.singleShot(100, self.load_backups)
             return
 
         self.setAcceptDrops(True)
@@ -134,7 +134,7 @@ class WinMain(UMainWindow):
         self.scaner_task_canceled = False
 
         self.backup_timer = QTimer(self)
-        self.backup_timer.timeout.connect(lambda: self.do_backup())
+        self.backup_timer.timeout.connect(self.do_backup)
         self.backup_timer.start(10 * 60 * 1000)
         
         QTimer.singleShot(100, self.do_backup)
@@ -159,13 +159,7 @@ class WinMain(UMainWindow):
         self.win_backups.center_relative_parent(self)
         self.win_backups.show()
 
-    def check_validation(self):
-        return any([
-            MainFolder.validation_failed,
-            UserFilter.validation_failed
-        ])
-
-    def check_validation_finished(self):
+    def load_backups(self):
         if MainFolder.validation_failed:
             self.open_backup_win(BackupType.main_folder)
         elif UserFilter.validation_failed:
