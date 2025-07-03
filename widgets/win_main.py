@@ -56,15 +56,17 @@ class WinMain(UMainWindow):
     argv_flag = "noscan"
 
     def __init__(self, argv: list[str]):
+
+        if self.check_validation():
+            self.check_validation_finished()
+            return
+
         super().__init__()
         self.setAcceptDrops(True)
         self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
         self.setMinimumWidth(750)
         self.setMenuBar(BarMacos())
 
-        if self.json_errors():
-            QTimer.singleShot(100, lambda: self.json_errors_delayed())
-            return
 
         self.set_window_title()
 
@@ -160,15 +162,18 @@ class WinMain(UMainWindow):
         self.win_backups.center_relative_parent(self)
         self.win_backups.show()
 
-    def json_errors(self):
-        if MainFolder.validation_failed or UserFilterErrors.was:
-            return True
-        else:
-            return False
+    def check_validation(self):
+        return any([
+            MainFolder.validation_failed,
+            MainFolder.used_defaults,
+            UserFilterErrors.was
+        ])
 
-    def json_errors_delayed(self):
+    def check_validation_finished(self):
         if MainFolder.validation_failed:
             self.open_backup_win(BackupType.main_folder)
+        elif MainFolder.used_defaults:
+            self.open_warn_win("Ошибка", "Папка с коллекциями:\nзначения были сброшены по умолчанию")
         elif UserFilterErrors.was:
             self.open_backup_win(BackupType.user_filter)
 
