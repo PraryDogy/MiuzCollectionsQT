@@ -136,13 +136,13 @@ class WinMain(UMainWindow):
         self.backup_timer = QTimer(self)
         self.backup_timer.timeout.connect(lambda: self.do_backup())
         self.backup_timer.start(10 * 60 * 1000)
-
+        
+        QTimer.singleShot(100, self.do_backup)
         QTimer.singleShot(100, self.main_folder_check)
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
-        
-        
+
     def main_folder_check(self):
         main_folder = MainFolder.current.is_available()
         if not main_folder:
@@ -151,8 +151,8 @@ class WinMain(UMainWindow):
             self.win_warn.show()
 
     def do_backup(self):
-        MainFolder.do_backup()
-        UserFilter.do_backup()
+        for i in (MainFolder, UserFilter):
+            i.do_backup()
      
     def open_backup_win(self, backup_type: BackupType):
         self.win_backups = WinBackups(backup_type)
