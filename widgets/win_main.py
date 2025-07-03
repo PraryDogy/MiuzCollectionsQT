@@ -61,7 +61,7 @@ class WinMain(UMainWindow):
         self.setMinimumWidth(750)
 
         if self.check_validation():
-            self.check_validation_finished()
+            QTimer.singleShot(100, self.check_validation_finished)
             return
 
         self.setAcceptDrops(True)
