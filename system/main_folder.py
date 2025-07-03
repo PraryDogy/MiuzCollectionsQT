@@ -102,7 +102,7 @@ class MainFolder:
         if not os.path.exists(Static.APP_SUPPORT_BACKUP):
             os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
 
-        if not MainFolder.list_:
+        if not cls.list_:
             return
 
         backups = cls.get_backups()
@@ -149,14 +149,14 @@ class MainFolder:
                 with open(cls.json_file, "r", encoding="utf-8") as f:
                     json_data: dict = json.load(f)
                     validated = cls.validate(json_data)
-                    MainFolder.list_ = [
+                    cls.list_ = [
                         cls.from_model(m)
                         for m in validated.main_folder_list
                     ]
-                    if len(MainFolder.list_) == 0:
+                    if len(cls.list_) == 0:
                         raise Exception("MainFolder.list_ пуст")
                     else:
-                        MainFolder.current = MainFolder.list_[0]
+                        cls.current = cls.list_[0]
             except Exception as e:
                 MainUtils.print_error()
                 if cls.get_backups():
