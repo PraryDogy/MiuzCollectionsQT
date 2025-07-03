@@ -56,18 +56,16 @@ class WinMain(UMainWindow):
     argv_flag = "noscan"
 
     def __init__(self, argv: list[str]):
+        super().__init__()
+        self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
+        self.setMinimumWidth(750)
 
         if self.check_validation():
             self.check_validation_finished()
             return
 
-        super().__init__()
         self.setAcceptDrops(True)
-        self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
-        self.setMinimumWidth(750)
         self.setMenuBar(BarMacos())
-
-
         self.set_window_title()
 
         h_wid_main = QWidget()
