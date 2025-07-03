@@ -169,8 +169,6 @@ class WinMain(UMainWindow):
     def check_validation_finished(self):
         if MainFolder.validation_failed:
             self.open_backup_win(BackupType.main_folder)
-        elif MainFolder.used_defaults:
-            self.open_warn_win("Ошибка", "Папка с коллекциями:\nзначения были сброшены по умолчанию", True)
         elif UserFilterErrors.was:
             self.open_backup_win(BackupType.user_filter)
 
