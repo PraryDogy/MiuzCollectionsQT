@@ -35,7 +35,7 @@ class ThumbData:
 
 class Static:
 
-    APP_VER = "2.11"
+    APP_VER = "2.20"
     APP_NAME: str = "Collections"
 
     # в сетке изображений может отображаться за раз 150 штук
