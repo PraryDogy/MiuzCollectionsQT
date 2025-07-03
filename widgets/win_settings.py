@@ -207,7 +207,7 @@ class MainFolderItemsWid(QListWidget):
             items = self.main_folder_copy.paths
 
         for i in items:
-            item_ = UListWidgetItem(parent=self, item_name=i)
+            item_ = UListWidgetItem(parent=self, text=i)
             self.addItem(item_)
 
     def list_item_context(self, ev):
@@ -259,7 +259,7 @@ class MainFolderItemsWid(QListWidget):
         self.add_row_win.show()
 
     def add_row_fin(self, text: str):
-        item_ = UListWidgetItem(parent=self, item_name=text)
+        item_ = UListWidgetItem(parent=self, text=text)
         self.addItem(item_)
         if self.is_stop_list:
             self.main_folder_copy.stop_list.append(text)

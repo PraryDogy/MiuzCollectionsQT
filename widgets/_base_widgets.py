@@ -242,11 +242,12 @@ class WinChild(UMainWindow):
 
 
 class UListWidgetItem(QListWidgetItem):
-    def __init__(self, parent: QListWidget, height: int = 30, item_name: str = None):
+    def __init__(self, parent: QListWidget, height: int = 30, text: str = None):
         """
         - height: 30
-        - width: parent (QListWidget) width 
+        - width: parent (QListWidget) width
         """
         super().__init__()
         self.setSizeHint(QSize(parent.width(), height))
-        self.item_name = item_name
+        if text:
+            self.setText(text)
