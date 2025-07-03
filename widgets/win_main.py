@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
-from system.filters import UserFilter, UserFilterErrors
+from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
@@ -162,13 +162,13 @@ class WinMain(UMainWindow):
     def check_validation(self):
         return any([
             MainFolder.validation_failed,
-            UserFilterErrors.was
+            UserFilter.validation_failed
         ])
 
     def check_validation_finished(self):
         if MainFolder.validation_failed:
             self.open_backup_win(BackupType.main_folder)
-        elif UserFilterErrors.was:
+        elif UserFilter.validation_failed:
             self.open_backup_win(BackupType.user_filter)
 
     def start_scaner_task(self):

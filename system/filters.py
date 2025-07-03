@@ -10,10 +10,6 @@ from .lang import Lang
 from .utils import MainUtils
 
 
-class UserFilterErrors:
-    was: bool = False
-
-
 class UserFilterItemModel(BaseModel):
     lang_names: list[str]
     dir_name: str
@@ -26,6 +22,7 @@ class UserFilterListModel(BaseModel):
 
 class UserFilter:
     list_: list["UserFilter"] = []
+    validation_failed: bool = False
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "user_filters.json")
     __slots__ = ["lang_names", "dir_name", "value"]
 
@@ -113,7 +110,7 @@ class UserFilter:
             except Exception:
                 MainUtils.print_error()
                 if cls.get_backups():
-                    UserFilterErrors.was = True
+                    cls.validation_failed = True
                 else:
                     cls.set_default_filters()
             
