@@ -9,10 +9,6 @@ from cfg import Static
 from .utils import MainUtils
 
 
-class MainFolderErrors:
-    was = False
-
-
 class MainFolderItemModel(BaseModel):
     name: str
     paths: list[str]
@@ -27,6 +23,7 @@ class MainFolderListModel(BaseModel):
 class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
+    validation_failed: bool = False
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
     __slots__ = ["name", "paths", "stop_list", "curr_path"]
 
@@ -166,7 +163,7 @@ class MainFolder:
             MainUtils.print_error()
 
             if cls.get_backups():
-                MainFolderErrors.was = True
+                cls.validation_failed = True
             else:
                 cls.set_default_main_folders()
 

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
 from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import UserFilter, UserFilterErrors
 from system.lang import Lang
-from system.main_folder import MainFolder, MainFolderErrors
+from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, ScanerTask, UploadFilesTask)
 from system.utils import UThreadPool
@@ -161,13 +161,13 @@ class WinMain(UMainWindow):
         self.win_backups.show()
 
     def json_errors(self):
-        if MainFolderErrors.was or UserFilterErrors.was:
+        if MainFolder.validation_failed or UserFilterErrors.was:
             return True
         else:
             return False
 
     def json_errors_delayed(self):
-        if MainFolderErrors.was:
+        if MainFolder.validation_failed:
             self.open_backup_win(BackupType.main_folder)
         elif UserFilterErrors.was:
             self.open_backup_win(BackupType.user_filter)
