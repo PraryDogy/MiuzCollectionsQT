@@ -821,7 +821,7 @@ class WinSettings(WinSystem):
         self.set_apply_btn()
 
     def set_apply_btn(self):
-        self.ok_btn.setText(Lang.apply)
+        self.ok_btn.setText(Lang.restart_app)
 
     def init_ui(self):
         self.tabs_wid = QTabWidget()

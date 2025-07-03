@@ -170,7 +170,7 @@ class WinMain(UMainWindow):
         if MainFolder.validation_failed:
             self.open_backup_win(BackupType.main_folder)
         elif MainFolder.used_defaults:
-            self.open_warn_win("Ошибка", "Папка с коллекциями:\nзначения были сброшены по умолчанию")
+            self.open_warn_win("Ошибка", "Папка с коллекциями:\nзначения были сброшены по умолчанию", True)
         elif UserFilterErrors.was:
             self.open_backup_win(BackupType.user_filter)
 
@@ -278,8 +278,8 @@ class WinMain(UMainWindow):
         self.win_dates.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         self.win_dates.show()
 
-    def open_warn_win(self, title: str, text: str):
-        self.win_warn = WinWarn(title, text)
+    def open_warn_win(self, title: str, text: str, restart_app: bool = False):
+        self.win_warn = WinWarn(title, text, restart_app)
         self.win_warn.adjustSize()
         self.win_warn.center_relative_parent(self)
         self.win_warn.show()

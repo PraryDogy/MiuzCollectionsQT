@@ -26,7 +26,7 @@ class _Lang:
         "Все коллекции",
         "All collections"
     ]
-    apply = [
+    restart_app = [
         "Перезапуск",
         "Restart app"
     ]

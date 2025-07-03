@@ -140,7 +140,7 @@ class WinBackups(WinSystem):
             self.list_widget.addItem(item)
             self.list_widget.setItemWidget(item, label)
 
-        apply_btn = QPushButton(text=Lang.apply)
+        apply_btn = QPushButton(text=Lang.restart_app)
         apply_btn.clicked.connect(self.apply_cmd)
         self.central_layout.addWidget(apply_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
