@@ -45,7 +45,7 @@ class DirsLoader:
 
 class DirsCompator:
     @classmethod
-    def get_removed_dirs(cls, finder_dirs: list, db_dirs: list) ->:
+    def get_removed_dirs(cls, finder_dirs: list, db_dirs: list) -> list :
         """
         Параметры:
         - finder_dirs: [(относительный путь к директории, дата изменения), ...]
