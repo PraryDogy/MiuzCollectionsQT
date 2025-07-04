@@ -203,10 +203,11 @@ class ImagesCompator:
         Возвращает те изображения, которых нет в finder_dirs, но есть в db_dirs:
         - [(относительный путь к изображению, дата изменения), ...]
         """
+        finder_set = set(finder_images)
         return [
             (rel_img_path, mod)
             for rel_img_path, mod in db_images
-            if (rel_img_path, mod) not in finder_images
+            if (rel_img_path, mod) not in finder_set
         ]
     
     @classmethod
@@ -219,10 +220,11 @@ class ImagesCompator:
         Возвращает те изображения, которых нет в db_dirs, но есть в finder_dirs:
         - [(относительный путь к изображению, дата изменения), ...]
         """
+        db_set = set(db_images)
         return [
             (rel_img_path, mod)
             for rel_img_path, mod in finder_images
-            if (rel_img_path, mod) not in db_images
+            if (rel_img_path, mod) not in db_set
         ]
 
 
