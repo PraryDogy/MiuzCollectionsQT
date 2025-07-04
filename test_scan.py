@@ -2,7 +2,7 @@ import os
 from time import time
 
 import sqlalchemy
-from sqlalchemy import func
+from cfg import Static
 
 from cfg import JsonData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
@@ -13,7 +13,7 @@ from system.utils import MainUtils
 class DirsLoader:
 
     @classmethod
-    def get_finder_dirs(cls, main_folder: MainFolder) -> list:
+    def load_finder_dirs(cls, main_folder: MainFolder) -> list:
         """
         Возвращает:
         - [(относительный путь к директории, дата изменения), ...]
@@ -32,7 +32,7 @@ class DirsLoader:
         return dirs
 
     @classmethod
-    def get_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder) -> list:
+    def load_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder) -> list:
         """
         Возвращает:
         - [(относительный путь к директории, дата изменения), ...]
@@ -134,6 +134,42 @@ class DirsUpdater:
             conn.rollback()
 
 
+class ImagesLoader:
+
+    @classmethod
+    def load_finder_images(cls, new_dirs: list, main_folder: MainFolder) -> list:
+        """
+        Параметры:
+        - new_dirs: [(относительный путь к директории, дата изменения), ...]
+
+        Возвращает изображения в указанных директориях:
+        - finder_images: [(относительный путь к директории, дата изменения), ...]
+        """
+
+        finder_images = []
+
+        for rel_dir_path, mod in new_dirs:
+            abs_dir_path = MainUtils.get_abs_path(main_folder.curr_path, rel_dir_path)
+            for i in os.scandir(abs_dir_path):
+                if i.path.endswith(Static.ext_all):
+                    try:
+                        rel_img_path = MainUtils.get_rel_path(main_folder.curr_path, i.path)
+                        mod = os.stat(i.path).st_mtime
+                        finder_images.append((rel_img_path, mod))
+                    except Exception as e:
+                        MainUtils.print_error()
+                        continue
+
+
+
+
+
+
+
+
+
+
+
 coll_folder = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready"
 src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/52 Florance"
 
@@ -147,9 +183,9 @@ for main_folder in MainFolder.list_:
     coll_folder = main_folder.is_available()
     if main_folder:
 
-        finder_dirs = DirsLoader.get_finder_dirs(main_folder.current_path)
+        finder_dirs = DirsLoader.load_finder_dirs(main_folder.current_path)
         if finder_dirs:
-            db_dirs = DirsLoader.get_db_dirs(conn, main_folder.name)
+            db_dirs = DirsLoader.load_db_dirs(conn, main_folder.name)
             removed_dirs = DirsLoader.get_removed_dirs(finder_dirs, db_dirs)
             new_dirs = DirsLoader.get_new_dirs(finder_dirs, db_dirs)
 
@@ -166,7 +202,6 @@ for main_folder in MainFolder.list_:
 #         break
 
 # a = Images.get_db_images(conn, "/42 Amalia/1 IMG", "miuz")
-
 
 
 conn.close()

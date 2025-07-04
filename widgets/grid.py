@@ -569,7 +569,7 @@ class Grid(QScrollArea):
                 main_folder_path = MainFolder.current.is_available()
                 if main_folder_path:
                     img_path_list = [
-                        MainUtils.get_img_path(main_folder_path, i.rel_img_path)
+                        MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
                         for i in self.selected_widgets
                     ]
                     self.win_info = WinInfo(img_path_list)
@@ -871,7 +871,7 @@ class Grid(QScrollArea):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
-                MainUtils.get_img_path(main_folder_path, i.rel_img_path)
+                MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
                 for i in self.selected_widgets
             ]
         else:

@@ -48,7 +48,7 @@ class WinInfoAction(QAction):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             self.rel_img_path_list = [
-                    MainUtils.get_img_path(main_folder_path, i)
+                    MainUtils.get_abs_path(main_folder_path, i)
                     for i in self.rel_img_path_list
             ]
             self.win_info = WinInfo(self.rel_img_path_list)
@@ -77,7 +77,7 @@ class CopyPath(QAction):
         if main_folder_path:
             img_path_list: list[str] = []
             for i in self.rel_img_path_list:
-                i = MainUtils.get_img_path(main_folder_path, i)
+                i = MainUtils.get_abs_path(main_folder_path, i)
                 img_path_list.append(i)
             img_path_list = "\n".join(img_path_list)
             MainUtils.copy_text(img_path_list)
@@ -121,7 +121,7 @@ class ShowInFinder(QAction):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
-                MainUtils.get_img_path(main_folder_path, i)
+                MainUtils.get_abs_path(main_folder_path, i)
                 for i in self.rel_img_path_list
             ]
             MainUtils.reveal_files(img_path_list)
@@ -176,7 +176,7 @@ class Save(QAction):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
-                MainUtils.get_img_path(main_folder_path, rel_img_path)
+                MainUtils.get_abs_path(main_folder_path, rel_img_path)
                 for rel_img_path in self.rel_img_path_list
             ]
             if self.save_as:

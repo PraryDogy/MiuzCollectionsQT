@@ -349,12 +349,12 @@ class MainUtils:
             return date.strftime("%d.%m.%Y %H:%M")
         
     @classmethod
-    def get_img_path(cls, main_folder_path: str, rel_img_path: str) -> str:
-        return main_folder_path + rel_img_path
+    def get_abs_path(cls, main_folder_path: str, rel_path: str) -> str:
+        return main_folder_path + rel_path
     
     @classmethod
-    def get_rel_path(cls, main_folder_path: str, img_path: str) -> str:
-        return img_path.replace(main_folder_path, "")
+    def get_rel_path(cls, main_folder_path: str, abs_path: str) -> str:
+        return abs_path.replace(main_folder_path, "")
 
     @classmethod
     def rm_rf(cls, folder_path: str):

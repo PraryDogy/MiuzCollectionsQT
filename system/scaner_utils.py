@@ -175,7 +175,7 @@ class DbImages(QObject):
         main_folder_path = self.main_folder.get_current_path()
         return {
             rel_thumb_path: (
-                MainUtils.get_img_path(main_folder_path, rel_img_path),
+                MainUtils.get_abs_path(main_folder_path, rel_img_path),
                 size,
                 birth,
                 mod

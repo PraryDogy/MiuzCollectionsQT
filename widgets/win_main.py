@@ -279,7 +279,7 @@ class WinMain(UMainWindow):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
-                MainUtils.get_img_path(main_folder_path, i)
+                MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
             self.upload_win = WinUpload()
@@ -300,7 +300,7 @@ class WinMain(UMainWindow):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             img_path_list = [
-                MainUtils.get_img_path(main_folder_path, i)
+                MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
             self.remove_files_win = RemoveFilesWin(img_path_list)

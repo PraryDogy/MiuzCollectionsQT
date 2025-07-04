@@ -247,7 +247,7 @@ class WinImageView(WinChild):
         self.image_label.set_image(pixmap)
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
-            self.img_path = MainUtils.get_img_path(main_folder_path, self.rel_img_path)
+            self.img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
             self.load_image()
         else:
             print("img viewer > no smb")
@@ -397,7 +397,7 @@ class WinImageView(WinChild):
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             main_folder_path = MainFolder.current.is_available()
             if main_folder_path:
-                img_path = MainUtils.get_img_path(main_folder_path, self.rel_img_path)
+                img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
                 img_path_list = [img_path]
                 self.win_info = WinInfo(img_path_list)
                 self.win_info.finished_.connect(self.open_info_win_delayed)
