@@ -25,7 +25,7 @@ class DirsLoader:
             current = stack.pop()
             with os.scandir(current) as it:
                 for entry in it:
-                    if entry.is_dir():
+                    if entry.is_dir() and entry.name not in main_folder.stop_list:
                         stack.append(entry.path)
                         rel_path = MainUtils.get_rel_path(main_folder.get_current_path(), entry.path)
                         dirs.append((rel_path, int(entry.stat().st_mtime)))
@@ -240,6 +240,12 @@ for main_folder in MainFolder.list_:
         if finder_dirs:
             db_dirs = DirsLoader.load_db_dirs(conn, main_folder)
             new_dirs = DirsCompator.get_new_dirs(finder_dirs, db_dirs)
-            removed_dirs = DirsCompator.get_removed_dirs(finder_dirs, db_dirs)
+            del_dirs = DirsCompator.get_removed_dirs(finder_dirs, db_dirs)
+
+            print("new dirs", main_folder.name, len(new_dirs))
+            print("remove dirs", main_folder.name, len(new_dirs))
+
+            DirsUpdater.remove_db_dirs(conn, del_dirs, main_folder)
+            DirsUpdater.add_new_dirs(conn, new_dirs, main_folder)
 
 conn.close()
