@@ -218,13 +218,6 @@ class ImagesCompator:
         ]
 
 
-
-
-
-coll_folder = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready"
-src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/52 Florance"
-
-
 MainFolder.set_default_main_folders()
 Dbase.create_engine()
 conn = Dbase.engine.connect()
@@ -239,7 +232,5 @@ for main_folder in MainFolder.list_:
             db_dirs = DirsLoader.load_db_dirs(conn, main_folder.name)
             removed_dirs = DirsLoader.get_removed_dirs(finder_dirs, db_dirs)
             new_dirs = DirsLoader.get_new_dirs(finder_dirs, db_dirs)
-
-
 
 conn.close()
