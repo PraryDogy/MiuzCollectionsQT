@@ -2,9 +2,8 @@ import os
 from time import time
 
 import sqlalchemy
-from cfg import Static
 
-from cfg import JsonData
+from cfg import JsonData, Static
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.main_folder import MainFolder
 from system.utils import MainUtils
@@ -228,6 +227,11 @@ class ImagesCompator:
         ]
 
 
+
+
+
+
+
 from time import time
 
 start = time()
@@ -249,15 +253,50 @@ for main_folder in MainFolder.list_:
             finder_images = ImagesLoader.load_finder_images(new_dirs, main_folder)
             db_images = ImagesLoader.load_db_images(new_dirs, main_folder, conn)
 
-            print("new method", "finder images", len(finder_images))
-            print("new method", "db images", len(finder_images))
+            print("new method", "finder images", len(finder_images), main_folder.name)
+            print("new method", "db images", len(db_images), main_folder.name)
 
-            # print("new dirs", main_folder.name, len(new_dirs))
-            # print("remove dirs", main_folder.name, len(new_dirs))
-
-            # DirsUpdater.remove_db_dirs(conn, del_dirs, main_folder)
-            # DirsUpdater.add_new_dirs(conn, new_dirs, main_folder)
+            DirsUpdater.remove_db_dirs(conn, del_dirs, main_folder)
+            DirsUpdater.add_new_dirs(conn, new_dirs, main_folder)
 
 conn.close()
+end = time() - start
+print(end)
+
+
+
+
+
+
+
+from system.scaner_utils import DbImages, FinderImages
+from system.utils import TaskState
+from system.lang import Lang
+
+start = time()
+
+task_state = TaskState()
+task_state.set_should_run(True)
+
+MainFolder.set_default_main_folders()
+Dbase.create_engine()
+conn = Dbase.engine.connect()
+JsonData.init()
+Lang.init()
+
+for main_folder in MainFolder.list_:
+    coll_folder = main_folder.is_available()
+    if coll_folder:
+        finder_images = FinderImages(main_folder, task_state)
+        finder_images = finder_images.run()
+
+        if finder_images:
+            db_images = DbImages(main_folder)
+            db_images = db_images.run()
+
+            print("old method", "finder images", len(finder_images), main_folder.name)
+            print("old method", "db images", len(db_images), main_folder.name)
+
+
 end = time() - start
 print(end)

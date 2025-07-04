@@ -45,6 +45,7 @@ class FinderImages(QObject):
                 self.task_state.set_should_run(False)
                 return None
         except Exception as e:
+            MainUtils.print_error()
             self.task_state.set_should_run(False)
             return None
 
