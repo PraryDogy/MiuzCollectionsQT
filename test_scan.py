@@ -143,7 +143,7 @@ class ImagesLoader:
         - new_dirs: [(относительный путь к директории, дата изменения), ...]
 
         Возвращает изображения в указанных директориях:
-        - finder_images: [(относительный путь к директории, дата изменения), ...]
+        - finder_images: [(относительный путь к изображению, дата изменения), ...]
         """
         finder_images = []
         for rel_dir_path, mod in new_dirs:
@@ -159,11 +159,63 @@ class ImagesLoader:
                         continue
         return finder_images
 
+    @classmethod
+    def load_db_images(cls, new_dirs: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
+        """
+        Параметры:
+        - new_dirs: [(относительный путь к директории, дата изменения), ...]
+
+        Возвращает изображения в указанных директориях:
+        - db_images: [(относительный путь к изображению, дата изменения), ...]
+        """
+        db_images: list = []
+        for rel_dir_path, mod in new_dirs:
+            q = sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.mod)
+            q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
+            q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
+            q = q.where(THUMBS.c.brand == main_folder.name)
+            try:
+                res = conn.execute(q).fetchall()
+                db_images.extend(res)
+            except Exception:
+                MainUtils.print_error()
+                conn.rollback()
+        return db_images
 
 
+class ImagesCompator:
 
+    @classmethod
+    def get_removed_images(cls, finder_images: list, db_images: list) -> list:
+        """
+        Параметры:
+        - finder_images: [(относительный путь к изображению, дата изменения), ...]
+        - db_dirs: [(относительный путь к изображению, дата изменения), ...]
 
+        Возвращает те изображения, которых нет в finder_dirs, но есть в db_dirs:
+        - [(относительный путь к изображению, дата изменения), ...]
+        """
+        return [
+            (rel_img_path, mod)
+            for rel_img_path, mod in db_images
+            if (rel_img_path, mod) not in finder_images
+        ]
+    
+    @classmethod
+    def get_new_images(cls, finder_images: list, db_images: list) -> list:
+        """
+        Параметры:
+        - finder_images: [(относительный путь к изображению, дата изменения), ...]
+        - db_dirs: [(относительный путь к изображению, дата изменения), ...]
 
+        Возвращает те изображения, которых нет в db_dirs, но есть в finder_dirs:
+        - [(относительный путь к изображению, дата изменения), ...]
+        """
+        return [
+            (rel_img_path, mod)
+            for rel_img_path, mod in finder_images
+            if (rel_img_path, mod) not in db_images
+        ]
 
 
 
@@ -188,19 +240,6 @@ for main_folder in MainFolder.list_:
             removed_dirs = DirsLoader.get_removed_dirs(finder_dirs, db_dirs)
             new_dirs = DirsLoader.get_new_dirs(finder_dirs, db_dirs)
 
-#             # это нужно будет делать в самом конце, когда уже просканены 
-#             # изображения
-#             if del_dirs:
-#                 Dirs.execute_del_dirs(conn, del_dirs, main_folder.name)
-#                 print("del dirs", del_dirs)
-
-#             if new_dirs:
-#                 Dirs.execute_new_dirs(conn, new_dirs, main_folder.name)
-#                 print("new dirs", new_dirs)
-
-#         break
-
-# a = Images.get_db_images(conn, "/42 Amalia/1 IMG", "miuz")
 
 
 conn.close()
