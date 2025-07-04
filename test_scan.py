@@ -228,6 +228,10 @@ class ImagesCompator:
         ]
 
 
+from time import time
+
+start = time()
+
 MainFolder.set_default_main_folders()
 Dbase.create_engine()
 conn = Dbase.engine.connect()
@@ -242,10 +246,18 @@ for main_folder in MainFolder.list_:
             new_dirs = DirsCompator.get_new_dirs(finder_dirs, db_dirs)
             del_dirs = DirsCompator.get_removed_dirs(finder_dirs, db_dirs)
 
-            print("new dirs", main_folder.name, len(new_dirs))
-            print("remove dirs", main_folder.name, len(new_dirs))
+            finder_images = ImagesLoader.load_finder_images(new_dirs, main_folder)
+            db_images = ImagesLoader.load_db_images(new_dirs, main_folder, conn)
 
-            DirsUpdater.remove_db_dirs(conn, del_dirs, main_folder)
-            DirsUpdater.add_new_dirs(conn, new_dirs, main_folder)
+            print("new method", "finder images", len(finder_images))
+            print("new method", "db images", len(finder_images))
+
+            # print("new dirs", main_folder.name, len(new_dirs))
+            # print("remove dirs", main_folder.name, len(new_dirs))
+
+            # DirsUpdater.remove_db_dirs(conn, del_dirs, main_folder)
+            # DirsUpdater.add_new_dirs(conn, new_dirs, main_folder)
 
 conn.close()
+end = time() - start
+print(end)
