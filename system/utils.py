@@ -294,7 +294,7 @@ class MainUtils:
 
     @classmethod
     def get_coll_name(cls, main_folder_path: str, img_path: str) -> str:
-        coll = cls.get_rel_img_path(main_folder_path, img_path)
+        coll = cls.get_rel_path(main_folder_path, img_path)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
@@ -353,7 +353,7 @@ class MainUtils:
         return main_folder_path + rel_img_path
     
     @classmethod
-    def get_rel_img_path(cls, main_folder_path: str, img_path: str) -> str:
+    def get_rel_path(cls, main_folder_path: str, img_path: str) -> str:
         return img_path.replace(main_folder_path, "")
 
     @classmethod

@@ -10,17 +10,13 @@ from system.main_folder import MainFolder
 from system.utils import MainUtils
 
 
-class Dirs:
+class DirsLoader:
 
     @classmethod
-    def get_finder_dirs(cls, main_folder: MainFolder) -> list[tuple[str, int]]:
+    def get_finder_dirs(cls, main_folder: MainFolder) -> list:
         """
-        Рекурсивно собирает список всех поддиректорий внутри main_folder.curr_path. 
-        Параметры:
-        - main_folder (MainFolder)
-
-        Возвращаемое значение:
-        - list[tuple[str, int]] — список относительных директорий с временем модификации.
+        Возвращает:
+        - [(относительный путь к директории, дата изменения), ...]
         """
         dirs = []
         stack = [main_folder.curr_path]
@@ -31,52 +27,69 @@ class Dirs:
                 for entry in it:
                     if entry.is_dir():
                         stack.append(entry.path)
-                        rel_path = MainUtils.get_rel_img_path(main_folder.curr_path, entry.path)
+                        rel_path = MainUtils.get_rel_path(main_folder.curr_path, entry.path)
                         dirs.append((rel_path, int(entry.stat().st_mtime)))
         return dirs
 
     @classmethod
-    def get_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder) -> list[tuple[str, int]]:
+    def get_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder) -> list:
         """
-        Возвращает список (относительный путь, время модификации) из БД по имени MainFolder.
+        Возвращает:
+        - [(относительный путь к директории, дата изменения), ...]
         """
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod)
         q = q.where(DIRS.c.brand == main_folder.name)
         res = conn.execute(q).fetchall()
         return [(short_src, mod) for short_src, mod in res]
-        
+
+
+class DirsCompator:
     @classmethod
-    def get_removed_dirs(cls, finder_dirs, db_dirs):
+    def get_removed_dirs(cls, finder_dirs: list, db_dirs: list) ->:
         """
-        Директории в БД, которых нет в найденных.
-        Args:
-            finder_dirs (list[tuple[str, int]]): найденные директории (путь, время).
-            db_dirs (list[tuple[str, int]]): директории из базы (путь, время).
-        Returns:
-            list[tuple[str, int]]: удалённые директории.
-        """
-        return [(short_src, mod) for short_src, mod in db_dirs if (short_src, mod) not in finder_dirs]
+        Параметры:
+        - finder_dirs: [(относительный путь к директории, дата изменения), ...]
+        - db_dirs: [(относительный путь к директории, дата изменения), ...]
 
-    @classmethod
-    def get_new_dirs(cls, finder_dirs, db_dirs):
+        Возвращает те директории, которых нет в finder_dirs, но есть в db_dirs:
+        - [(относительный путь к директории, дата изменения), ...]
         """
-        Новые директории в найденных, отсутствующие в БД.
-
-        Args:
-            finder_dirs (dict[str, int]): найденные директории {путь: время}.
-            db_dirs (dict[str, int]): директории из базы {путь: время}.
-
-        Returns:
-            list[str]: новые пути.
-        """
-        return [path for path in finder_dirs if path not in db_dirs]
+        return [
+            (rel_dir_path, mod)
+            for rel_dir_path, mod in db_dirs
+            if (rel_dir_path, mod) not in finder_dirs
+        ]
 
     @classmethod
-    def execute_del_dirs(cls, conn: sqlalchemy.Connection, del_dirs: list, main_folder_name: str):
-        for short_src, mod in del_dirs:
+    def get_new_dirs(cls, finder_dirs: list, db_dirs: list) -> list:
+        """
+        Параметры:
+        - finder_dirs: [(относительный путь к директории, дата изменения), ...]
+        - db_dirs: [(относительный путь к директории, дата изменения), ...]
+
+        Возвращает те директории, которых нет в db_dirs, но есть в finder_dirs:
+        - [(относительный путь к директории, дата изменения), ...]
+        """
+        return [
+            (rel_dir_path, mod)
+            for (rel_dir_path, mod) in finder_dirs
+            if (rel_dir_path, mod) not in db_dirs
+        ]
+
+
+class DirsUpdater:
+    @classmethod
+    def remove_db_dirs(cls, conn: sqlalchemy.Connection, del_dirs: list, main_folder: MainFolder):
+        """
+        Параметры:
+        - del_dirs: [(относительный путь к директории, дата изменения), ...]
+
+        Удаляет директории из таблицы DIRS
+        """
+        for rel_dir_path, mod in del_dirs:
             q = sqlalchemy.delete(DIRS)
-            q = q.where(DIRS.c.short_src == short_src)
-            q = q.where(DIRS.c.brand == main_folder_name)
+            q = q.where(DIRS.c.short_src == rel_dir_path)
+            q = q.where(DIRS.c.brand == main_folder.name)
 
             try:
                 conn.execute(q)
@@ -92,16 +105,19 @@ class Dirs:
             conn.rollback()
 
     @classmethod
-    def execute_new_dirs(cls, conn: sqlalchemy.Connection, new_dirs: list, main_folder_name: str):
-        for short_src, mod in new_dirs:
+    def add_new_dirs(cls, conn: sqlalchemy.Connection, new_dirs: list, main_folder: MainFolder):
+        """
+        Параметры:
+        - new_dirs: [(относительный путь к директории, дата изменения), ...]
 
+        Добавляет директории в таблицу DIRS
+        """
+        for short_src, mod in new_dirs:
             values = {
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.MOD: mod,
-                ClmNames.BRAND: main_folder_name
+                ClmNames.BRAND: main_folder.name
             }
-
-
             q = sqlalchemy.insert(DIRS).values(**values)
 
             try:
@@ -118,56 +134,6 @@ class Dirs:
             conn.rollback()
 
 
-class Images:
-    def __init__(self, conn: sqlalchemy.Connection, short_src: str, main_folder: MainFolder):
-        super().__init__()
-        self.conn = conn
-        self.short_src = short_src
-        self.main_folder = main_folder
-
-    def get_db_images(self):
-        """
-        Загружает изображения, соответствующие директории,
-        исключая поддиректории
-        """
-        sep_count = self.short_src.count(os.sep) + 1
-        no_sep = func.replace(THUMBS.c.short_src, "/", "")
-        sep_count_expr = (func.length(THUMBS.c.short_src) - func.length(no_sep))
-
-        stmt = sqlalchemy.select(
-            THUMBS.c.short_hash,
-            THUMBS.c.short_src,
-            THUMBS.c.size,
-            THUMBS.c.birth,
-            THUMBS.c.mod
-            )
-        
-        stmt = stmt.where(
-            THUMBS.c.short_src.like(f"{self.short_src}/%"),
-            sep_count_expr == sep_count,
-            THUMBS.c.brand == self.main_folder.name
-        )
-
-        return conn.execute(stmt).fetchall()
-    
-    def get_finder_images(self):
-        finder_images = []
-
-        for i in os.scandir(self.main_folder.get_current_path()):
-            ...
-
-
-    def get_file_data(self, entry: os.DirEntry) -> tuple[str, int, int, int]:
-        """Получает данные файла."""
-        stats = entry.stat()
-        return (
-            entry.path,
-            int(stats.st_size),
-            int(stats.st_birthtime),
-            int(stats.st_mtime),
-        )
-
-
 coll_folder = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready"
 src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/52 Florance"
 
@@ -181,11 +147,11 @@ for main_folder in MainFolder.list_:
     coll_folder = main_folder.is_available()
     if main_folder:
 
-        finder_dirs = Dirs.get_finder_dirs(main_folder.current_path)
+        finder_dirs = DirsLoader.get_finder_dirs(main_folder.current_path)
         if finder_dirs:
-            db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
-            removed_dirs = Dirs.get_removed_dirs(finder_dirs, db_dirs)
-            new_dirs = Dirs.get_new_dirs(finder_dirs, db_dirs)
+            db_dirs = DirsLoader.get_db_dirs(conn, main_folder.name)
+            removed_dirs = DirsLoader.get_removed_dirs(finder_dirs, db_dirs)
+            new_dirs = DirsLoader.get_new_dirs(finder_dirs, db_dirs)
 
 #             # это нужно будет делать в самом конце, когда уже просканены 
 #             # изображения
