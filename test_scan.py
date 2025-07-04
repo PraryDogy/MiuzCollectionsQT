@@ -19,7 +19,7 @@ class DirsLoader:
         - [(rel_dir_path, mod_time), ...]
         """
         dirs = []
-        stack = [main_folder.curr_path]
+        stack = [main_folder.get_current_path()]
 
         while stack:
             current = stack.pop()
@@ -27,7 +27,7 @@ class DirsLoader:
                 for entry in it:
                     if entry.is_dir():
                         stack.append(entry.path)
-                        rel_path = MainUtils.get_rel_path(main_folder.curr_path, entry.path)
+                        rel_path = MainUtils.get_rel_path(main_folder.get_current_path(), entry.path)
                         dirs.append((rel_path, int(entry.stat().st_mtime)))
         return dirs
 
@@ -147,11 +147,11 @@ class ImagesLoader:
         """
         finder_images = []
         for rel_dir_path, mod in new_dirs:
-            abs_dir_path = MainUtils.get_abs_path(main_folder.curr_path, rel_dir_path)
+            abs_dir_path = MainUtils.get_abs_path(main_folder.get_current_path(), rel_dir_path)
             for i in os.scandir(abs_dir_path):
                 if i.path.endswith(Static.ext_all):
                     try:
-                        rel_img_path = MainUtils.get_rel_path(main_folder.curr_path, i.path)
+                        rel_img_path = MainUtils.get_rel_path(main_folder.get_current_path(), i.path)
                         stats = os.stat(i.path)
                         size = stats.st_size
                         birth = stats.st_birthtime
@@ -235,12 +235,11 @@ JsonData.init()
 
 for main_folder in MainFolder.list_:
     coll_folder = main_folder.is_available()
-    if main_folder:
-
-        finder_dirs = DirsLoader.load_finder_dirs(main_folder.current_path)
+    if coll_folder:
+        finder_dirs = DirsLoader.load_finder_dirs(main_folder)
         if finder_dirs:
-            db_dirs = DirsLoader.load_db_dirs(conn, main_folder.name)
-            removed_dirs = DirsLoader.get_removed_dirs(finder_dirs, db_dirs)
-            new_dirs = DirsLoader.get_new_dirs(finder_dirs, db_dirs)
+            db_dirs = DirsLoader.load_db_dirs(conn, main_folder)
+            new_dirs = DirsCompator.get_new_dirs(finder_dirs, db_dirs)
+            removed_dirs = DirsCompator.get_removed_dirs(finder_dirs, db_dirs)
 
 conn.close()
