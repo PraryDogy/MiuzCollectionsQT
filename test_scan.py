@@ -145,9 +145,7 @@ class ImagesLoader:
         Возвращает изображения в указанных директориях:
         - finder_images: [(относительный путь к директории, дата изменения), ...]
         """
-
         finder_images = []
-
         for rel_dir_path, mod in new_dirs:
             abs_dir_path = MainUtils.get_abs_path(main_folder.curr_path, rel_dir_path)
             for i in os.scandir(abs_dir_path):
@@ -159,6 +157,7 @@ class ImagesLoader:
                     except Exception as e:
                         MainUtils.print_error()
                         continue
+        return finder_images
 
 
 
