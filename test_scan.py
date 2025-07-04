@@ -6,61 +6,71 @@ from sqlalchemy import func
 
 from cfg import JsonData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
-from system.main_folder import MainFolder, miuz, panacea
+from system.main_folder import MainFolder
 from system.utils import MainUtils
 
 
 class Dirs:
 
     @classmethod
-    def get_finder_dirs(cls, main_folder_path: str):
-        dirs: list[tuple[str, int]] = []
-        stack = [main_folder_path]
+    def get_finder_dirs(cls, main_folder: MainFolder) -> list[tuple[str, int]]:
+        """
+        Рекурсивно собирает список всех поддиректорий внутри main_folder.curr_path. 
+        Параметры:
+        - main_folder (MainFolder)
+
+        Возвращаемое значение:
+        - list[tuple[str, int]] — список относительных директорий с временем модификации.
+        """
+        dirs = []
+        stack = [main_folder.curr_path]
 
         while stack:
             current = stack.pop()
-            for i in os.scandir(current):
-                if i.is_dir():
-                    stack.append(i.path)
-                    dirs.append(
-                        (
-                            MainUtils.get_short_img_path(main_folder_path, i.path),
-                            int(i.stat().st_mtime)
-                        )
-                    )
-
+            with os.scandir(current) as it:
+                for entry in it:
+                    if entry.is_dir():
+                        stack.append(entry.path)
+                        rel_path = MainUtils.get_rel_img_path(main_folder.curr_path, entry.path)
+                        dirs.append((rel_path, int(entry.stat().st_mtime)))
         return dirs
 
     @classmethod
-    def get_db_dirs(cls, conn: sqlalchemy.Connection, main_folder_name: str):
+    def get_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder) -> list[tuple[str, int]]:
+        """
+        Возвращает список (относительный путь, время модификации) из БД по имени MainFolder.
+        """
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod)
-        q = q.where(DIRS.c.brand==main_folder_name)
+        q = q.where(DIRS.c.brand == main_folder.name)
         res = conn.execute(q).fetchall()
-        return [
-            (short_src, mod)
-            for short_src, mod in res
-        ]
-    
+        return [(short_src, mod) for short_src, mod in res]
+        
     @classmethod
-    def get_removed_dirs(cls, finder_dirs: list, db_dirs: list):
-        del_dirs = []
-
-        for short_src, mod in db_dirs:
-            if (short_src, mod) not in finder_dirs:
-                del_dirs.append((short_src, mod))
-
-        return del_dirs
+    def get_removed_dirs(cls, finder_dirs, db_dirs):
+        """
+        Директории в БД, которых нет в найденных.
+        Args:
+            finder_dirs (list[tuple[str, int]]): найденные директории (путь, время).
+            db_dirs (list[tuple[str, int]]): директории из базы (путь, время).
+        Returns:
+            list[tuple[str, int]]: удалённые директории.
+        """
+        return [(short_src, mod) for short_src, mod in db_dirs if (short_src, mod) not in finder_dirs]
 
     @classmethod
-    def get_new_dirs(cls, finder_dirs: dict, db_dirs: dict):
-        new_dirs = []
+    def get_new_dirs(cls, finder_dirs, db_dirs):
+        """
+        Новые директории в найденных, отсутствующие в БД.
 
-        for i in finder_dirs:
-            if i not in db_dirs:
-                new_dirs.append(i)
+        Args:
+            finder_dirs (dict[str, int]): найденные директории {путь: время}.
+            db_dirs (dict[str, int]): директории из базы {путь: время}.
 
-        return new_dirs
-    
+        Returns:
+            list[str]: новые пути.
+        """
+        return [path for path in finder_dirs if path not in db_dirs]
+
     @classmethod
     def execute_del_dirs(cls, conn: sqlalchemy.Connection, del_dirs: list, main_folder_name: str):
         for short_src, mod in del_dirs:
@@ -162,17 +172,15 @@ coll_folder = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready"
 src = "/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/52 Florance"
 
 
-MainFolder.list_.append(miuz)
-MainFolder.list_.append(panacea)
-MainFolder.current = MainFolder.list_[0]
-
+MainFolder.set_default_main_folders()
 Dbase.create_engine()
 conn = Dbase.engine.connect()
 JsonData.init()
 
 for main_folder in MainFolder.list_:
-    coll_folder = main_folder.check_avaiability()
-    if main_folder.is_avaiable():
+    coll_folder = main_folder.is_available()
+    if main_folder:
+
         finder_dirs = Dirs.get_finder_dirs(main_folder.current_path)
         if finder_dirs:
             db_dirs = Dirs.get_db_dirs(conn, main_folder.name)
