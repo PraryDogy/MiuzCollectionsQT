@@ -16,7 +16,7 @@ class DirsLoader:
     def load_finder_dirs(cls, main_folder: MainFolder) -> list:
         """
         Возвращает:
-        - [(относительный путь к директории, дата изменения), ...]
+        - [(rel_dir_path, mod_time), ...]
         """
         dirs = []
         stack = [main_folder.curr_path]
@@ -35,7 +35,7 @@ class DirsLoader:
     def load_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder) -> list:
         """
         Возвращает:
-        - [(относительный путь к директории, дата изменения), ...]
+        - [(rel_dir_path, mod_time), ...]
         """
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod)
         q = q.where(DIRS.c.brand == main_folder.name)
@@ -48,8 +48,8 @@ class DirsCompator:
     def get_removed_dirs(cls, finder_dirs: list, db_dirs: list) -> list :
         """
         Параметры:
-        - finder_dirs: [(относительный путь к директории, дата изменения), ...]
-        - db_dirs: [(относительный путь к директории, дата изменения), ...]
+        - finder_dirs: [(rel_dir_path, mod_time), ...]
+        - db_dirs: [(rel_dir_path, mod_time), ...]
 
         Возвращает те директории, которых нет в finder_dirs, но есть в db_dirs:
         - [(относительный путь к директории, дата изменения), ...]
@@ -64,11 +64,11 @@ class DirsCompator:
     def get_new_dirs(cls, finder_dirs: list, db_dirs: list) -> list:
         """
         Параметры:
-        - finder_dirs: [(относительный путь к директории, дата изменения), ...]
-        - db_dirs: [(относительный путь к директории, дата изменения), ...]
+        - finder_dirs: [(rel_dir_path, mod_time), ...]
+        - db_dirs: [(rel_dir_path, mod_time), ...]
 
         Возвращает те директории, которых нет в db_dirs, но есть в finder_dirs:
-        - [(относительный путь к директории, дата изменения), ...]
+        - [(rel_dir_path, mod_time), ...]
         """
         return [
             (rel_dir_path, mod)
@@ -82,7 +82,7 @@ class DirsUpdater:
     def remove_db_dirs(cls, conn: sqlalchemy.Connection, del_dirs: list, main_folder: MainFolder):
         """
         Параметры:
-        - del_dirs: [(относительный путь к директории, дата изменения), ...]
+        - del_dirs: [(rel_dir_path, mod_time), ...]
 
         Удаляет директории из таблицы DIRS
         """
@@ -108,7 +108,7 @@ class DirsUpdater:
     def add_new_dirs(cls, conn: sqlalchemy.Connection, new_dirs: list, main_folder: MainFolder):
         """
         Параметры:
-        - new_dirs: [(относительный путь к директории, дата изменения), ...]
+        - new_dirs: [(rel_dir_path, mod_time), ...]
 
         Добавляет директории в таблицу DIRS
         """
