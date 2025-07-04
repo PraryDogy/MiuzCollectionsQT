@@ -140,10 +140,10 @@ class ImagesLoader:
     def load_finder_images(cls, new_dirs: list, main_folder: MainFolder) -> list:
         """
         Параметры:
-        - new_dirs: [(относительный путь к директории, дата изменения), ...]
+        - new_dirs: [(rel_dir_path, mod_time), ...]
 
         Возвращает изображения в указанных директориях:
-        - finder_images: [(относительный путь к изображению, дата изменения), ...]
+        - finder_images: [(rel_img_path, size, birth_time, mod_time), ...]    
         """
         finder_images = []
         for rel_dir_path, mod in new_dirs:
@@ -152,8 +152,11 @@ class ImagesLoader:
                 if i.path.endswith(Static.ext_all):
                     try:
                         rel_img_path = MainUtils.get_rel_path(main_folder.curr_path, i.path)
-                        mod = os.stat(i.path).st_mtime
-                        finder_images.append((rel_img_path, mod))
+                        stats = os.stat(i.path)
+                        size = stats.st_size
+                        birth = stats.st_birthtime
+                        mod = stats.st_mtime
+                        finder_images.append((rel_img_path, size, birth, mod))
                     except Exception as e:
                         MainUtils.print_error()
                         continue
@@ -163,14 +166,19 @@ class ImagesLoader:
     def load_db_images(cls, new_dirs: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
         """
         Параметры:
-        - new_dirs: [(относительный путь к директории, дата изменения), ...]
+        - new_dirs: [(rel_dir_path, mod_time), ...]
 
         Возвращает изображения в указанных директориях:
-        - db_images: [(относительный путь к изображению, дата изменения), ...]
+        - db_images: [(rel_img_path, size, birth_time, mod_time), ...]    
         """
         db_images: list = []
         for rel_dir_path, mod in new_dirs:
-            q = sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.mod)
+            q = sqlalchemy.select(
+                THUMBS.c.short_src,
+                THUMBS.c.size,
+                THUMBS.c.birth,
+                THUMBS.c.mod
+            )
             q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
             q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             q = q.where(THUMBS.c.brand == main_folder.name)
