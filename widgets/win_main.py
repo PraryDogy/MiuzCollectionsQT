@@ -54,6 +54,7 @@ class USep(QFrame):
 
 class WinMain(UMainWindow):
     argv_flag = "noscan"
+    update_mins = 30
 
     def __init__(self, argv: list[str]):
         super().__init__()
@@ -135,7 +136,7 @@ class WinMain(UMainWindow):
 
         self.backup_timer = QTimer(self)
         self.backup_timer.timeout.connect(self.do_backup)
-        self.backup_timer.start(10 * 60 * 1000)
+        self.backup_timer.start(self.update_mins * 60 * 1000)
         
         QTimer.singleShot(100, self.do_backup)
         QTimer.singleShot(100, self.main_folder_check)
