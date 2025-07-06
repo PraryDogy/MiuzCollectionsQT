@@ -108,16 +108,6 @@ class ImgWid(QLabel):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    def test(self):
-        ev = QMouseEvent(
-            QEvent.Type.MouseButtonRelease,
-            self.cursor().pos(),
-            Qt.MouseButton.LeftButton,
-            Qt.MouseButton.LeftButton,
-            Qt.KeyboardModifier.NoModifier
-        )
-        super().mouseReleaseEvent(ev)
-
     def mouseReleaseEvent(self, ev):
         return super().mouseReleaseEvent(ev)
     
