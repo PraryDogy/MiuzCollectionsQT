@@ -28,6 +28,8 @@ UP_STYLE = f"""
     border-radius: 22px;
 """
 FIRST_LOAD = "first_load"
+MORE = "more"
+FIRST = "first"
 
 
 class CellWid:
