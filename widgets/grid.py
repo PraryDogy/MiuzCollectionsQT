@@ -325,6 +325,8 @@ class Grid(QScrollArea):
         self.col_count: int = 0
         self.wid_under_mouse: Thumbnail = None
         self.origin_pos = QPoint()
+        
+        self.glob_row, self.glob_col = 0, 0
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
@@ -377,7 +379,6 @@ class Grid(QScrollArea):
         self.selected_widgets: list[Thumbnail] = []
         self.grid_widgets: list[QGridLayout] = []
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
-        self.global_row = 0
         Thumbnail.path_to_wid.clear()
         if not db_images:
             self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -390,21 +391,24 @@ class Grid(QScrollArea):
             Thumbnail.calculate_size()
             self.col_count = self.get_max_col()
             for date, db_images_list in db_images.items():
+                
+                
+                
+                
                 self.single_grid(date, db_images_list)
             spacer = QWidget()
             self.scroll_layout.addWidget(spacer)
 
     def single_grid(self, date: str, db_images: list[LoadDbImagesItem]):
-        title = Title(date)
-        self.scroll_layout.addWidget(title)
         grid_wid = GridWidget(date)
         self.scroll_layout.addWidget(grid_wid)
-        self.grid_widgets.append(grid_wid)
+
         grid_lay = QGridLayout()
         grid_lay.setContentsMargins(0, 0, 0, 40)
         grid_lay.setSpacing(2)
         grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         grid_wid.setLayout(grid_lay)
+
         # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
         add_last_row = False
         row, col = 0, 0
@@ -419,8 +423,8 @@ class Grid(QScrollArea):
             wid.set_no_frame()
             wid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
             Thumbnail.path_to_wid[wid.rel_img_path] = wid
-            self.cell_to_wid[self.global_row, col] = wid
-            wid.row, wid.col = self.global_row, col
+            self.cell_to_wid[self.glob_row, col] = wid
+            wid.row, wid.col = self.glob_row, col
             grid_lay.addWidget(wid, row, col)
             col += 1
             add_last_row = True
@@ -431,13 +435,13 @@ class Grid(QScrollArea):
             if col >= self.col_count:  
                 col = 0
                 row += 1
-                self.global_row += 1
+                self.glob_row += 1
                 add_last_row = False
         # Если после цикла остались элементы в неполной последней строке,
         # переходим к следующей строке для корректного добавления
         # новых элементов в будущем.
         if add_last_row:
-            self.global_row += 1
+            self.glob_row += 1
             row += 1
             col = 0
 
@@ -496,7 +500,7 @@ class Grid(QScrollArea):
             return
         Thumbnail.path_to_wid.clear()
         self.cell_to_wid.clear()
-        self.global_row = 0
+        self.glob_row = 0
         self.col_count = self.get_max_col()
         add_last_row = False
         for grid_wid in self.grid_widgets:
@@ -504,19 +508,19 @@ class Grid(QScrollArea):
             grid_lay = grid_wid.layout()
             for wid in grid_wid.findChildren(Thumbnail):
                 Thumbnail.path_to_wid[wid.rel_img_path] = wid
-                self.cell_to_wid[self.global_row, col] = wid
-                wid.row, wid.col = self.global_row, col
+                self.cell_to_wid[self.glob_row, col] = wid
+                wid.row, wid.col = self.glob_row, col
                 grid_lay.addWidget(wid, row, col)
                 col += 1
                 add_last_row = True
                 if col >= self.col_count:
                     add_last_row = False
                     col = 0
-                    self.global_row += 1
+                    self.glob_row += 1
                     row += 1       
             if add_last_row:
                 col = 0
-                self.global_row += 1
+                self.glob_row += 1
                 row += 1
 
     def get_wid_under_mouse(self, a0: QMouseEvent) -> None | Thumbnail:
