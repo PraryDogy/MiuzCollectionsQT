@@ -198,7 +198,8 @@ class Thumbnail(QFrame, CellWid):
         self.setFixedSize(Thumbnail.thumb_w, Thumbnail.thumb_h)
 
         # рамка вокруг pixmap при выделении Thumb
-        self.img_wid.setFixedSize(Thumbnail.pixmap_size + ThumbData.OFFSET, Thumbnail.pixmap_size + ThumbData.OFFSET)
+        size_ = Thumbnail.pixmap_size + ThumbData.OFFSET
+        self.img_wid.setFixedSize(size_, size_)
         self.img_wid.setPixmap(PixmapUtils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
