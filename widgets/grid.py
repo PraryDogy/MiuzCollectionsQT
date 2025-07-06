@@ -39,8 +39,8 @@ class Title(QLabel, CellWid):
     """
 
     def __init__(self, title: str):
-        CellWid.__init__(self)
-        QLabel.__init__(self, text=title)
+        super().__init__()
+        self.setText(title)
         self.setSizePolicy(
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Preferred
@@ -162,8 +162,7 @@ class Thumbnail(QFrame, CellWid):
     corner = 0
 
     def __init__(self, pixmap: QPixmap, rel_img_path: str, coll_name: str, fav: int, f_mod: str):
-        CellWid.__init__(self)
-        QFrame.__init__(self)
+        super().__init__()
         self.setStyleSheet(Static.border_transparent_style)
 
         self.img = pixmap
