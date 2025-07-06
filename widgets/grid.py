@@ -22,11 +22,7 @@ from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
 from .win_info import WinInfo
 from .win_warn import WinWarn
 
-UP_SVG = os.path.join(Static.INNER_IMAGES, "up.svg")
-UP_STYLE = f"""
-    background: {Static.gray_color};
-    border-radius: 22px;
-"""
+
 FIRST_LOAD = "first_load"
 
 
@@ -291,16 +287,22 @@ class NoImagesLabel(QLabel):
 
 class UpBtn(QFrame):
     scroll_to_top = pyqtSignal()
+    icon = os.path.join(Static.INNER_IMAGES, "up.svg")
+    icon_size = 44
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-        self.setFixedSize(44, 44)
-        self.setStyleSheet(UP_STYLE)
+        self.setFixedSize(self.icon_size, self.icon_size)
+        style_ = f"""
+            background: {Static.gray_color};
+            border-radius: 22px;
+        """
+        self.setStyleSheet(style_)
 
         v_layout = UVBoxLayout()
         self.setLayout(v_layout)
 
-        self.svg = SvgBtn(UP_SVG, 44)
+        self.svg = SvgBtn(self.icon, self.icon_size)
         v_layout.addWidget(self.svg)
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
