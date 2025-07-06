@@ -23,9 +23,6 @@ from .win_info import WinInfo
 from .win_warn import WinWarn
 
 
-FIRST_LOAD = "first_load"
-
-
 class CellWid:
     def __init__(self):
         super().__init__()
@@ -334,6 +331,7 @@ class Grid(QScrollArea):
         self.setStyleSheet("QScrollArea { border: none; }")
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
+        self.first_load = True
         self.col_count: int = 0
         self.wid_under_mouse: Thumbnail = None
         self.origin_pos = QPoint()
@@ -503,8 +501,8 @@ class Grid(QScrollArea):
 
     def rearrange(self):
         "перетасовка сетки"
-        if not hasattr(self, FIRST_LOAD):
-            setattr(self, FIRST_LOAD, False)
+        if self.first_load:
+            self.first_load = False
             return
         Thumbnail.path_to_wid.clear()
         self.cell_to_wid.clear()
@@ -728,8 +726,8 @@ class Grid(QScrollArea):
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
 
-        if not hasattr(self, FIRST_LOAD):
-            setattr(self, FIRST_LOAD, False)
+        if self.first_load:
+            self.first_load = False
             return
 
         self.resize_timer.stop()
