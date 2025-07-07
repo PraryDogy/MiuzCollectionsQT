@@ -374,7 +374,7 @@ class Grid(QScrollArea):
             f"""
             font-size: 24pt;
             font-weight: bold;
-            background: {Static.gray_color};
+            background: rgba(125, 125, 125, 1);
             border-radius: 7px;
             padding-left: 2px;
             padding-right: 2px;
