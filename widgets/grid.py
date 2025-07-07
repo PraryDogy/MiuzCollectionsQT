@@ -371,6 +371,11 @@ class Grid(QScrollArea):
         self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
         self.up_btn.hide()
         
+    def load_no_images(self):
+        self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.no_images_wid = NoImagesLabel()
+        self.scroll_layout.addWidget(self.no_images_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+        
     def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for i in (self.grid_wid, self.rubberBand):
             i.deleteLater()
@@ -378,19 +383,18 @@ class Grid(QScrollArea):
         for i in (self.selected_widgets, self.cell_to_wid, Thumbnail.path_to_wid):
             i.clear()
 
-        if not db_images:
-            self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            wid = NoImagesLabel()
-            self.scroll_layout.addWidget(wid, alignment=Qt.AlignmentFlag.AlignCenter)
-            return
+        self.load_grid_wid()
+        self.load_rubber()
+
+        # if not db_images:
+        #     self.load_no_images()
+        #     return
         
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         
         Thumbnail.calculate_size()
         self.col_count = self.get_max_col()
         self.glob_row, self.glob_col = 0, 0
-        self.load_grid_wid()
-        self.load_rubber()
 
         for date, db_images_list in db_images.items():
             self.single_grid(db_images_list)
