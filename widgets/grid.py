@@ -395,7 +395,7 @@ class Grid(QScrollArea):
     def single_grid(self, db_images: list[LoadDbImagesItem]):
         # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
         add_last_row = False
-        row, col = 0, 0
+
         for db_image in db_images:
             wid = Thumbnail(
                 pixmap=db_image.pixmap,
@@ -407,18 +407,17 @@ class Grid(QScrollArea):
             wid.set_no_frame()
             wid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
             Thumbnail.path_to_wid[wid.rel_img_path] = wid
-            self.cell_to_wid[self.glob_row, col] = wid
-            wid.row, wid.col = self.glob_row, col
-            grid_lay.addWidget(wid, row, col)
-            col += 1
+            self.cell_to_wid[self.glob_row, self.glob_col] = wid
+            wid.row, wid.col = self.glob_row, self.glob_col
+            self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
+            self.glob_col += 1
             add_last_row = True
             # Если достигли максимального количества столбцов:
             # Сбрасываем индекс столбца.
             # Переходим к следующей строке.
             # Указываем, что текущая строка завершена.
-            if col >= self.col_count:  
-                col = 0
-                row += 1
+            if self.glob_col >= self.col_count:  
+                self.glob_col = 0
                 self.glob_row += 1
                 add_last_row = False
         # Если после цикла остались элементы в неполной последней строке,
@@ -426,8 +425,7 @@ class Grid(QScrollArea):
         # новых элементов в будущем.
         if add_last_row:
             self.glob_row += 1
-            row += 1
-            col = 0
+            self.glob_col = 0
 
     def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
         if db_images:
