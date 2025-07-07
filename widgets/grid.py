@@ -498,6 +498,7 @@ class Grid(QScrollArea):
             self.add_thumb_data(wid)
             self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
             self.glob_col += 1
+            f_mod = wid.f_mod
             if self.glob_col >= self.col_count:
                 self.glob_col = 0
                 self.glob_row += 1
