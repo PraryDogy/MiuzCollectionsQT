@@ -4,9 +4,9 @@ import os
 from PyQt5.QtCore import (QEvent, QMimeData, QPoint, QRect, QSize, Qt, QTimer,
                           QUrl, pyqtSignal)
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
-                         QPixmap, QResizeEvent)
+                         QPixmap, QResizeEvent, QColor)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QRubberBand, QScrollArea, QSizePolicy, QWidget)
+                             QRubberBand, QScrollArea, QSizePolicy, QWidget, QGraphicsDropShadowEffect)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import SystemFilter, UserFilter
@@ -374,12 +374,19 @@ class Grid(QScrollArea):
             f"""
             font-size: 24pt;
             font-weight: bold;
-            background: rgba(125, 125, 125, 1);
+            background: rgba(125, 125, 125, 0.5);
             border-radius: 7px;
             padding-left: 2px;
             padding-right: 2px;
             """
         )
+
+        # shadow = QGraphicsDropShadowEffect(self.date_wid)
+        # shadow.setBlurRadius(10)
+        # shadow.setOffset(2, 2)
+        # shadow.setColor(QColor(0, 0, 0, 160))
+        # self.date_wid.setGraphicsEffect(shadow)
+
         self.date_wid.hide()
         
     def load_up_btn(self):
@@ -823,7 +830,7 @@ class Grid(QScrollArea):
                 self.date_wid.show()
                 self.date_wid.move(
                     (self.viewport().width() - self.date_wid.width()) // 2,
-                    self.date_wid.y()
+                    5
                 )
      
         elif value == 0:
