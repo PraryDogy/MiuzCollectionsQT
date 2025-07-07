@@ -415,8 +415,6 @@ class Grid(QScrollArea):
         wid.row, wid.col = self.glob_row, self.glob_col        
 
     def single_grid(self, db_images: list[LoadDbImagesItem]):
-        add_last_row = False
-
         for db_image in db_images:
             wid = Thumbnail(
                 pixmap=db_image.pixmap,
@@ -429,22 +427,15 @@ class Grid(QScrollArea):
             wid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
             self.add_thumb_data(wid)
             self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
+
             self.glob_col += 1
-            add_last_row = True
-            # Если достигли максимального количества столбцов:
-            # Сбрасываем индекс столбца.
-            # Переходим к следующей строке.
-            # Указываем, что текущая строка завершена.
-            if self.glob_col >= self.col_count:  
+            if self.glob_col >= self.col_count:
                 self.glob_col = 0
                 self.glob_row += 1
-                add_last_row = False
-        # Если после цикла остались элементы в неполной последней строке,
-        # переходим к следующей строке для корректного добавления
-        # новых элементов в будущем.
-        if add_last_row:
-            self.glob_row += 1
+
+        if self.glob_col != 0:
             self.glob_col = 0
+            self.glob_row += 1
 
     def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for date, db_images_list in db_images.items():
