@@ -794,17 +794,13 @@ class Grid(QScrollArea):
         self.menu_.show_()
 
     def checkScrollValue(self, value):
-        self.up_btn.move(
-            self.width() - 65,
-            self.height() - 60 + value
-            )
 
-        self.date_wid.move(
-            (self.viewport().width() - self.date_wid.width()) // 2,
-            self.date_wid.y()
-        )
-        
         if value > 0:
+            self.up_btn.move(
+                self.width() - 65,
+                self.height() - 60 + value
+                )
+        
             self.up_btn.show()
             self.up_btn.raise_()
             
@@ -815,6 +811,10 @@ class Grid(QScrollArea):
                 self.date_wid.setText(wid.f_mod)
                 self.date_wid.adjustSize()
                 self.date_wid.show()
+                self.date_wid.move(
+                    (self.viewport().width() - self.date_wid.width()) // 2,
+                    self.date_wid.y()
+                )
      
         elif value == 0:
             self.date_wid.hide()
