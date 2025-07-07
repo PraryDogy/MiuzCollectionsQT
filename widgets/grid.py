@@ -391,9 +391,13 @@ class Grid(QScrollArea):
 
         for date, db_images_list in db_images.items():
             self.single_grid(db_images_list)
+            
+    def add_thumb_data(self, wid: Thumbnail):
+        Thumbnail.path_to_wid[wid.rel_img_path] = wid
+        self.cell_to_wid[self.glob_row, self.glob_col] = wid
+        wid.row, wid.col = self.glob_row, self.glob_col        
 
     def single_grid(self, db_images: list[LoadDbImagesItem]):
-        # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
         add_last_row = False
 
         for db_image in db_images:
@@ -406,9 +410,7 @@ class Grid(QScrollArea):
             )
             wid.set_no_frame()
             wid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
-            Thumbnail.path_to_wid[wid.rel_img_path] = wid
-            self.cell_to_wid[self.glob_row, self.glob_col] = wid
-            wid.row, wid.col = self.glob_row, self.glob_col
+            self.add_thumb_data(wid)
             self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
             self.glob_col += 1
             add_last_row = True
@@ -489,9 +491,7 @@ class Grid(QScrollArea):
         add_last_row = False
 
         for wid in self.grid_wid.findChildren(Thumbnail):
-            Thumbnail.path_to_wid[wid.rel_img_path] = wid
-            self.cell_to_wid[self.glob_row, self.glob_col] = wid
-            wid.row, wid.col = self.glob_row, self.glob_col
+            self.add_thumb_data(wid)
             self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
             self.glob_col += 1
             add_last_row = True
