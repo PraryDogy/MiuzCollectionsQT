@@ -339,8 +339,6 @@ class Grid(QScrollArea):
         self.load_rubber()
         
         self.reload_thumbnails()
-        
-        Static.GRID_LIMIT = 30
 
     def scroll_to_top(self):
         self.verticalScrollBar().setValue(0)
@@ -799,6 +797,13 @@ class Grid(QScrollArea):
         if value > 0:
             self.up_btn.show()
             self.up_btn.raise_()
+            
+            point = QPoint(50, 50)
+            mapped_pos = self.scroll_wid.mapFrom(self.viewport(), point)
+            wid: Thumbnail = self.scroll_wid.childAt(mapped_pos).parent()
+            if isinstance(wid, Thumbnail):
+                a = wid.f_mod
+     
         elif value == 0:
             self.up_btn.hide()
 
