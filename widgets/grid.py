@@ -408,7 +408,7 @@ class Grid(QScrollArea):
 
         for date, db_images_list in db_images.items():
             self.single_grid(db_images_list)
-            
+                        
     def add_thumb_data(self, wid: Thumbnail):
         Thumbnail.path_to_wid[wid.rel_img_path] = wid
         self.cell_to_wid[self.glob_row, self.glob_col] = wid
