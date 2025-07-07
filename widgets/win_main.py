@@ -115,7 +115,7 @@ class WinMain(UMainWindow):
 
         self.bar_bottom = BarBottom()
         self.bar_bottom.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.bar_bottom.theme_changed.connect(self.grid.reload_rubber)
+        self.bar_bottom.theme_changed.connect(self.reload_rubber)
         self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
         right_lay.addWidget(self.bar_bottom)
 
@@ -143,6 +143,10 @@ class WinMain(UMainWindow):
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
+    
+    def reload_rubber(self):
+        self.grid.rubberBand.deleteLater()
+        self.grid.load_rubber()
 
     def main_folder_check(self):
         main_folder = MainFolder.current.is_available()

@@ -296,12 +296,6 @@ class UpBtn(QFrame):
         if a0.button() == Qt.MouseButton.LeftButton:
             self.scroll_to_top.emit()
         return super().mouseReleaseEvent(a0)
-    
-
-class GridWidget(QWidget):
-    def __init__(self, name: str):
-        super().__init__()
-        self.name = name
 
 
 class Grid(QScrollArea):
@@ -325,7 +319,8 @@ class Grid(QScrollArea):
         self.col_count: int = 0
         self.wid_under_mouse: Thumbnail = None
         self.origin_pos = QPoint()
-        
+        self.selected_widgets: list[Thumbnail] = []
+        self.cell_to_wid: dict[tuple, Thumbnail] = {}
         self.glob_row, self.glob_col = 0, 0
 
         self.resize_timer = QTimer(self)
@@ -337,12 +332,12 @@ class Grid(QScrollArea):
         
         self.scroll_layout = UVBoxLayout()
         self.scroll_wid.setLayout(self.scroll_layout)
-
+        
+        self.load_up_btn()
+        self.load_grid_wid()
         self.load_rubber()
+        
         self.reload_thumbnails()
-
-    def scroll_to_top(self):
-        self.verticalScrollBar().setValue(0)
 
     def reload_thumbnails(self):
         Dynamic.grid_offset = 0
@@ -361,54 +356,43 @@ class Grid(QScrollArea):
 
     def load_rubber(self):
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
-
-    def reload_rubber(self):
-        self.rubberBand.deleteLater()
-        self.load_rubber()
-
-    def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
-        widgets = self.scroll_wid.findChildren(QWidget)
-        if self.rubberBand in widgets:
-            widgets.remove(self.rubberBand)
-        for wid in widgets:
-            wid.deleteLater()
-        self.reload_rubber()
+        
+    def load_grid_wid(self):
+        self.grid_wid = QWidget()
+        self.scroll_layout.addWidget(self.grid_wid)
+        self.grid_lay = QGridLayout()
+        self.grid_wid.setLayout(self.grid_lay)
+        
+    def load_up_btn(self):
         self.up_btn = UpBtn(self.scroll_wid)
-        self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
+        self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
         self.up_btn.hide()
-        self.selected_widgets: list[Thumbnail] = []
-        self.grid_widgets: list[QGridLayout] = []
-        self.cell_to_wid: dict[tuple, Thumbnail] = {}
-        Thumbnail.path_to_wid.clear()
+        
+    def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
+        for i in (self.grid_wid, self.rubberBand):
+            i.deleteLater()
+        
+        for i in (self.selected_widgets, self.cell_to_wid, Thumbnail.path_to_wid):
+            i.clear()
+
         if not db_images:
             self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            error_title = NoImagesLabel()
-            self.scroll_layout.addWidget(error_title, alignment=Qt.AlignmentFlag.AlignCenter)
-        else:
-            self.scroll_layout.setAlignment(
-                Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
-            )
-            Thumbnail.calculate_size()
-            self.col_count = self.get_max_col()
-            for date, db_images_list in db_images.items():
-                
-                
-                
-                
-                self.single_grid(date, db_images_list)
-            spacer = QWidget()
-            self.scroll_layout.addWidget(spacer)
+            wid = NoImagesLabel()
+            self.scroll_layout.addWidget(wid, alignment=Qt.AlignmentFlag.AlignCenter)
+            return
+        
+        self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+        
+        Thumbnail.calculate_size()
+        self.col_count = self.get_max_col()
+        self.glob_row, self.glob_col = 0, 0
+        self.load_grid_wid()
+        self.load_rubber()
 
-    def single_grid(self, date: str, db_images: list[LoadDbImagesItem]):
-        grid_wid = GridWidget(date)
-        self.scroll_layout.addWidget(grid_wid)
+        for date, db_images_list in db_images.items():
+            self.single_grid(db_images_list)
 
-        grid_lay = QGridLayout()
-        grid_lay.setContentsMargins(0, 0, 0, 40)
-        grid_lay.setSpacing(2)
-        grid_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        grid_wid.setLayout(grid_lay)
-
+    def single_grid(self, db_images: list[LoadDbImagesItem]):
         # Флаг, указывающий, нужно ли добавить последнюю строку в сетке.
         add_last_row = False
         row, col = 0, 0
