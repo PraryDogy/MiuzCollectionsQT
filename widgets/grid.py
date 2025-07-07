@@ -435,7 +435,6 @@ class Grid(QScrollArea):
                 self.single_grid(date, db_images_list)
     
     def open_in_view(self, wid: Thumbnail):
-        assert isinstance(wid, Thumbnail)
         from .win_image_view import WinImageView
         if len(self.selected_widgets) == 1:
             path_to_wid = Thumbnail.path_to_wid
@@ -478,7 +477,6 @@ class Grid(QScrollArea):
         self.rearrange()
 
     def rearrange(self):
-        "перетасовка сетки"
         if self.first_load:
             self.first_load = False
             return
