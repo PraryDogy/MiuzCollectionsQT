@@ -370,7 +370,16 @@ class Grid(QScrollArea):
         
     def load_date_wid(self):
         self.date_wid = QLabel(self.viewport())
-        self.date_wid.setText("test")
+        self.date_wid.setStyleSheet(
+            f"""
+            font-size: 24pt;
+            font-weight: bold;
+            background: {Static.gray_color};
+            border-radius: 7px;
+            padding-left: 2px;
+            padding-right: 2px;
+            """
+        )
         self.date_wid.hide()
         
     def load_up_btn(self):
