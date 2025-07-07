@@ -339,6 +339,9 @@ class Grid(QScrollArea):
         
         self.reload_thumbnails()
 
+    def scroll_to_top(self):
+        self.verticalScrollBar().setValue(0)
+
     def reload_thumbnails(self):
         Dynamic.grid_offset = 0
         cmd_ = lambda db_images: self.create_grid(db_images)
@@ -365,7 +368,7 @@ class Grid(QScrollArea):
         
     def load_up_btn(self):
         self.up_btn = UpBtn(self.scroll_wid)
-        self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
+        self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
         self.up_btn.hide()
         
     def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
