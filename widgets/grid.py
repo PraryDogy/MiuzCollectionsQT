@@ -493,19 +493,16 @@ class Grid(QScrollArea):
 
         self.col_count = self.get_max_col()
         self.glob_row, self.glob_col = 0, 0
-        add_last_row = False
 
         for wid in self.grid_wid.findChildren(Thumbnail):
             self.add_thumb_data(wid)
             self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
             self.glob_col += 1
-            add_last_row = True
             if self.glob_col >= self.col_count:
-                add_last_row = False
                 self.glob_col = 0
                 self.glob_row += 1
-    
-        if add_last_row:
+
+        if self.glob_col != 0:
             self.glob_col = 0
             self.glob_row += 1
 
