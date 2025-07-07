@@ -480,30 +480,29 @@ class Grid(QScrollArea):
         if self.first_load:
             self.first_load = False
             return
-        Thumbnail.path_to_wid.clear()
-        self.cell_to_wid.clear()
-        self.glob_row = 0
+
+        for i in (self.cell_to_wid, Thumbnail.path_to_wid):
+            i.clear()
+
         self.col_count = self.get_max_col()
+        self.glob_row, self.glob_col = 0, 0
         add_last_row = False
-        for grid_wid in self.grid_widgets:
-            row, col = 0, 0
-            grid_lay = grid_wid.layout()
-            for wid in grid_wid.findChildren(Thumbnail):
-                Thumbnail.path_to_wid[wid.rel_img_path] = wid
-                self.cell_to_wid[self.glob_row, col] = wid
-                wid.row, wid.col = self.glob_row, col
-                grid_lay.addWidget(wid, row, col)
-                col += 1
-                add_last_row = True
-                if col >= self.col_count:
-                    add_last_row = False
-                    col = 0
-                    self.glob_row += 1
-                    row += 1       
-            if add_last_row:
-                col = 0
+
+        for wid in self.grid_wid.findChildren(Thumbnail):
+            Thumbnail.path_to_wid[wid.rel_img_path] = wid
+            self.cell_to_wid[self.glob_row, self.glob_col] = wid
+            wid.row, wid.col = self.glob_row, self.glob_col
+            self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
+            self.glob_col += 1
+            add_last_row = True
+            if self.glob_col >= self.col_count:
+                add_last_row = False
+                self.glob_col = 0
                 self.glob_row += 1
-                row += 1
+    
+        if add_last_row:
+            self.glob_col = 0
+            self.glob_row += 1
 
     def get_wid_under_mouse(self, a0: QMouseEvent) -> None | Thumbnail:
         wid = QApplication.widgetAt(a0.globalPos())
