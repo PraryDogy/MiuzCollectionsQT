@@ -339,6 +339,8 @@ class Grid(QScrollArea):
         self.load_rubber()
         
         self.reload_thumbnails()
+        
+        Static.GRID_LIMIT = 30
 
     def scroll_to_top(self):
         self.verticalScrollBar().setValue(0)
@@ -432,9 +434,8 @@ class Grid(QScrollArea):
             self.glob_col = 0
 
     def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
-        if db_images:
-            for date, db_images_list in db_images.items():
-                self.single_grid(date, db_images_list)
+        for date, db_images_list in db_images.items():
+            self.single_grid(date, db_images_list)
     
     def open_in_view(self, wid: Thumbnail):
         from .win_image_view import WinImageView
