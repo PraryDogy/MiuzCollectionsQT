@@ -331,6 +331,7 @@ class Grid(QScrollArea):
         self.setWidget(self.scroll_wid)
         
         self.scroll_layout = UVBoxLayout()
+        self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.scroll_wid.setLayout(self.scroll_layout)
         
         self.load_up_btn()
@@ -371,10 +372,10 @@ class Grid(QScrollArea):
         self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
         self.up_btn.hide()
         
-    def load_no_images(self):
-        self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.no_images_wid = NoImagesLabel()
-        self.scroll_layout.addWidget(self.no_images_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+    # def load_no_images(self):
+    #     self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    #     self.no_images_wid = NoImagesLabel()
+    #     self.scroll_layout.addWidget(self.no_images_wid, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for i in (self.grid_wid, self.rubberBand):
@@ -385,13 +386,7 @@ class Grid(QScrollArea):
 
         self.load_grid_wid()
         self.load_rubber()
-
-        # if not db_images:
-        #     self.load_no_images()
-        #     return
-        
-        self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-        
+                
         Thumbnail.calculate_size()
         self.col_count = self.get_max_col()
         self.glob_row, self.glob_col = 0, 0
