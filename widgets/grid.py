@@ -334,6 +334,7 @@ class Grid(QScrollArea):
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.scroll_wid.setLayout(self.scroll_layout)
         
+        self.load_date_wid()
         self.load_up_btn()
         self.load_grid_wid()
         self.load_rubber()
@@ -366,6 +367,11 @@ class Grid(QScrollArea):
         self.scroll_layout.addWidget(self.grid_wid)
         self.grid_lay = QGridLayout()
         self.grid_wid.setLayout(self.grid_lay)
+        
+    def load_date_wid(self):
+        self.date_wid = QLabel(self.viewport())
+        self.date_wid.setText("test")
+        self.date_wid.hide()
         
     def load_up_btn(self):
         self.up_btn = UpBtn(self.scroll_wid)
@@ -802,9 +808,14 @@ class Grid(QScrollArea):
             mapped_pos = self.scroll_wid.mapFrom(self.viewport(), point)
             wid: Thumbnail = self.scroll_wid.childAt(mapped_pos).parent()
             if isinstance(wid, Thumbnail):
-                a = wid.f_mod
+                self.date_wid.setText(wid.f_mod)
+                self.date_wid.adjustSize()
+                self.date_wid.show()
+                # self.date_wid.show()
+                # self.date_wid.raise_()
      
         elif value == 0:
+            self.date_wid.hide()
             self.up_btn.hide()
 
         if value == self.verticalScrollBar().maximum():
