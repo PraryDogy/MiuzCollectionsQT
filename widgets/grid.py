@@ -449,7 +449,7 @@ class Grid(QScrollArea):
         wid = Thumbnail.path_to_wid.get(path)
         if wid:
             self.clear_selected_widgets()
-            self.add_and_select_widget(wid=wid)
+            self.add_and_select_widget(wid)
     
     def clear_thumb_data(self):
         """
