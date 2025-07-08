@@ -795,15 +795,14 @@ class Grid(QScrollArea):
             point = QPoint(50, 50)
             mapped_pos = self.scroll_wid.mapFrom(self.viewport(), point)
             wid: Thumbnail = self.scroll_wid.childAt(mapped_pos).parent()
-            if isinstance(wid, Thumbnail):
-                if wid.f_mod != self.date_wid.text():
-                    self.date_wid.setText(wid.f_mod)
-                    self.date_wid.adjustSize()
-                    self.date_wid.move(
-                        (self.viewport().width() - self.date_wid.width()) // 2,
-                        5
-                    )
-                self.date_wid.show()
+            if isinstance(wid, Thumbnail) and wid.f_mod != self.date_wid.text():
+                self.date_wid.setText(wid.f_mod)
+                self.date_wid.adjustSize()
+                self.date_wid.move(
+                    (self.viewport().width() - self.date_wid.width()) // 2,
+                    5
+                )
+            self.date_wid.show()
      
         elif value == 0:
             self.date_wid.hide()
