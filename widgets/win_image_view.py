@@ -15,11 +15,11 @@ from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
                             WinChild)
-from .actions import (CopyName, CopyPath, FavActionDb, ShowInFinder, Save,
+from .actions import (CopyName, CopyPath, FavActionDb, Save, ShowInFinder,
                       WinInfoAction)
+from .grid import Thumbnail
 from .win_info import WinInfo
 from .win_warn import WinWarn
-from .grid import Thumbnail
 
 
 class ImageWidget(QLabel):
