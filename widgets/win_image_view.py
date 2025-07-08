@@ -7,7 +7,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
                          QPaintEvent, QPixmap, QPixmapCache, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from cfg import Dynamic, Static
+from cfg import Static
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadImage, LoadThumb
@@ -17,9 +17,9 @@ from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
                             WinChild)
 from .actions import (CopyName, CopyPath, FavActionDb, ShowInFinder, Save,
                       WinInfoAction)
-from .grid import Thumbnail
 from .win_info import WinInfo
 from .win_warn import WinWarn
+from .grid import Thumbnail
 
 
 class ImageWidget(QLabel):
