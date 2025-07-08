@@ -289,7 +289,7 @@ class WinMain(UMainWindow):
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
-            self.upload_win = WinUpload()
+            self.upload_win = WinUpload(self)
             self.upload_win.center_relative_parent(self.window())
             cmd = lambda dest: self.filemove_task_start(dest, img_path_list)
             self.upload_win.finished_.connect(cmd)
@@ -326,7 +326,7 @@ class WinMain(UMainWindow):
     def open_upload_win(self, img_path_list: list):
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
-            self.upload_win = WinUpload()
+            self.upload_win = WinUpload(self)
             self.upload_win.finished_.connect(lambda dest: self.upload_task_start(dest, img_path_list))
             self.upload_win.center_relative_parent(self)
             self.upload_win.show()
