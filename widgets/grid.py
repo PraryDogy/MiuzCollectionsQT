@@ -309,7 +309,6 @@ class Grid(QScrollArea):
         super().__init__()
         self.setWidgetResizable(True)
         self.setAcceptDrops(True)
-        # self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setStyleSheet("QScrollArea { border: none; }")
@@ -341,7 +340,7 @@ class Grid(QScrollArea):
         shadow.setColor(QColor(0, 0, 0, 255))
         self.date_wid.setGraphicsEffect(shadow)
 
-        self.up_btn = UpBtn(self.scroll_wid)
+        self.up_btn = UpBtn(self.viewport())
         self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
         self.up_btn.hide()
 
@@ -780,12 +779,11 @@ class Grid(QScrollArea):
 
     def checkScrollValue(self, value):
 
-        if value > 0:
+        if value > 0:            
             self.up_btn.move(
-                self.width() - 65,
-                self.height() - 60 + value
-                )
-        
+                self.viewport().width() - self.up_btn.width() - 20,
+                self.viewport().height() - self.up_btn.height() - 20
+            )
             self.up_btn.show()
             self.up_btn.raise_()
             
