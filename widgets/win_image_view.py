@@ -181,6 +181,8 @@ class WinImageView(WinChild):
     task_count_limit = 10
     switch_image_sig = pyqtSignal(object)
     closed_ = pyqtSignal()
+    ww, hh = 700, 500
+    min_w, min_h = 500, 400
 
     def __init__(self, rel_img_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
@@ -194,8 +196,8 @@ class WinImageView(WinChild):
         self.task_count = 0
 
         self.setStyleSheet(IMG_VIEW_STYLE)
-        self.setMinimumSize(QSize(500, 400))
-        self.resize(Dynamic.imgview_g["aw"], Dynamic.imgview_g["ah"])
+        self.setMinimumSize(QSize(self.min_w, self.min_h))
+        self.resize(self.ww, self.hh)
         self.installEventFilter(self)
 
         self.mouse_move_timer = QTimer(self)
@@ -447,7 +449,8 @@ class WinImageView(WinChild):
         bottom_window_side = a0.size().height() - self.zoom_btns.height()
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
 
-        Dynamic.imgview_g.update({"aw": a0.size().width(), "ah": a0.size().height()})
+        WinImageView.ww = a0.size().width()
+        WinImageView.hh = a0.size().height()
 
         return super().resizeEvent(a0)
 
