@@ -383,10 +383,8 @@ class Grid(QScrollArea):
         self.clear_selected_widgets()
         self.load_grid_wid()
         self.load_rubber()
-                
         Thumbnail.calculate_size()
-        self.max_col = self.get_max_col()
-        self.glob_row, self.glob_col = 0, 0
+        self.clear_cell_data()
 
         for date, db_images_list in db_images.items():
             self.single_grid(db_images_list)
@@ -462,21 +460,28 @@ class Grid(QScrollArea):
         """
         for i in (self.cell_to_wid, Thumbnail.path_to_wid):
             i.clear()
+            
+    def clear_cell_data(self):
+        """
+        Сбрасывет max col, glob row, glob col
+        """
+        self.max_col = self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_ind])
+        self.glob_row, self.glob_col = 0, 0
 
     def resize_thumbnails(self):
-        "изменение размера Thumbnail"
+        """
+        - Высчитывает новые размеры Thumbnail
+        - Меняет размеры виджетов Thumbnail в текущей сетке
+        - Переформирует сетку в соотетствии с новыми размерами
+        """
         Thumbnail.calculate_size()
-        for path, wid in Thumbnail.path_to_wid.items():
+        for cell, wid in self.cell_to_wid.items():
             wid.setup()
-        for i in self.selected_widgets:
-            i.set_frame()
         self.rearrange()
 
     def rearrange(self):
         self.clear_thumb_data()
-
-        self.max_col = self.get_max_col()
-        self.glob_row, self.glob_col = 0, 0
+        self.clear_cell_data()
         thumbnails = self.grid_wid.findChildren(Thumbnail)
         if not thumbnails:
             return
@@ -508,11 +513,17 @@ class Grid(QScrollArea):
             return None
         
     def clear_selected_widgets(self):
+        """
+        Очищает selected widgets и убирает стиль выделенных виджетов
+        """
         for i in self.selected_widgets:
             i.set_no_frame()
         self.selected_widgets.clear()
 
     def add_and_select_widget(self, wid: Thumbnail):
+        """
+        Добавляет в selected widgets и задает стиль переданному виджету
+        """
         if isinstance(wid, Thumbnail):
             self.selected_widgets.append(wid)
             wid.set_frame()
