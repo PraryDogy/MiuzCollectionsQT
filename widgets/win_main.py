@@ -55,11 +55,13 @@ class USep(QFrame):
 class WinMain(UMainWindow):
     argv_flag = "noscan"
     update_mins = 30
+    min_w = 750
+    ww, hh = 870, 500
 
     def __init__(self, argv: list[str]):
         super().__init__()
-        self.resize(Dynamic.root_g["aw"], Dynamic.root_g["ah"])
-        self.setMinimumWidth(750)
+        self.resize(self.ww, self.hh)
+        self.setMinimumWidth(self.min_w)
 
         if any([MainFolder.validation_failed, UserFilter.validation_failed]):
             QTimer.singleShot(100, self.load_backups)
