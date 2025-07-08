@@ -333,13 +333,13 @@ class Grid(QScrollArea):
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.scroll_wid.setLayout(self.scroll_layout)
 
+        self.date_wid = QPushButton(parent=self.viewport())
         self.date_wid.hide()
         shadow = QGraphicsDropShadowEffect(self.date_wid)
         shadow.setBlurRadius(10)
         shadow.setOffset(0, 2)
         shadow.setColor(QColor(0, 0, 0, 255))
         self.date_wid.setGraphicsEffect(shadow)
-        self.date_wid = QPushButton(parent=self.viewport())
 
         self.up_btn = UpBtn(self.scroll_wid)
         self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
@@ -354,15 +354,15 @@ class Grid(QScrollArea):
 
     def reload_thumbnails(self):
         Dynamic.grid_offset = 0
-        cmd_ = lambda db_images: self.create_grid(db_images)
-        self.start_load_db_images_task(cmd_)
+        cmd_ = lambda db_images: self.first_grid(db_images)
+        self.load_db_images_task(cmd_)
 
     def load_more_thumbnails(self):
         Dynamic.grid_offset += Static.GRID_LIMIT
         cmd_ = lambda db_images: self.grid_more(db_images)
-        self.start_load_db_images_task(cmd_)
+        self.load_db_images_task(cmd_)
 
-    def start_load_db_images_task(self, on_finish_cmd: callable):
+    def load_db_images_task(self, on_finish_cmd: callable):
         self.task_ = LoadDbImagesTask()
         self.task_.signals_.finished_.connect(on_finish_cmd)
         UThreadPool.start(self.task_)
@@ -376,7 +376,7 @@ class Grid(QScrollArea):
         self.grid_lay = QGridLayout()
         self.grid_wid.setLayout(self.grid_lay)
                                 
-    def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
+    def first_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for i in (self.grid_wid, self.rubberBand):
             i.deleteLater()
         
