@@ -4,9 +4,9 @@ import os
 from PyQt5.QtCore import (QEvent, QMimeData, QPoint, QRect, QSize, Qt, QTimer,
                           QUrl, pyqtSignal)
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
-                         QPixmap, QResizeEvent, QColor, QPalette)
+                         QPixmap, QResizeEvent, QColor)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QRubberBand, QScrollArea, QSizePolicy, QWidget, QPushButton, QToolButton)
+                             QRubberBand, QScrollArea, QSizePolicy, QWidget, QPushButton, QGraphicsDropShadowEffect)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import SystemFilter, UserFilter
@@ -371,6 +371,19 @@ class Grid(QScrollArea):
     def load_date_wid(self):
         self.date_wid = QPushButton(parent=self.viewport())
         self.date_wid.hide()
+        
+        self.date_wid.setStyleSheet(
+            """
+            color: red;
+            """
+        )
+
+        shadow = QGraphicsDropShadowEffect(self.date_wid)
+        shadow.setBlurRadius(5)
+        shadow.setOffset(0, 2)
+        shadow.setColor(QColor(0, 0, 0, 255))
+
+        self.date_wid.setGraphicsEffect(shadow)
                 
     def load_up_btn(self):
         self.up_btn = UpBtn(self.scroll_wid)
