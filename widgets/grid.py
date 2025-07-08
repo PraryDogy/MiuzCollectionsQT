@@ -450,20 +450,22 @@ class Grid(QScrollArea):
         if wid:
             self.clear_selected_widgets()
             self.add_and_select_widget(wid=wid)
-
-    def get_max_col(self):
-        return self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_ind])
     
     def clear_thumb_data(self):
         """
-        Очищает cell to wid и path to wid
+        Очищает:
+        - cell to wid
+        - path to wid
         """
         for i in (self.cell_to_wid, Thumbnail.path_to_wid):
             i.clear()
             
     def clear_cell_data(self):
         """
-        Сбрасывет max col, glob row, glob col
+        Сбрасывет:
+        - max col
+        - glob row
+        - glob col
         """
         self.max_col = self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_ind])
         self.glob_row, self.glob_col = 0, 0
@@ -519,7 +521,8 @@ class Grid(QScrollArea):
         
     def clear_selected_widgets(self):
         """
-        Очищает selected widgets и убирает стиль выделенных виджетов
+        - Убирает стиль выделенных виджетов
+        - Очищает selected widgets
         """
         for i in self.selected_widgets:
             i.set_no_frame()
@@ -527,7 +530,8 @@ class Grid(QScrollArea):
 
     def add_and_select_widget(self, wid: Thumbnail):
         """
-        Добавляет в selected widgets и задает стиль переданному виджету
+        - Добавляет переданный виджет в selected widgets
+        - Задает стиль переданному виджету
         """
         if isinstance(wid, Thumbnail):
             self.selected_widgets.append(wid)
