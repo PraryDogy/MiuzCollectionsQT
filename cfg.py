@@ -311,12 +311,6 @@ class Dynamic:
     # какие расширения отображать по умолчанию (и джепеги и послойники)
     types = [Static.ext_non_layers, Static.ext_layers]
 
-    # стандартная папка загрузок
-    down_folder: str = os.path.join(
-        os.path.expanduser("~"),
-        "Downloads"
-    )
-
     # индекс соответствующий STATIC > IMG_LABEL_SIZE
     # от индекса зависит размер Thumbnail и всех его внутренних виджетов
     thumb_size_ind: int = 0

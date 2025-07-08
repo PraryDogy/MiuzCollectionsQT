@@ -183,7 +183,7 @@ class Save(QAction):
                 dialog = QFileDialog()
                 dest = dialog.getExistingDirectory()
             else:
-                dest = Dynamic.down_folder
+                dest = os.path.join(os.path.expanduser("~"), "Downloads")
             if dest and os.path.isdir(dest):
                 self.save_files_finalize(dest, img_path_list)
         else:
