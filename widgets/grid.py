@@ -379,9 +379,8 @@ class Grid(QScrollArea):
         for i in (self.grid_wid, self.rubberBand):
             i.deleteLater()
         
-        for i in (self.selected_widgets, self.cell_to_wid, Thumbnail.path_to_wid):
-            i.clear()
-
+        self.clear_thumb_data()
+        self.clear_selected_widgets()
         self.load_grid_wid()
         self.load_rubber()
                 
@@ -456,6 +455,13 @@ class Grid(QScrollArea):
 
     def get_max_col(self):
         return self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_ind])
+    
+    def clear_thumb_data(self):
+        """
+        Очищает cell to wid и path to wid
+        """
+        for i in (self.cell_to_wid, Thumbnail.path_to_wid):
+            i.clear()
 
     def resize_thumbnails(self):
         "изменение размера Thumbnail"
@@ -467,8 +473,7 @@ class Grid(QScrollArea):
         self.rearrange()
 
     def rearrange(self):
-        for i in (self.cell_to_wid, Thumbnail.path_to_wid):
-            i.clear()
+        self.clear_thumb_data()
 
         self.max_col = self.get_max_col()
         self.glob_row, self.glob_col = 0, 0
