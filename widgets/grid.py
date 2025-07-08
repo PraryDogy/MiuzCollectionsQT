@@ -371,15 +371,9 @@ class Grid(QScrollArea):
     def load_date_wid(self):
         self.date_wid = QPushButton(parent=self.viewport())
         self.date_wid.hide()
-        
-        self.date_wid.setStyleSheet(
-            """
-            color: red;
-            """
-        )
 
         shadow = QGraphicsDropShadowEffect(self.date_wid)
-        shadow.setBlurRadius(5)
+        shadow.setBlurRadius(10)
         shadow.setOffset(0, 2)
         shadow.setColor(QColor(0, 0, 0, 255))
 
