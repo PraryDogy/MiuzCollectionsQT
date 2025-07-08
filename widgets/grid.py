@@ -315,12 +315,11 @@ class Grid(QScrollArea):
         self.setStyleSheet("QScrollArea { border: none; }")
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
-        self.first_load = True
-        self.col_count: int = 0
         self.wid_under_mouse: Thumbnail = None
         self.origin_pos = QPoint()
         self.selected_widgets: list[Thumbnail] = []
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
+        self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
 
         self.resize_timer = QTimer(self)
@@ -333,12 +332,21 @@ class Grid(QScrollArea):
         self.scroll_layout = UVBoxLayout()
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.scroll_wid.setLayout(self.scroll_layout)
-        
-        self.load_date_wid()
-        self.load_up_btn()
+
+        self.date_wid.hide()
+        shadow = QGraphicsDropShadowEffect(self.date_wid)
+        shadow.setBlurRadius(10)
+        shadow.setOffset(0, 2)
+        shadow.setColor(QColor(0, 0, 0, 255))
+        self.date_wid.setGraphicsEffect(shadow)
+        self.date_wid = QPushButton(parent=self.viewport())
+
+        self.up_btn = UpBtn(self.scroll_wid)
+        self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
+        self.up_btn.hide()
+
         self.load_grid_wid()
         self.load_rubber()
-        
         self.reload_thumbnails()
 
     def scroll_to_top(self):
@@ -367,28 +375,7 @@ class Grid(QScrollArea):
         self.scroll_layout.addWidget(self.grid_wid)
         self.grid_lay = QGridLayout()
         self.grid_wid.setLayout(self.grid_lay)
-        
-    def load_date_wid(self):
-        self.date_wid = QPushButton(parent=self.viewport())
-        self.date_wid.hide()
-
-        shadow = QGraphicsDropShadowEffect(self.date_wid)
-        shadow.setBlurRadius(10)
-        shadow.setOffset(0, 2)
-        shadow.setColor(QColor(0, 0, 0, 255))
-
-        self.date_wid.setGraphicsEffect(shadow)
-                
-    def load_up_btn(self):
-        self.up_btn = UpBtn(self.scroll_wid)
-        self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
-        self.up_btn.hide()
-        
-    # def load_no_images(self):
-    #     self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    #     self.no_images_wid = NoImagesLabel()
-    #     self.scroll_layout.addWidget(self.no_images_wid, alignment=Qt.AlignmentFlag.AlignCenter)
-        
+                                
     def create_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for i in (self.grid_wid, self.rubberBand):
             i.deleteLater()
@@ -400,7 +387,7 @@ class Grid(QScrollArea):
         self.load_rubber()
                 
         Thumbnail.calculate_size()
-        self.col_count = self.get_max_col()
+        self.max_col = self.get_max_col()
         self.glob_row, self.glob_col = 0, 0
 
         for date, db_images_list in db_images.items():
@@ -426,7 +413,7 @@ class Grid(QScrollArea):
             self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
 
             self.glob_col += 1
-            if self.glob_col >= self.col_count:
+            if self.glob_col >= self.max_col:
                 self.glob_col = 0
                 self.glob_row += 1
 
@@ -481,14 +468,10 @@ class Grid(QScrollArea):
         self.rearrange()
 
     def rearrange(self):
-        if self.first_load:
-            self.first_load = False
-            return
-
         for i in (self.cell_to_wid, Thumbnail.path_to_wid):
             i.clear()
 
-        self.col_count = self.get_max_col()
+        self.max_col = self.get_max_col()
         self.glob_row, self.glob_col = 0, 0
         thumbnails = self.grid_wid.findChildren(Thumbnail)
         if not thumbnails:
@@ -503,7 +486,7 @@ class Grid(QScrollArea):
             self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
 
             self.glob_col += 1
-            if self.glob_col >= self.col_count:
+            if self.glob_col >= self.max_col:
                 self.glob_col = 0
                 self.glob_row += 1
 
@@ -602,7 +585,7 @@ class Grid(QScrollArea):
                 elif a0.key() == Qt.Key.Key_Left:
                     coords = (
                         self.wid_under_mouse.row - 1,
-                        self.col_count - 1
+                        self.max_col - 1
                     )
                 next_wid = self.cell_to_wid.get(coords)
 
@@ -709,11 +692,6 @@ class Grid(QScrollArea):
             self.add_and_select_widget(self.wid_under_mouse)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
-
-        if self.first_load:
-            self.first_load = False
-            return
-
         self.resize_timer.stop()
         self.resize_timer.start(10)
         self.up_btn.hide()
