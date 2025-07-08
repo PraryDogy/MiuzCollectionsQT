@@ -4,9 +4,9 @@ import os
 from PyQt5.QtCore import (QEvent, QMimeData, QPoint, QRect, QSize, Qt, QTimer,
                           QUrl, pyqtSignal)
 from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
-                         QPixmap, QResizeEvent, QColor)
+                         QPixmap, QResizeEvent, QColor, QPalette)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QRubberBand, QScrollArea, QSizePolicy, QWidget, QGraphicsDropShadowEffect)
+                             QRubberBand, QScrollArea, QSizePolicy, QWidget, QPushButton, QToolButton)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import SystemFilter, UserFilter
@@ -369,26 +369,9 @@ class Grid(QScrollArea):
         self.grid_wid.setLayout(self.grid_lay)
         
     def load_date_wid(self):
-        self.date_wid = QLabel(self.viewport())
-        self.date_wid.setStyleSheet(
-            f"""
-            font-size: 24pt;
-            font-weight: bold;
-            background: rgba(125, 125, 125, 0.5);
-            border-radius: 7px;
-            padding-left: 2px;
-            padding-right: 2px;
-            """
-        )
-
-        # shadow = QGraphicsDropShadowEffect(self.date_wid)
-        # shadow.setBlurRadius(10)
-        # shadow.setOffset(2, 2)
-        # shadow.setColor(QColor(0, 0, 0, 160))
-        # self.date_wid.setGraphicsEffect(shadow)
-
+        self.date_wid = QPushButton(parent=self.viewport())
         self.date_wid.hide()
-        
+                
     def load_up_btn(self):
         self.up_btn = UpBtn(self.scroll_wid)
         self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
