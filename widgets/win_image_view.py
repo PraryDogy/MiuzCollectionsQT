@@ -21,27 +21,6 @@ from .grid import Thumbnail
 from .win_info import WinInfo
 from .win_warn import WinWarn
 
-IMG_VIEW_STYLE = """
-    background: black;
-"""
-
-ZOOM_STYLE = """
-    background-color: rgba(128, 128, 128, 0.40);
-    border-radius: 15px;
-"""
-
-NAVI_STYLE = """
-    background-color: rgba(128, 128, 128, 0.40);
-    border-radius: 27px;
-"""
-
-ZOOM_OUT = os.path.join(Static.INNER_IMAGES, "zoom_out.svg")
-ZOOM_IN = os.path.join(Static.INNER_IMAGES, "zoom_in.svg")
-ZOOM_FIT = os.path.join(Static.INNER_IMAGES, "zoom_fit.svg")
-CLOSE_ = os.path.join(Static.INNER_IMAGES, "zoom_close.svg")
-PREV_ = os.path.join(Static.INNER_IMAGES, "prev.svg")
-NEXT_ = os.path.join(Static.INNER_IMAGES, "next.svg")
-
 
 class ImageWidget(QLabel):
     def __init__(self):
@@ -125,28 +104,38 @@ class ImageWidget(QLabel):
     
 
 class ZoomBtns(QFrame):
+    style_ = """
+        background-color: rgba(128, 128, 128, 0.40);
+        border-radius: 15px;
+    """
+    size_ = 45
+    zoom_out_svg = os.path.join(Static.INNER_IMAGES, "zoom_out.svg")
+    zoom_in_svg = os.path.join(Static.INNER_IMAGES, "zoom_in.svg")
+    zoom_fit_svg = os.path.join(Static.INNER_IMAGES, "zoom_fit.svg")
+    zoom_close_svg = os.path.join(Static.INNER_IMAGES, "zoom_close.svg")
+
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
-        self.setStyleSheet(ZOOM_STYLE)
+        self.setStyleSheet(self.style_)
 
         h_layout = UHBoxLayout()
         self.setLayout(h_layout)
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
 
-        self.zoom_out = SvgShadowed(ZOOM_OUT, 45)
+        self.zoom_out = SvgShadowed(self.zoom_out_svg, self.size_)
         h_layout.addWidget(self.zoom_out)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_in = SvgShadowed(ZOOM_IN, 45)
+        self.zoom_in = SvgShadowed(self.zoom_in_svg, self.size_)
         h_layout.addWidget(self.zoom_in)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_fit = SvgShadowed(ZOOM_FIT, 45)
+        self.zoom_fit = SvgShadowed(self.zoom_fit_svg, self.size_)
         h_layout.addWidget(self.zoom_fit)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_close = SvgShadowed(CLOSE_, 45)
+        self.zoom_close = SvgShadowed(self.zoom_close_svg, self.size_)
         h_layout.addWidget(self.zoom_close)
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
@@ -155,10 +144,16 @@ class ZoomBtns(QFrame):
 
 
 class SwitchImageBtn(QFrame):
+    style_ = """
+        background-color: rgba(128, 128, 128, 0.40);
+        border-radius: 27px;
+    """
+    size_ = 54  # 27px border-radius, 27 * 2 for round shape
+
     def __init__(self, path: str, parent: QWidget = None) -> None:
         super().__init__(parent)
-        self.setFixedSize(54, 54) # 27px border-radius, 27 * 2 for round shape
-        self.setStyleSheet(NAVI_STYLE)
+        self.setFixedSize(self.size_, self.size_)
+        self.setStyleSheet(self.style_)
 
         v_layout = UVBoxLayout()
         self.setLayout(v_layout)
@@ -168,13 +163,17 @@ class SwitchImageBtn(QFrame):
 
 
 class PrevImageBtn(SwitchImageBtn):
+    svg_ = os.path.join(Static.INNER_IMAGES, "prev.svg")
+
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(PREV_, parent)
+        super().__init__(self.svg_, parent)
 
 
 class NextImageBtn(SwitchImageBtn):
+    svg_ = os.path.join(Static.INNER_IMAGES, "next.svg")
+
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(NEXT_, parent)
+        super().__init__(self.svg_, parent)
 
 
 class WinImageView(WinChild):
@@ -183,6 +182,9 @@ class WinImageView(WinChild):
     closed_ = pyqtSignal()
     ww, hh = 700, 500
     min_w, min_h = 500, 400
+    style_ = """
+        background: black;
+    """
 
     def __init__(self, rel_img_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
@@ -195,7 +197,7 @@ class WinImageView(WinChild):
         self.wid = path_to_wid.get(self.rel_img_path)
         self.task_count = 0
 
-        self.setStyleSheet(IMG_VIEW_STYLE)
+        self.setStyleSheet(self.style_)
         self.setMinimumSize(QSize(self.min_w, self.min_h))
         self.resize(self.ww, self.hh)
         self.installEventFilter(self)
