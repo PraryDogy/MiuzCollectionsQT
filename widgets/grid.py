@@ -695,6 +695,17 @@ class Grid(QScrollArea):
         self.resize_timer.start(10)
         self.up_btn.hide()
         self.date_wid.hide()
+
+        self.up_btn.move(
+            self.viewport().width() - self.up_btn.width() - 20,
+            self.viewport().height() - self.up_btn.height() - 20
+        )        
+
+        self.date_wid.move(
+            (self.viewport().width() - self.date_wid.width()) // 2,
+            5
+        )
+
         return super().resizeEvent(a0)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
@@ -778,26 +789,21 @@ class Grid(QScrollArea):
         self.menu_.show_()
 
     def checkScrollValue(self, value):
-
         if value > 0:            
-            self.up_btn.move(
-                self.viewport().width() - self.up_btn.width() - 20,
-                self.viewport().height() - self.up_btn.height() - 20
-            )
             self.up_btn.show()
-            self.up_btn.raise_()
             
             point = QPoint(50, 50)
             mapped_pos = self.scroll_wid.mapFrom(self.viewport(), point)
             wid: Thumbnail = self.scroll_wid.childAt(mapped_pos).parent()
             if isinstance(wid, Thumbnail):
-                self.date_wid.setText(wid.f_mod)
-                self.date_wid.adjustSize()
+                if wid.f_mod != self.date_wid.text():
+                    self.date_wid.setText(wid.f_mod)
+                    self.date_wid.adjustSize()
+                    self.date_wid.move(
+                        (self.viewport().width() - self.date_wid.width()) // 2,
+                        5
+                    )
                 self.date_wid.show()
-                self.date_wid.move(
-                    (self.viewport().width() - self.date_wid.width()) // 2,
-                    5
-                )
      
         elif value == 0:
             self.date_wid.hide()
