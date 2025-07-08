@@ -380,11 +380,11 @@ class Grid(QScrollArea):
             i.deleteLater()
         
         self.clear_thumb_data()
+        self.clear_cell_data()
         self.clear_selected_widgets()
         self.load_grid_wid()
         self.load_rubber()
         Thumbnail.calculate_size()
-        self.clear_cell_data()
 
         for date, db_images_list in db_images.items():
             self.single_grid(db_images_list)
