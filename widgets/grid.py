@@ -318,6 +318,7 @@ class Grid(QScrollArea):
         self.origin_pos = QPoint()
         self.selected_widgets: list[Thumbnail] = []
         self.cell_to_wid: dict[tuple, Thumbnail] = {}
+        self.path_to_wid: dict[str, Thumbnail] = {}
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
 
@@ -390,7 +391,7 @@ class Grid(QScrollArea):
             self.single_grid(db_images_list)
                         
     def add_thumb_data(self, wid: Thumbnail):
-        Thumbnail.path_to_wid[wid.rel_img_path] = wid
+        self.path_to_wid[wid.rel_img_path] = wid
         self.cell_to_wid[self.glob_row, self.glob_col] = wid
         wid.row, wid.col = self.glob_row, self.glob_col        
 
@@ -424,7 +425,7 @@ class Grid(QScrollArea):
     def open_in_view(self, wid: Thumbnail):
         from .win_image_view import WinImageView
         if len(self.selected_widgets) == 1:
-            path_to_wid = Thumbnail.path_to_wid
+            path_to_wid = self.path_to_wid.copy()
             is_selection = False
         else:
             path_to_wid = {i.rel_img_path: i for i in self.selected_widgets}
@@ -446,7 +447,7 @@ class Grid(QScrollArea):
         gc.collect()
 
     def select_viewed_image(self, path: str):
-        wid = Thumbnail.path_to_wid.get(path)
+        wid = self.path_to_wid.get(path)
         if wid:
             self.clear_selected_widgets()
             self.add_and_select_widget(wid)
@@ -457,7 +458,7 @@ class Grid(QScrollArea):
         - cell to wid
         - path to wid
         """
-        for i in (self.cell_to_wid, Thumbnail.path_to_wid):
+        for i in (self.cell_to_wid, self.path_to_wid):
             i.clear()
             
     def clear_cell_data(self):
@@ -570,7 +571,7 @@ class Grid(QScrollArea):
                     self.win_warn.show()
 
         elif a0.modifiers() == command and a0.key() == Qt.Key.Key_A:
-            for i in Thumbnail.path_to_wid.values():
+            for i in self.cell_to_wid.values():
                 i.set_frame()
                 self.selected_widgets.append(i)
 
