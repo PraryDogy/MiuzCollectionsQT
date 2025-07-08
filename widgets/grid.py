@@ -143,7 +143,6 @@ class TextAdvancedWid(QLabel):
 class Thumbnail(QFrame, CellWid):
     reload_thumbnails = pyqtSignal()
     select = pyqtSignal(str)
-    path_to_wid: dict[str, "Thumbnail"] = {}
 
     img_frame_size = 0
     pixmap_size = 0
