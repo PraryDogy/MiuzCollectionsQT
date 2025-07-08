@@ -472,7 +472,7 @@ class Grid(QScrollArea):
         """
         - Высчитывает новые размеры Thumbnail
         - Меняет размеры виджетов Thumbnail в текущей сетке
-        - Переформирует сетку в соотетствии с новыми размерами
+        - Переупорядочивает сетку в соотетствии с новыми размерами
         """
         Thumbnail.calculate_size()
         for cell, wid in self.cell_to_wid.items():
@@ -480,6 +480,11 @@ class Grid(QScrollArea):
         self.rearrange()
 
     def rearrange(self):
+        """
+        Переупорядочивает все элементы сетки заново:
+        - Очищает предыдущие данные по сетке
+        - Расставляет виджеты Thumbnail
+        """
         self.clear_thumb_data()
         self.clear_cell_data()
         thumbnails = self.grid_wid.findChildren(Thumbnail)
