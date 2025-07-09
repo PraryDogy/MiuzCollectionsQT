@@ -297,12 +297,25 @@ class UpBtn(QFrame):
         return super().mouseReleaseEvent(a0)
 
 
+class DateWid(QPushButton):
+    def __init__(self, parent: QWidget):
+        super().__init__(parent)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(15)
+        shadow.setOffset(0, 2)
+        shadow.setColor(QColor(0, 0, 0, 255))
+        self.setGraphicsEffect(shadow)
+
+
 class Grid(QScrollArea):
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
     move_files = pyqtSignal(list)
     save_files = pyqtSignal(tuple)
     update_bottom_bar = pyqtSignal()
+    img_view = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -332,13 +345,8 @@ class Grid(QScrollArea):
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.scroll_wid.setLayout(self.scroll_layout)
 
-        self.date_wid = QPushButton(parent=self.viewport())
+        self.date_wid = DateWid(parent=self.viewport())
         self.date_wid.hide()
-        shadow = QGraphicsDropShadowEffect(self.date_wid)
-        shadow.setBlurRadius(10)
-        shadow.setOffset(0, 2)
-        shadow.setColor(QColor(0, 0, 0, 255))
-        self.date_wid.setGraphicsEffect(shadow)
 
         self.up_btn = UpBtn(self.viewport())
         self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
@@ -420,30 +428,6 @@ class Grid(QScrollArea):
     def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for date, db_images_list in db_images.items():
             self.single_grid(db_images_list)
-    
-    def open_in_view(self, wid: Thumbnail):
-        from .win_image_view import WinImageView
-        if len(self.selected_widgets) == 1:
-            path_to_wid = self.path_to_wid.copy()
-            is_selection = False
-        else:
-            path_to_wid = {i.rel_img_path: i for i in self.selected_widgets}
-            is_selection = True
-        self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
-        self.win_image_view.closed_.connect(lambda: gc.collect())
-        self.win_image_view.center_relative_parent(self.window())
-
-        self.win_image_view.switch_image_sig.connect(
-            lambda img_path: self.select_viewed_image(img_path)
-        )
-        self.win_image_view.closed_.connect(
-            lambda: self.img_view_closed(self.win_image_view)
-        )
-        self.win_image_view.show()
-
-    def img_view_closed(self, win: QWidget):
-        del win
-        gc.collect()
 
     def select_viewed_image(self, path: str):
         wid = self.path_to_wid.get(path)
@@ -719,7 +703,7 @@ class Grid(QScrollArea):
         self.resize_timer.stop()
         self.resize_timer.start(10)
         self.up_btn.hide()
-        self.date_wid.hide()
+        # self.date_wid.hide()
 
         self.up_btn.move(
             self.viewport().width() - self.up_btn.width() - 20,
@@ -820,14 +804,15 @@ class Grid(QScrollArea):
             point = QPoint(50, 50)
             mapped_pos = self.scroll_wid.mapFrom(self.viewport(), point)
             wid: Thumbnail = self.scroll_wid.childAt(mapped_pos).parent()
-            if isinstance(wid, Thumbnail) and wid.f_mod != self.date_wid.text():
+            if isinstance(wid, Thumbnail):
                 self.date_wid.setText(wid.f_mod)
                 self.date_wid.adjustSize()
+                
                 self.date_wid.move(
                     (self.viewport().width() - self.date_wid.width()) // 2,
                     5
                 )
-            self.date_wid.show()
+                self.date_wid.show()
      
         elif value == 0:
             self.date_wid.hide()
@@ -840,7 +825,7 @@ class Grid(QScrollArea):
         if self.wid_under_mouse:
             self.clear_selected_widgets()
             self.add_and_select_widget(self.wid_under_mouse)
-            self.open_in_view(self.wid_under_mouse)
+            self.img_view.emit()
 
     def mousePressEvent(self, a0):
         self.origin_pos = a0.pos()

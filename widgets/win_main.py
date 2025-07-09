@@ -1,3 +1,4 @@
+import gc
 import json
 import os
 
@@ -23,6 +24,7 @@ from .menu_left import MenuLeft
 from .win_backups import BackupType, WinBackups
 from .win_dates import WinDates
 from .win_downloads import WinDownloads
+from .win_image_view import WinImageView
 from .win_remove_files import RemoveFilesWin
 from .win_upload import WinUpload
 from .win_warn import WinWarn
@@ -110,6 +112,7 @@ class WinMain(UMainWindow):
         self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
         self.grid.save_files.connect(lambda data: self.save_files_task(*data))
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
+        self.grid.img_view.connect(lambda: self.open_img_view())
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -145,6 +148,20 @@ class WinMain(UMainWindow):
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
+    
+    def open_img_view(self):
+        if len(self.grid.selected_widgets) == 1:
+            path_to_wid = self.grid.path_to_wid.copy()
+            is_selection = False
+        else:
+            path_to_wid = {i.rel_img_path: i for i in self.grid.selected_widgets}
+            is_selection = True
+        wid = self.grid.selected_widgets[-1]
+        self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
+        self.win_image_view.closed_.connect(lambda: gc.collect())
+        self.win_image_view.switch_image_sig.connect(lambda img_path: self.grid.select_viewed_image(img_path))
+        self.win_image_view.center_relative_parent(self.window())
+        self.win_image_view.show()
     
     def reload_rubber(self):
         self.grid.rubberBand.deleteLater()
