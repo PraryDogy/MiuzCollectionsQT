@@ -24,41 +24,6 @@ from .win_info import WinInfo
 from .win_warn import WinWarn
 
 
-class CellWid:
-    def __init__(self):
-        super().__init__()
-        self.row = 0
-        self.col = 0
-
-
-class Title(QLabel, CellWid):
-    r_click = pyqtSignal()
-    style_ = f"""
-        font-size: 18pt;
-        font-weight: bold;
-        border: {Static.border_transparent};
-    """
-
-    def __init__(self, title: str):
-        super().__init__()
-        self.setText(title)
-        self.setSizePolicy(
-            QSizePolicy.Policy.Fixed,
-            QSizePolicy.Policy.Preferred
-            )
-
-        self.setStyleSheet(self.style_)
-
-    def set_frame(self):
-        return
-
-    def set_no_frame(self):
-        return
-    
-    def contextMenuEvent(self, ev):
-        return super().contextMenuEvent(ev)
-
-
 class TextWid(QLabel):
     def __init__(self, parent, name: str, coll: str):
         super().__init__(parent)
@@ -141,7 +106,7 @@ class TextAdvancedWid(QLabel):
             return text
 
 
-class Thumbnail(QFrame, CellWid):
+class Thumbnail(QFrame):
     reload_thumbnails = pyqtSignal()
     select = pyqtSignal(str)
 
@@ -236,42 +201,6 @@ class Thumbnail(QFrame, CellWid):
             self.reload_thumbnails.emit()
 
 
-class NoImagesLabel(QLabel):
-    def __init__(self):
-        super().__init__()
-
-        enabled_filters = [
-            filter.lang_names[JsonData.lang_ind].lower()
-            for filter in UserFilter.list_
-            if filter.value
-            ]
-        
-        if SystemFilter.value:
-            enabled_filters.append(
-                SystemFilter.lang_names[JsonData.lang_ind].lower()
-            )
-
-        if enabled_filters:
-            enabled_filters = ", ".join(enabled_filters)
-            noimg_t = f"{Lang.no_photo}: {enabled_filters}"
-
-        if Dynamic.date_start:
-            noimg_t = [
-                f"{Lang.no_photo}: ",
-                f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
-            ]
-            noimg_t = "".join(noimg_t)
-
-
-        elif Dynamic.search_widget_text:
-            noimg_t = f"{Lang.no_photo}: {Dynamic.search_widget_text}"
-        
-        else:
-            noimg_t = Lang.no_photo
-
-        self.setText(noimg_t)
-
-
 class UpBtn(QFrame):
     scroll_to_top = pyqtSignal()
     icon = os.path.join(Static.INNER_IMAGES, "up.svg")
@@ -308,7 +237,7 @@ class DateWid(QPushButton):
         shadow.setOffset(0, 2)
         shadow.setColor(QColor(0, 0, 0, 255))
         self.setGraphicsEffect(shadow)
-
+        
 
 class Grid(VScrollArea):
     restart_scaner = pyqtSignal()
