@@ -4,7 +4,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QGraphicsDropShadowEffect, QHBoxLayout,
                              QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QTextEdit, QVBoxLayout,
-                             QWidget)
+                             QWidget, QScrollArea)
 
 from system.lang import Lang
 from system.utils import MainUtils
@@ -251,3 +251,13 @@ class UListWidgetItem(QListWidgetItem):
         self.setSizeHint(QSize(parent.width(), height))
         if text:
             self.setText(text)
+            
+            
+class VScrollArea(QScrollArea):
+    def __init__(self):
+        super().__init__()
+        self.setWidgetResizable(True)
+        self.setAcceptDrops(True)
+        self.horizontalScrollBar().setDisabled(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setStyleSheet("QScrollArea { border: none; }")

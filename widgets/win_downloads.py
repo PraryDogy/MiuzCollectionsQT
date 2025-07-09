@@ -2,15 +2,15 @@ import os
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import (QLabel, QProgressBar, QScrollArea, QSpacerItem,
-                             QWidget)
+from PyQt5.QtWidgets import QLabel, QProgressBar, QSpacerItem, QWidget
 
 from cfg import Static
 from system.lang import Lang
 from system.tasks import CopyFilesTask
 from system.utils import MainUtils
 
-from ._base_widgets import SvgBtn, UHBoxLayout, UVBoxLayout, WinSystem
+from ._base_widgets import (SvgBtn, UHBoxLayout, UVBoxLayout, VScrollArea,
+                            WinSystem)
 
 MAX_ROW = 45
 SVG_SIZE = 16
@@ -100,9 +100,7 @@ class WinDownloads(WinSystem):
 
         self.download_items: list[CopyFilesTask] = []
 
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area = VScrollArea()
 
         self.scroll_widget = QWidget()
         self.scroll_area.setWidget(self.scroll_widget)

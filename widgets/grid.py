@@ -3,10 +3,11 @@ import os
 
 from PyQt5.QtCore import (QEvent, QMimeData, QPoint, QRect, QSize, Qt, QTimer,
                           QUrl, pyqtSignal)
-from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
-                         QPixmap, QResizeEvent, QColor)
-from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QRubberBand, QScrollArea, QSizePolicy, QWidget, QPushButton, QGraphicsDropShadowEffect)
+from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
+                         QMouseEvent, QPixmap, QResizeEvent)
+from PyQt5.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
+                             QGridLayout, QLabel, QPushButton, QRubberBand,
+                             QSizePolicy, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import SystemFilter, UserFilter
@@ -15,7 +16,7 @@ from system.main_folder import MainFolder
 from system.tasks import LoadDbImagesItem, LoadDbImagesTask
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
-from ._base_widgets import SvgBtn, UMenu, UVBoxLayout
+from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
 from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
                       OpenInView, RemoveFiles, Save, ScanerRestart,
                       ShowInFinder, WinInfoAction)
@@ -309,7 +310,7 @@ class DateWid(QPushButton):
         self.setGraphicsEffect(shadow)
 
 
-class Grid(QScrollArea):
+class Grid(VScrollArea):
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
     move_files = pyqtSignal(list)
@@ -319,11 +320,6 @@ class Grid(QScrollArea):
 
     def __init__(self):
         super().__init__()
-        self.setWidgetResizable(True)
-        self.setAcceptDrops(True)
-        self.horizontalScrollBar().setDisabled(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setStyleSheet("QScrollArea { border: none; }")
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
         self.wid_under_mouse: Thumbnail = None
