@@ -3,8 +3,8 @@ from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QGraphicsDropShadowEffect, QHBoxLayout,
                              QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QTextEdit, QVBoxLayout,
-                             QWidget, QScrollArea)
+                             QMainWindow, QMenu, QScrollArea, QTextEdit,
+                             QVBoxLayout, QWidget)
 
 from system.lang import Lang
 from system.utils import MainUtils
@@ -261,3 +261,10 @@ class VScrollArea(QScrollArea):
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setStyleSheet("QScrollArea { border: none; }")
+
+
+class VListWidget(QListWidget):
+    def __init__(self, parent: QWidget = None):
+        super().__init__()
+        self.horizontalScrollBar().setDisabled(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)

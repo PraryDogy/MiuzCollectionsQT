@@ -4,7 +4,7 @@ import shutil
 from enum import Enum
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QLabel, QListWidget, QPushButton
+from PyQt5.QtWidgets import QApplication, QLabel, QPushButton
 
 from cfg import Static
 from system.filters import UserFilter
@@ -12,7 +12,8 @@ from system.lang import Lang
 from system.main_folder import MainFolder
 from system.utils import MainUtils
 
-from ._base_widgets import UListWidgetItem, UMenu, UTextEdit, WinSystem
+from ._base_widgets import (UListWidgetItem, UMenu, UTextEdit, VListWidget,
+                            WinSystem)
 from .actions import OpenInView
 
 
@@ -125,9 +126,7 @@ class WinBackups(WinSystem):
         descr = QLabel(text)
         self.central_layout.addWidget(descr)
 
-        self.list_widget = QListWidget(self)
-        self.list_widget.horizontalScrollBar().setDisabled(True)
-        self.list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.list_widget = VListWidget(self)
         self.central_layout.addWidget(self.list_widget)
 
         backups = self.get_backup_list()

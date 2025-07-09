@@ -3,12 +3,12 @@ import os
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QModelIndex, QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
-                             QListWidget, QPushButton, QSpacerItem, QSpinBox,
-                             QTabWidget, QWidget)
+                             QPushButton, QSpacerItem, QSpinBox, QTabWidget,
+                             QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lang
@@ -17,7 +17,7 @@ from system.paletes import ThemeChanger
 from system.utils import MainUtils
 
 from ._base_widgets import (UHBoxLayout, ULineEdit, UListWidgetItem, UMenu,
-                            UTextEdit, UVBoxLayout, WinSystem)
+                            UTextEdit, UVBoxLayout, VListWidget, WinSystem)
 from .win_backups import BackupType, WinBackups
 from .win_help import WinHelp
 
@@ -179,7 +179,7 @@ class AddRowWindow(WinSystem):
         return super().keyPressEvent(a0)
 
 
-class MainFolderItemsWid(QListWidget):
+class MainFolderItemsWid(VListWidget):
     changed = pyqtSignal()
 
     def __init__(self, main_folder_copy: MainFolder, is_stop_list: bool):
@@ -194,8 +194,6 @@ class MainFolderItemsWid(QListWidget):
         Если пользователь нажимает "Отмена", оригинальный MainFolder остаётся без изменений.
         """
         super().__init__()
-        self.horizontalScrollBar().setDisabled(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.contextMenuEvent = self.list_item_context
 
         self.main_folder_copy = main_folder_copy
@@ -454,9 +452,7 @@ class RemoveMainFolderWin(WinSystem):
 
         self.main_folder_list_copy = main_folder_list_copy
 
-        list_widget = QListWidget(self)
-        list_widget.horizontalScrollBar().setDisabled(True)
-        list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        list_widget = VListWidget(self)
         self.central_layout.addWidget(list_widget)
 
         for main_folder in self.main_folder_list_copy:
@@ -492,7 +488,7 @@ class RemoveMainFolderWin(WinSystem):
         self.setFocus()
 
     def ok_cmd(self):
-        list_widget: QListWidget = self.findChild(QListWidget)
+        list_widget: VListWidget = self.findChild(VListWidget)
 
         if not list_widget.selectedItems():
             return

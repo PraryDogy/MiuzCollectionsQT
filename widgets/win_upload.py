@@ -1,14 +1,14 @@
 
 import os
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import QLabel, QListWidget, QWidget
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtWidgets import QLabel, QWidget
 
 from cfg import Dynamic, Static
 from system.lang import Lang
 from system.main_folder import MainFolder
 
-from ._base_widgets import UHBoxLayout, UListWidgetItem, WinSystem
+from ._base_widgets import UHBoxLayout, UListWidgetItem, VListWidget, WinSystem
 from .menu_left import CollectionBtn, MenuLeft
 
 
@@ -20,7 +20,7 @@ class WinUpload(WinSystem):
         super().__init__()
         self.setWindowTitle(Lang.title_downloads)
         self.resize(Static.MENU_LEFT_WIDTH, parent.height())
-        self.current_submenu: QListWidget = None
+        self.current_submenu: VListWidget = None
         self.coll_path: str = None
 
         self.h_wid = QWidget()
@@ -89,9 +89,7 @@ class WinUpload(WinSystem):
         self.resize(Static.MENU_LEFT_WIDTH * 2, self.height())
 
         self.del_submenu()
-        self.current_submenu = QListWidget()
-        self.current_submenu.horizontalScrollBar().setDisabled(True)
-        self.current_submenu.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.current_submenu = VListWidget()
         self.h_lay.addWidget(self.current_submenu)
 
         self.current_submenu.setFixedHeight(self.current_submenu.height() - 10)

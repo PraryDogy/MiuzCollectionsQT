@@ -4,7 +4,7 @@ from typing import Literal
 
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QAction, QLabel, QListWidget, QTabWidget
+from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
 
 from cfg import Dynamic, Static
 from system.lang import Lang
@@ -12,7 +12,7 @@ from system.main_folder import MainFolder
 from system.tasks import LoadCollectionsTask
 from system.utils import UThreadPool
 
-from ._base_widgets import UListWidgetItem, UMenu
+from ._base_widgets import UListWidgetItem, UMenu, VListWidget
 from .win_warn import WinWarn
 
 
@@ -68,7 +68,7 @@ class CollectionBtn(QLabel):
         return super().contextMenuEvent(ev)
 
 
-class MenuTab(QListWidget):
+class MenuTab(VListWidget):
     h_ = 30
     scroll_to_top = pyqtSignal()
     reload_thumbnails = pyqtSignal()
@@ -76,8 +76,6 @@ class MenuTab(QListWidget):
 
     def __init__(self, main_folder_index: int):
         super().__init__()
-        self.horizontalScrollBar().setDisabled(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.main_folder_index = main_folder_index
         self.coll_btns: list[CollectionBtn] = []
         self.setup_task()
