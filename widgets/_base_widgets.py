@@ -265,6 +265,6 @@ class VScrollArea(QScrollArea):
 
 class VListWidget(QListWidget):
     def __init__(self, parent: QWidget = None):
-        super().__init__()
+        super().__init__(parent)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
