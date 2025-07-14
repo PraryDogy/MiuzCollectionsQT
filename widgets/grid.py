@@ -230,14 +230,7 @@ class UpBtn(QFrame):
 class DateWid(QPushButton):
     def __init__(self, parent: QWidget, blue_color: bool = True):
         super().__init__(parent)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-        shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(15)
-        shadow.setOffset(0, 2)
-        shadow.setColor(QColor(0, 0, 0, 255))
-        self.setGraphicsEffect(shadow)
-        
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)        
         self.setCheckable(blue_color)
         self.setChecked(blue_color)
         
