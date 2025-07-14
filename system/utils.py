@@ -324,8 +324,11 @@ class MainUtils:
     @classmethod
     def start_new_app(cls):
         os.execl(sys.executable, sys.executable, *sys.argv)
-        # subprocess.Popen([sys.executable, *sys.argv])
-        # sys.exit(0)
+
+    @classmethod
+    def open_default(cls, abs_img_path: list[str]):
+        for i in abs_img_path:
+            subprocess.Popen(["open", i])
 
     @classmethod
     def get_f_size(cls, bytes_size: int) -> str:

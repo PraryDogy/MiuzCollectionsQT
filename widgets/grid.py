@@ -447,6 +447,16 @@ class Grid(VScrollArea):
         self.win_info.adjustSize()
         self.win_info.center_relative_parent(self.window())
         self.win_info.show()
+
+    def open_default_cmd(self, rel_img_path_list: list[str]):
+        main_folder_path = MainFolder.current.is_available()
+        if main_folder_path:
+            abs_img_path_list = [
+                MainUtils.get_abs_path(main_folder_path, i)
+                for i in rel_img_path_list
+            ]
+            MainUtils.open_default(abs_img_path_list)
+
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -679,6 +689,7 @@ class Grid(VScrollArea):
             self.menu_.addAction(view)
 
             open_default = OpenDefault(self.menu_, rel_img_path_list)
+            open_default.triggered.connect(lambda: self.open_default_cmd(rel_img_path_list))
             self.menu_.addAction(open_default)
 
             self.menu_.addSeparator()
