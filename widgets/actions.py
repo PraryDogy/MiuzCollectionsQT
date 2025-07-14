@@ -247,3 +247,9 @@ class MoveFiles(QAction):
     def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
         text = f"{Lang.move_files} ({len(rel_img_path_list)})"
         super().__init__(text=text, parent=parent)
+
+
+class OpenDefault(QAction):
+    def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
+        text = f"{Lang.open_default} ({len(rel_img_path_list)})"
+        super().__init__(text=text, parent=parent)

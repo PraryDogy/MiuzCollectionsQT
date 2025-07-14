@@ -5,12 +5,10 @@ from PyQt5.QtCore import (QEvent, QMimeData, QPoint, QRect, QSize, Qt, QTimer,
                           QUrl, pyqtSignal)
 from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
                          QMouseEvent, QPixmap, QResizeEvent)
-from PyQt5.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
-                             QGridLayout, QLabel, QPushButton, QRubberBand,
-                             QSizePolicy, QWidget)
+from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
+                             QPushButton, QRubberBand, QWidget)
 
-from cfg import Dynamic, JsonData, Static, ThumbData
-from system.filters import SystemFilter, UserFilter
+from cfg import Dynamic, Static, ThumbData
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadDbImagesItem, LoadDbImagesTask
@@ -18,8 +16,8 @@ from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
 from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
-                      OpenInView, RemoveFiles, Save, ScanerRestart,
-                      ShowInFinder, WinInfoAction)
+                      OpenDefault, OpenInView, RemoveFiles, Save,
+                      ScanerRestart, ShowInFinder, WinInfoAction)
 from .win_info import WinInfo
 from .win_warn import WinWarn
 
@@ -680,6 +678,10 @@ class Grid(VScrollArea):
             view._clicked.connect(cmd_)
             self.menu_.addAction(view)
 
+            open_default = OpenDefault(self.menu_, rel_img_path_list)
+            self.menu_.addAction(open_default)
+
+            self.menu_.addSeparator()
 
             info = WinInfoAction(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(info)

@@ -649,6 +649,11 @@ class _Lang:
         "User filters"
     ]
 
+    open_default = [
+        "Открыть по умолчанию",
+        "Open by default"
+    ]
+
 class Lang(_Lang):
 
     @classmethod
