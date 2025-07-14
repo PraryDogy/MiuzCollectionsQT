@@ -749,7 +749,12 @@ class LoadDbImagesTask(URunnable):
             else:
                 f_mod = f"{Lang.months[str(f_mod.month)]} {f_mod.year}"
 
-            thumbs_dict[f_mod].append(LoadDbImagesItem(pixmap, rel_img_path, coll, fav, f_mod))
+            item = LoadDbImagesItem(pixmap, rel_img_path, coll, fav, f_mod)
+
+            if not Dynamic.resents:
+                thumbs_dict[f_mod].append(item)
+            else:
+                thumbs_dict[0].append(item)
 
         try:
             self.signals_.finished_.emit(thumbs_dict)
