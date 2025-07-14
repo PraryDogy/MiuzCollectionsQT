@@ -449,6 +449,8 @@ class Grid(VScrollArea):
         self.win_info.show()
 
     def open_default_cmd(self, rel_img_path_list: list[str]):
+        print(MainUtils.image_apps())
+        return
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             abs_img_path_list = [
