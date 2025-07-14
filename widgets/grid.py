@@ -264,6 +264,7 @@ class Grid(VScrollArea):
         self.path_to_wid: dict[str, Thumbnail] = {}
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
+        self.is_first_load = True
 
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
@@ -291,7 +292,6 @@ class Grid(VScrollArea):
         self.verticalScrollBar().setValue(0)
 
     def reload_thumbnails(self):
-        print("reload th")
         Dynamic.grid_offset = 0
         cmd_ = lambda db_images: self.first_grid(db_images)
         self.load_db_images_task(cmd_)
@@ -326,8 +326,11 @@ class Grid(VScrollArea):
         self.load_rubber()
         Thumbnail.calculate_size()
 
+        self.grid_wid.hide()
         for date, db_images_list in db_images.items():
             self.single_grid(db_images_list)
+        self.rearrange()
+        self.grid_wid.show()
                         
     def add_thumb_data(self, wid: Thumbnail):
         self.path_to_wid[wid.rel_img_path] = wid
@@ -346,16 +349,7 @@ class Grid(VScrollArea):
             wid.set_no_frame()
             wid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
             self.add_thumb_data(wid)
-            self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
-
-            self.glob_col += 1
-            if self.glob_col >= self.max_col:
-                self.glob_col = 0
-                self.glob_row += 1
-
-        if self.glob_col != 0:
-            self.glob_col = 0
-            self.glob_row += 1
+            self.grid_lay.addWidget(wid, 0, 0)
 
     def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for date, db_images_list in db_images.items():
@@ -396,7 +390,6 @@ class Grid(VScrollArea):
         for cell, wid in self.cell_to_wid.items():
             wid.setup()
         self.rearrange()
-        print("resize")
 
     def rearrange(self):
         """
@@ -404,8 +397,6 @@ class Grid(VScrollArea):
         - Очищает предыдущие данные по сетке
         - Расставляет виджеты Thumbnail
         """
-        print("rearrange")
-        print(self.sender())
         self.clear_thumb_data()
         self.clear_cell_data()
         thumbnails = self.grid_wid.findChildren(Thumbnail)
@@ -635,7 +626,6 @@ class Grid(VScrollArea):
             self.add_and_select_widget(self.wid_under_mouse)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
-        print("resize timer")
         self.resize_timer.stop()
         self.resize_timer.start(10)
 
