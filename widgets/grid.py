@@ -291,6 +291,7 @@ class Grid(VScrollArea):
         self.verticalScrollBar().setValue(0)
 
     def reload_thumbnails(self):
+        print("reload th")
         Dynamic.grid_offset = 0
         cmd_ = lambda db_images: self.first_grid(db_images)
         self.load_db_images_task(cmd_)
@@ -395,6 +396,7 @@ class Grid(VScrollArea):
         for cell, wid in self.cell_to_wid.items():
             wid.setup()
         self.rearrange()
+        print("resize")
 
     def rearrange(self):
         """
@@ -402,6 +404,8 @@ class Grid(VScrollArea):
         - Очищает предыдущие данные по сетке
         - Расставляет виджеты Thumbnail
         """
+        print("rearrange")
+        print(self.sender())
         self.clear_thumb_data()
         self.clear_cell_data()
         thumbnails = self.grid_wid.findChildren(Thumbnail)
@@ -631,10 +635,9 @@ class Grid(VScrollArea):
             self.add_and_select_widget(self.wid_under_mouse)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        print("resize timer")
         self.resize_timer.stop()
         self.resize_timer.start(10)
-        self.up_btn.hide()
-        # self.date_wid.hide()
 
         self.up_btn.move(
             self.viewport().width() - self.up_btn.width() - 20,
