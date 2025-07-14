@@ -733,29 +733,22 @@ class LoadDbImagesTask(URunnable):
             rel_img_path: str
             if not rel_img_path.endswith(exts_):
                 continue
-
             f_mod = datetime.fromtimestamp(mod).date()
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             thumb = ThumbUtils.read_thumb(thumb_path)
-
             if isinstance(thumb, ndarray):
                 pixmap = PixmapUtils.pixmap_from_array(thumb)
             else:
                 continue
-
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
-
             else:
                 f_mod = f"{Lang.months[str(f_mod.month)]} {f_mod.year}"
-
             item = LoadDbImagesItem(pixmap, rel_img_path, coll, fav, f_mod)
-
-            if not Dynamic.resents:
-                thumbs_dict[f_mod].append(item)
-            else:
+            if Dynamic.resents:
                 thumbs_dict[0].append(item)
-
+            else:
+                thumbs_dict[f_mod].append(item)
         try:
             self.signals_.finished_.emit(thumbs_dict)
         except RuntimeError:
