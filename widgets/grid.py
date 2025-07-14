@@ -1,12 +1,12 @@
 import gc
 import os
 
-from PyQt5.QtCore import (QEvent, QMimeData, QPoint, QRect, QSize, Qt, QTimer,
+from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer,
                           QUrl, pyqtSignal)
-from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
+from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent,
                          QMouseEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QPushButton, QRubberBand, QWidget)
+                             QPushButton, QRubberBand, QWidget, QAction)
 
 from cfg import Dynamic, Static, ThumbData
 from system.lang import Lang
@@ -257,6 +257,11 @@ class Grid(VScrollArea):
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
 
+        self.image_apps = {
+            i: os.path.basename(i)
+            for i in MainUtils.image_apps()
+        }
+
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
@@ -449,16 +454,18 @@ class Grid(VScrollArea):
         self.win_info.show()
 
     def open_default_cmd(self, rel_img_path_list: list[str]):
-        print(MainUtils.image_apps())
-        return
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
-            abs_img_path_list = [
-                MainUtils.get_abs_path(main_folder_path, i)
-                for i in rel_img_path_list
-            ]
-            MainUtils.open_default(abs_img_path_list)
+            for i in rel_img_path_list:
+                abs_path = MainUtils.get_abs_path(main_folder_path, i)
+                MainUtils.open_in_app(abs_path)
 
+    def open_in_app_cmd(self, rel_img_path_list: list[str], app_path: str):
+        main_folder_path = MainFolder.current.is_available()
+        if main_folder_path:
+            for i in rel_img_path_list:
+                abs_path = MainUtils.get_abs_path(main_folder_path, i)
+                MainUtils.open_in_app(abs_path, app_path)
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -689,6 +696,16 @@ class Grid(VScrollArea):
             view = OpenInView(self.menu_)
             view._clicked.connect(cmd_)
             self.menu_.addAction(view)
+
+            open_menu = UMenu(a0)
+            open_menu.setTitle(f"{Lang.open_in} ({len(rel_img_path_list)})")
+            self.menu_.addMenu(open_menu)
+
+            for app_path, basename in self.image_apps.items():
+                act = QAction(parent=open_menu, text=basename)
+                cmd = lambda e, app_path=app_path: self.open_in_app_cmd(rel_img_path_list, app_path)
+                act.triggered.connect(cmd)
+                open_menu.addAction(act)
 
             open_default = OpenDefault(self.menu_, rel_img_path_list)
             open_default.triggered.connect(lambda: self.open_default_cmd(rel_img_path_list))

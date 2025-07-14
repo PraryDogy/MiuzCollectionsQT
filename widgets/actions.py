@@ -1,6 +1,5 @@
 import os
 
-import sqlalchemy
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 

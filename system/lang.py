@@ -654,6 +654,11 @@ class _Lang:
         "Open by default"
     ]
 
+    open_in = [
+        "Открыть в программе",
+        "Open in application"
+    ]
+
 class Lang(_Lang):
 
     @classmethod
