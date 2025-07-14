@@ -270,6 +270,10 @@ class Grid(VScrollArea):
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
 
+        self.date_timer = QTimer(self)
+        self.date_timer.setSingleShot(True)
+        self.date_timer.timeout.connect(lambda: self.date_wid.hide())
+
         self.scroll_wid = QWidget()
         self.setWidget(self.scroll_wid)
         
@@ -738,6 +742,8 @@ class Grid(VScrollArea):
                     5
                 )
                 self.date_wid.show()
+                self.date_timer.stop()
+                self.date_timer.start(3000)
      
         elif value == 0:
             self.date_wid.hide()
