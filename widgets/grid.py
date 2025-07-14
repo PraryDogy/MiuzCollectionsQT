@@ -354,6 +354,7 @@ class Grid(VScrollArea):
     def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for date, db_images_list in db_images.items():
             self.single_grid(db_images_list)
+        self.rearrange()
 
     def select_viewed_image(self, path: str):
         wid = self.path_to_wid.get(path)
