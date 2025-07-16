@@ -224,7 +224,7 @@ class JsonData:
             cls.scaner_minutes = model.scaner_minutes
             cls.apps = model.apps
         else:
-            cls.set_attributes()
+            # cls.set_attributes()
             cls.write_json_data()
 
     @classmethod
@@ -233,7 +233,7 @@ class JsonData:
             with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as f:
                 data: dict = json.load(f)
             for k, v in data.items():
-                if hasattr(cls, k) and type(k) == type(getattr(cls, k)):
+                if hasattr(cls, k) and type(v) == type(getattr(cls, k)):
                     setattr(cls, k, v)
         except Exception as e:
             print("Ошибка чтения json файла в set_attributes")
@@ -254,10 +254,25 @@ class JsonData:
     def load_json_data(cls) -> JsonDataModel | None:
         try:
             with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as f:
-                return JsonDataModel(**json.load(f))
+                raw_data = json.load(f)
+                return JsonDataModel(**raw_data)
         except Exception as e:
-            print("Ошибка при загрузке JSON:", e)
-            return None
+            try:
+                # Пытаемся подмержить с дефолтами, если ошибка валидации
+                with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as f:
+                    raw_data = json.load(f)
+                defaults = JsonDataModel(
+                    app_ver=cls.app_ver,
+                    lang_ind=cls.lang_ind,
+                    dark_mode=cls.dark_mode,
+                    scaner_minutes=cls.scaner_minutes,
+                    apps=cls.apps
+                ).model_dump()
+                merged = {**defaults, **raw_data}
+                return JsonDataModel(**merged)
+            except Exception as e:
+                print("Ошибка при чтении и объединении JSON:", e)
+                return None
 
     @classmethod
     def check_dirs(cls):
