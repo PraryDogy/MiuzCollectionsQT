@@ -224,7 +224,19 @@ class JsonData:
             cls.scaner_minutes = model.scaner_minutes
             cls.apps = model.apps
         else:
+            cls.set_attributes()
             cls.write_json_data()
+
+    @classmethod
+    def set_attributes(cls) -> None:
+        try:
+            with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as f:
+                data: dict = json.load(f)
+            for k, v in data.items():
+                if hasattr(cls, k) and type(k) == type(getattr(cls, k)):
+                    setattr(cls, k, v)
+        except Exception as e:
+            print("Ошибка чтения json файла в set_attributes")
 
     @classmethod
     def write_json_data(cls) -> None:
