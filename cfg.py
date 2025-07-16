@@ -186,6 +186,7 @@ class JsonDataModel(BaseModel):
     lang_ind: int
     dark_mode: int
     scaner_minutes: int
+    apps: list[str]
 
 
 class JsonData:
@@ -193,6 +194,25 @@ class JsonData:
     lang_ind: int = 0
     dark_mode: int = 0
     scaner_minutes: int = 5
+    apps = [
+        "preview",
+        "photos",
+        "photoshop",
+        "lightroom",
+        "affinity photo",
+        "pixelmator",
+        "gimp",
+        "capture one",
+        "dxo photolab",
+        "luminar neo",
+        "sketch",
+        "graphicconverter",
+        "imageoptim",
+        "snapheal",
+        "photoscape",
+        "preview",
+        "просмотр"
+    ]
 
     @classmethod
     def set_json_data(cls) -> None:
@@ -202,6 +222,7 @@ class JsonData:
             cls.lang_ind = model.lang_ind
             cls.dark_mode = model.dark_mode
             cls.scaner_minutes = model.scaner_minutes
+            cls.apps = model.apps
         else:
             cls.write_json_data()
 
@@ -212,6 +233,7 @@ class JsonData:
             lang_ind=cls.lang_ind,
             dark_mode=cls.dark_mode,
             scaner_minutes=cls.scaner_minutes,
+            apps=cls.apps
         )
         with open(Static.APP_SUPPORT_JSON_DATA, "w", encoding="utf-8") as f:
             json.dump(model.model_dump(), f, indent=4, ensure_ascii=False)
