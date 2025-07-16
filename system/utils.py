@@ -378,30 +378,11 @@ class MainUtils:
             print(f"Неизвестная ошибка: {e}")
 
     @classmethod
-    def image_apps(cls):
+    def image_apps(cls, apps: list[str]):
         app_dirs = [
             "/Applications",
             os.path.expanduser("~/Applications"),
             "/System/Applications"
-        ]
-        known_keywords = [
-            "preview",
-            "photos",
-            "photoshop",
-            "lightroom",
-            "affinity photo",
-            "pixelmator",
-            "gimp",
-            "capture one",
-            "dxo photolab",
-            "luminar neo",
-            "sketch",
-            "graphicconverter",
-            "imageoptim",
-            "snapheal",
-            "photoscape",
-            "preview",
-            "просмотр"
         ]
         found_apps = []
 
@@ -411,7 +392,7 @@ class MainUtils:
                     path = os.path.join(directory, entry)
                     if entry.endswith(".app"):
                         name_lower = entry.lower()
-                        if any(k in name_lower for k in known_keywords):
+                        if any(k in name_lower for k in apps):
                             found_apps.append(path)
                     elif os.path.isdir(path):
                         search_dir(path)

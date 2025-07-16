@@ -1,14 +1,14 @@
 import gc
 import os
 
-from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer,
-                          QUrl, pyqtSignal)
-from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent,
-                         QMouseEvent, QPixmap, QResizeEvent)
-from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
-                             QPushButton, QRubberBand, QWidget, QAction)
+from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
+                          pyqtSignal)
+from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
+                         QPixmap, QResizeEvent)
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGridLayout,
+                             QLabel, QPushButton, QRubberBand, QWidget)
 
-from cfg import Dynamic, Static, ThumbData
+from cfg import Dynamic, JsonData, Static, ThumbData
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadDbImagesItem, LoadDbImagesTask
@@ -259,7 +259,7 @@ class Grid(VScrollArea):
 
         self.image_apps = {
             i: os.path.basename(i)
-            for i in MainUtils.image_apps()
+            for i in MainUtils.image_apps(JsonData.apps)
         }
 
         self.resize_timer = QTimer(self)
