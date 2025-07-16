@@ -243,6 +243,8 @@ class LoadImage(URunnable):
                 img = ImgUtils.desaturate_image(img, 0.2)
                 self.pixmap = PixmapUtils.pixmap_from_array(img)
                 self.cached_images[self.img_path] = self.pixmap
+                del img 
+                gc.collect()
         else:
             self.pixmap = self.cached_images.get(self.img_path)
 
@@ -259,12 +261,6 @@ class LoadImage(URunnable):
             self.signals_.finished_.emit(image_data)
         except RuntimeError:
             ...
-
-        # === очищаем ссылки
-        del self.pixmap
-        self.signals_ = None
-        gc.collect()
-        QPixmapCache.clear()
 
 
 class ImgInfoSignals(QObject):

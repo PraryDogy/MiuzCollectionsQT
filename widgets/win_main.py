@@ -158,11 +158,15 @@ class WinMain(UMainWindow):
             is_selection = True
         wid = self.grid.selected_widgets[-1]
         self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
-        self.win_image_view.closed_.connect(lambda: gc.collect())
+        self.win_image_view.closed_.connect(lambda: self.closed_img_view())
         self.win_image_view.switch_image_sig.connect(lambda img_path: self.grid.select_viewed_image(img_path))
         self.win_image_view.center_relative_parent(self.window())
         self.win_image_view.show()
     
+    def closed_img_view(self):
+        del self.win_image_view
+        gc.collect()
+
     def reload_rubber(self):
         self.grid.rubberBand.deleteLater()
         self.grid.load_rubber()
