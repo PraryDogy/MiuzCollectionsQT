@@ -15,8 +15,7 @@ import psd_tools
 import rawpy
 from imagecodecs.imagecodecs import DelayedImportError
 from PIL import Image
-from pydantic import BaseModel
-from PyQt5.QtCore import QRunnable, Qt, QThreadPool, QTimer
+from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 from tifffile import tifffile
@@ -488,8 +487,8 @@ class URunnable(QRunnable):
             self.task()
         finally:
             self.task_state.set_finished(True)
-            if self in UThreadPool.tasks:
-                QTimer.singleShot(5000, lambda: UThreadPool.tasks.remove(self))
+            # if self in UThreadPool.tasks:
+                # QTimer.singleShot(5000, lambda: UThreadPool.tasks.remove(self))
 
     def task(self):
         raise NotImplementedError("Переопредели метод task() в подклассе.")
@@ -508,5 +507,5 @@ class UThreadPool:
         """
         Запускает URunnable, добавляет в список UThreadPool.tasks
         """
-        cls.tasks.append(runnable)
+        # cls.tasks.append(runnable)
         cls.pool.start(runnable)
