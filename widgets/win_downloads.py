@@ -149,15 +149,6 @@ class WinDownloads(WinSystem):
                     self.progress_layout.addWidget(item)
                     self.download_items.append(thread)
 
-        for files_list in CopyFilesTask.copied_files():
-            if files_list not in self.download_items:
-                item = OldDownloadsItem(files=files_list)
-                one = lambda: self.remove_from_file_lists(download_item=files_list)
-                item.stop_btn_pressed.connect(one)
-                item.stop_btn_pressed.connect(item.deleteLater)
-                self.progress_layout.addWidget(item)
-                self.download_items.append(files_list)
-
         QTimer.singleShot(1000, self.add_progress_widgets)
 
     def remove_from_file_lists(self, download_item: list[str] | CopyFilesTask):
