@@ -694,7 +694,7 @@ class Grid(VScrollArea):
                 for i in self.selected_widgets
             ]
 
-            cmd_ = lambda: self.open_in_view(wid=clicked_wid)
+            cmd_ = lambda: self.img_view.emit()
             view = OpenInView(self.menu_)
             view._clicked.connect(cmd_)
             self.menu_.addAction(view)
