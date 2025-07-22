@@ -37,6 +37,11 @@ class WinUpload(WinSystem):
         self.h_lay.addWidget(self.menu_left)
         self.check_coll_btns()
 
+    def after_load(self):
+        first_tab = self.menu_left.menu_tabs_list[0]
+        first_btn = first_tab.coll_btns
+        print(first_btn)
+
     def check_coll_btns(self):
         any_tab = self.menu_left.menu_tabs_list[0]
         if len(any_tab.coll_btns) == 0:
@@ -58,6 +63,10 @@ class WinUpload(WinSystem):
                 i.main_folder_index = menu.main_folder_index
                 cmd_ = lambda coll_btn=i: self.coll_btn_cmd(coll_btn=coll_btn)
                 i.pressed_.connect(cmd_)
+        
+        # first_tab = self.menu_left.menu_tabs_list[0]
+        # first_btn = first_tab.coll_btns[3:][0]
+        # self.coll_btn_cmd(first_btn)
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
         main_folder_path = MainFolder.current.is_available()
