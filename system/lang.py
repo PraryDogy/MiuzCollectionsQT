@@ -342,8 +342,8 @@ class _Lang:
         "Type"
     ]
     view = [
-        "Просмотр",
-        "View"
+        "Открыть",
+        "Open"
     ]
     wait_update = [
         "Подождите...",
@@ -655,7 +655,7 @@ class _Lang:
     ]
 
     open_in = [
-        "Открыть в программе",
+        "Открыть в приложении",
         "Open in application"
     ]
 

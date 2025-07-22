@@ -709,9 +709,9 @@ class Grid(VScrollArea):
                 act.triggered.connect(cmd)
                 open_menu.addAction(act)
 
-            open_default = OpenDefault(self.menu_, rel_img_path_list)
-            open_default.triggered.connect(lambda: self.open_default_cmd(rel_img_path_list))
-            self.menu_.addAction(open_default)
+            # open_default = OpenDefault(self.menu_, rel_img_path_list)
+            # open_default.triggered.connect(lambda: self.open_default_cmd(rel_img_path_list))
+            # self.menu_.addAction(open_default)
 
             self.menu_.addSeparator()
 
