@@ -66,10 +66,12 @@ class WinUpload(WinSystem):
         
         # first_tab = self.menu_left.menu_tabs_list[0]
         # first_btn = first_tab.coll_btns[3:][0]
-        # self.coll_btn_cmd(first_btn)
+        # QTimer.singleShot(200, lambda: self.coll_btn_cmd(first_btn))
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
-        main_folder_path = MainFolder.current.is_available()
+        main_folder = MainFolder.list_[coll_btn.main_folder_index]
+        main_folder_path = main_folder.is_available()
+
         if main_folder_path:
             self.coll_path = os.path.join(main_folder_path, coll_btn.coll_name)
             # поправка на корневой каталог

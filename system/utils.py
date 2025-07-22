@@ -408,6 +408,7 @@ class MainUtils:
     @classmethod
     def print_error(cls):
         print()
+        print("Исключение обработано")
         print(traceback.format_exc())
         print()
 
