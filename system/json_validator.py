@@ -16,6 +16,9 @@ class JsonValidator:
         json_data = self.load_json_data(self.filepath) or {}
         obj_data = self.get_obj_data(self.obj)
         errors = []
+
+        print(json_data)
+        print(obj_data)
         
         try:
             self.model(**json_data)
