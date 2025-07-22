@@ -19,7 +19,7 @@ class WinUpload(WinSystem):
     def __init__(self, parent: QWidget):
         super().__init__()
         self.setWindowTitle(Lang.title_downloads)
-        self.resize(Static.MENU_LEFT_WIDTH, parent.height())
+        self.resize(Static.MENU_LEFT_WIDTH, 500)
         self.current_submenu: VListWidget = None
         self.coll_path: str = None
 
@@ -95,7 +95,10 @@ class WinUpload(WinSystem):
         self.current_submenu.setFixedHeight(self.current_submenu.height() - 10)
         self.current_submenu.move(self.current_submenu.x(), self.current_submenu.y() + 5)
 
-        wid = QLabel(os.path.basename(self.coll_path))
+        root_name = os.path.basename(self.coll_path)
+        root_name = root_name.strip("1234567890").strip()
+
+        wid = QLabel(root_name)
         wid.setStyleSheet("padding-left: 5px;")
         cmd_ = lambda e, : self.list_widget_item_cmd(entry=self.coll_path)
         wid.mouseReleaseEvent = cmd_
@@ -107,7 +110,7 @@ class WinUpload(WinSystem):
 
             wid = QLabel(entry_.name)
             wid.setStyleSheet("padding-left: 5px;")
-            wid.mouseReleaseEvent = lambda e, entry=entry_: self.list_widget_item_cmd(entry=entry)
+            wid.mouseReleaseEvent = lambda e, entry=entry_: self.list_widget_item_cmd(entry)
             list_item = UListWidgetItem(self.current_submenu)
             self.current_submenu.addItem(list_item)
             self.current_submenu.setItemWidget(list_item, wid)
