@@ -3,10 +3,11 @@ import os
 
 from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
-from PyQt5.QtGui import (QContextMenuEvent, QDrag, QKeyEvent, QMouseEvent,
-                         QPixmap, QResizeEvent)
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGridLayout,
-                             QLabel, QPushButton, QRubberBand, QWidget)
+from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
+                         QMouseEvent, QPalette, QPixmap, QResizeEvent)
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
+                             QGraphicsDropShadowEffect, QGridLayout, QLabel,
+                             QRubberBand, QWidget)
 
 from cfg import Dynamic, JsonData, Static, ThumbData
 from system.lang import Lang
@@ -225,15 +226,16 @@ class UpBtn(QFrame):
         return super().mouseReleaseEvent(a0)
 
 
-class DateWid(QPushButton):
+class DateWid(QLabel):
     def __init__(self, parent: QWidget, blue_color: bool = True):
         super().__init__(parent)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)        
-        self.setCheckable(blue_color)
-        self.setChecked(blue_color)
-        
-    def mousePressEvent(self, e):
-        e.ignore()
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)      
+
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(20)
+        shadow.setOffset(0, 2)
+        shadow.setColor(QColor(0, 0, 0, 190))
+        self.setGraphicsEffect(shadow)
         
 
 class Grid(VScrollArea):
@@ -766,9 +768,28 @@ class Grid(VScrollArea):
                     (self.viewport().width() - self.date_wid.width()) // 2,
                     5
                 )
-                self.date_wid.show()
-                self.date_timer.stop()
-                self.date_timer.start(3000)
+                if self.date_wid.isHidden():
+                    palete = QApplication.palette()
+                    color = QPalette.windowText(palete).color().name()
+                
+                    bg_style_data = {
+                        "#000000": "rgba(220, 220, 220, 1)",
+                        "#ffffff": "rgba(80, 80, 80, 1)",
+                    }
+
+                    self.date_wid.setStyleSheet(f"""
+                        QLabel {{
+                            background: {bg_style_data.get(color)};
+                            font-weight: bold;
+                            font-size: 20pt;
+                            border-radius: 10px;
+                            padding: 5px;
+                        }}
+                    """)
+
+                    self.date_wid.show()
+                    self.date_timer.stop()
+                    self.date_timer.start(3000)
      
         elif value == 0:
             self.date_wid.hide()
