@@ -6,32 +6,55 @@ import sqlalchemy
 from cfg import JsonData, Static
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.main_folder import MainFolder
-from system.utils import MainUtils
+from system.scaner_utils import Compator, DbUpdater, HashdirUpdater, Inspector
+from system.utils import MainUtils, TaskState
 
 
 class DirsLoader:
 
     @classmethod
-    def load_finder_dirs(cls, main_folder: MainFolder) -> list:
+    def finder_dirs(
+        cls,
+        main_folder: MainFolder,
+        task_state: TaskState,
+        conn: sqlalchemy.Connection,
+    ) -> list[tuple]:
         """
         Возвращает:
         - [(rel_dir_path, mod_time), ...]
         """
         dirs = []
-        stack = [main_folder.get_current_path()]
+        main_folder_path = main_folder.get_current_path()
+        stack = [main_folder_path]
+
+
+        def iter_dir(entry: os.DirEntry):
+            if entry.is_dir() and entry.name not in main_folder.stop_list:
+                stack.append(entry.path)
+                rel_path = MainUtils.get_rel_path(main_folder_path, entry.path)
+                dirs.append((rel_path, int(entry.stat().st_mtime)))
+
 
         while stack:
             current = stack.pop()
             with os.scandir(current) as it:
                 for entry in it:
-                    if entry.is_dir() and entry.name not in main_folder.stop_list:
-                        stack.append(entry.path)
-                        rel_path = MainUtils.get_rel_path(main_folder.get_current_path(), entry.path)
-                        dirs.append((rel_path, int(entry.stat().st_mtime)))
+                    if not task_state.should_run():
+                        break
+                    try:
+                        iter_dir(entry)
+                    except Exception:
+                        MainUtils.print_error()
+                        task_state.set_should_run(False)
         return dirs
 
     @classmethod
-    def load_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder) -> list:
+    def db_dirs(
+        cls,
+        main_folder: MainFolder,
+        task_state: TaskState,
+        conn: sqlalchemy.Connection,
+    ) -> list[tuple]:
         """
         Возвращает:
         - [(rel_dir_path, mod_time), ...]
@@ -44,7 +67,7 @@ class DirsLoader:
 
 class DirsCompator:
     @classmethod
-    def get_removed_dirs(cls, finder_dirs: list, db_dirs: list) -> list :
+    def get_rm_from_db_dirs(cls, finder_dirs: list, db_dirs: list) -> list :
         """
         Параметры:
         - finder_dirs: [(rel_dir_path, mod_time), ...]
@@ -60,7 +83,7 @@ class DirsCompator:
         ]
 
     @classmethod
-    def get_new_dirs(cls, finder_dirs: list, db_dirs: list) -> list:
+    def get_add_to_db_dirs(cls, finder_dirs: list, db_dirs: list) -> list:
         """
         Параметры:
         - finder_dirs: [(rel_dir_path, mod_time), ...]
@@ -76,9 +99,14 @@ class DirsCompator:
         ]
 
 
-class DirsUpdater:
+class Updater:
     @classmethod
-    def remove_db_dirs(cls, conn: sqlalchemy.Connection, del_dirs: list, main_folder: MainFolder):
+    def remove_db_dirs(
+        cls,
+        conn: sqlalchemy.Connection,
+        del_dirs: list,
+        main_folder: MainFolder,
+    ):
         """
         Параметры:
         - del_dirs: [(rel_dir_path, mod_time), ...]
@@ -104,7 +132,12 @@ class DirsUpdater:
             conn.rollback()
 
     @classmethod
-    def add_new_dirs(cls, conn: sqlalchemy.Connection, new_dirs: list, main_folder: MainFolder):
+    def add_new_dirs(
+        cls,
+        conn: sqlalchemy.Connection,
+        new_dirs: list,
+        main_folder: MainFolder,
+    ):
         """
         Параметры:
         - new_dirs: [(rel_dir_path, mod_time), ...]
@@ -133,10 +166,16 @@ class DirsUpdater:
             conn.rollback()
 
 
-class ImagesLoader:
+class ImgLoader:
 
     @classmethod
-    def load_finder_images(cls, new_dirs: list, main_folder: MainFolder) -> list:
+    def finder_images(
+        cls,
+        new_dirs: list,
+        main_folder: MainFolder,
+        task_state: TaskState,
+        conn: sqlalchemy.Connection,
+    ) -> list[tuple]:
         """
         Параметры:
         - new_dirs: [(rel_dir_path, mod_time), ...]
@@ -145,24 +184,38 @@ class ImagesLoader:
         - finder_images: [(rel_img_path, size, birth_time, mod_time), ...]    
         """
         finder_images = []
+        main_folder_path = main_folder.get_current_path()
+
+
+        def process_entry(entry: os.DirEntry):
+            rel_img_path = MainUtils.get_rel_path(main_folder_path, entry.path)
+            stats = entry.stat()
+            size = stats.st_size
+            birth = stats.st_birthtime
+            mod = stats.st_mtime
+            finder_images.append((rel_img_path, size, birth, mod))
+
+
         for rel_dir_path, mod in new_dirs:
-            abs_dir_path = MainUtils.get_abs_path(main_folder.get_current_path(), rel_dir_path)
-            for i in os.scandir(abs_dir_path):
-                if i.path.endswith(Static.ext_all):
+            abs_dir_path = MainUtils.get_abs_path(main_folder_path, rel_dir_path)
+            for entry in os.scandir(abs_dir_path):
+                if entry.path.endswith(Static.ext_all):
                     try:
-                        rel_img_path = MainUtils.get_rel_path(main_folder.get_current_path(), i.path)
-                        stats = os.stat(i.path)
-                        size = stats.st_size
-                        birth = stats.st_birthtime
-                        mod = stats.st_mtime
-                        finder_images.append((rel_img_path, size, birth, mod))
+                        process_entry(entry)
                     except Exception as e:
                         MainUtils.print_error()
-                        continue
+                        task_state.set_should_run(False)
+                        break
         return finder_images
 
     @classmethod
-    def load_db_images(cls, new_dirs: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
+    def db_images(
+        cls,
+        new_dirs: list,
+        main_folder: MainFolder,
+        task_state: TaskState,
+        conn: sqlalchemy.Connection,
+        ) -> list[tuple]:
         """
         Параметры:
         - new_dirs: [(rel_dir_path, mod_time), ...]
@@ -190,10 +243,10 @@ class ImagesLoader:
         return db_images
 
 
-class ImagesCompator:
+class ImgCompator:
 
     @classmethod
-    def get_removed_images(cls, finder_images: list, db_images: list) -> list:
+    def get_rm_from_db_images(cls, finder_images: list, db_images: list) -> list:
         """
         Параметры:
         - finder_images: [(относительный путь к изображению, дата изменения), ...]
@@ -210,7 +263,7 @@ class ImagesCompator:
         ]
     
     @classmethod
-    def get_new_images(cls, finder_images: list, db_images: list) -> list:
+    def get_add_to_db_images(cls, finder_images: list, db_images: list) -> list:
         """
         Параметры:
         - finder_images: [(относительный путь к изображению, дата изменения), ...]
@@ -228,75 +281,61 @@ class ImagesCompator:
 
 
 
+class TestScan:
+
+    @classmethod
+    def start():
+        MainFolder.set_default_main_folders()
+        Dbase.create_engine()
+        conn = Dbase.engine.connect()
+        JsonData.init()
+        task_state = TaskState()
+
+        for main_folder in MainFolder.list_:
+            coll_folder = main_folder.is_available()
+            if not coll_folder:
+                return
+
+            args = (main_folder, task_state, conn)
+            finder_dirs = DirsLoader.finder_dirs(*args)
+            if not finder_dirs or not task_state.should_run():
+                return
+
+            db_dirs = DirsLoader.db_dirs(*args)
+
+            args = (finder_dirs, db_dirs)
+            new_dirs = DirsCompator.get_add_to_db_dirs(*args)
+            del_dirs = DirsCompator.get_rm_from_db_dirs(*args)
+
+            args = (new_dirs, main_folder, task_state, conn)
+            finder_images = ImgLoader.finder_images(*args)
+            if not finder_images or not task_state.should_run():
+                return
+            
+            db_images = ImgLoader.db_images(args)
+            
+            args = (finder_images, db_images)
+            new_images = ImgCompator.get_add_to_db_images(*args)
+            del_images = ImgCompator.get_rm_from_db_images(*args)
+
+            inspector = Inspector(del_images, main_folder)
+            is_remove_all = inspector.is_remove_all()
+            if is_remove_all:
+                print("scaner > обнаружена попытка массового удаления фотографий")
+                print("в папке:", main_folder.name, main_folder.get_current_path())
+                return
+
+            # обновляем хэш
+            # обновляем бд
+
+            # обновляем бд дирс
+
+            # print("new method", "finder images", len(finder_images), main_folder.name)
+            # print("new method", "db images", len(db_images), main_folder.name)
 
 
+            Updater.remove_db_dirs(conn, del_dirs, main_folder)
+            Updater.add_new_dirs(conn, new_dirs, main_folder)
 
 
-from time import time
-
-start = time()
-
-MainFolder.set_default_main_folders()
-Dbase.create_engine()
-conn = Dbase.engine.connect()
-JsonData.init()
-
-for main_folder in MainFolder.list_:
-    coll_folder = main_folder.is_available()
-    if coll_folder:
-        finder_dirs = DirsLoader.load_finder_dirs(main_folder)
-        if finder_dirs:
-            db_dirs = DirsLoader.load_db_dirs(conn, main_folder)
-            new_dirs = DirsCompator.get_new_dirs(finder_dirs, db_dirs)
-            del_dirs = DirsCompator.get_removed_dirs(finder_dirs, db_dirs)
-
-            finder_images = ImagesLoader.load_finder_images(new_dirs, main_folder)
-            db_images = ImagesLoader.load_db_images(new_dirs, main_folder, conn)
-
-            print("new method", "finder images", len(finder_images), main_folder.name)
-            print("new method", "db images", len(db_images), main_folder.name)
-
-            DirsUpdater.remove_db_dirs(conn, del_dirs, main_folder)
-            DirsUpdater.add_new_dirs(conn, new_dirs, main_folder)
-
-conn.close()
-end = time() - start
-print(end)
-
-
-
-
-
-
-
-from system.scaner_utils import DbImages, FinderImages
-from system.utils import TaskState
-from system.lang import Lang
-
-start = time()
-
-task_state = TaskState()
-task_state.set_should_run(True)
-
-MainFolder.set_default_main_folders()
-Dbase.create_engine()
-conn = Dbase.engine.connect()
-JsonData.init()
-Lang.init()
-
-for main_folder in MainFolder.list_:
-    coll_folder = main_folder.is_available()
-    if coll_folder:
-        finder_images = FinderImages(main_folder, task_state)
-        finder_images = finder_images.run()
-
-        if finder_images:
-            db_images = DbImages(main_folder)
-            db_images = db_images.run()
-
-            print("old method", "finder images", len(finder_images), main_folder.name)
-            print("old method", "db images", len(db_images), main_folder.name)
-
-
-end = time() - start
-print(end)
+TestScan.start()
