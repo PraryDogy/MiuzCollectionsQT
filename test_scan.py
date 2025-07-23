@@ -104,8 +104,9 @@ class DirsUpdater:
     def remove_db_dirs(
         cls,
         conn: sqlalchemy.Connection,
-        del_dirs: list,
         main_folder: MainFolder,
+        del_dirs: list,
+        new_dirs: list,
     ):
         """
         Параметры:
@@ -135,8 +136,9 @@ class DirsUpdater:
     def add_new_dirs(
         cls,
         conn: sqlalchemy.Connection,
-        new_dirs: list,
         main_folder: MainFolder,
+        del_dirs: list,
+        new_dirs: list,
     ):
         """
         Параметры:
@@ -332,15 +334,9 @@ class TestScan:
             db_updater = DbUpdater(del_images, new_images, main_folder)
             db_updater.run()
 
-
-            # обновляем бд дирс
-
-            # print("new method", "finder images", len(finder_images), main_folder.name)
-            # print("new method", "db images", len(db_images), main_folder.name)
-
-
-            DirsUpdater.remove_db_dirs(conn, del_dirs, main_folder)
-            DirsUpdater.add_new_dirs(conn, new_dirs, main_folder)
+            args = (conn, main_folder, del_dirs, new_dirs)
+            DirsUpdater.remove_db_dirs(*args)
+            DirsUpdater.add_new_dirs(*args)
 
 
 TestScan.start()
