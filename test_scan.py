@@ -99,7 +99,7 @@ class DirsCompator:
         ]
 
 
-class Updater:
+class DirsUpdater:
     @classmethod
     def remove_db_dirs(
         cls,
@@ -324,9 +324,14 @@ class TestScan:
                 print("scaner > обнаружена попытка массового удаления фотографий")
                 print("в папке:", main_folder.name, main_folder.get_current_path())
                 return
+            
+            args = (del_images, new_images, main_folder, task_state)
+            hashdir_updater = HashdirUpdater(*args)
+            del_images, new_images = hashdir_updater.run()
 
-            # обновляем хэш
-            # обновляем бд
+            db_updater = DbUpdater(del_images, new_images, main_folder)
+            db_updater.run()
+
 
             # обновляем бд дирс
 
@@ -334,8 +339,8 @@ class TestScan:
             # print("new method", "db images", len(db_images), main_folder.name)
 
 
-            Updater.remove_db_dirs(conn, del_dirs, main_folder)
-            Updater.add_new_dirs(conn, new_dirs, main_folder)
+            DirsUpdater.remove_db_dirs(conn, del_dirs, main_folder)
+            DirsUpdater.add_new_dirs(conn, new_dirs, main_folder)
 
 
 TestScan.start()
