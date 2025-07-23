@@ -336,6 +336,8 @@ class TestScan:
             # перепиши hashdir updater и db updater
             # потому что у тебя del items имеет данные path, size, mod, birth
             # а старые классы прниимают del items из только path
+            # не забудь hashdir updater если ошшибки то task state should run Dalse
+            # и тогда не продолжаем обновление
 
             args = (del_images, new_images, main_folder, task_state)
             hashdir_updater = HashdirUpdater(*args)
