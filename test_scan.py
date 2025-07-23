@@ -286,7 +286,7 @@ class ImgCompator:
 class TestScan:
 
     @classmethod
-    def start():
+    def start(cls):
         MainFolder.set_default_main_folders()
         Dbase.create_engine()
         conn = Dbase.engine.connect()
@@ -337,6 +337,11 @@ class TestScan:
             args = (conn, main_folder, del_dirs, new_dirs)
             DirsUpdater.remove_db_dirs(*args)
             DirsUpdater.add_new_dirs(*args)
+
+            print("del dirs", del_dirs)
+            print("new dirs", new_dirs)
+            print("del images", del_images)
+            print("new images", new_images)
 
 
 TestScan.start()
