@@ -5,6 +5,7 @@ import sqlalchemy
 
 from cfg import JsonData, Static
 from system.database import DIRS, THUMBS, ClmNames, Dbase
+from system.lang import Lang
 from system.main_folder import MainFolder
 from system.scaner_utils import Compator, DbUpdater, HashdirUpdater, Inspector
 from system.utils import MainUtils, TaskState
@@ -294,6 +295,7 @@ class TestScan:
         Dbase.create_engine()
         conn = Dbase.engine.connect()
         JsonData.init()
+        Lang.init()
         task_state = TaskState()
 
         for main_folder in MainFolder.list_:
