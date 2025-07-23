@@ -32,7 +32,9 @@ class DirsLoader:
             if entry.is_dir() and entry.name not in main_folder.stop_list:
                 stack.append(entry.path)
                 rel_path = MainUtils.get_rel_path(main_folder_path, entry.path)
-                dirs.append((rel_path, int(entry.stat().st_mtime)))
+                stats = entry.stat()
+                mod = int(stats.st_mtime)
+                dirs.append((rel_path, mod))
 
 
         while stack:
@@ -192,9 +194,9 @@ class ImgLoader:
         def process_entry(entry: os.DirEntry):
             rel_img_path = MainUtils.get_rel_path(main_folder_path, entry.path)
             stats = entry.stat()
-            size = stats.st_size
-            birth = stats.st_birthtime
-            mod = stats.st_mtime
+            size = int(stats.st_size)
+            birth = int(stats.st_birthtime)
+            mod = int(stats.st_mtime)
             finder_images.append((rel_img_path, size, birth, mod))
 
 
@@ -251,34 +253,35 @@ class ImgCompator:
     def get_rm_from_db_images(cls, finder_images: list, db_images: list) -> list:
         """
         Параметры:
-        - finder_images: [(относительный путь к изображению, дата изменения), ...]
-        - db_dirs: [(относительный путь к изображению, дата изменения), ...]
+        - finder_images: [(rel_img_path, size, birth_time, mod_time), ...] 
+        - db_images: [(rel_img_path, size, birth_time, mod_time), ...] 
 
         Возвращает те изображения, которых нет в finder_dirs, но есть в db_dirs:
-        - [(относительный путь к изображению, дата изменения), ...]
+        - [(rel_img_path, size, birth_time, mod_time), ...] 
         """
         finder_set = set(finder_images)
         return [
-            (rel_img_path, mod)
-            for rel_img_path, mod in db_images
-            if (rel_img_path, mod) not in finder_set
+            data
+            for data in db_images
+            if data not in finder_set
         ]
     
     @classmethod
     def get_add_to_db_images(cls, finder_images: list, db_images: list) -> list:
         """
         Параметры:
-        - finder_images: [(относительный путь к изображению, дата изменения), ...]
-        - db_dirs: [(относительный путь к изображению, дата изменения), ...]
+        - finder_images: [(rel_img_path, size, birth_time, mod_time), ...] 
+        - db_images: [(rel_img_path, size, birth_time, mod_time), ...] 
 
         Возвращает те изображения, которых нет в db_dirs, но есть в finder_dirs:
-        - [(относительный путь к изображению, дата изменения), ...]
+        - [(rel_img_path, size, birth_time, mod_time), ...] 
         """
         db_set = set(db_images)
+
         return [
-            (rel_img_path, mod)
-            for rel_img_path, mod in finder_images
-            if (rel_img_path, mod) not in db_set
+            data
+            for data in finder_images
+            if data not in db_set
         ]
 
 
@@ -314,8 +317,8 @@ class TestScan:
             if not finder_images or not task_state.should_run():
                 return
             
-            db_images = ImgLoader.db_images(args)
-            
+            db_images = ImgLoader.db_images(*args)
+
             args = (finder_images, db_images)
             new_images = ImgCompator.get_add_to_db_images(*args)
             del_images = ImgCompator.get_rm_from_db_images(*args)
