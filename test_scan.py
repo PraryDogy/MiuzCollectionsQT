@@ -332,6 +332,11 @@ class TestScan:
                 print("в папке:", main_folder.name, main_folder.get_current_path())
                 return
             
+
+            # перепиши hashdir updater и db updater
+            # потому что у тебя del items имеет данные path, size, mod, birth
+            # а старые классы прниимают del items из только path
+
             args = (del_images, new_images, main_folder, task_state)
             hashdir_updater = HashdirUpdater(*args)
             del_images, new_images = hashdir_updater.run()
