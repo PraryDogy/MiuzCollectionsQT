@@ -11,7 +11,7 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.scaner_task import ScanerTask
+from system.old_scaner.scaner_task import ScanerTask
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, UploadFilesTask)
 from system.utils import UThreadPool
