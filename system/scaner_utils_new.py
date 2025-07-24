@@ -9,7 +9,6 @@ from cfg import JsonData, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.scaner_utils import Inspector, MainFolderRemover
 from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils, URunnable
 
 
@@ -455,120 +454,116 @@ class DbUpdater:
             MainUtils.print_error()
             conn.rollback()
 
-        if len(self.new_items) > 0:
-            self.reload_gui.emit()
 
-
-class ScanerSignals(QObject):
-    finished_ = pyqtSignal()
-    progress_text = pyqtSignal(str)
-    reload_gui = pyqtSignal()
-
-
-class ScanerTask(URunnable):
-    short_timer = 15000
-    long_timer = JsonData.scaner_minutes * 60 * 1000
-
-    def __init__(self):
+class Inspector:
+    def __init__(self, del_items: list, main_folder: MainFolder):
         """
-        Сигналы: finished_, progress_text(str), reload_gui, remove_all_win(MainWin)
+        del_items: [rel thumb path, ...]
+
+        Этот класс выполняет проверку безопасности перед удалением данных.
+        Метод is_remove_all() инициирует сравнение между количеством записей
+        в БД и количеством удаляемых миниатюр, связанных с MainFolder.
+
+        Если количество удаляемых элементов совпадает с количеством записей в базе,
+        это может свидетельствовать о потенциальной ошибке в логике сканера,
+        приводящей к попытке удалить все данные, связанные с MainFolder.
+        В таком случае, операция считается подозрительной и может быть заблокирована
+        как мера предосторожности.
         """
         super().__init__()
-        self.signals_ = ScanerSignals()
-        self.pause_flag = False
-        self.user_canceled_scan = False
-
-    def task(self):
-        main_folders = [
-            i
-            for i in MainFolder.list_
-            if i.is_available()
-        ]
-
-        for i in main_folders:
-            print("scaner started", i.name)
-            self.main_folder_scan(i)
-            gc.collect()
-            print("scaner finished", i.name)
-            
-        try:
-            self.signals_.finished_.emit()
-        except RuntimeError as e:
-            ...
-
-    def main_folder_scan(self, main_folder: MainFolder):
-        main_folder_remover = MainFolderRemover()
-        main_folder_remover.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
-        main_folder_remover.run()
-
-        coll_folder = main_folder.is_available()
-        if not coll_folder:
-            print(main_folder.name, "coll folder not avaiable")
-            return
-
+        self.del_items = del_items
+        self.main_folder = main_folder
+    
+    def is_remove_all(self):
         conn = Dbase.engine.connect()
-        text = f"{main_folder.name}: ищу обновления"
-        self.signals_.progress_text.emit(text)
-        args = (main_folder, self.task_state, conn)
-        finder_dirs = DirsLoader.finder_dirs(*args)
-        db_dirs = DirsLoader.db_dirs(*args)
+        q = sqlalchemy.select(sqlalchemy.func.count())
+        q = q.where(THUMBS.c.brand == self.main_folder.name)
+        result = conn.execute(q).scalar()
         conn.close()
-        if not finder_dirs or not self.task_state.should_run():
-            print(main_folder.name, "no finder dirs")
-            return
+        if len(self.del_items) == result and len(self.del_items) != 0:
+            return True
+        return None
 
-        args = (finder_dirs, db_dirs)
-        new_dirs = DirsCompator.get_add_to_db_dirs(*args)
-        del_dirs = DirsCompator.get_rm_from_db_dirs(*args)
 
-        conn = Dbase.engine.connect()
-        text = f"{main_folder.name}: ищу изображения"
-        self.signals_.progress_text.emit(text)
-        args = (new_dirs, main_folder, self.task_state, conn)
-        finder_images = ImgLoader.finder_images(*args)
-        db_images = ImgLoader.db_images(*args)
-        conn.close()
-        if not finder_images or not self.task_state.should_run():
-            print(main_folder.name, "no finder images")
-            return
+class MainFolderRemover:
+    def __init__(self):
+        """
+        Запуск: run()   
+        Сигналы: progress_text(str)
+
+        Сверяет список экземпляров класса MainFolder в бд (THUMBS.c.brand)     
+        со списком MainFolder в приложении.     
+        Удаляет весь контент MainFolder, если MainFolder больще нет в бд:   
+        - изображения thumbs из hashdir в ApplicationSupport    
+        - записи в базе данных
+
+        Вызови run для работы
+        """
+        super().__init__()
+        self.conn = Dbase.engine.connect()
+
+    def run(self):
+        q = sqlalchemy.select(THUMBS.c.brand).distinct()
+        db_main_folders = self.conn.execute(q).scalars().all()
+        app_main_folders = [i.name for i in MainFolder.list_]
+        del_main_folders = [i for i in db_main_folders if i not in app_main_folders]
+        for i in del_main_folders:
+            rows = self.get_rows(i)
+            self.remove_images(rows)
+            self.remove_rows(rows)
+        self.conn.close()
         
+    def get_rows(self, main_folder_name):
+        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
+        q = q.where(THUMBS.c.brand == main_folder_name)
+        res = self.conn.execute(q).fetchall()
+        res = [
+            (id_, ThumbUtils.get_thumb_path(rel_thumb_path))
+            for id_, rel_thumb_path in res
+        ]
+        return res
 
-        args = (finder_images, db_images)
-        img_compator = ImgCompator(*args)
-        del_images, new_images = img_compator.run()
+    def remove_images(self, rows: list):
+        """
+        rows: [(row id int, thumb path), ...]
+        """
+        total = len(rows)
+        for x, (id_, image_path) in enumerate(rows):
+            try:
+                t = f"{Lang.deleting}: {x} {Lang.from_} {total}"
+                self.progress_text.emit(t)
 
-        inspector = Inspector(del_images, main_folder)
-        is_remove_all = inspector.is_remove_all()
-        if is_remove_all:
-            print("scaner > обнаружена попытка массового удаления фотографий")
-            print("в папке:", main_folder.name, main_folder.get_current_path())
-            return
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+                folder = os.path.dirname(image_path)
+                if os.path.exists(folder) and not os.listdir(folder):
+                    os.rmdir(folder)
 
-        text = f"Обновляю: {len(del_images) + len(new_images)}"
-        self.signals_.progress_text.emit(text)
-        args = (del_images, new_images, main_folder, self.task_state)
-        hashdir_updater = HashdirUpdater(*args)
-        del_images, new_images = hashdir_updater.run()
+            except Exception as e:
+                MainUtils.print_error()
+                continue
 
-        db_updater = DbUpdater(del_images, new_images, main_folder)
-        db_updater.run()
+    def remove_rows(self, rows: list):
+        """
+        rows: [(row id int, thumb path), ...]
+        """
+        for id_, thumb_path in rows:
+            q = sqlalchemy.delete(THUMBS)
+            q = q.where(THUMBS.c.id == id_)
 
-        conn = Dbase.engine.connect()
-        args = (conn, main_folder, del_dirs, new_dirs)
-        DirsUpdater.remove_db_dirs(*args)
-        DirsUpdater.add_new_dirs(*args)
-        conn.close()
+            try:
+                self.conn.execute(q)
+            except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
+                MainUtils.print_error()
+                self.conn.rollback()
+                continue
 
-        self.signals_.progress_text.emit("")
-        if del_images or new_images:
-            self.signals_.reload_gui.emit()
-
-        print("del dirs", del_dirs)
-        print("new dirs", new_dirs)
-        print("del images", del_images)
-        print("new images", new_images)
-
-
-# добавление изображений работает
-# удаление не работает
-# TestScan.start()
+            except sqlalchemy.exc.OperationalError as e:
+                MainUtils.print_error()
+                self.conn.rollback()
+                break
+        try:
+            self.conn.commit()
+        except Exception as e:
+            self.conn.rollback()
+            MainUtils.print_error()
