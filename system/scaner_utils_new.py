@@ -376,7 +376,7 @@ class HashdirUpdater:
 
 
 class DbUpdater:
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
+    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
@@ -390,35 +390,35 @@ class DbUpdater:
         self.main_folder = main_folder
         self.del_items = del_items
         self.new_items = new_items
+        self.conn = conn
 
     def run(self):
         self.run_del_items()
         self.run_new_items()
 
     def run_del_items(self):
-        conn = Dbase.engine.connect()
+
         for rel_thumb_path in self.del_items:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
             q = q.where(THUMBS.c.brand==self.main_folder.name)
             try:
-                conn.execute(q)
+                self.conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 MainUtils.print_error()
-                conn.rollback()
+                self.conn.rollback()
                 continue
             except sqlalchemy.exc.OperationalError as e:
                 MainUtils.print_error()
-                conn.rollback()
+                self.conn.rollback()
                 return None
         try:
-            conn.commit()
+            self.conn.commit()
         except Exception as e:
             MainUtils.print_error()
-            conn.rollback()
+            self.conn.rollback()
 
     def run_new_items(self):
-        conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
             small_img_path = ThumbUtils.create_thumb_path(img_path)
             short_img_path = MainUtils.get_rel_path(self.main_folder.get_current_path(), img_path)
@@ -437,22 +437,22 @@ class DbUpdater:
             }
             stmt = sqlalchemy.insert(THUMBS).values(**values) 
             try:
-                conn.execute(stmt)
+                self.conn.execute(stmt)
             # overflow error бывает прозникает когда пишет
             # python integer too large to insert db
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 MainUtils.print_error()
-                conn.rollback()
+                self.conn.rollback()
                 continue
             except sqlalchemy.exc.OperationalError as e:
                 MainUtils.print_error()
-                conn.rollback()
+                self.conn.rollback()
                 break
         try:
-            conn.commit()
+            self.conn.commit()
         except Exception as e:
             MainUtils.print_error()
-            conn.rollback()
+            self.conn.rollback()
 
 
 class Inspector:

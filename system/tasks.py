@@ -445,17 +445,13 @@ class RemoveFilesTask(URunnable):
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
         file_updater = HashdirUpdater(rel_thumb_path_list, [], main_folder, self.task_state)
-        """
-        сигнал для прогресс бара
-        """
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
-        db_updater = DbUpdater(del_items, [], main_folder)
-        """
-        сигнал для прогресс бара
-        """
+        conn = Dbase.engine.connect()
+        db_updater = DbUpdater(del_items, [], main_folder, conn)
         db_updater.run()
+        conn.close()
 
 
 class UploadFilesSignals(QObject):
@@ -517,8 +513,10 @@ class UploadFilesTask(URunnable):
         file_updater = HashdirUpdater(*args)
         rel_thumb_path_list, new_items = file_updater.run()
 
-        db_updater = DbUpdater(rel_thumb_path_list, new_items, MainFolder.current)
+        conn = Dbase.engine.connect()
+        db_updater = DbUpdater(rel_thumb_path_list, new_items, MainFolder.current, conn)
         db_updater.run()
+        conn.close()
         try:
             self.signals_.progress_text.emit("")
             self.signals_.reload_gui.emit()
@@ -735,8 +733,10 @@ class ScanerTask(URunnable):
         hashdir_updater = HashdirUpdater(*args)
         del_images, new_images = hashdir_updater.run()
 
+        conn = Dbase.engine.connect()
         db_updater = DbUpdater(del_images, new_images, main_folder)
         db_updater.run()
+        conn.close()
 
         conn = Dbase.engine.connect()
         args = (conn, main_folder, del_dirs, new_dirs)
