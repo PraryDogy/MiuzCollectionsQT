@@ -505,7 +505,7 @@ class Grid(VScrollArea):
 
             if self.selected_widgets:
                 wid = self.selected_widgets[-1]
-                self.open_in_view(wid=wid)
+                self.img_view.emit()
 
         elif a0.key() in KEY_NAVI:
             offset = KEY_NAVI.get(a0.key())
