@@ -401,7 +401,7 @@ class RemoveFilesTask(URunnable):
     def task(self):
         try:
             if len(self.img_path_list) > 0:
-                text = f"Удаляю изображения ({len(self.img_path_list)})"
+                text = f"{Lang.removing_images} ({len(self.img_path_list)})"
                 self.signals_.progress_text.emit(text)
             img_path_list = self.remove_files()
             self.remove_thumbs(img_path_list)
@@ -684,7 +684,7 @@ class ScanerTask(URunnable):
             return
 
         conn = Dbase.engine.connect()
-        text = f"{main_folder.name}: ищу обновления"
+        text = f"{main_folder.name.capitalize()}: {Lang.searching_updates.lower()}"
         self.signals_.progress_text.emit(text)
         args = (main_folder, self.task_state, conn)
         finder_dirs = DirsLoader.finder_dirs(*args)
@@ -699,7 +699,7 @@ class ScanerTask(URunnable):
         del_dirs = DirsCompator.get_rm_from_db_dirs(*args)
 
         conn = Dbase.engine.connect()
-        text = f"{main_folder.name}: ищу изображения"
+        text = f"{main_folder.name.capitalize()}: {Lang.searching_images.lower()}"
         self.signals_.progress_text.emit(text)
         args = (new_dirs, main_folder, self.task_state, conn)
         finder_images = ImgLoader.finder_images(*args)
@@ -721,7 +721,7 @@ class ScanerTask(URunnable):
             print("в папке:", main_folder.name, main_folder.get_current_path())
             return
 
-        text = f"Обновляю: {len(del_images) + len(new_images)}"
+        text = f"{Lang.updating_data} ({len(del_images) + len(new_images)})"
         self.signals_.progress_text.emit(text)
         args = (del_images, new_images, main_folder, self.task_state)
         hashdir_updater = HashdirUpdater(*args)

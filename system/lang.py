@@ -659,6 +659,26 @@ class _Lang:
         "Open in application"
     ]
 
+    searching_updates = [
+        "Ищу обновления",
+        "Searching updates"
+    ]
+
+    removing_images = [
+        "Удаляю изображения",
+        "Removing images"
+    ]
+
+    searching_images = [
+        "Ищу изображения",
+        "Searching images"
+    ]
+
+    updating_data = [
+        "Обновляю данные",
+        "Updating data"
+    ]
+
 class Lang(_Lang):
 
     @classmethod
