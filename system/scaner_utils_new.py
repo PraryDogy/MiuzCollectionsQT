@@ -456,7 +456,7 @@ class DbUpdater:
 
 
 class Inspector:
-    def __init__(self, del_items: list, main_folder: MainFolder):
+    def __init__(self, del_items: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
         """
         del_items: [rel thumb path, ...]
 
@@ -473,20 +473,19 @@ class Inspector:
         super().__init__()
         self.del_items = del_items
         self.main_folder = main_folder
+        self.conn = conn
     
     def is_remove_all(self):
-        conn = Dbase.engine.connect()
         q = sqlalchemy.select(sqlalchemy.func.count())
         q = q.where(THUMBS.c.brand == self.main_folder.name)
-        result = conn.execute(q).scalar()
-        conn.close()
+        result = self.conn.execute(q).scalar()
         if len(self.del_items) == result and len(self.del_items) != 0:
             return True
         return None
 
 
 class MainFolderRemover:
-    def __init__(self):
+    def __init__(self, conn: sqlalchemy.Connection):
         """
         Запуск: run()   
         Сигналы: progress_text(str)
@@ -500,7 +499,7 @@ class MainFolderRemover:
         Вызови run для работы
         """
         super().__init__()
-        self.conn = Dbase.engine.connect()
+        self.conn = conn
 
     def run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
@@ -511,7 +510,6 @@ class MainFolderRemover:
             rows = self.get_rows(i)
             self.remove_images(rows)
             self.remove_rows(rows)
-        self.conn.close()
         
     def get_rows(self, main_folder_name):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path

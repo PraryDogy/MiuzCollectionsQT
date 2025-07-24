@@ -675,8 +675,10 @@ class ScanerTask(URunnable):
             ...
 
     def main_folder_scan(self, main_folder: MainFolder):
-        main_folder_remover = MainFolderRemover()
+        conn = Dbase.engine.connect()
+        main_folder_remover = MainFolderRemover(conn)
         main_folder_remover.run()
+        conn.close()
 
         coll_folder = main_folder.is_available()
         if not coll_folder:
@@ -714,8 +716,10 @@ class ScanerTask(URunnable):
         img_compator = ImgCompator(*args)
         del_images, new_images = img_compator.run()
 
-        inspector = Inspector(del_images, main_folder)
+        conn = Dbase.engine.connect()
+        inspector = Inspector(del_images, main_folder, conn)
         is_remove_all = inspector.is_remove_all()
+        conn.close()
         if is_remove_all:
             print("scaner > обнаружена попытка массового удаления фотографий")
             print("в папке:", main_folder.name, main_folder.get_current_path())
