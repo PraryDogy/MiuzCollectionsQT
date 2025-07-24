@@ -114,6 +114,10 @@ class ScanerTask(URunnable):
         db_updater.run()
         conn.close()
 
+        if not self.task_state.should_run():
+            self.signals_.reload_gui.emit()
+            return
+
         conn = Dbase.engine.connect()
         args = (conn, main_folder, del_dirs, new_dirs)
         DirsUpdater.remove_db_dirs(*args)
