@@ -534,10 +534,10 @@ class Grid(VScrollArea):
                         0
                     )
                 elif a0.key() == Qt.Key.Key_Left:
-                    coords = (
-                        self.wid_under_mouse.row - 1,
-                        self.max_col - 1
-                    )
+                    coord_list = list(self.cell_to_wid.keys())
+                    curr_index = coord_list.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
+                    coords = coord_list[curr_index-1]
+
                 next_wid = self.cell_to_wid.get(coords)
 
             if next_wid:
