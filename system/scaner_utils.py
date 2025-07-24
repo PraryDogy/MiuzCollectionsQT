@@ -2,203 +2,270 @@ import gc
 import os
 
 import sqlalchemy
-import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import Static, ThumbData
-from system.database import THUMBS, ClmNames, Dbase
+from cfg import JsonData, Static, ThumbData
+from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lang
 from system.main_folder import MainFolder
+from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils, URunnable
 
-from .utils import ImgUtils, TaskState, ThumbUtils, MainUtils
 
+class DirsLoader:
 
-class FinderImages(QObject):
-    progress_text = pyqtSignal(str)
-
-    def __init__(self, main_folder: MainFolder, task_state: TaskState):
+    @classmethod
+    def finder_dirs(
+        cls,
+        main_folder: MainFolder,
+        task_state: TaskState,
+        conn: sqlalchemy.Connection,
+    ) -> list[tuple]:
         """
-        Запуск: run()   
-        Сигналы: progress_text(str)     
-
-        Возвращает все изображения, найденные в MainFolder    
-        [(img_path, size, birth_time, mod_time), ...]   
-        Если не найдено ни одного изображения, вернет None и установит
-        TaskState.should_run на False
-
-        При любой неизвестной ошибке TaskState.should_run будет установлен на False,     
-        чтобы последующие действия не привели к массовому удалению фотографий.      
-        Возвращает None
+        Возвращает:
+        - [(rel_dir_path, mod_time), ...]
         """
-        super().__init__()
-        self.main_folder = main_folder
-        self.task_state = task_state
+        dirs = []
+        main_folder_path = main_folder.get_current_path()
+        stack = [main_folder_path]
 
-    def run(self) -> list | None:
-        try:
-            collections = self.collect_scan_dirs()
-            finder_images = self.process_subdirs(collections)
-            if finder_images:
-                return finder_images
-            else:
-                self.task_state.set_should_run(False)
-                return None
-        except Exception as e:
-            MainUtils.print_error()
-            self.task_state.set_should_run(False)
-            return None
 
-    def collect_scan_dirs(self) -> list[str]:
+        def iter_dir(entry: os.DirEntry):
+            if entry.is_dir() and entry.name not in main_folder.stop_list:
+                stack.append(entry.path)
+                rel_path = MainUtils.get_rel_path(main_folder_path, entry.path)
+                stats = entry.stat()
+                mod = int(stats.st_mtime)
+                dirs.append((rel_path, mod))
+
+
+        while stack:
+            current = stack.pop()
+            with os.scandir(current) as it:
+                for entry in it:
+                    if not task_state.should_run():
+                        break
+                    try:
+                        iter_dir(entry)
+                    except Exception:
+                        MainUtils.print_error()
+                        task_state.set_should_run(False)
+        return dirs
+
+    @classmethod
+    def db_dirs(
+        cls,
+        main_folder: MainFolder,
+        task_state: TaskState,
+        conn: sqlalchemy.Connection,
+    ) -> list[tuple]:
         """
-        Возвращает список путей для сканирования:
-        - все подпапки текущей директории MainFolder, кроме тех, что в stop_list
-        - сам путь MainFolder в конце списка
+        Возвращает:
+        - [(rel_dir_path, mod_time), ...]
         """
-        collections = []
-        for item in os.scandir(self.main_folder.get_current_path()):
-            if item.is_dir() and item.name not in self.main_folder.stop_list:
-                collections.append(item.path)
-        collections.append(self.main_folder.get_current_path())
-        return collections
+        q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod)
+        q = q.where(DIRS.c.brand == main_folder.name)
+        res = conn.execute(q).fetchall()
+        return [(short_src, mod) for short_src, mod in res]
 
-    def process_subdirs(self, subdirs: list[str]) -> list:
+
+class DirsCompator:
+    @classmethod
+    def get_rm_from_db_dirs(cls, finder_dirs: list, db_dirs: list) -> list :
         """
-        Обрабатывает переданные директории и собирает информацию об изображениях.
+        Параметры:
+        - finder_dirs: [(rel_dir_path, mod_time), ...]
+        - db_dirs: [(rel_dir_path, mod_time), ...]
 
-        Возвращает список кортежей с данными файлов:
-        [(img_path, size, birth_time, mod_time), ...]
-
-        - Все подпапки (кроме последней) сканируются рекурсивно.
-        - Последняя папка (корневая) сканируется только на наличие изображений в ней самой.
-        - Прогресс отображается через сигнал progress_text.
-        - Если task_state.should_run() возвращает False, процесс прерывается.
+        Возвращает те директории, которых нет в finder_dirs, но есть в db_dirs:
+        - [(rel_dir_path, mod_time), ...]
         """
-        finder_images = []
-        *subdirs, rootdir = subdirs
-        subrirs_count = len(subdirs)
+        return [
+            (rel_dir_path, mod)
+            for rel_dir_path, mod in db_dirs
+            if (rel_dir_path, mod) not in finder_dirs
+        ]
 
-        for index, subdir in enumerate(subdirs, start=1):
-            if not self.task_state.should_run():
-                return finder_images
-            text = self.get_progress_text(index, subrirs_count)
-            self.progress_text.emit(text)
+    @classmethod
+    def get_add_to_db_dirs(cls, finder_dirs: list, db_dirs: list) -> list:
+        """
+        Параметры:
+        - finder_dirs: [(rel_dir_path, mod_time), ...]
+        - db_dirs: [(rel_dir_path, mod_time), ...]
+
+        Возвращает те директории, которых нет в db_dirs, но есть в finder_dirs:
+        - [(rel_dir_path, mod_time), ...]
+        """
+        return [
+            (rel_dir_path, mod)
+            for (rel_dir_path, mod) in finder_dirs
+            if (rel_dir_path, mod) not in db_dirs
+        ]
+
+
+class DirsUpdater:
+    @classmethod
+    def remove_db_dirs(
+        cls,
+        conn: sqlalchemy.Connection,
+        main_folder: MainFolder,
+        del_dirs: list,
+        new_dirs: list,
+    ):
+        """
+        Параметры:
+        - del_dirs: [(rel_dir_path, mod_time), ...]
+
+        Удаляет директории из таблицы DIRS
+        """
+        for rel_dir_path, mod in del_dirs:
+            q = sqlalchemy.delete(DIRS)
+            q = q.where(DIRS.c.short_src == rel_dir_path)
+            q = q.where(DIRS.c.brand == main_folder.name)
+
             try:
-                walked_images = self.walk_subdir(subdir)
-                finder_images.extend(walked_images)
+                conn.execute(q)
             except Exception as e:
                 MainUtils.print_error()
+                conn.rollback()
                 continue
+        
+        try:
+            conn.commit()
+        except Exception as e:
+            MainUtils.print_error()
+            conn.rollback()
 
-        for i in os.scandir(rootdir):
-            if i.name.endswith(Static.ext_all):
-                try:
-                    file_data = self.get_file_data(i)
-                    finder_images.append(file_data)
-                except Exception as e:
-                    MainUtils.print_error()
-                    continue
-        return finder_images
-
-    def get_progress_text(self, current: int, total: int) -> str:
+    @classmethod
+    def add_new_dirs(
+        cls,
+        conn: sqlalchemy.Connection,
+        main_folder: MainFolder,
+        del_dirs: list,
+        new_dirs: list,
+    ):
         """
-        Формирует строку для отображения прогресса обработки:
-        Пример: "Miuz (MainFolder.name): коллекция 3 из 10"
-        """
-        main_folder = self.main_folder.name.capitalize()
-        collection_name = Lang.collection
-        return f"{main_folder}: {collection_name.lower()} {current} {Lang.from_} {total}"
+        Параметры:
+        - new_dirs: [(rel_dir_path, mod_time), ...]
 
-    def walk_subdir(self, subdir: str) -> list[tuple]:
+        Добавляет директории в таблицу DIRS
         """
-        Рекурсивно обходит поддиректории и собирает данные об изображениях.
+        for short_src, mod in new_dirs:
+            values = {
+                ClmNames.SHORT_SRC: short_src,
+                ClmNames.MOD: mod,
+                ClmNames.BRAND: main_folder.name
+            }
+            q = sqlalchemy.insert(DIRS).values(**values)
 
-        Возвращает:
-        - Список кортежей: [(путь, размер, дата_создания, дата_модификации), ...]
-        - Прерывается, если task_state.should_run() вернёт False.
+            try:
+                conn.execute(q)
+            except Exception as e:
+                MainUtils.print_error()
+                conn.rollback()
+                continue
+        
+        try:
+            conn.commit()
+        except Exception as e:
+            MainUtils.print_error()
+            conn.rollback()
+
+
+class ImgLoader:
+
+    @classmethod
+    def finder_images(
+        cls,
+        new_dirs: list,
+        main_folder: MainFolder,
+        task_state: TaskState,
+        conn: sqlalchemy.Connection,
+    ) -> list[tuple]:
+        """
+        Параметры:
+        - new_dirs: [(rel_dir_path, mod_time), ...]
+
+        Возвращает изображения в указанных директориях:
+        - [(abs_img_path, size, birth_time, mod_time), ...]    
         """
         finder_images = []
-        stack = [subdir]
-        while stack:
-            current_dir = stack.pop()
-            for entry in os.scandir(current_dir):
-                if not self.task_state.should_run():
-                    return finder_images
-                if entry.is_dir():
-                    stack.append(entry.path)
-                elif entry.name.endswith(Static.ext_all):
-                    finder_images.append(self.get_file_data(entry))
+        main_folder_path = main_folder.get_current_path()
+
+
+        def process_entry(entry: os.DirEntry):
+            abs_img_path = entry.path
+            stats = entry.stat()
+            size = int(stats.st_size)
+            birth = int(stats.st_birthtime)
+            mod = int(stats.st_mtime)
+            finder_images.append((abs_img_path, size, birth, mod))
+
+
+        for rel_dir_path, mod in new_dirs:
+            abs_dir_path = MainUtils.get_abs_path(main_folder_path, rel_dir_path)
+            for entry in os.scandir(abs_dir_path):
+                if entry.path.endswith(Static.ext_all):
+                    try:
+                        process_entry(entry)
+                    except Exception as e:
+                        MainUtils.print_error()
+                        task_state.set_should_run(False)
+                        break
         return finder_images
 
-    def get_file_data(self, entry: os.DirEntry) -> tuple:
+    @classmethod
+    def db_images(
+        cls,
+        new_dirs: list,
+        main_folder: MainFolder,
+        task_state: TaskState,
+        conn: sqlalchemy.Connection,
+        ) -> list[tuple]:
         """
-        Возвращает информацию о файле: (путь, размер, время создания, время изменения).
+        Параметры:
+        - new_dirs: [(rel_dir_path, mod_time), ...]
+
+        Возвращает изображения в указанных директориях:
+        - {rel_thumb_path: (abs_img_path, size, birth, mod), ...}  
         """
-        stats = entry.stat()
-        return (
-            entry.path,
-            int(stats.st_size),
-            int(stats.st_birthtime),
-            int(stats.st_mtime),
-        )
+        main_folder_path = main_folder.get_current_path()
+        db_images: dict = {}
+        for rel_dir_path, mod in new_dirs:
+            q = sqlalchemy.select(
+                THUMBS.c.short_hash, # rel thumb path
+                THUMBS.c.short_src,
+                THUMBS.c.size,
+                THUMBS.c.birth,
+                THUMBS.c.mod
+                )
+            q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
+            q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
+            q = q.where(THUMBS.c.brand == main_folder.name)
+            try:
+                res = conn.execute(q).fetchall()
+                for rel_thumb_path, rel_img_path, size, birth, mod in res:
+                    abs_img_path = MainUtils.get_abs_path(main_folder_path, rel_img_path)
+                    db_images[rel_thumb_path] = (abs_img_path, size, birth, mod)
+            except Exception:
+                MainUtils.print_error()
+                conn.rollback()
+        return db_images
 
 
-class DbImages(QObject):
-    progress_text = pyqtSignal(str)
-
-    def __init__(self, main_folder: MainFolder):
-        """
-        Запуск: run()   
-        Сигналы: progress_text(str)     
-
-        Возвращает записи из бд, относящиеся к MainFolder:  
-        {rel thumb path: (img path, size, birth time, mod time), ...}   
-        """
-        super().__init__()
-        self.main_folder = main_folder
-
-    def run(self) -> dict:
-        self.progress_text.emit("")
-        conn = Dbase.engine.connect()
-
-        q = sqlalchemy.select(
-            THUMBS.c.short_hash, # relative thumb path
-            THUMBS.c.short_src,
-            THUMBS.c.size,
-            THUMBS.c.birth,
-            THUMBS.c.mod
-            )
-        q = q.where(THUMBS.c.brand == self.main_folder.name)
-        # не забываем относительный путь к изображению преобразовать в полный
-        # для сравнения с finder_items
-        res = conn.execute(q).fetchall()
-        conn.close()
-        main_folder_path = self.main_folder.get_current_path()
-        return {
-            rel_thumb_path: (
-                MainUtils.get_abs_path(main_folder_path, rel_img_path),
-                size,
-                birth,
-                mod
-            )
-            for rel_thumb_path, rel_img_path, size, birth, mod in res
-        }
-
-
-class Compator:
+class ImgCompator:
     def __init__(self, finder_images: dict, db_images: dict):
         """
         Сравнивает данные об изображениях FinderImages и DbImages.  
-        del_items: нет в FinderImages и есть в DbImages     
-        new_items: есть в FinderImages и нет в DbImages
+        Запуск: run()
 
         Принимает:      
-        finder_images: [(img_path, size, birth_time, mod_time), ...]    
-        db_images:  {rel thumb path: (img path, size, birth time, mod time), ...}
+        finder_images: [(abs_img_path, size, birth_time, mod_time), ...]    
+        db_images:  {rel thumb path: (abs img path, size, birth time, mod time), ...}
 
         Возвращает:
         del_items: [rel thumb path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]
+        new_items: [(abs img_path, size, birth, mod), ...]
         """
         super().__init__()
         self.finder_images = finder_images
@@ -212,38 +279,9 @@ class Compator:
         return del_items, ins_items
 
 
-class Inspector(QObject):
-    def __init__(self, del_items: list, main_folder: MainFolder):
-        """
-        del_items: [rel thumb path, ...]
 
-        Этот класс выполняет проверку безопасности перед удалением данных.
-        Метод is_remove_all() инициирует сравнение между количеством записей
-        в БД и количеством удаляемых миниатюр, связанных с MainFolder.
-
-        Если количество удаляемых элементов совпадает с количеством записей в базе,
-        это может свидетельствовать о потенциальной ошибке в логике сканера,
-        приводящей к попытке удалить все данные, связанные с MainFolder.
-        В таком случае, операция считается подозрительной и может быть заблокирована
-        как мера предосторожности.
-        """
-        super().__init__()
-        self.del_items = del_items
-        self.main_folder = main_folder
-    
-    def is_remove_all(self):
-        conn = Dbase.engine.connect()
-        q = sqlalchemy.select(sqlalchemy.func.count())
-        q = q.where(THUMBS.c.brand == self.main_folder.name)
-        result = conn.execute(q).scalar()
-        conn.close()
-        if len(self.del_items) == result and len(self.del_items) != 0:
-            return True
-        return None
-
-
-class HashdirUpdater(QObject):
-    progress_text = pyqtSignal(str)
+class HashdirUpdater:
+    # progress_text = pyqtSignal(str)
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
@@ -276,7 +314,7 @@ class HashdirUpdater(QObject):
             return ([], [])
         del_items = self.run_del_items()
         new_items = self.run_new_items()
-        self.progress_text.emit("")
+        # self.progress_text.emit("")
         return del_items, new_items
 
     def progressbar_text(self, text: str, x: int, total: int):
@@ -287,7 +325,7 @@ class HashdirUpdater(QObject):
         """
         main_folder = self.main_folder.name.capitalize()
         t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
-        self.progress_text.emit(t)
+        # self.progress_text.emit(t)
 
     def run_del_items(self):
         new_del_items = []
@@ -337,10 +375,8 @@ class HashdirUpdater(QObject):
         return new_new_items
 
 
-class DbUpdater(QObject):
-    reload_gui = pyqtSignal()
-
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
+class DbUpdater:
+    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
@@ -354,40 +390,35 @@ class DbUpdater(QObject):
         self.main_folder = main_folder
         self.del_items = del_items
         self.new_items = new_items
+        self.conn = conn
 
     def run(self):
         self.run_del_items()
         self.run_new_items()
 
     def run_del_items(self):
-        conn = Dbase.engine.connect()
+
         for rel_thumb_path in self.del_items:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
             q = q.where(THUMBS.c.brand==self.main_folder.name)
             try:
-                conn.execute(q)
+                self.conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 MainUtils.print_error()
-                conn.rollback()
+                self.conn.rollback()
                 continue
             except sqlalchemy.exc.OperationalError as e:
                 MainUtils.print_error()
-                conn.rollback()
-                conn.close()
+                self.conn.rollback()
                 return None
         try:
-            conn.commit()
+            self.conn.commit()
         except Exception as e:
             MainUtils.print_error()
-            conn.rollback()
-        conn.close()
-
-        if len(self.del_items) > 0:
-            self.reload_gui.emit()
+            self.conn.rollback()
 
     def run_new_items(self):
-        conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
             small_img_path = ThumbUtils.create_thumb_path(img_path)
             short_img_path = MainUtils.get_rel_path(self.main_folder.get_current_path(), img_path)
@@ -406,32 +437,55 @@ class DbUpdater(QObject):
             }
             stmt = sqlalchemy.insert(THUMBS).values(**values) 
             try:
-                conn.execute(stmt)
+                self.conn.execute(stmt)
             # overflow error бывает прозникает когда пишет
             # python integer too large to insert db
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
                 MainUtils.print_error()
-                conn.rollback()
+                self.conn.rollback()
                 continue
             except sqlalchemy.exc.OperationalError as e:
                 MainUtils.print_error()
-                conn.rollback()
+                self.conn.rollback()
                 break
         try:
-            conn.commit()
+            self.conn.commit()
         except Exception as e:
             MainUtils.print_error()
-            conn.rollback()
-        conn.close()
-
-        if len(self.new_items) > 0:
-            self.reload_gui.emit()
+            self.conn.rollback()
 
 
-class MainFolderRemover(QObject):
-    progress_text = pyqtSignal(str)
+class Inspector:
+    def __init__(self, del_items: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
+        """
+        del_items: [rel thumb path, ...]
 
-    def __init__(self):
+        Этот класс выполняет проверку безопасности перед удалением данных.
+        Метод is_remove_all() инициирует сравнение между количеством записей
+        в БД и количеством удаляемых миниатюр, связанных с MainFolder.
+
+        Если количество удаляемых элементов совпадает с количеством записей в базе,
+        это может свидетельствовать о потенциальной ошибке в логике сканера,
+        приводящей к попытке удалить все данные, связанные с MainFolder.
+        В таком случае, операция считается подозрительной и может быть заблокирована
+        как мера предосторожности.
+        """
+        super().__init__()
+        self.del_items = del_items
+        self.main_folder = main_folder
+        self.conn = conn
+    
+    def is_remove_all(self):
+        q = sqlalchemy.select(sqlalchemy.func.count())
+        q = q.where(THUMBS.c.brand == self.main_folder.name)
+        result = self.conn.execute(q).scalar()
+        if len(self.del_items) == result and len(self.del_items) != 0:
+            return True
+        return None
+
+
+class MainFolderRemover:
+    def __init__(self, conn: sqlalchemy.Connection):
         """
         Запуск: run()   
         Сигналы: progress_text(str)
@@ -445,7 +499,7 @@ class MainFolderRemover(QObject):
         Вызови run для работы
         """
         super().__init__()
-        self.conn = Dbase.engine.connect()
+        self.conn = conn
 
     def run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
@@ -456,7 +510,6 @@ class MainFolderRemover(QObject):
             rows = self.get_rows(i)
             self.remove_images(rows)
             self.remove_rows(rows)
-        self.conn.close()
         
     def get_rows(self, main_folder_name):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
