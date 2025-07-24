@@ -510,7 +510,7 @@ class UploadFilesTask(URunnable):
             rel_thumb_path_list.append(rel_thumb_path)
 
         if rel_thumb_path_list:
-            text = f"{Lang.updating_data}: {len(rel_thumb_path_list)} {Lang.izobrazheniya.lower()}"
+            text = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {len(rel_thumb_path_list)} "
             self.signals_.progress_text.emit(text)
 
         args = (rel_thumb_path_list, img_with_stats_list, MainFolder.current, self.task_state)
@@ -729,7 +729,7 @@ class ScanerTask(URunnable):
             print("в папке:", main_folder.name, main_folder.get_current_path())
             return
 
-        text = f"{Lang.updating_data}: {len(del_images) + len(new_images)} {Lang.izobrazheniya.lower()}"
+        text = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {len(del_images) + len(new_images)} "
         self.signals_.progress_text.emit(text)
         args = (del_images, new_images, main_folder, self.task_state)
         hashdir_updater = HashdirUpdater(*args)

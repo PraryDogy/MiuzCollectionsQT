@@ -679,8 +679,8 @@ class _Lang:
         "Updating data"
     ]
 
-    izobrazheniya = [
-        "Изображения",
+    izobrazhenii = [
+        "Изображений",
         "Images"
     ]
 
