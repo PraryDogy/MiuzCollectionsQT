@@ -623,14 +623,6 @@ class ScanerTask(URunnable):
             db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
             db_updater.run()
 
-    def accept_remove_all(self):
-        self.user_canceled_scan = False
-        self.pause_flag = False
-
-    def cancel_remove_all(self):
-        self.user_canceled_scan = True
-        self.pause_flag = False
-
 
 class MoveFilesTask(QObject):
     set_progress_text = pyqtSignal(str)

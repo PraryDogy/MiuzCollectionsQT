@@ -9,8 +9,8 @@ from cfg import JsonData, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.scaner_utils import Inspector
-from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
+from system.scaner_utils import Inspector, MainFolderRemover
+from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils, URunnable
 
 
 class DirsLoader:
@@ -281,8 +281,8 @@ class ImgCompator:
 
 
 
-class HashdirUpdater(QObject):
-    progress_text = pyqtSignal(str)
+class HashdirUpdater:
+    # progress_text = pyqtSignal(str)
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
@@ -315,7 +315,7 @@ class HashdirUpdater(QObject):
             return ([], [])
         del_items = self.run_del_items()
         new_items = self.run_new_items()
-        self.progress_text.emit("")
+        # self.progress_text.emit("")
         return del_items, new_items
 
     def progressbar_text(self, text: str, x: int, total: int):
@@ -326,7 +326,7 @@ class HashdirUpdater(QObject):
         """
         main_folder = self.main_folder.name.capitalize()
         t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
-        self.progress_text.emit(t)
+        # self.progress_text.emit(t)
 
     def run_del_items(self):
         new_del_items = []
@@ -376,9 +376,7 @@ class HashdirUpdater(QObject):
         return new_new_items
 
 
-class DbUpdater(QObject):
-    reload_gui = pyqtSignal()
-
+class DbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
@@ -413,17 +411,12 @@ class DbUpdater(QObject):
             except sqlalchemy.exc.OperationalError as e:
                 MainUtils.print_error()
                 conn.rollback()
-                conn.close()
                 return None
         try:
             conn.commit()
         except Exception as e:
             MainUtils.print_error()
             conn.rollback()
-        conn.close()
-
-        if len(self.del_items) > 0:
-            self.reload_gui.emit()
 
     def run_new_items(self):
         conn = Dbase.engine.connect()
@@ -461,77 +454,121 @@ class DbUpdater(QObject):
         except Exception as e:
             MainUtils.print_error()
             conn.rollback()
-        conn.close()
 
         if len(self.new_items) > 0:
             self.reload_gui.emit()
 
 
-class TestScan:
+class ScanerSignals(QObject):
+    finished_ = pyqtSignal()
+    progress_text = pyqtSignal(str)
+    reload_gui = pyqtSignal()
 
-    @classmethod
-    def start(cls):
-        MainFolder.set_default_main_folders()
-        Dbase.create_engine()
-        conn = Dbase.engine.connect()
-        JsonData.init()
-        Lang.init()
-        task_state = TaskState()
 
-        for main_folder in MainFolder.list_:
-            coll_folder = main_folder.is_available()
-            if not coll_folder:
-                print(main_folder.name, "coll folder not avaiable")
-                continue
+class ScanerTask(URunnable):
+    short_timer = 15000
+    long_timer = JsonData.scaner_minutes * 60 * 1000
 
-            args = (main_folder, task_state, conn)
-            finder_dirs = DirsLoader.finder_dirs(*args)
-            if not finder_dirs or not task_state.should_run():
-                print(main_folder.name, "no finder dirs")
-                continue
+    def __init__(self):
+        """
+        Сигналы: finished_, progress_text(str), reload_gui, remove_all_win(MainWin)
+        """
+        super().__init__()
+        self.signals_ = ScanerSignals()
+        self.pause_flag = False
+        self.user_canceled_scan = False
 
-            db_dirs = DirsLoader.db_dirs(*args)
+    def task(self):
+        main_folders = [
+            i
+            for i in MainFolder.list_
+            if i.is_available()
+        ]
 
-            args = (finder_dirs, db_dirs)
-            new_dirs = DirsCompator.get_add_to_db_dirs(*args)
-            del_dirs = DirsCompator.get_rm_from_db_dirs(*args)
-
-            args = (new_dirs, main_folder, task_state, conn)
-            finder_images = ImgLoader.finder_images(*args)
-            if not finder_images or not task_state.should_run():
-                print(main_folder.name, "no finder images")
-                continue
+        for i in main_folders:
+            print("scaner started", i.name)
+            self.main_folder_scan(i)
+            gc.collect()
+            print("scaner finished", i.name)
             
-            db_images = ImgLoader.db_images(*args)
+        try:
+            self.signals_.finished_.emit()
+        except RuntimeError as e:
+            ...
 
-            args = (finder_images, db_images)
-            img_compator = ImgCompator(*args)
-            del_images, new_images = img_compator.run()
+    def main_folder_scan(self, main_folder: MainFolder):
+        main_folder_remover = MainFolderRemover()
+        main_folder_remover.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
+        main_folder_remover.run()
 
-            inspector = Inspector(del_images, main_folder)
-            is_remove_all = inspector.is_remove_all()
-            if is_remove_all:
-                print("scaner > обнаружена попытка массового удаления фотографий")
-                print("в папке:", main_folder.name, main_folder.get_current_path())
-                continue
+        coll_folder = main_folder.is_available()
+        if not coll_folder:
+            print(main_folder.name, "coll folder not avaiable")
+            return
 
-            args = (del_images, new_images, main_folder, task_state)
-            hashdir_updater = HashdirUpdater(*args)
-            del_images, new_images = hashdir_updater.run()
+        conn = Dbase.engine.connect()
+        text = f"{main_folder.name}: ищу обновления"
+        self.signals_.progress_text.emit(text)
+        args = (main_folder, self.task_state, conn)
+        finder_dirs = DirsLoader.finder_dirs(*args)
+        db_dirs = DirsLoader.db_dirs(*args)
+        conn.close()
+        if not finder_dirs or not self.task_state.should_run():
+            print(main_folder.name, "no finder dirs")
+            return
 
-            db_updater = DbUpdater(del_images, new_images, main_folder)
-            db_updater.run()
+        args = (finder_dirs, db_dirs)
+        new_dirs = DirsCompator.get_add_to_db_dirs(*args)
+        del_dirs = DirsCompator.get_rm_from_db_dirs(*args)
 
-            args = (conn, main_folder, del_dirs, new_dirs)
-            DirsUpdater.remove_db_dirs(*args)
-            DirsUpdater.add_new_dirs(*args)
+        conn = Dbase.engine.connect()
+        text = f"{main_folder.name}: ищу изображения"
+        self.signals_.progress_text.emit(text)
+        args = (new_dirs, main_folder, self.task_state, conn)
+        finder_images = ImgLoader.finder_images(*args)
+        db_images = ImgLoader.db_images(*args)
+        conn.close()
+        if not finder_images or not self.task_state.should_run():
+            print(main_folder.name, "no finder images")
+            return
+        
 
-            print("del dirs", del_dirs)
-            print("new dirs", new_dirs)
-            print("del images", del_images)
-            print("new images", new_images)
+        args = (finder_images, db_images)
+        img_compator = ImgCompator(*args)
+        del_images, new_images = img_compator.run()
+
+        inspector = Inspector(del_images, main_folder)
+        is_remove_all = inspector.is_remove_all()
+        if is_remove_all:
+            print("scaner > обнаружена попытка массового удаления фотографий")
+            print("в папке:", main_folder.name, main_folder.get_current_path())
+            return
+
+        text = f"Обновляю: {len(del_images) + len(new_images)}"
+        self.signals_.progress_text.emit(text)
+        args = (del_images, new_images, main_folder, self.task_state)
+        hashdir_updater = HashdirUpdater(*args)
+        del_images, new_images = hashdir_updater.run()
+
+        db_updater = DbUpdater(del_images, new_images, main_folder)
+        db_updater.run()
+
+        conn = Dbase.engine.connect()
+        args = (conn, main_folder, del_dirs, new_dirs)
+        DirsUpdater.remove_db_dirs(*args)
+        DirsUpdater.add_new_dirs(*args)
+        conn.close()
+
+        self.signals_.progress_text.emit("")
+        if del_images or new_images:
+            self.signals_.reload_gui.emit()
+
+        print("del dirs", del_dirs)
+        print("new dirs", new_dirs)
+        print("del images", del_images)
+        print("new images", new_images)
 
 
 # добавление изображений работает
 # удаление не работает
-TestScan.start()
+# TestScan.start()
