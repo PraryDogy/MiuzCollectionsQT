@@ -403,8 +403,8 @@ class RemoveFilesTask(URunnable):
             if len(self.img_path_list) > 0:
                 text = f"{Lang.removing_images} ({len(self.img_path_list)})"
                 self.signals_.progress_text.emit(text)
-            img_path_list = self.remove_files()
-            self.remove_thumbs(img_path_list)
+            self.remove_files()
+            self.remove_thumbs()
         except Exception as e:
             MainUtils.print_error()
         try:
@@ -428,13 +428,13 @@ class RemoveFilesTask(URunnable):
                 MainUtils.print_error()
         return files
 
-    def remove_thumbs(self, img_path_list: list):
+    def remove_thumbs(self):
         """
         Удаляет из hashdir и из базы данных.
         """      
         thumb_path_list = [
             ThumbUtils.create_thumb_path(img_path)
-            for img_path in img_path_list
+            for img_path in self.img_path_list
         ]
         rel_thumb_path_list = [
             ThumbUtils.get_rel_thumb_path(thumb_path)
