@@ -679,6 +679,11 @@ class _Lang:
         "Updating data"
     ]
 
+    izobrazheniya = [
+        "Изображения",
+        "Images"
+    ]
+
 class Lang(_Lang):
 
     @classmethod

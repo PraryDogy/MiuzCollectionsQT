@@ -509,15 +509,19 @@ class UploadFilesTask(URunnable):
             rel_thumb_path = ThumbUtils.get_rel_thumb_path(thumb_path)
             rel_thumb_path_list.append(rel_thumb_path)
 
+        if rel_thumb_path_list:
+            text = f"{Lang.updating_data}: {len(rel_thumb_path_list)} {Lang.izobrazheniya.lower()}"
+            self.signals_.progress_text.emit(text)
+
         args = (rel_thumb_path_list, img_with_stats_list, MainFolder.current, self.task_state)
         file_updater = HashdirUpdater(*args)
-        file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
         rel_thumb_path_list, new_items = file_updater.run()
 
         db_updater = DbUpdater(rel_thumb_path_list, new_items, MainFolder.current)
-        db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
         db_updater.run()
         try:
+            self.signals_.progress_text.emit("")
+            self.signals_.reload_gui.emit()
             self.signals_.finished_.emit()
         except RuntimeError as e:
             MainUtils.print_error()
@@ -725,7 +729,7 @@ class ScanerTask(URunnable):
             print("в папке:", main_folder.name, main_folder.get_current_path())
             return
 
-        text = f"{Lang.updating_data} ({len(del_images) + len(new_images)})"
+        text = f"{Lang.updating_data}: {len(del_images) + len(new_images)} {Lang.izobrazheniya.lower()}"
         self.signals_.progress_text.emit(text)
         args = (del_images, new_images, main_folder, self.task_state)
         hashdir_updater = HashdirUpdater(*args)
