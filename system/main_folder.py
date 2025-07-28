@@ -91,16 +91,20 @@ class MainFolder:
         try:
             with open(cls.json_file, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
-
             if not isinstance(data, list):
                 cls.list_ = cls.get_default_main_folders()
                 cls.current = cls.list_[0]
-
             else:
                 for main_folder in data:
-                    item = MainFolder(**main_folder)
-                    cls.list_.append(item)
-                cls.current = cls.list_[0]
+                    try:
+                        item = MainFolder(**main_folder)
+                        cls.list_.append(item)
+                    except Exception:
+                        continue
+            if len(cls.list_) == 0:
+                cls.list_ = cls.get_default_main_folders()
+
+            cls.current = cls.list_[0]
 
         except Exception as e:
             MainUtils.print_error()
