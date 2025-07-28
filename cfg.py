@@ -1,10 +1,7 @@
 import json
 import os
 import shutil
-import traceback
 from datetime import datetime
-
-from pydantic import BaseModel
 
 
 class ThumbData:
@@ -180,14 +177,6 @@ class Static:
     """
 
 
-class JsonDataModel(BaseModel):
-    app_ver: str
-    lang_ind: int
-    dark_mode: int
-    scaner_minutes: int
-    apps: list[str]
-
-
 class JsonData:
     app_ver: str = Static.APP_VER
     lang_ind: int = 0
@@ -214,64 +203,30 @@ class JsonData:
     ]
 
     @classmethod
-    def set_json_data(cls) -> None:
-        model = cls.load_json_data()
-        if model:
-            cls.app_ver = model.app_ver
-            cls.lang_ind = model.lang_ind
-            cls.dark_mode = model.dark_mode
-            cls.scaner_minutes = model.scaner_minutes
-            cls.apps = model.apps
-        else:
-            # cls.set_attributes()
-            cls.write_json_data()
-
-    @classmethod
-    def set_attributes(cls) -> None:
-        try:
-            with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as f:
-                data: dict = json.load(f)
-            for k, v in data.items():
-                if hasattr(cls, k) and type(v) == type(getattr(cls, k)):
-                    setattr(cls, k, v)
-        except Exception as e:
-            print("Ошибка чтения json файла в set_attributes")
-
-    @classmethod
-    def write_json_data(cls) -> None:
-        model = JsonDataModel(
-            app_ver=cls.app_ver,
-            lang_ind=cls.lang_ind,
-            dark_mode=cls.dark_mode,
-            scaner_minutes=cls.scaner_minutes,
-            apps=cls.apps
-        )
-        with open(Static.APP_SUPPORT_JSON_DATA, "w", encoding="utf-8") as f:
-            json.dump(model.model_dump(), f, indent=4, ensure_ascii=False)
-
-    @classmethod
-    def load_json_data(cls) -> JsonDataModel | None:
-        try:
-            with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as f:
-                raw_data = json.load(f)
-                return JsonDataModel(**raw_data)
-        except Exception as e:
+    def set_json_data(cls):
+        with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as file:
             try:
-                # Пытаемся подмержить с дефолтами, если ошибка валидации
-                with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as f:
-                    raw_data = json.load(f)
-                defaults = JsonDataModel(
-                    app_ver=cls.app_ver,
-                    lang_ind=cls.lang_ind,
-                    dark_mode=cls.dark_mode,
-                    scaner_minutes=cls.scaner_minutes,
-                    apps=cls.apps
-                ).model_dump()
-                merged = {**defaults, **raw_data}
-                return JsonDataModel(**merged)
+                data: dict = json.load(file)
             except Exception as e:
-                print("Ошибка при чтении и объединении JSON:", e)
-                return None
+                print(e)
+                data = {}
+        
+        for k, v in data.items():
+            if getattr(cls, k):
+                setattr(cls, k, v)
+
+    @classmethod
+    def write_json_data(cls):
+        data = {
+            k: v
+            for k, v in JsonData.__dict__.items()
+            if not k.startswith("__")
+            and
+            not isinstance(v, classmethod)
+        }
+
+        with open(Static.APP_SUPPORT_JSON_DATA, "w", encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
 
     @classmethod
     def check_dirs(cls):
