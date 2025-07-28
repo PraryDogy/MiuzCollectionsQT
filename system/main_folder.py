@@ -20,10 +20,10 @@ class MainFolder:
 
     def __init__(
             self,
-            name: str,
-            paths: list[str],
-            stop_list: list[str],
-            curr_path: str
+            name: str = "name",
+            paths: list[str] = ["/path", ],
+            stop_list: list[str] = ["stop word", ],
+            curr_path: str = ""
     ):
         """
         Использование:
@@ -52,8 +52,6 @@ class MainFolder:
             то она будет исключена из обработки.
 
         curr_path (str): Актуальный, проверенный путь к папке из списка `paths`.
-
-        disabled (bool): отключить/включить взаимодействие с MainFolder
 
         """
         super().__init__()
@@ -109,15 +107,10 @@ class MainFolder:
             cls.list_ = cls.get_default_main_folders()
             cls.current = cls.list_[0]
 
-
     @classmethod
     def write_json_data(cls):
         with open(cls.json_file, "w", encoding="utf-8") as file:
-            data = [
-                i.get_data()
-                for i in cls.list_
-            ]
-
+            data = [i.get_data() for i in cls.list_]
             json.dump(data, file, ensure_ascii=False, indent=4)
 
     @classmethod
