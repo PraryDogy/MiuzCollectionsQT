@@ -212,7 +212,7 @@ class JsonData:
                 data = {}
         
         for k, v in data.items():
-            if getattr(cls, k):
+            if hasattr(cls, k):
                 setattr(cls, k, v)
 
     @classmethod
