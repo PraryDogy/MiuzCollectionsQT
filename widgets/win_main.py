@@ -1,5 +1,4 @@
 import gc
-import json
 import os
 
 from PyQt5.QtCore import Qt, QTimer
@@ -23,7 +22,6 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
-from .win_backups import BackupType, WinBackups
 from .win_dates import WinDates
 from .win_downloads import WinDownloads
 from .win_image_view import WinImageView
@@ -66,10 +64,6 @@ class WinMain(UMainWindow):
         super().__init__()
         self.resize(self.ww, self.hh)
         self.setMinimumWidth(self.min_w)
-
-        if any([MainFolder.validation_failed, UserFilter.validation_failed]):
-            QTimer.singleShot(100, self.load_backups)
-            return
 
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
@@ -141,11 +135,6 @@ class WinMain(UMainWindow):
         self.scaner_task: ScanerTask | None = None
         self.scaner_task_canceled = False
 
-        self.backup_timer = QTimer(self)
-        self.backup_timer.timeout.connect(self.do_backup)
-        self.backup_timer.start(self.update_mins * 60 * 1000)
-        
-        QTimer.singleShot(100, self.do_backup)
         QTimer.singleShot(100, self.main_folder_check)
 
         if argv[-1] != self.argv_flag:
@@ -179,21 +168,6 @@ class WinMain(UMainWindow):
             self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
             self.win_warn.center_relative_parent(self)
             self.win_warn.show()
-
-    def do_backup(self):
-        for i in (MainFolder, UserFilter):
-            i.do_backup()
-     
-    def open_backup_win(self, backup_type: BackupType):
-        self.win_backups = WinBackups(backup_type)
-        self.win_backups.center_relative_parent(self)
-        self.win_backups.show()
-
-    def load_backups(self):
-        if MainFolder.validation_failed:
-            self.open_backup_win(BackupType.main_folder)
-        elif UserFilter.validation_failed:
-            self.open_backup_win(BackupType.user_filter)
 
     def start_scaner_task(self):
         """

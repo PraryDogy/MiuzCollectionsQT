@@ -2,36 +2,30 @@ import json
 import os
 from datetime import datetime
 
-from pydantic import BaseModel
-
 from cfg import Static
 
 from .utils import MainUtils
 
 
-class MainFolderItemModel(BaseModel):
-    name: str
-    paths: list[str]
-    stop_list: list[str]
-    curr_path: str
-
-
-class MainFolderListModel(BaseModel):
-    main_folder_list: list[MainFolderItemModel]
-
-
 class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
-    validation_failed: bool = False
-    used_defaults: bool = False
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
-    __slots__ = ["name", "paths", "stop_list", "curr_path"]
+    __slots__ = [
+        "name",
+        "paths",
+        "stop_list",
+        "curr_path"
+    ]
 
-    def __init__(self, name: str, paths: list[str], stop_list: list[str], curr_path: str):
+    def __init__(
+            self,
+            name: str,
+            paths: list[str],
+            stop_list: list[str],
+            curr_path: str
+    ):
         """
-        curr_path (str): Актуальный, проверенный путь к папке из списка `paths`.
-
         Использование:
         - При инициализации из JSON по умолчанию curr_path будет пустым.
         - Значение устанавливается при вызове метода is_available(), который
@@ -56,6 +50,11 @@ class MainFolder:
         stop_list (list[str]): Список вложенных папок внутри MainFolder, которые следует игнорировать.
             Пример: если в папке лежат "A", "B", "C", и "C" указана в stop_list,
             то она будет исключена из обработки.
+
+        curr_path (str): Актуальный, проверенный путь к папке из списка `paths`.
+
+        disabled (bool): отключить/включить взаимодействие с MainFolder
+
         """
         super().__init__()
         self.name = name
@@ -77,116 +76,52 @@ class MainFolder:
                 self.curr_path = i
                 break        
         return self.curr_path
-
-    def to_model(self) -> MainFolderItemModel:
-        return MainFolderItemModel(
-            name=self.name,
-            paths=self.paths,
-            stop_list=self.stop_list,
-            curr_path=self.curr_path
-        )
-
-    @classmethod
-    def from_model(cls, model: MainFolderItemModel) -> "MainFolder":
-        return MainFolder(
-            name=model.name,
-            paths=model.paths,
-            stop_list=model.stop_list,
-            curr_path=model.curr_path
-        )
-
-    @classmethod
-    def do_backup(cls):
-        if not os.path.exists(Static.APP_SUPPORT_BACKUP):
-            os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
-
-        if not cls.list_:
-            return
-
-        backups = cls.get_backups()
-        cls.remove_backups(backups)
-
-        now = datetime.now().replace(microsecond=0)
-        now = now.strftime("%Y-%m-%d %H-%M-%S") 
-        
-        filename = f"{now} main_folders.json"
-        filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
-
-        item_list: list[MainFolderItemModel] = [item.to_model() for item in cls.list_]
-        data = MainFolderListModel(main_folder_list=item_list)
-        data = data.model_dump()
-        data = json.dumps(data, indent=4, ensure_ascii=False)
- 
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(data)
-
-    @classmethod
-    def get_backups(cls) -> list[os.DirEntry]:
-        return [
-            entry for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
-            if entry.is_file() and "main_folders" in entry.name
-        ]
-
-    @classmethod
-    def remove_backups(cls, backups: list[os.DirEntry], limit: int = 20):
-        if len(backups) <= limit:
-            return
-
-        backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
-        for entry in backups[limit:]:
-            try:
-                os.remove(entry.path)
-            except Exception:
-                pass  # Можно логировать, если нужно
+    
+    def get_data(self):
+        return {
+            i: getattr(self, i)
+            for i in self.__slots__
+        }
 
     @classmethod
     def init(cls):
         if not os.path.exists(cls.json_file):
-            cls.set_default_main_folders()
+            cls.list_ = cls.get_default_main_folders()
+            cls.current = cls.list_[0]
             return
-
+        
         try:
-            with open(cls.json_file, "r", encoding="utf-8") as f:
-                json_data: dict = json.load(f)
+            with open(cls.json_file, "r", encoding="utf-8") as file:
+                data: list[dict] = json.load(file)
 
-            main_folder_list_model = cls.validate(json_data)
-            cls.list_ = [
-                cls.from_model(m)
-                for m in main_folder_list_model.main_folder_list
-            ]
+            if not isinstance(data, list):
+                cls.list_ = cls.get_default_main_folders()
+                cls.current = cls.list_[0]
 
-            if not cls.list_:
-                raise ValueError("MainFolder.list_ пуст после валидации")
+            else:
+                for main_folder in data:
+                    item = MainFolder(**main_folder)
+                    cls.list_.append(item)
+                cls.current = cls.list_[0]
 
+        except Exception as e:
+            MainUtils.print_error()
+            cls.list_ = cls.get_default_main_folders()
             cls.current = cls.list_[0]
 
-        except Exception:
-            MainUtils.print_error()
-
-            if cls.get_backups():
-                cls.validation_failed = True
-            else:
-                cls.set_default_main_folders()
 
     @classmethod
     def write_json_data(cls):
-        if not cls.list_:
-            print("Ошибка записи main_folder > MainFolder > write_json_data")
-            return
+        with open(cls.json_file, "w", encoding="utf-8") as file:
+            data = [
+                i.get_data()
+                for i in cls.list_
+            ]
 
-        data = MainFolderListModel(
-            main_folder_list=[item.to_model() for item in cls.list_]
-        )
-
-        with open(cls.json_file, "w", encoding="utf-8") as f:
-            json.dump(data.model_dump(), f, indent=4, ensure_ascii=False)
+            json.dump(data, file, ensure_ascii=False, indent=4)
 
     @classmethod
-    def validate(cls, json_data: dict):
-        return MainFolderListModel(**json_data)
-
-    @classmethod
-    def set_default_main_folders(cls) -> list["MainFolder"]:
+    def get_default_main_folders(cls) -> list["MainFolder"]:
         miuz = MainFolder(
             "miuz",
             [
@@ -214,5 +149,4 @@ class MainFolder:
             ""
         )
 
-        cls.list_ = [miuz, panacea]
-        cls.current = cls.list_[0]
+        return [miuz, panacea]
