@@ -1,8 +1,7 @@
 import json
 import os
+import shutil
 from datetime import datetime
-
-from pydantic import BaseModel
 
 from cfg import Static
 
@@ -10,20 +9,11 @@ from .lang import Lang
 from .utils import MainUtils
 
 
-class UserFilterItemModel(BaseModel):
-    lang_names: list[str]
-    dir_name: str
-    value: bool
-
-
-class UserFilterListModel(BaseModel):
-    user_filter_list: list[UserFilterItemModel]
-
-
 class UserFilter:
     list_: list["UserFilter"] = []
     validation_failed: bool = False
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "user_filters.json")
+    json_file_backup = os.path.join(Static.APP_SUPPORT_DIR, "user_filters_backup.json")
     __slots__ = ["lang_names", "dir_name", "value"]
 
     def __init__(self, lang_names: list[str], dir_name: str, value: bool):
@@ -37,96 +27,47 @@ class UserFilter:
         self.dir_name = dir_name
         self.value = value
 
-    def to_model(self) -> UserFilterItemModel:
-        return UserFilterItemModel(
-            lang_names=self.lang_names,
-            dir_name=self.dir_name,
-            value=self.value
-        )
-
-    @classmethod
-    def from_model(cls, model: UserFilterItemModel) -> "UserFilter":
-        return UserFilter(
-            lang_names=model.lang_names,
-            dir_name=model.dir_name,
-            value=model.value
-        )
-
-    @classmethod
-    def do_backup(cls):
-        os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
-
-        backups = cls.get_backups()
-        cls.remove_backups(backups)
-
-        if not cls.list_:
-            return
-
-        timestamp = datetime.now().replace(microsecond=0).strftime("%Y-%m-%d %H-%M-%S")
-        filename = f"{timestamp} user_filters.json"
-        filepath = os.path.join(Static.APP_SUPPORT_BACKUP, filename)
-
-        models = [item.to_model() for item in cls.list_]
-        data = UserFilterListModel(user_filter_list=models).model_dump()
-
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
-
-    @classmethod
-    def get_backups(cls):
-        return [
-            entry
-            for entry in os.scandir(Static.APP_SUPPORT_BACKUP)
-            if entry.is_file() and "user_filters" in entry.name
-        ]
-
-    @classmethod
-    def remove_backups(cls, backups: list[os.DirEntry], limit: int = 20):
-        if len(backups) <= limit:
-            return
-
-        backups.sort(key=lambda e: e.stat().st_mtime, reverse=True)
-        for entry in backups[limit:]:
-            try:
-                os.remove(entry.path)
-            except Exception:
-                pass  # логировать при необходимости
+    def get_data(self):
+        return {
+            i: getattr(self, i)
+            for i in self.__slots__
+        }
 
     @classmethod
     def init(cls):
         if not os.path.exists(cls.json_file):
-            cls.set_default_filters()
+            cls.list_ = cls.get_default_filters()
             return
-
+        
         try:
-            with open(cls.json_file, "r", encoding="utf-8") as f:
-                json_data: dict = json.load(f)
-                user_filter_list_model = cls.validate(json_data)
-                cls.list_ = [
-                    cls.from_model(i)
-                    for i in user_filter_list_model.user_filter_list
-                ]
-        except Exception:
-            MainUtils.print_error()
-            if cls.get_backups():
-                cls.validation_failed = True
+            with open(cls.json_file, "r", encoding="utf-8") as file:
+                data: list[dict] = json.load(file)
+            if not isinstance(data, list):
+                cls.list_ = cls.get_default_filters()
             else:
-                cls.set_default_filters()
-            
-    @classmethod
-    def validate(cls, json_data: dict):
-        return UserFilterListModel(**json_data)
+                for item in data:
+                    item = UserFilter(**item)
+                    cls.list_.append(item)
+            if len(cls.list_) == 0:
+                cls.list_ = cls.get_default_filters()
+
+        except Exception as e:
+            MainUtils.print_error()
+            cls.backup_corruped_file()
+            cls.list_ = cls.get_default_filters()
 
     @classmethod
     def write_json_data(cls):
-        data = UserFilterListModel(
-            user_filter_list=[i.to_model() for i in cls.list_]
-        )
-        with open(cls.json_file, "w", encoding="utf-8") as f:
-            json.dump(data.model_dump(), f, indent=4, ensure_ascii=False)
+        with open(cls.json_file, "w", encoding="utf-8") as file:
+            data = [i.get_data() for i in cls.list_]
+            json.dump(data, file, ensure_ascii=False, indent=4)
 
     @classmethod
-    def set_default_filters(cls) -> list["UserFilter"]:
+    def backup_corruped_file(cls):
+        shutil.copy2(cls.json_file, cls.json_file_backup)
+
+    @classmethod
+    def get_default_filters(cls) -> list["UserFilter"]:
         product = UserFilter(
             ["Продукт", "Product"],
             "1 IMG",
@@ -139,7 +80,7 @@ class UserFilter:
             False,
         )
 
-        cls.list_ = [product, model]
+        return [product, model]
 
 
 class SystemFilter:
