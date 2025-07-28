@@ -96,11 +96,8 @@ class MainFolder:
                 cls.current = cls.list_[0]
             else:
                 for main_folder in data:
-                    try:
-                        item = MainFolder(**main_folder)
-                        cls.list_.append(item)
-                    except Exception:
-                        continue
+                    item = MainFolder(**main_folder)
+                    cls.list_.append(item)
             if len(cls.list_) == 0:
                 cls.list_ = cls.get_default_main_folders()
 
