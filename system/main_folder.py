@@ -116,7 +116,6 @@ class MainFolder:
             data = [i.get_data() for i in cls.list_]
             json.dump(data, file, ensure_ascii=False, indent=4)
 
-
     @classmethod
     def backup_corruped_file(cls):
         shutil.copy2(cls.json_file, cls.json_file_backup)
