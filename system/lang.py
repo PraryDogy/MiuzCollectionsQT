@@ -624,11 +624,6 @@ class _Lang:
         "Error file read"
     ]
 
-    choose_backup = [
-        "Выберите файл резервной копии",
-        "Choose backup file"
-    ]
-
     restore = [
         "Восстановить",
         "Restore"

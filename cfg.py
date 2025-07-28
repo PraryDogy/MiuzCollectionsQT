@@ -72,7 +72,6 @@ class Static:
     APP_SUPPORT_JSON_DATA: str = os.path.join(APP_SUPPORT_DIR, "cfg.json")
     APP_SUPPORT_DB: str = os.path.join(APP_SUPPORT_DIR, "db.db")
     APP_SUPPORT_HASHDIR: str = os.path.join(APP_SUPPORT_DIR, HASHDIR_NAME)
-    APP_SUPPORT_BACKUP: str = os.path.join(APP_SUPPORT_DIR, "backup")
 
     PRELOAD_DB: str = os.path.join(PRELOAD_NAME, "db.db")
     PRELOAD_HASHDIR: str = os.path.join(PRELOAD_NAME, HASHDIR_NAME)
@@ -284,7 +283,6 @@ class JsonData:
             cls.make_internal_files()
 
         os.makedirs(Static.APP_SUPPORT_DIR, exist_ok=True)
-        os.makedirs(Static.APP_SUPPORT_BACKUP, exist_ok=True)
 
         if not os.path.exists(Static.APP_SUPPORT_DB):
             cls.copy_preload_db()
