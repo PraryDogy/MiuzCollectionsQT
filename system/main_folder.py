@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime
-
+import shutil
 from cfg import Static
 
 from .utils import MainUtils
@@ -11,6 +11,7 @@ class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
+    json_file_backup = os.path.join(Static.APP_SUPPORT_DIR, "main_folders_backup.json")
     __slots__ = [
         "name",
         "paths",
@@ -105,6 +106,7 @@ class MainFolder:
 
         except Exception as e:
             MainUtils.print_error()
+            cls.backup_corruped_file()
             cls.list_ = cls.get_default_main_folders()
             cls.current = cls.list_[0]
 
@@ -113,6 +115,11 @@ class MainFolder:
         with open(cls.json_file, "w", encoding="utf-8") as file:
             data = [i.get_data() for i in cls.list_]
             json.dump(data, file, ensure_ascii=False, indent=4)
+
+
+    @classmethod
+    def backup_corruped_file(cls):
+        shutil.copy2(cls.json_file, cls.json_file_backup)
 
     @classmethod
     def get_default_main_folders(cls) -> list["MainFolder"]:
