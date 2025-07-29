@@ -710,20 +710,17 @@ class Grid(VScrollArea):
                 act.triggered.connect(cmd)
                 open_menu.addAction(act)
 
-            # open_default = OpenDefault(self.menu_, rel_img_path_list)
-            # open_default.triggered.connect(lambda: self.open_default_cmd(rel_img_path_list))
-            # self.menu_.addAction(open_default)
-
-            self.menu_.addSeparator()
-
-            info = WinInfoAction(self.menu_, self.window(), rel_img_path_list)
-            self.menu_.addAction(info)
-
             self.fav_action = FavActionDb(self.menu_, clicked_wid.rel_img_path, clicked_wid.fav_value)
             self.fav_action.finished_.connect(clicked_wid.change_fav)
             self.menu_.addAction(self.fav_action)
 
+            info = WinInfoAction(self.menu_, self.window(), rel_img_path_list)
+            self.menu_.addAction(info)
+
             self.menu_.addSeparator()
+
+            reveal = ShowInFinder(self.menu_, self.window(), rel_img_path_list)
+            self.menu_.addAction(reveal)
 
             copy = CopyPath(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(copy)
@@ -731,18 +728,15 @@ class Grid(VScrollArea):
             copy_name = CopyName(self.menu_, self.window(), rel_img_path_list)
             self.menu_.addAction(copy_name)
 
-            reveal = ShowInFinder(self.menu_, self.window(), rel_img_path_list)
-            self.menu_.addAction(reveal)
-
-            save_as = Save(self.menu_, self.window(), rel_img_path_list, True)
-            save_as.save_files.connect(lambda data: self.save_files.emit(data))
-            self.menu_.addAction(save_as)
+            self.menu_.addSeparator()
 
             save = Save(self.menu_, self.window(), rel_img_path_list, False)
             save.save_files.connect(lambda data: self.save_files.emit(data))
             self.menu_.addAction(save)
 
-            self.menu_.addSeparator()
+            save_as = Save(self.menu_, self.window(), rel_img_path_list, True)
+            save_as.save_files.connect(lambda data: self.save_files.emit(data))
+            self.menu_.addAction(save_as)
 
             move_files = MoveFiles(self.menu_, rel_img_path_list)
             move_files.triggered.connect(lambda: self.move_files.emit(rel_img_path_list))
