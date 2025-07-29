@@ -16,7 +16,7 @@ class MainFolder:
         "name",
         "paths",
         "stop_list",
-        "curr_path"
+        "curr_path",
     ]
 
     def __init__(
@@ -24,7 +24,8 @@ class MainFolder:
             name: str = "name",
             paths: list[str] = ["/path", ],
             stop_list: list[str] = ["stop word", ],
-            curr_path: str = ""
+            curr_path: str = "",
+            **kw
     ):
         """
         Использование:
