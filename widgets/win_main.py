@@ -10,6 +10,7 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
+from system.scaner_task import ScanerTask
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, UploadFilesTask)
 from system.utils import UThreadPool
@@ -26,11 +27,6 @@ from .win_image_view import WinImageView
 from .win_remove_files import RemoveFilesWin
 from .win_upload import WinUpload
 from .win_warn import WinWarn
-
-if JsonData.new_scaner:
-    from system.new_scaner.scaner_task import ScanerTask
-else:
-    from system.old_scaner.scaner_task import ScanerTask
 
 
 class TestWid(QFrame):

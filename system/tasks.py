@@ -6,19 +6,16 @@ from datetime import datetime
 import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtGui import QColor, QPixmap, QPixmapCache
+from PyQt5.QtGui import QColor, QPixmap
 from sqlalchemy import select, update
 
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Static
 
 from .database import THUMBS, Dbase
 from .filters import SystemFilter, UserFilter
 from .lang import Lang
 from .main_folder import MainFolder
-from .old_scaner.scaner_utils import MainFolderRemover
-from .scaner_utils import (DbUpdater, DirsCompator, DirsLoader, DirsUpdater,
-                           HashdirUpdater, ImgCompator, ImgLoader, Inspector,
-                           MainFolderRemover)
+from .old_scaner.scaner_utils import DbUpdater, HashdirUpdater
 from .utils import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
                     UThreadPool)
 

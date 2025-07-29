@@ -1,7 +1,2 @@
-from cfg import JsonData
-
-
-
-for k, v in JsonData.__dict__.items():
-    if not k.startswith("__") and not isinstance(v, (classmethod)):
-        print(k, v)
+"('/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/0803 копия.jpg', 30601264, 1752065147, 1752130091),"
+"('/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/2 Model IMG/0803 копия.jpg', 30601264, 1752065147, 1752130091)"
