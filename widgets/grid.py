@@ -771,16 +771,16 @@ class Grid(VScrollArea):
                 )
                 if self.date_wid.isHidden():
                     palete = QApplication.palette()
-                    color = QPalette.windowText(palete).color().name()
+                    text_color = QPalette.windowText(palete).color().name()
                 
-                    bg_style_data = {
-                        "#000000": "rgba(220, 220, 220, 1)",
-                        "#ffffff": "rgba(80, 80, 80, 1)",
+                    color_data = {
+                        "#000000": "#dcdcdc",
+                        "#ffffff": "#505050",
                     }
 
                     self.date_wid.setStyleSheet(f"""
                         QLabel {{
-                            background: {bg_style_data.get(color)};
+                            background: {color_data.get(text_color)};
                             font-weight: bold;
                             font-size: 20pt;
                             border-radius: 10px;
