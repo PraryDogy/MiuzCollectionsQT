@@ -28,11 +28,9 @@ from .win_upload import WinUpload
 from .win_warn import WinWarn
 
 if JsonData.new_scaner:
-    from system.scaner_task import ScanerTask
+    from system.new_scaner.scaner_task import ScanerTask
 else:
     from system.old_scaner.scaner_task import ScanerTask
-
-print(JsonData.new_scaner)
 
 
 class TestWid(QFrame):

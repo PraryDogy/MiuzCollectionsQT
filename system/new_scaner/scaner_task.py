@@ -4,14 +4,14 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData
 
-from .database import Dbase
-from .lang import Lang
-from .main_folder import MainFolder
-from .old_scaner.scaner_utils import MainFolderRemover
+from ..database import Dbase
+from ..lang import Lang
+from ..main_folder import MainFolder
+from .scaner_utils import MainFolderRemover
 from .scaner_utils import (DbUpdater, DirsCompator, DirsLoader, DirsUpdater,
                            HashdirUpdater, ImgCompator, ImgLoader, Inspector,
                            MainFolderRemover)
-from .utils import URunnable
+from ..utils import URunnable
 
 
 class ScanerSignals(QObject):

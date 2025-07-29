@@ -3,13 +3,12 @@ import os
 
 import sqlalchemy
 from numpy import ndarray
-from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import JsonData, Static, ThumbData
-from system.database import DIRS, THUMBS, ClmNames, Dbase
+from cfg import Static, ThumbData
+from system.database import DIRS, THUMBS, ClmNames
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils, URunnable
+from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
 
 class DirsLoader:
