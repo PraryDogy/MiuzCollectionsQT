@@ -32,7 +32,6 @@ class ScanerTask(URunnable):
         self.signals_ = ScanerSignals()
         self.pause_flag = False
         self.user_canceled_scan = False
-        print("инициирован старый сканер")
 
     def task(self):
         main_folders = [
