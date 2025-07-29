@@ -90,7 +90,6 @@ class ScanerTask(URunnable):
             print(main_folder.name, "no finder images")
             return
         
-
         args = (finder_images, db_images)
         img_compator = ImgCompator(*args)
         del_images, new_images = img_compator.run()
