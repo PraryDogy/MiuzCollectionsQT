@@ -446,7 +446,7 @@ class RemoveFilesTask(URunnable):
         
         # new_items пустой так как мы только удаляем thumbs из бд
         conn = Dbase.engine.connect()
-        db_updater = DbUpdater(del_items, [], main_folder, conn)
+        db_updater = DbUpdater(del_items, [], main_folder)
         db_updater.run()
         conn.close()
 
@@ -511,7 +511,7 @@ class UploadFilesTask(URunnable):
         rel_thumb_path_list, new_items = file_updater.run()
 
         conn = Dbase.engine.connect()
-        db_updater = DbUpdater(rel_thumb_path_list, new_items, MainFolder.current, conn)
+        db_updater = DbUpdater(rel_thumb_path_list, new_items, conn)
         db_updater.run()
         conn.close()
         try:
