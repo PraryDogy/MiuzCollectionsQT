@@ -267,11 +267,10 @@ class WinMain(UMainWindow):
         self.move(x, y)
 
     def on_exit(self):
-        for i in UThreadPool.tasks:
-            i.task_state.set_should_run(False)
         JsonData.write_json_data()
         MainFolder.write_json_data()
         UserFilter.write_json_data()
+        os._exit(0)
 
     def open_dates_win(self):
         self.win_dates = WinDates()
