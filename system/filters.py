@@ -15,7 +15,13 @@ class UserFilter:
     json_file_backup = os.path.join(Static.APP_SUPPORT_DIR, "user_filters_backup.json")
     __slots__ = ["lang_names", "dir_name", "value"]
 
-    def __init__(self, lang_names: list[str], dir_name: str, value: bool):
+    def __init__(
+            self,
+            lang_names: list[str] = ["filter eng, filter rus"],
+            dir_name: str = "filter_dir",
+            value: bool = False,
+            **kw
+    ):
         """
         Аргументы:
         - lang_names (list[str]): Названия фильтра (на русском и английском).    
