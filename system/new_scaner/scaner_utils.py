@@ -204,6 +204,8 @@ class ImgLoader:
         for rel_dir_path, mod in new_dirs:
             abs_dir_path = MainUtils.get_abs_path(main_folder_path, rel_dir_path)
             for entry in os.scandir(abs_dir_path):
+                if not task_state.should_run():
+                    return []
                 if entry.path.endswith(Static.ext_all):
                     try:
                         process_entry(entry)
