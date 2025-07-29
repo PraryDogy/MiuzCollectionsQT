@@ -679,6 +679,11 @@ class _Lang:
         "Images"
     ]
 
+    new_scaner = [
+        "Быстрый поиск изображений (бета, возможны ошибки)",
+        "Fast image search (beta, errors possible)"
+    ]
+
 class Lang(_Lang):
 
     @classmethod

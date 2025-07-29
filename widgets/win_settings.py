@@ -6,9 +6,9 @@ import subprocess
 from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
-                             QPushButton, QSpacerItem, QSpinBox, QTabWidget,
-                             QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QFrame,
+                             QGroupBox, QLabel, QPushButton, QSpacerItem,
+                             QSpinBox, QTabWidget, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lang
@@ -125,6 +125,35 @@ class SimpleSettings(QGroupBox):
         self.help_win = WinHelp()
         self.help_win.center_relative_parent(self.window())
         self.help_win.show()
+
+
+class ScanerSettings(QGroupBox):
+    clicked_ = pyqtSignal(bool)
+
+    def __init__(self):
+        super().__init__()
+        self.h_lay = UHBoxLayout()
+        self.h_lay.setContentsMargins(2, 2, 2, 2)
+        self.setLayout(self.h_lay)
+
+        self.checkbox = QCheckBox()
+        self.checkbox.setText(" " + Lang.new_scaner)
+        self.checkbox.clicked.connect(self.cmd_)
+        self.h_lay.addWidget(self.checkbox)
+
+        self.new_scaner = JsonData.new_scaner
+        if self.new_scaner:
+            self.checkbox.setChecked(True)
+
+    def cmd_(self):
+        if self.new_scaner:
+            self.new_scaner = False
+            self.checkbox.setChecked(False)
+        else:
+            self.new_scaner = True
+            self.checkbox.setChecked(True)
+
+        self.clicked_.emit(self.new_scaner)
 
 
 class AddRowWindow(WinSystem):
@@ -769,6 +798,7 @@ class WinSettings(WinSystem):
         self.reset_data = False
         self.new_lang = None
         self.scan_time = None
+        self.new_scaner = None
 
         self.main_folder_list_changed = False
         self.main_folder_list_copy = copy.deepcopy(MainFolder.list_)
@@ -789,6 +819,10 @@ class WinSettings(WinSystem):
 
     def set_scan_time(self, value: int):
         self.scan_time = value
+        self.set_apply_btn()
+
+    def set_new_scaner(self, value: bool):
+        self.new_scaner = value
         self.set_apply_btn()
 
     def main_folder_list_changed_cmd(self):
@@ -818,6 +852,10 @@ class WinSettings(WinSystem):
 
         simple_settings = SimpleSettings()
         v_lay.addWidget(simple_settings)
+
+        scaner_settings = ScanerSettings()
+        scaner_settings.clicked_.connect(lambda value: self.set_new_scaner(value))
+        v_lay.addWidget(scaner_settings)
 
         themes = Themes()
         themes.theme_changed.connect(self.theme_changed.emit)
@@ -887,6 +925,10 @@ class WinSettings(WinSystem):
         if self.scan_time:
             restart_app = True
             JsonData.scaner_minutes = self.scan_time
+
+        if self.new_scaner is not None:
+            restart_app = True
+            JsonData.new_scaner = self.new_scaner
 
         if self.reset_data:
             shutil.rmtree(Static.APP_SUPPORT_DIR)
