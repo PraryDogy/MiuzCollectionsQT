@@ -32,6 +32,8 @@ if JsonData.new_scaner:
 else:
     from system.old_scaner.scaner_task import ScanerTask
 
+print(JsonData.new_scaner)
+
 
 class TestWid(QFrame):
     def __init__(self, parent=None):
