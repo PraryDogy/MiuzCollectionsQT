@@ -510,10 +510,9 @@ class UploadFilesTask(URunnable):
         file_updater = HashdirUpdater(*args)
         rel_thumb_path_list, new_items = file_updater.run()
 
-        conn = Dbase.engine.connect()
-        db_updater = DbUpdater(rel_thumb_path_list, new_items, conn)
+        db_updater = DbUpdater(rel_thumb_path_list, new_items, MainFolder.current)
         db_updater.run()
-        conn.close()
+
         try:
             self.signals_.progress_text.emit("")
             self.signals_.reload_gui.emit()
