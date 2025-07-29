@@ -10,7 +10,7 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.scaner_task import ScanerTask
+
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, UploadFilesTask)
 from system.utils import UThreadPool
@@ -131,14 +131,14 @@ class WinMain(UMainWindow):
         self.scaner_timer = QTimer(self)
         self.scaner_timer.setSingleShot(True)
         self.scaner_timer.timeout.connect(self.start_scaner_task)
-        self.scaner_task: ScanerTask | None = None
+        self.scaner_task = None
         self.scaner_task_canceled = False
 
         QTimer.singleShot(100, self.main_folder_check)
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
-    
+
     def open_img_view(self):
         if len(self.grid.selected_widgets) == 1:
             path_to_wid = self.grid.path_to_wid.copy()
@@ -182,6 +182,12 @@ class WinMain(UMainWindow):
         Если задача ещё выполняется, метод откладывает повторную попытку запуска на 3 секунды
         с помощью QTimer.singleShot.
         """
+
+        if JsonData.new_scaner:
+            from system.new_scaner.scaner_task import ScanerTask
+        else:
+            from system.old_scaner.scaner_task import ScanerTask
+
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
             self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
