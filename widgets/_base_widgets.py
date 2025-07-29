@@ -1,10 +1,10 @@
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent
+from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QGraphicsDropShadowEffect, QHBoxLayout,
-                             QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QScrollArea, QTextEdit,
-                             QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsDropShadowEffect,
+                             QHBoxLayout, QLineEdit, QListWidget,
+                             QListWidgetItem, QMainWindow, QMenu, QScrollArea,
+                             QTextEdit, QVBoxLayout, QWidget)
 
 from system.lang import Lang
 from system.utils import MainUtils
@@ -28,6 +28,24 @@ class UMenu(QMenu):
     def __init__(self, event: QContextMenuEvent):
         self.ev = event
         super().__init__()
+
+        palette = QApplication.palette()
+        text_color = palette.color(QPalette.WindowText).name().lower()
+
+        color_data = {
+            "#000000": "#8a8a8a",
+            "#ffffff": "#5A5A5A",
+        }
+
+        sep_color = color_data.get(text_color)  # дефолт если нет ключа
+
+        self.setStyleSheet(f"""
+            QMenu::separator {{
+                height: 1px;
+                background: {sep_color};
+                margin: 4px 10px;
+            }}
+        """)
 
     def show_(self):
         self.exec_(self.ev.globalPos())
