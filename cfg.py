@@ -182,6 +182,7 @@ class JsonData:
     lang_ind: int = 0
     dark_mode: int = 0
     scaner_minutes: int = 5
+    new_scaner: int = True
     apps = [
         "preview",
         "photos",
