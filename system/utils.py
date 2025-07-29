@@ -14,7 +14,7 @@ import numpy as np
 import psd_tools
 import rawpy
 from imagecodecs.imagecodecs import DelayedImportError
-from PIL import Image
+from PIL import Image, ImageOps
 from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
@@ -96,6 +96,7 @@ class ImgUtils:
     def read_jpg(cls, img_path: str) -> np.ndarray | None:
         try:
             img = Image.open(img_path)
+            img = ImageOps.exif_transpose(img) 
             img = img.convert("RGB")
             array_img = np.array(img)
             img.close()
