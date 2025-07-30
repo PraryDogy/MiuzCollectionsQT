@@ -44,11 +44,15 @@ class BaseSlider(QSlider):
         )
         self.setStyleSheet(SLIDER_STYLE)
 
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() == Qt.MouseButton.LeftButton:
-            super().mouseReleaseEvent(ev)
-        else:
+    def mousePressEvent(self, ev: QMouseEvent) -> None:
+        if ev.button() != Qt.LeftButton:
             ev.ignore()
+            return
+
+        ratio = ev.x() / self.width()
+        value = self.minimum() + round(ratio * (self.maximum() - self.minimum()))
+        self.setValue(value)
+        ev.accept()
 
     def wheelEvent(self, e: QWheelEvent | None) -> None:
         e.ignore()
