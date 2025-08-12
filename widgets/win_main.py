@@ -282,7 +282,7 @@ class WinMain(UMainWindow):
         self.win_dates.show()
 
     def open_warn_win(self, title: str, text: str, restart_app: bool = False):
-        self.win_warn = WinWarn(title, text, restart_app)
+        self.win_warn = WinWarn(title, text)
         self.win_warn.adjustSize()
         self.win_warn.center_relative_parent(self)
         self.win_warn.show()
