@@ -3,8 +3,8 @@ import os
 from typing import Literal
 
 from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import (QContextMenuEvent, QKeyEvent, QMouseEvent, QPainter,
-                         QPaintEvent, QPixmap, QPixmapCache, QResizeEvent)
+from PyQt5.QtGui import (QColor, QContextMenuEvent, QKeyEvent, QMouseEvent,
+                         QPainter, QPaintEvent, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from cfg import Static
@@ -240,15 +240,20 @@ class WinImageView(WinChild):
         self.load_thumb()
 
     def load_thumb(self):
-        self.setFocus()
         self.img_viewer_title()
-        task = LoadThumb(self.rel_img_path)
-        task.signals_.finished_.connect(self.load_thumb_fin)
-        UThreadPool.start(task)
+        try:
+            pixmap = self.wid.img_wid.pixmap()
+        except Exception:
+            pixmap = None
+        if pixmap:
+            self.image_label.set_image(pixmap)
+        else:
+            pixmap = QPixmap(1, 1)
+            pixmap.fill(QColor(0, 0, 0))
+            self.image_label.set_image(pixmap)
+            t = f"{os.path.basename(self.rel_img_path)}\n{Lang.loading}"
+            self.image_label.setText(t)
 
-    def load_thumb_fin(self, data: tuple[str, QPixmap]):
-        rel_img_path, pixmap = data
-        self.image_label.set_image(pixmap)
         main_folder_path = MainFolder.current.is_available()
         if main_folder_path:
             self.img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
@@ -257,22 +262,23 @@ class WinImageView(WinChild):
             print("img viewer > no smb")
 
     def load_image(self):
-        self.task_count += 1
-        cmd_ = lambda data: self.load_image_fin(data, self.img_path)
-        img_thread = LoadImage(self.img_path, self.cached_images)
-        img_thread.signals_.finished_.connect(cmd_)
-        UThreadPool.start(img_thread)
 
-    def load_image_fin(self, data: tuple[str, QPixmap], current_img_path: str):
-        old_img_path, pixmap = data
-        self.task_count -= 1
-        if pixmap.width() == 0 or old_img_path != current_img_path:
-            return
-        elif isinstance(pixmap, QPixmap):
-            try:
-                self.image_label.set_image(pixmap)
-            except RuntimeError:
-                ...
+        def fin(data: tuple[str, QPixmap]):
+            old_img_path, pixmap = data
+            self.task_count -= 1
+            if pixmap.width() == 0 or old_img_path != self.img_path:
+                return
+            elif isinstance(pixmap, QPixmap):
+                try:
+                    self.image_label.clear()
+                    self.image_label.set_image(pixmap)
+                except RuntimeError:
+                    ...
+
+        self.task_count += 1
+        img_thread = LoadImage(self.img_path, self.cached_images)
+        img_thread.signals_.finished_.connect(fin)
+        UThreadPool.start(img_thread)
 
 # GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
 
