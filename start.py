@@ -1,7 +1,9 @@
 import os
-import subprocess
 import sys
 import traceback
+
+from PyQt5.QtWidgets import (QApplication, QDialog, QPushButton, QTextEdit,
+                             QVBoxLayout)
 
 
 class System_:
@@ -27,8 +29,19 @@ class System_:
 
         SUMMARY_MSG = "\n".join([ERROR, STARS, ABOUT])
         
-        script = "scripts/error_msg.scpt"
-        subprocess.run(["osascript", script, SUMMARY_MSG])
+        d = QDialog()
+        d.setWindowTitle("Ошибка")
+        l = QVBoxLayout(d)
+
+        txt = QTextEdit()
+        txt.setReadOnly(True)
+        txt.setPlainText(SUMMARY_MSG)
+        l.addWidget(txt)
+
+        l.addWidget(QPushButton("Закрыть", clicked=d.close))
+        d.resize(500, 400)
+        d.setFocus()
+        d.exec_()
 
     def catch_error_in_proj(exctype, value, tb):
 
