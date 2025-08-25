@@ -539,8 +539,8 @@ class _Lang:
     ]
 
     scan_every = [
-        "Искать новые изображения каждые",
-        "Search for new images every"
+        "Интервал поиска новых изображений",
+        "Interval for checking new images"
     ]
 
     mins = [
@@ -680,8 +680,8 @@ class _Lang:
     ]
 
     new_scaner = [
-        "Быстрый поиск изображений (бета, возможны ошибки)",
-        "Fast image search (beta, errors possible)"
+        "Быстрый поиск изображений (бета)",
+        "Fast image search (beta)"
     ]
 
 class Lang(_Lang):

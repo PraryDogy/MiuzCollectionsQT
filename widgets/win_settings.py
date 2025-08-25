@@ -129,21 +129,49 @@ class SimpleSettings(QGroupBox):
 
 class ScanerSettings(QGroupBox):
     clicked_ = pyqtSignal(bool)
+    new_scan_time = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
-        self.h_lay = UHBoxLayout()
-        self.h_lay.setContentsMargins(2, 2, 2, 2)
-        self.setLayout(self.h_lay)
+        self.main_lay = UVBoxLayout()
+        self.main_lay.setContentsMargins(2, 2, 2, 2)
+        self.setLayout(self.main_lay)
+
+        first_row = QWidget()
+        self.main_lay.addWidget(first_row)
+        first_lay = UHBoxLayout()
+        first_row.setLayout(first_lay)
 
         self.checkbox = QCheckBox()
         self.checkbox.setText(" " + Lang.new_scaner)
         self.checkbox.clicked.connect(self.cmd_)
-        self.h_lay.addWidget(self.checkbox)
+        first_lay.addWidget(self.checkbox)
 
         self.new_scaner = JsonData.new_scaner
         if self.new_scaner:
             self.checkbox.setChecked(True)
+
+        sec_row = QWidget()
+        self.main_lay.addWidget(sec_row)
+        sec_lay = UHBoxLayout()
+        sec_row.setLayout(sec_lay)
+        sec_lay.setSpacing(10)
+        sec_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        self.spin = QSpinBox(self)
+        self.spin.setFixedWidth(90)
+        self.spin.setMinimum(1)
+        self.spin.setMaximum(60)
+        self.spin.setSuffix(f" {Lang.mins}")
+        self.spin.setValue(JsonData.scaner_minutes)
+        self.spin.valueChanged.connect(self.change_scan_time)
+        sec_lay.addWidget(self.spin)
+
+        label = QLabel(Lang.scan_every, self)
+        sec_lay.addWidget(label)
+
+    def change_scan_time(self, value: int):
+        self.new_scan_time.emit(value)
 
     def cmd_(self):
         if self.new_scaner:
@@ -757,36 +785,6 @@ class Themes(QGroupBox):
             f.selected(f is selected_frame)
 
 
-class ScanTimeWid(QGroupBox):
-    new_scan_time = pyqtSignal(int)
-
-    def __init__(self):
-        """
-        Сигналы: new_scan_time(int)
-        """
-        super().__init__()
-
-        layout = UHBoxLayout(self)
-        layout.setContentsMargins(5, 0, 5, 0)
-        layout.setSpacing(10)
-        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-
-        label = QLabel(Lang.scan_every, self)
-        layout.addWidget(label)
-
-        self.spin = QSpinBox(self)
-        self.spin.setFixedWidth(90)
-        self.spin.setMinimum(1)
-        self.spin.setMaximum(60)
-        self.spin.setSuffix(f" {Lang.mins}")
-        self.spin.setValue(JsonData.scaner_minutes)
-        self.spin.valueChanged.connect(self.change_scan_time)
-        layout.addWidget(self.spin)
-
-    def change_scan_time(self, value: int):
-        self.new_scan_time.emit(value)
-
-
 class WinSettings(WinSystem):
     theme_changed = pyqtSignal()
 
@@ -855,6 +853,7 @@ class WinSettings(WinSystem):
 
         scaner_settings = ScanerSettings()
         scaner_settings.clicked_.connect(lambda value: self.set_new_scaner(value))
+        scaner_settings.new_scan_time.connect(lambda value: self.set_scan_time(value))
         v_lay.addWidget(scaner_settings)
 
         themes = Themes()
@@ -877,10 +876,6 @@ class WinSettings(WinSystem):
         self.main_folder_wid = MainFolderWid(self.main_folder_list_copy)
         self.main_folder_wid.changed.connect(lambda: self.main_folder_list_changed_cmd())
         v_lay.addWidget(self.main_folder_wid)
-
-        scan_wid = ScanTimeWid()
-        scan_wid.new_scan_time.connect(lambda value: self.set_scan_time(value))
-        v_lay.addWidget(scan_wid)
 
         main_folder_tab = EditMainFoldersWid(self.main_folder_list_copy)
         main_folder_tab.changed.connect(lambda: self.main_folder_list_changed_cmd())
