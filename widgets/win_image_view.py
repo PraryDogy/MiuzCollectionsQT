@@ -3,14 +3,15 @@ import os
 from typing import Literal
 
 from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import (QColor, QContextMenuEvent, QKeyEvent, QMouseEvent,
-                         QPainter, QPaintEvent, QPixmap, QResizeEvent)
+from PyQt5.QtGui import (QColor, QContextMenuEvent, QImage, QKeyEvent,
+                         QMouseEvent, QPainter, QPaintEvent, QPixmap,
+                         QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from cfg import Static
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.tasks import LoadImage, LoadThumb
+from system.tasks import LoadImage
 from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
@@ -262,18 +263,19 @@ class WinImageView(WinChild):
             print("img viewer > no smb")
 
     def load_image(self):
-
-        def fin(data: tuple[str, QPixmap]):
-            old_img_path, pixmap = data
+        def fin(data: tuple[str, QImage]):
             self.task_count -= 1
-            if pixmap.width() == 0 or old_img_path != self.img_path:
-                return
-            elif isinstance(pixmap, QPixmap):
+            old_img_path, qimage = data
+            if qimage and qimage.width() > 0 and old_img_path == self.img_path:
+                pixmap = QPixmap.fromImage(qimage)
                 try:
-                    self.image_label.clear()
                     self.image_label.set_image(pixmap)
                 except RuntimeError:
                     ...
+            else:
+                self.image_label.clear()
+                self.image_label.set_image(QPixmap(0, 0))
+                self.image_label.setText(Lang.read_file_error)
 
         self.task_count += 1
         img_thread = LoadImage(self.img_path, self.cached_images)

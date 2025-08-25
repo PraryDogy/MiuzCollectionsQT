@@ -266,6 +266,24 @@ class ThumbUtils:
 class PixmapUtils:
 
     @classmethod
+    def qimage_from_array(cls, image: np.ndarray) -> QImage | None:
+        if not (isinstance(image, np.ndarray) and QApplication.instance()):
+            return None
+        if image.ndim == 2:  # grayscale
+            height, width = image.shape
+            bytes_per_line = width
+            qimage = QImage(image.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+        elif image.ndim == 3 and image.shape[2] in (3, 4):
+            height, width, channels = image.shape
+            bytes_per_line = channels * width
+            fmt = QImage.Format_RGB888 if channels == 3 else QImage.Format_RGBA8888
+            qimage = QImage(image.data, width, height, bytes_per_line, fmt)
+        else:
+            print("pixmap from array channels trouble", image.shape)
+            return None
+        return qimage
+
+    @classmethod
     def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
         if isinstance(image, np.ndarray) and QApplication.instance():
             height, width, channel = image.shape

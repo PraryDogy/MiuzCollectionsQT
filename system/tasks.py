@@ -6,7 +6,7 @@ from datetime import datetime
 import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtGui import QColor, QPixmap
+from PyQt5.QtGui import QPixmap, QImage
 from sqlalchemy import select, update
 
 from cfg import Dynamic, Static
@@ -193,42 +193,12 @@ class LoadImageSignals(QObject):
     finished_ = pyqtSignal(tuple)
 
 
-class LoadThumb(URunnable):
-    def __init__(self, rel_img_path: str):
-        """
-        Возвращает в сигнале finished_ (rel_img_path, QPixmap)
-        """
-        super().__init__()
-        self.signals_ = LoadImageSignals()
-        self.rel_img_path = rel_img_path
-
-    def task(self):
-        conn = Dbase.engine.connect()
-        q = select(THUMBS.c.short_hash) #rel thumb path
-        q = q.where(THUMBS.c.short_src == self.rel_img_path)
-        q = q.where(THUMBS.c.brand == MainFolder.current.name)
-        rel_thumb_path = conn.execute(q).scalar()
-        conn.close()
-
-        if rel_thumb_path:
-            thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
-            thumb = ThumbUtils.read_thumb(thumb_path)
-            thumb = ImgUtils.desaturate_image(thumb, 0.2)
-            pixmap = PixmapUtils.pixmap_from_array(thumb)
-        else:
-            pixmap = QPixmap(1, 1)
-            pixmap.fill(QColor(128, 128, 128))
-
-        image_data = (self.rel_img_path, pixmap)
-        self.signals_.finished_.emit(image_data)
-
-
 class LoadImage(URunnable):
     max_images_count = 50
 
     def __init__(self, img_path: str, cached_images: dict[str, QPixmap]):
         """
-        Возвращает в сигнале finished_ (img_path, QPixmap)
+        Возвращает в сигнале finished_ (img_path, QImage)
         """
         super().__init__()
         self.signals_ = LoadImageSignals()
@@ -240,21 +210,20 @@ class LoadImage(URunnable):
             img = ImgUtils.read_image(self.img_path)
             if img is not None:
                 img = ImgUtils.desaturate_image(img, 0.2)
-                self.pixmap = PixmapUtils.pixmap_from_array(img)
-                self.cached_images[self.img_path] = self.pixmap
+                self.qimage = PixmapUtils.qimage_from_array(img)
+                self.cached_images[self.img_path] = self.qimage
                 del img 
                 gc.collect()
         else:
-            self.pixmap = self.cached_images.get(self.img_path)
+            self.qimage = self.cached_images.get(self.img_path)
 
-        if not hasattr(self, "pixmap"):
-            print("не могу загрузить крупное изображение")
-            self.pixmap = QPixmap(0, 0)
+        if not hasattr(self, "qimage"):
+            self.qimage = None
 
         if len(self.cached_images) > self.max_images_count:
             self.cached_images.pop(next(iter(self.cached_images)))
 
-        image_data = (self.img_path, self.pixmap)
+        image_data = (self.img_path, self.qimage)
 
         try:
             self.signals_.finished_.emit(image_data)
@@ -576,9 +545,9 @@ class MoveFilesTask(QObject):
 
 
 class LoadDbImagesItem:
-    __slots__ = ["pixmap", "rel_img_path", "coll_name", "fav", "f_mod"]
-    def __init__(self, pixmap: QPixmap, rel_img_path: str, coll: str, fav: int, f_mod: str):
-        self.pixmap = pixmap
+    __slots__ = ["qimage", "rel_img_path", "coll_name", "fav", "f_mod"]
+    def __init__(self, qimage: QImage, rel_img_path: str, coll: str, fav: int, f_mod: str):
+        self.qimage = qimage
         self.rel_img_path = rel_img_path
         self.coll_name = coll
         self.fav = fav
@@ -622,14 +591,14 @@ class LoadDbImagesTask(URunnable):
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             thumb = ThumbUtils.read_thumb(thumb_path)
             if isinstance(thumb, ndarray):
-                pixmap = PixmapUtils.pixmap_from_array(thumb)
+                qimage = PixmapUtils.qimage_from_array(thumb)
             else:
                 continue
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             else:
                 f_mod = f"{Lang.months[str(f_mod.month)]} {f_mod.year}"
-            item = LoadDbImagesItem(pixmap, rel_img_path, coll, fav, f_mod)
+            item = LoadDbImagesItem(qimage, rel_img_path, coll, fav, f_mod)
             if Dynamic.resents:
                 thumbs_dict[0].append(item)
             else:

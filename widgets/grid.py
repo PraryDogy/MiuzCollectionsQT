@@ -344,8 +344,9 @@ class Grid(VScrollArea):
 
     def single_grid(self, db_images: list[LoadDbImagesItem]):
         for db_image in db_images:
+            pixmap = QPixmap.fromImage(db_image.qimage)
             wid = Thumbnail(
-                pixmap=db_image.pixmap,
+                pixmap=pixmap,
                 rel_img_path=db_image.rel_img_path,
                 coll_name=db_image.coll_name,
                 fav=db_image.fav,
