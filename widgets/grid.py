@@ -318,21 +318,24 @@ class Grid(VScrollArea):
         self.grid_wid.setLayout(self.grid_lay)
                                 
     def first_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
-        for i in (self.grid_wid, self.rubberBand):
-            i.deleteLater()
-        
-        self.clear_thumb_data()
-        self.clear_cell_data()
-        self.clear_selected_widgets()
-        self.load_grid_wid()
-        self.load_rubber()
-        Thumbnail.calculate_size()
+        def cmd():
+            for i in (self.grid_wid, self.rubberBand):
+                i.deleteLater()
+            
+            self.clear_thumb_data()
+            self.clear_cell_data()
+            self.clear_selected_widgets()
+            self.load_grid_wid()
+            self.load_rubber()
+            Thumbnail.calculate_size()
+
+            for date, db_images_list in db_images.items():
+                self.single_grid(db_images_list)
+            self.rearrange()
+            self.grid_wid.show()
 
         self.grid_wid.hide()
-        for date, db_images_list in db_images.items():
-            self.single_grid(db_images_list)
-        self.rearrange()
-        self.grid_wid.show()
+        QTimer.singleShot(50, cmd)
                         
     def add_thumb_data(self, wid: Thumbnail):
         self.path_to_wid[wid.rel_img_path] = wid
