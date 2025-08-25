@@ -134,41 +134,59 @@ class ScanerSettings(QGroupBox):
     def __init__(self):
         super().__init__()
         self.main_lay = UVBoxLayout()
-        self.main_lay.setContentsMargins(2, 2, 2, 2)
+        self.main_lay.setSpacing(5)
+        # self.main_lay.setContentsMargins(2, 2, 2, 2)
         self.setLayout(self.main_lay)
-
-        first_row = QWidget()
-        self.main_lay.addWidget(first_row)
-        first_lay = UHBoxLayout()
-        first_row.setLayout(first_lay)
-
-        self.checkbox = QCheckBox()
-        self.checkbox.setText(" " + Lang.new_scaner)
-        self.checkbox.clicked.connect(self.cmd_)
-        first_lay.addWidget(self.checkbox)
-
-        self.new_scaner = JsonData.new_scaner
-        if self.new_scaner:
-            self.checkbox.setChecked(True)
 
         sec_row = QWidget()
         self.main_lay.addWidget(sec_row)
-        sec_lay = UHBoxLayout()
-        sec_row.setLayout(sec_lay)
-        sec_lay.setSpacing(10)
-        sec_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.spin_lay = UHBoxLayout()
+        sec_row.setLayout(self.spin_lay)
+        self.spin_lay.setSpacing(15)
+        self.spin_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         self.spin = QSpinBox(self)
-        self.spin.setFixedWidth(90)
         self.spin.setMinimum(1)
         self.spin.setMaximum(60)
         self.spin.setSuffix(f" {Lang.mins}")
         self.spin.setValue(JsonData.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
-        sec_lay.addWidget(self.spin)
+        self.spin_lay.addWidget(self.spin)
 
         label = QLabel(Lang.scan_every, self)
-        sec_lay.addWidget(label)
+        self.spin_lay.addWidget(label)
+
+        self.change_theme()
+
+        first_row = QWidget()
+        self.main_lay.addWidget(first_row)
+        first_lay = UHBoxLayout()
+        first_lay.setSpacing(15)
+        first_row.setLayout(first_lay)
+
+        self.checkbox = QPushButton()
+        self.checkbox.clicked.connect(self.cmd_)
+        self.checkbox.setFixedWidth(115)
+        first_lay.addWidget(self.checkbox)
+
+        self.checkbox_lbl = QLabel(Lang.new_scaner)
+        first_lay.addWidget(self.checkbox_lbl)
+
+        self.new_scaner = JsonData.new_scaner
+        if self.new_scaner:
+            self.checkbox.setText(Lang.disable)
+        else:
+            self.checkbox.setText(Lang.enable)
+
+        self.checkbox.setChecked(True)
+
+    def change_theme(self):
+        if JsonData.dark_mode == 0:
+            self.spin_lay.setContentsMargins(5, 0, 0, 0)
+            self.spin.setFixedWidth(104)
+        else:
+            self.spin_lay.setContentsMargins(0, 0, 0, 0)
+            self.spin.setFixedWidth(115)
 
     def change_scan_time(self, value: int):
         self.new_scan_time.emit(value)
@@ -176,10 +194,10 @@ class ScanerSettings(QGroupBox):
     def cmd_(self):
         if self.new_scaner:
             self.new_scaner = False
-            self.checkbox.setChecked(False)
+            self.checkbox.setText(Lang.enable)
         else:
             self.new_scaner = True
-            self.checkbox.setChecked(True)
+            self.checkbox.setText(Lang.disable)
 
         self.clicked_.emit(self.new_scaner)
 
@@ -807,6 +825,8 @@ class WinSettings(WinSystem):
         self.btns_wid()
         self.setFixedSize(420, 540)
 
+        self.setFocus()
+
     def reset_data_cmd(self):
         self.reset_data = True
         self.set_apply_btn()
@@ -858,6 +878,7 @@ class WinSettings(WinSystem):
 
         themes = Themes()
         themes.theme_changed.connect(self.theme_changed.emit)
+        themes.theme_changed.connect(scaner_settings.change_theme)
         v_lay.addWidget(themes)
 
         about_wid = AboutWin()
