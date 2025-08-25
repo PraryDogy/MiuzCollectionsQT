@@ -242,6 +242,7 @@ class WinImageView(WinChild):
 
     def load_thumb(self):
         self.img_viewer_title()
+        self.image_label.clear()
         try:
             pixmap = self.wid.img_wid.pixmap()
         except Exception:
@@ -266,16 +267,16 @@ class WinImageView(WinChild):
         def fin(data: tuple[str, QImage]):
             self.task_count -= 1
             old_img_path, qimage = data
-            if qimage and qimage.width() > 0 and old_img_path == self.img_path:
-                pixmap = QPixmap.fromImage(qimage)
-                try:
+            if qimage:
+                if old_img_path == self.img_path:
+                    pixmap = QPixmap.fromImage(qimage)
                     self.image_label.set_image(pixmap)
-                except RuntimeError:
-                    ...
             else:
-                self.image_label.clear()
-                self.image_label.set_image(QPixmap(0, 0))
-                self.image_label.setText(Lang.read_file_error)
+                pixmap = QPixmap(1, 1)
+                pixmap.fill(QColor(0, 0, 0))
+                self.image_label.set_image(pixmap)
+                t = f"{os.path.basename(self.img_path)}\n{Lang.read_file_error}"
+                self.image_label.setText(t)
 
         self.task_count += 1
         img_thread = LoadImage(self.img_path, self.cached_images)
