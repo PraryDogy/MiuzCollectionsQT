@@ -316,6 +316,7 @@ class Grid(VScrollArea):
         self.grid_wid = QWidget()
         self.scroll_layout.addWidget(self.grid_wid)
         self.grid_lay = QGridLayout()
+        self.grid_lay.setSpacing(1)
         self.grid_wid.setLayout(self.grid_lay)
                                 
     def first_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
