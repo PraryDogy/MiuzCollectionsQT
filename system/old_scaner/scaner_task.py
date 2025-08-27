@@ -1,9 +1,11 @@
 import gc
+from time import sleep
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData
 
+from ..lang import Lang
 from ..main_folder import MainFolder
 from ..utils import URunnable
 from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
@@ -31,17 +33,16 @@ class ScanerTask(URunnable):
         print("Выбран старый сканер")
 
     def task(self):
-        main_folders = [
-            i
-            for i in MainFolder.list_
-            if i.is_available()
-        ]
-
-        for i in main_folders:
-            print("scaner started", i.name)
-            self.main_folder_scan(i)
-            gc.collect()
-            print("scaner finished", i.name)
+        for i in MainFolder.list_:
+            if i.is_available():
+                print("scaner started", i.name)
+                self.main_folder_scan(i)
+                gc.collect()
+                print("scaner finished", i.name)
+            else:
+                t = f"{i.name}: {Lang.no_connection.lower()}"
+                self.signals_.progress_text.emit(t)
+                sleep(5)
             
         try:
             self.signals_.finished_.emit()
