@@ -1,5 +1,6 @@
 import gc
 import os
+import subprocess
 
 from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
@@ -713,6 +714,19 @@ class Grid(VScrollArea):
             open_menu = UMenu(a0)
             open_menu.setTitle(f"{Lang.open_in} ({len(rel_img_path_list)})")
             self.menu_.addMenu(open_menu)
+
+            def open_def_cmd():
+                main_folder_path = MainFolder.current.is_available()
+                if not main_folder_path:
+                    return
+                rel_path = self.selected_widgets[-1].rel_img_path
+                path = MainUtils.get_abs_path(main_folder_path, rel_path)
+                subprocess.Popen(["open", path])
+
+            open_def = QAction(parent=open_menu, text=Lang.open_default)
+            open_def.triggered.connect(open_def_cmd)
+            open_menu.addAction(open_def)
+            open_menu.addSeparator()
 
             for app_path, basename in self.image_apps.items():
                 act = QAction(parent=open_menu, text=basename)

@@ -126,7 +126,7 @@ class ScanerTask(URunnable):
         if del_images or new_images:
             self.signals_.reload_gui.emit()
 
-        print("del dirs", del_dirs)
-        print("new dirs", new_dirs)
-        print("del images", del_images)
-        print("new images", new_images)
+        # print("del dirs", del_dirs)
+        # print("new dirs", new_dirs)
+        # print("del images", del_images)
+        # print("new images", new_images)
