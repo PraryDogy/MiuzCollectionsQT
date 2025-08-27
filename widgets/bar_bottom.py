@@ -53,6 +53,7 @@ class BaseSlider(QSlider):
         value = self.minimum() + round(ratio * (self.maximum() - self.minimum()))
         self.setValue(value)
         ev.accept()
+        super().mousePressEvent(ev)
 
     def wheelEvent(self, e: QWheelEvent | None) -> None:
         e.ignore()
