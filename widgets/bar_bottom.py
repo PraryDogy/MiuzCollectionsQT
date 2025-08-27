@@ -97,7 +97,6 @@ class FilterBtn(QLabel):
         t = f"{Lang.type_show}: {Lang.type_jpg}, {Lang.type_tiff}"
         super().__init__(text=t)
         self.setObjectName("filter_btn")
-        # self.setFixedWidth(150)
         self.set_normal_style()
 
         self.adjustSize()
@@ -112,6 +111,7 @@ class FilterBtn(QLabel):
         self.set_solid_style()
 
         menu_ = MenuTypes(parent=self)
+        menu_.setFixedWidth(self.width())
         menu_.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
         menu_.update_bottom_bar.connect(lambda: self.update_bottom_bar.emit())
 
