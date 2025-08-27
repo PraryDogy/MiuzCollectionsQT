@@ -49,11 +49,6 @@ class WidSearch(ULineEdit):
         self.textChanged.connect(self.create_search)
         self.setPlaceholderText(Lang.search)
 
-        self.timer = QTimer(self)
-        self.timer.setInterval(1000)
-        self.timer.setSingleShot(True)
-        self.timer.timeout.connect(self.delayed_search)
-
         self.clear_btn = ClearBtn(parent=self)
         self.clear_btn.clicked_.connect(self.clear_search)
         self.clear_btn.disable()
@@ -70,9 +65,6 @@ class WidSearch(ULineEdit):
             Dynamic.search_widget_text = None
             self.clear_btn.disable()
 
-        self.timer.stop()
-        self.timer.start()
-
     def delayed_search(self):
         self.reload_thumbnails.emit()
 
@@ -84,6 +76,8 @@ class WidSearch(ULineEdit):
         self.scroll_to_top.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+            self.delayed_search()
         if a0.key() == Qt.Key.Key_Escape:
             self.clearFocus()
         return super().keyPressEvent(a0)

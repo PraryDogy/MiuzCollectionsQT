@@ -338,6 +338,7 @@ class Grid(VScrollArea):
                     self.single_grid(db_images_list)
                 self.rearrange()
                 self.grid_wid.show()
+                QTimer.singleShot(100, self.setFocus)
 
         self.grid_wid.hide()
         QTimer.singleShot(50, cmd)
