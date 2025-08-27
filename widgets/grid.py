@@ -328,11 +328,16 @@ class Grid(VScrollArea):
             self.load_grid_wid()
             self.load_rubber()
             Thumbnail.calculate_size()
-
-            for date, db_images_list in db_images.items():
-                self.single_grid(db_images_list)
-            self.rearrange()
-            self.grid_wid.show()
+            if not db_images:
+                lbl = QLabel(Lang.no_photo)
+                self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+                self.grid_lay.setRowStretch(0, 1)
+                self.grid_lay.setColumnStretch(0, 1)
+            else:
+                for date, db_images_list in db_images.items():
+                    self.single_grid(db_images_list)
+                self.rearrange()
+                self.grid_wid.show()
 
         self.grid_wid.hide()
         QTimer.singleShot(50, cmd)
