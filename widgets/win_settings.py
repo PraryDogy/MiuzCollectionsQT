@@ -366,31 +366,12 @@ class EditMainFoldersWid(QTabWidget):
             self.addTab(wid, x.name)
 
     def tab_ui(self, main_folder_copy: MainFolder):
+        # ПУТЬ К КОЛЛЕКЦИЯМ
         wid = QWidget()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(10)
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         wid.setLayout(v_lay)
-
-        h_wid_one = QWidget()
-        v_lay.addWidget(h_wid_one)
-        h_lay_one = UHBoxLayout()
-        h_lay_one.setSpacing(15)
-        h_wid_one.setLayout(h_lay_one)
-
-        add_stop_coll_btn = QPushButton(Lang.add_)
-        add_stop_coll_btn.setFixedWidth(115)
-        h_lay_one.addWidget(add_stop_coll_btn)
-
-        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
-        h_lay_one.addWidget(stop_colls_lbl)
-
-        stop_colls_list = MainFolderItemsWid(main_folder_copy, True)
-        stop_colls_list.changed.connect(lambda: self.changed.emit())
-        v_lay.addWidget(stop_colls_list)
-
-        cmd = lambda: stop_colls_list.open_add_row_win()
-        add_stop_coll_btn.clicked.connect(cmd)
 
         h_wid_two = QWidget()
         v_lay.addWidget(h_wid_two)
@@ -411,6 +392,29 @@ class EditMainFoldersWid(QTabWidget):
 
         cmd = lambda: coll_folders_list.open_add_row_win()
         add_btn_two.clicked.connect(cmd)
+
+
+
+        # ИГНОР ЛИСТ КОЛЛЕКЦИЙ
+        h_wid_one = QWidget()
+        v_lay.addWidget(h_wid_one)
+        h_lay_one = UHBoxLayout()
+        h_lay_one.setSpacing(15)
+        h_wid_one.setLayout(h_lay_one)
+
+        add_stop_coll_btn = QPushButton(Lang.add_)
+        add_stop_coll_btn.setFixedWidth(115)
+        h_lay_one.addWidget(add_stop_coll_btn)
+
+        stop_colls_lbl = QLabel(Lang.sett_stopcolls)
+        h_lay_one.addWidget(stop_colls_lbl)
+
+        stop_colls_list = MainFolderItemsWid(main_folder_copy, True)
+        stop_colls_list.changed.connect(lambda: self.changed.emit())
+        v_lay.addWidget(stop_colls_list)
+
+        cmd = lambda: stop_colls_list.open_add_row_win()
+        add_stop_coll_btn.clicked.connect(cmd)
         return wid
 
 
@@ -436,24 +440,6 @@ class AddMainFolderWin(WinSystem):
         self.main_folder_name.textChanged.connect(lambda text: self.on_name_changed(text))
         self.central_layout.addWidget(self.main_folder_name)
 
-        first_row = QWidget()
-        self.central_layout.addWidget(first_row)
-        first_row_lay = UHBoxLayout()
-        first_row_lay.setSpacing(15)
-        first_row.setLayout(first_row_lay)
-
-        first_add_btn = QPushButton(Lang.add_)
-        first_add_btn.setFixedWidth(115)
-        first_row_lay.addWidget(first_add_btn)
-
-        first_descr_lbl = QLabel(Lang.sett_stopcolls)
-        first_row_lay.addWidget(first_descr_lbl)
-
-        stop_list_wid = MainFolderItemsWid(self.new_main_folder, True)
-        self.central_layout.addWidget(stop_list_wid)
-
-        cmd = lambda: stop_list_wid.open_add_row_win()
-        first_add_btn.clicked.connect(cmd)
 
         sec_row = QWidget()
         self.central_layout.addWidget(sec_row)
@@ -473,6 +459,25 @@ class AddMainFolderWin(WinSystem):
 
         cmd = lambda: paths_list_wid.open_add_row_win()
         sec_add_btn.clicked.connect(cmd)
+
+        first_row = QWidget()
+        self.central_layout.addWidget(first_row)
+        first_row_lay = UHBoxLayout()
+        first_row_lay.setSpacing(15)
+        first_row.setLayout(first_row_lay)
+
+        first_add_btn = QPushButton(Lang.add_)
+        first_add_btn.setFixedWidth(115)
+        first_row_lay.addWidget(first_add_btn)
+
+        first_descr_lbl = QLabel(Lang.sett_stopcolls)
+        first_row_lay.addWidget(first_descr_lbl)
+
+        stop_list_wid = MainFolderItemsWid(self.new_main_folder, True)
+        self.central_layout.addWidget(stop_list_wid)
+
+        cmd = lambda: stop_list_wid.open_add_row_win()
+        first_add_btn.clicked.connect(cmd)
 
         btns_wid = QWidget()
         self.central_layout.addWidget(btns_wid)
