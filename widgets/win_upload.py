@@ -129,6 +129,7 @@ class CollBtnList(VListWidget):
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
+    double_clicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -151,6 +152,14 @@ class MainFolderList(VListWidget):
         index = MainFolder.list_.index(folder)
         self.open_main_folder.emit(index)
 
+    def mouseDoubleClickEvent(self, e):
+        idx = self.indexAt(e.pos())
+        if not idx.isValid():
+            return
+        if e.button() == Qt.MouseButton.LeftButton:
+            self.double_clicked.emit()
+        return super().mouseDoubleClickEvent(e)
+
     def mouseReleaseEvent(self, e):
         idx = self.indexAt(e.pos())
         if not idx.isValid():
@@ -172,6 +181,7 @@ class WinUpload(WinChild):
 
         self.main_folders = MainFolderList()
         self.main_folders.open_main_folder.connect(lambda index: self.collections_list.reload(index))
+        self.main_folders.double_clicked.connect(lambda: self.tab_wid.setCurrentIndex(1))
         self.tab_wid.addTab(self.main_folders, Lang.folders)
         self.collections_list = CollBtnList(0)
         self.collections_list.clicked.connect(self.clicked_cmd)

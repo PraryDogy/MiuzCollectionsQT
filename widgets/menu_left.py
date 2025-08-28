@@ -148,9 +148,14 @@ class CollectionList(VListWidget):
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
+    double_clicked = pyqtSignal()
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
+        self._click_timer = QTimer(self)
+        self._click_timer.setSingleShot(True)
+        self._click_timer.timeout.connect(lambda: self.cmd("view"))
+
         for i in MainFolder.list_:
             item = UListWidgetItem(parent=self, text=i.name)
             self.addItem(item)
@@ -180,8 +185,18 @@ class MainFolderList(VListWidget):
         if not idx.isValid():
             return
         if e.button() == Qt.MouseButton.LeftButton:
-            self.cmd("view")
+            self._click_timer.stop()
+            self._click_timer.start(100)
         return super().mouseReleaseEvent(e)
+
+    def mouseDoubleClickEvent(self, e):
+        idx = self.indexAt(e.pos())
+        if not idx.isValid():
+            return
+        if e.button() == Qt.MouseButton.LeftButton:
+            self._click_timer.stop()
+            self.double_clicked.emit()
+        return super().mouseDoubleClickEvent(e)
 
     def contextMenuEvent(self, a0):
         menu = UMenu(a0)
@@ -217,6 +232,7 @@ class MenuLeft(QTabWidget):
 
         main_folders = MainFolderList(self)
         main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
+        main_folders.double_clicked.connect(lambda: self.setCurrentIndex(1))
         self.addTab(main_folders, Lang.folders)
 
         self.collections_list = CollectionList()
