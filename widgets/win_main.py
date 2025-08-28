@@ -295,15 +295,17 @@ class WinMain(UMainWindow):
                 for i in rel_img_path_list
             ]
             self.win_upload = WinUpload()
-            cmd = lambda dest: self.filemove_task_start(dest, img_path_list)
+            cmd = lambda data: self.filemove_task_start(data, img_path_list)
             self.win_upload.clicked.connect(cmd)
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
 
-    def filemove_task_start(self, dest: str, img_path_list: list):
-        task = MoveFilesTask(dest, img_path_list)
+    def filemove_task_start(self, data: tuple, img_path_list: list):
+        dest, main_folder_name = data
+        main_folder = next(i for i in MainFolder.list_ if i.name == main_folder_name)
+        task = MoveFilesTask(main_folder, dest, img_path_list)
         task.reload_gui.connect(lambda: self.grid.reload_thumbnails())
         task.set_progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
         task.run()

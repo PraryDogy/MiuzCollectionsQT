@@ -486,7 +486,7 @@ class MoveFilesTask(QObject):
     set_progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
 
-    def __init__(self, dest: str, img_path_list: list):
+    def __init__(self, main_folder: MainFolder, dest: str, img_path_list: list):
         """
         Важно: это QObject, не URunnable. Объединяет несколько URunnable-задач.
 
@@ -503,6 +503,7 @@ class MoveFilesTask(QObject):
         super().__init__()
         self.dest = dest
         self.img_path_list = img_path_list
+        self.main_folder = main_folder
 
     def run(self):
         self.start_copy_task()
@@ -530,7 +531,7 @@ class MoveFilesTask(QObject):
         """
         Загружает в hadhdir миниатюры и делает записи в базу данных.
         """
-        upload_task = UploadFilesTask(new_img_path_list)
+        upload_task = UploadFilesTask(new_img_path_list, self.main_folder)
         upload_task.signals_.progress_text.connect(lambda text: self.set_progress_text.emit(text))
         upload_task.signals_.reload_gui.connect(lambda: self.reload_gui.emit())
         UThreadPool.start(upload_task)
