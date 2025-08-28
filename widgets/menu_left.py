@@ -240,3 +240,5 @@ class MenuLeft(QTabWidget):
         self.collections_list.set_window_title.connect(self.set_window_title.emit)
         self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
         self.addTab(self.collections_list, Lang.collections)
+
+        self.setCurrentIndex(1)
