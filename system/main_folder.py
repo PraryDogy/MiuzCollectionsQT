@@ -65,7 +65,7 @@ class MainFolder:
     def get_current_path(self):
         return self.curr_path
         
-    def is_available(self) -> str | None:
+    def availability(self) -> str | None:
         """
         Проверяет и устанавливает путь к MainFolder.    
         Возвращает доступный путь к MainFolder или None

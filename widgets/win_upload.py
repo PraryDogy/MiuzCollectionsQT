@@ -66,7 +66,7 @@ class WinUpload(WinSystem):
 
     def coll_btn_cmd(self, coll_btn: CollectionBtn):
         main_folder = MainFolder.list_[coll_btn.main_folder_index]
-        main_folder_path = main_folder.is_available()
+        main_folder_path = main_folder.availability()
 
         if main_folder_path:
             self.coll_path = os.path.join(main_folder_path, coll_btn.coll_name)

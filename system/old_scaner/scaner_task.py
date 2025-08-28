@@ -34,7 +34,7 @@ class ScanerTask(URunnable):
 
     def task(self):
         for i in MainFolder.list_:
-            if i.is_available():
+            if i.availability():
                 print("scaner started", i.name)
                 self.main_folder_scan(i)
                 gc.collect()

@@ -36,7 +36,7 @@ class ScanerTask(URunnable):
 
     def task(self):
         for i in MainFolder.list_:
-            if i.is_available():
+            if i.availability():
                 print("scaner started", i.name)
                 self.main_folder_scan(i)
                 gc.collect()
@@ -58,7 +58,7 @@ class ScanerTask(URunnable):
         main_folder_remover.run()
         conn.close()
 
-        coll_folder = main_folder.is_available()
+        coll_folder = main_folder.availability()
         if not coll_folder:
             print(main_folder.name, "coll folder not avaiable")
             return

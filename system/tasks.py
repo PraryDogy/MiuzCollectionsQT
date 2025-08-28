@@ -245,7 +245,7 @@ class SingleImgInfo(URunnable):
         self.signals_ = ImgInfoSignals()
 
     def task(self):
-        mail_folder_path = MainFolder.current.is_available()
+        mail_folder_path = MainFolder.current.availability()
         try:
             name = os.path.basename(self.url)
             _, type_ = os.path.splitext(name)

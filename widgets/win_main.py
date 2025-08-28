@@ -162,7 +162,7 @@ class WinMain(UMainWindow):
         self.grid.load_rubber()
 
     def main_folder_check(self):
-        main_folder = MainFolder.current.is_available()
+        main_folder = MainFolder.current.availability()
         if not main_folder:
             self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
             self.win_warn.center_relative_parent(self)
@@ -288,7 +288,7 @@ class WinMain(UMainWindow):
         self.win_warn.show()
 
     def open_filemove_win(self, rel_img_path_list: list):
-        main_folder_path = MainFolder.current.is_available()
+        main_folder_path = MainFolder.current.availability()
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -309,7 +309,7 @@ class WinMain(UMainWindow):
         task.run()
 
     def open_remove_files_win(self, rel_img_path_list: list):
-        main_folder_path = MainFolder.current.is_available()
+        main_folder_path = MainFolder.current.availability()
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -329,7 +329,7 @@ class WinMain(UMainWindow):
         UThreadPool.start(remove_files_task)
 
     def open_upload_win(self, img_path_list: list):
-        main_folder_path = MainFolder.current.is_available()
+        main_folder_path = MainFolder.current.availability()
         if main_folder_path:
             self.upload_win = WinUpload(self)
             self.upload_win.finished_.connect(lambda dest: self.upload_task_start(dest, img_path_list))
@@ -401,7 +401,7 @@ class WinMain(UMainWindow):
 
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
-        main_folder_path = MainFolder.current.is_available()
+        main_folder_path = MainFolder.current.availability()
         if not main_folder_path:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
             return

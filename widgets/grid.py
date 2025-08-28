@@ -468,14 +468,14 @@ class Grid(VScrollArea):
         self.win_info.show()
 
     def open_default_cmd(self, rel_img_path_list: list[str]):
-        main_folder_path = MainFolder.current.is_available()
+        main_folder_path = MainFolder.current.availability()
         if main_folder_path:
             for i in rel_img_path_list:
                 abs_path = MainUtils.get_abs_path(main_folder_path, i)
                 MainUtils.open_in_app(abs_path)
 
     def open_in_app_cmd(self, rel_img_path_list: list[str], app_path: str):
-        main_folder_path = MainFolder.current.is_available()
+        main_folder_path = MainFolder.current.availability()
         if main_folder_path:
             for i in rel_img_path_list:
                 abs_path = MainUtils.get_abs_path(main_folder_path, i)
@@ -494,7 +494,7 @@ class Grid(VScrollArea):
 
         if a0.modifiers() == command and a0.key() == Qt.Key.Key_I:
             if self.selected_widgets:
-                main_folder_path = MainFolder.current.is_available()
+                main_folder_path = MainFolder.current.availability()
                 if main_folder_path:
                     img_path_list = [
                         MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
@@ -717,7 +717,7 @@ class Grid(VScrollArea):
             self.menu_.addMenu(open_menu)
 
             def open_def_cmd():
-                main_folder_path = MainFolder.current.is_available()
+                main_folder_path = MainFolder.current.availability()
                 if not main_folder_path:
                     return
                 rel_path = self.selected_widgets[-1].rel_img_path
@@ -855,7 +855,7 @@ class Grid(VScrollArea):
             self.add_and_select_widget(self.wid_under_mouse)
             QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
-        main_folder_path = MainFolder.current.is_available()
+        main_folder_path = MainFolder.current.availability()
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
