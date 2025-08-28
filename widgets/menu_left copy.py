@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
 from cfg import Dynamic, Static
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.tasks import LoadCollectionsTask
+from system.tasks import LoadCollListTask
 from system.utils import UThreadPool
 
 from ._base_widgets import UListWidgetItem, UMenu, VListWidget
@@ -75,7 +75,7 @@ class MenuTab(VListWidget):
 
     def setup_task(self):
         main_folder = MainFolder.list_[self.main_folder_index]
-        self.task_ = LoadCollectionsTask(main_folder)
+        self.task_ = LoadCollListTask(main_folder)
         self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.start(self.task_)
 

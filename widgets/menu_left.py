@@ -11,15 +11,31 @@ from PyQt5.QtWidgets import (QAction, QLabel, QListWidgetItem, QTabWidget,
 from cfg import Dynamic, Static, JsonData
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.tasks import LoadCollectionsTask
+from system.tasks import LoadCollListTask
 from system.utils import UThreadPool
-from ._base_widgets import UListWidgetItem, UMenu, VListWidget, BaseCollBtn
+from ._base_widgets import UListWidgetItem, UMenu, VListWidget
 from .win_warn import WinWarn
 
 
-class CollBtn(BaseCollBtn):
+class BaseCollBtn(QLabel):
     pressed_ = pyqtSignal()
 
+    def __init__(self, text: str):
+        self.coll_name = text
+        data = {
+            Static.NAME_ALL_COLLS: Lang.all_colls,
+            Static.NAME_RECENTS: Lang.recents,
+            Static.NAME_FAVS: Lang.fav_coll
+        }
+        if text in data:
+            text = data.get(text)
+        if JsonData.abc_name:
+            text = re.sub(r'^[^A-Za-zА-Яа-я]+', '', text)
+        super().__init__(text=text)
+        self.setStyleSheet("padding-left: 5px;")
+
+
+class CollBtn(BaseCollBtn):
     def __init__(self, text: str):
         super().__init__(text)
 
@@ -68,15 +84,15 @@ class CollectionList(VListWidget):
         super().__init__()
         self.main_folder_index = main_folder_index
         self.coll_btns: list[CollBtn] = []
-        self.setup_task()
+        self.load_coll_list()
 
     def reload(self, main_folder_index: int):
         self.main_folder_index = main_folder_index
-        self.setup_task()
+        self.load_coll_list()
 
-    def setup_task(self):
+    def load_coll_list(self):
         main_folder = MainFolder.list_[self.main_folder_index]
-        self.task_ = LoadCollectionsTask(main_folder)
+        self.task_ = LoadCollListTask(main_folder)
         self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.start(self.task_)
 

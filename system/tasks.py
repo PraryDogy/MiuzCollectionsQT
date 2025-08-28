@@ -144,7 +144,7 @@ class MenuSignals(QObject):
     finished_ = pyqtSignal(list)
 
 
-class LoadCollectionsTask(URunnable):
+class LoadCollListTask(URunnable):
     def __init__(self, main_folder: MainFolder):
         super().__init__()
         self.main_folder = main_folder

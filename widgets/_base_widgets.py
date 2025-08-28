@@ -287,21 +287,3 @@ class VListWidget(QListWidget):
         super().__init__(parent)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
-
-class BaseCollBtn(QLabel):
-    pressed_ = pyqtSignal()
-
-    def __init__(self, text: str):
-        self.coll_name = text
-        data = {
-            Static.NAME_ALL_COLLS: Lang.all_colls,
-            Static.NAME_RECENTS: Lang.recents,
-            Static.NAME_FAVS: Lang.fav_coll
-        }
-        if text in data:
-            text = data.get(text)
-        if JsonData.abc_name:
-            text = re.sub(r'^[^A-Za-zА-Яа-я]+', '', text)
-        super().__init__(text=text)
-        self.setStyleSheet("padding-left: 5px;")
