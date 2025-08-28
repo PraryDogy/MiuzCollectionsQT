@@ -2,11 +2,11 @@ import os
 import re
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
 
-from cfg import Dynamic, JsonData, Static
+from cfg import JsonData, Static
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadCollListTask
@@ -16,7 +16,45 @@ from ._base_widgets import UListWidgetItem, UMenu, VListWidget, WinChild
 from .win_warn import WinWarn
 
 
-class BaseCollBtn(QLabel):
+class SubWinList(VListWidget):
+    clicked = pyqtSignal(str)
+
+    def __init__(self, path: str):
+        super().__init__()
+        root = UListWidgetItem(self, text=os.path.basename(path))
+        root.path = path
+        self.addItem(root)
+        for i in os.scandir(path):
+            if i.is_dir():
+                item = UListWidgetItem(self, text=i.name)
+                item.path = i.path
+                self.addItem(item)
+        self.setCurrentRow(0)
+
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.MouseButton.LeftButton:
+            path = self.currentItem().path
+            self.clicked.emit(path)
+        return super().mouseReleaseEvent(e)
+    
+
+class SubWin(WinChild):
+    clicked = pyqtSignal(str)
+
+    def __init__(self, path):
+        super().__init__()
+        self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
+        self.v_list = SubWinList(path)
+        self.v_list.clicked.connect(self.clicked.emit)
+        self.central_layout.addWidget(self.v_list)
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+
+
+class CollBtn(QLabel):
     pressed_ = pyqtSignal()
 
     def __init__(self, text: str):
@@ -33,74 +71,12 @@ class BaseCollBtn(QLabel):
         super().__init__(text=text)
         self.setStyleSheet("padding-left: 5px;")
 
-
-class CollBtn(BaseCollBtn):
-    def __init__(self, text: str):
-        super().__init__(text)
-
-    def reveal_cmd(self, *args) -> None:
-        main_folder_path = MainFolder.current.availability()
-        if main_folder_path:
-            if self.coll_name in (Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS):
-                coll = main_folder_path
-            else:
-                coll = os.path.join(main_folder_path, self.coll_name)
-            subprocess.Popen(["open", coll])
-        else:
-            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
-            self.win_warn.adjustSize()
-            self.win_warn.center_relative_parent(self.window())
-            self.win_warn.show()
-
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             self.pressed_.emit()
 
 
-class _SubWin(VListWidget):
-    clicked = pyqtSignal(str)
-
-    def __init__(self, path: str):
-        super().__init__()
-
-        root = UListWidgetItem(self, text=os.path.basename(path))
-        root.path = path
-        self.addItem(root)
-
-        for i in os.scandir(path):
-            if i.is_dir():
-                item = UListWidgetItem(self, text=i.name)
-                item.path = i.path
-                self.addItem(item)
-
-        self.setCurrentRow(0)
-
-    def mouseReleaseEvent(self, e):
-        if e.button() == Qt.MouseButton.LeftButton:
-            path = self.currentItem().path
-            print(path)
-
-        return super().mouseReleaseEvent(e)
-    
-
-class SubWin(WinChild):
-    clicked = pyqtSignal(str)
-
-    def __init__(self, path):
-        super().__init__()
-        self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
-        self.v_list = _SubWin(path)
-        self.v_list.clicked.connect(self.clicked.emit)
-        self.central_layout.addWidget(self.v_list)
-
-    def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
-            self.deleteLater()
-        return super().keyPressEvent(a0)
-    
-
-class CollectionList(VListWidget):
-    h_ = 30
+class CollBtnList(VListWidget):
     clicked = pyqtSignal(str)
 
     def __init__(self, main_folder_index: int):
@@ -136,45 +112,39 @@ class CollectionList(VListWidget):
             list_item = UListWidgetItem(self)
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
-
         self.setCurrentRow(0)
 
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
 
-    def __init__(self, parent: QTabWidget):
-        super().__init__(parent=parent)
+    def __init__(self):
+        super().__init__()
         for i in MainFolder.list_:
             item = UListWidgetItem(parent=self, text=i.name)
             self.addItem(item)
         self.setCurrentRow(0)
 
-    def cmd(self, flag: str):
+    def view(self):
         name = self.currentItem().text()
         folder = next((i for i in MainFolder.list_ if i.name == name), None)
         if folder is None:
             return
-
         path = folder.availability()
         if not path:
             self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
             return
-
-        if flag == "reveal":
-            subprocess.Popen(["open", path])
-        elif flag == "view":
-            index = MainFolder.list_.index(folder)
-            self.open_main_folder.emit(index)
+        index = MainFolder.list_.index(folder)
+        self.open_main_folder.emit(index)
 
     def mouseReleaseEvent(self, e):
         idx = self.indexAt(e.pos())
         if not idx.isValid():
             return
         if e.button() == Qt.MouseButton.LeftButton:
-            self.cmd("view")
+            self.view()
         return super().mouseReleaseEvent(e)
 
 
@@ -188,15 +158,12 @@ class WinUpload(WinChild):
         self.tab_wid = QTabWidget()
         self.central_layout.addWidget(self.tab_wid)
 
-        main_folders = MainFolderList(self.tab_wid)
-        main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
+        main_folders = MainFolderList()
+        main_folders.open_main_folder.connect(lambda index: self.collections_list.reload(index))
         self.tab_wid.addTab(main_folders, Lang.folders)
-        self.collections_list = CollectionList(0)
+        self.collections_list = CollBtnList(0)
         self.collections_list.clicked.connect(self.clicked.emit)
         self.tab_wid.addTab(self.collections_list, Lang.collections)
-
-    def open_main_folder(self, index: int):
-        self.collections_list.reload(index)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
