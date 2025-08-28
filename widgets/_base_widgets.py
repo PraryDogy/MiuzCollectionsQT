@@ -1,14 +1,15 @@
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsDropShadowEffect,
-                             QHBoxLayout, QLineEdit, QListWidget,
+                             QHBoxLayout, QLabel, QLineEdit, QListWidget,
                              QListWidgetItem, QMainWindow, QMenu, QScrollArea,
                              QTextEdit, QVBoxLayout, QWidget)
 
+from cfg import JsonData, Static
 from system.lang import Lang
 from system.utils import MainUtils
-
+import re
 
 class UHBoxLayout(QHBoxLayout):
     def __init__(self, *args, **kwargs):
@@ -286,3 +287,21 @@ class VListWidget(QListWidget):
         super().__init__(parent)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+
+class BaseCollBtn(QLabel):
+    pressed_ = pyqtSignal()
+
+    def __init__(self, text: str):
+        self.coll_name = text
+        data = {
+            Static.NAME_ALL_COLLS: Lang.all_colls,
+            Static.NAME_RECENTS: Lang.recents,
+            Static.NAME_FAVS: Lang.fav_coll
+        }
+        if text in data:
+            text = data.get(text)
+        if JsonData.abc_name:
+            text = re.sub(r'^[^A-Za-zА-Яа-я]+', '', text)
+        super().__init__(text=text)
+        self.setStyleSheet("padding-left: 5px;")

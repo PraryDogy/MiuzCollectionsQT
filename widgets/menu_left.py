@@ -13,26 +13,15 @@ from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadCollectionsTask
 from system.utils import UThreadPool
-from ._base_widgets import UListWidgetItem, UMenu, VListWidget
+from ._base_widgets import UListWidgetItem, UMenu, VListWidget, BaseCollBtn
 from .win_warn import WinWarn
 
 
-class CollectionBtn(QLabel):
+class CollBtn(BaseCollBtn):
     pressed_ = pyqtSignal()
 
     def __init__(self, text: str):
-        self.coll_name = text
-        data = {
-            Static.NAME_ALL_COLLS: Lang.all_colls,
-            Static.NAME_RECENTS: Lang.recents,
-            Static.NAME_FAVS: Lang.fav_coll
-        }
-        if text in data:
-            text = data.get(text)
-        if JsonData.abc_name:
-            text = re.sub(r'^[^A-Za-zА-Яа-я]+', '', text)
-        super().__init__(text=text)
-        self.setStyleSheet("padding-left: 5px;")
+        super().__init__(text)
 
     def reveal_cmd(self, *args) -> None:
         main_folder_path = MainFolder.current.availability()
@@ -78,7 +67,7 @@ class CollectionList(VListWidget):
     def __init__(self, main_folder_index: int):
         super().__init__()
         self.main_folder_index = main_folder_index
-        self.coll_btns: list[CollectionBtn] = []
+        self.coll_btns: list[CollBtn] = []
         self.setup_task()
 
     def reload(self, main_folder_index: int):
@@ -91,7 +80,7 @@ class CollectionList(VListWidget):
         self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.start(self.task_)
 
-    def collection_btn_cmd(self, btn: CollectionBtn):
+    def collection_btn_cmd(self, btn: CollBtn):
         Dynamic.curr_coll_name = btn.coll_name
         Dynamic.grid_offset = 0
         Dynamic.resents = False
@@ -112,7 +101,7 @@ class CollectionList(VListWidget):
     def init_ui(self, menus: list[str]):
         self.clear()
         # ALL COLLECTIONS
-        all_colls_btn = CollectionBtn(text=Static.NAME_ALL_COLLS)
+        all_colls_btn = CollBtn(text=Static.NAME_ALL_COLLS)
         cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
         all_colls_btn.pressed_.connect(cmd_)
         all_colls_item = UListWidgetItem(self)
@@ -121,7 +110,7 @@ class CollectionList(VListWidget):
         self.coll_btns.append(all_colls_btn)
 
         # FAVORITES
-        favs_btn = CollectionBtn(text=Static.NAME_FAVS)
+        favs_btn = CollBtn(text=Static.NAME_FAVS)
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
         favs_item = UListWidgetItem(self)
@@ -130,7 +119,7 @@ class CollectionList(VListWidget):
         self.coll_btns.append(favs_btn)
 
         # RECENTS
-        recents_btn = CollectionBtn(text=Static.NAME_RECENTS)
+        recents_btn = CollBtn(text=Static.NAME_RECENTS)
         recents_btn.pressed_.connect(self.recents_cmd)
         recents_item = UListWidgetItem(self)
         self.addItem(recents_item)
@@ -150,7 +139,7 @@ class CollectionList(VListWidget):
             self.setCurrentRow(self.row(favs_item))
 
         for i in menus:
-            coll_btn = CollectionBtn(i)
+            coll_btn = CollBtn(i)
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
             coll_btn.pressed_.connect(cmd_)
             list_item = UListWidgetItem(self)

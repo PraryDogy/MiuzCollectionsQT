@@ -9,7 +9,7 @@ from system.lang import Lang
 from system.main_folder import MainFolder
 
 from ._base_widgets import UHBoxLayout, UListWidgetItem, VListWidget, WinSystem
-from .menu_left import CollectionBtn, MenuLeft
+from .menu_left import CollBtn, MenuLeft
 
 
 class WinUpload(WinSystem):
@@ -64,7 +64,7 @@ class WinUpload(WinSystem):
                 cmd_ = lambda coll_btn=i: self.coll_btn_cmd(coll_btn=coll_btn)
                 i.pressed_.connect(cmd_)
 
-    def coll_btn_cmd(self, coll_btn: CollectionBtn):
+    def coll_btn_cmd(self, coll_btn: CollBtn):
         main_folder = MainFolder.list_[coll_btn.main_folder_index]
         main_folder_path = main_folder.availability()
 
