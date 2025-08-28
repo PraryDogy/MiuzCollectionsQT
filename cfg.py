@@ -205,6 +205,7 @@ class JsonData:
     scaner_minutes: int = 5
     new_scaner: int = True
     abc_name: bool = True
+    abc_sort: bool = True
     apps = [
         "preview",
         "photos",

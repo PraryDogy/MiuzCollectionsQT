@@ -10,7 +10,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 from sqlalchemy import select, update
 
-from cfg import Dynamic, Static
+from cfg import Dynamic, Static, JsonData
 
 from .database import THUMBS, Dbase
 from .filters import SystemFilter, UserFilter
@@ -168,7 +168,10 @@ class LoadCollectionsTask(URunnable):
         if not res:
             return list()
 
-        return sorted(res, key=self.strip_to_first_letter)
+        if JsonData.abc_sort:
+            return sorted(res, key=self.strip_to_first_letter)
+        else:
+            return list(res)
     
     def strip_to_first_letter(self, s: str) -> str:
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
