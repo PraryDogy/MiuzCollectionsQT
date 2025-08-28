@@ -160,9 +160,6 @@ class MainFolderList(VListWidget):
             item = UListWidgetItem(parent=self, text=i.name)
             self.addItem(item)
 
-        item_ = UListWidgetItem(parent=self, text=Lang.add_main_folder_short)
-        self.addItem(item_)
-
         self.setCurrentRow(0)
 
     def cmd(self, flag: str):
