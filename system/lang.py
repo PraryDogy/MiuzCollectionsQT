@@ -639,6 +639,11 @@ class _Lang:
         "Collections folder"
     ]
 
+    folders = [
+        "Папки",
+        "Folders"
+    ]
+
     user_filter = [
         "Пользовательские фильтры",
         "User filters"
