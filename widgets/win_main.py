@@ -78,7 +78,7 @@ class WinMain(UMainWindow):
         splitter = QSplitter(Qt.Horizontal)
 
         # Левый виджет (MenuLeft)
-        self.left_menu = MenuLeft(is_window=False)
+        self.left_menu = MenuLeft()
         self.left_menu.set_window_title.connect(lambda: self.set_window_title())
         self.left_menu.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
@@ -294,13 +294,8 @@ class WinMain(UMainWindow):
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
-            test = MenuLeft(is_window=True)
+            test = MenuLeft()
             test.show()
-            # self.upload_win = WinUpload(self)
-            # self.upload_win.center_relative_parent(self.window())
-            # cmd = lambda dest: self.filemove_task_start(dest, img_path_list)
-            # self.upload_win.finished_.connect(cmd)
-            # self.upload_win.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
 
@@ -333,9 +328,7 @@ class WinMain(UMainWindow):
     def open_upload_win(self, img_path_list: list):
         main_folder_path = MainFolder.current.availability()
         if main_folder_path:
-            self.upload_win = WinUpload(self)
-            self.upload_win.finished_.connect(lambda dest: self.upload_task_start(dest, img_path_list))
-            self.upload_win.center_relative_parent(self)
+            self.upload_win = MenuLeft()
             self.upload_win.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
