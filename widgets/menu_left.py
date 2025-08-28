@@ -251,6 +251,7 @@ class MenuLeft(QTabWidget):
                 MainFolder.current = i
                 self.subfolders.reload(MainFolder.list_.index(i))
                 break
+        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         self.set_window_title.emit()
         self.scroll_to_top.emit()
         self.reload_thumbnails.emit()
@@ -264,6 +265,9 @@ class MenuLeft(QTabWidget):
         self.addTab(main_folders, Lang.folders)
 
         self.subfolders = CollectionList(0)
+        self.subfolders.scroll_to_top.connect(self.scroll_to_top.emit)
+        self.subfolders.set_window_title.connect(self.set_window_title.emit)
+        self.subfolders.reload_thumbnails.connect(self.reload_thumbnails.emit)
         self.addTab(self.subfolders, Lang.collections)
 
     #     for i in MainFolder.list_:
