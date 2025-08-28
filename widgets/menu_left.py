@@ -155,15 +155,9 @@ class CollectionList(VListWidget):
 
         # SPACER
         spacer = UListWidgetItem(self)
-        spacer.setSizeHint(QSize(0, CollectionList.h_ // 2))  # 10 — высота отступа
+        spacer.setSizeHint(QSize(0, self.h_ // 2))  # 10 — высота отступа
         spacer.setFlags(Qt.NoItemFlags)   # не кликабелен
         self.addItem(spacer)
-
-        if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            self.setCurrentRow(self.row(all_colls_item))
-
-        elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-            self.setCurrentRow(self.row(favs_item))
 
         for i in menus:
             coll_btn = CollBtn(i)
@@ -172,8 +166,8 @@ class CollectionList(VListWidget):
             list_item = UListWidgetItem(self)
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
-            if Dynamic.curr_coll_name == i:
-                self.setCurrentRow(self.row(list_item))
+
+        self.setCurrentRow(0)
 
     def contextMenuEvent(self, a0):
         a0.ignore()
@@ -239,9 +233,9 @@ class MenuLeft(QTabWidget):
 
     def open_main_folder(self, index: int):
         MainFolder.current = MainFolder.list_[index]
-        self.collections_list.reload(index)
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
+        self.collections_list.reload(index)
         self.set_window_title.emit()
         self.scroll_to_top.emit()
         self.reload_thumbnails.emit()
