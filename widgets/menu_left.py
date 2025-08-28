@@ -20,26 +20,23 @@ from .win_warn import WinWarn
 class CollectionBtn(QLabel):
     pressed_ = pyqtSignal()
 
-    def __init__(self, short_name: str, coll_name: str):
-        super().__init__(text=short_name)
+    def __init__(self, text: str):
+        super().__init__(text=text)
         self.setStyleSheet("padding-left: 5px;")
-        self.coll_name = coll_name
-        self.short_name = short_name
-        self.main_folder_index: int = 0 # для win_upload
 
     def reveal_cmd(self, *args) -> None:
         main_folder_path = MainFolder.current.availability()
-        if not main_folder_path:
+        if main_folder_path:
+            if self.text() in (Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS):
+                coll = main_folder_path
+            else:
+                coll = os.path.join(main_folder_path, self.text())
+            subprocess.Popen(["open", coll])
+        else:
             self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
             self.win_warn.adjustSize()
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
-        else:
-            if self.coll_name in (Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS):
-                coll = main_folder_path
-            else:
-                coll = os.path.join(main_folder_path, self.coll_name)
-            subprocess.Popen(["open", coll])
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -112,42 +109,30 @@ class CollectionList(VListWidget):
         self.reload_thumbnails.emit()
         self.scroll_to_top.emit()
 
-    def init_ui(self, menus: list[dict[str, str]]):
+    def init_ui(self, menus: list[str]):
         self.clear()
         # ALL COLLECTIONS
-        all_colls_btn = CollectionBtn(
-            short_name=Lang.all_colls,
-            coll_name=Static.NAME_ALL_COLLS
-            )
+        all_colls_btn = CollectionBtn(text=Static.NAME_ALL_COLLS)
         cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
         all_colls_btn.pressed_.connect(cmd_)
         all_colls_item = UListWidgetItem(self)
-        # all_colls_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(all_colls_item)
         self.setItemWidget(all_colls_item, all_colls_btn)
         self.coll_btns.append(all_colls_btn)
 
         # FAVORITES
-        favs_btn = CollectionBtn(
-            short_name=Lang.fav_coll,
-            coll_name=Static.NAME_FAVS
-            )
+        favs_btn = CollectionBtn(text=Static.NAME_FAVS)
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
         favs_btn.pressed_.connect(cmd_)
         favs_item = UListWidgetItem(self)
-        # favs_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(favs_item)
         self.setItemWidget(favs_item, favs_btn)
         self.coll_btns.append(favs_btn)
 
         # RECENTS
-        recents_btn = CollectionBtn(
-            short_name=Lang.recents,
-            coll_name=Static.NAME_RECENTS
-            )
+        recents_btn = CollectionBtn(text=Static.NAME_RECENTS)
         recents_btn.pressed_.connect(self.recents_cmd)
         recents_item = UListWidgetItem(self)
-        # recents_item.setSizeHint(QSize(Static.MENU_LEFT_WIDTH, MenuTab.h_))
         self.addItem(recents_item)
         self.setItemWidget(recents_item, recents_btn)
         self.coll_btns.append(recents_btn)
@@ -164,23 +149,15 @@ class CollectionList(VListWidget):
         elif Dynamic.curr_coll_name == Static.NAME_FAVS:
             self.setCurrentRow(self.row(favs_item))
 
-
-        for data in menus:
-
-            coll_btn = CollectionBtn(
-                short_name=data.get("short_name"),
-                coll_name=data.get("coll_name")
-                )
+        for i in menus:
+            coll_btn = CollectionBtn(i)
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
             coll_btn.pressed_.connect(cmd_)
-
             list_item = UListWidgetItem(self)
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
-
-            if Dynamic.curr_coll_name == data.get("coll_name"):
+            if Dynamic.curr_coll_name == i:
                 self.setCurrentRow(self.row(list_item))
-
             self.coll_btns.append(coll_btn)
 
     def contextMenuEvent(self, a0):
@@ -189,7 +166,7 @@ class CollectionList(VListWidget):
 
 
 class MainFolderList(VListWidget):
-    open_main_folder = pyqtSignal(str)
+    open_main_folder = pyqtSignal(int)
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
@@ -201,20 +178,23 @@ class MainFolderList(VListWidget):
         self.setCurrentRow(0)
 
     def cmd(self, flag: str):
-        main_folder_name = self.currentItem().text()
-        for i in MainFolder.list_:
-            if i.name == main_folder_name:
-                path = i.availability()
-                if path:
-                    if flag == "reveal":
-                        subprocess.Popen(["open", path])
-                    elif flag == "view":
-                        self.open_main_folder.emit(path)
-                    break
-                else:
-                    self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
-                    self.win_warn.center_relative_parent(self.window())
-                    self.win_warn.show()
+        name = self.currentItem().text()
+        folder = next((i for i in MainFolder.list_ if i.name == name), None)
+        if folder is None:
+            return
+
+        path = folder.availability()
+        if not path:
+            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.show()
+            return
+
+        if flag == "reveal":
+            subprocess.Popen(["open", path])
+        elif flag == "view":
+            index = MainFolder.list_.index(folder)
+            self.open_main_folder.emit(index)
 
     def mouseReleaseEvent(self, e):
         idx = self.indexAt(e.pos())
@@ -245,12 +225,9 @@ class MenuLeft(QTabWidget):
         self.menu_tabs_list: list[CollectionList] = []
         self.init_ui()
 
-    def open_main_folder(self, path: str):
-        for i in MainFolder.list_:
-            if i.curr_path == path:
-                MainFolder.current = i
-                self.subfolders.reload(MainFolder.list_.index(i))
-                break
+    def open_main_folder(self, index: int):
+        MainFolder.current = MainFolder.list_[index]
+        self.collections_list.reload(index)
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         self.set_window_title.emit()
         self.scroll_to_top.emit()
@@ -261,44 +238,11 @@ class MenuLeft(QTabWidget):
         self.menu_tabs_list.clear()
 
         main_folders = MainFolderList(self)
-        main_folders.open_main_folder.connect(lambda path: self.open_main_folder(path))
+        main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
         self.addTab(main_folders, Lang.folders)
 
-        self.subfolders = CollectionList(0)
-        self.subfolders.scroll_to_top.connect(self.scroll_to_top.emit)
-        self.subfolders.set_window_title.connect(self.set_window_title.emit)
-        self.subfolders.reload_thumbnails.connect(self.reload_thumbnails.emit)
-        self.addTab(self.subfolders, Lang.collections)
-
-    #     for i in MainFolder.list_:
-    #         main_folder_index = MainFolder.list_.index(i)
-    #         wid = MenuTab(main_folder_index=main_folder_index)
-    #         wid.set_window_title.connect(lambda: self.set_window_title.emit())
-    #         wid.scroll_to_top.connect(lambda: self.scroll_to_top.emit())
-    #         wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
-    #         self.addTab(wid, i.name)
-    #         self.menu_tabs_list.append(wid)
-       
-    #     current_index = MainFolder.list_.index(MainFolder.current)
-    #     self.setCurrentIndex(current_index)
-
-    # def tab_cmd(self, index: int):
-    #     MainFolder.current = MainFolder.list_[index]
-    #     Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
-    #     Dynamic.grid_offset = 0
-
-    #     for i in self.menu_tabs_list:
-    #         i.setCurrentRow(0)
-
-    #     self.set_window_title.emit()
-    #     self.reload_thumbnails.emit()
-    #     self.scroll_to_top.emit()
-
-    # def menu_left_cmd(self, flag: Literal["reload", "select_all_colls"]):
-    #     if flag == "reload":
-    #         self.init_ui()
-    #     elif flag == "select_all_colls":
-    #         for i in self.menu_tabs_list:
-    #             i.setCurrentRow(0)
-    #     else:
-    #         raise Exception("widgets > menu left > wrong flag", flag)
+        self.collections_list = CollectionList(0)
+        self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
+        self.collections_list.set_window_title.connect(self.set_window_title.emit)
+        self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
+        self.addTab(self.collections_list, Lang.collections)

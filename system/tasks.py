@@ -1,12 +1,13 @@
 import gc
 import os
+import re
 from collections import defaultdict
 from datetime import datetime
 
 import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtGui import QImage, QPixmap
 from sqlalchemy import select, update
 
 from cfg import Dynamic, Static
@@ -157,37 +158,21 @@ class LoadCollectionsTask(URunnable):
             MainUtils.print_error()
 
     def get_collections_list(self) -> list[dict]:
-        """
-        Queries the database to load distinct `THUMBS.c.coll`, processes them, 
-        and returns a list of dictionaries containing short and full `THUMBS.c.coll`.
-
-        :return: A sorted list of dictionaries with `short_name` and `coll_name` keys.
-        """
-
         conn = Dbase.engine.connect()
         q = select(THUMBS.c.coll)
         q = q.where(THUMBS.c.brand == self.main_folder.name)
         q = q.distinct()
-        res = conn.execute(q).fetchall()
+        res = conn.execute(q).scalars()
         conn.close()
 
         if not res:
             return list()
 
-        menus: list[dict] = []
-
-        for row in res:
-            coll_name: str = row[0]
-            fake_name = coll_name.lstrip("0123456789").strip()
-            fake_name = fake_name if fake_name else coll_name
-            menus.append(
-                {
-                    "short_name": fake_name,
-                    "coll_name": coll_name
-                }
-            )
-        return sorted(menus, key = lambda x: x["short_name"])
+        return sorted(res, key=self.strip_to_first_letter)
     
+    def strip_to_first_letter(self, s: str) -> str:
+        return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
+        
 
 class LoadImageSignals(QObject):
     finished_ = pyqtSignal(tuple)
