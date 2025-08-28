@@ -295,7 +295,9 @@ class WinMain(UMainWindow):
                 for i in rel_img_path_list
             ]
             self.win_upload = WinUpload()
-            self.win_upload.clicked.connect(lambda path: print(path))
+            cmd = lambda dest: self.filemove_task_start(dest, img_path_list)
+            self.win_upload.clicked.connect(cmd)
+            self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
@@ -329,8 +331,11 @@ class WinMain(UMainWindow):
     def open_upload_win(self, img_path_list: list):
         main_folder_path = MainFolder.current.availability()
         if main_folder_path:
-            self.upload_win = MenuLeft()
-            self.upload_win.show()
+            self.win_upload = WinUpload()
+            cmd = lambda dest: self.upload_task_start(dest, img_path_list)
+            self.win_upload.clicked.connect(cmd)
+            self.win_upload.center_relative_parent(self.window())
+            self.win_upload.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
 

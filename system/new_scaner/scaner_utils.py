@@ -350,7 +350,7 @@ class HashdirUpdater:
 
     def create_thumb(self, img_path: str) -> ndarray | None:
         img = ImgUtils.read_image(img_path)
-        thumb = ThumbUtils.fit_to_thumb(img, ThumbData.DB_PIXMAP_SIZE)
+        thumb = ThumbUtils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
         del img
         gc.collect()
         if isinstance(thumb, ndarray):

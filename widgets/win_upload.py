@@ -101,6 +101,7 @@ class CollBtnList(VListWidget):
             self.subwin = SubWin(path)
             self.subwin.clicked.connect(self.clicked.emit)
             self.subwin.adjustSize()
+            self.subwin.center_relative_parent(self.window())
             self.subwin.show()
 
     def init_ui(self, menus: list[str]):
