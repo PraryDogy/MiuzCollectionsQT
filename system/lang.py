@@ -18,6 +18,12 @@ class _Lang:
         "Добавить папку с коллекциями",
         "Add collections folder"
     ]
+
+    add_main_folder_short = [
+        "Добавить папку",
+        "Add folder"
+    ]
+
     adding = [
         "Добавляю",
         "Add"
