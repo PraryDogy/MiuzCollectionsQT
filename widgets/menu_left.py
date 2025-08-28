@@ -186,7 +186,7 @@ class MainFolderList(VListWidget):
             return
         if e.button() == Qt.MouseButton.LeftButton:
             self._click_timer.stop()
-            self._click_timer.start(100)
+            self._click_timer.start(300)
         return super().mouseReleaseEvent(e)
 
     def mouseDoubleClickEvent(self, e):
