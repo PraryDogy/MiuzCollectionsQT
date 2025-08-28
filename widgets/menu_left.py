@@ -2,7 +2,7 @@ import os
 import re
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
 
@@ -81,15 +81,7 @@ class CollectionList(VListWidget):
 
     def __init__(self):
         super().__init__()
-        self.load_coll_list()
-
-    def reload(self):
-        self.load_coll_list()
-
-    def load_coll_list(self):
-        self.task_ = LoadCollListTask(MainFolder.current)
-        self.task_.signals_.finished_.connect(self.init_ui)
-        UThreadPool.start(self.task_)
+        self.init_ui()
 
     def collection_btn_cmd(self, btn: CollBtn):
         Dynamic.curr_coll_name = btn.coll_name
@@ -98,14 +90,12 @@ class CollectionList(VListWidget):
         self.reload_thumbnails.emit()
         self.scroll_to_top.emit()
 
-    def recents_cmd(self, *args):
-        Dynamic.curr_coll_name = Static.NAME_RECENTS
-        Dynamic.grid_buff_size = 0
-        self.set_window_title.emit()
-        self.reload_thumbnails.emit()
-        self.scroll_to_top.emit()
+    def init_ui(self):
+        self.task_ = LoadCollListTask(MainFolder.current)
+        self.task_.signals_.finished_.connect(self._init_ui)
+        UThreadPool.start(self.task_)
 
-    def init_ui(self, menus: list[str]):
+    def _init_ui(self, menus: list[str]):
         self.clear()
 
         # ALL COLLECTIONS
@@ -126,7 +116,8 @@ class CollectionList(VListWidget):
 
         # RECENTS
         recents_btn = CollBtn(text=Static.NAME_RECENTS)
-        recents_btn.pressed_.connect(self.recents_cmd)
+        cmd_ = lambda: self.collection_btn_cmd(recents_btn)
+        recents_btn.pressed_.connect(cmd_)
         recents_item = UListWidgetItem(self)
         self.addItem(recents_item)
         self.setItemWidget(recents_item, recents_btn)
@@ -137,6 +128,8 @@ class CollectionList(VListWidget):
         spacer.setFlags(Qt.NoItemFlags)   # не кликабелен
         self.addItem(spacer)
 
+        self.setCurrentRow(0)
+
         for i in menus:
             coll_btn = CollBtn(i)
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
@@ -145,7 +138,8 @@ class CollectionList(VListWidget):
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
 
-        self.setCurrentRow(0)
+            if i == Dynamic.curr_coll_name:
+                self.setCurrentItem(list_item)
 
     def contextMenuEvent(self, a0):
         a0.ignore()
@@ -213,7 +207,7 @@ class MenuLeft(QTabWidget):
         MainFolder.current = MainFolder.list_[index]
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_buff_size = 0
-        self.collections_list.reload()
+        self.collections_list.init_ui()
         self.set_window_title.emit()
         self.scroll_to_top.emit()
         self.reload_thumbnails.emit()
