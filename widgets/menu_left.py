@@ -82,17 +82,7 @@ class CollectionList(VListWidget):
         UThreadPool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollectionBtn):
-        """
-        This is a command for `CollectionBtn`. It sets `curr_coll` based
-        on the button's `coll_name`, 
-        resets `grid_offset`, sets the window title, and reloads the image
-        grid according to the `curr_coll`.
-
-        :param btn: An instance of `CollectionBtn` representing the button
-        that was pressed.
-        """
-
-        Dynamic.curr_coll_name = btn.coll_name
+        Dynamic.curr_coll_name = btn.text()
         Dynamic.grid_offset = 0
         Dynamic.resents = False
 
@@ -229,6 +219,7 @@ class MenuLeft(QTabWidget):
         MainFolder.current = MainFolder.list_[index]
         self.collections_list.reload(index)
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
+        Dynamic.grid_offset = 0
         self.set_window_title.emit()
         self.scroll_to_top.emit()
         self.reload_thumbnails.emit()
