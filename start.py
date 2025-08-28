@@ -74,7 +74,7 @@ else:
 
 from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QWidget
 
 from cfg import JsonData, Static
 from system.database import Dbase

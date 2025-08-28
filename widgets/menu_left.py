@@ -106,7 +106,19 @@ class CollectionList(VListWidget):
         self.scroll_to_top.emit()
 
     def upload_cmd(self, btn: CollBtn):
-        print("open subfolder win")
+        main_folder = MainFolder.list_[self.main_folder_index]
+        path = os.path.join(main_folder.curr_path, btn.coll_name)
+        if os.path.exists(path):
+            self.subwin = VListWidget()
+            self.subwin.setWindowModality(Qt.WindowModality.ApplicationModal)
+            self.subwin.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
+
+            for i in os.scandir(path):
+                if i.is_dir():
+                    item = UListWidgetItem(self.subwin, text=i.name)
+                    self.subwin.addItem(item)
+            self.subwin.adjustSize()
+            self.subwin.show()
 
     def recents_cmd(self, *args):
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
@@ -177,8 +189,9 @@ class CollectionList(VListWidget):
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
 
-    def __init__(self, parent: QTabWidget):
+    def __init__(self, parent: QTabWidget, is_window: bool):
         super().__init__(parent=parent)
+        self.is_window = is_window
 
         for i in MainFolder.list_:
             item = UListWidgetItem(parent=self, text=i.name)
@@ -237,6 +250,7 @@ class MenuLeft(QTabWidget):
         if self.is_window:
             self.resize(300, 500)
             self.setWindowModality(Qt.WindowModality.ApplicationModal)
+            self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
 
     def open_main_folder(self, index: int):
         MainFolder.current = MainFolder.list_[index]
@@ -250,7 +264,7 @@ class MenuLeft(QTabWidget):
     def init_ui(self):
         self.clear()
 
-        main_folders = MainFolderList(self)
+        main_folders = MainFolderList(self, self.is_window)
         main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
         self.addTab(main_folders, Lang.folders)
 
