@@ -252,10 +252,10 @@ class WinMain(UMainWindow):
             t = Lang.all_colls
         elif Dynamic.curr_coll_name == Static.NAME_FAVS:
             t = Lang.fav_coll
+        elif Dynamic.curr_coll_name == Static.NAME_RECENTS:
+            t = Lang.recents
         else:
             t = Dynamic.curr_coll_name
-        if Dynamic.resents:
-            t = Lang.recents
         t = f"{main_folder}: {t}"
         self.setWindowTitle(t)
 

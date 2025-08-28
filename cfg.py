@@ -332,7 +332,6 @@ class Dynamic:
     grid_offset: int = 0
     search_widget_text: str = None
     curr_coll_name = Static.NAME_ALL_COLLS
-    resents: bool = False
 
     # какие расширения отображать по умолчанию (и джепеги и послойники)
     types = [Static.ext_non_layers, Static.ext_layers]

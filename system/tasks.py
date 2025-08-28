@@ -587,7 +587,7 @@ class LoadDbImagesTask(URunnable):
             else:
                 f_mod = f"{Lang.months[str(f_mod.month)]} {f_mod.year}"
             item = LoadDbImagesItem(qimage, rel_img_path, coll, fav, f_mod)
-            if Dynamic.resents:
+            if Dynamic.curr_coll_name == Static.NAME_RECENTS:
                 thumbs_dict[0].append(item)
             else:
                 thumbs_dict[f_mod].append(item)
@@ -608,7 +608,7 @@ class LoadDbImagesTask(URunnable):
         stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
         stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
-        if Dynamic.resents:
+        if Dynamic.curr_coll_name == Static.NAME_RECENTS:
             stmt = stmt.order_by(-THUMBS.c.id)
         else:
             stmt = stmt.order_by(-THUMBS.c.mod)
