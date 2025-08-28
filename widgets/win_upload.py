@@ -187,6 +187,8 @@ class WinUpload(WinChild):
         self.collections_list.clicked.connect(self.clicked_cmd)
         self.tab_wid.addTab(self.collections_list, Lang.collections)
 
+        self.tab_wid.setCurrentIndex(1)
+
     def clicked_cmd(self, path: str):
         data = (path, self.main_folders.currentItem().text())
         self.clicked.emit(data)
