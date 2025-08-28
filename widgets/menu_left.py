@@ -80,10 +80,10 @@ class CollectionList(VListWidget):
     reload_thumbnails = pyqtSignal()
     set_window_title = pyqtSignal()
 
-    def __init__(self, main_folder_index: int):
+    def __init__(self, main_folder_index: int, is_window: bool):
         super().__init__()
         self.main_folder_index = main_folder_index
-        self.coll_btns: list[CollBtn] = []
+        self.is_window = is_window
         self.load_coll_list()
 
     def reload(self, main_folder_index: int):
@@ -105,6 +105,9 @@ class CollectionList(VListWidget):
         self.reload_thumbnails.emit()
         self.scroll_to_top.emit()
 
+    def upload_cmd(self, btn: CollBtn):
+        print("open subfolder win")
+
     def recents_cmd(self, *args):
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
@@ -116,54 +119,55 @@ class CollectionList(VListWidget):
 
     def init_ui(self, menus: list[str]):
         self.clear()
-        # ALL COLLECTIONS
-        all_colls_btn = CollBtn(text=Static.NAME_ALL_COLLS)
-        cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
-        all_colls_btn.pressed_.connect(cmd_)
-        all_colls_item = UListWidgetItem(self)
-        self.addItem(all_colls_item)
-        self.setItemWidget(all_colls_item, all_colls_btn)
-        self.coll_btns.append(all_colls_btn)
 
-        # FAVORITES
-        favs_btn = CollBtn(text=Static.NAME_FAVS)
-        cmd_ = lambda: self.collection_btn_cmd(favs_btn)
-        favs_btn.pressed_.connect(cmd_)
-        favs_item = UListWidgetItem(self)
-        self.addItem(favs_item)
-        self.setItemWidget(favs_item, favs_btn)
-        self.coll_btns.append(favs_btn)
+        if not self.is_window:
+            # ALL COLLECTIONS
+            all_colls_btn = CollBtn(text=Static.NAME_ALL_COLLS)
+            cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
+            all_colls_btn.pressed_.connect(cmd_)
+            all_colls_item = UListWidgetItem(self)
+            self.addItem(all_colls_item)
+            self.setItemWidget(all_colls_item, all_colls_btn)
 
-        # RECENTS
-        recents_btn = CollBtn(text=Static.NAME_RECENTS)
-        recents_btn.pressed_.connect(self.recents_cmd)
-        recents_item = UListWidgetItem(self)
-        self.addItem(recents_item)
-        self.setItemWidget(recents_item, recents_btn)
-        self.coll_btns.append(recents_btn)
+            # FAVORITES
+            favs_btn = CollBtn(text=Static.NAME_FAVS)
+            cmd_ = lambda: self.collection_btn_cmd(favs_btn)
+            favs_btn.pressed_.connect(cmd_)
+            favs_item = UListWidgetItem(self)
+            self.addItem(favs_item)
+            self.setItemWidget(favs_item, favs_btn)
 
-        # SPACER
-        spacer = UListWidgetItem(self)
-        spacer.setSizeHint(QSize(0, CollectionList.h_ // 2))  # 10 — высота отступа
-        spacer.setFlags(Qt.NoItemFlags)   # не кликабелен
-        self.addItem(spacer)
+            # RECENTS
+            recents_btn = CollBtn(text=Static.NAME_RECENTS)
+            recents_btn.pressed_.connect(self.recents_cmd)
+            recents_item = UListWidgetItem(self)
+            self.addItem(recents_item)
+            self.setItemWidget(recents_item, recents_btn)
 
-        if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            self.setCurrentRow(self.row(all_colls_item))
+            # SPACER
+            spacer = UListWidgetItem(self)
+            spacer.setSizeHint(QSize(0, CollectionList.h_ // 2))  # 10 — высота отступа
+            spacer.setFlags(Qt.NoItemFlags)   # не кликабелен
+            self.addItem(spacer)
 
-        elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-            self.setCurrentRow(self.row(favs_item))
+            if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
+                self.setCurrentRow(self.row(all_colls_item))
+
+            elif Dynamic.curr_coll_name == Static.NAME_FAVS:
+                self.setCurrentRow(self.row(favs_item))
 
         for i in menus:
             coll_btn = CollBtn(i)
-            cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
+            if self.is_window:
+                cmd_ = lambda wid=coll_btn: self.upload_cmd(wid)
+            else:
+                cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
             coll_btn.pressed_.connect(cmd_)
             list_item = UListWidgetItem(self)
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
             if Dynamic.curr_coll_name == i:
                 self.setCurrentRow(self.row(list_item))
-            self.coll_btns.append(coll_btn)
 
     def contextMenuEvent(self, a0):
         a0.ignore()
@@ -225,10 +229,14 @@ class MenuLeft(QTabWidget):
     scroll_to_top = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     
-    def __init__(self):
+    def __init__(self, is_window: bool):
         super().__init__()
-        self.menu_tabs_list: list[CollectionList] = []
+        self.is_window = is_window
         self.init_ui()
+
+        if self.is_window:
+            self.resize(300, 500)
+            self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
     def open_main_folder(self, index: int):
         MainFolder.current = MainFolder.list_[index]
@@ -241,13 +249,12 @@ class MenuLeft(QTabWidget):
 
     def init_ui(self):
         self.clear()
-        self.menu_tabs_list.clear()
 
         main_folders = MainFolderList(self)
         main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
         self.addTab(main_folders, Lang.folders)
 
-        self.collections_list = CollectionList(0)
+        self.collections_list = CollectionList(0, self.is_window)
         self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
         self.collections_list.set_window_title.connect(self.set_window_title.emit)
         self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
