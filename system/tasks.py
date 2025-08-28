@@ -605,7 +605,7 @@ class LoadDbImagesTask(URunnable):
             THUMBS.c.fav
             )
         
-        stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_offset)
+        stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_buff_size)
         stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
         if Dynamic.curr_coll_name == Static.NAME_RECENTS:

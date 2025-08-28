@@ -71,7 +71,7 @@ class WidSearch(ULineEdit):
     def clear_search(self):
         self.clear()
         Dynamic.search_widget_text = None
-        Dynamic.grid_offset = 0
+        Dynamic.grid_buff_size = 0
         self.reload_thumbnails.emit()
         self.scroll_to_top.emit()
 

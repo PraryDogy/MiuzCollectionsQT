@@ -295,12 +295,12 @@ class Grid(VScrollArea):
         self.verticalScrollBar().setValue(0)
 
     def reload_thumbnails(self):
-        Dynamic.grid_offset = 0
+        Dynamic.grid_buff_size = 0
         cmd_ = lambda db_images: self.first_grid(db_images)
         self.load_db_images_task(cmd_)
 
     def load_more_thumbnails(self):
-        Dynamic.grid_offset += Static.GRID_LIMIT
+        Dynamic.grid_buff_size += Static.GRID_LIMIT
         cmd_ = lambda db_images: self.grid_more(db_images)
         self.load_db_images_task(cmd_)
 

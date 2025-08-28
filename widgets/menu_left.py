@@ -93,16 +93,14 @@ class CollectionList(VListWidget):
 
     def collection_btn_cmd(self, btn: CollBtn):
         Dynamic.curr_coll_name = btn.coll_name
-        Dynamic.grid_offset = 0
-        Dynamic.resents = False
+        Dynamic.grid_buff_size = 0
         self.set_window_title.emit()
         self.reload_thumbnails.emit()
         self.scroll_to_top.emit()
 
     def recents_cmd(self, *args):
         Dynamic.curr_coll_name = Static.NAME_RECENTS
-        Dynamic.grid_offset = 0
-        Dynamic.resents = True
+        Dynamic.grid_buff_size = 0
         self.set_window_title.emit()
         self.reload_thumbnails.emit()
         self.scroll_to_top.emit()
@@ -214,8 +212,7 @@ class MenuLeft(QTabWidget):
     def open_main_folder(self, index: int):
         MainFolder.current = MainFolder.list_[index]
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
-        Dynamic.grid_offset = 0
-        Dynamic.resents = False
+        Dynamic.grid_buff_size = 0
         self.collections_list.reload()
         self.set_window_title.emit()
         self.scroll_to_top.emit()

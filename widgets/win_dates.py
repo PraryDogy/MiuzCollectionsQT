@@ -270,7 +270,7 @@ class WinDates(WinSystem):
         else:
             Dynamic.date_start, Dynamic.date_end = None, None
             Dynamic.f_date_start, Dynamic.f_date_end = None, None
-            Dynamic.grid_offset = 0
+            Dynamic.grid_buff_size = 0
             self.reload_thumbnails.emit()
             self.scroll_to_top.emit()
             self.dates_btn_normal.emit()
