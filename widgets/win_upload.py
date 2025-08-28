@@ -12,7 +12,7 @@ from system.main_folder import MainFolder
 from system.tasks import LoadCollListTask
 from system.utils import UThreadPool
 
-from ._base_widgets import UListWidgetItem, UMenu, VListWidget
+from ._base_widgets import UListWidgetItem, UMenu, VListWidget, WinChild
 from .win_warn import WinWarn
 
 
@@ -73,30 +73,51 @@ class CollBtn(BaseCollBtn):
         return super().contextMenuEvent(ev)
 
 
-class Subwin(VListWidget):
+class _SubWin(VListWidget):
+    clicked = pyqtSignal(str)
+
     def __init__(self, path: str):
         super().__init__()
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
 
-
+        root = UListWidgetItem(self, text=os.path.basename(path))
+        root.path = path
+        self.addItem(root)
 
         for i in os.scandir(path):
             if i.is_dir():
                 item = UListWidgetItem(self, text=i.name)
+                item.path = i.path
                 self.addItem(item)
+
+        self.setCurrentRow(0)
+
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.MouseButton.LeftButton:
+            path = self.currentItem().path
+            print(path)
+
+        return super().mouseReleaseEvent(e)
+    
+
+class SubWin(WinChild):
+    clicked = pyqtSignal(str)
+
+    def __init__(self, path):
+        super().__init__()
+        self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
+        self.v_list = _SubWin(path)
+        self.v_list.clicked.connect(self.clicked.emit)
+        self.central_layout.addWidget(self.v_list)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
-
+    
 
 class CollectionList(VListWidget):
     h_ = 30
-    scroll_to_top = pyqtSignal()
-    reload_thumbnails = pyqtSignal()
-    set_window_title = pyqtSignal()
+    clicked = pyqtSignal(str)
 
     def __init__(self, main_folder_index: int):
         super().__init__()
@@ -117,7 +138,8 @@ class CollectionList(VListWidget):
         main_folder = MainFolder.list_[self.main_folder_index]
         path = os.path.join(main_folder.curr_path, btn.coll_name)
         if os.path.exists(path):
-            self.subwin = Subwin(path)
+            self.subwin = SubWin(path)
+            self.subwin.clicked.connect(self.clicked.emit)
             self.subwin.adjustSize()
             self.subwin.show()
 
@@ -130,8 +152,8 @@ class CollectionList(VListWidget):
             list_item = UListWidgetItem(self)
             self.addItem(list_item)
             self.setItemWidget(list_item, coll_btn)
-            if Dynamic.curr_coll_name == i:
-                self.setCurrentRow(self.row(list_item))
+
+        self.setCurrentRow(0)
 
     def contextMenuEvent(self, a0):
         a0.ignore()
@@ -186,18 +208,22 @@ class MainFolderList(VListWidget):
         menu.show_()
 
 
-class WinUpload(QTabWidget):
-    
+class WinUpload(WinChild):
+    clicked = pyqtSignal(str)
+
     def __init__(self):
         super().__init__()
-        self.resize(300, 600)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.resize(300, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
-        main_folders = MainFolderList(self)
+        self.tab_wid = QTabWidget()
+        self.central_layout.addWidget(self.tab_wid)
+
+        main_folders = MainFolderList(self.tab_wid)
         main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
-        self.addTab(main_folders, Lang.folders)
+        self.tab_wid.addTab(main_folders, Lang.folders)
         self.collections_list = CollectionList(0)
-        self.addTab(self.collections_list, Lang.collections)
+        self.collections_list.clicked.connect(self.clicked.emit)
+        self.tab_wid.addTab(self.collections_list, Lang.collections)
 
     def open_main_folder(self, index: int):
         self.collections_list.reload(index)

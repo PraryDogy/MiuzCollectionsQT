@@ -295,6 +295,7 @@ class WinMain(UMainWindow):
                 for i in rel_img_path_list
             ]
             self.win_upload = WinUpload()
+            self.win_upload.clicked.connect(lambda path: print(path))
             self.win_upload.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
