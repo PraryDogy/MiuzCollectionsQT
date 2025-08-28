@@ -349,7 +349,11 @@ class WinMain(UMainWindow):
     def upload_task_finished(self, img_path_list: list[str]):
         upload_files_task = UploadFilesTask(img_path_list)
         upload_files_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-        upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
+
+        if img_path_list and MainFolder.current.curr_path in img_path_list[0]:
+            upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
+        else:
+            print("незамеи обновлять сетку")
         UThreadPool.start(upload_files_task)
 
     def save_files_task(self, dest: str, img_path_list: list):
