@@ -79,18 +79,15 @@ class CollectionList(VListWidget):
     reload_thumbnails = pyqtSignal()
     set_window_title = pyqtSignal()
 
-    def __init__(self, main_folder_index: int):
+    def __init__(self):
         super().__init__()
-        self.main_folder_index = main_folder_index
         self.load_coll_list()
 
-    def reload(self, main_folder_index: int):
-        self.main_folder_index = main_folder_index
+    def reload(self):
         self.load_coll_list()
 
     def load_coll_list(self):
-        main_folder = MainFolder.list_[self.main_folder_index]
-        self.task_ = LoadCollListTask(main_folder)
+        self.task_ = LoadCollListTask(MainFolder.current)
         self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.start(self.task_)
 
@@ -98,31 +95,14 @@ class CollectionList(VListWidget):
         Dynamic.curr_coll_name = btn.coll_name
         Dynamic.grid_offset = 0
         Dynamic.resents = False
-
         self.set_window_title.emit()
         self.reload_thumbnails.emit()
         self.scroll_to_top.emit()
 
-    def upload_cmd(self, btn: CollBtn):
-        main_folder = MainFolder.list_[self.main_folder_index]
-        path = os.path.join(main_folder.curr_path, btn.coll_name)
-        if os.path.exists(path):
-            self.subwin = VListWidget()
-            self.subwin.setWindowModality(Qt.WindowModality.ApplicationModal)
-            self.subwin.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
-
-            for i in os.scandir(path):
-                if i.is_dir():
-                    item = UListWidgetItem(self.subwin, text=i.name)
-                    self.subwin.addItem(item)
-            self.subwin.adjustSize()
-            self.subwin.show()
-
     def recents_cmd(self, *args):
-        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
+        Dynamic.curr_coll_name = Static.NAME_RECENTS
         Dynamic.grid_offset = 0
         Dynamic.resents = True
-
         self.set_window_title.emit()
         self.reload_thumbnails.emit()
         self.scroll_to_top.emit()
@@ -235,7 +215,8 @@ class MenuLeft(QTabWidget):
         MainFolder.current = MainFolder.list_[index]
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_offset = 0
-        self.collections_list.reload(index)
+        Dynamic.resents = False
+        self.collections_list.reload()
         self.set_window_title.emit()
         self.scroll_to_top.emit()
         self.reload_thumbnails.emit()
@@ -247,7 +228,7 @@ class MenuLeft(QTabWidget):
         main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
         self.addTab(main_folders, Lang.folders)
 
-        self.collections_list = CollectionList(0)
+        self.collections_list = CollectionList()
         self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
         self.collections_list.set_window_title.connect(self.set_window_title.emit)
         self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
