@@ -204,6 +204,7 @@ class JsonData:
     dark_mode: int = 0
     scaner_minutes: int = 5
     new_scaner: int = True
+    abc_name: bool = True
     apps = [
         "preview",
         "photos",

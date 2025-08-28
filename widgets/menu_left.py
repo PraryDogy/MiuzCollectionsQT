@@ -8,12 +8,11 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import (QAction, QLabel, QListWidgetItem, QTabWidget,
                              QWidget)
 
-from cfg import Dynamic, Static
+from cfg import Dynamic, Static, JsonData
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import LoadCollectionsTask
 from system.utils import UThreadPool
-
 from ._base_widgets import UListWidgetItem, UMenu, VListWidget
 from .win_warn import WinWarn
 
@@ -30,7 +29,8 @@ class CollectionBtn(QLabel):
         }
         if text in data:
             text = data.get(text)
-        text = re.sub(r'^[^A-Za-zА-Яа-я]+', '', text)
+        if JsonData.abc_name:
+            text = re.sub(r'^[^A-Za-zА-Яа-я]+', '', text)
         super().__init__(text=text)
         self.setStyleSheet("padding-left: 5px;")
 
