@@ -97,7 +97,10 @@ class CollBtnList(VListWidget):
     def collection_btn_cmd(self, btn: CollBtn):
         main_folder = MainFolder.list_[self.main_folder_index]
         path = os.path.join(main_folder.curr_path, btn.coll_name)
-        if os.path.exists(path):
+        if btn.coll_name == Static.NAME_ALL_COLLS:
+            path = main_folder.curr_path
+            self.clicked.emit(path)
+        elif os.path.exists(path):
             self.subwin = SubWin(path)
             self.subwin.clicked.connect(self.clicked.emit)
             self.subwin.adjustSize()
@@ -106,6 +109,14 @@ class CollBtnList(VListWidget):
 
     def init_ui(self, menus: list[str]):
         self.clear()
+
+        coll_btn = CollBtn(Static.NAME_ALL_COLLS)
+        cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
+        coll_btn.pressed_.connect(cmd_)
+        list_item = UListWidgetItem(self)
+        self.addItem(list_item)
+        self.setItemWidget(list_item, coll_btn)
+
         for i in menus:
             coll_btn = CollBtn(i)
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
@@ -154,7 +165,7 @@ class WinUpload(WinChild):
 
     def __init__(self):
         super().__init__()
-        self.resize(300, 500)
+        self.resize(250, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.tab_wid = QTabWidget()
         self.central_layout.addWidget(self.tab_wid)
@@ -168,7 +179,8 @@ class WinUpload(WinChild):
 
     def clicked_cmd(self, path: str):
         self.clicked.emit(path)
-        self.collections_list.subwin.deleteLater()
+        if hasattr(self.collections_list, "subwin"):
+            self.collections_list.subwin.deleteLater()
         self.deleteLater()
 
     def keyPressEvent(self, a0):
