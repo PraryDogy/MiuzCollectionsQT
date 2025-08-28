@@ -56,22 +56,6 @@ class CollBtn(BaseCollBtn):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.pressed_.emit()
 
-    def contextMenuEvent(self, ev):
-        self.context_menu = UMenu(ev)
-
-        preview = QAction(Lang.view, self.context_menu)
-        preview.triggered.connect(lambda: self.pressed_.emit())
-        self.context_menu.addAction(preview)
-
-        self.context_menu.addSeparator()
-
-        show_in_finder = QAction(Lang.reveal_in_finder, self.context_menu)
-        show_in_finder.triggered.connect(lambda: self.reveal_cmd())
-        self.context_menu.addAction(show_in_finder)
-
-        self.context_menu.show_()
-        return super().contextMenuEvent(ev)
-
 
 class _SubWin(VListWidget):
     clicked = pyqtSignal(str)
@@ -155,10 +139,6 @@ class CollectionList(VListWidget):
 
         self.setCurrentRow(0)
 
-    def contextMenuEvent(self, a0):
-        a0.ignore()
-        return super().contextMenuEvent(a0)
-
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
@@ -196,16 +176,6 @@ class MainFolderList(VListWidget):
         if e.button() == Qt.MouseButton.LeftButton:
             self.cmd("view")
         return super().mouseReleaseEvent(e)
-
-    def contextMenuEvent(self, a0):
-        menu = UMenu(a0)
-        open = QAction(Lang.view, menu)
-        open.triggered.connect(lambda: self.cmd("view"))
-        menu.addAction(open)
-        reveal = QAction(Lang.reveal_in_finder, menu)
-        reveal.triggered.connect(lambda: self.cmd("reveal"))
-        menu.addAction(reveal)
-        menu.show_()
 
 
 class WinUpload(WinChild):
