@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 from typing import Literal
 
@@ -21,16 +22,25 @@ class CollectionBtn(QLabel):
     pressed_ = pyqtSignal()
 
     def __init__(self, text: str):
+        self.coll_name = text
+        data = {
+            Static.NAME_ALL_COLLS: Lang.all_colls,
+            Static.NAME_RECENTS: Lang.recents,
+            Static.NAME_FAVS: Lang.fav_coll
+        }
+        if text in data:
+            text = data.get(text)
+        text = re.sub(r'^[^A-Za-zА-Яа-я]+', '', text)
         super().__init__(text=text)
         self.setStyleSheet("padding-left: 5px;")
 
     def reveal_cmd(self, *args) -> None:
         main_folder_path = MainFolder.current.availability()
         if main_folder_path:
-            if self.text() in (Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS):
+            if self.coll_name in (Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS):
                 coll = main_folder_path
             else:
-                coll = os.path.join(main_folder_path, self.text())
+                coll = os.path.join(main_folder_path, self.coll_name)
             subprocess.Popen(["open", coll])
         else:
             self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
@@ -82,7 +92,7 @@ class CollectionList(VListWidget):
         UThreadPool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollectionBtn):
-        Dynamic.curr_coll_name = btn.text()
+        Dynamic.curr_coll_name = btn.coll_name
         Dynamic.grid_offset = 0
         Dynamic.resents = False
 
