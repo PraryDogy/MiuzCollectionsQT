@@ -73,6 +73,25 @@ class CollBtn(BaseCollBtn):
         return super().contextMenuEvent(ev)
 
 
+class Subwin(VListWidget):
+    def __init__(self, path: str):
+        super().__init__()
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
+
+
+
+        for i in os.scandir(path):
+            if i.is_dir():
+                item = UListWidgetItem(self, text=i.name)
+                self.addItem(item)
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+
+
 class CollectionList(VListWidget):
     h_ = 30
     scroll_to_top = pyqtSignal()
@@ -95,76 +114,15 @@ class CollectionList(VListWidget):
         UThreadPool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollBtn):
-        Dynamic.curr_coll_name = btn.coll_name
-        Dynamic.grid_offset = 0
-        Dynamic.resents = False
-
-        self.set_window_title.emit()
-        self.reload_thumbnails.emit()
-        self.scroll_to_top.emit()
-
-    def upload_cmd(self, btn: CollBtn):
         main_folder = MainFolder.list_[self.main_folder_index]
         path = os.path.join(main_folder.curr_path, btn.coll_name)
         if os.path.exists(path):
-            self.subwin = VListWidget()
-            self.subwin.setWindowModality(Qt.WindowModality.ApplicationModal)
-            self.subwin.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
-
-            for i in os.scandir(path):
-                if i.is_dir():
-                    item = UListWidgetItem(self.subwin, text=i.name)
-                    self.subwin.addItem(item)
+            self.subwin = Subwin(path)
             self.subwin.adjustSize()
             self.subwin.show()
 
-    def recents_cmd(self, *args):
-        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
-        Dynamic.grid_offset = 0
-        Dynamic.resents = True
-
-        self.set_window_title.emit()
-        self.reload_thumbnails.emit()
-        self.scroll_to_top.emit()
-
     def init_ui(self, menus: list[str]):
         self.clear()
-
-        # ALL COLLECTIONS
-        all_colls_btn = CollBtn(text=Static.NAME_ALL_COLLS)
-        cmd_ = lambda: self.collection_btn_cmd(all_colls_btn)
-        all_colls_btn.pressed_.connect(cmd_)
-        all_colls_item = UListWidgetItem(self)
-        self.addItem(all_colls_item)
-        self.setItemWidget(all_colls_item, all_colls_btn)
-
-        # FAVORITES
-        favs_btn = CollBtn(text=Static.NAME_FAVS)
-        cmd_ = lambda: self.collection_btn_cmd(favs_btn)
-        favs_btn.pressed_.connect(cmd_)
-        favs_item = UListWidgetItem(self)
-        self.addItem(favs_item)
-        self.setItemWidget(favs_item, favs_btn)
-
-        # RECENTS
-        recents_btn = CollBtn(text=Static.NAME_RECENTS)
-        recents_btn.pressed_.connect(self.recents_cmd)
-        recents_item = UListWidgetItem(self)
-        self.addItem(recents_item)
-        self.setItemWidget(recents_item, recents_btn)
-
-        # SPACER
-        spacer = UListWidgetItem(self)
-        spacer.setSizeHint(QSize(0, CollectionList.h_ // 2))  # 10 — высота отступа
-        spacer.setFlags(Qt.NoItemFlags)   # не кликабелен
-        self.addItem(spacer)
-
-        if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            self.setCurrentRow(self.row(all_colls_item))
-
-        elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-            self.setCurrentRow(self.row(favs_item))
-
         for i in menus:
             coll_btn = CollBtn(i)
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
