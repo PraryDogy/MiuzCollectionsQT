@@ -294,8 +294,8 @@ class WinMain(UMainWindow):
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
-            test = MenuLeft()
-            test.show()
+            self.win_upload = WinUpload()
+            self.win_upload.show()
         else:
             self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
 

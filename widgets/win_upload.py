@@ -228,33 +228,23 @@ class MainFolderList(VListWidget):
         menu.show_()
 
 
-class MenuLeft(QTabWidget):
-    set_window_title = pyqtSignal()
-    scroll_to_top = pyqtSignal()
-    reload_thumbnails = pyqtSignal()
+class WinUpload(QTabWidget):
     
     def __init__(self):
         super().__init__()
-        self.init_ui()
-
-    def open_main_folder(self, index: int):
-        MainFolder.current = MainFolder.list_[index]
-        self.collections_list.reload(index)
-        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
-        Dynamic.grid_offset = 0
-        self.set_window_title.emit()
-        self.scroll_to_top.emit()
-        self.reload_thumbnails.emit()
-
-    def init_ui(self):
-        self.clear()
-
+        self.resize(300, 600)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         main_folders = MainFolderList(self)
         main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
         self.addTab(main_folders, Lang.folders)
-
         self.collections_list = CollectionList(0)
-        self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
-        self.collections_list.set_window_title.connect(self.set_window_title.emit)
-        self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
         self.addTab(self.collections_list, Lang.collections)
+
+    def open_main_folder(self, index: int):
+        self.collections_list.reload(index)
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
