@@ -161,7 +161,7 @@ class MainFolderList(VListWidget):
 
 
 class WinUpload(WinChild):
-    clicked = pyqtSignal(str)
+    clicked = pyqtSignal(tuple)
 
     def __init__(self):
         super().__init__()
@@ -170,15 +170,16 @@ class WinUpload(WinChild):
         self.tab_wid = QTabWidget()
         self.central_layout.addWidget(self.tab_wid)
 
-        main_folders = MainFolderList()
-        main_folders.open_main_folder.connect(lambda index: self.collections_list.reload(index))
-        self.tab_wid.addTab(main_folders, Lang.folders)
+        self.main_folders = MainFolderList()
+        self.main_folders.open_main_folder.connect(lambda index: self.collections_list.reload(index))
+        self.tab_wid.addTab(self.main_folders, Lang.folders)
         self.collections_list = CollBtnList(0)
         self.collections_list.clicked.connect(self.clicked_cmd)
         self.tab_wid.addTab(self.collections_list, Lang.collections)
 
     def clicked_cmd(self, path: str):
-        self.clicked.emit(path)
+        data = (path, self.main_folders.currentItem().text())
+        self.clicked.emit(data)
         if hasattr(self.collections_list, "subwin"):
             self.collections_list.subwin.deleteLater()
         self.deleteLater()

@@ -329,32 +329,25 @@ class WinMain(UMainWindow):
         UThreadPool.start(remove_files_task)
 
     def open_upload_win(self, img_path_list: list):
-        main_folder_path = MainFolder.current.availability()
-        if main_folder_path:
-            self.win_upload = WinUpload()
-            cmd = lambda dest: self.upload_task_start(dest, img_path_list)
-            self.win_upload.clicked.connect(cmd)
-            self.win_upload.center_relative_parent(self.window())
-            self.win_upload.show()
-        else:
-            self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
+        self.win_upload = WinUpload()
+        cmd = lambda data: self.upload_task_start(data, img_path_list)
+        self.win_upload.clicked.connect(cmd)
+        self.win_upload.center_relative_parent(self.window())
+        self.win_upload.show()
 
-    def upload_task_start(self, dest: str, img_path_list: list[str]):
+    def upload_task_start(self, data: tuple, img_path_list: list[str]):
+        dest, main_folder_name = data
+        main_folder = next(i for i in MainFolder.list_ if main_folder_name == i.name)
         copy_files_task = CopyFilesTask(dest, img_path_list)
-        cmd = lambda img_path_list: self.upload_task_finished(img_path_list)
+        cmd = lambda img_path_list: self.upload_task_finished(main_folder, img_path_list)
         copy_files_task.signals_.finished_.connect(cmd)
         UThreadPool.start(copy_files_task)
         self.open_downloads_win()
 
-    def upload_task_finished(self, img_path_list: list[str]):
-        upload_files_task = UploadFilesTask(img_path_list)
+    def upload_task_finished(self, main_folder: MainFolder, img_path_list: list[str]):
+        upload_files_task = UploadFilesTask(img_path_list, main_folder)
         upload_files_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-
-        if img_path_list and MainFolder.current.curr_path in img_path_list[0]:
-            upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
-        else:
-            upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
-            print("незамеи обновлять сетку")
+        upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
         UThreadPool.start(upload_files_task)
 
     def save_files_task(self, dest: str, img_path_list: list):

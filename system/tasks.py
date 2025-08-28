@@ -415,7 +415,7 @@ class UploadFilesSignals(QObject):
 
 
 class UploadFilesTask(URunnable):
-    def __init__(self, img_path_list: list):
+    def __init__(self, img_path_list: list, main_folder: MainFolder):
         """ 
         Запуск: UThreadPool.start   
         Сигналы: finished_(), progress_text(str), reload_gui()
@@ -440,9 +440,13 @@ class UploadFilesTask(URunnable):
         """
         super().__init__()
         self.img_path_list = img_path_list
+        self.main_folder = main_folder
         self.signals_ = UploadFilesSignals()
 
     def task(self):
+        """
+        ДОБАВЛЯЕТ В БД В ТЕКУЩУЮ MAINFOLDER
+        """
         img_with_stats_list = []
         rel_thumb_path_list = []
         for img_path in self.img_path_list:
@@ -463,11 +467,11 @@ class UploadFilesTask(URunnable):
             text = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {len(rel_thumb_path_list)} "
             self.signals_.progress_text.emit(text)
 
-        args = (rel_thumb_path_list, img_with_stats_list, MainFolder.current, self.task_state)
+        args = (rel_thumb_path_list, img_with_stats_list, self.main_folder, self.task_state)
         file_updater = HashdirUpdater(*args)
         rel_thumb_path_list, new_items = file_updater.run()
 
-        db_updater = DbUpdater(rel_thumb_path_list, new_items, MainFolder.current)
+        db_updater = DbUpdater(rel_thumb_path_list, new_items, self.main_folder)
         db_updater.run()
 
         try:
@@ -555,7 +559,6 @@ class LoadDbImagesTask(URunnable):
     def task(self):
         stmt = self.get_stmt()
         res: list[tuple] = self.conn.execute(stmt).fetchall()
-        print(len(res), "длина загрузки из бд")   
 
         self.conn.close()
         self.create_dict(res)
