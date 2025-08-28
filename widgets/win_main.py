@@ -353,6 +353,7 @@ class WinMain(UMainWindow):
         if img_path_list and MainFolder.current.curr_path in img_path_list[0]:
             upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
         else:
+            upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
             print("незамеи обновлять сетку")
         UThreadPool.start(upload_files_task)
 
