@@ -554,7 +554,8 @@ class LoadDbImagesTask(URunnable):
 
     def task(self):
         stmt = self.get_stmt()
-        res: list[tuple] = self.conn.execute(stmt).fetchall()        
+        res: list[tuple] = self.conn.execute(stmt).fetchall()
+        print(len(res), "длина загрузки из бд")   
 
         self.conn.close()
         self.create_dict(res)
@@ -621,7 +622,7 @@ class LoadDbImagesTask(URunnable):
         if Dynamic.curr_coll_name == Static.NAME_FAVS:
             stmt = stmt.where(THUMBS.c.fav == 1)
 
-        elif Dynamic.curr_coll_name != Static.NAME_ALL_COLLS:
+        elif Dynamic.curr_coll_name not in (Static.NAME_ALL_COLLS, Static.NAME_RECENTS):
             stmt = stmt.where(THUMBS.c.coll == Dynamic.curr_coll_name)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
