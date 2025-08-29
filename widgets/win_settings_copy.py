@@ -1,21 +1,30 @@
+import copy
+import os
+import shutil
 import subprocess
-from copy import deepcopy
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import (QGroupBox, QLabel, QPushButton, QSpinBox,
-                             QSplitter, QWidget)
+from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QFrame,
+                             QGroupBox, QLabel, QPushButton, QSpacerItem,
+                             QSpinBox, QSplitter, QTabWidget, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lang
 from system.main_folder import MainFolder
+from system.paletes import ThemeChanger
+from system.utils import MainUtils
 
-from ._base_widgets import (UHBoxLayout, UListWidgetItem, UVBoxLayout,
-                            VListWidget, WinChild)
+from ._base_widgets import (UHBoxLayout, ULineEdit, UListWidgetItem, UMenu,
+                            UTextEdit, UVBoxLayout, VListWidget, WinChild,
+                            WinSystem)
 from .win_help import WinHelp
 
 
 class LangReset(QGroupBox):
     reset = pyqtSignal()
+    changed = pyqtSignal()
 
     def __init__(self, json_data_copy: JsonData):
         """
@@ -52,6 +61,7 @@ class LangReset(QGroupBox):
 
         self.reset_data_btn = QPushButton(Lang.reset)
         self.reset_data_btn.setFixedWidth(115)
+        self.reset_data_btn.clicked.connect(self.changed.emit)
         self.reset_data_btn.clicked.connect(self.reset.emit)
         sec_row_lay.addWidget(self.reset_data_btn)
 
@@ -68,6 +78,7 @@ class LangReset(QGroupBox):
         else:
             self.lang_btn.setText("Русский")
             self.json_data.lang_ind = 0
+        self.changed.emit()
 
 
 class SimpleSettings(QGroupBox):
@@ -119,6 +130,8 @@ class SimpleSettings(QGroupBox):
 
 
 class ScanerSettings(QGroupBox):
+    changed = pyqtSignal()
+
     def __init__(self, json_data_copy: JsonData):
         super().__init__()
         self.json_data_copy = json_data_copy
@@ -145,7 +158,7 @@ class ScanerSettings(QGroupBox):
         label = QLabel(Lang.scan_every, self)
         self.spin_lay.addWidget(label)
 
-        self.change_theme()
+        self.theme_changed()
 
         first_row = QWidget()
         self.main_lay.addWidget(first_row)
@@ -168,7 +181,7 @@ class ScanerSettings(QGroupBox):
 
         self.checkbox.setChecked(True)
 
-    def change_theme(self):
+    def theme_changed(self):
         if self.json_data_copy.dark_mode == 0:
             self.spin_lay.setContentsMargins(5, 0, 0, 0)
             self.spin.setFixedWidth(104)
@@ -178,6 +191,7 @@ class ScanerSettings(QGroupBox):
 
     def change_scan_time(self, value: int):
         self.json_data_copy.scaner_minutes = value
+        self.changed.emit()
 
     def change_new_scaner(self):
         if self.json_data_copy.new_scaner:
@@ -186,34 +200,211 @@ class ScanerSettings(QGroupBox):
         else:
             self.json_data_copy.new_scaner = True
             self.checkbox.setText(Lang.disable)
+        self.changed.emit()
+
+
+class ThemesBtn(QFrame):
+    clicked = pyqtSignal()
+
+    def __init__(self, svg_path: str, label_text: str):
+        super().__init__()
+        v_lay = UVBoxLayout()
+        self.setLayout(v_lay)
+
+        self.svg_container = QFrame()
+        self.svg_container.setObjectName("svg_container")
+        self.svg_container.setStyleSheet(self.regular_style())
+        v_lay.addWidget(self.svg_container)
+
+        svg_lay = UVBoxLayout()
+        self.svg_container.setLayout(svg_lay)
+
+        self.svg_widget = QSvgWidget(svg_path)
+        self.svg_widget.setFixedSize(50, 50)
+        svg_lay.addWidget(self.svg_widget)
+
+        label = QLabel(label_text)
+        label.setAlignment(Qt.AlignCenter)
+        v_lay.addWidget(label)
+
+    def regular_style(self):
+        return """
+            #svg_container {
+                border: 2px solid transparent;
+                border-radius: 10px;
+            }
+        """
+
+    def border_style(self):
+        return """
+            #svg_container {
+                border: 2px solid #007aff;
+                border-radius: 10px;
+            }
+        """
+
+    def selected(self, enable=True):
+        if enable:
+            self.svg_container.setStyleSheet(
+                self.border_style()
+            )
+        else:
+            self.svg_container.setStyleSheet(
+                self.regular_style()
+            )
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+
+
+class Themes(QGroupBox):
+    theme_changed = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        h_lay = UHBoxLayout()
+        h_lay.setContentsMargins(10, 10, 10, 10)
+        h_lay.setSpacing(20)
+        h_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.setLayout(h_lay)
+
+        self.frames = []
+
+        self.system_theme = ThemesBtn(
+            os.path.join(Static.INNER_IMAGES, "system_theme.svg"),
+            Lang.theme_auto
+        )
+        self.dark_theme = ThemesBtn(
+            os.path.join(Static.INNER_IMAGES,"dark_theme.svg"),
+            Lang.theme_dark
+        )
+        self.light_theme = ThemesBtn(
+            os.path.join(Static.INNER_IMAGES,"light_theme.svg"),
+            Lang.theme_light
+        )
+
+        for f in (self.system_theme, self.dark_theme, self.light_theme):
+            h_lay.addWidget(f)
+            self.frames.append(f)
+            f.clicked.connect(self.on_frame_clicked)
+
+        if JsonData.dark_mode == 0:
+            self.set_selected(self.system_theme)
+        elif JsonData.dark_mode == 1:
+            self.set_selected(self.dark_theme)
+        elif JsonData.dark_mode == 2:
+            self.set_selected(self.light_theme)
+
+    def on_frame_clicked(self):
+        sender: ThemesBtn = self.sender()
+        self.set_selected(sender)
+
+        if sender == self.system_theme:
+            JsonData.dark_mode = 0
+        elif sender == self.dark_theme:
+            JsonData.dark_mode = 1
+        elif sender == self.light_theme:
+            JsonData.dark_mode = 2
+
+        ThemeChanger.init()
+        self.theme_changed.emit()
+
+    def set_selected(self, selected_frame: ThemesBtn):
+        for f in self.frames:
+            f.selected(f is selected_frame)
+
+
+class SelectableLabel(QLabel):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        txt = "\n".join([
+            f"Version {Static.APP_VER}",
+            "Developed by Evlosh",
+            "email: evlosh@gmail.com",
+            "telegram: evlosh",
+            ])
+        
+        self.setText(txt)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.setCursor(Qt.CursorShape.IBeamCursor)
+
+    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+        context_menu = UMenu(ev)
+
+        copy_text = QAction(parent=context_menu, text=Lang.copy)
+        copy_text.triggered.connect(self.copy_text_md)
+        context_menu.addAction(copy_text)
+
+        context_menu.addSeparator()
+
+        select_all = QAction(parent=context_menu, text=Lang.copy_all)
+        select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
+        context_menu.addAction(select_all)
+
+        context_menu.show_()
+        return super().contextMenuEvent(ev)
+
+    def copy_text_md(self):
+        MainUtils.copy_text(self.selectedText())
+
+
+class AboutWid(QGroupBox):
+    icon_svg = os.path.join(Static.INNER_IMAGES, "icon.svg")
+
+    def __init__(self):
+        super().__init__()
+        h_lay = UHBoxLayout()
+        self.setLayout(h_lay)
+
+        icon = QSvgWidget(self.icon_svg)
+        icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+        icon.setFixedSize(85, 85)
+        h_lay.addWidget(icon)
+
+        h_lay.addSpacerItem(QSpacerItem(0, 20))
+
+        lbl = SelectableLabel(self)
+        h_lay.addWidget(lbl)
 
 
 class MainSettings(QWidget):
     reset = pyqtSignal()
+    changed = pyqtSignal()
 
     def __init__(self, json_data_copy: JsonData):
         super().__init__()
-        self.v_lay = UVBoxLayout()
-        self.v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.v_lay.setSpacing(10)
-        self.setLayout(self.v_lay)
+        v_lay = UVBoxLayout()
+        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
+        v_lay.setSpacing(10)
+        self.setLayout(v_lay)
 
         lang_reset = LangReset(json_data_copy)
         lang_reset.reset.connect(self.reset.emit)
-        self.v_lay.addWidget(lang_reset)
+        lang_reset.changed.connect(self.changed.emit)
+        v_lay.addWidget(lang_reset)
 
         simple_settings = SimpleSettings()
-        self.v_lay.addWidget(simple_settings)
+        v_lay.addWidget(simple_settings)
 
         scaner_settings = ScanerSettings(json_data_copy)
-        self.v_lay.addWidget(scaner_settings)
+        scaner_settings.changed.connect(self.changed.emit)
+        v_lay.addWidget(scaner_settings)
+
+        themes = Themes()
+        themes.theme_changed.connect(scaner_settings.theme_changed)
+        v_lay.addWidget(themes)
+
+        about = AboutWid()
+        v_lay.addWidget(about)
 
 
-class WinSettings(WinChild):
+class WinSettings(WinSystem):
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.main_folder_list = deepcopy(MainFolder.list_)
-        self.json_data_copy = deepcopy(JsonData())
+        self.main_folder_list = copy.deepcopy(MainFolder.list_)
+        self.json_data_copy = copy.deepcopy(JsonData())
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -247,9 +438,9 @@ class WinSettings(WinChild):
         btns_wid.setLayout(btns_lay)
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        ok_btn = QPushButton(Lang.ok)
-        ok_btn.setFixedWidth(90)
-        btns_lay.addWidget(ok_btn)
+        self.ok_btn = QPushButton(Lang.ok)
+        self.ok_btn.setFixedWidth(90)
+        btns_lay.addWidget(self.ok_btn)
 
         cancel_btn = QPushButton(Lang.cancel)
         cancel_btn.setFixedWidth(90)
@@ -267,16 +458,17 @@ class WinSettings(WinChild):
             i.deleteLater()
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
+            self.main_settings.changed.connect(lambda: self.ok_btn.setText(Lang.restart_app))
             self.right_lay.insertWidget(0, self.main_settings)
         else:
             main_folder_name = self.left_menu.currentItem().text()
             print(main_folder_name)
     
     def deleteLater(self):
-        new_data = vars(self.json_data_copy)
-        if new_data:
-            for k, v in new_data.items():
-                setattr(JsonData, k, v)
+        # new_data = vars(self.json_data_copy)
+        # if new_data:
+        #     for k, v in new_data.items():
+        #         setattr(JsonData, k, v)
         return super().deleteLater()
 
     def keyPressEvent(self, a0):
