@@ -403,8 +403,10 @@ class MainSettings(QWidget):
 class WinSettings(WinSystem):
     def __init__(self, parent = None):
         super().__init__(parent)
+        self.setWindowTitle(Lang.settings)
         self.main_folder_list = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(JsonData())
+        self.need_reset = False
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -439,13 +441,14 @@ class WinSettings(WinSystem):
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.ok_btn = QPushButton(Lang.ok)
-        self.ok_btn.setFixedWidth(90)
+        self.ok_btn.clicked.connect(self.ok_cmd)
+        self.ok_btn.setFixedWidth(100)
         btns_lay.addWidget(self.ok_btn)
 
         cancel_btn = QPushButton(Lang.cancel)
-        cancel_btn.setFixedWidth(90)
+        cancel_btn.clicked.connect(self.deleteLater)
+        cancel_btn.setFixedWidth(100)
         btns_lay.addWidget(cancel_btn)
-
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)
@@ -458,18 +461,31 @@ class WinSettings(WinSystem):
             i.deleteLater()
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
+            self.main_settings.reset.connect(lambda: setattr(self, "need_reset", True))
             self.main_settings.changed.connect(lambda: self.ok_btn.setText(Lang.restart_app))
             self.right_lay.insertWidget(0, self.main_settings)
         else:
             main_folder_name = self.left_menu.currentItem().text()
             print(main_folder_name)
-    
-    def deleteLater(self):
-        # new_data = vars(self.json_data_copy)
-        # if new_data:
-        #     for k, v in new_data.items():
-        #         setattr(JsonData, k, v)
-        return super().deleteLater()
+
+    def ok_cmd(self):
+        new_json_data = vars(self.json_data_copy)
+
+        if self.need_reset:
+            shutil.rmtree(Static.APP_SUPPORT_DIR)
+            QApplication.quit()
+            MainUtils.start_new_app()
+
+        elif new_json_data:
+            for k, v in new_json_data.items():
+                setattr(JsonData, k, v)
+            MainFolder.write_json_data()
+            JsonData.write_json_data()
+            QApplication.quit()
+            MainUtils.start_new_app()
+
+        else:
+            self.deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
