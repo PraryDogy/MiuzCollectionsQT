@@ -258,21 +258,22 @@ class WinSettings(WinChild):
         self.item_clicked()
 
     def item_clicked(self, *args):
+
+        def changed_cmd():
+            self.changed = True
+
         for i in self.right_wid.findChildren(QWidget):
             i.deleteLater()
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
-            self.main_settings.changed.connect(self.changed_cmd)
+            self.main_settings.changed.connect(changed_cmd)
             self.right_lay.addWidget(self.main_settings)
         else:
             main_folder_name = self.left_menu.currentItem().text()
             print(main_folder_name)
     
-    def changed_cmd(self):
-        self.changed = True
-
     def deleteLater(self):
-        for k, v in self.json_data_copy.__dict__.items():
+        for k, v in vars(self.json_data_copy).items():
             setattr(JsonData, k, v)
         return super().deleteLater()
 
