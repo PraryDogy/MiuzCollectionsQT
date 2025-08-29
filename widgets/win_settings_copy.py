@@ -239,6 +239,23 @@ class WinSettings(WinChild):
         self.right_wid.setLayout(self.right_lay)
         self.splitter.addWidget(self.right_wid)
 
+        btns_wid = QWidget()
+        btns_wid.setFixedHeight(40)
+        self.right_lay.addWidget(btns_wid, alignment=Qt.AlignmentFlag.AlignBottom)
+        btns_lay = UHBoxLayout()
+        btns_lay.setSpacing(15)
+        btns_wid.setLayout(btns_lay)
+        btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        ok_btn = QPushButton(Lang.ok)
+        ok_btn.setFixedWidth(90)
+        btns_lay.addWidget(ok_btn)
+
+        cancel_btn = QPushButton(Lang.cancel)
+        cancel_btn.setFixedWidth(90)
+        btns_lay.addWidget(cancel_btn)
+
+
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([Static.MENU_LEFT_WIDTH, 600])
@@ -246,11 +263,11 @@ class WinSettings(WinChild):
         self.item_clicked()
 
     def item_clicked(self, *args):
-        for i in self.right_wid.findChildren(QWidget):
+        for i in self.right_wid.findChildren((MainSettings, )):
             i.deleteLater()
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
-            self.right_lay.addWidget(self.main_settings)
+            self.right_lay.insertWidget(0, self.main_settings)
         else:
             main_folder_name = self.left_menu.currentItem().text()
             print(main_folder_name)
