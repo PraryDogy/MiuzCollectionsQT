@@ -210,15 +210,18 @@ class JsonData:
                 setattr(cls, k, v)
 
     @classmethod
-    def write_json_data(cls):
-        data = {
+    def get_data(cls):
+        return {
             k: v
             for k, v in JsonData.__dict__.items()
             if not k.startswith("__")
             and
             not isinstance(v, classmethod)
         }
-
+ 
+    @classmethod
+    def write_json_data(cls):
+        data = cls.get_data()
         with open(Static.APP_SUPPORT_JSON_DATA, "w", encoding="utf-8") as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
 

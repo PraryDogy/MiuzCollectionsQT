@@ -16,6 +16,7 @@ from .win_help import WinHelp
 
 class LangReset(QGroupBox):
     changed = pyqtSignal()
+    reset = pyqtSignal()
 
     def __init__(self, json_data_copy: JsonData):
         """
@@ -52,7 +53,7 @@ class LangReset(QGroupBox):
 
         self.reset_data_btn = QPushButton(Lang.reset)
         self.reset_data_btn.setFixedWidth(115)
-        self.reset_data_btn.clicked.connect(lambda: self.reset_data.emit())
+        self.reset_data_btn.clicked.connect(self.reset.emit)
         sec_row_lay.addWidget(self.reset_data_btn)
 
         descr = QLabel(text=Lang.restore_db_descr)
@@ -197,6 +198,7 @@ class ScanerSettings(QGroupBox):
 
 class MainSettings(QWidget):
     changed = pyqtSignal()
+    reset = pyqtSignal()
 
     def __init__(self, json_data_copy: JsonData):
         super().__init__()
@@ -207,6 +209,7 @@ class MainSettings(QWidget):
 
         lang_reset = LangReset(json_data_copy)
         lang_reset.changed.connect(self.changed.emit)
+        lang_reset.reset.connect(self.reset.emit)
         self.v_lay.addWidget(lang_reset)
 
         simple_settings = SimpleSettings()
@@ -221,7 +224,7 @@ class WinSettings(WinChild):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.main_folder_list = deepcopy(MainFolder.list_)
-        self.json_data_copy = deepcopy(JsonData)
+        self.json_data_copy = deepcopy(JsonData())
         self.changed = False
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -267,7 +270,11 @@ class WinSettings(WinChild):
     
     def changed_cmd(self):
         self.changed = True
-        print(self.json_data_copy.__dict__)
+
+    def deleteLater(self):
+        for k, v in self.json_data_copy.__dict__.items():
+            setattr(JsonData, k, v)
+        return super().deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
