@@ -15,7 +15,6 @@ from .win_help import WinHelp
 
 
 class LangReset(QGroupBox):
-    changed = pyqtSignal()
     reset = pyqtSignal()
 
     def __init__(self, json_data_copy: JsonData):
@@ -66,11 +65,9 @@ class LangReset(QGroupBox):
         if self.lang_btn.text() == "Русский":
             self.lang_btn.setText("English")
             self.json_data.lang_ind = 1
-            self.changed.emit()
         else:
             self.lang_btn.setText("Русский")
             self.json_data.lang_ind = 0
-            self.changed.emit()
 
 
 class SimpleSettings(QGroupBox):
@@ -122,8 +119,6 @@ class SimpleSettings(QGroupBox):
 
 
 class ScanerSettings(QGroupBox):
-    changed = pyqtSignal()
-
     def __init__(self, json_data_copy: JsonData):
         super().__init__()
         self.json_data_copy = json_data_copy
@@ -183,7 +178,6 @@ class ScanerSettings(QGroupBox):
 
     def change_scan_time(self, value: int):
         self.json_data_copy.scaner_minutes = value
-        self.changed.emit()
 
     def change_new_scaner(self):
         if self.json_data_copy.new_scaner:
@@ -193,11 +187,8 @@ class ScanerSettings(QGroupBox):
             self.json_data_copy.new_scaner = True
             self.checkbox.setText(Lang.disable)
 
-        self.changed.emit()
-
 
 class MainSettings(QWidget):
-    changed = pyqtSignal()
     reset = pyqtSignal()
 
     def __init__(self, json_data_copy: JsonData):
@@ -208,7 +199,6 @@ class MainSettings(QWidget):
         self.setLayout(self.v_lay)
 
         lang_reset = LangReset(json_data_copy)
-        lang_reset.changed.connect(self.changed.emit)
         lang_reset.reset.connect(self.reset.emit)
         self.v_lay.addWidget(lang_reset)
 
@@ -216,7 +206,6 @@ class MainSettings(QWidget):
         self.v_lay.addWidget(simple_settings)
 
         scaner_settings = ScanerSettings(json_data_copy)
-        scaner_settings.changed.connect(self.changed.emit)
         self.v_lay.addWidget(scaner_settings)
 
 
@@ -225,7 +214,6 @@ class WinSettings(WinChild):
         super().__init__(parent)
         self.main_folder_list = deepcopy(MainFolder.list_)
         self.json_data_copy = deepcopy(JsonData())
-        self.changed = False
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -258,23 +246,20 @@ class WinSettings(WinChild):
         self.item_clicked()
 
     def item_clicked(self, *args):
-
-        def changed_cmd():
-            self.changed = True
-
         for i in self.right_wid.findChildren(QWidget):
             i.deleteLater()
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
-            self.main_settings.changed.connect(changed_cmd)
             self.right_lay.addWidget(self.main_settings)
         else:
             main_folder_name = self.left_menu.currentItem().text()
             print(main_folder_name)
     
     def deleteLater(self):
-        for k, v in vars(self.json_data_copy).items():
-            setattr(JsonData, k, v)
+        new_data = vars(self.json_data_copy)
+        if new_data:
+            for k, v in new_data.items():
+                setattr(JsonData, k, v)
         return super().deleteLater()
 
     def keyPressEvent(self, a0):
