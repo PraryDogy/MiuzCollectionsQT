@@ -700,6 +700,19 @@ class _Lang:
         "Folder name"
     ]
 
+    main_folder_descr = [
+        "Путь к папке с коллекциями: перетащите сюда папку или укажите\n"
+        "путь с новой строки.",
+        "Path to the collections folder: drag a folder here or enter a path\n"
+        "on a new line."
+    ]
+
+    ignor_list_descr = [
+        "Игнор лист: перетащите сюда папку или укажите имя с новой\n"
+        "строки.",
+        "Ignore list: drag a folder here or enter a name on a new line."
+    ]
+
 class Lang(_Lang):
 
     @classmethod

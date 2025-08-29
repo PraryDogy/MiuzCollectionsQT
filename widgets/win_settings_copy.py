@@ -484,20 +484,13 @@ class MainFolderSettings(QWidget):
 
         sec_row = MainFolderPaths()
         v_lay.addWidget(sec_row)
-        t = (
-            "Путь к папке с коллекциями: перетащите сюда папку или\n"
-            "укажите путь с новой строки."
-        )
-        sec_row.top_label.setText(t)
+        sec_row.top_label.setText(Lang.main_folder_descr)
         text_ = "\n".join(i for i in main_folder.paths)
         sec_row.text_edit.setPlainText(text_)
 
         third_row = IgnorList()
         v_lay.addWidget(third_row)
-        t = (
-            "Игнор лист: перетащите сюда папку или укажите имя с новой\nстроки."
-        )
-        third_row.top_label.setText(t)
+        third_row.top_label.setText(Lang.ignor_list_descr)
         text_ = "\n".join(i for i in main_folder.stop_list)
         third_row.text_edit.setPlainText(text_)
 
