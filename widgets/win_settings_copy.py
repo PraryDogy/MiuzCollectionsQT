@@ -22,6 +22,9 @@ from ._base_widgets import (UHBoxLayout, ULineEdit, UListWidgetItem, UMenu,
 from .win_help import WinHelp
 
 
+# ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
+
+
 class LangReset(QGroupBox):
     reset = pyqtSignal()
     changed = pyqtSignal()
@@ -400,17 +403,119 @@ class MainSettings(QWidget):
         v_lay.addWidget(about)
 
 
+# ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
+
+
+class DropableGroupBox(QGroupBox):
+    def __init__(self):
+        super().__init__()
+        self.setAcceptDrops(True)
+        self.setFixedHeight(150)
+
+        v_lay = UVBoxLayout()
+        v_lay.setSpacing(10)
+        v_lay.setContentsMargins(0, 10, 0, 10)
+        self.setLayout(v_lay)
+
+        self.top_label = QLabel()
+        v_lay.addWidget(self.top_label)
+
+        self.text_edit = UTextEdit()
+        self.text_edit.setAcceptDrops(False)
+        v_lay.addWidget(self.text_edit)
+
+    def dragEnterEvent(self, a0):
+        a0.accept()
+        return super().dragEnterEvent(a0)
+    
+
+class MainFolderPaths(DropableGroupBox):
+    def __init__(self):
+        super().__init__()
+
+    def dropEvent(self, a0):
+        if a0.mimeData().hasUrls():
+            urls = [
+                i.toLocalFile()
+                for i in a0.mimeData().urls()
+                if os.path.isdir(i.toLocalFile())
+            ]
+            text = "\n".join((self.text_edit.toPlainText(), *urls))
+            self.text_edit.setPlainText(text)
+        return super().dropEvent(a0)
+
+
+class IgnorList(DropableGroupBox):
+    def __init__(self):
+        super().__init__()
+
+    def dropEvent(self, a0):
+        if a0.mimeData().hasUrls():
+            urls = [
+                os.path.basename(i.toLocalFile().rstrip(os.sep))
+                for i in a0.mimeData().urls()
+                if os.path.isdir(i.toLocalFile())
+            ]
+            text = "\n".join((self.text_edit.toPlainText(), *urls))
+            self.text_edit.setPlainText(text)
+        return super().dropEvent(a0)
+
+
 class MainFolderSettings(QWidget):
     def __init__(self, main_folder: MainFolder):
         super().__init__()
         v_lay = UVBoxLayout()
+        v_lay.setSpacing(15)
+        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(v_lay)
         self.main_folder = main_folder
 
         first_row = QGroupBox()
+        first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
-        name_label = QLabel(self.main_folder.name)
-        first_row
+        first_lay = UHBoxLayout()
+        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        first_lay.setSpacing(5)
+        first_row.setLayout(first_lay)
+        name_descr = QLabel(Lang.folder_name + ":")
+        first_lay.addWidget(name_descr)
+        name_label = QLabel(main_folder.name)
+        first_lay.addWidget(name_label)
+
+        sec_row = MainFolderPaths()
+        v_lay.addWidget(sec_row)
+        t = (
+            "Путь к папке с коллекциями: перетащите сюда папку или\n"
+            "укажите путь с новой строки."
+        )
+        sec_row.top_label.setText(t)
+        text_ = "\n".join(i for i in main_folder.paths)
+        sec_row.text_edit.setPlainText(text_)
+
+        third_row = IgnorList()
+        v_lay.addWidget(third_row)
+        t = (
+            "Игнор лист: перетащите сюда папку или укажите имя с новой\nстроки."
+        )
+        third_row.top_label.setText(t)
+        text_ = "\n".join(i for i in main_folder.stop_list)
+        third_row.text_edit.setPlainText(text_)
+
+        remove_btn = QPushButton(Lang.delete)
+        remove_btn.setFixedWidth(100)
+
+        btn_lay = UHBoxLayout()
+        btn_lay.addStretch()
+        btn_lay.addWidget(remove_btn)
+        btn_lay.addStretch()
+        v_lay.addLayout(btn_lay)
+
+    def mouseReleaseEvent(self, a0):
+        self.setFocus()
+        return super().mouseReleaseEvent(a0)
+
+
+# ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
 
 class WinSettings(WinSystem):
@@ -479,8 +584,8 @@ class WinSettings(WinSystem):
             self.right_lay.insertWidget(0, self.main_settings)
         else:
             for i in self.main_folder_list:
-                if i == self.left_menu.currentItem().text():
-                    main_folder_sett = MainFolderSettings()
+                if i.name == self.left_menu.currentItem().text():
+                    main_folder_sett = MainFolderSettings(i)
                     self.right_lay.insertWidget(0, main_folder_sett)
                     break
 

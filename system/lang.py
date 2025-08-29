@@ -695,6 +695,11 @@ class _Lang:
         "Fast image search (beta)"
     ]
 
+    folder_name = [
+        "Имя папки",
+        "Folder name"
+    ]
+
 class Lang(_Lang):
 
     @classmethod
