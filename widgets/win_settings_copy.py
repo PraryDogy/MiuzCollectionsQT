@@ -60,8 +60,7 @@ class WinSettings(WinChild):
     def item_clicked(self, *args):
         for i in self.right_wid.findChildren(QWidget):
             i.deleteLater()
-        curr_row = self.left_menu.currentRow()
-        if curr_row == 0:
+        if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings()
             self.right_lay.addWidget(self.main_settings)
         else:
