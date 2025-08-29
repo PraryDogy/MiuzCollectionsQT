@@ -400,6 +400,19 @@ class MainSettings(QWidget):
         v_lay.addWidget(about)
 
 
+class MainFolderSettings(QWidget):
+    def __init__(self, main_folder: MainFolder):
+        super().__init__()
+        v_lay = UVBoxLayout()
+        self.setLayout(v_lay)
+        self.main_folder = main_folder
+
+        first_row = QGroupBox()
+        v_lay.addWidget(first_row)
+        name_label = QLabel(self.main_folder.name)
+        first_row
+
+
 class WinSettings(WinSystem):
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -457,7 +470,7 @@ class WinSettings(WinSystem):
         self.item_clicked()
 
     def item_clicked(self, *args):
-        for i in self.right_wid.findChildren((MainSettings, )):
+        for i in self.right_wid.findChildren((MainSettings, MainFolderSettings)):
             i.deleteLater()
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
@@ -465,8 +478,11 @@ class WinSettings(WinSystem):
             self.main_settings.changed.connect(lambda: self.ok_btn.setText(Lang.restart_app))
             self.right_lay.insertWidget(0, self.main_settings)
         else:
-            main_folder_name = self.left_menu.currentItem().text()
-            print(main_folder_name)
+            for i in self.main_folder_list:
+                if i == self.left_menu.currentItem().text():
+                    main_folder_sett = MainFolderSettings()
+                    self.right_lay.insertWidget(0, main_folder_sett)
+                    break
 
     def ok_cmd(self):
         new_json_data = vars(self.json_data_copy)
