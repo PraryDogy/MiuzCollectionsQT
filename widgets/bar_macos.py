@@ -5,7 +5,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
-from cfg import Static
+from cfg import JsonData, Static
 from system.lang import Lang
 from system.utils import MainUtils
 
@@ -15,6 +15,11 @@ from .win_settings import WinSettings
 ICON_SVG = os.path.join(Static.INNER_IMAGES, "icon.svg")
 
 class SelectableLabel(QLabel):
+    lang = (
+        ("Копировать", "Copy"),
+        ("Копировать все", "Copy all"),
+
+    )
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -32,13 +37,13 @@ class SelectableLabel(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=Lang.copy)
+        copy_text = QAction(parent=context_menu, text=self.lang[0][JsonData.lang_ind])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Lang.copy_all)
+        select_all = QAction(parent=context_menu, text=self.lang[1][JsonData.lang_ind])
         select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -72,13 +77,17 @@ class AboutWin(WinSystem):
 
 
 class BarMacos(QMenuBar):
+    lang = (
+        ("Меню", "Menu"),
+
+    )
     def __init__(self):
         super().__init__()
         self.settings_win = None
         self.init_ui()
 
     def init_ui(self):
-        self.mainMenu = QMenu(Lang.bar_menu, self)
+        self.mainMenu = QMenu(self.lang[0][JsonData.lang_ind], self)
 
         # Добавляем пункт "Открыть настройки"
         actionSettings = QAction(Lang.open_settings_window, self)

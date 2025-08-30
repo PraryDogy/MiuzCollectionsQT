@@ -3,11 +3,11 @@ import os
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 
-from cfg import Dynamic, Static
+from cfg import Dynamic, JsonData, Static
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.utils import MainUtils, UThreadPool
 from system.tasks import FavTask
+from system.utils import MainUtils, UThreadPool
 
 from .win_info import WinInfo
 from .win_warn import WinWarn
@@ -62,8 +62,13 @@ class WinInfoAction(QAction):
 
 
 class CopyPath(QAction):
+    lang = (
+        ("Скопировать путь", "Copy filepath"),
+
+    )
+
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        text = f"{Lang.copy_path} ({len(rel_img_path_list)})"
+        text = f"{self.lang[0][JsonData.lang_ind]} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
@@ -130,15 +135,19 @@ class ShowInFinder(QAction):
 
 class FavActionDb(QAction):
     finished_ = pyqtSignal(int)
+    lang = (
+        ("Добавить в избранное", "Add to favorites"),
+        ("Удалить из избранного", "Remove from favorites"),
+    )
 
     def __init__(self, parent: QMenu, rel_img_path: str, fav_value:  int):
 
         if fav_value == 0 or fav_value is None:
-            t = Lang.add_fav
+            t = self.lang[0][JsonData.lang_ind]
             self.value = 1
 
         elif fav_value == 1:
-            t = Lang.del_fav
+            t = self.lang[1][JsonData.lang_ind]
             self.value = 0
 
         super().__init__(parent=parent, text=t)

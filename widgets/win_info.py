@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
-from cfg import Static
+from cfg import JsonData, Static
 from system.lang import Lang
 from system.tasks import MultipleImgInfo, SingleImgInfo
 from system.utils import MainUtils, UThreadPool
@@ -13,6 +13,11 @@ from ._base_widgets import UMenu, WinSystem
 
 
 class Selectable(QLabel):
+    lang = (
+        ("Копировать", "Copy"),
+
+    )
+
     def __init__(self, text: str):
         super().__init__(text)
 
@@ -36,7 +41,7 @@ class Selectable(QLabel):
 
         menu_ = UMenu(event=ev)
 
-        label_text = Lang.copy
+        label_text = self.lang[0][JsonData.lang_ind]
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(lambda: MainUtils.copy_text(text))
         menu_.addAction(sel)

@@ -226,6 +226,11 @@ class ImgInfoSignals(QObject):
 
 class SingleImgInfo(URunnable):
     max_row = 50
+    lang = (
+        ("Изменен", "Changed"),
+        ("Коллекция", "Collection"),
+
+    )
 
     def __init__(self, url: str):
         super().__init__()
@@ -249,8 +254,8 @@ class SingleImgInfo(URunnable):
                 Lang.file_size: size,
                 Lang.place: self.lined_text(self.url),
                 Lang.thumb_path: self.lined_text(thumb_path),
-                Lang.changed: mod,
-                Lang.collection: self.lined_text(coll),
+                self.lang[0][JsonData.lang_ind]: mod,
+                self.lang[1][JsonData.lang_ind]: self.lined_text(coll),
                 Lang.resol: Lang.calculating,
                 }
             

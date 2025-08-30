@@ -27,9 +27,13 @@ class BarTopBtn(QLabel):
 
 class DatesBtn(BarTopBtn):
     open_dates_win = pyqtSignal()
+    lang = (
+        ("Даты", "Dates"),
+
+    )
 
     def __init__(self):
-        super().__init__(text=Lang.dates)
+        super().__init__(text=self.lang[0][JsonData.lang_ind])
 
     def open_win(self):
         self.open_dates_win.emit()

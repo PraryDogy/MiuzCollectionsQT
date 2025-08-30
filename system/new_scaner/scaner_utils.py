@@ -4,7 +4,7 @@ import os
 import sqlalchemy
 from numpy import ndarray
 
-from cfg import Static, ThumbData
+from cfg import JsonData, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames
 from system.lang import Lang
 from system.main_folder import MainFolder
@@ -282,7 +282,10 @@ class ImgCompator:
 
 
 class HashdirUpdater:
-    # progress_text = pyqtSignal(str)
+    lang = (
+        ("Добавляю", "Add"),
+
+    )
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
@@ -364,7 +367,7 @@ class HashdirUpdater:
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
             if not self.task_state.should_run():
                 break
-            self.progressbar_text(Lang.adding, x, total)
+            self.progressbar_text(self.lang[0][JsonData.lang_ind], x, total)
             try:
                 thumb = self.create_thumb(img_path)
                 thumb_path = ThumbUtils.create_thumb_path(img_path)

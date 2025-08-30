@@ -6,16 +6,20 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import Static, ThumbData
+from cfg import JsonData, Static, ThumbData
 from system.database import THUMBS, ClmNames, Dbase
 from system.lang import Lang
 from system.main_folder import MainFolder
 
-from ..utils import ImgUtils, TaskState, ThumbUtils, MainUtils
+from ..utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
 
 class FinderImages(QObject):
     progress_text = pyqtSignal(str)
+    lang = (
+        ("Коллекция", "Collection"),
+
+    )
 
     def __init__(self, main_folder: MainFolder, task_state: TaskState):
         """
@@ -106,7 +110,7 @@ class FinderImages(QObject):
         Пример: "Miuz (MainFolder.name): коллекция 3 из 10"
         """
         main_folder = self.main_folder.name.capitalize()
-        collection_name = Lang.collection
+        collection_name = self.lang[0][JsonData.lang_ind]
         return f"{main_folder}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
     def walk_subdir(self, subdir: str) -> list[tuple]:
@@ -244,6 +248,10 @@ class Inspector(QObject):
 
 class HashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
+    lang = (
+        ("Добавляю", "Add"),
+
+    )
 
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
@@ -325,7 +333,7 @@ class HashdirUpdater(QObject):
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
             if not self.task_state.should_run():
                 break
-            self.progressbar_text(Lang.adding, x, total)
+            self.progressbar_text(self.lang[0][JsonData.lang_ind], x, total)
             try:
                 thumb = self.create_thumb(img_path)
                 thumb_path = ThumbUtils.create_thumb_path(img_path)

@@ -18,11 +18,15 @@ from .win_warn import WinWarn
 
 class BaseCollBtn(QLabel):
     pressed_ = pyqtSignal()
+    lang = (
+        ("Все коллекции", "All collections"),
+
+    )
 
     def __init__(self, text: str):
         self.coll_name = text
         data = {
-            Static.NAME_ALL_COLLS: Lang.all_colls,
+            Static.NAME_ALL_COLLS: self.lang[0][JsonData.lang_ind],
             Static.NAME_RECENTS: Lang.recents,
             Static.NAME_FAVS: Lang.fav_coll
         }
@@ -214,6 +218,10 @@ class MenuLeft(QTabWidget):
     set_window_title = pyqtSignal()
     scroll_to_top = pyqtSignal()
     reload_thumbnails = pyqtSignal()
+    lang = (
+        ("Коллекции", "Collections"),
+
+    )
     
     def __init__(self):
         super().__init__()
@@ -240,6 +248,6 @@ class MenuLeft(QTabWidget):
         self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
         self.collections_list.set_window_title.connect(self.set_window_title.emit)
         self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
-        self.addTab(self.collections_list, Lang.collections)
+        self.addTab(self.collections_list, self.lang[0][JsonData.lang_ind])
 
         self.setCurrentIndex(1)

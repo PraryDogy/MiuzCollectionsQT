@@ -58,6 +58,10 @@ class WinMain(UMainWindow):
     update_mins = 30
     min_w = 750
     ww, hh = 870, 500
+    lang = (
+        ("Все коллекции", "All collections"),
+
+    )
 
     def __init__(self, argv: list[str]):
         super().__init__()
@@ -249,7 +253,7 @@ class WinMain(UMainWindow):
     def set_window_title(self):
         main_folder = MainFolder.current.name.capitalize()
         if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            t = Lang.all_colls
+            t = self.lang[0][JsonData.lang_ind]
         elif Dynamic.curr_coll_name == Static.NAME_FAVS:
             t = Lang.fav_coll
         elif Dynamic.curr_coll_name == Static.NAME_RECENTS:

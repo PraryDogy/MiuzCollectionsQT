@@ -56,11 +56,15 @@ class SubWin(WinChild):
 
 class CollBtn(QLabel):
     pressed_ = pyqtSignal()
+    lang = (
+        ("Все коллекции", "All collections"),
+
+    )
 
     def __init__(self, text: str):
         self.coll_name = text
         data = {
-            Static.NAME_ALL_COLLS: Lang.all_colls,
+            Static.NAME_ALL_COLLS: self.lang[0][JsonData.lang_ind],
             Static.NAME_RECENTS: Lang.recents,
             Static.NAME_FAVS: Lang.fav_coll
         }
@@ -171,6 +175,10 @@ class MainFolderList(VListWidget):
 
 class WinUpload(WinChild):
     clicked = pyqtSignal(tuple)
+    lang = (
+        ("Коллекции", "Collections"),
+
+    )
 
     def __init__(self):
         super().__init__()
@@ -185,7 +193,7 @@ class WinUpload(WinChild):
         self.tab_wid.addTab(self.main_folders, Lang.folders)
         self.collections_list = CollBtnList(0)
         self.collections_list.clicked.connect(self.clicked_cmd)
-        self.tab_wid.addTab(self.collections_list, Lang.collections)
+        self.tab_wid.addTab(self.collections_list, self.lang[0][JsonData.lang_ind])
 
         self.tab_wid.setCurrentIndex(1)
 

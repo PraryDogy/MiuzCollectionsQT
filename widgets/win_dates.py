@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
-from cfg import Dynamic
+from cfg import Dynamic, JsonData
 from system.lang import Lang
 
 from ._base_widgets import UHBoxLayout, ULineEdit, UVBoxLayout, WinSystem
@@ -28,10 +28,14 @@ class DatesTools:
 
 class DatesLineEdit(ULineEdit):
     inputChangedSignal = pyqtSignal()
+    lang = (
+        ("день.месяц.год", "day.month.year"),
+
+    )
 
     def __init__(self):
         super().__init__()
-        self.setPlaceholderText(Lang.d_m_y)
+        self.setPlaceholderText(self.lang[0][JsonData.lang_ind])
         self.textChanged.connect(self.onTextChanged)
         self.date = None
 
@@ -163,11 +167,16 @@ class WinDates(WinSystem):
     dates_btn_normal = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     scroll_to_top = pyqtSignal()
+    lang = (
+        ("Отмена", "Cancel"),
+        ("Даты", "Dates"),
+
+    )
 
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle(Lang.dates)
+        self.setWindowTitle(self.lang[1][JsonData.lang_ind])
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
 
@@ -221,7 +230,7 @@ class WinDates(WinSystem):
         spacer_item = QSpacerItem(10, 1)
         btns_h_lay.addItem(spacer_item)
 
-        cancel_btn = QPushButton(text=Lang.cancel)
+        cancel_btn = QPushButton(text=self.lang[0][JsonData.lang_ind])
         self.ok_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.cancel_cmd)
         btns_h_lay.addWidget(cancel_btn)

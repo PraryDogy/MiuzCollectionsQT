@@ -6,52 +6,6 @@ class _Lang:
         "Русский",
         "English"
     ]
-    add_fav = [
-        "Добавить в избранное",
-        "Add to favorites"
-    ]
-    add_ = [
-        "Добавить",
-        "Add"
-    ]
-    add_main_folder = [
-        "Добавить папку с коллекциями",
-        "Add collections folder"
-    ]
-
-    add_main_folder_short = [
-        "Добавить папку",
-        "Add folder"
-    ]
-
-    adding = [
-        "Добавляю",
-        "Add"
-    ]
-    all_colls = [
-        "Все коллекции",
-        "All collections"
-    ]
-    restart_app = [
-        "Перезапуск",
-        "Restart app"
-    ]
-    bar_menu = [
-        "Меню",
-        "Menu"
-    ]
-    browse = [
-        "Обзор",
-        "Browse"
-    ]
-    cancel = [
-        "Отмена",
-        "Cancel"
-    ]
-    changed = [
-        "Изменен",
-        "Changed"
-    ]
     no_connection_descr = [
         "- Подключитесь к диску с коллекциями\
         \n- Добавьте новый путь к коллекциям\
@@ -60,50 +14,6 @@ class _Lang:
         "- Connect to disk with collections\
         \n- Add a new path to collections\
         \nin the settings."
-    ]
-    collection = [
-        "Коллекция",
-        "Collection"
-    ]
-    collections = [
-        "Коллекции",
-        "Collections"
-    ]
-    copy = [
-        "Копировать",
-        "Copy"
-    ]
-    copy_all = [
-        "Копировать все",
-        "Copy all"
-    ]
-    copy_path = [
-        "Скопировать путь",
-        "Copy filepath"
-    ]
-    copying = [
-        "Копирую",
-        "Copying"
-    ]
-    cut = [
-        "Вырезать",
-        "Cut"
-    ]
-    d_m_y = [
-        "день.месяц.год",
-        "day.month.year"
-    ]
-    dates = [
-        "Даты",
-        "Dates"
-    ]
-    del_fav = [
-        "Удалить из избранного",
-        "Remove from favorites"
-    ]
-    del_ = [
-        "Удалить",
-        "Remove"
     ]
     deleting = [
         "Удаляю",
