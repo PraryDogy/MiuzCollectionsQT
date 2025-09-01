@@ -606,6 +606,7 @@ class WinSettings(WinSystem):
         self.left_menu.setCurrentRow(0)
 
         self.right_wid = QWidget()
+        self.right_wid.setFixedWidth(450)
         self.right_lay = UVBoxLayout()
         self.right_wid.setLayout(self.right_lay)
         self.splitter.addWidget(self.right_wid)
@@ -672,29 +673,20 @@ class WinSettings(WinSystem):
             i.deleteLater()
 
     def ok_cmd(self):
-        new_json_data = vars(self.json_data_copy)
+        if self.need_reset:
+            shutil.rmtree(Static.APP_SUPPORT_DIR)
+            QApplication.quit()
+            MainUtils.start_new_app()
 
-        for i in self.main_folder_list:
-            print(i.name)
-            # print(i.paths)
-            print(i.stop_list)
-            print()
-
-
-        # if self.need_reset:
-        #     shutil.rmtree(Static.APP_SUPPORT_DIR)
-        #     QApplication.quit()
-        #     MainUtils.start_new_app()
-
-        # else:
-        #     for k, v in new_json_data.items():
-        #         setattr(JsonData, k, v)
-        #     MainFolder.write_json_data()
-        #     JsonData.write_json_data()
-        #     QApplication.quit()
-        #     MainUtils.start_new_app()
-
-
+        else:
+            MainFolder.list_ = self.main_folder_list
+            new_json_data = vars(self.json_data_copy)
+            for k, v in new_json_data.items():
+                setattr(JsonData, k, v)
+            MainFolder.write_json_data()
+            JsonData.write_json_data()
+            QApplication.quit()
+            MainUtils.start_new_app()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
