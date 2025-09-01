@@ -13,7 +13,7 @@ from system.tasks import LoadCollListTask
 from system.utils import UThreadPool
 
 from ._base_widgets import UListWidgetItem, UMenu, VListWidget, WinChild
-from .win_warn import WinWarn
+from .win_warn import WinSmb
 
 
 class SubWinList(VListWidget):
@@ -149,7 +149,7 @@ class MainFolderList(VListWidget):
             return
         path = folder.availability()
         if not path:
-            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_warn = WinSmb()
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
             return

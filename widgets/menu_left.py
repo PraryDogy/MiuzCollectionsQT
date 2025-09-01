@@ -2,7 +2,7 @@ import os
 import re
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal, QTimer
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
 
@@ -13,7 +13,7 @@ from system.tasks import LoadCollListTask
 from system.utils import UThreadPool
 
 from ._base_widgets import UListWidgetItem, UMenu, VListWidget
-from .win_warn import WinWarn
+from .win_warn import WinSmb
 
 
 class BaseCollBtn(QLabel):
@@ -51,7 +51,7 @@ class CollBtn(BaseCollBtn):
                 coll = os.path.join(main_folder_path, self.coll_name)
             subprocess.Popen(["open", coll])
         else:
-            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_warn = WinSmb()
             self.win_warn.adjustSize()
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
@@ -174,7 +174,7 @@ class MainFolderList(VListWidget):
 
         path = folder.availability()
         if not path:
-            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_warn = WinSmb()
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
             return

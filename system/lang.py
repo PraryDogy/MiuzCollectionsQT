@@ -6,15 +6,6 @@ class _Lang:
         "Русский",
         "English"
     ]
-    no_connection_descr = [
-        "- Подключитесь к диску с коллекциями\
-        \n- Добавьте новый путь к коллекциям\
-        \nв настройках.",
-
-        "- Connect to disk with collections\
-        \n- Add a new path to collections\
-        \nin the settings."
-    ]
     deleting = [
         "Удаляю",
         "Deleting"

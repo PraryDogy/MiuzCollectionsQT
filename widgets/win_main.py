@@ -10,7 +10,6 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
-
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
                           RemoveFilesTask, UploadFilesTask)
 from system.utils import UThreadPool
@@ -26,7 +25,7 @@ from .win_downloads import WinDownloads
 from .win_image_view import WinImageView
 from .win_remove_files import RemoveFilesWin
 from .win_upload import WinUpload
-from .win_warn import WinWarn
+from .win_warn import WinSmb, WinWarn
 
 
 class TestWid(QFrame):
@@ -168,7 +167,7 @@ class WinMain(UMainWindow):
     def main_folder_check(self):
         main_folder = MainFolder.current.availability()
         if not main_folder:
-            self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_warn = WinSmb()
             self.win_warn.center_relative_parent(self)
             self.win_warn.show()
 
@@ -304,7 +303,9 @@ class WinMain(UMainWindow):
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
         else:
-            self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
+            self.win_smb = WinSmb()
+            self.win_smb.center_relative_parent(self.window())
+            self.win_smb.show()
 
     def filemove_task_start(self, data: tuple, img_path_list: list):
         dest, main_folder_name = data
@@ -326,7 +327,9 @@ class WinMain(UMainWindow):
             self.remove_files_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
             self.remove_files_win.show()
         else:
-            self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
+            self.win_smb = WinSmb()
+            self.win_smb.center_relative_parent(self.window())
+            self.win_smb.show()
     
     def remove_task_start(self, img_path_list: list[str]):
         remove_files_task = RemoveFilesTask(img_path_list)
@@ -409,7 +412,9 @@ class WinMain(UMainWindow):
             return
         main_folder_path = MainFolder.current.availability()
         if not main_folder_path:
-            self.open_warn_win(Lang.no_connection, Lang.no_connection_descr)
+            self.win_smb = WinSmb()
+            self.win_smb.center_relative_parent(self.window())
+            self.win_smb.show()
             return
 
         img_path_list: list[str] = [

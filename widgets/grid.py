@@ -21,7 +21,7 @@ from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
                       OpenDefault, OpenInView, RemoveFiles, Save,
                       ScanerRestart, ShowInFinder, WinInfoAction)
 from .win_info import WinInfo
-from .win_warn import WinWarn
+from .win_warn import WinSmb
 
 
 class TextWid(QLabel):
@@ -503,7 +503,7 @@ class Grid(VScrollArea):
                     self.win_info = WinInfo(img_path_list)
                     self.win_info.finished_.connect(self.open_info_win_delayed)
                 else:
-                    self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+                    self.win_warn = WinSmb()
                     self.win_warn.adjustSize()
                     self.win_warn.center_relative_parent(self.window())
                     self.win_warn.show()
@@ -882,7 +882,7 @@ class Grid(VScrollArea):
         self.drag.exec_(Qt.DropAction.CopyAction)
 
         if not img_path_list:
-            self.win_smb = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+            self.win_smb = WinSmb()
             self.win_smb.adjustSize()
             self.win_smb.center_relative_parent(self.window())
             self.win_smb.show()

@@ -10,13 +10,13 @@ from system.tasks import FavTask
 from system.utils import MainUtils, UThreadPool
 
 from .win_info import WinInfo
-from .win_warn import WinWarn
+from .win_warn import WinSmb
 
 
 class SmbWin:
     @classmethod
     def show(cls, parent_: QMainWindow):
-        cls.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+        cls.win_warn = WinSmb()
         cls.win_warn.adjustSize()
         cls.win_warn.center_relative_parent(parent_)
         cls.win_warn.show()

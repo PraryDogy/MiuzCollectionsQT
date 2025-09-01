@@ -20,7 +20,7 @@ from .actions import (CopyName, CopyPath, FavActionDb, Save, ShowInFinder,
                       WinInfoAction)
 from .grid import Thumbnail
 from .win_info import WinInfo
-from .win_warn import WinWarn
+from .win_warn import WinSmb
 
 
 class ImageWidget(QLabel):
@@ -377,7 +377,7 @@ class WinImageView(WinChild):
         self.win_info.show()
 
     def open_smb_win(self):
-        self.win_warn = WinWarn(Lang.no_connection, Lang.no_connection_descr)
+        self.win_warn = WinSmb()
         self.win_warn.adjustSize()
         self.win_warn.center_relative_parent(self)
         self.win_warn.show()
