@@ -229,9 +229,8 @@ class SingleImgInfo(URunnable):
     lang = (
         ("Изменен", "Changed"),
         ("Коллекция", "Collection"),
-
+        ("Имя файла", "File name"),
     )
-
     def __init__(self, url: str):
         super().__init__()
         self.url = url
@@ -249,7 +248,7 @@ class SingleImgInfo(URunnable):
             thumb_path = ThumbUtils.create_thumb_path(self.url)
 
             res = {
-                Lang.file_name: self.lined_text(name),
+                self.lang[2][JsonData.lang]: self.lined_text(name),
                 Lang.type_: type_,
                 Lang.file_size: size,
                 Lang.place: self.lined_text(self.url),
@@ -268,7 +267,7 @@ class SingleImgInfo(URunnable):
         except Exception as e:
             MainUtils.print_error()
             res = {
-                Lang.file_name: self.lined_text(os.path.basename(self.url)),
+                self.lang[2][JsonData.lang]: self.lined_text(os.path.basename(self.url)),
                 Lang.place: self.lined_text(self.url),
                 Lang.type_: self.lined_text(os.path.splitext(self.url)[0])
                 }
@@ -295,7 +294,9 @@ class SingleImgInfo(URunnable):
 
 class MultipleImgInfo(URunnable):
     max_row = 50
-
+    lang = (
+        ("Имя файла", "File name"),
+    )
     def __init__(self, img_path_list: list[str]):
         super().__init__()
         self.img_path_list = img_path_list
@@ -313,7 +314,7 @@ class MultipleImgInfo(URunnable):
             names = names + ", ..."
 
         res = {
-            Lang.file_name: names,
+            self.lang[0][JsonData.lang]: names,
             Lang.total: str(len(self.img_path_list)),
             Lang.file_size: self.get_total_size()
         }

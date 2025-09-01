@@ -59,7 +59,7 @@ class WinMain(UMainWindow):
     ww, hh = 870, 500
     lang = (
         ("Все коллекции", "All collections"),
-
+        ("Избранное", "Favorites"),
     )
 
     def __init__(self, argv: list[str]):
@@ -254,7 +254,7 @@ class WinMain(UMainWindow):
         if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
             t = self.lang[0][JsonData.lang]
         elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-            t = Lang.fav_coll
+            t = self.lang[1][JsonData.lang]
         elif Dynamic.curr_coll_name == Static.NAME_RECENTS:
             t = Lang.recents
         else:

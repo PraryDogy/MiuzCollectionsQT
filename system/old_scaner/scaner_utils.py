@@ -250,9 +250,8 @@ class HashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
     lang = (
         ("Добавляю", "Add"),
-
+        ("Удаляю", "Deleting")
     )
-
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
@@ -305,7 +304,7 @@ class HashdirUpdater(QObject):
                 break
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
-                self.progressbar_text(Lang.deleting, x, total)
+                self.progressbar_text(self.lang[1][JsonData.lang], x, total)
                 try:
                     os.remove(thumb_path)
                     folder = os.path.dirname(thumb_path)
@@ -438,6 +437,9 @@ class DbUpdater(QObject):
 
 class MainFolderRemover(QObject):
     progress_text = pyqtSignal(str)
+    lang = (
+        ("Удаляю", "Deleting"),
+    )
 
     def __init__(self):
         """
@@ -483,7 +485,7 @@ class MainFolderRemover(QObject):
         total = len(rows)
         for x, (id_, image_path) in enumerate(rows):
             try:
-                t = f"{Lang.deleting}: {x} {Lang.from_} {total}"
+                t = f"{self.lang[0][JsonData.lang]}: {x} {Lang.from_} {total}"
                 self.progress_text.emit(t)
 
                 if os.path.exists(image_path):

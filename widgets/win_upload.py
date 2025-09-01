@@ -58,7 +58,7 @@ class CollBtn(QLabel):
     pressed_ = pyqtSignal()
     lang = (
         ("Все коллекции", "All collections"),
-
+        ("Избранное", "Favorites"),
     )
 
     def __init__(self, text: str):
@@ -66,7 +66,7 @@ class CollBtn(QLabel):
         data = {
             Static.NAME_ALL_COLLS: self.lang[0][JsonData.lang],
             Static.NAME_RECENTS: Lang.recents,
-            Static.NAME_FAVS: Lang.fav_coll
+            Static.NAME_FAVS: self.lang[1][JsonData.lang]
         }
         if text in data:
             text = data.get(text)

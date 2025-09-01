@@ -453,6 +453,7 @@ class DropableGroupBox(QGroupBox):
         return [
             i
             for i in self.text_edit.toPlainText().split("\n")
+            if i
         ]
 
     def dragEnterEvent(self, a0):
@@ -488,6 +489,7 @@ class StopList(DropableGroupBox):
         self.text_changed.connect(self.set_data)
 
     def set_data(self, *args):
+        print(self.get_data())
         self.main_folder.stop_list = self.get_data()
 
     def dropEvent(self, a0):
@@ -692,7 +694,7 @@ class WinSettings(WinSystem):
             QApplication.quit()
             MainUtils.start_new_app()
 
-        else:
+        elif self.ok_btn.text() == self.lang[4][JsonData.lang]:
             MainFolder.list_ = self.main_folder_list
             new_json_data = vars(self.json_data_copy)
             for k, v in new_json_data.items():

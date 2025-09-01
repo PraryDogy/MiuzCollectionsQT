@@ -6,34 +6,6 @@ class _Lang:
         "Русский",
         "English"
     ]
-    deleting = [
-        "Удаляю",
-        "Deleting"
-    ]
-    disable = [
-        "Выключить",
-        "Disable"
-    ]
-    download_update = [
-        "Обновление",
-        "Update app"
-    ]
-    enable = [
-        "Включить",
-        "Enable"
-    ]
-    end = [
-        "Конец",
-        "End"
-    ]
-    fav_coll = [
-        "Избранное",
-        "Favorites"
-    ]
-    file_name = [
-        "Имя файла",
-        "Filename"
-    ]
     file_size = [
         "Размер",
         "Size"
