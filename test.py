@@ -1,2 +1,2 @@
-"('/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/0803 копия.jpg', 30601264, 1752065147, 1752130091),"
-"('/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/2 Model IMG/0803 копия.jpg', 30601264, 1752065147, 1752130091)"
+a = [1, 3, 4, "    ", "dsfds"]
+b = [i.strip() for i in a]
