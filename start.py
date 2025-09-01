@@ -16,17 +16,12 @@ class System_:
             return
 
         ERROR = "".join(traceback.format_exception(exctype, value, tb))
-
         ABOUT = [
             "Отправьте это сообщение в telegram @evlosh",
             "или на почту loshkarev@miuz.ru"
         ]
-
         ABOUT = " ".join(ABOUT)
-
         STARS = "*" * 40
-
-
         SUMMARY_MSG = "\n".join([ERROR, STARS, ABOUT])
         
         d = QDialog()
