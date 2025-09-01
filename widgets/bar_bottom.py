@@ -256,6 +256,5 @@ class BarBottom(QWidget):
         if e.button() == Qt.MouseButton.LeftButton:
             self.win_settings = WinSettings()
             self.win_settings.center_relative_parent(self.window())
-            self.win_settings.theme_changed.connect(self.theme_changed.emit)
             self.win_settings.show()
     

@@ -483,6 +483,22 @@ class IgnorList(DropableGroupBox):
 
 
 class MainFolderSettings(QWidget):
+    lang = (
+        ("Имя папки", "Folder name"),
+        (
+            "Путь к папке с коллекциями: перетащите сюда папку или укажите\n"
+            "путь с новой строки.",
+            "Path to the collections folder: drag a folder here or enter a path\n"
+            "on a new line."
+        ),
+        (
+            "Игнор лист: перетащите сюда папку или укажите имя с новой\n"
+            "строки.",
+            "Ignore list: drag a folder here or enter a name on a new line."
+        ),
+        ("Удалить", "Delete"),
+    )
+
     def __init__(self, main_folder: MainFolder):
         super().__init__()
         v_lay = UVBoxLayout()
@@ -498,24 +514,24 @@ class MainFolderSettings(QWidget):
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_lay.setSpacing(5)
         first_row.setLayout(first_lay)
-        name_descr = QLabel(Lang.folder_name + ":")
+        name_descr = QLabel(self.lang[0][JsonData.lang] + ":")
         first_lay.addWidget(name_descr)
         name_label = QLabel(main_folder.name)
         first_lay.addWidget(name_label)
 
         sec_row = MainFolderPaths()
         v_lay.addWidget(sec_row)
-        sec_row.top_label.setText(Lang.main_folder_descr)
+        sec_row.top_label.setText(self.lang[1][JsonData.lang])
         text_ = "\n".join(i for i in main_folder.paths)
         sec_row.text_edit.setPlainText(text_)
 
         third_row = IgnorList()
         v_lay.addWidget(third_row)
-        third_row.top_label.setText(Lang.ignor_list_descr)
+        third_row.top_label.setText(self.lang[2][JsonData.lang])
         text_ = "\n".join(i for i in main_folder.stop_list)
         third_row.text_edit.setPlainText(text_)
 
-        remove_btn = QPushButton(Lang.delete)
+        remove_btn = QPushButton(self.lang[3][JsonData.lang])
         remove_btn.setFixedWidth(100)
 
         btn_lay = UHBoxLayout()
@@ -533,9 +549,16 @@ class MainFolderSettings(QWidget):
 
 
 class WinSettings(WinSystem):
+    lang = (
+        ("Настройки", "Settings"),
+        ("Основные", "General"),
+        ("Ок", "Ok"),
+        ("Отмена", "Cancel"),
+        ("Перезапуск", "Restart"),
+    )
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.setWindowTitle(Lang.settings)
+        self.setWindowTitle(self.lang[0][JsonData.lang])
         self.main_folder_list = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(JsonData())
         self.need_reset = False
@@ -550,7 +573,7 @@ class WinSettings(WinSystem):
         self.left_menu.mouseReleaseEvent = self.item_clicked
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = UListWidgetItem(self.left_menu, text=Lang.main)
+        main_settings_item = UListWidgetItem(self.left_menu, text=self.lang[1][JsonData.lang])
         self.left_menu.addItem(main_settings_item)
 
         for i in MainFolder.list_:
@@ -572,12 +595,12 @@ class WinSettings(WinSystem):
         btns_wid.setLayout(btns_lay)
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.ok_btn = QPushButton(Lang.ok)
+        self.ok_btn = QPushButton(self.lang[2][JsonData.lang])
         self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(100)
         btns_lay.addWidget(self.ok_btn)
 
-        cancel_btn = QPushButton(Lang.cancel)
+        cancel_btn = QPushButton(self.lang[3][JsonData.lang])
         cancel_btn.clicked.connect(self.deleteLater)
         cancel_btn.setFixedWidth(100)
         btns_lay.addWidget(cancel_btn)
@@ -594,7 +617,7 @@ class WinSettings(WinSystem):
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
             self.main_settings.reset.connect(lambda: setattr(self, "need_reset", True))
-            self.main_settings.changed.connect(lambda: self.ok_btn.setText(Lang.restart_app))
+            self.main_settings.changed.connect(lambda: self.ok_btn.setText(self.lang[4][JsonData.lang]))
             self.right_lay.insertWidget(0, self.main_settings)
         else:
             for i in self.main_folder_list:
