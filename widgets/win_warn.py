@@ -57,32 +57,16 @@ class WinWarn(WinSystem):
             self.deleteLater()
 
 
-class WinError(WinSystem):
-    def __init__(self, title: str, text: str):
-        super().__init__()
-        self.setWindowTitle(title)
-        self.setFixedSize(350, 350)
-        self.my_text = text
-
-        self.central_layout.setContentsMargins(10, 10, 10, 10)
-        self.central_layout.setSpacing(10)
-        self.init_ui()
-
-    def init_ui(self):
-        text_edit = UTextEdit()
-        text_edit.setReadOnly(True)
-        text_edit.setPlainText(self.my_text)
-        self.central_layout.addWidget(text_edit)
-
-        # Отступ между текстом и кнопкой
-        self.central_layout.addSpacerItem(QSpacerItem(0, 15))
-
-        # Кнопка OK
-        ok_btn = QPushButton(text=Lang.ok)
-        ok_btn.setFixedWidth(90)
-        ok_btn.clicked.connect(self.close)
-        self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-            self.deleteLater()
+class WinSmb(WinWarn):
+    lang = (
+        ("Нет подключения", "No connection"),
+        (
+            "- Подключитесь к диску с коллекциями\
+            \n- Добавьте новый путь к коллекциям\
+            \nв настройках.",
+            "- Connect to disk with collections\
+            \n- Add a new path to collections\
+            \nin the settings.")
+    )
+    def __init__(self):
+        super().__init__(title, text)
