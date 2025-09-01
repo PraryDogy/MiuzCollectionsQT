@@ -10,7 +10,7 @@ from system.lang import Lang
 from ._base_widgets import SvgBtn, UHBoxLayout
 from .actions import MenuTypes
 from .win_downloads import WinDownloads
-from .win_settings import WinSettings
+from .win_settings_new import WinSettings
 
 SLIDER_STYLE = """
     QSlider::groove:horizontal {
@@ -253,13 +253,9 @@ class BarBottom(QWidget):
         self.win_downloads = None
 
     def sett_btn_cmd(self, e: QMouseEvent):
-        # if e.button() == Qt.MouseButton.LeftButton:
-        #     self.win_settings = WinSettings()
-        #     self.win_settings.center_relative_parent(self.window())
-        #     self.win_settings.theme_changed.connect(self.theme_changed.emit)
-        #     self.win_settings.show()
+        if e.button() == Qt.MouseButton.LeftButton:
+            self.win_settings = WinSettings()
+            self.win_settings.center_relative_parent(self.window())
+            self.win_settings.theme_changed.connect(self.theme_changed.emit)
+            self.win_settings.show()
     
-        from .win_settings_copy import WinSettings
-        self.win_settings = WinSettings()
-        self.win_settings.center_relative_parent(self.window())
-        self.win_settings.show()
