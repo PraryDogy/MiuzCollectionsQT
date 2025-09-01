@@ -69,4 +69,4 @@ class WinSmb(WinWarn):
             \nin the settings.")
     )
     def __init__(self):
-        super().__init__(title, text)
+        super().__init__(self.lang[0][JsonData.lang], self.lang[1][JsonData.lang])
