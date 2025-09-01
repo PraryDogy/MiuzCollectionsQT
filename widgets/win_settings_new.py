@@ -30,6 +30,8 @@ class LangReset(QGroupBox):
     lang = (
         ("Русский", "English"),
         ("Язык", "Language"),
+        ("Сбросить", "Reset"),
+        ("Сбросить настройки", "Reset settings"),
 
     )
 
@@ -60,29 +62,33 @@ class LangReset(QGroupBox):
         sec_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_row_wid.setLayout(sec_row_lay)
 
-        self.reset_data_btn = QPushButton(Lang.reset)
+        self.reset_data_btn = QPushButton(self.lang[2][JsonData.lang])
         self.reset_data_btn.setFixedWidth(115)
         self.reset_data_btn.clicked.connect(self.changed.emit)
         self.reset_data_btn.clicked.connect(self.reset.emit)
         sec_row_lay.addWidget(self.reset_data_btn)
 
-        descr = QLabel(text=Lang.restore_db_descr)
+        descr = QLabel(text=self.lang[1][JsonData.lang])
         sec_row_lay.addWidget(descr)
 
         v_lay.addWidget(first_row_wid)
         v_lay.addWidget(sec_row_wid)
 
     def lang_btn_cmd(self, *args):
-        if self.lang_btn.text() == "Русский":
-            self.lang_btn.setText("English")
+        if self.lang_btn.text() == self.lang[0][0]: 
+            self.lang_btn.setText(self.lang[0][1])
             self.json_data.lang = 1
         else:
-            self.lang_btn.setText("Русский")
+            self.lang_btn.setText(self.lang[0][0])
             self.json_data.lang = 0
         self.changed.emit()
 
 
 class SimpleSettings(QGroupBox):
+    lang = (
+
+    )
+
     def __init__(self):
         super().__init__()
 
