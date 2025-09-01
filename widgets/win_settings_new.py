@@ -503,6 +503,7 @@ class StopList(DropableGroupBox):
 
 class MainFolderSettings(QWidget):
     remove = pyqtSignal()
+    changed = pyqtSignal()
     lang = (
         ("Имя папки", "Folder name"),
         (
@@ -539,12 +540,14 @@ class MainFolderSettings(QWidget):
         first_lay.addWidget(name_label)
 
         sec_row = MainFolderPaths(main_folder)
+        sec_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(sec_row)
         sec_row.top_label.setText(self.lang[1][JsonData.lang])
         text_ = "\n".join(i for i in main_folder.paths)
         sec_row.text_edit.setPlainText(text_)
 
         third_row = StopList(main_folder)
+        third_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(third_row)
         third_row.top_label.setText(self.lang[2][JsonData.lang])
         text_ = "\n".join(i for i in main_folder.stop_list)
@@ -590,7 +593,7 @@ class WinSettings(WinSystem):
         self.central_layout.addWidget(self.splitter)
 
         self.left_menu = VListWidget()
-        self.left_menu.mouseReleaseEvent = self.item_clicked
+        self.left_menu.mouseReleaseEvent = self.init_right_side
         self.splitter.addWidget(self.left_menu)
 
         main_settings_item = UListWidgetItem(self.left_menu, text=self.lang[1][JsonData.lang])
@@ -629,10 +632,11 @@ class WinSettings(WinSystem):
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([Static.MENU_LEFT_WIDTH, 600])
 
-        self.item_clicked()
+        self.init_right_side()
 
-    def item_clicked(self, *args):
+    def init_right_side(self, *args):
         self.clear_right_side()
+
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
             self.main_settings.reset.connect(lambda: setattr(self, "need_reset", True))
@@ -648,6 +652,7 @@ class WinSettings(WinSystem):
             if main_folder:
                 item = self.left_menu.currentItem()
                 main_folder_sett = MainFolderSettings(main_folder)
+                main_folder_sett.changed.connect(lambda: self.ok_btn.setText(self.lang[4][JsonData.lang]))
                 main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder, item))
                 self.right_lay.insertWidget(0, main_folder_sett)
 
@@ -657,7 +662,8 @@ class WinSettings(WinSystem):
             self.left_menu.takeItem(self.left_menu.currentRow())
             self.left_menu.setCurrentRow(0)
             self.clear_right_side()
-            self.item_clicked()
+            self.init_right_side()
+            self.ok_btn.setText(self.lang[4][JsonData.lang])
         except Exception:
             print("win settings > ошибка удаления main folder по кнопке удалить")
 
