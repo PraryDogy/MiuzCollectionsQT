@@ -619,11 +619,15 @@ class WinSettings(WinSystem):
             self.main_settings.changed.connect(lambda: self.ok_btn.setText(self.lang[4][JsonData.lang]))
             self.right_lay.insertWidget(0, self.main_settings)
         else:
-            for i in self.main_folder_list:
-                if i.name == self.left_menu.currentItem().text():
-                    main_folder_sett = MainFolderSettings(self.main_folder_list, i)
-                    self.right_lay.insertWidget(0, main_folder_sett)
-                    break
+            i = next(
+                (x
+                 for x in self.main_folder_list
+                 if x.name == self.left_menu.currentItem().text()
+                )
+            )
+            if i:
+                main_folder_sett = MainFolderSettings(self.main_folder_list, i)
+                self.right_lay.insertWidget(0, main_folder_sett)
 
     def ok_cmd(self):
         new_json_data = vars(self.json_data_copy)
