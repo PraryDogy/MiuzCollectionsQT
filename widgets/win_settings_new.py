@@ -499,13 +499,12 @@ class MainFolderSettings(QWidget):
         ("Удалить", "Delete"),
     )
 
-    def __init__(self, main_folder: MainFolder):
+    def __init__(self, main_folder_list: list[MainFolder], current: MainFolder):
         super().__init__()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(15)
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(v_lay)
-        self.main_folder = main_folder
 
         first_row = QGroupBox()
         first_row.setFixedHeight(50)
@@ -516,19 +515,19 @@ class MainFolderSettings(QWidget):
         first_row.setLayout(first_lay)
         name_descr = QLabel(self.lang[0][JsonData.lang] + ":")
         first_lay.addWidget(name_descr)
-        name_label = QLabel(main_folder.name)
+        name_label = QLabel(current.name)
         first_lay.addWidget(name_label)
 
         sec_row = MainFolderPaths()
         v_lay.addWidget(sec_row)
         sec_row.top_label.setText(self.lang[1][JsonData.lang])
-        text_ = "\n".join(i for i in main_folder.paths)
+        text_ = "\n".join(i for i in current.paths)
         sec_row.text_edit.setPlainText(text_)
 
         third_row = IgnorList()
         v_lay.addWidget(third_row)
         third_row.top_label.setText(self.lang[2][JsonData.lang])
-        text_ = "\n".join(i for i in main_folder.stop_list)
+        text_ = "\n".join(i for i in current.stop_list)
         third_row.text_edit.setPlainText(text_)
 
         remove_btn = QPushButton(self.lang[3][JsonData.lang])
@@ -622,7 +621,7 @@ class WinSettings(WinSystem):
         else:
             for i in self.main_folder_list:
                 if i.name == self.left_menu.currentItem().text():
-                    main_folder_sett = MainFolderSettings(i)
+                    main_folder_sett = MainFolderSettings(self.main_folder_list, i)
                     self.right_lay.insertWidget(0, main_folder_sett)
                     break
 
