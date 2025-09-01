@@ -146,7 +146,6 @@ class ScanerSettings(QGroupBox):
         ("Быстрый поиск изображений (бета)", "Fast image search (beta)"),
         ("Выключить", "Disable"),
         ("Включить", "Enable"),
-
     )
 
     def __init__(self, json_data_copy: JsonData):
@@ -277,6 +276,11 @@ class ThemesBtn(QFrame):
 
 class Themes(QGroupBox):
     theme_changed = pyqtSignal()
+    lang = (
+        ("Авто", "Auto"),
+        ("Темная", "Dark"),
+        ("Светлая", "Light"),
+    )
 
     def __init__(self):
         super().__init__()
@@ -290,15 +294,15 @@ class Themes(QGroupBox):
 
         self.system_theme = ThemesBtn(
             os.path.join(Static.INNER_IMAGES, "system_theme.svg"),
-            Lang.theme_auto
+            self.lang[0][JsonData.lang]
         )
         self.dark_theme = ThemesBtn(
             os.path.join(Static.INNER_IMAGES,"dark_theme.svg"),
-            Lang.theme_dark
+            self.lang[1][JsonData.lang]
         )
         self.light_theme = ThemesBtn(
             os.path.join(Static.INNER_IMAGES,"light_theme.svg"),
-            Lang.theme_light
+            self.lang[2][JsonData.lang]
         )
 
         for f in (self.system_theme, self.dark_theme, self.light_theme):
@@ -333,30 +337,33 @@ class Themes(QGroupBox):
 
 
 class SelectableLabel(QLabel):
+    txt = "\n".join([
+        f"Version {Static.APP_VER}",
+        "Developed by Evlosh",
+        "email: evlosh@gmail.com",
+        "telegram: evlosh",
+        ])
+    lang = (
+        ("Копировать", "Copy"),
+        ("Копировать все", "Copy all"),
+    )
+
     def __init__(self, parent):
         super().__init__(parent)
-
-        txt = "\n".join([
-            f"Version {Static.APP_VER}",
-            "Developed by Evlosh",
-            "email: evlosh@gmail.com",
-            "telegram: evlosh",
-            ])
-        
-        self.setText(txt)
+        self.setText(self.txt)
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=Lang.copy)
+        copy_text = QAction(parent=context_menu, text=self.lang[0][JsonData.lang])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Lang.copy_all)
+        select_all = QAction(parent=context_menu, text=self.lang[1][JsonData.lang])
         select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
