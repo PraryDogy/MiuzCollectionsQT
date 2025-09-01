@@ -68,7 +68,7 @@ class LangReset(QGroupBox):
         self.reset_data_btn.clicked.connect(self.reset.emit)
         sec_row_lay.addWidget(self.reset_data_btn)
 
-        descr = QLabel(text=self.lang[1][JsonData.lang])
+        descr = QLabel(text=self.lang[3][JsonData.lang])
         sec_row_lay.addWidget(descr)
 
         v_lay.addWidget(first_row_wid)
