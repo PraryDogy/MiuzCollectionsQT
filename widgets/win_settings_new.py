@@ -428,6 +428,8 @@ class MainSettings(QWidget):
 
 
 class DropableGroupBox(QGroupBox):
+    text_changed = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
@@ -442,8 +444,15 @@ class DropableGroupBox(QGroupBox):
         v_lay.addWidget(self.top_label)
 
         self.text_edit = UTextEdit()
+        self.text_edit.textChanged.connect(self.text_changed.emit)
         self.text_edit.setAcceptDrops(False)
         v_lay.addWidget(self.text_edit)
+
+    def get_data(self):
+        return [
+            i
+            for i in self.text_edit.toPlainText().split("\n")
+        ]
 
     def dragEnterEvent(self, a0):
         a0.accept()
@@ -451,8 +460,13 @@ class DropableGroupBox(QGroupBox):
     
 
 class MainFolderPaths(DropableGroupBox):
-    def __init__(self):
+    def __init__(self, main_folder: MainFolder):
         super().__init__()
+        self.main_folder = main_folder
+        self.text_changed.connect(self.set_data)
+
+    def set_data(self, *args):
+        self.main_folder.paths = self.get_data()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -466,9 +480,14 @@ class MainFolderPaths(DropableGroupBox):
         return super().dropEvent(a0)
 
 
-class IgnorList(DropableGroupBox):
-    def __init__(self):
+class StopList(DropableGroupBox):
+    def __init__(self, main_folder: MainFolder):
         super().__init__()
+        self.main_folder = main_folder
+        self.text_changed.connect(self.set_data)
+
+    def set_data(self, *args):
+        self.main_folder.stop_list = self.get_data()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -483,6 +502,7 @@ class IgnorList(DropableGroupBox):
 
 
 class MainFolderSettings(QWidget):
+    remove = pyqtSignal()
     lang = (
         ("Имя папки", "Folder name"),
         (
@@ -499,7 +519,7 @@ class MainFolderSettings(QWidget):
         ("Удалить", "Delete"),
     )
 
-    def __init__(self, main_folder_list: list[MainFolder], current: MainFolder):
+    def __init__(self, main_folder: MainFolder):
         super().__init__()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(15)
@@ -515,22 +535,23 @@ class MainFolderSettings(QWidget):
         first_row.setLayout(first_lay)
         name_descr = QLabel(self.lang[0][JsonData.lang] + ":")
         first_lay.addWidget(name_descr)
-        name_label = QLabel(current.name)
+        name_label = QLabel(main_folder.name)
         first_lay.addWidget(name_label)
 
-        sec_row = MainFolderPaths()
+        sec_row = MainFolderPaths(main_folder)
         v_lay.addWidget(sec_row)
         sec_row.top_label.setText(self.lang[1][JsonData.lang])
-        text_ = "\n".join(i for i in current.paths)
+        text_ = "\n".join(i for i in main_folder.paths)
         sec_row.text_edit.setPlainText(text_)
 
-        third_row = IgnorList()
+        third_row = StopList(main_folder)
         v_lay.addWidget(third_row)
         third_row.top_label.setText(self.lang[2][JsonData.lang])
-        text_ = "\n".join(i for i in current.stop_list)
+        text_ = "\n".join(i for i in main_folder.stop_list)
         third_row.text_edit.setPlainText(text_)
 
         remove_btn = QPushButton(self.lang[3][JsonData.lang])
+        remove_btn.clicked.connect(self.remove.emit)
         remove_btn.setFixedWidth(100)
 
         btn_lay = UHBoxLayout()
@@ -611,42 +632,63 @@ class WinSettings(WinSystem):
         self.item_clicked()
 
     def item_clicked(self, *args):
-        for i in self.right_wid.findChildren((MainSettings, MainFolderSettings)):
-            i.deleteLater()
+        self.clear_right_side()
         if self.left_menu.currentRow() == 0:
             self.main_settings = MainSettings(self.json_data_copy)
             self.main_settings.reset.connect(lambda: setattr(self, "need_reset", True))
             self.main_settings.changed.connect(lambda: self.ok_btn.setText(self.lang[4][JsonData.lang]))
             self.right_lay.insertWidget(0, self.main_settings)
         else:
-            i = next(
+            main_folder = next(
                 (x
                  for x in self.main_folder_list
                  if x.name == self.left_menu.currentItem().text()
                 )
             )
-            if i:
-                main_folder_sett = MainFolderSettings(self.main_folder_list, i)
+            if main_folder:
+                item = self.left_menu.currentItem()
+                main_folder_sett = MainFolderSettings(main_folder)
+                main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder, item))
                 self.right_lay.insertWidget(0, main_folder_sett)
+
+    def remove_main_folder(self, main_folder: MainFolder, item: UListWidgetItem):
+        try:
+            self.main_folder_list.remove(main_folder)
+            self.left_menu.takeItem(self.left_menu.currentRow())
+            self.left_menu.setCurrentRow(0)
+            self.clear_right_side()
+            self.item_clicked()
+        except Exception:
+            print("win settings > ошибка удаления main folder по кнопке удалить")
+
+    def clear_right_side(self):
+        for i in self.right_wid.findChildren((MainSettings, MainFolderSettings)):
+            i.deleteLater()
 
     def ok_cmd(self):
         new_json_data = vars(self.json_data_copy)
 
-        if self.need_reset:
-            shutil.rmtree(Static.APP_SUPPORT_DIR)
-            QApplication.quit()
-            MainUtils.start_new_app()
+        for i in self.main_folder_list:
+            print(i.name)
+            # print(i.paths)
+            print(i.stop_list)
+            print()
 
-        elif new_json_data:
-            for k, v in new_json_data.items():
-                setattr(JsonData, k, v)
-            MainFolder.write_json_data()
-            JsonData.write_json_data()
-            QApplication.quit()
-            MainUtils.start_new_app()
 
-        else:
-            self.deleteLater()
+        # if self.need_reset:
+        #     shutil.rmtree(Static.APP_SUPPORT_DIR)
+        #     QApplication.quit()
+        #     MainUtils.start_new_app()
+
+        # else:
+        #     for k, v in new_json_data.items():
+        #         setattr(JsonData, k, v)
+        #     MainFolder.write_json_data()
+        #     JsonData.write_json_data()
+        #     QApplication.quit()
+        #     MainUtils.start_new_app()
+
+
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
