@@ -43,7 +43,7 @@ class WinHelp(WinSystem):
         descr = QLabel(text)
         v_lay.addWidget(descr)
 
-        svg = f"example {page_num} {JsonData.lang_ind}.svg"
+        svg = f"example {page_num} {JsonData.lang}.svg"
         svg = os.path.join(Static.INNER_IMAGES, svg)
 
         svg_wid = QSvgWidget()

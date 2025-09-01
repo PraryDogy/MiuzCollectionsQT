@@ -636,12 +636,12 @@ class Lang(_Lang):
 
         max_ = len(_Lang._lang_name) - 1
 
-        if JsonData.lang_ind > max_:
+        if JsonData.lang > max_:
             print("lang > init")
-            print(f"lang_ind is {JsonData.lang_ind}, max is {max_}, set to 0")
-            JsonData.lang_ind = 0
+            print(f"lang_ind is {JsonData.lang}, max is {max_}, set to 0")
+            JsonData.lang = 0
 
         for k, v in vars(_Lang).items():
             if isinstance(v, list):
-                setattr(cls, k, v[JsonData.lang_ind])
+                setattr(cls, k, v[JsonData.lang])
     

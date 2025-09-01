@@ -254,8 +254,8 @@ class SingleImgInfo(URunnable):
                 Lang.file_size: size,
                 Lang.place: self.lined_text(self.url),
                 Lang.thumb_path: self.lined_text(thumb_path),
-                self.lang[0][JsonData.lang_ind]: mod,
-                self.lang[1][JsonData.lang_ind]: self.lined_text(coll),
+                self.lang[0][JsonData.lang]: mod,
+                self.lang[1][JsonData.lang]: self.lined_text(coll),
                 Lang.resol: Lang.calculating,
                 }
             

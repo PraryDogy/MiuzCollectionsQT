@@ -367,7 +367,7 @@ class HashdirUpdater:
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
             if not self.task_state.should_run():
                 break
-            self.progressbar_text(self.lang[0][JsonData.lang_ind], x, total)
+            self.progressbar_text(self.lang[0][JsonData.lang], x, total)
             try:
                 thumb = self.create_thumb(img_path)
                 thumb_path = ThumbUtils.create_thumb_path(img_path)

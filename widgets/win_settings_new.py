@@ -21,21 +21,19 @@ from ._base_widgets import (UHBoxLayout, ULineEdit, UListWidgetItem, UMenu,
                             WinSystem)
 from .win_help import WinHelp
 
-
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
 
 
 class LangReset(QGroupBox):
     reset = pyqtSignal()
     changed = pyqtSignal()
+    lang = (
+        ("Русский", "English"),
+        ("Язык", "Language"),
+
+    )
 
     def __init__(self, json_data_copy: JsonData):
-        """
-        Сигналы:
-        - reset_data() сброс всех настроек приложения
-        - new_lang(0 или 1): system > lang > _Lang._lang_name. 
-        0 это русский язык, 1 это английский
-        """
         super().__init__()
         self.json_data = json_data_copy
 
@@ -48,12 +46,12 @@ class LangReset(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.lang_btn = QPushButton(text=Lang._lang_name)
+        self.lang_btn = QPushButton(text=self.lang[0][JsonData.lang])
         self.lang_btn.setFixedWidth(115)
         self.lang_btn.clicked.connect(self.lang_btn_cmd)
         first_row_lay.addWidget(self.lang_btn)
 
-        self.lang_label = QLabel(Lang.lang_label)
+        self.lang_label = QLabel(self.lang[1][JsonData.lang])
         first_row_lay.addWidget(self.lang_label)
 
         sec_row_wid = QWidget()
@@ -77,10 +75,10 @@ class LangReset(QGroupBox):
     def lang_btn_cmd(self, *args):
         if self.lang_btn.text() == "Русский":
             self.lang_btn.setText("English")
-            self.json_data.lang_ind = 1
+            self.json_data.lang = 1
         else:
             self.lang_btn.setText("Русский")
-            self.json_data.lang_ind = 0
+            self.json_data.lang = 0
         self.changed.emit()
 
 

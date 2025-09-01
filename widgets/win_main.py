@@ -253,7 +253,7 @@ class WinMain(UMainWindow):
     def set_window_title(self):
         main_folder = MainFolder.current.name.capitalize()
         if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            t = self.lang[0][JsonData.lang_ind]
+            t = self.lang[0][JsonData.lang]
         elif Dynamic.curr_coll_name == Static.NAME_FAVS:
             t = Lang.fav_coll
         elif Dynamic.curr_coll_name == Static.NAME_RECENTS:

@@ -35,7 +35,7 @@ class DatesLineEdit(ULineEdit):
 
     def __init__(self):
         super().__init__()
-        self.setPlaceholderText(self.lang[0][JsonData.lang_ind])
+        self.setPlaceholderText(self.lang[0][JsonData.lang])
         self.textChanged.connect(self.onTextChanged)
         self.date = None
 
@@ -176,7 +176,7 @@ class WinDates(WinSystem):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle(self.lang[1][JsonData.lang_ind])
+        self.setWindowTitle(self.lang[1][JsonData.lang])
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
 
@@ -230,7 +230,7 @@ class WinDates(WinSystem):
         spacer_item = QSpacerItem(10, 1)
         btns_h_lay.addItem(spacer_item)
 
-        cancel_btn = QPushButton(text=self.lang[0][JsonData.lang_ind])
+        cancel_btn = QPushButton(text=self.lang[0][JsonData.lang])
         self.ok_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.cancel_cmd)
         btns_h_lay.addWidget(cancel_btn)

@@ -236,7 +236,7 @@ class AddRowWindow(WinSystem):
         ok_btn.setFixedWidth(90)
         h_lay.addWidget(ok_btn)
 
-        can_btn = QPushButton(text=self.lang[0][JsonData.lang_ind])
+        can_btn = QPushButton(text=self.lang[0][JsonData.lang])
         can_btn.clicked.connect(self.close)
         can_btn.setFixedWidth(90)
         h_lay.addWidget(can_btn)
@@ -295,20 +295,20 @@ class MainFolderItemsWid(VListWidget):
     def list_item_context(self, ev):
         menu = UMenu(event=ev)
 
-        add_item = QAction(parent=menu, text=self.lang[0][JsonData.lang_ind])
+        add_item = QAction(parent=menu, text=self.lang[0][JsonData.lang])
         add_item.triggered.connect(self.open_add_row_win)
         menu.addAction(add_item)
 
         wid = self.itemAt(ev.pos())
         if wid:
-            copy_text = QAction(parent=menu, text=self.lang[1][JsonData.lang_ind])
+            copy_text = QAction(parent=menu, text=self.lang[1][JsonData.lang])
             cmd = lambda: MainUtils.copy_text(wid.text())
             copy_text.triggered.connect(cmd)
             menu.addAction(copy_text)
 
             menu.addSeparator()
         
-            del_item = QAction(parent=menu, text=self.lang[2][JsonData.lang_ind])
+            del_item = QAction(parent=menu, text=self.lang[2][JsonData.lang])
             del_item.triggered.connect(self.del_item_cmd)
             menu.addAction(del_item)
 
@@ -393,7 +393,7 @@ class EditMainFoldersWid(QTabWidget):
         h_lay_two.setSpacing(15)
         h_wid_two.setLayout(h_lay_two)
 
-        add_btn_two = QPushButton(self.lang[0][JsonData.lang_ind])
+        add_btn_two = QPushButton(self.lang[0][JsonData.lang])
         add_btn_two.setFixedWidth(115)
         h_lay_two.addWidget(add_btn_two)
 
@@ -416,7 +416,7 @@ class EditMainFoldersWid(QTabWidget):
         h_lay_one.setSpacing(15)
         h_wid_one.setLayout(h_lay_one)
 
-        add_stop_coll_btn = QPushButton(self.lang[0][JsonData.lang_ind])
+        add_stop_coll_btn = QPushButton(self.lang[0][JsonData.lang])
         add_stop_coll_btn.setFixedWidth(115)
         h_lay_one.addWidget(add_stop_coll_btn)
 
@@ -466,7 +466,7 @@ class AddMainFolderWin(WinSystem):
         sec_row_lay.setSpacing(15)
         sec_row.setLayout(sec_row_lay)
 
-        sec_add_btn = QPushButton(self.lang[0][JsonData.lang_ind])
+        sec_add_btn = QPushButton(self.lang[0][JsonData.lang])
         sec_add_btn.setFixedWidth(115)
         sec_row_lay.addWidget(sec_add_btn)
 
@@ -485,7 +485,7 @@ class AddMainFolderWin(WinSystem):
         first_row_lay.setSpacing(15)
         first_row.setLayout(first_row_lay)
 
-        first_add_btn = QPushButton(self.lang[0][JsonData.lang_ind])
+        first_add_btn = QPushButton(self.lang[0][JsonData.lang])
         first_add_btn.setFixedWidth(115)
         first_row_lay.addWidget(first_add_btn)
 
@@ -512,7 +512,7 @@ class AddMainFolderWin(WinSystem):
         ok_btn.setFixedWidth(90)
         btns_lay.addWidget(ok_btn)
 
-        cancel_btn = QPushButton(self.lang[1][JsonData.lang_ind])
+        cancel_btn = QPushButton(self.lang[1][JsonData.lang])
         cancel_btn.clicked.connect(self.close)
         cancel_btn.setFixedWidth(90)
         btns_lay.addWidget(cancel_btn)
@@ -577,7 +577,7 @@ class RemoveMainFolderWin(WinSystem):
         self.ok_btn.setFixedWidth(90)
         h_lay.addWidget(self.ok_btn)
 
-        cancel_btn = QPushButton(text=self.lang[0][JsonData.lang_ind])
+        cancel_btn = QPushButton(text=self.lang[0][JsonData.lang])
         cancel_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.close)
         h_lay.addWidget(cancel_btn)
@@ -634,12 +634,12 @@ class MainFolderWid(QGroupBox):
         h_lay.setSpacing(15)
         first_row.setLayout(h_lay)
 
-        add_btn = QPushButton(self.lang[0][JsonData.lang_ind])
+        add_btn = QPushButton(self.lang[0][JsonData.lang])
         add_btn.mouseReleaseEvent = self.add_btn_cmd
         add_btn.setFixedWidth(115)
         h_lay.addWidget(add_btn)
 
-        descr = QLabel(self.lang[1][JsonData.lang_ind])
+        descr = QLabel(self.lang[1][JsonData.lang])
         h_lay.addWidget(descr)
 
         second_row = QWidget()
@@ -694,13 +694,13 @@ class SelectableLabel(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=self.lang[0][JsonData.lang_ind])
+        copy_text = QAction(parent=context_menu, text=self.lang[0][JsonData.lang])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=self.lang[1][JsonData.lang_ind])
+        select_all = QAction(parent=context_menu, text=self.lang[1][JsonData.lang])
         select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -893,7 +893,7 @@ class WinSettings(WinSystem):
         self.set_apply_btn()
 
     def set_apply_btn(self):
-        self.ok_btn.setText(self.lang[0][JsonData.lang_ind])
+        self.ok_btn.setText(self.lang[0][JsonData.lang])
 
     def init_ui(self):
         self.tabs_wid = QTabWidget()
@@ -948,7 +948,7 @@ class WinSettings(WinSystem):
         v_lay.addWidget(main_folder_tab)
 
         v_lay.addStretch()
-        self.tabs_wid.addTab(v_wid, self.lang[2][JsonData.lang_ind])
+        self.tabs_wid.addTab(v_wid, self.lang[2][JsonData.lang])
 
     def btns_wid(self):
         btns_wid = QWidget()
@@ -965,7 +965,7 @@ class WinSettings(WinSystem):
 
         btns_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        cancel_btn = QPushButton(text=self.lang[1][JsonData.lang_ind])
+        cancel_btn = QPushButton(text=self.lang[1][JsonData.lang])
         cancel_btn.setFixedWidth(100)
         cancel_btn.clicked.connect(self.close)
         btns_layout.addWidget(cancel_btn)
@@ -981,7 +981,7 @@ class WinSettings(WinSystem):
 
         if self.new_lang in (0, 1):
             restart_app = True
-            JsonData.lang_ind = self.new_lang
+            JsonData.lang = self.new_lang
 
         if self.scan_time:
             restart_app = True

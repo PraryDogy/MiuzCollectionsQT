@@ -98,11 +98,11 @@ class ULineEdit(QLineEdit):
         self.menu_ = UMenu(event=a0)
         self.menu_.setFixedWidth(120)
 
-        sel = QAction(text=self.lang[1][JsonData.lang_ind], parent=self.menu_)
+        sel = QAction(text=self.lang[1][JsonData.lang], parent=self.menu_)
         sel.triggered.connect(self.cut_selection)
         self.menu_.addAction(sel)
 
-        sel_all = QAction(text=self.lang[0][JsonData.lang_ind], parent=self.menu_)
+        sel_all = QAction(text=self.lang[0][JsonData.lang], parent=self.menu_)
         sel_all.triggered.connect(
             lambda: MainUtils.copy_text(self.selectedText())
         )
@@ -186,11 +186,11 @@ class UTextEdit(QTextEdit):
         menu_ = UMenu(event=a0)
         menu_.setFixedWidth(120)
 
-        sel = QAction(text=self.lang[1][JsonData.lang_ind], parent=menu_)
+        sel = QAction(text=self.lang[1][JsonData.lang], parent=menu_)
         sel.triggered.connect(self.cut_selection)
         menu_.addAction(sel)
 
-        sel_all = QAction(text=self.lang[0][JsonData.lang_ind], parent=menu_)
+        sel_all = QAction(text=self.lang[0][JsonData.lang], parent=menu_)
         sel_all.triggered.connect(self.copy_selection)
         menu_.addAction(sel_all)
 

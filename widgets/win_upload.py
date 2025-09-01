@@ -64,7 +64,7 @@ class CollBtn(QLabel):
     def __init__(self, text: str):
         self.coll_name = text
         data = {
-            Static.NAME_ALL_COLLS: self.lang[0][JsonData.lang_ind],
+            Static.NAME_ALL_COLLS: self.lang[0][JsonData.lang],
             Static.NAME_RECENTS: Lang.recents,
             Static.NAME_FAVS: Lang.fav_coll
         }
@@ -193,7 +193,7 @@ class WinUpload(WinChild):
         self.tab_wid.addTab(self.main_folders, Lang.folders)
         self.collections_list = CollBtnList(0)
         self.collections_list.clicked.connect(self.clicked_cmd)
-        self.tab_wid.addTab(self.collections_list, self.lang[0][JsonData.lang_ind])
+        self.tab_wid.addTab(self.collections_list, self.lang[0][JsonData.lang])
 
         self.tab_wid.setCurrentIndex(1)
 

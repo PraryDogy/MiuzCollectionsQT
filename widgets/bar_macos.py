@@ -37,13 +37,13 @@ class SelectableLabel(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=self.lang[0][JsonData.lang_ind])
+        copy_text = QAction(parent=context_menu, text=self.lang[0][JsonData.lang])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=self.lang[1][JsonData.lang_ind])
+        select_all = QAction(parent=context_menu, text=self.lang[1][JsonData.lang])
         select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -87,7 +87,7 @@ class BarMacos(QMenuBar):
         self.init_ui()
 
     def init_ui(self):
-        self.mainMenu = QMenu(self.lang[0][JsonData.lang_ind], self)
+        self.mainMenu = QMenu(self.lang[0][JsonData.lang], self)
 
         # Добавляем пункт "Открыть настройки"
         actionSettings = QAction(Lang.open_settings_window, self)
