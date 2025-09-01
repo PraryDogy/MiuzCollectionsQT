@@ -32,7 +32,6 @@ class LangReset(QGroupBox):
         ("Язык", "Language"),
         ("Сбросить", "Reset"),
         ("Сбросить настройки", "Reset settings"),
-
     )
 
     def __init__(self, json_data_copy: JsonData):
@@ -86,7 +85,10 @@ class LangReset(QGroupBox):
 
 class SimpleSettings(QGroupBox):
     lang = (
-
+        ("Показать", "Show"),
+        ("Показать системные файлы в Finder", "Show system files in Finder"),
+        ("Помощь", "Help"),
+        ("Показать окно справки", "Show help window"),
     )
 
     def __init__(self):
@@ -102,12 +104,12 @@ class SimpleSettings(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.show_files_btn = QPushButton(text=Lang.show_app_support)
+        self.show_files_btn = QPushButton(text=self.lang[0][JsonData.lang])
         self.show_files_btn.setFixedWidth(115)
         self.show_files_btn.clicked.connect(self.show_files_cmd)
         first_row_lay.addWidget(self.show_files_btn)
 
-        self.lang_label = QLabel(Lang.show_files)
+        self.lang_label = QLabel(self.lang[1][JsonData.lang])
         first_row_lay.addWidget(self.lang_label)
 
         sec_row_wid = QWidget()
@@ -116,12 +118,12 @@ class SimpleSettings(QGroupBox):
         sec_row_lay.setSpacing(15)
         sec_row_wid.setLayout(sec_row_lay)
 
-        self.help_btn = QPushButton(text=Lang.win_manual)
+        self.help_btn = QPushButton(text=self.lang[2][JsonData.lang])
         self.help_btn.setFixedWidth(115)
         self.help_btn.clicked.connect(self.show_help)
         sec_row_lay.addWidget(self.help_btn)
 
-        self.lang_label = QLabel(Lang.win_manual_descr)
+        self.lang_label = QLabel(self.lang[3][JsonData.lang])
         sec_row_lay.addWidget(self.lang_label)
 
     def show_files_cmd(self, *args):
@@ -138,6 +140,14 @@ class SimpleSettings(QGroupBox):
 
 class ScanerSettings(QGroupBox):
     changed = pyqtSignal()
+    lang = (
+        ("минут", "minutes"),
+        ("Интервал поиска новых изображений", "Interval for checking new images"),
+        ("Быстрый поиск изображений (бета)", "Fast image search (beta)"),
+        ("Выключить", "Disable"),
+        ("Включить", "Enable"),
+
+    )
 
     def __init__(self, json_data_copy: JsonData):
         super().__init__()
@@ -157,12 +167,12 @@ class ScanerSettings(QGroupBox):
         self.spin = QSpinBox(self)
         self.spin.setMinimum(1)
         self.spin.setMaximum(60)
-        self.spin.setSuffix(f" {Lang.mins}")
+        self.spin.setSuffix(f" {self.lang[0][JsonData.lang]}")
         self.spin.setValue(self.json_data_copy.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
         self.spin_lay.addWidget(self.spin)
 
-        label = QLabel(Lang.scan_every, self)
+        label = QLabel(self.lang[1][JsonData.lang], self)
         self.spin_lay.addWidget(label)
 
         self.theme_changed()
@@ -178,13 +188,13 @@ class ScanerSettings(QGroupBox):
         self.checkbox.setFixedWidth(115)
         first_lay.addWidget(self.checkbox)
 
-        self.checkbox_lbl = QLabel(Lang.new_scaner)
+        self.checkbox_lbl = QLabel(self.lang[2][JsonData.lang])
         first_lay.addWidget(self.checkbox_lbl)
 
         if self.json_data_copy.new_scaner:
-            self.checkbox.setText(Lang.disable)
+            self.checkbox.setText(self.lang[3][JsonData.lang])
         else:
-            self.checkbox.setText(Lang.enable)
+            self.checkbox.setText(self.lang[4][JsonData.lang])
 
         self.checkbox.setChecked(True)
 
@@ -203,10 +213,10 @@ class ScanerSettings(QGroupBox):
     def change_new_scaner(self):
         if self.json_data_copy.new_scaner:
             self.json_data_copy.new_scaner = False
-            self.checkbox.setText(Lang.enable)
+            self.checkbox.setText(self.lang[4][JsonData.lang])
         else:
             self.json_data_copy.new_scaner = True
-            self.checkbox.setText(Lang.disable)
+            self.checkbox.setText(self.lang[3][JsonData.lang])
         self.changed.emit()
 
 

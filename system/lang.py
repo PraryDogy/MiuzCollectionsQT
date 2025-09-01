@@ -346,8 +346,7 @@ class _Lang:
     ]
 
     show_files = [
-        "Показать системные файлы в Finder",
-        "Show system files in Finder"
+        ("Показать системные файлы в Finder", "Show system files in Finder")
     ]
 
     restore_db_descr = [
@@ -455,8 +454,7 @@ class _Lang:
     ]
 
     scan_every = [
-        "Интервал поиска новых изображений",
-        "Interval for checking new images"
+        ("Интервал поиска новых изображений", "Interval for checking new images")
     ]
 
     mins = [
@@ -527,8 +525,7 @@ class _Lang:
     ]
 
     win_manual_descr = [
-        "Показать окно справки",
-        "Show help window"
+        ("Показать окно справки", "Show help window")
     ]
 
     back = ["Назад", "Back"]
@@ -601,8 +598,7 @@ class _Lang:
     ]
 
     new_scaner = [
-        "Быстрый поиск изображений (бета)",
-        "Fast image search (beta)"
+        ("Быстрый поиск изображений (бета)", "Fast image search (beta)")
     ]
 
     folder_name = [
