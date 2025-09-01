@@ -20,6 +20,7 @@ from ._base_widgets import (UHBoxLayout, ULineEdit, UListWidgetItem, UMenu,
                             UTextEdit, UVBoxLayout, VListWidget, WinChild,
                             WinSystem)
 from .win_help import WinHelp
+from .win_warn import WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
 
@@ -578,6 +579,11 @@ class WinSettings(WinSystem):
         ("Ок", "Ok"),
         ("Отмена", "Cancel"),
         ("Перезапуск", "Restart"),
+        ("Внимание", "Attention"),
+        (
+            "Нужна хотя бы одна папка с коллекциями",
+            "At least one collection folder required"
+        )
     )
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -659,12 +665,20 @@ class WinSettings(WinSystem):
 
     def remove_main_folder(self, main_folder: MainFolder, item: UListWidgetItem):
         try:
-            self.main_folder_list.remove(main_folder)
-            self.left_menu.takeItem(self.left_menu.currentRow())
-            self.left_menu.setCurrentRow(0)
-            self.clear_right_side()
-            self.init_right_side()
-            self.ok_btn.setText(self.lang[4][JsonData.lang])
+            if len(self.main_folder_list) == 1:
+                self.win_warn = WinWarn(
+                    self.lang[5][JsonData.lang],
+                    self.lang[6][JsonData.lang],
+                )
+                self.win_warn.center_relative_parent(self)
+                self.win_warn.show()
+            else:
+                self.main_folder_list.remove(main_folder)
+                self.left_menu.takeItem(self.left_menu.currentRow())
+                self.left_menu.setCurrentRow(0)
+                self.clear_right_side()
+                self.init_right_side()
+                self.ok_btn.setText(self.lang[4][JsonData.lang])
         except Exception:
             print("win settings > ошибка удаления main folder по кнопке удалить")
 
