@@ -306,6 +306,7 @@ class HashdirUpdater:
         self.new_items = new_items
         self.main_folder = main_folder
         self.task_state = task_state
+        self.total = len(new_items) + len(del_items)
 
     def run(self) -> tuple[list, list]:
         """
@@ -317,34 +318,22 @@ class HashdirUpdater:
             return ([], [])
         del_items = self.run_del_items()
         new_items = self.run_new_items()
-        # self.progress_text.emit("")
         return del_items, new_items
-
-    def progressbar_text(self, text: str, x: int, total: int):
-        """
-        text: `Lang.adding`, `Lang.deleting`
-        x: item of `enumerate`
-        total: `len`
-        """
-        main_folder = self.main_folder.name.capitalize()
-        t = f"{main_folder}: {text.lower()} {x} {Lang.from_} {total}"
-        # self.progress_text.emit(t)
 
     def run_del_items(self):
         new_del_items = []
-        total = len(self.del_items)
-        for x, rel_thumb_path in enumerate(self.del_items, start=1):
+        for rel_thumb_path in self.del_items:
             if not self.task_state.should_run():
                 break
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
-                self.progressbar_text(self.lang[1][JsonData.lang], x, total)
                 try:
                     os.remove(thumb_path)
                     folder = os.path.dirname(thumb_path)
                     if not os.listdir(folder):
                         os.rmdir(folder)
                     new_del_items.append(rel_thumb_path)
+                    self.total -= 1
                 except Exception as e:
                     MainUtils.print_error()
                     continue
@@ -362,16 +351,15 @@ class HashdirUpdater:
 
     def run_new_items(self):
         new_new_items = []
-        total = len(self.new_items)
-        for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
+        for img_path, size, birth, mod in self.new_items:
             if not self.task_state.should_run():
                 break
-            self.progressbar_text(self.lang[0][JsonData.lang], x, total)
             try:
                 thumb = self.create_thumb(img_path)
                 thumb_path = ThumbUtils.create_thumb_path(img_path)
                 ThumbUtils.write_thumb(thumb_path, thumb)
                 new_new_items.append((img_path, size, birth, mod))
+                self.total -= 1
             except Exception as e:
                 MainUtils.print_error()
                 continue
@@ -516,8 +504,9 @@ class MainFolderRemover:
             rows = self.get_rows(i)
             self.remove_images(rows)
             self.remove_rows(rows)
+            self.remove_dirs(i)
         
-    def get_rows(self, main_folder_name):
+    def get_rows(self, main_folder_name: str):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
         q = q.where(THUMBS.c.brand == main_folder_name)
         res = self.conn.execute(q).fetchall()
@@ -531,12 +520,8 @@ class MainFolderRemover:
         """
         rows: [(row id int, thumb path), ...]
         """
-        total = len(rows)
-        for x, (id_, image_path) in enumerate(rows):
+        for id_, image_path in rows:
             try:
-                t = f"{self.lang[0][JsonData.lang]}: {x} {Lang.from_} {total}"
-                self.progress_text.emit(t)
-
                 if os.path.exists(image_path):
                     os.remove(image_path)
                 folder = os.path.dirname(image_path)
@@ -571,3 +556,14 @@ class MainFolderRemover:
         except Exception as e:
             self.conn.rollback()
             MainUtils.print_error()
+
+    def remove_dirs(self, main_folder_name: str):
+        q = sqlalchemy.delete(DIRS)
+        q = q.where(DIRS.c.brand == main_folder_name)
+
+        try:
+            self.conn.execute(q)
+            self.conn.commit()
+        except Exception as e:
+            print("new scaner main folder remover error, remove dirs", e)
+            self.conn.rollback()

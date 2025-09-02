@@ -1,7 +1,7 @@
 import gc
 from time import sleep
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 from cfg import JsonData
 
@@ -33,6 +33,8 @@ class ScanerTask(URunnable):
         self.pause_flag = False
         self.user_canceled_scan = False
         print("Выбран новый сканер")
+
+        
 
     def task(self):
         for i in MainFolder.list_:
@@ -102,11 +104,17 @@ class ScanerTask(URunnable):
             print("в папке:", main_folder.name, main_folder.get_current_path())
             return
 
-        text = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {len(del_images) + len(new_images)} "
-        self.signals_.progress_text.emit(text)
+        def text(hashdir_updater: HashdirUpdater):
+            t = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {hashdir_updater.total}"
+            self.signals_.progress_text.emit(t)
+
         args = (del_images, new_images, main_folder, self.task_state)
         hashdir_updater = HashdirUpdater(*args)
+        timer = QTimer(self)
+        timer.timeout.connect(lambda: text(hashdir_updater))
+        timer.start(100)
         del_images, new_images = hashdir_updater.run()
+        timer.stop()
 
         conn = Dbase.engine.connect()
         db_updater = DbUpdater(del_images, new_images, main_folder, conn)
@@ -125,8 +133,3 @@ class ScanerTask(URunnable):
 
         if del_images or new_images:
             self.signals_.reload_gui.emit()
-
-        # print("del dirs", del_dirs)
-        # print("new dirs", new_dirs)
-        # print("del images", del_images)
-        # print("new images", new_images)
