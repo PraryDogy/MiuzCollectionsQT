@@ -584,7 +584,11 @@ class WinSettings(WinSystem):
         (
             "Нужна хотя бы одна папка с коллекциями",
             "At least one collection folder required"
-        )
+        ),
+        (
+            "Вы уверены, что хотите удалить папку?",
+            "Are you sure you want to delete the folder?"
+        ),
     )
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -685,7 +689,7 @@ class WinSettings(WinSystem):
             else:
                 self.win_question = WinQuestion(
                     self.lang[5][JsonData.lang],
-                    "Вы уверены, что хотите удалить папку?"
+                    self.lang[7][JsonData.lang],
                 )
                 self.win_question.center_relative_parent(self)
                 self.win_question.ok_clicked.connect(fin)
