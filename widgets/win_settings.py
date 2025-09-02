@@ -662,6 +662,8 @@ class NewFolder(QWidget):
                 )
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
+        else:
+            self.new_folder.emit(self.main_folder)
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -758,20 +760,30 @@ class WinSettings(WinSystem):
             self.right_lay.insertWidget(0, self.gen_settings)
         elif ind == 1:
             self.new_folder = NewFolder()
+            self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
         else:
-            main_folder = next(
-                (x
-                 for x in self.main_folder_list
-                 if x.name == self.left_menu.currentItem().text()
-                )
-            )
+            main_folder = [
+                x
+                for x in self.main_folder_list
+                if x.name == self.left_menu.currentItem().text()
+                ][0]
+            
             if main_folder:
                 item = self.left_menu.currentItem()
                 main_folder_sett = MainFolderSettings(main_folder)
                 main_folder_sett.changed.connect(lambda: self.ok_btn.setText(self.lang[4][JsonData.lang]))
                 main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder, item))
                 self.right_lay.insertWidget(0, main_folder_sett)
+
+    def add_main_folder(self, main_folder: MainFolder):
+        self.main_folder_list.append(main_folder)
+        item = UListWidgetItem(self.left_menu, text=main_folder.name)
+        self.left_menu.addItem(item)
+        self.left_menu.setCurrentItem(item)
+        self.clear_right_side()
+        self.init_right_side()
+        self.ok_btn.setText(self.lang[4][JsonData.lang])
 
     def remove_main_folder(self, main_folder: MainFolder, item: UListWidgetItem):
 

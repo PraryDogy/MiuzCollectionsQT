@@ -75,7 +75,8 @@ class ImgUtils:
             array_img = np.array(img)
             return array_img
         except Exception as e:
-            MainUtils.print_error()
+            # MainUtils.print_error()
+            print("Utils - read psb - ошибка чтения psb", e)
             return None
 
     @classmethod
@@ -234,7 +235,7 @@ class ThumbUtils:
             cv2.imwrite(thumb_path, img)
             return True
         except Exception as e:
-            MainUtils.print_error()
+            print("Utils - write_thumb - ошибка записи thumb на диск", e)
             return False
 
     @classmethod
