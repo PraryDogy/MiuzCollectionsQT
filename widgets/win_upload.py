@@ -131,6 +131,12 @@ class CollBtnList(VListWidget):
         self.setCurrentRow(0)
 
 
+class MainFolderItem(UListWidgetItem):
+    def __init__(self, parent: VListWidget, main_folder: MainFolder, height = 30, text = None):
+        super().__init__(parent, height, text)
+        self.main_folder = main_folder
+
+
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
     double_clicked = pyqtSignal()
@@ -138,30 +144,24 @@ class MainFolderList(VListWidget):
     def __init__(self):
         super().__init__()
         for i in MainFolder.list_:
-            item = UListWidgetItem(parent=self, text=i.name)
+            item = MainFolderItem(parent=self, main_folder=i, text=i.name)
             self.addItem(item)
         self.setCurrentRow(0)
 
-    def view(self):
-        name = self.currentItem().text()
-        folder = next((i for i in MainFolder.list_ if i.name == name), None)
-        if folder is None:
-            return
-        path = folder.availability()
-        if not path:
-            self.win_warn = WinSmb()
-            self.win_warn.center_relative_parent(self.window())
-            self.win_warn.show()
-            return
-        index = MainFolder.list_.index(folder)
-        self.open_main_folder.emit(index)
+    def currentItem(self) -> MainFolderItem:
+        return super().currentItem()
 
     def mouseReleaseEvent(self, e):
-        idx = self.indexAt(e.pos())
-        if not idx.isValid():
-            return
-        if e.button() == Qt.MouseButton.LeftButton:
-            self.view()
+        item = self.currentItem()
+        if e.button() == Qt.MouseButton.LeftButton and item:
+            path = item.main_folder.availability()
+            if path:
+                index = MainFolder.list_.index(item.main_folder)
+                self.open_main_folder.emit(index)
+            else:
+                self.win_warn = WinSmb()
+                self.win_warn.center_relative_parent(self.window())
+                self.win_warn.show()
         return super().mouseReleaseEvent(e)
 
 
