@@ -18,9 +18,10 @@ class Window(QWidget):
     def run_task(self):
         UThreadPool.init()
         Dbase.init()
-        src = "/Users/pupitor9000/Downloads/collections/new"
-        main_folder = MainFolder(name="aaa", paths=[src, ], curr_path=src)
-        self.task = ScanerSingleDir(main_folder, src)
+        main_folder_path = "/Users/pupitor9000/Downloads/collections"
+        path = "/Users/pupitor9000/Downloads/collections"
+        main_folder = MainFolder(name="aaa", paths=[main_folder_path, ], curr_path=main_folder_path)
+        self.task = ScanerSingleDir(main_folder=main_folder, path=path)
         UThreadPool.start(self.task)
 
 app = QApplication(sys.argv)

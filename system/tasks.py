@@ -16,8 +16,8 @@ from .database import THUMBS, Dbase
 from .filters import SystemFilter, UserFilter
 from .lang import Lang
 from .main_folder import MainFolder
-from .old_scaner.scaner_utils import DbUpdater, HashdirUpdater
-from .new_scaner.scaner_utils import ImgLoader, ImgCompator, DirsUpdater
+# from .old_scaner.scaner_utils import DbUpdater, HashdirUpdater
+from .new_scaner.scaner_utils import ImgLoader, ImgCompator, DirsUpdater, DbUpdater, HashdirUpdater
 from .utils import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
                     UThreadPool)
 
@@ -728,7 +728,6 @@ class ScanerSingleDir(URunnable):
         self.path = path    
         
     def task(self):
-        print("start")
         conn = Dbase.engine.connect()
 
         rel_path = MainUtils.get_rel_path(self.main_folder.curr_path, self.path)
@@ -742,11 +741,7 @@ class ScanerSingleDir(URunnable):
         if not finder_images or not self.task_state.should_run():
             print(self.main_folder.name, "no finder images")
             return
-        
-        print(finder_images)
-        
-        return
-        
+                
         args = (finder_images, db_images)
         img_compator = ImgCompator(*args)
         del_images, new_images = img_compator.run()
@@ -757,7 +752,6 @@ class ScanerSingleDir(URunnable):
 
         args = (del_images, new_images, self.main_folder, self.task_state)
         hashdir_updater = HashdirUpdater(*args)
-        hashdir_updater.total_sig.connect(text)
         del_images, new_images = hashdir_updater.run()
 
         conn = Dbase.engine.connect()
@@ -765,18 +759,18 @@ class ScanerSingleDir(URunnable):
         db_updater.run()
         conn.close()
 
-        if not self.task_state.should_run():
-            self.signals_.reload_gui.emit()
-            return
+        # if not self.task_state.should_run():
+        #     self.signals_.reload_gui.emit()
+        #     return
 
-        conn = Dbase.engine.connect()
-        args = (conn, self.main_folder, del_dirs, new_dirs)
-        DirsUpdater.remove_db_dirs(*args)
-        DirsUpdater.add_new_dirs(*args)
-        conn.close()
+        # conn = Dbase.engine.connect()
+        # args = (conn, self.main_folder, del_dirs, new_dirs)
+        # DirsUpdater.remove_db_dirs(*args)
+        # DirsUpdater.add_new_dirs(*args)
+        # conn.close()
 
-        if del_images or new_images:
-            self.signals_.reload_gui.emit()
+        # if del_images or new_images:
+        #     self.signals_.reload_gui.emit()
 
     def create_new_dirs(self):
         ...
