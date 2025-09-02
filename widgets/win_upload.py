@@ -1,18 +1,16 @@
 import os
 import re
-import subprocess
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QGroupBox, QLabel, QPushButton, QTabWidget
 
-from cfg import JsonData, Static
+from cfg import JsonData
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.tasks import LoadCollListTask, LoadDirsTask
+from system.tasks import LoadDirsTask
 from system.utils import UThreadPool
 
-from ._base_widgets import (UHBoxLayout, UListWidgetItem, UMenu, UVBoxLayout,
+from ._base_widgets import (UHBoxLayout, UListWidgetItem, UVBoxLayout,
                             VListWidget, WinChild)
 
 
