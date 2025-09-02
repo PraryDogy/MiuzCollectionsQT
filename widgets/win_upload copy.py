@@ -9,10 +9,11 @@ from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
 from cfg import JsonData, Static
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.tasks import LoadCollListTask, LoadDirsTask
+from system.tasks import LoadCollListTask
 from system.utils import UThreadPool
 
 from ._base_widgets import UListWidgetItem, UMenu, VListWidget, WinChild
+from .win_warn import WinSmb
 
 
 class SubWinList(VListWidget):
@@ -79,62 +80,53 @@ class CollBtn(QLabel):
             self.pressed_.emit()
 
 
-class CollBtnItem(UListWidgetItem):
-    def __init__(self, parent: VListWidget, path: str, height = 30, text = None):
-        super().__init__(parent, height, text)
-        self.path = path
-
-
-class DirsList(VListWidget):
+class CollBtnList(VListWidget):
     clicked = pyqtSignal(str)
 
-    def __init__(self, path: str):
+    def __init__(self, main_folder: MainFolder):
         super().__init__()
-        self.path = path
-        self.main_folder_paths = [x for i in MainFolder.list_ for x in  i.paths]
-        self.init_ui()
+        self.main_folder = main_folder
+        self.load_coll_list()
 
-    def init_ui(self):
-        self.task_ = LoadDirsTask(self.path)
-        self.task_.sigs.finished_.connect(self.init_ui_fin)
+    def reload(self, main_folder: MainFolder):
+        self.main_folder = main_folder
+        self.load_coll_list()
+
+    def load_coll_list(self):
+        self.task_ = LoadCollListTask(self.main_folder)
+        self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.start(self.task_)
-    
-    def init_ui_fin(self, dirs: dict[str, str]):        
+
+    def collection_btn_cmd(self, btn: CollBtn):
+        path = os.path.join(self.main_folder.curr_path, btn.coll_name)
+        if btn.coll_name == Static.NAME_ALL_COLLS:
+            path = self.main_folder.curr_path
+            self.clicked.emit(path)
+        elif os.path.exists(path):
+            self.subwin = SubWin(path)
+            self.subwin.clicked.connect(self.clicked.emit)
+            self.subwin.adjustSize()
+            self.subwin.center_relative_parent(self.window())
+            self.subwin.show()
+
+    def init_ui(self, menus: list[str]):
         self.clear()
-        back = CollBtnItem(parent=self, path=os.path.dirname(self.path), text="...")
-        self.addItem(back)
-        if self.path in self.main_folder_paths:
-            for path, name in sorted(dirs.items(), key=lambda x: self._strip(x[1])):
-                item = CollBtnItem(parent=self, path=path, text=self._strip(name))
-                self.addItem(item)
-        else:
-            for path, name in dirs.items():
-                item = CollBtnItem(parent=self, path=path, text=name)
-                self.addItem(item)
+
+        coll_btn = CollBtn(Static.NAME_ALL_COLLS)
+        cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
+        coll_btn.pressed_.connect(cmd_)
+        list_item = UListWidgetItem(self)
+        self.addItem(list_item)
+        self.setItemWidget(list_item, coll_btn)
+
+        for i in menus:
+            coll_btn = CollBtn(i)
+            cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)
+            coll_btn.pressed_.connect(cmd_)
+            list_item = UListWidgetItem(self)
+            self.addItem(list_item)
+            self.setItemWidget(list_item, coll_btn)
         self.setCurrentRow(0)
-
-    def _strip(self, s: str) -> str:
-        return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
-
-    def currentItem(self) -> CollBtnItem:
-        return super().currentItem()
-    
-    def mouseReleaseEvent(self, e):
-        e.ignore()
-
-    def mouseDoubleClickEvent(self, e):
-        if e.button() != Qt.MouseButton.LeftButton:
-            return
-
-        item = self.itemAt(e.pos())
-        if item:
-            self.path = item.path
-            self.init_ui()
-
-        return super().mouseDoubleClickEvent(e)
-
-
-# ПЕРВАЯ ВКАДКА ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА 
 
 
 class MainFolderItem(UListWidgetItem):
@@ -144,7 +136,7 @@ class MainFolderItem(UListWidgetItem):
 
 
 class MainFolderList(VListWidget):
-    clicked = pyqtSignal(MainFolder)
+    open_main_folder = pyqtSignal(MainFolder)
 
     def __init__(self):
         super().__init__()
@@ -161,11 +153,12 @@ class MainFolderList(VListWidget):
         if e.button() == Qt.MouseButton.LeftButton and item:
             path = item.main_folder.availability()
             if path:
-                self.clicked.emit(item.main_folder)
+                self.open_main_folder.emit(item.main_folder)
+            else:
+                self.win_warn = WinSmb()
+                self.win_warn.center_relative_parent(self.window())
+                self.win_warn.show()
         return super().mouseReleaseEvent(e)
-
-
-# ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО 
 
 
 class WinUpload(WinChild):
@@ -176,23 +169,22 @@ class WinUpload(WinChild):
 
     def __init__(self):
         super().__init__()
-        self.resize(500, 500)
+        self.resize(250, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.tab_wid = QTabWidget()
         self.central_layout.addWidget(self.tab_wid)
 
         self.main_folders = MainFolderList()
-        self.main_folders.clicked.connect(self.main_folder_click)
+        self.main_folders.open_main_folder.connect(self.open_main_folder)
         self.tab_wid.addTab(self.main_folders, Lang.folders)
-        self.collections_list = DirsList(MainFolder.current.curr_path)
+        self.collections_list = CollBtnList(MainFolder.current)
         self.collections_list.clicked.connect(self.clicked_cmd)
         self.tab_wid.addTab(self.collections_list, self.lang[0][JsonData.lang])
 
         self.tab_wid.setCurrentIndex(1)
 
-    def main_folder_click(self, main_folder: MainFolder):
-        self.collections_list.path = main_folder.curr_path
-        self.collections_list.init_ui()
+    def open_main_folder(self, main_folder: MainFolder):
+        self.collections_list.reload(main_folder)
         self.tab_wid.setCurrentIndex(1)
 
     def clicked_cmd(self, path: str):

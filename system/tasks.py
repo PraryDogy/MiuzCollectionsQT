@@ -709,11 +709,8 @@ class LoadDirsTask(URunnable):
         self.path = path
 
     def task(self):
-        dirs = {
-            i.path : i.name
-            for i in os.scandir(self.path)
-            if i.is_dir()
-        }
-
-        self.sigs.finished_.emit(dirs)
-        
+        if not os.path.exists(self.path):
+            self.sigs.finished_.emit({})
+        else:
+            dirs = {i.path : i.name for i in os.scandir(self.path) if i.is_dir()}
+            self.sigs.finished_.emit(dirs)
