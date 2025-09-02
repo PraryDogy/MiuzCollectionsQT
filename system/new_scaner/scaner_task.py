@@ -104,17 +104,14 @@ class ScanerTask(URunnable):
             print("в папке:", main_folder.name, main_folder.get_current_path())
             return
 
-        def text(hashdir_updater: HashdirUpdater):
-            t = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {hashdir_updater.total}"
+        def text(total: int):
+            t = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {total}"
             self.signals_.progress_text.emit(t)
 
         args = (del_images, new_images, main_folder, self.task_state)
         hashdir_updater = HashdirUpdater(*args)
-        timer = QTimer(self)
-        timer.timeout.connect(lambda: text(hashdir_updater))
-        timer.start(100)
+        hashdir_updater.total_sig.connect(text)
         del_images, new_images = hashdir_updater.run()
-        timer.stop()
 
         conn = Dbase.engine.connect()
         db_updater = DbUpdater(del_images, new_images, main_folder, conn)

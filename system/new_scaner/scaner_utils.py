@@ -3,6 +3,7 @@ import os
 
 import sqlalchemy
 from numpy import ndarray
+from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames
@@ -281,7 +282,8 @@ class ImgCompator:
 
 
 
-class HashdirUpdater:
+class HashdirUpdater(QObject):
+    total_sig = pyqtSignal(int)
     lang = (
         ("Добавляю", "Add"),
         ("Удаляю", "Deleting"),
@@ -334,6 +336,7 @@ class HashdirUpdater:
                         os.rmdir(folder)
                     new_del_items.append(rel_thumb_path)
                     self.total -= 1
+                    self.total_sig.emit(self.total)
                 except Exception as e:
                     MainUtils.print_error()
                     continue
@@ -360,6 +363,7 @@ class HashdirUpdater:
                 ThumbUtils.write_thumb(thumb_path, thumb)
                 new_new_items.append((img_path, size, birth, mod))
                 self.total -= 1
+                self.total_sig.emit(self.total)
             except Exception as e:
                 MainUtils.print_error()
                 continue
