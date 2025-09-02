@@ -177,7 +177,6 @@ class WinUpload(WinChild):
     clicked = pyqtSignal(tuple)
     lang = (
         ("Коллекции", "Collections"),
-
     )
 
     def __init__(self):
@@ -188,13 +187,16 @@ class WinUpload(WinChild):
         self.central_layout.addWidget(self.tab_wid)
 
         self.main_folders = MainFolderList()
-        self.main_folders.open_main_folder.connect(lambda index: self.collections_list.reload(index))
-        self.main_folders.double_clicked.connect(lambda: self.tab_wid.setCurrentIndex(1))
+        self.main_folders.open_main_folder.connect(self.open_main_folder)
         self.tab_wid.addTab(self.main_folders, Lang.folders)
         self.collections_list = CollBtnList(0)
         self.collections_list.clicked.connect(self.clicked_cmd)
         self.tab_wid.addTab(self.collections_list, self.lang[0][JsonData.lang])
 
+        self.tab_wid.setCurrentIndex(1)
+
+    def open_main_folder(self, index: int):
+        self.collections_list.reload(index)
         self.tab_wid.setCurrentIndex(1)
 
     def clicked_cmd(self, path: str):

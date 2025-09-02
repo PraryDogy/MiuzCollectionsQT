@@ -553,14 +553,14 @@ class LoadDbImagesItem:
         self.f_mod = f_mod
 
 
-class LoadDbImagesSignals(QObject):
+class _LoadDbImagesSigs(QObject):
     finished_ = pyqtSignal(dict)
 
 
 class LoadDbImagesTask(URunnable):
     def __init__(self):
         super().__init__()
-        self.signals_ = LoadDbImagesSignals()
+        self.signals_ = _LoadDbImagesSigs()
         self.conn = Dbase.engine.connect()
 
     def task(self):
@@ -693,3 +693,27 @@ class LoadDbImagesTask(URunnable):
         start = datetime.combine(date_start, datetime.min.time())
         end = datetime.combine(date_end, datetime.max.time().replace(microsecond=0))
         return datetime.timestamp(start), datetime.timestamp(end)
+
+
+class _LoadDirsSigs(QObject):
+    finished_ = pyqtSignal(dict)
+
+
+class LoadDirsTask(URunnable):
+    def __init__(self, path: str):
+        """
+        сигнал finished возвращает словарь: путь - имя
+        """
+        super().__init__()
+        self.sigs = _LoadDirsSigs()
+        self.path = path
+
+    def task(self):
+        dirs = {
+            i.path : i.name
+            for i in os.scandir(self.path)
+            if i.is_dir()
+        }
+
+        self.sigs.finished_.emit(dirs)
+        
