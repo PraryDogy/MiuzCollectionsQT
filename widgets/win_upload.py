@@ -83,26 +83,24 @@ class CollBtn(QLabel):
 class CollBtnList(VListWidget):
     clicked = pyqtSignal(str)
 
-    def __init__(self, main_folder_index: int):
+    def __init__(self, main_folder: MainFolder):
         super().__init__()
-        self.main_folder_index = main_folder_index
+        self.main_folder = main_folder
         self.load_coll_list()
 
-    def reload(self, main_folder_index: int):
-        self.main_folder_index = main_folder_index
+    def reload(self, main_folder: MainFolder):
+        self.main_folder = main_folder
         self.load_coll_list()
 
     def load_coll_list(self):
-        main_folder = MainFolder.list_[self.main_folder_index]
-        self.task_ = LoadCollListTask(main_folder)
+        self.task_ = LoadCollListTask(self.main_folder)
         self.task_.signals_.finished_.connect(self.init_ui)
         UThreadPool.start(self.task_)
 
     def collection_btn_cmd(self, btn: CollBtn):
-        main_folder = MainFolder.list_[self.main_folder_index]
-        path = os.path.join(main_folder.curr_path, btn.coll_name)
+        path = os.path.join(self.main_folder.curr_path, btn.coll_name)
         if btn.coll_name == Static.NAME_ALL_COLLS:
-            path = main_folder.curr_path
+            path = self.main_folder.curr_path
             self.clicked.emit(path)
         elif os.path.exists(path):
             self.subwin = SubWin(path)
@@ -138,7 +136,7 @@ class MainFolderItem(UListWidgetItem):
 
 
 class MainFolderList(VListWidget):
-    open_main_folder = pyqtSignal(int)
+    open_main_folder = pyqtSignal(MainFolder)
 
     def __init__(self):
         super().__init__()
@@ -155,8 +153,7 @@ class MainFolderList(VListWidget):
         if e.button() == Qt.MouseButton.LeftButton and item:
             path = item.main_folder.availability()
             if path:
-                index = MainFolder.list_.index(item.main_folder)
-                self.open_main_folder.emit(index)
+                self.open_main_folder.emit(item.main_folder)
             else:
                 self.win_warn = WinSmb()
                 self.win_warn.center_relative_parent(self.window())
@@ -180,14 +177,14 @@ class WinUpload(WinChild):
         self.main_folders = MainFolderList()
         self.main_folders.open_main_folder.connect(self.open_main_folder)
         self.tab_wid.addTab(self.main_folders, Lang.folders)
-        self.collections_list = CollBtnList(0)
+        self.collections_list = CollBtnList(MainFolder.current)
         self.collections_list.clicked.connect(self.clicked_cmd)
         self.tab_wid.addTab(self.collections_list, self.lang[0][JsonData.lang])
 
         self.tab_wid.setCurrentIndex(1)
 
-    def open_main_folder(self, index: int):
-        self.collections_list.reload(index)
+    def open_main_folder(self, main_folder: MainFolder):
+        self.collections_list.reload(main_folder)
         self.tab_wid.setCurrentIndex(1)
 
     def clicked_cmd(self, path: str):
