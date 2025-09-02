@@ -394,7 +394,7 @@ class AboutWid(QGroupBox):
         h_lay.addWidget(lbl)
 
 
-class MainSettings(QWidget):
+class GeneralSettings(QWidget):
     reset = pyqtSignal()
     changed = pyqtSignal()
 
@@ -503,11 +503,9 @@ class StopList(DropableGroupBox):
         return super().dropEvent(a0)
 
 
-class MainFolderSettings(QWidget):
-    remove = pyqtSignal()
+class MainFolderAdvanced(QWidget):
     changed = pyqtSignal()
     lang = (
-        ("Имя папки", "Folder name"),
         (
             "Путь к папке с коллекциями: перетащите сюда папку или укажите\n"
             "путь с новой строки.",
@@ -519,6 +517,33 @@ class MainFolderSettings(QWidget):
             "строки.",
             "Ignore list: drag a folder here or enter a name on a new line."
         ),
+    )
+
+    def __init__(self, main_folder: MainFolder):
+        super().__init__()
+        v_lay = UVBoxLayout()
+        self.setLayout(v_lay)
+
+        sec_row = MainFolderPaths(main_folder)
+        sec_row.text_changed.connect(self.changed.emit)
+        v_lay.addWidget(sec_row)
+        sec_row.top_label.setText(self.lang[0][JsonData.lang])
+        text_ = "\n".join(i for i in main_folder.paths)
+        sec_row.text_edit.setPlainText(text_)
+
+        third_row = StopList(main_folder)
+        third_row.text_changed.connect(self.changed.emit)
+        v_lay.addWidget(third_row)
+        third_row.top_label.setText(self.lang[1][JsonData.lang])
+        text_ = "\n".join(i for i in main_folder.stop_list)
+        third_row.text_edit.setPlainText(text_)
+
+
+class MainFolderSettings(QWidget):
+    remove = pyqtSignal()
+    changed = pyqtSignal()
+    lang = (
+        ("Имя папки", "Folder name"),
         ("Удалить", "Delete"),
     )
 
@@ -541,27 +566,66 @@ class MainFolderSettings(QWidget):
         name_label = QLabel(main_folder.name)
         first_lay.addWidget(name_label)
 
-        sec_row = MainFolderPaths(main_folder)
-        sec_row.text_changed.connect(self.changed.emit)
-        v_lay.addWidget(sec_row)
-        sec_row.top_label.setText(self.lang[1][JsonData.lang])
-        text_ = "\n".join(i for i in main_folder.paths)
-        sec_row.text_edit.setPlainText(text_)
+        advanced = MainFolderAdvanced(main_folder)
+        advanced.changed.connect(self.changed.emit)
+        v_lay.addWidget(advanced)
 
-        third_row = StopList(main_folder)
-        third_row.text_changed.connect(self.changed.emit)
-        v_lay.addWidget(third_row)
-        third_row.top_label.setText(self.lang[2][JsonData.lang])
-        text_ = "\n".join(i for i in main_folder.stop_list)
-        third_row.text_edit.setPlainText(text_)
-
-        remove_btn = QPushButton(self.lang[3][JsonData.lang])
+        remove_btn = QPushButton(self.lang[1][JsonData.lang])
         remove_btn.clicked.connect(self.remove.emit)
         remove_btn.setFixedWidth(100)
 
         btn_lay = UHBoxLayout()
         btn_lay.addStretch()
         btn_lay.addWidget(remove_btn)
+        btn_lay.addStretch()
+        v_lay.addLayout(btn_lay)
+
+    def mouseReleaseEvent(self, a0):
+        self.setFocus()
+        return super().mouseReleaseEvent(a0)
+
+
+# НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
+
+
+class NewFolder(QWidget):
+    lang = (
+        (
+            "Имя папки (нельзя изменить после сохранения)",
+            "Folder name (cannot be changed after saving)"
+        ),
+        ("Сохранить", "Save"),
+    )
+
+    def __init__(self):
+        super().__init__()
+        v_lay = UVBoxLayout()
+        v_lay.setSpacing(15)
+        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.setLayout(v_lay)
+        main_folder = MainFolder("", [], [])
+
+        first_row = QGroupBox()
+        first_row.setFixedHeight(70)
+        v_lay.addWidget(first_row)
+        first_lay = UVBoxLayout()
+        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        first_lay.setSpacing(5)
+        first_row.setLayout(first_lay)
+        name_descr = QLabel(self.lang[0][JsonData.lang] + ":")
+        first_lay.addWidget(name_descr)
+        name_label = ULineEdit()
+        first_lay.addWidget(name_label)
+
+        self.advanced = MainFolderAdvanced(main_folder)
+        v_lay.addWidget(self.advanced)
+
+        add_btn = QPushButton(self.lang[1][JsonData.lang])
+        add_btn.setFixedWidth(100)
+
+        btn_lay = UHBoxLayout()
+        btn_lay.addStretch()
+        btn_lay.addWidget(add_btn)
         btn_lay.addStretch()
         v_lay.addLayout(btn_lay)
 
@@ -589,6 +653,7 @@ class WinSettings(WinSystem):
             "Вы уверены, что хотите удалить папку?",
             "Are you sure you want to delete the folder?"
         ),
+        ("Новая папка", "New folder"),
     )
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -604,11 +669,14 @@ class WinSettings(WinSystem):
         self.central_layout.addWidget(self.splitter)
 
         self.left_menu = VListWidget()
-        self.left_menu.mouseReleaseEvent = self.init_right_side
+        self.left_menu.clicked.connect(self.left_menu_click)
         self.splitter.addWidget(self.left_menu)
 
         main_settings_item = UListWidgetItem(self.left_menu, text=self.lang[1][JsonData.lang])
         self.left_menu.addItem(main_settings_item)
+
+        item = UListWidgetItem(self.left_menu, text=self.lang[8][JsonData.lang])
+        self.left_menu.addItem(item)
 
         for i in MainFolder.list_:
             item = UListWidgetItem(self.left_menu, text=i.name)
@@ -647,13 +715,16 @@ class WinSettings(WinSystem):
         self.init_right_side()
 
     def init_right_side(self, *args):
-        self.clear_right_side()
+        ind = self.left_menu.currentRow()
 
-        if self.left_menu.currentRow() == 0:
-            self.main_settings = MainSettings(self.json_data_copy)
-            self.main_settings.reset.connect(lambda: setattr(self, "need_reset", True))
-            self.main_settings.changed.connect(lambda: self.ok_btn.setText(self.lang[4][JsonData.lang]))
-            self.right_lay.insertWidget(0, self.main_settings)
+        if ind == 0:
+            self.gen_settings = GeneralSettings(self.json_data_copy)
+            self.gen_settings.reset.connect(lambda: setattr(self, "need_reset", True))
+            self.gen_settings.changed.connect(lambda: self.ok_btn.setText(self.lang[4][JsonData.lang]))
+            self.right_lay.insertWidget(0, self.gen_settings)
+        elif ind == 1:
+            self.new_folder = NewFolder()
+            self.right_lay.insertWidget(0, self.new_folder)
         else:
             main_folder = next(
                 (x
@@ -699,8 +770,13 @@ class WinSettings(WinSystem):
             print("win settings > ошибка удаления main folder по кнопке удалить", e)
 
     def clear_right_side(self):
-        for i in self.right_wid.findChildren((MainSettings, MainFolderSettings)):
+        wids = (GeneralSettings, MainFolderSettings, NewFolder)
+        for i in self.right_wid.findChildren(wids):
             i.deleteLater()
+
+    def left_menu_click(self, *args):
+        self.clear_right_side()
+        self.init_right_side()
 
     def ok_cmd(self):
         if self.need_reset:
