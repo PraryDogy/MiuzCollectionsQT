@@ -10,7 +10,7 @@ from system.lang import Lang
 from ._base_widgets import SvgBtn, UHBoxLayout
 from .actions import MenuTypes
 from .win_downloads import WinDownloads
-from .win_settings_new import WinSettings
+from .win_settings import WinSettings
 
 SLIDER_STYLE = """
     QSlider::groove:horizontal {

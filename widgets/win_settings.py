@@ -20,7 +20,7 @@ from ._base_widgets import (UHBoxLayout, ULineEdit, UListWidgetItem, UMenu,
                             UTextEdit, UVBoxLayout, VListWidget, WinChild,
                             WinSystem)
 from .win_help import WinHelp
-from .win_warn import WinWarn
+from .win_warn import WinWarn, WinQuestion
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
 
@@ -665,6 +665,15 @@ class WinSettings(WinSystem):
                 self.right_lay.insertWidget(0, main_folder_sett)
 
     def remove_main_folder(self, main_folder: MainFolder, item: UListWidgetItem):
+
+        def fin():
+            self.main_folder_list.remove(main_folder)
+            self.left_menu.takeItem(self.left_menu.currentRow())
+            self.left_menu.setCurrentRow(0)
+            self.clear_right_side()
+            self.init_right_side()
+            self.ok_btn.setText(self.lang[4][JsonData.lang])
+
         try:
             if len(self.main_folder_list) == 1:
                 self.win_warn = WinWarn(
@@ -674,14 +683,16 @@ class WinSettings(WinSystem):
                 self.win_warn.center_relative_parent(self)
                 self.win_warn.show()
             else:
-                self.main_folder_list.remove(main_folder)
-                self.left_menu.takeItem(self.left_menu.currentRow())
-                self.left_menu.setCurrentRow(0)
-                self.clear_right_side()
-                self.init_right_side()
-                self.ok_btn.setText(self.lang[4][JsonData.lang])
-        except Exception:
-            print("win settings > ошибка удаления main folder по кнопке удалить")
+                self.win_question = WinQuestion(
+                    self.lang[5][JsonData.lang],
+                    "Вы уверены, что хотите удалить папку?"
+                )
+                self.win_question.center_relative_parent(self)
+                self.win_question.ok_clicked.connect(fin)
+                self.win_question.show()
+
+        except Exception as e:
+            print("win settings > ошибка удаления main folder по кнопке удалить", e)
 
     def clear_right_side(self):
         for i in self.right_wid.findChildren((MainSettings, MainFolderSettings)):

@@ -10,7 +10,7 @@ from system.lang import Lang
 from system.utils import MainUtils
 
 from ._base_widgets import UMenu, WinSystem
-from .win_settings_new import WinSettings
+from .win_settings import WinSettings
 
 ICON_SVG = os.path.join(Static.INNER_IMAGES, "icon.svg")
 
