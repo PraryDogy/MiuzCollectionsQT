@@ -156,14 +156,6 @@ class MainFolderList(VListWidget):
         index = MainFolder.list_.index(folder)
         self.open_main_folder.emit(index)
 
-    def mouseDoubleClickEvent(self, e):
-        idx = self.indexAt(e.pos())
-        if not idx.isValid():
-            return
-        if e.button() == Qt.MouseButton.LeftButton:
-            self.double_clicked.emit()
-        return super().mouseDoubleClickEvent(e)
-
     def mouseReleaseEvent(self, e):
         idx = self.indexAt(e.pos())
         if not idx.isValid():
