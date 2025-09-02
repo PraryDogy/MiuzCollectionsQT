@@ -23,18 +23,18 @@ class BaseCollBtn(QLabel):
         ("Избранное", "Favorites"),
     )
 
-    def __init__(self, text: str):
-        self.coll_name = text
+    def __init__(self, coll_name: str):
+        self.coll_name = coll_name
         data = {
             Static.NAME_ALL_COLLS: self.lang[0][JsonData.lang],
             Static.NAME_RECENTS: Lang.recents,
             Static.NAME_FAVS: self.lang[1][JsonData.lang]
         }
-        if text in data:
-            text = data.get(text)
+        if coll_name in data:
+            coll_name = data.get(coll_name)
         if JsonData.abc_name:
-            text = re.sub(r'^[^A-Za-zА-Яа-я]+', '', text)
-        super().__init__(text=text)
+            coll_name = re.sub(r'^[^A-Za-zА-Яа-я]+', '', coll_name)
+        super().__init__(text=coll_name)
         self.setStyleSheet("padding-left: 5px;")
 
 
@@ -77,7 +77,7 @@ class CollBtn(BaseCollBtn):
         return super().contextMenuEvent(ev)
 
 
-class CollectionList(VListWidget):
+class CollList(VListWidget):
     h_ = 30
     scroll_to_top = pyqtSignal()
     reload_thumbnails = pyqtSignal()
@@ -156,9 +156,6 @@ class MainFolderList(VListWidget):
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
-        self._click_timer = QTimer(self)
-        self._click_timer.setSingleShot(True)
-        self._click_timer.timeout.connect(lambda: self.cmd("view"))
 
         for i in MainFolder.list_:
             item = UListWidgetItem(parent=self, text=i.name)
@@ -171,16 +168,14 @@ class MainFolderList(VListWidget):
         folder = next((i for i in MainFolder.list_ if i.name == name), None)
         if folder is None:
             return
-
         path = folder.availability()
-        if not path:
-            self.win_warn = WinSmb()
-            self.win_warn.center_relative_parent(self.window())
-            self.win_warn.show()
-            return
-
         if flag == "reveal":
-            subprocess.Popen(["open", path])
+            if not path:
+                self.win_warn = WinSmb()
+                self.win_warn.center_relative_parent(self.window())
+                self.win_warn.show()
+            else:
+                subprocess.Popen(["open", path])
         elif flag == "view":
             index = MainFolder.list_.index(folder)
             self.open_main_folder.emit(index)
@@ -190,18 +185,8 @@ class MainFolderList(VListWidget):
         if not idx.isValid():
             return
         if e.button() == Qt.MouseButton.LeftButton:
-            self._click_timer.stop()
-            self._click_timer.start(300)
+            self.cmd("view")
         return super().mouseReleaseEvent(e)
-
-    def mouseDoubleClickEvent(self, e):
-        idx = self.indexAt(e.pos())
-        if not idx.isValid():
-            return
-        if e.button() == Qt.MouseButton.LeftButton:
-            self._click_timer.stop()
-            self.double_clicked.emit()
-        return super().mouseDoubleClickEvent(e)
 
     def contextMenuEvent(self, a0):
         menu = UMenu(a0)
@@ -231,6 +216,7 @@ class MenuLeft(QTabWidget):
         MainFolder.current = MainFolder.list_[index]
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_buff_size = 0
+        self.setCurrentIndex(1)
         self.collections_list.init_ui()
         self.set_window_title.emit()
         self.scroll_to_top.emit()
@@ -244,7 +230,7 @@ class MenuLeft(QTabWidget):
         main_folders.double_clicked.connect(lambda: self.setCurrentIndex(1))
         self.addTab(main_folders, Lang.folders)
 
-        self.collections_list = CollectionList()
+        self.collections_list = CollList()
         self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
         self.collections_list.set_window_title.connect(self.set_window_title.emit)
         self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
