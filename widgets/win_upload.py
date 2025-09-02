@@ -40,23 +40,16 @@ class DirsList(VListWidget):
         self.clear()
         back = DirsItem(parent=self, path=os.path.dirname(self.path), text="...")
         self.addItem(back)
+
         if self.path in self.main_folder_paths:
             for path, name in sorted(dirs.items(), key=lambda x: self._strip(x[1])):
-                item = DirsItem(parent=self, path=path, text=self._strip(name))
+                item = DirsItem(parent=self, path=path, text=name)
                 self.addItem(item)
         else:
             for path, name in dirs.items():
                 item = DirsItem(parent=self, path=path, text=name)
                 self.addItem(item)
         self.setCurrentRow(0)
-
-    def get_path(self):
-        item = self.currentItem()
-        if item:
-            if item.text() == "...":
-                return None
-            else:
-                return item.path
 
     def _strip(self, s: str) -> str:
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
@@ -69,16 +62,9 @@ class DirsList(VListWidget):
             return
         item: DirsItem = self.itemAt(e.pos())
         if item:
-            self.set_path.emit(item.path)
-
-    def mouseDoubleClickEvent(self, e):
-        if e.button() != Qt.MouseButton.LeftButton:
-            return
-        item = self.itemAt(e.pos())
-        if item:
             self.path = item.path
             self.init_ui()
-        return super().mouseDoubleClickEvent(e)
+            self.set_path.emit(item.path)
 
 
 # ПЕРВАЯ ВКАДКА ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА 
@@ -116,21 +102,18 @@ class MainFolderList(VListWidget):
 
 
 class InfoBox(QGroupBox):
-    lang = (
-        ("Копировать сюда:", "Copy here:"),
-    )
     def __init__(self):
         super().__init__()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
         v_lay.setContentsMargins(5, 5, 5, 5)
 
-        self.label_top = QLabel(self.lang[0][JsonData.lang])
         self.label_bottom = QLabel()
-
-        v_lay.addWidget(self.label_top)
+        self.label_bottom.setWordWrap(True)
+        self.label_bottom.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.addWidget(self.label_bottom)
         self.setLayout(v_lay)
+        self.label_bottom.setFixedHeight(50)
 
     def set_path(self, path: str):
         self.label_bottom.setText(path)
@@ -142,10 +125,12 @@ class WinUpload(WinChild):
         ("Коллекции", "Collections"),
         ("Ок", "Ok"),
         ("Отмена", "Cancel"),
+        ("Загрузка", "Upload")
     )
 
     def __init__(self):
         super().__init__()
+        self.setWindowTitle(self.lang[3][JsonData.lang])
         self.resize(350, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.central_layout.setSpacing(5)
@@ -180,8 +165,8 @@ class WinUpload(WinChild):
         self.cancel_btn.setFixedWidth(90)
 
         btn_lay.addStretch()
-        btn_lay.addWidget(self.cancel_btn)
         btn_lay.addWidget(self.ok_btn)
+        btn_lay.addWidget(self.cancel_btn)
         btn_lay.addStretch()
 
         self.central_layout.addLayout(btn_lay)
@@ -191,10 +176,11 @@ class WinUpload(WinChild):
     def main_folder_click(self, main_folder: MainFolder):
         self.dirs_list.path = main_folder.curr_path
         self.dirs_list.init_ui()
+        self.info_box.set_path(main_folder.curr_path)
         self.tab_wid.setCurrentIndex(1)
 
     def ok_cmd(self):
-        path = self.dirs_list.get_path()
+        path = self.info_box.label_bottom.text()
         if path:
             data = (self.main_folders.currentItem().main_folder, path)
             self.clicked.emit(data)
