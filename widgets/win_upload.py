@@ -4,7 +4,7 @@ import subprocess
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
+from PyQt5.QtWidgets import QLabel, QPushButton, QTabWidget
 
 from cfg import JsonData, Static
 from system.lang import Lang
@@ -12,7 +12,8 @@ from system.main_folder import MainFolder
 from system.tasks import LoadCollListTask, LoadDirsTask
 from system.utils import UThreadPool
 
-from ._base_widgets import UListWidgetItem, UMenu, VListWidget, WinChild
+from ._base_widgets import (UHBoxLayout, UListWidgetItem, UMenu, VListWidget,
+                            WinChild)
 
 
 class SubWinList(VListWidget):
@@ -113,6 +114,14 @@ class DirsList(VListWidget):
                 self.addItem(item)
         self.setCurrentRow(0)
 
+    def get_path(self):
+        item = self.currentItem()
+        if item:
+            if item.text() == "...":
+                return None
+            else:
+                return item.path
+
     def _strip(self, s: str) -> str:
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
@@ -172,35 +181,57 @@ class WinUpload(WinChild):
     clicked = pyqtSignal(tuple)
     lang = (
         ("Коллекции", "Collections"),
+        ("Ок", "Ok"),
+        ("Отмена", "Cancel"),
     )
 
     def __init__(self):
         super().__init__()
-        self.resize(500, 500)
+        self.resize(350, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.tab_wid = QTabWidget()
         self.central_layout.addWidget(self.tab_wid)
+        self.central_layout.setSpacing(5)
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
 
         self.main_folders = MainFolderList()
         self.main_folders.clicked.connect(self.main_folder_click)
         self.tab_wid.addTab(self.main_folders, Lang.folders)
-        self.collections_list = DirsList(MainFolder.current.curr_path)
-        self.collections_list.clicked.connect(self.clicked_cmd)
-        self.tab_wid.addTab(self.collections_list, self.lang[0][JsonData.lang])
+
+        self.dirs_list = DirsList(MainFolder.current.curr_path)
+        self.tab_wid.addTab(self.dirs_list, self.lang[0][JsonData.lang])
+
+        # кнопки внизу
+        btn_lay = UHBoxLayout()
+        btn_lay.setSpacing(10)
+
+        self.ok_btn = QPushButton(self.lang[1][JsonData.lang])
+        self.ok_btn.clicked.connect(self.ok_cmd)
+        self.ok_btn.setFixedWidth(90)
+
+        self.cancel_btn = QPushButton(self.lang[2][JsonData.lang])
+        self.cancel_btn.clicked.connect(self.deleteLater)
+        self.cancel_btn.setFixedWidth(90)
+
+        btn_lay.addStretch()
+        btn_lay.addWidget(self.cancel_btn)
+        btn_lay.addWidget(self.ok_btn)
+        btn_lay.addStretch()
+
+        self.central_layout.addLayout(btn_lay)
 
         self.tab_wid.setCurrentIndex(1)
 
     def main_folder_click(self, main_folder: MainFolder):
-        self.collections_list.path = main_folder.curr_path
-        self.collections_list.init_ui()
+        self.dirs_list.path = main_folder.curr_path
+        self.dirs_list.init_ui()
         self.tab_wid.setCurrentIndex(1)
 
-    def clicked_cmd(self, path: str):
-        data = (path, self.main_folders.currentItem().text())
-        self.clicked.emit(data)
-        if hasattr(self.collections_list, "subwin"):
-            self.collections_list.subwin.deleteLater()
-        self.deleteLater()
+    def ok_cmd(self):
+        path = self.dirs_list.get_path()
+        if path:
+            data = (self.main_folders.currentItem().main_folder, path)
+            self.clicked.emit(data)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:

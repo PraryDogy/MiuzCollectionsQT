@@ -345,8 +345,7 @@ class WinMain(UMainWindow):
         self.win_upload.show()
 
     def upload_task_start(self, data: tuple, img_path_list: list[str]):
-        dest, main_folder_name = data
-        main_folder = next(i for i in MainFolder.list_ if main_folder_name == i.name)
+        main_folder, dest = data
         copy_files_task = CopyFilesTask(dest, img_path_list)
         cmd = lambda img_path_list: self.upload_task_finished(main_folder, img_path_list)
         copy_files_task.signals_.finished_.connect(cmd)
