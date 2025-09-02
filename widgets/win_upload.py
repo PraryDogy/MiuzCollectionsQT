@@ -139,7 +139,6 @@ class MainFolderItem(UListWidgetItem):
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
-    double_clicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
