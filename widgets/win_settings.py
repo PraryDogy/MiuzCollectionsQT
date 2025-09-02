@@ -555,7 +555,7 @@ class MainFolderSettings(QWidget):
         self.setLayout(v_lay)
 
         first_row = QGroupBox()
-        first_row.setFixedHeight(50)
+        first_row.setFixedHeight(70)
         v_lay.addWidget(first_row)
         first_lay = UHBoxLayout()
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -589,21 +589,33 @@ class MainFolderSettings(QWidget):
 
 
 class NewFolder(QWidget):
+    new_folder = pyqtSignal(MainFolder)
     lang = (
         (
             "Имя папки (нельзя изменить после сохранения)",
             "Folder name (cannot be changed after saving)"
         ),
         ("Сохранить", "Save"),
+        ("Новая папка", "New folder"),
+        ("Внимание", "Attention"),
+        (
+            "Укажите имя папки с коллекциями",
+            "Enter collections folder name"
+        ),
+        (
+            "Укажите путь к папке с коллекциями",
+            "Select path to the collections folder"
+        ),
     )
 
     def __init__(self):
         super().__init__()
+        self.main_folder = MainFolder("", [], [])
+
         v_lay = UVBoxLayout()
         v_lay.setSpacing(15)
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(v_lay)
-        main_folder = MainFolder("", [], [])
 
         first_row = QGroupBox()
         first_row.setFixedHeight(70)
@@ -614,13 +626,15 @@ class NewFolder(QWidget):
         first_row.setLayout(first_lay)
         name_descr = QLabel(self.lang[0][JsonData.lang] + ":")
         first_lay.addWidget(name_descr)
-        name_label = ULineEdit()
-        first_lay.addWidget(name_label)
+        self.name_label = ULineEdit()
+        self.name_label.textChanged.connect(self.name_cmd)
+        first_lay.addWidget(self.name_label)
 
-        self.advanced = MainFolderAdvanced(main_folder)
+        self.advanced = MainFolderAdvanced(self.main_folder)
         v_lay.addWidget(self.advanced)
 
         add_btn = QPushButton(self.lang[1][JsonData.lang])
+        add_btn.clicked.connect(self.save)
         add_btn.setFixedWidth(100)
 
         btn_lay = UHBoxLayout()
@@ -628,6 +642,26 @@ class NewFolder(QWidget):
         btn_lay.addWidget(add_btn)
         btn_lay.addStretch()
         v_lay.addLayout(btn_lay)
+
+    def name_cmd(self):
+        name = self.name_label.text().strip()
+        self.main_folder.name = name
+
+    def save(self):
+        if not self.main_folder.name:
+            self.win_warn = WinWarn(
+                self.lang[3][JsonData.lang],
+                self.lang[4][JsonData.lang]
+                )
+            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.show()
+        elif not self.main_folder.paths:
+            self.win_warn = WinWarn(
+                self.lang[3][JsonData.lang],
+                self.lang[5][JsonData.lang]
+                )
+            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
