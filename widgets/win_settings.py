@@ -477,7 +477,7 @@ class MainFolderPaths(DropableGroupBox):
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
-            text = "\n".join((self.text_edit.toPlainText(), *urls))
+            text = "\n".join((self.text_edit.toPlainText(), *urls)).strip()
             self.text_edit.setPlainText(text)
         return super().dropEvent(a0)
 
@@ -498,7 +498,7 @@ class StopList(DropableGroupBox):
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
-            text = "\n".join((self.text_edit.toPlainText(), *urls))
+            text = "\n".join((self.text_edit.toPlainText(), *urls)).strip()
             self.text_edit.setPlainText(text)
         return super().dropEvent(a0)
 
