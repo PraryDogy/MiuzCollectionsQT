@@ -338,8 +338,15 @@ class WinMain(UMainWindow):
         UThreadPool.start(remove_files_task)
 
     def open_upload_win(self, img_path_list: list):
+
+        def cmd(data):
+            try:
+                self.win_upload.deleteLater()
+            except Exception:
+                ...
+            self.upload_task_start(data, img_path_list)
+
         self.win_upload = WinUpload()
-        cmd = lambda data: self.upload_task_start(data, img_path_list)
         self.win_upload.clicked.connect(cmd)
         self.win_upload.center_relative_parent(self.window())
         self.win_upload.show()
@@ -353,6 +360,10 @@ class WinMain(UMainWindow):
         self.open_downloads_win()
 
     def upload_task_finished(self, main_folder: MainFolder, img_path_list: list[str]):
+        try:
+            self.win_downloads.deleteLater()
+        except Exception:
+            ...
         upload_files_task = UploadFilesTask(img_path_list, main_folder)
         upload_files_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
         if main_folder == MainFolder.current:
