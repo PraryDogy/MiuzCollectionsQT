@@ -50,6 +50,14 @@ class DirsLoader:
                     except Exception:
                         MainUtils.print_error()
                         task_state.set_should_run(False)
+
+        try:
+            stats = os.stat(main_folder_path)
+            data = (os.sep, int(stats.st_mtime))
+            dirs.append(data)
+        except Exception as e:
+            print("new scaner dirs loader finder dirs error add root dir", e)
+
         return dirs
 
     @classmethod
