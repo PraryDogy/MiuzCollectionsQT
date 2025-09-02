@@ -351,7 +351,7 @@ class WinMain(UMainWindow):
         self.win_upload.center_relative_parent(self.window())
         self.win_upload.show()
 
-    def upload_task_start(self, data: tuple, img_path_list: list[str]):
+    def upload_task_start(self, data: tuple[MainFolder, str], img_path_list: list[str]):
         main_folder, dest = data
         copy_files_task = CopyFilesTask(dest, img_path_list)
         cmd = lambda img_path_list: self.upload_task_finished(main_folder, img_path_list)

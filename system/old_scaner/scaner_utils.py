@@ -399,7 +399,9 @@ class DbUpdater(QObject):
             small_img_path = ThumbUtils.create_thumb_path(img_path)
             short_img_path = MainUtils.get_rel_path(self.main_folder.get_current_path(), img_path)
             rel_thumb_path = ThumbUtils.get_rel_thumb_path(small_img_path)
+
             coll_name = MainUtils.get_coll_name(self.main_folder.get_current_path(), img_path)
+
             values = {
                 ClmNames.SHORT_SRC: short_img_path,
                 ClmNames.SHORT_HASH: rel_thumb_path,
