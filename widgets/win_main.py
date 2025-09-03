@@ -292,13 +292,12 @@ class WinMain(UMainWindow):
 
     def open_filemove_win(self, rel_img_path_list: list):
 
-        def filemove_task_start(data: tuple, img_path_list: list):
-            dest, main_folder_name = data
-            main_folder = next(i for i in MainFolder.list_ if i.name == main_folder_name)
-            task = MoveFilesTask(main_folder, dest, img_path_list)
-            task.reload_gui.connect(lambda: self.grid.reload_thumbnails())
-            task.set_progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-            task.run()
+        def move_files_task(data: tuple[str, MainFolder], img_path_list: list):
+            dest, main_folder = data
+            self.move_files_task = MoveFilesTask(main_folder, dest, img_path_list)
+            # self.move_files_task.reload_gui.connect(lambda: self.grid.reload_thumbnails())
+            # self.move_files_task.set_progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
+            # self.move_files_task.run()
 
         main_folder_path = MainFolder.current.availability()
         if main_folder_path:
@@ -307,8 +306,7 @@ class WinMain(UMainWindow):
                 for i in rel_img_path_list
             ]
             self.win_upload = WinUpload()
-            cmd = lambda data: filemove_task_start(data, img_path_list)
-            self.win_upload.clicked.connect(cmd)
+            self.win_upload.clicked.connect(lambda data: move_files_task(data, img_path_list))
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
         else:
