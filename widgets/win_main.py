@@ -11,7 +11,7 @@ from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
-                          RemoveFilesTask, UploadFilesTask)
+                          RemoveFilesTask, ScanSingleDirTask)
 from system.utils import UThreadPool
 
 from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
@@ -364,12 +364,10 @@ class WinMain(UMainWindow):
             self.win_downloads.deleteLater()
         except Exception:
             ...
-        self.restart_scaner_task()
-        # upload_files_task = UploadFilesTask(img_path_list, main_folder)
-        # upload_files_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-        # if main_folder == MainFolder.current:
-        #     upload_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
-        # UThreadPool.start(upload_files_task)
+        if img_path_list:
+            scan_dir = os.path.dirname(img_path_list[0])
+            self.single_dir_task = ScanSingleDirTask(main_folder, scan_dir)
+            UThreadPool.start(self.single_dir_task)
 
     def save_files_task(self, dest: str, img_path_list: list):
         copy_files_task = CopyFilesTask(dest, img_path_list)

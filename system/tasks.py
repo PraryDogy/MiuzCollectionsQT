@@ -421,72 +421,72 @@ class UploadFilesSignals(QObject):
     reload_gui = pyqtSignal()
 
 
-class UploadFilesTask(URunnable):
-    def __init__(self, img_path_list: list, main_folder: MainFolder):
-        """ 
-        Запуск: UThreadPool.start   
-        Сигналы: finished_(), progress_text(str), reload_gui()
+# class UploadFilesTask(URunnable):
+#     def __init__(self, img_path_list: list, main_folder: MainFolder):
+#         """ 
+#         Запуск: UThreadPool.start   
+#         Сигналы: finished_(), progress_text(str), reload_gui()
 
-        Подготавливает списки `del_items` и `new_items` для `FileUpdater` и `DbUpdater`.    
-        Добавляет записи в базу данных и миниатюры в hashdir.   
-        Механизм реализует корректное обновление записей в базе данных и миниатюр в `hashdir`   
-        в случае, если файл был заменён на новый с тем же именем. Пример:
+#         Подготавливает списки `del_items` и `new_items` для `FileUpdater` и `DbUpdater`.    
+#         Добавляет записи в базу данных и миниатюры в hashdir.   
+#         Механизм реализует корректное обновление записей в базе данных и миниатюр в `hashdir`   
+#         в случае, если файл был заменён на новый с тем же именем. Пример:
 
-        - В папке уже есть файл `1.jpg`
-        - Пользователь копирует новый `1.jpg` в ту же папку через `CopyFilesTask`
-        - Старый `1.jpg` автоматически заменяется
-        - Однако в базе данных и `hashdir` остаются данные о старом файле
-        - Поэтому:
-        - старая запись из БД удаляется
-        - старая миниатюра удаляется из `hashdir`
-        - создаются новые запись и миниатюра для нового файла
+#         - В папке уже есть файл `1.jpg`
+#         - Пользователь копирует новый `1.jpg` в ту же папку через `CopyFilesTask`
+#         - Старый `1.jpg` автоматически заменяется
+#         - Однако в базе данных и `hashdir` остаются данные о старом файле
+#         - Поэтому:
+#         - старая запись из БД удаляется
+#         - старая миниатюра удаляется из `hashdir`
+#         - создаются новые запись и миниатюра для нового файла
 
-        Это необходимо, чтобы избежать конфликтов и дубликатов,     
-        так как новый файл с тем же именем является другим объектом     
-        (другой хеш, размер и т.п.).
-        """
-        super().__init__()
-        self.img_path_list = img_path_list
-        self.main_folder = main_folder
-        self.signals_ = UploadFilesSignals()
+#         Это необходимо, чтобы избежать конфликтов и дубликатов,     
+#         так как новый файл с тем же именем является другим объектом     
+#         (другой хеш, размер и т.п.).
+#         """
+#         super().__init__()
+#         self.img_path_list = img_path_list
+#         self.main_folder = main_folder
+#         self.signals_ = UploadFilesSignals()
 
-    def task(self):
-        """
-        ДОБАВЛЯЕТ В БД В ТЕКУЩУЮ MAINFOLDER
-        """
-        img_with_stats_list = []
-        rel_thumb_path_list = []
-        for img_path in self.img_path_list:
-            try:
-                stat = os.stat(img_path)
-            except Exception as e:
-                MainUtils.print_error()
-                continue
-            size, birth, mod = stat.st_size, stat.st_birthtime, stat.st_mtime
-            data = (img_path, size, birth, mod)
-            img_with_stats_list.append(data)
+#     def task(self):
+#         """
+#         ДОБАВЛЯЕТ В БД В ТЕКУЩУЮ MAINFOLDER
+#         """
+#         img_with_stats_list = []
+#         rel_thumb_path_list = []
+#         for img_path in self.img_path_list:
+#             try:
+#                 stat = os.stat(img_path)
+#             except Exception as e:
+#                 MainUtils.print_error()
+#                 continue
+#             size, birth, mod = stat.st_size, stat.st_birthtime, stat.st_mtime
+#             data = (img_path, size, birth, mod)
+#             img_with_stats_list.append(data)
 
-            thumb_path = ThumbUtils.create_thumb_path(img_path)
-            rel_thumb_path = ThumbUtils.get_rel_thumb_path(thumb_path)
-            rel_thumb_path_list.append(rel_thumb_path)
+#             thumb_path = ThumbUtils.create_thumb_path(img_path)
+#             rel_thumb_path = ThumbUtils.get_rel_thumb_path(thumb_path)
+#             rel_thumb_path_list.append(rel_thumb_path)
 
-        if rel_thumb_path_list:
-            text = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {len(rel_thumb_path_list)} "
-            self.signals_.progress_text.emit(text)
+#         if rel_thumb_path_list:
+#             text = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {len(rel_thumb_path_list)} "
+#             self.signals_.progress_text.emit(text)
 
-        args = (rel_thumb_path_list, img_with_stats_list, self.main_folder, self.task_state)
-        file_updater = HashdirUpdater(*args)
-        rel_thumb_path_list, new_items = file_updater.run()
+#         args = (rel_thumb_path_list, img_with_stats_list, self.main_folder, self.task_state)
+#         file_updater = HashdirUpdater(*args)
+#         rel_thumb_path_list, new_items = file_updater.run()
 
-        db_updater = DbUpdater(rel_thumb_path_list, new_items, self.main_folder)
-        db_updater.run()
+#         db_updater = DbUpdater(rel_thumb_path_list, new_items, self.main_folder)
+#         db_updater.run()
 
-        try:
-            self.signals_.progress_text.emit("")
-            self.signals_.reload_gui.emit()
-            self.signals_.finished_.emit()
-        except RuntimeError as e:
-            MainUtils.print_error()
+#         try:
+#             self.signals_.progress_text.emit("")
+#             self.signals_.reload_gui.emit()
+#             self.signals_.finished_.emit()
+#         except RuntimeError as e:
+#             MainUtils.print_error()
     
 
 class MoveFilesTask(QObject):
@@ -721,18 +721,35 @@ class LoadDirsTask(URunnable):
             self.sigs.finished_.emit(dirs)
 
 
-class ScanerSingleDir(URunnable):
-    def __init__(self, main_folder: MainFolder, path: str):
+class _ScanSingleDirSigs(QObject):
+    finished_ = pyqtSignal()
+    progress_text = pyqtSignal(str)
+    reload_thumbnails = pyqtSignal()
+
+
+class ScanSingleDirTask(URunnable):
+    lang = (
+        ("Поиск в", "Search in"),
+        ("Обновление", "Updating")
+    )
+
+    def __init__(self, main_folder: MainFolder, scan_dir: str):
         super().__init__()
+        self.sigs = _ScanSingleDirSigs()
         self.main_folder = main_folder
-        self.path = path    
+        self.scan_dir = scan_dir
         
     def task(self):
         conn = Dbase.engine.connect()
 
-        rel_path = MainUtils.get_rel_path(self.main_folder.curr_path, self.path)
-        mod_time = int(os.stat(self.path).st_mtime)
+        rel_path = MainUtils.get_rel_path(self.main_folder.curr_path, self.scan_dir)
+        mod_time = int(os.stat(self.scan_dir).st_mtime)
         new_dirs = [(rel_path, mod_time), ]
+
+        # Поиск в *имя папки*
+        self.sigs.progress_text.emit(
+            f"{self.lang[0][JsonData.lang]} {self.main_folder.name}"
+        )
 
         args = (new_dirs, self.main_folder, self.task_state, conn)
         finder_images = ImgLoader.finder_images(*args)
@@ -746,12 +763,15 @@ class ScanerSingleDir(URunnable):
         img_compator = ImgCompator(*args)
         del_images, new_images = img_compator.run()
 
-        def text(total: int):
-            t = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {total}"
-            self.signals_.progress_text.emit(t)
+        # обновление *имя папки* (*оставшееся число изображений*)
+        def hashdir_text(value: int):
+            self.sigs.progress_text.emit(
+                f"{self.lang[1][JsonData.lang]} {self.main_folder.name} ({value})"
+            )
 
         args = (del_images, new_images, self.main_folder, self.task_state)
         hashdir_updater = HashdirUpdater(*args)
+        hashdir_updater.progress_text.connect(hashdir_text)
         del_images, new_images = hashdir_updater.run()
 
         conn = Dbase.engine.connect()
@@ -759,18 +779,18 @@ class ScanerSingleDir(URunnable):
         db_updater.run()
         conn.close()
 
-        # if not self.task_state.should_run():
-        #     self.signals_.reload_gui.emit()
-        #     return
+        if not self.task_state.should_run():
+            return
 
-        # conn = Dbase.engine.connect()
-        # args = (conn, self.main_folder, del_dirs, new_dirs)
-        # DirsUpdater.remove_db_dirs(*args)
-        # DirsUpdater.add_new_dirs(*args)
-        # conn.close()
+        del_dirs = new_dirs
+        conn = Dbase.engine.connect()
+        args = (conn, self.main_folder, del_dirs, new_dirs)
+        DirsUpdater.remove_db_dirs(*args)
+        DirsUpdater.add_new_dirs(*args)
+        conn.close()
 
-        # if del_images or new_images:
-        #     self.signals_.reload_gui.emit()
+        # скрываем текст
+        self.sigs.progress_text.emit("")
 
-    def create_new_dirs(self):
-        ...
+        if new_images or del_images:
+            self.sigs.reload_thumbnails.emit()

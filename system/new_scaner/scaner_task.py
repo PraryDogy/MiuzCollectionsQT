@@ -110,7 +110,7 @@ class ScanerTask(URunnable):
 
         args = (del_images, new_images, main_folder, self.task_state)
         hashdir_updater = HashdirUpdater(*args)
-        hashdir_updater.total_sig.connect(text)
+        hashdir_updater.progress_text.connect(text)
         del_images, new_images = hashdir_updater.run()
 
         conn = Dbase.engine.connect()

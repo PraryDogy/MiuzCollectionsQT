@@ -291,11 +291,7 @@ class ImgCompator:
 
 
 class HashdirUpdater(QObject):
-    total_sig = pyqtSignal(int)
-    lang = (
-        ("Добавляю", "Add"),
-        ("Удаляю", "Deleting"),
-    )
+    progress_text = pyqtSignal(int)
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
@@ -344,7 +340,7 @@ class HashdirUpdater(QObject):
                         os.rmdir(folder)
                     new_del_items.append(rel_thumb_path)
                     self.total -= 1
-                    self.total_sig.emit(self.total)
+                    self.progress_text.emit(self.total)
                 except Exception as e:
                     MainUtils.print_error()
                     continue
@@ -371,7 +367,7 @@ class HashdirUpdater(QObject):
                 ThumbUtils.write_thumb(thumb_path, thumb)
                 new_new_items.append((img_path, size, birth, mod))
                 self.total -= 1
-                self.total_sig.emit(self.total)
+                self.progress_text.emit(self.total)
             except Exception as e:
                 MainUtils.print_error()
                 continue

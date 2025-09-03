@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QVBoxLayout
 from PyQt5.QtCore import QThreadPool, QRunnable, pyqtSlot
-from system.tasks import ScanerSingleDir
+from system.tasks import ScanSingleDirTask
 from system.utils import UThreadPool
 from system.main_folder import MainFolder
 from system.database import Dbase
@@ -21,7 +21,7 @@ class Window(QWidget):
         main_folder_path = "/Users/pupitor9000/Downloads/collections"
         path = "/Users/pupitor9000/Downloads/collections"
         main_folder = MainFolder(name="aaa", paths=[main_folder_path, ], curr_path=main_folder_path)
-        self.task = ScanerSingleDir(main_folder=main_folder, path=path)
+        self.task = ScanSingleDirTask(main_folder=main_folder, scan_dir=path)
         UThreadPool.start(self.task)
 
 app = QApplication(sys.argv)
