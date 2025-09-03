@@ -78,18 +78,17 @@ class ScanerTask(URunnable):
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
 
-        conn = Dbase.engine.connect()
         text = f"{main_folder.name.capitalize()}: {Lang.searching_images.lower()}"
         self.signals_.progress_text.emit(text)
         finder_images = ImgLoader.finder_images(new_dirs, main_folder, self.task_state)
+        conn = Dbase.engine.connect()
         db_images = ImgLoader.db_images(new_dirs, main_folder, conn)
         conn.close()
         if not self.task_state.should_run():
             print(main_folder.name, "no finder images")
             return
         
-        args = (finder_images, db_images)
-        img_compator = ImgCompator(*args)
+        img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
 
         conn = Dbase.engine.connect()
@@ -105,8 +104,7 @@ class ScanerTask(URunnable):
             t = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {total}"
             self.signals_.progress_text.emit(t)
 
-        args = (del_images, new_images, main_folder, self.task_state)
-        hashdir_updater = HashdirUpdater(*args)
+        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state)
         hashdir_updater.progress_text.connect(text)
         del_images, new_images = hashdir_updater.run()
 

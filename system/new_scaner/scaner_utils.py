@@ -270,7 +270,7 @@ class ImgCompator:
 
 class HashdirUpdater(QObject):
     progress_text = pyqtSignal(int)
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
+    def __init__(self, del_items: list, new_items: list, task_state: TaskState):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
         Запуск: run()   
@@ -288,7 +288,6 @@ class HashdirUpdater(QObject):
         super().__init__()
         self.del_items = del_items
         self.new_items = new_items
-        self.main_folder = main_folder
         self.task_state = task_state
         self.total = len(new_items) + len(del_items)
 

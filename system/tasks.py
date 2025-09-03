@@ -403,7 +403,7 @@ class RemoveFilesTask(URunnable):
         ]
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = HashdirUpdater(rel_thumb_path_list, [], MainFolder.current, self.task_state)
+        file_updater = HashdirUpdater(rel_thumb_path_list, [], self.task_state)
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
@@ -695,8 +695,7 @@ class ScanSingleDirTask(URunnable):
             print(self.main_folder.name, "no finder images")
             return
                 
-        args = (finder_images, db_images)
-        img_compator = ImgCompator(*args)
+        img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
 
         # обновление *имя папки* (*оставшееся число изображений*)
@@ -705,8 +704,7 @@ class ScanSingleDirTask(URunnable):
                 f"{self.lang[1][JsonData.lang]} {self.main_folder.name} ({value})"
             )
 
-        args = (del_images, new_images, self.main_folder, self.task_state)
-        hashdir_updater = HashdirUpdater(*args)
+        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state)
         hashdir_updater.progress_text.connect(hashdir_text)
         del_images, new_images = hashdir_updater.run()
 
