@@ -293,6 +293,8 @@ class WinMain(UMainWindow):
     def open_filemove_win(self, rel_img_path_list: list):
 
         def move_files_task(data: tuple[str, MainFolder], img_path_list: list):
+            print(data, img_path_list)
+            return
             dest, main_folder = data
             self.move_files_task = MoveFilesTask(main_folder, dest, img_path_list)
             # self.move_files_task.reload_gui.connect(lambda: self.grid.reload_thumbnails())
