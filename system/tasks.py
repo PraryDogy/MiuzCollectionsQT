@@ -686,7 +686,6 @@ class ScanSingleDirTask(URunnable):
             f"{self.lang[0][JsonData.lang]} {self.main_folder.name}"
         )
 
-        args = (new_dirs, self.main_folder, self.task_state, conn)
         finder_images = ImgLoader.finder_images(new_dirs, self.main_folder, self.task_state)
         conn = Dbase.engine.connect()
         db_images = ImgLoader.db_images(new_dirs, self.main_folder, conn)
