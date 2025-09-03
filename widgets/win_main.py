@@ -193,10 +193,10 @@ class WinMain(UMainWindow):
 
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
-            self.scaner_task.signals_.finished_.connect(self.on_scaner_finished)
-            self.scaner_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-            self.scaner_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
-            self.scaner_task.signals_.reload_gui.connect(lambda: self.left_menu.init_ui())
+            self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
+            self.scaner_task.sigs.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
+            self.scaner_task.sigs.reload_gui.connect(lambda: self.grid.reload_thumbnails())
+            self.scaner_task.sigs.reload_gui.connect(lambda: self.left_menu.init_ui())
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
