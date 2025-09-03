@@ -410,84 +410,21 @@ class RemoveFilesTask(URunnable):
         
         # new_items пустой так как мы только удаляем thumbs из бд
         conn = Dbase.engine.connect()
-        db_updater = DbUpdater(del_items, [], main_folder)
+        db_updater = DbUpdater(del_items, [], main_folder, conn)
         db_updater.run()
+
+        worker_dirs = [
+            (
+                MainUtils.get_rel_path(main_folder.curr_path, os.path.dirname(i)),
+                os.stat(os.path.dirname(i)).st_mtime
+            )
+            for i in self.img_path_list
+        ]
+
+        DirsUpdater.remove_db_dirs(conn, main_folder, worker_dirs, worker_dirs)
+        DirsUpdater.add_new_dirs(conn, main_folder, worker_dirs, worker_dirs)
         conn.close()
 
-
-class UploadFilesSignals(QObject):
-    finished_ = pyqtSignal()
-    progress_text = pyqtSignal(str)
-    reload_gui = pyqtSignal()
-
-
-# class UploadFilesTask(URunnable):
-#     def __init__(self, img_path_list: list, main_folder: MainFolder):
-#         """ 
-#         Запуск: UThreadPool.start   
-#         Сигналы: finished_(), progress_text(str), reload_gui()
-
-#         Подготавливает списки `del_items` и `new_items` для `FileUpdater` и `DbUpdater`.    
-#         Добавляет записи в базу данных и миниатюры в hashdir.   
-#         Механизм реализует корректное обновление записей в базе данных и миниатюр в `hashdir`   
-#         в случае, если файл был заменён на новый с тем же именем. Пример:
-
-#         - В папке уже есть файл `1.jpg`
-#         - Пользователь копирует новый `1.jpg` в ту же папку через `CopyFilesTask`
-#         - Старый `1.jpg` автоматически заменяется
-#         - Однако в базе данных и `hashdir` остаются данные о старом файле
-#         - Поэтому:
-#         - старая запись из БД удаляется
-#         - старая миниатюра удаляется из `hashdir`
-#         - создаются новые запись и миниатюра для нового файла
-
-#         Это необходимо, чтобы избежать конфликтов и дубликатов,     
-#         так как новый файл с тем же именем является другим объектом     
-#         (другой хеш, размер и т.п.).
-#         """
-#         super().__init__()
-#         self.img_path_list = img_path_list
-#         self.main_folder = main_folder
-#         self.signals_ = UploadFilesSignals()
-
-#     def task(self):
-#         """
-#         ДОБАВЛЯЕТ В БД В ТЕКУЩУЮ MAINFOLDER
-#         """
-#         img_with_stats_list = []
-#         rel_thumb_path_list = []
-#         for img_path in self.img_path_list:
-#             try:
-#                 stat = os.stat(img_path)
-#             except Exception as e:
-#                 MainUtils.print_error()
-#                 continue
-#             size, birth, mod = stat.st_size, stat.st_birthtime, stat.st_mtime
-#             data = (img_path, size, birth, mod)
-#             img_with_stats_list.append(data)
-
-#             thumb_path = ThumbUtils.create_thumb_path(img_path)
-#             rel_thumb_path = ThumbUtils.get_rel_thumb_path(thumb_path)
-#             rel_thumb_path_list.append(rel_thumb_path)
-
-#         if rel_thumb_path_list:
-#             text = f"{Lang.updating_data} {Lang.izobrazhenii.lower()}: {len(rel_thumb_path_list)} "
-#             self.signals_.progress_text.emit(text)
-
-#         args = (rel_thumb_path_list, img_with_stats_list, self.main_folder, self.task_state)
-#         file_updater = HashdirUpdater(*args)
-#         rel_thumb_path_list, new_items = file_updater.run()
-
-#         db_updater = DbUpdater(rel_thumb_path_list, new_items, self.main_folder)
-#         db_updater.run()
-
-#         try:
-#             self.signals_.progress_text.emit("")
-#             self.signals_.reload_gui.emit()
-#             self.signals_.finished_.emit()
-#         except RuntimeError as e:
-#             MainUtils.print_error()
-    
 
 class MoveFilesTask(QObject):
     set_progress_text = pyqtSignal(str)
