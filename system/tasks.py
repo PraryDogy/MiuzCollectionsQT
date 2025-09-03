@@ -401,28 +401,28 @@ class RemoveFilesTask(URunnable):
             ThumbUtils.get_rel_thumb_path(thumb_path)
             for thumb_path in thumb_path_list
         ]
-
-        main_folder = MainFolder.current
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = HashdirUpdater(rel_thumb_path_list, [], main_folder, self.task_state)
+        file_updater = HashdirUpdater(rel_thumb_path_list, [], MainFolder.current, self.task_state)
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
         conn = Dbase.engine.connect()
-        db_updater = DbUpdater(del_items, [], main_folder, conn)
+        db_updater = DbUpdater(del_items, [], MainFolder.current, conn)
         db_updater.run()
 
+
+        # [(rel dir path, mod time), ...]
         worker_dirs = [
             (
-                MainUtils.get_rel_path(main_folder.curr_path, os.path.dirname(i)),
+                MainUtils.get_rel_path(MainFolder.current.curr_path, os.path.dirname(i)),
                 os.stat(os.path.dirname(i)).st_mtime
             )
             for i in self.img_path_list
         ]
 
-        DirsUpdater.remove_db_dirs(conn, main_folder, worker_dirs, worker_dirs)
-        DirsUpdater.add_new_dirs(conn, main_folder, worker_dirs, worker_dirs)
+        DirsUpdater.remove_db_dirs(conn, MainFolder.current, worker_dirs, worker_dirs)
+        DirsUpdater.add_new_dirs(conn, MainFolder.current, worker_dirs, worker_dirs)
         conn.close()
 
 
