@@ -719,9 +719,8 @@ class ScanSingleDirTask(URunnable):
         if not self.task_state.should_run():
             return
 
-        del_dirs = new_dirs
         conn = Dbase.engine.connect()
-        args = (conn, self.main_folder, del_dirs, new_dirs)
+        args = (conn, self.main_folder, new_dirs, new_dirs)
         DirsUpdater.remove_db_dirs(*args)
         DirsUpdater.add_new_dirs(*args)
         conn.close()
