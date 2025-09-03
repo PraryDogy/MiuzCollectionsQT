@@ -297,6 +297,8 @@ class WinMain(UMainWindow):
                 scan_dir = os.path.dirname(new_files[0])
                 update_task = ScanSingleDirTask(main_folder, scan_dir)
                 UThreadPool.start(update_task)
+                self.grid.reload_thumbnails()
+                self.reload_rubber()
 
         def remove_files(old_files: list[str], new_files: list[str], main_folder: MainFolder):
             remove_task = RemoveFilesTask(old_files)
@@ -306,7 +308,7 @@ class WinMain(UMainWindow):
             UThreadPool.start(remove_task)
 
         def copy_files(data: tuple[str, MainFolder], old_files: list):
-            dest, main_folder = data
+            main_folder, dest = data
             copy_task = CopyFilesTask(dest, old_files)
             copy_task.signals_.finished_.connect(
                 lambda new_files: remove_files(old_files, new_files, main_folder)
@@ -321,6 +323,7 @@ class WinMain(UMainWindow):
             ]
             self.win_upload = WinUpload()
             self.win_upload.clicked.connect(lambda data: copy_files(data, files))
+            self.win_upload.clicked.connect(self.win_upload.deleteLater)
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
         else:
