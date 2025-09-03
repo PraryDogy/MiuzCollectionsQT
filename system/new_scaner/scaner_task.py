@@ -59,7 +59,7 @@ class ScanerTask(URunnable):
         try:
             self._cmd(main_folder)
         except Exception as e:
-            print("new scaner scanertask, main folder scan error", e)
+            print("new scaner task, main folder scan error", e)
 
     def _cmd(self, main_folder: MainFolder):
 

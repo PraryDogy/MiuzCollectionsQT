@@ -150,7 +150,6 @@ class ImgLoader:
         finder_images = []
         main_folder_path = main_folder.get_current_path()
 
-
         def process_entry(entry: os.DirEntry):
             abs_img_path = entry.path
             stats = entry.stat()
@@ -158,7 +157,6 @@ class ImgLoader:
             birth = int(stats.st_birthtime)
             mod = int(stats.st_mtime)
             finder_images.append((abs_img_path, size, birth, mod))
-
 
         for rel_dir_path, mod in new_dirs:
             abs_dir_path = MainUtils.get_abs_path(main_folder_path, rel_dir_path)
@@ -169,7 +167,7 @@ class ImgLoader:
                     try:
                         process_entry(entry)
                     except Exception as e:
-                        MainUtils.print_error()
+                        print("new scaner utils, img loader, finder images, error", e)
                         task_state.set_should_run(False)
                         break
         return finder_images
@@ -196,14 +194,10 @@ class ImgLoader:
             q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
             q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             q = q.where(THUMBS.c.brand == main_folder.name)
-            try:
-                res = conn.execute(q).fetchall()
-                for rel_thumb_path, rel_img_path, size, birth, mod in res:
-                    abs_img_path = MainUtils.get_abs_path(main_folder_path, rel_img_path)
-                    db_images[rel_thumb_path] = (abs_img_path, size, birth, mod)
-            except Exception:
-                MainUtils.print_error()
-                conn.rollback()
+            res = conn.execute(q).fetchall()
+            for rel_thumb_path, rel_img_path, size, birth, mod in res:
+                abs_img_path = MainUtils.get_abs_path(main_folder_path, rel_img_path)
+                db_images[rel_thumb_path] = (abs_img_path, size, birth, mod)
         return db_images
 
 
@@ -231,7 +225,6 @@ class ImgCompator:
         del_items = [k for k, v in self.db_images.items() if v not in finder_set]
         ins_items = list(finder_set - db_values)
         return del_items, ins_items
-
 
 
 class HashdirUpdater(QObject):
@@ -285,7 +278,7 @@ class HashdirUpdater(QObject):
                     self.total -= 1
                     self.progress_text.emit(self.total)
                 except Exception as e:
-                    MainUtils.print_error()
+                    print("new scaner utils, hashdir updater, remove img error", e)
                     continue
         return new_del_items
 
@@ -312,7 +305,7 @@ class HashdirUpdater(QObject):
                 self.total -= 1
                 self.progress_text.emit(self.total)
             except Exception as e:
-                MainUtils.print_error()
+                print("new scaner utils, hashdir updater, create new img error", e)
                 continue
         return new_new_items
 
@@ -339,26 +332,12 @@ class DbUpdater:
         self.run_new_items()
 
     def run_del_items(self):
-
         for rel_thumb_path in self.del_items:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
             q = q.where(THUMBS.c.brand==self.main_folder.name)
-            try:
-                self.conn.execute(q)
-            except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                MainUtils.print_error()
-                self.conn.rollback()
-                continue
-            except sqlalchemy.exc.OperationalError as e:
-                MainUtils.print_error()
-                self.conn.rollback()
-                return None
-        try:
-            self.conn.commit()
-        except Exception as e:
-            MainUtils.print_error()
-            self.conn.rollback()
+            self.conn.execute(q)
+        self.conn.commit()
 
     def run_new_items(self):
         for img_path, size, birth, mod in self.new_items:
@@ -378,23 +357,8 @@ class DbUpdater:
                 ClmNames.BRAND: self.main_folder.name
             }
             stmt = sqlalchemy.insert(THUMBS).values(**values) 
-            try:
-                self.conn.execute(stmt)
-            # overflow error бывает прозникает когда пишет
-            # python integer too large to insert db
-            except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                MainUtils.print_error()
-                self.conn.rollback()
-                continue
-            except sqlalchemy.exc.OperationalError as e:
-                MainUtils.print_error()
-                self.conn.rollback()
-                break
-        try:
-            self.conn.commit()
-        except Exception as e:
-            MainUtils.print_error()
-            self.conn.rollback()
+            self.conn.execute(stmt)
+        self.conn.commit()
 
 
 class Inspector:
@@ -478,9 +442,8 @@ class MainFolderRemover:
                 folder = os.path.dirname(image_path)
                 if os.path.exists(folder) and not os.listdir(folder):
                     os.rmdir(folder)
-
             except Exception as e:
-                MainUtils.print_error()
+                print("new scaner utils, MainFolderRemover,  remove images error", e)
                 continue
 
     def remove_rows(self, rows: list):
@@ -490,31 +453,11 @@ class MainFolderRemover:
         for id_, thumb_path in rows:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.id == id_)
-
-            try:
-                self.conn.execute(q)
-            except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                MainUtils.print_error()
-                self.conn.rollback()
-                continue
-
-            except sqlalchemy.exc.OperationalError as e:
-                MainUtils.print_error()
-                self.conn.rollback()
-                break
-        try:
-            self.conn.commit()
-        except Exception as e:
-            self.conn.rollback()
-            MainUtils.print_error()
+            self.conn.execute(q)
+        self.conn.commit()
 
     def remove_dirs(self, main_folder_name: str):
         q = sqlalchemy.delete(DIRS)
         q = q.where(DIRS.c.brand == main_folder_name)
-
-        try:
-            self.conn.execute(q)
-            self.conn.commit()
-        except Exception as e:
-            print("new scaner main folder remover error, remove dirs", e)
-            self.conn.rollback()
+        self.conn.execute(q)
+        self.conn.commit()
