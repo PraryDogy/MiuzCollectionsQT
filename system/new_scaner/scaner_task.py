@@ -45,7 +45,6 @@ class ScanerTask(URunnable):
                 t = f"{i.name}: {Lang.no_connection.lower()}"
                 self.signals_.progress_text.emit(t)
                 sleep(5)
-            
         try:
             self.signals_.progress_text.emit("")
             self.signals_.finished_.emit()
@@ -54,11 +53,11 @@ class ScanerTask(URunnable):
 
     def main_folder_scan(self, main_folder: MainFolder):
         try:
-            self._main_folder_scan(main_folder)
+            self._cmd(main_folder)
         except Exception as e:
             print("new scaner scanertask, main folder scan error", e)
 
-    def _main_folder_scan(self, main_folder: MainFolder):
+    def _cmd(self, main_folder: MainFolder):
         conn = Dbase.engine.connect()
         main_folder_remover = MainFolderRemover(conn)
         main_folder_remover.run()
