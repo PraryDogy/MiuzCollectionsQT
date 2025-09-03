@@ -367,6 +367,9 @@ class WinMain(UMainWindow):
         if img_path_list:
             scan_dir = os.path.dirname(img_path_list[0])
             self.single_dir_task = ScanSingleDirTask(main_folder, scan_dir)
+            self.single_dir_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
+            self.single_dir_task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
+            self.single_dir_task.sigs.reload_thumbnails.connect(self.reload_rubber)
             UThreadPool.start(self.single_dir_task)
 
     def save_files_task(self, dest: str, img_path_list: list):
