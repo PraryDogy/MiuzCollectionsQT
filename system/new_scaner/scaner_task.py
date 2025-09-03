@@ -58,7 +58,7 @@ class ScanerTask(URunnable):
     def main_folder_scan(self, main_folder: MainFolder):
         try:
             self._cmd(main_folder)
-        except Exception as e:
+        except (Exception, AttributeError) as e:
             print("new scaner task, main folder scan error", e)
 
     def _cmd(self, main_folder: MainFolder):
@@ -115,7 +115,7 @@ class ScanerTask(URunnable):
         # обновление *имя папки* (*оставшееся число изображений*)
         def hashdir_text(value: int):
             self.sigs.progress_text.emit(
-                f"{self.lang[1][JsonData.lang]} {self.main_folder.name} ({value})"
+                f"{self.lang[1][JsonData.lang]} {main_folder.name} ({value})"
             )
 
         # создаем / обновляем изображения в hashdir
