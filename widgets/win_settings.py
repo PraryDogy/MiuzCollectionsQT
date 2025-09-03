@@ -473,7 +473,7 @@ class MainFolderPaths(DropableGroupBox):
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
             urls = [
-                i.toLocalFile()
+                i.toLocalFile().rstrip(os.sep)
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
