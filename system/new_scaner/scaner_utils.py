@@ -15,12 +15,7 @@ from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 class DirsLoader:
 
     @classmethod
-    def finder_dirs(
-        cls,
-        main_folder: MainFolder,
-        task_state: TaskState,
-        conn: sqlalchemy.Connection,
-    ) -> list[tuple]:
+    def finder_dirs(cls, main_folder: MainFolder, task_state: TaskState) -> list[tuple]:
         """
         Возвращает:
         - [(rel_dir_path, mod_time), ...]
@@ -61,12 +56,7 @@ class DirsLoader:
         return dirs
 
     @classmethod
-    def db_dirs(
-        cls,
-        main_folder: MainFolder,
-        task_state: TaskState,
-        conn: sqlalchemy.Connection,
-    ) -> list[tuple]:
+    def db_dirs(cls, main_folder: MainFolder, conn: sqlalchemy.Connection,) -> list[tuple]:
         """
         Возвращает:
         - [(rel_dir_path, mod_time), ...]
@@ -183,13 +173,7 @@ class DirsUpdater:
 class ImgLoader:
 
     @classmethod
-    def finder_images(
-        cls,
-        new_dirs: list,
-        main_folder: MainFolder,
-        task_state: TaskState,
-        conn: sqlalchemy.Connection,
-    ) -> list[tuple]:
+    def finder_images(cls, new_dirs: list, main_folder: MainFolder, task_state: TaskState) -> list[tuple]:
         """
         Параметры:
         - new_dirs: [(rel_dir_path, mod_time), ...]
@@ -225,13 +209,7 @@ class ImgLoader:
         return finder_images
 
     @classmethod
-    def db_images(
-        cls,
-        new_dirs: list,
-        main_folder: MainFolder,
-        task_state: TaskState,
-        conn: sqlalchemy.Connection,
-        ) -> list[tuple]:
+    def db_images(cls, new_dirs: list, main_folder: MainFolder, conn: sqlalchemy.Connection,) -> list[tuple]:
         """
         Параметры:
         - new_dirs: [(rel_dir_path, mod_time), ...]

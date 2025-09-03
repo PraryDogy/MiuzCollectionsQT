@@ -677,8 +677,6 @@ class ScanSingleDirTask(URunnable):
         self.scan_dir = scan_dir
         
     def task(self):
-        conn = Dbase.engine.connect()
-
         rel_path = MainUtils.get_rel_path(self.main_folder.curr_path, self.scan_dir)
         mod_time = int(os.stat(self.scan_dir).st_mtime)
         new_dirs = [(rel_path, mod_time), ]
@@ -689,8 +687,9 @@ class ScanSingleDirTask(URunnable):
         )
 
         args = (new_dirs, self.main_folder, self.task_state, conn)
-        finder_images = ImgLoader.finder_images(*args)
-        db_images = ImgLoader.db_images(*args)
+        finder_images = ImgLoader.finder_images(new_dirs, self.main_folder, self.task_state)
+        conn = Dbase.engine.connect()
+        db_images = ImgLoader.db_images(new_dirs, self.main_folder, conn)
         conn.close()
         if not finder_images or not self.task_state.should_run():
             print(self.main_folder.name, "no finder images")

@@ -68,24 +68,21 @@ class ScanerTask(URunnable):
         conn = Dbase.engine.connect()
         text = f"{main_folder.name.capitalize()}: {Lang.searching_updates.lower()}"
         self.signals_.progress_text.emit(text)
-        args = (main_folder, self.task_state, conn)
-        finder_dirs = DirsLoader.finder_dirs(*args)
-        db_dirs = DirsLoader.db_dirs(*args)
+        finder_dirs = DirsLoader.finder_dirs(main_folder, self.task_state)
+        db_dirs = DirsLoader.db_dirs(main_folder, conn)
         conn.close()
         if not finder_dirs or not self.task_state.should_run():
             print(main_folder.name, "no finder dirs")
             return
 
-        args = (finder_dirs, db_dirs)
-        new_dirs = DirsCompator.get_add_to_db_dirs(*args)
-        del_dirs = DirsCompator.get_rm_from_db_dirs(*args)
+        new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
+        del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
 
         conn = Dbase.engine.connect()
         text = f"{main_folder.name.capitalize()}: {Lang.searching_images.lower()}"
         self.signals_.progress_text.emit(text)
-        args = (new_dirs, main_folder, self.task_state, conn)
-        finder_images = ImgLoader.finder_images(*args)
-        db_images = ImgLoader.db_images(*args)
+        finder_images = ImgLoader.finder_images(new_dirs, main_folder, self.task_state)
+        db_images = ImgLoader.db_images(new_dirs, main_folder, conn)
         conn.close()
         if not self.task_state.should_run():
             print(main_folder.name, "no finder images")
