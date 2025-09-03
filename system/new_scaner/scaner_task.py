@@ -62,12 +62,10 @@ class ScanerTask(URunnable):
             print("new scaner task, main folder scan error", e)
 
     def _cmd(self, main_folder: MainFolder):
-
         coll_folder = main_folder.availability()
         if not coll_folder:
             print(main_folder.name, "coll folder not avaiable")
             return
-
 
         # удаляем все файлы и данные по удаленному MainFolder
         conn = Dbase.engine.connect()
