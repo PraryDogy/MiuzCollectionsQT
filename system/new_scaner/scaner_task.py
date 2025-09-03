@@ -87,7 +87,7 @@ class ScanerTask(URunnable):
         finder_images = ImgLoader.finder_images(*args)
         db_images = ImgLoader.db_images(*args)
         conn.close()
-        if not finder_images or not self.task_state.should_run():
+        if not self.task_state.should_run():
             print(main_folder.name, "no finder images")
             return
         
