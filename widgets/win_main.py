@@ -292,23 +292,35 @@ class WinMain(UMainWindow):
 
     def open_filemove_win(self, rel_img_path_list: list):
 
-        def move_files_task(data: tuple[str, MainFolder], img_path_list: list):
-            print(data, img_path_list)
-            return
+        def udpate_hashdir(new_files: list[str], main_folder: MainFolder):
+            if new_files:
+                scan_dir = os.path.dirname(new_files[0])
+                update_task = ScanSingleDirTask(main_folder, scan_dir)
+                UThreadPool.start(update_task)
+
+        def remove_files(old_files: list[str], new_files: list[str], main_folder: MainFolder):
+            remove_task = RemoveFilesTask(old_files)
+            remove_task.signals_.finished_.connect(
+                lambda: udpate_hashdir(new_files, main_folder)
+            )
+            UThreadPool.start(remove_task)
+
+        def copy_files(data: tuple[str, MainFolder], old_files: list):
             dest, main_folder = data
-            self.move_files_task = MoveFilesTask(main_folder, dest, img_path_list)
-            # self.move_files_task.reload_gui.connect(lambda: self.grid.reload_thumbnails())
-            # self.move_files_task.set_progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-            # self.move_files_task.run()
+            copy_task = CopyFilesTask(dest, old_files)
+            copy_task.signals_.finished_.connect(
+                lambda new_files: remove_files(old_files, new_files, main_folder)
+            )
+            UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.availability()
         if main_folder_path:
-            img_path_list = [
+            files = [
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
             self.win_upload = WinUpload()
-            self.win_upload.clicked.connect(lambda data: move_files_task(data, img_path_list))
+            self.win_upload.clicked.connect(lambda data: copy_files(data, files))
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
         else:
