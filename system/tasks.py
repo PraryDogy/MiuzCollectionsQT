@@ -421,8 +421,8 @@ class RemoveFilesTask(URunnable):
             for i in self.img_path_list
         ]
 
-        DirsUpdater.remove_db_dirs(conn, MainFolder.current, worker_dirs, worker_dirs)
-        DirsUpdater.add_new_dirs(conn, MainFolder.current, worker_dirs, worker_dirs)
+        DirsUpdater.remove_db_dirs(conn, MainFolder.current, worker_dirs)
+        DirsUpdater.add_new_dirs(conn, MainFolder.current, worker_dirs)
         conn.close()
 
 
@@ -717,9 +717,8 @@ class ScanSingleDirTask(URunnable):
             return
 
         conn = Dbase.engine.connect()
-        args = (conn, self.main_folder, new_dirs, new_dirs)
-        DirsUpdater.remove_db_dirs(*args)
-        DirsUpdater.add_new_dirs(*args)
+        DirsUpdater.remove_db_dirs(conn, self.main_folder, new_dirs)
+        DirsUpdater.add_new_dirs(conn, self.main_folder, new_dirs)
         conn.close()
 
         # скрываем текст

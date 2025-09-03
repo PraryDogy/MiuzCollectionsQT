@@ -137,9 +137,8 @@ class ScanerTask(URunnable):
 
         # обновляем информацию о директориях в БД
         conn = Dbase.engine.connect()
-        args = (conn, main_folder, del_dirs, new_dirs)
-        DirsUpdater.remove_db_dirs(*args)
-        DirsUpdater.add_new_dirs(*args)
+        DirsUpdater.remove_db_dirs(conn, main_folder, del_dirs)
+        DirsUpdater.add_new_dirs(conn, main_folder, new_dirs)
         conn.close()
 
         self.sigs.progress_text.emit("")

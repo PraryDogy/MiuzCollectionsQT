@@ -42,8 +42,8 @@ class DirsLoader:
                         break
                     try:
                         iter_dir(entry)
-                    except Exception:
-                        MainUtils.print_error()
+                    except Exception as e:
+                        print("new scaner utils, dirs loader, finder dirs error", e)
                         task_state.set_should_run(False)
 
         try:
@@ -103,13 +103,7 @@ class DirsCompator:
 
 class DirsUpdater:
     @classmethod
-    def remove_db_dirs(
-        cls,
-        conn: sqlalchemy.Connection,
-        main_folder: MainFolder,
-        del_dirs: list,
-        new_dirs: list,
-    ):
+    def remove_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder, del_dirs: list):
         """
         Параметры:
         - del_dirs: [(rel_dir_path, mod_time), ...]
@@ -120,28 +114,11 @@ class DirsUpdater:
             q = sqlalchemy.delete(DIRS)
             q = q.where(DIRS.c.short_src == rel_dir_path)
             q = q.where(DIRS.c.brand == main_folder.name)
-
-            try:
-                conn.execute(q)
-            except Exception as e:
-                MainUtils.print_error()
-                conn.rollback()
-                continue
-        
-        try:
-            conn.commit()
-        except Exception as e:
-            MainUtils.print_error()
-            conn.rollback()
+            conn.execute(q)
+        conn.commit()
 
     @classmethod
-    def add_new_dirs(
-        cls,
-        conn: sqlalchemy.Connection,
-        main_folder: MainFolder,
-        del_dirs: list,
-        new_dirs: list,
-    ):
+    def add_new_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder, new_dirs: list):
         """
         Параметры:
         - new_dirs: [(rel_dir_path, mod_time), ...]
@@ -155,19 +132,8 @@ class DirsUpdater:
                 ClmNames.BRAND: main_folder.name
             }
             q = sqlalchemy.insert(DIRS).values(**values)
-
-            try:
-                conn.execute(q)
-            except Exception as e:
-                MainUtils.print_error()
-                conn.rollback()
-                continue
-        
-        try:
-            conn.commit()
-        except Exception as e:
-            MainUtils.print_error()
-            conn.rollback()
+            conn.execute(q)
+        conn.commit()
 
 
 class ImgLoader:
