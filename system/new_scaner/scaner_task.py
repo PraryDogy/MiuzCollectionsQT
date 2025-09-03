@@ -34,8 +34,6 @@ class ScanerTask(URunnable):
         self.user_canceled_scan = False
         print("Выбран новый сканер")
 
-        
-
     def task(self):
         for i in MainFolder.list_:
             if i.availability():
@@ -55,6 +53,12 @@ class ScanerTask(URunnable):
             ...
 
     def main_folder_scan(self, main_folder: MainFolder):
+        try:
+            self._main_folder_scan(main_folder)
+        except Exception as e:
+            print("new scaner scanertask, main folder scan error", e)
+
+    def _main_folder_scan(self, main_folder: MainFolder):
         conn = Dbase.engine.connect()
         main_folder_remover = MainFolderRemover(conn)
         main_folder_remover.run()

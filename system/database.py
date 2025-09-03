@@ -44,7 +44,7 @@ DIRS = sqlalchemy.Table(
 
 class Dbase:
     engine: sqlalchemy.Engine = None
-    _timeout = 15
+    _timeout = 5
     _echo = False
     _same_thread = False
     WAL_ = None
