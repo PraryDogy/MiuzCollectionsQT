@@ -2,7 +2,7 @@ import os
 import re
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QGroupBox, QLabel, QPushButton, QTabWidget
+from PyQt5.QtWidgets import QGroupBox, QLabel, QPushButton, QTabWidget, QWidget
 
 from cfg import JsonData
 from system.lang import Lang
@@ -94,7 +94,25 @@ class MainFolderList(VListWidget):
 # ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО 
 
 
-class InfoBox(QGroupBox):
+class PathWindow(WinChild):
+    lang = (
+        ("Директория загрузки", "Upload path"),
+    )
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(self.lang[0][JsonData.lang])
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.text_label = QLabel()
+        self.text_label.setWordWrap(True)
+        self.central_layout.addWidget(self.text_label)
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+
+
+class PathWidget(QGroupBox):
     def __init__(self):
         super().__init__()
         v_lay = UVBoxLayout()
@@ -102,14 +120,22 @@ class InfoBox(QGroupBox):
         v_lay.setContentsMargins(5, 5, 5, 5)
 
         self.label_bottom = QLabel()
+        self.label_bottom.mouseReleaseEvent = self.show_path_win
         self.label_bottom.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.addWidget(self.label_bottom)
         self.setLayout(v_lay)
-        # self.label_bottom.setWordWrap(True)
-        # self.label_bottom.setFixedHeight(20)
 
     def set_path(self, path: str):
         self.label_bottom.setText(path)
+
+    def show_path_win(self, *args):
+        self.win = PathWindow()
+        self.win.text_label.setText(self.label_bottom.text())
+        self.win.setMinimumSize(400, 30)
+        self.win.setMaximumWidth(900)
+        self.win.adjustSize()
+        self.win.center_relative_parent(self.window())
+        self.win.show()
 
 
 class WinUpload(WinChild):
@@ -124,7 +150,7 @@ class WinUpload(WinChild):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(self.lang[3][JsonData.lang])
-        # self.resize(350, 500)
+        self.setFixedSize(650, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -140,7 +166,8 @@ class WinUpload(WinChild):
         self.tab_wid.addTab(self.dirs_list, self.lang[0][JsonData.lang])
 
         # новый бокс над кнопками
-        self.info_box = InfoBox()
+        self.info_box = PathWidget()
+        self.info_box.setMaximumWidth(self.width())
         self.info_box.set_path(MainFolder.current.curr_path)
         self.central_layout.addWidget(self.info_box)
         self.dirs_list.set_path.connect(self.info_box.set_path)
