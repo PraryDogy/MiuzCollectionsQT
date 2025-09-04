@@ -93,7 +93,7 @@ class FilterBtn(QLabel):
         # - update_bottom_bar()
         """
 
-        t = f"{Lng.type_show[JsonData.lng]}: {Lng.type_jpg[JsonData.lng]}, {Lng.type_tiff[JsonData.lng]}"
+        t = f"{Lng.show[JsonData.lng]}: {Lng.type_jpg[JsonData.lng]}, {Lng.type_tiff[JsonData.lng]}"
         super().__init__(text=t)
         self.setObjectName("filter_btn")
         self.set_normal_style()
@@ -219,7 +219,7 @@ class BarBottom(QWidget):
             ]
 
         types = ", ".join(types)
-        t = f"{Lng.type_show[JsonData.lng]}: {types}"
+        t = f"{Lng.show[JsonData.lng]}: {types}"
         self.filter_label.setText(t)
         self.filter_label.adjustSize()
 

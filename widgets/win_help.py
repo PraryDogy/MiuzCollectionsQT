@@ -14,7 +14,7 @@ class WinHelp(WinSystem):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.win_manual[JsonData.lng])
+        self.setWindowTitle(Lng.help[JsonData.lng])
         self.central_layout.setContentsMargins(10, 5, 10, 5)
         self.central_layout.setSpacing(5)
 

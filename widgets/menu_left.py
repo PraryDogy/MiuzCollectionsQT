@@ -59,7 +59,7 @@ class CollBtn(BaseCollBtn):
     def contextMenuEvent(self, ev):
         self.context_menu = UMenu(ev)
 
-        preview = QAction(Lng.view[JsonData.lng], self.context_menu)
+        preview = QAction(Lng.open[JsonData.lng], self.context_menu)
         preview.triggered.connect(lambda: self.pressed_.emit())
         self.context_menu.addAction(preview)
 
@@ -186,7 +186,7 @@ class MainFolderList(VListWidget):
 
     def contextMenuEvent(self, a0):
         menu = UMenu(a0)
-        open = QAction(Lng.view[JsonData.lng], menu)
+        open = QAction(Lng.open[JsonData.lng], menu)
         open.triggered.connect(lambda: self.cmd("view"))
         menu.addAction(open)
         reveal = QAction(Lng.reveal_in_finder[JsonData.lng], menu)

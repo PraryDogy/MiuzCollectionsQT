@@ -99,41 +99,19 @@ class Lng:
             "6": "sun"
         }
     ]
-    lang_name = ("Русский", "English")
     file_size = ("Размер", "Size")
-    filter_rename_win_title = ("Имя фильтра", "Filter name")
-    filter_value = ("Значение фильтра", "Filter value")
-    from_ = ("из", "from")
     info = ("Инфо", "Info")
-    lang_label = ("Язык / Language", "Language / Язык")
     loading = ("Загрузка...", "Loading...")
-    main = ("Основные", "Main")
-    no_connection = ("Нет подключения", "No connection")
-    no_connection_descr = (
-        "- Подключитесь к диску с коллекциями\n"
-        "- Добавьте новый путь к коллекциям\n"
-        "в настройках.",
-        "- Connect to disk with collections\n"
-        "- Add a new path to collections\n"
-        "in the settings."
-    )
     no_photo = ("Нет фотографий", "No photos")
-    no_photo_filter = ("Нет фотографий в категории", "No photos in cathegory")
-    ok = ("Ок", "Ok")
     open_settings_window = ("Открыть настройки", "Open settings window")
     paste = ("Вставить", "Paste")
-    paste_text = ("Вставьте текст", "Insert text")
-    photo = ("Фото", "Photo")
-    photos_named_dates = ("Фото за даты", "Photo from")
     place = ("Место", "Place")
     reload_gui = ("Обновить", "Update")
     reset = ("Сбросить", "Reset")
     resol = ("Разрешение", "Resolution")
-    reset_all = ("Сбросить всё", "Restore all")
-    reveal = ("Показать", "Reveal")
     reveal_in_finder = ("Показать в Finder", "Reveal in Finder")
-    save_image_downloads = ("Сохранить в загрузки", "Save to Downloads")
-    save_image_in = ("Сохранить как", "Save as")
+    save_to_downloads = ("Сохранить в загрузки", "Save to Downloads")
+    save_as = ("Сохранить как", "Save as")
     search = ("Поиск", "Search")
     search_dates = (
         "Поиск фотографий по датам.\n"
@@ -141,69 +119,26 @@ class Lng:
         "Searching for photos by dates.\n"
         "Control dates with up/down keys."
     )
-    sett_stopcolls = ("Игнорировать коллекции", "Ignore collections")
     settings = ("Настройки", "Settings")
-    show_about = ("Сведения", "About")
-    show_all = ("Показать все", "Show all")
-    show_app_support = ("Показать", "Show")
-    show_more = ("Позазать еще", "Show more")
-    start = ("Начало", "Start")
-    title_downloads = ("Передача файлов", "Files transfer")
     total = ("Всего", "Total")
     type_ = ("Тип", "Type")
-    view = ("Открыть", "Open")
-    wait_update = ("Подождите...", "Wait...")
-    where_to_look_coll_folder = ("Расположение коллекций", "Collection locations")
-    with_name = ("с именем", "with name")
-    from_new_row = ("С новой строки", "From the new row")
+    open = ("Открыть", "Open")
     recents = ("Недавние", "Recents")
     type_jpg = ("jpg, png", "jpg, png")
     type_tiff = ("tiff, psd", "tiff, psd")
-    type_show = ("Показать", "Show")
-    update_descr = ("Скачать обновление", "Download update")
-    show_files = ("Показать системные файлы в Finder", "Show system files in Finder")
-    restore_db_descr = ("Сбросить все данные и настройки", "Restore all data and settings")
-    preparing = ("подготовка", "preparing")
     thumb_path = ("Данные", "Data")
     calculating = ("Вычисляю", "Calculating")
-    add_main_folder_descr = (
-        "Имя папки с коллекциями: произвольно\n"
-        "Игнорировать коллекции: необязательно к заполнению\n"
-        "Расположение коллекций: добавьте путь к папке с коллекциями",
-        "Set the name of the folder with collections\n"
-        "Click OK and add the path to the folder\n"
-        "with collections to the collection location"
-    )
-    set_name_main_folder = ("Имя папки с коллекциями", "Name of collections folder")
-    add_main_folder_title = ("Новая папка с коллекциями", "New collections folder")
     delete = ("Удалить", "Remove")
-    delete_main_folder = ("Удалить папку с коллекциями", "Remove collections folder")
-    rename = ("Переименовать", "Rename")
-    rename_main_folder = ("Переименовать папку с коллекциями", "Rename collections folder")
     copy_name = ("Скопировать имя", "Copy filename")
     attention = ("Внимание!", "Warning!")
-    move_to_trash = ("Переместить в корзину", "Move to trash")
+    move_to_trash = ("Удалить безвозвратно", "Delete forever")
     theme_auto = ("Авто", "Auto")
     theme_dark = ("Темная", "Dark")
     theme_light = ("Светлая", "Light")
     start_date = ("Дата начала", "Start date")
     end_date = ("Дата окончания", "End date")
-    weekday_ = ("День недели", "Weekday")
-    scan_every = ("Интервал поиска новых изображений", "Interval for checking new images")
-    mins = ("минут", "minutes")
-    move_files = ("Переместить", "Move files")
-    remove_all_descr = (
-        "Вы собираетесь удалить все файлы.\n"
-        "Это может быть результатом ошибки,\n"
-        "которая приведёт к полной потере данных.\n"
-        "Вы уверены, что хотите продолжить?",
-        "You are about to delete all files.\n"
-        "This may be caused by error\n"
-        "and could result in complete data loss.\n"
-        "Are you sure you want to continue?"
-    )
+    move = ("Переместить", "Move files")
     drop_only_files = ("Можно загружать только файлы.", "Only files can be uploaded.")
-    continue_ = ("Продолжить", "Continue")
     system_filter = ("Остальное", "Other")
     page_one = (
         "Папка с коллекциями:\n"
@@ -223,25 +158,14 @@ class Lng:
         "- Models: images in folder 2 MODEL IMG\n"
         "- Other: everything not related to the filters"
     )
-    win_manual = ("Справка", "Help")
-    win_manual_descr = ("Показать окно справки", "Show help window")
+    help = ("Справка", "Help")
+    help_descr = ("Показать окно справки", "Show help window")
     back = ("Назад", "Back")
     next_ = ("Далее", "Next")
-    error = ("Ошибка", "Error")
     read_file_error = ("Ошибка чтения файла", "Error file read")
-    restore = ("Восстановить", "Restore")
-    restore_main_folder = ("Восстановить предыдущие настройки", "Restore previous settings")
-    main_folder = ("Папка с коллекциями", "Collections folder")
     folders = ("Папки", "Folders")
-    user_filter = ("Пользовательские фильтры", "User filters")
     open_default = ("Открыть по умолчанию", "Open by default")
     open_in = ("Открыть в приложении", "Open in application")
-    searching_updates = ("Ищу обновления", "Searching updates")
-    removing_images = ("Удаляю изображения", "Removing images")
-    searching_images = ("Ищу изображения", "Searching images")
-    updating_data = ("Обновляю данные", "Updating data")
-    izobrazhenii = ("Изображений", "Images")
-    new_scaner = ("Быстрый поиск изображений (бета)", "Fast image search (beta)")
     folder_name_immutable = (
         "Имя папки (нельзя изменить после сохранения)",
         "Folder name (cannot be changed after saving)"
@@ -266,70 +190,28 @@ class Lng:
     dates = ("Даты", "Dates")
     favorites = ("Избранное", "Favorites")
     cancel = ("Отмена", "Cancel")
-
     no_connection = ("Нет подключения", "No connection")
     no_connection_descr = (
         "- Подключитесь к диску с коллекциями\
-    \n- Добавьте новый путь к коллекциям\
-    \nв настройках.",
+        \n- Добавьте новый путь к коллекциям\
+        \nв настройках.",
         "- Connect to disk with collections\
-    \n- Add a new path to collections\
-    \nin the settings."
+        \n- Add a new path to collections\
+        \nin the settings."
     )
-
-    collections = ("Коллекции", "Collections")
     ok = ("Ок", "Ok")
-    cancel = ("Отмена", "Cancel")
-    upload = ("Загрузка", "Upload")
-    upload_path = ("Директория загрузки", "Upload path")
-    settings = ("Настройки", "Settings")
-    general = ("Основные", "General")
-    ok = ("Ок", "Ok")
-    cancel = ("Отмена", "Cancel")
-    restart = ("Перезапуск", "Restart")
-    attention = ("Внимание", "Attention")
-    at_least_one_folder_required = (
-        "Нужна хотя бы одна папка с коллекциями",
-        "At least one collection folder required"
-    )
-    confirm_delete_folder = (
-        "Вы уверены, что хотите удалить папку?",
-        "Are you sure you want to delete the folder?"
-    )
-    new_folder = ("Новая папка", "New folder")
-    folder_name_immutable = (
-    "Имя папки (нельзя изменить после сохранения)",
-    "Folder name (cannot be changed after saving)"
-)
-    save = ("Сохранить", "Save")
-    new_folder = ("Новая папка", "New folder")
-    attention = ("Внимание", "Attention")
-    enter_folder_name = (
-        "Укажите имя папки с коллекциями",
-        "Enter collections folder name"
-    )
-    select_folder_path = (
-        "Укажите путь к папке с коллекциями",
-        "Select path to the collections folder"
-    )
     folder_name = ("Имя папки", "Folder name")
-    delete = ("Удалить", "Delete")
     collections_folder_path = (
-    "Путь к папке с коллекциями: перетащите сюда папку или укажите\n"
-    "путь с новой строки.",
-    "Path to the collections folder: drag a folder here or enter a path\n"
-    "on a new line."
+        "Путь к папке с коллекциями: перетащите сюда папку или укажите\n"
+        "путь с новой строки.",
+        "Path to the collections folder: drag a folder here or enter a path\n"
+        "on a new line."
     )
-
     ignore_list_descr = (
         "Игнор лист: перетащите сюда папку или укажите имя с новой\n"
         "строки.",
         "Ignore list: drag a folder here or enter a name on a new line."
     )
-
-    theme_auto = ("Авто", "Auto")
-    theme_dark = ("Темная", "Dark")
-    theme_light = ("Светлая", "Light")
     minutes = ("минут", "minutes")
     search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
     fast_image_search = ("Быстрый поиск изображений (бета)", "Fast image search (beta)")
@@ -341,35 +223,20 @@ class Lng:
     show_help_window = ("Показать окно справки", "Show help window")
     russian = ("Русский", "English")
     language = ("Язык", "Language")
-    reset = ("Сбросить", "Reset")
     reset_settings = ("Сбросить настройки", "Reset settings")
-    all_collections = ("Все коллекции", "All collections")
-    favorites = ("Избранное", "Favorites")
     copying = ("Копирование", "Copying")
-    copy_to = ("Копирую в", "Copy to")
-    copying_ing = ("Копирую", "Copying")
     from_ = ("из", "from")
     in_ = ("в", "in")
-    cancel = ("Отмена", "Cancel")
-    dates = ("Даты", "Dates")
     date_format = ("день.месяц.год", "day.month.year")
-    all_collections = ("Все коллекции", "All collections")
-    favorites = ("Избранное", "Favorites")
-    dates = ("Даты", "Dates")
     copy = ("Копировать", "Copy")
     copy_all = ("Копировать все", "Copy all")
     add_to_favorites = ("Добавить в избранное", "Add to favorites")
     remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
     copy_filepath = ("Скопировать путь", "Copy filepath")
-    copy = ("Копировать", "Copy")
     cut = ("Вырезать", "Cut")
     adding = ("Добавляю", "Add")
     deleting = ("Удаляю", "Deleting")
     search_in = ("Поиск в", "Search in")
     updating = ("Обновление", "Updating")
     changed = ("Изменен", "Changed")
-    collection = ("Коллекция", "Collection")
     file_name = ("Имя файла", "File name")
-    
-
-

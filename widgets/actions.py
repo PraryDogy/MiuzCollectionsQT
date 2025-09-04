@@ -26,7 +26,7 @@ class OpenInView(QAction):
     _clicked = pyqtSignal()
 
     def __init__(self, parent_: QMenu):
-        super().__init__(parent=parent_, text=Lng.view[JsonData.lng])
+        super().__init__(parent=parent_, text=Lng.open[JsonData.lng])
         self.triggered.connect(self._clicked.emit)
 
 
@@ -163,9 +163,9 @@ class Save(QAction):
         - save_files: (папка назначения, список файлов для копирования)
         """
         if save_as:
-            text: str = Lng.save_image_in[JsonData.lng]
+            text: str = Lng.save_as[JsonData.lng]
         else:
-            text: str = Lng.save_image_downloads[JsonData.lng]
+            text: str = Lng.save_to_downloads[JsonData.lng]
         text = f"{text} ({len(rel_img_path_list)})"
 
         super().__init__(parent=parent, text=text)
@@ -207,7 +207,7 @@ class MenuTypes(QMenu):
         - reload_thumbnails()
         - update_bottom_bar()
         """
-        super().__init__(parent=parent, title=Lng.type_show[JsonData.lng])
+        super().__init__(parent=parent, title=Lng.show[JsonData.lng])
 
         type_jpg = QAction(parent=self, text=Lng.type_jpg[JsonData.lng])
         type_jpg.setCheckable(True)
@@ -248,7 +248,7 @@ class RemoveFiles(QAction):
 
 class MoveFiles(QAction):
     def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
-        text = f"{Lng.move_files[JsonData.lng]} ({len(rel_img_path_list)})"
+        text = f"{Lng.move[JsonData.lng]} ({len(rel_img_path_list)})"
         super().__init__(text=text, parent=parent)
 
 
