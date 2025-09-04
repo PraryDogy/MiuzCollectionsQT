@@ -14,7 +14,7 @@ from .scaner_utils import (DbUpdater, DirsCompator, DirsLoader, DirsUpdater,
                            MainFolderRemover)
 
 
-class ScanerSignals(QObject):
+class ScanerSigs(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
@@ -33,7 +33,7 @@ class ScanerTask(URunnable):
         Сигналы: finished_, progress_text(str), reload_gui, remove_all_win(MainWin)
         """
         super().__init__()
-        self.sigs = ScanerSignals()
+        self.sigs = ScanerSigs()
         self.pause_flag = False
         self.user_canceled_scan = False
         print("Выбран новый сканер")

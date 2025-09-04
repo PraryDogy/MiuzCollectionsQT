@@ -156,7 +156,7 @@ class FavActionDb(QAction):
 
     def cmd_(self):
         self.task = FavTask(self.rel_img_path, self.value)
-        self.task.signals_.finished_.connect(self.finished_.emit)
+        self.task.sigs.finished_.connect(self.finished_.emit)
         UThreadPool.start(self.task)
 
 

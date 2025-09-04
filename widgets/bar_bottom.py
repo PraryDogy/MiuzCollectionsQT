@@ -75,10 +75,10 @@ class CustomSlider(BaseSlider):
     
     def move_(self, value: int):
         # Отключаем сигнал valueChanged
-        self.blockSignals(True)
+        self.blockSigs(True)
         self.setValue(value)
         # Включаем сигнал обратно
-        self.blockSignals(False)
+        self.blockSigs(False)
         Dynamic.thumb_size_ind = value
         self.resize_thumbnails.emit()
 

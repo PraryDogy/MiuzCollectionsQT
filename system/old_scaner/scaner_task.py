@@ -12,7 +12,7 @@ from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
                            HashdirUpdater, Inspector, MainFolderRemover)
 
 
-class ScanerSignals(QObject):
+class ScanerSigs(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
@@ -27,7 +27,7 @@ class ScanerTask(URunnable):
         Сигналы: finished_, progress_text(str), reload_gui, remove_all_win(MainWin)
         """
         super().__init__()
-        self.signals_ = ScanerSignals()
+        self.sigs = ScanerSigs()
         self.pause_flag = False
         self.user_canceled_scan = False
         print("Выбран старый сканер")
@@ -41,11 +41,11 @@ class ScanerTask(URunnable):
                 print("scaner finished", i.name)
             else:
                 t = f"{i.name}: {Lang.no_connection.lower()}"
-                self.signals_.progress_text.emit(t)
+                self.sigs.progress_text.emit(t)
                 sleep(5)
             
         try:
-            self.signals_.finished_.emit()
+            self.sigs.finished_.emit()
         except RuntimeError as e:
             ...
     
@@ -96,15 +96,15 @@ class ScanerTask(URunnable):
         """
 
         main_folder_remover = MainFolderRemover()
-        main_folder_remover.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
+        main_folder_remover.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
         main_folder_remover.run()
 
         finder_images = FinderImages(main_folder, self.task_state)
-        finder_images.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
+        finder_images.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
         finder_images = finder_images.run()
         if finder_images and self.task_state.should_run():
             db_images = DbImages(main_folder)
-            db_images.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
+            db_images.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
@@ -117,8 +117,8 @@ class ScanerTask(URunnable):
                 return
 
             file_updater = HashdirUpdater(del_items, new_items, main_folder, self.task_state)
-            file_updater.progress_text.connect(lambda text: self.signals_.progress_text.emit(text))
+            file_updater.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
             del_items, new_items = file_updater.run()
             db_updater = DbUpdater(del_items, new_items, main_folder)
-            db_updater.reload_gui.connect(lambda: self.signals_.reload_gui.emit())
+            db_updater.reload_gui.connect(lambda: self.sigs.reload_gui.emit())
             db_updater.run()

@@ -136,7 +136,8 @@ class DirsUpdater:
         conn.commit()
 
 
-class ImgLoader:
+class ImgLoader(QObject):
+    progress_text = pyqtSignal(str)
 
     @classmethod
     def finder_images(cls, new_dirs: list, main_folder: MainFolder, task_state: TaskState) -> list[tuple]:

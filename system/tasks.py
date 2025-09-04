@@ -10,19 +10,19 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 from sqlalchemy import select, update
 
-from cfg import Dynamic, Static, JsonData
+from cfg import Dynamic, JsonData, Static
 
 from .database import THUMBS, Dbase
 from .filters import SystemFilter, UserFilter
 from .lang import Lang
 from .main_folder import MainFolder
-# from .old_scaner.scaner_utils import DbUpdater, HashdirUpdater
-from .new_scaner.scaner_utils import ImgLoader, ImgCompator, DirsUpdater, DbUpdater, HashdirUpdater
+from .new_scaner.scaner_utils import (DbUpdater, DirsUpdater, HashdirUpdater,
+                                      ImgCompator, ImgLoader)
 from .utils import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
                     UThreadPool)
 
 
-class CopyFilesSignals(QObject):
+class _CopyFilesSigs(QObject):
     finished_ = pyqtSignal(list)
     value_changed = pyqtSignal(int)
 
@@ -45,7 +45,7 @@ class CopyFilesTask(URunnable):
         - value_changed(int) — значение от 0 до 100 для QProgressBar
         """
         super().__init__()
-        self.signals_ = CopyFilesSignals()
+        self.sigs = _CopyFilesSigs()
         self.files = files
         self.dest = dest
 
@@ -80,7 +80,7 @@ class CopyFilesTask(URunnable):
             self.copy_files_finished(files_dests)
             return
 
-        self.signals_.value_changed.emit(0)
+        self.sigs.value_changed.emit(0)
 
         for file_path in self.files:
             
@@ -99,7 +99,7 @@ class CopyFilesTask(URunnable):
                         fdest.write(buf)
                         copied_size += len(buf)
                         percent = int((copied_size / total_size) * 100)
-                        self.signals_.value_changed.emit(percent)
+                        self.sigs.value_changed.emit(percent)
             except Exception as e:
                 MainUtils.print_error()
                 break
@@ -107,20 +107,20 @@ class CopyFilesTask(URunnable):
         self.copy_files_finished(files_dests)
 
     def copy_files_finished(self, files_dests: list[str]):
-        self.signals_.value_changed.emit(100)
-        self.signals_.finished_.emit(files_dests)
+        self.sigs.value_changed.emit(100)
+        self.sigs.finished_.emit(files_dests)
         CopyFilesTask.copied_files_.append(files_dests)
         CopyFilesTask.list_.remove(self)
 
 
-class FavSignals(QObject):
+class _FavSigs(QObject):
     finished_ = pyqtSignal(int)
 
 
 class FavTask(URunnable):
     def __init__(self, rel_img_path: str, value: int):
         super().__init__()
-        self.signals_ = FavSignals()
+        self.sigs = _FavSigs()
         self.rel_img_path = rel_img_path
         self.value = value
 
@@ -134,14 +134,14 @@ class FavTask(URunnable):
         try:
             conn.execute(q)
             conn.commit()
-            self.signals_.finished_.emit(self.value)
+            self.sigs.finished_.emit(self.value)
         except Exception as e:
             MainUtils.print_error()
             conn.rollback()
         conn.close()
 
 
-class MenuSignals(QObject):
+class _LoadCollListSigs(QObject):
     finished_ = pyqtSignal(list)
 
 
@@ -149,12 +149,12 @@ class LoadCollListTask(URunnable):
     def __init__(self, main_folder: MainFolder):
         super().__init__()
         self.main_folder = main_folder
-        self.signals_ = MenuSignals()
+        self.sigs = _LoadCollListSigs()
 
     def task(self) -> None:
         menus = self.get_collections_list()
         try:
-            self.signals_.finished_.emit(menus)
+            self.sigs.finished_.emit(menus)
         except RuntimeError as e:
             MainUtils.print_error()
 
@@ -178,11 +178,11 @@ class LoadCollListTask(URunnable):
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
         
 
-class LoadImageSignals(QObject):
+class _LoadSingleImgSigs(QObject):
     finished_ = pyqtSignal(tuple)
 
 
-class LoadImage(URunnable):
+class LoadSingleImgTask(URunnable):
     max_images_count = 50
 
     def __init__(self, img_path: str, cached_images: dict[str, QPixmap]):
@@ -190,7 +190,7 @@ class LoadImage(URunnable):
         Возвращает в сигнале finished_ (img_path, QImage)
         """
         super().__init__()
-        self.signals_ = LoadImageSignals()
+        self.sigs = _LoadSingleImgSigs()
         self.img_path = img_path
         self.cached_images = cached_images
 
@@ -215,17 +215,17 @@ class LoadImage(URunnable):
         image_data = (self.img_path, self.qimage)
 
         try:
-            self.signals_.finished_.emit(image_data)
+            self.sigs.finished_.emit(image_data)
         except RuntimeError:
             ...
 
 
-class ImgInfoSignals(QObject):
+class _SingleFileInfoSigs(QObject):
     finished_ = pyqtSignal(dict)
     delayed_info = pyqtSignal(str)
 
 
-class SingleImgInfo(URunnable):
+class SingleFileInfoTask(URunnable):
     max_row = 50
     lang = (
         ("Изменен", "Changed"),
@@ -235,7 +235,7 @@ class SingleImgInfo(URunnable):
     def __init__(self, url: str):
         super().__init__()
         self.url = url
-        self.signals_ = ImgInfoSignals()
+        self.sigs = _SingleFileInfoSigs()
 
     def task(self):
         mail_folder_path = MainFolder.current.availability()
@@ -259,11 +259,11 @@ class SingleImgInfo(URunnable):
                 Lang.resol: Lang.calculating,
                 }
             
-            self.signals_.finished_.emit(res)
+            self.sigs.finished_.emit(res)
 
             res = self.get_img_resol(self.url)
             if res:
-                self.signals_.delayed_info.emit(res)
+                self.sigs.delayed_info.emit(res)
         
         except Exception as e:
             MainUtils.print_error()
@@ -272,7 +272,7 @@ class SingleImgInfo(URunnable):
                 Lang.place: self.lined_text(self.url),
                 Lang.type_: self.lined_text(os.path.splitext(self.url)[0])
                 }
-            self.signals_.finished_.emit(res)
+            self.sigs.finished_.emit(res)
 
     def get_img_resol(self, img_path: str):
         img_ = ImgUtils.read_image(img_path)
@@ -293,7 +293,7 @@ class SingleImgInfo(URunnable):
             return text
 
 
-class MultipleImgInfo(URunnable):
+class FilesInfoTask(URunnable):
     max_row = 50
     lang = (
         ("Имя файла", "File name"),
@@ -301,7 +301,7 @@ class MultipleImgInfo(URunnable):
     def __init__(self, img_path_list: list[str]):
         super().__init__()
         self.img_path_list = img_path_list
-        self.signals_ = ImgInfoSignals()
+        self.sigs = _SingleFileInfoSigs()
     
     def task(self):
         names = [
@@ -319,7 +319,7 @@ class MultipleImgInfo(URunnable):
             Lang.total: str(len(self.img_path_list)),
             Lang.file_size: self.get_total_size()
         }
-        self.signals_.finished_.emit(res)
+        self.sigs.finished_.emit(res)
 
     def get_total_size(self):
         total = 0
@@ -341,13 +341,13 @@ class MultipleImgInfo(URunnable):
             return text
 
 
-class RemoveFilesSignals(QObject):
+class _RmFilesSigs(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
 
 
-class RemoveFilesTask(URunnable):
+class RmFilesTask(URunnable):
     def __init__(self, img_path_list: list[str]):
         """
         Удаляет изображения.
@@ -356,22 +356,22 @@ class RemoveFilesTask(URunnable):
         Сигналы: finished_(), progress_text(str), reload_gui()
         """
         super().__init__()
-        self.signals_ = RemoveFilesSignals()
+        self.sigs = _RmFilesSigs()
         self.img_path_list = img_path_list
 
     def task(self):
         try:
             if len(self.img_path_list) > 0:
                 text = f"{Lang.removing_images} ({len(self.img_path_list)})"
-                self.signals_.progress_text.emit(text)
+                self.sigs.progress_text.emit(text)
             self.remove_files()
             self.remove_thumbs()
         except Exception as e:
             MainUtils.print_error()
         try:
-            self.signals_.progress_text.emit("")
-            self.signals_.reload_gui.emit()
-            self.signals_.finished_.emit()
+            self.sigs.progress_text.emit("")
+            self.sigs.reload_gui.emit()
+            self.sigs.finished_.emit()
         except RuntimeError as e:
             MainUtils.print_error()
 
@@ -426,61 +426,6 @@ class RemoveFilesTask(URunnable):
         conn.close()
 
 
-class MoveFilesTask(QObject):
-    set_progress_text = pyqtSignal(str)
-    reload_gui = pyqtSignal()
-
-    def __init__(self, main_folder: MainFolder, dest: str, img_path_list: list):
-        """
-        Важно: это QObject, не URunnable. Объединяет несколько URunnable-задач.
-
-        Старт: вызов run()  
-        Сигналы: 
-        - set_progress_text(str)
-        - reload_gui()
-
-        Действия:
-        - Копирует файлы в новую директорию
-        - Удаляет исходные файлы
-        - Обновляет hashdir и базу данных
-        """
-        super().__init__()
-        self.dest = dest
-        self.img_path_list = img_path_list
-        self.main_folder = main_folder
-
-    def run(self):
-        self.start_copy_task()
-
-    def start_copy_task(self):
-        """
-        Копирует файлы в заданную директорию.
-        """
-        copy_task = CopyFilesTask(self.dest, self.img_path_list)
-        cmd = lambda new_img_path_list: self.start_remove_task(self.img_path_list, new_img_path_list)
-        copy_task.signals_.finished_.connect(cmd)
-        UThreadPool.start(copy_task)
-
-    def start_remove_task(self, img_path_list: list, new_img_path_list: list):
-        """
-        Удаляет исходные файлы (перемещение из исходной директории).
-        """
-        remove_task = RemoveFilesTask(img_path_list)
-        cmd = lambda: self.start_upload_task(new_img_path_list)
-        remove_task.signals_.finished_.connect(cmd)
-        remove_task.signals_.progress_text.connect(lambda text: self.set_progress_text.emit(text))
-        UThreadPool.start(remove_task)
-
-    def start_upload_task(self, new_img_path_list: list):
-        """
-        Загружает в hadhdir миниатюры и делает записи в базу данных.
-        """
-        upload_task = UploadFilesTask(new_img_path_list, self.main_folder)
-        upload_task.signals_.progress_text.connect(lambda text: self.set_progress_text.emit(text))
-        upload_task.signals_.reload_gui.connect(lambda: self.reload_gui.emit())
-        UThreadPool.start(upload_task)
-
-
 class LoadDbImagesItem:
     __slots__ = ["qimage", "rel_img_path", "coll_name", "fav", "f_mod"]
     def __init__(self, qimage: QImage, rel_img_path: str, coll: str, fav: int, f_mod: str):
@@ -498,7 +443,7 @@ class _LoadDbImagesSigs(QObject):
 class LoadDbImagesTask(URunnable):
     def __init__(self):
         super().__init__()
-        self.signals_ = _LoadDbImagesSigs()
+        self.sigs = _LoadDbImagesSigs()
         self.conn = Dbase.engine.connect()
 
     def task(self):
@@ -517,7 +462,7 @@ class LoadDbImagesTask(URunnable):
             exts_ = Static.ext_all
 
         if not res:
-            self.signals_.finished_.emit(thumbs_dict)
+            self.sigs.finished_.emit(thumbs_dict)
             return
         
         basename = os.path.basename(MainFolder.current.curr_path.strip(os.sep))
@@ -545,7 +490,7 @@ class LoadDbImagesTask(URunnable):
             else:
                 thumbs_dict[f_mod].append(item)
         try:
-            self.signals_.finished_.emit(thumbs_dict)
+            self.sigs.finished_.emit(thumbs_dict)
         except RuntimeError:
             ...
 

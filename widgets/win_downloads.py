@@ -143,9 +143,9 @@ class WinDownloads(WinSystem):
                     one = lambda: self.remove_from_file_lists(download_item=thread)
                     item.stop_btn_pressed.connect(one)
                     item.stop_btn_pressed.connect(item.deleteLater)
-                    thread.signals_.finished_.connect(one)
-                    thread.signals_.finished_.connect(item.deleteLater)
-                    thread.signals_.value_changed.connect(item.progress_bar.setValue)
+                    thread.sigs.finished_.connect(one)
+                    thread.sigs.finished_.connect(item.deleteLater)
+                    thread.sigs.value_changed.connect(item.progress_bar.setValue)
                     self.progress_layout.addWidget(item)
                     self.download_items.append(thread)
 
@@ -157,7 +157,7 @@ class WinDownloads(WinSystem):
             if isinstance(download_item, list):
                 CopyFilesTask.copied_files.remove(download_item)
             elif isinstance(download_item, CopyFilesTask):
-                download_item.signals_.stop.emit()
+                download_item.sigs.stop.emit()
         except Exception:
             ...
 

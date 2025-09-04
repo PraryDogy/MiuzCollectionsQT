@@ -96,7 +96,7 @@ class CollList(VListWidget):
 
     def init_ui(self):
         self.task_ = LoadCollListTask(MainFolder.current)
-        self.task_.signals_.finished_.connect(self._init_ui)
+        self.task_.sigs.finished_.connect(self._init_ui)
         UThreadPool.start(self.task_)
 
     def _init_ui(self, menus: list[str]):

@@ -306,7 +306,7 @@ class Grid(VScrollArea):
 
     def load_db_images_task(self, on_finish_cmd: callable):
         self.task_ = LoadDbImagesTask()
-        self.task_.signals_.finished_.connect(on_finish_cmd)
+        self.task_.sigs.finished_.connect(on_finish_cmd)
         UThreadPool.start(self.task_)
 
     def load_rubber(self):

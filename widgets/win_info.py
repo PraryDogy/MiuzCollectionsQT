@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
 from cfg import JsonData, Static
 from system.lang import Lang
-from system.tasks import MultipleImgInfo, SingleImgInfo
+from system.tasks import FilesInfoTask, SingleFileInfoTask
 from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import UMenu, WinSystem
@@ -83,13 +83,13 @@ class WinInfo(WinSystem):
             self.multiple_img()
 
     def single_img(self):
-        self.task_ = SingleImgInfo(self.img_path_list[0])
-        self.task_.signals_.finished_.connect(lambda data: self.single_img_fin(data))
+        self.task_ = SingleFileInfoTask(self.img_path_list[0])
+        self.task_.sigs.finished_.connect(lambda data: self.single_img_fin(data))
         UThreadPool.start(self.task_)
 
     def multiple_img(self):
-        self.task_ = MultipleImgInfo(self.img_path_list)
-        self.task_.signals_.finished_.connect(lambda data: self.multiple_img_fin(data))
+        self.task_ = FilesInfoTask(self.img_path_list)
+        self.task_.sigs.finished_.connect(lambda data: self.multiple_img_fin(data))
         UThreadPool.start(self.task_)
 
     def multiple_img_fin(self, data: dict[str, str]):
@@ -107,7 +107,7 @@ class WinInfo(WinSystem):
 
         self.last_label = self.findChildren(QLabel)[-1]
         cmd = lambda text: self.last_label.setText(text)
-        self.task_.signals_.delayed_info.connect(cmd)
+        self.task_.sigs.delayed_info.connect(cmd)
         self.finished_.emit()
 
     def single_img_fin(self, data: dict[str, str]):
@@ -123,7 +123,7 @@ class WinInfo(WinSystem):
 
         self.last_label = self.findChildren(QLabel)[-1]
         cmd = lambda text: self.last_label.setText(text)
-        self.task_.signals_.delayed_info.connect(cmd)
+        self.task_.sigs.delayed_info.connect(cmd)
         self.finished_.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

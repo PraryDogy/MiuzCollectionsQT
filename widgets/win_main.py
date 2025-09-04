@@ -10,8 +10,8 @@ from cfg import Dynamic, JsonData, Static, ThumbData
 from system.filters import UserFilter
 from system.lang import Lang
 from system.main_folder import MainFolder
-from system.tasks import (CopyFilesTask, MainUtils, MoveFilesTask,
-                          RemoveFilesTask, ScanSingleDirTask)
+from system.tasks import (CopyFilesTask, MainUtils, RmFilesTask,
+                          ScanSingleDirTask)
 from system.utils import UThreadPool
 
 from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
@@ -301,8 +301,8 @@ class WinMain(UMainWindow):
                 self.reload_rubber()
 
         def remove_files(old_files: list[str], new_files: list[str], main_folder: MainFolder):
-            remove_task = RemoveFilesTask(old_files)
-            remove_task.signals_.finished_.connect(
+            remove_task = RmFilesTask(old_files)
+            remove_task.sigs.finished_.connect(
                 lambda: udpate_hashdir(new_files, main_folder)
             )
             UThreadPool.start(remove_task)
@@ -310,7 +310,7 @@ class WinMain(UMainWindow):
         def copy_files(data: tuple[str, MainFolder], old_files: list):
             main_folder, dest = data
             copy_task = CopyFilesTask(dest, old_files)
-            copy_task.signals_.finished_.connect(
+            copy_task.sigs.finished_.connect(
                 lambda new_files: remove_files(old_files, new_files, main_folder)
             )
             UThreadPool.start(copy_task)
@@ -348,9 +348,9 @@ class WinMain(UMainWindow):
             self.win_smb.show()
     
     def remove_task_start(self, img_path_list: list[str]):
-        remove_files_task = RemoveFilesTask(img_path_list)
-        remove_files_task.signals_.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-        remove_files_task.signals_.reload_gui.connect(lambda: self.grid.reload_thumbnails())
+        remove_files_task = RmFilesTask(img_path_list)
+        remove_files_task.sigs.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
+        remove_files_task.sigs.reload_gui.connect(lambda: self.grid.reload_thumbnails())
         UThreadPool.start(remove_files_task)
 
     def open_upload_win(self, img_path_list: list):
@@ -371,7 +371,7 @@ class WinMain(UMainWindow):
         main_folder, dest = data
         copy_files_task = CopyFilesTask(dest, img_path_list)
         cmd = lambda img_path_list: self.upload_task_finished(main_folder, img_path_list)
-        copy_files_task.signals_.finished_.connect(cmd)
+        copy_files_task.sigs.finished_.connect(cmd)
         UThreadPool.start(copy_files_task)
         self.open_downloads_win()
 
