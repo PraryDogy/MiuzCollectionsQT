@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
-from system.lang import Lang
+from system.lang import Lng
 from system.main_folder import MainFolder
 from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
@@ -29,7 +29,7 @@ class DirsLoader(QObject):
         dirs = []
         stack = [self.main_folder_path]
         self.progress_text.emit(
-            f"{Lang.search_in[JsonData.lang]} {self.main_folder.name}"
+            f"{Lng.search_in[JsonData.lang]} {self.main_folder.name}"
         )
 
         def iter_dir(entry: os.DirEntry):
@@ -162,7 +162,7 @@ class ImgLoader(QObject):
         - [(abs_img_path, size, birth_time, mod_time), ...]    
         """
         self.progress_text.emit(
-            f"{Lang.search_in[JsonData.lang]} {self.main_folder.name}"
+            f"{Lng.search_in[JsonData.lang]} {self.main_folder.name}"
         )
         finder_images = []
 
@@ -305,7 +305,7 @@ class HashdirUpdater(QObject):
     
     def send_text(self):
         self.progress_text.emit(
-            f"{Lang.updating[JsonData.lang]} {self.main_folder.name} ({self.total})"
+            f"{Lng.updating[JsonData.lang]} {self.main_folder.name} ({self.total})"
             )
 
     def create_thumb(self, img_path: str) -> ndarray | None:

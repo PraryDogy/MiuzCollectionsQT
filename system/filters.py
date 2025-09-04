@@ -4,7 +4,7 @@ import shutil
 
 from cfg import Static
 
-from .lang import Lang
+from .lang import Lng
 from .utils import MainUtils
 
 
@@ -95,7 +95,7 @@ class SystemFilter:
     Используется для определения записей, не попавших ни под один явно заданный фильтр.
     Должен быть один на систему — предотвращает конфликты логики фильтрации.
     """
-    lang_names: list[str] = Lang.system_filter
+    lang_names: list[str] = Lng.system_filter
     value: bool = False
 
 

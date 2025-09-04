@@ -14,7 +14,7 @@ from cfg import Dynamic, JsonData, Static
 
 from .database import THUMBS, Dbase
 from .filters import SystemFilter, UserFilter
-from .lang import Lang
+from .lang import Lng
 from .main_folder import MainFolder
 from .new_scaner.scaner_utils import (DbUpdater, DirsUpdater, HashdirUpdater,
                                       ImgCompator, ImgLoader)
@@ -250,14 +250,14 @@ class SingleFileInfoTask(URunnable):
             thumb_path = ThumbUtils.create_thumb_path(self.url)
 
             res = {
-                Lang.file_name[JsonData.lang]: self.lined_text(name),
-                Lang.type_: type_,
-                Lang.file_size: size,
-                Lang.place: self.lined_text(self.url),
-                Lang.thumb_path: self.lined_text(thumb_path),
-                Lang.changed[JsonData.lang]: mod,
-                Lang.collection[JsonData.lang]: self.lined_text(coll),
-                Lang.resol: Lang.calculating,
+                Lng.file_name[JsonData.lang]: self.lined_text(name),
+                Lng.type_: type_,
+                Lng.file_size: size,
+                Lng.place: self.lined_text(self.url),
+                Lng.thumb_path: self.lined_text(thumb_path),
+                Lng.changed[JsonData.lang]: mod,
+                Lng.collection[JsonData.lang]: self.lined_text(coll),
+                Lng.resol: Lng.calculating,
                 }
             
             self.sigs.finished_.emit(res)
@@ -269,9 +269,9 @@ class SingleFileInfoTask(URunnable):
         except Exception as e:
             MainUtils.print_error()
             res = {
-                Lang.file_name[JsonData.lang]: self.lined_text(os.path.basename(self.url)),
-                Lang.place: self.lined_text(self.url),
-                Lang.type_: self.lined_text(os.path.splitext(self.url)[0])
+                Lng.file_name[JsonData.lang]: self.lined_text(os.path.basename(self.url)),
+                Lng.place: self.lined_text(self.url),
+                Lng.type_: self.lined_text(os.path.splitext(self.url)[0])
                 }
             self.sigs.finished_.emit(res)
 
@@ -313,9 +313,9 @@ class FilesInfoTask(URunnable):
             names = names + ", ..."
 
         res = {
-            Lang.file_name[JsonData.lang]: names,
-            Lang.total: str(len(self.img_path_list)),
-            Lang.file_size: self.get_total_size()
+            Lng.file_name[JsonData.lang]: names,
+            Lng.total: str(len(self.img_path_list)),
+            Lng.file_size: self.get_total_size()
         }
         self.sigs.finished_.emit(res)
 
@@ -475,7 +475,7 @@ class LoadDbImagesTask(URunnable):
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             else:
-                f_mod = f"{Lang.months[str(f_mod.month)]} {f_mod.year}"
+                f_mod = f"{Lng.months[str(f_mod.month)]} {f_mod.year}"
             if coll == basename:
                 coll = MainFolder.current.name
             item = LoadDbImagesItem(qimage, rel_img_path, coll, fav, f_mod)
@@ -629,7 +629,7 @@ class ScanSingleDirTask(URunnable):
         # обновление *имя папки* (*оставшееся число изображений*)
         def hashdir_text(value: int):
             self.sigs.progress_text.emit(
-                f"{Lang.search_in[JsonData.lang]} {self.main_folder.name} ({value})"
+                f"{Lng.search_in[JsonData.lang]} {self.main_folder.name} ({value})"
             )
 
         hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)

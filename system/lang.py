@@ -1,4 +1,4 @@
-class Lang:
+class Lng:
     months = [
         {
             "1": "Январь",
@@ -109,6 +109,14 @@ class Lang:
     loading = ("Загрузка...", "Loading...")
     main = ("Основные", "Main")
     no_connection = ("Нет подключения", "No connection")
+    no_connection_descr = (
+        "- Подключитесь к диску с коллекциями\n"
+        "- Добавьте новый путь к коллекциям\n"
+        "в настройках.",
+        "- Connect to disk with collections\n"
+        "- Add a new path to collections\n"
+        "in the settings."
+    )
     no_photo = ("Нет фотографий", "No photos")
     no_photo_filter = ("Нет фотографий в категории", "No photos in cathegory")
     ok = ("Ок", "Ok")
@@ -234,106 +242,21 @@ class Lang:
     updating_data = ("Обновляю данные", "Updating data")
     izobrazhenii = ("Изображений", "Images")
     new_scaner = ("Быстрый поиск изображений (бета)", "Fast image search (beta)")
-    folder_name = ("Имя папки", "Folder name")
-    main_folder_descr = (
-        "Путь к папке с коллекциями: перетащите сюда папку или укажите\n"
-        "путь с новой строки.",
-        "Path to the collections folder: drag a folder here or enter a path\n"
-        "on a new line."
-    )
-    ignor_list_descr = (
-        "Игнор лист: перетащите сюда папку или укажите имя с новой\n"
-        "строки.",
-        "Ignore list: drag a folder here or enter a name on a new line."
-    )
-    changed = ("Изменен", "Changed")
-    collection = ("Коллекция", "Collection")
-    file_name = ("Имя файла", "File name")
-    search_in = ("Поиск в", "Search in")
-    updating = ("Обновление", "Updating")
-    adding = ("Добавляю", "Add")
-    deleting = ("Удаляю", "Deleting")
-    copy = ("Копировать", "Copy")
-    cut = ("Вырезать", "Cut")
-    copy_filepath = ("Скопировать путь", "Copy filepath")
-    add_to_favorites = ("Добавить в избранное", "Add to favorites")
-    remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
-    copy_all = ("Копировать все", "Copy all")
-    menu = ("Меню", "Menu")
-    dates = ("Даты", "Dates")
-    all_collections = ("Все коллекции", "All collections")
-    favorites = ("Избранное", "Favorites")
-    date_format = ("день.месяц.год", "day.month.year")
-    cancel = ("Отмена", "Cancel")
-    copy_to = ("Копирую в", "Copy to")
-    copying = ("Копирую", "Copying")
-    from_ = ("из", "from")
-    in_ = ("в", "in")
-    russian = ("Русский", "English")
-    language = ("Язык", "Language")
-    reset = ("Сбросить", "Reset")
-    reset_settings = ("Сбросить настройки", "Reset settings")
-    show = ("Показать", "Show")
-    show_system_files = ("Показать системные файлы в Finder", "Show system files in Finder")
-    help_ = ("Помощь", "Help")
-    show_help_window = ("Показать окно справки", "Show help window")
-    minutes = ("минут", "minutes")
-    search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
-    fast_image_search = ("Быстрый поиск изображений (бета)", "Fast image search (beta)")
-    disable = ("Выключить", "Disable")
-    enable = ("Включить", "Enable")
-    theme_auto = ("Авто", "Auto")
-    theme_dark = ("Темная", "Dark")
-    theme_light = ("Светлая", "Light")
-    collections_folder_path = (
-        "Путь к папке с коллекциями: перетащите сюда папку или укажите\n"
-        "путь с новой строки.",
-        "Path to the collections folder: drag a folder here or enter a path\n"
-        "on a new line."
-    )
-    ignore_list_descr = (
-        "Игнор лист: перетащите сюда папку или укажите имя с новой\n"
-        "строки.",
-        "Ignore list: drag a folder here or enter a name on a new line."
-    )
-    folder_name = ("Имя папки", "Folder name")
-    delete = ("Удалить", "Delete")
     folder_name_immutable = (
         "Имя папки (нельзя изменить после сохранения)",
         "Folder name (cannot be changed after saving)"
     )
     save = ("Сохранить", "Save")
     new_folder = ("Новая папка", "New folder")
-    attention = ("Внимание", "Attention")
-    enter_folder_name = (
-        "Укажите имя папки с коллекциями",
-        "Enter collections folder name"
-    )
-    select_folder_path = (
-        "Укажите путь к папке с коллекциями",
-        "Select path to the collections folder"
-    )
-    settings = ("Настройки", "Settings")
+    enter_folder_name = ("Укажите имя папки с коллекциями", "Enter collections folder name")
+    select_folder_path = ("Укажите путь к папке с коллекциями", "Select path to the collections folder")
     general = ("Основные", "General")
-    ok = ("Ок", "Ok")
     restart = ("Перезапуск", "Restart")
     at_least_one_folder_required = (
         "Нужна хотя бы одна папка с коллекциями",
         "At least one collection folder required"
     )
-    confirm_delete_folder = (
-        "Вы уверены, что хотите удалить папку?",
-        "Are you sure you want to delete the folder?"
-    )
+    confirm_delete_folder = ("Вы уверены, что хотите удалить папку?", "Are you sure you want to delete the folder?")
     upload_path = ("Директория загрузки", "Upload path")
     collections = ("Коллекции", "Collections")
     upload = ("Загрузка", "Upload")
-    no_connection = ("Нет подключения", "No connection")
-    no_connection_descr = (
-        "- Подключитесь к диску с коллекциями\
-        \n- Добавьте новый путь к коллекциям\
-        \nв настройках.",
-        "- Connect to disk with collections\
-        \n- Add a new path to collections\
-        \nin the settings."
-    )

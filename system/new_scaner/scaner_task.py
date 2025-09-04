@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from cfg import JsonData
 
 from ..database import Dbase
-from ..lang import Lang
+from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
 from .scaner_utils import (DbUpdater, DirsCompator, DirsLoader, DirsUpdater,
@@ -42,7 +42,7 @@ class ScanerTask(URunnable):
                 gc.collect()
                 print("scaner finished", i.name)
             else:
-                self.send_text(f"{i.name}: {Lang.no_connection.lower()}")
+                self.send_text(f"{i.name}: {Lng.no_connection.lower()}")
                 sleep(5)
         try:
             self.send_text("")

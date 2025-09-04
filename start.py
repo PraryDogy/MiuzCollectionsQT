@@ -74,7 +74,7 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from cfg import JsonData, Static
 from system.database import Dbase
 from system.filters import UserFilter
-from system.lang import Lang
+from system.lang import Lng
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import UThreadPool

@@ -5,7 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData
 
-from ..lang import Lang
+from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
 from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
@@ -40,7 +40,7 @@ class ScanerTask(URunnable):
                 gc.collect()
                 print("scaner finished", i.name)
             else:
-                t = f"{i.name}: {Lang.no_connection.lower()}"
+                t = f"{i.name}: {Lng.no_connection.lower()}"
                 self.sigs.progress_text.emit(t)
                 sleep(5)
             

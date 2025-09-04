@@ -5,7 +5,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
 from cfg import JsonData, Static
-from system.lang import Lang
+from system.lang import Lng
 from system.tasks import FilesInfoTask, SingleFileInfoTask
 from system.utils import MainUtils, UThreadPool
 
@@ -41,12 +41,12 @@ class Selectable(QLabel):
 
         menu_ = UMenu(event=ev)
 
-        label_text = Lang.copy[JsonData.lang]
+        label_text = Lng.copy[JsonData.lang]
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(lambda: MainUtils.copy_text(text))
         menu_.addAction(sel)
 
-        reveal = QAction(parent=menu_, text=Lang.reveal_in_finder)
+        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder)
         reveal.triggered.connect(
             lambda: MainUtils.reveal_files([full_text])
         )
@@ -63,7 +63,7 @@ class WinInfo(WinSystem):
 
     def __init__(self, img_path_list: list[str]):
         super().__init__()
-        self.setWindowTitle(Lang.info)
+        self.setWindowTitle(Lng.info)
         self.img_path_list = img_path_list
 
         wid = QWidget()

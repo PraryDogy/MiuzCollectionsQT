@@ -6,7 +6,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QLabel, QMenu, QMenuBar, QSpacerItem
 
 from cfg import JsonData, Static
-from system.lang import Lang
+from system.lang import Lng
 from system.utils import MainUtils
 
 from ._base_widgets import UMenu, WinSystem
@@ -32,13 +32,13 @@ class SelectableLabel(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=Lang.copy[JsonData.lang])
+        copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lang])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Lang.copy_all[JsonData.lang])
+        select_all = QAction(parent=context_menu, text=Lng.copy_all[JsonData.lang])
         select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -82,15 +82,15 @@ class BarMacos(QMenuBar):
         self.init_ui()
 
     def init_ui(self):
-        self.mainMenu = QMenu(Lang.menu[JsonData.lang], self)
+        self.mainMenu = QMenu(Lng.menu[JsonData.lang], self)
 
         # Добавляем пункт "Открыть настройки"
-        actionSettings = QAction(Lang.open_settings_window, self)
+        actionSettings = QAction(Lng.open_settings_window, self)
         actionSettings.triggered.connect(self.open_settings_window)
         self.mainMenu.addAction(actionSettings)
 
         # Добавляем пункт "О приложении"
-        actionAbout = QAction(Lang.show_about, self)
+        actionAbout = QAction(Lng.show_about, self)
         actionAbout.triggered.connect(self.open_about_window)
         self.mainMenu.addAction(actionAbout)
 

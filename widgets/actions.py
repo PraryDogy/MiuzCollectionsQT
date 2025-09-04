@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 
 from cfg import Dynamic, JsonData, Static
-from system.lang import Lang
+from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import FavTask
 from system.utils import MainUtils, UThreadPool
@@ -26,18 +26,18 @@ class OpenInView(QAction):
     _clicked = pyqtSignal()
 
     def __init__(self, parent_: QMenu):
-        super().__init__(parent=parent_, text=Lang.view)
+        super().__init__(parent=parent_, text=Lng.view)
         self.triggered.connect(self._clicked.emit)
 
 
 class ScanerRestart(QAction):
     def __init__(self, parent: QMenu):
-        super().__init__(parent=parent, text=Lang.reload_gui)
+        super().__init__(parent=parent, text=Lng.reload_gui)
 
 
 class WinInfoAction(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        super().__init__(parent=parent, text=Lang.info)
+        super().__init__(parent=parent, text=Lng.info)
         self.parent_ = parent
         self.win_ = win
         self.rel_img_path_list = rel_img_path_list
@@ -63,7 +63,7 @@ class WinInfoAction(QAction):
 
 class CopyPath(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        text = f"{Lang.copy_filepath[JsonData.lang]} ({len(rel_img_path_list)})"
+        text = f"{Lng.copy_filepath[JsonData.lang]} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
@@ -86,7 +86,7 @@ class CopyPath(QAction):
 
 class CopyName(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, img_path_list: list[str]):
-        text = f"{Lang.copy_name} ({len(img_path_list)})"
+        text = f"{Lng.copy_name} ({len(img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
@@ -109,7 +109,7 @@ class CopyName(QAction):
 
 class ShowInFinder(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        text = f"{Lang.reveal_in_finder} ({len(rel_img_path_list)})"
+        text = f"{Lng.reveal_in_finder} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.rel_img_path_list = rel_img_path_list
         self.parent_ = parent
@@ -138,11 +138,11 @@ class FavActionDb(QAction):
     def __init__(self, parent: QMenu, rel_img_path: str, fav_value:  int):
 
         if fav_value == 0 or fav_value is None:
-            t = Lang.add_to_favorites[JsonData.lang]
+            t = Lng.add_to_favorites[JsonData.lang]
             self.value = 1
 
         elif fav_value == 1:
-            t = Lang.remove_from_favorites[JsonData.lang]
+            t = Lng.remove_from_favorites[JsonData.lang]
             self.value = 0
 
         super().__init__(parent=parent, text=t)
@@ -163,9 +163,9 @@ class Save(QAction):
         - save_files: (папка назначения, список файлов для копирования)
         """
         if save_as:
-            text: str = Lang.save_image_in
+            text: str = Lng.save_image_in
         else:
-            text: str = Lang.save_image_downloads
+            text: str = Lng.save_image_downloads
         text = f"{text} ({len(rel_img_path_list)})"
 
         super().__init__(parent=parent, text=text)
@@ -207,15 +207,15 @@ class MenuTypes(QMenu):
         - reload_thumbnails()
         - update_bottom_bar()
         """
-        super().__init__(parent=parent, title=Lang.type_show)
+        super().__init__(parent=parent, title=Lng.type_show)
 
-        type_jpg = QAction(parent=self, text=Lang.type_jpg)
+        type_jpg = QAction(parent=self, text=Lng.type_jpg)
         type_jpg.setCheckable(True)
         cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.ext_non_layers)
         type_jpg.triggered.connect(cmd_jpg)
         self.addAction(type_jpg)
 
-        type_tiff = QAction(parent=self, text=Lang.type_tiff)
+        type_tiff = QAction(parent=self, text=Lng.type_tiff)
         type_tiff.setCheckable(True)
         cmd_tiff = lambda: self.cmd_(action_=type_tiff, type_=Static.ext_layers)
         type_tiff.triggered.connect(cmd_tiff)
@@ -242,17 +242,17 @@ class MenuTypes(QMenu):
 
 class RemoveFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text_ = f"{Lang.delete} ({total})"
+        text_ = f"{Lng.delete} ({total})"
         super().__init__(text_, parent)
 
 
 class MoveFiles(QAction):
     def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
-        text = f"{Lang.move_files} ({len(rel_img_path_list)})"
+        text = f"{Lng.move_files} ({len(rel_img_path_list)})"
         super().__init__(text=text, parent=parent)
 
 
 class OpenDefault(QAction):
     def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
-        text = f"{Lang.open_default} ({len(rel_img_path_list)})"
+        text = f"{Lng.open_default} ({len(rel_img_path_list)})"
         super().__init__(text=text, parent=parent)

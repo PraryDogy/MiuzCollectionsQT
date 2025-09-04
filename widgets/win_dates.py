@@ -7,7 +7,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
 from cfg import Dynamic, JsonData
-from system.lang import Lang
+from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout, ULineEdit, UVBoxLayout, WinSystem
 
@@ -31,7 +31,7 @@ class DatesLineEdit(ULineEdit):
 
     def __init__(self):
         super().__init__()
-        self.setPlaceholderText(Lang.date_format[JsonData.lang])
+        self.setPlaceholderText(Lng.date_format[JsonData.lang])
         self.textChanged.connect(self.onTextChanged)
         self.date = None
 
@@ -97,11 +97,11 @@ class DatesTitle(QLabel):
 
     def get_named_weekday(self, date: datetime) -> str:
         day_number = str(date.weekday())
-        return Lang.weekdays_short[day_number]
+        return Lng.weekdays_short[day_number]
     
     def get_named_date(self, date: datetime) -> str:
         month_number = str(date.month)
-        month = Lang.months_genitive_case[month_number]
+        month = Lng.months_genitive_case[month_number]
         return f"{date.day} {month} {date.year}"
 
 
@@ -141,7 +141,7 @@ class DatesWid(QWidget):
 
 class LeftDateWidget(DatesWid):
     def __init__(self):
-        text = Lang.start_date
+        text = Lng.start_date
         super().__init__(text)
 
         if Dynamic.date_start:
@@ -150,7 +150,7 @@ class LeftDateWidget(DatesWid):
 
 class RightDateWidget(DatesWid):
     def __init__(self):
-        text = Lang.end_date
+        text = Lng.end_date
         super().__init__(text)
 
         if Dynamic.date_end:
@@ -167,14 +167,14 @@ class WinDates(WinSystem):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle(Lang.dates[JsonData.lang])
+        self.setWindowTitle(Lng.dates[JsonData.lang])
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
 
         self.central_layout.setSpacing(10)
         self.central_layout.setContentsMargins(10, 10, 10, 10)
 
-        main_title = QLabel(Lang.search_dates)
+        main_title = QLabel(Lng.search_dates)
         self.central_layout.addWidget(main_title)
 
         dates_h_wid = QWidget()
@@ -195,7 +195,7 @@ class WinDates(WinSystem):
         self.right_date_wid.dateChangedSignal.connect(right_cmd)
         dates_h_lay.addWidget(self.right_date_wid)
 
-        clear_btn = QPushButton(text=Lang.reset)
+        clear_btn = QPushButton(text=Lng.reset)
         clear_btn.setFixedWidth(100)
         clear_btn.clicked.connect(self.clear_btn_cmd)
         self.central_layout.addWidget(
@@ -213,7 +213,7 @@ class WinDates(WinSystem):
         btns_h_lay.addStretch(1)
         btns_h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.ok_btn = QPushButton(text=Lang.ok)
+        self.ok_btn = QPushButton(text=Lng.ok)
         self.ok_btn.setFixedWidth(90)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_h_lay.addWidget(self.ok_btn)
@@ -221,7 +221,7 @@ class WinDates(WinSystem):
         spacer_item = QSpacerItem(10, 1)
         btns_h_lay.addItem(spacer_item)
 
-        cancel_btn = QPushButton(text=Lang.cancel[JsonData.lang])
+        cancel_btn = QPushButton(text=Lng.cancel[JsonData.lang])
         self.ok_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.cancel_cmd)
         btns_h_lay.addWidget(cancel_btn)
@@ -242,7 +242,7 @@ class WinDates(WinSystem):
             self.date_end = new_date
 
     def named_date(self, date: datetime):
-        month = Lang.months_genitive_case[str(date.month)]
+        month = Lng.months_genitive_case[str(date.month)]
         return f"{date.day} {month} {date.year}"
 
     def ok_cmd(self, *args):

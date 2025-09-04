@@ -5,7 +5,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel, QPushButton, QWidget
 
 from cfg import JsonData, Static
-from system.lang import Lang
+from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
 
@@ -14,7 +14,7 @@ class WinHelp(WinSystem):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lang.win_manual)
+        self.setWindowTitle(Lng.win_manual)
         self.central_layout.setContentsMargins(10, 5, 10, 5)
         self.central_layout.setSpacing(5)
 
@@ -24,9 +24,9 @@ class WinHelp(WinSystem):
         self.current_page = 0
         self.max_pages = 2
         self.page_list = [
-            lambda: self.create_page(Lang.page_one, 0),
-            lambda: self.create_page(Lang.page_one, 1),
-            lambda: self.create_page(Lang.page_two, 2)
+            lambda: self.create_page(Lng.page_one, 0),
+            lambda: self.create_page(Lng.page_one, 1),
+            lambda: self.create_page(Lng.page_two, 2)
         ]
 
         self.dynamic_wid = self.page_list[0]()
@@ -63,12 +63,12 @@ class WinHelp(WinSystem):
 
         btn_lay.addStretch()
 
-        self.prev_btn = QPushButton(Lang.back)
+        self.prev_btn = QPushButton(Lng.back)
         self.prev_btn.clicked.connect(self.prev_page)
         self.prev_btn.setFixedWidth(100)
         btn_lay.addWidget(self.prev_btn)
 
-        self.next_btn = QPushButton(Lang.next)
+        self.next_btn = QPushButton(Lng.next)
         self.next_btn.clicked.connect(self.next_page)
         self.next_btn.setFixedWidth(100)
         btn_lay.addWidget(self.next_btn)

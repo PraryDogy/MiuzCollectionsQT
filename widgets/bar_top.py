@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QWidget
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import SystemFilter, UserFilter
-from system.lang import Lang
+from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout
 from .wid_search import WidSearch
@@ -29,7 +29,7 @@ class DatesBtn(BarTopBtn):
     open_dates_win = pyqtSignal()
 
     def __init__(self):
-        super().__init__(text=Lang.dates[JsonData.lang])
+        super().__init__(text=Lng.dates[JsonData.lang])
 
     def open_win(self):
         self.open_dates_win.emit()

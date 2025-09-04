@@ -7,7 +7,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
 
 from cfg import Dynamic, JsonData, Static
-from system.lang import Lang
+from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import LoadCollListTask
 from system.utils import UThreadPool
@@ -22,9 +22,9 @@ class BaseCollBtn(QLabel):
     def __init__(self, coll_name: str):
         self.coll_name = coll_name
         data = {
-            Static.NAME_ALL_COLLS: Lang.all_collections[JsonData.lang],
-            Static.NAME_RECENTS: Lang.recents,
-            Static.NAME_FAVS: Lang.favorites[JsonData.lang]
+            Static.NAME_ALL_COLLS: Lng.all_collections[JsonData.lang],
+            Static.NAME_RECENTS: Lng.recents,
+            Static.NAME_FAVS: Lng.favorites[JsonData.lang]
         }
         if coll_name in data:
             coll_name = data.get(coll_name)
@@ -59,13 +59,13 @@ class CollBtn(BaseCollBtn):
     def contextMenuEvent(self, ev):
         self.context_menu = UMenu(ev)
 
-        preview = QAction(Lang.view, self.context_menu)
+        preview = QAction(Lng.view, self.context_menu)
         preview.triggered.connect(lambda: self.pressed_.emit())
         self.context_menu.addAction(preview)
 
         self.context_menu.addSeparator()
 
-        show_in_finder = QAction(Lang.reveal_in_finder, self.context_menu)
+        show_in_finder = QAction(Lng.reveal_in_finder, self.context_menu)
         show_in_finder.triggered.connect(lambda: self.reveal_cmd())
         self.context_menu.addAction(show_in_finder)
 
@@ -186,10 +186,10 @@ class MainFolderList(VListWidget):
 
     def contextMenuEvent(self, a0):
         menu = UMenu(a0)
-        open = QAction(Lang.view, menu)
+        open = QAction(Lng.view, menu)
         open.triggered.connect(lambda: self.cmd("view"))
         menu.addAction(open)
-        reveal = QAction(Lang.reveal_in_finder, menu)
+        reveal = QAction(Lng.reveal_in_finder, menu)
         reveal.triggered.connect(lambda: self.cmd("reveal"))
         menu.addAction(reveal)
         menu.show_()
@@ -220,12 +220,12 @@ class MenuLeft(QTabWidget):
         main_folders = MainFolderList(self)
         main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
         main_folders.double_clicked.connect(lambda: self.setCurrentIndex(1))
-        self.addTab(main_folders, Lang.folders)
+        self.addTab(main_folders, Lng.folders)
 
         self.collections_list = CollList()
         self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
         self.collections_list.set_window_title.connect(self.set_window_title.emit)
         self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
-        self.addTab(self.collections_list, Lang.collection[JsonData.lang])
+        self.addTab(self.collections_list, Lng.collection[JsonData.lang])
 
         self.setCurrentIndex(1)

@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsDropShadowEffect,
                              QTextEdit, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
-from system.lang import Lang
+from system.lang import Lng
 from system.utils import MainUtils
 import re
 
@@ -98,17 +98,17 @@ class ULineEdit(QLineEdit):
         self.menu_ = UMenu(event=a0)
         self.menu_.setFixedWidth(120)
 
-        sel = QAction(text=Lang.cut[JsonData.lang], parent=self.menu_)
+        sel = QAction(text=Lng.cut[JsonData.lang], parent=self.menu_)
         sel.triggered.connect(self.cut_selection)
         self.menu_.addAction(sel)
 
-        sel_all = QAction(text=Lang.copy[JsonData.lang], parent=self.menu_)
+        sel_all = QAction(text=Lng.copy[JsonData.lang], parent=self.menu_)
         sel_all.triggered.connect(
             lambda: MainUtils.copy_text(self.selectedText())
         )
         self.menu_.addAction(sel_all)
 
-        sel_all = QAction(text=Lang.paste, parent=self.menu_)
+        sel_all = QAction(text=Lng.paste, parent=self.menu_)
         sel_all.triggered.connect(self.paste_text)
         self.menu_.addAction(sel_all)
 
@@ -186,15 +186,15 @@ class UTextEdit(QTextEdit):
         menu_ = UMenu(event=a0)
         menu_.setFixedWidth(120)
 
-        sel = QAction(text=Lang.cut[JsonData.lang], parent=menu_)
+        sel = QAction(text=Lng.cut[JsonData.lang], parent=menu_)
         sel.triggered.connect(self.cut_selection)
         menu_.addAction(sel)
 
-        sel_all = QAction(text=Lang.copy[JsonData.lang], parent=menu_)
+        sel_all = QAction(text=Lng.copy[JsonData.lang], parent=menu_)
         sel_all.triggered.connect(self.copy_selection)
         menu_.addAction(sel_all)
 
-        sel_all = QAction(text=Lang.paste, parent=menu_)
+        sel_all = QAction(text=Lng.paste, parent=menu_)
         sel_all.triggered.connect(self.paste_text)
         menu_.addAction(sel_all)
 
