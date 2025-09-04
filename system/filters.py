@@ -95,7 +95,5 @@ class SystemFilter:
     Используется для определения записей, не попавших ни под один явно заданный фильтр.
     Должен быть один на систему — предотвращает конфликты логики фильтрации.
     """
-    lang_names: list[str] = Lng.system_filter[JsonData.lng]
+    lang_names: list[str] = Lng.system_filter
     value: bool = False
-
-

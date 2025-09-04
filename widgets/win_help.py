@@ -68,7 +68,7 @@ class WinHelp(WinSystem):
         self.prev_btn.setFixedWidth(100)
         btn_lay.addWidget(self.prev_btn)
 
-        self.next_btn = QPushButton(Lng.next[JsonData.lng])
+        self.next_btn = QPushButton(Lng.next_[JsonData.lng])
         self.next_btn.clicked.connect(self.next_page)
         self.next_btn.setFixedWidth(100)
         btn_lay.addWidget(self.next_btn)

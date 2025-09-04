@@ -153,7 +153,7 @@ class RightDateWidget(DatesWid):
         text = Lng.end_date[JsonData.lng]
         super().__init__(text)
 
-        if Dynamic.date_end[JsonData.lng]:
+        if Dynamic.date_end:
             self.input.setText(DatesTools.date_to_text(Dynamic.date_end))
 
 
