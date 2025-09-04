@@ -18,6 +18,7 @@ from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
+from .copy_files_win import ProgressbarWin
 from .grid import Grid
 from .menu_left import MenuLeft
 from .win_dates import WinDates
@@ -60,6 +61,8 @@ class WinMain(UMainWindow):
     lang = (
         ("Все коллекции", "All collections"),
         ("Избранное", "Favorites"),
+        ("Копирование", "Copying"),
+        ("Копирую в", "Copy to")
     )
 
     def __init__(self, argv: list[str]):
@@ -388,9 +391,27 @@ class WinMain(UMainWindow):
             UThreadPool.start(self.single_dir_task)
 
     def save_files_task(self, dest: str, img_path_list: list):
+
+        lang = (
+            ("Все коллекции", "All collections"),
+            ("Избранное", "Favorites"),
+            ("Копирование", "Copying"),
+            ("Копирую в", "Copy to")
+        )
+
+        dest_name = os.path.basename(dest)
+
+        self.copy_win = ProgressbarWin(self.lang[2][JsonData.lang])
+        self.copy_win.above_label.setText(
+            f"{self.lang[3][JsonData.lang]} \"{dest_name}\""
+        )
+        self.copy_win.progressbar.setMaximum(100)
+        self.copy_win.center_relative_parent(self)
+        self.copy_win.show()
+
         copy_files_task = CopyFilesTask(dest, img_path_list)
+        copy_files_task.sigs.value_changed.connect(self.copy_win.progressbar.setValue)
         UThreadPool.start(copy_files_task)
-        self.open_downloads_win()
 
     def open_downloads_win(self):
         self.win_downloads = WinDownloads()

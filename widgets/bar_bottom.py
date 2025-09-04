@@ -253,6 +253,10 @@ class BarBottom(QWidget):
         self.win_downloads = None
 
     def sett_btn_cmd(self, e: QMouseEvent):
+        from .copy_files_win import ProgressbarWin
+        self.win = ProgressbarWin("test")
+        self.win.show()
+        return
         if e.button() == Qt.MouseButton.LeftButton:
             self.win_settings = WinSettings()
             self.win_settings.center_relative_parent(self.window())
