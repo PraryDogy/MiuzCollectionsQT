@@ -243,3 +243,6 @@ class Lng:
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
     show_about = ("Об авторе", "About")
+    folder_name_error = ("Имя папки должно быть уникальным", "Folder name must be unique")
+    name_taken = ("Уже занято", "Already taken")
+    name = ("Имя", "Name")

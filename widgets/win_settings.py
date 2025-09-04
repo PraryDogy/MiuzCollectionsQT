@@ -551,9 +551,10 @@ class MainFolderSettings(QWidget):
 class NewFolder(QWidget):
     new_folder = pyqtSignal(MainFolder)
 
-    def __init__(self):
+    def __init__(self, main_folder_list: list[MainFolder]):
         super().__init__()
         self.main_folder = MainFolder("", [], [])
+        self.main_folder_list = main_folder_list
 
         v_lay = UVBoxLayout()
         v_lay.setSpacing(15)
@@ -589,11 +590,23 @@ class NewFolder(QWidget):
         name = self.name_label.text().strip()
         self.main_folder.name = name
 
-    def save(self):
+    def save(self):        
         if not self.main_folder.name:
             self.win_warn = WinWarn(
                 Lng.attention[JsonData.lng],
                 Lng.enter_folder_name[JsonData.lng]
+                )
+            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.show()
+        elif any(i.name == self.main_folder.name for i in self.main_folder_list):
+            t = (
+                f"{Lng.folder_name_error[JsonData.lng]}.",
+                f"{Lng.name[JsonData.lng]} \"{self.main_folder.name}\" {Lng.name_taken[JsonData.lng].lower()}."
+                )
+            t = "\n".join(t)
+            self.win_warn = WinWarn(
+                Lng.attention[JsonData.lng],
+                t
                 )
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
@@ -687,7 +700,7 @@ class WinSettings(WinSystem):
             self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[JsonData.lng]))
             self.right_lay.insertWidget(0, self.gen_settings)
         elif ind == 1:
-            self.new_folder = NewFolder()
+            self.new_folder = NewFolder(self.main_folder_list)
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
         else:
