@@ -18,9 +18,9 @@ from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
-from .progressbar_win import ProgressbarWin
 from .grid import Grid
 from .menu_left import MenuLeft
+from .progressbar_win import ProgressbarWin
 from .win_dates import WinDates
 from .win_image_view import WinImageView
 from .win_remove_files import RemoveFilesWin
@@ -108,11 +108,16 @@ class WinMain(UMainWindow):
         sep_upper = USep()
         right_lay.addWidget(sep_upper)
 
+        def copy_files_task(data):
+            dest, files = data
+            task = self.copy_files_task(dest, files)
+            UThreadPool.start(task)
+
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_path_list: self.open_remove_files_win(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
-        self.grid.save_files.connect(lambda data: self.copy_files_task(*data))
+        self.grid.save_files.connect(copy_files_task)
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         self.grid.img_view.connect(lambda: self.open_img_view())
         right_lay.addWidget(self.grid)

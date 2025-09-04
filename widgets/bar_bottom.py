@@ -9,7 +9,6 @@ from system.lang import Lang
 
 from ._base_widgets import SvgBtn, UHBoxLayout
 from .actions import MenuTypes
-from .win_downloads import WinDownloads
 from .win_settings import WinSettings
 
 SLIDER_STYLE = """
@@ -29,7 +28,6 @@ SLIDER_STYLE = """
     }
 """
 
-DOWNLOADS_SVG = os.path.join(Static.INNER_IMAGES, "downloads.svg")
 SETTINGS_SVG = os.path.join(Static.INNER_IMAGES, "settings.svg")
 
 
@@ -181,8 +179,6 @@ class BarBottom(QWidget):
         self.h_layout.setContentsMargins(0, 0, 15, 0)
         self.init_ui()
 
-        self.win_downloads = None
-
     def init_ui(self):
 
         self.filter_label = FilterBtn()
@@ -198,10 +194,6 @@ class BarBottom(QWidget):
             self.progress_bar,
             alignment=Qt.AlignmentFlag.AlignVCenter
         )
-
-        self.downloads = SvgBtn_(icon_path=DOWNLOADS_SVG , size=20)
-        self.downloads.mouseReleaseEvent = self.open_downloads_cmd
-        self.h_layout.addWidget(self.downloads)
 
         self.sett_widget = SvgBtn_(SETTINGS_SVG, size=20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
@@ -230,27 +222,6 @@ class BarBottom(QWidget):
         t = f"{Lang.type_show}: {types}"
         self.filter_label.setText(t)
         self.filter_label.adjustSize()
-
-    def open_downloads_cmd(self, e: QMouseEvent):
-        if e.button() == Qt.MouseButton.LeftButton:
-            self.open_downloads_win()
-
-    def open_downloads_win(self):
-        if self.win_downloads is None:
-            self.win_downloads = WinDownloads()
-            self.win_downloads.closed.connect(self.downloads_win_closed)
-            self.win_downloads.center_relative_parent(self.window())
-            self.win_downloads.show()
-
-    def downloads_win_closed(self, *args):
-        self.win_downloads = None
-
-    def close_downloads_win(self):
-        try:
-            self.win_downloads.deleteLater()
-        except Exception:
-            ...
-        self.win_downloads = None
 
     def sett_btn_cmd(self, e: QMouseEvent):
         if e.button() == Qt.MouseButton.LeftButton:
