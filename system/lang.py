@@ -261,3 +261,7 @@ class Lng:
     collections = ("Коллекции", "Collections")
     upload = ("Загрузка", "Upload")
     collection = ("Коллекция", "Collection")
+    menu = ("Меню", "Menu")
+    all_collections = ("Все коллекции", "All collections")
+    dates = ("Даты", "Dates")
+    favorites = ("Избранное", "Favorites")
