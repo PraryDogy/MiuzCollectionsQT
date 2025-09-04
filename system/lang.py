@@ -248,3 +248,4 @@ class Lng:
     name = ("Имя", "Name")
     collection_folder = ("Папка с коллекциями", "Collections folder")
     image = ("Изображение", "Image")
+    other_folders = ("Прочие папки", "Other folders")
