@@ -13,7 +13,7 @@ class ProgressbarWin(WinSystem):
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
         self.setWindowModality(Qt.WindowModality.WindowModal)
         self.setWindowTitle(title)
-        self.setFixedSize(350, 70)
+        self.setFixedSize(400, 70)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -42,7 +42,6 @@ class ProgressbarWin(WinSystem):
         self.progressbar = QProgressBar()
         self.progressbar.setTextVisible(False)
         self.progressbar.setFixedHeight(6)
-        self.progressbar.setFixedWidth(250)
         progressbar_lay.addWidget(self.progressbar)
 
         self.cancel_btn = QSvgWidget("./images/clear.svg")

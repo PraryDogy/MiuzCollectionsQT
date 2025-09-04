@@ -401,7 +401,7 @@ class WinMain(UMainWindow):
 
         def set_above_label(text: str, dest_name: str):
             self.copy_win.above_label.setText(
-                f"{text}"
+                f"\"{text}\" {Lng.in_[JsonData.lng]} \"{dest_name}\""
             )
 
         dest_name = os.path.basename(dest)
