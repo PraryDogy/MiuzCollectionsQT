@@ -240,3 +240,4 @@ class Lng:
     updating = ("Обновление", "Updating")
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
+    show_about = ("Об авторе", "About")
