@@ -22,7 +22,6 @@ from .progressbar_win import ProgressbarWin
 from .grid import Grid
 from .menu_left import MenuLeft
 from .win_dates import WinDates
-from .win_downloads import WinDownloads
 from .win_image_view import WinImageView
 from .win_remove_files import RemoveFilesWin
 from .win_upload import WinUpload
@@ -113,7 +112,7 @@ class WinMain(UMainWindow):
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_path_list: self.open_remove_files_win(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
-        self.grid.save_files.connect(lambda data: self.save_files_task(*data))
+        self.grid.save_files.connect(lambda data: self.copy_files_task(*data))
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         self.grid.img_view.connect(lambda: self.open_img_view())
         right_lay.addWidget(self.grid)
@@ -373,11 +372,12 @@ class WinMain(UMainWindow):
 
     def upload_task_start(self, data: tuple[MainFolder, str], img_path_list: list[str]):
         main_folder, dest = data
-        copy_files_task = CopyFilesTask(dest, img_path_list)
-        cmd = lambda img_path_list: self.upload_task_finished(main_folder, img_path_list)
-        copy_files_task.sigs.finished_.connect(cmd)
+
+        copy_files_task = self.copy_files_task(dest, img_path_list)
+        copy_files_task.sigs.finished_.connect(
+            lambda img_path_list: self.upload_task_finished(main_folder, img_path_list)
+        )
         UThreadPool.start(copy_files_task)
-        self.open_downloads_win()
 
     def upload_task_finished(self, main_folder: MainFolder, img_path_list: list[str]):
         try:
@@ -392,16 +392,7 @@ class WinMain(UMainWindow):
             self.single_dir_task.sigs.reload_thumbnails.connect(self.reload_rubber)
             UThreadPool.start(self.single_dir_task)
 
-    def save_files_task(self, dest: str, img_path_list: list):
-
-        lang = (
-            ("Все коллекции", "All collections"),
-            ("Избранное", "Favorites"),
-            ("Копирование", "Copying"),
-            ("Копирую в", "Copy to"),
-            ("Копирую", "Copying"),
-            ("из", "from")
-        )
+    def copy_files_task(self, dest: str, img_path_list: list):
 
         def set_below_label(data: tuple[int, int]):
             self.copy_win.below_label.setText(
@@ -424,13 +415,9 @@ class WinMain(UMainWindow):
         )
         copy_files_task.sigs.value_changed.connect(self.copy_win.progressbar.setValue)
         copy_files_task.sigs.progress_changed.connect(set_below_label)
-        # copy_files_task.sigs.finished_.connect(self.copy_win.deleteLater)
-        UThreadPool.start(copy_files_task)
+        copy_files_task.sigs.finished_.connect(self.copy_win.deleteLater)
 
-    def open_downloads_win(self):
-        self.win_downloads = WinDownloads()
-        self.win_downloads.center_relative_parent(self)
-        self.win_downloads.show()
+        return copy_files_task
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
