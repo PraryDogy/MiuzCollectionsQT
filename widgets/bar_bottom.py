@@ -97,7 +97,7 @@ class FilterBtn(QSvgWidget):
         t = f"{Lng.show[JsonData.lng]}: {Lng.type_jpg[JsonData.lng]}, {Lng.type_tiff[JsonData.lng]}"
         super().__init__()
         self.load("./images/filter.svg")
-        self.setFixedSize(20, 20)
+        self.setFixedSize(18, 18)
 
     def menu_types(self, *args):
         menu_ = MenuTypes(parent=self)
@@ -147,15 +147,14 @@ class BarBottom(QWidget):
         self.progress_bar = QLabel(text="")
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.progress_bar.setFixedWidth(300)
-        # self.progress_bar.setStyleSheet("background: red")
         self.progress_bar.setFixedHeight(20)
         self.h_layout.addWidget(self.progress_bar)
 
         self.h_layout.addStretch()
         
-        from PyQt5.QtCore import QTimer
-        t = "длинное имя папки: обновление (1000)"
-        QTimer.singleShot(1000, lambda: self.progress_bar.setText(t))
+        # from PyQt5.QtCore import QTimer
+        # t = "длинное имя папки: обновление (1000)"
+        # QTimer.singleShot(1000, lambda: self.progress_bar.setText(t))
 
         self.filter_label = FilterBtn()
         self.filter_label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
