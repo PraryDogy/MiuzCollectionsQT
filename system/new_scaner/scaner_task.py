@@ -23,10 +23,6 @@ class ScanerSigs(QObject):
 class ScanerTask(URunnable):
     short_timer = 15000
     long_timer = JsonData.scaner_minutes * 60 * 1000
-    lang = (
-        ("Поиск в", "Search in"),
-        ("Обновление", "Updating")
-    )
 
     def __init__(self):
         """
@@ -46,11 +42,10 @@ class ScanerTask(URunnable):
                 gc.collect()
                 print("scaner finished", i.name)
             else:
-                t = f"{i.name}: {Lang.no_connection.lower()}"
-                self.sigs.progress_text.emit(t)
+                self.send_text(f"{i.name}: {Lang.no_connection.lower()}")
                 sleep(5)
         try:
-            self.sigs.progress_text.emit("")
+            self.send_text("")
             self.sigs.finished_.emit()
         except RuntimeError as e:
             ...
@@ -60,6 +55,9 @@ class ScanerTask(URunnable):
             self._cmd(main_folder)
         except (Exception, AttributeError) as e:
             print("new scaner task, main folder scan error", e)
+
+    def send_text(self, text: str):
+        self.sigs.progress_text.emit(text)
 
     def _cmd(self, main_folder: MainFolder):
         coll_folder = main_folder.availability()
@@ -74,13 +72,10 @@ class ScanerTask(URunnable):
         conn.close()
 
         # собираем Finder директории и базу данных
-        self.sigs.progress_text.emit(
-            f"{self.lang[0][JsonData.lang]} {main_folder.name}"
-        )
-        finder_dirs = DirsLoader.finder_dirs(main_folder, self.task_state)
-        conn = Dbase.engine.connect()
-        db_dirs = DirsLoader.db_dirs(main_folder, conn)
-        conn.close()
+        dirs_loader = DirsLoader(main_folder, self.task_state)
+        dirs_loader.progress_text.connect(self.send_text)
+        finder_dirs = dirs_loader.finder_dirs()
+        db_dirs = dirs_loader.db_dirs()
         if not finder_dirs or not self.task_state.should_run():
             print(main_folder.name, "no finder dirs")
             return
@@ -91,7 +86,7 @@ class ScanerTask(URunnable):
 
         # ищем изображения в новых (обновленных) директориях
         img_loader = ImgLoader(new_dirs, main_folder, self.task_state)
-        img_loader.progress_text.connect(self.sigs.progress_text.emit)
+        img_loader.progress_text.connect(self.send_text)
         finder_images = img_loader.finder_images()
         db_images = img_loader.db_images()
         if not self.task_state.should_run():
@@ -112,15 +107,9 @@ class ScanerTask(URunnable):
             print("в папке:", main_folder.name, main_folder.get_current_path())
             return
 
-        # обновление *имя папки* (*оставшееся число изображений*)
-        def hashdir_text(value: int):
-            self.sigs.progress_text.emit(
-                f"{self.lang[1][JsonData.lang]} {main_folder.name} ({value})"
-            )
-
         # создаем / обновляем изображения в hashdir
-        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state)
-        hashdir_updater.progress_text.connect(hashdir_text)
+        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, main_folder)
+        hashdir_updater.progress_text.connect(self.send_text)
         del_images, new_images = hashdir_updater.run()
 
         # обновляем БД
@@ -139,7 +128,6 @@ class ScanerTask(URunnable):
         DirsUpdater.add_new_dirs(conn, main_folder, new_dirs)
         conn.close()
 
-        self.sigs.progress_text.emit("")
-
+        self.send_text("")
         if del_images or new_images:
             self.sigs.reload_gui.emit()

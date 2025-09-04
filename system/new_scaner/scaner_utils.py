@@ -12,42 +12,51 @@ from system.main_folder import MainFolder
 from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
 
-class DirsLoader:
+class DirsLoader(QObject):
+    progress_text = pyqtSignal(str)
+    lang = (
+        ("Поиск в", "Search in"),
+    )
 
-    @classmethod
-    def finder_dirs(cls, main_folder: MainFolder, task_state: TaskState) -> list[tuple]:
+    def __init__(self, main_folder: MainFolder, task_state: TaskState):
+        super().__init__()
+        self.main_folder = main_folder
+        self.main_folder_path = main_folder.get_current_path()
+        self.task_state = task_state
+
+    def finder_dirs(self) -> list[tuple]:
         """
         Возвращает:
         - [(rel_dir_path, mod_time), ...]
         """
         dirs = []
-        main_folder_path = main_folder.get_current_path()
-        stack = [main_folder_path]
-
+        stack = [self.main_folder_path]
+        self.progress_text.emit(
+            f"{self.lang[0][JsonData.lang]} {self.main_folder.name}"
+        )
 
         def iter_dir(entry: os.DirEntry):
-            if entry.is_dir() and entry.name not in main_folder.stop_list:
+            if entry.is_dir() and entry.name not in self.main_folder.stop_list:
                 stack.append(entry.path)
-                rel_path = MainUtils.get_rel_path(main_folder_path, entry.path)
+                rel_path = MainUtils.get_rel_path(self.main_folder_path, entry.path)
                 stats = entry.stat()
                 mod = int(stats.st_mtime)
                 dirs.append((rel_path, mod))
-
 
         while stack:
             current = stack.pop()
             with os.scandir(current) as it:
                 for entry in it:
-                    if not task_state.should_run():
+                    if not self.task_state.should_run():
                         break
                     try:
                         iter_dir(entry)
                     except Exception as e:
                         print("new scaner utils, dirs loader, finder dirs error", e)
-                        task_state.set_should_run(False)
+                        self.task_state.set_should_run(False)
 
         try:
-            stats = os.stat(main_folder_path)
+            stats = os.stat(self.main_folder_path)
             data = (os.sep, int(stats.st_mtime))
             dirs.append(data)
         except Exception as e:
@@ -55,15 +64,16 @@ class DirsLoader:
 
         return dirs
 
-    @classmethod
-    def db_dirs(cls, main_folder: MainFolder, conn: sqlalchemy.Connection,) -> list[tuple]:
+    def db_dirs(self) -> list[tuple]:
         """
         Возвращает:
         - [(rel_dir_path, mod_time), ...]
         """
+        conn = Dbase.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod)
-        q = q.where(DIRS.c.brand == main_folder.name)
+        q = q.where(DIRS.c.brand == self.main_folder.name)
         res = conn.execute(q).fetchall()
+        conn.close()
         return [(short_src, mod) for short_src, mod in res]
 
 
@@ -182,7 +192,6 @@ class ImgLoader(QObject):
                         print("new scaner utils, img loader, finder images, error", e)
                         self.task_state.set_should_run(False)
                         break
-        self.progress_text.emit("")
         return finder_images
 
     def db_images(self) -> list[tuple]:
@@ -241,8 +250,12 @@ class ImgCompator:
 
 
 class HashdirUpdater(QObject):
-    progress_text = pyqtSignal(int)
-    def __init__(self, del_items: list, new_items: list, task_state: TaskState):
+    progress_text = pyqtSignal(str)
+    lang = (
+        ("Обновление", "Updating"),
+    )
+
+    def __init__(self, del_items: list, new_items: list, task_state: TaskState, main_folder: MainFolder):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
         Запуск: run()   
@@ -261,6 +274,7 @@ class HashdirUpdater(QObject):
         self.del_items = del_items
         self.new_items = new_items
         self.task_state = task_state
+        self.main_folder = main_folder
         self.total = len(new_items) + len(del_items)
 
     def run(self) -> tuple[list, list]:
@@ -289,11 +303,16 @@ class HashdirUpdater(QObject):
                         os.rmdir(folder)
                     new_del_items.append(rel_thumb_path)
                     self.total -= 1
-                    self.progress_text.emit(self.total)
+                    self.send_text()
                 except Exception as e:
                     print("new scaner utils, hashdir updater, remove img error", e)
                     continue
         return new_del_items
+    
+    def send_text(self):
+        self.progress_text.emit(
+            f"{self.lang[0][JsonData.lang]} {self.main_folder.name} ({self.total})"
+            )
 
     def create_thumb(self, img_path: str) -> ndarray | None:
         img = ImgUtils.read_image(img_path)
@@ -316,7 +335,7 @@ class HashdirUpdater(QObject):
                 ThumbUtils.write_thumb(thumb_path, thumb)
                 new_new_items.append((img_path, size, birth, mod))
                 self.total -= 1
-                self.progress_text.emit(self.total)
+                self.send_text()
             except Exception as e:
                 print("new scaner utils, hashdir updater, create new img error", e)
                 continue

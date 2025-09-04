@@ -301,7 +301,7 @@ class WinMain(UMainWindow):
                 self.reload_rubber()
 
         def remove_files(old_files: list[str], new_files: list[str], main_folder: MainFolder):
-            remove_task = RmFilesTask(old_files)
+            remove_task = RmFilesTask(old_files, main_folder)
             remove_task.sigs.finished_.connect(
                 lambda: udpate_hashdir(new_files, main_folder)
             )
@@ -348,8 +348,7 @@ class WinMain(UMainWindow):
             self.win_smb.show()
     
     def remove_task_start(self, img_path_list: list[str]):
-        remove_files_task = RmFilesTask(img_path_list)
-        remove_files_task.sigs.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
+        remove_files_task = RmFilesTask(img_path_list, MainFolder.current)
         remove_files_task.sigs.reload_gui.connect(lambda: self.grid.reload_thumbnails())
         UThreadPool.start(remove_files_task)
 

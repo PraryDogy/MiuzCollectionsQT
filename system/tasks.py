@@ -342,12 +342,12 @@ class FilesInfoTask(URunnable):
 
 class _RmFilesSigs(QObject):
     finished_ = pyqtSignal()
-    progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
 
 
 class RmFilesTask(URunnable):
-    def __init__(self, img_path_list: list[str]):
+
+    def __init__(self, img_path_list: list[str], main_folder: MainFolder):
         """
         Удаляет изображения.
         Удаляет миниатюры из hashdir, удаляет записи об изображениях из бд.   
@@ -357,18 +357,15 @@ class RmFilesTask(URunnable):
         super().__init__()
         self.sigs = _RmFilesSigs()
         self.img_path_list = img_path_list
+        self.main_folder = main_folder
 
     def task(self):
         try:
-            if len(self.img_path_list) > 0:
-                text = f"{Lang.removing_images} ({len(self.img_path_list)})"
-                self.sigs.progress_text.emit(text)
             self.remove_files()
             self.remove_thumbs()
         except Exception as e:
             MainUtils.print_error()
         try:
-            self.sigs.progress_text.emit("")
             self.sigs.reload_gui.emit()
             self.sigs.finished_.emit()
         except RuntimeError as e:
@@ -402,14 +399,13 @@ class RmFilesTask(URunnable):
         ]
         
         # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = HashdirUpdater(rel_thumb_path_list, [], self.task_state)
+        file_updater = HashdirUpdater(rel_thumb_path_list, [], self.task_state, self.main_folder)
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
         conn = Dbase.engine.connect()
         db_updater = DbUpdater(del_items, [], MainFolder.current, conn)
         db_updater.run()
-
 
         # [(rel dir path, mod time), ...]
         worker_dirs = [
@@ -642,7 +638,7 @@ class ScanSingleDirTask(URunnable):
                 f"{self.lang[1][JsonData.lang]} {self.main_folder.name} ({value})"
             )
 
-        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state)
+        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
         hashdir_updater.progress_text.connect(hashdir_text)
         del_images, new_images = hashdir_updater.run()
 
