@@ -755,7 +755,6 @@ class WinSettings(WinSystem):
             MainUtils.start_new_app()
 
         elif self.ok_btn.text() == Lng.restart[JsonData.lng]:
-            
             for i in self.main_folder_list:
                 if not i.paths:
                     self.win_warn = WinWarn(
@@ -765,7 +764,6 @@ class WinSettings(WinSystem):
                     self.win_warn.center_relative_parent(self.window())
                     self.win_warn.show()
                     return
-            
             MainFolder.list_ = self.main_folder_list
             for k, v in vars(self.json_data_copy).items():
                 setattr(JsonData, k, v)
