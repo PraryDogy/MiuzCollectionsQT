@@ -25,6 +25,7 @@ class _CopyFilesSigs(QObject):
     finished_ = pyqtSignal(list)
     value_changed = pyqtSignal(int)
     progress_changed = pyqtSignal(tuple)
+    file_changed = pyqtSignal(str)
 
 class CopyFilesTask(URunnable):
     list_: list["CopyFilesTask"] = []
@@ -88,6 +89,9 @@ class CopyFilesTask(URunnable):
 
             self.sigs.progress_changed.emit(
                 (x, len(self.files))
+            )
+            self.sigs.file_changed.emit(
+                os.path.basename(file_path)
             )
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             files_dests.append(dest_path)

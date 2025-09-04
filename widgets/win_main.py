@@ -63,7 +63,8 @@ class WinMain(UMainWindow):
         ("Копирование", "Copying"),
         ("Копирую в", "Copy to"),
         ("Копирую", "Copying"),
-        ("из", "from")
+        ("из", "from"),
+        ("в", "in")
     )
 
     def __init__(self, argv: list[str]):
@@ -406,6 +407,11 @@ class WinMain(UMainWindow):
                 f"{self.lang[4][JsonData.lang]} {data[0]} {self.lang[5][JsonData.lang]} {data[1]}"
             )
 
+        def set_above_lavel(text: str, dest_name: str):
+            self.copy_win.above_label.setText(
+                f"{self.lang[4][JsonData.lang]} {text} {self.lang[6][JsonData.lang]} {dest_name}"
+            )
+
         dest_name = os.path.basename(dest)
 
         self.copy_win = ProgressbarWin(self.lang[2][JsonData.lang])
@@ -422,6 +428,7 @@ class WinMain(UMainWindow):
         )
         copy_files_task.sigs.value_changed.connect(self.copy_win.progressbar.setValue)
         copy_files_task.sigs.progress_changed.connect(set_below_label)
+        copy_files_task.sigs.file_changed.connect(lambda text: set_above_lavel(text, dest_name))
         copy_files_task.sigs.finished_.connect(self.copy_win.deleteLater)
 
         return copy_files_task
