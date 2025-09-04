@@ -18,8 +18,7 @@ from .lang import Lang
 from .main_folder import MainFolder
 from .new_scaner.scaner_utils import (DbUpdater, DirsUpdater, HashdirUpdater,
                                       ImgCompator, ImgLoader)
-from .utils import (ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable,
-                    UThreadPool)
+from .utils import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
 
 
 class _CopyFilesSigs(QObject):
@@ -626,15 +625,10 @@ class ScanSingleDirTask(URunnable):
         mod_time = int(os.stat(self.scan_dir).st_mtime)
         new_dirs = [(rel_path, mod_time), ]
 
-        # Поиск в *имя папки*
-        self.sigs.progress_text.emit(
-            f"{self.lang[0][JsonData.lang]} {self.main_folder.name}"
-        )
-
-        finder_images = ImgLoader.finder_images(new_dirs, self.main_folder, self.task_state)
-        conn = Dbase.engine.connect()
-        db_images = ImgLoader.db_images(new_dirs, self.main_folder, conn)
-        conn.close()
+        img_loader = ImgLoader(new_dirs, self.main_folder, self.task_state)
+        img_loader.progress_text.connect(self.sigs.progress_text.emit)
+        finder_images = img_loader.finder_images()
+        db_images = img_loader.db_images()
         if not finder_images or not self.task_state.should_run():
             print(self.main_folder.name, "no finder images")
             return

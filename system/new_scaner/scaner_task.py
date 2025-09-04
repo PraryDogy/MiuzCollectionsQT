@@ -90,10 +90,10 @@ class ScanerTask(URunnable):
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
 
         # ищем изображения в новых (обновленных) директориях
-        finder_images = ImgLoader.finder_images(new_dirs, main_folder, self.task_state)
-        conn = Dbase.engine.connect()
-        db_images = ImgLoader.db_images(new_dirs, main_folder, conn)
-        conn.close()
+        img_loader = ImgLoader(new_dirs, main_folder, self.task_state)
+        img_loader.progress_text.connect(self.sigs.progress_text.emit)
+        finder_images = img_loader.finder_images()
+        db_images = img_loader.db_images()
         if not self.task_state.should_run():
             print(main_folder.name, "no finder images")
             return

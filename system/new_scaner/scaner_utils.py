@@ -6,7 +6,7 @@ from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import JsonData, Static, ThumbData
-from system.database import DIRS, THUMBS, ClmNames
+from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lang
 from system.main_folder import MainFolder
 from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
@@ -138,9 +138,18 @@ class DirsUpdater:
 
 class ImgLoader(QObject):
     progress_text = pyqtSignal(str)
+    lang = (
+        ("Поиск в", "Search in"),
+    )
 
-    @classmethod
-    def finder_images(cls, new_dirs: list, main_folder: MainFolder, task_state: TaskState) -> list[tuple]:
+    def __init__(self, new_dirs: list, main_folder: MainFolder, task_state: TaskState):
+        super().__init__()
+        self.new_dirs = new_dirs
+        self.main_folder = main_folder
+        self.main_folder_path = main_folder.get_current_path()
+        self.task_state = task_state
+
+    def finder_images(self) -> list[tuple]:
         """
         Параметры:
         - new_dirs: [(rel_dir_path, mod_time), ...]
@@ -148,8 +157,10 @@ class ImgLoader(QObject):
         Возвращает изображения в указанных директориях:
         - [(abs_img_path, size, birth_time, mod_time), ...]    
         """
+        self.progress_text.emit(
+            f"{self.lang[0][JsonData.lang]} {self.main_folder.name}"
+        )
         finder_images = []
-        main_folder_path = main_folder.get_current_path()
 
         def process_entry(entry: os.DirEntry):
             abs_img_path = entry.path
@@ -159,22 +170,22 @@ class ImgLoader(QObject):
             mod = int(stats.st_mtime)
             finder_images.append((abs_img_path, size, birth, mod))
 
-        for rel_dir_path, mod in new_dirs:
-            abs_dir_path = MainUtils.get_abs_path(main_folder_path, rel_dir_path)
+        for rel_dir_path, mod in self.new_dirs:
+            abs_dir_path = MainUtils.get_abs_path(self.main_folder_path, rel_dir_path)
             for entry in os.scandir(abs_dir_path):
-                if not task_state.should_run():
+                if not self.task_state.should_run():
                     return []
                 if entry.path.endswith(Static.ext_all):
                     try:
                         process_entry(entry)
                     except Exception as e:
                         print("new scaner utils, img loader, finder images, error", e)
-                        task_state.set_should_run(False)
+                        self.task_state.set_should_run(False)
                         break
+        self.progress_text.emit("")
         return finder_images
 
-    @classmethod
-    def db_images(cls, new_dirs: list, main_folder: MainFolder, conn: sqlalchemy.Connection,) -> list[tuple]:
+    def db_images(self) -> list[tuple]:
         """
         Параметры:
         - new_dirs: [(rel_dir_path, mod_time), ...]
@@ -182,9 +193,9 @@ class ImgLoader(QObject):
         Возвращает изображения в указанных директориях:
         - {rel_thumb_path: (abs_img_path, size, birth, mod), ...}  
         """
-        main_folder_path = main_folder.get_current_path()
+        conn = Dbase.engine.connect()
         db_images: dict = {}
-        for rel_dir_path, mod in new_dirs:
+        for rel_dir_path, mod in self.new_dirs:
             q = sqlalchemy.select(
                 THUMBS.c.short_hash, # rel thumb path
                 THUMBS.c.short_src,
@@ -194,11 +205,12 @@ class ImgLoader(QObject):
                 )
             q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
             q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
-            q = q.where(THUMBS.c.brand == main_folder.name)
+            q = q.where(THUMBS.c.brand == self.main_folder.name)
             res = conn.execute(q).fetchall()
             for rel_thumb_path, rel_img_path, size, birth, mod in res:
-                abs_img_path = MainUtils.get_abs_path(main_folder_path, rel_img_path)
+                abs_img_path = MainUtils.get_abs_path(self.main_folder_path, rel_img_path)
                 db_images[rel_thumb_path] = (abs_img_path, size, birth, mod)
+        conn.close()
         return db_images
 
 
