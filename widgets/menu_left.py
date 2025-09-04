@@ -216,7 +216,7 @@ class MenuLeft(QTabWidget):
         MainFolder.current = MainFolder.list_[index]
         Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
         Dynamic.grid_buff_size = 0
-        self.setCurrentIndex(1)
+        # self.setCurrentIndex(1)
         self.collections_list.init_ui()
         self.set_window_title.emit()
         self.scroll_to_top.emit()
