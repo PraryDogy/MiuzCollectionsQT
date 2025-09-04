@@ -441,6 +441,7 @@ class MainFolderPaths(DropableGroupBox):
         super().__init__()
         self.main_folder = main_folder
         self.text_changed.connect(self.set_data)
+        self.text_edit.setPlaceholderText(Lng.select_folder_path[JsonData.lng])
 
     def set_data(self, *args):
         self.main_folder.paths = self.get_data()
@@ -462,6 +463,7 @@ class StopList(DropableGroupBox):
         super().__init__()
         self.main_folder = main_folder
         self.text_changed.connect(self.set_data)
+        self.text_edit.setPlaceholderText(Lng.ignore_list[JsonData.lng])
 
     def set_data(self, *args):
         self.main_folder.stop_list = self.get_data()
@@ -513,7 +515,7 @@ class MainFolderSettings(QWidget):
         self.setLayout(v_lay)
 
         first_row = QGroupBox()
-        first_row.setFixedHeight(70)
+        first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
         first_lay = UHBoxLayout()
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -559,15 +561,14 @@ class NewFolder(QWidget):
         self.setLayout(v_lay)
 
         first_row = QGroupBox()
-        first_row.setFixedHeight(70)
+        first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
         first_lay = UVBoxLayout()
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         first_lay.setSpacing(5)
         first_row.setLayout(first_lay)
-        name_descr = QLabel(Lng.folder_name_immutable[JsonData.lng] + ":")
-        first_lay.addWidget(name_descr)
         self.name_label = ULineEdit()
+        self.name_label.setPlaceholderText(Lng.folder_name_immutable[JsonData.lng])
         self.name_label.textChanged.connect(self.name_cmd)
         first_lay.addWidget(self.name_label)
 

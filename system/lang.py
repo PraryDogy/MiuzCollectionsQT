@@ -212,6 +212,7 @@ class Lng:
         "строки.",
         "Ignore list: drag a folder here or enter a name on a new line."
     )
+    ignore_list = ("Игнор лист", "Ignore list")
     minutes = ("минут", "minutes")
     search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
     fast_image_search = ("Быстрый поиск изображений (бета)", "Fast image search (beta)")
