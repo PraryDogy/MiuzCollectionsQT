@@ -231,3 +231,21 @@ class Lng:
     collection_folder = ("Папка с коллекциями", "Collections folder")
     image = ("Изображение", "Image")
     other_folders = ("Прочие папки", "Other folders")
+    help_text = (
+        "Папка с коллекциями:\n"
+        "- Может содержать подпапки (коллекции)\n"
+        "- Может содержать изображения без подпапок\n"
+        "\n"
+        "Фильтры:\n"
+        "- Изображения в папке \"1 IMG\"\n"
+        "- Изображения в папке \"2 MODEL IMG\"\n"
+        "- Любые другие изображения (не в \"1 IMG\" и \"2 MODEL IMG\")",
+        "Collection folder:\n"
+        "- Can contain subfolders (collections)\n"
+        "- Can contain images without subfolders\n"
+        "\n"
+        "Filters:\n"
+        "- Images in \"1 IMG\" folder\n"
+        "- Images in \"2 MODEL IMG\" folder\n"
+        "- Any other images (not in \"1 IMG\" or \"2 MODEL IMG\")"
+    )

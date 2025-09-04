@@ -87,10 +87,13 @@ class WinHelp(WinSystem):
         super().__init__()
         self.setWindowTitle(Lng.help[JsonData.lng])
         self.central_layout.setContentsMargins(10, 5, 10, 5)
-        self.central_layout.setSpacing(5)
+        self.central_layout.setSpacing(15)
+
+        descr = QLabel(Lng.help_text[JsonData.lng])
+        self.central_layout.insertWidget(0, descr)
 
         btn_wid_ = self.btn_wid()
-        self.central_layout.insertWidget(1, btn_wid_)
+        self.central_layout.insertWidget(2, btn_wid_)
 
         self.current_page = 0
         self.max_pages = 2
@@ -101,9 +104,8 @@ class WinHelp(WinSystem):
         ]
 
         self.dynamic_wid = self.page_list[0]()
-        self.central_layout.insertWidget(0, self.dynamic_wid)
-        self.adjustSize()
-        self.setFixedSize(400, 300)
+        self.central_layout.insertWidget(1, self.dynamic_wid)
+        self.setFixedSize(450, 430)
 
     def create_page(self, wid: QTreeWidget, page_num: int):
         tree: QTreeWidget = wid()
