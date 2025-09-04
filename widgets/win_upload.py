@@ -39,14 +39,9 @@ class DirsList(VListWidget):
         back = DirsItem(parent=self, path=os.path.dirname(self.path), text="...")
         self.addItem(back)
 
-        if self.path in self.main_folder_paths:
-            for path, name in sorted(dirs.items(), key=lambda x: self._strip(x[1])):
-                item = DirsItem(parent=self, path=path, text=name)
-                self.addItem(item)
-        else:
-            for path, name in dirs.items():
-                item = DirsItem(parent=self, path=path, text=name)
-                self.addItem(item)
+        for path, name in sorted(dirs.items(), key=lambda x: self._strip(x[1])):
+            item = DirsItem(parent=self, path=path, text=name)
+            self.addItem(item)
         self.setCurrentRow(0)
 
     def _strip(self, s: str) -> str:
@@ -107,11 +102,11 @@ class InfoBox(QGroupBox):
         v_lay.setContentsMargins(5, 5, 5, 5)
 
         self.label_bottom = QLabel()
-        self.label_bottom.setWordWrap(True)
         self.label_bottom.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.addWidget(self.label_bottom)
         self.setLayout(v_lay)
-        self.label_bottom.setFixedHeight(50)
+        # self.label_bottom.setWordWrap(True)
+        # self.label_bottom.setFixedHeight(20)
 
     def set_path(self, path: str):
         self.label_bottom.setText(path)
@@ -129,7 +124,7 @@ class WinUpload(WinChild):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(self.lang[3][JsonData.lang])
-        self.resize(350, 500)
+        # self.resize(350, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
