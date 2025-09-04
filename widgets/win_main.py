@@ -111,6 +111,7 @@ class WinMain(UMainWindow):
         def copy_files_task(data):
             dest, files = data
             task = self.copy_files_task(dest, files)
+            task.sigs.finished_.connect(MainUtils.reveal_files)
             UThreadPool.start(task)
 
         self.grid = Grid()
@@ -379,6 +380,7 @@ class WinMain(UMainWindow):
         main_folder, dest = data
 
         copy_files_task = self.copy_files_task(dest, img_path_list)
+        copy_files_task.sigs.finished_.connect(MainUtils.reveal_files)
         copy_files_task.sigs.finished_.connect(
             lambda img_path_list: self.upload_task_finished(main_folder, img_path_list)
         )

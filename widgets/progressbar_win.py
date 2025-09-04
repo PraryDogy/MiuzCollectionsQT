@@ -11,6 +11,7 @@ class ProgressbarWin(WinSystem):
     def __init__(self, title: str):
         super().__init__()
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
+        self.setWindowModality(Qt.WindowModality.WindowModal)
         self.setWindowTitle(title)
         self.setFixedSize(350, 70)
 
