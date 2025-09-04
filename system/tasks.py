@@ -24,8 +24,7 @@ from .utils import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
 class _CopyFilesSigs(QObject):
     finished_ = pyqtSignal(list)
     value_changed = pyqtSignal(int)
-    value_max = pyqtSignal(int)
-
+    progress_changed = pyqtSignal(tuple)
 
 class CopyFilesTask(URunnable):
     list_: list["CopyFilesTask"] = []
@@ -80,14 +79,16 @@ class CopyFilesTask(URunnable):
             self.copy_files_finished(files_dests)
             return
 
-        self.sigs.value_max.emit(total_size)
         self.sigs.value_changed.emit(0)
 
-        for file_path in self.files:
+        for x, file_path in enumerate(self.files, start=1):
             
             if not self.task_state.should_run():
                 break
 
+            self.sigs.progress_changed.emit(
+                (x, len(self.files))
+            )
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             files_dests.append(dest_path)
 

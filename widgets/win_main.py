@@ -18,7 +18,7 @@ from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
-from .copy_files_win import ProgressbarWin
+from .progressbar_win import ProgressbarWin
 from .grid import Grid
 from .menu_left import MenuLeft
 from .win_dates import WinDates
@@ -62,7 +62,9 @@ class WinMain(UMainWindow):
         ("Все коллекции", "All collections"),
         ("Избранное", "Favorites"),
         ("Копирование", "Copying"),
-        ("Копирую в", "Copy to")
+        ("Копирую в", "Copy to"),
+        ("Копирую", "Copying"),
+        ("из", "from")
     )
 
     def __init__(self, argv: list[str]):
@@ -396,8 +398,15 @@ class WinMain(UMainWindow):
             ("Все коллекции", "All collections"),
             ("Избранное", "Favorites"),
             ("Копирование", "Copying"),
-            ("Копирую в", "Copy to")
+            ("Копирую в", "Copy to"),
+            ("Копирую", "Copying"),
+            ("из", "from")
         )
+
+        def set_below_label(data: tuple[int, int]):
+            self.copy_win.below_label.setText(
+                f"{self.lang[4][JsonData.lang]} {data[0]} {self.lang[5][JsonData.lang]} {data[1]}"
+            )
 
         dest_name = os.path.basename(dest)
 
@@ -410,7 +419,12 @@ class WinMain(UMainWindow):
         self.copy_win.show()
 
         copy_files_task = CopyFilesTask(dest, img_path_list)
+        self.copy_win.cancel.connect(
+            lambda: copy_files_task.task_state.set_should_run(False)
+        )
         copy_files_task.sigs.value_changed.connect(self.copy_win.progressbar.setValue)
+        copy_files_task.sigs.progress_changed.connect(set_below_label)
+        # copy_files_task.sigs.finished_.connect(self.copy_win.deleteLater)
         UThreadPool.start(copy_files_task)
 
     def open_downloads_win(self):

@@ -12,7 +12,7 @@ class ProgressbarWin(WinSystem):
         super().__init__()
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
         self.setWindowTitle(title)
-        self.setFixedSize(350, 60)
+        self.setFixedSize(350, 70)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
