@@ -695,14 +695,17 @@ class WinSettings(WinSystem):
                 x
                 for x in self.main_folder_list
                 if x.name == self.left_menu.currentItem().text()
-                ][0]
+                ]
             
-            if main_folder:
+            if len(main_folder) == 1:
                 item = self.left_menu.currentItem()
-                main_folder_sett = MainFolderSettings(main_folder)
+                main_folder_sett = MainFolderSettings(main_folder[0])
                 main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[JsonData.lng]))
-                main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder, item))
+                main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder[0], item))
                 self.right_lay.insertWidget(0, main_folder_sett)
+            else:
+                self.left_menu.setCurrentRow(0)
+                self.init_right_side()
 
     def add_main_folder(self, main_folder: MainFolder):
         self.main_folder_list.append(main_folder)
