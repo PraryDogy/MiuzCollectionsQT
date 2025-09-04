@@ -110,7 +110,7 @@ class FinderImages(QObject):
         Пример: "Miuz (MainFolder.name): коллекция 3 из 10"
         """
         main_folder = self.main_folder.name.capitalize()
-        collection_name = self.lang[0][JsonData.lang]
+        collection_name = Lang.collection[JsonData.lang]
         return f"{main_folder}: {collection_name.lower()} {current} {Lang.from_} {total}"
 
     def walk_subdir(self, subdir: str) -> list[tuple]:
@@ -304,7 +304,7 @@ class HashdirUpdater(QObject):
                 break
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
-                self.progressbar_text(self.lang[1][JsonData.lang], x, total)
+                self.progressbar_text(Lang.deleting[JsonData.lang], x, total)
                 try:
                     os.remove(thumb_path)
                     folder = os.path.dirname(thumb_path)
@@ -332,7 +332,7 @@ class HashdirUpdater(QObject):
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
             if not self.task_state.should_run():
                 break
-            self.progressbar_text(self.lang[0][JsonData.lang], x, total)
+            self.progressbar_text(Lang.adding[JsonData.lang], x, total)
             try:
                 thumb = self.create_thumb(img_path)
                 thumb_path = ThumbUtils.create_thumb_path(img_path)
@@ -439,9 +439,6 @@ class DbUpdater(QObject):
 
 class MainFolderRemover(QObject):
     progress_text = pyqtSignal(str)
-    lang = (
-        ("Удаляю", "Deleting"),
-    )
 
     def __init__(self):
         """
@@ -487,7 +484,7 @@ class MainFolderRemover(QObject):
         total = len(rows)
         for x, (id_, image_path) in enumerate(rows):
             try:
-                t = f"{self.lang[0][JsonData.lang]}: {x} {Lang.from_} {total}"
+                t = f"{Lang.deleting[JsonData.lang]}: {x} {Lang.from_} {total}"
                 self.progress_text.emit(t)
 
                 if os.path.exists(image_path):

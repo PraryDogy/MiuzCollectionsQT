@@ -58,18 +58,8 @@ class WinWarn(WinSystem):
 
 
 class WinSmb(WinWarn):
-    lang = (
-        ("Нет подключения", "No connection"),
-        (
-            "- Подключитесь к диску с коллекциями\
-            \n- Добавьте новый путь к коллекциям\
-            \nв настройках.",
-            "- Connect to disk with collections\
-            \n- Add a new path to collections\
-            \nin the settings.")
-    )
     def __init__(self):
-        super().__init__(self.lang[0][JsonData.lang], self.lang[1][JsonData.lang])
+        super().__init__(Lang.no_connection[JsonData.lang], Lang.no_connection_descr[JsonData.lang])
 
 
 class WinQuestion(WinSystem):
@@ -116,12 +106,12 @@ class WinQuestion(WinSystem):
         btn_lay.setContentsMargins(0, 10, 0, 0)
         btn_wid.setLayout(btn_lay)
 
-        ok_btn = QPushButton(self.lang[0][JsonData.lang])
+        ok_btn = QPushButton(Lang.ok[JsonData.lang])
         ok_btn.clicked.connect(self.ok_clicked.emit)
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.close)
 
-        cancel_btn = QPushButton(self.lang[1][JsonData.lang])
+        cancel_btn = QPushButton(Lang.cancel[JsonData.lang])
         cancel_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.deleteLater)
 

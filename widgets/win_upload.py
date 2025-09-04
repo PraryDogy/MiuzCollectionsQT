@@ -95,12 +95,9 @@ class MainFolderList(VListWidget):
 
 
 class PathWindow(WinChild):
-    lang = (
-        ("Директория загрузки", "Upload path"),
-    )
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(self.lang[0][JsonData.lang])
+        self.setWindowTitle(Lang.upload_path[JsonData.lang])
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.text_label = QLabel()
         self.text_label.setWordWrap(True)
@@ -140,16 +137,10 @@ class PathWidget(QGroupBox):
 
 class WinUpload(WinChild):
     clicked = pyqtSignal(tuple)
-    lang = (
-        ("Коллекции", "Collections"),
-        ("Ок", "Ok"),
-        ("Отмена", "Cancel"),
-        ("Загрузка", "Upload")
-    )
-
+ 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(self.lang[3][JsonData.lang])
+        self.setWindowTitle(Lang.upload[JsonData.lang])
         self.setFixedSize(650, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.central_layout.setSpacing(5)
@@ -163,7 +154,7 @@ class WinUpload(WinChild):
         self.tab_wid.addTab(self.main_folders, Lang.folders)
 
         self.dirs_list = DirsList(MainFolder.current.curr_path)
-        self.tab_wid.addTab(self.dirs_list, self.lang[0][JsonData.lang])
+        self.tab_wid.addTab(self.dirs_list, Lang.collections[JsonData.lang])
 
         # новый бокс над кнопками
         self.info_box = PathWidget()
@@ -176,11 +167,11 @@ class WinUpload(WinChild):
         btn_lay = UHBoxLayout()
         btn_lay.setSpacing(10)
 
-        self.ok_btn = QPushButton(self.lang[1][JsonData.lang])
+        self.ok_btn = QPushButton(Lang.ok[JsonData.lang])
         self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(90)
 
-        self.cancel_btn = QPushButton(self.lang[2][JsonData.lang])
+        self.cancel_btn = QPushButton(Lang.cancel[JsonData.lang])
         self.cancel_btn.clicked.connect(self.deleteLater)
         self.cancel_btn.setFixedWidth(90)
 

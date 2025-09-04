@@ -62,13 +62,8 @@ class WinInfoAction(QAction):
 
 
 class CopyPath(QAction):
-    lang = (
-        ("Скопировать путь", "Copy filepath"),
-
-    )
-
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        text = f"{self.lang[0][JsonData.lang]} ({len(rel_img_path_list)})"
+        text = f"{Lang.copy_filepath[JsonData.lang]} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
@@ -143,11 +138,11 @@ class FavActionDb(QAction):
     def __init__(self, parent: QMenu, rel_img_path: str, fav_value:  int):
 
         if fav_value == 0 or fav_value is None:
-            t = self.lang[0][JsonData.lang]
+            t = Lang.add_to_favorites[JsonData.lang]
             self.value = 1
 
         elif fav_value == 1:
-            t = self.lang[1][JsonData.lang]
+            t = Lang.remove_from_favorites[JsonData.lang]
             self.value = 0
 
         super().__init__(parent=parent, text=t)

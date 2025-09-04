@@ -87,7 +87,6 @@ class App(QApplication):
 
         JsonData.init()
         Dbase.init()
-        Lang.init()
         MainFolder.init()
         UserFilter.init()
         UThreadPool.init()

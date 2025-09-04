@@ -14,9 +14,6 @@ from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
 class DirsLoader(QObject):
     progress_text = pyqtSignal(str)
-    lang = (
-        ("Поиск в", "Search in"),
-    )
 
     def __init__(self, main_folder: MainFolder, task_state: TaskState):
         super().__init__()
@@ -32,7 +29,7 @@ class DirsLoader(QObject):
         dirs = []
         stack = [self.main_folder_path]
         self.progress_text.emit(
-            f"{self.lang[0][JsonData.lang]} {self.main_folder.name}"
+            f"{Lang.search_in[JsonData.lang]} {self.main_folder.name}"
         )
 
         def iter_dir(entry: os.DirEntry):
@@ -148,9 +145,6 @@ class DirsUpdater:
 
 class ImgLoader(QObject):
     progress_text = pyqtSignal(str)
-    lang = (
-        ("Поиск в", "Search in"),
-    )
 
     def __init__(self, new_dirs: list, main_folder: MainFolder, task_state: TaskState):
         super().__init__()
@@ -168,7 +162,7 @@ class ImgLoader(QObject):
         - [(abs_img_path, size, birth_time, mod_time), ...]    
         """
         self.progress_text.emit(
-            f"{self.lang[0][JsonData.lang]} {self.main_folder.name}"
+            f"{Lang.search_in[JsonData.lang]} {self.main_folder.name}"
         )
         finder_images = []
 
@@ -311,7 +305,7 @@ class HashdirUpdater(QObject):
     
     def send_text(self):
         self.progress_text.emit(
-            f"{self.lang[0][JsonData.lang]} {self.main_folder.name} ({self.total})"
+            f"{Lang.updating[JsonData.lang]} {self.main_folder.name} ({self.total})"
             )
 
     def create_thumb(self, img_path: str) -> ndarray | None:

@@ -57,15 +57,6 @@ class WinMain(UMainWindow):
     update_mins = 30
     min_w = 750
     ww, hh = 870, 500
-    lang = (
-        ("Все коллекции", "All collections"),
-        ("Избранное", "Favorites"),
-        ("Копирование", "Copying"),
-        ("Копирую в", "Copy to"),
-        ("Копирую", "Copying"),
-        ("из", "from"),
-        ("в", "in")
-    )
 
     def __init__(self, argv: list[str]):
         super().__init__()
@@ -263,9 +254,9 @@ class WinMain(UMainWindow):
     def set_window_title(self):
         main_folder = MainFolder.current.name.capitalize()
         if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            t = self.lang[0][JsonData.lang]
+            t = Lang.all_collections[JsonData.lang]
         elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-            t = self.lang[1][JsonData.lang]
+            t = Lang.favorites[JsonData.lang]
         elif Dynamic.curr_coll_name == Static.NAME_RECENTS:
             t = Lang.recents
         else:
@@ -403,21 +394,19 @@ class WinMain(UMainWindow):
     def copy_files_task(self, dest: str, img_path_list: list):
 
         def set_below_label(data: tuple[int, int]):
+            count, total = data
             self.copy_win.below_label.setText(
-                f"{self.lang[4][JsonData.lang]} {data[0]} {self.lang[5][JsonData.lang]} {data[1]}"
+                f"{Lang.copying[JsonData.lang]} {count} {Lang.from_[JsonData.lang]} {total}"
             )
 
-        def set_above_lavel(text: str, dest_name: str):
+        def set_above_label(text: str, dest_name: str):
             self.copy_win.above_label.setText(
-                f"{self.lang[4][JsonData.lang]} {text} {self.lang[6][JsonData.lang]} {dest_name}"
+                f"{text}"
             )
 
         dest_name = os.path.basename(dest)
 
-        self.copy_win = ProgressbarWin(self.lang[2][JsonData.lang])
-        self.copy_win.above_label.setText(
-            f"{self.lang[3][JsonData.lang]} \"{dest_name}\""
-        )
+        self.copy_win = ProgressbarWin(Lang.copying[JsonData.lang])
         self.copy_win.progressbar.setMaximum(100)
         self.copy_win.center_relative_parent(self)
         self.copy_win.show()
@@ -428,7 +417,7 @@ class WinMain(UMainWindow):
         )
         copy_files_task.sigs.value_changed.connect(self.copy_win.progressbar.setValue)
         copy_files_task.sigs.progress_changed.connect(set_below_label)
-        copy_files_task.sigs.file_changed.connect(lambda text: set_above_lavel(text, dest_name))
+        copy_files_task.sigs.file_changed.connect(lambda text: set_above_label(text, dest_name))
         copy_files_task.sigs.finished_.connect(self.copy_win.deleteLater)
 
         return copy_files_task

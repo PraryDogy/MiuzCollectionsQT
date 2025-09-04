@@ -233,11 +233,6 @@ class _SingleFileInfoSigs(QObject):
 
 class SingleFileInfoTask(URunnable):
     max_row = 50
-    lang = (
-        ("Изменен", "Changed"),
-        ("Коллекция", "Collection"),
-        ("Имя файла", "File name"),
-    )
     def __init__(self, url: str):
         super().__init__()
         self.url = url
@@ -255,13 +250,13 @@ class SingleFileInfoTask(URunnable):
             thumb_path = ThumbUtils.create_thumb_path(self.url)
 
             res = {
-                self.lang[2][JsonData.lang]: self.lined_text(name),
+                Lang.file_name[JsonData.lang]: self.lined_text(name),
                 Lang.type_: type_,
                 Lang.file_size: size,
                 Lang.place: self.lined_text(self.url),
                 Lang.thumb_path: self.lined_text(thumb_path),
-                self.lang[0][JsonData.lang]: mod,
-                self.lang[1][JsonData.lang]: self.lined_text(coll),
+                Lang.changed[JsonData.lang]: mod,
+                Lang.collection[JsonData.lang]: self.lined_text(coll),
                 Lang.resol: Lang.calculating,
                 }
             
@@ -274,7 +269,7 @@ class SingleFileInfoTask(URunnable):
         except Exception as e:
             MainUtils.print_error()
             res = {
-                self.lang[2][JsonData.lang]: self.lined_text(os.path.basename(self.url)),
+                Lang.file_name[JsonData.lang]: self.lined_text(os.path.basename(self.url)),
                 Lang.place: self.lined_text(self.url),
                 Lang.type_: self.lined_text(os.path.splitext(self.url)[0])
                 }
@@ -301,9 +296,6 @@ class SingleFileInfoTask(URunnable):
 
 class FilesInfoTask(URunnable):
     max_row = 50
-    lang = (
-        ("Имя файла", "File name"),
-    )
     def __init__(self, img_path_list: list[str]):
         super().__init__()
         self.img_path_list = img_path_list
@@ -321,7 +313,7 @@ class FilesInfoTask(URunnable):
             names = names + ", ..."
 
         res = {
-            self.lang[0][JsonData.lang]: names,
+            Lang.file_name[JsonData.lang]: names,
             Lang.total: str(len(self.img_path_list)),
             Lang.file_size: self.get_total_size()
         }
@@ -612,11 +604,6 @@ class _ScanSingleDirSigs(QObject):
 
 
 class ScanSingleDirTask(URunnable):
-    lang = (
-        ("Поиск в", "Search in"),
-        ("Обновление", "Updating")
-    )
-
     def __init__(self, main_folder: MainFolder, scan_dir: str):
         super().__init__()
         self.sigs = _ScanSingleDirSigs()
@@ -642,7 +629,7 @@ class ScanSingleDirTask(URunnable):
         # обновление *имя папки* (*оставшееся число изображений*)
         def hashdir_text(value: int):
             self.sigs.progress_text.emit(
-                f"{self.lang[1][JsonData.lang]} {self.main_folder.name} ({value})"
+                f"{Lang.search_in[JsonData.lang]} {self.main_folder.name} ({value})"
             )
 
         hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)

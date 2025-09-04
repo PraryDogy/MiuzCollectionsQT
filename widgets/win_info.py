@@ -41,7 +41,7 @@ class Selectable(QLabel):
 
         menu_ = UMenu(event=ev)
 
-        label_text = self.lang[0][JsonData.lang]
+        label_text = Lang.copy[JsonData.lang]
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(lambda: MainUtils.copy_text(text))
         menu_.addAction(sel)

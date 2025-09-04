@@ -14,10 +14,6 @@ class RemoveFilesWin(WinSystem):
     warning_svg = os.path.join(Static.INNER_IMAGES, "warning.svg")
     finished_ = pyqtSignal()
     svg_size = 50
-    lang = (
-        ("Отмена", "Cancel"),
-
-    )
 
     def __init__(self, img_path_list: list[str]):
         super().__init__()
@@ -50,7 +46,7 @@ class RemoveFilesWin(WinSystem):
         ok_btn.setFixedWidth(90)
         h_lay.addWidget(ok_btn)
 
-        can_btn = QPushButton(self.lang[0][JsonData.lang])
+        can_btn = QPushButton(Lang.cancel[JsonData.lang])
         can_btn.clicked.connect(self.deleteLater)
         can_btn.setFixedWidth(90)
         h_lay.addWidget(can_btn)
