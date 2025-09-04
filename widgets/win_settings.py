@@ -759,7 +759,7 @@ class WinSettings(WinSystem):
                 if not i.paths:
                     self.win_warn = WinWarn(
                         Lng.attention[JsonData.lng],
-                        Lng.select_folder_path[JsonData.lng]
+                        f"{Lng.select_folder_path[JsonData.lng]} \"{i.name}\""
                         )
                     self.win_warn.center_relative_parent(self.window())
                     self.win_warn.show()
