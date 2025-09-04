@@ -638,6 +638,10 @@ class WinSettings(WinSystem):
 
         item = UListWidgetItem(self.left_menu, text=Lng.new_folder[JsonData.lng])
         self.left_menu.addItem(item)
+        
+        spacer = UListWidgetItem(self.left_menu, height=15)
+        spacer.setFlags(Qt.NoItemFlags)
+        self.left_menu.addItem(spacer)
 
         for i in MainFolder.list_:
             item = UListWidgetItem(self.left_menu, text=i.name)
