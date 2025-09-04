@@ -174,6 +174,7 @@ class Lng:
     new_folder = ("Новая папка", "New folder")
     enter_folder_name = ("Укажите имя папки с коллекциями", "Enter collections folder name")
     select_folder_path = ("Укажите путь к папке с коллекциями", "Select path to the collections folder")
+    folder_path = ("Путь к папке с коллекциями", "Collections folder path")
     general = ("Основные", "General")
     restart = ("Перезапуск", "Restart")
     at_least_one_folder_required = (

@@ -441,7 +441,7 @@ class MainFolderPaths(DropableGroupBox):
         super().__init__()
         self.main_folder = main_folder
         self.text_changed.connect(self.set_data)
-        self.text_edit.setPlaceholderText(Lng.select_folder_path[JsonData.lng])
+        self.text_edit.setPlaceholderText(Lng.folder_path[JsonData.lng])
 
     def set_data(self, *args):
         self.main_folder.paths = self.get_data()
