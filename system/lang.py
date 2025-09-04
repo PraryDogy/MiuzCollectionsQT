@@ -246,3 +246,5 @@ class Lng:
     folder_name_error = ("Имя папки должно быть уникальным", "Folder name must be unique")
     name_taken = ("Уже занято", "Already taken")
     name = ("Имя", "Name")
+    collection_folder = ("Папка с коллекциями", "Collections folder")
+    image = ("Изображение", "Image")
