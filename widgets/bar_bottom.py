@@ -2,6 +2,7 @@ import os
 
 from PyQt5.QtCore import QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QFrame, QLabel, QSlider, QWidget
 
 from cfg import Dynamic, JsonData, Static, ThumbData
@@ -81,7 +82,7 @@ class CustomSlider(BaseSlider):
         self.resize_thumbnails.emit()
 
 
-class FilterBtn(QLabel):
+class FilterBtn(QSvgWidget):
     obj_name = "filter_btn"
     reload_thumbnails = pyqtSignal()
     update_bottom_bar = pyqtSignal()
@@ -94,23 +95,13 @@ class FilterBtn(QLabel):
         """
 
         t = f"{Lng.show[JsonData.lng]}: {Lng.type_jpg[JsonData.lng]}, {Lng.type_tiff[JsonData.lng]}"
-        super().__init__(text=t)
-        self.setObjectName("filter_btn")
-        self.set_normal_style()
-
-        self.adjustSize()
-
-    def set_normal_style(self):
-        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.border_transparent_style}}}")
-
-    def set_solid_style(self):
-        self.setStyleSheet(f"#{FilterBtn.obj_name} {{{Static.blue_bg_style}}}")
+        super().__init__()
+        self.load("./images/filter.svg")
+        self.setFixedSize(20, 20)
 
     def menu_types(self, *args):
-        self.set_solid_style()
-
         menu_ = MenuTypes(parent=self)
-        menu_.setFixedWidth(self.width())
+        menu_.setFixedWidth(130)
         menu_.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
         menu_.update_bottom_bar.connect(lambda: self.update_bottom_bar.emit())
 
@@ -126,38 +117,11 @@ class FilterBtn(QLabel):
 
         menu_.move(menu_center_top)
         menu_.exec_()
-        
-        self.set_normal_style()
 
     def mouseReleaseEvent(self, ev):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.menu_types()
 
-
-class SvgBtn_(QFrame):
-    def __init__(self, icon_path, size, parent = None):
-        super().__init__(parent)
-
-        v_lay = UHBoxLayout()
-        self.setLayout(v_lay)
-        self.layout().setContentsMargins(2, 1, 2, 1)
-        self.svg_btn = SvgBtn(icon_path, size, parent)
-        self.layout().addWidget(self.svg_btn)
-        self.setStyleSheet(self.normal_style())
-        self.adjustSize()
-
-    def solid_style(self):
-        style = f"""
-        background: {Static.gray_color};
-        border-radius: 6px;
-        """
-        return style
-
-    def normal_style(self):
-        style = f"""
-        background: transparent;
-        """
-        return style
 
 class BarBottom(QWidget):
     theme_changed = pyqtSignal()
@@ -180,22 +144,27 @@ class BarBottom(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        self.progress_bar = QLabel(text="")
+        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.progress_bar.setFixedWidth(300)
+        # self.progress_bar.setStyleSheet("background: red")
+        self.progress_bar.setFixedHeight(20)
+        self.h_layout.addWidget(self.progress_bar)
+
+        self.h_layout.addStretch()
+        
+        from PyQt5.QtCore import QTimer
+        t = "длинное имя папки: обновление (1000)"
+        QTimer.singleShot(1000, lambda: self.progress_bar.setText(t))
 
         self.filter_label = FilterBtn()
         self.filter_label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
         self.filter_label.update_bottom_bar.connect(lambda: self.toggle_types())
         self.h_layout.addWidget(self.filter_label)
 
-        self.h_layout.addStretch()
-
-        self.progress_bar = QLabel(text="")
-        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.h_layout.addWidget(
-            self.progress_bar,
-            alignment=Qt.AlignmentFlag.AlignVCenter
-        )
-
-        self.sett_widget = SvgBtn_(SETTINGS_SVG, size=20)
+        self.sett_widget = QSvgWidget()
+        self.sett_widget.load("./images/settings.svg")
+        self.sett_widget.setFixedSize(20, 20)
         self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
         self.h_layout.addWidget(self.sett_widget)
 
