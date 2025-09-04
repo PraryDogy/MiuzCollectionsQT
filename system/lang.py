@@ -140,24 +140,6 @@ class Lng:
     move = ("Переместить", "Move files")
     drop_only_files = ("Можно загружать только файлы.", "Only files can be uploaded.")
     system_filter = ("Остальное", "Other")
-    page_one = (
-        "Папка с коллекциями:\n"
-        "- Папка, содержащая вложенные папки с изображениями.\n"
-        "- Папка с изображениями.",
-        "Collections folder:\n"
-        "- A folder containing subfolders with images.\n"
-        "- A folder with images."
-    )
-    page_two = (
-        "Фильтры:\n"
-        "- Продукт: изображения в папке 1 IMG\n"
-        "- Модели: изображения в папке 2 MODEL IMG\n"
-        "- Остальное: все, что не относится к фильтрам",
-        "Filters:\n"
-        "- Product: images in folder 1 IMG\n"
-        "- Models: images in folder 2 MODEL IMG\n"
-        "- Other: everything not related to the filters"
-    )
     help = ("Справка", "Help")
     help_descr = ("Показать окно справки", "Show help window")
     back = ("Назад", "Back")

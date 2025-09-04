@@ -1,14 +1,85 @@
 import os
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QLabel, QPushButton, QWidget
+from PyQt5.QtWidgets import (QLabel, QPushButton, QTreeWidget, QTreeWidgetItem,
+                             QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
 
+
+class PageOne(QTreeWidget):
+    def __init__(self):
+        super().__init__()
+        self.setHeaderHidden(True)
+
+        # Корневая папка
+        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[JsonData.lng]])
+
+        for i in range(1, 4):  # три подпапки
+            subfolder_item = QTreeWidgetItem(
+                folder_item,
+                [f"{Lng.collection[JsonData.lng]} {i}"]
+            )
+            for j in range(1, 4):  # три изображения в каждой
+                QTreeWidgetItem(
+                    subfolder_item,
+                    [f"{Lng.image[JsonData.lng]} {j}"]
+                )
+
+        self.expandAll()
+        
+
+class PageTwo(QTreeWidget):
+    def __init__(self):
+        super().__init__()
+        self.setHeaderHidden(True)
+
+        # Корневая папка
+        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[JsonData.lng]])
+
+        # Добавляем изображения напрямую в папку
+        for i in range(1, 11):  # четыре изображения
+            QTreeWidgetItem(folder_item, [f"{Lng.image[JsonData.lng]} {i}"])
+
+        self.expandAll()
+
+
+class PageThree(QTreeWidget):
+    filters = (
+        "1 IMG",
+        "2 MODEL IMG"
+    )
+    def __init__(self):
+        super().__init__()
+        self.setHeaderHidden(True)
+
+        # Корневая папка
+        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[JsonData.lng]])
+
+        # Коллекция
+        collection_item = QTreeWidgetItem(folder_item, [f"{Lng.collection[JsonData.lng]} 1"])
+
+        # 1 IMG
+        img1_item = QTreeWidgetItem(collection_item, [self.filters[0]])
+        for i in range(1, 4):
+            QTreeWidgetItem(img1_item, [f"{Lng.image[JsonData.lng]} {i}"])
+
+        # 2 MODEL IMG
+        img2_item = QTreeWidgetItem(collection_item, [self.filters[1]])
+        for i in range(1, 4):
+            QTreeWidgetItem(img2_item, [f"{Lng.image[JsonData.lng]} {i}"])
+
+        # Любая другая папка
+        other_folder_item = QTreeWidgetItem(folder_item, [f"{Lng.other_folders[JsonData.lng]}"])
+        for i in range(1, 4):
+            QTreeWidgetItem(other_folder_item, [f"{Lng.image[JsonData.lng]} {i}"])
+
+        self.expandAll()
+        
 
 class WinHelp(WinSystem):
 
@@ -24,36 +95,19 @@ class WinHelp(WinSystem):
         self.current_page = 0
         self.max_pages = 2
         self.page_list = [
-            lambda: self.create_page(Lng.page_one[JsonData.lng], 0),
-            lambda: self.create_page(Lng.page_one[JsonData.lng], 1),
-            lambda: self.create_page(Lng.page_two[JsonData.lng], 2)
+            lambda: self.create_page(PageOne, 0),
+            lambda: self.create_page(PageTwo, 1),
+            lambda: self.create_page(PageThree, 2)
         ]
 
         self.dynamic_wid = self.page_list[0]()
         self.central_layout.insertWidget(0, self.dynamic_wid)
         self.adjustSize()
-        self.setFixedSize(480, 320)
+        self.setFixedSize(400, 300)
 
-    def create_page(self, text: str, page_num: int):
-        v_wid = QWidget()
-        v_lay = UVBoxLayout()
-        v_lay.setSpacing(10)
-        v_wid.setLayout(v_lay)
-
-        descr = QLabel(text)
-        v_lay.addWidget(descr)
-
-        svg = f"example {page_num} {JsonData.lng}.svg"
-        svg = os.path.join(Static.INNER_IMAGES, svg)
-
-        svg_wid = QSvgWidget()
-        svg_wid.load(svg)
-        svg_wid.setFixedSize(svg_wid.sizeHint())
-        v_lay.addWidget(svg_wid, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        v_lay.addStretch()
-
-        return v_wid
+    def create_page(self, wid: QTreeWidget, page_num: int):
+        tree: QTreeWidget = wid()
+        return tree
 
     def btn_wid(self):
         btn_wid = QWidget()
