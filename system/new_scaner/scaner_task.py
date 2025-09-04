@@ -42,7 +42,7 @@ class ScanerTask(URunnable):
                 gc.collect()
                 print("scaner finished", i.name)
             else:
-                self.send_text(f"{i.name}: {Lng.no_connection[JsonData.lng].lower()}")
+                self.send_text(f"\"{i.name}\": {Lng.no_connection[JsonData.lng].lower()}")
                 sleep(5)
         try:
             self.send_text("")

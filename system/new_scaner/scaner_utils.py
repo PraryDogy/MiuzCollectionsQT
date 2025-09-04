@@ -29,7 +29,7 @@ class DirsLoader(QObject):
         dirs = []
         stack = [self.main_folder_path]
         self.progress_text.emit(
-            f"{Lng.search_in[JsonData.lng]} {self.main_folder.name}"
+            f"\"{self.main_folder.name}\": {Lng.search_in[JsonData.lng].lower()}"
         )
 
         def iter_dir(entry: os.DirEntry):
@@ -162,7 +162,7 @@ class ImgLoader(QObject):
         - [(abs_img_path, size, birth_time, mod_time), ...]    
         """
         self.progress_text.emit(
-            f"{Lng.search_in[JsonData.lng]} {self.main_folder.name}"
+            f"\"{self.main_folder.name}\": {Lng.search_in[JsonData.lng].lower()}"
         )
         finder_images = []
 
@@ -245,10 +245,6 @@ class ImgCompator:
 
 class HashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
-    lang = (
-        ("Обновление", "Updating"),
-    )
-
     def __init__(self, del_items: list, new_items: list, task_state: TaskState, main_folder: MainFolder):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
@@ -305,7 +301,7 @@ class HashdirUpdater(QObject):
     
     def send_text(self):
         self.progress_text.emit(
-            f"{Lng.updating[JsonData.lng]} {self.main_folder.name} ({self.total})"
+            f"\"{self.main_folder.name}\": {Lng.updating_folder[JsonData.lng].lower()} ({self.total})"
             )
 
     def create_thumb(self, img_path: str) -> ndarray | None:
