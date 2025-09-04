@@ -40,7 +40,7 @@ class ScanerTask(URunnable):
                 gc.collect()
                 print("scaner finished", i.name)
             else:
-                t = f"{i.name}: {Lng.no_connection.lower()}"
+                t = f"{i.name}: {Lng.no_connection[JsonData.lng].lower()}"
                 self.sigs.progress_text.emit(t)
                 sleep(5)
             

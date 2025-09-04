@@ -260,3 +260,4 @@ class Lng:
     upload_path = ("Директория загрузки", "Upload path")
     collections = ("Коллекции", "Collections")
     upload = ("Загрузка", "Upload")
+    collection = ("Коллекция", "Collection")

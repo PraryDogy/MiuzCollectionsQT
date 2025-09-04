@@ -17,7 +17,7 @@ class RemoveFilesWin(WinSystem):
 
     def __init__(self, img_path_list: list[str]):
         super().__init__()
-        self.setWindowTitle(Lng.attention)
+        self.setWindowTitle(Lng.attention[JsonData.lng])
         self.img_path_list = img_path_list
 
         first_row_wid = QWidget()
@@ -29,7 +29,7 @@ class RemoveFilesWin(WinSystem):
         warn = SvgBtn(self.warning_svg, RemoveFilesWin.svg_size)
         first_row_lay.addWidget(warn)
 
-        t = f"{Lng.move_to_trash} ({len(self.img_path_list)})?"
+        t = f"{Lng.move_to_trash[JsonData.lng]} ({len(self.img_path_list)})?"
         question = QLabel(text=t)
         first_row_lay.addWidget(question)
 
@@ -41,12 +41,12 @@ class RemoveFilesWin(WinSystem):
         h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         h_wid.setLayout(h_lay)
 
-        ok_btn = QPushButton(Lng.ok)
+        ok_btn = QPushButton(Lng.ok[JsonData.lng])
         ok_btn.clicked.connect(self.cmd_)
         ok_btn.setFixedWidth(90)
         h_lay.addWidget(ok_btn)
 
-        can_btn = QPushButton(Lng.cancel[JsonData.lang])
+        can_btn = QPushButton(Lng.cancel[JsonData.lng])
         can_btn.clicked.connect(self.deleteLater)
         can_btn.setFixedWidth(90)
         h_lay.addWidget(can_btn)

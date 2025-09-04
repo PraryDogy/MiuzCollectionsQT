@@ -26,18 +26,18 @@ class OpenInView(QAction):
     _clicked = pyqtSignal()
 
     def __init__(self, parent_: QMenu):
-        super().__init__(parent=parent_, text=Lng.view)
+        super().__init__(parent=parent_, text=Lng.view[JsonData.lng])
         self.triggered.connect(self._clicked.emit)
 
 
 class ScanerRestart(QAction):
     def __init__(self, parent: QMenu):
-        super().__init__(parent=parent, text=Lng.reload_gui)
+        super().__init__(parent=parent, text=Lng.reload_gui[JsonData.lng])
 
 
 class WinInfoAction(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        super().__init__(parent=parent, text=Lng.info)
+        super().__init__(parent=parent, text=Lng.info[JsonData.lng])
         self.parent_ = parent
         self.win_ = win
         self.rel_img_path_list = rel_img_path_list
@@ -63,7 +63,7 @@ class WinInfoAction(QAction):
 
 class CopyPath(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        text = f"{Lng.copy_filepath[JsonData.lang]} ({len(rel_img_path_list)})"
+        text = f"{Lng.copy_filepath[JsonData.lng]} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
@@ -86,7 +86,7 @@ class CopyPath(QAction):
 
 class CopyName(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, img_path_list: list[str]):
-        text = f"{Lng.copy_name} ({len(img_path_list)})"
+        text = f"{Lng.copy_name[JsonData.lng]} ({len(img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.parent_ = parent
         self.win_ = win
@@ -109,7 +109,7 @@ class CopyName(QAction):
 
 class ShowInFinder(QAction):
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        text = f"{Lng.reveal_in_finder} ({len(rel_img_path_list)})"
+        text = f"{Lng.reveal_in_finder[JsonData.lng]} ({len(rel_img_path_list)})"
         super().__init__(parent=parent, text=text)
         self.rel_img_path_list = rel_img_path_list
         self.parent_ = parent
@@ -138,11 +138,11 @@ class FavActionDb(QAction):
     def __init__(self, parent: QMenu, rel_img_path: str, fav_value:  int):
 
         if fav_value == 0 or fav_value is None:
-            t = Lng.add_to_favorites[JsonData.lang]
+            t = Lng.add_to_favorites[JsonData.lng]
             self.value = 1
 
         elif fav_value == 1:
-            t = Lng.remove_from_favorites[JsonData.lang]
+            t = Lng.remove_from_favorites[JsonData.lng]
             self.value = 0
 
         super().__init__(parent=parent, text=t)
@@ -163,9 +163,9 @@ class Save(QAction):
         - save_files: (папка назначения, список файлов для копирования)
         """
         if save_as:
-            text: str = Lng.save_image_in
+            text: str = Lng.save_image_in[JsonData.lng]
         else:
-            text: str = Lng.save_image_downloads
+            text: str = Lng.save_image_downloads[JsonData.lng]
         text = f"{text} ({len(rel_img_path_list)})"
 
         super().__init__(parent=parent, text=text)
@@ -207,15 +207,15 @@ class MenuTypes(QMenu):
         - reload_thumbnails()
         - update_bottom_bar()
         """
-        super().__init__(parent=parent, title=Lng.type_show)
+        super().__init__(parent=parent, title=Lng.type_show[JsonData.lng])
 
-        type_jpg = QAction(parent=self, text=Lng.type_jpg)
+        type_jpg = QAction(parent=self, text=Lng.type_jpg[JsonData.lng])
         type_jpg.setCheckable(True)
         cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.ext_non_layers)
         type_jpg.triggered.connect(cmd_jpg)
         self.addAction(type_jpg)
 
-        type_tiff = QAction(parent=self, text=Lng.type_tiff)
+        type_tiff = QAction(parent=self, text=Lng.type_tiff[JsonData.lng])
         type_tiff.setCheckable(True)
         cmd_tiff = lambda: self.cmd_(action_=type_tiff, type_=Static.ext_layers)
         type_tiff.triggered.connect(cmd_tiff)
@@ -242,17 +242,17 @@ class MenuTypes(QMenu):
 
 class RemoveFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text_ = f"{Lng.delete} ({total})"
+        text_ = f"{Lng.delete[JsonData.lng]} ({total})"
         super().__init__(text_, parent)
 
 
 class MoveFiles(QAction):
     def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
-        text = f"{Lng.move_files} ({len(rel_img_path_list)})"
+        text = f"{Lng.move_files[JsonData.lng]} ({len(rel_img_path_list)})"
         super().__init__(text=text, parent=parent)
 
 
 class OpenDefault(QAction):
     def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
-        text = f"{Lng.open_default} ({len(rel_img_path_list)})"
+        text = f"{Lng.open_default[JsonData.lng]} ({len(rel_img_path_list)})"
         super().__init__(text=text, parent=parent)

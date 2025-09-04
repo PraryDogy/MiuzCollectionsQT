@@ -254,11 +254,11 @@ class WinMain(UMainWindow):
     def set_window_title(self):
         main_folder = MainFolder.current.name.capitalize()
         if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            t = Lng.all_collections[JsonData.lang]
+            t = Lng.all_collections[JsonData.lng]
         elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-            t = Lng.favorites[JsonData.lang]
+            t = Lng.favorites[JsonData.lng]
         elif Dynamic.curr_coll_name == Static.NAME_RECENTS:
-            t = Lng.recents
+            t = Lng.recents[JsonData.lng]
         else:
             t = Dynamic.curr_coll_name
         t = f"{main_folder}: {t}"
@@ -396,7 +396,7 @@ class WinMain(UMainWindow):
         def set_below_label(data: tuple[int, int]):
             count, total = data
             self.copy_win.below_label.setText(
-                f"{Lng.copying[JsonData.lang]} {count} {Lng.from_[JsonData.lang]} {total}"
+                f"{Lng.copying[JsonData.lng]} {count} {Lng.from_[JsonData.lng]} {total}"
             )
 
         def set_above_label(text: str, dest_name: str):
@@ -406,7 +406,7 @@ class WinMain(UMainWindow):
 
         dest_name = os.path.basename(dest)
 
-        self.copy_win = ProgressbarWin(Lng.copying[JsonData.lang])
+        self.copy_win = ProgressbarWin(Lng.copying[JsonData.lng])
         self.copy_win.progressbar.setMaximum(100)
         self.copy_win.center_relative_parent(self)
         self.copy_win.show()
@@ -477,7 +477,7 @@ class WinMain(UMainWindow):
 
         for i in img_path_list:
             if os.path.isdir(i):
-                self.open_warn_win(Lng.attention, Lng.drop_only_files)
+                self.open_warn_win(Lng.attention[JsonData.lng], Lng.drop_only_files[JsonData.lng])
                 return
 
         if img_path_list:

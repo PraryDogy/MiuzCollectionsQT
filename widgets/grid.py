@@ -331,7 +331,7 @@ class Grid(VScrollArea):
             self.load_rubber()
             Thumbnail.calculate_size()
             if not db_images:
-                lbl = QLabel(Lng.no_photo)
+                lbl = QLabel(Lng.no_photo[JsonData.lng])
                 self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
                 self.grid_lay.setRowStretch(0, 1)
                 self.grid_lay.setColumnStretch(0, 1)
@@ -713,7 +713,7 @@ class Grid(VScrollArea):
             self.menu_.addAction(view)
 
             open_menu = UMenu(a0)
-            open_menu.setTitle(f"{Lng.open_in} ({len(rel_img_path_list)})")
+            open_menu.setTitle(f"{Lng.open_in[JsonData.lng]} ({len(rel_img_path_list)})")
             self.menu_.addMenu(open_menu)
 
             def open_def_cmd():
@@ -724,7 +724,7 @@ class Grid(VScrollArea):
                 path = MainUtils.get_abs_path(main_folder_path, rel_path)
                 subprocess.Popen(["open", path])
 
-            open_def = QAction(parent=open_menu, text=Lng.open_default)
+            open_def = QAction(parent=open_menu, text=Lng.open_default[JsonData.lng])
             open_def.triggered.connect(open_def_cmd)
             open_menu.addAction(open_def)
             open_menu.addSeparator()

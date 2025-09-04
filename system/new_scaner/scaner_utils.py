@@ -29,7 +29,7 @@ class DirsLoader(QObject):
         dirs = []
         stack = [self.main_folder_path]
         self.progress_text.emit(
-            f"{Lng.search_in[JsonData.lang]} {self.main_folder.name}"
+            f"{Lng.search_in[JsonData.lng]} {self.main_folder.name}"
         )
 
         def iter_dir(entry: os.DirEntry):
@@ -162,7 +162,7 @@ class ImgLoader(QObject):
         - [(abs_img_path, size, birth_time, mod_time), ...]    
         """
         self.progress_text.emit(
-            f"{Lng.search_in[JsonData.lang]} {self.main_folder.name}"
+            f"{Lng.search_in[JsonData.lng]} {self.main_folder.name}"
         )
         finder_images = []
 
@@ -305,7 +305,7 @@ class HashdirUpdater(QObject):
     
     def send_text(self):
         self.progress_text.emit(
-            f"{Lng.updating[JsonData.lang]} {self.main_folder.name} ({self.total})"
+            f"{Lng.updating[JsonData.lng]} {self.main_folder.name} ({self.total})"
             )
 
     def create_thumb(self, img_path: str) -> ndarray | None:

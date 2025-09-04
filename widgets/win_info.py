@@ -41,12 +41,12 @@ class Selectable(QLabel):
 
         menu_ = UMenu(event=ev)
 
-        label_text = Lng.copy[JsonData.lang]
+        label_text = Lng.copy[JsonData.lng]
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(lambda: MainUtils.copy_text(text))
         menu_.addAction(sel)
 
-        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder)
+        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[JsonData.lng])
         reveal.triggered.connect(
             lambda: MainUtils.reveal_files([full_text])
         )
@@ -63,7 +63,7 @@ class WinInfo(WinSystem):
 
     def __init__(self, img_path_list: list[str]):
         super().__init__()
-        self.setWindowTitle(Lng.info)
+        self.setWindowTitle(Lng.info[JsonData.lng])
         self.img_path_list = img_path_list
 
         wid = QWidget()

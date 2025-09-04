@@ -29,7 +29,7 @@ class DatesBtn(BarTopBtn):
     open_dates_win = pyqtSignal()
 
     def __init__(self):
-        super().__init__(text=Lng.dates[JsonData.lang])
+        super().__init__(text=Lng.dates[JsonData.lng])
 
     def open_win(self):
         self.open_dates_win.emit()
@@ -44,7 +44,7 @@ class FilterBtn(BarTopBtn):
     scroll_to_top = pyqtSignal()
 
     def __init__(self, filter: UserFilter):
-        super().__init__(text=filter.lang_names[JsonData.lang])
+        super().__init__(text=filter.lang_names[JsonData.lng])
 
         self.filter = filter
 

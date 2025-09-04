@@ -170,7 +170,7 @@ class Static:
 
 class JsonData:
     app_ver: str = Static.APP_VER
-    lang: int = 0
+    lng: int = 0
     dark_mode: int = 0
     scaner_minutes: int = 5
     new_scaner: int = True
