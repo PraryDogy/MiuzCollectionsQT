@@ -12,7 +12,7 @@ from system.main_folder import MainFolder
 from system.tasks import LoadCollListTask
 from system.utils import UThreadPool
 
-from ._base_widgets import UListWidgetItem, UMenu, VListWidget
+from ._base_widgets import UListSpaserItem, UListWidgetItem, UMenu, VListWidget
 from .win_warn import WinSmb
 
 
@@ -122,10 +122,7 @@ class CollList(VListWidget):
         self.addItem(recents_item)
         self.setItemWidget(recents_item, recents_btn)
 
-        # SPACER
-        spacer = UListWidgetItem(self)
-        spacer.setSizeHint(QSize(0, self.h_ // 2))  # 10 — высота отступа
-        spacer.setFlags(Qt.NoItemFlags)   # не кликабелен
+        spacer = UListSpaserItem(self)
         self.addItem(spacer)
 
         self.setCurrentRow(0)

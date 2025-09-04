@@ -16,11 +16,11 @@ from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
 
-from ._base_widgets import (UHBoxLayout, ULineEdit, UListWidgetItem, UMenu,
-                            UTextEdit, UVBoxLayout, VListWidget, WinChild,
-                            WinSystem)
+from ._base_widgets import (UHBoxLayout, ULineEdit, UListSpaserItem,
+                            UListWidgetItem, UMenu, UTextEdit, UVBoxLayout,
+                            VListWidget, WinChild, WinSystem)
 from .win_help import WinHelp
-from .win_warn import WinWarn, WinQuestion
+from .win_warn import WinQuestion, WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
 
@@ -639,8 +639,7 @@ class WinSettings(WinSystem):
         item = UListWidgetItem(self.left_menu, text=Lng.new_folder[JsonData.lng])
         self.left_menu.addItem(item)
         
-        spacer = UListWidgetItem(self.left_menu, height=15)
-        spacer.setFlags(Qt.NoItemFlags)
+        spacer = UListSpaserItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
         for i in MainFolder.list_:

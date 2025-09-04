@@ -281,8 +281,15 @@ class UListWidgetItem(QListWidgetItem):
         self.setSizeHint(QSize(parent.width(), height))
         if text:
             self.setText(text)
-            
-            
+
+
+class UListSpaserItem(QListWidgetItem):
+    def __init__(self, parent: QListWidget, height: int = 15):
+        super().__init__()
+        self.setSizeHint(QSize(parent.width(), height))
+        self.setFlags(Qt.ItemFlag.NoItemFlags)
+
+
 class VScrollArea(QScrollArea):
     def __init__(self):
         super().__init__()
