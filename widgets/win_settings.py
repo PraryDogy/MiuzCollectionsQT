@@ -539,6 +539,8 @@ class MainFolderSettings(QWidget):
         btn_lay.addWidget(remove_btn)
         btn_lay.addStretch()
         v_lay.addLayout(btn_lay)
+        
+        v_lay.addStretch()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -585,6 +587,8 @@ class NewFolder(QWidget):
         btn_lay.addWidget(add_btn)
         btn_lay.addStretch()
         v_lay.addLayout(btn_lay)
+        
+        v_lay.addStretch()
 
     def name_cmd(self):
         name = self.name_label.text().strip()
