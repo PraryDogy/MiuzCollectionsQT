@@ -67,10 +67,6 @@ class WinSmb(WinWarn):
 
 class WinQuestion(WinSystem):
     ok_clicked = pyqtSignal()
-    lang = (
-        ("Ок", "Ok"),
-        ("Отмена", "Cancel"),
-    )
 
     def __init__(self, title: str, text: str):
         super().__init__()

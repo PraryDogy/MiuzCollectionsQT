@@ -23,9 +23,8 @@ from .menu_left import MenuLeft
 from .progressbar_win import ProgressbarWin
 from .win_dates import WinDates
 from .win_image_view import WinImageView
-from .win_remove_files import RemoveFilesWin
 from .win_upload import WinUpload
-from .win_warn import WinSmb, WinWarn
+from .win_warn import WinQuestion, WinSmb, WinWarn
 
 
 class TestWid(QFrame):
@@ -334,26 +333,30 @@ class WinMain(UMainWindow):
             self.win_smb.show()
 
     def open_remove_files_win(self, rel_img_path_list: list):
+        
+        def task(img_path_list: list[str]):
+            task = RmFilesTask(img_path_list, MainFolder.current)
+            task.sigs.reload_gui.connect(self.grid.reload_thumbnails)
+            UThreadPool.start(task)
+
         main_folder_path = MainFolder.current.availability()
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
-            self.remove_files_win = RemoveFilesWin(img_path_list)
+            self.remove_files_win = WinQuestion(
+                Lng.attention[JsonData.lng],
+                f"{Lng.delete_forever[JsonData.lng]} ({len(img_path_list)})?"
+            )
             self.remove_files_win.center_relative_parent(self.window())
-            self.remove_files_win.finished_.connect(lambda: self.remove_task_start(img_path_list))
+            self.remove_files_win.ok_clicked.connect(lambda: task(img_path_list))
             self.remove_files_win.show()
         else:
             self.win_smb = WinSmb()
             self.win_smb.center_relative_parent(self.window())
             self.win_smb.show()
     
-    def remove_task_start(self, img_path_list: list[str]):
-        remove_files_task = RmFilesTask(img_path_list, MainFolder.current)
-        remove_files_task.sigs.reload_gui.connect(lambda: self.grid.reload_thumbnails())
-        UThreadPool.start(remove_files_task)
-
     def open_upload_win(self, img_path_list: list):
 
         def cmd(data):

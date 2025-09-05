@@ -131,7 +131,7 @@ class Lng:
     delete = ("Удалить", "Remove")
     copy_name = ("Скопировать имя", "Copy filename")
     attention = ("Внимание!", "Warning!")
-    move_to_trash = ("Удалить безвозвратно", "Delete forever")
+    delete_forever = ("Удалить безвозвратно файлы", "Delete forever files")
     theme_auto = ("Авто", "Auto")
     theme_dark = ("Темная", "Dark")
     theme_light = ("Светлая", "Light")
