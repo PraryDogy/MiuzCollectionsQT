@@ -394,8 +394,9 @@ class WinMain(UMainWindow):
             task.sigs.reload_thumbnails.connect(reload_gui)
             UThreadPool.start(task)
 
-        def copy_files_start(win: WinUpload):
-            main_folder, dest = win.get_selected_paths()  # Предполагаемый метод
+        def copy_files_start(win: WinUpload, data: tuple):
+            win.deleteLater()
+            main_folder, dest = data
             dest_name = os.path.basename(dest)
             progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
             progress_win.progressbar.setMaximum(100)
@@ -411,7 +412,7 @@ class WinMain(UMainWindow):
             win.deleteLater()
 
         self.win_upload = WinUpload()
-        self.win_upload.clicked.connect(lambda: copy_files_start(self.win_upload))
+        self.win_upload.clicked.connect(lambda data: copy_files_start(self.win_upload, data))
         self.win_upload.center_relative_parent(self.window())
         self.win_upload.show()
 
