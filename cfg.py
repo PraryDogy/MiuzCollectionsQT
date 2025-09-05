@@ -7,15 +7,15 @@ from datetime import datetime
 class ThumbData:
 
     # размер в пикселях по длинной стороне изображения для базы данных
-    DB_IMAGE_SIZE: int = 210
+    DB_IMAGE_SIZE = 210
     # ширина и высота grid.py > Thumb
     THUMB_H = [130, 150, 185, 270]
     THUMB_W = [145, 145, 180, 230]
     # максимальный размер изображения в пикселях для grid.py > Thumb
-    PIXMAP_SIZE: list = [50, 70, 100, 170]
+    PIXMAP_SIZE = [50, 70, 100, 170]
     # максимальное количество символов на строку для grid.py > Thumb
-    MAX_ROW: list = [20, 20, 25, 32]
-    CORNER: list = [4, 8, 14, 16]
+    MAX_ROW = [20, 20, 25, 32]
+    CORNER = [4, 8, 14, 16]
     # растояние между изображением и текстом для grid.py > Thumb
     SPACING = 2
     # дополнительное пространство вокруг изображения для grid.py > Thumb
@@ -23,13 +23,13 @@ class ThumbData:
 
 class Static:
     APP_VER = 3.00
-    APP_NAME: str = "Collections"
-    GRID_LIMIT: int = 100
-    NAME_ALL_COLLS: str = "___collections___"
-    NAME_FAVS: str = "___favorites___"
-    NAME_RECENTS: str = "___recents___"
+    APP_NAME = "Collections"
+    GRID_LIMIT = 100
+    NAME_ALL_COLLS = "___collections___"
+    NAME_FAVS = "___favorites___"
+    NAME_RECENTS = "___recents___"
     FOLDER_HASHDIR = "hashdir"
-    FOLDER_PRELOAD: str = "_preload"
+    FOLDER_PRELOAD = "_preload"
     APP_SUPPORT_DIR = os.path.expanduser(f"~/Library/Application Support/{APP_NAME}")
     APP_SUPPORT_JSON = f"{APP_SUPPORT_DIR}/cfg.json"
     APP_SUPPORT_DB = f"{APP_SUPPORT_DIR}/db.db"
@@ -137,7 +137,6 @@ class Static:
         padding-right: 2px;
     """
 
-
 class Cfg:
     app_ver: str = Static.APP_VER
     lng: int = 0
@@ -171,47 +170,35 @@ class Cfg:
         with open(Static.APP_SUPPORT_JSON, "r", encoding="utf-8") as file:
             try:
                 data: dict = json.load(file)
+                for k, v in data.items():
+                    if hasattr(cls, k):
+                        setattr(cls, k, v)
             except Exception as e:
-                print(e)
+                print("cfg, set json data error",e)
                 data = {}
-        
-        for k, v in data.items():
-            if hasattr(cls, k):
-                setattr(cls, k, v)
 
     @classmethod
-    def get_data(cls):
+    def get_data(cls, start: int = 2, end: int = 10):
         return {
-            k: v
-            for k, v in Cfg.__dict__.items()
-            if not k.startswith("__")
-            and
-            not isinstance(v, classmethod)
+            i: getattr(Cfg, i)
+            for i in list(vars(Cfg))[start:end]
         }
  
     @classmethod
     def write_json_data(cls):
-        data = cls.get_data()
         with open(Static.APP_SUPPORT_JSON, "w", encoding="utf-8") as file:
-            json.dump(data, file, ensure_ascii=False, indent=4)
+            json.dump(cls.get_data(), file, ensure_ascii=False, indent=4)
 
     @classmethod
     def check_dirs(cls):
-        if not all(os.path.exists(p) for p in (
-            Static.FOLDER_PRELOAD,
-            Static.PRELOAD_HASHDIR_ZIP,
-            Static.PRELOAD_DB
-        )):
+        dirs = (Static.FOLDER_PRELOAD, Static.PRELOAD_HASHDIR_ZIP, Static.PRELOAD_DB)
+        if not all(os.path.exists(p) for p in dirs):
             cls.make_internal_files()
-
         os.makedirs(Static.APP_SUPPORT_DIR, exist_ok=True)
-
         if not os.path.exists(Static.APP_SUPPORT_DB):
             cls.copy_preload_db()
-
         if not os.path.exists(Static.APP_SUPPORT_HASHDIR):
             cls.copy_preload_hashdir_zip()
-
         if not os.path.exists(Static.APP_SUPPORT_JSON):
             cls.write_json_data()
 

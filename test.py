@@ -1,13 +1,9 @@
-import os
-from cfg import Static
-
-a = os.path.join("images", "icon.icns")
-b = "./images/icon.icns"
+from cfg import Cfg
 
 
+a = {
+    i: getattr(Cfg, i)
+    for i in vars(Cfg).keys()[2:10]
+}
 
-app_support = os.path.expanduser("~/Library/Application Support")
-
-APP_SUPPORT_JSON_DATA: str = f"{app_support}/cfg.json"
-
-print(APP_SUPPORT_JSON_DATA)
+print(a)
