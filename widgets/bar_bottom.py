@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QFrame, QLabel, QSlider, QWidget
+from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 
 from cfg import Dynamic, JsonData, Static, ThumbData
 from system.lang import Lng
@@ -12,36 +12,34 @@ from ._base_widgets import SvgBtn, UHBoxLayout
 from .actions import MenuTypes
 from .win_settings import WinSettings
 
-SLIDER_STYLE = """
-    QSlider::groove:horizontal {
-        border-radius: 1px;
-        height: 3px;
-        margin: 0px;
-        background-color: rgba(111, 111, 111, 0.5);
-    }
-    QSlider::handle:horizontal {
-        background-color: rgba(199, 199, 199, 1);
-        height: 10px;
-        width: 10px;
-        border-radius: 5px;
-        margin: -4px 0;
-        padding: -4px 0px;
-    }
-"""
-
-SETTINGS_SVG = os.path.join(Static.INNER_IMAGES, "settings.svg")
-
 
 class BaseSlider(QSlider):
     _clicked = pyqtSignal()
 
-    def __init__(self, orientation: Qt.Orientation, minimum: int, maximum: int):
-        super().__init__(
-            orientation=orientation,
-            minimum=minimum,
-            maximum=maximum
-        )
-        self.setStyleSheet(SLIDER_STYLE)
+    def __init__(self, orientation: Qt.Orientation, min_: int, max_: int):
+        super().__init__()
+        self.setOrientation(orientation)
+        self.setMinimum(min_)
+        self.setMaximum(max_)
+
+        style = """
+            QSlider::groove:horizontal {
+                border-radius: 1px;
+                height: 3px;
+                margin: 0px;
+                background-color: rgba(111, 111, 111, 0.5);
+            }
+            QSlider::handle:horizontal {
+                background-color: rgba(199, 199, 199, 1);
+                height: 10px;
+                width: 10px;
+                border-radius: 5px;
+                margin: -4px 0;
+                padding: -4px 0px;
+            }
+        """
+        
+        self.setStyleSheet(style)
 
     def mousePressEvent(self, ev: QMouseEvent) -> None:
         if ev.button() != Qt.LeftButton:
@@ -64,8 +62,8 @@ class CustomSlider(BaseSlider):
     def __init__(self):
         super().__init__(
             orientation=Qt.Orientation.Horizontal,
-            minimum=0,
-            maximum=len(ThumbData.PIXMAP_SIZE) - 1
+            min_=0,
+            max_=len(ThumbData.PIXMAP_SIZE) - 1
         )
         self.setFixedWidth(80)
         self.setValue(Dynamic.thumb_size_ind)

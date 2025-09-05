@@ -1,27 +1,23 @@
-import os
-
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLineEdit
 
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, JsonData
 from system.lang import Lng
 
 from ._base_widgets import ULineEdit
 
-CLEAR_SVG = os.path.join(Static.INNER_IMAGES, "clear.svg")
-CLEAR_SIZE = 14
-INPUT_H = 28
-
 
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
+    svg_clear = "./images/clear.svg"
+    svg_size = 14
 
     def __init__(self, parent: QLineEdit):
         super().__init__(parent=parent)
-        self.setFixedSize(CLEAR_SIZE, CLEAR_SIZE)
-        self.load(CLEAR_SVG)
+        self.setFixedSize(self.svg_size, self.svg_size)
+        self.load(self.svg_clear)
 
     def disable(self):
         self.hide()
@@ -53,8 +49,8 @@ class WidSearch(ULineEdit):
         self.clear_btn.clicked_.connect(self.clear_search)
         self.clear_btn.disable()
         self.clear_btn.move(
-            self.width() - CLEAR_SIZE - 8,
-            INPUT_H // 4
+            self.width() - ClearBtn.svg_size - 8,
+            (ClearBtn.svg_size * 2) // 4
         )
 
     def create_search(self, new_text):

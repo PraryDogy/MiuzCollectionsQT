@@ -92,7 +92,7 @@ class App(QApplication):
         UThreadPool.init()
         ThemeChanger.init()
 
-        icon_path = os.path.join(Static.INNER_IMAGES, "icon.icns")
+        icon_path = "./images/icon.icns"
         icon = QIcon(icon_path)
         self.setWindowIcon(icon)
 

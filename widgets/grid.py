@@ -203,7 +203,7 @@ class Thumbnail(QFrame):
 
 class UpBtn(QFrame):
     scroll_to_top = pyqtSignal()
-    icon = os.path.join(Static.INNER_IMAGES, "up.svg")
+    icon = "./images/up.svg"
     icon_size = 44
 
     def __init__(self, parent: QWidget = None):
@@ -866,7 +866,7 @@ class Grid(VScrollArea):
 
         self.drag = QDrag(self)
         self.mime_data = QMimeData()
-        img = os.path.join(Static.INNER_IMAGES, "copy_files.png")
+        img = "./images/copy_files.png"
         img = QPixmap(img)
         self.drag.setPixmap(img)
         

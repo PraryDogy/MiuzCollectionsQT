@@ -12,7 +12,6 @@ from system.utils import MainUtils
 from ._base_widgets import UMenu, WinSystem
 from .win_settings import WinSettings
 
-ICON_SVG = os.path.join(Static.INNER_IMAGES, "icon.svg")
 
 class SelectableLabel(QLabel):
     def __init__(self, parent):
@@ -56,7 +55,8 @@ class AboutWin(WinSystem):
         self.setWindowTitle(Static.APP_NAME)
         self.setFixedSize(280, 240)
 
-        icon = QSvgWidget(ICON_SVG)
+        icon = QSvgWidget()
+        icon.load("./images/icon.svg")
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(150, 130)
         self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)

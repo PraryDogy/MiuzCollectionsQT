@@ -262,6 +262,9 @@ class ThemesBtn(QFrame):
 
 class Themes(QGroupBox):
     theme_changed = pyqtSignal()
+    svg_theme_system = "./images/system_theme.svg"
+    svg_theme_dark = "./images/dark_theme.svg"
+    svg_theme_light = "./images/light_theme.svg"
 
     def __init__(self):
         super().__init__()
@@ -274,15 +277,15 @@ class Themes(QGroupBox):
         self.frames = []
 
         self.system_theme = ThemesBtn(
-            os.path.join(Static.INNER_IMAGES, "system_theme.svg"),
+            self.svg_theme_system,
             Lng.theme_auto[JsonData.lng]
         )
         self.dark_theme = ThemesBtn(
-            os.path.join(Static.INNER_IMAGES,"dark_theme.svg"),
+            self.svg_theme_dark,
             Lng.theme_dark[JsonData.lng]
         )
         self.light_theme = ThemesBtn(
-            os.path.join(Static.INNER_IMAGES,"light_theme.svg"),
+            self.svg_theme_light,
             Lng.theme_light[JsonData.lng]
         )
 
@@ -351,14 +354,14 @@ class SelectableLabel(QLabel):
 
 
 class AboutWid(QGroupBox):
-    icon_svg = os.path.join(Static.INNER_IMAGES, "icon.svg")
+    svg_icon = "./images/icon.svg"
 
     def __init__(self):
         super().__init__()
         h_lay = UHBoxLayout()
         self.setLayout(h_lay)
 
-        icon = QSvgWidget(self.icon_svg)
+        icon = QSvgWidget(self.svg_icon)
         icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         icon.setFixedSize(85, 85)
         h_lay.addWidget(icon)

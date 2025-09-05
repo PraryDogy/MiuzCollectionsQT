@@ -1,22 +1,23 @@
-import os
-
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QSpacerItem,
-                             QWidget)
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
-from cfg import JsonData, Static
+from cfg import JsonData
 from system.lang import Lng
-from system.main_folder import MainFolder
-from system.utils import MainUtils
 
-from ._base_widgets import (SvgBtn, UHBoxLayout, UTextEdit, UVBoxLayout,
-                            WinSystem)
-
-WARNING_SVG = os.path.join(Static.INNER_IMAGES, "warning.svg")
+from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
 
 
-class WinWarn(WinSystem):
+class BaseWinWarn(WinSystem):
+    svg_warning = "./images/warning.svg"
+    svg_size = 40
+
+    def __init__(sefl):
+        super().__init__()
+        
+
+class WinWarn(BaseWinWarn):
     def __init__(self, title: str, text: str):
         super().__init__()
         self.setWindowTitle(title)
@@ -33,7 +34,9 @@ class WinWarn(WinSystem):
         h_layout = UHBoxLayout()
         h_wid.setLayout(h_layout)
 
-        warning = SvgBtn(WARNING_SVG, 40)
+        warning = QSvgWidget()
+        warning.load(self.svg_warning)
+        warning.setFixedSize(self.svg_size, self.svg_size)
         h_layout.addWidget(warning)
 
         h_layout.addSpacerItem(QSpacerItem(15, 0))
@@ -57,15 +60,7 @@ class WinWarn(WinSystem):
             self.deleteLater()
 
 
-class WinSmb(WinWarn):
-    def __init__(self):
-        super().__init__(
-            Lng.no_connection[JsonData.lng],
-            Lng.no_connection_descr[JsonData.lng]
-        )
-
-
-class WinQuestion(WinSystem):
+class WinQuestion(BaseWinWarn):
     ok_clicked = pyqtSignal()
 
     def __init__(self, title: str, text: str):
@@ -84,7 +79,7 @@ class WinQuestion(WinSystem):
         h_layout = UHBoxLayout()
         h_wid.setLayout(h_layout)
 
-        warning = SvgBtn(WARNING_SVG, 40)
+        warning = QSvgWidget(self.svg_warning, self.svg_size)
         h_layout.addWidget(warning)
 
         h_layout.addSpacerItem(QSpacerItem(15, 0))
@@ -125,3 +120,11 @@ class WinQuestion(WinSystem):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
             self.deleteLater()
+            
+
+class WinSmb(WinWarn):
+    def __init__(self):
+        super().__init__(
+            Lng.no_connection[JsonData.lng],
+            Lng.no_connection_descr[JsonData.lng]
+        )

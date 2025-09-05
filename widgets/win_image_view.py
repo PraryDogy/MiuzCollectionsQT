@@ -109,11 +109,11 @@ class ZoomBtns(QFrame):
         background-color: rgba(128, 128, 128, 0.40);
         border-radius: 15px;
     """
-    size_ = 45
-    zoom_out_svg = os.path.join(Static.INNER_IMAGES, "zoom_out.svg")
-    zoom_in_svg = os.path.join(Static.INNER_IMAGES, "zoom_in.svg")
-    zoom_fit_svg = os.path.join(Static.INNER_IMAGES, "zoom_fit.svg")
-    zoom_close_svg = os.path.join(Static.INNER_IMAGES, "zoom_close.svg")
+    svg_size = 45
+    svg_zoom_out = "./images/zoom_out.svg"
+    svg_zoom_in = "./images/zoom_in.svg"
+    svg_zoom_fit = "./images/zoom_fit.svg"
+    svg_zoom_close = "./images/zoom_close.svg"
 
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
@@ -124,19 +124,19 @@ class ZoomBtns(QFrame):
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
 
-        self.zoom_out = SvgShadowed(self.zoom_out_svg, self.size_)
+        self.zoom_out = SvgShadowed(self.svg_zoom_out, self.svg_size)
         h_layout.addWidget(self.zoom_out)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_in = SvgShadowed(self.zoom_in_svg, self.size_)
+        self.zoom_in = SvgShadowed(self.svg_zoom_in, self.svg_size)
         h_layout.addWidget(self.zoom_in)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_fit = SvgShadowed(self.zoom_fit_svg, self.size_)
+        self.zoom_fit = SvgShadowed(self.svg_zoom_fit, self.svg_size)
         h_layout.addWidget(self.zoom_fit)
         h_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        self.zoom_close = SvgShadowed(self.zoom_close_svg, self.size_)
+        self.zoom_close = SvgShadowed(self.svg_zoom_close, self.svg_size)
         h_layout.addWidget(self.zoom_close)
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
@@ -164,28 +164,26 @@ class SwitchImageBtn(QFrame):
 
 
 class PrevImageBtn(SwitchImageBtn):
-    svg_ = os.path.join(Static.INNER_IMAGES, "prev.svg")
+    svg_prev = "./images/prev.svg"
 
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(self.svg_, parent)
+        super().__init__(self.svg_prev, parent)
 
 
 class NextImageBtn(SwitchImageBtn):
-    svg_ = os.path.join(Static.INNER_IMAGES, "next.svg")
+    svg_next = "./images/next.svg"
 
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(self.svg_, parent)
+        super().__init__(self.svg_next, parent)
 
 
 class WinImageView(WinChild):
     task_count_limit = 10
-    switch_image_sig = pyqtSignal(object)
+    switch_image_sig = pyqtSignal(str)
     closed_ = pyqtSignal()
     ww, hh = 700, 500
     min_w, min_h = 500, 400
-    style_ = """
-        background: black;
-    """
+    window_style = """background: black;"""
 
     def __init__(self, rel_img_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
@@ -198,7 +196,7 @@ class WinImageView(WinChild):
         self.wid = path_to_wid.get(self.rel_img_path)
         self.task_count = 0
 
-        self.setStyleSheet(self.style_)
+        self.setStyleSheet(self.window_style)
         self.setMinimumSize(QSize(self.min_w, self.min_h))
         self.resize(self.ww, self.hh)
         self.installEventFilter(self)
