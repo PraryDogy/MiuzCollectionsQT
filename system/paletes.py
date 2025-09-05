@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import QApplication
 
-from cfg import JsonData
+from cfg import Cfg
 
 
 class UPallete:
@@ -48,12 +48,12 @@ class ThemeChanger:
     @classmethod
     def init(cls):
         app: QApplication = QApplication.instance()
-        if JsonData.dark_mode == 0:
+        if Cfg.dark_mode == 0:
             app.setPalette(QPalette())
             app.setStyle("macintosh")
-        elif JsonData.dark_mode == 1:
+        elif Cfg.dark_mode == 1:
             app.setPalette(UPallete.dark())
             app.setStyle("Fusion")
-        elif JsonData.dark_mode == 2:
+        elif Cfg.dark_mode == 2:
             app.setPalette(UPallete.light())
             app.setStyle("Fusion")

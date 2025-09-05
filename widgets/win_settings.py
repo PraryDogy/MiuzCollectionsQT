@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QFrame,
                              QGroupBox, QLabel, QPushButton, QSpacerItem,
                              QSpinBox, QSplitter, QTabWidget, QWidget)
 
-from cfg import JsonData, Static
+from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
@@ -35,7 +35,7 @@ class LangReset(QGroupBox):
         ("Сбросить настройки", "Reset settings"),
     )
 
-    def __init__(self, json_data_copy: JsonData):
+    def __init__(self, json_data_copy: Cfg):
         super().__init__()
         self.json_data = json_data_copy
 
@@ -48,12 +48,12 @@ class LangReset(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.lang_btn = QPushButton(text=Lng.russian[JsonData.lng])
+        self.lang_btn = QPushButton(text=Lng.russian[Cfg.lng])
         self.lang_btn.setFixedWidth(115)
         self.lang_btn.clicked.connect(self.lang_btn_cmd)
         first_row_lay.addWidget(self.lang_btn)
 
-        self.lang_label = QLabel(Lng.language[JsonData.lng])
+        self.lang_label = QLabel(Lng.language[Cfg.lng])
         first_row_lay.addWidget(self.lang_label)
 
         sec_row_wid = QWidget()
@@ -62,13 +62,13 @@ class LangReset(QGroupBox):
         sec_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_row_wid.setLayout(sec_row_lay)
 
-        self.reset_data_btn = QPushButton(Lng.reset[JsonData.lng])
+        self.reset_data_btn = QPushButton(Lng.reset[Cfg.lng])
         self.reset_data_btn.setFixedWidth(115)
         self.reset_data_btn.clicked.connect(self.changed.emit)
         self.reset_data_btn.clicked.connect(self.reset.emit)
         sec_row_lay.addWidget(self.reset_data_btn)
 
-        descr = QLabel(text=Lng.reset_settings[JsonData.lng])
+        descr = QLabel(text=Lng.reset_settings[Cfg.lng])
         sec_row_lay.addWidget(descr)
 
         v_lay.addWidget(first_row_wid)
@@ -97,12 +97,12 @@ class SimpleSettings(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.show_files_btn = QPushButton(text=Lng.show[JsonData.lng])
+        self.show_files_btn = QPushButton(text=Lng.show[Cfg.lng])
         self.show_files_btn.setFixedWidth(115)
         self.show_files_btn.clicked.connect(self.show_files_cmd)
         first_row_lay.addWidget(self.show_files_btn)
 
-        self.lang_label = QLabel(Lng.show_system_files[JsonData.lng])
+        self.lang_label = QLabel(Lng.show_system_files[Cfg.lng])
         first_row_lay.addWidget(self.lang_label)
 
         sec_row_wid = QWidget()
@@ -111,12 +111,12 @@ class SimpleSettings(QGroupBox):
         sec_row_lay.setSpacing(15)
         sec_row_wid.setLayout(sec_row_lay)
 
-        self.help_btn = QPushButton(text=Lng.help_[JsonData.lng])
+        self.help_btn = QPushButton(text=Lng.help_[Cfg.lng])
         self.help_btn.setFixedWidth(115)
         self.help_btn.clicked.connect(self.show_help)
         sec_row_lay.addWidget(self.help_btn)
 
-        self.lang_label = QLabel(Lng.show_help_window[JsonData.lng])
+        self.lang_label = QLabel(Lng.show_help_window[Cfg.lng])
         sec_row_lay.addWidget(self.lang_label)
 
     def show_files_cmd(self, *args):
@@ -134,7 +134,7 @@ class SimpleSettings(QGroupBox):
 class ScanerSettings(QGroupBox):
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: JsonData):
+    def __init__(self, json_data_copy: Cfg):
         super().__init__()
         self.json_data_copy = json_data_copy
 
@@ -152,12 +152,12 @@ class ScanerSettings(QGroupBox):
         self.spin = QSpinBox(self)
         self.spin.setMinimum(1)
         self.spin.setMaximum(60)
-        self.spin.setSuffix(f" {Lng.minutes[JsonData.lng]}")
+        self.spin.setSuffix(f" {Lng.minutes[Cfg.lng]}")
         self.spin.setValue(self.json_data_copy.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
         self.spin_lay.addWidget(self.spin)
 
-        label = QLabel(Lng.search_interval[JsonData.lng], self)
+        label = QLabel(Lng.search_interval[Cfg.lng], self)
         self.spin_lay.addWidget(label)
 
         self.theme_changed()
@@ -173,13 +173,13 @@ class ScanerSettings(QGroupBox):
         self.checkbox.setFixedWidth(115)
         first_lay.addWidget(self.checkbox)
 
-        self.checkbox_lbl = QLabel(Lng.fast_image_search[JsonData.lng])
+        self.checkbox_lbl = QLabel(Lng.fast_image_search[Cfg.lng])
         first_lay.addWidget(self.checkbox_lbl)
 
         if self.json_data_copy.new_scaner:
-            self.checkbox.setText(Lng.disable[JsonData.lng])
+            self.checkbox.setText(Lng.disable[Cfg.lng])
         else:
-            self.checkbox.setText(Lng.enable[JsonData.lng])
+            self.checkbox.setText(Lng.enable[Cfg.lng])
 
         self.checkbox.setChecked(True)
 
@@ -198,10 +198,10 @@ class ScanerSettings(QGroupBox):
     def change_new_scaner(self):
         if self.json_data_copy.new_scaner:
             self.json_data_copy.new_scaner = False
-            self.checkbox.setText(Lng.enable[JsonData.lng])
+            self.checkbox.setText(Lng.enable[Cfg.lng])
         else:
             self.json_data_copy.new_scaner = True
-            self.checkbox.setText(Lng.disable[JsonData.lng])
+            self.checkbox.setText(Lng.disable[Cfg.lng])
         self.changed.emit()
 
 
@@ -278,15 +278,15 @@ class Themes(QGroupBox):
 
         self.system_theme = ThemesBtn(
             self.svg_theme_system,
-            Lng.theme_auto[JsonData.lng]
+            Lng.theme_auto[Cfg.lng]
         )
         self.dark_theme = ThemesBtn(
             self.svg_theme_dark,
-            Lng.theme_dark[JsonData.lng]
+            Lng.theme_dark[Cfg.lng]
         )
         self.light_theme = ThemesBtn(
             self.svg_theme_light,
-            Lng.theme_light[JsonData.lng]
+            Lng.theme_light[Cfg.lng]
         )
 
         for f in (self.system_theme, self.dark_theme, self.light_theme):
@@ -294,11 +294,11 @@ class Themes(QGroupBox):
             self.frames.append(f)
             f.clicked.connect(self.on_frame_clicked)
 
-        if JsonData.dark_mode == 0:
+        if Cfg.dark_mode == 0:
             self.set_selected(self.system_theme)
-        elif JsonData.dark_mode == 1:
+        elif Cfg.dark_mode == 1:
             self.set_selected(self.dark_theme)
-        elif JsonData.dark_mode == 2:
+        elif Cfg.dark_mode == 2:
             self.set_selected(self.light_theme)
 
     def on_frame_clicked(self):
@@ -306,11 +306,11 @@ class Themes(QGroupBox):
         self.set_selected(sender)
 
         if sender == self.system_theme:
-            JsonData.dark_mode = 0
+            Cfg.dark_mode = 0
         elif sender == self.dark_theme:
-            JsonData.dark_mode = 1
+            Cfg.dark_mode = 1
         elif sender == self.light_theme:
-            JsonData.dark_mode = 2
+            Cfg.dark_mode = 2
 
         ThemeChanger.init()
         self.theme_changed.emit()
@@ -336,13 +336,13 @@ class SelectableLabel(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lng])
+        copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Lng.copy_all[JsonData.lng])
+        select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng])
         select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -376,7 +376,7 @@ class GeneralSettings(QWidget):
     reset = pyqtSignal()
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: JsonData):
+    def __init__(self, json_data_copy: Cfg):
         super().__init__()
         v_lay = UVBoxLayout()
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -444,7 +444,7 @@ class MainFolderPaths(DropableGroupBox):
         super().__init__()
         self.main_folder = main_folder
         self.text_changed.connect(self.set_data)
-        self.text_edit.setPlaceholderText(Lng.folder_path[JsonData.lng])
+        self.text_edit.setPlaceholderText(Lng.folder_path[Cfg.lng])
 
     def set_data(self, *args):
         self.main_folder.paths = self.get_data()
@@ -466,7 +466,7 @@ class StopList(DropableGroupBox):
         super().__init__()
         self.main_folder = main_folder
         self.text_changed.connect(self.set_data)
-        self.text_edit.setPlaceholderText(Lng.ignore_list[JsonData.lng])
+        self.text_edit.setPlaceholderText(Lng.ignore_list[Cfg.lng])
 
     def set_data(self, *args):
         self.main_folder.stop_list = self.get_data()
@@ -494,14 +494,14 @@ class MainFolderAdvanced(QWidget):
         sec_row = MainFolderPaths(main_folder)
         sec_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(sec_row)
-        sec_row.top_label.setText(Lng.collections_folder_path[JsonData.lng])
+        sec_row.top_label.setText(Lng.collections_folder_path[Cfg.lng])
         text_ = "\n".join(i for i in main_folder.paths)
         sec_row.text_edit.setPlainText(text_)
 
         third_row = StopList(main_folder)
         third_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(third_row)
-        third_row.top_label.setText(Lng.ignore_list_descr[JsonData.lng])
+        third_row.top_label.setText(Lng.ignore_list_descr[Cfg.lng])
         text_ = "\n".join(i for i in main_folder.stop_list)
         third_row.text_edit.setPlainText(text_)
 
@@ -524,7 +524,7 @@ class MainFolderSettings(QWidget):
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_lay.setSpacing(5)
         first_row.setLayout(first_lay)
-        name_descr = QLabel(Lng.folder_name[JsonData.lng] + ":")
+        name_descr = QLabel(Lng.folder_name[Cfg.lng] + ":")
         first_lay.addWidget(name_descr)
         name_label = QLabel(main_folder.name)
         first_lay.addWidget(name_label)
@@ -533,7 +533,7 @@ class MainFolderSettings(QWidget):
         advanced.changed.connect(self.changed.emit)
         v_lay.addWidget(advanced)
 
-        remove_btn = QPushButton(Lng.delete[JsonData.lng])
+        remove_btn = QPushButton(Lng.delete[Cfg.lng])
         remove_btn.clicked.connect(self.remove.emit)
         remove_btn.setFixedWidth(100)
 
@@ -574,14 +574,14 @@ class NewFolder(QWidget):
         first_lay.setSpacing(5)
         first_row.setLayout(first_lay)
         self.name_label = ULineEdit()
-        self.name_label.setPlaceholderText(Lng.folder_name_immutable[JsonData.lng])
+        self.name_label.setPlaceholderText(Lng.folder_name_immutable[Cfg.lng])
         self.name_label.textChanged.connect(self.name_cmd)
         first_lay.addWidget(self.name_label)
 
         self.advanced = MainFolderAdvanced(self.main_folder)
         v_lay.addWidget(self.advanced)
 
-        add_btn = QPushButton(Lng.save[JsonData.lng])
+        add_btn = QPushButton(Lng.save[Cfg.lng])
         add_btn.clicked.connect(self.save)
         add_btn.setFixedWidth(100)
 
@@ -600,27 +600,27 @@ class NewFolder(QWidget):
     def save(self):        
         if not self.main_folder.name:
             self.win_warn = WinWarn(
-                Lng.attention[JsonData.lng],
-                Lng.enter_folder_name[JsonData.lng]
+                Lng.attention[Cfg.lng],
+                Lng.enter_folder_name[Cfg.lng]
                 )
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
         elif any(i.name == self.main_folder.name for i in self.main_folder_list):
             t = (
-                f"{Lng.folder_name_error[JsonData.lng]}.",
-                f"{Lng.name[JsonData.lng]} \"{self.main_folder.name}\" {Lng.name_taken[JsonData.lng].lower()}."
+                f"{Lng.folder_name_error[Cfg.lng]}.",
+                f"{Lng.name[Cfg.lng]} \"{self.main_folder.name}\" {Lng.name_taken[Cfg.lng].lower()}."
                 )
             t = "\n".join(t)
             self.win_warn = WinWarn(
-                Lng.attention[JsonData.lng],
+                Lng.attention[Cfg.lng],
                 t
                 )
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
         elif not self.main_folder.paths:
             self.win_warn = WinWarn(
-                Lng.attention[JsonData.lng],
-                Lng.select_folder_path[JsonData.lng]
+                Lng.attention[Cfg.lng],
+                Lng.select_folder_path[Cfg.lng]
                 )
             self.win_warn.center_relative_parent(self.window())
             self.win_warn.show()
@@ -640,9 +640,9 @@ class WinSettings(WinSystem):
 
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.setWindowTitle(Lng.settings[JsonData.lng])
+        self.setWindowTitle(Lng.settings[Cfg.lng])
         self.main_folder_list = copy.deepcopy(MainFolder.list_)
-        self.json_data_copy = copy.deepcopy(JsonData())
+        self.json_data_copy = copy.deepcopy(Cfg())
         self.need_reset = False
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -655,10 +655,10 @@ class WinSettings(WinSystem):
         self.left_menu.clicked.connect(self.left_menu_click)
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = UListWidgetItem(self.left_menu, text=Lng.general[JsonData.lng])
+        main_settings_item = UListWidgetItem(self.left_menu, text=Lng.general[Cfg.lng])
         self.left_menu.addItem(main_settings_item)
 
-        item = UListWidgetItem(self.left_menu, text=Lng.new_folder[JsonData.lng])
+        item = UListWidgetItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
         self.left_menu.addItem(item)
         
         spacer = UListSpaserItem(self.left_menu)
@@ -684,12 +684,12 @@ class WinSettings(WinSystem):
         btns_wid.setLayout(btns_lay)
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.ok_btn = QPushButton(Lng.ok[JsonData.lng])
+        self.ok_btn = QPushButton(Lng.ok[Cfg.lng])
         self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(100)
         btns_lay.addWidget(self.ok_btn)
 
-        cancel_btn = QPushButton(Lng.cancel[JsonData.lng])
+        cancel_btn = QPushButton(Lng.cancel[Cfg.lng])
         cancel_btn.clicked.connect(self.deleteLater)
         cancel_btn.setFixedWidth(100)
         btns_lay.addWidget(cancel_btn)
@@ -706,7 +706,7 @@ class WinSettings(WinSystem):
         if ind == 0:
             self.gen_settings = GeneralSettings(self.json_data_copy)
             self.gen_settings.reset.connect(lambda: setattr(self, "need_reset", True))
-            self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[JsonData.lng]))
+            self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             self.right_lay.insertWidget(0, self.gen_settings)
         elif ind == 1:
             self.new_folder = NewFolder(self.main_folder_list)
@@ -722,7 +722,7 @@ class WinSettings(WinSystem):
             if len(main_folder) == 1:
                 item = self.left_menu.currentItem()
                 main_folder_sett = MainFolderSettings(main_folder[0])
-                main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[JsonData.lng]))
+                main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
                 main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder[0], item))
                 self.right_lay.insertWidget(0, main_folder_sett)
             else:
@@ -736,7 +736,7 @@ class WinSettings(WinSystem):
         self.left_menu.setCurrentItem(item)
         self.clear_right_side()
         self.init_right_side()
-        self.ok_btn.setText(Lng.restart[JsonData.lng])
+        self.ok_btn.setText(Lng.restart[Cfg.lng])
 
     def remove_main_folder(self, main_folder: MainFolder, item: UListWidgetItem):
 
@@ -746,20 +746,20 @@ class WinSettings(WinSystem):
             self.left_menu.setCurrentRow(0)
             self.clear_right_side()
             self.init_right_side()
-            self.ok_btn.setText(Lng.restart[JsonData.lng])
+            self.ok_btn.setText(Lng.restart[Cfg.lng])
 
         try:
             if len(self.main_folder_list) == 1:
                 self.win_warn = WinWarn(
-                    Lng.attention[JsonData.lng],
-                    Lng.at_least_one_folder_required[JsonData.lng],
+                    Lng.attention[Cfg.lng],
+                    Lng.at_least_one_folder_required[Cfg.lng],
                 )
                 self.win_warn.center_relative_parent(self)
                 self.win_warn.show()
             else:
                 self.win_question = WinQuestion(
-                    Lng.attention[JsonData.lng],
-                    Lng.confirm_delete_folder[JsonData.lng],
+                    Lng.attention[Cfg.lng],
+                    Lng.confirm_delete_folder[Cfg.lng],
                 )
                 self.win_question.center_relative_parent(self)
                 self.win_question.ok_clicked.connect(fin)
@@ -783,21 +783,21 @@ class WinSettings(WinSystem):
             QApplication.quit()
             MainUtils.start_new_app()
 
-        elif self.ok_btn.text() == Lng.restart[JsonData.lng]:
+        elif self.ok_btn.text() == Lng.restart[Cfg.lng]:
             for i in self.main_folder_list:
                 if not i.paths:
                     self.win_warn = WinWarn(
-                        Lng.attention[JsonData.lng],
-                        f"{Lng.select_folder_path[JsonData.lng]} \"{i.name}\""
+                        Lng.attention[Cfg.lng],
+                        f"{Lng.select_folder_path[Cfg.lng]} \"{i.name}\""
                         )
                     self.win_warn.center_relative_parent(self.window())
                     self.win_warn.show()
                     return
             MainFolder.list_ = self.main_folder_list
             for k, v in vars(self.json_data_copy).items():
-                setattr(JsonData, k, v)
+                setattr(Cfg, k, v)
             MainFolder.write_json_data()
-            JsonData.write_json_data()
+            Cfg.write_json_data()
             QApplication.quit()
             MainUtils.start_new_app()
 

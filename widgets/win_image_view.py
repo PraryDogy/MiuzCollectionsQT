@@ -8,7 +8,7 @@ from PyQt5.QtGui import (QColor, QContextMenuEvent, QImage, QKeyEvent,
                          QResizeEvent)
 from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
-from cfg import JsonData, Static
+from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import LoadSingleImgTask
@@ -251,7 +251,7 @@ class WinImageView(WinChild):
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(0, 0, 0))
             self.image_label.set_image(pixmap)
-            t = f"{os.path.basename(self.rel_img_path)}\n{Lng.loading[JsonData.lng]}"
+            t = f"{os.path.basename(self.rel_img_path)}\n{Lng.loading[Cfg.lng]}"
             self.image_label.setText(t)
 
         main_folder_path = MainFolder.current.availability()
@@ -273,7 +273,7 @@ class WinImageView(WinChild):
                 pixmap = QPixmap(1, 1)
                 pixmap.fill(QColor(0, 0, 0))
                 self.image_label.set_image(pixmap)
-                t = f"{os.path.basename(self.img_path)}\n{Lng.read_file_error[JsonData.lng]}"
+                t = f"{os.path.basename(self.img_path)}\n{Lng.read_file_error[Cfg.lng]}"
                 self.image_label.setText(t)
 
         self.task_count += 1

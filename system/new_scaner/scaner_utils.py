@@ -5,7 +5,7 @@ import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import JsonData, Static, ThumbData
+from cfg import Cfg, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import MainFolder
@@ -29,7 +29,7 @@ class DirsLoader(QObject):
         dirs = []
         stack = [self.main_folder_path]
         self.progress_text.emit(
-            f"\"{self.main_folder.name}\": {Lng.search_in[JsonData.lng].lower()}"
+            f"\"{self.main_folder.name}\": {Lng.search_in[Cfg.lng].lower()}"
         )
 
         def iter_dir(entry: os.DirEntry):
@@ -162,7 +162,7 @@ class ImgLoader(QObject):
         - [(abs_img_path, size, birth_time, mod_time), ...]    
         """
         self.progress_text.emit(
-            f"\"{self.main_folder.name}\": {Lng.search_in[JsonData.lng].lower()}"
+            f"\"{self.main_folder.name}\": {Lng.search_in[Cfg.lng].lower()}"
         )
         finder_images = []
 
@@ -301,7 +301,7 @@ class HashdirUpdater(QObject):
     
     def send_text(self):
         self.progress_text.emit(
-            f"\"{self.main_folder.name}\": {Lng.updating_folder[JsonData.lng].lower()} ({self.total})"
+            f"\"{self.main_folder.name}\": {Lng.updating_folder[Cfg.lng].lower()} ({self.total})"
             )
 
     def create_thumb(self, img_path: str) -> ndarray | None:

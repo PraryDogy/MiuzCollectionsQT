@@ -6,7 +6,7 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import JsonData, Static, ThumbData
+from cfg import Cfg, Static, ThumbData
 from system.database import THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import MainFolder
@@ -110,8 +110,8 @@ class FinderImages(QObject):
         Пример: "Miuz (MainFolder.name): коллекция 3 из 10"
         """
         main_folder = self.main_folder.name.capitalize()
-        collection_name: str = Lng.collection[JsonData.lng]
-        return f"{main_folder}: {collection_name.lower()} {current} {Lng.from_[JsonData.lng]} {total}"
+        collection_name: str = Lng.collection[Cfg.lng]
+        return f"{main_folder}: {collection_name.lower()} {current} {Lng.from_[Cfg.lng]} {total}"
 
     def walk_subdir(self, subdir: str) -> list[tuple]:
         """
@@ -293,7 +293,7 @@ class HashdirUpdater(QObject):
         total: `len`
         """
         main_folder = self.main_folder.name.capitalize()
-        t = f"{main_folder}: {text.lower()} {x} {Lng.from_[JsonData.lng]} {total}"
+        t = f"{main_folder}: {text.lower()} {x} {Lng.from_[Cfg.lng]} {total}"
         self.progress_text.emit(t)
 
     def run_del_items(self):
@@ -304,7 +304,7 @@ class HashdirUpdater(QObject):
                 break
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
-                self.progressbar_text(Lng.deleting[JsonData.lng], x, total)
+                self.progressbar_text(Lng.deleting[Cfg.lng], x, total)
                 try:
                     os.remove(thumb_path)
                     folder = os.path.dirname(thumb_path)
@@ -332,7 +332,7 @@ class HashdirUpdater(QObject):
         for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
             if not self.task_state.should_run():
                 break
-            self.progressbar_text(Lng.adding[JsonData.lng], x, total)
+            self.progressbar_text(Lng.adding[Cfg.lng], x, total)
             try:
                 thumb = self.create_thumb(img_path)
                 thumb_path = ThumbUtils.create_thumb_path(img_path)
@@ -484,7 +484,7 @@ class MainFolderRemover(QObject):
         total = len(rows)
         for x, (id_, image_path) in enumerate(rows):
             try:
-                t = f"{Lng.deleting[JsonData.lng]}: {x} {Lng.from_[JsonData.lng]} {total}"
+                t = f"{Lng.deleting[Cfg.lng]}: {x} {Lng.from_[Cfg.lng]} {total}"
                 self.progress_text.emit(t)
 
                 if os.path.exists(image_path):

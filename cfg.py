@@ -117,9 +117,6 @@ class Static:
         *ext_tiff
     )
 
-    # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ # РАСШИРЕНИЯ     
-
-    # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ # СТИЛИ 
     blue_color = "rgb(46, 89, 203)"
     gray_color = "rgba(125, 125, 125, 0.5)"
     border_transparent = "2px solid transparent"
@@ -141,7 +138,7 @@ class Static:
     """
 
 
-class JsonData:
+class Cfg:
     app_ver: str = Static.APP_VER
     lng: int = 0
     dark_mode: int = 0
@@ -186,7 +183,7 @@ class JsonData:
     def get_data(cls):
         return {
             k: v
-            for k, v in JsonData.__dict__.items()
+            for k, v in Cfg.__dict__.items()
             if not k.startswith("__")
             and
             not isinstance(v, classmethod)

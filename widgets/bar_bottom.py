@@ -5,7 +5,7 @@ from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 
-from cfg import Dynamic, JsonData, Static, ThumbData
+from cfg import Dynamic, Cfg, Static, ThumbData
 from system.lang import Lng
 
 from ._base_widgets import SvgBtn, UHBoxLayout
@@ -92,7 +92,7 @@ class FilterBtn(QSvgWidget):
         # - update_bottom_bar()
         """
 
-        t = f"{Lng.show[JsonData.lng]}: {Lng.type_jpg[JsonData.lng]}, {Lng.type_tiff[JsonData.lng]}"
+        t = f"{Lng.show[Cfg.lng]}: {Lng.type_jpg[Cfg.lng]}, {Lng.type_tiff[Cfg.lng]}"
         super().__init__()
         self.load("./images/filter.svg")
         self.setFixedSize(18, 18)
@@ -173,19 +173,19 @@ class BarBottom(QWidget):
         types = []
 
         if Static.ext_non_layers in Dynamic.types:
-            types.append(Lng.type_jpg[JsonData.lng])
+            types.append(Lng.type_jpg[Cfg.lng])
 
         if Static.ext_layers in Dynamic.types:
-            types.append(Lng.type_tiff[JsonData.lng])
+            types.append(Lng.type_tiff[Cfg.lng])
 
         if not types:
             types = [
-                Lng.type_jpg[JsonData.lng],
-                Lng.type_tiff[JsonData.lng]
+                Lng.type_jpg[Cfg.lng],
+                Lng.type_tiff[Cfg.lng]
             ]
 
         types = ", ".join(types)
-        t = f"{Lng.show[JsonData.lng]}: {types}"
+        t = f"{Lng.show[Cfg.lng]}: {types}"
         self.filter_label.setText(t)
         self.filter_label.adjustSize()
 

@@ -1,6 +1,6 @@
-from cfg import JsonData
+from cfg import Cfg
 
-if JsonData.new_scaner:
+if Cfg.new_scaner:
     from .new_scaner.scaner_task import ScanerTask
     class ScanerTask(ScanerTask): ...
 else:

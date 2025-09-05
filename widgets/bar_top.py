@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLabel, QWidget
 
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Cfg, Static
 from system.filters import SystemFilter, UserFilter
 from system.lang import Lng
 
@@ -29,7 +29,7 @@ class DatesBtn(BarTopBtn):
     open_dates_win = pyqtSignal()
 
     def __init__(self):
-        super().__init__(text=Lng.dates[JsonData.lng])
+        super().__init__(text=Lng.dates[Cfg.lng])
 
     def open_win(self):
         self.open_dates_win.emit()
@@ -44,7 +44,7 @@ class FilterBtn(BarTopBtn):
     scroll_to_top = pyqtSignal()
 
     def __init__(self, filter: UserFilter):
-        super().__init__(text=filter.lang_names[JsonData.lng])
+        super().__init__(text=filter.lang_names[Cfg.lng])
 
         self.filter = filter
 

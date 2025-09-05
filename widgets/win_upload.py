@@ -4,7 +4,7 @@ import re
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QGroupBox, QLabel, QPushButton, QTabWidget, QWidget
 
-from cfg import JsonData
+from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import LoadDirsTask
@@ -97,7 +97,7 @@ class MainFolderList(VListWidget):
 class PathWindow(WinChild):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.upload_path[JsonData.lng])
+        self.setWindowTitle(Lng.upload_path[Cfg.lng])
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.text_label = QLabel()
         self.text_label.setWordWrap(True)
@@ -140,7 +140,7 @@ class WinUpload(WinChild):
  
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.upload[JsonData.lng])
+        self.setWindowTitle(Lng.upload[Cfg.lng])
         self.setFixedSize(650, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.central_layout.setSpacing(5)
@@ -151,10 +151,10 @@ class WinUpload(WinChild):
 
         self.main_folders = MainFolderList()
         self.main_folders.clicked.connect(self.main_folder_click)
-        self.tab_wid.addTab(self.main_folders, Lng.folders[JsonData.lng])
+        self.tab_wid.addTab(self.main_folders, Lng.folders[Cfg.lng])
 
         self.dirs_list = DirsList(MainFolder.current.curr_path)
-        self.tab_wid.addTab(self.dirs_list, Lng.collections[JsonData.lng])
+        self.tab_wid.addTab(self.dirs_list, Lng.collections[Cfg.lng])
 
         # новый бокс над кнопками
         self.info_box = PathWidget()
@@ -167,11 +167,11 @@ class WinUpload(WinChild):
         btn_lay = UHBoxLayout()
         btn_lay.setSpacing(10)
 
-        self.ok_btn = QPushButton(Lng.ok[JsonData.lng])
+        self.ok_btn = QPushButton(Lng.ok[Cfg.lng])
         self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(90)
 
-        self.cancel_btn = QPushButton(Lng.cancel[JsonData.lng])
+        self.cancel_btn = QPushButton(Lng.cancel[Cfg.lng])
         self.cancel_btn.clicked.connect(self.deleteLater)
         self.cancel_btn.setFixedWidth(90)
 

@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsDropShadowEffect,
                              QListWidgetItem, QMainWindow, QMenu, QScrollArea,
                              QTextEdit, QVBoxLayout, QWidget)
 
-from cfg import JsonData, Static
+from cfg import Cfg, Static
 from system.lang import Lng
 from system.utils import MainUtils
 import re
@@ -98,17 +98,17 @@ class ULineEdit(QLineEdit):
         self.menu_ = UMenu(event=a0)
         self.menu_.setFixedWidth(120)
 
-        sel = QAction(text=Lng.cut[JsonData.lng], parent=self.menu_)
+        sel = QAction(text=Lng.cut[Cfg.lng], parent=self.menu_)
         sel.triggered.connect(self.cut_selection)
         self.menu_.addAction(sel)
 
-        sel_all = QAction(text=Lng.copy[JsonData.lng], parent=self.menu_)
+        sel_all = QAction(text=Lng.copy[Cfg.lng], parent=self.menu_)
         sel_all.triggered.connect(
             lambda: MainUtils.copy_text(self.selectedText())
         )
         self.menu_.addAction(sel_all)
 
-        sel_all = QAction(text=Lng.paste[JsonData.lng], parent=self.menu_)
+        sel_all = QAction(text=Lng.paste[Cfg.lng], parent=self.menu_)
         sel_all.triggered.connect(self.paste_text)
         self.menu_.addAction(sel_all)
 
@@ -186,15 +186,15 @@ class UTextEdit(QTextEdit):
         menu_ = UMenu(event=a0)
         menu_.setFixedWidth(120)
 
-        sel = QAction(text=Lng.cut[JsonData.lng], parent=menu_)
+        sel = QAction(text=Lng.cut[Cfg.lng], parent=menu_)
         sel.triggered.connect(self.cut_selection)
         menu_.addAction(sel)
 
-        sel_all = QAction(text=Lng.copy[JsonData.lng], parent=menu_)
+        sel_all = QAction(text=Lng.copy[Cfg.lng], parent=menu_)
         sel_all.triggered.connect(self.copy_selection)
         menu_.addAction(sel_all)
 
-        sel_all = QAction(text=Lng.paste[JsonData.lng], parent=menu_)
+        sel_all = QAction(text=Lng.paste[Cfg.lng], parent=menu_)
         sel_all.triggered.connect(self.paste_text)
         menu_.addAction(sel_all)
 

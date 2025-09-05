@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 
-from cfg import Static, JsonData
+from cfg import Static, Cfg
 
 from .lang import Lng
 from .utils import MainUtils

@@ -10,7 +10,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 from sqlalchemy import select, update
 
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Cfg, Static
 
 from .database import THUMBS, Dbase
 from .filters import SystemFilter, UserFilter
@@ -175,7 +175,7 @@ class LoadCollListTask(URunnable):
         if not res:
             return list()
 
-        if JsonData.abc_sort:
+        if Cfg.abc_sort:
             return sorted(res, key=self.strip_to_first_letter)
         else:
             return list(res)
@@ -250,14 +250,14 @@ class SingleFileInfoTask(URunnable):
             thumb_path = ThumbUtils.create_thumb_path(self.url)
 
             res = {
-                Lng.file_name[JsonData.lng]: self.lined_text(name),
-                Lng.type_[JsonData.lng]: type_,
-                Lng.file_size[JsonData.lng]: size,
-                Lng.place[JsonData.lng]: self.lined_text(self.url),
-                Lng.thumb_path[JsonData.lng]: self.lined_text(thumb_path),
-                Lng.changed[JsonData.lng]: mod,
-                Lng.collection[JsonData.lng]: self.lined_text(coll),
-                Lng.resol[JsonData.lng]: Lng.calculating[JsonData.lng],
+                Lng.file_name[Cfg.lng]: self.lined_text(name),
+                Lng.type_[Cfg.lng]: type_,
+                Lng.file_size[Cfg.lng]: size,
+                Lng.place[Cfg.lng]: self.lined_text(self.url),
+                Lng.thumb_path[Cfg.lng]: self.lined_text(thumb_path),
+                Lng.changed[Cfg.lng]: mod,
+                Lng.collection[Cfg.lng]: self.lined_text(coll),
+                Lng.resol[Cfg.lng]: Lng.calculating[Cfg.lng],
                 }
             
             self.sigs.finished_.emit(res)
@@ -269,9 +269,9 @@ class SingleFileInfoTask(URunnable):
         except Exception as e:
             MainUtils.print_error()
             res = {
-                Lng.file_name[JsonData.lng]: self.lined_text(os.path.basename(self.url)),
-                Lng.place[JsonData.lng]: self.lined_text(self.url),
-                Lng.type_[JsonData.lng]: self.lined_text(os.path.splitext(self.url)[0])
+                Lng.file_name[Cfg.lng]: self.lined_text(os.path.basename(self.url)),
+                Lng.place[Cfg.lng]: self.lined_text(self.url),
+                Lng.type_[Cfg.lng]: self.lined_text(os.path.splitext(self.url)[0])
                 }
             self.sigs.finished_.emit(res)
 
@@ -313,9 +313,9 @@ class FilesInfoTask(URunnable):
             names = names + ", ..."
 
         res = {
-            Lng.file_name[JsonData.lng]: names,
-            Lng.total[JsonData.lng]: str(len(self.img_path_list)),
-            Lng.file_size[JsonData.lng]: self.get_total_size()
+            Lng.file_name[Cfg.lng]: names,
+            Lng.total[Cfg.lng]: str(len(self.img_path_list)),
+            Lng.file_size[Cfg.lng]: self.get_total_size()
         }
         self.sigs.finished_.emit(res)
 
@@ -475,7 +475,7 @@ class LoadDbImagesTask(URunnable):
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             else:
-                f_mod = f"{Lng.months[JsonData.lng][str(f_mod.month)]} {f_mod.year}"
+                f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
             if coll == basename:
                 coll = MainFolder.current.name
             item = LoadDbImagesItem(qimage, rel_img_path, coll, fav, f_mod)
@@ -629,7 +629,7 @@ class ScanSingleDirTask(URunnable):
         # обновление *имя папки* (*оставшееся число изображений*)
         def hashdir_text(value: int):
             self.sigs.progress_text.emit(
-                f"{Lng.search_in[JsonData.lng]} {self.main_folder.name} ({value})"
+                f"{Lng.search_in[Cfg.lng]} {self.main_folder.name} ({value})"
             )
 
         hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)

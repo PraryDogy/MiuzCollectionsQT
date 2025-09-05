@@ -3,7 +3,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
-from cfg import JsonData
+from cfg import Cfg
 from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
@@ -46,7 +46,7 @@ class WinWarn(BaseWinWarn):
     def __init__(self, title: str, text: str):
         super().__init__(title, text)
 
-        ok_btn = QPushButton(text=Lng.ok[JsonData.lng])
+        ok_btn = QPushButton(text=Lng.ok[Cfg.lng])
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.deleteLater)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -70,12 +70,12 @@ class WinQuestion(BaseWinWarn):
         btn_lay.setContentsMargins(0, 10, 0, 0)
         btn_wid.setLayout(btn_lay)
 
-        ok_btn = QPushButton(Lng.ok[JsonData.lng])
+        ok_btn = QPushButton(Lng.ok[Cfg.lng])
         ok_btn.clicked.connect(self.ok_clicked.emit)
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.close)
 
-        cancel_btn = QPushButton(Lng.cancel[JsonData.lng])
+        cancel_btn = QPushButton(Lng.cancel[Cfg.lng])
         cancel_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.deleteLater)
 
@@ -95,6 +95,6 @@ class WinQuestion(BaseWinWarn):
 class WinSmb(WinWarn):
     def __init__(self):
         super().__init__(
-            Lng.no_connection[JsonData.lng],
-            Lng.no_connection_descr[JsonData.lng]
+            Lng.no_connection[Cfg.lng],
+            Lng.no_connection_descr[Cfg.lng]
         )

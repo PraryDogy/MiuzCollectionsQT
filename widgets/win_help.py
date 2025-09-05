@@ -5,7 +5,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QLabel, QPushButton, QTreeWidget, QTreeWidgetItem,
                              QWidget)
 
-from cfg import JsonData, Static
+from cfg import Cfg, Static
 from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
@@ -17,17 +17,17 @@ class PageOne(QTreeWidget):
         self.setHeaderHidden(True)
 
         # Корневая папка
-        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[JsonData.lng]])
+        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[Cfg.lng]])
 
         for i in range(1, 4):  # три подпапки
             subfolder_item = QTreeWidgetItem(
                 folder_item,
-                [f"{Lng.collection[JsonData.lng]} {i}"]
+                [f"{Lng.collection[Cfg.lng]} {i}"]
             )
             for j in range(1, 4):  # три изображения в каждой
                 QTreeWidgetItem(
                     subfolder_item,
-                    [f"{Lng.image[JsonData.lng]} {j}"]
+                    [f"{Lng.image[Cfg.lng]} {j}"]
                 )
 
         self.expandAll()
@@ -39,11 +39,11 @@ class PageTwo(QTreeWidget):
         self.setHeaderHidden(True)
 
         # Корневая папка
-        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[JsonData.lng]])
+        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[Cfg.lng]])
 
         # Добавляем изображения напрямую в папку
         for i in range(1, 11):  # четыре изображения
-            QTreeWidgetItem(folder_item, [f"{Lng.image[JsonData.lng]} {i}"])
+            QTreeWidgetItem(folder_item, [f"{Lng.image[Cfg.lng]} {i}"])
 
         self.expandAll()
 
@@ -58,25 +58,25 @@ class PageThree(QTreeWidget):
         self.setHeaderHidden(True)
 
         # Корневая папка
-        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[JsonData.lng]])
+        folder_item = QTreeWidgetItem(self, [Lng.collection_folder[Cfg.lng]])
 
         # Коллекция
-        collection_item = QTreeWidgetItem(folder_item, [f"{Lng.collection[JsonData.lng]} 1"])
+        collection_item = QTreeWidgetItem(folder_item, [f"{Lng.collection[Cfg.lng]} 1"])
 
         # 1 IMG
         img1_item = QTreeWidgetItem(collection_item, [self.filters[0]])
         for i in range(1, 4):
-            QTreeWidgetItem(img1_item, [f"{Lng.image[JsonData.lng]} {i}"])
+            QTreeWidgetItem(img1_item, [f"{Lng.image[Cfg.lng]} {i}"])
 
         # 2 MODEL IMG
         img2_item = QTreeWidgetItem(collection_item, [self.filters[1]])
         for i in range(1, 4):
-            QTreeWidgetItem(img2_item, [f"{Lng.image[JsonData.lng]} {i}"])
+            QTreeWidgetItem(img2_item, [f"{Lng.image[Cfg.lng]} {i}"])
 
         # Любая другая папка
-        other_folder_item = QTreeWidgetItem(folder_item, [f"{Lng.other_folders[JsonData.lng]}"])
+        other_folder_item = QTreeWidgetItem(folder_item, [f"{Lng.other_folders[Cfg.lng]}"])
         for i in range(1, 4):
-            QTreeWidgetItem(other_folder_item, [f"{Lng.image[JsonData.lng]} {i}"])
+            QTreeWidgetItem(other_folder_item, [f"{Lng.image[Cfg.lng]} {i}"])
 
         self.expandAll()
         
@@ -85,11 +85,11 @@ class WinHelp(WinSystem):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.help[JsonData.lng])
+        self.setWindowTitle(Lng.help[Cfg.lng])
         self.central_layout.setContentsMargins(10, 5, 10, 5)
         self.central_layout.setSpacing(15)
 
-        descr = QLabel(Lng.help_text[JsonData.lng])
+        descr = QLabel(Lng.help_text[Cfg.lng])
         self.central_layout.insertWidget(0, descr)
 
         btn_wid_ = self.btn_wid()
@@ -119,12 +119,12 @@ class WinHelp(WinSystem):
 
         btn_lay.addStretch()
 
-        self.prev_btn = QPushButton(Lng.back[JsonData.lng])
+        self.prev_btn = QPushButton(Lng.back[Cfg.lng])
         self.prev_btn.clicked.connect(self.prev_page)
         self.prev_btn.setFixedWidth(100)
         btn_lay.addWidget(self.prev_btn)
 
-        self.next_btn = QPushButton(Lng.next_[JsonData.lng])
+        self.next_btn = QPushButton(Lng.next_[Cfg.lng])
         self.next_btn.clicked.connect(self.next_page)
         self.next_btn.setFixedWidth(100)
         btn_lay.addWidget(self.next_btn)

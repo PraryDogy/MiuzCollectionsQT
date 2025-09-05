@@ -6,7 +6,7 @@ from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
-from cfg import Dynamic, JsonData, Static, ThumbData
+from cfg import Dynamic, Cfg, Static, ThumbData
 from system.filters import UserFilter
 from system.lang import Lng
 from system.main_folder import MainFolder
@@ -191,7 +191,7 @@ class WinMain(UMainWindow):
         с помощью QTimer.singleShot.
         """
 
-        if JsonData.new_scaner:
+        if Cfg.new_scaner:
             from system.new_scaner.scaner_task import ScanerTask
         else:
             from system.old_scaner.scaner_task import ScanerTask
@@ -225,7 +225,7 @@ class WinMain(UMainWindow):
             self.scaner_task_canceled = False
             self.scaner_timer.start(1000)
         else:
-            self.scaner_timer.start(JsonData.scaner_minutes * 60 * 1000)
+            self.scaner_timer.start(Cfg.scaner_minutes * 60 * 1000)
 
     def restart_scaner_task(self):
         """
@@ -257,11 +257,11 @@ class WinMain(UMainWindow):
     def set_window_title(self):
         main_folder = MainFolder.current.name.capitalize()
         if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            t = Lng.all_collections[JsonData.lng]
+            t = Lng.all_collections[Cfg.lng]
         elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-            t = Lng.favorites[JsonData.lng]
+            t = Lng.favorites[Cfg.lng]
         elif Dynamic.curr_coll_name == Static.NAME_RECENTS:
-            t = Lng.recents[JsonData.lng]
+            t = Lng.recents[Cfg.lng]
         else:
             t = Dynamic.curr_coll_name
         t = f"{main_folder}: {t}"
@@ -275,7 +275,7 @@ class WinMain(UMainWindow):
         self.move(x, y)
 
     def on_exit(self):
-        JsonData.write_json_data()
+        Cfg.write_json_data()
         MainFolder.write_json_data()
         UserFilter.write_json_data()
         os._exit(0)
@@ -350,8 +350,8 @@ class WinMain(UMainWindow):
                 for i in rel_img_path_list
             ]
             self.remove_files_win = WinQuestion(
-                Lng.attention[JsonData.lng],
-                f"{Lng.delete_forever[JsonData.lng]} ({len(img_path_list)})?"
+                Lng.attention[Cfg.lng],
+                f"{Lng.delete_forever[Cfg.lng]} ({len(img_path_list)})?"
             )
             self.remove_files_win.center_relative_parent(self.window())
             self.remove_files_win.ok_clicked.connect(lambda: task(img_path_list))
@@ -403,17 +403,17 @@ class WinMain(UMainWindow):
         def set_below_label(data: tuple[int, int]):
             count, total = data
             self.copy_win.below_label.setText(
-                f"{Lng.copying[JsonData.lng]} {count} {Lng.from_[JsonData.lng]} {total}"
+                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
             )
 
         def set_above_label(text: str, dest_name: str):
             self.copy_win.above_label.setText(
-                f"\"{text}\" {Lng.in_[JsonData.lng]} \"{dest_name}\""
+                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
             )
 
         dest_name = os.path.basename(dest)
 
-        self.copy_win = ProgressbarWin(Lng.copying[JsonData.lng])
+        self.copy_win = ProgressbarWin(Lng.copying[Cfg.lng])
         self.copy_win.progressbar.setMaximum(100)
         self.copy_win.center_relative_parent(self)
         self.copy_win.show()
@@ -484,7 +484,7 @@ class WinMain(UMainWindow):
 
         for i in img_path_list:
             if os.path.isdir(i):
-                self.open_warn_win(Lng.attention[JsonData.lng], Lng.drop_only_files[JsonData.lng])
+                self.open_warn_win(Lng.attention[Cfg.lng], Lng.drop_only_files[Cfg.lng])
                 return
 
         if img_path_list:

@@ -3,7 +3,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLineEdit
 
-from cfg import Dynamic, JsonData
+from cfg import Dynamic, Cfg
 from system.lang import Lng
 
 from ._base_widgets import ULineEdit
@@ -43,7 +43,7 @@ class WidSearch(ULineEdit):
         self.setFixedWidth(150)
 
         self.textChanged.connect(self.create_search)
-        self.setPlaceholderText(Lng.search[JsonData.lng])
+        self.setPlaceholderText(Lng.search[Cfg.lng])
 
         self.clear_btn = ClearBtn(parent=self)
         self.clear_btn.clicked_.connect(self.clear_search)

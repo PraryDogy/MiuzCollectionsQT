@@ -71,7 +71,7 @@ from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget
 
-from cfg import JsonData, Static
+from cfg import Cfg, Static
 from system.database import Dbase
 from system.filters import UserFilter
 from system.lang import Lng
@@ -85,7 +85,7 @@ class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
 
-        JsonData.init()
+        Cfg.init()
         Dbase.init()
         MainFolder.init()
         UserFilter.init()

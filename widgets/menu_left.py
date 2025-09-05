@@ -6,7 +6,7 @@ from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QAction, QLabel, QTabWidget
 
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Cfg, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import LoadCollListTask
@@ -22,13 +22,13 @@ class BaseCollBtn(QLabel):
     def __init__(self, coll_name: str):
         self.coll_name = coll_name
         data = {
-            Static.NAME_ALL_COLLS: Lng.all_collections[JsonData.lng],
-            Static.NAME_RECENTS: Lng.recents[JsonData.lng],
-            Static.NAME_FAVS: Lng.favorites[JsonData.lng]
+            Static.NAME_ALL_COLLS: Lng.all_collections[Cfg.lng],
+            Static.NAME_RECENTS: Lng.recents[Cfg.lng],
+            Static.NAME_FAVS: Lng.favorites[Cfg.lng]
         }
         if coll_name in data:
             coll_name = data.get(coll_name)
-        if JsonData.abc_name:
+        if Cfg.abc_name:
             coll_name = re.sub(r'^[^A-Za-zА-Яа-я]+', '', coll_name)
         super().__init__(text=coll_name)
         self.setStyleSheet("padding-left: 5px;")
@@ -59,13 +59,13 @@ class CollBtn(BaseCollBtn):
     def contextMenuEvent(self, ev):
         self.context_menu = UMenu(ev)
 
-        preview = QAction(Lng.open[JsonData.lng], self.context_menu)
+        preview = QAction(Lng.open[Cfg.lng], self.context_menu)
         preview.triggered.connect(lambda: self.pressed_.emit())
         self.context_menu.addAction(preview)
 
         self.context_menu.addSeparator()
 
-        show_in_finder = QAction(Lng.reveal_in_finder[JsonData.lng], self.context_menu)
+        show_in_finder = QAction(Lng.reveal_in_finder[Cfg.lng], self.context_menu)
         show_in_finder.triggered.connect(lambda: self.reveal_cmd())
         self.context_menu.addAction(show_in_finder)
 
@@ -183,10 +183,10 @@ class MainFolderList(VListWidget):
 
     def contextMenuEvent(self, a0):
         menu = UMenu(a0)
-        open = QAction(Lng.open[JsonData.lng], menu)
+        open = QAction(Lng.open[Cfg.lng], menu)
         open.triggered.connect(lambda: self.cmd("view"))
         menu.addAction(open)
-        reveal = QAction(Lng.reveal_in_finder[JsonData.lng], menu)
+        reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
         reveal.triggered.connect(lambda: self.cmd("reveal"))
         menu.addAction(reveal)
         menu.show_()
@@ -217,12 +217,12 @@ class MenuLeft(QTabWidget):
         main_folders = MainFolderList(self)
         main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
         main_folders.double_clicked.connect(lambda: self.setCurrentIndex(1))
-        self.addTab(main_folders, Lng.folders[JsonData.lng])
+        self.addTab(main_folders, Lng.folders[Cfg.lng])
 
         self.collections_list = CollList()
         self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
         self.collections_list.set_window_title.connect(self.set_window_title.emit)
         self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
-        self.addTab(self.collections_list, Lng.collection[JsonData.lng])
+        self.addTab(self.collections_list, Lng.collection[Cfg.lng])
 
         self.setCurrentIndex(1)

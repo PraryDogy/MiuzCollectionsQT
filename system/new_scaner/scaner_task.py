@@ -3,7 +3,7 @@ from time import sleep
 
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
-from cfg import JsonData
+from cfg import Cfg
 
 from ..database import Dbase
 from ..lang import Lng
@@ -22,7 +22,7 @@ class ScanerSigs(QObject):
 
 class ScanerTask(URunnable):
     short_timer = 15000
-    long_timer = JsonData.scaner_minutes * 60 * 1000
+    long_timer = Cfg.scaner_minutes * 60 * 1000
 
     def __init__(self):
         """
@@ -42,7 +42,7 @@ class ScanerTask(URunnable):
                 gc.collect()
                 print("scaner finished", i.name)
             else:
-                self.send_text(f"\"{i.name}\": {Lng.no_connection[JsonData.lng].lower()}")
+                self.send_text(f"\"{i.name}\": {Lng.no_connection[Cfg.lng].lower()}")
                 sleep(5)
         try:
             self.send_text("")
