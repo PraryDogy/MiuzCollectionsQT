@@ -381,7 +381,7 @@ class RmFilesTask(URunnable):
                 os.remove(i)
                 files.append(i)
             except Exception as e:
-                MainUtils.print_error()
+                print("system, tasks, rm files task error", e)
         return files
 
     def remove_thumbs(self):

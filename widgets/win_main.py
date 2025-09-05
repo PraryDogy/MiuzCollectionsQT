@@ -195,13 +195,17 @@ class WinMain(UMainWindow):
             from system.new_scaner.scaner_task import ScanerTask
         else:
             from system.old_scaner.scaner_task import ScanerTask
+            
+        def reload_gui():
+            self.grid.reload_thumbnails()
+            self.reload_rubber()
+            self.left_menu.init_ui()
 
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
             self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
             self.scaner_task.sigs.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-            self.scaner_task.sigs.reload_gui.connect(lambda: self.grid.reload_thumbnails())
-            self.scaner_task.sigs.reload_gui.connect(lambda: self.left_menu.init_ui())
+            self.scaner_task.sigs.reload_gui.connect(reload_gui)
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
@@ -386,16 +390,22 @@ class WinMain(UMainWindow):
         UThreadPool.start(copy_files_task)
 
     def upload_task_finished(self, main_folder: MainFolder, img_path_list: list[str]):
+        
+        def reload_gui():
+            self.grid.reload_thumbnails()
+            self.reload_rubber()
+            self.left_menu.init_ui()
+
         try:
             self.win_downloads.deleteLater()
         except Exception:
             ...
+
         if img_path_list:
             scan_dir = os.path.dirname(img_path_list[0])
             self.single_dir_task = ScanSingleDirTask(main_folder, scan_dir)
             self.single_dir_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
-            self.single_dir_task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-            self.single_dir_task.sigs.reload_thumbnails.connect(self.reload_rubber)
+            self.single_dir_task.sigs.reload_thumbnails.connect(reload_gui)
             UThreadPool.start(self.single_dir_task)
 
     def copy_files_task(self, dest: str, img_path_list: list):

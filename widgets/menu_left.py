@@ -226,3 +226,5 @@ class MenuLeft(QTabWidget):
         self.addTab(self.collections_list, Lng.collection[Cfg.lng])
 
         self.setCurrentIndex(1)
+        
+        print(1)
