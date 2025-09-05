@@ -377,53 +377,43 @@ class WinMain(UMainWindow):
             win.above_label.setText(
                 f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
             )
-            
-        def copy_files_fin(files: list, win: ProgressbarWin, main_folder: MainFolder):
-            win.deleteLater()
-            MainUtils.reveal_files(files)
-            self.upload_task_finished(main_folder, files)
 
-        def copy_files_start(data: tuple, win: WinUpload):
-            win.deleteLater()
-            main_folder, dest = data
-            dest_name = os.path.basename(dest)
-
-            self.copy_win = ProgressbarWin(Lng.copying[Cfg.lng])
-            self.copy_win.progressbar.setMaximum(100)
-            self.copy_win.center_relative_parent(self)
-            self.copy_win.show()
-
-            task = CopyFilesTask(dest, img_path_list)
-            self.copy_win.cancel.connect(lambda: task.task_state.set_should_run(False))
-            task.sigs.value_changed.connect(self.copy_win.progressbar.setValue)
-            task.sigs.progress_changed.connect(lambda data: set_below_label(data, self.copy_win))
-            task.sigs.file_changed.connect(lambda text: set_above_label(text, dest_name, self.copy_win))
-            task.sigs.finished_.connect(lambda files: copy_files_fin(files, self.copy_win, main_folder))
-            UThreadPool.start(task)
-
-        self.win_upload = WinUpload()
-        self.win_upload.clicked.connect(lambda: copy_files_start(self.win_upload))
-        self.win_upload.center_relative_parent(self.window())
-        self.win_upload.show()
-
-    def upload_task_finished(self, main_folder: MainFolder, img_path_list: list[str]):
-        
         def reload_gui():
             self.grid.reload_thumbnails()
             self.reload_rubber()
             self.left_menu.init_ui()
 
-        try:
-            self.win_downloads.deleteLater()
-        except Exception:
-            ...
-
-        if img_path_list:
+        def copy_files_fin(files: list, win: ProgressbarWin, main_folder: MainFolder):
+            if not files:
+                return
+            win.deleteLater()
+            MainUtils.reveal_files(files)
             scan_dir = os.path.dirname(img_path_list[0])
-            self.single_dir_task = ScanSingleDirTask(main_folder, scan_dir)
-            self.single_dir_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
-            self.single_dir_task.sigs.reload_thumbnails.connect(reload_gui)
-            UThreadPool.start(self.single_dir_task)
+            task = ScanSingleDirTask(main_folder, scan_dir)
+            task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
+            task.sigs.reload_thumbnails.connect(reload_gui)
+            UThreadPool.start(task)
+
+        def copy_files_start(win: WinUpload):
+            main_folder, dest = win.get_selected_paths()  # Предполагаемый метод
+            dest_name = os.path.basename(dest)
+            progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
+            progress_win.progressbar.setMaximum(100)
+            progress_win.center_relative_parent(self)
+            progress_win.show()
+            task = CopyFilesTask(dest, img_path_list)
+            progress_win.cancel.connect(lambda: task.task_state.set_should_run(False))
+            task.sigs.value_changed.connect(progress_win.progressbar.setValue)
+            task.sigs.progress_changed.connect(lambda data: set_below_label(data, progress_win))
+            task.sigs.file_changed.connect(lambda text: set_above_label(text, dest_name, progress_win))
+            task.sigs.finished_.connect(lambda files: copy_files_fin(files, progress_win, main_folder))
+            UThreadPool.start(task)
+            win.deleteLater()
+
+        self.win_upload = WinUpload()
+        self.win_upload.clicked.connect(lambda: copy_files_start(self.win_upload))
+        self.win_upload.center_relative_parent(self.window())
+        self.win_upload.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
