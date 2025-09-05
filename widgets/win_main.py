@@ -367,27 +367,44 @@ class WinMain(UMainWindow):
     
     def open_upload_win(self, img_path_list: list):
 
-        def cmd(data):
-            try:
-                self.win_upload.deleteLater()
-            except Exception:
-                ...
-            self.upload_task_start(data, img_path_list)
+        def set_below_label(data: tuple[int, int], win: ProgressbarWin):
+            count, total = data
+            win.below_label.setText(
+                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
+            )
+
+        def set_above_label(text: str, dest_name: str, win: ProgressbarWin):
+            win.above_label.setText(
+                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
+            )
+            
+        def copy_files_fin(files: list, win: ProgressbarWin, main_folder: MainFolder):
+            win.deleteLater()
+            MainUtils.reveal_files(files)
+            self.upload_task_finished(main_folder, files)
+
+        def copy_files_start(data: tuple, win: WinUpload):
+            win.deleteLater()
+            main_folder, dest = data
+            dest_name = os.path.basename(dest)
+
+            self.copy_win = ProgressbarWin(Lng.copying[Cfg.lng])
+            self.copy_win.progressbar.setMaximum(100)
+            self.copy_win.center_relative_parent(self)
+            self.copy_win.show()
+
+            task = CopyFilesTask(dest, img_path_list)
+            self.copy_win.cancel.connect(lambda: task.task_state.set_should_run(False))
+            task.sigs.value_changed.connect(self.copy_win.progressbar.setValue)
+            task.sigs.progress_changed.connect(lambda data: set_below_label(data, self.copy_win))
+            task.sigs.file_changed.connect(lambda text: set_above_label(text, dest_name, self.copy_win))
+            task.sigs.finished_.connect(lambda files: copy_files_fin(files, self.copy_win, main_folder))
+            UThreadPool.start(task)
 
         self.win_upload = WinUpload()
-        self.win_upload.clicked.connect(cmd)
+        self.win_upload.clicked.connect(lambda: copy_files_start(self.win_upload))
         self.win_upload.center_relative_parent(self.window())
         self.win_upload.show()
-
-    def upload_task_start(self, data: tuple[MainFolder, str], img_path_list: list[str]):
-        main_folder, dest = data
-
-        copy_files_task = self.copy_files_task(dest, img_path_list)
-        copy_files_task.sigs.finished_.connect(MainUtils.reveal_files)
-        copy_files_task.sigs.finished_.connect(
-            lambda img_path_list: self.upload_task_finished(main_folder, img_path_list)
-        )
-        UThreadPool.start(copy_files_task)
 
     def upload_task_finished(self, main_folder: MainFolder, img_path_list: list[str]):
         
@@ -407,37 +424,6 @@ class WinMain(UMainWindow):
             self.single_dir_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
             self.single_dir_task.sigs.reload_thumbnails.connect(reload_gui)
             UThreadPool.start(self.single_dir_task)
-
-    def copy_files_task(self, dest: str, img_path_list: list):
-
-        def set_below_label(data: tuple[int, int]):
-            count, total = data
-            self.copy_win.below_label.setText(
-                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
-            )
-
-        def set_above_label(text: str, dest_name: str):
-            self.copy_win.above_label.setText(
-                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
-            )
-
-        dest_name = os.path.basename(dest)
-
-        self.copy_win = ProgressbarWin(Lng.copying[Cfg.lng])
-        self.copy_win.progressbar.setMaximum(100)
-        self.copy_win.center_relative_parent(self)
-        self.copy_win.show()
-
-        copy_files_task = CopyFilesTask(dest, img_path_list)
-        self.copy_win.cancel.connect(
-            lambda: copy_files_task.task_state.set_should_run(False)
-        )
-        copy_files_task.sigs.value_changed.connect(self.copy_win.progressbar.setValue)
-        copy_files_task.sigs.progress_changed.connect(set_below_label)
-        copy_files_task.sigs.file_changed.connect(lambda text: set_above_label(text, dest_name))
-        copy_files_task.sigs.finished_.connect(self.copy_win.deleteLater)
-
-        return copy_files_task
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
