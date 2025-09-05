@@ -56,6 +56,7 @@ class WinMain(UMainWindow):
     update_mins = 30
     min_w = 750
     ww, hh = 870, 500
+    left_side_width = 210
 
     def __init__(self, argv: list[str]):
         super().__init__()
@@ -128,7 +129,10 @@ class WinMain(UMainWindow):
 
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
-        splitter.setSizes([Static.MENU_LEFT_WIDTH, self.width() - Static.MENU_LEFT_WIDTH])
+        splitter.setSizes([
+            self.left_side_width,
+            self.width() - self.left_side_width
+        ])
 
         self.grid.setFocus()
 

@@ -636,6 +636,8 @@ class NewFolder(QWidget):
 
 
 class WinSettings(WinSystem):
+    left_side_width = 210
+
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setWindowTitle(Lng.settings[JsonData.lng])
@@ -694,7 +696,7 @@ class WinSettings(WinSystem):
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)
-        self.splitter.setSizes([Static.MENU_LEFT_WIDTH, 600])
+        self.splitter.setSizes([self.left_side_width, 600])
 
         self.init_right_side()
 

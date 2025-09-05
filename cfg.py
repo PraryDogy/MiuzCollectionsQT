@@ -47,7 +47,6 @@ class Static:
 
     HASHDIR_NAME = "hashdir"
     PRELOAD_NAME: str = "_preload"
-    INNER_IMAGES = "images"
 
     # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ 
     APP_SUPPORT_DIR: str = os.path.join(
