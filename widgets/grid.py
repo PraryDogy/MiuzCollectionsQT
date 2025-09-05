@@ -109,6 +109,7 @@ class TextAdvancedWid(QLabel):
 class Thumbnail(QFrame):
     reload_thumbnails = pyqtSignal()
     select = pyqtSignal(str)
+    sym_star = "\U00002605" + " "
 
     img_frame_size = 0
     pixmap_size = 0
@@ -129,7 +130,7 @@ class Thumbnail(QFrame):
         if fav == 0 or fav is None:
             self.name = os.path.basename(rel_img_path)
         elif fav == 1:
-            self.name = Static.STAR_SYM + os.path.basename(rel_img_path)
+            self.name = self.sym_star + os.path.basename(rel_img_path)
 
         self.v_layout = UVBoxLayout()
         self.v_layout.setSpacing(ThumbData.SPACING)
@@ -191,7 +192,7 @@ class Thumbnail(QFrame):
             self.name = os.path.basename(self.rel_img_path)
         elif value == 1:
             self.fav_value = value
-            self.name = Static.STAR_SYM + os.path.basename(self.rel_img_path)
+            self.name = self.sym_star + os.path.basename(self.rel_img_path)
 
         self.text_wid.name = self.name
         self.text_wid.set_text()

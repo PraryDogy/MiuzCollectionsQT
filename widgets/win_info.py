@@ -13,10 +13,8 @@ from ._base_widgets import UMenu, WinSystem
 
 
 class Selectable(QLabel):
-    lang = (
-        ("Копировать", "Copy"),
-
-    )
+    sym_line_feed = "\u000a"
+    sym_paragraph_sep = "\u2029"
 
     def __init__(self, text: str):
         super().__init__(text)
@@ -28,10 +26,11 @@ class Selectable(QLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
         text = self.selectedText()
-        text = text.replace(Static.PARAGRAPH_SEP, "")
-        text = text.replace(Static.LINE_FEED, "")
+        text = text.replace(self.sym_paragraph_sep, "")
+        text = text.replace(self.sym_line_feed, "")
 
-        full_text = self.text().replace(Static.PARAGRAPH_SEP, "").replace(Static.LINE_FEED, "")
+        full_text = self.text().replace(self.sym_paragraph_sep, "")
+        full_text = full_text.replace(self.sym_line_feed, "")
 
         is_path = bool(
             os.path.isdir(full_text)

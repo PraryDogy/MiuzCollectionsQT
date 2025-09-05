@@ -22,47 +22,21 @@ class ThumbData:
     OFFSET = 15
 
 class Static:
-
     APP_VER = 3.00
     APP_NAME: str = "Collections"
-
-    # в сетке изображений может отображаться за раз 150 штук
     GRID_LIMIT: int = 100
-
-    # ширина главного меню...
-    MENU_LEFT_WIDTH: int = 210
-
-    # внутренние имена для "все коллекции", "избранное", "недавние"
-    # можно задавать произвольные имена
     NAME_ALL_COLLS: str = "___collections___"
     NAME_FAVS: str = "___favorites___"
     NAME_RECENTS: str = "___recents___"
-
-    # для метки "избранное", произвольный
-    STAR_SYM = "\U00002605" + " "
-
-    # это символ новой строки в QLabel
-    PARAGRAPH_SEP = "\u2029"
-    LINE_FEED  = "\u000a"
-
-    HASHDIR_NAME = "hashdir"
-    PRELOAD_NAME: str = "_preload"
-
-    # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ # ДИРЕКТОРИИ 
-    APP_SUPPORT_DIR: str = os.path.join(
-        os.path.expanduser("~"),
-        "Library",
-        "Application Support",
-        APP_NAME
-        )
-
-    APP_SUPPORT_JSON_DATA: str = os.path.join(APP_SUPPORT_DIR, "cfg.json")
-    APP_SUPPORT_DB: str = os.path.join(APP_SUPPORT_DIR, "db.db")
-    APP_SUPPORT_HASHDIR: str = os.path.join(APP_SUPPORT_DIR, HASHDIR_NAME)
-
-    PRELOAD_DB: str = os.path.join(PRELOAD_NAME, "db.db")
-    PRELOAD_HASHDIR: str = os.path.join(PRELOAD_NAME, HASHDIR_NAME)
-    PRELOAD_HASHDIR_ZIP: str = os.path.join(PRELOAD_NAME, "hashdir.zip")
+    FOLDER_HASHDIR = "hashdir"
+    FOLDER_PRELOAD: str = "_preload"
+    APP_SUPPORT_DIR = os.path.expanduser(f"~/Library/Application Support/{APP_NAME}")
+    APP_SUPPORT_JSON = f"{APP_SUPPORT_DIR}/cfg.json"
+    APP_SUPPORT_DB = f"{APP_SUPPORT_DIR}/db.db"
+    APP_SUPPORT_HASHDIR = f"{APP_SUPPORT_DIR}/{FOLDER_HASHDIR}"
+    PRELOAD_DB = f"{FOLDER_PRELOAD}/db.db"
+    PRELOAD_HASHDIR = f"{FOLDER_PRELOAD}/{FOLDER_HASHDIR}"
+    PRELOAD_HASHDIR_ZIP = f"{FOLDER_PRELOAD}/hashdir.zip"
 
     ext_jpeg = (
         ".jpg", ".JPG",
@@ -197,7 +171,7 @@ class JsonData:
 
     @classmethod
     def set_json_data(cls):
-        with open(Static.APP_SUPPORT_JSON_DATA, "r", encoding="utf-8") as file:
+        with open(Static.APP_SUPPORT_JSON, "r", encoding="utf-8") as file:
             try:
                 data: dict = json.load(file)
             except Exception as e:
@@ -221,13 +195,13 @@ class JsonData:
     @classmethod
     def write_json_data(cls):
         data = cls.get_data()
-        with open(Static.APP_SUPPORT_JSON_DATA, "w", encoding="utf-8") as file:
+        with open(Static.APP_SUPPORT_JSON, "w", encoding="utf-8") as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
 
     @classmethod
     def check_dirs(cls):
         if not all(os.path.exists(p) for p in (
-            Static.PRELOAD_NAME,
+            Static.FOLDER_PRELOAD,
             Static.PRELOAD_HASHDIR_ZIP,
             Static.PRELOAD_DB
         )):
@@ -241,14 +215,14 @@ class JsonData:
         if not os.path.exists(Static.APP_SUPPORT_HASHDIR):
             cls.copy_preload_hashdir_zip()
 
-        if not os.path.exists(Static.APP_SUPPORT_JSON_DATA):
+        if not os.path.exists(Static.APP_SUPPORT_JSON):
             cls.write_json_data()
 
     @classmethod
     def make_internal_files(cls):
         print("Создаю пустую базу данных")
         print("Создаю пустую hashdir")
-        os.makedirs(Static.PRELOAD_NAME, exist_ok=True)
+        os.makedirs(Static.FOLDER_PRELOAD, exist_ok=True)
         open(Static.PRELOAD_DB, "w").close()
 
         os.makedirs(Static.PRELOAD_HASHDIR, exist_ok=True)
@@ -256,10 +230,10 @@ class JsonData:
         open(dummy_file, 'a').close()
 
         shutil.make_archive(
-            base_name=os.path.join(Static.PRELOAD_NAME, Static.HASHDIR_NAME), 
+            base_name=os.path.join(Static.FOLDER_PRELOAD, Static.FOLDER_HASHDIR), 
             format="zip",
-            root_dir=Static.PRELOAD_NAME,
-            base_dir=Static.HASHDIR_NAME
+            root_dir=Static.FOLDER_PRELOAD,
+            base_dir=Static.FOLDER_HASHDIR
         )
         shutil.rmtree(Static.PRELOAD_HASHDIR)
 
