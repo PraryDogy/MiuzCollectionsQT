@@ -13,22 +13,13 @@ class BaseWinWarn(WinSystem):
     svg_warning = "./images/warning.svg"
     svg_size = 40
 
-    def __init__(sefl):
-        super().__init__()
-        
-
-class WinWarn(BaseWinWarn):
     def __init__(self, title: str, text: str):
         super().__init__()
         self.setWindowTitle(title)
-        self.my_text = text
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
-        self.init_ui()
-        self.adjustSize()
 
-    def init_ui(self):
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
         h_layout = UHBoxLayout()
@@ -47,13 +38,20 @@ class WinWarn(BaseWinWarn):
         v_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         v_wid.setLayout(v_lay)
 
-        descr = QLabel(self.my_text)
+        descr = QLabel(text)
         v_lay.addWidget(descr)
+
+
+class WinWarn(BaseWinWarn):
+    def __init__(self, title: str, text: str):
+        super().__init__(title, text)
 
         ok_btn = QPushButton(text=Lng.ok[JsonData.lng])
         ok_btn.setFixedWidth(90)
-        ok_btn.clicked.connect(self.close)
+        ok_btn.clicked.connect(self.deleteLater)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        
+        self.adjustSize()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
@@ -64,36 +62,8 @@ class WinQuestion(BaseWinWarn):
     ok_clicked = pyqtSignal()
 
     def __init__(self, title: str, text: str):
-        super().__init__()
-        self.setWindowTitle(title)
-        self.my_text = text
+        super().__init__(title, text)
 
-        self.central_layout.setContentsMargins(10, 10, 10, 10)
-        self.central_layout.setSpacing(10)
-        self.init_ui()
-        self.adjustSize()
-
-    def init_ui(self):
-        h_wid = QWidget()
-        self.central_layout.addWidget(h_wid)
-        h_layout = UHBoxLayout()
-        h_wid.setLayout(h_layout)
-
-        warning = QSvgWidget(self.svg_warning, self.svg_size)
-        h_layout.addWidget(warning)
-
-        h_layout.addSpacerItem(QSpacerItem(15, 0))
-
-        v_wid = QWidget()
-        h_layout.addWidget(v_wid)
-        v_lay = UVBoxLayout()
-        v_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        v_wid.setLayout(v_lay)
-
-        descr = QLabel(self.my_text)
-        v_lay.addWidget(descr)
-
-        # кнопки
         btn_wid = QWidget()
         btn_lay = UHBoxLayout()
         btn_lay.setSpacing(10)
@@ -115,10 +85,10 @@ class WinQuestion(BaseWinWarn):
         btn_lay.addStretch()
 
         self.central_layout.addWidget(btn_wid)
-
+        self.adjustSize()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
+        if a0.key() in (Qt.Key.Key_Escape):
             self.deleteLater()
             
 
