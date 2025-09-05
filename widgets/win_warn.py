@@ -88,7 +88,7 @@ class WinQuestion(BaseWinWarn):
         self.adjustSize()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Escape):
+        if a0.key() in (Qt.Key.Key_Escape, ):
             self.deleteLater()
             
 
