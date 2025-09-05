@@ -130,10 +130,6 @@ class ShowInFinder(QAction):
 
 class FavActionDb(QAction):
     finished_ = pyqtSignal(int)
-    lang = (
-        ("Добавить в избранное", "Add to favorites"),
-        ("Удалить из избранного", "Remove from favorites"),
-    )
 
     def __init__(self, parent: QMenu, rel_img_path: str, fav_value:  int):
 

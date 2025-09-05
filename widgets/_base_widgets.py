@@ -62,11 +62,7 @@ class ULineEdit(QLineEdit):
     INPUT_H = 28
     LEFT_PADDING = 2
     RIGHT_PADDING = 28
-    lang = (
-        ("Копировать", "Copy"),
-        ("Вырезать", "Cut"),
 
-    )
     def __init__(self):
         f"""
         custom context menu
@@ -154,11 +150,6 @@ class SvgShadowed(SvgBtn):
 
 
 class UTextEdit(QTextEdit):
-    lang = (
-        ("Копировать", "Copy"),
-        ("Вырезать", "Cut"),
-
-    )
 
     def __init__(self):
         """

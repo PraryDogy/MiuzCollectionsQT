@@ -413,9 +413,7 @@ class Inspector:
 
 
 class MainFolderRemover:
-    lang = (
-        ("Удаляю", "Deleting"),
-    )
+
     def __init__(self, conn: sqlalchemy.Connection):
         """
         Запуск: run()   

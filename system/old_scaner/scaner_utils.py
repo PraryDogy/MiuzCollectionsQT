@@ -16,10 +16,6 @@ from ..utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
 class FinderImages(QObject):
     progress_text = pyqtSignal(str)
-    lang = (
-        ("Коллекция", "Collection"),
-
-    )
 
     def __init__(self, main_folder: MainFolder, task_state: TaskState):
         """
@@ -248,10 +244,7 @@ class Inspector(QObject):
 
 class HashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
-    lang = (
-        ("Добавляю", "Add"),
-        ("Удаляю", "Deleting")
-    )
+
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  

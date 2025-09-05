@@ -72,10 +72,6 @@ class AboutWin(WinSystem):
 
 
 class BarMacos(QMenuBar):
-    lang = (
-        ("Меню", "Menu"),
-
-    )
     def __init__(self):
         super().__init__()
         self.settings_win = None

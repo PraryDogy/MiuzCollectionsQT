@@ -28,12 +28,6 @@ from .win_warn import WinQuestion, WinWarn
 class LangReset(QGroupBox):
     reset = pyqtSignal()
     changed = pyqtSignal()
-    lang = (
-        ("Русский", "English"),
-        ("Язык", "Language"),
-        ("Сбросить", "Reset"),
-        ("Сбросить настройки", "Reset settings"),
-    )
 
     def __init__(self, json_data_copy: Cfg):
         super().__init__()
