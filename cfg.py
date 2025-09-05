@@ -244,14 +244,9 @@ class Cfg:
         shutil.copy2(Static.PRELOAD_DB, Static.APP_SUPPORT_DIR)
 
     @classmethod
-    def _compare_versions(cls) -> bool:
-        ...
-
-    @classmethod
     def init(cls):
         cls.check_dirs()
         cls.set_json_data()
-        cls._compare_versions()
 
 
 class Dynamic:
