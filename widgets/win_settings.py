@@ -631,6 +631,7 @@ class NewFolder(QWidget):
 
 class WinSettings(WinSystem):
     left_side_width = 210
+    closed = pyqtSignal()
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -798,6 +799,10 @@ class WinSettings(WinSystem):
 
         else:
             self.deleteLater()
+
+    def deleteLater(self):
+        self.closed.emit()
+        return super().deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:

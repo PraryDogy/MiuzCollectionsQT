@@ -9,8 +9,6 @@ from system.lang import Lng
 from ._base_widgets import UHBoxLayout, UVBoxLayout
 from .wid_search import WidSearch
 
-BTN_W, BTN_H = 80, 28
-
 
 class BarTopBtn(QFrame):
     clicked = pyqtSignal()

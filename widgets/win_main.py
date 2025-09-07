@@ -6,7 +6,7 @@ from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
-from cfg import Dynamic, Cfg, Static, ThumbData
+from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, RmFilesTask,
@@ -22,6 +22,7 @@ from .menu_left import MenuLeft
 from .progressbar_win import ProgressbarWin
 from .win_dates import WinDates
 from .win_image_view import WinImageView
+from .win_settings import WinSettings
 from .win_upload import WinUpload
 from .win_warn import WinQuestion, WinSmb, WinWarn
 
@@ -94,9 +95,10 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.open_dates.connect(lambda: self.open_dates_win())
+        self.bar_top.open_dates.connect(self.open_dates_win)
         self.bar_top.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
         self.bar_top.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
+        self.bar_top.open_settings.connect(self.open_settings)
         right_lay.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -431,6 +433,13 @@ class WinMain(UMainWindow):
         )
         self.win_upload.center_relative_parent(self.window())
         self.win_upload.show()
+
+    def open_settings(self):
+        self.bar_top.settings_btn.set_solid_style()
+        self.win_settings = WinSettings()
+        self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
+        self.win_settings.center_relative_parent(self.window())
+        self.win_settings.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
