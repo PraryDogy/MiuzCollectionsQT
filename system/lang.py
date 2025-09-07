@@ -139,7 +139,7 @@ class Lng:
     end_date = ("Дата окончания", "End date")
     move = ("Переместить", "Move files")
     drop_only_files = ("Можно загружать только файлы.", "Only files can be uploaded.")
-    system_filter = ("Остальное", "Other")
+    filters = ("Фильтры", "Filters")
     help = ("Справка", "Help")
     help_descr = ("Показать окно справки", "Show help window")
     back = ("Назад", "Back")

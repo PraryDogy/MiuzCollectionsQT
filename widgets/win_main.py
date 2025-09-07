@@ -94,7 +94,7 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.open_dates_win.connect(lambda: self.open_dates_win())
+        self.bar_top.open_dates.connect(lambda: self.open_dates_win())
         self.bar_top.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
         self.bar_top.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         right_lay.addWidget(self.bar_top)
