@@ -607,7 +607,6 @@ class LoadDirsTask(URunnable):
         else:
             dirs = {i.path : i.name for i in os.scandir(self.path) if i.is_dir()}
             self.sigs.finished_.emit(dirs)
-            print(dirs)
 
 
 class _ScanSingleDirSigs(QObject):

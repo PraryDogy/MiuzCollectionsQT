@@ -1,8 +1,10 @@
 import os
 import re
+from typing import Dict
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QGroupBox, QLabel, QPushButton, QTabWidget, QWidget
+from PyQt5.QtCore import QObject, QSize, Qt, QThreadPool, pyqtSignal
+from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QPushButton,
+                             QTabWidget, QTreeWidget, QTreeWidgetItem, QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
@@ -14,51 +16,44 @@ from ._base_widgets import (UHBoxLayout, UListWidgetItem, UVBoxLayout,
                             VListWidget, WinChild)
 
 
-class DirsItem(UListWidgetItem):
-    def __init__(self, parent: VListWidget, path: str, height = 30, text = None):
-        super().__init__(parent, height, text)
-        self.path = path
+class MyTree(QTreeWidget):
+    clicked_: pyqtSignal = pyqtSignal(str)
+    hh = 25
 
-
-class DirsList(VListWidget):
-    set_path = pyqtSignal(str)
-
-    def __init__(self, path: str):
+    def __init__(self, root_dir: str) -> None:
         super().__init__()
-        self.path = path
-        self.main_folder_paths = [x for i in MainFolder.list_ for x in  i.paths]
-        self.init_ui()
+        root_dir = "/Users"
+        self.setHeaderHidden(True)
+        self.threadpool: QThreadPool = QThreadPool()
+        self.itemClicked.connect(self.on_item_click)
 
-    def init_ui(self):
-        self.task_ = LoadDirsTask(self.path)
-        self.task_.sigs.finished_.connect(self.init_ui_fin)
-        UThreadPool.start(self.task_)
-    
-    def init_ui_fin(self, dirs: dict[str, str]):        
-        self.clear()
+        root_item: QTreeWidgetItem = QTreeWidgetItem([os.path.basename(root_dir)])
+        root_item.setSizeHint(0, QSize(0, self.hh))
+        root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)  # полный путь
+        self.addTopLevelItem(root_item)
 
-        if not self.path in self.main_folder_paths:
-            back = DirsItem(parent=self, path=os.path.dirname(self.path), text="...")
-            self.addItem(back)
+        worker: LoadDirsTask = LoadDirsTask(root_dir)
+        worker.sigs.finished_.connect(lambda data, item=root_item: self.add_children(item, data))
+        worker.sigs.finished_.connect(self.clearFocus)
+        self.threadpool.start(worker)
 
-        for path, name in sorted(dirs.items(), key=lambda x: self._strip(x[1])):
-            item = DirsItem(parent=self, path=path, text=name)
-            self.addItem(item)
+    def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
+        path: str = item.data(0, Qt.ItemDataRole.UserRole)
+        self.clicked_.emit(path)
+        if item.childCount() == 0:
+            worker: LoadDirsTask = LoadDirsTask(path)
+            worker.sigs.finished_.connect(lambda data, item=item: self.add_children(item, data))
+            self.threadpool.start(worker)
+        item.setExpanded(True)
 
-    def _strip(self, s: str) -> str:
-        return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
+    def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
+        parent_item.takeChildren()  # удаляем заглушку
+        for path, name in data.items():
+            child: QTreeWidgetItem = QTreeWidgetItem([name])
+            child.setSizeHint(0, QSize(0, self.hh))
+            child.setData(0, Qt.ItemDataRole.UserRole, path)  # полный путь
+            parent_item.addChild(child)
 
-    def currentItem(self) -> DirsItem:
-        return super().currentItem()
-        
-    def mouseReleaseEvent(self, e):
-        if e.button() != Qt.MouseButton.LeftButton:
-            return
-        item: DirsItem = self.itemAt(e.pos())
-        if item:
-            self.path = item.path
-            self.init_ui()
-            self.set_path.emit(item.path)
 
 # ПЕРВАЯ ВКАДКА ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА 
 
@@ -153,7 +148,7 @@ class WinUpload(WinChild):
         self.main_folders.clicked.connect(self.main_folder_click)
         self.tab_wid.addTab(self.main_folders, Lng.folders[Cfg.lng])
 
-        self.dirs_list = DirsList(MainFolder.current.curr_path)
+        self.dirs_list = MyTree(MainFolder.current.curr_path)
         self.tab_wid.addTab(self.dirs_list, Lng.collections[Cfg.lng])
 
         # новый бокс над кнопками
@@ -161,7 +156,7 @@ class WinUpload(WinChild):
         self.info_box.setMaximumWidth(self.width())
         self.info_box.set_path(MainFolder.current.curr_path)
         self.central_layout.addWidget(self.info_box)
-        self.dirs_list.set_path.connect(self.info_box.set_path)
+        self.dirs_list.clicked_.connect(self.info_box.set_path)
 
         # кнопки внизу
         btn_lay = UHBoxLayout()
