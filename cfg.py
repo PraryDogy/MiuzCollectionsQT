@@ -25,7 +25,6 @@ class Static:
     APP_VER = 3.00
     APP_NAME = "Collections"
     GRID_LIMIT = 100
-    NAME_ALL_COLLS = "___collections___"
     NAME_FAVS = "___favorites___"
     NAME_RECENTS = "___recents___"
     NAME_ROOT = "___root___"
@@ -257,7 +256,7 @@ class Dynamic:
     f_date_end: str = None # 31 january 1991
     grid_buff_size: int = 0
     search_widget_text: str = None
-    curr_coll_name = Static.NAME_ALL_COLLS
+    curr_coll_name = None
 
     # какие расширения отображать по умолчанию (и джепеги и послойники)
     types = [Static.ext_non_layers, Static.ext_layers]

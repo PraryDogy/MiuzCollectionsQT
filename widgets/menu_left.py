@@ -148,7 +148,7 @@ class MenuLeft(QTabWidget):
 
     def open_main_folder(self, index: int):
         MainFolder.current = MainFolder.list_[index]
-        Dynamic.curr_coll_name = Static.NAME_ALL_COLLS
+        Dynamic.curr_coll_name = os.path.basename(MainFolder.current.curr_path)
         Dynamic.grid_buff_size = 0
         self.collections_list.root_dir = MainFolder.current.curr_path
         self.collections_list.first_load()

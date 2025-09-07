@@ -255,7 +255,6 @@ class WinMain(UMainWindow):
         
     def set_window_title(self):
         data = {
-            Static.NAME_ALL_COLLS: Lng.all_collections[Cfg.lng],
             Static.NAME_FAVS: Lng.favorites[Cfg.lng],
             Static.NAME_RECENTS: Lng.recents[Cfg.lng],
             Static.NAME_ROOT: Lng.root[Cfg.lng],
