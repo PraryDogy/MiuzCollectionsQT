@@ -86,7 +86,7 @@ class MyTree(QTreeWidget):
         subprocess.Popen(["open", path])
 
     def select_first_item(self):
-        top_item = self.topLevelItem(0)
+        top_item = self.topLevelItem(1)
         if top_item:
             self.setCurrentItem(top_item)
             self.itemClicked.emit(top_item, 0)
@@ -179,10 +179,10 @@ class MenuLeft(QTabWidget):
         
     def clicked_cmd(self, path: str):
         if path == Static.NAME_FAVS:
-            Dynamic.curr_path = Lng.favorites[Cfg.lng]
+            Dynamic.dir_name = Lng.favorites[Cfg.lng]
             Dynamic.curr_coll_name = Static.NAME_FAVS
         else:
-            Dynamic.curr_path = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
+            Dynamic.dir_name = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
             Dynamic.curr_coll_name = os.path.basename(path)
         self.clicked_.emit()
 
