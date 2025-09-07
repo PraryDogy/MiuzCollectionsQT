@@ -22,20 +22,23 @@ class MyTree(QTreeWidget):
 
     def __init__(self, root_dir: str) -> None:
         super().__init__()
-        root_dir = "/Users"
+        # root_dir = "/Users"
+        self.root_dir = root_dir
         self.setHeaderHidden(True)
-        self.threadpool: QThreadPool = QThreadPool()
         self.itemClicked.connect(self.on_item_click)
+        self.first_load()
 
-        root_item: QTreeWidgetItem = QTreeWidgetItem([os.path.basename(root_dir)])
+    def first_load(self):
+        self.clear()
+        root_item: QTreeWidgetItem = QTreeWidgetItem([os.path.basename(self.root_dir)])
         root_item.setSizeHint(0, QSize(0, self.hh))
-        root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)  # полный путь
+        root_item.setData(0, Qt.ItemDataRole.UserRole, self.root_dir)  # полный путь
         self.addTopLevelItem(root_item)
 
-        worker: LoadDirsTask = LoadDirsTask(root_dir)
+        worker: LoadDirsTask = LoadDirsTask(self.root_dir)
         worker.sigs.finished_.connect(lambda data, item=root_item: self.add_children(item, data))
         worker.sigs.finished_.connect(self.clearFocus)
-        self.threadpool.start(worker)
+        UThreadPool.start(worker)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
         path: str = item.data(0, Qt.ItemDataRole.UserRole)
@@ -43,7 +46,7 @@ class MyTree(QTreeWidget):
         if item.childCount() == 0:
             worker: LoadDirsTask = LoadDirsTask(path)
             worker.sigs.finished_.connect(lambda data, item=item: self.add_children(item, data))
-            self.threadpool.start(worker)
+            UThreadPool.start(worker)
         item.setExpanded(True)
 
     def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
@@ -180,8 +183,8 @@ class WinUpload(WinChild):
         self.tab_wid.setCurrentIndex(1)
 
     def main_folder_click(self, main_folder: MainFolder):
-        self.dirs_list.path = main_folder.curr_path
-        self.dirs_list.init_ui()
+        self.dirs_list.root_dir = main_folder.curr_path
+        self.dirs_list.first_load()
         self.info_box.set_path(main_folder.curr_path)
         self.tab_wid.setCurrentIndex(1)
 
