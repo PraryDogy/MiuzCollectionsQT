@@ -508,30 +508,25 @@ class LoadDbImagesTask(URunnable):
         stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_buff_size)
         stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
-        # if Dynamic.curr_coll_name == Static.NAME_RECENTS:
-        #     stmt = stmt.order_by(-THUMBS.c.id)
-        # else:
-        #     stmt = stmt.order_by(-THUMBS.c.mod)
+        if Dynamic.curr_coll_name == Static.NAME_RECENTS:
+            stmt = stmt.order_by(-THUMBS.c.id)
+        else:
+            stmt = stmt.order_by(-THUMBS.c.mod)
 
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"%{text}%"))
             return stmt
-        
-        if Dynamic.curr_path:
-            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.curr_path}/%"))
-            # stmt = stmt.where(THUMBS.c.short_src.not_ilike(f"{Dynamic.curr_path}/%/%"))
-            print(Dynamic.curr_path)
 
-        # if Dynamic.curr_coll_name == Static.NAME_FAVS:
-        #     stmt = stmt.where(THUMBS.c.fav == 1)
+        if Dynamic.curr_coll_name == Static.NAME_FAVS:
+            stmt = stmt.where(THUMBS.c.fav == 1)
             
-        # elif Dynamic.curr_coll_name == Static.NAME_ROOT:
-        #     stmt = stmt.where(THUMBS.c.short_src.ilike("/%"))
-        #     stmt = stmt.where(THUMBS.c.short_src.not_ilike("/%/%"))
+        elif Dynamic.curr_coll_name == Static.NAME_ROOT:
+            stmt = stmt.where(THUMBS.c.short_src.ilike("/%"))
+            stmt = stmt.where(THUMBS.c.short_src.not_ilike("/%/%"))
 
-        # elif Dynamic.curr_coll_name not in (Static.NAME_ALL_COLLS, Static.NAME_RECENTS):
-        #     stmt = stmt.where(THUMBS.c.coll == Dynamic.curr_coll_name)
+        elif Dynamic.curr_coll_name not in (Static.NAME_ALL_COLLS, Static.NAME_RECENTS):
+            stmt = stmt.where(THUMBS.c.coll == Dynamic.curr_coll_name)
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             start, end = self.combine_dates(Dynamic.date_start, Dynamic.date_end)
