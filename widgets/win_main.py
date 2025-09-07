@@ -195,17 +195,12 @@ class WinMain(UMainWindow):
             from system.new_scaner.scaner_task import ScanerTask
         else:
             from system.old_scaner.scaner_task import ScanerTask
-            
-        def reload_gui():
-            self.grid.reload_thumbnails()
-            self.reload_rubber()
-            self.left_menu.init_ui()
 
         if self.scaner_task is None:
             self.scaner_task = ScanerTask()
             self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
             self.scaner_task.sigs.progress_text.connect(lambda text: self.bar_bottom.progress_bar.setText(text))
-            self.scaner_task.sigs.reload_gui.connect(reload_gui)
+            self.scaner_task.sigs.reload_gui.connect(self.reload_gui)
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
@@ -344,7 +339,7 @@ class WinMain(UMainWindow):
         
         def task(img_path_list: list[str]):
             task = RmFilesTask(img_path_list, MainFolder.current)
-            task.sigs.reload_gui.connect(self.grid.reload_thumbnails)
+            task.sigs.reload_gui.connect(self.reload_gui)
             UThreadPool.start(task)
 
         main_folder_path = MainFolder.current.availability()
@@ -364,8 +359,13 @@ class WinMain(UMainWindow):
             self.win_smb = WinSmb()
             self.win_smb.center_relative_parent(self.window())
             self.win_smb.show()
+
+    def reload_gui(self):
+        self.grid.reload_thumbnails()
+        self.reload_rubber()
+        self.left_menu.init_ui()
     
-    def open_upload_win(self, img_path_list: list):
+    def upload_files(self, img_path_list: list):
 
         def set_below_label(data: tuple[int, int], win: ProgressbarWin):
             count, total = data
@@ -378,11 +378,6 @@ class WinMain(UMainWindow):
                 f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
             )
 
-        def reload_gui():
-            self.grid.reload_thumbnails()
-            self.reload_rubber()
-            self.left_menu.init_ui()
-
         def copy_files_fin(files: list, dest: str, main_folder: MainFolder):
             if not files:
                 return
@@ -392,11 +387,11 @@ class WinMain(UMainWindow):
                 self.bar_bottom.progress_bar.setText
             )
             task.sigs.reload_thumbnails.connect(
-                reload_gui
+                self.reload_gui
             )
             UThreadPool.start(task)
 
-        def copy_files_start(win: WinUpload, data: tuple):
+        def copy_files_start(data: tuple):
             main_folder, dest = data
             dest_name = os.path.basename(dest)
             progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
@@ -423,11 +418,13 @@ class WinMain(UMainWindow):
                 progress_win.deleteLater
             )
             UThreadPool.start(task)
-            win.deleteLater()
 
         self.win_upload = WinUpload()
         self.win_upload.clicked.connect(
-            lambda data: copy_files_start(self.win_upload, data)
+            lambda data: copy_files_start(data)
+        )
+        self.win_upload.clicked.connect(
+            self.win_upload.deleteLater
         )
         self.win_upload.center_relative_parent(self.window())
         self.win_upload.show()
@@ -491,6 +488,6 @@ class WinMain(UMainWindow):
                 return
 
         if img_path_list:
-            self.open_upload_win(img_path_list)
+            self.upload_files(img_path_list)
 
         return super().dropEvent(a0)
