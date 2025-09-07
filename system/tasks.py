@@ -507,12 +507,15 @@ class LoadDbImagesTask(URunnable):
         stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_buff_size)
         stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
-        # if Dynamic.curr_coll_name == Static.NAME_RECENTS:
-        #     stmt = stmt.order_by(-THUMBS.c.id)
-        # else:
-
+        # здесь будет тип сортировки по добавлению / по дате изменения
+        # которая будет вызываться из топбара
         stmt = stmt.order_by(-THUMBS.c.mod)
-        stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.curr_path}/%"))
+
+        if Dynamic.curr_coll_name == Static.NAME_FAVS:
+            stmt = stmt.where(THUMBS.c.fav == 1)
+            print(1)
+        else:
+            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.curr_path}/%"))
 
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")

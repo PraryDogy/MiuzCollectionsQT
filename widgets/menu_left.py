@@ -20,6 +20,11 @@ from ._base_widgets import (UHBoxLayout, UListSpaserItem, UListWidgetItem,
 from .win_warn import WinSmb
 
 
+class FavItem(QTreeWidgetItem):
+    def __init__(self):
+        super().__init__([Lng.favorites[Cfg.lng]])
+
+        
 class MyTree(QTreeWidget):
     clicked_: pyqtSignal = pyqtSignal(str)
     hh = 25
@@ -33,6 +38,12 @@ class MyTree(QTreeWidget):
 
     def first_load(self):
         self.clear()
+
+        custom_item = FavItem()
+        custom_item.setSizeHint(0, QSize(0, self.hh))
+        custom_item.setData(0, Qt.ItemDataRole.UserRole, "")
+        self.insertTopLevelItem(0, custom_item)
+
         root_item: QTreeWidgetItem = QTreeWidgetItem([os.path.basename(self.root_dir)])
         root_item.setSizeHint(0, QSize(0, self.hh))
         root_item.setData(0, Qt.ItemDataRole.UserRole, self.root_dir)
@@ -46,15 +57,18 @@ class MyTree(QTreeWidget):
         UThreadPool.start(worker)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
-        path: str = item.data(0, Qt.ItemDataRole.UserRole)
-        self.clicked_.emit(path)
-        if item.childCount() == 0:
-            worker: LoadSortedDirsTask = LoadSortedDirsTask(path)
-            worker.sigs.finished_.connect(
-                lambda data, item=item: self.add_children(item, data)
-            )
-            UThreadPool.start(worker)
-        item.setExpanded(True)
+        if isinstance(item, FavItem):
+            self.clicked_.emit(Static.NAME_FAVS)
+        else:
+            path: str = item.data(0, Qt.ItemDataRole.UserRole)
+            self.clicked_.emit(path)
+            if item.childCount() == 0:
+                worker: LoadSortedDirsTask = LoadSortedDirsTask(path)
+                worker.sigs.finished_.connect(
+                    lambda data, item=item: self.add_children(item, data)
+                )
+                UThreadPool.start(worker)
+            item.setExpanded(True)
 
     def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
         parent_item.takeChildren()
@@ -164,8 +178,12 @@ class MenuLeft(QTabWidget):
         self.clicked_.emit()
         
     def clicked_cmd(self, path: str):
-        Dynamic.curr_path = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
-        Dynamic.curr_coll_name = os.path.basename(path)
+        if path == Static.NAME_FAVS:
+            Dynamic.curr_path = Lng.favorites[Cfg.lng]
+            Dynamic.curr_coll_name = Static.NAME_FAVS
+        else:
+            Dynamic.curr_path = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
+            Dynamic.curr_coll_name = os.path.basename(path)
         self.clicked_.emit()
 
     def init_ui(self):
