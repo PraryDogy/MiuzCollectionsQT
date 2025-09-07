@@ -17,7 +17,7 @@ from .filters import SystemFilter, UserFilter
 from .lang import Lng
 from .main_folder import MainFolder
 from .new_scaner.scaner_utils import (DbUpdater, DirsUpdater, HashdirUpdater,
-                                      ImgCompator, ImgLoader)
+                                      ImgCompator, ImgLoader, ImgRemover)
 from .utils import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
 
 

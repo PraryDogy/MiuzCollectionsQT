@@ -345,7 +345,6 @@ class ImgRemover:
     def run(self):
         rel_paths = self.get_rel_paths()
         confirmed_images = self.remove_images(rel_paths)
-        print(self.del_dirs)
         self.remove_db(confirmed_images)
 
     def remove_db(self, confirmed_images: list[int]):
