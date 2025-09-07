@@ -79,6 +79,10 @@ class FiltersBtn(BarTopBtn):
             Dynamic.enabled_filters.add(val)
         self.clicked_.emit()
 
+    def reset(self):
+        Dynamic.enabled_filters.clear()
+        self.clicked_.emit()
+
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             self.set_solid_style()
@@ -89,6 +93,11 @@ class FiltersBtn(BarTopBtn):
                 act.setChecked(f in Dynamic.enabled_filters)
                 act.triggered.connect(lambda _, val=f: self._on_action(val))
                 menu.addAction(act)
+
+            menu.addSeparator()
+            act = QAction(Lng.reset[Cfg.lng], menu)
+            act.triggered.connect(self.reset)
+            menu.addAction(act)
 
             pos = self.mapToGlobal(self.rect().bottomLeft())
             menu.exec(pos)
