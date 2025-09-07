@@ -73,6 +73,7 @@ from PyQt5.QtWidgets import QApplication
 
 from cfg import Cfg
 from system.database import Dbase
+from system.filters import Filters
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import UThreadPool
@@ -84,6 +85,7 @@ class App(QApplication):
         super().__init__(argv)
 
         Cfg.init()
+        Filters.init()
         Dbase.init()
         MainFolder.init()
         UThreadPool.init()

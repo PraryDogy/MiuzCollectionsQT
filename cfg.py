@@ -265,4 +265,4 @@ class Dynamic:
     thumb_size_ind: int = 0
     dir_name: str = None
     sort_by_mod: bool = True
-    filters: list[str] = []
+    enabled_filters: set[str] = set()

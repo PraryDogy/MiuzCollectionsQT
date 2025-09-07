@@ -4,6 +4,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 
 from cfg import Cfg, Dynamic, Static
+from system.filters import Filters
 from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout, UMenu, UVBoxLayout
@@ -71,15 +72,11 @@ class FiltersBtn(BarTopBtn):
         self.lbl.setText(Lng.filters[Cfg.lng])
         self.svg_btn.load("./images/filters.svg")
 
-        # потом заменишь чтением json фильтров
-        self.filters = ["/1 IMG", "/2 MODEL IMG", ".jpg", ".tiff"]
-        self.current = self.filters[0] if self.filters else None  # активный фильтр
-
     def _on_action(self, val: str):
-        if val in Dynamic.filters:
-            Dynamic.filters.remove(val)
+        if val in Dynamic.enabled_filters:
+            Dynamic.enabled_filters.remove(val)
         else:
-            Dynamic.filters.append(val)
+            Dynamic.enabled_filters.add(val)
         self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -87,16 +84,16 @@ class FiltersBtn(BarTopBtn):
             self.set_solid_style()
             menu = UMenu(self)
 
-            for f in self.filters:
+            for f in Filters.filters:
                 act = QAction(f, self, checkable=True)
-                act.setChecked(f in Dynamic.filters)
+                act.setChecked(f in Dynamic.enabled_filters)
                 act.triggered.connect(lambda _, val=f: self._on_action(val))
                 menu.addAction(act)
 
             pos = self.mapToGlobal(self.rect().bottomLeft())
             menu.exec(pos)
 
-            if not Dynamic.filters:
+            if not Dynamic.enabled_filters:
                 self.set_normal_style()
 
 

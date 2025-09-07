@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
                              QVBoxLayout, QWidget)
 
 from cfg import Cfg, Dynamic, Static, ThumbData
+from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, RmFilesTask,
@@ -277,6 +278,7 @@ class WinMain(UMainWindow):
 
     def on_exit(self):
         Cfg.write_json_data()
+        Filters.write_file()
         MainFolder.write_json_data()
         os._exit(0)
 

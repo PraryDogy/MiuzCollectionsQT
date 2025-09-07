@@ -513,10 +513,10 @@ class LoadDbImagesTask(URunnable):
         else:
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.dir_name}/%"))
 
-        if Dynamic.filters:
+        if Dynamic.enabled_filters:
             or_conditions = [
                 THUMBS.c.short_src.ilike(f"%{f}%")
-                for f in Dynamic.filters
+                for f in Dynamic.enabled_filters
             ]
             stmt = stmt.where(sqlalchemy.or_(*or_conditions))
 
