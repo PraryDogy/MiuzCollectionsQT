@@ -522,7 +522,6 @@ class LoadDbImagesTask(URunnable):
             stmt = stmt.where(THUMBS.c.fav == 1)
             
         elif Dynamic.curr_coll_name == Static.NAME_ROOT:
-            print(1)
             stmt = stmt.where(THUMBS.c.short_src.ilike("/%"))
             stmt = stmt.where(THUMBS.c.short_src.not_ilike("/%/%"))
 
