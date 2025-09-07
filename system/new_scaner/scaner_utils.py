@@ -207,10 +207,15 @@ class ImgLoader(QObject):
                 THUMBS.c.birth,
                 THUMBS.c.mod
                 )
-            q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
-            q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             q = q.where(THUMBS.c.brand == self.main_folder.name)
+            if rel_dir_path == "/":
+                q = q.where(THUMBS.c.short_src.ilike("/%"))
+                q = q.where(THUMBS.c.short_src.not_ilike(f"/%/%"))
+            else:
+                q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
+                q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             res = conn.execute(q).fetchall()
+            print(rel_dir_path, len(res))
             for rel_thumb_path, rel_img_path, size, birth, mod in res:
                 abs_img_path = MainUtils.get_abs_path(self.main_folder_path, rel_img_path)
                 db_images[rel_thumb_path] = (abs_img_path, size, birth, mod)
