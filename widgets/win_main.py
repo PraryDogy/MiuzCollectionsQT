@@ -124,8 +124,6 @@ class WinMain(UMainWindow):
         right_lay.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
-        self.bar_bottom.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.bar_bottom.theme_changed.connect(self.reload_rubber)
         self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
         right_lay.addWidget(self.bar_bottom)
 
@@ -439,6 +437,7 @@ class WinMain(UMainWindow):
     def open_settings(self):
         self.bar_top.settings_btn.set_solid_style()
         self.win_settings = WinSettings()
+        # self.win_settings.theme
         self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
         self.win_settings.center_relative_parent(self.window())
         self.win_settings.show()

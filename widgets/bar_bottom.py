@@ -5,7 +5,7 @@ from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 
-from cfg import Dynamic, Cfg, Static, ThumbData
+from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
 
 from ._base_widgets import SvgBtn, UHBoxLayout
@@ -80,50 +80,7 @@ class CustomSlider(BaseSlider):
         self.resize_thumbnails.emit()
 
 
-class FilterBtn(QSvgWidget):
-    obj_name = "filter_btn"
-    reload_thumbnails = pyqtSignal()
-    update_bottom_bar = pyqtSignal()
-
-    def __init__(self):
-        """
-        Сигналы:
-        - reload_thumbnails()
-        # - update_bottom_bar()
-        """
-
-        t = f"{Lng.show[Cfg.lng]}: {Lng.type_jpg[Cfg.lng]}, {Lng.type_tiff[Cfg.lng]}"
-        super().__init__()
-        self.load("./images/filters.svg")
-        self.setFixedSize(18, 18)
-
-    def menu_types(self, *args):
-        menu_ = MenuTypes(parent=self)
-        menu_.setFixedWidth(130)
-        menu_.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
-        menu_.update_bottom_bar.connect(lambda: self.update_bottom_bar.emit())
-
-        widget_rect = self.rect()
-        menu_size = menu_.sizeHint()
-
-        centered = QPoint(
-            menu_size.width() // 2,
-            menu_size.height() + self.height() // 2
-        )
-
-        menu_center_top = self.mapToGlobal(widget_rect.center()) - centered
-
-        menu_.move(menu_center_top)
-        menu_.exec_()
-
-    def mouseReleaseEvent(self, ev):
-        if ev.button() == Qt.MouseButton.LeftButton:
-            self.menu_types()
-
-
 class BarBottom(QWidget):
-    theme_changed = pyqtSignal()
-    reload_thumbnails = pyqtSignal()
     resize_thumbnails = pyqtSignal()
 
     def __init__(self):
@@ -149,49 +106,7 @@ class BarBottom(QWidget):
         self.h_layout.addWidget(self.progress_bar)
 
         self.h_layout.addStretch()
-        
-        # from PyQt5.QtCore import QTimer
-        # t = "длинное имя папки: обновление (1000)"
-        # QTimer.singleShot(1000, lambda: self.progress_bar.setText(t))
-
-        self.filter_label = FilterBtn()
-        self.filter_label.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
-        self.filter_label.update_bottom_bar.connect(lambda: self.toggle_types())
-        self.h_layout.addWidget(self.filter_label)
-
-        self.sett_widget = QSvgWidget()
-        self.sett_widget.load("./images/settings.svg")
-        self.sett_widget.setFixedSize(20, 20)
-        self.sett_widget.mouseReleaseEvent = self.sett_btn_cmd
-        self.h_layout.addWidget(self.sett_widget)
 
         self.slider = CustomSlider()
         self.slider.resize_thumbnails.connect(lambda: self.resize_thumbnails.emit())
         self.h_layout.addWidget(self.slider)
-
-    def toggle_types(self):
-        types = []
-
-        if Static.ext_non_layers in Dynamic.types:
-            types.append(Lng.type_jpg[Cfg.lng])
-
-        if Static.ext_layers in Dynamic.types:
-            types.append(Lng.type_tiff[Cfg.lng])
-
-        if not types:
-            types = [
-                Lng.type_jpg[Cfg.lng],
-                Lng.type_tiff[Cfg.lng]
-            ]
-
-        types = ", ".join(types)
-        t = f"{Lng.show[Cfg.lng]}: {types}"
-        self.filter_label.setText(t)
-        self.filter_label.adjustSize()
-
-    def sett_btn_cmd(self, e: QMouseEvent):
-        if e.button() == Qt.MouseButton.LeftButton:
-            self.win_settings = WinSettings()
-            self.win_settings.center_relative_parent(self.window())
-            self.win_settings.show()
-    
