@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QPushButton,
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import LoadDirsTask
+from system.tasks import LoadSortedDirsTask
 from system.utils import UThreadPool
 
 from ._base_widgets import (UHBoxLayout, UListWidgetItem, UVBoxLayout,
@@ -35,7 +35,7 @@ class MyTree(QTreeWidget):
         root_item.setData(0, Qt.ItemDataRole.UserRole, self.root_dir)  # полный путь
         self.addTopLevelItem(root_item)
 
-        worker: LoadDirsTask = LoadDirsTask(self.root_dir)
+        worker: LoadSortedDirsTask = LoadSortedDirsTask(self.root_dir)
         worker.sigs.finished_.connect(lambda data, item=root_item: self.add_children(item, data))
         worker.sigs.finished_.connect(self.clearFocus)
         UThreadPool.start(worker)
@@ -44,7 +44,7 @@ class MyTree(QTreeWidget):
         path: str = item.data(0, Qt.ItemDataRole.UserRole)
         self.clicked_.emit(path)
         if item.childCount() == 0:
-            worker: LoadDirsTask = LoadDirsTask(path)
+            worker: LoadSortedDirsTask = LoadSortedDirsTask(path)
             worker.sigs.finished_.connect(lambda data, item=item: self.add_children(item, data))
             UThreadPool.start(worker)
         item.setExpanded(True)

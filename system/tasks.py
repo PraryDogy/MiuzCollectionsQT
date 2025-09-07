@@ -588,25 +588,31 @@ class LoadDbImagesTask(URunnable):
         return datetime.timestamp(start), datetime.timestamp(end)
 
 
-class _LoadDirsSigs(QObject):
+class _LoadSortedDirsSigs(QObject):
     finished_ = pyqtSignal(dict)
 
 
-class LoadDirsTask(URunnable):
+class LoadSortedDirsTask(URunnable):
     def __init__(self, path: str):
         """
         сигнал finished возвращает словарь: путь - имя
         """
         super().__init__()
-        self.sigs = _LoadDirsSigs()
+        self.sigs = _LoadSortedDirsSigs()
         self.path = path
 
     def task(self):
         if not os.path.exists(self.path):
             self.sigs.finished_.emit({})
         else:
-            dirs = {i.path : i.name for i in os.scandir(self.path) if i.is_dir()}
-            self.sigs.finished_.emit(dirs)
+            dirs = {i.path: i.name for i in os.scandir(self.path) if i.is_dir()}
+            sorted_dirs = dict(
+                sorted(dirs.items(), key=lambda kv: self.strip_to_first_letter(kv[1]))
+            )
+            self.sigs.finished_.emit(sorted_dirs)
+
+    def strip_to_first_letter(self, s: str) -> str:
+        return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
 
 class _ScanSingleDirSigs(QObject):

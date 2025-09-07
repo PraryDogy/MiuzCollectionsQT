@@ -1,7 +1,7 @@
 import os
 from PyQt5.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem
 from PyQt5.QtCore import Qt, QThreadPool, QObject, pyqtSignal
-from system.tasks import LoadDirsTask
+from system.tasks import LoadSortedDirsTask
 import os
 from typing import Dict
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
@@ -21,7 +21,7 @@ class MyTree(QTreeWidget):
         root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)  # полный путь
         self.addTopLevelItem(root_item)
 
-        worker: LoadDirsTask = LoadDirsTask(root_dir)
+        worker: LoadSortedDirsTask = LoadSortedDirsTask(root_dir)
         worker.sigs.finished_.connect(lambda data, item=root_item: self.add_children(item, data))
         self.threadpool.start(worker)
 
@@ -29,7 +29,7 @@ class MyTree(QTreeWidget):
         path: str = item.data(0, Qt.ItemDataRole.UserRole)
         self.clicked_.emit(path)
         if item.childCount() == 0:
-            worker: LoadDirsTask = LoadDirsTask(path)
+            worker: LoadSortedDirsTask = LoadSortedDirsTask(path)
             worker.sigs.finished_.connect(lambda data, item=item: self.add_children(item, data))
             self.threadpool.start(worker)
         item.setExpanded(True)
