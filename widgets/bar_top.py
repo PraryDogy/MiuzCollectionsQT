@@ -64,7 +64,7 @@ class DatesBtn(BarTopBtn):
 
 
 class FiltersBtn(BarTopBtn):
-    clicked_ = pyqtSignal(str)  # будем отдавать имя фильтра
+    clicked_ = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -72,7 +72,7 @@ class FiltersBtn(BarTopBtn):
         self.svg_btn.load("./images/filters.svg")
 
         # потом заменишь чтением json фильтров
-        self.filters = ["/1 IMG", "/2 MODEL IMG", ".jpg", "tiff"]
+        self.filters = ["/1 IMG", "/2 MODEL IMG", ".jpg", ".tiff"]
         self.current = self.filters[0] if self.filters else None  # активный фильтр
 
     def _on_action(self, val: str):

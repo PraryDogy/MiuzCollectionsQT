@@ -503,7 +503,6 @@ class LoadDbImagesTask(URunnable):
         stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_buff_size)
         stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
-        # сортировка по дате изменения / по дате добавления
         if Dynamic.sort_by_mod:
             stmt = stmt.order_by(-THUMBS.c.mod)
         else:
@@ -513,6 +512,13 @@ class LoadDbImagesTask(URunnable):
             stmt = stmt.where(THUMBS.c.fav == 1)
         else:
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.dir_name}/%"))
+
+        if Dynamic.filters:
+            or_conditions = [
+                THUMBS.c.short_src.ilike(f"%{f}%")
+                for f in Dynamic.filters
+            ]
+            stmt = stmt.where(sqlalchemy.or_(*or_conditions))
 
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
