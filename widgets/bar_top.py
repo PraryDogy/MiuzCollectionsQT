@@ -80,6 +80,7 @@ class FiltersBtn(BarTopBtn):
             Dynamic.filters.remove(val)
         else:
             Dynamic.filters.append(val)
+        self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -177,7 +178,8 @@ class BarTop(QWidget):
 
         # сортировка по слоям по джепегам: добавим их в фильтры
         self.filters_btn = FiltersBtn()
-        self.filters_btn.clicked_.connect(lambda: self.open_settings.emit())
+        self.filters_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
+        self.filters_btn.clicked_.connect(lambda: self.scroll_to_top.emit())
         self.h_layout.addWidget(
             self.filters_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
