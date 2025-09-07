@@ -343,37 +343,32 @@ class ImgRemover:
 
     def run(self):
         rel_paths = self.get_rel_paths()
-        confirmed_images = self.remove_images(rel_paths)
-        self.remove_db(confirmed_images)
+        self.remove_images(rel_paths)
 
-    def remove_db(self, confirmed_images: list[int]):
-        for id_ in confirmed_images:
+        return
+        for rel_dir_path, mod in self.del_dirs:
             q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.id == id_)
+            q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
+            q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
+            q = q.where(THUMBS.c.brand == self.main_folder.name)
             self.conn.execute(q)
         self.conn.commit()
 
     def get_rel_paths(self):
         rel_paths = []
         for rel_dir_path, mod in self.del_dirs:
-            q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash)
+            q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_src)
             q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
             q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             q = q.where(THUMBS.c.brand == self.main_folder.name)
             rel_paths.extend(self.conn.execute(q).fetchall())
-        return rel_paths
+
+        print(rel_paths)
 
     def remove_images(self, rel_paths: list[int, str]):
-        removed_images: list[int] = []
         for id_, rel_path in rel_paths:
-            abs_path = ThumbUtils.get_thumb_path(rel_path)
-            try:
-                os.remove(abs_path)
-                removed_images.append(id_)                
-            except Exception as e:
-                print("system new scaner, utils, ImgRemover error remove img", e)
-                continue
-        return removed_images
+            abs_path = MainUtils.get_abs_path(self.main_folder.curr_path, rel_path)
+            print(abs_path)
 
 
 class DbUpdater:
