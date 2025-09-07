@@ -109,7 +109,7 @@ class WinMain(UMainWindow):
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_path_list: self.remove_files(rel_img_path_list))
-        self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
+        self.grid.move_files.connect(lambda rel_img_path_list: self.move_files(rel_img_path_list))
         self.grid.save_files.connect(copy_files_task)
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         self.grid.img_view.connect(lambda: self.open_img_view())
@@ -294,15 +294,14 @@ class WinMain(UMainWindow):
         self.win_warn.center_relative_parent(self)
         self.win_warn.show()
 
-    def open_filemove_win(self, rel_img_path_list: list):
+    def move_files(self, rel_img_path_list: list):
 
         def udpate_hashdir(new_files: list[str], main_folder: MainFolder):
             if new_files:
                 scan_dir = os.path.dirname(new_files[0])
                 update_task = ScanSingleDirTask(main_folder, scan_dir)
+                update_task.sigs.finished_.connect(self.reload_gui)
                 UThreadPool.start(update_task)
-                self.grid.reload_thumbnails()
-                self.reload_rubber()
 
         def remove_files(old_files: list[str], new_files: list[str], main_folder: MainFolder):
             remove_task = RmFilesTask(old_files, main_folder)
