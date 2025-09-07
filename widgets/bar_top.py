@@ -64,16 +64,39 @@ class DatesBtn(BarTopBtn):
 
 
 class FiltersBtn(BarTopBtn):
-    clicked_ = pyqtSignal()
+    clicked_ = pyqtSignal(str)  # будем отдавать имя фильтра
 
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.filters[Cfg.lng])
         self.svg_btn.load("./images/filters.svg")
 
+        # потом заменишь чтением json фильтров
+        self.filters = ["/1 IMG", "/2 MODEL IMG", ".jpg", "tiff"]
+        self.current = self.filters[0] if self.filters else None  # активный фильтр
+
+    def _on_action(self, val: str):
+        if val in Dynamic.filters:
+            Dynamic.filters.remove(val)
+        else:
+            Dynamic.filters.append(val)
+
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
+            self.set_solid_style()
+            menu = UMenu(self)
+
+            for f in self.filters:
+                act = QAction(f, self, checkable=True)
+                act.setChecked(f in Dynamic.filters)
+                act.triggered.connect(lambda _, val=f: self._on_action(val))
+                menu.addAction(act)
+
+            pos = self.mapToGlobal(self.rect().bottomLeft())
+            menu.exec(pos)
+
+            if not Dynamic.filters:
+                self.set_normal_style()
 
 
 class SortBtn(BarTopBtn):
