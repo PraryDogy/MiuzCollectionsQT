@@ -132,16 +132,20 @@ class CollList(VListWidget):
         spacer = UListSpaserItem(self)
         self.addItem(spacer)
 
+        if root:
+            root_btn = CollBtn(text=Static.NAME_ROOT)
+            root_btn.pressed_.connect(
+                lambda: self.collection_btn_cmd(root_btn)
+            )
+            root_item = UListWidgetItem(self)
+            self.addItem(root_item)
+            self.setItemWidget(root_item, root_btn)
+            
+            spacer = UListSpaserItem(self)
+            self.addItem(spacer)
+
         self.setCurrentRow(0)
         
-        root_btn = CollBtn(text=Static.NAME_ROOT)
-        root_btn.pressed_.connect(
-            lambda: self.collection_btn_cmd(root_btn)
-        )
-        root_item = UListWidgetItem(self)
-        self.addItem(root_item)
-        self.setItemWidget(root_item, root_btn)
-
         for i in menus:
             coll_btn = CollBtn(i)
             cmd_ = lambda wid=coll_btn: self.collection_btn_cmd(wid)

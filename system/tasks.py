@@ -189,7 +189,7 @@ class LoadCollListTask(URunnable):
         q = q.where(THUMBS.c.short_src.ilike("/%"))
         q = q.where(THUMBS.c.short_src.not_ilike("/%/%"))
         q = q.distinct()
-        return self.conn.execute(q).scalar_one()
+        return self.conn.execute(q).scalar_one_or_none()
     
     def strip_to_first_letter(self, s: str) -> str:
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
