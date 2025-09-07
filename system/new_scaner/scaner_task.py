@@ -84,8 +84,8 @@ class ScanerTask(URunnable):
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
 
-        # если в Finder была удалена какая-либо директория
-        # удаляем изображения из БД, относящиеся к этой директории
+        # например была удалена папка Collection 1, тогда все данные
+        # в THUMBS и hadhdir будут удалены через ImgRemover
         conn = Dbase.engine.connect()
         img_remover = ImgRemover(del_dirs, main_folder, conn)
         img_remover.run()
