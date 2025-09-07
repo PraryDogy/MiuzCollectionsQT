@@ -505,7 +505,10 @@ class LoadDbImagesTask(URunnable):
 
         # здесь будет тип сортировки по добавлению / по дате изменения
         # которая будет вызываться из топбара
-        stmt = stmt.order_by(-THUMBS.c.mod)
+        if Dynamic.sort_by_mod:
+            stmt = stmt.order_by(-THUMBS.c.mod)
+        else:
+            stmt = stmt.order_by(-THUMBS.c.id)
 
         if Dynamic.curr_coll_name == Static.NAME_FAVS:
             stmt = stmt.where(THUMBS.c.fav == 1)

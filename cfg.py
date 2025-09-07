@@ -264,3 +264,4 @@ class Dynamic:
     # от индекса зависит размер Thumbnail и всех его внутренних виджетов
     thumb_size_ind: int = 0
     dir_name: str = None
+    sort_by_mod: bool = True

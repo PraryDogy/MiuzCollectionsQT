@@ -1,12 +1,12 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QFrame, QLabel, QWidget
+from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 
-from ._base_widgets import UHBoxLayout, UVBoxLayout
+from ._base_widgets import UHBoxLayout, UMenu, UVBoxLayout
 from .wid_search import WidSearch
 
 
@@ -84,9 +84,31 @@ class SortBtn(BarTopBtn):
         self.lbl.setText(Lng.sort[Cfg.lng])
         self.svg_btn.load("./images/sort.svg")
 
+    def menu_clicked(self, value: bool):
+        Dynamic.sort_by_mod = value
+        self.clicked_.emit()
+
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
+            self.set_solid_style()
+            menu = UMenu(ev)
+
+            act1 = QAction(Lng.sort_by_mod[Cfg.lng], self, checkable=True)
+            act2 = QAction(Lng.sort_by_recent[Cfg.lng], self, checkable=True)
+
+            # состояние — допустим, у тебя есть self.sort_by_mod_flag: bool
+            act1.setChecked(Dynamic.sort_by_mod)
+            act2.setChecked(not Dynamic.sort_by_mod)
+
+            act1.triggered.connect(lambda: self.menu_clicked(True))
+            act2.triggered.connect(lambda: self.menu_clicked(False))
+
+            menu.addAction(act1)
+            menu.addAction(act2)
+
+            pos = self.mapToGlobal(self.rect().bottomLeft())
+            menu.exec(pos)
+            self.set_normal_style()
 
 
 class SettingsBtn(BarTopBtn):
@@ -100,7 +122,6 @@ class SettingsBtn(BarTopBtn):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             self.clicked_.emit()
-
 
 
 class BarTop(QWidget):
@@ -124,7 +145,8 @@ class BarTop(QWidget):
         self.h_layout.addStretch(1)
 
         self.sort_btn = SortBtn()
-        self.sort_btn.clicked_.connect(lambda: self.open_settings.emit())
+        self.sort_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
+        self.sort_btn.clicked_.connect(lambda: self.scroll_to_top.emit())
         self.h_layout.addWidget(
             self.sort_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
@@ -161,9 +183,3 @@ class BarTop(QWidget):
             self.search_wid,
             alignment=Qt.AlignmentFlag.AlignRight
         )
-
-        # if any((Dynamic.date_start, Dynamic.date_end)):
-        #     self.dates_btn.set_solid_style()
-        # else:
-        #     self.dates_btn.set_normal_style()
-    

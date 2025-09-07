@@ -232,6 +232,8 @@ class Lng:
     image = ("Изображение", "Image")
     other_folders = ("Прочие папки", "Other folders")
     sort = ("Сорт.", "Sort")
+    sort_by_mod = ("По дате изменения", "Date modification")
+    sort_by_recent = ("По дате добавления", "Date added")
     help_text = (
         "Папка с коллекциями:\n"
         "- Может содержать подпапки (коллекции)\n"
