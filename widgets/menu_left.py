@@ -26,7 +26,6 @@ class MyTree(QTreeWidget):
 
     def __init__(self, root_dir: str) -> None:
         super().__init__()
-        # root_dir = "/Users"
         self.root_dir = root_dir
         self.setHeaderHidden(True)
         self.itemClicked.connect(self.on_item_click)
@@ -36,7 +35,7 @@ class MyTree(QTreeWidget):
         self.clear()
         root_item: QTreeWidgetItem = QTreeWidgetItem([os.path.basename(self.root_dir)])
         root_item.setSizeHint(0, QSize(0, self.hh))
-        root_item.setData(0, Qt.ItemDataRole.UserRole, self.root_dir)  # полный путь
+        root_item.setData(0, Qt.ItemDataRole.UserRole, self.root_dir)
         self.addTopLevelItem(root_item)
 
         worker: LoadSortedDirsTask = LoadSortedDirsTask(self.root_dir)
@@ -54,14 +53,40 @@ class MyTree(QTreeWidget):
         item.setExpanded(True)
 
     def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
-        parent_item.takeChildren()  # удаляем заглушку
+        parent_item.takeChildren()
         for path, name in data.items():
             child: QTreeWidgetItem = QTreeWidgetItem([name])
             child.setSizeHint(0, QSize(0, self.hh))
-            child.setData(0, Qt.ItemDataRole.UserRole, path)  # полный путь
+            child.setData(0, Qt.ItemDataRole.UserRole, path)
             parent_item.addChild(child)
         parent_item.setExpanded(True)
 
+    def view(self, path: str):
+        self.clicked_.emit(path)
+
+    def reveal(self, path: str):
+        subprocess.Popen(["open", path])
+
+    def contextMenuEvent(self, a0):
+        item = self.itemAt(a0.pos())
+        if item:
+            path: str = item.data(0, Qt.ItemDataRole.UserRole)
+
+            menu = UMenu(a0)
+            view = QAction(Lng.open[Cfg.lng], menu)
+            view.triggered.connect(
+                lambda: self.view(path)
+            )
+            menu.addAction(view)
+
+            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
+            reveal.triggered.connect(
+                    lambda: self.reveal(path)
+                )
+            menu.addAction(reveal)
+
+            menu.show_()
+        return super().contextMenuEvent(a0)
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
@@ -133,8 +158,10 @@ class MenuLeft(QTabWidget):
         
     def clicked_(self, path: str):
         Dynamic.curr_path = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
+        Dynamic.curr_coll_name = os.path.basename(path)
         self.scroll_to_top.emit()
         self.reload_thumbnails.emit()
+        self.set_window_title.emit()
 
     def init_ui(self):
         self.clear()
@@ -146,9 +173,6 @@ class MenuLeft(QTabWidget):
 
         self.collections_list = MyTree(MainFolder.current.curr_path)
         self.collections_list.clicked_.connect(self.clicked_)
-        # self.collections_list.scroll_to_top.connect(self.scroll_to_top.emit)
-        # self.collections_list.set_window_title.connect(self.set_window_title.emit)
-        # self.collections_list.reload_thumbnails.connect(self.reload_thumbnails.emit)
         self.addTab(self.collections_list, Lng.collection[Cfg.lng])
 
         self.setCurrentIndex(1)

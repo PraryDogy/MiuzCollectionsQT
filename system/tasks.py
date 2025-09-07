@@ -511,17 +511,15 @@ class LoadDbImagesTask(URunnable):
         # if Dynamic.curr_coll_name == Static.NAME_RECENTS:
         #     stmt = stmt.order_by(-THUMBS.c.id)
         # else:
-        #     stmt = stmt.order_by(-THUMBS.c.mod)
+
+        stmt = stmt.order_by(-THUMBS.c.mod)
+        stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.curr_path}/%"))
 
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"%{text}%"))
             return stmt
         
-        if Dynamic.curr_path:
-            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.curr_path}/%"))
-            # stmt = stmt.where(THUMBS.c.short_src.not_ilike(f"{Dynamic.curr_path}/%/%"))
-            print(Dynamic.curr_path)
 
         # if Dynamic.curr_coll_name == Static.NAME_FAVS:
         #     stmt = stmt.where(THUMBS.c.fav == 1)
