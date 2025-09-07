@@ -138,9 +138,7 @@ class MainFolderList(VListWidget):
 
 
 class MenuLeft(QTabWidget):
-    set_window_title = pyqtSignal()
-    scroll_to_top = pyqtSignal()
-    reload_thumbnails = pyqtSignal()
+    clicked_ = pyqtSignal()
     
     def __init__(self):
         super().__init__()
@@ -152,16 +150,12 @@ class MenuLeft(QTabWidget):
         Dynamic.grid_buff_size = 0
         self.collections_list.root_dir = MainFolder.current.curr_path
         self.collections_list.first_load()
-        self.set_window_title.emit()
-        self.scroll_to_top.emit()
-        self.reload_thumbnails.emit()
+        self.clicked_.emit()
         
-    def clicked_(self, path: str):
+    def clicked_cmd(self, path: str):
         Dynamic.curr_path = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
         Dynamic.curr_coll_name = os.path.basename(path)
-        self.scroll_to_top.emit()
-        self.reload_thumbnails.emit()
-        self.set_window_title.emit()
+        self.clicked_.emit()
 
     def init_ui(self):
         self.clear()
@@ -172,8 +166,7 @@ class MenuLeft(QTabWidget):
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
         self.collections_list = MyTree(MainFolder.current.curr_path)
-        self.collections_list.clicked_.connect(self.clicked_)
+        self.collections_list.clicked_.connect(self.clicked_cmd)
         self.addTab(self.collections_list, Lng.collection[Cfg.lng])
 
         self.setCurrentIndex(1)
-        

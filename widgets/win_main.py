@@ -65,7 +65,6 @@ class WinMain(UMainWindow):
 
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
-        self.set_window_title()
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -78,9 +77,13 @@ class WinMain(UMainWindow):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.set_window_title.connect(lambda: self.set_window_title())
-        self.left_menu.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.left_menu.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
+        self.left_menu.clicked_.connect(
+            lambda: self.grid.reload_thumbnails())
+        self.left_menu.clicked_.connect(
+            lambda: self.reload_rubber())
+        self.left_menu.clicked_.connect(
+            lambda: self.set_window_title()
+        )
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
