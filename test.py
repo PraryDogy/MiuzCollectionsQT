@@ -1,9 +1,7 @@
-from cfg import Cfg
+from system.new_scaner.scaner_utils import ImgRemover
+import sqlalchemy
+from system.main_folder import MainFolder
 
+MainFolder.init()
 
-a = {
-    i: getattr(Cfg, i)
-    for i in vars(Cfg).keys()[2:10]
-}
-
-print(a)
+img_remover = ImgRemover()

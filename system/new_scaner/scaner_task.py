@@ -84,6 +84,8 @@ class ScanerTask(URunnable):
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
 
+        # если в Finder была удалена какая-либо директория
+        # удаляем изображения из БД, относящиеся к этой директории
         conn = Dbase.engine.connect()
         img_remover = ImgRemover(del_dirs, main_folder, conn)
         img_remover.run()
@@ -134,5 +136,5 @@ class ScanerTask(URunnable):
         conn.close()
 
         self.send_text("")
-        if del_images or new_images:
+        if del_dirs or new_dirs:
             self.sigs.reload_gui.emit()

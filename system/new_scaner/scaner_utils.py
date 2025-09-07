@@ -342,9 +342,34 @@ class ImgRemover:
         self.conn = conn
 
     def run(self):
+        rel_paths = self.get_rel_paths()
+        self.remove_images(rel_paths)
+
+        return
         for rel_dir_path, mod in self.del_dirs:
             q = sqlalchemy.delete(THUMBS)
-            print(rel_dir_path)
+            q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
+            q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
+            q = q.where(THUMBS.c.brand == self.main_folder.name)
+            self.conn.execute(q)
+        self.conn.commit()
+
+    def get_rel_paths(self):
+        rel_paths = []
+        for rel_dir_path, mod in self.del_dirs:
+            q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_src)
+            q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
+            q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
+            q = q.where(THUMBS.c.brand == self.main_folder.name)
+            rel_paths.extend(self.conn.execute(q).fetchall())
+
+        print(rel_paths)
+
+    def remove_images(self, rel_paths: list[int, str]):
+        for id_, rel_path in rel_paths:
+            abs_path = MainUtils.get_abs_path(self.main_folder.curr_path, rel_path)
+            print(abs_path)
+
 
 class DbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
