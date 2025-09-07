@@ -484,8 +484,8 @@ class LoadDbImagesTask(URunnable):
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             else:
                 f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
-            if coll == basename:
-                coll = MainFolder.current.name
+            if rel_img_path.count("/") == 1:
+                coll = Lng.root[Cfg.lng]
             item = LoadDbImagesItem(qimage, rel_img_path, coll, fav, f_mod)
             if Dynamic.curr_coll_name == Static.NAME_RECENTS:
                 thumbs_dict[0].append(item)
