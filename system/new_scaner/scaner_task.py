@@ -86,10 +86,8 @@ class ScanerTask(URunnable):
 
         # например была удалена папка Collection 1, тогда все данные
         # в THUMBS и hadhdir будут удалены через ImgRemover
-        conn = Dbase.engine.connect()
-        img_remover = ImgRemover(del_dirs, main_folder, conn)
+        img_remover = ImgRemover(del_dirs, main_folder)
         img_remover.run()
-        conn.close()
 
         # ищем изображения в новых (обновленных) директориях
         img_loader = ImgLoader(new_dirs, main_folder, self.task_state)

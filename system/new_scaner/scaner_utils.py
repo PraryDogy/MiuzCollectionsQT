@@ -332,14 +332,13 @@ class HashdirUpdater(QObject):
 
 
 class ImgRemover:
-    def __init__(self, del_dirs: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
+    def __init__(self, del_dirs: list, main_folder: MainFolder):
         """
         - del_dirs: [(rel_dir_path, mod_time), ...]
         """
         super().__init__()
         self.del_dirs = del_dirs
         self.main_folder = main_folder
-        self.conn = conn
 
     def run(self):
         rel_paths = self.get_rel_paths()
@@ -347,13 +346,16 @@ class ImgRemover:
         self.remove_db(confirmed_images)
 
     def remove_db(self, confirmed_images: list[int]):
+        conn = Dbase.engine.connect()
         for id_ in confirmed_images:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.id == id_)
-            self.conn.execute(q)
-        self.conn.commit()
+            conn.execute(q)
+        conn.commit()
+        conn.close()
 
     def get_rel_paths(self):
+        conn = Dbase.engine.connect()
         rel_paths = []
         for rel_dir_path, mod in self.del_dirs:
             q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash)
@@ -361,6 +363,7 @@ class ImgRemover:
             q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             q = q.where(THUMBS.c.brand == self.main_folder.name)
             rel_paths.extend(self.conn.execute(q).fetchall())
+        conn.close()
         return rel_paths
 
     def remove_images(self, rel_paths: list[int, str]):
