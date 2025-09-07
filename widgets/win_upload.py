@@ -143,7 +143,7 @@ class WinUpload(WinChild):
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(5, 10, 5, 5)
-
+        
         self.tab_wid = QTabWidget()
         self.central_layout.addWidget(self.tab_wid)
 
