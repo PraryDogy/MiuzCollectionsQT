@@ -345,6 +345,7 @@ class ImgRemover:
     def run(self):
         rel_paths = self.get_rel_paths()
         confirmed_images = self.remove_images(rel_paths)
+        print(self.del_dirs)
         self.remove_db(confirmed_images)
 
     def remove_db(self, confirmed_images: list[int]):
@@ -361,9 +362,13 @@ class ImgRemover:
         rel_paths = []
         for rel_dir_path, mod in self.del_dirs:
             q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash)
-            q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
-            q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             q = q.where(THUMBS.c.brand == self.main_folder.name)
+            if rel_dir_path == "/":
+                q = q.where(THUMBS.c.short_src.ilike("/%"))
+                q = q.where(THUMBS.c.short_src.not_ilike("/%/%"))
+            else:
+                q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
+                q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             rel_paths.extend(conn.execute(q).fetchall())
         conn.close()
         return rel_paths
