@@ -178,6 +178,6 @@ class MenuLeft(QTabWidget):
 
         self.collections_list = MyTree(MainFolder.current.curr_path)
         self.collections_list.clicked_.connect(self.clicked_cmd)
-        self.addTab(self.collections_list, Lng.collection[Cfg.lng])
+        self.addTab(self.collections_list, Lng.images[Cfg.lng])
 
         self.setCurrentIndex(1)
