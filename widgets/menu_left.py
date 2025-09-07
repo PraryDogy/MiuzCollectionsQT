@@ -24,7 +24,8 @@ class BaseCollBtn(QLabel):
         data = {
             Static.NAME_ALL_COLLS: Lng.all_collections[Cfg.lng],
             Static.NAME_RECENTS: Lng.recents[Cfg.lng],
-            Static.NAME_FAVS: Lng.favorites[Cfg.lng]
+            Static.NAME_FAVS: Lng.favorites[Cfg.lng],
+            Static.NAME_ROOT: Lng.root[Cfg.lng]
         }
         if coll_name in data:
             coll_name = data.get(coll_name)
@@ -41,7 +42,12 @@ class CollBtn(BaseCollBtn):
     def reveal_cmd(self, *args) -> None:
         main_folder_path = MainFolder.current.availability()
         if main_folder_path:
-            if self.coll_name in (Static.NAME_ALL_COLLS, Static.NAME_FAVS, Static.NAME_RECENTS):
+            if self.coll_name in (
+                Static.NAME_ALL_COLLS,
+                Static.NAME_FAVS,
+                Static.NAME_RECENTS,
+                Static.NAME_ROOT
+            ):
                 coll = main_folder_path
             else:
                 coll = os.path.join(main_folder_path, self.coll_name)
@@ -97,6 +103,7 @@ class CollList(VListWidget):
 
     def _init_ui(self, menus: list[str]):
         self.clear()
+        menus, root = menus
 
         # ALL COLLECTIONS
         all_colls_btn = CollBtn(text=Static.NAME_ALL_COLLS)
@@ -126,6 +133,14 @@ class CollList(VListWidget):
         self.addItem(spacer)
 
         self.setCurrentRow(0)
+        
+        root_btn = CollBtn(text=Static.NAME_ROOT)
+        root_btn.pressed_.connect(
+            lambda: self.collection_btn_cmd(root_btn)
+        )
+        root_item = UListWidgetItem(self)
+        self.addItem(root_item)
+        self.setItemWidget(root_item, root_btn)
 
         for i in menus:
             coll_btn = CollBtn(i)

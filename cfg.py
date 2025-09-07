@@ -28,6 +28,7 @@ class Static:
     NAME_ALL_COLLS = "___collections___"
     NAME_FAVS = "___favorites___"
     NAME_RECENTS = "___recents___"
+    NAME_ROOT = "___root___"
     FOLDER_HASHDIR = "hashdir"
     FOLDER_PRELOAD = "_preload"
     APP_SUPPORT_DIR = os.path.expanduser(f"~/Library/Application Support/{APP_NAME}")

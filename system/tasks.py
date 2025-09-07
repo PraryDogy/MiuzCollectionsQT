@@ -148,7 +148,7 @@ class FavTask(URunnable):
 
 
 class _LoadCollListSigs(QObject):
-    finished_ = pyqtSignal(list)
+    finished_ = pyqtSignal(tuple)
 
 
 class LoadCollListTask(URunnable):
@@ -156,21 +156,24 @@ class LoadCollListTask(URunnable):
         super().__init__()
         self.main_folder = main_folder
         self.sigs = _LoadCollListSigs()
+        self.conn = Dbase.engine.connect()
 
     def task(self) -> None:
         menus = self.get_collections_list()
+        root = self.get_root()
+
         try:
-            self.sigs.finished_.emit(menus)
+            self.sigs.finished_.emit((menus, root))
         except RuntimeError as e:
             MainUtils.print_error()
+        self.conn.close()
 
-    def get_collections_list(self) -> list[dict]:
-        conn = Dbase.engine.connect()
+    def get_collections_list(self):
         q = select(THUMBS.c.coll)
         q = q.where(THUMBS.c.brand == self.main_folder.name)
+        q = q.where(THUMBS.c.short_src.ilike("/%/%"))
         q = q.distinct()
-        res = conn.execute(q).scalars()
-        conn.close()
+        res = self.conn.execute(q).scalars()
 
         if not res:
             return list()
@@ -179,6 +182,14 @@ class LoadCollListTask(URunnable):
             return sorted(res, key=self.strip_to_first_letter)
         else:
             return list(res)
+        
+    def get_root(self):
+        q = select(THUMBS.c.coll)
+        q = q.where(THUMBS.c.brand == self.main_folder.name)
+        q = q.where(THUMBS.c.short_src.ilike("/%"))
+        q = q.where(THUMBS.c.short_src.not_ilike("/%/%"))
+        q = q.distinct()
+        return self.conn.execute(q).scalar_one()
     
     def strip_to_first_letter(self, s: str) -> str:
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
@@ -509,6 +520,11 @@ class LoadDbImagesTask(URunnable):
 
         if Dynamic.curr_coll_name == Static.NAME_FAVS:
             stmt = stmt.where(THUMBS.c.fav == 1)
+            
+        elif Dynamic.curr_coll_name == Static.NAME_ROOT:
+            print(1)
+            stmt = stmt.where(THUMBS.c.short_src.ilike("/%"))
+            stmt = stmt.where(THUMBS.c.short_src.not_ilike("/%/%"))
 
         elif Dynamic.curr_coll_name not in (Static.NAME_ALL_COLLS, Static.NAME_RECENTS):
             stmt = stmt.where(THUMBS.c.coll == Dynamic.curr_coll_name)

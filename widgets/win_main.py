@@ -258,12 +258,12 @@ class WinMain(UMainWindow):
             Static.NAME_ALL_COLLS: Lng.all_collections[Cfg.lng],
             Static.NAME_FAVS: Lng.favorites[Cfg.lng],
             Static.NAME_RECENTS: Lng.recents[Cfg.lng],
+            Static.NAME_ROOT: Lng.root[Cfg.lng],
         }
         if Dynamic.curr_coll_name in data:
             t = data.get(Dynamic.curr_coll_name)
         else:
             t = Dynamic.curr_coll_name
-        t = f"{MainFolder.current.name}: {t}"
         self.setWindowTitle(t)
 
     def center(self):

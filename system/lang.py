@@ -231,6 +231,7 @@ class Lng:
     collection_folder = ("Папка с коллекциями", "Collections folder")
     image = ("Изображение", "Image")
     other_folders = ("Прочие папки", "Other folders")
+    root = ("Корень", "Root")
     help_text = (
         "Папка с коллекциями:\n"
         "- Может содержать подпапки (коллекции)\n"
