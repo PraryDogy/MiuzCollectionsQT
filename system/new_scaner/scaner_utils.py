@@ -364,7 +364,7 @@ class ImgRemover:
             q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
             q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             q = q.where(THUMBS.c.brand == self.main_folder.name)
-            rel_paths.extend(self.conn.execute(q).fetchall())
+            rel_paths.extend(conn.execute(q).fetchall())
         conn.close()
         return rel_paths
 
