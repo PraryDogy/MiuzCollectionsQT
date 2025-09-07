@@ -259,7 +259,6 @@ class WinMain(UMainWindow):
         data = {
             Static.NAME_FAVS: Lng.favorites[Cfg.lng],
             Static.NAME_RECENTS: Lng.recents[Cfg.lng],
-            Static.NAME_ROOT: Lng.root[Cfg.lng],
         }
         if Dynamic.curr_coll_name in data:
             t = data.get(Dynamic.curr_coll_name)

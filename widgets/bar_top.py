@@ -91,6 +91,19 @@ class TypesBtn(BarTopBtn):
             self.clicked_.emit()
 
 
+class SortBtn(BarTopBtn):
+    clicked_ = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.lbl.setText(Lng.sort[Cfg.lng])
+        self.svg_btn.load("./images/filter.svg")
+
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.button() == Qt.MouseButton.LeftButton:
+            self.clicked_.emit()
+
+
 class SettingsBtn(BarTopBtn):
     clicked_ = pyqtSignal()
 
@@ -125,17 +138,12 @@ class BarTop(QWidget):
 
         self.h_layout.addStretch(1)
 
+
+        # сортировка по слоям по джепегам: добавим их в фильтры
         self.filters_btn = FiltersBtn()
         self.filters_btn.clicked_.connect(lambda: self.open_settings.emit())
         self.h_layout.addWidget(
             self.filters_btn,
-            alignment=Qt.AlignmentFlag.AlignLeft
-        )
-
-        self.types_btn = TypesBtn()
-        self.types_btn.clicked_.connect(lambda: self.open_settings.emit())
-        self.h_layout.addWidget(
-            self.types_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
         )
 
