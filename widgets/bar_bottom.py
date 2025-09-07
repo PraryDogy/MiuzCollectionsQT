@@ -94,7 +94,7 @@ class FilterBtn(QSvgWidget):
 
         t = f"{Lng.show[Cfg.lng]}: {Lng.type_jpg[Cfg.lng]}, {Lng.type_tiff[Cfg.lng]}"
         super().__init__()
-        self.load("./images/filter.svg")
+        self.load("./images/filters.svg")
         self.setFixedSize(18, 18)
 
     def menu_types(self, *args):

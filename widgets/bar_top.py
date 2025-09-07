@@ -57,7 +57,7 @@ class DatesBtn(BarTopBtn):
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.dates[Cfg.lng])
-        self.svg_btn.load("./images/filter.svg")
+        self.svg_btn.load("./images/calendar.svg")
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -71,20 +71,7 @@ class FiltersBtn(BarTopBtn):
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.filters[Cfg.lng])
-        self.svg_btn.load("./images/filter.svg")
-
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
-
-
-class TypesBtn(BarTopBtn):
-    clicked_ = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-        self.lbl.setText(Lng.type_[Cfg.lng])
-        self.svg_btn.load("./images/filter.svg")
+        self.svg_btn.load("./images/filters.svg")
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -97,7 +84,7 @@ class SortBtn(BarTopBtn):
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.sort[Cfg.lng])
-        self.svg_btn.load("./images/filter.svg")
+        self.svg_btn.load("./images/sort.svg")
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -138,6 +125,12 @@ class BarTop(QWidget):
 
         self.h_layout.addStretch(1)
 
+        self.sort_btn = SortBtn()
+        self.sort_btn.clicked_.connect(lambda: self.open_settings.emit())
+        self.h_layout.addWidget(
+            self.sort_btn,
+            alignment=Qt.AlignmentFlag.AlignLeft
+        )
 
         # сортировка по слоям по джепегам: добавим их в фильтры
         self.filters_btn = FiltersBtn()
