@@ -73,7 +73,6 @@ class WinQuestion(BaseWinWarn):
         ok_btn = QPushButton(Lng.ok[Cfg.lng])
         ok_btn.clicked.connect(self.ok_clicked.emit)
         ok_btn.setFixedWidth(90)
-        ok_btn.clicked.connect(self.close)
 
         cancel_btn = QPushButton(Lng.cancel[Cfg.lng])
         cancel_btn.setFixedWidth(90)

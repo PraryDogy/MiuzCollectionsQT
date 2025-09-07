@@ -757,6 +757,7 @@ class WinSettings(WinSystem):
                 )
                 self.win_question.center_relative_parent(self)
                 self.win_question.ok_clicked.connect(fin)
+                self.win_question.ok_clicked.connect(self.win_question.deleteLater)
                 self.win_question.show()
 
         except Exception as e:

@@ -108,7 +108,7 @@ class WinMain(UMainWindow):
 
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
-        self.grid.remove_files.connect(lambda rel_img_path_list: self.open_remove_files_win(rel_img_path_list))
+        self.grid.remove_files.connect(lambda rel_img_path_list: self.remove_files(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.open_filemove_win(rel_img_path_list))
         self.grid.save_files.connect(copy_files_task)
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
@@ -335,9 +335,9 @@ class WinMain(UMainWindow):
             self.win_smb.center_relative_parent(self.window())
             self.win_smb.show()
 
-    def open_remove_files_win(self, rel_img_path_list: list):
+    def remove_files(self, rel_img_path_list: list):
         
-        def task(img_path_list: list[str]):
+        def start_remove(img_path_list: list[str]):
             task = RmFilesTask(img_path_list, MainFolder.current)
             task.sigs.reload_gui.connect(self.reload_gui)
             UThreadPool.start(task)
@@ -353,7 +353,12 @@ class WinMain(UMainWindow):
                 f"{Lng.delete_forever[Cfg.lng]} ({len(img_path_list)})?"
             )
             self.remove_files_win.center_relative_parent(self.window())
-            self.remove_files_win.ok_clicked.connect(lambda: task(img_path_list))
+            self.remove_files_win.ok_clicked.connect(
+                lambda: start_remove(img_path_list)
+            )
+            self.remove_files_win.ok_clicked.connect(
+                self.remove_files_win.deleteLater
+            )
             self.remove_files_win.show()
         else:
             self.win_smb = WinSmb()
