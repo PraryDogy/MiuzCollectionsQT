@@ -383,15 +383,17 @@ class WinMain(UMainWindow):
             self.reload_rubber()
             self.left_menu.init_ui()
 
-        def copy_files_fin(files: list, win: ProgressbarWin, main_folder: MainFolder):
+        def copy_files_fin(files: list, dest: str, main_folder: MainFolder):
             if not files:
                 return
-            win.deleteLater()
-            MainUtils.reveal_files(files)
-            scan_dir = os.path.dirname(img_path_list[0])
-            task = ScanSingleDirTask(main_folder, scan_dir)
-            task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
-            task.sigs.reload_thumbnails.connect(reload_gui)
+
+            task = ScanSingleDirTask(main_folder, dest)
+            task.sigs.progress_text.connect(
+                self.bar_bottom.progress_bar.setText
+            )
+            task.sigs.reload_thumbnails.connect(
+                reload_gui
+            )
             UThreadPool.start(task)
 
         def copy_files_start(win: WinUpload, data: tuple):
@@ -402,11 +404,24 @@ class WinMain(UMainWindow):
             progress_win.center_relative_parent(self)
             progress_win.show()
             task = CopyFilesTask(dest, img_path_list)
-            progress_win.cancel.connect(lambda: task.task_state.set_should_run(False))
-            task.sigs.value_changed.connect(progress_win.progressbar.setValue)
-            task.sigs.progress_changed.connect(lambda data: set_below_label(data, progress_win))
-            task.sigs.file_changed.connect(lambda text: set_above_label(text, dest_name, progress_win))
-            task.sigs.finished_.connect(lambda files: copy_files_fin(files, progress_win, main_folder))
+            progress_win.cancel.connect(
+                lambda: task.task_state.set_should_run(False)
+            )
+            task.sigs.value_changed.connect(
+                progress_win.progressbar.setValue
+            )
+            task.sigs.progress_changed.connect(
+                lambda data: set_below_label(data, progress_win)
+            )
+            task.sigs.file_changed.connect(
+                lambda text: set_above_label(text, dest_name, progress_win)
+            )
+            task.sigs.finished_.connect(
+                lambda files: copy_files_fin(files, dest, main_folder)
+            )
+            task.sigs.finished_.connect(
+                progress_win.deleteLater
+            )
             UThreadPool.start(task)
             win.deleteLater()
 

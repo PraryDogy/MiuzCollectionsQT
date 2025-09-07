@@ -227,4 +227,3 @@ class MenuLeft(QTabWidget):
 
         self.setCurrentIndex(1)
         
-        print(1)
