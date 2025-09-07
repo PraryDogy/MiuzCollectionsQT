@@ -76,7 +76,7 @@ class FiltersBtn(BarTopBtn):
         if val in Dynamic.enabled_filters:
             Dynamic.enabled_filters.remove(val)
         else:
-            Dynamic.enabled_filters.add(val)
+            Dynamic.enabled_filters.append(val)
         self.clicked_.emit()
 
     def reset(self):
