@@ -105,11 +105,19 @@ class SortBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__()
-        self.lbl.setText(Lng.sort[Cfg.lng])
         self.svg_btn.load("./images/sort.svg")
+        self.set_text()
+
+    def set_text(self):
+        if Dynamic.sort_by_mod:
+            text = Lng.sort_by_mod_short[Cfg.lng]
+        else:
+            text = Lng.sort_by_recent_short[Cfg.lng]
+        self.lbl.setText(text)
 
     def menu_clicked(self, value: bool):
         Dynamic.sort_by_mod = value
+        self.set_text()
         self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:

@@ -503,8 +503,7 @@ class LoadDbImagesTask(URunnable):
         stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_buff_size)
         stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
-        # здесь будет тип сортировки по добавлению / по дате изменения
-        # которая будет вызываться из топбара
+        # сортировка по дате изменения / по дате добавления
         if Dynamic.sort_by_mod:
             stmt = stmt.order_by(-THUMBS.c.mod)
         else:
