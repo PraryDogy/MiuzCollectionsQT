@@ -259,16 +259,16 @@ class WinMain(UMainWindow):
             self.scaner_timer.start(1000)
         
     def set_window_title(self):
-        main_folder = MainFolder.current.name.capitalize()
-        if Dynamic.curr_coll_name == Static.NAME_ALL_COLLS:
-            t = Lng.all_collections[Cfg.lng]
-        elif Dynamic.curr_coll_name == Static.NAME_FAVS:
-            t = Lng.favorites[Cfg.lng]
-        elif Dynamic.curr_coll_name == Static.NAME_RECENTS:
-            t = Lng.recents[Cfg.lng]
+        data = {
+            Static.NAME_ALL_COLLS: Lng.all_collections[Cfg.lng],
+            Static.NAME_FAVS: Lng.favorites[Cfg.lng],
+            Static.NAME_RECENTS: Lng.recents[Cfg.lng],
+        }
+        if Dynamic.curr_coll_name in data:
+            t = data.get(Dynamic.curr_coll_name)
         else:
             t = Dynamic.curr_coll_name
-        t = f"{main_folder}: {t}"
+        t = f"{MainFolder.current.name}: {t}"
         self.setWindowTitle(t)
 
     def center(self):
