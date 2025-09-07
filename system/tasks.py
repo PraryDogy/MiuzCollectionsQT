@@ -13,7 +13,6 @@ from sqlalchemy import select, update
 from cfg import Dynamic, Cfg, Static
 
 from .database import THUMBS, Dbase
-from .filters import SystemFilter, UserFilter
 from .lang import Lng
 from .main_folder import MainFolder
 from .new_scaner.scaner_utils import (DbUpdater, DirsUpdater, HashdirUpdater,
@@ -536,48 +535,7 @@ class LoadDbImagesTask(URunnable):
             stmt = stmt.where(THUMBS.c.mod > start)
             stmt = stmt.where(THUMBS.c.mod < end)
 
-        all_values = {i.value for i in UserFilter.list_} | {SystemFilter.value}
-
-        if len(all_values) == 1:
-            return stmt
-    
-        include_conditions = [
-            self.get_include_condition(i.dir_name)
-            for i in UserFilter.list_
-            if i.value
-        ]
-
-        exclude_conditions = [
-            self.get_exclude_condition(i.dir_name)
-            for i in UserFilter.list_
-        ]
-
-        if include_conditions and SystemFilter.value:
-            stmt = stmt.where(sqlalchemy.or_(
-                sqlalchemy.or_(*include_conditions),
-                sqlalchemy.and_(*exclude_conditions)
-            ))
-
-        elif include_conditions:
-            stmt = stmt.where(sqlalchemy.or_(*include_conditions))
-
-        elif SystemFilter.value:
-            stmt = stmt.where(sqlalchemy.and_(*exclude_conditions))
-
         return stmt
-
-    def get_exclude_condition(self, dir_name: str):
-        """
-        Формирует условие для исключения всех путей, содержащих любую из папок фильтров.
-        """
-        return THUMBS.c.short_src.not_ilike(f"%/{dir_name}/%")
-
-    def get_include_condition(self, dir_name: str):
-        """
-        Формирует условие для включения путей, содержащих указанную папку.
-        """
-        return THUMBS.c.short_src.ilike(f"%/{dir_name}/%")
-
 
     def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:
         """

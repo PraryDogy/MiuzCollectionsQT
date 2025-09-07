@@ -69,12 +69,10 @@ else:
 
 from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication
 
-from cfg import Cfg, Static
+from cfg import Cfg
 from system.database import Dbase
-from system.filters import UserFilter
-from system.lang import Lng
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import UThreadPool
@@ -88,7 +86,6 @@ class App(QApplication):
         Cfg.init()
         Dbase.init()
         MainFolder.init()
-        UserFilter.init()
         UThreadPool.init()
         ThemeChanger.init()
 
