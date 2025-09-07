@@ -44,7 +44,6 @@ class DirsList(VListWidget):
         for path, name in sorted(dirs.items(), key=lambda x: self._strip(x[1])):
             item = DirsItem(parent=self, path=path, text=name)
             self.addItem(item)
-        self.setCurrentRow(0)
 
     def _strip(self, s: str) -> str:
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
@@ -60,7 +59,6 @@ class DirsList(VListWidget):
             self.path = item.path
             self.init_ui()
             self.set_path.emit(item.path)
-
 
 # ПЕРВАЯ ВКАДКА ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА 
 
@@ -146,7 +144,7 @@ class WinUpload(WinChild):
         self.setFixedSize(650, 500)
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.central_layout.setSpacing(5)
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setContentsMargins(5, 10, 5, 5)
 
         self.tab_wid = QTabWidget()
         self.central_layout.addWidget(self.tab_wid)
