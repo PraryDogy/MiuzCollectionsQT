@@ -114,7 +114,7 @@ class ScanerTask(URunnable):
         del_images, new_images = hashdir_updater.run()
 
         # обновляем БД
-        db_updater = DbUpdater(del_images, new_images, main_folder, conn)
+        db_updater = DbUpdater(del_images, new_images, main_folder)
         db_updater.run()
 
         if not self.task_state.should_run():

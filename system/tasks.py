@@ -633,19 +633,16 @@ class ScanSingleDirTask(URunnable):
         hashdir_updater.progress_text.connect(hashdir_text)
         del_images, new_images = hashdir_updater.run()
 
-        conn = Dbase.engine.connect()
-        db_updater = DbUpdater(del_images, new_images, self.main_folder, conn)
+        db_updater = DbUpdater(del_images, new_images, self.main_folder)
         db_updater.run()
-        conn.close()
 
         if not self.task_state.should_run():
             return
 
-        conn = Dbase.engine.connect()
-        DirsUpdater.remove_db_dirs(conn, self.main_folder, new_dirs)
-        DirsUpdater.add_new_dirs(conn, self.main_folder, new_dirs)
-        conn.close()
-
+        del_dirs = new_dirs
+        dirs_updater = DirsUpdater(self.main_folder, del_dirs, new_dirs)
+        dirs_updater.run()
+        
         # скрываем текст
         self.sigs.progress_text.emit("")
 
