@@ -92,7 +92,7 @@ class ScanerTask(URunnable):
         if not self.task_state.should_run():
             print(main_folder.name, "no finder images")
             return
-        
+
         # сравниваем Finder и БД изображения
         img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()

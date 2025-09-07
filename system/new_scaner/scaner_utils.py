@@ -52,13 +52,12 @@ class DirsLoader(QObject):
                         print("new scaner utils, dirs loader, finder dirs error", e)
                         self.task_state.set_should_run(False)
 
-        try:
-            stats = os.stat(self.main_folder_path)
-            data = (os.sep, int(stats.st_mtime))
-            dirs.append(data)
-        except Exception as e:
-            print("new scaner dirs loader finder dirs error add root dir", e)
-
+        # try:
+        #     stats = os.stat(self.main_folder_path)
+        #     data = (os.sep, int(stats.st_mtime))
+        #     dirs.append(data)
+        # except Exception as e:
+        #     print("new scaner dirs loader finder dirs error add root dir", e)
         return dirs
 
     def db_dirs(self) -> list[tuple]:
