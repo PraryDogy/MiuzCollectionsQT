@@ -108,38 +108,40 @@ class DirsCompator:
 
 
 class DirsUpdater:
-    @classmethod
-    def remove_db_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder, del_dirs: list):
+    def __init__(self, main_folder: MainFolder, del_dirs, new_dirs):
         """
-        Параметры:
         - del_dirs: [(rel_dir_path, mod_time), ...]
-
-        Удаляет директории из таблицы DIRS
+        - new_dirs: [(rel_dir_path, mod_time), ...]
         """
-        for rel_dir_path, mod in del_dirs:
+        super().__init__()
+        self.main_folder = main_folder
+        self.del_dirs = del_dirs
+        self.new_dirs = new_dirs
+        self.conn = Dbase.engine.connect()
+        
+    def run(self):
+        self.remove_db_dirs()
+        self.add_new_dirs()
+        self.conn.close()
+
+    def remove_db_dirs(self):
+        for rel_dir_path, mod in self.del_dirs:
             q = sqlalchemy.delete(DIRS)
             q = q.where(DIRS.c.short_src == rel_dir_path)
-            q = q.where(DIRS.c.brand == main_folder.name)
-            conn.execute(q)
-        conn.commit()
+            q = q.where(DIRS.c.brand == self.main_folder.name)
+            self.conn.execute(q)
+        self.conn.commit()
 
-    @classmethod
-    def add_new_dirs(cls, conn: sqlalchemy.Connection, main_folder: MainFolder, new_dirs: list):
-        """
-        Параметры:
-        - new_dirs: [(rel_dir_path, mod_time), ...]
-
-        Добавляет директории в таблицу DIRS
-        """
-        for short_src, mod in new_dirs:
+    def add_new_dirs(self):
+        for short_src, mod in self.new_dirs:
             values = {
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.MOD: mod,
-                ClmNames.BRAND: main_folder.name
+                ClmNames.BRAND: self.main_folder.name
             }
             q = sqlalchemy.insert(DIRS).values(**values)
-            conn.execute(q)
-        conn.commit()
+            self.conn.execute(q)
+        self.conn.commit()
 
 
 class ImgLoader(QObject):
@@ -380,7 +382,7 @@ class ImgRemover:
 
 
 class DbUpdater:
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
+    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
@@ -394,7 +396,7 @@ class DbUpdater:
         self.main_folder = main_folder
         self.del_items = del_items
         self.new_items = new_items
-        self.conn = conn
+        self.conn = Dbase.engine.connect()
 
     def run(self):
         self.run_del_items()
@@ -431,7 +433,7 @@ class DbUpdater:
 
 
 class Inspector:
-    def __init__(self, del_items: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
+    def __init__(self, del_items: list, main_folder: MainFolder):
         """
         del_items: [rel thumb path, ...]
 
@@ -448,7 +450,7 @@ class Inspector:
         super().__init__()
         self.del_items = del_items
         self.main_folder = main_folder
-        self.conn = conn
+        self.conn = Dbase.engine.connect()
     
     def is_remove_all(self):
         q = sqlalchemy.select(sqlalchemy.func.count())
@@ -461,7 +463,7 @@ class Inspector:
 
 class MainFolderRemover:
 
-    def __init__(self, conn: sqlalchemy.Connection):
+    def __init__(self):
         """
         Запуск: run()   
         Сигналы: progress_text(str)
@@ -475,7 +477,7 @@ class MainFolderRemover:
         Вызови run для работы
         """
         super().__init__()
-        self.conn = conn
+        self.conn = Dbase.engine.connect()
 
     def run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
@@ -487,6 +489,7 @@ class MainFolderRemover:
             self.remove_images(rows)
             self.remove_rows(rows)
             self.remove_dirs(i)
+        self.conn.close()
         
     def get_rows(self, main_folder_name: str):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path

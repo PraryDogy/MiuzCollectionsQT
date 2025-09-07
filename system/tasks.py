@@ -402,8 +402,7 @@ class RmFilesTask(URunnable):
         del_items, new_items = file_updater.run()
         
         # new_items пустой так как мы только удаляем thumbs из бд
-        conn = Dbase.engine.connect()
-        db_updater = DbUpdater(del_items, [], MainFolder.current, conn)
+        db_updater = DbUpdater(del_items, [], MainFolder.current)
         db_updater.run()
 
         # [(rel dir path, mod time), ...]
@@ -415,10 +414,8 @@ class RmFilesTask(URunnable):
             for i in self.img_path_list
         ]
 
-        DirsUpdater.remove_db_dirs(conn, MainFolder.current, worker_dirs)
-        DirsUpdater.add_new_dirs(conn, MainFolder.current, worker_dirs)
-        conn.close()
-
+        dirs_updater = DirsUpdater(self.main_folder, worker_dirs, worker_dirs)
+        dirs_updater.run()
 
 class LoadDbImagesItem:
     __slots__ = ["qimage", "rel_img_path", "coll_name", "fav", "f_mod"]

@@ -66,10 +66,8 @@ class ScanerTask(URunnable):
             return
 
         # удаляем все файлы и данные по удаленному MainFolder
-        conn = Dbase.engine.connect()
-        main_folder_remover = MainFolderRemover(conn)
+        main_folder_remover = MainFolderRemover()
         main_folder_remover.run()
-        conn.close()
 
         # собираем Finder директории и базу данных
         dirs_loader = DirsLoader(main_folder, self.task_state)
@@ -103,10 +101,8 @@ class ScanerTask(URunnable):
         del_images, new_images = img_compator.run()
 
         # запрещаем удалять сразу все изображения относящиеся к папке
-        conn = Dbase.engine.connect()
-        inspector = Inspector(del_images, main_folder, conn)
+        inspector = Inspector(del_images, main_folder)
         is_remove_all = inspector.is_remove_all()
-        conn.close()
         if is_remove_all:
             print("scaner > обнаружена попытка массового удаления фотографий")
             print("в папке:", main_folder.name, main_folder.get_current_path())
@@ -118,20 +114,16 @@ class ScanerTask(URunnable):
         del_images, new_images = hashdir_updater.run()
 
         # обновляем БД
-        conn = Dbase.engine.connect()
         db_updater = DbUpdater(del_images, new_images, main_folder, conn)
         db_updater.run()
-        conn.close()
 
         if not self.task_state.should_run():
             self.sigs.reload_gui.emit()
             return
 
         # обновляем информацию о директориях в БД
-        conn = Dbase.engine.connect()
-        DirsUpdater.remove_db_dirs(conn, main_folder, del_dirs)
-        DirsUpdater.add_new_dirs(conn, main_folder, new_dirs)
-        conn.close()
+        dirs_updater = DirsUpdater(main_folder, del_dirs, new_dirs)
+        dirs_updater.run()
 
         self.send_text("")
         if del_dirs or new_dirs:
