@@ -8,6 +8,12 @@ class Filters:
     default = [
         "/1 IMG/",
         "/2 MODEL IMG/",
+        ".tiff",
+        ".psd",
+        ".psb",
+        ".jpg",
+        ".jpeg",
+        ".png"
     ]
 
     @classmethod
