@@ -156,6 +156,11 @@ class WinUpload(WinChild):
         left_lay = UVBoxLayout(left_wid)
         left_lay.setSpacing(5)
 
+        self.info_box = PathWidget()
+        self.info_box.setMaximumWidth(self.width())
+        self.info_box.set_path(MainFolder.current.curr_path)
+        left_lay.addWidget(self.info_box)
+
         self.tab_wid = QTabWidget()
         left_lay.addWidget(self.tab_wid)
 
@@ -164,13 +169,8 @@ class WinUpload(WinChild):
         self.tab_wid.addTab(self.main_folders, Lng.folders[Cfg.lng])
 
         self.dirs_list = MyTree(MainFolder.current.curr_path)
-        self.tab_wid.addTab(self.dirs_list, Lng.collections[Cfg.lng])
-
-        self.info_box = PathWidget()
-        self.info_box.setMaximumWidth(self.width())
-        self.info_box.set_path(MainFolder.current.curr_path)
         self.dirs_list.clicked_.connect(self.info_box.set_path)
-        left_lay.addWidget(self.info_box)
+        self.tab_wid.addTab(self.dirs_list, Lng.collections[Cfg.lng])
 
         # правая часть (кнопки сверху)
         right_wid = QWidget()
