@@ -331,6 +331,21 @@ class HashdirUpdater(QObject):
         return new_new_items
 
 
+class ImgRemover:
+    def __init__(self, del_dirs: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
+        """
+        - del_dirs: [(rel_dir_path, mod_time), ...]
+        """
+        super().__init__()
+        self.del_dirs = del_dirs
+        self.main_folder = main_folder
+        self.conn = conn
+
+    def run(self):
+        for rel_dir_path, mod in self.del_dirs:
+            q = sqlalchemy.delete(THUMBS)
+            print(rel_dir_path)
+
 class DbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, conn: sqlalchemy.Connection):
         """

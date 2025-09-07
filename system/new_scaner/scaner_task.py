@@ -11,7 +11,7 @@ from ..main_folder import MainFolder
 from ..utils import URunnable
 from .scaner_utils import (DbUpdater, DirsCompator, DirsLoader, DirsUpdater,
                            HashdirUpdater, ImgCompator, ImgLoader, Inspector,
-                           MainFolderRemover)
+                           MainFolderRemover, ImgRemover)
 
 
 class ScanerSigs(QObject):
@@ -83,6 +83,11 @@ class ScanerTask(URunnable):
         # сравниваем Finder и БД директории
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
+
+        conn = Dbase.engine.connect()
+        img_remover = ImgRemover(del_dirs, main_folder, conn)
+        img_remover.run()
+        conn.close()
 
         # ищем изображения в новых (обновленных) директориях
         img_loader = ImgLoader(new_dirs, main_folder, self.task_state)
