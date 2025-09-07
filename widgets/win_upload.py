@@ -36,8 +36,10 @@ class DirsList(VListWidget):
     
     def init_ui_fin(self, dirs: dict[str, str]):        
         self.clear()
-        back = DirsItem(parent=self, path=os.path.dirname(self.path), text="...")
-        self.addItem(back)
+
+        if not self.path in self.main_folder_paths:
+            back = DirsItem(parent=self, path=os.path.dirname(self.path), text="...")
+            self.addItem(back)
 
         for path, name in sorted(dirs.items(), key=lambda x: self._strip(x[1])):
             item = DirsItem(parent=self, path=path, text=name)
