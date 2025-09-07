@@ -39,8 +39,10 @@ class MyTree(QTreeWidget):
         self.addTopLevelItem(root_item)
 
         worker: LoadSortedDirsTask = LoadSortedDirsTask(self.root_dir)
-        worker.sigs.finished_.connect(lambda data, item=root_item: self.add_children(item, data))
-        worker.sigs.finished_.connect(self.clearFocus)
+        worker.sigs.finished_.connect(
+            lambda data, item=root_item: self.add_children(item, data)
+        )
+        worker.sigs.finished_.connect(self.select_first_item)
         UThreadPool.start(worker)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
@@ -48,7 +50,9 @@ class MyTree(QTreeWidget):
         self.clicked_.emit(path)
         if item.childCount() == 0:
             worker: LoadSortedDirsTask = LoadSortedDirsTask(path)
-            worker.sigs.finished_.connect(lambda data, item=item: self.add_children(item, data))
+            worker.sigs.finished_.connect(
+                lambda data, item=item: self.add_children(item, data)
+            )
             UThreadPool.start(worker)
         item.setExpanded(True)
 
@@ -66,6 +70,12 @@ class MyTree(QTreeWidget):
 
     def reveal(self, path: str):
         subprocess.Popen(["open", path])
+
+    def select_first_item(self):
+        top_item = self.topLevelItem(0)
+        if top_item:
+            self.setCurrentItem(top_item)
+            self.itemClicked.emit(top_item, 0)
 
     def contextMenuEvent(self, a0):
         item = self.itemAt(a0.pos())
@@ -87,6 +97,7 @@ class MyTree(QTreeWidget):
 
             menu.show_()
         return super().contextMenuEvent(a0)
+
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
