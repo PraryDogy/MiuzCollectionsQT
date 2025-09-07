@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QLabel, QPushButton, QTreeWidget, QTreeWidgetItem,
                              QWidget)
@@ -11,7 +11,17 @@ from system.lang import Lng
 from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
 
 
-class PageOne(QTreeWidget):
+class BasePage(QTreeWidget):
+    clicked_= pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.setSelectionMode(QTreeWidget.SelectionMode.NoSelection)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        # self.setDisabled(True)
+
+
+class PageOne(BasePage):
     def __init__(self):
         super().__init__()
         self.setHeaderHidden(True)
@@ -33,7 +43,7 @@ class PageOne(QTreeWidget):
         self.expandAll()
         
 
-class PageTwo(QTreeWidget):
+class PageTwo(BasePage):
     def __init__(self):
         super().__init__()
         self.setHeaderHidden(True)
@@ -48,7 +58,7 @@ class PageTwo(QTreeWidget):
         self.expandAll()
 
 
-class PageThree(QTreeWidget):
+class PageThree(BasePage):
     filters = (
         "1 IMG",
         "2 MODEL IMG"
@@ -86,14 +96,11 @@ class WinHelp(WinSystem):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.help[Cfg.lng])
-        self.central_layout.setContentsMargins(10, 5, 10, 5)
+        self.central_layout.setContentsMargins(10, 5, 10, 10)
         self.central_layout.setSpacing(15)
 
         descr = QLabel(Lng.help_text[Cfg.lng])
         self.central_layout.insertWidget(0, descr)
-
-        btn_wid_ = self.btn_wid()
-        self.central_layout.insertWidget(2, btn_wid_)
 
         self.current_page = 0
         self.max_pages = 2
@@ -105,43 +112,18 @@ class WinHelp(WinSystem):
 
         self.dynamic_wid = self.page_list[0]()
         self.central_layout.insertWidget(1, self.dynamic_wid)
-        self.setFixedSize(450, 430)
+        self.setFixedSize(450, 420)
 
     def create_page(self, wid: QTreeWidget, page_num: int):
         tree: QTreeWidget = wid()
+        tree.clicked.connect(self.next_page)
         return tree
-
-    def btn_wid(self):
-        btn_wid = QWidget()
-        btn_lay = UHBoxLayout()
-        btn_lay.setSpacing(10)
-        btn_wid.setLayout(btn_lay)
-
-        btn_lay.addStretch()
-
-        self.prev_btn = QPushButton(Lng.back[Cfg.lng])
-        self.prev_btn.clicked.connect(self.prev_page)
-        self.prev_btn.setFixedWidth(100)
-        btn_lay.addWidget(self.prev_btn)
-
-        self.next_btn = QPushButton(Lng.next_[Cfg.lng])
-        self.next_btn.clicked.connect(self.next_page)
-        self.next_btn.setFixedWidth(100)
-        btn_lay.addWidget(self.next_btn)
-
-        btn_lay.addStretch()
-
-        return btn_wid
     
     def next_page(self):
         self.current_page += 1
         if self.current_page > self.max_pages:
-            self.current_page -= 1
+            self.current_page = 0
 
-        if self.current_page == self.max_pages:
-            self.next_btn.setDisabled(True)
-
-        self.prev_btn.setDisabled(False)
         self.dynamic_wid.deleteLater()
         new_wid = self.page_list[self.current_page]
         self.dynamic_wid = new_wid()
