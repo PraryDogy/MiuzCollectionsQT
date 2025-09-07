@@ -56,6 +56,7 @@ class MyTree(QTreeWidget):
             child.setSizeHint(0, QSize(0, self.hh))
             child.setData(0, Qt.ItemDataRole.UserRole, path)  # полный путь
             parent_item.addChild(child)
+        parent_item.setExpanded(True)
 
 
 # ПЕРВАЯ ВКАДКА ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА  ПЕРВАЯ ВКАДКА 
@@ -100,6 +101,7 @@ class PathWindow(WinChild):
         self.text_label = QLabel()
         self.text_label.setWordWrap(True)
         self.central_layout.addWidget(self.text_label)
+        self.setMinimumWidth(350)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
@@ -119,6 +121,7 @@ class PathWidget(QGroupBox):
         self.label_bottom.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.addWidget(self.label_bottom)
         self.setLayout(v_lay)
+        
 
     def set_path(self, path: str):
         self.label_bottom.setText(path)
@@ -126,8 +129,7 @@ class PathWidget(QGroupBox):
     def show_path_win(self, *args):
         self.win = PathWindow()
         self.win.text_label.setText(self.label_bottom.text())
-        self.win.setMinimumSize(400, 30)
-        self.win.setMaximumWidth(900)
+        self.win.resize(30, 350)
         self.win.adjustSize()
         self.win.center_relative_parent(self.window())
         self.win.show()
@@ -135,7 +137,7 @@ class PathWidget(QGroupBox):
 
 class WinUpload(WinChild):
     clicked = pyqtSignal(tuple)
- 
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.upload[Cfg.lng])
@@ -143,9 +145,19 @@ class WinUpload(WinChild):
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(5, 10, 5, 5)
-        
+
+        # общий горизонтальный контейнер
+        main_wid = QWidget()
+        main_lay = UHBoxLayout(main_wid)
+        main_lay.setSpacing(5)
+
+        # левая часть (вертикально: вкладки + путь)
+        left_wid = QWidget()
+        left_lay = UVBoxLayout(left_wid)
+        left_lay.setSpacing(5)
+
         self.tab_wid = QTabWidget()
-        self.central_layout.addWidget(self.tab_wid)
+        left_lay.addWidget(self.tab_wid)
 
         self.main_folders = MainFolderList()
         self.main_folders.clicked.connect(self.main_folder_click)
@@ -154,32 +166,34 @@ class WinUpload(WinChild):
         self.dirs_list = MyTree(MainFolder.current.curr_path)
         self.tab_wid.addTab(self.dirs_list, Lng.collections[Cfg.lng])
 
-        # новый бокс над кнопками
         self.info_box = PathWidget()
         self.info_box.setMaximumWidth(self.width())
         self.info_box.set_path(MainFolder.current.curr_path)
-        self.central_layout.addWidget(self.info_box)
         self.dirs_list.clicked_.connect(self.info_box.set_path)
+        left_lay.addWidget(self.info_box)
 
-        # кнопки внизу
-        btn_lay = UHBoxLayout()
-        btn_lay.setSpacing(10)
+        # правая часть (кнопки сверху)
+        right_wid = QWidget()
+        right_lay = UVBoxLayout(right_wid)
+        right_lay.setSpacing(10)
 
         self.ok_btn = QPushButton(Lng.ok[Cfg.lng])
-        self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(90)
+        self.ok_btn.clicked.connect(self.ok_cmd)
 
         self.cancel_btn = QPushButton(Lng.cancel[Cfg.lng])
-        self.cancel_btn.clicked.connect(self.deleteLater)
         self.cancel_btn.setFixedWidth(90)
+        self.cancel_btn.clicked.connect(self.deleteLater)
 
-        btn_lay.addStretch()
-        btn_lay.addWidget(self.ok_btn)
-        btn_lay.addWidget(self.cancel_btn)
-        btn_lay.addStretch()
+        right_lay.addWidget(self.ok_btn)
+        right_lay.addWidget(self.cancel_btn)
+        right_lay.addStretch()
 
-        self.central_layout.addLayout(btn_lay)
+        # собрать всё
+        main_lay.addWidget(left_wid, stretch=1)
+        main_lay.addWidget(right_wid)
 
+        self.central_layout.addWidget(main_wid)
         self.tab_wid.setCurrentIndex(1)
 
     def main_folder_click(self, main_folder: MainFolder):
