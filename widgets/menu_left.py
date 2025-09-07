@@ -113,6 +113,15 @@ class CollList(VListWidget):
         self.addItem(all_colls_item)
         self.setItemWidget(all_colls_item, all_colls_btn)
 
+        if root:
+            root_btn = CollBtn(text=Static.NAME_ROOT)
+            root_btn.pressed_.connect(
+                lambda: self.collection_btn_cmd(root_btn)
+            )
+            root_item = UListWidgetItem(self)
+            self.addItem(root_item)
+            self.setItemWidget(root_item, root_btn)
+
         # FAVORITES
         favs_btn = CollBtn(text=Static.NAME_FAVS)
         cmd_ = lambda: self.collection_btn_cmd(favs_btn)
@@ -131,18 +140,6 @@ class CollList(VListWidget):
 
         spacer = UListSpaserItem(self)
         self.addItem(spacer)
-
-        if root:
-            root_btn = CollBtn(text=Static.NAME_ROOT)
-            root_btn.pressed_.connect(
-                lambda: self.collection_btn_cmd(root_btn)
-            )
-            root_item = UListWidgetItem(self)
-            self.addItem(root_item)
-            self.setItemWidget(root_item, root_btn)
-            
-            spacer = UListSpaserItem(self)
-            self.addItem(spacer)
 
         self.setCurrentRow(0)
         
