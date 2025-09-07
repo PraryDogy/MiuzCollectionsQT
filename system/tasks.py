@@ -597,7 +597,6 @@ class LoadDirsTask(URunnable):
 class _ScanSingleDirSigs(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
-    reload_thumbnails = pyqtSignal()
 
 
 class ScanSingleDirTask(URunnable):
@@ -647,4 +646,4 @@ class ScanSingleDirTask(URunnable):
         self.sigs.progress_text.emit("")
 
         if new_images or del_images:
-            self.sigs.reload_thumbnails.emit()
+            self.sigs.finished_.emit()

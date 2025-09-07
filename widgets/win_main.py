@@ -390,7 +390,7 @@ class WinMain(UMainWindow):
             task.sigs.progress_text.connect(
                 self.bar_bottom.progress_bar.setText
             )
-            task.sigs.reload_thumbnails.connect(
+            task.sigs.finished_.connect(
                 self.reload_gui
             )
             UThreadPool.start(task)
