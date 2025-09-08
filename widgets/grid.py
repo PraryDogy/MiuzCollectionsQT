@@ -420,7 +420,7 @@ class Grid(VScrollArea):
             return
         prev_f_mod = thumbnails[0].f_mod
         for wid in thumbnails:
-            if wid.f_mod != prev_f_mod:
+            if Dynamic.sort_by_mod and wid.f_mod != prev_f_mod:
                 self.glob_col = 0
                 self.glob_row += 1
 
@@ -800,9 +800,10 @@ class Grid(VScrollArea):
                         }}
                     """)
 
-                    self.date_wid.show()
-                    self.date_timer.stop()
-                    self.date_timer.start(3000)
+                    if Dynamic.sort_by_mod:
+                        self.date_wid.show()
+                        self.date_timer.stop()
+                        self.date_timer.start(3000)
      
         elif value == 0:
             self.date_wid.hide()
