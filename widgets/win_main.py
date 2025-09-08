@@ -426,15 +426,18 @@ class WinMain(UMainWindow):
             )
             UThreadPool.start(task)
 
-        self.win_upload = WinUpload()
-        self.win_upload.clicked.connect(
-            lambda data: copy_files_start(data)
-        )
-        self.win_upload.clicked.connect(
-            self.win_upload.deleteLater
-        )
-        self.win_upload.center_relative_parent(self.window())
-        self.win_upload.show()
+        if MainFolder.current.get_curr_path():
+            self.win_upload = WinUpload()
+            self.win_upload.clicked.connect(
+                lambda data: copy_files_start(data)
+            )
+            self.win_upload.clicked.connect(
+                self.win_upload.deleteLater
+            )
+            self.win_upload.center_relative_parent(self.window())
+            self.win_upload.show()
+        else:
+            self.open_win_smb()
 
     def open_settings(self):
         self.bar_top.settings_btn.set_solid_style()
@@ -483,10 +486,6 @@ class WinMain(UMainWindow):
     def dropEvent(self, a0):
 
         if not a0.mimeData().hasUrls() or a0.source() is not None:
-            return
-        
-        if not MainFolder.current.get_curr_path():
-            self.open_win_smb()
             return
 
         img_path_list: list[str] = [
