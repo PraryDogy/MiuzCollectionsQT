@@ -29,14 +29,13 @@ class MyTree(QTreeWidget):
     clicked_: pyqtSignal = pyqtSignal(str)
     hh = 25
 
-    def __init__(self, root_dir: str) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.root_dir = root_dir
+        self.root_dir = None
         self.setHeaderHidden(True)
         self.itemClicked.connect(self.on_item_click)
-        self.first_load()
 
-    def first_load(self):
+    def init_ui(self):
         self.clear()
 
         custom_item = FavItem()
@@ -170,19 +169,19 @@ class MenuLeft(QTabWidget):
         super().__init__()
         self.init_ui()
 
-    def open_main_folder(self, index: int):
+    def main_folder_clicked(self, index: int):
         MainFolder.current = MainFolder.list_[index]
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             Dynamic.current_dir = main_folder_path
             Dynamic.grid_buff_size = 0
             self.collections_list.root_dir = main_folder_path
-            self.collections_list.first_load()
+            self.collections_list.init_ui()
             self.clicked_.emit()
         else:
             self.no_connection.emit()
         
-    def clicked_cmd(self, path: str):
+    def tree_clicked(self, path: str):
         if path == Static.NAME_FAVS:
             Dynamic.current_dir = Static.NAME_FAVS
         else:
@@ -193,12 +192,16 @@ class MenuLeft(QTabWidget):
         self.clear()
 
         main_folders = MainFolderList(self)
-        main_folders.open_main_folder.connect(lambda index: self.open_main_folder(index))
+        main_folders.open_main_folder.connect(lambda index: self.main_folder_clicked(index))
         main_folders.double_clicked.connect(lambda: self.setCurrentIndex(1))
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
-        self.collections_list = MyTree(MainFolder.current.curr_path)
-        self.collections_list.clicked_.connect(self.clicked_cmd)
+        self.collections_list = MyTree()
+        self.collections_list.clicked_.connect(self.tree_clicked)
         self.addTab(self.collections_list, Lng.images[Cfg.lng])
-
-        self.setCurrentIndex(1)
+        
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            self.collections_list.root_dir = main_folder_path
+            self.collections_list.init_ui()
+            self.setCurrentIndex(1)
