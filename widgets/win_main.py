@@ -115,7 +115,7 @@ class WinMain(UMainWindow):
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_path_list: self.remove_files(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.move_files(rel_img_path_list))
-        self.grid.save_files.connect(copy_files_task)
+        # self.grid.save_files.connect(self.open)
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         self.grid.img_view.connect(lambda: self.open_img_view())
         right_lay.addWidget(self.grid)

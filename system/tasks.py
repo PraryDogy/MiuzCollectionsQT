@@ -482,10 +482,14 @@ class LoadDbImagesTask(URunnable):
             else:
                 f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
             item = LoadDbImagesItem(qimage, rel_img_path, coll, fav, f_mod)
-            if Dynamic.curr_coll_name == Static.NAME_RECENTS:
-                thumbs_dict[0].append(item)
-            else:
+            # если сортировка по дате изменения, то thumbs dict будет состоять
+            # из списков (список апрель 2023, список март 2023, ...)
+            # иначе thumbs dict будет иметь только один список, но с сортировкой
+            # по дате добавления
+            if Dynamic.sort_by_mod:
                 thumbs_dict[f_mod].append(item)
+            else:
+                thumbs_dict[0].append(item)
         try:
             self.sigs.finished_.emit(thumbs_dict)
         except RuntimeError:
