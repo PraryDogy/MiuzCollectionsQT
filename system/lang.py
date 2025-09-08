@@ -140,8 +140,6 @@ class Lng:
     move = ("Переместить", "Move files")
     drop_only_files = ("Можно загружать только файлы.", "Only files can be uploaded.")
     filters = ("Фильтры", "Filters")
-    help = ("Справка", "Help")
-    help_descr = ("Показать окно справки", "Show help window")
     back = ("Назад", "Back")
     next_ = ("Далее", "Next")
     read_file_error = ("Ошибка чтения файла", "Error file read")
@@ -200,8 +198,6 @@ class Lng:
     enable = ("Включить", "Enable")
     show = ("Показать", "Show")
     show_system_files = ("Показать системные файлы в Finder", "Show system files in Finder")
-    help_ = ("Помощь", "Help")
-    show_help_window = ("Показать окно справки", "Show help window")
     russian = ("Русский", "English")
     language = ("Язык", "Language")
     reset_settings = ("Сбросить настройки", "Reset settings")
@@ -231,15 +227,8 @@ class Lng:
     sort_by_mod = ("По дате изменения", "Date modification")
     sort_by_recent = ("По дате добавления", "Date added")
     sort_by_mod_short = ("Дата изм.", "Date mod.")
-    sort_by_recent_short = ("Дата доб.", "Date add.")  
-    help_text = (
-        "Папка с коллекциями:\n"
-        "- Может содержать подпапки (коллекции)\n"
-        "- Может содержать изображения без подпапок\n",
-        "Collection folder:\n"
-        "- Can contain subfolders (collections)\n"
-        "- Can contain images without subfolders\n"
-    )
+    sort_by_recent_short = ("Дата доб.", "Date add.")
+    reset_data = ("Сбросить данные", "Reset data")
     filters_descr = (
         "Фильтры:\n"
         "- Показывают файлы, путь которых содержит указанный текст.\n"

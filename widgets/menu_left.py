@@ -12,8 +12,8 @@ from PyQt5.QtWidgets import (QAction, QApplication, QGroupBox, QLabel,
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import LoadCollListTask, LoadSortedDirsTask
-from system.utils import UThreadPool, MainUtils
+from system.tasks import LoadSortedDirsTask, ResetDataTask
+from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (UHBoxLayout, UListSpaserItem, UListWidgetItem,
                             UMenu, UVBoxLayout, VListWidget, WinChild)
@@ -119,6 +119,7 @@ class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
     double_clicked = pyqtSignal()
     no_connection = pyqtSignal()
+    reset_data = pyqtSignal()
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
@@ -143,6 +144,11 @@ class MainFolderList(VListWidget):
             elif flag == "view":
                 index = MainFolder.list_.index(folder)
                 self.open_main_folder.emit(index)
+                
+    def reset_data_cmd(self, main_folder_name: str):
+        self.reset_task = ResetDataTask(main_folder_name)
+        self.reset_task.sigs.finished_.connect(self.reset_data.emit)
+        UThreadPool.start(self.reset_task)
 
     def mouseReleaseEvent(self, e):
         idx = self.indexAt(e.pos())
@@ -153,6 +159,10 @@ class MainFolderList(VListWidget):
         return super().mouseReleaseEvent(e)
 
     def contextMenuEvent(self, a0):
+        item = self.itemAt(a0.pos())
+        if not item:
+            return
+
         menu = UMenu(a0)
         open = QAction(Lng.open[Cfg.lng], menu)
         open.triggered.connect(lambda: self.cmd("view"))
@@ -160,12 +170,17 @@ class MainFolderList(VListWidget):
         reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
         reveal.triggered.connect(lambda: self.cmd("reveal"))
         menu.addAction(reveal)
+        menu.addSeparator()
+        reset = QAction(Lng.reset_data[Cfg.lng], menu)
+        reset.triggered.connect(lambda: self.reset_data_cmd(item.main_folder_name))
+        menu.addAction(reset)
         menu.show_()
 
 
 class MenuLeft(QTabWidget):
     clicked_ = pyqtSignal()
     no_connection = pyqtSignal()
+    reset_data = pyqtSignal()
     
     def __init__(self):
         super().__init__()
@@ -197,6 +212,7 @@ class MenuLeft(QTabWidget):
         main_folders.open_main_folder.connect(lambda index: self.main_folder_clicked(index))
         main_folders.double_clicked.connect(lambda: self.setCurrentIndex(1))
         main_folders.no_connection.connect(self.no_connection.emit)
+        main_folders.reset_data.connect(self.reset_data.emit)
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
         self.collections_list = MyTree()

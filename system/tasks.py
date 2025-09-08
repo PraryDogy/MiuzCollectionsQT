@@ -12,7 +12,7 @@ from sqlalchemy import select, update
 
 from cfg import Dynamic, Cfg, Static
 
-from .database import THUMBS, Dbase
+from .database import THUMBS, Dbase, DIRS
 from .lang import Lng
 from .main_folder import MainFolder
 from .new_scaner.scaner_utils import (DbUpdater, DirsUpdater, HashdirUpdater,
@@ -623,3 +623,26 @@ class ScanSingleDirTask(URunnable):
 
         if new_images or del_images:
             self.sigs.finished_.emit()
+            
+
+class _ResetDataSigs(QObject):
+    finished_ = pyqtSignal()
+
+
+class ResetDataTask(URunnable):
+    def __init__(self, main_folder_name: str):
+        super().__init__()
+        self.sigs = _ResetDataSigs()
+        self.main_folder_name = main_folder_name
+        
+    def task(self):
+        conn = Dbase.engine.connect()
+        q = sqlalchemy.delete(DIRS)
+        q = q.where(DIRS.c.brand == self.main_folder_name)
+        try:
+            conn.execute(q)
+            conn.commit()
+        except Exception as e:
+            print("tasks, reset data task error", e)
+        
+        self.sigs.finished_.emit()
