@@ -171,7 +171,7 @@ class MenuLeft(QTabWidget):
 
     def open_main_folder(self, index: int):
         MainFolder.current = MainFolder.list_[index]
-        Dynamic.curr_coll_name = os.path.basename(MainFolder.current.curr_path)
+        Dynamic.current_dir = MainFolder.current.curr_path
         Dynamic.grid_buff_size = 0
         self.collections_list.root_dir = MainFolder.current.curr_path
         self.collections_list.first_load()
@@ -179,11 +179,9 @@ class MenuLeft(QTabWidget):
         
     def clicked_cmd(self, path: str):
         if path == Static.NAME_FAVS:
-            Dynamic.dir_name = Lng.favorites[Cfg.lng]
-            Dynamic.curr_coll_name = Static.NAME_FAVS
+            Dynamic.current_dir = Static.NAME_FAVS
         else:
-            Dynamic.dir_name = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
-            Dynamic.curr_coll_name = os.path.basename(path)
+            Dynamic.current_dir = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
         self.clicked_.emit()
 
     def init_ui(self):

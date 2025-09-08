@@ -198,7 +198,7 @@ class Thumbnail(QFrame):
         self.text_wid.set_text()
 
         # удаляем из избранного и если это избранные то обновляем сетку
-        if value == 0 and Dynamic.curr_coll_name == Static.NAME_FAVS:
+        if value == 0 and Dynamic.current_dir == Static.NAME_FAVS:
             self.reload_thumbnails.emit()
 
 

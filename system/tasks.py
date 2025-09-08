@@ -512,10 +512,10 @@ class LoadDbImagesTask(URunnable):
         else:
             stmt = stmt.order_by(-THUMBS.c.id)
 
-        if Dynamic.curr_coll_name == Static.NAME_FAVS:
+        if Dynamic.current_dir == Static.NAME_FAVS:
             stmt = stmt.where(THUMBS.c.fav == 1)
         else:
-            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.dir_name}/%"))
+            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
 
         if Dynamic.enabled_filters:
             or_conditions = [

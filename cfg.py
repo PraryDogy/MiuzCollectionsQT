@@ -255,7 +255,6 @@ class Dynamic:
     f_date_end: str = None # 31 january 1991
     grid_buff_size: int = 0
     search_widget_text: str = None
-    curr_coll_name = None
 
     # какие расширения отображать по умолчанию (и джепеги и послойники)
     types = [Static.ext_non_layers, Static.ext_layers]
@@ -263,6 +262,6 @@ class Dynamic:
     # индекс соответствующий STATIC > IMG_LABEL_SIZE
     # от индекса зависит размер Thumbnail и всех его внутренних виджетов
     thumb_size_ind: int = 0
-    dir_name: str = None
+    current_dir: str = None
     sort_by_mod: bool = True
     enabled_filters: list[str] = []
