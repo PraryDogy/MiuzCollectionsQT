@@ -131,16 +131,12 @@ class MainFolderList(VListWidget):
     def cmd(self, flag: str):
         name = self.currentItem().main_folder_name
         folder = next((i for i in MainFolder.list_ if i.name == name), None)
-        if folder is None:
-            return
-        path = folder.get_curr_path()
+        main_folder_path = folder.get_curr_path()
         if flag == "reveal":
-            if not path:
-                self.win_warn = WinSmb()
-                self.win_warn.center_relative_parent(self.window())
-                self.win_warn.show()
+            if not main_folder_path:
+                self.no_connection.emit()
             else:
-                subprocess.Popen(["open", path])
+                subprocess.Popen(["open", main_folder_path])
         elif flag == "view":
             index = MainFolder.list_.index(folder)
             self.open_main_folder.emit(index)
@@ -197,6 +193,7 @@ class MenuLeft(QTabWidget):
         main_folders = MainFolderList(self)
         main_folders.open_main_folder.connect(lambda index: self.main_folder_clicked(index))
         main_folders.double_clicked.connect(lambda: self.setCurrentIndex(1))
+        main_folders.no_connection.connect(self.no_connection.emit)
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
         self.collections_list = MyTree()
