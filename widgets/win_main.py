@@ -333,7 +333,7 @@ class WinMain(UMainWindow):
             ]
             self.win_upload = WinUpload()
             self.win_upload.clicked.connect(lambda data: copy_files(data, files))
-            self.win_upload.clicked.connect(self.win_upload.deleteLater)
+            self.win_upload.no_connection.connect(self.open_win_smb)
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
         else:
@@ -428,12 +428,8 @@ class WinMain(UMainWindow):
 
         if MainFolder.current.get_curr_path():
             self.win_upload = WinUpload()
-            self.win_upload.clicked.connect(
-                lambda data: copy_files_start(data)
-            )
-            self.win_upload.clicked.connect(
-                self.win_upload.deleteLater
-            )
+            self.win_upload.clicked.connect(lambda data: copy_files_start(data))
+            self.win_upload.no_connection.connect(self.open_win_smb)
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
         else:

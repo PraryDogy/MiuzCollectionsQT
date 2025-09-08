@@ -84,14 +84,7 @@ class MainFolderList(VListWidget):
     def mouseReleaseEvent(self, e):
         item = self.currentItem()
         if e.button() == Qt.MouseButton.LeftButton and item:
-            path = item.main_folder.get_curr_path()
-            path = None
-            if path:
-                self.clicked.emit(item.main_folder)
-            else:
-                self.smb_win = WinSmb()
-                self.smb_win.center_relative_parent(self.window())
-                self.smb_win.show()
+            self.clicked.emit(item.main_folder)
             return super().mouseReleaseEvent(e)
 
 
@@ -160,6 +153,7 @@ class PathWidget(QGroupBox):
 
 class WinUpload(WinChild):
     clicked = pyqtSignal(tuple)
+    no_connection = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -222,15 +216,21 @@ class WinUpload(WinChild):
         self.tab_wid.setCurrentIndex(1)
 
     def main_folder_click(self, main_folder: MainFolder):
-        self.dirs_list.root_dir = main_folder.curr_path
-        self.dirs_list.first_load()
-        self.info_box.set_path(main_folder.curr_path)
+        if main_folder.get_curr_path():
+            self.dirs_list.root_dir = main_folder.curr_path
+            self.dirs_list.first_load()
+            self.info_box.set_path(main_folder.curr_path)
+        else:
+            self.no_connection.emit()
 
     def ok_cmd(self):
         path = self.info_box.label_bottom.text()
-        if path:
+        if path and os.path.exists(path):
             data = (self.main_folders.currentItem().main_folder, path)
             self.clicked.emit(data)
+            self.deleteLater()
+        else:
+            self.no_connection.emit()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
