@@ -26,7 +26,8 @@ class FavItem(QTreeWidgetItem):
 
         
 class MyTree(QTreeWidget):
-    clicked_: pyqtSignal = pyqtSignal(str)
+    clicked_ = pyqtSignal(str)
+    no_connection = pyqtSignal()
     hh = 25
 
     def __init__(self) -> None:
@@ -82,7 +83,10 @@ class MyTree(QTreeWidget):
         self.clicked_.emit(path)
 
     def reveal(self, path: str):
-        subprocess.Popen(["open", path])
+        if os.path.exists(path):
+            subprocess.Popen(["open", path])
+        else:
+            self.no_connection.emit()
 
     def select_first_item(self):
         top_item = self.topLevelItem(1)
@@ -132,14 +136,14 @@ class MainFolderList(VListWidget):
         name = self.currentItem().main_folder_name
         folder = next((i for i in MainFolder.list_ if i.name == name), None)
         main_folder_path = folder.get_curr_path()
-        if flag == "reveal":
-            if not main_folder_path:
-                self.no_connection.emit()
-            else:
+        if not main_folder_path:
+            self.no_connection.emit()
+        else:
+            if flag == "reveal":
                 subprocess.Popen(["open", main_folder_path])
-        elif flag == "view":
-            index = MainFolder.list_.index(folder)
-            self.open_main_folder.emit(index)
+            elif flag == "view":
+                index = MainFolder.list_.index(folder)
+                self.open_main_folder.emit(index)
 
     def mouseReleaseEvent(self, e):
         idx = self.indexAt(e.pos())
@@ -198,6 +202,7 @@ class MenuLeft(QTabWidget):
 
         self.collections_list = MyTree()
         self.collections_list.clicked_.connect(self.tree_clicked)
+        self.collections_list.no_connection.connect(self.no_connection.emit)
         self.addTab(self.collections_list, Lng.images[Cfg.lng])
         
         main_folder_path = MainFolder.current.get_curr_path()
