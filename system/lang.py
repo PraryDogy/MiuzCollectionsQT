@@ -229,6 +229,7 @@ class Lng:
     sort_by_mod_short = ("Дата изм.", "Date mod.")
     sort_by_recent_short = ("Дата доб.", "Date add.")
     reset_data = ("Сбросить данные", "Reset data")
+    data_was_reset = ("Данные сброшены", "Data reset")
     filters_descr = (
         "Фильтры:\n"
         "- Показывают файлы, путь которых содержит указанный текст.\n"

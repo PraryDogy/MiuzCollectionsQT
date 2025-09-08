@@ -485,6 +485,7 @@ class MainFolderAdvanced(QWidget):
 class MainFolderSettings(QWidget):
     remove = pyqtSignal()
     changed = pyqtSignal()
+    reset_data = pyqtSignal(MainFolder)
 
     def __init__(self, main_folder: MainFolder):
         super().__init__()
@@ -509,12 +510,18 @@ class MainFolderSettings(QWidget):
         advanced.changed.connect(self.changed.emit)
         v_lay.addWidget(advanced)
 
+        reset_btn = QPushButton(Lng.reset[Cfg.lng])
+        reset_btn.clicked.connect(lambda: self.reset_data.emit(main_folder))
+        reset_btn.setFixedWidth(100)
+
         remove_btn = QPushButton(Lng.delete[Cfg.lng])
         remove_btn.clicked.connect(self.remove.emit)
         remove_btn.setFixedWidth(100)
 
         btn_lay = UHBoxLayout()
+        btn_lay.setSpacing(15)
         btn_lay.addStretch()
+        btn_lay.addWidget(reset_btn)
         btn_lay.addWidget(remove_btn)
         btn_lay.addStretch()
         v_lay.addLayout(btn_lay)
@@ -665,6 +672,7 @@ class FiltersWid(QWidget):
 class WinSettings(WinSystem):
     left_side_width = 210
     closed = pyqtSignal()
+    reset_data = pyqtSignal(MainFolder)
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -759,6 +767,7 @@ class WinSettings(WinSystem):
                 main_folder_sett = MainFolderSettings(main_folder[0])
                 main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
                 main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder[0], item))
+                main_folder_sett.reset_data.connect(self.reset_data.emit)
                 self.right_lay.insertWidget(0, main_folder_sett)
             else:
                 self.left_menu.setCurrentRow(0)

@@ -335,9 +335,20 @@ class WinMain(UMainWindow):
         self.win_dates.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         self.win_dates.show()
 
-    def reset_data_cmd(self, main_folder_name: str):            
-        self.reset_task = ResetDataTask(main_folder_name)
-        self.reset_task.sigs.finished_.connect(self.restart_scaner_task)
+    def reset_data_cmd(self, main_folder: MainFolder):
+
+        def fin():
+            t = f"{os.path.basename(main_folder.paths[0])} ({main_folder.name})"
+            self.win_warn = WinWarn(
+                Lng.attention[Cfg.lng],
+                f"{t}: {Lng.data_was_reset[Cfg.lng].lower()}"
+            )
+            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.show()
+            self.restart_scaner_task()
+
+        self.reset_task = ResetDataTask(main_folder.name)
+        self.reset_task.sigs.finished_.connect(fin)
         UThreadPool.start(self.reset_task)
 
     def move_files(self, rel_img_path_list: list):
@@ -478,6 +489,7 @@ class WinMain(UMainWindow):
         self.bar_top.settings_btn.set_solid_style()
         self.win_settings = WinSettings()
         self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
+        self.win_settings.reset_data.connect(self.reset_data_cmd)
         self.win_settings.center_relative_parent(self.window())
         self.win_settings.show()
 

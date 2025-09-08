@@ -119,7 +119,7 @@ class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
     double_clicked = pyqtSignal()
     no_connection = pyqtSignal()
-    reset_data = pyqtSignal(str)
+    reset_data = pyqtSignal(MainFolder)
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
@@ -127,30 +127,29 @@ class MainFolderList(VListWidget):
         for i in MainFolder.list_:
             text = f"{os.path.basename(i.paths[0])} ({i.name})"
             item = UListWidgetItem(parent=self, text=text)
-            item.main_folder_name = i.name
+            item.main_folder = i
             self.addItem(item)
 
         self.setCurrentRow(0)
 
-    def cmd(self, flag: str):
-        name = self.currentItem().main_folder_name
-        folder = next((i for i in MainFolder.list_ if i.name == name), None)
-        main_folder_path = folder.get_curr_path()
+    def cmd(self, flag: str, item: UListWidgetItem):
+        main_folder: MainFolder = item.main_folder
+        main_folder_path = main_folder.get_curr_path()
         if not main_folder_path:
             self.no_connection.emit()
         else:
             if flag == "reveal":
                 subprocess.Popen(["open", main_folder_path])
             elif flag == "view":
-                index = MainFolder.list_.index(folder)
+                index = MainFolder.list_.index(main_folder)
                 self.open_main_folder.emit(index)
 
     def mouseReleaseEvent(self, e):
-        idx = self.indexAt(e.pos())
-        if not idx.isValid():
+        item = self.itemAt(e.pos())
+        if not item:
             return
         if e.button() == Qt.MouseButton.LeftButton:
-            self.cmd("view")
+            self.cmd("view", item)
         return super().mouseReleaseEvent(e)
 
     def contextMenuEvent(self, a0):
@@ -160,14 +159,14 @@ class MainFolderList(VListWidget):
 
         menu = UMenu(a0)
         open = QAction(Lng.open[Cfg.lng], menu)
-        open.triggered.connect(lambda: self.cmd("view"))
+        open.triggered.connect(lambda: self.cmd("view", item))
         menu.addAction(open)
         reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-        reveal.triggered.connect(lambda: self.cmd("reveal"))
+        reveal.triggered.connect(lambda: self.cmd("reveal", item))
         menu.addAction(reveal)
         menu.addSeparator()
         reset = QAction(Lng.reset_data[Cfg.lng], menu)
-        reset.triggered.connect(lambda: self.reset_data.emit(item.main_folder_name))
+        reset.triggered.connect(lambda: self.reset_data.emit(item.main_folder))
         menu.addAction(reset)
         menu.show_()
 
@@ -175,7 +174,7 @@ class MainFolderList(VListWidget):
 class MenuLeft(QTabWidget):
     clicked_ = pyqtSignal()
     no_connection = pyqtSignal()
-    reset_data = pyqtSignal(str)
+    reset_data = pyqtSignal(MainFolder)
     
     def __init__(self):
         super().__init__()
