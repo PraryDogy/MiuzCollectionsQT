@@ -671,6 +671,17 @@ class Grid(VScrollArea):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
 
+        def reveal_cmd():
+            main_folder_path = MainFolder.current.get_curr_path()
+            if main_folder_path:
+                reveal_path = MainUtils.get_abs_path(
+                    main_folder_path,
+                    Dynamic.current_dir
+                )
+                subprocess.Popen(["open", reveal_path])
+            else:
+                self.no_connection.emit()
+
         self.menu_ = UMenu(event=a0)
         clicked_wid = self.get_wid_under_mouse(a0=a0)
 
@@ -680,6 +691,10 @@ class Grid(VScrollArea):
             reload = ScanerRestart(parent=self.menu_)
             reload.triggered.connect(lambda: self.restart_scaner.emit())
             self.menu_.addAction(reload)
+            self.menu_.addSeparator()
+            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], self.menu_)
+            reveal.triggered.connect(reveal_cmd)
+            self.menu_.addAction(reveal)
 
         # клик по виджету
         else:
