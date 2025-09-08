@@ -78,13 +78,10 @@ class WinMain(UMainWindow):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.clicked_.connect(
-            lambda: self.grid.reload_thumbnails())
-        self.left_menu.clicked_.connect(
-            lambda: self.reload_rubber())
-        self.left_menu.clicked_.connect(
-            lambda: self.set_window_title()
-        )
+        self.left_menu.clicked_.connect(lambda: self.grid.reload_thumbnails())
+        self.left_menu.clicked_.connect(lambda: self.reload_rubber())
+        self.left_menu.clicked_.connect(lambda: self.set_window_title())
+        self.left_menu.no_connection.connect(self.open_win_smb)
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -104,12 +101,6 @@ class WinMain(UMainWindow):
 
         sep_upper = USep()
         right_lay.addWidget(sep_upper)
-
-        def copy_files_task(data):
-            dest, files = data
-            task = self.copy_files_task(dest, files)
-            task.sigs.finished_.connect(MainUtils.reveal_files)
-            UThreadPool.start(task)
 
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
@@ -154,6 +145,11 @@ class WinMain(UMainWindow):
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
+
+    def open_win_smb(self):
+        self.win_smb = WinSmb()
+        self.win_smb.center_relative_parent(self.window())
+        self.win_smb.show()
 
     def open_img_view(self):
         if len(self.grid.selected_widgets) == 1:

@@ -172,11 +172,15 @@ class MenuLeft(QTabWidget):
 
     def open_main_folder(self, index: int):
         MainFolder.current = MainFolder.list_[index]
-        Dynamic.current_dir = MainFolder.current.curr_path
-        Dynamic.grid_buff_size = 0
-        self.collections_list.root_dir = MainFolder.current.curr_path
-        self.collections_list.first_load()
-        self.clicked_.emit()
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            Dynamic.current_dir = main_folder_path
+            Dynamic.grid_buff_size = 0
+            self.collections_list.root_dir = main_folder_path
+            self.collections_list.first_load()
+            self.clicked_.emit()
+        else:
+            self.no_connection.emit()
         
     def clicked_cmd(self, path: str):
         if path == Static.NAME_FAVS:
