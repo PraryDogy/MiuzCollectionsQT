@@ -185,14 +185,11 @@ class Lng:
     ok = ("Ок", "Ok")
     folder_name = ("Имя папки", "Folder name")
     collections_folder_path = (
-        "Путь к папке с коллекциями: перетащите сюда папку или укажите\n"
-        "путь с новой строки.",
-        "Path to the collections folder: drag a folder here or enter a path\n"
-        "on a new line."
+        "Путь к папке с коллекциями: перетащите сюда папку или укажите путь с новой строки.",
+        "Path to the collections folder: drag a folder here or enter a path on a new line."
     )
     ignore_list_descr = (
-        "Игнор лист: перетащите сюда папку или укажите имя с новой\n"
-        "строки.",
+        "Игнор лист: перетащите сюда папку или укажите имя с новой строки.",
         "Ignore list: drag a folder here or enter a name on a new line."
     )
     ignore_list = ("Игнор лист", "Ignore list")
@@ -238,27 +235,22 @@ class Lng:
     help_text = (
         "Папка с коллекциями:\n"
         "- Может содержать подпапки (коллекции)\n"
-        "- Может содержать изображения без подпапок\n"
-        "\n"
-        "Фильтры:\n"
-        "- Изображения в папке \"1 IMG\"\n"
-        "- Изображения в папке \"2 MODEL IMG\"\n"
-        "- Любые другие изображения (не в \"1 IMG\" и \"2 MODEL IMG\")",
+        "- Может содержать изображения без подпапок\n",
         "Collection folder:\n"
         "- Can contain subfolders (collections)\n"
         "- Can contain images without subfolders\n"
-        "\n"
-        "Filters:\n"
-        "- Images in \"1 IMG\" folder\n"
-        "- Images in \"2 MODEL IMG\" folder\n"
-        "- Any other images (not in \"1 IMG\" or \"2 MODEL IMG\")"
     )
     filters_descr = (
         "Фильтры:\n"
-        "- Показывают файлы, если путь содержит текст фильтра.\n"
-        "- Каждый фильтр с новой строки.",
+        "- Показывают файлы, путь которых содержит указанный текст.\n"
+        "- Каждый фильтр вводится с новой строки.\n"
+        "Пример:\n"
+        "- Добавьте фильтр \".jpg\" и нажмите \"Сохранить\".\n"
+        "- В приложении выберите фильтр \".jpg\" — будут показаны все .jpg файлы.",
         "Filters:\n"
-        "- Show files if the path contains the filter text.\n"
-        "- One filter per line."
+        "- Show files whose path contains the specified text.\n"
+        "- Enter each filter on a new line.\n"
+        "Example:\n"
+        "- Add the filter \".jpg\" and click \"Save\".\n"
+        "- In the app, select the \".jpg\" filter — all .jpg files will be displayed."
     )
-

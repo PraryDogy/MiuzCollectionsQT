@@ -20,7 +20,6 @@ from system.utils import MainUtils
 from ._base_widgets import (UHBoxLayout, ULineEdit, UListSpaserItem,
                             UListWidgetItem, UMenu, UTextEdit, UVBoxLayout,
                             VListWidget, WinChild, WinSystem)
-from .win_help import WinHelp
 from .win_warn import WinQuestion, WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
@@ -100,30 +99,11 @@ class SimpleSettings(QGroupBox):
         self.lang_label = QLabel(Lng.show_system_files[Cfg.lng])
         first_row_lay.addWidget(self.lang_label)
 
-        sec_row_wid = QWidget()
-        v_lay.addWidget(sec_row_wid)
-        sec_row_lay = UHBoxLayout()
-        sec_row_lay.setSpacing(15)
-        sec_row_wid.setLayout(sec_row_lay)
-
-        self.help_btn = QPushButton(text=Lng.help_[Cfg.lng])
-        self.help_btn.setFixedWidth(115)
-        self.help_btn.clicked.connect(self.show_help)
-        sec_row_lay.addWidget(self.help_btn)
-
-        self.lang_label = QLabel(Lng.show_help_window[Cfg.lng])
-        sec_row_lay.addWidget(self.lang_label)
-
     def show_files_cmd(self, *args):
         try:
             subprocess.Popen(["open", Static.APP_SUPPORT_DIR])
         except Exception as e:
             print(e)
-
-    def show_help(self, *args):
-        self.help_win = WinHelp()
-        self.help_win.center_relative_parent(self.window())
-        self.help_win.show()
 
 
 class ScanerSettings(QGroupBox):
@@ -415,6 +395,7 @@ class DropableGroupBox(QGroupBox):
         self.setLayout(v_lay)
 
         self.top_label = QLabel()
+        self.top_label.setWordWrap(True)
         v_lay.addWidget(self.top_label)
 
         self.text_edit = UTextEdit()

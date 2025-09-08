@@ -87,6 +87,7 @@ class FiltersBtn(BarTopBtn):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.set_solid_style()
             menu = UMenu(self)
+            menu.setMinimumWidth(200)
 
             for f in Filters.filters:
                 act = QAction(f, self, checkable=True)
