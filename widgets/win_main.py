@@ -288,12 +288,6 @@ class WinMain(UMainWindow):
         self.win_dates.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         self.win_dates.show()
 
-    def open_warn_win(self, title: str, text: str, restart_app: bool = False):
-        self.win_warn = WinWarn(title, text)
-        self.win_warn.adjustSize()
-        self.win_warn.center_relative_parent(self)
-        self.win_warn.show()
-
     def move_files(self, rel_img_path_list: list):
 
         def udpate_hashdir(new_files: list[str], main_folder: MainFolder):
@@ -485,7 +479,10 @@ class WinMain(UMainWindow):
 
         for i in img_path_list:
             if os.path.isdir(i):
-                self.open_warn_win(Lng.attention[Cfg.lng], Lng.drop_only_files[Cfg.lng])
+                self.win_warn = WinWarn(Lng.attention[Cfg.lng], Lng.drop_only_files[Cfg.lng])
+                self.win_warn.adjustSize()
+                self.win_warn.center_relative_parent(self)
+                self.win_warn.show()
                 return
 
         if img_path_list:
