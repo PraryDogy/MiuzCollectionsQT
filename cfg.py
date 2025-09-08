@@ -22,7 +22,7 @@ class ThumbData:
     OFFSET = 15
 
 class Static:
-    APP_VER = 3.00
+    APP_VER = 3.50
     APP_NAME = "Collections"
     GRID_LIMIT = 100
     NAME_FAVS = "___favorites___"
