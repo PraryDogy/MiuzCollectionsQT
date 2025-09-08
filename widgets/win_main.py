@@ -109,6 +109,7 @@ class WinMain(UMainWindow):
         self.grid.no_connection.connect(self.open_win_smb)
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         self.grid.img_view.connect(lambda: self.open_img_view())
+        self.grid.save_files.connect(self.save_files)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -146,6 +147,52 @@ class WinMain(UMainWindow):
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
+
+    def save_files(self, data: tuple):
+
+        def set_below_label(data: tuple[int, int], win: ProgressbarWin):
+            count, total = data
+            win.below_label.setText(
+                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
+            )
+
+        def set_above_label(text: str, dest_name: str, win: ProgressbarWin):
+            win.above_label.setText(
+                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
+            )
+
+        def copy_files_start(dest, files):
+            dest_name = os.path.basename(dest)
+            progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
+            progress_win.progressbar.setMaximum(100)
+            progress_win.center_relative_parent(self)
+            progress_win.show()
+            task = CopyFilesTask(dest, files)
+            progress_win.cancel.connect(
+                lambda: task.task_state.set_should_run(False)
+            )
+            task.sigs.value_changed.connect(
+                progress_win.progressbar.setValue
+            )
+            task.sigs.progress_changed.connect(
+                lambda data: set_below_label(data, progress_win)
+            )
+            task.sigs.file_changed.connect(
+                lambda text: set_above_label(text, dest_name, progress_win)
+            )
+            task.sigs.finished_.connect(
+                MainUtils.reveal_files
+            )
+            task.sigs.finished_.connect(
+                progress_win.deleteLater
+            )
+            UThreadPool.start(task)
+
+        dest, files = data
+        if os.path.exists(dest):
+            copy_files_start(dest, files)
+        else:
+            self.open_win_smb()
 
     def open_win_smb(self):
         self.win_smb = WinSmb()
@@ -425,7 +472,6 @@ class WinMain(UMainWindow):
     def open_settings(self):
         self.bar_top.settings_btn.set_solid_style()
         self.win_settings = WinSettings()
-        # self.win_settings.theme
         self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
         self.win_settings.center_relative_parent(self.window())
         self.win_settings.show()
