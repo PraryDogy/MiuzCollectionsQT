@@ -144,8 +144,13 @@ class WinMain(UMainWindow):
         self.scaner_timer.timeout.connect(self.start_scaner_task)
         self.scaner_task = None
         self.scaner_task_canceled = False
+        
+        def check_all_folders():
+            for i in MainFolder.list_:
+                if self.main_folder_check(i) is None:
+                    break
 
-        QTimer.singleShot(100, self.main_folder_check)
+        QTimer.singleShot(100, check_all_folders)
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
@@ -163,7 +168,17 @@ class WinMain(UMainWindow):
         self.win_image_view.switch_image_sig.connect(lambda img_path: self.grid.select_viewed_image(img_path))
         self.win_image_view.center_relative_parent(self.window())
         self.win_image_view.show()
-    
+
+    def main_folder_check(self, main_folder: MainFolder):
+        curr_path = main_folder.get_curr_path()
+        if curr_path:
+            return curr_path
+        else:
+            self.win_warn = WinSmb()
+            self.win_warn.center_relative_parent(self)
+            self.win_warn.show()
+            return None
+
     def closed_img_view(self):
         del self.win_image_view
         gc.collect()
@@ -171,13 +186,6 @@ class WinMain(UMainWindow):
     def reload_rubber(self):
         self.grid.rubberBand.deleteLater()
         self.grid.load_rubber()
-
-    def main_folder_check(self):
-        main_folder = MainFolder.current.set_path()
-        if not main_folder:
-            self.win_warn = WinSmb()
-            self.win_warn.center_relative_parent(self)
-            self.win_warn.show()
 
     def start_scaner_task(self):
         """
@@ -320,7 +328,7 @@ class WinMain(UMainWindow):
             )
             UThreadPool.start(copy_task)
 
-        main_folder_path = MainFolder.current.set_path()
+        main_folder_path = self.main_folder_check(MainFolder.current)
         if main_folder_path:
             files = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -331,10 +339,6 @@ class WinMain(UMainWindow):
             self.win_upload.clicked.connect(self.win_upload.deleteLater)
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
-        else:
-            self.win_smb = WinSmb()
-            self.win_smb.center_relative_parent(self.window())
-            self.win_smb.show()
 
     def remove_files(self, rel_img_path_list: list):
         
@@ -343,7 +347,7 @@ class WinMain(UMainWindow):
             task.sigs.reload_gui.connect(self.reload_gui)
             UThreadPool.start(task)
 
-        main_folder_path = MainFolder.current.set_path()
+        main_folder_path = self.main_folder_check(MainFolder.current)
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -361,10 +365,6 @@ class WinMain(UMainWindow):
                 self.remove_files_win.deleteLater
             )
             self.remove_files_win.show()
-        else:
-            self.win_smb = WinSmb()
-            self.win_smb.center_relative_parent(self.window())
-            self.win_smb.show()
 
     def reload_gui(self):
         self.grid.reload_thumbnails()
@@ -483,8 +483,8 @@ class WinMain(UMainWindow):
 
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
-        main_folder_path = MainFolder.current.set_path()
-        if not main_folder_path:
+        
+        if not self.main_folder_check(MainFolder.current):
             self.win_smb = WinSmb()
             self.win_smb.center_relative_parent(self.window())
             self.win_smb.show()

@@ -44,7 +44,7 @@ class WinInfoAction(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        main_folder_path = MainFolder.current.set_path()
+        main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             self.rel_img_path_list = [
                     MainUtils.get_abs_path(main_folder_path, i)
@@ -71,7 +71,7 @@ class CopyPath(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        main_folder_path = MainFolder.current.set_path()
+        main_folder_path = MainFolder.current.get_curr_path()
 
         if main_folder_path:
             img_path_list: list[str] = []
@@ -94,7 +94,7 @@ class CopyName(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        main_folder_path = MainFolder.current.set_path()
+        main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             names: list[str] = []
             for i in self.img_path_list:
@@ -117,7 +117,7 @@ class ShowInFinder(QAction):
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
-        main_folder_path = MainFolder.current.set_path()
+        main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -172,7 +172,7 @@ class Save(QAction):
         self.win_ = win
 
     def save_files_cmd(self):
-        main_folder_path = MainFolder.current.set_path()
+        main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, rel_img_path)

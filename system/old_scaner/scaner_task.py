@@ -34,7 +34,7 @@ class ScanerTask(URunnable):
 
     def task(self):
         for i in MainFolder.list_:
-            if i.set_path():
+            if i.get_curr_path():
                 print("scaner started", i.name)
                 self.main_folder_scan(i)
                 gc.collect()

@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import LoadSortedDirsTask
 from system.utils import UThreadPool
-
+from .win_warn import WinSmb
 from ._base_widgets import (UHBoxLayout, UListWidgetItem, UVBoxLayout,
                             VListWidget, WinChild, UTextEdit)
 
@@ -84,10 +84,15 @@ class MainFolderList(VListWidget):
     def mouseReleaseEvent(self, e):
         item = self.currentItem()
         if e.button() == Qt.MouseButton.LeftButton and item:
-            path = item.main_folder.set_path()
+            path = item.main_folder.get_curr_path()
+            path = None
             if path:
                 self.clicked.emit(item.main_folder)
-        return super().mouseReleaseEvent(e)
+            else:
+                self.smb_win = WinSmb()
+                self.smb_win.center_relative_parent(self.window())
+                self.smb_win.show()
+            return super().mouseReleaseEvent(e)
 
 
 # ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО 

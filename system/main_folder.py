@@ -62,7 +62,7 @@ class MainFolder:
         self.stop_list = stop_list
         self.curr_path: str = curr_path
             
-    def set_path(self) -> str | None:
+    def get_curr_path(self) -> str | None:
         """
         Проверяет и устанавливает путь к MainFolder.    
         Возвращает доступный путь к MainFolder или None

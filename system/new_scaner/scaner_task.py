@@ -36,7 +36,7 @@ class ScanerTask(URunnable):
 
     def task(self):
         for i in MainFolder.list_:
-            if i.set_path():
+            if i.get_curr_path():
                 print("scaner started", i.name)
                 self.main_folder_scan(i)
                 gc.collect()
@@ -60,7 +60,7 @@ class ScanerTask(URunnable):
         self.sigs.progress_text.emit(text)
 
     def _cmd(self, main_folder: MainFolder):
-        coll_folder = main_folder.set_path()
+        coll_folder = main_folder.get_curr_path()
         if not coll_folder:
             print(main_folder.name, "coll folder not avaiable")
             return

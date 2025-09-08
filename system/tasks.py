@@ -249,7 +249,7 @@ class SingleFileInfoTask(URunnable):
         self.sigs = _SingleFileInfoSigs()
 
     def task(self):
-        mail_folder_path = MainFolder.current.set_path()
+        mail_folder_path = MainFolder.current.get_curr_path()
         try:
             name = os.path.basename(self.url)
             _, type_ = os.path.splitext(name)

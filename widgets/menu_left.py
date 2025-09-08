@@ -131,7 +131,7 @@ class MainFolderList(VListWidget):
         folder = next((i for i in MainFolder.list_ if i.name == name), None)
         if folder is None:
             return
-        path = folder.set_path()
+        path = folder.get_curr_path()
         if flag == "reveal":
             if not path:
                 self.win_warn = WinSmb()
