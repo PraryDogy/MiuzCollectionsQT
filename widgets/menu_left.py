@@ -119,7 +119,7 @@ class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
     double_clicked = pyqtSignal()
     no_connection = pyqtSignal()
-    reset_data = pyqtSignal()
+    reset_data = pyqtSignal(str)
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
@@ -144,11 +144,6 @@ class MainFolderList(VListWidget):
             elif flag == "view":
                 index = MainFolder.list_.index(folder)
                 self.open_main_folder.emit(index)
-                
-    def reset_data_cmd(self, main_folder_name: str):
-        self.reset_task = ResetDataTask(main_folder_name)
-        self.reset_task.sigs.finished_.connect(self.reset_data.emit)
-        UThreadPool.start(self.reset_task)
 
     def mouseReleaseEvent(self, e):
         idx = self.indexAt(e.pos())
@@ -172,7 +167,7 @@ class MainFolderList(VListWidget):
         menu.addAction(reveal)
         menu.addSeparator()
         reset = QAction(Lng.reset_data[Cfg.lng], menu)
-        reset.triggered.connect(lambda: self.reset_data_cmd(item.main_folder_name))
+        reset.triggered.connect(lambda: self.reset_data.emit(item.main_folder_name))
         menu.addAction(reset)
         menu.show_()
 
@@ -180,7 +175,7 @@ class MainFolderList(VListWidget):
 class MenuLeft(QTabWidget):
     clicked_ = pyqtSignal()
     no_connection = pyqtSignal()
-    reset_data = pyqtSignal()
+    reset_data = pyqtSignal(str)
     
     def __init__(self):
         super().__init__()

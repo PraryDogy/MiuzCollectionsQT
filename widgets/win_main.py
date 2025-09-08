@@ -11,7 +11,7 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, MainUtils, RmFilesTask,
-                          ScanSingleDirTask)
+                          ScanSingleDirTask, ResetDataTask)
 from system.utils import UThreadPool
 
 from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
@@ -82,7 +82,7 @@ class WinMain(UMainWindow):
         self.left_menu.clicked_.connect(lambda: self.reload_grid_rubber())
         self.left_menu.clicked_.connect(lambda: self.set_window_title())
         self.left_menu.no_connection.connect(self.open_win_smb)
-        self.left_menu.reset_data.connect(self.restart_scaner_task)
+        self.left_menu.reset_data.connect(self.reset_data_cmd)
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -334,6 +334,11 @@ class WinMain(UMainWindow):
         self.win_dates.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
         self.win_dates.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         self.win_dates.show()
+
+    def reset_data_cmd(self, main_folder_name: str):            
+        self.reset_task = ResetDataTask(main_folder_name)
+        self.reset_task.sigs.finished_.connect(self.restart_scaner_task)
+        UThreadPool.start(self.reset_task)
 
     def move_files(self, rel_img_path_list: list):
 
