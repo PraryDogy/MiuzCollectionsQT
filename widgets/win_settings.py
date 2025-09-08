@@ -632,7 +632,7 @@ class FiltersWid(QWidget):
         g_lay.addWidget(descr)
 
         self.text_wid = UTextEdit()
-        self.text_wid.setFixedHeight(300)
+        self.text_wid.setFixedHeight(220)
         self.text_wid.setPlaceholderText(Lng.filters[Cfg.lng])
         self.text_wid.setPlainText("\n".join(self.filters_copy))
         g_lay.addWidget(self.text_wid)
@@ -654,6 +654,10 @@ class FiltersWid(QWidget):
         Filters.filters = filters_list
         self.text_wid.setPlainText("\n".join(self.filters_copy))
         self.setFocus()
+
+    def mouseReleaseEvent(self, a0):
+        self.setFocus()
+        return super().mouseReleaseEvent(a0)
 
 # ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
