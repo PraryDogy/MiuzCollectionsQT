@@ -304,7 +304,7 @@ class WinMain(UMainWindow):
         data = {
             Static.NAME_FAVS: Lng.favorites[Cfg.lng],
             Static.NAME_RECENTS: Lng.recents[Cfg.lng],
-            "": f"{MainFolder.current.name} ({os.path.basename(MainFolder.current.curr_path)})"
+            "": f"{os.path.basename(MainFolder.current.curr_path)} ({MainFolder.current.name})"
         }
         if Dynamic.current_dir in data:
             t = data.get(Dynamic.current_dir)
