@@ -4,7 +4,7 @@ from typing import Dict
 
 from PyQt5.QtCore import QObject, QSize, Qt, QThreadPool, pyqtSignal
 from PyQt5.QtWidgets import (QApplication, QGroupBox, QLabel, QPushButton,
-                             QTabWidget, QTreeWidget, QTreeWidgetItem, QWidget)
+                             QTabWidget, QTreeWidget, QTreeWidgetItem, QWidget, QSpacerItem)
 
 from cfg import Cfg
 from system.lang import Lng
@@ -194,6 +194,8 @@ class WinUpload(WinChild):
         right_wid = QWidget()
         right_lay = UVBoxLayout(right_wid)
         right_lay.setSpacing(10)
+        
+        right_lay.addSpacerItem(QSpacerItem(0, 7))
 
         self.ok_btn = QPushButton(Lng.ok[Cfg.lng])
         self.ok_btn.setFixedWidth(90)
