@@ -136,12 +136,13 @@ class WinMain(UMainWindow):
         self.scaner_task = None
         self.scaner_task_canceled = False
         
-        def check_all_folders():
+        def first_check():
             for i in MainFolder.list_:
-                if self.main_folder_check(i) is None:
+                if not i.get_curr_path():
+                    self.open_win_smb()
                     break
 
-        QTimer.singleShot(100, check_all_folders)
+        QTimer.singleShot(100, first_check)
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
@@ -324,7 +325,7 @@ class WinMain(UMainWindow):
             )
             UThreadPool.start(copy_task)
 
-        main_folder_path = self.main_folder_check(MainFolder.current)
+        main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             files = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -335,6 +336,8 @@ class WinMain(UMainWindow):
             self.win_upload.clicked.connect(self.win_upload.deleteLater)
             self.win_upload.center_relative_parent(self.window())
             self.win_upload.show()
+        else:
+            self.open_win_smb()
 
     def remove_files(self, rel_img_path_list: list):
         
@@ -342,8 +345,8 @@ class WinMain(UMainWindow):
             task = RmFilesTask(img_path_list, MainFolder.current)
             task.sigs.reload_gui.connect(self.reload_gui)
             UThreadPool.start(task)
-
-        main_folder_path = self.main_folder_check(MainFolder.current)
+        
+        main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -361,6 +364,8 @@ class WinMain(UMainWindow):
                 self.remove_files_win.deleteLater
             )
             self.remove_files_win.show()
+        else:
+            self.open_win_smb()
 
     def reload_gui(self):
         self.grid.reload_thumbnails()
@@ -480,10 +485,8 @@ class WinMain(UMainWindow):
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
         
-        if not self.main_folder_check(MainFolder.current):
-            self.win_smb = WinSmb()
-            self.win_smb.center_relative_parent(self.window())
-            self.win_smb.show()
+        if not MainFolder.current.get_curr_path():
+            self.open_win_smb()
             return
 
         img_path_list: list[str] = [
