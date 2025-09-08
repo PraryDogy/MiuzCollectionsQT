@@ -1,16 +1,10 @@
-import os
-
-from PyQt5.QtCore import QPoint, Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 
-from cfg import Cfg, Dynamic, Static, ThumbData
-from system.lang import Lng
+from cfg import Dynamic, ThumbData
 
-from ._base_widgets import SvgBtn, UHBoxLayout
-from .actions import MenuTypes
-from .win_settings import WinSettings
+from ._base_widgets import UHBoxLayout
 
 
 class BaseSlider(QSlider):

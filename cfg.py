@@ -256,9 +256,6 @@ class Dynamic:
     grid_buff_size: int = 0
     search_widget_text: str = None
 
-    # какие расширения отображать по умолчанию (и джепеги и послойники)
-    types = [Static.ext_non_layers, Static.ext_layers]
-
     # индекс соответствующий STATIC > IMG_LABEL_SIZE
     # от индекса зависит размер Thumbnail и всех его внутренних виджетов
     thumb_size_ind: int = 0

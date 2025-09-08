@@ -193,49 +193,6 @@ class Save(QAction):
         self.save_files.emit(data)
 
 
-class MenuTypes(QMenu):
-    reload_thumbnails = pyqtSignal()
-    update_bottom_bar = pyqtSignal()
-
-    def __init__(self, parent: QMenu):
-        """
-        Сигналы:
-        - reload_thumbnails()
-        - update_bottom_bar()
-        """
-        super().__init__(parent=parent, title=Lng.show[Cfg.lng])
-
-        type_jpg = QAction(parent=self, text=Lng.type_jpg[Cfg.lng])
-        type_jpg.setCheckable(True)
-        cmd_jpg = lambda: self.cmd_(action_=type_jpg, type_=Static.ext_non_layers)
-        type_jpg.triggered.connect(cmd_jpg)
-        self.addAction(type_jpg)
-
-        type_tiff = QAction(parent=self, text=Lng.type_tiff[Cfg.lng])
-        type_tiff.setCheckable(True)
-        cmd_tiff = lambda: self.cmd_(action_=type_tiff, type_=Static.ext_layers)
-        type_tiff.triggered.connect(cmd_tiff)
-        self.addAction(type_tiff)
-
-        if Static.ext_non_layers in Dynamic.types:
-            type_jpg.setChecked(True)
-
-        if Static.ext_layers in Dynamic.types:
-            type_tiff.setChecked(True)
-
-    def cmd_(self, action_: QAction, type_: str):
-
-        if type_ in Dynamic.types:
-            Dynamic.types.remove(type_)
-            action_.setChecked(False)
-
-        else:
-            Dynamic.types.append(type_)
-            action_.setChecked(True)
-        self.reload_thumbnails.emit()
-        self.update_bottom_bar.emit()
-
-
 class RemoveFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
         text_ = f"{Lng.delete[Cfg.lng]} ({total})"

@@ -457,18 +457,13 @@ class LoadDbImagesTask(URunnable):
     def create_dict(self, res: list[tuple]) -> dict[str, list[LoadDbImagesItem]] | dict:
         thumbs_dict = defaultdict(list[LoadDbImagesItem])
 
-        if len(Dynamic.types) == 1:
-            exts_ = Dynamic.types[0]
-        else:
-            exts_ = Static.ext_all
-
         if not res:
             self.sigs.finished_.emit(thumbs_dict)
             return
 
         for rel_img_path, rel_thumb_path, mod, coll, fav in res:
             rel_img_path: str
-            if not rel_img_path.endswith(exts_):
+            if not rel_img_path.endswith(Static.ext_all):
                 continue
             f_mod = datetime.fromtimestamp(mod).date()
             thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)

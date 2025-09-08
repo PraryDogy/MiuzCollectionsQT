@@ -17,7 +17,7 @@ from system.tasks import LoadDbImagesItem, LoadDbImagesTask
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
-from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
+from .actions import (CopyName, CopyPath, FavActionDb, MoveFiles,
                       OpenDefault, OpenInView, RemoveFiles, Save,
                       ScanerRestart, ShowInFinder, WinInfoAction)
 from .win_info import WinInfo
@@ -680,11 +680,6 @@ class Grid(VScrollArea):
             reload = ScanerRestart(parent=self.menu_)
             reload.triggered.connect(lambda: self.restart_scaner.emit())
             self.menu_.addAction(reload)
-            self.menu_.addSeparator()
-            types_ = MenuTypes(parent=self.menu_)
-            types_.reload_thumbnails.connect(lambda: self.reload_thumbnails_())
-            types_.update_bottom_bar.connect(lambda: self.update_bottom_bar.emit())
-            self.menu_.addMenu(types_)
 
         # клик по виджету
         else:

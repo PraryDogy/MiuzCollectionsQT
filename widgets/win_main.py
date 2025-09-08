@@ -107,7 +107,6 @@ class WinMain(UMainWindow):
         self.grid.remove_files.connect(lambda rel_img_path_list: self.remove_files(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.move_files(rel_img_path_list))
         self.grid.no_connection.connect(self.open_win_smb)
-        self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         self.grid.img_view.connect(lambda: self.open_img_view())
         self.grid.save_files.connect(self.save_files)
         right_lay.addWidget(self.grid)
