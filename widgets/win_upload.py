@@ -13,7 +13,7 @@ from system.tasks import LoadSortedDirsTask
 from system.utils import UThreadPool
 
 from ._base_widgets import (UHBoxLayout, UListWidgetItem, UVBoxLayout,
-                            VListWidget, WinChild)
+                            VListWidget, WinChild, UTextEdit)
 
 
 class MyTree(QTreeWidget):
@@ -96,12 +96,15 @@ class MainFolderList(VListWidget):
 class PathWindow(WinChild):
     def __init__(self):
         super().__init__()
+        self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
         self.setWindowTitle(Lng.upload_path[Cfg.lng])
         self.central_layout.setContentsMargins(5, 5, 5, 5)
-        self.text_label = QLabel()
-        self.text_label.setWordWrap(True)
+
+        self.text_label = UTextEdit()
+        self.text_label.setReadOnly(True)
         self.central_layout.addWidget(self.text_label)
-        self.setMinimumWidth(350)
+        
+        self.resize(350, 70)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
@@ -109,28 +112,43 @@ class PathWindow(WinChild):
         return super().keyPressEvent(a0)
 
 
+class ElideLabel(QLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._text = ""
+
+    def setText(self, text: str):
+        self._text = text
+        fm = self.fontMetrics()
+        elided = fm.elidedText(self._text, Qt.TextElideMode.ElideLeft, self.width())
+        super().setText(elided)
+
+    def resizeEvent(self, event):
+        self.setText(self._text)
+        super().resizeEvent(event)
+
+
 class PathWidget(QGroupBox):
     def __init__(self):
         super().__init__()
+        self.path = ""
         v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
         v_lay.setContentsMargins(5, 5, 5, 5)
 
-        self.label_bottom = QLabel()
+        self.label_bottom = ElideLabel()
         self.label_bottom.mouseReleaseEvent = self.show_path_win
         self.label_bottom.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.addWidget(self.label_bottom)
         self.setLayout(v_lay)
-        
 
     def set_path(self, path: str):
         self.label_bottom.setText(path)
+        self.path = path
 
     def show_path_win(self, *args):
         self.win = PathWindow()
-        self.win.text_label.setText(self.label_bottom.text())
-        self.win.resize(30, 350)
-        self.win.adjustSize()
+        self.win.text_label.setPlainText(self.path)
         self.win.center_relative_parent(self.window())
         self.win.show()
 
@@ -200,7 +218,6 @@ class WinUpload(WinChild):
         self.dirs_list.root_dir = main_folder.curr_path
         self.dirs_list.first_load()
         self.info_box.set_path(main_folder.curr_path)
-        self.tab_wid.setCurrentIndex(1)
 
     def ok_cmd(self):
         path = self.info_box.label_bottom.text()
