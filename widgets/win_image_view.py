@@ -20,7 +20,6 @@ from .actions import (CopyName, CopyPath, FavActionDb, Save, ShowInFinder,
                       WinInfoAction)
 from .grid import Thumbnail
 from .win_info import WinInfo
-from .win_warn import WinSmb
 
 
 class ImageWidget(QLabel):
@@ -180,6 +179,7 @@ class NextImageBtn(SwitchImageBtn):
 class WinImageView(WinChild):
     task_count_limit = 10
     switch_image_sig = pyqtSignal(str)
+    no_connection = pyqtSignal()
     closed_ = pyqtSignal()
     ww, hh = 700, 500
     min_w, min_h = 500, 400
@@ -232,7 +232,8 @@ class WinImageView(WinChild):
 
 
     def first_load(self):
-        self.check_main_folder(MainFolder.current, True)
+        if not MainFolder.current.get_curr_path():
+            self.no_connection.emit()
         self.load_thumb()
 
     def load_thumb(self):
@@ -251,7 +252,7 @@ class WinImageView(WinChild):
             t = f"{os.path.basename(self.rel_img_path)}\n{Lng.loading[Cfg.lng]}"
             self.image_label.setText(t)
 
-        main_folder_path = self.check_main_folder(MainFolder.current, False)
+        main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             self.img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
             self.load_image()
@@ -371,15 +372,6 @@ class WinImageView(WinChild):
         self.win_info.center_relative_parent(self)
         self.win_info.show()
 
-    def check_main_folder(self, main_folder: MainFolder, show_win: bool):
-        curr_path = main_folder.get_curr_path()
-        if curr_path:
-            return curr_path
-        elif show_win:
-            self.win_warn = WinSmb()
-            self.win_warn.adjustSize()
-            self.win_warn.center_relative_parent(self)
-            self.win_warn.show()
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
@@ -407,12 +399,14 @@ class WinImageView(WinChild):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            main_folder_path = self.check_main_folder(MainFolder.current, True)
+            main_folder_path = MainFolder.current.get_curr_path()
             if main_folder_path:
                 img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
                 img_path_list = [img_path]
                 self.win_info = WinInfo(img_path_list)
                 self.win_info.finished_.connect(self.open_info_win_delayed)
+            else:
+                self.no_connection.emit()
 
         return super().keyPressEvent(ev)
 

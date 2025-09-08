@@ -162,7 +162,10 @@ class WinMain(UMainWindow):
         wid = self.grid.selected_widgets[-1]
         self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
         self.win_image_view.closed_.connect(lambda: self.closed_img_view())
-        self.win_image_view.switch_image_sig.connect(lambda img_path: self.grid.select_viewed_image(img_path))
+        self.win_image_view.switch_image_sig.connect(
+            lambda img_path: self.grid.select_viewed_image(img_path)
+        )
+        self.win_image_view.no_connection.connect(self.open_win_smb)
         self.win_image_view.center_relative_parent(self.window())
         self.win_image_view.show()
 
