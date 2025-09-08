@@ -18,7 +18,7 @@ class DirsLoader(QObject):
     def __init__(self, main_folder: MainFolder, task_state: TaskState):
         super().__init__()
         self.main_folder = main_folder
-        self.main_folder_path = main_folder.get_current_path()
+        self.main_folder_path = main_folder.curr_path
         self.task_state = task_state
 
     def finder_dirs(self) -> list[tuple]:
@@ -151,7 +151,7 @@ class ImgLoader(QObject):
         super().__init__()
         self.new_dirs = new_dirs
         self.main_folder = main_folder
-        self.main_folder_path = main_folder.get_current_path()
+        self.main_folder_path = main_folder.curr_path
         self.task_state = task_state
 
     def finder_images(self) -> list[tuple]:
@@ -421,9 +421,9 @@ class DbUpdater:
     def run_new_items(self):
         for img_path, size, birth, mod in self.new_items:
             small_img_path = ThumbUtils.create_thumb_path(img_path)
-            short_img_path = MainUtils.get_rel_path(self.main_folder.get_current_path(), img_path)
+            short_img_path = MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
             rel_thumb_path = ThumbUtils.get_rel_thumb_path(small_img_path)
-            coll_name = MainUtils.get_coll_name(self.main_folder.get_current_path(), img_path)
+            coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, img_path)
             values = {
                 ClmNames.SHORT_SRC: short_img_path,
                 ClmNames.SHORT_HASH: rel_thumb_path,

@@ -173,7 +173,7 @@ class WinMain(UMainWindow):
         self.grid.load_rubber()
 
     def main_folder_check(self):
-        main_folder = MainFolder.current.availability()
+        main_folder = MainFolder.current.set_path()
         if not main_folder:
             self.win_warn = WinSmb()
             self.win_warn.center_relative_parent(self)
@@ -320,7 +320,7 @@ class WinMain(UMainWindow):
             )
             UThreadPool.start(copy_task)
 
-        main_folder_path = MainFolder.current.availability()
+        main_folder_path = MainFolder.current.set_path()
         if main_folder_path:
             files = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -343,7 +343,7 @@ class WinMain(UMainWindow):
             task.sigs.reload_gui.connect(self.reload_gui)
             UThreadPool.start(task)
 
-        main_folder_path = MainFolder.current.availability()
+        main_folder_path = MainFolder.current.set_path()
         if main_folder_path:
             img_path_list = [
                 MainUtils.get_abs_path(main_folder_path, i)
@@ -483,7 +483,7 @@ class WinMain(UMainWindow):
 
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
-        main_folder_path = MainFolder.current.availability()
+        main_folder_path = MainFolder.current.set_path()
         if not main_folder_path:
             self.win_smb = WinSmb()
             self.win_smb.center_relative_parent(self.window())

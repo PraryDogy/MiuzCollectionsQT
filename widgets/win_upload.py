@@ -84,7 +84,7 @@ class MainFolderList(VListWidget):
     def mouseReleaseEvent(self, e):
         item = self.currentItem()
         if e.button() == Qt.MouseButton.LeftButton and item:
-            path = item.main_folder.availability()
+            path = item.main_folder.set_path()
             if path:
                 self.clicked.emit(item.main_folder)
         return super().mouseReleaseEvent(e)

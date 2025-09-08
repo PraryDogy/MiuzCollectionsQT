@@ -56,10 +56,10 @@ class FinderImages(QObject):
         - сам путь MainFolder в конце списка
         """
         collections = []
-        for item in os.scandir(self.main_folder.get_current_path()):
+        for item in os.scandir(self.main_folder.curr_path):
             if item.is_dir() and item.name not in self.main_folder.stop_list:
                 collections.append(item.path)
-        collections.append(self.main_folder.get_current_path())
+        collections.append(self.main_folder.curr_path)
         return collections
 
     def process_subdirs(self, subdirs: list[str]) -> list:
@@ -173,7 +173,7 @@ class DbImages(QObject):
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
         conn.close()
-        main_folder_path = self.main_folder.get_current_path()
+        main_folder_path = self.main_folder.curr_path
         return {
             rel_thumb_path: (
                 MainUtils.get_abs_path(main_folder_path, rel_img_path),
@@ -390,10 +390,10 @@ class DbUpdater(QObject):
         conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
             small_img_path = ThumbUtils.create_thumb_path(img_path)
-            short_img_path = MainUtils.get_rel_path(self.main_folder.get_current_path(), img_path)
+            short_img_path = MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
             rel_thumb_path = ThumbUtils.get_rel_thumb_path(small_img_path)
 
-            coll_name = MainUtils.get_coll_name(self.main_folder.get_current_path(), img_path)
+            coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, img_path)
 
             values = {
                 ClmNames.SHORT_SRC: short_img_path,

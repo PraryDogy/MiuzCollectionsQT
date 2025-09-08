@@ -61,11 +61,8 @@ class MainFolder:
         self.paths = paths
         self.stop_list = stop_list
         self.curr_path: str = curr_path
-    
-    def get_current_path(self):
-        return self.curr_path
-        
-    def availability(self) -> str | None:
+            
+    def set_path(self) -> str | None:
         """
         Проверяет и устанавливает путь к MainFolder.    
         Возвращает доступный путь к MainFolder или None
@@ -74,8 +71,8 @@ class MainFolder:
         for i in self.paths:
             if os.path.exists(i):
                 self.curr_path = i
-                break        
-        return self.curr_path
+                return self.curr_path
+        return None
     
     def get_data(self):
         return {
