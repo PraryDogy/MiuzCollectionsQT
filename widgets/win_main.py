@@ -79,7 +79,7 @@ class WinMain(UMainWindow):
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
         self.left_menu.clicked_.connect(lambda: self.grid.reload_thumbnails())
-        self.left_menu.clicked_.connect(lambda: self.reload_rubber())
+        self.left_menu.clicked_.connect(lambda: self.reload_grid_rubber())
         self.left_menu.clicked_.connect(lambda: self.set_window_title())
         self.left_menu.no_connection.connect(self.open_win_smb)
         splitter.addWidget(self.left_menu)
@@ -173,7 +173,7 @@ class WinMain(UMainWindow):
         del self.win_image_view
         gc.collect()
 
-    def reload_rubber(self):
+    def reload_grid_rubber(self):
         self.grid.rubberBand.deleteLater()
         self.grid.load_rubber()
 
@@ -356,7 +356,7 @@ class WinMain(UMainWindow):
 
     def reload_gui(self):
         self.grid.reload_thumbnails()
-        self.reload_rubber()
+        self.reload_grid_rubber()
         self.left_menu.init_ui()
     
     def upload_files(self, img_path_list: list):
