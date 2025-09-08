@@ -164,6 +164,7 @@ class MainFolderList(VListWidget):
 
 class MenuLeft(QTabWidget):
     clicked_ = pyqtSignal()
+    no_connection = pyqtSignal()
     
     def __init__(self):
         super().__init__()

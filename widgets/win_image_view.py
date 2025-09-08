@@ -232,10 +232,7 @@ class WinImageView(WinChild):
 
 
     def first_load(self):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if not main_folder_path:
-            self.open_smb_win()
-
+        self.check_main_folder(MainFolder.current, True)
         self.load_thumb()
 
     def load_thumb(self):
@@ -254,7 +251,7 @@ class WinImageView(WinChild):
             t = f"{os.path.basename(self.rel_img_path)}\n{Lng.loading[Cfg.lng]}"
             self.image_label.setText(t)
 
-        main_folder_path = MainFolder.current.get_curr_path()
+        main_folder_path = self.check_main_folder(MainFolder.current, False)
         if main_folder_path:
             self.img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
             self.load_image()
@@ -374,11 +371,15 @@ class WinImageView(WinChild):
         self.win_info.center_relative_parent(self)
         self.win_info.show()
 
-    def open_smb_win(self):
-        self.win_warn = WinSmb()
-        self.win_warn.adjustSize()
-        self.win_warn.center_relative_parent(self)
-        self.win_warn.show()
+    def check_main_folder(self, main_folder: MainFolder, show_win: bool):
+        curr_path = main_folder.get_curr_path()
+        if curr_path:
+            return curr_path
+        elif show_win:
+            self.win_warn = WinSmb()
+            self.win_warn.adjustSize()
+            self.win_warn.center_relative_parent(self)
+            self.win_warn.show()
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
@@ -406,14 +407,12 @@ class WinImageView(WinChild):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            main_folder_path = MainFolder.current.get_curr_path()
+            main_folder_path = self.check_main_folder(MainFolder.current, True)
             if main_folder_path:
                 img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
                 img_path_list = [img_path]
                 self.win_info = WinInfo(img_path_list)
                 self.win_info.finished_.connect(self.open_info_win_delayed)
-            else:
-                self.open_smb_win()
 
         return super().keyPressEvent(ev)
 
