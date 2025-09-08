@@ -73,7 +73,8 @@ class MainFolderList(VListWidget):
     def __init__(self):
         super().__init__()
         for i in MainFolder.list_:
-            item = MainFolderItem(parent=self, main_folder=i, text=i.name)
+            name = f"{os.path.basename(i.paths[0])} ({i.name})"
+            item = MainFolderItem(parent=self, main_folder=i, text=name)
             self.addItem(item)
         self.setCurrentRow(0)
 
