@@ -115,18 +115,21 @@ class MyTree(QTreeWidget):
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
     double_clicked = pyqtSignal()
+    no_connection = pyqtSignal()
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
 
         for i in MainFolder.list_:
-            item = UListWidgetItem(parent=self, text=i.name)
+            text = f"{i.name} ({os.path.basename(i.paths[0])})"
+            item = UListWidgetItem(parent=self, text=text)
+            item.main_folder_name = i.name
             self.addItem(item)
 
         self.setCurrentRow(0)
 
     def cmd(self, flag: str):
-        name = self.currentItem().text()
+        name = self.currentItem().main_folder_name
         folder = next((i for i in MainFolder.list_ if i.name == name), None)
         if folder is None:
             return
