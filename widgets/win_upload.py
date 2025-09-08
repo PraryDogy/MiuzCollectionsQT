@@ -11,7 +11,6 @@ from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import LoadSortedDirsTask
 from system.utils import UThreadPool
-from .win_warn import WinSmb
 from ._base_widgets import (UHBoxLayout, UListWidgetItem, UVBoxLayout,
                             VListWidget, WinChild, UTextEdit)
 

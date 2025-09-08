@@ -21,7 +21,6 @@ from .actions import (CopyName, CopyPath, FavActionDb, MenuTypes, MoveFiles,
                       OpenDefault, OpenInView, RemoveFiles, Save,
                       ScanerRestart, ShowInFinder, WinInfoAction)
 from .win_info import WinInfo
-from .win_warn import WinSmb
 
 
 class TextWid(QLabel):
@@ -247,6 +246,7 @@ class Grid(VScrollArea):
     save_files = pyqtSignal(tuple)
     update_bottom_bar = pyqtSignal()
     img_view = pyqtSignal()
+    no_connection = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -504,10 +504,7 @@ class Grid(VScrollArea):
                     self.win_info = WinInfo(img_path_list)
                     self.win_info.finished_.connect(self.open_info_win_delayed)
                 else:
-                    self.win_warn = WinSmb()
-                    self.win_warn.adjustSize()
-                    self.win_warn.center_relative_parent(self.window())
-                    self.win_warn.show()
+                    self.no_connection.emit()
 
         elif a0.modifiers() == command and a0.key() == Qt.Key.Key_A:
             for i in self.cell_to_wid.values():
@@ -882,10 +879,7 @@ class Grid(VScrollArea):
         self.drag.setMimeData(self.mime_data)
         self.drag.exec_(Qt.DropAction.CopyAction)
 
-        if not img_path_list:
-            self.win_smb = WinSmb()
-            self.win_smb.adjustSize()
-            self.win_smb.center_relative_parent(self.window())
-            self.win_smb.show()
+        if not MainFolder.current.get_curr_path():
+            self.no_connection.emit()
 
         return super().mouseMoveEvent(a0)

@@ -106,7 +106,7 @@ class WinMain(UMainWindow):
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_path_list: self.remove_files(rel_img_path_list))
         self.grid.move_files.connect(lambda rel_img_path_list: self.move_files(rel_img_path_list))
-        # self.grid.save_files.connect(self.open)
+        self.grid.no_connection.connect(self.open_win_smb)
         self.grid.update_bottom_bar.connect(lambda: self.bar_bottom.toggle_types())
         self.grid.img_view.connect(lambda: self.open_img_view())
         right_lay.addWidget(self.grid)
@@ -168,16 +168,6 @@ class WinMain(UMainWindow):
         self.win_image_view.no_connection.connect(self.open_win_smb)
         self.win_image_view.center_relative_parent(self.window())
         self.win_image_view.show()
-
-    def main_folder_check(self, main_folder: MainFolder):
-        curr_path = main_folder.get_curr_path()
-        if curr_path:
-            return curr_path
-        else:
-            self.win_warn = WinSmb()
-            self.win_warn.center_relative_parent(self)
-            self.win_warn.show()
-            return None
 
     def closed_img_view(self):
         del self.win_image_view

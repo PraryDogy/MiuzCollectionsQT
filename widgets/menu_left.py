@@ -17,7 +17,6 @@ from system.utils import UThreadPool, MainUtils
 
 from ._base_widgets import (UHBoxLayout, UListSpaserItem, UListWidgetItem,
                             UMenu, UVBoxLayout, VListWidget, WinChild)
-from .win_warn import WinSmb
 
 
 class FavItem(QTreeWidgetItem):
