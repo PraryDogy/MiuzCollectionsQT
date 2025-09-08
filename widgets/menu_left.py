@@ -124,7 +124,7 @@ class MainFolderList(VListWidget):
         super().__init__(parent=parent)
 
         for i in MainFolder.list_:
-            text = f"{i.name} ({os.path.basename(i.paths[0])})"
+            text = f"{os.path.basename(i.paths[0])} ({i.name})"
             item = UListWidgetItem(parent=self, text=text)
             item.main_folder_name = i.name
             self.addItem(item)
