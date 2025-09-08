@@ -12,12 +12,13 @@ class Filters:
 
     @classmethod
     def init(cls):
-        cls.filters.extend(cls.default)
         if os.path.exists(cls.filepath):
             with open(cls.filepath, "r", encoding="utf-8") as f:
                 for i in json.load(f):
                     if i not in cls.filters:
                         cls.filters.append(i)
+        else:
+            cls.filters.extend(cls.default)
 
     @classmethod
     def write_file(cls):

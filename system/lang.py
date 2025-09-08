@@ -253,3 +253,12 @@ class Lng:
         "- Images in \"2 MODEL IMG\" folder\n"
         "- Any other images (not in \"1 IMG\" or \"2 MODEL IMG\")"
     )
+    filters_descr = (
+        "Фильтры:\n"
+        "- Показывают файлы, если путь содержит текст фильтра.\n"
+        "- Каждый фильтр с новой строки.",
+        "Filters:\n"
+        "- Show files if the path contains the filter text.\n"
+        "- One filter per line."
+    )
+

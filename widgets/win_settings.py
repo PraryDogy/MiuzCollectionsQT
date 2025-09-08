@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QFrame,
                              QSpinBox, QSplitter, QTabWidget, QWidget)
 
 from cfg import Cfg, Static
+from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
@@ -626,6 +627,53 @@ class NewFolder(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
+
+# ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ 
+
+
+class FiltersWid(QWidget):
+
+    def __init__(self, filters_copy: list[str]):
+        super().__init__()
+        self.filters_copy = filters_copy
+
+        self.v_lay = UVBoxLayout()
+        self.v_lay.setSpacing(15)
+        self.setLayout(self.v_lay)
+
+        group = QGroupBox()
+        g_lay = UVBoxLayout(group)
+        g_lay.setContentsMargins(0, 5, 0, 5)
+        g_lay.setSpacing(15)
+
+        descr = QLabel(Lng.filters_descr[Cfg.lng])
+        descr.setWordWrap(True)
+        g_lay.addWidget(descr)
+
+        self.text_wid = UTextEdit()
+        self.text_wid.setFixedHeight(300)
+        self.text_wid.setPlaceholderText(Lng.filters[Cfg.lng])
+        self.text_wid.setPlainText("\n".join(self.filters_copy))
+        g_lay.addWidget(self.text_wid)
+
+        self.v_lay.addWidget(group)
+        
+        self.save_btn = QPushButton(Lng.save[Cfg.lng])
+        self.save_btn.setFixedWidth(100)
+        self.save_btn.clicked.connect(self.save_clicked)
+        self.v_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        
+        self.v_lay.addStretch(1)
+        
+    def save_clicked(self):
+        filters_list = self.text_wid.toPlainText().split("\n")
+        filters_list = [f.strip() for f in filters_list if f.strip()]
+        filters_list = list(dict.fromkeys(filters_list))
+        self.filters_copy = filters_list
+        Filters.filters = filters_list
+        self.text_wid.setPlainText("\n".join(self.filters_copy))
+        self.setFocus()
+
 # ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
 
@@ -638,6 +686,7 @@ class WinSettings(WinSystem):
         self.setWindowTitle(Lng.settings[Cfg.lng])
         self.main_folder_list = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
+        self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = False
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -652,6 +701,9 @@ class WinSettings(WinSystem):
 
         main_settings_item = UListWidgetItem(self.left_menu, text=Lng.general[Cfg.lng])
         self.left_menu.addItem(main_settings_item)
+        
+        filter_settings = UListWidgetItem(self.left_menu, text=Lng.filters[Cfg.lng])
+        self.left_menu.addItem(filter_settings)
 
         item = UListWidgetItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
         self.left_menu.addItem(item)
@@ -704,6 +756,9 @@ class WinSettings(WinSystem):
             self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             self.right_lay.insertWidget(0, self.gen_settings)
         elif ind == 1:
+            self.filters_wid = FiltersWid(self.filters_copy)
+            self.right_lay.insertWidget(0, self.filters_wid)
+        elif ind == 2:
             self.new_folder = NewFolder(self.main_folder_list)
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
@@ -765,7 +820,7 @@ class WinSettings(WinSystem):
             print("win settings > ошибка удаления main folder по кнопке удалить", e)
 
     def clear_right_side(self):
-        wids = (GeneralSettings, MainFolderSettings, NewFolder)
+        wids = (GeneralSettings, MainFolderSettings, NewFolder, FiltersWid)
         for i in self.right_wid.findChildren(wids):
             i.deleteLater()
 
@@ -790,6 +845,7 @@ class WinSettings(WinSystem):
                     self.win_warn.show()
                     return
             MainFolder.list_ = self.main_folder_list
+            Filters.filters = self.filters_copy
             for k, v in vars(self.json_data_copy).items():
                 setattr(Cfg, k, v)
             MainFolder.write_json_data()
