@@ -289,8 +289,6 @@ class Grid(VScrollArea):
         self.up_btn.hide()
 
         self.load_grid_wid()
-        self.load_rubber()
-        # self.reload_thumbnails()
 
     def scroll_to_top(self):
         self.verticalScrollBar().setValue(0)
@@ -309,9 +307,6 @@ class Grid(VScrollArea):
         self.task_ = LoadDbImagesTask()
         self.task_.sigs.finished_.connect(on_finish_cmd)
         UThreadPool.start(self.task_)
-
-    def load_rubber(self):
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
         
     def load_grid_wid(self):
         self.grid_wid = QWidget()
@@ -319,7 +314,8 @@ class Grid(VScrollArea):
         self.grid_lay = QGridLayout()
         self.grid_lay.setSpacing(1)
         self.grid_wid.setLayout(self.grid_lay)
-                                
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
+
     def first_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
         def cmd():
             for i in (self.grid_wid, self.rubberBand):
@@ -329,7 +325,6 @@ class Grid(VScrollArea):
             self.clear_cell_data()
             self.clear_selected_widgets()
             self.load_grid_wid()
-            self.load_rubber()
             Thumbnail.calculate_size()
             if not db_images:
                 lbl = QLabel(Lng.no_photo[Cfg.lng])

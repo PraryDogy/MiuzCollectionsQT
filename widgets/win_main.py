@@ -79,7 +79,6 @@ class WinMain(UMainWindow):
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
         self.left_menu.clicked_.connect(lambda: self.grid.reload_thumbnails())
-        self.left_menu.clicked_.connect(lambda: self.reload_grid_rubber())
         self.left_menu.clicked_.connect(lambda: self.set_window_title())
         self.left_menu.no_connection.connect(self.open_win_smb)
         self.left_menu.reset_data.connect(self.reset_data_cmd)
@@ -219,10 +218,6 @@ class WinMain(UMainWindow):
     def closed_img_view(self):
         del self.win_image_view
         gc.collect()
-
-    def reload_grid_rubber(self):
-        self.grid.rubberBand.deleteLater()
-        self.grid.load_rubber()
 
     def start_scaner_task(self):
         """
@@ -419,7 +414,6 @@ class WinMain(UMainWindow):
 
     def reload_gui(self):
         self.grid.reload_thumbnails()
-        self.reload_grid_rubber()
         self.left_menu.init_ui()
     
     def upload_files(self, img_path_list: list):
