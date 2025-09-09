@@ -674,8 +674,8 @@ class WinSettings(WinSystem):
     closed = pyqtSignal()
     reset_data = pyqtSignal(MainFolder)
 
-    def __init__(self, parent = None):
-        super().__init__(parent)
+    def __init__(self, main_folder: MainFolder = None):
+        super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng])
         self.main_folder_list = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
@@ -707,8 +707,11 @@ class WinSettings(WinSystem):
         for i in MainFolder.list_:
             item = UListWidgetItem(self.left_menu, text=i.name)
             self.left_menu.addItem(item)
+            if main_folder and i.name == main_folder.name:
+                self.left_menu.setCurrentRow(self.left_menu.row(item))
 
-        self.left_menu.setCurrentRow(0)
+        if main_folder is None:
+            self.left_menu.setCurrentRow(0)
 
         self.right_wid = QWidget()
         self.right_wid.setFixedWidth(450)

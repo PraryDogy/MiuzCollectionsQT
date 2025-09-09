@@ -81,7 +81,9 @@ class WinMain(UMainWindow):
         self.left_menu.clicked_.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.clicked_.connect(lambda: self.set_window_title())
         self.left_menu.no_connection.connect(self.open_win_smb)
-        self.left_menu.reset_data.connect(self.reset_data_cmd)
+        self.left_menu.setup_main_folder.connect(
+            lambda main_folder: self.open_settings(main_folder)
+        )
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -479,9 +481,9 @@ class WinMain(UMainWindow):
         else:
             self.open_win_smb()
 
-    def open_settings(self):
+    def open_settings(self, main_folder: MainFolder = None):
         self.bar_top.settings_btn.set_solid_style()
-        self.win_settings = WinSettings()
+        self.win_settings = WinSettings(main_folder)
         self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
         self.win_settings.reset_data.connect(self.reset_data_cmd)
         self.win_settings.center_relative_parent(self.window())
