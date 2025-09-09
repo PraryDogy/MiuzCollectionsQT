@@ -152,6 +152,10 @@ class Lng:
         "Folder name (cannot be changed after saving)"
     )
     save = ("Сохранить", "Save")
+    save_filters = (
+        "Сохраните и нажмите «ОК», чтобы применить фильтры.",
+        "Save and press \"OK\" to apply filters."
+    )
     new_folder = ("Новая папка", "New folder")
     enter_folder_name = ("Укажите имя папки с изображениями", "Enter images folder name")
     select_folder_path = ("Укажите путь к папке с изображениями", "Select path to the images folder")
@@ -229,6 +233,10 @@ class Lng:
     reset_data = ("Сбросить данные", "Reset data")
     data_was_reset = ("Данные сброшены", "Data reset")
     setup = ("Настроить", "Setup")
+    save_new_folder = (
+        "Сохраните и нажмите «Перезапуск», чтобы применить изменения.",
+        "Save and press \"Restart\" to apply changes."
+    )
     filters_descr = (
         "Фильтры:\n"
         "- Показывают файлы, путь которых содержит указанный текст.\n"
