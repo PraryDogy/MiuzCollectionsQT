@@ -274,7 +274,7 @@ class UListWidgetItem(QListWidgetItem):
             self.setText(text)
 
 
-class UListSpaserItem(QListWidgetItem):
+class UListSpacerItem(QListWidgetItem):
     def __init__(self, parent: QListWidget, height: int = 15):
         super().__init__()
         self.setSizeHint(QSize(parent.width(), height))

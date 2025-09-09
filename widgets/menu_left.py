@@ -15,7 +15,7 @@ from system.main_folder import MainFolder
 from system.tasks import LoadSortedDirsTask, ResetDataTask
 from system.utils import MainUtils, UThreadPool
 
-from ._base_widgets import (UHBoxLayout, UListSpaserItem, UListWidgetItem,
+from ._base_widgets import (UHBoxLayout, UListSpacerItem, UListWidgetItem,
                             UMenu, UVBoxLayout, VListWidget, WinChild)
 
 

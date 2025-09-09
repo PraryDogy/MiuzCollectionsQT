@@ -17,7 +17,7 @@ from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
 
-from ._base_widgets import (UHBoxLayout, ULineEdit, UListSpaserItem,
+from ._base_widgets import (UHBoxLayout, ULineEdit, UListSpacerItem,
                             UListWidgetItem, UMenu, UTextEdit, UVBoxLayout,
                             VListWidget, WinChild, WinSystem)
 from .win_warn import WinQuestion, WinWarn
@@ -669,6 +669,12 @@ class FiltersWid(QWidget):
 # ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
 
+class SettingsItem(UListWidgetItem):
+    def __init__(self, parent, height = 30, text = None):
+        super().__init__(parent, height, text)
+        self.main_folder_name = None
+
+
 class WinSettings(WinSystem):
     left_side_width = 210
     closed = pyqtSignal()
@@ -692,20 +698,22 @@ class WinSettings(WinSystem):
         self.left_menu.clicked.connect(self.left_menu_click)
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = UListWidgetItem(self.left_menu, text=Lng.general[Cfg.lng])
+        main_settings_item = SettingsItem(self.left_menu, text=Lng.general[Cfg.lng])
         self.left_menu.addItem(main_settings_item)
         
-        filter_settings = UListWidgetItem(self.left_menu, text=Lng.filters[Cfg.lng])
+        filter_settings = SettingsItem(self.left_menu, text=Lng.filters[Cfg.lng])
         self.left_menu.addItem(filter_settings)
 
-        item = UListWidgetItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
+        item = SettingsItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
         self.left_menu.addItem(item)
         
-        spacer = UListSpaserItem(self.left_menu)
+        spacer = UListSpacerItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
         for i in MainFolder.list_:
-            item = UListWidgetItem(self.left_menu, text=i.name)
+            text = f"{os.path.basename(i.paths[0])} ({i.name})"
+            item = SettingsItem(self.left_menu, text=text)
+            item.main_folder_name = i.name
             self.left_menu.addItem(item)
             if main_folder and i.name == main_folder.name:
                 self.left_menu.setCurrentRow(self.left_menu.row(item))
@@ -762,7 +770,7 @@ class WinSettings(WinSystem):
             main_folder = [
                 x
                 for x in self.main_folder_list
-                if x.name == self.left_menu.currentItem().text()
+                if x.name == self.left_menu.currentItem().main_folder_name
                 ]
             
             if len(main_folder) == 1:
@@ -778,14 +786,16 @@ class WinSettings(WinSystem):
 
     def add_main_folder(self, main_folder: MainFolder):
         self.main_folder_list.append(main_folder)
-        item = UListWidgetItem(self.left_menu, text=main_folder.name)
+        text = f"{os.path.basename(main_folder.paths[0])} ({main_folder.name})"
+        item = SettingsItem(self.left_menu, text=text)
+        item.main_folder_name = main_folder.name
         self.left_menu.addItem(item)
         self.left_menu.setCurrentItem(item)
         self.clear_right_side()
         self.init_right_side()
         self.ok_btn.setText(Lng.restart[Cfg.lng])
 
-    def remove_main_folder(self, main_folder: MainFolder, item: UListWidgetItem):
+    def remove_main_folder(self, main_folder: MainFolder, item: SettingsItem):
 
         def fin():
             self.main_folder_list.remove(main_folder)
@@ -861,3 +871,4 @@ class WinSettings(WinSystem):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
+    
