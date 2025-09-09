@@ -188,7 +188,6 @@ class MenuLeft(QTabWidget):
             Dynamic.grid_buff_size = 0
             self.collections_list.root_dir = main_folder_path
             self.collections_list.init_ui()
-            self.clicked_.emit()
         else:
             self.no_connection.emit()
         
