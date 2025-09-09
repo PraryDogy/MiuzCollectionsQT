@@ -294,6 +294,7 @@ class Grid(VScrollArea):
         self.verticalScrollBar().setValue(0)
 
     def reload_thumbnails(self):
+        print("reload thumbnails", self.sender())
         Dynamic.grid_buff_size = 0
         cmd_ = lambda db_images: self.first_grid(db_images)
         self.load_db_images_task(cmd_)
