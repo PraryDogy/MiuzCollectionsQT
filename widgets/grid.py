@@ -320,11 +320,10 @@ class Grid(VScrollArea):
         def cmd():
             for i in (self.grid_wid, self.rubberBand):
                 i.deleteLater()
-            
+            self.load_grid_wid()
             self.clear_thumb_data()
             self.clear_cell_data()
             self.clear_selected_widgets()
-            self.load_grid_wid()
             Thumbnail.calculate_size()
             if not db_images:
                 lbl = QLabel(Lng.no_photo[Cfg.lng])
