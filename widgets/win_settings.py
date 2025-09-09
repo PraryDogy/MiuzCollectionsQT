@@ -470,7 +470,7 @@ class MainFolderAdvanced(QWidget):
         sec_row = MainFolderPaths(main_folder)
         sec_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(sec_row)
-        sec_row.top_label.setText(Lng.collections_folder_path[Cfg.lng])
+        sec_row.top_label.setText(Lng.images_folder_path[Cfg.lng])
         text_ = "\n".join(i for i in main_folder.paths)
         sec_row.text_edit.setPlainText(text_)
 

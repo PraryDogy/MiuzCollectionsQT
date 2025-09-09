@@ -187,7 +187,7 @@ class WinUpload(WinChild):
 
         self.dirs_list = MyTree(MainFolder.current.curr_path)
         self.dirs_list.clicked_.connect(self.info_box.set_path)
-        self.tab_wid.addTab(self.dirs_list, Lng.collections[Cfg.lng])
+        self.tab_wid.addTab(self.dirs_list, Lng.images[Cfg.lng])
 
         # правая часть (кнопки сверху)
         right_wid = QWidget()

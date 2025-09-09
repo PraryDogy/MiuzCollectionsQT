@@ -266,7 +266,6 @@ class SingleFileInfoTask(URunnable):
                 Lng.place[Cfg.lng]: self.lined_text(self.url),
                 Lng.thumb_path[Cfg.lng]: self.lined_text(thumb_path),
                 Lng.changed[Cfg.lng]: mod,
-                Lng.collection[Cfg.lng]: self.lined_text(coll),
                 Lng.resol[Cfg.lng]: Lng.calculating[Cfg.lng],
                 }
             

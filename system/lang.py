@@ -144,6 +144,7 @@ class Lng:
     next_ = ("Далее", "Next")
     read_file_error = ("Ошибка чтения файла", "Error file read")
     folders = ("Папки", "Folders")
+    folder = ("Папка", "Folder")
     open_default = ("Открыть по умолчанию", "Open by default")
     open_in = ("Открыть в приложении", "Open in application")
     folder_name_immutable = (
@@ -152,20 +153,18 @@ class Lng:
     )
     save = ("Сохранить", "Save")
     new_folder = ("Новая папка", "New folder")
-    enter_folder_name = ("Укажите имя папки с коллекциями", "Enter collections folder name")
-    select_folder_path = ("Укажите путь к папке с коллекциями", "Select path to the collections folder")
-    folder_path = ("Путь к папке с коллекциями", "Collections folder path")
+    enter_folder_name = ("Укажите имя папки с изображениями", "Enter images folder name")
+    select_folder_path = ("Укажите путь к папке с изображениями", "Select path to the images folder")
+    folder_path = ("Путь к папке с изображениями", "Images folder path")
     general = ("Основные", "General")
     restart = ("Перезапуск", "Restart")
     at_least_one_folder_required = (
-        "Нужна хотя бы одна папка с коллекциями",
-        "At least one collection folder required"
+        "Нужна хотя бы одна папка с изображениями",
+        "At least one images folder required"
     )
     confirm_delete_folder = ("Вы уверены, что хотите удалить папку?", "Are you sure you want to delete the folder?")
     upload_path = ("Директория загрузки", "Upload path")
-    collections = ("Коллекции", "Collections")
     upload = ("Загрузка", "Upload")
-    collection = ("Коллекция", "Collection")
     images = ("Изображения", "Images")
     menu = ("Меню", "Menu")
     dates = ("Календарь", "Calendar")
@@ -173,18 +172,18 @@ class Lng:
     cancel = ("Отмена", "Cancel")
     no_connection = ("Нет подключения", "No connection")
     no_connection_descr = (
-        "- Подключитесь к диску с коллекциями\
-        \n- Добавьте новый путь к коллекциям\
+        "- Подключитесь к диску\
+        \n- Добавьте новый путь к папке с изображениями\
         \nв настройках.",
-        "- Connect to disk with collections\
-        \n- Add a new path to collections\
+        "- Connect to disk\
+        \n- Add a new path to images folder\
         \nin the settings."
     )
     ok = ("Ок", "Ok")
     folder_name = ("Имя папки", "Folder name")
-    collections_folder_path = (
-        "Путь к папке с коллекциями: перетащите сюда папку или укажите путь с новой строки.",
-        "Path to the collections folder: drag a folder here or enter a path on a new line."
+    images_folder_path = (
+        "Путь к папке с изображениями: перетащите сюда папку или укажите путь с новой строки.",
+        "Path to the images folder: drag a folder here or enter a path on a new line."
     )
     ignore_list_descr = (
         "Игнор лист: перетащите сюда папку или укажите имя с новой строки.",
@@ -221,7 +220,6 @@ class Lng:
     folder_name_error = ("Имя папки должно быть уникальным", "Folder name must be unique")
     name_taken = ("Уже занято", "Already taken")
     name = ("Имя", "Name")
-    collection_folder = ("Папка с коллекциями", "Collections folder")
     image = ("Изображение", "Image")
     other_folders = ("Прочие папки", "Other folders")
     sort_by_mod = ("По дате изменения", "Date modification")

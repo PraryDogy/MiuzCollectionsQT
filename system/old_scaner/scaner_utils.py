@@ -106,7 +106,7 @@ class FinderImages(QObject):
         Пример: "Miuz (MainFolder.name): коллекция 3 из 10"
         """
         main_folder = self.main_folder.name.capitalize()
-        collection_name: str = Lng.collection[Cfg.lng]
+        collection_name: str = Lng.folder[Cfg.lng]
         return f"{main_folder}: {collection_name.lower()} {current} {Lng.from_[Cfg.lng]} {total}"
 
     def walk_subdir(self, subdir: str) -> list[tuple]:
