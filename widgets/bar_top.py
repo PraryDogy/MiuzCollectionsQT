@@ -39,7 +39,7 @@ class BarTopBtn(QFrame):
         self.set_normal_style()
 
     def set_solid_style(self):
-        self.setStyleSheet(f"#{self.object_name} {{ {Static.blue_bg_style} }}")
+        self.setStyleSheet(f"#{self.object_name} {{ {Static.gray_bg_style} }}")
 
     def set_normal_style(self):
         self.setStyleSheet(f"#{self.object_name} {{ {Static.border_transparent_style} }}")

@@ -136,6 +136,15 @@ class Static:
         padding-right: 2px;
     """
 
+    gray_bg_style = f"""
+        border-radius: 7px;
+        color: rgb(255, 255, 255);
+        background: {gray_color};
+        border: {border_transparent};
+        padding-left: 2px;
+        padding-right: 2px;
+    """
+
 class Cfg:
     app_ver: str = Static.APP_VER
     lng: int = 0
