@@ -672,7 +672,7 @@ class FiltersWid(QWidget):
 class SettingsItem(UListWidgetItem):
     def __init__(self, parent, height = 30, text = None):
         super().__init__(parent, height, text)
-        self.main_folder_name = None
+        self.main_folder_name: str = ""
 
 
 class WinSettings(WinSystem):
@@ -767,11 +767,11 @@ class WinSettings(WinSystem):
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
         else:
+            current_item: SettingsItem = self.left_menu.currentItem()
             main_folder = [
-                x
-                for x in self.main_folder_list
-                if x.name == self.left_menu.currentItem().main_folder_name
-                ]
+                x for x in self.main_folder_list
+                if x.name == current_item.main_folder_name
+            ]
             
             if len(main_folder) == 1:
                 item = self.left_menu.currentItem()
