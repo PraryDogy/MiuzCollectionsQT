@@ -290,7 +290,7 @@ class Grid(VScrollArea):
 
         self.load_grid_wid()
         self.load_rubber()
-        self.reload_thumbnails()
+        # self.reload_thumbnails()
 
     def scroll_to_top(self):
         self.verticalScrollBar().setValue(0)
