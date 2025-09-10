@@ -348,6 +348,17 @@ class WinMain(UMainWindow):
         MainFolder.write_json_data()
         os._exit(0)
 
+    def reveal_in_finder(self, rel_img_path_list: list[str]):
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            abs_paths = [
+                MainUtils.get_abs_path(main_folder_path, i)
+                for i in rel_img_path_list
+            ]
+            MainUtils.reveal_files(abs_paths)
+        else:
+            self.open_win_smb()
+
     def copy_name(self, rel_img_path_list: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:

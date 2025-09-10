@@ -19,7 +19,7 @@ from system.utils import MainUtils, PixmapUtils, UThreadPool
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
 from .actions import (CopyName, CopyPath, FavActionDb, MoveFiles,
                       OpenDefault, OpenInView, RemoveFiles, Save,
-                      ScanerRestart, ShowInFinder, WinInfoAction)
+                      ScanerRestart, RevealInFinder, WinInfoAction)
 
 
 class TextWid(QLabel):
@@ -249,6 +249,7 @@ class Grid(VScrollArea):
     open_info_win = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     copy_name = pyqtSignal(list)
+    reveal_in_finder = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -660,7 +661,7 @@ class Grid(VScrollArea):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
 
-        def reveal_cmd():
+        def reveal_grid():
             main_folder_path = MainFolder.current.get_curr_path()
             if main_folder_path:
                 reveal_path = MainUtils.get_abs_path(
@@ -682,7 +683,7 @@ class Grid(VScrollArea):
             self.menu_.addAction(reload)
             self.menu_.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], self.menu_)
-            reveal.triggered.connect(reveal_cmd)
+            reveal.triggered.connect(reveal_grid)
             self.menu_.addAction(reveal)
 
         # клик по виджету
@@ -744,7 +745,10 @@ class Grid(VScrollArea):
 
             self.menu_.addSeparator()
 
-            reveal = ShowInFinder(self.menu_, self.window(), rel_img_path_list)
+            reveal = RevealInFinder(self.menu_, len(rel_img_path_list))
+            reveal.triggered.connect(
+                lambda: self.reveal_in_finder.emit(rel_img_path_list)
+            )
             self.menu_.addAction(reveal)
 
             copy_path = CopyPath(self.menu_, len(rel_img_path_list))

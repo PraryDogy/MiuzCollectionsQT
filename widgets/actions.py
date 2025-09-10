@@ -60,25 +60,10 @@ class CopyName(QAction):
         super().__init__(parent=parent, text=text)
 
 
-class ShowInFinder(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        text = f"{Lng.reveal_in_finder[Cfg.lng]} ({len(rel_img_path_list)})"
+class RevealInFinder(QAction):
+    def __init__(self, parent: QMenu, total: int):
+        text = f"{Lng.reveal_in_finder[Cfg.lng]} ({total})"
         super().__init__(parent=parent, text=text)
-        self.rel_img_path_list = rel_img_path_list
-        self.parent_ = parent
-        self.win_ = win
-        self.triggered.connect(self.cmd)
-
-    def cmd(self, *args):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            img_path_list = [
-                MainUtils.get_abs_path(main_folder_path, i)
-                for i in self.rel_img_path_list
-            ]
-            MainUtils.reveal_files(img_path_list)
-        else:
-            SmbWin.show(self.win_)
 
 
 class FavActionDb(QAction):

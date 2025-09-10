@@ -16,7 +16,7 @@ from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
                             AppModalWindow)
-from .actions import (CopyName, CopyPath, FavActionDb, Save, ShowInFinder,
+from .actions import (CopyName, CopyPath, FavActionDb, Save, RevealInFinder,
                       WinInfoAction)
 from .grid import Thumbnail
 
@@ -182,6 +182,7 @@ class WinImageView(AppModalWindow):
     open_win_info = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     copy_name = pyqtSignal(list)
+    reveal_in_finder = pyqtSignal(list)
     
     task_count_limit = 10
     ww, hh = 700, 500
@@ -430,7 +431,10 @@ class WinImageView(AppModalWindow):
         )
         self.menu_.addAction(copy_name)
 
-        reveal = ShowInFinder(self.menu_, self, rel_img_path_list)
+        reveal = RevealInFinder(self.menu_, 1)
+        reveal.triggered.connect(
+            lambda: self.reveal_in_finder.emit(rel_img_path_list)
+        )
         self.menu_.addAction(reveal)
 
         save_as = Save(self.menu_, self, rel_img_path_list, True)
