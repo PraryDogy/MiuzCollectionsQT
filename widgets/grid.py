@@ -194,8 +194,17 @@ class Thumbnail(QFrame):
             padding-right: 2px;
         """
         self.img_wid.setStyleSheet(style_)
-        text_style = Static.blue_bg_style + "font-size: 11px;"
-        self.text_wid.setStyleSheet(text_style)
+        
+        style_ = f"""
+            border-radius: 7px;
+            color: rgb(255, 255, 255);
+            background: {Static.rgba_blue};
+            border: 2px solid transparent;
+            padding-left: 2px;
+            padding-right: 2px;
+            font-size: 11px;
+        """
+        self.text_wid.setStyleSheet(style_)
 
     def set_no_frame(self):
         style_ = f"""
