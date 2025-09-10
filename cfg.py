@@ -19,7 +19,7 @@ class ThumbData:
     # растояние между изображением и текстом для grid.py > Thumb
     SPACING = 2
     # дополнительное пространство вокруг изображения для grid.py > Thumb
-    OFFSET = 15
+    MARGIN = 15
 
 class Static:
     APP_VER = 3.50

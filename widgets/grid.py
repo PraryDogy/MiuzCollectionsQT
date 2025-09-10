@@ -170,7 +170,7 @@ class Thumbnail(QFrame):
     def calculate_size(cls):
         ind = Dynamic.thumb_size_index
         cls.pixmap_size = ThumbData.PIXMAP_SIZE[ind]
-        cls.img_frame_size = Thumbnail.pixmap_size + ThumbData.OFFSET
+        cls.img_frame_size = ThumbData.PIXMAP_SIZE[ind] + ThumbData.MARGIN
         cls.thumb_w = ThumbData.THUMB_W[ind]
         cls.thumb_h = ThumbData.THUMB_H[ind]
         cls.corner = ThumbData.CORNER[ind]
@@ -178,20 +178,19 @@ class Thumbnail(QFrame):
     def setup(self):
         # инициация текста
         self.text_wid.set_text()
-
-        self.setFixedSize(Thumbnail.thumb_w, Thumbnail.thumb_h)
+        self.setFixedSize(self.thumb_w, self.thumb_h)
 
         # рамка вокруг pixmap при выделении Thumb
-        size_ = Thumbnail.pixmap_size + ThumbData.OFFSET
+        size_ = self.pixmap_size + ThumbData.MARGIN
         self.img_wid.setFixedSize(size_, size_)
         self.img_wid.setPixmap(PixmapUtils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
         style_ = f"""
-            border-radius: {Thumbnail.corner}px;
+            border-radius: {self.corner}px;
             color: rgb(255, 255, 255);
             background: {Static.rgba_gray};
-            border: {Static.border_transparent};
+            border: 2px solid transparent;
             padding-left: 2px;
             padding-right: 2px;
         """
@@ -200,9 +199,17 @@ class Thumbnail(QFrame):
         self.text_wid.setStyleSheet(text_style)
 
     def set_no_frame(self):
-        self.img_wid.setStyleSheet(Static.border_transparent_style)
-        text_style = Static.border_transparent_style + "font-size: 11px;"
-        self.text_wid.setStyleSheet(text_style)
+        style_ = f"""
+            border: 2px solid transparent;
+            padding-left: 2px;
+            padding-right: 2px;
+        """
+        self.img_wid.setStyleSheet(style_)
+        style_ = """
+            border: 2px solid transparent;
+            font-size: 11px;
+        """
+        self.text_wid.setStyleSheet(style_)
 
     def set_fav(self, value: int):
         if value == 0:
