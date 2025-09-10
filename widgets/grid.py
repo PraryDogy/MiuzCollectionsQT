@@ -773,7 +773,7 @@ class Grid(VScrollArea):
             rem.triggered.connect(lambda: self.remove_files.emit(rel_img_path_list))
             self.menu_.addAction(rem)
 
-        self.menu_.show_()
+        self.menu_.show_umenu()
 
     def checkScrollValue(self, value):
         if value > 0:            

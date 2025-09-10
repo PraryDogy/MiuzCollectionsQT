@@ -321,7 +321,7 @@ class SelectableLabel(QLabel):
         select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
-        context_menu.show_()
+        context_menu.show_umenu()
         return super().contextMenuEvent(ev)
 
     def copy_text_md(self):

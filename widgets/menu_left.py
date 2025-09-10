@@ -126,7 +126,7 @@ class TreeWid(QTreeWidget):
                 )
             menu.addAction(reveal)
 
-            menu.show_()
+            menu.show_umenu()
         return super().contextMenuEvent(a0)
 
 
@@ -183,7 +183,7 @@ class MainFolderList(VListWidget):
         setup = QAction(Lng.setup[Cfg.lng], menu)
         setup.triggered.connect(lambda: self.setup_main_folder.emit(item.main_folder))
         menu.addAction(setup)
-        menu.show_()
+        menu.show_umenu()
 
 
 class MenuLeft(QTabWidget):

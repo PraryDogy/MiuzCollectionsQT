@@ -439,7 +439,7 @@ class WinImageView(WinChild):
         save = Save(self.menu_, self, [self.rel_img_path], False)
         self.menu_.addAction(save)
 
-        self.menu_.show_()
+        self.menu_.show_umenu()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2

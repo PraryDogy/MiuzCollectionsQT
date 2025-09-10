@@ -1,3 +1,5 @@
+import re
+
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
@@ -9,7 +11,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsDropShadowEffect,
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.utils import MainUtils
-import re
+
 
 class UHBoxLayout(QHBoxLayout):
     def __init__(self, *args, **kwargs):
@@ -27,19 +29,21 @@ class UVBoxLayout(QVBoxLayout):
 
 class UMenu(QMenu):
     def __init__(self, event: QContextMenuEvent):
-        self.ev = event
         super().__init__()
+        self.ev = event
 
+        # --- палитра ---
         palette = QApplication.palette()
         text_color = palette.color(QPalette.WindowText).name().lower()
 
+        # --- соответствие цвета текста и разделителя ---
         color_data = {
             "#000000": "#8a8a8a",
-            "#ffffff": "#5A5A5A",
+            "#ffffff": "#5a5a5a",
         }
+        sep_color = color_data.get(text_color, "#8a8a8a")  # дефолт
 
-        sep_color = color_data.get(text_color)  # дефолт если нет ключа
-
+        # --- стили ---
         self.setStyleSheet(f"""
             QMenu::separator {{
                 height: 1px;
@@ -48,7 +52,8 @@ class UMenu(QMenu):
             }}
         """)
 
-    def show_(self):
+
+    def show_umenu(self):
         self.exec_(self.ev.globalPos())
 
     def mouseReleaseEvent(self, a0):
@@ -108,7 +113,7 @@ class ULineEdit(QLineEdit):
         sel_all.triggered.connect(self.paste_text)
         self.menu_.addAction(sel_all)
 
-        self.menu_.show_()
+        self.menu_.show_umenu()
 
 
 class SvgBtn(QWidget):
@@ -189,7 +194,7 @@ class UTextEdit(QTextEdit):
         sel_all.triggered.connect(self.paste_text)
         menu_.addAction(sel_all)
 
-        menu_.show_()
+        menu_.show_umenu()
 
 
 class Manager:
