@@ -746,23 +746,26 @@ class WinSettings(SingleActionWindow):
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([self.left_side_width, 600])
 
+        mapping = {
+            settings_item.general: 0,
+            settings_item.filters: 1,
+            settings_item.new_folder: 2,
+        }
 
-        if settings_item.general in settings_item.data:
-            self.left_menu.setCurrentRow(0)
-            self.init_right_side(0)
-        elif settings_item.filters in settings_item.data:
-            self.left_menu.setCurrentRow(1)
-            self.init_right_side(1)
-        elif settings_item.new_folder in settings_item.data:
-            self.left_menu.setCurrentRow(2)
-            self.init_right_side(2)
-        elif settings_item.edit_folder in settings_item.data:
-            for i in self.main_folder_items:
-                if i.main_folder == settings_item.data.get(settings_item.edit_folder):
-                    index = self.left_menu.row(i)
-                    self.left_menu.setCurrentRow(index)
-                    self.init_right_side(index)
-                    break
+        for key, idx in mapping.items():
+            if key in settings_item.data:
+                self.left_menu.setCurrentRow(idx)
+                self.init_right_side(idx)
+                break
+        else:
+            if settings_item.edit_folder in settings_item.data:
+                target_folder = settings_item.data[settings_item.edit_folder]
+                for i in self.main_folder_items:
+                    if i.main_folder == target_folder:
+                        index = self.left_menu.row(i)
+                        self.left_menu.setCurrentRow(index)
+                        self.init_right_side(index)
+                        break
 
     def init_right_side(self, index: int):
         if index == 0:
