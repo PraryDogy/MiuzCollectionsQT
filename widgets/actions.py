@@ -1,36 +1,7 @@
-import os
+from PyQt5.QtWidgets import QAction, QMenu
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
-
-from cfg import Cfg, Dynamic, Static
+from cfg import Cfg
 from system.lang import Lng
-from system.main_folder import MainFolder
-from system.tasks import FavTask
-from system.utils import MainUtils, UThreadPool
-
-from .win_warn import WinSmb
-
-
-class SmbWin:
-    """
-    Класс-обёртка для отображения окна WinSmb как модального дочернего окна.
-    
-    Методы:
-        show(parent_: QMainWindow): Создаёт экземпляр WinSmb, центрирует относительно родителя и отображает.
-    """
-
-    @classmethod
-    def show(cls, parent_: QMainWindow):
-        # --- Создаём окно ---
-        cls.win_warn = WinSmb()
-        cls.win_warn.adjustSize()
-
-        # --- Центрируем относительно родителя ---
-        cls.win_warn.center_to_parent(parent_)
-
-        # --- Отображаем окно ---
-        cls.win_warn.show()
 
 
 class OpenInView(QAction):
