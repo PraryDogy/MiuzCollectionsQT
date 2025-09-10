@@ -12,47 +12,80 @@ from .wid_search import WidSearch
 
 
 class BarTopBtn(QFrame):
-    clicked = pyqtSignal()
+    """
+    QFrame с иконкой SVG и подписью, который изменяет стиль при наведении
+    и испускает сигнал при клике.
+
+    Сигналы:
+        clicked_ (pyqtSignal): испускается при клике мышью на виджет.
+
+    Атрибуты:
+        object_name (str): имя объекта для CSS.
+        ww, hh (int): размеры виджета.
+        svg_ww, svg_hh (int): размеры SVG-иконки.
+        font_size (int): размер шрифта подписи.
+        gray_bg_style (str): CSS стиль с серым фоном.
+        border_transparent_style (str): CSS стиль с прозрачным бордером.
+    """
+
+    clicked_ = pyqtSignal()
     object_name = "_frame_"
-    ww_ = 65
-    hh_ = 45
+    ww, hh = 65, 45
+    svg_ww, svg_hh = 20, 20
+    font_size = 10
+
+    # --- Стили ---
+    gray_bg_style = f"""
+        border-radius: 7px;
+        color: rgb(255, 255, 255);
+        background: rgba(130, 130, 130, 0.5);
+        border: 1px solid transparent;
+        padding-left: 2px;
+        padding-right: 2px;
+    """
+    border_transparent_style = f"""
+        border: 1px solid transparent;
+        padding-left: 2px;
+        padding-right: 2px;
+    """
 
     def __init__(self):
-        """
-        QFrame с изменением стиля при наведении курсора и svg иконкой.
-        """
         super().__init__()
         self.setObjectName(self.object_name)
-        self.setFixedSize(self.ww_, self.hh_)
+        self.setFixedSize(self.ww, self.hh)
 
+        # --- Компоновка ---
         self.v_lay = UVBoxLayout()
         self.setLayout(self.v_lay)
 
+        # --- SVG-иконка ---
         self.svg_btn = QSvgWidget()
-        self.svg_btn.setFixedSize(20, 20)
+        self.svg_btn.setFixedSize(self.svg_ww, self.svg_hh)
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        # --- Подпись ---
         self.lbl = QLabel()
-        self.lbl.setStyleSheet("font-size: 10px;")
+        self.lbl.setStyleSheet(f"font-size: {self.font_size}px;")
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        # --- Стиль по умолчанию ---
         self.set_normal_style()
 
     def set_solid_style(self):
-        self.setStyleSheet(f"#{self.object_name} {{ {Static.gray_bg_style} }}")
+        """Применяет сплошной серый фон."""
+        self.setStyleSheet(f"#{self.object_name} {{ {self.gray_bg_style} }}")
 
     def set_normal_style(self):
-        self.setStyleSheet(f"#{self.object_name} {{ {Static.border_transparent_style} }}")
+        """Применяет прозрачный бордер."""
+        self.setStyleSheet(f"#{self.object_name} {{ {self.border_transparent_style} }}")
 
     def mouseReleaseEvent(self, a0):
+        """Испускает сигнал при клике левой кнопкой мыши."""
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit()
-        super().mouseReleaseEvent(a0)  # Можно оставить, если родительский класс этого требует
+            self.clicked_.emit()
 
 
 class DatesBtn(BarTopBtn):
-    clicked_ = pyqtSignal()
-
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.dates[Cfg.lng])
@@ -65,8 +98,6 @@ class DatesBtn(BarTopBtn):
 
 
 class FiltersBtn(BarTopBtn):
-    clicked_ = pyqtSignal()
-
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.filters[Cfg.lng])
@@ -108,8 +139,6 @@ class FiltersBtn(BarTopBtn):
 
 
 class SortBtn(BarTopBtn):
-    clicked_ = pyqtSignal()
-
     def __init__(self):
         super().__init__()
         self.svg_btn.load("./images/sort.svg")
@@ -151,16 +180,10 @@ class SortBtn(BarTopBtn):
 
 
 class SettingsBtn(BarTopBtn):
-    clicked_ = pyqtSignal()
-
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.settings[Cfg.lng])
         self.svg_btn.load("./images/settings.svg")
-
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
 
 
 class BarTop(QWidget):
