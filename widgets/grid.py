@@ -674,27 +674,19 @@ class Grid(VScrollArea):
 
         super().keyPressEvent(event)
 
-
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() != Qt.MouseButton.LeftButton:
             return
 
-        if self.rubberBand.isVisible():
-            rect = QRect(self.origin_pos, a0.pos()).normalized()
-            self.rubberBand.hide()
+        def handle_rubber_band_selection(rect: QRect):
             ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
 
             for wid in self.cell_to_wid.values():
-                
                 widgets = wid.findChildren((FilenameWid, ImgWid))
-
-                intersects = False
-                for child in widgets:
-                    top_left = child.mapTo(self, QPoint(0, 0))
-                    child_rect = QRect(top_left, child.size())
-                    if rect.intersects(child_rect):
-                        intersects = True
-                        break
+                intersects = any(
+                    rect.intersects(QRect(child.mapTo(self, QPoint(0, 0)), child.size()))
+                    for child in widgets
+                )
 
                 if intersects:
                     if ctrl:
@@ -712,59 +704,51 @@ class Grid(VScrollArea):
                     if not ctrl and wid in self.selected_widgets:
                         wid.set_no_frame()
                         self.selected_widgets.remove(wid)
+
+        def handle_shift_click():
+            coords = list(self.cell_to_wid)
+            start_pos = (self.selected_widgets[-1].row, self.selected_widgets[-1].col)
+            target_pos = (self.wid_under_mouse.row, self.wid_under_mouse.col)
+
+            if coords.index(target_pos) > coords.index(start_pos):
+                start = coords.index(start_pos)
+                end = coords.index(target_pos)
+                slice_coords = coords[start : end + 1]
+            else:
+                start = coords.index(target_pos)
+                end = coords.index(start_pos)
+                slice_coords = coords[start : end + 1]
+
+            for c in slice_coords:
+                wid = self.cell_to_wid.get(c)
+                if wid not in self.selected_widgets:
+                    self.wid_to_selected_widgets(wid)
+
+        def handle_control_click():
+            if self.wid_under_mouse in self.selected_widgets:
+                self.selected_widgets.remove(self.wid_under_mouse)
+                self.wid_under_mouse.set_no_frame()
+            else:
+                self.wid_to_selected_widgets(self.wid_under_mouse)
+
+        # --- Основная логика ---
+        if self.rubberBand.isVisible():
+            rect = QRect(self.origin_pos, a0.pos()).normalized()
+            self.rubberBand.hide()
+            handle_rubber_band_selection(rect)
             return
 
         self.wid_under_mouse = self.get_clicked_widget(a0)
 
-        # клик по сетке
         if not self.wid_under_mouse:
             self.clear_selected_widgets()
             return
 
-        if a0.modifiers() == Qt.KeyboardModifier.ShiftModifier:
-
-            # шифт клик: если не было выделенных виджетов
-            if not self.selected_widgets:
-
-                self.wid_to_selected_widgets(self.wid_under_mouse)
-
-            # шифт клик: если уже был выделен один / несколько виджетов
-            else:
-
-                coords = list(self.cell_to_wid)
-                start_pos = (self.selected_widgets[-1].row, self.selected_widgets[-1].col)
-
-                # шифт клик: слева направо (по возрастанию)
-                if coords.index((self.wid_under_mouse.row, self.wid_under_mouse.col)) > coords.index(start_pos):
-                    start = coords.index(start_pos)
-                    end = coords.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
-                    coords = coords[start : end + 1]
-
-                # шифт клик: справа налево (по убыванию)
-                else:
-                    start = coords.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
-                    end = coords.index(start_pos)
-                    coords = coords[start : end]
-
-                # выделяем виджеты по срезу координат coords
-                for i in coords:
-
-                    wid_ = self.cell_to_wid.get(i)
-
-                    if wid_ not in self.selected_widgets:
-                        self.wid_to_selected_widgets(wid=wid_)
-
-        elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-
-            # комманд клик: был выделен виджет, снять выделение
-            if self.wid_under_mouse in self.selected_widgets:
-                self.selected_widgets.remove(self.wid_under_mouse)
-                self.wid_under_mouse.set_no_frame()
-
-            # комманд клик: виджет не был виделен, выделить
-            else:
-                self.wid_to_selected_widgets(self.wid_under_mouse)
-
+        modifiers = a0.modifiers()
+        if modifiers == Qt.KeyboardModifier.ShiftModifier and self.selected_widgets:
+            handle_shift_click()
+        elif modifiers == Qt.KeyboardModifier.ControlModifier:
+            handle_control_click()
         else:
             self.clear_selected_widgets()
             self.wid_to_selected_widgets(self.wid_under_mouse)
