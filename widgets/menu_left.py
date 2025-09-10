@@ -200,10 +200,11 @@ class MainFolderList(VListWidget):
 class MenuLeft(QTabWidget):
     clicked_ = pyqtSignal()
     no_connection = pyqtSignal()
-    setup_main_folder = pyqtSignal(MainFolder)
+    setup_main_folder = pyqtSignal(object)
     
     def __init__(self):
         super().__init__()
+        self.setAcceptDrops(True)
         self.init_ui()
 
     def main_folder_clicked(self, main_folder: MainFolder):
@@ -245,3 +246,12 @@ class MenuLeft(QTabWidget):
             self.setCurrentIndex(1)
             # без таймера не срабатывает
             QTimer.singleShot(0, lambda: self.tree_clicked(main_folder_path))
+            
+    def dragEnterEvent(self, a0):
+        a0.accept()
+    
+    def dropEvent(self, a0):
+        if a0.mimeData().hasUrls():
+            url = a0.mimeData().urls()[0].toLocalFile()
+            if os.path.isdir(url):
+                self.setup_main_folder.emit(url)

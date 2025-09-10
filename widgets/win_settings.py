@@ -672,7 +672,7 @@ class FiltersWid(QWidget):
 class SettingsItem(UListWidgetItem):
     def __init__(self, parent, height = 30, text = None):
         super().__init__(parent, height, text)
-        self.main_folder_name: str = ""
+        self.main_folder: MainFolder = None
 
 
 class WinSettings(SingleActionWindow):
@@ -680,13 +680,14 @@ class WinSettings(SingleActionWindow):
     closed = pyqtSignal()
     reset_data = pyqtSignal(MainFolder)
 
-    def __init__(self, main_folder: MainFolder = None):
+    def __init__(self, data: MainFolder | str):
         super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng])
         self.main_folder_list = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
         self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = False
+        self.main_folder_items: list[SettingsItem] = []
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -713,13 +714,9 @@ class WinSettings(SingleActionWindow):
         for i in MainFolder.list_:
             text = f"{os.path.basename(i.paths[0])} ({i.name})"
             item = SettingsItem(self.left_menu, text=text)
-            item.main_folder_name = i.name
+            item.main_folder = i
             self.left_menu.addItem(item)
-            if main_folder and i.name == main_folder.name:
-                self.left_menu.setCurrentRow(self.left_menu.row(item))
-
-        if main_folder is None:
-            self.left_menu.setCurrentRow(0)
+            self.main_folder_items.append(item)
 
         self.right_wid = QWidget()
         self.right_wid.setFixedWidth(450)
@@ -749,46 +746,48 @@ class WinSettings(SingleActionWindow):
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([self.left_side_width, 600])
 
-        self.init_right_side()
+        if isinstance(data, str):
+            self.left_menu.setCurrentRow(2)
+            self.init_right_side(2)
+        elif data is None:
+            self.left_menu.setCurrentRow(0)
+            self.init_right_side(0)
+        elif isinstance(data, MainFolder):
+            for i in self.main_folder_items:
+                if i.main_folder == data:
+                    index = self.left_menu.row(i)
+                    self.left_menu.setCurrentRow(index)
+                    self.init_right_side(index)
+                    break
 
-    def init_right_side(self, *args):
-        ind = self.left_menu.currentRow()
-
-        if ind == 0:
+    def init_right_side(self, index: int):
+        if index == 0:
             self.gen_settings = GeneralSettings(self.json_data_copy)
             self.gen_settings.reset.connect(lambda: setattr(self, "need_reset", True))
             self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             self.right_lay.insertWidget(0, self.gen_settings)
-        elif ind == 1:
+        elif index == 1:
             self.filters_wid = FiltersWid(self.filters_copy)
             self.right_lay.insertWidget(0, self.filters_wid)
-        elif ind == 2:
+        elif index == 2:
             self.new_folder = NewFolder(self.main_folder_list)
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
         else:
-            current_item: SettingsItem = self.left_menu.currentItem()
-            main_folder = [
-                x for x in self.main_folder_list
-                if x.name == current_item.main_folder_name
-            ]
-            
-            if len(main_folder) == 1:
-                item = self.left_menu.currentItem()
-                main_folder_sett = MainFolderSettings(main_folder[0])
-                main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
-                main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder[0], item))
-                main_folder_sett.reset_data.connect(self.reset_data.emit)
-                self.right_lay.insertWidget(0, main_folder_sett)
-            else:
-                self.left_menu.setCurrentRow(0)
-                self.init_right_side()
+            item: SettingsItem = self.left_menu.item(index)
+            main_folder = item.main_folder
+            main_folder_sett = MainFolderSettings(main_folder)
+            main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
+            main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder, item))
+            main_folder_sett.reset_data.connect(self.reset_data.emit)
+            self.right_lay.insertWidget(0, main_folder_sett)
+
 
     def add_main_folder(self, main_folder: MainFolder):
         self.main_folder_list.append(main_folder)
         text = f"{os.path.basename(main_folder.paths[0])} ({main_folder.name})"
         item = SettingsItem(self.left_menu, text=text)
-        item.main_folder_name = main_folder.name
+        item.main_folder.name = main_folder.name
         self.left_menu.addItem(item)
         self.left_menu.setCurrentItem(item)
         self.clear_right_side()
@@ -833,7 +832,8 @@ class WinSettings(SingleActionWindow):
 
     def left_menu_click(self, *args):
         self.clear_right_side()
-        self.init_right_side()
+        index = self.left_menu.currentRow()
+        self.init_right_side(index)
 
     def ok_cmd(self):
         if self.need_reset:
