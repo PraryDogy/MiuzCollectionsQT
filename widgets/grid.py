@@ -190,7 +190,7 @@ class Thumbnail(QFrame):
         style_ = f"""
             border-radius: {Thumbnail.corner}px;
             color: rgb(255, 255, 255);
-            background: {Static.gray_color};
+            background: {Static.rgba_gray};
             border: {Static.border_transparent};
             padding-left: 2px;
             padding-right: 2px;
@@ -229,7 +229,7 @@ class UpBtn(QFrame):
         super().__init__(parent)
         self.setFixedSize(self.icon_size, self.icon_size)
         style_ = f"""
-            background: {Static.gray_color};
+            background: {Static.rgba_gray};
             border-radius: 22px;
         """
         self.setStyleSheet(style_)

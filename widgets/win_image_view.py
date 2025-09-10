@@ -143,7 +143,7 @@ class ZoomBtns(QFrame):
 
 
 class SwitchImageBtn(QFrame):
-    style_ = """
+    style_ = f"""
         background-color: rgba(128, 128, 128, 0.40);
         border-radius: 27px;
     """

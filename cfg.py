@@ -116,10 +116,10 @@ class Static:
         *ext_tiff
     )
 
-    blue_color = "rgb(46, 89, 203)"
-    gray_color = "rgba(125, 125, 125, 0.5)"
+    rgba_blue = "rgba(46, 89, 203, 1.0)"
+    rgba_gray = "rgba(125, 125, 125, 0.5)"
     border_transparent = "2px solid transparent"
-    border_blue = f"2px solid {blue_color}"
+    border_blue = f"2px solid {rgba_blue}"
 
     border_transparent_style = f"""
         border: {border_transparent};
@@ -130,7 +130,7 @@ class Static:
     blue_bg_style = f"""
         border-radius: 7px;
         color: rgb(255, 255, 255);
-        background: {blue_color};
+        background: {rgba_blue};
         border: {border_transparent};
         padding-left: 2px;
         padding-right: 2px;
@@ -139,7 +139,7 @@ class Static:
     gray_bg_style = f"""
         border-radius: 7px;
         color: rgb(255, 255, 255);
-        background: {gray_color};
+        background: {rgba_gray};
         border: {border_transparent};
         padding-left: 2px;
         padding-right: 2px;

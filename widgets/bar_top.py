@@ -38,7 +38,7 @@ class BarTopBtn(QFrame):
     gray_bg_style = f"""
         border-radius: 7px;
         color: rgb(255, 255, 255);
-        background: rgba(130, 130, 130, 0.5);
+        background: {Static.rgba_gray};
         border: 1px solid transparent;
         padding-left: 2px;
         padding-right: 2px;
