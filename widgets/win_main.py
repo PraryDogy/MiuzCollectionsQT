@@ -26,7 +26,7 @@ from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
 from .win_upload import WinUpload
-from .win_warn import WinQuestion, WinSmb, WinWarn
+from .win_warn import WinQuestion, WinWarn
 
 
 class TestWid(QFrame):
@@ -233,7 +233,10 @@ class WinMain(UMainWindow):
             self.open_win_smb()
 
     def open_win_smb(self):
-        self.win_smb = WinSmb()
+        self.win_smb = WinWarn(
+            Lng.no_connection[Cfg.lng],
+            Lng.no_connection_descr[Cfg.lng]
+        )
         self.win_smb.center_to_parent(self.window())
         self.win_smb.show()
 

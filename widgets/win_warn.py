@@ -89,11 +89,3 @@ class WinQuestion(BaseWinWarn):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Escape, ):
             self.deleteLater()
-            
-
-class WinSmb(WinWarn):
-    def __init__(self):
-        super().__init__(
-            Lng.no_connection[Cfg.lng],
-            Lng.no_connection_descr[Cfg.lng]
-        )
