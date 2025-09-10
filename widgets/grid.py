@@ -342,6 +342,7 @@ class Grid(VScrollArea):
     copy_name = pyqtSignal(list)
     reveal_in_finder = pyqtSignal(list)
     set_fav = pyqtSignal(tuple)
+    open_in_app = pyqtSignal(tuple)
 
     def __init__(self):
         super().__init__()
@@ -468,7 +469,7 @@ class Grid(VScrollArea):
         if path in self.path_to_wid:
             wid = self.path_to_wid.get(path)
             self.clear_selected_widgets()
-            self.add_and_select_widget(wid)
+            self.wid_to_selected_widgets(wid)
     
     def reset_grid_properties(self):
         self.max_col = self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_index])
@@ -531,7 +532,7 @@ class Grid(VScrollArea):
         if self.glob_col != 0:
             _next_row()
 
-    def get_wid_under_mouse(self, a0: QMouseEvent) -> None | Thumbnail:
+    def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumbnail:
         wid = QApplication.widgetAt(a0.globalPos())
         if isinstance(wid, (ImgWid, FilenameWid)):
             return wid.parent()
@@ -547,7 +548,7 @@ class Grid(VScrollArea):
             i.set_no_frame()
         self.selected_widgets.clear()
 
-    def add_and_select_widget(self, wid: Thumbnail):
+    def wid_to_selected_widgets(self, wid: Thumbnail):
         """
         - Добавляет переданный виджет в selected widgets
         - Задает стиль переданному виджету
@@ -555,25 +556,6 @@ class Grid(VScrollArea):
         if isinstance(wid, Thumbnail):
             self.selected_widgets.append(wid)
             wid.set_frame()
-
-    def open_info_win_delayed(self):
-        self.open_info_win.adjustSize()
-        self.open_info_win.center_to_parent(self.window())
-        self.open_info_win.show()
-
-    def open_default_cmd(self, rel_img_path_list: list[str]):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            for i in rel_img_path_list:
-                abs_path = MainUtils.get_abs_path(main_folder_path, i)
-                MainUtils.open_in_app(abs_path)
-
-    def open_in_app_cmd(self, rel_img_path_list: list[str], app_path: str):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            for i in rel_img_path_list:
-                abs_path = MainUtils.get_abs_path(main_folder_path, i)
-                MainUtils.open_in_app(abs_path, app_path)
                 
     def set_thumb_fav(self, rel_img_path: str, value: int):
         if rel_img_path in self.path_to_wid:
@@ -644,7 +626,7 @@ class Grid(VScrollArea):
 
             if next_wid:
                 self.clear_selected_widgets()
-                self.add_and_select_widget(next_wid)
+                self.wid_to_selected_widgets(next_wid)
                 self.ensureWidgetVisible(next_wid)
                 self.wid_under_mouse = next_wid
 
@@ -689,7 +671,7 @@ class Grid(VScrollArea):
                         self.selected_widgets.remove(wid)
             return
 
-        self.wid_under_mouse = self.get_wid_under_mouse(a0)
+        self.wid_under_mouse = self.get_clicked_widget(a0)
 
         # клик по сетке
         if not self.wid_under_mouse:
@@ -701,7 +683,7 @@ class Grid(VScrollArea):
             # шифт клик: если не было выделенных виджетов
             if not self.selected_widgets:
 
-                self.add_and_select_widget(self.wid_under_mouse)
+                self.wid_to_selected_widgets(self.wid_under_mouse)
 
             # шифт клик: если уже был выделен один / несколько виджетов
             else:
@@ -727,7 +709,7 @@ class Grid(VScrollArea):
                     wid_ = self.cell_to_wid.get(i)
 
                     if wid_ not in self.selected_widgets:
-                        self.add_and_select_widget(wid=wid_)
+                        self.wid_to_selected_widgets(wid=wid_)
 
         elif a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
 
@@ -738,11 +720,11 @@ class Grid(VScrollArea):
 
             # комманд клик: виджет не был виделен, выделить
             else:
-                self.add_and_select_widget(self.wid_under_mouse)
+                self.wid_to_selected_widgets(self.wid_under_mouse)
 
         else:
             self.clear_selected_widgets()
-            self.add_and_select_widget(self.wid_under_mouse)
+            self.wid_to_selected_widgets(self.wid_under_mouse)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.resize_timer.stop()
@@ -774,7 +756,7 @@ class Grid(VScrollArea):
                 self.no_connection.emit()
 
         self.menu_ = UMenu(event=a0)
-        clicked_wid = self.get_wid_under_mouse(a0=a0)
+        clicked_wid = self.get_clicked_widget(a0=a0)
 
         # клик по пустому пространству
         if not clicked_wid:
@@ -793,13 +775,13 @@ class Grid(VScrollArea):
             # если не было выделено ни одного виджет ранее
             # то выделяем кликнутый
             if not self.selected_widgets:
-                self.add_and_select_widget(wid=clicked_wid)
+                self.wid_to_selected_widgets(wid=clicked_wid)
 
             # если есть выделенные виджеты, но кликнутый виджет не выделены
             # то снимаем выделение с других и выделяем кликнутый
             elif clicked_wid not in self.selected_widgets:
                 self.clear_selected_widgets()
-                self.add_and_select_widget(wid=clicked_wid)
+                self.wid_to_selected_widgets(wid=clicked_wid)
 
             rel_img_path_list = [
                 i.rel_img_path
@@ -815,23 +797,18 @@ class Grid(VScrollArea):
             open_menu.setTitle(f"{Lng.open_in[Cfg.lng]} ({len(rel_img_path_list)})")
             self.menu_.addMenu(open_menu)
 
-            def open_def_cmd():
-                main_folder_path = MainFolder.current.get_curr_path()
-                if not main_folder_path:
-                    return
-                rel_path = self.selected_widgets[-1].rel_img_path
-                path = MainUtils.get_abs_path(main_folder_path, rel_path)
-                subprocess.Popen(["open", path])
-
             open_def = QAction(parent=open_menu, text=Lng.open_default[Cfg.lng])
-            open_def.triggered.connect(open_def_cmd)
+            open_def.triggered.connect(
+                lambda: self.open_in_app.emit((rel_img_path_list, None))
+            )
             open_menu.addAction(open_def)
             open_menu.addSeparator()
 
             for app_path, basename in self.image_apps.items():
                 act = QAction(parent=open_menu, text=basename)
-                cmd = lambda e, app_path=app_path: self.open_in_app_cmd(rel_img_path_list, app_path)
-                act.triggered.connect(cmd)
+                act.triggered.connect(
+                    lambda e, app_path=app_path: self.open_in_app.emit((rel_img_path_list, app_path))
+                )
                 open_menu.addAction(act)
 
             if len(rel_img_path_list) == 1:
@@ -946,12 +923,12 @@ class Grid(VScrollArea):
     def mouseDoubleClickEvent(self, a0):
         if self.wid_under_mouse:
             self.clear_selected_widgets()
-            self.add_and_select_widget(self.wid_under_mouse)
+            self.wid_to_selected_widgets(self.wid_under_mouse)
             self.img_view.emit()
 
     def mousePressEvent(self, a0):
         self.origin_pos = a0.pos()
-        self.wid_under_mouse = self.get_wid_under_mouse(a0)
+        self.wid_under_mouse = self.get_clicked_widget(a0)
         return super().mousePressEvent(a0)
     
     def mouseMoveEvent(self, a0):
@@ -977,7 +954,7 @@ class Grid(VScrollArea):
 
         if self.wid_under_mouse and self.wid_under_mouse not in self.selected_widgets:
             self.clear_selected_widgets()
-            self.add_and_select_widget(self.wid_under_mouse)
+            self.wid_to_selected_widgets(self.wid_under_mouse)
             QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
         main_folder_path = MainFolder.current.get_curr_path()

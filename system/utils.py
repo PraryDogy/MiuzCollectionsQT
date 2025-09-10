@@ -346,13 +346,6 @@ class MainUtils:
         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @classmethod
-    def open_in_app(cls, abs_path: str, app_path: str = None):
-        if app_path:
-            subprocess.Popen(["open", "-a", app_path, abs_path])
-        else:
-            subprocess.Popen(["open", abs_path])
-
-    @classmethod
     def get_f_size(cls, bytes_size: int) -> str:
         if bytes_size < 1024:
             return f"{bytes_size} байт"

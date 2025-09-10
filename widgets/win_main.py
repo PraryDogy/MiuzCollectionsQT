@@ -1,10 +1,11 @@
 import gc
 import os
+import subprocess
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
-from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
-                             QVBoxLayout, QWidget, QFileDialog)
+from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QPushButton,
+                             QSplitter, QVBoxLayout, QWidget)
 
 from cfg import Cfg, Dynamic, Static, ThumbData
 from system.filters import Filters
@@ -118,6 +119,7 @@ class WinMain(UMainWindow):
         self.grid.copy_name.connect(self.copy_name)
         self.grid.reveal_in_finder.connect(self.reveal_in_finder)
         self.grid.set_fav.connect(self.set_fav)
+        self.grid.open_in_app.connect(self.open_in_app)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -381,6 +383,19 @@ class WinMain(UMainWindow):
             lambda: finished(rel_img_path, value)
         )
         UThreadPool.start(self.task)
+
+    def open_in_app(self, data: tuple[list[str], str | None]):
+        rel_img_path_list, app_path = data
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            for i in rel_img_path_list:
+                abs_path = MainUtils.get_abs_path(main_folder_path, i)
+                if app_path:
+                    subprocess.Popen(["open", "-a", app_path, abs_path])
+                else:
+                    subprocess.Popen(["open", abs_path])
+        else:
+            self.open_win_smb()
 
     def reveal_in_finder(self, rel_img_path_list: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()
