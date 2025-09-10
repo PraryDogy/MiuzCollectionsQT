@@ -17,7 +17,7 @@ from system.tasks import LoadDbImagesItem, LoadDbImagesTask
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
-from .actions import (CopyName, CopyPath, FavActionDb, MoveFiles,
+from .actions import (CopyName, CopyPath, SetFav, MoveFiles,
                       OpenDefault, OpenInView, RemoveFiles, Save,
                       ScanerRestart, RevealInFinder, WinInfoAction)
 
@@ -184,7 +184,7 @@ class Thumbnail(QFrame):
         text_style = Static.border_transparent_style + "font-size: 11px;"
         self.text_wid.setStyleSheet(text_style)
 
-    def change_fav(self, value: int):
+    def set_fav(self, value: int):
         if value == 0:
             self.fav_value = value
             self.name = os.path.basename(self.rel_img_path)
@@ -250,6 +250,7 @@ class Grid(VScrollArea):
     copy_path = pyqtSignal(list)
     copy_name = pyqtSignal(list)
     reveal_in_finder = pyqtSignal(list)
+    set_fav = pyqtSignal(tuple)
 
     def __init__(self):
         super().__init__()
@@ -478,6 +479,11 @@ class Grid(VScrollArea):
             for i in rel_img_path_list:
                 abs_path = MainUtils.get_abs_path(main_folder_path, i)
                 MainUtils.open_in_app(abs_path, app_path)
+                
+    def set_thumb_fav(self, rel_img_path: str, value: int):
+        if rel_img_path in self.path_to_wid:
+            wid = self.path_to_wid.get(rel_img_path)
+            wid.set_fav(value)
             
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 
@@ -733,9 +739,14 @@ class Grid(VScrollArea):
                 act.triggered.connect(cmd)
                 open_menu.addAction(act)
 
-            self.fav_action = FavActionDb(self.menu_, clicked_wid.rel_img_path, clicked_wid.fav_value)
-            self.fav_action.finished_.connect(clicked_wid.change_fav)
-            self.menu_.addAction(self.fav_action)
+            if len(rel_img_path_list) == 1:
+                self.fav_action = SetFav(self.menu_, clicked_wid.fav_value)
+                self.fav_action.triggered.connect(
+                    lambda: self.set_fav.emit(
+                        (clicked_wid.rel_img_path, not clicked_wid.fav_value)
+                        )
+                )
+                self.menu_.addAction(self.fav_action)
 
             info = WinInfoAction(self.menu_)
             info.triggered.connect(

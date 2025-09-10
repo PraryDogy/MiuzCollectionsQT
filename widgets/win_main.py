@@ -10,8 +10,8 @@ from cfg import Cfg, Dynamic, Static, ThumbData
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import (CopyFilesTask, MainUtils, RmFilesTask,
-                          ScanSingleDirTask, ResetDataTask)
+from system.tasks import (CopyFilesTask, FavTask, MainUtils, ResetDataTask,
+                          RmFilesTask, ScanSingleDirTask)
 from system.utils import UThreadPool
 
 from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
@@ -23,10 +23,11 @@ from .menu_left import MenuLeft
 from .progressbar_win import ProgressbarWin
 from .win_dates import WinDates
 from .win_image_view import WinImageView
+from .win_info import WinInfo
 from .win_settings import WinSettings
 from .win_upload import WinUpload
 from .win_warn import WinQuestion, WinSmb, WinWarn
-from .win_info import WinInfo
+
 
 class TestWid(QFrame):
     def __init__(self, parent=None):
@@ -66,6 +67,8 @@ class WinMain(UMainWindow):
 
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
+        
+        self.win_image_view: WinImageView = None
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -115,6 +118,7 @@ class WinMain(UMainWindow):
         self.grid.copy_path.connect(self.copy_path)
         self.grid.copy_name.connect(self.copy_name)
         self.grid.reveal_in_finder.connect(self.reveal_in_finder)
+        self.grid.set_fav.connect(self.set_fav)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -237,6 +241,7 @@ class WinMain(UMainWindow):
         self.win_image_view.copy_path.connect(self.copy_path)
         self.win_image_view.copy_name.connect(self.copy_name)
         self.win_image_view.reveal_in_finder.connect(self.reveal_in_finder)
+        self.win_image_view.set_fav.connect(self.set_fav)
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
@@ -349,6 +354,20 @@ class WinMain(UMainWindow):
         Filters.write_file()
         MainFolder.write_json_data()
         os._exit(0)
+
+    def set_fav(self, data: tuple[str, int]):
+
+        def finished(rel_img_path: str, value: int):
+            self.grid.set_thumb_fav(rel_img_path, value)
+            if self.win_image_view:
+                self.win_image_view.set_title()
+
+        rel_img_path, value = data
+        self.task = FavTask(rel_img_path, value)
+        self.task.sigs.finished_.connect(
+            lambda: finished(rel_img_path, value)
+        )
+        UThreadPool.start(self.task)
 
     def reveal_in_finder(self, rel_img_path_list: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()

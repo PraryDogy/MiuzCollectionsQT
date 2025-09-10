@@ -66,27 +66,13 @@ class RevealInFinder(QAction):
         super().__init__(parent=parent, text=text)
 
 
-class FavActionDb(QAction):
-    finished_ = pyqtSignal(int)
-
-    def __init__(self, parent: QMenu, rel_img_path: str, fav_value:  int):
-
-        if fav_value == 0 or fav_value is None:
+class SetFav(QAction):
+    def __init__(self, parent: QMenu, fav_value: int):
+        if not fav_value:
             t = Lng.add_to_favorites[Cfg.lng]
-            self.value = 1
-
-        elif fav_value == 1:
+        else:
             t = Lng.remove_from_favorites[Cfg.lng]
-            self.value = 0
-
         super().__init__(parent=parent, text=t)
-        self.triggered.connect(self.cmd_)
-        self.rel_img_path = rel_img_path
-
-    def cmd_(self):
-        self.task = FavTask(self.rel_img_path, self.value)
-        self.task.sigs.finished_.connect(self.finished_.emit)
-        UThreadPool.start(self.task)
 
 
 class Save(QAction):

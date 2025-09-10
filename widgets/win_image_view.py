@@ -16,7 +16,7 @@ from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
                             AppModalWindow)
-from .actions import (CopyName, CopyPath, FavActionDb, Save, RevealInFinder,
+from .actions import (CopyName, CopyPath, SetFav, Save, RevealInFinder,
                       WinInfoAction)
 from .grid import Thumbnail
 
@@ -183,6 +183,7 @@ class WinImageView(AppModalWindow):
     copy_path = pyqtSignal(list)
     copy_name = pyqtSignal(list)
     reveal_in_finder = pyqtSignal(list)
+    set_fav = pyqtSignal(tuple)
     
     task_count_limit = 10
     ww, hh = 700, 500
@@ -241,7 +242,7 @@ class WinImageView(AppModalWindow):
         self.load_thumb()
 
     def load_thumb(self):
-        self.img_viewer_title()
+        self.set_title()
         self.image_label.clear()
         try:
             pixmap = self.wid.img_wid.pixmap()
@@ -357,7 +358,7 @@ class WinImageView(AppModalWindow):
         if not self.is_selection:
             self.switch_image_sig.emit(self.rel_img_path)
 
-    def img_viewer_title(self):
+    def set_title(self):
         self.setWindowTitle(f"{self.wid.collection}: {self.wid.name}")
 
     def button_switch_cmd(self, flag: Literal["+", "-"]) -> None:
@@ -368,8 +369,8 @@ class WinImageView(AppModalWindow):
         self.image_label.setCursor(Qt.CursorShape.ArrowCursor)
 
     def change_fav(self, value: int):
-        self.wid.change_fav(value)
-        self.img_viewer_title()
+        self.wid.set_fav(value)
+        self.set_title()
 
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
@@ -413,8 +414,12 @@ class WinImageView(AppModalWindow):
         )
         self.menu_.addAction(info)
 
-        self.fav_action = FavActionDb(self.menu_, self.rel_img_path, self.wid.fav_value)
-        self.fav_action.finished_.connect(self.change_fav)
+        self.fav_action = SetFav(self.menu_, self.wid.fav_value)
+        self.fav_action.triggered.connect(
+            lambda: self.set_fav.emit(
+                (self.wid.rel_img_path, not self.wid.fav_value)
+            )
+        )
         self.menu_.addAction(self.fav_action)
 
         self.menu_.addSeparator()
