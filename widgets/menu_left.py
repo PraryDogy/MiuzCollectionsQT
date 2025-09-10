@@ -41,13 +41,14 @@ class TreeWid(QTreeWidget):
     def __init__(self) -> None:
         super().__init__()
         self.root_dir: str = None
-        self.last_item: QTreeWidgetItem = None
+        self.last_dir: str = None
         self.setHeaderHidden(True)
         self.itemClicked.connect(self.on_item_click)
 
     def init_ui(self, root_dir: str):
         self.clear()
         self.root_dir = root_dir
+        self.last_dir = root_dir
 
         custom_item = FavItem()
         custom_item.setSizeHint(0, QSize(0, self.hh))
@@ -65,25 +66,22 @@ class TreeWid(QTreeWidget):
         worker.sigs.finished_.connect(
             lambda data, item=root_item: self.add_children(item, data)
         )
-        # worker.sigs.finished_.connect(
-        #     lambda: self.clicked_.emit(self.root_dir)
-        # )
         UThreadPool.start(worker)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
+        clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
         if isinstance(item, TreeSep):
             return
-        elif item == self.last_item:
+        elif clicked_dir == self.last_dir:
             return
         elif isinstance(item, FavItem):
-            self.last_item = item
+            self.last_dir = clicked_dir
             self.clicked_.emit(Static.NAME_FAVS)
         else:
-            self.last_item = item
-            path: str = item.data(0, Qt.ItemDataRole.UserRole)
-            self.clicked_.emit(path)
+            self.last_dir = clicked_dir
+            self.clicked_.emit(clicked_dir)
             if item.childCount() == 0:
-                worker: LoadSortedDirsTask = LoadSortedDirsTask(path)
+                worker: LoadSortedDirsTask = LoadSortedDirsTask(clicked_dir)
                 worker.sigs.finished_.connect(
                     lambda data, item=item: self.add_children(item, data)
                 )
