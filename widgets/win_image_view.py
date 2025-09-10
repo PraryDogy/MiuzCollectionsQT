@@ -296,7 +296,7 @@ class WinImageView(AppModalWindow):
         self.next_image_btn.hide()
 
     def switch_image(self, offset):
-        if self.task_count == WinImageView.task_count_limit:
+        if self.task_count == self.task_count_limit:
             return
 
         # мы формируем актуальный список src из актуальной сетки изображений
@@ -471,8 +471,8 @@ class WinImageView(AppModalWindow):
         bottom_window_side = a0.size().height() - self.zoom_btns.height()
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
 
-        WinImageView.ww = a0.size().width()
-        WinImageView.hh = a0.size().height()
+        self.ww = a0.size().width()
+        self.hh = a0.size().height()
 
         return super().resizeEvent(a0)
 
