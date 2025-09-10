@@ -113,6 +113,7 @@ class WinMain(UMainWindow):
         self.grid.save_files.connect(self.save_files)
         self.grid.open_info_win.connect(self.open_win_info)
         self.grid.copy_path.connect(self.copy_path)
+        self.grid.copy_name.connect(self.copy_name)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -233,6 +234,7 @@ class WinMain(UMainWindow):
         self.win_image_view.closed_.connect(self.closed_img_view)
         self.win_image_view.open_win_info.connect(self.open_win_info)
         self.win_image_view.copy_path.connect(self.copy_path)
+        self.win_image_view.copy_name.connect(self.copy_name)
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
@@ -349,12 +351,10 @@ class WinMain(UMainWindow):
     def copy_name(self, rel_img_path_list: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            names: list[str] = []
-            for i in rel_img_path_list:
-                i = os.path.basename(i)
-                i, _ = os.path.splitext(i)
-                names.append(i)
-            names = "\n".join(names)
+            names = [
+                os.path.splitext(os.path.basename(i))[0]
+                for i in rel_img_path_list
+            ]
             MainUtils.copy_text("\n".join(names))
         else:
             self.open_win_smb()
