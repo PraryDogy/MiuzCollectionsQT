@@ -501,7 +501,7 @@ class MainFolderSettings(QWidget):
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_lay.setSpacing(5)
         first_row.setLayout(first_lay)
-        name_descr = QLabel(Lng.folder_name[Cfg.lng] + ":")
+        name_descr = QLabel(Lng.alias[Cfg.lng] + ":")
         first_lay.addWidget(name_descr)
         name_label = QLabel(main_folder.name)
         first_lay.addWidget(name_label)
@@ -557,7 +557,7 @@ class NewFolder(QWidget):
         first_lay.setSpacing(5)
         first_row.setLayout(first_lay)
         self.name_label = ULineEdit()
-        self.name_label.setPlaceholderText(Lng.folder_name_immutable[Cfg.lng])
+        self.name_label.setPlaceholderText(Lng.alias_immutable[Cfg.lng])
         self.name_label.textChanged.connect(self.name_cmd)
         first_lay.addWidget(self.name_label)
 
@@ -590,19 +590,14 @@ class NewFolder(QWidget):
         if not self.main_folder.name:
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
-                Lng.enter_folder_name[Cfg.lng]
+                Lng.enter_alias_warning[Cfg.lng]
                 )
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         elif any(i.name == self.main_folder.name for i in self.main_folder_list):
-            t = (
-                f"{Lng.folder_name_error[Cfg.lng]}.",
-                f"{Lng.name[Cfg.lng]} \"{self.main_folder.name}\" {Lng.name_taken[Cfg.lng].lower()}."
-                )
-            t = "\n".join(t)
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
-                t
+                f"{Lng.alias[Cfg.lng]} \"{self.main_folder.name}\" {Lng.already_taken[Cfg.lng].lower()}."
                 )
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()

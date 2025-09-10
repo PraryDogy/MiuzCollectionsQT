@@ -129,7 +129,7 @@ class Lng:
     thumb_path = ("Данные", "Data")
     calculating = ("Вычисляю", "Calculating")
     delete = ("Удалить", "Remove")
-    copy_name = ("Скопировать имя", "Copy filename")
+    copy_name = ("Скопировать имя файла", "Copy filename")
     attention = ("Внимание!", "Warning!")
     delete_forever = ("Удалить безвозвратно файлы", "Delete forever files")
     theme_auto = ("Авто", "Auto")
@@ -147,9 +147,9 @@ class Lng:
     folder = ("Папка", "Folder")
     open_default = ("Открыть по умолчанию", "Open by default")
     open_in = ("Открыть в приложении", "Open in application")
-    folder_name_immutable = (
-        "Имя папки (нельзя изменить после сохранения)",
-        "Folder name (cannot be changed after saving)"
+    alias_immutable = (
+        "Псевдоним (нельзя изменить после сохранения)",
+        "Alias (cannot be changed after saving)"
     )
     save = ("Сохранить", "Save")
     save_filters = (
@@ -157,7 +157,10 @@ class Lng:
         "Save and press \"OK\" to apply filters."
     )
     new_folder = ("Новая папка", "New folder")
-    enter_folder_name = ("Укажите имя папки с изображениями", "Enter images folder name")
+    enter_alias_warning = (
+        "Поле «Псевдоним» обязательно для заполнения",
+        "Alias field is required"
+    )
     select_folder_path = ("Укажите путь к папке с изображениями", "Select path to the images folder")
     folder_path = ("Путь к папке с изображениями", "Images folder path")
     general = ("Основные", "General")
@@ -184,7 +187,7 @@ class Lng:
         \nin the settings."
     )
     ok = ("Ок", "Ok")
-    folder_name = ("Имя папки", "Folder name")
+    alias = ("Псевдоним", "Alias")
     images_folder_path = (
         "Путь к папке с изображениями: перетащите сюда папку или укажите путь с новой строки.",
         "Path to the images folder: drag a folder here or enter a path on a new line."
@@ -221,9 +224,8 @@ class Lng:
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
     show_about = ("Об авторе", "About")
-    folder_name_error = ("Имя папки должно быть уникальным", "Folder name must be unique")
-    name_taken = ("Уже занято", "Already taken")
-    name = ("Имя", "Name")
+    alias_error = ("Псевдоним должен быть уникальным", "Alias must be unique")
+    already_taken = ("Уже используется", "Is already taken")
     image = ("Изображение", "Image")
     other_folders = ("Прочие папки", "Other folders")
     sort_by_mod = ("По дате изменения", "Date modification")
