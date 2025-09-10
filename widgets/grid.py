@@ -373,6 +373,7 @@ class Grid(VScrollArea):
     
     resize_ms = 10
     date_wid_ms = 3000
+    png_copy_files = "./images/copy_files.png"
 
     def __init__(self):
         super().__init__()
@@ -893,56 +894,60 @@ class Grid(VScrollArea):
     def mouseMoveEvent(self, a0):
         try:
             distance = (a0.pos() - self.origin_pos).manhattanLength()
-        except AttributeError as e:
+        except AttributeError:
             MainUtils.print_error()
             return
 
         if distance < QApplication.startDragDistance():
             return
 
-        if self.wid_under_mouse is None and not self.rubberBand.isVisible():
+        def start_rubber_band():
             self.rubberBand.setGeometry(QRect(self.origin_pos, QSize()))
             self.rubberBand.show()
 
-        if self.rubberBand.isVisible():
-            origin = self.origin_pos
-            current = a0.pos()
-            rect = QRect(origin, current).normalized()
+        def update_rubber_band():
+            rect = QRect(self.origin_pos, a0.pos()).normalized()
             self.rubberBand.setGeometry(rect)
-            return
 
-        if self.wid_under_mouse and self.wid_under_mouse not in self.selected_widgets:
-            self.clear_selected_widgets()
-            self.wid_to_selected_widgets(self.wid_under_mouse)
-            QTimer.singleShot(100, self.wid_under_mouse.set_frame)
+        def start_drag():
+            # если виджет под курсором не выделен — выделяем его
+            if self.wid_under_mouse and self.wid_under_mouse not in self.selected_widgets:
+                self.clear_selected_widgets()
+                self.wid_to_selected_widgets(self.wid_under_mouse)
+                QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            img_path_list = [
-                MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
-                for i in self.selected_widgets
-            ]
-        else:
+            # собираем пути выбранных изображений
+            main_folder_path = MainFolder.current.get_curr_path()
             img_path_list = []
+            if main_folder_path:
+                img_path_list = [
+                    MainUtils.get_abs_path(main_folder_path, wid.rel_img_path)
+                    for wid in self.selected_widgets
+                ]
 
-        self.drag = QDrag(self)
-        self.mime_data = QMimeData()
-        img = "./images/copy_files.png"
-        img = QPixmap(img)
-        self.drag.setPixmap(img)
-        
-        img_path_list = [
-            QUrl.fromLocalFile(i)
-            for i in img_path_list
-            ]
+            if not img_path_list:
+                return self.no_connection.emit()
 
-        if img_path_list:
-            self.mime_data.setUrls(img_path_list)
+            # создаём объект перетаскивания
+            drag = QDrag(self)
+            mime_data = QMimeData()
+            drag.setMimeData(mime_data)
 
-        self.drag.setMimeData(self.mime_data)
-        self.drag.exec_(Qt.DropAction.CopyAction)
+            # иконка для drag
+            drag_icon = QPixmap(self.png_copy_files)
+            drag.setPixmap(drag_icon)
 
-        if not MainFolder.current.get_curr_path():
-            self.no_connection.emit()
+            # назначаем urls
+            mime_data.setUrls([QUrl.fromLocalFile(p) for p in img_path_list])
+            drag.exec_(Qt.DropAction.CopyAction)
+
+        # --- Основная логика ---
+        if self.wid_under_mouse is None and not self.rubberBand.isVisible():
+            start_rubber_band()
+        elif self.rubberBand.isVisible():
+            update_rubber_band()
+        else:
+            start_drag()
 
         return super().mouseMoveEvent(a0)
+
