@@ -26,7 +26,7 @@ from .win_image_view import WinImageView
 from .win_settings import WinSettings
 from .win_upload import WinUpload
 from .win_warn import WinQuestion, WinSmb, WinWarn
-
+from .win_info import WinInfo
 
 class TestWid(QFrame):
     def __init__(self, parent=None):
@@ -111,6 +111,7 @@ class WinMain(UMainWindow):
         self.grid.no_connection.connect(self.open_win_smb)
         self.grid.img_view.connect(lambda: self.open_img_view())
         self.grid.save_files.connect(self.save_files)
+        self.grid.open_info_win.connect(self.open_win_info)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -195,6 +196,25 @@ class WinMain(UMainWindow):
         else:
             self.open_win_smb()
 
+    def open_win_info(self, rel_img_path_list: list[str]):
+        
+        def open_delayed():
+            """Отображает окно WinInfo после его инициализации."""
+            self.win_info.adjustSize()
+            self.win_info.center_to_parent(self)
+            self.win_info.show()
+        
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            abs_paths = [
+                MainUtils.get_abs_path(main_folder_path, i)
+                for i in rel_img_path_list
+            ]
+            self.win_info = WinInfo(abs_paths)
+            self.win_info.finished_.connect(open_delayed)
+        else:
+            self.open_win_smb()
+
     def open_win_smb(self):
         self.win_smb = WinSmb()
         self.win_smb.center_to_parent(self.window())
@@ -209,7 +229,8 @@ class WinMain(UMainWindow):
             is_selection = True
         wid = self.grid.selected_widgets[-1]
         self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
-        self.win_image_view.closed_.connect(lambda: self.closed_img_view())
+        self.win_image_view.closed_.connect(self.closed_img_view)
+        self.win_image_view.open_win_info.connect(self.open_win_info)
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )

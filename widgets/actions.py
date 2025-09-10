@@ -45,54 +45,8 @@ class ScanerRestart(QAction):
 
 
 class WinInfoAction(QAction):
-    """
-    QAction для отображения информационного окна с изображениями.
-
-    Аргументы:
-        parent (QMenu): родительское меню.
-        win (QMainWindow): главное окно, относительно которого показывается информация.
-        rel_img_path_list (list[str]): список относительных путей к изображениям.
-    """
-
-    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
+    def __init__(self, parent: QMenu):
         super().__init__(text=Lng.info[Cfg.lng], parent=parent)
-
-        self.parent_ = parent
-        self.win_ = win
-        self.rel_img_path_list = rel_img_path_list
-
-        # --- Подключаем слот для выполнения действия ---
-        self.triggered.connect(self.cmd)
-
-    def cmd(self, *args):
-        """
-        Выполняет действие при активации QAction:
-        - Если существует текущий MainFolder, открывает окно WinInfo с изображениями.
-        - Если текущей папки нет, показывает окно SmbWin.
-        """
-
-        def open_delayed():
-            """Отображает окно WinInfo после его инициализации."""
-            self.win_info.adjustSize()
-            self.win_info.center_to_parent(self.win_)
-            self.win_info.show()
-
-        # Получаем путь к текущей папке
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            # Формируем абсолютные пути к изображениям
-            abs_path_list = [
-                MainUtils.get_abs_path(main_folder_path, i)
-                for i in self.rel_img_path_list
-            ]
-            self.win_info = WinInfo(abs_path_list)
-            # Подключаем задержку показа до завершения инициализации
-            self.win_info.finished_.connect(open_delayed)
-        else:
-            # Если папка недоступна, показываем окно SmbWin
-            SmbWin.show(self.win_)
-
-
 
 
 class CopyPath(QAction):

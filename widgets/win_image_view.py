@@ -19,7 +19,6 @@ from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
 from .actions import (CopyName, CopyPath, FavActionDb, Save, ShowInFinder,
                       WinInfoAction)
 from .grid import Thumbnail
-from .win_info import WinInfo
 
 
 class ImageWidget(QLabel):
@@ -181,6 +180,7 @@ class WinImageView(AppModalWindow):
     switch_image_sig = pyqtSignal(str)
     no_connection = pyqtSignal()
     closed_ = pyqtSignal()
+    open_win_info = pyqtSignal(list)
     ww, hh = 700, 500
     min_w, min_h = 500, 400
     window_style = """background: black;"""
@@ -367,11 +367,6 @@ class WinImageView(AppModalWindow):
         self.wid.change_fav(value)
         self.img_viewer_title()
 
-    def open_info_win_delayed(self):
-        self.win_info.adjustSize()
-        self.win_info.center_to_parent(self)
-        self.win_info.show()
-
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
@@ -399,14 +394,7 @@ class WinImageView(AppModalWindow):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            main_folder_path = MainFolder.current.get_curr_path()
-            if main_folder_path:
-                img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
-                img_path_list = [img_path]
-                self.win_info = WinInfo(img_path_list)
-                self.win_info.finished_.connect(self.open_info_win_delayed)
-            else:
-                self.no_connection.emit()
+            self.open_win_info.emit([self.rel_img_path])
 
         return super().keyPressEvent(ev)
 
@@ -415,7 +403,10 @@ class WinImageView(AppModalWindow):
         self.menu_ = UMenu(event=ev)
         rel_img_path_list = [self.rel_img_path]
 
-        info = WinInfoAction(self.menu_, self, rel_img_path_list)
+        info = WinInfoAction(self.menu_)
+        info.triggered.connect(
+            lambda: self.open_win_info.emit(rel_img_path_list)
+        )
         self.menu_.addAction(info)
 
         self.fav_action = FavActionDb(self.menu_, self.rel_img_path, self.wid.fav_value)

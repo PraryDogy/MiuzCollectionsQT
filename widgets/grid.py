@@ -247,6 +247,7 @@ class Grid(VScrollArea):
     update_bottom_bar = pyqtSignal()
     img_view = pyqtSignal()
     no_connection = pyqtSignal()
+    open_info_win = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -458,9 +459,9 @@ class Grid(VScrollArea):
             wid.set_frame()
 
     def open_info_win_delayed(self):
-        self.win_info.adjustSize()
-        self.win_info.center_to_parent(self.window())
-        self.win_info.show()
+        self.open_info_win.adjustSize()
+        self.open_info_win.center_to_parent(self.window())
+        self.open_info_win.show()
 
     def open_default_cmd(self, rel_img_path_list: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()
@@ -495,8 +496,8 @@ class Grid(VScrollArea):
                         MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
                         for i in self.selected_widgets
                     ]
-                    self.win_info = WinInfo(img_path_list)
-                    self.win_info.finished_.connect(self.open_info_win_delayed)
+                    self.open_info_win = WinInfo(img_path_list)
+                    self.open_info_win.finished_.connect(self.open_info_win_delayed)
                 else:
                     self.no_connection.emit()
 
@@ -741,8 +742,10 @@ class Grid(VScrollArea):
             self.fav_action.finished_.connect(clicked_wid.change_fav)
             self.menu_.addAction(self.fav_action)
 
-            info = WinInfoAction(self.menu_, self.window(), rel_img_path_list)
-            info.triggered.connect(self.open)
+            info = WinInfoAction(self.menu_)
+            info.triggered.connect(
+                lambda: self.open_info_win.emit(rel_img_path_list)
+            )
             self.menu_.addAction(info)
 
             self.menu_.addSeparator()
