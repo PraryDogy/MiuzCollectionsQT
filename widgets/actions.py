@@ -3,13 +3,12 @@ import os
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMenu
 
-from cfg import Dynamic, Cfg, Static
+from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import FavTask
 from system.utils import MainUtils, UThreadPool
 
-from .win_info import WinInfo
 from .win_warn import WinSmb
 
 

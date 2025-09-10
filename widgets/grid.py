@@ -20,7 +20,6 @@ from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
 from .actions import (CopyName, CopyPath, FavActionDb, MoveFiles,
                       OpenDefault, OpenInView, RemoveFiles, Save,
                       ScanerRestart, ShowInFinder, WinInfoAction)
-from .win_info import WinInfo
 
 
 class TextWid(QLabel):
@@ -490,16 +489,9 @@ class Grid(VScrollArea):
 
         if a0.modifiers() == command and a0.key() == Qt.Key.Key_I:
             if self.selected_widgets:
-                main_folder_path = MainFolder.current.get_curr_path()
-                if main_folder_path:
-                    img_path_list = [
-                        MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
-                        for i in self.selected_widgets
-                    ]
-                    self.open_info_win = WinInfo(img_path_list)
-                    self.open_info_win.finished_.connect(self.open_info_win_delayed)
-                else:
-                    self.no_connection.emit()
+                self.open_info_win.emit(
+                    [i.rel_img_path for i in self.selected_widgets]
+                )
 
         elif a0.modifiers() == command and a0.key() == Qt.Key.Key_A:
             for i in self.cell_to_wid.values():
