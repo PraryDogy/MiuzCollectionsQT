@@ -392,7 +392,7 @@ class Grid(VScrollArea):
 
     def load_more_thumbnails(self):
         Dynamic.thumbnails_count += Static.thumbnails_step
-        self.load_db_images_task(self.grid_more)
+        self.load_db_images_task(self.add_more_thumbnails)
 
     def load_db_images_task(self, on_finish: callable):
         self.task_ = LoadDbImagesTask()
@@ -416,8 +416,7 @@ class Grid(VScrollArea):
         def load_grid_delayed():
             self.remove_grid_container()
             self.load_grid_container()
-            self.clear_thumb_data()
-            self.clear_cell_data()
+            self.reset_grid_properties()
             self.clear_selected_widgets()
             Thumbnail.calculate_size()
             if not db_images:
@@ -460,35 +459,22 @@ class Grid(VScrollArea):
             self.add_thumb_data(thumbnail)
             self.grid_lay.addWidget(thumbnail, 0, 0)
 
-    def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
+    def add_more_thumbnails(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for _, db_images_list in db_images.items():
             self.add_thumbnails_to_grid(db_images_list)
         self.rearrange()
 
     def select_viewed_image(self, path: str):
-        wid = self.path_to_wid.get(path)
-        if wid:
+        if path in self.path_to_wid:
+            wid = self.path_to_wid.get(path)
             self.clear_selected_widgets()
             self.add_and_select_widget(wid)
     
-    def clear_thumb_data(self):
-        """
-        Очищает:
-        - cell to wid
-        - path to wid
-        """
-        for i in (self.cell_to_wid, self.path_to_wid):
-            i.clear()
-            
-    def clear_cell_data(self):
-        """
-        Сбрасывет:
-        - max col
-        - glob row
-        - glob col
-        """
+    def reset_grid_properties(self):
         self.max_col = self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_index])
         self.glob_row, self.glob_col = 0, 0
+        for i in (self.cell_to_wid, self.path_to_wid):
+            i.clear()
 
     def resize_thumbnails(self):
         """
@@ -499,6 +485,8 @@ class Grid(VScrollArea):
         Thumbnail.calculate_size()
         for cell, wid in self.cell_to_wid.items():
             wid.setup()
+            if wid in self.selected_widgets:
+                wid.set_frame()
         self.rearrange()
 
     def rearrange(self):
@@ -507,8 +495,7 @@ class Grid(VScrollArea):
         - Очищает предыдущие данные по сетке
         - Расставляет виджеты Thumbnail
         """
-        self.clear_thumb_data()
-        self.clear_cell_data()
+        self.reset_grid_properties()
         thumbnails = self.grid_wid.findChildren(Thumbnail)
         if not thumbnails:
             return
