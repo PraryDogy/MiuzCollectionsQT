@@ -135,7 +135,7 @@ class MainFolerListItem(UListWidgetItem):
     
 
 class MainFolderList(VListWidget):
-    open_main_folder = pyqtSignal(int)
+    open_main_folder = pyqtSignal(MainFolder)
     no_connection = pyqtSignal()
     setup_main_folder = pyqtSignal(MainFolder)
 
@@ -159,8 +159,7 @@ class MainFolderList(VListWidget):
             if flag == "reveal":
                 subprocess.Popen(["open", main_folder_path])
             elif flag == "view":
-                index = MainFolder.list_.index(main_folder)
-                self.open_main_folder.emit(index)
+                self.open_main_folder.emit(main_folder)
 
     def mouseReleaseEvent(self, e):
         item = self.itemAt(e.pos())
@@ -198,8 +197,8 @@ class MenuLeft(QTabWidget):
         super().__init__()
         self.init_ui()
 
-    def main_folder_clicked(self, index: int):
-        MainFolder.current = MainFolder.list_[index]
+    def main_folder_clicked(self, main_folder: MainFolder):
+        MainFolder.current = main_folder
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             Dynamic.current_dir = main_folder_path
@@ -220,7 +219,7 @@ class MenuLeft(QTabWidget):
         self.clear()
 
         main_folders = MainFolderList(self)
-        main_folders.open_main_folder.connect(lambda index: self.main_folder_clicked(index))
+        main_folders.open_main_folder.connect(self.main_folder_clicked)
         main_folders.no_connection.connect(self.no_connection.emit)
         main_folders.setup_main_folder.connect(self.setup_main_folder.emit)
         self.addTab(main_folders, Lng.folders[Cfg.lng])
