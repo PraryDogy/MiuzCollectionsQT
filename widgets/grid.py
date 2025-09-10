@@ -127,7 +127,7 @@ class BelowTextWid(QLabel):
 class Thumbnail(QFrame):
     reload_thumbnails = pyqtSignal()
     select = pyqtSignal(str)
-    sym_star = "\U00002605" + " "
+    sym_star = "\U00002605"
 
     img_frame_size = 0
     pixmap_size = 0
@@ -144,10 +144,10 @@ class Thumbnail(QFrame):
         self.fav_value = fav
         self.f_mod = f_mod
 
-        if fav == 0 or fav is None:
+        if not fav:
             self.name = os.path.basename(rel_img_path)
-        elif fav == 1:
-            self.name = self.sym_star + os.path.basename(rel_img_path)
+        else:
+            self.name = f"{self.sym_star} {os.path.basename(rel_img_path)}"
 
         self.v_layout = UVBoxLayout()
         self.v_layout.setSpacing(ThumbData.SPACING)
