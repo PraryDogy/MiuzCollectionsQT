@@ -268,7 +268,7 @@ class WinDates(SingleActionWindow):
         else:
             Dynamic.date_start, Dynamic.date_end = None, None
             Dynamic.f_date_start, Dynamic.f_date_end = None, None
-            Dynamic.loaded_count = 0
+            Dynamic.thumbnails_count = 0
             self.reload_thumbnails.emit()
             self.dates_btn_normal.emit()
 

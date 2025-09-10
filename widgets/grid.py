@@ -387,12 +387,12 @@ class Grid(VScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
     def reload_thumbnails(self):
-        Dynamic.loaded_count = 0
+        Dynamic.thumbnails_count = 0
         cmd_ = lambda db_images: self.first_grid(db_images)
         self.load_db_images_task(cmd_)
 
     def load_more_thumbnails(self):
-        Dynamic.loaded_count += Static.load_batch_size
+        Dynamic.thumbnails_count += Static.thumbnails_step
         cmd_ = lambda db_images: self.grid_more(db_images)
         self.load_db_images_task(cmd_)
 
