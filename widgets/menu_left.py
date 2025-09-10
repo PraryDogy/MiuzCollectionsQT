@@ -22,7 +22,7 @@ from ._base_widgets import (UHBoxLayout, UListSpacerItem, UListWidgetItem,
 class FavItem(QTreeWidgetItem):
     def __init__(self):
         super().__init__([Lng.favorites[Cfg.lng]])
-        self.setData(0, Qt.ItemDataRole.UserRole, "")
+        self.setData(0, Qt.ItemDataRole.UserRole, None)
 
 
 class TreeSep(QTreeWidgetItem):
@@ -30,7 +30,7 @@ class TreeSep(QTreeWidgetItem):
         super().__init__()
         self.setDisabled(True)
         self.setSizeHint(0, QSize(0, 10))
-        self.setData(0, Qt.ItemDataRole.UserRole, "")
+        self.setData(0, Qt.ItemDataRole.UserRole, None)
 
 
 class TreeWid(QTreeWidget):
