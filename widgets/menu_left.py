@@ -130,7 +130,6 @@ class TreeWid(QTreeWidget):
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
-    double_clicked = pyqtSignal()
     no_connection = pyqtSignal()
     setup_main_folder = pyqtSignal(MainFolder)
 
@@ -216,7 +215,6 @@ class MenuLeft(QTabWidget):
 
         main_folders = MainFolderList(self)
         main_folders.open_main_folder.connect(lambda index: self.main_folder_clicked(index))
-        main_folders.double_clicked.connect(lambda: self.setCurrentIndex(1))
         main_folders.no_connection.connect(self.no_connection.emit)
         main_folders.setup_main_folder.connect(self.setup_main_folder.emit)
         self.addTab(main_folders, Lng.folders[Cfg.lng])
