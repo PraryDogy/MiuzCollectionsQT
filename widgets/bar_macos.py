@@ -23,17 +23,18 @@ class SelectableLabel(QLabel):
         - Контекстное меню позволяет копировать выделенный текст или весь текст.
     """
 
+    INFO_TEXT = "\n".join([
+        f"Version {Static.APP_VER}",
+        "Developed by Evlosh",
+        "email: evlosh@gmail.com",
+        "telegram: evlosh",
+    ])
+
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
         # --- Текст информации ---
-        txt = "\n".join([
-            f"Version {Static.APP_VER}",
-            "Developed by Evlosh",
-            "email: evlosh@gmail.com",
-            "telegram: evlosh",
-        ])
-        self.setText(txt)
+        self.setText(self.INFO_TEXT)
 
         # --- Настройка взаимодействия с текстом ---
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
