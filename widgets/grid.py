@@ -100,7 +100,7 @@ class BelowTextWid(QLabel):
     """
 
     MAX_ROW = 18
-    STYLE = f"""
+    STYLE = """
         font-size: 11px;
         color: #6199E4;
     """
