@@ -137,7 +137,6 @@ class Thumbnail(QFrame):
 
     def __init__(self, pixmap: QPixmap, rel_img_path: str, coll_name: str, fav: int, f_mod: str):
         super().__init__()
-        self.setStyleSheet(Static.border_transparent_style)
 
         self.img = pixmap
         self.rel_img_path = rel_img_path
