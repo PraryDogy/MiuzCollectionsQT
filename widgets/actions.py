@@ -14,20 +14,29 @@ from .win_warn import WinSmb
 
 
 class SmbWin:
+    """
+    Класс-обёртка для отображения окна WinSmb как модального дочернего окна.
+    
+    Методы:
+        show(parent_: QMainWindow): Создаёт экземпляр WinSmb, центрирует относительно родителя и отображает.
+    """
+
     @classmethod
     def show(cls, parent_: QMainWindow):
+        # --- Создаём окно ---
         cls.win_warn = WinSmb()
         cls.win_warn.adjustSize()
+
+        # --- Центрируем относительно родителя ---
         cls.win_warn.center_to_parent(parent_)
+
+        # --- Отображаем окно ---
         cls.win_warn.show()
 
 
 class OpenInView(QAction):
-    _clicked = pyqtSignal()
-
     def __init__(self, parent_: QMenu):
         super().__init__(parent=parent_, text=Lng.open[Cfg.lng])
-        self.triggered.connect(self._clicked.emit)
 
 
 class ScanerRestart(QAction):
@@ -36,29 +45,54 @@ class ScanerRestart(QAction):
 
 
 class WinInfoAction(QAction):
+    """
+    QAction для отображения информационного окна с изображениями.
+
+    Аргументы:
+        parent (QMenu): родительское меню.
+        win (QMainWindow): главное окно, относительно которого показывается информация.
+        rel_img_path_list (list[str]): список относительных путей к изображениям.
+    """
+
     def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str]):
-        super().__init__(parent=parent, text=Lng.info[Cfg.lng])
+        super().__init__(text=Lng.info[Cfg.lng], parent=parent)
+
         self.parent_ = parent
         self.win_ = win
         self.rel_img_path_list = rel_img_path_list
+
+        # --- Подключаем слот для выполнения действия ---
         self.triggered.connect(self.cmd)
 
     def cmd(self, *args):
+        """
+        Выполняет действие при активации QAction:
+        - Если существует текущий MainFolder, открывает окно WinInfo с изображениями.
+        - Если текущей папки нет, показывает окно SmbWin.
+        """
+
+        def open_delayed():
+            """Отображает окно WinInfo после его инициализации."""
+            self.win_info.adjustSize()
+            self.win_info.center_to_parent(self.win_)
+            self.win_info.show()
+
+        # Получаем путь к текущей папке
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            self.rel_img_path_list = [
-                    MainUtils.get_abs_path(main_folder_path, i)
-                    for i in self.rel_img_path_list
+            # Формируем абсолютные пути к изображениям
+            abs_path_list = [
+                MainUtils.get_abs_path(main_folder_path, i)
+                for i in self.rel_img_path_list
             ]
-            self.win_info = WinInfo(self.rel_img_path_list)
-            self.win_info.finished_.connect(self.open_delayed)
+            self.win_info = WinInfo(abs_path_list)
+            # Подключаем задержку показа до завершения инициализации
+            self.win_info.finished_.connect(open_delayed)
         else:
+            # Если папка недоступна, показываем окно SmbWin
             SmbWin.show(self.win_)
 
-    def open_delayed(self):
-        self.win_info.adjustSize()
-        self.win_info.center_to_parent(self.win_)
-        self.win_info.show()
+
 
 
 class CopyPath(QAction):

@@ -711,7 +711,7 @@ class Grid(VScrollArea):
 
             cmd_ = lambda: self.img_view.emit()
             view = OpenInView(self.menu_)
-            view._clicked.connect(cmd_)
+            view.triggered.connect(cmd_)
             self.menu_.addAction(view)
 
             open_menu = UMenu(a0)
@@ -742,6 +742,7 @@ class Grid(VScrollArea):
             self.menu_.addAction(self.fav_action)
 
             info = WinInfoAction(self.menu_, self.window(), rel_img_path_list)
+            info.triggered.connect(self.open)
             self.menu_.addAction(info)
 
             self.menu_.addSeparator()
