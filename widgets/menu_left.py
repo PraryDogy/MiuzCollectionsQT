@@ -22,8 +22,17 @@ from ._base_widgets import (UHBoxLayout, UListSpacerItem, UListWidgetItem,
 class FavItem(QTreeWidgetItem):
     def __init__(self):
         super().__init__([Lng.favorites[Cfg.lng]])
+        self.setData(0, Qt.ItemDataRole.UserRole, "")
 
-        
+
+class TreeSep(QTreeWidgetItem):
+    def __init__(self):
+        super().__init__()
+        self.setDisabled(True)
+        self.setSizeHint(0, QSize(0, 10))
+        self.setData(0, Qt.ItemDataRole.UserRole, "")
+
+
 class MyTree(QTreeWidget):
     clicked_ = pyqtSignal(str)
     no_connection = pyqtSignal()
@@ -36,12 +45,21 @@ class MyTree(QTreeWidget):
         self.itemClicked.connect(self.on_item_click)
 
     def init_ui(self):
+        
+        def select_first_item():
+            top_item = self.topLevelItem(2)
+            if top_item:
+                self.setCurrentItem(top_item)
+                self.itemClicked.emit(top_item, 0)
+
         self.clear()
 
         custom_item = FavItem()
         custom_item.setSizeHint(0, QSize(0, self.hh))
-        custom_item.setData(0, Qt.ItemDataRole.UserRole, "")
         self.insertTopLevelItem(0, custom_item)
+
+        sep = TreeSep()
+        self.insertTopLevelItem(1, sep)
 
         root_item: QTreeWidgetItem = QTreeWidgetItem([os.path.basename(self.root_dir)])
         root_item.setSizeHint(0, QSize(0, self.hh))
@@ -52,10 +70,12 @@ class MyTree(QTreeWidget):
         worker.sigs.finished_.connect(
             lambda data, item=root_item: self.add_children(item, data)
         )
-        worker.sigs.finished_.connect(self.select_first_item)
+        worker.sigs.finished_.connect(select_first_item)
         UThreadPool.start(worker)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
+        if isinstance(item, TreeSep):
+            return
         if isinstance(item, FavItem):
             self.clicked_.emit(Static.NAME_FAVS)
         else:
@@ -86,12 +106,6 @@ class MyTree(QTreeWidget):
             subprocess.Popen(["open", path])
         else:
             self.no_connection.emit()
-
-    def select_first_item(self):
-        top_item = self.topLevelItem(1)
-        if top_item:
-            self.setCurrentItem(top_item)
-            self.itemClicked.emit(top_item, 0)
 
     def contextMenuEvent(self, a0):
         item = self.itemAt(a0.pos())
