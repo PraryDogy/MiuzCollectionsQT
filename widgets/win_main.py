@@ -404,7 +404,10 @@ class WinMain(UMainWindow):
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_path_list
             ]
-            MainUtils.reveal_files(abs_paths)
+            if os.path.isdir(abs_paths[0]):
+                subprocess.Popen(["open", abs_paths[0]])
+            else:
+                MainUtils.reveal_files(abs_paths)
         else:
             self.open_win_smb()
 
