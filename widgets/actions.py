@@ -55,26 +55,9 @@ class CopyPath(QAction):
 
 
 class CopyName(QAction):
-    def __init__(self, parent: QMenu, win: QMainWindow, img_path_list: list[str]):
-        text = f"{Lng.copy_name[Cfg.lng]} ({len(img_path_list)})"
+    def __init__(self, parent: QMenu, total: int):
+        text = f"{Lng.copy_name[Cfg.lng]} ({total})"
         super().__init__(parent=parent, text=text)
-        self.parent_ = parent
-        self.win_ = win
-        self.img_path_list = img_path_list
-        self.triggered.connect(self.cmd)
-
-    def cmd(self, *args):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            names: list[str] = []
-            for i in self.img_path_list:
-                i = os.path.basename(i)
-                i, _ = os.path.splitext(i)
-                names.append(i)
-            names = "\n".join(names)
-            MainUtils.copy_text(names)
-        else:
-            SmbWin.show(self.win_)
 
 
 class ShowInFinder(QAction):

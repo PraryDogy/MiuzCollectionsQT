@@ -248,6 +248,7 @@ class Grid(VScrollArea):
     no_connection = pyqtSignal()
     open_info_win = pyqtSignal(list)
     copy_path = pyqtSignal(list)
+    copy_name = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -752,7 +753,10 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(copy_path)
 
-            copy_name = CopyName(self.menu_, self.window(), rel_img_path_list)
+            copy_name = CopyName(self.menu_, len(rel_img_path_list))
+            copy_name.triggered.connect(
+                lambda: self.copy_name.emit(rel_img_path_list)
+            )
             self.menu_.addAction(copy_name)
 
             self.menu_.addSeparator()

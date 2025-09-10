@@ -176,12 +176,14 @@ class NextImageBtn(SwitchImageBtn):
 
 
 class WinImageView(AppModalWindow):
-    task_count_limit = 10
     switch_image_sig = pyqtSignal(str)
     no_connection = pyqtSignal()
     closed_ = pyqtSignal()
     open_win_info = pyqtSignal(list)
     copy_path = pyqtSignal(list)
+    copy_name = pyqtSignal(list)
+    
+    task_count_limit = 10
     ww, hh = 700, 500
     min_w, min_h = 500, 400
     window_style = """background: black;"""
@@ -416,22 +418,25 @@ class WinImageView(AppModalWindow):
 
         self.menu_.addSeparator()
 
-        copy_path = CopyPath(self.menu_, len([self.rel_img_path]))
+        copy_path = CopyPath(self.menu_, 1)
         copy_path.triggered.connect(
-            lambda: self.copy_path.emit([self.rel_img_path])
+            lambda: self.copy_path.emit(rel_img_path_list)
         )
         self.menu_.addAction(copy_path)
 
-        copy_name = CopyName(self.menu_, self, [self.rel_img_path])
+        copy_name = CopyName(self.menu_, 1)
+        copy_name.triggered.connect(
+            lambda: self.copy_name.emit(rel_img_path_list)
+        )
         self.menu_.addAction(copy_name)
 
-        reveal = ShowInFinder(self.menu_, self, [self.rel_img_path])
+        reveal = ShowInFinder(self.menu_, self, rel_img_path_list)
         self.menu_.addAction(reveal)
 
-        save_as = Save(self.menu_, self, [self.rel_img_path], True)
+        save_as = Save(self.menu_, self, rel_img_path_list, True)
         self.menu_.addAction(save_as)
 
-        save = Save(self.menu_, self, [self.rel_img_path], False)
+        save = Save(self.menu_, self, rel_img_path_list, False)
         self.menu_.addAction(save)
 
         self.menu_.show_umenu()

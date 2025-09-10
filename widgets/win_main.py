@@ -346,6 +346,19 @@ class WinMain(UMainWindow):
         MainFolder.write_json_data()
         os._exit(0)
 
+    def copy_name(self, rel_img_path_list: list[str]):
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            names: list[str] = []
+            for i in rel_img_path_list:
+                i = os.path.basename(i)
+                i, _ = os.path.splitext(i)
+                names.append(i)
+            names = "\n".join(names)
+            MainUtils.copy_text("\n".join(names))
+        else:
+            self.open_win_smb()
+
     def copy_path(self, rel_img_path_list: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
