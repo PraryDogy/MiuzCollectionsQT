@@ -24,7 +24,7 @@ class ThumbData:
 class Static:
     APP_VER = 3.50
     APP_NAME = "Collections"
-    GRID_LIMIT = 100
+    load_batch_size = 100
     NAME_FAVS = "___favorites___"
     NAME_RECENTS = "___recents___"
     FOLDER_HASHDIR = "hashdir"
@@ -262,7 +262,7 @@ class Dynamic:
     date_end: datetime = None
     f_date_start: str = None # 1 january 1991
     f_date_end: str = None # 31 january 1991
-    grid_buff_size: int = 0
+    loaded_count: int = 0
     search_widget_text: str = None
 
     # индекс соответствующий STATIC > IMG_LABEL_SIZE

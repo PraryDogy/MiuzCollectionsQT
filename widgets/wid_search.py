@@ -66,7 +66,7 @@ class WidSearch(ULineEdit):
     def clear_search(self):
         self.clear()
         Dynamic.search_widget_text = None
-        Dynamic.grid_buff_size = 0
+        Dynamic.loaded_count = 0
         self.reload_thumbnails.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

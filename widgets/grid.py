@@ -327,6 +327,9 @@ class DateWid(QLabel):
         
 
 class Grid(VScrollArea):
+    """Сетка миниатюр с сигналами для действий с файлами и интерфейсом."""
+
+    # --- Сигналы ---
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
     move_files = pyqtSignal(list)
@@ -342,8 +345,8 @@ class Grid(VScrollArea):
 
     def __init__(self):
         super().__init__()
-        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
+        # --- Состояние и данные ---
         self.wid_under_mouse: Thumbnail = None
         self.origin_pos = QPoint()
         self.selected_widgets: list[Thumbnail] = []
@@ -353,11 +356,9 @@ class Grid(VScrollArea):
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
 
-        self.image_apps = {
-            i: os.path.basename(i)
-            for i in MainUtils.image_apps(Cfg.apps)
-        }
+        self.image_apps = {i: os.path.basename(i) for i in MainUtils.image_apps(Cfg.apps)}
 
+        # --- Таймеры ---
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rearrange)
@@ -366,13 +367,14 @@ class Grid(VScrollArea):
         self.date_timer.setSingleShot(True)
         self.date_timer.timeout.connect(lambda: self.date_wid.hide())
 
+        # --- Вкладка прокрутки ---
         self.scroll_wid = QWidget()
         self.setWidget(self.scroll_wid)
-        
         self.scroll_layout = UVBoxLayout()
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.scroll_wid.setLayout(self.scroll_layout)
 
+        # --- Виджеты ---
         self.date_wid = DateWid(parent=self.viewport())
         self.date_wid.hide()
 
@@ -380,15 +382,17 @@ class Grid(VScrollArea):
         self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
         self.up_btn.hide()
 
+        # --- Сборка ---
         self.load_grid_wid()
+        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
     def reload_thumbnails(self):
-        Dynamic.grid_buff_size = 0
+        Dynamic.loaded_count = 0
         cmd_ = lambda db_images: self.first_grid(db_images)
         self.load_db_images_task(cmd_)
 
     def load_more_thumbnails(self):
-        Dynamic.grid_buff_size += Static.GRID_LIMIT
+        Dynamic.loaded_count += Static.load_batch_size
         cmd_ = lambda db_images: self.grid_more(db_images)
         self.load_db_images_task(cmd_)
 

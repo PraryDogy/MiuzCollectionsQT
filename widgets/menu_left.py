@@ -211,7 +211,7 @@ class MenuLeft(QTabWidget):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             Dynamic.current_dir = main_folder_path
-            Dynamic.grid_buff_size = 0
+            Dynamic.loaded_count = 0
             self.tree_clicked(main_folder_path)
             self.tree_wid.init_ui(main_folder_path)
         else:

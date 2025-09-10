@@ -498,7 +498,7 @@ class LoadDbImagesTask(URunnable):
             THUMBS.c.fav
             )
         
-        stmt = stmt.limit(Static.GRID_LIMIT).offset(Dynamic.grid_buff_size)
+        stmt = stmt.limit(Static.load_batch_size).offset(Dynamic.loaded_count)
         stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
         if Dynamic.sort_by_mod:
