@@ -76,45 +76,15 @@ class SetFav(QAction):
 
 
 class Save(QAction):
-    save_files = pyqtSignal(tuple)
-    def __init__(self, parent: QMenu, win: QMainWindow, rel_img_path_list: list[str], save_as: bool):
-        """
-        Сигналы:
-        - save_files: (папка назначения, список файлов для копирования)
-        """
-        if save_as:
-            text: str = Lng.save_as[Cfg.lng]
-        else:
-            text: str = Lng.save_to_downloads[Cfg.lng]
-        text = f"{text} ({len(rel_img_path_list)})"
-
+    def __init__(self, parent: QMenu, total: int):
+        text = f"{Lng.save_to_downloads[Cfg.lng]} ({total})"
         super().__init__(parent=parent, text=text)
-        self.triggered.connect(self.save_files_cmd)
-        self.save_as = save_as
-        self.rel_img_path_list = rel_img_path_list
-        self.parent_ = parent
-        self.win_ = win
 
-    def save_files_cmd(self):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            img_path_list = [
-                MainUtils.get_abs_path(main_folder_path, rel_img_path)
-                for rel_img_path in self.rel_img_path_list
-            ]
-            if self.save_as:
-                dialog = QFileDialog()
-                dest = dialog.getExistingDirectory()
-            else:
-                dest = os.path.join(os.path.expanduser("~"), "Downloads")
-            if dest and os.path.isdir(dest):
-                self.save_files_finalize(dest, img_path_list)
-        else:
-            SmbWin.show(self.win_)
 
-    def save_files_finalize(self, dest: str, img_path_list: list):
-        data = (dest, img_path_list)
-        self.save_files.emit(data)
+class SaveAs(QAction):
+    def __init__(self, parent: QMenu, total: int):
+        text = f"{Lng.save_as[Cfg.lng]} ({total})"
+        super().__init__(parent=parent, text=text)
 
 
 class RemoveFiles(QAction):

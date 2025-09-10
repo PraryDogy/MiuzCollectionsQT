@@ -10,16 +10,16 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsDropShadowEffect, QGridLayout, QLabel,
                              QRubberBand, QWidget)
 
-from cfg import Dynamic, Cfg, Static, ThumbData
+from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import LoadDbImagesItem, LoadDbImagesTask
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
-from .actions import (CopyName, CopyPath, SetFav, MoveFiles,
-                      OpenDefault, OpenInView, RemoveFiles, Save,
-                      ScanerRestart, RevealInFinder, WinInfoAction)
+from .actions import (CopyName, CopyPath, MoveFiles, OpenDefault, OpenInView,
+                      RemoveFiles, RevealInFinder, Save, SaveAs, ScanerRestart,
+                      SetFav, WinInfoAction)
 
 
 class TextWid(QLabel):
@@ -776,12 +776,20 @@ class Grid(VScrollArea):
 
             self.menu_.addSeparator()
 
-            save = Save(self.menu_, self.window(), rel_img_path_list, False)
-            save.save_files.connect(lambda data: self.save_files.emit(data))
+            save = Save(self.menu_, len(rel_img_path_list))
+            save.triggered.connect(
+                lambda: self.save_files.emit(
+                    (os.path.expanduser("~/Downloads"), rel_img_path_list)
+                )
+            )
             self.menu_.addAction(save)
 
-            save_as = Save(self.menu_, self.window(), rel_img_path_list, True)
-            save_as.save_files.connect(lambda data: self.save_files.emit(data))
+            save_as = SaveAs(self.menu_, len(rel_img_path_list))
+            save_as.triggered.connect(
+                lambda: self.save_files.emit(
+                    (None, rel_img_path_list)
+                )
+            )
             self.menu_.addAction(save_as)
 
             move_files = MoveFiles(self.menu_, rel_img_path_list)

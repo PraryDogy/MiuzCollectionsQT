@@ -14,9 +14,9 @@ from system.main_folder import MainFolder
 from system.tasks import LoadSingleImgTask
 from system.utils import MainUtils, UThreadPool
 
-from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
-                            AppModalWindow)
-from .actions import (CopyName, CopyPath, SetFav, Save, RevealInFinder,
+from ._base_widgets import (AppModalWindow, SvgShadowed, UHBoxLayout, UMenu,
+                            UVBoxLayout)
+from .actions import (CopyName, CopyPath, RevealInFinder, Save, SaveAs, SetFav,
                       WinInfoAction)
 from .grid import Thumbnail
 
@@ -184,6 +184,7 @@ class WinImageView(AppModalWindow):
     copy_name = pyqtSignal(list)
     reveal_in_finder = pyqtSignal(list)
     set_fav = pyqtSignal(tuple)
+    save_files = pyqtSignal(tuple)
     
     task_count_limit = 10
     ww, hh = 700, 500
@@ -442,11 +443,21 @@ class WinImageView(AppModalWindow):
         )
         self.menu_.addAction(reveal)
 
-        save_as = Save(self.menu_, self, rel_img_path_list, True)
-        self.menu_.addAction(save_as)
-
-        save = Save(self.menu_, self, rel_img_path_list, False)
+        save = Save(self.menu_, 1)
+        save.triggered.connect(
+            lambda: self.save_files.emit(
+                (os.path.expanduser("~/Downloads"), rel_img_path_list)
+            )
+        )
         self.menu_.addAction(save)
+
+        save_as = SaveAs(self.menu_, 1)
+        save_as.triggered.connect(
+            lambda: self.save_files.emit(
+                (None, rel_img_path_list)
+            )
+        )
+        self.menu_.addAction(save_as)
 
         self.menu_.show_umenu()
 

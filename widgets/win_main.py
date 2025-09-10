@@ -4,7 +4,7 @@ import os
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFrame, QPushButton, QSplitter,
-                             QVBoxLayout, QWidget)
+                             QVBoxLayout, QWidget, QFileDialog)
 
 from cfg import Cfg, Dynamic, Static, ThumbData
 from system.filters import Filters
@@ -170,13 +170,13 @@ class WinMain(UMainWindow):
                 f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
             )
 
-        def copy_files_start(dest, files):
+        def copy_files_start(dest: str, abs_files: list[str]):
             dest_name = os.path.basename(dest)
             progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
             progress_win.progressbar.setMaximum(100)
             progress_win.center_to_parent(self)
             progress_win.show()
-            task = CopyFilesTask(dest, files)
+            task = CopyFilesTask(dest, abs_files)
             progress_win.cancel.connect(
                 lambda: task.task_state.set_should_run(False)
             )
@@ -197,9 +197,19 @@ class WinMain(UMainWindow):
             )
             UThreadPool.start(task)
 
-        dest, files = data
-        if os.path.exists(dest):
-            copy_files_start(dest, files)
+        dest, rel_img_path_list = data
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            abs_files = [
+                MainUtils.get_abs_path(main_folder_path, i)
+                for i in rel_img_path_list
+            ]
+            if dest is None:
+                dest = QFileDialog.getExistingDirectory()
+                if dest:
+                    copy_files_start(dest, abs_files)
+            else:
+                copy_files_start(dest, abs_files)
         else:
             self.open_win_smb()
 
@@ -242,6 +252,7 @@ class WinMain(UMainWindow):
         self.win_image_view.copy_name.connect(self.copy_name)
         self.win_image_view.reveal_in_finder.connect(self.reveal_in_finder)
         self.win_image_view.set_fav.connect(self.set_fav)
+        self.win_image_view.save_files.connect(self.save_files)
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
