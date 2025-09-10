@@ -796,7 +796,7 @@ class WinSettings(SingleActionWindow):
             main_folder = item.main_folder
             main_folder_sett = MainFolderSettings(main_folder)
             main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
-            main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder, item))
+            main_folder_sett.remove.connect(lambda: self.remove_main_folder(item))
             main_folder_sett.reset_data.connect(self.reset_data.emit)
             self.right_lay.insertWidget(0, main_folder_sett)
 
@@ -804,22 +804,26 @@ class WinSettings(SingleActionWindow):
         self.main_folder_list.append(main_folder)
         text = f"{os.path.basename(main_folder.paths[0])} ({main_folder.name})"
         item = SettingsListItem(self.left_menu, text=text)
-        item.main_folder.name = main_folder.name
+        item.main_folder = main_folder
         self.left_menu.addItem(item)
         self.left_menu.setCurrentItem(item)
         self.clear_right_side()
-        self.init_right_side()
+        index = self.left_menu.count() - 1
+        self.init_right_side(index)
         self.ok_btn.setText(Lng.restart[Cfg.lng])
 
-    def remove_main_folder(self, main_folder: MainFolder, item: SettingsListItem):
+    def remove_main_folder(self, item: SettingsListItem):
 
         def fin():
-            self.main_folder_list.remove(main_folder)
-            self.left_menu.takeItem(self.left_menu.currentRow())
-            self.left_menu.setCurrentRow(0)
-            self.clear_right_side()
-            self.init_right_side()
-            self.ok_btn.setText(Lng.restart[Cfg.lng])
+            for i in self.main_folder_list:
+                if i.name == item.main_folder.name:
+                    self.main_folder_list.remove(i)
+                    self.left_menu.takeItem(self.left_menu.currentRow())
+                    self.left_menu.setCurrentRow(0)
+                    self.clear_right_side()
+                    self.init_right_side(0)
+                    self.ok_btn.setText(Lng.restart[Cfg.lng])
+                    break
 
         try:
             if len(self.main_folder_list) == 1:
