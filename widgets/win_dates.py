@@ -162,7 +162,6 @@ class WinDates(SingleActionWindow):
     dates_btn_solid = pyqtSignal()
     dates_btn_normal = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    scroll_to_top = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -265,14 +264,12 @@ class WinDates(SingleActionWindow):
             Dynamic.f_date_start = self.named_date(date=Dynamic.date_start)
             Dynamic.f_date_end = self.named_date(date=Dynamic.date_end)
             self.reload_thumbnails.emit()
-            self.scroll_to_top.emit()
             self.dates_btn_solid.emit()
         else:
             Dynamic.date_start, Dynamic.date_end = None, None
             Dynamic.f_date_start, Dynamic.f_date_end = None, None
             Dynamic.grid_buff_size = 0
             self.reload_thumbnails.emit()
-            self.scroll_to_top.emit()
             self.dates_btn_normal.emit()
 
         self.deleteLater()

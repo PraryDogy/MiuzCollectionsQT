@@ -289,13 +289,10 @@ class Grid(VScrollArea):
         self.date_wid.hide()
 
         self.up_btn = UpBtn(self.viewport())
-        self.up_btn.scroll_to_top.connect(lambda: self.scroll_to_top())
+        self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
         self.up_btn.hide()
 
         self.load_grid_wid()
-
-    def scroll_to_top(self):
-        self.verticalScrollBar().setValue(0)
 
     def reload_thumbnails(self):
         Dynamic.grid_buff_size = 0

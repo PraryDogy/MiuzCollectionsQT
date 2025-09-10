@@ -36,7 +36,6 @@ class ClearBtn(QSvgWidget):
 
 class WidSearch(ULineEdit):
     reload_thumbnails = pyqtSignal()
-    scroll_to_top = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -69,7 +68,6 @@ class WidSearch(ULineEdit):
         Dynamic.search_widget_text = None
         Dynamic.grid_buff_size = 0
         self.reload_thumbnails.emit()
-        self.scroll_to_top.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):

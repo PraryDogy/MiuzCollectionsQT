@@ -98,10 +98,9 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.open_dates.connect(self.open_dates_win)
+        self.bar_top.open_dates_win.connect(self.open_dates_win)
         self.bar_top.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.bar_top.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
-        self.bar_top.open_settings.connect(self.open_settings)
+        self.bar_top.open_settings_win.connect(self.open_settings)
         right_lay.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -422,7 +421,6 @@ class WinMain(UMainWindow):
         self.win_dates.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
         self.win_dates.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
         self.win_dates.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.win_dates.scroll_to_top.connect(lambda: self.grid.scroll_to_top())
         self.win_dates.show()
 
     def reset_data_cmd(self, main_folder: MainFolder):

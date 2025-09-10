@@ -86,24 +86,50 @@ class BarTopBtn(QFrame):
 
 
 class DatesBtn(BarTopBtn):
+    """
+    Кнопка для выбора даты с SVG-иконкой календаря и подписью.
+    
+    Особенности:
+        - Испускает сигнал `clicked_` при клике.
+        - Меняет стиль на сплошной при нажатии.
+        - Использует SVG-иконку календаря.
+    """
+
+    ICON_PATH = "./images/calendar.svg"
+
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.dates[Cfg.lng])
-        self.svg_btn.load("./images/calendar.svg")
+        self.svg_btn.load(self.ICON_PATH)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() == Qt.MouseButton.LeftButton:
+        """Испускает сигнал и применяет сплошной стиль при клике левой кнопкой мыши."""
+        if ev and ev.button() == Qt.MouseButton.LeftButton:
             self.clicked_.emit()
             self.set_solid_style()
 
 
 class FiltersBtn(BarTopBtn):
+    """
+    Кнопка для управления фильтрами с SVG-иконкой.
+
+    Особенности:
+        - Отображает список фильтров через выпадающее меню.
+        - Позволяет включать/выключать фильтры.
+        - Сигнал `clicked_` испускается при изменении фильтров.
+        - Имеет пункт сброса всех фильтров.
+    """
+
+    ICON_PATH = "./images/filters.svg"
+    menu_ww = 200
+
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.filters[Cfg.lng])
-        self.svg_btn.load("./images/filters.svg")
+        self.svg_btn.load(self.ICON_PATH)
 
     def _on_action(self, val: str):
+        """Добавляет или удаляет фильтр из списка включённых и испускает сигнал."""
         if val in Dynamic.enabled_filters:
             Dynamic.enabled_filters.remove(val)
         else:
@@ -111,86 +137,115 @@ class FiltersBtn(BarTopBtn):
         self.clicked_.emit()
 
     def reset(self):
+        """Сбрасывает все фильтры и испускает сигнал."""
         Dynamic.enabled_filters.clear()
         self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() == Qt.MouseButton.LeftButton:
+        """Показывает меню фильтров при клике левой кнопкой мыши."""
+        if ev and ev.button() == Qt.MouseButton.LeftButton:
             self.set_solid_style()
             menu = UMenu(self)
-            menu.setMinimumWidth(200)
+            menu.setMinimumWidth(self.menu_ww)
 
+            # --- Добавляем фильтры ---
             for f in Filters.filters:
                 act = QAction(f, self, checkable=True)
                 act.setChecked(f in Dynamic.enabled_filters)
                 act.triggered.connect(lambda _, val=f: self._on_action(val))
                 menu.addAction(act)
 
+            # --- Разделитель и пункт сброса ---
             menu.addSeparator()
-            act = QAction(Lng.reset[Cfg.lng], menu)
-            act.triggered.connect(self.reset)
-            menu.addAction(act)
+            act_reset = QAction(Lng.reset[Cfg.lng], menu)
+            act_reset.triggered.connect(self.reset)
+            menu.addAction(act_reset)
 
+            # --- Показ меню под кнопкой ---
             pos = self.mapToGlobal(self.rect().bottomLeft())
             menu.exec(pos)
 
+            # --- Если фильтры пусты, вернуть обычный стиль ---
             if not Dynamic.enabled_filters:
                 self.set_normal_style()
 
 
 class SortBtn(BarTopBtn):
+    """
+    Кнопка для выбора порядка сортировки с SVG-иконкой.
+
+    Особенности:
+        - Отображает текущий способ сортировки (по модификации или по дате).
+        - Сигнал `clicked_` испускается при изменении сортировки.
+        - Выпадающее меню позволяет выбрать способ сортировки.
+    """
+
+    ICON_PATH = "./images/sort.svg"
+
     def __init__(self):
         super().__init__()
-        self.svg_btn.load("./images/sort.svg")
+        self.svg_btn.load(self.ICON_PATH)
         self.set_text()
 
     def set_text(self):
-        if Dynamic.sort_by_mod:
-            text = Lng.sort_by_mod_short[Cfg.lng]
-        else:
-            text = Lng.sort_by_recent_short[Cfg.lng]
+        """Устанавливает текст кнопки в зависимости от текущей сортировки."""
+        text = Lng.sort_by_mod_short[Cfg.lng] if Dynamic.sort_by_mod else Lng.sort_by_recent_short[Cfg.lng]
         self.lbl.setText(text)
 
     def menu_clicked(self, value: bool):
+        """Обрабатывает выбор сортировки из меню."""
         Dynamic.sort_by_mod = value
         self.set_text()
         self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() == Qt.MouseButton.LeftButton:
+        """Показывает меню выбора сортировки при клике левой кнопкой мыши."""
+        if ev and ev.button() == Qt.MouseButton.LeftButton:
             self.set_solid_style()
             menu = UMenu(ev)
 
-            act1 = QAction(Lng.sort_by_mod[Cfg.lng], self, checkable=True)
-            act2 = QAction(Lng.sort_by_recent[Cfg.lng], self, checkable=True)
+            # --- Создаем пункты меню ---
+            act_mod = QAction(Lng.sort_by_mod[Cfg.lng], self, checkable=True)
+            act_recent = QAction(Lng.sort_by_recent[Cfg.lng], self, checkable=True)
 
-            # состояние — допустим, у тебя есть self.sort_by_mod_flag: bool
-            act1.setChecked(Dynamic.sort_by_mod)
-            act2.setChecked(not Dynamic.sort_by_mod)
+            act_mod.setChecked(Dynamic.sort_by_mod)
+            act_recent.setChecked(not Dynamic.sort_by_mod)
 
-            act1.triggered.connect(lambda: self.menu_clicked(True))
-            act2.triggered.connect(lambda: self.menu_clicked(False))
+            act_mod.triggered.connect(lambda: self.menu_clicked(True))
+            act_recent.triggered.connect(lambda: self.menu_clicked(False))
 
-            menu.addAction(act1)
-            menu.addAction(act2)
+            menu.addAction(act_mod)
+            menu.addAction(act_recent)
 
+            # --- Показ меню под кнопкой ---
             pos = self.mapToGlobal(self.rect().bottomLeft())
             menu.exec(pos)
+
+            # --- Вернуть нормальный стиль после закрытия меню ---
             self.set_normal_style()
 
 
 class SettingsBtn(BarTopBtn):
+    """
+    Кнопка для открытия окна настроек с SVG-иконкой.
+
+    Особенности:
+        - Испускает сигнал `clicked_` при клике.
+        - Отображает подпись "Настройки".
+    """
+
+    ICON_PATH = "./images/settings.svg"
+
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.settings[Cfg.lng])
-        self.svg_btn.load("./images/settings.svg")
+        self.svg_btn.load(self.ICON_PATH)
 
 
 class BarTop(QWidget):
-    open_dates = pyqtSignal()
-    open_settings = pyqtSignal()
+    open_dates_win = pyqtSignal()
+    open_settings_win = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    scroll_to_top = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -208,7 +263,6 @@ class BarTop(QWidget):
 
         self.sort_btn = SortBtn()
         self.sort_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
-        self.sort_btn.clicked_.connect(lambda: self.scroll_to_top.emit())
         self.h_layout.addWidget(
             self.sort_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
@@ -217,21 +271,20 @@ class BarTop(QWidget):
         # сортировка по слоям по джепегам: добавим их в фильтры
         self.filters_btn = FiltersBtn()
         self.filters_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
-        self.filters_btn.clicked_.connect(lambda: self.scroll_to_top.emit())
         self.h_layout.addWidget(
             self.filters_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
         )
 
         self.dates_btn = DatesBtn()
-        self.dates_btn.clicked_.connect(lambda: self.open_dates.emit())
+        self.dates_btn.clicked_.connect(lambda: self.open_dates_win.emit())
         self.h_layout.addWidget(
             self.dates_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
         )
 
         self.settings_btn = SettingsBtn()
-        self.settings_btn.clicked_.connect(lambda: self.open_settings.emit())
+        self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit())
         self.h_layout.addWidget(
             self.settings_btn,
             alignment=Qt.AlignmentFlag.AlignLeft
@@ -241,7 +294,6 @@ class BarTop(QWidget):
 
         self.search_wid = WidSearch()
         self.search_wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
-        self.search_wid.scroll_to_top.connect(lambda: self.scroll_to_top.emit())
         self.h_layout.addWidget(
             self.search_wid,
             alignment=Qt.AlignmentFlag.AlignRight
