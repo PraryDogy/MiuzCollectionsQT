@@ -65,9 +65,9 @@ class TreeWid(QTreeWidget):
         worker.sigs.finished_.connect(
             lambda data, item=root_item: self.add_children(item, data)
         )
-        worker.sigs.finished_.connect(
-            lambda: self.clicked_.emit(self.root_dir)
-        )
+        # worker.sigs.finished_.connect(
+        #     lambda: self.clicked_.emit(self.root_dir)
+        # )
         UThreadPool.start(worker)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
@@ -202,6 +202,7 @@ class MenuLeft(QTabWidget):
             Dynamic.current_dir = main_folder_path
             Dynamic.grid_buff_size = 0
             self.tree_wid.init_ui(main_folder_path)
+            QTimer.singleShot(0, lambda: self.tree_clicked(main_folder_path))
         else:
             self.no_connection.emit()
         
@@ -231,3 +232,4 @@ class MenuLeft(QTabWidget):
         if main_folder_path:
             self.tree_wid.init_ui(main_folder_path)
             self.setCurrentIndex(1)
+            QTimer.singleShot(0, lambda: self.tree_clicked(main_folder_path))
