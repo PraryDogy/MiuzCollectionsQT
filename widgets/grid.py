@@ -308,22 +308,42 @@ class DateWid(QLabel):
         SHADOW_BLUR (int): радиус размытия тени.
         SHADOW_OFFSET (tuple[int, int]): смещение тени (x, y).
         SHADOW_COLOR (QColor): цвет тени.
+        COLOR_DATA (dict): соответствие цвета текста палитры → фону.
     """
 
     SHADOW_BLUR = 20
     SHADOW_OFFSET = (0, 2)
     SHADOW_COLOR = QColor(0, 0, 0, 190)
 
+    COLOR_DATA = {
+        "#000000": "#dcdcdc",
+        "#ffffff": "#505050",
+    }
+
     def __init__(self, parent: QWidget, blue_color: bool = True):
         super().__init__(parent)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-        # Настройка тени
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(self.SHADOW_BLUR)
         shadow.setOffset(*self.SHADOW_OFFSET)
         shadow.setColor(self.SHADOW_COLOR)
         self.setGraphicsEffect(shadow)
+
+    def apply_style(self):
+        palette = QApplication.palette()
+        text_color = QPalette.windowText(palette).color().name()
+        bg_color = self.COLOR_DATA.get(text_color, "#dcdcdc")
+
+        self.setStyleSheet(f"""
+            QLabel {{
+                background: {bg_color};
+                font-weight: bold;
+                font-size: 20pt;
+                border-radius: 10px;
+                padding: 5px;
+            }}
+        """)
         
 
 class Grid(VScrollArea):
@@ -343,6 +363,9 @@ class Grid(VScrollArea):
     reveal_in_finder = pyqtSignal(list)
     set_fav = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
+    
+    resize_ms = 10
+    date_wid_ms = 3000
 
     def __init__(self):
         super().__init__()
@@ -728,7 +751,7 @@ class Grid(VScrollArea):
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.resize_timer.stop()
-        self.resize_timer.start(10)
+        self.resize_timer.start(self.resize_ms)
 
         self.up_btn.move(
             self.viewport().width() - self.up_btn.width() - 20,
@@ -817,52 +840,41 @@ class Grid(VScrollArea):
 
         self.menu_.show_umenu()
 
+    def checkScrollValue(self, value: int):
+        """Обрабатывает прокрутку: показывает кнопку вверх, дату и подгружает миниатюры."""
 
-    def checkScrollValue(self, value):
-        if value > 0:            
-            self.up_btn.show()
-            
-            point = QPoint(50, 50)
+        def thumbnail_under_point(point: QPoint) -> Thumbnail | None:
             mapped_pos = self.scroll_wid.mapFrom(self.viewport(), point)
-            wid: Thumbnail = self.scroll_wid.childAt(mapped_pos).parent()
-            if isinstance(wid, Thumbnail):
-                self.date_wid.setText(wid.f_mod)
-                self.date_wid.adjustSize()
-                
-                self.date_wid.move(
-                    (self.viewport().width() - self.date_wid.width()) // 2,
-                    5
-                )
-                if self.date_wid.isHidden():
-                    palete = QApplication.palette()
-                    text_color = QPalette.windowText(palete).color().name()
-                
-                    color_data = {
-                        "#000000": "#dcdcdc",
-                        "#ffffff": "#505050",
-                    }
+            wid = self.scroll_wid.childAt(mapped_pos)
+            if wid and isinstance(wid.parent(), Thumbnail):
+                return wid.parent()
+            return None
 
-                    self.date_wid.setStyleSheet(f"""
-                        QLabel {{
-                            background: {color_data.get(text_color)};
-                            font-weight: bold;
-                            font-size: 20pt;
-                            border-radius: 10px;
-                            padding: 5px;
-                        }}
-                    """)
+        def update_date_wid(wid: Thumbnail):
+            self.date_wid.setText(wid.f_mod)
+            self.date_wid.adjustSize()
+            self.date_wid.move((self.viewport().width() - self.date_wid.width()) // 2, 5)
 
-                    if Dynamic.sort_by_mod:
-                        self.date_wid.show()
-                        self.date_timer.stop()
-                        self.date_timer.start(3000)
-     
-        elif value == 0:
+            if self.date_wid.isHidden() and Dynamic.sort_by_mod:
+                self.date_wid.apply_style()
+                self.date_wid.show()
+                self.date_timer.start(self.date_wid_ms)
+
+        # --- кнопка вверх ---
+        self.up_btn.setVisible(value > 0)
+
+        # --- дата ---
+        if value > 0:
+            wid = thumbnail_under_point(QPoint(50, 50))
+            if wid:
+                update_date_wid(wid)
+        else:
             self.date_wid.hide()
-            self.up_btn.hide()
 
+        # --- конец списка ---
         if value == self.verticalScrollBar().maximum():
             self.load_more_thumbnails()
+
 
     def mouseDoubleClickEvent(self, a0):
         if self.wid_under_mouse:
