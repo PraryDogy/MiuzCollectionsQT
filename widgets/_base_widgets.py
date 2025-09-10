@@ -14,6 +14,8 @@ from system.utils import MainUtils
 
 
 class UHBoxLayout(QHBoxLayout):
+    """QHBoxLayout с нулевыми отступами и нулевым расстоянием между виджетами."""
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setContentsMargins(0, 0, 0, 0)
@@ -21,6 +23,8 @@ class UHBoxLayout(QHBoxLayout):
 
 
 class UVBoxLayout(QVBoxLayout):
+    """QVBoxLayout с нулевыми отступами и нулевым расстоянием между виджетами."""
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setContentsMargins(0, 0, 0, 0)
@@ -28,6 +32,13 @@ class UVBoxLayout(QVBoxLayout):
 
 
 class UMenu(QMenu):
+    """
+    QMenu с кастомной окраской разделителей, подстроенной под цвет текста приложения.
+    
+    Аргументы:
+        event (QContextMenuEvent): Событие контекстного меню.
+    """
+
     def __init__(self, event: QContextMenuEvent):
         super().__init__()
         self.ev = event
@@ -52,7 +63,6 @@ class UMenu(QMenu):
             }}
         """)
 
-
     def show_umenu(self):
         self.exec_(self.ev.globalPos())
 
@@ -64,12 +74,19 @@ class UMenu(QMenu):
 
 
 class ULineEdit(QLineEdit):
+    """
+    QLineEdit с фиксированной высотой, кастомными отступами и шириной контекстного меню.
+    
+    Атрибуты:
+        hh (int): высота виджета.
+        padding (tuple[int, int]): отступы слева и справа.
+        menu_width (int): ширина контекстного меню.
+    """
     hh = 28
     padding = (2, 28)
     menu_width = 120
 
     def __init__(self):
-        """QLineEdit с фиксированной высотой и кастомными отступами"""
         super().__init__()
 
         self.setFixedHeight(self.hh)
@@ -108,6 +125,15 @@ class ULineEdit(QLineEdit):
 
 
 class SvgBtn(QWidget):
+    """
+    Виджет кнопки с SVG-иконкой.
+
+    Аргументы:
+        icon_path (str): путь к SVG-файлу.
+        size (int): размер кнопки (ширина и высота).
+        parent (QWidget, optional): родительский виджет.
+    """
+
     def __init__(self, icon_path: str, size: int, parent: QWidget = None):
         super().__init__(parent)
 
@@ -134,6 +160,16 @@ class SvgBtn(QWidget):
 
 
 class SvgShadowed(SvgBtn):
+    """
+    Виджет кнопки с SVG-иконкой и тенью.
+
+    Аргументы:
+        icon_name (str): путь к SVG-файлу.
+        size (int): размер кнопки (ширина и высота).
+        shadow_depth (int, optional): прозрачность тени (0–255). По умолчанию 200.
+        parent (QWidget, optional): родительский виджет.
+    """
+
     def __init__(self, icon_name: str, size: int, shadow_depth: int = 200,
                  parent: QWidget = None):
         super().__init__(icon_name, size, parent)
@@ -190,6 +226,13 @@ class Manager:
 
 
 class UMainWindow(QMainWindow):
+    """
+    Базовое главное окно приложения с центральным виджетом и вертикальным layout.
+
+    Атрибуты:
+        central_layout (QVBoxLayout): вертикальный layout центрального виджета.
+    """
+
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
@@ -256,6 +299,7 @@ class AppModalWindow(UMainWindow):
         Окно с пользовательскими флагами отображения:
         - Модальность: блокирует другие окна приложения (ApplicationModal)
         """
+
         super().__init__(parent)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
@@ -277,6 +321,15 @@ class UListWidgetItem(QListWidgetItem):
 
 
 class UListSpacerItem(QListWidgetItem):
+    """
+    Пустой элемент списка QListWidget, используемый как разделитель/отступ.
+
+    Аргументы:
+        parent (QListWidget): родительский список.
+        height (int, optional): высота элемента. По умолчанию 15.
+    """
+
+
     def __init__(self, parent: QListWidget, height: int = 15):
         super().__init__()
         self.setSizeHint(QSize(parent.width(), height))
@@ -284,17 +337,30 @@ class UListSpacerItem(QListWidgetItem):
 
 
 class VScrollArea(QScrollArea):
+    """QScrollArea с вертикальной прокруткой, без горизонтальной и без границ."""
+
     def __init__(self):
         super().__init__()
+
+        # --- Настройка области прокрутки ---
         self.setWidgetResizable(True)
         self.setAcceptDrops(True)
+
+        # --- Вертикальная прокрутка только ---
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        # --- Убираем границы ---
         self.setStyleSheet("QScrollArea { border: none; }")
 
 
 class VListWidget(QListWidget):
+    """QListWidget с вертикальной прокруткой, без горизонтальной."""
+
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
+
+        # --- Отключаем горизонтальную прокрутку ---
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
