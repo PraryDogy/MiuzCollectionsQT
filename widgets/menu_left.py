@@ -148,6 +148,7 @@ class MainFolderList(VListWidget):
             item.main_folder = i
             self.addItem(item)
 
+        self._last_main_folder = MainFolder.list_[0]
         self.setCurrentRow(0)
 
     def cmd(self, flag: str, item: MainFolerListItem):
@@ -162,12 +163,20 @@ class MainFolderList(VListWidget):
                 self.open_main_folder.emit(main_folder)
 
     def mouseReleaseEvent(self, e):
-        item = self.itemAt(e.pos())
+        item: MainFolerListItem = self.itemAt(e.pos())
         if not item:
             return
+
+        # --- Игнорируем клик по уже выбранному элементу ---
+        if item.main_folder == self._last_main_folder:
+            return
+
         if e.button() == Qt.MouseButton.LeftButton:
             self.cmd("view", item)
+            self._last_main_folder = item.main_folder
+
         return super().mouseReleaseEvent(e)
+
 
     def contextMenuEvent(self, a0):
         item = self.itemAt(a0.pos())
