@@ -633,13 +633,19 @@ class Grid(VScrollArea):
 
             # обработка перехода за пределы строки
             if next_wid is None:
+                keys = list(self.cell_to_wid.keys())
+                curr_idx = keys.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
+
                 if event.key() == Qt.Key.Key_Right:
                     row += 1
                     col = 0
                 elif event.key() == Qt.Key.Key_Left:
-                    keys = list(self.cell_to_wid.keys())
-                    idx = keys.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
-                    row, col = keys[idx - 1]
+                    if curr_idx > 0:
+                        row, col = keys[curr_idx - 1]
+                    else:
+                        # достигли начала сетки, остаёмся на месте
+                        row, col = self.wid_under_mouse.row, self.wid_under_mouse.col
+
                 next_wid = self.cell_to_wid.get((row, col))
 
             if next_wid:
