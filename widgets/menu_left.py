@@ -128,6 +128,12 @@ class TreeWid(QTreeWidget):
         return super().contextMenuEvent(a0)
 
 
+class MainFolerListItem(UListWidgetItem):
+    def __init__(self, parent, height = 30, text = None):
+        super().__init__(parent, height, text)
+        self.main_folder: MainFolder = None
+    
+
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(int)
     no_connection = pyqtSignal()
@@ -138,14 +144,14 @@ class MainFolderList(VListWidget):
 
         for i in MainFolder.list_:
             text = f"{os.path.basename(i.paths[0])} ({i.name})"
-            item = UListWidgetItem(parent=self, text=text)
+            item = MainFolerListItem(parent=self, text=text)
             item.main_folder = i
             self.addItem(item)
 
         self.setCurrentRow(0)
 
-    def cmd(self, flag: str, item: UListWidgetItem):
-        main_folder: MainFolder = item.main_folder
+    def cmd(self, flag: str, item: MainFolerListItem):
+        main_folder = item.main_folder
         main_folder_path = main_folder.get_curr_path()
         if not main_folder_path:
             self.no_connection.emit()
