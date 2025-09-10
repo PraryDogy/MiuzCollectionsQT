@@ -426,7 +426,7 @@ class Grid(VScrollArea):
                 self.grid_lay.setRowStretch(0, 1)
                 self.grid_lay.setColumnStretch(0, 1)
             else:
-                for date, db_images_list in db_images.items():
+                for _, db_images_list in db_images.items():
                     self.add_thumbnails_to_grid(db_images_list)
                 self.rearrange()
                 self.grid_wid.show()
@@ -461,7 +461,7 @@ class Grid(VScrollArea):
             self.grid_lay.addWidget(thumbnail, 0, 0)
 
     def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
-        for date, db_images_list in db_images.items():
+        for _, db_images_list in db_images.items():
             self.add_thumbnails_to_grid(db_images_list)
         self.rearrange()
 
