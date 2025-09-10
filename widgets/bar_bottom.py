@@ -7,15 +7,28 @@ from cfg import Dynamic, ThumbData
 from ._base_widgets import UHBoxLayout
 
 
-class BaseSlider(QSlider):
-    _clicked = pyqtSignal()
+class CustomSlider(QSlider):
+    """
+    Кастомный горизонтальный слайдер для выбора размера миниатюр с сигналами
+    и стилизованным внешним видом.
 
-    def __init__(self, orientation: Qt.Orientation, min_: int, max_: int):
+    Атрибуты:
+        resize_thumbnails (pyqtSignal): сигнал для изменения размера миниатюр.
+    """
+
+    resize_thumbnails = pyqtSignal()
+
+    def __init__(self):
         super().__init__()
-        self.setOrientation(orientation)
-        self.setMinimum(min_)
-        self.setMaximum(max_)
 
+        # --- Настройка диапазона и ориентации ---
+        self.setOrientation(Qt.Orientation.Horizontal)
+        self.setMinimum(0)
+        self.setMaximum(len(ThumbData.PIXMAP_SIZE) - 1)
+        self.setValue(Dynamic.thumb_size_ind)
+        self.setFixedWidth(80)
+
+        # --- Стилизация слайдера ---
         style = """
             QSlider::groove:horizontal {
                 border-radius: 1px;
@@ -32,10 +45,13 @@ class BaseSlider(QSlider):
                 padding: -4px 0px;
             }
         """
-        
         self.setStyleSheet(style)
 
+        # --- Подключаем обработку изменения значения ---
+        self.valueChanged.connect(self._on_value_changed)
+
     def mousePressEvent(self, ev: QMouseEvent) -> None:
+        """Устанавливает значение слайдера при клике мышью по шкале."""
         if ev.button() != Qt.LeftButton:
             ev.ignore()
             return
@@ -47,29 +63,16 @@ class BaseSlider(QSlider):
         super().mousePressEvent(ev)
 
     def wheelEvent(self, e: QWheelEvent | None) -> None:
-        e.ignore()
+        """Отключает изменение значения колесиком мыши."""
+        if e:
+            e.ignore()
 
-
-class CustomSlider(BaseSlider):
-    resize_thumbnails = pyqtSignal()
-
-    def __init__(self):
-        super().__init__(
-            orientation=Qt.Orientation.Horizontal,
-            min_=0,
-            max_=len(ThumbData.PIXMAP_SIZE) - 1
-        )
-        self.setFixedWidth(80)
-        self.setValue(Dynamic.thumb_size_ind)
-
-        self.valueChanged.connect(self.move_)
-    
-    def move_(self, value: int):
-        # Отключаем сигнал valueChanged
+    def _on_value_changed(self, value: int):
+        """Обновляет текущий индекс миниатюр и эмитит сигнал resize_thumbnails."""
         self.blockSignals(True)
         self.setValue(value)
-        # Включаем сигнал обратно
         self.blockSignals(False)
+
         Dynamic.thumb_size_ind = value
         self.resize_thumbnails.emit()
 
