@@ -181,6 +181,7 @@ class WinImageView(AppModalWindow):
     no_connection = pyqtSignal()
     closed_ = pyqtSignal()
     open_win_info = pyqtSignal(list)
+    copy_path = pyqtSignal(list)
     ww, hh = 700, 500
     min_w, min_h = 500, 400
     window_style = """background: black;"""
@@ -415,8 +416,11 @@ class WinImageView(AppModalWindow):
 
         self.menu_.addSeparator()
 
-        copy = CopyPath(self.menu_, self, [self.rel_img_path])
-        self.menu_.addAction(copy)
+        copy_path = CopyPath(self.menu_, len([self.rel_img_path]))
+        copy_path.triggered.connect(
+            lambda: self.copy_path.emit([self.rel_img_path])
+        )
+        self.menu_.addAction(copy_path)
 
         copy_name = CopyName(self.menu_, self, [self.rel_img_path])
         self.menu_.addAction(copy_name)

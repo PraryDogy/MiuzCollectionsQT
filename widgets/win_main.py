@@ -112,6 +112,7 @@ class WinMain(UMainWindow):
         self.grid.img_view.connect(lambda: self.open_img_view())
         self.grid.save_files.connect(self.save_files)
         self.grid.open_info_win.connect(self.open_win_info)
+        self.grid.copy_path.connect(self.copy_path)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -231,6 +232,7 @@ class WinMain(UMainWindow):
         self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
         self.win_image_view.closed_.connect(self.closed_img_view)
         self.win_image_view.open_win_info.connect(self.open_win_info)
+        self.win_image_view.copy_path.connect(self.copy_path)
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
@@ -343,6 +345,17 @@ class WinMain(UMainWindow):
         Filters.write_file()
         MainFolder.write_json_data()
         os._exit(0)
+
+    def copy_path(self, rel_img_path_list: list[str]):
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            abs_paths = [
+                MainUtils.get_abs_path(main_folder_path, i)
+                for i in rel_img_path_list
+            ]
+            MainUtils.copy_text("\n".join(abs_paths))
+        else:
+            self.open_win_smb()
 
     def open_dates_win(self):
         self.win_dates = WinDates()
