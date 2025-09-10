@@ -125,37 +125,83 @@ class BelowTextWid(QLabel):
 
 
 class Thumbnail(QFrame):
+    """
+    Виджет миниатюры изображения с текстовой информацией и визуальной рамкой.
+
+    Сигналы:
+        reload_thumbnails (pyqtSignal): испускается при изменении избранного в текущей коллекции.
+        select (pyqtSignal[str]): испускается при выборе миниатюры, передает путь к файлу.
+
+    Атрибуты класса (настраиваемые):
+        sym_star (str): символ для избранного.
+        img_frame_size, pixmap_size, thumb_w, thumb_h, corner (int): размеры элементов миниатюры.
+        IMG_FRAME_STYLE, TEXT_FRAME_STYLE, IMG_NO_FRAME_STYLE, TEXT_NO_FRAME_STYLE (str): стили для рамки и текста.
+    """
+
+    # --- Сигналы ---
     reload_thumbnails = pyqtSignal()
     select = pyqtSignal(str)
+
+    # --- Константы ---
     sym_star = "\U00002605"
 
+    # --- Параметры размеров (будут изменяться при calculate_size) ---
     img_frame_size = 0
     pixmap_size = 0
     thumb_w = 0
     thumb_h = 0
     corner = 0
 
+    # --- Стили (f-строки с тройными кавычками) ---
+    # bg_color будет ссылаться на Static.rgba_gray и Static.rgba_blue
+    IMG_FRAME_STYLE = f"""
+        border-radius: {{corner}}px;
+        color: rgb(255,255,255);
+        background: {{bg_color}};
+        border: 2px solid transparent;
+        padding-left: 2px;
+        padding-right: 2px;
+    """
+    TEXT_FRAME_STYLE = f"""
+        border-radius: 7px;
+        color: rgb(255,255,255);
+        background: {{bg_color}};
+        border: 2px solid transparent;
+        padding-left: 2px;
+        padding-right: 2px;
+        font-size: 11px;
+    """
+    IMG_NO_FRAME_STYLE = """
+        border: 2px solid transparent;
+        padding-left: 2px;
+        padding-right: 2px;
+    """
+    TEXT_NO_FRAME_STYLE = """
+        border: 2px solid transparent;
+        font-size: 11px;
+    """
+
     def __init__(self, pixmap: QPixmap, rel_img_path: str, coll_name: str, fav: int, f_mod: str):
         super().__init__()
 
+        # --- Исходные данные ---
         self.img = pixmap
         self.rel_img_path = rel_img_path
         self.collection = coll_name
         self.fav_value = fav
         self.f_mod = f_mod
+        self.name = f"{self.sym_star} {os.path.basename(rel_img_path)}" if fav else os.path.basename(rel_img_path)
 
-        if not fav:
-            self.name = os.path.basename(rel_img_path)
-        else:
-            self.name = f"{self.sym_star} {os.path.basename(rel_img_path)}"
-
+        # --- Layout ---
         self.v_layout = UVBoxLayout()
         self.v_layout.setSpacing(ThumbData.SPACING)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self.v_layout)
 
+        # --- Виджеты ---
         self.img_wid = ImgWid()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+
         self.text_wid = FilenameWid(self, self.name, coll_name)
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(self.text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -167,6 +213,7 @@ class Thumbnail(QFrame):
 
     @classmethod
     def calculate_size(cls):
+        """Пересчет размеров миниатюр в зависимости от индекса размера."""
         ind = Dynamic.thumb_size_index
         cls.pixmap_size = ThumbData.PIXMAP_SIZE[ind]
         cls.img_frame_size = ThumbData.PIXMAP_SIZE[ind] + ThumbData.MARGIN
@@ -175,62 +222,36 @@ class Thumbnail(QFrame):
         cls.corner = ThumbData.CORNER[ind]
 
     def setup(self):
-        # инициация текста
+        """Настройка миниатюры: текст, размеры, изображение."""
         self.text_wid.set_text()
         self.setFixedSize(self.thumb_w, self.thumb_h)
 
-        # рамка вокруг pixmap при выделении Thumb
         size_ = self.pixmap_size + ThumbData.MARGIN
         self.img_wid.setFixedSize(size_, size_)
         self.img_wid.setPixmap(PixmapUtils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
-        style_ = f"""
-            border-radius: {self.corner}px;
-            color: rgb(255, 255, 255);
-            background: {Static.rgba_gray};
-            border: 2px solid transparent;
-            padding-left: 2px;
-            padding-right: 2px;
-        """
-        self.img_wid.setStyleSheet(style_)
-        
-        style_ = f"""
-            border-radius: 7px;
-            color: rgb(255, 255, 255);
-            background: {Static.rgba_blue};
-            border: 2px solid transparent;
-            padding-left: 2px;
-            padding-right: 2px;
-            font-size: 11px;
-        """
-        self.text_wid.setStyleSheet(style_)
+        """Устанавливает рамку и фон для выделенной миниатюры."""
+        self.img_wid.setStyleSheet(self.IMG_FRAME_STYLE.format(corner=self.corner, bg_color=Static.rgba_gray))
+        self.text_wid.setStyleSheet(self.TEXT_FRAME_STYLE.format(bg_color=Static.rgba_blue))
 
     def set_no_frame(self):
-        style_ = f"""
-            border: 2px solid transparent;
-            padding-left: 2px;
-            padding-right: 2px;
-        """
-        self.img_wid.setStyleSheet(style_)
-        style_ = """
-            border: 2px solid transparent;
-            font-size: 11px;
-        """
-        self.text_wid.setStyleSheet(style_)
+        """Снимает рамку и фон для миниатюры."""
+        self.img_wid.setStyleSheet(self.IMG_NO_FRAME_STYLE)
+        self.text_wid.setStyleSheet(self.TEXT_NO_FRAME_STYLE)
 
     def set_fav(self, value: int):
+        """Добавляет или удаляет миниатюру из избранного и обновляет текст."""
         if value == 0:
-            self.fav_value = value
+            self.fav_value = 0
             self.name = os.path.basename(self.rel_img_path)
-        elif value == 1:
-            self.fav_value = value
-            self.name = self.sym_star + os.path.basename(self.rel_img_path)
+        else:
+            self.fav_value = 1
+            self.name = f"{self.sym_star} {os.path.basename(self.rel_img_path)}"
 
         self.text_wid.name = self.name
         self.text_wid.set_text()
 
-        # удаляем из избранного и если это избранные то обновляем сетку
         if value == 0 and Dynamic.current_dir == Static.NAME_FAVS:
             self.reload_thumbnails.emit()
 
