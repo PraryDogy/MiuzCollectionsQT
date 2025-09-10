@@ -17,54 +17,63 @@ from system.tasks import LoadDbImagesItem, LoadDbImagesTask
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
-from .actions import (CopyName, CopyPath, MoveFiles, OpenDefault, OpenInView,
+from .actions import (CopyName, CopyPath, MoveFiles, OpenInView,
                       RemoveFiles, RevealInFinder, Save, SaveAs, ScanerRestart,
                       SetFav, WinInfoAction)
 
 
 class TextWid(QLabel):
-    def __init__(self, parent, name: str, coll: str):
+    """
+    QLabel для отображения текста с ограничением по длине и разбиением на строки.
+
+    Атрибуты:
+        name (str): основной текст.
+        coll (str): дополнительная информация (не используется в текущей версии).
+    """
+
+    def __init__(self, parent: QWidget, name: str, coll: str):
         super().__init__(parent)
         self.name = name
         self.coll = coll
 
-    def set_text(self) -> list[str]:
-        name: str | list = self.name
-        ind = Dynamic.thumb_size_ind
+    def set_text(self) -> None:
+        """
+        Устанавливает текст QLabel с учетом максимальной длины строки.
+        Делит длинный текст на две строки и сокращает, если необходимо.
+        """
+        name: str = self.name
+        ind = Dynamic.thumb_size_index
         max_row = ThumbData.MAX_ROW[ind]
         lines: list[str] = []
 
         if len(name) > max_row:
-
             first_line = name[:max_row]
             second_line = name[max_row:]
 
             if len(second_line) > max_row:
+                second_line = self.short_text(second_line, max_row)
 
-                second_line = self.short_text(
-                    text=second_line,
-                    max_row=max_row
-                )
-
-            for i in (first_line, second_line):
-                lines.append(i)
-
+            lines.extend([first_line, second_line])
         else:
-            name = lines.append(name)
+            lines.append(name)
 
         self.setText("\n".join(lines))
 
-    def short_text(self, text: str, max_row: int):
+    def short_text(self, text: str, max_row: int) -> str:
+        """
+        Сокращает текст, оставляя начало и конец, вставляя "..." посередине.
+        """
         return f"{text[:max_row - 10]}...{text[-7:]}"
 
+    # --- Передача событий родительскому QLabel ---
     def mouseReleaseEvent(self, ev):
-        return super().mouseReleaseEvent(ev)
-    
+        super().mouseReleaseEvent(ev)
+
     def contextMenuEvent(self, ev):
-        return super().contextMenuEvent(ev)
-    
-    def mouseDoubleClickEvent(self, a0):
-        return super().mouseDoubleClickEvent(a0)
+        super().contextMenuEvent(ev)
+
+    def mouseDoubleClickEvent(self, ev):
+        super().mouseDoubleClickEvent(ev)
     
     
 class ImgWid(QLabel):
@@ -148,7 +157,7 @@ class Thumbnail(QFrame):
 
     @classmethod
     def calculate_size(cls):
-        ind = Dynamic.thumb_size_ind
+        ind = Dynamic.thumb_size_index
         cls.pixmap_size = ThumbData.PIXMAP_SIZE[ind]
         cls.img_frame_size = Thumbnail.pixmap_size + ThumbData.OFFSET
         cls.thumb_w = ThumbData.THUMB_W[ind]
@@ -388,7 +397,7 @@ class Grid(VScrollArea):
         - glob row
         - glob col
         """
-        self.max_col = self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_ind])
+        self.max_col = self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_index])
         self.glob_row, self.glob_col = 0, 0
 
     def resize_thumbnails(self):

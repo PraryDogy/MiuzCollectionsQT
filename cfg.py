@@ -267,7 +267,7 @@ class Dynamic:
 
     # индекс соответствующий STATIC > IMG_LABEL_SIZE
     # от индекса зависит размер Thumbnail и всех его внутренних виджетов
-    thumb_size_ind: int = 0
+    thumb_size_index: int = 0
     current_dir: str = None
     sort_by_mod: bool = True
     enabled_filters: list[str] = []

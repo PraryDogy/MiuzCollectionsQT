@@ -25,7 +25,7 @@ class CustomSlider(QSlider):
         self.setOrientation(Qt.Orientation.Horizontal)
         self.setMinimum(0)
         self.setMaximum(len(ThumbData.PIXMAP_SIZE) - 1)
-        self.setValue(Dynamic.thumb_size_ind)
+        self.setValue(Dynamic.thumb_size_index)
         self.setFixedWidth(80)
 
         # --- Стилизация слайдера ---
@@ -73,7 +73,7 @@ class CustomSlider(QSlider):
         self.setValue(value)
         self.blockSignals(False)
 
-        Dynamic.thumb_size_ind = value
+        Dynamic.thumb_size_index = value
         self.resize_thumbnails.emit()
 
 
