@@ -364,3 +364,11 @@ class VListWidget(QListWidget):
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
+
+class SettingsItem:
+    def __init__(self):
+        self.general = "general"
+        self.filters = "filters"
+        self.new_folder = "new_folder"
+        self.edit_folder = "edit_folder"
+        self.data = {}

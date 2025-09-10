@@ -3,20 +3,17 @@ import re
 import subprocess
 from typing import Dict
 
-from PyQt5.QtCore import QObject, QSize, Qt, QThreadPool, QTimer, pyqtSignal
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import (QAction, QApplication, QGroupBox, QLabel,
-                             QPushButton, QTabWidget, QTreeWidget,
-                             QTreeWidgetItem, QWidget)
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
 
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import LoadSortedDirsTask, ResetDataTask
+from system.tasks import LoadSortedDirsTask
 from system.utils import MainUtils, UThreadPool
 
-from ._base_widgets import (UHBoxLayout, UListSpacerItem, UListWidgetItem,
-                            UMenu, UVBoxLayout, VListWidget, AppModalWindow)
+from ._base_widgets import (SettingsItem, UListWidgetItem, UMenu, UVBoxLayout,
+                            VListWidget)
 
 
 class FavItem(QTreeWidgetItem):
@@ -200,7 +197,7 @@ class MainFolderList(VListWidget):
 class MenuLeft(QTabWidget):
     clicked_ = pyqtSignal()
     no_connection = pyqtSignal()
-    setup_main_folder = pyqtSignal(object)
+    setup_main_folder = pyqtSignal(SettingsItem)
     
     def __init__(self):
         super().__init__()
@@ -226,12 +223,18 @@ class MenuLeft(QTabWidget):
         self.clicked_.emit()
 
     def init_ui(self):
+        
+        def edit_main_folder(main_folder: MainFolder):
+            item = SettingsItem()
+            item.data = {item.edit_folder: main_folder}
+            self.setup_main_folder.emit(item)
+        
         self.clear()
 
         main_folders = MainFolderList(self)
         main_folders.open_main_folder.connect(self.main_folder_clicked)
         main_folders.no_connection.connect(self.no_connection.emit)
-        main_folders.setup_main_folder.connect(self.setup_main_folder.emit)
+        main_folders.setup_main_folder.connect(edit_main_folder)
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
@@ -254,4 +257,6 @@ class MenuLeft(QTabWidget):
         if a0.mimeData().hasUrls():
             url = a0.mimeData().urls()[0].toLocalFile()
             if os.path.isdir(url):
-                self.setup_main_folder.emit(url)
+                item = SettingsItem()
+                item.data = {item.new_folder: url}
+                self.setup_main_folder.emit(item)                

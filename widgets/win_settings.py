@@ -17,9 +17,9 @@ from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
 
-from ._base_widgets import (UHBoxLayout, ULineEdit, UListSpacerItem,
-                            UListWidgetItem, UMenu, UTextEdit, UVBoxLayout,
-                            VListWidget, AppModalWindow, SingleActionWindow)
+from ._base_widgets import (AppModalWindow, SingleActionWindow, UHBoxLayout,
+                            ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
+                            UTextEdit, UVBoxLayout, VListWidget, SettingsItem)
 from .win_warn import WinQuestion, WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
@@ -669,7 +669,7 @@ class FiltersWid(QWidget):
 # ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
 
-class SettingsItem(UListWidgetItem):
+class SettingsListItem(UListWidgetItem):
     def __init__(self, parent, height = 30, text = None):
         super().__init__(parent, height, text)
         self.main_folder: MainFolder = None
@@ -680,14 +680,14 @@ class WinSettings(SingleActionWindow):
     closed = pyqtSignal()
     reset_data = pyqtSignal(MainFolder)
 
-    def __init__(self, data: MainFolder | str):
+    def __init__(self, settings_item: SettingsItem):
         super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng])
         self.main_folder_list = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
         self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = False
-        self.main_folder_items: list[SettingsItem] = []
+        self.main_folder_items: list[SettingsListItem] = []
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -699,13 +699,13 @@ class WinSettings(SingleActionWindow):
         self.left_menu.clicked.connect(self.left_menu_click)
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = SettingsItem(self.left_menu, text=Lng.general[Cfg.lng])
+        main_settings_item = SettingsListItem(self.left_menu, text=Lng.general[Cfg.lng])
         self.left_menu.addItem(main_settings_item)
         
-        filter_settings = SettingsItem(self.left_menu, text=Lng.filters[Cfg.lng])
+        filter_settings = SettingsListItem(self.left_menu, text=Lng.filters[Cfg.lng])
         self.left_menu.addItem(filter_settings)
 
-        item = SettingsItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
+        item = SettingsListItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
         self.left_menu.addItem(item)
         
         spacer = UListSpacerItem(self.left_menu)
@@ -713,7 +713,7 @@ class WinSettings(SingleActionWindow):
 
         for i in MainFolder.list_:
             text = f"{os.path.basename(i.paths[0])} ({i.name})"
-            item = SettingsItem(self.left_menu, text=text)
+            item = SettingsListItem(self.left_menu, text=text)
             item.main_folder = i
             self.left_menu.addItem(item)
             self.main_folder_items.append(item)
@@ -746,15 +746,19 @@ class WinSettings(SingleActionWindow):
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([self.left_side_width, 600])
 
-        if isinstance(data, str):
-            self.left_menu.setCurrentRow(2)
-            self.init_right_side(2)
-        elif data is None:
+
+        if settings_item.general in settings_item.data:
             self.left_menu.setCurrentRow(0)
             self.init_right_side(0)
-        elif isinstance(data, MainFolder):
+        elif settings_item.filters in settings_item.data:
+            self.left_menu.setCurrentRow(1)
+            self.init_right_side(1)
+        elif settings_item.new_folder in settings_item.data:
+            self.left_menu.setCurrentRow(2)
+            self.init_right_side(2)
+        elif settings_item.edit_folder in settings_item.data:
             for i in self.main_folder_items:
-                if i.main_folder == data:
+                if i.main_folder == settings_item.data.get(settings_item.edit_folder):
                     index = self.left_menu.row(i)
                     self.left_menu.setCurrentRow(index)
                     self.init_right_side(index)
@@ -774,7 +778,7 @@ class WinSettings(SingleActionWindow):
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
         else:
-            item: SettingsItem = self.left_menu.item(index)
+            item: SettingsListItem = self.left_menu.item(index)
             main_folder = item.main_folder
             main_folder_sett = MainFolderSettings(main_folder)
             main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
@@ -786,7 +790,7 @@ class WinSettings(SingleActionWindow):
     def add_main_folder(self, main_folder: MainFolder):
         self.main_folder_list.append(main_folder)
         text = f"{os.path.basename(main_folder.paths[0])} ({main_folder.name})"
-        item = SettingsItem(self.left_menu, text=text)
+        item = SettingsListItem(self.left_menu, text=text)
         item.main_folder.name = main_folder.name
         self.left_menu.addItem(item)
         self.left_menu.setCurrentItem(item)
@@ -794,7 +798,7 @@ class WinSettings(SingleActionWindow):
         self.init_right_side()
         self.ok_btn.setText(Lng.restart[Cfg.lng])
 
-    def remove_main_folder(self, main_folder: MainFolder, item: SettingsItem):
+    def remove_main_folder(self, main_folder: MainFolder, item: SettingsListItem):
 
         def fin():
             self.main_folder_list.remove(main_folder)

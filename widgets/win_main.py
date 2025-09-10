@@ -15,7 +15,7 @@ from system.tasks import (CopyFilesTask, FavTask, MainUtils, ResetDataTask,
                           RmFilesTask, ScanSingleDirTask)
 from system.utils import UThreadPool
 
-from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
+from ._base_widgets import SettingsItem, UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -85,9 +85,7 @@ class WinMain(UMainWindow):
         self.left_menu.clicked_.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.clicked_.connect(lambda: self.set_window_title())
         self.left_menu.no_connection.connect(self.open_win_smb)
-        self.left_menu.setup_main_folder.connect(
-            lambda main_folder: self.open_settings(main_folder)
-        )
+        self.left_menu.setup_main_folder.connect(self.open_settings)
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -591,9 +589,9 @@ class WinMain(UMainWindow):
         else:
             self.open_win_smb()
 
-    def open_settings(self, main_folder: MainFolder = None):
+    def open_settings(self, settings_item: SettingsItem):
         self.bar_top.settings_btn.set_solid_style()
-        self.win_settings = WinSettings(main_folder)
+        self.win_settings = WinSettings(settings_item)
         self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
         self.win_settings.reset_data.connect(self.reset_data_cmd)
         self.win_settings.center_to_parent(self.window())

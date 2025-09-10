@@ -7,7 +7,7 @@ from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import UHBoxLayout, UMenu, UVBoxLayout
+from ._base_widgets import SettingsItem, UHBoxLayout, UMenu, UVBoxLayout
 from .wid_search import WidSearch
 
 
@@ -260,7 +260,7 @@ class BarTop(QWidget):
     """
 
     open_dates_win = pyqtSignal()
-    open_settings_win = pyqtSignal()
+    open_settings_win = pyqtSignal(SettingsItem)
     reload_thumbnails = pyqtSignal()
 
     def __init__(self):
@@ -286,8 +286,10 @@ class BarTop(QWidget):
         self.h_layout.addWidget(self.dates_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка настроек ---
+        item = SettingsItem()
+        item.data = {item.general: None}
         self.settings_btn = SettingsBtn()
-        self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit())
+        self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.h_layout.addStretch(1)
