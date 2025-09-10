@@ -64,25 +64,19 @@ class UMenu(QMenu):
 
 
 class ULineEdit(QLineEdit):
-    INPUT_H = 28
-    LEFT_PADDING = 2
-    RIGHT_PADDING = 28
+    hh = 28
+    padding = (2, 28)
+    menu_width = 120
 
     def __init__(self):
-        f"""
-        custom context menu
-        height 28
-        padding left 2
-        padding right 28
-        """
+        """QLineEdit с фиксированной высотой и кастомными отступами"""
         super().__init__()
-        self.setFixedHeight(self.INPUT_H)
-        self.setStyleSheet(
-            f"""
-            padding-left: {self.LEFT_PADDING};
-            padding-right: {self.RIGHT_PADDING};
-            """
-        )
+
+        self.setFixedHeight(self.hh)
+        self.setStyleSheet(f"""
+            padding-left: {self.padding[0]}px;
+            padding-right: {self.padding[1]}px;
+        """)
 
     def cut_selection(self, *args):
         text = self.selectedText()
@@ -97,40 +91,38 @@ class ULineEdit(QLineEdit):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.menu_ = UMenu(event=a0)
-        self.menu_.setFixedWidth(120)
+        self.menu_.setFixedWidth(self.menu_width)
 
-        sel = QAction(text=Lng.cut[Cfg.lng], parent=self.menu_)
-        sel.triggered.connect(self.cut_selection)
-        self.menu_.addAction(sel)
+        actions = [
+            (Lng.cut[Cfg.lng], self.cut_selection),
+            (Lng.copy[Cfg.lng], lambda: MainUtils.copy_text(self.selectedText())),
+            (Lng.paste[Cfg.lng], self.paste_text),
+        ]
 
-        sel_all = QAction(text=Lng.copy[Cfg.lng], parent=self.menu_)
-        sel_all.triggered.connect(
-            lambda: MainUtils.copy_text(self.selectedText())
-        )
-        self.menu_.addAction(sel_all)
-
-        sel_all = QAction(text=Lng.paste[Cfg.lng], parent=self.menu_)
-        sel_all.triggered.connect(self.paste_text)
-        self.menu_.addAction(sel_all)
+        for text, slot in actions:
+            act = QAction(text=text, parent=self.menu_)
+            act.triggered.connect(slot)
+            self.menu_.addAction(act)
 
         self.menu_.show_umenu()
 
 
 class SvgBtn(QWidget):
     def __init__(self, icon_path: str, size: int, parent: QWidget = None):
+        super().__init__(parent)
 
         self.icon_path = icon_path
+        self.setStyleSheet("background-color: transparent;")
 
-        super().__init__(parent=parent)
-        self.setStyleSheet(f"""background-color: transparent;""")
-
-        h_layout = UHBoxLayout()
-        self.setLayout(h_layout)
+        h_layout = UHBoxLayout(self)
+        h_layout.setContentsMargins(0, 0, 0, 0)
+        h_layout.setSpacing(0)
 
         self.svg_btn = QSvgWidget()
         self.svg_btn.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self.svg_btn.setFixedSize(size, size)
         self.set_icon(icon_path)
+
         h_layout.addWidget(self.svg_btn)
         self.adjustSize()
 
@@ -144,22 +136,19 @@ class SvgBtn(QWidget):
 class SvgShadowed(SvgBtn):
     def __init__(self, icon_name: str, size: int, shadow_depth: int = 200,
                  parent: QWidget = None):
-
         super().__init__(icon_name, size, parent)
 
-        effect = QGraphicsDropShadowEffect()
-        effect.setOffset(0, 0)
-        effect.setColor(QColor(0, 0, 0, shadow_depth))
-        effect.setBlurRadius(15)
-        self.setGraphicsEffect(effect)
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setOffset(0, 0)
+        shadow.setColor(QColor(0, 0, 0, shadow_depth))
+        shadow.setBlurRadius(15)
+        self.setGraphicsEffect(shadow)
 
 
 class UTextEdit(QTextEdit):
+    """QTextEdit с кастомным контекстным меню для копирования/вставки"""
 
     def __init__(self):
-        """
-        custom copy paste context
-        """
         super().__init__()
 
     def copy_selection(self):
@@ -182,17 +171,16 @@ class UTextEdit(QTextEdit):
         menu_ = UMenu(event=a0)
         menu_.setFixedWidth(120)
 
-        sel = QAction(text=Lng.cut[Cfg.lng], parent=menu_)
-        sel.triggered.connect(self.cut_selection)
-        menu_.addAction(sel)
+        actions = [
+            (Lng.cut[Cfg.lng], self.cut_selection),
+            (Lng.copy[Cfg.lng], self.copy_selection),
+            (Lng.paste[Cfg.lng], self.paste_text),
+        ]
 
-        sel_all = QAction(text=Lng.copy[Cfg.lng], parent=menu_)
-        sel_all.triggered.connect(self.copy_selection)
-        menu_.addAction(sel_all)
-
-        sel_all = QAction(text=Lng.paste[Cfg.lng], parent=menu_)
-        sel_all.triggered.connect(self.paste_text)
-        menu_.addAction(sel_all)
+        for text, slot in actions:
+            act = QAction(text=text, parent=menu_)
+            act.triggered.connect(slot)
+            menu_.addAction(act)
 
         menu_.show_umenu()
 
@@ -203,28 +191,26 @@ class Manager:
 
 class UMainWindow(QMainWindow):
     def __init__(self, parent: QWidget = None):
-        super().__init__(parent=parent)
+        super().__init__(parent)
 
-        central_widget = QWidget()
+        # --- Центральный виджет ---
+        central_widget = QWidget(self)
         central_widget.setContentsMargins(0, 0, 0, 0)
         self.setCentralWidget(central_widget)
 
-        self.central_layout = UVBoxLayout()
-        central_widget.setLayout(self.central_layout)
+        # --- Компоновка ---
+        self.central_layout = UVBoxLayout(central_widget)
 
+        # --- Регистрация окна в менеджере ---
         Manager.wins.append(self)
 
-    def center_relative_parent(self, parent: QMainWindow):
-
-        if not isinstance(parent, QMainWindow):
-            raise TypeError
-
+    def center_to_parent(self, parent: QMainWindow):
         try:
             geo = self.geometry()
             geo.moveCenter(parent.geometry().center())
             self.setGeometry(geo)
-        except (RuntimeError, Exception) as e:
-            MainUtils.print_error()
+        except Exception as e:
+            print("base widgets, u main window, center error", e)
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:

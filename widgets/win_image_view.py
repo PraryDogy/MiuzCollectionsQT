@@ -369,7 +369,7 @@ class WinImageView(WinChild):
 
     def open_info_win_delayed(self):
         self.win_info.adjustSize()
-        self.win_info.center_relative_parent(self)
+        self.win_info.center_to_parent(self)
         self.win_info.show()
 
 

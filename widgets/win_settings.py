@@ -586,7 +586,7 @@ class NewFolder(QWidget):
                 Lng.attention[Cfg.lng],
                 Lng.enter_folder_name[Cfg.lng]
                 )
-            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         elif any(i.name == self.main_folder.name for i in self.main_folder_list):
             t = (
@@ -598,14 +598,14 @@ class NewFolder(QWidget):
                 Lng.attention[Cfg.lng],
                 t
                 )
-            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         elif not self.main_folder.paths:
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
                 Lng.select_folder_path[Cfg.lng]
                 )
-            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         else:
             self.new_folder.emit(self.main_folder)
@@ -811,14 +811,14 @@ class WinSettings(WinSystem):
                     Lng.attention[Cfg.lng],
                     Lng.at_least_one_folder_required[Cfg.lng],
                 )
-                self.win_warn.center_relative_parent(self)
+                self.win_warn.center_to_parent(self)
                 self.win_warn.show()
             else:
                 self.win_question = WinQuestion(
                     Lng.attention[Cfg.lng],
                     Lng.confirm_delete_folder[Cfg.lng],
                 )
-                self.win_question.center_relative_parent(self)
+                self.win_question.center_to_parent(self)
                 self.win_question.ok_clicked.connect(fin)
                 self.win_question.ok_clicked.connect(self.win_question.deleteLater)
                 self.win_question.show()
@@ -848,7 +848,7 @@ class WinSettings(WinSystem):
                         Lng.attention[Cfg.lng],
                         f"{Lng.select_folder_path[Cfg.lng]} \"{i.name}\""
                         )
-                    self.win_warn.center_relative_parent(self.window())
+                    self.win_warn.center_to_parent(self.window())
                     self.win_warn.show()
                     return
             MainFolder.list_ = self.main_folder_list

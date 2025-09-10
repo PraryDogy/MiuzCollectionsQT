@@ -147,7 +147,7 @@ class PathWidget(QGroupBox):
     def show_path_win(self, *args):
         self.win = PathWindow()
         self.win.text_label.setPlainText(self.path)
-        self.win.center_relative_parent(self.window())
+        self.win.center_to_parent(self.window())
         self.win.show()
 
 

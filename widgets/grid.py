@@ -459,7 +459,7 @@ class Grid(VScrollArea):
 
     def open_info_win_delayed(self):
         self.win_info.adjustSize()
-        self.win_info.center_relative_parent(self.window())
+        self.win_info.center_to_parent(self.window())
         self.win_info.show()
 
     def open_default_cmd(self, rel_img_path_list: list[str]):

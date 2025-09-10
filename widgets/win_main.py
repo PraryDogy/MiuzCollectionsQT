@@ -166,7 +166,7 @@ class WinMain(UMainWindow):
             dest_name = os.path.basename(dest)
             progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
             progress_win.progressbar.setMaximum(100)
-            progress_win.center_relative_parent(self)
+            progress_win.center_to_parent(self)
             progress_win.show()
             task = CopyFilesTask(dest, files)
             progress_win.cancel.connect(
@@ -197,7 +197,7 @@ class WinMain(UMainWindow):
 
     def open_win_smb(self):
         self.win_smb = WinSmb()
-        self.win_smb.center_relative_parent(self.window())
+        self.win_smb.center_to_parent(self.window())
         self.win_smb.show()
 
     def open_img_view(self):
@@ -214,7 +214,7 @@ class WinMain(UMainWindow):
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
         self.win_image_view.no_connection.connect(self.open_win_smb)
-        self.win_image_view.center_relative_parent(self.window())
+        self.win_image_view.center_to_parent(self.window())
         self.win_image_view.show()
 
     def closed_img_view(self):
@@ -325,7 +325,7 @@ class WinMain(UMainWindow):
 
     def open_dates_win(self):
         self.win_dates = WinDates()
-        self.win_dates.center_relative_parent(self)
+        self.win_dates.center_to_parent(self)
         self.win_dates.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
         self.win_dates.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
         self.win_dates.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
@@ -340,7 +340,7 @@ class WinMain(UMainWindow):
                 Lng.attention[Cfg.lng],
                 f"{t}: {Lng.data_was_reset[Cfg.lng].lower()}"
             )
-            self.win_warn.center_relative_parent(self.window())
+            self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
             self.restart_scaner_task()
 
@@ -381,7 +381,7 @@ class WinMain(UMainWindow):
             self.win_upload = WinUpload()
             self.win_upload.clicked.connect(lambda data: copy_files(data, files))
             self.win_upload.no_connection.connect(self.open_win_smb)
-            self.win_upload.center_relative_parent(self.window())
+            self.win_upload.center_to_parent(self.window())
             self.win_upload.show()
         else:
             self.open_win_smb()
@@ -403,7 +403,7 @@ class WinMain(UMainWindow):
                 Lng.attention[Cfg.lng],
                 f"{Lng.delete_forever[Cfg.lng]} ({len(img_path_list)})?"
             )
-            self.remove_files_win.center_relative_parent(self.window())
+            self.remove_files_win.center_to_parent(self.window())
             self.remove_files_win.ok_clicked.connect(
                 lambda: start_remove(img_path_list)
             )
@@ -449,7 +449,7 @@ class WinMain(UMainWindow):
             dest_name = os.path.basename(dest)
             progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
             progress_win.progressbar.setMaximum(100)
-            progress_win.center_relative_parent(self)
+            progress_win.center_to_parent(self)
             progress_win.show()
             task = CopyFilesTask(dest, img_path_list)
             progress_win.cancel.connect(
@@ -476,7 +476,7 @@ class WinMain(UMainWindow):
             self.win_upload = WinUpload()
             self.win_upload.clicked.connect(lambda data: copy_files_start(data))
             self.win_upload.no_connection.connect(self.open_win_smb)
-            self.win_upload.center_relative_parent(self.window())
+            self.win_upload.center_to_parent(self.window())
             self.win_upload.show()
         else:
             self.open_win_smb()
@@ -486,7 +486,7 @@ class WinMain(UMainWindow):
         self.win_settings = WinSettings(main_folder)
         self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
         self.win_settings.reset_data.connect(self.reset_data_cmd)
-        self.win_settings.center_relative_parent(self.window())
+        self.win_settings.center_to_parent(self.window())
         self.win_settings.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
@@ -540,7 +540,7 @@ class WinMain(UMainWindow):
             if os.path.isdir(i):
                 self.win_warn = WinWarn(Lng.attention[Cfg.lng], Lng.drop_only_files[Cfg.lng])
                 self.win_warn.adjustSize()
-                self.win_warn.center_relative_parent(self)
+                self.win_warn.center_to_parent(self)
                 self.win_warn.show()
                 return
 

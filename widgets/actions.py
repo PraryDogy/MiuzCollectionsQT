@@ -18,7 +18,7 @@ class SmbWin:
     def show(cls, parent_: QMainWindow):
         cls.win_warn = WinSmb()
         cls.win_warn.adjustSize()
-        cls.win_warn.center_relative_parent(parent_)
+        cls.win_warn.center_to_parent(parent_)
         cls.win_warn.show()
 
 
@@ -57,7 +57,7 @@ class WinInfoAction(QAction):
 
     def open_delayed(self):
         self.win_info.adjustSize()
-        self.win_info.center_relative_parent(self.win_)
+        self.win_info.center_to_parent(self.win_)
         self.win_info.show()
 
 
