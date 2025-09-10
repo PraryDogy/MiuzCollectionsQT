@@ -807,7 +807,7 @@ class Grid(VScrollArea):
             for app_path, basename in self.image_apps.items():
                 act = QAction(parent=open_menu, text=basename)
                 act.triggered.connect(
-                    lambda e, app_path=app_path: self.open_in_app.emit((rel_img_path_list, app_path))
+                    lambda e, x=app_path: self.open_in_app.emit((rel_img_path_list, x))
                 )
                 open_menu.addAction(act)
 
