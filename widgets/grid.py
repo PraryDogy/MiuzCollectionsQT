@@ -483,7 +483,7 @@ class Grid(VScrollArea):
         - Переупорядочивает сетку в соотетствии с новыми размерами
         """
         Thumbnail.calculate_size()
-        for cell, wid in self.cell_to_wid.items():
+        for _, wid in self.cell_to_wid.items():
             wid.setup()
             if wid in self.selected_widgets:
                 wid.set_frame()
@@ -491,33 +491,45 @@ class Grid(VScrollArea):
 
     def rearrange(self):
         """
-        Переупорядочивает все элементы сетки заново:
-        - Очищает предыдущие данные по сетке
-        - Расставляет виджеты Thumbnail
+        Переупорядочивает все миниатюры в сетке заново.
+
+        Логика:
+            - Сбрасывает свойства сетки (строки и столбцы)
+            - Находит все Thumbnail в контейнере
+            - Расставляет их по рядам и колонкам
+            - Если сортировка по модификации включена, начинает новый ряд при смене модификации
         """
+
+        def _next_row():
+            """Сдвигает счетчики сетки на новый ряд."""
+            self.glob_col = 0
+            self.glob_row += 1
+
         self.reset_grid_properties()
         thumbnails = self.grid_wid.findChildren(Thumbnail)
         if not thumbnails:
             return
+
         prev_f_mod = thumbnails[0].f_mod
-        for wid in thumbnails:
-            if Dynamic.sort_by_mod and wid.f_mod != prev_f_mod:
-                self.glob_col = 0
-                self.glob_row += 1
+        for thumb in thumbnails:
+            # Проверка на смену модификации при сортировке по модификации
+            if Dynamic.sort_by_mod and thumb.f_mod != prev_f_mod:
+                _next_row()
 
-            self.add_thumb_data(wid)
-            self.grid_lay.addWidget(wid, self.glob_row, self.glob_col)
+            # Добавляем миниатюру в сетку и обновляем координаты
+            self.add_thumb_data(thumb)
+            self.grid_lay.addWidget(thumb, self.glob_row, self.glob_col)
 
+            # Переходим к следующей колонке, если достигнут максимум, переход к следующему ряду
             self.glob_col += 1
             if self.glob_col >= self.max_col:
-                self.glob_col = 0
-                self.glob_row += 1
+                _next_row()
 
-            prev_f_mod = wid.f_mod
+            prev_f_mod = thumb.f_mod
 
+        # Если последний ряд не завершен, начинаем новый ряд для следующих элементов
         if self.glob_col != 0:
-            self.glob_col = 0
-            self.glob_row += 1
+            _next_row()
 
     def get_wid_under_mouse(self, a0: QMouseEvent) -> None | Thumbnail:
         wid = QApplication.widgetAt(a0.globalPos())
