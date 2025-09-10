@@ -250,7 +250,7 @@ class WinMain(UMainWindow):
             is_selection = True
         wid = self.grid.selected_widgets[-1]
         self.win_image_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
-        self.win_image_view.closed_.connect(self.closed_img_view)
+        self.win_image_view.closed_.connect(self.image_view_closed)
         self.win_image_view.open_win_info.connect(self.open_win_info)
         self.win_image_view.copy_path.connect(self.copy_path)
         self.win_image_view.copy_name.connect(self.copy_name)
@@ -264,9 +264,10 @@ class WinMain(UMainWindow):
         self.win_image_view.center_to_parent(self.window())
         self.win_image_view.show()
 
-    def closed_img_view(self):
+    def image_view_closed(self):
         del self.win_image_view
-        gc.collect()
+        self.win_image_view = None
+        gc.collect
 
     def start_scaner_task(self):
         """

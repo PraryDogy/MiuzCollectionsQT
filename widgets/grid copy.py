@@ -743,80 +743,126 @@ class Grid(VScrollArea):
         return super().resizeEvent(a0)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        """Создаёт контекстное меню для пустой области или выбранных виджетов."""
         self.menu_ = UMenu(event=a0)
-        clicked_wid = self.get_clicked_widget(a0)
+        clicked_wid = self.get_clicked_widget(a0=a0)
 
-        def add_action(action: QAction, slot: callable):
-            action.triggered.connect(slot)
-            self.menu_.addAction(action)
-
-        def menu_empty():
+        # клик по пустому пространству
+        if not clicked_wid:
             self.clear_selected_widgets()
             reload = ScanerRestart(parent=self.menu_)
-            add_action(reload, lambda: self.restart_scaner.emit())
+            reload.triggered.connect(lambda: self.restart_scaner.emit())
+            self.menu_.addAction(reload)
             self.menu_.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], self.menu_)
-            add_action(reveal, lambda: self.reveal_in_finder.emit([Dynamic.current_dir]))
+            reveal.triggered.connect(
+                lambda: self.reveal_in_finder.emit([Dynamic.current_dir])
+            )
+            self.menu_.addAction(reveal)
 
-        def menu_widget(clicked: Thumbnail):
-            if not self.selected_widgets:
-                self.wid_to_selected_widgets(clicked)
-            elif clicked not in self.selected_widgets:
-                self.clear_selected_widgets()
-                self.wid_to_selected_widgets(clicked)
-
-            rel_paths = [w.rel_img_path for w in self.selected_widgets]
-
-            # просмотр
-            add_action(OpenInView(self.menu_), lambda: self.img_view.emit())
-
-            # открыть в приложении
-            open_menu = UMenu(self.menu_)
-            open_menu.setTitle(f"{Lng.open_in[Cfg.lng]} ({len(rel_paths)})")
-            self.menu_.addMenu(open_menu)
-            add_action(QAction(Lng.open_default[Cfg.lng], open_menu),
-                    lambda: self.open_in_app.emit((rel_paths, None)))
-            open_menu.addSeparator()
-            for app_path, basename in self.image_apps.items():
-                add_action(QAction(basename, open_menu),
-                        lambda _, x=app_path: self.open_in_app.emit((rel_paths, x)))
-
-            # избранное
-            if len(rel_paths) == 1:
-                fav = SetFav(self.menu_, clicked.fav_value)
-                add_action(fav, lambda: self.set_fav.emit((clicked.rel_img_path, not clicked.fav_value)))
-
-            # инфо
-            add_action(WinInfoAction(self.menu_), lambda: self.open_info_win.emit(rel_paths))
-            self.menu_.addSeparator()
-
-            # reveal / copy
-            add_action(RevealInFinder(self.menu_, len(rel_paths)),
-                    lambda: self.reveal_in_finder.emit(rel_paths))
-            add_action(CopyPath(self.menu_, len(rel_paths)),
-                    lambda: self.copy_path.emit(rel_paths))
-            add_action(CopyName(self.menu_, len(rel_paths)),
-                    lambda: self.copy_name.emit(rel_paths))
-            self.menu_.addSeparator()
-
-            # save / move / remove
-            add_action(Save(self.menu_, len(rel_paths)),
-                    lambda: self.save_files.emit((os.path.expanduser("~/Downloads"), rel_paths)))
-            add_action(SaveAs(self.menu_, len(rel_paths)),
-                    lambda: self.save_files.emit((None, rel_paths)))
-            add_action(MoveFiles(self.menu_, rel_paths),
-                    lambda: self.move_files.emit(rel_paths))
-            add_action(RemoveFiles(self.menu_, len(self.selected_widgets)),
-                    lambda: self.remove_files.emit(rel_paths))
-
-        if not clicked_wid:
-            menu_empty()
+        # клик по виджету
         else:
-            menu_widget(clicked_wid)
+
+            # если не было выделено ни одного виджет ранее
+            # то выделяем кликнутый
+            if not self.selected_widgets:
+                self.wid_to_selected_widgets(wid=clicked_wid)
+
+            # если есть выделенные виджеты, но кликнутый виджет не выделены
+            # то снимаем выделение с других и выделяем кликнутый
+            elif clicked_wid not in self.selected_widgets:
+                self.clear_selected_widgets()
+                self.wid_to_selected_widgets(wid=clicked_wid)
+
+            rel_img_path_list = [
+                i.rel_img_path
+                for i in self.selected_widgets
+            ]
+
+            cmd_ = lambda: self.img_view.emit()
+            view = OpenInView(self.menu_)
+            view.triggered.connect(cmd_)
+            self.menu_.addAction(view)
+
+            open_menu = UMenu(a0)
+            open_menu.setTitle(f"{Lng.open_in[Cfg.lng]} ({len(rel_img_path_list)})")
+            self.menu_.addMenu(open_menu)
+
+            open_def = QAction(parent=open_menu, text=Lng.open_default[Cfg.lng])
+            open_def.triggered.connect(
+                lambda: self.open_in_app.emit((rel_img_path_list, None))
+            )
+            open_menu.addAction(open_def)
+            open_menu.addSeparator()
+
+            for app_path, basename in self.image_apps.items():
+                act = QAction(parent=open_menu, text=basename)
+                act.triggered.connect(
+                    lambda e, x=app_path: self.open_in_app.emit((rel_img_path_list, x))
+                )
+                open_menu.addAction(act)
+
+            if len(rel_img_path_list) == 1:
+                self.fav_action = SetFav(self.menu_, clicked_wid.fav_value)
+                self.fav_action.triggered.connect(
+                    lambda: self.set_fav.emit(
+                        (clicked_wid.rel_img_path, not clicked_wid.fav_value)
+                        )
+                )
+                self.menu_.addAction(self.fav_action)
+
+            info = WinInfoAction(self.menu_)
+            info.triggered.connect(
+                lambda: self.open_info_win.emit(rel_img_path_list)
+            )
+            self.menu_.addAction(info)
+
+            self.menu_.addSeparator()
+
+            reveal = RevealInFinder(self.menu_, len(rel_img_path_list))
+            reveal.triggered.connect(
+                lambda: self.reveal_in_finder.emit(rel_img_path_list)
+            )
+            self.menu_.addAction(reveal)
+
+            copy_path = CopyPath(self.menu_, len(rel_img_path_list))
+            copy_path.triggered.connect(
+                lambda: self.copy_path.emit(rel_img_path_list)
+            )
+            self.menu_.addAction(copy_path)
+
+            copy_name = CopyName(self.menu_, len(rel_img_path_list))
+            copy_name.triggered.connect(
+                lambda: self.copy_name.emit(rel_img_path_list)
+            )
+            self.menu_.addAction(copy_name)
+
+            self.menu_.addSeparator()
+
+            save = Save(self.menu_, len(rel_img_path_list))
+            save.triggered.connect(
+                lambda: self.save_files.emit(
+                    (os.path.expanduser("~/Downloads"), rel_img_path_list)
+                )
+            )
+            self.menu_.addAction(save)
+
+            save_as = SaveAs(self.menu_, len(rel_img_path_list))
+            save_as.triggered.connect(
+                lambda: self.save_files.emit(
+                    (None, rel_img_path_list)
+                )
+            )
+            self.menu_.addAction(save_as)
+
+            move_files = MoveFiles(self.menu_, rel_img_path_list)
+            move_files.triggered.connect(lambda: self.move_files.emit(rel_img_path_list))
+            self.menu_.addAction(move_files)
+
+            rem = RemoveFiles(self.menu_, len(self.selected_widgets))
+            rem.triggered.connect(lambda: self.remove_files.emit(rel_img_path_list))
+            self.menu_.addAction(rem)
 
         self.menu_.show_umenu()
-
 
     def checkScrollValue(self, value):
         if value > 0:            
