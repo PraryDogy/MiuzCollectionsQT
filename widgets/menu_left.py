@@ -33,26 +33,27 @@ class TreeSep(QTreeWidgetItem):
         self.setData(0, Qt.ItemDataRole.UserRole, "")
 
 
-class MyTree(QTreeWidget):
+class TreeWid(QTreeWidget):
     clicked_ = pyqtSignal(str)
     no_connection = pyqtSignal()
     hh = 25
 
     def __init__(self) -> None:
         super().__init__()
-        self.root_dir = None
+        self.root_dir: str = None
+        self.last_item: QTreeWidgetItem = None
         self.setHeaderHidden(True)
         self.itemClicked.connect(self.on_item_click)
 
-    def init_ui(self):
+    def init_ui(self, root_dir: str):
         
         def select_first_item():
             top_item = self.topLevelItem(2)
             if top_item:
-                self.setCurrentItem(top_item)
-                self.itemClicked.emit(top_item, 0)
+                self.clicked_.emit(self.root_dir)
 
         self.clear()
+        self.root_dir = root_dir
 
         custom_item = FavItem()
         custom_item.setSizeHint(0, QSize(0, self.hh))
@@ -76,9 +77,13 @@ class MyTree(QTreeWidget):
     def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
         if isinstance(item, TreeSep):
             return
-        if isinstance(item, FavItem):
+        elif item == self.last_item:
+            return
+        elif isinstance(item, FavItem):
+            self.last_item = item
             self.clicked_.emit(Static.NAME_FAVS)
         else:
+            self.last_item = item
             path: str = item.data(0, Qt.ItemDataRole.UserRole)
             self.clicked_.emit(path)
             if item.childCount() == 0:
@@ -200,8 +205,7 @@ class MenuLeft(QTabWidget):
         if main_folder_path:
             Dynamic.current_dir = main_folder_path
             Dynamic.grid_buff_size = 0
-            self.collections_list.root_dir = main_folder_path
-            self.collections_list.init_ui()
+            self.tree_wid.init_ui(main_folder_path)
         else:
             self.no_connection.emit()
         
@@ -222,13 +226,12 @@ class MenuLeft(QTabWidget):
         main_folders.setup_main_folder.connect(self.setup_main_folder.emit)
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
-        self.collections_list = MyTree()
-        self.collections_list.clicked_.connect(self.tree_clicked)
-        self.collections_list.no_connection.connect(self.no_connection.emit)
-        self.addTab(self.collections_list, Lng.images[Cfg.lng])
+        self.tree_wid = TreeWid()
+        self.tree_wid.clicked_.connect(self.tree_clicked)
+        self.tree_wid.no_connection.connect(self.no_connection.emit)
+        self.addTab(self.tree_wid, Lng.images[Cfg.lng])
         
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            self.collections_list.root_dir = main_folder_path
-            self.collections_list.init_ui()
+            self.tree_wid.init_ui(main_folder_path)
             self.setCurrentIndex(1)
