@@ -140,7 +140,6 @@ class Thumbnail(QFrame):
 
     # --- Сигналы ---
     reload_thumbnails = pyqtSignal()
-    select = pyqtSignal(str)
 
     # --- Константы ---
     sym_star = "\U00002605"
