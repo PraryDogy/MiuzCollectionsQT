@@ -383,37 +383,39 @@ class Grid(VScrollArea):
         self.up_btn.hide()
 
         # --- Сборка ---
-        self.load_grid_wid()
+        self.load_grid_container()
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
     def reload_thumbnails(self):
         Dynamic.thumbnails_count = 0
-        cmd_ = lambda db_images: self.first_grid(db_images)
-        self.load_db_images_task(cmd_)
+        self.load_db_images_task(self.load_initial_grid)
 
     def load_more_thumbnails(self):
         Dynamic.thumbnails_count += Static.thumbnails_step
-        cmd_ = lambda db_images: self.grid_more(db_images)
-        self.load_db_images_task(cmd_)
+        self.load_db_images_task(self.grid_more)
 
-    def load_db_images_task(self, on_finish_cmd: callable):
+    def load_db_images_task(self, on_finish: callable):
         self.task_ = LoadDbImagesTask()
-        self.task_.sigs.finished_.connect(on_finish_cmd)
+        self.task_.sigs.finished_.connect(on_finish)
         UThreadPool.start(self.task_)
         
-    def load_grid_wid(self):
+    def load_grid_container(self):
         self.grid_wid = QWidget()
         self.scroll_layout.addWidget(self.grid_wid)
         self.grid_lay = QGridLayout()
         self.grid_lay.setSpacing(1)
         self.grid_wid.setLayout(self.grid_lay)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
+        
+    def remove_grid_container(self):
+        self.grid_wid.deleteLater()
+        self.rubberBand.deleteLater()
 
-    def first_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
-        def cmd():
-            for i in (self.grid_wid, self.rubberBand):
-                i.deleteLater()
-            self.load_grid_wid()
+    def load_initial_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
+
+        def load_grid_delayed():
+            self.remove_grid_container()
+            self.load_grid_container()
             self.clear_thumb_data()
             self.clear_cell_data()
             self.clear_selected_widgets()
@@ -425,37 +427,42 @@ class Grid(VScrollArea):
                 self.grid_lay.setColumnStretch(0, 1)
             else:
                 for date, db_images_list in db_images.items():
-                    self.single_grid(db_images_list)
+                    self.add_thumbnails_to_grid(db_images_list)
                 self.rearrange()
                 self.grid_wid.show()
                 QTimer.singleShot(100, self.setFocus)
 
         self.grid_wid.hide()
-        QTimer.singleShot(50, cmd)
+        QTimer.singleShot(50, load_grid_delayed)
                         
     def add_thumb_data(self, wid: Thumbnail):
         self.path_to_wid[wid.rel_img_path] = wid
         self.cell_to_wid[self.glob_row, self.glob_col] = wid
         wid.row, wid.col = self.glob_row, self.glob_col        
 
-    def single_grid(self, db_images: list[LoadDbImagesItem]):
-        for db_image in db_images:
-            pixmap = QPixmap.fromImage(db_image.qimage)
-            wid = Thumbnail(
+    def add_thumbnails_to_grid(self, db_images: list[LoadDbImagesItem]):
+
+        def create_thumb(image_item: LoadDbImagesItem):
+            thumbnail = Thumbnail(
                 pixmap=pixmap,
-                rel_img_path=db_image.rel_img_path,
-                coll_name=db_image.coll_name,
-                fav=db_image.fav,
-                f_mod=db_image.f_mod
+                rel_img_path=image_item.rel_img_path,
+                coll_name=image_item.coll_name,
+                fav=image_item.fav,
+                f_mod=image_item.f_mod
             )
-            wid.set_no_frame()
-            wid.reload_thumbnails.connect(lambda: self.reload_thumbnails())
-            self.add_thumb_data(wid)
-            self.grid_lay.addWidget(wid, 0, 0)
+            thumbnail.set_no_frame()
+            thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
+            return thumbnail
+
+        for image_item in db_images:
+            pixmap = QPixmap.fromImage(image_item.qimage)
+            thumbnail = create_thumb(image_item)
+            self.add_thumb_data(thumbnail)
+            self.grid_lay.addWidget(thumbnail, 0, 0)
 
     def grid_more(self, db_images: dict[str, list[LoadDbImagesItem]]):
         for date, db_images_list in db_images.items():
-            self.single_grid(db_images_list)
+            self.add_thumbnails_to_grid(db_images_list)
         self.rearrange()
 
     def select_viewed_image(self, path: str):
