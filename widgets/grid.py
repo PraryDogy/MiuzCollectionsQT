@@ -315,7 +315,7 @@ class DateWid(QLabel):
     SHADOW_OFFSET = (0, 2)
     SHADOW_COLOR = QColor(0, 0, 0, 190)
 
-    COLOR_DATA = {
+    TEXT_TO_BG_COLOR = {
         "#000000": "#dcdcdc",
         "#ffffff": "#505050",
     }
@@ -333,7 +333,13 @@ class DateWid(QLabel):
     def apply_style(self):
         palette = QApplication.palette()
         text_color = QPalette.windowText(palette).color().name()
-        bg_color = self.COLOR_DATA.get(text_color, "#dcdcdc")
+        if text_color in self.TEXT_TO_BG_COLOR:
+            bg_color = self.TEXT_TO_BG_COLOR[text_color]
+        else:
+            raise Exception(
+                "DateWid.apply_style: цвет текста "
+                f"'{text_color}' не найден в COLOR_DATA"
+            )
 
         self.setStyleSheet(f"""
             QLabel {{
@@ -874,7 +880,6 @@ class Grid(VScrollArea):
         # --- конец списка ---
         if value == self.verticalScrollBar().maximum():
             self.load_more_thumbnails()
-
 
     def mouseDoubleClickEvent(self, a0):
         if self.wid_under_mouse:
