@@ -19,7 +19,7 @@ from system.utils import MainUtils
 
 from ._base_widgets import (UHBoxLayout, ULineEdit, UListSpacerItem,
                             UListWidgetItem, UMenu, UTextEdit, UVBoxLayout,
-                            VListWidget, WinChild, WinSystem)
+                            VListWidget, AppModalWindow, SingleActionWindow)
 from .win_warn import WinQuestion, WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
@@ -675,7 +675,7 @@ class SettingsItem(UListWidgetItem):
         self.main_folder_name: str = ""
 
 
-class WinSettings(WinSystem):
+class WinSettings(SingleActionWindow):
     left_side_width = 210
     closed = pyqtSignal()
     reset_data = pyqtSignal(MainFolder)

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 from cfg import Dynamic, Cfg
 from system.lang import Lng
 
-from ._base_widgets import UHBoxLayout, ULineEdit, UVBoxLayout, WinSystem
+from ._base_widgets import UHBoxLayout, ULineEdit, UVBoxLayout, SingleActionWindow
 
 
 class DatesTools:
@@ -157,7 +157,7 @@ class RightDateWidget(DatesWid):
             self.input.setText(DatesTools.date_to_text(Dynamic.date_end))
 
 
-class WinDates(WinSystem):
+class WinDates(SingleActionWindow):
     date_wid_width = 150
     dates_btn_solid = pyqtSignal()
     dates_btn_normal = pyqtSignal()

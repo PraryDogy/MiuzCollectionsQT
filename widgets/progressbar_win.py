@@ -2,10 +2,10 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel, QProgressBar, QWidget
 
-from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
+from ._base_widgets import UHBoxLayout, UVBoxLayout, SingleActionWindow
 
 
-class ProgressbarWin(WinSystem):
+class ProgressbarWin(SingleActionWindow):
     cancel = pyqtSignal()
 
     def __init__(self, title: str):

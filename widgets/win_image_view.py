@@ -15,7 +15,7 @@ from system.tasks import LoadSingleImgTask
 from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (SvgShadowed, UHBoxLayout, UMenu, UVBoxLayout,
-                            WinChild)
+                            AppModalWindow)
 from .actions import (CopyName, CopyPath, FavActionDb, Save, ShowInFinder,
                       WinInfoAction)
 from .grid import Thumbnail
@@ -176,7 +176,7 @@ class NextImageBtn(SwitchImageBtn):
         super().__init__(self.svg_next, parent)
 
 
-class WinImageView(WinChild):
+class WinImageView(AppModalWindow):
     task_count_limit = 10
     switch_image_sig = pyqtSignal(str)
     no_connection = pyqtSignal()

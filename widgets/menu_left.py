@@ -16,7 +16,7 @@ from system.tasks import LoadSortedDirsTask, ResetDataTask
 from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (UHBoxLayout, UListSpacerItem, UListWidgetItem,
-                            UMenu, UVBoxLayout, VListWidget, WinChild)
+                            UMenu, UVBoxLayout, VListWidget, AppModalWindow)
 
 
 class FavItem(QTreeWidgetItem):

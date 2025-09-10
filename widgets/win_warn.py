@@ -6,10 +6,10 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 from cfg import Cfg
 from system.lang import Lng
 
-from ._base_widgets import UHBoxLayout, UVBoxLayout, WinSystem
+from ._base_widgets import UHBoxLayout, UVBoxLayout, SingleActionWindow
 
 
-class BaseWinWarn(WinSystem):
+class BaseWinWarn(SingleActionWindow):
     svg_warning = "./images/warning.svg"
     svg_size = 40
 

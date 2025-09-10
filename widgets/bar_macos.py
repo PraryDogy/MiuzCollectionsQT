@@ -9,7 +9,7 @@ from cfg import Cfg, Static
 from system.lang import Lng
 from system.utils import MainUtils
 
-from ._base_widgets import UMenu, WinSystem
+from ._base_widgets import UMenu, SingleActionWindow
 from .win_settings import WinSettings
 
 
@@ -48,7 +48,7 @@ class SelectableLabel(QLabel):
         MainUtils.copy_text(self.selectedText())
 
 
-class AboutWin(WinSystem):
+class AboutWin(SingleActionWindow):
     def __init__(self):
         super().__init__()
 

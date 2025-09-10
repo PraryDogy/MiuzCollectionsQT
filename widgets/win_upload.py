@@ -12,7 +12,7 @@ from system.main_folder import MainFolder
 from system.tasks import LoadSortedDirsTask
 from system.utils import UThreadPool
 from ._base_widgets import (UHBoxLayout, UListWidgetItem, UVBoxLayout,
-                            VListWidget, WinChild, UTextEdit)
+                            VListWidget, AppModalWindow, UTextEdit)
 
 
 class MyTree(QTreeWidget):
@@ -91,7 +91,7 @@ class MainFolderList(VListWidget):
 # ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО ОСНОВНОЕ ОКНО 
 
 
-class PathWindow(WinChild):
+class PathWindow(AppModalWindow):
     def __init__(self):
         super().__init__()
         self.setWindowFlags(Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowCloseButtonHint)
@@ -151,7 +151,7 @@ class PathWidget(QGroupBox):
         self.win.show()
 
 
-class WinUpload(WinChild):
+class WinUpload(AppModalWindow):
     clicked = pyqtSignal(tuple)
     no_connection = pyqtSignal()
 

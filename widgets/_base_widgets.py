@@ -227,23 +227,30 @@ class UMainWindow(QMainWindow):
         return super().deleteLater()
 
 
-class WinSystem(UMainWindow):
+class SingleActionWindow(UMainWindow):
+    """
+    Окно с пользовательскими флагами отображения:
+    - Модальность: блокирует другие окна приложения (ApplicationModal)
+    - Заголовок с кнопкой закрытия, остальные кнопки неактивны
+    - Внутренние отступы центрального layout'а: (10, 5, 10, 5)
+    """
+
     def __init__(self, parent: QWidget = None):
-        """
-        Окно с пользовательскими флагами отображения:
-        - Модальность: блокирует другие окна приложения (ApplicationModal)
-        - Заголовок с кнопкой закрытия, остальные кнопки неактивны
-        - Внутренние отступы центрального layout'а: (10, 5, 10, 5)
-        """
         super().__init__(parent)
+
+        # --- Модальность окна ---
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        fl = Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint
-        fl = fl  | Qt.WindowType.WindowCloseButtonHint
-        self.setWindowFlags(fl)
+
+        # --- Флаги окна: только кнопка закрытия ---
+        flags = Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint
+        flags |= Qt.WindowType.WindowCloseButtonHint
+        self.setWindowFlags(flags)
+
+        # --- Отступы центрального layout'а ---
         self.central_layout.setContentsMargins(10, 5, 10, 5)
 
 
-class WinChild(UMainWindow):
+class AppModalWindow(UMainWindow):
     def __init__(self, parent: QWidget = None):
         """
         Окно с пользовательскими флагами отображения:
@@ -254,13 +261,17 @@ class WinChild(UMainWindow):
 
 
 class UListWidgetItem(QListWidgetItem):
-    def __init__(self, parent: QListWidget, height: int = 30, text: str = None):
-        """
-        - height: 30
-        - width: parent (QListWidget) width
-        """
-        super().__init__()
+    """
+    QListWidgetItem с фиксированной высотой и шириной, совпадающей с родителем.
+    """
+
+    def __init__(self, parent: QListWidget, height: int = 30, text: str | None = None):
+        super().__init__(parent)
+
+        # фиксированный размер
         self.setSizeHint(QSize(parent.width(), height))
+
+        # текст, если указан
         if text:
             self.setText(text)
 

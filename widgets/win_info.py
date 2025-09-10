@@ -9,7 +9,7 @@ from system.lang import Lng
 from system.tasks import FilesInfoTask, SingleFileInfoTask
 from system.utils import MainUtils, UThreadPool
 
-from ._base_widgets import UMenu, WinSystem
+from ._base_widgets import UMenu, SingleActionWindow
 
 
 class Selectable(QLabel):
@@ -57,7 +57,7 @@ class Selectable(QLabel):
         menu_.show_umenu()
 
 
-class WinInfo(WinSystem):
+class WinInfo(SingleActionWindow):
     finished_ = pyqtSignal()
 
     def __init__(self, img_path_list: list[str]):
