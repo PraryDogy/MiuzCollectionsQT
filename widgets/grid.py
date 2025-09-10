@@ -300,16 +300,29 @@ class UpBtn(QFrame):
         super().mouseReleaseEvent(ev)
 
 
-
 class DateWid(QLabel):
+    """
+    QLabel с тенью для отображения даты.
+
+    Атрибуты класса:
+        SHADOW_BLUR (int): радиус размытия тени.
+        SHADOW_OFFSET (tuple[int, int]): смещение тени (x, y).
+        SHADOW_COLOR (QColor): цвет тени.
+    """
+
+    SHADOW_BLUR = 20
+    SHADOW_OFFSET = (0, 2)
+    SHADOW_COLOR = QColor(0, 0, 0, 190)
+
     def __init__(self, parent: QWidget, blue_color: bool = True):
         super().__init__(parent)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)      
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
+        # Настройка тени
         shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(20)
-        shadow.setOffset(0, 2)
-        shadow.setColor(QColor(0, 0, 0, 190))
+        shadow.setBlurRadius(self.SHADOW_BLUR)
+        shadow.setOffset(*self.SHADOW_OFFSET)
+        shadow.setColor(self.SHADOW_COLOR)
         self.setGraphicsEffect(shadow)
         
 
