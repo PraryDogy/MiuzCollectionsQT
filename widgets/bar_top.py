@@ -122,26 +122,33 @@ class FiltersBtn(BarTopBtn):
 
     ICON_PATH = "./images/filters.svg"
     menu_ww = 200
+    edit_filters = pyqtSignal(SettingsItem)
 
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.filters[Cfg.lng])
         self.svg_btn.load(self.ICON_PATH)
-
-    def _on_action(self, val: str):
-        """Добавляет или удаляет фильтр из списка включённых и испускает сигнал."""
-        if val in Dynamic.enabled_filters:
-            Dynamic.enabled_filters.remove(val)
-        else:
-            Dynamic.enabled_filters.append(val)
-        self.clicked_.emit()
-
-    def reset(self):
-        """Сбрасывает все фильтры и испускает сигнал."""
-        Dynamic.enabled_filters.clear()
-        self.clicked_.emit()
-
+        
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+
+        def on_action(val: str):
+            """Добавляет или удаляет фильтр из списка включённых и испускает сигнал."""
+            if val in Dynamic.enabled_filters:
+                Dynamic.enabled_filters.remove(val)
+            else:
+                Dynamic.enabled_filters.append(val)
+            self.clicked_.emit()
+        
+        def reset():
+            """Сбрасывает все фильтры и испускает сигнал."""
+            Dynamic.enabled_filters.clear()
+            self.clicked_.emit()
+   
+        def edit_filters():
+            item = SettingsItem()
+            item.data = {item.filters: None}
+            self.edit_filters.emit(item)
+
         """Показывает меню фильтров при клике левой кнопкой мыши."""
         if ev and ev.button() == Qt.MouseButton.LeftButton:
             self.set_solid_style()
@@ -152,13 +159,18 @@ class FiltersBtn(BarTopBtn):
             for f in Filters.filters:
                 act = QAction(f, self, checkable=True)
                 act.setChecked(f in Dynamic.enabled_filters)
-                act.triggered.connect(lambda _, val=f: self._on_action(val))
+                act.triggered.connect(lambda _, val=f: on_action(val))
                 menu.addAction(act)
 
             # --- Разделитель и пункт сброса ---
             menu.addSeparator()
+
+            edit = QAction(Lng.setup[Cfg.lng], self)
+            edit.triggered.connect(edit_filters)
+            menu.addAction(edit)
+            
             act_reset = QAction(Lng.reset[Cfg.lng], menu)
-            act_reset.triggered.connect(self.reset)
+            act_reset.triggered.connect(reset)
             menu.addAction(act_reset)
 
             # --- Показ меню под кнопкой ---
@@ -278,6 +290,7 @@ class BarTop(QWidget):
         # --- Кнопка фильтров ---
         self.filters_btn = FiltersBtn()
         self.filters_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
+        self.filters_btn.edit_filters.connect(self.open_settings_win.emit)
         self.h_layout.addWidget(self.filters_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка выбора даты ---
