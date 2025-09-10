@@ -78,32 +78,37 @@ class CustomSlider(QSlider):
 
 
 class BarBottom(QWidget):
+    """
+    Нижняя панель с прогресс-баром и слайдером для изменения размера миниатюр.
+
+    Сигналы:
+        resize_thumbnails (pyqtSignal): испускается при изменении размера миниатюр.
+    """
+
     resize_thumbnails = pyqtSignal()
+    hh = 28
 
     def __init__(self):
-        """
-        Сигналы:
-        - reload_thumbnails()
-        - theme_changed()
-        """
         super().__init__()
 
-        self.setFixedHeight(28)
+        # --- Настройка размеров панели ---
+        self.setFixedHeight(self.hh)
 
+        # --- Горизонтальный layout ---
         self.h_layout = UHBoxLayout(self)
         self.h_layout.setSpacing(20)
         self.h_layout.setContentsMargins(0, 0, 15, 0)
-        self.init_ui()
 
-    def init_ui(self):
+        # --- Прогресс-бар ---
         self.progress_bar = QLabel(text="")
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.progress_bar.setFixedWidth(300)
-        self.progress_bar.setFixedHeight(20)
+        self.progress_bar.setFixedSize(300, 20)
         self.h_layout.addWidget(self.progress_bar)
 
+        # --- Разделитель перед слайдером ---
         self.h_layout.addStretch()
 
+        # --- Слайдер изменения размера миниатюр ---
         self.slider = CustomSlider()
-        self.slider.resize_thumbnails.connect(lambda: self.resize_thumbnails.emit())
+        self.slider.resize_thumbnails.connect(self.resize_thumbnails)
         self.h_layout.addWidget(self.slider)
