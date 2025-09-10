@@ -114,6 +114,7 @@ class WinMain(UMainWindow):
         self.grid.open_info_win.connect(self.open_win_info)
         self.grid.copy_path.connect(self.copy_path)
         self.grid.copy_name.connect(self.copy_name)
+        self.grid.reveal_in_finder.connect(self.reveal_in_finder)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -235,6 +236,7 @@ class WinMain(UMainWindow):
         self.win_image_view.open_win_info.connect(self.open_win_info)
         self.win_image_view.copy_path.connect(self.copy_path)
         self.win_image_view.copy_name.connect(self.copy_name)
+        self.win_image_view.reveal_in_finder.connect(self.reveal_in_finder)
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
