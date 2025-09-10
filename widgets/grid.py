@@ -591,67 +591,55 @@ class Grid(VScrollArea):
             wid = self.path_to_wid.get(rel_img_path)
             wid.set_fav(value)
             
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+    def keyPressEvent(self, event: QKeyEvent | None) -> None:
+        """
+        Обрабатывает навигацию и горячие клавиши в сетке:
+            - Ctrl+I: открыть информацию по выбранным элементам
+            - Ctrl+A: выделить все элементы
+            - Space / Enter: открыть просмотр последнего выбранного элемента
+            - Стрелки: навигация по элементам сетки
+        """
 
-        command = Qt.KeyboardModifier.ControlModifier
-
-        KEY_NAVI = {
-            Qt.Key.Key_Left: (0, -1),
-            Qt.Key.Key_Right: (0, 1),
-            Qt.Key.Key_Up: (-1, 0),
-            Qt.Key.Key_Down: (1, 0)
-        }
-
-        if a0.modifiers() == command and a0.key() == Qt.Key.Key_I:
+        def open_info():
+            """Открывает окно информации для выбранных виджетов."""
             if self.selected_widgets:
-                self.open_info_win.emit(
-                    [i.rel_img_path for i in self.selected_widgets]
-                )
+                self.open_info_win.emit([i.rel_img_path for i in self.selected_widgets])
 
-        elif a0.modifiers() == command and a0.key() == Qt.Key.Key_A:
-            for i in self.cell_to_wid.values():
-                i.set_frame()
-                self.selected_widgets.append(i)
+        def select_all():
+            """Выделяет все виджеты в сетке."""
+            for wid in self.cell_to_wid.values():
+                wid.set_frame()
+                self.selected_widgets.append(wid)
 
-        elif a0.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
-
+        def open_last_selected():
+            """Открывает просмотр последнего выбранного виджета."""
             if self.selected_widgets:
-                wid = self.selected_widgets[-1]
                 self.img_view.emit()
 
-        elif a0.key() in KEY_NAVI:
-            offset = KEY_NAVI.get(a0.key())
-
-            # если не выделено ни одного виджета
+        def navigate(offset: tuple[int, int]):
+            """Перемещает выделение в сетке по заданному смещению."""
+            # начальный виджет
             if not self.selected_widgets:
                 self.wid_under_mouse = self.cell_to_wid.get((0, 0))
             else:
                 self.wid_under_mouse = self.selected_widgets[-1]
 
-            # если нет даже первого виджета значит сетка пуста
             if not self.wid_under_mouse:
                 return
 
-            coords = (
-                self.wid_under_mouse.row + offset[0], 
-                self.wid_under_mouse.col + offset[1]
-            )
+            row, col = self.wid_under_mouse.row + offset[0], self.wid_under_mouse.col + offset[1]
+            next_wid = self.cell_to_wid.get((row, col))
 
-            next_wid = self.cell_to_wid.get(coords)
-
+            # обработка перехода за пределы строки
             if next_wid is None:
-                if a0.key() == Qt.Key.Key_Right:
-                    coords = (
-                        self.wid_under_mouse.row + 1, 
-                        0
-                    )
-                elif a0.key() == Qt.Key.Key_Left:
-                    coord_list = list(self.cell_to_wid.keys())
-                    coords = (self.wid_under_mouse.row, self.wid_under_mouse.col)
-                    curr_index = coord_list.index(coords)
-                    coords = coord_list[curr_index-1]
-
-                next_wid = self.cell_to_wid.get(coords)
+                if event.key() == Qt.Key.Key_Right:
+                    row += 1
+                    col = 0
+                elif event.key() == Qt.Key.Key_Left:
+                    keys = list(self.cell_to_wid.keys())
+                    idx = keys.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
+                    row, col = keys[idx - 1]
+                next_wid = self.cell_to_wid.get((row, col))
 
             if next_wid:
                 self.clear_selected_widgets()
@@ -659,7 +647,26 @@ class Grid(VScrollArea):
                 self.ensureWidgetVisible(next_wid)
                 self.wid_under_mouse = next_wid
 
-        return super().keyPressEvent(a0)
+        # --- Основная логика ---
+        CTRL = Qt.KeyboardModifier.ControlModifier
+        KEY_NAVI = {
+            Qt.Key.Key_Left: (0, -1),
+            Qt.Key.Key_Right: (0, 1),
+            Qt.Key.Key_Up: (-1, 0),
+            Qt.Key.Key_Down: (1, 0)
+        }
+
+        if event.modifiers() == CTRL and event.key() == Qt.Key.Key_I:
+            open_info()
+        elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_A:
+            select_all()
+        elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
+            open_last_selected()
+        elif event.key() in KEY_NAVI:
+            navigate(KEY_NAVI[event.key()])
+
+        super().keyPressEvent(event)
+
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
         if a0.button() != Qt.MouseButton.LeftButton:
