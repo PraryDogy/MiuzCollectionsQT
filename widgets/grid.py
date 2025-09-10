@@ -329,6 +329,7 @@ class DateWid(QLabel):
         shadow.setOffset(*self.SHADOW_OFFSET)
         shadow.setColor(self.SHADOW_COLOR)
         self.setGraphicsEffect(shadow)
+        self.setText("Date wid text")
 
     def apply_style(self):
         palette = QApplication.palette()
