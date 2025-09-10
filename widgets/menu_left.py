@@ -46,12 +46,6 @@ class TreeWid(QTreeWidget):
         self.itemClicked.connect(self.on_item_click)
 
     def init_ui(self, root_dir: str):
-        
-        def select_first_item():
-            top_item = self.topLevelItem(2)
-            if top_item:
-                self.clicked_.emit(self.root_dir)
-
         self.clear()
         self.root_dir = root_dir
 
@@ -71,7 +65,9 @@ class TreeWid(QTreeWidget):
         worker.sigs.finished_.connect(
             lambda data, item=root_item: self.add_children(item, data)
         )
-        worker.sigs.finished_.connect(select_first_item)
+        worker.sigs.finished_.connect(
+            lambda: self.clicked_.emit(self.root_dir)
+        )
         UThreadPool.start(worker)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
