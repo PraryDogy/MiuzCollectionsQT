@@ -467,12 +467,12 @@ class MainFolderAdvanced(QWidget):
         v_lay = UVBoxLayout()
         self.setLayout(v_lay)
 
-        sec_row = MainFolderPaths(main_folder)
-        sec_row.text_changed.connect(self.changed.emit)
-        v_lay.addWidget(sec_row)
-        sec_row.top_label.setText(Lng.images_folder_path[Cfg.lng])
+        self.paths_wid = MainFolderPaths(main_folder)
+        self.paths_wid.text_changed.connect(self.changed.emit)
+        v_lay.addWidget(self.paths_wid)
+        self.paths_wid.top_label.setText(Lng.images_folder_path[Cfg.lng])
         text_ = "\n".join(i for i in main_folder.paths)
-        sec_row.text_edit.setPlainText(text_)
+        self.paths_wid.text_edit.setPlainText(text_)
 
         third_row = StopList(main_folder)
         third_row.text_changed.connect(self.changed.emit)
@@ -575,6 +575,12 @@ class NewFolder(QWidget):
         v_lay.addLayout(btn_lay)
         
         v_lay.addStretch()
+        
+    def preset_new_folder(self, url: str):
+        name = os.path.basename(url)
+        self.name_label.setText(name)
+        text_edit = self.findChildren(DropableGroupBox)[0].text_edit
+        text_edit.setPlainText(url)
 
     def name_cmd(self):
         name = self.name_label.text().strip()
@@ -688,6 +694,7 @@ class WinSettings(SingleActionWindow):
         self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = False
         self.main_folder_items: list[SettingsListItem] = []
+        self.settings_item = settings_item
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -780,6 +787,10 @@ class WinSettings(SingleActionWindow):
             self.new_folder = NewFolder(self.main_folder_list)
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
+            if self.settings_item.new_folder in self.settings_item.data:
+                url = self.settings_item.data.get(self.settings_item.new_folder)
+                self.new_folder.preset_new_folder(url)
+                self.settings_item.data = {self.settings_item.general: None}
         else:
             item: SettingsListItem = self.left_menu.item(index)
             main_folder = item.main_folder
@@ -788,7 +799,6 @@ class WinSettings(SingleActionWindow):
             main_folder_sett.remove.connect(lambda: self.remove_main_folder(main_folder, item))
             main_folder_sett.reset_data.connect(self.reset_data.emit)
             self.right_lay.insertWidget(0, main_folder_sett)
-
 
     def add_main_folder(self, main_folder: MainFolder):
         self.main_folder_list.append(main_folder)
@@ -834,8 +844,8 @@ class WinSettings(SingleActionWindow):
 
     def clear_right_side(self):
         wids = (GeneralSettings, MainFolderSettings, NewFolder, FiltersWid)
-        for i in self.right_wid.findChildren(wids):
-            i.deleteLater()
+        right_wid = self.right_wid.findChild(wids)
+        right_wid.deleteLater()
 
     def left_menu_click(self, *args):
         self.clear_right_side()
