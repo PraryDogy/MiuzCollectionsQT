@@ -256,29 +256,49 @@ class Thumbnail(QFrame):
 
 
 class UpBtn(QFrame):
+    """
+    Кнопка для прокрутки вверх с круглой серой фоном и SVG-иконкой.
+
+    Сигналы:
+        scroll_to_top (pyqtSignal): испускается при нажатии кнопки.
+
+    Атрибуты класса:
+        icon (str): путь к SVG-иконке.
+        icon_size (int): размер кнопки и иконки.
+        bg_color (str): цвет фона кнопки.
+        radius (int): радиус скругления кнопки.
+        STYLE (str): стиль кнопки в формате f-строки.
+    """
+
     scroll_to_top = pyqtSignal()
+
+    # Настраиваемые параметры
     icon = "./images/up.svg"
     icon_size = 44
+    radius = 22
+
+    # --- Стиль кнопки ---
+    STYLE = f"""
+        background: {Static.rgba_gray};
+        border-radius: {radius}px;
+    """
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.setFixedSize(self.icon_size, self.icon_size)
-        style_ = f"""
-            background: {Static.rgba_gray};
-            border-radius: 22px;
-        """
-        self.setStyleSheet(style_)
+        self.setStyleSheet(self.STYLE)
 
         v_layout = UVBoxLayout()
         self.setLayout(v_layout)
 
         self.svg = SvgBtn(self.icon, self.icon_size)
-        v_layout.addWidget(self.svg)
+        v_layout.addWidget(self.svg, alignment=Qt.AlignmentFlag.AlignCenter)
 
-    def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
-        if a0.button() == Qt.MouseButton.LeftButton:
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        if ev.button() == Qt.MouseButton.LeftButton:
             self.scroll_to_top.emit()
-        return super().mouseReleaseEvent(a0)
+        super().mouseReleaseEvent(ev)
+
 
 
 class DateWid(QLabel):
