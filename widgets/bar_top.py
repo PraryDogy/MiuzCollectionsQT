@@ -243,6 +243,22 @@ class SettingsBtn(BarTopBtn):
 
 
 class BarTop(QWidget):
+    """
+    Верхняя панель с кнопками управления и поиском.
+
+    Сигналы:
+        open_dates_win: открывает окно выбора даты.
+        open_settings_win: открывает окно настроек.
+        reload_thumbnails: обновляет миниатюры при изменении фильтров или сортировки.
+
+    Атрибуты:
+        sort_btn: кнопка сортировки.
+        filters_btn: кнопка фильтров.
+        dates_btn: кнопка открытия окна выбора даты.
+        settings_btn: кнопка настроек.
+        search_wid: виджет поиска.
+    """
+
     open_dates_win = pyqtSignal()
     open_settings_win = pyqtSignal()
     reload_thumbnails = pyqtSignal()
@@ -251,50 +267,34 @@ class BarTop(QWidget):
         super().__init__()
         self.h_layout = UHBoxLayout()
         self.setLayout(self.h_layout)
-        self.filter_btns = []
-        self.win_dates = None
-        self.init_ui()
-        self.adjustSize()
-
-    def init_ui(self):
-        self.filter_btns.clear()
 
         self.h_layout.addStretch(1)
 
+        # --- Кнопка сортировки ---
         self.sort_btn = SortBtn()
         self.sort_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
-        self.h_layout.addWidget(
-            self.sort_btn,
-            alignment=Qt.AlignmentFlag.AlignLeft
-        )
+        self.h_layout.addWidget(self.sort_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        # сортировка по слоям по джепегам: добавим их в фильтры
+        # --- Кнопка фильтров ---
         self.filters_btn = FiltersBtn()
         self.filters_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
-        self.h_layout.addWidget(
-            self.filters_btn,
-            alignment=Qt.AlignmentFlag.AlignLeft
-        )
+        self.h_layout.addWidget(self.filters_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
+        # --- Кнопка выбора даты ---
         self.dates_btn = DatesBtn()
         self.dates_btn.clicked_.connect(lambda: self.open_dates_win.emit())
-        self.h_layout.addWidget(
-            self.dates_btn,
-            alignment=Qt.AlignmentFlag.AlignLeft
-        )
+        self.h_layout.addWidget(self.dates_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
+        # --- Кнопка настроек ---
         self.settings_btn = SettingsBtn()
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit())
-        self.h_layout.addWidget(
-            self.settings_btn,
-            alignment=Qt.AlignmentFlag.AlignLeft
-        )
+        self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.h_layout.addStretch(1)
 
+        # --- Виджет поиска ---
         self.search_wid = WidSearch()
         self.search_wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
-        self.h_layout.addWidget(
-            self.search_wid,
-            alignment=Qt.AlignmentFlag.AlignRight
-        )
+        self.h_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
+
+        self.adjustSize()
