@@ -11,7 +11,7 @@ class OpenInView(QAction):
 
 class ScanerRestart(QAction):
     def __init__(self, parent: QMenu):
-        super().__init__(parent=parent, text=Lng.reload_gui[Cfg.lng])
+        super().__init__(parent=parent, text=Lng.scan_folder[Cfg.lng])
 
 
 class WinInfoAction(QAction):

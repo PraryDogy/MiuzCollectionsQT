@@ -781,6 +781,9 @@ class Grid(VScrollArea):
 
         def menu_empty():
             self.clear_selected_widgets()
+            update_grid = QAction(Lng.update_grid[Cfg.lng], self.menu_)
+            update_grid.triggered.connect(self.reload_thumbnails)
+            self.menu_.addAction(update_grid)
             reload = ScanerRestart(parent=self.menu_)
             add_action(reload, lambda: self.restart_scaner.emit())
             self.menu_.addSeparator()
