@@ -85,7 +85,7 @@ class DirsCompator:
         - [(rel_dir_path, mod_time), ...]
         """
         return [
-            (rel_dir_path, mod)
+            (rel_dir_path, int(mod))
             for rel_dir_path, mod in db_dirs
             if (rel_dir_path, mod) not in finder_dirs
         ]
@@ -101,7 +101,7 @@ class DirsCompator:
         - [(rel_dir_path, mod_time), ...]
         """
         return [
-            (rel_dir_path, mod)
+            (rel_dir_path, int(mod))
             for (rel_dir_path, mod) in finder_dirs
             if (rel_dir_path, mod) not in db_dirs
         ]

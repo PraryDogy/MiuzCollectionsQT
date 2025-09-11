@@ -81,6 +81,9 @@ class ScanerTask(URunnable):
         # сравниваем Finder и БД директории
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
+        
+        print("new_dirs", new_dirs)
+        print("del_dirs", del_dirs)
 
         # например была удалена папка Collection 1, тогда все данные
         # в THUMBS и hadhdir будут удалены через ImgRemover
