@@ -621,6 +621,7 @@ class NewFolder(QWidget):
 
 
 class FiltersWid(QWidget):
+    changed = pyqtSignal()
 
     def __init__(self, filters_copy: list[str]):
         super().__init__()
@@ -643,25 +644,21 @@ class FiltersWid(QWidget):
         self.text_wid.setFixedHeight(220)
         self.text_wid.setPlaceholderText(Lng.filters[Cfg.lng])
         self.text_wid.setPlainText("\n".join(self.filters_copy))
+        self.text_wid.textChanged.connect(self.on_text_changed)
         g_lay.addWidget(self.text_wid)
 
         self.v_lay.addWidget(group)
-        
-        self.save_btn = QPushButton(Lng.save[Cfg.lng])
-        self.save_btn.setFixedWidth(100)
-        self.save_btn.clicked.connect(self.save_clicked)
-        self.v_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-        
+                
         self.v_lay.addStretch(1)
         
-    def save_clicked(self):
-        filters_list = self.text_wid.toPlainText().split("\n")
-        filters_list = [f.strip() for f in filters_list if f.strip()]
-        filters_list = list(dict.fromkeys(filters_list))
-        self.filters_copy = filters_list
-        Filters.filters = filters_list
-        self.text_wid.setPlainText("\n".join(self.filters_copy))
-        self.setFocus()
+    def on_text_changed(self):
+        text = self.text_wid.toPlainText().strip()
+        lines = [line for line in text.split("\n") if line]
+
+        self.filters_copy.clear()   # очищаем текущий список
+        self.filters_copy.extend(lines)  # добавляем новые элементы
+        
+        self.changed.emit()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -777,6 +774,7 @@ class WinSettings(SingleActionWindow):
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
             self.filters_wid = FiltersWid(self.filters_copy)
+            self.filters_wid.changed.connect(lambda: self.ok_btn.setText(Lng.save[Cfg.lng]))
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
             self.new_folder = NewFolder(self.main_folder_list)
@@ -856,8 +854,12 @@ class WinSettings(SingleActionWindow):
             shutil.rmtree(Static.APP_SUPPORT_DIR)
             QApplication.quit()
             MainUtils.start_new_app()
+            
+        elif self.ok_btn.text() in (Lng.save[Cfg.lng]):
+            Filters.filters = self.filters_copy
+            self.deleteLater()
 
-        elif self.ok_btn.text() == Lng.restart[Cfg.lng]:
+        elif self.ok_btn.text() in (Lng.restart[Cfg.lng]):
             for i in self.main_folder_list:
                 if not i.paths:
                     self.win_warn = WinWarn(
