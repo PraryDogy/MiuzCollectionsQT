@@ -711,7 +711,7 @@ class WinSettings(SingleActionWindow):
         self.left_menu.addItem(spacer)
 
         for i in MainFolder.list_:
-            text = f"{os.path.basename(i.paths[0])} ({i.name})"
+            text = f"{os.path.basename(i.curr_path)} ({i.name})"
             item = SettingsListItem(self.left_menu, text=text)
             item.main_folder = i
             self.left_menu.addItem(item)
@@ -803,7 +803,7 @@ class WinSettings(SingleActionWindow):
 
     def add_main_folder(self, main_folder: MainFolder):
         self.main_folder_list_copy.append(main_folder)
-        text = f"{os.path.basename(main_folder.paths[0])} ({main_folder.name})"
+        text = f"{os.path.basename(main_folder.curr_path)} ({main_folder.name})"
         item = SettingsListItem(self.left_menu, text=text)
         item.main_folder = main_folder
         self.left_menu.addItem(item)

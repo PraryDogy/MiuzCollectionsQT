@@ -442,7 +442,7 @@ class WinMain(UMainWindow):
     def reset_data_cmd(self, main_folder: MainFolder):
 
         def fin():
-            t = f"{os.path.basename(main_folder.paths[0])} ({main_folder.name})"
+            t = f"{os.path.basename(main_folder.curr_path)} ({main_folder.name})"
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
                 f"{t}: {Lng.data_was_reset[Cfg.lng].lower()}"
