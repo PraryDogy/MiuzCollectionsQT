@@ -1,4 +1,5 @@
 import gc
+import os
 from time import sleep
 
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
@@ -10,8 +11,8 @@ from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
 from .scaner_utils import (DbUpdater, DirsCompator, DirsLoader, DirsUpdater,
-                           HashdirUpdater, ImgCompator, ImgLoader, Inspector,
-                           MainFolderRemover, ImgRemover)
+                           HashdirUpdater, ImgCompator, ImgLoader, ImgRemover,
+                           Inspector, MainFolderRemover)
 
 
 class ScanerSigs(QObject):
@@ -42,7 +43,10 @@ class ScanerTask(URunnable):
                 gc.collect()
                 print("scaner finished", i.name)
             else:
-                self.send_text(f"\"{i.name}\": {Lng.no_connection[Cfg.lng].lower()}")
+                basename = os.path.basename(i.paths[0])
+                alias = i.name
+                no_conn = Lng.no_connection[Cfg.lng].lower()
+                self.send_text(f"{basename} ({alias}): {no_conn}")
                 sleep(5)
         try:
             self.send_text("")
@@ -82,8 +86,8 @@ class ScanerTask(URunnable):
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
         
-        print("new_dirs", new_dirs)
-        print("del_dirs", del_dirs)
+        # print("new_dirs", new_dirs)
+        # print("del_dirs", del_dirs)
 
         # например была удалена папка Collection 1, тогда все данные
         # в THUMBS и hadhdir будут удалены через ImgRemover
@@ -96,7 +100,7 @@ class ScanerTask(URunnable):
         finder_images = img_loader.finder_images()
         db_images = img_loader.db_images()
         if not self.task_state.should_run():
-            print(main_folder.name, "no finder images")
+            print(main_folder.name, "utils, new scaner, img_loader, сканирование прервано task state")
             return
 
         # сравниваем Finder и БД изображения
@@ -121,7 +125,7 @@ class ScanerTask(URunnable):
         db_updater.run()
 
         if not self.task_state.should_run():
-            self.sigs.reload_gui.emit()
+            print(main_folder.name, "utils, new scaner, db updater, сканирование прервано task state")
             return
 
         # обновляем информацию о директориях в БД
