@@ -1,34 +1,40 @@
-class WinSettings(QMainWindow):
-    left_side_width = 210
-    closed = pyqtSignal()
-    reset_data = pyqtSignal(MainFolder)
+from PyQt5.QtWidgets import QMainWindow, QLabel, QApplication, QWidget, QVBoxLayout
+from PyQt5.QtCore import Qt, QTimer
+import sys
 
-    def __init__(self, settings_item: SettingsItem):
+class MainWin(QMainWindow):
+    def __init__(self):
         super().__init__()
-        self.filters_copy: list[str] = copy.deepcopy(Filters.filters)
-        
 
-class FiltersWid(QWidget):
+        # Центральный виджет и layout
+        central = QWidget()
+        self.setCentralWidget(central)
+        self.layout = QVBoxLayout(central)
+        self.layout.addStretch()  # чтобы QLabel был снизу
 
-    def __init__(self, filters_copy: list[str]):
-        super().__init__()
-        self.filters_copy = filters_copy
+        # Статусная метка слева-снизу
+        self.status_label = QLabel("Статус")
+        self.status_label.setAlignment(Qt.AlignLeft)  # левое выравнивание
+        self.layout.addWidget(self.status_label, alignment=Qt.AlignLeft)
 
-        self.v_lay = UVBoxLayout()
-        self.v_lay.setSpacing(15)
-        self.setLayout(self.v_lay)
+        self.show()
 
-        group = QGroupBox()
-        g_lay = UVBoxLayout(group)
-        g_lay.setContentsMargins(0, 5, 0, 5)
-        g_lay.setSpacing(15)
+        # Список текстов для эмуляции изменения
+        self.texts = [f"Статус {i}" for i in range(0, 10000000000, 1000)]
+        self.index = 0
 
-        descr = QLabel(Lng.filters_descr[Cfg.lng])
-        descr.setWordWrap(True)
-        g_lay.addWidget(descr)
+        # Таймер для обновления текста каждые 10 мс
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_text)
+        self.timer.start(10)  # 10 мс ≈ 0.01 с
 
-        self.text_wid = UTextEdit()
-        self.text_wid.setFixedHeight(220)
-        self.text_wid.setPlaceholderText(Lng.filters[Cfg.lng])
-        self.text_wid.setPlainText("\n".join(self.filters_copy))
-        g_lay.addWidget(self.text_wid)
+    def update_text(self):
+        if self.index >= len(self.texts):
+            self.timer.stop()
+            return
+        self.status_label.setText(self.texts[self.index])
+        self.index += 1
+
+app = QApplication(sys.argv)
+win = MainWin()
+sys.exit(app.exec_())

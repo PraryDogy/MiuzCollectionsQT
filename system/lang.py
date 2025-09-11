@@ -225,7 +225,7 @@ class Lng:
     adding = ("Добавляю", "Add")
     deleting = ("Удаляю", "Deleting")
     search_in = ("Поиск в папке", "Search in folder")
-    updating_folder = ("Обновление папки", "Updating folder")
+    updating = ("Обновление", "Updating")
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
     show_about = ("Об авторе", "About")
