@@ -785,6 +785,10 @@ class WinSettings(SingleActionWindow):
                 self.new_folder.preset_new_folder(url)
                 self.settings_item.data = {self.settings_item.general: None}
         else:
+            # Находим в копии списка MainFolder объект с нужным псевдонимом,
+            # чтобы передать его в дочерний виджет MainFolderSettings.
+            # Изменения, внесённые в дочернем виджете, будут напрямую
+            # применяться к этому объекту в копии списка.
             item: SettingsListItem = self.left_menu.item(index)
             main_folder = next(
                 i
