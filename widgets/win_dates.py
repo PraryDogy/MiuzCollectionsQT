@@ -277,6 +277,10 @@ class WinDates(SingleActionWindow):
     def cancel_cmd(self, *args):
         self.dates_btn_normal.emit()
         self.deleteLater()
+        
+    def mouseReleaseEvent(self, a0):
+        self.setFocus()
+        return super().mouseReleaseEvent(a0)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
