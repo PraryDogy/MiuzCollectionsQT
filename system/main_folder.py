@@ -95,8 +95,11 @@ class MainFolder:
                 cls.current = cls.list_[0]
             else:
                 for main_folder in data:
-                    item = MainFolder(**main_folder)
-                    cls.list_.append(item)
+                    if main_folder["paths"]:
+                        item = MainFolder(**main_folder)
+                        cls.list_.append(item)
+                    else:
+                        print("папка не имеет путей")
             if len(cls.list_) == 0:
                 cls.list_ = cls.get_default_main_folders()
 
