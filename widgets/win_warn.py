@@ -55,7 +55,9 @@ class WinWarn(BaseWinWarn):
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.deleteLater)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-        
+
+        self.text_label.setMaximumWidth(370)
+        self.text_label.setWordWrap(True)
         self.adjustSize()
 
 
@@ -88,34 +90,10 @@ class WinQuestion(BaseWinWarn):
         self.adjustSize()
 
 
-class WinSmb(BaseWinWarn):
-    setup = pyqtSignal()
-
+class WinSmb(WinWarn):
     def __init__(self):
         super().__init__(
             Lng.attention[Cfg.lng],
             Lng.folder_access_error[Cfg.lng]
         )
-        
-        btn_wid = QWidget()
-        btn_lay = UHBoxLayout()
-        btn_lay.setSpacing(10)
-        btn_wid.setLayout(btn_lay)
-        self.central_layout.addWidget(btn_wid)
-        
-        btn_lay.addStretch()
-  
-        ok_btn = QPushButton(Lng.ok[Cfg.lng])
-        ok_btn.clicked.connect(self.deleteLater)
-        ok_btn.setFixedWidth(90)
-        btn_lay.addWidget(ok_btn)
-      
-        setup_btn = QPushButton(Lng.settings[Cfg.lng])
-        setup_btn.setFixedWidth(90)
-        btn_lay.addWidget(setup_btn)
-        
-        btn_lay.addStretch()
-        
-        self.text_label.setMaximumWidth(370)
-        self.text_label.setWordWrap(True)
-        self.adjustSize()
+                
