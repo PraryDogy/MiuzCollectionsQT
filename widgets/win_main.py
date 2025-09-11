@@ -344,10 +344,15 @@ class WinMain(UMainWindow):
             self.scaner_timer.start(1000)
         
     def set_window_title(self):
+        if MainFolder.current.curr_path:
+            true_name = os.path.basename(MainFolder.current.curr_path)
+        else:
+            true_name = os.path.basename(MainFolder.current.paths[0])
+        alias = MainFolder.current.name
         data = {
             Static.NAME_FAVS: Lng.favorites[Cfg.lng],
             Static.NAME_RECENTS: Lng.recents[Cfg.lng],
-            "": f"{os.path.basename(MainFolder.current.curr_path)} ({MainFolder.current.name})"
+            "": f"{true_name} ({alias})"
         }
         if Dynamic.current_dir in data:
             t = data.get(Dynamic.current_dir)
@@ -442,10 +447,14 @@ class WinMain(UMainWindow):
     def reset_data_cmd(self, main_folder: MainFolder):
 
         def fin():
-            t = f"{os.path.basename(main_folder.curr_path)} ({main_folder.name})"
+            if main_folder.curr_path:
+                true_name = os.path.basename(main_folder.curr_path)
+            else:
+                true_name = os.path.basename(main_folder.paths[0])
+            alias = main_folder.name
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
-                f"{t}: {Lng.data_was_reset[Cfg.lng].lower()}"
+                f"{true_name} ({alias}): {Lng.data_was_reset[Cfg.lng].lower()}"
             )
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()

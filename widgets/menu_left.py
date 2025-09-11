@@ -141,7 +141,11 @@ class MainFolderList(VListWidget):
         super().__init__(parent=parent)
 
         for i in MainFolder.list_:
-            text = f"{os.path.basename(i.curr_path)} ({i.name})"
+            if i.curr_path:
+                true_name = os.path.basename(i.curr_path)
+            else:
+                true_name = os.path.basename(i.paths[0])
+            text = f"{true_name} ({i.name})"
             item = MainFolerListItem(parent=self, text=text)
             item.main_folder = i
             self.addItem(item)

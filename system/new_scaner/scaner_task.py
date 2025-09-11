@@ -43,10 +43,13 @@ class ScanerTask(URunnable):
                 gc.collect()
                 print("scaner finished", i.name)
             else:
-                basename = os.path.basename(i.curr_path)
+                if i.curr_path:
+                    true_name = os.path.basename(i.curr_path)
+                else:
+                    true_name = os.path.basename(i.paths[0])
                 alias = i.name
                 no_conn = Lng.no_connection[Cfg.lng].lower()
-                self.send_text(f"{basename} ({alias}): {no_conn}")
+                self.send_text(f"{true_name} ({alias}): {no_conn}")
                 sleep(5)
         try:
             self.send_text("")

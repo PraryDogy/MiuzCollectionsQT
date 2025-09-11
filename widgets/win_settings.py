@@ -711,7 +711,12 @@ class WinSettings(SingleActionWindow):
         self.left_menu.addItem(spacer)
 
         for i in MainFolder.list_:
-            text = f"{os.path.basename(i.curr_path)} ({i.name})"
+            if i.curr_path:
+                true_name = os.path.basename(i.curr_path)
+            else:
+                true_name = os.path.basename(i.paths[0])
+            alias = i.name
+            text = f"{true_name} ({alias})"
             item = SettingsListItem(self.left_menu, text=text)
             item.main_folder = i
             self.left_menu.addItem(item)

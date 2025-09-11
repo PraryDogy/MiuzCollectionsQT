@@ -20,7 +20,10 @@ class DirsLoader(QObject):
         self.main_folder = main_folder
         self.main_folder_path = main_folder.curr_path
         self.task_state = task_state
-        self.basename = os.path.basename(main_folder.curr_path)
+        if main_folder.curr_path:
+            self.true_name = os.path.basename(main_folder.curr_path)
+        else:
+            self.true_name = os.path.basename(main_folder.paths[0])
         self.alias = main_folder.name
 
     def finder_dirs(self) -> list[tuple]:
@@ -32,7 +35,7 @@ class DirsLoader(QObject):
         stack = [self.main_folder_path]
         
         self.progress_text.emit(
-            f"{self.basename} ({self.alias}): {Lng.search_in[Cfg.lng].lower()}"
+            f"{self.true_name} ({self.alias}): {Lng.search_in[Cfg.lng].lower()}"
         )
 
         def iter_dir(entry: os.DirEntry):
@@ -156,7 +159,10 @@ class ImgLoader(QObject):
         self.main_folder = main_folder
         self.main_folder_path = main_folder.curr_path
         self.task_state = task_state
-        self.basename = os.path.basename(main_folder.curr_path)
+        if main_folder.curr_path:
+            self.true_name = os.path.basename(main_folder.curr_path)
+        else:
+            self.true_name = os.path.basename(main_folder.paths[0])
         self.alias = main_folder.name
 
     def finder_images(self) -> list[tuple]:
@@ -169,7 +175,7 @@ class ImgLoader(QObject):
         """
 
         self.progress_text.emit(
-            f"{self.basename} ({self.alias}): {Lng.search[Cfg.lng].lower()}"
+            f"{self.true_name} ({self.alias}): {Lng.search[Cfg.lng].lower()}"
         )
         finder_images = []
 
@@ -277,7 +283,10 @@ class HashdirUpdater(QObject):
         self.task_state = task_state
         self.main_folder = main_folder
         self.total = len(new_items) + len(del_items)
-        self.basename = os.path.basename(main_folder.curr_path)
+        if main_folder.curr_path:
+            self.true_name = os.path.basename(main_folder.curr_path)
+        else:
+            self.true_name = os.path.basename(main_folder.paths[0])
         self.alias = main_folder.name
 
     def run(self) -> tuple[list, list]:
@@ -314,7 +323,7 @@ class HashdirUpdater(QObject):
     
     def send_text(self):
         self.progress_text.emit(
-            f"{self.basename} ({self.alias}): {Lng.updating[Cfg.lng].lower()} ({self.total})"
+            f"{self.true_name} ({self.alias}): {Lng.updating[Cfg.lng].lower()} ({self.total})"
             )
 
     def create_thumb(self, img_path: str) -> ndarray | None:
