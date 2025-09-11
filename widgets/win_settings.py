@@ -850,36 +850,59 @@ class WinSettings(SingleActionWindow):
         self.init_right_side(index)
 
     def ok_cmd(self):
-        if self.need_reset:
+        """Handle OK button click based on its current mode."""
+        btn_text = self.ok_btn.text()
+
+        def reset_app():
+            """Remove app support directory and restart app."""
             shutil.rmtree(Static.APP_SUPPORT_DIR)
             QApplication.quit()
             MainUtils.start_new_app()
-            
-        elif self.ok_btn.text() in (Lng.save[Cfg.lng]):
-            Filters.filters = self.filters_copy
-            self.deleteLater()
 
-        elif self.ok_btn.text() in (Lng.restart[Cfg.lng]):
-            for i in self.main_folder_list:
-                if not i.paths:
+        def save_filters():
+            """Save filters to global list."""
+            Filters.filters = self.filters_copy
+
+        def validate_folders() -> bool:
+            """Check that all folders have paths, show warning if not."""
+            for folder in self.main_folder_list:
+                if not folder.paths:
                     self.win_warn = WinWarn(
                         Lng.attention[Cfg.lng],
-                        f"{Lng.select_folder_path[Cfg.lng]} \"{i.name}\""
-                        )
+                        f"{Lng.select_folder_path[Cfg.lng]} \"{folder.name}\""
+                    )
                     self.win_warn.center_to_parent(self.window())
                     self.win_warn.show()
-                    return
+                    return False
+            return True
+
+        def apply_changes_and_restart():
+            """Apply all changes and restart the application."""
             MainFolder.list_ = self.main_folder_list
             Filters.filters = self.filters_copy
-            for k, v in vars(self.json_data_copy).items():
-                setattr(Cfg, k, v)
+
+            for key, value in vars(self.json_data_copy).items():
+                setattr(Cfg, key, value)
+
             MainFolder.write_json_data()
             Cfg.write_json_data()
+
             QApplication.quit()
             MainUtils.start_new_app()
 
+        # --- Основная логика ---
+        if self.need_reset:
+            reset_app()
+        elif btn_text == Lng.save[Cfg.lng]:
+            save_filters()
+            self.deleteLater()
+        elif btn_text == Lng.restart[Cfg.lng]:
+            if not validate_folders():
+                return
+            apply_changes_and_restart()
         else:
             self.deleteLater()
+
 
     def deleteLater(self):
         self.closed.emit()
