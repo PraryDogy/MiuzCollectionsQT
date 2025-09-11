@@ -241,6 +241,7 @@ class Lng:
     reset_data = ("Сбросить данные", "Reset data")
     data_was_reset = ("Данные сброшены", "Data reset")
     setup = ("Настроить", "Setup")
+    preparing = ("Подготовка", "Preparing")
     save_new_folder = (
         "Сохраните и нажмите «Перезапуск», чтобы применить изменения.",
         "Save and press \"Restart\" to apply changes."

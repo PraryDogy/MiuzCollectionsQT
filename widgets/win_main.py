@@ -325,6 +325,8 @@ class WinMain(UMainWindow):
         Если задача уже завершена, активный таймер останавливается, и запускается короткий таймер на 1 секунду
         для немедленного запуска новой задачи сканирования.
         """
+        self.bar_bottom.progress_bar.setText(Lng.preparing[Cfg.lng])
+        
         if self.scaner_task is None:
             self.scaner_timer.stop()
             self.scaner_timer.start(1000)
