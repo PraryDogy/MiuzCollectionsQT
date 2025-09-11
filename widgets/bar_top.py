@@ -313,3 +313,7 @@ class BarTop(QWidget):
         self.h_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.adjustSize()
+
+    def mouseReleaseEvent(self, a0):
+        self.setFocus()
+        return super().mouseReleaseEvent(a0)
