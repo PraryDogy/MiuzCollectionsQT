@@ -27,6 +27,6 @@ class Filters:
             cls.filters.extend(cls.default)
 
     @classmethod
-    def write_file(cls):
+    def write_json_data(cls):
         with open(cls.filepath, "w", encoding="utf-8") as f:
             json.dump(cls.filters, f, indent=4, ensure_ascii=False)

@@ -362,7 +362,7 @@ class WinMain(UMainWindow):
 
     def on_exit(self):
         Cfg.write_json_data()
-        Filters.write_file()
+        Filters.write_json_data()
         MainFolder.write_json_data()
         os._exit(0)
 

@@ -681,7 +681,7 @@ class WinSettings(SingleActionWindow):
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng])
-        self.main_folder_list = copy.deepcopy(MainFolder.list_)
+        self.main_folder_list_copy = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
         self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = False
@@ -777,7 +777,7 @@ class WinSettings(SingleActionWindow):
             self.filters_wid.changed.connect(lambda: self.ok_btn.setText(Lng.save[Cfg.lng]))
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
-            self.new_folder = NewFolder(self.main_folder_list)
+            self.new_folder = NewFolder(self.main_folder_list_copy)
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
             if self.settings_item.new_folder in self.settings_item.data:
@@ -786,7 +786,11 @@ class WinSettings(SingleActionWindow):
                 self.settings_item.data = {self.settings_item.general: None}
         else:
             item: SettingsListItem = self.left_menu.item(index)
-            main_folder = item.main_folder
+            main_folder = next(
+                i
+                for i in self.main_folder_list_copy
+                if i.name == item.main_folder.name
+            )
             main_folder_sett = MainFolderSettings(main_folder)
             main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             main_folder_sett.remove.connect(lambda: self.remove_main_folder(item))
@@ -794,7 +798,7 @@ class WinSettings(SingleActionWindow):
             self.right_lay.insertWidget(0, main_folder_sett)
 
     def add_main_folder(self, main_folder: MainFolder):
-        self.main_folder_list.append(main_folder)
+        self.main_folder_list_copy.append(main_folder)
         text = f"{os.path.basename(main_folder.paths[0])} ({main_folder.name})"
         item = SettingsListItem(self.left_menu, text=text)
         item.main_folder = main_folder
@@ -808,9 +812,9 @@ class WinSettings(SingleActionWindow):
     def remove_main_folder(self, item: SettingsListItem):
 
         def fin():
-            for i in self.main_folder_list:
+            for i in self.main_folder_list_copy:
                 if i.name == item.main_folder.name:
-                    self.main_folder_list.remove(i)
+                    self.main_folder_list_copy.remove(i)
                     self.left_menu.takeItem(self.left_menu.currentRow())
                     self.left_menu.setCurrentRow(0)
                     self.clear_right_side()
@@ -819,7 +823,7 @@ class WinSettings(SingleActionWindow):
                     break
 
         try:
-            if len(self.main_folder_list) == 1:
+            if len(self.main_folder_list_copy) == 1:
                 self.win_warn = WinWarn(
                     Lng.attention[Cfg.lng],
                     Lng.at_least_one_folder_required[Cfg.lng],
@@ -862,10 +866,11 @@ class WinSettings(SingleActionWindow):
         def save_filters():
             """Save filters to global list."""
             Filters.filters = self.filters_copy
+            Filters.write_json_data()
 
         def validate_folders() -> bool:
             """Check that all folders have paths, show warning if not."""
-            for folder in self.main_folder_list:
+            for folder in self.main_folder_list_copy:
                 if not folder.paths:
                     self.win_warn = WinWarn(
                         Lng.attention[Cfg.lng],
@@ -878,13 +883,15 @@ class WinSettings(SingleActionWindow):
 
         def apply_changes_and_restart():
             """Apply all changes and restart the application."""
-            MainFolder.list_ = self.main_folder_list
+            
+            MainFolder.list_ = self.main_folder_list_copy
             Filters.filters = self.filters_copy
 
             for key, value in vars(self.json_data_copy).items():
                 setattr(Cfg, key, value)
 
             MainFolder.write_json_data()
+            Filters.write_json_data()
             Cfg.write_json_data()
 
             QApplication.quit()
