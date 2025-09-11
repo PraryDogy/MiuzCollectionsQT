@@ -85,6 +85,7 @@ class WinMain(UMainWindow):
         self.left_menu.clicked_.connect(lambda: self.set_window_title())
         self.left_menu.no_connection.connect(self.open_win_smb)
         self.left_menu.setup_main_folder.connect(self.open_settings)
+        self.left_menu.setup_new_folder.connect(self.open_settings)
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -155,8 +156,6 @@ class WinMain(UMainWindow):
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
             
-        QTimer.singleShot(300, self.open_win_smb)
-
     def save_files(self, data: tuple):
 
         def set_below_label(data: tuple[int, int], win: ProgressbarWin):

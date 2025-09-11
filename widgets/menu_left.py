@@ -135,6 +135,7 @@ class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(MainFolder)
     no_connection = pyqtSignal()
     setup_main_folder = pyqtSignal(MainFolder)
+    setup_new_folder = pyqtSignal()
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
@@ -174,23 +175,24 @@ class MainFolderList(VListWidget):
 
         return super().mouseReleaseEvent(e)
 
-
     def contextMenuEvent(self, a0):
-        item = self.itemAt(a0.pos())
-        if not item:
-            return
-
         menu = UMenu(a0)
-        open = QAction(Lng.open[Cfg.lng], menu)
-        open.triggered.connect(lambda: self.cmd("view", item))
-        menu.addAction(open)
-        reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-        reveal.triggered.connect(lambda: self.cmd("reveal", item))
-        menu.addAction(reveal)
-        menu.addSeparator()
-        setup = QAction(Lng.setup[Cfg.lng], menu)
-        setup.triggered.connect(lambda: self.setup_main_folder.emit(item.main_folder))
-        menu.addAction(setup)
+        item = self.itemAt(a0.pos())
+        if item:
+            open = QAction(Lng.open[Cfg.lng], menu)
+            open.triggered.connect(lambda: self.cmd("view", item))
+            menu.addAction(open)
+            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
+            reveal.triggered.connect(lambda: self.cmd("reveal", item))
+            menu.addAction(reveal)
+            menu.addSeparator()
+            setup = QAction(Lng.setup[Cfg.lng], menu)
+            setup.triggered.connect(lambda: self.setup_main_folder.emit(item.main_folder))
+            menu.addAction(setup)
+        else:
+            new_folder = QAction(Lng.new_folder[Cfg.lng], menu)
+            new_folder.triggered.connect(self.setup_new_folder.emit)
+            menu.addAction(new_folder)
         menu.show_umenu()
 
 
@@ -198,6 +200,7 @@ class MenuLeft(QTabWidget):
     clicked_ = pyqtSignal()
     no_connection = pyqtSignal()
     setup_main_folder = pyqtSignal(SettingsItem)
+    setup_new_folder = pyqtSignal(SettingsItem)
     
     def __init__(self):
         super().__init__()
@@ -228,6 +231,11 @@ class MenuLeft(QTabWidget):
             item = SettingsItem()
             item.data = {item.edit_folder: main_folder}
             self.setup_main_folder.emit(item)
+            
+        def setup_new_folder():
+            item = SettingsItem()
+            item.data = {item.new_folder: ""}
+            self.setup_new_folder.emit(item) 
         
         self.clear()
 
@@ -235,6 +243,7 @@ class MenuLeft(QTabWidget):
         main_folders.open_main_folder.connect(self.main_folder_clicked)
         main_folders.no_connection.connect(self.no_connection.emit)
         main_folders.setup_main_folder.connect(edit_main_folder)
+        main_folders.setup_new_folder.connect(setup_new_folder)
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
