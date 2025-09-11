@@ -513,7 +513,7 @@ class MainFolderRemover:
             rows = self.get_rows(i)
             self.remove_images(rows)
             self.remove_rows(rows)
-            self.remove_dirs(i)
+        self.remove_dirs()
         self.conn.close()
         
     def get_rows(self, main_folder_name: str):
@@ -551,8 +551,13 @@ class MainFolderRemover:
             self.conn.execute(q)
         self.conn.commit()
 
-    def remove_dirs(self, main_folder_name: str):
-        q = sqlalchemy.delete(DIRS)
-        q = q.where(DIRS.c.brand == main_folder_name)
-        self.conn.execute(q)
+    def remove_dirs(self):
+        q = sqlalchemy.select(DIRS.c.brand).distinct()
+        res = list(self.conn.execute(q).scalars())
+        alias_list = [i.name for i in MainFolder.list_]
+        for i in res:
+            if i not in alias_list:
+                q = sqlalchemy.delete(DIRS)
+                q = q.where(DIRS.c.brand == i)
+                self.conn.execute(q)
         self.conn.commit()
