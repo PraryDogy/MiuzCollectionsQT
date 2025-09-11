@@ -774,7 +774,7 @@ class WinSettings(SingleActionWindow):
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
             self.filters_wid = FiltersWid(self.filters_copy)
-            self.filters_wid.changed.connect(lambda: self.ok_btn.setText(Lng.save[Cfg.lng]))
+            self.filters_wid.changed.connect(self.on_filters_changed)
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
             self.new_folder = NewFolder(self.main_folder_list_copy)
@@ -846,6 +846,10 @@ class WinSettings(SingleActionWindow):
 
         except Exception as e:
             print("win settings > ошибка удаления main folder по кнопке удалить", e)
+            
+    def on_filters_changed(self):
+        if self.ok_btn.text() == Lng.ok[Cfg.lng]:
+            self.ok_btn.setText(Lng.save[Cfg.lng])
 
     def clear_right_side(self):
         wids = (GeneralSettings, MainFolderSettings, NewFolder, FiltersWid)
