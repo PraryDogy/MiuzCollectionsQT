@@ -28,8 +28,12 @@ class DirsLoader(QObject):
         """
         dirs = []
         stack = [self.main_folder_path]
+        
+        basename = os.path.basename(self.main_folder_path)
+        alias = self.main_folder.name
+
         self.progress_text.emit(
-            f"\"{self.main_folder.name}\": {Lng.search_in[Cfg.lng].lower()}"
+            f"{basename} ({alias}): {Lng.search_in[Cfg.lng].lower()}"
         )
 
         def iter_dir(entry: os.DirEntry):
