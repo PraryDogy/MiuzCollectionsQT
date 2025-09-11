@@ -5,8 +5,9 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
 from cfg import Cfg
 from system.lang import Lng
+from system.main_folder import MainFolder
 
-from ._base_widgets import UHBoxLayout, UVBoxLayout, SingleActionWindow
+from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
 
 
 class BaseWinWarn(SingleActionWindow):
@@ -38,8 +39,12 @@ class BaseWinWarn(SingleActionWindow):
         v_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         v_wid.setLayout(v_lay)
 
-        descr = QLabel(text)
-        v_lay.addWidget(descr)
+        self.text_label = QLabel(text)
+        v_lay.addWidget(self.text_label)
+
+    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
+            self.deleteLater()
 
 
 class WinWarn(BaseWinWarn):
@@ -52,10 +57,6 @@ class WinWarn(BaseWinWarn):
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
         self.adjustSize()
-
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-            self.deleteLater()
 
 
 class WinQuestion(BaseWinWarn):
@@ -86,6 +87,35 @@ class WinQuestion(BaseWinWarn):
         self.central_layout.addWidget(btn_wid)
         self.adjustSize()
 
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Escape, ):
-            self.deleteLater()
+
+class WinSmb(BaseWinWarn):
+    setup = pyqtSignal()
+
+    def __init__(self):
+        super().__init__(
+            Lng.attention[Cfg.lng],
+            Lng.folder_access_error[Cfg.lng]
+        )
+        
+        btn_wid = QWidget()
+        btn_lay = UHBoxLayout()
+        btn_lay.setSpacing(10)
+        btn_wid.setLayout(btn_lay)
+        self.central_layout.addWidget(btn_wid)
+        
+        btn_lay.addStretch()
+  
+        ok_btn = QPushButton(Lng.ok[Cfg.lng])
+        ok_btn.clicked.connect(self.deleteLater)
+        ok_btn.setFixedWidth(90)
+        btn_lay.addWidget(ok_btn)
+      
+        setup_btn = QPushButton(Lng.settings[Cfg.lng])
+        setup_btn.setFixedWidth(90)
+        btn_lay.addWidget(setup_btn)
+        
+        btn_lay.addStretch()
+        
+        self.text_label.setMaximumWidth(370)
+        self.text_label.setWordWrap(True)
+        self.adjustSize()

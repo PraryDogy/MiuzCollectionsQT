@@ -178,13 +178,18 @@ class Lng:
     favorites = ("Избранное", "Favorites")
     cancel = ("Отмена", "Cancel")
     no_connection = ("Нет подключения", "No connection")
-    no_connection_descr = (
-        "- Подключитесь к диску\
-        \n- Добавьте новый путь к папке с изображениями\
-        \nв настройках.",
-        "- Connect to disk\
-        \n- Add a new path to images folder\
-        \nin the settings."
+    folder_access_error = (
+        "Не удалось получить доступ к папке с изображениями.\n"
+        "Возможные причины:\n"
+        "- Диск не подключён\n"
+        "- Указанный путь недоступен\n\n"
+        "Решение: откройте настройки и добавьте новый путь к папке с изображениями.",
+        
+        "Unable to access the images folder.\n"
+        "Possible reasons:\n"
+        "- Disk is not connected\n"
+        "- The specified path is unavailable\n\n"
+        "Solution: open settings and add a new path to the images folder."
     )
     ok = ("Ок", "Ok")
     alias = ("Псевдоним", "Alias")

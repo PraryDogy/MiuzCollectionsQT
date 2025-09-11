@@ -27,8 +27,7 @@ from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
 from .win_upload import WinUpload
-from .win_warn import WinQuestion, WinWarn
-
+from .win_warn import WinQuestion, WinWarn, WinSmb
 
 class TestWid(QFrame):
     def __init__(self, parent=None):
@@ -155,6 +154,8 @@ class WinMain(UMainWindow):
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
+            
+        QTimer.singleShot(300, self.open_win_smb)
 
     def save_files(self, data: tuple):
 
@@ -232,10 +233,7 @@ class WinMain(UMainWindow):
             self.open_win_smb()
 
     def open_win_smb(self):
-        self.win_smb = WinWarn(
-            Lng.no_connection[Cfg.lng],
-            Lng.no_connection_descr[Cfg.lng]
-        )
+        self.win_smb = WinSmb()
         self.win_smb.center_to_parent(self.window())
         self.win_smb.show()
 
