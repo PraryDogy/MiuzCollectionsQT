@@ -470,6 +470,7 @@ class WinMain(UMainWindow):
             if new_files:
                 scan_dir = os.path.dirname(new_files[0])
                 update_task = ScanSingleDirTask(main_folder, scan_dir)
+                update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
                 update_task.sigs.finished_.connect(self.reload_gui)
                 UThreadPool.start(update_task)
 

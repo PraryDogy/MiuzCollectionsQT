@@ -580,6 +580,11 @@ class ScanSingleDirTask(URunnable):
         self.sigs = _ScanSingleDirSigs()
         self.main_folder = main_folder
         self.scan_dir = scan_dir
+        if main_folder.curr_path:
+            self.true_name = os.path.basename(main_folder.curr_path)
+        else:
+            self.true_name = os.path.basename(main_folder.paths[0])
+        self.alias = main_folder.name
         
     def task(self):
         rel_path = MainUtils.get_rel_path(self.main_folder.curr_path, self.scan_dir)
@@ -592,25 +597,21 @@ class ScanSingleDirTask(URunnable):
         db_images = img_loader.db_images()
         if not finder_images or not self.task_state.should_run():
             print(self.main_folder.name, "no finder images")
+            self.sigs.progress_text.emit("")
             return
                 
         img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
 
-        # обновление *имя папки* (*оставшееся число изображений*)
-        def hashdir_text(value: int):
-            self.sigs.progress_text.emit(
-                f"{Lng.search_in[Cfg.lng]} {self.main_folder.name} ({value})"
-            )
-
         hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
-        hashdir_updater.progress_text.connect(hashdir_text)
+        hashdir_updater.progress_text.connect(self.sigs.progress_text.emit)
         del_images, new_images = hashdir_updater.run()
 
         db_updater = DbUpdater(del_images, new_images, self.main_folder)
         db_updater.run()
 
         if not self.task_state.should_run():
+            self.sigs.progress_text.emit("")
             return
 
         del_dirs = new_dirs
