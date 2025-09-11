@@ -401,7 +401,7 @@ class ImgRemover:
                 os.remove(abs_path)
                 removed_images.append(id_)                
             except Exception as e:
-                print("system new scaner, utils, ImgRemover error remove img", e)
+                print("system new scaner, utils, ImgRemover error remove img, scaner continued", e)
                 continue
         return removed_images
 
