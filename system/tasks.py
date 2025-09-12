@@ -10,13 +10,12 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 from sqlalchemy import select, update
 
-from cfg import Dynamic, Cfg, Static
+from cfg import Cfg, Dynamic, Static
 
-from .database import THUMBS, Dbase, DIRS
+from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import MainFolder
-from .new_scaner.scaner_utils import (DbUpdater, DirsUpdater, HashdirUpdater,
-                                      ImgCompator, ImgLoader, ImgRemover)
+from .new_scaner.scaner_utils import ScanDirs
 from .utils import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
 
 
@@ -524,7 +523,7 @@ class _CustomScanerSigs(QObject):
 
 
 class CustomScanerTask(URunnable):
-    def __init__(self, main_folder: MainFolder, dirs: list[str]):
+    def __init__(self, main_folder: MainFolder, dirs_to_scan: list[str]):
         """
         Аналог полноценного сканера, но принимает список директорий
         и выполняет сканирование для каждой из них в пределах MainFolder.
@@ -533,54 +532,21 @@ class CustomScanerTask(URunnable):
         super().__init__()
         self.sigs = _CustomScanerSigs()
         self.main_folder = main_folder
-        self.dirs = dirs
-        if main_folder.curr_path:
-            self.true_name = os.path.basename(main_folder.curr_path)
-        else:
-            self.true_name = os.path.basename(main_folder.paths[0])
-        self.alias = main_folder.name
+        self.dirs_to_scan = dirs_to_scan
         
     def task(self):
-        stats = (
+        dirs_to_scan = (
             (i, int(os.stat(i).st_mtime))
-            for i in self.dirs
+            for i in self.dirs_to_scan
         )
-        new_dirs = [
+        dirs_to_scan = [
             (MainUtils.get_rel_path(self.main_folder.curr_path, abs_path), st_mtime)
-            for abs_path, st_mtime in stats
+            for abs_path, st_mtime in dirs_to_scan
         ]
-
-        img_loader = ImgLoader(new_dirs, self.main_folder, self.task_state)
-        img_loader.progress_text.connect(self.sigs.progress_text.emit)
-        finder_images = img_loader.finder_images()
-        db_images = img_loader.db_images()
-        if not finder_images or not self.task_state.should_run():
-            print(self.main_folder.name, "no finder images")
-            self.sigs.progress_text.emit("")
-            return
-                        
-        img_compator = ImgCompator(finder_images, db_images)
-        del_images, new_images = img_compator.run()
-
-        print(del_images, new_images)
-
-        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
-        hashdir_updater.progress_text.connect(self.sigs.progress_text.emit)
-        del_images, new_images = hashdir_updater.run()
-
-        db_updater = DbUpdater(del_images, new_images, self.main_folder)
-        db_updater.run()
-
-        if not self.task_state.should_run():
-            self.sigs.progress_text.emit("")
-            return
-
-        del_dirs = new_dirs
-        dirs_updater = DirsUpdater(self.main_folder, del_dirs, new_dirs)
-        dirs_updater.run()
         
-        # скрываем текст
-        self.sigs.progress_text.emit("")
+        scan_dirs = ScanDirs(dirs_to_scan, self.main_folder, self.task_state)
+        scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
+        del_images, new_images = scan_dirs.run()
 
         if new_images or del_images:
             self.sigs.finished_.emit()

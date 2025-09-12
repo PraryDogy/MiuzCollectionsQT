@@ -114,15 +114,13 @@ class DirsCompator:
 
 
 class DirsUpdater:
-    def __init__(self, main_folder: MainFolder, del_dirs, new_dirs):
+    def __init__(self, main_folder: MainFolder, dirs_to_scan: list[str]):
         """
-        - del_dirs: [(rel_dir_path, mod_time), ...]
-        - new_dirs: [(rel_dir_path, mod_time), ...]
+        - dirs_to_scan: [(rel_dir_path, mod_time), ...]
         """
         super().__init__()
         self.main_folder = main_folder
-        self.del_dirs = del_dirs
-        self.new_dirs = new_dirs
+        self.dirs_to_scan = dirs_to_scan
         self.conn = Dbase.engine.connect()
         
     def run(self):
@@ -131,7 +129,7 @@ class DirsUpdater:
         self.conn.close()
 
     def remove_db_dirs(self):
-        for rel_dir_path, mod in self.del_dirs:
+        for rel_dir_path, mod in self.dirs_to_scan:
             q = sqlalchemy.delete(DIRS)
             q = q.where(DIRS.c.short_src == rel_dir_path)
             q = q.where(DIRS.c.brand == self.main_folder.name)
@@ -139,7 +137,7 @@ class DirsUpdater:
         self.conn.commit()
 
     def add_new_dirs(self):
-        for short_src, mod in self.new_dirs:
+        for short_src, mod in self.dirs_to_scan:
             values = {
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.MOD: mod,
@@ -354,58 +352,6 @@ class HashdirUpdater(QObject):
         return new_new_items
 
 
-class ImgRemover:
-    def __init__(self, del_dirs: list, main_folder: MainFolder):
-        """
-        - del_dirs: [(rel_dir_path, mod_time), ...]
-        """
-        super().__init__()
-        self.del_dirs = del_dirs
-        self.main_folder = main_folder
-
-    def run(self):
-        rel_paths = self.get_rel_paths()
-        confirmed_images = self.remove_images(rel_paths)
-        self.remove_db(confirmed_images)
-
-    def remove_db(self, confirmed_images: list[int]):
-        conn = Dbase.engine.connect()
-        for id_ in confirmed_images:
-            q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.id == id_)
-            conn.execute(q)
-        conn.commit()
-        conn.close()
-
-    def get_rel_paths(self):
-        conn = Dbase.engine.connect()
-        rel_paths = []
-        for rel_dir_path, mod in self.del_dirs:
-            q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash)
-            q = q.where(THUMBS.c.brand == self.main_folder.name)
-            if rel_dir_path == "/":
-                q = q.where(THUMBS.c.short_src.ilike("/%"))
-                q = q.where(THUMBS.c.short_src.not_ilike("/%/%"))
-            else:
-                q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
-                q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
-            rel_paths.extend(conn.execute(q).fetchall())
-        conn.close()
-        return rel_paths
-
-    def remove_images(self, rel_paths: list[int, str]):
-        removed_images: list[int] = []
-        for id_, rel_path in rel_paths:
-            abs_path = ThumbUtils.get_thumb_path(rel_path)
-            try:
-                os.remove(abs_path)
-                removed_images.append(id_)                
-            except Exception as e:
-                print("system new scaner, utils, ImgRemover error remove img, scaner continued", e)
-                continue
-        return removed_images
-
-
 class DbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
@@ -455,35 +401,6 @@ class DbUpdater:
             stmt = sqlalchemy.insert(THUMBS).values(**values) 
             self.conn.execute(stmt)
         self.conn.commit()
-
-
-class Inspector:
-    def __init__(self, del_items: list, main_folder: MainFolder):
-        """
-        del_items: [rel thumb path, ...]
-
-        Этот класс выполняет проверку безопасности перед удалением данных.
-        Метод is_remove_all() инициирует сравнение между количеством записей
-        в БД и количеством удаляемых миниатюр, связанных с MainFolder.
-
-        Если количество удаляемых элементов совпадает с количеством записей в базе,
-        это может свидетельствовать о потенциальной ошибке в логике сканера,
-        приводящей к попытке удалить все данные, связанные с MainFolder.
-        В таком случае, операция считается подозрительной и может быть заблокирована
-        как мера предосторожности.
-        """
-        super().__init__()
-        self.del_items = del_items
-        self.main_folder = main_folder
-        self.conn = Dbase.engine.connect()
-    
-    def is_remove_all(self):
-        q = sqlalchemy.select(sqlalchemy.func.count())
-        q = q.where(THUMBS.c.brand == self.main_folder.name)
-        result = self.conn.execute(q).scalar()
-        if len(self.del_items) == result and len(self.del_items) != 0:
-            return True
-        return None
 
 
 class MainFolderRemover:
@@ -591,18 +508,17 @@ class ScanDirs(QObject):
         hashdir_updater.progress_text.connect(self.progress_text.emit)
         del_images, new_images = hashdir_updater.run()
 
-        # обновляем БД
-        db_updater = DbUpdater(del_images, new_images, self.main_folder)
-        db_updater.run()
-
         if not self.task_state.should_run():
             print(self.main_folder.name, "new scaner utils, ScanDirs, db updater, сканирование прервано task state")
             return
 
-        # мы приравниваем del dirs к dirs to scan, чтобы можно было удалить
-        # старую информацию о директориях и добавить новую
-        # по сути это аналог sqlalchemy.update, но delete + insert
-        dirs_updater = DirsUpdater(self.main_folder, self.dirs_to_scan, self.dirs_to_scan)
+        # обновляем БД
+        db_updater = DbUpdater(del_images, new_images, self.main_folder)
+        db_updater.run()
+
+        dirs_updater = DirsUpdater(self.main_folder, self.dirs_to_scan)
         dirs_updater.run()
 
         self.progress_text.emit("")
+
+        return (del_images, new_images)

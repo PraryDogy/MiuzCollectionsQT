@@ -2,17 +2,14 @@ import gc
 import os
 from time import sleep
 
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import Cfg
 
-from ..database import Dbase
 from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
-from .scaner_utils import (DbUpdater, DirsCompator, DirsLoader, DirsUpdater,
-                           HashdirUpdater, ImgCompator, ImgLoader, ImgRemover,
-                           Inspector, MainFolderRemover, ScanDirs)
+from .scaner_utils import DirsCompator, DirsLoader, MainFolderRemover, ScanDirs
 
 
 class ScanerSigs(QObject):
@@ -91,17 +88,6 @@ class ScanerTask(URunnable):
         
         print(del_dirs, new_dirs)
 
-        # ВРЕДИТЕЛЬ
-        # например была удалена папка Collection 1, тогда все данные
-        # в THUMBS и hadhdir будут удалены через ImgRemover
-        # img_remover = ImgRemover(del_dirs, main_folder)
-        # img_remover.run()
-
-        # ищем изображения в новых (обновленных) директориях
-        img_loader = ImgLoader(new_dirs, main_folder, self.task_state)
-        img_loader.progress_text.connect(self.send_text)
-        finder_images = img_loader.finder_images()
-        db_images = img_loader.db_images()
         if not self.task_state.should_run():
             print(main_folder.name, "utils, new scaner, img_loader, сканирование прервано task state")
             return
@@ -111,3 +97,7 @@ class ScanerTask(URunnable):
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
             scan_dirs.run()
             self.sigs.reload_gui.emit()
+        if del_dirs:
+            ...
+            print("удалить директории")
+            # удалить все связанное с директорией в DIRS, THUMBS и hashdir
