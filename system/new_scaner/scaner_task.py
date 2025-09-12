@@ -92,10 +92,12 @@ class ScanerTask(URunnable):
         # print("new_dirs", new_dirs)
         # print("del_dirs", del_dirs)
 
+
+        # ВРЕДИТЕЛЬ
         # например была удалена папка Collection 1, тогда все данные
         # в THUMBS и hadhdir будут удалены через ImgRemover
-        img_remover = ImgRemover(del_dirs, main_folder)
-        img_remover.run()
+        # img_remover = ImgRemover(del_dirs, main_folder)
+        # img_remover.run()
 
         # ищем изображения в новых (обновленных) директориях
         img_loader = ImgLoader(new_dirs, main_folder, self.task_state)
@@ -109,6 +111,10 @@ class ScanerTask(URunnable):
         # сравниваем Finder и БД изображения
         img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
+        
+        # print(len(del_images))
+        # print(len(new_images))
+        # print()
 
         # запрещаем удалять сразу все изображения относящиеся к папке
         inspector = Inspector(del_images, main_folder)
