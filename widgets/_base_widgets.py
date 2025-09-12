@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsDropShadowEffect,
 
 from cfg import Cfg, Static
 from system.lang import Lng
+from system.main_folder import MainFolder
 from system.utils import MainUtils
 
 
@@ -372,3 +373,13 @@ class SettingsItem:
         self.new_folder = "new_folder"
         self.edit_folder = "edit_folder"
         self.data = {}
+
+
+class ClipBoardItem:
+    type_cut = "cut"
+    type_copy = "copy"
+    
+    def __init__(self):
+        self.action_type: str
+        self.src_main_folder: MainFolder
+        self.rel_img_paths: list[str]

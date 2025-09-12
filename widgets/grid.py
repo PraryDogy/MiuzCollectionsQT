@@ -926,14 +926,14 @@ class Grid(VScrollArea):
 
             # собираем пути выбранных изображений
             main_folder_path = MainFolder.current.get_curr_path()
-            img_path_list = []
+            img_paths = []
             if main_folder_path:
-                img_path_list = [
+                img_paths = [
                     MainUtils.get_abs_path(main_folder_path, wid.rel_img_path)
                     for wid in self.selected_widgets
                 ]
 
-            if not img_path_list:
+            if not img_paths:
                 return self.no_connection.emit()
 
             # создаём объект перетаскивания
@@ -946,7 +946,7 @@ class Grid(VScrollArea):
             drag.setPixmap(drag_icon)
 
             # назначаем urls
-            mime_data.setUrls([QUrl.fromLocalFile(p) for p in img_path_list])
+            mime_data.setUrls([QUrl.fromLocalFile(p) for p in img_paths])
             drag.exec_(Qt.DropAction.CopyAction)
 
         # --- Основная логика ---

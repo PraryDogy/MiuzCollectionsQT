@@ -65,6 +65,6 @@ class RemoveFiles(QAction):
 
 
 class MoveFiles(QAction):
-    def __init__(self, parent: QMenu, rel_img_path_list: list[str]):
-        text = f"{Lng.move[Cfg.lng]} ({len(rel_img_path_list)})"
+    def __init__(self, parent: QMenu, rel_img_paths: list[str]):
+        text = f"{Lng.move[Cfg.lng]} ({len(rel_img_paths)})"
         super().__init__(text=text, parent=parent)

@@ -197,7 +197,7 @@ class WinImageView(AppModalWindow):
         self.cached_images: dict[str, QPixmap] = {}
         self.is_selection = is_selection
         self.path_to_wid = path_to_wid
-        self.rel_img_path_list = list(path_to_wid.keys())
+        self.rel_img_paths = list(path_to_wid.keys())
         self.rel_img_path = rel_img_path
         self.wid = path_to_wid.get(self.rel_img_path)
         self.task_count = 0
@@ -300,19 +300,19 @@ class WinImageView(AppModalWindow):
             return
 
         # мы формируем актуальный список src из актуальной сетки изображений
-        self.rel_img_path_list = list(self.path_to_wid.keys())
+        self.rel_img_paths = list(self.path_to_wid.keys())
 
-        if self.rel_img_path in self.rel_img_path_list:
-            current_index = self.rel_img_path_list.index(self.rel_img_path)
+        if self.rel_img_path in self.rel_img_paths:
+            current_index = self.rel_img_paths.index(self.rel_img_path)
             new_index = current_index + offset
         else:
             new_index = 0
 
-        if new_index == len(self.rel_img_path_list):
+        if new_index == len(self.rel_img_paths):
             new_index = 0
 
         elif new_index < 0:
-            new_index = len(self.rel_img_path_list) - 1
+            new_index = len(self.rel_img_paths) - 1
 
         # 
         # сетка = Thumbnail.path_to_wid = сетка thumbnails
@@ -322,7 +322,7 @@ class WinImageView(AppModalWindow):
         # так как мы сохранили список src сетки, то новый src будет найден
         # но не факт, что он уже есть в сетке
         try:
-            rel_img_path = self.rel_img_path_list[new_index]
+            rel_img_path = self.rel_img_paths[new_index]
         except IndexError as e:
             print(e)
             return
@@ -336,7 +336,7 @@ class WinImageView(AppModalWindow):
         # берем первый src из этого списка
         # и первый виджет из сетки
         if not new_wid:
-            self.rel_img_path = self.rel_img_path_list[0]
+            self.rel_img_path = self.rel_img_paths[0]
             self.wid = self.path_to_wid.get(self.rel_img_path)
 
         # если виджет найден, тоне факт, что список src актуален
@@ -407,11 +407,11 @@ class WinImageView(AppModalWindow):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
         self.menu_ = UMenu(event=ev)
-        rel_img_path_list = [self.rel_img_path]
+        rel_img_paths = [self.rel_img_path]
 
         info = WinInfoAction(self.menu_)
         info.triggered.connect(
-            lambda: self.open_win_info.emit(rel_img_path_list)
+            lambda: self.open_win_info.emit(rel_img_paths)
         )
         self.menu_.addAction(info)
 
@@ -427,26 +427,26 @@ class WinImageView(AppModalWindow):
 
         copy_path = CopyPath(self.menu_, 1)
         copy_path.triggered.connect(
-            lambda: self.copy_path.emit(rel_img_path_list)
+            lambda: self.copy_path.emit(rel_img_paths)
         )
         self.menu_.addAction(copy_path)
 
         copy_name = CopyName(self.menu_, 1)
         copy_name.triggered.connect(
-            lambda: self.copy_name.emit(rel_img_path_list)
+            lambda: self.copy_name.emit(rel_img_paths)
         )
         self.menu_.addAction(copy_name)
 
         reveal = RevealInFinder(self.menu_, 1)
         reveal.triggered.connect(
-            lambda: self.reveal_in_finder.emit(rel_img_path_list)
+            lambda: self.reveal_in_finder.emit(rel_img_paths)
         )
         self.menu_.addAction(reveal)
 
         save = Save(self.menu_, 1)
         save.triggered.connect(
             lambda: self.save_files.emit(
-                (os.path.expanduser("~/Downloads"), rel_img_path_list)
+                (os.path.expanduser("~/Downloads"), rel_img_paths)
             )
         )
         self.menu_.addAction(save)
@@ -454,7 +454,7 @@ class WinImageView(AppModalWindow):
         save_as = SaveAs(self.menu_, 1)
         save_as.triggered.connect(
             lambda: self.save_files.emit(
-                (None, rel_img_path_list)
+                (None, rel_img_paths)
             )
         )
         self.menu_.addAction(save_as)

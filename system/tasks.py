@@ -297,32 +297,32 @@ class OneFileInfoTask(URunnable):
 
 class MultiFileInfoTask(URunnable):
     max_row = 50
-    def __init__(self, img_path_list: list[str]):
+    def __init__(self, img_paths: list[str]):
         super().__init__()
-        self.img_path_list = img_path_list
+        self.img_paths = img_paths
         self.sigs = _OneFileInfoSigs()
     
     def task(self):
         names = [
             os.path.basename(i)
-            for i in self.img_path_list
+            for i in self.img_paths
         ]
         names = names[:10]
         names = ", ".join(names)
         names = self.lined_text(names)
-        if len(self.img_path_list) > 10:
+        if len(self.img_paths) > 10:
             names = names + ", ..."
 
         res = {
             Lng.file_name[Cfg.lng]: names,
-            Lng.total[Cfg.lng]: str(len(self.img_path_list)),
+            Lng.total[Cfg.lng]: str(len(self.img_paths)),
             Lng.file_size[Cfg.lng]: self.get_total_size()
         }
         self.sigs.finished_.emit(res)
 
     def get_total_size(self):
         total = 0
-        for i in self.img_path_list:
+        for i in self.img_paths:
             stats = os.stat(i)
             size_ = stats.st_size
             total += size_
@@ -342,26 +342,22 @@ class MultiFileInfoTask(URunnable):
 
 class _RmFilesSigs(QObject):
     finished_ = pyqtSignal()
-    reload_gui = pyqtSignal()
 
 
 class RmFilesTask(URunnable):
 
-    def __init__(self, img_path_list: list[str], main_folder: MainFolder):
+    def __init__(self, img_paths: list[str]):
         """
         Удаляет изображения.
-        Удаляет миниатюры из hashdir, удаляет записи об изображениях из бд.   
         Запуск: UThreadPool.start   
-        Сигналы: finished_(), progress_text(str), reload_gui()
+        Сигналы: finished_()
         """
         super().__init__()
         self.sigs = _RmFilesSigs()
-        self.img_path_list = img_path_list
-        self.main_folder = main_folder
+        self.img_paths = img_paths
 
     def task(self):
         self.remove_files()
-        self.sigs.reload_gui.emit()
         self.sigs.finished_.emit()
 
     def remove_files(self):
@@ -370,7 +366,7 @@ class RmFilesTask(URunnable):
         Возвращает список успешно удаленных файлов.
         """
         files: list = []
-        for i in self.img_path_list:
+        for i in self.img_paths:
             try:
                 os.remove(i)
                 files.append(i)
@@ -378,38 +374,6 @@ class RmFilesTask(URunnable):
                 print("system, tasks, rm files task error", e)
         return files
 
-    def remove_thumbs(self):
-        """
-        Удаляет из hashdir и из базы данных.
-        """      
-        thumb_path_list = [
-            ThumbUtils.create_thumb_path(img_path)
-            for img_path in self.img_path_list
-        ]
-        rel_thumb_path_list = [
-            ThumbUtils.get_rel_thumb_path(thumb_path)
-            for thumb_path in thumb_path_list
-        ]
-        
-        # new_items пустой так как мы только удаляем thumbs из hashdir
-        file_updater = HashdirUpdater(rel_thumb_path_list, [], self.task_state, self.main_folder)
-        del_items, new_items = file_updater.run()
-        
-        # new_items пустой так как мы только удаляем thumbs из бд
-        db_updater = DbUpdater(del_items, [], MainFolder.current)
-        db_updater.run()
-
-        # [(rel dir path, mod time), ...]
-        worker_dirs = [
-            (
-                MainUtils.get_rel_path(MainFolder.current.curr_path, os.path.dirname(i)),
-                os.stat(os.path.dirname(i)).st_mtime
-            )
-            for i in self.img_path_list
-        ]
-
-        dirs_updater = DirsUpdater(self.main_folder, worker_dirs, worker_dirs)
-        dirs_updater.run()
 
 class LoadDbImagesItem:
     __slots__ = ["qimage", "rel_img_path", "coll_name", "fav", "f_mod"]

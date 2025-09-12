@@ -333,8 +333,8 @@ class MainUtils:
         return QApplication.clipboard().text()
         
     @classmethod
-    def reveal_files(cls, img_path_list: list[str]):
-        command = ["osascript", REVEAL_SCPT] + img_path_list
+    def reveal_files(cls, img_paths: list[str]):
+        command = ["osascript", REVEAL_SCPT] + img_paths
         subprocess.Popen(
             command,
             stdout=subprocess.DEVNULL,
