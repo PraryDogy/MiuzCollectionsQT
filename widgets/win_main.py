@@ -69,6 +69,7 @@ class WinMain(UMainWindow):
         self.setMenuBar(BarMacos())
         
         self.win_image_view: WinImageView = None
+        self.clipboard: dict[str, list[str]] = {}
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -235,6 +236,12 @@ class WinMain(UMainWindow):
         self.win_smb = WinSmb()
         self.win_smb.center_to_parent(self.window())
         self.win_smb.show()
+        
+    def set_clipboard(self, data: dict[str, list[str]]):
+        self.clipboard = data
+    
+    def paste_files(self):
+        ...
 
     def open_img_view(self):
         if len(self.grid.selected_widgets) == 1:

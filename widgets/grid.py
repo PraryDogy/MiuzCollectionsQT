@@ -7,8 +7,8 @@ from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
 from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
                          QMouseEvent, QPalette, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
-                             QGraphicsDropShadowEffect, QGridLayout, QLabel,
-                             QRubberBand, QWidget)
+                             QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
+                             QGridLayout, QLabel, QRubberBand, QWidget)
 
 from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
@@ -17,9 +17,9 @@ from system.tasks import LoadDbImagesItem, LoadDbImagesTask
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
-from .actions import (CopyName, CopyPath, MoveFiles, OpenInView,
-                      RemoveFiles, RevealInFinder, Save, SaveAs, ScanerRestart,
-                      SetFav, WinInfoAction)
+from .actions import (CopyName, CopyPath, MoveFiles, OpenInView, RemoveFiles,
+                      RevealInFinder, Save, SaveAs, ScanerRestart, SetFav,
+                      WinInfoAction)
 
 
 class FilenameWid(QLabel):
@@ -238,6 +238,11 @@ class Thumbnail(QFrame):
         """Снимает рамку и фон для миниатюры."""
         self.img_wid.setStyleSheet(self.IMG_NO_FRAME_STYLE)
         self.text_wid.setStyleSheet(self.TEXT_NO_FRAME_STYLE)
+
+    def set_transparent_frame(self, value: float):
+        effect = QGraphicsOpacityEffect(self)
+        effect.setOpacity(value)
+        self.setGraphicsEffect(effect)
 
     def set_fav(self, value: int):
         """Добавляет или удаляет миниатюру из избранного и обновляет текст."""
