@@ -86,7 +86,7 @@ class ScanerTask(URunnable):
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
         
-        print(del_dirs, new_dirs)
+        # print(del_dirs, new_dirs)
 
         if not self.task_state.should_run():
             print(main_folder.name, "utils, new scaner, img_loader, сканирование прервано task state")

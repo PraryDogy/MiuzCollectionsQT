@@ -435,11 +435,10 @@ class _ImgHashdirUpdater(QObject):
 
 
 class _ImgDbUpdater:
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
+    def __init__(self, del_images: list, new_images: list, main_folder: MainFolder):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
-        Сигналы: reload_gui()
 
         Принимает:  
         - del_items: [rel_thumb_path, ...]       
@@ -447,8 +446,8 @@ class _ImgDbUpdater:
         """
         super().__init__()
         self.main_folder = main_folder
-        self.del_items = del_items
-        self.new_items = new_items
+        self.del_images = del_images
+        self.new_images = new_images
         self.conn = Dbase.engine.connect()
 
     def run(self):
@@ -456,7 +455,7 @@ class _ImgDbUpdater:
         self.run_new_items()
 
     def run_del_items(self):
-        for rel_thumb_path in self.del_items:
+        for rel_thumb_path in self.del_images:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
             q = q.where(THUMBS.c.brand==self.main_folder.name)
@@ -464,7 +463,7 @@ class _ImgDbUpdater:
         self.conn.commit()
 
     def run_new_items(self):
-        for img_path, size, birth, mod in self.new_items:
+        for img_path, size, birth, mod in self.new_images:
             small_img_path = ThumbUtils.create_thumb_path(img_path)
             short_img_path = MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
             rel_thumb_path = ThumbUtils.get_rel_thumb_path(small_img_path)
@@ -497,7 +496,7 @@ class ScanDirs(QObject):
     
     def run(self):
         img_loader = _ImgLoader(self.dirs_to_scan, self.main_folder, self.task_state)
-        img_loader.progress_text.connect(self.send_text)
+        img_loader.progress_text.connect(self.progress_text.emit)
         finder_images = img_loader.finder_images()
         db_images = img_loader.db_images()
         if not self.task_state.should_run():
@@ -507,6 +506,8 @@ class ScanDirs(QObject):
         # сравниваем Finder и БД изображения
         img_compator = _ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
+        
+        print(del_images, new_images)
 
         # создаем / обновляем изображения в hashdir
         hashdir_updater = _ImgHashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
