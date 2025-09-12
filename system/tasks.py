@@ -542,13 +542,14 @@ class CustomScanerTask(URunnable):
         
     def task(self):
         stats = (
-            (i, os.stat(i).st_mtime)
+            (i, int(os.stat(i).st_mtime))
             for i in self.dirs
         )
-        new_dirs = (
+        new_dirs = [
             (MainUtils.get_rel_path(self.main_folder.curr_path, abs_path), st_mtime)
             for abs_path, st_mtime in stats
-        )
+        ]
+
         img_loader = ImgLoader(new_dirs, self.main_folder, self.task_state)
         img_loader.progress_text.connect(self.sigs.progress_text.emit)
         finder_images = img_loader.finder_images()
@@ -557,11 +558,14 @@ class CustomScanerTask(URunnable):
             print(self.main_folder.name, "no finder images")
             self.sigs.progress_text.emit("")
             return
-                
+                        
         img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
 
-        print(len(del_images), len(new_images), "custom scaner", "\n")
+        # print(len(del_images), len(new_images), "custom scaner", "\n")
+        # print(del_images)
+        # print(new_images)
+        # return
 
         hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
         hashdir_updater.progress_text.connect(self.sigs.progress_text.emit)

@@ -468,11 +468,15 @@ class WinMain(UMainWindow):
 
     def paste_files_here(self):
 
-        def scan_dirs(item: ClipBoardItem):
+        def scan_dirs(files_copied: list[str], item: ClipBoardItem):
+            if not files_copied:
+                print("ни один файл не был скопирован")
+                return
             if item.action_type == item.type_cut:
                 ...
             else:
-                # self.restart_scaner_task()
+                self.restart_scaner_task()
+                return
                 dirs = [item.target_dir, ]
                 update_task = CustomScanerTask(item.target_main_folder, dirs)
                 update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
@@ -496,7 +500,7 @@ class WinMain(UMainWindow):
                     lambda files_copied: remove_files(item, files_copied)
             )
             else:
-                copy_task.sigs.finished_.connect(lambda _: scan_dirs(item))
+                copy_task.sigs.finished_.connect(lambda files_copied: scan_dirs(files_copied, item))
             UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.get_curr_path()
