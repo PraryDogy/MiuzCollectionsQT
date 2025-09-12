@@ -12,6 +12,85 @@ from system.main_folder import MainFolder
 from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
 
+
+
+class MainFolderRemover:
+
+    def __init__(self):
+        """
+        Запуск: run()   
+        Сигналы: progress_text(str)
+
+        Сверяет список экземпляров класса MainFolder в бд (THUMBS.c.brand)     
+        со списком MainFolder в приложении.     
+        Удаляет весь контент MainFolder, если MainFolder больще нет в бд:   
+        - изображения thumbs из hashdir в ApplicationSupport    
+        - записи в базе данных
+
+        Вызови run для работы
+        """
+        super().__init__()
+        self.conn = Dbase.engine.connect()
+
+    def run(self):
+        q = sqlalchemy.select(THUMBS.c.brand).distinct()
+        db_main_folders = self.conn.execute(q).scalars().all()
+        app_main_folders = [i.name for i in MainFolder.list_]
+        del_main_folders = [i for i in db_main_folders if i not in app_main_folders]
+        for i in del_main_folders:
+            rows = self.get_rows(i)
+            self.remove_images(rows)
+            self.remove_rows(rows)
+        self.remove_dirs()
+        self.conn.close()
+        
+    def get_rows(self, main_folder_name: str):
+        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
+        q = q.where(THUMBS.c.brand == main_folder_name)
+        res = self.conn.execute(q).fetchall()
+        res = [
+            (id_, ThumbUtils.get_thumb_path(rel_thumb_path))
+            for id_, rel_thumb_path in res
+        ]
+        return res
+
+    def remove_images(self, rows: list):
+        """
+        rows: [(row id int, thumb path), ...]
+        """
+        for id_, image_path in rows:
+            try:
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+                folder = os.path.dirname(image_path)
+                if os.path.exists(folder) and not os.listdir(folder):
+                    os.rmdir(folder)
+            except Exception as e:
+                print("new scaner utils, MainFolderRemover,  remove images error", e)
+                continue
+
+    def remove_rows(self, rows: list):
+        """
+        rows: [(row id int, thumb path), ...]
+        """
+        for id_, thumb_path in rows:
+            q = sqlalchemy.delete(THUMBS)
+            q = q.where(THUMBS.c.id == id_)
+            self.conn.execute(q)
+        self.conn.commit()
+
+    def remove_dirs(self):
+        q = sqlalchemy.select(DIRS.c.brand).distinct()
+        res = list(self.conn.execute(q).scalars())
+        alias_list = [i.name for i in MainFolder.list_]
+        for i in res:
+            if i not in alias_list:
+                q = sqlalchemy.delete(DIRS)
+                q = q.where(DIRS.c.brand == i)
+                self.conn.execute(q)
+        self.conn.commit()
+        
+
 class DirsLoader(QObject):
     progress_text = pyqtSignal(str)
 
@@ -113,7 +192,7 @@ class DirsCompator:
         ]
 
 
-class DirsUpdater:
+class _DirsUpdater:
     def __init__(self, main_folder: MainFolder, dirs_to_scan: list[str]):
         """
         - dirs_to_scan: [(rel_dir_path, mod_time), ...]
@@ -148,12 +227,15 @@ class DirsUpdater:
         self.conn.commit()
 
 
-class ImgLoader(QObject):
+class _ImgLoader(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, new_dirs: list, main_folder: MainFolder, task_state: TaskState):
+    def __init__(self, dirs_to_scan: list[str, int], main_folder: MainFolder, task_state: TaskState):
+        """
+        dirs_to_scan: [(rel dir path, int modified time), ...]
+        """
         super().__init__()
-        self.new_dirs = new_dirs
+        self.dirs_to_scan = dirs_to_scan
         self.main_folder = main_folder
         self.main_folder_path = main_folder.curr_path
         self.task_state = task_state
@@ -185,7 +267,7 @@ class ImgLoader(QObject):
             mod = int(stats.st_mtime)
             finder_images.append((abs_img_path, size, birth, mod))
 
-        for rel_dir_path, mod in self.new_dirs:
+        for rel_dir_path, mod in self.dirs_to_scan:
             abs_dir_path = MainUtils.get_abs_path(self.main_folder_path, rel_dir_path)
             for entry in os.scandir(abs_dir_path):
                 if not self.task_state.should_run():
@@ -209,7 +291,7 @@ class ImgLoader(QObject):
         """
         conn = Dbase.engine.connect()
         db_images: dict = {}
-        for rel_dir_path, mod in self.new_dirs:
+        for rel_dir_path, mod in self.dirs_to_scan:
             q = sqlalchemy.select(
                 THUMBS.c.short_hash, # rel thumb path
                 THUMBS.c.short_src,
@@ -232,7 +314,7 @@ class ImgLoader(QObject):
         return db_images
 
 
-class ImgCompator:
+class _ImgCompator:
     def __init__(self, finder_images: dict, db_images: dict):
         """
         Сравнивает данные об изображениях FinderImages и DbImages.  
@@ -258,7 +340,7 @@ class ImgCompator:
         return del_items, ins_items
 
 
-class ImgHashdirUpdater(QObject):
+class _ImgHashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
     def __init__(self, del_items: list, new_items: list, task_state: TaskState, main_folder: MainFolder):
         """
@@ -352,7 +434,7 @@ class ImgHashdirUpdater(QObject):
         return new_new_items
 
 
-class ImgDbUpdater:
+class _ImgDbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
@@ -403,83 +485,6 @@ class ImgDbUpdater:
         self.conn.commit()
 
 
-class MainFolderRemover:
-
-    def __init__(self):
-        """
-        Запуск: run()   
-        Сигналы: progress_text(str)
-
-        Сверяет список экземпляров класса MainFolder в бд (THUMBS.c.brand)     
-        со списком MainFolder в приложении.     
-        Удаляет весь контент MainFolder, если MainFolder больще нет в бд:   
-        - изображения thumbs из hashdir в ApplicationSupport    
-        - записи в базе данных
-
-        Вызови run для работы
-        """
-        super().__init__()
-        self.conn = Dbase.engine.connect()
-
-    def run(self):
-        q = sqlalchemy.select(THUMBS.c.brand).distinct()
-        db_main_folders = self.conn.execute(q).scalars().all()
-        app_main_folders = [i.name for i in MainFolder.list_]
-        del_main_folders = [i for i in db_main_folders if i not in app_main_folders]
-        for i in del_main_folders:
-            rows = self.get_rows(i)
-            self.remove_images(rows)
-            self.remove_rows(rows)
-        self.remove_dirs()
-        self.conn.close()
-        
-    def get_rows(self, main_folder_name: str):
-        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
-        q = q.where(THUMBS.c.brand == main_folder_name)
-        res = self.conn.execute(q).fetchall()
-        res = [
-            (id_, ThumbUtils.get_thumb_path(rel_thumb_path))
-            for id_, rel_thumb_path in res
-        ]
-        return res
-
-    def remove_images(self, rows: list):
-        """
-        rows: [(row id int, thumb path), ...]
-        """
-        for id_, image_path in rows:
-            try:
-                if os.path.exists(image_path):
-                    os.remove(image_path)
-                folder = os.path.dirname(image_path)
-                if os.path.exists(folder) and not os.listdir(folder):
-                    os.rmdir(folder)
-            except Exception as e:
-                print("new scaner utils, MainFolderRemover,  remove images error", e)
-                continue
-
-    def remove_rows(self, rows: list):
-        """
-        rows: [(row id int, thumb path), ...]
-        """
-        for id_, thumb_path in rows:
-            q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.id == id_)
-            self.conn.execute(q)
-        self.conn.commit()
-
-    def remove_dirs(self):
-        q = sqlalchemy.select(DIRS.c.brand).distinct()
-        res = list(self.conn.execute(q).scalars())
-        alias_list = [i.name for i in MainFolder.list_]
-        for i in res:
-            if i not in alias_list:
-                q = sqlalchemy.delete(DIRS)
-                q = q.where(DIRS.c.brand == i)
-                self.conn.execute(q)
-        self.conn.commit()
-
-
 class ScanDirs(QObject):
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
@@ -491,7 +496,7 @@ class ScanDirs(QObject):
         self.task_state = task_state
     
     def run(self):
-        img_loader = ImgLoader(self.dirs_to_scan, self.main_folder, self.task_state)
+        img_loader = _ImgLoader(self.dirs_to_scan, self.main_folder, self.task_state)
         img_loader.progress_text.connect(self.send_text)
         finder_images = img_loader.finder_images()
         db_images = img_loader.db_images()
@@ -500,11 +505,11 @@ class ScanDirs(QObject):
             return
 
         # сравниваем Finder и БД изображения
-        img_compator = ImgCompator(finder_images, db_images)
+        img_compator = _ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
 
         # создаем / обновляем изображения в hashdir
-        hashdir_updater = ImgHashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
+        hashdir_updater = _ImgHashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
         hashdir_updater.progress_text.connect(self.progress_text.emit)
         del_images, new_images = hashdir_updater.run()
 
@@ -513,10 +518,10 @@ class ScanDirs(QObject):
             return
 
         # обновляем БД
-        db_updater = ImgDbUpdater(del_images, new_images, self.main_folder)
+        db_updater = _ImgDbUpdater(del_images, new_images, self.main_folder)
         db_updater.run()
 
-        dirs_updater = DirsUpdater(self.main_folder, self.dirs_to_scan)
+        dirs_updater = _DirsUpdater(self.main_folder, self.dirs_to_scan)
         dirs_updater.run()
 
         self.progress_text.emit("")
