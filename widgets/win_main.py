@@ -469,9 +469,6 @@ class WinMain(UMainWindow):
     def paste_files_here(self):
 
         def scan_dirs(item: ClipBoardItem):
-            self.restart_scaner_task()
-            self.grid.clipboard_item = None
-            return
             if item.action_type == item.type_cut:
                 ...
             else:
@@ -480,6 +477,8 @@ class WinMain(UMainWindow):
                 update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
                 update_task.sigs.finished_.connect(self.reload_gui)
                 UThreadPool.start(update_task)
+
+            self.grid.clipboard_item = None
 
         def remove_files(item: ClipBoardItem, files_copied: list[str]):
             item.files_copied = files_copied

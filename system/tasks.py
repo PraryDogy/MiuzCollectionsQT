@@ -558,6 +558,8 @@ class CustomScanerTask(URunnable):
         img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
 
+        print(len(del_images), len(new_images), "custom scaner", "\n")
+
         hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
         hashdir_updater.progress_text.connect(self.sigs.progress_text.emit)
         del_images, new_images = hashdir_updater.run()

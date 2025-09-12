@@ -112,9 +112,7 @@ class ScanerTask(URunnable):
         img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
         
-        # print(len(del_images))
-        # print(len(new_images))
-        # print()
+        print(len(del_images), len(new_images), "full scaner", "\n")
 
         # запрещаем удалять сразу все изображения относящиеся к папке
         inspector = Inspector(del_images, main_folder)
