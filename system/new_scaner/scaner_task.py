@@ -89,8 +89,7 @@ class ScanerTask(URunnable):
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
         
-        # print("new_dirs", new_dirs)
-        # print("del_dirs", del_dirs)
+        print(del_dirs, new_dirs)
 
 
         # ВРЕДИТЕЛЬ
