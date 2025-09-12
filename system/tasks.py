@@ -524,7 +524,8 @@ class CustomScanerTask(URunnable):
     def __init__(self, main_folder: MainFolder, dirs: list[str]):
         """
         Аналог полноценного сканера, но принимает список директорий
-        и выполняет сканирование для каждой из них.
+        и выполняет сканирование для каждой из них в пределах MainFolder.
+        dirs: abs_image_paths
         """
         super().__init__()
         self.sigs = _CustomScanerSigs()

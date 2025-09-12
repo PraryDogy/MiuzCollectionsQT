@@ -475,11 +475,12 @@ class WinMain(UMainWindow):
         def scan_dirs():
             if self.clipboard_item.action_type == self.clipboard_item.type_cut:
                 ...
-            # else:
-            #     update_task = CustomScanerTask(MainFolder.current, scan_dir)
-            #     update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
-            #     update_task.sigs.finished_.connect(self.reload_gui)
-            #     UThreadPool.start(update_task)
+            else:
+                dirs = [self.clipboard_item.target_dir, ]
+                update_task = CustomScanerTask(self.clipboard_item.target_main_folder, dirs)
+                update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
+                update_task.sigs.finished_.connect(self.reload_gui)
+                UThreadPool.start(update_task)
 
         def remove_files(files_copied: list[str]):
             self.clipboard_item.files_copied = files_copied
@@ -488,7 +489,7 @@ class WinMain(UMainWindow):
             UThreadPool.start(remove_task)
 
         def copy_files():
-            copy_task = CopyFilesTask(MainFolder.current.curr_path, self.clipboard_item.files_to_copy)
+            copy_task = CopyFilesTask(self.clipboard_item.target_dir, self.clipboard_item.files_to_copy)
             if self.clipboard_item.action_type == self.clipboard_item.type_cut:
                 copy_task.sigs.finished_.connect(lambda files_copied: remove_files(files_copied))
             UThreadPool.start(copy_task)
@@ -496,6 +497,7 @@ class WinMain(UMainWindow):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             self.clipboard_item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+            self.clipboard_item.target_main_folder = MainFolder.current
             copy_files()
         else:
             self.open_win_smb()
