@@ -557,7 +557,7 @@ class _CustomScanerSigs(QObject):
 
 
 class CustomScanerTask(URunnable):
-    def __init__(self, main_folder: MainFolder, scan_dir: str):
+    def __init__(self, main_folder: MainFolder, dirs: list[str]):
         """
         Аналог полноценного сканера, но принимает список директорий
         и выполняет сканирование для каждой из них.
@@ -565,7 +565,7 @@ class CustomScanerTask(URunnable):
         super().__init__()
         self.sigs = _CustomScanerSigs()
         self.main_folder = main_folder
-        self.scan_dir = scan_dir
+        self.dirs = dirs
         if main_folder.curr_path:
             self.true_name = os.path.basename(main_folder.curr_path)
         else:
@@ -573,10 +573,17 @@ class CustomScanerTask(URunnable):
         self.alias = main_folder.name
         
     def task(self):
-        rel_path = MainUtils.get_rel_path(self.main_folder.curr_path, self.scan_dir)
-        mod_time = int(os.stat(self.scan_dir).st_mtime)
-        new_dirs = [(rel_path, mod_time), ]
+        
+        rel_paths = (
+            MainUtils.get_rel_path(self.main_folder.curr_path, i)
+            for i in self.dirs
+        )
 
+        new_dirs = (
+            (i, os.stat(i).st_mtime)
+            for i in rel_paths
+        )
+        
         img_loader = ImgLoader(new_dirs, self.main_folder, self.task_state)
         img_loader.progress_text.connect(self.sigs.progress_text.emit)
         finder_images = img_loader.finder_images()
