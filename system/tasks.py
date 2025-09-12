@@ -160,11 +160,7 @@ class LoadCollListTask(URunnable):
     def task(self) -> None:
         menus = self.get_collections_list()
         root = self.get_root()
-
-        try:
-            self.sigs.finished_.emit((menus, root))
-        except RuntimeError as e:
-            MainUtils.print_error()
+        self.sigs.finished_.emit((menus, root))
         self.conn.close()
 
     def get_collections_list(self):
@@ -194,11 +190,11 @@ class LoadCollListTask(URunnable):
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
         
 
-class _LoadSingleImgSigs(QObject):
+class _LoadOneImgSigs(QObject):
     finished_ = pyqtSignal(tuple)
 
 
-class LoadSingleImgTask(URunnable):
+class LoadOneImgTask(URunnable):
     max_images_count = 50
 
     def __init__(self, img_path: str, cached_images: dict[str, QPixmap]):
@@ -206,7 +202,7 @@ class LoadSingleImgTask(URunnable):
         Возвращает в сигнале finished_ (img_path, QImage)
         """
         super().__init__()
-        self.sigs = _LoadSingleImgSigs()
+        self.sigs = _LoadOneImgSigs()
         self.img_path = img_path
         self.cached_images = cached_images
 
@@ -229,24 +225,20 @@ class LoadSingleImgTask(URunnable):
             self.cached_images.pop(next(iter(self.cached_images)))
 
         image_data = (self.img_path, self.qimage)
-
-        try:
-            self.sigs.finished_.emit(image_data)
-        except RuntimeError:
-            ...
+        self.sigs.finished_.emit(image_data)
 
 
-class _SingleFileInfoSigs(QObject):
+class _OneFileInfoSigs(QObject):
     finished_ = pyqtSignal(dict)
     delayed_info = pyqtSignal(str)
 
 
-class SingleFileInfoTask(URunnable):
+class OneFileInfoTask(URunnable):
     max_row = 50
     def __init__(self, url: str):
         super().__init__()
         self.url = url
-        self.sigs = _SingleFileInfoSigs()
+        self.sigs = _OneFileInfoSigs()
 
     def task(self):
         mail_folder_path = MainFolder.current.get_curr_path()
@@ -303,12 +295,12 @@ class SingleFileInfoTask(URunnable):
             return text
 
 
-class FilesInfoTask(URunnable):
+class MultiFileInfoTask(URunnable):
     max_row = 50
     def __init__(self, img_path_list: list[str]):
         super().__init__()
         self.img_path_list = img_path_list
-        self.sigs = _SingleFileInfoSigs()
+        self.sigs = _OneFileInfoSigs()
     
     def task(self):
         names = [
@@ -368,16 +360,9 @@ class RmFilesTask(URunnable):
         self.main_folder = main_folder
 
     def task(self):
-        try:
-            self.remove_files()
-            self.remove_thumbs()
-        except Exception as e:
-            MainUtils.print_error()
-        try:
-            self.sigs.reload_gui.emit()
-            self.sigs.finished_.emit()
-        except RuntimeError as e:
-            MainUtils.print_error()
+        self.remove_files()
+        self.sigs.reload_gui.emit()
+        self.sigs.finished_.emit()
 
     def remove_files(self):
         """
@@ -484,10 +469,7 @@ class LoadDbImagesTask(URunnable):
                 thumbs_dict[f_mod].append(item)
             else:
                 thumbs_dict[0].append(item)
-        try:
-            self.sigs.finished_.emit(thumbs_dict)
-        except RuntimeError:
-            ...
+        self.sigs.finished_.emit(thumbs_dict)
 
     def get_stmt(self) -> sqlalchemy.Select:
         stmt = sqlalchemy.select(
@@ -569,15 +551,19 @@ class LoadSortedDirsTask(URunnable):
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
 
-class _ScanSingleDirSigs(QObject):
+class _CustomScanerSigs(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
 
 
-class ScanSingleDirTask(URunnable):
+class CustomScanerTask(URunnable):
     def __init__(self, main_folder: MainFolder, scan_dir: str):
+        """
+        Аналог полноценного сканера, но принимает список директорий
+        и выполняет сканирование для каждой из них.
+        """
         super().__init__()
-        self.sigs = _ScanSingleDirSigs()
+        self.sigs = _CustomScanerSigs()
         self.main_folder = main_folder
         self.scan_dir = scan_dir
         if main_folder.curr_path:

@@ -12,7 +12,7 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.tasks import (CopyFilesTask, FavTask, MainUtils, ResetDataTask,
-                          RmFilesTask, ScanSingleDirTask)
+                          RmFilesTask, CustomScanerTask)
 from system.utils import UThreadPool
 
 from ._base_widgets import SettingsItem, UHBoxLayout, UMainWindow, UVBoxLayout
@@ -469,7 +469,7 @@ class WinMain(UMainWindow):
         def udpate_hashdir(new_files: list[str], main_folder: MainFolder):
             if new_files:
                 scan_dir = os.path.dirname(new_files[0])
-                update_task = ScanSingleDirTask(main_folder, scan_dir)
+                update_task = CustomScanerTask(main_folder, scan_dir)
                 update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
                 update_task.sigs.finished_.connect(self.reload_gui)
                 UThreadPool.start(update_task)
@@ -552,7 +552,7 @@ class WinMain(UMainWindow):
             if not files:
                 return
 
-            task = ScanSingleDirTask(main_folder, dest)
+            task = CustomScanerTask(main_folder, dest)
             task.sigs.progress_text.connect(
                 self.bar_bottom.progress_bar.setText
             )
