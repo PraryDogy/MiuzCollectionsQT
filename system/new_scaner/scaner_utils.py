@@ -258,7 +258,7 @@ class ImgCompator:
         return del_items, ins_items
 
 
-class HashdirUpdater(QObject):
+class ImgHashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
     def __init__(self, del_items: list, new_items: list, task_state: TaskState, main_folder: MainFolder):
         """
@@ -352,7 +352,7 @@ class HashdirUpdater(QObject):
         return new_new_items
 
 
-class DbUpdater:
+class ImgDbUpdater:
     def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
@@ -504,7 +504,7 @@ class ScanDirs(QObject):
         del_images, new_images = img_compator.run()
 
         # создаем / обновляем изображения в hashdir
-        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
+        hashdir_updater = ImgHashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
         hashdir_updater.progress_text.connect(self.progress_text.emit)
         del_images, new_images = hashdir_updater.run()
 
@@ -513,7 +513,7 @@ class ScanDirs(QObject):
             return
 
         # обновляем БД
-        db_updater = DbUpdater(del_images, new_images, self.main_folder)
+        db_updater = ImgDbUpdater(del_images, new_images, self.main_folder)
         db_updater.run()
 
         dirs_updater = DirsUpdater(self.main_folder, self.dirs_to_scan)
