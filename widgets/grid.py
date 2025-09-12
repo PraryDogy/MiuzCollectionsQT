@@ -16,7 +16,8 @@ from system.main_folder import MainFolder
 from system.tasks import LoadDbImagesItem, LoadDbImagesTask
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
-from ._base_widgets import SvgBtn, UMenu, UVBoxLayout, VScrollArea
+from ._base_widgets import (ClipBoardItem, SvgBtn, UMenu, UVBoxLayout,
+                            VScrollArea)
 from .actions import (CopyName, CopyPath, MoveFiles, OpenInView, RemoveFiles,
                       RevealInFinder, Save, SaveAs, ScanerRestart, SetFav,
                       WinInfoAction)
@@ -392,6 +393,7 @@ class Grid(VScrollArea):
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
+        self.clipboard_item = ClipBoardItem()
 
         self.image_apps = {i: os.path.basename(i) for i in MainUtils.image_apps(Cfg.apps)}
 
@@ -597,7 +599,23 @@ class Grid(VScrollArea):
         if rel_img_path in self.path_to_wid:
             wid = self.path_to_wid.get(rel_img_path)
             wid.set_fav(value)
-            
+
+    def set_clipboard(self, type: str):
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path and self.selected_widgets:
+            self.clipboard_item = ClipBoardItem()
+            self.clipboard_item.action_type = type
+            self.clipboard_item.source_main_folder = MainFolder.current
+            self.clipboard_item.files_to_copy = [
+                MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
+                for i in self.selected_widgets
+            ]
+            if type == self.clipboard_item.type_cut:
+                for i in self.selected_widgets:
+                    i.set_transparent_frame(0.5)
+        else:
+            self.no_connection.emit()
+
     def keyPressEvent(self, event: QKeyEvent | None) -> None:
         """
         Обрабатывает навигацию и горячие клавиши в сетке:
@@ -673,6 +691,10 @@ class Grid(VScrollArea):
             open_info()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_A:
             select_all()
+        elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
+            self.set_clipboard(ClipBoardItem.type_copy)
+        elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_X:
+            self.set_clipboard(ClipBoardItem.type_cut)
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             open_last_selected()
         elif event.key() in KEY_NAVI:

@@ -71,7 +71,6 @@ class WinMain(UMainWindow):
         self.setMenuBar(BarMacos())
         
         self.win_image_view: WinImageView
-        self.clipboard_item: ClipBoardItem
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -238,9 +237,6 @@ class WinMain(UMainWindow):
         self.win_smb = WinSmb()
         self.win_smb.center_to_parent(self.window())
         self.win_smb.show()
-        
-    def set_clipboard(self, data: dict[str, list[str]]):
-        self.clipboard_item = data
     
     def open_img_view(self):
         if len(self.grid.selected_widgets) == 1:
@@ -472,43 +468,49 @@ class WinMain(UMainWindow):
 
     def paste_files_here(self):
 
-        def scan_dirs():
-            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
+        def scan_dirs(item: ClipBoardItem):
+            if item.action_type == item.type_cut:
                 ...
             else:
-                dirs = [self.clipboard_item.target_dir, ]
-                update_task = CustomScanerTask(self.clipboard_item.target_main_folder, dirs)
+                dirs = [item.target_dir, ]
+                update_task = CustomScanerTask(item.target_main_folder, dirs)
                 update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
                 update_task.sigs.finished_.connect(self.reload_gui)
                 UThreadPool.start(update_task)
 
-        def remove_files(files_copied: list[str]):
-            self.clipboard_item.files_copied = files_copied
-            remove_task = RmFilesTask(self.clipboard_item.files_to_copy)
-            remove_task.sigs.finished_.connect(scan_dirs)
+        def remove_files(item: ClipBoardItem, files_copied: list[str]):
+            item.files_copied = files_copied
+            remove_task = RmFilesTask(item.files_to_copy)
+            remove_task.sigs.finished_.connect(
+                scan_dirs(item)
+            )
             UThreadPool.start(remove_task)
 
-        def copy_files():
-            copy_task = CopyFilesTask(self.clipboard_item.target_dir, self.clipboard_item.files_to_copy)
-            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
-                copy_task.sigs.finished_.connect(lambda files_copied: remove_files(files_copied))
+        def copy_files(item: ClipBoardItem):
+            copy_task = CopyFilesTask(item.target_dir, item.files_to_copy)
+            if item.action_type == item.type_cut:
+                copy_task.sigs.finished_.connect(
+                    lambda files_copied: remove_files(item, files_copied)
+            )
             else:
-                copy_task.sigs.finished_.connect(lambda files_copied: scan_dirs())
+                copy_task.sigs.finished_.connect(lambda _: scan_dirs(item))
             UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            self.clipboard_item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
-            self.clipboard_item.target_main_folder = MainFolder.current
-            copy_files()
+            item = self.grid.clipboard_item
+            item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+            item.target_main_folder = MainFolder.current
+            copy_files(item)
         else:
             self.open_win_smb()
 
     def remove_files(self, rel_img_paths: list):
+        # нужно добавить сканирование директории епта
+        
         
         def start_remove(img_paths: list[str]):
-            task = RmFilesTask(img_paths, MainFolder.current)
-            task.sigs.reload_gui.connect(self.reload_gui)
+            task = RmFilesTask(img_paths)
             UThreadPool.start(task)
         
         main_folder_path = MainFolder.current.get_curr_path()
@@ -553,7 +555,7 @@ class WinMain(UMainWindow):
             if not files:
                 return
 
-            task = CustomScanerTask(main_folder, dest)
+            task = CustomScanerTask(main_folder, [dest, ])
             task.sigs.progress_text.connect(
                 self.bar_bottom.progress_bar.setText
             )

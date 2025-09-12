@@ -538,17 +538,14 @@ class CustomScanerTask(URunnable):
         self.alias = main_folder.name
         
     def task(self):
-        
-        rel_paths = (
-            MainUtils.get_rel_path(self.main_folder.curr_path, i)
+        stats = (
+            (i, os.stat(i).st_mtime)
             for i in self.dirs
         )
-
         new_dirs = (
-            (i, os.stat(i).st_mtime)
-            for i in rel_paths
+            (MainUtils.get_rel_path(self.main_folder.curr_path, abs_path), st_mtime)
+            for abs_path, st_mtime in stats
         )
-        
         img_loader = ImgLoader(new_dirs, self.main_folder, self.task_state)
         img_loader.progress_text.connect(self.sigs.progress_text.emit)
         finder_images = img_loader.finder_images()
