@@ -469,6 +469,9 @@ class WinMain(UMainWindow):
     def paste_files_here(self):
 
         def scan_dirs(item: ClipBoardItem):
+            self.restart_scaner_task()
+            self.grid.clipboard_item = None
+            return
             if item.action_type == item.type_cut:
                 ...
             else:
@@ -498,19 +501,20 @@ class WinMain(UMainWindow):
 
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            item = self.grid.clipboard_item
-            item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
-            item.target_main_folder = MainFolder.current
-            copy_files(item)
+            if self.grid.clipboard_item:
+                item = self.grid.clipboard_item
+                item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+                item.target_main_folder = MainFolder.current
+                copy_files(item)
         else:
             self.open_win_smb()
 
     def remove_files(self, rel_img_paths: list):
         # нужно добавить сканирование директории епта
         
-        
         def start_remove(img_paths: list[str]):
             task = RmFilesTask(img_paths)
+            task.sigs.finished_.connect(self.restart_scaner_task)
             UThreadPool.start(task)
         
         main_folder_path = MainFolder.current.get_curr_path()

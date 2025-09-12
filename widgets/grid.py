@@ -393,7 +393,7 @@ class Grid(VScrollArea):
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
-        self.clipboard_item = ClipBoardItem()
+        self.clipboard_item = None
 
         self.image_apps = {i: os.path.basename(i) for i in MainUtils.image_apps(Cfg.apps)}
 
