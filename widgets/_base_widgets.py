@@ -381,5 +381,9 @@ class ClipBoardItem:
     
     def __init__(self):
         self.action_type: str
-        self.src_main_folder: MainFolder
-        self.rel_img_paths: list[str]
+        self.source_main_folder: MainFolder
+        self.files_to_copy: list[str]
+
+        self.target_dir: str
+        self.target_main_folder: MainFolder
+        self.files_copied: list[str]
