@@ -282,7 +282,7 @@ class HashdirUpdater(QObject):
         self.new_items = new_items
         self.task_state = task_state
         self.main_folder = main_folder
-        self.total = len(new_items) + len(del_items)
+        self.total = len(new_items)
         if main_folder.curr_path:
             self.true_name = os.path.basename(main_folder.curr_path)
         else:
@@ -314,7 +314,6 @@ class HashdirUpdater(QObject):
                     if not os.listdir(folder):
                         os.rmdir(folder)
                     new_del_items.append(rel_thumb_path)
-                    self.total -= 1
                     self.send_text()
                 except Exception as e:
                     print("new scaner utils, hashdir updater, remove img error", e)
