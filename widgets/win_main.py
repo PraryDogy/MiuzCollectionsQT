@@ -475,8 +475,8 @@ class WinMain(UMainWindow):
             if item.action_type == item.type_cut:
                 ...
             else:
-                self.restart_scaner_task()
-                return
+                # self.restart_scaner_task()
+                # return
                 dirs = [item.target_dir, ]
                 update_task = CustomScanerTask(item.target_main_folder, dirs)
                 update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
