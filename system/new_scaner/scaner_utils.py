@@ -561,3 +561,48 @@ class MainFolderRemover:
                 q = q.where(DIRS.c.brand == i)
                 self.conn.execute(q)
         self.conn.commit()
+
+
+class ScanDirs(QObject):
+    progress_text = pyqtSignal(str)
+    reload_gui = pyqtSignal()
+   
+    def __init__(self, dirs_to_scan: list[str], main_folder: MainFolder, task_state: TaskState):
+        super().__init__()
+        self.dirs_to_scan = dirs_to_scan
+        self.main_folder = main_folder
+        self.task_state = task_state
+    
+    def run(self):
+        img_loader = ImgLoader(self.dirs_to_scan, self.main_folder, self.task_state)
+        img_loader.progress_text.connect(self.send_text)
+        finder_images = img_loader.finder_images()
+        db_images = img_loader.db_images()
+        if not self.task_state.should_run():
+            print(self.main_folder.name, "new scaner utils, ScanDirs, img_loader, сканирование прервано task state")
+            return
+
+        # сравниваем Finder и БД изображения
+        img_compator = ImgCompator(finder_images, db_images)
+        del_images, new_images = img_compator.run()
+
+        # создаем / обновляем изображения в hashdir
+        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
+        hashdir_updater.progress_text.connect(self.progress_text.emit)
+        del_images, new_images = hashdir_updater.run()
+
+        # обновляем БД
+        db_updater = DbUpdater(del_images, new_images, self.main_folder)
+        db_updater.run()
+
+        if not self.task_state.should_run():
+            print(self.main_folder.name, "new scaner utils, ScanDirs, db updater, сканирование прервано task state")
+            return
+
+        # мы приравниваем del dirs к dirs to scan, чтобы можно было удалить
+        # старую информацию о директориях и добавить новую
+        # по сути это аналог sqlalchemy.update, но delete + insert
+        dirs_updater = DirsUpdater(self.main_folder, self.dirs_to_scan, self.dirs_to_scan)
+        dirs_updater.run()
+
+        self.progress_text.emit("")

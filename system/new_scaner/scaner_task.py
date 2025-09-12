@@ -12,7 +12,7 @@ from ..main_folder import MainFolder
 from ..utils import URunnable
 from .scaner_utils import (DbUpdater, DirsCompator, DirsLoader, DirsUpdater,
                            HashdirUpdater, ImgCompator, ImgLoader, ImgRemover,
-                           Inspector, MainFolderRemover)
+                           Inspector, MainFolderRemover, ScanDirs)
 
 
 class ScanerSigs(QObject):
@@ -91,7 +91,6 @@ class ScanerTask(URunnable):
         
         print(del_dirs, new_dirs)
 
-
         # ВРЕДИТЕЛЬ
         # например была удалена папка Collection 1, тогда все данные
         # в THUMBS и hadhdir будут удалены через ImgRemover
@@ -107,37 +106,8 @@ class ScanerTask(URunnable):
             print(main_folder.name, "utils, new scaner, img_loader, сканирование прервано task state")
             return
 
-        # сравниваем Finder и БД изображения
-        img_compator = ImgCompator(finder_images, db_images)
-        del_images, new_images = img_compator.run()
-        
-        # print(del_images, new_images)
-
-        # запрещаем удалять сразу все изображения относящиеся к папке
-        inspector = Inspector(del_images, main_folder)
-        is_remove_all = inspector.is_remove_all()
-        if is_remove_all:
-            print("scaner > обнаружена попытка массового удаления фотографий")
-            print("в папке:", main_folder.name, main_folder.curr_path)
-            return
-
-        # создаем / обновляем изображения в hashdir
-        hashdir_updater = HashdirUpdater(del_images, new_images, self.task_state, main_folder)
-        hashdir_updater.progress_text.connect(self.send_text)
-        del_images, new_images = hashdir_updater.run()
-
-        # обновляем БД
-        db_updater = DbUpdater(del_images, new_images, main_folder)
-        db_updater.run()
-
-        if not self.task_state.should_run():
-            print(main_folder.name, "utils, new scaner, db updater, сканирование прервано task state")
-            return
-
-        # обновляем информацию о директориях в БД
-        dirs_updater = DirsUpdater(main_folder, del_dirs, new_dirs)
-        dirs_updater.run()
-
-        self.send_text("")
-        if del_dirs or new_dirs:
+        if new_dirs:
+            scan_dirs = ScanDirs(new_dirs, main_folder, self.task_state)
+            scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
+            scan_dirs.run()
             self.sigs.reload_gui.emit()
