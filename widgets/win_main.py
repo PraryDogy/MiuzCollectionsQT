@@ -472,11 +472,12 @@ class WinMain(UMainWindow):
             if item.action_type == item.type_cut:
                 ...
             else:
-                dirs = [item.target_dir, ]
-                update_task = CustomScanerTask(item.target_main_folder, dirs)
-                update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
-                update_task.sigs.finished_.connect(self.reload_gui)
-                UThreadPool.start(update_task)
+                self.restart_scaner_task()
+                # dirs = [item.target_dir, ]
+                # update_task = CustomScanerTask(item.target_main_folder, dirs)
+                # update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
+                # update_task.sigs.finished_.connect(self.reload_gui)
+                # UThreadPool.start(update_task)
 
             self.grid.clipboard_item = None
 
