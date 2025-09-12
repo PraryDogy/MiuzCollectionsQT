@@ -492,6 +492,8 @@ class WinMain(UMainWindow):
             copy_task = CopyFilesTask(self.clipboard_item.target_dir, self.clipboard_item.files_to_copy)
             if self.clipboard_item.action_type == self.clipboard_item.type_cut:
                 copy_task.sigs.finished_.connect(lambda files_copied: remove_files(files_copied))
+            else:
+                copy_task.sigs.finished_.connect(lambda files_copied: scan_dirs())
             UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.get_curr_path()
