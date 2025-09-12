@@ -93,6 +93,9 @@ class CopyFilesTask(URunnable):
                 os.path.basename(file_path)
             )
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
+            if dest_path == file_path:
+                print("нельзя копировать в себя файл", dest_path)
+                continue
             files_dests.append(dest_path)
 
             try:
