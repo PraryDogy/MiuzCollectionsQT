@@ -9,8 +9,8 @@ from cfg import Cfg
 from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
-from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirRemover,
-                           MainFolderRemover, NewDirsHandler,
+from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
+                           RemovedMainFolderHandler, NewDirsHandler,
                            RemovedDirsHandler)
 
 
@@ -72,10 +72,10 @@ class ScanerTask(URunnable):
             return
 
         # удаляем все файлы и данные из бД по удаленному MainFolder
-        main_folder_remover = MainFolderRemover()
+        main_folder_remover = RemovedMainFolderHandler()
         main_folder_remover.run()
         
-        empty_remover = EmptyHashdirRemover()
+        empty_remover = EmptyHashdirHandler()
         empty_remover.run()
 
         # собираем Finder директории и директории из БД

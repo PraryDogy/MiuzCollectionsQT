@@ -13,7 +13,7 @@ from system.main_folder import MainFolder
 from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
 
-class MainFolderRemover:
+class RemovedMainFolderHandler:
 
     def __init__(self):
         """
@@ -567,7 +567,7 @@ class RemovedDirsHandler(QObject):
         self.conn.commit()
         
 
-class EmptyHashdirRemover:
+class EmptyHashdirHandler:
     def __init__(self):
         super().__init__()
         
