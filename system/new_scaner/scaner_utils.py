@@ -484,7 +484,7 @@ class _ImgDbUpdater:
         self.conn.commit()
 
 
-class ScanDirs(QObject):
+class NewDirsHandler(QObject):
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
    

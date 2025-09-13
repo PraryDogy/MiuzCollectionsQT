@@ -15,7 +15,7 @@ from cfg import Cfg, Dynamic, Static
 from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import MainFolder
-from .new_scaner.scaner_utils import ScanDirs
+from .new_scaner.scaner_utils import NewDirsHandler
 from .utils import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
 
 
@@ -544,7 +544,7 @@ class CustomScanerTask(URunnable):
             for abs_path, st_mtime in dirs_to_scan
         ]
         
-        scan_dirs = ScanDirs(dirs_to_scan, self.main_folder, self.task_state)
+        scan_dirs = NewDirsHandler(dirs_to_scan, self.main_folder, self.task_state)
         scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
         del_images, new_images = scan_dirs.run()
 

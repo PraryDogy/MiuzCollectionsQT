@@ -9,7 +9,7 @@ from cfg import Cfg
 from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
-from .scaner_utils import DirsCompator, DirsLoader, MainFolderRemover, ScanDirs
+from .scaner_utils import DirsCompator, DirsLoader, MainFolderRemover, NewDirsHandler
 
 
 class ScanerSigs(QObject):
@@ -69,11 +69,11 @@ class ScanerTask(URunnable):
             print(main_folder.name, "coll folder not avaiable")
             return
 
-        # удаляем все файлы и данные по удаленному MainFolder
+        # удаляем все файлы и данные из бД по удаленному MainFolder
         main_folder_remover = MainFolderRemover()
         main_folder_remover.run()
 
-        # собираем Finder директории и базу данных
+        # собираем Finder директории и директории из БД
         dirs_loader = DirsLoader(main_folder, self.task_state)
         dirs_loader.progress_text.connect(self.send_text)
         finder_dirs = dirs_loader.finder_dirs()
@@ -82,20 +82,21 @@ class ScanerTask(URunnable):
             print(main_folder.name, "no finder dirs")
             return
 
-        # сравниваем Finder и БД директории
+        # сравниваем кортежи (директория, дата изменения)
+        # new_dirs: директории, которых нет в БД
+        # del_dirs: директории, которых нет в Finder
+        # при этом это может быть одна и та же директория, по сути аналог
+        # sqlalchemy.update
         new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
         
-        # print(del_dirs, new_dirs)
-
-        if not self.task_state.should_run():
-            print(main_folder.name, "utils, new scaner, img_loader, сканирование прервано task state")
-            return
+        print(del_dirs, new_dirs)
 
         if new_dirs:
-            scan_dirs = ScanDirs(new_dirs, main_folder, self.task_state)
+            scan_dirs = NewDirsHandler(new_dirs, main_folder, self.task_state)
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
             scan_dirs.run()
+
             self.sigs.reload_gui.emit()
         if del_dirs:
             ...
