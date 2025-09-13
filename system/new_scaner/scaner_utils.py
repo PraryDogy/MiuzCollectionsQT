@@ -169,10 +169,11 @@ class DirsCompator:
         Возвращает те директории, которых нет в finder_dirs, но есть в db_dirs:
         - [(rel_dir_path, mod_time), ...]
         """
+        finder_paths = [rel_path for rel_path, _ in finder_dirs]
         return [
             (rel_dir_path, int(mod))
             for rel_dir_path, mod in db_dirs
-            if (rel_dir_path, mod) not in finder_dirs
+            if rel_dir_path not in finder_paths
         ]
 
     @classmethod
