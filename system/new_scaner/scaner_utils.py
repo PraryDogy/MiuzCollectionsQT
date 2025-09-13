@@ -203,27 +203,25 @@ class _DirsUpdater:
         self.conn = Dbase.engine.connect()
         
     def run(self):
-        self.remove_db_dirs()
-        self.add_new_dirs()
+        self.update_dirs()
         self.conn.close()
 
-    def remove_db_dirs(self):
-        for rel_dir_path, mod in self.dirs_to_scan:
-            q = sqlalchemy.delete(DIRS)
-            q = q.where(DIRS.c.short_src == rel_dir_path)
-            q = q.where(DIRS.c.brand == self.main_folder.name)
-            self.conn.execute(q)
-        self.conn.commit()
-
-    def add_new_dirs(self):
+    def update_dirs(self):
         for short_src, mod in self.dirs_to_scan:
             values = {
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.MOD: mod,
                 ClmNames.BRAND: self.main_folder.name
             }
-            q = sqlalchemy.insert(DIRS).values(**values)
-            self.conn.execute(q)
+
+            # сначала пытаемся обновить
+            upd = DIRS.update().where(DIRS.c.short_src == short_src).values(**values)
+            result = self.conn.execute(upd)
+
+            # если строка не найдена, вставляем
+            if result.rowcount == 0:
+                ins = DIRS.insert().values(**values)
+                self.conn.execute(ins)
         self.conn.commit()
 
 
@@ -507,7 +505,7 @@ class NewDirsHandler(QObject):
         img_compator = _ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
         
-        print(del_images, new_images)
+        # print(del_images, new_images)
 
         # создаем / обновляем изображения в hashdir
         hashdir_updater = _ImgHashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
@@ -521,6 +519,7 @@ class NewDirsHandler(QObject):
         # обновляем БД
         db_updater = _ImgDbUpdater(del_images, new_images, self.main_folder)
         db_updater.run()
+
 
         dirs_updater = _DirsUpdater(self.main_folder, self.dirs_to_scan)
         dirs_updater.run()
