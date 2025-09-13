@@ -1,5 +1,6 @@
 import gc
 import os
+import shutil
 
 import sqlalchemy
 from numpy import ndarray
@@ -10,8 +11,6 @@ from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
-
-
 
 
 class MainFolderRemover:
@@ -566,3 +565,16 @@ class RemovedDirsHandler(QObject):
             stmt = stmt.where(DIRS.c.brand == self.main_folder.name)
             self.conn.execute(stmt)
         self.conn.commit()
+        
+
+class EmptyHashdirRemover:
+    def __init__(self):
+        super().__init__()
+        
+    def run(self):
+        for i in os.scandir(Static.APP_SUPPORT_HASHDIR):
+            if os.path.isdir(i.path) and not os.listdir(i.path):
+                try:
+                    shutil.rmtree(i.path)
+                except Exception as e:
+                    print("new scaner, empty hashdir remover", e)

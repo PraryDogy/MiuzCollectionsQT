@@ -9,8 +9,9 @@ from cfg import Cfg
 from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
-from .scaner_utils import (RemovedDirsHandler, DirsCompator, DirsLoader,
-                           MainFolderRemover, NewDirsHandler)
+from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirRemover,
+                           MainFolderRemover, NewDirsHandler,
+                           RemovedDirsHandler)
 
 
 class ScanerSigs(QObject):
@@ -73,6 +74,9 @@ class ScanerTask(URunnable):
         # удаляем все файлы и данные из бД по удаленному MainFolder
         main_folder_remover = MainFolderRemover()
         main_folder_remover.run()
+        
+        empty_remover = EmptyHashdirRemover()
+        empty_remover.run()
 
         # собираем Finder директории и директории из БД
         dirs_loader = DirsLoader(main_folder, self.task_state)
