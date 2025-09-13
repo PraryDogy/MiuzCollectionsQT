@@ -95,13 +95,8 @@ class ScanerTask(URunnable):
             scan_dirs = NewDirsHandler(new_dirs, main_folder, self.task_state)
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
             scan_dirs.run()
-
             self.sigs.reload_gui.emit()
             
         if del_dirs:
             del_handler = DelDirsHandler(del_dirs, main_folder)
             del_handler.run()
-            # ...
-            # print("удалить директории")
-            # print(del_dirs)
-            # удалить все связанное с директорией в DIRS, THUMBS и hashdir
