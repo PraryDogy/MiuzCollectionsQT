@@ -83,12 +83,12 @@ class ScanerTask(URunnable):
             return
 
         # сравниваем кортежи (директория, дата изменения)
-        # new_dirs: директории, которых нет в БД
-        # del_dirs: директории, которых нет в Finder
-        # при этом это может быть одна и та же директория, по сути аналог
-        # sqlalchemy.update
-        new_dirs = DirsCompator.get_add_to_db_dirs(finder_dirs, db_dirs)
-        del_dirs = DirsCompator.get_rm_from_db_dirs(finder_dirs, db_dirs)
+        # new_dirs: директории, которые нужно просканировать на изображения
+        # и обновить в БД данные об изображениях и о директориях
+        # del_dirs: директории, которых были удалены в Finder, то 
+        # есть когда была удалена папка целиком
+        new_dirs = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
+        del_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         
         print(del_dirs, new_dirs)
 
