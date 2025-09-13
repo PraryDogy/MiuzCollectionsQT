@@ -9,7 +9,8 @@ from cfg import Cfg
 from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
-from .scaner_utils import DirsCompator, DirsLoader, MainFolderRemover, NewDirsHandler
+from .scaner_utils import (DelDirsHandler, DirsCompator, DirsLoader,
+                           MainFolderRemover, NewDirsHandler)
 
 
 class ScanerSigs(QObject):
@@ -90,8 +91,6 @@ class ScanerTask(URunnable):
         new_dirs = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
         del_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         
-        print(del_dirs, new_dirs)
-
         if new_dirs:
             scan_dirs = NewDirsHandler(new_dirs, main_folder, self.task_state)
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
@@ -100,6 +99,9 @@ class ScanerTask(URunnable):
             self.sigs.reload_gui.emit()
             
         if del_dirs:
-            ...
-            print("удалить директории")
+            del_handler = DelDirsHandler(del_dirs, main_folder)
+            del_handler.run()
+            # ...
+            # print("удалить директории")
+            # print(del_dirs)
             # удалить все связанное с директорией в DIRS, THUMBS и hashdir

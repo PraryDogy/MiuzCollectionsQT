@@ -49,7 +49,7 @@ class MainFolderRemover:
         q = q.where(THUMBS.c.brand == main_folder_name)
         res = self.conn.execute(q).fetchall()
         res = [
-            (id_, ThumbUtils.get_thumb_path(rel_thumb_path))
+            (id_, ThumbUtils.get_abs_thumb_path(rel_thumb_path))
             for id_, rel_thumb_path in res
         ]
         return res
@@ -385,7 +385,7 @@ class _ImgHashdirUpdater(QObject):
         for rel_thumb_path in self.del_items:
             if not self.task_state.should_run():
                 break
-            thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
+            thumb_path = ThumbUtils.get_abs_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
                 try:
                     os.remove(thumb_path)
@@ -524,7 +524,6 @@ class NewDirsHandler(QObject):
         db_updater = _ImgDbUpdater(del_images, new_images, self.main_folder)
         db_updater.run()
 
-
         dirs_updater = _DirsUpdater(self.main_folder, self.dirs_to_scan)
         dirs_updater.run()
 
@@ -535,4 +534,35 @@ class NewDirsHandler(QObject):
 
 class DelDirsHandler(QObject):
     def __init__(self, dirs_to_del: list, main_folder: MainFolder):
+        """
+        dirs_to_del: [(rel dir path, int modified time), ...]
+        """
         super().__init__()
+        self.dirs_to_del = dirs_to_del
+        self.main_folder = main_folder
+        self.conn = Dbase.engine.connect()
+        
+    def run(self):
+        self.get_thumb_dirs()
+        
+    def get_thumb_dirs(self):
+        for rel_dir, mod in self.dirs_to_del:
+            stmt = sqlalchemy.select(THUMBS.c.short_hash)
+            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
+            stmt = stmt.where(THUMBS.c.brand == self.main_folder.name)
+            rel_hash_paths = list(self.conn.execute(stmt).scalars())
+            for short_hash in rel_hash_paths:
+                abs_path = ThumbUtils.get_abs_thumb_path(short_hash)
+                try:
+                    os.remove(abs_path)
+                except Exception as e:
+                    print("new scaner, scaner utils, DelDirsHandler, remove thumb", e)
+            stmt = sqlalchemy.delete(THUMBS)
+            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
+            stmt = stmt.where(THUMBS.c.brand == self.main_folder.name)
+            self.conn.execute(stmt)
+            stmt = sqlalchemy.delete(DIRS)
+            stmt = stmt.where(DIRS.c.short_src == rel_dir)
+            stmt = stmt.where(DIRS.c.brand == self.main_folder.name)
+            self.conn.execute(stmt)
+        self.conn.commit()

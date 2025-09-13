@@ -416,7 +416,7 @@ class LoadDbImagesTask(URunnable):
             if not rel_img_path.endswith(Static.ext_all):
                 continue
             f_mod = datetime.fromtimestamp(mod).date()
-            thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
+            thumb_path = ThumbUtils.get_abs_thumb_path(rel_thumb_path)
             thumb = ThumbUtils.read_thumb(thumb_path)
             if isinstance(thumb, ndarray):
                 qimage = PixmapUtils.qimage_from_array(thumb)

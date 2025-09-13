@@ -295,7 +295,7 @@ class HashdirUpdater(QObject):
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
             if not self.task_state.should_run():
                 break
-            thumb_path = ThumbUtils.get_thumb_path(rel_thumb_path)
+            thumb_path = ThumbUtils.get_abs_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
                 self.progressbar_text(Lng.deleting[Cfg.lng], x, total)
                 try:
@@ -465,7 +465,7 @@ class MainFolderRemover(QObject):
         q = q.where(THUMBS.c.brand == main_folder_name)
         res = self.conn.execute(q).fetchall()
         res = [
-            (id_, ThumbUtils.get_thumb_path(rel_thumb_path))
+            (id_, ThumbUtils.get_abs_thumb_path(rel_thumb_path))
             for id_, rel_thumb_path in res
         ]
         return res

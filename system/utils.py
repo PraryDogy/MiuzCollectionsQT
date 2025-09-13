@@ -225,7 +225,7 @@ class ThumbUtils:
         return thumb_path.replace(Static.APP_SUPPORT_DIR, "")
     
     @classmethod
-    def get_thumb_path(cls, rel_thumb_path: str):
+    def get_abs_thumb_path(cls, rel_thumb_path: str):
         return Static.APP_SUPPORT_DIR + rel_thumb_path
 
     @classmethod
