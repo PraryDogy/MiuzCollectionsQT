@@ -9,7 +9,7 @@ from cfg import Cfg
 from ..lang import Lng
 from ..main_folder import MainFolder
 from ..utils import URunnable
-from .scaner_utils import (DelDirsHandler, DirsCompator, DirsLoader,
+from .scaner_utils import (RemovedDirsHandler, DirsCompator, DirsLoader,
                            MainFolderRemover, NewDirsHandler)
 
 
@@ -89,7 +89,7 @@ class ScanerTask(URunnable):
         # del_dirs: директории, которых были удалены в Finder, то 
         # есть когда была удалена папка целиком
         new_dirs = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
-        del_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
+        removed_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         
         if new_dirs:
             scan_dirs = NewDirsHandler(new_dirs, main_folder, self.task_state)
@@ -97,6 +97,6 @@ class ScanerTask(URunnable):
             scan_dirs.run()
             self.sigs.reload_gui.emit()
             
-        if del_dirs:
-            del_handler = DelDirsHandler(del_dirs, main_folder)
+        if removed_dirs:
+            del_handler = RemovedDirsHandler(removed_dirs, main_folder)
             del_handler.run()

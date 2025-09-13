@@ -532,7 +532,7 @@ class NewDirsHandler(QObject):
         return (del_images, new_images)
     
 
-class DelDirsHandler(QObject):
+class RemovedDirsHandler(QObject):
     def __init__(self, dirs_to_del: list, main_folder: MainFolder):
         """
         dirs_to_del: [(rel dir path, int modified time), ...]
