@@ -474,7 +474,7 @@ class WinMain(UMainWindow):
                 print("ни один файл не был скопирован")
                 return
             if item.action_type == item.type_cut:
-                print("вырезать")
+                item.source_main_folder
             else:
                 dirs = [item.target_dir, ]
                 update_task = CustomScanerTask(item.target_main_folder, dirs)
@@ -515,7 +515,17 @@ class WinMain(UMainWindow):
     def remove_files(self, rel_img_paths: list):
         # нужно добавить сканирование директории епта
         
+        def fin_remove(dirs_to_scan: list[str]):
+            task = CustomScanerTask(
+                MainFolder.current,
+                dirs_to_scan
+            )
+            task.sigs.finished_.connect(...)
+            UThreadPool.start(task)
+        
         def start_remove(img_paths: list[str]):
+            fin_remove(img_paths)
+            return
             task = RmFilesTask(img_paths)
             task.sigs.finished_.connect(self.restart_scaner_task)
             UThreadPool.start(task)
@@ -526,6 +536,10 @@ class WinMain(UMainWindow):
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_paths
             ]
+            scan_dirs = {
+                os.path.dirname(i)
+                for i in img_paths
+            }
             self.remove_files_win = WinQuestion(
                 Lng.attention[Cfg.lng],
                 f"{Lng.delete_forever[Cfg.lng]} ({len(img_paths)})?"
@@ -664,7 +678,6 @@ class WinMain(UMainWindow):
         img_paths: list[str] = [
             i.toLocalFile()
             for i in a0.mimeData().urls()
-            # if os.path.isfile(i.toLocalFile())
         ]
 
         for i in img_paths:
