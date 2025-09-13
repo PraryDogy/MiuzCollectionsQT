@@ -95,12 +95,14 @@ class ScanerTask(URunnable):
         new_dirs = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
         removed_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         
+        # обходим новые директории, добавляем / удаляем изображения
         if new_dirs:
             scan_dirs = NewDirsHandler(new_dirs, main_folder, self.task_state)
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
             scan_dirs.run()
             self.sigs.reload_gui.emit()
-            
+        
+        # удаляем удаленные Finder директории
         if removed_dirs:
             del_handler = RemovedDirsHandler(removed_dirs, main_folder)
             del_handler.run()
