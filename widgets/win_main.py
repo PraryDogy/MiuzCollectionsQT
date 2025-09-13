@@ -518,16 +518,16 @@ class WinMain(UMainWindow):
         def fin_remove(dirs_to_scan: list[str]):
             task = CustomScanerTask(
                 MainFolder.current,
-                dirs_to_scan
+                list(dirs_to_scan)
             )
-            task.sigs.finished_.connect(...)
+            task.sigs.finished_.connect(self.reload_gui)
             UThreadPool.start(task)
         
-        def start_remove(img_paths: list[str]):
-            fin_remove(img_paths)
-            return
+        def start_remove(img_paths: list[str], dirs_to_scan: list[str]):
             task = RmFilesTask(img_paths)
-            task.sigs.finished_.connect(self.restart_scaner_task)
+            task.sigs.finished_.connect(
+                lambda: fin_remove(dirs_to_scan)
+            )
             UThreadPool.start(task)
         
         main_folder_path = MainFolder.current.get_curr_path()
@@ -536,17 +536,14 @@ class WinMain(UMainWindow):
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_paths
             ]
-            scan_dirs = {
-                os.path.dirname(i)
-                for i in img_paths
-            }
+            dirs_to_scan = {os.path.dirname(i) for i in img_paths}
             self.remove_files_win = WinQuestion(
                 Lng.attention[Cfg.lng],
                 f"{Lng.delete_forever[Cfg.lng]} ({len(img_paths)})?"
             )
             self.remove_files_win.center_to_parent(self.window())
             self.remove_files_win.ok_clicked.connect(
-                lambda: start_remove(img_paths)
+                lambda: start_remove(img_paths, dirs_to_scan)
             )
             self.remove_files_win.ok_clicked.connect(
                 self.remove_files_win.deleteLater
