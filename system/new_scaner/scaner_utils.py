@@ -488,6 +488,9 @@ class NewDirsHandler(QObject):
     reload_gui = pyqtSignal()
    
     def __init__(self, dirs_to_scan: list[str], main_folder: MainFolder, task_state: TaskState):
+        """
+        dirs_to_scan: [(rel dir path, int modified time), ...]
+        """
         super().__init__()
         self.dirs_to_scan = dirs_to_scan
         self.main_folder = main_folder
@@ -528,3 +531,8 @@ class NewDirsHandler(QObject):
         self.progress_text.emit("")
 
         return (del_images, new_images)
+    
+
+class DelDirsHandler(QObject):
+    def __init__(self, dirs_to_del: list, main_folder: MainFolder):
+        super().__init__()

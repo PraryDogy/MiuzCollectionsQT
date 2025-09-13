@@ -98,6 +98,7 @@ class ScanerTask(URunnable):
             scan_dirs.run()
 
             self.sigs.reload_gui.emit()
+            
         if del_dirs:
             ...
             print("удалить директории")
