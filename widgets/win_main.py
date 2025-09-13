@@ -11,8 +11,9 @@ from cfg import Cfg, Dynamic, Static, ThumbData
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import (CopyFilesTask, CustomScanerTask, FavTask, MainUtils,
-                          ResetDataTask, RmFilesTask)
+from system.new_scaner.scaner_task import CustomScanerTask
+from system.tasks import (CopyFilesTask, FavTask, MainUtils, ResetDataTask,
+                          RmFilesTask)
 from system.utils import UThreadPool
 
 from ._base_widgets import (ClipBoardItem, SettingsItem, UHBoxLayout,

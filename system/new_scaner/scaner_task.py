@@ -8,10 +8,10 @@ from cfg import Cfg
 
 from ..lang import Lng
 from ..main_folder import MainFolder
-from ..utils import URunnable
+from ..utils import MainUtils, URunnable
 from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
-                           RemovedMainFolderHandler, NewDirsHandler,
-                           RemovedDirsHandler)
+                           NewDirsHandler, RemovedDirsHandler,
+                           RemovedMainFolderHandler)
 
 
 class ScanerSigs(QObject):
@@ -106,3 +106,38 @@ class ScanerTask(URunnable):
         if removed_dirs:
             del_handler = RemovedDirsHandler(removed_dirs, main_folder)
             del_handler.run()
+
+
+class _CustomScanerSigs(QObject):
+    finished_ = pyqtSignal()
+    progress_text = pyqtSignal(str)
+
+
+class CustomScanerTask(URunnable):
+    def __init__(self, main_folder: MainFolder, dirs_to_scan: list[str]):
+        """
+        Аналог полноценного сканера, но принимает список директорий
+        и выполняет сканирование для каждой из них в пределах MainFolder.
+        dirs: abs_image_paths
+        """
+        super().__init__()
+        self.sigs = _CustomScanerSigs()
+        self.main_folder = main_folder
+        self.dirs_to_scan = dirs_to_scan
+        
+    def task(self):
+        dirs_to_scan = (
+            (i, int(os.stat(i).st_mtime))
+            for i in self.dirs_to_scan
+        )
+        dirs_to_scan = [
+            (MainUtils.get_rel_path(self.main_folder.curr_path, abs_path), st_mtime)
+            for abs_path, st_mtime in dirs_to_scan
+        ]
+        
+        scan_dirs = NewDirsHandler(dirs_to_scan, self.main_folder, self.task_state)
+        scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
+        del_images, new_images = scan_dirs.run()
+
+        if new_images or del_images:
+            self.sigs.finished_.emit()
