@@ -95,6 +95,6 @@ class WinSmb(WinWarn):
     def __init__(self):
         super().__init__(
             Lng.attention[Cfg.lng],
-            Lng.folder_access_error[Cfg.lng]
+            "\n" + Lng.folder_access_error[Cfg.lng] + "\n"
         )
                 
