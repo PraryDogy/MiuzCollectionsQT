@@ -80,7 +80,9 @@ class ScanerTask(URunnable):
 
         # удаляем все файлы и данные из бД по удаленному MainFolder
         main_folder_remover = RemovedMainFolderHandler()
-        main_folder_remover.run()
+        deleted_main_folders = main_folder_remover.run()
+        if deleted_main_folders:
+            print("main folder deleted", deleted_main_folders)
         
         empty_remover = EmptyHashdirHandler()
         empty_remover.reload_gui.connect(lambda: self.set_flag(True))

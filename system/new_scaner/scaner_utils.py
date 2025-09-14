@@ -32,6 +32,13 @@ class RemovedMainFolderHandler:
         self.conn = Dbase.engine.connect()
 
     def run(self):
+        try:
+            return self.run()
+        except Exception as e:
+            print("new scaner utils, RemovedMainFoldeHandler", e)
+            return None
+
+    def _run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
         db_main_folders = self.conn.execute(q).scalars().all()
         app_main_folders = [i.name for i in MainFolder.list_]
@@ -42,6 +49,7 @@ class RemovedMainFolderHandler:
             self.remove_rows(rows)
         self.remove_dirs()
         self.conn.close()
+        return del_main_folders
         
     def get_rows(self, main_folder_name: str):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
