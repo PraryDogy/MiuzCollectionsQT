@@ -469,9 +469,14 @@ class WinMain(UMainWindow):
 
     def paste_files_here(self):
 
-        def scan_dirs(files_copied: list[str], item: ClipBoardItem):
-            if not files_copied:
+        def reset_clipboard():
+            self.grid.clipboard_item = None
+
+        def scan_dirs():
+            item = self.grid.clipboard_item
+            if not item.files_copied:
                 print("ни один файл не был скопирован")
+                reset_clipboard()
                 return
             if item.action_type == item.type_cut:
                 dirs = [item.source_dir, ]
@@ -483,46 +488,43 @@ class WinMain(UMainWindow):
                     lambda: item.set_type(item.type_copy)
                 )
                 scaner_task.sigs.finished_.connect(
-                    lambda: scan_dirs(files_copied, item)
+                    lambda: scan_dirs(item.files_copied, item)
                 )
                 UThreadPool.start(scaner_task)
-            else:
+            elif item.action_type == item.type_copy:
                 dirs = [item.target_dir, ]
                 scaner_task = CustomScanerTask(item.target_main_folder, dirs)
                 scaner_task.sigs.progress_text.connect(
                     self.bar_bottom.progress_bar.setText
                 )
+                scaner_task.sigs.finished_.connect(reset_clipboard)
                 UThreadPool.start(scaner_task)
 
-            self.grid.clipboard_item = None
-
-        def remove_files(item: ClipBoardItem, files_copied: list[str]):
-            item.files_copied = files_copied
+        def remove_files():
+            item = self.grid.clipboard_item
             remove_task = RmFilesTask(item.files_to_copy)
-            remove_task.sigs.finished_.connect(
-                scan_dirs(item)
-            )
+            remove_task.sigs.finished_.connect(scan_dirs)
             UThreadPool.start(remove_task)
 
-        def copy_files(item: ClipBoardItem):
+        def copy_files():
+            item = self.grid.clipboard_item
             copy_task = CopyFilesTask(item.target_dir, item.files_to_copy)
+            copy_task.sigs.finished_.connect(lambda files: item.set_files_copied(files))
             if item.action_type == item.type_cut:
-                copy_task.sigs.finished_.connect(
-                    lambda files_copied: remove_files(item, files_copied)
-            )
+                copy_task.sigs.finished_.connect(lambda _: remove_files())
             else:
-                copy_task.sigs.finished_.connect(
-                    lambda files_copied: scan_dirs(files_copied, item)
-                )
+                copy_task.sigs.finished_.connect(lambda _: scan_dirs())
             UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            if self.grid.clipboard_item:
-                item = self.grid.clipboard_item
-                item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
-                item.target_main_folder = MainFolder.current
-                copy_files(item)
+            item = self.grid.clipboard_item
+            if item:
+                item.set_target(
+                    main_folder=MainFolder.current,
+                    dir=MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+                )
+                copy_files()
         else:
             self.open_win_smb()
 
