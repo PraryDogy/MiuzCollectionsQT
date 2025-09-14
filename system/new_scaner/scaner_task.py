@@ -50,6 +50,7 @@ class ScanerTask(URunnable):
                 alias = i.name
                 no_conn = Lng.no_connection[Cfg.lng].lower()
                 self.sigs.progress_text.emit(f"{true_name} ({alias}): {no_conn}")
+                print("scaner no connection", true_name, alias)
                 sleep(5)
         try:
             self.sigs.progress_text.emit("")
@@ -59,14 +60,11 @@ class ScanerTask(URunnable):
 
     def main_folder_scan(self, main_folder: MainFolder):
         try:
-            self._cmd(main_folder)
+            self._main_folder_scan(main_folder)
         except (Exception, AttributeError) as e:
             print("new scaner task, main folder scan error", e)
 
-    def send_text(self, text: str):
-        self.sigs.progress_text.emit(text)
-
-    def _cmd(self, main_folder: MainFolder):
+    def _main_folder_scan(self, main_folder: MainFolder):
         coll_folder = main_folder.get_curr_path()
         if not coll_folder:
             print(main_folder.name, "coll folder not avaiable")
