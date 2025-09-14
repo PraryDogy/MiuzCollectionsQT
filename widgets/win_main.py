@@ -88,6 +88,8 @@ class WinMain(UMainWindow):
         self.left_menu.no_connection.connect(self.open_win_smb)
         self.left_menu.setup_main_folder.connect(self.open_settings)
         self.left_menu.setup_new_folder.connect(self.open_settings)
+        self.left_menu.update_grid.connect(lambda: self.grid.reload_thumbnails())
+        self.left_menu.restart_scaner.connect(lambda: self.restart_scaner_task())
         splitter.addWidget(self.left_menu)
 
         # Правый виджет

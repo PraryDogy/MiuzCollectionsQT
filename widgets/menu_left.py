@@ -33,6 +33,8 @@ class TreeSep(QTreeWidgetItem):
 class TreeWid(QTreeWidget):
     clicked_ = pyqtSignal(str)
     no_connection = pyqtSignal()
+    update_grid = pyqtSignal()
+    restart_scaner = pyqtSignal()
     hh = 25
 
     def __init__(self):
@@ -151,7 +153,12 @@ class TreeWid(QTreeWidget):
             menu.addAction(view)
 
             update_grid = QAction(Lng.update_grid[Cfg.lng], menu)
+            update_grid.triggered.connect(self.update_grid)
             menu.addAction(update_grid)
+
+            restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
+            restart_scaner.triggered.connect(self.restart_scaner.emit)
+            menu.addAction(restart_scaner)
 
             menu.addSeparator()
 
@@ -176,6 +183,8 @@ class MainFolderList(VListWidget):
     no_connection = pyqtSignal()
     setup_main_folder = pyqtSignal(MainFolder)
     setup_new_folder = pyqtSignal()
+    update_grid = pyqtSignal()
+    restart_scaner = pyqtSignal()
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
@@ -226,6 +235,13 @@ class MainFolderList(VListWidget):
             open = QAction(Lng.open[Cfg.lng], menu)
             open.triggered.connect(lambda: self.cmd("view", item))
             menu.addAction(open)
+            update_grid = QAction(Lng.update_grid[Cfg.lng], menu)
+            update_grid.triggered.connect(self.update_grid)
+            menu.addAction(update_grid)
+            restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
+            restart_scaner.triggered.connect(self.restart_scaner.emit)
+            menu.addAction(restart_scaner)
+            menu.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
             reveal.triggered.connect(lambda: self.cmd("reveal", item))
             menu.addAction(reveal)
@@ -245,6 +261,8 @@ class MenuLeft(QTabWidget):
     no_connection = pyqtSignal()
     setup_main_folder = pyqtSignal(SettingsItem)
     setup_new_folder = pyqtSignal(SettingsItem)
+    update_grid = pyqtSignal()
+    restart_scaner = pyqtSignal()
     
     def __init__(self):
         super().__init__()
@@ -288,11 +306,15 @@ class MenuLeft(QTabWidget):
         main_folders.no_connection.connect(self.no_connection.emit)
         main_folders.setup_main_folder.connect(edit_main_folder)
         main_folders.setup_new_folder.connect(setup_new_folder)
+        main_folders.update_grid.connect(self.update_grid.emit)
+        main_folders.restart_scaner.connect(self.restart_scaner.emit)
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
         self.tree_wid.clicked_.connect(self.tree_clicked)
         self.tree_wid.no_connection.connect(self.no_connection.emit)
+        self.tree_wid.update_grid.connect(self.update_grid.emit)
+        self.tree_wid.restart_scaner.connect(self.restart_scaner.emit)
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
         
         main_folder_path = MainFolder.current.get_curr_path()
