@@ -603,16 +603,18 @@ class Grid(VScrollArea):
     def set_clipboard(self, type: str):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path and self.selected_widgets:
+            abs_paths = [
+                MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
+                for i in self.selected_widgets
+            ]
             self.clipboard_item = ClipBoardItem()
             self.clipboard_item.set_type(type)
-            self.clipboard_item.set_source(
-                main_folder = MainFolder.current,
-                dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir),
-                files = [
-                    MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
-                    for i in self.selected_widgets
-                ]
-            )
+            self.clipboard_item.source_main_folder = MainFolder.current
+            self.clipboard_item.files_to_copy = abs_paths
+            self.clipboard_item.source_dirs = list(set(
+                os.path.dirname(i)
+                for i in abs_paths
+            ))
             if type == self.clipboard_item.type_cut:
                 for i in self.selected_widgets:
                     i.set_transparent_frame(0.5)

@@ -479,8 +479,7 @@ class WinMain(UMainWindow):
                 reset_clipboard()
                 return
             if item.action_type == item.type_cut:
-                dirs = [item.source_dir, ]
-                scaner_task = CustomScanerTask(item.source_main_folder, dirs)
+                scaner_task = CustomScanerTask(item.source_main_folder, item.source_dirs)
                 scaner_task.sigs.progress_text.connect(
                     self.bar_bottom.progress_bar.setText
                 )
@@ -502,12 +501,16 @@ class WinMain(UMainWindow):
                 UThreadPool.start(scaner_task)
 
         def remove_files():
-            item = self.grid.clipboard_item
             remove_task = RmFilesTask(item.files_to_copy)
             remove_task.sigs.finished_.connect(scan_dirs)
             UThreadPool.start(remove_task)
 
         def copy_files():
+            # item = self.grid.clipboard_item
+            # print(item.source_main_folder.name)
+            # print(item.source_dirs)
+            # print(item.files_to_copy)
+            # return
             item = self.grid.clipboard_item
             copy_task = CopyFilesTask(item.target_dir, item.files_to_copy)
             copy_task.sigs.finished_.connect(lambda files: item.set_files_copied(files))

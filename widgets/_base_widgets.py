@@ -382,21 +382,13 @@ class ClipBoardItem:
     def __init__(self):
         self.action_type: str
 
-        self.source_dir: str
+        self.source_dirs: list[str]
         self.source_main_folder: MainFolder
         self.files_to_copy: list[str]
 
         self.target_dir: str
         self.target_main_folder: MainFolder
         self.files_copied: list[str]
-
-    def set_source(self, main_folder: MainFolder, dir: str, files: list[str]):
-        """
-        dir: Dynamic.current_dir
-        """
-        self.source_main_folder = main_folder
-        self.source_dir = dir
-        self.files_to_copy = files
 
     def set_target(self, main_folder: MainFolder, dir: str):
         self.target_main_folder = main_folder
