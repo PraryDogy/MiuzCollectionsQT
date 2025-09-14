@@ -229,6 +229,11 @@ class MenuLeft(QTabWidget):
             Dynamic.current_dir = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
         self.clicked_.emit()
 
+    def reload_tree_menu(self):
+        print("reload tree menu")
+        self.tree_wid
+        TreeWid
+
     def init_ui(self):
         
         def edit_main_folder(main_folder: MainFolder):

@@ -292,7 +292,7 @@ class WinMain(UMainWindow):
             self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
             self.scaner_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
             self.scaner_task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-            self.scaner_task.sigs.reload_menu.connect(self.left_menu.init_ui)
+            self.scaner_task.sigs.reload_menu.connect(self.left_menu.reload_tree_menu)
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
