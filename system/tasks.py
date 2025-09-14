@@ -358,7 +358,10 @@ class RmFilesTask(URunnable):
         self.img_paths = img_paths
 
     def task(self):
-        self.remove_files()
+        try:
+            remove_files = self.remove_files()
+        except Exception as e:
+            print("tasks, RmFilesTask", e)
         self.sigs.finished_.emit()
 
     def remove_files(self):
