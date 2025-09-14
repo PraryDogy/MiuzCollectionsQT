@@ -82,7 +82,7 @@ class ScanerTask(URunnable):
         main_folder_remover = RemovedMainFolderHandler()
         deleted_main_folders = main_folder_remover.run()
         if deleted_main_folders:
-            print("main folder deleted", deleted_main_folders)
+            print("main folders deleted", deleted_main_folders)
         
         empty_remover = EmptyHashdirHandler()
         empty_remover.reload_gui.connect(lambda: self.set_flag(True))
@@ -116,6 +116,7 @@ class ScanerTask(URunnable):
         if removed_dirs:
             del_handler = RemovedDirsHandler(removed_dirs, main_folder)
             del_handler.run()
+            print("dirs removed", removed_dirs)
 
 
 class _CustomScanerSigs(QObject):
