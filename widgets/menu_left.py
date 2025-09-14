@@ -35,10 +35,11 @@ class TreeWid(QTreeWidget):
     no_connection = pyqtSignal()
     hh = 25
 
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
         self.root_dir: str = None
         self.last_dir: str = None
+        self.selected_path: str = None
         self.setHeaderHidden(True)
         self.itemClicked.connect(self.on_item_click)
 
@@ -47,6 +48,7 @@ class TreeWid(QTreeWidget):
         self.root_dir = root_dir
         self.last_dir = root_dir
 
+        # верхние кастомные элементы
         custom_item = FavItem()
         custom_item.setSizeHint(0, QSize(0, self.hh))
         self.insertTopLevelItem(0, custom_item)
@@ -54,18 +56,19 @@ class TreeWid(QTreeWidget):
         sep = TreeSep()
         self.insertTopLevelItem(1, sep)
 
-        root_item: QTreeWidgetItem = QTreeWidgetItem([os.path.basename(self.root_dir)])
+        # корневая директория
+        root_item = QTreeWidgetItem([os.path.basename(root_dir)])
         root_item.setSizeHint(0, QSize(0, self.hh))
-        root_item.setData(0, Qt.ItemDataRole.UserRole, self.root_dir)
+        root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)
         self.addTopLevelItem(root_item)
 
-        worker: LoadSortedDirsTask = LoadSortedDirsTask(self.root_dir)
+        worker = LoadSortedDirsTask(root_dir)
         worker.sigs.finished_.connect(
             lambda data, item=root_item: self.add_children(item, data)
         )
         UThreadPool.start(worker)
 
-    def on_item_click(self, item: QTreeWidgetItem, col: int) -> None:
+    def on_item_click(self, item: QTreeWidgetItem, col: int):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
         if isinstance(item, TreeSep):
             return
@@ -73,17 +76,25 @@ class TreeWid(QTreeWidget):
             return
         elif isinstance(item, FavItem):
             self.last_dir = clicked_dir
+            self.selected_path = clicked_dir
             self.clicked_.emit(Static.NAME_FAVS)
         else:
             self.last_dir = clicked_dir
+            self.selected_path = clicked_dir
             self.clicked_.emit(clicked_dir)
             if item.childCount() == 0:
-                worker: LoadSortedDirsTask = LoadSortedDirsTask(clicked_dir)
+                worker = LoadSortedDirsTask(clicked_dir)
                 worker.sigs.finished_.connect(
                     lambda data, item=item: self.add_children(item, data)
                 )
                 UThreadPool.start(worker)
             item.setExpanded(True)
+
+    def refresh_tree(self):
+        if not self.root_dir:
+            return
+        # просто перезапускаем init_ui, выделение восстановится
+        self.init_ui(self.root_dir)
 
     def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
         parent_item.takeChildren()
@@ -94,60 +105,15 @@ class TreeWid(QTreeWidget):
             parent_item.addChild(child)
         parent_item.setExpanded(True)
 
-    def refresh_tree(self):
-
-        def on_finished(data, item=root_item):
-            existing_items = {
-                item.child(j).data(0, Qt.ItemDataRole.UserRole): item.child(j)
-                for j in range(item.childCount())
-            }
-
-            # добавляем новые
-            for path, name in data.items():
-                if path not in existing_items:
-                    child = QTreeWidgetItem([name])
-                    child.setSizeHint(0, QSize(0, self.hh))
-                    child.setData(0, Qt.ItemDataRole.UserRole, path)
-                    item.addChild(child)
-
-            # удаляем отсутствующие
-            for path in list(existing_items.keys()):
-                if path not in data:
-                    idx = item.indexOfChild(existing_items[path])
-                    item.takeChild(idx)
-
-            # восстановить выделение
-            if selected_path:
-                items = self.findItems(
-                    "*", Qt.MatchFlag.MatchRecursive | Qt.MatchFlag.MatchWildcard
-                )
-                for it in items:
-                    if it.data(0, Qt.ItemDataRole.UserRole) == selected_path:
-                        self.setCurrentItem(it)
-                        break
-
-        if not self.root_dir:
-            return
-
-        root_item = None
-        for i in range(self.topLevelItemCount()):
-            item = self.topLevelItem(i)
-            if item.data(0, Qt.ItemDataRole.UserRole) == self.root_dir:
-                root_item = item
-                break
-        if root_item is None:
-            return
-
-        current_selected = self.currentItem()
-        selected_path = (
-            current_selected.data(0, Qt.ItemDataRole.UserRole)
-            if current_selected else None
-        )
-
-        worker = LoadSortedDirsTask(self.root_dir)
-        worker.sigs.finished_.connect(on_finished)
-        UThreadPool.start(worker)
-
+        # восстановление выделения
+        if self.selected_path:
+            items = self.findItems(
+                "*", Qt.MatchFlag.MatchRecursive | Qt.MatchFlag.MatchWildcard
+            )
+            for it in items:
+                if it.data(0, Qt.ItemDataRole.UserRole) == self.selected_path:
+                    self.setCurrentItem(it)
+                    break
 
     def view(self, path: str):
         self.clicked_.emit(path)
