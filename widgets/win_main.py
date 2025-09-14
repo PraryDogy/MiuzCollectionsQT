@@ -111,7 +111,6 @@ class WinMain(UMainWindow):
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_paths: self.remove_files(rel_img_paths))
-        self.grid.move_files.connect(lambda rel_img_paths: self.paste_files_here(rel_img_paths))
         self.grid.no_connection.connect(self.open_win_smb)
         self.grid.img_view.connect(lambda: self.open_img_view())
         self.grid.save_files.connect(self.save_files)

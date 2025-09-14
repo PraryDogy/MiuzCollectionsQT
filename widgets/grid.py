@@ -18,7 +18,7 @@ from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import (ClipBoardItem, SvgBtn, UMenu, UVBoxLayout,
                             VScrollArea)
-from .actions import (CopyName, CopyPath, MoveFiles, OpenInView, RemoveFiles,
+from .actions import (CopyName, CopyPath, OpenInView, RemoveFiles,
                       RevealInFinder, Save, SaveAs, ScanerRestart, SetFav,
                       WinInfoAction)
 
@@ -365,7 +365,6 @@ class Grid(VScrollArea):
     # --- Сигналы ---
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
-    move_files = pyqtSignal(list)
     save_files = pyqtSignal(tuple)
     update_bottom_bar = pyqtSignal()
     img_view = pyqtSignal()
@@ -863,13 +862,11 @@ class Grid(VScrollArea):
                     lambda: self.copy_name.emit(rel_paths))
             self.menu_.addSeparator()
 
-            # save / move / remove
+            # save / remove
             add_action(Save(self.menu_, len(rel_paths)),
                     lambda: self.save_files.emit((os.path.expanduser("~/Downloads"), rel_paths)))
             add_action(SaveAs(self.menu_, len(rel_paths)),
                     lambda: self.save_files.emit((None, rel_paths)))
-            add_action(MoveFiles(self.menu_, rel_paths),
-                    lambda: self.move_files.emit(rel_paths))
             add_action(RemoveFiles(self.menu_, len(self.selected_widgets)),
                     lambda: self.remove_files.emit(rel_paths))
 

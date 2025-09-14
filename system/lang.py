@@ -138,7 +138,7 @@ class Lng:
     theme_light = ("Светлая", "Light")
     start_date = ("Дата начала", "Start date")
     end_date = ("Дата окончания", "End date")
-    move = ("Переместить", "Move files")
+    cut = ("Вырезать", "Cut")
     drop_only_files = ("Можно загружать только файлы.", "Only files can be uploaded.")
     filters = ("Фильтры", "Filters")
     back = ("Назад", "Back")

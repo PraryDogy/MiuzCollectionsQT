@@ -64,7 +64,17 @@ class RemoveFiles(QAction):
         super().__init__(text_, parent)
 
 
-class MoveFiles(QAction):
-    def __init__(self, parent: QMenu, rel_img_paths: list[str]):
-        text = f"{Lng.move[Cfg.lng]} ({len(rel_img_paths)})"
+class CutFiles(QAction):
+    def __init__(self, parent: QMenu, total: int):
+        text = f"{Lng.cut[Cfg.lng]} ({total})"
+        super().__init__(text=text, parent=parent)
+
+class CopyFiles(QAction):
+    def __init__(self, parent: QMenu, total: int):
+        text = f"{Lng.copy[Cfg.lng]} ({total})"
+        super().__init__(text=text, parent=parent)
+
+class PasteFiles(QAction):
+    def __init__(self, parent: QMenu, total: int):
+        text = f"{Lng.paste[Cfg.lng]} ({total})"
         super().__init__(text=text, parent=parent)
