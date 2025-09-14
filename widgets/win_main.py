@@ -291,7 +291,8 @@ class WinMain(UMainWindow):
             self.scaner_task = ScanerTask()
             self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
             self.scaner_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
-            self.scaner_task.sigs.reload_thumbnails.connect(self.reload_gui)
+            self.scaner_task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
+            self.scaner_task.sigs.reload_menu.connect(self.left_menu.init_ui)
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
@@ -560,10 +561,6 @@ class WinMain(UMainWindow):
             self.remove_files_win.show()
         else:
             self.open_win_smb()
-
-    def reload_gui(self):
-        self.grid.reload_thumbnails()
-        self.left_menu.init_ui()
     
     def upload_files(self, img_paths: list):
 
@@ -587,7 +584,7 @@ class WinMain(UMainWindow):
                 self.bar_bottom.progress_bar.setText
             )
             task.sigs.reload_thumbnails.connect(
-                self.reload_gui
+                self.grid.reload_thumbnails
             )
             UThreadPool.start(task)
 
@@ -620,11 +617,7 @@ class WinMain(UMainWindow):
             UThreadPool.start(task)
 
         if MainFolder.current.get_curr_path():
-            self.win_upload = WinUpload()
-            self.win_upload.clicked.connect(lambda data: copy_files_start(data))
-            self.win_upload.no_connection.connect(self.open_win_smb)
-            self.win_upload.center_to_parent(self.window())
-            self.win_upload.show()
+            print("upload files here")
         else:
             self.open_win_smb()
 
