@@ -398,7 +398,7 @@ class ClipBoardItem:
         self.source_dir = dir
         self.files_to_copy = files
 
-    def set_target(self, main_folder: MainFolder, dir: str, files: list[str]):
+    def set_target(self, main_folder: MainFolder, dir: str):
         self.target_main_folder = main_folder
         self.target_dir = dir
     
