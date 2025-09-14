@@ -487,9 +487,7 @@ class WinMain(UMainWindow):
                 scaner_task.sigs.finished_.connect(
                     lambda: item.set_type(item.type_copy)
                 )
-                scaner_task.sigs.finished_.connect(
-                    lambda: scan_dirs(item.files_copied, item)
-                )
+                scaner_task.sigs.finished_.connect(scan_dirs)
                 UThreadPool.start(scaner_task)
             elif item.action_type == item.type_copy:
                 dirs = [item.target_dir, ]
