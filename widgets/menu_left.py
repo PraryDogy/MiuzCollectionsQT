@@ -105,15 +105,35 @@ class TreeWid(QTreeWidget):
             parent_item.addChild(child)
         parent_item.setExpanded(True)
 
-        # восстановление выделения
-        if self.selected_path:
+        if not self.selected_path:
+            return
+
+        paths = self.generate_path_hierarchy(self.selected_path)
+        if paths:
             items = self.findItems(
                 "*", Qt.MatchFlag.MatchRecursive | Qt.MatchFlag.MatchWildcard
             )
             for it in items:
-                if it.data(0, Qt.ItemDataRole.UserRole) == self.selected_path:
-                    self.setCurrentItem(it)
-                    break
+                for x in paths:
+                    if it.data(0, Qt.ItemDataRole.UserRole) == x:
+                        self.setCurrentItem(it)
+                        # опционально раскроем все родительские элементы до найденного
+                        p = it.parent()
+                        while p:
+                            p.setExpanded(True)
+                            p = p.parent()
+                        break
+
+    def generate_path_hierarchy(self, full_path):
+        parts = []
+        path = full_path
+        while True:
+            parts.append(path)
+            parent = os.path.dirname(path)
+            if parent == path:  # достигли корня
+                break
+            path = parent
+        return parts
 
     def view(self, path: str):
         self.clicked_.emit(path)
