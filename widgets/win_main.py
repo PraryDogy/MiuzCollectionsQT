@@ -16,7 +16,8 @@ from system.tasks import (CopyFilesTask, FavTask, MainUtils, ResetDataTask,
                           RmFilesTask)
 from system.utils import UThreadPool
 
-from ._base_widgets import SettingsItem, UHBoxLayout, UMainWindow, UVBoxLayout
+from ._base_widgets import (ClipBoardItem, SettingsItem, UHBoxLayout,
+                            UMainWindow, UVBoxLayout)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -519,10 +520,8 @@ class WinMain(UMainWindow):
         if main_folder_path:
             item = self.grid.clipboard_item
             if item:
-                item.set_target(
-                    main_folder=MainFolder.current,
-                    dir=MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
-                )
+                item.target_main_folder = MainFolder.current
+                item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
                 copy_files()
         else:
             self.open_win_smb()
@@ -562,61 +561,15 @@ class WinMain(UMainWindow):
             self.open_win_smb()
     
     def upload_files(self, img_paths: list):
-
-        def set_below_label(data: tuple[int, int], win: ProgressbarWin):
-            count, total = data
-            win.below_label.setText(
-                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
-            )
-
-        def set_above_label(text: str, dest_name: str, win: ProgressbarWin):
-            win.above_label.setText(
-                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
-            )
-
-        def copy_files_fin(files: list, dest: str, main_folder: MainFolder):
-            if not files:
-                return
-
-            task = CustomScanerTask(main_folder, [dest, ])
-            task.sigs.progress_text.connect(
-                self.bar_bottom.progress_bar.setText
-            )
-            task.sigs.reload_thumbnails.connect(
-                self.grid.reload_thumbnails
-            )
-            UThreadPool.start(task)
-
-        def copy_files_start(data: tuple):
-            main_folder, dest = data
-            dest_name = os.path.basename(dest)
-            progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
-            progress_win.progressbar.setMaximum(100)
-            progress_win.center_to_parent(self)
-            progress_win.show()
-            task = CopyFilesTask(dest, img_paths)
-            progress_win.cancel.connect(
-                lambda: task.task_state.set_should_run(False)
-            )
-            task.sigs.value_changed.connect(
-                progress_win.progressbar.setValue
-            )
-            task.sigs.progress_changed.connect(
-                lambda data: set_below_label(data, progress_win)
-            )
-            task.sigs.file_changed.connect(
-                lambda text: set_above_label(text, dest_name, progress_win)
-            )
-            task.sigs.finished_.connect(
-                lambda files: copy_files_fin(files, dest, main_folder)
-            )
-            task.sigs.finished_.connect(
-                progress_win.deleteLater
-            )
-            UThreadPool.start(task)
-
-        if MainFolder.current.get_curr_path():
-            print("upload files here")
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            self.grid.clipboard_item = ClipBoardItem()
+            item = self.grid.clipboard_item
+            item.set_type(ClipBoardItem.type_copy)
+            item.target_main_folder = MainFolder.current
+            item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+            item.files_to_copy = img_paths
+            self.paste_files_here()
         else:
             self.open_win_smb()
 
