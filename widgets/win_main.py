@@ -474,13 +474,25 @@ class WinMain(UMainWindow):
                 print("ни один файл не был скопирован")
                 return
             if item.action_type == item.type_cut:
-                item.source_main_folder
+                dirs = [item.source_dir, ]
+                scaner_task = CustomScanerTask(item.source_main_folder, dirs)
+                scaner_task.sigs.progress_text.connect(
+                    self.bar_bottom.progress_bar.setText
+                )
+                scaner_task.sigs.finished_.connect(
+                    lambda: item.set_type(item.type_copy)
+                )
+                scaner_task.sigs.finished_.connect(
+                    lambda: scan_dirs(files_copied, item)
+                )
+                UThreadPool.start(scaner_task)
             else:
                 dirs = [item.target_dir, ]
-                update_task = CustomScanerTask(item.target_main_folder, dirs)
-                update_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
-                update_task.sigs.finished_.connect(self.reload_gui)
-                UThreadPool.start(update_task)
+                scaner_task = CustomScanerTask(item.target_main_folder, dirs)
+                scaner_task.sigs.progress_text.connect(
+                    self.bar_bottom.progress_bar.setText
+                )
+                UThreadPool.start(scaner_task)
 
             self.grid.clipboard_item = None
 
