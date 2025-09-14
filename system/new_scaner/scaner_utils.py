@@ -558,6 +558,7 @@ class RemovedDirsHandler(QObject):
             stmt = (
                 sqlalchemy.select(THUMBS.c.short_hash)
                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
+                .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
                 .where(THUMBS.c.brand == self.main_folder.name)
             )
             for short_hash in self.conn.execute(stmt).scalars():
@@ -569,6 +570,7 @@ class RemovedDirsHandler(QObject):
             del_stmt = (
                 sqlalchemy.delete(THUMBS)
                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
+                .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%/%"))
                 .where(THUMBS.c.brand == self.main_folder.name)
             )
             self.conn.execute(del_stmt)
