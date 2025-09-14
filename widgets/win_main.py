@@ -528,7 +528,6 @@ class WinMain(UMainWindow):
             self.open_win_smb()
 
     def remove_files(self, rel_img_paths: list):
-        # нужно добавить сканирование директории епта
         
         def fin_remove(dirs_to_scan: list[str]):
             task = CustomScanerTask(MainFolder.current, dirs_to_scan)
