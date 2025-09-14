@@ -16,8 +16,7 @@ from system.tasks import (CopyFilesTask, FavTask, MainUtils, ResetDataTask,
                           RmFilesTask)
 from system.utils import UThreadPool
 
-from ._base_widgets import (ClipBoardItem, SettingsItem, UHBoxLayout,
-                            UMainWindow, UVBoxLayout)
+from ._base_widgets import SettingsItem, UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -28,7 +27,6 @@ from .win_dates import WinDates
 from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
-from .win_upload import WinUpload
 from .win_warn import WinQuestion, WinSmb, WinWarn
 
 
