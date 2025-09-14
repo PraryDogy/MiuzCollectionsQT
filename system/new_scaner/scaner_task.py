@@ -17,7 +17,7 @@ from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
 class ScanerSigs(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
-    reload_gui = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
     reload_menu = pyqtSignal()
 
 
@@ -33,6 +33,7 @@ class ScanerTask(URunnable):
         self.sigs = ScanerSigs()
         self.pause_flag = False
         self.user_canceled_scan = False
+        self.reload_gui_flag = False
         print("Выбран новый сканер")
 
     def task(self):
@@ -53,6 +54,9 @@ class ScanerTask(URunnable):
                 print("scaner no connection", true_name, alias)
                 sleep(5)
         try:
+            if self.reload_gui_flag:
+                self.sigs.reload_menu.emit()
+                self.sigs.reload_thumbnails.emit()
             self.sigs.progress_text.emit("")
             self.sigs.finished_.emit()
         except RuntimeError as e:
