@@ -498,6 +498,9 @@ class WinMain(UMainWindow):
                     self.bar_bottom.progress_bar.setText
                 )
                 scaner_task.sigs.finished_.connect(reset_clipboard)
+                scaner_task.sigs.finished_.connect(
+                    self.grid.reload_thumbnails
+                )
                 UThreadPool.start(scaner_task)
 
         def remove_files():
