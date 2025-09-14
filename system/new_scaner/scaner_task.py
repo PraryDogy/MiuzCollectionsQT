@@ -55,12 +55,16 @@ class ScanerTask(URunnable):
                 sleep(5)
         try:
             if self.reload_gui_flag:
+                self.set_flag(False)
                 self.sigs.reload_menu.emit()
                 self.sigs.reload_thumbnails.emit()
             self.sigs.progress_text.emit("")
             self.sigs.finished_.emit()
         except RuntimeError as e:
             ...
+
+    def set_flag(self, value: bool):
+        self.reload_gui_flag = value
 
     def main_folder_scan(self, main_folder: MainFolder):
         try:
@@ -102,6 +106,7 @@ class ScanerTask(URunnable):
         if new_dirs:
             scan_dirs = NewDirsHandler(new_dirs, main_folder, self.task_state)
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
+            scan_dirs.reload_gui.connect(lambda: self.set_flag(True))
             scan_dirs.run()
         
         # удаляем удаленные Finder директории
