@@ -381,6 +381,7 @@ class ClipBoardItem:
     
     def __init__(self):
         self.action_type: str
+
         self.source_main_folder: MainFolder
         self.files_to_copy: list[str]
 
