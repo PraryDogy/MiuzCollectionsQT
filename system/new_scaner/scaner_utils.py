@@ -580,14 +580,18 @@ class RemovedDirsHandler(QObject):
         self.conn.commit()
 
 
-class EmptyHashdirHandler:
+class EmptyHashdirHandler(QObject):
+    reload_gui = pyqtSignal()
+
     def __init__(self):
         super().__init__()
+
         
     def run(self):
         for i in os.scandir(Static.APP_SUPPORT_HASHDIR):
             if os.path.isdir(i.path) and not os.listdir(i.path):
                 try:
                     shutil.rmtree(i.path)
+                    self.reload_gui.emit()
                 except Exception as e:
                     print("new scaner, empty hashdir remover", e)

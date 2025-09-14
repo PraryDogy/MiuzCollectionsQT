@@ -93,7 +93,6 @@ class TreeWid(QTreeWidget):
     def refresh_tree(self):
         if not self.root_dir:
             return
-        # просто перезапускаем init_ui, выделение восстановится
         self.init_ui(self.root_dir)
 
     def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
@@ -117,11 +116,6 @@ class TreeWid(QTreeWidget):
                 for x in paths:
                     if it.data(0, Qt.ItemDataRole.UserRole) == x:
                         self.setCurrentItem(it)
-                        # опционально раскроем все родительские элементы до найденного
-                        p = it.parent()
-                        while p:
-                            p.setExpanded(True)
-                            p = p.parent()
                         break
 
     def generate_path_hierarchy(self, full_path):
@@ -269,9 +263,6 @@ class MenuLeft(QTabWidget):
         else:
             Dynamic.current_dir = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
         self.clicked_.emit()
-
-    def reload_tree_menu(self):
-        self.tree_wid.refresh_tree()
 
     def init_ui(self):
         

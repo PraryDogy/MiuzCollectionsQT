@@ -83,6 +83,7 @@ class ScanerTask(URunnable):
         main_folder_remover.run()
         
         empty_remover = EmptyHashdirHandler()
+        empty_remover.reload_gui.connect(lambda: self.set_flag(True))
         empty_remover.run()
 
         # собираем Finder директории и директории из БД
