@@ -506,11 +506,6 @@ class WinMain(UMainWindow):
             UThreadPool.start(remove_task)
 
         def copy_files():
-            # item = self.grid.clipboard_item
-            # print(item.source_main_folder.name)
-            # print(item.source_dirs)
-            # print(item.files_to_copy)
-            # return
             item = self.grid.clipboard_item
             copy_task = CopyFilesTask(item.target_dir, item.files_to_copy)
             copy_task.sigs.finished_.connect(lambda files: item.set_files_copied(files))
@@ -536,18 +531,13 @@ class WinMain(UMainWindow):
         # нужно добавить сканирование директории епта
         
         def fin_remove(dirs_to_scan: list[str]):
-            task = CustomScanerTask(
-                MainFolder.current,
-                list(dirs_to_scan)
-            )
-            task.sigs.finished_.connect(self.reload_gui)
+            task = CustomScanerTask(MainFolder.current, dirs_to_scan)
+            task.sigs.finished_.connect(self.grid.reload_thumbnails)
             UThreadPool.start(task)
         
         def start_remove(img_paths: list[str], dirs_to_scan: list[str]):
             task = RmFilesTask(img_paths)
-            task.sigs.finished_.connect(
-                lambda: fin_remove(dirs_to_scan)
-            )
+            task.sigs.finished_.connect(lambda: fin_remove(dirs_to_scan))
             UThreadPool.start(task)
         
         main_folder_path = MainFolder.current.get_curr_path()
@@ -556,7 +546,7 @@ class WinMain(UMainWindow):
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_paths
             ]
-            dirs_to_scan = {os.path.dirname(i) for i in img_paths}
+            dirs_to_scan = list(set(os.path.dirname(i) for i in img_paths))
             self.remove_files_win = WinQuestion(
                 Lng.attention[Cfg.lng],
                 f"{Lng.delete_forever[Cfg.lng]} ({len(img_paths)})?"
