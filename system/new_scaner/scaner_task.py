@@ -109,7 +109,7 @@ class ScanerTask(URunnable):
 
 
 class _CustomScanerSigs(QObject):
-    finished_ = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
     progress_text = pyqtSignal(str)
 
 
@@ -139,5 +139,5 @@ class CustomScanerTask(URunnable):
         scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
         del_images, new_images = scan_dirs.run()
 
-        if new_images or del_images:
-            self.sigs.finished_.emit()
+        if del_images or new_images:
+            self.sigs.reload_thumbnails.emit()

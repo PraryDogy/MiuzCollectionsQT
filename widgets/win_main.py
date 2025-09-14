@@ -483,10 +483,10 @@ class WinMain(UMainWindow):
                 scaner_task.sigs.progress_text.connect(
                     self.bar_bottom.progress_bar.setText
                 )
-                scaner_task.sigs.finished_.connect(
+                scaner_task.sigs.reload_thumbnails.connect(
                     lambda: item.set_type(item.type_copy)
                 )
-                scaner_task.sigs.finished_.connect(scan_dirs)
+                scaner_task.sigs.reload_thumbnails.connect(scan_dirs)
                 UThreadPool.start(scaner_task)
             elif item.action_type == item.type_copy:
                 dirs = [item.target_dir, ]
@@ -494,8 +494,8 @@ class WinMain(UMainWindow):
                 scaner_task.sigs.progress_text.connect(
                     self.bar_bottom.progress_bar.setText
                 )
-                scaner_task.sigs.finished_.connect(reset_clipboard)
-                scaner_task.sigs.finished_.connect(
+                scaner_task.sigs.reload_thumbnails.connect(reset_clipboard)
+                scaner_task.sigs.reload_thumbnails.connect(
                     self.grid.reload_thumbnails
                 )
                 UThreadPool.start(scaner_task)
@@ -531,7 +531,7 @@ class WinMain(UMainWindow):
         
         def fin_remove(dirs_to_scan: list[str]):
             task = CustomScanerTask(MainFolder.current, dirs_to_scan)
-            task.sigs.finished_.connect(self.grid.reload_thumbnails)
+            task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
             UThreadPool.start(task)
         
         def start_remove(img_paths: list[str], dirs_to_scan: list[str]):
@@ -586,7 +586,7 @@ class WinMain(UMainWindow):
             task.sigs.progress_text.connect(
                 self.bar_bottom.progress_bar.setText
             )
-            task.sigs.finished_.connect(
+            task.sigs.reload_thumbnails.connect(
                 self.reload_gui
             )
             UThreadPool.start(task)
