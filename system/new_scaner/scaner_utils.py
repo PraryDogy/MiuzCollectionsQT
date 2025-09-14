@@ -484,6 +484,7 @@ class _ImgDbUpdater:
 
 class NewDirsHandler(QObject):
     progress_text = pyqtSignal(str)
+    reload_gui = pyqtSignal()
    
     def __init__(self, dirs_to_scan: list[str], main_folder: MainFolder, task_state: TaskState):
         """
@@ -507,8 +508,6 @@ class NewDirsHandler(QObject):
         img_compator = _ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
         
-        # print(del_images, new_images)
-
         # создаем / обновляем изображения в hashdir
         hashdir_updater = _ImgHashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
         hashdir_updater.progress_text.connect(self.progress_text.emit)
@@ -526,6 +525,9 @@ class NewDirsHandler(QObject):
         dirs_updater.run()
 
         self.progress_text.emit("")
+
+        if del_images or new_images:
+            self.reload_gui.emit()
 
         return (del_images, new_images)
     
