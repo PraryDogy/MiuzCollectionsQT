@@ -94,6 +94,61 @@ class TreeWid(QTreeWidget):
             parent_item.addChild(child)
         parent_item.setExpanded(True)
 
+    def refresh_tree(self):
+
+        def on_finished(data, item=root_item):
+            existing_items = {
+                item.child(j).data(0, Qt.ItemDataRole.UserRole): item.child(j)
+                for j in range(item.childCount())
+            }
+
+            # добавляем новые
+            for path, name in data.items():
+                if path not in existing_items:
+                    child = QTreeWidgetItem([name])
+                    child.setSizeHint(0, QSize(0, self.hh))
+                    child.setData(0, Qt.ItemDataRole.UserRole, path)
+                    item.addChild(child)
+
+            # удаляем отсутствующие
+            for path in list(existing_items.keys()):
+                if path not in data:
+                    idx = item.indexOfChild(existing_items[path])
+                    item.takeChild(idx)
+
+            # восстановить выделение
+            if selected_path:
+                items = self.findItems(
+                    "*", Qt.MatchFlag.MatchRecursive | Qt.MatchFlag.MatchWildcard
+                )
+                for it in items:
+                    if it.data(0, Qt.ItemDataRole.UserRole) == selected_path:
+                        self.setCurrentItem(it)
+                        break
+
+        if not self.root_dir:
+            return
+
+        root_item = None
+        for i in range(self.topLevelItemCount()):
+            item = self.topLevelItem(i)
+            if item.data(0, Qt.ItemDataRole.UserRole) == self.root_dir:
+                root_item = item
+                break
+        if root_item is None:
+            return
+
+        current_selected = self.currentItem()
+        selected_path = (
+            current_selected.data(0, Qt.ItemDataRole.UserRole)
+            if current_selected else None
+        )
+
+        worker = LoadSortedDirsTask(self.root_dir)
+        worker.sigs.finished_.connect(on_finished)
+        UThreadPool.start(worker)
+
+
     def view(self, path: str):
         self.clicked_.emit(path)
 
@@ -230,9 +285,7 @@ class MenuLeft(QTabWidget):
         self.clicked_.emit()
 
     def reload_tree_menu(self):
-        print("reload tree menu")
-        self.tree_wid
-        TreeWid
+        self.tree_wid.refresh_tree()
 
     def init_ui(self):
         
