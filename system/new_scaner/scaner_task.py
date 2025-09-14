@@ -18,6 +18,7 @@ class ScanerSigs(QObject):
     finished_ = pyqtSignal()
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
+    reload_menu = pyqtSignal()
 
 
 class ScanerTask(URunnable):
@@ -48,10 +49,10 @@ class ScanerTask(URunnable):
                     true_name = os.path.basename(i.paths[0])
                 alias = i.name
                 no_conn = Lng.no_connection[Cfg.lng].lower()
-                self.send_text(f"{true_name} ({alias}): {no_conn}")
+                self.sigs.progress_text.emit(f"{true_name} ({alias}): {no_conn}")
                 sleep(5)
         try:
-            self.send_text("")
+            self.sigs.progress_text.emit("")
             self.sigs.finished_.emit()
         except RuntimeError as e:
             ...
@@ -80,7 +81,7 @@ class ScanerTask(URunnable):
 
         # собираем Finder директории и директории из БД
         dirs_loader = DirsLoader(main_folder, self.task_state)
-        dirs_loader.progress_text.connect(self.send_text)
+        dirs_loader.progress_text.connect(self.sigs.progress_text.emit)
         finder_dirs = dirs_loader.finder_dirs()
         db_dirs = dirs_loader.db_dirs()
         if not finder_dirs or not self.task_state.should_run():
@@ -100,7 +101,6 @@ class ScanerTask(URunnable):
             scan_dirs = NewDirsHandler(new_dirs, main_folder, self.task_state)
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
             scan_dirs.run()
-            self.sigs.reload_gui.emit()
         
         # удаляем удаленные Finder директории
         if removed_dirs:
