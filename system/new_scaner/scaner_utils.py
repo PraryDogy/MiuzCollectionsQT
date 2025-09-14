@@ -33,7 +33,7 @@ class RemovedMainFolderHandler:
 
     def run(self):
         try:
-            return self.run()
+            return self._run()
         except Exception as e:
             print("new scaner utils, RemovedMainFoldeHandler", e)
             return None

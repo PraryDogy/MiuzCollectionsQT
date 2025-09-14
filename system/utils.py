@@ -231,12 +231,25 @@ class ThumbUtils:
     @classmethod
     def write_thumb(cls, thumb_path: str, thumb: np.ndarray) -> bool:
         try:
-            img = cv2.cvtColor(thumb, cv2.COLOR_BGR2RGB)
-            cv2.imwrite(thumb_path, img)
-            return True
+            if thumb is None or thumb.size == 0:
+                print("Utils - write_thumb - пустой thumb")
+                return False
+
+            if len(thumb.shape) == 2:  # grayscale
+                img = thumb
+            elif thumb.shape[2] == 3:  # BGR
+                img = cv2.cvtColor(thumb, cv2.COLOR_BGR2RGB)
+            elif thumb.shape[2] == 4:  # BGRA
+                img = cv2.cvtColor(thumb, cv2.COLOR_BGRA2RGB)
+            else:
+                print(f"Utils - write_thumb - неподдерживаемое число каналов: {thumb.shape}")
+                return False
+
+            return cv2.imwrite(thumb_path, img)
         except Exception as e:
             print("Utils - write_thumb - ошибка записи thumb на диск", e)
             return False
+
 
     @classmethod
     def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
@@ -255,12 +268,17 @@ class ThumbUtils:
     def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:
         try:
             h, w = image.shape[:2]
-            scale = size / max(h, w)
-            new_w, new_h = int(w * scale), int(h * scale)
-            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+            if h == 0 or w == 0:
+                print("fit_to_thumb error: пустое изображение")
+                return None
 
+            scale = size / max(h, w)
+            new_w = max(1, int(w * scale))
+            new_h = max(1, int(h * scale))
+
+            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
         except Exception as e:
-            print("resize_max_aspect_ratio error:", e)
+            print("fit_to_thumb error:", e)
             return None
 
 
