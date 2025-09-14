@@ -150,6 +150,11 @@ class TreeWid(QTreeWidget):
             )
             menu.addAction(view)
 
+            update_grid = QAction(Lng.update_grid[Cfg.lng], menu)
+            menu.addAction(update_grid)
+
+            menu.addSeparator()
+
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
             reveal.triggered.connect(
                     lambda: self.reveal(path)
