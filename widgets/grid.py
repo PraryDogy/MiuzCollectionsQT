@@ -819,6 +819,7 @@ class Grid(VScrollArea):
             reload = ScanerRestart(parent=self.menu_)
             add_action(reload, lambda: self.restart_scaner.emit())
             if self.clipboard_item:
+                self.menu_.addSeparator()
                 paste = PasteFiles(self.menu_)
                 paste.triggered.connect(self.paste_files.emit)
                 self.menu_.addAction(paste)
