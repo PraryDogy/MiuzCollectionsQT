@@ -551,7 +551,10 @@ class RemovedDirsHandler(QObject):
         self.conn = Dbase.engine.connect()
 
     def run(self):
-        self._process_dirs()
+        try:
+            self._process_dirs()
+        except Exception as e:
+            print("DelDirsHandler, run error:", e)
 
     def _process_dirs(self):
         def remove_thumbs(rel_dir: str):
@@ -570,7 +573,7 @@ class RemovedDirsHandler(QObject):
             del_stmt = (
                 sqlalchemy.delete(THUMBS)
                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
-                .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%/%"))
+                .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
                 .where(THUMBS.c.brand == self.main_folder.name)
             )
             self.conn.execute(del_stmt)
