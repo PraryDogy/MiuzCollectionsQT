@@ -120,6 +120,7 @@ class WinMain(UMainWindow):
         self.grid.reveal_in_finder.connect(self.reveal_in_finder)
         self.grid.set_fav.connect(self.set_fav)
         self.grid.open_in_app.connect(self.open_in_app)
+        self.grid.paste_files.connect(self.paste_files_here)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()

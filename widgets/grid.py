@@ -18,9 +18,9 @@ from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import (ClipBoardItem, SvgBtn, UMenu, UVBoxLayout,
                             VScrollArea)
-from .actions import (CopyName, CopyPath, OpenInView, RemoveFiles,
-                      RevealInFinder, Save, SaveAs, ScanerRestart, SetFav,
-                      WinInfoAction)
+from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
+                      PasteFiles, RemoveFiles, RevealInFinder, Save, SaveAs,
+                      ScanerRestart, SetFav, WinInfoAction)
 
 
 class FilenameWid(QLabel):
@@ -375,6 +375,7 @@ class Grid(VScrollArea):
     reveal_in_finder = pyqtSignal(list)
     set_fav = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
+    paste_files = pyqtSignal()
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -817,6 +818,11 @@ class Grid(VScrollArea):
             self.menu_.addAction(update_grid)
             reload = ScanerRestart(parent=self.menu_)
             add_action(reload, lambda: self.restart_scaner.emit())
+            if self.clipboard_item:
+                paste = PasteFiles(self.menu_)
+                paste.triggered.connect(self.paste_files.emit)
+                self.menu_.addAction(paste)
+                self.menu_.addSeparator()
             self.menu_.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], self.menu_)
             add_action(reveal, lambda: self.reveal_in_finder.emit([Dynamic.current_dir]))
@@ -860,6 +866,17 @@ class Grid(VScrollArea):
                     lambda: self.copy_path.emit(rel_paths))
             add_action(CopyName(self.menu_, len(rel_paths)),
                     lambda: self.copy_name.emit(rel_paths))
+            self.menu_.addSeparator()
+
+            # cut / copy / paste
+
+            add_action(CutFiles(self.menu_, len(rel_paths)),
+                    lambda: self.set_clipboard(ClipBoardItem.type_cut))
+            add_action(CopyFiles(self.menu_, len(rel_paths)),
+                    lambda: self.set_clipboard(ClipBoardItem.type_copy))
+            if self.clipboard_item:
+                add_action(PasteFiles(self.menu_),
+                        lambda: self.paste_files.emit())
             self.menu_.addSeparator()
 
             # save / remove

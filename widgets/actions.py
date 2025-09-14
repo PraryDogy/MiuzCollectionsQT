@@ -75,6 +75,5 @@ class CopyFiles(QAction):
         super().__init__(text=text, parent=parent)
 
 class PasteFiles(QAction):
-    def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.paste[Cfg.lng]} ({total})"
-        super().__init__(text=text, parent=parent)
+    def __init__(self, parent: QMenu):
+        super().__init__(text=Lng.paste[Cfg.lng], parent=parent)
