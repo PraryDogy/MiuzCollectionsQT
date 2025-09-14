@@ -499,7 +499,9 @@ class WinMain(UMainWindow):
                     lambda files_copied: remove_files(item, files_copied)
             )
             else:
-                copy_task.sigs.finished_.connect(lambda files_copied: scan_dirs(files_copied, item))
+                copy_task.sigs.finished_.connect(
+                    lambda files_copied: scan_dirs(files_copied, item)
+                )
             UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.get_curr_path()
