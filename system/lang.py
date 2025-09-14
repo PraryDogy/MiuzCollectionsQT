@@ -242,6 +242,11 @@ class Lng:
     data_was_reset = ("Данные сброшены", "Data reset")
     setup = ("Настроить", "Setup")
     preparing = ("Подготовка", "Preparing")
+    copy_name_same_dir = (
+        "Копирование невозможно — файлы уже находятся в этой папке",
+        "Copy operation not allowed — the files is already in this folder"
+    )
+
     save_new_folder = (
         "Сохраните и нажмите «Перезапуск», чтобы применить изменения.",
         "Save and press \"Restart\" to apply changes."

@@ -519,11 +519,20 @@ class WinMain(UMainWindow):
             UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.get_curr_path()
+        item = self.grid.clipboard_item
+        abs_current_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+        copy_self = abs_current_dir in item.source_dirs
         if main_folder_path:
-            item = self.grid.clipboard_item
-            if item:
+            if copy_self:
+                self.win_warn = WinWarn(
+                    Lng.attention[Cfg.lng],
+                    Lng.copy_name_same_dir[Cfg.lng]
+                )
+                self.win_warn.center_to_parent(self)
+                self.win_warn.show()
+            elif item:
                 item.target_main_folder = MainFolder.current
-                item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+                item.target_dir = abs_current_dir
                 copy_files()
         else:
             self.open_win_smb()
