@@ -426,7 +426,6 @@ class Grid(VScrollArea):
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
     def reload_thumbnails(self):
-        print("reload th", self.sender())
         Dynamic.thumbnails_count = 0
         self.load_db_images_task(self.load_initial_grid)
 
@@ -631,6 +630,11 @@ class Grid(VScrollArea):
             - Стрелки: навигация по элементам сетки
         """
 
+        def remove_files():
+            self.remove_files.emit(
+                [i.rel_img_path for i in self.selected_widgets]
+            )
+
         def open_info():
             """Открывает окно информации для выбранных виджетов."""
             if self.selected_widgets:
@@ -693,6 +697,8 @@ class Grid(VScrollArea):
             Qt.Key.Key_Down: (1, 0)
         }
 
+        if event.modifiers() == CTRL and event.key() == Qt.Key.Key_Backspace:
+            remove_files()
         if event.modifiers() == CTRL and event.key() == Qt.Key.Key_I:
             open_info()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_A:
