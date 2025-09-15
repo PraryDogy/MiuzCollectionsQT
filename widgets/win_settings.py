@@ -25,13 +25,19 @@ from .win_warn import WinQuestion, WinWarn
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
 
 
+class QLabel(QLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setWordWrap(True)
+
+
 class LangReset(QGroupBox):
     reset = pyqtSignal()
     changed = pyqtSignal()
 
     def __init__(self, json_data_copy: Cfg):
         super().__init__()
-        self.json_data = json_data_copy
+        self.json_data_copy = json_data_copy
 
         v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
@@ -69,11 +75,11 @@ class LangReset(QGroupBox):
         v_lay.addWidget(sec_row_wid)
 
     def lang_btn_cmd(self, *args):
-        if self.json_data.lng == 0:
-            self.json_data.lng = 1
+        if self.json_data_copy.lng == 0:
+            self.json_data_copy.lng = 1
         else:
-            self.json_data.lng = 0
-        self.lang_btn.setText(Lng.russian[self.json_data.lng])
+            self.json_data_copy.lng = 0
+        self.lang_btn.setText(Lng.russian[self.json_data_copy.lng])
         self.changed.emit()
 
 
@@ -563,35 +569,6 @@ class MainFolderSettings(QWidget):
 
 
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
-
-
-class NewFolder(QWidget):
-    new_folder = pyqtSignal(MainFolder)
-
-    def __init__(self, main_folder_list: list[MainFolder]):
-        super().__init__()
-        self.main_folder = MainFolder("", [], [])
-        self.main_folder_list = main_folder_list
-
-        v_lay = UVBoxLayout()
-        v_lay.setSpacing(15)
-        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.setLayout(v_lay)
-
-        first_row = QGroupBox()
-        first_row.setFixedHeight(50)
-        v_lay.addWidget(first_row)
-        first_lay = UVBoxLayout()
-        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        first_lay.setSpacing(5)
-        first_row.setLayout(first_lay)
-        self.name_label = ULineEdit()
-        self.name_label.setPlaceholderText(Lng.alias_immutable[Cfg.lng])
-        self.name_label.textChanged.connect(self.name_cmd)
-        first_lay.addWidget(self.name_label)
-
-        self.advanced = MainFolderAdvanced(self.main_folder)
-        v_lay.addWidget(self.advanced)
 
 class NewFolder(QWidget):
     new_folder = pyqtSignal(MainFolder)
