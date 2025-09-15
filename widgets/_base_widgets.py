@@ -390,11 +390,5 @@ class ClipBoardItem:
         self.target_main_folder: MainFolder
         self.files_copied: list[str]
    
-    def set_type(self, type: str):
-        """
-        type: cut / copy
-        """
-        self.action_type = type
-
     def set_files_copied(self, files: list[str]):
         self.files_copied = files

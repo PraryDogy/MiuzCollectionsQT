@@ -71,6 +71,7 @@ class WinMain(UMainWindow):
         self.setMenuBar(BarMacos())
         
         self.win_image_view: WinImageView
+        self.clipboard_item: ClipBoardItem = None
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -122,6 +123,7 @@ class WinMain(UMainWindow):
         self.grid.set_fav.connect(self.set_fav)
         self.grid.open_in_app.connect(self.open_in_app)
         self.grid.paste_files.connect(self.paste_files_here)
+        self.grid.copy_files.connect(self.set_clipboard)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -232,6 +234,28 @@ class WinMain(UMainWindow):
             ]
             self.win_info = WinInfo(abs_paths)
             self.win_info.finished_.connect(open_delayed)
+        else:
+            self.open_win_smb()
+
+    def set_clipboard(self, data: tuple):
+        action_type, rel_img_paths = data
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path and rel_img_paths:
+            abs_paths = [
+                MainUtils.get_abs_path(main_folder_path, i)
+                for i in rel_img_paths
+            ]
+            self.clipboard_item = ClipBoardItem()
+            self.clipboard_item.action_type = action_type
+            self.clipboard_item.files_to_copy = abs_paths
+            self.clipboard_item.source_main_folder = MainFolder.current
+            self.clipboard_item.source_dirs = list(set(
+                os.path.dirname(i)
+                for i in abs_paths
+            ))
+            if type == self.clipboard_item.type_cut:
+                for i in self.grid.selected_widgets:
+                    i.set_transparent_frame(0.5)
         else:
             self.open_win_smb()
 

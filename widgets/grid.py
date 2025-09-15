@@ -615,27 +615,6 @@ class Grid(VScrollArea):
             wid = self.path_to_wid.get(rel_img_path)
             wid.set_fav(value)
 
-    def set_clipboard(self, type: str):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path and self.selected_widgets:
-            abs_paths = [
-                MainUtils.get_abs_path(main_folder_path, i.rel_img_path)
-                for i in self.selected_widgets
-            ]
-            self.clipboard_item = ClipBoardItem()
-            self.clipboard_item.set_type(type)
-            self.clipboard_item.source_main_folder = MainFolder.current
-            self.clipboard_item.files_to_copy = abs_paths
-            self.clipboard_item.source_dirs = list(set(
-                os.path.dirname(i)
-                for i in abs_paths
-            ))
-            if type == self.clipboard_item.type_cut:
-                for i in self.selected_widgets:
-                    i.set_transparent_frame(0.5)
-        else:
-            self.no_connection.emit()
-
     def keyPressEvent(self, event: QKeyEvent | None) -> None:
         """
         Обрабатывает навигацию и горячие клавиши в сетке:
@@ -720,8 +699,13 @@ class Grid(VScrollArea):
             select_all()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
             self.set_clipboard(ClipBoardItem.type_copy)
+            self.copy_files.emit(
+                (ClipBoardItem.type_copy, [i.rel_img_path for i in self.selected_widgets])
+            )
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_X:
-            self.set_clipboard(ClipBoardItem.type_cut)
+            self.copy_files.emit(
+                (ClipBoardItem.type_cut, [i.rel_img_path for i in self.selected_widgets])
+            )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             open_last_selected()
         elif event.key() in KEY_NAVI:
