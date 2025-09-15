@@ -229,71 +229,80 @@ class LoadOneImgTask(URunnable):
         self.sigs.finished_.emit(image_data)
 
 
-class _OneFileInfoSigs(QObject):
-    finished_ = pyqtSignal(dict)
-    delayed_info = pyqtSignal(str)
+class OneFileInfo(URunnable):
+    """
+    Загружает информацию об одном файле и формирует сигналы для UI.
 
+    Сигналы:
+    - finished_(dict): информация о файле (имя, тип, размер, путь, миниатюра, дата изменения).
+    - delayed_info(str): разрешение изображения (emited после вычисления).
+    """
 
-class OneFileInfoTask(URunnable):
+    class Sigs(QObject):
+        finished_ = pyqtSignal(dict)
+        delayed_info = pyqtSignal(str)
+
     max_row = 50
+
     def __init__(self, url: str):
         super().__init__()
         self.url = url
-        self.sigs = _OneFileInfoSigs()
+        self.sigs = OneFileInfo.Sigs()
 
     def task(self):
-        mail_folder_path = MainFolder.current.get_curr_path()
+        """Выполняет сбор информации и эмит сигналы."""
         try:
-            name = os.path.basename(self.url)
-            _, type_ = os.path.splitext(name)
-            stats = os.stat(self.url)
-            size = MainUtils.get_f_size(stats.st_size)
-            mod = MainUtils.get_f_date(stats.st_mtime)
-            coll = MainUtils.get_coll_name(mail_folder_path, self.url)
-            thumb_path = ThumbUtils.create_thumb_path(self.url)
-
-            res = {
-                Lng.file_name[Cfg.lng]: self.lined_text(name),
-                Lng.type_[Cfg.lng]: type_,
-                Lng.file_size[Cfg.lng]: size,
-                Lng.place[Cfg.lng]: self.lined_text(self.url),
-                Lng.thumb_path[Cfg.lng]: self.lined_text(thumb_path),
-                Lng.changed[Cfg.lng]: mod,
-                Lng.resol[Cfg.lng]: Lng.calculating[Cfg.lng],
-                }
-            
+            res = self._gather_info()
             self.sigs.finished_.emit(res)
 
-            res = self.get_img_resol(self.url)
-            if res:
-                self.sigs.delayed_info.emit(res)
-        
+            resol = self.get_img_resol(self.url)
+            if resol:
+                self.sigs.delayed_info.emit(resol)
         except Exception as e:
             MainUtils.print_error()
             res = {
                 Lng.file_name[Cfg.lng]: self.lined_text(os.path.basename(self.url)),
                 Lng.place[Cfg.lng]: self.lined_text(self.url),
-                Lng.type_[Cfg.lng]: self.lined_text(os.path.splitext(self.url)[0])
-                }
+                Lng.type_[Cfg.lng]: self.lined_text(os.path.splitext(self.url)[0]),
+            }
             self.sigs.finished_.emit(res)
 
-    def get_img_resol(self, img_path: str):
+    def _gather_info(self) -> dict:
+        """Приватный метод: собирает всю информацию о файле."""
+        mail_folder_path = MainFolder.current.get_curr_path()
+        name = os.path.basename(self.url)
+        _, type_ = os.path.splitext(name)
+        stats = os.stat(self.url)
+        size = MainUtils.get_f_size(stats.st_size)
+        mod = MainUtils.get_f_date(stats.st_mtime)
+        coll = MainUtils.get_coll_name(mail_folder_path, self.url)
+        thumb_path = ThumbUtils.create_thumb_path(self.url)
+
+        res = {
+            Lng.file_name[Cfg.lng]: self.lined_text(name),
+            Lng.type_[Cfg.lng]: type_,
+            Lng.file_size[Cfg.lng]: size,
+            Lng.place[Cfg.lng]: self.lined_text(self.url),
+            Lng.thumb_path[Cfg.lng]: self.lined_text(thumb_path),
+            Lng.changed[Cfg.lng]: mod,
+            Lng.resol[Cfg.lng]: Lng.calculating[Cfg.lng],
+        }
+
+        return res
+
+    def get_img_resol(self, img_path: str) -> str:
+        """Возвращает разрешение изображения в формате 'WxH' или пустую строку."""
         img_ = ImgUtils.read_image(img_path)
         if img_ is not None and len(img_.shape) > 1:
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"
-        else:
-            return ""
+        return ""
 
-    def lined_text(self, text: str):
+    def lined_text(self, text: str) -> str:
+        """Разбивает текст на строки длиной не более max_row символов."""
         if len(text) > self.max_row:
-            text = [
-                text[i:i + self.max_row]
-                for i in range(0, len(text), self.max_row)
-                ]
-            return "\n".join(text)
-        else:
-            return text
+            return "\n".join(text[i:i + self.max_row] for i in range(0, len(text), self.max_row))
+        return text
 
 
 class MultiFileInfo(URunnable):

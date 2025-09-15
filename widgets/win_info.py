@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
 from cfg import Cfg, Static
 from system.lang import Lng
-from system.tasks import MultiFileInfo, OneFileInfoTask
+from system.tasks import MultiFileInfo, OneFileInfo
 from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import UMenu, SingleActionWindow
@@ -82,7 +82,7 @@ class WinInfo(SingleActionWindow):
             self.multiple_img()
 
     def single_img(self):
-        self.task_ = OneFileInfoTask(self.img_paths[0])
+        self.task_ = OneFileInfo(self.img_paths[0])
         self.task_.sigs.finished_.connect(lambda data: self.single_img_fin(data))
         UThreadPool.start(self.task_)
 
