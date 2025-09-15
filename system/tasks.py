@@ -34,8 +34,6 @@ class CopyFilesManager(URunnable):
         progress_changed = pyqtSignal(tuple)
         file_changed = pyqtSignal(str)
 
-    max_buf_size = 1024 * 1024
-
     def __init__(self, dest: str, files: list[str]):
         super().__init__()
         self.sigs = CopyFilesManager.Sigs()
@@ -84,7 +82,7 @@ class CopyFilesManager(URunnable):
         """Приватный метод для копирования одного файла с обновлением прогресса."""
         with open(src, 'rb') as fsrc, open(dst, 'wb') as fdst:
             while self.task_state.should_run():
-                buf = fsrc.read(self.max_buf_size)
+                buf = fsrc.read(1024 * 1024)
                 if not buf:
                     break
                 fdst.write(buf)
