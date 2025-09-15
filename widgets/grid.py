@@ -105,25 +105,30 @@ class BelowTextWid(QLabel):
         color: #6199E4;
     """
 
+    sep = " | "
+
     def __init__(self, wid: "Thumbnail"):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.wid = wid
+        self.set_text()
 
-        root = os.path.dirname(wid.rel_img_path).strip("/").replace("/", " > ")
+    def set_text(self):
+        root = os.path.dirname(self.wid.rel_img_path).strip("/").replace("/", self.sep)
         first_row = self.short_text(root)
-        text = "\n".join((first_row, wid.f_mod))
+        text = "\n".join((first_row, self.wid.f_mod))
         self.setText(text)
 
         self.setStyleSheet(self.STYLE)
 
-    def short_text(self, text: str) -> str:
-        """
-        Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
-        """
-        max_row = ThumbData.MAX_ROW[Dynamic.thumb_size_index]
-        if len(text) >= max_row:
-            return f"{text[:max_row - 10]}...{text[-7:]}"
-        return text
+    # def short_text(self, text: str) -> str:
+    #     """
+    #     Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
+    #     """
+    #     max_row = ThumbData.MAX_ROW[Dynamic.thumb_size_index]
+    #     if len(text) >= max_row:
+    #         return f"{text[:max_row - 10]}...{text[-7:]}"
+    #     return text
     
     def short_text(self, text: str) -> str:
         """
@@ -216,8 +221,8 @@ class Thumbnail(QFrame):
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(self.text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.text_adv = BelowTextWid(self)
-        self.v_layout.addWidget(self.text_adv, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.below_text = BelowTextWid(self)
+        self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setup()
 
@@ -234,6 +239,7 @@ class Thumbnail(QFrame):
     def setup(self):
         """Настройка миниатюры: текст, размеры, изображение."""
         self.text_wid.set_text()
+        self.below_text.set_text()
         self.setFixedSize(self.thumb_w, self.thumb_h)
 
         size_ = self.pixmap_size + ThumbData.MARGIN
