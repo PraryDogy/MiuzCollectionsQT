@@ -751,25 +751,23 @@ class WinSettings(SingleActionWindow):
         self.splitter.setSizes([self.left_side_width, 600])
 
         mapping = {
-            settings_item.general: 0,
-            settings_item.filters: 1,
-            settings_item.new_folder: 2,
+            self.settings_item.type_general: 0,
+            self.settings_item.type_filters: 1,
+            self.settings_item.type_new_folder: 2,
         }
 
         for key, idx in mapping.items():
-            if key in settings_item.data:
+            if key == self.settings_item.action_type:
                 self.left_menu.setCurrentRow(idx)
                 self.init_right_side(idx)
                 break
         else:
-            if settings_item.edit_folder in settings_item.data:
-                target_folder = settings_item.data[settings_item.edit_folder]
-                for i in self.main_folder_items:
-                    if i.main_folder == target_folder:
-                        index = self.left_menu.row(i)
-                        self.left_menu.setCurrentRow(index)
-                        self.init_right_side(index)
-                        break
+            for i in self.main_folder_items:
+                if i.main_folder == self.settings_item.content:
+                    index = self.left_menu.row(i)
+                    self.left_menu.setCurrentRow(index)
+                    self.init_right_side(index)
+                    break
 
     def init_right_side(self, index: int):
         if index == 0:
@@ -785,10 +783,8 @@ class WinSettings(SingleActionWindow):
             self.new_folder = NewFolder(self.main_folder_list_copy)
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
-            if self.settings_item.new_folder in self.settings_item.data:
-                url = self.settings_item.data.get(self.settings_item.new_folder)
-                self.new_folder.preset_new_folder(url)
-                self.settings_item.data = {self.settings_item.general: None}
+            self.new_folder.preset_new_folder(self.settings_item.content)
+                
         else:
             # Находим в копии списка MainFolder объект с нужным псевдонимом,
             # чтобы передать его в дочерний виджет MainFolderSettings.

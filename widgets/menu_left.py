@@ -291,12 +291,14 @@ class MenuLeft(QTabWidget):
         
         def edit_main_folder(main_folder: MainFolder):
             item = SettingsItem()
-            item.data = {item.edit_folder: main_folder}
+            item.action_type = item.type_edit_folder
+            item.content = main_folder
             self.setup_main_folder.emit(item)
             
         def setup_new_folder():
             item = SettingsItem()
-            item.data = {item.new_folder: ""}
+            item.action_type = item.type_new_folder
+            item.content = ""
             self.setup_new_folder.emit(item) 
         
         self.clear()
@@ -333,5 +335,6 @@ class MenuLeft(QTabWidget):
             url = a0.mimeData().urls()[0].toLocalFile().rstrip("/")
             if os.path.isdir(url):
                 item = SettingsItem()
-                item.data = {item.new_folder: url}
+                item.action_type = item.type_new_folder
+                item.content = url
                 self.setup_main_folder.emit(item)                

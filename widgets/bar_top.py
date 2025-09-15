@@ -146,7 +146,7 @@ class FiltersBtn(BarTopBtn):
    
         def edit_filters():
             item = SettingsItem()
-            item.data = {item.filters: None}
+            item.action_type = item.type_filters
             self.edit_filters.emit(item)
 
         """Показывает меню фильтров при клике левой кнопкой мыши."""
@@ -300,7 +300,7 @@ class BarTop(QWidget):
 
         # --- Кнопка настроек ---
         item = SettingsItem()
-        item.data = {item.general: None}
+        item.action_type = item.type_general
         self.settings_btn = SettingsBtn()
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)

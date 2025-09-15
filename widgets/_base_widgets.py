@@ -367,12 +367,14 @@ class VListWidget(QListWidget):
 
 
 class SettingsItem:
+    type_general = "general"
+    type_filters = "filters"
+    type_new_folder = "new_folder"
+    type_edit_folder = "edit_folder"
+
     def __init__(self):
-        self.general = "general"
-        self.filters = "filters"
-        self.new_folder = "new_folder"
-        self.edit_folder = "edit_folder"
-        self.data = {}
+        self.action_type: str
+        self.content: None | str | MainFolder
 
 
 class ClipBoardItem:
