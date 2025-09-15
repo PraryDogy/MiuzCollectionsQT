@@ -341,50 +341,42 @@ class MultiFileInfoTask(URunnable):
             return text
 
 
-class _RmFilesSigs(QObject):
-    finished_ = pyqtSignal()
+class FilesRemover(URunnable):
+    """
+    Удаляет указанные файлы.
 
+    Запуск через: UThreadPool.start
+    Сигналы:
+    - finished_(): вызывается после завершения удаления.
+    """
 
-class RmFilesTask(URunnable):
+    class Sigs(QObject):
+        finished_ = pyqtSignal()
 
     def __init__(self, img_paths: list[str]):
-        """
-        Удаляет изображения.
-        Запуск: UThreadPool.start   
-        Сигналы: finished_()
-        """
         super().__init__()
-        self.sigs = _RmFilesSigs()
+        self.sigs = FilesRemover.Sigs()
         self.img_paths = img_paths
 
     def task(self):
-        # здесь не нужен try / except, т.к. он выполняется в цикле
-        remove_files = self.remove_files()
+        # Здесь не нужен try/except, ошибки обрабатываются в _remove_files
+        self._remove_files()
         self.sigs.finished_.emit()
 
-    def remove_files(self):
+    def _remove_files(self) -> list[str]:
         """
-        Удаляет файлы.  
-        Возвращает список успешно удаленных файлов.
+        Удаляет файлы по списку self.img_paths.
+
+        Возвращает список успешно удалённых файлов.
         """
-        files: list = []
-        for i in self.img_paths:
+        deleted_files = []
+        for path in self.img_paths:
             try:
-                os.remove(i)
-                files.append(i)
+                os.remove(path)
+                deleted_files.append(path)
             except Exception as e:
-                print("system, tasks, rm files task error", e)
-        return files
-
-
-class LoadDbImagesItem:
-    __slots__ = ["qimage", "rel_img_path", "coll_name", "fav", "f_mod"]
-    def __init__(self, qimage: QImage, rel_img_path: str, coll: str, fav: int, f_mod: str):
-        self.qimage = qimage
-        self.rel_img_path = rel_img_path
-        self.coll_name = coll
-        self.fav = fav
-        self.f_mod = f_mod
+                print("FilesRemover error:", e)
+        return deleted_files
 
 
 class DbImagesLoader(URunnable):

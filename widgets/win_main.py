@@ -13,7 +13,7 @@ from system.lang import Lng
 from system.main_folder import MainFolder
 from system.new_scaner.scaner_task import CustomScanerTask
 from system.tasks import (CopyFilesTask, FavTask, MainUtils, MainFolderDataCleaner,
-                          RmFilesTask)
+                          FilesRemover)
 from system.utils import UThreadPool
 
 from ._base_widgets import (ClipBoardItem, SettingsItem, UHBoxLayout,
@@ -504,7 +504,7 @@ class WinMain(UMainWindow):
                 UThreadPool.start(scaner_task)
 
         def remove_files():
-            remove_task = RmFilesTask(item.files_to_copy)
+            remove_task = FilesRemover(item.files_to_copy)
             remove_task.sigs.finished_.connect(scan_dirs)
             UThreadPool.start(remove_task)
 
@@ -545,7 +545,7 @@ class WinMain(UMainWindow):
             UThreadPool.start(task)
         
         def start_remove(img_paths: list[str], dirs_to_scan: list[str]):
-            task = RmFilesTask(img_paths)
+            task = FilesRemover(img_paths)
             task.sigs.finished_.connect(lambda: fin_remove(dirs_to_scan))
             UThreadPool.start(task)
         
