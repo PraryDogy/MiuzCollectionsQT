@@ -160,33 +160,37 @@ class OneImgLoader(URunnable):
     def task(self):
         """Выполняет загрузку изображения и эмитит сигнал."""
         try:
-            self._load_image()
-            self.sigs.finished_.emit((self.abs_img_path, getattr(self, "qimage", None)))
+            self.sigs.finished_.emit(
+                (self.abs_img_path, self._load_image())
+            )
         except Exception as e:
             print("OneImgLoader error:", e)
-            self.sigs.finished_.emit((self.abs_img_path, None))
+            self.sigs.finished_.emit(
+                (self.abs_img_path, None)
+            )
 
     def _load_image(self):
         """Приватный метод: загружает и кэширует изображение."""
         if self.abs_img_path in self.cached_images:
-            self.qimage = self.cached_images[self.abs_img_path]
-            return
+            return self.cached_images.get(self.abs_img_path)
 
         img = ImgUtils.read_image(self.abs_img_path)
         if img is None:
-            self.qimage = None
-            return
+            return None
 
         img = ImgUtils.desaturate_image(img, 0.2)
-        self.qimage = PixmapUtils.qimage_from_array(img)
-        self.cached_images[self.abs_img_path] = self.qimage
+        qimage = PixmapUtils.qimage_from_array(img)
+        self.cached_images[self.abs_img_path] = qimage
 
         del img
         gc.collect()
 
-        # Обрезаем кэш при превышении лимита
+        # Если кэш превышает лимит, удаляем самый старый элемент
         if len(self.cached_images) > self.max_images_count:
-            self.cached_images.pop(next(iter(self.cached_images)))
+            first_key = next(iter(self.cached_images))
+            self.cached_images.pop(first_key)
+
+        return qimage
 
 
 class OneFileInfo(URunnable):
