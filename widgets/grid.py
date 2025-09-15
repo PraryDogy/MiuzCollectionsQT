@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
 from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import LoadDbImagesItem, LoadDbImagesTask
+from system.tasks import LoadDbImagesItem, DbImagesLoader
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import (ClipBoardItem, SvgBtn, UMenu, UVBoxLayout,
@@ -444,7 +444,7 @@ class Grid(VScrollArea):
         self.load_db_images_task(self.add_more_thumbnails)
 
     def load_db_images_task(self, on_finish: callable):
-        self.task_ = LoadDbImagesTask()
+        self.task_ = DbImagesLoader()
         self.task_.sigs.finished_.connect(on_finish)
         UThreadPool.start(self.task_)
         

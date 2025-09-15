@@ -387,14 +387,14 @@ class LoadDbImagesItem:
         self.f_mod = f_mod
 
 
-class _LoadDbImagesSigs(QObject):
-    finished_ = pyqtSignal(dict)
+class DbImagesLoader(URunnable):
 
+    class Sigs(QObject):
+        finished_ = pyqtSignal(dict)
 
-class LoadDbImagesTask(URunnable):
     def __init__(self):
         super().__init__()
-        self.sigs = _LoadDbImagesSigs()
+        self.sigs = DbImagesLoader.Sigs()
         self.conn = Dbase.engine.connect()
 
     def task(self):
