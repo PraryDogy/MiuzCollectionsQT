@@ -34,6 +34,8 @@ class CopyFilesManager(URunnable):
         progress_changed = pyqtSignal(tuple)
         file_changed = pyqtSignal(str)
 
+    max_buf_size = 1024 * 1024
+
     def __init__(self, dest: str, files: list[str]):
         super().__init__()
         self.sigs = CopyFilesManager.Sigs()
@@ -41,7 +43,15 @@ class CopyFilesManager(URunnable):
         self.dest = dest
 
     def task(self):
-        """Основной метод выполнения копирования файлов."""
+        """Основной метод с обработкой исключений."""
+        try:
+            self._finish_copy(self._copy_files())
+        except Exception as e:
+            MainUtils.print_error()
+            self._finish_copy([])
+
+    def _copy_files(self):
+        """Приватный метод: копирует все файлы и обновляет прогресс."""
         copied_size = 0
         files_dests = []
 
@@ -67,19 +77,15 @@ class CopyFilesManager(URunnable):
             self.sigs.progress_changed.emit((idx, len(self.files)))
             self.sigs.file_changed.emit(os.path.basename(file_path))
 
-            try:
-                copied_size = self._copy_file(file_path, dest_path, copied_size, total_size)
-            except Exception:
-                MainUtils.print_error()
-                break
+            copied_size = self._copy_file(file_path, dest_path, copied_size, total_size)
 
-        self._finish_copy(files_dests)
+        return files_dests
 
     def _copy_file(self, src: str, dst: str, copied_size: int, total_size: int) -> int:
         """Приватный метод для копирования одного файла с обновлением прогресса."""
         with open(src, 'rb') as fsrc, open(dst, 'wb') as fdst:
             while self.task_state.should_run():
-                buf = fsrc.read(1024*1024)
+                buf = fsrc.read(self.max_buf_size)
                 if not buf:
                     break
                 fdst.write(buf)
