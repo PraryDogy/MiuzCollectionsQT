@@ -846,6 +846,8 @@ class WinSettings(SingleActionWindow):
             main_folder_sett.reset_data.connect(self.reset_data.emit)
             self.right_lay.insertWidget(0, main_folder_sett)
 
+        self.settings_item.action_type = self.settings_item.type_general
+
     def add_main_folder(self, main_folder: MainFolder):
         self.main_folder_list_copy.append(main_folder)
         text = f"{os.path.basename(main_folder.curr_path)} ({main_folder.name})"
