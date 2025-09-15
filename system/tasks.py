@@ -57,10 +57,9 @@ class CopyFilesManager(URunnable):
 
         try:
             total_size = sum(os.path.getsize(f) for f in self.files)
-        except Exception:
-            MainUtils.print_error()
-            self._finish_copy(files_dests)
-            return
+        except Exception as e:
+            print("CopyFilesManager error:", e)
+            return files_dests
 
         self.sigs.value_changed.emit(0)
 
