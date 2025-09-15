@@ -12,7 +12,7 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.new_scaner.scaner_task import CustomScanerTask
-from system.tasks import (CopyFilesTask, FavTask, MainUtils, MainFolderDataCleaner,
+from system.tasks import (CopyFilesTask, FavManager, MainUtils, MainFolderDataCleaner,
                           FilesRemover)
 from system.utils import UThreadPool
 
@@ -387,7 +387,7 @@ class WinMain(UMainWindow):
                 self.win_image_view.set_title()
 
         rel_img_path, value = data
-        self.task = FavTask(rel_img_path, value)
+        self.task = FavManager(rel_img_path, value)
         self.task.sigs.finished_.connect(
             lambda: finished(rel_img_path, value)
         )

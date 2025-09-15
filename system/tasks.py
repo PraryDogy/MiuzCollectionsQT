@@ -119,76 +119,41 @@ class CopyFilesTask(URunnable):
         CopyFilesTask.list_.remove(self)
 
 
-class _FavSigs(QObject):
-    finished_ = pyqtSignal(int)
+class FavManager(URunnable):
+    """
+    Менеджер избранного для изображений.
+    
+    Сигналы:
+    - finished_(int): возвращает новое значение избранного после обновления.
+    """
 
+    class Sigs(QObject):
+        finished_ = pyqtSignal(int)
 
-class FavTask(URunnable):
     def __init__(self, rel_img_path: str, value: int):
         super().__init__()
-        self.sigs = _FavSigs()
+        self.sigs = FavManager.Sigs()
         self.rel_img_path = rel_img_path
         self.value = value
+        self.conn = Dbase.engine.connect()
 
     def task(self):
-        values = {"fav": self.value}
-        q = update(THUMBS)
-        q = q.where(THUMBS.c.short_src == self.rel_img_path)
-        q = q.where(THUMBS.c.brand == MainFolder.current.name)
-        q = q.values(**values)
-        conn = Dbase.engine.connect()
+        """Обновляет поле 'fav' в БД и эмитит сигнал с результатом."""
         try:
-            conn.execute(q)
-            conn.commit()
+            q = (
+                update(THUMBS)
+                .where(THUMBS.c.short_src == self.rel_img_path)
+                .where(THUMBS.c.brand == MainFolder.current.name)
+                .values(fav=self.value)
+            )
+            self.conn.execute(q)
+            self.conn.commit()
             self.sigs.finished_.emit(self.value)
         except Exception as e:
             MainUtils.print_error()
-            conn.rollback()
-        conn.close()
-
-
-class _LoadCollListSigs(QObject):
-    finished_ = pyqtSignal(tuple)
-
-
-class LoadCollListTask(URunnable):
-    def __init__(self, main_folder: MainFolder):
-        super().__init__()
-        self.main_folder = main_folder
-        self.sigs = _LoadCollListSigs()
-        self.conn = Dbase.engine.connect()
-
-    def task(self) -> None:
-        menus = self.get_collections_list()
-        root = self.get_root()
-        self.sigs.finished_.emit((menus, root))
-        self.conn.close()
-
-    def get_collections_list(self):
-        q = select(THUMBS.c.coll)
-        q = q.where(THUMBS.c.brand == self.main_folder.name)
-        q = q.where(THUMBS.c.short_src.ilike("/%/%"))
-        q = q.distinct()
-        res = self.conn.execute(q).scalars()
-
-        if not res:
-            return list()
-
-        if Cfg.abc_sort:
-            return sorted(res, key=self.strip_to_first_letter)
-        else:
-            return list(res)
-        
-    def get_root(self):
-        q = select(THUMBS.c.coll)
-        q = q.where(THUMBS.c.brand == self.main_folder.name)
-        q = q.where(THUMBS.c.short_src.ilike("/%"))
-        q = q.where(THUMBS.c.short_src.not_ilike("/%/%"))
-        q = q.distinct()
-        return self.conn.execute(q).scalar_one_or_none()
-    
-    def strip_to_first_letter(self, s: str) -> str:
-        return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
+            self.conn.rollback()
+        finally:
+            self.conn.close()
 
 
 class OneImgLoader(URunnable):
