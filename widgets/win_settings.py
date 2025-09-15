@@ -490,7 +490,7 @@ class MainFolderSettings(QWidget):
     def __init__(self, main_folder: MainFolder):
         super().__init__()
         v_lay = UVBoxLayout()
-        v_lay.setSpacing(15)
+        v_lay.setSpacing(5)
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(v_lay)
 
