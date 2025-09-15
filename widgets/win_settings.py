@@ -494,6 +494,7 @@ class MainFolderSettings(QWidget):
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(v_lay)
 
+        # Верхний ряд с названием
         first_row = QGroupBox()
         first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
@@ -506,26 +507,54 @@ class MainFolderSettings(QWidget):
         name_label = QLabel(main_folder.name)
         first_lay.addWidget(name_label)
 
+        # Advanced настройки
         advanced = MainFolderAdvanced(main_folder)
         advanced.changed.connect(self.changed.emit)
         v_lay.addWidget(advanced)
 
+        # QGroupBox для кнопок и описания
+        btn_group = QGroupBox()
+        btn_group_lay = UVBoxLayout()
+        btn_group_lay.setSpacing(10)
+        btn_group_lay.setContentsMargins(0, 5, 0, 5)
+        btn_group.setLayout(btn_group_lay)
+
+        # Первая строка: кнопка "Сброс" и описание
+        btn_first_row = QWidget()
+        first_row_lay = UHBoxLayout()
+        first_row_lay.setSpacing(15)
+        first_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        btn_first_row.setLayout(first_row_lay)
+
         reset_btn = QPushButton(Lng.reset[Cfg.lng])
         reset_btn.clicked.connect(lambda: self.reset_data.emit(main_folder))
         reset_btn.setFixedWidth(100)
+        first_row_lay.addWidget(reset_btn)
+
+        first_desc = QLabel(Lng.reset_btn_description[Cfg.lng])
+        first_row_lay.addWidget(first_desc)
+
+        btn_group_lay.addWidget(btn_first_row)
+
+        # Вторая строка: кнопка "Ок" и описание
+        btn_second_row = QWidget()
+        second_row_lay = UHBoxLayout()
+        second_row_lay.setSpacing(15)
+        second_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        btn_second_row.setLayout(second_row_lay)
 
         remove_btn = QPushButton(Lng.delete[Cfg.lng])
         remove_btn.clicked.connect(self.remove.emit)
         remove_btn.setFixedWidth(100)
+        second_row_lay.addWidget(remove_btn)
 
-        btn_lay = UHBoxLayout()
-        btn_lay.setSpacing(15)
-        btn_lay.addStretch()
-        btn_lay.addWidget(reset_btn)
-        btn_lay.addWidget(remove_btn)
-        btn_lay.addStretch()
-        v_lay.addLayout(btn_lay)
-        
+        second_desc = QLabel(Lng.remove_btn_description[Cfg.lng])
+        # second_desc.setWordWrap(True)
+        second_row_lay.addWidget(second_desc)
+
+        btn_group_lay.addWidget(btn_second_row)
+
+        v_lay.addWidget(btn_group)
         v_lay.addStretch()
 
     def mouseReleaseEvent(self, a0):
@@ -783,7 +812,10 @@ class WinSettings(SingleActionWindow):
             self.new_folder = NewFolder(self.main_folder_list_copy)
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
-            self.new_folder.preset_new_folder(self.settings_item.content)
+            if self.settings_item.action_type == self.settings_item.type_general:
+                self.new_folder.preset_new_folder("")
+            else:
+                self.new_folder.preset_new_folder(self.settings_item.content)
         else:
             # Находим в копии списка MainFolder объект с нужным псевдонимом,
             # чтобы передать его в дочерний виджет MainFolderSettings.

@@ -246,6 +246,14 @@ class Lng:
         "Копирование невозможно — файлы уже находятся в этой папке",
         "Copy operation not allowed — the files is already in this folder"
     )
+    reset_btn_description = (
+        "Найти заново все изображения в папке.",
+        "Rescan all images in the folder."
+    )
+    remove_btn_description = (
+        "Удалить папку с изображениями и все данные",  # русский
+        "Delete the image folder and all its data"    # английский
+    )
 
     save_new_folder = (
         "Сохраните и нажмите «Перезапуск», чтобы применить изменения.",
