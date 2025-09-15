@@ -424,6 +424,7 @@ class DbImagesLoader(URunnable):
 
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
+                # f_mod = f"{Dynamic.date_start} - {Dynamic.date_end}"
             else:
                 f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
 

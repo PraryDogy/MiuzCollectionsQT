@@ -240,9 +240,12 @@ class WinDates(SingleActionWindow):
             new_date = self.right_date_wid.get_datetime_date()
             self.date_end = new_date
 
-    def named_date(self, date: datetime):
-        month = Lng.months_genitive_case[Cfg.lng][str(date.month)]
-        return f"{date.day} {month} {date.year}"
+    # def named_date(self, date: datetime):
+    #     month = Lng.months_genitive_case[Cfg.lng][str(date.month)]
+    #     return f"{date.day} {month} {date.year}"
+    
+    def named_date(self, date: datetime) -> str:
+        return date.strftime("%d.%m.%Y")
 
     def ok_cmd(self, *args):
         if self.date_start and not self.date_end:
