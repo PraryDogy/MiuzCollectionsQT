@@ -703,13 +703,13 @@ class SettingsListItem(UListWidgetItem):
 
 
 class WinSettings(SingleActionWindow):
-    left_side_width = 210
     closed = pyqtSignal()
     reset_data = pyqtSignal(MainFolder)
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng])
+        self.setMinimumHeight(520)
         self.main_folder_list_copy = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
         self.filters_copy = copy.deepcopy(Filters.filters)
@@ -752,7 +752,6 @@ class WinSettings(SingleActionWindow):
             self.main_folder_items.append(item)
 
         self.right_wid = QWidget()
-        self.right_wid.setFixedWidth(450)
         self.right_lay = UVBoxLayout()
         self.right_wid.setLayout(self.right_lay)
         self.splitter.addWidget(self.right_wid)
@@ -777,7 +776,7 @@ class WinSettings(SingleActionWindow):
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)
-        self.splitter.setSizes([self.left_side_width, 600])
+        self.splitter.setSizes([200, 600])
 
         mapping = {
             self.settings_item.type_general: 0,
