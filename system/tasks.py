@@ -539,8 +539,7 @@ class ResetDataTask(URunnable):
         # Удаляем битые миниатюры
         stmt = sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.short_hash)
         for rel_img_path, rel_thumb_path in self.conn.execute(stmt):
-            abs_thumb_path = ThumbUtils.get_abs_thumb_path(rel_thumb_path)
-            if not os.path.exists(abs_thumb_path):
+            if not os.path.exists(ThumbUtils.get_abs_thumb_path(rel_thumb_path)):
                 self.conn.execute(
                     sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_img_path)
                 )
