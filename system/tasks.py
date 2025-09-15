@@ -505,6 +505,15 @@ class SortedDirsLoader(URunnable):
         self.sigs = SortedDirsLoader.Sigs()
         self.path = path
 
+    def task(self):
+        """Выполняет загрузку директорий с обработкой ошибок."""
+        try:
+            sorted_dirs = self._load_dirs()
+            self.sigs.finished_.emit(sorted_dirs)
+        except Exception as e:
+            print("SortedDirsLoader error:", e)
+            self.sigs.finished_.emit({})
+
     def _load_dirs(self) -> dict:
         """Приватный метод: собирает и сортирует директории."""
         if not os.path.exists(self.path):
@@ -515,15 +524,6 @@ class SortedDirsLoader(URunnable):
             sorted(dirs.items(), key=lambda kv: self.strip_to_first_letter(kv[1]))
         )
         return sorted_dirs
-
-    def task(self):
-        """Выполняет загрузку директорий с обработкой ошибок."""
-        try:
-            sorted_dirs = self._load_dirs()
-            self.sigs.finished_.emit(sorted_dirs)
-        except Exception as e:
-            print("SortedDirsLoader error:", e)
-            self.sigs.finished_.emit({})
     
     def strip_to_first_letter(self, s: str) -> str:
         """Удаляет начальные символы, которые не являются буквами, для сортировки."""
