@@ -18,14 +18,15 @@ from .main_folder import MainFolder
 from .utils import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
 
 
-class _CopyFilesSigs(QObject):
-    finished_ = pyqtSignal(list)
-    value_changed = pyqtSignal(int)
-    progress_changed = pyqtSignal(tuple)
-    file_changed = pyqtSignal(str)
+class CopyFilesManager(URunnable):
 
-class CopyFilesTask(URunnable):
-    list_: list["CopyFilesTask"] = []
+    class Sigs(QObject):
+        finished_ = pyqtSignal(list)
+        value_changed = pyqtSignal(int)
+        progress_changed = pyqtSignal(tuple)
+        file_changed = pyqtSignal(str)
+
+    list_: list["CopyFilesManager"] = []
     copied_files_: list[list[str]] = []
 
     def __init__(self, dest: str, files: list):
@@ -42,7 +43,7 @@ class CopyFilesTask(URunnable):
         - value_changed(int) — значение от 0 до 100 для QProgressBar
         """
         super().__init__()
-        self.sigs = _CopyFilesSigs()
+        self.sigs = CopyFilesManager.Sigs()
         self.files = files
         self.dest = dest
 
@@ -54,7 +55,7 @@ class CopyFilesTask(URunnable):
         - finished(список путей к скопированным файлам)
         - value_changed(0-100, для передачи в QProgressBar)
         """
-        return CopyFilesTask.list_
+        return CopyFilesManager.list_
     
     @classmethod
     def copied_files(cls):
@@ -62,10 +63,10 @@ class CopyFilesTask(URunnable):
         Возвращает список списков с путями к уже скопированным файлам.  
         Формат:[[<путь_к_файлу1>, <путь_к_файлу2>],...]
         """
-        return CopyFilesTask.copied_files_
+        return CopyFilesManager.copied_files_
 
     def task(self):
-        CopyFilesTask.list_.append(self)
+        CopyFilesManager.list_.append(self)
 
         copied_size = 0
         files_dests = []
@@ -115,8 +116,8 @@ class CopyFilesTask(URunnable):
     def copy_files_finished(self, files_dests: list[str]):
         self.sigs.value_changed.emit(100)
         self.sigs.finished_.emit(files_dests)
-        CopyFilesTask.copied_files_.append(files_dests)
-        CopyFilesTask.list_.remove(self)
+        CopyFilesManager.copied_files_.append(files_dests)
+        CopyFilesManager.list_.remove(self)
 
 
 class FavManager(URunnable):

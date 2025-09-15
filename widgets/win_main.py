@@ -12,7 +12,7 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.new_scaner.scaner_task import CustomScanerTask
-from system.tasks import (CopyFilesTask, FavManager, MainUtils, MainFolderDataCleaner,
+from system.tasks import (CopyFilesManager, FavManager, MainUtils, MainFolderDataCleaner,
                           FilesRemover)
 from system.utils import UThreadPool
 
@@ -179,7 +179,7 @@ class WinMain(UMainWindow):
             progress_win.progressbar.setMaximum(100)
             progress_win.center_to_parent(self)
             progress_win.show()
-            task = CopyFilesTask(dest, abs_files)
+            task = CopyFilesManager(dest, abs_files)
             progress_win.cancel.connect(
                 lambda: task.task_state.set_should_run(False)
             )
@@ -510,7 +510,7 @@ class WinMain(UMainWindow):
 
         def copy_files():
             item = self.grid.clipboard_item
-            copy_task = CopyFilesTask(item.target_dir, item.files_to_copy)
+            copy_task = CopyFilesManager(item.target_dir, item.files_to_copy)
             copy_task.sigs.finished_.connect(lambda files: item.set_files_copied(files))
             if item.action_type == item.type_cut:
                 copy_task.sigs.finished_.connect(lambda _: remove_files())
