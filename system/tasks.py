@@ -490,17 +490,18 @@ class LoadDbImagesTask(URunnable):
         return datetime.timestamp(start), datetime.timestamp(end)
 
 
-class _LoadSortedDirsSigs(QObject):
-    finished_ = pyqtSignal(dict)
 
+class SortedDirsLoader(URunnable):
 
-class LoadSortedDirsTask(URunnable):
+    class Sigs(QObject):
+        finished_ = pyqtSignal(dict)
+
     def __init__(self, path: str):
         """
         сигнал finished возвращает словарь: путь - имя
         """
         super().__init__()
-        self.sigs = _LoadSortedDirsSigs()
+        self.sigs = SortedDirsLoader.Sigs()
         self.path = path
 
     def task(self):

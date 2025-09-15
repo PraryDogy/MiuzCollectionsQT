@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import LoadSortedDirsTask
+from system.tasks import SortedDirsLoader
 from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (SettingsItem, UListWidgetItem, UMenu, UVBoxLayout,
@@ -64,7 +64,7 @@ class TreeWid(QTreeWidget):
         root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)
         self.addTopLevelItem(root_item)
 
-        worker = LoadSortedDirsTask(root_dir)
+        worker = SortedDirsLoader(root_dir)
         worker.sigs.finished_.connect(
             lambda data, item=root_item: self.add_children(item, data)
         )
@@ -85,7 +85,7 @@ class TreeWid(QTreeWidget):
             self.selected_path = clicked_dir
             self.clicked_.emit(clicked_dir)
             if item.childCount() == 0:
-                worker = LoadSortedDirsTask(clicked_dir)
+                worker = SortedDirsLoader(clicked_dir)
                 worker.sigs.finished_.connect(
                     lambda data, item=item: self.add_children(item, data)
                 )
