@@ -500,6 +500,10 @@ class Grid(VScrollArea):
             )
             thumbnail.set_no_frame()
             thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
+
+            if pixmap is None:
+                print(image_item.rel_img_path)
+
             return thumbnail
 
         for image_item in db_images:
