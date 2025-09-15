@@ -296,49 +296,61 @@ class OneFileInfoTask(URunnable):
             return text
 
 
-class MultiFileInfoTask(URunnable):
+class MultiFileInfo(URunnable):
+    """
+    Формирует информацию о нескольких файлах.
+
+    Сигналы:
+    - finished_(dict): возвращает словарь с информацией:
+        - языковая ссылка: имена файлов,
+        - языковая ссылка: общее количество файлов,
+        - языковая ссылка: суммарный размер файлов.
+    """
     max_row = 50
+
+    class Sigs(QObject):
+        finished_ = pyqtSignal(dict)
+        delayed_info = pyqtSignal(str)
+
     def __init__(self, img_paths: list[str]):
         super().__init__()
         self.img_paths = img_paths
-        self.sigs = _OneFileInfoSigs()
-    
-    def task(self):
-        names = [
-            os.path.basename(i)
-            for i in self.img_paths
-        ]
-        names = names[:10]
+        self.sigs = MultiFileInfo.Sigs()
+
+    def _prepare_info(self) -> dict:
+        """Приватный метод: собирает словарь информации о файлах."""
+        # Формируем строку имён (не более 10)
+        names = [os.path.basename(p) for p in self.img_paths][:10]
         names = ", ".join(names)
         names = self.lined_text(names)
         if len(self.img_paths) > 10:
-            names = names + ", ..."
+            names += ", ..."
 
-        res = {
+        return {
             Lng.file_name[Cfg.lng]: names,
             Lng.total[Cfg.lng]: str(len(self.img_paths)),
             Lng.file_size[Cfg.lng]: self.get_total_size()
         }
-        self.sigs.finished_.emit(res)
 
-    def get_total_size(self):
-        total = 0
-        for i in self.img_paths:
-            stats = os.stat(i)
-            size_ = stats.st_size
-            total += size_
+    def task(self):
+        """Выполняет сбор информации и эмит сигнал с результатом."""
+        try:
+            info = self._prepare_info()
+            self.sigs.finished_.emit(info)
+        except Exception as e:
+            print("MultiFileInfo error:", e)
+            self.sigs.finished_.emit({})
 
+    def get_total_size(self) -> str:
+        """Возвращает суммарный размер всех файлов в удобочитаемом формате."""
+        total = sum(os.stat(p).st_size for p in self.img_paths)
         return MainUtils.get_f_size(total)
 
-    def lined_text(self, text: str):
+    def lined_text(self, text: str) -> str:
+        """Разбивает строку на строки длиной не более max_row символов."""
         if len(text) > self.max_row:
-            text = [
-                text[i:i + self.max_row]
-                for i in range(0, len(text), self.max_row)
-                ]
-            return "\n".join(text)
-        else:
-            return text
+            return "\n".join(text[i:i + self.max_row] for i in range(0, len(text), self.max_row))
+        return text
 
 
 class FilesRemover(URunnable):
