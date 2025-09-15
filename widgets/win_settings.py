@@ -354,18 +354,18 @@ class AboutWid(QGroupBox):
 
 
 class GeneralSettings(QWidget):
-    reset = pyqtSignal()
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: Cfg):
+    def __init__(self, json_data_copy: Cfg, need_reset: list[bool]):
         super().__init__()
+        self.need_reset = need_reset
         v_lay = UVBoxLayout()
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.setSpacing(10)
         self.setLayout(v_lay)
 
         lang_reset = LangReset(json_data_copy)
-        lang_reset.reset.connect(self.reset.emit)
+        lang_reset.reset.connect(self.set_need_reset)
         lang_reset.changed.connect(self.changed.emit)
         v_lay.addWidget(lang_reset)
 
@@ -383,6 +383,8 @@ class GeneralSettings(QWidget):
         about = AboutWid()
         v_lay.addWidget(about)
 
+    def set_need_reset(self):
+        self.need_reset[0] = True
 
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
 
@@ -726,7 +728,7 @@ class WinSettings(SingleActionWindow):
         self.main_folder_list_copy = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
         self.filters_copy = copy.deepcopy(Filters.filters)
-        self.need_reset = False
+        self.need_reset = [False, ]
         self.main_folder_items: list[SettingsListItem] = []
         self.settings_item = settings_item
 
@@ -812,13 +814,12 @@ class WinSettings(SingleActionWindow):
 
     def init_right_side(self, index: int):
         if index == 0:
-            self.gen_settings = GeneralSettings(self.json_data_copy)
-            self.gen_settings.reset.connect(lambda: setattr(self, "need_reset", True))
+            self.gen_settings = GeneralSettings(self.json_data_copy, self.need_reset)
             self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
             self.filters_wid = FiltersWid(self.filters_copy)
-            self.filters_wid.changed.connect(self.on_filters_changed)
+            self.filters_wid.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
             self.new_folder = NewFolder(self.main_folder_list_copy)
@@ -890,10 +891,6 @@ class WinSettings(SingleActionWindow):
 
         except Exception as e:
             print("win settings > ошибка удаления main folder по кнопке удалить", e)
-            
-    def on_filters_changed(self):
-        if self.ok_btn.text() == Lng.ok[Cfg.lng]:
-            self.ok_btn.setText(Lng.save[Cfg.lng])
 
     def clear_right_side(self):
         wids = (GeneralSettings, MainFolderSettings, NewFolder, FiltersWid)
@@ -906,19 +903,6 @@ class WinSettings(SingleActionWindow):
         self.init_right_side(index)
 
     def ok_cmd(self):
-        """Handle OK button click based on its current mode."""
-        btn_text = self.ok_btn.text()
-
-        def reset_app():
-            """Remove app support directory and restart app."""
-            shutil.rmtree(Static.APP_SUPPORT_DIR)
-            QApplication.quit()
-            MainUtils.start_new_app()
-
-        def save_filters():
-            """Save filters to global list."""
-            Filters.filters = self.filters_copy
-            Filters.write_json_data()
 
         def validate_folders() -> bool:
             """Check that all folders have paths, show warning if not."""
@@ -933,9 +917,10 @@ class WinSettings(SingleActionWindow):
                     return False
             return True
 
-        def apply_changes_and_restart():
-            """Apply all changes and restart the application."""
-            
+        if self.ok_btn.text() in Lng.restart:
+            if not validate_folders():
+                return
+
             MainFolder.list_ = self.main_folder_list_copy
             Filters.filters = self.filters_copy
 
@@ -946,19 +931,12 @@ class WinSettings(SingleActionWindow):
             Filters.write_json_data()
             Cfg.write_json_data()
 
+            if self.need_reset[0]:
+                shutil.rmtree(Static.APP_SUPPORT_DIR)
+            
             QApplication.quit()
             MainUtils.start_new_app()
 
-        # --- Основная логика ---
-        if self.need_reset:
-            reset_app()
-        elif btn_text == Lng.save[Cfg.lng]:
-            save_filters()
-            self.deleteLater()
-        elif btn_text == Lng.restart[Cfg.lng]:
-            if not validate_folders():
-                return
-            apply_changes_and_restart()
         else:
             self.deleteLater()
 
