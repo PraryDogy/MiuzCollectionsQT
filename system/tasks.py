@@ -8,7 +8,6 @@ import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
-from sqlalchemy import select, update
 
 from cfg import Cfg, Dynamic, Static
 
@@ -142,7 +141,7 @@ class FavManager(URunnable):
         """Обновляет поле 'fav' в БД и эмитит сигнал с результатом."""
         try:
             q = (
-                update(THUMBS)
+                sqlalchemy.update(THUMBS)
                 .where(THUMBS.c.short_src == self.rel_img_path)
                 .where(THUMBS.c.brand == MainFolder.current.name)
                 .values(fav=self.value)
