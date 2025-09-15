@@ -36,18 +36,25 @@ class RemovedMainFolderCleaner:
             return self._run()
         except Exception as e:
             print("new scaner utils, RemovedMainFoldeHandler", e)
+            import traceback
+            print(traceback.format_exc())
             return None
 
     def _run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
         db_main_folders = self.conn.execute(q).scalars().all()
         app_main_folders = [i.name for i in MainFolder.list_]
-        del_main_folders = [i for i in db_main_folders if i not in app_main_folders]
-        for i in del_main_folders:
-            rows = self.get_rows(i)
-            self.remove_images(rows)
-            self.remove_rows(rows)
-        self.remove_dirs()
+        del_main_folders = [
+            i
+            for i in db_main_folders
+            if i not in app_main_folders and i is not None
+        ]
+        if del_main_folders:
+            for i in del_main_folders:
+                rows = self.get_rows(i)
+                self.remove_images(rows)
+                self.remove_rows(rows)
+            self.remove_dirs()
         self.conn.close()
         return del_main_folders
         
@@ -318,8 +325,8 @@ class ImgLoader(QObject):
             else:
                 q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
-            res = conn.execute(q).fetchall()
-            for rel_thumb_path, rel_img_path, size, birth, mod in res:
+            for rel_thumb_path, rel_img_path, size, birth, mod in conn.execute(q):
+                print(rel_thumb_path)
                 abs_img_path = MainUtils.get_abs_path(self.main_folder_path, rel_img_path)
                 db_images[rel_thumb_path] = (abs_img_path, size, birth, mod)
         conn.close()
