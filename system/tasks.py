@@ -317,6 +317,15 @@ class MultiFileInfo(URunnable):
         self.img_paths = img_paths
         self.sigs = MultiFileInfo.Sigs()
 
+    def task(self):
+        """Выполняет сбор информации и эмит сигнал с результатом."""
+        try:
+            info = self._prepare_info()
+            self.sigs.finished_.emit(info)
+        except Exception as e:
+            print("MultiFileInfo error:", e)
+            self.sigs.finished_.emit({})
+
     def _prepare_info(self) -> dict:
         """Приватный метод: собирает словарь информации о файлах."""
         # Формируем строку имён (не более 10)
@@ -331,15 +340,6 @@ class MultiFileInfo(URunnable):
             Lng.total[Cfg.lng]: str(len(self.img_paths)),
             Lng.file_size[Cfg.lng]: self.get_total_size()
         }
-
-    def task(self):
-        """Выполняет сбор информации и эмит сигнал с результатом."""
-        try:
-            info = self._prepare_info()
-            self.sigs.finished_.emit(info)
-        except Exception as e:
-            print("MultiFileInfo error:", e)
-            self.sigs.finished_.emit({})
 
     def get_total_size(self) -> str:
         """Возвращает суммарный размер всех файлов в удобочитаемом формате."""
