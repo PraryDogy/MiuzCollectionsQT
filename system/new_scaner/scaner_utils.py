@@ -200,7 +200,7 @@ class DirsCompator:
         ]
 
 
-class _DirsUpdater:
+class DirsUpdater:
     def __init__(self, main_folder: MainFolder, dirs_to_scan: list[str]):
         """
         - dirs_to_scan: [(rel_dir_path, mod_time), ...]
@@ -215,21 +215,27 @@ class _DirsUpdater:
         self.conn.close()
 
     def update_dirs(self):
-        for short_src, mod in self.dirs_to_scan:
-            values = {
+        # удалить старые записи
+        short_paths = [short_src for short_src, _ in self.dirs_to_scan]
+        if short_paths:
+            del_stmt = sqlalchemy.delete(DIRS).where(
+                DIRS.c.short_src.in_(short_paths),
+                DIRS.c.brand == self.main_folder.name
+            )
+            self.conn.execute(del_stmt)
+
+        # вставить новые записи батчем
+        values_list = [
+            {
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.MOD: mod,
                 ClmNames.BRAND: self.main_folder.name
             }
+            for short_src, mod in self.dirs_to_scan
+        ]
+        if values_list:
+            self.conn.execute(DIRS.insert(), values_list)
 
-            # сначала пытаемся обновить
-            upd = DIRS.update().where(DIRS.c.short_src == short_src).values(**values)
-            result = self.conn.execute(upd)
-
-            # если строка не найдена, вставляем
-            if result.rowcount == 0:
-                ins = DIRS.insert().values(**values)
-                self.conn.execute(ins)
         self.conn.commit()
 
 
@@ -543,7 +549,7 @@ class NewDirsHandler(QObject):
         db_updater = _ImgDbUpdater(del_images, new_images, self.main_folder)
         db_updater.run()
 
-        dirs_updater = _DirsUpdater(self.main_folder, self.dirs_to_scan)
+        dirs_updater = DirsUpdater(self.main_folder, self.dirs_to_scan)
         dirs_updater.run()
 
         self.progress_text.emit("")
