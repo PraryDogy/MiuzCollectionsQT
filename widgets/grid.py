@@ -386,6 +386,7 @@ class Grid(VScrollArea):
     set_fav = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
     paste_files = pyqtSignal()
+    copy_files = pyqtSignal(tuple)
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -893,9 +894,9 @@ class Grid(VScrollArea):
             # cut / copy / paste
 
             add_action(CutFiles(self.menu_, len(rel_paths)),
-                    lambda: self.set_clipboard(ClipBoardItem.type_cut))
+                    lambda: self.copy_files.emit((ClipBoardItem.type_cut, rel_paths)))
             add_action(CopyFiles(self.menu_, len(rel_paths)),
-                    lambda: self.set_clipboard(ClipBoardItem.type_copy))
+                    lambda: self.copy_files.emit((ClipBoardItem.type_copy, rel_paths)))
             if self.clipboard_item:
                 add_action(PasteFiles(self.menu_),
                         lambda: self.paste_files.emit())
