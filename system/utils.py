@@ -75,9 +75,9 @@ class ImgUtils:
             array_img = np.array(img)
             return array_img
         except Exception as e:
-            # MainUtils.print_error()
+            MainUtils.print_error()
             print("Utils - read psb - ошибка чтения psb", e)
-            return None
+            return cls.read_jpg(img_path)
 
     @classmethod
     def read_png(cls, img_path: str) -> np.ndarray | None:
@@ -105,7 +105,8 @@ class ImgUtils:
 
             return array_img
         except Exception as e:
-            MainUtils.print_error()
+            # MainUtils.print_error()
+            print("ошибка чтения jpg", e)
             return None
 
     @classmethod

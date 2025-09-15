@@ -1,7 +1,4 @@
-from system.database import Dbase, THUMBS
-import sqlalchemy
+from system.utils import ImgUtils
 
-
-Dbase.init()
-q = sqlalchemy.select(THUMBS.c.short_src)
-q = q.where()
+src = '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready/0 Other/1 IMG/2025-09-08 15-47-41 (B,R1,S1).psd'
+ImgUtils.read_image(src)
