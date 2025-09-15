@@ -12,7 +12,7 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.new_scaner.scaner_task import CustomScanerTask
-from system.tasks import (CopyFilesTask, FavTask, MainUtils, ResetDataTask,
+from system.tasks import (CopyFilesTask, FavTask, MainUtils, MainFolderDataCleaner,
                           RmFilesTask)
 from system.utils import UThreadPool
 
@@ -466,7 +466,7 @@ class WinMain(UMainWindow):
             self.win_warn.show()
             self.restart_scaner_task()
 
-        self.reset_task = ResetDataTask(main_folder.name)
+        self.reset_task = MainFolderDataCleaner(main_folder.name)
         self.reset_task.sigs.finished_.connect(fin)
         UThreadPool.start(self.reset_task)
 

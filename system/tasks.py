@@ -517,11 +517,12 @@ class LoadSortedDirsTask(URunnable):
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
 
-class _ResetDataSigs(QObject):
-    finished_ = pyqtSignal()
 
+class MainFolderDataCleaner(URunnable):
 
-class ResetDataTask(URunnable):
+    class Sigs(QObject):
+        finished_ = pyqtSignal()
+
     """
     Сбрасывает данные в БД для пересканирования:
     
@@ -531,7 +532,7 @@ class ResetDataTask(URunnable):
 
     def __init__(self, main_folder_name: str):
         super().__init__()
-        self.sigs = _ResetDataSigs()
+        self.sigs = MainFolderDataCleaner.Sigs()
         self.main_folder_name = main_folder_name
         self.conn = Dbase.engine.connect()
 
