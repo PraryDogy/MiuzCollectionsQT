@@ -13,7 +13,7 @@ from system.main_folder import MainFolder
 from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
 
 
-class RemovedMainFolderHandler:
+class RemovedMainFolderCleaner:
 
     def __init__(self):
         """
@@ -52,14 +52,13 @@ class RemovedMainFolderHandler:
         return del_main_folders
         
     def get_rows(self, main_folder_name: str):
-        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
-        q = q.where(THUMBS.c.brand == main_folder_name)
-        res = self.conn.execute(q).fetchall()
-        res = [
+        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash).where(
+            THUMBS.c.brand == main_folder_name
+        )
+        return [
             (id_, ThumbUtils.get_abs_thumb_path(rel_thumb_path))
-            for id_, rel_thumb_path in res
+            for id_, rel_thumb_path in self.conn.execute(q).fetchall()
         ]
-        return res
 
     def remove_images(self, rows: list):
         """
@@ -71,31 +70,31 @@ class RemovedMainFolderHandler:
                     os.remove(image_path)
                 folder = os.path.dirname(image_path)
                 if os.path.exists(folder) and not os.listdir(folder):
-                    os.rmdir(folder)
+                    shutil.rmtree(folder)
             except Exception as e:
-                print("new scaner utils, MainFolderRemover,  remove images error", e)
+                print(f"new scaner utils, MainFolderRemover, remove images error. ID: {id_}, Path: {image_path}, Error: {e}")
                 continue
 
     def remove_rows(self, rows: list):
         """
         rows: [(row id int, thumb path), ...]
         """
-        for id_, thumb_path in rows:
-            q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.id == id_)
+        ids = [id_ for id_, _ in rows]
+        if ids:
+            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.id.in_(ids))
             self.conn.execute(q)
-        self.conn.commit()
+            self.conn.commit()
 
     def remove_dirs(self):
         q = sqlalchemy.select(DIRS.c.brand).distinct()
-        res = list(self.conn.execute(q).scalars())
-        alias_list = [i.name for i in MainFolder.list_]
-        for i in res:
-            if i not in alias_list:
-                q = sqlalchemy.delete(DIRS)
-                q = q.where(DIRS.c.brand == i)
-                self.conn.execute(q)
-        self.conn.commit()
+        db_brands = set(self.conn.execute(q).scalars())
+        app_brands = set(i.name for i in MainFolder.list_)
+        to_delete = db_brands - app_brands
+
+        if to_delete:
+            del_stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand.in_(to_delete))
+            self.conn.execute(del_stmt)
+            self.conn.commit()
         
 
 class DirsLoader(QObject):

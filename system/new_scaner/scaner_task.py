@@ -11,7 +11,7 @@ from ..main_folder import MainFolder
 from ..utils import MainUtils, URunnable
 from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
                            NewDirsHandler, RemovedDirsHandler,
-                           RemovedMainFolderHandler)
+                           RemovedMainFolderCleaner)
 
 
 class ScanerSigs(QObject):
@@ -79,7 +79,7 @@ class ScanerTask(URunnable):
             return
 
         # удаляем все файлы и данные из бД по удаленному MainFolder
-        main_folder_remover = RemovedMainFolderHandler()
+        main_folder_remover = RemovedMainFolderCleaner()
         deleted_main_folders = main_folder_remover.run()
         if deleted_main_folders:
             print("main folders deleted", deleted_main_folders)
