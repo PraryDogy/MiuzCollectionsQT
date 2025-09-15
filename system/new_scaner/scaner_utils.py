@@ -458,6 +458,7 @@ class _ImgDbUpdater:
 
     def run(self):
         self.run_del_items()
+        self.del_dublicates()
         self.run_new_items()
 
     def run_del_items(self):
@@ -469,19 +470,18 @@ class _ImgDbUpdater:
             self.conn.execute(q)
             self.conn.commit()
 
-    def run_new_items(self):
+    def del_dublicates(self):
         short_paths = [
             MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
             for img_path, size, birth, mod in self.new_images
         ]
-
         q = sqlalchemy.delete(THUMBS).where(
             THUMBS.c.short_src.in_(short_paths),
             THUMBS.c.brand == self.main_folder.name
         )
+        self.conn.execute(q)
 
-        self.conn.execute()
-
+    def run_new_items(self):
         for img_path, size, birth, mod in self.new_images:
             hash = ThumbUtils.create_thumb_path(img_path)
             short_hash = ThumbUtils.get_rel_thumb_path(hash)
