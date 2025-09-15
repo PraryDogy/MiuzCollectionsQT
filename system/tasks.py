@@ -408,8 +408,7 @@ class DbImagesLoader(URunnable):
     def create_dict(self, res: list[tuple]):
         thumbs_dict = defaultdict(list[DbImagesLoader.Item])
         if not res:
-            self.sigs.finished_.emit(thumbs_dict)
-            return
+            return {}
 
         for rel_img_path, rel_thumb_path, mod, coll, fav in res:
             if not rel_img_path.endswith(Static.ext_all):
