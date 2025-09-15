@@ -109,7 +109,8 @@ class BelowTextWid(QLabel):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        first_row = self.short_text(os.path.dirname(wid.rel_img_path).strip("/"))
+        root = os.path.dirname(wid.rel_img_path).strip("/").replace("/", " > ")
+        first_row = self.short_text(root)
         text = "\n".join((first_row, wid.f_mod))
         self.setText(text)
 
@@ -122,6 +123,15 @@ class BelowTextWid(QLabel):
         max_row = ThumbData.MAX_ROW[Dynamic.thumb_size_index]
         if len(text) >= max_row:
             return f"{text[:max_row - 10]}...{text[-7:]}"
+        return text
+    
+    def short_text(self, text: str) -> str:
+        """
+        Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
+        """
+        max_row = ThumbData.MAX_ROW[Dynamic.thumb_size_index]
+        if len(text) > max_row:
+            return f"{text[:max_row]}..."
         return text
 
 
