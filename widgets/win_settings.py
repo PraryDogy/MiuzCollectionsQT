@@ -962,7 +962,6 @@ class WinSettings(SingleActionWindow):
         else:
             self.deleteLater()
 
-
     def deleteLater(self):
         self.closed.emit()
         return super().deleteLater()
