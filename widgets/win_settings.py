@@ -593,17 +593,53 @@ class NewFolder(QWidget):
         self.advanced = MainFolderAdvanced(self.main_folder)
         v_lay.addWidget(self.advanced)
 
+class NewFolder(QWidget):
+    new_folder = pyqtSignal(MainFolder)
+
+    def __init__(self, main_folder_list: list[MainFolder]):
+        super().__init__()
+        self.main_folder = MainFolder("", [], [])
+        self.main_folder_list = main_folder_list
+
+        v_lay = UVBoxLayout()
+        v_lay.setSpacing(5)
+        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.setLayout(v_lay)
+
+        first_row = QGroupBox()
+        first_row.setFixedHeight(50)
+        v_lay.addWidget(first_row)
+        first_lay = UVBoxLayout()
+        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        first_lay.setSpacing(5)
+        first_row.setLayout(first_lay)
+        self.name_label = ULineEdit()
+        self.name_label.setPlaceholderText(Lng.alias_immutable[Cfg.lng])
+        self.name_label.textChanged.connect(self.name_cmd)
+        first_lay.addWidget(self.name_label)
+
+        self.advanced = MainFolderAdvanced(self.main_folder)
+        v_lay.addWidget(self.advanced)
+
+        # QGroupBox для кнопки "Сохранить" и описания
+        btn_group = QGroupBox()
+        btn_group_lay = UHBoxLayout()
+        btn_group_lay.setContentsMargins(0, 5, 0, 5)
+        btn_group_lay.setSpacing(15)
+        btn_group_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        btn_group.setLayout(btn_group_lay)
+
         add_btn = QPushButton(Lng.save[Cfg.lng])
         add_btn.clicked.connect(self.save)
         add_btn.setFixedWidth(100)
+        btn_group_lay.addWidget(add_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        btn_lay = UHBoxLayout()
-        btn_lay.addStretch()
-        btn_lay.addWidget(add_btn)
-        btn_lay.addStretch()
-        v_lay.addLayout(btn_lay)
-        
+        description_label = QLabel(Lng.save_btn_description[Cfg.lng])
+        btn_group_lay.addWidget(description_label, alignment=Qt.AlignmentFlag.AlignRight)
+
+        v_lay.addWidget(btn_group)
         v_lay.addStretch()
+
         
     def preset_new_folder(self, url: str):
         name = os.path.basename(url)

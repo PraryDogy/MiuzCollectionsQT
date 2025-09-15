@@ -254,7 +254,10 @@ class Lng:
         "Удалить папку с изображениями и все данные",  # русский
         "Delete the image folder and all its data"    # английский
     )
-
+    save_btn_description = (
+        "Нажмите \"Сохранить\" и \"Перезапуск\"",  # русский
+        "Click \"Save\" and \"Restart\""           # английский
+    )
     save_new_folder = (
         "Сохраните и нажмите «Перезапуск», чтобы применить изменения.",
         "Save and press \"Restart\" to apply changes."
