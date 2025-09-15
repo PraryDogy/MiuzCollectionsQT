@@ -392,7 +392,7 @@ class Grid(VScrollArea):
     date_wid_ms = 3000
     png_copy_files = "./images/copy_files.png"
 
-    def __init__(self, clipboard_item: ClipBoardItem):
+    def __init__(self):
         super().__init__()
 
         # --- Состояние и данные ---
@@ -404,7 +404,7 @@ class Grid(VScrollArea):
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
-        self.clipboard_item = clipboard_item
+        self.clipboard_item: ClipBoardItem = None
 
         self.image_apps = {i: os.path.basename(i) for i in MainUtils.image_apps(Cfg.apps)}
 
@@ -880,9 +880,6 @@ class Grid(VScrollArea):
                     lambda: self.copy_files.emit((ClipBoardItem.type_cut, rel_paths)))
             add_action(CopyFiles(self.menu_, len(rel_paths)),
                     lambda: self.copy_files.emit((ClipBoardItem.type_copy, rel_paths)))
-            if self.clipboard_item:
-                add_action(PasteFiles(self.menu_),
-                        lambda: self.paste_files.emit())
             self.menu_.addSeparator()
 
             # save / remove

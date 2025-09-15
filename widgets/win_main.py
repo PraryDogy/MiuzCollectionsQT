@@ -110,7 +110,7 @@ class WinMain(UMainWindow):
         sep_upper = USep()
         right_lay.addWidget(sep_upper)
 
-        self.grid = Grid(self.clipboard_item)
+        self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_paths: self.remove_files(rel_img_paths))
         self.grid.no_connection.connect(self.open_win_smb)
@@ -246,6 +246,7 @@ class WinMain(UMainWindow):
                 for i in rel_img_paths
             ]
             self.clipboard_item = ClipBoardItem()
+            self.grid.clipboard_item = self.clipboard_item
             self.clipboard_item.action_type = action_type
             self.clipboard_item.files_to_copy = abs_paths
             self.clipboard_item.source_main_folder = MainFolder.current
@@ -253,7 +254,7 @@ class WinMain(UMainWindow):
                 os.path.dirname(i)
                 for i in abs_paths
             ))
-            if type == self.clipboard_item.type_cut:
+            if action_type == self.clipboard_item.type_cut:
                 for i in self.grid.selected_widgets:
                     i.set_transparent_frame(0.5)
         else:
@@ -497,55 +498,76 @@ class WinMain(UMainWindow):
     def paste_files_here(self):
 
         def reset_clipboard():
+            self.clipboard_item = None
             self.grid.clipboard_item = None
 
+        def set_type(type: str):
+            self.clipboard_item.action_type = type
+
+        def set_files_copied(files: list[str]):
+            self.clipboard_item.files_copied = files
+
         def scan_dirs():
-            item = self.grid.clipboard_item
-            if not item.files_copied:
+            if not self.clipboard_item.files_copied:
                 print("ни один файл не был скопирован")
                 reset_clipboard()
                 return
-            if item.action_type == item.type_cut:
-                scaner_task = CustomScanerTask(item.source_main_folder, item.source_dirs)
+            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
+                scaner_task = CustomScanerTask(
+                    self.clipboard_item.source_main_folder,
+                    self.clipboard_item.source_dirs
+                )
                 scaner_task.sigs.progress_text.connect(
                     self.bar_bottom.progress_bar.setText
                 )
                 scaner_task.sigs.reload_thumbnails.connect(
-                    lambda: item.set_type(item.type_copy)
+                    lambda: set_type(self.clipboard_item.type_copy)
                 )
                 scaner_task.sigs.reload_thumbnails.connect(scan_dirs)
                 UThreadPool.start(scaner_task)
-            elif item.action_type == item.type_copy:
-                dirs = [item.target_dir, ]
-                scaner_task = CustomScanerTask(item.target_main_folder, dirs)
+            elif self.clipboard_item.action_type == self.clipboard_item.type_copy:
+                dirs = [self.clipboard_item.target_dir, ]
+                scaner_task = CustomScanerTask(
+                    self.clipboard_item.target_main_folder,
+                    dirs
+                )
                 scaner_task.sigs.progress_text.connect(
                     self.bar_bottom.progress_bar.setText
                 )
-                scaner_task.sigs.reload_thumbnails.connect(reset_clipboard)
+                scaner_task.sigs.reload_thumbnails.connect(
+                    reset_clipboard
+                )
                 scaner_task.sigs.reload_thumbnails.connect(
                     self.grid.reload_thumbnails
                 )
                 UThreadPool.start(scaner_task)
 
         def remove_files():
-            remove_task = FilesRemover(item.files_to_copy)
+            remove_task = FilesRemover(self.clipboard_item.files_to_copy)
             remove_task.sigs.finished_.connect(scan_dirs)
             UThreadPool.start(remove_task)
 
         def copy_files():
-            item = self.grid.clipboard_item
-            copy_task = CopyFilesManager(item.target_dir, item.files_to_copy)
-            copy_task.sigs.finished_.connect(lambda files: item.set_files_copied(files))
-            if item.action_type == item.type_cut:
-                copy_task.sigs.finished_.connect(lambda _: remove_files())
+            copy_task = CopyFilesManager(
+                self.clipboard_item.target_dir,
+                self.clipboard_item.files_to_copy
+            )
+            copy_task.sigs.finished_.connect(
+                lambda files: set_files_copied(files)
+            )
+            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
+                copy_task.sigs.finished_.connect(
+                    lambda _: remove_files()
+                )
             else:
-                copy_task.sigs.finished_.connect(lambda _: scan_dirs())
+                copy_task.sigs.finished_.connect(
+                    lambda _: scan_dirs()
+                )
             UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.get_curr_path()
-        item = self.grid.clipboard_item
         abs_current_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
-        copy_self = abs_current_dir in item.source_dirs
+        copy_self = abs_current_dir in self.clipboard_item.source_dirs
         if main_folder_path:
             if copy_self:
                 self.win_warn = WinWarn(
@@ -554,9 +576,9 @@ class WinMain(UMainWindow):
                 )
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
-            elif item:
-                item.target_main_folder = MainFolder.current
-                item.target_dir = abs_current_dir
+            elif self.clipboard_item:
+                self.clipboard_item.target_main_folder = MainFolder.current
+                self.clipboard_item.target_dir = abs_current_dir
                 copy_files()
         else:
             self.open_win_smb()
@@ -598,16 +620,13 @@ class WinMain(UMainWindow):
     def upload_files(self, abs_img_paths: list):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            self.grid.clipboard_item = ClipBoardItem()
-            item = self.grid.clipboard_item
-            item.action_type = ClipBoardItem.type_copy
-            item.target_main_folder = MainFolder.current
-            item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
-            item.files_to_copy = abs_img_paths
-            item.source_dirs = list(set(
-                os.path.dirname(i)
-                for i in abs_img_paths
-            ))
+            self.clipboard_item = ClipBoardItem()
+            self.grid.clipboard_item = self.clipboard_item
+            self.clipboard_item.action_type = ClipBoardItem.type_copy
+            self.clipboard_item.target_main_folder = MainFolder.current
+            self.clipboard_item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+            self.clipboard_item.files_to_copy = abs_img_paths
+            self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_img_paths))
             self.paste_files_here()
         else:
             self.open_win_smb()
