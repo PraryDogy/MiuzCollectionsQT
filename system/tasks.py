@@ -388,9 +388,25 @@ class LoadDbImagesItem:
 
 
 class DbImagesLoader(URunnable):
+    """
+    Загружает изображения из БД и формирует словарь для UI.
+
+    Сигнал finished_ возвращает словарь:
+    - ключ — дата изменения изображения (или 0 при сортировке по добавлению),
+    - значение — список LoadDbImagesItem для соответствующей даты.
+    """
 
     class Sigs(QObject):
         finished_ = pyqtSignal(dict)
+
+    class Item:
+        __slots__ = ["qimage", "rel_img_path", "coll_name", "fav", "f_mod"]
+        def __init__(self, qimage: QImage, rel_img_path: str, coll: str, fav: int, f_mod: str):
+            self.qimage = qimage
+            self.rel_img_path = rel_img_path
+            self.coll_name = coll
+            self.fav = fav
+            self.f_mod = f_mod
 
     def __init__(self):
         super().__init__()
@@ -398,55 +414,60 @@ class DbImagesLoader(URunnable):
         self.conn = Dbase.engine.connect()
 
     def task(self):
+        try:
+            res = self._load_images()
+        except Exception as e:
+            print("DbImagesLoader error:", e)
+        finally:
+            self.sigs.finished_.emit(res)
+            self.conn.close()
+
+    def _load_images(self):
         stmt = self.get_stmt()
         res: list[tuple] = self.conn.execute(stmt).fetchall()
+        return self.create_dict(res)
 
-        self.conn.close()
-        self.create_dict(res)
-
-    def create_dict(self, res: list[tuple]) -> dict[str, list[LoadDbImagesItem]] | dict:
-        thumbs_dict = defaultdict(list[LoadDbImagesItem])
-
+    def create_dict(self, res: list[tuple]):
+        thumbs_dict = defaultdict(list[DbImagesLoader.Item])
         if not res:
             self.sigs.finished_.emit(thumbs_dict)
             return
 
         for rel_img_path, rel_thumb_path, mod, coll, fav in res:
-            rel_img_path: str
             if not rel_img_path.endswith(Static.ext_all):
                 continue
+
             f_mod = datetime.fromtimestamp(mod).date()
             thumb_path = ThumbUtils.get_abs_thumb_path(rel_thumb_path)
             thumb = ThumbUtils.read_thumb(thumb_path)
-            if isinstance(thumb, ndarray):
-                qimage = PixmapUtils.qimage_from_array(thumb)
-            else:
+            if not isinstance(thumb, ndarray):
                 continue
+
+            qimage = PixmapUtils.qimage_from_array(thumb)
+
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             else:
                 f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
-            item = LoadDbImagesItem(qimage, rel_img_path, coll, fav, f_mod)
-            # если сортировка по дате изменения, то thumbs dict будет состоять
-            # из списков (список апрель 2023, список март 2023, ...)
-            # иначе thumbs dict будет иметь только один список, но с сортировкой
-            # по дате добавления
+
+            item = DbImagesLoader.Item(qimage, rel_img_path, coll, fav, f_mod)
+
             if Dynamic.sort_by_mod:
                 thumbs_dict[f_mod].append(item)
             else:
                 thumbs_dict[0].append(item)
-        self.sigs.finished_.emit(thumbs_dict)
+
+        return thumbs_dict
 
     def get_stmt(self) -> sqlalchemy.Select:
         stmt = sqlalchemy.select(
-            THUMBS.c.short_src, # rel img path
-            THUMBS.c.short_hash, # rel thumb path
+            THUMBS.c.short_src,
+            THUMBS.c.short_hash,
             THUMBS.c.mod,
             THUMBS.c.coll,
             THUMBS.c.fav
-            )
-        
-        stmt = stmt.limit(Static.thumbnails_step).offset(Dynamic.thumbnails_count)
+        ).limit(Static.thumbnails_step).offset(Dynamic.thumbnails_count)
+
         stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
 
         if Dynamic.sort_by_mod:
@@ -460,35 +481,30 @@ class DbImagesLoader(URunnable):
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
 
         if Dynamic.enabled_filters:
-            or_conditions = [
-                THUMBS.c.short_src.ilike(f"%{f}%")
-                for f in Dynamic.enabled_filters
-            ]
-            stmt = stmt.where(sqlalchemy.or_(*or_conditions))
+            stmt = stmt.where(
+                sqlalchemy.or_(*[THUMBS.c.short_src.ilike(f"%{f}%") for f in Dynamic.enabled_filters])
+            )
 
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"%{text}%"))
-            return stmt
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             start, end = self.combine_dates(Dynamic.date_start, Dynamic.date_end)
-            stmt = stmt.where(THUMBS.c.mod > start)
-            stmt = stmt.where(THUMBS.c.mod < end)
+            stmt = stmt.where(THUMBS.c.mod > start).where(THUMBS.c.mod < end)
 
         return stmt
 
     def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:
         """
-        Объединяет даты `Dynamic.date_start` и `Dynamic.date_end` с минимальным и максимальным временем суток 
-        соответственно (00:00:00 и 23:59:59), и возвращает кортеж меток времени (timestamp).
-        Возвращает:
-        - Кортеж timestamp (начало, конец).
+        Преобразует даты в timestamp для фильтрации:
+        - date_start → 00:00:00
+        - date_end → 23:59:59
+        Возвращает кортеж (start_timestamp, end_timestamp).
         """
         start = datetime.combine(date_start, datetime.min.time())
         end = datetime.combine(date_end, datetime.max.time().replace(microsecond=0))
         return datetime.timestamp(start), datetime.timestamp(end)
-
 
 
 class SortedDirsLoader(URunnable):

@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
 from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import LoadDbImagesItem, DbImagesLoader
+from system.tasks import DbImagesLoader
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
 from ._base_widgets import (ClipBoardItem, SvgBtn, UMenu, UVBoxLayout,
@@ -460,7 +460,7 @@ class Grid(VScrollArea):
         self.grid_wid.deleteLater()
         self.rubberBand.deleteLater()
 
-    def load_initial_grid(self, db_images: dict[str, list[LoadDbImagesItem]]):
+    def load_initial_grid(self, db_images: dict[str, list[DbImagesLoader.Item]]):
 
         def load_grid_delayed():
             self.remove_grid_container()
@@ -488,9 +488,9 @@ class Grid(VScrollArea):
         self.cell_to_wid[self.glob_row, self.glob_col] = wid
         wid.row, wid.col = self.glob_row, self.glob_col        
 
-    def add_thumbnails_to_grid(self, db_images: list[LoadDbImagesItem]):
+    def add_thumbnails_to_grid(self, db_images: list[DbImagesLoader.Item]):
 
-        def create_thumb(image_item: LoadDbImagesItem):
+        def create_thumb(image_item: DbImagesLoader.Item):
             thumbnail = Thumbnail(
                 pixmap=pixmap,
                 rel_img_path=image_item.rel_img_path,
@@ -512,7 +512,7 @@ class Grid(VScrollArea):
             self.add_thumb_data(thumbnail)
             self.grid_lay.addWidget(thumbnail, 0, 0)
 
-    def add_more_thumbnails(self, db_images: dict[str, list[LoadDbImagesItem]]):
+    def add_more_thumbnails(self, db_images: dict[str, list[DbImagesLoader.Item]]):
         for _, db_images_list in db_images.items():
             self.add_thumbnails_to_grid(db_images_list)
         self.rearrange()
