@@ -295,8 +295,7 @@ class MultiFileInfo(URunnable):
     def task(self):
         """Выполняет сбор информации и эмит сигнал с результатом."""
         try:
-            info = self._prepare_info()
-            self.sigs.finished_.emit(info)
+            self.sigs.finished_.emit(self._prepare_info())
         except Exception as e:
             print("MultiFileInfo error:", e)
             self.sigs.finished_.emit({})
