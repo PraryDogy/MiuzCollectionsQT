@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import LoadOneImgTask
+from system.tasks import OneImgLoader
 from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (AppModalWindow, SvgShadowed, UHBoxLayout, UMenu,
@@ -281,7 +281,7 @@ class WinImageView(AppModalWindow):
                 self.image_label.setText(t)
 
         self.task_count += 1
-        img_thread = LoadOneImgTask(self.img_path, self.cached_images)
+        img_thread = OneImgLoader(self.img_path, self.cached_images)
         img_thread.sigs.finished_.connect(fin)
         UThreadPool.start(img_thread)
 

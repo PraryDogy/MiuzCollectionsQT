@@ -189,44 +189,61 @@ class LoadCollListTask(URunnable):
     
     def strip_to_first_letter(self, s: str) -> str:
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
-        
-
-class _LoadOneImgSigs(QObject):
-    finished_ = pyqtSignal(tuple)
 
 
-class LoadOneImgTask(URunnable):
+class OneImgLoader(URunnable):
+    """
+    Загружает одно изображение, десатурирует его и кэширует в словаре.
+
+    Сигналы:
+    - finished_(tuple): возвращает кортеж (img_path, QPixmap или None)
+    """
+
     max_images_count = 50
 
-    def __init__(self, img_path: str, cached_images: dict[str, QPixmap]):
+    class Sigs(QObject):
+        finished_ = pyqtSignal(tuple)
+
+    def __init__(self, abs_img_path: str, cached_images: dict[str, QPixmap]):
         """
-        Возвращает в сигнале finished_ (img_path, QImage)
+        :param img_path: путь к изображению
+        :param cached_images: словарь кэшированных изображений {путь: QPixmap}
         """
         super().__init__()
-        self.sigs = _LoadOneImgSigs()
-        self.img_path = img_path
+        self.sigs = OneImgLoader.Sigs()
+        self.abs_img_path = abs_img_path
         self.cached_images = cached_images
 
     def task(self):
-        if self.img_path not in self.cached_images:
-            img = ImgUtils.read_image(self.img_path)
-            if img is not None:
-                img = ImgUtils.desaturate_image(img, 0.2)
-                self.qimage = PixmapUtils.qimage_from_array(img)
-                self.cached_images[self.img_path] = self.qimage
-                del img 
-                gc.collect()
-        else:
-            self.qimage = self.cached_images.get(self.img_path)
+        """Выполняет загрузку изображения и эмитит сигнал."""
+        try:
+            self._load_image()
+            self.sigs.finished_.emit((self.abs_img_path, getattr(self, "qimage", None)))
+        except Exception as e:
+            print("OneImgLoader error:", e)
+            self.sigs.finished_.emit((self.abs_img_path, None))
 
-        if not hasattr(self, "qimage"):
+    def _load_image(self):
+        """Приватный метод: загружает и кэширует изображение."""
+        if self.abs_img_path in self.cached_images:
+            self.qimage = self.cached_images[self.abs_img_path]
+            return
+
+        img = ImgUtils.read_image(self.abs_img_path)
+        if img is None:
             self.qimage = None
+            return
 
+        img = ImgUtils.desaturate_image(img, 0.2)
+        self.qimage = PixmapUtils.qimage_from_array(img)
+        self.cached_images[self.abs_img_path] = self.qimage
+
+        del img
+        gc.collect()
+
+        # Обрезаем кэш при превышении лимита
         if len(self.cached_images) > self.max_images_count:
             self.cached_images.pop(next(iter(self.cached_images)))
-
-        image_data = (self.img_path, self.qimage)
-        self.sigs.finished_.emit(image_data)
 
 
 class OneFileInfo(URunnable):
