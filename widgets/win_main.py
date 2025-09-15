@@ -597,18 +597,18 @@ class WinMain(UMainWindow):
         
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            img_paths = [
+            abs_paths = [
                 MainUtils.get_abs_path(main_folder_path, i)
                 for i in rel_img_paths
             ]
-            dirs_to_scan = list(set(os.path.dirname(i) for i in img_paths))
+            dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
             self.remove_files_win = WinQuestion(
                 Lng.attention[Cfg.lng],
-                f"{Lng.delete_forever[Cfg.lng]} ({len(img_paths)})?"
+                f"{Lng.delete_forever[Cfg.lng]} ({len(abs_paths)})?"
             )
             self.remove_files_win.center_to_parent(self.window())
             self.remove_files_win.ok_clicked.connect(
-                lambda: start_remove(img_paths, dirs_to_scan)
+                lambda: start_remove(abs_paths, dirs_to_scan)
             )
             self.remove_files_win.ok_clicked.connect(
                 self.remove_files_win.deleteLater
