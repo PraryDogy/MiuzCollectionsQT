@@ -548,6 +548,15 @@ class MainFolderDataCleaner(URunnable):
         self.main_folder_name = main_folder_name
         self.conn = Dbase.engine.connect()
 
+    def task(self):
+        try:
+            self._task()
+        except Exception as e:
+            print("tasks, reset data task error:", e)
+        finally:
+            self.conn.close()
+            self.sigs.finished_.emit()
+
     def _task(self):
         # Удаляем битые миниатюры
         stmt = sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.short_hash)
@@ -562,12 +571,3 @@ class MainFolderDataCleaner(URunnable):
         stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand == self.main_folder_name)
         self.conn.execute(stmt)
         self.conn.commit()
-
-    def task(self):
-        try:
-            self._task()
-        except Exception as e:
-            print("tasks, reset data task error:", e)
-        finally:
-            self.conn.close()
-            self.sigs.finished_.emit()
