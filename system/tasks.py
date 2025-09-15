@@ -522,19 +522,40 @@ class _ResetDataSigs(QObject):
 
 
 class ResetDataTask(URunnable):
+    """
+    Сбрасывает данные в БД для пересканирования:
+    
+    - Удаляет записи из THUMBS, если файл миниатюры отсутствует.
+    - Удаляет запись о папке `main_folder` из DIRS.
+    """
+
     def __init__(self, main_folder_name: str):
         super().__init__()
         self.sigs = _ResetDataSigs()
         self.main_folder_name = main_folder_name
-        
+        self.conn = Dbase.engine.connect()
+
+    def _task(self):
+        # Удаляем битые миниатюры
+        stmt = sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.short_hash)
+        for rel_img_path, rel_thumb_path in self.conn.execute(stmt):
+            abs_thumb_path = ThumbUtils.get_abs_thumb_path(rel_thumb_path)
+            if not os.path.exists(abs_thumb_path):
+                self.conn.execute(
+                    sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_img_path)
+                )
+        self.conn.commit()
+
+        # Удаляем папку
+        stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand == self.main_folder_name)
+        self.conn.execute(stmt)
+        self.conn.commit()
+
     def task(self):
-        conn = Dbase.engine.connect()
-        q = sqlalchemy.delete(DIRS)
-        q = q.where(DIRS.c.brand == self.main_folder_name)
         try:
-            conn.execute(q)
-            conn.commit()
+            self._task()
         except Exception as e:
-            print("tasks, reset data task error", e)
-        
-        self.sigs.finished_.emit()
+            print("tasks, reset data task error:", e)
+        finally:
+            self.conn.close()
+            self.sigs.finished_.emit()
