@@ -468,7 +468,7 @@ class _ImgDbUpdater:
                 THUMBS.c.brand == self.main_folder.name
             )
             self.conn.execute(q)
-            self.conn.commit()
+        self.conn.commit()
 
     def del_dublicates(self):
         short_paths = [
