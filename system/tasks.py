@@ -18,6 +18,15 @@ from .utils import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
 
 
 class CopyFilesManager(URunnable):
+    """
+    Копирует файлы в указанную директорию с обновлением прогресса.
+
+    Сигналы:
+    - finished_(list[str]): список скопированных файлов
+    - value_changed(int): значение от 0 до 100 для QProgressBar
+    - progress_changed(tuple): (текущий индекс, общее количество файлов)
+    - file_changed(str): имя текущего копируемого файла
+    """
 
     class Sigs(QObject):
         finished_ = pyqtSignal(list)
@@ -25,98 +34,64 @@ class CopyFilesManager(URunnable):
         progress_changed = pyqtSignal(tuple)
         file_changed = pyqtSignal(str)
 
-    list_: list["CopyFilesManager"] = []
-    copied_files_: list[list[str]] = []
-
-    def __init__(self, dest: str, files: list):
-        """
-        Копирует файлы в новую директорию.
-
-        Поведение:
-        - Добавляется в список активных задач CopyFilesTask.list_
-        - По завершении удаляется из этого списка
-        - Список путей скопированных файлов добавляется в CopyFilesTask.copied_files
-
-        Сигналы:
-        - finished(list[str]) — список скопированных файлов
-        - value_changed(int) — значение от 0 до 100 для QProgressBar
-        """
+    def __init__(self, dest: str, files: list[str]):
         super().__init__()
         self.sigs = CopyFilesManager.Sigs()
         self.files = files
         self.dest = dest
 
-    @classmethod
-    def get_current_tasks(cls):
-        """
-        Возвращает список действующих задач CopyFilesTask:   
-        Сигналы:
-        - finished(список путей к скопированным файлам)
-        - value_changed(0-100, для передачи в QProgressBar)
-        """
-        return CopyFilesManager.list_
-    
-    @classmethod
-    def copied_files(cls):
-        """
-        Возвращает список списков с путями к уже скопированным файлам.  
-        Формат:[[<путь_к_файлу1>, <путь_к_файлу2>],...]
-        """
-        return CopyFilesManager.copied_files_
-
     def task(self):
-        CopyFilesManager.list_.append(self)
-
+        """Основной метод выполнения копирования файлов."""
         copied_size = 0
         files_dests = []
 
         try:
-            total_size = sum(os.path.getsize(file) for file in self.files)
-        except Exception as e:
+            total_size = sum(os.path.getsize(f) for f in self.files)
+        except Exception:
             MainUtils.print_error()
-            self.copy_files_finished(files_dests)
+            self._finish_copy(files_dests)
             return
 
         self.sigs.value_changed.emit(0)
 
-        for x, file_path in enumerate(self.files, start=1):
-            
+        for idx, file_path in enumerate(self.files, start=1):
             if not self.task_state.should_run():
                 break
 
-            self.sigs.progress_changed.emit(
-                (x, len(self.files))
-            )
-            self.sigs.file_changed.emit(
-                os.path.basename(file_path)
-            )
             dest_path = os.path.join(self.dest, os.path.basename(file_path))
             if dest_path == file_path:
-                print("нельзя копировать в себя файл", dest_path)
+                print("нельзя копировать файл в себя:", dest_path)
                 continue
             files_dests.append(dest_path)
 
+            self.sigs.progress_changed.emit((idx, len(self.files)))
+            self.sigs.file_changed.emit(os.path.basename(file_path))
+
             try:
-                with open(file_path, 'rb') as fsrc, open(dest_path, 'wb') as fdest:
-                    while self.task_state.should_run():
-                        buf = fsrc.read(1024*1024)
-                        if not buf:
-                            break
-                        fdest.write(buf)
-                        copied_size += len(buf)
-                        percent = int((copied_size / total_size) * 100)
-                        self.sigs.value_changed.emit(percent)
-            except Exception as e:
+                copied_size = self._copy_file(file_path, dest_path, copied_size, total_size)
+            except Exception:
                 MainUtils.print_error()
                 break
-        
-        self.copy_files_finished(files_dests)
 
-    def copy_files_finished(self, files_dests: list[str]):
+        self._finish_copy(files_dests)
+
+    def _copy_file(self, src: str, dst: str, copied_size: int, total_size: int) -> int:
+        """Приватный метод для копирования одного файла с обновлением прогресса."""
+        with open(src, 'rb') as fsrc, open(dst, 'wb') as fdst:
+            while self.task_state.should_run():
+                buf = fsrc.read(1024*1024)
+                if not buf:
+                    break
+                fdst.write(buf)
+                copied_size += len(buf)
+                percent = int((copied_size / total_size) * 100)
+                self.sigs.value_changed.emit(percent)
+        return copied_size
+
+    def _finish_copy(self, files_dests: list[str]):
+        """Приватный метод для завершения копирования и эмита сигнала finished_."""
         self.sigs.value_changed.emit(100)
         self.sigs.finished_.emit(files_dests)
-        CopyFilesManager.copied_files_.append(files_dests)
-        CopyFilesManager.list_.remove(self)
 
 
 class FavManager(URunnable):
