@@ -239,7 +239,7 @@ class DirsUpdater:
         self.conn.commit()
 
 
-class _ImgLoader(QObject):
+class ImgLoader(QObject):
     progress_text = pyqtSignal(str)
 
     def __init__(self, dirs_to_scan: list[str, int], main_folder: MainFolder, task_state: TaskState):
@@ -524,7 +524,7 @@ class NewDirsHandler(QObject):
         self.task_state = task_state
     
     def run(self):
-        img_loader = _ImgLoader(self.dirs_to_scan, self.main_folder, self.task_state)
+        img_loader = ImgLoader(self.dirs_to_scan, self.main_folder, self.task_state)
         img_loader.progress_text.connect(self.progress_text.emit)
         finder_images = img_loader.finder_images()
         db_images = img_loader.db_images()
