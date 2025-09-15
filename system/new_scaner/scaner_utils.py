@@ -36,8 +36,6 @@ class RemovedMainFolderCleaner:
             return self._run()
         except Exception as e:
             print("new scaner utils, RemovedMainFoldeHandler", e)
-            import traceback
-            print(traceback.format_exc())
             return None
 
     def _run(self):
