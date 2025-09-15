@@ -571,7 +571,7 @@ class WinMain(UMainWindow):
         else:
             self.open_win_smb()
     
-    def upload_files(self, img_paths: list):
+    def upload_files(self, abs_img_paths: list):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             self.grid.clipboard_item = ClipBoardItem()
@@ -579,7 +579,11 @@ class WinMain(UMainWindow):
             item.set_type(ClipBoardItem.type_copy)
             item.target_main_folder = MainFolder.current
             item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
-            item.files_to_copy = img_paths
+            item.files_to_copy = abs_img_paths
+            item.source_dirs = list(set(
+                os.path.dirname(i)
+                for i in abs_img_paths
+            ))
             self.paste_files_here()
         else:
             self.open_win_smb()
