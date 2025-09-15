@@ -264,7 +264,10 @@ class OneFileInfo(URunnable):
     def lined_text(self, text: str) -> str:
         """Разбивает текст на строки длиной не более max_row символов."""
         if len(text) > self.max_row:
-            return "\n".join(text[i:i + self.max_row] for i in range(0, len(text), self.max_row))
+            return "\n".join(
+                text[i:i + self.max_row]
+                for i in range(0, len(text), self.max_row)
+            )
         return text
 
 
