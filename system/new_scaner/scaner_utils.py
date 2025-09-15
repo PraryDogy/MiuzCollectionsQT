@@ -483,12 +483,13 @@ class _ImgDbUpdater:
         self.conn.commit()
 
     def run_new_items(self):
+        values_list = []
         for img_path, size, birth, mod in self.new_images:
-            hash = ThumbUtils.create_thumb_path(img_path)
-            short_hash = ThumbUtils.get_rel_thumb_path(hash)
+            abs_hash = ThumbUtils.create_thumb_path(img_path)
+            short_hash = ThumbUtils.get_rel_thumb_path(abs_hash)
             short_src = MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
             coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, img_path)
-            values = {
+            values_list.append({
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.SHORT_HASH: short_hash,
                 ClmNames.SIZE: size,
@@ -498,9 +499,8 @@ class _ImgDbUpdater:
                 ClmNames.COLL: coll_name,
                 ClmNames.FAV: 0,
                 ClmNames.BRAND: self.main_folder.name
-            }
-            stmt = sqlalchemy.insert(THUMBS).values(**values) 
-            self.conn.execute(stmt)
+            })
+        self.conn.execute(sqlalchemy.insert(THUMBS), values_list)
         self.conn.commit()
 
 
