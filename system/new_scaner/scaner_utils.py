@@ -234,7 +234,7 @@ class DirsUpdater:
             for short_src, mod in self.dirs_to_scan
         ]
         if values_list:
-            self.conn.execute(DIRS.insert(), values_list)
+            self.conn.execute(sqlalchemy.insert(DIRS), values_list)
 
         self.conn.commit()
 
