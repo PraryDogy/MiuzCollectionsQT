@@ -239,7 +239,6 @@ class OneFileInfo(URunnable):
         stats = os.stat(self.url)
         size = MainUtils.get_f_size(stats.st_size)
         mod = MainUtils.get_f_date(stats.st_mtime)
-        coll = MainUtils.get_coll_name(mail_folder_path, self.url)
         thumb_path = ThumbUtils.create_thumb_path(self.url)
 
         res = {
