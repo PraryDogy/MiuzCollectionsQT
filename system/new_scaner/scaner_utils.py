@@ -157,11 +157,12 @@ class DirsLoader(QObject):
         - [(rel_dir_path, mod_time), ...]
         """
         conn = Dbase.engine.connect()
-        q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod)
-        q = q.where(DIRS.c.brand == self.main_folder.name)
-        res = conn.execute(q).fetchall()
+        q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
+            DIRS.c.brand == self.main_folder.name
+        )
+        res = [(short_src, mod) for short_src, mod in conn.execute(q)]
         conn.close()
-        return [(short_src, mod) for short_src, mod in res]
+        return res
 
 
 class DirsCompator:
