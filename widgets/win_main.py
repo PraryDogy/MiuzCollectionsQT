@@ -110,7 +110,7 @@ class WinMain(UMainWindow):
         sep_upper = USep()
         right_lay.addWidget(sep_upper)
 
-        self.grid = Grid()
+        self.grid = Grid(self.clipboard_item)
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_paths: self.remove_files(rel_img_paths))
         self.grid.no_connection.connect(self.open_win_smb)
@@ -600,7 +600,7 @@ class WinMain(UMainWindow):
         if main_folder_path:
             self.grid.clipboard_item = ClipBoardItem()
             item = self.grid.clipboard_item
-            item.set_type(ClipBoardItem.type_copy)
+            item.action_type = ClipBoardItem.type_copy
             item.target_main_folder = MainFolder.current
             item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
             item.files_to_copy = abs_img_paths

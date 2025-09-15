@@ -392,7 +392,7 @@ class Grid(VScrollArea):
     date_wid_ms = 3000
     png_copy_files = "./images/copy_files.png"
 
-    def __init__(self):
+    def __init__(self, clipboard_item: ClipBoardItem):
         super().__init__()
 
         # --- Состояние и данные ---
@@ -404,7 +404,7 @@ class Grid(VScrollArea):
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
-        self.clipboard_item = None
+        self.clipboard_item = clipboard_item
 
         self.image_apps = {i: os.path.basename(i) for i in MainUtils.image_apps(Cfg.apps)}
 
@@ -698,7 +698,6 @@ class Grid(VScrollArea):
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_A:
             select_all()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
-            self.set_clipboard(ClipBoardItem.type_copy)
             self.copy_files.emit(
                 (ClipBoardItem.type_copy, [i.rel_img_path for i in self.selected_widgets])
             )

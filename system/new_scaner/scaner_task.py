@@ -116,7 +116,6 @@ class ScanerTask(URunnable):
         if removed_dirs:
             del_handler = RemovedDirsHandler(removed_dirs, main_folder)
             del_handler.run()
-            print("dirs removed", removed_dirs)
 
 
 class _CustomScanerSigs(QObject):
