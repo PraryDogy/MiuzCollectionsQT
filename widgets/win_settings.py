@@ -922,23 +922,18 @@ class WinSettings(SingleActionWindow):
         if self.ok_btn.text() in Lng.restart:
             if not validate_folders():
                 return
-
-            MainFolder.list_ = self.main_folder_list_copy
-            Filters.filters = self.filters_copy
-
-            for key, value in vars(self.json_data_copy).items():
-                setattr(Cfg, key, value)
-
-            MainFolder.write_json_data()
-            Filters.write_json_data()
-            Cfg.write_json_data()
-
             if self.need_reset[0]:
                 shutil.rmtree(Static.APP_SUPPORT_DIR)
-            
+            else:
+                MainFolder.list_ = self.main_folder_list_copy
+                Filters.filters = self.filters_copy
+                for key, value in vars(self.json_data_copy).items():
+                    setattr(Cfg, key, value)
+                MainFolder.write_json_data()
+                Filters.write_json_data()
+                Cfg.write_json_data()
             QApplication.quit()
             MainUtils.start_new_app()
-
         else:
             self.deleteLater()
 
