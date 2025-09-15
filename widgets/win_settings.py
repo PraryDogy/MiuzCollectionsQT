@@ -784,7 +784,6 @@ class WinSettings(SingleActionWindow):
             self.new_folder.new_folder.connect(self.add_main_folder)
             self.right_lay.insertWidget(0, self.new_folder)
             self.new_folder.preset_new_folder(self.settings_item.content)
-                
         else:
             # Находим в копии списка MainFolder объект с нужным псевдонимом,
             # чтобы передать его в дочерний виджет MainFolderSettings.
