@@ -461,12 +461,13 @@ class _ImgDbUpdater:
         self.run_new_items()
 
     def run_del_items(self):
-        for rel_thumb_path in self.del_images:
-            q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.short_hash==rel_thumb_path)
-            q = q.where(THUMBS.c.brand==self.main_folder.name)
+        if self.del_images:
+            q = sqlalchemy.delete(THUMBS).where(
+                THUMBS.c.short_hash.in_(self.del_images),
+                THUMBS.c.brand == self.main_folder.name
+            )
             self.conn.execute(q)
-        self.conn.commit()
+            self.conn.commit()
 
     def run_new_items(self):
         for img_path, size, birth, mod in self.new_images:
