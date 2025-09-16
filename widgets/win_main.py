@@ -124,6 +124,7 @@ class WinMain(UMainWindow):
         self.grid.open_in_app.connect(self.open_in_app)
         self.grid.paste_files.connect(self.paste_files_here)
         self.grid.copy_files.connect(self.set_clipboard)
+        self.grid.setup_main_folder.connect(self.open_settings)
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()

@@ -8,7 +8,8 @@ from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
                          QMouseEvent, QPalette, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-                             QGridLayout, QLabel, QRubberBand, QWidget)
+                             QGridLayout, QLabel, QPushButton, QRubberBand,
+                             QWidget)
 
 from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
@@ -16,8 +17,8 @@ from system.main_folder import MainFolder
 from system.tasks import DbImagesLoader
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
-from ._base_widgets import (ClipBoardItem, SvgBtn, UMenu, UVBoxLayout,
-                            VScrollArea)
+from ._base_widgets import (ClipBoardItem, SettingsItem, SvgBtn, UMenu,
+                            UVBoxLayout, VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save, SaveAs,
                       ScanerRestart, SetFav, WinInfoAction)
@@ -402,6 +403,7 @@ class Grid(VScrollArea):
     open_in_app = pyqtSignal(tuple)
     paste_files = pyqtSignal()
     copy_files = pyqtSignal(tuple)
+    setup_main_folder = pyqtSignal(SettingsItem)
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -478,6 +480,12 @@ class Grid(VScrollArea):
 
     def load_initial_grid(self, db_images: dict[str, list[DbImagesLoader.Item]]):
 
+        def create_item():
+            item = SettingsItem()
+            item.action_type = item.type_edit_folder
+            item.content = MainFolder.current
+            return item
+
         def load_grid_delayed():
             self.remove_grid_container()
             self.load_grid_container()
@@ -487,11 +495,24 @@ class Grid(VScrollArea):
             if not db_images:
                 for i in Dynamic.current_dir.split("/"):
                     if i in MainFolder.current.stop_list:
-                        text = f"\"{i}\" {Lng.on_ignore_list[Cfg.lng].lower()}"
-                        lbl = QLabel(text)
-                        self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+                        settings_wid = QWidget()
+                        settings_lay = UVBoxLayout()
+                        settings_lay.setSpacing(15)
+                        settings_wid.setLayout(settings_lay)
+                        self.grid_lay.addWidget(settings_wid, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
                         self.grid_lay.setRowStretch(0, 1)
                         self.grid_lay.setColumnStretch(0, 1)
+
+                        text = f"\"{i}\" {Lng.on_ignore_list[Cfg.lng].lower()}"
+                        lbl = QLabel(text)
+                        settings_lay.addWidget(lbl)
+
+                        settings = QPushButton(Lng.setup[Cfg.lng])
+                        settings.setFixedWidth(110)
+                        settings.clicked.connect(
+                            lambda: self.setup_main_folder.emit(create_item())
+                        )
+                        settings_lay.addWidget(settings, alignment=Qt.AlignmentFlag.AlignCenter)
                         break
                 else:
                     lbl = QLabel(Lng.no_photo[Cfg.lng])
