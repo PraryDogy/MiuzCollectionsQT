@@ -200,6 +200,7 @@ class MainFolderList(VListWidget):
             text = f"{true_name} ({i.name})"
             item = MainFolerListItem(parent=self, text=text)
             item.main_folder = i
+            item.setToolTip(i.name + "\n" + i.curr_path)
             self.addItem(item)
 
         self._last_main_folder = MainFolder.list_[0]
