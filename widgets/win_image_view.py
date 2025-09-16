@@ -402,7 +402,7 @@ class WinImageView(AppModalWindow):
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             self.open_win_info.emit([self.rel_img_path])
 
-        return super().keyPressEvent(ev)
+        # return super().keyPressEvent(ev)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
