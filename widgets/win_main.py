@@ -176,45 +176,6 @@ class WinMain(UMainWindow):
             self.wait_timer.start(10)
 
     def save_files(self, data: tuple):
-
-        def set_below_label(data: tuple[int, int], win: ProgressbarWin):
-            count, total = data
-            win.below_label.setText(
-                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
-            )
-
-        def set_above_label(text: str, dest_name: str, win: ProgressbarWin):
-            win.above_label.setText(
-                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
-            )
-
-        def copy_files_start(dest: str, abs_files: list[str]):
-            dest_name = os.path.basename(dest)
-            progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
-            progress_win.progressbar.setMaximum(100)
-            progress_win.center_to_parent(self)
-            progress_win.show()
-            task = CopyFilesManager(dest, abs_files)
-            progress_win.cancel.connect(
-                lambda: task.task_state.set_should_run(False)
-            )
-            task.sigs.value_changed.connect(
-                progress_win.progressbar.setValue
-            )
-            task.sigs.progress_changed.connect(
-                lambda data: set_below_label(data, progress_win)
-            )
-            task.sigs.file_changed.connect(
-                lambda text: set_above_label(text, dest_name, progress_win)
-            )
-            task.sigs.finished_.connect(
-                MainUtils.reveal_files
-            )
-            task.sigs.finished_.connect(
-                progress_win.deleteLater
-            )
-            UThreadPool.start(task)
-
         dest, rel_img_paths = data
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
@@ -225,9 +186,11 @@ class WinMain(UMainWindow):
             if dest is None:
                 dest = QFileDialog.getExistingDirectory()
                 if dest:
-                    copy_files_start(dest, abs_files)
+                    task = self.copy_files_task(dest, abs_files)
+                    UThreadPool.start(task)
             else:
-                copy_files_start(dest, abs_files)
+                task = self.copy_files_task(dest, abs_files)
+                UThreadPool.start(task)
         else:
             self.open_win_smb()
 
@@ -508,6 +471,45 @@ class WinMain(UMainWindow):
         self.reset_task.sigs.finished_.connect(fin)
         UThreadPool.start(self.reset_task)
 
+    def copy_files_task(self, target_dir: str, files_to_copy: list[str]):
+
+        def set_below_label(data: tuple[int, int], win: ProgressbarWin):
+            count, total = data
+            win.below_label.setText(
+                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
+            )
+
+        def set_above_label(text: str, dest_name: str, win: ProgressbarWin):
+            win.above_label.setText(
+                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
+            )
+
+        def copy_files(target_dir: str, files_to_copy: list[str]):
+            dest_name = os.path.basename(os.path.basename(target_dir))
+            progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
+            progress_win.progressbar.setMaximum(100)
+            progress_win.center_to_parent(self)
+            progress_win.show()
+            task = CopyFilesManager(target_dir, files_to_copy)
+            progress_win.cancel.connect(
+                lambda: task.task_state.set_should_run(False)
+            )
+            task.sigs.value_changed.connect(
+                progress_win.progressbar.setValue
+            )
+            task.sigs.progress_changed.connect(
+                lambda data: set_below_label(data, progress_win)
+            )
+            task.sigs.file_changed.connect(
+                lambda text: set_above_label(text, dest_name, progress_win)
+            )
+            task.sigs.finished_.connect(
+                progress_win.deleteLater
+            )
+            return task
+        
+        return copy_files(target_dir, files_to_copy)
+
     def paste_files_here(self):
 
         def reset_clipboard():
@@ -560,44 +562,13 @@ class WinMain(UMainWindow):
             remove_task.sigs.finished_.connect(scan_dirs)
             UThreadPool.start(remove_task)
 
-        def set_below_label(data: tuple[int, int], win: ProgressbarWin):
-            count, total = data
-            win.below_label.setText(
-                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
-            )
-
-        def set_above_label(text: str, dest_name: str, win: ProgressbarWin):
-            win.above_label.setText(
-                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
-            )
-
         def copy_files():
-            dest_name = os.path.basename(os.path.basename(self.clipboard_item.target_dir))
-            progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
-            progress_win.progressbar.setMaximum(100)
-            progress_win.center_to_parent(self)
-            progress_win.show()
-            task = CopyFilesManager(
+            task = self.copy_files_task(
                 self.clipboard_item.target_dir,
                 self.clipboard_item.files_to_copy
             )
-            progress_win.cancel.connect(
-                lambda: task.task_state.set_should_run(False)
-            )
-            task.sigs.value_changed.connect(
-                progress_win.progressbar.setValue
-            )
-            task.sigs.progress_changed.connect(
-                lambda data: set_below_label(data, progress_win)
-            )
-            task.sigs.file_changed.connect(
-                lambda text: set_above_label(text, dest_name, progress_win)
-            )
             task.sigs.finished_.connect(
                 MainUtils.reveal_files
-            )
-            task.sigs.finished_.connect(
-                progress_win.deleteLater
             )
             task.sigs.finished_.connect(
                 lambda files: set_files_copied(files)
@@ -611,24 +582,6 @@ class WinMain(UMainWindow):
                     lambda _: scan_dirs()
                 )
             UThreadPool.start(task)
-
-        # def copy_files():
-        #     copy_task = CopyFilesManager(
-        #         self.clipboard_item.target_dir,
-        #         self.clipboard_item.files_to_copy
-        #     )
-        #     copy_task.sigs.finished_.connect(
-        #         lambda files: set_files_copied(files)
-        #     )
-        #     if self.clipboard_item.action_type == self.clipboard_item.type_cut:
-        #         copy_task.sigs.finished_.connect(
-        #             lambda _: remove_files()
-        #         )
-        #     else:
-        #         copy_task.sigs.finished_.connect(
-        #             lambda _: scan_dirs()
-        #         )
-        #     UThreadPool.start(copy_task)
 
         main_folder_path = MainFolder.current.get_curr_path()
         abs_current_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
