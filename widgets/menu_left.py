@@ -59,9 +59,11 @@ class TreeWid(QTreeWidget):
         self.insertTopLevelItem(1, sep)
 
         # корневая директория
-        root_item = QTreeWidgetItem([os.path.basename(root_dir)])
+        basename = os.path.basename(root_dir)
+        root_item = QTreeWidgetItem([basename])
         root_item.setSizeHint(0, QSize(0, self.hh))
         root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)
+        root_item.setToolTip(0, basename + "\n" + root_dir)
         self.addTopLevelItem(root_item)
 
         worker = SortedDirsLoader(root_dir)
@@ -103,6 +105,7 @@ class TreeWid(QTreeWidget):
             child: QTreeWidgetItem = QTreeWidgetItem([name])
             child.setSizeHint(0, QSize(0, self.hh))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
+            child.setToolTip(0, name + "\n" + path)
             parent_item.addChild(child)
         parent_item.setExpanded(True)
 
