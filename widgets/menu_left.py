@@ -43,6 +43,7 @@ class TreeWid(QTreeWidget):
         self.last_dir: str = None
         self.selected_path: str = None
         self.setHeaderHidden(True)
+        self.setAutoScroll(False)
         self.itemClicked.connect(self.on_item_click)
 
     def init_ui(self, root_dir: str):
