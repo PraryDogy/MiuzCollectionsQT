@@ -32,17 +32,13 @@ class UVBoxLayout(QVBoxLayout):
         self.setSpacing(0)
 
 
-class UMenu(QMenu):
+class UMenuBase(QMenu):
     """
-    QMenu с кастомной окраской разделителей, подстроенной под цвет текста приложения.
-    
-    Аргументы:
-        event (QContextMenuEvent): Событие контекстного меню.
+    Базовый QMenu с кастомной окраской разделителей, подстроенной под цвет текста приложения.
     """
 
-    def __init__(self, event: QContextMenuEvent):
-        super().__init__()
-        self.ev = event
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         # --- палитра ---
         palette = QApplication.palette()
@@ -64,14 +60,36 @@ class UMenu(QMenu):
             }}
         """)
 
-    def show_umenu(self):
-        self.exec_(self.ev.globalPos())
-
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.RightButton:
             a0.ignore()
         else:
             super().mouseReleaseEvent(a0)
+
+
+class UMenu(UMenuBase):
+    """
+    Контекстное меню для главного окна.
+    
+    Аргументы:
+        event (QContextMenuEvent): Событие контекстного меню.
+    """
+
+    def __init__(self, event: QContextMenuEvent):
+        super().__init__()
+        self.ev = event
+
+    def show_umenu(self):
+        self.exec_(self.ev.globalPos())
+
+
+class USubMenu(UMenuBase):
+    """
+    Подменю с тем же стилем, что и UMenu.
+    """
+
+    def __init__(self, title: str, parent: QMenu):
+        super().__init__(title, parent)
 
 
 class ULineEdit(QLineEdit):

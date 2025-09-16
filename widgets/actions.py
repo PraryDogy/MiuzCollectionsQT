@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QAction, QMenu
-
+from ._base_widgets import UMenu
 from cfg import Cfg
 from system.lang import Lng
 
