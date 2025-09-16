@@ -28,11 +28,7 @@ from .win_warn import WinQuestion, WinWarn
 class ULabel(QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setWordWrap(True)
-        self.setSizePolicy(
-            QSizePolicy.Policy.MinimumExpanding,
-            QSizePolicy.Policy.Minimum
-        )
+        self.setMinimumWidth(30)
 
 
 class LangReset(QGroupBox):
@@ -210,7 +206,7 @@ class ThemesBtn(QFrame):
         self.svg_widget.setFixedSize(50, 50)
         svg_lay.addWidget(self.svg_widget)
 
-        label = QLabel(label_text)
+        label = ULabel(label_text)
         label.setAlignment(Qt.AlignCenter)
         v_lay.addWidget(label)
 
@@ -305,7 +301,7 @@ class Themes(QGroupBox):
             f.selected(f is selected_frame)
 
 
-class SelectableLabel(QLabel):
+class SelectableLabel(ULabel):
     txt = "\n".join([
         f"Version {Static.APP_VER}",
         "Developed by Evlosh",
@@ -407,7 +403,6 @@ class DropableGroupBox(QGroupBox):
         self.setLayout(v_lay)
 
         self.top_label = ULabel()
-        self.top_label.setWordWrap(True)
         v_lay.addWidget(self.top_label)
 
         self.text_edit = UTextEdit()
@@ -508,11 +503,11 @@ class MainFolderSettings(QWidget):
 
         # Верхний ряд с названием
         first_row = QGroupBox()
-        first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
         first_lay = UHBoxLayout()
-        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        first_lay.setContentsMargins(10, 10, 10, 10)
         first_lay.setSpacing(5)
+        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_row.setLayout(first_lay)
         name_descr = ULabel(Lng.alias[Cfg.lng] + ":")
         first_lay.addWidget(name_descr)
@@ -561,7 +556,6 @@ class MainFolderSettings(QWidget):
         second_row_lay.addWidget(remove_btn)
 
         second_desc = ULabel(Lng.remove_btn_description[Cfg.lng])
-        # second_desc.setWordWrap(True)
         second_row_lay.addWidget(second_desc)
 
         btn_group_lay.addWidget(btn_second_row)
@@ -618,12 +612,10 @@ class NewFolder(QWidget):
         btn_group_lay.addWidget(add_btn)
 
         description_label = ULabel(Lng.save_btn_description[Cfg.lng])
-        description_label.setWordWrap(True)
         btn_group_lay.addWidget(description_label)
 
         v_lay.addWidget(btn_group)
         v_lay.addStretch()
-
         
     def preset_new_folder(self, url: str):
         name = os.path.basename(url)
@@ -685,8 +677,7 @@ class FiltersWid(QWidget):
         g_lay.setContentsMargins(0, 5, 0, 5)
         g_lay.setSpacing(15)
 
-        descr = QLabel(Lng.filters_descr[Cfg.lng])
-        descr.setWordWrap(True)
+        descr = ULabel(Lng.filters_descr[Cfg.lng])
         g_lay.addWidget(descr)
 
         self.text_wid = UTextEdit()
