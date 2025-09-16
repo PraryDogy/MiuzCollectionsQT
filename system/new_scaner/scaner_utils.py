@@ -324,7 +324,6 @@ class ImgLoader(QObject):
                 q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             for rel_thumb_path, rel_img_path, size, birth, mod in conn.execute(q):
-                print(rel_thumb_path)
                 abs_img_path = MainUtils.get_abs_path(self.main_folder_path, rel_img_path)
                 db_images[rel_thumb_path] = (abs_img_path, size, birth, mod)
         conn.close()
