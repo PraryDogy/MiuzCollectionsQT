@@ -210,7 +210,7 @@ class ThemesBtn(QFrame):
         self.svg_widget.setFixedSize(50, 50)
         svg_lay.addWidget(self.svg_widget)
 
-        label = ULabel(label_text)
+        label = QLabel(label_text)
         label.setAlignment(Qt.AlignCenter)
         v_lay.addWidget(label)
 
