@@ -150,18 +150,30 @@ class WinMain(UMainWindow):
         self.scaner_timer.timeout.connect(self.start_scaner_task)
         self.scaner_task = None
         self.scaner_task_canceled = False
-        
-        def first_check():
-            for i in MainFolder.list_:
-                if not i.get_curr_path():
-                    self.open_win_smb()
-                    break
 
-        QTimer.singleShot(100, first_check)
+        self.wait_timer = QTimer(self)
+        self.wait_timer.setSingleShot(True)
+        self.wait_timer.timeout.connect(self.wait_connection)
+
+        QTimer.singleShot(100, self.first_check)
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
             
+    def wait_connection(self):
+        self.wait_timer.stop()
+        if not MainFolder.current.get_curr_path():
+            self.wait_timer.start(1000)
+        else:
+            # Dynamic.current_dir = ""
+            self.left_menu.main_folder_clicked(MainFolder.current)
+        print("wait smb connection")
+    
+    def first_check(self):
+        if not MainFolder.current.get_curr_path():
+            self.open_win_smb()
+            self.wait_timer.start(10)
+
     def save_files(self, data: tuple):
 
         def set_below_label(data: tuple[int, int], win: ProgressbarWin):
