@@ -44,7 +44,7 @@ class LangReset(QGroupBox):
         self.json_data_copy = json_data_copy
 
         v_lay = UVBoxLayout()
-        v_lay.setSpacing(5)
+        v_lay.setSpacing(10)
         self.setLayout(v_lay)
 
         first_row_wid = QWidget()
@@ -615,10 +615,11 @@ class NewFolder(QWidget):
         add_btn = QPushButton(Lng.save[Cfg.lng])
         add_btn.clicked.connect(self.save)
         add_btn.setFixedWidth(100)
-        btn_group_lay.addWidget(add_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+        btn_group_lay.addWidget(add_btn)
 
         description_label = ULabel(Lng.save_btn_description[Cfg.lng])
-        btn_group_lay.addWidget(description_label, alignment=Qt.AlignmentFlag.AlignRight)
+        description_label.setWordWrap(True)
+        btn_group_lay.addWidget(description_label)
 
         v_lay.addWidget(btn_group)
         v_lay.addStretch()
@@ -684,7 +685,8 @@ class FiltersWid(QWidget):
         g_lay.setContentsMargins(0, 5, 0, 5)
         g_lay.setSpacing(15)
 
-        descr = ULabel(Lng.filters_descr[Cfg.lng])
+        descr = QLabel(Lng.filters_descr[Cfg.lng])
+        descr.setWordWrap(True)
         g_lay.addWidget(descr)
 
         self.text_wid = UTextEdit()
@@ -695,7 +697,7 @@ class FiltersWid(QWidget):
         g_lay.addWidget(self.text_wid)
 
         self.v_lay.addWidget(group)
-                
+
         self.v_lay.addStretch(1)
         
     def on_text_changed(self):
