@@ -8,7 +8,7 @@ class Filters:
     default = [
         "/1 IMG/",
         "/2 MODEL IMG/",
-        ".tiff",
+        ".tif",
         ".psd",
         ".psb",
         ".jpg",
