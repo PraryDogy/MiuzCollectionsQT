@@ -8,7 +8,7 @@ from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QFrame,
                              QGroupBox, QLabel, QPushButton, QSpacerItem,
-                             QSpinBox, QSplitter, QTabWidget, QWidget)
+                             QSpinBox, QSplitter, QTabWidget, QWidget, QSizePolicy)
 
 from cfg import Cfg, Static
 from system.filters import Filters
@@ -25,10 +25,11 @@ from .win_warn import WinQuestion, WinWarn
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
 
 
-class QLabel(QLabel):
+class ULabel(QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setWordWrap(True)
+        self.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
 
 
 class LangReset(QGroupBox):
@@ -53,7 +54,7 @@ class LangReset(QGroupBox):
         self.lang_btn.clicked.connect(self.lang_btn_cmd)
         first_row_lay.addWidget(self.lang_btn)
 
-        self.lang_label = QLabel(Lng.language[Cfg.lng])
+        self.lang_label = ULabel(Lng.language[Cfg.lng])
         first_row_lay.addWidget(self.lang_label)
 
         sec_row_wid = QWidget()
@@ -68,7 +69,7 @@ class LangReset(QGroupBox):
         self.reset_data_btn.clicked.connect(self.reset.emit)
         sec_row_lay.addWidget(self.reset_data_btn)
 
-        descr = QLabel(text=Lng.reset_settings[Cfg.lng])
+        descr = ULabel(text=Lng.reset_settings[Cfg.lng])
         sec_row_lay.addWidget(descr)
 
         v_lay.addWidget(first_row_wid)
@@ -102,7 +103,7 @@ class SimpleSettings(QGroupBox):
         self.show_files_btn.clicked.connect(self.show_files_cmd)
         first_row_lay.addWidget(self.show_files_btn)
 
-        self.lang_label = QLabel(Lng.show_system_files[Cfg.lng])
+        self.lang_label = ULabel(Lng.show_system_files[Cfg.lng])
         first_row_lay.addWidget(self.lang_label)
 
     def show_files_cmd(self, *args):
@@ -138,7 +139,7 @@ class ScanerSettings(QGroupBox):
         self.spin.valueChanged.connect(self.change_scan_time)
         self.spin_lay.addWidget(self.spin)
 
-        label = QLabel(Lng.search_interval[Cfg.lng], self)
+        label = ULabel(Lng.search_interval[Cfg.lng], self)
         self.spin_lay.addWidget(label)
 
         self.theme_changed()
@@ -154,7 +155,7 @@ class ScanerSettings(QGroupBox):
         self.checkbox.setFixedWidth(115)
         first_lay.addWidget(self.checkbox)
 
-        self.checkbox_lbl = QLabel(Lng.fast_image_search[Cfg.lng])
+        self.checkbox_lbl = ULabel(Lng.fast_image_search[Cfg.lng])
         first_lay.addWidget(self.checkbox_lbl)
 
         if self.json_data_copy.new_scaner:
@@ -206,7 +207,7 @@ class ThemesBtn(QFrame):
         self.svg_widget.setFixedSize(50, 50)
         svg_lay.addWidget(self.svg_widget)
 
-        label = QLabel(label_text)
+        label = ULabel(label_text)
         label.setAlignment(Qt.AlignCenter)
         v_lay.addWidget(label)
 
@@ -402,7 +403,7 @@ class DropableGroupBox(QGroupBox):
         v_lay.setContentsMargins(0, 10, 0, 10)
         self.setLayout(v_lay)
 
-        self.top_label = QLabel()
+        self.top_label = ULabel()
         self.top_label.setWordWrap(True)
         v_lay.addWidget(self.top_label)
 
@@ -510,9 +511,9 @@ class MainFolderSettings(QWidget):
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_lay.setSpacing(5)
         first_row.setLayout(first_lay)
-        name_descr = QLabel(Lng.alias[Cfg.lng] + ":")
+        name_descr = ULabel(Lng.alias[Cfg.lng] + ":")
         first_lay.addWidget(name_descr)
-        name_label = QLabel(main_folder.name)
+        name_label = ULabel(main_folder.name)
         first_lay.addWidget(name_label)
 
         # Advanced настройки
@@ -539,7 +540,7 @@ class MainFolderSettings(QWidget):
         reset_btn.setFixedWidth(100)
         first_row_lay.addWidget(reset_btn)
 
-        first_desc = QLabel(Lng.reset_btn_description[Cfg.lng])
+        first_desc = ULabel(Lng.reset_btn_description[Cfg.lng])
         first_row_lay.addWidget(first_desc)
 
         btn_group_lay.addWidget(btn_first_row)
@@ -556,7 +557,7 @@ class MainFolderSettings(QWidget):
         remove_btn.setFixedWidth(100)
         second_row_lay.addWidget(remove_btn)
 
-        second_desc = QLabel(Lng.remove_btn_description[Cfg.lng])
+        second_desc = ULabel(Lng.remove_btn_description[Cfg.lng])
         # second_desc.setWordWrap(True)
         second_row_lay.addWidget(second_desc)
 
@@ -613,7 +614,7 @@ class NewFolder(QWidget):
         add_btn.setFixedWidth(100)
         btn_group_lay.addWidget(add_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        description_label = QLabel(Lng.save_btn_description[Cfg.lng])
+        description_label = ULabel(Lng.save_btn_description[Cfg.lng])
         btn_group_lay.addWidget(description_label, alignment=Qt.AlignmentFlag.AlignRight)
 
         v_lay.addWidget(btn_group)
@@ -680,7 +681,7 @@ class FiltersWid(QWidget):
         g_lay.setContentsMargins(0, 5, 0, 5)
         g_lay.setSpacing(15)
 
-        descr = QLabel(Lng.filters_descr[Cfg.lng])
+        descr = ULabel(Lng.filters_descr[Cfg.lng])
         descr.setWordWrap(True)
         g_lay.addWidget(descr)
 
