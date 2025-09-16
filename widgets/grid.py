@@ -485,10 +485,19 @@ class Grid(VScrollArea):
             self.clear_selected_widgets()
             Thumbnail.calculate_size()
             if not db_images:
-                lbl = QLabel(Lng.no_photo[Cfg.lng])
-                self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
-                self.grid_lay.setRowStretch(0, 1)
-                self.grid_lay.setColumnStretch(0, 1)
+                for i in Dynamic.current_dir.split("/"):
+                    if i in MainFolder.current.stop_list:
+                        text = f"\"{i}\" {Lng.on_ignore_list[Cfg.lng].lower()}"
+                        lbl = QLabel(text)
+                        self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+                        self.grid_lay.setRowStretch(0, 1)
+                        self.grid_lay.setColumnStretch(0, 1)
+                        break
+                else:
+                    lbl = QLabel(Lng.no_photo[Cfg.lng])
+                    self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+                    self.grid_lay.setRowStretch(0, 1)
+                    self.grid_lay.setColumnStretch(0, 1)
             else:
                 for _, db_images_list in db_images.items():
                     self.add_thumbnails_to_grid(db_images_list)

@@ -242,6 +242,7 @@ class Lng:
     data_was_reset = ("Данные сброшены", "Data reset")
     setup = ("Настроить", "Setup")
     preparing = ("Подготовка", "Preparing")
+    on_ignore_list = ("В игнор листе", "on the ignore list")
     copy_name_same_dir = (
         "Копирование невозможно — файлы уже находятся в этой папке",
         "Copy operation not allowed — the files is already in this folder"
