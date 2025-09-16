@@ -685,7 +685,6 @@ class FiltersWid(QWidget):
         g_lay.setSpacing(15)
 
         descr = ULabel(Lng.filters_descr[Cfg.lng])
-        descr.setWordWrap(True)
         g_lay.addWidget(descr)
 
         self.text_wid = UTextEdit()
