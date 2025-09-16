@@ -187,9 +187,11 @@ class WinMain(UMainWindow):
                 dest = QFileDialog.getExistingDirectory()
                 if dest:
                     task = self.copy_files_task(dest, abs_files)
+                    task.sigs.finished_.connect(MainUtils.reveal_files)
                     UThreadPool.start(task)
             else:
                 task = self.copy_files_task(dest, abs_files)
+                task.sigs.finished_.connect(MainUtils.reveal_files)
                 UThreadPool.start(task)
         else:
             self.open_win_smb()
@@ -472,6 +474,10 @@ class WinMain(UMainWindow):
         UThreadPool.start(self.reset_task)
 
     def copy_files_task(self, target_dir: str, files_to_copy: list[str]):
+        """
+        Создает QRunnable и окно с прогрессбаром для копирования файлов.
+        Возвращает QRunnable (можно доподключить сигналы).
+        """
 
         def set_below_label(data: tuple[int, int], win: ProgressbarWin):
             count, total = data
