@@ -724,7 +724,7 @@ class WinSettings(SingleActionWindow):
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng])
-        self.setMinimumHeight(520)
+        self.setFixedSize(700, 550)
         self.main_folder_list_copy = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
         self.filters_copy = copy.deepcopy(Filters.filters)
