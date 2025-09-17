@@ -91,13 +91,41 @@ class ResultsDialog(QWidget):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
         self.files = files
-        self.init_ui()
+        self.filenames = []
+        self.names = []
+        self.percents = []
+        self.init_table()
+        self.init_btns()
         self.adjustSize()
 
-    def init_ui(self):
-        layout = QVBoxLayout(self)
+    def init_btns(self):
+        btn_lay = QHBoxLayout()
+        btn_lay.setSpacing(15)
+        self.v_layout.addLayout(btn_lay)
+
+        btn_lay.addStretch()
+
+        def copy_cmd(values: list):
+            text = "\n".join(values)
+            clipboard = QApplication.clipboard()
+            clipboard.setText(text)
+
+        copy_names = QPushButton("Копир. имена")
+        copy_names.clicked.connect(lambda: copy_cmd(self.filenames))
+        copy_names.setFixedWidth(120)
+        btn_lay.addWidget(copy_names)
+
+        copy_values = QPushButton("Копир. резул.")
+        copy_values.clicked.connect(lambda: copy_cmd(self.percents))
+        copy_values.setFixedWidth(120)
+        btn_lay.addWidget(copy_values)
+
+        btn_lay.addStretch()
+
+    def init_table(self):
+        self.v_layout = QVBoxLayout(self)
         self.grid_layout = QGridLayout()
-        layout.addLayout(self.grid_layout)
+        self.v_layout.addLayout(self.grid_layout)
 
         # Заголовки
         headers = ["Превью", "Файл", "Процент"]
@@ -108,6 +136,9 @@ class ResultsDialog(QWidget):
 
         # Строки
         for row, (qimg, filename, percent) in enumerate(self.files, start=1):
+
+            self.filenames.append(filename)
+            self.percents.append(str(percent))
             # Превью
             pixmap_lbl = ImgLabel()
             if qimg is not None:
