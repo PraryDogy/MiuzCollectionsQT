@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import OneImgLoader
-from system.utils import MainUtils, UThreadPool
+from system.tasks import OneImgLoader, UThreadPool
+from system.utils import MainUtils
 
 from ._base_widgets import (AppModalWindow, SvgShadowed, UHBoxLayout, UMenu,
                             UVBoxLayout)

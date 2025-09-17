@@ -1,24 +1,14 @@
 import hashlib
-import io
-import json
-import logging
 import os
 import subprocess
 import sys
 import traceback
-from datetime import datetime, timedelta
 
 import cv2
-import jsonschema
 import numpy as np
-import psd_tools
-import rawpy
-from imagecodecs.imagecodecs import DelayedImportError
-from PIL import Image, ImageOps
-from PyQt5.QtCore import QRunnable, Qt, QThreadPool
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
-from tifffile import tifffile
 
 from cfg import Static
 
@@ -206,67 +196,3 @@ class MainUtils:
         print("Исключение обработано")
         print(traceback.format_exc())
         print()
-
-
-class TaskState:
-    __slots__ = ["_should_run", "_finished"]
-
-    def __init__(self, value=True, finished=False):
-        self._should_run = value
-        self._finished = finished
-
-    def should_run(self):
-        return self._should_run
-    
-    def set_should_run(self, value: bool):
-        self._should_run = value
-
-    def set_finished(self, value: bool):
-        self._finished = value
-
-    def finished(self):
-        return self._finished
-
-
-class URunnable(QRunnable):
-    def __init__(self):
-        """
-        Внимание:   
-        Не переопределяйте метод self.run() как в QRunnable, переопределите
-        метод self.task()
-
-        self.task_state:
-        - для управления QRunnable.
-        - Можно остановить задачу self.task_state.set_should_run(False)
-        - По завершению задачи self.task_state.finished() вернет True
-        """
-        super().__init__()
-        self.task_state = TaskState()
-    
-    def run(self):
-        try:
-            self.task()
-        finally:
-            self.task_state.set_finished(True)
-            # if self in UThreadPool.tasks:
-                # QTimer.singleShot(5000, lambda: UThreadPool.tasks.remove(self))
-
-    def task(self):
-        raise NotImplementedError("Переопредели метод task() в подклассе.")
-    
-
-class UThreadPool:
-    pool: QThreadPool = None
-    tasks: list[URunnable] = []
-
-    @classmethod
-    def init(cls):
-        cls.pool = QThreadPool.globalInstance()
-
-    @classmethod
-    def start(cls, runnable: URunnable):
-        """
-        Запускает URunnable, добавляет в список UThreadPool.tasks
-        """
-        # cls.tasks.append(runnable)
-        cls.pool.start(runnable)

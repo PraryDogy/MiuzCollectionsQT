@@ -9,8 +9,8 @@ from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.tasks import SortedDirsLoader
-from system.utils import MainUtils, UThreadPool
+from system.tasks import SortedDirsLoader, UThreadPool
+from system.utils import MainUtils
 
 from ._base_widgets import (SettingsItem, UListWidgetItem, UMenu, UVBoxLayout,
                             VListWidget)

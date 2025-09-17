@@ -10,8 +10,9 @@ from cfg import Cfg, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.utils import MainUtils, TaskState
 from system.shared_utils import ReadImage
+from system.tasks import TaskState
+from system.utils import MainUtils
 
 
 class RemovedMainFolderCleaner:

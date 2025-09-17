@@ -76,7 +76,7 @@ from system.database import Dbase
 from system.filters import Filters
 from system.main_folder import MainFolder
 from system.paletes import ThemeChanger
-from system.utils import UThreadPool
+from system.tasks import UThreadPool
 from widgets.win_main import WinMain
 
 

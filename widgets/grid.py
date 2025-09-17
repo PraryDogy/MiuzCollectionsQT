@@ -15,8 +15,8 @@ from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.shared_utils import SharedUtils
-from system.tasks import DbImagesLoader
-from system.utils import MainUtils, UThreadPool
+from system.tasks import DbImagesLoader, UThreadPool
+from system.utils import MainUtils
 
 from ._base_widgets import (ClipBoardItem, SettingsItem, SvgBtn, UMenu,
                             USubMenu, UVBoxLayout, VScrollArea)

@@ -8,7 +8,8 @@ from cfg import Cfg
 
 from ..lang import Lng
 from ..main_folder import MainFolder
-from ..utils import MainUtils, URunnable
+from ..tasks import URunnable
+from ..utils import MainUtils
 from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
                            NewDirsHandler, RemovedDirsHandler,
                            RemovedMainFolderCleaner)

@@ -7,7 +7,7 @@ from cfg import Cfg
 
 from ..lang import Lng
 from ..main_folder import MainFolder
-from ..utils import URunnable
+from ..tasks import URunnable
 from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
                            HashdirUpdater, Inspector, MainFolderRemover)
 

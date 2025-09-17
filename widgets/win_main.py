@@ -12,9 +12,8 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import MainFolder
 from system.new_scaner.scaner_task import CustomScanerTask
-from system.tasks import (CopyFilesManager, FavManager, MainUtils, MainFolderDataCleaner,
-                          FilesRemover)
-from system.utils import UThreadPool
+from system.tasks import (CopyFilesManager, FavManager, FilesRemover,
+                          MainFolderDataCleaner, MainUtils, UThreadPool)
 
 from ._base_widgets import (ClipBoardItem, SettingsItem, UHBoxLayout,
                             UMainWindow, UVBoxLayout)

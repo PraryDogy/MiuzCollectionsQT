@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 
 from cfg import Cfg, Static
 from system.lang import Lng
-from system.tasks import MultiFileInfo, OneFileInfo
-from system.utils import MainUtils, UThreadPool
+from system.tasks import MultiFileInfo, OneFileInfo, UThreadPool
+from system.utils import MainUtils
 
 from ._base_widgets import UMenu, SingleActionWindow
 

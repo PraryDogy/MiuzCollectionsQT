@@ -12,7 +12,8 @@ from system.lang import Lng
 from system.main_folder import MainFolder
 
 from ..shared_utils import ReadImage
-from ..utils import MainUtils, TaskState
+from ..tasks import TaskState
+from ..utils import MainUtils
 
 
 class FinderImages(QObject):
