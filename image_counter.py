@@ -3,6 +3,7 @@ import sys
 
 import cv2
 import numpy as np
+from PIL import Image
 from PyQt5.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
@@ -38,7 +39,9 @@ class ColorHighlighter(QRunnable):
         Закрашивает области для всех цветов из search_colors.
         Возвращает изображение и словарь с процентом площади каждого цвета.
         """
-        image = cv2.imread(file)
+        img_pil = Image.open(file)
+        img = np.array(img_pil)           # теперь это ndarray
+        image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         output = image.copy()
         filled_mask = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
