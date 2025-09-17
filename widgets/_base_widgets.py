@@ -1,12 +1,11 @@
-import re
-
-from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsDropShadowEffect,
-                             QHBoxLayout, QLabel, QLineEdit, QListWidget,
-                             QListWidgetItem, QMainWindow, QMenu, QScrollArea,
-                             QTextEdit, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
+                             QGraphicsDropShadowEffect, QHBoxLayout, QLabel,
+                             QLineEdit, QListWidget, QListWidgetItem,
+                             QMainWindow, QMenu, QScrollArea, QTextEdit,
+                             QVBoxLayout, QWidget)
 
 from cfg import Cfg, Static
 from system.lang import Lng
@@ -412,3 +411,63 @@ class ClipBoardItem:
    
     def set_files_copied(self, files: list[str]):
         self.files_copied = files
+
+
+class NotifyWid(QFrame):
+    ms = 1500
+
+    def __init__(self, parent: QWidget, text: str, svg_path: str):
+        super().__init__(parent=parent)
+
+        self.setObjectName("notifyWidget")
+        self.setStyleSheet(
+            f"""
+            #notifyWidget {{
+                background: {Static.BLUE_GLOBAL};
+                border-radius: 10px;
+                font-size: 16px;
+            }}
+            #notifyWidget QLabel {{
+                color: white;
+            }}
+            """
+        )
+
+        # иконка
+        self.icon = QSvgWidget(svg_path, self)
+        self.icon.setFixedSize(20, 20)
+
+        # текст
+        self.label = QLabel(text, self)
+        self.label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+
+        # лейаут
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setSpacing(6)
+        layout.addWidget(self.icon)
+        layout.addWidget(self.label)
+
+        # тень
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(12)
+        shadow.setXOffset(0)
+        shadow.setYOffset(2)
+        shadow.setColor(QColor(0, 0, 0, 160))
+        self.setGraphicsEffect(shadow)
+
+        self.adjustSize()
+
+    def _show(self):
+        self.adjustSize()
+        pw, ph = self.parent().width(), self.parent().height()
+        x = (pw - self.width()) // 2
+        y = 10
+        self.move(x, y)
+        self.show()
+        QTimer.singleShot(self.ms, self._close)
+
+    def _close(self):
+        self.setGraphicsEffect(None)
+        self.hide()
+        self.deleteLater()

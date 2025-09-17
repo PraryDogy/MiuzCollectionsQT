@@ -255,6 +255,10 @@ class Lng:
         "Удалить папку с изображениями и все данные",  # русский
         "Delete the image folder and all its data"    # английский
     )
+    drop_event_denied_msg = (
+        "Завершите поиск, затем перетащите файлы",
+        "Finish the search, then drag the files"
+    )
     save_btn_description = (
         "Нажмите \"Сохранить\" и \"Перезапуск\"",  # русский
         "Click \"Save\" and \"Restart\""           # английский

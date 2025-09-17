@@ -15,8 +15,8 @@ from system.new_scaner.scaner_task import CustomScanerTask
 from system.tasks import (CopyFilesManager, FavManager, FilesRemover,
                           MainFolderDataCleaner, MainUtils, UThreadPool)
 
-from ._base_widgets import (ClipBoardItem, SettingsItem, UHBoxLayout,
-                            UMainWindow, UVBoxLayout)
+from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
+                            UHBoxLayout, UMainWindow, UVBoxLayout)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -60,6 +60,7 @@ class WinMain(UMainWindow):
     min_w = 750
     ww, hh = 870, 500
     left_side_width = 210
+    warning_svg = "./images/warning.svg"
 
     def __init__(self, argv: list[str]):
         super().__init__()
@@ -706,6 +707,13 @@ class WinMain(UMainWindow):
 
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
+        
+        elif Dynamic.search_widget_text:
+            noti = NotifyWid(
+                Lng.drop_event_denied_msg[Cfg.lng],
+                self.warning_svg
+                )
+            noti._show()
 
         img_paths: list[str] = [
             i.toLocalFile()
