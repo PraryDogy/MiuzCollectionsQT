@@ -415,6 +415,7 @@ class ClipBoardItem:
 
 class NotifyWid(QFrame):
     ms = 1500
+    blue = "rgb(70, 130, 240)"
 
     def __init__(self, parent: QWidget, text: str, svg_path: str):
         super().__init__(parent=parent)
@@ -423,7 +424,7 @@ class NotifyWid(QFrame):
         self.setStyleSheet(
             f"""
             #notifyWidget {{
-                background: {Static.BLUE_GLOBAL};
+                background: {self.blue};
                 border-radius: 10px;
                 font-size: 16px;
             }}

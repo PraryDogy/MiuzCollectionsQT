@@ -710,10 +710,12 @@ class WinMain(UMainWindow):
         
         elif Dynamic.search_widget_text:
             noti = NotifyWid(
+                self.grid,
                 Lng.drop_event_denied_msg[Cfg.lng],
                 self.warning_svg
                 )
             noti._show()
+            return
 
         img_paths: list[str] = [
             i.toLocalFile()
