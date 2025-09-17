@@ -415,6 +415,7 @@ class ClipBoardItem:
 
 class NotifyWid(QFrame):
     blue = "rgb(70, 130, 240)"
+    # blue = "rgb(45, 84, 156)"
     yy = 10
 
     def __init__(self, parent: QWidget, text: str, svg_path: str, ms: int = 1500):
