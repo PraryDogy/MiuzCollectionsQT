@@ -62,7 +62,7 @@ class RemovedMainFolderCleaner:
             THUMBS.c.brand == main_folder_name
         )
         return [
-            (id_, ThumbUtils.get_abs_thumb_path(rel_thumb_path))
+            (id_, ThumbUtils.get_abs_hash(rel_thumb_path))
             for id_, rel_thumb_path in self.conn.execute(q).fetchall()
         ]
 
@@ -403,7 +403,7 @@ class _ImgHashdirUpdater(QObject):
         for rel_thumb_path in self.del_items:
             if not self.task_state.should_run():
                 break
-            thumb_path = ThumbUtils.get_abs_thumb_path(rel_thumb_path)
+            thumb_path = ThumbUtils.get_abs_hash(rel_thumb_path)
             if os.path.exists(thumb_path):
                 try:
                     os.remove(thumb_path)
@@ -440,7 +440,7 @@ class _ImgHashdirUpdater(QObject):
                 break
             try:
                 thumb = self.create_thumb(img_path)
-                thumb_path = ThumbUtils.create_thumb_path(img_path)
+                thumb_path = ThumbUtils.create_abs_hash(img_path)
                 ThumbUtils.write_thumb(thumb_path, thumb)
                 new_new_items.append((img_path, size, birth, mod))
                 self.total -= 1
@@ -496,8 +496,8 @@ class _ImgDbUpdater:
     def run_new_items(self):
         values_list = []
         for img_path, size, birth, mod in self.new_images:
-            abs_hash = ThumbUtils.create_thumb_path(img_path)
-            short_hash = ThumbUtils.get_rel_thumb_path(abs_hash)
+            abs_hash = ThumbUtils.create_abs_hash(img_path)
+            short_hash = ThumbUtils.get_rel_hash(abs_hash)
             short_src = MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
             coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, img_path)
             values_list.append({
@@ -591,7 +591,7 @@ class RemovedDirsHandler(QObject):
             )
             for short_hash in self.conn.execute(stmt).scalars():
                 try:
-                    os.remove(ThumbUtils.get_abs_thumb_path(short_hash))
+                    os.remove(ThumbUtils.get_abs_hash(short_hash))
                 except Exception as e:
                     print("DelDirsHandler, remove thumb:", e)
 

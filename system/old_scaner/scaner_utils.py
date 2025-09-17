@@ -296,7 +296,7 @@ class HashdirUpdater(QObject):
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
             if not self.task_state.should_run():
                 break
-            thumb_path = ThumbUtils.get_abs_thumb_path(rel_thumb_path)
+            thumb_path = ThumbUtils.get_abs_hash(rel_thumb_path)
             if os.path.exists(thumb_path):
                 self.progressbar_text(Lng.deleting[Cfg.lng], x, total)
                 try:
@@ -329,7 +329,7 @@ class HashdirUpdater(QObject):
             self.progressbar_text(Lng.adding[Cfg.lng], x, total)
             try:
                 thumb = self.create_thumb(img_path)
-                thumb_path = ThumbUtils.create_thumb_path(img_path)
+                thumb_path = ThumbUtils.create_abs_hash(img_path)
                 ThumbUtils.write_thumb(thumb_path, thumb)
                 new_new_items.append((img_path, size, birth, mod))
             except Exception as e:
@@ -390,9 +390,9 @@ class DbUpdater(QObject):
     def run_new_items(self):
         conn = Dbase.engine.connect()
         for img_path, size, birth, mod in self.new_items:
-            small_img_path = ThumbUtils.create_thumb_path(img_path)
+            small_img_path = ThumbUtils.create_abs_hash(img_path)
             short_img_path = MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
-            rel_thumb_path = ThumbUtils.get_rel_thumb_path(small_img_path)
+            rel_thumb_path = ThumbUtils.get_rel_hash(small_img_path)
 
             coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, img_path)
 
@@ -466,7 +466,7 @@ class MainFolderRemover(QObject):
         q = q.where(THUMBS.c.brand == main_folder_name)
         res = self.conn.execute(q).fetchall()
         res = [
-            (id_, ThumbUtils.get_abs_thumb_path(rel_thumb_path))
+            (id_, ThumbUtils.get_abs_hash(rel_thumb_path))
             for id_, rel_thumb_path in res
         ]
         return res

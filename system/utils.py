@@ -29,18 +29,18 @@ REVEAL_SCPT = os.path.join(SCRIPTS, "reveal_files.scpt")
 
 class ThumbUtils:
     @classmethod
-    def create_thumb_path(cls, img_path: str) -> str:
+    def create_abs_hash(cls, img_path: str) -> str:
         new_name = hashlib.md5(img_path.encode('utf-8')).hexdigest() + ".jpg"
         new_folder = os.path.join(Static.APP_SUPPORT_HASHDIR, new_name[:2])
         os.makedirs(new_folder, exist_ok=True)
         return os.path.join(new_folder, new_name)
 
     @classmethod
-    def get_rel_thumb_path(cls, thumb_path: str):
+    def get_rel_hash(cls, thumb_path: str):
         return thumb_path.replace(Static.APP_SUPPORT_DIR, "")
     
     @classmethod
-    def get_abs_thumb_path(cls, rel_thumb_path: str):
+    def get_abs_hash(cls, rel_thumb_path: str):
         return Static.APP_SUPPORT_DIR + rel_thumb_path
 
     @classmethod
