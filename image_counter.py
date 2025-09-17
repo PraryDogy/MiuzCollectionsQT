@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
                              QHBoxLayout, QLabel, QMenu, QPushButton,
-                             QTextEdit, QVBoxLayout, QWidget)
+                             QScrollArea, QTextEdit, QVBoxLayout, QWidget)
 
 
 class ColorHighlighter(QRunnable):
@@ -23,9 +23,13 @@ class ColorHighlighter(QRunnable):
         self.result = []
 
     def run(self):
-        for i in self.files:
-            qimage, filename, percent = self.highlight_colors(i)
-            self.result.append((qimage, filename, percent))
+        for x, i in enumerate(self.files, start=1):
+            print(x, len(self.files))
+            try:
+                qimage, filename, percent = self.highlight_colors(i)
+                self.result.append((qimage, filename, percent))
+            except Exception as e:
+                print("cv2 error", e)
 
         self.sigs.finished_.emit(self.result)
 
@@ -123,9 +127,20 @@ class ResultsDialog(QWidget):
         btn_lay.addStretch()
 
     def init_table(self):
-        self.v_layout = QVBoxLayout(self)
+        # Создаём область прокрутки
+        scroll = QScrollArea(self)
+        scroll.setWidgetResizable(True)  # чтобы содержимое растягивалось
+
+        # Контейнер внутри scroll
+        container = QWidget()
+        self.v_layout = QVBoxLayout(container)
         self.grid_layout = QGridLayout()
         self.v_layout.addLayout(self.grid_layout)
+
+        scroll.setWidget(container)  # добавляем контейнер в scroll
+        main_layout = QVBoxLayout(self)  # основной layout для окна
+        main_layout.addWidget(scroll)
+        self.setLayout(main_layout)
 
         # Заголовки
         headers = ["Превью", "Файл", "Процент"]
@@ -136,9 +151,9 @@ class ResultsDialog(QWidget):
 
         # Строки
         for row, (qimg, filename, percent) in enumerate(self.files, start=1):
-
             self.filenames.append(filename)
             self.percents.append(str(percent))
+
             # Превью
             pixmap_lbl = ImgLabel()
             if qimg is not None:
@@ -158,6 +173,7 @@ class ResultsDialog(QWidget):
             percent_lbl = QLabel(str(percent))
             percent_lbl.setTextInteractionFlags(Qt.TextSelectableByMouse)
             self.grid_layout.addWidget(percent_lbl, row, 2)
+
 
     def show_image(self, qimage, filename, percent):
         self.img_win = ImgLabel()
