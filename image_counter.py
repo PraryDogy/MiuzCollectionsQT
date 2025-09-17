@@ -14,12 +14,8 @@ class ColorHighlighter(QRunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal(list)
 
-    # словарь цветов для поиска: ключ — название, значение — (lower HSV, upper HSV)
     search_colors = {
-        # "blue": (np.array([85, 40, 40]), np.array([160, 255, 255])),
         "blue": (np.array([100, 80, 80]), np.array([140, 255, 255])),
-        # можно добавлять другие цвета, например:
-        # "red": (np.array([0, 100, 100]), np.array([10, 255, 255]))
     }
 
     def __init__(self, files: list[str]):
