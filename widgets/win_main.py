@@ -239,9 +239,15 @@ class WinMain(UMainWindow):
             self.open_win_smb()
 
     def open_win_smb(self):
-        self.win_smb = WinSmb()
-        self.win_smb.center_to_parent(self.window())
-        self.win_smb.show()
+        noti = NotifyWid(
+            self.grid,
+            Lng.no_connection_full[Cfg.lng],
+            self.warning_svg
+            )
+        noti._show()
+        # self.win_smb = WinSmb()
+        # self.win_smb.center_to_parent(self.window())
+        # self.win_smb.show()
     
     def open_img_view(self):
         if len(self.grid.selected_widgets) == 1:

@@ -179,6 +179,7 @@ class Lng:
     favorites = ("Избранное", "Favorites")
     cancel = ("Отмена", "Cancel")
     no_connection = ("Нет подключения", "No connection")
+    no_connection_full = ("Нет подключения к папке с изображениями", "No connection to images folder")
     folder_access_error = (
         "Не удалось получить доступ к папке с изображениями.\n"
         "Возможные причины:\n"
