@@ -268,6 +268,7 @@ class Lng:
         "Сохраните и нажмите «Перезапуск», чтобы применить изменения.",
         "Save and press \"Restart\" to apply changes."
     )
+    reset_filters_descr = ("Вернуть фильтры по умолчанию", "Reset filters to default")
     filters_descr = (
         "Фильтры:\n"
         "- Показывают файлы, путь которых содержит указанный текст.\n"

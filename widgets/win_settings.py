@@ -686,11 +686,35 @@ class FiltersWid(QWidget):
         self.text_wid.setPlainText("\n".join(self.filters_copy))
         self.text_wid.textChanged.connect(self.on_text_changed)
         g_lay.addWidget(self.text_wid)
+        self.v_lay.addWidget(group)
+
+        # Новый group box с кнопкой и описанием
+        reset_group = QGroupBox()
+        reset_lay = UHBoxLayout(reset_group)
+        reset_lay.setContentsMargins(5, 5, 5, 5)
+        reset_lay.setSpacing(10)
+
+        reset_btn = QPushButton(Lng.reset[Cfg.lng])
+        reset_btn.setFixedWidth(100)
+        reset_btn.clicked.connect(self.reset_filters)
+        reset_lay.addWidget(reset_btn)
+
+        reset_label = ULabel(Lng.reset_filters_descr[Cfg.lng])
+        reset_lay.addWidget(reset_label, 1)
+
+        g_lay.addWidget(reset_group)
 
         self.v_lay.addWidget(group)
+        self.v_lay.addStretch(1)
 
         self.v_lay.addStretch(1)
         
+    def reset_filters(self):
+        self.text_wid.clear()
+        self.text_wid.insertPlainText(
+            "\n".join(Filters.default)
+        )
+
     def on_text_changed(self):
         text = self.text_wid.toPlainText().strip()
         lines = [line for line in text.split("\n") if line]
