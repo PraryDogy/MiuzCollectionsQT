@@ -16,7 +16,7 @@ from system.lang import Lng
 from system.main_folder import MainFolder
 from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader
-from system.utils import MainUtils, PixmapUtils, UThreadPool
+from system.utils import MainUtils, UThreadPool
 
 from ._base_widgets import (ClipBoardItem, SettingsItem, SvgBtn, UMenu,
                             USubMenu, UVBoxLayout, VScrollArea)
@@ -255,7 +255,7 @@ class Thumbnail(QFrame):
 
         size_ = self.pixmap_size + ThumbData.MARGIN
         self.img_wid.setFixedSize(size_, size_)
-        self.img_wid.setPixmap(PixmapUtils.pixmap_scale(self.img, self.pixmap_size))
+        self.img_wid.setPixmap(MainUtils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
         """Устанавливает рамку и фон для выделенной миниатюры."""
