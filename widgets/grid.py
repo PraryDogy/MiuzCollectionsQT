@@ -18,8 +18,8 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import MainUtils
 
-from ._base_widgets import (ClipBoardItem, SettingsItem, SvgBtn, UMenu,
-                            USubMenu, UVBoxLayout, VScrollArea)
+from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem, SvgBtn,
+                            UMenu, USubMenu, UVBoxLayout, VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save, SaveAs,
                       ScanerRestart, SetFav, WinInfoAction)
@@ -379,7 +379,7 @@ class DateWid(QLabel):
             QLabel {{
                 background: {bg_color};
                 font-weight: bold;
-                font-size: 20pt;
+                font-size: 18pt;
                 border-radius: 10px;
                 padding: 5px;
             }}
@@ -848,7 +848,7 @@ class Grid(VScrollArea):
 
         self.date_wid.move(
             (self.viewport().width() - self.date_wid.width()) // 2,
-            5
+            NotifyWid.yy
         )
 
         return super().resizeEvent(a0)
@@ -983,7 +983,10 @@ class Grid(VScrollArea):
         def update_date_wid(wid: Thumbnail):
             self.date_wid.setText(wid.f_mod)
             self.date_wid.adjustSize()
-            self.date_wid.move((self.viewport().width() - self.date_wid.width()) // 2, 5)
+            self.date_wid.move(
+                (self.viewport().width() - self.date_wid.width()) // 2,
+                NotifyWid.yy
+            )
 
             if self.date_wid.isHidden() and Dynamic.sort_by_mod:
                 self.date_wid.apply_style()

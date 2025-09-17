@@ -416,6 +416,7 @@ class ClipBoardItem:
 class NotifyWid(QFrame):
     ms = 1500
     blue = "rgb(70, 130, 240)"
+    yy = 10
 
     def __init__(self, parent: QWidget, text: str, svg_path: str):
         super().__init__(parent=parent)
@@ -458,10 +459,10 @@ class NotifyWid(QFrame):
         self.adjustSize()
         pw, ph = self.parent().width(), self.parent().height()
         x = (pw - self.width()) // 2
-        y = 10
+        y = self.yy
         self.move(x, y)
         self.show()
-        QTimer.singleShot(self.ms, self._close)
+        # QTimer.singleShot(self.ms, self._close)
 
     def _close(self):
         self.setGraphicsEffect(None)
