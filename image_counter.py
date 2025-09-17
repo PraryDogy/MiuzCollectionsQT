@@ -60,11 +60,12 @@ class ColorHighlighter(QRunnable):
         return round(percent, 2), output
 
 
-class ResultsDialog(QWidget):
+class ResultsDialog(QDialog):
     def __init__(self, files: list, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
-        self.resize(600, 400)
+        self.setModal(True)  # application modal
+        self.resize(800, 400)
 
         layout = QHBoxLayout(self)
 
@@ -79,6 +80,22 @@ class ResultsDialog(QWidget):
         self.percent_edit.setReadOnly(True)
         self.percent_edit.setPlainText("\n".join(str(f[1]) for f in files))  # percent
         layout.addWidget(self.percent_edit)
+
+        # Третий "столбец" с кнопками Просмотр
+        btns_layout = QVBoxLayout()
+        for i, f in enumerate(files):
+            btn = QPushButton("Просмотр")
+            btn.clicked.connect(lambda _, img=f[2], name=f[0]: self.show_image(img, name))
+            btns_layout.addWidget(btn)
+        btns_layout.addStretch(1)
+        layout.addLayout(btns_layout)
+
+    def show_image(self, img, name: str):
+        if img is None:
+            return
+        cv2.imshow(name, img)
+        cv2.waitKey(0)
+        cv2.destroyWindow(name)
 
 
 class FileDropTextEdit(QTextEdit):
