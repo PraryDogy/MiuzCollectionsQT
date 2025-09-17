@@ -84,8 +84,8 @@ class WinMain(UMainWindow):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.clicked_.connect(lambda: self.grid.reload_thumbnails())
-        self.left_menu.clicked_.connect(lambda: self.set_window_title())
+        self.left_menu.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.left_menu.reload_thumbnails.connect(lambda: self.set_window_title())
         self.left_menu.no_connection.connect(self.open_win_smb)
         self.left_menu.setup_main_folder.connect(self.open_settings)
         self.left_menu.setup_new_folder.connect(self.open_settings)

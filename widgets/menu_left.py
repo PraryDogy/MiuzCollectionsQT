@@ -262,7 +262,7 @@ class MainFolderList(VListWidget):
 
 
 class MenuLeft(QTabWidget):
-    clicked_ = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
     no_connection = pyqtSignal()
     setup_main_folder = pyqtSignal(SettingsItem)
     setup_new_folder = pyqtSignal(SettingsItem)
@@ -280,17 +280,17 @@ class MenuLeft(QTabWidget):
         if main_folder_path:
             Dynamic.current_dir = main_folder_path
             Dynamic.thumbnails_count = 0
-            self.tree_clicked(main_folder_path)
+            self.reload_thumbnails_cmd(main_folder_path)
             self.tree_wid.init_ui(main_folder_path)
         else:
             self.no_connection.emit()
         
-    def tree_clicked(self, path: str):
+    def reload_thumbnails_cmd(self, path: str):
         if path == Static.NAME_FAVS:
             Dynamic.current_dir = Static.NAME_FAVS
         else:
             Dynamic.current_dir = MainUtils.get_rel_path(MainFolder.current.curr_path, path)
-        self.clicked_.emit()
+        self.reload_thumbnails.emit()
 
     def init_ui(self):
         
@@ -318,7 +318,7 @@ class MenuLeft(QTabWidget):
         self.addTab(main_folders, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
-        self.tree_wid.clicked_.connect(self.tree_clicked)
+        self.tree_wid.clicked_.connect(self.reload_thumbnails_cmd)
         self.tree_wid.no_connection.connect(self.no_connection.emit)
         self.tree_wid.update_grid.connect(self.update_grid.emit)
         self.tree_wid.restart_scaner.connect(self.restart_scaner.emit)
@@ -326,11 +326,11 @@ class MenuLeft(QTabWidget):
         
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            self.tree_clicked(main_folder_path)
+            self.reload_thumbnails_cmd(main_folder_path)
             self.tree_wid.init_ui(main_folder_path)
             self.setCurrentIndex(1)
             # без таймера не срабатывает
-            QTimer.singleShot(0, lambda: self.tree_clicked(main_folder_path))
+            QTimer.singleShot(0, lambda: self.reload_thumbnails_cmd(main_folder_path))
             
     def dragEnterEvent(self, a0):
         a0.accept()
