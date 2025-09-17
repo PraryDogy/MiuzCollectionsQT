@@ -636,3 +636,24 @@ class MainFolderDataCleaner(URunnable):
         stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand == self.main_folder_name)
         self.conn.execute(stmt)
         self.conn.commit()
+
+
+class LoadDbMenu(URunnable):
+
+    class Sigs(QObject):
+        finished_ = pyqtSignal()
+
+    def __init__(self, main_folder: MainFolder):
+        super().__init__()
+        self.main_folder = main_folder
+        self.sigs = LoadDbMenu.Sigs()
+        self.conn = Dbase.engine.connect()
+
+    def task(self):
+        try:
+            self.sigs.finished_.emit(self._task())
+        except Exception as e:
+            print("LoadDbMenu error", e)
+
+    def _task(self):
+        ...
