@@ -10,7 +10,8 @@ from cfg import Cfg, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import MainFolder
-from system.utils import ImgUtils, MainUtils, TaskState, ThumbUtils
+from system.utils import MainUtils, TaskState, ThumbUtils
+from system.shared_utils import ReadImage
 
 
 class RemovedMainFolderCleaner:
@@ -423,7 +424,7 @@ class _ImgHashdirUpdater(QObject):
             )
 
     def create_thumb(self, img_path: str) -> ndarray | None:
-        img = ImgUtils.read_image(img_path)
+        img = ReadImage.read_image(img_path)
         thumb = ThumbUtils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
         del img
         gc.collect()

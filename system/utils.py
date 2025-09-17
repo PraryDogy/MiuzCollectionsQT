@@ -22,195 +22,9 @@ from tifffile import tifffile
 
 from cfg import Static
 
-psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
-psd_logger = logging.getLogger("psd_tools")
-psd_logger.setLevel(logging.CRITICAL)
-Image.MAX_IMAGE_PIXELS = None
-
 SCRIPTS = "scripts"
 REVEAL_SCPT = os.path.join(SCRIPTS, "reveal_files.scpt")
 
-
-class ImgUtils:
-
-    @classmethod
-    def read_tiff(cls, img_path: str) -> np.ndarray | None:
-        try:
-            img = tifffile.imread(img_path)
-            # Проверяем, что изображение трёхмерное
-            if img.ndim == 3:
-                channels = min(img.shape)
-                channels_index = img.shape.index(channels)
-                # Транспонируем, если каналы на первом месте
-                if channels_index == 0:
-                    img = img.transpose(1, 2, 0)
-                # Ограничиваем количество каналов до 3
-                if channels > 3:
-                    img = img[:, :, :3]
-                # Преобразуем в uint8, если тип другой
-                if str(img.dtype) != "uint8":
-                    img = (img / 256).astype(dtype="uint8")
-            # Если изображение уже 2D, просто показываем его
-            elif img.ndim == 2:
-                img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-            return img
-        except (tifffile.TiffFileError, RuntimeError, DelayedImportError, Exception) as e: 
-            MainUtils.print_error()
-            try:
-                img = Image.open(img_path)
-                img = img.convert("RGB")
-                array_img = np.array(img)
-                img.close()
-                return array_img
-            except Exception as e:
-                MainUtils.print_error()
-                return None
-                    
-    @classmethod
-    def read_psb(cls, img_path: str):
-        try:
-            img = psd_tools.PSDImage.open(img_path)
-            img = img.composite()
-            img = img.convert("RGB")
-            array_img = np.array(img)
-            return array_img
-        except Exception as e:
-            MainUtils.print_error()
-            print("Utils - read psb - ошибка чтения psb", e)
-            return cls.read_jpg(img_path)
-
-    @classmethod
-    def read_png(cls, img_path: str) -> np.ndarray | None:
-        try:
-            img = Image.open(img_path)
-            if img.mode == "RGBA":
-                white_background = Image.new("RGBA", img.size, (255, 255, 255))
-                img = Image.alpha_composite(white_background, img)
-            img = img.convert("RGB")
-            array_img = np.array(img)
-            img.close()
-            return array_img
-        except Exception as e:
-            MainUtils.print_error()
-            return None
-
-    @classmethod
-    def read_jpg(cls, img_path: str) -> np.ndarray | None:
-        try:
-            img = Image.open(img_path)
-            img = ImageOps.exif_transpose(img) 
-            img = img.convert("RGB")
-            array_img = np.array(img)
-            img.close()
-
-            return array_img
-        except Exception as e:
-            # MainUtils.print_error()
-            print("ошибка чтения jpg", e)
-            return None
-
-    @classmethod
-    def read_raw(cls, img_path: str) -> np.ndarray | None:
-        try:
-            # https://github.com/letmaik/rawpy
-            # Извлечение встроенного эскиза/превью из RAW-файла и преобразование в изображение:
-            # Открываем RAW-файл с помощью rawpy
-            with rawpy.imread(img_path) as raw:
-                # Извлекаем встроенный эскиз (thumbnail)
-                thumb = raw.extract_thumb()
-            # Проверяем формат извлечённого эскиза
-            if thumb.format == rawpy.ThumbFormat.JPEG:
-                # Если это JPEG — открываем как изображение через BytesIO
-                img = Image.open(io.BytesIO(thumb.data))
-                # Конвертируем в RGB (на случай, если изображение не в RGB)
-                img = img.convert("RGB")
-            elif thumb.format == rawpy.ThumbFormat.BITMAP:
-                # Если формат BITMAP — создаём изображение из массива
-                img: Image.Image = Image.fromarray(thumb.data)
-            try:
-                exif = img.getexif()
-                orientation_tag = 274  # Код тега Orientation
-                if orientation_tag in exif:
-                    orientation = exif[orientation_tag]
-                    # Коррекция поворота на основе EXIF-ориентации
-                    if orientation == 3:
-                        img = img.rotate(180, expand=True)
-                    elif orientation == 6:
-                        img = img.rotate(270, expand=True)
-                    elif orientation == 8:
-                        img = img.rotate(90, expand=True)
-            except Exception as e:
-                MainUtils.print_error()
-            array_img = np.array(img)
-            img.close()
-            return array_img
-        except (Exception, rawpy._rawpy.LibRawDataError) as e:
-            MainUtils.print_error()
-            return None
-
-    @classmethod
-    def read_movie(cls, path: str, time_sec=1) -> np.ndarray | None:
-        try:
-            cap = cv2.VideoCapture(path)
-            cap.set(cv2.CAP_PROP_POS_MSEC, time_sec * 1000)
-            success, frame = cap.read()
-            cap.release()
-            if success:
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                return frame
-            else:
-                return None
-        except Exception as e:
-            MainUtils.print_error()
-            return None
-
-    @classmethod
-    def read_any(cls, img_path: str) -> np.ndarray | None:
-        ...
-
-    @classmethod
-    def read_image(cls, img_path: str) -> np.ndarray | None:
-        _, ext = os.path.splitext(img_path)
-        ext = ext.lower()
-
-        read_any_dict: dict[str, callable] = {}
-
-        for i in Static.ext_psd:
-            read_any_dict[i] = cls.read_psb
-        for i in Static.ext_tiff:
-            read_any_dict[i] = cls.read_tiff
-        for i in Static.ext_raw:
-            read_any_dict[i] = cls.read_raw
-        for i in Static.ext_jpeg:
-            read_any_dict[i] = cls.read_jpg
-        for i in Static.ext_png:
-            read_any_dict[i] = cls.read_png
-        for i in Static.ext_video:
-            read_any_dict[i] = cls.read_movie
-
-        for i in Static.ext_all:
-            if i not in read_any_dict:
-                raise Exception (f"utils > ReadImage > init_read_dict: не инициирован {i}")
-
-        fn = read_any_dict.get(ext)
-
-        if fn:
-            cls.read_any = fn
-            return cls.read_any(img_path)
-
-        else:
-            return None
-
-    @classmethod
-    def desaturate_image(cls, image: np.ndarray, factor=0.2):
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        return cv2.addWeighted(
-            image,
-            1 - factor,
-            cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR),
-            factor,
-            0
-        )
 
 
 class ThumbUtils:
@@ -437,6 +251,16 @@ class MainUtils:
 
         return found_apps
 
+    @classmethod
+    def desaturate_image(cls, image: np.ndarray, factor=0.2):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        return cv2.addWeighted(
+            image,
+            1 - factor,
+            cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR),
+            factor,
+            0
+        )
 
     @classmethod
     def print_error(cls):

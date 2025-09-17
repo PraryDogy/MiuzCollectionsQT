@@ -14,7 +14,8 @@ from cfg import Cfg, Dynamic, Static
 from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import MainFolder
-from .utils import ImgUtils, MainUtils, PixmapUtils, ThumbUtils, URunnable
+from .shared_utils import ReadImage
+from .utils import MainUtils, PixmapUtils, ThumbUtils, URunnable
 
 
 class CopyFilesManager(URunnable):
@@ -174,11 +175,11 @@ class OneImgLoader(URunnable):
         if self.abs_img_path in self.cached_images:
             return self.cached_images.get(self.abs_img_path)
 
-        img = ImgUtils.read_image(self.abs_img_path)
+        img = ReadImage.read_image(self.abs_img_path)
         if img is None:
             return None
 
-        img = ImgUtils.desaturate_image(img, 0.2)
+        img = MainUtils.desaturate_image(img, 0.2)
         qimage = PixmapUtils.qimage_from_array(img)
         self.cached_images[self.abs_img_path] = qimage
 
@@ -255,7 +256,7 @@ class OneFileInfo(URunnable):
 
     def get_img_resol(self, img_path: str) -> str:
         """Возвращает разрешение изображения в формате 'WxH' или пустую строку."""
-        img_ = ImgUtils.read_image(img_path)
+        img_ = ReadImage.read_image(img_path)
         if img_ is not None and len(img_.shape) > 1:
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"
