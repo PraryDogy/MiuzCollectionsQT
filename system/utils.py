@@ -177,33 +177,6 @@ class MainUtils:
     @classmethod
     def start_new_app(cls):
         os.execl(sys.executable, sys.executable, *sys.argv)
-
-    @classmethod
-    def get_f_size(cls, bytes_size: int) -> str:
-        if bytes_size < 1024:
-            return f"{bytes_size} байт"
-        elif bytes_size < pow(1024,2):
-            return f"{round(bytes_size/1024, 2)} КБ"
-        elif bytes_size < pow(1024,3):
-            return f"{round(bytes_size/(pow(1024,2)), 2)} МБ"
-        elif bytes_size < pow(1024,4):
-            return f"{round(bytes_size/(pow(1024,3)), 2)} ГБ"
-        elif bytes_size < pow(1024,5):
-            return f"{round(bytes_size/(pow(1024,4)), 2)} ТБ"
-
-    @classmethod
-    def get_f_date(cls, timestamp_: int, date_only: bool = False) -> str:
-        date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
-        now = datetime.now()
-        today = now.date()
-        yesterday = today - timedelta(days=1)
-
-        if date.date() == today:
-            return f"сегодня {date.strftime('%H:%M')}"
-        elif date.date() == yesterday:
-            return f"вчера {date.strftime('%H:%M')}"
-        else:
-            return date.strftime("%d.%m.%y %H:%M")
         
     @classmethod
     def get_abs_path(cls, main_folder_path: str, rel_path: str) -> str:
@@ -222,34 +195,6 @@ class MainUtils:
             print(f"Ошибка удаления: {e}")
         except Exception as e:
             print(f"Неизвестная ошибка: {e}")
-
-    @classmethod
-    def image_apps(cls, apps: list[str]):
-        app_dirs = [
-            "/Applications",
-            os.path.expanduser("~/Applications"),
-            "/System/Applications"
-        ]
-        found_apps = []
-
-        def search_dir(directory):
-            try:
-                for entry in os.listdir(directory):
-                    path = os.path.join(directory, entry)
-                    if entry.endswith(".app"):
-                        name_lower = entry.lower()
-                        if any(k in name_lower for k in apps):
-                            found_apps.append(path)
-                    elif os.path.isdir(path):
-                        search_dir(path)
-            except PermissionError:
-                pass
-
-        for app_dir in app_dirs:
-            if os.path.exists(app_dir):
-                search_dir(app_dir)
-
-        return found_apps
 
     @classmethod
     def desaturate_image(cls, image: np.ndarray, factor=0.2):

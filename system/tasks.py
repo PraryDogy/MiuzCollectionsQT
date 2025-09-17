@@ -14,7 +14,7 @@ from cfg import Cfg, Dynamic, Static
 from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import MainFolder
-from .shared_utils import ReadImage
+from .shared_utils import ReadImage, SharedUtils
 from .utils import MainUtils, PixmapUtils, ThumbUtils, URunnable
 
 
@@ -238,8 +238,8 @@ class OneFileInfo(URunnable):
         name = os.path.basename(self.url)
         _, type_ = os.path.splitext(name)
         stats = os.stat(self.url)
-        size = MainUtils.get_f_size(stats.st_size)
-        mod = MainUtils.get_f_date(stats.st_mtime)
+        size = SharedUtils.get_f_size(stats.st_size)
+        mod = SharedUtils.get_f_date(stats.st_mtime)
         thumb_path = ThumbUtils.create_thumb_path(self.url)
 
         res = {
@@ -319,7 +319,7 @@ class MultiFileInfo(URunnable):
     def get_total_size(self) -> str:
         """Возвращает суммарный размер всех файлов в удобочитаемом формате."""
         total = sum(os.stat(p).st_size for p in self.img_paths)
-        return MainUtils.get_f_size(total)
+        return SharedUtils.get_f_size(total)
 
     def lined_text(self, text: str) -> str:
         """Разбивает строку на строки длиной не более max_row символов."""

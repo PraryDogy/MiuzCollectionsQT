@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
 from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
 from system.main_folder import MainFolder
+from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader
 from system.utils import MainUtils, PixmapUtils, UThreadPool
 
@@ -423,7 +424,7 @@ class Grid(VScrollArea):
         self.is_first_load = True
         self.clipboard_item: ClipBoardItem = None
 
-        self.image_apps = {i: os.path.basename(i) for i in MainUtils.image_apps(Cfg.apps)}
+        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
 
         # --- Таймеры ---
         self.resize_timer = QTimer(self)
