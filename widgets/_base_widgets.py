@@ -239,8 +239,8 @@ class UTextEdit(QTextEdit):
         menu_.show_umenu()
 
 
-class Manager:
-    wins: list[QMainWindow] = []
+class WinManager:
+    win_list: list[QMainWindow] = []
 
 
 class UMainWindow(QMainWindow):
@@ -263,7 +263,7 @@ class UMainWindow(QMainWindow):
         self.central_layout = UVBoxLayout(central_widget)
 
         # --- Регистрация окна в менеджере ---
-        Manager.wins.append(self)
+        WinManager.win_list.append(self)
 
     def center_to_parent(self, parent: QMainWindow):
         try:
@@ -275,14 +275,14 @@ class UMainWindow(QMainWindow):
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         try:
-            Manager.wins.remove(self)
+            WinManager.win_list.remove(self)
         except Exception as e:
             MainUtils.print_error()
         return super().closeEvent(a0)
     
     def deleteLater(self):
         try:
-            Manager.wins.remove(self)
+            WinManager.win_list.remove(self)
         except Exception as e:
             MainUtils.print_error()
         return super().deleteLater()
@@ -423,14 +423,9 @@ class NotifyWid(QFrame):
         self.setObjectName("notifyWidget")
         self.setStyleSheet(
             f"""
-            #notifyWidget {{
                 background: {self.blue};
                 border-radius: 10px;
-                font-size: 16px;
-            }}
-            #notifyWidget QLabel {{
-                color: white;
-            }}
+                font-size: 14px;
             """
         )
 

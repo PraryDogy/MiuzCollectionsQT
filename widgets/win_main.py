@@ -16,7 +16,7 @@ from system.tasks import (CopyFilesManager, FavManager, FilesRemover,
                           MainFolderDataCleaner, MainUtils, UThreadPool)
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
-                            UHBoxLayout, UMainWindow, UVBoxLayout)
+                            UHBoxLayout, UMainWindow, UVBoxLayout, WinManager)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -239,8 +239,12 @@ class WinMain(UMainWindow):
             self.open_win_smb()
 
     def open_win_smb(self):
+        parent = WinManager.win_list[-1]
+        if isinstance(parent, WinMain):
+            parent = self.grid
+
         noti = NotifyWid(
-            self.grid,
+            parent,
             Lng.no_connection_full[Cfg.lng],
             self.warning_svg
             )

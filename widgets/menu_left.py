@@ -224,8 +224,8 @@ class MainFolderList(VListWidget):
             return
 
         # --- Игнорируем клик по уже выбранному элементу ---
-        if item.main_folder == self._last_main_folder:
-            return
+        # if item.main_folder == self._last_main_folder:
+        #     return
 
         if e.button() == Qt.MouseButton.LeftButton:
             self.cmd("view", item)
