@@ -15,7 +15,7 @@ from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import MainFolder
 from .shared_utils import ReadImage, SharedUtils
-from .utils import MainUtils, URunnable
+from .utils import MainUtils
 
 
 class TaskState:
