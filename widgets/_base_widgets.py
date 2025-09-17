@@ -418,7 +418,7 @@ class NotifyWid(QFrame):
     # blue = "rgb(45, 84, 156)"
     yy = 10
 
-    def __init__(self, parent: QWidget, text: str, svg_path: str, ms: int = 1500):
+    def __init__(self, parent: QWidget, text: str, svg_path: str, ms: int = 2000):
         super().__init__(parent=parent)
 
         self.ms = ms
