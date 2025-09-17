@@ -15,7 +15,7 @@ class ColorHighlighter(QRunnable):
         finished_ = pyqtSignal(list)
 
     search_colors = {
-        "blue": (np.array([100, 80, 80]), np.array([140, 255, 255])),
+        "Синий": (np.array([100, 80, 80]), np.array([140, 255, 255])),
     }
 
     def __init__(self, files: list[str]):
@@ -36,7 +36,6 @@ class ColorHighlighter(QRunnable):
         Закрашивает области для всех цветов из search_colors.
         Возвращает изображение и словарь с процентом площади каждого цвета.
         """
-        print(f"start read: {self.files.index(file) + 1} from {len(self.files)}")
         image = cv2.imread(file)
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         output = image.copy()
@@ -52,7 +51,6 @@ class ColorHighlighter(QRunnable):
                     cv2.drawContours(filled_mask, [cnt], -1, 255, cv2.FILLED)
 
             percent = (cv2.countNonZero(filled_mask) / (image.shape[0] * image.shape[1])) * 100
-            # percent_dict[color_name] = round(percent, 2)
 
         return round(percent, 2), output
 
