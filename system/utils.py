@@ -65,7 +65,6 @@ class ThumbUtils:
             print("Utils - write_thumb - ошибка записи thumb на диск", e)
             return False
 
-
     @classmethod
     def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
         try:
@@ -76,7 +75,7 @@ class ThumbUtils:
                 # print("system > read_thumb > изображения не существует")
                 return None
         except Exception as e:
-            MainUtils.print_error()
+            print("utils, read thumb error")
             return None
 
     @classmethod
@@ -213,41 +212,6 @@ class MainUtils:
         print("Исключение обработано")
         print(traceback.format_exc())
         print()
-
-
-class JsonUtils:
-
-    @classmethod
-    def validate_data(cls, data: dict, schema: dict):
-        try:
-            jsonschema.validate(data, schema)
-        except jsonschema.ValidationError as ve:
-            path = ".".join(str(p) for p in ve.path)
-            print()
-            print(f"JsonUtils.validate_data error: '{path}': {ve.message}")
-            print(data)
-            print()
-            return None
-        return True
-        
-    @classmethod
-    def write_json_data(cls, json_file: str, data: list[dict]) -> bool | None:
-        try:
-            with open(json_file, "w", encoding='utf-8') as f:
-                f.write(json.dumps(obj=data, indent=4, ensure_ascii=False))
-            return True
-        except Exception:
-            MainUtils.print_error()
-            return None
-
-    @classmethod
-    def read_json_data(cls, json_file: str) -> list[dict] | None:
-        try:
-            with open(json_file, "r", encoding='utf-8') as f:
-                return json.loads(f.read())
-        except Exception:
-            MainUtils.print_error()
-            return None
 
 
 class TaskState:
