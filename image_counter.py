@@ -3,9 +3,10 @@ import sys
 
 import cv2
 import numpy as np
-from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
-from PyQt5.QtWidgets import (QApplication, QDialog, QHBoxLayout, QPushButton,
-                             QTextEdit, QVBoxLayout, QWidget)
+from PyQt5.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
+from PyQt5.QtWidgets import (QApplication, QDialog, QGridLayout, QHBoxLayout,
+                             QLabel, QPushButton, QTextEdit, QVBoxLayout,
+                             QWidget)
 
 
 class ColorHighlighter(QRunnable):
@@ -64,31 +65,39 @@ class ResultsDialog(QDialog):
     def __init__(self, files: list, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
-        self.setModal(True)  # application modal
+        self.setModal(True)
         self.resize(800, 400)
 
-        layout = QHBoxLayout(self)
+        layout = QVBoxLayout(self)
+        grid = QGridLayout()
+        layout.addLayout(grid)
 
-        # Первый QTextEdit с именами файлов
-        self.files_edit = QTextEdit(self)
+        # Заголовки
+        grid.addWidget(QTextEdit("Файл"), 0, 0)
+        grid.addWidget(QTextEdit("Процент"), 0, 1)
+        grid.addWidget(QTextEdit("Действие"), 0, 2)
+
+        # Первый "столбец" — файлы
+        self.files_edit = QTextEdit()
         self.files_edit.setReadOnly(True)
-        self.files_edit.setPlainText("\n".join(f[0] for f in files))  # filename
-        layout.addWidget(self.files_edit)
+        self.files_edit.setFrameStyle(0)
+        self.files_edit.setText("\n".join(f[0] for f in files))
+        grid.addWidget(self.files_edit, 1, 0)
 
-        # Второй QTextEdit с процентами
-        self.percent_edit = QTextEdit(self)
+        # Второй "столбец" — проценты
+        self.percent_edit = QTextEdit()
         self.percent_edit.setReadOnly(True)
-        self.percent_edit.setPlainText("\n".join(str(f[1]) for f in files))  # percent
-        layout.addWidget(self.percent_edit)
+        self.percent_edit.setFrameStyle(0)
+        self.percent_edit.setText("\n".join(str(f[1]) for f in files))
+        grid.addWidget(self.percent_edit, 1, 1)
 
-        # Третий "столбец" с кнопками Просмотр
+        # Третий "столбец" — кнопки
         btns_layout = QVBoxLayout()
-        for i, f in enumerate(files):
+        for filename, _, img in files:
             btn = QPushButton("Просмотр")
-            btn.clicked.connect(lambda _, img=f[2], name=f[0]: self.show_image(img, name))
+            btn.clicked.connect(lambda _, img=img, name=filename: self.show_image(img, name))
             btns_layout.addWidget(btn)
-        btns_layout.addStretch(1)
-        layout.addLayout(btns_layout)
+        grid.addLayout(btns_layout, 1, 2)
 
     def show_image(self, img, name: str):
         if img is None:
