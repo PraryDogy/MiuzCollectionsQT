@@ -129,7 +129,8 @@ class WinMain(UMainWindow):
         self.grid.copy_name.connect(self.copy_name)
         self.grid.reveal_in_finder.connect(self.reveal_in_finder)
         self.grid.set_fav.connect(self.set_fav)
-        self.grid.open_in_app.connect(self.open_in_app)
+        self.grid.open_in_app.connect(
+            lambda data: self.open_in_app(self.grid, MainFolder.current, data))
         self.grid.paste_files.connect(self.paste_files_here)
         self.grid.copy_files.connect(
             lambda data: self.set_clipboard(self.grid, MainFolder.current, data)
@@ -181,12 +182,21 @@ class WinMain(UMainWindow):
                 self.open_win_smb(parent, main_folder)
         return wrapper
 
+    def open_win_smb(self, parent: QWidget, main_folder: MainFolder):
+        basename = os.path.basename(main_folder.current.paths[0])
+        alias = main_folder.name
+        noti = NotifyWid(
+            parent,
+            f"{basename} ({alias}): {Lng.no_connection_full[Cfg.lng].lower()}",
+            self.warning_svg
+            )
+        noti._show()
+
     def wait_connection(self):
         self.wait_timer.stop()
         if not MainFolder.current.get_curr_path():
             self.wait_timer.start(1000)
         else:
-            # Dynamic.current_dir = ""
             self.left_menu.main_folder_clicked(MainFolder.current)
         print("wait smb connection")
     
@@ -250,17 +260,55 @@ class WinMain(UMainWindow):
                 for i in self.grid.selected_widgets:
                     i.set_transparent_frame(0.5)
 
-    def open_win_smb(self, parent: QWidget, main_folder: MainFolder):
-        basename = os.path.basename(main_folder.current.paths[0])
-        alias = main_folder.name
-        noti = NotifyWid(
-            parent,
-            f"{basename} ({alias}): {Lng.no_connection_full[Cfg.lng].lower()}",
-            self.warning_svg
-            )
-        noti._show()
-    
+    @with_conn
+    def open_in_app(self, parent: QWidget, main_folder: MainFolder, data: tuple):
+        rel_img_paths, app_path = data
+        for i in rel_img_paths:
+            abs_path = MainUtils.get_abs_path(main_folder.curr_path, i)
+            if app_path:
+                subprocess.Popen(["open", "-a", app_path, abs_path])
+            else:
+                subprocess.Popen(["open", abs_path])
+
+    @with_conn
+    def reveal_in_finder(self, parent: QWidget, main_folder: MainFolder, rel_paths: list):
+        abs_paths = [
+            MainUtils.get_abs_path(main_folder.curr_path, i)
+            for i in rel_paths
+        ]
+        if os.path.isdir(abs_paths[0]):
+            subprocess.Popen(["open", abs_paths[0]])
+        else:
+            MainUtils.reveal_files(abs_paths)
+
+    def copy_name(self, rel_img_paths: list[str]):
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            names = [
+                os.path.splitext(os.path.basename(i))[0]
+                for i in rel_img_paths
+            ]
+            MainUtils.copy_text("\n".join(names))
+        else:
+            self.open_win_smb(self.grid, MainFolder.current)
+
+    def copy_path(self, rel_img_paths: list[str]):
+        main_folder_path = MainFolder.current.get_curr_path()
+        if main_folder_path:
+            abs_paths = [
+                MainUtils.get_abs_path(main_folder_path, i)
+                for i in rel_img_paths
+            ]
+            MainUtils.copy_text("\n".join(abs_paths))
+        else:
+            self.open_win_smb(self.grid, MainFolder.current)
+
     def open_img_view(self):
+
+        def on_closed():
+            self.win_img_view = None
+            gc.collect
+
         if len(self.grid.selected_widgets) == 1:
             path_to_wid = self.grid.path_to_wid.copy()
             is_selection = False
@@ -269,13 +317,15 @@ class WinMain(UMainWindow):
             is_selection = True
         wid = self.grid.selected_widgets[-1]
         self.win_img_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
-        self.win_img_view.closed_.connect(self.image_view_closed)
+        self.win_img_view.closed_.connect(on_closed)
         self.win_img_view.open_win_info.connect(
             lambda rel_paths: self.open_win_info(self.win_img_view, MainFolder.current, rel_paths)
         )
         self.win_img_view.copy_path.connect(self.copy_path)
         self.win_img_view.copy_name.connect(self.copy_name)
-        self.win_img_view.reveal_in_finder.connect(self.reveal_in_finder)
+        self.win_img_view.reveal_in_finder.connect(
+            lambda rel_paths: self.reveal_in_finder(self.win_img_view, MainFolder.current, rel_paths)
+        )
         self.win_img_view.set_fav.connect(self.set_fav)
         self.win_img_view.save_files.connect(
             lambda data: self.save_files(self.win_img_view, MainFolder.current, data)
@@ -288,11 +338,6 @@ class WinMain(UMainWindow):
         )
         self.win_img_view.center_to_parent(self.window())
         self.win_img_view.show()
-
-    def image_view_closed(self):
-        del self.win_img_view
-        self.win_img_view = None
-        gc.collect
 
     def start_scaner_task(self):
         """
@@ -409,8 +454,10 @@ class WinMain(UMainWindow):
 
         def finished(rel_img_path: str, value: int):
             self.grid.set_thumb_fav(rel_img_path, value)
-            if self.win_img_view:
+            try:
                 self.win_img_view.set_title()
+            except AttributeError:
+                ...
 
         rel_img_path, value = data
         self.task = FavManager(rel_img_path, value)
@@ -418,55 +465,6 @@ class WinMain(UMainWindow):
             lambda: finished(rel_img_path, value)
         )
         UThreadPool.start(self.task)
-
-    def open_in_app(self, data: tuple[list[str], str | None]):
-        rel_img_paths, app_path = data
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            for i in rel_img_paths:
-                abs_path = MainUtils.get_abs_path(main_folder_path, i)
-                if app_path:
-                    subprocess.Popen(["open", "-a", app_path, abs_path])
-                else:
-                    subprocess.Popen(["open", abs_path])
-        else:
-            self.open_win_smb(self.grid, MainFolder.current)
-
-    def reveal_in_finder(self, rel_img_paths: list[str]):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            abs_paths = [
-                MainUtils.get_abs_path(main_folder_path, i)
-                for i in rel_img_paths
-            ]
-            if os.path.isdir(abs_paths[0]):
-                subprocess.Popen(["open", abs_paths[0]])
-            else:
-                MainUtils.reveal_files(abs_paths)
-        else:
-            self.open_win_smb(self.grid, MainFolder.current)
-
-    def copy_name(self, rel_img_paths: list[str]):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            names = [
-                os.path.splitext(os.path.basename(i))[0]
-                for i in rel_img_paths
-            ]
-            MainUtils.copy_text("\n".join(names))
-        else:
-            self.open_win_smb(self.grid, MainFolder.current)
-
-    def copy_path(self, rel_img_paths: list[str]):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            abs_paths = [
-                MainUtils.get_abs_path(main_folder_path, i)
-                for i in rel_img_paths
-            ]
-            MainUtils.copy_text("\n".join(abs_paths))
-        else:
-            self.open_win_smb(self.grid, MainFolder.current)
 
     def open_dates_win(self):
         self.win_dates = WinDates()
