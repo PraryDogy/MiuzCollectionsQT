@@ -96,7 +96,7 @@ class App(QApplication):
         self.setWindowIcon(icon)
 
         self.win_main = WinMain(argv)
-        self.win_main.center()
+        self.win_main.center_screen()
         self.win_main.show()
 
         self.installEventFilter(self)

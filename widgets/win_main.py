@@ -89,8 +89,8 @@ class WinMain(UMainWindow):
         self.left_menu.no_connection.connect(
             lambda mf: self.open_win_smb(self.grid, mf)
         )
-        self.left_menu.setup_mf.connect(self.open_settings)
-        self.left_menu.setup_new_folder.connect(self.open_settings)
+        self.left_menu.setup_mf.connect(self.open_settings_win)
+        self.left_menu.setup_new_folder.connect(self.open_settings_win)
         self.left_menu.update_grid.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.restart_scaner.connect(lambda: self.restart_scaner_task())
         splitter.addWidget(self.left_menu)
@@ -106,7 +106,7 @@ class WinMain(UMainWindow):
         self.bar_top = BarTop()
         self.bar_top.open_dates_win.connect(self.open_dates_win)
         self.bar_top.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.bar_top.open_settings_win.connect(self.open_settings)
+        self.bar_top.open_settings_win.connect(self.open_settings_win)
         right_lay.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -117,7 +117,7 @@ class WinMain(UMainWindow):
             lambda: self.restart_scaner_task()
         )
         self.grid.remove_files.connect(
-            lambda rel_paths: self.remove_files(rel_paths))
+            lambda rel_paths: self.remove_files(self.grid, Mf.current, rel_paths))
         self.grid.no_connection.connect(
             lambda: self.open_win_smb(self.grid, Mf.current)
         )
@@ -128,7 +128,7 @@ class WinMain(UMainWindow):
             lambda data: self.save_files(self.grid, Mf.current, data)
         )
         self.grid.open_info_win.connect(
-            lambda rel_paths: self.open_win_info(self.grid, Mf.current, rel_paths)
+            lambda rel_paths: self.open_info_win(self.grid, Mf.current, rel_paths)
         )
         self.grid.copy_path.connect(
             lambda rel_paths: self.copy_path(self.grid, Mf.current, rel_paths)
@@ -145,13 +145,13 @@ class WinMain(UMainWindow):
         self.grid.open_in_app.connect(
             lambda data: self.open_in_app(self.grid, Mf.current, data))
         self.grid.paste_files.connect(
-            self.paste_files_here
+            lambda: self.paste_files_here(self.grid,  Mf.current)
         )
         self.grid.copy_files.connect(
             lambda data: self.set_clipboard(self.grid, Mf.current, data)
         )
         self.grid.setup_mf.connect(
-            self.open_settings
+            self.open_settings_win
         )
         right_lay.addWidget(self.grid)
 
@@ -241,22 +241,6 @@ class WinMain(UMainWindow):
             UThreadPool.start(task)
 
     @with_conn
-    def open_win_info(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
-        
-        def open_delayed():
-            """Отображает окно WinInfo после его инициализации."""
-            self.win_info.adjustSize()
-            self.win_info.center_to_parent(self)
-            self.win_info.show()
-        
-        abs_paths = [
-            MainUtils.get_abs_path(mf.curr_path, i)
-            for i in rel_paths
-        ]
-        self.win_info = WinInfo(abs_paths)
-        self.win_info.finished_.connect(open_delayed)
-
-    @with_conn
     def set_clipboard(self, parent: QWidget, mf: Mf, data: tuple):
         action_type, rel_paths = data
         if rel_paths:
@@ -314,13 +298,167 @@ class WinMain(UMainWindow):
         ]
         MainUtils.copy_text("\n".join(abs_paths))
 
-    def open_settings(self, settings_item: SettingsItem):
+    @with_conn
+    def paste_files_here(self, parent: QWidget, mf: Mf):
+
+        def reset_clipboard():
+            self.clipboard_item = None
+            self.grid.clipboard_item = None
+
+        def set_type(type: str):
+            self.clipboard_item.action_type = type
+
+        def set_files_copied(files: list[str]):
+            self.clipboard_item.files_copied = files
+
+        def scan_dirs():
+            if not self.clipboard_item.files_copied:
+                print("ни один файл не был скопирован")
+                reset_clipboard()
+                return
+            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
+                scaner_task = CustomScanerTask(
+                    self.clipboard_item.source_mf,
+                    self.clipboard_item.source_dirs
+                )
+                scaner_task.sigs.progress_text.connect(
+                    self.bar_bottom.progress_bar.setText
+                )
+                scaner_task.sigs.reload_thumbnails.connect(
+                    lambda: set_type(self.clipboard_item.type_copy)
+                )
+                scaner_task.sigs.reload_thumbnails.connect(scan_dirs)
+                UThreadPool.start(scaner_task)
+            elif self.clipboard_item.action_type == self.clipboard_item.type_copy:
+                dirs = [self.clipboard_item.target_dir, ]
+                scaner_task = CustomScanerTask(
+                    self.clipboard_item.target_mf,
+                    dirs
+                )
+                scaner_task.sigs.progress_text.connect(
+                    self.bar_bottom.progress_bar.setText
+                )
+                scaner_task.sigs.reload_thumbnails.connect(
+                    reset_clipboard
+                )
+                scaner_task.sigs.reload_thumbnails.connect(
+                    self.grid.reload_thumbnails
+                )
+                UThreadPool.start(scaner_task)
+
+        def remove_files():
+            remove_task = FilesRemover(self.clipboard_item.files_to_copy)
+            remove_task.sigs.finished_.connect(scan_dirs)
+            UThreadPool.start(remove_task)
+
+        def copy_files():
+            task = self.copy_files_task(
+                self.clipboard_item.target_dir,
+                self.clipboard_item.files_to_copy
+            )
+            # task.sigs.finished_.connect(
+            #     MainUtils.reveal_files
+            # )
+            task.sigs.finished_.connect(
+                lambda files: set_files_copied(files)
+            )
+            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
+                task.sigs.finished_.connect(
+                    lambda _: remove_files()
+                )
+            else:
+                task.sigs.finished_.connect(
+                    lambda _: scan_dirs()
+                )
+            UThreadPool.start(task)
+
+        abs_current_dir = MainUtils.get_abs_path(mf.curr_path, Dynamic.current_dir)
+        copy_self = abs_current_dir in self.clipboard_item.source_dirs
+        if copy_self:
+            self.win_warn = WinWarn(
+                Lng.attention[Cfg.lng],
+                Lng.copy_name_same_dir[Cfg.lng]
+            )
+            self.win_warn.center_to_parent(self)
+            self.win_warn.show()
+        elif self.clipboard_item:
+            self.clipboard_item.target_mf = Mf.current
+            self.clipboard_item.target_dir = abs_current_dir
+            copy_files()
+
+    @with_conn
+    def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list):
+        
+        def fin_remove(dirs_to_scan: list[str]):
+            task = CustomScanerTask(Mf.current, dirs_to_scan)
+            task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
+            UThreadPool.start(task)
+        
+        def start_remove(paths: list[str], dirs_to_scan: list[str]):
+            task = FilesRemover(paths)
+            task.sigs.finished_.connect(lambda: fin_remove(dirs_to_scan))
+            UThreadPool.start(task)
+
+        abs_paths = [
+            MainUtils.get_abs_path(mf.curr_path, i)
+            for i in rel_paths
+        ]
+        dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
+        self.remove_files_win = WinQuestion(
+            Lng.attention[Cfg.lng],
+            f"{Lng.delete_forever[Cfg.lng]} ({len(abs_paths)})?"
+        )
+        self.remove_files_win.center_to_parent(self.window())
+        self.remove_files_win.ok_clicked.connect(
+            lambda: start_remove(abs_paths, dirs_to_scan)
+        )
+        self.remove_files_win.ok_clicked.connect(
+            self.remove_files_win.deleteLater
+        )
+        self.remove_files_win.show()
+    
+    @with_conn
+    def upload_files(self, parent: QWidget, mf: Mf, abs_paths: list):
+        self.clipboard_item = ClipBoardItem()
+        self.grid.clipboard_item = self.clipboard_item
+        self.clipboard_item.action_type = ClipBoardItem.type_copy
+        self.clipboard_item.target_mf = Mf.current
+        self.clipboard_item.target_dir = MainUtils.get_abs_path(mf.curr_path, Dynamic.current_dir)
+        self.clipboard_item.files_to_copy = abs_paths
+        self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
+        self.paste_files_here(self.grid, Mf.current)
+
+    @with_conn
+    def open_info_win(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
+        
+        def open_delayed():
+            """Отображает окно WinInfo после его инициализации."""
+            self.info_win.adjustSize()
+            self.info_win.center_to_parent(self)
+            self.info_win.show()
+        
+        abs_paths = [
+            MainUtils.get_abs_path(mf.curr_path, i)
+            for i in rel_paths
+        ]
+        self.info_win = WinInfo(abs_paths)
+        self.info_win.finished_.connect(open_delayed)
+
+    def open_settings_win(self, settings_item: SettingsItem):
         self.bar_top.settings_btn.set_solid_style()
-        self.win_settings = WinSettings(settings_item)
-        self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
-        self.win_settings.reset_data.connect(self.reset_data_cmd)
-        self.win_settings.center_to_parent(self.window())
-        self.win_settings.show()
+        self.settings_win = WinSettings(settings_item)
+        self.settings_win.closed.connect(self.bar_top.settings_btn.set_normal_style)
+        self.settings_win.reset_data.connect(self.reset_data_cmd)
+        self.settings_win.center_to_parent(self.window())
+        self.settings_win.show()
+
+    def open_dates_win(self):
+        self.dates_win = WinDates()
+        self.dates_win.center_to_parent(self)
+        self.dates_win.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
+        self.dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
+        self.dates_win.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.dates_win.show()
 
     def open_view_win(self):
 
@@ -340,7 +478,7 @@ class WinMain(UMainWindow):
             lambda: on_closed()
         )
         self.view_win.open_win_info.connect(
-            lambda rel_paths: self.open_win_info(self.view_win, Mf.current, rel_paths)
+            lambda rel_paths: self.open_info_win(self.view_win, Mf.current, rel_paths)
         )
         self.view_win.copy_path.connect(
             lambda rel_paths: self.copy_path(self.view_win, Mf.current, rel_paths)
@@ -365,14 +503,6 @@ class WinMain(UMainWindow):
         )
         self.view_win.center_to_parent(self.window())
         self.view_win.show()
-
-    def open_dates_win(self):
-        self.win_dates = WinDates()
-        self.win_dates.center_to_parent(self)
-        self.win_dates.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
-        self.win_dates.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
-        self.win_dates.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.win_dates.show()
 
     def start_scaner_task(self):
         """
@@ -461,18 +591,18 @@ class WinMain(UMainWindow):
         else:
             true_name = os.path.basename(Mf.current.paths[0])
         alias = Mf.current.name
-        data = {
+        mappings = {
             Static.NAME_FAVS: Lng.favorites[Cfg.lng],
             Static.NAME_RECENTS: Lng.recents[Cfg.lng],
             "": f"{true_name} ({alias})"
         }
-        if Dynamic.current_dir in data:
-            t = data.get(Dynamic.current_dir)
+        if Dynamic.current_dir in mappings:
+            t = mappings.get(Dynamic.current_dir)
         else:
             t = os.path.basename(Dynamic.current_dir)
         self.setWindowTitle(t)
 
-    def center(self):
+    def center_screen(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         x = (screen.width() - size.width()) // 2
@@ -564,145 +694,6 @@ class WinMain(UMainWindow):
         
         return copy_files(target_dir, files_to_copy)
 
-    def paste_files_here(self):
-
-        def reset_clipboard():
-            self.clipboard_item = None
-            self.grid.clipboard_item = None
-
-        def set_type(type: str):
-            self.clipboard_item.action_type = type
-
-        def set_files_copied(files: list[str]):
-            self.clipboard_item.files_copied = files
-
-        def scan_dirs():
-            if not self.clipboard_item.files_copied:
-                print("ни один файл не был скопирован")
-                reset_clipboard()
-                return
-            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
-                scaner_task = CustomScanerTask(
-                    self.clipboard_item.source_mf,
-                    self.clipboard_item.source_dirs
-                )
-                scaner_task.sigs.progress_text.connect(
-                    self.bar_bottom.progress_bar.setText
-                )
-                scaner_task.sigs.reload_thumbnails.connect(
-                    lambda: set_type(self.clipboard_item.type_copy)
-                )
-                scaner_task.sigs.reload_thumbnails.connect(scan_dirs)
-                UThreadPool.start(scaner_task)
-            elif self.clipboard_item.action_type == self.clipboard_item.type_copy:
-                dirs = [self.clipboard_item.target_dir, ]
-                scaner_task = CustomScanerTask(
-                    self.clipboard_item.target_mf,
-                    dirs
-                )
-                scaner_task.sigs.progress_text.connect(
-                    self.bar_bottom.progress_bar.setText
-                )
-                scaner_task.sigs.reload_thumbnails.connect(
-                    reset_clipboard
-                )
-                scaner_task.sigs.reload_thumbnails.connect(
-                    self.grid.reload_thumbnails
-                )
-                UThreadPool.start(scaner_task)
-
-        def remove_files():
-            remove_task = FilesRemover(self.clipboard_item.files_to_copy)
-            remove_task.sigs.finished_.connect(scan_dirs)
-            UThreadPool.start(remove_task)
-
-        def copy_files():
-            task = self.copy_files_task(
-                self.clipboard_item.target_dir,
-                self.clipboard_item.files_to_copy
-            )
-            task.sigs.finished_.connect(
-                MainUtils.reveal_files
-            )
-            task.sigs.finished_.connect(
-                lambda files: set_files_copied(files)
-            )
-            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
-                task.sigs.finished_.connect(
-                    lambda _: remove_files()
-                )
-            else:
-                task.sigs.finished_.connect(
-                    lambda _: scan_dirs()
-                )
-            UThreadPool.start(task)
-
-        mf_path = Mf.current.get_curr_path()
-        abs_current_dir = MainUtils.get_abs_path(mf_path, Dynamic.current_dir)
-        copy_self = abs_current_dir in self.clipboard_item.source_dirs
-        if mf_path:
-            if copy_self:
-                self.win_warn = WinWarn(
-                    Lng.attention[Cfg.lng],
-                    Lng.copy_name_same_dir[Cfg.lng]
-                )
-                self.win_warn.center_to_parent(self)
-                self.win_warn.show()
-            elif self.clipboard_item:
-                self.clipboard_item.target_mf = Mf.current
-                self.clipboard_item.target_dir = abs_current_dir
-                copy_files()
-        else:
-            self.open_win_smb(self.grid, Mf.current)
-
-    def remove_files(self, rel_paths: list):
-        
-        def fin_remove(dirs_to_scan: list[str]):
-            task = CustomScanerTask(Mf.current, dirs_to_scan)
-            task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-            UThreadPool.start(task)
-        
-        def start_remove(paths: list[str], dirs_to_scan: list[str]):
-            task = FilesRemover(paths)
-            task.sigs.finished_.connect(lambda: fin_remove(dirs_to_scan))
-            UThreadPool.start(task)
-        
-        mf_path = Mf.current.get_curr_path()
-        if mf_path:
-            abs_paths = [
-                MainUtils.get_abs_path(mf_path, i)
-                for i in rel_paths
-            ]
-            dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
-            self.remove_files_win = WinQuestion(
-                Lng.attention[Cfg.lng],
-                f"{Lng.delete_forever[Cfg.lng]} ({len(abs_paths)})?"
-            )
-            self.remove_files_win.center_to_parent(self.window())
-            self.remove_files_win.ok_clicked.connect(
-                lambda: start_remove(abs_paths, dirs_to_scan)
-            )
-            self.remove_files_win.ok_clicked.connect(
-                self.remove_files_win.deleteLater
-            )
-            self.remove_files_win.show()
-        else:
-            self.open_win_smb(self.grid, Mf.current)
-    
-    def upload_files(self, abs_paths: list):
-        mf_path = Mf.current.get_curr_path()
-        if mf_path:
-            self.clipboard_item = ClipBoardItem()
-            self.grid.clipboard_item = self.clipboard_item
-            self.clipboard_item.action_type = ClipBoardItem.type_copy
-            self.clipboard_item.target_mf = Mf.current
-            self.clipboard_item.target_dir = MainUtils.get_abs_path(mf_path, Dynamic.current_dir)
-            self.clipboard_item.files_to_copy = abs_paths
-            self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
-            self.paste_files_here()
-        else:
-            self.open_win_smb(self.grid, Mf.current)
-
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
         a0.ignore()
@@ -710,7 +701,7 @@ class WinMain(UMainWindow):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         
         if a0.key() == Qt.Key.Key_V:
-            self.paste_files_here()
+            self.paste_files_here(self.grid, Mf.current)
         
         if a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
@@ -771,6 +762,6 @@ class WinMain(UMainWindow):
                 return
 
         if paths:
-            self.upload_files(paths)
+            self.upload_files(self.grid, Mf.current, paths)
 
         return super().dropEvent(a0)
