@@ -209,8 +209,7 @@ class MfList(VListWidget):
 
     @staticmethod
     def with_conn(fn):
-        def wrapper(self, item: MainFolerListItem):
-            assert isinstance(self, MfList)
+        def wrapper(self: "MfList", item: MainFolerListItem):
             mf = item.mf
             path = mf.get_curr_path()
             if path:
