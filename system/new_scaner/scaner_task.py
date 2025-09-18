@@ -74,11 +74,6 @@ class ScanerTask(URunnable):
             print("new scaner task, main folder scan error", e)
 
     def _mf_scan(self, mf: Mf):
-        coll_folder = mf.get_curr_path()
-        if not coll_folder:
-            print(mf.name, "coll folder not avaiable")
-            return
-
         # удаляем все файлы и данные из бД по удаленному Mf
         mf_remover = RemovedMfCleaner()
         deleted_mfs = mf_remover.run()

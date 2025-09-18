@@ -298,7 +298,6 @@ class OneFileInfo(URunnable):
 
     def _gather_info(self) -> dict:
         """Приватный метод: собирает всю информацию о файле."""
-        mail_folder_path = Mf.current.get_curr_path()
         name = os.path.basename(self.url)
         _, type_ = os.path.splitext(name)
         stats = os.stat(self.url)
