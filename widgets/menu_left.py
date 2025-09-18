@@ -207,28 +207,39 @@ class MainFolderList(VListWidget):
         self._last_main_folder = MainFolder.list_[0]
         self.setCurrentRow(0)
 
-    def cmd(self, flag: str, item: MainFolerListItem):
-        main_folder = item.main_folder
-        main_folder_path = main_folder.get_curr_path()
-        if not main_folder_path:
-            self.no_connection.emit(main_folder)
-        else:
-            if flag == "reveal":
-                subprocess.Popen(["open", main_folder_path])
-            elif flag == "view":
-                self.open_main_folder.emit(main_folder)
+    @staticmethod
+    def with_conn(fn):
+        from functools import wraps
+        @wraps(fn)
+        def wrapper(self, item: MainFolerListItem):
+            assert isinstance(self, MainFolderList)
+            main_folder = item.main_folder
+            path = main_folder.get_curr_path()
+            if path:
+                return fn(self, item, path, main_folder)
+            else:
+                self.no_connection.emit(main_folder)
+        return wrapper
+
+    @with_conn
+    def view_cmd(self, item, path, main_folder):
+        self.open_main_folder.emit(main_folder)
+
+    @with_conn
+    def update_grid_cmd(self, item, path, main_folder):
+        self.update_grid.emit()
+
+    @with_conn
+    def reveal_cmd(self, item, path, main_folder):
+        subprocess.Popen(["open", path])
 
     def mouseReleaseEvent(self, e):
         item: MainFolerListItem = self.itemAt(e.pos())
         if not item:
             return
 
-        # --- Игнорируем клик по уже выбранному элементу ---
-        # if item.main_folder == self._last_main_folder:
-        #     return
-
         if e.button() == Qt.MouseButton.LeftButton:
-            self.cmd("view", item)
+            self.view_cmd(item)
             self._last_main_folder = item.main_folder
 
         return super().mouseReleaseEvent(e)
@@ -238,17 +249,17 @@ class MainFolderList(VListWidget):
         item = self.itemAt(a0.pos())
         if item:
             open = QAction(Lng.open[Cfg.lng], menu)
-            open.triggered.connect(lambda: self.cmd("view", item))
+            open.triggered.connect(lambda: self.view_cmd(item))
             menu.addAction(open)
             update_grid = QAction(Lng.update_grid[Cfg.lng], menu)
-            update_grid.triggered.connect(self.update_grid.emit)
+            update_grid.triggered.connect(lambda: self.update_grid_cmd(item))
             menu.addAction(update_grid)
             restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
             restart_scaner.triggered.connect(self.restart_scaner.emit)
             menu.addAction(restart_scaner)
             menu.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-            reveal.triggered.connect(lambda: self.cmd("reveal", item))
+            reveal.triggered.connect(lambda: self.reveal_cmd(item))
             menu.addAction(reveal)
             menu.addSeparator()
             setup = QAction(Lng.setup[Cfg.lng], menu)
