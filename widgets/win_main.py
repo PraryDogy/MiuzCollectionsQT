@@ -89,8 +89,8 @@ class WinMain(UMainWindow):
         self.left_menu.no_connection.connect(
             lambda mf: self.open_win_smb(self.grid, mf)
         )
-        self.left_menu.setup_mf.connect(self.open_settings_win)
-        self.left_menu.setup_new_folder.connect(self.open_settings_win)
+        self.left_menu.edit_mf.connect(self.open_settings_win)
+        self.left_menu.setup_new_mf.connect(self.open_settings_win)
         self.left_menu.update_grid.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.restart_scaner.connect(lambda: self.restart_scaner_task())
         splitter.addWidget(self.left_menu)

@@ -273,8 +273,8 @@ class MfList(VListWidget):
 class MenuLeft(QTabWidget):
     reload_thumbnails = pyqtSignal()
     no_connection = pyqtSignal(Mf)
-    setup_mf = pyqtSignal(SettingsItem)
-    setup_new_folder = pyqtSignal(SettingsItem)
+    edit_mf = pyqtSignal(SettingsItem)
+    setup_new_mf = pyqtSignal(SettingsItem)
     update_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
     
@@ -307,13 +307,13 @@ class MenuLeft(QTabWidget):
             item = SettingsItem()
             item.action_type = item.type_edit_folder
             item.content = mf
-            self.setup_mf.emit(item)
+            self.edit_mf.emit(item)
             
         def setup_new_folder():
             item = SettingsItem()
             item.action_type = item.type_new_folder
             item.content = ""
-            self.setup_new_folder.emit(item) 
+            self.setup_new_mf.emit(item) 
         
         self.clear()
 
@@ -351,4 +351,4 @@ class MenuLeft(QTabWidget):
                 item = SettingsItem()
                 item.action_type = item.type_new_folder
                 item.content = url
-                self.setup_mf.emit(item)                
+                self.edit_mf.emit(item)                
