@@ -209,8 +209,6 @@ class MainFolderList(VListWidget):
 
     @staticmethod
     def with_conn(fn):
-        from functools import wraps
-        @wraps(fn)
         def wrapper(self, item: MainFolerListItem):
             assert isinstance(self, MainFolderList)
             main_folder = item.main_folder
