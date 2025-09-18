@@ -117,7 +117,7 @@ class WinMain(UMainWindow):
             lambda: self.restart_scaner_task()
         )
         self.grid.remove_files.connect(
-            lambda rel_img_paths: self.remove_files(rel_img_paths))
+            lambda rel_paths: self.remove_files(rel_paths))
         self.grid.no_connection.connect(
             lambda: self.open_win_smb(self.grid, MainFolder.current)
         )
@@ -224,10 +224,10 @@ class WinMain(UMainWindow):
 
     @with_conn
     def save_files(self, parent: QWidget, main_folder: MainFolder, data: tuple):
-        dest, rel_img_paths = data
+        dest, rel_paths = data
         abs_files = [
             MainUtils.get_abs_path(main_folder.curr_path, i)
-            for i in rel_img_paths
+            for i in rel_paths
         ]
         if dest is None:
             dest = QFileDialog.getExistingDirectory()
@@ -241,7 +241,7 @@ class WinMain(UMainWindow):
             UThreadPool.start(task)
 
     @with_conn
-    def open_win_info(self, parent: QWidget, main_folder: MainFolder, rel_img_paths: list[str]):
+    def open_win_info(self, parent: QWidget, main_folder: MainFolder, rel_paths: list[str]):
         
         def open_delayed():
             """Отображает окно WinInfo после его инициализации."""
@@ -251,18 +251,18 @@ class WinMain(UMainWindow):
         
         abs_paths = [
             MainUtils.get_abs_path(main_folder.curr_path, i)
-            for i in rel_img_paths
+            for i in rel_paths
         ]
         self.win_info = WinInfo(abs_paths)
         self.win_info.finished_.connect(open_delayed)
 
     @with_conn
     def set_clipboard(self, parent: QWidget, main_folder: MainFolder, data: tuple):
-        action_type, rel_img_paths = data
-        if rel_img_paths:
+        action_type, rel_paths = data
+        if rel_paths:
             abs_paths = [
                 MainUtils.get_abs_path(main_folder.curr_path, i)
-                for i in rel_img_paths
+                for i in rel_paths
             ]
             self.clipboard_item = ClipBoardItem()
             self.grid.clipboard_item = self.clipboard_item
@@ -279,8 +279,8 @@ class WinMain(UMainWindow):
 
     @with_conn
     def open_in_app(self, parent: QWidget, main_folder: MainFolder, data: tuple):
-        rel_img_paths, app_path = data
-        for i in rel_img_paths:
+        rel_paths, app_path = data
+        for i in rel_paths:
             abs_path = MainUtils.get_abs_path(main_folder.curr_path, i)
             if app_path:
                 subprocess.Popen(["open", "-a", app_path, abs_path])
@@ -299,18 +299,18 @@ class WinMain(UMainWindow):
             MainUtils.reveal_files(abs_paths)
 
     @with_conn
-    def copy_name(self, parent: QWidget, main_folder: MainFolder, rel_img_paths: list[str]):
+    def copy_name(self, parent: QWidget, main_folder: MainFolder, rel_paths: list[str]):
         names = [
             os.path.splitext(os.path.basename(i))[0]
-            for i in rel_img_paths
+            for i in rel_paths
         ]
         MainUtils.copy_text("\n".join(names))
 
     @with_conn
-    def copy_path(self, parent: QWidget, main_folder: MainFolder, rel_img_paths: list[str]):
+    def copy_path(self, parent: QWidget, main_folder: MainFolder, rel_paths: list[str]):
         abs_paths = [
             MainUtils.get_abs_path(main_folder.curr_path, i)
-            for i in rel_img_paths
+            for i in rel_paths
         ]
         MainUtils.copy_text("\n".join(abs_paths))
 
@@ -332,10 +332,10 @@ class WinMain(UMainWindow):
             path_to_wid = self.grid.path_to_wid.copy()
             is_selection = False
         else:
-            path_to_wid = {i.rel_img_path: i for i in self.grid.selected_widgets}
+            path_to_wid = {i.rel_path: i for i in self.grid.selected_widgets}
             is_selection = True
         wid = self.grid.selected_widgets[-1]
-        self.view_win = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
+        self.view_win = WinImageView(wid.rel_path, path_to_wid, is_selection)
         self.view_win.closed_.connect(
             lambda: on_closed()
         )
@@ -358,7 +358,7 @@ class WinMain(UMainWindow):
             lambda data: self.save_files(self.view_win, MainFolder.current, data)
         )
         self.view_win.switch_image_sig.connect(
-            lambda img_path: self.grid.select_viewed_image(img_path)
+            lambda path: self.grid.select_viewed_image(path)
         )
         self.view_win.no_connection.connect(
             lambda: self.open_win_smb(self.view_win, MainFolder.current)
@@ -487,17 +487,17 @@ class WinMain(UMainWindow):
 
     def set_fav(self, data: tuple[str, int]):
 
-        def finished(rel_img_path: str, value: int):
-            self.grid.set_thumb_fav(rel_img_path, value)
+        def finished(rel_path: str, value: int):
+            self.grid.set_thumb_fav(rel_path, value)
             try:
                 self.view_win.set_title()
             except AttributeError:
                 ...
 
-        rel_img_path, value = data
-        self.task = FavManager(rel_img_path, value)
+        rel_path, value = data
+        self.task = FavManager(rel_path, value)
         self.task.sigs.finished_.connect(
-            lambda: finished(rel_img_path, value)
+            lambda: finished(rel_path, value)
         )
         UThreadPool.start(self.task)
 
@@ -655,15 +655,15 @@ class WinMain(UMainWindow):
         else:
             self.open_win_smb(self.grid, MainFolder.current)
 
-    def remove_files(self, rel_img_paths: list):
+    def remove_files(self, rel_paths: list):
         
         def fin_remove(dirs_to_scan: list[str]):
             task = CustomScanerTask(MainFolder.current, dirs_to_scan)
             task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
             UThreadPool.start(task)
         
-        def start_remove(img_paths: list[str], dirs_to_scan: list[str]):
-            task = FilesRemover(img_paths)
+        def start_remove(paths: list[str], dirs_to_scan: list[str]):
+            task = FilesRemover(paths)
             task.sigs.finished_.connect(lambda: fin_remove(dirs_to_scan))
             UThreadPool.start(task)
         
@@ -671,7 +671,7 @@ class WinMain(UMainWindow):
         if main_folder_path:
             abs_paths = [
                 MainUtils.get_abs_path(main_folder_path, i)
-                for i in rel_img_paths
+                for i in rel_paths
             ]
             dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
             self.remove_files_win = WinQuestion(
@@ -689,7 +689,7 @@ class WinMain(UMainWindow):
         else:
             self.open_win_smb(self.grid, MainFolder.current)
     
-    def upload_files(self, abs_img_paths: list):
+    def upload_files(self, abs_paths: list):
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
             self.clipboard_item = ClipBoardItem()
@@ -697,8 +697,8 @@ class WinMain(UMainWindow):
             self.clipboard_item.action_type = ClipBoardItem.type_copy
             self.clipboard_item.target_main_folder = MainFolder.current
             self.clipboard_item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
-            self.clipboard_item.files_to_copy = abs_img_paths
-            self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_img_paths))
+            self.clipboard_item.files_to_copy = abs_paths
+            self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
             self.paste_files_here()
         else:
             self.open_win_smb(self.grid, MainFolder.current)
@@ -757,12 +757,12 @@ class WinMain(UMainWindow):
             noti._show()
             return
 
-        img_paths: list[str] = [
+        paths: list[str] = [
             i.toLocalFile()
             for i in a0.mimeData().urls()
         ]
 
-        for i in img_paths:
+        for i in paths:
             if os.path.isdir(i):
                 self.win_warn = WinWarn(Lng.attention[Cfg.lng], Lng.drop_only_files[Cfg.lng])
                 self.win_warn.adjustSize()
@@ -770,7 +770,7 @@ class WinMain(UMainWindow):
                 self.win_warn.show()
                 return
 
-        if img_paths:
-            self.upload_files(img_paths)
+        if paths:
+            self.upload_files(paths)
 
         return super().dropEvent(a0)

@@ -191,15 +191,15 @@ class WinImageView(AppModalWindow):
     min_w, min_h = 500, 400
     window_style = """background: black;"""
 
-    def __init__(self, rel_img_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
+    def __init__(self, rel_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
 
         self.cached_images: dict[str, QPixmap] = {}
         self.is_selection = is_selection
         self.path_to_wid = path_to_wid
-        self.rel_img_paths = list(path_to_wid.keys())
-        self.rel_img_path = rel_img_path
-        self.wid = path_to_wid.get(self.rel_img_path)
+        self.rel_paths = list(path_to_wid.keys())
+        self.rel_path = rel_path
+        self.wid = path_to_wid.get(self.rel_path)
         self.task_count = 0
 
         self.setStyleSheet(self.window_style)
@@ -255,12 +255,12 @@ class WinImageView(AppModalWindow):
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(0, 0, 0))
             self.image_label.set_image(pixmap)
-            t = f"{os.path.basename(self.rel_img_path)}\n{Lng.loading[Cfg.lng]}"
+            t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng]}"
             self.image_label.setText(t)
 
         main_folder_path = MainFolder.current.get_curr_path()
         if main_folder_path:
-            self.img_path = MainUtils.get_abs_path(main_folder_path, self.rel_img_path)
+            self.path = MainUtils.get_abs_path(main_folder_path, self.rel_path)
             self.load_image()
         else:
             print("img viewer > no smb")
@@ -268,20 +268,20 @@ class WinImageView(AppModalWindow):
     def load_image(self):
         def fin(data: tuple[str, QImage]):
             self.task_count -= 1
-            old_img_path, qimage = data
+            old_path, qimage = data
             if qimage:
-                if old_img_path == self.img_path:
+                if old_path == self.path:
                     pixmap = QPixmap.fromImage(qimage)
                     self.image_label.set_image(pixmap)
             else:
                 pixmap = QPixmap(1, 1)
                 pixmap.fill(QColor(0, 0, 0))
                 self.image_label.set_image(pixmap)
-                t = f"{os.path.basename(self.img_path)}\n{Lng.read_file_error[Cfg.lng]}"
+                t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[Cfg.lng]}"
                 self.image_label.setText(t)
 
         self.task_count += 1
-        img_thread = OneImgLoader(self.img_path, self.cached_images)
+        img_thread = OneImgLoader(self.path, self.cached_images)
         img_thread.sigs.finished_.connect(fin)
         UThreadPool.start(img_thread)
 
@@ -300,19 +300,19 @@ class WinImageView(AppModalWindow):
             return
 
         # мы формируем актуальный список src из актуальной сетки изображений
-        self.rel_img_paths = list(self.path_to_wid.keys())
+        self.rel_paths = list(self.path_to_wid.keys())
 
-        if self.rel_img_path in self.rel_img_paths:
-            current_index = self.rel_img_paths.index(self.rel_img_path)
+        if self.rel_path in self.rel_paths:
+            current_index = self.rel_paths.index(self.rel_path)
             new_index = current_index + offset
         else:
             new_index = 0
 
-        if new_index == len(self.rel_img_paths):
+        if new_index == len(self.rel_paths):
             new_index = 0
 
         elif new_index < 0:
-            new_index = len(self.rel_img_paths) - 1
+            new_index = len(self.rel_paths) - 1
 
         # 
         # сетка = Thumbnail.path_to_wid = сетка thumbnails
@@ -322,13 +322,13 @@ class WinImageView(AppModalWindow):
         # так как мы сохранили список src сетки, то новый src будет найден
         # но не факт, что он уже есть в сетке
         try:
-            rel_img_path = self.rel_img_paths[new_index]
+            rel_path = self.rel_paths[new_index]
         except IndexError as e:
             print(e)
             return
 
         # ищем виджет в актуальной сетке, которая могла обновиться в фоне
-        new_wid = self.path_to_wid.get(rel_img_path)
+        new_wid = self.path_to_wid.get(rel_path)
 
         # если виджет не найден в сетке
         # значит сетка обновилась в фоне с новыми виджетами
@@ -336,8 +336,8 @@ class WinImageView(AppModalWindow):
         # берем первый src из этого списка
         # и первый виджет из сетки
         if not new_wid:
-            self.rel_img_path = self.rel_img_paths[0]
-            self.wid = self.path_to_wid.get(self.rel_img_path)
+            self.rel_path = self.rel_paths[0]
+            self.wid = self.path_to_wid.get(self.rel_path)
 
         # если виджет найден, тоне факт, что список src актуален
         # то есть сетка все равно могла быть перетасована
@@ -346,7 +346,7 @@ class WinImageView(AppModalWindow):
         # то есть и src в списке src
         # поэтому берем ранее найденный src и виджет
         else:
-            self.rel_img_path = rel_img_path
+            self.rel_path = rel_path
             self.wid = new_wid
 
         self.load_thumb()
@@ -357,7 +357,7 @@ class WinImageView(AppModalWindow):
         # но если было выбрано для просмотра х число виджетов, мы не 
         # снимаем с них выделение
         if not self.is_selection:
-            self.switch_image_sig.emit(self.rel_img_path)
+            self.switch_image_sig.emit(self.rel_path)
 
     def set_title(self):
         self.setWindowTitle(f"{self.wid.collection}: {self.wid.name}")
@@ -400,25 +400,25 @@ class WinImageView(AppModalWindow):
             self.image_label.zoom_reset()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            self.open_win_info.emit([self.rel_img_path])
+            self.open_win_info.emit([self.rel_path])
 
         # return super().keyPressEvent(ev)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
         self.menu_ = UMenu(event=ev)
-        rel_img_paths = [self.rel_img_path]
+        rel_paths = [self.rel_path]
 
         info = WinInfoAction(self.menu_)
         info.triggered.connect(
-            lambda: self.open_win_info.emit(rel_img_paths)
+            lambda: self.open_win_info.emit(rel_paths)
         )
         self.menu_.addAction(info)
 
         self.fav_action = SetFav(self.menu_, self.wid.fav_value)
         self.fav_action.triggered.connect(
             lambda: self.set_fav.emit(
-                (self.wid.rel_img_path, not self.wid.fav_value)
+                (self.wid.rel_path, not self.wid.fav_value)
             )
         )
         self.menu_.addAction(self.fav_action)
@@ -427,26 +427,26 @@ class WinImageView(AppModalWindow):
 
         copy_path = CopyPath(self.menu_, 1)
         copy_path.triggered.connect(
-            lambda: self.copy_path.emit(rel_img_paths)
+            lambda: self.copy_path.emit(rel_paths)
         )
         self.menu_.addAction(copy_path)
 
         copy_name = CopyName(self.menu_, 1)
         copy_name.triggered.connect(
-            lambda: self.copy_name.emit(rel_img_paths)
+            lambda: self.copy_name.emit(rel_paths)
         )
         self.menu_.addAction(copy_name)
 
         reveal = RevealInFinder(self.menu_, 1)
         reveal.triggered.connect(
-            lambda: self.reveal_in_finder.emit(rel_img_paths)
+            lambda: self.reveal_in_finder.emit(rel_paths)
         )
         self.menu_.addAction(reveal)
 
         save = Save(self.menu_, 1)
         save.triggered.connect(
             lambda: self.save_files.emit(
-                (os.path.expanduser("~/Downloads"), rel_img_paths)
+                (os.path.expanduser("~/Downloads"), rel_paths)
             )
         )
         self.menu_.addAction(save)
@@ -454,7 +454,7 @@ class WinImageView(AppModalWindow):
         save_as = SaveAs(self.menu_, 1)
         save_as.triggered.connect(
             lambda: self.save_files.emit(
-                (None, rel_img_paths)
+                (None, rel_paths)
             )
         )
         self.menu_.addAction(save_as)

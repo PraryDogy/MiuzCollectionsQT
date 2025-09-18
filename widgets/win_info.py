@@ -60,10 +60,10 @@ class Selectable(QLabel):
 class WinInfo(SingleActionWindow):
     finished_ = pyqtSignal()
 
-    def __init__(self, img_paths: list[str]):
+    def __init__(self, paths: list[str]):
         super().__init__()
         self.setWindowTitle(Lng.info[Cfg.lng])
-        self.img_paths = img_paths
+        self.paths = paths
 
         wid = QWidget()
         self.central_layout.addWidget(wid)
@@ -73,8 +73,8 @@ class WinInfo(SingleActionWindow):
         self.grid_lay.setContentsMargins(0, 0, 0, 0)
         wid.setLayout(self.grid_lay)
 
-        if len(self.img_paths) == 1:
-            if os.path.isfile(self.img_paths[0]):
+        if len(self.paths) == 1:
+            if os.path.isfile(self.paths[0]):
                 self.single_img()
             else:
                 print("info dir")
@@ -82,12 +82,12 @@ class WinInfo(SingleActionWindow):
             self.multiple_img()
 
     def single_img(self):
-        self.task_ = OneFileInfo(self.img_paths[0])
+        self.task_ = OneFileInfo(self.paths[0])
         self.task_.sigs.finished_.connect(lambda data: self.single_img_fin(data))
         UThreadPool.start(self.task_)
 
     def multiple_img(self):
-        self.task_ = MultiFileInfo(self.img_paths)
+        self.task_ = MultiFileInfo(self.paths)
         self.task_.sigs.finished_.connect(lambda data: self.multiple_img_fin(data))
         UThreadPool.start(self.task_)
 

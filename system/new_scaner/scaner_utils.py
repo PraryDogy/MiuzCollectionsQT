@@ -270,7 +270,7 @@ class ImgLoader(QObject):
         - new_dirs: [(rel_dir_path, mod_time), ...]
 
         Возвращает изображения в указанных директориях:
-        - [(abs_img_path, size, birth_time, mod_time), ...]    
+        - [(abs_path, size, birth_time, mod_time), ...]    
         """
 
         self.progress_text.emit(
@@ -279,12 +279,12 @@ class ImgLoader(QObject):
         finder_images = []
 
         def process_entry(entry: os.DirEntry):
-            abs_img_path = entry.path
+            abs_path = entry.path
             stats = entry.stat()
             size = int(stats.st_size)
             birth = int(stats.st_birthtime)
             mod = int(stats.st_mtime)
-            finder_images.append((abs_img_path, size, birth, mod))
+            finder_images.append((abs_path, size, birth, mod))
 
         for rel_dir_path, mod in self.dirs_to_scan:
             abs_dir_path = MainUtils.get_abs_path(self.main_folder_path, rel_dir_path)
@@ -306,7 +306,7 @@ class ImgLoader(QObject):
         - new_dirs: [(rel_dir_path, mod_time), ...]
 
         Возвращает изображения в указанных директориях:
-        - {rel_thumb_path: (abs_img_path, size, birth, mod), ...}  
+        - {rel_thumb_path: (abs_path, size, birth, mod), ...}  
         """
         conn = Dbase.engine.connect()
         db_images: dict = {}
@@ -325,9 +325,9 @@ class ImgLoader(QObject):
             else:
                 q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
-            for rel_thumb_path, rel_img_path, size, birth, mod in conn.execute(q):
-                abs_img_path = MainUtils.get_abs_path(self.main_folder_path, rel_img_path)
-                db_images[rel_thumb_path] = (abs_img_path, size, birth, mod)
+            for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
+                abs_path = MainUtils.get_abs_path(self.main_folder_path, rel_path)
+                db_images[rel_thumb_path] = (abs_path, size, birth, mod)
         conn.close()
         return db_images
 
@@ -339,12 +339,12 @@ class _ImgCompator:
         Запуск: run()
 
         Принимает:      
-        finder_images: [(abs_img_path, size, birth_time, mod_time), ...]    
+        finder_images: [(abs_path, size, birth_time, mod_time), ...]    
         db_images:  {rel thumb path: (abs img path, size, birth time, mod time), ...}
 
         Возвращает:
         del_items: [rel thumb path, ...]    
-        new_items: [(abs img_path, size, birth, mod), ...]
+        new_items: [(abs path, size, birth, mod), ...]
         """
         super().__init__()
         self.finder_images = finder_images
@@ -368,12 +368,12 @@ class _ImgHashdirUpdater(QObject):
         
         Принимает:  
         del_items: [rel_thumb_path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]  
+        new_items: [(path, size, birth, mod), ...]  
 
 
         Возвращает:     
         del_items: [rel_thumb_path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]  
+        new_items: [(path, size, birth, mod), ...]  
         """
         super().__init__()
         self.del_items = del_items
@@ -391,7 +391,7 @@ class _ImgHashdirUpdater(QObject):
         """
         Возвращает:     
         del_items: [rel_thumb_path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]  
+        new_items: [(path, size, birth, mod), ...]  
         """
         if not self.task_state.should_run():
             return ([], [])
@@ -424,8 +424,8 @@ class _ImgHashdirUpdater(QObject):
             f"{self.true_name} ({self.alias}): {Lng.updating[Cfg.lng].lower()} ({self.total})"
             )
 
-    def create_thumb(self, img_path: str) -> ndarray | None:
-        img = ReadImage.read_image(img_path)
+    def create_thumb(self, path: str) -> ndarray | None:
+        img = ReadImage.read_image(path)
         thumb = MainUtils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
         del img
         gc.collect()
@@ -436,14 +436,14 @@ class _ImgHashdirUpdater(QObject):
 
     def run_new_items(self):
         new_new_items = []
-        for img_path, size, birth, mod in self.new_items:
+        for path, size, birth, mod in self.new_items:
             if not self.task_state.should_run():
                 break
             try:
-                thumb = self.create_thumb(img_path)
-                thumb_path = MainUtils.create_abs_hash(img_path)
+                thumb = self.create_thumb(path)
+                thumb_path = MainUtils.create_abs_hash(path)
                 MainUtils.write_thumb(thumb_path, thumb)
-                new_new_items.append((img_path, size, birth, mod))
+                new_new_items.append((path, size, birth, mod))
                 self.total -= 1
                 self.send_text()
             except Exception as e:
@@ -460,7 +460,7 @@ class _ImgDbUpdater:
 
         Принимает:  
         - del_items: [rel_thumb_path, ...]       
-        - new_items: [(img_path, size, birth, mod), ...]          
+        - new_items: [(path, size, birth, mod), ...]          
         """
         super().__init__()
         self.main_folder = main_folder
@@ -484,8 +484,8 @@ class _ImgDbUpdater:
 
     def del_dublicates(self):
         short_paths = [
-            MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
-            for img_path, size, birth, mod in self.new_images
+            MainUtils.get_rel_path(self.main_folder.curr_path, path)
+            for path, size, birth, mod in self.new_images
         ]
         q = sqlalchemy.delete(THUMBS).where(
             THUMBS.c.short_src.in_(short_paths),
@@ -496,11 +496,11 @@ class _ImgDbUpdater:
 
     def run_new_items(self):
         values_list = []
-        for img_path, size, birth, mod in self.new_images:
-            abs_hash = MainUtils.create_abs_hash(img_path)
+        for path, size, birth, mod in self.new_images:
+            abs_hash = MainUtils.create_abs_hash(path)
             short_hash = MainUtils.get_rel_hash(abs_hash)
-            short_src = MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
-            coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, img_path)
+            short_src = MainUtils.get_rel_path(self.main_folder.curr_path, path)
+            coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, path)
             values_list.append({
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.SHORT_HASH: short_hash,

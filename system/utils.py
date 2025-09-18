@@ -62,8 +62,8 @@ class MainUtils:
         )
 
     @classmethod
-    def create_abs_hash(cls, img_path: str) -> str:
-        new_name = hashlib.md5(img_path.encode('utf-8')).hexdigest() + ".jpg"
+    def create_abs_hash(cls, path: str) -> str:
+        new_name = hashlib.md5(path.encode('utf-8')).hexdigest() + ".jpg"
         new_folder = os.path.join(Static.APP_SUPPORT_HASHDIR, new_name[:2])
         os.makedirs(new_folder, exist_ok=True)
         return os.path.join(new_folder, new_name)
@@ -129,8 +129,8 @@ class MainUtils:
             return None
 
     @classmethod
-    def get_coll_name(cls, main_folder_path: str, img_path: str) -> str:
-        coll = cls.get_rel_path(main_folder_path, img_path)
+    def get_coll_name(cls, main_folder_path: str, path: str) -> str:
+        coll = cls.get_rel_path(main_folder_path, path)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
@@ -149,8 +149,8 @@ class MainUtils:
         return QApplication.clipboard().text()
         
     @classmethod
-    def reveal_files(cls, img_paths: list[str]):
-        command = ["osascript", REVEAL_SCPT] + img_paths
+    def reveal_files(cls, paths: list[str]):
+        command = ["osascript", REVEAL_SCPT] + paths
         subprocess.Popen(
             command,
             stdout=subprocess.DEVNULL,

@@ -173,10 +173,10 @@ class FavManager(URunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal(int)
 
-    def __init__(self, rel_img_path: str, value: int):
+    def __init__(self, rel_path: str, value: int):
         super().__init__()
         self.sigs = FavManager.Sigs()
-        self.rel_img_path = rel_img_path
+        self.rel_path = rel_path
         self.value = value
         self.conn = Dbase.engine.connect()
 
@@ -185,7 +185,7 @@ class FavManager(URunnable):
         try:
             q = (
                 sqlalchemy.update(THUMBS)
-                .where(THUMBS.c.short_src == self.rel_img_path)
+                .where(THUMBS.c.short_src == self.rel_path)
                 .where(THUMBS.c.brand == MainFolder.current.name)
                 .values(fav=self.value)
             )
@@ -204,7 +204,7 @@ class OneImgLoader(URunnable):
     Загружает одно изображение, десатурирует его и кэширует в словаре.
 
     Сигналы:
-    - finished_(tuple): возвращает кортеж (img_path, QPixmap или None)
+    - finished_(tuple): возвращает кортеж (path, QPixmap или None)
     """
 
     max_images_count = 50
@@ -212,40 +212,40 @@ class OneImgLoader(URunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal(tuple)
 
-    def __init__(self, abs_img_path: str, cached_images: dict[str, QPixmap]):
+    def __init__(self, abs_path: str, cached_images: dict[str, QPixmap]):
         """
-        :param img_path: путь к изображению
+        :param path: путь к изображению
         :param cached_images: словарь кэшированных изображений {путь: QPixmap}
         """
         super().__init__()
         self.sigs = OneImgLoader.Sigs()
-        self.abs_img_path = abs_img_path
+        self.abs_path = abs_path
         self.cached_images = cached_images
 
     def task(self):
         """Выполняет загрузку изображения и эмитит сигнал."""
         try:
             self.sigs.finished_.emit(
-                (self.abs_img_path, self._load_image())
+                (self.abs_path, self._load_image())
             )
         except Exception as e:
             print("OneImgLoader error:", e)
             self.sigs.finished_.emit(
-                (self.abs_img_path, None)
+                (self.abs_path, None)
             )
 
     def _load_image(self):
         """Приватный метод: загружает и кэширует изображение."""
-        if self.abs_img_path in self.cached_images:
-            return self.cached_images.get(self.abs_img_path)
+        if self.abs_path in self.cached_images:
+            return self.cached_images.get(self.abs_path)
 
-        img = ReadImage.read_image(self.abs_img_path)
+        img = ReadImage.read_image(self.abs_path)
         if img is None:
             return None
 
         img = MainUtils.desaturate_image(img, 0.2)
         qimage = MainUtils.qimage_from_array(img)
-        self.cached_images[self.abs_img_path] = qimage
+        self.cached_images[self.abs_path] = qimage
 
         del img
         gc.collect()
@@ -318,9 +318,9 @@ class OneFileInfo(URunnable):
 
         return res
 
-    def get_img_resol(self, img_path: str) -> str:
+    def get_img_resol(self, path: str) -> str:
         """Возвращает разрешение изображения в формате 'WxH' или пустую строку."""
-        img_ = ReadImage.read_image(img_path)
+        img_ = ReadImage.read_image(path)
         if img_ is not None and len(img_.shape) > 1:
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"
@@ -352,9 +352,9 @@ class MultiFileInfo(URunnable):
         finished_ = pyqtSignal(dict)
         delayed_info = pyqtSignal(str)
 
-    def __init__(self, img_paths: list[str]):
+    def __init__(self, paths: list[str]):
         super().__init__()
-        self.img_paths = img_paths
+        self.paths = paths
         self.sigs = MultiFileInfo.Sigs()
 
     def task(self):
@@ -368,21 +368,21 @@ class MultiFileInfo(URunnable):
     def _prepare_info(self) -> dict:
         """Приватный метод: собирает словарь информации о файлах."""
         # Формируем строку имён (не более 10)
-        names = [os.path.basename(p) for p in self.img_paths][:10]
+        names = [os.path.basename(p) for p in self.paths][:10]
         names = ", ".join(names)
         names = self.lined_text(names)
-        if len(self.img_paths) > 10:
+        if len(self.paths) > 10:
             names += ", ..."
 
         return {
             Lng.file_name[Cfg.lng]: names,
-            Lng.total[Cfg.lng]: str(len(self.img_paths)),
+            Lng.total[Cfg.lng]: str(len(self.paths)),
             Lng.file_size[Cfg.lng]: self.get_total_size()
         }
 
     def get_total_size(self) -> str:
         """Возвращает суммарный размер всех файлов в удобочитаемом формате."""
-        total = sum(os.stat(p).st_size for p in self.img_paths)
+        total = sum(os.stat(p).st_size for p in self.paths)
         return SharedUtils.get_f_size(total)
 
     def lined_text(self, text: str) -> str:
@@ -404,10 +404,10 @@ class FilesRemover(URunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal()
 
-    def __init__(self, img_paths: list[str]):
+    def __init__(self, paths: list[str]):
         super().__init__()
         self.sigs = FilesRemover.Sigs()
-        self.img_paths = img_paths
+        self.paths = paths
 
     def task(self):
         # Здесь не нужен try/except, ошибки обрабатываются в _remove_files
@@ -416,12 +416,12 @@ class FilesRemover(URunnable):
 
     def _remove_files(self) -> list[str]:
         """
-        Удаляет файлы по списку self.img_paths.
+        Удаляет файлы по списку self.paths.
 
         Возвращает список успешно удалённых файлов.
         """
         deleted_files = []
-        for path in self.img_paths:
+        for path in self.paths:
             try:
                 os.remove(path)
                 deleted_files.append(path)
@@ -443,10 +443,10 @@ class DbImagesLoader(URunnable):
         finished_ = pyqtSignal(dict)
 
     class Item:
-        __slots__ = ["qimage", "rel_img_path", "coll_name", "fav", "f_mod"]
-        def __init__(self, qimage: QImage, rel_img_path: str, coll: str, fav: int, f_mod: str):
+        __slots__ = ["qimage", "rel_path", "coll_name", "fav", "f_mod"]
+        def __init__(self, qimage: QImage, rel_path: str, coll: str, fav: int, f_mod: str):
             self.qimage = qimage
-            self.rel_img_path = rel_img_path
+            self.rel_path = rel_path
             self.coll_name = coll
             self.fav = fav
             self.f_mod = f_mod
@@ -475,8 +475,8 @@ class DbImagesLoader(URunnable):
         if not res:
             return {}
 
-        for rel_img_path, rel_thumb_path, mod, coll, fav in res:
-            if not rel_img_path.endswith(Static.ext_all):
+        for rel_path, rel_thumb_path, mod, coll, fav in res:
+            if not rel_path.endswith(Static.ext_all):
                 continue
 
             f_mod = datetime.fromtimestamp(mod).date()
@@ -493,7 +493,7 @@ class DbImagesLoader(URunnable):
             else:
                 f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
 
-            item = DbImagesLoader.Item(qimage, rel_img_path, coll, fav, f_mod)
+            item = DbImagesLoader.Item(qimage, rel_path, coll, fav, f_mod)
 
             if Dynamic.sort_by_mod:
                 thumbs_dict[f_mod].append(item)
@@ -625,10 +625,10 @@ class MainFolderDataCleaner(URunnable):
     def _task(self):
         # Удаляем битые миниатюры
         stmt = sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.short_hash)
-        for rel_img_path, rel_thumb_path in self.conn.execute(stmt):
+        for rel_path, rel_thumb_path in self.conn.execute(stmt):
             if not os.path.exists(MainUtils.get_abs_hash(rel_thumb_path)):
                 self.conn.execute(
-                    sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_img_path)
+                    sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_path)
                 )
         self.conn.commit()
 

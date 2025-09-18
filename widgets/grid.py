@@ -116,7 +116,7 @@ class BelowTextWid(QLabel):
         self.set_text()
 
     def set_text(self):
-        root = os.path.dirname(self.wid.rel_img_path).strip("/").replace("/", self.sep)
+        root = os.path.dirname(self.wid.rel_path).strip("/").replace("/", self.sep)
         if not root:
             root = self.wid.collection
         first_row = self.short_text(root)
@@ -200,16 +200,16 @@ class Thumbnail(QFrame):
         font-size: 11px;
     """
 
-    def __init__(self, pixmap: QPixmap, rel_img_path: str, coll_name: str, fav: int, f_mod: str):
+    def __init__(self, pixmap: QPixmap, rel_path: str, coll_name: str, fav: int, f_mod: str):
         super().__init__()
 
         # --- Исходные данные ---
         self.img = pixmap
-        self.rel_img_path = rel_img_path
+        self.rel_path = rel_path
         self.collection = coll_name
         self.fav_value = fav
         self.f_mod = f_mod
-        self.name = f"{self.sym_star} {os.path.basename(rel_img_path)}" if fav else os.path.basename(rel_img_path)
+        self.name = f"{self.sym_star} {os.path.basename(rel_path)}" if fav else os.path.basename(rel_path)
 
         # --- Layout ---
         self.v_layout = UVBoxLayout()
@@ -230,7 +230,7 @@ class Thumbnail(QFrame):
 
         self.setToolTip("\n".join([
                 self.name,
-                os.path.dirname(self.rel_img_path),
+                os.path.dirname(self.rel_path),
                 self.f_mod,
             ])
         )
@@ -276,10 +276,10 @@ class Thumbnail(QFrame):
         """Добавляет или удаляет миниатюру из избранного и обновляет текст."""
         if value == 0:
             self.fav_value = 0
-            self.name = os.path.basename(self.rel_img_path)
+            self.name = os.path.basename(self.rel_path)
         else:
             self.fav_value = 1
-            self.name = f"{self.sym_star} {os.path.basename(self.rel_img_path)}"
+            self.name = f"{self.sym_star} {os.path.basename(self.rel_path)}"
 
         self.text_wid.name = self.name
         self.text_wid.set_text()
@@ -531,7 +531,7 @@ class Grid(VScrollArea):
         QTimer.singleShot(50, load_grid_delayed)
                         
     def add_thumb_data(self, wid: Thumbnail):
-        self.path_to_wid[wid.rel_img_path] = wid
+        self.path_to_wid[wid.rel_path] = wid
         self.cell_to_wid[self.glob_row, self.glob_col] = wid
         wid.row, wid.col = self.glob_row, self.glob_col        
 
@@ -540,7 +540,7 @@ class Grid(VScrollArea):
         def create_thumb(image_item: DbImagesLoader.Item):
             thumbnail = Thumbnail(
                 pixmap=pixmap,
-                rel_img_path=image_item.rel_img_path,
+                rel_path=image_item.rel_path,
                 coll_name=image_item.coll_name,
                 fav=image_item.fav,
                 f_mod=image_item.f_mod
@@ -549,7 +549,7 @@ class Grid(VScrollArea):
             thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
 
             if pixmap is None:
-                print(image_item.rel_img_path)
+                print(image_item.rel_path)
 
             return thumbnail
 
@@ -656,9 +656,9 @@ class Grid(VScrollArea):
             self.selected_widgets.append(wid)
             wid.set_frame()
                 
-    def set_thumb_fav(self, rel_img_path: str, value: int):
-        if rel_img_path in self.path_to_wid:
-            wid = self.path_to_wid.get(rel_img_path)
+    def set_thumb_fav(self, rel_path: str, value: int):
+        if rel_path in self.path_to_wid:
+            wid = self.path_to_wid.get(rel_path)
             wid.set_fav(value)
 
     def keyPressEvent(self, event: QKeyEvent | None) -> None:
@@ -672,13 +672,13 @@ class Grid(VScrollArea):
 
         def remove_files():
             self.remove_files.emit(
-                [i.rel_img_path for i in self.selected_widgets]
+                [i.rel_path for i in self.selected_widgets]
             )
 
         def open_info():
             """Открывает окно информации для выбранных виджетов."""
             if self.selected_widgets:
-                self.open_info_win.emit([i.rel_img_path for i in self.selected_widgets])
+                self.open_info_win.emit([i.rel_path for i in self.selected_widgets])
 
         def select_all():
             """Выделяет все виджеты в сетке."""
@@ -745,11 +745,11 @@ class Grid(VScrollArea):
             select_all()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
             self.copy_files.emit(
-                (ClipBoardItem.type_copy, [i.rel_img_path for i in self.selected_widgets])
+                (ClipBoardItem.type_copy, [i.rel_path for i in self.selected_widgets])
             )
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_X:
             self.copy_files.emit(
-                (ClipBoardItem.type_cut, [i.rel_img_path for i in self.selected_widgets])
+                (ClipBoardItem.type_cut, [i.rel_path for i in self.selected_widgets])
             )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             open_last_selected()
@@ -888,7 +888,7 @@ class Grid(VScrollArea):
                 self.clear_selected_widgets()
                 self.wid_to_selected_widgets(clicked)
 
-            rel_paths = [w.rel_img_path for w in self.selected_widgets]
+            rel_paths = [w.rel_path for w in self.selected_widgets]
 
             # просмотр
             act = OpenInView(self.menu_)
@@ -916,7 +916,7 @@ class Grid(VScrollArea):
             # избранное
             if len(rel_paths) == 1:
                 fav = SetFav(self.menu_, clicked.fav_value)
-                fav.triggered.connect(lambda: self.set_fav.emit((clicked.rel_img_path, not clicked.fav_value)))
+                fav.triggered.connect(lambda: self.set_fav.emit((clicked.rel_path, not clicked.fav_value)))
                 self.menu_.addAction(fav)
 
             # инфо
@@ -1046,14 +1046,14 @@ class Grid(VScrollArea):
 
             # собираем пути выбранных изображений
             main_folder_path = MainFolder.current.get_curr_path()
-            img_paths = []
+            paths = []
             if main_folder_path:
-                img_paths = [
-                    MainUtils.get_abs_path(main_folder_path, wid.rel_img_path)
+                paths = [
+                    MainUtils.get_abs_path(main_folder_path, wid.rel_path)
                     for wid in self.selected_widgets
                 ]
 
-            if not img_paths:
+            if not paths:
                 return self.no_connection.emit()
 
             # создаём объект перетаскивания
@@ -1066,7 +1066,7 @@ class Grid(VScrollArea):
             drag.setPixmap(drag_icon)
 
             # назначаем urls
-            mime_data.setUrls([QUrl.fromLocalFile(p) for p in img_paths])
+            mime_data.setUrls([QUrl.fromLocalFile(p) for p in paths])
             drag.exec_(Qt.DropAction.CopyAction)
 
         # --- Основная логика ---

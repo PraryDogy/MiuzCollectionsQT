@@ -25,7 +25,7 @@ class FinderImages(QObject):
         Сигналы: progress_text(str)     
 
         Возвращает все изображения, найденные в MainFolder    
-        [(img_path, size, birth_time, mod_time), ...]   
+        [(path, size, birth_time, mod_time), ...]   
         Если не найдено ни одного изображения, вернет None и установит
         TaskState.should_run на False
 
@@ -69,7 +69,7 @@ class FinderImages(QObject):
         Обрабатывает переданные директории и собирает информацию об изображениях.
 
         Возвращает список кортежей с данными файлов:
-        [(img_path, size, birth_time, mod_time), ...]
+        [(path, size, birth_time, mod_time), ...]
 
         - Все подпапки (кроме последней) сканируются рекурсивно.
         - Последняя папка (корневая) сканируется только на наличие изображений в ней самой.
@@ -178,12 +178,12 @@ class DbImages(QObject):
         main_folder_path = self.main_folder.curr_path
         return {
             rel_thumb_path: (
-                MainUtils.get_abs_path(main_folder_path, rel_img_path),
+                MainUtils.get_abs_path(main_folder_path, rel_path),
                 size,
                 birth,
                 mod
             )
-            for rel_thumb_path, rel_img_path, size, birth, mod in res
+            for rel_thumb_path, rel_path, size, birth, mod in res
         }
 
 
@@ -195,12 +195,12 @@ class Compator:
         new_items: есть в FinderImages и нет в DbImages
 
         Принимает:      
-        finder_images: [(img_path, size, birth_time, mod_time), ...]    
+        finder_images: [(path, size, birth_time, mod_time), ...]    
         db_images:  {rel thumb path: (img path, size, birth time, mod time), ...}
 
         Возвращает:
         del_items: [rel thumb path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]
+        new_items: [(path, size, birth, mod), ...]
         """
         super().__init__()
         self.finder_images = finder_images
@@ -255,12 +255,12 @@ class HashdirUpdater(QObject):
         
         Принимает:  
         del_items: [rel_thumb_path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]  
+        new_items: [(path, size, birth, mod), ...]  
 
 
         Возвращает:     
         del_items: [rel_thumb_path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]  
+        new_items: [(path, size, birth, mod), ...]  
         """
         super().__init__()
         self.del_items = del_items
@@ -272,7 +272,7 @@ class HashdirUpdater(QObject):
         """
         Возвращает:     
         del_items: [rel_thumb_path, ...]    
-        new_items: [(img_path, size, birth, mod), ...]  
+        new_items: [(path, size, birth, mod), ...]  
         """
         if not self.task_state.should_run():
             return ([], [])
@@ -311,8 +311,8 @@ class HashdirUpdater(QObject):
                     continue
         return new_del_items
 
-    def create_thumb(self, img_path: str) -> ndarray | None:
-        img = ReadImage.read_image(img_path)
+    def create_thumb(self, path: str) -> ndarray | None:
+        img = ReadImage.read_image(path)
         thumb = MainUtils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
         del img
         gc.collect()
@@ -324,15 +324,15 @@ class HashdirUpdater(QObject):
     def run_new_items(self):
         new_new_items = []
         total = len(self.new_items)
-        for x, (img_path, size, birth, mod) in enumerate(self.new_items, start=1):
+        for x, (path, size, birth, mod) in enumerate(self.new_items, start=1):
             if not self.task_state.should_run():
                 break
             self.progressbar_text(Lng.adding[Cfg.lng], x, total)
             try:
-                thumb = self.create_thumb(img_path)
-                thumb_path = MainUtils.create_abs_hash(img_path)
+                thumb = self.create_thumb(path)
+                thumb_path = MainUtils.create_abs_hash(path)
                 MainUtils.write_thumb(thumb_path, thumb)
-                new_new_items.append((img_path, size, birth, mod))
+                new_new_items.append((path, size, birth, mod))
             except Exception as e:
                 MainUtils.print_error()
                 continue
@@ -350,7 +350,7 @@ class DbUpdater(QObject):
 
         Принимает:  
         - del_items: [rel_thumb_path, ...]       
-        - new_items: [(img_path, size, birth, mod), ...]          
+        - new_items: [(path, size, birth, mod), ...]          
         """
         super().__init__()
         self.main_folder = main_folder
@@ -390,15 +390,15 @@ class DbUpdater(QObject):
 
     def run_new_items(self):
         conn = Dbase.engine.connect()
-        for img_path, size, birth, mod in self.new_items:
-            small_img_path = MainUtils.create_abs_hash(img_path)
-            short_img_path = MainUtils.get_rel_path(self.main_folder.curr_path, img_path)
-            rel_thumb_path = MainUtils.get_rel_hash(small_img_path)
+        for path, size, birth, mod in self.new_items:
+            small_path = MainUtils.create_abs_hash(path)
+            short_path = MainUtils.get_rel_path(self.main_folder.curr_path, path)
+            rel_thumb_path = MainUtils.get_rel_hash(small_path)
 
-            coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, img_path)
+            coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, path)
 
             values = {
-                ClmNames.SHORT_SRC: short_img_path,
+                ClmNames.SHORT_SRC: short_path,
                 ClmNames.SHORT_HASH: rel_thumb_path,
                 ClmNames.SIZE: size,
                 ClmNames.BIRTH: birth,
