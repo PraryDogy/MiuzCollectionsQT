@@ -10,8 +10,8 @@ from .utils import MainUtils
 class MainFolder:
     current: "MainFolder" = None
     list_: list["MainFolder"] = []
-    json_file = os.path.join(Static.APP_SUPPORT_DIR, "main_folders.json")
-    json_file_backup = os.path.join(Static.APP_SUPPORT_DIR, "main_folders_backup.json")
+    json_file = os.path.join(Static.APP_SUPPORT_DIR, "mf.json")
+    json_file_backup = os.path.join(Static.APP_SUPPORT_DIR, "mf_backup.json")
     __slots__ = [
         "name",
         "paths",
@@ -83,7 +83,7 @@ class MainFolder:
     @classmethod
     def init(cls):
         if not os.path.exists(cls.json_file):
-            cls.list_ = cls.get_default_main_folders()
+            cls.list_ = cls.get_default_mfs()
             cls.current = cls.list_[0]
             return
         
@@ -91,24 +91,24 @@ class MainFolder:
             with open(cls.json_file, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
             if not isinstance(data, list):
-                cls.list_ = cls.get_default_main_folders()
+                cls.list_ = cls.get_default_mfs()
                 cls.current = cls.list_[0]
             else:
-                for main_folder in data:
-                    if main_folder["paths"]:
-                        item = MainFolder(**main_folder)
+                for mf in data:
+                    if mf["paths"]:
+                        item = MainFolder(**mf)
                         cls.list_.append(item)
                     else:
                         print("папка не имеет путей")
             if len(cls.list_) == 0:
-                cls.list_ = cls.get_default_main_folders()
+                cls.list_ = cls.get_default_mfs()
 
             cls.current = cls.list_[0]
 
         except Exception as e:
             MainUtils.print_error()
             cls.backup_corruped_file()
-            cls.list_ = cls.get_default_main_folders()
+            cls.list_ = cls.get_default_mfs()
             cls.current = cls.list_[0]
 
     @classmethod
@@ -122,7 +122,7 @@ class MainFolder:
         shutil.copy2(cls.json_file, cls.json_file_backup)
 
     @classmethod
-    def get_default_main_folders(cls) -> list["MainFolder"]:
+    def get_default_mfs(cls) -> list["MainFolder"]:
         miuz = MainFolder(
             "miuz",
             [

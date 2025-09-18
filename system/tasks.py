@@ -604,13 +604,13 @@ class MainFolderDataCleaner(URunnable):
     Сбрасывает данные в БД для пересканирования:
     
     - Удаляет записи из THUMBS, если файл миниатюры отсутствует.
-    - Удаляет запись о папке `main_folder` из DIRS.
+    - Удаляет запись о папке `mf` из DIRS.
     """
 
-    def __init__(self, main_folder_name: str):
+    def __init__(self, mf_name: str):
         super().__init__()
         self.sigs = MainFolderDataCleaner.Sigs()
-        self.main_folder_name = main_folder_name
+        self.mf_name = mf_name
         self.conn = Dbase.engine.connect()
 
     def task(self):
@@ -633,7 +633,7 @@ class MainFolderDataCleaner(URunnable):
         self.conn.commit()
 
         # Удаляем папку
-        stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand == self.main_folder_name)
+        stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand == self.mf_name)
         self.conn.execute(stmt)
         self.conn.commit()
 
@@ -643,9 +643,9 @@ class LoadDbMenu(URunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal()
 
-    def __init__(self, main_folder: MainFolder):
+    def __init__(self, mf: MainFolder):
         super().__init__()
-        self.main_folder = main_folder
+        self.mf = mf
         self.sigs = LoadDbMenu.Sigs()
         self.conn = Dbase.engine.connect()
 

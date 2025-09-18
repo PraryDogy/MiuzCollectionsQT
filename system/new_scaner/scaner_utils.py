@@ -42,25 +42,25 @@ class RemovedMainFolderCleaner:
 
     def _run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
-        db_main_folders = self.conn.execute(q).scalars().all()
-        app_main_folders = [i.name for i in MainFolder.list_]
-        del_main_folders = [
+        db_mfs = self.conn.execute(q).scalars().all()
+        app_mfs = [i.name for i in MainFolder.list_]
+        del_mfs = [
             i
-            for i in db_main_folders
-            if i not in app_main_folders and i is not None
+            for i in db_mfs
+            if i not in app_mfs and i is not None
         ]
-        if del_main_folders:
-            for i in del_main_folders:
+        if del_mfs:
+            for i in del_mfs:
                 rows = self.get_rows(i)
                 self.remove_images(rows)
                 self.remove_rows(rows)
             self.remove_dirs()
         self.conn.close()
-        return del_main_folders
+        return del_mfs
         
-    def get_rows(self, main_folder_name: str):
+    def get_rows(self, mf_name: str):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash).where(
-            THUMBS.c.brand == main_folder_name
+            THUMBS.c.brand == mf_name
         )
         return [
             (id_, MainUtils.get_abs_hash(rel_thumb_path))
@@ -107,16 +107,16 @@ class RemovedMainFolderCleaner:
 class DirsLoader(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, main_folder: MainFolder, task_state: TaskState):
+    def __init__(self, mf: MainFolder, task_state: TaskState):
         super().__init__()
-        self.main_folder = main_folder
-        self.main_folder_path = main_folder.curr_path
+        self.mf = mf
+        self.mf_path = mf.curr_path
         self.task_state = task_state
-        if main_folder.curr_path:
-            self.true_name = os.path.basename(main_folder.curr_path)
+        if mf.curr_path:
+            self.true_name = os.path.basename(mf.curr_path)
         else:
-            self.true_name = os.path.basename(main_folder.paths[0])
-        self.alias = main_folder.name
+            self.true_name = os.path.basename(mf.paths[0])
+        self.alias = mf.name
 
     def finder_dirs(self) -> list[tuple]:
         """
@@ -124,16 +124,16 @@ class DirsLoader(QObject):
         - [(rel_dir_path, mod_time), ...]
         """
         dirs = []
-        stack = [self.main_folder_path]
+        stack = [self.mf_path]
         
         self.progress_text.emit(
             f"{self.true_name} ({self.alias}): {Lng.search_in[Cfg.lng].lower()}"
         )
 
         def iter_dir(entry: os.DirEntry):
-            if entry.is_dir() and entry.name not in self.main_folder.stop_list:
+            if entry.is_dir() and entry.name not in self.mf.stop_list:
                 stack.append(entry.path)
-                rel_path = MainUtils.get_rel_path(self.main_folder_path, entry.path)
+                rel_path = MainUtils.get_rel_path(self.mf_path, entry.path)
                 stats = entry.stat()
                 mod = int(stats.st_mtime)
                 dirs.append((rel_path, mod))
@@ -151,7 +151,7 @@ class DirsLoader(QObject):
                         self.task_state.set_should_run(False)
 
         try:
-            stats = os.stat(self.main_folder_path)
+            stats = os.stat(self.mf_path)
             data = (os.sep, int(stats.st_mtime))
             dirs.append(data)
         except Exception as e:
@@ -165,7 +165,7 @@ class DirsLoader(QObject):
         """
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
-            DIRS.c.brand == self.main_folder.name
+            DIRS.c.brand == self.mf.name
         )
         res = [(short_src, mod) for short_src, mod in conn.execute(q)]
         conn.close()
@@ -208,12 +208,12 @@ class DirsCompator:
 
 
 class DirsUpdater:
-    def __init__(self, main_folder: MainFolder, dirs_to_scan: list[str]):
+    def __init__(self, mf: MainFolder, dirs_to_scan: list[str]):
         """
         - dirs_to_scan: [(rel_dir_path, mod_time), ...]
         """
         super().__init__()
-        self.main_folder = main_folder
+        self.mf = mf
         self.dirs_to_scan = dirs_to_scan
         self.conn = Dbase.engine.connect()
         
@@ -227,7 +227,7 @@ class DirsUpdater:
         if short_paths:
             del_stmt = sqlalchemy.delete(DIRS).where(
                 DIRS.c.short_src.in_(short_paths),
-                DIRS.c.brand == self.main_folder.name
+                DIRS.c.brand == self.mf.name
             )
             self.conn.execute(del_stmt)
 
@@ -236,7 +236,7 @@ class DirsUpdater:
             {
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.MOD: mod,
-                ClmNames.BRAND: self.main_folder.name
+                ClmNames.BRAND: self.mf.name
             }
             for short_src, mod in self.dirs_to_scan
         ]
@@ -249,20 +249,20 @@ class DirsUpdater:
 class ImgLoader(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, dirs_to_scan: list[str, int], main_folder: MainFolder, task_state: TaskState):
+    def __init__(self, dirs_to_scan: list[str, int], mf: MainFolder, task_state: TaskState):
         """
         dirs_to_scan: [(rel dir path, int modified time), ...]
         """
         super().__init__()
         self.dirs_to_scan = dirs_to_scan
-        self.main_folder = main_folder
-        self.main_folder_path = main_folder.curr_path
+        self.mf = mf
+        self.mf_path = mf.curr_path
         self.task_state = task_state
-        if main_folder.curr_path:
-            self.true_name = os.path.basename(main_folder.curr_path)
+        if mf.curr_path:
+            self.true_name = os.path.basename(mf.curr_path)
         else:
-            self.true_name = os.path.basename(main_folder.paths[0])
-        self.alias = main_folder.name
+            self.true_name = os.path.basename(mf.paths[0])
+        self.alias = mf.name
 
     def finder_images(self) -> list[tuple]:
         """
@@ -287,7 +287,7 @@ class ImgLoader(QObject):
             finder_images.append((abs_path, size, birth, mod))
 
         for rel_dir_path, mod in self.dirs_to_scan:
-            abs_dir_path = MainUtils.get_abs_path(self.main_folder_path, rel_dir_path)
+            abs_dir_path = MainUtils.get_abs_path(self.mf_path, rel_dir_path)
             for entry in os.scandir(abs_dir_path):
                 if not self.task_state.should_run():
                     return []
@@ -318,7 +318,7 @@ class ImgLoader(QObject):
                 THUMBS.c.birth,
                 THUMBS.c.mod
                 )
-            q = q.where(THUMBS.c.brand == self.main_folder.name)
+            q = q.where(THUMBS.c.brand == self.mf.name)
             if rel_dir_path == "/":
                 q = q.where(THUMBS.c.short_src.ilike("/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"/%/%"))
@@ -326,7 +326,7 @@ class ImgLoader(QObject):
                 q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
-                abs_path = MainUtils.get_abs_path(self.main_folder_path, rel_path)
+                abs_path = MainUtils.get_abs_path(self.mf_path, rel_path)
                 db_images[rel_thumb_path] = (abs_path, size, birth, mod)
         conn.close()
         return db_images
@@ -360,7 +360,7 @@ class _ImgCompator:
 
 class _ImgHashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
-    def __init__(self, del_items: list, new_items: list, task_state: TaskState, main_folder: MainFolder):
+    def __init__(self, del_items: list, new_items: list, task_state: TaskState, mf: MainFolder):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
         Запуск: run()   
@@ -379,13 +379,13 @@ class _ImgHashdirUpdater(QObject):
         self.del_items = del_items
         self.new_items = new_items
         self.task_state = task_state
-        self.main_folder = main_folder
+        self.mf = mf
         self.total = len(new_items) + len(del_items)
-        if main_folder.curr_path:
-            self.true_name = os.path.basename(main_folder.curr_path)
+        if mf.curr_path:
+            self.true_name = os.path.basename(mf.curr_path)
         else:
-            self.true_name = os.path.basename(main_folder.paths[0])
-        self.alias = main_folder.name
+            self.true_name = os.path.basename(mf.paths[0])
+        self.alias = mf.name
 
     def run(self) -> tuple[list, list]:
         """
@@ -453,7 +453,7 @@ class _ImgHashdirUpdater(QObject):
 
 
 class _ImgDbUpdater:
-    def __init__(self, del_images: list, new_images: list, main_folder: MainFolder):
+    def __init__(self, del_images: list, new_images: list, mf: MainFolder):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
@@ -463,7 +463,7 @@ class _ImgDbUpdater:
         - new_items: [(path, size, birth, mod), ...]          
         """
         super().__init__()
-        self.main_folder = main_folder
+        self.mf = mf
         self.del_images = del_images
         self.new_images = new_images
         self.conn = Dbase.engine.connect()
@@ -477,19 +477,19 @@ class _ImgDbUpdater:
         if self.del_images:
             q = sqlalchemy.delete(THUMBS).where(
                 THUMBS.c.short_hash.in_(self.del_images),
-                THUMBS.c.brand == self.main_folder.name
+                THUMBS.c.brand == self.mf.name
             )
             self.conn.execute(q)
             self.conn.commit()
 
     def del_dublicates(self):
         short_paths = [
-            MainUtils.get_rel_path(self.main_folder.curr_path, path)
+            MainUtils.get_rel_path(self.mf.curr_path, path)
             for path, size, birth, mod in self.new_images
         ]
         q = sqlalchemy.delete(THUMBS).where(
             THUMBS.c.short_src.in_(short_paths),
-            THUMBS.c.brand == self.main_folder.name
+            THUMBS.c.brand == self.mf.name
         )
         self.conn.execute(q)
         self.conn.commit()
@@ -499,8 +499,8 @@ class _ImgDbUpdater:
         for path, size, birth, mod in self.new_images:
             abs_hash = MainUtils.create_abs_hash(path)
             short_hash = MainUtils.get_rel_hash(abs_hash)
-            short_src = MainUtils.get_rel_path(self.main_folder.curr_path, path)
-            coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, path)
+            short_src = MainUtils.get_rel_path(self.mf.curr_path, path)
+            coll_name = MainUtils.get_coll_name(self.mf.curr_path, path)
             values_list.append({
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.SHORT_HASH: short_hash,
@@ -510,7 +510,7 @@ class _ImgDbUpdater:
                 ClmNames.RESOL: "",
                 ClmNames.COLL: coll_name,
                 ClmNames.FAV: 0,
-                ClmNames.BRAND: self.main_folder.name
+                ClmNames.BRAND: self.mf.name
             })
         self.conn.execute(sqlalchemy.insert(THUMBS), values_list)
         self.conn.commit()
@@ -520,22 +520,22 @@ class NewDirsHandler(QObject):
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
    
-    def __init__(self, dirs_to_scan: list[str], main_folder: MainFolder, task_state: TaskState):
+    def __init__(self, dirs_to_scan: list[str], mf: MainFolder, task_state: TaskState):
         """
         dirs_to_scan: [(rel dir path, int modified time), ...]
         """
         super().__init__()
         self.dirs_to_scan = dirs_to_scan
-        self.main_folder = main_folder
+        self.mf = mf
         self.task_state = task_state
     
     def run(self):
-        img_loader = ImgLoader(self.dirs_to_scan, self.main_folder, self.task_state)
+        img_loader = ImgLoader(self.dirs_to_scan, self.mf, self.task_state)
         img_loader.progress_text.connect(self.progress_text.emit)
         finder_images = img_loader.finder_images()
         db_images = img_loader.db_images()
         if not self.task_state.should_run():
-            print(self.main_folder.name, "new scaner utils, ScanDirs, img_loader, сканирование прервано task state")
+            print(self.mf.name, "new scaner utils, ScanDirs, img_loader, сканирование прервано task state")
             return
 
         # сравниваем Finder и БД изображения
@@ -543,19 +543,19 @@ class NewDirsHandler(QObject):
         del_images, new_images = img_compator.run()
         
         # создаем / обновляем изображения в hashdir
-        hashdir_updater = _ImgHashdirUpdater(del_images, new_images, self.task_state, self.main_folder)
+        hashdir_updater = _ImgHashdirUpdater(del_images, new_images, self.task_state, self.mf)
         hashdir_updater.progress_text.connect(self.progress_text.emit)
         del_images, new_images = hashdir_updater.run()
 
         if not self.task_state.should_run():
-            print(self.main_folder.name, "new scaner utils, ScanDirs, db updater, сканирование прервано task state")
+            print(self.mf.name, "new scaner utils, ScanDirs, db updater, сканирование прервано task state")
             return
 
         # обновляем БД
-        db_updater = _ImgDbUpdater(del_images, new_images, self.main_folder)
+        db_updater = _ImgDbUpdater(del_images, new_images, self.mf)
         db_updater.run()
 
-        dirs_updater = DirsUpdater(self.main_folder, self.dirs_to_scan)
+        dirs_updater = DirsUpdater(self.mf, self.dirs_to_scan)
         dirs_updater.run()
 
         self.progress_text.emit("")
@@ -567,13 +567,13 @@ class NewDirsHandler(QObject):
     
 
 class RemovedDirsHandler(QObject):
-    def __init__(self, dirs_to_del: list, main_folder: MainFolder):
+    def __init__(self, dirs_to_del: list, mf: MainFolder):
         """
         dirs_to_del: [(rel dir path, int modified time), ...]
         """
         super().__init__()
         self.dirs_to_del = dirs_to_del
-        self.main_folder = main_folder
+        self.mf = mf
         self.conn = Dbase.engine.connect()
 
     def run(self):
@@ -588,7 +588,7 @@ class RemovedDirsHandler(QObject):
                 sqlalchemy.select(THUMBS.c.short_hash)
                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
                 .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-                .where(THUMBS.c.brand == self.main_folder.name)
+                .where(THUMBS.c.brand == self.mf.name)
             )
             for short_hash in self.conn.execute(stmt).scalars():
                 try:
@@ -600,7 +600,7 @@ class RemovedDirsHandler(QObject):
                 sqlalchemy.delete(THUMBS)
                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
                 .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-                .where(THUMBS.c.brand == self.main_folder.name)
+                .where(THUMBS.c.brand == self.mf.name)
             )
             self.conn.execute(del_stmt)
 
@@ -608,7 +608,7 @@ class RemovedDirsHandler(QObject):
             stmt = (
                 sqlalchemy.delete(DIRS)
                 .where(DIRS.c.short_src == rel_dir)
-                .where(DIRS.c.brand == self.main_folder.name)
+                .where(DIRS.c.brand == self.mf.name)
             )
             self.conn.execute(stmt)
 

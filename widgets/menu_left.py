@@ -179,13 +179,13 @@ class TreeWid(QTreeWidget):
 class MainFolerListItem(UListWidgetItem):
     def __init__(self, parent, height = 30, text = None):
         super().__init__(parent, height, text)
-        self.main_folder: MainFolder = None
+        self.mf: MainFolder = None
     
 
 class MainFolderList(VListWidget):
-    open_main_folder = pyqtSignal(MainFolder)
+    open_mf = pyqtSignal(MainFolder)
     no_connection = pyqtSignal(MainFolder)
-    setup_main_folder = pyqtSignal(MainFolder)
+    setup_mf = pyqtSignal(MainFolder)
     setup_new_folder = pyqtSignal()
     update_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
@@ -200,35 +200,35 @@ class MainFolderList(VListWidget):
                 true_name = os.path.basename(i.paths[0])
             text = f"{true_name} ({i.name})"
             item = MainFolerListItem(parent=self, text=text)
-            item.main_folder = i
+            item.mf = i
             item.setToolTip(i.name + "\n" + i.curr_path)
             self.addItem(item)
 
-        self._last_main_folder = MainFolder.list_[0]
+        self._last_mf = MainFolder.list_[0]
         self.setCurrentRow(0)
 
     @staticmethod
     def with_conn(fn):
         def wrapper(self, item: MainFolerListItem):
             assert isinstance(self, MainFolderList)
-            main_folder = item.main_folder
-            path = main_folder.get_curr_path()
+            mf = item.mf
+            path = mf.get_curr_path()
             if path:
-                return fn(self, item, path, main_folder)
+                return fn(self, item, path, mf)
             else:
-                self.no_connection.emit(main_folder)
+                self.no_connection.emit(mf)
         return wrapper
 
     @with_conn
-    def view_cmd(self, item, path, main_folder):
-        self.open_main_folder.emit(main_folder)
+    def view_cmd(self, item, path, mf):
+        self.open_mf.emit(mf)
 
     @with_conn
-    def update_grid_cmd(self, item, path, main_folder):
+    def update_grid_cmd(self, item, path, mf):
         self.update_grid.emit()
 
     @with_conn
-    def reveal_cmd(self, item, path, main_folder):
+    def reveal_cmd(self, item, path, mf):
         subprocess.Popen(["open", path])
 
     def mouseReleaseEvent(self, e):
@@ -238,7 +238,7 @@ class MainFolderList(VListWidget):
 
         if e.button() == Qt.MouseButton.LeftButton:
             self.view_cmd(item)
-            self._last_main_folder = item.main_folder
+            self._last_mf = item.mf
 
         return super().mouseReleaseEvent(e)
 
@@ -261,7 +261,7 @@ class MainFolderList(VListWidget):
             menu.addAction(reveal)
             menu.addSeparator()
             setup = QAction(Lng.setup[Cfg.lng], menu)
-            setup.triggered.connect(lambda: self.setup_main_folder.emit(item.main_folder))
+            setup.triggered.connect(lambda: self.setup_mf.emit(item.mf))
             menu.addAction(setup)
         else:
             new_folder = QAction(Lng.new_folder[Cfg.lng], menu)
@@ -273,7 +273,7 @@ class MainFolderList(VListWidget):
 class MenuLeft(QTabWidget):
     reload_thumbnails = pyqtSignal()
     no_connection = pyqtSignal(MainFolder)
-    setup_main_folder = pyqtSignal(SettingsItem)
+    setup_mf = pyqtSignal(SettingsItem)
     setup_new_folder = pyqtSignal(SettingsItem)
     update_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
@@ -283,14 +283,14 @@ class MenuLeft(QTabWidget):
         self.setAcceptDrops(True)
         self.init_ui()
 
-    def main_folder_clicked(self, main_folder: MainFolder):
-        MainFolder.current = main_folder
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            Dynamic.current_dir = main_folder_path
+    def mf_clicked(self, mf: MainFolder):
+        MainFolder.current = mf
+        mf_path = MainFolder.current.get_curr_path()
+        if mf_path:
+            Dynamic.current_dir = mf_path
             Dynamic.thumbnails_count = 0
-            self.reload_thumbnails_cmd(main_folder_path)
-            self.tree_wid.init_ui(main_folder_path)
+            self.reload_thumbnails_cmd(mf_path)
+            self.tree_wid.init_ui(mf_path)
         else:
             self.no_connection.emit()
         
@@ -303,11 +303,11 @@ class MenuLeft(QTabWidget):
 
     def init_ui(self):
         
-        def edit_main_folder(main_folder: MainFolder):
+        def edit_mf(mf: MainFolder):
             item = SettingsItem()
             item.action_type = item.type_edit_folder
-            item.content = main_folder
-            self.setup_main_folder.emit(item)
+            item.content = mf
+            self.setup_mf.emit(item)
             
         def setup_new_folder():
             item = SettingsItem()
@@ -317,14 +317,14 @@ class MenuLeft(QTabWidget):
         
         self.clear()
 
-        main_folders = MainFolderList(self)
-        main_folders.open_main_folder.connect(self.main_folder_clicked)
-        main_folders.no_connection.connect(self.no_connection.emit)
-        main_folders.setup_main_folder.connect(edit_main_folder)
-        main_folders.setup_new_folder.connect(setup_new_folder)
-        main_folders.update_grid.connect(self.update_grid.emit)
-        main_folders.restart_scaner.connect(self.restart_scaner.emit)
-        self.addTab(main_folders, Lng.folders[Cfg.lng])
+        mfs = MainFolderList(self)
+        mfs.open_mf.connect(self.mf_clicked)
+        mfs.no_connection.connect(self.no_connection.emit)
+        mfs.setup_mf.connect(edit_mf)
+        mfs.setup_new_folder.connect(setup_new_folder)
+        mfs.update_grid.connect(self.update_grid.emit)
+        mfs.restart_scaner.connect(self.restart_scaner.emit)
+        self.addTab(mfs, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
         self.tree_wid.clicked_.connect(self.reload_thumbnails_cmd)
@@ -333,13 +333,13 @@ class MenuLeft(QTabWidget):
         self.tree_wid.restart_scaner.connect(self.restart_scaner.emit)
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
         
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            self.reload_thumbnails_cmd(main_folder_path)
-            self.tree_wid.init_ui(main_folder_path)
+        mf_path = MainFolder.current.get_curr_path()
+        if mf_path:
+            self.reload_thumbnails_cmd(mf_path)
+            self.tree_wid.init_ui(mf_path)
             self.setCurrentIndex(1)
             # без таймера не срабатывает
-            QTimer.singleShot(0, lambda: self.reload_thumbnails_cmd(main_folder_path))
+            QTimer.singleShot(0, lambda: self.reload_thumbnails_cmd(mf_path))
             
     def dragEnterEvent(self, a0):
         a0.accept()
@@ -351,4 +351,4 @@ class MenuLeft(QTabWidget):
                 item = SettingsItem()
                 item.action_type = item.type_new_folder
                 item.content = url
-                self.setup_main_folder.emit(item)                
+                self.setup_mf.emit(item)                

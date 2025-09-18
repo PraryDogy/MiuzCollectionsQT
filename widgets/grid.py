@@ -404,7 +404,7 @@ class Grid(VScrollArea):
     open_in_app = pyqtSignal(tuple)
     paste_files = pyqtSignal()
     copy_files = pyqtSignal(tuple)
-    setup_main_folder = pyqtSignal(SettingsItem)
+    setup_mf = pyqtSignal(SettingsItem)
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -511,7 +511,7 @@ class Grid(VScrollArea):
                         settings = QPushButton(Lng.setup[Cfg.lng])
                         settings.setFixedWidth(110)
                         settings.clicked.connect(
-                            lambda: self.setup_main_folder.emit(create_item())
+                            lambda: self.setup_mf.emit(create_item())
                         )
                         settings_lay.addWidget(settings, alignment=Qt.AlignmentFlag.AlignCenter)
                         break
@@ -1045,11 +1045,11 @@ class Grid(VScrollArea):
                 QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
             # собираем пути выбранных изображений
-            main_folder_path = MainFolder.current.get_curr_path()
+            mf_path = MainFolder.current.get_curr_path()
             paths = []
-            if main_folder_path:
+            if mf_path:
                 paths = [
-                    MainUtils.get_abs_path(main_folder_path, wid.rel_path)
+                    MainUtils.get_abs_path(mf_path, wid.rel_path)
                     for wid in self.selected_widgets
                 ]
 

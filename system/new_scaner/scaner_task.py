@@ -41,7 +41,7 @@ class ScanerTask(URunnable):
         for i in MainFolder.list_:
             if i.get_curr_path():
                 print("scaner started", i.name)
-                self.main_folder_scan(i)
+                self.mf_scan(i)
                 gc.collect()
                 print("scaner finished", i.name)
             else:
@@ -67,35 +67,35 @@ class ScanerTask(URunnable):
     def set_flag(self, value: bool):
         self.reload_gui_flag = value
 
-    def main_folder_scan(self, main_folder: MainFolder):
+    def mf_scan(self, mf: MainFolder):
         try:
-            self._main_folder_scan(main_folder)
+            self._mf_scan(mf)
         except (Exception, AttributeError) as e:
             print("new scaner task, main folder scan error", e)
 
-    def _main_folder_scan(self, main_folder: MainFolder):
-        coll_folder = main_folder.get_curr_path()
+    def _mf_scan(self, mf: MainFolder):
+        coll_folder = mf.get_curr_path()
         if not coll_folder:
-            print(main_folder.name, "coll folder not avaiable")
+            print(mf.name, "coll folder not avaiable")
             return
 
         # удаляем все файлы и данные из бД по удаленному MainFolder
-        main_folder_remover = RemovedMainFolderCleaner()
-        deleted_main_folders = main_folder_remover.run()
-        if deleted_main_folders:
-            print("main folders deleted", deleted_main_folders)
+        mf_remover = RemovedMainFolderCleaner()
+        deleted_mfs = mf_remover.run()
+        if deleted_mfs:
+            print("main folders deleted", deleted_mfs)
         
         empty_remover = EmptyHashdirHandler()
         empty_remover.reload_gui.connect(lambda: self.set_flag(True))
         empty_remover.run()
 
         # собираем Finder директории и директории из БД
-        dirs_loader = DirsLoader(main_folder, self.task_state)
+        dirs_loader = DirsLoader(mf, self.task_state)
         dirs_loader.progress_text.connect(self.sigs.progress_text.emit)
         finder_dirs = dirs_loader.finder_dirs()
         db_dirs = dirs_loader.db_dirs()
         if not finder_dirs or not self.task_state.should_run():
-            print(main_folder.name, "no finder dirs")
+            print(mf.name, "no finder dirs")
             return
 
         # сравниваем кортежи (директория, дата изменения)
@@ -108,14 +108,14 @@ class ScanerTask(URunnable):
         
         # обходим новые директории, добавляем / удаляем изображения
         if new_dirs:
-            scan_dirs = NewDirsHandler(new_dirs, main_folder, self.task_state)
+            scan_dirs = NewDirsHandler(new_dirs, mf, self.task_state)
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
             scan_dirs.reload_gui.connect(lambda: self.set_flag(True))
             scan_dirs.run()
         
         # удаляем удаленные Finder директории
         if removed_dirs:
-            del_handler = RemovedDirsHandler(removed_dirs, main_folder)
+            del_handler = RemovedDirsHandler(removed_dirs, mf)
             del_handler.run()
 
 
@@ -125,7 +125,7 @@ class _CustomScanerSigs(QObject):
 
 
 class CustomScanerTask(URunnable):
-    def __init__(self, main_folder: MainFolder, dirs_to_scan: list[str]):
+    def __init__(self, mf: MainFolder, dirs_to_scan: list[str]):
         """
         Аналог полноценного сканера, но принимает список директорий
         и выполняет сканирование для каждой из них в пределах MainFolder.   
@@ -133,7 +133,7 @@ class CustomScanerTask(URunnable):
         """
         super().__init__()
         self.sigs = _CustomScanerSigs()
-        self.main_folder = main_folder
+        self.mf = mf
         self.dirs_to_scan = dirs_to_scan
         
     def task(self):
@@ -142,11 +142,11 @@ class CustomScanerTask(URunnable):
             for i in self.dirs_to_scan
         )
         dirs_to_scan = [
-            (MainUtils.get_rel_path(self.main_folder.curr_path, abs_path), st_mtime)
+            (MainUtils.get_rel_path(self.mf.curr_path, abs_path), st_mtime)
             for abs_path, st_mtime in dirs_to_scan
         ]
         
-        scan_dirs = NewDirsHandler(dirs_to_scan, self.main_folder, self.task_state)
+        scan_dirs = NewDirsHandler(dirs_to_scan, self.mf, self.task_state)
         scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
         del_images, new_images = scan_dirs.run()
 

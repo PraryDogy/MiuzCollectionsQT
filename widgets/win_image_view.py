@@ -258,9 +258,9 @@ class WinImageView(AppModalWindow):
             t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng]}"
             self.image_label.setText(t)
 
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            self.path = MainUtils.get_abs_path(main_folder_path, self.rel_path)
+        mf_path = MainFolder.current.get_curr_path()
+        if mf_path:
+            self.path = MainUtils.get_abs_path(mf_path, self.rel_path)
             self.load_image()
         else:
             print("img viewer > no smb")

@@ -129,15 +129,15 @@ class MainUtils:
             return None
 
     @classmethod
-    def get_coll_name(cls, main_folder_path: str, path: str) -> str:
-        coll = cls.get_rel_path(main_folder_path, path)
+    def get_coll_name(cls, mf_path: str, path: str) -> str:
+        coll = cls.get_rel_path(mf_path, path)
         coll = coll.strip(os.sep)
         coll = coll.split(os.sep)
 
         if len(coll) > 1:
             return coll[0]
         else:
-            return os.path.basename(main_folder_path.strip(os.sep))
+            return os.path.basename(mf_path.strip(os.sep))
 
     @classmethod
     def copy_text(cls, text: str):
@@ -162,12 +162,12 @@ class MainUtils:
         os.execl(sys.executable, sys.executable, *sys.argv)
         
     @classmethod
-    def get_abs_path(cls, main_folder_path: str, rel_path: str) -> str:
-        return main_folder_path + rel_path
+    def get_abs_path(cls, mf_path: str, rel_path: str) -> str:
+        return mf_path + rel_path
     
     @classmethod
-    def get_rel_path(cls, main_folder_path: str, abs_path: str) -> str:
-        return abs_path.replace(main_folder_path, "")
+    def get_rel_path(cls, mf_path: str, abs_path: str) -> str:
+        return abs_path.replace(mf_path, "")
 
     @classmethod
     def rm_rf(cls, folder_path: str):

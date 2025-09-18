@@ -87,9 +87,9 @@ class WinMain(UMainWindow):
         self.left_menu.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.reload_thumbnails.connect(lambda: self.set_window_title())
         self.left_menu.no_connection.connect(
-            lambda main_folder: self.open_win_smb(self.grid, main_folder)
+            lambda mf: self.open_win_smb(self.grid, mf)
         )
-        self.left_menu.setup_main_folder.connect(self.open_settings)
+        self.left_menu.setup_mf.connect(self.open_settings)
         self.left_menu.setup_new_folder.connect(self.open_settings)
         self.left_menu.update_grid.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.restart_scaner.connect(lambda: self.restart_scaner_task())
@@ -150,7 +150,7 @@ class WinMain(UMainWindow):
         self.grid.copy_files.connect(
             lambda data: self.set_clipboard(self.grid, MainFolder.current, data)
         )
-        self.grid.setup_main_folder.connect(
+        self.grid.setup_mf.connect(
             self.open_settings
         )
         right_lay.addWidget(self.grid)
@@ -191,17 +191,17 @@ class WinMain(UMainWindow):
 
     @staticmethod
     def with_conn(fn):
-        def wrapper(self: "WinMain", parent: QWidget, main_folder: MainFolder, *args, **kwargs):
-            path = main_folder.get_curr_path()
+        def wrapper(self: "WinMain", parent: QWidget, mf: MainFolder, *args, **kwargs):
+            path = mf.get_curr_path()
             if path:
-                return fn(self, parent, main_folder, *args, **kwargs)
+                return fn(self, parent, mf, *args, **kwargs)
             else:
-                self.open_win_smb(parent, main_folder)
+                self.open_win_smb(parent, mf)
         return wrapper
 
-    def open_win_smb(self, parent: QWidget, main_folder: MainFolder):
-        basename = os.path.basename(main_folder.current.paths[0])
-        alias = main_folder.name
+    def open_win_smb(self, parent: QWidget, mf: MainFolder):
+        basename = os.path.basename(mf.current.paths[0])
+        alias = mf.name
         noti = NotifyWid(
             parent,
             f"{basename} ({alias}): {Lng.no_connection_full[Cfg.lng].lower()}",
@@ -214,7 +214,7 @@ class WinMain(UMainWindow):
         if not MainFolder.current.get_curr_path():
             self.wait_timer.start(1000)
         else:
-            self.left_menu.main_folder_clicked(MainFolder.current)
+            self.left_menu.mf_clicked(MainFolder.current)
         print("wait smb connection")
     
     def first_check(self):
@@ -223,10 +223,10 @@ class WinMain(UMainWindow):
             self.wait_timer.start(1000)
 
     @with_conn
-    def save_files(self, parent: QWidget, main_folder: MainFolder, data: tuple):
+    def save_files(self, parent: QWidget, mf: MainFolder, data: tuple):
         dest, rel_paths = data
         abs_files = [
-            MainUtils.get_abs_path(main_folder.curr_path, i)
+            MainUtils.get_abs_path(mf.curr_path, i)
             for i in rel_paths
         ]
         if dest is None:
@@ -241,7 +241,7 @@ class WinMain(UMainWindow):
             UThreadPool.start(task)
 
     @with_conn
-    def open_win_info(self, parent: QWidget, main_folder: MainFolder, rel_paths: list[str]):
+    def open_win_info(self, parent: QWidget, mf: MainFolder, rel_paths: list[str]):
         
         def open_delayed():
             """Отображает окно WinInfo после его инициализации."""
@@ -250,25 +250,25 @@ class WinMain(UMainWindow):
             self.win_info.show()
         
         abs_paths = [
-            MainUtils.get_abs_path(main_folder.curr_path, i)
+            MainUtils.get_abs_path(mf.curr_path, i)
             for i in rel_paths
         ]
         self.win_info = WinInfo(abs_paths)
         self.win_info.finished_.connect(open_delayed)
 
     @with_conn
-    def set_clipboard(self, parent: QWidget, main_folder: MainFolder, data: tuple):
+    def set_clipboard(self, parent: QWidget, mf: MainFolder, data: tuple):
         action_type, rel_paths = data
         if rel_paths:
             abs_paths = [
-                MainUtils.get_abs_path(main_folder.curr_path, i)
+                MainUtils.get_abs_path(mf.curr_path, i)
                 for i in rel_paths
             ]
             self.clipboard_item = ClipBoardItem()
             self.grid.clipboard_item = self.clipboard_item
             self.clipboard_item.action_type = action_type
             self.clipboard_item.files_to_copy = abs_paths
-            self.clipboard_item.source_main_folder = MainFolder.current
+            self.clipboard_item.source_mf = MainFolder.current
             self.clipboard_item.source_dirs = list(set(
                 os.path.dirname(i)
                 for i in abs_paths
@@ -278,19 +278,19 @@ class WinMain(UMainWindow):
                     i.set_transparent_frame(0.5)
 
     @with_conn
-    def open_in_app(self, parent: QWidget, main_folder: MainFolder, data: tuple):
+    def open_in_app(self, parent: QWidget, mf: MainFolder, data: tuple):
         rel_paths, app_path = data
         for i in rel_paths:
-            abs_path = MainUtils.get_abs_path(main_folder.curr_path, i)
+            abs_path = MainUtils.get_abs_path(mf.curr_path, i)
             if app_path:
                 subprocess.Popen(["open", "-a", app_path, abs_path])
             else:
                 subprocess.Popen(["open", abs_path])
 
     @with_conn
-    def reveal_in_finder(self, parent: QWidget, main_folder: MainFolder, rel_paths: list):
+    def reveal_in_finder(self, parent: QWidget, mf: MainFolder, rel_paths: list):
         abs_paths = [
-            MainUtils.get_abs_path(main_folder.curr_path, i)
+            MainUtils.get_abs_path(mf.curr_path, i)
             for i in rel_paths
         ]
         if os.path.isdir(abs_paths[0]):
@@ -299,7 +299,7 @@ class WinMain(UMainWindow):
             MainUtils.reveal_files(abs_paths)
 
     @with_conn
-    def copy_name(self, parent: QWidget, main_folder: MainFolder, rel_paths: list[str]):
+    def copy_name(self, parent: QWidget, mf: MainFolder, rel_paths: list[str]):
         names = [
             os.path.splitext(os.path.basename(i))[0]
             for i in rel_paths
@@ -307,9 +307,9 @@ class WinMain(UMainWindow):
         MainUtils.copy_text("\n".join(names))
 
     @with_conn
-    def copy_path(self, parent: QWidget, main_folder: MainFolder, rel_paths: list[str]):
+    def copy_path(self, parent: QWidget, mf: MainFolder, rel_paths: list[str]):
         abs_paths = [
-            MainUtils.get_abs_path(main_folder.curr_path, i)
+            MainUtils.get_abs_path(mf.curr_path, i)
             for i in rel_paths
         ]
         MainUtils.copy_text("\n".join(abs_paths))
@@ -501,14 +501,14 @@ class WinMain(UMainWindow):
         )
         UThreadPool.start(self.task)
 
-    def reset_data_cmd(self, main_folder: MainFolder):
+    def reset_data_cmd(self, mf: MainFolder):
 
         def fin():
-            if main_folder.curr_path:
-                true_name = os.path.basename(main_folder.curr_path)
+            if mf.curr_path:
+                true_name = os.path.basename(mf.curr_path)
             else:
-                true_name = os.path.basename(main_folder.paths[0])
-            alias = main_folder.name
+                true_name = os.path.basename(mf.paths[0])
+            alias = mf.name
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
                 f"{true_name} ({alias}): {Lng.data_was_reset[Cfg.lng].lower()}"
@@ -517,7 +517,7 @@ class WinMain(UMainWindow):
             self.win_warn.show()
             self.restart_scaner_task()
 
-        self.reset_task = MainFolderDataCleaner(main_folder.name)
+        self.reset_task = MainFolderDataCleaner(mf.name)
         self.reset_task.sigs.finished_.connect(fin)
         UThreadPool.start(self.reset_task)
 
@@ -583,7 +583,7 @@ class WinMain(UMainWindow):
                 return
             if self.clipboard_item.action_type == self.clipboard_item.type_cut:
                 scaner_task = CustomScanerTask(
-                    self.clipboard_item.source_main_folder,
+                    self.clipboard_item.source_mf,
                     self.clipboard_item.source_dirs
                 )
                 scaner_task.sigs.progress_text.connect(
@@ -597,7 +597,7 @@ class WinMain(UMainWindow):
             elif self.clipboard_item.action_type == self.clipboard_item.type_copy:
                 dirs = [self.clipboard_item.target_dir, ]
                 scaner_task = CustomScanerTask(
-                    self.clipboard_item.target_main_folder,
+                    self.clipboard_item.target_mf,
                     dirs
                 )
                 scaner_task.sigs.progress_text.connect(
@@ -637,10 +637,10 @@ class WinMain(UMainWindow):
                 )
             UThreadPool.start(task)
 
-        main_folder_path = MainFolder.current.get_curr_path()
-        abs_current_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+        mf_path = MainFolder.current.get_curr_path()
+        abs_current_dir = MainUtils.get_abs_path(mf_path, Dynamic.current_dir)
         copy_self = abs_current_dir in self.clipboard_item.source_dirs
-        if main_folder_path:
+        if mf_path:
             if copy_self:
                 self.win_warn = WinWarn(
                     Lng.attention[Cfg.lng],
@@ -649,7 +649,7 @@ class WinMain(UMainWindow):
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
             elif self.clipboard_item:
-                self.clipboard_item.target_main_folder = MainFolder.current
+                self.clipboard_item.target_mf = MainFolder.current
                 self.clipboard_item.target_dir = abs_current_dir
                 copy_files()
         else:
@@ -667,10 +667,10 @@ class WinMain(UMainWindow):
             task.sigs.finished_.connect(lambda: fin_remove(dirs_to_scan))
             UThreadPool.start(task)
         
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
+        mf_path = MainFolder.current.get_curr_path()
+        if mf_path:
             abs_paths = [
-                MainUtils.get_abs_path(main_folder_path, i)
+                MainUtils.get_abs_path(mf_path, i)
                 for i in rel_paths
             ]
             dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
@@ -690,13 +690,13 @@ class WinMain(UMainWindow):
             self.open_win_smb(self.grid, MainFolder.current)
     
     def upload_files(self, abs_paths: list):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
+        mf_path = MainFolder.current.get_curr_path()
+        if mf_path:
             self.clipboard_item = ClipBoardItem()
             self.grid.clipboard_item = self.clipboard_item
             self.clipboard_item.action_type = ClipBoardItem.type_copy
-            self.clipboard_item.target_main_folder = MainFolder.current
-            self.clipboard_item.target_dir = MainUtils.get_abs_path(main_folder_path, Dynamic.current_dir)
+            self.clipboard_item.target_mf = MainFolder.current
+            self.clipboard_item.target_dir = MainUtils.get_abs_path(mf_path, Dynamic.current_dir)
             self.clipboard_item.files_to_copy = abs_paths
             self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
             self.paste_files_here()

@@ -423,14 +423,14 @@ class DropableGroupBox(QGroupBox):
     
 
 class MainFolderPaths(DropableGroupBox):
-    def __init__(self, main_folder: MainFolder):
+    def __init__(self, mf: MainFolder):
         super().__init__()
-        self.main_folder = main_folder
+        self.mf = mf
         self.text_changed.connect(self.set_data)
         self.text_edit.setPlaceholderText(Lng.folder_path[Cfg.lng])
 
     def set_data(self, *args):
-        self.main_folder.paths = self.get_data()
+        self.mf.paths = self.get_data()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -445,14 +445,14 @@ class MainFolderPaths(DropableGroupBox):
 
 
 class StopList(DropableGroupBox):
-    def __init__(self, main_folder: MainFolder):
+    def __init__(self, mf: MainFolder):
         super().__init__()
-        self.main_folder = main_folder
+        self.mf = mf
         self.text_changed.connect(self.set_data)
         self.text_edit.setPlaceholderText(Lng.ignore_list[Cfg.lng])
 
     def set_data(self, *args):
-        self.main_folder.stop_list = self.get_data()
+        self.mf.stop_list = self.get_data()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -469,23 +469,23 @@ class StopList(DropableGroupBox):
 class MainFolderAdvanced(QWidget):
     changed = pyqtSignal()
 
-    def __init__(self, main_folder: MainFolder):
+    def __init__(self, mf: MainFolder):
         super().__init__()
         v_lay = UVBoxLayout()
         self.setLayout(v_lay)
 
-        self.paths_wid = MainFolderPaths(main_folder)
+        self.paths_wid = MainFolderPaths(mf)
         self.paths_wid.text_changed.connect(self.changed.emit)
         v_lay.addWidget(self.paths_wid)
         self.paths_wid.top_label.setText(Lng.images_folder_path[Cfg.lng])
-        text_ = "\n".join(i for i in main_folder.paths)
+        text_ = "\n".join(i for i in mf.paths)
         self.paths_wid.text_edit.setPlainText(text_)
 
-        third_row = StopList(main_folder)
+        third_row = StopList(mf)
         third_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(third_row)
         third_row.top_label.setText(Lng.ignore_list_descr[Cfg.lng])
-        text_ = "\n".join(i for i in main_folder.stop_list)
+        text_ = "\n".join(i for i in mf.stop_list)
         third_row.text_edit.setPlainText(text_)
 
 
@@ -494,7 +494,7 @@ class MainFolderSettings(QWidget):
     changed = pyqtSignal()
     reset_data = pyqtSignal(MainFolder)
 
-    def __init__(self, main_folder: MainFolder):
+    def __init__(self, mf: MainFolder):
         super().__init__()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
@@ -511,11 +511,11 @@ class MainFolderSettings(QWidget):
         first_row.setLayout(first_lay)
         name_descr = ULabel(Lng.alias[Cfg.lng] + ":")
         first_lay.addWidget(name_descr)
-        name_label = ULabel(main_folder.name)
+        name_label = ULabel(mf.name)
         first_lay.addWidget(name_label)
 
         # Advanced настройки
-        advanced = MainFolderAdvanced(main_folder)
+        advanced = MainFolderAdvanced(mf)
         advanced.changed.connect(self.changed.emit)
         v_lay.addWidget(advanced)
 
@@ -534,7 +534,7 @@ class MainFolderSettings(QWidget):
         btn_first_row.setLayout(first_row_lay)
 
         reset_btn = QPushButton(Lng.reset[Cfg.lng])
-        reset_btn.clicked.connect(lambda: self.reset_data.emit(main_folder))
+        reset_btn.clicked.connect(lambda: self.reset_data.emit(mf))
         reset_btn.setFixedWidth(100)
         first_row_lay.addWidget(reset_btn)
 
@@ -573,10 +573,10 @@ class MainFolderSettings(QWidget):
 class NewFolder(QWidget):
     new_folder = pyqtSignal(MainFolder)
 
-    def __init__(self, main_folder_list: list[MainFolder]):
+    def __init__(self, mf_list: list[MainFolder]):
         super().__init__()
-        self.main_folder = MainFolder("", [], [])
-        self.main_folder_list = main_folder_list
+        self.mf = MainFolder("", [], [])
+        self.mf_list = mf_list
 
         v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
@@ -595,7 +595,7 @@ class NewFolder(QWidget):
         self.name_label.textChanged.connect(self.name_cmd)
         first_lay.addWidget(self.name_label)
 
-        self.advanced = MainFolderAdvanced(self.main_folder)
+        self.advanced = MainFolderAdvanced(self.mf)
         v_lay.addWidget(self.advanced)
 
         # QGroupBox для кнопки "Сохранить" и описания
@@ -625,24 +625,24 @@ class NewFolder(QWidget):
 
     def name_cmd(self):
         name = self.name_label.text().strip()
-        self.main_folder.name = name
+        self.mf.name = name
 
     def save(self):        
-        if not self.main_folder.name:
+        if not self.mf.name:
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
                 Lng.enter_alias_warning[Cfg.lng]
                 )
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
-        elif any(i.name == self.main_folder.name for i in self.main_folder_list):
+        elif any(i.name == self.mf.name for i in self.mf_list):
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
-                f"{Lng.alias[Cfg.lng]} \"{self.main_folder.name}\" {Lng.already_taken[Cfg.lng].lower()}."
+                f"{Lng.alias[Cfg.lng]} \"{self.mf.name}\" {Lng.already_taken[Cfg.lng].lower()}."
                 )
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
-        elif not self.main_folder.paths:
+        elif not self.mf.paths:
             self.win_warn = WinWarn(
                 Lng.attention[Cfg.lng],
                 Lng.select_folder_path[Cfg.lng]
@@ -650,7 +650,7 @@ class NewFolder(QWidget):
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         else:
-            self.new_folder.emit(self.main_folder)
+            self.new_folder.emit(self.mf)
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -734,7 +734,7 @@ class FiltersWid(QWidget):
 class SettingsListItem(UListWidgetItem):
     def __init__(self, parent, height = 30, text = None):
         super().__init__(parent, height, text)
-        self.main_folder: MainFolder = None
+        self.mf: MainFolder = None
 
 
 class WinSettings(SingleActionWindow):
@@ -745,11 +745,11 @@ class WinSettings(SingleActionWindow):
         super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng])
         self.setFixedSize(700, 550)
-        self.main_folder_list_copy = copy.deepcopy(MainFolder.list_)
+        self.mf_list_copy = copy.deepcopy(MainFolder.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
         self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = [False, ]
-        self.main_folder_items: list[SettingsListItem] = []
+        self.mf_items: list[SettingsListItem] = []
         self.settings_item = settings_item
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -782,9 +782,9 @@ class WinSettings(SingleActionWindow):
             alias = i.name
             text = f"{true_name} ({alias})"
             item = SettingsListItem(self.left_menu, text=text)
-            item.main_folder = i
+            item.mf = i
             self.left_menu.addItem(item)
-            self.main_folder_items.append(item)
+            self.mf_items.append(item)
 
         self.right_wid = QWidget()
         self.right_lay = UVBoxLayout()
@@ -825,8 +825,8 @@ class WinSettings(SingleActionWindow):
                 self.init_right_side(idx)
                 break
         else:
-            for i in self.main_folder_items:
-                if i.main_folder == self.settings_item.content:
+            for i in self.mf_items:
+                if i.mf == self.settings_item.content:
                     index = self.left_menu.row(i)
                     self.left_menu.setCurrentRow(index)
                     self.init_right_side(index)
@@ -842,8 +842,8 @@ class WinSettings(SingleActionWindow):
             self.filters_wid.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
-            self.new_folder = NewFolder(self.main_folder_list_copy)
-            self.new_folder.new_folder.connect(self.add_main_folder)
+            self.new_folder = NewFolder(self.mf_list_copy)
+            self.new_folder.new_folder.connect(self.add_mf)
             self.right_lay.insertWidget(0, self.new_folder)
             if self.settings_item.action_type == self.settings_item.type_general:
                 self.new_folder.preset_new_folder("")
@@ -855,24 +855,24 @@ class WinSettings(SingleActionWindow):
             # Изменения, внесённые в дочернем виджете, будут напрямую
             # применяться к этому объекту в копии списка.
             item: SettingsListItem = self.left_menu.item(index)
-            main_folder = next(
+            mf = next(
                 i
-                for i in self.main_folder_list_copy
-                if i.name == item.main_folder.name
+                for i in self.mf_list_copy
+                if i.name == item.mf.name
             )
-            main_folder_sett = MainFolderSettings(main_folder)
-            main_folder_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
-            main_folder_sett.remove.connect(lambda: self.remove_main_folder(item))
-            main_folder_sett.reset_data.connect(self.reset_data.emit)
-            self.right_lay.insertWidget(0, main_folder_sett)
+            mf_sett = MainFolderSettings(mf)
+            mf_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
+            mf_sett.remove.connect(lambda: self.remove_mf(item))
+            mf_sett.reset_data.connect(self.reset_data.emit)
+            self.right_lay.insertWidget(0, mf_sett)
 
         self.settings_item.action_type = self.settings_item.type_general
 
-    def add_main_folder(self, main_folder: MainFolder):
-        self.main_folder_list_copy.append(main_folder)
-        text = f"{os.path.basename(main_folder.curr_path)} ({main_folder.name})"
+    def add_mf(self, mf: MainFolder):
+        self.mf_list_copy.append(mf)
+        text = f"{os.path.basename(mf.curr_path)} ({mf.name})"
         item = SettingsListItem(self.left_menu, text=text)
-        item.main_folder = main_folder
+        item.mf = mf
         self.left_menu.addItem(item)
         self.left_menu.setCurrentItem(item)
         self.clear_right_side()
@@ -880,12 +880,12 @@ class WinSettings(SingleActionWindow):
         self.init_right_side(index)
         self.ok_btn.setText(Lng.restart[Cfg.lng])
 
-    def remove_main_folder(self, item: SettingsListItem):
+    def remove_mf(self, item: SettingsListItem):
 
         def fin():
-            for i in self.main_folder_list_copy:
-                if i.name == item.main_folder.name:
-                    self.main_folder_list_copy.remove(i)
+            for i in self.mf_list_copy:
+                if i.name == item.mf.name:
+                    self.mf_list_copy.remove(i)
                     self.left_menu.takeItem(self.left_menu.currentRow())
                     self.left_menu.setCurrentRow(0)
                     self.clear_right_side()
@@ -894,7 +894,7 @@ class WinSettings(SingleActionWindow):
                     break
 
         try:
-            if len(self.main_folder_list_copy) == 1:
+            if len(self.mf_list_copy) == 1:
                 self.win_warn = WinWarn(
                     Lng.attention[Cfg.lng],
                     Lng.at_least_one_folder_required[Cfg.lng],
@@ -928,7 +928,7 @@ class WinSettings(SingleActionWindow):
 
         def validate_folders() -> bool:
             """Check that all folders have paths, show warning if not."""
-            for folder in self.main_folder_list_copy:
+            for folder in self.mf_list_copy:
                 if not folder.paths:
                     self.win_warn = WinWarn(
                         Lng.attention[Cfg.lng],
@@ -945,7 +945,7 @@ class WinSettings(SingleActionWindow):
             if self.need_reset[0]:
                 shutil.rmtree(Static.APP_SUPPORT_DIR)
             else:
-                MainFolder.list_ = self.main_folder_list_copy
+                MainFolder.list_ = self.mf_list_copy
                 Filters.filters = self.filters_copy
                 for key, value in vars(self.json_data_copy).items():
                     setattr(Cfg, key, value)

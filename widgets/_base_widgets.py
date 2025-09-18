@@ -402,11 +402,11 @@ class ClipBoardItem:
         self.action_type: str
 
         self.source_dirs: list[str]
-        self.source_main_folder: MainFolder
+        self.source_mf: MainFolder
         self.files_to_copy: list[str]
 
         self.target_dir: str
-        self.target_main_folder: MainFolder
+        self.target_mf: MainFolder
         self.files_copied: list[str]
    
     def set_files_copied(self, files: list[str]):

@@ -19,7 +19,7 @@ from ..utils import MainUtils
 class FinderImages(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, main_folder: MainFolder, task_state: TaskState):
+    def __init__(self, mf: MainFolder, task_state: TaskState):
         """
         Запуск: run()   
         Сигналы: progress_text(str)     
@@ -34,7 +34,7 @@ class FinderImages(QObject):
         Возвращает None
         """
         super().__init__()
-        self.main_folder = main_folder
+        self.mf = mf
         self.task_state = task_state
 
     def run(self) -> list | None:
@@ -58,10 +58,10 @@ class FinderImages(QObject):
         - сам путь MainFolder в конце списка
         """
         collections = []
-        for item in os.scandir(self.main_folder.curr_path):
-            if item.is_dir() and item.name not in self.main_folder.stop_list:
+        for item in os.scandir(self.mf.curr_path):
+            if item.is_dir() and item.name not in self.mf.stop_list:
                 collections.append(item.path)
-        collections.append(self.main_folder.curr_path)
+        collections.append(self.mf.curr_path)
         return collections
 
     def process_subdirs(self, subdirs: list[str]) -> list:
@@ -107,9 +107,9 @@ class FinderImages(QObject):
         Формирует строку для отображения прогресса обработки:
         Пример: "Miuz (MainFolder.name): коллекция 3 из 10"
         """
-        main_folder = self.main_folder.name.capitalize()
+        mf = self.mf.name.capitalize()
         collection_name: str = Lng.folder[Cfg.lng]
-        return f"{main_folder}: {collection_name.lower()} {current} {Lng.from_[Cfg.lng]} {total}"
+        return f"{mf}: {collection_name.lower()} {current} {Lng.from_[Cfg.lng]} {total}"
 
     def walk_subdir(self, subdir: str) -> list[tuple]:
         """
@@ -148,7 +148,7 @@ class FinderImages(QObject):
 class DbImages(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, main_folder: MainFolder):
+    def __init__(self, mf: MainFolder):
         """
         Запуск: run()   
         Сигналы: progress_text(str)     
@@ -157,7 +157,7 @@ class DbImages(QObject):
         {rel thumb path: (img path, size, birth time, mod time), ...}   
         """
         super().__init__()
-        self.main_folder = main_folder
+        self.mf = mf
 
     def run(self) -> dict:
         self.progress_text.emit("")
@@ -170,15 +170,15 @@ class DbImages(QObject):
             THUMBS.c.birth,
             THUMBS.c.mod
             )
-        q = q.where(THUMBS.c.brand == self.main_folder.name)
+        q = q.where(THUMBS.c.brand == self.mf.name)
         # не забываем относительный путь к изображению преобразовать в полный
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
         conn.close()
-        main_folder_path = self.main_folder.curr_path
+        mf_path = self.mf.curr_path
         return {
             rel_thumb_path: (
-                MainUtils.get_abs_path(main_folder_path, rel_path),
+                MainUtils.get_abs_path(mf_path, rel_path),
                 size,
                 birth,
                 mod
@@ -215,7 +215,7 @@ class Compator:
 
 
 class Inspector(QObject):
-    def __init__(self, del_items: list, main_folder: MainFolder):
+    def __init__(self, del_items: list, mf: MainFolder):
         """
         del_items: [rel thumb path, ...]
 
@@ -231,12 +231,12 @@ class Inspector(QObject):
         """
         super().__init__()
         self.del_items = del_items
-        self.main_folder = main_folder
+        self.mf = mf
     
     def is_remove_all(self):
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(sqlalchemy.func.count())
-        q = q.where(THUMBS.c.brand == self.main_folder.name)
+        q = q.where(THUMBS.c.brand == self.mf.name)
         result = conn.execute(q).scalar()
         conn.close()
         if len(self.del_items) == result and len(self.del_items) != 0:
@@ -247,7 +247,7 @@ class Inspector(QObject):
 class HashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder, task_state: TaskState):
+    def __init__(self, del_items: list, new_items: list, mf: MainFolder, task_state: TaskState):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
         Запуск: run()   
@@ -265,7 +265,7 @@ class HashdirUpdater(QObject):
         super().__init__()
         self.del_items = del_items
         self.new_items = new_items
-        self.main_folder = main_folder
+        self.mf = mf
         self.task_state = task_state
 
     def run(self) -> tuple[list, list]:
@@ -287,8 +287,8 @@ class HashdirUpdater(QObject):
         x: item of `enumerate`
         total: `len`
         """
-        main_folder = self.main_folder.name.capitalize()
-        t = f"{main_folder}: {text.lower()} {x} {Lng.from_[Cfg.lng]} {total}"
+        mf = self.mf.name.capitalize()
+        t = f"{mf}: {text.lower()} {x} {Lng.from_[Cfg.lng]} {total}"
         self.progress_text.emit(t)
 
     def run_del_items(self):
@@ -342,7 +342,7 @@ class HashdirUpdater(QObject):
 class DbUpdater(QObject):
     reload_gui = pyqtSignal()
 
-    def __init__(self, del_items: list, new_items: list, main_folder: MainFolder):
+    def __init__(self, del_items: list, new_items: list, mf: MainFolder):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
@@ -353,7 +353,7 @@ class DbUpdater(QObject):
         - new_items: [(path, size, birth, mod), ...]          
         """
         super().__init__()
-        self.main_folder = main_folder
+        self.mf = mf
         self.del_items = del_items
         self.new_items = new_items
 
@@ -366,7 +366,7 @@ class DbUpdater(QObject):
         for rel_thumb_path in self.del_items:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
-            q = q.where(THUMBS.c.brand==self.main_folder.name)
+            q = q.where(THUMBS.c.brand==self.mf.name)
             try:
                 conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
@@ -392,10 +392,10 @@ class DbUpdater(QObject):
         conn = Dbase.engine.connect()
         for path, size, birth, mod in self.new_items:
             small_path = MainUtils.create_abs_hash(path)
-            short_path = MainUtils.get_rel_path(self.main_folder.curr_path, path)
+            short_path = MainUtils.get_rel_path(self.mf.curr_path, path)
             rel_thumb_path = MainUtils.get_rel_hash(small_path)
 
-            coll_name = MainUtils.get_coll_name(self.main_folder.curr_path, path)
+            coll_name = MainUtils.get_coll_name(self.mf.curr_path, path)
 
             values = {
                 ClmNames.SHORT_SRC: short_path,
@@ -406,7 +406,7 @@ class DbUpdater(QObject):
                 ClmNames.RESOL: "",
                 ClmNames.COLL: coll_name,
                 ClmNames.FAV: 0,
-                ClmNames.BRAND: self.main_folder.name
+                ClmNames.BRAND: self.mf.name
             }
             stmt = sqlalchemy.insert(THUMBS).values(**values) 
             try:
@@ -453,18 +453,18 @@ class MainFolderRemover(QObject):
 
     def run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
-        db_main_folders = self.conn.execute(q).scalars().all()
-        app_main_folders = [i.name for i in MainFolder.list_]
-        del_main_folders = [i for i in db_main_folders if i not in app_main_folders]
-        for i in del_main_folders:
+        db_mfs = self.conn.execute(q).scalars().all()
+        app_mfs = [i.name for i in MainFolder.list_]
+        del_mfs = [i for i in db_mfs if i not in app_mfs]
+        for i in del_mfs:
             rows = self.get_rows(i)
             self.remove_images(rows)
             self.remove_rows(rows)
         self.conn.close()
         
-    def get_rows(self, main_folder_name):
+    def get_rows(self, mf_name):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
-        q = q.where(THUMBS.c.brand == main_folder_name)
+        q = q.where(THUMBS.c.brand == mf_name)
         res = self.conn.execute(q).fetchall()
         res = [
             (id_, MainUtils.get_abs_hash(rel_thumb_path))

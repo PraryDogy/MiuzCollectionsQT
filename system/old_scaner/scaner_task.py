@@ -36,7 +36,7 @@ class ScanerTask(URunnable):
         for i in MainFolder.list_:
             if i.get_curr_path():
                 print("scaner started", i.name)
-                self.main_folder_scan(i)
+                self.mf_scan(i)
                 gc.collect()
                 print("scaner finished", i.name)
             else:
@@ -49,7 +49,7 @@ class ScanerTask(URunnable):
         except RuntimeError as e:
             ...
     
-    def main_folder_scan(self, main_folder: MainFolder):
+    def mf_scan(self, mf: MainFolder):
         """
         Выполняет полную синхронизацию содержимого указанной папки MainFolder
         с базой данных и директориями миниатюр (hashdir).
@@ -95,30 +95,30 @@ class ScanerTask(URunnable):
         основываясь на уже обработанных файлах.
         """
 
-        main_folder_remover = MainFolderRemover()
-        main_folder_remover.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
-        main_folder_remover.run()
+        mf_remover = MainFolderRemover()
+        mf_remover.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
+        mf_remover.run()
 
-        finder_images = FinderImages(main_folder, self.task_state)
+        finder_images = FinderImages(mf, self.task_state)
         finder_images.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
         finder_images = finder_images.run()
         if finder_images and self.task_state.should_run():
-            db_images = DbImages(main_folder)
+            db_images = DbImages(mf)
             db_images.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
             db_images = db_images.run()
             compator = Compator(finder_images, db_images)
             del_items, new_items = compator.run()
 
-            inspector = Inspector(del_items, main_folder)
+            inspector = Inspector(del_items, mf)
             is_remove_all = inspector.is_remove_all()
             if is_remove_all:
                 print("scaner > обнаружена попытка массового удаления фотографий")
-                print("в папке:", main_folder.name, main_folder.curr_path)
+                print("в папке:", mf.name, mf.curr_path)
                 return
 
-            file_updater = HashdirUpdater(del_items, new_items, main_folder, self.task_state)
+            file_updater = HashdirUpdater(del_items, new_items, mf, self.task_state)
             file_updater.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
             del_items, new_items = file_updater.run()
-            db_updater = DbUpdater(del_items, new_items, main_folder)
+            db_updater = DbUpdater(del_items, new_items, mf)
             db_updater.reload_gui.connect(lambda: self.sigs.reload_gui.emit())
             db_updater.run()
