@@ -169,8 +169,7 @@ class WinMain(UMainWindow):
 
     @staticmethod
     def with_conn(fn):
-        def wrapper(self, parent: QWidget, main_folder: MainFolder, *args, **kwargs):
-            assert isinstance(self, WinMain)
+        def wrapper(self: WinMain, parent: QWidget, main_folder: MainFolder, *args, **kwargs):
             path = main_folder.get_curr_path()
             if path:
                 return fn(self, parent, main_folder, *args, **kwargs)
