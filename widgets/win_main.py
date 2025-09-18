@@ -189,7 +189,7 @@ class WinMain(UMainWindow):
     def first_check(self):
         if not MainFolder.current.get_curr_path():
             self.open_win_smb(self.grid, MainFolder.current)
-            self.wait_timer.start(10)
+            self.wait_timer.start(1000)
 
     @with_conn
     def save_files(self, parent: QWidget, main_folder: MainFolder, data: tuple):
