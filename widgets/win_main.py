@@ -749,7 +749,7 @@ class WinMain(UMainWindow):
             return
 
         paths: list[str] = [
-            i.toLocalFile()
+            i.toLocalFile().rstrip(os.sep)
             for i in a0.mimeData().urls()
         ]
 

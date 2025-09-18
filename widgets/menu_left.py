@@ -346,7 +346,7 @@ class MenuLeft(QTabWidget):
     
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
-            url = a0.mimeData().urls()[0].toLocalFile().rstrip("/")
+            url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if os.path.isdir(url):
                 item = SettingsItem()
                 item.action_type = item.type_new_folder
