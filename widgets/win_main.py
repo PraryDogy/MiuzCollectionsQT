@@ -243,9 +243,11 @@ class WinMain(UMainWindow):
             self.open_win_smb(self.grid, MainFolder.current)
 
     def open_win_smb(self, parent: QWidget, main_folder: MainFolder):
+        basename = os.path.basename(main_folder.current.paths[0])
+        alias = main_folder.name
         noti = NotifyWid(
             parent,
-            f"{main_folder.name}: {Lng.no_connection_full[Cfg.lng]}",
+            f"{basename} ({alias}): {Lng.no_connection_full[Cfg.lng].lower()}",
             self.warning_svg
             )
         noti._show()
