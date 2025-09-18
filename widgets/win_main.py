@@ -113,29 +113,46 @@ class WinMain(UMainWindow):
         right_lay.addWidget(sep_upper)
 
         self.grid = Grid()
-        self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
-        self.grid.remove_files.connect(lambda rel_img_paths: self.remove_files(rel_img_paths))
+        self.grid.restart_scaner.connect(
+            lambda: self.restart_scaner_task()
+        )
+        self.grid.remove_files.connect(
+            lambda rel_img_paths: self.remove_files(rel_img_paths))
         self.grid.no_connection.connect(
             lambda: self.open_win_smb(self.grid, MainFolder.current)
         )
-        self.grid.open_img_view.connect(lambda: self.open_img_view())
+        self.grid.open_img_view.connect(
+            lambda: self.open_img_view()
+        )
         self.grid.save_files.connect(
             lambda data: self.save_files(self.grid, MainFolder.current, data)
         )
         self.grid.open_info_win.connect(
             lambda rel_paths: self.open_win_info(self.grid, MainFolder.current, rel_paths)
         )
-        self.grid.copy_path.connect(self.copy_path)
-        self.grid.copy_name.connect(self.copy_name)
-        self.grid.reveal_in_finder.connect(self.reveal_in_finder)
-        self.grid.set_fav.connect(self.set_fav)
+        self.grid.copy_path.connect(
+            lambda rel_paths: self.copy_path(self.grid, MainFolder.current, rel_paths)
+        )
+        self.grid.copy_name.connect(
+            lambda rel_paths: self.copy_name(self.grid, MainFolder.current, rel_paths)
+        )
+        self.grid.reveal_in_finder.connect(
+            lambda rel_paths: self.reveal_in_finder(self.grid, MainFolder.current, rel_paths)
+        )
+        self.grid.set_fav.connect(
+            self.set_fav
+        )
         self.grid.open_in_app.connect(
             lambda data: self.open_in_app(self.grid, MainFolder.current, data))
-        self.grid.paste_files.connect(self.paste_files_here)
+        self.grid.paste_files.connect(
+            self.paste_files_here
+        )
         self.grid.copy_files.connect(
             lambda data: self.set_clipboard(self.grid, MainFolder.current, data)
         )
-        self.grid.setup_main_folder.connect(self.open_settings)
+        self.grid.setup_main_folder.connect(
+            self.open_settings
+        )
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -281,27 +298,21 @@ class WinMain(UMainWindow):
         else:
             MainUtils.reveal_files(abs_paths)
 
-    def copy_name(self, rel_img_paths: list[str]):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            names = [
-                os.path.splitext(os.path.basename(i))[0]
-                for i in rel_img_paths
-            ]
-            MainUtils.copy_text("\n".join(names))
-        else:
-            self.open_win_smb(self.grid, MainFolder.current)
+    @with_conn
+    def copy_name(self, parent: QWidget, main_folder: MainFolder, rel_img_paths: list[str]):
+        names = [
+            os.path.splitext(os.path.basename(i))[0]
+            for i in rel_img_paths
+        ]
+        MainUtils.copy_text("\n".join(names))
 
-    def copy_path(self, rel_img_paths: list[str]):
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            abs_paths = [
-                MainUtils.get_abs_path(main_folder_path, i)
-                for i in rel_img_paths
-            ]
-            MainUtils.copy_text("\n".join(abs_paths))
-        else:
-            self.open_win_smb(self.grid, MainFolder.current)
+    @with_conn
+    def copy_path(self, parent: QWidget, main_folder: MainFolder, rel_img_paths: list[str]):
+        abs_paths = [
+            MainUtils.get_abs_path(main_folder.curr_path, i)
+            for i in rel_img_paths
+        ]
+        MainUtils.copy_text("\n".join(abs_paths))
 
     def open_img_view(self):
 
@@ -317,16 +328,24 @@ class WinMain(UMainWindow):
             is_selection = True
         wid = self.grid.selected_widgets[-1]
         self.win_img_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
-        self.win_img_view.closed_.connect(on_closed)
+        self.win_img_view.closed_.connect(
+            lambda: on_closed()
+        )
         self.win_img_view.open_win_info.connect(
             lambda rel_paths: self.open_win_info(self.win_img_view, MainFolder.current, rel_paths)
         )
-        self.win_img_view.copy_path.connect(self.copy_path)
-        self.win_img_view.copy_name.connect(self.copy_name)
+        self.win_img_view.copy_path.connect(
+            lambda rel_paths: self.copy_path(self.win_img_view, MainFolder.current, rel_paths)
+        )
+        self.win_img_view.copy_name.connect(
+            lambda rel_paths: self.copy_name(self.win_img_view, MainFolder.current, rel_paths)
+        )
         self.win_img_view.reveal_in_finder.connect(
             lambda rel_paths: self.reveal_in_finder(self.win_img_view, MainFolder.current, rel_paths)
         )
-        self.win_img_view.set_fav.connect(self.set_fav)
+        self.win_img_view.set_fav.connect(
+            self.set_fav
+        )
         self.win_img_view.save_files.connect(
             lambda data: self.save_files(self.win_img_view, MainFolder.current, data)
         )
