@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QFrame,
 from cfg import Cfg, Static
 from system.filters import Filters
 from system.lang import Lng
-from system.main_folder import MainFolder
+from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.utils import MainUtils
 
@@ -422,8 +422,8 @@ class DropableGroupBox(QGroupBox):
         return super().dragEnterEvent(a0)
     
 
-class MainFolderPaths(DropableGroupBox):
-    def __init__(self, mf: MainFolder):
+class MfPaths(DropableGroupBox):
+    def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
         self.text_changed.connect(self.set_data)
@@ -445,7 +445,7 @@ class MainFolderPaths(DropableGroupBox):
 
 
 class StopList(DropableGroupBox):
-    def __init__(self, mf: MainFolder):
+    def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
         self.text_changed.connect(self.set_data)
@@ -466,15 +466,15 @@ class StopList(DropableGroupBox):
         return super().dropEvent(a0)
 
 
-class MainFolderAdvanced(QWidget):
+class MfAdvanced(QWidget):
     changed = pyqtSignal()
 
-    def __init__(self, mf: MainFolder):
+    def __init__(self, mf: Mf):
         super().__init__()
         v_lay = UVBoxLayout()
         self.setLayout(v_lay)
 
-        self.paths_wid = MainFolderPaths(mf)
+        self.paths_wid = MfPaths(mf)
         self.paths_wid.text_changed.connect(self.changed.emit)
         v_lay.addWidget(self.paths_wid)
         self.paths_wid.top_label.setText(Lng.images_folder_path[Cfg.lng])
@@ -489,12 +489,12 @@ class MainFolderAdvanced(QWidget):
         third_row.text_edit.setPlainText(text_)
 
 
-class MainFolderSettings(QWidget):
+class MfSettings(QWidget):
     remove = pyqtSignal()
     changed = pyqtSignal()
-    reset_data = pyqtSignal(MainFolder)
+    reset_data = pyqtSignal(Mf)
 
-    def __init__(self, mf: MainFolder):
+    def __init__(self, mf: Mf):
         super().__init__()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(5)
@@ -515,7 +515,7 @@ class MainFolderSettings(QWidget):
         first_lay.addWidget(name_label)
 
         # Advanced настройки
-        advanced = MainFolderAdvanced(mf)
+        advanced = MfAdvanced(mf)
         advanced.changed.connect(self.changed.emit)
         v_lay.addWidget(advanced)
 
@@ -571,11 +571,11 @@ class MainFolderSettings(QWidget):
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
 class NewFolder(QWidget):
-    new_folder = pyqtSignal(MainFolder)
+    new_folder = pyqtSignal(Mf)
 
-    def __init__(self, mf_list: list[MainFolder]):
+    def __init__(self, mf_list: list[Mf]):
         super().__init__()
-        self.mf = MainFolder("", [], [])
+        self.mf = Mf("", [], [])
         self.mf_list = mf_list
 
         v_lay = UVBoxLayout()
@@ -595,7 +595,7 @@ class NewFolder(QWidget):
         self.name_label.textChanged.connect(self.name_cmd)
         first_lay.addWidget(self.name_label)
 
-        self.advanced = MainFolderAdvanced(self.mf)
+        self.advanced = MfAdvanced(self.mf)
         v_lay.addWidget(self.advanced)
 
         # QGroupBox для кнопки "Сохранить" и описания
@@ -734,18 +734,18 @@ class FiltersWid(QWidget):
 class SettingsListItem(UListWidgetItem):
     def __init__(self, parent, height = 30, text = None):
         super().__init__(parent, height, text)
-        self.mf: MainFolder = None
+        self.mf: Mf = None
 
 
 class WinSettings(SingleActionWindow):
     closed = pyqtSignal()
-    reset_data = pyqtSignal(MainFolder)
+    reset_data = pyqtSignal(Mf)
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng])
         self.setFixedSize(700, 550)
-        self.mf_list_copy = copy.deepcopy(MainFolder.list_)
+        self.mf_list_copy = copy.deepcopy(Mf.list_)
         self.json_data_copy = copy.deepcopy(Cfg())
         self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = [False, ]
@@ -774,7 +774,7 @@ class WinSettings(SingleActionWindow):
         spacer = UListSpacerItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
-        for i in MainFolder.list_:
+        for i in Mf.list_:
             if i.curr_path:
                 true_name = os.path.basename(i.curr_path)
             else:
@@ -850,8 +850,8 @@ class WinSettings(SingleActionWindow):
             else:
                 self.new_folder.preset_new_folder(self.settings_item.content)
         else:
-            # Находим в копии списка MainFolder объект с нужным псевдонимом,
-            # чтобы передать его в дочерний виджет MainFolderSettings.
+            # Находим в копии списка Mf объект с нужным псевдонимом,
+            # чтобы передать его в дочерний виджет MfSettings.
             # Изменения, внесённые в дочернем виджете, будут напрямую
             # применяться к этому объекту в копии списка.
             item: SettingsListItem = self.left_menu.item(index)
@@ -860,7 +860,7 @@ class WinSettings(SingleActionWindow):
                 for i in self.mf_list_copy
                 if i.name == item.mf.name
             )
-            mf_sett = MainFolderSettings(mf)
+            mf_sett = MfSettings(mf)
             mf_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             mf_sett.remove.connect(lambda: self.remove_mf(item))
             mf_sett.reset_data.connect(self.reset_data.emit)
@@ -868,7 +868,7 @@ class WinSettings(SingleActionWindow):
 
         self.settings_item.action_type = self.settings_item.type_general
 
-    def add_mf(self, mf: MainFolder):
+    def add_mf(self, mf: Mf):
         self.mf_list_copy.append(mf)
         text = f"{os.path.basename(mf.curr_path)} ({mf.name})"
         item = SettingsListItem(self.left_menu, text=text)
@@ -915,7 +915,7 @@ class WinSettings(SingleActionWindow):
             print("win settings > ошибка удаления main folder по кнопке удалить", e)
 
     def clear_right_side(self):
-        wids = (GeneralSettings, MainFolderSettings, NewFolder, FiltersWid)
+        wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
         right_wid.deleteLater()
 
@@ -945,11 +945,11 @@ class WinSettings(SingleActionWindow):
             if self.need_reset[0]:
                 shutil.rmtree(Static.APP_SUPPORT_DIR)
             else:
-                MainFolder.list_ = self.mf_list_copy
+                Mf.list_ = self.mf_list_copy
                 Filters.filters = self.filters_copy
                 for key, value in vars(self.json_data_copy).items():
                     setattr(Cfg, key, value)
-                MainFolder.write_json_data()
+                Mf.write_json_data()
                 Filters.write_json_data()
                 Cfg.write_json_data()
             QApplication.quit()

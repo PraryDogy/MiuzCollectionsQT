@@ -7,9 +7,9 @@ from cfg import Static
 from .utils import MainUtils
 
 
-class MainFolder:
-    current: "MainFolder" = None
-    list_: list["MainFolder"] = []
+class Mf:
+    current: "Mf" = None
+    list_: list["Mf"] = []
     json_file = os.path.join(Static.APP_SUPPORT_DIR, "mf.json")
     json_file_backup = os.path.join(Static.APP_SUPPORT_DIR, "mf_backup.json")
     __slots__ = [
@@ -34,14 +34,14 @@ class MainFolder:
           проверяет наличие путей из `paths` на диске.
         - Может быть передано явно, если известен корректный путь.  
 
-        name (str): Имя MainFolder — произвольное, используется для отображения в интерфейсе.
+        name (str): Имя Mf — произвольное, используется для отображения в интерфейсе.
             Важно: имя нельзя изменить после создания. Чтобы изменить, необходимо
-            удалить текущий MainFolder в настройках и создать новый с другим именем.
+            удалить текущий Mf в настройках и создать новый с другим именем.
 
-        paths (list[str]): Список возможных абсолютных путей к папке MainFolder.
+        paths (list[str]): Список возможных абсолютных путей к папке Mf.
             Все пути указываются вручную пользователем — приложение не ищет их автоматически.
             Используется для определения актуального доступного пути (обычно на сетевом диске).
-            Пример: если папка MainFolder лежит по пути 
+            Пример: если папка Mf лежит по пути 
             /Volumes/Shares/Studio/MIUZ/Photo/Art/Ready, но при следующем подключении
             сетевые диски смонтированы иначе — и этот путь больше не существует —
             приложение попробует альтернативные пути, например:
@@ -49,7 +49,7 @@ class MainFolder:
             /Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready и т.д.
             Это позволяет избежать ошибок при изменении порядка монтирования дисков.
 
-        stop_list (list[str]): Список вложенных папок внутри MainFolder, которые следует игнорировать.
+        stop_list (list[str]): Список вложенных папок внутри Mf, которые следует игнорировать.
             Пример: если в папке лежат "A", "B", "C", и "C" указана в stop_list,
             то она будет исключена из обработки.
 
@@ -64,8 +64,8 @@ class MainFolder:
             
     def get_curr_path(self) -> str | None:
         """
-        Проверяет и устанавливает путь к MainFolder.    
-        Возвращает доступный путь к MainFolder или None
+        Проверяет и устанавливает путь к Mf.    
+        Возвращает доступный путь к Mf или None
         """
         self.curr_path = ""
         for i in self.paths:
@@ -96,7 +96,7 @@ class MainFolder:
             else:
                 for mf in data:
                     if mf["paths"]:
-                        item = MainFolder(**mf)
+                        item = Mf(**mf)
                         cls.list_.append(item)
                     else:
                         print("папка не имеет путей")
@@ -122,8 +122,8 @@ class MainFolder:
         shutil.copy2(cls.json_file, cls.json_file_backup)
 
     @classmethod
-    def get_default_mfs(cls) -> list["MainFolder"]:
-        miuz = MainFolder(
+    def get_default_mfs(cls) -> list["Mf"]:
+        miuz = Mf(
             "miuz",
             [
                 '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
@@ -138,7 +138,7 @@ class MainFolder:
             ""
         )
 
-        panacea = MainFolder(
+        panacea = Mf(
             "panacea",
             [
                 '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready',

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
 
 from cfg import Cfg, Static
 from system.lang import Lng
-from system.main_folder import MainFolder
+from system.main_folder import Mf
 from system.utils import MainUtils
 
 
@@ -391,7 +391,7 @@ class SettingsItem:
 
     def __init__(self):
         self.action_type: str
-        self.content: None | str | MainFolder
+        self.content: None | str | Mf
 
 
 class ClipBoardItem:
@@ -402,11 +402,11 @@ class ClipBoardItem:
         self.action_type: str
 
         self.source_dirs: list[str]
-        self.source_mf: MainFolder
+        self.source_mf: Mf
         self.files_to_copy: list[str]
 
         self.target_dir: str
-        self.target_mf: MainFolder
+        self.target_mf: Mf
         self.files_copied: list[str]
    
     def set_files_copied(self, files: list[str]):

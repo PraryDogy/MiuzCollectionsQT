@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
 
 from cfg import Cfg, Dynamic, Static, ThumbData
 from system.lang import Lng
-from system.main_folder import MainFolder
+from system.main_folder import Mf
 from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import MainUtils
@@ -484,7 +484,7 @@ class Grid(VScrollArea):
         def create_item():
             item = SettingsItem()
             item.action_type = item.type_edit_folder
-            item.content = MainFolder.current
+            item.content = Mf.current
             return item
 
         def load_grid_delayed():
@@ -495,7 +495,7 @@ class Grid(VScrollArea):
             Thumbnail.calculate_size()
             if not db_images:
                 for i in Dynamic.current_dir.split("/"):
-                    if i in MainFolder.current.stop_list:
+                    if i in Mf.current.stop_list:
                         settings_wid = QWidget()
                         settings_lay = UVBoxLayout()
                         settings_lay.setSpacing(15)
@@ -1045,7 +1045,7 @@ class Grid(VScrollArea):
                 QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
             # собираем пути выбранных изображений
-            mf_path = MainFolder.current.get_curr_path()
+            mf_path = Mf.current.get_curr_path()
             paths = []
             if mf_path:
                 paths = [

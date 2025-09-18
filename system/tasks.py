@@ -13,7 +13,7 @@ from cfg import Cfg, Dynamic, Static
 
 from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
-from .main_folder import MainFolder
+from .main_folder import Mf
 from .shared_utils import ReadImage, SharedUtils
 from .utils import MainUtils
 
@@ -186,7 +186,7 @@ class FavManager(URunnable):
             q = (
                 sqlalchemy.update(THUMBS)
                 .where(THUMBS.c.short_src == self.rel_path)
-                .where(THUMBS.c.brand == MainFolder.current.name)
+                .where(THUMBS.c.brand == Mf.current.name)
                 .values(fav=self.value)
             )
             self.conn.execute(q)
@@ -298,7 +298,7 @@ class OneFileInfo(URunnable):
 
     def _gather_info(self) -> dict:
         """Приватный метод: собирает всю информацию о файле."""
-        mail_folder_path = MainFolder.current.get_curr_path()
+        mail_folder_path = Mf.current.get_curr_path()
         name = os.path.basename(self.url)
         _, type_ = os.path.splitext(name)
         stats = os.stat(self.url)
@@ -511,7 +511,7 @@ class DbImagesLoader(URunnable):
             THUMBS.c.fav
         ).limit(Static.thumbnails_step).offset(Dynamic.thumbnails_count)
 
-        stmt = stmt.where(THUMBS.c.brand == MainFolder.current.name)
+        stmt = stmt.where(THUMBS.c.brand == Mf.current.name)
 
         if Dynamic.sort_by_mod:
             stmt = stmt.order_by(-THUMBS.c.mod)
@@ -595,7 +595,7 @@ class SortedDirsLoader(URunnable):
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
 
-class MainFolderDataCleaner(URunnable):
+class MfDataCleaner(URunnable):
 
     class Sigs(QObject):
         finished_ = pyqtSignal()
@@ -609,7 +609,7 @@ class MainFolderDataCleaner(URunnable):
 
     def __init__(self, mf_name: str):
         super().__init__()
-        self.sigs = MainFolderDataCleaner.Sigs()
+        self.sigs = MfDataCleaner.Sigs()
         self.mf_name = mf_name
         self.conn = Dbase.engine.connect()
 
@@ -643,7 +643,7 @@ class LoadDbMenu(URunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal()
 
-    def __init__(self, mf: MainFolder):
+    def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
         self.sigs = LoadDbMenu.Sigs()

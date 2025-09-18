@@ -7,12 +7,12 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from cfg import Cfg
 
 from ..lang import Lng
-from ..main_folder import MainFolder
+from ..main_folder import Mf
 from ..tasks import URunnable
 from ..utils import MainUtils
 from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
                            NewDirsHandler, RemovedDirsHandler,
-                           RemovedMainFolderCleaner)
+                           RemovedMfCleaner)
 
 
 class ScanerSigs(QObject):
@@ -38,7 +38,7 @@ class ScanerTask(URunnable):
         print("Выбран новый сканер")
 
     def task(self):
-        for i in MainFolder.list_:
+        for i in Mf.list_:
             if i.get_curr_path():
                 print("scaner started", i.name)
                 self.mf_scan(i)
@@ -67,20 +67,20 @@ class ScanerTask(URunnable):
     def set_flag(self, value: bool):
         self.reload_gui_flag = value
 
-    def mf_scan(self, mf: MainFolder):
+    def mf_scan(self, mf: Mf):
         try:
             self._mf_scan(mf)
         except (Exception, AttributeError) as e:
             print("new scaner task, main folder scan error", e)
 
-    def _mf_scan(self, mf: MainFolder):
+    def _mf_scan(self, mf: Mf):
         coll_folder = mf.get_curr_path()
         if not coll_folder:
             print(mf.name, "coll folder not avaiable")
             return
 
-        # удаляем все файлы и данные из бД по удаленному MainFolder
-        mf_remover = RemovedMainFolderCleaner()
+        # удаляем все файлы и данные из бД по удаленному Mf
+        mf_remover = RemovedMfCleaner()
         deleted_mfs = mf_remover.run()
         if deleted_mfs:
             print("main folders deleted", deleted_mfs)
@@ -125,10 +125,10 @@ class _CustomScanerSigs(QObject):
 
 
 class CustomScanerTask(URunnable):
-    def __init__(self, mf: MainFolder, dirs_to_scan: list[str]):
+    def __init__(self, mf: Mf, dirs_to_scan: list[str]):
         """
         Аналог полноценного сканера, но принимает список директорий
-        и выполняет сканирование для каждой из них в пределах MainFolder.   
+        и выполняет сканирование для каждой из них в пределах Mf.   
         dirs: [abs dir path, ...]
         """
         super().__init__()

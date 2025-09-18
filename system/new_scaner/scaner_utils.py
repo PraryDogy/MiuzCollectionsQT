@@ -9,22 +9,22 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from cfg import Cfg, Static, ThumbData
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
-from system.main_folder import MainFolder
+from system.main_folder import Mf
 from system.shared_utils import ReadImage
 from system.tasks import TaskState
 from system.utils import MainUtils
 
 
-class RemovedMainFolderCleaner:
+class RemovedMfCleaner:
 
     def __init__(self):
         """
         Запуск: run()   
         Сигналы: progress_text(str)
 
-        Сверяет список экземпляров класса MainFolder в бд (THUMBS.c.brand)     
-        со списком MainFolder в приложении.     
-        Удаляет весь контент MainFolder, если MainFolder больще нет в бд:   
+        Сверяет список экземпляров класса Mf в бд (THUMBS.c.brand)     
+        со списком Mf в приложении.     
+        Удаляет весь контент Mf, если Mf больще нет в бд:   
         - изображения thumbs из hashdir в ApplicationSupport    
         - записи в базе данных
 
@@ -43,7 +43,7 @@ class RemovedMainFolderCleaner:
     def _run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
         db_mfs = self.conn.execute(q).scalars().all()
-        app_mfs = [i.name for i in MainFolder.list_]
+        app_mfs = [i.name for i in Mf.list_]
         del_mfs = [
             i
             for i in db_mfs
@@ -79,7 +79,7 @@ class RemovedMainFolderCleaner:
                 if os.path.exists(folder) and not os.listdir(folder):
                     shutil.rmtree(folder)
             except Exception as e:
-                print(f"new scaner utils, MainFolderRemover, remove images error. ID: {id_}, Path: {image_path}, Error: {e}")
+                print(f"new scaner utils, MfRemover, remove images error. ID: {id_}, Path: {image_path}, Error: {e}")
                 continue
 
     def remove_rows(self, rows: list):
@@ -95,7 +95,7 @@ class RemovedMainFolderCleaner:
     def remove_dirs(self):
         q = sqlalchemy.select(DIRS.c.brand).distinct()
         db_brands = set(self.conn.execute(q).scalars())
-        app_brands = set(i.name for i in MainFolder.list_)
+        app_brands = set(i.name for i in Mf.list_)
         to_delete = db_brands - app_brands
 
         if to_delete:
@@ -107,7 +107,7 @@ class RemovedMainFolderCleaner:
 class DirsLoader(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, mf: MainFolder, task_state: TaskState):
+    def __init__(self, mf: Mf, task_state: TaskState):
         super().__init__()
         self.mf = mf
         self.mf_path = mf.curr_path
@@ -208,7 +208,7 @@ class DirsCompator:
 
 
 class DirsUpdater:
-    def __init__(self, mf: MainFolder, dirs_to_scan: list[str]):
+    def __init__(self, mf: Mf, dirs_to_scan: list[str]):
         """
         - dirs_to_scan: [(rel_dir_path, mod_time), ...]
         """
@@ -249,7 +249,7 @@ class DirsUpdater:
 class ImgLoader(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, dirs_to_scan: list[str, int], mf: MainFolder, task_state: TaskState):
+    def __init__(self, dirs_to_scan: list[str, int], mf: Mf, task_state: TaskState):
         """
         dirs_to_scan: [(rel dir path, int modified time), ...]
         """
@@ -360,7 +360,7 @@ class _ImgCompator:
 
 class _ImgHashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
-    def __init__(self, del_items: list, new_items: list, task_state: TaskState, mf: MainFolder):
+    def __init__(self, del_items: list, new_items: list, task_state: TaskState, mf: Mf):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
         Запуск: run()   
@@ -453,7 +453,7 @@ class _ImgHashdirUpdater(QObject):
 
 
 class _ImgDbUpdater:
-    def __init__(self, del_images: list, new_images: list, mf: MainFolder):
+    def __init__(self, del_images: list, new_images: list, mf: Mf):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
@@ -520,7 +520,7 @@ class NewDirsHandler(QObject):
     progress_text = pyqtSignal(str)
     reload_gui = pyqtSignal()
    
-    def __init__(self, dirs_to_scan: list[str], mf: MainFolder, task_state: TaskState):
+    def __init__(self, dirs_to_scan: list[str], mf: Mf, task_state: TaskState):
         """
         dirs_to_scan: [(rel dir path, int modified time), ...]
         """
@@ -567,7 +567,7 @@ class NewDirsHandler(QObject):
     
 
 class RemovedDirsHandler(QObject):
-    def __init__(self, dirs_to_del: list, mf: MainFolder):
+    def __init__(self, dirs_to_del: list, mf: Mf):
         """
         dirs_to_del: [(rel dir path, int modified time), ...]
         """

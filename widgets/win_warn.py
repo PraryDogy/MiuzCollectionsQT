@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 
 from cfg import Cfg
 from system.lang import Lng
-from system.main_folder import MainFolder
+from system.main_folder import Mf
 
 from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
 

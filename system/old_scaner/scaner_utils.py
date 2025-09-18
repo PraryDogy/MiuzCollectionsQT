@@ -9,7 +9,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from cfg import Cfg, Static, ThumbData
 from system.database import THUMBS, ClmNames, Dbase
 from system.lang import Lng
-from system.main_folder import MainFolder
+from system.main_folder import Mf
 
 from ..shared_utils import ReadImage
 from ..tasks import TaskState
@@ -19,12 +19,12 @@ from ..utils import MainUtils
 class FinderImages(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, mf: MainFolder, task_state: TaskState):
+    def __init__(self, mf: Mf, task_state: TaskState):
         """
         Запуск: run()   
         Сигналы: progress_text(str)     
 
-        Возвращает все изображения, найденные в MainFolder    
+        Возвращает все изображения, найденные в Mf    
         [(path, size, birth_time, mod_time), ...]   
         Если не найдено ни одного изображения, вернет None и установит
         TaskState.should_run на False
@@ -54,8 +54,8 @@ class FinderImages(QObject):
     def collect_scan_dirs(self) -> list[str]:
         """
         Возвращает список путей для сканирования:
-        - все подпапки текущей директории MainFolder, кроме тех, что в stop_list
-        - сам путь MainFolder в конце списка
+        - все подпапки текущей директории Mf, кроме тех, что в stop_list
+        - сам путь Mf в конце списка
         """
         collections = []
         for item in os.scandir(self.mf.curr_path):
@@ -105,7 +105,7 @@ class FinderImages(QObject):
     def get_progress_text(self, current: int, total: int) -> str:
         """
         Формирует строку для отображения прогресса обработки:
-        Пример: "Miuz (MainFolder.name): коллекция 3 из 10"
+        Пример: "Miuz (Mf.name): коллекция 3 из 10"
         """
         mf = self.mf.name.capitalize()
         collection_name: str = Lng.folder[Cfg.lng]
@@ -148,12 +148,12 @@ class FinderImages(QObject):
 class DbImages(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, mf: MainFolder):
+    def __init__(self, mf: Mf):
         """
         Запуск: run()   
         Сигналы: progress_text(str)     
 
-        Возвращает записи из бд, относящиеся к MainFolder:  
+        Возвращает записи из бд, относящиеся к Mf:  
         {rel thumb path: (img path, size, birth time, mod time), ...}   
         """
         super().__init__()
@@ -215,17 +215,17 @@ class Compator:
 
 
 class Inspector(QObject):
-    def __init__(self, del_items: list, mf: MainFolder):
+    def __init__(self, del_items: list, mf: Mf):
         """
         del_items: [rel thumb path, ...]
 
         Этот класс выполняет проверку безопасности перед удалением данных.
         Метод is_remove_all() инициирует сравнение между количеством записей
-        в БД и количеством удаляемых миниатюр, связанных с MainFolder.
+        в БД и количеством удаляемых миниатюр, связанных с Mf.
 
         Если количество удаляемых элементов совпадает с количеством записей в базе,
         это может свидетельствовать о потенциальной ошибке в логике сканера,
-        приводящей к попытке удалить все данные, связанные с MainFolder.
+        приводящей к попытке удалить все данные, связанные с Mf.
         В таком случае, операция считается подозрительной и может быть заблокирована
         как мера предосторожности.
         """
@@ -247,7 +247,7 @@ class Inspector(QObject):
 class HashdirUpdater(QObject):
     progress_text = pyqtSignal(str)
 
-    def __init__(self, del_items: list, new_items: list, mf: MainFolder, task_state: TaskState):
+    def __init__(self, del_items: list, new_items: list, mf: Mf, task_state: TaskState):
         """
         Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
         Запуск: run()   
@@ -342,7 +342,7 @@ class HashdirUpdater(QObject):
 class DbUpdater(QObject):
     reload_gui = pyqtSignal()
 
-    def __init__(self, del_items: list, new_items: list, mf: MainFolder):
+    def __init__(self, del_items: list, new_items: list, mf: Mf):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
         Запуск: run()  
@@ -432,7 +432,7 @@ class DbUpdater(QObject):
             self.reload_gui.emit()
 
 
-class MainFolderRemover(QObject):
+class MfRemover(QObject):
     progress_text = pyqtSignal(str)
 
     def __init__(self):
@@ -440,9 +440,9 @@ class MainFolderRemover(QObject):
         Запуск: run()   
         Сигналы: progress_text(str)
 
-        Сверяет список экземпляров класса MainFolder в бд (THUMBS.c.brand)     
-        со списком MainFolder в приложении.     
-        Удаляет весь контент MainFolder, если MainFolder больще нет в бд:   
+        Сверяет список экземпляров класса Mf в бд (THUMBS.c.brand)     
+        со списком Mf в приложении.     
+        Удаляет весь контент Mf, если Mf больще нет в бд:   
         - изображения thumbs из hashdir в ApplicationSupport    
         - записи в базе данных
 
@@ -454,7 +454,7 @@ class MainFolderRemover(QObject):
     def run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
         db_mfs = self.conn.execute(q).scalars().all()
-        app_mfs = [i.name for i in MainFolder.list_]
+        app_mfs = [i.name for i in Mf.list_]
         del_mfs = [i for i in db_mfs if i not in app_mfs]
         for i in del_mfs:
             rows = self.get_rows(i)

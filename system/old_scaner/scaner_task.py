@@ -6,10 +6,10 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from cfg import Cfg
 
 from ..lang import Lng
-from ..main_folder import MainFolder
+from ..main_folder import Mf
 from ..tasks import URunnable
 from .scaner_utils import (Compator, DbImages, DbUpdater, FinderImages,
-                           HashdirUpdater, Inspector, MainFolderRemover)
+                           HashdirUpdater, Inspector, MfRemover)
 
 
 class ScanerSigs(QObject):
@@ -33,7 +33,7 @@ class ScanerTask(URunnable):
         print("Выбран старый сканер")
 
     def task(self):
-        for i in MainFolder.list_:
+        for i in Mf.list_:
             if i.get_curr_path():
                 print("scaner started", i.name)
                 self.mf_scan(i)
@@ -49,21 +49,21 @@ class ScanerTask(URunnable):
         except RuntimeError as e:
             ...
     
-    def mf_scan(self, mf: MainFolder):
+    def mf_scan(self, mf: Mf):
         """
-        Выполняет полную синхронизацию содержимого указанной папки MainFolder
+        Выполняет полную синхронизацию содержимого указанной папки Mf
         с базой данных и директориями миниатюр (hashdir).
 
         Этапы выполнения:
 
-        1. **MainFolderRemover**
-        - Если папка MainFolder была удалена, удаляются:
+        1. **MfRemover**
+        - Если папка Mf была удалена, удаляются:
             - Все связанные записи в базе данных.
             - Все соответствующие миниатюры из hashdir.
         - После этого работа метода завершается.
 
         2. **FinderImages**
-        - Выполняет рекурсивный поиск изображений в MainFolder.
+        - Выполняет рекурсивный поиск изображений в Mf.
         - Результаты будут использоваться для сравнения с базой данных.
 
         3. **Проверка can_scan**
@@ -71,7 +71,7 @@ class ScanerTask(URunnable):
             прерывается сразу после поиска (FinderImages).
 
         4. **DbImages**
-        - Загружает из базы все записи, связанные с текущим MainFolder.
+        - Загружает из базы все записи, связанные с текущим Mf.
 
         5. **Compator**
         - Сравнивает изображения, найденные в файловой системе, с записями в БД.
@@ -95,7 +95,7 @@ class ScanerTask(URunnable):
         основываясь на уже обработанных файлах.
         """
 
-        mf_remover = MainFolderRemover()
+        mf_remover = MfRemover()
         mf_remover.progress_text.connect(lambda text: self.sigs.progress_text.emit(text))
         mf_remover.run()
 

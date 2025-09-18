@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg, Static
 from system.lang import Lng
-from system.main_folder import MainFolder
+from system.main_folder import Mf
 from system.tasks import OneImgLoader, UThreadPool
 from system.utils import MainUtils
 
@@ -238,7 +238,7 @@ class WinImageView(AppModalWindow):
 
 
     def first_load(self):
-        if not MainFolder.current.get_curr_path():
+        if not Mf.current.get_curr_path():
             self.no_connection.emit()
         self.load_thumb()
 
@@ -258,7 +258,7 @@ class WinImageView(AppModalWindow):
             t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng]}"
             self.image_label.setText(t)
 
-        mf_path = MainFolder.current.get_curr_path()
+        mf_path = Mf.current.get_curr_path()
         if mf_path:
             self.path = MainUtils.get_abs_path(mf_path, self.rel_path)
             self.load_image()

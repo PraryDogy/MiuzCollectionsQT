@@ -17,7 +17,7 @@ class ClmNames:
     RESOL = "resol" #ignore
     COLL = "coll"
     FAV = "fav"
-    BRAND = "brand" # MainFolder name
+    BRAND = "brand" # Mf name
 
 
 THUMBS = sqlalchemy.Table(
@@ -31,7 +31,7 @@ THUMBS = sqlalchemy.Table(
     sqlalchemy.Column(ClmNames.RESOL, sqlalchemy.Text, comment="ignore"),
     sqlalchemy.Column(ClmNames.COLL, sqlalchemy.Text),
     sqlalchemy.Column(ClmNames.FAV, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.BRAND, sqlalchemy.Text, comment="MainFolder name"),
+    sqlalchemy.Column(ClmNames.BRAND, sqlalchemy.Text, comment="Mf name"),
 )
 
 DIRS = sqlalchemy.Table(
