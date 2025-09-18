@@ -394,7 +394,7 @@ class Grid(VScrollArea):
     remove_files = pyqtSignal(list)
     save_files = pyqtSignal(tuple)
     update_bottom_bar = pyqtSignal()
-    img_view = pyqtSignal()
+    open_img_view = pyqtSignal()
     no_connection = pyqtSignal()
     open_info_win = pyqtSignal(list)
     copy_path = pyqtSignal(list)
@@ -689,7 +689,7 @@ class Grid(VScrollArea):
         def open_last_selected():
             """Открывает просмотр последнего выбранного виджета."""
             if self.selected_widgets:
-                self.img_view.emit()
+                self.open_img_view.emit()
 
         def navigate(offset: tuple[int, int]):
             """Перемещает выделение в сетке по заданному смещению."""
@@ -892,7 +892,7 @@ class Grid(VScrollArea):
 
             # просмотр
             act = OpenInView(self.menu_)
-            act.triggered.connect(lambda: self.img_view.emit())
+            act.triggered.connect(lambda: self.open_img_view.emit())
             self.menu_.addAction(act)
 
             # открыть в приложении
@@ -1012,7 +1012,7 @@ class Grid(VScrollArea):
         if self.wid_under_mouse:
             self.clear_selected_widgets()
             self.wid_to_selected_widgets(self.wid_under_mouse)
-            self.img_view.emit()
+            self.open_img_view.emit()
 
     def mousePressEvent(self, a0):
         self.origin_pos = a0.pos()

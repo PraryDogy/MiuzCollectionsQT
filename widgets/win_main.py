@@ -118,8 +118,10 @@ class WinMain(UMainWindow):
         self.grid.no_connection.connect(
             lambda: self.open_win_smb(self.grid, MainFolder.current)
         )
-        self.grid.img_view.connect(lambda: self.open_img_view())
-        self.grid.save_files.connect(self.save_files)
+        self.grid.open_img_view.connect(lambda: self.open_img_view())
+        self.grid.save_files.connect(
+            lambda data: self.save_files(self.grid, MainFolder.current, data)
+        )
         self.grid.open_info_win.connect(self.open_win_info)
         self.grid.copy_path.connect(self.copy_path)
         self.grid.copy_name.connect(self.copy_name)
@@ -164,7 +166,18 @@ class WinMain(UMainWindow):
 
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
-            
+
+    @staticmethod
+    def with_conn(fn):
+        def wrapper(self, parent: QWidget, main_folder: MainFolder, *args, **kwargs):
+            assert isinstance(self, WinMain)
+            path = main_folder.get_curr_path()
+            if path:
+                return fn(self, parent, main_folder, *args, **kwargs)
+            else:
+                self.open_win_smb(parent, main_folder)
+        return wrapper
+
     def wait_connection(self):
         self.wait_timer.stop()
         if not MainFolder.current.get_curr_path():
@@ -179,26 +192,23 @@ class WinMain(UMainWindow):
             self.open_win_smb(self.grid, MainFolder.current)
             self.wait_timer.start(10)
 
-    def save_files(self, data: tuple):
+    @with_conn
+    def save_files(self, parent: QWidget, main_folder: MainFolder, data: tuple):
         dest, rel_img_paths = data
-        main_folder_path = MainFolder.current.get_curr_path()
-        if main_folder_path:
-            abs_files = [
-                MainUtils.get_abs_path(main_folder_path, i)
-                for i in rel_img_paths
-            ]
-            if dest is None:
-                dest = QFileDialog.getExistingDirectory()
-                if dest:
-                    task = self.copy_files_task(dest, abs_files)
-                    task.sigs.finished_.connect(MainUtils.reveal_files)
-                    UThreadPool.start(task)
-            else:
+        abs_files = [
+            MainUtils.get_abs_path(main_folder.curr_path, i)
+            for i in rel_img_paths
+        ]
+        if dest is None:
+            dest = QFileDialog.getExistingDirectory()
+            if dest:
                 task = self.copy_files_task(dest, abs_files)
                 task.sigs.finished_.connect(MainUtils.reveal_files)
                 UThreadPool.start(task)
         else:
-            self.open_win_smb(self.grid, MainFolder.current)
+            task = self.copy_files_task(dest, abs_files)
+            task.sigs.finished_.connect(MainUtils.reveal_files)
+            UThreadPool.start(task)
 
     def open_win_info(self, rel_img_paths: list[str]):
         
@@ -267,7 +277,9 @@ class WinMain(UMainWindow):
         self.win_image_view.copy_name.connect(self.copy_name)
         self.win_image_view.reveal_in_finder.connect(self.reveal_in_finder)
         self.win_image_view.set_fav.connect(self.set_fav)
-        self.win_image_view.save_files.connect(self.save_files)
+        self.win_image_view.save_files.connect(
+            lambda data: self.save_files(self.win_image_view, MainFolder.current, data)
+        )
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
