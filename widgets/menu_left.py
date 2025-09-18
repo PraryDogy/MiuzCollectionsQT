@@ -32,7 +32,7 @@ class TreeSep(QTreeWidgetItem):
 
 class TreeWid(QTreeWidget):
     clicked_ = pyqtSignal(str)
-    no_connection = pyqtSignal()
+    no_connection = pyqtSignal(MainFolder)
     update_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
     hh = 25
@@ -142,7 +142,7 @@ class TreeWid(QTreeWidget):
         if os.path.exists(path):
             subprocess.Popen(["open", path])
         else:
-            self.no_connection.emit()
+            self.no_connection.emit(MainFolder.current)
 
     def contextMenuEvent(self, a0):
         item = self.itemAt(a0.pos())
@@ -184,7 +184,7 @@ class MainFolerListItem(UListWidgetItem):
 
 class MainFolderList(VListWidget):
     open_main_folder = pyqtSignal(MainFolder)
-    no_connection = pyqtSignal()
+    no_connection = pyqtSignal(MainFolder)
     setup_main_folder = pyqtSignal(MainFolder)
     setup_new_folder = pyqtSignal()
     update_grid = pyqtSignal()
@@ -211,7 +211,7 @@ class MainFolderList(VListWidget):
         main_folder = item.main_folder
         main_folder_path = main_folder.get_curr_path()
         if not main_folder_path:
-            self.no_connection.emit()
+            self.no_connection.emit(main_folder)
         else:
             if flag == "reveal":
                 subprocess.Popen(["open", main_folder_path])
@@ -263,7 +263,7 @@ class MainFolderList(VListWidget):
 
 class MenuLeft(QTabWidget):
     reload_thumbnails = pyqtSignal()
-    no_connection = pyqtSignal()
+    no_connection = pyqtSignal(MainFolder)
     setup_main_folder = pyqtSignal(SettingsItem)
     setup_new_folder = pyqtSignal(SettingsItem)
     update_grid = pyqtSignal()

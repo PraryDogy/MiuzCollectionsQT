@@ -86,7 +86,9 @@ class WinMain(UMainWindow):
         self.left_menu = MenuLeft()
         self.left_menu.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
         self.left_menu.reload_thumbnails.connect(lambda: self.set_window_title())
-        self.left_menu.no_connection.connect(self.open_win_smb)
+        self.left_menu.no_connection.connect(
+            lambda main_folder: self.open_win_smb(self.grid, main_folder)
+        )
         self.left_menu.setup_main_folder.connect(self.open_settings)
         self.left_menu.setup_new_folder.connect(self.open_settings)
         self.left_menu.update_grid.connect(lambda: self.grid.reload_thumbnails())
@@ -113,7 +115,9 @@ class WinMain(UMainWindow):
         self.grid = Grid()
         self.grid.restart_scaner.connect(lambda: self.restart_scaner_task())
         self.grid.remove_files.connect(lambda rel_img_paths: self.remove_files(rel_img_paths))
-        self.grid.no_connection.connect(self.open_win_smb)
+        self.grid.no_connection.connect(
+            lambda: self.open_win_smb(self.grid, MainFolder.current)
+        )
         self.grid.img_view.connect(lambda: self.open_img_view())
         self.grid.save_files.connect(self.save_files)
         self.grid.open_info_win.connect(self.open_win_info)
@@ -172,7 +176,7 @@ class WinMain(UMainWindow):
     
     def first_check(self):
         if not MainFolder.current.get_curr_path():
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
             self.wait_timer.start(10)
 
     def save_files(self, data: tuple):
@@ -194,7 +198,7 @@ class WinMain(UMainWindow):
                 task.sigs.finished_.connect(MainUtils.reveal_files)
                 UThreadPool.start(task)
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
     def open_win_info(self, rel_img_paths: list[str]):
         
@@ -213,7 +217,7 @@ class WinMain(UMainWindow):
             self.win_info = WinInfo(abs_paths)
             self.win_info.finished_.connect(open_delayed)
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
     def set_clipboard(self, data: tuple):
         action_type, rel_img_paths = data
@@ -236,22 +240,15 @@ class WinMain(UMainWindow):
                 for i in self.grid.selected_widgets:
                     i.set_transparent_frame(0.5)
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
-    def open_win_smb(self):
-        parent = WinManager.win_list[-1]
-        if isinstance(parent, WinMain):
-            parent = self.grid
-
+    def open_win_smb(self, parent: QWidget, main_folder: MainFolder):
         noti = NotifyWid(
             parent,
-            Lng.no_connection_full[Cfg.lng],
+            f"{main_folder.name}: {Lng.no_connection_full[Cfg.lng]}",
             self.warning_svg
             )
         noti._show()
-        # self.win_smb = WinSmb()
-        # self.win_smb.center_to_parent(self.window())
-        # self.win_smb.show()
     
     def open_img_view(self):
         if len(self.grid.selected_widgets) == 1:
@@ -272,7 +269,9 @@ class WinMain(UMainWindow):
         self.win_image_view.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
-        self.win_image_view.no_connection.connect(self.open_win_smb)
+        self.win_image_view.no_connection.connect(
+            lambda: self.open_win_smb(self.win_image_view, MainFolder.current)
+        )
         self.win_image_view.center_to_parent(self.window())
         self.win_image_view.show()
 
@@ -417,7 +416,7 @@ class WinMain(UMainWindow):
                 else:
                     subprocess.Popen(["open", abs_path])
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
     def reveal_in_finder(self, rel_img_paths: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()
@@ -431,7 +430,7 @@ class WinMain(UMainWindow):
             else:
                 MainUtils.reveal_files(abs_paths)
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
     def copy_name(self, rel_img_paths: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()
@@ -442,7 +441,7 @@ class WinMain(UMainWindow):
             ]
             MainUtils.copy_text("\n".join(names))
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
     def copy_path(self, rel_img_paths: list[str]):
         main_folder_path = MainFolder.current.get_curr_path()
@@ -453,7 +452,7 @@ class WinMain(UMainWindow):
             ]
             MainUtils.copy_text("\n".join(abs_paths))
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
     def open_dates_win(self):
         self.win_dates = WinDates()
@@ -615,7 +614,7 @@ class WinMain(UMainWindow):
                 self.clipboard_item.target_dir = abs_current_dir
                 copy_files()
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
     def remove_files(self, rel_img_paths: list):
         
@@ -649,7 +648,7 @@ class WinMain(UMainWindow):
             )
             self.remove_files_win.show()
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
     
     def upload_files(self, abs_img_paths: list):
         main_folder_path = MainFolder.current.get_curr_path()
@@ -663,7 +662,7 @@ class WinMain(UMainWindow):
             self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_img_paths))
             self.paste_files_here()
         else:
-            self.open_win_smb()
+            self.open_win_smb(self.grid, MainFolder.current)
 
     def open_settings(self, settings_item: SettingsItem):
         self.bar_top.settings_btn.set_solid_style()
