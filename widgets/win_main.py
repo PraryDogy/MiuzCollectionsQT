@@ -70,7 +70,7 @@ class WinMain(UMainWindow):
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
         
-        self.win_img_view: WinImageView
+        self.view_win: WinImageView
         self.clipboard_item: ClipBoardItem = None
 
         h_wid_main = QWidget()
@@ -122,7 +122,7 @@ class WinMain(UMainWindow):
             lambda: self.open_win_smb(self.grid, MainFolder.current)
         )
         self.grid.open_img_view.connect(
-            lambda: self.open_img_view()
+            lambda: self.open_view_win()
         )
         self.grid.save_files.connect(
             lambda data: self.save_files(self.grid, MainFolder.current, data)
@@ -314,10 +314,18 @@ class WinMain(UMainWindow):
         ]
         MainUtils.copy_text("\n".join(abs_paths))
 
-    def open_img_view(self):
+    def open_settings(self, settings_item: SettingsItem):
+        self.bar_top.settings_btn.set_solid_style()
+        self.win_settings = WinSettings(settings_item)
+        self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
+        self.win_settings.reset_data.connect(self.reset_data_cmd)
+        self.win_settings.center_to_parent(self.window())
+        self.win_settings.show()
+
+    def open_view_win(self):
 
         def on_closed():
-            self.win_img_view = None
+            self.view_win = None
             gc.collect
 
         if len(self.grid.selected_widgets) == 1:
@@ -327,36 +335,44 @@ class WinMain(UMainWindow):
             path_to_wid = {i.rel_img_path: i for i in self.grid.selected_widgets}
             is_selection = True
         wid = self.grid.selected_widgets[-1]
-        self.win_img_view = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
-        self.win_img_view.closed_.connect(
+        self.view_win = WinImageView(wid.rel_img_path, path_to_wid, is_selection)
+        self.view_win.closed_.connect(
             lambda: on_closed()
         )
-        self.win_img_view.open_win_info.connect(
-            lambda rel_paths: self.open_win_info(self.win_img_view, MainFolder.current, rel_paths)
+        self.view_win.open_win_info.connect(
+            lambda rel_paths: self.open_win_info(self.view_win, MainFolder.current, rel_paths)
         )
-        self.win_img_view.copy_path.connect(
-            lambda rel_paths: self.copy_path(self.win_img_view, MainFolder.current, rel_paths)
+        self.view_win.copy_path.connect(
+            lambda rel_paths: self.copy_path(self.view_win, MainFolder.current, rel_paths)
         )
-        self.win_img_view.copy_name.connect(
-            lambda rel_paths: self.copy_name(self.win_img_view, MainFolder.current, rel_paths)
+        self.view_win.copy_name.connect(
+            lambda rel_paths: self.copy_name(self.view_win, MainFolder.current, rel_paths)
         )
-        self.win_img_view.reveal_in_finder.connect(
-            lambda rel_paths: self.reveal_in_finder(self.win_img_view, MainFolder.current, rel_paths)
+        self.view_win.reveal_in_finder.connect(
+            lambda rel_paths: self.reveal_in_finder(self.view_win, MainFolder.current, rel_paths)
         )
-        self.win_img_view.set_fav.connect(
+        self.view_win.set_fav.connect(
             self.set_fav
         )
-        self.win_img_view.save_files.connect(
-            lambda data: self.save_files(self.win_img_view, MainFolder.current, data)
+        self.view_win.save_files.connect(
+            lambda data: self.save_files(self.view_win, MainFolder.current, data)
         )
-        self.win_img_view.switch_image_sig.connect(
+        self.view_win.switch_image_sig.connect(
             lambda img_path: self.grid.select_viewed_image(img_path)
         )
-        self.win_img_view.no_connection.connect(
-            lambda: self.open_win_smb(self.win_img_view, MainFolder.current)
+        self.view_win.no_connection.connect(
+            lambda: self.open_win_smb(self.view_win, MainFolder.current)
         )
-        self.win_img_view.center_to_parent(self.window())
-        self.win_img_view.show()
+        self.view_win.center_to_parent(self.window())
+        self.view_win.show()
+
+    def open_dates_win(self):
+        self.win_dates = WinDates()
+        self.win_dates.center_to_parent(self)
+        self.win_dates.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
+        self.win_dates.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
+        self.win_dates.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.win_dates.show()
 
     def start_scaner_task(self):
         """
@@ -474,7 +490,7 @@ class WinMain(UMainWindow):
         def finished(rel_img_path: str, value: int):
             self.grid.set_thumb_fav(rel_img_path, value)
             try:
-                self.win_img_view.set_title()
+                self.view_win.set_title()
             except AttributeError:
                 ...
 
@@ -484,14 +500,6 @@ class WinMain(UMainWindow):
             lambda: finished(rel_img_path, value)
         )
         UThreadPool.start(self.task)
-
-    def open_dates_win(self):
-        self.win_dates = WinDates()
-        self.win_dates.center_to_parent(self)
-        self.win_dates.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
-        self.win_dates.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
-        self.win_dates.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.win_dates.show()
 
     def reset_data_cmd(self, main_folder: MainFolder):
 
@@ -694,14 +702,6 @@ class WinMain(UMainWindow):
             self.paste_files_here()
         else:
             self.open_win_smb(self.grid, MainFolder.current)
-
-    def open_settings(self, settings_item: SettingsItem):
-        self.bar_top.settings_btn.set_solid_style()
-        self.win_settings = WinSettings(settings_item)
-        self.win_settings.closed.connect(self.bar_top.settings_btn.set_normal_style)
-        self.win_settings.reset_data.connect(self.reset_data_cmd)
-        self.win_settings.center_to_parent(self.window())
-        self.win_settings.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
