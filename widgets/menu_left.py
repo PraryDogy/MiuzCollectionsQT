@@ -241,7 +241,7 @@ class MainFolderList(VListWidget):
             open.triggered.connect(lambda: self.cmd("view", item))
             menu.addAction(open)
             update_grid = QAction(Lng.update_grid[Cfg.lng], menu)
-            update_grid.triggered.connect(self.update_grid)
+            update_grid.triggered.connect(self.update_grid.emit)
             menu.addAction(update_grid)
             restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
             restart_scaner.triggered.connect(self.restart_scaner.emit)
