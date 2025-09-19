@@ -66,27 +66,35 @@ class Utils:
             return None
 
     @classmethod
-    def create_abs_hash(cls, path: str) -> str:
-        new_name = hashlib.md5(path.encode('utf-8')).hexdigest() + ".jpg"
-        new_folder = os.path.join(Static.APP_SUPPORT_HASHDIR, new_name[:2])
-        os.makedirs(new_folder, exist_ok=True)
-        return os.path.join(new_folder, new_name)
+    def create_abs_hash(cls, path: str) -> str | None:
+        try:
+            new_name = hashlib.md5(path.encode('utf-8')).hexdigest() + ".jpg"
+            new_folder = os.path.join(Static.APP_SUPPORT_HASHDIR, new_name[:2])
+            os.makedirs(new_folder, exist_ok=True)
+            return os.path.join(new_folder, new_name)
+        except Exception as e:
+            print(f"create_abs_hash: {e}")
+            return None
 
     @classmethod
-    def get_rel_hash(cls, thumb_path: str):
-        return thumb_path.replace(Static.APP_SUPPORT_DIR, "")
-    
+    def get_rel_hash(cls, thumb_path: str) -> str | None:
+        try:
+            return thumb_path.replace(Static.APP_SUPPORT_DIR, "")
+        except Exception as e:
+            print(f"get_rel_hash: {e}")
+            return None
+
     @classmethod
-    def get_abs_hash(cls, rel_thumb_path: str):
-        return Static.APP_SUPPORT_DIR + rel_thumb_path
+    def get_abs_hash(cls, rel_thumb_path: str) -> str | None:
+        try:
+            return Static.APP_SUPPORT_DIR + rel_thumb_path
+        except Exception as e:
+            print(f"get_abs_hash: {e}")
+            return None
 
     @classmethod
     def write_thumb(cls, thumb_path: str, thumb: np.ndarray) -> bool:
         try:
-            if thumb is None or thumb.size == 0:
-                print("Utils - write_thumb - пустой thumb")
-                return False
-
             if len(thumb.shape) == 2:  # grayscale
                 img = thumb
             elif thumb.shape[2] == 3:  # BGR
@@ -94,13 +102,12 @@ class Utils:
             elif thumb.shape[2] == 4:  # BGRA
                 img = cv2.cvtColor(thumb, cv2.COLOR_BGRA2RGB)
             else:
-                print(f"Utils - write_thumb - неподдерживаемое число каналов: {thumb.shape}")
-                return False
-
+                print(f"write_thumb: неподдерживаемое число каналов {thumb.shape}")
+                return None
             return cv2.imwrite(thumb_path, img)
         except Exception as e:
-            print("Utils - write_thumb - ошибка записи thumb на диск", e)
-            return False
+            print(f"write_thumb: ошибка записи thumb на диск: {e}")
+            return None
 
     @classmethod
     def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
@@ -109,10 +116,10 @@ class Utils:
                 img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
                 return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             else:
-                # print("system > read_thumb > изображения не существует")
+                print(f"read_thumb: файл не существует {thumb_path}")
                 return None
         except Exception as e:
-            print("utils, read thumb error")
+            print(f"read_thumb: ошибка чтения thumb: {e}")
             return None
 
     @classmethod
@@ -120,7 +127,7 @@ class Utils:
         try:
             h, w = image.shape[:2]
             if h == 0 or w == 0:
-                print("fit_to_thumb error: пустое изображение")
+                print("fit_to_thumb: пустое изображение")
                 return None
 
             scale = size / max(h, w)
@@ -129,19 +136,8 @@ class Utils:
 
             return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
         except Exception as e:
-            print("fit_to_thumb error:", e)
+            print(f"fit_to_thumb: ошибка масштабирования: {e}")
             return None
-
-    @classmethod
-    def get_coll_name(cls, mf_path: str, path: str) -> str:
-        coll = cls.get_rel_path(mf_path, path)
-        coll = coll.strip(os.sep)
-        coll = coll.split(os.sep)
-
-        if len(coll) > 1:
-            return coll[0]
-        else:
-            return os.path.basename(mf_path.strip(os.sep))
 
     @classmethod
     def copy_text(cls, text: str):
@@ -154,12 +150,7 @@ class Utils:
         
     @classmethod
     def reveal_files(cls, paths: list[str]):
-        command = ["osascript", REVEAL_SCPT] + paths
-        subprocess.Popen(
-            command,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
+        subprocess.Popen(["osascript", REVEAL_SCPT] + paths)
 
     @classmethod
     def start_new_app(cls):
