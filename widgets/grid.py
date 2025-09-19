@@ -255,7 +255,9 @@ class Thumbnail(QFrame):
 
         size_ = self.pixmap_size + ThumbData.MARGIN
         self.img_wid.setFixedSize(size_, size_)
-        self.img_wid.setPixmap(Utils.pixmap_scale(self.img, self.pixmap_size))
+        self.img_wid.setPixmap(
+            Utils.pixmap_scale(self.img, self.pixmap_size, self.pixmap_size)
+        )
 
     def set_frame(self):
         """Устанавливает рамку и фон для выделенной миниатюры."""

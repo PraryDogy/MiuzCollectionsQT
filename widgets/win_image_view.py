@@ -38,11 +38,7 @@ class ImageWidget(QLabel):
         self.setCursor(Qt.CursorShape.ArrowCursor)
         self.w, self.h = self.width(), self.height()
 
-        self.current_pixmap.scaled(
-            self.w, self.h, 
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
-            )
+        Utils.pixmap_scale(self.current_pixmap, self.w, self.h)
         self.update()
 
     def zoom_in(self):
@@ -82,12 +78,11 @@ class ImageWidget(QLabel):
     def paintEvent(self, a0: QPaintEvent | None) -> None:
         if self.current_pixmap is not None:
             painter = QPainter(self)
-            scaled_pixmap = self.current_pixmap.scaled(
+            scaled_pixmap = Utils.pixmap_scale(
+                self.current_pixmap,
                 int(self.w * self.scale_factor),
                 int(self.h * self.scale_factor),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-                )
+            )
 
             offset = self.offset + QPoint(
                 int((self.width() - scaled_pixmap.width()) / 2),

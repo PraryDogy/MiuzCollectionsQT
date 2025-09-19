@@ -20,25 +20,27 @@ class Utils:
 
     @classmethod
     def qimage_from_array(cls, image: np.ndarray) -> QImage | None:
-        if not (isinstance(image, np.ndarray) and QApplication.instance()):
+        try:
+            if image.ndim == 2:  # grayscale
+                height, width = image.shape
+                bytes_per_line = width
+                qimage = QImage(image.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+            elif image.ndim == 3 and image.shape[2] in (3, 4):
+                height, width, channels = image.shape
+                bytes_per_line = channels * width
+                fmt = QImage.Format_RGB888 if channels == 3 else QImage.Format_RGBA8888
+                qimage = QImage(image.data, width, height, bytes_per_line, fmt)
+            else:
+                print(f"qimage_from_array: channels trouble {image.shape}")
+                return None
+            return qimage
+        except Exception as e:
+            print(f"qimage_from_array: {e}")
             return None
-        if image.ndim == 2:  # grayscale
-            height, width = image.shape
-            bytes_per_line = width
-            qimage = QImage(image.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
-        elif image.ndim == 3 and image.shape[2] in (3, 4):
-            height, width, channels = image.shape
-            bytes_per_line = channels * width
-            fmt = QImage.Format_RGB888 if channels == 3 else QImage.Format_RGBA8888
-            qimage = QImage(image.data, width, height, bytes_per_line, fmt)
-        else:
-            print("pixmap from array channels trouble", image.shape)
-            return None
-        return qimage
 
     @classmethod
     def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
-        if isinstance(image, np.ndarray) and QApplication.instance():
+        try:
             height, width, channel = image.shape
             bytes_per_line = channel * width
             qimage = QImage(
@@ -49,17 +51,19 @@ class Utils:
                 QImage.Format.Format_RGB888
             )
             return QPixmap.fromImage(qimage)
-        else:
+        except Exception as e:
+            print(f"pixmap_from_array: {e}")
             return None
 
     @classmethod
-    def pixmap_scale(cls, pixmap: QPixmap, size: int) -> QPixmap:
-        return pixmap.scaled(
-            size,
-            size,
-            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-            transformMode=Qt.TransformationMode.SmoothTransformation
-        )
+    def pixmap_scale(cls, pixmap: QPixmap, w: int, h: int) -> QPixmap | None:
+        try:
+            aspect = Qt.AspectRatioMode.KeepAspectRatio
+            transf = Qt.TransformationMode.SmoothTransformation
+            return pixmap.scaled(w, h, aspect, transf)
+        except Exception as e:
+            print(f"pixmap_scale: {e}")
+            return None
 
     @classmethod
     def create_abs_hash(cls, path: str) -> str:
