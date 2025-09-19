@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.tasks import MultiFileInfo, OneFileInfo, UThreadPool
-from system.utils import MainUtils
+from system.utils import Utils
 
 from ._base_widgets import UMenu, SingleActionWindow
 
@@ -42,12 +42,12 @@ class Selectable(QLabel):
 
         label_text = Lng.copy[Cfg.lng]
         sel = QAction(text=label_text, parent=self)
-        sel.triggered.connect(lambda: MainUtils.copy_text(text))
+        sel.triggered.connect(lambda: Utils.copy_text(text))
         menu_.addAction(sel)
 
         reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[Cfg.lng])
         reveal.triggered.connect(
-            lambda: MainUtils.reveal_files([full_text])
+            lambda: Utils.reveal_files([full_text])
         )
         menu_.addAction(reveal)
 

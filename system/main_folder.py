@@ -3,7 +3,7 @@ import os
 import shutil
 from cfg import Static
 
-from .utils import MainUtils
+from .utils import Utils
 
 
 class Mf:
@@ -105,7 +105,7 @@ class Mf:
             cls.current = cls.list_[0]
 
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
             cls.backup_corruped_file()
             cls.list_ = cls.get_default_mfs()
             cls.current = cls.list_[0]

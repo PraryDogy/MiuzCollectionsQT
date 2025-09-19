@@ -16,7 +16,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
-from system.utils import MainUtils
+from system.utils import Utils
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem, SvgBtn,
                             UMenu, USubMenu, UVBoxLayout, VScrollArea)
@@ -255,7 +255,7 @@ class Thumbnail(QFrame):
 
         size_ = self.pixmap_size + ThumbData.MARGIN
         self.img_wid.setFixedSize(size_, size_)
-        self.img_wid.setPixmap(MainUtils.pixmap_scale(self.img, self.pixmap_size))
+        self.img_wid.setPixmap(Utils.pixmap_scale(self.img, self.pixmap_size))
 
     def set_frame(self):
         """Устанавливает рамку и фон для выделенной миниатюры."""
@@ -1023,7 +1023,7 @@ class Grid(VScrollArea):
         try:
             distance = (a0.pos() - self.origin_pos).manhattanLength()
         except AttributeError:
-            MainUtils.print_error()
+            Utils.print_error()
             return
 
         if distance < QApplication.startDragDistance():
@@ -1049,7 +1049,7 @@ class Grid(VScrollArea):
             paths = []
             if mf_path:
                 paths = [
-                    MainUtils.get_abs_path(mf_path, wid.rel_path)
+                    Utils.get_abs_path(mf_path, wid.rel_path)
                     for wid in self.selected_widgets
                 ]
 

@@ -15,7 +15,7 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
 from system.paletes import ThemeChanger
-from system.utils import MainUtils
+from system.utils import Utils
 
 from ._base_widgets import (AppModalWindow, SingleActionWindow, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
@@ -324,14 +324,14 @@ class SelectableLabel(ULabel):
         context_menu.addSeparator()
 
         select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng])
-        select_all.triggered.connect(lambda: MainUtils.copy_text(self.text()))
+        select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
         context_menu.show_umenu()
         return super().contextMenuEvent(ev)
 
     def copy_text_md(self):
-        MainUtils.copy_text(self.selectedText())
+        Utils.copy_text(self.selectedText())
 
 
 class AboutWid(QGroupBox):
@@ -953,7 +953,7 @@ class WinSettings(SingleActionWindow):
                 Filters.write_json_data()
                 Cfg.write_json_data()
             QApplication.quit()
-            MainUtils.start_new_app()
+            Utils.start_new_app()
         else:
             self.deleteLater()
 

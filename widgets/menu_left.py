@@ -10,7 +10,7 @@ from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import SortedDirsLoader, UThreadPool
-from system.utils import MainUtils
+from system.utils import Utils
 
 from ._base_widgets import (SettingsItem, UListWidgetItem, UMenu, UVBoxLayout,
                             VListWidget)
@@ -297,7 +297,7 @@ class MenuLeft(QTabWidget):
         if path == Static.NAME_FAVS:
             Dynamic.current_dir = Static.NAME_FAVS
         else:
-            Dynamic.current_dir = MainUtils.get_rel_path(Mf.current.curr_path, path)
+            Dynamic.current_dir = Utils.get_rel_path(Mf.current.curr_path, path)
         self.reload_thumbnails.emit()
 
     def init_ui(self):

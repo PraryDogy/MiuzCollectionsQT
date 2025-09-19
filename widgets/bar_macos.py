@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QAction, QLabel, QMenu, QMenuBar, QSpacerItem,
 
 from cfg import Cfg, Static
 from system.lang import Lng
-from system.utils import MainUtils
+from system.utils import Utils
 
 from ._base_widgets import SingleActionWindow, UMenu
 from .win_settings import WinSettings
@@ -47,7 +47,7 @@ class SelectableLabel(QLabel):
         # --- Копировать выделенный текст ---
         copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng])
         copy_text.triggered.connect(
-            lambda: MainUtils.copy_text(self.selectedText())
+            lambda: Utils.copy_text(self.selectedText())
         )
         context_menu.addAction(copy_text)
 
@@ -56,7 +56,7 @@ class SelectableLabel(QLabel):
         # --- Копировать весь текст ---
         select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng])
         select_all.triggered.connect(
-            lambda: MainUtils.copy_text(self.text())
+            lambda: Utils.copy_text(self.text())
         )
         context_menu.addAction(select_all)
 

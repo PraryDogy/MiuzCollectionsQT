@@ -12,7 +12,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ReadImage
 from system.tasks import TaskState
-from system.utils import MainUtils
+from system.utils import Utils
 
 
 class RemovedMfCleaner:
@@ -63,7 +63,7 @@ class RemovedMfCleaner:
             THUMBS.c.brand == mf_name
         )
         return [
-            (id_, MainUtils.get_abs_hash(rel_thumb_path))
+            (id_, Utils.get_abs_hash(rel_thumb_path))
             for id_, rel_thumb_path in self.conn.execute(q).fetchall()
         ]
 
@@ -133,7 +133,7 @@ class DirsLoader(QObject):
         def iter_dir(entry: os.DirEntry):
             if entry.is_dir() and entry.name not in self.mf.stop_list:
                 stack.append(entry.path)
-                rel_path = MainUtils.get_rel_path(self.mf_path, entry.path)
+                rel_path = Utils.get_rel_path(self.mf_path, entry.path)
                 stats = entry.stat()
                 mod = int(stats.st_mtime)
                 dirs.append((rel_path, mod))
@@ -287,7 +287,7 @@ class ImgLoader(QObject):
             finder_images.append((abs_path, size, birth, mod))
 
         for rel_dir_path, mod in self.dirs_to_scan:
-            abs_dir_path = MainUtils.get_abs_path(self.mf_path, rel_dir_path)
+            abs_dir_path = Utils.get_abs_path(self.mf_path, rel_dir_path)
             for entry in os.scandir(abs_dir_path):
                 if not self.task_state.should_run():
                     return []
@@ -326,7 +326,7 @@ class ImgLoader(QObject):
                 q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
-                abs_path = MainUtils.get_abs_path(self.mf_path, rel_path)
+                abs_path = Utils.get_abs_path(self.mf_path, rel_path)
                 db_images[rel_thumb_path] = (abs_path, size, birth, mod)
         conn.close()
         return db_images
@@ -404,7 +404,7 @@ class _ImgHashdirUpdater(QObject):
         for rel_thumb_path in self.del_items:
             if not self.task_state.should_run():
                 break
-            thumb_path = MainUtils.get_abs_hash(rel_thumb_path)
+            thumb_path = Utils.get_abs_hash(rel_thumb_path)
             if os.path.exists(thumb_path):
                 try:
                     os.remove(thumb_path)
@@ -426,7 +426,7 @@ class _ImgHashdirUpdater(QObject):
 
     def create_thumb(self, path: str) -> ndarray | None:
         img = ReadImage.read_image(path)
-        thumb = MainUtils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
+        thumb = Utils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
         del img
         gc.collect()
         if isinstance(thumb, ndarray):
@@ -441,8 +441,8 @@ class _ImgHashdirUpdater(QObject):
                 break
             try:
                 thumb = self.create_thumb(path)
-                thumb_path = MainUtils.create_abs_hash(path)
-                MainUtils.write_thumb(thumb_path, thumb)
+                thumb_path = Utils.create_abs_hash(path)
+                Utils.write_thumb(thumb_path, thumb)
                 new_new_items.append((path, size, birth, mod))
                 self.total -= 1
                 self.send_text()
@@ -484,7 +484,7 @@ class _ImgDbUpdater:
 
     def del_dublicates(self):
         short_paths = [
-            MainUtils.get_rel_path(self.mf.curr_path, path)
+            Utils.get_rel_path(self.mf.curr_path, path)
             for path, size, birth, mod in self.new_images
         ]
         q = sqlalchemy.delete(THUMBS).where(
@@ -497,10 +497,10 @@ class _ImgDbUpdater:
     def run_new_items(self):
         values_list = []
         for path, size, birth, mod in self.new_images:
-            abs_hash = MainUtils.create_abs_hash(path)
-            short_hash = MainUtils.get_rel_hash(abs_hash)
-            short_src = MainUtils.get_rel_path(self.mf.curr_path, path)
-            coll_name = MainUtils.get_coll_name(self.mf.curr_path, path)
+            abs_hash = Utils.create_abs_hash(path)
+            short_hash = Utils.get_rel_hash(abs_hash)
+            short_src = Utils.get_rel_path(self.mf.curr_path, path)
+            coll_name = Utils.get_coll_name(self.mf.curr_path, path)
             values_list.append({
                 ClmNames.SHORT_SRC: short_src,
                 ClmNames.SHORT_HASH: short_hash,
@@ -592,7 +592,7 @@ class RemovedDirsHandler(QObject):
             )
             for short_hash in self.conn.execute(stmt).scalars():
                 try:
-                    os.remove(MainUtils.get_abs_hash(short_hash))
+                    os.remove(Utils.get_abs_hash(short_hash))
                 except Exception as e:
                     print("DelDirsHandler, remove thumb:", e)
 

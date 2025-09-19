@@ -16,7 +16,7 @@ SCRIPTS = "scripts"
 REVEAL_SCPT = os.path.join(SCRIPTS, "reveal_files.scpt")
 
 
-class MainUtils:
+class Utils:
 
     @classmethod
     def qimage_from_array(cls, image: np.ndarray) -> QImage | None:

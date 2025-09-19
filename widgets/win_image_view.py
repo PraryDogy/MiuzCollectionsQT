@@ -12,7 +12,7 @@ from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import OneImgLoader, UThreadPool
-from system.utils import MainUtils
+from system.utils import Utils
 
 from ._base_widgets import (AppModalWindow, SvgShadowed, UHBoxLayout, UMenu,
                             UVBoxLayout)
@@ -260,7 +260,7 @@ class WinImageView(AppModalWindow):
 
         mf_path = Mf.current.get_curr_path()
         if mf_path:
-            self.path = MainUtils.get_abs_path(mf_path, self.rel_path)
+            self.path = Utils.get_abs_path(mf_path, self.rel_path)
             self.load_image()
         else:
             print("img viewer > no smb")

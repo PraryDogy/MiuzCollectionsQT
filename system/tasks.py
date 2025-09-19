@@ -15,7 +15,7 @@ from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ReadImage, SharedUtils
-from .utils import MainUtils
+from .utils import Utils
 
 
 class TaskState:
@@ -110,7 +110,7 @@ class CopyFilesManager(URunnable):
         try:
             self._finish_copy(self._copy_files())
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
             self._finish_copy([])
 
     def _copy_files(self):
@@ -193,7 +193,7 @@ class FavManager(URunnable):
             self.conn.commit()
             self.sigs.finished_.emit(self.value)
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
             self.conn.rollback()
         finally:
             self.conn.close()
@@ -243,8 +243,8 @@ class OneImgLoader(URunnable):
         if img is None:
             return None
 
-        img = MainUtils.desaturate_image(img, 0.2)
-        qimage = MainUtils.qimage_from_array(img)
+        img = Utils.desaturate_image(img, 0.2)
+        qimage = Utils.qimage_from_array(img)
         self.cached_images[self.abs_path] = qimage
 
         del img
@@ -288,7 +288,7 @@ class OneFileInfo(URunnable):
             if resol:
                 self.sigs.delayed_info.emit(resol)
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
             res = {
                 Lng.file_name[Cfg.lng]: self.lined_text(os.path.basename(self.url)),
                 Lng.place[Cfg.lng]: self.lined_text(self.url),
@@ -303,7 +303,7 @@ class OneFileInfo(URunnable):
         stats = os.stat(self.url)
         size = SharedUtils.get_f_size(stats.st_size)
         mod = SharedUtils.get_f_date(stats.st_mtime)
-        thumb_path = MainUtils.create_abs_hash(self.url)
+        thumb_path = Utils.create_abs_hash(self.url)
 
         res = {
             Lng.file_name[Cfg.lng]: self.lined_text(name),
@@ -479,12 +479,12 @@ class DbImagesLoader(URunnable):
                 continue
 
             f_mod = datetime.fromtimestamp(mod).date()
-            thumb_path = MainUtils.get_abs_hash(rel_thumb_path)
-            thumb = MainUtils.read_thumb(thumb_path)
+            thumb_path = Utils.get_abs_hash(rel_thumb_path)
+            thumb = Utils.read_thumb(thumb_path)
             if not isinstance(thumb, ndarray):
                 continue
 
-            qimage = MainUtils.qimage_from_array(thumb)
+            qimage = Utils.qimage_from_array(thumb)
 
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
@@ -625,7 +625,7 @@ class MfDataCleaner(URunnable):
         # Удаляем битые миниатюры
         stmt = sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.short_hash)
         for rel_path, rel_thumb_path in self.conn.execute(stmt):
-            if not os.path.exists(MainUtils.get_abs_hash(rel_thumb_path)):
+            if not os.path.exists(Utils.get_abs_hash(rel_thumb_path)):
                 self.conn.execute(
                     sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_path)
                 )

@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
-from system.utils import MainUtils
+from system.utils import Utils
 
 
 class UHBoxLayout(QHBoxLayout):
@@ -115,13 +115,13 @@ class ULineEdit(QLineEdit):
 
     def cut_selection(self, *args):
         text = self.selectedText()
-        MainUtils.copy_text(text)
+        Utils.copy_text(text)
 
         new_text = self.text().replace(text, "")
         self.setText(new_text)
 
     def paste_text(self, *args):
-        text = MainUtils.paste_text()
+        text = Utils.paste_text()
         self.insert(text)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
@@ -130,7 +130,7 @@ class ULineEdit(QLineEdit):
 
         actions = [
             (Lng.cut[Cfg.lng], self.cut_selection),
-            (Lng.copy[Cfg.lng], lambda: MainUtils.copy_text(self.selectedText())),
+            (Lng.copy[Cfg.lng], lambda: Utils.copy_text(self.selectedText())),
             (Lng.paste[Cfg.lng], self.paste_text),
         ]
 
@@ -208,16 +208,16 @@ class UTextEdit(QTextEdit):
     def copy_selection(self):
         cur = self.parent_.textCursor()
         text = cur.selectedText().strip()
-        MainUtils.copy_text(text)
+        Utils.copy_text(text)
 
     def cut_selection(self):
         cur = self.textCursor()
         text = cur.selectedText().strip()
-        MainUtils.copy_text(text)
+        Utils.copy_text(text)
         cur.removeSelectedText()
 
     def paste_text(self):
-        text = MainUtils.paste_text()
+        text = Utils.paste_text()
         new_text = self.toPlainText() + text
         self.setPlainText(new_text)
 
@@ -277,14 +277,14 @@ class UMainWindow(QMainWindow):
         try:
             WinManager.win_list.remove(self)
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
         return super().closeEvent(a0)
     
     def deleteLater(self):
         try:
             WinManager.win_list.remove(self)
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
         return super().deleteLater()
 
 

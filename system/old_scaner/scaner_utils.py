@@ -13,7 +13,7 @@ from system.main_folder import Mf
 
 from ..shared_utils import ReadImage
 from ..tasks import TaskState
-from ..utils import MainUtils
+from ..utils import Utils
 
 
 class FinderImages(QObject):
@@ -47,7 +47,7 @@ class FinderImages(QObject):
                 self.task_state.set_should_run(False)
                 return None
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
             self.task_state.set_should_run(False)
             return None
 
@@ -89,7 +89,7 @@ class FinderImages(QObject):
                 walked_images = self.walk_subdir(subdir)
                 finder_images.extend(walked_images)
             except Exception as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 continue
 
         for i in os.scandir(rootdir):
@@ -98,7 +98,7 @@ class FinderImages(QObject):
                     file_data = self.get_file_data(i)
                     finder_images.append(file_data)
                 except Exception as e:
-                    MainUtils.print_error()
+                    Utils.print_error()
                     continue
         return finder_images
 
@@ -178,7 +178,7 @@ class DbImages(QObject):
         mf_path = self.mf.curr_path
         return {
             rel_thumb_path: (
-                MainUtils.get_abs_path(mf_path, rel_path),
+                Utils.get_abs_path(mf_path, rel_path),
                 size,
                 birth,
                 mod
@@ -297,7 +297,7 @@ class HashdirUpdater(QObject):
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
             if not self.task_state.should_run():
                 break
-            thumb_path = MainUtils.get_abs_hash(rel_thumb_path)
+            thumb_path = Utils.get_abs_hash(rel_thumb_path)
             if os.path.exists(thumb_path):
                 self.progressbar_text(Lng.deleting[Cfg.lng], x, total)
                 try:
@@ -307,13 +307,13 @@ class HashdirUpdater(QObject):
                         os.rmdir(folder)
                     new_del_items.append(rel_thumb_path)
                 except Exception as e:
-                    MainUtils.print_error()
+                    Utils.print_error()
                     continue
         return new_del_items
 
     def create_thumb(self, path: str) -> ndarray | None:
         img = ReadImage.read_image(path)
-        thumb = MainUtils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
+        thumb = Utils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
         del img
         gc.collect()
         if isinstance(thumb, ndarray):
@@ -330,11 +330,11 @@ class HashdirUpdater(QObject):
             self.progressbar_text(Lng.adding[Cfg.lng], x, total)
             try:
                 thumb = self.create_thumb(path)
-                thumb_path = MainUtils.create_abs_hash(path)
-                MainUtils.write_thumb(thumb_path, thumb)
+                thumb_path = Utils.create_abs_hash(path)
+                Utils.write_thumb(thumb_path, thumb)
                 new_new_items.append((path, size, birth, mod))
             except Exception as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 continue
         return new_new_items
 
@@ -370,18 +370,18 @@ class DbUpdater(QObject):
             try:
                 conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 conn.rollback()
                 continue
             except sqlalchemy.exc.OperationalError as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 conn.rollback()
                 conn.close()
                 return None
         try:
             conn.commit()
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
             conn.rollback()
         conn.close()
 
@@ -391,11 +391,11 @@ class DbUpdater(QObject):
     def run_new_items(self):
         conn = Dbase.engine.connect()
         for path, size, birth, mod in self.new_items:
-            small_path = MainUtils.create_abs_hash(path)
-            short_path = MainUtils.get_rel_path(self.mf.curr_path, path)
-            rel_thumb_path = MainUtils.get_rel_hash(small_path)
+            small_path = Utils.create_abs_hash(path)
+            short_path = Utils.get_rel_path(self.mf.curr_path, path)
+            rel_thumb_path = Utils.get_rel_hash(small_path)
 
-            coll_name = MainUtils.get_coll_name(self.mf.curr_path, path)
+            coll_name = Utils.get_coll_name(self.mf.curr_path, path)
 
             values = {
                 ClmNames.SHORT_SRC: short_path,
@@ -414,17 +414,17 @@ class DbUpdater(QObject):
             # overflow error бывает прозникает когда пишет
             # python integer too large to insert db
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 conn.rollback()
                 continue
             except sqlalchemy.exc.OperationalError as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 conn.rollback()
                 break
         try:
             conn.commit()
         except Exception as e:
-            MainUtils.print_error()
+            Utils.print_error()
             conn.rollback()
         conn.close()
 
@@ -467,7 +467,7 @@ class MfRemover(QObject):
         q = q.where(THUMBS.c.brand == mf_name)
         res = self.conn.execute(q).fetchall()
         res = [
-            (id_, MainUtils.get_abs_hash(rel_thumb_path))
+            (id_, Utils.get_abs_hash(rel_thumb_path))
             for id_, rel_thumb_path in res
         ]
         return res
@@ -489,7 +489,7 @@ class MfRemover(QObject):
                     os.rmdir(folder)
 
             except Exception as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 continue
 
     def remove_rows(self, rows: list):
@@ -503,16 +503,16 @@ class MfRemover(QObject):
             try:
                 self.conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 self.conn.rollback()
                 continue
 
             except sqlalchemy.exc.OperationalError as e:
-                MainUtils.print_error()
+                Utils.print_error()
                 self.conn.rollback()
                 break
         try:
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            MainUtils.print_error()
+            Utils.print_error()

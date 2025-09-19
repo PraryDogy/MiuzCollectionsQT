@@ -9,7 +9,7 @@ from cfg import Cfg
 from ..lang import Lng
 from ..main_folder import Mf
 from ..tasks import URunnable
-from ..utils import MainUtils
+from ..utils import Utils
 from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
                            NewDirsHandler, RemovedDirsHandler,
                            RemovedMfCleaner)
@@ -137,7 +137,7 @@ class CustomScanerTask(URunnable):
             for i in self.dirs_to_scan
         )
         dirs_to_scan = [
-            (MainUtils.get_rel_path(self.mf.curr_path, abs_path), st_mtime)
+            (Utils.get_rel_path(self.mf.curr_path, abs_path), st_mtime)
             for abs_path, st_mtime in dirs_to_scan
         ]
         
