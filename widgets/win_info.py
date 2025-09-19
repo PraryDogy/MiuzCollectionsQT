@@ -2,7 +2,7 @@ import os
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
-from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget
+from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget, QSpacerItem
 
 from cfg import Cfg, Static
 from system.lang import Lng
@@ -12,7 +12,15 @@ from system.utils import Utils
 from ._base_widgets import UMenu, SingleActionWindow
 
 
-class Selectable(QLabel):
+class ULabel(QLabel):
+    def __init__(self, text: str):
+        super().__init__(text=text)
+
+        self.setStyleSheet("font-size: 12px;")
+
+
+
+class Selectable(ULabel):
     sym_line_feed = "\u000a"
     sym_paragraph_sep = "\u2029"
 
@@ -93,34 +101,36 @@ class WinInfo(SingleActionWindow):
 
     def multiple_img_fin(self, data: dict[str, str]):
         row = 0
-        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         for left_t, right_t in data.items():
-            left_lbl = QLabel(left_t)
+            left_lbl = ULabel(left_t + ":")
             right_lbl = Selectable(right_t)
             self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
-            self.grid_lay.addWidget(right_lbl, row, 1, alignment=r_fl)
+            self.grid_lay.addItem(QSpacerItem(15, 1), row, 1)
+            self.grid_lay.addWidget(right_lbl, row, 2, alignment=r_fl)
             row += 1
 
         self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.last_label = self.findChildren(QLabel)[-1]
+        self.last_label = self.findChildren(ULabel)[-1]
         cmd = lambda text: self.last_label.setText(text)
         self.task_.sigs.delayed_info.connect(cmd)
         self.finished_.emit()
 
     def single_img_fin(self, data: dict[str, str]):
         row = 0
-        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         for left_t, right_t in data.items():
-            left_lbl = QLabel(left_t)
+            left_lbl = ULabel(left_t + ":")
             right_lbl = Selectable(right_t)
             self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
-            self.grid_lay.addWidget(right_lbl, row, 1, alignment=r_fl)
+            self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
+            self.grid_lay.addWidget(right_lbl, row, 2, alignment=r_fl)
             row += 1
 
-        self.last_label = self.findChildren(QLabel)[-1]
+        self.last_label = self.findChildren(ULabel)[-1]
         cmd = lambda text: self.last_label.setText(text)
         self.task_.sigs.delayed_info.connect(cmd)
         self.finished_.emit()
