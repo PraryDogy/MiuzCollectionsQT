@@ -16,7 +16,7 @@ class ULabel(QLabel):
     def __init__(self, text: str):
         super().__init__(text=text)
 
-        self.setStyleSheet("font-size: 12px;")
+        self.setStyleSheet("font-size: 11px;")
 
 
 
@@ -40,11 +40,7 @@ class Selectable(ULabel):
         full_text = self.text().replace(self.sym_paragraph_sep, "")
         full_text = full_text.replace(self.sym_line_feed, "")
 
-        is_path = bool(
-            os.path.isdir(full_text)
-            or
-            os.path.isfile(full_text)
-        )
+        is_path = any((os.path.isdir(full_text), os.path.isfile(full_text)))
 
         menu_ = UMenu(event=ev)
 
@@ -57,10 +53,9 @@ class Selectable(ULabel):
         reveal.triggered.connect(
             lambda: Utils.reveal_files([full_text])
         )
-        menu_.addAction(reveal)
-
-        if not is_path:
-            reveal.setDisabled(True)
+        
+        if is_path:
+            menu_.addAction(reveal)
 
         menu_.show_umenu()
 

@@ -303,14 +303,13 @@ class OneFileInfo(URunnable):
         stats = os.stat(self.url)
         size = SharedUtils.get_f_size(stats.st_size)
         mod = SharedUtils.get_f_date(stats.st_mtime)
-        thumb_path = Utils.create_abs_hash(self.url)
 
         res = {
             Lng.file_name[Cfg.lng]: self.lined_text(name),
             Lng.type_[Cfg.lng]: type_,
             Lng.file_size[Cfg.lng]: size,
             Lng.place[Cfg.lng]: self.lined_text(self.url),
-            Lng.thumb_path[Cfg.lng]: self.lined_text(thumb_path),
+            # Lng.thumb_path[Cfg.lng]: self.lined_text(thumb_path),
             Lng.changed[Cfg.lng]: mod,
             Lng.resol[Cfg.lng]: Lng.calculating[Cfg.lng],
         }
