@@ -77,6 +77,7 @@ from system.filters import Filters
 from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.tasks import UThreadPool
+from widgets._base_widgets import WinManager
 from widgets.win_main import WinMain
 
 
@@ -104,7 +105,9 @@ class App(QApplication):
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            self.win_main.show()
+            for i in WinManager.win_list:
+                i.raise_()
+                i.show()
         return super().eventFilter(a0, a1)
 
 app = App(sys.argv)
