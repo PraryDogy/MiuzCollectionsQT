@@ -124,15 +124,6 @@ class BelowTextWid(QLabel):
         self.setText(text)
 
         self.setStyleSheet(self.STYLE)
-
-    # def short_text(self, text: str) -> str:
-    #     """
-    #     Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
-    #     """
-    #     max_row = ThumbData.MAX_ROW[Dynamic.thumb_size_index]
-    #     if len(text) >= max_row:
-    #         return f"{text[:max_row - 10]}...{text[-7:]}"
-    #     return text
     
     def short_text(self, text: str) -> str:
         """

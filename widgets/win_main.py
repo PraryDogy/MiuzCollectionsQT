@@ -419,14 +419,31 @@ class WinMain(UMainWindow):
     
     @with_conn
     def upload_files(self, parent: QWidget, mf: Mf, abs_paths: list):
-        self.clipboard_item = ClipBoardItem()
-        self.grid.clipboard_item = self.clipboard_item
-        self.clipboard_item.action_type = ClipBoardItem.type_copy
-        self.clipboard_item.target_mf = Mf.current
-        self.clipboard_item.target_dir = Utils.get_abs_path(mf.curr_path, Dynamic.current_dir)
-        self.clipboard_item.files_to_copy = abs_paths
-        self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
-        self.paste_files_here(self.grid, Mf.current)
+
+        def fin(target_dir: str):
+            self.clipboard_item = ClipBoardItem()
+            self.grid.clipboard_item = self.clipboard_item
+            self.clipboard_item.action_type = ClipBoardItem.type_copy
+            self.clipboard_item.target_mf = Mf.current
+            self.clipboard_item.target_dir = target_dir
+            self.clipboard_item.files_to_copy = abs_paths
+            self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
+            self.paste_files_here(self.grid, Mf.current)
+
+        target_dir = Utils.get_abs_path(mf.curr_path, Dynamic.current_dir)
+        text = (
+            Lng.upload_files_in[Cfg.lng],
+            target_dir
+        )
+
+        self.upload_win = WinQuestion(
+            Lng.attention[Cfg.lng],
+            "\n".join(text)
+        )
+        self.upload_win.center_to_parent(self)
+        self.upload_win.adjustSize()
+        self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
+        self.upload_win.show()
 
     @with_conn
     def open_info_win(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
