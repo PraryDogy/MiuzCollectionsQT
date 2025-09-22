@@ -254,6 +254,44 @@ class SettingsBtn(BarTopBtn):
         self.svg_btn.load(self.ICON_PATH)
 
 
+class ViewBtn(BarTopBtn):
+    ICON_PATH = "./images/settings.svg"
+
+    def __init__(self):
+        super().__init__()
+        self.lbl.setText(Lng.show[Cfg.lng])
+        self.svg_btn.load(self.ICON_PATH)
+
+    def menu_clicked(self, value: bool):
+        Dynamic.show_all_images = value
+
+    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+        """Показывает меню выбора сортировки при клике левой кнопкой мыши."""
+        if ev and ev.button() == Qt.MouseButton.LeftButton:
+            self.set_solid_style()
+            menu = UMenu(ev)
+
+            # --- Создаем пункты меню ---
+            all_images = QAction(Lng.all_images[Cfg.lng], self, checkable=True)
+            only_this_folder = QAction(Lng.only_this_folder[Cfg.lng], self, checkable=True)
+
+            all_images.setChecked(Dynamic.show_all_images)
+            only_this_folder.setChecked(not Dynamic.show_all_images)
+
+            all_images.triggered.connect(lambda: self.menu_clicked(True))
+            only_this_folder.triggered.connect(lambda: self.menu_clicked(False))
+
+            menu.addAction(all_images)
+            menu.addAction(only_this_folder)
+
+            # --- Показ меню под кнопкой ---
+            pos = self.mapToGlobal(self.rect().bottomLeft())
+            menu.exec(pos)
+
+            # --- Вернуть нормальный стиль после закрытия меню ---
+            self.set_normal_style()
+
+
 class BarTop(QWidget):
     """
     Верхняя панель с кнопками управления и поиском.
@@ -281,6 +319,9 @@ class BarTop(QWidget):
         self.setLayout(self.h_layout)
 
         self.h_layout.addStretch(1)
+
+        self.view_btn = ViewBtn()
+        self.h_layout.addWidget(self.view_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка сортировки ---
         self.sort_btn = SortBtn()

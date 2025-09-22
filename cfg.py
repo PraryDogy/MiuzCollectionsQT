@@ -270,4 +270,5 @@ class Dynamic:
     thumb_size_index: int = 0
     current_dir: str = None
     sort_by_mod: bool = True
+    show_all_images: bool = True
     enabled_filters: list[str] = []

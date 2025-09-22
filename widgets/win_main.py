@@ -189,12 +189,6 @@ class WinMain(UMainWindow):
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
 
-        def test():
-            self.asd = ProgressbarWin("test")
-            self.asd.show()
-
-        QTimer.singleShot(1000, test)
-
     @staticmethod
     def with_conn(fn):
         def wrapper(self: "WinMain", parent: QWidget, mf: Mf, *args, **kwargs):

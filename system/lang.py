@@ -283,3 +283,5 @@ class Lng:
         "- Add the filter \".jpg\" and click \"Save\".\n"
         "- In the app, select the \".jpg\" filter — all .jpg files will be displayed."
     )
+    all_images = ("Все изображения", "All images")
+    only_this_folder = ("Только в этой папке", "Only this folder")
