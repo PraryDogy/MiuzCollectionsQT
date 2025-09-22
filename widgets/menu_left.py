@@ -201,7 +201,7 @@ class MfList(VListWidget):
             text = f"{true_name} ({i.name})"
             item = MainFolerListItem(parent=self, text=text)
             item.mf = i
-            item.setToolTip(i.name + "\n" + i.curr_path)
+            item.setToolTip(i.name)
             self.addItem(item)
 
         self._last_mf = Mf.list_[0]
