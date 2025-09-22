@@ -255,15 +255,21 @@ class SettingsBtn(BarTopBtn):
 
 
 class ViewBtn(BarTopBtn):
-    ICON_PATH = "./images/settings.svg"
+    eye_on = "./images/eye_on.svg"
+    eye_off = "./images/eye_off.svg"
 
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.show[Cfg.lng])
-        self.svg_btn.load(self.ICON_PATH)
+        self.mappings = {
+            True: self.eye_on,
+            False: self.eye_off
+        }
+        self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
 
     def menu_clicked(self, value: bool):
         Dynamic.show_all_images = value
+        self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
         self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
