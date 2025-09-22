@@ -420,7 +420,13 @@ class WinMain(UMainWindow):
     @with_conn
     def upload_files(self, parent: QWidget, mf: Mf, abs_paths: list):
 
+        def shorten_path(path, max_len=50):
+            if len(path) <= max_len:
+                return path
+            return '…' + path[-(max_len-1):]  # оставляем конец, добавляем '…' спереди
+
         def fin(target_dir: str):
+            self.upload_win.deleteLater()
             self.clipboard_item = ClipBoardItem()
             self.grid.clipboard_item = self.clipboard_item
             self.clipboard_item.action_type = ClipBoardItem.type_copy
@@ -433,15 +439,13 @@ class WinMain(UMainWindow):
         target_dir = Utils.get_abs_path(mf.curr_path, Dynamic.current_dir)
         text = (
             Lng.upload_files_in[Cfg.lng],
-            target_dir
+            shorten_path(target_dir)
         )
-
         self.upload_win = WinQuestion(
             Lng.attention[Cfg.lng],
             "\n".join(text)
         )
         self.upload_win.center_to_parent(self)
-        self.upload_win.adjustSize()
         self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
         self.upload_win.show()
 
