@@ -518,8 +518,11 @@ class DbImagesLoader(URunnable):
 
         if Dynamic.current_dir == Static.NAME_FAVS:
             stmt = stmt.where(THUMBS.c.fav == 1)
+        elif Dynamic.show_all_images:
+            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
         else:
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
+            stmt = stmt.where(THUMBS.c.short_src.not_ilike(f"{Dynamic.current_dir}/%/%"))
 
         if Dynamic.enabled_filters:
             stmt = stmt.where(

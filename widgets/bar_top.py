@@ -264,6 +264,7 @@ class ViewBtn(BarTopBtn):
 
     def menu_clicked(self, value: bool):
         Dynamic.show_all_images = value
+        self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         """Показывает меню выбора сортировки при клике левой кнопкой мыши."""
@@ -321,6 +322,7 @@ class BarTop(QWidget):
         self.h_layout.addStretch(1)
 
         self.view_btn = ViewBtn()
+        self.view_btn.clicked_.connect(self.reload_thumbnails.emit)
         self.h_layout.addWidget(self.view_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка сортировки ---
