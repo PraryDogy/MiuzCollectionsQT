@@ -283,7 +283,7 @@ class MenuLeft(QTabWidget):
             self.tree_wid.init_ui(mf_path)
             self.setCurrentIndex(1)
             # без таймера не срабатывает
-            # QTimer.singleShot(0, lambda: self.reload_thumbnails_cmd(mf_path))
+            QTimer.singleShot(0, lambda: self.reload_thumbnails.emit(mf_path))
             
     def dragEnterEvent(self, a0):
         a0.accept()
