@@ -297,8 +297,6 @@ class MenuLeft(QTabWidget):
             lambda: mf_new()
         )
 
-        self.addTab(self.mf_list, Lng.folders[Cfg.lng])
-
         self.tree_wid = TreeWid()
         self.tree_wid.restart_scaner.connect(
             lambda: self.restart_scaner.emit()
@@ -312,6 +310,8 @@ class MenuLeft(QTabWidget):
         self.tree_wid.restart_scaner.connect(
             lambda: self.restart_scaner.emit()
         )
+
+        self.addTab(self.mf_list, Lng.folders[Cfg.lng])
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
         
         QTimer.singleShot(0, lambda: mf_click(Mf.current))
