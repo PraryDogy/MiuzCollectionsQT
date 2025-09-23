@@ -12,8 +12,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.utils import Utils
 
-from ._base_widgets import (SettingsItem, UListSpacerItem, UListWidgetItem,
-                            UMenu, VListWidget)
+from ._base_widgets import SettingsItem, UListWidgetItem, UMenu, VListWidget
 
 
 class CustomSortProxy(QSortFilterProxyModel):
@@ -150,9 +149,6 @@ class MfList(VListWidget):
         item.setToolTip(Lng.favorites[Cfg.lng])
         self.addItem(item)
 
-        item = UListSpacerItem(parent=self)
-        self.addItem(item)
-
         for i in Mf.list_:
             if i.curr_path:
                 true_name = os.path.basename(i.curr_path)
@@ -170,26 +166,27 @@ class MfList(VListWidget):
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
 
+    def item_click(self, item: MfListItem):
+        if item.mf == Static.NAME_FAVS:
+            self.fav_click.emit()
+        elif item.mf:
+            self.mf_click.emit(item.mf)
+
     def mouseReleaseEvent(self, e):
         item: MfListItem = self.itemAt(e.pos())
         if not item:
             return
-
         if e.button() == Qt.MouseButton.LeftButton:
-            if item.mf == Static.NAME_FAVS:
-                self.fav_click.emit()
-            elif item.mf:
-                self.mf_click.emit(item.mf)
+            self.item_click(item)
         return super().mouseReleaseEvent(e)
 
     def contextMenuEvent(self, a0):
         menu = UMenu(a0)
         item: MfListItem = self.itemAt(a0.pos())
         if item:
-
             view_action = QAction(Lng.open[Cfg.lng], menu)
             view_action.triggered.connect(
-                lambda: self.mf_click.emit(item.mf)
+                lambda: self.item_click(item)
             )
             menu.addAction(view_action)
             restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
@@ -197,18 +194,19 @@ class MfList(VListWidget):
                 lambda: self.restart_scaner.emit()
             )
             menu.addAction(restart_scaner)
-            menu.addSeparator()
-            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-            reveal.triggered.connect(
-                lambda: self.mf_reveal.emit(item.mf)
-            )
-            menu.addAction(reveal)
-            menu.addSeparator()
-            setup = QAction(Lng.setup[Cfg.lng], menu)
-            setup.triggered.connect(
-                lambda: self.mf_edit.emit(item.mf)
-            )
-            menu.addAction(setup)
+            if item.mf != Static.NAME_FAVS:
+                menu.addSeparator()
+                reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
+                reveal.triggered.connect(
+                    lambda: self.mf_reveal.emit(item.mf)
+                )
+                menu.addAction(reveal)
+                menu.addSeparator()
+                setup = QAction(Lng.setup[Cfg.lng], menu)
+                setup.triggered.connect(
+                    lambda: self.mf_edit.emit(item.mf)
+                )
+                menu.addAction(setup)
         else:
             new_folder = QAction(Lng.new_folder[Cfg.lng], menu)
             new_folder.triggered.connect(
@@ -328,7 +326,7 @@ class MenuLeft(QTabWidget):
         )
 
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
-        self.addTab(self.tree_wid, Lng.images[Cfg.lng])
+        self.addTab(self.tree_wid, Lng.contents[Cfg.lng])
         QTimer.singleShot(0, lambda: mf_click(Mf.current))
 
     def dragEnterEvent(self, a0):

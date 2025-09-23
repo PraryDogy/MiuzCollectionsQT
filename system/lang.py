@@ -286,3 +286,4 @@ class Lng:
     all_images = ("Все изображения", "All images")
     only_this_folder = ("Только в этой папке", "Only this folder")
     upload_files_in = ("Загрузить файлы в", "Upload files in")
+    contents = ("Содержимое", "Contents")
