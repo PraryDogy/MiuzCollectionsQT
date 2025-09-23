@@ -157,6 +157,12 @@ class MfList(VListWidget):
 
         self.setCurrentRow(0)
 
+        self.setCurrentRow(1)
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
+
     def mouseReleaseEvent(self, e):
         item: MfListItem = self.itemAt(e.pos())
         if not item:
@@ -185,6 +191,16 @@ class MfList(VListWidget):
             new_folder.triggered.connect(lambda: self.mf_new.emit())
             menu.addAction(new_folder)
         menu.show_umenu()
+
+    def dropEvent(self, event):
+        super().dropEvent(event)  # перемещаем элемент визуально
+
+        # обновляем порядок в Mf.list_ согласно виджету
+        new_order = []
+        for i in range(self.count()):
+            item: MfListItem = self.item(i)
+            new_order.append(item.mf)
+        Mf.list_ = new_order
 
 
 class MenuLeft(QTabWidget):
