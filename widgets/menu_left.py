@@ -126,19 +126,17 @@ class MfListItem(UListWidgetItem):
     
 
 class MfList(VListWidget):
-    open_mf = pyqtSignal(Mf)
-    no_connection = pyqtSignal(Mf)
-    setup_mf = pyqtSignal(Mf)
-    setup_new_folder = pyqtSignal()
-    update_grid = pyqtSignal()
 
-    view = pyqtSignal(Mf)
-    reveal = pyqtSignal(Mf)
+    mf_view = pyqtSignal(Mf)
+    mf_reveal = pyqtSignal(Mf)
+    mf_edit = pyqtSignal(Mf)
+    mf_new = pyqtSignal()
     restart_scaner = pyqtSignal()
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
 
+    def init_ui(self):
         for i in Mf.list_:
             if i.curr_path:
                 true_name = os.path.basename(i.curr_path)
@@ -159,7 +157,7 @@ class MfList(VListWidget):
             return
 
         if e.button() == Qt.MouseButton.LeftButton:
-            self.view.emit(item.mf)
+            self.mf_view.emit(item.mf)
             self._last_mf = item.mf
 
         return super().mouseReleaseEvent(e)
@@ -167,35 +165,36 @@ class MfList(VListWidget):
     def contextMenuEvent(self, a0):
         menu = UMenu(a0)
         item: MfListItem = self.itemAt(a0.pos())
-        if not item:
-            return
-        view_action = QAction(Lng.open[Cfg.lng], menu)
-        view_action.triggered.connect(
-            lambda: self.view.emit(item.mf)
-        )
-        menu.addAction(view_action)
-        restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
-        restart_scaner.triggered.connect(
-            lambda: self.restart_scaner.emit()
-        )
-        menu.addAction(restart_scaner)
-        menu.addSeparator()
-        reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-        reveal.triggered.connect(
-            lambda: self.reveal.emit(item.mf)
-        )
-        menu.addAction(reveal)
+        if item:
 
-        # сканировать папку, сеп, показать в финдер, настроить
-
-        # menu.addSeparator()
-        # setup = QAction(Lng.setup[Cfg.lng], menu)
-        # setup.triggered.connect(lambda: self.setup_mf.emit(item.mf))
-        # menu.addAction(setup)
-    # else:
-    #     new_folder = QAction(Lng.new_folder[Cfg.lng], menu)
-    #     new_folder.triggered.connect(self.setup_new_folder.emit)
-    #     menu.addAction(new_folder)
+            view_action = QAction(Lng.open[Cfg.lng], menu)
+            view_action.triggered.connect(
+                lambda: self.mf_view.emit(item.mf)
+            )
+            menu.addAction(view_action)
+            restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
+            restart_scaner.triggered.connect(
+                lambda: self.restart_scaner.emit()
+            )
+            menu.addAction(restart_scaner)
+            menu.addSeparator()
+            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
+            reveal.triggered.connect(
+                lambda: self.mf_reveal.emit(item.mf)
+            )
+            menu.addAction(reveal)
+            menu.addSeparator()
+            setup = QAction(Lng.setup[Cfg.lng], menu)
+            setup.triggered.connect(
+                lambda: self.mf_edit.emit(item.mf)
+            )
+            menu.addAction(setup)
+        else:
+            new_folder = QAction(Lng.new_folder[Cfg.lng], menu)
+            new_folder.triggered.connect(
+                lambda: self.mf_new.emit()
+            )
+            menu.addAction(new_folder)
         menu.show_umenu()
 
 
@@ -205,63 +204,65 @@ class MenuLeft(QTabWidget):
     restart_scaner = pyqtSignal()
 
     no_connection = pyqtSignal(Mf)
-    edit_mf = pyqtSignal(SettingsItem)
-    setup_new_mf = pyqtSignal(SettingsItem)
+    mf_edit = pyqtSignal(SettingsItem)
+    mf_new = pyqtSignal(SettingsItem)
     
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
         self.init_ui()
 
-    def mf_view(self, mf: Mf):
-        Mf.current = mf
-        mf_path = mf.get_curr_path()
-        if mf_path:
-            self.reload_thumbnails.emit(mf_path)
-            self.tree_wid.init_ui(mf_path)
-        else:
-            self.no_connection.emit()
-
-    def mf_reveal(self, mf: Mf):
-        Mf.current = mf
-        mf_path = mf.get_curr_path()
-        if mf_path:
-            self.reveal.emit(mf_path)
-        else:
-            self.no_connection.emit()
- 
     def init_ui(self):
-        
-        def edit_mf(mf: Mf):
+
+        def mf_view(mf: Mf):
+            Mf.current = mf
+            mf_path = mf.get_curr_path()
+            if mf_path:
+                self.reload_thumbnails.emit(mf_path)
+                self.tree_wid.init_ui(mf_path)
+            else:
+                self.no_connection.emit()
+
+        def mf_reveal(mf: Mf):
+            Mf.current = mf
+            mf_path = mf.get_curr_path()
+            if mf_path:
+                self.reveal.emit(mf_path)
+            else:
+                self.no_connection.emit()
+  
+        def mf_edit(mf: Mf):
             item = SettingsItem()
             item.action_type = item.type_edit_folder
             item.content = mf
-            self.edit_mf.emit(item)
+            self.mf_edit.emit(item)
             
-        def setup_new_folder():
+        def mf_new():
             item = SettingsItem()
             item.action_type = item.type_new_folder
-            # item.content = ""
-            self.setup_new_mf.emit(item) 
+            item.content = str()
+            self.mf_new.emit(item) 
         
         self.clear()
 
         self.mf_list = MfList(self)
-        self.mf_list.view.connect(
-            lambda mf: self.mf_view(mf)
+        self.mf_list.init_ui()
+        self.mf_list.mf_view.connect(
+            lambda mf: mf_view(mf)
         )
-        self.mf_list.reveal.connect(
-            lambda mf: self.mf_reveal(mf)
+        self.mf_list.mf_reveal.connect(
+            lambda mf: mf_reveal(mf)
         )
         self.mf_list.restart_scaner.connect(
             lambda: self.restart_scaner.emit()
         )
+        self.mf_list.mf_edit.connect(
+            lambda mf: mf_edit(mf)
+        )
+        self.mf_list.mf_new.connect(
+            lambda: mf_new()
+        )
 
-        # mfs.open_mf.connect(self.mf_clicked)
-        # mfs.no_connection.connect(self.no_connection.emit)
-        # mfs.setup_mf.connect(edit_mf)
-        # mfs.setup_new_folder.connect(setup_new_folder)
-        # mfs.restart_scaner.connect(self.restart_scaner.emit)
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
@@ -296,4 +297,4 @@ class MenuLeft(QTabWidget):
                 item = SettingsItem()
                 item.action_type = item.type_new_folder
                 item.content = url
-                self.edit_mf.emit(item)                
+                self.mf_edit.emit(item)                

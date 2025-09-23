@@ -96,8 +96,12 @@ class WinMain(UMainWindow):
         self.left_menu.restart_scaner.connect(
             lambda: self.restart_scaner_task()
         )
-        # self.left_menu.edit_mf.connect(self.open_settings_win)
-        # self.left_menu.setup_new_mf.connect(self.open_settings_win)
+        self.left_menu.mf_edit.connect(
+            lambda settings_item: self.open_settings_win(settings_item)
+        )
+        self.left_menu.mf_new.connect(
+            lambda settings_item: self.open_settings_win(settings_item)
+        )
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
