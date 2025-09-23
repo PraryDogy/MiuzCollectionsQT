@@ -298,6 +298,8 @@ class ImgLoader(QObject):
                         print("new scaner utils, img loader, finder images, error", e)
                         self.task_state.set_should_run(False)
                         break
+
+        # print(self.mf.name, len(finder_images))
         return finder_images
 
     def db_images(self) -> list[tuple]:
