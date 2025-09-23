@@ -42,7 +42,6 @@ class TreeWid(QTreeWidget):
         self.init_ui(self.root_dir)
 
     def init_ui(self, root_dir: str):
-        print(2, self.sender())
         self.clear()
         self.root_dir = root_dir
         self.last_dir = root_dir
