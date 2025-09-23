@@ -884,6 +884,7 @@ class WinSettings(SingleActionWindow):
         self.mf_list_copy.append(mf)
         text = f"{os.path.basename(mf.curr_path)} ({mf.name})"
         item = SettingsListItem(self.left_menu, text=text)
+        item.setIcon(QIcon(self.svg_folder))
         item.mf = mf
         self.left_menu.addItem(item)
         self.left_menu.setCurrentItem(item)
