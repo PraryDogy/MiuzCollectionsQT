@@ -267,9 +267,9 @@ class ViewBtn(BarTopBtn):
         }
         self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
 
-    def menu_clicked(self, value: bool):
+    def menu_clicreked(self, value: bool):
         Dynamic.show_all_images = value
-        self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
+        # self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
         self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
