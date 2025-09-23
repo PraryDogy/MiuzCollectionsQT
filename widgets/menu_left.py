@@ -19,7 +19,7 @@ from ._base_widgets import (SettingsItem, UListWidgetItem, UMenu, UVBoxLayout,
 
 class TreeWid(QTreeWidget):
     tree_reveal = pyqtSignal(str)
-    reload_thumbnails = pyqtSignal(str)
+    tree_open = pyqtSignal(str)
 
     svg_folder = "./images/folder.svg"
     svg_size = 16
@@ -68,7 +68,7 @@ class TreeWid(QTreeWidget):
         else:
             self.last_dir = clicked_dir
             self.selected_path = clicked_dir
-            self.clicked_.emit(clicked_dir)
+            self.tree_open.emit(clicked_dir)
             if item.childCount() == 0:
                 worker = SortedDirsLoader(clicked_dir)
                 worker.sigs.finished_.connect(
@@ -119,7 +119,7 @@ class TreeWid(QTreeWidget):
             abs_path: str = item.data(0, Qt.ItemDataRole.UserRole)
             menu = UMenu(a0)
             view = QAction(Lng.open[Cfg.lng], menu)
-            view.triggered.connect(lambda: self.reload_thumbnails.emit(abs_path))
+            view.triggered.connect(lambda: self.tree_open.emit(abs_path))
             menu.addAction(view)
             menu.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
@@ -220,8 +220,14 @@ class MenuLeft(QTabWidget):
             subprocess.Popen(["open", mf.curr_path])
 
         @with_conn
-        def _tree_reveal(mf: Mf, abs_path):
+        def _tree_reveal(mf: Mf, abs_path: str):
             subprocess.Popen(["open", abs_path])
+
+        @with_conn
+        def _tree_open(mf: Mf, abs_path: str):
+            rel_path = Utils.get_rel_path(mf.curr_path, abs_path)
+            Dynamic.current_dir = rel_path
+            self.reload_thumbnails.emit()
 
         def _mf_edit(mf: Mf):
             item = SettingsItem()
@@ -246,17 +252,14 @@ class MenuLeft(QTabWidget):
         self.tree_wid.tree_reveal.connect(
             lambda abs_path: _tree_reveal(Mf.current, abs_path)
         )
+        self.tree_wid.tree_open.connect(
+            lambda abs_path: _tree_open(Mf.current, abs_path)
+        )
 
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
 
-        # mf_path = Mf.current.get_curr_path()
-        # if mf_path:
-        #     self.reload_thumbnails_cmd(mf_path)
-        #     self.tree_wid.init_ui(mf_path)
-        #     self.setCurrentIndex(1)
-        #     # без таймера не срабатывает
-        #     QTimer.singleShot(0, lambda: self.reload_thumbnails_cmd(mf_path))
+        QTimer.singleShot(10, lambda: _mf_open(Mf.current))
 
     def dragEnterEvent(self, a0):
         a0.accept()
@@ -268,3 +271,4 @@ class MenuLeft(QTabWidget):
                 item = SettingsItem()
                 item.action_type = item.type_new_folder
                 item.content = url
+                self.mf_new.emit(item)
