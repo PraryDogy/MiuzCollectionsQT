@@ -59,7 +59,7 @@ class WinMain(UMainWindow):
     update_mins = 30
     min_w = 750
     ww, hh = 870, 500
-    left_side_width = 210
+    left_side_width = 250
     warning_svg = "./images/warning.svg"
 
     def __init__(self, argv: list[str]):
@@ -550,7 +550,7 @@ class WinMain(UMainWindow):
             self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
             self.scaner_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
             self.scaner_task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-            self.scaner_task.sigs.reload_menu.connect(self.left_menu.tree_wid.refresh_tree)
+            # self.scaner_task.sigs.reload_menu.connect(self.left_menu.tree_wid.refresh_tree)
             # self.scaner_task.sigs.finished_.connect(self.left_menu.tree_wid.refresh_tree)
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():

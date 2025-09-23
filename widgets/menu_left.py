@@ -3,8 +3,11 @@ import re
 import subprocess
 from typing import Dict
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
+from PyQt5.QtCore import (QDir, QModelIndex, QSize, QSortFilterProxyModel, Qt,
+                          QTimer, pyqtSignal)
+from PyQt5.QtWidgets import (QAction, QFileSystemModel, QHeaderView,
+                             QStyledItemDelegate, QTabWidget, QTreeView,
+                             QTreeWidget, QTreeWidgetItem)
 
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
@@ -16,168 +19,226 @@ from ._base_widgets import (SettingsItem, UListWidgetItem, UMenu, UVBoxLayout,
                             VListWidget)
 
 
-class FavItem(QTreeWidgetItem):
-    def __init__(self):
-        super().__init__([Lng.favorites[Cfg.lng]])
-        self.setData(0, Qt.ItemDataRole.UserRole, None)
+class CustomSortProxy(QSortFilterProxyModel):
+    def lessThan(self, left: QModelIndex, right: QModelIndex) -> bool:
+        left_name = self.normalize_name(left.data())
+        right_name = self.normalize_name(right.data())
+        return left_name < right_name
+
+    def normalize_name(self, name: str) -> str:
+        # убираем цифры из начала имени
+        return re.sub(r"^\d+", "", name).lower()
 
 
-class TreeSep(QTreeWidgetItem):
-    def __init__(self):
-        super().__init__()
-        self.setDisabled(True)
-        self.setSizeHint(0, QSize(0, 10))
-        self.setData(0, Qt.ItemDataRole.UserRole, None)
+class RowHeightDelegate(QStyledItemDelegate):
+    def __init__(self, height: int, parent=None):
+        super().__init__(parent)
+        self._height = height
 
+    def sizeHint(self, option, index):
+        size = super().sizeHint(option, index)
+        return QSize(size.width(), self._height)
+    
 
-class TreeWid(QTreeWidget):
+class TreeWid(QTreeView):
     clicked_ = pyqtSignal(str)
-    no_connection = pyqtSignal(Mf)
     update_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
-    hh = 25
+    item_hh = 28
 
-    def __init__(self):
-        super().__init__()
-        self.root_dir: str = None
-        self.last_dir: str = None
-        self.selected_path: str = None
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.model_ = QFileSystemModel()
+        self.model_.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
+
+        # proxy для сортировки (наш кастомный)
+        self.proxy = CustomSortProxy()
+        self.proxy.setSourceModel(self.model_)
+
+        self.setModel(self.proxy)
         self.setHeaderHidden(True)
-        self.setAutoScroll(False)
-        self.itemClicked.connect(self.on_item_click)
+        self.setSortingEnabled(True)
+        self.sortByColumn(0, Qt.SortOrder.AscendingOrder)
+
+        # показывать только первую колонку
+        for col in range(1, self.model_.columnCount()):
+            self.setColumnHidden(col, True)
+
+        # отключить горизонтальный скролл
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.header().setStretchLastSection(False)
+        self.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+
+        self.setItemDelegate(RowHeightDelegate(self.item_hh, self))
 
     def init_ui(self, root_dir: str):
-        self.clear()
-        self.root_dir = root_dir
-        self.last_dir = root_dir
+        self.model_.setRootPath(root_dir)
+        self.setRootIndex(self.proxy.mapFromSource(self.model_.index(root_dir)))
 
-        # верхние кастомные элементы
-        custom_item = FavItem()
-        custom_item.setSizeHint(0, QSize(0, self.hh))
-        self.insertTopLevelItem(0, custom_item)
 
-        sep = TreeSep()
-        self.insertTopLevelItem(1, sep)
+# class FavItem(QTreeWidgetItem):
+#     def __init__(self):
+#         super().__init__([Lng.favorites[Cfg.lng]])
+#         self.setData(0, Qt.ItemDataRole.UserRole, None)
 
-        # корневая директория
-        basename = os.path.basename(root_dir)
-        root_item = QTreeWidgetItem([basename])
-        root_item.setSizeHint(0, QSize(0, self.hh))
-        root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)
-        root_item.setToolTip(0, basename + "\n" + root_dir)
-        self.addTopLevelItem(root_item)
 
-        worker = SortedDirsLoader(root_dir)
-        worker.sigs.finished_.connect(
-            lambda data, item=root_item: self.add_children(item, data)
-        )
-        UThreadPool.start(worker)
+# class TreeSep(QTreeWidgetItem):
+#     def __init__(self):
+#         super().__init__()
+#         self.setDisabled(True)
+#         self.setSizeHint(0, QSize(0, 10))
+#         self.setData(0, Qt.ItemDataRole.UserRole, None)
 
-    def on_item_click(self, item: QTreeWidgetItem, col: int):
-        clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
-        if isinstance(item, TreeSep):
-            return
-        elif clicked_dir == self.last_dir:
-            return
-        elif isinstance(item, FavItem):
-            self.last_dir = clicked_dir
-            self.selected_path = clicked_dir
-            self.clicked_.emit(Static.NAME_FAVS)
-        else:
-            self.last_dir = clicked_dir
-            self.selected_path = clicked_dir
-            self.clicked_.emit(clicked_dir)
-            if item.childCount() == 0:
-                worker = SortedDirsLoader(clicked_dir)
-                worker.sigs.finished_.connect(
-                    lambda data, item=item: self.add_children(item, data)
-                )
-                UThreadPool.start(worker)
-            item.setExpanded(True)
 
-    def refresh_tree(self):
-        if not self.root_dir:
-            return
-        self.init_ui(self.root_dir)
+# class TreeWid(QTreeWidget):
+#     clicked_ = pyqtSignal(str)
+#     no_connection = pyqtSignal(Mf)
+#     update_grid = pyqtSignal()
+#     restart_scaner = pyqtSignal()
+#     hh = 25
 
-    def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
-        parent_item.takeChildren()
-        for path, name in data.items():
-            child: QTreeWidgetItem = QTreeWidgetItem([name])
-            child.setSizeHint(0, QSize(0, self.hh))
-            child.setData(0, Qt.ItemDataRole.UserRole, path)
-            child.setToolTip(0, name + "\n" + path)
-            parent_item.addChild(child)
-        parent_item.setExpanded(True)
+#     def __init__(self):
+#         super().__init__()
+#         self.root_dir: str = None
+#         self.last_dir: str = None
+#         self.selected_path: str = None
+#         self.setHeaderHidden(True)
+#         self.setAutoScroll(False)
+#         self.itemClicked.connect(self.on_item_click)
 
-        if not self.selected_path:
-            return
+#     def init_ui(self, root_dir: str):
+#         self.clear()
+#         self.root_dir = root_dir
+#         self.last_dir = root_dir
 
-        paths = self.generate_path_hierarchy(self.selected_path)
-        if paths:
-            items = self.findItems(
-                "*", Qt.MatchFlag.MatchRecursive | Qt.MatchFlag.MatchWildcard
-            )
-            for it in items:
-                for x in paths:
-                    if it.data(0, Qt.ItemDataRole.UserRole) == x:
-                        self.setCurrentItem(it)
-                        break
+#         # верхние кастомные элементы
+#         custom_item = FavItem()
+#         custom_item.setSizeHint(0, QSize(0, self.hh))
+#         self.insertTopLevelItem(0, custom_item)
 
-    def generate_path_hierarchy(self, full_path):
-        parts = []
-        path = full_path
-        while True:
-            parts.append(path)
-            parent = os.path.dirname(path)
-            if parent == path:  # достигли корня
-                break
-            path = parent
-        return parts
+#         sep = TreeSep()
+#         self.insertTopLevelItem(1, sep)
 
-    def view(self, path: str):
-        self.clicked_.emit(path)
+#         # корневая директория
+#         basename = os.path.basename(root_dir)
+#         root_item = QTreeWidgetItem([basename])
+#         root_item.setSizeHint(0, QSize(0, self.hh))
+#         root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)
+#         root_item.setToolTip(0, basename + "\n" + root_dir)
+#         self.addTopLevelItem(root_item)
 
-    def reveal(self, path: str):
-        if os.path.exists(path):
-            subprocess.Popen(["open", path])
-        else:
-            self.no_connection.emit(Mf.current)
+#         worker = SortedDirsLoader(root_dir)
+#         worker.sigs.finished_.connect(
+#             lambda data, item=root_item: self.add_children(item, data)
+#         )
+#         UThreadPool.start(worker)
 
-    def contextMenuEvent(self, a0):
-        item = self.itemAt(a0.pos())
-        if item:
-            path: str = item.data(0, Qt.ItemDataRole.UserRole)
+#     def on_item_click(self, item: QTreeWidgetItem, col: int):
+#         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
+#         if isinstance(item, TreeSep):
+#             return
+#         elif clicked_dir == self.last_dir:
+#             return
+#         elif isinstance(item, FavItem):
+#             self.last_dir = clicked_dir
+#             self.selected_path = clicked_dir
+#             self.clicked_.emit(Static.NAME_FAVS)
+#         else:
+#             self.last_dir = clicked_dir
+#             self.selected_path = clicked_dir
+#             self.clicked_.emit(clicked_dir)
+#             if item.childCount() == 0:
+#                 worker = SortedDirsLoader(clicked_dir)
+#                 worker.sigs.finished_.connect(
+#                     lambda data, item=item: self.add_children(item, data)
+#                 )
+#                 UThreadPool.start(worker)
+#             item.setExpanded(True)
 
-            menu = UMenu(a0)
-            view = QAction(Lng.open[Cfg.lng], menu)
-            view.triggered.connect(
-                lambda: self.view(path)
-            )
-            menu.addAction(view)
+#     def refresh_tree(self):
+#         if not self.root_dir:
+#             return
+#         self.init_ui(self.root_dir)
 
-            update_grid = QAction(Lng.update_grid[Cfg.lng], menu)
-            update_grid.triggered.connect(self.update_grid)
-            menu.addAction(update_grid)
+#     def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
+#         parent_item.takeChildren()
+#         for path, name in data.items():
+#             child: QTreeWidgetItem = QTreeWidgetItem([name])
+#             child.setSizeHint(0, QSize(0, self.hh))
+#             child.setData(0, Qt.ItemDataRole.UserRole, path)
+#             child.setToolTip(0, name + "\n" + path)
+#             parent_item.addChild(child)
+#         parent_item.setExpanded(True)
 
-            restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
-            restart_scaner.triggered.connect(self.restart_scaner.emit)
-            menu.addAction(restart_scaner)
+#         if not self.selected_path:
+#             return
 
-            menu.addSeparator()
+#         paths = self.generate_path_hierarchy(self.selected_path)
+#         if paths:
+#             items = self.findItems(
+#                 "*", Qt.MatchFlag.MatchRecursive | Qt.MatchFlag.MatchWildcard
+#             )
+#             for it in items:
+#                 for x in paths:
+#                     if it.data(0, Qt.ItemDataRole.UserRole) == x:
+#                         self.setCurrentItem(it)
+#                         break
 
-            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-            reveal.triggered.connect(
-                    lambda: self.reveal(path)
-                )
-            menu.addAction(reveal)
+#     def generate_path_hierarchy(self, full_path):
+#         parts = []
+#         path = full_path
+#         while True:
+#             parts.append(path)
+#             parent = os.path.dirname(path)
+#             if parent == path:  # достигли корня
+#                 break
+#             path = parent
+#         return parts
 
-            menu.show_umenu()
-        return super().contextMenuEvent(a0)
+#     def view(self, path: str):
+#         self.clicked_.emit(path)
+
+#     def reveal(self, path: str):
+#         if os.path.exists(path):
+#             subprocess.Popen(["open", path])
+#         else:
+#             self.no_connection.emit(Mf.current)
+
+#     def contextMenuEvent(self, a0):
+#         item = self.itemAt(a0.pos())
+#         if item:
+#             path: str = item.data(0, Qt.ItemDataRole.UserRole)
+
+#             menu = UMenu(a0)
+#             view = QAction(Lng.open[Cfg.lng], menu)
+#             view.triggered.connect(
+#                 lambda: self.view(path)
+#             )
+#             menu.addAction(view)
+
+#             update_grid = QAction(Lng.update_grid[Cfg.lng], menu)
+#             update_grid.triggered.connect(self.update_grid)
+#             menu.addAction(update_grid)
+
+#             restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
+#             restart_scaner.triggered.connect(self.restart_scaner.emit)
+#             menu.addAction(restart_scaner)
+
+#             menu.addSeparator()
+
+#             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
+#             reveal.triggered.connect(
+#                     lambda: self.reveal(path)
+#                 )
+#             menu.addAction(reveal)
+
+#             menu.show_umenu()
+#         return super().contextMenuEvent(a0)
 
 
 class MainFolerListItem(UListWidgetItem):
-    def __init__(self, parent, height = 30, text = None):
+    def __init__(self, parent, height = 28, text = None):
         super().__init__(parent, height, text)
         self.mf: Mf = None
     
@@ -327,7 +388,7 @@ class MenuLeft(QTabWidget):
 
         self.tree_wid = TreeWid()
         self.tree_wid.clicked_.connect(self.reload_thumbnails_cmd)
-        self.tree_wid.no_connection.connect(self.no_connection.emit)
+        # self.tree_wid.no_connection.connect(self.no_connection.emit)
         self.tree_wid.update_grid.connect(self.update_grid.emit)
         self.tree_wid.restart_scaner.connect(self.restart_scaner.emit)
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
