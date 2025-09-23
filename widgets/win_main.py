@@ -219,7 +219,7 @@ class WinMain(UMainWindow):
         if not Mf.current.get_curr_path():
             self.wait_timer.start(1000)
         else:
-            self.left_menu.mf_clicked(Mf.current)
+            self.left_menu.mf_view(Mf.current)
         print("wait smb connection")
     
     def first_check(self):
