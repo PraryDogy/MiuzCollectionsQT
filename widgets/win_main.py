@@ -84,10 +84,10 @@ class WinMain(UMainWindow):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.reload_thumbnails.connect(
-            lambda abs_path: self.reload_thumbnails(self, Mf.current, abs_path)
+        self.left_menu.left_menu_click.connect(
+            lambda abs_path: self.left_menu_click(self, Mf.current, abs_path)
         )
-        self.left_menu.reload_thumbnails.connect(
+        self.left_menu.left_menu_click.connect(
             lambda: self.set_window_title()
         )
         self.left_menu.path_reveal.connect(
@@ -234,7 +234,7 @@ class WinMain(UMainWindow):
             self.wait_timer.start(1000)
 
     @with_conn
-    def reload_thumbnails(self, parent: QWidget, mf: Mf, abs_path: str):
+    def left_menu_click(self, parent: QWidget, mf: Mf, abs_path: str):
         rel_path = Utils.get_rel_path(mf.curr_path, abs_path)
         Dynamic.current_dir = rel_path
         self.grid.reload_thumbnails()

@@ -37,7 +37,7 @@ class RowHeightDelegate(QStyledItemDelegate):
     
 
 class TreeWid(QTreeView):
-    reload_thumbnails = pyqtSignal(str)
+    tree_click = pyqtSignal(str)
     reveal = pyqtSignal(str)
     restart_scaner = pyqtSignal()
 
@@ -78,7 +78,7 @@ class TreeWid(QTreeView):
     def on_item_click(self, index: QModelIndex):
         if self.last_selection != index:
             self.last_selection = index
-            self.reload_thumbnails.emit(self.get_path(index))
+            self.tree_click.emit(self.get_path(index))
 
     def get_path(self, index: QModelIndex):
         source_index = self.proxy.mapToSource(index)
@@ -198,7 +198,7 @@ class MfList(VListWidget):
 
 
 class MenuLeft(QTabWidget):
-    reload_thumbnails = pyqtSignal(str)
+    left_menu_click = pyqtSignal(str)
     path_reveal = pyqtSignal(str)
     restart_scaner = pyqtSignal()
     mf_edit = pyqtSignal(SettingsItem)
@@ -212,7 +212,7 @@ class MenuLeft(QTabWidget):
     def init_ui(self):
         def mf_view(mf: Mf):
             Mf.current = mf
-            self.reload_thumbnails.emit(mf.curr_path)
+            self.left_menu_click.emit(mf.curr_path)
             self.tree_wid.init_ui(mf.curr_path)
 
         def mf_reveal(mf: Mf):
@@ -260,8 +260,8 @@ class MenuLeft(QTabWidget):
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
-        self.tree_wid.reload_thumbnails.connect(
-            lambda abs_path: self.reload_thumbnails.emit(abs_path)
+        self.tree_wid.tree_click.connect(
+            lambda abs_path: self.left_menu_click.emit(abs_path)
         )
         self.tree_wid.restart_scaner.connect(
             lambda: self.restart_scaner.emit()
@@ -279,7 +279,7 @@ class MenuLeft(QTabWidget):
             self.tree_wid.init_ui(mf_path)
             self.setCurrentIndex(1)
             # без таймера не срабатывает
-            QTimer.singleShot(0, lambda: self.reload_thumbnails.emit(mf_path))
+            QTimer.singleShot(0, lambda: self.left_menu_click.emit(mf_path))
             
     def dragEnterEvent(self, a0):
         a0.accept()
