@@ -204,14 +204,20 @@ class WinMain(UMainWindow):
         return wrapper
 
     def open_win_smb(self, parent: QWidget, mf: Mf):
+        try:
+            self.noti_wid.deleteLater()
+        except (AttributeError, RuntimeError) as e:
+            print(e)
+
         basename = os.path.basename(mf.current.paths[0])
         alias = mf.name
-        noti = NotifyWid(
+        self.noti_wid = NotifyWid(
             parent,
             f"{basename} ({alias}): {Lng.no_connection_full[Cfg.lng].lower()}",
-            self.warning_svg
+            self.warning_svg,
+            ms=3000
             )
-        noti._show()
+        self.noti_wid._show()
     
     def first_check(self):
         if not Mf.current.get_curr_path():
@@ -758,12 +764,17 @@ class WinMain(UMainWindow):
             return
         
         elif Dynamic.search_widget_text:
-            noti = NotifyWid(
+            try:
+                self.noti_wid.deleteLater()
+            except (AttributeError, RuntimeError) as e:
+                print(e)
+            self.noti_wid = NotifyWid(
                 self.grid,
                 Lng.drop_event_denied_msg[Cfg.lng],
-                self.warning_svg
+                self.warning_svg,
+                ms=3000
                 )
-            noti._show()
+            self.noti_wid._show()
             return
 
         paths: list[str] = [
