@@ -213,23 +213,20 @@ class MenuLeft(QTabWidget):
         self.init_ui()
 
     def init_ui(self):
-
         def mf_view(mf: Mf):
             Mf.current = mf
-            mf_path = mf.get_curr_path()
-            if mf_path:
-                self.reload_thumbnails.emit(mf_path)
-                self.tree_wid.init_ui(mf_path)
-            else:
-                self.no_connection.emit()
+            self.reload_thumbnails.emit(mf.curr_path)
+            self.tree_wid.init_ui(mf.curr_path)
 
         def mf_reveal(mf: Mf):
+            # такой костыль, потому что в MainWin функция reveal_in_Finder
+            # подразумевает reveal только для текущей Mf
+            # поэтому мы временно делаем желаемую Mf текущей,
+            # а потом возвращаем назад
+            old_mf = Mf.current
             Mf.current = mf
-            mf_path = mf.get_curr_path()
-            if mf_path:
-                self.reveal.emit(mf_path)
-            else:
-                self.no_connection.emit()
+            self.reveal.emit(mf.curr_path)
+            Mf.current = old_mf
   
         def mf_edit(mf: Mf):
             item = SettingsItem()

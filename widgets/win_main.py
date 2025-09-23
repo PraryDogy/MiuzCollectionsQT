@@ -297,6 +297,8 @@ class WinMain(UMainWindow):
         else:
             Utils.reveal_files(abs_paths)
 
+        print(rel_paths, abs_paths)
+
     @with_conn
     def copy_name(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
         names = [
