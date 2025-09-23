@@ -138,17 +138,11 @@ class MfList(VListWidget):
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal()
     restart_scaner = pyqtSignal()
-    fav_click = pyqtSignal()
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
 
     def init_ui(self):
-        item = MfListItem(parent=self, text=Lng.favorites[Cfg.lng])
-        item.mf = Static.NAME_FAVS
-        item.setToolTip(Lng.favorites[Cfg.lng])
-        self.addItem(item)
-
         for i in Mf.list_:
             if i.curr_path:
                 true_name = os.path.basename(i.curr_path)
@@ -167,9 +161,7 @@ class MfList(VListWidget):
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
 
     def item_click(self, item: MfListItem):
-        if item.mf == Static.NAME_FAVS:
-            self.fav_click.emit()
-        elif item.mf:
+        if item.mf:
             self.mf_click.emit(item.mf)
 
     def mouseReleaseEvent(self, e):
@@ -194,19 +186,18 @@ class MfList(VListWidget):
                 lambda: self.restart_scaner.emit()
             )
             menu.addAction(restart_scaner)
-            if item.mf != Static.NAME_FAVS:
-                menu.addSeparator()
-                reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-                reveal.triggered.connect(
-                    lambda: self.mf_reveal.emit(item.mf)
-                )
-                menu.addAction(reveal)
-                menu.addSeparator()
-                setup = QAction(Lng.setup[Cfg.lng], menu)
-                setup.triggered.connect(
-                    lambda: self.mf_edit.emit(item.mf)
-                )
-                menu.addAction(setup)
+            menu.addSeparator()
+            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
+            reveal.triggered.connect(
+                lambda: self.mf_reveal.emit(item.mf)
+            )
+            menu.addAction(reveal)
+            menu.addSeparator()
+            setup = QAction(Lng.setup[Cfg.lng], menu)
+            setup.triggered.connect(
+                lambda: self.mf_edit.emit(item.mf)
+            )
+            menu.addAction(setup)
         else:
             new_folder = QAction(Lng.new_folder[Cfg.lng], menu)
             new_folder.triggered.connect(
@@ -283,10 +274,6 @@ class MenuLeft(QTabWidget):
             item.action_type = item.type_new_folder
             item.content = str()
             self.mf_new.emit(item)
-
-        def fav_click():
-            Dynamic.current_dir = Static.NAME_FAVS
-            self.reload_thumbnails.emit()
         
         self.clear()
 
@@ -306,9 +293,6 @@ class MenuLeft(QTabWidget):
         )
         self.mf_list.mf_new.connect(
             lambda: mf_new()
-        )
-        self.mf_list.fav_click.connect(
-            lambda: fav_click()
         )
 
         self.tree_wid = TreeWid()
