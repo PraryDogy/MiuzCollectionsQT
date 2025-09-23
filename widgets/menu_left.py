@@ -133,7 +133,7 @@ class MfListItem(UListWidgetItem):
     
 
 class MfList(VListWidget):
-    mf_view = pyqtSignal(Mf)
+    mf_click = pyqtSignal(Mf)
     mf_reveal = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal()
@@ -168,7 +168,7 @@ class MfList(VListWidget):
             return
 
         if e.button() == Qt.MouseButton.LeftButton:
-            self.mf_view.emit(item.mf)
+            self.mf_click.emit(item.mf)
             self._last_mf = item.mf
 
         return super().mouseReleaseEvent(e)
@@ -180,7 +180,7 @@ class MfList(VListWidget):
 
             view_action = QAction(Lng.open[Cfg.lng], menu)
             view_action.triggered.connect(
-                lambda: self.mf_view.emit(item.mf)
+                lambda: self.mf_click.emit(item.mf)
             )
             menu.addAction(view_action)
             restart_scaner = QAction(Lng.scan_folder[Cfg.lng], menu)
@@ -232,7 +232,7 @@ class MenuLeft(QTabWidget):
         self.init_ui()
 
     def init_ui(self):
-        def mf_view(mf: Mf):
+        def mf_click(mf: Mf):
             if mf.get_curr_path():
                 Mf.current = mf
                 Dynamic.current_dir = ""
@@ -265,13 +265,16 @@ class MenuLeft(QTabWidget):
                 rel_path = Utils.get_rel_path(Mf.current.curr_path, abs_path)
                 Dynamic.current_dir = rel_path
                 self.reload_thumbnails.emit()
+
+        def tree_reveal(abs_path):
+            subprocess.Popen(["open", abs_path])
         
         self.clear()
 
         self.mf_list = MfList(self)
         self.mf_list.init_ui()
-        self.mf_list.mf_view.connect(
-            lambda mf: mf_view(mf)
+        self.mf_list.mf_click.connect(
+            lambda mf: mf_click(mf)
         )
         self.mf_list.mf_reveal.connect(
             lambda mf: mf_reveal(mf)
@@ -295,9 +298,15 @@ class MenuLeft(QTabWidget):
         self.tree_wid.tree_click.connect(
             lambda abs_path: tree_click(abs_path)
         )
+        self.tree_wid.reveal.connect(
+            lambda abs_path: tree_reveal(abs_path)
+        )
+        self.tree_wid.restart_scaner.connect(
+            lambda: self.restart_scaner.emit()
+        )
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
         
-        QTimer.singleShot(0, lambda: mf_view(Mf.current))
+        QTimer.singleShot(0, lambda: mf_click(Mf.current))
 
     def dragEnterEvent(self, a0):
         a0.accept()
