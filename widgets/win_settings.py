@@ -3,12 +3,13 @@ import os
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
+from PyQt5.QtCore import QModelIndex, QSize, Qt, pyqtSignal
+from PyQt5.QtGui import QContextMenuEvent, QIcon, QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QFrame,
-                             QGroupBox, QLabel, QPushButton, QSpacerItem,
-                             QSpinBox, QSplitter, QTabWidget, QWidget, QSizePolicy)
+                             QGroupBox, QLabel, QPushButton, QSizePolicy,
+                             QSpacerItem, QSpinBox, QSplitter, QTabWidget,
+                             QWidget)
 
 from cfg import Cfg, Static
 from system.filters import Filters
@@ -17,9 +18,10 @@ from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (AppModalWindow, SingleActionWindow, UHBoxLayout,
-                            ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
-                            UTextEdit, UVBoxLayout, VListWidget, SettingsItem)
+from ._base_widgets import (AppModalWindow, SettingsItem, SingleActionWindow,
+                            UHBoxLayout, ULineEdit, UListSpacerItem,
+                            UListWidgetItem, UMenu, UTextEdit, UVBoxLayout,
+                            VListWidget)
 from .win_warn import WinQuestion, WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
@@ -740,6 +742,8 @@ class SettingsListItem(UListWidgetItem):
 class WinSettings(SingleActionWindow):
     closed = pyqtSignal()
     reset_data = pyqtSignal(Mf)
+    svg_folder = "./images/folder.svg"
+    svg_size = 16
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
@@ -760,6 +764,7 @@ class WinSettings(SingleActionWindow):
 
         self.left_menu = VListWidget()
         self.left_menu.clicked.connect(self.left_menu_click)
+        self.left_menu.setIconSize(QSize(self.svg_size, self.svg_size))
         self.splitter.addWidget(self.left_menu)
 
         main_settings_item = SettingsListItem(self.left_menu, text=Lng.general[Cfg.lng])
@@ -783,6 +788,7 @@ class WinSettings(SingleActionWindow):
             text = f"{true_name} ({alias})"
             item = SettingsListItem(self.left_menu, text=text)
             item.mf = i
+            item.setIcon(QIcon(self.svg_folder))
             self.left_menu.addItem(item)
             self.mf_items.append(item)
 
