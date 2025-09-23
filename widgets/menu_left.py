@@ -234,6 +234,8 @@ class MenuLeft(QTabWidget):
         self.mf_list = MfList(self)
         self.mf_list.mf_open.connect(lambda mf: _mf_open(mf))
         self.mf_list.mf_reveal.connect(lambda mf: _mf_reveal(mf))
+        self.mf_list.mf_edit.connect(lambda mf: _mf_edit(mf))
+        self.mf_list.mf_new.connect(lambda: _mf_new())
 
         self.tree_wid = TreeWid()
 

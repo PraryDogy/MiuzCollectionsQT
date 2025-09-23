@@ -93,6 +93,12 @@ class WinMain(UMainWindow):
         self.left_menu.reload_thumbnails.connect(
             lambda: self.set_window_title()
         )
+        self.left_menu.mf_edit.connect(
+            lambda settings_item: self.open_settings_win(settings_item)
+        )
+        self.left_menu.mf_new.connect(
+            lambda settings_item: self.open_settings_win(settings_item)
+        )
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
