@@ -45,7 +45,7 @@ class BarTopBtn(QFrame):
         # --- Фрейм под SVG ---
         self.svg_frame = QFrame()
         self.svg_frame.setObjectName(self.object_name)
-        self.svg_frame.setFixedSize(self.svg_ww + 15, self.svg_hh + 10)
+        self.svg_frame.setFixedSize(self.svg_ww + 12, self.svg_hh + 6)
         self.svg_lay = UVBoxLayout()
         self.svg_frame.setLayout(self.svg_lay)
 
@@ -366,6 +366,7 @@ class BarTop(QWidget):
         self.search_wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
         self.h_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
+        self.h_layout.setContentsMargins(0, 2, 0, 2)
         self.adjustSize()
 
     def mouseReleaseEvent(self, a0):
