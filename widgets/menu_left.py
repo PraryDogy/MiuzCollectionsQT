@@ -136,6 +136,8 @@ class MfList(VListWidget):
     mf_open = pyqtSignal(Mf)
     mf_reveal = pyqtSignal(Mf)
     mf_new = pyqtSignal()
+    svg_folder = "./images/folder.svg"
+    svg_size = 16
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
@@ -144,6 +146,7 @@ class MfList(VListWidget):
         self.setAcceptDrops(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
+        self.setIconSize(QSize(self.svg_size, self.svg_size))
 
         for i in Mf.list_:
             if i.curr_path:
@@ -152,6 +155,7 @@ class MfList(VListWidget):
                 true_name = os.path.basename(i.paths[0])
             text = f"{true_name} ({i.name})"
             item = MfListItem(parent=self, text=text)
+            item.setIcon(QIcon(self.svg_folder))
             item.mf = i
             item.setToolTip(i.name)
             self.addItem(item)
