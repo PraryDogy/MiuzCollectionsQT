@@ -267,7 +267,7 @@ class ViewBtn(BarTopBtn):
         }
         self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
 
-    def menu_clicreked(self, value: bool):
+    def menu_clicked(self, value: bool):
         Dynamic.show_all_images = value
         # self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
         self.clicked_.emit()
