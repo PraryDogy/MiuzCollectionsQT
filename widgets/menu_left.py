@@ -232,6 +232,7 @@ class MenuLeft(QTabWidget):
         self.init_ui()
 
     def init_ui(self):
+
         def mf_click(mf: Mf):
             if mf.get_curr_path():
                 Mf.current = mf
@@ -269,7 +270,7 @@ class MenuLeft(QTabWidget):
                 self.no_connection.emit(Mf.current)
 
         def tree_reveal(abs_path):
-            if os.path.exists(abs_path):
+            if Mf.current.get_curr_path():
                 subprocess.Popen(["open", abs_path])
             else:
                 self.no_connection.emit(Mf.current)
