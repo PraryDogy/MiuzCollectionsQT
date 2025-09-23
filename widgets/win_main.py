@@ -114,7 +114,9 @@ class WinMain(UMainWindow):
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
         self.bar_top.open_dates_win.connect(self.open_dates_win)
-        self.bar_top.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.bar_top.reload_thumbnails.connect(
+            lambda: self.grid.reload_thumbnails()
+            )
         self.bar_top.open_settings_win.connect(self.open_settings_win)
         right_lay.addWidget(self.bar_top)
 
@@ -565,8 +567,6 @@ class WinMain(UMainWindow):
             self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
             self.scaner_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
             self.scaner_task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-            # self.scaner_task.sigs.reload_menu.connect(self.left_menu.tree_wid.refresh_tree)
-            # self.scaner_task.sigs.finished_.connect(self.left_menu.tree_wid.refresh_tree)
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
