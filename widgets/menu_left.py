@@ -232,29 +232,39 @@ class MenuLeft(QTabWidget):
         self.init_ui()
 
     def init_ui(self):
-
+        
         def with_conn(fn: callable):
             def wrapper(mf: Mf, *args, **kwargs):
                 if mf.get_curr_path():
                     fn(mf, *args, **kwargs)
-                return wrapper
+                else:
+                    self.no_connection.emit(mf)
+            return wrapper
 
+        @with_conn
         def mf_click(mf: Mf):
-            if mf.get_curr_path():
-                Mf.current = mf
-                Dynamic.current_dir = ""
-                self.tree_wid.init_ui(mf.curr_path)
-                self.reload_thumbnails.emit()
-            else:
-                self.no_connection.emit(mf)
+            Mf.current = mf
+            Dynamic.current_dir = ""
+            self.tree_wid.init_ui(mf.curr_path)
+            self.reload_thumbnails.emit()
 
+        @with_conn
         def mf_reveal(mf: Mf):
-            if mf.get_curr_path():
-                Mf.current = mf
-                subprocess.Popen(["open", mf.curr_path])
-            else:
-                self.no_connection.emit(mf)
-  
+            old_mf = Mf.current
+            Mf.current = mf
+            subprocess.Popen(["open", mf.curr_path])
+            Mf.current = old_mf
+
+        @with_conn
+        def tree_click(mf: Mf, abs_path: str):
+            rel_path = Utils.get_rel_path(mf.curr_path, abs_path)
+            Dynamic.current_dir = rel_path
+            self.reload_thumbnails.emit()
+
+        @with_conn
+        def tree_reveal(mf: Mf, abs_path):
+            subprocess.Popen(["open", abs_path])
+
         def mf_edit(mf: Mf):
             item = SettingsItem()
             item.action_type = item.type_edit_folder
@@ -266,20 +276,6 @@ class MenuLeft(QTabWidget):
             item.action_type = item.type_new_folder
             item.content = str()
             self.mf_new.emit(item)
-
-        def tree_click(abs_path):
-            if Mf.current.get_curr_path():
-                rel_path = Utils.get_rel_path(Mf.current.curr_path, abs_path)
-                Dynamic.current_dir = rel_path
-                self.reload_thumbnails.emit()
-            else:
-                self.no_connection.emit(Mf.current)
-
-        def tree_reveal(abs_path):
-            if Mf.current.get_curr_path():
-                subprocess.Popen(["open", abs_path])
-            else:
-                self.no_connection.emit(Mf.current)
         
         self.clear()
 
@@ -308,10 +304,10 @@ class MenuLeft(QTabWidget):
             lambda: self.restart_scaner.emit()
         )
         self.tree_wid.tree_click.connect(
-            lambda abs_path: tree_click(abs_path)
+            lambda abs_path: tree_click(Mf.current, abs_path)
         )
         self.tree_wid.reveal.connect(
-            lambda abs_path: tree_reveal(abs_path)
+            lambda abs_path: tree_reveal(Mf.current, abs_path)
         )
         self.tree_wid.restart_scaner.connect(
             lambda: self.restart_scaner.emit()
