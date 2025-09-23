@@ -84,15 +84,7 @@ class WinMain(UMainWindow):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.left_menu_click.connect(
-            lambda abs_path: self.left_menu_click(self.grid, Mf.current, abs_path)
-        )
-        self.left_menu.left_menu_click.connect(
-            lambda: self.set_window_title()
-        )
-        self.left_menu.path_reveal.connect(
-            lambda abs_path: self.reveal_in_finder(self.grid, Mf.current, [abs_path, ])
-        )
+
         self.left_menu.restart_scaner.connect(
             lambda: self.restart_scaner_task()
         )
@@ -101,6 +93,15 @@ class WinMain(UMainWindow):
         )
         self.left_menu.mf_new.connect(
             lambda settings_item: self.open_settings_win(settings_item)
+        )
+        self.left_menu.no_connection.connect(
+            lambda mf: self.open_win_smb(self.grid, mf)
+        )
+        self.left_menu.reload_thumbnails.connect(
+            lambda: self.grid.reload_thumbnails()
+        )
+        self.left_menu.reload_thumbnails.connect(
+            lambda: self.set_window_title()
         )
         splitter.addWidget(self.left_menu)
 
@@ -219,12 +220,6 @@ class WinMain(UMainWindow):
     def first_check(self):
         if not Mf.current.get_curr_path():
             self.open_win_smb(self.grid, Mf.current)
-
-    @with_conn
-    def left_menu_click(self, parent: QWidget, mf: Mf, abs_path: str):
-        rel_path = Utils.get_rel_path(mf.curr_path, abs_path)
-        Dynamic.current_dir = rel_path
-        self.grid.reload_thumbnails()
 
     @with_conn
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):

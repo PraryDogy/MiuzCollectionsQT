@@ -220,11 +220,11 @@ class MfList(VListWidget):
 
 
 class MenuLeft(QTabWidget):
-    left_menu_click = pyqtSignal(str)
-    path_reveal = pyqtSignal(str)
     restart_scaner = pyqtSignal()
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
+    no_connection = pyqtSignal(Mf)
+    reload_thumbnails = pyqtSignal()
     
     def __init__(self):
         super().__init__()
@@ -233,19 +233,20 @@ class MenuLeft(QTabWidget):
 
     def init_ui(self):
         def mf_view(mf: Mf):
-            Mf.current = mf
-            self.left_menu_click.emit(mf.curr_path)
-            self.tree_wid.init_ui(mf.curr_path)
+            if mf.get_curr_path():
+                Mf.current = mf
+                Dynamic.current_dir = ""
+                self.tree_wid.init_ui(mf.curr_path)
+                self.reload_thumbnails.emit()
+            else:
+                self.no_connection.emit(mf)
 
         def mf_reveal(mf: Mf):
-            # такой костыль, потому что в MainWin функция reveal_in_Finder
-            # подразумевает reveal только для текущей Mf
-            # поэтому мы временно делаем желаемую Mf текущей,
-            # а потом возвращаем назад
-            old_mf = Mf.current
-            Mf.current = mf
-            self.path_reveal.emit(mf.curr_path)
-            Mf.current = old_mf
+            if mf.get_curr_path():
+                Mf.current = mf
+                subprocess.Popen(["open", mf.curr_path])
+            else:
+                self.no_connection.emit(mf)
   
         def mf_edit(mf: Mf):
             item = SettingsItem()
@@ -257,7 +258,13 @@ class MenuLeft(QTabWidget):
             item = SettingsItem()
             item.action_type = item.type_new_folder
             item.content = str()
-            self.mf_new.emit(item) 
+            self.mf_new.emit(item)
+
+        def tree_click(abs_path):
+            if Mf.current.get_curr_path():
+                rel_path = Utils.get_rel_path(Mf.current.curr_path, abs_path)
+                Dynamic.current_dir = rel_path
+                self.reload_thumbnails.emit()
         
         self.clear()
 
@@ -282,27 +289,16 @@ class MenuLeft(QTabWidget):
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
+        self.tree_wid.restart_scaner.connect(
+            lambda: self.restart_scaner.emit()
+        )
         self.tree_wid.tree_click.connect(
-            lambda abs_path: self.left_menu_click.emit(abs_path)
-        )
-        self.tree_wid.restart_scaner.connect(
-            lambda: self.restart_scaner.emit()
-        )
-        self.tree_wid.reveal.connect(
-            lambda abs_path: self.path_reveal.emit(abs_path)
-        )
-        self.tree_wid.restart_scaner.connect(
-            lambda: self.restart_scaner.emit()
+            lambda abs_path: tree_click(abs_path)
         )
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
         
-        mf_path = Mf.current.get_curr_path()
-        if mf_path:
-            self.tree_wid.init_ui(mf_path)
-            self.setCurrentIndex(1)
-            # без таймера не срабатывает
-            QTimer.singleShot(0, lambda: self.left_menu_click.emit(mf_path))
-            
+        QTimer.singleShot(0, lambda: mf_view(Mf.current))
+
     def dragEnterEvent(self, a0):
         a0.accept()
     
