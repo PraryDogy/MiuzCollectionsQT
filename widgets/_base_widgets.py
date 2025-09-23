@@ -100,7 +100,7 @@ class ULineEdit(QLineEdit):
         padding (tuple[int, int]): отступы слева и справа.
         menu_width (int): ширина контекстного меню.
     """
-    hh = 28
+    hh = 30
     padding = (2, 28)
     menu_width = 120
 

@@ -13,25 +13,14 @@ from .wid_search import WidSearch
 
 class BarTopBtn(QFrame):
     """
-    QFrame с иконкой SVG и подписью, который изменяет стиль при наведении
-    и испускает сигнал при клике.
-
-    Сигналы:
-        clicked_ (pyqtSignal): испускается при клике мышью на виджет.
-
-    Атрибуты:
-        object_name (str): имя объекта для CSS.
-        ww, hh (int): размеры виджета.
-        svg_ww, svg_hh (int): размеры SVG-иконки.
-        font_size (int): размер шрифта подписи.
-        gray_bg_style (str): CSS стиль с серым фоном.
-        border_transparent_style (str): CSS стиль с прозрачным бордером.
+    QFrame с иконкой SVG (в отдельном фрейме) и подписью.
+    Меняет стиль только иконки при наведении/клике, текст остаётся неизменным.
     """
 
     clicked_ = pyqtSignal()
     object_name = "_frame_"
     ww, hh = 65, 45
-    svg_ww, svg_hh = 20, 20
+    svg_ww, svg_hh = 23, 23
     font_size = 10
 
     # --- Стили ---
@@ -40,44 +29,49 @@ class BarTopBtn(QFrame):
         color: rgb(255, 255, 255);
         background: {Static.rgba_gray};
         border: 1px solid transparent;
-        padding-left: 2px;
-        padding-right: 2px;
     """
-    border_transparent_style = f"""
+    border_transparent_style = """
         border: 1px solid transparent;
-        padding-left: 2px;
-        padding-right: 2px;
     """
 
     def __init__(self):
         super().__init__()
-        self.setObjectName(self.object_name)
         self.setFixedSize(self.ww, self.hh)
 
         # --- Компоновка ---
         self.v_lay = UVBoxLayout()
         self.setLayout(self.v_lay)
 
+        # --- Фрейм под SVG ---
+        self.svg_frame = QFrame()
+        self.svg_frame.setObjectName(self.object_name)
+        self.svg_frame.setFixedSize(self.svg_ww + 15, self.svg_hh + 10)
+        self.svg_lay = UVBoxLayout()
+        self.svg_frame.setLayout(self.svg_lay)
+
         # --- SVG-иконка ---
         self.svg_btn = QSvgWidget()
         self.svg_btn.setFixedSize(self.svg_ww, self.svg_hh)
-        self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.svg_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # --- Подпись ---
         self.lbl = QLabel()
         self.lbl.setStyleSheet(f"font-size: {self.font_size}px;")
+
+        # --- Добавляем в корневой layout ---
+        self.v_lay.addWidget(self.svg_frame, alignment=Qt.AlignmentFlag.AlignCenter)
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # --- Стиль по умолчанию ---
         self.set_normal_style()
 
     def set_solid_style(self):
-        """Применяет сплошной серый фон."""
-        self.setStyleSheet(f"#{self.object_name} {{ {self.gray_bg_style} }}")
+        """Применяет сплошной серый фон только к svg_frame."""
+        self.svg_frame.setStyleSheet(f"#{self.object_name} {{ {self.gray_bg_style} }}")
 
     def set_normal_style(self):
-        """Применяет прозрачный бордер."""
-        self.setStyleSheet(f"#{self.object_name} {{ {self.border_transparent_style} }}")
+        """Применяет прозрачный бордер только к svg_frame."""
+        self.svg_frame.setStyleSheet(f"#{self.object_name} {{ {self.border_transparent_style} }}")
 
     def mouseReleaseEvent(self, a0):
         """Испускает сигнал при клике левой кнопкой мыши."""
