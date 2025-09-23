@@ -212,11 +212,16 @@ class MenuLeft(QTabWidget):
         def _mf_open(mf: Mf):
             Mf.current = mf
             Dynamic.current_dir = ""
+            self.tree_wid.init_ui(mf.curr_path)
             self.reload_thumbnails.emit()
-
+            
         @with_conn
         def _mf_reveal(mf: Mf):
             subprocess.Popen(["open", mf.curr_path])
+
+        @with_conn
+        def _tree_reveal(mf: Mf, abs_path):
+            subprocess.Popen(["open", abs_path])
 
         def _mf_edit(mf: Mf):
             item = SettingsItem()
@@ -238,6 +243,9 @@ class MenuLeft(QTabWidget):
         self.mf_list.mf_new.connect(lambda: _mf_new())
 
         self.tree_wid = TreeWid()
+        self.tree_wid.tree_reveal.connect(
+            lambda abs_path: _tree_reveal(Mf.current, abs_path)
+        )
 
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
