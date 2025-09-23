@@ -743,6 +743,9 @@ class WinSettings(SingleActionWindow):
     closed = pyqtSignal()
     reset_data = pyqtSignal(Mf)
     svg_folder = "./images/folder.svg"
+    svg_filters = "./images/filters.svg"
+    svg_settings = "./images/settings.svg"
+    svg_new_folder = "./images/new_folder.svg"
     svg_size = 16
 
     def __init__(self, settings_item: SettingsItem):
@@ -768,13 +771,16 @@ class WinSettings(SingleActionWindow):
         self.splitter.addWidget(self.left_menu)
 
         main_settings_item = SettingsListItem(self.left_menu, text=Lng.general[Cfg.lng])
+        main_settings_item.setIcon(QIcon(self.svg_settings))
         self.left_menu.addItem(main_settings_item)
         
         filter_settings = SettingsListItem(self.left_menu, text=Lng.filters[Cfg.lng])
+        filter_settings.setIcon(QIcon(self.svg_filters))
         self.left_menu.addItem(filter_settings)
 
-        item = SettingsListItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
-        self.left_menu.addItem(item)
+        new_folder = SettingsListItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
+        new_folder.setIcon(QIcon(self.svg_new_folder))
+        self.left_menu.addItem(new_folder)
         
         spacer = UListSpacerItem(self.left_menu)
         self.left_menu.addItem(spacer)
@@ -786,11 +792,11 @@ class WinSettings(SingleActionWindow):
                 true_name = os.path.basename(i.paths[0])
             alias = i.name
             text = f"{true_name} ({alias})"
-            item = SettingsListItem(self.left_menu, text=text)
-            item.mf = i
-            item.setIcon(QIcon(self.svg_folder))
-            self.left_menu.addItem(item)
-            self.mf_items.append(item)
+            new_folder = SettingsListItem(self.left_menu, text=text)
+            new_folder.mf = i
+            new_folder.setIcon(QIcon(self.svg_folder))
+            self.left_menu.addItem(new_folder)
+            self.mf_items.append(new_folder)
 
         self.right_wid = QWidget()
         self.right_lay = UVBoxLayout()
