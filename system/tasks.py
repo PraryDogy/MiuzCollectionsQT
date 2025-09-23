@@ -586,7 +586,11 @@ class SortedDirsLoader(URunnable):
         if not os.path.exists(self.path):
             return {}
 
-        dirs = {i.path: i.name for i in os.scandir(self.path) if i.is_dir()}
+        dirs = {
+            i.path: i.name
+            for i in os.scandir(self.path)
+            if i.is_dir()
+        }
         sorted_dirs = dict(
             sorted(dirs.items(), key=lambda kv: self.strip_to_first_letter(kv[1]))
         )
