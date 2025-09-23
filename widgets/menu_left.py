@@ -30,11 +30,11 @@ class TreeWid(QTreeWidget):
         self.root_dir: str = None
         self.last_dir: str = None
         self.selected_path: str = None
+        self.itemClicked.connect(self.on_item_click)
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
-        self.itemClicked.connect(self.on_item_click)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
-        self.setIndentation(10)
+        self.setIndentation(15)
 
     def refresh_tree(self):
         if not self.root_dir:
@@ -45,8 +45,6 @@ class TreeWid(QTreeWidget):
         self.clear()
         self.root_dir = root_dir
         self.last_dir = root_dir
-
-        # корневая директория
         basename = os.path.basename(root_dir)
         root_item = QTreeWidgetItem([basename])
         root_item.setSizeHint(0, QSize(0, self.item_height))
@@ -87,10 +85,8 @@ class TreeWid(QTreeWidget):
             child.setToolTip(0, name + "\n" + path)
             parent_item.addChild(child)
         parent_item.setExpanded(True)
-
         if not self.selected_path:
             return
-
         paths = self.generate_path_hierarchy(self.selected_path)
         if paths:
             items = self.findItems(
