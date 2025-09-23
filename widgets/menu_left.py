@@ -21,25 +21,28 @@ class TreeWid(QTreeWidget):
     tree_reveal = pyqtSignal(str)
     tree_open = pyqtSignal(str)
 
-    svg_folder = "./images/folder.svg"
-    svg_size = 16
-    item_height = 25
+    # настройки
+    SVG_FOLDER = "./images/folder.svg"
+    SVG_SIZE = 16
+    ITEM_HEIGHT = 25
+    INDENTATION = 10
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # внутренние переменные
         self.root_dir: str = None
         self.last_dir: str = None
         self.selected_path: str = None
+
+        # настройки дерева
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
-        self.itemClicked.connect(self.on_item_click)
-        self.setIconSize(QSize(self.svg_size, self.svg_size))
-        self.setIndentation(10)
+        self.setIconSize(QSize(self.SVG_SIZE, self.SVG_SIZE))
+        self.setIndentation(self.INDENTATION)
 
-    def refresh_tree(self):
-        if not self.root_dir:
-            return
-        self.init_ui(self.root_dir)
+        # сигналы
+        self.itemClicked.connect(self.on_item_click)
 
     def init_ui(self, root_dir: str):
         self.clear()
