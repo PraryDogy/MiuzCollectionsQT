@@ -265,9 +265,14 @@ class MenuLeft(QTabWidget):
                 rel_path = Utils.get_rel_path(Mf.current.curr_path, abs_path)
                 Dynamic.current_dir = rel_path
                 self.reload_thumbnails.emit()
+            else:
+                self.no_connection.emit(Mf.current)
 
         def tree_reveal(abs_path):
-            subprocess.Popen(["open", abs_path])
+            if os.path.exists(abs_path):
+                subprocess.Popen(["open", abs_path])
+            else:
+                self.no_connection.emit(Mf.current)
         
         self.clear()
 
