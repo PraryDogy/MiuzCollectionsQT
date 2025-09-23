@@ -233,6 +233,12 @@ class MenuLeft(QTabWidget):
 
     def init_ui(self):
 
+        def with_conn(fn: callable):
+            def wrapper(mf: Mf, *args, **kwargs):
+                if mf.get_curr_path():
+                    fn(mf, *args, **kwargs)
+                return wrapper
+
         def mf_click(mf: Mf):
             if mf.get_curr_path():
                 Mf.current = mf
