@@ -85,13 +85,13 @@ class WinMain(UMainWindow):
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
         self.left_menu.left_menu_click.connect(
-            lambda abs_path: self.left_menu_click(self, Mf.current, abs_path)
+            lambda abs_path: self.left_menu_click(self.grid, Mf.current, abs_path)
         )
         self.left_menu.left_menu_click.connect(
             lambda: self.set_window_title()
         )
         self.left_menu.path_reveal.connect(
-            lambda abs_path: self.reveal_in_finder(self, Mf.current, [abs_path, ])
+            lambda abs_path: self.reveal_in_finder(self.grid, Mf.current, [abs_path, ])
         )
         self.left_menu.restart_scaner.connect(
             lambda: self.restart_scaner_task()
