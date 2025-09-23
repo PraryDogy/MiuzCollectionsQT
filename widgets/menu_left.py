@@ -219,7 +219,7 @@ class MenuLeft(QTabWidget):
                     self.no_connection.emit(mf)
             return wrapper
 
-        @with_conn
+        # @with_conn
         def _mf_open(mf: Mf):
             Mf.current = mf
             Dynamic.current_dir = ""
