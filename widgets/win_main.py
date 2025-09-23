@@ -93,9 +93,11 @@ class WinMain(UMainWindow):
         self.left_menu.reveal.connect(
             lambda abs_path: self.reveal_in_finder(self, Mf.current, [abs_path, ])
         )
+        self.left_menu.restart_scaner.connect(
+            lambda: self.restart_scaner_task()
+        )
         # self.left_menu.edit_mf.connect(self.open_settings_win)
         # self.left_menu.setup_new_mf.connect(self.open_settings_win)
-        # self.left_menu.restart_scaner.connect(lambda: self.restart_scaner_task())
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -290,7 +292,6 @@ class WinMain(UMainWindow):
             subprocess.Popen(["open", abs_paths[0]])
         else:
             Utils.reveal_files(abs_paths)
-
 
     @with_conn
     def copy_name(self, parent: QWidget, mf: Mf, rel_paths: list[str]):

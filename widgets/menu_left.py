@@ -273,6 +273,9 @@ class MenuLeft(QTabWidget):
         self.tree_wid.reveal.connect(
             lambda abs_path: self.reveal.emit(abs_path)
         )
+        self.tree_wid.restart_scaner.connect(
+            lambda: self.restart_scaner.emit()
+        )
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
         
         mf_path = Mf.current.get_curr_path()
