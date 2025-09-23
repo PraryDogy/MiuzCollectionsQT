@@ -38,13 +38,14 @@ class RowHeightDelegate(QStyledItemDelegate):
 
 class TreeWid(QTreeView):
     reload_thumbnails = pyqtSignal(str)
-    # update_grid = pyqtSignal()
-    # restart_scaner = pyqtSignal()
-    no_connection = pyqtSignal()
+    reveal = pyqtSignal(str)
+    restart_scaner = pyqtSignal()
     item_hh = 28
 
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self.last_selection: QModelIndex = None
 
         self.model_ = QFileSystemModel()
         self.model_.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
@@ -75,40 +76,43 @@ class TreeWid(QTreeView):
         self.model_.setRootPath(root_dir)
         self.setRootIndex(self.proxy.mapFromSource(self.model_.index(root_dir)))
 
-    def on_item_click(self, index):
+    def on_item_click(self, index: QModelIndex):
+        if self.last_selection != index:
+            self.last_selection = index
+            self.reload_thumbnails.emit(self.get_path(index))
+
+    def get_path(self, index: QModelIndex):
         source_index = self.proxy.mapToSource(index)
-        path = self.model_.filePath(source_index)
-        self.reload_thumbnails.emit(path)
+        return self.model_.filePath(source_index)
 
     def contextMenuEvent(self, event):
         index = self.indexAt(event.pos())
         if not index.isValid():
             return
-        source_index = self.proxy.mapToSource(index)
-        path = self.model_.filePath(source_index)
 
         menu = UMenu(event)
 
         # Открыть
         view_action = QAction(Lng.open[Cfg.lng], menu)
-        view_action.triggered.connect(lambda: self.on_item_click(index))
+        view_action.triggered.connect(
+            lambda: self.on_item_click(index)
+        )
         menu.addAction(view_action)
-
-        # Обновить сетку
-        update_action = QAction(Lng.update_grid[Cfg.lng], menu)
-        # update_action.triggered.connect(self.update_grid)
-        menu.addAction(update_action)
 
         # Перезапустить сканер
         restart_action = QAction(Lng.scan_folder[Cfg.lng], menu)
-        # restart_action.triggered.connect(self.restart_scaner.emit)
+        restart_action.triggered.connect(
+            lambda: self.restart_scaner.emit()
+        )
         menu.addAction(restart_action)
 
         menu.addSeparator()
 
         # Показать в проводнике / Finder
         reveal_action = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-        # reveal_action.triggered.connect(lambda: self.reveal(path))
+        reveal_action.triggered.connect(
+            lambda: self.reveal.emit(self.get_path(index))
+        )
         menu.addAction(reveal_action)
 
         menu.show_umenu()
@@ -210,12 +214,14 @@ class MfList(VListWidget):
 
 
 class MenuLeft(QTabWidget):
-    reload_thumbnails = pyqtSignal()
+    reload_thumbnails = pyqtSignal(str)
+    reveal = pyqtSignal(str)
+    restart_scaner = pyqtSignal()
+
+
     no_connection = pyqtSignal(Mf)
     edit_mf = pyqtSignal(SettingsItem)
     setup_new_mf = pyqtSignal(SettingsItem)
-    update_grid = pyqtSignal()
-    restart_scaner = pyqtSignal()
     
     def __init__(self):
         super().__init__()
@@ -233,10 +239,6 @@ class MenuLeft(QTabWidget):
         else:
             self.no_connection.emit()
         
-    def reload_thumbnails_cmd(self, path: str):
-        Dynamic.current_dir = Utils.get_rel_path(Mf.current.curr_path, path)
-        self.reload_thumbnails.emit()
-
     def init_ui(self):
         
         def edit_mf(mf: Mf):
@@ -258,24 +260,27 @@ class MenuLeft(QTabWidget):
         mfs.no_connection.connect(self.no_connection.emit)
         mfs.setup_mf.connect(edit_mf)
         mfs.setup_new_folder.connect(setup_new_folder)
-        mfs.update_grid.connect(self.update_grid.emit)
         mfs.restart_scaner.connect(self.restart_scaner.emit)
         self.addTab(mfs, Lng.folders[Cfg.lng])
 
         self.tree_wid = TreeWid()
-        self.tree_wid.reload_thumbnails.connect(self.reload_thumbnails_cmd)
-        # self.tree_wid.no_connection.connect(self.no_connection.emit)
-        # self.tree_wid.update_grid.connect(self.update_grid.emit)
-        # self.tree_wid.restart_scaner.connect(self.restart_scaner.emit)
+        self.tree_wid.reload_thumbnails.connect(
+            lambda abs_path: self.reload_thumbnails.emit(abs_path)
+        )
+        self.tree_wid.restart_scaner.connect(
+            lambda: self.restart_scaner.emit()
+        )
+        self.tree_wid.reveal.connect(
+            lambda abs_path: self.reveal.emit(abs_path)
+        )
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
         
         mf_path = Mf.current.get_curr_path()
         if mf_path:
-            self.reload_thumbnails_cmd(mf_path)
             self.tree_wid.init_ui(mf_path)
             self.setCurrentIndex(1)
             # без таймера не срабатывает
-            QTimer.singleShot(0, lambda: self.reload_thumbnails_cmd(mf_path))
+            # QTimer.singleShot(0, lambda: self.reload_thumbnails_cmd(mf_path))
             
     def dragEnterEvent(self, a0):
         a0.accept()

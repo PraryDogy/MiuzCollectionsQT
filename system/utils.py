@@ -158,7 +158,10 @@ class Utils:
         
     @classmethod
     def get_abs_path(cls, mf_path: str, rel_path: str) -> str:
-        return mf_path + rel_path
+        if mf_path in rel_path:
+            return rel_path
+        else:
+            return mf_path + rel_path
     
     @classmethod
     def get_rel_path(cls, mf_path: str, abs_path: str) -> str:

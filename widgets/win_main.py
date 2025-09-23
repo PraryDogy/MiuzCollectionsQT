@@ -84,15 +84,18 @@ class WinMain(UMainWindow):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
-        self.left_menu.reload_thumbnails.connect(lambda: self.set_window_title())
-        self.left_menu.no_connection.connect(
-            lambda mf: self.open_win_smb(self.grid, mf)
+        self.left_menu.reload_thumbnails.connect(
+            lambda abs_path: self.reload_thumbnails(self, Mf.current, abs_path)
         )
-        self.left_menu.edit_mf.connect(self.open_settings_win)
-        self.left_menu.setup_new_mf.connect(self.open_settings_win)
-        self.left_menu.update_grid.connect(lambda: self.grid.reload_thumbnails())
-        self.left_menu.restart_scaner.connect(lambda: self.restart_scaner_task())
+        self.left_menu.reload_thumbnails.connect(
+            lambda: self.set_window_title()
+        )
+        self.left_menu.reveal.connect(
+            lambda abs_path: self.reveal_in_finder(self, Mf.current, [abs_path, ])
+        )
+        # self.left_menu.edit_mf.connect(self.open_settings_win)
+        # self.left_menu.setup_new_mf.connect(self.open_settings_win)
+        # self.left_menu.restart_scaner.connect(lambda: self.restart_scaner_task())
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -223,6 +226,12 @@ class WinMain(UMainWindow):
             self.wait_timer.start(1000)
 
     @with_conn
+    def reload_thumbnails(self, parent: QWidget, mf: Mf, abs_path: str):
+        rel_path = Utils.get_rel_path(mf.curr_path, abs_path)
+        Dynamic.current_dir = rel_path
+        self.grid.reload_thumbnails()
+
+    @with_conn
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
         dest, rel_paths = data
         abs_files = [
@@ -281,6 +290,7 @@ class WinMain(UMainWindow):
             subprocess.Popen(["open", abs_paths[0]])
         else:
             Utils.reveal_files(abs_paths)
+
 
     @with_conn
     def copy_name(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
