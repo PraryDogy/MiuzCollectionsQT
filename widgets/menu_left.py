@@ -4,6 +4,7 @@ import subprocess
 from typing import Dict
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
 
 from cfg import Cfg, Dynamic, Static
@@ -35,6 +36,8 @@ class TreeWid(QTreeWidget):
     no_connection = pyqtSignal(Mf)
     update_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
+    svg_folder = "./images/folder.svg"
+    svg_size = 16
     hh = 25
 
     def __init__(self):
@@ -45,6 +48,8 @@ class TreeWid(QTreeWidget):
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
         self.itemClicked.connect(self.on_item_click)
+        self.setIconSize(QSize(self.svg_size, self.svg_size))
+        self.setIndentation(10)
 
     def init_ui(self, root_dir: str):
         self.clear()
@@ -65,6 +70,7 @@ class TreeWid(QTreeWidget):
         root_item.setSizeHint(0, QSize(0, self.hh))
         root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)
         root_item.setToolTip(0, basename + "\n" + root_dir)
+        root_item.setIcon(0, QIcon(self.svg_folder))
         self.addTopLevelItem(root_item)
 
         worker = SortedDirsLoader(root_dir)
@@ -104,6 +110,7 @@ class TreeWid(QTreeWidget):
         parent_item.takeChildren()
         for path, name in data.items():
             child: QTreeWidgetItem = QTreeWidgetItem([name])
+            child.setIcon(0, QIcon(self.svg_folder))
             child.setSizeHint(0, QSize(0, self.hh))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
             child.setToolTip(0, name + "\n" + path)
