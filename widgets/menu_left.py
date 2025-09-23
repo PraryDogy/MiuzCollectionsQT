@@ -152,7 +152,6 @@ class MfList(VListWidget):
 
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
-        # self.setDropIndicatorShown(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
 
