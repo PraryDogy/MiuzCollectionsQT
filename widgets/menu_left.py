@@ -17,20 +17,6 @@ from ._base_widgets import (SettingsItem, UListWidgetItem, UMenu, UVBoxLayout,
                             VListWidget)
 
 
-class FavItem(QTreeWidgetItem):
-    def __init__(self):
-        super().__init__([Lng.favorites[Cfg.lng]])
-        self.setData(0, Qt.ItemDataRole.UserRole, None)
-
-
-class TreeSep(QTreeWidgetItem):
-    def __init__(self):
-        super().__init__()
-        self.setDisabled(True)
-        self.setSizeHint(0, QSize(0, 10))
-        self.setData(0, Qt.ItemDataRole.UserRole, None)
-
-
 class TreeWid(QTreeWidget):
     clicked_ = pyqtSignal(str)
     no_connection = pyqtSignal(Mf)
@@ -56,14 +42,6 @@ class TreeWid(QTreeWidget):
         self.root_dir = root_dir
         self.last_dir = root_dir
 
-        # верхние кастомные элементы
-        custom_item = FavItem()
-        custom_item.setSizeHint(0, QSize(0, self.hh))
-        self.insertTopLevelItem(0, custom_item)
-
-        sep = TreeSep()
-        self.insertTopLevelItem(1, sep)
-
         # корневая директория
         basename = os.path.basename(root_dir)
         root_item = QTreeWidgetItem([basename])
@@ -81,14 +59,8 @@ class TreeWid(QTreeWidget):
 
     def on_item_click(self, item: QTreeWidgetItem, col: int):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
-        if isinstance(item, TreeSep):
+        if clicked_dir == self.last_dir:
             return
-        elif clicked_dir == self.last_dir:
-            return
-        elif isinstance(item, FavItem):
-            self.last_dir = clicked_dir
-            self.selected_path = clicked_dir
-            self.clicked_.emit(Static.NAME_FAVS)
         else:
             self.last_dir = clicked_dir
             self.selected_path = clicked_dir
