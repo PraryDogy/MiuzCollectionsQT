@@ -21,28 +21,25 @@ class TreeWid(QTreeWidget):
     tree_reveal = pyqtSignal(str)
     tree_open = pyqtSignal(str)
 
-    # настройки
-    SVG_FOLDER = "./images/folder.svg"
-    SVG_SIZE = 16
-    ITEM_HEIGHT = 25
-    INDENTATION = 10
+    svg_folder = "./images/folder.svg"
+    svg_size = 16
+    item_height = 25
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        # внутренние переменные
+    def __init__(self):
+        super().__init__()
         self.root_dir: str = None
         self.last_dir: str = None
         self.selected_path: str = None
-
-        # настройки дерева
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
-        self.setIconSize(QSize(self.SVG_SIZE, self.SVG_SIZE))
-        self.setIndentation(self.INDENTATION)
-
-        # сигналы
         self.itemClicked.connect(self.on_item_click)
+        self.setIconSize(QSize(self.svg_size, self.svg_size))
+        self.setIndentation(10)
+
+    def refresh_tree(self):
+        if not self.root_dir:
+            return
+        self.init_ui(self.root_dir)
 
     def init_ui(self, root_dir: str):
         self.clear()
@@ -146,6 +143,11 @@ class MfList(VListWidget):
 
     def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
+        self.setCurrentRow(0)
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
 
         for i in Mf.list_:
             if i.curr_path:
@@ -157,14 +159,6 @@ class MfList(VListWidget):
             item.mf = i
             item.setToolTip(i.name)
             self.addItem(item)
-
-        self.setCurrentRow(0)
-
-        self.setCurrentRow(1)
-        self.setDragEnabled(True)
-        self.setAcceptDrops(True)
-        self.setDefaultDropAction(Qt.DropAction.MoveAction)
-        self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
 
     def mouseReleaseEvent(self, e):
         item: MfListItem = self.itemAt(e.pos())
@@ -196,9 +190,7 @@ class MfList(VListWidget):
         menu.show_umenu()
 
     def dropEvent(self, event):
-        super().dropEvent(event)  # перемещаем элемент визуально
-
-        # обновляем порядок в Mf.list_ согласно виджету
+        super().dropEvent(event)
         new_order = []
         for i in range(self.count()):
             item: MfListItem = self.item(i)
