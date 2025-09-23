@@ -12,7 +12,8 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.utils import Utils
 
-from ._base_widgets import SettingsItem, UListWidgetItem, UMenu, VListWidget
+from ._base_widgets import (SettingsItem, UListSpacerItem, UListWidgetItem,
+                            UMenu, VListWidget)
 
 
 class CustomSortProxy(QSortFilterProxyModel):
@@ -149,6 +150,9 @@ class MfList(VListWidget):
         item.setToolTip(Lng.favorites[Cfg.lng])
         self.addItem(item)
 
+        item = UListSpacerItem(parent=self)
+        self.addItem(item)
+
         for i in Mf.list_:
             if i.curr_path:
                 true_name = os.path.basename(i.curr_path)
@@ -160,8 +164,7 @@ class MfList(VListWidget):
             item.setToolTip(i.name)
             self.addItem(item)
 
-        self.setCurrentRow(0)
-
+        self.setCurrentRow(1)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
@@ -326,7 +329,6 @@ class MenuLeft(QTabWidget):
 
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
         self.addTab(self.tree_wid, Lng.images[Cfg.lng])
-        
         QTimer.singleShot(0, lambda: mf_click(Mf.current))
 
     def dragEnterEvent(self, a0):
