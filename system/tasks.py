@@ -513,14 +513,13 @@ class DbImagesLoader(URunnable):
             stmt = stmt.order_by(-THUMBS.c.mod)
         else:
             stmt = stmt.order_by(-THUMBS.c.id)
+    
+        stmt = stmt.where(THUMBS.c.brand == Mf.current.name)
 
-        if Dynamic.current_dir != Static.NAME_FAVS:
-            stmt = stmt.where(THUMBS.c.brand == Mf.current.name)
-
-        if Dynamic.current_dir == Static.NAME_FAVS:
+        if Dynamic.favs:
             stmt = stmt.where(THUMBS.c.fav == 1)
 
-        elif Dynamic.show_all_images:
+        if Dynamic.show_all_images:
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
         else:
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))

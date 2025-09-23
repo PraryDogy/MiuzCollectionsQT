@@ -272,3 +272,4 @@ class Dynamic:
     sort_by_mod: bool = True
     show_all_images: bool = True
     enabled_filters: list[str] = []
+    favs: bool = False

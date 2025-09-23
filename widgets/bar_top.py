@@ -149,11 +149,22 @@ class FiltersBtn(BarTopBtn):
             item.action_type = item.type_filters
             self.edit_filters.emit(item)
 
+        def favs_cmd():
+            Dynamic.favs = not Dynamic.favs
+            self.clicked_.emit()
+
         """Показывает меню фильтров при клике левой кнопкой мыши."""
         if ev and ev.button() == Qt.MouseButton.LeftButton:
             self.set_solid_style()
             menu = UMenu(self)
             menu.setMinimumWidth(self.menu_ww)
+
+            favs = QAction(Lng.favorites[Cfg.lng], self, checkable=True)
+            favs.setChecked(Dynamic.favs)
+            favs.triggered.connect(favs_cmd)
+            menu.addAction(favs)
+
+            menu.addSeparator()
 
             # --- Добавляем фильтры ---
             for f in Filters.filters:
@@ -178,7 +189,7 @@ class FiltersBtn(BarTopBtn):
             menu.exec(pos)
 
             # --- Если фильтры пусты, вернуть обычный стиль ---
-            if not Dynamic.enabled_filters:
+            if not Dynamic.enabled_filters and not Dynamic.favs:
                 self.set_normal_style()
 
 
