@@ -191,10 +191,6 @@ class WinMain(UMainWindow):
         self.scaner_task = None
         self.scaner_task_canceled = False
 
-        self.wait_timer = QTimer(self)
-        self.wait_timer.setSingleShot(True)
-        self.wait_timer.timeout.connect(self.wait_connection)
-
         QTimer.singleShot(100, self.first_check)
 
         if argv[-1] != self.argv_flag:
@@ -219,19 +215,10 @@ class WinMain(UMainWindow):
             self.warning_svg
             )
         noti._show()
-
-    def wait_connection(self):
-        self.wait_timer.stop()
-        if not Mf.current.get_curr_path():
-            self.wait_timer.start(1000)
-        else:
-            self.left_menu.mf_view(Mf.current)
-        print("wait smb connection")
     
     def first_check(self):
         if not Mf.current.get_curr_path():
             self.open_win_smb(self.grid, Mf.current)
-            self.wait_timer.start(1000)
 
     @with_conn
     def left_menu_click(self, parent: QWidget, mf: Mf, abs_path: str):
