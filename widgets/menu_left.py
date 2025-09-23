@@ -126,7 +126,6 @@ class MfListItem(UListWidgetItem):
     
 
 class MfList(VListWidget):
-
     mf_view = pyqtSignal(Mf)
     mf_reveal = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
@@ -200,10 +199,8 @@ class MfList(VListWidget):
 
 class MenuLeft(QTabWidget):
     reload_thumbnails = pyqtSignal(str)
-    reveal = pyqtSignal(str)
+    path_reveal = pyqtSignal(str)
     restart_scaner = pyqtSignal()
-
-    no_connection = pyqtSignal(Mf)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
     
@@ -225,7 +222,7 @@ class MenuLeft(QTabWidget):
             # а потом возвращаем назад
             old_mf = Mf.current
             Mf.current = mf
-            self.reveal.emit(mf.curr_path)
+            self.path_reveal.emit(mf.curr_path)
             Mf.current = old_mf
   
         def mf_edit(mf: Mf):
@@ -270,7 +267,7 @@ class MenuLeft(QTabWidget):
             lambda: self.restart_scaner.emit()
         )
         self.tree_wid.reveal.connect(
-            lambda abs_path: self.reveal.emit(abs_path)
+            lambda abs_path: self.path_reveal.emit(abs_path)
         )
         self.tree_wid.restart_scaner.connect(
             lambda: self.restart_scaner.emit()

@@ -90,7 +90,7 @@ class WinMain(UMainWindow):
         self.left_menu.reload_thumbnails.connect(
             lambda: self.set_window_title()
         )
-        self.left_menu.reveal.connect(
+        self.left_menu.path_reveal.connect(
             lambda abs_path: self.reveal_in_finder(self, Mf.current, [abs_path, ])
         )
         self.left_menu.restart_scaner.connect(
@@ -296,8 +296,6 @@ class WinMain(UMainWindow):
             subprocess.Popen(["open", abs_paths[0]])
         else:
             Utils.reveal_files(abs_paths)
-
-        print(rel_paths, abs_paths)
 
     @with_conn
     def copy_name(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
