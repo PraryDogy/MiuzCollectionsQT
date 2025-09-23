@@ -270,6 +270,7 @@ class MenuLeft(QTabWidget):
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
         self.addTab(self.tree_wid, Lng.contents[Cfg.lng])
 
+        self.mf_list.setCurrentRow(0)
         QTimer.singleShot(10, lambda: _mf_open(Mf.current))
 
     def dragEnterEvent(self, a0):
