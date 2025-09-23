@@ -27,7 +27,7 @@ class CustomSortProxy(QSortFilterProxyModel):
 
 
 class RowHeightDelegate(QStyledItemDelegate):
-    def __init__(self, height: int, parent=None):
+    def __init__(self, height: int = 28, parent=None):
         super().__init__(parent)
         self._height = height
 
@@ -40,7 +40,6 @@ class TreeWid(QTreeView):
     reload_thumbnails = pyqtSignal(str)
     reveal = pyqtSignal(str)
     restart_scaner = pyqtSignal()
-    item_hh = 28
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -68,7 +67,7 @@ class TreeWid(QTreeView):
         self.header().setStretchLastSection(False)
         self.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
 
-        self.setItemDelegate(RowHeightDelegate(self.item_hh, self))
+        self.setItemDelegate(RowHeightDelegate(parent=self))
 
         self.clicked.connect(self.on_item_click)
 
