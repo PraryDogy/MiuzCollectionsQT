@@ -85,24 +85,24 @@ class WinMain(UMainWindow):
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
 
-        self.left_menu.restart_scaner.connect(
-            lambda: self.restart_scaner_task()
-        )
-        self.left_menu.mf_edit.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.left_menu.mf_new.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.left_menu.no_connection.connect(
-            lambda mf: self.open_win_smb(self.grid, mf)
-        )
-        self.left_menu.reload_thumbnails.connect(
-            lambda: self.grid.reload_thumbnails()
-        )
-        self.left_menu.reload_thumbnails.connect(
-            lambda: self.set_window_title()
-        )
+        # self.left_menu.restart_scaner.connect(
+        #     lambda: self.restart_scaner_task()
+        # )
+        # self.left_menu.mf_edit.connect(
+        #     lambda settings_item: self.open_settings_win(settings_item)
+        # )
+        # self.left_menu.mf_new.connect(
+        #     lambda settings_item: self.open_settings_win(settings_item)
+        # )
+        # self.left_menu.no_connection.connect(
+        #     lambda mf: self.open_win_smb(self.grid, mf)
+        # )
+        # self.left_menu.reload_thumbnails.connect(
+        #     lambda: self.grid.reload_thumbnails()
+        # )
+        # self.left_menu.reload_thumbnails.connect(
+        #     lambda: self.set_window_title()
+        # )
         splitter.addWidget(self.left_menu)
 
         # Правый виджет
