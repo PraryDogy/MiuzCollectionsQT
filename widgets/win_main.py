@@ -609,6 +609,8 @@ class WinMain(UMainWindow):
             self.scaner_timer.start(1000)
         
     def set_window_title(self):
+        if Dynamic.current_dir is None:
+            return
         if Mf.current.curr_path:
             true_name = os.path.basename(Mf.current.curr_path)
         else:

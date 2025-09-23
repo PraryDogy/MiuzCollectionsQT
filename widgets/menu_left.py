@@ -46,6 +46,12 @@ class TreeWid(QTreeView):
 
         self.last_selection: QModelIndex = None
 
+    def init_ui(self, root_dir: str):
+
+        if not root_dir:
+            self.setModel(None)
+            return
+
         self.model_ = QFileSystemModel()
         self.model_.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
 
@@ -71,9 +77,10 @@ class TreeWid(QTreeView):
 
         self.clicked.connect(self.on_item_click)
 
-    def init_ui(self, root_dir: str):
         self.model_.setRootPath(root_dir)
-        self.setRootIndex(self.proxy.mapFromSource(self.model_.index(root_dir)))
+        self.setRootIndex(
+            self.proxy.mapFromSource(self.model_.index(root_dir))
+        )
 
     def on_item_click(self, index: QModelIndex):
         if self.last_selection != index:
