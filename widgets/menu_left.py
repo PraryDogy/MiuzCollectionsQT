@@ -268,7 +268,7 @@ class MenuLeft(QTabWidget):
         )
 
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])
-        self.addTab(self.tree_wid, Lng.images[Cfg.lng])
+        self.addTab(self.tree_wid, Lng.contents[Cfg.lng])
 
         QTimer.singleShot(10, lambda: _mf_open(Mf.current))
 
