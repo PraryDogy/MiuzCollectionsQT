@@ -94,15 +94,11 @@ class TreeWid(QTreeWidget):
 
         root_item.setExpanded(True)
         if self.selected_path and self.selected_path in items:
-            item = items[self.selected_path]
-
-            # раскрываем всех родителей
+            item = items.get(self.selected_path)
             parent = item.parent()
             while parent:
                 parent.setExpanded(True)
                 parent = parent.parent()
-
-            # раскрываем сам элемент и выделяем
             item.setExpanded(True)
             self.setCurrentItem(item)
 
