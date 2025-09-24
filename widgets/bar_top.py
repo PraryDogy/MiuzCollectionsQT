@@ -127,15 +127,15 @@ class FiltersBtn(BarTopBtn):
 
         def on_action(val: str):
             """Добавляет или удаляет фильтр из списка включённых и испускает сигнал."""
-            if val in Dynamic.enabled_filters:
-                Dynamic.enabled_filters.remove(val)
+            if val in Dynamic.filters_enabled:
+                Dynamic.filters_enabled.remove(val)
             else:
-                Dynamic.enabled_filters.append(val)
+                Dynamic.filters_enabled.append(val)
             self.clicked_.emit()
         
         def reset():
             """Сбрасывает все фильтры и испускает сигнал."""
-            Dynamic.enabled_filters.clear()
+            Dynamic.filters_enabled.clear()
             self.clicked_.emit()
    
         def edit_filters():
@@ -144,7 +144,11 @@ class FiltersBtn(BarTopBtn):
             self.edit_filters.emit(item)
 
         def favs_cmd():
-            Dynamic.favs = not Dynamic.favs
+            Dynamic.filter_favs = not Dynamic.filter_favs
+            self.clicked_.emit()
+
+        def only_folder_cmd():
+            Dynamic.filter_only_folder = not Dynamic.filter_only_folder
             self.clicked_.emit()
 
         """Показывает меню фильтров при клике левой кнопкой мыши."""
@@ -154,16 +158,21 @@ class FiltersBtn(BarTopBtn):
             menu.setMinimumWidth(self.menu_ww)
 
             favs = QAction(Lng.favorites[Cfg.lng], self, checkable=True)
-            favs.setChecked(Dynamic.favs)
+            favs.setChecked(Dynamic.filter_favs)
             favs.triggered.connect(favs_cmd)
             menu.addAction(favs)
+
+            only_folder = QAction(Lng.only_this_folder[Cfg.lng], self, checkable=True)
+            only_folder.setChecked(Dynamic.filter_only_folder)
+            only_folder.triggered.connect(only_folder_cmd)
+            menu.addAction(only_folder)
 
             menu.addSeparator()
 
             # --- Добавляем фильтры ---
             for f in Filters.filters:
                 act = QAction(f, self, checkable=True)
-                act.setChecked(f in Dynamic.enabled_filters)
+                act.setChecked(f in Dynamic.filters_enabled)
                 act.triggered.connect(lambda _, val=f: on_action(val))
                 menu.addAction(act)
 
@@ -182,8 +191,13 @@ class FiltersBtn(BarTopBtn):
             pos = self.mapToGlobal(self.rect().bottomLeft())
             menu.exec(pos)
 
-            # --- Если фильтры пусты, вернуть обычный стиль ---
-            if not Dynamic.enabled_filters and not Dynamic.favs:
+            filters = (
+                *Dynamic.filters_enabled,
+                Dynamic.filter_favs,
+                Dynamic.filter_only_folder
+            )
+
+            if not any(filters):
                 self.set_normal_style()
 
 
@@ -259,51 +273,6 @@ class SettingsBtn(BarTopBtn):
         self.svg_btn.load(self.ICON_PATH)
 
 
-class ViewBtn(BarTopBtn):
-    eye_on = "./images/eye_on.svg"
-    eye_off = "./images/eye_off.svg"
-
-    def __init__(self):
-        super().__init__()
-        self.lbl.setText(Lng.show[Cfg.lng])
-        self.mappings = {
-            True: self.eye_on,
-            False: self.eye_off
-        }
-        self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
-
-    def menu_clicked(self, value: bool):
-        Dynamic.show_all_images = value
-        # self.svg_btn.load(self.mappings.get(Dynamic.show_all_images, True))
-        self.clicked_.emit()
-
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        """Показывает меню выбора сортировки при клике левой кнопкой мыши."""
-        if ev and ev.button() == Qt.MouseButton.LeftButton:
-            self.set_solid_style()
-            menu = UMenu(ev)
-
-            # --- Создаем пункты меню ---
-            all_images = QAction(Lng.all_images[Cfg.lng], self, checkable=True)
-            only_this_folder = QAction(Lng.only_this_folder[Cfg.lng], self, checkable=True)
-
-            all_images.setChecked(Dynamic.show_all_images)
-            only_this_folder.setChecked(not Dynamic.show_all_images)
-
-            all_images.triggered.connect(lambda: self.menu_clicked(True))
-            only_this_folder.triggered.connect(lambda: self.menu_clicked(False))
-
-            menu.addAction(all_images)
-            menu.addAction(only_this_folder)
-
-            # --- Показ меню под кнопкой ---
-            pos = self.mapToGlobal(self.rect().bottomLeft())
-            menu.exec(pos)
-
-            # --- Вернуть нормальный стиль после закрытия меню ---
-            self.set_normal_style()
-
-
 class BarTop(QWidget):
     """
     Верхняя панель с кнопками управления и поиском.
@@ -331,10 +300,6 @@ class BarTop(QWidget):
         self.setLayout(self.h_layout)
 
         self.h_layout.addStretch(1)
-
-        self.view_btn = ViewBtn()
-        self.view_btn.clicked_.connect(self.reload_thumbnails.emit)
-        self.h_layout.addWidget(self.view_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка сортировки ---
         self.sort_btn = SortBtn()

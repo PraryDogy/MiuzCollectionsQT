@@ -506,36 +506,26 @@ class DbImagesLoader(URunnable):
             THUMBS.c.mod,
             THUMBS.c.fav
         ).limit(Static.thumbnails_step).offset(Dynamic.thumbnails_count)
-
         if Dynamic.sort_by_mod:
             stmt = stmt.order_by(-THUMBS.c.mod)
         else:
             stmt = stmt.order_by(-THUMBS.c.id)
-    
         stmt = stmt.where(THUMBS.c.brand == Mf.current.name)
-
-        if Dynamic.favs:
+        stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
+        if Dynamic.filter_favs:
             stmt = stmt.where(THUMBS.c.fav == 1)
-
-        if Dynamic.show_all_images:
-            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
-        else:
-            stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
+        if Dynamic.filter_only_folder:
             stmt = stmt.where(THUMBS.c.short_src.not_ilike(f"{Dynamic.current_dir}/%/%"))
-
-        if Dynamic.enabled_filters:
+        if Dynamic.filters_enabled:
             stmt = stmt.where(
-                sqlalchemy.or_(*[THUMBS.c.short_src.ilike(f"%{f}%") for f in Dynamic.enabled_filters])
+                sqlalchemy.or_(*[THUMBS.c.short_src.ilike(f"%{f}%") for f in Dynamic.filters_enabled])
             )
-
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
             stmt = stmt.where(THUMBS.c.short_src.ilike(f"%{text}%"))
-
         if any((Dynamic.date_start, Dynamic.date_end)):
             start, end = self.combine_dates(Dynamic.date_start, Dynamic.date_end)
             stmt = stmt.where(THUMBS.c.mod > start).where(THUMBS.c.mod < end)
-
         return stmt
 
     def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:

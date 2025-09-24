@@ -284,7 +284,7 @@ class Lng:
         "- In the app, select the \".jpg\" filter — all .jpg files will be displayed."
     )
     all_images = ("Все изображения", "All images")
-    only_this_folder = ("Только в этой папке", "Only this folder")
+    only_this_folder = ("Показать только в этой папке", "Show only this folder")
     upload_files_in = ("Загрузить файлы в", "Upload files in")
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрывать нумерацию", "Hide numbering")
