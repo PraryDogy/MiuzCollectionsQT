@@ -98,6 +98,12 @@ class TreeWid(QTreeWidget):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
         if clicked_dir and clicked_dir != self.selected_path:
             self.selected_path = clicked_dir
+            if clicked_dir == os.sep:
+                # Корневая директория представляется пустой строкой.
+                # Это нужно потому, что в запросах к БД формируется шаблон вида `path + '/%'` (ILIKE/LIKE).
+                # Если хранить корень как `'/'`, шаблон превратится в `'//%'` — поиск будет неверным.
+                # Пустая строка даёт корректный шаблон `'/%'`, то есть все записи из корня.
+                clicked_dir = ""
             self.tree_open.emit(clicked_dir)
 
     def generate_path_hierarchy(self, full_path):
@@ -230,6 +236,10 @@ class MenuLeft(QTabWidget):
 
         def _mf_open(mf: Mf):
             Mf.current = mf
+            # Корневая директория представляется пустой строкой.
+            # Это нужно потому, что в запросах к БД формируется шаблон вида `path + '/%'` (ILIKE/LIKE).
+            # Если хранить корень как `'/'`, шаблон превратится в `'//%'` — поиск будет неверным.
+            # Пустая строка даёт корректный шаблон `'/%'`, то есть все записи из корня.
             Dynamic.current_dir = ""
             self.tree_wid.init_ui()
             self.reload_thumbnails.emit()
