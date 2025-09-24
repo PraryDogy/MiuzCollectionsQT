@@ -1036,11 +1036,10 @@ class Grid(VScrollArea):
                 QTimer.singleShot(100, self.wid_under_mouse.set_frame)
 
             # собираем пути выбранных изображений
-            mf_path = Mf.current.get_curr_path()
             paths = []
-            if mf_path:
+            if Mf.current.set_curr_path():
                 paths = [
-                    Utils.get_abs_path(mf_path, wid.rel_path)
+                    Utils.get_abs_path(Mf.current.curr_path, wid.rel_path)
                     for wid in self.selected_widgets
                 ]
 

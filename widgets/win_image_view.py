@@ -233,7 +233,7 @@ class WinImageView(AppModalWindow):
 
 
     def first_load(self):
-        if not Mf.current.get_curr_path():
+        if not Mf.current.set_curr_path():
             self.no_connection.emit()
         self.load_thumb()
 
@@ -253,9 +253,8 @@ class WinImageView(AppModalWindow):
             t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng]}"
             self.image_label.setText(t)
 
-        mf_path = Mf.current.get_curr_path()
-        if mf_path:
-            self.path = Utils.get_abs_path(mf_path, self.rel_path)
+        if Mf.current.set_curr_path():
+            self.path = Utils.get_abs_path(Mf.current.curr_path, self.rel_path)
             self.load_image()
         else:
             print("img viewer > no smb")

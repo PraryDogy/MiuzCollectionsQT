@@ -39,7 +39,7 @@ class ScanerTask(URunnable):
 
     def task(self):
         for i in Mf.list_:
-            if i.get_curr_path():
+            if i.set_curr_path():
                 print("scaner started", i.name)
                 self.mf_scan(i)
                 gc.collect()
