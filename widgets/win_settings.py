@@ -135,7 +135,7 @@ class ScanerSettings(QGroupBox):
         self.spin = QSpinBox(self)
         self.spin.setMinimum(1)
         self.spin.setMaximum(60)
-        self.spin.setFixedSize(110, 27)
+        self.spin.setFixedHeight(27)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[Cfg.lng]}")
         self.spin.setValue(self.json_data_copy.scaner_minutes)
@@ -145,9 +145,17 @@ class ScanerSettings(QGroupBox):
         label = ULabel(Lng.search_interval[Cfg.lng], self)
         self.spin_lay.addWidget(label)
 
+        self.change_spin_width()
+
     def change_scan_time(self, value: int):
         self.json_data_copy.scaner_minutes = value
         self.changed.emit()
+
+    def change_spin_width(self):
+        if Cfg.dark_mode == 0:
+            self.spin.setFixedWidth(109)
+        else:
+            self.spin.setFixedWidth(115)
 
 
 class ThemesBtn(QFrame):
@@ -206,7 +214,7 @@ class ThemesBtn(QFrame):
 
 
 class Themes(QGroupBox):
-    theme_changed = pyqtSignal()
+    clicked = pyqtSignal()
     svg_theme_system = "./images/system_theme.svg"
     svg_theme_dark = "./images/dark_theme.svg"
     svg_theme_light = "./images/light_theme.svg"
@@ -258,7 +266,7 @@ class Themes(QGroupBox):
             Cfg.dark_mode = 2
 
         ThemeChanger.init()
-        self.theme_changed.emit()
+        self.clicked.emit()
 
     def set_selected(self, selected_frame: ThemesBtn):
         for f in self.frames:
@@ -341,6 +349,7 @@ class GeneralSettings(QWidget):
         v_lay.addWidget(scaner_settings)
 
         themes = Themes()
+        themes.clicked.connect(scaner_settings.change_spin_width)
         v_lay.addWidget(themes)
 
         about = AboutWid()
