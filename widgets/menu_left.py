@@ -63,15 +63,6 @@ class TreeWid(QTreeWidget):
     def init_ui(self):
         self.clear()
 
-        # if Mf.current.get_curr_path():
-        #     root_dir = Mf.current.curr_path
-        # else:
-        #     root_dir = Mf.current.paths[0]
-
-        # self.root_dir = root_dir
-        # self.last_dir = root_dir
-        # self.selected_path = root_dir
-
         root_item = QTreeWidgetItem([Mf.current.name])
         root_item.setSizeHint(0, QSize(0, self.item_height))
         root_item.setData(0, Qt.ItemDataRole.UserRole, "/")
