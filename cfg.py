@@ -151,8 +151,7 @@ class Cfg:
     dark_mode: int = 0
     scaner_minutes: int = 5
     new_scaner: int = True
-    abc_name: bool = True
-    abc_sort: bool = True
+    hide_digits: bool = True
     apps = [
         "preview",
         "photos",
@@ -186,7 +185,7 @@ class Cfg:
                 data = {}
 
     @classmethod
-    def get_data(cls, start: int = 2, end: int = 10):
+    def get_data(cls, start: int = 2, end: int = 9):
         return {
             i: getattr(Cfg, i)
             for i in list(vars(Cfg))[start:end]

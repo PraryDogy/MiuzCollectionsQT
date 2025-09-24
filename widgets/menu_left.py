@@ -73,6 +73,8 @@ class TreeWid(QTreeWidget):
                 continue
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
+            if Cfg.hide_digits:
+                name = self.strip_to_first_letter(name)
 
             parent_item = items.get(parent)
             if parent_item is None:
@@ -82,6 +84,7 @@ class TreeWid(QTreeWidget):
             child.setIcon(0, QIcon(self.svg_folder))
             child.setSizeHint(0, QSize(0, self.item_height))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
+            child.setToolTip(1, os.path.basename(path))
             parent_item.addChild(child)
 
             items[path] = child
