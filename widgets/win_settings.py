@@ -40,7 +40,7 @@ class LangReset(QGroupBox):
         self.json_data_copy = json_data_copy
 
         v_lay = UVBoxLayout()
-        v_lay.setSpacing(10)
+        # v_lay.setSpacing(10)
         self.setLayout(v_lay)
 
         first_row_wid = QWidget()
@@ -73,6 +73,8 @@ class LangReset(QGroupBox):
 
         v_lay.addWidget(first_row_wid)
         v_lay.addWidget(sec_row_wid)
+
+        self.setFixedHeight(70)
 
     def lang_btn_cmd(self, *args):
         if self.json_data_copy.lng == 0:
