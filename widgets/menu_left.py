@@ -27,7 +27,6 @@ class TreeWid(QTreeWidget):
 
     def __init__(self):
         super().__init__()
-        self.last_dir: str = None
         self.selected_path: str = None
 
         self.setHeaderHidden(True)
@@ -85,8 +84,7 @@ class TreeWid(QTreeWidget):
 
     def on_item_click(self, item: QTreeWidgetItem, col: int):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
-        if clicked_dir and clicked_dir != self.last_dir:
-            self.last_dir = clicked_dir
+        if clicked_dir and clicked_dir != self.selected_path:
             self.selected_path = clicked_dir
             self.tree_open.emit(clicked_dir)
 
