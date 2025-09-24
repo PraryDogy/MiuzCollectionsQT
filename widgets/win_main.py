@@ -191,6 +191,13 @@ class WinMain(UMainWindow):
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
 
+        # test = QFrame(self)
+        # test.setStyleSheet("background: red")
+        # test.setFixedSize(100, 100)
+        # test.move(30, 30)
+        # test.show()
+        # test.mouseReleaseEvent = lambda e: self.grid.reload_thumbnails()
+
     @staticmethod
     def with_conn(fn):
         def wrapper(self: "WinMain", parent: QWidget, mf: Mf, *args, **kwargs):
