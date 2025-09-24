@@ -397,15 +397,15 @@ class DbUpdater(QObject):
             coll = os.path.basename(os.path.dirname(path))
 
             values = {
-                ClmNames.SHORT_SRC: short_path,
-                ClmNames.SHORT_HASH: rel_thumb_path,
-                ClmNames.SIZE: size,
-                ClmNames.BIRTH: birth,
-                ClmNames.MOD: mod,
-                ClmNames.RESOL: "",
-                ClmNames.COLL: coll,
-                ClmNames.FAV: 0,
-                ClmNames.BRAND: self.mf.name
+                ClmNames.short_src: short_path,
+                ClmNames.short_hash: rel_thumb_path,
+                ClmNames.size: size,
+                ClmNames.birth: birth,
+                ClmNames.mod: mod,
+                ClmNames.resol: "",
+                ClmNames.coll: coll,
+                ClmNames.fav: 0,
+                ClmNames.brand: self.mf.name
             }
             stmt = sqlalchemy.insert(THUMBS).values(**values) 
             try:

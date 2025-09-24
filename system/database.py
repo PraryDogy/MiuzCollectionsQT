@@ -8,38 +8,38 @@ from system.utils import Utils
 METADATA = sqlalchemy.MetaData()
 
 class ClmNames:
-    ID = "id"
-    SHORT_SRC = "short_src" #relative img path
-    SHORT_HASH = "short_hash" #relative thumb path
-    SIZE = "size"
-    BIRTH = "birth"
-    MOD = "mod"
-    RESOL = "resol" #ignore
-    COLL = "coll"
-    FAV = "fav"
-    BRAND = "brand" # Mf name
+    id = "id"
+    short_src = "short_src" #relative img path
+    short_hash = "short_hash" #relative thumb path
+    size = "size"
+    birth = "birth"
+    mod = "mod"
+    resol = "resol" #ignore
+    coll = "coll"
+    fav = "fav"
+    brand = "brand" # Mf name
 
 
 THUMBS = sqlalchemy.Table(
     "thumbs", METADATA,
-    sqlalchemy.Column(ClmNames.ID, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmNames.SHORT_SRC, sqlalchemy.Text, comment="relative img path"),
-    sqlalchemy.Column(ClmNames.SHORT_HASH, sqlalchemy.Text, comment="relative thumb path"),
-    sqlalchemy.Column(ClmNames.SIZE, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.BIRTH, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.MOD, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.RESOL, sqlalchemy.Text, comment="ignore"),
-    sqlalchemy.Column(ClmNames.COLL, sqlalchemy.Text),
-    sqlalchemy.Column(ClmNames.FAV, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.BRAND, sqlalchemy.Text, comment="Mf name"),
+    sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text, comment="относительный путь к изображению"),
+    sqlalchemy.Column(ClmNames.short_hash, sqlalchemy.Text, comment="относительный путь к миниатюре"),
+    sqlalchemy.Column(ClmNames.size, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.birth, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.mod, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.resol, sqlalchemy.Text, comment="более не используется"),
+    sqlalchemy.Column(ClmNames.coll, sqlalchemy.Text, comment="более не используется"),
+    sqlalchemy.Column(ClmNames.fav, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text, comment="Mf.name (смотри system > main_folder)"),
 )
 
 DIRS = sqlalchemy.Table(
     "dirs", METADATA,
-    sqlalchemy.Column(ClmNames.ID, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmNames.SHORT_SRC, sqlalchemy.Text),
-    sqlalchemy.Column(ClmNames.MOD, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.BRAND, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.mod, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text),
 )
 
 class Dbase:

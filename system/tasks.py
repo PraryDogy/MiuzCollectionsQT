@@ -663,3 +663,26 @@ class LoadDbMenu(URunnable):
 
     def _task(self):
         ...
+
+
+class DbDirsLoader(URunnable):
+
+    class Sigs(QObject):
+        finished_ = pyqtSignal(list)
+
+    def __init__(self, mf: Mf):
+        super().__init__()
+        self.sigs = DbDirsLoader.Sigs()
+        self.mf = mf
+        self.conn = Dbase.engine.connect()
+
+    def task(self):
+        try:
+            self._task()
+        except Exception as e:
+            print("DbDirsLoader error:", e)
+
+    def _task(self):
+        stmt = (
+            sqlalchemy.select(DIRS.c.short_src)
+        )
