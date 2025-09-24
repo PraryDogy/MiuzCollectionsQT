@@ -441,11 +441,10 @@ class DbImagesLoader(URunnable):
         finished_ = pyqtSignal(dict)
 
     class Item:
-        __slots__ = ["qimage", "rel_path", "coll_name", "fav", "f_mod"]
-        def __init__(self, qimage: QImage, rel_path: str, coll: str, fav: int, f_mod: str):
+        __slots__ = ["qimage", "rel_path", "fav", "f_mod"]
+        def __init__(self, qimage: QImage, rel_path: str, fav: int, f_mod: str):
             self.qimage = qimage
             self.rel_path = rel_path
-            self.coll_name = coll
             self.fav = fav
             self.f_mod = f_mod
 
@@ -473,7 +472,7 @@ class DbImagesLoader(URunnable):
         if not res:
             return {}
 
-        for rel_path, rel_thumb_path, mod, coll, fav in res:
+        for rel_path, rel_thumb_path, mod, fav in res:
             if not rel_path.endswith(Static.ext_all):
                 continue
 
@@ -491,7 +490,7 @@ class DbImagesLoader(URunnable):
             else:
                 f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
 
-            item = DbImagesLoader.Item(qimage, rel_path, coll, fav, f_mod)
+            item = DbImagesLoader.Item(qimage, rel_path, fav, f_mod)
 
             if Dynamic.sort_by_mod:
                 thumbs_dict[f_mod].append(item)
@@ -505,7 +504,6 @@ class DbImagesLoader(URunnable):
             THUMBS.c.short_src,
             THUMBS.c.short_hash,
             THUMBS.c.mod,
-            THUMBS.c.coll,
             THUMBS.c.fav
         ).limit(Static.thumbnails_step).offset(Dynamic.thumbnails_count)
 

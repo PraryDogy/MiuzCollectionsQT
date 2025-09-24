@@ -33,7 +33,7 @@ class FilenameWid(QLabel):
         name (str): основной текст.
     """
 
-    def __init__(self, parent: QWidget, name: str, coll: str):
+    def __init__(self, parent: QWidget, name: str):
         super().__init__(parent)
         self.name = name
 
@@ -118,7 +118,7 @@ class BelowTextWid(QLabel):
     def set_text(self):
         root = os.path.dirname(self.wid.rel_path).strip("/").replace("/", self.sep)
         if not root:
-            root = self.wid.collection
+            root = os.path.basename(Mf.current.curr_path)
         first_row = self.short_text(root)
         text = "\n".join((first_row, self.wid.f_mod))
         self.setText(text)
@@ -191,13 +191,12 @@ class Thumbnail(QFrame):
         font-size: 11px;
     """
 
-    def __init__(self, pixmap: QPixmap, rel_path: str, coll_name: str, fav: int, f_mod: str):
+    def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, f_mod: str):
         super().__init__()
 
         # --- Исходные данные ---
         self.img = pixmap
         self.rel_path = rel_path
-        self.collection = coll_name
         self.fav_value = fav
         self.f_mod = f_mod
         self.name = f"{self.sym_star} {os.path.basename(rel_path)}" if fav else os.path.basename(rel_path)
@@ -212,7 +211,7 @@ class Thumbnail(QFrame):
         self.img_wid = ImgWid()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.text_wid = FilenameWid(self, self.name, coll_name)
+        self.text_wid = FilenameWid(self, self.name)
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(self.text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -534,7 +533,6 @@ class Grid(VScrollArea):
             thumbnail = Thumbnail(
                 pixmap=pixmap,
                 rel_path=image_item.rel_path,
-                coll_name=image_item.coll_name,
                 fav=image_item.fav,
                 f_mod=image_item.f_mod
             )
