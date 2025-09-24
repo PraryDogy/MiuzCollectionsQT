@@ -63,20 +63,18 @@ class TreeWid(QTreeWidget):
     def init_ui(self):
         self.clear()
 
-        if Mf.current.get_curr_path():
-            root_dir = Mf.current.curr_path
-        else:
-            root_dir = Mf.current.paths[0]
+        # if Mf.current.get_curr_path():
+        #     root_dir = Mf.current.curr_path
+        # else:
+        #     root_dir = Mf.current.paths[0]
 
-        self.root_dir = root_dir
-        self.last_dir = root_dir
-        self.selected_path = root_dir
+        # self.root_dir = root_dir
+        # self.last_dir = root_dir
+        # self.selected_path = root_dir
 
-        basename = os.path.basename(root_dir)
-        root_item = QTreeWidgetItem([basename])
+        root_item = QTreeWidgetItem([Mf.current.name])
         root_item.setSizeHint(0, QSize(0, self.item_height))
-        root_item.setData(0, Qt.ItemDataRole.UserRole, root_dir)
-        root_item.setToolTip(0, basename + "\n" + root_dir)
+        root_item.setData(0, Qt.ItemDataRole.UserRole, "/")
         root_item.setIcon(0, QIcon(self.svg_folder))
         self.addTopLevelItem(root_item)
 
@@ -90,10 +88,11 @@ class TreeWid(QTreeWidget):
         paths — список всех директорий (root + вложенные).
         Строим дерево сразу.
         """
-        items: dict[str, QTreeWidgetItem] = {self.root_dir: root_item}
+        items: dict[str, QTreeWidgetItem] = {"/": root_item}
+
 
         for path in sorted(paths):
-            if path == self.root_dir:
+            if path == "/":
                 continue
             parent = os.path.dirname(path)
             name = os.path.basename(path)
@@ -261,9 +260,8 @@ class MenuLeft(QTabWidget):
         def _tree_reveal(mf: Mf, abs_path: str):
             subprocess.Popen(["open", abs_path])
 
-        @with_conn
-        def _tree_open(mf: Mf, abs_path: str):
-            rel_path = Utils.get_rel_path(mf.curr_path, abs_path)
+
+        def _tree_open(mf: Mf, rel_path: str):
             Dynamic.current_dir = rel_path
             self.reload_thumbnails.emit()
 
@@ -292,7 +290,7 @@ class MenuLeft(QTabWidget):
             lambda abs_path: _tree_reveal(Mf.current, abs_path)
         )
         self.tree_wid.tree_open.connect(
-            lambda abs_path: _tree_open(Mf.current, abs_path)
+            lambda rel_path: _tree_open(Mf.current, rel_path)
         )
 
         self.addTab(self.mf_list, Lng.folders[Cfg.lng])

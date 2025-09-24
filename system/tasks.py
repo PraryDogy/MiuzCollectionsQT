@@ -689,8 +689,16 @@ class DbDirsLoader(URunnable):
             .where(DIRS.c.brand == self.mf.name)
         )
 
-        return list(
-            Utils.get_abs_path(self.mf.curr_path, i)
-            for i in self.conn.execute(stmt).scalars()
-        )
+        res = list(self.conn.execute(stmt).scalars())
+        return self.fill_missing_paths(res)
         
+    def fill_missing_paths(self, paths: list[str]) -> list[str]:
+        """Добавляет недостающие промежуточные директории."""
+        full_set = set()
+        for p in paths:
+            parts = p.strip("/").split("/")
+            curr = ""
+            for part in parts:
+                curr = curr + "/" + part if curr else "/" + part
+                full_set.add(curr)
+        return sorted(full_set)
