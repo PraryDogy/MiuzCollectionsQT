@@ -3,12 +3,11 @@ import os
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QModelIndex, QSize, Qt, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QIcon, QKeyEvent
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QFrame,
-                             QGroupBox, QLabel, QPushButton, QSizePolicy,
-                             QSpacerItem, QSpinBox, QSplitter, QTabWidget,
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
+                             QPushButton, QSpacerItem, QSpinBox, QSplitter,
                              QWidget)
 
 from cfg import Cfg, Static
@@ -18,7 +17,7 @@ from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (AppModalWindow, SettingsItem, SingleActionWindow,
+from ._base_widgets import (SettingsItem, SingleActionWindow,
                             UHBoxLayout, ULineEdit, UListSpacerItem,
                             UListWidgetItem, UMenu, UTextEdit, UVBoxLayout,
                             VListWidget)
@@ -574,6 +573,7 @@ class MfSettings(QWidget):
 
 class NewFolder(QWidget):
     new_folder = pyqtSignal(Mf)
+    svg_warning = "./images/warning.svg"
 
     def __init__(self, mf_list: list[Mf]):
         super().__init__()
@@ -601,22 +601,28 @@ class NewFolder(QWidget):
         v_lay.addWidget(self.advanced)
 
         # QGroupBox для кнопки "Сохранить" и описания
-        btn_group = QGroupBox()
+        self.btn_group = QGroupBox()
         btn_group_lay = UHBoxLayout()
         btn_group_lay.setContentsMargins(0, 5, 0, 5)
         btn_group_lay.setSpacing(15)
         btn_group_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        btn_group.setLayout(btn_group_lay)
+        self.btn_group.setLayout(btn_group_lay)
 
-        add_btn = QPushButton(Lng.save[Cfg.lng])
-        add_btn.clicked.connect(self.save)
-        add_btn.setFixedWidth(100)
-        btn_group_lay.addWidget(add_btn)
+        self.save_btn = QPushButton(Lng.save[Cfg.lng])
+        self.save_btn.clicked.connect(self.save)
+        self.save_btn.setFixedWidth(100)
+        btn_group_lay.addWidget(self.save_btn)
 
         description_label = ULabel(Lng.save_btn_description[Cfg.lng])
         btn_group_lay.addWidget(description_label)
 
-        v_lay.addWidget(btn_group)
+        self.svg_btn = QSvgWidget()
+        self.svg_btn.load(self.svg_warning)
+        self.svg_btn.setFixedSize(20, 20)
+        btn_group_lay.addWidget(self.svg_btn)
+        self.svg_btn.hide()
+
+        v_lay.addWidget(self.btn_group)
         v_lay.addStretch()
         
     def preset_new_folder(self, url: str):
@@ -624,6 +630,26 @@ class NewFolder(QWidget):
         self.name_label.setText(name)
         text_edit = self.findChildren(DropableGroupBox)[0].text_edit
         text_edit.setPlainText(url)
+        self.blink_save()
+
+    def blink_save(self):
+        """Мерцание кнопки save три раза."""
+        self._blink_count = 0
+
+        def toggle():
+            if self._blink_count >= 12:  # 6 переключений = 3 мигания
+                self.svg_btn.hide()
+                timer.stop()
+                return
+            if self._blink_count % 2 == 0:
+                self.svg_btn.show()
+            else:
+                self.svg_btn.hide()
+            self._blink_count += 1
+
+        timer = QTimer(self)
+        timer.timeout.connect(toggle)
+        timer.start(300)
 
     def name_cmd(self):
         name = self.name_label.text().strip()
