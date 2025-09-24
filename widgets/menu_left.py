@@ -245,21 +245,20 @@ class MenuLeft(QTabWidget):
                     self.no_connection.emit(mf)
             return wrapper
 
-        # @with_conn
-        def _mf_open(mf: Mf):
-            Mf.current = mf
-            Dynamic.current_dir = ""
-            self.tree_wid.init_ui()
-            self.reload_thumbnails.emit()
-            
         @with_conn
         def _mf_reveal(mf: Mf):
             subprocess.Popen(["open", mf.curr_path])
 
         @with_conn
-        def _tree_reveal(mf: Mf, abs_path: str):
+        def _tree_reveal(mf: Mf, rel_path: str):
+            abs_path = Utils.get_abs_path(mf.curr_path, rel_path)
             subprocess.Popen(["open", abs_path])
 
+        def _mf_open(mf: Mf):
+            Mf.current = mf
+            Dynamic.current_dir = ""
+            self.tree_wid.init_ui()
+            self.reload_thumbnails.emit()
 
         def _tree_open(mf: Mf, rel_path: str):
             Dynamic.current_dir = rel_path
@@ -287,7 +286,7 @@ class MenuLeft(QTabWidget):
         self.tree_wid = TreeWid()
         self.tree_wid.init_ui()
         self.tree_wid.tree_reveal.connect(
-            lambda abs_path: _tree_reveal(Mf.current, abs_path)
+            lambda rel_path: _tree_reveal(Mf.current, rel_path)
         )
         self.tree_wid.tree_open.connect(
             lambda rel_path: _tree_open(Mf.current, rel_path)
