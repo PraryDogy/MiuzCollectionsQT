@@ -22,7 +22,7 @@ class ThumbData:
     MARGIN = 15
 
 class Static:
-    APP_VER = 3.50
+    APP_VER = 3.75
     APP_NAME = "Collections"
     thumbnails_step = 100
     NAME_FAVS = "___favorites___"
