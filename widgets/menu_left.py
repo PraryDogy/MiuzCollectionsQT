@@ -3,7 +3,7 @@ import re
 import subprocess
 from typing import Dict
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal, QTimer
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
 
@@ -93,9 +93,18 @@ class TreeWid(QTreeWidget):
         self.sort_children(root_item)
 
         root_item.setExpanded(True)
-
         if self.selected_path and self.selected_path in items:
-            self.setCurrentItem(items[self.selected_path])
+            item = items[self.selected_path]
+
+            # раскрываем всех родителей
+            parent = item.parent()
+            while parent:
+                parent.setExpanded(True)
+                parent = parent.parent()
+
+            # раскрываем сам элемент и выделяем
+            item.setExpanded(True)
+            self.setCurrentItem(item)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
