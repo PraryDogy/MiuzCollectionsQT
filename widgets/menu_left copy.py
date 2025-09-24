@@ -36,30 +36,6 @@ class TreeWid(QTreeWidget):
     def reload_ui(self):
         self.init_ui(self.root_dir)
 
-class TreeWid(QTreeWidget):
-    tree_reveal = pyqtSignal(str)
-    tree_open = pyqtSignal(str)
-
-    svg_folder = "./images/folder.svg"
-    svg_size = 16
-    item_height = 25
-
-    def __init__(self):
-        super().__init__()
-        self.root_dir: str = None
-        self.last_dir: str = None
-        self.selected_path: str = None
-
-        self.setHeaderHidden(True)
-        self.setAutoScroll(False)
-        self.setIconSize(QSize(self.svg_size, self.svg_size))
-        self.setIndentation(15)
-
-        self.itemClicked.connect(self.on_item_click)
-
-    def reload_ui(self):
-        self.init_ui()
-
     def init_ui(self):
         self.clear()
 
@@ -68,9 +44,9 @@ class TreeWid(QTreeWidget):
         else:
             root_dir = Mf.current.paths[0]
 
-        self.root_dir = root_dir
-        self.last_dir = root_dir
-        self.selected_path = root_dir
+        self.root_dir: str = root_dir
+        self.last_dir: str = root_dir
+        self.selected_path: str = root_dir
 
         basename = os.path.basename(root_dir)
         root_item = QTreeWidgetItem([basename])
@@ -80,58 +56,63 @@ class TreeWid(QTreeWidget):
         root_item.setIcon(0, QIcon(self.svg_folder))
         self.addTopLevelItem(root_item)
 
-        # новый таск возвращает список всех директорий
+        # worker = SortedDirsLoader(root_dir)
+        # worker.sigs.finished_.connect(
+        #     lambda data, item=root_item: self.add_children(item, data)
+        # )
+        # UThreadPool.start(worker)
+
         task = DbDirsLoader(Mf.current)
-        task.sigs.finished_.connect(lambda lst: self.build_tree(root_item, lst))
+        task.sigs.finished_.connect(lambda lst: ...)
         UThreadPool.start(task)
-
-    def build_tree(self, root_item: QTreeWidgetItem, paths: list[str]) -> None:
-        """
-        paths — список всех директорий (root + вложенные).
-        Строим дерево сразу.
-        """
-        items: dict[str, QTreeWidgetItem] = {self.root_dir: root_item}
-
-        for path in sorted(paths):
-            if path == self.root_dir:
-                continue
-            parent = os.path.dirname(path)
-            name = os.path.basename(path)
-
-            parent_item = items.get(parent)
-            if parent_item is None:
-                continue  # защита на случай дыр в списке
-
-            child = QTreeWidgetItem([name])
-            child.setIcon(0, QIcon(self.svg_folder))
-            child.setSizeHint(0, QSize(0, self.item_height))
-            child.setData(0, Qt.ItemDataRole.UserRole, path)
-            child.setToolTip(0, f"{name}\n{path}")
-            parent_item.addChild(child)
-
-            items[path] = child
-
-        root_item.setExpanded(True)
-
-        # восстановить выделение
-        if self.selected_path and self.selected_path in items:
-            self.setCurrentItem(items[self.selected_path])
+        print(Mf.current.curr_path)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
-        if clicked_dir and clicked_dir != self.last_dir:
+        if clicked_dir == self.last_dir:
+            return
+        else:
             self.last_dir = clicked_dir
             self.selected_path = clicked_dir
             self.tree_open.emit(clicked_dir)
+            if item.childCount() == 0:
+                worker = SortedDirsLoader(clicked_dir)
+                worker.sigs.finished_.connect(
+                    lambda data, item=item: self.add_children(item, data)
+                )
+                UThreadPool.start(worker)
+            item.setExpanded(True)
+
+    def add_children(self, parent_item: QTreeWidgetItem, data: Dict[str, str]) -> None:
+        parent_item.takeChildren()
+        for path, name in data.items():
+            child: QTreeWidgetItem = QTreeWidgetItem([name])
+            child.setIcon(0, QIcon(self.svg_folder))
+            child.setSizeHint(0, QSize(0, self.item_height))
+            child.setData(0, Qt.ItemDataRole.UserRole, path)
+            child.setToolTip(0, name + "\n" + path)
+            parent_item.addChild(child)
+        parent_item.setExpanded(True)
+        if not self.selected_path:
+            return
+        paths = self.generate_path_hierarchy(self.selected_path)
+        if paths:
+            items = self.findItems(
+                "*", Qt.MatchFlag.MatchRecursive | Qt.MatchFlag.MatchWildcard
+            )
+            for it in items:
+                for x in paths:
+                    if it.data(0, Qt.ItemDataRole.UserRole) == x:
+                        self.setCurrentItem(it)
+                        break
 
     def generate_path_hierarchy(self, full_path):
-        """Оставил, если нужно для другого кода"""
         parts = []
         path = full_path
         while True:
             parts.append(path)
             parent = os.path.dirname(path)
-            if parent == path:
+            if parent == path:  # достигли корня
                 break
             path = parent
         return parts

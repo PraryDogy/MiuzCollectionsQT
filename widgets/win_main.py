@@ -393,7 +393,7 @@ class WinMain(UMainWindow):
         def fin_remove(dirs_to_scan: list[str]):
             task = CustomScanerTask(Mf.current, dirs_to_scan)
             task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-            task.sigs.reload_thumbnails.connect(self.left_menu.tree_wid.refresh_tree)
+            task.sigs.reload_thumbnails.connect(self.left_menu.tree_wid.init_ui)
             UThreadPool.start(task)
         
         def start_remove(paths: list[str], dirs_to_scan: list[str]):
@@ -552,7 +552,7 @@ class WinMain(UMainWindow):
             self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
             self.scaner_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
             self.scaner_task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-            self.scaner_task.sigs.reload_thumbnails.connect(self.left_menu.tree_wid.refresh_tree)
+            self.scaner_task.sigs.reload_thumbnails.connect(self.left_menu.tree_wid.init_ui)
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None

@@ -676,11 +676,21 @@ class DbDirsLoader(URunnable):
 
     def task(self):
         try:
-            self._task()
+            res = self._task()
+            self.sigs.finished_.emit(res)
         except Exception as e:
             print("DbDirsLoader error:", e)
+            import traceback
+            print(traceback.format_exc())
 
     def _task(self):
         stmt = (
             sqlalchemy.select(DIRS.c.short_src)
+            .where(DIRS.c.brand == self.mf.name)
         )
+
+        return list(
+            Utils.get_abs_path(self.mf.curr_path, i)
+            for i in self.conn.execute(stmt).scalars()
+        )
+        
