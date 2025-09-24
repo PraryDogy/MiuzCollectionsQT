@@ -15,14 +15,14 @@ from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
                            RemovedMfCleaner)
 
 
-class ScanerSigs(QObject):
-    finished_ = pyqtSignal()
-    progress_text = pyqtSignal(str)
-    reload_thumbnails = pyqtSignal()
-    reload_menu = pyqtSignal()
-
-
 class ScanerTask(URunnable):
+
+    class Sigs(QObject):
+        finished_ = pyqtSignal()
+        progress_text = pyqtSignal(str)
+        reload_thumbnails = pyqtSignal()
+        reload_menu = pyqtSignal()
+
     short_timer = 15000
     long_timer = Cfg.scaner_minutes * 60 * 1000
 
@@ -31,7 +31,7 @@ class ScanerTask(URunnable):
         Сигналы: finished_, progress_text(str), reload_gui, remove_all_win(MainWin)
         """
         super().__init__()
-        self.sigs = ScanerSigs()
+        self.sigs = ScanerTask.Sigs()
         self.pause_flag = False
         self.user_canceled_scan = False
         self.reload_gui_flag = False
