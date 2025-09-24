@@ -550,55 +550,6 @@ class DbImagesLoader(URunnable):
         return datetime.timestamp(start), datetime.timestamp(end)
 
 
-class SortedDirsLoader(URunnable):
-    """
-    Загружает директории из указанного пути и сортирует их по имени.
-
-    Сигнал finished_ возвращает словарь {путь: имя}:
-    - ключ — абсолютный путь к директории,
-    - значение — имя директории.
-    """
-
-    class Sigs(QObject):
-        finished_ = pyqtSignal(dict)
-
-    def __init__(self, path: str):
-        """
-        :param path: путь к папке, из которой нужно загрузить поддиректории
-        """
-        super().__init__()
-        self.sigs = SortedDirsLoader.Sigs()
-        self.path = path
-
-    def task(self):
-        """Выполняет загрузку директорий с обработкой ошибок."""
-        try:
-            sorted_dirs = self._load_dirs()
-            self.sigs.finished_.emit(sorted_dirs)
-        except Exception as e:
-            print("SortedDirsLoader error:", e)
-            self.sigs.finished_.emit({})
-
-    def _load_dirs(self) -> dict:
-        """Приватный метод: собирает и сортирует директории."""
-        if not os.path.exists(self.path):
-            return {}
-
-        dirs = {
-            i.path: i.name
-            for i in os.scandir(self.path)
-            if i.is_dir()
-        }
-        sorted_dirs = dict(
-            sorted(dirs.items(), key=lambda kv: self.strip_to_first_letter(kv[1]))
-        )
-        return sorted_dirs
-    
-    def strip_to_first_letter(self, s: str) -> str:
-        """Удаляет начальные символы, которые не являются буквами, для сортировки."""
-        return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
-
-
 class MfDataCleaner(URunnable):
 
     class Sigs(QObject):
