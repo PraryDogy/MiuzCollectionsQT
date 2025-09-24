@@ -642,27 +642,6 @@ class MfDataCleaner(URunnable):
         self.conn.commit()
 
 
-class LoadDbMenu(URunnable):
-
-    class Sigs(QObject):
-        finished_ = pyqtSignal()
-
-    def __init__(self, mf: Mf):
-        super().__init__()
-        self.mf = mf
-        self.sigs = LoadDbMenu.Sigs()
-        self.conn = Dbase.engine.connect()
-
-    def task(self):
-        try:
-            self.sigs.finished_.emit(self._task())
-        except Exception as e:
-            print("LoadDbMenu error", e)
-
-    def _task(self):
-        ...
-
-
 class DbDirsLoader(URunnable):
 
     class Sigs(QObject):

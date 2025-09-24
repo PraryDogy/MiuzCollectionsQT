@@ -36,6 +36,22 @@ class TreeWid(QTreeWidget):
 
         self.itemClicked.connect(self.on_item_click)
 
+    # --- сортировка ---
+    def strip_to_first_letter(self, s: str) -> str:
+        """Удаляет начальные символы, которые не являются буквами, для сортировки."""
+        return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
+
+    def sort_children(self, parent_item: QTreeWidgetItem):
+        """Сортировка детей рекурсивно по strip_to_first_letter."""
+        children = [parent_item.child(i) for i in range(parent_item.childCount())]
+        children.sort(key=lambda it: self.strip_to_first_letter(it.text(0)).lower())
+
+        parent_item.takeChildren()
+        for child in children:
+            parent_item.addChild(child)
+            self.sort_children(child)
+
+    # --- построение ---
     def init_ui(self):
         self.clear()
 
@@ -45,28 +61,22 @@ class TreeWid(QTreeWidget):
         root_item.setIcon(0, QIcon(self.svg_folder))
         self.addTopLevelItem(root_item)
 
-        # новый таск возвращает список всех директорий
         task = DbDirsLoader(Mf.current)
         task.sigs.finished_.connect(lambda lst: self.build_tree(root_item, lst))
         UThreadPool.start(task)
 
     def build_tree(self, root_item: QTreeWidgetItem, paths: list[str]) -> None:
-        """
-        paths — список всех директорий (root + вложенные).
-        Строим дерево сразу.
-        """
         items: dict[str, QTreeWidgetItem] = {os.sep: root_item}
-
 
         for path in sorted(paths):
             if path == os.sep:
                 continue
-            parent = os.path.dirname(path)
+            parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
 
             parent_item = items.get(parent)
             if parent_item is None:
-                continue  # защита на случай дыр в списке
+                continue
 
             child = QTreeWidgetItem([name])
             child.setIcon(0, QIcon(self.svg_folder))
@@ -76,9 +86,11 @@ class TreeWid(QTreeWidget):
 
             items[path] = child
 
+        # сортировка после построения
+        self.sort_children(root_item)
+
         root_item.setExpanded(True)
 
-        # восстановить выделение
         if self.selected_path and self.selected_path in items:
             self.setCurrentItem(items[self.selected_path])
 
@@ -89,7 +101,6 @@ class TreeWid(QTreeWidget):
             self.tree_open.emit(clicked_dir)
 
     def generate_path_hierarchy(self, full_path):
-        """Оставил, если нужно для другого кода"""
         parts = []
         path = full_path
         while True:
