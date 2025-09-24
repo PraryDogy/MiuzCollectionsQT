@@ -486,32 +486,10 @@ class Grid(VScrollArea):
             self.clear_selected_widgets()
             Thumbnail.calculate_size()
             if not db_images:
-                for i in Dynamic.current_dir.split("/"):
-                    if i in Mf.current.stop_list:
-                        settings_wid = QWidget()
-                        settings_lay = UVBoxLayout()
-                        settings_lay.setSpacing(15)
-                        settings_wid.setLayout(settings_lay)
-                        self.grid_lay.addWidget(settings_wid, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
-                        self.grid_lay.setRowStretch(0, 1)
-                        self.grid_lay.setColumnStretch(0, 1)
-
-                        text = f"\"{i}\" {Lng.on_ignore_list[Cfg.lng].lower()}"
-                        lbl = QLabel(text)
-                        settings_lay.addWidget(lbl)
-
-                        settings = QPushButton(Lng.setup[Cfg.lng])
-                        settings.setFixedWidth(110)
-                        settings.clicked.connect(
-                            lambda: self.setup_mf.emit(create_item())
-                        )
-                        settings_lay.addWidget(settings, alignment=Qt.AlignmentFlag.AlignCenter)
-                        break
-                else:
-                    lbl = QLabel(Lng.no_photo[Cfg.lng])
-                    self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
-                    self.grid_lay.setRowStretch(0, 1)
-                    self.grid_lay.setColumnStretch(0, 1)
+                lbl = QLabel(Lng.no_photo[Cfg.lng])
+                self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+                self.grid_lay.setRowStretch(0, 1)
+                self.grid_lay.setColumnStretch(0, 1)
             else:
                 for _, db_images_list in db_images.items():
                     self.add_thumbnails_to_grid(db_images_list)
