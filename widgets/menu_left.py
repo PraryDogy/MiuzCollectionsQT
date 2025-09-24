@@ -105,7 +105,6 @@ class TreeWid(QTreeWidget):
             child.setIcon(0, QIcon(self.svg_folder))
             child.setSizeHint(0, QSize(0, self.item_height))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
-            child.setToolTip(0, f"{name}\n{path}")
             parent_item.addChild(child)
 
             items[path] = child
@@ -183,7 +182,6 @@ class MfList(VListWidget):
             item = MfListItem(parent=self, text=text)
             item.setIcon(QIcon(self.svg_folder))
             item.mf = i
-            item.setToolTip(i.name)
             self.addItem(item)
 
     def mouseReleaseEvent(self, e):
@@ -239,9 +237,13 @@ class MenuLeft(QTabWidget):
 
         def with_conn(fn: callable):
             def wrapper(mf: Mf, *args, **kwargs):
-                if mf.get_curr_path():
-                    fn(mf, *args, **kwargs)
-                else:
+                # if mf.get_curr_path():
+                #     fn(mf, *args, **kwargs)
+                # else:
+                #     self.no_connection.emit(mf)
+
+                fn(mf, *args, **kwargs)
+                if not mf.get_curr_path():
                     self.no_connection.emit(mf)
             return wrapper
 

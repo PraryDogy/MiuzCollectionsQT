@@ -188,8 +188,6 @@ class WinMain(UMainWindow):
         self.scaner_task = None
         self.scaner_task_canceled = False
 
-        QTimer.singleShot(100, self.first_check)
-
         if argv[-1] != self.argv_flag:
             self.start_scaner_task()
 
@@ -218,10 +216,6 @@ class WinMain(UMainWindow):
             ms=3000
             )
         self.noti_wid._show()
-    
-    def first_check(self):
-        if not Mf.current.get_curr_path():
-            self.open_win_smb(self.grid, Mf.current)
 
     @with_conn
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
