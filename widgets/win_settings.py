@@ -7,8 +7,8 @@ from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
-                             QPushButton, QSpacerItem, QSpinBox, QSplitter,
-                             QWidget)
+                             QLineEdit, QPushButton, QSpacerItem, QSpinBox,
+                             QSplitter, QWidget)
 
 from cfg import Cfg, Static
 from system.filters import Filters
@@ -17,10 +17,9 @@ from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (SettingsItem, SingleActionWindow,
-                            UHBoxLayout, ULineEdit, UListSpacerItem,
-                            UListWidgetItem, UMenu, UTextEdit, UVBoxLayout,
-                            VListWidget)
+from ._base_widgets import (SettingsItem, SingleActionWindow, UHBoxLayout,
+                            ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
+                            UTextEdit, UVBoxLayout, VListWidget)
 from .win_warn import WinQuestion, WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
@@ -134,6 +133,8 @@ class ScanerSettings(QGroupBox):
         self.spin = QSpinBox(self)
         self.spin.setMinimum(1)
         self.spin.setMaximum(60)
+        self.spin.setFixedHeight(27)
+        self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[Cfg.lng]}")
         self.spin.setValue(self.json_data_copy.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
@@ -1005,3 +1006,6 @@ class WinSettings(SingleActionWindow):
             self.deleteLater()
         return super().keyPressEvent(a0)
     
+    def mouseReleaseEvent(self, a0):
+        self.setFocus()
+        return super().mouseReleaseEvent(a0)
