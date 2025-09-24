@@ -289,3 +289,5 @@ class Lng:
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрывать нумерацию", "Hide numbering")
     go_to_folder = ("Перейти к папке", "Go to folder")
+    expand_all = ("Развернуть всё", "Expand All")
+    collapse_all = ("Свернуть всё", "Collapse All")

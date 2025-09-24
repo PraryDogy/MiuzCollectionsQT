@@ -137,36 +137,45 @@ class TreeWid(QTreeWidget):
             Cfg.hide_digits = not Cfg.hide_digits
             self.init_ui()
 
+        def collapse_all_cmd():
+            self.collapseAll()
+            self.setCurrentItem(list(self.items.values())[0])
+
         item = self.itemAt(a0.pos())
         menu = UMenu(a0)
+
+        abs_path = ""
         if item:
-            abs_path: str = item.data(0, Qt.ItemDataRole.UserRole)
+            abs_path = item.data(0, Qt.ItemDataRole.UserRole)
+
             view = QAction(Lng.open[Cfg.lng], menu)
             view.triggered.connect(lambda: self.tree_open.emit(abs_path))
             menu.addAction(view)
             menu.addSeparator()
-            hide_digits = QAction(Lng.hide_digits[Cfg.lng], menu)
-            hide_digits.triggered.connect(hide_digits_cmd)
-            hide_digits.setCheckable(True)
-            if Cfg.hide_digits:
-                hide_digits.setChecked(True)
-            menu.addAction(hide_digits)
-            menu.addSeparator()
-            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-            reveal.triggered.connect(lambda: self.tree_reveal.emit(abs_path))
-            menu.addAction(reveal)
-        else:
-            hide_digits = QAction(Lng.hide_digits[Cfg.lng], menu)
-            hide_digits.triggered.connect(hide_digits_cmd)
-            hide_digits.setCheckable(True)
-            if Cfg.hide_digits:
-                hide_digits.setChecked(True)
-            menu.addAction(hide_digits)
-            menu.addSeparator()
-            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
-            reveal.triggered.connect(lambda: self.tree_reveal.emit(""))
-            menu.addAction(reveal)
+
+        expand_all = QAction(Lng.expand_all[Cfg.lng], menu)
+        expand_all.triggered.connect(lambda: self.expandAll())
+        menu.addAction(expand_all)
+
+        collapse_all = QAction(Lng.collapse_all[Cfg.lng], menu)
+        collapse_all.triggered.connect(lambda: collapse_all_cmd())
+        menu.addAction(collapse_all)
+
+        menu.addSeparator()
+
+        hide_digits = QAction(Lng.hide_digits[Cfg.lng], menu)
+        hide_digits.triggered.connect(hide_digits_cmd)
+        hide_digits.setCheckable(True)
+        hide_digits.setChecked(Cfg.hide_digits)
+        menu.addAction(hide_digits)
+        menu.addSeparator()
+
+        reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
+        reveal.triggered.connect(lambda: self.tree_reveal.emit(abs_path))
+        menu.addAction(reveal)
+
         menu.show_umenu()
+
         return super().contextMenuEvent(a0)
 
 
