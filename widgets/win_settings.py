@@ -133,7 +133,7 @@ class ScanerSettings(QGroupBox):
         self.spin = QSpinBox(self)
         self.spin.setMinimum(1)
         self.spin.setMaximum(60)
-        self.spin.setFixedHeight(27)
+        self.spin.setFixedSize(110, 27)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[Cfg.lng]}")
         self.spin.setValue(self.json_data_copy.scaner_minutes)
@@ -143,48 +143,8 @@ class ScanerSettings(QGroupBox):
         label = ULabel(Lng.search_interval[Cfg.lng], self)
         self.spin_lay.addWidget(label)
 
-        self.theme_changed()
-
-        first_row = QWidget()
-        self.main_lay.addWidget(first_row)
-        first_lay = UHBoxLayout()
-        first_lay.setSpacing(15)
-        first_row.setLayout(first_lay)
-
-        self.checkbox = QPushButton()
-        self.checkbox.clicked.connect(self.change_new_scaner)
-        self.checkbox.setFixedWidth(115)
-        first_lay.addWidget(self.checkbox)
-
-        self.checkbox_lbl = ULabel(Lng.fast_image_search[Cfg.lng])
-        first_lay.addWidget(self.checkbox_lbl)
-
-        if self.json_data_copy.new_scaner:
-            self.checkbox.setText(Lng.disable[Cfg.lng])
-        else:
-            self.checkbox.setText(Lng.enable[Cfg.lng])
-
-        self.checkbox.setChecked(True)
-
-    def theme_changed(self):
-        if self.json_data_copy.dark_mode == 0:
-            self.spin_lay.setContentsMargins(5, 0, 0, 0)
-            self.spin.setFixedWidth(104)
-        else:
-            self.spin_lay.setContentsMargins(0, 0, 0, 0)
-            self.spin.setFixedWidth(115)
-
     def change_scan_time(self, value: int):
         self.json_data_copy.scaner_minutes = value
-        self.changed.emit()
-
-    def change_new_scaner(self):
-        if self.json_data_copy.new_scaner:
-            self.json_data_copy.new_scaner = False
-            self.checkbox.setText(Lng.enable[Cfg.lng])
-        else:
-            self.json_data_copy.new_scaner = True
-            self.checkbox.setText(Lng.disable[Cfg.lng])
         self.changed.emit()
 
 
@@ -379,7 +339,6 @@ class GeneralSettings(QWidget):
         v_lay.addWidget(scaner_settings)
 
         themes = Themes()
-        themes.theme_changed.connect(scaner_settings.theme_changed)
         v_lay.addWidget(themes)
 
         about = AboutWid()
