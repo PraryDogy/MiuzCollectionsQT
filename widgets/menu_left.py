@@ -237,11 +237,6 @@ class MenuLeft(QTabWidget):
 
         def with_conn(fn: callable):
             def wrapper(mf: Mf, *args, **kwargs):
-                # if mf.get_curr_path():
-                #     fn(mf, *args, **kwargs)
-                # else:
-                #     self.no_connection.emit(mf)
-
                 fn(mf, *args, **kwargs)
                 if not mf.get_curr_path():
                     self.no_connection.emit(mf)
