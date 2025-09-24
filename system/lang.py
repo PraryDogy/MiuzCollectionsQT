@@ -287,3 +287,4 @@ class Lng:
     only_this_folder = ("Только в этой папке", "Only this folder")
     upload_files_in = ("Загрузить файлы в", "Upload files in")
     contents = ("Содержимое", "Contents")
+    hide_digits = ("Скрывать нумерацию", "Hide numbering")
