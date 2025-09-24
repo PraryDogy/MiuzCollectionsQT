@@ -397,6 +397,7 @@ class Grid(VScrollArea):
     paste_files = pyqtSignal()
     copy_files = pyqtSignal(tuple)
     setup_mf = pyqtSignal(SettingsItem)
+    expand_to_path = pyqtSignal(str)
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -827,6 +828,9 @@ class Grid(VScrollArea):
         self.menu_ = UMenu(event=a0)
         clicked_wid = self.get_clicked_widget(a0)
 
+        def expand_to_path_cmd(rel_path: str):
+            self.expand_to_path.emit(os.path.dirname(rel_path))
+
         def menu_empty():
             self.clear_selected_widgets()
 
@@ -906,6 +910,11 @@ class Grid(VScrollArea):
             act = CopyName(self.menu_, len(rel_paths))
             act.triggered.connect(lambda: self.copy_name.emit(rel_paths))
             self.menu_.addAction(act)
+
+            expand_to_path = QAction(Lng.go_to_folder[Cfg.lng], self.menu_)
+            expand_to_path.triggered.connect(lambda: expand_to_path_cmd(clicked.rel_path))
+            self.menu_.addAction(expand_to_path)
+
             self.menu_.addSeparator()
 
             # cut / copy / paste
@@ -1046,4 +1055,3 @@ class Grid(VScrollArea):
             start_drag()
 
         return super().mouseMoveEvent(a0)
-

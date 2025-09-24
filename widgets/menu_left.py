@@ -28,6 +28,7 @@ class TreeWid(QTreeWidget):
     def __init__(self):
         super().__init__()
         self.selected_path: str = None
+        self.items: dict[str, QTreeWidgetItem] = {}
 
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
@@ -66,7 +67,7 @@ class TreeWid(QTreeWidget):
         UThreadPool.start(task)
 
     def build_tree(self, root_item: QTreeWidgetItem, paths: list[str]) -> None:
-        items: dict[str, QTreeWidgetItem] = {os.sep: root_item}
+        self.items: dict[str, QTreeWidgetItem] = {os.sep: root_item}
 
         for path in sorted(paths):
             if path == os.sep:
@@ -76,7 +77,7 @@ class TreeWid(QTreeWidget):
             if Cfg.hide_digits:
                 name = self.strip_to_first_letter(name)
 
-            parent_item = items.get(parent)
+            parent_item = self.items.get(parent)
             if parent_item is None:
                 continue
 
@@ -87,20 +88,25 @@ class TreeWid(QTreeWidget):
             child.setToolTip(1, os.path.basename(path))
             parent_item.addChild(child)
 
-            items[path] = child
+            self.items[path] = child
 
         # сортировка после построения
         self.sort_children(root_item)
 
         root_item.setExpanded(True)
-        if self.selected_path and self.selected_path in items:
-            item = items.get(self.selected_path)
-            parent = item.parent()
-            while parent:
-                parent.setExpanded(True)
-                parent = parent.parent()
-            item.setExpanded(True)
-            self.setCurrentItem(item)
+        self.expand_to_path(self.selected_path)
+
+    def expand_to_path(self, path: str):
+        if not path or path not in self.items:
+            return
+        item = self.items.get(path)
+        parent = item.parent()
+        while parent:
+            parent.setExpanded(True)
+            parent = parent.parent()
+        item.setExpanded(True)
+        self.setCurrentItem(item)
+        self.scrollToItem(item, QTreeWidget.ScrollHint.PositionAtCenter)
 
     def on_item_click(self, item: QTreeWidgetItem, col: int):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)

@@ -161,6 +161,12 @@ class WinMain(UMainWindow):
         self.grid.setup_mf.connect(
             self.open_settings_win
         )
+        self.grid.expand_to_path.connect(
+            lambda rel_path: self.left_menu.tree_wid.expand_to_path(rel_path)
+        )
+        self.grid.expand_to_path.connect(
+            lambda _: self.left_menu.setCurrentIndex(1)
+        )
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()

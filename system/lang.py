@@ -288,3 +288,4 @@ class Lng:
     upload_files_in = ("Загрузить файлы в", "Upload files in")
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрывать нумерацию", "Hide numbering")
+    go_to_folder = ("Перейти к папке", "Go to folder")
