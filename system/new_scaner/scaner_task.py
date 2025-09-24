@@ -54,11 +54,14 @@ class ScanerTask(URunnable):
                 self.sigs.progress_text.emit(f"{true_name} ({alias}): {no_conn}")
                 print("scaner no connection", true_name, alias)
                 sleep(5)
+            try:
+                if self.reload_gui_flag:
+                    self.set_flag(False)
+                    self.sigs.reload_menu.emit()
+                    self.sigs.reload_thumbnails.emit()
+            except RuntimeError as e:
+                print("new scaner task error:", e)
         try:
-            if self.reload_gui_flag:
-                self.set_flag(False)
-                self.sigs.reload_menu.emit()
-                self.sigs.reload_thumbnails.emit()
             self.sigs.progress_text.emit("")
             self.sigs.finished_.emit()
         except RuntimeError as e:
@@ -103,13 +106,14 @@ class ScanerTask(URunnable):
         
         # обходим новые директории, добавляем / удаляем изображения
         if new_dirs:
+            self.set_flag(True)
             scan_dirs = NewDirsHandler(new_dirs, mf, self.task_state)
             scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
-            scan_dirs.reload_gui.connect(lambda: self.set_flag(True))
             scan_dirs.run()
         
         # удаляем удаленные Finder директории
         if removed_dirs:
+            self.set_flag(True)
             del_handler = RemovedDirsHandler(removed_dirs, mf)
             del_handler.run()
 

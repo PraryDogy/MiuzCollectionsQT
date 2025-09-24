@@ -519,7 +519,6 @@ class _ImgDbUpdater:
 
 class NewDirsHandler(QObject):
     progress_text = pyqtSignal(str)
-    reload_gui = pyqtSignal()
    
     def __init__(self, dirs_to_scan: list[str], mf: Mf, task_state: TaskState):
         """
@@ -560,9 +559,6 @@ class NewDirsHandler(QObject):
         dirs_updater.run()
 
         self.progress_text.emit("")
-
-        if del_images or new_images:
-            self.reload_gui.emit()
 
         return (del_images, new_images)
     
