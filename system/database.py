@@ -9,15 +9,15 @@ METADATA = sqlalchemy.MetaData()
 
 class ClmNames:
     id = "id"
-    short_src = "short_src" #relative img path
-    short_hash = "short_hash" #relative thumb path
+    short_src = "short_src"
+    short_hash = "short_hash"
     size = "size"
     birth = "birth"
     mod = "mod"
-    resol = "resol" #ignore
+    resol = "resol"
     coll = "coll"
     fav = "fav"
-    brand = "brand" # Mf name
+    brand = "brand"
 
 
 THUMBS = sqlalchemy.Table(
@@ -37,9 +37,9 @@ THUMBS = sqlalchemy.Table(
 DIRS = sqlalchemy.Table(
     "dirs", METADATA,
     sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text, comment="относительный путь к директории"),
     sqlalchemy.Column(ClmNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text, comment="Mf.name (смотри system > main_folder)"),
 )
 
 class Dbase:

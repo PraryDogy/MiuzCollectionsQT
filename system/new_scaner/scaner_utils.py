@@ -502,7 +502,6 @@ class _ImgDbUpdater:
             abs_hash = Utils.create_abs_hash(path)
             short_hash = Utils.get_rel_hash(abs_hash)
             short_src = Utils.get_rel_path(self.mf.curr_path, path)
-            coll = os.path.basename(os.path.dirname(path))
             values_list.append({
                 ClmNames.short_src: short_src,
                 ClmNames.short_hash: short_hash,
@@ -510,7 +509,7 @@ class _ImgDbUpdater:
                 ClmNames.birth: birth,
                 ClmNames.mod: mod,
                 ClmNames.resol: "",
-                ClmNames.coll: coll,
+                ClmNames.coll: "",
                 ClmNames.fav: 0,
                 ClmNames.brand: self.mf.name
             })

@@ -394,7 +394,6 @@ class DbUpdater(QObject):
             small_path = Utils.create_abs_hash(path)
             short_path = Utils.get_rel_path(self.mf.curr_path, path)
             rel_thumb_path = Utils.get_rel_hash(small_path)
-            coll = os.path.basename(os.path.dirname(path))
 
             values = {
                 ClmNames.short_src: short_path,
@@ -403,7 +402,7 @@ class DbUpdater(QObject):
                 ClmNames.birth: birth,
                 ClmNames.mod: mod,
                 ClmNames.resol: "",
-                ClmNames.coll: coll,
+                ClmNames.coll: "",
                 ClmNames.fav: 0,
                 ClmNames.brand: self.mf.name
             }
