@@ -27,26 +27,6 @@ class TreeWid(QTreeWidget):
 
     def __init__(self):
         super().__init__()
-        self.setHeaderHidden(True)
-        self.setAutoScroll(False)
-        self.setIconSize(QSize(self.svg_size, self.svg_size))
-        self.setIndentation(15)
-        self.itemClicked.connect(self.on_item_click)
-
-    def reload_ui(self):
-        self.init_ui(self.root_dir)
-
-class TreeWid(QTreeWidget):
-    tree_reveal = pyqtSignal(str)
-    tree_open = pyqtSignal(str)
-
-    svg_folder = "./images/folder.svg"
-    svg_size = 16
-    item_height = 25
-
-    def __init__(self):
-        super().__init__()
-        self.root_dir: str = None
         self.last_dir: str = None
         self.selected_path: str = None
 
@@ -57,15 +37,12 @@ class TreeWid(QTreeWidget):
 
         self.itemClicked.connect(self.on_item_click)
 
-    def reload_ui(self):
-        self.init_ui()
-
     def init_ui(self):
         self.clear()
 
         root_item = QTreeWidgetItem([Mf.current.name])
         root_item.setSizeHint(0, QSize(0, self.item_height))
-        root_item.setData(0, Qt.ItemDataRole.UserRole, "/")
+        root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
         root_item.setIcon(0, QIcon(self.svg_folder))
         self.addTopLevelItem(root_item)
 
@@ -79,11 +56,11 @@ class TreeWid(QTreeWidget):
         paths — список всех директорий (root + вложенные).
         Строим дерево сразу.
         """
-        items: dict[str, QTreeWidgetItem] = {"/": root_item}
+        items: dict[str, QTreeWidgetItem] = {os.sep: root_item}
 
 
         for path in sorted(paths):
-            if path == "/":
+            if path == os.sep:
                 continue
             parent = os.path.dirname(path)
             name = os.path.basename(path)
