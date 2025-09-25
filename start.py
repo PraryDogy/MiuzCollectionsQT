@@ -85,7 +85,7 @@ class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
 
-        Cfg.init()
+        Cfg.initialize()
         Filters.init()
         Dbase.init()
         Mf.init()

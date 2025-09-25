@@ -45,72 +45,80 @@ class Static:
     corner_values = [4, 8, 14, 16]
 
 
-class Cfg:
-    app_ver: str = Static.app_ver
-    lng: int = 0
-    dark_mode: int = 0
-    scaner_minutes: int = 5
-    new_scaner: int = True
-    hide_digits: bool = True
-    apps = [
-        "preview",
-        "photos",
-        "photoshop",
-        "lightroom",
-        "affinity photo",
-        "pixelmator",
-        "gimp",
-        "capture one",
-        "dxo photolab",
-        "luminar neo",
-        "sketch",
-        "graphicconverter",
-        "imageoptim",
-        "snapheal",
-        "photoscape",
-        "preview",
-        "просмотр"
-    ]
+class Dynamic:
+    date_start: datetime = None
+    date_end: datetime = None
+    f_date_start: str = None # 1 january 1991
+    f_date_end: str = None # 31 january 1991
+    loaded_thumbs: int = 0
+    search_widget_text: str = None
 
-    @classmethod
-    def set_json_data(cls):
+    # индекс соответствующий STATIC > IMG_LABEL_SIZE
+    # от индекса зависит размер Thumbnail и всех его внутренних виджетов
+    thumb_size_index: int = 0
+    current_dir: str = ""
+    sort_by_mod: bool = True
+    filters_enabled: list[str] = []
+    filter_favs: bool = False
+    filter_only_folder: bool = False
+
+
+class _Cfg:
+    def __init__(self):
+        self.app_ver: str = Static.app_ver
+        self.lng: int = 0
+        self.dark_mode: int = 0
+        self.scaner_minutes: int = 5
+        self.new_scaner: int = True
+        self.hide_digits: bool = True
+        self.apps = [
+            "preview",
+            "photos",
+            "photoshop",
+            "lightroom",
+            "affinity photo",
+            "pixelmator",
+            "gimp",
+            "capture one",
+            "dxo photolab",
+            "luminar neo",
+            "sketch",
+            "graphicconverter",
+            "imageoptim",
+            "snapheal",
+            "photoscape",
+            "preview",
+            "просмотр"
+        ]
+
+    def set_json_data(self):
         def cmd():
             with open(Static.app_support_cfg, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
             for k, v in data.items():
-                setattr(cls, k, v) if hasattr(cls, k) else None
+                setattr(self, k, v) if hasattr(self, k) else None
         try:
             cmd()
         except Exception as e:
             print("cfg, set json data error",e)
-
-    @classmethod
-    def get_data(cls, start: int = 2, end: int = 9):
-        return {
-            i: getattr(Cfg, i)
-            for i in list(vars(Cfg))[start:end]
-        }
  
-    @classmethod
-    def write_json_data(cls):
+    def write_json_data(self):
         with open(Static.app_support_cfg, "w", encoding="utf-8") as file:
-            json.dump(cls.get_data(), file, ensure_ascii=False, indent=4)
+            json.dump(vars(self), file, ensure_ascii=False, indent=4)
 
-    @classmethod
-    def check_dirs(cls):
+    def check_dirs(self):
         dirs = (Static._preload, Static._preload_zip, Static._preload_db)
         if not all(os.path.exists(p) for p in dirs):
-            cls.make_internal_files()
+            self.make_internal_files()
         os.makedirs(Static.app_support, exist_ok=True)
         if not os.path.exists(Static.app_support_db):
-            cls.copy_preload_db()
+            self.copy_preload_db()
         if not os.path.exists(Static.app_support_hashdir):
-            cls.copy_preload_hashdir_zip()
+            self.copy_preload_hashdir_zip()
         if not os.path.exists(Static.app_support_cfg):
-            cls.write_json_data()
+            self.write_json_data()
 
-    @classmethod
-    def make_internal_files(cls):
+    def make_internal_files(self):
         print("Создаю пустую базу данных")
         print("Создаю пустую hashdir")
         os.makedirs(Static._preload, exist_ok=True)
@@ -128,8 +136,7 @@ class Cfg:
         )
         shutil.rmtree(Static._preload_hashdir)
 
-    @classmethod
-    def copy_preload_hashdir_zip(cls):
+    def copy_preload_hashdir_zip(self):
         # удаляем пользовательскую hashdir из ApplicationSupport
         if os.path.exists(Static.app_support_hashdir):
             print("Удаляю пользовательскую HASH_DIR")
@@ -140,8 +147,7 @@ class Cfg:
         shutil.unpack_archive(dest, Static.app_support)
         os.remove(dest)
 
-    @classmethod
-    def copy_preload_db(cls):
+    def copy_preload_db(self):
         # удаляем пользовательный db.db из Application Support если он есть
         if os.path.exists(Static.app_support_db):
             print("Удаляю пользовательский DB_FILE")
@@ -150,25 +156,9 @@ class Cfg:
         print("Копирую предустановленный DB_FILE")
         shutil.copy2(Static._preload_db, Static.app_support)
 
-    @classmethod
-    def init(cls):
-        cls.check_dirs()
-        cls.set_json_data()
+    def initialize(self):
+        self.check_dirs()
+        self.set_json_data()
 
 
-class Dynamic:
-    date_start: datetime = None
-    date_end: datetime = None
-    f_date_start: str = None # 1 january 1991
-    f_date_end: str = None # 31 january 1991
-    loaded_thumbs: int = 0
-    search_widget_text: str = None
-
-    # индекс соответствующий STATIC > IMG_LABEL_SIZE
-    # от индекса зависит размер Thumbnail и всех его внутренних виджетов
-    thumb_size_index: int = 0
-    current_dir: str = ""
-    sort_by_mod: bool = True
-    filters_enabled: list[str] = []
-    filter_favs: bool = False
-    filter_only_folder: bool = False
+Cfg = _Cfg()
