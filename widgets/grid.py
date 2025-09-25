@@ -828,30 +828,35 @@ class Grid(VScrollArea):
         self.menu_ = UMenu(event=a0)
         clicked_wid = self.get_clicked_widget(a0)
 
-        def expand_to_path_cmd(rel_path: str):
-            self.expand_to_path.emit(os.path.dirname(rel_path))
-
         def menu_empty():
             self.clear_selected_widgets()
 
             update_grid = QAction(Lng.update_grid[Cfg.lng], self.menu_)
-            update_grid.triggered.connect(self.reload_thumbnails)
+            update_grid.triggered.connect(
+                self.reload_thumbnails()
+            )
             self.menu_.addAction(update_grid)
 
             reload = ScanerRestart(parent=self.menu_)
-            reload.triggered.connect(lambda: self.restart_scaner.emit())
+            reload.triggered.connect(
+                lambda: self.restart_scaner.emit()
+            )
             self.menu_.addAction(reload)
 
             if self.clipboard_item:
                 self.menu_.addSeparator()
                 paste = PasteFiles(self.menu_)
-                paste.triggered.connect(self.paste_files.emit)
+                paste.triggered.connect(
+                    lambda: self.paste_files.emit()
+                )
                 self.menu_.addAction(paste)
                 self.menu_.addSeparator()
 
             self.menu_.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng], self.menu_)
-            reveal.triggered.connect(lambda: self.reveal_in_finder.emit([Dynamic.current_dir]))
+            reveal.triggered.connect(
+                lambda: self.reveal_in_finder.emit([Dynamic.current_dir])
+            )
             self.menu_.addAction(reveal)
 
         def menu_widget(clicked: Thumbnail):
@@ -865,7 +870,9 @@ class Grid(VScrollArea):
 
             # просмотр
             act = OpenInView(self.menu_)
-            act.triggered.connect(lambda: self.open_img_view.emit())
+            act.triggered.connect(
+                lambda: self.open_img_view.emit()
+            )
             self.menu_.addAction(act)
 
             # открыть в приложении
@@ -875,13 +882,17 @@ class Grid(VScrollArea):
             )
 
             act = QAction(Lng.open_default[Cfg.lng], open_menu)
-            act.triggered.connect(lambda: self.open_in_app.emit((rel_paths, None)))
+            act.triggered.connect(
+                lambda: self.open_in_app.emit((rel_paths, None))
+            )
             open_menu.addAction(act)
             open_menu.addSeparator()
 
             for app_path, basename in self.image_apps.items():
                 act = QAction(basename, open_menu)
-                act.triggered.connect(lambda _, x=app_path: self.open_in_app.emit((rel_paths, x)))
+                act.triggered.connect(
+                    lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))
+                )
                 open_menu.addAction(act)
 
             self.menu_.addMenu(open_menu)
@@ -889,56 +900,78 @@ class Grid(VScrollArea):
             # избранное
             if len(rel_paths) == 1:
                 fav = SetFav(self.menu_, clicked.fav_value)
-                fav.triggered.connect(lambda: self.set_fav.emit((clicked.rel_path, not clicked.fav_value)))
+                fav.triggered.connect(
+                    lambda: self.set_fav.emit((clicked.rel_path, not clicked.fav_value))
+                )
                 self.menu_.addAction(fav)
 
             # инфо
             act = WinInfoAction(self.menu_)
-            act.triggered.connect(lambda: self.open_info_win.emit(rel_paths))
+            act.triggered.connect(
+                lambda: self.open_info_win.emit(rel_paths)
+            )
             self.menu_.addAction(act)
             self.menu_.addSeparator()
 
             # reveal / copy
             act = RevealInFinder(self.menu_, len(rel_paths))
-            act.triggered.connect(lambda: self.reveal_in_finder.emit(rel_paths))
+            act.triggered.connect(
+                lambda: self.reveal_in_finder.emit(rel_paths)
+            )
             self.menu_.addAction(act)
 
             act = CopyPath(self.menu_, len(rel_paths))
-            act.triggered.connect(lambda: self.copy_path.emit(rel_paths))
+            act.triggered.connect(
+                lambda: self.copy_path.emit(rel_paths)
+            )
             self.menu_.addAction(act)
 
             act = CopyName(self.menu_, len(rel_paths))
-            act.triggered.connect(lambda: self.copy_name.emit(rel_paths))
+            act.triggered.connect(
+                lambda: self.copy_name.emit(rel_paths)
+            )
             self.menu_.addAction(act)
 
             expand_to_path = QAction(Lng.go_to_folder[Cfg.lng], self.menu_)
-            expand_to_path.triggered.connect(lambda: expand_to_path_cmd(clicked.rel_path))
+            expand_to_path.triggered.connect(
+                lambda: self.expand_to_path.emit(os.path.dirname(clicked.rel_path))
+            )
             self.menu_.addAction(expand_to_path)
 
             self.menu_.addSeparator()
 
             # cut / copy / paste
             act = CutFiles(self.menu_, len(rel_paths))
-            act.triggered.connect(lambda: self.copy_files.emit((ClipBoardItem.type_cut, rel_paths)))
+            act.triggered.connect(
+                lambda: self.copy_files.emit((ClipBoardItem.type_cut, rel_paths))
+            )
             self.menu_.addAction(act)
 
             act = CopyFiles(self.menu_, len(rel_paths))
-            act.triggered.connect(lambda: self.copy_files.emit((ClipBoardItem.type_copy, rel_paths)))
+            act.triggered.connect(
+                lambda: self.copy_files.emit((ClipBoardItem.type_copy, rel_paths))
+            )
             self.menu_.addAction(act)
 
             self.menu_.addSeparator()
 
             # save / remove
             act = Save(self.menu_, len(rel_paths))
-            act.triggered.connect(lambda: self.save_files.emit((os.path.expanduser("~/Downloads"), rel_paths)))
+            act.triggered.connect(
+                lambda: self.save_files.emit((os.path.expanduser("~/Downloads"), rel_paths))
+            )
             self.menu_.addAction(act)
 
             act = SaveAs(self.menu_, len(rel_paths))
-            act.triggered.connect(lambda: self.save_files.emit((None, rel_paths)))
+            act.triggered.connect(
+                lambda: self.save_files.emit((None, rel_paths))
+            )
             self.menu_.addAction(act)
 
             act = RemoveFiles(self.menu_, len(self.selected_widgets))
-            act.triggered.connect(lambda: self.remove_files.emit(rel_paths))
+            act.triggered.connect(
+                lambda: self.remove_files.emit(rel_paths)
+            )
             self.menu_.addAction(act)
 
         if not clicked_wid:
