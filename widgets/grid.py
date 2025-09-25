@@ -945,7 +945,7 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
-            expand_to_path = QAction(Lng.go_to_folder[Cfg.lng], self.menu_)
+            expand_to_path = QAction(Lng.go_to_folder[Cfg.lng] + " (1)", self.menu_)
             expand_to_path.triggered.connect(
                 lambda: self.go_to_widget.emit(clicked.rel_path)
             )
