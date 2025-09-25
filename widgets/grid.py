@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGridLayout, QLabel, QPushButton, QRubberBand,
                              QWidget)
 
-from cfg import Cfg, Dynamic, Static, ThumbData
+from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
@@ -44,7 +44,7 @@ class FilenameWid(QLabel):
         """
         name: str = self.name
         ind = Dynamic.thumb_size_index
-        max_row = ThumbData.row_limits[ind]
+        max_row = Static.row_limits[ind]
         lines: list[str] = []
 
         if len(name) > max_row:
@@ -81,6 +81,7 @@ class ImgWid(QLabel):
     def __init__(self):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setContentsMargins(2, 2, 2, 2)
 
     def mouseReleaseEvent(self, ev):
         return super().mouseReleaseEvent(ev)
@@ -129,7 +130,7 @@ class BelowTextWid(QLabel):
         """
         Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
         """
-        max_row = ThumbData.row_limits[Dynamic.thumb_size_index]
+        max_row = Static.row_limits[Dynamic.thumb_size_index]
         if len(text) > max_row:
             return f"{text[:max_row]}..."
         return text
@@ -233,11 +234,11 @@ class Thumbnail(QFrame):
     def calculate_size(cls):
         """Пересчет размеров миниатюр в зависимости от индекса размера."""
         ind = Dynamic.thumb_size_index
-        cls.pixmap_size = ThumbData.pixmap_sizes[ind]
-        cls.img_frame_size = ThumbData.pixmap_sizes[ind]
-        cls.thumb_w = ThumbData.thumb_widths[ind]
-        cls.thumb_h = ThumbData.thumb_heights[ind]
-        cls.corner = ThumbData.corner_values[ind]
+        cls.pixmap_size = Static.pixmap_sizes[ind]
+        cls.img_frame_size = Static.pixmap_sizes[ind]
+        cls.thumb_w = Static.thumb_widths[ind]
+        cls.thumb_h = Static.thumb_heights[ind]
+        cls.corner = Static.corner_values[ind]
 
     def setup(self):
         """Настройка миниатюры: текст, размеры, изображение."""
@@ -553,7 +554,7 @@ class Grid(VScrollArea):
             self.wid_to_selected_widgets(wid)
     
     def reset_grid_properties(self):
-        self.max_col = self.width() // (ThumbData.thumb_widths[Dynamic.thumb_size_index])
+        self.max_col = self.width() // (Static.thumb_widths[Dynamic.thumb_size_index])
         self.glob_row, self.glob_col = 0, 0
         for i in (self.cell_to_wid, self.path_to_wid):
             i.clear()

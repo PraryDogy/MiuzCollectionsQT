@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 
-from cfg import Dynamic, ThumbData
+from cfg import Dynamic, Static
 
 from ._base_widgets import UHBoxLayout
 
@@ -24,7 +24,7 @@ class CustomSlider(QSlider):
         # --- Настройка диапазона и ориентации ---
         self.setOrientation(Qt.Orientation.Horizontal)
         self.setMinimum(0)
-        self.setMaximum(len(ThumbData.pixmap_sizes) - 1)
+        self.setMaximum(len(Static.pixmap_sizes) - 1)
         self.setValue(Dynamic.thumb_size_index)
         self.setFixedWidth(80)
 

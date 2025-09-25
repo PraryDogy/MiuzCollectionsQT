@@ -6,7 +6,7 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import Cfg, Static, ThumbData
+from cfg import Cfg, Static
 from system.database import THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
@@ -313,7 +313,7 @@ class HashdirUpdater(QObject):
 
     def create_thumb(self, path: str) -> ndarray | None:
         img = ReadImage.read_image(path)
-        thumb = Utils.fit_to_thumb(img, ThumbData.max_img_size)
+        thumb = Utils.fit_to_thumb(img, Static.max_img_size)
         del img
         gc.collect()
         if isinstance(thumb, ndarray):
