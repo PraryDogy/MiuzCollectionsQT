@@ -45,7 +45,6 @@ class Static:
     corner_values = [4, 8, 14, 16]
 
 
-
 class Cfg:
     app_ver: str = Static.app_ver
     lng: int = 0
@@ -75,15 +74,15 @@ class Cfg:
 
     @classmethod
     def set_json_data(cls):
-        with open(Static.app_support_cfg, "r", encoding="utf-8") as file:
-            try:
+        def cmd():
+            with open(Static.app_support_cfg, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
-                for k, v in data.items():
-                    if hasattr(cls, k):
-                        setattr(cls, k, v)
-            except Exception as e:
-                print("cfg, set json data error",e)
-                data = {}
+            for k, v in data.items():
+                setattr(cls, k, v) if hasattr(cls, k) else None
+        try:
+            cmd()
+        except Exception as e:
+            print("cfg, set json data error",e)
 
     @classmethod
     def get_data(cls, start: int = 2, end: int = 9):
