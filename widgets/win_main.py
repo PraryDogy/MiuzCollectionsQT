@@ -7,7 +7,7 @@ from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QPushButton,
                              QSplitter, QVBoxLayout, QWidget)
 
-from cfg import Cfg, Dynamic, Static, ThumbData
+from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
@@ -759,7 +759,7 @@ class WinMain(UMainWindow):
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.thumb_size_index < len(ThumbData.pixmap_sizes) - 1:
+                if Dynamic.thumb_size_index < len(Static.pixmap_sizes) - 1:
                     Dynamic.thumb_size_index += 1
                     self.bar_bottom.slider._on_value_changed(Dynamic.thumb_size_index)
 
