@@ -288,6 +288,7 @@ class MenuLeft(QTabWidget):
             # Это нужно потому, что в запросах к БД формируется шаблон вида `path + '/%'` (ILIKE/LIKE).
             # Если хранить корень как `'/'`, шаблон превратится в `'//%'` — поиск будет неверным.
             # Пустая строка даёт корректный шаблон `'/%'`, то есть все записи из корня.
+            Dynamic.history.clear()
             Dynamic.current_dir = ""
             self.tree_wid.init_ui()
             self.reload_thumbnails.emit()
