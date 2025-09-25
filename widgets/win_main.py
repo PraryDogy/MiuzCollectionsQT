@@ -212,10 +212,12 @@ class WinMain(UMainWindow):
     
     def go_to_widget(self, rel_path: str):
         dirname = os.path.dirname(rel_path)
+        Dynamic.current_dir = dirname
         self.left_menu.tree_wid.expand_to_path(dirname)
         self.left_menu.setCurrentIndex(1)
         self.grid.go_to_url = rel_path
         self.grid.reload_thumbnails()
+        self.set_window_title()
 
     def open_win_smb(self, parent: QWidget, mf: Mf):
         try:
