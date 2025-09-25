@@ -293,12 +293,21 @@ class MenuLeft(QTabWidget):
             self.reload_thumbnails.emit()
 
         def _tree_open(mf: Mf, rel_path: str):
+            
+            try:
+                curr_ind = max(x for x, i in enumerate(Dynamic.history) if i == Dynamic.current_dir)
+            except Exception as e:
+                curr_ind = 0
+
+            print(curr_ind)
+
             Dynamic.current_dir = rel_path
             self.reload_thumbnails.emit()
-
             Dynamic.history.append(rel_path)
             if len(Dynamic.history) > 100:
                 Dynamic.history.pop(0)
+
+
 
         def _mf_edit(mf: Mf):
             item = SettingsItem()

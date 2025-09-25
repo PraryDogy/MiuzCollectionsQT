@@ -301,6 +301,17 @@ class NextBtn(BarTopBtn):
         self.lbl.setText(Lng.next_[Cfg.lng])
         self.svg_btn.load(self.ICON_PATH)
 
+    def mouseReleaseEvent(self, a0):
+        def cmd():
+            ind = Dynamic.history.index(Dynamic.current_dir) + 1
+            if ind >= 0:
+                Dynamic.current_dir = Dynamic.history[ind]
+                self.clicked_.emit()
+        try:
+            cmd()
+        except Exception as e:
+            print("BackBtn error", e)
+
 
 class BarTop(QWidget):
     """
@@ -322,6 +333,7 @@ class BarTop(QWidget):
     open_dates_win = pyqtSignal()
     open_settings_win = pyqtSignal(SettingsItem)
     reload_thumbnails = pyqtSignal()
+    history_press = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -329,7 +341,7 @@ class BarTop(QWidget):
         self.setLayout(self.h_layout)
 
         self.back_btn = BackBtn()
-        self.back_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
+        self.back_btn.clicked_.connect(lambda: self.history_press.emit())
         self.h_layout.addWidget(self.back_btn)
 
         self.next_btn = NextBtn()

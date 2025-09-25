@@ -110,14 +110,21 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.open_dates_win.connect(self.open_dates_win)
+        self.bar_top.open_dates_win.connect(
+            lambda: self.open_dates_win()
+        )
         self.bar_top.reload_thumbnails.connect(
             lambda: self.grid.reload_thumbnails()
             )
         self.bar_top.reload_thumbnails.connect(
             lambda: self.set_window_title()
             )
-        self.bar_top.open_settings_win.connect(self.open_settings_win)
+        self.bar_top.open_settings_win.connect(
+            lambda settings_item: self.open_settings_win(settings_item)
+        )
+        self.bar_top.history_press.connect(
+            lambda: self.history_press()
+        )
         right_lay.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -212,6 +219,12 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(parent, mf)
         return wrapper
+    
+    def history_press(self):
+        self.left_menu.tree_wid.expand_to_path(Dynamic.current_dir)
+        self.left_menu.setCurrentIndex(1)
+        self.grid.reload_thumbnails()
+        self.set_window_title()
     
     def go_to_widget(self, rel_path: str):
         dirname = os.path.dirname(rel_path)
