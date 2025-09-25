@@ -199,11 +199,13 @@ class Thumbnail(QFrame):
         self.rel_path = rel_path
         self.fav_value = fav
         self.f_mod = f_mod
-        self.name = f"{self.sym_star} {os.path.basename(rel_path)}" if fav else os.path.basename(rel_path)
+        self.name = os.path.basename(rel_path)
+        if fav:
+            self.name = self.sym_star + self.name
 
         # --- Layout ---
         self.v_layout = UVBoxLayout()
-        self.v_layout.setSpacing(ThumbData.spacing)
+        self.v_layout.setSpacing(2)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self.v_layout)
 
@@ -232,7 +234,7 @@ class Thumbnail(QFrame):
         """Пересчет размеров миниатюр в зависимости от индекса размера."""
         ind = Dynamic.thumb_size_index
         cls.pixmap_size = ThumbData.pixmap_sizes[ind]
-        cls.img_frame_size = ThumbData.pixmap_sizes[ind] + ThumbData.margins
+        cls.img_frame_size = ThumbData.pixmap_sizes[ind]
         cls.thumb_w = ThumbData.thumb_widths[ind]
         cls.thumb_h = ThumbData.thumb_heights[ind]
         cls.corner = ThumbData.corner_values[ind]
@@ -243,7 +245,7 @@ class Thumbnail(QFrame):
         self.below_text.set_text()
         self.setFixedSize(self.thumb_w, self.thumb_h)
 
-        size_ = self.pixmap_size + ThumbData.margins
+        size_ = self.pixmap_size
         self.img_wid.setFixedSize(size_, size_)
         self.img_wid.setPixmap(
             Utils.pixmap_scale(self.img, self.pixmap_size, self.pixmap_size)
