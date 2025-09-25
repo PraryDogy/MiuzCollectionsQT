@@ -476,7 +476,7 @@ class DbImagesLoader(URunnable):
             return {}
 
         for rel_path, rel_thumb_path, mod, fav in res:
-            if not rel_path.endswith(Static.ext_all):
+            if not rel_path.endswith(Static.img_extensions):
                 continue
 
             f_mod = datetime.fromtimestamp(mod).date()

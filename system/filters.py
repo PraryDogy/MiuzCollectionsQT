@@ -3,7 +3,7 @@ import json
 from cfg import Static, Dynamic
 
 class Filters:
-    filepath = os.path.join(Static.APP_SUPPORT_DIR, "filters.json")
+    filepath = os.path.join(Static.app_support, "filters.json")
     filters = []
     default = [
         "/1 IMG/",

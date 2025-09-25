@@ -67,8 +67,8 @@ def include_files(folder_name: str) -> list[str, list]:
 AUTHOR = "Evgeny Loshkarev"  # "Evgeny Loshkarev"
 SHORT_AUTHOR_NAME = "Evlosh" # "Evlosh"
 COMPANY = "MIUZ Diamonds" # "MIUZ Diamonds"
-APP_NAME = Static.APP_NAME
-APP_VER = str(Static.APP_VER)
+APP_NAME = Static.app_name
+APP_VER = str(Static.app_ver)
 ICON_PATH = "./images/icon.icns"
 MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 
@@ -110,13 +110,13 @@ print("Нажми 1 чтобы создать приложение с кешем
 if input() == "1":
     print("Создаю приложение с кешем ApplicationSupport")
 
-    src = Static.APP_SUPPORT_HASHDIR
-    root = os.path.basename(Static.APP_SUPPORT_HASHDIR)
-    app_sup = Static.APP_SUPPORT_DIR
+    src = Static.app_support_hashdir
+    root = os.path.basename(Static.app_support_hashdir)
+    app_sup = Static.app_support
     new_hashdir = shutil.make_archive(src, "zip", app_sup, root)
 
     DATA_FILES.append(
-        ('_preload', [new_hashdir, Static.APP_SUPPORT_DB])
+        ('_preload', [new_hashdir, Static.app_support_db])
     )
 
 else:

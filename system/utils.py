@@ -69,7 +69,7 @@ class Utils:
     def create_abs_hash(cls, path: str) -> str | None:
         try:
             new_name = hashlib.md5(path.encode('utf-8')).hexdigest() + ".jpg"
-            new_folder = os.path.join(Static.APP_SUPPORT_HASHDIR, new_name[:2])
+            new_folder = os.path.join(Static.app_support_hashdir, new_name[:2])
             os.makedirs(new_folder, exist_ok=True)
             return os.path.join(new_folder, new_name)
         except Exception as e:
@@ -79,7 +79,7 @@ class Utils:
     @classmethod
     def get_rel_hash(cls, thumb_path: str) -> str | None:
         try:
-            return thumb_path.replace(Static.APP_SUPPORT_DIR, "")
+            return thumb_path.replace(Static.app_support, "")
         except Exception as e:
             print(f"get_rel_hash: {e}")
             return None
@@ -87,7 +87,7 @@ class Utils:
     @classmethod
     def get_abs_hash(cls, rel_thumb_path: str) -> str | None:
         try:
-            return Static.APP_SUPPORT_DIR + rel_thumb_path
+            return Static.app_support + rel_thumb_path
         except Exception as e:
             print(f"get_abs_hash: {e}")
             return None

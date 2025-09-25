@@ -109,7 +109,7 @@ class SimpleSettings(QGroupBox):
 
     def show_files_cmd(self, *args):
         try:
-            subprocess.Popen(["open", Static.APP_SUPPORT_DIR])
+            subprocess.Popen(["open", Static.app_support])
         except Exception as e:
             print(e)
 
@@ -275,7 +275,7 @@ class Themes(QGroupBox):
 
 class SelectableLabel(ULabel):
     txt = "\n".join([
-        f"Version {Static.APP_VER}",
+        f"Version {Static.app_ver}",
         "Developed by Evlosh",
         "email: evlosh@gmail.com",
         "telegram: evlosh",
@@ -953,7 +953,7 @@ class WinSettings(SingleActionWindow):
             if not validate_folders():
                 return
             if self.need_reset[0]:
-                shutil.rmtree(Static.APP_SUPPORT_DIR)
+                shutil.rmtree(Static.app_support)
             else:
                 Mf.list_ = self.mf_list_copy
                 Filters.filters = self.filters_copy

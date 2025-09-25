@@ -631,18 +631,12 @@ class WinMain(UMainWindow):
     def set_window_title(self):
         if Dynamic.current_dir is None:
             return
-        if Mf.current.curr_path:
-            true_name = os.path.basename(Mf.current.curr_path)
+        if Mf.current.set_curr_path():
+            real_name = os.path.basename(Mf.current.curr_path)
         else:
-            true_name = os.path.basename(Mf.current.paths[0])
-        alias = Mf.current.name
-        mappings = {
-            Static.NAME_FAVS: Lng.favorites[Cfg.lng],
-            Static.NAME_RECENTS: Lng.recents[Cfg.lng],
-            "": f"{true_name} ({alias})"
-        }
-        if Dynamic.current_dir in mappings:
-            t = mappings.get(Dynamic.current_dir)
+            real_name = os.path.basename(Mf.current.paths[0])
+        if Dynamic.current_dir == "":
+            t = f"{real_name} ({Mf.current.name})"
         else:
             t = os.path.basename(Dynamic.current_dir)
         self.setWindowTitle(t)

@@ -56,9 +56,9 @@ class Dbase:
 
     @classmethod
     def create_engine(cls):
-        if os.path.exists(Static.APP_SUPPORT_DB):
+        if os.path.exists(Static.app_support_db):
             cls.engine = sqlalchemy.create_engine(
-                f"sqlite:///{Static.APP_SUPPORT_DB}",
+                f"sqlite:///{Static.app_support_db}",
                 echo=cls._echo,
                 connect_args={
                     "check_same_thread": cls._same_thread,

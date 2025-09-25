@@ -276,9 +276,6 @@ class Thumbnail(QFrame):
         self.text_wid.name = self.name
         self.text_wid.set_text()
 
-        if value == 0 and Dynamic.current_dir == Static.NAME_FAVS:
-            self.reload_thumbnails.emit()
-
 
 class UpBtn(QFrame):
     """

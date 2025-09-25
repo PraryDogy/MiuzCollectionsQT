@@ -291,7 +291,7 @@ class ImgLoader(QObject):
             for entry in os.scandir(abs_dir_path):
                 if not self.task_state.should_run():
                     return []
-                if entry.path.endswith(Static.ext_all):
+                if entry.path.endswith(Static.img_extensions):
                     try:
                         process_entry(entry)
                     except Exception as e:
@@ -624,7 +624,7 @@ class EmptyHashdirHandler(QObject):
 
         
     def run(self):
-        for i in os.scandir(Static.APP_SUPPORT_HASHDIR):
+        for i in os.scandir(Static.app_support_hashdir):
             if os.path.isdir(i.path) and not os.listdir(i.path):
                 try:
                     shutil.rmtree(i.path)

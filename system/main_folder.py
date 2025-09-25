@@ -9,8 +9,8 @@ from .utils import Utils
 class Mf:
     current: "Mf" = None
     list_: list["Mf"] = []
-    json_file = os.path.join(Static.APP_SUPPORT_DIR, "mf.json")
-    json_file_backup = os.path.join(Static.APP_SUPPORT_DIR, "mf_backup.json")
+    json_file = os.path.join(Static.app_support, "mf.json")
+    json_file_backup = os.path.join(Static.app_support, "mf_backup.json")
     __slots__ = [
         "name",
         "paths",
