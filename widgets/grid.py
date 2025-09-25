@@ -397,7 +397,7 @@ class Grid(VScrollArea):
     paste_files = pyqtSignal()
     copy_files = pyqtSignal(tuple)
     setup_mf = pyqtSignal(SettingsItem)
-    expand_to_path = pyqtSignal(str)
+    go_to_widget = pyqtSignal(str)
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -416,6 +416,7 @@ class Grid(VScrollArea):
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
         self.clipboard_item: ClipBoardItem = None
+        self.go_to_url: str = None
 
         self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
 
@@ -447,6 +448,18 @@ class Grid(VScrollArea):
         self.load_grid_container()
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
+    # def go_to_widget(self, rel_path: str):
+
+    #     def delayed_cmd():
+    #         print(rel_path, self.path_to_wid)
+    #         if not self.path_to_wid:
+    #             QTimer.singleShot(500, delayed_cmd)
+    #         elif rel_path in self.path_to_wid:
+    #             self.ensureWidgetVisible(self.path_to_wid[rel_path])
+
+    #     self.reload_thumbnails()
+    #     delayed_cmd()
+
     def reload_thumbnails(self):
         Dynamic.thumbnails_count = 0
         self.load_db_images_task(self.load_initial_grid)
@@ -474,12 +487,6 @@ class Grid(VScrollArea):
 
     def load_initial_grid(self, db_images: dict[str, list[DbImagesLoader.Item]]):
 
-        def create_item():
-            item = SettingsItem()
-            item.action_type = item.type_edit_folder
-            item.content = Mf.current
-            return item
-
         def load_grid_delayed():
             self.remove_grid_container()
             self.load_grid_container()
@@ -496,6 +503,12 @@ class Grid(VScrollArea):
                     self.add_thumbnails_to_grid(db_images_list)
                 self.rearrange()
                 self.grid_wid.show()
+                if self.go_to_url and self.go_to_url in self.path_to_wid:
+                    wid = self.path_to_wid[self.go_to_url]
+                    wid.set_frame()
+                    self.selected_widgets.append(wid)
+                    self.go_to_url = None
+                    QTimer.singleShot(200, lambda: self.ensureWidgetVisible(wid))
                 QTimer.singleShot(100, self.setFocus)
 
         self.grid_wid.hide()
@@ -833,7 +846,7 @@ class Grid(VScrollArea):
 
             update_grid = QAction(Lng.update_grid[Cfg.lng], self.menu_)
             update_grid.triggered.connect(
-                self.reload_thumbnails()
+                lambda: self.reload_thumbnails()
             )
             self.menu_.addAction(update_grid)
 
@@ -934,7 +947,7 @@ class Grid(VScrollArea):
 
             expand_to_path = QAction(Lng.go_to_folder[Cfg.lng], self.menu_)
             expand_to_path.triggered.connect(
-                lambda: self.expand_to_path.emit(os.path.dirname(clicked.rel_path))
+                lambda: self.go_to_widget.emit(clicked.rel_path)
             )
             self.menu_.addAction(expand_to_path)
 

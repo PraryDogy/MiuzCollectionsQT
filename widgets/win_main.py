@@ -161,11 +161,8 @@ class WinMain(UMainWindow):
         self.grid.setup_mf.connect(
             self.open_settings_win
         )
-        self.grid.expand_to_path.connect(
-            lambda rel_path: self.left_menu.tree_wid.expand_to_path(rel_path)
-        )
-        self.grid.expand_to_path.connect(
-            lambda _: self.left_menu.setCurrentIndex(1)
+        self.grid.go_to_widget.connect(
+            lambda rel_path: self.go_to_widget(rel_path)
         )
         right_lay.addWidget(self.grid)
 
@@ -212,6 +209,13 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(parent, mf)
         return wrapper
+    
+    def go_to_widget(self, rel_path: str):
+        dirname = os.path.dirname(rel_path)
+        self.left_menu.tree_wid.expand_to_path(dirname)
+        self.left_menu.setCurrentIndex(1)
+        self.grid.go_to_url = rel_path
+        self.grid.reload_thumbnails()
 
     def open_win_smb(self, parent: QWidget, mf: Mf):
         try:
