@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QPushButton, QSpacerItem, QSpinBox,
                              QSplitter, QWidget)
 
-from cfg import Cfg, Static
+from cfg import Cfg, Static, _Cfg
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
@@ -35,7 +35,7 @@ class LangReset(QGroupBox):
     reset = pyqtSignal()
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: Cfg):
+    def __init__(self, json_data_copy: _Cfg):
         super().__init__()
         self.json_data_copy = json_data_copy
 
@@ -117,7 +117,7 @@ class SimpleSettings(QGroupBox):
 class ScanerSettings(QGroupBox):
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: Cfg):
+    def __init__(self, json_data_copy: _Cfg):
         super().__init__()
         self.json_data_copy = json_data_copy
 
@@ -328,7 +328,7 @@ class AboutWid(QGroupBox):
 class GeneralSettings(QWidget):
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: Cfg, need_reset: list[bool]):
+    def __init__(self, json_data_copy: _Cfg, need_reset: list[bool]):
         super().__init__()
         self.need_reset = need_reset
         v_lay = UVBoxLayout()
