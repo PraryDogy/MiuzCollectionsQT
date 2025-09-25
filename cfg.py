@@ -6,20 +6,14 @@ from datetime import datetime
 
 class ThumbData:
 
-    # размер в пикселях по длинной стороне изображения для базы данных
-    DB_IMAGE_SIZE = 210
-    # ширина и высота grid.py > Thumb
-    THUMB_H = [130, 150, 185, 270]
-    THUMB_W = [145, 145, 180, 230]
-    # максимальный размер изображения в пикселях для grid.py > Thumb
-    PIXMAP_SIZE = [50, 70, 100, 170]
-    # максимальное количество символов на строку для grid.py > Thumb
-    MAX_ROW = [20, 20, 25, 32]
-    CORNER = [4, 8, 14, 16]
-    # растояние между изображением и текстом для grid.py > Thumb
-    SPACING = 2
-    # дополнительное пространство вокруг изображения для grid.py > Thumb
-    MARGIN = 15
+    max_img_size = 210
+    thumb_heights = [130, 150, 185, 270]
+    thumb_widths = [145, 145, 180, 230]
+    pixmap_sizes = [50, 70, 100, 170]
+    row_limits = [20, 20, 25, 32]
+    corner_values = [4, 8, 14, 16]
+    spacing = 2
+    margins = 15
 
 class Static:
     app_ver = 3.75

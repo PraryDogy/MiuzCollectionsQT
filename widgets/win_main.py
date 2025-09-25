@@ -759,7 +759,7 @@ class WinMain(UMainWindow):
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.thumb_size_index < len(ThumbData.PIXMAP_SIZE) - 1:
+                if Dynamic.thumb_size_index < len(ThumbData.pixmap_sizes) - 1:
                     Dynamic.thumb_size_index += 1
                     self.bar_bottom.slider._on_value_changed(Dynamic.thumb_size_index)
 

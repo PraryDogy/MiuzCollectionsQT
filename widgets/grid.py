@@ -44,7 +44,7 @@ class FilenameWid(QLabel):
         """
         name: str = self.name
         ind = Dynamic.thumb_size_index
-        max_row = ThumbData.MAX_ROW[ind]
+        max_row = ThumbData.row_limits[ind]
         lines: list[str] = []
 
         if len(name) > max_row:
@@ -129,7 +129,7 @@ class BelowTextWid(QLabel):
         """
         Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
         """
-        max_row = ThumbData.MAX_ROW[Dynamic.thumb_size_index]
+        max_row = ThumbData.row_limits[Dynamic.thumb_size_index]
         if len(text) > max_row:
             return f"{text[:max_row]}..."
         return text
@@ -203,7 +203,7 @@ class Thumbnail(QFrame):
 
         # --- Layout ---
         self.v_layout = UVBoxLayout()
-        self.v_layout.setSpacing(ThumbData.SPACING)
+        self.v_layout.setSpacing(ThumbData.spacing)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self.v_layout)
 
@@ -231,11 +231,11 @@ class Thumbnail(QFrame):
     def calculate_size(cls):
         """Пересчет размеров миниатюр в зависимости от индекса размера."""
         ind = Dynamic.thumb_size_index
-        cls.pixmap_size = ThumbData.PIXMAP_SIZE[ind]
-        cls.img_frame_size = ThumbData.PIXMAP_SIZE[ind] + ThumbData.MARGIN
-        cls.thumb_w = ThumbData.THUMB_W[ind]
-        cls.thumb_h = ThumbData.THUMB_H[ind]
-        cls.corner = ThumbData.CORNER[ind]
+        cls.pixmap_size = ThumbData.pixmap_sizes[ind]
+        cls.img_frame_size = ThumbData.pixmap_sizes[ind] + ThumbData.margins
+        cls.thumb_w = ThumbData.thumb_widths[ind]
+        cls.thumb_h = ThumbData.thumb_heights[ind]
+        cls.corner = ThumbData.corner_values[ind]
 
     def setup(self):
         """Настройка миниатюры: текст, размеры, изображение."""
@@ -243,7 +243,7 @@ class Thumbnail(QFrame):
         self.below_text.set_text()
         self.setFixedSize(self.thumb_w, self.thumb_h)
 
-        size_ = self.pixmap_size + ThumbData.MARGIN
+        size_ = self.pixmap_size + ThumbData.margins
         self.img_wid.setFixedSize(size_, size_)
         self.img_wid.setPixmap(
             Utils.pixmap_scale(self.img, self.pixmap_size, self.pixmap_size)
@@ -551,7 +551,7 @@ class Grid(VScrollArea):
             self.wid_to_selected_widgets(wid)
     
     def reset_grid_properties(self):
-        self.max_col = self.width() // (ThumbData.THUMB_W[Dynamic.thumb_size_index])
+        self.max_col = self.width() // (ThumbData.thumb_widths[Dynamic.thumb_size_index])
         self.glob_row, self.glob_col = 0, 0
         for i in (self.cell_to_wid, self.path_to_wid):
             i.clear()

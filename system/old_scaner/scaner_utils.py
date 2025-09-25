@@ -313,7 +313,7 @@ class HashdirUpdater(QObject):
 
     def create_thumb(self, path: str) -> ndarray | None:
         img = ReadImage.read_image(path)
-        thumb = Utils.fit_to_thumb(img, ThumbData.DB_IMAGE_SIZE)
+        thumb = Utils.fit_to_thumb(img, ThumbData.max_img_size)
         del img
         gc.collect()
         if isinstance(thumb, ndarray):

@@ -24,7 +24,7 @@ class CustomSlider(QSlider):
         # --- Настройка диапазона и ориентации ---
         self.setOrientation(Qt.Orientation.Horizontal)
         self.setMinimum(0)
-        self.setMaximum(len(ThumbData.PIXMAP_SIZE) - 1)
+        self.setMaximum(len(ThumbData.pixmap_sizes) - 1)
         self.setValue(Dynamic.thumb_size_index)
         self.setFixedWidth(80)
 
