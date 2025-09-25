@@ -461,11 +461,11 @@ class Grid(VScrollArea):
     #     delayed_cmd()
 
     def reload_thumbnails(self):
-        Dynamic.thumbnails_count = 0
+        Dynamic.loaded_thumbs = 0
         self.load_db_images_task(self.load_initial_grid)
 
     def load_more_thumbnails(self):
-        Dynamic.thumbnails_count += Static.thumbnails_step
+        Dynamic.loaded_thumbs += Static.thumbs_load_limit
         self.load_db_images_task(self.add_more_thumbnails)
 
     def load_db_images_task(self, on_finish: callable):

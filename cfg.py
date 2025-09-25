@@ -24,7 +24,7 @@ class ThumbData:
 class Static:
     APP_VER = 3.75
     APP_NAME = "Collections"
-    thumbnails_step = 100
+    thumbs_load_limit = 100
     NAME_FAVS = "___favorites___"
     NAME_RECENTS = "___recents___"
     FOLDER_HASHDIR = "hashdir"
@@ -261,7 +261,7 @@ class Dynamic:
     date_end: datetime = None
     f_date_start: str = None # 1 january 1991
     f_date_end: str = None # 31 january 1991
-    thumbnails_count: int = 0
+    loaded_thumbs: int = 0
     search_widget_text: str = None
 
     # индекс соответствующий STATIC > IMG_LABEL_SIZE

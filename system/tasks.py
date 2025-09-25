@@ -508,7 +508,7 @@ class DbImagesLoader(URunnable):
             THUMBS.c.short_hash,
             THUMBS.c.mod,
             THUMBS.c.fav
-        ).limit(Static.thumbnails_step).offset(Dynamic.thumbnails_count)
+        ).limit(Static.thumbs_load_limit).offset(Dynamic.loaded_thumbs)
         if Dynamic.sort_by_mod:
             stmt = stmt.order_by(-THUMBS.c.mod)
         else:
