@@ -24,18 +24,14 @@ class ThumbData:
 class Static:
     app_ver = 3.75
     app_name = "Collections"
-
     thumbs_load_limit = 100
-    hashdir = "hashdir"
-    rgba_blue = "rgba(46, 89, 203, 1.0)"
-    rgba_gray = "rgba(125, 125, 125, 0.5)"
 
+    hashdir = "hashdir"
+    _preload = "_preload"
     app_support = os.path.expanduser(f"~/Library/Application Support/{app_name}")
     app_support_cfg = f"{app_support}/cfg.json"
     app_support_db = f"{app_support}/db.db"
     app_support_hashdir = f"{app_support}/{hashdir}"
-
-    _preload = "_preload"
     _preload_db = f"{_preload}/db.db"
     _preload_hashdir = f"{_preload}/{hashdir}"
     _preload_zip = f"{_preload}/hashdir.zip"
