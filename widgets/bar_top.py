@@ -273,44 +273,45 @@ class SettingsBtn(BarTopBtn):
         self.svg_btn.load(self.ICON_PATH)
 
 
-class BackBtn(BarTopBtn):
+class HistoryNavBtn(BarTopBtn):
+    """
+    Базовый класс для кнопок навигации по истории.
+    direction: int = -1 для "назад", +1 для "вперед"
+    """
+    ICON_PATH = ""
+    direction: int = -1
+
+    def __init__(self):
+        super().__init__()
+        self.svg_btn.load(self.ICON_PATH)
+
+    def mouseReleaseEvent(self, a0):
+        try:
+            if Dynamic.current_dir not in Dynamic.history:
+                return  # нет текущей позиции
+            curr_ind = Dynamic.history.index(Dynamic.current_dir)
+            new_ind = curr_ind + self.direction
+            if 0 <= new_ind < len(Dynamic.history):
+                Dynamic.current_dir = Dynamic.history[new_ind]
+                self.clicked_.emit()
+        except Exception as e:
+            print("HistoryNavBtn error", e)
+
+
+class BackBtn(HistoryNavBtn):
     ICON_PATH = "./images/arrow_back.svg"
-
     def __init__(self):
         super().__init__()
+        self.direction = -1
         self.lbl.setText(Lng.back[Cfg.lng])
-        self.svg_btn.load(self.ICON_PATH)
-
-    def mouseReleaseEvent(self, a0):
-        def cmd():
-            ind = Dynamic.history.index(Dynamic.current_dir) - 1
-            if ind >= 0:
-                Dynamic.current_dir = Dynamic.history[ind]
-                self.clicked_.emit()
-        try:
-            cmd()
-        except Exception as e:
-            print("BackBtn error", e)
 
 
-class NextBtn(BarTopBtn):
+class NextBtn(HistoryNavBtn):
     ICON_PATH = "./images/arrow_next.svg"
-
     def __init__(self):
         super().__init__()
+        self.direction = +1
         self.lbl.setText(Lng.next_[Cfg.lng])
-        self.svg_btn.load(self.ICON_PATH)
-
-    def mouseReleaseEvent(self, a0):
-        def cmd():
-            ind = Dynamic.history.index(Dynamic.current_dir) + 1
-            if ind >= 0:
-                Dynamic.current_dir = Dynamic.history[ind]
-                self.clicked_.emit()
-        try:
-            cmd()
-        except Exception as e:
-            print("BackBtn error", e)
 
 
 class BarTop(QWidget):
@@ -345,6 +346,7 @@ class BarTop(QWidget):
         self.h_layout.addWidget(self.back_btn)
 
         self.next_btn = NextBtn()
+        self.next_btn.clicked_.connect(lambda: self.history_press.emit())
         self.h_layout.addWidget(self.next_btn)
 
         self.h_layout.addStretch(1)
