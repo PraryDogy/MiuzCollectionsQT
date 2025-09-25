@@ -175,7 +175,7 @@ class Thumbnail(QFrame):
     TEXT_FRAME_STYLE = f"""
         border-radius: 7px;
         color: rgb(255,255,255);
-        background: {{bg_color}};
+        background: rgba(46, 89, 203, 1.0);
         border: 2px solid transparent;
         padding-left: 2px;
         padding-right: 2px;
@@ -252,7 +252,7 @@ class Thumbnail(QFrame):
     def set_frame(self):
         """Устанавливает рамку и фон для выделенной миниатюры."""
         self.img_wid.setStyleSheet(self.IMG_FRAME_STYLE.format(corner=self.corner, bg_color=Static.rgba_gray))
-        self.text_wid.setStyleSheet(self.TEXT_FRAME_STYLE.format(bg_color=Static.rgba_blue))
+        self.text_wid.setStyleSheet(self.TEXT_FRAME_STYLE)
 
     def set_no_frame(self):
         """Снимает рамку и фон для миниатюры."""
