@@ -434,10 +434,19 @@ class WinMain(UMainWindow):
     @with_conn
     def upload_files(self, parent: QWidget, mf: Mf, abs_paths: list):
 
-        def shorten_path(path, max_len=50):
-            if len(path) <= max_len:
-                return path
-            return '…' + path[-(max_len-1):]  # оставляем конец, добавляем '…' спереди
+        # def shorten_path(path, max_len=50):
+        #     if len(path) <= max_len:
+        #         return path
+        #     return '…' + path[-(max_len-1):]  # оставляем конец, добавляем '…' спереди
+
+
+        def shorten_path(path: str, max_len=50):
+            splited = path.strip(os.sep).split(os.sep)
+            max_len = max_len - len(splited[0]) - len(splited[-1])
+            while len(os.sep.join(splited[1:-1])) > max_len:
+                splited.pop(1)
+            splited.insert(1, "...")
+            return os.sep + os.sep.join(splited)
 
         def fin(target_dir: str):
             self.upload_win.deleteLater()
