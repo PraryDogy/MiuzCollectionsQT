@@ -192,7 +192,7 @@ class MfList(VListWidget):
     mf_open = pyqtSignal(Mf)
     mf_reveal = pyqtSignal(Mf)
     mf_new = pyqtSignal()
-    svg_folder = "./images/folder.svg"
+    svg_folder = "./images/img_folder.svg"
     svg_size = 16
 
     def __init__(self, parent: QTabWidget):

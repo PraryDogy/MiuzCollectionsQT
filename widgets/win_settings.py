@@ -739,7 +739,7 @@ class SettingsListItem(UListWidgetItem):
 class WinSettings(SingleActionWindow):
     closed = pyqtSignal()
     reset_data = pyqtSignal(Mf)
-    svg_folder = "./images/folder.svg"
+    svg_folder = "./images/img_folder.svg"
     svg_filters = "./images/filters.svg"
     svg_settings = "./images/settings.svg"
     svg_new_folder = "./images/new_folder.svg"
