@@ -302,7 +302,10 @@ class OneFileInfo(URunnable):
         _, type_ = os.path.splitext(name)
         stats = os.stat(self.url)
         size = SharedUtils.get_f_size(stats.st_size)
-        mod = SharedUtils.get_f_date(stats.st_mtime)
+
+        date_time = datetime.fromtimestamp(stats.st_mtime)
+        month = Lng.months_genitive_case[Cfg.lng][str(date_time.month)]
+        mod = f"{date_time.day} {month} {date_time.year}"
 
         res = {
             Lng.file_name[Cfg.lng]: self.lined_text(name),
