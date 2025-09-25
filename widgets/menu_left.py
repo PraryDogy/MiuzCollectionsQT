@@ -139,7 +139,9 @@ class TreeWid(QTreeWidget):
 
         def collapse_all_cmd():
             self.collapseAll()
-            self.setCurrentItem(list(self.items.values())[0])
+            first_item = list(self.items.values())[0]
+            first_item.setExpanded(True)
+            self.setCurrentItem(first_item)
 
         item = self.itemAt(a0.pos())
         menu = UMenu(a0)
