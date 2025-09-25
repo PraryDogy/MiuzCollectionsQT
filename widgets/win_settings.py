@@ -750,7 +750,7 @@ class WinSettings(SingleActionWindow):
         self.setWindowTitle(Lng.settings[Cfg.lng])
         self.setFixedSize(700, 550)
         self.mf_list_copy = copy.deepcopy(Mf.list_)
-        self.json_data_copy = copy.deepcopy(Cfg())
+        self.json_data_copy = copy.deepcopy(Cfg)
         self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = [False, ]
         self.mf_items: list[SettingsListItem] = []
