@@ -112,6 +112,7 @@ class WinInfo(SingleActionWindow):
         cmd = lambda text: self.last_label.setText(text)
         self.task_.sigs.delayed_info.connect(cmd)
         self.finished_.emit()
+        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
     def single_img_fin(self, data: dict[str, str]):
         row = 0
