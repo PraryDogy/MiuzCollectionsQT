@@ -311,8 +311,6 @@ class MenuLeft(QTabWidget):
             Dynamic.current_dir = rel_path
             self.reload_thumbnails.emit()
 
-            print(Dynamic.history)
-
         def _mf_edit(mf: Mf):
             item = SettingsItem()
             item.action_type = item.type_edit_folder
