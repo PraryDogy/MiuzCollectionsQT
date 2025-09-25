@@ -306,9 +306,10 @@ class MenuLeft(QTabWidget):
             Dynamic.history.append(rel_path)
             if len(Dynamic.history) > 100:
                 Dynamic.history = Dynamic.history[-100:]
-
             Dynamic.current_dir = rel_path
             self.reload_thumbnails.emit()
+
+            print(Dynamic.history)
 
         def _mf_edit(mf: Mf):
             item = SettingsItem()
