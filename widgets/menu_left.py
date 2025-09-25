@@ -283,6 +283,8 @@ class MenuLeft(QTabWidget):
             subprocess.Popen(["open", abs_path])
 
         def _mf_open(mf: Mf):
+            if Mf.current == mf:
+                return
             Mf.current = mf
             # Корневая директория представляется пустой строкой.
             # Это нужно потому, что в запросах к БД формируется шаблон вида `path + '/%'` (ILIKE/LIKE).
