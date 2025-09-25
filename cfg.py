@@ -58,6 +58,7 @@ class Dynamic:
     filters_enabled: list[str] = []
     filter_favs: bool = False
     filter_only_folder: bool = False
+    history: list[str] = []
 
 
 class _Cfg:

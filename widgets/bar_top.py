@@ -273,6 +273,35 @@ class SettingsBtn(BarTopBtn):
         self.svg_btn.load(self.ICON_PATH)
 
 
+class BackBtn(BarTopBtn):
+    ICON_PATH = "./images/arrow_back.svg"
+
+    def __init__(self):
+        super().__init__()
+        self.lbl.setText(Lng.back[Cfg.lng])
+        self.svg_btn.load(self.ICON_PATH)
+
+    def mouseReleaseEvent(self, a0):
+        def cmd():
+            ind = Dynamic.history.index(Dynamic.current_dir) - 1
+            if ind >= 0:
+                Dynamic.current_dir = Dynamic.history[ind]
+                self.clicked_.emit()
+        try:
+            cmd()
+        except Exception as e:
+            print("BackBtn error", e)
+
+
+class NextBtn(BarTopBtn):
+    ICON_PATH = "./images/arrow_next.svg"
+
+    def __init__(self):
+        super().__init__()
+        self.lbl.setText(Lng.next_[Cfg.lng])
+        self.svg_btn.load(self.ICON_PATH)
+
+
 class BarTop(QWidget):
     """
     Верхняя панель с кнопками управления и поиском.
@@ -298,6 +327,13 @@ class BarTop(QWidget):
         super().__init__()
         self.h_layout = UHBoxLayout()
         self.setLayout(self.h_layout)
+
+        self.back_btn = BackBtn()
+        self.back_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
+        self.h_layout.addWidget(self.back_btn)
+
+        self.next_btn = NextBtn()
+        self.h_layout.addWidget(self.next_btn)
 
         self.h_layout.addStretch(1)
 

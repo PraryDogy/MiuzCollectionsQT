@@ -114,6 +114,9 @@ class WinMain(UMainWindow):
         self.bar_top.reload_thumbnails.connect(
             lambda: self.grid.reload_thumbnails()
             )
+        self.bar_top.reload_thumbnails.connect(
+            lambda: self.set_window_title()
+            )
         self.bar_top.open_settings_win.connect(self.open_settings_win)
         right_lay.addWidget(self.bar_top)
 
