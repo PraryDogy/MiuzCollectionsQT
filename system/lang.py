@@ -152,10 +152,6 @@ class Lng:
         "Alias (cannot be changed after saving)"
     )
     save = ("Сохранить", "Save")
-    save_filters = (
-        "Сохраните и нажмите «ОК», чтобы применить фильтры.",
-        "Save and press \"OK\" to apply filters."
-    )
     new_folder = ("Новая папка", "New folder")
     enter_alias_warning = (
         "Поле «Псевдоним» обязательно для заполнения",
@@ -263,7 +259,6 @@ class Lng:
         "Сохраните и нажмите «Перезапуск», чтобы применить изменения.",
         "Save and press \"Restart\" to apply changes."
     )
-    reset_filters_descr = ("Вернуть фильтры по умолчанию", "Reset filters to default")
     filters_descr = (
         "Фильтры:\n"
         "- Показывают файлы, путь которых содержит указанный текст.\n"
@@ -297,4 +292,8 @@ class Lng:
     folder_removed_text = (
         "Папка будет удалена из приложения. Продолжить?",
         "The folder will be removed from the application. Continue?"
+    )
+    filters_reset = (
+        "Список фильтров будет сброшен по умолчанию. Продолжить?",
+        "The filter list will be reset to default. Continue?"
     )

@@ -793,10 +793,21 @@ class FiltersWid(QWidget):
         self.v_lay.addStretch(1)
         
     def reset_filters(self):
-        self.text_wid.clear()
-        self.text_wid.insertPlainText(
-            "\n".join(Filters.default)
+
+        def fin():
+            self.text_wid.clear()
+            self.text_wid.insertPlainText(
+                "\n".join(Filters.default)
+            )
+            self.filters_win.deleteLater()
+
+        self.filters_win = WinQuestion(
+            Lng.attention[Cfg.lng],
+            Lng.filters_reset[Cfg.lng]
         )
+        self.filters_win.ok_clicked.connect(fin)
+        self.filters_win.center_to_parent(self.window())
+        self.filters_win.show()
 
     def on_text_changed(self):
         text = self.text_wid.toPlainText().strip()
