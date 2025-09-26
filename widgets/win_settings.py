@@ -33,6 +33,12 @@ class ULabel(QLabel):
         self.setMinimumWidth(30)
 
 
+class UPushButton(QPushButton):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setFixedWidth(115)
+
+
 class LangSettings(QGroupBox):
     changed = pyqtSignal()
 
@@ -48,8 +54,7 @@ class LangSettings(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.lang_btn = QPushButton(text=Lng.russian[Cfg.lng])
-        self.lang_btn.setFixedWidth(115)
+        self.lang_btn = UPushButton(text=Lng.russian[Cfg.lng])
         self.lang_btn.clicked.connect(self.lang_btn_cmd)
         first_row_lay.addWidget(self.lang_btn)
 
@@ -71,7 +76,7 @@ class LangSettings(QGroupBox):
 class SizesWin(SingleActionWindow):
     def __init__(self, sizes: dict[str, int], parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Размер данных / Data Sizes")
+        self.setWindowTitle(Lng.data_size[Cfg.lng])
         self.resize(400, 300)
 
         central = QWidget()
@@ -135,8 +140,7 @@ class DataSettings(QGroupBox):
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_wid.setLayout(first_lay)
 
-        self.reset_data_btn = QPushButton(Lng.reset[Cfg.lng])
-        self.reset_data_btn.setFixedWidth(115)
+        self.reset_data_btn = UPushButton(Lng.reset[Cfg.lng])
         self.reset_data_btn.clicked.connect(self.changed.emit)
         self.reset_data_btn.clicked.connect(self.reset.emit)
         first_lay.addWidget(self.reset_data_btn)
@@ -154,8 +158,7 @@ class DataSettings(QGroupBox):
         sec_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_wid.setLayout(sec_lay)
 
-        self.data_size_btn = QPushButton(Lng.details[Cfg.lng])
-        self.data_size_btn.setFixedWidth(115)
+        self.data_size_btn = UPushButton(Lng.details[Cfg.lng])
         sec_lay.addWidget(self.data_size_btn)
 
         data_size_lbl = ULabel(text=Lng.data_size[Cfg.lng] + ":")
@@ -202,8 +205,7 @@ class SimpleSettings(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.show_files_btn = QPushButton(text=Lng.show[Cfg.lng])
-        self.show_files_btn.setFixedWidth(115)
+        self.show_files_btn = UPushButton(text=Lng.show[Cfg.lng])
         self.show_files_btn.clicked.connect(self.show_files_cmd)
         first_row_lay.addWidget(self.show_files_btn)
 
@@ -615,18 +617,16 @@ class MfSettings(QWidget):
 
         btn_group_lay.addStretch()
 
-        self.reset_btn = QPushButton(Lng.reset[Cfg.lng])
+        self.reset_btn = UPushButton(Lng.reset[Cfg.lng])
         self.reset_btn.clicked.connect(
             lambda: self.show_reset_win(mf)
         )
-        self.reset_btn.setFixedWidth(100)
         btn_group_lay.addWidget(self.reset_btn)
 
-        self.remove_btn = QPushButton(Lng.delete[Cfg.lng])
+        self.remove_btn = UPushButton(Lng.delete[Cfg.lng])
         self.remove_btn.clicked.connect(
             lambda: self.show_remove_win()
         )
-        self.remove_btn.setFixedWidth(100)
         btn_group_lay.addWidget(self.remove_btn)
 
         btn_group_lay.addStretch()
@@ -709,29 +709,10 @@ class NewFolder(QWidget):
         self.advanced = MfAdvanced(self.mf)
         v_lay.addWidget(self.advanced)
 
-        # QGroupBox для кнопки "Сохранить" и описания
-        self.btn_group = QGroupBox()
-        btn_group_lay = UHBoxLayout()
-        btn_group_lay.setContentsMargins(0, 5, 0, 5)
-        btn_group_lay.setSpacing(15)
-        btn_group_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.btn_group.setLayout(btn_group_lay)
-
-        self.save_btn = QPushButton(Lng.save[Cfg.lng])
+        self.save_btn = UPushButton(Lng.save[Cfg.lng])
         self.save_btn.clicked.connect(self.save)
-        self.save_btn.setFixedWidth(100)
-        btn_group_lay.addWidget(self.save_btn)
+        v_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        description_label = ULabel(Lng.save_btn_description[Cfg.lng])
-        btn_group_lay.addWidget(description_label)
-
-        self.svg_btn = QSvgWidget()
-        self.svg_btn.load(self.svg_warning)
-        self.svg_btn.setFixedSize(20, 20)
-        btn_group_lay.addWidget(self.svg_btn)
-        self.svg_btn.hide()
-
-        v_lay.addWidget(self.btn_group)
         v_lay.addStretch()
         
     def preset_new_folder(self, url: str):
@@ -739,26 +720,6 @@ class NewFolder(QWidget):
         self.name_label.setText(name)
         text_edit = self.findChildren(DropableGroupBox)[0].text_edit
         text_edit.setPlainText(url)
-        self.blink_save()
-
-    def blink_save(self):
-        """Мерцание кнопки save три раза."""
-        self._blink_count = 0
-
-        def toggle():
-            if self._blink_count >= 12:  # 6 переключений = 3 мигания
-                self.svg_btn.hide()
-                timer.stop()
-                return
-            if self._blink_count % 2 == 0:
-                self.svg_btn.show()
-            else:
-                self.svg_btn.hide()
-            self._blink_count += 1
-
-        timer = QTimer(self)
-        timer.timeout.connect(toggle)
-        timer.start(300)
 
     def name_cmd(self):
         name = self.name_label.text().strip()
@@ -831,8 +792,7 @@ class FiltersWid(QWidget):
         reset_lay.setContentsMargins(5, 5, 5, 5)
         reset_lay.setSpacing(10)
 
-        reset_btn = QPushButton(Lng.reset[Cfg.lng])
-        reset_btn.setFixedWidth(100)
+        reset_btn = UPushButton(Lng.reset[Cfg.lng])
         reset_btn.clicked.connect(self.reset_filters)
         reset_lay.addWidget(reset_btn)
 
@@ -946,14 +906,12 @@ class WinSettings(SingleActionWindow):
         btns_wid.setLayout(btns_lay)
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.ok_btn = QPushButton(Lng.ok[Cfg.lng])
+        self.ok_btn = UPushButton(Lng.ok[Cfg.lng])
         self.ok_btn.clicked.connect(self.ok_cmd)
-        self.ok_btn.setFixedWidth(100)
         btns_lay.addWidget(self.ok_btn)
 
-        cancel_btn = QPushButton(Lng.cancel[Cfg.lng])
+        cancel_btn = UPushButton(Lng.cancel[Cfg.lng])
         cancel_btn.clicked.connect(self.deleteLater)
-        cancel_btn.setFixedWidth(100)
         btns_lay.addWidget(cancel_btn)
 
         self.splitter.setStretchFactor(0, 0)
