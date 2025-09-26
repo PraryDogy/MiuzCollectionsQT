@@ -19,7 +19,7 @@ class BaseWinWarn(SingleActionWindow):
         super().__init__()
         self.setWindowTitle(title)
         self.setMinimumWidth(290)
-        self.setMaximumWidth(350)
+        self.setMaximumWidth(370)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -39,13 +39,17 @@ class BaseWinWarn(SingleActionWindow):
         self.right_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.right_wid.setLayout(self.right_layout)
 
+        text = self.insert_linebreaks(text)
         self.text_label = QLabel(text)
-        self.text_label.setWordWrap(True)
-        self.text_label.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding
-        )
         self.right_layout.addWidget(self.text_label)
+
+        self.adjustSize()
+
+    def insert_linebreaks(self, text: str, n: int = 35) -> str:
+        return '\n'.join(
+            text[i:i+n]
+            for i in range(0, len(text), n)
+        )
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
@@ -55,13 +59,10 @@ class BaseWinWarn(SingleActionWindow):
 class WinWarn(BaseWinWarn):
     def __init__(self, title: str, text: str):
         super().__init__(title, text)
-
         ok_btn = QPushButton(text=Lng.ok[Cfg.lng])
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.deleteLater)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        self.adjustSize()
 
 
 class WinQuestion(BaseWinWarn):
@@ -73,7 +74,6 @@ class WinQuestion(BaseWinWarn):
         btn_wid = QWidget()
         btn_lay = UHBoxLayout()
         btn_lay.setSpacing(10)
-        btn_lay.setContentsMargins(0, 10, 0, 0)
         btn_wid.setLayout(btn_lay)
 
         ok_btn = QPushButton(Lng.ok[Cfg.lng])
@@ -90,4 +90,3 @@ class WinQuestion(BaseWinWarn):
         btn_lay.addStretch()
 
         self.central_layout.addWidget(btn_wid)
-        self.adjustSize()
