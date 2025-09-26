@@ -11,7 +11,7 @@ from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
-from system.new_scaner.scaner_task import CustomScanerTask
+from system.new_scaner.scaner_task import DirListScanTask
 from system.tasks import (CopyFilesManager, FavManager, FilesRemover,
                           MfDataCleaner, Utils, UThreadPool)
 
@@ -346,7 +346,7 @@ class WinMain(UMainWindow):
                 reset_clipboard()
                 return
             if self.clipboard_item.action_type == self.clipboard_item.type_cut:
-                scaner_task = CustomScanerTask(
+                scaner_task = DirListScanTask(
                     self.clipboard_item.source_mf,
                     self.clipboard_item.source_dirs
                 )
@@ -360,7 +360,7 @@ class WinMain(UMainWindow):
                 UThreadPool.start(scaner_task)
             elif self.clipboard_item.action_type == self.clipboard_item.type_copy:
                 dirs = [self.clipboard_item.target_dir, ]
-                scaner_task = CustomScanerTask(
+                scaner_task = DirListScanTask(
                     self.clipboard_item.target_mf,
                     dirs
                 )
@@ -419,7 +419,7 @@ class WinMain(UMainWindow):
     def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list):
         
         def fin_remove(dirs_to_scan: list[str]):
-            task = CustomScanerTask(Mf.current, dirs_to_scan)
+            task = DirListScanTask(Mf.current, dirs_to_scan)
             task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
             task.sigs.reload_thumbnails.connect(self.left_menu.tree_wid.init_ui)
             UThreadPool.start(task)

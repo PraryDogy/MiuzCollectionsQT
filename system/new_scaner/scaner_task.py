@@ -77,16 +77,6 @@ class ScanerTask(URunnable):
             print("new scaner task, main folder scan error", e)
 
     def _mf_scan(self, mf: Mf):
-        # удаляем все файлы и данные из бД по удаленному Mf
-        mf_remover = RemovedMfCleaner()
-        deleted_mfs = mf_remover.run()
-        if deleted_mfs:
-            print("main folders deleted", deleted_mfs)
-        
-        empty_remover = EmptyHashdirHandler()
-        empty_remover.reload_gui.connect(lambda: self.set_flag(True))
-        empty_remover.run()
-
         # собираем Finder директории и директории из БД
         dirs_loader = DirsLoader(mf, self.task_state)
         dirs_loader.progress_text.connect(self.sigs.progress_text.emit)
@@ -118,12 +108,14 @@ class ScanerTask(URunnable):
             del_handler.run()
 
 
-class _CustomScanerSigs(QObject):
-    reload_thumbnails = pyqtSignal()
-    progress_text = pyqtSignal(str)
 
 
-class CustomScanerTask(URunnable):
+class DirListScanTask(URunnable):
+    
+    class Sigs(QObject):
+        reload_thumbnails = pyqtSignal()
+        progress_text = pyqtSignal(str)
+
     def __init__(self, mf: Mf, dirs_to_scan: list[str]):
         """
         Аналог полноценного сканера, но принимает список директорий
@@ -131,7 +123,7 @@ class CustomScanerTask(URunnable):
         dirs: [abs dir path, ...]
         """
         super().__init__()
-        self.sigs = _CustomScanerSigs()
+        self.sigs = DirListScanTask.Sigs()
         self.mf = mf
         self.dirs_to_scan = dirs_to_scan
         
@@ -151,3 +143,30 @@ class CustomScanerTask(URunnable):
 
         if del_images or new_images:
             self.sigs.reload_thumbnails.emit()
+
+
+class OnStartTask(URunnable):
+
+    class Sigs(QObject):
+        finished_ = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.sigs = OnStartTask.Sigs()
+
+    def task(self):
+        try:
+            self._task()
+        except Exception as e:
+            print("OnStartTask error", e)
+
+        self.sigs.finished_.emit()
+
+    def _task(self):
+        # удаляем все файлы и данные из бД по удаленному Mf
+        mf_remover = RemovedMfCleaner()
+        deleted_mfs = mf_remover.run()
+        if deleted_mfs:
+            print("main folders deleted", deleted_mfs)
+        empty_remover = EmptyHashdirHandler()
+        empty_remover.run()
