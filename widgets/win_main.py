@@ -225,6 +225,8 @@ class WinMain(UMainWindow):
             if argv[-1] != self.argv_flag:
                 self.start_scaner_task()
 
+        self.grid.reload_thumbnails()
+        self.set_window_title()
         self.on_start_task = OnStartTask()
         self.on_start_task.sigs.finished_.connect(on_finish)
         UThreadPool.start(self.on_start_task)
