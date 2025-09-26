@@ -141,8 +141,7 @@ class DataSettings(QGroupBox):
         first_wid.setLayout(first_lay)
 
         self.reset_data_btn = UPushButton(Lng.reset[Cfg.lng])
-        self.reset_data_btn.clicked.connect(self.changed.emit)
-        self.reset_data_btn.clicked.connect(self.reset.emit)
+        self.reset_data_btn.clicked.connect(self.reset_cmd)
         first_lay.addWidget(self.reset_data_btn)
 
         reset_lbl = ULabel(Lng.reset_settings[Cfg.lng])
@@ -170,6 +169,20 @@ class DataSettings(QGroupBox):
         self.v_lay.addWidget(sec_wid)
 
         self.get_sizes()
+
+    def reset_cmd(self):
+
+        def fin():
+            self.reset_data_btn.clicked.connect(self.changed.emit)
+            self.reset_data_btn.clicked.connect(self.reset.emit)
+
+        self.reset_win = WinQuestion(
+            Lng.attention[Cfg.lng],
+            Lng.reset_settings_max[Cfg.lng]
+        )
+        self.reset_win.ok_clicked.connect(fin)
+        self.reset_win.center_to_parent(self.window())
+        self.reset_win.show()
 
     def open_win(self, data: dict):
         self.sizes_win = SizesWin(data)

@@ -297,3 +297,7 @@ class Lng:
         "Список фильтров будет сброшен по умолчанию. Продолжить?",
         "The filter list will be reset to default. Continue?"
     )
+    reset_settings_max = (
+        "Будут удалены все данные приложения. Продолжить?",
+        "All application data will be deleted. Continue?"
+    )
