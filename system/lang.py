@@ -248,14 +248,6 @@ class Lng:
         "Копирование невозможно — файлы уже находятся в этой папке",
         "Copy operation not allowed — the files is already in this folder"
     )
-    reset_btn_description = (
-        "Найти заново все изображения в папке.",
-        "Rescan all images in the folder."
-    )
-    remove_btn_description = (
-        "Удалить папку с изображениями и все данные",  # русский
-        "Delete the image folder and all its data"    # английский
-    )
     drop_event_denied_msg = (
         "Завершите поиск, затем перетащите файлы",
         "Finish the search, then drag the files"
@@ -295,3 +287,11 @@ class Lng:
     details = ("Подробнее", "Details")
     data_size = ("Размер данных", "Data size")
     calculating = ("Вычисление", "Calculating")
+    reset_mf_text = (
+        "Данные папки будут сброшены, и все изображения будут заново просканированы. Продолжить?",
+        "The data for this folder will be reset, and all images will be rescanned. Continue?"
+    )
+    folder_removed_text = (
+        "Папка будет удалена из приложения. Продолжить?",
+        "The folder will be removed from the application. Continue?"
+    )

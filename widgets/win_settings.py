@@ -568,6 +568,14 @@ class MfAdvanced(QWidget):
         third_row.text_edit.setPlainText(text_)
 
 
+class ResetMfWin(WinQuestion):
+    def __init__(self):
+        super().__init__(
+            Lng.attention[Cfg.lng],
+            "Описательный текст бла бла бла"
+        )
+
+
 class MfSettings(QWidget):
     remove = pyqtSignal()
     changed = pyqtSignal()
@@ -607,20 +615,46 @@ class MfSettings(QWidget):
 
         btn_group_lay.addStretch()
 
-        reset_btn = QPushButton(Lng.reset[Cfg.lng])
-        reset_btn.clicked.connect(lambda: self.reset_data.emit(mf))
-        reset_btn.setFixedWidth(100)
-        btn_group_lay.addWidget(reset_btn)
+        self.reset_btn = QPushButton(Lng.reset[Cfg.lng])
+        self.reset_btn.clicked.connect(
+            lambda: self.show_reset_win(mf)
+        )
+        self.reset_btn.setFixedWidth(100)
+        btn_group_lay.addWidget(self.reset_btn)
 
-        remove_btn = QPushButton(Lng.delete[Cfg.lng])
-        remove_btn.clicked.connect(self.remove.emit)
-        remove_btn.setFixedWidth(100)
-        btn_group_lay.addWidget(remove_btn)
+        self.remove_btn = QPushButton(Lng.delete[Cfg.lng])
+        self.remove_btn.clicked.connect(
+            lambda: self.show_remove_win()
+        )
+        self.remove_btn.setFixedWidth(100)
+        btn_group_lay.addWidget(self.remove_btn)
 
         btn_group_lay.addStretch()
 
         v_lay.addWidget(btn_group)
         v_lay.addStretch()
+
+    def show_reset_win(self, mf: Mf):
+        self.reset_win = WinQuestion(
+            Lng.attention[Cfg.lng],
+            Lng.reset_mf_text[Cfg.lng]
+        )
+        self.reset_win.center_to_parent(self.window())
+        self.reset_win.ok_clicked.connect(
+            lambda: self.reset_data.emit(mf)
+        )
+        self.reset_win.show()
+
+    def show_remove_win(self):
+        self.reset_win = WinQuestion(
+            Lng.attention[Cfg.lng],
+            Lng.folder_removed_text[Cfg.lng]
+        )
+        self.reset_win.center_to_parent(self.window())
+        self.reset_win.ok_clicked.connect(
+            lambda: self.remove.emit()
+        )
+        self.reset_win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()

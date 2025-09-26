@@ -17,6 +17,7 @@ class BaseWinWarn(SingleActionWindow):
     def __init__(self, title: str, text: str):
         super().__init__()
         self.setWindowTitle(title)
+        self.setFixedWidth(350)
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
@@ -40,6 +41,7 @@ class BaseWinWarn(SingleActionWindow):
         v_wid.setLayout(v_lay)
 
         self.text_label = QLabel(text)
+        self.text_label.setWordWrap(True)
         v_lay.addWidget(self.text_label)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
