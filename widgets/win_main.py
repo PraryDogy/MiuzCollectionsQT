@@ -221,12 +221,6 @@ class WinMain(UMainWindow):
     
     def on_start(self, argv: list[str]):
 
-        from system.tasks import HashDirSize
-        self.hashdir_size = HashDirSize()
-        UThreadPool.start(self.hashdir_size)
-        return
-
-
         def on_finish():
             if argv[-1] != self.argv_flag:
                 self.start_scaner_task()
