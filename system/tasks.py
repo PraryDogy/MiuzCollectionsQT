@@ -625,3 +625,36 @@ class DbDirsLoader(URunnable):
                 curr = curr + "/" + part if curr else "/" + part
                 full_set.add(curr)
         return sorted(full_set)
+
+
+class HashDirSize(URunnable):
+    
+    class Sigs(QObject):
+        finished_ = pyqtSignal(dict)
+
+    def __init__(self):
+        super().__init__()
+        self.sigs = HashDirSize.Sigs()
+        self.conn = Dbase.engine.connect()
+
+    def task(self):
+        try:
+            self.sigs.finished_.emit(
+                self._task()
+            )
+        except Exception as e:
+            print("HashDirSize error", e)
+
+    def _task(self):
+        main_folder_sizes = {}
+        for i in Mf.list_:
+            stmt = (
+                sqlalchemy.select(THUMBS.c.short_hash)
+                .where(THUMBS.c.brand == i.name)
+            )
+            res = sum([
+                os.path.getsize(Utils.get_abs_hash(i))
+                for i in self.conn.execute(stmt).scalars()
+            ])
+            main_folder_sizes[i.name] = res
+        return main_folder_sizes
