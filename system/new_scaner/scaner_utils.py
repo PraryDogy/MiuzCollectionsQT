@@ -631,3 +631,27 @@ class EmptyHashdirHandler(QObject):
                     self.reload_gui.emit()
                 except Exception as e:
                     print("new scaner, empty hashdir remover", e)
+
+
+class EmptyRecordRemover(QObject):
+    def __init__(self):
+        super().__init__()
+        self.conn = Dbase.engine.connect()
+
+    def run(self):
+        try:
+            self._run()
+        except Exception as e:
+            print("EmptyRecordRemover error", e)
+
+    def _run(self):
+        stmt = (
+            sqlalchemy.delete(THUMBS).where(
+                sqlalchemy.or_(
+                    THUMBS.c.short_hash == None,
+                    THUMBS.c.short_src == None
+                )
+            )
+        )
+        self.conn.execute(stmt)
+        self.conn.commit()

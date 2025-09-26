@@ -11,8 +11,8 @@ from ..main_folder import Mf
 from ..tasks import URunnable
 from ..utils import Utils
 from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
-                           NewDirsHandler, RemovedDirsHandler,
-                           RemovedMfCleaner)
+                           EmptyRecordRemover, NewDirsHandler,
+                           RemovedDirsHandler, RemovedMfCleaner)
 
 
 class ScanerTask(URunnable):
@@ -165,8 +165,8 @@ class OnStartTask(URunnable):
     def _task(self):
         # удаляем все файлы и данные из бД по удаленному Mf
         mf_remover = RemovedMfCleaner()
-        deleted_mfs = mf_remover.run()
-        if deleted_mfs:
-            print("main folders deleted", deleted_mfs)
+        mf_remover.run()
+        record_remover = EmptyRecordRemover()
+        record_remover.run()
         empty_remover = EmptyHashdirHandler()
         empty_remover.run()

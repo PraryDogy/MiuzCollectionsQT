@@ -1,8 +1,16 @@
-lst = ["a", "b", "c", "b", "d", "dfds", "21323dd"]
-find = "b"
-ind = max(x for x, i in enumerate(lst) if i == find)
+from system.database import Dbase, THUMBS
+import sqlalchemy
 
 
-new = lst[:ind]
+Dbase.init()
+conn = Dbase.engine.connect()
+q = (
+    sqlalchemy.select(THUMBS.c.id)
+    .where(
+        THUMBS.c.short_src == None,
+        THUMBS.c.short_hash == None
+    )
+)
+res = conn.execute(q).fetchall()
 
-print(new)
+print(res)
