@@ -588,15 +588,14 @@ class MfSettings(QWidget):
         super().__init__()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(15)
-        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
+        v_lay.setContentsMargins(6, 0, 6, 0)
         self.setLayout(v_lay)
 
         # Верхний ряд с названием
         first_row = QGroupBox()
+        first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
         first_lay = UHBoxLayout()
-        first_lay.setContentsMargins(10, 10, 10, 10)
-        first_lay.setSpacing(5)
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_row.setLayout(first_lay)
         name_descr = ULabel(Lng.alias[Cfg.lng] + ":")
@@ -611,25 +610,22 @@ class MfSettings(QWidget):
 
         # QGroupBox для кнопок и описания
         btn_group = QWidget()
-        btn_group_lay = UHBoxLayout()
-        btn_group_lay.setSpacing(15)
-        btn_group.setLayout(btn_group_lay)
-
-        btn_group_lay.addStretch()
+        btn_lay = UHBoxLayout()
+        btn_lay.setSpacing(15)
+        btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        btn_group.setLayout(btn_lay)
 
         self.reset_btn = UPushButton(Lng.reset[Cfg.lng])
         self.reset_btn.clicked.connect(
             lambda: self.show_reset_win(mf)
         )
-        btn_group_lay.addWidget(self.reset_btn)
+        btn_lay.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.remove_btn = UPushButton(Lng.delete[Cfg.lng])
         self.remove_btn.clicked.connect(
             lambda: self.show_remove_win()
         )
-        btn_group_lay.addWidget(self.remove_btn)
-
-        btn_group_lay.addStretch()
+        btn_lay.addWidget(self.remove_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         v_lay.addWidget(btn_group)
         v_lay.addStretch()
@@ -690,16 +686,13 @@ class NewFolder(QWidget):
         self.mf_list = mf_list
 
         v_lay = UVBoxLayout()
-        v_lay.setSpacing(5)
-        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
+        v_lay.setSpacing(15)
         self.setLayout(v_lay)
 
         first_row = QGroupBox()
         first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
         first_lay = UVBoxLayout()
-        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        first_lay.setSpacing(5)
         first_row.setLayout(first_lay)
         self.name_label = ULineEdit()
         self.name_label.setPlaceholderText(Lng.alias_immutable[Cfg.lng])
