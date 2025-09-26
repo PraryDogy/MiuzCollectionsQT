@@ -11,9 +11,9 @@ from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
-from system.new_scaner.scaner_task import DirListScanTask
+from system.new_scaner.scaner_task import DirListScanTask, OnStartTask
 from system.tasks import (CopyFilesManager, FavManager, FilesRemover,
-                          MfDataCleaner, Utils, UThreadPool)
+                          MfDataCleaner, UThreadPool, Utils)
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
                             UHBoxLayout, UMainWindow, UVBoxLayout, WinManager)
@@ -201,8 +201,7 @@ class WinMain(UMainWindow):
         self.scaner_task = None
         self.scaner_task_canceled = False
 
-        if argv[-1] != self.argv_flag:
-            self.start_scaner_task()
+        self.on_start(argv)
 
         # test = QFrame(self)
         # test.setStyleSheet("background: red")
@@ -219,6 +218,16 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(parent, mf)
         return wrapper
+    
+    def on_start(self, argv: list[str]):
+
+        def on_finish():
+            if argv[-1] != self.argv_flag:
+                self.start_scaner_task()
+
+        self.on_start_task = OnStartTask()
+        self.on_start_task.sigs.finished_.connect(on_finish)
+        UThreadPool.start(self.on_start_task)
     
     def history_press(self):
         self.left_menu.tree_wid.expand_to_path(Dynamic.current_dir)
