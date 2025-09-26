@@ -1,7 +1,8 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
+from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
+                             QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
@@ -20,30 +21,31 @@ class BaseWinWarn(SingleActionWindow):
         self.setMinimumWidth(290)
         self.setMaximumWidth(350)
 
-        self.central_layout.setContentsMargins(10, 10, 10, 10)
-        self.central_layout.setSpacing(10)
-
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
-        h_layout = UHBoxLayout()
-        h_wid.setLayout(h_layout)
+        self.content_layout = UHBoxLayout()
+        h_wid.setLayout(self.content_layout)
 
         warning = QSvgWidget()
         warning.load(self.svg_warning)
         warning.setFixedSize(self.svg_size, self.svg_size)
-        h_layout.addWidget(warning)
+        self.content_layout.addWidget(warning)
 
-        h_layout.addSpacerItem(QSpacerItem(15, 0))
+        self.content_layout.addSpacerItem(QSpacerItem(15, 0))
 
-        v_wid = QWidget()
-        h_layout.addWidget(v_wid)
-        v_lay = UVBoxLayout()
-        v_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        v_wid.setLayout(v_lay)
+        self.right_wid = QWidget()
+        self.content_layout.addWidget(self.right_wid)
+        self.right_layout = UVBoxLayout()
+        self.right_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.right_wid.setLayout(self.right_layout)
 
         self.text_label = QLabel(text)
         self.text_label.setWordWrap(True)
-        v_lay.addWidget(self.text_label)
+        self.text_label.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding
+        )
+        self.right_layout.addWidget(self.text_label)
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):

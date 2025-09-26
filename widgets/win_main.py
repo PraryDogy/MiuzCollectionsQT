@@ -4,8 +4,8 @@ import subprocess
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
-from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QPushButton,
-                             QSplitter, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
+                             QPushButton, QSplitter, QVBoxLayout, QWidget)
 
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
@@ -461,12 +461,6 @@ class WinMain(UMainWindow):
     @with_conn
     def upload_files(self, parent: QWidget, mf: Mf, abs_paths: list):
 
-        # def shorten_path(path, max_len=50):
-        #     if len(path) <= max_len:
-        #         return path
-        #     return '…' + path[-(max_len-1):]  # оставляем конец, добавляем '…' спереди
-
-
         def shorten_path(path: str, max_len=50):
             splited = path.strip(os.sep).split(os.sep)
             max_len = max_len - len(splited[0]) - len(splited[-1])
@@ -487,14 +481,10 @@ class WinMain(UMainWindow):
             self.paste_files_here(self.grid, Mf.current)
 
         target_dir = Utils.get_abs_path(mf.curr_path, Dynamic.current_dir)
-        text = (
-            Lng.upload_files_in[Cfg.lng],
-            ":  ",
-            shorten_path(target_dir)
-        )
+
         self.upload_win = WinQuestion(
             Lng.attention[Cfg.lng],
-            "".join(text)
+            Lng.upload_files_in[Cfg.lng] + "\n" + shorten_path(target_dir)
         )
         self.upload_win.center_to_parent(self)
         self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
@@ -812,7 +802,10 @@ class WinMain(UMainWindow):
 
         for i in paths:
             if os.path.isdir(i):
-                self.win_warn = WinWarn(Lng.attention[Cfg.lng], Lng.drop_only_files[Cfg.lng])
+                self.win_warn = WinWarn(
+                    Lng.attention[Cfg.lng],
+                    Lng.drop_only_files[Cfg.lng]
+                )
                 self.win_warn.adjustSize()
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
