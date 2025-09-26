@@ -175,6 +175,7 @@ class DataSettings(QGroupBox):
         def fin():
             self.reset_data_btn.clicked.connect(self.changed.emit)
             self.reset_data_btn.clicked.connect(self.reset.emit)
+            self.reset_win.deleteLater()
 
         self.reset_win = WinQuestion(
             Lng.attention[Cfg.lng],
