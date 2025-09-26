@@ -59,9 +59,6 @@ class WinWarn(BaseWinWarn):
         ok_btn.clicked.connect(self.deleteLater)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.setMinimumWidth(300)
-        self.setMaximumWidth(500)
-        self.text_label.setWordWrap(True)
         self.adjustSize()
 
 

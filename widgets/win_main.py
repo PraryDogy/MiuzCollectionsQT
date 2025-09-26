@@ -519,7 +519,7 @@ class WinMain(UMainWindow):
         self.bar_top.settings_btn.set_solid_style()
         self.settings_win = WinSettings(settings_item)
         self.settings_win.closed.connect(self.bar_top.settings_btn.set_normal_style)
-        self.settings_win.reset_data.connect(self.reset_data_cmd)
+        self.settings_win.reset_data.connect(lambda mf: self.reset_data_cmd(mf))
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
 
@@ -698,23 +698,8 @@ class WinMain(UMainWindow):
         UThreadPool.start(self.task)
 
     def reset_data_cmd(self, mf: Mf):
-
-        def fin():
-            if mf.curr_path:
-                true_name = os.path.basename(mf.curr_path)
-            else:
-                true_name = os.path.basename(mf.paths[0])
-            alias = mf.name
-            self.win_warn = WinWarn(
-                Lng.attention[Cfg.lng],
-                f"{true_name} ({alias}): {Lng.data_was_reset[Cfg.lng].lower()}"
-            )
-            self.win_warn.center_to_parent(self.window())
-            self.win_warn.show()
-            self.restart_scaner_task()
-
         self.reset_task = MfDataCleaner(mf.name)
-        self.reset_task.sigs.finished_.connect(fin)
+        self.reset_task.sigs.finished_.connect(self.restart_scaner_task)
         UThreadPool.start(self.reset_task)
 
     def copy_files_task(self, target_dir: str, files_to_copy: list[str]):

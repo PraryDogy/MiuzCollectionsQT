@@ -565,6 +565,8 @@ class MfDataCleaner(URunnable):
         try:
             self._task()
         except Exception as e:
+            import traceback
+            print(traceback.format_exc())
             print("tasks, reset data task error:", e)
         finally:
             self.conn.close()
@@ -572,8 +574,15 @@ class MfDataCleaner(URunnable):
 
     def _task(self):
         # Удаляем битые миниатюры
-        stmt = sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.short_hash)
-        for rel_path, rel_thumb_path in self.conn.execute(stmt):
+        stmt = (
+            sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.short_hash)
+            .where(THUMBS.c.brand == self.mf_name)
+        )
+        res = self.conn.execute(stmt)
+        for rel_path, rel_thumb_path in res:
+            if not (rel_path or rel_thumb_path):
+                print(rel_path, rel_thumb_path)
+                continue
             if not os.path.exists(Utils.get_abs_hash(rel_thumb_path)):
                 self.conn.execute(
                     sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_path)

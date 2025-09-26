@@ -634,6 +634,14 @@ class MfSettings(QWidget):
         v_lay.addWidget(btn_group)
         v_lay.addStretch()
 
+    def show_finish_win(self):
+        self.finish_win = WinWarn(
+            Lng.attention[Cfg.lng],
+            f"{Lng.data_was_reset[Cfg.lng]}"
+        )
+        self.finish_win.center_to_parent(self.window())
+        self.finish_win.show()
+
     def show_reset_win(self, mf: Mf):
         self.reset_win = WinQuestion(
             Lng.attention[Cfg.lng],
@@ -641,20 +649,29 @@ class MfSettings(QWidget):
         )
         self.reset_win.center_to_parent(self.window())
         self.reset_win.ok_clicked.connect(
+            lambda: self.show_finish_win()
+        )
+        self.reset_win.ok_clicked.connect(
             lambda: self.reset_data.emit(mf)
+        )
+        self.reset_win.ok_clicked.connect(
+            lambda: self.reset_win.deleteLater()
         )
         self.reset_win.show()
 
     def show_remove_win(self):
-        self.reset_win = WinQuestion(
+        self.remove_win = WinQuestion(
             Lng.attention[Cfg.lng],
             Lng.folder_removed_text[Cfg.lng]
         )
-        self.reset_win.center_to_parent(self.window())
-        self.reset_win.ok_clicked.connect(
+        self.remove_win.center_to_parent(self.window())
+        self.remove_win.ok_clicked.connect(
             lambda: self.remove.emit()
         )
-        self.reset_win.show()
+        self.remove_win.ok_clicked.connect(
+            lambda: self.reset_win.deleteLater()
+        )
+        self.remove_win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -993,7 +1010,7 @@ class WinSettings(SingleActionWindow):
             mf_sett = MfSettings(mf)
             mf_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
             mf_sett.remove.connect(lambda: self.remove_mf(item))
-            mf_sett.reset_data.connect(self.reset_data.emit)
+            mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
             self.right_lay.insertWidget(0, mf_sett)
 
         self.settings_item.action_type = self.settings_item.type_general

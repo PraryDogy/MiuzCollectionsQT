@@ -240,7 +240,10 @@ class Lng:
     sort_by_mod_short = ("Дата изм.", "Date mod.")
     sort_by_recent_short = ("Дата доб.", "Date add.")
     reset_data = ("Сбросить данные", "Reset data")
-    data_was_reset = ("Данные сброшены", "Data reset")
+    data_was_reset = (
+        "Данные сброшены. Поиск изображений",
+        "Data reset. Searching images"
+    )
     setup = ("Настроить", "Setup")
     preparing = ("Подготовка", "Preparing")
     on_ignore_list = ("В игнор листе", "on the ignore list")
