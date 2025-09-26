@@ -599,45 +599,25 @@ class MfSettings(QWidget):
         v_lay.addWidget(advanced)
 
         # QGroupBox для кнопок и описания
-        btn_group = QGroupBox()
-        btn_group_lay = UVBoxLayout()
-        btn_group_lay.setSpacing(10)
+        btn_group = QWidget()
+        btn_group_lay = UHBoxLayout()
+        btn_group_lay.setSpacing(15)
         btn_group_lay.setContentsMargins(0, 5, 0, 5)
         btn_group.setLayout(btn_group_lay)
 
-        # Первая строка: кнопка "Сброс" и описание
-        btn_first_row = QWidget()
-        first_row_lay = UHBoxLayout()
-        first_row_lay.setSpacing(15)
-        first_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        btn_first_row.setLayout(first_row_lay)
+        btn_group_lay.addStretch()
 
         reset_btn = QPushButton(Lng.reset[Cfg.lng])
         reset_btn.clicked.connect(lambda: self.reset_data.emit(mf))
         reset_btn.setFixedWidth(100)
-        first_row_lay.addWidget(reset_btn)
-
-        first_desc = ULabel(Lng.reset_btn_description[Cfg.lng])
-        first_row_lay.addWidget(first_desc)
-
-        btn_group_lay.addWidget(btn_first_row)
-
-        # Вторая строка: кнопка "Ок" и описание
-        btn_second_row = QWidget()
-        second_row_lay = UHBoxLayout()
-        second_row_lay.setSpacing(15)
-        second_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        btn_second_row.setLayout(second_row_lay)
+        btn_group_lay.addWidget(reset_btn)
 
         remove_btn = QPushButton(Lng.delete[Cfg.lng])
         remove_btn.clicked.connect(self.remove.emit)
         remove_btn.setFixedWidth(100)
-        second_row_lay.addWidget(remove_btn)
+        btn_group_lay.addWidget(remove_btn)
 
-        second_desc = ULabel(Lng.remove_btn_description[Cfg.lng])
-        second_row_lay.addWidget(second_desc)
-
-        btn_group_lay.addWidget(btn_second_row)
+        btn_group_lay.addStretch()
 
         v_lay.addWidget(btn_group)
         v_lay.addStretch()
