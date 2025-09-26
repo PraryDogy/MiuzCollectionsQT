@@ -311,7 +311,7 @@ class NextBtn(HistoryNavBtn):
     def __init__(self):
         super().__init__()
         self.direction = +1
-        self.lbl.setText(Lng.next_[Cfg.lng])
+        self.lbl.setText(Lng.forward[Cfg.lng])
 
 
 class BarTop(QWidget):

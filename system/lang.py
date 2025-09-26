@@ -291,3 +291,4 @@ class Lng:
     go_to_folder = ("Перейти к папке", "Go to folder")
     expand_all = ("Развернуть всё", "Expand All")
     collapse_all = ("Свернуть всё", "Collapse All")
+    forward = ("Вперед", "Forward")
