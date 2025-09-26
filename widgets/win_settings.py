@@ -559,7 +559,9 @@ class MfAdvanced(QWidget):
         self.paths_wid = MfPaths(mf)
         self.paths_wid.text_changed.connect(self.changed.emit)
         v_lay.addWidget(self.paths_wid)
-        self.paths_wid.top_label.setText(Lng.images_folder_path[Cfg.lng])
+        self.paths_wid.top_label.setText(
+            self.insert_linebreaks(Lng.images_folder_path[Cfg.lng])
+        )
         text_ = "\n".join(i for i in mf.paths)
         self.paths_wid.text_edit.setPlainText(text_)
 
@@ -570,6 +572,11 @@ class MfAdvanced(QWidget):
         text_ = "\n".join(i for i in mf.stop_list)
         third_row.text_edit.setPlainText(text_)
 
+    def insert_linebreaks(self, text: str, n: int = 64) -> str:
+        return '\n'.join(
+            text[i:i+n]
+            for i in range(0, len(text), n)
+        )
 
 class ResetMfWin(WinQuestion):
     def __init__(self):
