@@ -15,6 +15,8 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
 from system.paletes import ThemeChanger
+from system.shared_utils import SharedUtils
+from system.tasks import HashDirSize, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (SettingsItem, SingleActionWindow, UHBoxLayout,
@@ -31,8 +33,7 @@ class ULabel(QLabel):
         self.setMinimumWidth(30)
 
 
-class LangReset(QGroupBox):
-    reset = pyqtSignal()
+class LangSettings(QGroupBox):
     changed = pyqtSignal()
 
     def __init__(self, json_data_copy: _Cfg):
@@ -40,7 +41,6 @@ class LangReset(QGroupBox):
         self.json_data_copy = json_data_copy
 
         v_lay = UVBoxLayout()
-        # v_lay.setSpacing(10)
         self.setLayout(v_lay)
 
         first_row_wid = QWidget()
@@ -53,28 +53,11 @@ class LangReset(QGroupBox):
         self.lang_btn.clicked.connect(self.lang_btn_cmd)
         first_row_lay.addWidget(self.lang_btn)
 
-        self.lang_label = ULabel(Lng.language[Cfg.lng])
+        self.lang_label = ULabel(Lng.language_max[Cfg.lng])
         first_row_lay.addWidget(self.lang_label)
 
-        sec_row_wid = QWidget()
-        sec_row_lay = UHBoxLayout()
-        sec_row_lay.setSpacing(15)
-        sec_row_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        sec_row_wid.setLayout(sec_row_lay)
-
-        self.reset_data_btn = QPushButton(Lng.reset[Cfg.lng])
-        self.reset_data_btn.setFixedWidth(115)
-        self.reset_data_btn.clicked.connect(self.changed.emit)
-        self.reset_data_btn.clicked.connect(self.reset.emit)
-        sec_row_lay.addWidget(self.reset_data_btn)
-
-        descr = ULabel(text=Lng.reset_settings[Cfg.lng])
-        sec_row_lay.addWidget(descr)
-
         v_lay.addWidget(first_row_wid)
-        v_lay.addWidget(sec_row_wid)
 
-        self.setFixedHeight(70)
 
     def lang_btn_cmd(self, *args):
         if self.json_data_copy.lng == 0:
@@ -83,6 +66,69 @@ class LangReset(QGroupBox):
             self.json_data_copy.lng = 0
         self.lang_btn.setText(Lng.russian[self.json_data_copy.lng])
         self.changed.emit()
+
+
+class DataSettings(QGroupBox):
+    reset = pyqtSignal()
+    changed = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.v_lay = UVBoxLayout()
+        self.setLayout(self.v_lay)
+
+        first_wid = QWidget()
+        first_lay = UHBoxLayout()
+        first_lay.setSpacing(15)
+        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        first_wid.setLayout(first_lay)
+
+        self.reset_data_btn = QPushButton(Lng.reset[Cfg.lng])
+        self.reset_data_btn.setFixedWidth(115)
+        self.reset_data_btn.clicked.connect(self.changed.emit)
+        self.reset_data_btn.clicked.connect(self.reset.emit)
+        first_lay.addWidget(self.reset_data_btn)
+
+        reset_lbl = ULabel(Lng.reset_settings[Cfg.lng])
+        first_lay.addWidget(reset_lbl)
+
+        self.v_lay.addWidget(first_wid)
+
+
+
+        sec_wid = QWidget()
+        sec_lay = UHBoxLayout()
+        sec_lay.setSpacing(15)
+        sec_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        sec_wid.setLayout(sec_lay)
+
+        self.data_size_btn = QPushButton(Lng.details[Cfg.lng])
+        self.data_size_btn.setFixedWidth(115)
+        self.data_size_btn.clicked.connect(self.changed.emit)
+        self.data_size_btn.clicked.connect(self.reset.emit)
+        sec_lay.addWidget(self.data_size_btn)
+
+        data_size_lbl = ULabel(text=Lng.data_size[Cfg.lng] + ":")
+        sec_lay.addWidget(data_size_lbl)
+
+        self.size_lbl = ULabel(Lng.calculating[Cfg.lng].lower())
+        sec_lay.addWidget(self.size_lbl)
+
+        self.v_lay.addWidget(sec_wid)
+
+        self.get_sizes()
+
+    def get_sizes(self):
+        
+        def on_finish(data: dict):
+            total_size = SharedUtils.get_f_size(
+                sum(i for i in data.values())
+            )
+            self.size_lbl.setText(total_size)
+
+        self.hashdir_size = HashDirSize()
+        self.hashdir_size.sigs.finished_.connect(on_finish)
+        UThreadPool.start(self.hashdir_size)
 
 
 class SimpleSettings(QGroupBox):
@@ -336,10 +382,14 @@ class GeneralSettings(QWidget):
         v_lay.setSpacing(10)
         self.setLayout(v_lay)
 
-        lang_reset = LangReset(json_data_copy)
-        lang_reset.reset.connect(self.set_need_reset)
+        lang_reset = LangSettings(json_data_copy)
         lang_reset.changed.connect(self.changed.emit)
         v_lay.addWidget(lang_reset)
+
+        data_settings = DataSettings()
+        data_settings.reset.connect(self.set_need_reset)
+        data_settings.changed.connect(self.changed.emit)
+        v_lay.addWidget(data_settings)
 
         simple_settings = SimpleSettings()
         v_lay.addWidget(simple_settings)
