@@ -786,23 +786,9 @@ class FiltersWid(QWidget):
         g_lay.addWidget(self.text_wid)
         self.v_lay.addWidget(group)
 
-        # Новый group box с кнопкой и описанием
-        reset_group = QGroupBox()
-        reset_lay = UHBoxLayout(reset_group)
-        reset_lay.setContentsMargins(5, 5, 5, 5)
-        reset_lay.setSpacing(10)
-
         reset_btn = UPushButton(Lng.reset[Cfg.lng])
         reset_btn.clicked.connect(self.reset_filters)
-        reset_lay.addWidget(reset_btn)
-
-        reset_label = ULabel(Lng.reset_filters_descr[Cfg.lng])
-        reset_lay.addWidget(reset_label, 1)
-
-        g_lay.addWidget(reset_group)
-
-        self.v_lay.addWidget(group)
-        self.v_lay.addStretch(1)
+        self.v_lay.addWidget(reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.v_lay.addStretch(1)
         
