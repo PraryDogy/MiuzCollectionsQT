@@ -553,6 +553,7 @@ class MfAdvanced(QWidget):
     def __init__(self, mf: Mf):
         super().__init__()
         v_lay = UVBoxLayout()
+        v_lay.setSpacing(15)
         self.setLayout(v_lay)
 
         self.paths_wid = MfPaths(mf)
@@ -586,7 +587,7 @@ class MfSettings(QWidget):
     def __init__(self, mf: Mf):
         super().__init__()
         v_lay = UVBoxLayout()
-        v_lay.setSpacing(5)
+        v_lay.setSpacing(15)
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(v_lay)
 
@@ -612,7 +613,6 @@ class MfSettings(QWidget):
         btn_group = QWidget()
         btn_group_lay = UHBoxLayout()
         btn_group_lay.setSpacing(15)
-        btn_group_lay.setContentsMargins(0, 5, 0, 5)
         btn_group.setLayout(btn_group_lay)
 
         btn_group_lay.addStretch()
