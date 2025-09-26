@@ -17,7 +17,8 @@ class BaseWinWarn(SingleActionWindow):
     def __init__(self, title: str, text: str):
         super().__init__()
         self.setWindowTitle(title)
-        self.setFixedWidth(350)
+        self.setMinimumWidth(290)
+        self.setMaximumWidth(350)
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)

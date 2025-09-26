@@ -1033,14 +1033,7 @@ class WinSettings(SingleActionWindow):
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
             else:
-                self.win_question = WinQuestion(
-                    Lng.attention[Cfg.lng],
-                    Lng.confirm_delete_folder[Cfg.lng],
-                )
-                self.win_question.center_to_parent(self)
-                self.win_question.ok_clicked.connect(fin)
-                self.win_question.ok_clicked.connect(self.win_question.deleteLater)
-                self.win_question.show()
+                fin()
 
         except Exception as e:
             print("win settings > ошибка удаления main folder по кнопке удалить", e)
