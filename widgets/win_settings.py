@@ -8,7 +8,7 @@ from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QPushButton, QSpacerItem, QSpinBox,
-                             QSplitter, QWidget)
+                             QSplitter, QWidget, QTableWidget, QTableWidgetItem, QAbstractScrollArea)
 
 from cfg import Cfg, Static, _Cfg
 from system.filters import Filters
@@ -68,6 +68,58 @@ class LangSettings(QGroupBox):
         self.changed.emit()
 
 
+class SizesWin(SingleActionWindow):
+    def __init__(self, sizes: dict[str, int], parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Размер данных / Data Sizes")
+        self.resize(400, 300)
+
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = UVBoxLayout()
+        central.setLayout(layout)
+
+        # создаём таблицу
+        self.table = QTableWidget()
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderLabels([
+            Lng.folder[Cfg.lng], Lng.file_size[Cfg.lng]
+        ])
+        self.table.horizontalHeader().setStretchLastSection(True)
+        layout.addWidget(self.table)
+
+        # заполняем таблицу
+        self.populate_table(sizes)
+
+    def populate_table(self, sizes: dict[str, int]):
+        self.table.setRowCount(len(sizes))
+        self.table.setColumnCount(2)
+        self.table.verticalHeader().setVisible(False)
+        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.table.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+
+        alignment = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        item_flags = Qt.ItemFlag.ItemIsSelectable|Qt.ItemFlag.ItemIsEnabled
+
+        for row, (folder, size) in enumerate(sizes.items()):
+            folder_item = QTableWidgetItem(folder)
+            folder_item.setFlags(item_flags)
+
+            size_item = QTableWidgetItem(SharedUtils.get_f_size(size))
+            size_item.setFlags(item_flags)
+            size_item.setTextAlignment(alignment)
+
+            self.table.setItem(row, 0, folder_item)
+            self.table.setItem(row, 1, size_item)
+
+        self.table.resizeColumnsToContents()
+        
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+
+
 class DataSettings(QGroupBox):
     reset = pyqtSignal()
     changed = pyqtSignal()
@@ -104,8 +156,6 @@ class DataSettings(QGroupBox):
 
         self.data_size_btn = QPushButton(Lng.details[Cfg.lng])
         self.data_size_btn.setFixedWidth(115)
-        self.data_size_btn.clicked.connect(self.changed.emit)
-        self.data_size_btn.clicked.connect(self.reset.emit)
         sec_lay.addWidget(self.data_size_btn)
 
         data_size_lbl = ULabel(text=Lng.data_size[Cfg.lng] + ":")
@@ -118,6 +168,11 @@ class DataSettings(QGroupBox):
 
         self.get_sizes()
 
+    def open_win(self, data: dict):
+        self.sizes_win = SizesWin(data)
+        self.sizes_win.center_to_parent(self.window())
+        self.sizes_win.show()
+
     def get_sizes(self):
         
         def on_finish(data: dict):
@@ -125,6 +180,8 @@ class DataSettings(QGroupBox):
                 sum(i for i in data.values())
             )
             self.size_lbl.setText(total_size)
+            self.data_size_btn.disconnect()
+            self.data_size_btn.clicked.connect(lambda: self.open_win(data))
 
         self.hashdir_size = HashDirSize()
         self.hashdir_size.sigs.finished_.connect(on_finish)
