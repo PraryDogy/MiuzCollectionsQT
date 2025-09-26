@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
 
 from cfg import Cfg
 from system.lang import Lng
-from system.main_folder import Mf
+from system.shared_utils import SharedUtils
 
 from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
 
@@ -39,17 +39,11 @@ class BaseWinWarn(SingleActionWindow):
         self.right_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.right_wid.setLayout(self.right_layout)
 
-        text = self.insert_linebreaks(text)
+        text = SharedUtils.insert_linebreaks(text, n = 40)
         self.text_label = QLabel(text)
         self.right_layout.addWidget(self.text_label)
 
         self.adjustSize()
-
-    def insert_linebreaks(self, text: str, n: int = 35) -> str:
-        return '\n'.join(
-            text[i:i+n]
-            for i in range(0, len(text), n)
-        )
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
