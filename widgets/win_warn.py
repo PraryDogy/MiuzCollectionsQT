@@ -89,12 +89,3 @@ class WinQuestion(BaseWinWarn):
 
         self.central_layout.addWidget(btn_wid)
         self.adjustSize()
-
-
-class WinSmb(WinWarn):
-    def __init__(self):
-        super().__init__(
-            Lng.attention[Cfg.lng],
-            "\n" + Lng.folder_access_error[Cfg.lng] + "\n"
-        )
-                

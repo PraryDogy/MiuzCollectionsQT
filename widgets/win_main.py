@@ -27,7 +27,7 @@ from .win_dates import WinDates
 from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
-from .win_warn import WinQuestion, WinSmb, WinWarn
+from .win_warn import WinQuestion, WinWarn
 
 
 class TestWid(QFrame):
@@ -489,11 +489,12 @@ class WinMain(UMainWindow):
         target_dir = Utils.get_abs_path(mf.curr_path, Dynamic.current_dir)
         text = (
             Lng.upload_files_in[Cfg.lng],
+            ":  ",
             shorten_path(target_dir)
         )
         self.upload_win = WinQuestion(
             Lng.attention[Cfg.lng],
-            "\n".join(text)
+            "".join(text)
         )
         self.upload_win.center_to_parent(self)
         self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
