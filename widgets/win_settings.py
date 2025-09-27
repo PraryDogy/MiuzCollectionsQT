@@ -1000,7 +1000,11 @@ class WinSettings(SingleActionWindow):
 
     def add_mf(self, mf: Mf):
         self.mf_list_copy.append(mf)
-        text = f"{os.path.basename(mf.curr_path)} ({mf.name})"
+        if mf.set_curr_path():
+            real_name = os.path.basename(mf.curr_path)
+        else:
+            real_name = os.path.basename(mf.paths[0])
+        text = f"{real_name} ({mf.name})"
         item = SettingsListItem(self.left_menu, text=text)
         item.setIcon(QIcon(self.svg_folder))
         item.mf = mf
