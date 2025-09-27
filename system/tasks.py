@@ -665,5 +665,10 @@ class HashDirSize(URunnable):
                 os.path.getsize(Utils.get_abs_hash(i))
                 for i in self.conn.execute(stmt).scalars()
             ])
-            main_folder_sizes[i.name] = res
+            if i.set_curr_path():
+                real_name = os.path.basename(i.curr_path)
+            else:
+                real_name = os.path.basename(i.paths[0])
+            name = f"{real_name} ({i.name})"
+            main_folder_sizes[name] = res
         return main_folder_sizes
