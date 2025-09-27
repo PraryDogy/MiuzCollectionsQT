@@ -301,3 +301,5 @@ class Lng:
         "Будут удалены все данные приложения. Продолжить?",
         "All application data will be deleted. Continue?"
     )
+    location = ("Расположение", "Location")
+    modified = ("Изменен", "Modified")

@@ -192,7 +192,7 @@ class Thumbnail(QFrame):
         font-size: 11px;
     """
 
-    def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, f_mod: str):
+    def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, f_mod: str, mod: str):
         super().__init__()
 
         # --- Исходные данные ---
@@ -200,6 +200,7 @@ class Thumbnail(QFrame):
         self.rel_path = rel_path
         self.fav_value = fav
         self.f_mod = f_mod
+        self.mod = mod
         self.name = os.path.basename(rel_path)
         if fav:
             self.name = self.sym_star + self.name
@@ -221,7 +222,9 @@ class Thumbnail(QFrame):
         self.below_text = BelowTextWid(self)
         self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.setToolTip("\n".join([rel_path, self.f_mod, ]))
+        location = f"{Lng.location[Cfg.lng]}: ...{rel_path}"
+        modified = f"{Lng.modified[Cfg.lng]}: {self.mod}"
+        self.setToolTip("\n".join([location, modified, ]))
 
         self.setup()
 
@@ -521,7 +524,8 @@ class Grid(VScrollArea):
                 pixmap=pixmap,
                 rel_path=image_item.rel_path,
                 fav=image_item.fav,
-                f_mod=image_item.f_mod
+                f_mod=image_item.f_mod,
+                mod=image_item.mod
             )
             thumbnail.set_no_frame()
             thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
