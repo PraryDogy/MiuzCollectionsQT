@@ -221,12 +221,7 @@ class Thumbnail(QFrame):
         self.below_text = BelowTextWid(self)
         self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.setToolTip("\n".join([
-                self.name,
-                os.path.dirname(self.rel_path),
-                self.f_mod,
-            ])
-        )
+        self.setToolTip("\n".join([rel_path, self.f_mod, ]))
 
         self.setup()
 
