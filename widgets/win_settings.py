@@ -100,24 +100,38 @@ class SizesWin(SingleActionWindow):
         self.table.setRowCount(len(sizes))
         self.table.setColumnCount(2)
         self.table.verticalHeader().setVisible(False)
-        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.table.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+        self.table.setSelectionBehavior(
+            QTableWidget.SelectionBehavior.SelectRows
+        )
+        self.table.setSizeAdjustPolicy(
+            QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents
+        )
+        self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        alignment = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
         item_flags = Qt.ItemFlag.ItemIsSelectable|Qt.ItemFlag.ItemIsEnabled
+        v_center = Qt.AlignmentFlag.AlignVCenter
 
         for row, (folder, size) in enumerate(sizes.items()):
             folder_item = QTableWidgetItem(folder)
-            folder_item.setFlags(item_flags)
+            folder_item.setFlags(
+                Qt.ItemFlag.ItemIsSelectable|Qt.ItemFlag.ItemIsEnabled
+            )
+            folder_item.setTextAlignment(
+                Qt.AlignmentFlag.AlignLeft | v_center
+            )
 
             size_item = QTableWidgetItem(SharedUtils.get_f_size(size))
             size_item.setFlags(item_flags)
-            size_item.setTextAlignment(alignment)
+            size_item.setTextAlignment(
+                Qt.AlignmentFlag.AlignLeft | v_center
+            )
 
             self.table.setItem(row, 0, folder_item)
             self.table.setItem(row, 1, size_item)
 
         self.table.resizeColumnsToContents()
+        self.table.setColumnWidth(0, self.width() // 2)
+        self.setFocus()
         
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
@@ -686,7 +700,7 @@ class MfSettings(QWidget):
             lambda: self.remove.emit()
         )
         self.remove_win.ok_clicked.connect(
-            lambda: self.reset_win.deleteLater()
+            lambda: self.remove_win.deleteLater()
         )
         self.remove_win.show()
 
