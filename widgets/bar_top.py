@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
@@ -294,6 +294,8 @@ class HistoryNavBtn(BarTopBtn):
             if 0 <= new_ind < len(Dynamic.history):
                 Dynamic.current_dir = Dynamic.history[new_ind]
                 self.clicked_.emit()
+                self.set_solid_style()
+                QTimer.singleShot(100, self.set_normal_style)
         except Exception as e:
             print("HistoryNavBtn error", e)
 
