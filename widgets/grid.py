@@ -121,7 +121,7 @@ class BelowTextWid(QLabel):
         if not root:
             root = os.path.basename(Mf.current.curr_path)
         first_row = self.short_text(root)
-        text = "\n".join((first_row, self.wid.f_mod))
+        text = "\n".join((first_row, self.wid.mod))
         self.setText(text)
 
         self.setStyleSheet(self.STYLE)
