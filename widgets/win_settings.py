@@ -86,8 +86,8 @@ class SizesWin(SingleActionWindow):
 
         headers = [Lng.folder[Cfg.lng], Lng.file_size[Cfg.lng], Lng.images[Cfg.lng]]
         self.table = QTableWidget()
-        self.table.setHorizontalHeaderLabels(headers)
         self.table.setColumnCount(len(headers))
+        self.table.setHorizontalHeaderLabels(headers)
         self.table.setRowCount(len(sizes))
         self.table.verticalHeader().hide()
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
