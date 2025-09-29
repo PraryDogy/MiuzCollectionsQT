@@ -19,7 +19,7 @@ class BaseWinWarn(SingleActionWindow):
         super().__init__()
         self.setWindowTitle(title)
         self.setMinimumWidth(290)
-        self.setMaximumWidth(370)
+        # self.setMaximumWidth(370)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)

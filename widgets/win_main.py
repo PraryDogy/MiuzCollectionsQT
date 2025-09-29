@@ -484,7 +484,8 @@ class WinMain(UMainWindow):
 
         self.upload_win = WinQuestion(
             Lng.attention[Cfg.lng],
-            Lng.upload_files_in[Cfg.lng] + "\n" + shorten_path(target_dir)
+            Lng.upload_files_in[Cfg.lng] + "\n" + shorten_path(target_dir),
+            100
         )
         self.upload_win.center_to_parent(self)
         self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
