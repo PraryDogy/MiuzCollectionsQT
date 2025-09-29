@@ -84,6 +84,21 @@ class SizesWin(SingleActionWindow):
         layout = UVBoxLayout()
         central.setLayout(layout)
 
+        info_widget = QWidget()
+        info_layout = UVBoxLayout(info_widget)
+        info_layout.setContentsMargins(5, 5, 5, 5)
+        info_layout.setSpacing(5)
+
+        total_size = SharedUtils.get_f_size(sum(i['size'] for i in sizes.values()))
+        first_row = QLabel(f"{Lng.data_size[Cfg.lng]}: {total_size}")
+        info_layout.addWidget(first_row)
+
+        total = sum(i["total"] for i in sizes.values())
+        sec_row = QLabel(f"{Lng.images[Cfg.lng]}: {total}")
+        info_layout.addWidget(sec_row)
+
+        layout.addWidget(info_widget)
+
         headers = [Lng.folder[Cfg.lng], Lng.file_size[Cfg.lng], Lng.images[Cfg.lng]]
         self.table = QTableWidget()
         self.table.setColumnCount(len(headers))
@@ -173,10 +188,10 @@ class DataSettings(QGroupBox):
         sec_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_wid.setLayout(sec_lay)
 
-        self.data_size_btn = UPushButton(Lng.details[Cfg.lng])
+        self.data_size_btn = UPushButton(Lng.show[Cfg.lng])
         sec_lay.addWidget(self.data_size_btn)
 
-        self.size_lbl = ULabel(text=f"{Lng.data_size[Cfg.lng]}: {Lng.calculating[Cfg.lng].lower()}")
+        self.size_lbl = ULabel(text=Lng.statistic[Cfg.lng])
         sec_lay.addWidget(self.size_lbl)
 
         self.v_lay.addWidget(sec_wid)
@@ -206,10 +221,6 @@ class DataSettings(QGroupBox):
     def get_sizes(self):
         
         def on_finish(data: dict[str, dict[int, int]]):
-            total_size = SharedUtils.get_f_size(
-                sum(i["size"] for i in data.values())
-            )
-            self.size_lbl.setText(f"{Lng.data_size[Cfg.lng]}: {total_size}")
             self.data_size_btn.disconnect()
             self.data_size_btn.clicked.connect(lambda: self.open_win(data))
 

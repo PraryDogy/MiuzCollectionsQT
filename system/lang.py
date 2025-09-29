@@ -303,3 +303,4 @@ class Lng:
     )
     location = ("Расположение", "Location")
     modified = ("Изменен", "Modified")
+    statistic = ("Статистика данных", "Data statistics")
