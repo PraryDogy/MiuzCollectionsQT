@@ -665,14 +665,15 @@ class HashDirSize(URunnable):
                 sqlalchemy.select(THUMBS.c.short_hash)
                 .where(THUMBS.c.brand == i.name)
             )
-            res = sum([
+            res = list(self.conn.execute(stmt).scalars())
+            size = sum([
                 os.path.getsize(Utils.get_abs_hash(i))
-                for i in self.conn.execute(stmt).scalars()
+                for i in res
             ])
             if i.set_curr_path():
                 real_name = os.path.basename(i.curr_path)
             else:
                 real_name = os.path.basename(i.paths[0])
             name = f"{real_name} ({i.name})"
-            main_folder_sizes[name] = res
+            main_folder_sizes[name] = {"size": size, "total": len(res)}
         return main_folder_sizes

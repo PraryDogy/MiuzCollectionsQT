@@ -77,7 +77,7 @@ class SizesWin(SingleActionWindow):
     def __init__(self, sizes: dict[str, int], parent=None):
         super().__init__(parent)
         self.setWindowTitle(Lng.data_size[Cfg.lng])
-        self.resize(400, 300)
+        self.resize(500, 330)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -86,9 +86,9 @@ class SizesWin(SingleActionWindow):
 
         # создаём таблицу
         self.table = QTableWidget()
-        self.table.setColumnCount(2)
+        self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels([
-            Lng.folder[Cfg.lng], Lng.file_size[Cfg.lng]
+            Lng.folder[Cfg.lng], Lng.file_size[Cfg.lng], Lng.images[Cfg.lng],
         ])
         self.table.horizontalHeader().setStretchLastSection(True)
         layout.addWidget(self.table)
@@ -96,9 +96,8 @@ class SizesWin(SingleActionWindow):
         # заполняем таблицу
         self.populate_table(sizes)
 
-    def populate_table(self, sizes: dict[str, int]):
+    def populate_table(self, sizes: dict[str, dict]):
         self.table.setRowCount(len(sizes))
-        self.table.setColumnCount(2)
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(
             QTableWidget.SelectionBehavior.SelectRows
@@ -111,7 +110,7 @@ class SizesWin(SingleActionWindow):
         item_flags = Qt.ItemFlag.ItemIsSelectable|Qt.ItemFlag.ItemIsEnabled
         v_center = Qt.AlignmentFlag.AlignVCenter
 
-        for row, (folder, size) in enumerate(sizes.items()):
+        for row, (folder, data) in enumerate(sizes.items()):
             folder_item = QTableWidgetItem(folder)
             folder_item.setFlags(
                 Qt.ItemFlag.ItemIsSelectable|Qt.ItemFlag.ItemIsEnabled
@@ -120,17 +119,29 @@ class SizesWin(SingleActionWindow):
                 Qt.AlignmentFlag.AlignLeft | v_center
             )
 
-            size_item = QTableWidgetItem(SharedUtils.get_f_size(size))
+            size_item = QTableWidgetItem(SharedUtils.get_f_size(data["size"]))
             size_item.setFlags(item_flags)
             size_item.setTextAlignment(
                 Qt.AlignmentFlag.AlignLeft | v_center
             )
 
+            total_item = QTableWidgetItem(str(data["total"]))
+            total_item.setFlags(item_flags)
+            total_item.setTextAlignment(
+                Qt.AlignmentFlag.AlignLeft | v_center
+            )
+
             self.table.setItem(row, 0, folder_item)
             self.table.setItem(row, 1, size_item)
+            self.table.setItem(row, 2, total_item)
 
-        self.table.resizeColumnsToContents()
-        self.table.setColumnWidth(0, self.width() // 2)
+        name_width = self.width() // 2
+        other_width = self.width() // 4 - 2
+
+        self.table.setColumnWidth(0, name_width)
+        self.table.setColumnWidth(1, other_width)
+        self.table.setColumnWidth(2, other_width)
+        # self.table.resizeColumnsToContents()
         self.setFocus()
         
     def keyPressEvent(self, a0):
@@ -206,9 +217,9 @@ class DataSettings(QGroupBox):
 
     def get_sizes(self):
         
-        def on_finish(data: dict):
+        def on_finish(data: dict[str, dict[int, int]]):
             total_size = SharedUtils.get_f_size(
-                sum(i for i in data.values())
+                sum(i["size"] for i in data.values())
             )
             self.size_lbl.setText(total_size)
             self.data_size_btn.disconnect()
