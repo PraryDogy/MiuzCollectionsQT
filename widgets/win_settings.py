@@ -89,16 +89,22 @@ class SizesWin(SingleActionWindow):
         self.table.setHorizontalHeaderLabels(headers)
         self.table.setColumnCount(len(headers))
         self.table.setRowCount(len(sizes))
-        self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.verticalHeader().setVisible(False)
+        self.table.verticalHeader().hide()
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.table.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.table.horizontalScrollBar().setDisabled(True)
         self.table.horizontalScrollBar().hide()
+
+        name_width = self.width() // 2
+        other_width = self.width() // 4
+        self.table.setColumnWidth(0, name_width)
+        self.table.setColumnWidth(1, other_width)
+        self.table.setColumnWidth(2, other_width)
+
         layout.addWidget(self.table)
 
         self.populate_table(sizes)
+        self.setFocus()
 
     def populate_table(self, sizes: dict[str, dict]):
         item_flags = Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
@@ -128,14 +134,6 @@ class SizesWin(SingleActionWindow):
             self.table.setItem(row, 0, folder_item)
             self.table.setItem(row, 1, size_item)
             self.table.setItem(row, 2, total_item)
-
-        name_width = self.width() // 2
-        other_width = self.width() // 4
-
-        self.table.setColumnWidth(0, name_width)
-        self.table.setColumnWidth(1, other_width)
-        self.table.setColumnWidth(2, other_width)
-        self.setFocus()
         
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
