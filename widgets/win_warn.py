@@ -15,7 +15,7 @@ class BaseWinWarn(SingleActionWindow):
     svg_warning = "./images/warning.svg"
     svg_size = 40
 
-    def __init__(self, title: str, text: str):
+    def __init__(self, title: str, text: str, char_limit: int):
         super().__init__()
         self.setWindowTitle(title)
         self.setMinimumWidth(290)
@@ -39,7 +39,7 @@ class BaseWinWarn(SingleActionWindow):
         self.right_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.right_wid.setLayout(self.right_layout)
 
-        text = SharedUtils.insert_linebreaks(text, n = 40)
+        text = SharedUtils.insert_linebreaks(text, char_limit)
         self.text_label = QLabel(text)
         self.right_layout.addWidget(self.text_label)
 
@@ -51,8 +51,8 @@ class BaseWinWarn(SingleActionWindow):
 
 
 class WinWarn(BaseWinWarn):
-    def __init__(self, title: str, text: str):
-        super().__init__(title, text)
+    def __init__(self, title: str, text: str, char_limit: int = 40):
+        super().__init__(title, text, char_limit)
         ok_btn = QPushButton(text=Lng.ok[Cfg.lng])
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.deleteLater)
@@ -62,8 +62,8 @@ class WinWarn(BaseWinWarn):
 class WinQuestion(BaseWinWarn):
     ok_clicked = pyqtSignal()
 
-    def __init__(self, title: str, text: str):
-        super().__init__(title, text)
+    def __init__(self, title: str, text: str, char_limit = 40):
+        super().__init__(title, text, char_limit)
 
         btn_wid = QWidget()
         btn_lay = UHBoxLayout()
