@@ -446,18 +446,6 @@ class Grid(VScrollArea):
         self.load_grid_container()
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
-    # def go_to_widget(self, rel_path: str):
-
-    #     def delayed_cmd():
-    #         print(rel_path, self.path_to_wid)
-    #         if not self.path_to_wid:
-    #             QTimer.singleShot(500, delayed_cmd)
-    #         elif rel_path in self.path_to_wid:
-    #             self.ensureWidgetVisible(self.path_to_wid[rel_path])
-
-    #     self.reload_thumbnails()
-    #     delayed_cmd()
-
     def reload_thumbnails(self):
         Dynamic.loaded_thumbs = 0
         self.load_db_images_task(self.load_initial_grid)

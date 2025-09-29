@@ -6,16 +6,17 @@ from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import (QColor, QContextMenuEvent, QImage, QKeyEvent,
                          QMouseEvent, QPainter, QPaintEvent, QPixmap,
                          QResizeEvent)
-from PyQt5.QtWidgets import QFrame, QLabel, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
+from system.shared_utils import SharedUtils
 from system.tasks import OneImgLoader, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (AppModalWindow, SvgShadowed, UHBoxLayout, UMenu,
-                            UVBoxLayout)
+                            USubMenu, UVBoxLayout)
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SaveAs, SetFav,
                       WinInfoAction)
 from .grid import Thumbnail
@@ -180,6 +181,7 @@ class WinImageView(AppModalWindow):
     reveal_in_finder = pyqtSignal(list)
     set_fav = pyqtSignal(tuple)
     save_files = pyqtSignal(tuple)
+    open_in_app = pyqtSignal(tuple)
     
     task_count_limit = 10
     ww, hh = 700, 500
@@ -189,6 +191,7 @@ class WinImageView(AppModalWindow):
     def __init__(self, rel_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
 
+        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
         self.cached_images: dict[str, QPixmap] = {}
         self.is_selection = is_selection
         self.path_to_wid = path_to_wid
@@ -405,11 +408,27 @@ class WinImageView(AppModalWindow):
         self.menu_ = UMenu(event=ev)
         rel_paths = [self.rel_path]
 
-        info = WinInfoAction(self.menu_)
-        info.triggered.connect(
-            lambda: self.open_win_info.emit(rel_paths)
+        # открыть в приложении
+        open_menu = USubMenu(
+            f"{Lng.open_in[Cfg.lng]} ({len(rel_paths)})",
+            self.menu_
         )
-        self.menu_.addAction(info)
+
+        act = QAction(Lng.open_default[Cfg.lng], open_menu)
+        act.triggered.connect(
+            lambda: self.open_in_app.emit((rel_paths, None))
+        )
+        open_menu.addAction(act)
+        open_menu.addSeparator()
+
+        for app_path, basename in self.image_apps.items():
+            act = QAction(basename, open_menu)
+            act.triggered.connect(
+                lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))
+            )
+            open_menu.addAction(act)
+
+        self.menu_.addMenu(open_menu)
 
         self.fav_action = SetFav(self.menu_, self.wid.fav_value)
         self.fav_action.triggered.connect(
@@ -419,7 +438,19 @@ class WinImageView(AppModalWindow):
         )
         self.menu_.addAction(self.fav_action)
 
+        info = WinInfoAction(self.menu_)
+        info.triggered.connect(
+            lambda: self.open_win_info.emit(rel_paths)
+        )
+        self.menu_.addAction(info)
+
         self.menu_.addSeparator()
+
+        reveal = RevealInFinder(self.menu_, 1)
+        reveal.triggered.connect(
+            lambda: self.reveal_in_finder.emit(rel_paths)
+        )
+        self.menu_.addAction(reveal)
 
         copy_path = CopyPath(self.menu_, 1)
         copy_path.triggered.connect(
@@ -433,11 +464,7 @@ class WinImageView(AppModalWindow):
         )
         self.menu_.addAction(copy_name)
 
-        reveal = RevealInFinder(self.menu_, 1)
-        reveal.triggered.connect(
-            lambda: self.reveal_in_finder.emit(rel_paths)
-        )
-        self.menu_.addAction(reveal)
+        self.menu_.addSeparator()
 
         save = Save(self.menu_, 1)
         save.triggered.connect(

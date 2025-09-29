@@ -564,6 +564,9 @@ class WinMain(UMainWindow):
         self.view_win.no_connection.connect(
             lambda: self.open_win_smb(self.view_win, Mf.current)
         )
+        self.view_win.open_in_app.connect(
+            lambda data: self.open_in_app(self.window(), Mf.current, data)
+        )
         self.view_win.center_to_parent(self.window())
         self.view_win.show()
 
