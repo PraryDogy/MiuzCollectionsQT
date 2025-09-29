@@ -176,10 +176,7 @@ class DataSettings(QGroupBox):
         self.data_size_btn = UPushButton(Lng.details[Cfg.lng])
         sec_lay.addWidget(self.data_size_btn)
 
-        data_size_lbl = ULabel(text=Lng.data_size[Cfg.lng] + ":")
-        sec_lay.addWidget(data_size_lbl)
-
-        self.size_lbl = ULabel(Lng.calculating[Cfg.lng].lower())
+        self.size_lbl = ULabel(text=f"{Lng.data_size[Cfg.lng]}: {Lng.calculating[Cfg.lng].lower()}")
         sec_lay.addWidget(self.size_lbl)
 
         self.v_lay.addWidget(sec_wid)
@@ -212,7 +209,7 @@ class DataSettings(QGroupBox):
             total_size = SharedUtils.get_f_size(
                 sum(i["size"] for i in data.values())
             )
-            self.size_lbl.setText(total_size)
+            self.size_lbl.setText(f"{Lng.data_size[Cfg.lng]}: {total_size}")
             self.data_size_btn.disconnect()
             self.data_size_btn.clicked.connect(lambda: self.open_win(data))
 
