@@ -101,6 +101,7 @@ class SizesWin(SingleActionWindow):
 
         headers = [Lng.folder[Cfg.lng], Lng.file_size[Cfg.lng], Lng.images[Cfg.lng]]
         self.table = QTableWidget()
+        self.table.setSortingEnabled(True)
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
         self.table.setRowCount(len(sizes))
