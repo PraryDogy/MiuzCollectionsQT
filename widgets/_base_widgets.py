@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QMainWindow, QMenu, QScrollArea, QTextEdit,
                              QVBoxLayout, QWidget)
 
-from cfg import Cfg, Static
+from cfg import cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.utils import Utils
@@ -129,9 +129,9 @@ class ULineEdit(QLineEdit):
         self.menu_.setFixedWidth(self.menu_width)
 
         actions = [
-            (Lng.cut[Cfg.lng], self.cut_selection),
-            (Lng.copy[Cfg.lng], lambda: Utils.copy_text(self.selectedText())),
-            (Lng.paste[Cfg.lng], self.paste_text),
+            (Lng.cut[cfg.lng], self.cut_selection),
+            (Lng.copy[cfg.lng], lambda: Utils.copy_text(self.selectedText())),
+            (Lng.paste[cfg.lng], self.paste_text),
         ]
 
         for text, slot in actions:
@@ -226,9 +226,9 @@ class UTextEdit(QTextEdit):
         menu_.setFixedWidth(120)
 
         actions = [
-            (Lng.cut[Cfg.lng], self.cut_selection),
-            (Lng.copy[Cfg.lng], self.copy_selection),
-            (Lng.paste[Cfg.lng], self.paste_text),
+            (Lng.cut[cfg.lng], self.cut_selection),
+            (Lng.copy[cfg.lng], self.copy_selection),
+            (Lng.paste[cfg.lng], self.paste_text),
         ]
 
         for text, slot in actions:

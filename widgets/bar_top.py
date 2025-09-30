@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 
-from cfg import Cfg, Dynamic, Static
+from cfg import cfg, Dynamic, Static
 from system.filters import Filters
 from system.lang import Lng
 
@@ -93,7 +93,7 @@ class DatesBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__()
-        self.lbl.setText(Lng.dates[Cfg.lng])
+        self.lbl.setText(Lng.dates[cfg.lng])
         self.svg_btn.load(self.ICON_PATH)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -120,7 +120,7 @@ class FiltersBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__()
-        self.lbl.setText(Lng.filters[Cfg.lng])
+        self.lbl.setText(Lng.filters[cfg.lng])
         self.svg_btn.load(self.ICON_PATH)
         
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -157,12 +157,12 @@ class FiltersBtn(BarTopBtn):
             menu = UMenu(self)
             menu.setMinimumWidth(self.menu_ww)
 
-            favs = QAction(Lng.favorites[Cfg.lng], self, checkable=True)
+            favs = QAction(Lng.favorites[cfg.lng], self, checkable=True)
             favs.setChecked(Dynamic.filter_favs)
             favs.triggered.connect(favs_cmd)
             menu.addAction(favs)
 
-            only_folder = QAction(Lng.only_this_folder[Cfg.lng], self, checkable=True)
+            only_folder = QAction(Lng.only_this_folder[cfg.lng], self, checkable=True)
             only_folder.setChecked(Dynamic.filter_only_folder)
             only_folder.triggered.connect(only_folder_cmd)
             menu.addAction(only_folder)
@@ -179,11 +179,11 @@ class FiltersBtn(BarTopBtn):
             # --- Разделитель и пункт сброса ---
             menu.addSeparator()
 
-            edit = QAction(Lng.setup[Cfg.lng], self)
+            edit = QAction(Lng.setup[cfg.lng], self)
             edit.triggered.connect(edit_filters)
             menu.addAction(edit)
             
-            act_reset = QAction(Lng.reset[Cfg.lng], menu)
+            act_reset = QAction(Lng.reset[cfg.lng], menu)
             act_reset.triggered.connect(reset)
             menu.addAction(act_reset)
 
@@ -220,7 +220,7 @@ class SortBtn(BarTopBtn):
 
     def set_text(self):
         """Устанавливает текст кнопки в зависимости от текущей сортировки."""
-        text = Lng.sort_by_mod_short[Cfg.lng] if Dynamic.sort_by_mod else Lng.sort_by_recent_short[Cfg.lng]
+        text = Lng.sort_by_mod_short[cfg.lng] if Dynamic.sort_by_mod else Lng.sort_by_recent_short[cfg.lng]
         self.lbl.setText(text)
 
     def menu_clicked(self, value: bool):
@@ -236,8 +236,8 @@ class SortBtn(BarTopBtn):
             menu = UMenu(ev)
 
             # --- Создаем пункты меню ---
-            act_mod = QAction(Lng.sort_by_mod[Cfg.lng], self, checkable=True)
-            act_recent = QAction(Lng.sort_by_recent[Cfg.lng], self, checkable=True)
+            act_mod = QAction(Lng.sort_by_mod[cfg.lng], self, checkable=True)
+            act_recent = QAction(Lng.sort_by_recent[cfg.lng], self, checkable=True)
 
             act_mod.setChecked(Dynamic.sort_by_mod)
             act_recent.setChecked(not Dynamic.sort_by_mod)
@@ -269,7 +269,7 @@ class SettingsBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__()
-        self.lbl.setText(Lng.settings[Cfg.lng])
+        self.lbl.setText(Lng.settings[cfg.lng])
         self.svg_btn.load(self.ICON_PATH)
 
 
@@ -305,7 +305,7 @@ class BackBtn(HistoryNavBtn):
     def __init__(self):
         super().__init__()
         self.direction = -1
-        self.lbl.setText(Lng.back[Cfg.lng])
+        self.lbl.setText(Lng.back[cfg.lng])
 
 
 class NextBtn(HistoryNavBtn):
@@ -313,7 +313,7 @@ class NextBtn(HistoryNavBtn):
     def __init__(self):
         super().__init__()
         self.direction = +1
-        self.lbl.setText(Lng.forward[Cfg.lng])
+        self.lbl.setText(Lng.forward[cfg.lng])
 
 
 class BarTop(QWidget):

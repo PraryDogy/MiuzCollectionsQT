@@ -61,7 +61,7 @@ class Dynamic:
     history: list[str] = []
 
 
-class _Cfg:
+class Cfg:
     def __init__(self):
         self.app_ver: str = Static.app_ver
         self.lng: int = 0
@@ -159,4 +159,4 @@ class _Cfg:
         self.set_json_data()
 
 
-Cfg = _Cfg()
+cfg = Cfg()

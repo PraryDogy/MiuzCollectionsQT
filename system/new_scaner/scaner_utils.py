@@ -6,7 +6,7 @@ import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import Cfg, Static
+from cfg import cfg, Static
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
@@ -127,7 +127,7 @@ class DirsLoader(QObject):
         stack = [self.mf_path]
         
         self.progress_text.emit(
-            f"{self.true_name} ({self.alias}): {Lng.search_in[Cfg.lng].lower()}"
+            f"{self.true_name} ({self.alias}): {Lng.search_in[cfg.lng].lower()}"
         )
 
         def iter_dir(entry: os.DirEntry):
@@ -274,7 +274,7 @@ class ImgLoader(QObject):
         """
 
         self.progress_text.emit(
-            f"{self.true_name} ({self.alias}): {Lng.search[Cfg.lng].lower()}"
+            f"{self.true_name} ({self.alias}): {Lng.search[cfg.lng].lower()}"
         )
         finder_images = []
 
@@ -423,7 +423,7 @@ class _ImgHashdirUpdater(QObject):
     
     def send_text(self):
         self.progress_text.emit(
-            f"{self.true_name} ({self.alias}): {Lng.updating[Cfg.lng].lower()} ({self.total})"
+            f"{self.true_name} ({self.alias}): {Lng.updating[cfg.lng].lower()} ({self.total})"
             )
 
     def create_thumb(self, path: str) -> ndarray | None:

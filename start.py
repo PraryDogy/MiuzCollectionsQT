@@ -71,7 +71,7 @@ from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
 
-from cfg import Cfg
+from cfg import cfg
 from system.database import Dbase
 from system.filters import Filters
 from system.main_folder import Mf
@@ -85,7 +85,7 @@ class App(QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
 
-        Cfg.initialize()
+        cfg.initialize()
         Filters.init()
         Dbase.init()
         Mf.init()

@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QPushButton, QSpacerItem, QSpinBox,
                              QSplitter, QWidget, QTableWidget, QTableWidgetItem, QAbstractScrollArea)
 
-from cfg import Cfg, Static, _Cfg
+from cfg import cfg, Static, Cfg
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
@@ -42,7 +42,7 @@ class UPushButton(QPushButton):
 class LangSettings(QGroupBox):
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: _Cfg):
+    def __init__(self, json_data_copy: Cfg):
         super().__init__()
         self.json_data_copy = json_data_copy
 
@@ -54,11 +54,11 @@ class LangSettings(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.lang_btn = UPushButton(text=Lng.russian[Cfg.lng])
+        self.lang_btn = UPushButton(text=Lng.russian[cfg.lng])
         self.lang_btn.clicked.connect(self.lang_btn_cmd)
         first_row_lay.addWidget(self.lang_btn)
 
-        self.lang_label = ULabel(Lng.language_max[Cfg.lng])
+        self.lang_label = ULabel(Lng.language_max[cfg.lng])
         first_row_lay.addWidget(self.lang_label)
 
         v_lay.addWidget(first_row_wid)
@@ -76,7 +76,7 @@ class LangSettings(QGroupBox):
 class SizesWin(SingleActionWindow):
     def __init__(self, sizes: dict[str, int], parent=None):
         super().__init__(parent)
-        self.setWindowTitle(Lng.data_size[Cfg.lng])
+        self.setWindowTitle(Lng.data_size[cfg.lng])
         self.resize(500, 330)
 
         central = QWidget()
@@ -90,16 +90,16 @@ class SizesWin(SingleActionWindow):
         info_layout.setSpacing(5)
 
         total_size = SharedUtils.get_f_size(sum(i['size'] for i in sizes.values()))
-        first_row = QLabel(f"{Lng.data_size[Cfg.lng]}: {total_size}")
+        first_row = QLabel(f"{Lng.data_size[cfg.lng]}: {total_size}")
         info_layout.addWidget(first_row)
 
         total = sum(i["total"] for i in sizes.values())
-        sec_row = QLabel(f"{Lng.images[Cfg.lng]}: {total}")
+        sec_row = QLabel(f"{Lng.images[cfg.lng]}: {total}")
         info_layout.addWidget(sec_row)
 
         layout.addWidget(info_widget)
 
-        headers = [Lng.folder[Cfg.lng], Lng.file_size[Cfg.lng], Lng.images[Cfg.lng]]
+        headers = [Lng.folder[cfg.lng], Lng.file_size[cfg.lng], Lng.images[cfg.lng]]
         self.table = QTableWidget()
         self.table.setSortingEnabled(True)
         self.table.setColumnCount(len(headers))
@@ -172,11 +172,11 @@ class DataSettings(QGroupBox):
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_wid.setLayout(first_lay)
 
-        self.reset_data_btn = UPushButton(Lng.reset[Cfg.lng])
+        self.reset_data_btn = UPushButton(Lng.reset[cfg.lng])
         self.reset_data_btn.clicked.connect(self.reset_cmd)
         first_lay.addWidget(self.reset_data_btn)
 
-        reset_lbl = ULabel(Lng.reset_settings[Cfg.lng])
+        reset_lbl = ULabel(Lng.reset_settings[cfg.lng])
         first_lay.addWidget(reset_lbl)
 
         self.v_lay.addWidget(first_wid)
@@ -189,10 +189,10 @@ class DataSettings(QGroupBox):
         sec_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         sec_wid.setLayout(sec_lay)
 
-        self.data_size_btn = UPushButton(Lng.show[Cfg.lng])
+        self.data_size_btn = UPushButton(Lng.show[cfg.lng])
         sec_lay.addWidget(self.data_size_btn)
 
-        self.size_lbl = ULabel(text=Lng.statistic[Cfg.lng])
+        self.size_lbl = ULabel(text=Lng.statistic[cfg.lng])
         sec_lay.addWidget(self.size_lbl)
 
         self.v_lay.addWidget(sec_wid)
@@ -207,8 +207,8 @@ class DataSettings(QGroupBox):
             self.reset_win.deleteLater()
 
         self.reset_win = WinQuestion(
-            Lng.attention[Cfg.lng],
-            Lng.reset_settings_max[Cfg.lng]
+            Lng.attention[cfg.lng],
+            Lng.reset_settings_max[cfg.lng]
         )
         self.reset_win.ok_clicked.connect(fin)
         self.reset_win.center_to_parent(self.window())
@@ -244,11 +244,11 @@ class SimpleSettings(QGroupBox):
         first_row_lay.setSpacing(15)
         first_row_wid.setLayout(first_row_lay)
 
-        self.show_files_btn = UPushButton(text=Lng.show[Cfg.lng])
+        self.show_files_btn = UPushButton(text=Lng.show[cfg.lng])
         self.show_files_btn.clicked.connect(self.show_files_cmd)
         first_row_lay.addWidget(self.show_files_btn)
 
-        self.lang_label = ULabel(Lng.show_system_files[Cfg.lng])
+        self.lang_label = ULabel(Lng.show_system_files[cfg.lng])
         first_row_lay.addWidget(self.lang_label)
 
     def show_files_cmd(self, *args):
@@ -261,7 +261,7 @@ class SimpleSettings(QGroupBox):
 class ScanerSettings(QGroupBox):
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: _Cfg):
+    def __init__(self, json_data_copy: Cfg):
         super().__init__()
         self.json_data_copy = json_data_copy
 
@@ -281,12 +281,12 @@ class ScanerSettings(QGroupBox):
         self.spin.setMaximum(60)
         self.spin.setFixedHeight(27)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
-        self.spin.setSuffix(f" {Lng.minutes[Cfg.lng]}")
+        self.spin.setSuffix(f" {Lng.minutes[cfg.lng]}")
         self.spin.setValue(self.json_data_copy.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
         self.spin_lay.addWidget(self.spin)
 
-        label = ULabel(Lng.search_interval[Cfg.lng], self)
+        label = ULabel(Lng.search_interval[cfg.lng], self)
         self.spin_lay.addWidget(label)
 
         self.change_spin_width()
@@ -296,7 +296,7 @@ class ScanerSettings(QGroupBox):
         self.changed.emit()
 
     def change_spin_width(self):
-        if Cfg.dark_mode == 0:
+        if cfg.dark_mode == 0:
             self.spin.setFixedWidth(109)
         else:
             self.spin.setFixedWidth(115)
@@ -375,15 +375,15 @@ class Themes(QGroupBox):
 
         self.system_theme = ThemesBtn(
             self.svg_theme_system,
-            Lng.theme_auto[Cfg.lng]
+            Lng.theme_auto[cfg.lng]
         )
         self.dark_theme = ThemesBtn(
             self.svg_theme_dark,
-            Lng.theme_dark[Cfg.lng]
+            Lng.theme_dark[cfg.lng]
         )
         self.light_theme = ThemesBtn(
             self.svg_theme_light,
-            Lng.theme_light[Cfg.lng]
+            Lng.theme_light[cfg.lng]
         )
 
         for f in (self.system_theme, self.dark_theme, self.light_theme):
@@ -391,11 +391,11 @@ class Themes(QGroupBox):
             self.frames.append(f)
             f.clicked.connect(self.on_frame_clicked)
 
-        if Cfg.dark_mode == 0:
+        if cfg.dark_mode == 0:
             self.set_selected(self.system_theme)
-        elif Cfg.dark_mode == 1:
+        elif cfg.dark_mode == 1:
             self.set_selected(self.dark_theme)
-        elif Cfg.dark_mode == 2:
+        elif cfg.dark_mode == 2:
             self.set_selected(self.light_theme)
 
     def on_frame_clicked(self):
@@ -403,11 +403,11 @@ class Themes(QGroupBox):
         self.set_selected(sender)
 
         if sender == self.system_theme:
-            Cfg.dark_mode = 0
+            cfg.dark_mode = 0
         elif sender == self.dark_theme:
-            Cfg.dark_mode = 1
+            cfg.dark_mode = 1
         elif sender == self.light_theme:
-            Cfg.dark_mode = 2
+            cfg.dark_mode = 2
 
         ThemeChanger.init()
         self.clicked.emit()
@@ -433,13 +433,13 @@ class SelectableLabel(ULabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng])
+        copy_text = QAction(parent=context_menu, text=Lng.copy[cfg.lng])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng])
+        select_all = QAction(parent=context_menu, text=Lng.copy_all[cfg.lng])
         select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -472,7 +472,7 @@ class AboutWid(QGroupBox):
 class GeneralSettings(QWidget):
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: _Cfg, need_reset: list[bool]):
+    def __init__(self, json_data_copy: Cfg, need_reset: list[bool]):
         super().__init__()
         self.need_reset = need_reset
         v_lay = UVBoxLayout()
@@ -547,7 +547,7 @@ class MfPaths(DropableGroupBox):
         super().__init__()
         self.mf = mf
         self.text_changed.connect(self.set_data)
-        self.text_edit.setPlaceholderText(Lng.folder_path[Cfg.lng])
+        self.text_edit.setPlaceholderText(Lng.folder_path[cfg.lng])
 
     def set_data(self, *args):
         self.mf.paths = self.get_data()
@@ -569,7 +569,7 @@ class StopList(DropableGroupBox):
         super().__init__()
         self.mf = mf
         self.text_changed.connect(self.set_data)
-        self.text_edit.setPlaceholderText(Lng.ignore_list[Cfg.lng])
+        self.text_edit.setPlaceholderText(Lng.ignore_list[cfg.lng])
 
     def set_data(self, *args):
         self.mf.stop_list = self.get_data()
@@ -599,7 +599,7 @@ class MfAdvanced(QWidget):
         self.paths_wid.text_changed.connect(self.changed.emit)
         v_lay.addWidget(self.paths_wid)
         self.paths_wid.top_label.setText(
-            self.insert_linebreaks(Lng.images_folder_path[Cfg.lng])
+            self.insert_linebreaks(Lng.images_folder_path[cfg.lng])
         )
         text_ = "\n".join(i for i in mf.paths)
         self.paths_wid.text_edit.setPlainText(text_)
@@ -607,7 +607,7 @@ class MfAdvanced(QWidget):
         third_row = StopList(mf)
         third_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(third_row)
-        third_row.top_label.setText(Lng.ignore_list_descr[Cfg.lng])
+        third_row.top_label.setText(Lng.ignore_list_descr[cfg.lng])
         text_ = "\n".join(i for i in mf.stop_list)
         third_row.text_edit.setPlainText(text_)
 
@@ -620,7 +620,7 @@ class MfAdvanced(QWidget):
 class ResetMfWin(WinQuestion):
     def __init__(self):
         super().__init__(
-            Lng.attention[Cfg.lng],
+            Lng.attention[cfg.lng],
             "Описательный текст бла бла бла"
         )
 
@@ -644,7 +644,7 @@ class MfSettings(QWidget):
         first_lay = UHBoxLayout()
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_row.setLayout(first_lay)
-        name_descr = ULabel(Lng.alias[Cfg.lng] + ":")
+        name_descr = ULabel(Lng.alias[cfg.lng] + ":")
         first_lay.addWidget(name_descr)
         name_label = ULabel(mf.name)
         first_lay.addWidget(name_label)
@@ -661,13 +661,13 @@ class MfSettings(QWidget):
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btn_group.setLayout(btn_lay)
 
-        self.reset_btn = UPushButton(Lng.reset[Cfg.lng])
+        self.reset_btn = UPushButton(Lng.reset[cfg.lng])
         self.reset_btn.clicked.connect(
             lambda: self.show_reset_win(mf)
         )
         btn_lay.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.remove_btn = UPushButton(Lng.delete[Cfg.lng])
+        self.remove_btn = UPushButton(Lng.delete[cfg.lng])
         self.remove_btn.clicked.connect(
             lambda: self.show_remove_win()
         )
@@ -678,16 +678,16 @@ class MfSettings(QWidget):
 
     def show_finish_win(self):
         self.finish_win = WinWarn(
-            Lng.attention[Cfg.lng],
-            f"{Lng.data_was_reset[Cfg.lng]}"
+            Lng.attention[cfg.lng],
+            f"{Lng.data_was_reset[cfg.lng]}"
         )
         self.finish_win.center_to_parent(self.window())
         self.finish_win.show()
 
     def show_reset_win(self, mf: Mf):
         self.reset_win = WinQuestion(
-            Lng.attention[Cfg.lng],
-            Lng.reset_mf_text[Cfg.lng]
+            Lng.attention[cfg.lng],
+            Lng.reset_mf_text[cfg.lng]
         )
         self.reset_win.center_to_parent(self.window())
         self.reset_win.ok_clicked.connect(
@@ -703,8 +703,8 @@ class MfSettings(QWidget):
 
     def show_remove_win(self):
         self.remove_win = WinQuestion(
-            Lng.attention[Cfg.lng],
-            Lng.folder_removed_text[Cfg.lng]
+            Lng.attention[cfg.lng],
+            Lng.folder_removed_text[cfg.lng]
         )
         self.remove_win.center_to_parent(self.window())
         self.remove_win.ok_clicked.connect(
@@ -741,14 +741,14 @@ class NewFolder(QWidget):
         first_lay = UVBoxLayout()
         first_row.setLayout(first_lay)
         self.name_label = ULineEdit()
-        self.name_label.setPlaceholderText(Lng.alias_immutable[Cfg.lng])
+        self.name_label.setPlaceholderText(Lng.alias_immutable[cfg.lng])
         self.name_label.textChanged.connect(self.name_cmd)
         first_lay.addWidget(self.name_label)
 
         self.advanced = MfAdvanced(self.mf)
         v_lay.addWidget(self.advanced)
 
-        self.save_btn = UPushButton(Lng.save[Cfg.lng])
+        self.save_btn = UPushButton(Lng.save[cfg.lng])
         self.save_btn.clicked.connect(self.save)
         v_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -767,22 +767,22 @@ class NewFolder(QWidget):
     def save(self):        
         if not self.mf.name:
             self.win_warn = WinWarn(
-                Lng.attention[Cfg.lng],
-                Lng.enter_alias_warning[Cfg.lng]
+                Lng.attention[cfg.lng],
+                Lng.enter_alias_warning[cfg.lng]
                 )
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         elif any(i.name == self.mf.name for i in self.mf_list):
             self.win_warn = WinWarn(
-                Lng.attention[Cfg.lng],
-                f"{Lng.alias[Cfg.lng]} \"{self.mf.name}\" {Lng.already_taken[Cfg.lng].lower()}."
+                Lng.attention[cfg.lng],
+                f"{Lng.alias[cfg.lng]} \"{self.mf.name}\" {Lng.already_taken[cfg.lng].lower()}."
                 )
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         elif not self.mf.paths:
             self.win_warn = WinWarn(
-                Lng.attention[Cfg.lng],
-                Lng.select_folder_path[Cfg.lng]
+                Lng.attention[cfg.lng],
+                Lng.select_folder_path[cfg.lng]
                 )
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
@@ -814,18 +814,18 @@ class FiltersWid(QWidget):
         g_lay.setContentsMargins(0, 5, 0, 5)
         g_lay.setSpacing(15)
 
-        descr = ULabel(Lng.filters_descr[Cfg.lng])
+        descr = ULabel(Lng.filters_descr[cfg.lng])
         g_lay.addWidget(descr)
 
         self.text_wid = UTextEdit()
         self.text_wid.setFixedHeight(220)
-        self.text_wid.setPlaceholderText(Lng.filters[Cfg.lng])
+        self.text_wid.setPlaceholderText(Lng.filters[cfg.lng])
         self.text_wid.setPlainText("\n".join(self.filters_copy))
         self.text_wid.textChanged.connect(self.on_text_changed)
         g_lay.addWidget(self.text_wid)
         self.v_lay.addWidget(group)
 
-        reset_btn = UPushButton(Lng.reset[Cfg.lng])
+        reset_btn = UPushButton(Lng.reset[cfg.lng])
         reset_btn.clicked.connect(self.reset_filters)
         self.v_lay.addWidget(reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -841,8 +841,8 @@ class FiltersWid(QWidget):
             self.filters_win.deleteLater()
 
         self.filters_win = WinQuestion(
-            Lng.attention[Cfg.lng],
-            Lng.filters_reset[Cfg.lng]
+            Lng.attention[cfg.lng],
+            Lng.filters_reset[cfg.lng]
         )
         self.filters_win.ok_clicked.connect(fin)
         self.filters_win.center_to_parent(self.window())
@@ -881,10 +881,10 @@ class WinSettings(SingleActionWindow):
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
-        self.setWindowTitle(Lng.settings[Cfg.lng])
+        self.setWindowTitle(Lng.settings[cfg.lng])
         self.setFixedSize(700, 550)
         self.mf_list_copy = copy.deepcopy(Mf.list_)
-        self.json_data_copy = copy.deepcopy(Cfg)
+        self.json_data_copy = copy.deepcopy(cfg)
         self.filters_copy = copy.deepcopy(Filters.filters)
         self.need_reset = [False, ]
         self.mf_items: list[SettingsListItem] = []
@@ -901,15 +901,15 @@ class WinSettings(SingleActionWindow):
         self.left_menu.setIconSize(QSize(self.svg_size, self.svg_size))
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = SettingsListItem(self.left_menu, text=Lng.general[Cfg.lng])
+        main_settings_item = SettingsListItem(self.left_menu, text=Lng.general[cfg.lng])
         main_settings_item.setIcon(QIcon(self.svg_settings))
         self.left_menu.addItem(main_settings_item)
         
-        filter_settings = SettingsListItem(self.left_menu, text=Lng.filters[Cfg.lng])
+        filter_settings = SettingsListItem(self.left_menu, text=Lng.filters[cfg.lng])
         filter_settings.setIcon(QIcon(self.svg_filters))
         self.left_menu.addItem(filter_settings)
 
-        new_folder = SettingsListItem(self.left_menu, text=Lng.new_folder[Cfg.lng])
+        new_folder = SettingsListItem(self.left_menu, text=Lng.new_folder[cfg.lng])
         new_folder.setIcon(QIcon(self.svg_new_folder))
         self.left_menu.addItem(new_folder)
         
@@ -942,11 +942,11 @@ class WinSettings(SingleActionWindow):
         btns_wid.setLayout(btns_lay)
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.ok_btn = UPushButton(Lng.ok[Cfg.lng])
+        self.ok_btn = UPushButton(Lng.ok[cfg.lng])
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
-        cancel_btn = UPushButton(Lng.cancel[Cfg.lng])
+        cancel_btn = UPushButton(Lng.cancel[cfg.lng])
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
 
@@ -976,11 +976,11 @@ class WinSettings(SingleActionWindow):
     def init_right_side(self, index: int):
         if index == 0:
             self.gen_settings = GeneralSettings(self.json_data_copy, self.need_reset)
-            self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
+            self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
             self.filters_wid = FiltersWid(self.filters_copy)
-            self.filters_wid.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
+            self.filters_wid.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
             self.new_folder = NewFolder(self.mf_list_copy)
@@ -1002,7 +1002,7 @@ class WinSettings(SingleActionWindow):
                 if i.name == item.mf.name
             )
             mf_sett = MfSettings(mf)
-            mf_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[Cfg.lng]))
+            mf_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
             mf_sett.remove.connect(lambda: self.remove_mf(item))
             mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
             self.right_lay.insertWidget(0, mf_sett)
@@ -1024,7 +1024,7 @@ class WinSettings(SingleActionWindow):
         self.clear_right_side()
         index = self.left_menu.count() - 1
         self.init_right_side(index)
-        self.ok_btn.setText(Lng.restart[Cfg.lng])
+        self.ok_btn.setText(Lng.restart[cfg.lng])
 
     def remove_mf(self, item: SettingsListItem):
 
@@ -1036,14 +1036,14 @@ class WinSettings(SingleActionWindow):
                     self.left_menu.setCurrentRow(0)
                     self.clear_right_side()
                     self.init_right_side(0)
-                    self.ok_btn.setText(Lng.restart[Cfg.lng])
+                    self.ok_btn.setText(Lng.restart[cfg.lng])
                     break
 
         try:
             if len(self.mf_list_copy) == 1:
                 self.win_warn = WinWarn(
-                    Lng.attention[Cfg.lng],
-                    Lng.at_least_one_folder_required[Cfg.lng],
+                    Lng.attention[cfg.lng],
+                    Lng.at_least_one_folder_required[cfg.lng],
                 )
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
@@ -1070,8 +1070,8 @@ class WinSettings(SingleActionWindow):
             for folder in self.mf_list_copy:
                 if not folder.paths:
                     self.win_warn = WinWarn(
-                        Lng.attention[Cfg.lng],
-                        f"{Lng.select_folder_path[Cfg.lng]} \"{folder.name}\""
+                        Lng.attention[cfg.lng],
+                        f"{Lng.select_folder_path[cfg.lng]} \"{folder.name}\""
                     )
                     self.win_warn.center_to_parent(self.window())
                     self.win_warn.show()
@@ -1087,10 +1087,10 @@ class WinSettings(SingleActionWindow):
                 Mf.list_ = self.mf_list_copy
                 Filters.filters = self.filters_copy
                 for key, value in vars(self.json_data_copy).items():
-                    setattr(Cfg, key, value)
+                    setattr(cfg, key, value)
                 Mf.write_json_data()
                 Filters.write_json_data()
-                Cfg.write_json_data()
+                cfg.write_json_data()
             QApplication.quit()
             Utils.start_new_app()
         else:

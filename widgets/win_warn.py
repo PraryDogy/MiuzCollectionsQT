@@ -4,7 +4,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
                              QWidget)
 
-from cfg import Cfg
+from cfg import cfg
 from system.lang import Lng
 from system.shared_utils import SharedUtils
 
@@ -53,7 +53,7 @@ class BaseWinWarn(SingleActionWindow):
 class WinWarn(BaseWinWarn):
     def __init__(self, title: str, text: str, char_limit: int = 40):
         super().__init__(title, text, char_limit)
-        ok_btn = QPushButton(text=Lng.ok[Cfg.lng])
+        ok_btn = QPushButton(text=Lng.ok[cfg.lng])
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.deleteLater)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -70,11 +70,11 @@ class WinQuestion(BaseWinWarn):
         btn_lay.setSpacing(10)
         btn_wid.setLayout(btn_lay)
 
-        ok_btn = QPushButton(Lng.ok[Cfg.lng])
+        ok_btn = QPushButton(Lng.ok[cfg.lng])
         ok_btn.clicked.connect(self.ok_clicked.emit)
         ok_btn.setFixedWidth(90)
 
-        cancel_btn = QPushButton(Lng.cancel[Cfg.lng])
+        cancel_btn = QPushButton(Lng.cancel[cfg.lng])
         cancel_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.deleteLater)
 

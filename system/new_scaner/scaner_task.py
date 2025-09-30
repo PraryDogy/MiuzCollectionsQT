@@ -4,7 +4,7 @@ from time import sleep
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import Cfg
+from cfg import cfg
 
 from ..lang import Lng
 from ..main_folder import Mf
@@ -24,7 +24,7 @@ class ScanerTask(URunnable):
         reload_menu = pyqtSignal()
 
     short_timer = 15000
-    long_timer = Cfg.scaner_minutes * 60 * 1000
+    long_timer = cfg.scaner_minutes * 60 * 1000
 
     def __init__(self):
         """
@@ -50,7 +50,7 @@ class ScanerTask(URunnable):
                 else:
                     true_name = os.path.basename(i.paths[0])
                 alias = i.name
-                no_conn = Lng.no_connection[Cfg.lng].lower()
+                no_conn = Lng.no_connection[cfg.lng].lower()
                 self.sigs.progress_text.emit(f"{true_name} ({alias}): {no_conn}")
                 print("scaner no connection", true_name, alias)
                 sleep(5)

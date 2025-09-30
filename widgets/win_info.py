@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget, QSpacerItem
 
-from cfg import Cfg, Static
+from cfg import cfg, Static
 from system.lang import Lng
 from system.tasks import MultiFileInfo, OneFileInfo, UThreadPool
 from system.utils import Utils
@@ -44,12 +44,12 @@ class Selectable(ULabel):
 
         menu_ = UMenu(event=ev)
 
-        label_text = Lng.copy[Cfg.lng]
+        label_text = Lng.copy[cfg.lng]
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(lambda: Utils.copy_text(text))
         menu_.addAction(sel)
 
-        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[Cfg.lng])
+        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[cfg.lng])
         reveal.triggered.connect(
             lambda: Utils.reveal_files([full_text])
         )
@@ -65,7 +65,7 @@ class WinInfo(SingleActionWindow):
 
     def __init__(self, paths: list[str]):
         super().__init__()
-        self.setWindowTitle(Lng.info[Cfg.lng])
+        self.setWindowTitle(Lng.info[cfg.lng])
         self.paths = paths
 
         wid = QWidget()

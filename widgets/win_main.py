@@ -7,7 +7,7 @@ from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
 
-from cfg import Cfg, Dynamic, Static
+from cfg import cfg, Dynamic, Static
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
@@ -256,7 +256,7 @@ class WinMain(UMainWindow):
         alias = mf.name
         self.noti_wid = NotifyWid(
             parent,
-            f"{basename} ({alias}): {Lng.no_connection_full[Cfg.lng].lower()}",
+            f"{basename} ({alias}): {Lng.no_connection_full[cfg.lng].lower()}",
             self.warning_svg,
             ms=3000
             )
@@ -416,8 +416,8 @@ class WinMain(UMainWindow):
         copy_self = abs_current_dir in self.clipboard_item.source_dirs
         if copy_self:
             self.win_warn = WinWarn(
-                Lng.attention[Cfg.lng],
-                Lng.copy_name_same_dir[Cfg.lng]
+                Lng.attention[cfg.lng],
+                Lng.copy_name_same_dir[cfg.lng]
             )
             self.win_warn.center_to_parent(self)
             self.win_warn.show()
@@ -446,8 +446,8 @@ class WinMain(UMainWindow):
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
         self.remove_files_win = WinQuestion(
-            Lng.attention[Cfg.lng],
-            f"{Lng.delete_forever[Cfg.lng]} ({len(abs_paths)})?"
+            Lng.attention[cfg.lng],
+            f"{Lng.delete_forever[cfg.lng]} ({len(abs_paths)})?"
         )
         self.remove_files_win.center_to_parent(self.window())
         self.remove_files_win.ok_clicked.connect(
@@ -483,8 +483,8 @@ class WinMain(UMainWindow):
         target_dir = Utils.get_abs_path(mf.curr_path, Dynamic.current_dir)
 
         self.upload_win = WinQuestion(
-            Lng.attention[Cfg.lng],
-            Lng.upload_files_in[Cfg.lng] + "\n" + shorten_path(target_dir),
+            Lng.attention[cfg.lng],
+            Lng.upload_files_in[cfg.lng] + "\n" + shorten_path(target_dir),
             100
         )
         self.upload_win.center_to_parent(self)
@@ -585,7 +585,7 @@ class WinMain(UMainWindow):
         с помощью QTimer.singleShot.
         """
 
-        if Cfg.new_scaner:
+        if cfg.new_scaner:
             from system.new_scaner.scaner_task import ScanerTask
         else:
             from system.old_scaner.scaner_task import ScanerTask
@@ -619,7 +619,7 @@ class WinMain(UMainWindow):
             self.scaner_task_canceled = False
             self.scaner_timer.start(1000)
         else:
-            self.scaner_timer.start(Cfg.scaner_minutes * 60 * 1000)
+            self.scaner_timer.start(cfg.scaner_minutes * 60 * 1000)
 
     def restart_scaner_task(self):
         """
@@ -632,7 +632,7 @@ class WinMain(UMainWindow):
         Если задача уже завершена, активный таймер останавливается, и запускается короткий таймер на 1 секунду
         для немедленного запуска новой задачи сканирования.
         """
-        self.bar_bottom.progress_bar.setText(Lng.preparing[Cfg.lng])
+        self.bar_bottom.progress_bar.setText(Lng.preparing[cfg.lng])
         
         if self.scaner_task is None:
             self.scaner_timer.stop()
@@ -671,7 +671,7 @@ class WinMain(UMainWindow):
         self.move(x, y)
 
     def on_exit(self):
-        Cfg.write_json_data()
+        cfg.write_json_data()
         Filters.write_json_data()
         Mf.write_json_data()
         os._exit(0)
@@ -706,17 +706,17 @@ class WinMain(UMainWindow):
         def set_below_label(data: tuple[int, int], win: ProgressbarWin):
             count, total = data
             win.below_label.setText(
-                f"{Lng.copying[Cfg.lng]} {count} {Lng.from_[Cfg.lng]} {total}"
+                f"{Lng.copying[cfg.lng]} {count} {Lng.from_[cfg.lng]} {total}"
             )
 
         def set_above_label(text: str, dest_name: str, win: ProgressbarWin):
             win.above_label.setText(
-                f"\"{text}\" {Lng.in_[Cfg.lng]} \"{dest_name}\""
+                f"\"{text}\" {Lng.in_[cfg.lng]} \"{dest_name}\""
             )
 
         def copy_files(target_dir: str, files_to_copy: list[str]):
             dest_name = os.path.basename(os.path.basename(target_dir))
-            progress_win = ProgressbarWin(Lng.copying[Cfg.lng])
+            progress_win = ProgressbarWin(Lng.copying[cfg.lng])
             progress_win.progressbar.setMaximum(100)
             progress_win.center_to_parent(self)
             progress_win.show()
@@ -792,7 +792,7 @@ class WinMain(UMainWindow):
                 print(e)
             self.noti_wid = NotifyWid(
                 self.grid,
-                Lng.drop_event_denied_msg[Cfg.lng],
+                Lng.drop_event_denied_msg[cfg.lng],
                 self.warning_svg,
                 ms=3000
                 )
@@ -807,8 +807,8 @@ class WinMain(UMainWindow):
         for i in paths:
             if os.path.isdir(i):
                 self.win_warn = WinWarn(
-                    Lng.attention[Cfg.lng],
-                    Lng.drop_only_files[Cfg.lng]
+                    Lng.attention[cfg.lng],
+                    Lng.drop_only_files[cfg.lng]
                 )
                 self.win_warn.adjustSize()
                 self.win_warn.center_to_parent(self)

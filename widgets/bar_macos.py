@@ -6,7 +6,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QLabel, QMenu, QMenuBar, QSpacerItem,
                              QWidget)
 
-from cfg import Cfg, Static
+from cfg import cfg, Static
 from system.lang import Lng
 from system.utils import Utils
 
@@ -45,7 +45,7 @@ class SelectableLabel(QLabel):
         context_menu = UMenu(ev)
 
         # --- Копировать выделенный текст ---
-        copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng])
+        copy_text = QAction(parent=context_menu, text=Lng.copy[cfg.lng])
         copy_text.triggered.connect(
             lambda: Utils.copy_text(self.selectedText())
         )
@@ -54,7 +54,7 @@ class SelectableLabel(QLabel):
         context_menu.addSeparator()
 
         # --- Копировать весь текст ---
-        select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng])
+        select_all = QAction(parent=context_menu, text=Lng.copy_all[cfg.lng])
         select_all.triggered.connect(
             lambda: Utils.copy_text(self.text())
         )
@@ -117,15 +117,15 @@ class BarMacos(QMenuBar):
 
     def __init__(self):
         super().__init__()
-        self.mainMenu = QMenu(Lng.menu[Cfg.lng], self)
+        self.mainMenu = QMenu(Lng.menu[cfg.lng], self)
 
         # --- Пункт "Открыть настройки" ---
-        actionSettings = QAction(Lng.open_settings_window[Cfg.lng], self)
+        actionSettings = QAction(Lng.open_settings_window[cfg.lng], self)
         actionSettings.triggered.connect(self.open_settings_window)
         self.mainMenu.addAction(actionSettings)
 
         # --- Пункт "О приложении" ---
-        actionAbout = QAction(Lng.show_about[Cfg.lng], self)
+        actionAbout = QAction(Lng.show_about[cfg.lng], self)
         actionAbout.triggered.connect(self.open_about_window)
         self.mainMenu.addAction(actionAbout)
 

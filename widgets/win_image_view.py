@@ -8,7 +8,7 @@ from PyQt5.QtGui import (QColor, QContextMenuEvent, QImage, QKeyEvent,
                          QResizeEvent)
 from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSpacerItem, QWidget
 
-from cfg import Cfg, Static
+from cfg import cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
@@ -191,7 +191,7 @@ class WinImageView(AppModalWindow):
     def __init__(self, rel_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
 
-        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
+        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(cfg.apps)}
         self.cached_images: dict[str, QPixmap] = {}
         self.is_selection = is_selection
         self.path_to_wid = path_to_wid
@@ -253,7 +253,7 @@ class WinImageView(AppModalWindow):
             pixmap = QPixmap(1, 1)
             pixmap.fill(QColor(0, 0, 0))
             self.image_label.set_image(pixmap)
-            t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng]}"
+            t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[cfg.lng]}"
             self.image_label.setText(t)
 
         if Mf.current.set_curr_path():
@@ -274,7 +274,7 @@ class WinImageView(AppModalWindow):
                 pixmap = QPixmap(1, 1)
                 pixmap.fill(QColor(0, 0, 0))
                 self.image_label.set_image(pixmap)
-                t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[Cfg.lng]}"
+                t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[cfg.lng]}"
                 self.image_label.setText(t)
 
         self.task_count += 1
@@ -410,11 +410,11 @@ class WinImageView(AppModalWindow):
 
         # открыть в приложении
         open_menu = USubMenu(
-            f"{Lng.open_in[Cfg.lng]} ({len(rel_paths)})",
+            f"{Lng.open_in[cfg.lng]} ({len(rel_paths)})",
             self.menu_
         )
 
-        act = QAction(Lng.open_default[Cfg.lng], open_menu)
+        act = QAction(Lng.open_default[cfg.lng], open_menu)
         act.triggered.connect(
             lambda: self.open_in_app.emit((rel_paths, None))
         )

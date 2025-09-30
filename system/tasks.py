@@ -9,7 +9,7 @@ from numpy import ndarray
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 
-from cfg import Cfg, Dynamic, Static
+from cfg import cfg, Dynamic, Static
 
 from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
@@ -290,9 +290,9 @@ class OneFileInfo(URunnable):
         except Exception as e:
             Utils.print_error()
             res = {
-                Lng.file_name[Cfg.lng]: self.lined_text(os.path.basename(self.url)),
-                Lng.place[Cfg.lng]: self.lined_text(self.url),
-                Lng.type_[Cfg.lng]: self.lined_text(os.path.splitext(self.url)[0]),
+                Lng.file_name[cfg.lng]: self.lined_text(os.path.basename(self.url)),
+                Lng.place[cfg.lng]: self.lined_text(self.url),
+                Lng.type_[cfg.lng]: self.lined_text(os.path.splitext(self.url)[0]),
             }
             self.sigs.finished_.emit(res)
 
@@ -304,17 +304,17 @@ class OneFileInfo(URunnable):
         size = SharedUtils.get_f_size(stats.st_size)
 
         date_time = datetime.fromtimestamp(stats.st_mtime)
-        month = Lng.months_genitive_case[Cfg.lng][str(date_time.month)]
+        month = Lng.months_genitive_case[cfg.lng][str(date_time.month)]
         mod = f"{date_time.day} {month} {date_time.year}"
 
         res = {
-            Lng.file_name[Cfg.lng]: self.lined_text(name),
-            Lng.type_[Cfg.lng]: type_,
-            Lng.file_size[Cfg.lng]: size,
-            Lng.place[Cfg.lng]: self.lined_text(self.url),
+            Lng.file_name[cfg.lng]: self.lined_text(name),
+            Lng.type_[cfg.lng]: type_,
+            Lng.file_size[cfg.lng]: size,
+            Lng.place[cfg.lng]: self.lined_text(self.url),
             # Lng.thumb_path[Cfg.lng]: self.lined_text(thumb_path),
-            Lng.changed[Cfg.lng]: mod,
-            Lng.resol[Cfg.lng]: Lng.calculating[Cfg.lng],
+            Lng.changed[cfg.lng]: mod,
+            Lng.resol[cfg.lng]: Lng.calculating[cfg.lng],
         }
 
         return res
@@ -376,9 +376,9 @@ class MultiFileInfo(URunnable):
             names += ", ..."
 
         return {
-            Lng.file_name[Cfg.lng]: names,
-            Lng.total[Cfg.lng]: str(len(self.paths)),
-            Lng.file_size[Cfg.lng]: self.get_total_size()
+            Lng.file_name[cfg.lng]: names,
+            Lng.total[cfg.lng]: str(len(self.paths)),
+            Lng.file_size[cfg.lng]: self.get_total_size()
         }
 
     def get_total_size(self) -> str:
@@ -491,10 +491,10 @@ class DbImagesLoader(URunnable):
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             else:
-                f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
+                f_mod = f"{Lng.months[cfg.lng][str(f_mod.month)]} {f_mod.year}"
 
             date_time = datetime.fromtimestamp(mod)
-            month = Lng.months_genitive_case[Cfg.lng][str(date_time.month)]
+            month = Lng.months_genitive_case[cfg.lng][str(date_time.month)]
             mod = f"{date_time.day} {month} {date_time.year}"
 
             item = DbImagesLoader.Item(qimage, rel_path, fav, f_mod, mod)

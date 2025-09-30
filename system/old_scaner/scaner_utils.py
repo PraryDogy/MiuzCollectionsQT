@@ -6,7 +6,7 @@ import sqlalchemy.exc
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import Cfg, Static
+from cfg import cfg, Static
 from system.database import THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
@@ -108,8 +108,8 @@ class FinderImages(QObject):
         Пример: "Miuz (Mf.name): коллекция 3 из 10"
         """
         mf = self.mf.name.capitalize()
-        collection_name: str = Lng.folder[Cfg.lng]
-        return f"{mf}: {collection_name.lower()} {current} {Lng.from_[Cfg.lng]} {total}"
+        collection_name: str = Lng.folder[cfg.lng]
+        return f"{mf}: {collection_name.lower()} {current} {Lng.from_[cfg.lng]} {total}"
 
     def walk_subdir(self, subdir: str) -> list[tuple]:
         """
@@ -288,7 +288,7 @@ class HashdirUpdater(QObject):
         total: `len`
         """
         mf = self.mf.name.capitalize()
-        t = f"{mf}: {text.lower()} {x} {Lng.from_[Cfg.lng]} {total}"
+        t = f"{mf}: {text.lower()} {x} {Lng.from_[cfg.lng]} {total}"
         self.progress_text.emit(t)
 
     def run_del_items(self):
@@ -299,7 +299,7 @@ class HashdirUpdater(QObject):
                 break
             thumb_path = Utils.get_abs_hash(rel_thumb_path)
             if os.path.exists(thumb_path):
-                self.progressbar_text(Lng.deleting[Cfg.lng], x, total)
+                self.progressbar_text(Lng.deleting[cfg.lng], x, total)
                 try:
                     os.remove(thumb_path)
                     folder = os.path.dirname(thumb_path)
@@ -327,7 +327,7 @@ class HashdirUpdater(QObject):
         for x, (path, size, birth, mod) in enumerate(self.new_items, start=1):
             if not self.task_state.should_run():
                 break
-            self.progressbar_text(Lng.adding[Cfg.lng], x, total)
+            self.progressbar_text(Lng.adding[cfg.lng], x, total)
             try:
                 thumb = self.create_thumb(path)
                 thumb_path = Utils.create_abs_hash(path)
@@ -477,7 +477,7 @@ class MfRemover(QObject):
         total = len(rows)
         for x, (id_, image_path) in enumerate(rows):
             try:
-                t = f"{Lng.deleting[Cfg.lng]}: {x} {Lng.from_[Cfg.lng]} {total}"
+                t = f"{Lng.deleting[cfg.lng]}: {x} {Lng.from_[cfg.lng]} {total}"
                 self.progress_text.emit(t)
 
                 if os.path.exists(image_path):
