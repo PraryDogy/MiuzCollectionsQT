@@ -826,9 +826,14 @@ class FiltersWid(QGroupBox):
         g_lay.addWidget(self.text_wid)
         self.v_lay.addWidget(group)
 
+        btns_wid = QWidget()
+        self.v_lay.addWidget(btns_wid)
+        btns_lay = UHBoxLayout()
+        btns_wid.setLayout(btns_lay)
+
         reset_btn = UPushButton(Lng.reset[cfg.lng])
         reset_btn.clicked.connect(self.reset_filters)
-        self.v_lay.addWidget(reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        btns_lay.addWidget(reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def reset_filters(self):
 
