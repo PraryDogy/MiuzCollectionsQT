@@ -634,7 +634,6 @@ class MfSettings(QGroupBox):
         super().__init__()
         v_lay = UVBoxLayout()
         v_lay.setSpacing(15)
-        v_lay.setContentsMargins(6, 0, 6, 0)
         self.setLayout(v_lay)
 
         # Верхний ряд с названием
@@ -747,9 +746,15 @@ class NewFolder(QGroupBox):
         self.advanced = MfAdvanced(self.mf)
         v_lay.addWidget(self.advanced)
 
+        btn_wid = QWidget()
+        v_lay.addWidget(btn_wid)
+        btn_lay = UHBoxLayout()
+        btn_lay.setSpacing(15)
+        btn_wid.setLayout(btn_lay)
+
         self.save_btn = UPushButton(Lng.save[cfg.lng])
         self.save_btn.clicked.connect(self.save)
-        v_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def preset_new_folder(self, url: str):
         name = os.path.basename(url)
@@ -808,7 +813,6 @@ class FiltersWid(QGroupBox):
 
         group = QGroupBox()
         g_lay = UVBoxLayout(group)
-        g_lay.setContentsMargins(0, 5, 0, 5)
         g_lay.setSpacing(15)
 
         descr = ULabel(Lng.filters_descr[cfg.lng])
