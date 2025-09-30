@@ -469,7 +469,7 @@ class AboutWid(QGroupBox):
         h_lay.addWidget(lbl)
 
 
-class GeneralSettings(QWidget):
+class GeneralSettings(QGroupBox):
     changed = pyqtSignal()
 
     def __init__(self, json_data_copy: Cfg, need_reset: list[bool]):
@@ -674,7 +674,6 @@ class MfSettings(QGroupBox):
         btn_lay.addWidget(self.remove_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         v_lay.addWidget(btn_group)
-        v_lay.addStretch()
 
     def show_finish_win(self):
         self.finish_win = WinWarn(
@@ -751,8 +750,6 @@ class NewFolder(QGroupBox):
         self.save_btn = UPushButton(Lng.save[cfg.lng])
         self.save_btn.clicked.connect(self.save)
         v_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        v_lay.addStretch()
         
     def preset_new_folder(self, url: str):
         name = os.path.basename(url)
@@ -828,8 +825,6 @@ class FiltersWid(QGroupBox):
         reset_btn = UPushButton(Lng.reset[cfg.lng])
         reset_btn.clicked.connect(self.reset_filters)
         self.v_lay.addWidget(reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        self.v_lay.addStretch(1)
         
     def reset_filters(self):
 
@@ -934,6 +929,8 @@ class WinSettings(SingleActionWindow):
         self.right_lay = UVBoxLayout()
         self.right_wid.setLayout(self.right_lay)
         self.splitter.addWidget(self.right_wid)
+
+        self.right_lay.addStretch()
 
         btns_wid = QWidget()
         btns_wid.setFixedHeight(40)

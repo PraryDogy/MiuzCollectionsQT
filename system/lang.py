@@ -205,7 +205,7 @@ class Lng:
     disable = ("Выключить", "Disable")
     enable = ("Включить", "Enable")
     show = ("Показать", "Show")
-    show_system_files = ("Показать системные файлы в Finder", "Show system files in Finder")
+    show_system_files = ("Системные файлы в Finder", "System files in Finder")
     russian = ("Русский", "English")
     language = ("Язык", "Language")
     language_max = ("Сменить язык (Change language)", "Change language (Сменить язык)")
