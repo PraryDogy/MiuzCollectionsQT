@@ -625,7 +625,7 @@ class ResetMfWin(WinQuestion):
         )
 
 
-class MfSettings(QWidget):
+class MfSettings(QGroupBox):
     remove = pyqtSignal()
     changed = pyqtSignal()
     reset_data = pyqtSignal(Mf)
@@ -722,7 +722,7 @@ class MfSettings(QWidget):
 
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
-class NewFolder(QWidget):
+class NewFolder(QGroupBox):
     new_folder = pyqtSignal(Mf)
     svg_warning = "./images/warning.svg"
 
@@ -798,7 +798,7 @@ class NewFolder(QWidget):
 # ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ 
 
 
-class FiltersWid(QWidget):
+class FiltersWid(QGroupBox):
     changed = pyqtSignal()
 
     def __init__(self, filters_copy: list[str]):
