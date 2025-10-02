@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -51,8 +52,13 @@ class ColorHighlighter(QRunnable):
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             for cnt in contours:
                 if cv2.contourArea(cnt) >= min_area:
-                    cv2.drawContours(output, [cnt], -1, (0, 0, 255), cv2.FILLED)
+                    # средний цвет диапазона
+                    fill_color = tuple(int((l+u)//2) for l, u in zip(lower, upper))  
+                    fill_color_bgr = cv2.cvtColor(np.uint8([[fill_color]]), cv2.COLOR_HSV2BGR)[0][0]
+                    cv2.drawContours(output, [cnt], -1, tuple(int(c) for c in fill_color_bgr), cv2.FILLED)
                     cv2.drawContours(filled_mask, [cnt], -1, 255, cv2.FILLED)
+                    cv2.drawContours(output, [cnt], -1, (0, 0, 255), 2)
+
 
         percent = (cv2.countNonZero(filled_mask) / (image.shape[0] * image.shape[1])) * 100
         filename = os.path.basename(file.rstrip(os.sep))
