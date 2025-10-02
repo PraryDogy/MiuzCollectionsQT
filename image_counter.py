@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from PyQt5.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtGui import QDropEvent, QImage, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
                              QHBoxLayout, QLabel, QMenu, QPushButton,
                              QScrollArea, QTextEdit, QVBoxLayout, QWidget)
@@ -26,7 +26,6 @@ class ColorHighlighter(QRunnable):
 
     def run(self):
         for x, i in enumerate(self.files, start=1):
-            print(x, len(self.files))
             try:
                 qimage, filename, percent = self.highlight_colors(i)
                 self.result.append((qimage, filename, percent))
@@ -199,6 +198,7 @@ class FileDropTextEdit(QTextEdit):
         super().__init__(parent)
         self.setAcceptDrops(True)
         self.setPlaceholderText("Вставьте пути к файлам\nили перетащите их сюда")
+        self.paths = []
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -206,20 +206,19 @@ class FileDropTextEdit(QTextEdit):
         else:
             super().dragEnterEvent(event)
 
-    def dropEvent(self, event):
-        if event.mimeData().hasUrls():
-            paths = []
-            for url in event.mimeData().urls():
-                paths.append(url.toLocalFile())
-            # форматируем: один путь на строку
-            current_text = self.toPlainText().strip()
-            if current_text:
-                current_text += "\n"
-            current_text += "\n".join(paths)
-            self.setPlainText(current_text)
-            event.acceptProposedAction()
-        else:
-            super().dropEvent(event)
+    def dropEvent(self, event: QDropEvent):
+        if not event.mimeData().hasUrls():
+            return
+        for url in event.mimeData().urls():
+            url = url.toLocalFile()
+            self.paths.append(url)
+        # форматируем: один путь на строку
+        current_text = self.toPlainText().strip()
+        if current_text:
+            current_text += "\n"
+        current_text += "\n".join(self.paths)
+        self.setPlainText(current_text)
+        event.acceptProposedAction()
 
 
 class ColorAction(QAction):
@@ -280,7 +279,8 @@ class MainWindow(QWidget):
         self.color_menu.exec_(self.color_btn.mapToGlobal(self.color_btn.rect().bottomLeft()))
     
     def cmd(self):
-        files = self.text_edit.toPlainText().split("\n")
+        # files = self.text_edit.toPlainText().split("\n")
+        files = self.text_edit.paths
         if not files or not self.selected_colors:
             return
         self.start_btn.setDisabled(True)
