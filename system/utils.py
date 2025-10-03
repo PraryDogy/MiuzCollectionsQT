@@ -6,8 +6,8 @@ import traceback
 
 import cv2
 import numpy as np
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QIcon, QImage, QPixmap
 from PyQt5.QtWidgets import QApplication
 
 from cfg import Static
@@ -187,6 +187,20 @@ class Utils:
             factor,
             0
         )
+
+    @classmethod
+    def qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:
+        if pixmap.isNull():
+            return QPixmap()
+        w, h = pixmap.width(), pixmap.height()
+        if w > h:
+            new_w = max_side
+            new_h = int(h * max_side / w)
+        else:
+            new_h = max_side
+            new_w = int(w * max_side / h)
+        icon = QIcon(pixmap)
+        return icon.pixmap(QSize(new_w, new_h))
 
     @classmethod
     def print_error(cls):

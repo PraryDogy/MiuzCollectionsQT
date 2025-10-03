@@ -38,7 +38,6 @@ class ImageWidget(QLabel):
         self.offset = QPoint(0, 0)
         self.setCursor(Qt.CursorShape.ArrowCursor)
         self.w, self.h = self.width(), self.height()
-
         Utils.pixmap_scale(self.current_pixmap, self.w, self.h)
         self.update()
 
