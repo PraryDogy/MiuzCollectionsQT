@@ -1,9 +1,9 @@
-from PyQt5.QtCore import Qt, pyqtSignal, QTimer
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
+from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSpacerItem, QWidget
 
-from cfg import cfg, Dynamic, Static
+from cfg import Dynamic, Static, cfg
 from system.filters import Filters
 from system.lang import Lng
 
@@ -287,6 +287,8 @@ class HistoryNavBtn(BarTopBtn):
 
     def mouseReleaseEvent(self, a0):
         try:
+            self.set_solid_style()
+            QTimer.singleShot(100, self.set_normal_style)
             if Dynamic.current_dir not in Dynamic.history:
                 return  # нет текущей позиции
             curr_ind = Dynamic.history.index(Dynamic.current_dir)
@@ -294,8 +296,6 @@ class HistoryNavBtn(BarTopBtn):
             if 0 <= new_ind < len(Dynamic.history):
                 Dynamic.current_dir = Dynamic.history[new_ind]
                 self.clicked_.emit()
-                self.set_solid_style()
-                QTimer.singleShot(100, self.set_normal_style)
         except Exception as e:
             print("HistoryNavBtn error", e)
 
@@ -323,7 +323,13 @@ class LevelUpBtn(BarTopBtn):
         self.svg_btn.load(self.ICON_PATH)
         self.lbl.setText(Lng.level_up[cfg.lng])
 
-
+    def mouseReleaseEvent(self, a0):
+        try:
+            self.set_solid_style()
+            QTimer.singleShot(100, self.set_normal_style)
+            self.clicked_.emit()
+        except Exception as e:
+            print("HistoryNavBtn error", e)
 
 class BarTop(QWidget):
     """
@@ -366,6 +372,7 @@ class BarTop(QWidget):
         self.h_layout.addWidget(self.level_up_btn)
 
         self.h_layout.addStretch(1)
+        self.h_layout.addSpacerItem(QSpacerItem(25, 0))
 
         # --- Кнопка сортировки ---
         self.sort_btn = SortBtn()
@@ -391,6 +398,7 @@ class BarTop(QWidget):
         self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.h_layout.addStretch(1)
+        self.h_layout.addSpacerItem(QSpacerItem(25, 0))
 
         # --- Виджет поиска ---
         self.search_wid = WidSearch()
