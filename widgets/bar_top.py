@@ -20,7 +20,7 @@ class BarTopBtn(QFrame):
     clicked_ = pyqtSignal()
     object_name = "_frame_"
     ww, hh = 65, 45
-    svg_ww, svg_hh = 23, 23
+    svg_ww, svg_hh = 20, 20
     font_size = 10
 
     # --- Стили ---
@@ -316,6 +316,15 @@ class NextBtn(HistoryNavBtn):
         self.lbl.setText(Lng.forward[cfg.lng])
 
 
+class LevelUpBtn(BarTopBtn):
+    ICON_PATH = "./images/level_up.svg"
+    def __init__(self):
+        super().__init__()
+        self.svg_btn.load(self.ICON_PATH)
+        self.lbl.setText(Lng.level_up[cfg.lng])
+
+
+
 class BarTop(QWidget):
     """
     Верхняя панель с кнопками управления и поиском.
@@ -337,6 +346,7 @@ class BarTop(QWidget):
     open_settings_win = pyqtSignal(SettingsItem)
     reload_thumbnails = pyqtSignal()
     history_press = pyqtSignal()
+    level_up = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -350,6 +360,10 @@ class BarTop(QWidget):
         self.next_btn = NextBtn()
         self.next_btn.clicked_.connect(lambda: self.history_press.emit())
         self.h_layout.addWidget(self.next_btn)
+
+        self.level_up_btn = LevelUpBtn()
+        self.level_up_btn.clicked_.connect(lambda: self.level_up.emit())
+        self.h_layout.addWidget(self.level_up_btn)
 
         self.h_layout.addStretch(1)
 

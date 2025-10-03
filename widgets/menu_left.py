@@ -97,7 +97,9 @@ class TreeWid(QTreeWidget):
         self.expand_to_path(self.selected_path)
 
     def expand_to_path(self, path: str):
-        if not path or path not in self.items:
+        if path == "":
+            path = os.sep
+        if path not in self.items:
             return
         item = self.items.get(path)
         parent = item.parent()

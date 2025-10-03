@@ -126,6 +126,9 @@ class WinMain(UMainWindow):
         self.bar_top.history_press.connect(
             lambda: self.history_press()
         )
+        self.bar_top.level_up.connect(
+            lambda: self.level_up()
+        )
         right_lay.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -232,6 +235,17 @@ class WinMain(UMainWindow):
         self.on_start_task.sigs.finished_.connect(on_finish)
         UThreadPool.start(self.on_start_task)
     
+    def level_up(self):
+        if Dynamic.current_dir:
+            root = os.path.dirname(Dynamic.current_dir)
+            if root == os.sep:
+                root = ""
+            Dynamic.current_dir = root
+            self.left_menu.tree_wid.expand_to_path(root)
+            self.left_menu.setCurrentIndex(1)
+            self.grid.reload_thumbnails()
+            self.set_window_title()
+
     def history_press(self):
         self.left_menu.tree_wid.expand_to_path(Dynamic.current_dir)
         self.left_menu.setCurrentIndex(1)
