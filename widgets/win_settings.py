@@ -478,6 +478,7 @@ class GeneralSettings(QGroupBox):
         v_lay = UVBoxLayout()
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.setSpacing(10)
+        v_lay.setContentsMargins(0, 0, 0, 10)
         self.setLayout(v_lay)
 
         lang_reset = LangSettings(json_data_copy)
@@ -656,6 +657,7 @@ class MfSettings(QGroupBox):
         # QGroupBox для кнопок и описания
         btn_group = QWidget()
         btn_lay = UHBoxLayout()
+        btn_lay.setContentsMargins(0, 0, 0, 10)
         btn_lay.setSpacing(15)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btn_group.setLayout(btn_lay)
@@ -749,6 +751,7 @@ class NewFolder(QGroupBox):
         btn_wid = QWidget()
         v_lay.addWidget(btn_wid)
         btn_lay = UHBoxLayout()
+        btn_lay.setContentsMargins(0, 0, 0, 10)
         btn_lay.setSpacing(15)
         btn_wid.setLayout(btn_lay)
 
@@ -829,6 +832,7 @@ class FiltersWid(QGroupBox):
         btns_wid = QWidget()
         self.v_lay.addWidget(btns_wid)
         btns_lay = UHBoxLayout()
+        btns_lay.setContentsMargins(0, 0, 0, 10)
         btns_wid.setLayout(btns_lay)
 
         reset_btn = UPushButton(Lng.reset[cfg.lng])
