@@ -250,7 +250,6 @@ class WinImageView(AppModalWindow):
             self.no_connection.emit()
         self.load_thumb()
 
-
     def restart_img_wid(self, pixmap: QPixmap):
         self.text_label.hide()
         self.image_label.hide()  # скрываем старый
@@ -262,7 +261,7 @@ class WinImageView(AppModalWindow):
         self.image_label.deleteLater()
         self.image_label = new_wid
         self.image_label.show()
-        
+        self.image_label.lower()
         self.reconn_zoom_btns()
 
     def reconn_zoom_btns(self):
@@ -288,7 +287,7 @@ class WinImageView(AppModalWindow):
     def load_thumb(self):
         self.set_title()
         try:
-            pixmap = self.wid.img_wid.pixmap()
+            pixmap = self.wid.img
         except Exception:
             pixmap = None
         if pixmap:
@@ -546,9 +545,6 @@ class WinImageView(AppModalWindow):
             self.prev_image_btn.show()
             self.next_image_btn.show()
             self.zoom_btns.show()
-            self.prev_image_btn.raise_()
-            self.next_image_btn.raise_()
-            self.zoom_btns.raise_()
             self.mouse_move_timer.start(2000)
         return super().eventFilter(a0, a1)
 
