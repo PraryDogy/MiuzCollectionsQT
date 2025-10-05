@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QSize, Qt, QTimer
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
@@ -187,6 +187,8 @@ class SvgShadowed(SvgBtn):
         shadow_depth (int, optional): прозрачность тени (0–255). По умолчанию 200.
         parent (QWidget, optional): родительский виджет.
     """
+
+    clicked = pyqtSignal()
 
     def __init__(self, icon_name: str, size: int, shadow_depth: int = 200,
                  parent: QWidget = None):

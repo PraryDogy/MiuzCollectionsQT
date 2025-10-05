@@ -24,7 +24,7 @@ from .grid import Grid
 from .menu_left import MenuLeft
 from .progressbar_win import ProgressbarWin
 from .win_dates import WinDates
-from .win_image_view_new import WinImageView
+from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
 from .win_warn import WinQuestion, WinWarn

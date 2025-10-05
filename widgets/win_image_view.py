@@ -2,13 +2,17 @@ import gc
 import os
 from typing import Literal
 
-from PyQt5.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import (QColor, QContextMenuEvent, QImage, QKeyEvent,
-                         QMouseEvent, QPainter, QPaintEvent, QPixmap,
-                         QResizeEvent)
-from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSpacerItem, QWidget
+from PyQt5.QtCore import (QEvent, QObject, QPoint, QPointF, QSize, Qt, QTimer,
+                          pyqtSignal)
+from PyQt5.QtGui import (QColor, QContextMenuEvent, QCursor, QIcon, QImage,
+                         QKeyEvent, QMouseEvent, QPainter, QPaintEvent,
+                         QPixmap, QResizeEvent, QWheelEvent)
+from PyQt5.QtWidgets import (QAction, QFrame, QGraphicsPixmapItem,
+                             QGraphicsScene, QGraphicsView, QHBoxLayout,
+                             QLabel, QScrollBar, QSpacerItem, QVBoxLayout,
+                             QWidget)
 
-from cfg import cfg, Static
+from cfg import Static, cfg
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
@@ -22,79 +26,82 @@ from .actions import (CopyName, CopyPath, RevealInFinder, Save, SaveAs, SetFav,
 from .grid import Thumbnail
 
 
-class ImageWidget(QLabel):
+class ImageWidget(QGraphicsView):
+    mouse_moved = pyqtSignal()
+
     def __init__(self):
         super().__init__()
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.current_pixmap: QPixmap = None
-        self.scale_factor: float = 1.0
-        self.offset = QPoint(0, 0)
-        self.w, self.h = 0, 0
+        self.setMouseTracking(True)
+        self.setStyleSheet("background: black; color: white;")
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+
+        self.scene_ = QGraphicsScene()
+        self.setScene(self.scene_)
+
+        self.pixmap_item: QGraphicsPixmapItem = None
+        self._last_mouse_pos: QPointF = None
 
     def set_image(self, pixmap: QPixmap):
-        self.current_pixmap = pixmap
-        self.scale_factor = 1.0
-        self.offset = QPoint(0, 0)
-        self.setCursor(Qt.CursorShape.ArrowCursor)
-        self.w, self.h = self.width(), self.height()
-        Utils.pixmap_scale(self.current_pixmap, self.w, self.h)
-        self.update()
+        """Устанавливает изображение и центрирует под окно"""
+        self.scene_.clear()
+        self.pixmap_item = None
+        self.pixmap_item = QGraphicsPixmapItem(pixmap)
+        self.scene_.addItem(self.pixmap_item)
+
+        self.resetTransform()
+        self.horizontalScrollBar().setValue(0)
+        self.verticalScrollBar().setValue(0)
 
     def zoom_in(self):
-        self.scale_factor *= 1.1
-        self.setCursor(Qt.CursorShape.OpenHandCursor)
-        self.update()
+        self.scale(1.1, 1.1)
 
     def zoom_out(self):
-        self.scale_factor /= 1.1
-        self.update()
+        self.scale(0.9, 0.9)
 
     def zoom_reset(self):
-        self.scale_factor = 1.0
-        self.offset = QPoint(0, 0)
-        self.setCursor(Qt.CursorShape.ArrowCursor)
-        self.update()
+        if self.pixmap_item:
+            self.resetTransform()
+            self.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
 
-    def mousePressEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.button() == Qt.MouseButton.LeftButton:
-            self.last_mouse_pos = ev.pos()
-        return super().mousePressEvent(ev)
+    # ---------------------- Drag через мышь ----------------------
+    def mousePressEvent(self, event: QMouseEvent):
+        if event.button() == Qt.LeftButton:
+            self.setCursor(Qt.ClosedHandCursor)
+            self._last_mouse_pos = event.pos()
+        super().mousePressEvent(event)
 
-    def mouseMoveEvent(self, ev: QMouseEvent | None) -> None:
-        if ev.buttons() == Qt.MouseButton.LeftButton and self.scale_factor > 1.0:
-            delta = ev.pos() - self.last_mouse_pos
-            self.offset += delta
-            self.last_mouse_pos = ev.pos()
-            self.setCursor(Qt.CursorShape.ClosedHandCursor)
-            self.update()
-        return super().mouseMoveEvent(ev)
+    def mouseMoveEvent(self, event: QMouseEvent):
+        self.mouse_moved.emit()
+        if self._last_mouse_pos and event.buttons() & Qt.LeftButton:
+            delta = event.pos() - self._last_mouse_pos
+            self._last_mouse_pos = event.pos()
 
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        if self.scale_factor > 1.0:
-            self.setCursor(Qt.CursorShape.OpenHandCursor)
-        return super().mouseReleaseEvent(ev)
+            # перемещаем сцену через scrollbars
+            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
+        super().mouseMoveEvent(event)
 
-    def paintEvent(self, a0: QPaintEvent | None) -> None:
-        if self.current_pixmap is not None:
-            painter = QPainter(self)
-            scaled_pixmap = Utils.pixmap_scale(
-                self.current_pixmap,
-                int(self.w * self.scale_factor),
-                int(self.h * self.scale_factor),
-            )
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        self.setCursor(Qt.ArrowCursor)
+        self._last_mouse_pos = None
+        super().mouseReleaseEvent(event)
 
-            offset = self.offset + QPoint(
-                int((self.width() - scaled_pixmap.width()) / 2),
-                int((self.height() - scaled_pixmap.height()) / 2)
-                )
-            painter.drawPixmap(offset, scaled_pixmap)
-        return super().paintEvent(a0)
+    def keyPressEvent(self, event):
+        # Если это стрелки, не обрабатываем их здесь
+        if event.key() in (Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down):
+            event.ignore()  # передаём событие родителю
+            return
+        # для остальных клавиш можно оставить стандартную обработку
+        super().keyPressEvent(event)
 
-    def resizeEvent(self, a0: QResizeEvent | None) -> None:
-        self.w, self.h = self.width(), self.height()
-        self.update()
-        return super().resizeEvent(a0)
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.pixmap_item:
+            self.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
     
 
 class ZoomBtns(QFrame):
@@ -217,16 +224,20 @@ class WinImageView(AppModalWindow):
         self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
 
         self.zoom_btns = ZoomBtns(parent=self.centralWidget())
-        self.zoom_btns.zoom_in.mouseReleaseEvent = (
+        self.zoom_btns.zoom_in.clicked.connect(
             lambda e: self.image_label.zoom_in()
         )
-        self.zoom_btns.zoom_out.mouseReleaseEvent = (
+        self.zoom_btns.zoom_out.clicked.connect(
             lambda e: self.image_label.zoom_out()
         )
-        self.zoom_btns.zoom_fit.mouseReleaseEvent = (
+        self.zoom_btns.zoom_fit.clicked.connect(
             lambda e: self.image_label.zoom_reset()
         )
         self.zoom_btns.zoom_close.mouseReleaseEvent = lambda e: self.deleteLater()
+
+        self.text_label = QLabel(self)
+        self.text_label.setStyleSheet("background: black;")
+        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.hide_all_buttons()
         QTimer.singleShot(100, self.first_load)
@@ -239,21 +250,52 @@ class WinImageView(AppModalWindow):
             self.no_connection.emit()
         self.load_thumb()
 
+
+    def restart_img_wid(self, pixmap: QPixmap):
+        self.text_label.hide()
+        self.image_label.hide()  # скрываем старый
+        new_wid = ImageWidget()
+        new_wid.mouse_moved.connect(self.zoom_btns.show)
+        self.central_layout.addWidget(new_wid)
+        new_wid.set_image(pixmap)
+
+        self.image_label.deleteLater()
+        self.image_label = new_wid
+        self.image_label.show()
+        
+        self.reconn_zoom_btns()
+
+    def reconn_zoom_btns(self):
+        self.zoom_btns.zoom_in.clicked.disconnect()
+        self.zoom_btns.zoom_out.clicked.disconnect()
+        self.zoom_btns.zoom_fit.clicked.disconnect()
+
+        self.zoom_btns.zoom_in.clicked.connect(
+            lambda e: self.image_label.zoom_in()
+        )
+        self.zoom_btns.zoom_out.clicked.connect(
+            lambda e: self.image_label.zoom_out()
+        )
+        self.zoom_btns.zoom_fit.clicked.connect(
+            lambda e: self.image_label.zoom_reset()
+        )
+
+    def show_text_label(self, text: str):
+        self.text_label.setText(text)
+        self.text_label.raise_()  # поверх остальных
+        self.text_label.show()
+
     def load_thumb(self):
         self.set_title()
-        self.image_label.clear()
         try:
             pixmap = self.wid.img_wid.pixmap()
         except Exception:
             pixmap = None
         if pixmap:
-            self.image_label.set_image(pixmap)
+            self.restart_img_wid(pixmap)
         else:
-            pixmap = QPixmap(1, 1)
-            pixmap.fill(QColor(0, 0, 0))
-            self.image_label.set_image(pixmap)
             t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[cfg.lng]}"
-            self.image_label.setText(t)
+            self.show_text_label(t)
 
         if Mf.current.set_curr_path():
             self.path = Utils.get_abs_path(Mf.current.curr_path, self.rel_path)
@@ -268,13 +310,10 @@ class WinImageView(AppModalWindow):
             if qimage:
                 if old_path == self.path:
                     pixmap = QPixmap.fromImage(qimage)
-                    self.image_label.set_image(pixmap)
+                    self.restart_img_wid(pixmap)
             else:
-                pixmap = QPixmap(1, 1)
-                pixmap.fill(QColor(0, 0, 0))
-                self.image_label.set_image(pixmap)
                 t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[cfg.lng]}"
-                self.image_label.setText(t)
+                self.show_text_label(t)
 
         self.task_count += 1
         img_thread = OneImgLoader(self.path, self.cached_images)
@@ -496,6 +535,9 @@ class WinImageView(AppModalWindow):
         self.ww = a0.size().width()
         self.hh = a0.size().height()
 
+        self.text_label.resize(self.size())
+        self.setFocus()
+
         return super().resizeEvent(a0)
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
@@ -504,6 +546,9 @@ class WinImageView(AppModalWindow):
             self.prev_image_btn.show()
             self.next_image_btn.show()
             self.zoom_btns.show()
+            self.prev_image_btn.raise_()
+            self.next_image_btn.raise_()
+            self.zoom_btns.raise_()
             self.mouse_move_timer.start(2000)
         return super().eventFilter(a0, a1)
 
