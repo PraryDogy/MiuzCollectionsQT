@@ -14,6 +14,10 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
 
+search_colors = {
+    "Синий": (np.array([100, 80, 80]), np.array([140, 255, 255])),
+    "Жёлтый": (np.array([20, 100, 100]), np.array([30, 255, 255])),
+}
 
 class SaveImagesTask(QRunnable):
     
@@ -346,10 +350,7 @@ class ColorAction(QAction):
 
 
 class MainWindow(QWidget):
-    search_colors = {
-        "Синий": (np.array([100, 80, 80]), np.array([140, 255, 255])),
-        "Жёлтый": (np.array([20, 100, 100]), np.array([30, 255, 255])),
-    }
+
 
     def __init__(self):
         super().__init__()
@@ -366,7 +367,7 @@ class MainWindow(QWidget):
 
         self.color_menu = QMenu(parent=self.color_btn)
         self.color_menu.setMinimumWidth(150)
-        for color_name, value in self.search_colors.items():
+        for color_name, value in search_colors.items():
             act = ColorAction(self.color_menu, color_name)
             act.setCheckable(True)
             act.value = value
