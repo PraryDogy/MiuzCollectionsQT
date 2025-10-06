@@ -13,6 +13,31 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
 
 Image.MAX_IMAGE_PIXELS = None
 
+
+class SaveImagesTask(QRunnable):
+    
+    class Sigs(QObject):
+        process = pyqtSignal(tuple)
+        finished_ = pyqtSignal()
+        
+    def __init__(self, images: list[dict]):
+        """
+        images: список словарей вида {"qimage": QImage, "dest": str}
+        """
+        super().__init__()
+        self.images = images
+        self.sigs = SaveImagesTask.Sigs()
+
+    def run(self):
+        for x, item in enumerate(self.images, start=1):
+            qimage = item["qimage"]
+            filepath = item["dest"]
+            if isinstance(qimage, QImage) and filepath:
+                data = (x, len(self.images))
+                self.sigs.process.emit(data)
+                qimage.save(filepath)
+
+
 class ColorHighlighter(QRunnable):
 
     class Sigs(QObject):
@@ -102,22 +127,54 @@ class ImgLabel(QLabel):
         return super().keyPressEvent(ev)
 
 
+class ProcessDialog(QWidget):
+    cancel = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.v_lay = QVBoxLayout()
+        self.setLayout(self.v_lay)
+
+        self.text_label = QLabel()
+        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.v_lay.addWidget(self.text_label)
+
+        self.cancel_btn = QPushButton("Отмена")
+        self.cancel_btn.clicked.connect(self.cancel.emit)
+        self.v_lay.addWidget(self.cancel_btn)
+
+    def center_to_parent(self, parent: QWidget):
+        try:
+            geo = self.geometry()
+            geo.moveCenter(parent.geometry().center())
+            self.setGeometry(geo)
+        except Exception as e:
+            print("base widgets, u main window, center error", e)
+
 
 class ResultsDialog(QWidget):
     def __init__(self, files: list, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.downloads = os.path.join(os.path.expanduser("~"), "Downloads")
         self.files = files
         self.filenames = []
         self.names = []
         self.percents = []
-
         self.images = {}
-
         self.init_table()
         self.init_btns()
         self.adjustSize()
+
+    def center_to_parent(self, parent: QWidget):
+        try:
+            geo = self.geometry()
+            geo.moveCenter(parent.geometry().center())
+            self.setGeometry(geo)
+        except Exception as e:
+            print("base widgets, u main window, center error", e)
 
     def init_btns(self):
         btn_lay = QHBoxLayout()
@@ -194,8 +251,19 @@ class ResultsDialog(QWidget):
             self.grid_layout.addWidget(percent_lbl, row, 2, alignment=Qt.AlignmentFlag.AlignCenter)
 
             save_btn = QPushButton("Сохранить")
+            save_btn.clicked.connect(
+                lambda q=qimg, f=filename, p=percent: self.single_save(q, f, p)
+            )
             self.grid_layout.addWidget(save_btn, row, 3, alignment=Qt.AlignmentFlag.AlignCenter)
 
+    def single_save(self, qimg, file, percent):
+        filename, ext = os.path.splitext(file)
+        dest = f"{self.downloads}/{filename} ({percent}){ext}"
+        images = [
+            {"qimage": qimg, "dest": dest},
+        ]
+        self.save_task = SaveImagesTask(images)
+        
     def show_image(self, qimage, filename, percent):
         self.img_win = ImgLabel()
         self.img_win.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -204,23 +272,6 @@ class ResultsDialog(QWidget):
         self.img_win.setPixmap(pixmap)
         self.img_win.show()
         self.img_win.raise_()
-
-
-class ProcessDialog(QWidget):
-    cancel = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.v_lay = QVBoxLayout()
-        self.setLayout(self.v_lay)
-
-        self.text_label = QLabel()
-        self.v_lay.addWidget(self.text_label)
-
-        self.cancel_btn = QPushButton("Отмена")
-        self.cancel_btn.clicked.connect(self.cancel.emit)
-        self.v_lay.addWidget(self.cancel_btn)
 
 
 class FileDropTextEdit(QTextEdit):
@@ -324,10 +375,11 @@ class MainWindow(QWidget):
         task.sigs.finished_.connect(self.finished)
 
         self.process_win = ProcessDialog()
+        self.process_win.adjustSize()
+        self.process_win.center_to_parent(self.window())
         task.sigs.process.connect(
             lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
         )
-
         self.pool.start(task)
         self.process_win.show()
 
@@ -335,6 +387,7 @@ class MainWindow(QWidget):
         self.process_win.deleteLater()
         self.start_btn.setDisabled(False)
         self.result = ResultsDialog(files)
+        self.result.center_to_parent(self.window())
         self.result.show()
 
 
