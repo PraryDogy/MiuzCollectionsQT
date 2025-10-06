@@ -93,6 +93,11 @@ class ImgLabel(QLabel):
             super().setPixmap(scaled)
         super().resizeEvent(ev)
 
+    def keyPressEvent(self, ev):
+        if ev.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(ev)
+
 
 
 class ResultsDialog(QWidget):
@@ -153,7 +158,7 @@ class ResultsDialog(QWidget):
         for col, text in enumerate(headers):
             lbl = QLabel(f"<b>{text}</b>")
             lbl.setAlignment(Qt.AlignCenter)
-            self.grid_layout.addWidget(lbl, 0, col)
+            self.grid_layout.addWidget(lbl, 0, col, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Строки
         for row, (qimg, filename, percent) in enumerate(self.files, start=1):
@@ -168,20 +173,17 @@ class ResultsDialog(QWidget):
                 pixmap_lbl.clicked.connect(
                     lambda q=qimg, f=filename, p=percent: self.show_image(q, f, p)
                 )
-            self.grid_layout.addWidget(pixmap_lbl, row, 0)
+            self.grid_layout.addWidget(pixmap_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignCenter)
 
             # Имя файла
             name_lbl = QLabel(filename)
             name_lbl.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            self.grid_layout.addWidget(name_lbl, row, 1)
+            self.grid_layout.addWidget(name_lbl, row, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             # Процент
             percent_lbl = QLabel(str(percent))
             percent_lbl.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            self.grid_layout.addWidget(percent_lbl, row, 2)
-
-        
-
+            self.grid_layout.addWidget(percent_lbl, row, 2, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def show_image(self, qimage, filename, percent):
         self.img_win = ImgLabel()
@@ -243,6 +245,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("File Drop Example")
         self.resize(400, 300)
+        self.pool = QThreadPool()
         self.selected_colors = {}
 
         layout = QVBoxLayout(self)
@@ -290,7 +293,7 @@ class MainWindow(QWidget):
         self.start_btn.setDisabled(True)
         task = ColorHighlighter(files, self.selected_colors)
         task.sigs.finished_.connect(self.finished)
-        task.run()
+        self.pool.start(task)
 
     def finished(self, files: list):
         self.start_btn.setDisabled(False)
