@@ -29,15 +29,13 @@ from .grid import Thumbnail
 class ImageWidget(QGraphicsView):
     mouse_moved = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, pixmap: QPixmap = None):
         super().__init__()
 
         self.setMouseTracking(True)
-        self.setStyleSheet("background: black; color: white;")
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
-        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setStyleSheet("background: black")
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.scene_ = QGraphicsScene()
         self.setScene(self.scene_)
@@ -45,16 +43,12 @@ class ImageWidget(QGraphicsView):
         self.pixmap_item: QGraphicsPixmapItem = None
         self._last_mouse_pos: QPointF = None
 
-    def set_image(self, pixmap: QPixmap):
-        """Устанавливает изображение и центрирует под окно"""
-        self.scene_.clear()
-        self.pixmap_item = None
-        self.pixmap_item = QGraphicsPixmapItem(pixmap)
-        self.scene_.addItem(self.pixmap_item)
-
-        self.resetTransform()
-        self.horizontalScrollBar().setValue(0)
-        self.verticalScrollBar().setValue(0)
+        if pixmap:
+            self.pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.scene_.addItem(self.pixmap_item)
+            self.resetTransform()
+            self.horizontalScrollBar().setValue(0)
+            self.verticalScrollBar().setValue(0)
 
     def zoom_in(self):
         self.scale(1.1, 1.1)
@@ -62,7 +56,7 @@ class ImageWidget(QGraphicsView):
     def zoom_out(self):
         self.scale(0.9, 0.9)
 
-    def zoom_reset(self):
+    def zoom_fit(self):
         if self.pixmap_item:
             self.resetTransform()
             self.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
@@ -215,7 +209,7 @@ class WinImageView(AppModalWindow):
         self.mouse_move_timer.setSingleShot(True)
         self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
-        self.image_label = ImageWidget()
+        self.image_label = ImageWidget(QPixmap())
         self.central_layout.addWidget(self.image_label)
         self.prev_image_btn = PrevImageBtn(self.centralWidget())
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
@@ -225,13 +219,13 @@ class WinImageView(AppModalWindow):
 
         self.zoom_btns = ZoomBtns(parent=self.centralWidget())
         self.zoom_btns.zoom_in.clicked.connect(
-            lambda e: self.image_label.zoom_in()
+            lambda: self.zoom_cmd("in")
         )
         self.zoom_btns.zoom_out.clicked.connect(
-            lambda e: self.image_label.zoom_out()
+            lambda: self.zoom_cmd("out")
         )
         self.zoom_btns.zoom_fit.clicked.connect(
-            lambda e: self.image_label.zoom_reset()
+            lambda: self.zoom_cmd("fit")
         )
         self.zoom_btns.zoom_close.mouseReleaseEvent = lambda e: self.deleteLater()
 
@@ -249,35 +243,31 @@ class WinImageView(AppModalWindow):
         if not Mf.current.set_curr_path():
             self.no_connection.emit()
         self.load_thumb()
+    
+    def zoom_cmd(self, flag: str):
+        print(flag)
+        actions = {
+            "in": self.image_label.zoom_in,
+            "out": self.image_label.zoom_out,
+            "fit": self.image_label.zoom_fit,
+        }
+        actions[flag]()
 
     def restart_img_wid(self, pixmap: QPixmap):
         self.text_label.hide()
         self.image_label.hide()  # скрываем старый
-        new_wid = ImageWidget()
+        new_wid = ImageWidget(pixmap)
         new_wid.mouse_moved.connect(self.zoom_btns.show)
         self.central_layout.addWidget(new_wid)
-        new_wid.set_image(pixmap)
 
         self.image_label.deleteLater()
         self.image_label = new_wid
         self.image_label.show()
         self.image_label.lower()
-        self.reconn_zoom_btns()
 
-    def reconn_zoom_btns(self):
-        self.zoom_btns.zoom_in.clicked.disconnect()
-        self.zoom_btns.zoom_out.clicked.disconnect()
-        self.zoom_btns.zoom_fit.clicked.disconnect()
-
-        self.zoom_btns.zoom_in.clicked.connect(
-            lambda e: self.image_label.zoom_in()
-        )
-        self.zoom_btns.zoom_out.clicked.connect(
-            lambda e: self.image_label.zoom_out()
-        )
-        self.zoom_btns.zoom_fit.clicked.connect(
-            lambda e: self.image_label.zoom_reset()
-        )
+        btns = (self.prev_image_btn, self.next_image_btn, self.zoom_btns)
+        for i in btns:
+            QTimer.singleShot(100, i.raise_)
 
     def show_text_label(self, text: str):
         self.text_label.setText(text)
@@ -322,12 +312,12 @@ class WinImageView(AppModalWindow):
 # GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
 
     def hide_all_buttons(self):
-        for i in (self.prev_image_btn, self.next_image_btn, self.zoom_btns):
+        btns = (self.prev_image_btn, self.next_image_btn, self.zoom_btns)
+        for i in btns:
             if i.underMouse():
                 return
-        self.zoom_btns.hide()
-        self.prev_image_btn.hide()
-        self.next_image_btn.hide()
+        for i in btns:
+            i.hide()
 
     def switch_image(self, offset):
         if self.task_count == self.task_count_limit:
@@ -433,7 +423,7 @@ class WinImageView(AppModalWindow):
             self.image_label.zoom_out()
 
         elif ev.key() == Qt.Key.Key_0:
-            self.image_label.zoom_reset()
+            self.image_label.zoom_fit()
 
         elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
             self.open_win_info.emit([self.rel_path])
