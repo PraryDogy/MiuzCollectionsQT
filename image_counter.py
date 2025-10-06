@@ -16,6 +16,7 @@ Image.MAX_IMAGE_PIXELS = None
 class ColorHighlighter(QRunnable):
 
     class Sigs(QObject):
+        count = pyqtSignal(tuple)
         finished_ = pyqtSignal(list)
 
     def __init__(self, files: list[str], selected_colors: dict):
@@ -28,6 +29,8 @@ class ColorHighlighter(QRunnable):
     def run(self):
         for x, i in enumerate(self.files, start=1):
             try:
+                count = (x, len(self.files))
+                self.sigs.count.emit(count)
                 qimage, filename, percent = self.highlight_colors(i)
                 self.result.append((qimage, filename, percent))
             except Exception as e:
