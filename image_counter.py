@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
                              QScrollArea, QTextEdit, QVBoxLayout, QWidget)
 
 Image.MAX_IMAGE_PIXELS = None
+pool = QThreadPool()
 
 
 class SaveImagesTask(QRunnable):
@@ -31,12 +32,13 @@ class SaveImagesTask(QRunnable):
     def run(self):
         for x, item in enumerate(self.images, start=1):
             qimage = item["qimage"]
+            assert isinstance(qimage, QImage)
             filepath = item["dest"]
-            if isinstance(qimage, QImage) and filepath:
-                data = (x, len(self.images))
-                self.sigs.process.emit(data)
-                qimage.save(filepath)
-
+            data = (x, len(self.images))
+            self.sigs.process.emit(data)
+            print(qimage.width())
+            qimage.save(filepath)
+        self.sigs.finished_.emit()
 
 class ColorHighlighter(QRunnable):
 
@@ -163,7 +165,7 @@ class ResultsDialog(QWidget):
         self.filenames = []
         self.names = []
         self.percents = []
-        self.images = {}
+        self.images = []
         self.init_table()
         self.init_btns()
         self.adjustSize()
@@ -198,6 +200,11 @@ class ResultsDialog(QWidget):
         copy_values.setFixedWidth(120)
         btn_lay.addWidget(copy_values)
 
+        save_all = QPushButton("Сохранить все")
+        save_all.clicked.connect(self.all_save)
+        save_all.setFixedWidth(120)
+        btn_lay.addWidget(save_all)
+
         btn_lay.addStretch()
 
     def init_table(self):
@@ -229,6 +236,12 @@ class ResultsDialog(QWidget):
             self.filenames.append(filename)
             self.percents.append(str(percent))
 
+            filename, ext = os.path.splitext(filename)
+            dest = f"{self.downloads}/{filename} ({percent}){ext}"
+            self.images.append(
+                {"qimage": qimg, "dest": dest}
+            )
+
             # Превью
             pixmap_lbl = ImgLabel()
             if qimg is not None:
@@ -252,17 +265,34 @@ class ResultsDialog(QWidget):
 
             save_btn = QPushButton("Сохранить")
             save_btn.clicked.connect(
-                lambda q=qimg, f=filename, p=percent: self.single_save(q, f, p)
+                lambda e, q=qimg, d=dest: self.single_save(q, d)
             )
             self.grid_layout.addWidget(save_btn, row, 3, alignment=Qt.AlignmentFlag.AlignCenter)
 
-    def single_save(self, qimg, file, percent):
-        filename, ext = os.path.splitext(file)
-        dest = f"{self.downloads}/{filename} ({percent}){ext}"
+    def single_save(self, qimg, dest):
         images = [
             {"qimage": qimg, "dest": dest},
         ]
         self.save_task = SaveImagesTask(images)
+        self.process_win = ProcessDialog()
+        self.process_win.adjustSize()
+        self.save_task.sigs.process.connect(
+            lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
+        )
+        self.save_task.sigs.finished_.connect(self.process_win.deleteLater)
+        pool.start(self.save_task)
+        self.process_win.show()
+
+    def all_save(self):
+        self.save_task = SaveImagesTask(self.images)
+        self.process_win = ProcessDialog()
+        self.process_win.adjustSize()
+        self.save_task.sigs.process.connect(
+            lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
+        )
+        self.save_task.sigs.finished_.connect(self.process_win.deleteLater)
+        pool.start(self.save_task)
+        self.process_win.show()
         
     def show_image(self, qimage, filename, percent):
         self.img_win = ImgLabel()
@@ -324,7 +354,6 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("File Drop Example")
         self.resize(400, 300)
-        self.pool = QThreadPool()
         self.selected_colors = {}
 
         layout = QVBoxLayout(self)
@@ -380,7 +409,7 @@ class MainWindow(QWidget):
         task.sigs.process.connect(
             lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
         )
-        self.pool.start(task)
+        pool.start(task)
         self.process_win.show()
 
     def finished(self, files: list):
