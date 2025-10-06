@@ -227,7 +227,9 @@ class WinImageView(AppModalWindow):
         self.zoom_btns.zoom_fit.clicked.connect(
             lambda: self.zoom_cmd("fit")
         )
-        self.zoom_btns.zoom_close.mouseReleaseEvent = lambda e: self.deleteLater()
+        self.zoom_btns.zoom_close.clicked.connect(
+            lambda: self.deleteLater()
+        )
 
         self.text_label = QLabel(self)
         self.text_label.setStyleSheet("background: black;")
@@ -245,7 +247,6 @@ class WinImageView(AppModalWindow):
         self.load_thumb()
     
     def zoom_cmd(self, flag: str):
-        print(flag)
         actions = {
             "in": self.image_label.zoom_in,
             "out": self.image_label.zoom_out,
@@ -265,9 +266,9 @@ class WinImageView(AppModalWindow):
         self.image_label.show()
         self.image_label.lower()
 
-        btns = (self.prev_image_btn, self.next_image_btn, self.zoom_btns)
-        for i in btns:
-            QTimer.singleShot(100, i.raise_)
+        # btns = (self.prev_image_btn, self.next_image_btn, self.zoom_btns)
+        # for i in btns:
+        #     QTimer.singleShot(100, i.raise_)
 
     def show_text_label(self, text: str):
         self.text_label.setText(text)

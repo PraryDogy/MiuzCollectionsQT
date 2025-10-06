@@ -200,6 +200,10 @@ class SvgShadowed(SvgBtn):
         shadow.setBlurRadius(15)
         self.setGraphicsEffect(shadow)
 
+    def mouseReleaseEvent(self, a0):
+        self.clicked.emit()
+        return super().mouseReleaseEvent(a0)
+
 
 class UTextEdit(QTextEdit):
     """QTextEdit с кастомным контекстным меню для копирования/вставки"""
