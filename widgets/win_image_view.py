@@ -7,10 +7,11 @@ from PyQt5.QtCore import (QEvent, QObject, QPoint, QPointF, QSize, Qt, QTimer,
 from PyQt5.QtGui import (QColor, QContextMenuEvent, QCursor, QIcon, QImage,
                          QKeyEvent, QMouseEvent, QPainter, QPaintEvent,
                          QPixmap, QResizeEvent, QWheelEvent)
-from PyQt5.QtWidgets import (QAction, QFrame, QGraphicsPixmapItem,
-                             QGraphicsScene, QGraphicsView, QHBoxLayout,
-                             QLabel, QScrollBar, QSpacerItem, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
+                             QGraphicsPixmapItem, QGraphicsScene,
+                             QGraphicsView, QHBoxLayout, QLabel, QScrollBar,
+                             QSpacerItem, QVBoxLayout, QWidget)
 
 from cfg import Static, cfg
 from system.lang import Lng
@@ -264,11 +265,10 @@ class WinImageView(AppModalWindow):
         self.image_label.deleteLater()
         self.image_label = new_wid
         self.image_label.show()
-        self.image_label.lower()
 
-        # btns = (self.prev_image_btn, self.next_image_btn, self.zoom_btns)
-        # for i in btns:
-        #     QTimer.singleShot(100, i.raise_)
+        btns = (self.zoom_btns, self.prev_image_btn, self.next_image_btn)
+        for i in btns:
+            i.raise_()
 
     def show_text_label(self, text: str):
         self.text_label.setText(text)
@@ -314,9 +314,9 @@ class WinImageView(AppModalWindow):
 
     def hide_all_buttons(self):
         btns = (self.prev_image_btn, self.next_image_btn, self.zoom_btns)
-        for i in btns:
-            if i.underMouse():
-                return
+        widget_under_cursor = QApplication.widgetAt(QCursor.pos())
+        if isinstance(widget_under_cursor, QSvgWidget):
+            return
         for i in btns:
             i.hide()
 
