@@ -36,7 +36,6 @@ class SaveImagesTask(QRunnable):
             filepath = item["dest"]
             data = (x, len(self.images))
             self.sigs.process.emit(data)
-            print(qimage.width())
             qimage.save(filepath)
         self.sigs.finished_.emit()
 
@@ -276,6 +275,7 @@ class ResultsDialog(QWidget):
         self.save_task = SaveImagesTask(images)
         self.process_win = ProcessDialog()
         self.process_win.adjustSize()
+        self.process_win.center_to_parent(self.window())
         self.save_task.sigs.process.connect(
             lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
         )
@@ -287,6 +287,7 @@ class ResultsDialog(QWidget):
         self.save_task = SaveImagesTask(self.images)
         self.process_win = ProcessDialog()
         self.process_win.adjustSize()
+        self.process_win.center_to_parent(self.window())
         self.save_task.sigs.process.connect(
             lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
         )
