@@ -37,11 +37,11 @@ class ColorHighlighter(QRunnable):
 
     def highlight_colors(self, file: str, min_area: int = 500) -> tuple[np.ndarray, dict]:
         """
-        Закрашивает области для всех цветов из search_colors.
-        Возвращает изображение и словарь с процентом площади каждого цвета.
+        Закрашивает найденные области красным цветом.
+        Возвращает изображение и словарь с процентом площади.
         """
         img_pil = Image.open(file)
-        img = np.array(img_pil)           # теперь это ndarray
+        img = np.array(img_pil)
         image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         output = image.copy()
@@ -52,17 +52,13 @@ class ColorHighlighter(QRunnable):
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             for cnt in contours:
                 if cv2.contourArea(cnt) >= min_area:
-                    # средний цвет диапазона
-                    fill_color = tuple(int((l+u)//2) for l, u in zip(lower, upper))  
-                    fill_color_bgr = cv2.cvtColor(np.uint8([[fill_color]]), cv2.COLOR_HSV2BGR)[0][0]
-                    cv2.drawContours(output, [cnt], -1, tuple(int(c) for c in fill_color_bgr), cv2.FILLED)
+                    cv2.drawContours(output, [cnt], -1, (0, 0, 255), cv2.FILLED)
                     cv2.drawContours(filled_mask, [cnt], -1, 255, cv2.FILLED)
-                    cv2.drawContours(output, [cnt], -1, (0, 0, 255), 2)
-
 
         percent = (cv2.countNonZero(filled_mask) / (image.shape[0] * image.shape[1])) * 100
         filename = os.path.basename(file.rstrip(os.sep))
         return (self.ndarray_to_qpimg(output), filename, round(percent, 2))
+
     
     def ndarray_to_qpimg(self, img: np.ndarray) -> QPixmap:
         """Конвертирует BGR ndarray в QPixmap"""
@@ -144,6 +140,7 @@ class ResultsDialog(QWidget):
         container = QWidget()
         self.v_layout = QVBoxLayout(container)
         self.grid_layout = QGridLayout()
+        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addLayout(self.grid_layout)
 
         scroll.setWidget(container)  # добавляем контейнер в scroll
@@ -183,6 +180,8 @@ class ResultsDialog(QWidget):
             percent_lbl.setTextInteractionFlags(Qt.TextSelectableByMouse)
             self.grid_layout.addWidget(percent_lbl, row, 2)
 
+        
+
 
     def show_image(self, qimage, filename, percent):
         self.img_win = ImgLabel()
@@ -201,6 +200,13 @@ class FileDropTextEdit(QTextEdit):
         self.setPlaceholderText("Вставьте пути к файлам\nили перетащите их сюда")
         self.paths = []
 
+    def get_paths(self):
+        return [
+            i
+            for i in self.toPlainText().split("\n")
+            if i
+        ]
+
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
@@ -210,15 +216,13 @@ class FileDropTextEdit(QTextEdit):
     def dropEvent(self, event: QDropEvent):
         if not event.mimeData().hasUrls():
             return
-        for url in event.mimeData().urls():
-            url = url.toLocalFile()
-            self.paths.append(url)
-        # форматируем: один путь на строку
-        current_text = self.toPlainText().strip()
-        if current_text:
-            current_text += "\n"
-        current_text += "\n".join(self.paths)
-        self.setPlainText(current_text)
+        new_urls = [
+            url.toLocalFile().rstrip(os.sep)
+            for url in event.mimeData().urls()
+        ]
+        old_urls = self.get_paths()
+        old_urls.extend(new_urls)
+        self.setPlainText("\n".join(old_urls))
         event.acceptProposedAction()
 
 
@@ -280,8 +284,7 @@ class MainWindow(QWidget):
         self.color_menu.exec_(self.color_btn.mapToGlobal(self.color_btn.rect().bottomLeft()))
     
     def cmd(self):
-        # files = self.text_edit.toPlainText().split("\n")
-        files = self.text_edit.paths
+        files = self.text_edit.get_paths()
         if not files or not self.selected_colors:
             return
         self.start_btn.setDisabled(True)
