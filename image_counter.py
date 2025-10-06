@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
                              QHBoxLayout, QLabel, QMenu, QPushButton,
                              QScrollArea, QTextEdit, QVBoxLayout, QWidget)
 
+Image.MAX_IMAGE_PIXELS = None
 
 class ColorHighlighter(QRunnable):
 
