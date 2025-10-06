@@ -16,7 +16,7 @@ Image.MAX_IMAGE_PIXELS = None
 class ColorHighlighter(QRunnable):
 
     class Sigs(QObject):
-        count = pyqtSignal(tuple)
+        process = pyqtSignal(tuple)
         finished_ = pyqtSignal(list)
 
     def __init__(self, files: list[str], selected_colors: dict):
@@ -30,7 +30,7 @@ class ColorHighlighter(QRunnable):
         for x, i in enumerate(self.files, start=1):
             try:
                 count = (x, len(self.files))
-                self.sigs.count.emit(count)
+                self.sigs.process.emit(count)
                 qimage, filename, percent = self.highlight_colors(i)
                 self.result.append((qimage, filename, percent))
             except Exception as e:
@@ -107,10 +107,14 @@ class ResultsDialog(QWidget):
     def __init__(self, files: list, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.files = files
         self.filenames = []
         self.names = []
         self.percents = []
+
+        self.images = {}
+
         self.init_table()
         self.init_btns()
         self.adjustSize()
@@ -157,7 +161,7 @@ class ResultsDialog(QWidget):
         self.setLayout(main_layout)
 
         # Заголовки
-        headers = ["Превью", "Файл", "Процент"]
+        headers = ["Превью", "Файл", "Процент", "Действия"]
         for col, text in enumerate(headers):
             lbl = QLabel(f"<b>{text}</b>")
             lbl.setAlignment(Qt.AlignCenter)
@@ -171,7 +175,8 @@ class ResultsDialog(QWidget):
             # Превью
             pixmap_lbl = ImgLabel()
             if qimg is not None:
-                pixmap = QPixmap.fromImage(qimg).scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio)
+                pixmap = QPixmap.fromImage(qimg)
+                pixmap = pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio)
                 pixmap_lbl.setPixmap(pixmap)
                 pixmap_lbl.clicked.connect(
                     lambda q=qimg, f=filename, p=percent: self.show_image(q, f, p)
@@ -188,6 +193,9 @@ class ResultsDialog(QWidget):
             percent_lbl.setTextInteractionFlags(Qt.TextSelectableByMouse)
             self.grid_layout.addWidget(percent_lbl, row, 2, alignment=Qt.AlignmentFlag.AlignCenter)
 
+            save_btn = QPushButton("Сохранить")
+            self.grid_layout.addWidget(save_btn, row, 3, alignment=Qt.AlignmentFlag.AlignCenter)
+
     def show_image(self, qimage, filename, percent):
         self.img_win = ImgLabel()
         self.img_win.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -196,6 +204,23 @@ class ResultsDialog(QWidget):
         self.img_win.setPixmap(pixmap)
         self.img_win.show()
         self.img_win.raise_()
+
+
+class ProcessDialog(QWidget):
+    cancel = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.v_lay = QVBoxLayout()
+        self.setLayout(self.v_lay)
+
+        self.text_label = QLabel()
+        self.v_lay.addWidget(self.text_label)
+
+        self.cancel_btn = QPushButton("Отмена")
+        self.cancel_btn.clicked.connect(self.cancel.emit)
+        self.v_lay.addWidget(self.cancel_btn)
 
 
 class FileDropTextEdit(QTextEdit):
@@ -294,11 +319,20 @@ class MainWindow(QWidget):
         if not files or not self.selected_colors:
             return
         self.start_btn.setDisabled(True)
+
         task = ColorHighlighter(files, self.selected_colors)
         task.sigs.finished_.connect(self.finished)
+
+        self.process_win = ProcessDialog()
+        task.sigs.process.connect(
+            lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
+        )
+
         self.pool.start(task)
+        self.process_win.show()
 
     def finished(self, files: list):
+        self.process_win.deleteLater()
         self.start_btn.setDisabled(False)
         self.result = ResultsDialog(files)
         self.result.show()
