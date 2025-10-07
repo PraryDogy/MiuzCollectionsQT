@@ -31,11 +31,14 @@ class SaveImagesTask(QRunnable):
         images: список словарей вида {"qimage": QImage, "dest": str}
         """
         super().__init__()
-        self.images = images
         self.sigs = SaveImagesTask.Sigs()
+        self.images = images
+        self.flag = True
 
     def run(self):
         for x, item in enumerate(self.images, start=1):
+            if not self.flag:
+                break
             qimage: QImage = item["qimage"]
             filepath: str = item["dest"]
             data = (x, len(self.images))
@@ -52,13 +55,18 @@ class ColorHighlighter(QRunnable):
 
     def __init__(self, files: list[str], selected_colors: dict):
         super().__init__()
+        self.sigs = ColorHighlighter.Sigs()
+
         self.files = files
         self.selected_colors = selected_colors
-        self.sigs = ColorHighlighter.Sigs()
+
         self.result = []
+        self.flag = True
 
     def run(self):
         for x, i in enumerate(self.files, start=1):
+            if not self.flag:
+                break
             try:
                 count = (x, len(self.files))
                 self.sigs.process.emit(count)
@@ -80,7 +88,6 @@ class ColorHighlighter(QRunnable):
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         output = image.copy()
         filled_mask = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
-
         for color_name, (lower, upper) in self.selected_colors.items():
             mask = cv2.inRange(hsv, lower, upper)
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -92,19 +99,16 @@ class ColorHighlighter(QRunnable):
         percent = (cv2.countNonZero(filled_mask) / (image.shape[0] * image.shape[1])) * 100
         filename = os.path.basename(file.rstrip(os.sep))
         return (self.ndarray_to_qpimg(output), filename, round(percent, 2))
-
     
     def ndarray_to_qpimg(self, img: np.ndarray) -> QPixmap:
         """Конвертирует BGR ndarray в QPixmap"""
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         h, w, ch = img_rgb.shape
         bytes_per_line = ch * w
-        qt_img = QImage(img_rgb.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        return qt_img
+        return QImage(img_rgb.data, w, h, bytes_per_line, QImage.Format_RGB888)
 
 
-
-class ImgLabel(QLabel):
+class ImgView(QLabel):
     clicked = pyqtSignal()
 
     def __init__(self):
@@ -247,7 +251,7 @@ class ResultsDialog(QWidget):
             )
 
             # Превью
-            pixmap_lbl = ImgLabel()
+            pixmap_lbl = ImgView()
             if qimg is not None:
                 pixmap = QPixmap.fromImage(qimg)
                 pixmap = pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio)
@@ -301,7 +305,7 @@ class ResultsDialog(QWidget):
         self.process_win.show()
         
     def show_image(self, qimage, filename, percent):
-        self.img_win = ImgLabel()
+        self.img_win = ImgView()
         self.img_win.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.img_win.setWindowTitle(f"{filename}: {percent}%")
         pixmap = QPixmap.fromImage(qimage).scaled(500, 500, Qt.AspectRatioMode.KeepAspectRatio)
