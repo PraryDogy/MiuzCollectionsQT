@@ -304,11 +304,7 @@ class FileDropTextEdit(QTextEdit):
         self.paths = []
 
     def get_paths(self):
-        return [
-            i
-            for i in self.toPlainText().split("\n")
-            if i
-        ]
+        return [i for i in self.toPlainText().split("\n") if i]
 
     def dropEvent(self, event: QDropEvent):
         if not event.mimeData().hasUrls():
