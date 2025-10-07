@@ -42,6 +42,9 @@ class SaveImagesTask(QRunnable):
         self.images = images
         self.flag = True
 
+    def cancel(self):
+        self.flag = False
+
     def run(self):
         for x, item in enumerate(self.images, start=1):
             if not self.flag:
@@ -49,9 +52,16 @@ class SaveImagesTask(QRunnable):
             qimage: QImage = item["qimage"]
             filepath: str = item["dest"]
             data = (x, len(self.images))
-            self.sigs.process.emit(data)
+            try:
+                self.sigs.process.emit(data)
+            except RuntimeError:
+                ...
             qimage.save(filepath)
-        self.sigs.finished_.emit()
+        try:
+            self.sigs.finished_.emit()
+        except RuntimeError:
+            ...
+        print("save finished")
 
 
 class ColorHighlighter(QRunnable):
@@ -70,19 +80,28 @@ class ColorHighlighter(QRunnable):
         self.result = []
         self.flag = True
 
+    def cancel(self):
+        self.flag = False
+
     def run(self):
         for x, i in enumerate(self.files, start=1):
             if not self.flag:
                 break
             try:
                 count = (x, len(self.files))
-                self.sigs.process.emit(count)
+                try:
+                    self.sigs.process.emit(count)
+                except RuntimeError:
+                    ...
                 qimage, filename, percent = self.highlight_colors(i)
                 self.result.append((qimage, filename, percent))
             except Exception as e:
                 print("cv2 error", e)
-
-        self.sigs.finished_.emit(self.result)
+        try:
+            self.sigs.finished_.emit(self.result)
+        except RuntimeError:
+            ...
+        print("colors finished")
 
     def highlight_colors(self, file: str, min_area: int = 500) -> tuple[np.ndarray, dict]:
         """
@@ -129,19 +148,26 @@ class ImageLabel(QLabel):
 class ProcessDialog(QWidget):
     cancel = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, descr: str):
         super().__init__()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setMinimumWidth(200)
         self.v_lay = QVBoxLayout()
+        self.v_lay.setContentsMargins(5, 10, 5, 10)
+        self.v_lay.setSpacing(5)
         self.setLayout(self.v_lay)
 
-        self.text_label = QLabel()
-        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.v_lay.addWidget(self.text_label)
+        descr_label = QLabel(descr)
+        self.v_lay.addWidget(descr_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.count_label = QLabel()
+        self.count_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.v_lay.addWidget(self.count_label)
 
         self.cancel_btn = QPushButton("Отмена")
+        self.cancel_btn.setFixedWidth(100)
         self.cancel_btn.clicked.connect(self.cancel.emit)
-        self.v_lay.addWidget(self.cancel_btn)
+        self.v_lay.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def center_to_parent(self, parent: QWidget):
         try:
@@ -260,14 +286,17 @@ class ResultsDialog(QWidget):
 
     def save_task_cmd(self, images: list[dict]):
         self.save_task = SaveImagesTask(images)
-        self.process_win = ProcessDialog()
+        self.process_win = ProcessDialog("Сохраняю изображения в папку \"Загрузки\"")
         self.process_win.adjustSize()
         self.process_win.center_to_parent(self.window())
         self.save_task.sigs.process.connect(
-            lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
+            lambda data: self.process_win.count_label.setText(f"{data[0]} из {data[1]}")
         )
         self.save_task.sigs.finished_.connect(
             lambda: self.process_win.deleteLater()
+        )
+        self.process_win.cancel.connect(
+            lambda: self.save_task.cancel()
         )
         pool.start(self.save_task)
         self.process_win.show()
@@ -379,24 +408,25 @@ class MainWindow(QWidget):
         files = self.text_edit.get_paths()
         if not files or not self.selected_colors:
             return
-        self.start_btn.setDisabled(True)
-
         task = ColorHighlighter(files, self.selected_colors)
-        self.process_win = ProcessDialog()
+        text = f"Ищу цвета: {', '.join(list(self.selected_colors))}"
+        self.process_win = ProcessDialog(text)
         self.process_win.adjustSize()
         self.process_win.center_to_parent(self.window())
         task.sigs.finished_.connect(
             lambda files: self.show_result(files)
         )
         task.sigs.process.connect(
-            lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
+            lambda data: self.process_win.count_label.setText(f"{data[0]} из {data[1]}")
+        )
+        self.process_win.cancel.connect(
+            lambda: task.cancel()
         )
         pool.start(task)
         self.process_win.show()
 
     def show_result(self, files: list):
         self.process_win.deleteLater()
-        self.start_btn.setDisabled(False)
         self.result = ResultsDialog(files)
         self.result.center_to_parent(self.window())
         self.result.show()
