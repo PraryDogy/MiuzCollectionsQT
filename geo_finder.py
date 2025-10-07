@@ -22,9 +22,20 @@ app_support = os.path.join(
 )
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
+# search_colors = {
+#     "Синий": (np.array([90, 50, 20]), np.array([140, 255, 255])),
+#     "Жёлтый": (np.array([20, 100, 100]), np.array([30, 255, 255])),
+# }
+
 search_colors = {
-    "Синий": (np.array([100, 80, 80]), np.array([140, 255, 255])),
-    "Жёлтый": (np.array([20, 100, 100]), np.array([30, 255, 255])),
+    "Голубой": (np.array([85, 40, 40]), np.array([99, 255, 255])),
+    "Жёлтый": (np.array([20, 50, 50]), np.array([30, 255, 255])),
+    "Зелёный": (np.array([40, 50, 20]), np.array([80, 255, 255])),
+    "Красный_1": (np.array([0, 50, 20]), np.array([10, 255, 255])),
+    "Красный_2": (np.array([160, 50, 20]), np.array([179, 255, 255])),
+    "Оранжевый": (np.array([10, 50, 50]), np.array([20, 255, 255])),
+    "Синий": (np.array([100, 50, 20]), np.array([140, 255, 255])),
+    "Фиолетовый": (np.array([140, 50, 20]), np.array([160, 255, 255])),
 }
 
 
