@@ -120,28 +120,10 @@ class ImageLabel(QLabel):
 
     def __init__(self):
         super().__init__()
-    #     self._original_pixmap = None
-
-    # def setPixmap(self, pixmap: QPixmap):
-    #     self._original_pixmap = pixmap
-    #     super().setPixmap(pixmap)
 
     def mouseReleaseEvent(self, ev):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
-
-    # def resizeEvent(self, ev):
-    #     if self._original_pixmap:
-    #         scaled = self._original_pixmap.scaled(
-    #             self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation
-    #         )
-    #         super().setPixmap(scaled)
-    #     super().resizeEvent(ev)
-
-    def keyPressEvent(self, ev):
-        if ev.key() == Qt.Key.Key_Escape:
-            self.deleteLater()
-        return super().keyPressEvent(ev)
 
 
 class ProcessDialog(QWidget):
