@@ -291,7 +291,7 @@ class ResultsDialog(QWidget):
         self.process_win.show()
 
     def show_image(self, qimage: QImage, filename: str):
-        temp_path = os.path.join(self.downloads, f"{filename}.jpg", )
+        temp_path = os.path.join(app_support, f"{filename}.jpg", )
         qimage.save(temp_path)
         subprocess.Popen(["open", temp_path])
 
