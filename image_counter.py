@@ -109,28 +109,28 @@ class ColorHighlighter(QRunnable):
         return QImage(img_rgb.data, w, h, bytes_per_line, QImage.Format_RGB888)
 
 
-class ImgView(QLabel):
+class ImageLabel(QLabel):
     clicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
-        self._original_pixmap = None
+    #     self._original_pixmap = None
 
-    def setPixmap(self, pixmap: QPixmap):
-        self._original_pixmap = pixmap
-        super().setPixmap(pixmap)
+    # def setPixmap(self, pixmap: QPixmap):
+    #     self._original_pixmap = pixmap
+    #     super().setPixmap(pixmap)
 
     def mouseReleaseEvent(self, ev):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
 
-    def resizeEvent(self, ev):
-        if self._original_pixmap:
-            scaled = self._original_pixmap.scaled(
-                self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation
-            )
-            super().setPixmap(scaled)
-        super().resizeEvent(ev)
+    # def resizeEvent(self, ev):
+    #     if self._original_pixmap:
+    #         scaled = self._original_pixmap.scaled(
+    #             self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation
+    #         )
+    #         super().setPixmap(scaled)
+    #     super().resizeEvent(ev)
 
     def keyPressEvent(self, ev):
         if ev.key() == Qt.Key.Key_Escape:
@@ -169,12 +169,13 @@ class ResultsDialog(QWidget):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.downloads = os.path.join(os.path.expanduser("~"), "Downloads")
         self.files = files
+
+        self.downloads = os.path.join(os.path.expanduser("~"), "Downloads")
         self.filenames = []
-        self.names = []
         self.percents = []
         self.images = []
+
         self.init_table()
         self.init_btns()
         self.adjustSize()
@@ -210,14 +211,13 @@ class ResultsDialog(QWidget):
         btn_lay.addWidget(copy_values)
 
         save_all = QPushButton("Сохранить все")
-        save_all.clicked.connect(self.all_save)
+        save_all.clicked.connect(lambda: self.save_task_cmd(self.images))
         save_all.setFixedWidth(120)
         btn_lay.addWidget(save_all)
 
         btn_lay.addStretch()
 
     def init_table(self):
-        # Создаём область прокрутки
         scroll = QScrollArea(self)
         scroll.setWidgetResizable(True)  # чтобы содержимое растягивалось
 
@@ -233,33 +233,28 @@ class ResultsDialog(QWidget):
         main_layout.addWidget(scroll)
         self.setLayout(main_layout)
 
-        # Заголовки
         headers = ["Превью", "Файл", "Процент", "Действия"]
         for col, text in enumerate(headers):
             lbl = QLabel(f"<b>{text}</b>")
             lbl.setAlignment(Qt.AlignCenter)
             self.grid_layout.addWidget(lbl, 0, col, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Строки
         for row, (qimg, filename, percent) in enumerate(self.files, start=1):
             self.filenames.append(filename)
             self.percents.append(str(percent))
-
             filename, ext = os.path.splitext(filename)
             dest = f"{self.downloads}/{filename} ({percent}){ext}"
-            self.images.append(
-                {"qimage": qimg, "dest": dest}
-            )
+            image_dict = {"qimage": qimg, "dest": dest}
+            fake_images = [image_dict, ]
+            self.images.append(image_dict)
 
-            # Превью
-            pixmap_lbl = ImgView()
-            if qimg is not None:
-                pixmap = QPixmap.fromImage(qimg)
-                pixmap = pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio)
-                pixmap_lbl.setPixmap(pixmap)
-                pixmap_lbl.clicked.connect(
-                    lambda q=qimg, f=filename: self.show_image(q, f)
-                )
+            pixmap_lbl = ImageLabel()
+            pixmap = QPixmap.fromImage(qimg)
+            pixmap = pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio)
+            pixmap_lbl.setPixmap(pixmap)
+            pixmap_lbl.clicked.connect(
+                lambda q=qimg, f=filename: self.show_image(q, f)
+            )
             self.grid_layout.addWidget(pixmap_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignCenter)
 
             name_lbl = QLabel(filename)
@@ -271,14 +266,11 @@ class ResultsDialog(QWidget):
 
             save_btn = QPushButton("Сохранить")
             save_btn.clicked.connect(
-                lambda e, q=qimg, d=dest: self.single_save(q, d)
+                lambda e, images=fake_images: self.save_task_cmd(images)
             )
             self.grid_layout.addWidget(save_btn, row, 3, alignment=Qt.AlignmentFlag.AlignCenter)
 
-    def single_save(self, qimg, dest):
-        images = [
-            {"qimage": qimg, "dest": dest},
-        ]
+    def save_task_cmd(self, images: list[dict]):
         self.save_task = SaveImagesTask(images)
         self.process_win = ProcessDialog()
         self.process_win.adjustSize()
@@ -292,20 +284,6 @@ class ResultsDialog(QWidget):
         pool.start(self.save_task)
         self.process_win.show()
 
-    def all_save(self):
-        self.save_task = SaveImagesTask(self.images)
-        self.process_win = ProcessDialog()
-        self.process_win.adjustSize()
-        self.process_win.center_to_parent(self.window())
-        self.save_task.sigs.process.connect(
-            lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
-        )
-        self.save_task.sigs.finished_.connect(
-            lambda: self.process_win.deleteLater()
-        )
-        pool.start(self.save_task)
-        self.process_win.show()
-        
     def show_image(self, qimage: QImage, filename):
         temp_path = os.path.join(self.downloads, filename)
         qimage.save(temp_path)
