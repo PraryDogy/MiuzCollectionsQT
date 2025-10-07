@@ -6,13 +6,19 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image
-from PyQt5.QtCore import (QObject, QRunnable, Qt, QThreadPool, QTimer,
+from PyQt5.QtCore import (QObject, QPoint, QRunnable, Qt, QThreadPool, QTimer,
                           pyqtSignal)
 from PyQt5.QtGui import QDropEvent, QImage, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
                              QHBoxLayout, QLabel, QMenu, QPushButton,
                              QScrollArea, QTextEdit, QVBoxLayout, QWidget)
 
+app_support = os.path.join(
+    os.path.expanduser("~"),
+    "Library",
+    "Application Support",
+    "GeoFinder"    
+)
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
 search_colors = {
@@ -284,8 +290,8 @@ class ResultsDialog(QWidget):
         pool.start(self.save_task)
         self.process_win.show()
 
-    def show_image(self, qimage: QImage, filename):
-        temp_path = os.path.join(self.downloads, filename)
+    def show_image(self, qimage: QImage, filename: str):
+        temp_path = os.path.join(self.downloads, f"{filename}.jpg", )
         qimage.save(temp_path)
         subprocess.Popen(["open", temp_path])
 
@@ -303,12 +309,6 @@ class FileDropTextEdit(QTextEdit):
             for i in self.toPlainText().split("\n")
             if i
         ]
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.acceptProposedAction()
-        else:
-            super().dragEnterEvent(event)
 
     def dropEvent(self, event: QDropEvent):
         if not event.mimeData().hasUrls():
@@ -331,17 +331,17 @@ class ColorAction(QAction):
 
 
 class MainWindow(QWidget):
-
-
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("File Drop Example")
-        self.resize(400, 300)
+        self.setWindowTitle("GeoFinder")
+        self.resize(500, 400)
+        self.on_start()
+
         self.selected_colors = {}
 
         layout = QVBoxLayout(self)
 
-        self.color_btn = QPushButton("цвета")
+        self.color_btn = QPushButton("Цвета")
         self.color_btn.setFixedWidth(100)
         self.color_btn.clicked.connect(self.show_menu)
         layout.addWidget(self.color_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -368,6 +368,15 @@ class MainWindow(QWidget):
 
         QTimer.singleShot(50, self.show_menu)
 
+    def on_start(self):
+        os.makedirs(app_support, exist_ok=True)
+        for i in os.scandir(app_support):
+            try:
+                if i.is_file():
+                    os.remove(i.path)
+            except Exception as e:
+                print("GeoFinder MainWindow remove file error", e)
+
     def color_action(self, action: ColorAction):
         if action.color_name in self.selected_colors:
             self.selected_colors.pop(action.color_name)
@@ -377,7 +386,16 @@ class MainWindow(QWidget):
             action.setChecked(True)
 
     def show_menu(self):
-        self.color_menu.exec_(self.color_btn.mapToGlobal(self.color_btn.rect().bottomLeft()))
+        btn_rect = self.color_btn.rect()
+        global_pos = self.color_btn.mapToGlobal(btn_rect.bottomLeft())
+
+        # вычисляем центр под кнопкой
+        menu_width = self.color_menu.sizeHint().width()
+        btn_width = btn_rect.width()
+        x = global_pos.x() + (btn_width - menu_width) // 2
+        y = global_pos.y()
+
+        self.color_menu.exec_(QPoint(x, y))
     
     def cmd(self):
         files = self.text_edit.get_paths()
@@ -386,18 +404,19 @@ class MainWindow(QWidget):
         self.start_btn.setDisabled(True)
 
         task = ColorHighlighter(files, self.selected_colors)
-        task.sigs.finished_.connect(self.finished)
-
         self.process_win = ProcessDialog()
         self.process_win.adjustSize()
         self.process_win.center_to_parent(self.window())
+        task.sigs.finished_.connect(
+            lambda files: self.show_result(files)
+        )
         task.sigs.process.connect(
             lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
         )
         pool.start(task)
         self.process_win.show()
 
-    def finished(self, files: list):
+    def show_result(self, files: list):
         self.process_win.deleteLater()
         self.start_btn.setDisabled(False)
         self.result = ResultsDialog(files)
