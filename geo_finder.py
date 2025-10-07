@@ -378,7 +378,8 @@ class MainWindow(QWidget):
         self.selected_colors = {}
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(15)
 
         # Текстовое поле сверху
         self.text_edit = FileDropTextEdit(self)
@@ -386,6 +387,8 @@ class MainWindow(QWidget):
 
         # Горизонтальный лейаут для кнопок
         btn_lay = QHBoxLayout()
+        btn_lay.setContentsMargins(0, 0, 0, 0)
+        btn_lay.setSpacing(15)
         btn_lay.addStretch()
 
         # Кнопка выбора цвета
@@ -437,14 +440,16 @@ class MainWindow(QWidget):
             action.setChecked(True)
 
     def show_menu(self):
-        btn_rect = self.color_btn.rect()
-        global_pos = self.color_btn.mapToGlobal(btn_rect.bottomLeft())
+        btn_rect = self.text_edit.rect()
+        global_pos = self.text_edit.mapToGlobal(btn_rect.bottomLeft())
 
-        # вычисляем центр под кнопкой
         menu_width = self.color_menu.sizeHint().width()
+        menu_height = self.color_menu.sizeHint().height()
         btn_width = btn_rect.width()
+
+        # Центрируем и поднимаем меню вверх
         x = global_pos.x() + (btn_width - menu_width) // 2
-        y = global_pos.y()
+        y = global_pos.y() - menu_height
 
         self.color_menu.exec_(QPoint(x, y))
     
