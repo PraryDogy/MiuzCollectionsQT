@@ -317,6 +317,24 @@ class FileDropTextEdit(QTextEdit):
 
     def get_paths(self):
         return [i for i in self.toPlainText().split("\n") if i]
+    
+    def find_jpegs(self, urls: list[str]):
+        exts = (".jpg", ".jpeg")
+        stack = []
+        jpegs = []
+        for i in urls:
+            if i.lower().endswith(exts):
+                jpegs.append(i)
+            else:
+                stack.append(i)
+        while stack:
+            current_dir = stack.pop()
+            for i in os.scandir(current_dir):
+                if i.is_dir():
+                    stack.append(i)
+                elif i.name.endswith(exts):
+                    jpegs.append(i.path)
+        return jpegs
 
     def dropEvent(self, event: QDropEvent):
         if not event.mimeData().hasUrls():
@@ -325,6 +343,7 @@ class FileDropTextEdit(QTextEdit):
             url.toLocalFile().rstrip(os.sep)
             for url in event.mimeData().urls()
         ]
+        new_urls = self.find_jpegs(new_urls)
         old_urls = self.get_paths()
         old_urls.extend(new_urls)
         self.setPlainText("\n".join(old_urls))
