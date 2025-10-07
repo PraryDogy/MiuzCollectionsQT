@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -257,18 +258,15 @@ class ResultsDialog(QWidget):
                 pixmap = pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio)
                 pixmap_lbl.setPixmap(pixmap)
                 pixmap_lbl.clicked.connect(
-                    lambda q=qimg, f=filename, p=percent: self.show_image(q, f, p)
+                    lambda q=qimg, f=filename: self.show_image(q, f)
                 )
             self.grid_layout.addWidget(pixmap_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignCenter)
 
-            # Имя файла
             name_lbl = QLabel(filename)
-            name_lbl.setTextInteractionFlags(Qt.TextSelectableByMouse)
             self.grid_layout.addWidget(name_lbl, row, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             # Процент
             percent_lbl = QLabel(str(percent))
-            percent_lbl.setTextInteractionFlags(Qt.TextSelectableByMouse)
             self.grid_layout.addWidget(percent_lbl, row, 2, alignment=Qt.AlignmentFlag.AlignCenter)
 
             save_btn = QPushButton("Сохранить")
@@ -288,7 +286,9 @@ class ResultsDialog(QWidget):
         self.save_task.sigs.process.connect(
             lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
         )
-        self.save_task.sigs.finished_.connect(self.process_win.deleteLater)
+        self.save_task.sigs.finished_.connect(
+            lambda: self.process_win.deleteLater()
+        )
         pool.start(self.save_task)
         self.process_win.show()
 
@@ -300,18 +300,16 @@ class ResultsDialog(QWidget):
         self.save_task.sigs.process.connect(
             lambda data: self.process_win.text_label.setText(f"{data[0]} из {data[1]}")
         )
-        self.save_task.sigs.finished_.connect(self.process_win.deleteLater)
+        self.save_task.sigs.finished_.connect(
+            lambda: self.process_win.deleteLater()
+        )
         pool.start(self.save_task)
         self.process_win.show()
         
-    def show_image(self, qimage, filename, percent):
-        self.img_win = ImgView()
-        self.img_win.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.img_win.setWindowTitle(f"{filename}: {percent}%")
-        pixmap = QPixmap.fromImage(qimage).scaled(500, 500, Qt.AspectRatioMode.KeepAspectRatio)
-        self.img_win.setPixmap(pixmap)
-        self.img_win.show()
-        self.img_win.raise_()
+    def show_image(self, qimage: QImage, filename):
+        temp_path = os.path.join(self.downloads, filename)
+        qimage.save(temp_path)
+        subprocess.Popen(["open", temp_path])
 
 
 class FileDropTextEdit(QTextEdit):
