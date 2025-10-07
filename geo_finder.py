@@ -9,9 +9,10 @@ from PIL import Image
 from PyQt5.QtCore import (QObject, QPoint, QRunnable, Qt, QThreadPool, QTimer,
                           pyqtSignal)
 from PyQt5.QtGui import QDropEvent, QImage, QPixmap
-from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
-                             QHBoxLayout, QLabel, QMenu, QPushButton,
-                             QScrollArea, QTextEdit, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QFrame,
+                             QGridLayout, QHBoxLayout, QLabel, QMenu,
+                             QPushButton, QScrollArea, QTextEdit, QVBoxLayout,
+                             QWidget)
 
 app_support = os.path.join(
     os.path.expanduser("~"),
@@ -184,6 +185,7 @@ class ResultsDialog(QWidget):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.resize(650, 650)
         self.files = files
 
         self.downloads = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -191,9 +193,10 @@ class ResultsDialog(QWidget):
         self.percents = []
         self.images = []
 
+        self.main_layout = QVBoxLayout(self)
         self.init_table()
         self.init_btns()
-        self.adjustSize()
+        self.setLayout(self.main_layout)
 
     def center_to_parent(self, parent: QWidget):
         try:
@@ -206,8 +209,6 @@ class ResultsDialog(QWidget):
     def init_btns(self):
         btn_lay = QHBoxLayout()
         btn_lay.setSpacing(15)
-        self.v_layout.addLayout(btn_lay)
-
         btn_lay.addStretch()
 
         def copy_cmd(values: list):
@@ -215,12 +216,12 @@ class ResultsDialog(QWidget):
             clipboard = QApplication.clipboard()
             clipboard.setText(text)
 
-        copy_names = QPushButton("Копир. имена")
+        copy_names = QPushButton("Коп. имена")
         copy_names.clicked.connect(lambda: copy_cmd(self.filenames))
         copy_names.setFixedWidth(120)
         btn_lay.addWidget(copy_names)
 
-        copy_values = QPushButton("Копир. резул.")
+        copy_values = QPushButton("Коп. проценты")
         copy_values.clicked.connect(lambda: copy_cmd(self.percents))
         copy_values.setFixedWidth(120)
         btn_lay.addWidget(copy_values)
@@ -231,10 +232,11 @@ class ResultsDialog(QWidget):
         btn_lay.addWidget(save_all)
 
         btn_lay.addStretch()
+        self.main_layout.addLayout(btn_lay)  # кнопки в основной layout, под скроллом
 
     def init_table(self):
         scroll = QScrollArea(self)
-        scroll.setWidgetResizable(True)  # чтобы содержимое растягивалось
+        scroll.setWidgetResizable(True)  # содержимое растягивается
 
         # Контейнер внутри scroll
         container = QWidget()
@@ -243,10 +245,8 @@ class ResultsDialog(QWidget):
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addLayout(self.grid_layout)
 
-        scroll.setWidget(container)  # добавляем контейнер в scroll
-        main_layout = QVBoxLayout(self)  # основной layout для окна
-        main_layout.addWidget(scroll)
-        self.setLayout(main_layout)
+        scroll.setWidget(container)
+        self.main_layout.addWidget(scroll)  # добавляем scroll в основной layout
 
         headers = ["Превью", "Файл", "Процент", "Действия"]
         for col, text in enumerate(headers):
@@ -257,21 +257,24 @@ class ResultsDialog(QWidget):
         for row, (qimg, filename, percent) in enumerate(self.files, start=1):
             self.filenames.append(filename)
             self.percents.append(str(percent))
-            filename, ext = os.path.splitext(filename)
-            dest = f"{self.downloads}/{filename} ({percent}){ext}"
+            filename_no_ext, ext = os.path.splitext(filename)
+            dest = f"{self.downloads}/{filename_no_ext} ({percent}){ext}"
             image_dict = {"qimage": qimg, "dest": dest}
-            fake_images = [image_dict, ]
+            fake_images = [image_dict]
             self.images.append(image_dict)
 
+            # Превью
             pixmap_lbl = ImageLabel()
             pixmap = QPixmap.fromImage(qimg)
             pixmap = pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio)
             pixmap_lbl.setPixmap(pixmap)
-            pixmap_lbl.clicked.connect(
-                lambda q=qimg, f=filename: self.show_image(q, f)
-            )
+            pixmap_lbl.clicked.connect(lambda q=qimg, f=filename: self.show_image(q, f))
             self.grid_layout.addWidget(pixmap_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignCenter)
 
+            pixmap_lbl.setFrameShape(QFrame.Box)
+            pixmap_lbl.setLineWidth(1)
+
+            # Имя файла
             name_lbl = QLabel(filename)
             self.grid_layout.addWidget(name_lbl, row, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -279,10 +282,9 @@ class ResultsDialog(QWidget):
             percent_lbl = QLabel(str(percent))
             self.grid_layout.addWidget(percent_lbl, row, 2, alignment=Qt.AlignmentFlag.AlignCenter)
 
+            # Кнопка сохранить
             save_btn = QPushButton("Сохранить")
-            save_btn.clicked.connect(
-                lambda e, images=fake_images: self.save_task_cmd(images)
-            )
+            save_btn.clicked.connect(lambda e, images=fake_images: self.save_task_cmd(images))
             self.grid_layout.addWidget(save_btn, row, 3, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def save_task_cmd(self, images: list[dict]):
