@@ -314,7 +314,7 @@ class FileDropTextEdit(QTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setAcceptDrops(True)
-        self.setPlaceholderText("Вставьте пути к файлам\nили перетащите их сюда")
+        self.setPlaceholderText("Вставьте пути к файлам или перетащите их сюда")
         self.paths = []
 
     def get_paths(self):
@@ -364,17 +364,35 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("GeoFinder")
         self.resize(500, 400)
-        self.on_start()
-
         self.selected_colors = {}
 
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(5, 5, 5, 5)
 
+        # Текстовое поле сверху
+        self.text_edit = FileDropTextEdit(self)
+        layout.addWidget(self.text_edit)
+
+        # Горизонтальный лейаут для кнопок
+        btn_lay = QHBoxLayout()
+        btn_lay.addStretch()
+
+        # Кнопка выбора цвета
         self.color_btn = QPushButton("Цвета")
         self.color_btn.setFixedWidth(100)
         self.color_btn.clicked.connect(self.show_menu)
-        layout.addWidget(self.color_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        btn_lay.addWidget(self.color_btn)
 
+        # Кнопка Старт
+        self.start_btn = QPushButton("Старт", self)
+        self.start_btn.setFixedWidth(100)
+        self.start_btn.clicked.connect(self.cmd)
+        btn_lay.addWidget(self.start_btn)
+
+        btn_lay.addStretch()
+        layout.addLayout(btn_lay)
+
+        # Меню цветов
         self.color_menu = QMenu(parent=self.color_btn)
         self.color_menu.setMinimumWidth(150)
         for color_name, value in search_colors.items():
@@ -387,14 +405,7 @@ class MainWindow(QWidget):
                 act.setChecked(True)
             self.color_menu.addAction(act)
 
-        self.text_edit = FileDropTextEdit(self)
-        layout.addWidget(self.text_edit)
-
-        self.start_btn = QPushButton("Старт", self)
-        self.start_btn.setFixedWidth(100)
-        self.start_btn.clicked.connect(self.cmd)
-        layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-
+        # Показать меню через таймер для теста
         QTimer.singleShot(50, self.show_menu)
 
     def on_start(self):
