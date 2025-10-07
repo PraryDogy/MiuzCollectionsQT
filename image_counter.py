@@ -5,7 +5,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image
-from PyQt5.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
+from PyQt5.QtCore import (QObject, QRunnable, Qt, QThreadPool, QTimer,
+                          pyqtSignal)
 from PyQt5.QtGui import QDropEvent, QImage, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
                              QHBoxLayout, QLabel, QMenu, QPushButton,
@@ -13,11 +14,11 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QGridLayout,
 
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
-
 search_colors = {
     "Синий": (np.array([100, 80, 80]), np.array([140, 255, 255])),
     "Жёлтый": (np.array([20, 100, 100]), np.array([30, 255, 255])),
 }
+
 
 class SaveImagesTask(QRunnable):
     
@@ -25,7 +26,7 @@ class SaveImagesTask(QRunnable):
         process = pyqtSignal(tuple)
         finished_ = pyqtSignal()
         
-    def __init__(self, images: list[dict]):
+    def __init__(self, images: list[dict[QImage, str]]):
         """
         images: список словарей вида {"qimage": QImage, "dest": str}
         """
@@ -35,13 +36,13 @@ class SaveImagesTask(QRunnable):
 
     def run(self):
         for x, item in enumerate(self.images, start=1):
-            qimage = item["qimage"]
-            assert isinstance(qimage, QImage)
-            filepath = item["dest"]
+            qimage: QImage = item["qimage"]
+            filepath: str = item["dest"]
             data = (x, len(self.images))
             self.sigs.process.emit(data)
             qimage.save(filepath)
         self.sigs.finished_.emit()
+
 
 class ColorHighlighter(QRunnable):
 
@@ -384,6 +385,8 @@ class MainWindow(QWidget):
         self.start_btn.setFixedWidth(100)
         self.start_btn.clicked.connect(self.cmd)
         layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        QTimer.singleShot(50, self.show_menu)
 
     def color_action(self, action: ColorAction):
         if action.color_name in self.selected_colors:
