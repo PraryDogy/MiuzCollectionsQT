@@ -542,7 +542,7 @@ class WinMain(UMainWindow):
 
         def on_closed():
             self.view_win = None
-            gc.collect
+            gc.collect()
 
         if len(self.grid.selected_widgets) == 1:
             path_to_wid = self.grid.path_to_wid.copy()
@@ -614,6 +614,7 @@ class WinMain(UMainWindow):
             UThreadPool.start(self.scaner_task)
         elif self.scaner_task.task_state.finished():
             self.scaner_task = None
+            gc.collect()
             self.start_scaner_task()
         else:
             QTimer.singleShot(3000, self.start_scaner_task)
