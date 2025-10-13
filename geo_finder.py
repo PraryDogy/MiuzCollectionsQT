@@ -20,6 +20,10 @@ app_support = os.path.join(
     "Application Support",
     "GeoFinder"    
 )
+downloads = os.path.join(
+    os.path.expanduser("~"),
+    "Downloads"
+)
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
 # search_colors = {
@@ -62,14 +66,18 @@ class SaveImagesTask(QRunnable):
         for x, item in enumerate(self.images, start=1):
             if not self.flag:
                 break
-            qimage: QImage = item["qimage"]
-            filepath: str = item["dest"]
+            src_qimage: QImage = item["src_qimage"]
+            res_qimage: QImage = item["res_qimage"]
+            src_dest: str = item["src_dest"]
+            res_dest: str = item["res_dest"]
             data = (x, len(self.images))
             try:
                 self.sigs.process.emit(data)
             except RuntimeError:
                 ...
-            qimage.save(filepath)
+            src_qimage.save(src_dest)
+            res_qimage.save(res_dest)
+        subprocess.Popen(["open", downloads])
         try:
             self.sigs.finished_.emit()
         except RuntimeError:
@@ -205,7 +213,6 @@ class ResultsDialog(QWidget):
         self.resize(650, 650)
         self.files = files
 
-        self.downloads = os.path.join(os.path.expanduser("~"), "Downloads")
         self.filenames = []
         self.percents = []
         self.images = []
@@ -271,22 +278,28 @@ class ResultsDialog(QWidget):
             lbl.setAlignment(Qt.AlignCenter)
             self.grid_layout.addWidget(lbl, 0, col, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        for row, (src_qimg, qimg, filename, percent) in enumerate(self.files, start=1):
+        for row, (src_qimage, res_qimage, filename, percent) in enumerate(self.files, start=1):
             self.filenames.append(filename)
             self.percents.append(str(percent))
             filename_no_ext, ext = os.path.splitext(filename)
-            dest = f"{self.downloads}/{filename_no_ext} ({percent}){ext}"
-            image_dict = {"qimage": qimg, "dest": dest}
+            src_dest = f"{downloads}/{filename_no_ext}{ext}"
+            res_dest = f"{downloads}/{filename_no_ext} ({percent}){ext}"
+            image_dict = {
+                "src_qimage": src_qimage,
+                "res_qimage": res_qimage,
+                "src_dest": src_dest,
+                "res_dest": res_dest
+            }
             fake_images = [image_dict]
             self.images.append(image_dict)
 
             # Превью
             pixmap_lbl = ImageLabel()
-            pixmap = QPixmap.fromImage(qimg)
+            pixmap = QPixmap.fromImage(res_qimage)
             pixmap = pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio)
             pixmap_lbl.setPixmap(pixmap)
             pixmap_lbl.clicked.connect(
-                lambda src_qimg=src_qimg, qimg=qimg, filename=filename:
+                lambda src_qimg=src_qimage, qimg=res_qimage, filename=filename:
                 self.show_image(src_qimg, qimg, filename)
             )
             self.grid_layout.addWidget(pixmap_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignCenter)
