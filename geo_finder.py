@@ -107,6 +107,7 @@ class ColorHighlighter(QRunnable):
                 except RuntimeError:
                     ...
                 qimage, filename, percent = self.highlight_colors(i)
+                percent = str(percent).replace(".", ",")
                 self.result.append((qimage, filename, percent))
             except Exception as e:
                 print("cv2 error", e)
@@ -419,6 +420,8 @@ class MainWindow(QWidget):
             if act.color_name in self.selected_colors:
                 act.setChecked(True)
             self.color_menu.addAction(act)
+            
+        self.on_start()
 
         # Показать меню через таймер для теста
         QTimer.singleShot(50, self.show_menu)
