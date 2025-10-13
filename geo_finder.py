@@ -63,13 +63,11 @@ class SaveImagesTask(QRunnable):
         self.flag = False
 
     def run(self):
-        for x, item in enumerate(self.images, start=1):
+        for x, (src_qimage, res_qimage, src_dest, res_dest) in enumerate(self.images, start=1):
             if not self.flag:
                 break
-            src_qimage: QImage = item["src_qimage"]
-            res_qimage: QImage = item["res_qimage"]
-            src_dest: str = item["src_dest"]
-            res_dest: str = item["res_dest"]
+            src_qimage: QImage
+            res_qimage: QImage
             data = (x, len(self.images))
             try:
                 self.sigs.process.emit(data)
@@ -284,12 +282,7 @@ class ResultsDialog(QWidget):
             filename_no_ext, ext = os.path.splitext(filename)
             src_dest = f"{downloads}/{filename_no_ext}{ext}"
             res_dest = f"{downloads}/{filename_no_ext} ({percent}){ext}"
-            image_dict = {
-                "src_qimage": src_qimage,
-                "res_qimage": res_qimage,
-                "src_dest": src_dest,
-                "res_dest": res_dest
-            }
+            image_dict = (src_qimage, res_qimage, src_dest, res_dest)
             fake_images = [image_dict]
             self.images.append(image_dict)
 
