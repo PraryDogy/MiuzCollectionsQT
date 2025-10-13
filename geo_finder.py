@@ -106,9 +106,8 @@ class ColorHighlighter(QRunnable):
                     self.sigs.process.emit(count)
                 except RuntimeError:
                     ...
-                qimage, filename, percent = self.highlight_colors(i)
-                percent = str(percent).replace(".", ",")
-                self.result.append((qimage, filename, percent))
+                src_qimage, qimage, filename, percent = self.highlight_colors(i)
+                self.result.append((src_qimage, qimage, filename, percent))
             except Exception as e:
                 print("cv2 error", e)
         try:
@@ -138,7 +137,12 @@ class ColorHighlighter(QRunnable):
 
         percent = (cv2.countNonZero(filled_mask) / (image.shape[0] * image.shape[1])) * 100
         filename = os.path.basename(file.rstrip(os.sep))
-        return (self.ndarray_to_qpimg(output), filename, round(percent, 2))
+        return (
+            self.ndarray_to_qpimg(image),
+            self.ndarray_to_qpimg(output),
+            filename,
+            str(round(percent, 2)).replace(".", ",")
+            )
     
     def ndarray_to_qpimg(self, img: np.ndarray) -> QPixmap:
         """Конвертирует BGR ndarray в QPixmap"""
@@ -267,7 +271,7 @@ class ResultsDialog(QWidget):
             lbl.setAlignment(Qt.AlignCenter)
             self.grid_layout.addWidget(lbl, 0, col, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        for row, (qimg, filename, percent) in enumerate(self.files, start=1):
+        for row, (src_qimg, qimg, filename, percent) in enumerate(self.files, start=1):
             self.filenames.append(filename)
             self.percents.append(str(percent))
             filename_no_ext, ext = os.path.splitext(filename)
@@ -281,7 +285,10 @@ class ResultsDialog(QWidget):
             pixmap = QPixmap.fromImage(qimg)
             pixmap = pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio)
             pixmap_lbl.setPixmap(pixmap)
-            pixmap_lbl.clicked.connect(lambda q=qimg, f=filename: self.show_image(q, f))
+            pixmap_lbl.clicked.connect(
+                lambda src_qimg=src_qimg, qimg=qimg, filename=filename:
+                self.show_image(src_qimg, qimg, filename)
+            )
             self.grid_layout.addWidget(pixmap_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignCenter)
 
             pixmap_lbl.setFrameShape(QFrame.Box)
@@ -317,10 +324,20 @@ class ResultsDialog(QWidget):
         pool.start(self.save_task)
         self.process_win.show()
 
-    def show_image(self, qimage: QImage, filename: str):
-        temp_path = os.path.join(app_support, f"{filename}.jpg", )
-        qimage.save(temp_path)
-        subprocess.Popen(["open", temp_path])
+    def show_image(self, src_qimage: QImage, res_qimage: QImage, filename: str):
+        filename, ext = os.path.splitext(filename)
+        src_img = os.path.join(app_support, f"{filename}_src.jpg")
+        res_img = os.path.join(app_support, f"{filename}_res.jpg")
+        for i in (src_img, res_img):
+            if os.path.exists(i):
+                try:
+                    os.remove(i)
+                except Exception as e:
+                    print("show_image remove img error", e)
+        src_qimage.save(src_img)
+        res_qimage.save(res_img)
+        subprocess.Popen(["open", src_img])
+        subprocess.Popen(["open", res_img])
 
 
 class FileDropTextEdit(QTextEdit):
