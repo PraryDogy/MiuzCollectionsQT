@@ -369,7 +369,7 @@ class ResultsDialog(QWidget):
                     os.remove(i)
                 except Exception as e:
                     print("show_image remove img error", e)
-        src_qimage.save(src_img)
+        # src_qimage.save(src_img)
         res_qimage.save(res_img)
         subprocess.Popen(["open", src_img])
         subprocess.Popen(["open", res_img])
