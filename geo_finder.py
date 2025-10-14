@@ -22,7 +22,8 @@ app_support = os.path.join(
 )
 downloads = os.path.join(
     os.path.expanduser("~"),
-    "Downloads"
+    "Downloads",
+    "GeoFinder"
 )
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
@@ -50,7 +51,7 @@ class SaveImagesTask(QRunnable):
         process = pyqtSignal(tuple)
         finished_ = pyqtSignal()
         
-    def __init__(self, images: list[dict[QImage, str]]):
+    def __init__(self, images: list[tuple[QImage, QImage, str, str]]):
         """
         images: список словарей вида {"qimage": QImage, "dest": str}
         """
@@ -63,24 +64,21 @@ class SaveImagesTask(QRunnable):
         self.flag = False
 
     def run(self):
-        for x, (src_qimage, res_qimage, src_dest, res_dest) in enumerate(self.images, start=1):
+        for x, data in enumerate(self.images, start=1):
             if not self.flag:
                 break
-            src_qimage: QImage
-            res_qimage: QImage
-            data = (x, len(self.images))
             try:
-                self.sigs.process.emit(data)
+                self.sigs.process.emit((x, len(self.images)))
             except RuntimeError:
                 ...
-            src_qimage.save(src_dest)
-            res_qimage.save(res_dest)
+            src_qimage, res_qimage, src_filename, res_filename = data
+            src_qimage.save(os.path.join(downloads, src_filename))
+            res_qimage.save(os.path.join(downloads, res_filename))
         subprocess.Popen(["open", downloads])
         try:
             self.sigs.finished_.emit()
         except RuntimeError:
             ...
-        print("save finished")
 
 
 class ColorHighlighter(QRunnable):
