@@ -279,6 +279,13 @@ class ResultsDialog(QWidget):
             image_dict = (src_qimage, res_qimage, src_filename, res_filename)
             self.images.append(image_dict)
 
+            # === контейнер для строки ===
+            row_widget = QWidget()
+            row_widget.setObjectName("row_")  # одинаковое имя для всех строк
+            row_layout = QHBoxLayout(row_widget)
+            row_layout.setContentsMargins(5, 2, 5, 2)
+            row_layout.setSpacing(10)
+
             # Превью
             pixmap_lbl = ImageLabel()
             pixmap = QPixmap.fromImage(res_qimage)
@@ -288,25 +295,38 @@ class ResultsDialog(QWidget):
                 lambda src_qimg=src_qimage, qimg=res_qimage, filename=src_filename:
                 self.show_image(src_qimg, qimg, filename)
             )
-            self.grid_layout.addWidget(pixmap_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignCenter)
-
             pixmap_lbl.setFrameShape(QFrame.Box)
             pixmap_lbl.setLineWidth(1)
+            row_layout.addWidget(pixmap_lbl)
 
             # Имя файла
             name_lbl = QLabel(src_filename)
-            self.grid_layout.addWidget(name_lbl, row, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+            name_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            row_layout.addWidget(name_lbl)
 
             # Процент
             percent_lbl = QLabel(str(percent))
-            self.grid_layout.addWidget(percent_lbl, row, 2, alignment=Qt.AlignmentFlag.AlignCenter)
+            percent_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            row_layout.addWidget(percent_lbl)
 
             # Кнопка сохранить
-            save_btn = QPushButton("Сохранить")
-            save_btn.clicked.connect(self.save_task_cmd)
-            self.grid_layout.addWidget(save_btn, row, 3, alignment=Qt.AlignmentFlag.AlignCenter)
+            save_btn = QLabel("Сохранить")
+            save_btn.mouseReleaseEvent = self.save_task_cmd
+            row_layout.addWidget(save_btn)
 
-    def save_task_cmd(self):
+            # === фон через строку ===
+            if row % 2 == 0:
+                row_widget.setStyleSheet(f"""
+                    QWidget#row_ {{
+                        {gray_style}
+                    }}
+                """)
+
+            self.grid_layout.addWidget(row_widget, row, 0, 1, 4)
+
+
+
+    def save_task_cmd(self, *args):
         self.save_task = SaveImagesTask(self.images)
         self.process_win = ProcessDialog("Сохраняю изображения в папку \"Загрузки\"")
         self.process_win.adjustSize()
