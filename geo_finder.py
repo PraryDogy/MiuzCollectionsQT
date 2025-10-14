@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                              QWidget)
 
 exts = (".jpg", ".jpeg")
-gray_style = "background-color: rgba(100, 100, 100, 150);"
+gray_style = "background-color: rgba(100, 100, 100, 50);"
 app_support = os.path.join(
     os.path.expanduser("~"),
     "Library",
@@ -211,6 +211,8 @@ class ResultsDialog(QWidget):
         self.images: list[tuple[QImage, QImage, str, str]] = []
 
         self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 10)
+        self.main_layout.setSpacing(10)
         self.init_table()
         self.init_btns()
         self.setLayout(self.main_layout)
@@ -258,18 +260,14 @@ class ResultsDialog(QWidget):
         # Контейнер внутри scroll
         container = QWidget()
         self.v_layout = QVBoxLayout(container)
+        self.v_layout.setContentsMargins(0, 10, 0, 10)
         self.grid_layout = QGridLayout()
+        # self.grid_layout.setContentsMargins(0, 0, 0, 0)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addLayout(self.grid_layout)
 
         scroll.setWidget(container)
         self.main_layout.addWidget(scroll)  # добавляем scroll в основной layout
-
-        headers = ["Превью", "Файл", "Процент", "Действия"]
-        for col, text in enumerate(headers):
-            lbl = QLabel(f"<b>{text}</b>")
-            lbl.setAlignment(Qt.AlignCenter)
-            self.grid_layout.addWidget(lbl, 0, col, alignment=Qt.AlignmentFlag.AlignCenter)
 
         for row, (src_qimage, res_qimage, src_filename, percent) in enumerate(self.files, start=1):
             self.filenames.append(src_filename)
@@ -288,6 +286,7 @@ class ResultsDialog(QWidget):
 
             # Превью
             pixmap_lbl = ImageLabel()
+            pixmap_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             pixmap = QPixmap.fromImage(res_qimage)
             pixmap = pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio)
             pixmap_lbl.setPixmap(pixmap)
@@ -295,8 +294,6 @@ class ResultsDialog(QWidget):
                 lambda src_qimg=src_qimage, qimg=res_qimage, filename=src_filename:
                 self.show_image(src_qimg, qimg, filename)
             )
-            pixmap_lbl.setFrameShape(QFrame.Box)
-            pixmap_lbl.setLineWidth(1)
             row_layout.addWidget(pixmap_lbl)
 
             # Имя файла
@@ -305,7 +302,7 @@ class ResultsDialog(QWidget):
             row_layout.addWidget(name_lbl)
 
             # Процент
-            percent_lbl = QLabel(str(percent))
+            percent_lbl = QLabel(str(percent) + "%")
             percent_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             row_layout.addWidget(percent_lbl)
 
