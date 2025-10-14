@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 from PyQt5.QtCore import (QObject, QRunnable, QSize, Qt, QThreadPool, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import QDropEvent, QImage, QPixmap
+from PyQt5.QtGui import QDropEvent, QIcon, QImage, QPixmap
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                              QLabel, QListWidget, QListWidgetItem, QPushButton,
                              QScrollArea, QSplitter, QTextEdit, QVBoxLayout,
@@ -203,7 +203,7 @@ class ResultsDialog(QWidget):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.resize(650, 650)
+        self.resize(450, 450)
         self.files = files
 
         self.filenames: list[str] = []
@@ -272,13 +272,14 @@ class ResultsDialog(QWidget):
     def init_table(self):
         scroll = QScrollArea(self)
         scroll.setWidgetResizable(True)  # содержимое растягивается
+        scroll.horizontalScrollBar().setDisabled(True)
+        scroll.horizontalScrollBar().hide()
 
         # Контейнер внутри scroll
         container = QWidget()
         self.v_layout = QVBoxLayout(container)
         self.v_layout.setContentsMargins(0, 10, 0, 10)
         self.grid_layout = QGridLayout()
-        # self.grid_layout.setContentsMargins(0, 0, 0, 0)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.v_layout.addLayout(self.grid_layout)
 
@@ -302,9 +303,10 @@ class ResultsDialog(QWidget):
 
             # Превью
             pixmap_lbl = ImageLabel()
+            pixmap_lbl.setFixedSize(68, 68)
             pixmap_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            pixmap = QPixmap.fromImage(res_qimage)
-            pixmap = pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio)
+            qicon = QIcon(QPixmap.fromImage(src_qimage))
+            pixmap = qicon.pixmap(65, 65)
             pixmap_lbl.setPixmap(pixmap)
             pixmap_lbl.clicked.connect(
                 lambda src_qimg=src_qimage, qimg=res_qimage, filename=src_filename:
@@ -314,16 +316,19 @@ class ResultsDialog(QWidget):
 
             # Имя файла
             name_lbl = QLabel(src_filename)
-            name_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            name_lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+            name_lbl.setMinimumWidth(170)
             row_layout.addWidget(name_lbl)
 
             # Процент
             percent_lbl = QLabel(str(percent) + "%")
+            percent_lbl.setFixedWidth(50)
             percent_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             row_layout.addWidget(percent_lbl)
 
             # Кнопка сохранить
             save_btn = QLabel("Сохранить")
+            save_btn.setFixedWidth(150)
             save_btn.mouseReleaseEvent = lambda e, images=[image_dict, ]: self.save_task_cmd(images)
             row_layout.addWidget(save_btn)
 
