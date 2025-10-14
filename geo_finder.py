@@ -1,17 +1,16 @@
 import os
 import subprocess
 import sys
-from pathlib import Path
 
 import cv2
 import numpy as np
 from PIL import Image
-from PyQt5.QtCore import (QObject, QPoint, QRunnable, Qt, QThreadPool, QTimer,
+from PyQt5.QtCore import (QObject, QRunnable, QSize, Qt, QThreadPool, QTimer,
                           pyqtSignal)
 from PyQt5.QtGui import QDropEvent, QImage, QPixmap
-from PyQt5.QtWidgets import (QAction, QApplication, QDialog, QFrame,
-                             QGridLayout, QHBoxLayout, QLabel, QMenu,
-                             QPushButton, QScrollArea, QTextEdit, QVBoxLayout,
+from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
+                             QLabel, QListWidget, QListWidgetItem, QPushButton,
+                             QScrollArea, QSplitter, QTextEdit, QVBoxLayout,
                              QWidget)
 
 app_support = os.path.join(
@@ -387,66 +386,67 @@ class FileDropTextEdit(QTextEdit):
         event.acceptProposedAction()
 
 
-class ColorAction(QAction):
-    def __init__(self, parent, text):
-        super().__init__(parent=parent, text=text)
-        self.value: tuple[np.array, np.array]
-        self.color_name: str
+class ColorListWidget(QListWidget):
+    def mousePressEvent(self, event):
+        item = self.itemAt(event.pos())
+        if not item:  # клик по пустому месту
+            self.clearSelection()
+        super().mousePressEvent(event)
 
 
 class MainWindow(QWidget):
+    left_wid_w = 200
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("GeoFinder")
-        self.resize(500, 400)
+        self.resize(700, 400)
         self.selected_colors = {}
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
+        # === Главный сплиттер ===
+        splitter = QSplitter(self)
+        splitter.setHandleWidth(15)
+        main_layout = QHBoxLayout(self)
+        main_layout.setContentsMargins(5, 5, 5, 5)
+        main_layout.addWidget(splitter)
+
+        # === Левая часть: QListWidget ===
+        self.list_widget = ColorListWidget()
+        splitter.addWidget(self.list_widget)
+
+        # Добавляем элементы из search_colors в QListWidget
+        for color_name, value in search_colors.items():
+            item = QListWidgetItem(color_name)
+            item.setSizeHint(QSize(0, 28))
+            item.setCheckState(Qt.Checked if color_name in self.selected_colors else Qt.Unchecked)
+            item.value = value
+            self.list_widget.addItem(item)
+        self.list_widget.itemClicked.connect(self.on_color_item_changed)
+
+        # === Правая часть: старое содержимое ===
+        right_widget = QWidget()
+        splitter.addWidget(right_widget)
+
+        layout = QVBoxLayout(right_widget)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(15)
 
-        # Текстовое поле сверху
         self.text_edit = FileDropTextEdit(self)
         layout.addWidget(self.text_edit)
 
-        # Горизонтальный лейаут для кнопок
         btn_lay = QHBoxLayout()
-        btn_lay.setContentsMargins(0, 0, 0, 0)
         btn_lay.setSpacing(15)
         btn_lay.addStretch()
 
-        # Кнопка выбора цвета
-        self.color_btn = QPushButton("Цвета")
-        self.color_btn.setFixedWidth(100)
-        self.color_btn.clicked.connect(self.show_menu)
-        btn_lay.addWidget(self.color_btn)
-
-        # Кнопка Старт
         self.start_btn = QPushButton("Старт", self)
         self.start_btn.setFixedWidth(100)
         self.start_btn.clicked.connect(self.cmd)
         btn_lay.addWidget(self.start_btn)
-
         btn_lay.addStretch()
         layout.addLayout(btn_lay)
 
-        # Меню цветов
-        self.color_menu = QMenu(parent=self.color_btn)
-        self.color_menu.setMinimumWidth(150)
-        for color_name, value in search_colors.items():
-            act = ColorAction(self.color_menu, color_name)
-            act.setCheckable(True)
-            act.value = value
-            act.color_name = color_name
-            act.triggered.connect(lambda e, act=act: self.color_action(act))
-            if act.color_name in self.selected_colors:
-                act.setChecked(True)
-            self.color_menu.addAction(act)
-            
+        splitter.setSizes([self.left_wid_w, self.width() - self.left_wid_w])
         self.on_start()
-
-        # Показать меню через таймер для теста
-        QTimer.singleShot(50, self.show_menu)
 
     def on_start(self):
         os.makedirs(app_support, exist_ok=True)
@@ -457,27 +457,13 @@ class MainWindow(QWidget):
             except Exception as e:
                 print("GeoFinder MainWindow remove file error", e)
 
-    def color_action(self, action: ColorAction):
-        if action.color_name in self.selected_colors:
-            self.selected_colors.pop(action.color_name)
-            action.setChecked(False)
+    def on_color_item_changed(self, item: QListWidgetItem):
+        if item.checkState() == Qt.Checked:
+            item.setCheckState(Qt.Unchecked)
+            self.selected_colors.pop(item.text(), None)
         else:
-            self.selected_colors[action.color_name] = action.value
-            action.setChecked(True)
-
-    def show_menu(self):
-        btn_rect = self.text_edit.rect()
-        global_pos = self.text_edit.mapToGlobal(btn_rect.bottomLeft())
-
-        menu_width = self.color_menu.sizeHint().width()
-        menu_height = self.color_menu.sizeHint().height()
-        btn_width = btn_rect.width()
-
-        # Центрируем и поднимаем меню вверх
-        x = global_pos.x() + (btn_width - menu_width) // 2
-        y = global_pos.y() - menu_height
-
-        self.color_menu.exec_(QPoint(x, y))
+            item.setCheckState(Qt.Checked)
+            self.selected_colors[item.text()] = item.value
     
     def cmd(self):
         files = self.text_edit.get_paths()
