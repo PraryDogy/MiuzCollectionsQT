@@ -70,7 +70,7 @@ class SaveImagesTask(QRunnable):
             except RuntimeError:
                 ...
             src_qimage, res_qimage, src_filename, res_filename = data
-            src_qimage.save(os.path.join(downloads, src_filename))
+            # src_qimage.save(os.path.join(downloads, src_filename))
             res_qimage.save(os.path.join(downloads, res_filename))
         subprocess.Popen(["open", downloads])
         try:
@@ -369,7 +369,7 @@ class ResultsDialog(QWidget):
                     os.remove(i)
                 except Exception as e:
                     print("show_image remove img error", e)
-        # src_qimage.save(src_img)
+        src_qimage.save(src_img)
         res_qimage.save(res_img)
         subprocess.Popen(["open", src_img])
         subprocess.Popen(["open", res_img])
