@@ -230,20 +230,36 @@ class ResultsDialog(QWidget):
         btn_lay.setSpacing(15)
         btn_lay.addStretch()
 
-        def copy_cmd(values: list):
-            text = "\n".join(values)
+        def copy_cmd():
+            combined = "\n".join(
+                f"{a}\t{b}" for a, b in zip(self.filenames, self.percents)
+            )
             clipboard = QApplication.clipboard()
-            clipboard.setText(text)
+            clipboard.setText(combined)
 
-        copy_names = QPushButton("Коп. имена")
-        copy_names.clicked.connect(lambda: copy_cmd(self.filenames))
+            # Временный QLabel
+            msg_label = QLabel("Результат скопирован\nВставьте в Excel", self)
+            msg_label.setStyleSheet("""
+                background-color: rgba(0,0,0,180);
+                color: white;
+                padding: 8px;
+                border-radius: 5px;
+            """)
+            msg_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            msg_label.setFixedSize(200, 60)
+            msg_label.move(
+                (self.width() - msg_label.width()) // 2,
+                (self.height() - msg_label.height()) // 2
+            )
+            msg_label.show()
+
+            # Скрыть через 2 секунды
+            QTimer.singleShot(2000, msg_label.deleteLater)
+
+        copy_names = QPushButton("Excel")
+        copy_names.clicked.connect(copy_cmd)
         copy_names.setFixedWidth(120)
         btn_lay.addWidget(copy_names)
-
-        copy_values = QPushButton("Коп. проценты")
-        copy_values.clicked.connect(lambda: copy_cmd(self.percents))
-        copy_values.setFixedWidth(120)
-        btn_lay.addWidget(copy_values)
 
         save_all = QPushButton("Сохранить все")
         save_all.clicked.connect(self.save_task_cmd)
