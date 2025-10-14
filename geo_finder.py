@@ -150,6 +150,31 @@ class ColorHighlighter(QRunnable):
         return QImage(img_rgb.data, w, h, bytes_per_line, QImage.Format_RGB888)
 
 
+class ImageOpener(QRunnable):
+
+    class Sigs(QObject):
+        finished_ = pyqtSignal()
+
+    def __init__(self, data: tuple[QImage, QImage, str, str]):
+        super().__init__()
+        self.sigs = ImageOpener.Sigs()
+        self.data = data
+
+    def run(self):
+        try:
+            self._run()
+        except Exception as e:
+            print("ImageOpener error", e)
+        self.sigs.finished_.emit()
+
+    def _run(self):
+        src_qimage, res_qimage, src_img, res_img = self.data
+        src_qimage.save(src_img)
+        res_qimage.save(res_img)
+        subprocess.Popen(["open", src_img])
+        subprocess.Popen(["open", res_img])
+
+
 class ImageLabel(QLabel):
     clicked = pyqtSignal()
 
@@ -270,7 +295,7 @@ class ResultsDialog(QWidget):
         scroll = QScrollArea(self)
         scroll.setWidgetResizable(True)  # содержимое растягивается
         scroll.horizontalScrollBar().setDisabled(True)
-        scroll.horizontalScrollBar().hide()
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         # Контейнер внутри scroll
         container = QWidget()
@@ -362,6 +387,13 @@ class ResultsDialog(QWidget):
         self.process_win.show()
 
     def show_image(self, src_qimage: QImage, res_qimage: QImage, filename: str):
+
+        def fin():
+            try:
+                self.img_open_wait.deleteLater()
+            except RuntimeError:
+                ...
+
         filename, ext = os.path.splitext(filename)
         src_img = os.path.join(app_support, f"{filename}_src.jpg")
         res_img = os.path.join(app_support, f"{filename}_res.jpg")
@@ -371,10 +403,16 @@ class ResultsDialog(QWidget):
                     os.remove(i)
                 except Exception as e:
                     print("show_image remove img error", e)
-        src_qimage.save(src_img)
-        res_qimage.save(res_img)
-        subprocess.Popen(["open", src_img])
-        subprocess.Popen(["open", res_img])
+
+        self.img_open_task = ImageOpener((src_qimage, res_qimage, src_img, res_img))
+        self.img_open_wait = ProcessDialog("Открываю изображения...")
+        self.img_open_wait.count_label.deleteLater()
+        self.img_open_task.sigs.finished_.connect(fin)
+        self.img_open_wait.adjustSize()
+        self.img_open_wait.center_to_parent(self)
+        self.img_open_wait.cancel_btn.setDisabled(True)
+        self.img_open_wait.show()
+        pool.start(self.img_open_task)
 
 
 class FileDropTextEdit(QTextEdit):
@@ -492,7 +530,7 @@ class MainWindow(QWidget):
                 if i.is_file():
                     os.remove(i.path)
             except Exception as e:
-                print("GeoFinder MainWindow remove file error", e)
+                print("GeoFinder MainWindow remove file error", e)    
 
     def on_color_item_changed(self, item: QListWidgetItem):
         if item.checkState() == Qt.Checked:
