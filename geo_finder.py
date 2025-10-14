@@ -258,12 +258,12 @@ class ResultsDialog(QWidget):
 
         copy_names = QPushButton("Excel")
         copy_names.clicked.connect(copy_cmd)
-        copy_names.setFixedWidth(120)
+        copy_names.setFixedWidth(130)
         btn_lay.addWidget(copy_names)
 
-        save_all = QPushButton("Сохранить все")
+        save_all = QPushButton("Сохр. все фото")
         save_all.clicked.connect(self.save_task_cmd)
-        save_all.setFixedWidth(120)
+        save_all.setFixedWidth(130)
         btn_lay.addWidget(save_all)
 
         btn_lay.addStretch()
