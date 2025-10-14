@@ -193,7 +193,7 @@ class ProcessDialog(QWidget):
         super().__init__()
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.setMinimumWidth(200)
-        self.setWindowTitle("Пожалуйста, подождите")
+        self.setWindowTitle("Внимание")
         self.v_lay = QVBoxLayout()
         self.v_lay.setContentsMargins(5, 10, 5, 10)
         self.v_lay.setSpacing(10)
