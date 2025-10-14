@@ -64,6 +64,7 @@ class SaveImagesTask(QRunnable):
         self.flag = False
 
     def run(self):
+        os.makedirs(downloads, exist_ok=True)
         for x, data in enumerate(self.images, start=1):
             if not self.flag:
                 break
@@ -110,15 +111,14 @@ class ColorHighlighter(QRunnable):
                     self.sigs.process.emit(count)
                 except RuntimeError:
                     ...
-                src_qimage, qimage, filename, percent = self.highlight_colors(i)
-                self.result.append((src_qimage, qimage, filename, percent))
+                src_qimage, res_qimage, filename, percent = self.highlight_colors(i)
+                self.result.append((src_qimage, res_qimage, filename, percent))
             except Exception as e:
                 print("cv2 error", e)
         try:
             self.sigs.finished_.emit(self.result)
         except RuntimeError:
             ...
-        print("colors finished")
 
     def highlight_colors(self, file: str, min_area: int = 500) -> tuple[np.ndarray, dict]:
         """
@@ -247,7 +247,7 @@ class ResultsDialog(QWidget):
         btn_lay.addWidget(copy_values)
 
         save_all = QPushButton("Сохранить все")
-        save_all.clicked.connect(lambda: self.save_task_cmd(self.images))
+        save_all.clicked.connect(self.save_task_cmd)
         save_all.setFixedWidth(120)
         btn_lay.addWidget(save_all)
 
@@ -274,14 +274,12 @@ class ResultsDialog(QWidget):
             lbl.setAlignment(Qt.AlignCenter)
             self.grid_layout.addWidget(lbl, 0, col, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        for row, (src_qimage, res_qimage, filename, percent) in enumerate(self.files, start=1):
-            self.filenames.append(filename)
+        for row, (src_qimage, res_qimage, src_filename, percent) in enumerate(self.files, start=1):
+            self.filenames.append(src_filename)
             self.percents.append(str(percent))
-            filename_no_ext, ext = os.path.splitext(filename)
-            src_dest = f"{downloads}/{filename_no_ext}{ext}"
-            res_dest = f"{downloads}/{filename_no_ext} ({percent}){ext}"
-            image_dict = (src_qimage, res_qimage, src_dest, res_dest)
-            fake_images = [image_dict]
+            filename, ext = os.path.splitext(src_filename)
+            res_filename = f"{filename} ({percent}){ext}"
+            image_dict = (src_qimage, res_qimage, src_filename, res_filename)
             self.images.append(image_dict)
 
             # Превью
@@ -290,7 +288,7 @@ class ResultsDialog(QWidget):
             pixmap = pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio)
             pixmap_lbl.setPixmap(pixmap)
             pixmap_lbl.clicked.connect(
-                lambda src_qimg=src_qimage, qimg=res_qimage, filename=filename:
+                lambda src_qimg=src_qimage, qimg=res_qimage, filename=src_filename:
                 self.show_image(src_qimg, qimg, filename)
             )
             self.grid_layout.addWidget(pixmap_lbl, row, 0, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -299,7 +297,7 @@ class ResultsDialog(QWidget):
             pixmap_lbl.setLineWidth(1)
 
             # Имя файла
-            name_lbl = QLabel(filename)
+            name_lbl = QLabel(src_filename)
             self.grid_layout.addWidget(name_lbl, row, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             # Процент
@@ -308,11 +306,11 @@ class ResultsDialog(QWidget):
 
             # Кнопка сохранить
             save_btn = QPushButton("Сохранить")
-            save_btn.clicked.connect(lambda e, images=fake_images: self.save_task_cmd(images))
+            save_btn.clicked.connect(self.save_task_cmd)
             self.grid_layout.addWidget(save_btn, row, 3, alignment=Qt.AlignmentFlag.AlignCenter)
 
-    def save_task_cmd(self, images: list[dict]):
-        self.save_task = SaveImagesTask(images)
+    def save_task_cmd(self):
+        self.save_task = SaveImagesTask(self.images)
         self.process_win = ProcessDialog("Сохраняю изображения в папку \"Загрузки\"")
         self.process_win.adjustSize()
         self.process_win.center_to_parent(self.window())
@@ -324,6 +322,9 @@ class ResultsDialog(QWidget):
         )
         self.process_win.cancel.connect(
             lambda: self.save_task.cancel()
+        )
+        self.process_win.cancel.connect(
+            lambda: self.process_win.deleteLater()
         )
         pool.start(self.save_task)
         self.process_win.show()
@@ -495,6 +496,9 @@ class MainWindow(QWidget):
         )
         self.process_win.cancel.connect(
             lambda: task.cancel()
+        )
+        self.process_win.cancel.connect(
+            lambda: self.process_win.deleteLater()
         )
         pool.start(task)
         self.process_win.show()
