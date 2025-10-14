@@ -206,9 +206,9 @@ class ResultsDialog(QWidget):
         self.resize(650, 650)
         self.files = files
 
-        self.filenames = []
-        self.percents = []
-        self.images = []
+        self.filenames: list[str] = []
+        self.percents: list[str] = []
+        self.images: list[tuple[QImage, QImage, str, str]] = []
 
         self.main_layout = QVBoxLayout(self)
         self.init_table()
@@ -276,7 +276,7 @@ class ResultsDialog(QWidget):
             self.percents.append(str(percent))
             filename, ext = os.path.splitext(src_filename)
             res_filename = f"{filename} ({percent}){ext}"
-            image_dict = (src_qimage, res_qimage, src_filename, res_filename)
+            image_dict: tuple[QImage, QImage, str, str] = (src_qimage, res_qimage, src_filename, res_filename)
             self.images.append(image_dict)
 
             # === контейнер для строки ===
@@ -311,7 +311,7 @@ class ResultsDialog(QWidget):
 
             # Кнопка сохранить
             save_btn = QLabel("Сохранить")
-            save_btn.mouseReleaseEvent = self.save_task_cmd
+            save_btn.mouseReleaseEvent = lambda e, images=[image_dict, ]: self.save_task_cmd(images)
             row_layout.addWidget(save_btn)
 
             # === фон через строку ===
@@ -324,10 +324,10 @@ class ResultsDialog(QWidget):
 
             self.grid_layout.addWidget(row_widget, row, 0, 1, 4)
 
-
-
-    def save_task_cmd(self, *args):
-        self.save_task = SaveImagesTask(self.images)
+    def save_task_cmd(self, images: list[tuple[QImage, QImage, str, str]] = None):
+        if not images:
+            images = self.images
+        self.save_task = SaveImagesTask(images)
         self.process_win = ProcessDialog("Сохраняю изображения в папку \"Загрузки\"")
         self.process_win.adjustSize()
         self.process_win.center_to_parent(self.window())
