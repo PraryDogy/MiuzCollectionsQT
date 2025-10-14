@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                              QScrollArea, QSplitter, QTextEdit, QVBoxLayout,
                              QWidget)
 
+exts = (".jpg", ".jpeg")
 gray_style = "background-color: rgba(100, 100, 100, 150);"
 app_support = os.path.join(
     os.path.expanduser("~"),
@@ -356,13 +357,12 @@ class FileDropTextEdit(QTextEdit):
         return [i for i in self.toPlainText().split("\n") if i]
     
     def find_jpegs(self, urls: list[str]):
-        exts = (".jpg", ".jpeg")
         stack = []
         jpegs = []
         for i in urls:
             if i.lower().endswith(exts):
                 jpegs.append(i)
-            else:
+            elif os.path.isdir(i):
                 stack.append(i)
         while stack:
             current_dir = stack.pop()
