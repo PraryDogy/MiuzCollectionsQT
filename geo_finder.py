@@ -1,3 +1,4 @@
+import colorsys
 import os
 import subprocess
 import sys
@@ -7,7 +8,7 @@ import numpy as np
 from PIL import Image
 from PyQt5.QtCore import (QObject, QRunnable, QSize, Qt, QThreadPool, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import QDropEvent, QIcon, QImage, QPixmap
+from PyQt5.QtGui import QColor, QDropEvent, QIcon, QImage, QPixmap
 from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                              QLabel, QListWidget, QListWidgetItem, QPushButton,
                              QScrollArea, QSplitter, QTextEdit, QVBoxLayout,
@@ -26,21 +27,17 @@ downloads = os.path.join(
     "Downloads",
     "GeoFinder"
 )
+search_colors = {
+    "Красный": (np.array([0, 50, 20]),   np.array([10, 255, 255]),  "#FF0000"),
+    "Оранжевый": (np.array([10, 50, 50]),  np.array([20, 255, 255]),  "#FFA500"),
+    "Жёлтый":    (np.array([20, 50, 50]),  np.array([30, 255, 255]),  "#FFD700"),
+    "Зелёный":   (np.array([40, 50, 20]),  np.array([80, 255, 255]),  "#00FF00"),
+    "Голубой":   (np.array([85, 40, 40]),  np.array([99, 255, 255]),  "#00BFFF"),
+    "Синий":     (np.array([75, 30, 30]),  np.array([150, 255, 255]), "#0000FF"),
+    "Фиолетовый":(np.array([140, 50, 20]), np.array([160, 255, 255]), "#8A2BE2"),
+}
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
-
-search_colors = {
-    "Голубой": (np.array([85, 40, 40]), np.array([99, 255, 255])),
-    "Жёлтый": (np.array([20, 50, 50]), np.array([30, 255, 255])),
-    "Зелёный": (np.array([40, 50, 20]), np.array([80, 255, 255])),
-    "Красный_1": (np.array([0, 50, 20]), np.array([10, 255, 255])),
-    "Красный_2": (np.array([160, 50, 20]), np.array([179, 255, 255])),
-    "Оранжевый": (np.array([10, 50, 50]), np.array([20, 255, 255])),
-    # "Синий": (np.array([100, 50, 20]), np.array([140, 255, 255])),
-    "Синий": (np.array([75, 30, 30]), np.array([150, 255, 255])),
-    "Фиолетовый": (np.array([140, 50, 20]), np.array([160, 255, 255])),
-}
-
 
 class SaveImagesTask(QRunnable):
     
@@ -450,12 +447,17 @@ class MainWindow(QWidget):
         splitter.addWidget(self.list_widget)
 
         # Добавляем элементы из search_colors в QListWidget
-        for color_name, value in search_colors.items():
+        for color_name, (lower, upper, hex_color) in search_colors.items():
             item = QListWidgetItem(color_name)
             item.setSizeHint(QSize(0, 28))
             item.setCheckState(Qt.Checked if color_name in self.selected_colors else Qt.Unchecked)
-            item.value = value
+            item.value = (lower, upper)
+
+            pixmap = QPixmap(12, 12)
+            pixmap.fill(QColor(hex_color))
+            item.setIcon(QIcon(pixmap))
             self.list_widget.addItem(item)
+
         self.list_widget.itemClicked.connect(self.on_color_item_changed)
 
         # === Правая часть: старое содержимое ===
