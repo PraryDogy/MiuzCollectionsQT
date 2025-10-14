@@ -28,10 +28,6 @@ downloads = os.path.join(
 )
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
-# search_colors = {
-#     "Синий": (np.array([90, 50, 20]), np.array([140, 255, 255])),
-#     "Жёлтый": (np.array([20, 100, 100]), np.array([30, 255, 255])),
-# }
 
 search_colors = {
     "Голубой": (np.array([85, 40, 40]), np.array([99, 255, 255])),
