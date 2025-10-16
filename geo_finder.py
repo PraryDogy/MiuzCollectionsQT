@@ -34,9 +34,9 @@ search_colors = {
     "Жёлтый":    (np.array([20, 50, 50]),  np.array([30, 255, 255]),  "#FFD700"),
     "Зелёный":   (np.array([40, 50, 20]),  np.array([80, 255, 255]),  "#00FF00"),
     "Голубой":   (np.array([85, 40, 40]),  np.array([99, 255, 255]),  "#00BFFF"),
-    # "Синий":     (np.array([75, 30, 30]),  np.array([150, 255, 255]), "#0000FF"), # старый
+    "Синий":     (np.array([75, 30, 30]),  np.array([150, 255, 255]), "#0000FF"), # старый
     # "Синий": (np.array([90, 80, 50]), np.array([130, 255, 220]), "#0000FF"), # новый варик 2
-    "Синий": (np.array([75, 30, 30]), np.array([150, 255, 200]), "#0000FF"),
+    # "Синий": (np.array([75, 30, 30]), np.array([150, 255, 200]), "#0000FF"),
     "Фиолетовый":(np.array([140, 50, 20]), np.array([160, 255, 255]), "#8A2BE2"),
 }
 Image.MAX_IMAGE_PIXELS = None
@@ -119,31 +119,45 @@ class ColorHighlighter(QRunnable):
 
     def highlight_colors(self, file: str, min_area: int = 500) -> tuple[np.ndarray, dict]:
         """
-        Закрашивает найденные области красным цветом.
-        Возвращает изображение и словарь с процентом площади.
+        Подсвечивает выбранные цвета на изображении красным цветом.
+        Возвращает:
+            - исходное изображение (QPixmap),
+            - изображение с подсветкой (QPixmap),
+            - имя файла,
+            - процент найденной площади (в виде строки с запятой).
         """
+        # Открываем изображение и переводим его в формат OpenCV (BGR)
         img_pil = Image.open(file)
         img = np.array(img_pil)
         image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+        # Конвертация в HSV для фильтрации по цвету
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         output = image.copy()
         filled_mask = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
-        for color_name, (lower, upper) in self.selected_colors.items():
-            mask = cv2.inRange(hsv, lower, upper)
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            for cnt in contours:
-                if cv2.contourArea(cnt) >= min_area:
-                    cv2.drawContours(output, [cnt], -1, (0, 0, 255), cv2.FILLED)
-                    cv2.drawContours(filled_mask, [cnt], -1, 255, cv2.FILLED)
 
+        # Проходим по каждому выбранному диапазону цвета
+        for color_name, (lower, upper) in self.selected_colors.items():
+            # Создаём бинарную маску по HSV диапазону
+            mask = cv2.inRange(hsv, lower, upper)
+            # Убираем шум (морфологическое открытие)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+            # Закрашиваем только пиксели, реально попавшие в диапазон
+            output[mask > 0] = (0, 0, 255)
+            filled_mask[mask > 0] = 255
+
+        # Подсчёт процента закрашенной площади
         percent = (cv2.countNonZero(filled_mask) / (image.shape[0] * image.shape[1])) * 100
         filename = os.path.basename(file.rstrip(os.sep))
+
+        # Возвращаем исходное и обработанное изображение, имя и процент
         return (
             self.ndarray_to_qpimg(image),
             self.ndarray_to_qpimg(output),
             filename,
             str(round(percent, 2)).replace(".", ",")
-            )
+        )
+
     
     def ndarray_to_qpimg(self, img: np.ndarray) -> QPixmap:
         """Конвертирует BGR ndarray в QPixmap"""
@@ -174,8 +188,7 @@ class ImageOpener(QRunnable):
         src_qimage, res_qimage, src_img, res_img = self.data
         src_qimage.save(src_img)
         res_qimage.save(res_img)
-        subprocess.Popen(["open", src_img])
-        subprocess.Popen(["open", res_img])
+        subprocess.Popen(["open", src_img, res_img])
 
 
 class ImageLabel(QLabel):
