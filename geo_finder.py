@@ -523,7 +523,7 @@ class MainWindow(QWidget):
 
         self.start_btn = QPushButton("Старт", self)
         self.start_btn.setFixedWidth(100)
-        self.start_btn.clicked.connect(self.cmd)
+        self.start_btn.clicked.connect(self.start_cmd)
         btn_lay.addWidget(self.start_btn)
         btn_lay.addStretch()
         layout.addLayout(btn_lay)
@@ -548,8 +548,9 @@ class MainWindow(QWidget):
             item.setCheckState(Qt.Checked)
             self.selected_colors[item.text()] = item.value
     
-    def cmd(self):
+    def start_cmd(self):
         files = self.text_edit.get_paths()
+        files = [i for i in files if os.path.exists(i)]
         timeout = 400
 
         if not self.selected_colors:
