@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
 
 exts = (".jpg", ".jpeg")
 gray_style = "background-color: rgba(100, 100, 100, 50);"
+red_style = "background-color: rgba(137, 0, 0, 0.3);"
 app_support = os.path.join(
     os.path.expanduser("~"),
     "Library",
@@ -554,10 +555,10 @@ class MainWindow(QWidget):
         timeout = 400
 
         if not self.selected_colors:
-            self.list_widget.setStyleSheet(gray_style)
+            self.list_widget.setStyleSheet(red_style)
             QTimer.singleShot(timeout, lambda: self.list_widget.setStyleSheet(""))
         if not files:
-            self.text_edit.setStyleSheet(gray_style)
+            self.text_edit.setStyleSheet(red_style)
             QTimer.singleShot(timeout, lambda: self.text_edit.setStyleSheet(""))
 
         if not files or not self.selected_colors:
