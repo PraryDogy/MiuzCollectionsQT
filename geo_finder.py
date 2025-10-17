@@ -1,4 +1,5 @@
 import colorsys
+import gc
 import os
 import subprocess
 import sys
@@ -111,6 +112,8 @@ class ColorHighlighter(QRunnable):
                 src_qimage, res_qimage, filename, percent = self.highlight_colors(i)
                 self.result.append((src_qimage, res_qimage, filename, percent))
             except Exception as e:
+                import traceback
+                print(traceback.format_exc())
                 print("cv2 error", e)
         try:
             self.sigs.finished_.emit(self.result)
@@ -118,45 +121,36 @@ class ColorHighlighter(QRunnable):
             ...
 
     def highlight_colors(self, file: str, min_area: int = 500) -> tuple[np.ndarray, dict]:
-        """
-        Подсвечивает выбранные цвета на изображении красным цветом.
-        Возвращает:
-            - исходное изображение (QPixmap),
-            - изображение с подсветкой (QPixmap),
-            - имя файла,
-            - процент найденной площади (в виде строки с запятой).
-        """
-        # Открываем изображение и переводим его в формат OpenCV (BGR)
         img_pil = Image.open(file)
         img = np.array(img_pil)
-        image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        img_pil.close()  # <--- освобождаем память PIL
+        del img_pil
 
-        # Конвертация в HSV для фильтрации по цвету
+        image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        del img  # <--- удаляем исходный массив
+
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         output = image.copy()
         filled_mask = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
 
-        # Проходим по каждому выбранному диапазону цвета
         for color_name, (lower, upper) in self.selected_colors.items():
-            # Создаём бинарную маску по HSV диапазону
             mask = cv2.inRange(hsv, lower, upper)
-            # Убираем шум (морфологическое открытие)
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-            # Закрашиваем только пиксели, реально попавшие в диапазон
             output[mask > 0] = (0, 0, 255)
             filled_mask[mask > 0] = 255
+            del mask  # <--- важно при больших изображениях
 
-        # Подсчёт процента закрашенной площади
         percent = (cv2.countNonZero(filled_mask) / (image.shape[0] * image.shape[1])) * 100
         filename = os.path.basename(file.rstrip(os.sep))
 
-        # Возвращаем исходное и обработанное изображение, имя и процент
-        return (
-            self.ndarray_to_qpimg(image),
-            self.ndarray_to_qpimg(output),
-            filename,
-            str(round(percent, 2)).replace(".", ",")
-        )
+        qimg_original = self.ndarray_to_qpimg(image)
+        qimg_highlighted = self.ndarray_to_qpimg(output)
+
+        del image, output, hsv, filled_mask  # <--- очистка
+        gc.collect()  # <--- принудительный сбор мусора
+
+        return qimg_original, qimg_highlighted, filename, str(round(percent, 2)).replace(".", ",")
+
 
     
     def ndarray_to_qpimg(self, img: np.ndarray) -> QPixmap:
