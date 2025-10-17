@@ -361,14 +361,19 @@ class ResultsDialog(QWidget):
             # Процент
             percent_lbl = QLabel(str(percent) + "%")
             percent_lbl.setFixedWidth(50)
-            percent_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            percent_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
             row_layout.addWidget(percent_lbl)
 
             # Кнопка сохранить
             save_btn = QLabel("Сохранить")
             save_btn.setFixedWidth(150)
+            save_btn.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
             save_btn.mouseReleaseEvent = lambda e, images=[image_dict, ]: self.save_task_cmd(images)
             row_layout.addWidget(save_btn)
+
+            # name_lbl.setStyleSheet("background: red;")
+            # percent_lbl.setStyleSheet("background: blue;")
+            # save_btn.setStyleSheet("background: yellow;")
 
             # === фон через строку ===
             if row % 2 == 0:
