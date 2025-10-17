@@ -1,6 +1,7 @@
 import colorsys
 import gc
 import os
+import shutil
 import subprocess
 import sys
 
@@ -18,16 +19,17 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
 exts = (".jpg", ".jpeg")
 gray_style = "background-color: rgba(100, 100, 100, 50);"
 red_style = "background-color: rgba(137, 0, 0, 0.3);"
+app_name = "GeoFinder"
 app_support = os.path.join(
     os.path.expanduser("~"),
     "Library",
     "Application Support",
-    "GeoFinder"    
+    app_name
 )
 downloads = os.path.join(
     os.path.expanduser("~"),
     "Downloads",
-    "GeoFinder"
+    app_name
 )
 search_colors = {
     "Красный": (np.array([0, 50, 20]),   np.array([10, 255, 255]),  "#FF0000"),
@@ -43,19 +45,29 @@ search_colors = {
 Image.MAX_IMAGE_PIXELS = None
 pool = QThreadPool()
 
+
+class ImageItem:
+    def __init__(self, src_path: str, res_path: str, percent: str, pixmap: QPixmap):
+        super().__init__()
+        self.src_path = src_path
+        self.res_path = res_path
+        self.percent = percent
+        self.pixmap = pixmap
+
+
 class SaveImagesTask(QRunnable):
     
     class Sigs(QObject):
         process = pyqtSignal(tuple)
         finished_ = pyqtSignal()
         
-    def __init__(self, images: list[tuple[QImage, QImage, str, str]]):
+    def __init__(self, image_items: list[ImageItem]):
         """
         images: список словарей вида {"qimage": QImage, "dest": str}
         """
         super().__init__()
         self.sigs = SaveImagesTask.Sigs()
-        self.images = images
+        self.image_items = image_items
         self.flag = True
 
     def cancel(self):
@@ -63,16 +75,20 @@ class SaveImagesTask(QRunnable):
 
     def run(self):
         os.makedirs(downloads, exist_ok=True)
-        for x, data in enumerate(self.images, start=1):
+        for x, item in enumerate(self.image_items, start=1):
             if not self.flag:
                 break
             try:
-                self.sigs.process.emit((x, len(self.images)))
+                self.sigs.process.emit((x, len(self.image_items)))
             except RuntimeError:
                 ...
-            src_qimage, res_qimage, src_filename, res_filename = data
-            # src_qimage.save(os.path.join(downloads, src_filename))
-            res_qimage.save(os.path.join(downloads, res_filename))
+            try:
+                dest = os.path.join(downloads, os.path.basename(item.res_path))
+                if os.path.exists(dest):
+                    os.remove(dest)
+                shutil.copy2(item.res_path, dest)
+            except Exception as e:
+                print("shutil copy file error")
         subprocess.Popen(["open", downloads])
         try:
             self.sigs.finished_.emit()
@@ -109,49 +125,60 @@ class ColorHighlighter(QRunnable):
                     self.sigs.process.emit(count)
                 except RuntimeError:
                     ...
-                src_qimage, res_qimage, filename, percent = self.highlight_colors(i)
-                self.result.append((src_qimage, res_qimage, filename, percent))
+                self.result.append(self.highlight_colors(i))
             except Exception as e:
-                import traceback
-                print(traceback.format_exc())
+                # import traceback
+                # print(traceback.format_exc())
                 print("cv2 error", e)
         try:
             self.sigs.finished_.emit(self.result)
         except RuntimeError:
             ...
 
-    def highlight_colors(self, file: str, min_area: int = 500) -> tuple[np.ndarray, dict]:
+    def highlight_colors(self, file: str) -> ImageItem:
         img_pil = Image.open(file)
         img = np.array(img_pil)
-        img_pil.close()  # <--- освобождаем память PIL
-        del img_pil
+        # img_pil.close()  # <--- освобождаем память PIL
+        # del img_pil
 
-        image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        del img  # <--- удаляем исходный массив
+        src_array_image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        # del img  # <--- удаляем исходный массив
 
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        output = image.copy()
-        filled_mask = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
+        hsv = cv2.cvtColor(src_array_image, cv2.COLOR_BGR2HSV)
+        res_array_image = src_array_image.copy()
+        filled_mask = np.zeros((src_array_image.shape[0], src_array_image.shape[1]), dtype=np.uint8)
 
         for color_name, (lower, upper) in self.selected_colors.items():
             mask = cv2.inRange(hsv, lower, upper)
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-            output[mask > 0] = (0, 0, 255)
+            res_array_image[mask > 0] = (0, 0, 255)
             filled_mask[mask > 0] = 255
             del mask  # <--- важно при больших изображениях
 
-        percent = (cv2.countNonZero(filled_mask) / (image.shape[0] * image.shape[1])) * 100
-        filename = os.path.basename(file.rstrip(os.sep))
+        # src_qimg = self.ndarray_to_qpimg(src_array_image)
+        # res_qimg = self.ndarray_to_qpimg(res_array_image)
 
-        qimg_original = self.ndarray_to_qpimg(image)
-        qimg_highlighted = self.ndarray_to_qpimg(output)
+        percent = (cv2.countNonZero(filled_mask) / (src_array_image.shape[0] * src_array_image.shape[1])) * 100
+        percent = str(round(percent, 2)).replace(".", ",")
+        filename, ext = os.path.splitext(os.path.basename(file.rstrip(os.sep)))
+        src_path = os.path.join(app_support, f"{filename}{ext}")
+        res_path = os.path.join(app_support, f"{filename} ({percent}){ext}")
 
-        del image, output, hsv, filled_mask  # <--- очистка
-        gc.collect()  # <--- принудительный сбор мусора
+        qicon = QIcon(QPixmap.fromImage(self.ndarray_to_qpimg(src_array_image)))
+        pixmap = qicon.pixmap(65, 65)
 
-        return qimg_original, qimg_highlighted, filename, str(round(percent, 2)).replace(".", ",")
+        images = (src_array_image, res_array_image)
+        paths = (src_path, res_path)
 
-
+        for img, img_path in zip(images, paths):
+            if os.path.exists(img_path):
+                try:
+                    os.remove(img_path)
+                except Exception as e:
+                    ...
+            cv2.imwrite(img_path, img)
+        
+        return ImageItem(src_path, res_path, percent, pixmap)
     
     def ndarray_to_qpimg(self, img: np.ndarray) -> QPixmap:
         """Конвертирует BGR ndarray в QPixmap"""
@@ -166,10 +193,10 @@ class ImageOpener(QRunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal()
 
-    def __init__(self, data: tuple[QImage, QImage, str, str]):
+    def __init__(self, image_item: ImageItem):
         super().__init__()
         self.sigs = ImageOpener.Sigs()
-        self.data = data
+        self.image_item = image_item
 
     def run(self):
         try:
@@ -179,10 +206,7 @@ class ImageOpener(QRunnable):
         self.sigs.finished_.emit()
 
     def _run(self):
-        src_qimage, res_qimage, src_img, res_img = self.data
-        src_qimage.save(src_img)
-        res_qimage.save(res_img)
-        subprocess.Popen(["open", src_img, res_img])
+        subprocess.Popen(["open", self.image_item.src_path, self.image_item.res_path])
 
 
 class ImageLabel(QLabel):
@@ -237,16 +261,12 @@ class ProcessDialog(QWidget):
 
 
 class ResultsDialog(QWidget):
-    def __init__(self, files: list, parent=None):
+    def __init__(self, image_items: list[ImageItem], parent=None):
         super().__init__(parent)
         self.setWindowTitle("Результаты")
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.resize(450, 450)
-        self.files = files
-
-        self.filenames: list[str] = []
-        self.percents: list[str] = []
-        self.images: list[tuple[QImage, QImage, str, str]] = []
+        self.image_items = image_items
 
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 10)
@@ -269,8 +289,16 @@ class ResultsDialog(QWidget):
         btn_lay.addStretch()
 
         def copy_cmd():
+            filenames = (
+                os.path.basename(item.src_path)
+                for item in self.image_items
+            )
+            percents = (
+                item.percent
+                for item in self.image_items
+            )
             combined = "\n".join(
-                f"{a}\t{b}" for a, b in zip(self.filenames, self.percents)
+                f"{a}\t{b}" for a, b in zip(filenames, percents)
             )
             clipboard = QApplication.clipboard()
             clipboard.setText(combined)
@@ -300,7 +328,7 @@ class ResultsDialog(QWidget):
         btn_lay.addWidget(copy_names)
 
         save_all = QPushButton("Сохр. все фото")
-        save_all.clicked.connect(self.save_task_cmd)
+        save_all.clicked.connect(lambda: self.save_task_cmd(self.image_items))
         save_all.setFixedWidth(130)
         btn_lay.addWidget(save_all)
 
@@ -324,13 +352,8 @@ class ResultsDialog(QWidget):
         scroll.setWidget(container)
         self.main_layout.addWidget(scroll)  # добавляем scroll в основной layout
 
-        for row, (src_qimage, res_qimage, src_filename, percent) in enumerate(self.files, start=1):
-            self.filenames.append(src_filename)
-            self.percents.append(str(percent))
-            filename, ext = os.path.splitext(src_filename)
-            res_filename = f"{filename} ({percent}){ext}"
-            image_dict: tuple[QImage, QImage, str, str] = (src_qimage, res_qimage, src_filename, res_filename)
-            self.images.append(image_dict)
+        for row, image_item in enumerate(self.image_items, start=1):
+            filename = os.path.basename(image_item.src_path)
 
             # === контейнер для строки ===
             row_widget = QWidget()
@@ -343,23 +366,20 @@ class ResultsDialog(QWidget):
             pixmap_lbl = ImageLabel()
             pixmap_lbl.setFixedSize(68, 68)
             pixmap_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            qicon = QIcon(QPixmap.fromImage(src_qimage))
-            pixmap = qicon.pixmap(65, 65)
-            pixmap_lbl.setPixmap(pixmap)
+            pixmap_lbl.setPixmap(image_item.pixmap)
             pixmap_lbl.clicked.connect(
-                lambda src_qimg=src_qimage, qimg=res_qimage, filename=src_filename:
-                self.show_image(src_qimg, qimg, filename)
+                lambda image_item=image_item: self.show_image(image_item)
             )
             row_layout.addWidget(pixmap_lbl)
 
             # Имя файла
-            name_lbl = QLabel(src_filename)
+            name_lbl = QLabel(filename)
             name_lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             name_lbl.setMinimumWidth(170)
             row_layout.addWidget(name_lbl)
 
             # Процент
-            percent_lbl = QLabel(str(percent) + "%")
+            percent_lbl = QLabel(image_item.percent + "%")
             percent_lbl.setFixedWidth(50)
             percent_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
             row_layout.addWidget(percent_lbl)
@@ -368,7 +388,7 @@ class ResultsDialog(QWidget):
             save_btn = QLabel("Сохранить")
             save_btn.setFixedWidth(150)
             save_btn.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
-            save_btn.mouseReleaseEvent = lambda e, images=[image_dict, ]: self.save_task_cmd(images)
+            save_btn.mouseReleaseEvent = lambda e: self.save_task_cmd([image_item, ])
             row_layout.addWidget(save_btn)
 
             # name_lbl.setStyleSheet("background: red;")
@@ -385,10 +405,8 @@ class ResultsDialog(QWidget):
 
             self.grid_layout.addWidget(row_widget, row, 0, 1, 4)
 
-    def save_task_cmd(self, images: list[tuple[QImage, QImage, str, str]] = None):
-        if not images:
-            images = self.images
-        self.save_task = SaveImagesTask(images)
+    def save_task_cmd(self, image_items: list[ImageItem]):
+        self.save_task = SaveImagesTask(image_items)
         self.process_win = ProcessDialog("Сохраняю изображения в папку \"Загрузки\"")
         self.process_win.adjustSize()
         self.process_win.center_to_parent(self.window())
@@ -407,25 +425,14 @@ class ResultsDialog(QWidget):
         pool.start(self.save_task)
         self.process_win.show()
 
-    def show_image(self, src_qimage: QImage, res_qimage: QImage, filename: str):
-
+    def show_image(self, image_item: ImageItem):
         def fin():
             try:
                 self.img_open_wait.deleteLater()
             except RuntimeError:
                 ...
 
-        filename, ext = os.path.splitext(filename)
-        src_img = os.path.join(app_support, f"{filename}_src.jpg")
-        res_img = os.path.join(app_support, f"{filename}_res.jpg")
-        for i in (src_img, res_img):
-            if os.path.exists(i):
-                try:
-                    os.remove(i)
-                except Exception as e:
-                    print("show_image remove img error", e)
-
-        self.img_open_task = ImageOpener((src_qimage, res_qimage, src_img, res_img))
+        self.img_open_task = ImageOpener(image_item)
         self.img_open_wait = ProcessDialog("Открываю изображения...")
         self.img_open_wait.count_label.deleteLater()
         self.img_open_task.sigs.finished_.connect(fin)
@@ -595,15 +602,25 @@ class MainWindow(QWidget):
         pool.start(task)
         self.process_win.show()
 
-    def show_result(self, files: list):
+    def show_result(self, files: list[ImageItem]):
         self.process_win.deleteLater()
         self.result = ResultsDialog(files)
         self.result.center_to_parent(self.window())
         self.result.show()
 
+    @classmethod
+    def on_exit(cls):
+        for i in os.scandir(app_support):
+            if i.is_file():
+                try:
+                    os.remove(i.path)
+                except Exception as e:
+                    print("on exit remove file error", e)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.aboutToQuit.connect(MainWindow.on_exit)
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())

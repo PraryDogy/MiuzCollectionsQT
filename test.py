@@ -1,4 +1,6 @@
-import os
+a = [1, 2, 3]
+b = [5, 6, 7]
 
 
-downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+for a, b in zip(a, b):
+    print(a, b)
