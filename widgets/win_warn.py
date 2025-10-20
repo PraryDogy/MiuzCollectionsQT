@@ -9,6 +9,7 @@ from system.lang import Lng
 from system.shared_utils import SharedUtils
 
 from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
+from .path_widget import PathWidget
 
 
 class BaseWinWarn(SingleActionWindow):
@@ -84,3 +85,17 @@ class WinQuestion(BaseWinWarn):
         btn_lay.addStretch()
 
         self.central_layout.addWidget(btn_wid)
+
+
+class WinUpload(WinQuestion):
+    max_width = 400
+
+    def __init__(self, title, text, path: str, char_limit=40):
+        super().__init__(title, text, char_limit)
+
+        path_widget = PathWidget(path)
+        path_widget.adjustSize()
+        self.right_layout.insertWidget(1, path_widget)
+        self.setFixedSize(path_widget.width(), self.height())
+        if self.width() > self.max_width:
+            self.setFixedWidth(self.max_width)

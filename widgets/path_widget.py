@@ -39,6 +39,7 @@ class PathItem(QWidget):
         self.setLayout(item_layout)
 
         self.img_wid = QSvgWidget()
+        self.img_wid.setFixedSize(15, 15)
         item_layout.addWidget(self.img_wid)
         
         self.text_wid = QLabel(text=name)
@@ -103,11 +104,11 @@ class PathItem(QWidget):
         QTimer.singleShot(500, self.collapse)
 
 
-class PathBar(QWidget):
+class PathWidget(QWidget):
     last_item_limit = 40
     height_ = 25
     folder_icon = "./images/folder.svg"
-    hdd_icon = ".images/hdd.svg"
+    hdd_icon = "./images/hdd.svg"
     computer_icon = "./images/computer.svg"
 
     def __init__(self, path: str):
@@ -117,7 +118,7 @@ class PathBar(QWidget):
         """
         super().__init__()
         self.path = path
-        self.setFixedHeight(PathBar.height_)
+        self.setFixedHeight(PathWidget.height_)
         self.setAcceptDrops(True)
         self.current_path: str = None
 
@@ -126,6 +127,8 @@ class PathBar(QWidget):
         self.main_lay.setSpacing(5)
         self.main_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.setLayout(self.main_lay)
+
+        self.update(path)
 
     def update(self, dir: str):
         """
@@ -157,8 +160,8 @@ class PathBar(QWidget):
 
         if last_item:
             text_ = last_item.text_wid.text()
-            if len(text_) > PathBar.last_item_limit:
-                path_item.text_wid.setText(text_[:PathBar.last_item_limit] + "...")
+            if len(text_) > PathWidget.last_item_limit:
+                path_item.text_wid.setText(text_[:PathWidget.last_item_limit] + "...")
             last_item.del_arrow()
             last_item.expand()
             last_item.enterEvent = lambda *args, **kwargs: None
