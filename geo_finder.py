@@ -37,7 +37,8 @@ search_colors = {
     "Жёлтый":    (np.array([20, 50, 50]),  np.array([30, 255, 255]),  "#FFD700"),
     "Зелёный":   (np.array([40, 50, 20]),  np.array([80, 255, 255]),  "#00FF00"),
     "Голубой":   (np.array([85, 40, 40]),  np.array([99, 255, 255]),  "#00BFFF"),
-    "Синий":     (np.array([75, 30, 30]),  np.array([150, 255, 255]), "#0000FF"),
+    # "Синий":     (np.array([75, 30, 30]),  np.array([150, 255, 255]), "#0000FF"),
+    "Синий": (np.array([90, 70, 50]), np.array([130, 255, 255]), "#0000FF"),
     "Фиолетовый":(np.array([140, 50, 20]), np.array([160, 255, 255]), "#8A2BE2"),
 }
 Image.MAX_IMAGE_PIXELS = None
@@ -136,11 +137,10 @@ class ColorHighlighter(QRunnable):
     def highlight_colors(self, file: str) -> ImageItem:
         img_pil = Image.open(file)
         img = np.array(img_pil)
-        # img_pil.close()  # <--- освобождаем память PIL
-        # del img_pil
-
         src_array_image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        # del img  # <--- удаляем исходный массив
+
+        # 🔹 лёгкое размытие, чтобы сгладить аберрации и шум
+        src_array_image = cv2.GaussianBlur(src_array_image, (3, 3), 0)
 
         hsv = cv2.cvtColor(src_array_image, cv2.COLOR_BGR2HSV)
         res_array_image = src_array_image.copy()
@@ -149,12 +149,21 @@ class ColorHighlighter(QRunnable):
         for color_name, (lower, upper) in self.selected_colors.items():
             mask = cv2.inRange(hsv, lower, upper)
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+
+            # 🔹 фильтруем "червячков" по площади и толщине
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            for c in contours:
+                area = cv2.contourArea(c)
+                if area < 150:
+                    cv2.drawContours(mask, [c], -1, 0, -1)
+                    continue
+                perimeter = cv2.arcLength(c, True)
+                if perimeter > 0 and (area / perimeter) < 3:
+                    cv2.drawContours(mask, [c], -1, 0, -1)
+
             res_array_image[mask > 0] = (0, 0, 255)
             filled_mask[mask > 0] = 255
-            del mask  # <--- важно при больших изображениях
-
-        # src_qimg = self.ndarray_to_qpimg(src_array_image)
-        # res_qimg = self.ndarray_to_qpimg(res_array_image)
+            del mask
 
         percent = (cv2.countNonZero(filled_mask) / (src_array_image.shape[0] * src_array_image.shape[1])) * 100
         percent = str(round(percent, 2)).replace(".", ",")
@@ -165,18 +174,16 @@ class ColorHighlighter(QRunnable):
         qicon = QIcon(QPixmap.fromImage(self.ndarray_to_qpimg(src_array_image)))
         pixmap = qicon.pixmap(65, 65)
 
-        images = (src_array_image, res_array_image)
-        paths = (src_path, res_path)
-
-        for img, img_path in zip(images, paths):
+        for img, img_path in zip((src_array_image, res_array_image), (src_path, res_path)):
             if os.path.exists(img_path):
                 try:
                     os.remove(img_path)
-                except Exception as e:
+                except:
                     ...
             cv2.imwrite(img_path, img)
-        
+            
         return ImageItem(src_path, res_path, percent, pixmap)
+
     
     def ndarray_to_qpimg(self, img: np.ndarray) -> QPixmap:
         """Конвертирует BGR ndarray в QPixmap"""
