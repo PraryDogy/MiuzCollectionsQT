@@ -53,6 +53,7 @@ class DatesLineEdit(ULineEdit):
     def onTextChanged(self):
         date_check = self.re_date(text=self.text())
         new_date = self.convert_date(date_check)
+        pos = self.cursorPosition()
 
         if new_date:
             self.setText(date_check)
@@ -60,8 +61,8 @@ class DatesLineEdit(ULineEdit):
         else:
             self.date = None
 
+        self.setCursorPosition(pos)
         self.inputChangedSignal.emit()
-
 
     def keyPressEvent(self, a0):
         pos = self.cursorPosition()
