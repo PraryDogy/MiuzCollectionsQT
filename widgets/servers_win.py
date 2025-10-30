@@ -23,15 +23,13 @@ class ServersWidget(QListWidget):
             item.setSizeHint(QSize(0, 25))
             self.addItem(item)
 
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_context_menu)
-
-    def show_context_menu(self, pos):
+    def contextMenuEvent(self, a0):
+        pos = a0.pos()
         item = self.itemAt(pos)
         if not item:
             return
 
-        menu = UMenu("", self)
+        menu = UMenu(a0)
         copy_action = menu.addAction(Lng.copy[cfg.lng])
         delete_action = menu.addAction(Lng.delete[cfg.lng])
         action = menu.exec_(self.mapToGlobal(pos))
@@ -40,6 +38,9 @@ class ServersWidget(QListWidget):
             QApplication.clipboard().setText(item.text())
         elif action == delete_action:
             self.remove.emit(item)
+
+        return super().contextMenuEvent(a0)
+
 
 
 class ServersWin(AppModalWindow):
