@@ -62,37 +62,47 @@ class DatesLineEdit(ULineEdit):
 
         self.inputChangedSignal.emit()
 
+
     def keyPressEvent(self, a0):
         pos = self.cursorPosition()
         key = a0.key()
-
-        print(pos)
 
         if not self.date:
             self.date = datetime.today().date()
 
         day, month, year = self.date.day, self.date.month, self.date.year
+        delta = 1 if key == Qt.Key_Up else -1
 
         if key in (Qt.Key_Up, Qt.Key_Down):
-            delta = 1 if key == Qt.Key_Up else -1
-
-            if pos in (0, 1):  # день
+            # день
+            if pos in (0, 1):
                 day += delta
-                days_in_month = calendar.monthrange(year, month)[1]
-                if day > days_in_month:
+                if day > calendar.monthrange(year, month)[1]:
                     day = 1
+                    month += 1
+                    if month > 12:
+                        month = 1
+                        year += 1
                 elif day < 1:
-                    day = days_in_month
+                    month -= 1
+                    if month < 1:
+                        month = 12
+                        year -= 1
+                    day = calendar.monthrange(year, month)[1]
 
-            elif pos in (3, 4):  # месяц
+            # месяц
+            elif pos in (3, 4):
                 month += delta
                 if month > 12:
                     month = 1
+                    year += 1
                 elif month < 1:
                     month = 12
+                    year -= 1
                 day = min(day, calendar.monthrange(year, month)[1])
 
-            elif pos in range(6, 9):  # год
+            # год
+            elif pos in range(6, 10):
                 year += delta
                 day = min(day, calendar.monthrange(year, month)[1])
 
