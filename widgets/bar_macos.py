@@ -6,11 +6,12 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QLabel, QMenu, QMenuBar, QSpacerItem,
                              QWidget)
 
-from cfg import cfg, Static
+from cfg import Static, cfg
 from system.lang import Lng
 from system.utils import Utils
 
 from ._base_widgets import SingleActionWindow, UMenu
+from .servers_win import ServersWin
 from .win_settings import WinSettings
 
 
@@ -119,6 +120,10 @@ class BarMacos(QMenuBar):
         super().__init__()
         self.mainMenu = QMenu(Lng.menu[cfg.lng], self)
 
+        server_win = QAction("Подключение (Cmd + K)", self)
+        server_win.triggered.connect(self.open_server_window)
+        self.mainMenu.addAction(server_win)
+
         # --- Пункт "Открыть настройки" ---
         actionSettings = QAction(Lng.open_settings_window[cfg.lng], self)
         actionSettings.triggered.connect(self.open_settings_window)
@@ -132,6 +137,11 @@ class BarMacos(QMenuBar):
         # --- Добавляем меню в меню-бар ---
         self.addMenu(self.mainMenu)
         self.setNativeMenuBar(True)
+
+    def open_server_window(self):
+        self.server_win = ServersWin()
+        self.server_win.center_to_parent(self.window())
+        self.server_win.show()
 
     def open_settings_window(self):
         """Открывает окно настроек приложения."""
