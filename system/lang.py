@@ -305,3 +305,9 @@ class Lng:
     modified = ("Изменен", "Modified")
     statistic = ("Статистика данных", "Data statistics")
     level_up = ("Наверх", "Level up")
+    connect_to_server = ("Подключение к серверу", "Connect to server")
+    connect_short = ("Подкл.", "Conn.")
+    connect_placeholder = (
+        "Сервер, логин, пароль",
+        "Server, login, password"
+    )

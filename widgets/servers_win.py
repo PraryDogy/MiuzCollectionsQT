@@ -3,10 +3,12 @@ import os
 import subprocess
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import (QHBoxLayout, QListWidget, QListWidgetItem,
-                             QPushButton, QVBoxLayout, QWidget, QApplication)
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QListWidget,
+                             QListWidgetItem, QPushButton, QVBoxLayout,
+                             QWidget)
 
-from cfg import Static
+from cfg import Static, cfg
+from system.lang import Lng
 
 from ._base_widgets import AppModalWindow, ULineEdit, UMenu
 
@@ -30,8 +32,8 @@ class ServersWidget(QListWidget):
             return
 
         menu = UMenu("", self)
-        copy_action = menu.addAction("Скопировать текст")
-        delete_action = menu.addAction("Удалить")
+        copy_action = menu.addAction(Lng.copy[cfg.lng])
+        delete_action = menu.addAction(Lng.delete[cfg.lng])
         action = menu.exec_(self.mapToGlobal(pos))
 
         if action == copy_action:
@@ -41,14 +43,11 @@ class ServersWidget(QListWidget):
 
 
 class ServersWin(AppModalWindow):
-    title_text = "Подключение к серверу"
-    connect_text = "Подкл."
-    new_server_text = "Сервер, логин, пароль"
     json_file = os.path.join(Static.app_support, "servers.json")
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(self.title_text)
+        self.setWindowTitle(Lng.connect_to_server[cfg.lng])
         self.setFixedWidth(300)
         self.centralWidget().layout().setSpacing(10)
         self.centralWidget().layout().setContentsMargins(5, 5, 5, 5)
@@ -59,7 +58,7 @@ class ServersWin(AppModalWindow):
 
         # QLineEdit для нового сервера
         self.new_server = ULineEdit()
-        self.new_server.setPlaceholderText(self.new_server_text)
+        self.new_server.setPlaceholderText(Lng.connect_placeholder[cfg.lng])
         self.central_layout.addWidget(self.new_server)
 
         # QListWidget
@@ -83,7 +82,7 @@ class ServersWin(AppModalWindow):
         btn_remove.clicked.connect(lambda: self.remove_server(self.servers_widget.currentItem()))
 
         # Connect справа
-        btn_connect = QPushButton(self.connect_text)
+        btn_connect = QPushButton(Lng.connect_short[cfg.lng])
         btn_connect.setFixedWidth(90)
         btn_connect.clicked.connect(self.connect_cmd)
 
