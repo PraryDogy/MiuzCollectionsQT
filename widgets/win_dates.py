@@ -1,3 +1,4 @@
+import calendar
 import re
 from datetime import datetime, timedelta
 from typing import Literal
@@ -9,7 +10,8 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
 from cfg import Dynamic, cfg
 from system.lang import Lng
 
-from ._base_widgets import UHBoxLayout, ULineEdit, UVBoxLayout, SingleActionWindow
+from ._base_widgets import (SingleActionWindow, UHBoxLayout, ULineEdit,
+                            UVBoxLayout)
 
 
 class DatesTools:
@@ -60,24 +62,46 @@ class DatesLineEdit(ULineEdit):
 
         self.inputChangedSignal.emit()
 
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() == Qt.Key.Key_Up:
-            if self.date:
-                self.date = DatesTools.add_or_subtract_days(self.date, 1)
-                self.setText(DatesTools.date_to_text(self.date))
-            else:
-                self.date = datetime.today().date()
-                self.setText(DatesTools.date_to_text(self.date))
+    def keyPressEvent(self, a0):
+        pos = self.cursorPosition()
+        key = a0.key()
 
-        elif a0.key() == Qt.Key.Key_Down:
-            if self.date:
-                self.date = DatesTools.add_or_subtract_days(self.date, -1)
-                self.setText(DatesTools.date_to_text(self.date))
-            else:
-                self.date = datetime.today().date()
-                self.setText(DatesTools.date_to_text(self.date))
+        print(pos)
 
-        return super().keyPressEvent(a0)
+        if not self.date:
+            self.date = datetime.today().date()
+
+        day, month, year = self.date.day, self.date.month, self.date.year
+
+        if key in (Qt.Key_Up, Qt.Key_Down):
+            delta = 1 if key == Qt.Key_Up else -1
+
+            if pos in (0, 1):  # день
+                day += delta
+                days_in_month = calendar.monthrange(year, month)[1]
+                if day > days_in_month:
+                    day = 1
+                elif day < 1:
+                    day = days_in_month
+
+            elif pos in (3, 4):  # месяц
+                month += delta
+                if month > 12:
+                    month = 1
+                elif month < 1:
+                    month = 12
+                day = min(day, calendar.monthrange(year, month)[1])
+
+            elif pos in range(6, 9):  # год
+                year += delta
+                day = min(day, calendar.monthrange(year, month)[1])
+
+            self.date = datetime(year, month, day).date()
+            self.setText(DatesTools.date_to_text(self.date))
+            self.setCursorPosition(pos)
+            return
+
+        super().keyPressEvent(a0)
 
 
 class DatesTitle(QLabel):
