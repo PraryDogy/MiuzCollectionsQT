@@ -7,7 +7,7 @@ from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
 
-from cfg import cfg, Dynamic, Static
+from cfg import Dynamic, Static, cfg
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
@@ -23,6 +23,7 @@ from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
 from .progressbar_win import ProgressbarWin
+from .servers_win import ServersWin
 from .win_dates import WinDates
 from .win_image_view import WinImageView
 from .win_info import WinInfo
@@ -755,6 +756,11 @@ class WinMain(UMainWindow):
             return task
         
         return copy_files(target_dir, files_to_copy)
+    
+    def open_server_win(self):
+        self.server_win = ServersWin()
+        self.server_win.center_to_parent(self)
+        self.server_win.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.hide()
@@ -765,13 +771,17 @@ class WinMain(UMainWindow):
         if a0.key() == Qt.Key.Key_V:
             self.paste_files_here(self.grid, Mf.current)
         
-        if a0.key() == Qt.Key.Key_W:
+        elif a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 self.hide()
 
         elif a0.key() == Qt.Key.Key_F:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 self.bar_top.search_wid.setFocus()
+
+        elif a0.key() == Qt.Key.Key_K:
+            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+                self.open_server_win()
 
         elif a0.key() == Qt.Key.Key_Escape:
             if self.isFullScreen():
@@ -791,6 +801,7 @@ class WinMain(UMainWindow):
                 if Dynamic.thumb_size_index > 0:
                     Dynamic.thumb_size_index -= 1
                     self.bar_bottom.slider._on_value_changed(Dynamic.thumb_size_index)
+
 
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()

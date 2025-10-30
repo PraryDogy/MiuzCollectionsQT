@@ -42,7 +42,6 @@ class ServersWidget(QListWidget):
         return super().contextMenuEvent(a0)
 
 
-
 class ServersWin(AppModalWindow):
     json_file = os.path.join(Static.app_support, "servers.json")
 
