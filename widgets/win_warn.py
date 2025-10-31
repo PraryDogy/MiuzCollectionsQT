@@ -19,7 +19,8 @@ class BaseWinWarn(SingleActionWindow):
     def __init__(self, title: str, text: str, char_limit: int):
         super().__init__()
         self.setWindowTitle(title)
-        self.resize(1, 1)
+        self.setMinimumSize(200, 1)
+        self.resize(200, 1)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -59,11 +60,10 @@ class WinWarn(BaseWinWarn):
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         self.central_layout.setContentsMargins(5, 5, 5, 10)
 
-        self.right_wid.adjustSize()
-        ok_btn.adjustSize()
-        hh = self.right_wid.height() + ok_btn.height() + 15
-
-        self.resize(350, hh)
+        # self.right_wid.adjustSize()
+        # ok_btn.adjustSize()
+        # hh = self.right_wid.height() + ok_btn.height() + 15
+        # self.resize(self.width(), hh)
 
 
 class WinQuestion(BaseWinWarn):

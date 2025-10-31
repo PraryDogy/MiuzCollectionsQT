@@ -841,7 +841,7 @@ class WinMain(UMainWindow):
                     Lng.attention[cfg.lng],
                     Lng.drop_only_files[cfg.lng]
                 )
-                self.win_warn.adjustSize()
+                self.win_warn.resize(280, 80)
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
                 return
