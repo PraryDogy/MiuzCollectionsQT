@@ -466,6 +466,7 @@ class WinMain(UMainWindow):
             Lng.attention[cfg.lng],
             f"{Lng.delete_forever[cfg.lng]} ({len(abs_paths)})?"
         )
+        self.remove_files_win.resize(330, 80)
         self.remove_files_win.center_to_parent(self.window())
         self.remove_files_win.ok_clicked.connect(
             lambda: start_remove(abs_paths, dirs_to_scan)
