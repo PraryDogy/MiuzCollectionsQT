@@ -75,7 +75,10 @@ class TreeWid(QTreeWidget):
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
             if cfg.hide_digits:
+                old_name = name
                 name = self.strip_to_first_letter(name)
+                if not name:
+                    name = old_name
 
             parent_item = self.items.get(parent)
             if parent_item is None:
