@@ -275,7 +275,7 @@ class Lng:
     )
     all_images = ("Все изображения", "All images")
     only_this_folder = ("Показать только в этой папке", "Show only this folder")
-    upload_files_in = ("Загрузить файлы в", "Upload files in")
+    upload_files_in = ("Файлы будут загружены в папку:", "Files will be uploaded to:")
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрывать нумерацию", "Hide numbering")
     go_to_folder = ("Перейти к папке", "Go to folder")

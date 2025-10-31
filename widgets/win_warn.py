@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
@@ -90,36 +92,37 @@ class WinQuestion(BaseWinWarn):
 
 
 class WinUpload(WinQuestion):
+    arrow = "▸"
+
     def __init__(self, title, path: str):
-        super().__init__(title=title, text="Загрузить файлы в:", char_limit=999)
-        self.setFixedWidth(400)
+        super().__init__(title=title, text="", char_limit=999)
+        self.path = path
 
-        self.text_label.deleteLater()
+    def init_path(self):
+        self.text_label.setWordWrap(True)  # включаем перенос
+        self.text_label.setText("")         # чистим текст
+        fm = self.text_label.fontMetrics()
 
-        container = QWidget()
-        self.right_layout.addWidget(container)
-        main_layout = QVBoxLayout(container)
-        main_layout.setSpacing(4)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        chunks = self.path.strip(os.sep).split(os.sep)
+        max_width = self.width() - self.svg_size - 40
 
-        current_line = QHBoxLayout()
-        main_layout.addLayout(current_line)
+        current_line = chunks[0]
+        for chunk in chunks[1:]:
+            part = f" {self.arrow} {chunk}"
+            # проверяем, влезет ли текущий кусок в строку
+            if fm.horizontalAdvance(current_line + part) >= max_width:
+                # добавляем текущую строку в QLabel с переносом
+                self.text_label.setText(
+                    self.text_label.text() + current_line + f" {self.arrow}\n"
+                )
+                current_line = chunk  # начинаем новую строку с текущего куска
+            else:
+                current_line += part
 
-        total_width = 0
-        max_width = self.width() - 20  # запас для скроллбаров и отступов
+        # добавляем последнюю строку
+        self.text_label.setText(self.text_label.text() + current_line)
 
-        for part in path.split("/"):
-            label = QLabel(part)
-            label.adjustSize()
-            w = label.sizeHint().width()
+        text = Lng.upload_files_in[cfg.lng] + "\n" + self.text_label.text()
+        self.text_label.setText(text)
 
-            if total_width + w > max_width:
-                # перенос на новую строку
-                current_line = QHBoxLayout()
-                main_layout.addLayout(current_line)
-                total_width = 0
-
-            current_line.addWidget(label)
-            total_width += w + 8  # + отступ
-
-        self.right_layout.addWidget(container)
+        self.adjustSize()
