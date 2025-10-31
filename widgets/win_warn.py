@@ -96,6 +96,7 @@ class WinUpload(WinQuestion):
 
     def __init__(self, title, path: str):
         super().__init__(title=title, text="", char_limit=999)
+        self.central_layout.setContentsMargins(10, 5, 10, 0)
         self.path = path
 
     def init_path(self):
@@ -105,7 +106,7 @@ class WinUpload(WinQuestion):
 
         chunks = self.path.strip(os.sep).split(os.sep)
         max_width = self.width() - self.svg_size - 40
-
+        row_count = 2 # первая строка с текстом, вторая строка путьы
         current_line = chunks[0]
         for chunk in chunks[1:]:
             part = f" {self.arrow} {chunk}"
@@ -116,6 +117,7 @@ class WinUpload(WinQuestion):
                     self.text_label.text() + current_line + f" {self.arrow}\n"
                 )
                 current_line = chunk  # начинаем новую строку с текущего куска
+                row_count += 1
             else:
                 current_line += part
 
@@ -125,4 +127,5 @@ class WinUpload(WinQuestion):
         text = Lng.upload_files_in[cfg.lng] + "\n" + self.text_label.text()
         self.text_label.setText(text)
 
-        self.adjustSize()
+        hh = 17 * row_count + 40
+        self.setFixedHeight(hh)
