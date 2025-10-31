@@ -435,6 +435,7 @@ class WinMain(UMainWindow):
                 Lng.attention[cfg.lng],
                 Lng.copy_name_same_dir[cfg.lng]
             )
+            self.win_warn.resize(330, 90)
             self.win_warn.center_to_parent(self)
             self.win_warn.show()
         elif self.clipboard_item:
