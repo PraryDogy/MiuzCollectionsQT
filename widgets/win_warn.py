@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QLabel, QPushButton, QSizePolicy, QSpacerItem,
-                             QWidget)
+from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QSizePolicy,
+                             QSpacerItem, QVBoxLayout, QWidget)
 
 from cfg import cfg
 from system.lang import Lng
@@ -19,8 +19,7 @@ class BaseWinWarn(SingleActionWindow):
     def __init__(self, title: str, text: str, char_limit: int):
         super().__init__()
         self.setWindowTitle(title)
-        self.setMinimumWidth(290)
-        # self.setMaximumWidth(370)
+        self.resize(1, 1)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -32,7 +31,7 @@ class BaseWinWarn(SingleActionWindow):
         warning.setFixedSize(self.svg_size, self.svg_size)
         self.content_layout.addWidget(warning)
 
-        self.content_layout.addSpacerItem(QSpacerItem(15, 0))
+        self.content_layout.setSpacing(15)
 
         self.right_wid = QWidget()
         self.content_layout.addWidget(self.right_wid)
@@ -40,11 +39,10 @@ class BaseWinWarn(SingleActionWindow):
         self.right_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.right_wid.setLayout(self.right_layout)
 
-        text = SharedUtils.insert_linebreaks(text, char_limit)
+        # text = SharedUtils.insert_linebreaks(text, char_limit)
         self.text_label = QLabel(text)
+        self.text_label.setWordWrap(True)
         self.right_layout.addWidget(self.text_label)
-
-        self.adjustSize()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
@@ -54,10 +52,18 @@ class BaseWinWarn(SingleActionWindow):
 class WinWarn(BaseWinWarn):
     def __init__(self, title: str, text: str, char_limit: int = 40):
         super().__init__(title, text, char_limit)
+        
         ok_btn = QPushButton(text=Lng.ok[cfg.lng])
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.deleteLater)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.central_layout.setContentsMargins(5, 5, 5, 10)
+
+        self.right_wid.adjustSize()
+        ok_btn.adjustSize()
+        hh = self.right_wid.height() + ok_btn.height() + 15
+
+        self.resize(350, hh)
 
 
 class WinQuestion(BaseWinWarn):
@@ -87,15 +93,38 @@ class WinQuestion(BaseWinWarn):
         self.central_layout.addWidget(btn_wid)
 
 
+
 class WinUpload(WinQuestion):
-    max_width = 400
+    def __init__(self, title, path: str):
+        super().__init__(title=title, text="Загрузить файлы в:", char_limit=999)
+        self.setFixedWidth(400)
 
-    def __init__(self, title, text, path: str, char_limit=40):
-        super().__init__(title, text, char_limit)
+        self.text_label.deleteLater()
 
-        path_widget = PathWidget(path)
-        path_widget.adjustSize()
-        self.right_layout.insertWidget(1, path_widget)
-        self.setFixedSize(path_widget.width(), self.height())
-        if self.width() > self.max_width:
-            self.setFixedWidth(self.max_width)
+        container = QWidget()
+        self.right_layout.addWidget(container)
+        main_layout = QVBoxLayout(container)
+        main_layout.setSpacing(4)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
+        current_line = QHBoxLayout()
+        main_layout.addLayout(current_line)
+
+        total_width = 0
+        max_width = self.width() - 20  # запас для скроллбаров и отступов
+
+        for part in path.split("/"):
+            label = QLabel(part)
+            label.adjustSize()
+            w = label.sizeHint().width()
+
+            if total_width + w > max_width:
+                # перенос на новую строку
+                current_line = QHBoxLayout()
+                main_layout.addLayout(current_line)
+                total_width = 0
+
+            current_line.addWidget(label)
+            total_width += w + 8  # + отступ
+
+        self.right_layout.addWidget(container)
