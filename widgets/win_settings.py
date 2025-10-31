@@ -210,6 +210,7 @@ class DataSettings(QGroupBox):
             Lng.attention[cfg.lng],
             Lng.reset_settings_max[cfg.lng]
         )
+        self.reset_win.resize(330, 80)
         self.reset_win.ok_clicked.connect(fin)
         self.reset_win.center_to_parent(self.window())
         self.reset_win.show()
@@ -618,13 +619,6 @@ class MfAdvanced(QWidget):
             for i in range(0, len(text), n)
         )
 
-class ResetMfWin(WinQuestion):
-    def __init__(self):
-        super().__init__(
-            Lng.attention[cfg.lng],
-            "Описательный текст бла бла бла"
-        )
-
 
 class MfSettings(QGroupBox):
     remove = pyqtSignal()
@@ -681,6 +675,7 @@ class MfSettings(QGroupBox):
             Lng.attention[cfg.lng],
             f"{Lng.data_was_reset[cfg.lng]}"
         )
+        self.finish_win.resize(330, 80)
         self.finish_win.center_to_parent(self.window())
         self.finish_win.show()
 
@@ -689,6 +684,7 @@ class MfSettings(QGroupBox):
             Lng.attention[cfg.lng],
             Lng.reset_mf_text[cfg.lng]
         )
+        self.reset_win.resize(380, 95)
         self.reset_win.center_to_parent(self.window())
         self.reset_win.ok_clicked.connect(
             lambda: self.show_finish_win()
@@ -706,6 +702,7 @@ class MfSettings(QGroupBox):
             Lng.attention[cfg.lng],
             Lng.folder_removed_text[cfg.lng]
         )
+        self.remove_win.resize(330, 80)
         self.remove_win.center_to_parent(self.window())
         self.remove_win.ok_clicked.connect(
             lambda: self.remove.emit()
@@ -775,6 +772,7 @@ class NewFolder(QGroupBox):
                 Lng.attention[cfg.lng],
                 Lng.enter_alias_warning[cfg.lng]
                 )
+            self.win_warn.resize(380, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         elif any(i.name == self.mf.name for i in self.mf_list):
@@ -782,6 +780,7 @@ class NewFolder(QGroupBox):
                 Lng.attention[cfg.lng],
                 f"{Lng.alias[cfg.lng]} \"{self.mf.name}\" {Lng.already_taken[cfg.lng].lower()}."
                 )
+            self.win_warn.resize(380, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         elif not self.mf.paths:
@@ -789,6 +788,7 @@ class NewFolder(QGroupBox):
                 Lng.attention[cfg.lng],
                 Lng.select_folder_path[cfg.lng]
                 )
+            self.win_warn.resize(330, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
         else:
@@ -852,6 +852,7 @@ class FiltersWid(QGroupBox):
             Lng.attention[cfg.lng],
             Lng.filters_reset[cfg.lng]
         )
+        self.filters_win.resize(330, 80)
         self.filters_win.ok_clicked.connect(fin)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
@@ -1056,6 +1057,7 @@ class WinSettings(SingleActionWindow):
                     Lng.attention[cfg.lng],
                     Lng.at_least_one_folder_required[cfg.lng],
                 )
+                self.win_warn.resize(360, 80)
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
             else:
@@ -1084,6 +1086,7 @@ class WinSettings(SingleActionWindow):
                         Lng.attention[cfg.lng],
                         f"{Lng.select_folder_path[cfg.lng]} \"{folder.name}\""
                     )
+                    self.win_warn.resize(330, 80)
                     self.win_warn.center_to_parent(self.window())
                     self.win_warn.show()
                     return False

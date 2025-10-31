@@ -154,16 +154,16 @@ class Lng:
     save = ("Сохранить", "Save")
     new_folder = ("Новая папка", "New folder")
     enter_alias_warning = (
-        "Поле «Псевдоним» обязательно для заполнения",
-        "Alias field is required"
+        "Поле «Псевдоним» обязательно для заполнения.",
+        "Alias field is required."
     )
-    select_folder_path = ("Укажите путь к папке с изображениями", "Select path to the images folder")
+    select_folder_path = ("Укажите путь к папке с изображениями.", "Select path to the images folder.")
     folder_path = ("Путь к папке с изображениями", "Images folder path")
     general = ("Основные", "General")
     restart = ("Перезапуск", "Restart")
     at_least_one_folder_required = (
-        "Нужна хотя бы одна папка с изображениями",
-        "At least one images folder required"
+        "Нужна хотя бы одна папка с изображениями.",
+        "At least one images folder required."
     )
     confirm_delete_folder = ("Вы уверены, что хотите удалить папку?", "Are you sure you want to delete the folder?")
     upload_path = ("Директория загрузки", "Upload path")
@@ -237,8 +237,8 @@ class Lng:
     sort_by_recent_short = ("Дата доб.", "Date add.")
     reset_data = ("Сбросить данные", "Reset data")
     data_was_reset = (
-        "Данные сброшены. Поиск изображений",
-        "Data reset. Searching images"
+        "Данные сброшены. Поиск изображений.",
+        "Data reset. Searching images."
     )
     setup = ("Настроить", "Setup")
     preparing = ("Подготовка", "Preparing")
