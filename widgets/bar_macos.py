@@ -129,6 +129,8 @@ class BarMacos(QMenuBar):
         actionSettings.triggered.connect(self.open_settings_window)
         self.mainMenu.addAction(actionSettings)
 
+        self.mainMenu.addSeparator()
+
         # --- Пункт "О приложении" ---
         actionAbout = QAction(Lng.show_about[cfg.lng], self)
         actionAbout.triggered.connect(self.open_about_window)
