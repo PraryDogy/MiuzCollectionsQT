@@ -60,11 +60,6 @@ class WinWarn(BaseWinWarn):
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         self.central_layout.setContentsMargins(5, 5, 5, 10)
 
-        # self.right_wid.adjustSize()
-        # ok_btn.adjustSize()
-        # hh = self.right_wid.height() + ok_btn.height() + 15
-        # self.resize(self.width(), hh)
-
 
 class WinQuestion(BaseWinWarn):
     ok_clicked = pyqtSignal()
