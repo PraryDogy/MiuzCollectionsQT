@@ -500,8 +500,7 @@ class WinMain(UMainWindow):
 
         target_dir = Utils.get_abs_path(mf.curr_path, Dynamic.current_dir)
 
-        self.upload_win = WinUpload(Lng.attention[cfg.lng], target_dir)
-        self.upload_win.setFixedWidth(390)
+        self.upload_win = WinUpload(target_dir)
         self.upload_win.center_to_parent(self)
         self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
         self.upload_win.show()

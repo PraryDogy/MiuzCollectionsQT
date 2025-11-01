@@ -311,3 +311,4 @@ class Lng:
         "Сервер, логин, пароль",
         "Server, login, password"
     )
+    upload_in = ("Загрузить в ...", "Upload in ...")

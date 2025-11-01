@@ -88,13 +88,12 @@ class WinQuestion(BaseWinWarn):
         self.central_layout.addWidget(btn_wid)
 
 
-
 class WinUpload(WinQuestion):
     arrow = "▸"
-    ww = 400
+    ww = 380
 
-    def __init__(self, title, path: str):
-        super().__init__(title=title, text=None, char_limit=0)
+    def __init__(self, path: str):
+        super().__init__(title=Lng.upload_in[cfg.lng], text=None, char_limit=0)
         self.central_layout.setContentsMargins(10, 5, 10, 0)
         self.setFixedWidth(self.ww)
         self.text_label.deleteLater()
