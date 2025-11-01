@@ -8,11 +8,9 @@ from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QSizePolicy,
 
 from cfg import cfg
 from system.lang import Lng
-from system.shared_utils import SharedUtils
 
 from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
 from .path_widget import PathWidget
-
 
 class BaseWinWarn(SingleActionWindow):
     svg_warning = "./images/warning.svg"
@@ -29,10 +27,10 @@ class BaseWinWarn(SingleActionWindow):
         self.content_layout = UHBoxLayout()
         h_wid.setLayout(self.content_layout)
 
-        warning = QSvgWidget()
-        warning.load(self.svg_warning)
-        warning.setFixedSize(self.svg_size, self.svg_size)
-        self.content_layout.addWidget(warning)
+        self.svg_wid = QSvgWidget()
+        self.svg_wid.load(self.svg_warning)
+        self.svg_wid.setFixedSize(self.svg_size, self.svg_size)
+        self.content_layout.addWidget(self.svg_wid)
 
         self.content_layout.setSpacing(15)
 
@@ -93,39 +91,15 @@ class WinQuestion(BaseWinWarn):
 
 class WinUpload(WinQuestion):
     arrow = "▸"
+    ww = 400
 
     def __init__(self, title, path: str):
-        super().__init__(title=title, text="", char_limit=999)
+        super().__init__(title=title, text=None, char_limit=0)
         self.central_layout.setContentsMargins(10, 5, 10, 0)
-        self.path = path
+        self.setFixedWidth(self.ww)
+        self.text_label.deleteLater()
 
-    def init_path(self):
-        self.text_label.setWordWrap(True)  # включаем перенос
-        self.text_label.setText("")         # чистим текст
-        fm = self.text_label.fontMetrics()
-
-        chunks = self.path.strip(os.sep).split(os.sep)
-        max_width = self.width() - self.svg_size - 40
-        row_count = 2 # первая строка с текстом, вторая строка путьы
-        current_line = chunks[0]
-        for chunk in chunks[1:]:
-            part = f" {self.arrow} {chunk}"
-            # проверяем, влезет ли текущий кусок в строку
-            if fm.horizontalAdvance(current_line + part) >= max_width:
-                # добавляем текущую строку в QLabel с переносом
-                self.text_label.setText(
-                    self.text_label.text() + current_line + f" {self.arrow}\n"
-                )
-                current_line = chunk  # начинаем новую строку с текущего куска
-                row_count += 1
-            else:
-                current_line += part
-
-        # добавляем последнюю строку
-        self.text_label.setText(self.text_label.text() + current_line)
-
-        text = Lng.upload_files_in[cfg.lng] + "\n" + self.text_label.text()
-        self.text_label.setText(text)
-
-        hh = 17 * row_count + 40
-        self.setFixedHeight(hh)
+        self.text_label = PathWidget(path)
+        self.right_layout.addWidget(self.text_label)
+        self.adjustSize()
+        self.setFixedHeight(self.height() - 20) # срезаем лишнюю высоту

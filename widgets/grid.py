@@ -108,7 +108,7 @@ class BelowTextWid(QLabel):
         color: #6199E4;
     """
 
-    sep = " | "
+    sep = " ▸ "
 
     def __init__(self, wid: "Thumbnail"):
         super().__init__()
