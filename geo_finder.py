@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                              QScrollArea, QSplitter, QTextEdit, QVBoxLayout,
                              QWidget)
 
-exts = (".jpg", ".jpeg")
+exts = (".jpg", ".jpeg", ".png")
 gray_style = "background-color: rgba(100, 100, 100, 50);"
 red_style = "background-color: rgba(137, 0, 0, 0.3);"
 app_name = "GeoFinder"
@@ -37,7 +37,6 @@ search_colors = {
     "Жёлтый":    (np.array([20, 50, 50]),  np.array([30, 255, 255]),  "#FFD700"),
     "Зелёный":   (np.array([40, 50, 20]),  np.array([80, 255, 255]),  "#00FF00"),
     "Голубой":   (np.array([85, 40, 40]),  np.array([99, 255, 255]),  "#00BFFF"),
-    # "Синий":     (np.array([75, 30, 30]),  np.array([150, 255, 255]), "#0000FF"),
     "Синий": (np.array([90, 70, 50]), np.array([130, 255, 255]), "#0000FF"),
     "Фиолетовый":(np.array([140, 50, 20]), np.array([160, 255, 255]), "#8A2BE2"),
 }
