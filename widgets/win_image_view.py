@@ -179,20 +179,12 @@ class ZoomBtns(QFrame):
         return super().mouseReleaseEvent(a0)
 
 
-class SwitchImgBtn(QFrame):
+class SwitchImgBtn(USvgSqareWidget):
     pressed = pyqtSignal()
 
     def __init__(self, src: str, parent: QWidget) -> None:
-        super().__init__(parent)
-        self.setFixedSize(54, 54)
-
-        self.v_layout = QVBoxLayout()
-        self.v_layout.setContentsMargins(0, 0, 0, 0)
-        self.v_layout.setSpacing(0)
-        self.setLayout(self.v_layout)
-
-        btn = USvgSqareWidget(src, 50)
-        self.v_layout.addWidget(btn)
+        super().__init__(src, 54)
+        self.setParent(parent)
 
     def mouseReleaseEvent(self, a0):
         self.pressed.emit()
