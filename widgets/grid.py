@@ -8,18 +8,18 @@ from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
                          QMouseEvent, QPalette, QPixmap, QResizeEvent)
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-                             QGridLayout, QLabel, QPushButton, QRubberBand,
-                             QWidget)
+                             QGridLayout, QLabel, QRubberBand, QWidget)
 
-from cfg import cfg, Dynamic, Static
+from cfg import Dynamic, Static, cfg
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem, SvgBtn,
-                            UMenu, USubMenu, UVBoxLayout, VScrollArea)
+from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem, UMenu,
+                            USubMenu, USvgSqareWidget, UVBoxLayout,
+                            VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save, SaveAs,
                       ScanerRestart, SetFav, WinInfoAction)
@@ -314,7 +314,7 @@ class UpBtn(QFrame):
         v_layout = UVBoxLayout()
         self.setLayout(v_layout)
 
-        self.svg = SvgBtn(self.icon, self.icon_size)
+        self.svg = USvgSqareWidget(self.icon, self.icon_size)
         v_layout.addWidget(self.svg, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:

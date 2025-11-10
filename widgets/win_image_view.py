@@ -2,16 +2,15 @@ import gc
 import os
 from typing import Literal
 
-from PyQt5.QtCore import (QEvent, QObject, QPoint, QPointF, QSize, Qt, QTimer,
+from PyQt5.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import (QColor, QContextMenuEvent, QCursor, QIcon, QImage,
-                         QKeyEvent, QMouseEvent, QPainter, QPaintEvent,
-                         QPixmap, QResizeEvent, QWheelEvent)
+from PyQt5.QtGui import (QContextMenuEvent, QCursor, QImage, QKeyEvent,
+                         QMouseEvent, QPixmap, QResizeEvent)
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsPixmapItem, QGraphicsScene,
-                             QGraphicsView, QHBoxLayout, QLabel, QScrollBar,
-                             QSpacerItem, QVBoxLayout, QWidget)
+                             QGraphicsView, QHBoxLayout, QLabel, QSpacerItem,
+                             QVBoxLayout, QWidget)
 
 from cfg import Static, cfg
 from system.lang import Lng
@@ -20,8 +19,8 @@ from system.shared_utils import SharedUtils
 from system.tasks import OneImgLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (AppModalWindow, SvgShadowed, UHBoxLayout, UMenu,
-                            USubMenu, UVBoxLayout)
+from ._base_widgets import (AppModalWindow, UMenu, USubMenu, USvgSqareWidget,
+                            UVBoxLayout)
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SaveAs, SetFav,
                       WinInfoAction)
 from .grid import Thumbnail
@@ -99,44 +98,85 @@ class ImageWidget(QGraphicsView):
             self.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
     
 
+class UserSvg(USvgSqareWidget):
+    def __init__(self, src, size):
+        super().__init__(src, size)
+        self.value = None
+
+
 class ZoomBtns(QFrame):
-    style_ = """
-        background-color: rgba(128, 128, 128, 0.40);
-        border-radius: 15px;
-    """
-    svg_size = 45
-    svg_zoom_out = "./images/zoom_out.svg"
-    svg_zoom_in = "./images/zoom_in.svg"
-    svg_zoom_fit = "./images/zoom_fit.svg"
-    svg_zoom_close = "./images/zoom_close.svg"
+    zoom_close = pyqtSignal()
+    zoom_in = pyqtSignal()
+    zoom_out = pyqtSignal()
+    zoom_fit = pyqtSignal()
 
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
-        self.setStyleSheet(self.style_)
+        self.setStyleSheet("""
+            background-color: rgba(128, 128, 128, 0.5);
+            border-radius: 15px;
+        """)
 
-        h_layout = UHBoxLayout()
-        self.setLayout(h_layout)
+        h_layout = QHBoxLayout(self)
+        h_layout.setContentsMargins(0, 0, 0, 0)
 
-        h_layout.addSpacerItem(QSpacerItem(5, 0))
-
-        self.zoom_out = SvgShadowed(self.svg_zoom_out, self.svg_size)
-        h_layout.addWidget(self.zoom_out)
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
-
-        self.zoom_in = SvgShadowed(self.svg_zoom_in, self.svg_size)
-        h_layout.addWidget(self.zoom_in)
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
-
-        self.zoom_fit = SvgShadowed(self.svg_zoom_fit, self.svg_size)
-        h_layout.addWidget(self.zoom_fit)
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
-
-        self.zoom_close = SvgShadowed(self.svg_zoom_close, self.svg_size)
-        h_layout.addWidget(self.zoom_close)
+        def add_btn(name, val):
+            btn = UserSvg(os.path.join("./images", name), 45)
+            btn.value = val
+            h_layout.addWidget(btn)
+            return btn
 
         h_layout.addSpacerItem(QSpacerItem(5, 0))
+        add_btn("zoom_out.svg", -1)
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
+        add_btn("zoom_in.svg", 1)
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
+        add_btn("zoom_fit.svg", 0)
+        h_layout.addSpacerItem(QSpacerItem(10, 0))
+        add_btn("zoom_close.svg", 9999)
+        h_layout.addSpacerItem(QSpacerItem(5, 0))
 
+        self.mappings = {
+            -1: self.zoom_out.emit,
+            1: self.zoom_in.emit,
+            0: self.zoom_fit.emit,
+            9999: self.zoom_close.emit
+        }
+
+        self.start_pos = None
+        self.is_move = False
         self.adjustSize()
+
+    def mousePressEvent(self, e):
+        self.start_pos = e.pos()
+        self.is_move = False
+        super().mousePressEvent(e)
+
+    def mouseMoveEvent(self, e):
+        if not self.start_pos:
+            return
+
+        dx = e.x() - self.start_pos.x()
+        if abs(dx) > 30:  # горизонтальное движение
+            self.is_move = True
+            if dx > 0:
+                self.zoom_in.emit()
+            else:
+                self.zoom_out.emit()
+            self.start_pos = e.pos()
+        super().mouseMoveEvent(e)
+
+    def mouseReleaseEvent(self, a0):
+        if self.is_move:
+            self.is_move = False
+            return
+        pos = a0.globalPos()
+        wid = QApplication.widgetAt(pos)
+        if isinstance(wid, UserSvg):
+            func = self.mappings.get(wid.value)
+            if func:
+                func()
+        return super().mouseReleaseEvent(a0)
 
 
 class SwitchImageBtn(QFrame):
@@ -154,7 +194,7 @@ class SwitchImageBtn(QFrame):
         v_layout = UVBoxLayout()
         self.setLayout(v_layout)
 
-        btn = SvgShadowed(path, 50)
+        btn = USvgSqareWidget(path, 50)
         v_layout.addWidget(btn)
 
 
@@ -218,19 +258,12 @@ class WinImageView(AppModalWindow):
         self.next_image_btn = NextImageBtn(self.centralWidget())
         self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
 
-        self.zoom_btns = ZoomBtns(parent=self.centralWidget())
-        self.zoom_btns.zoom_in.clicked.connect(
-            lambda: self.zoom_cmd("in")
-        )
-        self.zoom_btns.zoom_out.clicked.connect(
-            lambda: self.zoom_cmd("out")
-        )
-        self.zoom_btns.zoom_fit.clicked.connect(
-            lambda: self.zoom_cmd("fit")
-        )
-        self.zoom_btns.zoom_close.clicked.connect(
-            lambda: self.deleteLater()
-        )
+        self.zoom_btns = ZoomBtns(parent=self)
+        self.zoom_btns.zoom_in.connect(lambda: self.zoom_cmd("in"))
+        self.zoom_btns.zoom_out.connect(lambda: self.zoom_cmd("out"))
+        self.zoom_btns.zoom_fit.connect(lambda: self.zoom_cmd("fit"))
+        self.zoom_btns.zoom_close.connect(self.deleteLater)
+        self.zoom_btns.zoom_in.connect(lambda: print("zoom in"))
 
         self.text_label = QLabel(self)
         self.text_label.setStyleSheet("background: black;")

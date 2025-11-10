@@ -142,67 +142,17 @@ class ULineEdit(QLineEdit):
         self.menu_.show_umenu()
 
 
-class SvgBtn(QWidget):
-    """
-    Виджет кнопки с SVG-иконкой.
-
-    Аргументы:
-        icon_path (str): путь к SVG-файлу.
-        size (int): размер кнопки (ширина и высота).
-        parent (QWidget, optional): родительский виджет.
-    """
-
-    def __init__(self, icon_path: str, size: int, parent: QWidget = None):
-        super().__init__(parent)
-
-        self.icon_path = icon_path
-        self.setStyleSheet("background-color: transparent;")
-
-        h_layout = UHBoxLayout(self)
-        h_layout.setContentsMargins(0, 0, 0, 0)
-        h_layout.setSpacing(0)
-
-        self.svg_btn = QSvgWidget()
-        self.svg_btn.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        self.svg_btn.setFixedSize(size, size)
-        self.set_icon(icon_path)
-
-        h_layout.addWidget(self.svg_btn)
-        self.adjustSize()
-
-    def set_icon(self, icon_path):
-        self.svg_btn.load(icon_path)
-
-    def get_icon_path(self):
-        return self.icon_path
-
-
-class SvgShadowed(SvgBtn):
-    """
-    Виджет кнопки с SVG-иконкой и тенью.
-
-    Аргументы:
-        icon_name (str): путь к SVG-файлу.
-        size (int): размер кнопки (ширина и высота).
-        shadow_depth (int, optional): прозрачность тени (0–255). По умолчанию 200.
-        parent (QWidget, optional): родительский виджет.
-    """
-
-    clicked = pyqtSignal()
-
-    def __init__(self, icon_name: str, size: int, shadow_depth: int = 200,
-                 parent: QWidget = None):
-        super().__init__(icon_name, size, parent)
-
-        shadow = QGraphicsDropShadowEffect(self)
-        shadow.setOffset(0, 0)
-        shadow.setColor(QColor(0, 0, 0, shadow_depth))
-        shadow.setBlurRadius(15)
-        self.setGraphicsEffect(shadow)
-
-    def mouseReleaseEvent(self, a0):
-        self.clicked.emit()
-        return super().mouseReleaseEvent(a0)
+class USvgSqareWidget(QSvgWidget):
+    def __init__(self, src: str, size: int):
+        """
+        Квадратный Svg виджет
+        """
+        super().__init__()
+        self.setStyleSheet(f"""background-color: transparent;""")
+        self.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+        self.setFixedSize(size, size)
+        if src:
+            self.load(src)
 
 
 class UTextEdit(QTextEdit):
