@@ -307,8 +307,7 @@ class Lng:
     level_up = ("Наверх", "Level up")
     connect_to_server = ("Подключение к серверу", "Connect to server")
     connect_short = ("Подкл.", "Conn.")
-    connect_placeholder = (
-        "Сервер, логин, пароль",
-        "Server, login, password"
-    )
+    server = ("Сервер", "Server")
+    login = ("логин", "login")
+    password = ("пароль", "password")
     upload_in = ("Загрузить в ...", "Upload in ...")

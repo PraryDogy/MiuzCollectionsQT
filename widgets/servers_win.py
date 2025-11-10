@@ -2,68 +2,126 @@ import json
 import os
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QListWidget,
-                             QListWidgetItem, QPushButton, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
+                             QListWidget, QListWidgetItem, QMenu, QPushButton,
+                             QTableView, QVBoxLayout, QWidget)
 
 from cfg import Static, cfg
 from system.lang import Lng
 
-from ._base_widgets import AppModalWindow, ULineEdit, UMenu
+from ._base_widgets import SingleActionWindow, ULineEdit, UMenu
 
 
-class ServersWidget(QListWidget):
+class ServersWidget(QTableView):
     remove = pyqtSignal(object)
 
     def __init__(self, data: list[list[str]]):
         super().__init__()
-        for server, login, password in data:
-            item = QListWidgetItem(f"{server}, {login}, {password}")
-            item.setSizeHint(QSize(0, 25))
-            self.addItem(item)
 
-    def contextMenuEvent(self, a0):
-        pos = a0.pos()
-        item = self.itemAt(pos)
-        if not item:
+        self.model_ = QStandardItemModel(0, 3, self)
+        self.model_.setHorizontalHeaderLabels([
+            Lng.server[cfg.lng], Lng.login[cfg.lng], Lng.password[cfg.lng]
+        ])
+        self.setModel(self.model_)
+
+        for row in data:
+            items = [QStandardItem(str(val)) for val in row]
+            for item in items:
+                item.setEditable(False)
+            self.model_.appendRow(items)
+
+        # Настройки таблицы
+        header = self.horizontalHeader()
+
+        # Сначала выставляем авто-ширину по содержимому
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+
+        # Потом немного увеличиваем, чтобы не было сжатия
+        self.resizeColumnsToContents()
+        self.horizontalHeader().setStretchLastSection(True)
+
+        # После этого включаем ручной ресайз
+        header.setSectionResizeMode(QHeaderView.Interactive)
+
+        self.verticalHeader().setVisible(False)
+        self.setSelectionBehavior(QTableView.SelectRows)
+        self.setSelectionMode(QTableView.SingleSelection)
+        self.setShowGrid(False)
+        self.setAlternatingRowColors(True)
+        self.verticalHeader().setDefaultSectionSize(25)
+
+        # Контекстное меню
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_context_menu)
+
+    def add_row(self, data: list[str]):
+        items = [QStandardItem(str(val)) for val in data]
+        for item in items:
+            item.setEditable(False)
+        self.model_.appendRow(items)
+
+    def get_row_text(self, index: QModelIndex):
+        return ", ".join(
+            self.model_.item(index.row(), c).text()
+            for c in range(self.model_.columnCount())
+        )
+
+    def show_context_menu(self, pos):
+        index = self.indexAt(pos)
+        row_text = self.get_row_text(index)
+        if not index.isValid():
             return
 
-        menu = UMenu(a0)
+        menu = QMenu(self)
         copy_action = menu.addAction(Lng.copy[cfg.lng])
         delete_action = menu.addAction(Lng.delete[cfg.lng])
-        action = menu.exec_(self.mapToGlobal(pos))
+        action = menu.exec_(self.viewport().mapToGlobal(pos))
 
         if action == copy_action:
-            QApplication.clipboard().setText(item.text())
+            QApplication.clipboard().setText(row_text)
+
         elif action == delete_action:
-            self.remove.emit(item)
+            self.remove.emit(row_text)
+            self.model_.removeRow(index.row())
 
-        return super().contextMenuEvent(a0)
+    def mouseReleaseEvent(self, e):
+        index = self.indexAt(e.pos())
+        if not index.isValid():
+            self.clearSelection()
+            self.setCurrentIndex(QModelIndex())
+        return super().mouseReleaseEvent(e)
 
 
-class ServersWin(AppModalWindow):
+class ServersWin(SingleActionWindow):
     json_file = os.path.join(Static.app_support, "servers.json")
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.connect_to_server[cfg.lng])
-        self.setFixedWidth(300)
-        self.centralWidget().layout().setSpacing(10)
-        self.centralWidget().layout().setContentsMargins(5, 5, 5, 5)
+        self.setFixedWidth(400)
 
         # Загрузка данных
         self.data: list[list[str]] = []
         self.init_data()
 
+        # Layout
+        # self.central_layout = QVBoxLayout()
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(10)
+        # self.centralWidget().setLayout(self.central_layout)
+
         # QLineEdit для нового сервера
         self.new_server = ULineEdit()
-        self.new_server.setPlaceholderText(Lng.connect_placeholder[cfg.lng])
+        self.new_server.setPlaceholderText(
+            f"{Lng.server[cfg.lng]}, {Lng.login[cfg.lng]}, {Lng.password[cfg.lng]}"
+        )
         self.central_layout.addWidget(self.new_server)
 
         # QListWidget
         self.servers_widget = ServersWidget(self.data)
-        self.servers_widget.remove.connect(lambda item: self.remove_server(item))
+        self.servers_widget.remove.connect(lambda text: self.remove_server(text))
         self.central_layout.addWidget(self.servers_widget)
 
         # Кнопки
@@ -79,7 +137,7 @@ class ServersWin(AppModalWindow):
 
         btn_remove = QPushButton("–")
         btn_remove.setFixedWidth(50)
-        btn_remove.clicked.connect(lambda: self.remove_server(self.servers_widget.currentItem()))
+        btn_remove.clicked.connect(lambda: self.remove_btn_cmd())
 
         # Connect справа
         btn_connect = QPushButton(Lng.connect_short[cfg.lng])
@@ -117,7 +175,7 @@ class ServersWin(AppModalWindow):
         item_text = f"{server}, {login}, {password}"
         item = QListWidgetItem(item_text)
         item.setSizeHint(QSize(0, 25))
-        self.servers_widget.addItem(item)
+        self.servers_widget.add_row(parts)
 
         # Добавляем в self.data
         self.data.append(parts)
@@ -128,32 +186,20 @@ class ServersWin(AppModalWindow):
         # Сохраняем
         self.save_cmd()
 
-    def remove_server(self, item: QListWidgetItem):
-        if not item:
-            return
+    def remove_btn_cmd(self):
+        ind = self.servers_widget.currentIndex()
+        if ind.isValid():
+            text = self.servers_widget.get_row_text(ind)
+            self.servers_widget.model_.removeRow(ind.row())
+            self.remove_server(text)
 
-        parts = [p.strip() for p in item.text().split(",")]
-
-        # Удаляем из QListWidget
-        row = self.servers_widget.row(item)
-        self.servers_widget.takeItem(row)
-
-        # Удаляем из self.data
-        if parts in self.data:
-            self.data.remove(parts)
-
-        # Сохраняем
+    def remove_server(self, text: str):
+        self.data.remove(text.split(", "))
         self.save_cmd()
 
     def save_cmd(self):
-        all_data = []
-        for i in range(self.servers_widget.count()):
-            item = self.servers_widget.item(i)
-            parts = [p.strip() for p in item.text().split(",")]
-            all_data.append(parts)
-
         with open(self.json_file, "w", encoding="utf-8") as file:
-            json.dump(all_data, file, indent=4, ensure_ascii=False)
+            json.dump(self.data, file, indent=4, ensure_ascii=False)
 
     def connect_cmd(self):
         delay = 0
@@ -170,3 +216,4 @@ class ServersWin(AppModalWindow):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
+    
