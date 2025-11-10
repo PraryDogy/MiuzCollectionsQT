@@ -179,37 +179,34 @@ class ZoomBtns(QFrame):
         return super().mouseReleaseEvent(a0)
 
 
-class SwitchImageBtn(QFrame):
-    style_ = f"""
-        background-color: rgba(128, 128, 128, 0.40);
-        border-radius: 27px;
-    """
-    size_ = 54  # 27px border-radius, 27 * 2 for round shape
+class SwitchImgBtn(QFrame):
+    pressed = pyqtSignal()
 
-    def __init__(self, path: str, parent: QWidget = None) -> None:
+    def __init__(self, src: str, parent: QWidget) -> None:
         super().__init__(parent)
-        self.setFixedSize(self.size_, self.size_)
-        self.setStyleSheet(self.style_)
+        self.setFixedSize(54, 54)
 
-        v_layout = UVBoxLayout()
-        self.setLayout(v_layout)
+        self.v_layout = QVBoxLayout()
+        self.v_layout.setContentsMargins(0, 0, 0, 0)
+        self.v_layout.setSpacing(0)
+        self.setLayout(self.v_layout)
 
-        btn = USvgSqareWidget(path, 50)
-        v_layout.addWidget(btn)
+        btn = USvgSqareWidget(src, 50)
+        self.v_layout.addWidget(btn)
+
+    def mouseReleaseEvent(self, a0):
+        self.pressed.emit()
+        return super().mouseReleaseEvent(a0)
 
 
-class PrevImageBtn(SwitchImageBtn):
-    svg_prev = "./images/prev.svg"
-
+class PrevImgBtn(SwitchImgBtn):
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(self.svg_prev, parent)
+        super().__init__(os.path.join("./images", "prev.svg"), parent)
 
 
-class NextImageBtn(SwitchImageBtn):
-    svg_next = "./images/next.svg"
-
+class NextImgBtn(SwitchImgBtn):
     def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(self.svg_next, parent)
+        super().__init__(os.path.join("./images", "next.svg"), parent)
 
 
 class WinImageView(AppModalWindow):
@@ -252,10 +249,10 @@ class WinImageView(AppModalWindow):
 
         self.image_label = ImageWidget(QPixmap())
         self.central_layout.addWidget(self.image_label)
-        self.prev_image_btn = PrevImageBtn(self.centralWidget())
+        self.prev_image_btn = PrevImgBtn(self.centralWidget())
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
 
-        self.next_image_btn = NextImageBtn(self.centralWidget())
+        self.next_image_btn = NextImgBtn(self.centralWidget())
         self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
 
         self.zoom_btns = ZoomBtns(parent=self)
