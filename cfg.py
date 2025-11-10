@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class Static:
-    app_ver = 3.93
+    app_ver = 3.95
     app_name = "Collections"
     thumbs_load_limit = 100
 
