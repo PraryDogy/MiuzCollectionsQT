@@ -311,3 +311,6 @@ class Lng:
     login = ("логин", "login")
     password = ("пароль", "password")
     upload_in = ("Загрузить в ...", "Upload in ...")
+    swipe_text = ("\u2039 Проведите мышкой \u203A", "\u2039 Drag with mouse \u203A")
+
+

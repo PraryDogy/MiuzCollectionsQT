@@ -118,7 +118,8 @@ class ZoomBtns(QFrame):
         """)
 
         h_layout = QHBoxLayout(self)
-        h_layout.setContentsMargins(0, 0, 0, 0)
+        h_layout.setSpacing(10)
+        h_layout.setContentsMargins(5, 0, 5, 0)
 
         def add_btn(name, val):
             btn = UserSvg(os.path.join("./images", name), 45)
@@ -126,15 +127,15 @@ class ZoomBtns(QFrame):
             h_layout.addWidget(btn)
             return btn
 
-        h_layout.addSpacerItem(QSpacerItem(5, 0))
+        # h_layout.addSpacerItem(QSpacerItem(5, 0))
         add_btn("zoom_out.svg", -1)
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
+        # h_layout.addSpacerItem(QSpacerItem(10, 0))
         add_btn("zoom_in.svg", 1)
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
+        # h_layout.addSpacerItem(QSpacerItem(10, 0))
         add_btn("zoom_fit.svg", 0)
-        h_layout.addSpacerItem(QSpacerItem(10, 0))
+        # h_layout.addSpacerItem(QSpacerItem(10, 0))
         add_btn("zoom_close.svg", 9999)
-        h_layout.addSpacerItem(QSpacerItem(5, 0))
+        # h_layout.addSpacerItem(QSpacerItem(5, 0))
 
         self.mappings = {
             -1: self.zoom_out.emit,
@@ -252,22 +253,36 @@ class WinImageView(AppModalWindow):
         self.zoom_btns.zoom_out.connect(lambda: self.zoom_cmd("out"))
         self.zoom_btns.zoom_fit.connect(lambda: self.zoom_cmd("fit"))
         self.zoom_btns.zoom_close.connect(self.deleteLater)
-        self.zoom_btns.zoom_in.connect(lambda: print("zoom in"))
 
         self.text_label = QLabel(self)
         self.text_label.setStyleSheet("background: black;")
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.hide_all_buttons()
+        # self.hide_all_buttons()
         QTimer.singleShot(100, self.first_load)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
 
 
     def first_load(self):
+
+        def on_finish():
+            temp_label.deleteLater()
+            for i in self.zoom_btns.findChildren(QWidget):
+                i.show()
+        
         if not Mf.current.set_curr_path():
             self.no_connection.emit()
         self.load_thumb()
+
+        for i in self.zoom_btns.findChildren(QWidget):
+            i.hide()
+        temp_label = QLabel(Lng.swipe_text[cfg.lng])
+        temp_label.setStyleSheet("font: 18pt; font-weight: bold; background: none;")
+        self.zoom_btns.layout().addWidget(temp_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        QTimer.singleShot(1400, on_finish)
+        QTimer.singleShot(1400, self.hide_all_buttons)
     
     def zoom_cmd(self, flag: str):
         actions = {
