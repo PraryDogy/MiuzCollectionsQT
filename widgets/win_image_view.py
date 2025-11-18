@@ -42,6 +42,7 @@ class ImgWid(QGraphicsView):
 
         self.pixmap_item: QGraphicsPixmapItem = None
         self._last_mouse_pos: QPointF = None
+        self.is_zoomed = False
 
         if pixmap:
             self.pixmap_item = QGraphicsPixmapItem(pixmap)
@@ -52,14 +53,20 @@ class ImgWid(QGraphicsView):
 
     def zoom_in(self):
         self.scale(1.1, 1.1)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.is_zoomed = True
 
     def zoom_out(self):
         self.scale(0.9, 0.9)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.is_zoomed = True
 
     def zoom_fit(self):
         if self.pixmap_item:
             self.resetTransform()
             self.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
+            self.is_zoomed = False
+            self.setCursor(Qt.CursorShape.ArrowCursor)
 
     # ---------------------- Drag через мышь ----------------------
     def mousePressEvent(self, event: QMouseEvent):
@@ -74,13 +81,15 @@ class ImgWid(QGraphicsView):
             delta = event.pos() - self._last_mouse_pos
             self._last_mouse_pos = event.pos()
 
-            # перемещаем сцену через scrollbars
             self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event: QMouseEvent):
-        self.setCursor(Qt.ArrowCursor)
+        if self.is_zoomed:
+            self.setCursor(Qt.CursorShape.OpenHandCursor)
+        else:
+            self.setCursor(Qt.CursorShape.ArrowCursor)
         self._last_mouse_pos = None
         super().mouseReleaseEvent(event)
 
@@ -160,6 +169,7 @@ class ZoomBtns(QFrame):
         dx = e.x() - self.start_pos.x()
         if abs(dx) > 30:  # горизонтальное движение
             self.is_move = True
+            self.setCursor(Qt.CursorShape.SizeHorCursor)
             if dx > 0:
                 self.zoom_in.emit()
             else:
@@ -167,17 +177,18 @@ class ZoomBtns(QFrame):
             self.start_pos = e.pos()
         super().mouseMoveEvent(e)
 
-    def mouseReleaseEvent(self, a0):
+    def mouseReleaseEvent(self, e):
+        self.setCursor(Qt.CursorShape.ArrowCursor)
         if self.is_move:
             self.is_move = False
-            return
-        pos = a0.globalPos()
+            return  # не считаем клик, если двигали мышь
+        pos = e.globalPos()
         wid = QApplication.widgetAt(pos)
         if isinstance(wid, UserSvg):
             func = self.mappings.get(wid.value)
             if func:
                 func()
-        return super().mouseReleaseEvent(a0)
+        super().mouseReleaseEvent(e)
 
 
 class SwitchImgBtn(USvgSqareWidget):
