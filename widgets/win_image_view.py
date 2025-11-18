@@ -26,7 +26,7 @@ from .actions import (CopyName, CopyPath, RevealInFinder, Save, SaveAs, SetFav,
 from .grid import Thumbnail
 
 
-class ImageWidget(QGraphicsView):
+class ImgWid(QGraphicsView):
     mouse_moved = pyqtSignal()
 
     def __init__(self, pixmap: QPixmap = None):
@@ -240,7 +240,7 @@ class WinImageView(AppModalWindow):
         self.mouse_move_timer.setSingleShot(True)
         self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
-        self.image_label = ImageWidget(QPixmap())
+        self.image_label = ImgWid(QPixmap())
         self.central_layout.addWidget(self.image_label)
         self.prev_image_btn = PrevImgBtn(self.centralWidget())
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
@@ -280,7 +280,7 @@ class WinImageView(AppModalWindow):
     def restart_img_wid(self, pixmap: QPixmap):
         self.text_label.hide()
         self.image_label.hide()  # скрываем старый
-        new_wid = ImageWidget(pixmap)
+        new_wid = ImgWid(pixmap)
         new_wid.mouse_moved.connect(self.zoom_btns.show)
         self.central_layout.addWidget(new_wid)
 
