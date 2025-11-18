@@ -266,23 +266,23 @@ class WinImageView(AppModalWindow):
 
     def first_load(self):
 
-        def on_finish():
-            temp_label.deleteLater()
-            for i in self.zoom_btns.findChildren(QWidget):
-                i.show()
+        # def on_finish():
+        #     temp_label.deleteLater()
+        #     for i in self.zoom_btns.findChildren(QWidget):
+        #         i.show()
         
         if not Mf.current.set_curr_path():
             self.no_connection.emit()
         self.load_thumb()
 
-        for i in self.zoom_btns.findChildren(QWidget):
-            i.hide()
-        temp_label = QLabel(Lng.swipe_text[cfg.lng])
-        temp_label.setStyleSheet("font: 18pt; font-weight: bold; background: none;")
-        self.zoom_btns.layout().addWidget(temp_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        # for i in self.zoom_btns.findChildren(QWidget):
+        #     i.hide()
+        # temp_label = QLabel(Lng.swipe_text[cfg.lng])
+        # temp_label.setStyleSheet("font: 18pt; font-weight: bold; background: none;")
+        # self.zoom_btns.layout().addWidget(temp_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        QTimer.singleShot(1400, on_finish)
-        QTimer.singleShot(1400, self.hide_all_buttons)
+        # QTimer.singleShot(1400, on_finish)
+        # QTimer.singleShot(1400, self.hide_all_buttons)
     
     def zoom_cmd(self, flag: str):
         actions = {
