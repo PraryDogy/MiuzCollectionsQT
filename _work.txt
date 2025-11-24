@@ -1,3 +1,0 @@
-Чиним RemoveFiles, добавив NewScaner + ScanerSingleDir
-Проверяем в Test ScanerSingleDir
-Прикручиваем к новой UploadTask SingleDir
