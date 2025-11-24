@@ -555,8 +555,8 @@ class WinImageView(AppModalWindow):
         bottom_window_side = a0.size().height() - self.zoom_btns.height()
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
 
-        self.ww = a0.size().width()
-        self.hh = a0.size().height()
+        WinImageView.ww = a0.size().width()
+        WinImageView.hh = a0.size().height()
 
         self.text_label.resize(self.size())
         self.setFocus()
