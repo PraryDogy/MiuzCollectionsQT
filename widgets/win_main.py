@@ -581,7 +581,13 @@ class WinMain(UMainWindow):
         self.view_win.open_in_app.connect(
             lambda data: self.open_in_app(self.window(), Mf.current, data)
         )
-        self.view_win.center_to_parent(self.window())
+
+        if WinImageView.xx == 0:
+            self.view_win.resize(WinImageView.base_w, WinImageView.base_h)
+            self.view_win.center_to_parent(self.window())
+        else:
+            self.view_win.resize(WinImageView.ww, WinImageView.hh)
+            self.view_win.move(WinImageView.xx, WinImageView.yy)
         self.view_win.show()
 
     def start_scaner_task(self):

@@ -226,8 +226,10 @@ class WinImageView(AppModalWindow):
     open_in_app = pyqtSignal(tuple)
     
     task_count_limit = 10
-    ww, hh = 700, 500
     min_w, min_h = 500, 400
+    base_w, base_h = 700, 500
+    ww, hh = 0, 0
+    xx, yy = 0, 0
     window_style = """background: black;"""
 
     def __init__(self, rel_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
@@ -244,7 +246,6 @@ class WinImageView(AppModalWindow):
 
         self.setStyleSheet(self.window_style)
         self.setMinimumSize(QSize(self.min_w, self.min_h))
-        self.resize(self.ww, self.hh)
         self.installEventFilter(self)
 
         self.mouse_move_timer = QTimer(self)
@@ -557,6 +558,8 @@ class WinImageView(AppModalWindow):
 
         WinImageView.ww = a0.size().width()
         WinImageView.hh = a0.size().height()
+        WinImageView.xx = self.x()
+        WinImageView.yy = self.y()
 
         self.text_label.resize(self.size())
         self.setFocus()
