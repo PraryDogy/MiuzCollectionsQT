@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
 
 from cfg import Static, cfg
 from system.lang import Lng
+from system.shared_utils import SharedUtils
 
 from ._base_widgets import SingleActionWindow, ULineEdit, UMenu
 
@@ -205,6 +206,8 @@ class ServersWin(SingleActionWindow):
         delay = 0
 
         for server, login, password in self.data:
+            if SharedUtils.is_mounted(server):
+                continue
             cmd = f"smb://{login}:{password}@{server}"
             QTimer.singleShot(delay, lambda c=cmd: subprocess.run(["open", c]))
             delay += 200  # задержка 200 мс между подключениями
