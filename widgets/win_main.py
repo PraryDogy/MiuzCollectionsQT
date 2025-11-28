@@ -76,7 +76,7 @@ class WinMain(UMainWindow):
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
-        h_lay_main.setContentsMargins(0, 0, 5, 0)
+        h_lay_main.setContentsMargins(5, 0, 5, 0)
         h_wid_main.setLayout(h_lay_main)
         self.central_layout.addWidget(h_wid_main)
 
