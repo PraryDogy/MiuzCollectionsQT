@@ -360,11 +360,11 @@ class BarTop(QWidget):
     reload_thumbnails = pyqtSignal()
     history_press = pyqtSignal()
     level_up = pyqtSignal()
-    height_ = 46
+    text_height = 53
 
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(self.height_)
+        self.setFixedHeight(self.text_height)
         self.h_layout = UHBoxLayout()
         self.h_layout.setContentsMargins(0, 3, 0, 3)
         self.h_layout.setSpacing(0)
