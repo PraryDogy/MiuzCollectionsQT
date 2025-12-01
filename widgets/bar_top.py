@@ -11,67 +11,74 @@ from ._base_widgets import SettingsItem, UHBoxLayout, UMenu, UVBoxLayout
 from .wid_search import WidSearch
 
 
-class BarTopBtn(QFrame):
+class UFrame(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setObjectName("uFrame")
+        self.normal_style()
+
+    def normal_style(self):
+        self.setStyleSheet("""
+            QFrame#uFrame {
+                background: transparent;
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+        """)
+
+    def solid_style(self):
+        self.setStyleSheet("""
+            QFrame#uFrame {
+                background: rgba(125, 125, 125, 0.5);
+                border-radius: 7px;
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+        """)
+
+
+class BarTopBtn(QWidget):
     """
     QFrame с иконкой SVG (в отдельном фрейме) и подписью.
     Меняет стиль только иконки при наведении/клике, текст остаётся неизменным.
     """
 
     clicked_ = pyqtSignal()
-    object_name = "_frame_"
-    ww, hh = 65, 45
-    svg_ww, svg_hh = 20, 20
-    font_size = 10
+    width_ = 40
+    height_ = 35
+    svg_size = 20
 
-    # --- Стили ---
-    gray_bg_style = f"""
-        border-radius: 7px;
-        color: rgb(255, 255, 255);
-        background: rgba(125, 125, 125, 0.5);
-        border: 1px solid transparent;
-    """
-    border_transparent_style = """
-        border: 1px solid transparent;
-    """
 
     def __init__(self):
         super().__init__()
-        self.setFixedSize(self.ww, self.hh)
-
-        # --- Компоновка ---
+        
         self.v_lay = UVBoxLayout()
+        self.v_lay.setSpacing(1)
+        self.v_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.v_lay)
 
         # --- Фрейм под SVG ---
-        self.svg_frame = QFrame()
-        self.svg_frame.setObjectName(self.object_name)
-        self.svg_frame.setFixedSize(self.svg_ww + 12, self.svg_hh + 6)
+        self.svg_frame = UFrame()
+        self.svg_frame.setFixedSize(self.width_, self.height_)
         self.svg_lay = UVBoxLayout()
         self.svg_frame.setLayout(self.svg_lay)
+        self.v_lay.addWidget(self.svg_frame, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # --- SVG-иконка ---
         self.svg_btn = QSvgWidget()
-        self.svg_btn.setFixedSize(self.svg_ww, self.svg_hh)
+        self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
         self.svg_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # --- Подпись ---
         self.lbl = QLabel()
-        self.lbl.setStyleSheet(f"font-size: {self.font_size}px;")
-
-        # --- Добавляем в корневой layout ---
-        self.v_lay.addWidget(self.svg_frame, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.lbl.setStyleSheet(f"font-size: 10px;")
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # --- Стиль по умолчанию ---
-        self.set_normal_style()
-
     def set_solid_style(self):
-        """Применяет сплошной серый фон только к svg_frame."""
-        self.svg_frame.setStyleSheet(f"#{self.object_name} {{ {self.gray_bg_style} }}")
+        self.svg_frame.solid_style()
 
     def set_normal_style(self):
-        """Применяет прозрачный бордер только к svg_frame."""
-        self.svg_frame.setStyleSheet(f"#{self.object_name} {{ {self.border_transparent_style} }}")
+        self.svg_frame.normal_style()
 
     def mouseReleaseEvent(self, a0):
         """Испускает сигнал при клике левой кнопкой мыши."""
@@ -353,10 +360,14 @@ class BarTop(QWidget):
     reload_thumbnails = pyqtSignal()
     history_press = pyqtSignal()
     level_up = pyqtSignal()
+    height_ = 46
 
     def __init__(self):
         super().__init__()
+        self.setFixedHeight(self.height_)
         self.h_layout = UHBoxLayout()
+        self.h_layout.setContentsMargins(0, 3, 0, 3)
+        self.h_layout.setSpacing(0)
         self.setLayout(self.h_layout)
 
         self.back_btn = BackBtn()
@@ -404,9 +415,6 @@ class BarTop(QWidget):
         self.search_wid = WidSearch()
         self.search_wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
         self.h_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
-
-        self.h_layout.setContentsMargins(0, 2, 0, 2)
-        self.adjustSize()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
