@@ -361,13 +361,14 @@ class BarTop(QWidget):
     history_press = pyqtSignal()
     level_up = pyqtSignal()
     text_height = 53
+    text_spacing = 15
 
     def __init__(self):
         super().__init__()
         self.setFixedHeight(self.text_height)
         self.h_layout = UHBoxLayout()
         self.h_layout.setContentsMargins(0, 3, 0, 3)
-        self.h_layout.setSpacing(0)
+        self.h_layout.setSpacing(self.text_spacing)
         self.setLayout(self.h_layout)
 
         self.back_btn = BackBtn()
