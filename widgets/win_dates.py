@@ -76,7 +76,7 @@ class DatesLineEdit(ULineEdit):
 
         if key in (Qt.Key_Up, Qt.Key_Down):
             # день
-            if pos in (0, 1):
+            if pos in (0, 2):
                 day += delta
                 if day > calendar.monthrange(year, month)[1]:
                     day = 1
@@ -92,7 +92,7 @@ class DatesLineEdit(ULineEdit):
                     day = calendar.monthrange(year, month)[1]
 
             # месяц
-            elif pos in (3, 4):
+            elif pos in (3, 5):
                 month += delta
                 if month > 12:
                     month = 1
