@@ -59,7 +59,7 @@ class WinMain(UMainWindow):
     argv_flag = "noscan"
     update_mins = 30
     min_w = 750
-    ww, hh = 870, 500
+    ww, hh = 1120, 760
     left_side_width = 250
     warning_svg = "./images/warning.svg"
 

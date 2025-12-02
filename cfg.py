@@ -52,7 +52,7 @@ class Dynamic:
     f_date_end: str = None # 31 january 1991
     loaded_thumbs: int = 0
     search_widget_text: str = None
-    thumb_size_index: int = 0
+    thumb_size_index: int = 2
     current_dir: str = ""
     sort_by_mod: bool = True
     filters_enabled: list[str] = []
