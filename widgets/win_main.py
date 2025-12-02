@@ -59,13 +59,12 @@ class WinMain(UMainWindow):
     argv_flag = "noscan"
     update_mins = 30
     min_w = 750
-    ww, hh = 1120, 760
     left_side_width = 250
     warning_svg = "./images/warning.svg"
 
     def __init__(self, argv: list[str]):
         super().__init__()
-        self.resize(self.ww, self.hh)
+        self.resize(Static.ww, Static.hh)
         self.setMinimumWidth(self.min_w)
 
         self.setAcceptDrops(True)
@@ -583,7 +582,7 @@ class WinMain(UMainWindow):
         )
 
         if WinImageView.xx == 0:
-            self.view_win.resize(WinImageView.base_w, WinImageView.base_h)
+            self.view_win.resize(Static.ww, Static.hh)
             self.view_win.center_to_parent(self.window())
         else:
             self.view_win.resize(WinImageView.ww, WinImageView.hh)

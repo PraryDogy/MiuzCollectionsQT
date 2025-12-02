@@ -227,7 +227,6 @@ class WinImageView(AppModalWindow):
     
     task_count_limit = 10
     min_w, min_h = 500, 400
-    base_w, base_h = 700, 500
     ww, hh = 0, 0
     xx, yy = 0, 0
     window_style = """background: black;"""

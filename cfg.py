@@ -18,6 +18,7 @@ class Static:
     _preload_db = f"{_preload}/db.db"
     _preload_hashdir = f"{_preload}/{hashdir}"
     _preload_zip = f"{_preload}/hashdir.zip"
+    ww, hh = 1120, 760
 
     img_extensions = (
         ".jpg", ".JPG", ".jpeg", ".JPEG", ".jpe", ".JPE", ".jfif", ".JFIF",
