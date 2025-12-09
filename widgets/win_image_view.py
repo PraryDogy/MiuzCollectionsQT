@@ -449,6 +449,9 @@ class WinImageView(AppModalWindow):
                 self.raise_()
             else:
                 self.deleteLater()
+        
+        elif ev.key() == Qt.Key.Key_Space:
+            self.deleteLater()
 
         elif ev.key() == Qt.Key.Key_Equal:
             self.image_label.zoom_in()

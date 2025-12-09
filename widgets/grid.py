@@ -722,7 +722,8 @@ class Grid(VScrollArea):
                 (ClipBoardItem.type_cut, [i.rel_path for i in self.selected_widgets])
             )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
-            open_last_selected()
+            if not event.isAutoRepeat():
+                open_last_selected()
         elif event.key() in KEY_NAVI:
             navigate(KEY_NAVI[event.key()])
 
