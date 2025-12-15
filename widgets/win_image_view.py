@@ -558,11 +558,6 @@ class WinImageView(AppModalWindow):
         bottom_window_side = a0.size().height() - self.zoom_btns.height()
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
 
-        WinImageView.ww = a0.size().width()
-        WinImageView.hh = a0.size().height()
-        WinImageView.xx = self.x()
-        WinImageView.yy = self.y()
-
         self.text_label.resize(self.size())
         self.setFocus()
 
@@ -582,9 +577,21 @@ class WinImageView(AppModalWindow):
         return super().leaveEvent(a0)
 
     def closeEvent(self, a0):
+
+        WinImageView.ww = self.size().width()
+        WinImageView.hh = self.size().height()
+        WinImageView.xx = self.x()
+        WinImageView.yy = self.y()
+
         self.closed_.emit()
         return super().closeEvent(a0)
     
     def deleteLater(self):
+
+        WinImageView.ww = self.size().width()
+        WinImageView.hh = self.size().height()
+        WinImageView.xx = self.x()
+        WinImageView.yy = self.y()
+
         self.closed_.emit()
         return super().deleteLater()
