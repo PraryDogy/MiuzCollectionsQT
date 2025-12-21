@@ -5,7 +5,7 @@ from typing import Literal
 from PyQt5.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
                           pyqtSignal)
 from PyQt5.QtGui import (QContextMenuEvent, QCursor, QImage, QKeyEvent,
-                         QMouseEvent, QPixmap, QResizeEvent)
+                         QMouseEvent, QPixmap, QResizeEvent, QTransform)
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsPixmapItem, QGraphicsScene,
@@ -343,6 +343,12 @@ class WinImageView(AppModalWindow):
         img_thread.sigs.finished_.connect(fin)
         UThreadPool.start(img_thread)
 
+    def rotate(self, value: int):
+        pixmap = self.image_label.pixmap_item.pixmap()
+        transform = QTransform().rotate(value)
+        pixmap = pixmap.transformed(transform)
+        self.restart_img_wid(pixmap)
+
 # GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
 
     def hide_all_buttons(self):
@@ -545,6 +551,17 @@ class WinImageView(AppModalWindow):
             )
         )
         self.menu_.addAction(save_as)
+
+        rotate_menu = USubMenu(Lng.rotate[cfg.lng], self.menu_)
+        self.menu_.addMenu(rotate_menu)
+
+        rotate_cw = QAction(Lng.clockwise[cfg.lng], rotate_menu)
+        rotate_cw.triggered.connect(lambda: self.rotate(90))
+        rotate_menu.addAction(rotate_cw)
+
+        rotate_ccw = QAction(Lng.counter_clockwise[cfg.lng], rotate_menu)
+        rotate_ccw.triggered.connect(lambda: self.rotate(-90))
+        rotate_menu.addAction(rotate_ccw)
 
         self.menu_.show_umenu()
 
