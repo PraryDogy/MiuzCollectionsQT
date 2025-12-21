@@ -443,35 +443,41 @@ class WinImageView(AppModalWindow):
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
     def keyPressEvent(self, ev: QKeyEvent | None) -> None:
-        if ev.key() == Qt.Key.Key_Left:
-            self.switch_image(-1)
 
-        elif ev.key() == Qt.Key.Key_Right:
-            self.switch_image(1)
+        if ev.modifiers() & Qt.KeyboardModifier.ControlModifier:
+            if ev.key() == Qt.Key.Key_I:
+                self.open_win_info.emit([self.rel_path])
+            
+            elif ev.key() == Qt.Key.Key_Left:
+                self.rotate(-90)
 
-        elif ev.key() == Qt.Key.Key_Escape:
-            if self.isFullScreen():
-                self.showNormal()
-                self.raise_()
-            else:
+            elif ev.key() == Qt.Key.Key_Right:
+                self.rotate(90)
+        else:
+            if ev.key() == Qt.Key.Key_Left:
+                self.switch_image(-1)
+
+            elif ev.key() == Qt.Key.Key_Right:
+                self.switch_image(1)
+
+            elif ev.key() == Qt.Key.Key_Escape:
+                if self.isFullScreen():
+                    self.showNormal()
+                    self.raise_()
+                else:
+                    self.deleteLater()
+            
+            elif ev.key() == Qt.Key.Key_Space:
                 self.deleteLater()
-        
-        elif ev.key() == Qt.Key.Key_Space:
-            self.deleteLater()
 
-        elif ev.key() == Qt.Key.Key_Equal:
-            self.image_label.zoom_in()
+            elif ev.key() == Qt.Key.Key_Equal:
+                self.image_label.zoom_in()
 
-        elif ev.key() == Qt.Key.Key_Minus:
-            self.image_label.zoom_out()
+            elif ev.key() == Qt.Key.Key_Minus:
+                self.image_label.zoom_out()
 
-        elif ev.key() == Qt.Key.Key_0:
-            self.image_label.zoom_fit()
-
-        elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier and ev.key() == Qt.Key.Key_I:
-            self.open_win_info.emit([self.rel_path])
-
-        # return super().keyPressEvent(ev)
+            elif ev.key() == Qt.Key.Key_0:
+                self.image_label.zoom_fit()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
