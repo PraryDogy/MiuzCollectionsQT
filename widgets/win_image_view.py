@@ -562,11 +562,11 @@ class WinImageView(AppModalWindow):
         rotate_menu = USubMenu(Lng.rotate[cfg.lng], self.menu_)
         self.menu_.addMenu(rotate_menu)
 
-        rotate_cw = QAction(Lng.clockwise[cfg.lng], rotate_menu)
+        rotate_cw = QAction(Lng.clockwise[cfg.lng] + " (⌘ + →)", rotate_menu)
         rotate_cw.triggered.connect(lambda: self.rotate(90))
         rotate_menu.addAction(rotate_cw)
 
-        rotate_ccw = QAction(Lng.counter_clockwise[cfg.lng], rotate_menu)
+        rotate_ccw = QAction(Lng.counter_clockwise[cfg.lng] + " (⌘ + ←)", rotate_menu)
         rotate_ccw.triggered.connect(lambda: self.rotate(-90))
         rotate_menu.addAction(rotate_ccw)
 
