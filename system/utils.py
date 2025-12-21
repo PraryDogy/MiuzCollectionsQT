@@ -179,14 +179,26 @@ class Utils:
 
     @classmethod
     def desaturate_image(cls, image: np.ndarray, factor=0.2):
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        return cv2.addWeighted(
-            image,
-            1 - factor,
-            cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR),
-            factor,
-            0
-        )
+        try:
+            # если 4 канала (RGBA), убираем альфу для операции
+            has_alpha = image.shape[2] == 4
+            img = image[:, :, :3] if has_alpha else image
+
+            # преобразуем в серый
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+
+            # объединяем с оригиналом
+            desat = cv2.addWeighted(img, 1 - factor, gray_bgr, factor, 0)
+
+            # если был альфа-канал, добавляем обратно
+            if has_alpha:
+                desat = np.dstack([desat, image[:, :, 3]])
+
+            return desat
+        except Exception:
+            cls.print_error()
+            return image
 
     @classmethod
     def qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:
