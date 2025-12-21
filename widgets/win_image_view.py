@@ -453,6 +453,19 @@ class WinImageView(AppModalWindow):
 
             elif ev.key() == Qt.Key.Key_Right:
                 self.rotate(90)
+
+            elif ev.key() == Qt.Key.Key_Space:
+                self.deleteLater()
+
+            elif ev.key() == Qt.Key.Key_Equal:
+                self.image_label.zoom_in()
+
+            elif ev.key() == Qt.Key.Key_Minus:
+                self.image_label.zoom_out()
+
+            elif ev.key() == Qt.Key.Key_0:
+                self.image_label.zoom_fit()
+
         else:
             if ev.key() == Qt.Key.Key_Left:
                 self.switch_image(-1)
@@ -466,18 +479,6 @@ class WinImageView(AppModalWindow):
                     self.raise_()
                 else:
                     self.deleteLater()
-            
-            elif ev.key() == Qt.Key.Key_Space:
-                self.deleteLater()
-
-            elif ev.key() == Qt.Key.Key_Equal:
-                self.image_label.zoom_in()
-
-            elif ev.key() == Qt.Key.Key_Minus:
-                self.image_label.zoom_out()
-
-            elif ev.key() == Qt.Key.Key_0:
-                self.image_label.zoom_fit()
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
