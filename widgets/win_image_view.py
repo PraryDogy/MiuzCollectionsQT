@@ -454,9 +454,6 @@ class WinImageView(AppModalWindow):
             elif ev.key() == Qt.Key.Key_Right:
                 self.rotate(90)
 
-            elif ev.key() == Qt.Key.Key_Space:
-                self.deleteLater()
-
             elif ev.key() == Qt.Key.Key_Equal:
                 self.image_label.zoom_in()
 
@@ -472,6 +469,9 @@ class WinImageView(AppModalWindow):
 
             elif ev.key() == Qt.Key.Key_Right:
                 self.switch_image(1)
+
+            elif ev.key() == Qt.Key.Key_Space:
+                self.deleteLater()
 
             elif ev.key() == Qt.Key.Key_Escape:
                 if self.isFullScreen():
