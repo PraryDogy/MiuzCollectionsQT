@@ -1,17 +1,14 @@
 import io
-import logging
 import os
 import struct
 import subprocess
 import tempfile
-import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import cv2
 import numpy as np
 import pillow_heif
-import psd_tools
 import rawpy
 import rawpy._rawpy
 import tifffile
@@ -125,6 +122,7 @@ class ImgUtils:
     pillow_heif.register_heif_opener() 
     Image.MAX_IMAGE_PIXELS = None
 
+
     ext_jpeg = (
             ".jpg", ".JPG",
             ".jpeg", ".JPEG",
@@ -185,6 +183,14 @@ class ImgUtils:
         ".webm", ".WEBM",
     )
 
+    ext_icns = (
+        ".icns", ".ICNS",
+    )
+
+    ext_svg = (
+        ".svg", ".SVG"
+    )
+
     ext_all = (
         *ext_jpeg,
         *ext_tiff,
@@ -192,8 +198,9 @@ class ImgUtils:
         *ext_png,
         *ext_raw,
         *ext_video,
+        *ext_icns,
+        *ext_svg,
     )
-
 
     @classmethod
     def _read_tiff(cls, path: str) -> np.ndarray | None:
@@ -238,6 +245,7 @@ class ImgUtils:
         
     @classmethod
     def _read_quicklook(cls, path: str, size: int = 5000) -> np.ndarray:
+        print("quicklook read")
         tmp_dir = Path(tempfile.gettempdir())
         subprocess.run(
             ["qlmanage", "-t", "-s", str(size), "-o", str(tmp_dir), path],
