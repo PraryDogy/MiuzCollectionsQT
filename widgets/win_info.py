@@ -4,11 +4,10 @@ from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QSpacerItem, QWidget
 
-from cfg import Static, cfg
+from cfg import cfg
 from system.items import OneFileInfoItem
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
-from system.tasks import MultiFileInfo, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import SingleActionWindow, UMenu

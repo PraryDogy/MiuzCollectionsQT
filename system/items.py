@@ -1,5 +1,7 @@
 from typing import Literal
 
+import numpy as np
+
 
 class CopyItem:
     def __init__(self, src_dir: str, dst_dir: str, src_urls: list[str], is_search: bool, is_cut: bool):
@@ -25,3 +27,10 @@ class OneFileInfoItem:
         self.size = size
         self.mod = mod
         self.res = res
+
+
+class ReadImgItem:
+    def __init__(self, src: str, img_array: np.ndarray):
+        super().__init__()
+        self.src = src
+        self.img_array = img_array

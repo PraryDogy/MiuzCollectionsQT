@@ -6,7 +6,7 @@ from pathlib import Path
 from time import sleep
 
 from cfg import Static, cfg
-from system.items import CopyItem, OneFileInfoItem
+from system.items import CopyItem, OneFileInfoItem, ReadImgItem
 from system.shared_utils import ImgUtils, SharedUtils
 from system.tasks import Utils
 
