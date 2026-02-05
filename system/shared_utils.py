@@ -245,7 +245,6 @@ class ImgUtils:
         
     @classmethod
     def _read_quicklook(cls, path: str, size: int = 5000) -> np.ndarray:
-        print("quicklook read")
         tmp_dir = Path(tempfile.gettempdir())
         subprocess.run(
             ["qlmanage", "-t", "-s", str(size), "-o", str(tmp_dir), path],

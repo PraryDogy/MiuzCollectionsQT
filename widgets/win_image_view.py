@@ -326,6 +326,11 @@ class WinImageView(AppModalWindow):
 
     def load_image(self, ms = 300):
 
+        def fin(src: str, qimage: QImage):
+            qpixmap = QPixmap.fromImage(qimage)
+            self.cached_images[src] = qpixmap
+            self.restart_img_wid(qpixmap)
+
         def poll():
             self.read_img_timer.stop()
             q = self.read_img_task.proc_q
@@ -335,8 +340,7 @@ class WinImageView(AppModalWindow):
                     if item.src == self.path:
                         qimage_task = ImgArrayQImage(item.img_array)
                         qimage_task.sigs.finished_.connect(
-                            lambda qimage: self.restart_img_wid(QPixmap.fromImage(qimage))
-                        )
+                            lambda qimage: fin(item.src, qimage))
                         UThreadPool.start(qimage_task)
                 else:
                     t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[cfg.lng]}"
@@ -353,16 +357,20 @@ class WinImageView(AppModalWindow):
         except AttributeError as e:
             print("widgets > win image view error", e)
 
-        self.read_img_task = ProcessWorker(
-            target=ReadImg.start,
-            args=(self.path, False, )
-        )
-        self.read_img_timer = QTimer(self)
-        self.read_img_timer.setSingleShot(True)
-        self.read_img_timer.timeout.connect(poll)
+        if self.path in self.cached_images:
+            self.restart_img_wid(self.cached_images[self.path])
+        else:
+            self.read_img_task = ProcessWorker(
+                target=ReadImg.start,
+                args=(self.path, False, )
+            )
+            self.read_img_timer = QTimer(self)
+            self.read_img_timer.setSingleShot(True)
+            self.read_img_timer.timeout.connect(poll)
 
-        self.read_img_task.start()
-        self.read_img_timer.start(ms)
+            self.read_img_task.start()
+            self.read_img_timer.start(ms)
+
 
     def rotate(self, value: int):
         pixmap = self.image_label.pixmap_item.pixmap()

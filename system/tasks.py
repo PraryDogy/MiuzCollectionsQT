@@ -199,58 +199,6 @@ class FavManager(URunnable):
             self.conn.close()
 
 
-class OneImgLoader(URunnable):
-    max_images_count = 50
-
-    class Sigs(QObject):
-        finished_ = pyqtSignal(tuple)
-
-    def __init__(self, abs_path: str, cached_images: dict[str, QPixmap]):
-        """
-        :param path: путь к изображению
-        :param cached_images: словарь кэшированных изображений {путь: QPixmap}
-        """
-        super().__init__()
-        self.sigs = OneImgLoader.Sigs()
-        self.abs_path = abs_path
-        self.cached_images = cached_images
-
-    def task(self):
-        """Выполняет загрузку изображения и эмитит сигнал."""
-        try:
-            self.sigs.finished_.emit(
-                (self.abs_path, self._load_image())
-            )
-        except Exception as e:
-            print("OneImgLoader error:", e)
-            self.sigs.finished_.emit(
-                (self.abs_path, None)
-            )
-
-    def _load_image(self):
-        """Приватный метод: загружает и кэширует изображение."""
-        if self.abs_path in self.cached_images:
-            return self.cached_images.get(self.abs_path)
-
-        img = ImgUtils.read_img(self.abs_path)
-        if img is None:
-            return None
-
-        img = Utils.desaturate_image(img, 0.2)
-        qimage = Utils.qimage_from_array(img)
-        self.cached_images[self.abs_path] = qimage
-
-        del img
-        gc.collect()
-
-        # Если кэш превышает лимит, удаляем самый старый элемент
-        if len(self.cached_images) > self.max_images_count:
-            first_key = next(iter(self.cached_images))
-            self.cached_images.pop(first_key)
-
-        return qimage
-
-
 class FilesRemover(URunnable):
     """
     Удаляет указанные файлы.
