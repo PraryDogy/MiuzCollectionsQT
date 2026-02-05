@@ -183,8 +183,6 @@ class DataSettings(QGroupBox):
 
         self.v_lay.addWidget(first_wid)
 
-
-
         sec_wid = QWidget()
         sec_lay = UHBoxLayout()
         sec_lay.setSpacing(15)
@@ -204,8 +202,8 @@ class DataSettings(QGroupBox):
     def reset_cmd(self):
 
         def fin():
-            self.reset_data_btn.clicked.connect(self.changed.emit)
-            self.reset_data_btn.clicked.connect(self.reset.emit)
+            self.changed.emit()
+            self.reset.emit()
             self.reset_win.deleteLater()
 
         self.reset_win = WinQuestion(
@@ -508,6 +506,7 @@ class GeneralSettings(QGroupBox):
         v_lay.addWidget(about)
 
     def set_need_reset(self):
+        print("need teset")
         self.need_reset_item.need_reset = True
 
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
@@ -1095,16 +1094,15 @@ class WinSettings(SingleActionWindow):
             return True
         
 
-        print(self.need_reset_item.need_reset)
-        self.deleteLater()
-        return
+        # print(self.need_reset_item.need_reset)
+        # self.deleteLater()
+        # return
 
         if self.ok_btn.text() in Lng.restart:
             if not validate_folders():
                 return
             if self.need_reset_item.need_reset:
-                print(123123123)
-                # shutil.rmtree(Static.app_support)
+                shutil.rmtree(Static.app_support)
             else:
                 Mf.list_ = self.mf_list_copy
                 Filters.filters = self.filters_copy
