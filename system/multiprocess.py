@@ -1,13 +1,16 @@
 import os
 import shutil
+from datetime import datetime
 from multiprocessing import Process, Queue
 from pathlib import Path
 from time import sleep
 
-from cfg import Static
-from system.items import CopyItem, DataItem, MultipleInfoItem
+from cfg import Static, cfg
+from system.items import CopyItem
 from system.shared_utils import ImgUtils, SharedUtils
 from system.tasks import Utils
+
+from .lang import Lng
 
 
 class BaseProcessWorker:
@@ -54,96 +57,6 @@ class ReadImg:
         if desaturate:
             img_array = Utils.desaturate_image(img_array, 0.2)
         q.put((src, img_array))
-
-
-class ImgRes:
-    undef_text = "Неизвестно"
-    @staticmethod
-    def psd_read(path: str):
-        try:
-            w, h = ImgUtils.get_psd_size(path)
-            resol= f"{w}x{h}"
-        except Exception as e:
-            print("multiprocess > ImgRes psd error", e)
-            resol = ImgRes.undef_text
-        return resol
-
-    @staticmethod
-    def read(path: str):
-        img_ = ImgUtils.read_img(path)
-        if img_ is not None and len(img_.shape) > 1:
-            h, w = img_.shape[0], img_.shape[1]
-            resol= f"{w}x{h}"
-        else:
-            resol = ImgRes.undef_text
-        return resol
-
-    @staticmethod
-    def start(path: str, q: Queue):
-        """
-        Возвращает str "ширина изображения x высота изображения
-        """
-        if path.endswith(ImgUtils.ext_psd):
-            resol = ImgRes.psd_read(path)
-        else:
-            resol = ImgRes.read(path)
-        q.put(resol)
-
-
-class MultipleInfo:
-    err = " Произошла ошибка"
-
-    @staticmethod
-    def start(data_items: list[DataItem], show_hidden: bool, q: Queue):
-        info_item = MultipleInfoItem()
-
-        try:
-            MultipleInfo._task(data_items, info_item, show_hidden)
-            info_item.total_size = SharedUtils.get_f_size(info_item.total_size),
-            info_item.total_files = len(list(info_item._files_set))
-            info_item.total_files = format(info_item.total_files, ",").replace(",", " ")
-            info_item.total_folders = len(list(info_item._folders_set))
-            info_item.total_folders = format(info_item.total_folders, ",").replace(",", " ")
-            q.put(info_item)
-
-        except Exception as e:
-            print("tasks, MultipleInfoFiles error", e)
-            info_item.total_size = MultipleInfo.err
-            info_item.total_files = MultipleInfo.err
-            info_item.total_folders = MultipleInfo.err
-            q.put(info_item)
-
-    @staticmethod
-    def _task(items: list[dict], info_item: MultipleInfoItem, show_hidden: bool):
-        for i in items:
-            if i["type_"] == Static.folder_type:
-                MultipleInfo.get_folder_size(i, info_item, show_hidden)
-                info_item._folders_set.add(i["src"])
-            else:
-                info_item.total_size += i["size"]
-                info_item._files_set.add(i["src"])
-
-    @staticmethod
-    def get_folder_size(item: dict, info_item: MultipleInfoItem, show_hidden: bool):
-        stack = [item["src"]]
-        while stack:
-            current_dir = stack.pop()
-            try:
-                os.listdir(current_dir)
-            except Exception as e:
-                print("tasks, MultipleItemsInfo error", e)
-                continue
-            for entry in os.scandir(current_dir):
-                if entry.is_dir():
-                    info_item._folders_set.add(item["src"])
-                    stack.append(entry.path)
-                else:
-                    if show_hidden:
-                        info_item.total_size += entry.stat().st_size
-                        info_item._files_set.add(entry.path)
-                    if not entry.name.startswith(Static.hidden_symbols):
-                        info_item.total_size += entry.stat().st_size
-                        info_item._files_set.add(entry.path)
 
 
 class CopyWorker(BaseProcessWorker):
@@ -273,3 +186,58 @@ class CopyTask:
                 copy_item.current_size += len(buf) // 1024
                 proc_q.put(copy_item)
         shutil.copystat(src, dest, follow_symlinks=True)
+
+
+class OneFileInfo:
+
+    @staticmethod
+    def start(path: str, proc_q: Queue):
+        """
+        Возвращает в Queue либо dict либо str
+        Если str, процесс окончен
+        """
+        try:
+            res = OneFileInfo._gather_info(path)
+            proc_q.put(res)
+            resol = ImgUtils.get_img_res(path)
+            if resol:
+                proc_q.put(resol)
+        except Exception as e:
+            Utils.print_error()
+            res = {
+                Lng.file_name[cfg.lng]: OneFileInfo.lined_text(os.path.basename(path)),
+                Lng.place[cfg.lng]: OneFileInfo.lined_text(path),
+                Lng.type_[cfg.lng]: OneFileInfo.lined_text(os.path.splitext(path)[0]),
+            }
+            proc_q.put(res)
+
+    @staticmethod
+    def _gather_info(path: str) -> dict:
+        name = os.path.basename(path)
+        _, type_ = os.path.splitext(name)
+        stats = os.stat(path)
+        size = SharedUtils.get_f_size(stats.st_size)
+
+        date_time = datetime.fromtimestamp(stats.st_mtime)
+        month = Lng.months_genitive_case[cfg.lng][str(date_time.month)]
+        mod = f"{date_time.day} {month} {date_time.year}"
+
+        res = {
+            Lng.file_name[cfg.lng]: OneFileInfo.lined_text(name),
+            Lng.type_[cfg.lng]: type_,
+            Lng.file_size[cfg.lng]: size,
+            Lng.place[cfg.lng]: OneFileInfo.lined_text(path),
+            Lng.changed[cfg.lng]: mod,
+            Lng.resol[cfg.lng]: Lng.calculating[cfg.lng],
+        }
+
+        return res
+
+    @staticmethod
+    def lined_text(text: str, max_row = 50) -> str:
+        if len(text) > max_row:
+            return "\n".join(
+                text[i:i + max_row]
+                for i in range(0, len(text), max_row)
+            )
+        return text

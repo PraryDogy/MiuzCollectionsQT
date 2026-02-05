@@ -1,15 +1,16 @@
 import os
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
-from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QWidget, QSpacerItem
+from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QSpacerItem, QWidget
 
-from cfg import cfg, Static
+from cfg import Static, cfg
 from system.lang import Lng
-from system.tasks import MultiFileInfo, OneFileInfo, UThreadPool
+from system.multiprocess import OneFileInfo, ProcessWorker
+from system.tasks import MultiFileInfo, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMenu, SingleActionWindow
+from ._base_widgets import SingleActionWindow, UMenu
 
 
 class ULabel(QLabel):
@@ -76,43 +77,30 @@ class WinInfo(SingleActionWindow):
         self.grid_lay.setContentsMargins(0, 0, 0, 0)
         wid.setLayout(self.grid_lay)
 
-        if len(self.paths) == 1:
-            if os.path.isfile(self.paths[0]):
-                self.single_img()
-            else:
-                print("info dir")
-        else:
-            self.multiple_img()
+        self.single_img()
 
     def single_img(self):
-        self.task_ = OneFileInfo(self.paths[0])
-        self.task_.sigs.finished_.connect(lambda data: self.single_img_fin(data))
-        UThreadPool.start(self.task_)
 
-    def multiple_img(self):
-        self.task_ = MultiFileInfo(self.paths)
-        self.task_.sigs.finished_.connect(lambda data: self.multiple_img_fin(data))
-        UThreadPool.start(self.task_)
+        def poll():
+            self.task_timer.stop()
+            q = self.task_.proc_q
+            if not q.empty():
+                res = q.get()
+                if isinstance(res, dict):
+                    self.single_img_fin(res)
 
-    def multiple_img_fin(self, data: dict[str, str]):
-        row = 0
-        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
-        r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        for left_t, right_t in data.items():
-            left_lbl = ULabel(left_t + ":")
-            right_lbl = Selectable(right_t)
-            self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
-            self.grid_lay.addItem(QSpacerItem(15, 1), row, 1)
-            self.grid_lay.addWidget(right_lbl, row, 2, alignment=r_fl)
-            row += 1
+            if not self.task_.is_alive():
+                self.task_.terminate()
+            else:
+                self.task_timer.start(500)
 
-        self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.task_ = ProcessWorker(target=OneFileInfo.start, args=(self.paths[0], ))
+        self.task_timer = QTimer(self)
+        self.task_timer.setSingleShot(True)
+        self.task_timer.timeout.connect(poll)
 
-        self.last_label = self.findChildren(ULabel)[-1]
-        cmd = lambda text: self.last_label.setText(text)
-        self.task_.sigs.delayed_info.connect(cmd)
-        self.finished_.emit()
-        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.task_timer.start(500)
+        self.task_.start()
 
     def single_img_fin(self, data: dict[str, str]):
         row = 0

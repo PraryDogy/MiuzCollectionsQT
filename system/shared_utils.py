@@ -427,3 +427,30 @@ class ImgUtils:
             return cls._read_any(path)
         else:
             return None
+
+    @classmethod
+    def get_img_res(cls, path: str):
+
+        def read(path: str):
+            img_ = ImgUtils.read_img(path)
+            if img_ is not None and len(img_.shape) > 1:
+                h, w = img_.shape[0], img_.shape[1]
+                resol= f"{w}x{h}"
+            else:
+                resol = None
+            return resol
+
+        def psd_read(path: str):
+            try:
+                w, h = ImgUtils.get_psd_size(path)
+                resol= f"{w}x{h}"
+            except Exception as e:
+                print("multiprocess > ImgRes psd error", e)
+                resol = None
+            return resol
+
+        if path.endswith(ImgUtils.ext_psd):
+            resol = psd_read(path)
+        else:
+            resol = read(path)
+        return resol
