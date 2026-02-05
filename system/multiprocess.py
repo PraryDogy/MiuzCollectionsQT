@@ -199,9 +199,7 @@ class OneFileInfo:
         try:
             res = OneFileInfo._gather_info(path)
             proc_q.put(res)
-            resol = ImgUtils.get_img_res(path)
-            if resol:
-                proc_q.put(resol)
+            proc_q.put(ImgUtils.get_img_res(path))
         except Exception as e:
             Utils.print_error()
             res = {

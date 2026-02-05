@@ -88,7 +88,7 @@ class WinInfo(SingleActionWindow):
                 res = q.get()
                 self.single_img_fin(res)
 
-            if not self.task_.is_alive():
+            if not self.task_.is_alive() and q.empty():
                 self.task_.terminate()
             else:
                 self.task_timer.start(500)
