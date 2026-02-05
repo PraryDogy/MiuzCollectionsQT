@@ -6,12 +6,14 @@ import subprocess
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
-                             QLineEdit, QPushButton, QSpacerItem, QSpinBox,
-                             QSplitter, QWidget, QTableWidget, QTableWidgetItem, QAbstractScrollArea)
+from PyQt5.QtWidgets import (QAbstractScrollArea, QAction, QApplication,
+                             QFrame, QGroupBox, QLabel, QLineEdit, QPushButton,
+                             QSpacerItem, QSpinBox, QSplitter, QTableWidget,
+                             QTableWidgetItem, QWidget)
 
-from cfg import cfg, Static, Cfg
+from cfg import Cfg, Static, cfg
 from system.filters import Filters
+from system.items import NeedResetItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.paletes import ThemeChanger
@@ -473,9 +475,9 @@ class AboutWid(QGroupBox):
 class GeneralSettings(QGroupBox):
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: Cfg, need_reset: list[bool]):
+    def __init__(self, json_data_copy: Cfg, need_reset_item: NeedResetItem):
         super().__init__()
-        self.need_reset = need_reset
+        self.need_reset_item = need_reset_item
         v_lay = UVBoxLayout()
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.setSpacing(10)
@@ -506,7 +508,7 @@ class GeneralSettings(QGroupBox):
         v_lay.addWidget(about)
 
     def set_need_reset(self):
-        self.need_reset[0] = True
+        self.need_reset_item.need_reset = True
 
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
 
@@ -895,7 +897,7 @@ class WinSettings(SingleActionWindow):
         self.mf_list_copy = copy.deepcopy(Mf.list_)
         self.json_data_copy = copy.deepcopy(cfg)
         self.filters_copy = copy.deepcopy(Filters.filters)
-        self.need_reset = [False, ]
+        self.need_reset_item = NeedResetItem()
         self.mf_items: list[SettingsListItem] = []
         self.settings_item = settings_item
 
@@ -987,7 +989,7 @@ class WinSettings(SingleActionWindow):
 
     def init_right_side(self, index: int):
         if index == 0:
-            self.gen_settings = GeneralSettings(self.json_data_copy, self.need_reset)
+            self.gen_settings = GeneralSettings(self.json_data_copy, self.need_reset_item)
             self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
@@ -1091,12 +1093,18 @@ class WinSettings(SingleActionWindow):
                     self.win_warn.show()
                     return False
             return True
+        
+
+        print(self.need_reset_item.need_reset)
+        self.deleteLater()
+        return
 
         if self.ok_btn.text() in Lng.restart:
             if not validate_folders():
                 return
-            if self.need_reset[0]:
-                shutil.rmtree(Static.app_support)
+            if self.need_reset_item.need_reset:
+                print(123123123)
+                # shutil.rmtree(Static.app_support)
             else:
                 Mf.list_ = self.mf_list_copy
                 Filters.filters = self.filters_copy

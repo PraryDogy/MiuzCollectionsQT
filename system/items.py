@@ -34,3 +34,9 @@ class ReadImgItem:
         super().__init__()
         self.src = src
         self.img_array = img_array
+
+
+class NeedResetItem:
+    def __init__(self):
+        super().__init__()
+        self.need_reset = False
