@@ -86,8 +86,7 @@ class WinInfo(SingleActionWindow):
             q = self.task_.proc_q
             if not q.empty():
                 res = q.get()
-                if isinstance(res, dict):
-                    self.single_img_fin(res)
+                self.single_img_fin(res)
 
             if not self.task_.is_alive():
                 self.task_.terminate()
@@ -102,7 +101,13 @@ class WinInfo(SingleActionWindow):
         self.task_timer.start(500)
         self.task_.start()
 
-    def single_img_fin(self, data: dict[str, str]):
+    def single_img_fin(self, data: dict | str):
+
+        if isinstance(data, str):
+            self.last_label = self.findChildren(ULabel)[-1]
+            self.last_label.setText(data)
+            return
+
         row = 0
         l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
@@ -113,10 +118,6 @@ class WinInfo(SingleActionWindow):
             self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
             self.grid_lay.addWidget(right_lbl, row, 2, alignment=r_fl)
             row += 1
-
-        self.last_label = self.findChildren(ULabel)[-1]
-        cmd = lambda text: self.last_label.setText(text)
-        self.task_.sigs.delayed_info.connect(cmd)
         self.finished_.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:

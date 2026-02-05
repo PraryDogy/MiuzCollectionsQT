@@ -110,5 +110,7 @@ class App(QApplication):
                 i.show()
         return super().eventFilter(a0, a1)
 
-app = App(sys.argv)
-app.exec()
+
+if __name__ == "__main__":
+    app = App(argv=sys.argv)
+    app.exec()
