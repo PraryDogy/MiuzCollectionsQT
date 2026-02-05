@@ -15,9 +15,11 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
 from cfg import cfg
 from system.lang import Lng
 from system.main_folder import Mf
+from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import SharedUtils
+from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
-from system.multiprocess import ReadImg, ReadImgItem, ProcessWorker
+
 from ._base_widgets import AppModalWindow, UMenu, USubMenu, USvgSqareWidget
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SaveAs, SetFav,
                       WinInfoAction)
@@ -332,9 +334,16 @@ class WinImageView(AppModalWindow):
             
                 if item.img_array is not None:
                     if item.src == self.path:
-                        qimage = Utils.qimage_from_array(item.img_array)
-                        pixmap = QPixmap.fromImage(qimage)
-                        self.restart_img_wid(pixmap)
+
+                        qimage_task = ImgArrayQImage(item.img_array)
+                        qimage_task.sigs.finished_.connect(
+                            lambda qimage: self.restart_img_wid(QPixmap.fromImage(qimage))
+                        )
+                        UThreadPool.start(qimage_task)
+                        
+                        # qimage = Utils.qimage_from_array(item.img_array)
+                        # pixmap = QPixmap.fromImage(qimage)
+                        # self.restart_img_wid(pixmap)
                 else:
                     t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[cfg.lng]}"
                     self.show_text_label(t)

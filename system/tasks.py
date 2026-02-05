@@ -16,7 +16,7 @@ from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils, SharedUtils
 from .utils import Utils
-
+import numpy as np
 
 class TaskState:
     __slots__ = ["_should_run", "_finished"]
@@ -536,3 +536,19 @@ class HashDirSize(URunnable):
             name = f"{real_name} ({i.name})"
             main_folder_sizes[name] = {"size": size, "total": len(res)}
         return main_folder_sizes
+    
+
+class ImgArrayQImage(URunnable):
+    
+    class Sigs(QObject):
+        finished_ = pyqtSignal(QImage)
+
+    def __init__(self, img_array: np.ndarray):
+        super().__init__()
+        self.sigs = ImgArrayQImage.Sigs()
+        self.img_array = img_array
+
+    def task(self):
+        self.sigs.finished_.emit(
+            Utils.qimage_from_array(self.img_array)
+        )
