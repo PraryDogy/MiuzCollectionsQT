@@ -16,3 +16,12 @@ class CopyItem:
         self.total_count: int = 0
         self.dst_urls: list[str] = []
         self.msg: Literal["", "error", "need_replace", "replace_one", "replace_all", "finished"]
+
+
+class OneFileInfoItem:
+    def __init__(self, type_: str, size: str, mod: str, res: str):
+        super().__init__()
+        self.type_ = type_
+        self.size = size
+        self.mod = mod
+        self.res = res

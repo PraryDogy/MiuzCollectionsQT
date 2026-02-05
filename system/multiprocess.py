@@ -6,7 +6,7 @@ from pathlib import Path
 from time import sleep
 
 from cfg import Static, cfg
-from system.items import CopyItem
+from system.items import CopyItem, OneFileInfoItem
 from system.shared_utils import ImgUtils, SharedUtils
 from system.tasks import Utils
 
@@ -197,39 +197,27 @@ class OneFileInfo:
         Если str, процесс окончен
         """
         try:
-            res = OneFileInfo._gather_info(path)
-            proc_q.put(res)
-            proc_q.put(ImgUtils.get_img_res(path))
+            info_item = OneFileInfo._gather_info(path)
+            proc_q.put(info_item)
+
+            resol = ImgUtils.get_img_res(path)
+            if resol:
+                info_item.res = resol
+            proc_q.put(info_item)
         except Exception as e:
             Utils.print_error()
-            res = {
-                Lng.file_name[cfg.lng]: OneFileInfo.lined_text(os.path.basename(path)),
-                Lng.place[cfg.lng]: OneFileInfo.lined_text(path),
-                Lng.type_[cfg.lng]: OneFileInfo.lined_text(os.path.splitext(path)[0]),
-            }
-            proc_q.put(res)
 
     @staticmethod
-    def _gather_info(path: str) -> dict:
+    def _gather_info(path: str) -> OneFileInfoItem:
         name = os.path.basename(path)
         _, type_ = os.path.splitext(name)
         stats = os.stat(path)
         size = SharedUtils.get_f_size(stats.st_size)
-
         date_time = datetime.fromtimestamp(stats.st_mtime)
         month = Lng.months_genitive_case[cfg.lng][str(date_time.month)]
         mod = f"{date_time.day} {month} {date_time.year}"
-
-        res = {
-            Lng.file_name[cfg.lng]: OneFileInfo.lined_text(name),
-            Lng.type_[cfg.lng]: type_,
-            Lng.file_size[cfg.lng]: size,
-            Lng.place[cfg.lng]: OneFileInfo.lined_text(path),
-            Lng.changed[cfg.lng]: mod,
-            Lng.resol[cfg.lng]: Lng.calculating[cfg.lng],
-        }
-
-        return res
+        item = OneFileInfoItem(type_, size, mod, "")
+        return item
 
     @staticmethod
     def lined_text(text: str, max_row = 50) -> str:

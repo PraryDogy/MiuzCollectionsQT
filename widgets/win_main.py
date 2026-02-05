@@ -507,18 +507,15 @@ class WinMain(UMainWindow):
     @with_conn
     def open_info_win(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
         
-        def open_delayed():
-            """Отображает окно WinInfo после его инициализации."""
-            self.info_win.adjustSize()
-            self.info_win.center_to_parent(self)
-            self.info_win.show()
-        
         abs_paths = [
             Utils.get_abs_path(mf.curr_path, i)
             for i in rel_paths
         ]
         self.info_win = WinInfo(abs_paths)
-        self.info_win.finished_.connect(open_delayed)
+        self.info_win.adjustSize()
+        self.info_win.center_to_parent(self)
+        self.info_win.show()
+        # self.info_win.finished_.connect(open_delayed)
 
     def open_settings_win(self, settings_item: SettingsItem):
         self.bar_top.settings_btn.set_solid_style()
