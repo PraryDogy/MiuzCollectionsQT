@@ -56,7 +56,7 @@ class ReadImg:
         img_array = ImgUtils.read_img(src)
         if desaturate:
             img_array = Utils.desaturate_image(img_array, 0.2)
-        q.put((src, img_array))
+        q.put(ReadImgItem(src, img_array))
 
 
 class CopyWorker(BaseProcessWorker):
