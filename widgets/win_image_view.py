@@ -340,10 +340,6 @@ class WinImageView(AppModalWindow):
                             lambda qimage: self.restart_img_wid(QPixmap.fromImage(qimage))
                         )
                         UThreadPool.start(qimage_task)
-                        
-                        # qimage = Utils.qimage_from_array(item.img_array)
-                        # pixmap = QPixmap.fromImage(qimage)
-                        # self.restart_img_wid(pixmap)
                 else:
                     t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[cfg.lng]}"
                     self.show_text_label(t)
