@@ -12,15 +12,13 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsView, QHBoxLayout, QLabel, QSpacerItem,
                              QVBoxLayout, QWidget)
 
-from cfg import Static, cfg
+from cfg import cfg
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
-from system.tasks import OneImgLoader, UThreadPool
 from system.utils import Utils
-
-from ._base_widgets import (AppModalWindow, UMenu, USubMenu, USvgSqareWidget,
-                            UVBoxLayout)
+from system.multiprocess import ReadImg, ReadImgItem, ProcessWorker
+from ._base_widgets import AppModalWindow, UMenu, USubMenu, USvgSqareWidget
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SaveAs, SetFav,
                       WinInfoAction)
 from .grid import Thumbnail
@@ -225,7 +223,6 @@ class WinImageView(AppModalWindow):
     save_files = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
     
-    task_count_limit = 10
     min_w, min_h = 500, 400
     ww, hh = 0, 0
     xx, yy = 0, 0
@@ -241,7 +238,6 @@ class WinImageView(AppModalWindow):
         self.rel_paths = list(path_to_wid.keys())
         self.rel_path = rel_path
         self.wid = path_to_wid.get(self.rel_path)
-        self.task_count = 0
 
         self.setStyleSheet(self.window_style)
         self.setMinimumSize(QSize(self.min_w, self.min_h))
@@ -326,22 +322,44 @@ class WinImageView(AppModalWindow):
         else:
             print("img viewer > no smb")
 
-    def load_image(self):
-        def fin(data: tuple[str, QImage]):
-            self.task_count -= 1
-            old_path, qimage = data
-            if qimage:
-                if old_path == self.path:
-                    pixmap = QPixmap.fromImage(qimage)
-                    self.restart_img_wid(pixmap)
-            else:
-                t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[cfg.lng]}"
-                self.show_text_label(t)
+    def load_image(self, ms = 300):
 
-        self.task_count += 1
-        img_thread = OneImgLoader(self.path, self.cached_images)
-        img_thread.sigs.finished_.connect(fin)
-        UThreadPool.start(img_thread)
+        def poll():
+            self.read_img_timer.stop()
+            q = self.read_img_task.proc_q
+            if not q.empty():
+                item: ReadImgItem = q.get()
+            
+                if item.img_array is not None:
+                    if item.src == self.path:
+                        qimage = Utils.qimage_from_array(item.img_array)
+                        pixmap = QPixmap.fromImage(qimage)
+                        self.restart_img_wid(pixmap)
+                else:
+                    t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[cfg.lng]}"
+                    self.show_text_label(t)
+            
+            if not self.read_img_task.is_alive():
+                self.read_img_task.terminate()
+            else:
+                self.read_img_timer.start(ms)
+
+        try:
+            self.read_img_task.terminate()
+            self.read_img_timer.stop()
+        except AttributeError as e:
+            print("widgets > win image view error", e)
+
+        self.read_img_task = ProcessWorker(
+            target=ReadImg.start,
+            args=(self.path, False, )
+        )
+        self.read_img_timer = QTimer(self)
+        self.read_img_timer.setSingleShot(True)
+        self.read_img_timer.timeout.connect(poll)
+
+        self.read_img_task.start()
+        self.read_img_timer.start(ms)
 
     def rotate(self, value: int):
         pixmap = self.image_label.pixmap_item.pixmap()
@@ -360,9 +378,6 @@ class WinImageView(AppModalWindow):
             i.hide()
 
     def switch_image(self, offset):
-        if self.task_count == self.task_count_limit:
-            return
-
         # мы формируем актуальный список src из актуальной сетки изображений
         self.rel_paths = list(self.path_to_wid.keys())
 
