@@ -11,7 +11,7 @@ from system.database import THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
 
-from ..shared_utils import ReadImage
+from ..shared_utils import ImgUtils
 from ..tasks import TaskState
 from ..utils import Utils
 
@@ -312,7 +312,7 @@ class HashdirUpdater(QObject):
         return new_del_items
 
     def create_thumb(self, path: str) -> ndarray | None:
-        img = ReadImage.read_image(path)
+        img = ImgUtils.read_image(path)
         thumb = Utils.fit_to_thumb(img, Static.max_img_size)
         del img
         gc.collect()

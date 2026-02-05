@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+import struct
 import subprocess
 import tempfile
 import traceback
@@ -9,6 +10,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+import pillow_heif
 import psd_tools
 import rawpy
 import rawpy._rawpy
@@ -140,10 +142,8 @@ class SharedUtils:
         return "\n".join(new_text).rstrip("-")
 
 
-class ReadImage:
-    psd_tools.psd.tagged_blocks.warn = lambda *args, **kwargs: None
-    psd_logger = logging.getLogger("psd_tools")
-    psd_logger.setLevel(logging.CRITICAL)
+class ImgUtils:
+    pillow_heif.register_heif_opener() 
     Image.MAX_IMAGE_PIXELS = None
 
     ext_jpeg = (
@@ -160,6 +160,8 @@ class ReadImage:
             ".pnm", ".PNM",
             ".gif", ".GIF",
             ".ico", ".ICO",
+            ".heic", ".HEIC",
+            ".heif", "HEIF"
         )
 
     ext_tiff = (
@@ -213,6 +215,7 @@ class ReadImage:
         *ext_video,
     )
 
+
     @classmethod
     def _read_tiff(cls, path: str) -> np.ndarray | None:
         def process_image(img: np.ndarray) -> np.ndarray:
@@ -240,48 +243,64 @@ class ReadImage:
             except Exception as e:
                 print(f"read tiff error with {loader.__name__}: {e}")
         return None
-                    
-    # @classmethod
-    # def _read_psb(cls, path: str):
-    #     try:
-    #         img = psd_tools.PSDImage.open(path)
-    #         img = img.composite()
-    #         img = img.convert("RGB")
-    #         array_img = np.array(img)
-    #         return array_img
-    #     except Exception as e:
-    #         print("read psb, psd tools error", e)
-    #         return None
 
     @classmethod
-    def _read_psb(cls, psd_path: str, size: int = 5000) -> np.ndarray:
+    def _read_psb(cls, path: str):
+        return cls._read_quicklook(path)
+        # try:
+        #     img = psd_tools.PSDImage.open(path)
+        #     img = img.composite()
+        #     img = img.convert("RGB")
+        #     array_img = np.array(img)
+        #     return array_img
+        # except Exception as e:
+        #     print("read psb, psd tools error", e)
+        #     return None
+        
+    @classmethod
+    def _read_quicklook(cls, path: str, size: int = 5000) -> np.ndarray:
         tmp_dir = Path(tempfile.gettempdir())
-        subprocess.run([
-            "qlmanage", "-t", "-s", str(size), "-o", str(tmp_dir), psd_path
-        ], check=True)
-        generated_files = list(tmp_dir.glob(Path(psd_path).stem + "*.png"))
+        subprocess.run(
+            ["qlmanage", "-t", "-s", str(size), "-o", str(tmp_dir), path],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL  # отключаем вывод ошибок
+        )
+        generated_files = list(tmp_dir.glob(Path(path).stem + "*.png"))
         if not generated_files:
             raise FileNotFoundError("QuickLook не создал PNG")
         generated = generated_files[0]
         with Image.open(generated) as img:
             arr = np.array(img)
-        generated.unlink()
+        if os.path.exists(generated):
+            generated.unlink()
         return arr
+
+    @classmethod
+    def _read_icns(cls, path: str):
+        return cls._read_png(path)
+        
+    @classmethod
+    def _read_svg(cls, path: str):
+        # ленивый импорт происходит здесь, чтобы через py2app не падало приложение
+        import cairosvg
+        png_data = cairosvg.svg2png(url=path)
+        nparr = np.frombuffer(png_data, np.uint8)
+        return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
 
     @classmethod
     def _read_png(cls, path: str) -> np.ndarray | None:
         try:
             img = Image.open(path)
-            if img.mode == "RGBA":
-                white_background = Image.new("RGBA", img.size, (255, 255, 255))
-                img = Image.alpha_composite(white_background, img)
-            img = img.convert("RGB")
+            if img.mode != "RGBA":
+                img = img.convert("RGBA")  # сохраняем альфа-канал
             array_img = np.array(img)
             img.close()
             return array_img
         except Exception as e:
             print("read png, PIL error", e)
             return None
+
 
     @classmethod
     def _read_jpg(cls, path: str) -> np.ndarray | None:
@@ -293,8 +312,14 @@ class ReadImage:
             img.close()
             return array_img
         except Exception as e:
-            print("read jpg, PIL error", e)
-            return None
+            print("read jpg, PIL error, try cv2 read", e)
+            try:
+                img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+                # img = np.array(img)
+                return img
+            except Exception as e:
+                print("read jpg, cv2 error, try cv2 read", e)
+                return None
 
     @classmethod
     def _read_raw(cls, path: str) -> np.ndarray | None:
@@ -356,7 +381,39 @@ class ReadImage:
         ...
 
     @classmethod
-    def read_image(cls, path: str) -> np.ndarray | None:
+    def get_psd_size(cls, path):
+        with open(path, "rb") as f:
+            header = f.read(26)
+
+        if header[:4] != b"8BPS":
+            raise ValueError("Не PSD")
+
+        height, width = struct.unpack(">II", header[14:22])
+        return width, height
+
+    @classmethod
+    def resize(cls, image: np.ndarray, size: int) -> np.ndarray:
+
+        def cmd():
+            h, w = image.shape[:2]
+            if w > h:  # Горизонтальное изображение
+                new_w = size
+                new_h = int(h * (size / w))
+            elif h > w:  # Вертикальное изображение
+                new_h = size
+                new_w = int(w * (size / h))
+            else:  # Квадратное изображение
+                new_w, new_h = size, size
+            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+        
+        try:
+            return cmd()
+        except Exception as e:
+            print("fit image error", e)
+            return None
+
+    @classmethod
+    def read_img(cls, path: str) -> np.ndarray | None:
         _, ext = os.path.splitext(path)
         ext = ext.lower()
         read_any_dict: dict[str, callable] = {}
@@ -373,14 +430,17 @@ class ReadImage:
             read_any_dict[i] = cls._read_png
         for i in cls.ext_video:
             read_any_dict[i] = cls._read_movie
-
+        for i in cls.ext_icns:
+            read_any_dict[i] = cls._read_icns
+        for i in cls.ext_svg:
+            read_any_dict[i] = cls._read_svg
         fn = read_any_dict.get(ext)
         if fn:
             cls._read_any = fn
             return cls._read_any(path)
         else:
             return None
-        
+
 
 class PathFinder:
     _volumes_dir: str = "/Volumes"

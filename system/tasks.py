@@ -14,7 +14,7 @@ from cfg import cfg, Dynamic, Static
 from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import Mf
-from .shared_utils import ReadImage, SharedUtils
+from .shared_utils import ImgUtils, SharedUtils
 from .utils import Utils
 
 
@@ -239,7 +239,7 @@ class OneImgLoader(URunnable):
         if self.abs_path in self.cached_images:
             return self.cached_images.get(self.abs_path)
 
-        img = ReadImage.read_image(self.abs_path)
+        img = ImgUtils.read_image(self.abs_path)
         if img is None:
             return None
 
@@ -321,7 +321,7 @@ class OneFileInfo(URunnable):
 
     def get_img_resol(self, path: str) -> str:
         """Возвращает разрешение изображения в формате 'WxH' или пустую строку."""
-        img_ = ReadImage.read_image(path)
+        img_ = ImgUtils.read_image(path)
         if img_ is not None and len(img_.shape) > 1:
             h, w = img_.shape[0], img_.shape[1]
             return f"{w}x{h}"

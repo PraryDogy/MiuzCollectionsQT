@@ -10,7 +10,7 @@ from cfg import cfg, Static
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
-from system.shared_utils import ReadImage
+from system.shared_utils import ImgUtils
 from system.tasks import TaskState
 from system.utils import Utils
 
@@ -427,7 +427,7 @@ class _ImgHashdirUpdater(QObject):
             )
 
     def create_thumb(self, path: str) -> ndarray | None:
-        img = ReadImage.read_image(path)
+        img = ImgUtils.read_image(path)
         thumb = Utils.fit_to_thumb(img, Static.max_img_size)
         del img
         gc.collect()
