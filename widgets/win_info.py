@@ -122,8 +122,17 @@ class WinInfo(SingleActionWindow):
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-            self.close_(a0)
+            self.deleteLater()
         return super().keyPressEvent(a0)
   
-    def close_(self, *args):
-        self.deleteLater()
+    def deleteLater(self):
+        if self.task_.is_alive():
+            self.task_timer.stop()
+            self.task_.terminate()
+        return super().deleteLater()
+
+    def closeEvent(self, a0):
+        if self.task_.is_alive():
+            self.task_timer.stop()
+            self.task_.terminate()
+        return super().closeEvent(a0)
