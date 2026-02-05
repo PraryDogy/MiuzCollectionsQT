@@ -331,10 +331,8 @@ class WinImageView(AppModalWindow):
             q = self.read_img_task.proc_q
             if not q.empty():
                 item: ReadImgItem = q.get()
-            
                 if item.img_array is not None:
                     if item.src == self.path:
-
                         qimage_task = ImgArrayQImage(item.img_array)
                         qimage_task.sigs.finished_.connect(
                             lambda qimage: self.restart_img_wid(QPixmap.fromImage(qimage))
