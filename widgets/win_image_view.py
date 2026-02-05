@@ -627,21 +627,25 @@ class WinImageView(AppModalWindow):
         return super().leaveEvent(a0)
 
     def closeEvent(self, a0):
-
+        try:
+            self.read_img_task.terminate()
+            self.read_img_timer.stop()
+        except AttributeError as e:
+            print("close img view error", e)
         WinImageView.ww = self.size().width()
         WinImageView.hh = self.size().height()
         WinImageView.xx = self.x()
         WinImageView.yy = self.y()
-
-        self.closed_.emit()
         return super().closeEvent(a0)
     
     def deleteLater(self):
-
+        try:
+            self.read_img_task.terminate()
+            self.read_img_timer.stop()
+        except AttributeError as e:
+            print("close img view error", e)
         WinImageView.ww = self.size().width()
         WinImageView.hh = self.size().height()
         WinImageView.xx = self.x()
         WinImageView.yy = self.y()
-
-        self.closed_.emit()
         return super().deleteLater()

@@ -535,10 +535,6 @@ class WinMain(UMainWindow):
 
     def open_view_win(self):
 
-        def on_closed():
-            self.view_win = None
-            gc.collect()
-
         if len(self.grid.selected_widgets) == 1:
             path_to_wid = self.grid.path_to_wid.copy()
             is_selection = False
@@ -547,9 +543,6 @@ class WinMain(UMainWindow):
             is_selection = True
         wid = self.grid.selected_widgets[-1]
         self.view_win = WinImageView(wid.rel_path, path_to_wid, is_selection)
-        self.view_win.closed_.connect(
-            lambda: on_closed()
-        )
         self.view_win.open_win_info.connect(
             lambda rel_paths: self.open_info_win(self.view_win, Mf.current, rel_paths)
         )
