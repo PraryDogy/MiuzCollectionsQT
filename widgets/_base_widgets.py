@@ -6,8 +6,9 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QScrollArea, QTextEdit,
                              QVBoxLayout, QWidget)
+from typing_extensions import Literal
 
-from cfg import cfg, Static
+from cfg import Static, cfg
 from system.lang import Lng
 from system.main_folder import Mf
 from system.utils import Utils
@@ -355,7 +356,7 @@ class ClipBoardItem:
     type_copy = "copy"
     
     def __init__(self):
-        self.action_type: str
+        self.action_type: Literal["cut", "copy"]
 
         self.source_dirs: list[str]
         self.source_mf: Mf

@@ -6,7 +6,7 @@ from pathlib import Path
 from time import sleep
 
 from cfg import Static, cfg
-from system.items import CopyItem, OneFileInfoItem, ReadImgItem
+from system.items import CopyTaskItem, OneFileInfoItem, ReadImgItem
 from system.shared_utils import ImgUtils, SharedUtils
 from system.tasks import Utils
 
@@ -101,7 +101,7 @@ class OneFileInfo:
     
 
 
-class CopyWorker(BaseProcessWorker):
+class CopyTaskWorker(BaseProcessWorker):
     def __init__(self, target, args):
         self.proc_q = Queue()
         self.gui_q = Queue()
@@ -110,13 +110,9 @@ class CopyWorker(BaseProcessWorker):
 
 class CopyTask:
     @staticmethod
-    def start(copy_item: CopyItem, proc_q: Queue, gui_q: Queue):
+    def start(copy_item: CopyTaskItem, proc_q: Queue, gui_q: Queue):
 
-        if copy_item.is_search or copy_item.src_dir != copy_item.dst_dir:
-            src_dst_urls = CopyTask.get_another_dir_urls(copy_item)
-        else:
-            src_dst_urls = CopyTask.get_same_dir_urls(copy_item)
-
+        src_dst_urls = CopyTask.get_another_dir_urls(copy_item)
         copy_item.dst_urls = [dst for src, dst in src_dst_urls]
 
         total_size = 0
@@ -129,23 +125,19 @@ class CopyTask:
 
         for count, (src, dest) in enumerate(src_dst_urls, start=1):
 
-            if src.is_dir():
-                continue
-
             if not replace_all and dest.exists() and src.name == dest.name:
                 copy_item.msg = "need_replace"
                 proc_q.put(copy_item)
                 while True:
                     sleep(1)
                     if not gui_q.empty():
-                        new_copy_item: CopyItem = gui_q.get()
+                        new_copy_item: CopyTaskItem = gui_q.get()
                         if new_copy_item.msg == "replace_one":
                             break
                         elif new_copy_item.msg == "replace_all":
                             replace_all = True
                             break
 
-            os.makedirs(dest.parent, exist_ok=True)
             copy_item.current_count = count
             copy_item.msg = ""
             try:
@@ -157,67 +149,25 @@ class CopyTask:
                 copy_item.msg = "error"
                 proc_q.put(copy_item)
                 return
-            if copy_item.is_cut and not copy_item.is_search:
+            if copy_item.is_cut:
                 os.remove(src)
                 "удаляем файлы чтобы очистить директории"
-
-        if copy_item.is_cut and not copy_item.is_search:
-            for src, dst in src_dst_urls:
-                if src.is_dir() and src.exists():
-                    try:
-                        shutil.rmtree(src)
-                    except Exception as e:
-                        print("copy task error dir remove", e)
         
         copy_item.msg = "finished"
         proc_q.put(copy_item)
 
     @staticmethod
-    def get_another_dir_urls(copy_item: CopyItem):
-        src_dst_urls: list[tuple[Path, Path]] = []
-        src_dir = Path(copy_item.src_dir)
-        dst_dir = Path(copy_item.dst_dir)
-        for url in copy_item.src_urls:
-            url = Path(url)
-            if url.is_dir():
-                # мы добавляем директорию в список копирования
-                # чтобы потом можно было удалить ее при вырезании
-                src_dst_urls.append((url, url))
-                for filepath in url.rglob("*"):
-                    if filepath.is_file():
-                        rel_path = filepath.relative_to(src_dir)
-                        new_path = dst_dir.joinpath(rel_path)
-                        src_dst_urls.append((filepath, new_path))
-            else:
-                new_path = dst_dir.joinpath(url.name)
-                src_dst_urls.append((url, new_path))
-        return src_dst_urls
-    
-    @staticmethod
-    def get_same_dir_urls(copy_item: CopyItem, copy_name: str = ""):
+    def get_another_dir_urls(copy_item: CopyTaskItem):
         src_dst_urls: list[tuple[Path, Path]] = []
         dst_dir = Path(copy_item.dst_dir)
         for url in copy_item.src_urls:
             url = Path(url)
-            url_with_copy = dst_dir.joinpath(url.name)
-            counter = 2
-            while url_with_copy.exists():
-                name, ext = os.path.splitext(url.name)
-                new_name = f"{name} {copy_name} {counter}{ext}"
-                url_with_copy = dst_dir.joinpath(new_name)
-                counter += 1
-            if url.is_file():
-                src_dst_urls.append((url, url_with_copy))
-            else:
-                for filepath in url.rglob("*"):
-                    if filepath.is_file():
-                        rel_path = filepath.relative_to(url)
-                        new_url = url_with_copy.joinpath(rel_path)
-                        src_dst_urls.append((filepath, new_url))
+            new_path = dst_dir.joinpath(url.name)
+            src_dst_urls.append((url, new_path))
         return src_dst_urls
-    
+        
     @staticmethod
-    def copy_file_with_progress(proc_q: Queue, copy_item: CopyItem, src: Path, dest: Path):
+    def copy_file_with_progress(proc_q: Queue, copy_item: CopyTaskItem, src: Path, dest: Path):
         block = 4 * 1024 * 1024  # 4 MB
         with open(src, "rb") as fsrc, open(dest, "wb") as fdst:
             while True:
