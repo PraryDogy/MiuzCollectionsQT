@@ -80,8 +80,9 @@ class FilenameWid(QLabel):
 class ImgWid(QLabel):
     def __init__(self):
         super().__init__()
+        margin = 4
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setContentsMargins(2, 2, 2, 2)
+        self.setContentsMargins(margin, margin, margin, margin)
 
     def mouseReleaseEvent(self, ev):
         return super().mouseReleaseEvent(ev)
