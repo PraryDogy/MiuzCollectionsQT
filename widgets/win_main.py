@@ -697,19 +697,14 @@ class WinMain(UMainWindow):
         self.reset_task.sigs.finished_.connect(self.restart_scaner_task)
         UThreadPool.start(self.reset_task)
 
-    def copy_files_task(self, target_dir: str, files_to_copy: list[str]):
-
-        def copy_files(target_dir: str, files_to_copy: list[str]):
-            progress_win = WinCopyFiles(
-                src_urls=self.clipboard_item.files_to_copy,
-                dst_dir=self.clipboard_item.target_dir,
-                is_cut=self.clipboard_item.action_type
-            )
-            progress_win.center_to_parent(self)
-            progress_win.show()
-            return task
-        
-        return copy_files(target_dir, files_to_copy)
+    def copy_files_task(self):
+        progress_win = WinCopyFiles(
+            src_urls=self.clipboard_item.files_to_copy,
+            dst_dir=self.clipboard_item.target_dir,
+            is_cut=self.clipboard_item.action_type
+        )
+        progress_win.center_to_parent(self)
+        progress_win.show()   
     
     def open_server_win(self):
         self.server_win = ServersWin()
