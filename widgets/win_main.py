@@ -423,7 +423,7 @@ class WinMain(UMainWindow):
             start_copy_files()
 
     @with_conn
-    def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list):
+    def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
         
         def fin_remove(dirs_to_scan: list[str]):
             task = DirListScanTask(Mf.current, dirs_to_scan)
@@ -439,7 +439,7 @@ class WinMain(UMainWindow):
             if not task.is_alive():
                 task.terminate()
             else:
-                QTimer.singleShot(300, lambda: poll_task(task, dirs_to_scan))
+                QTimer.singleShot(ms, lambda: poll_task(task, dirs_to_scan))
 
         def start_remove(paths: list[str], dirs_to_scan: list[str]):
             task = ProcessWorker(
@@ -447,7 +447,7 @@ class WinMain(UMainWindow):
                 args=(paths, )
             )
             task.start()
-            QTimer.singleShot(300, poll_task(task, dirs_to_scan))
+            QTimer.singleShot(ms, lambda: poll_task(task, dirs_to_scan))
 
         abs_paths = [
             Utils.get_abs_path(mf.curr_path, i)
@@ -460,12 +460,8 @@ class WinMain(UMainWindow):
         )
         self.remove_files_win.resize(330, 80)
         self.remove_files_win.center_to_parent(self.window())
-        self.remove_files_win.ok_clicked.connect(
-            lambda: start_remove(abs_paths, dirs_to_scan)
-        )
-        self.remove_files_win.ok_clicked.connect(
-            self.remove_files_win.deleteLater
-        )
+        self.remove_files_win.ok_clicked.connect(lambda: start_remove(abs_paths, dirs_to_scan))
+        self.remove_files_win.ok_clicked.connect(self.remove_files_win.deleteLater)
         self.remove_files_win.show()
     
     @with_conn
