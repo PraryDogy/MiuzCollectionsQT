@@ -117,44 +117,6 @@ class FavManager(URunnable):
             self.conn.close()
 
 
-class FilesRemover(URunnable):
-    """
-    Удаляет указанные файлы.
-
-    Запуск через: UThreadPool.start
-    Сигналы:
-    - finished_(): вызывается после завершения удаления.
-    """
-
-    class Sigs(QObject):
-        finished_ = pyqtSignal()
-
-    def __init__(self, paths: list[str]):
-        super().__init__()
-        self.sigs = FilesRemover.Sigs()
-        self.paths = paths
-
-    def task(self):
-        # Здесь не нужен try/except, ошибки обрабатываются в _remove_files
-        self._remove_files()
-        self.sigs.finished_.emit()
-
-    def _remove_files(self) -> list[str]:
-        """
-        Удаляет файлы по списку self.paths.
-
-        Возвращает список успешно удалённых файлов.
-        """
-        deleted_files = []
-        for path in self.paths:
-            try:
-                os.remove(path)
-                deleted_files.append(path)
-            except Exception as e:
-                print("FilesRemover error:", e)
-        return deleted_files
-
-
 class DbImagesLoader(URunnable):
     """
     Загружает изображения из БД и формирует словарь для UI.
