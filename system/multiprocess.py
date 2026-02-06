@@ -59,6 +59,48 @@ class ReadImg:
         q.put(ReadImgItem(src, img_array))
 
 
+class OneFileInfo:
+
+    @staticmethod
+    def start(path: str, proc_q: Queue):
+        """
+        Возвращает в Queue либо dict либо str
+        Если str, процесс окончен
+        """
+        try:
+            info_item = OneFileInfo._gather_info(path)
+            proc_q.put(info_item)
+
+            resol = ImgUtils.get_img_res(path)
+            if resol:
+                info_item.res = resol
+            proc_q.put(info_item)
+        except Exception as e:
+            Utils.print_error()
+
+    @staticmethod
+    def _gather_info(path: str) -> OneFileInfoItem:
+        name = os.path.basename(path)
+        _, type_ = os.path.splitext(name)
+        stats = os.stat(path)
+        size = SharedUtils.get_f_size(stats.st_size)
+        date_time = datetime.fromtimestamp(stats.st_mtime)
+        month = Lng.months_genitive_case[cfg.lng][str(date_time.month)]
+        mod = f"{date_time.day} {month} {date_time.year}"
+        item = OneFileInfoItem(type_, size, mod, "")
+        return item
+
+    @staticmethod
+    def lined_text(text: str, max_row = 50) -> str:
+        if len(text) > max_row:
+            return "\n".join(
+                text[i:i + max_row]
+                for i in range(0, len(text), max_row)
+            )
+        return text
+    
+
+
 class CopyWorker(BaseProcessWorker):
     def __init__(self, target, args):
         self.proc_q = Queue()
@@ -186,44 +228,3 @@ class CopyTask:
                 copy_item.current_size += len(buf) // 1024
                 proc_q.put(copy_item)
         shutil.copystat(src, dest, follow_symlinks=True)
-
-
-class OneFileInfo:
-
-    @staticmethod
-    def start(path: str, proc_q: Queue):
-        """
-        Возвращает в Queue либо dict либо str
-        Если str, процесс окончен
-        """
-        try:
-            info_item = OneFileInfo._gather_info(path)
-            proc_q.put(info_item)
-
-            resol = ImgUtils.get_img_res(path)
-            if resol:
-                info_item.res = resol
-            proc_q.put(info_item)
-        except Exception as e:
-            Utils.print_error()
-
-    @staticmethod
-    def _gather_info(path: str) -> OneFileInfoItem:
-        name = os.path.basename(path)
-        _, type_ = os.path.splitext(name)
-        stats = os.stat(path)
-        size = SharedUtils.get_f_size(stats.st_size)
-        date_time = datetime.fromtimestamp(stats.st_mtime)
-        month = Lng.months_genitive_case[cfg.lng][str(date_time.month)]
-        mod = f"{date_time.day} {month} {date_time.year}"
-        item = OneFileInfoItem(type_, size, mod, "")
-        return item
-
-    @staticmethod
-    def lined_text(text: str, max_row = 50) -> str:
-        if len(text) > max_row:
-            return "\n".join(
-                text[i:i + max_row]
-                for i in range(0, len(text), max_row)
-            )
-        return text
