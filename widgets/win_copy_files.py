@@ -15,11 +15,7 @@ from .progressbar_win import ProgressbarWin
 
 
 class ReplaceFilesWin(SingleActionWindow):
-    descr_text = "Заменить существующие файлы?"
-    title_text = "Замена"
-    replace_one_text = "Заменить"
-    replace_all_text = "Заменить все"
-    stop_text = "Стоп"
+    btn_w = 105
     icon_size = 50
     icon_path = "./images/warning.svg"
 
@@ -29,7 +25,7 @@ class ReplaceFilesWin(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(self.title_text)
+        self.setWindowTitle(Lng.replace[cfg.lng])
         self.setFixedSize(350, 90)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -46,7 +42,7 @@ class ReplaceFilesWin(SingleActionWindow):
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
-        test_two = QLabel(self.descr_text)
+        test_two = QLabel(Lng.replace_existing_files[cfg.lng])
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
@@ -59,18 +55,18 @@ class ReplaceFilesWin(SingleActionWindow):
         btn_wid.setLayout(btn_lay)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        replace_all_btn = QPushButton(self.replace_all_text)
-        replace_all_btn.setFixedWidth(95)
+        replace_all_btn = QPushButton(Lng.replace_all[cfg.lng])
+        replace_all_btn.setFixedWidth(self.btn_w)
         replace_all_btn.clicked.connect(lambda: self.replace_all_cmd())
         btn_lay.addWidget(replace_all_btn)
 
-        replace_one_btn = QPushButton(self.replace_one_text)
-        replace_one_btn.setFixedWidth(95)
+        replace_one_btn = QPushButton(Lng.replace_one[cfg.lng])
+        replace_one_btn.setFixedWidth(self.btn_w)
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        stop_btn = QPushButton(self.stop_text)
-        stop_btn.setFixedWidth(95)
+        stop_btn = QPushButton(Lng.stop[cfg.lng])
+        stop_btn.setFixedWidth(self.btn_w)
         stop_btn.clicked.connect(lambda: self.stop_cmd())
         btn_lay.addWidget(stop_btn)
         

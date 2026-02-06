@@ -315,3 +315,16 @@ class Lng:
     rotate = ("Повернуть", "Rotate")
     clockwise = ("Повернуть по ч.с.", "Rotate cw")
     counter_clockwise = ("Повернуть против ч.с.", "Rotate ccw")
+
+    replace = ("Замена", "Replace")
+    replace_one = ("Заменить", "Replace")
+    replace_all = ("Заменить все", "Replace all")
+    stop = ("Стоп", "Stop")
+    replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
+
+
+# class Lng:
+#     location = ("Расположение", "Location")
+#     modified = ("Изменен", "Modified")
+#     statistic = ("Статистика данных", "Data statistics")
+#     level_up = ("Наверх", "Level up")
