@@ -11,9 +11,9 @@ from cfg import Dynamic, Static, cfg
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
+from system.multiprocess import FilesRemover, ProcessWorker
 from system.new_scaner.scaner_task import DirListScanTask, OnStartTask
-from system.tasks import (FavManager, FilesRemover, MfDataCleaner, UThreadPool,
-                          Utils)
+from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
                             UHBoxLayout, UMainWindow, UVBoxLayout, WinManager)
@@ -431,10 +431,23 @@ class WinMain(UMainWindow):
             task.sigs.reload_thumbnails.connect(self.left_menu.tree_wid.init_ui)
             UThreadPool.start(task)
         
+        def poll_task(task: ProcessWorker, dirs_to_scan: list[str]):
+            q = task.proc_q
+            if not q.empty():
+                files = q.get()
+                fin_remove(dirs_to_scan)
+            if not task.is_alive():
+                task.terminate()
+            else:
+                QTimer.singleShot(300, lambda: poll_task(task, dirs_to_scan))
+
         def start_remove(paths: list[str], dirs_to_scan: list[str]):
-            task = FilesRemover(paths)
-            task.sigs.finished_.connect(lambda: fin_remove(dirs_to_scan))
-            UThreadPool.start(task)
+            task = ProcessWorker(
+                target=FilesRemover.start,
+                args=(paths, )
+            )
+            task.start()
+            QTimer.singleShot(300, poll_task(task, dirs_to_scan))
 
         abs_paths = [
             Utils.get_abs_path(mf.curr_path, i)

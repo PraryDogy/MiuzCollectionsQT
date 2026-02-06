@@ -175,3 +175,17 @@ class CopyTask:
                 copy_item.current_size += len(buf) // 1024
                 proc_q.put(copy_item)
         shutil.copystat(src, dest, follow_symlinks=True)
+
+
+class FilesRemover:
+    @staticmethod
+    def start(paths: list[str], q: Queue):
+        deleted_files = []
+        for path in paths:
+            try:
+                os.remove(path)
+                deleted_files.append(path)
+            except Exception as e:
+                print("FilesRemover error:", e)
+        q.put(deleted_files)
+        
