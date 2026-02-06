@@ -12,8 +12,8 @@ from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
 from system.new_scaner.scaner_task import DirListScanTask, OnStartTask
-from system.tasks import (CopyFilesManager, FavManager, FilesRemover,
-                          MfDataCleaner, UThreadPool, Utils)
+from system.tasks import (FavManager, FilesRemover, MfDataCleaner, UThreadPool,
+                          Utils)
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
                             UHBoxLayout, UMainWindow, UVBoxLayout, WinManager)
@@ -22,7 +22,6 @@ from .bar_macos import BarMacos
 from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
-from .progressbar_win import ProgressbarWin
 from .servers_win import ServersWin
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates

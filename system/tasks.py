@@ -1,22 +1,20 @@
-import gc
 import os
-import re
 from collections import defaultdict
 from datetime import datetime
 
+import numpy as np
 import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtGui import QImage
 
-from cfg import cfg, Dynamic, Static
+from cfg import Dynamic, Static, cfg
 
 from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import Mf
-from .shared_utils import ImgUtils, SharedUtils
 from .utils import Utils
-import numpy as np
+
 
 class TaskState:
     __slots__ = ["_should_run", "_finished"]
@@ -80,86 +78,6 @@ class UThreadPool:
         """
         # cls.tasks.append(runnable)
         cls.pool.start(runnable)
-
-
-class CopyFilesManager(URunnable):
-    """
-    Копирует файлы в указанную директорию с обновлением прогресса.
-
-    Сигналы:
-    - finished_(list[str]): список скопированных файлов
-    - value_changed(int): значение от 0 до 100 для QProgressBar
-    - progress_changed(tuple): (текущий индекс, общее количество файлов)
-    - file_changed(str): имя текущего копируемого файла
-    """
-
-    class Sigs(QObject):
-        finished_ = pyqtSignal(list)
-        value_changed = pyqtSignal(int)
-        progress_changed = pyqtSignal(tuple)
-        file_changed = pyqtSignal(str)
-
-    def __init__(self, dest: str, files: list[str]):
-        super().__init__()
-        self.sigs = CopyFilesManager.Sigs()
-        self.files = files
-        self.dest = dest
-
-    def task(self):
-        """Основной метод с обработкой исключений."""
-        try:
-            self._finish_copy(self._copy_files())
-        except Exception as e:
-            Utils.print_error()
-            self._finish_copy([])
-
-    def _copy_files(self):
-        """Приватный метод: копирует все файлы и обновляет прогресс."""
-        copied_size = 0
-        files_dests = []
-
-        try:
-            total_size = sum(os.path.getsize(f) for f in self.files)
-        except Exception as e:
-            print("CopyFilesManager error:", e)
-            return files_dests
-
-        self.sigs.value_changed.emit(0)
-
-        for idx, file_path in enumerate(self.files, start=1):
-            if not self.task_state.should_run():
-                break
-
-            dest_path = os.path.join(self.dest, os.path.basename(file_path))
-            if dest_path == file_path:
-                print("нельзя копировать файл в себя:", dest_path)
-                continue
-            files_dests.append(dest_path)
-
-            self.sigs.progress_changed.emit((idx, len(self.files)))
-            self.sigs.file_changed.emit(os.path.basename(file_path))
-
-            copied_size = self._copy_file(file_path, dest_path, copied_size, total_size)
-
-        return files_dests
-
-    def _copy_file(self, src: str, dst: str, copied_size: int, total_size: int) -> int:
-        """Приватный метод для копирования одного файла с обновлением прогресса."""
-        with open(src, 'rb') as fsrc, open(dst, 'wb') as fdst:
-            while self.task_state.should_run():
-                buf = fsrc.read(1024 * 1024)
-                if not buf:
-                    break
-                fdst.write(buf)
-                copied_size += len(buf)
-                percent = int((copied_size / total_size) * 100)
-                self.sigs.value_changed.emit(percent)
-        return copied_size
-
-    def _finish_copy(self, files_dests: list[str]):
-        """Приватный метод для завершения копирования и эмита сигнала finished_."""
-        self.sigs.value_changed.emit(100)
-        self.sigs.finished_.emit(files_dests)
 
 
 class FavManager(URunnable):
