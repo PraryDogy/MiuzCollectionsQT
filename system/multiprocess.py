@@ -6,15 +6,16 @@ from pathlib import Path
 from time import sleep
 
 import sqlalchemy
+from database import Dbase
 
 from cfg import Static, cfg
-from .items import CopyTaskItem, OneFileInfoItem, ReadImgItem
-from .shared_utils import ImgUtils, SharedUtils
-from .tasks import Utils
 
 from .database import DIRS, THUMBS
+from .items import CopyTaskItem, OneFileInfoItem, ReadImgItem
 from .lang import Lng
 from .main_folder import Mf
+from .shared_utils import ImgUtils, SharedUtils
+from .tasks import Utils
 
 
 class BaseProcessWorker:
@@ -195,7 +196,7 @@ class FilesRemover:
         q.put(deleted_files)
         
 
-class DeletedMfRemover:
+class _DeletedMfRemover:
 
     def start(engine: sqlalchemy.Engine, q: Queue):
         """
@@ -221,10 +222,10 @@ class DeletedMfRemover:
         ]
         if removed_mf_list:
             for i in removed_mf_list:
-                rows = DeletedMfRemover.get_rows(i, conn)
-                DeletedMfRemover.remove_images(rows)
-                DeletedMfRemover.remove_rows(rows, conn)
-            DeletedMfRemover.remove_dirs(conn)
+                rows = _DeletedMfRemover.get_rows(i, conn)
+                _DeletedMfRemover.remove_images(rows)
+                _DeletedMfRemover.remove_rows(rows, conn)
+            _DeletedMfRemover.remove_dirs(conn)
         conn.close()
         q.put(removed_mf_list)
     
@@ -278,7 +279,7 @@ class DeletedMfRemover:
             conn.commit()
 
 
-class EmptyRecordsRemover:
+class _EmptyRecordsRemover:
     @staticmethod
     def start(engine: sqlalchemy.Engine, q: Queue):
         """
@@ -300,9 +301,9 @@ class EmptyRecordsRemover:
         q.put(None)
 
 
-class EmptyHashdirRemover:
+class _EmptyHashdirRemover:
     @staticmethod
-    def run(q: Queue):
+    def start(q: Queue):
         """
         При запуске приложения проверяет, есть ли пустые директории в thumbnails,
         удаляет лишние
@@ -320,5 +321,10 @@ class EmptyHashdirRemover:
             q.put(removed_dirs)
 
 
-empty_remover = EmptyHashdirRemover()
-empty_remover.run()
+class OnStartTask:
+    @staticmethod
+    def start(q: Queue):
+        engine = Dbase.create_engine()
+        _DeletedMfRemover.start(engine, q)
+        _EmptyRecordsRemover.start(engine, q)
+        _EmptyHashdirRemover.start(q)

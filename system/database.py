@@ -51,13 +51,13 @@ class Dbase:
 
     @classmethod
     def init(cls) -> sqlalchemy.Engine:
-        cls.create_engine()
+        cls.engine = cls.create_engine()
         cls.toggle_wal(False)
 
     @classmethod
     def create_engine(cls):
         if os.path.exists(Static.app_support_db):
-            cls.engine = sqlalchemy.create_engine(
+            engine = sqlalchemy.create_engine(
                 f"sqlite:///{Static.app_support_db}",
                 echo=cls._echo,
                 connect_args={
@@ -65,19 +65,18 @@ class Dbase:
                     "timeout": cls._timeout
                     }
                     )
-            METADATA.create_all(cls.engine)
-
-            conn = cls.engine.connect()
+            METADATA.create_all(engine)
+            conn = engine.connect()
             check = cls.check_table(DIRS, conn)
             if not check:
-                DIRS.drop(cls.engine)
-                METADATA.create_all(cls.engine)
-
+                DIRS.drop(engine)
+                METADATA.create_all(engine)
             conn.close()
-            
+            return engine
         else:
             t = "Нет пользовательского файла DB_FILE"
             raise Exception(t)
+            return None
         
     @classmethod
     def check_table(cls, table: sqlalchemy.Table, conn: sqlalchemy.Connection) -> bool:
