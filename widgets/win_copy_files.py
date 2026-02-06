@@ -141,6 +141,10 @@ class WinCopyFiles(ProgressbarWin):
 
     def __init__(self, dst_dir: str, src_urls: list[str], is_cut: bool):
         super().__init__(Lng.copying[cfg.lng])
+        self.above_label.setText(
+            f"{Lng.copying[cfg.lng]} {Lng.in_[cfg.lng]} \"{os.path.basename(dst_dir)}\""
+        )
+
         self.dst_urls: list[str] = []
         self.cancel.connect(self.deleteLater)
         is_cut = True if is_cut == "cut" else False
