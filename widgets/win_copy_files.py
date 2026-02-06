@@ -188,7 +188,7 @@ class WinCopyFiles(ProgressbarWin):
             elif self.copy_item.msg == "finished":
                 finished = True
             
-            if self.progressbar.maximum() == 0:
+            if self.progressbar.maximum() == 100:
                 self.progressbar.setMaximum(self.copy_item.total_size)
 
             if len(self.dst_urls) == 0 and self.copy_item.dst_urls:
