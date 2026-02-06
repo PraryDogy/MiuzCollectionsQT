@@ -1,12 +1,13 @@
 import gc
 import os
 import shutil
+from multiprocessing import Queue
 
 import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import cfg, Static
+from cfg import Static, cfg
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
@@ -17,48 +18,39 @@ from system.utils import Utils
 
 class RemovedMfCleaner:
 
-    def __init__(self):
+    def start(engine: sqlalchemy.Engine, q: Queue):
         """
-        Запуск: run()   
-        Сигналы: progress_text(str)
-
-        Сверяет список экземпляров класса Mf в бд (THUMBS.c.brand)     
-        со списком Mf в приложении.     
-        Удаляет весь контент Mf, если Mf больще нет в бд:   
+        Логика такая:
+        - Пользователь в настройках приложения удаляет Mf
+        - Данные удаляются из БД, приложение перезапускается
+        - RemoveMfCleaner вызывается при перезапуске приложения
+        - Сравнивается список Mf в базе данных и список Mf в mf.json
+        Если Mf нет в базе данных, но есть в mf.json, нужно удалить все данные
+        по этой Mf:
         - изображения thumbs из hashdir в ApplicationSupport    
         - записи в базе данных
-
-        Вызови run для работы
+        Помещает в Queue список удаленных Mf (список имен str)
         """
-        super().__init__()
-        self.conn = Dbase.engine.connect()
-
-    def run(self):
-        try:
-            return self._run()
-        except Exception as e:
-            print("new scaner utils, RemovedMainFoldeHandler", e)
-            return None
-
-    def _run(self):
-        q = sqlalchemy.select(THUMBS.c.brand).distinct()
-        db_mfs = self.conn.execute(q).scalars().all()
-        app_mfs = [i.name for i in Mf.list_]
-        del_mfs = [
+        conn = engine.connect()
+        stmt = sqlalchemy.select(THUMBS.c.brand).distinct()
+        db_mf_list = conn.execute(stmt).scalars().all()
+        json_mf_list = [i.name for i in Mf.list_]
+        removed_mf_list: list[str] = [
             i
-            for i in db_mfs
-            if i not in app_mfs and i is not None
+            for i in db_mf_list
+            if i not in json_mf_list and i is not None
         ]
-        if del_mfs:
-            for i in del_mfs:
-                rows = self.get_rows(i)
-                self.remove_images(rows)
-                self.remove_rows(rows)
-            self.remove_dirs()
-        self.conn.close()
-        return del_mfs
-        
-    def get_rows(self, mf_name: str):
+        if removed_mf_list:
+            for i in removed_mf_list:
+                rows = RemovedMfCleaner.get_rows(i)
+                RemovedMfCleaner.remove_images(rows)
+                RemovedMfCleaner.remove_rows(rows)
+            RemovedMfCleaner.remove_dirs()
+        conn.close()
+        q.put(removed_mf_list)
+    
+    @staticmethod
+    def get_rows(mf_name: str):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash).where(
             THUMBS.c.brand == mf_name
         )
@@ -67,7 +59,8 @@ class RemovedMfCleaner:
             for id_, rel_thumb_path in self.conn.execute(q).fetchall()
         ]
 
-    def remove_images(self, rows: list):
+    @staticmethod
+    def remove_images(rows: list):
         """
         rows: [(row id int, thumb path), ...]
         """
@@ -82,7 +75,8 @@ class RemovedMfCleaner:
                 print(f"new scaner utils, MfRemover, remove images error. ID: {id_}, Path: {image_path}, Error: {e}")
                 continue
 
-    def remove_rows(self, rows: list):
+    @staticmethod
+    def remove_rows(rows: list):
         """
         rows: [(row id int, thumb path), ...]
         """
@@ -92,7 +86,8 @@ class RemovedMfCleaner:
             self.conn.execute(q)
             self.conn.commit()
 
-    def remove_dirs(self):
+    @staticmethod
+    def remove_dirs():
         q = sqlalchemy.select(DIRS.c.brand).distinct()
         db_brands = set(self.conn.execute(q).scalars())
         app_brands = set(i.name for i in Mf.list_)
