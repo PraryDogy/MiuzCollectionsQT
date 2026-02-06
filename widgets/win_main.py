@@ -402,11 +402,6 @@ class WinMain(UMainWindow):
                 )
                 UThreadPool.start(scaner_task)
 
-        def remove_files():
-            remove_task = FilesRemover(self.clipboard_item.files_to_copy)
-            remove_task.sigs.finished_.connect(scan_dirs)
-            UThreadPool.start(remove_task)
-
         def start_copy_files():
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda files: set_files_copied(files))
