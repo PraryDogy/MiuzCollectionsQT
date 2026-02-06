@@ -208,7 +208,7 @@ class DeletedMfRemover:
         по этой Mf:
         - изображения thumbs из hashdir в ApplicationSupport    
         - записи в базе данных
-        Помещает в Queue список удаленных Mf (список имен str)
+        Передает в Queue список удаленных Mf (список имен str)
         """
         conn = engine.connect()
         stmt = sqlalchemy.select(THUMBS.c.brand).distinct()
@@ -284,6 +284,7 @@ class EmptyRecordsRemover:
         """
         При запуске приложения проверяет данные в базе данных и удаляет
         записи со значениями None
+        Передает в очередь None
         """
         conn = engine.connect()
         stmt = (
@@ -296,7 +297,7 @@ class EmptyRecordsRemover:
         )
         conn.execute(stmt)
         conn.commit()
-        q.put("")
+        q.put(None)
 
 
 class EmptyHashdirRemover:
