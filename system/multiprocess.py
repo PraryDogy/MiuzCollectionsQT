@@ -299,7 +299,7 @@ class EmptyRecordsRemover:
         q.put("")
 
 
-class EmptyHashdirHandler:
+class EmptyHashdirRemover:
     @staticmethod
     def run(q: Queue):
         """
@@ -319,5 +319,5 @@ class EmptyHashdirHandler:
             q.put(removed_dirs)
 
 
-empty_remover = EmptyHashdirHandler()
+empty_remover = EmptyHashdirRemover()
 empty_remover.run()
