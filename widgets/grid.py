@@ -648,7 +648,8 @@ class Grid(VScrollArea):
         def open_info():
             """Открывает окно информации для выбранных виджетов."""
             if self.selected_widgets:
-                self.open_info_win.emit([i.rel_path for i in self.selected_widgets])
+                rel_paths = [self.wid_under_mouse.rel_path, ]
+                self.open_info_win.emit(rel_paths)
 
         def select_all():
             """Выделяет все виджеты в сетке."""
