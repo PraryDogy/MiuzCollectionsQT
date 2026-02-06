@@ -42,21 +42,21 @@ class RemovedMfCleaner:
         ]
         if removed_mf_list:
             for i in removed_mf_list:
-                rows = RemovedMfCleaner.get_rows(i)
+                rows = RemovedMfCleaner.get_rows(i, conn)
                 RemovedMfCleaner.remove_images(rows)
-                RemovedMfCleaner.remove_rows(rows)
-            RemovedMfCleaner.remove_dirs()
+                RemovedMfCleaner.remove_rows(rows, conn)
+            RemovedMfCleaner.remove_dirs(conn)
         conn.close()
         q.put(removed_mf_list)
     
     @staticmethod
-    def get_rows(mf_name: str):
+    def get_rows(mf_name: str, conn: sqlalchemy.Connection):
         q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash).where(
             THUMBS.c.brand == mf_name
         )
         return [
             (id_, Utils.get_abs_hash(rel_thumb_path))
-            for id_, rel_thumb_path in self.conn.execute(q).fetchall()
+            for id_, rel_thumb_path in conn.execute(q).fetchall()
         ]
 
     @staticmethod
@@ -76,27 +76,27 @@ class RemovedMfCleaner:
                 continue
 
     @staticmethod
-    def remove_rows(rows: list):
+    def remove_rows(rows: list, conn: sqlalchemy.Connection):
         """
         rows: [(row id int, thumb path), ...]
         """
         ids = [id_ for id_, _ in rows]
         if ids:
             q = sqlalchemy.delete(THUMBS).where(THUMBS.c.id.in_(ids))
-            self.conn.execute(q)
-            self.conn.commit()
+            conn.execute(q)
+            conn.commit()
 
     @staticmethod
-    def remove_dirs():
+    def remove_dirs(conn: sqlalchemy.Connection):
         q = sqlalchemy.select(DIRS.c.brand).distinct()
-        db_brands = set(self.conn.execute(q).scalars())
+        db_brands = set(conn.execute(q).scalars())
         app_brands = set(i.name for i in Mf.list_)
         to_delete = db_brands - app_brands
 
         if to_delete:
             del_stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand.in_(to_delete))
-            self.conn.execute(del_stmt)
-            self.conn.commit()
+            conn.execute(del_stmt)
+            conn.commit()
         
 
 class DirsLoader(QObject):
