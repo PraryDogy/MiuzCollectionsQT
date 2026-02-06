@@ -94,10 +94,12 @@ class ErrorWin(SingleActionWindow):
     title_text = "Ошибка"
     ok_text = "Ок"
     icon_size = 50
+    icon_path = "./images/warning.svg"
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle(ErrorWin.title_text)
+        self.setFixedSize(350, 90)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -108,9 +110,8 @@ class ErrorWin(SingleActionWindow):
         h_wid.setLayout(h_lay)
 
         warn = QSvgWidget()
-        warn.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         warn.load(self.icon_path)
-        warn.resize(self.icon_size, self.icon_size)
+        warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
         test_two = QLabel(ErrorWin.descr_text)
