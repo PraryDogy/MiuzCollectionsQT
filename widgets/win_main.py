@@ -288,13 +288,13 @@ class WinMain(UMainWindow):
         if dest is None:
             dest = QFileDialog.getExistingDirectory()
             if dest:
-                task = self.copy_files_win(dest, abs_files)
-                task.sigs.finished_.connect(Utils.reveal_files)
-                UThreadPool.start(task)
+                self.clipboard_item.target_dir = dest
+                copy_files_win = self.copy_files_win()
+                copy_files_win.finished_.connect(Utils.reveal_files)
         else:
-            task = self.copy_files_win(dest, abs_files)
-            task.sigs.finished_.connect(Utils.reveal_files)
-            UThreadPool.start(task)
+            self.clipboard_item.target_dir = dest
+            copy_files_win = self.copy_files_win()
+            copy_files_win.finished_.connect(Utils.reveal_files)
 
     @with_conn
     def set_clipboard(self, parent: QWidget, mf: Mf, data: tuple):
