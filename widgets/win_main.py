@@ -288,11 +288,11 @@ class WinMain(UMainWindow):
         if dest is None:
             dest = QFileDialog.getExistingDirectory()
             if dest:
-                task = self.copy_files_task(dest, abs_files)
+                task = self.copy_files_win(dest, abs_files)
                 task.sigs.finished_.connect(Utils.reveal_files)
                 UThreadPool.start(task)
         else:
-            task = self.copy_files_task(dest, abs_files)
+            task = self.copy_files_win(dest, abs_files)
             task.sigs.finished_.connect(Utils.reveal_files)
             UThreadPool.start(task)
 
@@ -408,13 +408,9 @@ class WinMain(UMainWindow):
             UThreadPool.start(remove_task)
 
         def start_copy_files():
-            task = self.copy_files_task(self.clipboard_item.target_dir, self.clipboard_item.files_to_copy)
-            task.sigs.finished_.connect(lambda files: set_files_copied(files))
-            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
-                task.sigs.finished_.connect(lambda _: remove_files())
-            else:
-                task.sigs.finished_.connect(lambda _: scan_dirs())
-            UThreadPool.start(task)
+            copy_files_win = self.copy_files_win()
+            copy_files_win.finished_.connect(lambda files: set_files_copied(files))
+            copy_files_win.finished_.connect(lambda _: scan_dirs())
 
         abs_current_dir = Utils.get_abs_path(mf.curr_path, Dynamic.current_dir)
         copy_self = abs_current_dir in self.clipboard_item.source_dirs
@@ -697,7 +693,7 @@ class WinMain(UMainWindow):
         self.reset_task.sigs.finished_.connect(self.restart_scaner_task)
         UThreadPool.start(self.reset_task)
 
-    def copy_files_task(self):
+    def copy_files_win(self):
         progress_win = WinCopyFiles(
             src_urls=self.clipboard_item.files_to_copy,
             dst_dir=self.clipboard_item.target_dir,
@@ -705,6 +701,7 @@ class WinMain(UMainWindow):
         )
         progress_win.center_to_parent(self)
         progress_win.show()   
+        return progress_win
     
     def open_server_win(self):
         self.server_win = ServersWin()
