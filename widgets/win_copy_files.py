@@ -86,15 +86,12 @@ class ReplaceFilesWin(SingleActionWindow):
     
 
 class ErrorWin(SingleActionWindow):
-    descr_text = "Произошла ошибка при копировании"
-    title_text = "Ошибка"
-    ok_text = "Ок"
     icon_size = 50
     icon_path = "./images/warning.svg"
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(ErrorWin.title_text)
+        self.setWindowTitle(Lng.error[cfg.lng])
         self.setFixedSize(350, 90)
 
         h_wid = QWidget()
@@ -110,11 +107,11 @@ class ErrorWin(SingleActionWindow):
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
-        test_two = QLabel(ErrorWin.descr_text)
+        test_two = QLabel(Lng.copy_error[cfg.lng])
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
-        ok_btn = QPushButton(ErrorWin.ok_text)
+        ok_btn = QPushButton(Lng.ok[cfg.lng])
         ok_btn.clicked.connect(self.deleteLater)
         ok_btn.setFixedWidth(90)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -197,13 +194,13 @@ class WinCopyFiles(ProgressbarWin):
 
             self.progressbar.setValue(self.copy_item.current_size)
             self.below_label.setText(
-                f'{self.windowTitle()} {self.copy_item.current_count} из {self.copy_item.total_count}'
+                f'{self.windowTitle()} {self.copy_item.current_count} {Lng.from_[cfg.lng]} {self.copy_item.total_count}'
             )
 
         if not self.copy_task.is_alive() or finished:
             self.progressbar.setValue(self.progressbar.maximum())
             self.below_label.setText(
-                f'{self.windowTitle()} {self.copy_item.total_count} из {self.copy_item.total_count}'
+                f'{self.windowTitle()} {self.copy_item.total_count} {Lng.from_[cfg.lng]} {self.copy_item.total_count}'
             )     
             self.finished_.emit(self.dst_urls)
             self.stop_task()

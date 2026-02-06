@@ -321,6 +321,9 @@ class Lng:
     replace_all = ("Заменить все", "Replace all")
     stop = ("Стоп", "Stop")
     replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
+    copy_error = ("Произошла ошибка при копировании", "An error occurred while copying")
+    error = ("Ошибка", "Error")
+
 
 
 # class Lng:
