@@ -5,11 +5,16 @@ from multiprocessing import Process, Queue
 from pathlib import Path
 from time import sleep
 
+import sqlalchemy
+
 from cfg import Static, cfg
-from system.items import CopyTaskItem, OneFileInfoItem, ReadImgItem
-from system.shared_utils import ImgUtils, SharedUtils
-from system.tasks import Utils
+from .items import CopyTaskItem, OneFileInfoItem, ReadImgItem
+from .shared_utils import ImgUtils, SharedUtils
+from .tasks import Utils
+
+from .database import DIRS, THUMBS
 from .lang import Lng
+from .main_folder import Mf
 
 
 class BaseProcessWorker:
@@ -189,3 +194,130 @@ class FilesRemover:
                 print("FilesRemover error:", e)
         q.put(deleted_files)
         
+
+class DeletedMfRemover:
+
+    def start(engine: sqlalchemy.Engine, q: Queue):
+        """
+        Логика такая:
+        - Пользователь в настройках приложения удаляет Mf
+        - Данные удаляются из БД, приложение перезапускается
+        - RemoveMfCleaner вызывается при перезапуске приложения
+        - Сравнивается список Mf в базе данных и список Mf в mf.json
+        Если Mf нет в базе данных, но есть в mf.json, нужно удалить все данные
+        по этой Mf:
+        - изображения thumbs из hashdir в ApplicationSupport    
+        - записи в базе данных
+        Помещает в Queue список удаленных Mf (список имен str)
+        """
+        conn = engine.connect()
+        stmt = sqlalchemy.select(THUMBS.c.brand).distinct()
+        db_mf_list = conn.execute(stmt).scalars().all()
+        json_mf_list = [i.name for i in Mf.list_]
+        removed_mf_list: list[str] = [
+            i
+            for i in db_mf_list
+            if i not in json_mf_list and i is not None
+        ]
+        if removed_mf_list:
+            for i in removed_mf_list:
+                rows = DeletedMfRemover.get_rows(i, conn)
+                DeletedMfRemover.remove_images(rows)
+                DeletedMfRemover.remove_rows(rows, conn)
+            DeletedMfRemover.remove_dirs(conn)
+        conn.close()
+        q.put(removed_mf_list)
+    
+    @staticmethod
+    def get_rows(mf_name: str, conn: sqlalchemy.Connection):
+        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash).where(
+            THUMBS.c.brand == mf_name
+        )
+        return [
+            (id_, Utils.get_abs_hash(rel_thumb_path))
+            for id_, rel_thumb_path in conn.execute(q).fetchall()
+        ]
+
+    @staticmethod
+    def remove_images(rows: list):
+        """
+        rows: [(row id int, thumb path), ...]
+        """
+        for id_, image_path in rows:
+            try:
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+                folder = os.path.dirname(image_path)
+                if os.path.exists(folder) and not os.listdir(folder):
+                    shutil.rmtree(folder)
+            except Exception as e:
+                print(f"new scaner utils, MfRemover, remove images error. ID: {id_}, Path: {image_path}, Error: {e}")
+                continue
+
+    @staticmethod
+    def remove_rows(rows: list, conn: sqlalchemy.Connection):
+        """
+        rows: [(row id int, thumb path), ...]
+        """
+        ids = [id_ for id_, _ in rows]
+        if ids:
+            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.id.in_(ids))
+            conn.execute(q)
+            conn.commit()
+
+    @staticmethod
+    def remove_dirs(conn: sqlalchemy.Connection):
+        q = sqlalchemy.select(DIRS.c.brand).distinct()
+        db_brands = set(conn.execute(q).scalars())
+        app_brands = set(i.name for i in Mf.list_)
+        to_delete = db_brands - app_brands
+
+        if to_delete:
+            del_stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand.in_(to_delete))
+            conn.execute(del_stmt)
+            conn.commit()
+
+
+class EmptyRecordsRemover:
+    @staticmethod
+    def start(engine: sqlalchemy.Engine, q: Queue):
+        """
+        При запуске приложения проверяет данные в базе данных и удаляет
+        записи со значениями None
+        """
+        conn = engine.connect()
+        stmt = (
+            sqlalchemy.delete(THUMBS).where(
+                sqlalchemy.or_(
+                    THUMBS.c.short_hash == None,
+                    THUMBS.c.short_src == None
+                )
+            )
+        )
+        conn.execute(stmt)
+        conn.commit()
+        q.put("")
+
+
+class EmptyHashdirHandler:
+    @staticmethod
+    def run(q: Queue):
+        """
+        При запуске приложения проверяет, есть ли пустые директории в thumbnails,
+        удаляет лишние
+        Передает в Queue список удаленных директорий
+        """
+        removed_dirs: list[str] = []
+        for i in os.scandir(Static.app_support_hashdir):
+            if os.path.isdir(i.path) and not os.listdir(i.path):
+                try:
+                    shutil.rmtree(i.path)
+                    removed_dirs.append(i.path)
+                except Exception as e:
+                    print("new scaner, empty hashdir remover", e)
+        if removed_dirs:
+            q.put(removed_dirs)
+
+
+empty_remover = EmptyHashdirHandler()
+empty_remover.run()
