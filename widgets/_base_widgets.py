@@ -240,8 +240,9 @@ class UMainWindow(QMainWindow):
     def deleteLater(self):
         try:
             WinManager.win_list.remove(self)
-        except Exception as e:
-            Utils.print_error()
+        except ValueError as e:
+            # Utils.print_error()
+            print("remove win from list err", e)
         return super().deleteLater()
 
 

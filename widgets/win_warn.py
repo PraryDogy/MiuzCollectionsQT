@@ -87,6 +87,11 @@ class WinQuestion(BaseWinWarn):
 
         self.central_layout.addWidget(btn_wid)
 
+    def keyPressEvent(self, a0):
+        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.ok_clicked.emit()
+        return super().keyPressEvent(a0)
+
 
 class WinUpload(WinQuestion):
     arrow = "▸"
