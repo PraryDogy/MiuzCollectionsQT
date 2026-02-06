@@ -29,17 +29,12 @@ class ReplaceFilesWin(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-        self.set_modality()
         self.setWindowTitle(self.title_text)
         self.setFixedSize(400, 100)
-
-        main_lay = QVBoxLayout()
-        main_lay.setContentsMargins(10, 5, 10, 10)
-        main_lay.setSpacing(10)
-        self.centralWidget().setLayout(main_lay)
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
 
         h_wid = QWidget()
-        main_lay.addWidget(h_wid)
+        self.central_layout.addWidget(h_wid)
 
         h_lay = QHBoxLayout()
         h_lay.setContentsMargins(0, 0, 0, 0)
@@ -48,7 +43,7 @@ class ReplaceFilesWin(SingleActionWindow):
 
         warn = QSvgWidget()
         warn.load(self.icon_path)
-        warn.resize(self.icon_size, self.icon_size)
+        warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
         test_two = QLabel(self.descr_text)
@@ -56,14 +51,13 @@ class ReplaceFilesWin(SingleActionWindow):
         h_lay.addWidget(test_two)
 
         btn_wid = QWidget()
-        main_lay.addWidget(btn_wid, alignment=Qt.AlignmentFlag.AlignRight)
+        self.central_layout.addWidget(btn_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
         btn_lay = QHBoxLayout()
         btn_lay.setContentsMargins(0, 0, 0, 0)
         btn_lay.setSpacing(10)
         btn_wid.setLayout(btn_lay)
-
-        btn_lay.addStretch()
+        btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         replace_all_btn = QPushButton(self.replace_all_text)
         replace_all_btn.setFixedWidth(95)
@@ -80,7 +74,6 @@ class ReplaceFilesWin(SingleActionWindow):
         stop_btn.clicked.connect(lambda: self.stop_cmd())
         btn_lay.addWidget(stop_btn)
         
-        btn_lay.addStretch()
         self.adjustSize()
 
     def replace_one_cmd(self):
@@ -104,16 +97,10 @@ class ErrorWin(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-        self.set_modality()
         self.setWindowTitle(ErrorWin.title_text)
 
-        main_lay = QVBoxLayout()
-        main_lay.setContentsMargins(10, 5, 10, 10)
-        main_lay.setSpacing(0)
-        self.centralWidget().setLayout(main_lay)
-
         h_wid = QWidget()
-        main_lay.addWidget(h_wid)
+        self.central_layout.addWidget(h_wid)
 
         h_lay = QHBoxLayout()
         h_lay.setContentsMargins(0, 0, 0, 0)
@@ -121,6 +108,7 @@ class ErrorWin(SingleActionWindow):
         h_wid.setLayout(h_lay)
 
         warn = QSvgWidget()
+        warn.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         warn.load(self.icon_path)
         warn.resize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
@@ -132,7 +120,7 @@ class ErrorWin(SingleActionWindow):
         ok_btn = QPushButton(ErrorWin.ok_text)
         ok_btn.clicked.connect(self.deleteLater)
         ok_btn.setFixedWidth(90)
-        main_lay.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.adjustSize()
 
@@ -156,6 +144,7 @@ class WinCopyFiles(ProgressbarWin):
         self.dst_urls: list[str] = []
         self.cancel.connect(self.deleteLater)
         is_cut = True if is_cut == "cut" else False
+
         self.copy_task_item = CopyTaskItem(
             dst_dir=dst_dir,
             src_urls=src_urls,
@@ -177,9 +166,9 @@ class WinCopyFiles(ProgressbarWin):
         finished = False
 
         if not self.copy_task.proc_q.empty():
-            copy_item: CopyTaskItem = self.copy_task.proc_q.get()
+            self.copy_item: CopyTaskItem = self.copy_task.proc_q.get()
 
-            if copy_item.msg == "error":
+            if self.copy_item.msg == "error":
                 self.error_win = ErrorWin()
                 self.error_win.center_to_parent(self.window())
                 self.error_win.show()
@@ -187,7 +176,7 @@ class WinCopyFiles(ProgressbarWin):
                 self.deleteLater()
                 return
             
-            elif copy_item.msg == "need_replace":
+            elif self.copy_item.msg == "need_replace":
                 self.replace_win = ReplaceFilesWin()
                 self.replace_win.center_to_parent(self)
                 self.replace_win.replace_all_press.connect(self.replace_all)
@@ -196,18 +185,18 @@ class WinCopyFiles(ProgressbarWin):
                 self.replace_win.show()
                 return
             
-            elif copy_item.msg == "finished":
+            elif self.copy_item.msg == "finished":
                 finished = True
             
             if self.progressbar.maximum() == 0:
-                self.progressbar.setMaximum(copy_item.total_size)
+                self.progressbar.setMaximum(self.copy_item.total_size)
 
-            if len(self.dst_urls) == 0 and copy_item.dst_urls:
-                self.dst_urls.extend(copy_item.dst_urls)
+            if len(self.dst_urls) == 0 and self.copy_item.dst_urls:
+                self.dst_urls.extend(self.copy_item.dst_urls)
 
-            self.progressbar.setValue(copy_item.current_size)
+            self.progressbar.setValue(self.copy_item.current_size)
             self.below_label.setText(
-                f'{self.windowTitle()} {copy_item.current_count} из {copy_item.total_count}'
+                f'{self.windowTitle()} {self.copy_item.current_count} из {self.copy_item.total_count}'
             )
 
         if not self.copy_task.is_alive() or finished:
@@ -219,7 +208,7 @@ class WinCopyFiles(ProgressbarWin):
             self.stop_task()
             self.deleteLater()
         else:
-            self.copy_timer.start(self.copy_timer_ms)
+            self.copy_timer.start(self.ms)
 
     def limit_string(self, text: str, limit: int = 30):
         if len(text) > limit:
@@ -236,14 +225,14 @@ class WinCopyFiles(ProgressbarWin):
         self.copy_item.msg = "replace_one"
         self.copy_task.gui_q.put(self.copy_item)
         self.replace_win.deleteLater()
-        self.copy_timer.start(self.copy_timer_ms)
+        self.copy_timer.start(self.ms)
 
     def replace_all(self):
         self.copy_timer.stop()
         self.copy_item.msg = "replace_all"
         self.copy_task.gui_q.put(self.copy_item)
         self.replace_win.deleteLater()
-        self.copy_timer.start(self.copy_timer_ms)
+        self.copy_timer.start(self.ms)
 
     def stop_task(self):
         self.copy_timer.stop()

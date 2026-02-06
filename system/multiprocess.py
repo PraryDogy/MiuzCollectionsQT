@@ -9,7 +9,6 @@ from cfg import Static, cfg
 from system.items import CopyTaskItem, OneFileInfoItem, ReadImgItem
 from system.shared_utils import ImgUtils, SharedUtils
 from system.tasks import Utils
-
 from .lang import Lng
 
 
@@ -177,4 +176,6 @@ class CopyTask:
                 fdst.write(buf)
                 copy_item.current_size += len(buf) // 1024
                 proc_q.put(copy_item)
+                sleep(0.2)
+                # print("copy kb", copy_item.current_size, copy_item.total_size)
         shutil.copystat(src, dest, follow_symlinks=True)
