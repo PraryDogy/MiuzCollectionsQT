@@ -140,8 +140,6 @@ class CopyTask:
             copy_item.current_count = count
             copy_item.msg = ""
             try:
-                if os.path.exists(dest) and dest.is_file():
-                    os.remove(dest)
                 CopyTask.copy_file_with_progress(proc_q, copy_item, src, dest)
             except Exception as e:
                 print("CopyTask copy error", e)
