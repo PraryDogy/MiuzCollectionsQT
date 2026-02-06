@@ -30,7 +30,7 @@ class ReplaceFilesWin(SingleActionWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(self.title_text)
-        self.setFixedSize(400, 100)
+        self.setFixedSize(350, 90)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
         h_wid = QWidget()
