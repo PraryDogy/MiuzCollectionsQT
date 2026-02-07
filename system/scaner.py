@@ -15,37 +15,25 @@ from system.shared_utils import ImgUtils
 from system.tasks import TaskState
 from system.utils import Utils
 
+from .items import ScanerItem
 
-class DirsLoader:
-    progress_text = pyqtSignal(str)
 
-    # def __init__(self, mf: Mf, task_state: TaskState):
-    #     super().__init__()
-    #     self.mf = mf
-    #     self.mf_path = mf.curr_path
-    #     self.task_state = task_state
-    #     if mf.curr_path:
-    #         self.true_name = os.path.basename(mf.curr_path)
-    #     else:
-    #         self.true_name = os.path.basename(mf.paths[0])
-    #     self.alias = mf.name
+class DirsManager:
 
-    def finder_dirs(self) -> list[tuple]:
+    def get_finder_dirs(scaner_item: ScanerItem, q: Queue):
         """
-        Возвращает:
-        - [(rel_dir_path, mod_time), ...]
+        Возвращает [(rel_dir_path, mod_time), ...]
         """
         dirs = []
-        stack = [self.mf_path]
+        stack = [scaner_item.mf.curr_path]
+        # gui_text: Имя папки (псевдоним папки): поиск в папке
+        scaner_item.gui_text = f"{scaner_item.mf_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
+        q.put(scaner_item)
         
-        self.progress_text.emit(
-            f"{self.true_name} ({self.alias}): {Lng.search_in[cfg.lng].lower()}"
-        )
-
         def iter_dir(entry: os.DirEntry):
-            if entry.is_dir() and entry.name not in self.mf.stop_list:
+            if entry.is_dir() and entry.name not in scaner_item.mf.stop_list:
                 stack.append(entry.path)
-                rel_path = Utils.get_rel_path(self.mf_path, entry.path)
+                rel_path = Utils.get_rel_path(scaner_item.mf.curr_path, entry.path)
                 stats = entry.stat()
                 mod = int(stats.st_mtime)
                 dirs.append((rel_path, mod))
@@ -54,26 +42,25 @@ class DirsLoader:
             current = stack.pop()
             with os.scandir(current) as it:
                 for entry in it:
-                    if not self.task_state.should_run():
+                    if scaner_item.stop_task:
                         break
                     try:
                         iter_dir(entry)
                     except Exception as e:
                         print("new scaner utils, dirs loader, finder dirs error", e)
-                        self.task_state.set_should_run(False)
+                        scaner_item.stop_task = True
 
         try:
-            stats = os.stat(self.mf_path)
+            stats = os.stat(scaner_item.mf.curr_path)
             data = (os.sep, int(stats.st_mtime))
             dirs.append(data)
         except Exception as e:
             print("new scaner dirs loader finder dirs error add root dir", e)
         return dirs
 
-    def db_dirs(self) -> list[tuple]:
+    def get_db_dirs(self):
         """
-        Возвращает:
-        - [(rel_dir_path, mod_time), ...]
+        Возвращает [(rel_dir_path, mod_time), ...]
         """
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(

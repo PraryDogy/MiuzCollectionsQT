@@ -1,3 +1,4 @@
+import os
 from time import time
 from typing import Literal
 
@@ -78,5 +79,12 @@ class ScanerItem:
         считается, что ScanerTask завис и его можно безопасно прервать.
         """
         super().__init__()
-        self.mf = mf
         self.time = time()
+        self.gui_text: str = "gui_text"
+        self.stop_task = False
+        self.mf = mf
+        self.mf_alias = mf.name
+        if mf.curr_path:
+            self.mf_name = os.path.basename(mf.curr_path)
+        else:
+            self.mf_name = os.path.basename(mf.paths[0])
