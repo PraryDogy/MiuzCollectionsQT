@@ -26,33 +26,28 @@ class DirsManager:
         """
         Возвращает [(rel_dir_path, mod_time), ...]
         """
-        dirs = []
-        stack = [scaner_item.mf.curr_path]
+
         # отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
         scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
         q.put(scaner_item)
-        
-        def iter_dir(entry: os.DirEntry):
-            if entry.is_dir() and entry.name not in scaner_item.mf.stop_list:
-                stack.append(entry.path)
-                rel_path = Utils.get_rel_path(scaner_item.mf.curr_path, entry.path)
-                stats = entry.stat()
-                mod = int(stats.st_mtime)
-                dirs.append((rel_path, mod))
-
+        dirs = []
+        stack = [scaner_item.mf.curr_path]
         while stack:
             current = stack.pop()
-            with os.scandir(current) as it:
-                for entry in it:
-                    if scaner_item.stop_task:
-                        break
-                    try:
-                        iter_dir(entry)
-                    except Exception as e:
-                        print("new scaner utils, dirs loader, finder dirs error", e)
-                        scaner_item.stop_task = True
-
+            for entry in os.scandir(current):
+                if scaner_item.stop_task:
+                    break
+                try:
+                    if entry.is_dir() and entry.name not in scaner_item.mf.stop_list:
+                        stack.append(entry.path)
+                        rel_path = Utils.get_rel_path(scaner_item.mf.curr_path, entry.path)
+                        stats = entry.stat()
+                        mod = int(stats.st_mtime)
+                        dirs.append((rel_path, mod))
+                except Exception as e:
+                    print("new scaner utils, dirs loader, finder dirs error", e)
+                    scaner_item.stop_task = True
         try:
             stats = os.stat(scaner_item.mf.curr_path)
             data = (os.sep, int(stats.st_mtime))
