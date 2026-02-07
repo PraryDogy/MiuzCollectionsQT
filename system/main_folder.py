@@ -20,7 +20,7 @@ class Mf:
 
     def __init__(
             self,
-            alias: str = "Псевдоним / Alias",
+            alias: str = "Псевдоним/Alias",
             paths: list[str] = ["/path", ],
             stop_list: list[str] = ["stop word", ],
             curr_path: str = "",
