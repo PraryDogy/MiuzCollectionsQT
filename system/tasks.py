@@ -1,4 +1,5 @@
 import os
+import shutil
 from collections import defaultdict
 from datetime import datetime
 
@@ -263,23 +264,31 @@ class MfDataCleaner(URunnable):
             self.sigs.finished_.emit()
 
     def _task(self):
-        # Удаляем битые миниатюры
+        abs_path_list: list[str] = []
         stmt = (
             sqlalchemy.select(THUMBS.c.short_src, THUMBS.c.short_hash)
             .where(THUMBS.c.brand == self.mf_name)
         )
         res = self.conn.execute(stmt)
         for rel_path, rel_thumb_path in res:
-            if not (rel_path or rel_thumb_path):
-                print(rel_path, rel_thumb_path)
-                continue
-            if not os.path.exists(Utils.get_abs_hash(rel_thumb_path)):
-                self.conn.execute(
-                    sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_path)
-                )
+            # if not rel_path or not rel_thumb_path:
+                # continue
+            abs_thumb_path = Utils.get_abs_hash(rel_thumb_path)
+            if os.path.exists(abs_thumb_path):
+                stmt = sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_path)
+                self.conn.execute(stmt)
+                abs_path_list.append(abs_thumb_path)
         self.conn.commit()
 
-        # Удаляем папку
+        for i in abs_path_list:
+            try:
+                os.remove(i)
+                parent = os.path.dirname(i)
+                if not os.listdir(parent):
+                    shutil.rmtree(parent)
+            except Exception as e:
+                print("system>tasks>MfDataCleaner remove thumb error", e)
+
         stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand == self.mf_name)
         self.conn.execute(stmt)
         self.conn.commit()
