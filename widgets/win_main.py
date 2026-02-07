@@ -18,6 +18,7 @@ from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
                             UHBoxLayout, UMainWindow, UVBoxLayout, WinManager)
+from system.items import OnStartItem
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -230,10 +231,8 @@ class WinMain(UMainWindow):
         self.grid.reload_thumbnails()
         self.set_window_title()
 
-        self.on_start_task = ProcessWorker(
-            target=OnStartTask.start,
-            args=()
-        )
+        on_start_item = OnStartItem(Mf.list_)
+        self.on_start_task = ProcessWorker(target=OnStartTask.start, args=(on_start_item, ))
         self.on_start_timer = QTimer(self)
         self.on_start_timer.setSingleShot(True)
         self.on_start_timer.timeout.connect(poll_task)

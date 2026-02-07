@@ -70,6 +70,7 @@ else:
 from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
+from typing_extensions import Literal
 
 from cfg import cfg
 from system.database import Dbase
@@ -82,7 +83,7 @@ from widgets.win_main import WinMain
 
 
 class App(QApplication):
-    def __init__(self, argv: list[str]) -> None:
+    def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
         super().__init__(argv)
 
         cfg.initialize()

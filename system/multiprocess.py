@@ -10,7 +10,7 @@ import sqlalchemy
 from cfg import Static, cfg
 
 from .database import DIRS, THUMBS, Dbase
-from .items import CopyTaskItem, OneFileInfoItem, ReadImgItem
+from .items import CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils, SharedUtils
@@ -197,7 +197,7 @@ class FilesRemover:
 
 class _DeletedMfRemover:
 
-    def start(engine: sqlalchemy.Engine, q: Queue):
+    def start(engine: sqlalchemy.Engine, on_start_item: OnStartItem, q: Queue):
         """
         Логика такая:
         - Пользователь в настройках приложения удаляет Mf
@@ -213,18 +213,21 @@ class _DeletedMfRemover:
         conn = engine.connect()
         stmt = sqlalchemy.select(THUMBS.c.brand).distinct()
         db_mf_list = conn.execute(stmt).scalars().all()
-        json_mf_list = [i.name for i in Mf.list_]
+        json_mf_list = [i.name for i in on_start_item.mf_list]
         removed_mf_list: list[str] = [
             i
             for i in db_mf_list
             if i not in json_mf_list and i is not None
         ]
-        if removed_mf_list:
-            for i in removed_mf_list:
-                rows = _DeletedMfRemover.get_rows(i, conn)
-                _DeletedMfRemover.remove_images(rows)
-                _DeletedMfRemover.remove_rows(rows, conn)
-            _DeletedMfRemover.remove_dirs(conn)
+
+        print(removed_mf_list)
+
+        # if removed_mf_list:
+        #     for i in removed_mf_list:
+        #         rows = _DeletedMfRemover.get_rows(i, conn)
+        #         _DeletedMfRemover.remove_images(rows)
+        #         _DeletedMfRemover.remove_rows(rows, conn)
+        #     _DeletedMfRemover.remove_dirs(conn)
         conn.close()
         q.put(removed_mf_list)
     
@@ -322,8 +325,8 @@ class _EmptyHashdirRemover:
 
 class OnStartTask:
     @staticmethod
-    def start(q: Queue):
+    def start(on_start_item: OnStartItem, q: Queue):
         engine = Dbase.create_engine()
-        # _DeletedMfRemover.start(engine, q)
+        _DeletedMfRemover.start(engine, on_start_item, q)
         _EmptyRecordsRemover.start(engine, q)
         _EmptyHashdirRemover.start(q)

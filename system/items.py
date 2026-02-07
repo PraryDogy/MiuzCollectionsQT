@@ -2,6 +2,8 @@ from typing import Literal
 
 import numpy as np
 
+from .main_folder import Mf
+
 
 class CopyTaskItem:
     def __init__(self, src_dir: str, dst_dir: str, src_urls: list[str], is_search: bool, is_cut: bool):
@@ -55,3 +57,9 @@ class CopyTaskItem:
         self.total_count: int = 0
         self.dst_urls: list[str] = []
         self.msg: Literal["", "error", "need_replace", "replace_one", "replace_all", "finished"]
+
+
+class OnStartItem:
+    def __init__(self, mf_list: list[Mf]):
+        super().__init__()
+        self.mf_list = mf_list
