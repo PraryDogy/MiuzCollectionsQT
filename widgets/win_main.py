@@ -6,13 +6,14 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
+from typing_extensions import Literal
 
 from cfg import Dynamic, Static, cfg
 from system.filters import Filters
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import FilesRemover, ProcessWorker
-from system.new_scaner.scaner_task import DirListScanTask, OnStartTask
+from system.multiprocess import FilesRemover, OnStartTask, ProcessWorker
+from system.new_scaner.scaner_task import DirListScanTask
 from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
@@ -56,13 +57,12 @@ class USep(QFrame):
 
 
 class WinMain(UMainWindow):
-    argv_flag = "noscan"
     update_mins = 30
     min_w = 750
     left_side_width = 250
     warning_svg = "./images/warning.svg"
 
-    def __init__(self, argv: list[str]):
+    def __init__(self, argv: list[Literal["noscan", ""]]):
         super().__init__()
         self.resize(Static.ww, Static.hh)
         self.setMinimumWidth(self.min_w)
@@ -207,13 +207,6 @@ class WinMain(UMainWindow):
 
         self.on_start(argv)
 
-        # test = QFrame(self)
-        # test.setStyleSheet("background: red")
-        # test.setFixedSize(100, 100)
-        # test.move(30, 30)
-        # test.show()
-        # test.mouseReleaseEvent = lambda e: self.grid.reload_thumbnails()
-
     @staticmethod
     def with_conn(fn):
         def wrapper(self: "WinMain", parent: QWidget, mf: Mf, *args, **kwargs):
@@ -223,17 +216,32 @@ class WinMain(UMainWindow):
                 self.open_win_smb(parent, mf)
         return wrapper
     
-    def on_start(self, argv: list[str]):
+    def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):
 
-        def on_finish():
-            if argv[-1] != self.argv_flag:
+        def start_scaner_task():
+            if argv[-1] != "noscan":
                 self.start_scaner_task()
+
+        def poll_task():
+            self.on_start_timer.stop()
+            if not self.on_start_task.is_alive():
+                self.on_start_task.terminate()
+            else:
+                self.on_start_timer.start(ms)
 
         self.grid.reload_thumbnails()
         self.set_window_title()
-        self.on_start_task = OnStartTask()
-        self.on_start_task.sigs.finished_.connect(on_finish)
-        UThreadPool.start(self.on_start_task)
+
+        self.on_start_task = ProcessWorker(
+            target=OnStartTask.start,
+            args=()
+        )
+        self.on_start_timer = QTimer(self)
+        self.on_start_timer.setSingleShot(True)
+        self.on_start_timer.timeout.connect(poll_task)
+
+        self.on_start_task.start()
+        self.on_start_timer.start(ms)
     
     def level_up(self):
         if Dynamic.current_dir:
