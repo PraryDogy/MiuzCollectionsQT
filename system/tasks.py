@@ -271,8 +271,8 @@ class MfDataCleaner(URunnable):
         )
         res = self.conn.execute(stmt)
         for rel_path, rel_thumb_path in res:
-            # if not rel_path or not rel_thumb_path:
-                # continue
+            if not rel_path or not rel_thumb_path:
+                continue
             abs_thumb_path = Utils.get_abs_hash(rel_thumb_path)
             if os.path.exists(abs_thumb_path):
                 stmt = sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_path)

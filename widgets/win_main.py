@@ -697,9 +697,13 @@ class WinMain(UMainWindow):
         UThreadPool.start(self.task)
 
     def reset_data_cmd(self, mf: Mf):
+
+        def reset_data_finished():
+            self.grid.reload_thumbnails()
+            self.restart_scaner_task()
+
         self.reset_task = MfDataCleaner(mf.name)
-        # self.reset_task.sigs.finished_.connect(self.restart_scaner_task)
-        self.reset_task.sigs.finished_.connect(lambda: print("fin"))
+        self.reset_task.sigs.finished_.connect(reset_data_finished)
         UThreadPool.start(self.reset_task)
 
     def copy_files_win(self):
