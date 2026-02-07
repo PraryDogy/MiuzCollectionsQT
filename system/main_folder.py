@@ -63,8 +63,8 @@ class Mf:
             
     def get_available_path(self) -> str | None:
         """
-        Проверяет и устанавливает путь к Mf.    
-        Возвращает доступный путь к Mf или None
+        Проверяет и устанавливает путь Mf.currpath  
+        Возвращает доступный путь Mf.curr_path или None
         """
         self.curr_path = ""
         for i in self.paths:
