@@ -120,8 +120,10 @@ class DirsUpdater:
         - dirs_to_scan: [(rel dir path, int modified time), ...]
 
         Запускается только после работы с изображениями:
-        - добавить / удалить изображения из базы данных THUMBS
-        - добавить / удалить изображения из кэша hashdir
+        - добавление и удаление изображений из базы данных THUMBS
+        - добавление и удаление изображений из "hashdir"
+
+        Что делает:
         - удаляет записи из DIRS, которые соответствуют Mf.alias
         - добавляет записи в DIRS, которые соответствуют Mf.alias
         - по сути это замена sqlalchemy.update
@@ -252,7 +254,7 @@ class HashdirUpdater(QObject):
         - Возвращает список успешно удаленных и список успешно добавленных изображений.
         - Далее необходимо обновить информацию в базе данных на основе полученных списков.
 
-        Получить данные del_images и new_images необходимо из ImaCompator.  
+        Получить данные del_images и new_images необходимо из ImgCompator.  
         Параметры:  
         - del_images [rel thumb path, ...]
         - new_images [(abs path, size, birth, mod), ...]
@@ -333,7 +335,7 @@ class HashdirUpdater(QObject):
         img = Utils.fit_to_thumb(img, Static.max_img_size)
 
 
-class _ImgDbUpdater:
+class DbUpdater:
     def __init__(self, del_images: list, new_images: list, mf: Mf):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
