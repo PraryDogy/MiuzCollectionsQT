@@ -12,7 +12,7 @@ class Mf:
     json_file = os.path.join(Static.app_support, "mf.json")
     json_file_backup = os.path.join(Static.app_support, "mf_backup.json")
     __slots__ = [
-        "name",
+        "alias",
         "paths",
         "stop_list",
         "curr_path",
@@ -20,7 +20,7 @@ class Mf:
 
     def __init__(
             self,
-            name: str = "name",
+            alias: str = "alias",
             paths: list[str] = ["/path", ],
             stop_list: list[str] = ["stop word", ],
             curr_path: str = "",
@@ -56,7 +56,7 @@ class Mf:
 
         """
         super().__init__()
-        self.name = name
+        self.alias = alias
         self.paths = paths
         self.stop_list = stop_list
         self.curr_path: str = curr_path

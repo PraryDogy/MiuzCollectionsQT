@@ -641,7 +641,7 @@ class MfSettings(QGroupBox):
         first_row.setLayout(first_lay)
         name_descr = ULabel(Lng.alias[cfg.lng] + ":")
         first_lay.addWidget(name_descr)
-        name_label = ULabel(mf.name)
+        name_label = ULabel(mf.alias)
         first_lay.addWidget(name_label)
 
         # Advanced настройки
@@ -765,10 +765,10 @@ class NewFolder(QGroupBox):
 
     def name_cmd(self):
         name = self.name_label.text().strip()
-        self.mf.name = name
+        self.mf.alias = name
 
     def save(self):        
-        if not self.mf.name:
+        if not self.mf.alias:
             self.win_warn = WinWarn(
                 Lng.attention[cfg.lng],
                 Lng.enter_alias_warning[cfg.lng]
@@ -776,10 +776,10 @@ class NewFolder(QGroupBox):
             self.win_warn.resize(380, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
-        elif any(i.name == self.mf.name for i in self.mf_list):
+        elif any(i.alias == self.mf.alias for i in self.mf_list):
             self.win_warn = WinWarn(
                 Lng.attention[cfg.lng],
-                f"{Lng.alias[cfg.lng]} \"{self.mf.name}\" {Lng.already_taken[cfg.lng].lower()}."
+                f"{Lng.alias[cfg.lng]} \"{self.mf.alias}\" {Lng.already_taken[cfg.lng].lower()}."
                 )
             self.win_warn.resize(380, 80)
             self.win_warn.center_to_parent(self.window())
@@ -932,7 +932,7 @@ class WinSettings(SingleActionWindow):
                 true_name = os.path.basename(i.curr_path)
             else:
                 true_name = os.path.basename(i.paths[0])
-            alias = i.name
+            alias = i.alias
             text = f"{true_name} ({alias})"
             new_folder = SettingsListItem(self.left_menu, text=text)
             new_folder.mf = i
@@ -1012,7 +1012,7 @@ class WinSettings(SingleActionWindow):
             mf = next(
                 i
                 for i in self.mf_list_copy
-                if i.name == item.mf.name
+                if i.alias == item.mf.alias
             )
             mf_sett = MfSettings(mf)
             mf_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
@@ -1028,7 +1028,7 @@ class WinSettings(SingleActionWindow):
             real_name = os.path.basename(mf.curr_path)
         else:
             real_name = os.path.basename(mf.paths[0])
-        text = f"{real_name} ({mf.name})"
+        text = f"{real_name} ({mf.alias})"
         item = SettingsListItem(self.left_menu, text=text)
         item.setIcon(QIcon(self.svg_folder))
         item.mf = mf
@@ -1043,7 +1043,7 @@ class WinSettings(SingleActionWindow):
 
         def fin():
             for i in self.mf_list_copy:
-                if i.name == item.mf.name:
+                if i.alias == item.mf.alias:
                     self.mf_list_copy.remove(i)
                     self.left_menu.takeItem(self.left_menu.currentRow())
                     self.left_menu.setCurrentRow(0)
@@ -1085,7 +1085,7 @@ class WinSettings(SingleActionWindow):
                 if not folder.paths:
                     self.win_warn = WinWarn(
                         Lng.attention[cfg.lng],
-                        f"{Lng.select_folder_path[cfg.lng]} \"{folder.name}\""
+                        f"{Lng.select_folder_path[cfg.lng]} \"{folder.alias}\""
                     )
                     self.win_warn.resize(330, 80)
                     self.win_warn.center_to_parent(self.window())

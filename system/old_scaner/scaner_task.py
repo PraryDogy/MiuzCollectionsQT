@@ -35,12 +35,12 @@ class ScanerTask(URunnable):
     def task(self):
         for i in Mf.list_:
             if i.set_curr_path():
-                print("scaner started", i.name)
+                print("scaner started", i.alias)
                 self.mf_scan(i)
                 gc.collect()
-                print("scaner finished", i.name)
+                print("scaner finished", i.alias)
             else:
-                t = f"{i.name}: {Lng.no_connection[cfg.lng].lower()}"
+                t = f"{i.alias}: {Lng.no_connection[cfg.lng].lower()}"
                 self.sigs.progress_text.emit(t)
                 sleep(5)
             
@@ -113,7 +113,7 @@ class ScanerTask(URunnable):
             is_remove_all = inspector.is_remove_all()
             if is_remove_all:
                 print("scaner > обнаружена попытка массового удаления фотографий")
-                print("в папке:", mf.name, mf.curr_path)
+                print("в папке:", mf.alias, mf.curr_path)
                 return
 
             file_updater = HashdirUpdater(del_items, new_items, mf, self.task_state)

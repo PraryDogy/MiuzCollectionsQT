@@ -106,7 +106,7 @@ class FavManager(URunnable):
             q = (
                 sqlalchemy.update(THUMBS)
                 .where(THUMBS.c.short_src == self.rel_path)
-                .where(THUMBS.c.brand == Mf.current.name)
+                .where(THUMBS.c.brand == Mf.current.alias)
                 .values(fav=self.value)
             )
             self.conn.execute(q)
@@ -205,7 +205,7 @@ class DbImagesLoader(URunnable):
             stmt = stmt.order_by(-THUMBS.c.mod)
         else:
             stmt = stmt.order_by(-THUMBS.c.id)
-        stmt = stmt.where(THUMBS.c.brand == Mf.current.name)
+        stmt = stmt.where(THUMBS.c.brand == Mf.current.alias)
         stmt = stmt.where(THUMBS.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
         if Dynamic.filter_favs:
             stmt = stmt.where(THUMBS.c.fav == 1)
@@ -318,7 +318,7 @@ class DbDirsLoader(URunnable):
     def _task(self):
         stmt = (
             sqlalchemy.select(DIRS.c.short_src)
-            .where(DIRS.c.brand == self.mf.name)
+            .where(DIRS.c.brand == self.mf.alias)
         )
 
         res = list(self.conn.execute(stmt).scalars())
@@ -359,7 +359,7 @@ class HashDirSize(URunnable):
         for i in Mf.list_:
             stmt = (
                 sqlalchemy.select(THUMBS.c.short_hash)
-                .where(THUMBS.c.brand == i.name)
+                .where(THUMBS.c.brand == i.alias)
             )
             res = list(self.conn.execute(stmt).scalars())
             size = sum([
@@ -371,7 +371,7 @@ class HashDirSize(URunnable):
                 real_name = os.path.basename(i.curr_path)
             else:
                 real_name = os.path.basename(i.paths[0])
-            name = f"{real_name} ({i.name})"
+            name = f"{real_name} ({i.alias})"
             main_folder_sizes[name] = {"size": size, "total": len(res)}
         return main_folder_sizes
     

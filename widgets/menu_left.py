@@ -56,7 +56,7 @@ class TreeWid(QTreeWidget):
     def init_ui(self):
         self.clear()
 
-        root_item = QTreeWidgetItem([Mf.current.name])
+        root_item = QTreeWidgetItem([Mf.current.alias])
         root_item.setSizeHint(0, QSize(0, self.item_height))
         root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
         root_item.setIcon(0, QIcon(self.svg_folder))
@@ -214,7 +214,7 @@ class MfList(VListWidget):
                 true_name = os.path.basename(i.curr_path)
             else:
                 true_name = os.path.basename(i.paths[0])
-            text = f"{true_name} ({i.name})"
+            text = f"{true_name} ({i.alias})"
             item = MfListItem(parent=self, text=text)
             item.setIcon(QIcon(self.svg_folder))
             item.mf = i

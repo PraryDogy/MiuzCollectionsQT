@@ -107,7 +107,7 @@ class FinderImages(QObject):
         Формирует строку для отображения прогресса обработки:
         Пример: "Miuz (Mf.name): коллекция 3 из 10"
         """
-        mf = self.mf.name.capitalize()
+        mf = self.mf.alias.capitalize()
         collection_name: str = Lng.folder[cfg.lng]
         return f"{mf}: {collection_name.lower()} {current} {Lng.from_[cfg.lng]} {total}"
 
@@ -170,7 +170,7 @@ class DbImages(QObject):
             THUMBS.c.birth,
             THUMBS.c.mod
             )
-        q = q.where(THUMBS.c.brand == self.mf.name)
+        q = q.where(THUMBS.c.brand == self.mf.alias)
         # не забываем относительный путь к изображению преобразовать в полный
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
@@ -236,7 +236,7 @@ class Inspector(QObject):
     def is_remove_all(self):
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(sqlalchemy.func.count())
-        q = q.where(THUMBS.c.brand == self.mf.name)
+        q = q.where(THUMBS.c.brand == self.mf.alias)
         result = conn.execute(q).scalar()
         conn.close()
         if len(self.del_items) == result and len(self.del_items) != 0:
@@ -287,7 +287,7 @@ class HashdirUpdater(QObject):
         x: item of `enumerate`
         total: `len`
         """
-        mf = self.mf.name.capitalize()
+        mf = self.mf.alias.capitalize()
         t = f"{mf}: {text.lower()} {x} {Lng.from_[cfg.lng]} {total}"
         self.progress_text.emit(t)
 
@@ -366,7 +366,7 @@ class DbUpdater(QObject):
         for rel_thumb_path in self.del_items:
             q = sqlalchemy.delete(THUMBS)
             q = q.where(THUMBS.c.short_hash==rel_thumb_path)
-            q = q.where(THUMBS.c.brand==self.mf.name)
+            q = q.where(THUMBS.c.brand==self.mf.alias)
             try:
                 conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
@@ -404,7 +404,7 @@ class DbUpdater(QObject):
                 ClmNames.resol: "",
                 ClmNames.coll: "",
                 ClmNames.fav: 0,
-                ClmNames.brand: self.mf.name
+                ClmNames.brand: self.mf.alias
             }
             stmt = sqlalchemy.insert(THUMBS).values(**values) 
             try:
@@ -452,7 +452,7 @@ class MfRemover(QObject):
     def run(self):
         q = sqlalchemy.select(THUMBS.c.brand).distinct()
         db_mfs = self.conn.execute(q).scalars().all()
-        app_mfs = [i.name for i in Mf.list_]
+        app_mfs = [i.alias for i in Mf.list_]
         del_mfs = [i for i in db_mfs if i not in app_mfs]
         for i in del_mfs:
             rows = self.get_rows(i)

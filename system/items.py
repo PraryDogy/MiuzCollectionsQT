@@ -83,7 +83,7 @@ class ScanerItem:
         self.gui_text: str = "gui_text"
         self.stop_task = False
         self.mf = mf
-        self.mf_alias = mf.name
+        self.mf_alias = mf.alias
         if mf.curr_path:
             self.mf_name = os.path.basename(mf.curr_path)
         else:

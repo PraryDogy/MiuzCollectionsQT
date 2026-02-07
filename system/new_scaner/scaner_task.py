@@ -39,16 +39,16 @@ class ScanerTask(URunnable):
     def task(self):
         for i in Mf.list_:
             if i.set_curr_path():
-                print("scaner started", i.name)
+                print("scaner started", i.alias)
                 self.mf_scan(i)
                 gc.collect()
-                print("scaner finished", i.name)
+                print("scaner finished", i.alias)
             else:
                 if i.curr_path:
                     true_name = os.path.basename(i.curr_path)
                 else:
                     true_name = os.path.basename(i.paths[0])
-                alias = i.name
+                alias = i.alias
                 no_conn = Lng.no_connection[cfg.lng].lower()
                 self.sigs.progress_text.emit(f"{true_name} ({alias}): {no_conn}")
                 print("scaner no connection", true_name, alias)
@@ -82,7 +82,7 @@ class ScanerTask(URunnable):
         finder_dirs = dirs_loader.finder_dirs()
         db_dirs = dirs_loader.db_dirs()
         if not finder_dirs or not self.task_state.should_run():
-            print(mf.name, "no finder dirs")
+            print(mf.alias, "no finder dirs")
             return
 
         # сравниваем кортежи (директория, дата изменения)

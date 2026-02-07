@@ -213,7 +213,7 @@ class _DeletedMfRemover:
         conn = engine.connect()
         stmt = sqlalchemy.select(THUMBS.c.brand).distinct()
         db_mf_list = conn.execute(stmt).scalars().all()
-        json_mf_list = [i.name for i in on_start_item.mf_list]
+        json_mf_list = [i.alias for i in on_start_item.mf_list]
         removed_mf_list: list[str] = [
             i
             for i in db_mf_list
@@ -270,7 +270,7 @@ class _DeletedMfRemover:
     def remove_dirs(conn: sqlalchemy.Connection):
         q = sqlalchemy.select(DIRS.c.brand).distinct()
         db_brands = set(conn.execute(q).scalars())
-        app_brands = set(i.name for i in Mf.list_)
+        app_brands = set(i.alias for i in Mf.list_)
         to_delete = db_brands - app_brands
 
         if to_delete:

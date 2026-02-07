@@ -27,7 +27,7 @@ class DirsLoader(QObject):
             self.true_name = os.path.basename(mf.curr_path)
         else:
             self.true_name = os.path.basename(mf.paths[0])
-        self.alias = mf.name
+        self.alias = mf.alias
 
     def finder_dirs(self) -> list[tuple]:
         """
@@ -76,7 +76,7 @@ class DirsLoader(QObject):
         """
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
-            DIRS.c.brand == self.mf.name
+            DIRS.c.brand == self.mf.alias
         )
         res = [(short_src, mod) for short_src, mod in conn.execute(q)]
         conn.close()
@@ -138,7 +138,7 @@ class DirsUpdater:
         if short_paths:
             del_stmt = sqlalchemy.delete(DIRS).where(
                 DIRS.c.short_src.in_(short_paths),
-                DIRS.c.brand == self.mf.name
+                DIRS.c.brand == self.mf.alias
             )
             self.conn.execute(del_stmt)
 
@@ -147,7 +147,7 @@ class DirsUpdater:
             {
                 ClmNames.short_src: short_src,
                 ClmNames.mod: mod,
-                ClmNames.brand: self.mf.name
+                ClmNames.brand: self.mf.alias
             }
             for short_src, mod in self.dirs_to_scan
         ]
@@ -173,7 +173,7 @@ class ImgLoader(QObject):
             self.true_name = os.path.basename(mf.curr_path)
         else:
             self.true_name = os.path.basename(mf.paths[0])
-        self.alias = mf.name
+        self.alias = mf.alias
 
     def finder_images(self) -> list[tuple]:
         """
@@ -231,7 +231,7 @@ class ImgLoader(QObject):
                 THUMBS.c.birth,
                 THUMBS.c.mod
                 )
-            q = q.where(THUMBS.c.brand == self.mf.name)
+            q = q.where(THUMBS.c.brand == self.mf.alias)
             if rel_dir_path == "/":
                 q = q.where(THUMBS.c.short_src.ilike("/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"/%/%"))
@@ -298,7 +298,7 @@ class _ImgHashdirUpdater(QObject):
             self.true_name = os.path.basename(mf.curr_path)
         else:
             self.true_name = os.path.basename(mf.paths[0])
-        self.alias = mf.name
+        self.alias = mf.alias
 
     def run(self) -> tuple[list, list]:
         """
@@ -390,7 +390,7 @@ class _ImgDbUpdater:
         if self.del_images:
             q = sqlalchemy.delete(THUMBS).where(
                 THUMBS.c.short_hash.in_(self.del_images),
-                THUMBS.c.brand == self.mf.name
+                THUMBS.c.brand == self.mf.alias
             )
             self.conn.execute(q)
             self.conn.commit()
@@ -402,7 +402,7 @@ class _ImgDbUpdater:
         ]
         q = sqlalchemy.delete(THUMBS).where(
             THUMBS.c.short_src.in_(short_paths),
-            THUMBS.c.brand == self.mf.name
+            THUMBS.c.brand == self.mf.alias
         )
         self.conn.execute(q)
         self.conn.commit()
@@ -422,7 +422,7 @@ class _ImgDbUpdater:
                 ClmNames.resol: "",
                 ClmNames.coll: "",
                 ClmNames.fav: 0,
-                ClmNames.brand: self.mf.name
+                ClmNames.brand: self.mf.alias
             })
         self.conn.execute(sqlalchemy.insert(THUMBS), values_list)
         self.conn.commit()
@@ -446,7 +446,7 @@ class NewDirsHandler(QObject):
         finder_images = img_loader.finder_images()
         db_images = img_loader.db_images()
         if not self.task_state.should_run():
-            print(self.mf.name, "new scaner utils, ScanDirs, img_loader, сканирование прервано task state")
+            print(self.mf.alias, "new scaner utils, ScanDirs, img_loader, сканирование прервано task state")
             return
 
         # сравниваем Finder и БД изображения
@@ -459,7 +459,7 @@ class NewDirsHandler(QObject):
         del_images, new_images = hashdir_updater.run()
 
         if not self.task_state.should_run():
-            print(self.mf.name, "new scaner utils, ScanDirs, db updater, сканирование прервано task state")
+            print(self.mf.alias, "new scaner utils, ScanDirs, db updater, сканирование прервано task state")
             return
 
         # обновляем БД
@@ -496,7 +496,7 @@ class RemovedDirsHandler(QObject):
                 sqlalchemy.select(THUMBS.c.short_hash)
                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
                 .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-                .where(THUMBS.c.brand == self.mf.name)
+                .where(THUMBS.c.brand == self.mf.alias)
             )
             for short_hash in self.conn.execute(stmt).scalars():
                 try:
@@ -508,7 +508,7 @@ class RemovedDirsHandler(QObject):
                 sqlalchemy.delete(THUMBS)
                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
                 .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-                .where(THUMBS.c.brand == self.mf.name)
+                .where(THUMBS.c.brand == self.mf.alias)
             )
             self.conn.execute(del_stmt)
 
@@ -516,7 +516,7 @@ class RemovedDirsHandler(QObject):
             stmt = (
                 sqlalchemy.delete(DIRS)
                 .where(DIRS.c.short_src == rel_dir)
-                .where(DIRS.c.brand == self.mf.name)
+                .where(DIRS.c.brand == self.mf.alias)
             )
             self.conn.execute(stmt)
 

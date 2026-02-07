@@ -273,7 +273,7 @@ class WinMain(UMainWindow):
             print(e)
 
         basename = os.path.basename(mf.current.paths[0])
-        alias = mf.name
+        alias = mf.alias
         self.noti_wid = NotifyWid(
             parent,
             f"{basename} ({alias}): {Lng.no_connection_full[cfg.lng].lower()}",
@@ -662,7 +662,7 @@ class WinMain(UMainWindow):
         else:
             real_name = os.path.basename(Mf.current.paths[0])
         if Dynamic.current_dir == "":
-            t = f"{real_name} ({Mf.current.name})"
+            t = f"{real_name} ({Mf.current.alias})"
         else:
             t = os.path.basename(Dynamic.current_dir)
         self.setWindowTitle(t)
@@ -702,7 +702,7 @@ class WinMain(UMainWindow):
             self.grid.reload_thumbnails()
             self.restart_scaner_task()
 
-        self.reset_task = MfDataCleaner(mf.name)
+        self.reset_task = MfDataCleaner(mf.alias)
         self.reset_task.sigs.finished_.connect(reset_data_finished)
         UThreadPool.start(self.reset_task)
 
