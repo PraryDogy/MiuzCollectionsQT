@@ -76,8 +76,8 @@ class DirsManager:
 
 
 class DirsCompator:
-    @classmethod
-    def get_dirs_to_remove(cls, finder_dirs: list, db_dirs: list) -> list :
+    @staticmethod
+    def get_dirs_to_remove(finder_dirs: list, db_dirs: list):
         """
         Параметры:
         - finder_dirs: [(rel_dir_path, mod_time), ...]
@@ -93,8 +93,8 @@ class DirsCompator:
             if rel_dir_path not in finder_paths
         ]
 
-    @classmethod
-    def get_dirs_to_scan(cls, finder_dirs: list, db_dirs: list) -> list:
+    @staticmethod
+    def get_dirs_to_scan(finder_dirs: list, db_dirs: list):
         """
         Параметры:
         - finder_dirs: [(rel_dir_path, mod_time), ...]
