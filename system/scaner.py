@@ -188,7 +188,7 @@ class ImgLoader:
         return finder_images
 
     @staticmethod
-    def db_images(scaner_item: ScanerItem, dirs_to_scan: list):
+    def get_db_images(scaner_item: ScanerItem, dirs_to_scan: list):
         """
         Параметры:
         - dirs_to_scan: [(rel_dir_path, mod_time), ...]
