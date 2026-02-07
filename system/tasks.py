@@ -367,7 +367,7 @@ class HashDirSize(URunnable):
                 for i in res
                 if os.path.exists(Utils.get_abs_hash(i))
             ])
-            if i.set_curr_path():
+            if i.get_available_path():
                 real_name = os.path.basename(i.curr_path)
             else:
                 real_name = os.path.basename(i.paths[0])

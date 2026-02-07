@@ -1024,7 +1024,7 @@ class WinSettings(SingleActionWindow):
 
     def add_mf(self, mf: Mf):
         self.mf_list_copy.append(mf)
-        if mf.set_curr_path():
+        if mf.get_available_path():
             real_name = os.path.basename(mf.curr_path)
         else:
             real_name = os.path.basename(mf.paths[0])

@@ -61,7 +61,7 @@ class Mf:
         self.stop_list = stop_list
         self.curr_path: str = curr_path
             
-    def set_curr_path(self) -> str | None:
+    def get_available_path(self) -> str | None:
         """
         Проверяет и устанавливает путь к Mf.    
         Возвращает доступный путь к Mf или None

@@ -211,7 +211,7 @@ class WinMain(UMainWindow):
     @staticmethod
     def with_conn(fn):
         def wrapper(self: "WinMain", parent: QWidget, mf: Mf, *args, **kwargs):
-            if mf.set_curr_path():
+            if mf.get_available_path():
                 return fn(self, parent, mf, *args, **kwargs)
             else:
                 self.open_win_smb(parent, mf)
@@ -657,7 +657,7 @@ class WinMain(UMainWindow):
     def set_window_title(self):
         if Dynamic.current_dir is None:
             return
-        if Mf.current.set_curr_path():
+        if Mf.current.get_available_path():
             real_name = os.path.basename(Mf.current.curr_path)
         else:
             real_name = os.path.basename(Mf.current.paths[0])

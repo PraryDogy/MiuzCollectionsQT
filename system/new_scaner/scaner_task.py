@@ -38,7 +38,7 @@ class ScanerTask(URunnable):
 
     def task(self):
         for i in Mf.list_:
-            if i.set_curr_path():
+            if i.get_available_path():
                 print("scaner started", i.alias)
                 self.mf_scan(i)
                 gc.collect()
@@ -105,8 +105,6 @@ class ScanerTask(URunnable):
             self.set_flag(True)
             del_handler = RemovedDirsHandler(removed_dirs, mf)
             del_handler.run()
-
-
 
 
 class DirListScanTask(URunnable):

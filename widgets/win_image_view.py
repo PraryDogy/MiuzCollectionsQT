@@ -274,7 +274,7 @@ class WinImageView(AppModalWindow):
 
 
     def first_load(self):
-        if not Mf.current.set_curr_path():
+        if not Mf.current.get_available_path():
             self.no_connection.emit()
         self.load_thumb()
     
@@ -318,7 +318,7 @@ class WinImageView(AppModalWindow):
             t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[cfg.lng]}"
             self.show_text_label(t)
 
-        if Mf.current.set_curr_path():
+        if Mf.current.get_available_path():
             self.path = Utils.get_abs_path(Mf.current.curr_path, self.rel_path)
             self.load_image()
         else:
