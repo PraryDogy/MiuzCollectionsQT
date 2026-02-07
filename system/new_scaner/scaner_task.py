@@ -10,9 +10,8 @@ from ..lang import Lng
 from ..main_folder import Mf
 from ..tasks import URunnable
 from ..utils import Utils
-from .scaner_utils import (DirsCompator, DirsLoader, EmptyHashdirHandler,
-                           EmptyRecordRemover, NewDirsHandler,
-                           RemovedDirsHandler, RemovedMfCleaner)
+from .scaner_utils import (DirsCompator, DirsLoader, NewDirsHandler,
+                           RemovedDirsHandler)
 
 
 class ScanerTask(URunnable):
@@ -143,30 +142,3 @@ class DirListScanTask(URunnable):
 
         if del_images or new_images:
             self.sigs.reload_thumbnails.emit()
-
-
-class OnStartTask(URunnable):
-
-    class Sigs(QObject):
-        finished_ = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-        self.sigs = OnStartTask.Sigs()
-
-    def task(self):
-        try:
-            self._task()
-        except Exception as e:
-            print("OnStartTask error", e)
-
-        self.sigs.finished_.emit()
-
-    def _task(self):
-        # удаляем все файлы и данные из бД по удаленному Mf
-        mf_remover = RemovedMfCleaner()
-        mf_remover.run()
-        record_remover = EmptyRecordRemover()
-        record_remover.run()
-        empty_remover = EmptyHashdirHandler()
-        empty_remover.run()

@@ -6,7 +6,7 @@ import sqlalchemy
 from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from cfg import cfg, Static
+from cfg import Static, cfg
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
@@ -14,94 +14,6 @@ from system.shared_utils import ImgUtils
 from system.tasks import TaskState
 from system.utils import Utils
 
-
-class RemovedMfCleaner:
-
-    def __init__(self):
-        """
-        Логика такая:
-        - Пользователь в настройках приложения удаляет Mf
-        - Данные удаляются из БД, приложение перезапускается
-        - RemoveMfCleaner вызывается при перезапуске приложения
-        - Сравнивается список Mf в базе данных и список Mf в mf.json
-        Если Mf нет в базе данных, но есть в mf.json, нужно удалить все данные
-        по этой Mf:
-        - изображения thumbs из hashdir в ApplicationSupport    
-        - записи в базе данных
-        """
-        super().__init__()
-        self.conn = Dbase.engine.connect()
-
-    def run(self):
-        try:
-            return self._run()
-        except Exception as e:
-            print("new scaner utils, RemovedMainFoldeHandler", e)
-            return None
-
-    def _run(self):
-        q = sqlalchemy.select(THUMBS.c.brand).distinct()
-        db_mfs = self.conn.execute(q).scalars().all()
-        app_mfs = [i.name for i in Mf.list_]
-        del_mfs = [
-            i
-            for i in db_mfs
-            if i not in app_mfs and i is not None
-        ]
-        if del_mfs:
-            for i in del_mfs:
-                rows = self.get_rows(i)
-                self.remove_images(rows)
-                self.remove_rows(rows)
-            self.remove_dirs()
-        self.conn.close()
-        return del_mfs
-        
-    def get_rows(self, mf_name: str):
-        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash).where(
-            THUMBS.c.brand == mf_name
-        )
-        return [
-            (id_, Utils.get_abs_hash(rel_thumb_path))
-            for id_, rel_thumb_path in self.conn.execute(q).fetchall()
-        ]
-
-    def remove_images(self, rows: list):
-        """
-        rows: [(row id int, thumb path), ...]
-        """
-        for id_, image_path in rows:
-            try:
-                if os.path.exists(image_path):
-                    os.remove(image_path)
-                folder = os.path.dirname(image_path)
-                if os.path.exists(folder) and not os.listdir(folder):
-                    shutil.rmtree(folder)
-            except Exception as e:
-                print(f"new scaner utils, MfRemover, remove images error. ID: {id_}, Path: {image_path}, Error: {e}")
-                continue
-
-    def remove_rows(self, rows: list):
-        """
-        rows: [(row id int, thumb path), ...]
-        """
-        ids = [id_ for id_, _ in rows]
-        if ids:
-            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.id.in_(ids))
-            self.conn.execute(q)
-            self.conn.commit()
-
-    def remove_dirs(self):
-        q = sqlalchemy.select(DIRS.c.brand).distinct()
-        db_brands = set(self.conn.execute(q).scalars())
-        app_brands = set(i.name for i in Mf.list_)
-        to_delete = db_brands - app_brands
-
-        if to_delete:
-            del_stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand.in_(to_delete))
-            self.conn.execute(del_stmt)
-            self.conn.commit()
-        
 
 class DirsLoader(QObject):
     progress_text = pyqtSignal(str)
@@ -612,45 +524,4 @@ class RemovedDirsHandler(QObject):
             remove_thumbs(rel_dir)
             remove_dir_entry(rel_dir)
 
-        self.conn.commit()
-
-
-class EmptyHashdirHandler(QObject):
-    reload_gui = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-
-        
-    def run(self):
-        for i in os.scandir(Static.app_support_hashdir):
-            if os.path.isdir(i.path) and not os.listdir(i.path):
-                try:
-                    shutil.rmtree(i.path)
-                    self.reload_gui.emit()
-                except Exception as e:
-                    print("new scaner, empty hashdir remover", e)
-
-
-class EmptyRecordRemover(QObject):
-    def __init__(self):
-        super().__init__()
-        self.conn = Dbase.engine.connect()
-
-    def run(self):
-        try:
-            self._run()
-        except Exception as e:
-            print("EmptyRecordRemover error", e)
-
-    def _run(self):
-        stmt = (
-            sqlalchemy.delete(THUMBS).where(
-                sqlalchemy.or_(
-                    THUMBS.c.short_hash == None,
-                    THUMBS.c.short_src == None
-                )
-            )
-        )
-        self.conn.execute(stmt)
         self.conn.commit()
