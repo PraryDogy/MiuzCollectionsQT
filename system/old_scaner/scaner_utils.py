@@ -93,7 +93,7 @@ class FinderImages(QObject):
                 continue
 
         for i in os.scandir(rootdir):
-            if i.name.endswith(Static.img_extensions):
+            if i.name.endswith(ImgUtils.ext_all):
                 try:
                     file_data = self.get_file_data(i)
                     finder_images.append(file_data)
@@ -128,7 +128,7 @@ class FinderImages(QObject):
                     return finder_images
                 if entry.is_dir():
                     stack.append(entry.path)
-                elif entry.name.endswith(Static.img_extensions):
+                elif entry.name.endswith(ImgUtils.ext_all):
                     finder_images.append(self.get_file_data(entry))
         return finder_images
 

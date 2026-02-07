@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class Static:
-    app_ver = 3.98
+    app_ver = 4.01
     app_name = "Collections"
     thumbs_load_limit = 100
 
@@ -19,22 +19,6 @@ class Static:
     _preload_hashdir = f"{_preload}/{hashdir}"
     _preload_zip = f"{_preload}/hashdir.zip"
     ww, hh = 1120, 760
-
-    img_extensions = (
-        ".jpg", ".JPG", ".jpeg", ".JPEG", ".jpe", ".JPE", ".jfif", ".JFIF",
-        ".bmp", ".BMP", ".dib", ".DIB", ".webp", ".WEBP", ".ppm", ".PPM",
-        ".pgm", ".PGM", ".pbm", ".PBM", ".pnm", ".PNM", ".gif", ".GIF",
-        ".ico", ".ICO",
-        ".tif", ".TIF", ".tiff", ".TIFF",
-        ".psd", ".PSD", ".psb", ".PSB",
-        ".png", ".PNG",
-        ".nef", ".NEF", ".cr2", ".CR2", ".cr3", ".CR3", ".arw", ".ARW",
-        ".raf", ".RAF", ".dng", ".DNG", ".rw2", ".RW2", ".orf", ".ORF",
-        ".srw", ".SRW", ".pef", ".PEF", ".rwl", ".RWL", ".mos", ".MOS",
-        ".kdc", ".KDC", ".mrw", ".MRW", ".x3f", ".X3F",
-        ".avi", ".AVI", ".mp4", ".MP4", ".mov", ".MOV", ".mkv", ".MKV",
-        ".wmv", ".WMV", ".flv", ".FLV", ".webm", ".WEBM",
-    )
 
     max_img_size = 210
     spacing = 2

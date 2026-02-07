@@ -14,6 +14,7 @@ from cfg import Dynamic, Static, cfg
 from .database import DIRS, THUMBS, Dbase
 from .lang import Lng
 from .main_folder import Mf
+from .shared_utils import ImgUtils
 from .utils import Utils
 
 
@@ -164,7 +165,7 @@ class DbImagesLoader(URunnable):
             return {}
 
         for rel_path, rel_thumb_path, mod, fav in res:
-            if not rel_path.endswith(Static.img_extensions):
+            if not rel_path.endswith(ImgUtils.ext_all):
                 continue
 
             f_mod = datetime.fromtimestamp(mod).date()

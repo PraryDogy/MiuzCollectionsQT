@@ -202,7 +202,7 @@ class ImgLoader(QObject):
             for entry in os.scandir(abs_dir_path):
                 if not self.task_state.should_run():
                     return []
-                if entry.path.endswith(Static.img_extensions):
+                if entry.path.endswith(ImgUtils.ext_all):
                     try:
                         process_entry(entry)
                     except Exception as e:
