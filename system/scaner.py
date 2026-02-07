@@ -222,26 +222,26 @@ class ImgLoader:
 
 class _ImgCompator:
     def __init__(self, finder_images: dict, db_images: dict):
-        """
-        Сравнивает данные об изображениях FinderImages и DbImages.  
-        Запуск: run()
-
-        Принимает:      
-        finder_images: [(abs_path, size, birth_time, mod_time), ...]    
-        db_images:  {rel thumb path: (abs img path, size, birth time, mod time), ...}
-
-        Возвращает:
-        del_items: [rel thumb path, ...]    
-        new_items: [(abs path, size, birth, mod), ...]
-        """
         super().__init__()
         self.finder_images = finder_images
         self.db_images = db_images
 
-    def run(self):
-        finder_set = set(self.finder_images)
-        db_values = set(self.db_images.values())
-        del_items = [k for k, v in self.db_images.items() if v not in finder_set]
+    @staticmethod
+    def start(finder_images: list, db_images: dict):
+        """
+        Сравнивает данные об изображениях из Finder и базы данных.  
+        Получить данные об изображениях необходимо из ImgLoader.    
+        Параметры:      
+        - finder_images: [(abs_path, size, birth_time, mod_time), ...]    
+        - db_images:  {rel thumb path: (abs img path, size, birth time, mod time), ...}
+
+        Возвращает:
+        - изображения, которых больше нет в Finder но есть в базе данных [rel thumb path, ...]
+        - изображения, которых нет в базе данных, но есть в Finder [(abs path, size, birth, mod), ...]
+        """
+        finder_set = set(finder_images)
+        db_values = set(db_images.values())
+        del_items = [k for k, v in db_images.items() if v not in finder_set]
         ins_items = list(finder_set - db_values)
         return del_items, ins_items
 
