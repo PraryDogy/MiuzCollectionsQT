@@ -66,29 +66,10 @@ class Dbase:
                     }
                     )
             METADATA.create_all(engine)
-            conn = engine.connect()
-            check = cls.check_table(DIRS, conn)
-            if not check:
-                DIRS.drop(engine)
-                METADATA.create_all(engine)
-            conn.close()
             return engine
         else:
             t = "Нет пользовательского файла DB_FILE"
             raise Exception(t)
-            return None
-        
-    @classmethod
-    def check_table(cls, table: sqlalchemy.Table, conn: sqlalchemy.Connection) -> bool:
-        try:
-            if not cls.engine.dialect.has_table(conn, table.name):
-                return False
-            q = sqlalchemy.select(table)
-            conn.execute(q).first()
-            return True
-        except Exception as e:
-            Utils.print_error()
-            return False
         
     @classmethod
     def toggle_wal(cls, value: bool):

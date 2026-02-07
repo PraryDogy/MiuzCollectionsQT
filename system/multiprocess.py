@@ -6,7 +6,7 @@ from pathlib import Path
 from time import sleep
 
 import sqlalchemy
-from database import Dbase
+from .database import Dbase
 
 from cfg import Static, cfg
 
