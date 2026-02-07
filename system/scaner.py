@@ -221,10 +221,6 @@ class ImgLoader:
 
 
 class _ImgCompator:
-    def __init__(self, finder_images: dict, db_images: dict):
-        super().__init__()
-        self.finder_images = finder_images
-        self.db_images = db_images
 
     @staticmethod
     def start(finder_images: list, db_images: dict):
@@ -233,7 +229,7 @@ class _ImgCompator:
         Получить данные об изображениях необходимо из ImgLoader.    
         Параметры:      
         - finder_images: [(abs_path, size, birth_time, mod_time), ...]    
-        - db_images:  {rel thumb path: (abs img path, size, birth time, mod time), ...}
+        - db_images: {rel thumb path: (abs img path, size, birth time, mod time), ...}
 
         Возвращает:
         - изображения, которых больше нет в Finder но есть в базе данных [rel thumb path, ...]
@@ -241,103 +237,96 @@ class _ImgCompator:
         """
         finder_set = set(finder_images)
         db_values = set(db_images.values())
-        del_items = [k for k, v in db_images.items() if v not in finder_set]
-        ins_items = list(finder_set - db_values)
-        return del_items, ins_items
+        del_images = [k for k, v in db_images.items() if v not in finder_set]
+        new_images = list(finder_set - db_values)
+        return del_images, new_images
 
 
-class _ImgHashdirUpdater(QObject):
-    progress_text = pyqtSignal(str)
-    def __init__(self, del_items: list, new_items: list, task_state: TaskState, mf: Mf):
+class HashdirUpdater(QObject):
+ 
+    @staticmethod
+    def start(scaner_item: ScanerItem, q: Queue, del_images: list, new_images: list):
         """
-        Удаляет thumbs из hashdir, добавляет thumbs в hashdir.  
-        Запуск: run()   
-        Сигналы: progress_text(str)
-        
-        Принимает:  
-        del_items: [rel_thumb_path, ...]    
-        new_items: [(path, size, birth, mod), ...]  
+        - Удаляет из "hashdir" изображения, которых больше нет в Finder.
+        - Добавляет изображения, которые есть в Finder, в "hashdir".
+        - Возвращает список успешно удаленных и список успешно добавленных изображений.
+        - Далее необходимо обновить информацию в базе данных на основе полученных списков.
 
+        Получить данные del_images и new_images необходимо из ImaCompator.  
+        Параметры:  
+        - del_images [rel thumb path, ...]
+        - new_images [(abs path, size, birth, mod), ...]
 
         Возвращает:     
-        del_items: [rel_thumb_path, ...]    
-        new_items: [(path, size, birth, mod), ...]  
+        - успешно удаленные из "hashdir" [rel_thumb_path, ...]    
+        - успешно добавленные в "hashdir" [(abs path, size, birth, mod), ...]
         """
-        super().__init__()
-        self.del_items = del_items
-        self.new_items = new_items
-        self.task_state = task_state
-        self.mf = mf
-        self.total = len(new_items) + len(del_items)
-        if mf.curr_path:
-            self.true_name = os.path.basename(mf.curr_path)
-        else:
-            self.true_name = os.path.basename(mf.paths[0])
-        self.alias = mf.alias
-
-    def run(self) -> tuple[list, list]:
-        """
-        Возвращает:     
-        del_items: [rel_thumb_path, ...]    
-        new_items: [(path, size, birth, mod), ...]  
-        """
-        if not self.task_state.should_run():
+        if scaner_item.stop_task:
             return ([], [])
-        del_items = self.run_del_items()
+        scaner_item.total_count = len(del_images) + len(new_images)
+        new_del_images = HashdirUpdater.run_del_images(scaner_item, q, del_images)
         new_items = self.run_new_items()
-        return del_items, new_items
+        return del_images, new_items
 
-    def run_del_items(self):
-        new_del_items = []
-        for rel_thumb_path in self.del_items:
-            if not self.task_state.should_run():
-                break
+    @staticmethod
+    def run_del_images(scaner_item: ScanerItem, q: Queue, del_images: list):
+        """
+        Пытается удалить изображения из "hashdir" и пустые папки.   
+        Возвращает список успешно удаленных изображений.
+        """
+        new_del_images = []
+        for rel_thumb_path in del_images:
+            if scaner_item.stop_task:
+                return new_del_images
             thumb_path = Utils.get_abs_hash(rel_thumb_path)
             if os.path.exists(thumb_path):
                 try:
                     os.remove(thumb_path)
                     folder = os.path.dirname(thumb_path)
                     if not os.listdir(folder):
-                        os.rmdir(folder)
-                    new_del_items.append(rel_thumb_path)
-                    self.total -= 1
-                    self.send_text()
+                        shutil.rmtree(folder)
                 except Exception as e:
                     print("new scaner utils, hashdir updater, remove img error", e)
                     continue
-        return new_del_items
-    
-    def send_text(self):
-        self.progress_text.emit(
-            f"{self.true_name} ({self.alias}): {Lng.updating[cfg.lng].lower()} ({self.total})"
-            )
+                new_del_images.append(rel_thumb_path)
+                # посылает текст в гуи
+                # Имя папки (псевдоним): обновление (оставшееся число)
+                scaner_item.total_count -= 1
+                text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.updating[cfg.lng].lower()} ({scaner_item.total_count})"
+                scaner_item.gui_text = text
+                q.put(scaner_item)
+        return new_del_images
 
-    def create_thumb(self, path: str) -> ndarray | None:
+    @staticmethod
+    def create_thumb(path: str) -> ndarray | None:
         img = ImgUtils.read_img(path)
         thumb = Utils.fit_to_thumb(img, Static.max_img_size)
-        del img
-        gc.collect()
-        if isinstance(thumb, ndarray):
+        if thumb is not None:
             return thumb
         else:
             return None
 
-    def run_new_items(self):
-        new_new_items = []
-        for path, size, birth, mod in self.new_items:
-            if not self.task_state.should_run():
-                break
+    @staticmethod
+    def run_new_items(scaner_item: ScanerItem, q: Queue, new_images: list):
+        """
+        Пытается создать изображения в "hashdir".     
+        Возвращает список успешно созданных изображений.
+        """
+        new_new_images = []
+        for path, size, birth, mod in new_images:
+            if scaner_item.stop_task:
+                return new_new_images
             try:
                 thumb = self.create_thumb(path)
                 thumb_path = Utils.create_abs_hash(path)
                 Utils.write_thumb(thumb_path, thumb)
-                new_new_items.append((path, size, birth, mod))
+                new_new_images.append((path, size, birth, mod))
                 self.total -= 1
                 self.send_text()
             except Exception as e:
                 print("new scaner utils, hashdir updater, create new img error", e)
                 continue
-        return new_new_items
+        return new_new_images
 
 
 class _ImgDbUpdater:

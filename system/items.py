@@ -80,3 +80,5 @@ class ScanerItem:
             self.mf_real_name = os.path.basename(mf.curr_path)
         else:
             self.mf_real_name = os.path.basename(mf.paths[0])
+        
+        self.current_count = 0
