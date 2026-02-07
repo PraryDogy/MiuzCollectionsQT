@@ -324,6 +324,6 @@ class OnStartTask:
     @staticmethod
     def start(q: Queue):
         engine = Dbase.create_engine()
-        _DeletedMfRemover.start(engine, q)
+        # _DeletedMfRemover.start(engine, q)
         _EmptyRecordsRemover.start(engine, q)
         _EmptyHashdirRemover.start(q)

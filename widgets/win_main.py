@@ -218,14 +218,12 @@ class WinMain(UMainWindow):
     
     def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):
 
-        def start_scaner_task():
-            if argv[-1] != "noscan":
-                self.start_scaner_task()
-
         def poll_task():
             self.on_start_timer.stop()
             if not self.on_start_task.is_alive():
                 self.on_start_task.terminate()
+                if argv[-1] != "noscan":
+                    self.start_scaner_task()
             else:
                 self.on_start_timer.start(ms)
 
