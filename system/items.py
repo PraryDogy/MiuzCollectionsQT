@@ -1,3 +1,4 @@
+from time import time
 from typing import Literal
 
 import numpy as np
@@ -63,3 +64,19 @@ class OnStartItem:
     def __init__(self, mf_list: list[Mf]):
         super().__init__()
         self.mf_list = mf_list
+
+
+class ScanerItem:
+    def __init__(self, mf: Mf):
+        """
+        Хранит состояние активности ScanerTask.
+
+        self.time должен обновляться при каждой итерации ScanerTask.
+        По разнице time.time() - self.time определяется время неактивности задачи.
+
+        Если разница превышает заданный порог (например, 5 минут),
+        считается, что ScanerTask завис и его можно безопасно прервать.
+        """
+        super().__init__()
+        self.mf = mf
+        self.time = time()
