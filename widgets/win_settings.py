@@ -758,8 +758,8 @@ class NewFolder(QGroupBox):
         btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def preset_new_folder(self, url: str):
-        name = os.path.basename(url)
-        self.name_label.setText(name)
+        # name = os.path.basename(url)
+        # self.name_label.setText(name)
         text_edit = self.findChildren(DropableGroupBox)[0].text_edit
         text_edit.setPlainText(url)
 
