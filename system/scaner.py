@@ -151,73 +151,54 @@ class DirsUpdater:
         conn.close()
 
 
-class ImgLoader(QObject):
-    progress_text = pyqtSignal(str)
+class ImgLoader:
 
-    def __init__(self, dirs_to_scan: list[str, int], mf: Mf, task_state: TaskState):
-        """
-        dirs_to_scan: [(rel dir path, int modified time), ...]
-        """
-        super().__init__()
-        self.dirs_to_scan = dirs_to_scan
-        self.mf = mf
-        self.mf_path = mf.curr_path
-        self.task_state = task_state
-        if mf.curr_path:
-            self.true_name = os.path.basename(mf.curr_path)
-        else:
-            self.true_name = os.path.basename(mf.paths[0])
-        self.alias = mf.alias
-
-    def finder_images(self) -> list[tuple]:
+    @staticmethod
+    def get_finder_images(scaner_item: ScanerItem, q: Queue, dirs_to_scan: list):
         """
         Параметры:
-        - new_dirs: [(rel_dir_path, mod_time), ...]
+        - dirs_to_scan: [(rel_dir_path, mod_time), ...]
 
-        Возвращает изображения в указанных директориях:
+        Получает и возвращает список изображений из указанных директорий:
         - [(abs_path, size, birth_time, mod_time), ...]    
         """
-
-        self.progress_text.emit(
-            f"{self.true_name} ({self.alias}): {Lng.search[cfg.lng].lower()}"
-        )
+        # передает в гуи текст
+        # имя папки (псевдоним): поиск
+        text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search[cfg.lng].lower()}"
+        scaner_item.gui_text = text
+        q.put(scaner_item)
         finder_images = []
-
-        def process_entry(entry: os.DirEntry):
-            abs_path = entry.path
-            stats = entry.stat()
-            size = int(stats.st_size)
-            birth = int(stats.st_birthtime)
-            mod = int(stats.st_mtime)
-            finder_images.append((abs_path, size, birth, mod))
-
-        for rel_dir_path, mod in self.dirs_to_scan:
-            abs_dir_path = Utils.get_abs_path(self.mf_path, rel_dir_path)
+        for rel_dir_path, _ in dirs_to_scan:
+            abs_dir_path = Utils.get_abs_path(scaner_item.mf.curr_path, rel_dir_path)
             for entry in os.scandir(abs_dir_path):
-                if not self.task_state.should_run():
+                # если где то ранее был включен флаг то возвращаем пустой список
+                if scaner_item.stop_task:
                     return []
                 if entry.path.endswith(ImgUtils.ext_all):
+                    # если нет доступа к изображению, то продолжить
                     try:
-                        process_entry(entry)
+                        stat = entry.stat()
                     except Exception as e:
                         print("new scaner utils, img loader, finder images, error", e)
-                        self.task_state.set_should_run(False)
-                        break
-
-        # print(self.mf.name, len(finder_images))
+                        continue
+                    size = int(stat.st_size)
+                    birth = int(stat.st_birthtime)
+                    mod = int(stat.st_mtime)
+                    finder_images.append((entry.path, size, birth, mod))
         return finder_images
 
-    def db_images(self) -> list[tuple]:
+    @staticmethod
+    def db_images(scaner_item: ScanerItem, dirs_to_scan: list):
         """
         Параметры:
-        - new_dirs: [(rel_dir_path, mod_time), ...]
+        - dirs_to_scan: [(rel_dir_path, mod_time), ...]
 
-        Возвращает изображения в указанных директориях:
+        Получает и возвращает информацию об изображениях в базе данных из указанных директорий:
         - {rel_thumb_path: (abs_path, size, birth, mod), ...}  
         """
-        conn = Dbase.engine.connect()
+        conn = scaner_item.engine.connect()
         db_images: dict = {}
-        for rel_dir_path, mod in self.dirs_to_scan:
+        for rel_dir_path, mod in dirs_to_scan:
             q = sqlalchemy.select(
                 THUMBS.c.short_hash, # rel thumb path
                 THUMBS.c.short_src,
@@ -225,7 +206,7 @@ class ImgLoader(QObject):
                 THUMBS.c.birth,
                 THUMBS.c.mod
                 )
-            q = q.where(THUMBS.c.brand == self.mf.alias)
+            q = q.where(THUMBS.c.brand == scaner_item.mf_alias)
             if rel_dir_path == "/":
                 q = q.where(THUMBS.c.short_src.ilike("/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"/%/%"))
@@ -233,7 +214,7 @@ class ImgLoader(QObject):
                 q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
-                abs_path = Utils.get_abs_path(self.mf_path, rel_path)
+                abs_path = Utils.get_abs_path(scaner_item.mf.curr_path, rel_path)
                 db_images[rel_thumb_path] = (abs_path, size, birth, mod)
         conn.close()
         return db_images
@@ -525,26 +506,16 @@ class RemovedDirsHandler(QObject):
 
 
 class ScanerTask:
-
-    class Sigs(QObject):
-        finished_ = pyqtSignal()
-        progress_text = pyqtSignal(str)
-        reload_thumbnails = pyqtSignal()
-        reload_menu = pyqtSignal()
-
-    short_timer = 15000
-    long_timer = cfg.scaner_minutes * 60 * 1000
-
-    def __init__(self):
-        """
-        Сигналы: finished_, progress_text(str), reload_gui, remove_all_win(MainWin)
-        """
-        super().__init__()
-        self.sigs = ScanerTask.Sigs()
-        self.pause_flag = False
-        self.user_canceled_scan = False
-        self.reload_gui_flag = False
-        print("Выбран новый сканер")
+    """
+    Что на счет проверки на таймаут сканера (если он завис)
+    Если сканер завис, он перестанет посылать q.put в основной гуи
+    И мы не сможем текущим методом сравнить время в ScanerItem и время в гуи
+    Нужно задать время в основном гуи и обнулять его каждый раз, когда получает ScanerItem
+    Но тогда нужно регулярно отправлять ScanerItem, чтобы обнулять время
+    А это может не подойти, так как ScanerItem обновляет gui_text
+    С другой стороны можно не париться и обновлять gui_text при каждом q.put
+    Потому что мы будем делать poll_task например раз в 1-2 секунды
+    """
 
     @staticmethod
     def start(mf_list: list[Mf], q: Queue):
