@@ -265,7 +265,7 @@ class HashdirUpdater(QObject):
             return ([], [])
         scaner_item.total_count = len(del_images) + len(new_images)
         new_del_images = HashdirUpdater.run_del_images(scaner_item, q, del_images)
-        new_items = self.run_new_items()
+        new_items = HashdirUpdater.run_new_images(scaner_item, q, new_images)
         return del_images, new_items
 
     @staticmethod
@@ -289,25 +289,12 @@ class HashdirUpdater(QObject):
                     print("new scaner utils, hashdir updater, remove img error", e)
                     continue
                 new_del_images.append(rel_thumb_path)
-                # посылает текст в гуи
-                # Имя папки (псевдоним): обновление (оставшееся число)
                 scaner_item.total_count -= 1
-                text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.updating[cfg.lng].lower()} ({scaner_item.total_count})"
-                scaner_item.gui_text = text
-                q.put(scaner_item)
+                HashdirUpdater.send_text(scaner_item, q)
         return new_del_images
 
     @staticmethod
-    def create_thumb(path: str) -> ndarray | None:
-        img = ImgUtils.read_img(path)
-        thumb = Utils.fit_to_thumb(img, Static.max_img_size)
-        if thumb is not None:
-            return thumb
-        else:
-            return None
-
-    @staticmethod
-    def run_new_items(scaner_item: ScanerItem, q: Queue, new_images: list):
+    def run_new_images(scaner_item: ScanerItem, q: Queue, new_images: list):
         """
         Пытается создать изображения в "hashdir".     
         Возвращает список успешно созданных изображений.
@@ -316,17 +303,34 @@ class HashdirUpdater(QObject):
         for path, size, birth, mod in new_images:
             if scaner_item.stop_task:
                 return new_new_images
-            try:
-                thumb = self.create_thumb(path)
-                thumb_path = Utils.create_abs_hash(path)
-                Utils.write_thumb(thumb_path, thumb)
-                new_new_images.append((path, size, birth, mod))
-                self.total -= 1
-                self.send_text()
-            except Exception as e:
-                print("new scaner utils, hashdir updater, create new img error", e)
-                continue
+            img = ImgUtils.read_img(path)
+            img = Utils.fit_to_thumb(img, Static.max_img_size)
+            if img is not None:
+                try:
+                    thumb_path = Utils.create_abs_hash(path)
+                    Utils.write_thumb(thumb_path, img)
+                    new_new_images.append((path, size, birth, mod))
+                    scaner_item.total_count -= 1
+                    HashdirUpdater.send_text(scaner_item, q)
+                except Exception as e:
+                    print("new scaner utils, hashdir updater, create new img error", e)
+                    continue
         return new_new_images
+
+    @staticmethod
+    def send_text(scaner_item: ScanerItem, q: Queue):
+        """
+        Посылает текст в гуи.   
+        Имя папки (псевдоним): обновление (оставшееся число)
+        """
+        text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.updating[cfg.lng].lower()} ({scaner_item.total_count})"
+        scaner_item.gui_text = text
+        q.put(scaner_item)
+
+    @staticmethod
+    def create_thumb(path: str) -> ndarray | None:
+        img = ImgUtils.read_img(path)
+        img = Utils.fit_to_thumb(img, Static.max_img_size)
 
 
 class _ImgDbUpdater:
