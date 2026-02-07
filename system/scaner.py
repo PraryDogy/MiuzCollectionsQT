@@ -28,6 +28,7 @@ class DirsManager:
         """
         dirs = []
         stack = [scaner_item.mf.curr_path]
+        # отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
         scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
         q.put(scaner_item)
@@ -552,12 +553,16 @@ class ScanerTask:
                 gc.collect()
                 print("scaner finished", scaner_item.mf_alias)
             else:
+                # Отправляем текст в гуи что нет подключения к папке
                 # Имя папки (псевдоним): нет подключения
                 no_conn = Lng.no_connection[cfg.lng].lower()
                 text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {no_conn}"
+                scaner_item.gui_text = text
                 q.put(scaner_item)
                 print("scaner no connection", scaner_item.mf_real_name, scaner_item.mf_alias)
                 sleep(5)
+            # после работы с очередной папкой отправляем айтем в гуи, чтобы перезагрузить гуи
+            # флаг reload gui устанавливается на false в основном гуи после перезагрузки гуи
             if scaner_item.reload_gui:
                 q.put(scaner_item)
         engine.dispose()
