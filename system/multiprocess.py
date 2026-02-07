@@ -220,14 +220,12 @@ class _DeletedMfRemover:
             if i not in json_mf_list and i is not None
         ]
 
-        print(removed_mf_list)
-
-        # if removed_mf_list:
-        #     for i in removed_mf_list:
-        #         rows = _DeletedMfRemover.get_rows(i, conn)
-        #         _DeletedMfRemover.remove_images(rows)
-        #         _DeletedMfRemover.remove_rows(rows, conn)
-        #     _DeletedMfRemover.remove_dirs(conn)
+        if removed_mf_list:
+            for i in removed_mf_list:
+                rows = _DeletedMfRemover.get_rows(i, conn)
+                _DeletedMfRemover.remove_images(rows)
+                _DeletedMfRemover.remove_rows(rows, conn)
+            _DeletedMfRemover.remove_dirs(conn)
         conn.close()
         q.put(removed_mf_list)
     
