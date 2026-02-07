@@ -6,11 +6,10 @@ from pathlib import Path
 from time import sleep
 
 import sqlalchemy
-from .database import Dbase
 
 from cfg import Static, cfg
 
-from .database import DIRS, THUMBS
+from .database import DIRS, THUMBS, Dbase
 from .items import CopyTaskItem, OneFileInfoItem, ReadImgItem
 from .lang import Lng
 from .main_folder import Mf
