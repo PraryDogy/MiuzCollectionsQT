@@ -36,18 +36,19 @@ class DirsManager:
         while stack:
             current = stack.pop()
             for entry in os.scandir(current):
-                if scaner_item.stop_task:
-                    break
                 try:
-                    if entry.is_dir() and entry.name not in scaner_item.mf.stop_list:
-                        stack.append(entry.path)
-                        rel_path = Utils.get_rel_path(scaner_item.mf.curr_path, entry.path)
-                        stats = entry.stat()
-                        mod = int(stats.st_mtime)
-                        dirs.append((rel_path, mod))
+                    stmt = entry.is_dir() and entry.name not in scaner_item.mf.stop_list
                 except Exception as e:
                     print("new scaner utils, dirs loader, finder dirs error", e)
                     scaner_item.stop_task = True
+                    break
+                if stmt:
+                    stack.append(entry.path)
+                    rel_path = Utils.get_rel_path(scaner_item.mf.curr_path, entry.path)
+                    stats = entry.stat()
+                    mod = int(stats.st_mtime)
+                    dirs.append((rel_path, mod))
+
         try:
             stats = os.stat(scaner_item.mf.curr_path)
             data = (os.sep, int(stats.st_mtime))
