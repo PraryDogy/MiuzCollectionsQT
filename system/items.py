@@ -69,18 +69,8 @@ class OnStartItem:
 
 class ScanerItem:
     def __init__(self, mf: Mf, engine: sqlalchemy.Engine):
-        """
-        Хранит состояние активности ScanerTask.
-
-        self.time должен обновляться при каждой итерации ScanerTask.
-        По разнице time.time() - self.time определяется время неактивности задачи.
-
-        Если разница превышает заданный порог (например, 5 минут),
-        считается, что ScanerTask завис и его можно безопасно прервать.
-        """
         super().__init__()
         self.engine = engine
-        self.time = time()
         self.gui_text: str = "gui_text"
         self.stop_task = False
         self.reload_gui = False
