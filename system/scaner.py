@@ -24,9 +24,10 @@ class DirsManager:
     @staticmethod
     def get_finder_dirs(scaner_item: ScanerItem, q: Queue):
         """
-        Возвращает [(rel_dir_path, mod_time), ...]
+        Возвращает директории [(rel_dir_path, mod_time), ...]
+        - которые есть в директории (Mf.curr_path)
+        - которых нет в стоп листе Mf.stop_list
         """
-
         # отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
         scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
@@ -60,7 +61,8 @@ class DirsManager:
     @staticmethod
     def get_db_dirs(scaner_item: ScanerItem):
         """
-        Возвращает [(rel_dir_path, mod_time), ...]
+        Возвращает директории [(rel_dir_path, mod_time), ...]
+        - которые есть в базе данных и соответствуют псевдониму Mf
         """
         conn = scaner_item.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
@@ -72,6 +74,7 @@ class DirsManager:
 
 
 class DirsCompator:
+
     @staticmethod
     def get_dirs_to_remove(finder_dirs: list, db_dirs: list):
         """
@@ -79,8 +82,9 @@ class DirsCompator:
         - finder_dirs: [(rel_dir_path, mod_time), ...]
         - db_dirs: [(rel_dir_path, mod_time), ...]
 
-        Возвращает директории Finder, которые были удалены:
-        - [(rel_dir_path, mod_time), ...]
+        Возвращает директории [(rel_dir_path, mod_time), ...]
+        - которых больше нет в Finder, но есть в базе данных
+        - которые нужно удалить из базы данных
         """
         finder_paths = [rel_path for rel_path, _ in finder_dirs]
         return [
@@ -96,8 +100,9 @@ class DirsCompator:
         - finder_dirs: [(rel_dir_path, mod_time), ...]
         - db_dirs: [(rel_dir_path, mod_time), ...]
 
-        Возвращает директории Finder, которые необходимо просканировать
-        - [(rel_dir_path, mod_time), ...]
+        Возвращает директории [(rel_dir_path, mod_time), ...]
+        - которые есть в Finder, но нет в базе данных
+        - которые нужно добавить в базу данных
         """
         return [
             (rel_dir_path, int(mod))
@@ -428,9 +433,12 @@ class NewDirsHandler(QObject):
         self.mf = mf
         self.task_state = task_state
     
-    def run(self):
-        img_loader = ImgLoader(self.dirs_to_scan, self.mf, self.task_state)
-        img_loader.progress_text.connect(self.progress_text.emit)
+    @staticmethod
+    def start(new_dirs: list, scaner_item: ScanerItem, q: Queue):
+        """
+        new_dirs: [(rel dir path, int modified time), ...]
+        """
+        img_loader = ImgLoader(new_dirs, scaner_item)
         finder_images = img_loader.finder_images()
         db_images = img_loader.db_images()
         if not self.task_state.should_run():
@@ -590,13 +598,10 @@ class ScanerTask:
         
         # обходим новые директории, добавляем / удаляем изображения
         if new_dirs:
-            self.set_flag(True)
-            scan_dirs = NewDirsHandler(new_dirs, mf, self.task_state)
-            scan_dirs.progress_text.connect(self.sigs.progress_text.emit)
+            scan_dirs = NewDirsHandler(new_dirs, scaner_item)
             scan_dirs.run()
         
         # удаляем удаленные Finder директории
         if removed_dirs:
-            self.set_flag(True)
             del_handler = RemovedDirsHandler(removed_dirs, mf)
             del_handler.run()
