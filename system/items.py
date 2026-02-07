@@ -1,7 +1,7 @@
 import os
 from time import time
 from typing import Literal
-
+import sqlalchemy
 import numpy as np
 
 from .main_folder import Mf
@@ -68,7 +68,7 @@ class OnStartItem:
 
 
 class ScanerItem:
-    def __init__(self, mf: Mf):
+    def __init__(self, mf: Mf, engine: sqlalchemy.Engine):
         """
         Хранит состояние активности ScanerTask.
 
@@ -79,12 +79,14 @@ class ScanerItem:
         считается, что ScanerTask завис и его можно безопасно прервать.
         """
         super().__init__()
+        self.engine = engine
         self.time = time()
         self.gui_text: str = "gui_text"
         self.stop_task = False
+        self.reload_gui = False
         self.mf = mf
         self.mf_alias = mf.alias
         if mf.curr_path:
-            self.mf_name = os.path.basename(mf.curr_path)
+            self.mf_real_name = os.path.basename(mf.curr_path)
         else:
-            self.mf_name = os.path.basename(mf.paths[0])
+            self.mf_real_name = os.path.basename(mf.paths[0])

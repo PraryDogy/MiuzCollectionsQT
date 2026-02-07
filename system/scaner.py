@@ -2,6 +2,7 @@ import gc
 import os
 import shutil
 from multiprocessing import Queue
+from time import sleep
 
 import sqlalchemy
 from numpy import ndarray
@@ -19,19 +20,8 @@ from .items import ScanerItem
 
 
 class DirsManager:
-    progress_text = pyqtSignal(str)
 
-    def __init__(self, mf: Mf, task_state: TaskState):
-        super().__init__()
-        self.mf = mf
-        self.mf_path = mf.curr_path
-        self.task_state = task_state
-        if mf.curr_path:
-            self.true_name = os.path.basename(mf.curr_path)
-        else:
-            self.true_name = os.path.basename(mf.paths[0])
-        self.alias = mf.alias
-
+    @staticmethod
     def get_finder_dirs(scaner_item: ScanerItem, q: Queue):
         """
         Возвращает [(rel_dir_path, mod_time), ...]
@@ -39,7 +29,7 @@ class DirsManager:
         dirs = []
         stack = [scaner_item.mf.curr_path]
         # gui_text: Имя папки (псевдоним папки): поиск в папке
-        scaner_item.gui_text = f"{scaner_item.mf_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
+        scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
         q.put(scaner_item)
         
         def iter_dir(entry: os.DirEntry):
@@ -70,13 +60,14 @@ class DirsManager:
             print("new scaner dirs loader finder dirs error add root dir", e)
         return dirs
 
-    def get_db_dirs(self):
+    @staticmethod
+    def get_db_dirs(scaner_item: ScanerItem):
         """
         Возвращает [(rel_dir_path, mod_time), ...]
         """
-        conn = Dbase.engine.connect()
+        conn = scaner_item.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
-            DIRS.c.brand == self.mf.alias
+            DIRS.c.brand == scaner_item.mf_alias
         )
         res = [(short_src, mod) for short_src, mod in conn.execute(q)]
         conn.close()
@@ -549,55 +540,43 @@ class ScanerTask:
         self.reload_gui_flag = False
         print("Выбран новый сканер")
 
+    @staticmethod
     def start(mf_list: list[Mf], q: Queue):
+        engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
-            scaner_item = ScanerItem(mf)
-            if mf.get_available_path():
-                print("scaner started", i.alias)
-                self.mf_scan(i)
+            scaner_item = ScanerItem(mf, engine)
+            if scaner_item.mf.get_available_path():
+                print("scaner started", scaner_item.mf_alias)
+                ScanerTask.mf_scan(scaner_item, q)
                 gc.collect()
-                print("scaner finished", i.alias)
+                print("scaner finished", scaner_item.mf_alias)
             else:
-                if i.curr_path:
-                    true_name = os.path.basename(i.curr_path)
-                else:
-                    true_name = os.path.basename(i.paths[0])
-                alias = i.alias
+                # Имя папки (псевдоним): нет подключения
                 no_conn = Lng.no_connection[cfg.lng].lower()
-                self.sigs.progress_text.emit(f"{true_name} ({alias}): {no_conn}")
-                print("scaner no connection", true_name, alias)
+                text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {no_conn}"
+                q.put(scaner_item)
+                print("scaner no connection", scaner_item.mf_real_name, scaner_item.mf_alias)
                 sleep(5)
-            try:
-                if self.reload_gui_flag:
-                    self.set_flag(False)
-                    self.sigs.reload_menu.emit()
-                    self.sigs.reload_thumbnails.emit()
-            except RuntimeError as e:
-                print("new scaner task error:", e)
+            if scaner_item.reload_gui:
+                q.put(scaner_item)
+        engine.dispose()
+        # в маин гуи if not ScanerTask.is_alive(): устанавливай прогресс текст на пустышку
+
+    @staticmethod
+    def mf_scan(scaner_item: ScanerItem, q: Queue):
         try:
-            self.sigs.progress_text.emit("")
-            self.sigs.finished_.emit()
-        except RuntimeError as e:
-            ...
+            ScanerTask._mf_scan(scaner_item, q)
+        except Exception as e:
+            print("scaner, main folder scan error", scaner_item.mf_real_name, scaner_item.mf_alias, e)
 
-    def set_flag(self, value: bool):
-        self.reload_gui_flag = value
-
-    def mf_scan(self, mf: Mf):
-        try:
-            self._mf_scan(mf)
-        except (Exception, AttributeError) as e:
-            print("new scaner task, main folder scan error", e)
-
-    def _mf_scan(self, mf: Mf):
+    @staticmethod
+    def _mf_scan(scaner_item: ScanerItem, q: Queue):
         # собираем Finder директории и директории из БД
-        dirs_loader = DirsLoader(mf, self.task_state)
-        dirs_loader.progress_text.connect(self.sigs.progress_text.emit)
-        finder_dirs = dirs_loader.finder_dirs()
-        db_dirs = dirs_loader.db_dirs()
-        if not finder_dirs or not self.task_state.should_run():
-            print(mf.alias, "no finder dirs")
+        finder_dirs = DirsManager.get_finder_dirs(scaner_item, q)
+        db_dirs = DirsManager.get_db_dirs(scaner_item)
+        if not finder_dirs or scaner_item.stop_task:
+            print(scaner_item.mf_alias, "no finder dirs")
             return
 
         # сравниваем кортежи (директория, дата изменения)
