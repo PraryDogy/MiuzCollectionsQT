@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 import sqlalchemy
 
@@ -7,17 +8,18 @@ from system.utils import Utils
 
 METADATA = sqlalchemy.MetaData()
 
+
 class ClmNames:
-    id = "id"
-    short_src = "short_src"
-    short_hash = "short_hash"
-    size = "size"
-    birth = "birth"
-    mod = "mod"
-    resol = "resol"
-    coll = "coll"
-    fav = "fav"
-    brand = "brand"
+    id: Literal["id"] = "id"
+    short_src: Literal["short_src"] = "short_src"
+    short_hash: Literal["short_hash"] = "short_hash"
+    size: Literal["size"] = "size"
+    birth: Literal["birth"] = "birth"
+    mod: Literal["mod"] = "mod"
+    resol: Literal["resol"] = "resol"
+    coll: Literal["coll"] = "coll"
+    fav: Literal["fav"] = "fav"
+    brand: Literal["brand"] = "brand"
 
 
 THUMBS = sqlalchemy.Table(
@@ -31,7 +33,7 @@ THUMBS = sqlalchemy.Table(
     sqlalchemy.Column(ClmNames.resol, sqlalchemy.Text, comment="более не используется"),
     sqlalchemy.Column(ClmNames.coll, sqlalchemy.Text, comment="более не используется"),
     sqlalchemy.Column(ClmNames.fav, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text, comment="Mf.name (смотри system > main_folder)"),
+    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text, comment="Mf.alias (смотри system > main_folder)"),
 )
 
 DIRS = sqlalchemy.Table(

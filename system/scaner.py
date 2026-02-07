@@ -112,42 +112,43 @@ class DirsCompator:
 
 
 class DirsUpdater:
-    def __init__(self, mf: Mf, dirs_to_scan: list[str]):
-        """
-        - dirs_to_scan: [(rel_dir_path, mod_time), ...]
-        """
-        super().__init__()
-        self.mf = mf
-        self.dirs_to_scan = dirs_to_scan
-        self.conn = Dbase.engine.connect()
-        
-    def run(self):
-        self.update_dirs()
-        self.conn.close()
 
-    def update_dirs(self):
+    @staticmethod
+    def start(scaner_item: ScanerItem, dirs_to_scan: list):
+        """
+        Параметры:
+        - dirs_to_scan: [(rel dir path, int modified time), ...]
+
+        Запускается только после работы с изображениями:
+        - добавить / удалить изображения из базы данных THUMBS
+        - добавить / удалить изображения из кэша hashdir
+        - удаляет записи из DIRS, которые соответствуют Mf.alias
+        - добавляет записи в DIRS, которые соответствуют Mf.alias
+        - по сути это замена sqlalchemy.update
+        """
         # удалить старые записи
-        short_paths = [short_src for short_src, _ in self.dirs_to_scan]
+        conn = scaner_item.engine.connect()
+        short_paths = [short_src for short_src, _ in dirs_to_scan]
         if short_paths:
             del_stmt = sqlalchemy.delete(DIRS).where(
                 DIRS.c.short_src.in_(short_paths),
-                DIRS.c.brand == self.mf.alias
+                DIRS.c.brand == scaner_item.mf_alias
             )
-            self.conn.execute(del_stmt)
+            conn.execute(del_stmt)
 
         # вставить новые записи батчем
         values_list = [
             {
                 ClmNames.short_src: short_src,
                 ClmNames.mod: mod,
-                ClmNames.brand: self.mf.alias
+                ClmNames.brand: scaner_item.mf_alias
             }
-            for short_src, mod in self.dirs_to_scan
+            for short_src, mod in dirs_to_scan
         ]
         if values_list:
-            self.conn.execute(sqlalchemy.insert(DIRS), values_list)
-
-        self.conn.commit()
+            conn.execute(sqlalchemy.insert(DIRS), values_list)
+        conn.commit()
+        conn.close()
 
 
 class ImgLoader(QObject):
