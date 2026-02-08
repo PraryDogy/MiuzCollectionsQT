@@ -21,6 +21,8 @@ from .items import ScanerItem
 
 class DirItem:
     def __init__(self, rel_path: str, mod: int):
+        if not isinstance(mod, int):
+            raise TypeError ("DirItem: mod должен быть int")
         self.rel_path = rel_path
         self.mod = mod
 
