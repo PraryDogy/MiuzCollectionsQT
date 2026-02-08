@@ -386,9 +386,9 @@ class HashdirImgUpdater:
             img = Utils.fit_to_thumb(img, Static.max_img_size)
             if img is not None:
                 try:
-                    thumb_path = Utils.create_abs_thumb_path(img_item)
+                    thumb_path = Utils.create_abs_thumb_path(img_item.abs_img_path)
                     Utils.write_thumb(thumb_path, img)
-                    new_new_images.append((path, size, birth, mod))
+                    new_new_images.append(img_item)
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
                     # а так же чтобы в основном потоке сбрасывался таймер таймаута
