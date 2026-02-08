@@ -19,12 +19,18 @@ from system.utils import Utils
 from .items import ScanerItem
 
 
+class DirItem:
+    def __init__(self, rel_path: str, mod: int):
+        self.rel_path = rel_path
+        self.mod = mod
+
+
 class DirsManager:
 
     @staticmethod
     def get_finder_dirs(scaner_item: ScanerItem, q: Queue):
         """
-        Возвращает директории [(rel_dir_path, mod_time), ...]
+        Возвращает список DirItem
         - которые есть в директории (Mf.curr_path)
         - которых нет в стоп листе Mf.stop_list
         """
@@ -32,7 +38,7 @@ class DirsManager:
         # gui_text: Имя папки (псевдоним папки): поиск в папке
         scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
         q.put(scaner_item)
-        dirs = []
+        dirs: list[DirItem] = []
         stack = [scaner_item.mf.curr_path]
         while stack:
             current = stack.pop()
@@ -48,12 +54,13 @@ class DirsManager:
                     rel_path = Utils.get_rel_path(scaner_item.mf.curr_path, entry.path)
                     stats = entry.stat()
                     mod = int(stats.st_mtime)
-                    dirs.append((rel_path, mod))
+                    dir_item = DirItem(rel_path, mod)
+                    dirs.append(dir_item)
 
         try:
             stats = os.stat(scaner_item.mf.curr_path)
-            data = (os.sep, int(stats.st_mtime))
-            dirs.append(data)
+            mod = int(stats.st_mtime)
+            dir_item = DirItem(os.sep, mod)
         except Exception as e:
             print("new scaner dirs loader finder dirs error add root dir", e)
         return dirs
@@ -61,14 +68,14 @@ class DirsManager:
     @staticmethod
     def get_db_dirs(scaner_item: ScanerItem):
         """
-        Возвращает директории [(rel_dir_path, mod_time), ...]
+        Возвращает список DirItem
         - которые есть в базе данных и соответствуют псевдониму Mf
         """
         conn = scaner_item.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
             DIRS.c.brand == scaner_item.mf_alias
         )
-        res = [(short_src, mod) for short_src, mod in conn.execute(q)]
+        res = [DirItem(rel_path, mod) for rel_path, mod in conn.execute(q)]
         conn.close()
         return res
 
@@ -76,38 +83,42 @@ class DirsManager:
 class DirsCompator:
 
     @staticmethod
-    def get_dirs_to_remove(finder_dirs: list, db_dirs: list):
+    def get_dirs_to_remove(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         """
         Параметры:
-        - finder_dirs: [(rel_dir_path, mod_time), ...]
-        - db_dirs: [(rel_dir_path, mod_time), ...]
+        - finder_dirs список DirItem
+        - db_dirs список DirItem
 
-        Возвращает директории [(rel_dir_path, mod_time), ...]
+        Возвращает список DirItem
         - которых больше нет в Finder, но есть в базе данных
         - которые нужно удалить из базы данных
         """
-        finder_paths = [rel_path for rel_path, _ in finder_dirs]
+        rel_paths = [dir_item.rel_path for dir_item in finder_dirs]
         return [
-            (rel_dir_path, int(mod))
-            for rel_dir_path, mod in db_dirs
-            if rel_dir_path not in finder_paths
+            dir_item
+            for dir_item in db_dirs
+            if dir_item.rel_path not in rel_paths
         ]
 
     @staticmethod
-    def get_dirs_to_scan(finder_dirs: list, db_dirs: list):
+    def get_dirs_to_scan(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         """
         Параметры:
-        - finder_dirs: [(rel_dir_path, mod_time), ...]
-        - db_dirs: [(rel_dir_path, mod_time), ...]
+        - finder_dirs список DirItem
+        - db_dirs список DirItem
 
-        Возвращает директории [(rel_dir_path, mod_time), ...]
+        Возвращает список DirItem
         - которые есть в Finder, но нет в базе данных
         - которые нужно добавить в базу данных
         """
+        rel_paths = [
+            (dir_item.rel_path, dir_item.mod)
+            for dir_item in db_dirs
+        ]
         return [
-            (rel_dir_path, int(mod))
-            for (rel_dir_path, mod) in finder_dirs
-            if (rel_dir_path, mod) not in db_dirs
+            dir_item
+            for dir_item in finder_dirs
+            if (dir_item.rel_path, dir_item.mod) not in rel_paths
         ]
 
 
