@@ -46,6 +46,15 @@ class ImgItem:
 
 class DirsLoader:
     @staticmethod
+    def start(scaner_item: ScanerItem):
+        """
+        Возвращает список директорий DirItem Finder и список директорий DirItem базы данных
+        """
+        finder_dirs = DirsLoader.get_finder_dirs(scaner_item)
+        db_dirs = DirsLoader.get_db_dirs(scaner_item)
+        return (finder_dirs, db_dirs)
+
+    @staticmethod
     def get_finder_dirs(scaner_item: ScanerItem):
         """
         Возвращает список DirItem
@@ -105,6 +114,15 @@ class DirsLoader:
 
 class DirsCompator:
     @staticmethod
+    def start(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
+        """
+        Возвращает список директорий DirItem для удаления и список директорий DirItem для сканирования
+        """
+        dirs_to_remove = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
+        dirs_to_scan = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
+        return (dirs_to_remove, dirs_to_scan)
+
+    @staticmethod
     def get_dirs_to_remove(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         """
         Параметры:
@@ -151,6 +169,9 @@ class DbDirUpdater:
         Параметры:
         - dir_list список DirItem
 
+        Возвращает:
+        - None
+
         Запускается только после работы с изображениями:
         - добавление и удаление изображений из базы данных THUMBS
         - добавление и удаление изображений из "hashdir"
@@ -184,9 +205,18 @@ class DbDirUpdater:
             conn.execute(sqlalchemy.insert(DIRS), values_list)
         conn.commit()
         conn.close()
+        return None
 
 
 class ImgLoader:
+    @staticmethod
+    def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
+        """
+        Возвращает список ImgItem из директорий и список ImgItem из базы данных
+        """
+        finder_images = ImgLoader.get_finder_images(scaner_item, dir_list)
+        db_images = ImgLoader.get_db_images(scaner_item, dir_list)
+        return (finder_images, db_images)
 
     @staticmethod
     def get_finder_images(scaner_item: ScanerItem, dir_list: list[DirItem]):
@@ -378,21 +408,7 @@ class HashdirImgUpdater:
 
 
 class DbImgUpdater:
-    def __init__(self, del_images: list, new_images: list, mf: Mf):
-        """
-        Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
-        Запуск: run()  
-
-        Принимает:  
-        - del_items: [rel_thumb_path, ...]       
-        - new_items: [(path, size, birth, mod), ...]          
-        """
-        super().__init__()
-        self.mf = mf
-        self.del_images = del_images
-        self.new_images = new_images
-        self.conn = Dbase.engine.connect()
-
+   
     def run(self):
         self.run_del_items()
         self.del_dublicates()
