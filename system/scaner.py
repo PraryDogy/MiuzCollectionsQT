@@ -289,7 +289,7 @@ class ImgLoader:
 
 class ImgCompator:
     @staticmethod
-    def start(finder_images: list[ImgItem], db_images: dict[str, ImgItem]):
+    def start(finder_images: list[ImgItem], db_images: list[ImgItem]):
         """
         Сравнивает данные об изображениях из Finder и базы данных.  
         Получить данные об изображениях необходимо из ImgLoader.    
@@ -471,106 +471,60 @@ class DbImgUpdater:
         conn.close()
 
 
-class NewDirsHandler(QObject):
-    progress_text = pyqtSignal(str)
-   
-    def __init__(self, dirs_to_scan: list[str], mf: Mf, task_state: TaskState):
-        """
-        dirs_to_scan: [(rel dir path, int modified time), ...]
-        """
-        super().__init__()
-        self.dirs_to_scan = dirs_to_scan
-        self.mf = mf
-        self.task_state = task_state
-    
+class NewDirsWorker:    
     @staticmethod
-    def start(new_dirs: list, scaner_item: ScanerItem, q: Queue):
+    def start(dirs_to_scan: list[DirItem], scaner_item: ScanerItem):
         """
-        new_dirs: [(rel dir path, int modified time), ...]
+        Параметры: 
+        - dirs_to_scan список DirItem
+        - на основе этого списка добавляются и удаляются миниатюры в "hashdir"
+        - обновляются базы данных THUMBS и DIRS
         """
-        img_loader = ImgLoader(new_dirs, scaner_item)
-        finder_images = img_loader.finder_images()
-        db_images = img_loader.db_images()
-        if not self.task_state.should_run():
-            print(self.mf.alias, "new scaner utils, ScanDirs, img_loader, сканирование прервано task state")
-            return
-
-        # сравниваем Finder и БД изображения
-        img_compator = ImgCompator(finder_images, db_images)
-        del_images, new_images = img_compator.run()
-        
-        # создаем / обновляем изображения в hashdir
-        hashdir_updater = _ImgHashdirUpdater(del_images, new_images, self.task_state, self.mf)
-        hashdir_updater.progress_text.connect(self.progress_text.emit)
-        del_images, new_images = hashdir_updater.run()
-
-        if not self.task_state.should_run():
-            print(self.mf.alias, "new scaner utils, ScanDirs, db updater, сканирование прервано task state")
-            return
-
-        # обновляем БД
-        db_updater = _ImgDbUpdater(del_images, new_images, self.mf)
-        db_updater.run()
-
-        dirs_updater = DbDirUpdater(self.mf, self.dirs_to_scan)
-        dirs_updater.run()
-
-        self.progress_text.emit("")
-
+        finder_images, db_images = ImgLoader.start(scaner_item, dirs_to_scan)
+        del_images, new_images = ImgCompator.start(finder_images, db_images)
+        del_images, new_images = HashdirImgUpdater.start(scaner_item, del_images, new_images)
+        DbImgUpdater.start(scaner_item, del_images, new_images)
+        DbDirUpdater.start(scaner_item, dirs_to_scan)
         return (del_images, new_images)
     
 
-# class RemovedDirsHandler(QObject):
-#     def __init__(self, dirs_to_del: list, mf: Mf):
-#         """
-#         dirs_to_del: [(rel dir path, int modified time), ...]
-#         """
-#         super().__init__()
-#         self.dirs_to_del = dirs_to_del
-#         self.mf = mf
-#         self.conn = Dbase.engine.connect()
+class RemovedDirsWorker:
+    @staticmethod
+    def _process_dirs(self):
+        def remove_thumbs(rel_dir: str):
+            stmt = (
+                sqlalchemy.select(THUMBS.c.short_hash)
+                .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
+                .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
+                .where(THUMBS.c.brand == self.mf.alias)
+            )
+            for short_hash in self.conn.execute(stmt).scalars():
+                try:
+                    os.remove(Utils.get_abs_thumb_path(short_hash))
+                except Exception as e:
+                    print("DelDirsHandler, remove thumb:", e)
 
-#     def run(self):
-#         try:
-#             self._process_dirs()
-#         except Exception as e:
-#             print("DelDirsHandler, run error:", e)
+            del_stmt = (
+                sqlalchemy.delete(THUMBS)
+                .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
+                .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
+                .where(THUMBS.c.brand == self.mf.alias)
+            )
+            self.conn.execute(del_stmt)
 
-#     def _process_dirs(self):
-#         def remove_thumbs(rel_dir: str):
-#             stmt = (
-#                 sqlalchemy.select(THUMBS.c.short_hash)
-#                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
-#                 .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-#                 .where(THUMBS.c.brand == self.mf.alias)
-#             )
-#             for short_hash in self.conn.execute(stmt).scalars():
-#                 try:
-#                     os.remove(Utils.get_abs_thumb_path(short_hash))
-#                 except Exception as e:
-#                     print("DelDirsHandler, remove thumb:", e)
+        def remove_dir_entry(rel_dir: str):
+            stmt = (
+                sqlalchemy.delete(DIRS)
+                .where(DIRS.c.short_src == rel_dir)
+                .where(DIRS.c.brand == self.mf.alias)
+            )
+            self.conn.execute(stmt)
 
-#             del_stmt = (
-#                 sqlalchemy.delete(THUMBS)
-#                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
-#                 .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-#                 .where(THUMBS.c.brand == self.mf.alias)
-#             )
-#             self.conn.execute(del_stmt)
+        for rel_dir, _ in self.dirs_to_del:
+            remove_thumbs(rel_dir)
+            remove_dir_entry(rel_dir)
 
-#         def remove_dir_entry(rel_dir: str):
-#             stmt = (
-#                 sqlalchemy.delete(DIRS)
-#                 .where(DIRS.c.short_src == rel_dir)
-#                 .where(DIRS.c.brand == self.mf.alias)
-#             )
-#             self.conn.execute(stmt)
-
-#         for rel_dir, _ in self.dirs_to_del:
-#             remove_thumbs(rel_dir)
-#             remove_dir_entry(rel_dir)
-
-#         self.conn.commit()
+        self.conn.commit()
 
 
 class ScanerTask:
@@ -616,7 +570,7 @@ class ScanerTask:
         removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
         # обходим новые директории, добавляем / удаляем изображения
         if new_dirs:
-            scan_dirs = NewDirsHandler(new_dirs, scaner_item)
+            scan_dirs = NewDirsWorker.start(new_dirs, scaner_item)
             scan_dirs.run()
         
         # удаляем удаленные Finder директории
