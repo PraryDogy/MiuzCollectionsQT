@@ -170,10 +170,10 @@ class DirsUpdater:
 class ImgLoader:
 
     @staticmethod
-    def get_finder_images(scaner_item: ScanerItem, q: Queue, dirs_to_scan: list):
+    def get_finder_images(scaner_item: ScanerItem, q: Queue, dir_list: list[DirItem]):
         """
         Параметры:
-        - dirs_to_scan: [(rel_dir_path, mod_time), ...]
+        - dir_list список DirItem
 
         Получает и возвращает список изображений из указанных директорий:
         - [(abs_path, size, birth_time, mod_time), ...]    
@@ -184,8 +184,8 @@ class ImgLoader:
         scaner_item.gui_text = text
         q.put(scaner_item)
         finder_images = []
-        for rel_dir_path, _ in dirs_to_scan:
-            abs_dir_path = Utils.get_abs_path(scaner_item.mf.curr_path, rel_dir_path)
+        for dir_item in dir_list:
+            abs_dir_path = Utils.get_abs_path(scaner_item.mf.curr_path, dir_item.rel_path)
             for entry in os.scandir(abs_dir_path):
                 # если где то ранее был включен флаг то возвращаем пустой список
                 if scaner_item.stop_task:
@@ -204,17 +204,17 @@ class ImgLoader:
         return finder_images
 
     @staticmethod
-    def get_db_images(scaner_item: ScanerItem, dirs_to_scan: list):
+    def get_db_images(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
         Параметры:
-        - dirs_to_scan: [(rel_dir_path, mod_time), ...]
+        - dir_list список DirItem
 
         Получает и возвращает информацию об изображениях в базе данных из указанных директорий:
         - {rel_thumb_path: (abs_path, size, birth, mod), ...}  
         """
         conn = scaner_item.engine.connect()
         db_images: dict = {}
-        for rel_dir_path, mod in dirs_to_scan:
+        for dir_item in dir_list:
             q = sqlalchemy.select(
                 THUMBS.c.short_hash, # rel thumb path
                 THUMBS.c.short_src,
@@ -223,12 +223,12 @@ class ImgLoader:
                 THUMBS.c.mod
                 )
             q = q.where(THUMBS.c.brand == scaner_item.mf_alias)
-            if rel_dir_path == "/":
+            if dir_item.rel_path == os.sep:
                 q = q.where(THUMBS.c.short_src.ilike("/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"/%/%"))
             else:
-                q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
-                q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
+                q = q.where(THUMBS.c.short_src.ilike(f"{dir_item.rel_path}/%"))
+                q = q.where(THUMBS.c.short_src.not_ilike(f"{dir_item.rel_path}/%/%"))
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
                 abs_path = Utils.get_abs_path(scaner_item.mf.curr_path, rel_path)
                 db_images[rel_thumb_path] = (abs_path, size, birth, mod)
