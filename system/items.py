@@ -75,13 +75,10 @@ class ScanerItem:
         self.engine = engine
         self.q = q
         self.gui_text: str = "gui_text"
-        self.stop_task = False
         self.reload_gui = False
         self.mf = mf
-        self.mf_alias = mf.alias
         if mf.curr_path:
             self.mf_real_name = os.path.basename(mf.curr_path)
         else:
             self.mf_real_name = os.path.basename(mf.paths[0])
-        
         self.total_count = 0

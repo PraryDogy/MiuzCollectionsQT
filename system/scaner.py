@@ -63,7 +63,7 @@ class DirsLoader:
         """
         # отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
-        scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
+        scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf.alias}): {Lng.search_in[cfg.lng].lower()}"
         scaner_item.q.put(scaner_item)
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.curr_path]
@@ -105,7 +105,7 @@ class DirsLoader:
         """
         conn = scaner_item.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
-            DIRS.c.brand == scaner_item.mf_alias
+            DIRS.c.brand == scaner_item.mf.alias
         )
         res = [DirItem(rel_path, mod) for rel_path, mod in conn.execute(q)]
         conn.close()
@@ -188,7 +188,7 @@ class DbDirUpdater:
         rel_paths = [dir_item.rel_path for dir_item in dir_list]
         del_stmt = sqlalchemy.delete(DIRS).where(
             DIRS.c.short_src.in_(rel_paths),
-            DIRS.c.brand == scaner_item.mf_alias
+            DIRS.c.brand == scaner_item.mf.alias
         )
         conn.execute(del_stmt)
 
@@ -197,7 +197,7 @@ class DbDirUpdater:
             {
                 ClmNames.short_src: dir_item.rel_path,
                 ClmNames.mod: dir_item.mod,
-                ClmNames.brand: scaner_item.mf_alias
+                ClmNames.brand: scaner_item.mf.alias
             }
             for dir_item in dir_list
         ]
@@ -229,7 +229,7 @@ class ImgLoader:
         """
         # передает в гуи текст
         # имя папки (псевдоним): поиск
-        text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search[cfg.lng].lower()}"
+        text = f"{scaner_item.mf_real_name} ({scaner_item.mf.alias}): {Lng.search[cfg.lng].lower()}"
         scaner_item.gui_text = text
         scaner_item.q.put(scaner_item)
         finder_images: list[ImgItem] = []
@@ -272,7 +272,7 @@ class ImgLoader:
                 THUMBS.c.birth,
                 THUMBS.c.mod
                 )
-            q = q.where(THUMBS.c.brand == scaner_item.mf_alias)
+            q = q.where(THUMBS.c.brand == scaner_item.mf.alias)
             if dir_item.rel_path == os.sep:
                 q = q.where(THUMBS.c.short_src.ilike("/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"/%/%"))
@@ -405,7 +405,7 @@ class HashdirImgUpdater:
         Посылает текст в гуи.   
         Имя папки (псевдоним): обновление (оставшееся число)
         """
-        text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.updating[cfg.lng].lower()} ({scaner_item.total_count})"
+        text = f"{scaner_item.mf_real_name} ({scaner_item.mf.alias}): {Lng.updating[cfg.lng].lower()} ({scaner_item.total_count})"
         scaner_item.gui_text = text
         scaner_item.q.put(scaner_item)
 
@@ -426,7 +426,7 @@ class DbImgUpdater:
         rel_thumb_paths = [i.rel_thumb_path for i in del_images]
         q = sqlalchemy.delete(THUMBS).where(
             THUMBS.c.short_hash.in_(rel_thumb_paths),
-            THUMBS.c.brand == scaner_item.mf_alias
+            THUMBS.c.brand == scaner_item.mf.alias
         )
         conn.execute(q)
         conn.commit()
@@ -441,7 +441,7 @@ class DbImgUpdater:
         ]
         q = sqlalchemy.delete(THUMBS).where(
             THUMBS.c.short_src.in_(rel_img_paths),
-            THUMBS.c.brand == scaner_item.mf_alias
+            THUMBS.c.brand == scaner_item.mf.alias
         )
         conn.execute(q)
         conn.commit()
@@ -464,7 +464,7 @@ class DbImgUpdater:
                 ClmNames.resol: "",
                 ClmNames.coll: "",
                 ClmNames.fav: 0,
-                ClmNames.brand: scaner_item.mf_alias
+                ClmNames.brand: scaner_item.mf.alias
             })
         conn.execute(sqlalchemy.insert(THUMBS), values_list)
         conn.commit()
@@ -592,18 +592,18 @@ class ScanerTask:
         for mf in mf_list:
             scaner_item = ScanerItem(mf, engine, q)
             if scaner_item.mf.get_available_path():
-                print("scaner started", scaner_item.mf_alias)
+                print("scaner started", scaner_item.mf.alias)
                 ScanerTask.mf_scan(scaner_item)
                 gc.collect()
-                print("scaner finished", scaner_item.mf_alias)
+                print("scaner finished", scaner_item.mf.alias)
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
-                text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {no_conn}"
+                text = f"{scaner_item.mf_real_name} ({scaner_item.mf.alias}): {no_conn}"
                 scaner_item.gui_text = text
                 # Отправляем текст в гуи что нет подключения к папке
                 # Имя папки (псевдоним): нет подключения
                 scaner_item.q.put(scaner_item)
-                print("scaner no connection", scaner_item.mf_real_name, scaner_item.mf_alias)
+                print("scaner no connection", scaner_item.mf_real_name, scaner_item.mf.alias)
                 sleep(5)
             # после работы с очередной папкой отправляем айтем в гуи, чтобы перезагрузить гуи
             # флаг reload gui устанавливается на false в основном гуи после перезагрузки гуи
@@ -617,7 +617,7 @@ class ScanerTask:
         try:
             ScanerTask._mf_scan(scaner_item)
         except Exception as e:
-            print("scaner, main folder scan error", scaner_item.mf_real_name, scaner_item.mf_alias, e)
+            print("scaner, main folder scan error", scaner_item.mf_real_name, scaner_item.mf.alias, e)
 
     @staticmethod
     def _mf_scan(scaner_item: ScanerItem):
@@ -625,7 +625,7 @@ class ScanerTask:
         finder_dirs = DirsLoader.get_finder_dirs(scaner_item)
         db_dirs = DirsLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
-            print(scaner_item.mf_alias, "no finder dirs")
+            print(scaner_item.mf.alias, "no finder dirs")
             return
 
         new_dirs = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
