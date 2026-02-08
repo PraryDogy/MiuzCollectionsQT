@@ -337,12 +337,12 @@ class HashdirImgUpdater:
 
         Получить данные del_images и new_images необходимо из ImgCompator.  
         Параметры:  
-        - del_images [rel thumb path, ...]
-        - new_images [(abs path, size, birth, mod), ...]
+        - del_images список ImgItem
+        - new_images список ImgItem
 
         Возвращает:     
-        - успешно удаленные из "hashdir" [rel_thumb_path, ...]    
-        - успешно добавленные в "hashdir" [(abs path, size, birth, mod), ...]
+        - успешно удаленные из "hashdir" список ImgItem
+        - успешно добавленные в "hashdir" список ImgItem
         """
         scaner_item.total_count = len(del_images) + len(new_images)
         new_del_images = HashdirImgUpdater.run_del_images(scaner_item, del_images)
@@ -350,14 +350,14 @@ class HashdirImgUpdater:
         return new_del_images, new_items
 
     @staticmethod
-    def run_del_images(scaner_item: ScanerItem, del_images: list):
+    def run_del_images(scaner_item: ScanerItem, del_images: list[ImgItem]):
         """
         Пытается удалить изображения из "hashdir" и пустые папки.   
         Возвращает список успешно удаленных изображений.
         """
-        new_del_images = []
-        for rel_thumb_path in del_images:
-            thumb_path = Utils.get_abs_hash(rel_thumb_path)
+        new_del_images: list[ImgItem] = []
+        for img_item in del_images:
+            thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
             if os.path.exists(thumb_path):
                 try:
                     os.remove(thumb_path)
@@ -367,27 +367,31 @@ class HashdirImgUpdater:
                 except Exception as e:
                     print("new scaner utils, hashdir updater, remove img error", e)
                     continue
-                new_del_images.append(rel_thumb_path)
+                new_del_images.append(img_item)
                 scaner_item.total_count -= 1
+                # передаем в основной поток текст для отображения
+                # а так же чтобы в основном потоке сбрасывался таймер таймаута
                 HashdirImgUpdater.send_text(scaner_item)
         return new_del_images
 
     @staticmethod
-    def run_new_images(scaner_item: ScanerItem, new_images: list):
+    def run_new_images(scaner_item: ScanerItem, new_images: list[ImgItem]):
         """
         Пытается создать изображения в "hashdir".     
         Возвращает список успешно созданных изображений.
         """
-        new_new_images = []
-        for path, size, birth, mod in new_images:
-            img = ImgUtils.read_img(path)
+        new_new_images: list[ImgItem] = []
+        for img_item in new_images:
+            img = ImgUtils.read_img(img_item.abs_img_path)
             img = Utils.fit_to_thumb(img, Static.max_img_size)
             if img is not None:
                 try:
-                    thumb_path = Utils.create_abs_hash(path)
+                    thumb_path = Utils.create_abs_thumb_path(img_item)
                     Utils.write_thumb(thumb_path, img)
                     new_new_images.append((path, size, birth, mod))
                     scaner_item.total_count -= 1
+                    # передаем в основной поток текст для отображения
+                    # а так же чтобы в основном потоке сбрасывался таймер таймаута
                     HashdirImgUpdater.send_text(scaner_item)
                 except Exception as e:
                     print("new scaner utils, hashdir updater, create new img error", e)
@@ -402,8 +406,6 @@ class HashdirImgUpdater:
         """
         text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.updating[cfg.lng].lower()} ({scaner_item.total_count})"
         scaner_item.gui_text = text
-        # передаем в основной поток текст для отображения
-        # а так же чтобы в основном потоке сбрасывался таймер таймаута
         scaner_item.q.put(scaner_item)
 
 
@@ -438,7 +440,7 @@ class DbImgUpdater:
     def run_new_items(self):
         values_list = []
         for path, size, birth, mod in self.new_images:
-            abs_hash = Utils.create_abs_hash(path)
+            abs_hash = Utils.create_abs_thumb_path(path)
             short_hash = Utils.get_rel_hash(abs_hash)
             short_src = Utils.get_rel_path(self.mf.curr_path, path)
             values_list.append({
@@ -531,7 +533,7 @@ class RemovedDirsHandler(QObject):
             )
             for short_hash in self.conn.execute(stmt).scalars():
                 try:
-                    os.remove(Utils.get_abs_hash(short_hash))
+                    os.remove(Utils.get_abs_thumb_path(short_hash))
                 except Exception as e:
                     print("DelDirsHandler, remove thumb:", e)
 

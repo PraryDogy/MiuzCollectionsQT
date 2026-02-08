@@ -235,7 +235,7 @@ class _DeletedMfRemover:
             THUMBS.c.brand == mf_name
         )
         return [
-            (id_, Utils.get_abs_hash(rel_thumb_path))
+            (id_, Utils.get_abs_thumb_path(rel_thumb_path))
             for id_, rel_thumb_path in conn.execute(q).fetchall()
         ]
 

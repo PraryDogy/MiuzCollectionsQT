@@ -317,7 +317,7 @@ class _ImgHashdirUpdater(QObject):
         for rel_thumb_path in self.del_items:
             if not self.task_state.should_run():
                 break
-            thumb_path = Utils.get_abs_hash(rel_thumb_path)
+            thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
                 try:
                     os.remove(thumb_path)
@@ -354,7 +354,7 @@ class _ImgHashdirUpdater(QObject):
                 break
             try:
                 thumb = self.create_thumb(path)
-                thumb_path = Utils.create_abs_hash(path)
+                thumb_path = Utils.create_abs_thumb_path(path)
                 Utils.write_thumb(thumb_path, thumb)
                 new_new_items.append((path, size, birth, mod))
                 self.total -= 1
@@ -410,7 +410,7 @@ class _ImgDbUpdater:
     def run_new_items(self):
         values_list = []
         for path, size, birth, mod in self.new_images:
-            abs_hash = Utils.create_abs_hash(path)
+            abs_hash = Utils.create_abs_thumb_path(path)
             short_hash = Utils.get_rel_hash(abs_hash)
             short_src = Utils.get_rel_path(self.mf.curr_path, path)
             values_list.append({
@@ -500,7 +500,7 @@ class RemovedDirsHandler(QObject):
             )
             for short_hash in self.conn.execute(stmt).scalars():
                 try:
-                    os.remove(Utils.get_abs_hash(short_hash))
+                    os.remove(Utils.get_abs_thumb_path(short_hash))
                 except Exception as e:
                     print("DelDirsHandler, remove thumb:", e)
 

@@ -169,7 +169,7 @@ class DbImagesLoader(URunnable):
                 continue
 
             f_mod = datetime.fromtimestamp(mod).date()
-            thumb_path = Utils.get_abs_hash(rel_thumb_path)
+            thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
             thumb = Utils.read_thumb(thumb_path)
             if not isinstance(thumb, ndarray):
                 continue
@@ -274,7 +274,7 @@ class MfDataCleaner(URunnable):
         for rel_path, rel_thumb_path in res:
             if not rel_path or not rel_thumb_path:
                 continue
-            abs_thumb_path = Utils.get_abs_hash(rel_thumb_path)
+            abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
             if os.path.exists(abs_thumb_path):
                 stmt = sqlalchemy.delete(THUMBS).where(THUMBS.c.short_src == rel_path)
                 self.conn.execute(stmt)
@@ -363,9 +363,9 @@ class HashDirSize(URunnable):
             )
             res = list(self.conn.execute(stmt).scalars())
             size = sum([
-                os.path.getsize(Utils.get_abs_hash(i))
+                os.path.getsize(Utils.get_abs_thumb_path(i))
                 for i in res
-                if os.path.exists(Utils.get_abs_hash(i))
+                if os.path.exists(Utils.get_abs_thumb_path(i))
             ])
             if i.get_available_path():
                 real_name = os.path.basename(i.curr_path)

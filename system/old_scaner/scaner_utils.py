@@ -297,7 +297,7 @@ class HashdirUpdater(QObject):
         for x, rel_thumb_path in enumerate(self.del_items, start=1):
             if not self.task_state.should_run():
                 break
-            thumb_path = Utils.get_abs_hash(rel_thumb_path)
+            thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
             if os.path.exists(thumb_path):
                 self.progressbar_text(Lng.deleting[cfg.lng], x, total)
                 try:
@@ -330,7 +330,7 @@ class HashdirUpdater(QObject):
             self.progressbar_text(Lng.adding[cfg.lng], x, total)
             try:
                 thumb = self.create_thumb(path)
-                thumb_path = Utils.create_abs_hash(path)
+                thumb_path = Utils.create_abs_thumb_path(path)
                 Utils.write_thumb(thumb_path, thumb)
                 new_new_items.append((path, size, birth, mod))
             except Exception as e:
@@ -391,7 +391,7 @@ class DbUpdater(QObject):
     def run_new_items(self):
         conn = Dbase.engine.connect()
         for path, size, birth, mod in self.new_items:
-            small_path = Utils.create_abs_hash(path)
+            small_path = Utils.create_abs_thumb_path(path)
             short_path = Utils.get_rel_path(self.mf.curr_path, path)
             rel_thumb_path = Utils.get_rel_hash(small_path)
 
@@ -465,7 +465,7 @@ class MfRemover(QObject):
         q = q.where(THUMBS.c.brand == mf_name)
         res = self.conn.execute(q).fetchall()
         res = [
-            (id_, Utils.get_abs_hash(rel_thumb_path))
+            (id_, Utils.get_abs_thumb_path(rel_thumb_path))
             for id_, rel_thumb_path in res
         ]
         return res
