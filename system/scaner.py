@@ -387,7 +387,7 @@ class HashdirImgUpdater:
             if img is not None:
                 try:
                     rel_img_path = Utils.get_rel_img_path(scaner_item.mf.curr_path, img_item.abs_img_path)
-                    thumb_path = Utils.create_abs_thumb_path(img_item.abs_img_path)
+                    thumb_path = Utils.create_abs_thumb_path(rel_img_path)
                     Utils.write_thumb(thumb_path, img)
                     new_new_images.append(img_item)
                     scaner_item.total_count -= 1
