@@ -44,8 +44,7 @@ class ImgItem:
         self.mod = mod
 
 
-class DirsManager:
-
+class DirsLoader:
     @staticmethod
     def get_finder_dirs(scaner_item: ScanerItem):
         """
@@ -105,7 +104,6 @@ class DirsManager:
 
 
 class DirsCompator:
-
     @staticmethod
     def get_dirs_to_remove(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         """
@@ -146,8 +144,7 @@ class DirsCompator:
         ]
 
 
-class DirsUpdater:
-
+class DbDirsUpdater:
     @staticmethod
     def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
@@ -260,8 +257,7 @@ class ImgLoader:
         return db_images
 
 
-class _ImgCompator:
-
+class ImgCompator:
     @staticmethod
     def start(finder_images: list[ImgItem], db_images: dict[str, ImgItem]):
         """
@@ -300,8 +296,7 @@ class _ImgCompator:
         return removed_images, new_images
 
 
-class HashdirUpdater(QObject):
- 
+class HashdirImgUpdater:
     @staticmethod
     def start(scaner_item: ScanerItem, del_images: list, new_images: list):
         """
@@ -320,8 +315,8 @@ class HashdirUpdater(QObject):
         - успешно добавленные в "hashdir" [(abs path, size, birth, mod), ...]
         """
         scaner_item.total_count = len(del_images) + len(new_images)
-        new_del_images = HashdirUpdater.run_del_images(scaner_item, del_images)
-        new_items = HashdirUpdater.run_new_images(scaner_item, new_images)
+        new_del_images = HashdirImgUpdater.run_del_images(scaner_item, del_images)
+        new_items = HashdirImgUpdater.run_new_images(scaner_item, new_images)
         return new_del_images, new_items
 
     @staticmethod
@@ -344,7 +339,7 @@ class HashdirUpdater(QObject):
                     continue
                 new_del_images.append(rel_thumb_path)
                 scaner_item.total_count -= 1
-                HashdirUpdater.send_text(scaner_item)
+                HashdirImgUpdater.send_text(scaner_item)
         return new_del_images
 
     @staticmethod
@@ -363,7 +358,7 @@ class HashdirUpdater(QObject):
                     Utils.write_thumb(thumb_path, img)
                     new_new_images.append((path, size, birth, mod))
                     scaner_item.total_count -= 1
-                    HashdirUpdater.send_text(scaner_item)
+                    HashdirImgUpdater.send_text(scaner_item)
                 except Exception as e:
                     print("new scaner utils, hashdir updater, create new img error", e)
                     continue
@@ -380,11 +375,6 @@ class HashdirUpdater(QObject):
         # передаем в основной поток текст для отображения
         # а так же чтобы в основном потоке сбрасывался таймер таймаута
         scaner_item.q.put(scaner_item)
-
-    @staticmethod
-    def create_thumb(path: str) -> ndarray | None:
-        img = ImgUtils.read_img(path)
-        img = Utils.fit_to_thumb(img, Static.max_img_size)
 
 
 class DbUpdater:
@@ -475,7 +465,7 @@ class NewDirsHandler(QObject):
             return
 
         # сравниваем Finder и БД изображения
-        img_compator = _ImgCompator(finder_images, db_images)
+        img_compator = ImgCompator(finder_images, db_images)
         del_images, new_images = img_compator.run()
         
         # создаем / обновляем изображения в hashdir
@@ -491,7 +481,7 @@ class NewDirsHandler(QObject):
         db_updater = _ImgDbUpdater(del_images, new_images, self.mf)
         db_updater.run()
 
-        dirs_updater = DirsUpdater(self.mf, self.dirs_to_scan)
+        dirs_updater = DbDirsUpdater(self.mf, self.dirs_to_scan)
         dirs_updater.run()
 
         self.progress_text.emit("")
@@ -601,8 +591,8 @@ class ScanerTask:
     @staticmethod
     def _mf_scan(scaner_item: ScanerItem):
         # собираем Finder директории и директории из БД
-        finder_dirs = DirsManager.get_finder_dirs(scaner_item)
-        db_dirs = DirsManager.get_db_dirs(scaner_item)
+        finder_dirs = DirsLoader.get_finder_dirs(scaner_item)
+        db_dirs = DirsLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
             print(scaner_item.mf_alias, "no finder dirs")
             return
