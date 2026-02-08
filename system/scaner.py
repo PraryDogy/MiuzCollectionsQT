@@ -144,7 +144,7 @@ class DirsCompator:
         ]
 
 
-class DbDirsUpdater:
+class DbDirUpdater:
     @staticmethod
     def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
@@ -377,7 +377,7 @@ class HashdirImgUpdater:
         scaner_item.q.put(scaner_item)
 
 
-class DbUpdater:
+class DbImgUpdater:
     def __init__(self, del_images: list, new_images: list, mf: Mf):
         """
         Удаляет записи thumbs из бд, добавляет записи thumbs в бд.  
@@ -481,7 +481,7 @@ class NewDirsHandler(QObject):
         db_updater = _ImgDbUpdater(del_images, new_images, self.mf)
         db_updater.run()
 
-        dirs_updater = DbDirsUpdater(self.mf, self.dirs_to_scan)
+        dirs_updater = DbDirUpdater(self.mf, self.dirs_to_scan)
         dirs_updater.run()
 
         self.progress_text.emit("")
