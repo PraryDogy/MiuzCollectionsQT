@@ -125,10 +125,10 @@ class DirsCompator:
 class DirsUpdater:
 
     @staticmethod
-    def start(scaner_item: ScanerItem, dirs_to_scan: list):
+    def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
         Параметры:
-        - dirs_to_scan: [(rel dir path, int modified time), ...]
+        - dir_list список DirItem
 
         Запускается только после работы с изображениями:
         - добавление и удаление изображений из базы данных THUMBS
@@ -140,23 +140,24 @@ class DirsUpdater:
         - по сути это замена sqlalchemy.update
         """
         # удалить старые записи
+        if not dir_list:
+            return
         conn = scaner_item.engine.connect()
-        short_paths = [short_src for short_src, _ in dirs_to_scan]
-        if short_paths:
-            del_stmt = sqlalchemy.delete(DIRS).where(
-                DIRS.c.short_src.in_(short_paths),
-                DIRS.c.brand == scaner_item.mf_alias
-            )
-            conn.execute(del_stmt)
+        rel_paths = [dir_item.rel_path for dir_item in dir_list]
+        del_stmt = sqlalchemy.delete(DIRS).where(
+            DIRS.c.short_src.in_(rel_paths),
+            DIRS.c.brand == scaner_item.mf_alias
+        )
+        conn.execute(del_stmt)
 
         # вставить новые записи батчем
         values_list = [
             {
-                ClmNames.short_src: short_src,
-                ClmNames.mod: mod,
+                ClmNames.short_src: dir_item.rel_path,
+                ClmNames.mod: dir_item.mod,
                 ClmNames.brand: scaner_item.mf_alias
             }
-            for short_src, mod in dirs_to_scan
+            for dir_item in dir_list
         ]
         if values_list:
             conn.execute(sqlalchemy.insert(DIRS), values_list)
