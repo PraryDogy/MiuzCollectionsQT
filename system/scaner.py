@@ -520,71 +520,60 @@ class NewDirsHandler(QObject):
         return (del_images, new_images)
     
 
-class RemovedDirsHandler(QObject):
-    def __init__(self, dirs_to_del: list, mf: Mf):
-        """
-        dirs_to_del: [(rel dir path, int modified time), ...]
-        """
-        super().__init__()
-        self.dirs_to_del = dirs_to_del
-        self.mf = mf
-        self.conn = Dbase.engine.connect()
+# class RemovedDirsHandler(QObject):
+#     def __init__(self, dirs_to_del: list, mf: Mf):
+#         """
+#         dirs_to_del: [(rel dir path, int modified time), ...]
+#         """
+#         super().__init__()
+#         self.dirs_to_del = dirs_to_del
+#         self.mf = mf
+#         self.conn = Dbase.engine.connect()
 
-    def run(self):
-        try:
-            self._process_dirs()
-        except Exception as e:
-            print("DelDirsHandler, run error:", e)
+#     def run(self):
+#         try:
+#             self._process_dirs()
+#         except Exception as e:
+#             print("DelDirsHandler, run error:", e)
 
-    def _process_dirs(self):
-        def remove_thumbs(rel_dir: str):
-            stmt = (
-                sqlalchemy.select(THUMBS.c.short_hash)
-                .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
-                .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-                .where(THUMBS.c.brand == self.mf.alias)
-            )
-            for short_hash in self.conn.execute(stmt).scalars():
-                try:
-                    os.remove(Utils.get_abs_thumb_path(short_hash))
-                except Exception as e:
-                    print("DelDirsHandler, remove thumb:", e)
+#     def _process_dirs(self):
+#         def remove_thumbs(rel_dir: str):
+#             stmt = (
+#                 sqlalchemy.select(THUMBS.c.short_hash)
+#                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
+#                 .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
+#                 .where(THUMBS.c.brand == self.mf.alias)
+#             )
+#             for short_hash in self.conn.execute(stmt).scalars():
+#                 try:
+#                     os.remove(Utils.get_abs_thumb_path(short_hash))
+#                 except Exception as e:
+#                     print("DelDirsHandler, remove thumb:", e)
 
-            del_stmt = (
-                sqlalchemy.delete(THUMBS)
-                .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
-                .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-                .where(THUMBS.c.brand == self.mf.alias)
-            )
-            self.conn.execute(del_stmt)
+#             del_stmt = (
+#                 sqlalchemy.delete(THUMBS)
+#                 .where(THUMBS.c.short_src.ilike(f"{rel_dir}/%"))
+#                 .where(THUMBS.c.short_src.not_ilike(f"{rel_dir}/%/%"))
+#                 .where(THUMBS.c.brand == self.mf.alias)
+#             )
+#             self.conn.execute(del_stmt)
 
-        def remove_dir_entry(rel_dir: str):
-            stmt = (
-                sqlalchemy.delete(DIRS)
-                .where(DIRS.c.short_src == rel_dir)
-                .where(DIRS.c.brand == self.mf.alias)
-            )
-            self.conn.execute(stmt)
+#         def remove_dir_entry(rel_dir: str):
+#             stmt = (
+#                 sqlalchemy.delete(DIRS)
+#                 .where(DIRS.c.short_src == rel_dir)
+#                 .where(DIRS.c.brand == self.mf.alias)
+#             )
+#             self.conn.execute(stmt)
 
-        for rel_dir, _ in self.dirs_to_del:
-            remove_thumbs(rel_dir)
-            remove_dir_entry(rel_dir)
+#         for rel_dir, _ in self.dirs_to_del:
+#             remove_thumbs(rel_dir)
+#             remove_dir_entry(rel_dir)
 
-        self.conn.commit()
+#         self.conn.commit()
 
 
 class ScanerTask:
-    """
-    Что на счет проверки на таймаут сканера (если он завис)
-    Если сканер завис, он перестанет посылать q.put в основной гуи
-    И мы не сможем текущим методом сравнить время в ScanerItem и время в гуи
-    Нужно задать время в основном гуи и обнулять его каждый раз, когда получает ScanerItem
-    Но тогда нужно регулярно отправлять ScanerItem, чтобы обнулять время
-    А это может не подойти, так как ScanerItem обновляет gui_text
-    С другой стороны можно не париться и обновлять gui_text при каждом q.put
-    Потому что мы будем делать poll_task например раз в 1-2 секунды
-    """
-
     @staticmethod
     def start(mf_list: list[Mf], q: Queue):
         engine = Dbase.create_engine()
@@ -594,7 +583,6 @@ class ScanerTask:
             if scaner_item.mf.get_available_path():
                 print("scaner started", scaner_item.mf.alias)
                 ScanerTask.mf_scan(scaner_item)
-                gc.collect()
                 print("scaner finished", scaner_item.mf.alias)
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
@@ -610,7 +598,6 @@ class ScanerTask:
             if scaner_item.reload_gui:
                 scaner_item.q.put(scaner_item)
         engine.dispose()
-        # в маин гуи if not ScanerTask.is_alive(): устанавливай прогресс текст на пустышку
 
     @staticmethod
     def mf_scan(scaner_item: ScanerItem):
@@ -622,15 +609,11 @@ class ScanerTask:
     @staticmethod
     def _mf_scan(scaner_item: ScanerItem):
         # собираем Finder директории и директории из БД
-        finder_dirs = DirsLoader.get_finder_dirs(scaner_item)
-        db_dirs = DirsLoader.get_db_dirs(scaner_item)
+        finder_dirs, db_dirs = DirsLoader.start(scaner_item)
         if not finder_dirs:
             print(scaner_item.mf.alias, "no finder dirs")
             return
-
-        new_dirs = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
-        removed_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
-        
+        removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
         # обходим новые директории, добавляем / удаляем изображения
         if new_dirs:
             scan_dirs = NewDirsHandler(new_dirs, scaner_item)
