@@ -47,7 +47,7 @@ class ImgItem:
 class DirsManager:
 
     @staticmethod
-    def get_finder_dirs(scaner_item: ScanerItem, q: Queue):
+    def get_finder_dirs(scaner_item: ScanerItem):
         """
         Возвращает список DirItem
         - которые есть в директории (Mf.curr_path)
@@ -56,18 +56,23 @@ class DirsManager:
         # отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
         scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search_in[cfg.lng].lower()}"
-        q.put(scaner_item)
+        scaner_item.q.put(scaner_item)
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.curr_path]
         while stack:
             current = stack.pop()
             for entry in os.scandir(current):
+                # передаем с каждой итерацией в основной поток ScanerItem
+                # чтобы в основном потоке сбрасывался таймер таймаута
+                scaner_item.q.put(scaner_item)
                 try:
                     stmt = entry.is_dir() and entry.name not in scaner_item.mf.stop_list
                 except Exception as e:
+                    # если к директории нет доступа, то далее
+                    # например если сетевой диск был отключен во время работы
+                    # или если нет прав доступа
                     print("new scaner utils, dirs loader, finder dirs error", e)
-                    scaner_item.stop_task = True
-                    break
+                    continue
                 if stmt:
                     stack.append(entry.path)
                     rel_path = Utils.get_rel_path(scaner_item.mf.curr_path, entry.path)
@@ -187,7 +192,7 @@ class DirsUpdater:
 class ImgLoader:
 
     @staticmethod
-    def get_finder_images(scaner_item: ScanerItem, q: Queue, dir_list: list[DirItem]):
+    def get_finder_images(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
         Параметры:
         - dir_list список DirItem
@@ -199,14 +204,14 @@ class ImgLoader:
         # имя папки (псевдоним): поиск
         text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.search[cfg.lng].lower()}"
         scaner_item.gui_text = text
-        q.put(scaner_item)
+        scaner_item.q.put(scaner_item)
         finder_images: list[ImgItem] = []
         for dir_item in dir_list:
             abs_dir_path = Utils.get_abs_path(scaner_item.mf.curr_path, dir_item.rel_path)
             for entry in os.scandir(abs_dir_path):
-                # если где то ранее был включен флаг то возвращаем пустой список
-                if scaner_item.stop_task:
-                    return []
+                # передаем в основной поток ScanerItem
+                # чтобы в основном потоке сбрасывался таймер таймаута
+                scaner_item.q.put(scaner_item)
                 if entry.path.endswith(ImgUtils.ext_all):
                     # если нет доступа к изображению, то продолжить
                     try:
@@ -298,7 +303,7 @@ class _ImgCompator:
 class HashdirUpdater(QObject):
  
     @staticmethod
-    def start(scaner_item: ScanerItem, q: Queue, del_images: list, new_images: list):
+    def start(scaner_item: ScanerItem, del_images: list, new_images: list):
         """
         - Удаляет из "hashdir" изображения, которых больше нет в Finder.
         - Добавляет изображения, которые есть в Finder, в "hashdir".
@@ -314,23 +319,19 @@ class HashdirUpdater(QObject):
         - успешно удаленные из "hashdir" [rel_thumb_path, ...]    
         - успешно добавленные в "hashdir" [(abs path, size, birth, mod), ...]
         """
-        if scaner_item.stop_task:
-            return ([], [])
         scaner_item.total_count = len(del_images) + len(new_images)
-        new_del_images = HashdirUpdater.run_del_images(scaner_item, q, del_images)
-        new_items = HashdirUpdater.run_new_images(scaner_item, q, new_images)
-        return del_images, new_items
+        new_del_images = HashdirUpdater.run_del_images(scaner_item, del_images)
+        new_items = HashdirUpdater.run_new_images(scaner_item, new_images)
+        return new_del_images, new_items
 
     @staticmethod
-    def run_del_images(scaner_item: ScanerItem, q: Queue, del_images: list):
+    def run_del_images(scaner_item: ScanerItem, del_images: list):
         """
         Пытается удалить изображения из "hashdir" и пустые папки.   
         Возвращает список успешно удаленных изображений.
         """
         new_del_images = []
         for rel_thumb_path in del_images:
-            if scaner_item.stop_task:
-                return new_del_images
             thumb_path = Utils.get_abs_hash(rel_thumb_path)
             if os.path.exists(thumb_path):
                 try:
@@ -343,19 +344,17 @@ class HashdirUpdater(QObject):
                     continue
                 new_del_images.append(rel_thumb_path)
                 scaner_item.total_count -= 1
-                HashdirUpdater.send_text(scaner_item, q)
+                HashdirUpdater.send_text(scaner_item)
         return new_del_images
 
     @staticmethod
-    def run_new_images(scaner_item: ScanerItem, q: Queue, new_images: list):
+    def run_new_images(scaner_item: ScanerItem, new_images: list):
         """
         Пытается создать изображения в "hashdir".     
         Возвращает список успешно созданных изображений.
         """
         new_new_images = []
         for path, size, birth, mod in new_images:
-            if scaner_item.stop_task:
-                return new_new_images
             img = ImgUtils.read_img(path)
             img = Utils.fit_to_thumb(img, Static.max_img_size)
             if img is not None:
@@ -364,21 +363,23 @@ class HashdirUpdater(QObject):
                     Utils.write_thumb(thumb_path, img)
                     new_new_images.append((path, size, birth, mod))
                     scaner_item.total_count -= 1
-                    HashdirUpdater.send_text(scaner_item, q)
+                    HashdirUpdater.send_text(scaner_item)
                 except Exception as e:
                     print("new scaner utils, hashdir updater, create new img error", e)
                     continue
         return new_new_images
 
     @staticmethod
-    def send_text(scaner_item: ScanerItem, q: Queue):
+    def send_text(scaner_item: ScanerItem):
         """
         Посылает текст в гуи.   
         Имя папки (псевдоним): обновление (оставшееся число)
         """
         text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {Lng.updating[cfg.lng].lower()} ({scaner_item.total_count})"
         scaner_item.gui_text = text
-        q.put(scaner_item)
+        # передаем в основной поток текст для отображения
+        # а так же чтобы в основном потоке сбрасывался таймер таймаута
+        scaner_item.q.put(scaner_item)
 
     @staticmethod
     def create_thumb(path: str) -> ndarray | None:
@@ -568,49 +569,44 @@ class ScanerTask:
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
-            scaner_item = ScanerItem(mf, engine)
+            scaner_item = ScanerItem(mf, engine, q)
             if scaner_item.mf.get_available_path():
                 print("scaner started", scaner_item.mf_alias)
-                ScanerTask.mf_scan(scaner_item, q)
+                ScanerTask.mf_scan(scaner_item)
                 gc.collect()
                 print("scaner finished", scaner_item.mf_alias)
             else:
-                # Отправляем текст в гуи что нет подключения к папке
-                # Имя папки (псевдоним): нет подключения
                 no_conn = Lng.no_connection[cfg.lng].lower()
                 text = f"{scaner_item.mf_real_name} ({scaner_item.mf_alias}): {no_conn}"
                 scaner_item.gui_text = text
-                q.put(scaner_item)
+                # Отправляем текст в гуи что нет подключения к папке
+                # Имя папки (псевдоним): нет подключения
+                scaner_item.q.put(scaner_item)
                 print("scaner no connection", scaner_item.mf_real_name, scaner_item.mf_alias)
                 sleep(5)
             # после работы с очередной папкой отправляем айтем в гуи, чтобы перезагрузить гуи
             # флаг reload gui устанавливается на false в основном гуи после перезагрузки гуи
             if scaner_item.reload_gui:
-                q.put(scaner_item)
+                scaner_item.q.put(scaner_item)
         engine.dispose()
         # в маин гуи if not ScanerTask.is_alive(): устанавливай прогресс текст на пустышку
 
     @staticmethod
-    def mf_scan(scaner_item: ScanerItem, q: Queue):
+    def mf_scan(scaner_item: ScanerItem):
         try:
-            ScanerTask._mf_scan(scaner_item, q)
+            ScanerTask._mf_scan(scaner_item)
         except Exception as e:
             print("scaner, main folder scan error", scaner_item.mf_real_name, scaner_item.mf_alias, e)
 
     @staticmethod
-    def _mf_scan(scaner_item: ScanerItem, q: Queue):
+    def _mf_scan(scaner_item: ScanerItem):
         # собираем Finder директории и директории из БД
-        finder_dirs = DirsManager.get_finder_dirs(scaner_item, q)
+        finder_dirs = DirsManager.get_finder_dirs(scaner_item)
         db_dirs = DirsManager.get_db_dirs(scaner_item)
-        if not finder_dirs or scaner_item.stop_task:
+        if not finder_dirs:
             print(scaner_item.mf_alias, "no finder dirs")
             return
 
-        # сравниваем кортежи (директория, дата изменения)
-        # new_dirs: директории, которые нужно просканировать на изображения
-        # и обновить в БД данные об изображениях и о директориях
-        # del_dirs: директории, которых были удалены в Finder, то 
-        # есть когда была удалена папка целиком
         new_dirs = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
         removed_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         

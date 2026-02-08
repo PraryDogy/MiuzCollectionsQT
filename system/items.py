@@ -1,8 +1,10 @@
 import os
+from multiprocessing import Queue
 from time import time
 from typing import Literal
-import sqlalchemy
+
 import numpy as np
+import sqlalchemy
 
 from .main_folder import Mf
 
@@ -68,9 +70,10 @@ class OnStartItem:
 
 
 class ScanerItem:
-    def __init__(self, mf: Mf, engine: sqlalchemy.Engine):
+    def __init__(self, mf: Mf, engine: sqlalchemy.Engine, q: Queue):
         super().__init__()
         self.engine = engine
+        self.q = q
         self.gui_text: str = "gui_text"
         self.stop_task = False
         self.reload_gui = False

@@ -1,4 +1,5 @@
-from system.scaner import DirItem
+import os
 
+src = "/Volumes/Shares/test"
 
-a = DirItem("dsfdsf", 22.2)
+print(os.path.exists(src))
