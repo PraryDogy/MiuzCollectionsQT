@@ -1062,7 +1062,7 @@ class Grid(VScrollArea):
             paths = []
             if Mf.current.get_available_path():
                 paths = [
-                    Utils.get_abs_path(Mf.current.curr_path, wid.rel_path)
+                    Utils.get_abs_img_path(Mf.current.curr_path, wid.rel_path)
                     for wid in self.selected_widgets
                 ]
 

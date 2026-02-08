@@ -44,7 +44,7 @@ class DirsLoader(QObject):
         def iter_dir(entry: os.DirEntry):
             if entry.is_dir() and entry.name not in self.mf.stop_list:
                 stack.append(entry.path)
-                rel_path = Utils.get_rel_path(self.mf_path, entry.path)
+                rel_path = Utils.get_rel_img_path(self.mf_path, entry.path)
                 stats = entry.stat()
                 mod = int(stats.st_mtime)
                 dirs.append((rel_path, mod))
@@ -198,7 +198,7 @@ class ImgLoader(QObject):
             finder_images.append((abs_path, size, birth, mod))
 
         for rel_dir_path, mod in self.dirs_to_scan:
-            abs_dir_path = Utils.get_abs_path(self.mf_path, rel_dir_path)
+            abs_dir_path = Utils.get_abs_img_path(self.mf_path, rel_dir_path)
             for entry in os.scandir(abs_dir_path):
                 if not self.task_state.should_run():
                     return []
@@ -239,7 +239,7 @@ class ImgLoader(QObject):
                 q = q.where(THUMBS.c.short_src.ilike(f"{rel_dir_path}/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
-                abs_path = Utils.get_abs_path(self.mf_path, rel_path)
+                abs_path = Utils.get_abs_img_path(self.mf_path, rel_path)
                 db_images[rel_thumb_path] = (abs_path, size, birth, mod)
         conn.close()
         return db_images
@@ -397,7 +397,7 @@ class _ImgDbUpdater:
 
     def del_dublicates(self):
         short_paths = [
-            Utils.get_rel_path(self.mf.curr_path, path)
+            Utils.get_rel_img_path(self.mf.curr_path, path)
             for path, size, birth, mod in self.new_images
         ]
         q = sqlalchemy.delete(THUMBS).where(
@@ -411,8 +411,8 @@ class _ImgDbUpdater:
         values_list = []
         for path, size, birth, mod in self.new_images:
             abs_hash = Utils.create_abs_thumb_path(path)
-            short_hash = Utils.get_rel_hash(abs_hash)
-            short_src = Utils.get_rel_path(self.mf.curr_path, path)
+            short_hash = Utils.get_rel_thumb_path(abs_hash)
+            short_src = Utils.get_rel_img_path(self.mf.curr_path, path)
             values_list.append({
                 ClmNames.short_src: short_src,
                 ClmNames.short_hash: short_hash,

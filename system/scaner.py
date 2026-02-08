@@ -83,7 +83,7 @@ class DirsLoader:
                     continue
                 if stmt:
                     stack.append(entry.path)
-                    rel_path = Utils.get_rel_path(scaner_item.mf.curr_path, entry.path)
+                    rel_path = Utils.get_rel_img_path(scaner_item.mf.curr_path, entry.path)
                     stats = entry.stat()
                     mod = int(stats.st_mtime)
                     dir_item = DirItem(rel_path, mod)
@@ -234,7 +234,7 @@ class ImgLoader:
         scaner_item.q.put(scaner_item)
         finder_images: list[ImgItem] = []
         for dir_item in dir_list:
-            abs_dir_path = Utils.get_abs_path(scaner_item.mf.curr_path, dir_item.rel_path)
+            abs_dir_path = Utils.get_abs_img_path(scaner_item.mf.curr_path, dir_item.rel_path)
             for entry in os.scandir(abs_dir_path):
                 # передаем в основной поток ScanerItem
                 # чтобы в основном потоке сбрасывался таймер таймаута
@@ -280,7 +280,7 @@ class ImgLoader:
                 q = q.where(THUMBS.c.short_src.ilike(f"{dir_item.rel_path}/%"))
                 q = q.where(THUMBS.c.short_src.not_ilike(f"{dir_item.rel_path}/%/%"))
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
-                abs_img_path = Utils.get_abs_path(scaner_item.mf.curr_path, rel_path)
+                abs_img_path = Utils.get_abs_img_path(scaner_item.mf.curr_path, rel_path)
                 img_item = ImgItem(abs_img_path, size, birth, mod, rel_thumb_path)
                 db_images.append(img_item)
         conn.close()
@@ -386,6 +386,7 @@ class HashdirImgUpdater:
             img = Utils.fit_to_thumb(img, Static.max_img_size)
             if img is not None:
                 try:
+                    rel_img_path = Utils.get_rel_img_path(scaner_item.mf.curr_path, img_item.abs_img_path)
                     thumb_path = Utils.create_abs_thumb_path(img_item.abs_img_path)
                     Utils.write_thumb(thumb_path, img)
                     new_new_images.append(img_item)
@@ -427,7 +428,7 @@ class DbImgUpdater:
 
     def del_dublicates(self):
         short_paths = [
-            Utils.get_rel_path(self.mf.curr_path, path)
+            Utils.get_rel_img_path(self.mf.curr_path, path)
             for path, size, birth, mod in self.new_images
         ]
         q = sqlalchemy.delete(THUMBS).where(
@@ -441,8 +442,8 @@ class DbImgUpdater:
         values_list = []
         for path, size, birth, mod in self.new_images:
             abs_hash = Utils.create_abs_thumb_path(path)
-            short_hash = Utils.get_rel_hash(abs_hash)
-            short_src = Utils.get_rel_path(self.mf.curr_path, path)
+            short_hash = Utils.get_rel_thumb_path(abs_hash)
+            short_src = Utils.get_rel_img_path(self.mf.curr_path, path)
             values_list.append({
                 ClmNames.short_src: short_src,
                 ClmNames.short_hash: short_hash,

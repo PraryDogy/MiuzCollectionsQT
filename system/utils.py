@@ -66,14 +66,14 @@ class Utils:
             return None
 
     @classmethod
-    def create_abs_thumb_path(cls, path: str) -> str | None:
-        new_name = hashlib.md5(path.encode('utf-8')).hexdigest() + ".jpg"
+    def create_abs_thumb_path(cls, rel_img_path: str) -> str | None:
+        new_name = hashlib.md5(rel_img_path.encode('utf-8')).hexdigest() + ".jpg"
         new_folder = os.path.join(Static.app_support_hashdir, new_name[:2])
         os.makedirs(new_folder, exist_ok=True)
         return os.path.join(new_folder, new_name)
 
     @classmethod
-    def get_rel_hash(cls, thumb_path: str) -> str | None:
+    def get_rel_thumb_path(cls, thumb_path: str) -> str | None:
         try:
             return thumb_path.replace(Static.app_support, "")
         except Exception as e:
@@ -153,14 +153,14 @@ class Utils:
         os.execl(sys.executable, sys.executable, *sys.argv)
         
     @classmethod
-    def get_abs_path(cls, mf_path: str, rel_path: str) -> str:
+    def get_abs_img_path(cls, mf_path: str, rel_path: str) -> str:
         if mf_path in rel_path:
             return rel_path
         else:
             return mf_path + rel_path
     
     @classmethod
-    def get_rel_path(cls, mf_path: str, abs_path: str) -> str:
+    def get_rel_img_path(cls, mf_path: str, abs_path: str) -> str:
         return abs_path.replace(mf_path, "")
 
     @classmethod

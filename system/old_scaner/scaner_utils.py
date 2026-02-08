@@ -178,7 +178,7 @@ class DbImages(QObject):
         mf_path = self.mf.curr_path
         return {
             rel_thumb_path: (
-                Utils.get_abs_path(mf_path, rel_path),
+                Utils.get_abs_img_path(mf_path, rel_path),
                 size,
                 birth,
                 mod
@@ -392,8 +392,8 @@ class DbUpdater(QObject):
         conn = Dbase.engine.connect()
         for path, size, birth, mod in self.new_items:
             small_path = Utils.create_abs_thumb_path(path)
-            short_path = Utils.get_rel_path(self.mf.curr_path, path)
-            rel_thumb_path = Utils.get_rel_hash(small_path)
+            short_path = Utils.get_rel_img_path(self.mf.curr_path, path)
+            rel_thumb_path = Utils.get_rel_thumb_path(small_path)
 
             values = {
                 ClmNames.short_src: short_path,
