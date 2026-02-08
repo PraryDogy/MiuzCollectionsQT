@@ -160,8 +160,8 @@ class Utils:
             return mf_path + rel_path
     
     @classmethod
-    def get_rel_img_path(cls, mf_path: str, abs_path: str) -> str:
-        return abs_path.replace(mf_path, "")
+    def get_rel_img_path(cls, mf_path: str, abs_img_path: str) -> str:
+        return abs_img_path.replace(mf_path, "")
 
     @classmethod
     def rm_rf(cls, folder_path: str):

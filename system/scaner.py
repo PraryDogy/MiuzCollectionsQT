@@ -411,52 +411,64 @@ class HashdirImgUpdater:
 
 
 class DbImgUpdater:
-   
-    def run(self):
-        self.run_del_items()
-        self.del_dublicates()
-        self.run_new_items()
+    @staticmethod
+    def start(scaner_item: ScanerItem, del_images: list[ImgItem], new_images: list[ImgItem]):
+        if del_images:
+            DbImgUpdater.remove_del_images(scaner_item, del_images)
+        if new_images:
+            DbImgUpdater.remove_exits_images()
+            DbImgUpdater.add_new_images()
+        return None
 
-    def run_del_items(self):
-        if self.del_images:
-            q = sqlalchemy.delete(THUMBS).where(
-                THUMBS.c.short_hash.in_(self.del_images),
-                THUMBS.c.brand == self.mf.alias
-            )
-            self.conn.execute(q)
-            self.conn.commit()
+    @staticmethod
+    def remove_del_images(scaner_item: ScanerItem, del_images: list[ImgItem]):
+        conn = scaner_item.engine.connect()
+        rel_thumb_paths = [i.rel_thumb_path for i in del_images]
+        q = sqlalchemy.delete(THUMBS).where(
+            THUMBS.c.short_hash.in_(rel_thumb_paths),
+            THUMBS.c.brand == scaner_item.mf_alias
+        )
+        conn.execute(q)
+        conn.commit()
+        conn.close()
 
-    def del_dublicates(self):
-        short_paths = [
-            Utils.get_rel_img_path(self.mf.curr_path, path)
-            for path, size, birth, mod in self.new_images
+    @staticmethod
+    def remove_exits_images(scaner_item: ScanerItem, new_images: list[ImgItem]):
+        conn = scaner_item.engine.connect()
+        rel_img_paths = [
+            Utils.get_rel_img_path(scaner_item.mf.curr_path, img_item.abs_img_path)
+            for img_item in new_images
         ]
         q = sqlalchemy.delete(THUMBS).where(
-            THUMBS.c.short_src.in_(short_paths),
-            THUMBS.c.brand == self.mf.alias
+            THUMBS.c.short_src.in_(rel_img_paths),
+            THUMBS.c.brand == scaner_item.mf_alias
         )
-        self.conn.execute(q)
-        self.conn.commit()
+        conn.execute(q)
+        conn.commit()
+        conn.close()
 
-    def run_new_items(self):
+    @staticmethod
+    def add_new_images(scaner_item: ScanerItem, new_images: list[ImgItem]):
+        conn = scaner_item.engine.connect()
         values_list = []
-        for path, size, birth, mod in self.new_images:
-            abs_hash = Utils.create_abs_thumb_path(path)
-            short_hash = Utils.get_rel_thumb_path(abs_hash)
-            short_src = Utils.get_rel_img_path(self.mf.curr_path, path)
+        for img_item in new_images:
+            rel_img_path = Utils.get_rel_img_path(scaner_item.mf.curr_path, img_item.abs_img_path)
+            abs_thumb_path = Utils.create_abs_thumb_path(rel_img_path)
+            rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
             values_list.append({
-                ClmNames.short_src: short_src,
-                ClmNames.short_hash: short_hash,
-                ClmNames.size: size,
-                ClmNames.birth: birth,
-                ClmNames.mod: mod,
+                ClmNames.short_src: rel_img_path,
+                ClmNames.short_hash: rel_thumb_path,
+                ClmNames.size: img_item.size,
+                ClmNames.birth: img_item.birth,
+                ClmNames.mod: img_item.mod,
                 ClmNames.resol: "",
                 ClmNames.coll: "",
                 ClmNames.fav: 0,
-                ClmNames.brand: self.mf.alias
+                ClmNames.brand: scaner_item.mf_alias
             })
-        self.conn.execute(sqlalchemy.insert(THUMBS), values_list)
-        self.conn.commit()
+        conn.execute(sqlalchemy.insert(THUMBS), values_list)
+        conn.commit()
+        conn.close()
 
 
 class NewDirsHandler(QObject):
