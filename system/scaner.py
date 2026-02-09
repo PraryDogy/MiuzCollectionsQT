@@ -48,7 +48,7 @@ class ImgItem:
     rel_thumb_path: str = ""
 
 
-class DirsLoader:
+class DirLoader:
     @staticmethod
     def start(scaner_item: ScanerItem):
         """
@@ -56,8 +56,8 @@ class DirsLoader:
         - Собирает список всех директорий из базы данных, которые
           соответствуют `Mf.alias`
         """
-        finder_dirs = DirsLoader.get_finder_dirs(scaner_item)
-        db_dirs = DirsLoader.get_db_dirs(scaner_item)
+        finder_dirs = DirLoader.get_finder_dirs(scaner_item)
+        db_dirs = DirLoader.get_db_dirs(scaner_item)
         return (finder_dirs, db_dirs)
 
     @staticmethod
@@ -93,7 +93,7 @@ class DirsLoader:
                     # если к директории нет доступа, то далее
                     # например если сетевой диск был отключен во время работы
                     # или если нет прав доступа
-                    print("new scaner utils, dirs loader, finder dirs error", e)
+                    print("scaner > DirLoader > finder dirs error", e)
                     continue
                 if stmt:
                     stack.append(entry.path)
@@ -576,7 +576,7 @@ class AllDirScaner:
     @staticmethod
     def single_mf_scan(scaner_item: ScanerItem):
         # собираем Finder директории и директории из БД
-        finder_dirs, db_dirs = DirsLoader.start(scaner_item)
+        finder_dirs, db_dirs = DirLoader.start(scaner_item)
         if not finder_dirs:
             print(scaner_item.mf.alias, "no finder dirs")
             return
