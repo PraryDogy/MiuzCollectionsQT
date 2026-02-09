@@ -36,7 +36,7 @@ THUMBS_TABLE = sqlalchemy.Table(
 )
 
 
-class THUMBS:
+class Thumbs:
     id = THUMBS_TABLE.c.id
     rel_img_path = THUMBS_TABLE.c.short_src
     rel_thumb_path = THUMBS_TABLE.c.short_hash
