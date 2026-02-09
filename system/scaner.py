@@ -33,9 +33,8 @@ class ImgItem:
         abs_img_path: полный путь до изображения
         rel_thumb_path: относительный путь до миниатюры в "hashdir"
         """
-        for i in (size, birth, mod):
-            if not isinstance(i, int):
-                raise TypeError ("DirItem: int")
+        if not all(isinstance(i, int) for i in (size, birth, mod)):
+            raise TypeError("system > scaner > ImgItem int error")
         super().__init__()
         self.abs_img_path = abs_img_path
         self.rel_thumb_path = rel_thumb_path 
