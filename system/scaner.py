@@ -341,10 +341,12 @@ class HashdirImgUpdater:
     @staticmethod
     def start(scaner_item: ScanerItem, del_images: list, new_images: list):
         """
-        - Удаляет из "hashdir" изображения, которых больше нет в Finder.
-        - Добавляет изображения, которые есть в Finder, в "hashdir".
-        - Возвращает список успешно удаленных и список успешно добавленных изображений.
-        - Далее необходимо обновить информацию в базе данных на основе полученных списков.
+        - Удаляет из `hashdir` миниатюры, которых больше нет в Finder
+        - Добавляет миниатюры в `hashdir`, которые есть в Finder
+        - Возвращает список успешно удаленных и список успешно добавленных
+          миниатюр.
+        - Далее необходимо обновить информацию в базе данных на основе
+          полученных списков.
 
         Получить данные del_images и new_images необходимо из ImgCompator.  
         Параметры:  
@@ -352,8 +354,8 @@ class HashdirImgUpdater:
         - new_images список ImgItem
 
         Возвращает:     
-        - успешно удаленные из "hashdir" список ImgItem
-        - успешно добавленные в "hashdir" список ImgItem
+        - успешно удаленные из `hashdir` список `ImgItem`
+        - успешно добавленные в `hashdir` список `ImgItem`
         """
         scaner_item.total_count = len(del_images) + len(new_images)
         new_del_images = HashdirImgUpdater.run_del_images(scaner_item, del_images)
