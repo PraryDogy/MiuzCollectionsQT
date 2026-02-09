@@ -482,7 +482,10 @@ class DbImgUpdater:
     def remove_exits_imgs(scaner_item: ScanerItem, new_images: list[ImgItem]):
         conn = scaner_item.engine.connect()
         rel_img_paths = [
-            Utils.get_rel_img_path(scaner_item.mf.curr_path, img_item.abs_img_path)
+            Utils.get_rel_img_path(
+                mf_path=scaner_item.mf.curr_path,
+                abs_img_path=img_item.abs_img_path
+            )
             for img_item in new_images
         ]
         q = sqlalchemy.delete(Thumbs).where(
@@ -498,7 +501,10 @@ class DbImgUpdater:
         conn = scaner_item.engine.connect()
         values_list = []
         for img_item in new_images:
-            rel_img_path = Utils.get_rel_img_path(scaner_item.mf.curr_path, img_item.abs_img_path)
+            rel_img_path = Utils.get_rel_img_path(
+                scaner_item=scaner_item.mf.curr_path,
+                abs_img_path=img_item.abs_img_path
+            )
             abs_thumb_path = Utils.create_abs_thumb_path(rel_img_path)
             rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
             values_list.append({
