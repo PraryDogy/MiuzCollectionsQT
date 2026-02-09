@@ -398,14 +398,14 @@ class HashdirImgUpdater:
                     folder = os.path.dirname(thumb_path)
                     if not os.listdir(folder):
                         shutil.rmtree(folder)
+                    new_del_images.append(img_item)
+                    scaner_item.total_count -= 1
+                    # передаем в основной поток текст для отображения
+                    # и чтобы в основном потоке сбрасывался таймер таймаута
+                    HashdirImgUpdater.send_text(scaner_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     continue
-                new_del_images.append(img_item)
-                scaner_item.total_count -= 1
-                # передаем в основной поток текст для отображения
-                # а так же чтобы в основном потоке сбрасывался таймер таймаута
-                HashdirImgUpdater.send_text(scaner_item)
         return new_del_images
 
     @staticmethod
@@ -420,7 +420,10 @@ class HashdirImgUpdater:
             img = Utils.fit_to_thumb(img, Static.max_img_size)
             if img is not None:
                 try:
-                    rel_img_path = Utils.get_rel_img_path(scaner_item.mf.curr_path, img_item.abs_img_path)
+                    rel_img_path = Utils.get_rel_img_path(
+                        mf_path=scaner_item.mf.curr_path,
+                        abs_img_path=img_item.abs_img_path
+                    )
                     thumb_path = Utils.create_abs_thumb_path(rel_img_path)
                     Utils.write_thumb(thumb_path, img)
                     new_new_images.append(img_item)
@@ -429,7 +432,7 @@ class HashdirImgUpdater:
                     # а так же чтобы в основном потоке сбрасывался таймер таймаута
                     HashdirImgUpdater.send_text(scaner_item)
                 except Exception as e:
-                    print("new scaner utils, hashdir updater, create new img error", e)
+                    print("scaner HashdirImgUpdater error", e)
                     continue
         return new_new_images
 
