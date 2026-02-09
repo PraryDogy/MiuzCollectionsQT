@@ -63,9 +63,9 @@ class DirsLoader:
     @staticmethod
     def get_finder_dirs(scaner_item: ScanerItem):
         """
-        Собирает список директорий:
-        - которые есть в каталоге `Mf.curr_path`
-        - которых нет в стоп листе `Mf.stop_list`
+        Собирает список директорий, которые:
+        - есть в каталоге `Mf.curr_path`
+        - не в стоп листе `Mf.stop_list`
         """
         # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
@@ -84,7 +84,11 @@ class DirsLoader:
                 # чтобы в основном потоке сбрасывался таймер таймаута
                 scaner_item.q.put(scaner_item)
                 try:
-                    stmt = entry.is_dir() and entry.name not in scaner_item.mf.stop_list
+                    stmt = (
+                        entry.is_dir()
+                        and
+                        entry.name not in scaner_item.mf.stop_list
+                    )
                 except Exception as e:
                     # если к директории нет доступа, то далее
                     # например если сетевой диск был отключен во время работы
@@ -93,7 +97,10 @@ class DirsLoader:
                     continue
                 if stmt:
                     stack.append(entry.path)
-                    rel_path = Utils.get_rel_img_path(scaner_item.mf.curr_path, entry.path)
+                    rel_path = Utils.get_rel_img_path(
+                        scaner_item.mf.curr_path,
+                        entry.path
+                    )
                     stats = entry.stat()
                     mod = int(stats.st_mtime)
                     dir_item = DirItem(rel_path, mod)
@@ -109,8 +116,8 @@ class DirsLoader:
     @staticmethod
     def get_db_dirs(scaner_item: ScanerItem):
         """
-        Возвращает список DirItem
-        - которые есть в базе данных и соответствуют псевдониму Mf
+        Возвращает список директорий из базы данных, которые:
+        - соответствуют DIRS.c.brand == `Mf.alias`
         """
         conn = scaner_item.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
