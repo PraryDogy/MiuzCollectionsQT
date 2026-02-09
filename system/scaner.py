@@ -29,6 +29,11 @@ class HashDir:
 
 class DirItem:
     def __init__(self, rel_path: str, mod: int):
+        """
+        Параметры:
+        - rel_path: путь к каталогу за вычетом :class:`Mf.curr_path`
+        - mod: дата модификации каталога os.stat.st_birthtime
+        """
         if not isinstance(mod, int):
             raise TypeError ("DirItem: mod должен быть int")
         self.rel_path = rel_path
@@ -43,7 +48,7 @@ class ImgItem:
         - size: размер изображения в байтах
         - birth: os.stat.st_birthtime
         - mod: os.stat.st_mtime
-        - rel_thumb_path: относительный путь до миниатюры в HashDir
+        - rel_thumb_path: относительный путь до миниатюры в :class:`HashDir`
         """
         if not all(isinstance(i, int) for i in (size, birth, mod)):
             raise TypeError("system > scaner > ImgItem int error")
