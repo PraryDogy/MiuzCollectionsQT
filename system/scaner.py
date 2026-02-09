@@ -312,13 +312,9 @@ class ImgCompator:
         - finder_images список ImgItem
         - db_images список ImgItem
 
-        Возвращает:
-        - изображения, которых больше нет в Finder но есть в базе данных: список ImgItem
-        - изображения, которых нет в базе данных, но есть в Finder: список ImgItem
-
-        Важно:
-        - db_images содержит rel_thumb_path, по которому изображения будут удалены из базы данных
-        - db_images переходит в removed_images для удалени из базы данных
+        Собирает списки `ImgItem`:
+        - изображения, которых больше нет в Finder но есть в БД
+        - изображения, которых нет в БД, но есть в Finder
         """
         finder_dict = {
             (i.abs_img_path, i.size, i.birth, i.mod): i
