@@ -396,15 +396,15 @@ class DbUpdater(QObject):
             rel_thumb_path = Utils.get_rel_thumb_path(small_path)
 
             values = {
-                ColumnNames.short_src: short_path,
-                ColumnNames.short_hash: rel_thumb_path,
+                ColumnNames.rel_item_path: short_path,
+                ColumnNames.rel_thumb_path: rel_thumb_path,
                 ColumnNames.size: size,
                 ColumnNames.birth: birth,
                 ColumnNames.mod: mod,
                 ColumnNames.resol: "",
                 ColumnNames.coll: "",
                 ColumnNames.fav: 0,
-                ColumnNames.brand: self.mf.alias
+                ColumnNames.mf_alias: self.mf.alias
             }
             stmt = sqlalchemy.insert(_table_thumbs).values(**values) 
             try:

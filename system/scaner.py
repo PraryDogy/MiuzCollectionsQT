@@ -211,9 +211,9 @@ class DbDirUpdater:
         # вставить новые записи батчем
         values_list = [
             {
-                ColumnNames.short_src: dir_item.rel_path,
+                ColumnNames.rel_item_path: dir_item.rel_path,
                 ColumnNames.mod: dir_item.mod,
-                ColumnNames.brand: scaner_item.mf.alias
+                ColumnNames.mf_alias: scaner_item.mf.alias
             }
             for dir_item in dir_list
         ]
@@ -473,15 +473,15 @@ class DbImgUpdater:
             abs_thumb_path = Utils.create_abs_thumb_path(rel_img_path)
             rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
             values_list.append({
-                ColumnNames.short_src: rel_img_path,
-                ColumnNames.short_hash: rel_thumb_path,
+                ColumnNames.rel_item_path: rel_img_path,
+                ColumnNames.rel_thumb_path: rel_thumb_path,
                 ColumnNames.size: img_item.size,
                 ColumnNames.birth: img_item.birth,
                 ColumnNames.mod: img_item.mod,
                 ColumnNames.resol: "",
                 ColumnNames.coll: "",
                 ColumnNames.fav: 0,
-                ColumnNames.brand: scaner_item.mf.alias
+                ColumnNames.mf_alias: scaner_item.mf.alias
             })
         conn.execute(sqlalchemy.insert(Thumbs.table), values_list)
         conn.commit()

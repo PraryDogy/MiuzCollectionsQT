@@ -145,9 +145,9 @@ class DirsUpdater:
         # вставить новые записи батчем
         values_list = [
             {
-                ColumnNames.short_src: short_src,
+                ColumnNames.rel_item_path: short_src,
                 ColumnNames.mod: mod,
-                ColumnNames.brand: self.mf.alias
+                ColumnNames.mf_alias: self.mf.alias
             }
             for short_src, mod in self.dirs_to_scan
         ]
@@ -414,15 +414,15 @@ class _ImgDbUpdater:
             short_hash = Utils.get_rel_thumb_path(abs_hash)
             short_src = Utils.get_rel_img_path(self.mf.curr_path, path)
             values_list.append({
-                ColumnNames.short_src: short_src,
-                ColumnNames.short_hash: short_hash,
+                ColumnNames.rel_item_path: short_src,
+                ColumnNames.rel_thumb_path: short_hash,
                 ColumnNames.size: size,
                 ColumnNames.birth: birth,
                 ColumnNames.mod: mod,
                 ColumnNames.resol: "",
                 ColumnNames.coll: "",
                 ColumnNames.fav: 0,
-                ColumnNames.brand: self.mf.alias
+                ColumnNames.mf_alias: self.mf.alias
             })
         self.conn.execute(sqlalchemy.insert(_table_thumbs), values_list)
         self.conn.commit()

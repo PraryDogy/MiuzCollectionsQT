@@ -11,38 +11,38 @@ METADATA = sqlalchemy.MetaData()
 
 class ColumnNames:
     id: Literal["id"] = "id"
-    short_src: Literal["short_src"] = "short_src"
-    short_hash: Literal["short_hash"] = "short_hash"
+    rel_item_path: Literal["short_src"] = "short_src"
+    rel_thumb_path: Literal["short_hash"] = "short_hash"
     size: Literal["size"] = "size"
     birth: Literal["birth"] = "birth"
     mod: Literal["mod"] = "mod"
     resol: Literal["resol"] = "resol"
     coll: Literal["coll"] = "coll"
     fav: Literal["fav"] = "fav"
-    brand: Literal["brand"] = "brand"
+    mf_alias: Literal["brand"] = "brand"
 
 
 _table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column(ColumnNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ColumnNames.short_src, sqlalchemy.Text),
-    sqlalchemy.Column(ColumnNames.short_hash, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.rel_item_path, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.rel_thumb_path, sqlalchemy.Text),
     sqlalchemy.Column(ColumnNames.size, sqlalchemy.Integer),
     sqlalchemy.Column(ColumnNames.birth, sqlalchemy.Integer),
     sqlalchemy.Column(ColumnNames.mod, sqlalchemy.Integer),
     sqlalchemy.Column(ColumnNames.resol, sqlalchemy.Text),
     sqlalchemy.Column(ColumnNames.coll, sqlalchemy.Text),
     sqlalchemy.Column(ColumnNames.fav, sqlalchemy.Integer),
-    sqlalchemy.Column(ColumnNames.brand, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.mf_alias, sqlalchemy.Text),
 )
 
 
 _table_dirs = sqlalchemy.Table(
     "dirs", METADATA,
     sqlalchemy.Column(ColumnNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ColumnNames.short_src, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.rel_item_path, sqlalchemy.Text),
     sqlalchemy.Column(ColumnNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ColumnNames.brand, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.mf_alias, sqlalchemy.Text),
 )
 
 
