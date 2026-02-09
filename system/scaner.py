@@ -261,7 +261,7 @@ class ImgLoader:
                     try:
                         stat = entry.stat()
                     except Exception as e:
-                        print("scaner > ImgLoader, get_finder_images, error", e)
+                        print("scaner > ImgLoader error", e)
                         continue
                     # передаем в основной поток ScanerItem
                     # чтобы в основном потоке сбрасывался таймер таймаута
@@ -431,7 +431,11 @@ class HashdirImgUpdater:
 
 class DbImgUpdater:
     @staticmethod
-    def start(scaner_item: ScanerItem, del_images: list[ImgItem], new_images: list[ImgItem]):
+    def start(
+        scaner_item: ScanerItem,
+        del_images: list[ImgItem],
+        new_images: list[ImgItem]
+    ):
         if del_images:
             DbImgUpdater.remove_del_images(scaner_item, del_images)
         if new_images:
