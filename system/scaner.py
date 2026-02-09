@@ -132,7 +132,9 @@ class DirsCompator:
     @staticmethod
     def start(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         """
-        Возвращает список директорий DirItem для удаления и список директорий DirItem для сканирования
+        - Сравнивает директории из Finder и из базы данных:
+            - Создает список удаленных директорий (нет в Finer, есть в БД)
+            - Создает список новых директорий (есть в Finder, нет в БД)
         """
         dirs_to_remove = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         dirs_to_scan = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
