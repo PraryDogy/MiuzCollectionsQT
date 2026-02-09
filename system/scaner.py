@@ -559,41 +559,41 @@ class NewDirsWorker:
 
 class RemovedDirsWorker:
     @staticmethod
-    def _process_dirs(self):
-        def remove_thumbs(rel_dir: str):
-            stmt = (
-                sqlalchemy.select(Thumbs.rel_thumb_path)
-                .where(Thumbs.rel_img_path.ilike(f"{rel_dir}/%"))
-                .where(Thumbs.rel_img_path.not_ilike(f"{rel_dir}/%/%"))
-                .where(Thumbs.mf_alias == self.mf.alias)
-            )
-            for rel_thumb_path in self.conn.execute(stmt).scalars():
-                try:
-                    os.remove(Utils.get_abs_thumb_path(rel_thumb_path))
-                except Exception as e:
-                    print("DelDirsHandler, remove thumb:", e)
-
-            del_stmt = (
-                sqlalchemy.delete(Thumbs.table)
-                .where(Thumbs.rel_img_path.ilike(f"{rel_dir}/%"))
-                .where(Thumbs.rel_img_path.not_ilike(f"{rel_dir}/%/%"))
-                .where(Thumbs.mf_alias == self.mf.alias)
-            )
-            self.conn.execute(del_stmt)
-
-        def remove_dir_entry(rel_dir: str):
-            stmt = (
-                sqlalchemy.delete(Dirs.table)
-                .where(Dirs.rel_dir_path == rel_dir)
-                .where(Dirs.mf_alias == self.mf.alias)
-            )
-            self.conn.execute(stmt)
-
+    def start():
         for rel_dir, _ in self.dirs_to_del:
             remove_thumbs(rel_dir)
             remove_dir_entry(rel_dir)
 
         self.conn.commit()
+
+    def remove_thumbs(rel_dir: str):
+        stmt = (
+            sqlalchemy.select(Thumbs.rel_thumb_path)
+            .where(Thumbs.rel_img_path.ilike(f"{rel_dir}/%"))
+            .where(Thumbs.rel_img_path.not_ilike(f"{rel_dir}/%/%"))
+            .where(Thumbs.mf_alias == self.mf.alias)
+        )
+        for rel_thumb_path in self.conn.execute(stmt).scalars():
+            try:
+                os.remove(Utils.get_abs_thumb_path(rel_thumb_path))
+            except Exception as e:
+                print("DelDirsHandler, remove thumb:", e)
+
+        del_stmt = (
+            sqlalchemy.delete(Thumbs.table)
+            .where(Thumbs.rel_img_path.ilike(f"{rel_dir}/%"))
+            .where(Thumbs.rel_img_path.not_ilike(f"{rel_dir}/%/%"))
+            .where(Thumbs.mf_alias == self.mf.alias)
+        )
+        self.conn.execute(del_stmt)
+
+    def remove_dir_entry(rel_dir: str):
+        stmt = (
+            sqlalchemy.delete(Dirs.table)
+            .where(Dirs.rel_dir_path == rel_dir)
+            .where(Dirs.mf_alias == self.mf.alias)
+        )
+        self.conn.execute(stmt)
 
 
 class AllDirScaner:
@@ -637,10 +637,9 @@ class AllDirScaner:
             print(scaner_item.mf.alias, "no finder dirs")
             return
         removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
-        # обходим новые директории, добавляем / удаляем изображения
         if new_dirs:
             NewDirsWorker.start(new_dirs, scaner_item)
         # удаляем удаленные Finder директории
         if removed_dirs:
-            del_handler = RemovedDirsHandler(removed_dirs, mf)
+            del_handler = RemovedDirsWorker.start(removed_dirs, scaner_item)
             del_handler.run()
