@@ -460,14 +460,14 @@ class DbImgUpdater:
         new_images: list[ImgItem]
     ):
         if del_images:
-            DbImgUpdater.remove_del_images(scaner_item, del_images)
+            DbImgUpdater.remove_del_imgs(scaner_item, del_images)
         if new_images:
-            DbImgUpdater.remove_exits_images()
-            DbImgUpdater.add_new_images()
+            DbImgUpdater.remove_exits_imgs(scaner_item, new_images)
+            DbImgUpdater.add_new_imgs(scaner_item, new_images)
         return None
 
     @staticmethod
-    def remove_del_images(scaner_item: ScanerItem, del_images: list[ImgItem]):
+    def remove_del_imgs(scaner_item: ScanerItem, del_images: list[ImgItem]):
         conn = scaner_item.engine.connect()
         rel_thumb_paths = [i.rel_thumb_path for i in del_images]
         q = sqlalchemy.delete(Thumbs.table).where(
@@ -479,7 +479,7 @@ class DbImgUpdater:
         conn.close()
 
     @staticmethod
-    def remove_exits_images(scaner_item: ScanerItem, new_images: list[ImgItem]):
+    def remove_exits_imgs(scaner_item: ScanerItem, new_images: list[ImgItem]):
         conn = scaner_item.engine.connect()
         rel_img_paths = [
             Utils.get_rel_img_path(scaner_item.mf.curr_path, img_item.abs_img_path)
@@ -494,7 +494,7 @@ class DbImgUpdater:
         conn.close()
 
     @staticmethod
-    def add_new_images(scaner_item: ScanerItem, new_images: list[ImgItem]):
+    def add_new_imgs(scaner_item: ScanerItem, new_images: list[ImgItem]):
         conn = scaner_item.engine.connect()
         values_list = []
         for img_item in new_images:
