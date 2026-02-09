@@ -479,13 +479,16 @@ class NewDirsWorker:
         - dirs_to_scan список DirItem
         - на основе этого списка добавляются и удаляются миниатюры в "hashdir"
         - обновляются базы данных THUMBS и DIRS
+
+        Возвращает:
+        - None
         """
         finder_images, db_images = ImgLoader.start(scaner_item, dirs_to_scan)
         del_images, new_images = ImgCompator.start(finder_images, db_images)
         del_images, new_images = HashdirImgUpdater.start(scaner_item, del_images, new_images)
         DbImgUpdater.start(scaner_item, del_images, new_images)
         DbDirUpdater.start(scaner_item, dirs_to_scan)
-        return (del_images, new_images)
+        return None
     
 
 class RemovedDirsWorker:
@@ -527,7 +530,7 @@ class RemovedDirsWorker:
         self.conn.commit()
 
 
-class ScanerTask:
+class AllDirScaner:
     @staticmethod
     def start(mf_list: list[Mf], q: Queue):
         engine = Dbase.create_engine()
@@ -536,7 +539,7 @@ class ScanerTask:
             scaner_item = ScanerItem(mf, engine, q)
             if scaner_item.mf.get_available_path():
                 print("scaner started", scaner_item.mf.alias)
-                ScanerTask.mf_scan(scaner_item)
+                AllDirScaner.single_mf_scan(scaner_item)
                 print("scaner finished", scaner_item.mf.alias)
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
@@ -554,14 +557,7 @@ class ScanerTask:
         engine.dispose()
 
     @staticmethod
-    def mf_scan(scaner_item: ScanerItem):
-        try:
-            ScanerTask._mf_scan(scaner_item)
-        except Exception as e:
-            print("scaner, main folder scan error", scaner_item.mf_real_name, scaner_item.mf.alias, e)
-
-    @staticmethod
-    def _mf_scan(scaner_item: ScanerItem):
+    def single_mf_scan(scaner_item: ScanerItem):
         # собираем Finder директории и директории из БД
         finder_dirs, db_dirs = DirsLoader.start(scaner_item)
         if not finder_dirs:
@@ -570,9 +566,7 @@ class ScanerTask:
         removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
         # обходим новые директории, добавляем / удаляем изображения
         if new_dirs:
-            scan_dirs = NewDirsWorker.start(new_dirs, scaner_item)
-            scan_dirs.run()
-        
+            NewDirsWorker.start(new_dirs, scaner_item)
         # удаляем удаленные Finder директории
         if removed_dirs:
             del_handler = RemovedDirsHandler(removed_dirs, mf)
