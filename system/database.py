@@ -2,7 +2,6 @@ import os
 from typing import Literal
 
 import sqlalchemy
-
 from cfg import Static
 from system.utils import Utils
 
@@ -22,7 +21,7 @@ class ClmNames:
     brand: Literal["brand"] = "brand"
 
 
-THUMBS = sqlalchemy.Table(
+THUMBS_TABLE = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text, comment="относительный путь к изображению"),
@@ -36,6 +35,20 @@ THUMBS = sqlalchemy.Table(
     sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text, comment="Mf.alias (смотри system > main_folder)"),
 )
 
+
+class THUMBS:
+    id = THUMBS_TABLE.c.id
+    rel_img_path = THUMBS_TABLE.c.short_src
+    rel_thumb_path = THUMBS_TABLE.c.short_hash
+    size = THUMBS_TABLE.c.size
+    birth = THUMBS_TABLE.c.birth
+    mod = THUMBS_TABLE.c.mod
+    resol = THUMBS_TABLE.c.resol
+    coll = THUMBS_TABLE.c.coll
+    fav = THUMBS_TABLE.c.fav
+    mf_alias = THUMBS_TABLE.c.brand
+
+
 DIRS = sqlalchemy.Table(
     "dirs", METADATA,
     sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
@@ -43,6 +56,11 @@ DIRS = sqlalchemy.Table(
     sqlalchemy.Column(ClmNames.mod, sqlalchemy.Integer),
     sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text, comment="Mf.name (смотри system > main_folder)"),
 )
+
+
+
+
+
 
 class Dbase:
     engine: sqlalchemy.Engine = None

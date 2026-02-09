@@ -7,7 +7,7 @@ from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import cfg, Static
-from system.database import THUMBS, ClmNames, Dbase
+from system.database import THUMBS_TABLE, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
 
@@ -164,13 +164,13 @@ class DbImages(QObject):
         conn = Dbase.engine.connect()
 
         q = sqlalchemy.select(
-            THUMBS.c.short_hash, # relative thumb path
-            THUMBS.c.short_src,
-            THUMBS.c.size,
-            THUMBS.c.birth,
-            THUMBS.c.mod
+            THUMBS_TABLE.c.short_hash, # relative thumb path
+            THUMBS_TABLE.c.short_src,
+            THUMBS_TABLE.c.size,
+            THUMBS_TABLE.c.birth,
+            THUMBS_TABLE.c.mod
             )
-        q = q.where(THUMBS.c.brand == self.mf.alias)
+        q = q.where(THUMBS_TABLE.c.brand == self.mf.alias)
         # не забываем относительный путь к изображению преобразовать в полный
         # для сравнения с finder_items
         res = conn.execute(q).fetchall()
@@ -236,7 +236,7 @@ class Inspector(QObject):
     def is_remove_all(self):
         conn = Dbase.engine.connect()
         q = sqlalchemy.select(sqlalchemy.func.count())
-        q = q.where(THUMBS.c.brand == self.mf.alias)
+        q = q.where(THUMBS_TABLE.c.brand == self.mf.alias)
         result = conn.execute(q).scalar()
         conn.close()
         if len(self.del_items) == result and len(self.del_items) != 0:
@@ -364,9 +364,9 @@ class DbUpdater(QObject):
     def run_del_items(self):
         conn = Dbase.engine.connect()
         for rel_thumb_path in self.del_items:
-            q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.short_hash==rel_thumb_path)
-            q = q.where(THUMBS.c.brand==self.mf.alias)
+            q = sqlalchemy.delete(THUMBS_TABLE)
+            q = q.where(THUMBS_TABLE.c.short_hash==rel_thumb_path)
+            q = q.where(THUMBS_TABLE.c.brand==self.mf.alias)
             try:
                 conn.execute(q)
             except (sqlalchemy.exc.IntegrityError, OverflowError) as e:
@@ -406,7 +406,7 @@ class DbUpdater(QObject):
                 ClmNames.fav: 0,
                 ClmNames.brand: self.mf.alias
             }
-            stmt = sqlalchemy.insert(THUMBS).values(**values) 
+            stmt = sqlalchemy.insert(THUMBS_TABLE).values(**values) 
             try:
                 conn.execute(stmt)
             # overflow error бывает прозникает когда пишет
@@ -450,7 +450,7 @@ class MfRemover(QObject):
         self.conn = Dbase.engine.connect()
 
     def run(self):
-        q = sqlalchemy.select(THUMBS.c.brand).distinct()
+        q = sqlalchemy.select(THUMBS_TABLE.c.brand).distinct()
         db_mfs = self.conn.execute(q).scalars().all()
         app_mfs = [i.alias for i in Mf.list_]
         del_mfs = [i for i in db_mfs if i not in app_mfs]
@@ -461,8 +461,8 @@ class MfRemover(QObject):
         self.conn.close()
         
     def get_rows(self, mf_name):
-        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash) #rel thumb path
-        q = q.where(THUMBS.c.brand == mf_name)
+        q = sqlalchemy.select(THUMBS_TABLE.c.id, THUMBS_TABLE.c.short_hash) #rel thumb path
+        q = q.where(THUMBS_TABLE.c.brand == mf_name)
         res = self.conn.execute(q).fetchall()
         res = [
             (id_, Utils.get_abs_thumb_path(rel_thumb_path))
@@ -495,8 +495,8 @@ class MfRemover(QObject):
         rows: [(row id int, thumb path), ...]
         """
         for id_, thumb_path in rows:
-            q = sqlalchemy.delete(THUMBS)
-            q = q.where(THUMBS.c.id == id_)
+            q = sqlalchemy.delete(THUMBS_TABLE)
+            q = q.where(THUMBS_TABLE.c.id == id_)
 
             try:
                 self.conn.execute(q)

@@ -9,7 +9,7 @@ import sqlalchemy
 
 from cfg import Static, cfg
 
-from .database import DIRS, THUMBS, Dbase
+from .database import DIRS, THUMBS_TABLE, Dbase
 from .items import CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem
 from .lang import Lng
 from .main_folder import Mf
@@ -211,7 +211,7 @@ class _DeletedMfRemover:
         Передает в Queue список удаленных Mf (список имен str)
         """
         conn = engine.connect()
-        stmt = sqlalchemy.select(THUMBS.c.brand).distinct()
+        stmt = sqlalchemy.select(THUMBS_TABLE.c.brand).distinct()
         db_mf_list = conn.execute(stmt).scalars().all()
         json_mf_list = [i.alias for i in on_start_item.mf_list]
         removed_mf_list: list[str] = [
@@ -231,8 +231,8 @@ class _DeletedMfRemover:
     
     @staticmethod
     def get_rows(mf_name: str, conn: sqlalchemy.Connection):
-        q = sqlalchemy.select(THUMBS.c.id, THUMBS.c.short_hash).where(
-            THUMBS.c.brand == mf_name
+        q = sqlalchemy.select(THUMBS_TABLE.c.id, THUMBS_TABLE.c.short_hash).where(
+            THUMBS_TABLE.c.brand == mf_name
         )
         return [
             (id_, Utils.get_abs_thumb_path(rel_thumb_path))
@@ -262,7 +262,7 @@ class _DeletedMfRemover:
         """
         ids = [id_ for id_, _ in rows]
         if ids:
-            q = sqlalchemy.delete(THUMBS).where(THUMBS.c.id.in_(ids))
+            q = sqlalchemy.delete(THUMBS_TABLE).where(THUMBS_TABLE.c.id.in_(ids))
             conn.execute(q)
             conn.commit()
 
@@ -289,10 +289,10 @@ class _EmptyRecordsRemover:
         """
         conn = engine.connect()
         stmt = (
-            sqlalchemy.delete(THUMBS).where(
+            sqlalchemy.delete(THUMBS_TABLE).where(
                 sqlalchemy.or_(
-                    THUMBS.c.short_hash == None,
-                    THUMBS.c.short_src == None
+                    THUMBS_TABLE.c.short_hash == None,
+                    THUMBS_TABLE.c.short_src == None
                 )
             )
         )
