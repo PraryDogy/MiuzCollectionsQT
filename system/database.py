@@ -9,7 +9,7 @@ from system.utils import Utils
 METADATA = sqlalchemy.MetaData()
 
 
-class ClmNames:
+class ColumnNames:
     id: Literal["id"] = "id"
     short_src: Literal["short_src"] = "short_src"
     short_hash: Literal["short_hash"] = "short_hash"
@@ -24,25 +24,25 @@ class ClmNames:
 
 _table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
-    sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text),
-    sqlalchemy.Column(ClmNames.short_hash, sqlalchemy.Text),
-    sqlalchemy.Column(ClmNames.size, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.birth, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.resol, sqlalchemy.Text),
-    sqlalchemy.Column(ClmNames.coll, sqlalchemy.Text),
-    sqlalchemy.Column(ClmNames.fav, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.id, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ColumnNames.short_src, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.short_hash, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.size, sqlalchemy.Integer),
+    sqlalchemy.Column(ColumnNames.birth, sqlalchemy.Integer),
+    sqlalchemy.Column(ColumnNames.mod, sqlalchemy.Integer),
+    sqlalchemy.Column(ColumnNames.resol, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.coll, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.fav, sqlalchemy.Integer),
+    sqlalchemy.Column(ColumnNames.brand, sqlalchemy.Text),
 )
 
 
 _table_dirs = sqlalchemy.Table(
     "dirs", METADATA,
-    sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text),
-    sqlalchemy.Column(ClmNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.id, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ColumnNames.short_src, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.mod, sqlalchemy.Integer),
+    sqlalchemy.Column(ColumnNames.brand, sqlalchemy.Text),
 )
 
 
@@ -51,6 +51,7 @@ class Thumbs:
     Класс-обёртка для колонок таблицы `thumbs` в базе данных.   
     Предоставляет удобный доступ к колонкам через атрибуты класса.
     """
+    table = _table_thumbs
     id = _table_thumbs.c.id
     rel_img_path = _table_thumbs.c.short_src
     rel_thumb_path = _table_thumbs.c.short_hash
@@ -68,6 +69,7 @@ class Dirs:
     Класс-обёртка для колонок таблицы `dirs` в базе данных.   
     Предоставляет удобный доступ к колонкам через атрибуты класса.
     """
+    table = _table_dirs
     id = _table_dirs.c.id
     rel_dir_path = _table_dirs.c.short_src
     mod = _table_dirs.c.mod

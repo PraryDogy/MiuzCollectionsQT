@@ -7,7 +7,7 @@ from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import Static, cfg
-from system.database import _table_dirs, _table_thumbs, ClmNames, Dbase
+from system.database import _table_dirs, _table_thumbs, ColumnNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils
@@ -145,9 +145,9 @@ class DirsUpdater:
         # вставить новые записи батчем
         values_list = [
             {
-                ClmNames.short_src: short_src,
-                ClmNames.mod: mod,
-                ClmNames.brand: self.mf.alias
+                ColumnNames.short_src: short_src,
+                ColumnNames.mod: mod,
+                ColumnNames.brand: self.mf.alias
             }
             for short_src, mod in self.dirs_to_scan
         ]
@@ -414,15 +414,15 @@ class _ImgDbUpdater:
             short_hash = Utils.get_rel_thumb_path(abs_hash)
             short_src = Utils.get_rel_img_path(self.mf.curr_path, path)
             values_list.append({
-                ClmNames.short_src: short_src,
-                ClmNames.short_hash: short_hash,
-                ClmNames.size: size,
-                ClmNames.birth: birth,
-                ClmNames.mod: mod,
-                ClmNames.resol: "",
-                ClmNames.coll: "",
-                ClmNames.fav: 0,
-                ClmNames.brand: self.mf.alias
+                ColumnNames.short_src: short_src,
+                ColumnNames.short_hash: short_hash,
+                ColumnNames.size: size,
+                ColumnNames.birth: birth,
+                ColumnNames.mod: mod,
+                ColumnNames.resol: "",
+                ColumnNames.coll: "",
+                ColumnNames.fav: 0,
+                ColumnNames.brand: self.mf.alias
             })
         self.conn.execute(sqlalchemy.insert(_table_thumbs), values_list)
         self.conn.commit()

@@ -7,7 +7,7 @@ from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import cfg, Static
-from system.database import _table_thumbs, ClmNames, Dbase
+from system.database import _table_thumbs, ColumnNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
 
@@ -396,15 +396,15 @@ class DbUpdater(QObject):
             rel_thumb_path = Utils.get_rel_thumb_path(small_path)
 
             values = {
-                ClmNames.short_src: short_path,
-                ClmNames.short_hash: rel_thumb_path,
-                ClmNames.size: size,
-                ClmNames.birth: birth,
-                ClmNames.mod: mod,
-                ClmNames.resol: "",
-                ClmNames.coll: "",
-                ClmNames.fav: 0,
-                ClmNames.brand: self.mf.alias
+                ColumnNames.short_src: short_path,
+                ColumnNames.short_hash: rel_thumb_path,
+                ColumnNames.size: size,
+                ColumnNames.birth: birth,
+                ColumnNames.mod: mod,
+                ColumnNames.resol: "",
+                ColumnNames.coll: "",
+                ColumnNames.fav: 0,
+                ColumnNames.brand: self.mf.alias
             }
             stmt = sqlalchemy.insert(_table_thumbs).values(**values) 
             try:
