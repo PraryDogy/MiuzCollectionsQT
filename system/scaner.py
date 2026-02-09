@@ -604,24 +604,27 @@ class AllDirScaner:
         for mf in mf_list:
             scaner_item = ScanerItem(mf, engine, q)
             if scaner_item.mf.get_available_path():
-                print("scaner started", scaner_item.mf.alias)
-                AllDirScaner.single_mf_scan(scaner_item)
-                print("scaner finished", scaner_item.mf.alias)
+                try:
+                    print("scaner started", scaner_item.mf.alias)
+                    AllDirScaner.single_mf_scan(scaner_item)
+                    print("scaner finished", scaner_item.mf.alias)
+                except Exception as e:
+                    print("scaner AllDirsScaner error", e)
+                    continue
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
-                text = (
+                scaner_item.gui_text = (
                     f"{scaner_item.mf_real_name} "
                     f"({scaner_item.mf.alias}): "
                     f"{no_conn}"
                 )
-                scaner_item.gui_text = text
-                # Отправляем текст в гуи что нет подключения к папке
-                # Имя папки (псевдоним): нет подключения
                 scaner_item.q.put(scaner_item)
-                print("scaner no connection", scaner_item.mf_real_name, scaner_item.mf.alias)
+                print(
+                    "scaner no connection",
+                    scaner_item.mf_real_name,
+                    scaner_item.mf.alias
+                )
                 sleep(5)
-            # после работы с очередной папкой отправляем айтем в гуи, чтобы перезагрузить гуи
-            # флаг reload gui устанавливается на false в основном гуи после перезагрузки гуи
             if scaner_item.reload_gui:
                 scaner_item.q.put(scaner_item)
         engine.dispose()
