@@ -1,62 +1,51 @@
-import gc
 import os
 import shutil
+from dataclasses import dataclass
 from multiprocessing import Queue
 from time import sleep
 
 import sqlalchemy
-from numpy import ndarray
-from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import Static, cfg
 from system.database import DIRS, THUMBS, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils
-from system.tasks import TaskState
 from system.utils import Utils
 
 from .items import ScanerItem
 
 
-class HashDir:
-    """
-    Это директория в /Users/User/Library/Application Support/Collections,   
-    которая хранит миниатюры изображений.   
-    Имя папки "hashdir"
-    """
-
-
+@dataclass
 class DirItem:
-    def __init__(self, rel_path: str, mod: int):
-        """
-        Параметры:
-        - rel_path: путь к каталогу за вычетом :class:`Mf.curr_path`
-        - mod: дата модификации каталога os.stat.st_birthtime
-        """
-        if not isinstance(mod, int):
-            raise TypeError ("DirItem: mod должен быть int")
-        self.rel_path = rel_path
-        self.mod = mod
+    """
+    Параметры:
+    - rel_path: относительный путь к подкаталогу относительно `Mf.curr_path`.
+      Пример:
+        - Mf.curr_path = /User/Downloads/parent/folder
+        - подкаталог = /User/Downloads/parent/folder/subfolder
+        - rel_path = /subfolder
+    - mod: дата модификации каталога (os.stat.st_birthtime)
+    """
+    rel_path: str
+    mod: int
 
 
+@dataclass
 class ImgItem:
-    def __init__(self, abs_img_path: str, size: int,birth: int, mod: int,rel_thumb_path = ""):
-        """
-        Параметры:
-        - abs_img_path: полный путь до изображения
-        - size: размер изображения в байтах
-        - birth: os.stat.st_birthtime
-        - mod: os.stat.st_mtime
-        - rel_thumb_path: относительный путь до миниатюры в :class:`HashDir`
-        """
-        if not all(isinstance(i, int) for i in (size, birth, mod)):
-            raise TypeError("system > scaner > ImgItem int error")
-        self.abs_img_path = abs_img_path
-        self.rel_thumb_path = rel_thumb_path 
-        self.size = size
-        self.birth = birth
-        self.mod = mod
+    """
+    Параметры:
+    - abs_img_path: полный путь до изображения
+    - size: размер изображения в байтах
+    - birth: os.stat.st_birthtime
+    - mod: os.stat.st_mtime
+    - rel_thumb_path: путь до миниатюры /hashdir/thumb.jpg
+    """
+    abs_img_path: str
+    size: int
+    birth: int
+    mod: int
+    rel_thumb_path: str = ""
 
 
 class DirsLoader:
