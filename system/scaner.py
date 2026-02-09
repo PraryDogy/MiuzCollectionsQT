@@ -399,7 +399,7 @@ class HashdirImgUpdater:
                     if not os.listdir(folder):
                         shutil.rmtree(folder)
                 except Exception as e:
-                    print("new scaner utils, hashdir updater, remove img error", e)
+                    print("scaner HashdirImgUpdater error", e)
                     continue
                 new_del_images.append(img_item)
                 scaner_item.total_count -= 1
