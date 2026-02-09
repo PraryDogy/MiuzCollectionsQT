@@ -117,7 +117,7 @@ class DirsLoader:
     def get_db_dirs(scaner_item: ScanerItem):
         """
         Возвращает список директорий из базы данных, которые:
-        - соответствуют DIRS.c.brand == `Mf.alias`
+        - соответствуют условию DIRS.c.brand == `Mf.alias`
         """
         conn = scaner_item.engine.connect()
         q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
