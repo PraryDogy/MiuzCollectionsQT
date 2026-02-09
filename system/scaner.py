@@ -21,7 +21,7 @@ from .items import ScanerItem
 
 class HashDir:
     """
-    Это директория в ~/Users/Username/Library/ApplicationSupport/Collections,   
+    Это директория в /Users/User/Library/Application Support/Collections,   
     которая хранит миниатюры изображений.   
     Имя папки "hashdir"
     """
