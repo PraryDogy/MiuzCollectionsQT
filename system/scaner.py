@@ -262,7 +262,7 @@ class ImgLoader:
                     try:
                         stat = entry.stat()
                     except Exception as e:
-                        print("new scaner utils, img loader, finder images, error", e)
+                        print("scaner > ImgLoader, get_finder_images, error", e)
                         continue
                     size = int(stat.st_size)
                     birth = int(stat.st_birthtime)
