@@ -52,10 +52,9 @@ class DirsLoader:
     @staticmethod
     def start(scaner_item: ScanerItem):
         """
-        - Собирает список :class:`DirItem` всех вложенных директорий
-          в каталоге :class:`Mf.curr_path`
-        - Собирает список :class:`DirItem` всех директорий
-          из базы данных, которые соответствуют :class:`Mf.alias`
+        - Собирает список всех вложенных директорий в каталоге `Mf.curr_path`
+        - Собирает список всех директорий из базы данных, которые
+          соответствуют `Mf.alias`
         """
         finder_dirs = DirsLoader.get_finder_dirs(scaner_item)
         db_dirs = DirsLoader.get_db_dirs(scaner_item)
@@ -64,9 +63,9 @@ class DirsLoader:
     @staticmethod
     def get_finder_dirs(scaner_item: ScanerItem):
         """
-        Возвращает список DirItem
-        - которые есть в директории (Mf.curr_path)
-        - которых нет в стоп листе Mf.stop_list
+        Собирает список директорий:
+        - которые есть в каталоге `Mf.curr_path`
+        - которых нет в стоп листе `Mf.stop_list`
         """
         # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
@@ -99,7 +98,6 @@ class DirsLoader:
                     mod = int(stats.st_mtime)
                     dir_item = DirItem(rel_path, mod)
                     dirs.append(dir_item)
-
         try:
             stats = os.stat(scaner_item.mf.curr_path)
             mod = int(stats.st_mtime)
