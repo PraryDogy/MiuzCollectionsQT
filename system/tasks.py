@@ -11,7 +11,7 @@ from PyQt5.QtGui import QImage
 
 from cfg import Dynamic, Static, cfg
 
-from .database import DIRS, THUMBS_TABLE, Dbase
+from .database import _table_dirs, _table_thumbs, Dbase
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils
@@ -104,9 +104,9 @@ class FavManager(URunnable):
         """Обновляет поле 'fav' в БД и эмитит сигнал с результатом."""
         try:
             q = (
-                sqlalchemy.update(THUMBS_TABLE)
-                .where(THUMBS_TABLE.c.short_src == self.rel_path)
-                .where(THUMBS_TABLE.c.brand == Mf.current.alias)
+                sqlalchemy.update(_table_thumbs)
+                .where(_table_thumbs.c.short_src == self.rel_path)
+                .where(_table_thumbs.c.brand == Mf.current.alias)
                 .values(fav=self.value)
             )
             self.conn.execute(q)
@@ -196,31 +196,31 @@ class DbImagesLoader(URunnable):
 
     def get_stmt(self) -> sqlalchemy.Select:
         stmt = sqlalchemy.select(
-            THUMBS_TABLE.c.short_src,
-            THUMBS_TABLE.c.short_hash,
-            THUMBS_TABLE.c.mod,
-            THUMBS_TABLE.c.fav
+            _table_thumbs.c.short_src,
+            _table_thumbs.c.short_hash,
+            _table_thumbs.c.mod,
+            _table_thumbs.c.fav
         ).limit(Static.thumbs_load_limit).offset(Dynamic.loaded_thumbs)
         if Dynamic.sort_by_mod:
-            stmt = stmt.order_by(-THUMBS_TABLE.c.mod)
+            stmt = stmt.order_by(-_table_thumbs.c.mod)
         else:
-            stmt = stmt.order_by(-THUMBS_TABLE.c.id)
-        stmt = stmt.where(THUMBS_TABLE.c.brand == Mf.current.alias)
-        stmt = stmt.where(THUMBS_TABLE.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
+            stmt = stmt.order_by(-_table_thumbs.c.id)
+        stmt = stmt.where(_table_thumbs.c.brand == Mf.current.alias)
+        stmt = stmt.where(_table_thumbs.c.short_src.ilike(f"{Dynamic.current_dir}/%"))
         if Dynamic.filter_favs:
-            stmt = stmt.where(THUMBS_TABLE.c.fav == 1)
+            stmt = stmt.where(_table_thumbs.c.fav == 1)
         if Dynamic.filter_only_folder:
-            stmt = stmt.where(THUMBS_TABLE.c.short_src.not_ilike(f"{Dynamic.current_dir}/%/%"))
+            stmt = stmt.where(_table_thumbs.c.short_src.not_ilike(f"{Dynamic.current_dir}/%/%"))
         if Dynamic.filters_enabled:
             stmt = stmt.where(
-                sqlalchemy.or_(*[THUMBS_TABLE.c.short_src.ilike(f"%{f}%") for f in Dynamic.filters_enabled])
+                sqlalchemy.or_(*[_table_thumbs.c.short_src.ilike(f"%{f}%") for f in Dynamic.filters_enabled])
             )
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
-            stmt = stmt.where(THUMBS_TABLE.c.short_src.ilike(f"%{text}%"))
+            stmt = stmt.where(_table_thumbs.c.short_src.ilike(f"%{text}%"))
         if any((Dynamic.date_start, Dynamic.date_end)):
             start, end = self.combine_dates(Dynamic.date_start, Dynamic.date_end)
-            stmt = stmt.where(THUMBS_TABLE.c.mod > start).where(THUMBS_TABLE.c.mod < end)
+            stmt = stmt.where(_table_thumbs.c.mod > start).where(_table_thumbs.c.mod < end)
         return stmt
 
     def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:
@@ -267,8 +267,8 @@ class MfDataCleaner(URunnable):
     def _task(self):
         abs_path_list: list[str] = []
         stmt = (
-            sqlalchemy.select(THUMBS_TABLE.c.short_src, THUMBS_TABLE.c.short_hash)
-            .where(THUMBS_TABLE.c.brand == self.mf_name)
+            sqlalchemy.select(_table_thumbs.c.short_src, _table_thumbs.c.short_hash)
+            .where(_table_thumbs.c.brand == self.mf_name)
         )
         res = self.conn.execute(stmt)
         for rel_path, rel_thumb_path in res:
@@ -276,7 +276,7 @@ class MfDataCleaner(URunnable):
                 continue
             abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
             if os.path.exists(abs_thumb_path):
-                stmt = sqlalchemy.delete(THUMBS_TABLE).where(THUMBS_TABLE.c.short_src == rel_path)
+                stmt = sqlalchemy.delete(_table_thumbs).where(_table_thumbs.c.short_src == rel_path)
                 self.conn.execute(stmt)
                 abs_path_list.append(abs_thumb_path)
         self.conn.commit()
@@ -290,7 +290,7 @@ class MfDataCleaner(URunnable):
             except Exception as e:
                 print("system>tasks>MfDataCleaner remove thumb error", e)
 
-        stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand == self.mf_name)
+        stmt = sqlalchemy.delete(_table_dirs).where(_table_dirs.c.brand == self.mf_name)
         self.conn.execute(stmt)
         self.conn.commit()
 
@@ -317,8 +317,8 @@ class DbDirsLoader(URunnable):
 
     def _task(self):
         stmt = (
-            sqlalchemy.select(DIRS.c.short_src)
-            .where(DIRS.c.brand == self.mf.alias)
+            sqlalchemy.select(_table_dirs.c.short_src)
+            .where(_table_dirs.c.brand == self.mf.alias)
         )
 
         res = list(self.conn.execute(stmt).scalars())
@@ -358,8 +358,8 @@ class HashDirSize(URunnable):
         main_folder_sizes = {}
         for i in Mf.list_:
             stmt = (
-                sqlalchemy.select(THUMBS_TABLE.c.short_hash)
-                .where(THUMBS_TABLE.c.brand == i.alias)
+                sqlalchemy.select(_table_thumbs.c.short_hash)
+                .where(_table_thumbs.c.brand == i.alias)
             )
             res = list(self.conn.execute(stmt).scalars())
             size = sum([

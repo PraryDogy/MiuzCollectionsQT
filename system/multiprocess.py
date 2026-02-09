@@ -9,7 +9,7 @@ import sqlalchemy
 
 from cfg import Static, cfg
 
-from .database import DIRS, THUMBS_TABLE, Dbase
+from .database import _table_dirs, Dbase, Thumbs
 from .items import CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem
 from .lang import Lng
 from .main_folder import Mf
@@ -268,13 +268,13 @@ class _DeletedMfRemover:
 
     @staticmethod
     def remove_dirs(conn: sqlalchemy.Connection):
-        q = sqlalchemy.select(DIRS.c.brand).distinct()
+        q = sqlalchemy.select(_table_dirs.c.brand).distinct()
         db_brands = set(conn.execute(q).scalars())
         app_brands = set(i.alias for i in Mf.list_)
         to_delete = db_brands - app_brands
 
         if to_delete:
-            del_stmt = sqlalchemy.delete(DIRS).where(DIRS.c.brand.in_(to_delete))
+            del_stmt = sqlalchemy.delete(_table_dirs).where(_table_dirs.c.brand.in_(to_delete))
             conn.execute(del_stmt)
             conn.commit()
 

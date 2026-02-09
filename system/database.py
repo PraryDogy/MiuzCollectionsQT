@@ -21,7 +21,7 @@ class ClmNames:
     brand: Literal["brand"] = "brand"
 
 
-THUMBS_TABLE = sqlalchemy.Table(
+_table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text, comment="относительный путь к изображению"),
@@ -36,20 +36,7 @@ THUMBS_TABLE = sqlalchemy.Table(
 )
 
 
-class Thumbs:
-    id = THUMBS_TABLE.c.id
-    rel_img_path = THUMBS_TABLE.c.short_src
-    rel_thumb_path = THUMBS_TABLE.c.short_hash
-    size = THUMBS_TABLE.c.size
-    birth = THUMBS_TABLE.c.birth
-    mod = THUMBS_TABLE.c.mod
-    resol = THUMBS_TABLE.c.resol
-    coll = THUMBS_TABLE.c.coll
-    fav = THUMBS_TABLE.c.fav
-    mf_alias = THUMBS_TABLE.c.brand
-
-
-DIRS = sqlalchemy.Table(
+_table_dirs = sqlalchemy.Table(
     "dirs", METADATA,
     sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text, comment="относительный путь к директории"),
@@ -58,8 +45,32 @@ DIRS = sqlalchemy.Table(
 )
 
 
+class Thumbs:
+    """
+    Класс-обёртка для колонок таблицы `thumbs` в базе данных.   
+    Предоставляет удобный доступ к колонкам через атрибуты класса.
+    """
+    id = _table_thumbs.c.id
+    rel_img_path = _table_thumbs.c.short_src
+    rel_thumb_path = _table_thumbs.c.short_hash
+    size = _table_thumbs.c.size
+    birth = _table_thumbs.c.birth
+    mod = _table_thumbs.c.mod
+    resol = _table_thumbs.c.resol
+    coll = _table_thumbs.c.coll
+    fav = _table_thumbs.c.fav
+    mf_alias = _table_thumbs.c.brand
 
 
+class Dirs:
+    """
+    Класс-обёртка для колонок таблицы `dirs` в базе данных.   
+    Предоставляет удобный доступ к колонкам через атрибуты класса.
+    """
+    id = _table_dirs.c.id
+    rel_dir_path = _table_dirs.c.short_src
+    mod = _table_dirs.c.mod
+    mf_alias = _table_dirs.c.brand
 
 
 class Dbase:

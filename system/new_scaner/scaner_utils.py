@@ -7,7 +7,7 @@ from numpy import ndarray
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from cfg import Static, cfg
-from system.database import DIRS, THUMBS_TABLE, ClmNames, Dbase
+from system.database import _table_dirs, _table_thumbs, ClmNames, Dbase
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils
@@ -75,8 +75,8 @@ class DirsLoader(QObject):
         - [(rel_dir_path, mod_time), ...]
         """
         conn = Dbase.engine.connect()
-        q = sqlalchemy.select(DIRS.c.short_src, DIRS.c.mod).where(
-            DIRS.c.brand == self.mf.alias
+        q = sqlalchemy.select(_table_dirs.c.short_src, _table_dirs.c.mod).where(
+            _table_dirs.c.brand == self.mf.alias
         )
         res = [(short_src, mod) for short_src, mod in conn.execute(q)]
         conn.close()
@@ -136,9 +136,9 @@ class DirsUpdater:
         # удалить старые записи
         short_paths = [short_src for short_src, _ in self.dirs_to_scan]
         if short_paths:
-            del_stmt = sqlalchemy.delete(DIRS).where(
-                DIRS.c.short_src.in_(short_paths),
-                DIRS.c.brand == self.mf.alias
+            del_stmt = sqlalchemy.delete(_table_dirs).where(
+                _table_dirs.c.short_src.in_(short_paths),
+                _table_dirs.c.brand == self.mf.alias
             )
             self.conn.execute(del_stmt)
 
@@ -152,7 +152,7 @@ class DirsUpdater:
             for short_src, mod in self.dirs_to_scan
         ]
         if values_list:
-            self.conn.execute(sqlalchemy.insert(DIRS), values_list)
+            self.conn.execute(sqlalchemy.insert(_table_dirs), values_list)
 
         self.conn.commit()
 
@@ -225,19 +225,19 @@ class ImgLoader(QObject):
         db_images: dict = {}
         for rel_dir_path, mod in self.dirs_to_scan:
             q = sqlalchemy.select(
-                THUMBS_TABLE.c.short_hash, # rel thumb path
-                THUMBS_TABLE.c.short_src,
-                THUMBS_TABLE.c.size,
-                THUMBS_TABLE.c.birth,
-                THUMBS_TABLE.c.mod
+                _table_thumbs.c.short_hash, # rel thumb path
+                _table_thumbs.c.short_src,
+                _table_thumbs.c.size,
+                _table_thumbs.c.birth,
+                _table_thumbs.c.mod
                 )
-            q = q.where(THUMBS_TABLE.c.brand == self.mf.alias)
+            q = q.where(_table_thumbs.c.brand == self.mf.alias)
             if rel_dir_path == "/":
-                q = q.where(THUMBS_TABLE.c.short_src.ilike("/%"))
-                q = q.where(THUMBS_TABLE.c.short_src.not_ilike(f"/%/%"))
+                q = q.where(_table_thumbs.c.short_src.ilike("/%"))
+                q = q.where(_table_thumbs.c.short_src.not_ilike(f"/%/%"))
             else:
-                q = q.where(THUMBS_TABLE.c.short_src.ilike(f"{rel_dir_path}/%"))
-                q = q.where(THUMBS_TABLE.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
+                q = q.where(_table_thumbs.c.short_src.ilike(f"{rel_dir_path}/%"))
+                q = q.where(_table_thumbs.c.short_src.not_ilike(f"{rel_dir_path}/%/%"))
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
                 abs_path = Utils.get_abs_img_path(self.mf_path, rel_path)
                 db_images[rel_thumb_path] = (abs_path, size, birth, mod)
@@ -388,9 +388,9 @@ class _ImgDbUpdater:
 
     def run_del_items(self):
         if self.del_images:
-            q = sqlalchemy.delete(THUMBS_TABLE).where(
-                THUMBS_TABLE.c.short_hash.in_(self.del_images),
-                THUMBS_TABLE.c.brand == self.mf.alias
+            q = sqlalchemy.delete(_table_thumbs).where(
+                _table_thumbs.c.short_hash.in_(self.del_images),
+                _table_thumbs.c.brand == self.mf.alias
             )
             self.conn.execute(q)
             self.conn.commit()
@@ -400,9 +400,9 @@ class _ImgDbUpdater:
             Utils.get_rel_img_path(self.mf.curr_path, path)
             for path, size, birth, mod in self.new_images
         ]
-        q = sqlalchemy.delete(THUMBS_TABLE).where(
-            THUMBS_TABLE.c.short_src.in_(short_paths),
-            THUMBS_TABLE.c.brand == self.mf.alias
+        q = sqlalchemy.delete(_table_thumbs).where(
+            _table_thumbs.c.short_src.in_(short_paths),
+            _table_thumbs.c.brand == self.mf.alias
         )
         self.conn.execute(q)
         self.conn.commit()
@@ -424,7 +424,7 @@ class _ImgDbUpdater:
                 ClmNames.fav: 0,
                 ClmNames.brand: self.mf.alias
             })
-        self.conn.execute(sqlalchemy.insert(THUMBS_TABLE), values_list)
+        self.conn.execute(sqlalchemy.insert(_table_thumbs), values_list)
         self.conn.commit()
 
 
@@ -493,10 +493,10 @@ class RemovedDirsHandler(QObject):
     def _process_dirs(self):
         def remove_thumbs(rel_dir: str):
             stmt = (
-                sqlalchemy.select(THUMBS_TABLE.c.short_hash)
-                .where(THUMBS_TABLE.c.short_src.ilike(f"{rel_dir}/%"))
-                .where(THUMBS_TABLE.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-                .where(THUMBS_TABLE.c.brand == self.mf.alias)
+                sqlalchemy.select(_table_thumbs.c.short_hash)
+                .where(_table_thumbs.c.short_src.ilike(f"{rel_dir}/%"))
+                .where(_table_thumbs.c.short_src.not_ilike(f"{rel_dir}/%/%"))
+                .where(_table_thumbs.c.brand == self.mf.alias)
             )
             for short_hash in self.conn.execute(stmt).scalars():
                 try:
@@ -505,18 +505,18 @@ class RemovedDirsHandler(QObject):
                     print("DelDirsHandler, remove thumb:", e)
 
             del_stmt = (
-                sqlalchemy.delete(THUMBS_TABLE)
-                .where(THUMBS_TABLE.c.short_src.ilike(f"{rel_dir}/%"))
-                .where(THUMBS_TABLE.c.short_src.not_ilike(f"{rel_dir}/%/%"))
-                .where(THUMBS_TABLE.c.brand == self.mf.alias)
+                sqlalchemy.delete(_table_thumbs)
+                .where(_table_thumbs.c.short_src.ilike(f"{rel_dir}/%"))
+                .where(_table_thumbs.c.short_src.not_ilike(f"{rel_dir}/%/%"))
+                .where(_table_thumbs.c.brand == self.mf.alias)
             )
             self.conn.execute(del_stmt)
 
         def remove_dir_entry(rel_dir: str):
             stmt = (
-                sqlalchemy.delete(DIRS)
-                .where(DIRS.c.short_src == rel_dir)
-                .where(DIRS.c.brand == self.mf.alias)
+                sqlalchemy.delete(_table_dirs)
+                .where(_table_dirs.c.short_src == rel_dir)
+                .where(_table_dirs.c.brand == self.mf.alias)
             )
             self.conn.execute(stmt)
 
