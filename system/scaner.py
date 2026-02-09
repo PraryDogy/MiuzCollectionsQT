@@ -182,7 +182,7 @@ class DirsCompator:
 
 class DbDirUpdater:
     @staticmethod
-    def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
+    def start(scaner_item: ScanerItem, dirs_to_scan: list[DirItem]):
         """
         Запускать только, когда:
         - добавлены и удалены изображения `ImgItem` из БД
@@ -194,10 +194,10 @@ class DbDirUpdater:
         - по сути это замена `sqlalchemy.update`
         """
         # удалить старые записи
-        if not dir_list:
+        if not dirs_to_scan:
             return
         conn = scaner_item.engine.connect()
-        rel_paths = [dir_item.rel_path for dir_item in dir_list]
+        rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
         del_stmt = sqlalchemy.delete(Dirs.table).where(
             Dirs.rel_dir_path.in_(rel_paths),
             Dirs.mf_alias == scaner_item.mf.alias
@@ -211,7 +211,7 @@ class DbDirUpdater:
                 ColumnNames.mod: dir_item.mod,
                 ColumnNames.mf_alias: scaner_item.mf.alias
             }
-            for dir_item in dir_list
+            for dir_item in dirs_to_scan
         ]
         if values_list:
             conn.execute(sqlalchemy.insert(Dirs.table), values_list)
@@ -222,7 +222,7 @@ class DbDirUpdater:
 
 class ImgLoader:
     @staticmethod
-    def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
+    def start(scaner_item: ScanerItem, dirs_to_scan: list[DirItem]):
         """
         - Обходит список `DirItem`:
             - Находит в Finder изображения и создает список `ImgItem`
@@ -230,8 +230,8 @@ class ImgLoader:
                 - Только из итерируемой директории
                 - Если запись соответствует `Mf.alias`
         """
-        finder_images = ImgLoader.get_finder_images(scaner_item, dir_list)
-        db_images = ImgLoader.get_db_images(scaner_item, dir_list)
+        finder_images = ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
+        db_images = ImgLoader.get_db_images(scaner_item, dirs_to_scan)
         return (finder_images, db_images)
 
     @staticmethod
@@ -531,15 +531,29 @@ class NewDirsWorker:
         - dirs_to_scan список DirItem
         - на основе этого списка добавляются и удаляются миниатюры в "hashdir"
         - обновляются базы данных THUMBS и DIRS
-
-        Возвращает:
-        - None
         """
-        finder_images, db_images = ImgLoader.start(scaner_item, dirs_to_scan)
-        del_images, new_images = ImgCompator.start(finder_images, db_images)
-        del_images, new_images = HashdirImgUpdater.start(scaner_item, del_images, new_images)
-        DbImgUpdater.start(scaner_item, del_images, new_images)
-        DbDirUpdater.start(scaner_item, dirs_to_scan)
+        finder_images, db_images = ImgLoader.start(
+            scaner_item=scaner_item,
+            dirs_to_scan=dirs_to_scan
+        )
+        del_images, new_images = ImgCompator.start(
+            finder_images=finder_images,
+            db_images=db_images
+        )
+        del_images, new_images = HashdirImgUpdater.start(
+            scaner_item=scaner_item,
+            del_images=del_images,
+            new_images=new_images
+        )
+        DbImgUpdater.start(
+            scaner_item=scaner_item,
+            del_images=del_images,
+            new_images=new_images
+        )
+        DbDirUpdater.start(
+            scaner_item=scaner_item,
+            dirs_to_scan=dirs_to_scan
+        )
         return None
     
 
