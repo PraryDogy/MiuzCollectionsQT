@@ -19,6 +19,14 @@ from system.utils import Utils
 from .items import ScanerItem
 
 
+class HashDir:
+    """
+    Это директория в ~/Users/Username/Library/ApplicationSupport/Collections,   
+    которая хранит миниатюры изображений.   
+    Имя папки "hashdir"
+    """
+
+
 class DirItem:
     def __init__(self, rel_path: str, mod: int):
         if not isinstance(mod, int):
@@ -28,14 +36,17 @@ class DirItem:
 
 
 class ImgItem:
-    def __init__(self, abs_img_path: str, size: int, birth: int, mod: int, rel_thumb_path = ""):
+    def __init__(self, abs_img_path: str, size: int,birth: int, mod: int,rel_thumb_path = ""):
         """
-        abs_img_path: полный путь до изображения
-        rel_thumb_path: относительный путь до миниатюры в "hashdir"
+        Параметры:
+        - abs_img_path: полный путь до изображения
+        - size: размер изображения в байтах
+        - birth: os.stat.st_birthtime
+        - mod: os.stat.st_mtime
+        - rel_thumb_path: относительный путь до миниатюры в HashDir
         """
         if not all(isinstance(i, int) for i in (size, birth, mod)):
             raise TypeError("system > scaner > ImgItem int error")
-        super().__init__()
         self.abs_img_path = abs_img_path
         self.rel_thumb_path = rel_thumb_path 
         self.size = size
@@ -47,7 +58,10 @@ class DirsLoader:
     @staticmethod
     def start(scaner_item: ScanerItem):
         """
-        Возвращает список директорий DirItem Finder и список директорий DirItem базы данных
+        - Собирает список :class:`DirItem` всех вложенных директорий
+          в каталоге :class:`Mf.curr_path`
+        - Собирает список :class:`DirItem` всех директорий
+          из базы данных, которые соответствуют :class:`Mf.alias`
         """
         finder_dirs = DirsLoader.get_finder_dirs(scaner_item)
         db_dirs = DirsLoader.get_db_dirs(scaner_item)
@@ -60,9 +74,13 @@ class DirsLoader:
         - которые есть в директории (Mf.curr_path)
         - которых нет в стоп листе Mf.stop_list
         """
-        # отправляем текст в гуи что идет поиск в папке
+        # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
-        scaner_item.gui_text = f"{scaner_item.mf_real_name} ({scaner_item.mf.alias}): {Lng.search_in[cfg.lng].lower()}"
+        scaner_item.gui_text = (
+            f"{scaner_item.mf_real_name}"
+            f"({scaner_item.mf.alias}):"
+            f"{Lng.search_in[cfg.lng].lower()}"
+        )
         scaner_item.q.put(scaner_item)
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.curr_path]
