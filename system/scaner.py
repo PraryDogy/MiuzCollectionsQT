@@ -429,7 +429,7 @@ class HashdirImgUpdater:
                     new_new_images.append(img_item)
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
-                    # а так же чтобы в основном потоке сбрасывался таймер таймаута
+                    # и чтобы в основном потоке сбрасывался таймер таймаута
                     HashdirImgUpdater.send_text(scaner_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
@@ -442,7 +442,12 @@ class HashdirImgUpdater:
         Посылает текст в гуи.   
         Имя папки (псевдоним): обновление (оставшееся число)
         """
-        text = f"{scaner_item.mf_real_name} ({scaner_item.mf.alias}): {Lng.updating[cfg.lng].lower()} ({scaner_item.total_count})"
+        text = (
+            f"{scaner_item.mf_real_name} "
+            f"({scaner_item.mf.alias}): "
+            f"{Lng.updating[cfg.lng].lower()} "
+            f"({scaner_item.total_count})"
+        )
         scaner_item.gui_text = text
         scaner_item.q.put(scaner_item)
 
