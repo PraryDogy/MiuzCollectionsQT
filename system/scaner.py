@@ -27,6 +27,7 @@ class DirItem:
         - rel_path = /subfolder
     - mod: дата модификации каталога (os.stat.st_birthtime)
     """
+    abs_path: str
     rel_path: str
     mod: int
 
@@ -103,12 +104,12 @@ class DirLoader:
                     )
                     stats = entry.stat()
                     mod = int(stats.st_mtime)
-                    dir_item = DirItem(rel_path, mod)
+                    dir_item = DirItem(entry.path, rel_path, mod)
                     dirs.append(dir_item)
         try:
             stats = os.stat(scaner_item.mf.curr_path)
             mod = int(stats.st_mtime)
-            dir_item = DirItem(os.sep, mod)
+            dir_item = DirItem(scaner_item.mf.curr_path, os.sep, mod)
         except Exception as e:
             print("new scaner dirs loader finder dirs error add root dir", e)
         return dirs
@@ -123,9 +124,18 @@ class DirLoader:
         q = sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod).where(
             Dirs.mf_alias == scaner_item.mf.alias
         )
-        res = [DirItem(rel_path, mod) for rel_path, mod in conn.execute(q)]
+        dirs: list[DirItem] = []
+        for rel_path, mod in conn.execute(q):
+            rel_path: str
+            abs_dir_path = os.path.join(
+                os.sep,
+                scaner_item.mf.curr_path.strip(os.sep),
+                rel_path.strip(os.sep)
+            )
+            item = DirItem(abs_dir_path, rel_path, mod)
+            dirs.append(item)
         conn.close()
-        return res
+        return dirs
 
 
 class DirsCompator:
@@ -260,12 +270,7 @@ class ImgLoader:
         scaner_item.q.put(scaner_item)
         finder_images: list[ImgItem] = []
         for dir_item in dir_list:
-            abs_dir_path = os.path.join(
-                os.sep,
-                scaner_item.mf.curr_path.strip(os.sep),
-                dir_item.rel_path.strip(os.sep)
-            )
-            for entry in os.scandir(abs_dir_path):
+            for entry in os.scandir(dir_item.abs_path):
                 # передаем в основной поток ScanerItem
                 # чтобы в основном потоке сбрасывался таймер таймаута
                 scaner_item.q.put(scaner_item)
