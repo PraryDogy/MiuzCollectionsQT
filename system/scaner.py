@@ -294,11 +294,20 @@ class ImgLoader:
                 q = q.where(Thumbs.rel_img_path.ilike("/%"))
                 q = q.where(Thumbs.rel_img_path.not_ilike(f"/%/%"))
             else:
-                q = q.where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
-                q = q.where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+                q = q.where(
+                    Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%")
+                )
+                q = q.where(
+                    Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%")
+                )
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
-                abs_img_path = Utils.get_abs_img_path(scaner_item.mf.curr_path, rel_path)
-                img_item = ImgItem(abs_img_path, size, birth, mod, rel_thumb_path)
+                abs_img_path = Utils.get_abs_img_path(
+                    mf_path=scaner_item.mf.curr_path,
+                    rel_path=rel_path
+                )
+                img_item = ImgItem(
+                    abs_img_path, size, birth, mod, rel_thumb_path
+                )
                 db_images.append(img_item)
         conn.close()
         return db_images
@@ -360,8 +369,14 @@ class HashdirImgUpdater:
         - успешно добавленные в `hashdir` список `ImgItem`
         """
         scaner_item.total_count = len(del_images) + len(new_images)
-        new_del_images = HashdirImgUpdater.run_del_images(scaner_item, del_images)
-        new_items = HashdirImgUpdater.run_new_images(scaner_item, new_images)
+        new_del_images = HashdirImgUpdater.run_del_images(
+            scaner_item=scaner_item,
+            del_images=del_images
+        )
+        new_items = HashdirImgUpdater.run_new_images(
+            scaner_item=scaner_item,
+            new_images=new_images
+        )
         return new_del_images, new_items
 
     @staticmethod
