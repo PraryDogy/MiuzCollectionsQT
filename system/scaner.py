@@ -230,7 +230,11 @@ class ImgLoader:
     @staticmethod
     def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
-        Возвращает список ImgItem из директорий и список ImgItem из базы данных
+        - Обходит директории Finder
+        - Находит любые изображения и создает список ImgItem
+        - Создает список ImgItem из записей БД с фильтрами:
+            - Только из итерируемой директории
+            - Если запись соответствует `Mf.alias`
         """
         finder_images = ImgLoader.get_finder_images(scaner_item, dir_list)
         db_images = ImgLoader.get_db_images(scaner_item, dir_list)
@@ -247,7 +251,11 @@ class ImgLoader:
         """
         # передает в гуи текст
         # имя папки (псевдоним): поиск
-        text = f"{scaner_item.mf_real_name} ({scaner_item.mf.alias}): {Lng.search[cfg.lng].lower()}"
+        text = (
+            f"{scaner_item.mf_real_name} "
+            f"({scaner_item.mf.alias}): "
+            f"{Lng.search[cfg.lng].lower()}"
+        )
         scaner_item.gui_text = text
         scaner_item.q.put(scaner_item)
         finder_images: list[ImgItem] = []
@@ -294,7 +302,6 @@ class ImgLoader:
             if dir_item.rel_path == os.sep:
                 q = q.where(Thumbs.rel_img_path.ilike("/%"))
                 q = q.where(Thumbs.rel_img_path.not_ilike(f"/%/%"))
-
             else:
                 q = q.where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
                 q = q.where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
