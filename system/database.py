@@ -2,6 +2,7 @@ import os
 from typing import Literal
 
 import sqlalchemy
+
 from cfg import Static
 from system.utils import Utils
 
@@ -24,24 +25,24 @@ class ClmNames:
 _table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text, comment="относительный путь к изображению"),
-    sqlalchemy.Column(ClmNames.short_hash, sqlalchemy.Text, comment="относительный путь к миниатюре"),
+    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.short_hash, sqlalchemy.Text),
     sqlalchemy.Column(ClmNames.size, sqlalchemy.Integer),
     sqlalchemy.Column(ClmNames.birth, sqlalchemy.Integer),
     sqlalchemy.Column(ClmNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.resol, sqlalchemy.Text, comment="более не используется"),
-    sqlalchemy.Column(ClmNames.coll, sqlalchemy.Text, comment="более не используется"),
+    sqlalchemy.Column(ClmNames.resol, sqlalchemy.Text),
+    sqlalchemy.Column(ClmNames.coll, sqlalchemy.Text),
     sqlalchemy.Column(ClmNames.fav, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text, comment="Mf.alias (смотри system > main_folder)"),
+    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text),
 )
 
 
 _table_dirs = sqlalchemy.Table(
     "dirs", METADATA,
     sqlalchemy.Column(ClmNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text, comment="относительный путь к директории"),
+    sqlalchemy.Column(ClmNames.short_src, sqlalchemy.Text),
     sqlalchemy.Column(ClmNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text, comment="Mf.name (смотри system > main_folder)"),
+    sqlalchemy.Column(ClmNames.brand, sqlalchemy.Text),
 )
 
 
