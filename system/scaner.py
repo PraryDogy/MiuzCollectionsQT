@@ -226,11 +226,11 @@ class ImgLoader:
     @staticmethod
     def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
-        - Обходит директории Finder
-        - Находит любые изображения и создает список ImgItem
-        - Создает список ImgItem из записей БД с фильтрами:
-            - Только из итерируемой директории
-            - Если запись соответствует `Mf.alias`
+        - Обходит список `DirItem`:
+            - Находит в Finder изображения и создает список `ImgItem`
+            - Создает список `ImgItem` из записей БД с фильтрами:
+                - Только из итерируемой директории
+                - Если запись соответствует `Mf.alias`
         """
         finder_images = ImgLoader.get_finder_images(scaner_item, dir_list)
         db_images = ImgLoader.get_db_images(scaner_item, dir_list)
