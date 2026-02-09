@@ -367,8 +367,12 @@ class HashdirImgUpdater:
     @staticmethod
     def run_del_images(scaner_item: ScanerItem, del_images: list[ImgItem]):
         """
-        Пытается удалить изображения из "hashdir" и пустые папки.   
+        Пытается удалить изображения из `hashdir` и пустые папки.   
         Возвращает список успешно удаленных изображений.
+        Обрати внимание:
+        - Только в списке del_images есть параметр `ImgItem.rel_thumb_path`
+        - Он был присвоен при загрузуке записей из БД
+        - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
         """
         new_del_images: list[ImgItem] = []
         for img_item in del_images:
