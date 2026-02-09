@@ -98,8 +98,8 @@ class DirsLoader:
                 if stmt:
                     stack.append(entry.path)
                     rel_path = Utils.get_rel_img_path(
-                        scaner_item.mf.curr_path,
-                        entry.path
+                        mf_path=scaner_item.mf.curr_path,
+                        abs_img_path=entry.path
                     )
                     stats = entry.stat()
                     mod = int(stats.st_mtime)
