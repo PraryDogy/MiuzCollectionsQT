@@ -609,7 +609,11 @@ class AllDirScaner:
                 print("scaner finished", scaner_item.mf.alias)
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
-                text = f"{scaner_item.mf_real_name} ({scaner_item.mf.alias}): {no_conn}"
+                text = (
+                    f"{scaner_item.mf_real_name} "
+                    f"({scaner_item.mf.alias}): "
+                    f"{no_conn}"
+                )
                 scaner_item.gui_text = text
                 # Отправляем текст в гуи что нет подключения к папке
                 # Имя папки (псевдоним): нет подключения
