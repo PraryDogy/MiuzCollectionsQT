@@ -70,8 +70,8 @@ class DirLoader:
         # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
         scaner_item.gui_text = (
-            f"{scaner_item.mf_real_name}"
-            f"({scaner_item.mf.alias}):"
+            f"{scaner_item.mf_real_name} "
+            f"({scaner_item.mf.alias}): "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
         scaner_item.q.put(scaner_item)
