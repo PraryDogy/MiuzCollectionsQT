@@ -142,9 +142,9 @@ class DirsCompator:
     @staticmethod
     def start(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         """
-        - Сравнивает директории из Finder и из базы данных:
-            - Создает список удаленных директорий (нет в Finer, есть в БД)
-            - Создает список новых директорий (есть в Finder, нет в БД)
+        Сравнивает директории из Finder и из базы данных:
+        - Создает список удаленных директорий (нет в Finer, есть в БД)
+        - Создает список новых директорий (есть в Finder, нет в БД)
         """
         dirs_to_remove = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         dirs_to_scan = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
@@ -153,11 +153,7 @@ class DirsCompator:
     @staticmethod
     def get_dirs_to_remove(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         """
-        Параметры:
-        - finder_dirs список DirItem
-        - db_dirs список DirItem
-
-        Возвращает список DirItem
+        Собирает список `DirItem`:
         - которых больше нет в Finder, но есть в базе данных
         - которые нужно удалить из базы данных
         """
@@ -171,11 +167,7 @@ class DirsCompator:
     @staticmethod
     def get_dirs_to_scan(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         """
-        Параметры:
-        - finder_dirs список DirItem
-        - db_dirs список DirItem
-
-        Возвращает список DirItem
+        Собирает список `DirItem`:
         - которые есть в Finder, но нет в базе данных
         - которые нужно добавить в базу данных
         """
@@ -194,20 +186,14 @@ class DbDirUpdater:
     @staticmethod
     def start(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
-        Параметры:
-        - dir_list список DirItem
+        Запускать только, когда:
+        - добавлены и удалены изображения `ImgItem` из БД
+        - добавлены и удалены изображения `ImgItem` из `hashdir`
 
-        Возвращает:
-        - None
-
-        Запускается только после работы с изображениями:
-        - добавление и удаление изображений из базы данных THUMBS
-        - добавление и удаление изображений из "hashdir"
-
-        Что делает:
-        - удаляет записи из DIRS, которые соответствуют Mf.alias
-        - добавляет записи в DIRS, которые соответствуют Mf.alias
-        - по сути это замена sqlalchemy.update
+        Работает с БД:
+        - удаляет записи из `DIRS`, которые соответствуют `Mf.alias`
+        - добавляет записи в `DIRS`, которые соответствуют `Mf.alias`
+        - по сути это замена `sqlalchemy.update`
         """
         # удалить старые записи
         if not dir_list:
@@ -253,10 +239,7 @@ class ImgLoader:
     @staticmethod
     def get_finder_images(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
-        Параметры:
-        - dir_list список DirItem
-
-        Возвращает список изображений из указанных директорий:
+        Собирает список `ImgItem` из указанных директорий:
         - fider_images список ImgItem
         """
         # передает в гуи текст
@@ -291,10 +274,7 @@ class ImgLoader:
     @staticmethod
     def get_db_images(scaner_item: ScanerItem, dir_list: list[DirItem]):
         """
-        Параметры:
-        - dir_list список DirItem
-
-        Возвращает информацию об изображениях в базе данных из указанных директорий:
+        Возвращает информацию об изображениях в БД из указанных директорий:
         - db_images список ImgItem
         """
         conn = scaner_item.engine.connect()
