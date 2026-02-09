@@ -260,7 +260,11 @@ class ImgLoader:
         scaner_item.q.put(scaner_item)
         finder_images: list[ImgItem] = []
         for dir_item in dir_list:
-            abs_dir_path = Utils.get_abs_img_path(scaner_item.mf.curr_path, dir_item.rel_path)
+            abs_dir_path = os.path.join(
+                os.sep,
+                scaner_item.mf.curr_path.strip(os.sep),
+                dir_item.rel_path.strip(os.sep)
+            )
             for entry in os.scandir(abs_dir_path):
                 # передаем в основной поток ScanerItem
                 # чтобы в основном потоке сбрасывался таймер таймаута

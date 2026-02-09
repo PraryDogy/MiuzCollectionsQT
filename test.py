@@ -1,9 +1,13 @@
-a = 2
-test = (3, 3)
-stmt = (
-    a == 1
-    and
-    a not in test
+import os
+
+curr_path = "Volumes/Test/Collections/"
+dir_path = "hello/world/"
+
+
+fin = os.path.join(
+    os.sep,
+    curr_path.strip(os.sep),
+    dir_path.strip(os.sep)
 )
 
-print(stmt)
+print(fin)
