@@ -79,24 +79,22 @@ class DirLoader:
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.curr_path]
         while stack:
-            current = stack.pop()
-            for entry in os.scandir(current):
-                # передаем с каждой итерацией в основной поток ScanerItem
-                # чтобы в основном потоке сбрасывался таймер таймаута
-                scaner_item.q.put(scaner_item)
+            try:
+                scandir_iterator = os.scandir(stack.pop())
+            except Exception as e:
+                print("scaner > DirLoader error", e)
+                continue
+            for entry in scandir_iterator:
                 try:
-                    stmt = (
-                        entry.is_dir()
-                        and
-                        entry.name not in scaner_item.mf.stop_list
-                    )
+                    is_allowed = entry.name not in scaner_item.mf.stop_list
+                    stmt = (entry.is_dir() and is_allowed)
                 except Exception as e:
-                    # если к директории нет доступа, то далее
-                    # например если сетевой диск был отключен во время работы
-                    # или если нет прав доступа
-                    print("scaner > DirLoader > finder dirs error", e)
+                    print("scaner > DirLoader error", e)
                     continue
                 if stmt:
+                    # передаем с каждой итерацией в основной поток ScanerItem
+                    # чтобы в основном потоке сбрасывался таймер таймаута
+                    scaner_item.q.put(scaner_item)
                     stack.append(entry.path)
                     rel_path = Utils.get_rel_img_path(
                         mf_path=scaner_item.mf.curr_path,
@@ -253,17 +251,21 @@ class ImgLoader:
         scaner_item.q.put(scaner_item)
         finder_images: list[ImgItem] = []
         for dir_item in dir_list:
-            for entry in os.scandir(dir_item.abs_path):
-                # передаем в основной поток ScanerItem
-                # чтобы в основном потоке сбрасывался таймер таймаута
-                scaner_item.q.put(scaner_item)
+            try:
+                scandir_iterator = os.scandir(dir_item.abs_path)
+            except Exception as e:
+                print("scaner > ImgLoader error", e)
+                continue
+            for entry in scandir_iterator:
                 if entry.path.endswith(ImgUtils.ext_all):
-                    # если нет доступа к изображению, то продолжить
                     try:
                         stat = entry.stat()
                     except Exception as e:
                         print("scaner > ImgLoader, get_finder_images, error", e)
                         continue
+                    # передаем в основной поток ScanerItem
+                    # чтобы в основном потоке сбрасывался таймер таймаута
+                    scaner_item.q.put(scaner_item)
                     size = int(stat.st_size)
                     birth = int(stat.st_birthtime)
                     mod = int(stat.st_mtime)
