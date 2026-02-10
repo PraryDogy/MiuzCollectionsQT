@@ -33,14 +33,18 @@ class OnStartItem:
     mf_list: list["Mf"]
 
 
-class ScanerItem:
+@dataclass(slots=True)
+class ExtScanerItem:
+    gui_text: str
+
+
+class IntScanerItem:
     def __init__(self, mf: Mf, eng: sqlalchemy.Engine | None, q: Queue| None):
         super().__init__()
         self.mf = mf
         self.eng = eng
         self.q = q
 
-        self.gui_text: str = "gui_text"
         self.reload_gui = False
         if mf.curr_path:
             self.mf_real_name = os.path.basename(mf.curr_path)

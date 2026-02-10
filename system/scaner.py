@@ -13,7 +13,7 @@ from system.main_folder import Mf
 from system.shared_utils import ImgUtils
 from system.utils import Utils
 
-from .items import ScanerItem
+from .items import ExtScanerItem, IntScanerItem
 
 
 @dataclass(slots=True)
@@ -51,7 +51,7 @@ class ImgItem:
 
 class DirLoader:
     @staticmethod
-    def start(scaner_item: ScanerItem):
+    def start(scaner_item: IntScanerItem):
         """
         - Собирает список всех вложенных директорий в каталоге `Mf.curr_path`
         - Собирает список всех директорий из базы данных, которые
@@ -62,23 +62,21 @@ class DirLoader:
         return (finder_dirs, db_dirs)
 
     @staticmethod
-    def get_finder_dirs(scaner_item: ScanerItem):
+    def get_finder_dirs(scaner_item: IntScanerItem):
         """
         Собирает список директорий, которые:
         - есть в каталоге `Mf.curr_path`
         - не в стоп листе `Mf.stop_list`
         """
-        # Создаем локальный ScanerItem без sql Engine, иначе ошибка pickle
-        # в put
         # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
-        put_scaner_item = ScanerItem(scaner_item.mf, None, None)
-        put_scaner_item.gui_text = (
+        gui_text = (
             f"{scaner_item.mf_real_name} "
             f"({scaner_item.mf.alias}): "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
-        scaner_item.q.put(put_scaner_item)
+        ext_scaner_item = ExtScanerItem(gui_text)
+        scaner_item.q.put(ext_scaner_item)
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.curr_path]
         while stack:
@@ -97,7 +95,7 @@ class DirLoader:
                 if stmt:
                     # передаем с каждой итерацией в основной поток ScanerItem
                     # чтобы в основном потоке сбрасывался таймер таймаута
-                    scaner_item.q.put(put_scaner_item)
+                    scaner_item.q.put(ext_scaner_item)
                     stack.append(entry.path)
                     rel_path = Utils.get_rel_img_path(
                         mf_path=scaner_item.mf.curr_path,
@@ -116,7 +114,7 @@ class DirLoader:
         return dirs
 
     @staticmethod
-    def get_db_dirs(scaner_item: ScanerItem):
+    def get_db_dirs(scaner_item: IntScanerItem):
         """
         Возвращает список директорий из базы данных, которые:
         - соответствуют условию DIRS.c.brand == `Mf.alias`
@@ -185,7 +183,7 @@ class DirsCompator:
 
 class DbDirUpdater:
     @staticmethod
-    def start(scaner_item: ScanerItem, dirs_to_scan: list[DirItem]):
+    def start(scaner_item: IntScanerItem, dirs_to_scan: list[DirItem]):
         """
         Запускать только, когда:
         - добавлены и удалены изображения `ImgItem` из БД
@@ -225,7 +223,7 @@ class DbDirUpdater:
 
 class ImgLoader:
     @staticmethod
-    def start(scaner_item: ScanerItem, dirs_to_scan: list[DirItem]):
+    def start(scaner_item: IntScanerItem, dirs_to_scan: list[DirItem]):
         """
         - Обходит список `DirItem`:
             - Находит в Finder изображения и создает список `ImgItem`
@@ -238,20 +236,20 @@ class ImgLoader:
         return (finder_images, db_images)
 
     @staticmethod
-    def get_finder_images(scaner_item: ScanerItem, dir_list: list[DirItem]):
+    def get_finder_images(scaner_item: IntScanerItem, dir_list: list[DirItem]):
         """
         Собирает список `ImgItem` из указанных директорий:
         - fider_images список ImgItem
         """
         # передает в гуи текст
         # имя папки (псевдоним): поиск
-        text = (
+        gui_text = (
             f"{scaner_item.mf_real_name} "
             f"({scaner_item.mf.alias}): "
             f"{Lng.search[cfg.lng].lower()}"
         )
-        scaner_item.gui_text = text
-        scaner_item.q.put(scaner_item)
+        ext_scaner_item = ExtScanerItem(gui_text)
+        scaner_item.q.put(ext_scaner_item)
         finder_images: list[ImgItem] = []
         for dir_item in dir_list:
             try:
@@ -268,7 +266,7 @@ class ImgLoader:
                         continue
                     # передаем в основной поток ScanerItem
                     # чтобы в основном потоке сбрасывался таймер таймаута
-                    scaner_item.q.put(scaner_item)
+                    scaner_item.q.put(ext_scaner_item)
                     size = int(stat.st_size)
                     birth = int(stat.st_birthtime)
                     mod = int(stat.st_mtime)
@@ -277,7 +275,7 @@ class ImgLoader:
         return finder_images
 
     @staticmethod
-    def get_db_images(scaner_item: ScanerItem, dir_list: list[DirItem]):
+    def get_db_images(scaner_item: IntScanerItem, dir_list: list[DirItem]):
         """
         Возвращает информацию об изображениях в БД из указанных директорий:
         - db_images список ImgItem
@@ -353,7 +351,7 @@ class ImgCompator:
 
 class HashdirImgUpdater:
     @staticmethod
-    def start(scaner_item: ScanerItem, del_images: list, new_images: list):
+    def start(scaner_item: IntScanerItem, del_images: list, new_images: list):
         """
         - Удаляет из `hashdir` миниатюры, которых больше нет в Finder
         - Добавляет миниатюры в `hashdir`, которые есть в Finder
@@ -383,7 +381,7 @@ class HashdirImgUpdater:
         return new_del_images, new_items
 
     @staticmethod
-    def run_del_images(scaner_item: ScanerItem, del_images: list[ImgItem]):
+    def run_del_images(scaner_item: IntScanerItem, del_images: list[ImgItem]):
         """
         Пытается удалить изображения из `hashdir` и пустые папки.   
         Возвращает список успешно удаленных изображений.
@@ -392,6 +390,7 @@ class HashdirImgUpdater:
         - Он был присвоен при загрузуке записей из БД
         - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
         """
+        ext_scaner_item = ExtScanerItem("not now")
         new_del_images: list[ImgItem] = []
         for img_item in del_images:
             thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
@@ -405,18 +404,19 @@ class HashdirImgUpdater:
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
                     # и чтобы в основном потоке сбрасывался таймер таймаута
-                    HashdirImgUpdater.send_text(scaner_item)
+                    HashdirImgUpdater.q_put(ext_scaner_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     continue
         return new_del_images
 
     @staticmethod
-    def run_new_images(scaner_item: ScanerItem, new_images: list[ImgItem]):
+    def run_new_images(scaner_item: IntScanerItem, new_images: list[ImgItem]):
         """
         Пытается создать изображения в "hashdir".     
         Возвращает список успешно созданных изображений.
         """
+        ext_scaner_item = ExtScanerItem("not now")
         new_new_images: list[ImgItem] = []
         for img_item in new_images:
             img = ImgUtils.read_img(img_item.abs_img_path)
@@ -433,14 +433,14 @@ class HashdirImgUpdater:
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
                     # и чтобы в основном потоке сбрасывался таймер таймаута
-                    HashdirImgUpdater.send_text(scaner_item)
+                    HashdirImgUpdater.q_put(ext_scaner_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     continue
         return new_new_images
 
     @staticmethod
-    def send_text(scaner_item: ScanerItem):
+    def q_put(scaner_item: IntScanerItem, ext_scaner_item: ExtScanerItem):
         """
         Посылает текст в гуи.   
         Имя папки (псевдоним): обновление (оставшееся число)
@@ -451,14 +451,14 @@ class HashdirImgUpdater:
             f"{Lng.updating[cfg.lng].lower()} "
             f"({scaner_item.total_count})"
         )
-        scaner_item.gui_text = text
-        scaner_item.q.put(scaner_item)
+        ext_scaner_item.gui_text = text
+        scaner_item.q.put(ext_scaner_item)
 
 
 class DbImgUpdater:
     @staticmethod
     def start(
-        scaner_item: ScanerItem,
+        scaner_item: IntScanerItem,
         del_images: list[ImgItem],
         new_images: list[ImgItem]
     ):
@@ -470,7 +470,7 @@ class DbImgUpdater:
         return None
 
     @staticmethod
-    def remove_del_imgs(scaner_item: ScanerItem, del_images: list[ImgItem]):
+    def remove_del_imgs(scaner_item: IntScanerItem, del_images: list[ImgItem]):
         conn = scaner_item.eng.connect()
         rel_thumb_paths = [i.rel_thumb_path for i in del_images]
         q = sqlalchemy.delete(Thumbs.table).where(
@@ -482,7 +482,7 @@ class DbImgUpdater:
         conn.close()
 
     @staticmethod
-    def remove_exits_imgs(scaner_item: ScanerItem, new_images: list[ImgItem]):
+    def remove_exits_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
         conn = scaner_item.eng.connect()
         rel_img_paths = [
             Utils.get_rel_img_path(
@@ -500,7 +500,7 @@ class DbImgUpdater:
         conn.close()
 
     @staticmethod
-    def add_new_imgs(scaner_item: ScanerItem, new_images: list[ImgItem]):
+    def add_new_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
         conn = scaner_item.eng.connect()
         values_list = []
         for img_item in new_images:
@@ -528,7 +528,7 @@ class DbImgUpdater:
 
 class NewDirsWorker:    
     @staticmethod
-    def start(dirs_to_scan: list[DirItem], scaner_item: ScanerItem):
+    def start(dirs_to_scan: list[DirItem], scaner_item: IntScanerItem):
         """
         Параметры: 
         - dirs_to_scan список DirItem
@@ -562,7 +562,7 @@ class NewDirsWorker:
 
 class RemovedDirsWorker:
     @staticmethod
-    def start(dirs_to_del: list[DirItem], scaner_item: ScanerItem):
+    def start(dirs_to_del: list[DirItem], scaner_item: IntScanerItem):
         conn = scaner_item.eng.connect()
         for dir_item in dirs_to_del:
             RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
@@ -573,7 +573,7 @@ class RemovedDirsWorker:
     @staticmethod
     def remove_thumbs(
         dir_item: DirItem,
-        scaner_item: ScanerItem,
+        scaner_item: IntScanerItem,
         conn: sqlalchemy.Connection
     ):
         stmt = (
@@ -598,7 +598,7 @@ class RemovedDirsWorker:
 
     def remove_dir_entry(
             dir_item: DirItem,
-            scaner_item: ScanerItem,
+            scaner_item: IntScanerItem,
             conn: sqlalchemy.Connection
         ):
         stmt = (
@@ -615,7 +615,7 @@ class AllDirScaner:
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
-            scaner_item = ScanerItem(mf, engine, q)
+            scaner_item = IntScanerItem(mf, engine, q)
             if scaner_item.mf.get_available_path():
                 try:
                     print("scaner started", scaner_item.mf.alias)
@@ -628,24 +628,23 @@ class AllDirScaner:
                     continue
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
-                scaner_item.gui_text = (
+                gui_text = (
                     f"{scaner_item.mf_real_name} "
                     f"({scaner_item.mf.alias}): "
                     f"{no_conn}"
                 )
-                scaner_item.q.put(scaner_item)
+                ext_scaner_item = ExtScanerItem(gui_text)
+                scaner_item.q.put(ext_scaner_item)
                 print(
                     "scaner no connection",
                     scaner_item.mf_real_name,
                     scaner_item.mf.alias
                 )
                 sleep(5)
-            if scaner_item.reload_gui:
-                scaner_item.q.put(scaner_item)
         engine.dispose()
 
     @staticmethod
-    def single_mf_scan(scaner_item: ScanerItem):
+    def single_mf_scan(scaner_item: IntScanerItem):
         # собираем Finder директории и директории из БД
         finder_dirs, db_dirs = DirLoader.start(scaner_item)
         print("finder dirs********", finder_dirs)
