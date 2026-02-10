@@ -72,11 +72,7 @@ class DirLoader:
         # в put
         # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
-        put_scaner_item = ScanerItem(
-            mf=scaner_item.mf,
-            eng=None,
-            q=None
-        )
+        put_scaner_item = ScanerItem(scaner_item.mf, None, None)
         put_scaner_item.gui_text = (
             f"{scaner_item.mf_real_name} "
             f"({scaner_item.mf.alias}): "
