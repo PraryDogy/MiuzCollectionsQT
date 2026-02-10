@@ -559,21 +559,23 @@ class NewDirsWorker:
 
 class RemovedDirsWorker:
     @staticmethod
-    def start():
-        for rel_dir, _ in self.dirs_to_del:
-            remove_thumbs(rel_dir)
-            remove_dir_entry(rel_dir)
+    def start(dirs_to_del: list[DirItem], scaner_item: ScanerItem):
+        conn = scaner_item.engine.connect()
+        for dir_item in dirs_to_del:
+            RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
+            RemovedDirsWorker.remove_dir_entry(dir_item, scaner_item, conn)
+        conn.commit()
+        conn.close()
 
-        self.conn.commit()
-
-    def remove_thumbs(rel_dir: str):
+    @staticmethod
+    def remove_thumbs(dir_item: DirItem, scaner_item: ScanerItem, conn: sqlalchemy.Connection):
         stmt = (
             sqlalchemy.select(Thumbs.rel_thumb_path)
-            .where(Thumbs.rel_img_path.ilike(f"{rel_dir}/%"))
-            .where(Thumbs.rel_img_path.not_ilike(f"{rel_dir}/%/%"))
-            .where(Thumbs.mf_alias == self.mf.alias)
+            .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
+            .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+            .where(Thumbs.mf_alias == scaner_item.mf.alias)
         )
-        for rel_thumb_path in self.conn.execute(stmt).scalars():
+        for rel_thumb_path in conn.execute(stmt).scalars():
             try:
                 os.remove(Utils.get_abs_thumb_path(rel_thumb_path))
             except Exception as e:
@@ -581,19 +583,19 @@ class RemovedDirsWorker:
 
         del_stmt = (
             sqlalchemy.delete(Thumbs.table)
-            .where(Thumbs.rel_img_path.ilike(f"{rel_dir}/%"))
-            .where(Thumbs.rel_img_path.not_ilike(f"{rel_dir}/%/%"))
-            .where(Thumbs.mf_alias == self.mf.alias)
+            .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
+            .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+            .where(Thumbs.mf_alias == scaner_item.mf.alias)
         )
-        self.conn.execute(del_stmt)
+        conn.execute(del_stmt)
 
-    def remove_dir_entry(rel_dir: str):
+    def remove_dir_entry(dir_item: DirItem, scaner_item: ScanerItem, conn: sqlalchemy.Connection):
         stmt = (
             sqlalchemy.delete(Dirs.table)
-            .where(Dirs.rel_dir_path == rel_dir)
-            .where(Dirs.mf_alias == self.mf.alias)
+            .where(Dirs.rel_dir_path == dir_item.rel_path)
+            .where(Dirs.mf_alias == scaner_item.mf.alias)
         )
-        self.conn.execute(stmt)
+        conn.execute(stmt)
 
 
 class AllDirScaner:
