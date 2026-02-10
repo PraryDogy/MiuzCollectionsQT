@@ -495,7 +495,7 @@ class DbImgUpdater:
             )
             for img_item in new_images
         ]
-        q = sqlalchemy.delete(Thumbs).where(
+        q = sqlalchemy.delete(Thumbs.table).where(
             Thumbs.rel_img_path.in_(rel_img_paths),
             Thumbs.mf_alias == scaner_item.mf.alias
         )
