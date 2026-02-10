@@ -16,7 +16,7 @@ from system.utils import Utils
 from .items import ScanerItem
 
 
-@dataclass
+@dataclass(slots=True)
 class DirItem:
     """
     Параметры:
@@ -32,7 +32,7 @@ class DirItem:
     mod: int
 
 
-@dataclass
+@dataclass(slots=True)
 class ImgItem:
     """
     Параметры:

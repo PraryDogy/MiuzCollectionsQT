@@ -1,6 +1,6 @@
 import os
+from dataclasses import dataclass, field
 from multiprocessing import Queue
-from time import time
 from typing import Literal
 
 import numpy as np
@@ -8,65 +8,59 @@ import sqlalchemy
 
 from .main_folder import Mf
 
+# class CopyTaskItem:
+#     def __init__(self, src_dir: str, dst_dir: str, src_urls: list[str], is_search: bool, is_cut: bool):
+#         super().__init__()
+#         self.src_dir = src_dir
+#         self.dst_dir = dst_dir
+#         self.src_urls = src_urls
+#         self.is_search = is_search
+#         self.is_cut = is_cut
 
-class CopyTaskItem:
-    def __init__(self, src_dir: str, dst_dir: str, src_urls: list[str], is_search: bool, is_cut: bool):
-        super().__init__()
-        self.src_dir = src_dir
-        self.dst_dir = dst_dir
-        self.src_urls = src_urls
-        self.is_search = is_search
-        self.is_cut = is_cut
-
-        self.current_size: int = 0
-        self.total_size: int = 0
-        self.current_count: int = 0
-        self.total_count: int = 0
-        self.dst_urls: list[str] = []
-        self.msg: Literal["", "error", "need_replace", "replace_one", "replace_all", "finished"]
+#         self.current_size: int = 0
+#         self.total_size: int = 0
+#         self.current_count: int = 0
+#         self.total_count: int = 0
+#         self.dst_urls: list[str] = []
+#         self.msg: Literal["", "error", "need_replace", "replace_one", "replace_all", "finished"]
 
 
+@dataclass(slots=True)
 class OneFileInfoItem:
-    def __init__(self, type_: str, size: str, mod: str, res: str):
-        super().__init__()
-        self.type_ = type_
-        self.size = size
-        self.mod = mod
-        self.res = res
+    type_: str
+    size: str
+    mod: str
+    res: str
 
 
+@dataclass(slots=True)
 class ReadImgItem:
-    def __init__(self, src: str, img_array: np.ndarray):
-        super().__init__()
-        self.src = src
-        self.img_array = img_array
+    src: str
+    img_array: np.ndarray
 
 
+@dataclass(slots=True)
 class NeedResetItem:
-    def __init__(self):
-        super().__init__()
-        self.need_reset = False
+    need_reset: bool = False
 
 
+@dataclass(slots=True)
 class CopyTaskItem:
-    def __init__(self, dst_dir: str, src_urls: list[str], is_cut: bool):
-        super().__init__()
-        self.dst_dir = dst_dir
-        self.src_urls = src_urls
-        self.is_cut = is_cut
+    dst_dir: str
+    src_urls: list[str]
+    is_cut: bool
 
-        self.current_size: int = 0
-        self.total_size: int = 0
-        self.current_count: int = 0
-        self.total_count: int = 0
-        self.dst_urls: list[str] = []
-        self.msg: Literal["", "error", "need_replace", "replace_one", "replace_all", "finished"]
+    current_size: int = 0
+    total_size: int = 0
+    current_count: int = 0
+    total_count: int = 0
+    dst_urls: list[str] = field(default_factory=list)
+    msg: Literal["", "error", "need_replace", "replace_one", "replace_all", "finished"] = ""
 
 
+@dataclass(slots=True)
 class OnStartItem:
-    def __init__(self, mf_list: list[Mf]):
-        super().__init__()
-        self.mf_list = mf_list
+    mf_list: list["Mf"]
 
 
 class ScanerItem:
