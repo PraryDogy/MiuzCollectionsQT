@@ -404,7 +404,7 @@ class HashdirImgUpdater:
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
                     # и чтобы в основном потоке сбрасывался таймер таймаута
-                    HashdirImgUpdater.q_put(ext_scaner_item)
+                    HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     continue
@@ -433,7 +433,7 @@ class HashdirImgUpdater:
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
                     # и чтобы в основном потоке сбрасывался таймер таймаута
-                    HashdirImgUpdater.q_put(ext_scaner_item)
+                    HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     continue
