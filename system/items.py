@@ -72,11 +72,12 @@ class OnStartItem:
 class ScanerItem:
     def __init__(self, mf: Mf, engine: sqlalchemy.Engine, q: Queue):
         super().__init__()
+        self.mf = mf
         self.engine = engine
         self.q = q
+
         self.gui_text: str = "gui_text"
         self.reload_gui = False
-        self.mf = mf
         if mf.curr_path:
             self.mf_real_name = os.path.basename(mf.curr_path)
         else:
