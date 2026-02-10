@@ -6,7 +6,6 @@ from system.scaner import AllDirScaner
 def main():
     Mf.init()
     q = Queue()
-    # AllDirScaner.start(Mf.list_, q)
     process = Process(
         target=AllDirScaner.start,
         args=(Mf.list_, q)
