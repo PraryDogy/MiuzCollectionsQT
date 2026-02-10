@@ -1,13 +1,7 @@
-import os
+from system.main_folder import Mf
+from system.scaner import AllDirScaner
+from multiprocessing import Queue
 
-curr_path = "Volumes/Test/Collections/"
-dir_path = "hello/world/"
-
-
-fin = os.path.join(
-    os.sep,
-    curr_path.strip(os.sep),
-    dir_path.strip(os.sep)
-)
-
-print(fin)
+Mf.init()
+q = Queue
+AllDirScaner.start(Mf.list_, q)

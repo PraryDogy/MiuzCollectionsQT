@@ -613,6 +613,7 @@ class AllDirScaner:
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
             scaner_item = ScanerItem(mf, engine, q)
+            continue
             if scaner_item.mf.get_available_path():
                 try:
                     print("scaner started", scaner_item.mf.alias)
