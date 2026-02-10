@@ -68,14 +68,21 @@ class DirLoader:
         - есть в каталоге `Mf.curr_path`
         - не в стоп листе `Mf.stop_list`
         """
+        # Создаем локальный ScanerItem без sql Engine, иначе ошибка pickle
+        # в put
         # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
-        scaner_item.gui_text = (
+        put_scaner_item = ScanerItem(
+            mf=scaner_item.mf,
+            engine=None,
+            q=None
+        )
+        put_scaner_item.gui_text = (
             f"{scaner_item.mf_real_name} "
             f"({scaner_item.mf.alias}): "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
-        scaner_item.q.put(scaner_item)
+        scaner_item.q.put(put_scaner_item)
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.curr_path]
         while stack:
@@ -94,7 +101,7 @@ class DirLoader:
                 if stmt:
                     # передаем с каждой итерацией в основной поток ScanerItem
                     # чтобы в основном потоке сбрасывался таймер таймаута
-                    scaner_item.q.put(scaner_item)
+                    scaner_item.q.put(put_scaner_item)
                     stack.append(entry.path)
                     rel_path = Utils.get_rel_img_path(
                         mf_path=scaner_item.mf.curr_path,
@@ -613,13 +620,14 @@ class AllDirScaner:
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
             scaner_item = ScanerItem(mf, engine, q)
-            continue
             if scaner_item.mf.get_available_path():
                 try:
                     print("scaner started", scaner_item.mf.alias)
                     AllDirScaner.single_mf_scan(scaner_item)
                     print("scaner finished", scaner_item.mf.alias)
                 except Exception as e:
+                    import traceback
+                    print(traceback.format_exc())
                     print("scaner AllDirsScaner error", e)
                     continue
             else:
@@ -644,6 +652,9 @@ class AllDirScaner:
     def single_mf_scan(scaner_item: ScanerItem):
         # собираем Finder директории и директории из БД
         finder_dirs, db_dirs = DirLoader.start(scaner_item)
+        print("finder dirs********", finder_dirs)
+        print("db_dirs********", db_dirs)
+        return
         if not finder_dirs:
             print(scaner_item.mf.alias, "no finder dirs")
             return
