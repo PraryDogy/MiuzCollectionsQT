@@ -568,7 +568,11 @@ class RemovedDirsWorker:
         conn.close()
 
     @staticmethod
-    def remove_thumbs(dir_item: DirItem, scaner_item: ScanerItem, conn: sqlalchemy.Connection):
+    def remove_thumbs(
+        dir_item: DirItem,
+        scaner_item: ScanerItem,
+        conn: sqlalchemy.Connection
+    ):
         stmt = (
             sqlalchemy.select(Thumbs.rel_thumb_path)
             .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
@@ -589,7 +593,11 @@ class RemovedDirsWorker:
         )
         conn.execute(del_stmt)
 
-    def remove_dir_entry(dir_item: DirItem, scaner_item: ScanerItem, conn: sqlalchemy.Connection):
+    def remove_dir_entry(
+            dir_item: DirItem,
+            scaner_item: ScanerItem,
+            conn: sqlalchemy.Connection
+        ):
         stmt = (
             sqlalchemy.delete(Dirs.table)
             .where(Dirs.rel_dir_path == dir_item.rel_path)
