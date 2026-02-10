@@ -74,7 +74,7 @@ class DirLoader:
         # gui_text: Имя папки (псевдоним папки): поиск в папке
         put_scaner_item = ScanerItem(
             mf=scaner_item.mf,
-            engine=None,
+            eng=None,
             q=None
         )
         put_scaner_item.gui_text = (
@@ -125,7 +125,7 @@ class DirLoader:
         Возвращает список директорий из базы данных, которые:
         - соответствуют условию DIRS.c.brand == `Mf.alias`
         """
-        conn = scaner_item.engine.connect()
+        conn = scaner_item.eng.connect()
         q = sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod).where(
             Dirs.mf_alias == scaner_item.mf.alias
         )
@@ -203,7 +203,7 @@ class DbDirUpdater:
         # удалить старые записи
         if not dirs_to_scan:
             return
-        conn = scaner_item.engine.connect()
+        conn = scaner_item.eng.connect()
         rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
         del_stmt = sqlalchemy.delete(Dirs.table).where(
             Dirs.rel_dir_path.in_(rel_paths),
@@ -286,7 +286,7 @@ class ImgLoader:
         Возвращает информацию об изображениях в БД из указанных директорий:
         - db_images список ImgItem
         """
-        conn = scaner_item.engine.connect()
+        conn = scaner_item.eng.connect()
         db_images: list[ImgItem] = []
         for dir_item in dir_list:
             q = sqlalchemy.select(
@@ -475,7 +475,7 @@ class DbImgUpdater:
 
     @staticmethod
     def remove_del_imgs(scaner_item: ScanerItem, del_images: list[ImgItem]):
-        conn = scaner_item.engine.connect()
+        conn = scaner_item.eng.connect()
         rel_thumb_paths = [i.rel_thumb_path for i in del_images]
         q = sqlalchemy.delete(Thumbs.table).where(
             Thumbs.rel_thumb_path.in_(rel_thumb_paths),
@@ -487,7 +487,7 @@ class DbImgUpdater:
 
     @staticmethod
     def remove_exits_imgs(scaner_item: ScanerItem, new_images: list[ImgItem]):
-        conn = scaner_item.engine.connect()
+        conn = scaner_item.eng.connect()
         rel_img_paths = [
             Utils.get_rel_img_path(
                 mf_path=scaner_item.mf.curr_path,
@@ -505,7 +505,7 @@ class DbImgUpdater:
 
     @staticmethod
     def add_new_imgs(scaner_item: ScanerItem, new_images: list[ImgItem]):
-        conn = scaner_item.engine.connect()
+        conn = scaner_item.eng.connect()
         values_list = []
         for img_item in new_images:
             rel_img_path = Utils.get_rel_img_path(
@@ -567,7 +567,7 @@ class NewDirsWorker:
 class RemovedDirsWorker:
     @staticmethod
     def start(dirs_to_del: list[DirItem], scaner_item: ScanerItem):
-        conn = scaner_item.engine.connect()
+        conn = scaner_item.eng.connect()
         for dir_item in dirs_to_del:
             RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
             RemovedDirsWorker.remove_dir_entry(dir_item, scaner_item, conn)

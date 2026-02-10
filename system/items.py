@@ -34,10 +34,10 @@ class OnStartItem:
 
 
 class ScanerItem:
-    def __init__(self, mf: Mf, engine: sqlalchemy.Engine, q: Queue):
+    def __init__(self, mf: Mf, eng: sqlalchemy.Engine | None, q: Queue| None):
         super().__init__()
         self.mf = mf
-        self.engine = engine
+        self.eng = eng
         self.q = q
 
         self.gui_text: str = "gui_text"
