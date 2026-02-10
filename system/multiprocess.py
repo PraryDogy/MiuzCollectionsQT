@@ -9,7 +9,7 @@ import sqlalchemy
 
 from cfg import Static, cfg
 
-from .database import _table_dirs, Dbase, Thumbs
+from .database import Dbase, Dirs, Thumbs
 from .items import CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem
 from .lang import Lng
 from .main_folder import Mf
@@ -211,7 +211,7 @@ class _DeletedMfRemover:
         Передает в Queue список удаленных Mf (список имен str)
         """
         conn = engine.connect()
-        stmt = sqlalchemy.select(THUMBS_TABLE.c.brand).distinct()
+        stmt = sqlalchemy.select(Thumbs.mf_alias).distinct()
         db_mf_list = conn.execute(stmt).scalars().all()
         json_mf_list = [i.alias for i in on_start_item.mf_list]
         removed_mf_list: list[str] = [
@@ -231,8 +231,8 @@ class _DeletedMfRemover:
     
     @staticmethod
     def get_rows(mf_name: str, conn: sqlalchemy.Connection):
-        q = sqlalchemy.select(THUMBS_TABLE.c.id, THUMBS_TABLE.c.short_hash).where(
-            THUMBS_TABLE.c.brand == mf_name
+        q = sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path).where(
+            Thumbs.mf_alias == mf_name
         )
         return [
             (id_, Utils.get_abs_thumb_path(rel_thumb_path))
@@ -262,19 +262,19 @@ class _DeletedMfRemover:
         """
         ids = [id_ for id_, _ in rows]
         if ids:
-            q = sqlalchemy.delete(THUMBS_TABLE).where(THUMBS_TABLE.c.id.in_(ids))
+            q = sqlalchemy.delete(Thumbs.table).where(Thumbs.id.in_(ids))
             conn.execute(q)
             conn.commit()
 
     @staticmethod
     def remove_dirs(conn: sqlalchemy.Connection):
-        q = sqlalchemy.select(_table_dirs.c.brand).distinct()
+        q = sqlalchemy.select(Dirs.mf_alias).distinct()
         db_brands = set(conn.execute(q).scalars())
         app_brands = set(i.alias for i in Mf.list_)
         to_delete = db_brands - app_brands
 
         if to_delete:
-            del_stmt = sqlalchemy.delete(_table_dirs).where(_table_dirs.c.brand.in_(to_delete))
+            del_stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias.in_(to_delete))
             conn.execute(del_stmt)
             conn.commit()
 
@@ -289,10 +289,10 @@ class _EmptyRecordsRemover:
         """
         conn = engine.connect()
         stmt = (
-            sqlalchemy.delete(THUMBS_TABLE).where(
+            sqlalchemy.delete(Thumbs.table).where(
                 sqlalchemy.or_(
-                    THUMBS_TABLE.c.short_hash == None,
-                    THUMBS_TABLE.c.short_src == None
+                    Thumbs.rel_thumb_path == None,
+                    Thumbs.rel_img_path == None
                 )
             )
         )
