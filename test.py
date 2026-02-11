@@ -8,15 +8,16 @@ def main():
     q = Queue()
     process = Process(
         target=AllDirScaner.start,
-        args=(Mf.list_, q)
+        args=(Mf.list_[-1:], q)
     )
 
     process.start()
     process.join()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
 
 
-# в .put передавай новый ScanerItem без engine
+a = [1, 2, 3]
+print(a[-1:])
