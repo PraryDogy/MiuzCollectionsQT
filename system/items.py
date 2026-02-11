@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 from multiprocessing import Queue
-from typing import Literal
+from typing import Literal, Optional
 
 import numpy as np
 import sqlalchemy
@@ -39,7 +39,12 @@ class ExtScanerItem:
 
 
 class IntScanerItem:
-    def __init__(self, mf: Mf, eng: sqlalchemy.Engine | None, q: Queue | None):
+    def __init__(
+            self,
+            mf: Mf,
+            eng: Optional[sqlalchemy.Engine],
+            q: Optional[Queue]
+        ):
         super().__init__()
         self.mf = mf
         self.eng = eng
@@ -59,9 +64,16 @@ class CopyTaskItem:
         self.src_urls = src_urls
         self.is_cut = is_cut
 
-        self.current_size: int = 0
-        self.total_size: int = 0
-        self.current_count: int = 0
-        self.total_count: int = 0
-        self.dst_urls: list[str] = []
-        self.msg: Literal["", "error", "need_replace", "replace_one", "replace_all", "finished"] = ""
+        self.current_size: int
+        self.total_size: int
+        self.current_count: int
+        self.total_count: int
+        self.dst_urls: list[str]
+        self.msg: Literal[
+            "none",
+            "error",
+            "need_replace",
+            "replace_one",
+            "replace_all",
+            "finished"
+        ]
