@@ -543,6 +543,11 @@ class NewDirsWorker:
             finder_images=finder_images,
             db_images=db_images
         )
+
+        print("del images", del_images)
+        print("new images", new_images)
+        return
+
         del_images, new_images = HashdirImgUpdater.start(
             scaner_item=scaner_item,
             del_images=del_images,
@@ -647,9 +652,6 @@ class AllDirScaner:
     def single_mf_scan(scaner_item: IntScanerItem):
         # собираем Finder директории и директории из БД
         finder_dirs, db_dirs = DirLoader.start(scaner_item)
-        print("finder dirs********", finder_dirs)
-        print("db_dirs********", db_dirs)
-        return
         if not finder_dirs:
             print(scaner_item.mf.alias, "no finder dirs")
             return
@@ -658,5 +660,4 @@ class AllDirScaner:
             NewDirsWorker.start(new_dirs, scaner_item)
         # удаляем удаленные Finder директории
         if removed_dirs:
-            del_handler = RemovedDirsWorker.start(removed_dirs, scaner_item)
-            del_handler.run()
+            RemovedDirsWorker.start(removed_dirs, scaner_item)
