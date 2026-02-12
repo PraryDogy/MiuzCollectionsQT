@@ -581,12 +581,15 @@ class WinMain(UMainWindow):
         def poll_task():
             self.scaner_timer.stop()
             q = self.scaner_task.proc_q
+            bar = self.bar_bottom.progress_bar
             while not q.empty():
                 res: ExtScanerItem = q.get()
-                print(res.gui_text)
+                if bar.text() != res.gui_text:
+                    bar.setText(res.gui_text)
             
             if not self.scaner_task.is_alive():
                 self.scaner_task.terminate()
+                bar.setText("")
             else:
                 self.scaner_timer.start(ms)
 
