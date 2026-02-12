@@ -109,6 +109,7 @@ class DirLoader:
             stats = os.stat(scaner_item.mf.curr_path)
             mod = int(stats.st_mtime)
             dir_item = DirItem(scaner_item.mf.curr_path, os.sep, mod)
+            dirs.append(dir_item)
         except Exception as e:
             print("new scaner dirs loader finder dirs error add root dir", e)
         return dirs
