@@ -247,7 +247,7 @@ class ImgLoader:
         gui_text = (
             f"{scaner_item.mf_real_name} "
             f"({scaner_item.mf.alias}): "
-            f"{Lng.search[cfg.lng].lower()}"
+            f"{Lng.search_in[cfg.lng].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text)
         scaner_item.q.put(ext_scaner_item)

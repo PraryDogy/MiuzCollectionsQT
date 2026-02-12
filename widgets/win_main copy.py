@@ -10,11 +10,12 @@ from typing_extensions import Literal
 
 from cfg import Dynamic, Static, cfg
 from system.filters import Filters
-from system.items import OnStartItem, ExtScanerItem
+from system.items import OnStartItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import FilesRemover, OnStartTask, ProcessWorker
 from system.scaner import AllDirScaner
+# from system.new_scaner.scaner_task import DirListScanTask
 from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
@@ -200,11 +201,11 @@ class WinMain(UMainWindow):
 
         self.grid.setFocus()
 
-        # self.scaner_timer = QTimer(self)
-        # self.scaner_timer.setSingleShot(True)
-        # self.scaner_timer.timeout.connect(self.start_scaner_task)
-        # self.scaner_task = None
-        # self.scaner_task_canceled = False
+        self.scaner_timer = QTimer(self)
+        self.scaner_timer.setSingleShot(True)
+        self.scaner_timer.timeout.connect(self.start_scaner_task)
+        self.scaner_task = None
+        self.scaner_task_canceled = False
 
         self.on_start(argv)
 
@@ -576,31 +577,8 @@ class WinMain(UMainWindow):
             self.view_win.move(WinImageView.xx, WinImageView.yy)
         self.view_win.show()
 
-    def start_scaner_task(self, ms: int = 1000):
-
-        def poll_task():
-            self.scaner_timer.stop()
-            q = self.scaner_task.proc_q
-            while not q.empty():
-                res: ExtScanerItem = q.get()
-                print(res.gui_text)
-            
-            if not self.scaner_task.is_alive():
-                self.scaner_task.terminate()
-            else:
-                self.scaner_timer.start(ms)
-
-        self.scaner_task = ProcessWorker(
-            target=AllDirScaner.start,
-            args=(Mf.list_, )
-        )
-        self.scaner_timer = QTimer(self)
-        self.scaner_timer.setSingleShot(True)
-        self.scaner_timer.timeout.connect(poll_task)
-
-        self.scaner_task.start()
-        self.scaner_timer.start(ms)
-
+    def start_scaner_task(self):
+        ...
         # """
         # Инициализирует и запускает задачу сканирования ScanerTask.
 
