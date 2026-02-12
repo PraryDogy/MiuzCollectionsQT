@@ -665,9 +665,12 @@ class AllDirScaner:
         if not finder_dirs:
             print(scaner_item.mf.alias, "no finder dirs")
             return
+
         removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
         if new_dirs:
+            # print("new dirs", new_dirs)
             NewDirsWorker.start(new_dirs, scaner_item)
-        # удаляем удаленные Finder директории
+
         if removed_dirs:
+            # print("removed dirs", removed_dirs)
             RemovedDirsWorker.start(removed_dirs, scaner_item)
