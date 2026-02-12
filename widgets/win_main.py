@@ -1,6 +1,7 @@
 import gc
 import os
 import subprocess
+from time import time
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
@@ -10,7 +11,7 @@ from typing_extensions import Literal
 
 from cfg import Dynamic, Static, cfg
 from system.filters import Filters
-from system.items import OnStartItem, ExtScanerItem
+from system.items import ExtScanerItem, OnStartItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import FilesRemover, OnStartTask, ProcessWorker
@@ -61,6 +62,7 @@ class WinMain(UMainWindow):
     update_mins = 30
     min_w = 750
     left_side_width = 250
+    max_timeout = 15 * 60
     warning_svg = "./images/warning.svg"
 
     def __init__(self, argv: list[Literal["noscan", ""]]):
@@ -70,7 +72,8 @@ class WinMain(UMainWindow):
 
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
-        
+
+        self.scaner_timeout = time()
         self.view_win: WinImageView
         self.clipboard_item: ClipBoardItem = None
 
@@ -586,6 +589,7 @@ class WinMain(UMainWindow):
                 res: ExtScanerItem = q.get()
                 if bar.text() != res.gui_text:
                     bar.setText(res.gui_text)
+                    self.scaner_timeout = time()
             
             if not self.scaner_task.is_alive():
                 self.scaner_task.terminate()
