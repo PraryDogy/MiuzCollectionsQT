@@ -505,7 +505,7 @@ class DbImgUpdater:
         values_list = []
         for img_item in new_images:
             rel_img_path = Utils.get_rel_img_path(
-                scaner_item=scaner_item.mf.curr_path,
+                mf_path=scaner_item.mf.curr_path,
                 abs_img_path=img_item.abs_img_path
             )
             abs_thumb_path = Utils.create_abs_thumb_path(rel_img_path)
@@ -546,7 +546,7 @@ class NewDirsWorker:
 
         print("del images", del_images)
         print("new images", new_images)
-        return
+        # return
 
         del_images, new_images = HashdirImgUpdater.start(
             scaner_item=scaner_item,
