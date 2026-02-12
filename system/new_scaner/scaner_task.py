@@ -52,7 +52,7 @@ class ScanerTask(URunnable):
                 no_conn = Lng.no_connection[cfg.lng].lower()
                 self.sigs.progress_text.emit(f"{true_name} ({alias}): {no_conn}")
                 print("scaner no connection", true_name, alias)
-                sleep(5)
+                sleep(1)
             try:
                 if self.reload_gui_flag:
                     self.set_flag(False)
