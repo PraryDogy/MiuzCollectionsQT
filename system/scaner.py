@@ -544,8 +544,8 @@ class NewDirsWorker:
             db_images=db_images
         )
 
-        print("del images", del_images)
-        print("new images", new_images)
+        # print("del images", del_images)
+        # print("new images", new_images)
         # return
 
         del_images, new_images = HashdirImgUpdater.start(
