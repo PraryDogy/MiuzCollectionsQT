@@ -549,6 +549,11 @@ class NewDirsWorker:
             db_images=db_images
         )
 
+        # получается db images сйечас 
+        print(finder_images)
+        print(db_images)
+        return
+
         del_images, new_images = HashdirImgUpdater.start(
             scaner_item=scaner_item,
             del_images=del_images,
@@ -566,9 +571,19 @@ class NewDirsWorker:
         return None
     
 
+
+
+# ЭТОТ КЛАСС НУЖЕН ЕСЛИ САМА ПАПКА С ФОТКАМИ БЫЛА УДАЛЕНА
+
 # class RemovedDirsWorker:
 #     @staticmethod
 #     def start(dirs_to_del: list[DirItem], scaner_item: IntScanerItem):
+#         """
+#         Если директория с содержимым была удалена, она не попадет в new_dirs,
+#         так как ее как бы не существует
+#         """
+
+
 #         conn = scaner_item.eng.connect()
 #         for dir_item in dirs_to_del:
 #             RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
@@ -656,10 +671,9 @@ class AllDirScaner:
             return
         removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
         if new_dirs:
-            # print("new dirs", new_dirs)
+            new_dirs.extend(removed_dirs)
             NewDirsWorker.start(new_dirs, scaner_item)
         # if removed_dirs:
-            # print("removed dirs", removed_dirs)
             # RemovedDirsWorker.start(removed_dirs, scaner_item)
 
 
