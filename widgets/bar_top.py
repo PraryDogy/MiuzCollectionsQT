@@ -147,8 +147,7 @@ class FiltersBtn(BarTopBtn):
             self.clicked_.emit()
    
         def edit_filters():
-            item = SettingsItem()
-            item.action_type = item.type_filters
+            item = SettingsItem("filters", None)
             self.edit_filters.emit(item)
 
         def favs_cmd():
@@ -404,8 +403,7 @@ class BarTop(QWidget):
         self.h_layout.addWidget(self.dates_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка настроек ---
-        item = SettingsItem()
-        item.action_type = item.type_general
+        item = SettingsItem("general", None)
         self.settings_btn = SettingsBtn()
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)

@@ -317,15 +317,11 @@ class MenuLeft(QTabWidget):
             self.reload_thumbnails.emit()
 
         def _mf_edit(mf: Mf):
-            item = SettingsItem()
-            item.action_type = item.type_edit_folder
-            item.content = mf
+            item = SettingsItem("edit_folder", mf)
             self.mf_edit.emit(item)
 
         def _mf_new():
-            item = SettingsItem()
-            item.action_type = item.type_new_folder
-            item.content = ""
+            item = SettingsItem("new_folder", "")
             self.mf_new.emit(item)
 
         self.clear()
@@ -361,7 +357,5 @@ class MenuLeft(QTabWidget):
         if a0.mimeData().hasUrls():
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if os.path.isdir(url):
-                item = SettingsItem()
-                item.action_type = item.type_new_folder
-                item.content = url
+                item = SettingsItem("new_folder", url)
                 self.mf_new.emit(item)

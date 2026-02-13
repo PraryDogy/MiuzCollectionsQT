@@ -968,10 +968,11 @@ class WinSettings(SingleActionWindow):
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([200, 600])
 
+        # SettingsItem.action_type
         mapping = {
-            self.settings_item.type_general: 0,
-            self.settings_item.type_filters: 1,
-            self.settings_item.type_new_folder: 2,
+            "general": 0,
+            "filters": 1,
+            "new_folder": 2,
         }
 
         for key, idx in mapping.items():
@@ -1000,7 +1001,7 @@ class WinSettings(SingleActionWindow):
             self.new_folder = NewFolder(self.mf_list_copy)
             self.new_folder.new_folder.connect(self.add_mf)
             self.right_lay.insertWidget(0, self.new_folder)
-            if self.settings_item.action_type == self.settings_item.type_general:
+            if self.settings_item.action_type == "general":
                 self.new_folder.preset_new_folder("")
             else:
                 self.new_folder.preset_new_folder(self.settings_item.content)
@@ -1021,7 +1022,7 @@ class WinSettings(SingleActionWindow):
             mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
             self.right_lay.insertWidget(0, mf_sett)
 
-        self.settings_item.action_type = self.settings_item.type_general
+        self.settings_item.action_type = "general"
 
     def add_mf(self, mf: Mf):
         self.mf_list_copy.append(mf)
