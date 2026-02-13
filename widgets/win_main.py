@@ -406,15 +406,12 @@ class WinMain(UMainWindow):
     @with_conn
     def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
         
-        def fin_remove():
-            single_dir_scaner.start()
-        
         def poll_file_remover():
             if not file_remover.proc_q.empty():
                 file_remover.proc_q.get()
-                fin_remove()
             if not file_remover.is_alive():
                 file_remover.terminate_join()
+                self.start_scaner_task(mf=mf, dirs_to_scan=dirs_to_scan)
             else:
                 QTimer.singleShot(ms, poll_file_remover)
 
@@ -431,17 +428,10 @@ class WinMain(UMainWindow):
             Lng.attention[cfg.lng],
             f"{Lng.delete_forever[cfg.lng]} ({len(abs_paths)})?"
         )
-
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
                 args=(abs_paths, )
             )
-
-        single_dir_scaner = ProcessWorker(
-            target=SingleDirScaner.start,
-            args=(mf, dirs_to_scan, )
-            )
-
         self.remove_files_win.resize(330, 80)
         self.remove_files_win.center_to_parent(self.window())
         self.remove_files_win.ok_clicked.connect(start_file_remover)
@@ -554,7 +544,12 @@ class WinMain(UMainWindow):
             self.view_win.move(WinImageView.xx, WinImageView.yy)
         self.view_win.show()
 
-    def start_scaner_task(self, ms: int = 1000):
+    def start_scaner_task(
+            self,
+            mf: Mf = None,
+            dirs_to_scan: list[str] = None,
+            ms: int = 1000
+        ):
 
         def poll_task(tsk: ProcessWorker, tmr: QTimer):
             bar = self.bar_bottom.progress_bar
@@ -605,11 +600,16 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
-            print("старт сканера")
-            self.scaner_task = ProcessWorker(
-                target=AllDirScaner.start,
-                args=(Mf.list_, )
-            )
+            if mf and dirs_to_scan:
+                self.scaner_task = ProcessWorker(
+                    target=SingleDirScaner.start,
+                    args=(mf, dirs_to_scan, )
+                    )
+            else:
+                self.scaner_task = ProcessWorker(
+                    target=AllDirScaner.start,
+                    args=(Mf.list_, )
+                )
             tmr = QTimer(self)
             tmr.setSingleShot(True)
             tmr.timeout.connect(lambda: poll_task(self.scaner_task, tmr))

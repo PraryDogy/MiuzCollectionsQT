@@ -685,6 +685,7 @@ class SingleDirScaner:
         - mf: сканируемая директория должна принадлежать определенному Mf
         - dirs_to_scan: директории, которые нужно просканировать
         """
+        print("scaner signle started")
         engine = Dbase.create_engine()
         scaner_item = IntScanerItem(mf, engine, q)
         if scaner_item.mf.get_available_path():
@@ -703,3 +704,4 @@ class SingleDirScaner:
                 dir_items.append(item)
             if dir_items:
                 NewDirsWorker.start(dir_items, scaner_item)
+        print("scaner signle started")
