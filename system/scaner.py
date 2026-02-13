@@ -644,7 +644,7 @@ class AllDirScaner:
                     scaner_item.mf_real_name,
                     scaner_item.mf.alias
                 )
-                sleep(5)
+                sleep(3)
         engine.dispose()
 
     @staticmethod
