@@ -607,8 +607,7 @@ class WinMain(UMainWindow):
         elif not self.scaner_task.is_alive():
             can_start = True
 
-        # соответственно последним условием будет
-        # задача живая и таймаут меньше заданного времени
+        # задача жива и таймаут меньше заданного времени
         # то есть задача еще что то делает и сбрасывает таймаут
         elif (
             self.scaner_task.is_alive()
@@ -618,7 +617,6 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
-            self.scaner_timeout = time()
             loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
 
             self.scaner_task = ProcessWorker(
