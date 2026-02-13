@@ -970,20 +970,17 @@ class WinSettings(SingleActionWindow):
         self.splitter.setSizes([200, 600])
 
         # ссылаемся на SettingsItem.action_type
-        item = SettingsItem("general", None)
-        item.type_
         mapping = {
             "general": 0,
             "filters": 1,
             "new_folder": 2,
-            "edit_folder": 3,  # лучше добавить все ключи
+            # "edit_folder": 3,  # лучше добавить все ключи
         }
 
-        for key, idx in mapping.items():
-            if key == self.settings_item.type_:
-                self.left_menu.setCurrentRow(idx)
-                self.init_right_side(idx)
-                break
+        if settings_item.type_ in mapping:
+            idx = mapping[settings_item.type_]
+            self.left_menu.setCurrentRow(idx)
+            self.init_right_side(idx)
         else:
             for i in self.mf_items:
                 if i.mf == self.settings_item.content:
