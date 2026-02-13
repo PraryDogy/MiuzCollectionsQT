@@ -354,24 +354,21 @@ class WinMain(UMainWindow):
     @with_conn
     def paste_files_here(self, parent: QWidget, mf: Mf):
 
-        def reset_clipboard():
-            self.clipboard_item = None
-            self.grid.clipboard_item = None
-
-        def set_files_copied(files: list[str]):
-            self.clipboard_item.files_copied = files
+        def set_files_copied(f: list[str]):
+            self.clipboard_item.files_copied = f
 
         def scan_dirs():
             if not self.clipboard_item.files_copied:
                 print("ни один файл не был скопирован")
-                reset_clipboard()
+                self.clipboard_item = None
+                self.grid.clipboard_item = None
                 return
             else:
                 scaner_task.start()
 
         def start_copy_files():
             copy_files_win = self.copy_files_win()
-            copy_files_win.finished_.connect(lambda files: set_files_copied(files))
+            copy_files_win.finished_.connect(lambda f: set_files_copied(f))
             copy_files_win.finished_.connect(lambda _: scan_dirs())
 
         abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
