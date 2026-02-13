@@ -628,8 +628,6 @@ class AllDirScaner:
                     AllDirScaner.single_mf_scan(scaner_item)
                     print("scaner finished", scaner_item.mf.alias)
                 except Exception as e:
-                    import traceback
-                    print(traceback.format_exc())
                     print("scaner AllDirsScaner error", e)
                     continue
             else:
