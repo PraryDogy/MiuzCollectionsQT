@@ -631,25 +631,8 @@ class WinMain(UMainWindow):
 
         else:
             # проверяем каждую минуту, что задача завершена
+            self.loop_tmr.stop()
             self.loop_tmr.start(1*60*1000)
-
-    # def on_scaner_finished(self):
-    #     """
-    #     Обрабатывает завершение текущей задачи сканирования.
-
-    #     Если задача была остановлена вручную (флаг self.scaner_task_canceled установлен в True),
-    #     запускается короткий таймер на 1 секунду для быстрого перезапуска сканирования.
-
-    #     Если задача завершилась штатно, запускается длительный таймер с интервалом, заданным
-    #     в JsonData.scaner_minutes (в минутах, конвертированных в миллисекунды), для
-    #     следующего автоматического запуска сканирования.
-    #     """
-    #     self.scaner_timer.stop()
-    #     if self.scaner_task_canceled:
-    #         self.scaner_task_canceled = False
-    #         self.scaner_timer.start(1000)
-    #     else:
-    #         self.scaner_timer.start(cfg.scaner_minutes * 60 * 1000)
 
     # def restart_scaner_task(self):
     #     """
