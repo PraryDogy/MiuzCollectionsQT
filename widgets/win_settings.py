@@ -23,7 +23,7 @@ from system.utils import Utils
 
 from ._base_widgets import (SettingsItem, SingleActionWindow, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
-                            UTextEdit, UVBoxLayout, VListWidget)
+                            UTextEdit, UVBoxLayout, VListWidget, SmallBtn)
 from .win_warn import WinQuestion, WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
@@ -35,10 +35,10 @@ class ULabel(QLabel):
         self.setMinimumWidth(30)
 
 
-class UPushButton(QPushButton):
+class UPushButton(SmallBtn):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setFixedWidth(115)
+        self.setFixedWidth(100)
 
 
 class LangSettings(QGroupBox):
