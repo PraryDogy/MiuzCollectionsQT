@@ -281,6 +281,10 @@ class MfDataCleaner(URunnable):
                 abs_path_list.append(abs_thumb_path)
         self.conn.commit()
 
+        stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias == self.mf_name)
+        self.conn.execute(stmt)
+        self.conn.commit()
+
         for i in abs_path_list:
             try:
                 os.remove(i)
@@ -289,10 +293,6 @@ class MfDataCleaner(URunnable):
                     shutil.rmtree(parent)
             except Exception as e:
                 print("system>tasks>MfDataCleaner remove thumb error", e)
-
-        stmt = sqlalchemy.delete(Dirs.table).where(Thumbs.mf_alias == self.mf_name)
-        self.conn.execute(stmt)
-        self.conn.commit()
 
 
 class DbDirsLoader(URunnable):
