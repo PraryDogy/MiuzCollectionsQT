@@ -386,21 +386,29 @@ class WinMain(UMainWindow):
             self.clipboard_item.target_mf = Mf.current
             self.clipboard_item.target_dir = abs_current_dir
             if self.clipboard_item.action_type == "cut":
-                self.single_dir_task = ProcessWorker(
-                    target=SingleDirScaner.start,
-                    args=(self.clipboard_item.source_mf,
-                        self.clipboard_item.source_dirs
-                    )
+                self.start_scaner_task(
+                    mf=self.clipboard_item.source_mf,
+                    dirs_to_scan=self.clipboard_item.source_dirs
                 )
+                # self.single_dir_task = ProcessWorker(
+                #     target=SingleDirScaner.start,
+                #     args=(self.clipboard_item.source_mf,
+                #         self.clipboard_item.source_dirs
+                #     )
+                # )
             elif self.clipboard_item.action_type == "copy":
                 dirs = [self.clipboard_item.target_dir, ]
-                self.single_dir_task = ProcessWorker(
-                    target=SingleDirScaner.start,
-                    args=(
-                        self.clipboard_item.target_mf,
-                        dirs
-                    )
+                self.start_scaner_task(
+                    self.clipboard_item.target_mf,
+                    dirs_to_scan=[self.clipboard_item.target_dir, ]
                 )
+                # self.single_dir_task = ProcessWorker(
+                #     target=SingleDirScaner.start,
+                #     args=(
+                #         self.clipboard_item.target_mf,
+                #         dirs
+                #     )
+                # )
             start_copy_files(self.single_dir_task)
 
     @with_conn
