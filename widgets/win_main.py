@@ -201,12 +201,6 @@ class WinMain(UMainWindow):
         ])
 
         self.grid.setFocus()
-
-        self.scaner_timeout = time()
-        self.scaner_loop_timer = QTimer(self)
-        self.scaner_loop_timer.timeout.connect(self.start_scaner_task)
-        self.scaner_loop_timer.start(100)
-
         self.on_start(argv)
 
     @staticmethod
@@ -237,8 +231,8 @@ class WinMain(UMainWindow):
         tmr.setSingleShot(True)
         tmr.timeout.connect(lambda: poll_task(tsk, tmr))
 
-        self.on_start_task.start()
-        self.on_start_timer.start(ms)
+        tsk.start()
+        tmr.start(ms)
     
     def level_up(self):
         if Dynamic.current_dir:
@@ -581,23 +575,29 @@ class WinMain(UMainWindow):
         def poll_task(tsk: ProcessWorker, tmr: QTimer):
             bar = self.bar_bottom.progress_bar
             while not tsk.proc_q.empty():
-                res: ExtScanerItem = tsk.proc_q.get()
-                if bar.text() != res.gui_text:
-                    bar.setText(res.gui_text)
-                    self.scaner_timeout = time()
-            
+                self.scaner_timeout = time()
+                scaner_item: ExtScanerItem = tsk.proc_q.get()
+                if bar.text() != scaner_item.gui_text:
+                    bar.setText(scaner_item.gui_text)
             if not tsk.is_alive():
                 tsk.terminate()
                 bar.setText("")
             else:
                 tmr.start(ms)
 
+        can_start = False
         stmt = (
+            not hasattr(self, "scaner_timeout")
+            or
             time() - self.scaner_timeout > self.scaner_timeout_max
             or
             not self.scaner_task.is_alive()
         )
         if stmt:
+            can_start = True
+            self.scaner_timeout = time()
+
+        if can_start:
             self.scaner_timeout = time()
             self.scaner_task = ProcessWorker(
                 target=AllDirScaner.start,
