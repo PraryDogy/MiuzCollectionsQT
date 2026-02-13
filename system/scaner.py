@@ -666,6 +666,14 @@ class AllDirScaner:
 class SingleDirScaner:
     @staticmethod
     def start(mf: Mf, dirs_to_scan: list[str], q: Queue):
+        """
+        Сканирует заданную директорию на предмет новых или удаленных
+        изображений.
+
+        Параметры:
+        - mf: сканируемая директория должна принадлежать определенному Mf
+        - dirs_to_scan: директории, которые нужно просканировать
+        """
         engine = Dbase.create_engine()
         scaner_item = IntScanerItem(mf, engine, q)
         if scaner_item.mf.get_available_path():
@@ -684,5 +692,12 @@ class SingleDirScaner:
                 dir_items.append(item)
             if dir_items:
                 NewDirsWorker.start(dir_items, scaner_item)
-            # elif rem_dir:
-            #     RemovedDirsWorker.start([rem_dir, ], scaner_item)
+            for i in dir_items:
+                try:
+                    files = os.listdir(i.abs_path)
+                except Exception as e:
+                    print("SingleDirScaner error", e)
+                    continue
+                if not files:
+                    print("директория пуста")
+                    RemovedDirsWorker.start(dir_items, scaner_item)
