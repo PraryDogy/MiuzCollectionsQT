@@ -3,18 +3,18 @@ import re
 import subprocess
 from typing import Dict
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal, QTimer
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
 
-from cfg import cfg, Dynamic, Static
+from cfg import Dynamic, cfg
+from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (SettingsItem, UListWidgetItem, UMenu, UVBoxLayout,
-                            VListWidget)
+from ._base_widgets import UListWidgetItem, UMenu, UVBoxLayout, VListWidget
 
 
 class TreeWid(QTreeWidget):

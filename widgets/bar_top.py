@@ -3,11 +3,12 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSpacerItem, QWidget
 
-from cfg import Dynamic, Static, cfg
+from cfg import Dynamic, cfg
 from system.filters import Filters
+from system.items import SettingsItem
 from system.lang import Lng
 
-from ._base_widgets import SettingsItem, UHBoxLayout, UMenu, UVBoxLayout
+from ._base_widgets import UHBoxLayout, UMenu, UVBoxLayout
 from .wid_search import WidSearch
 
 
