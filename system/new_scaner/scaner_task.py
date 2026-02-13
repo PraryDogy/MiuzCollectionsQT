@@ -130,7 +130,7 @@ class DirListScanTask(URunnable):
             for i in self.dirs_to_scan
         )
         dirs_to_scan = [
-            (Utils.get_rel_img_path(self.mf.curr_path, abs_path), st_mtime)
+            (Utils.get_rel_any_path(self.mf.curr_path, abs_path), st_mtime)
             for abs_path, st_mtime in dirs_to_scan
         ]
         

@@ -319,7 +319,7 @@ class WinImageView(AppModalWindow):
             self.show_text_label(t)
 
         if Mf.current.get_available_path():
-            self.path = Utils.get_abs_img_path(Mf.current.curr_path, self.rel_path)
+            self.path = Utils.get_abs_any_path(Mf.current.curr_path, self.rel_path)
             self.load_image()
         else:
             print("img viewer > no smb")

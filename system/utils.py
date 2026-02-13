@@ -153,14 +153,14 @@ class Utils:
         os.execl(sys.executable, sys.executable, *sys.argv)
         
     @classmethod
-    def get_abs_img_path(cls, mf_path: str, rel_path: str) -> str:
+    def get_abs_any_path(cls, mf_path: str, rel_path: str) -> str:
         if mf_path in rel_path:
             return rel_path
         else:
             return mf_path + rel_path
     
     @classmethod
-    def get_rel_img_path(cls, mf_path: str, abs_img_path: str) -> str:
+    def get_rel_any_path(cls, mf_path: str, abs_img_path: str) -> str:
         return abs_img_path.replace(mf_path, "")
 
     @classmethod

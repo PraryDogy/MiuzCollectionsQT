@@ -97,7 +97,7 @@ class AllDirLoader:
                     # чтобы в основном потоке сбрасывался таймер таймаута
                     scaner_item.q.put(ext_scaner_item)
                     stack.append(entry.path)
-                    rel_path = Utils.get_rel_img_path(
+                    rel_path = Utils.get_rel_any_path(
                         mf_path=scaner_item.mf.curr_path,
                         abs_img_path=entry.path
                     )
@@ -303,7 +303,7 @@ class ImgLoader:
                     Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%")
                 )
             for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
-                abs_img_path = Utils.get_abs_img_path(
+                abs_img_path = Utils.get_abs_any_path(
                     mf_path=scaner_item.mf.curr_path,
                     rel_path=rel_path
                 )
@@ -424,7 +424,7 @@ class HashdirImgUpdater:
             img = Utils.fit_to_thumb(img, Static.max_img_size)
             if img is not None:
                 try:
-                    rel_img_path = Utils.get_rel_img_path(
+                    rel_img_path = Utils.get_rel_any_path(
                         mf_path=scaner_item.mf.curr_path,
                         abs_img_path=img_item.abs_img_path
                     )
@@ -486,7 +486,7 @@ class DbImgUpdater:
     def remove_exits_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
         conn = scaner_item.eng.connect()
         rel_img_paths = [
-            Utils.get_rel_img_path(
+            Utils.get_rel_any_path(
                 mf_path=scaner_item.mf.curr_path,
                 abs_img_path=img_item.abs_img_path
             )
@@ -505,7 +505,7 @@ class DbImgUpdater:
         conn = scaner_item.eng.connect()
         values_list = []
         for img_item in new_images:
-            rel_img_path = Utils.get_rel_img_path(
+            rel_img_path = Utils.get_rel_any_path(
                 mf_path=scaner_item.mf.curr_path,
                 abs_img_path=img_item.abs_img_path
             )
@@ -665,11 +665,18 @@ class AllDirScaner:
 
 class SingleDirScaner:
     @staticmethod
-    def start(mf: Mf, new_dir: str, rem_dir: str, q: Queue):
+    def start(mf: Mf, dirs_to_scan: list[str], q: Queue):
         engine = Dbase.create_engine()
         scaner_item = IntScanerItem(mf, engine, q)
         if scaner_item.mf.get_available_path():
-            if new_dir:
-                NewDirsWorker.start([new_dir, ], scaner_item)
-            elif rem_dir:
-                RemovedDirsWorker.start([rem_dir, ], scaner_item)
+            dir_items: list[DirItem] = []
+            for i in dirs_to_scan:
+                item = DirItem(
+                    abs_path=i,
+                    rel_path=Utils.get_rel_any_path(mf.curr_path, i),
+                    mod=int(os.stat(i).st_mtime)
+                )
+                dir_items.append(item)
+            NewDirsWorker.start(dir_items, scaner_item)
+            # elif rem_dir:
+            #     RemovedDirsWorker.start([rem_dir, ], scaner_item)

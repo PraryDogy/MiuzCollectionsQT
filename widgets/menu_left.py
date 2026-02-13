@@ -284,7 +284,7 @@ class MenuLeft(QTabWidget):
 
         @with_conn
         def _tree_reveal(mf: Mf, rel_path: str):
-            abs_path = Utils.get_abs_img_path(mf.curr_path, rel_path)
+            abs_path = Utils.get_abs_any_path(mf.curr_path, rel_path)
             subprocess.Popen(["open", abs_path])
 
         def _mf_open(mf: Mf):

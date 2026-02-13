@@ -287,7 +287,7 @@ class WinMain(UMainWindow):
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
         dest, rel_paths = data
         abs_files = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         if dest is None:
@@ -306,7 +306,7 @@ class WinMain(UMainWindow):
         action_type, rel_paths = data
         if rel_paths:
             abs_paths = [
-                Utils.get_abs_img_path(mf.curr_path, i)
+                Utils.get_abs_any_path(mf.curr_path, i)
                 for i in rel_paths
             ]
             self.clipboard_item = ClipBoardItem()
@@ -326,7 +326,7 @@ class WinMain(UMainWindow):
     def open_in_app(self, parent: QWidget, mf: Mf, data: tuple):
         rel_paths, app_path = data
         for i in rel_paths:
-            abs_path = Utils.get_abs_img_path(mf.curr_path, i)
+            abs_path = Utils.get_abs_any_path(mf.curr_path, i)
             if app_path:
                 subprocess.Popen(["open", "-a", app_path, abs_path])
             else:
@@ -335,7 +335,7 @@ class WinMain(UMainWindow):
     @with_conn
     def reveal_in_finder(self, parent: QWidget, mf: Mf, rel_paths: list):
         abs_paths = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         if os.path.isdir(abs_paths[0]):
@@ -354,7 +354,7 @@ class WinMain(UMainWindow):
     @with_conn
     def copy_path(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
         abs_paths = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         Utils.copy_text("\n".join(abs_paths))
@@ -413,7 +413,7 @@ class WinMain(UMainWindow):
             copy_files_win.finished_.connect(lambda files: set_files_copied(files))
             copy_files_win.finished_.connect(lambda _: scan_dirs())
 
-        abs_current_dir = Utils.get_abs_img_path(mf.curr_path, Dynamic.current_dir)
+        abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
         copy_self = abs_current_dir in self.clipboard_item.source_dirs
         if copy_self:
             # копировать в себя нельзя
@@ -459,7 +459,7 @@ class WinMain(UMainWindow):
             QTimer.singleShot(ms, lambda: poll_task(task, dirs_to_scan))
 
         abs_paths = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
@@ -495,7 +495,7 @@ class WinMain(UMainWindow):
             self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
             self.paste_files_here(self.grid, Mf.current)
 
-        target_dir = Utils.get_abs_img_path(mf.curr_path, Dynamic.current_dir)
+        target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
 
         self.upload_win = WinUpload(target_dir)
         self.upload_win.center_to_parent(self)
@@ -506,7 +506,7 @@ class WinMain(UMainWindow):
     def open_info_win(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
         
         abs_paths = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         self.info_win = WinInfo(abs_paths)

@@ -15,11 +15,11 @@ from system.items import ExtScanerItem, OnStartItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import FilesRemover, OnStartTask, ProcessWorker
-from system.scaner import AllDirScaner
+from system.scaner import AllDirScaner, SingleDirScaner
 from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
 from ._base_widgets import (ClipBoardItem, NotifyWid, SettingsItem,
-                            UHBoxLayout, UMainWindow, UVBoxLayout, WinManager)
+                            UHBoxLayout, UMainWindow, UVBoxLayout)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -141,7 +141,7 @@ class WinMain(UMainWindow):
             lambda: self.restart_scaner_task()
         )
         self.grid.remove_files.connect(
-            lambda rel_paths: self.remove_files(self.grid, Mf.current, rel_paths))
+            lambda rel_paths: self.remove_files(self, Mf.current, rel_paths, ))
         self.grid.no_connection.connect(
             lambda: self.open_win_smb(self.grid, Mf.current)
         )
@@ -279,7 +279,7 @@ class WinMain(UMainWindow):
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
         dest, rel_paths = data
         abs_files = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         if dest is None:
@@ -298,7 +298,7 @@ class WinMain(UMainWindow):
         action_type, rel_paths = data
         if rel_paths:
             abs_paths = [
-                Utils.get_abs_img_path(mf.curr_path, i)
+                Utils.get_abs_any_path(mf.curr_path, i)
                 for i in rel_paths
             ]
             self.clipboard_item = ClipBoardItem()
@@ -318,7 +318,7 @@ class WinMain(UMainWindow):
     def open_in_app(self, parent: QWidget, mf: Mf, data: tuple):
         rel_paths, app_path = data
         for i in rel_paths:
-            abs_path = Utils.get_abs_img_path(mf.curr_path, i)
+            abs_path = Utils.get_abs_any_path(mf.curr_path, i)
             if app_path:
                 subprocess.Popen(["open", "-a", app_path, abs_path])
             else:
@@ -327,7 +327,7 @@ class WinMain(UMainWindow):
     @with_conn
     def reveal_in_finder(self, parent: QWidget, mf: Mf, rel_paths: list):
         abs_paths = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         if os.path.isdir(abs_paths[0]):
@@ -346,7 +346,7 @@ class WinMain(UMainWindow):
     @with_conn
     def copy_path(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
         abs_paths = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         Utils.copy_text("\n".join(abs_paths))
@@ -405,7 +405,7 @@ class WinMain(UMainWindow):
             copy_files_win.finished_.connect(lambda files: set_files_copied(files))
             copy_files_win.finished_.connect(lambda _: scan_dirs())
 
-        abs_current_dir = Utils.get_abs_img_path(mf.curr_path, Dynamic.current_dir)
+        abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
         copy_self = abs_current_dir in self.clipboard_item.source_dirs
         if copy_self:
             # копировать в себя нельзя
@@ -423,35 +423,25 @@ class WinMain(UMainWindow):
 
     @with_conn
     def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
-
-        return
         
-        def fin_remove(dirs_to_scan: list[str]):
-            task = DirListScanTask(Mf.current, dirs_to_scan)
-            task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-            task.sigs.reload_thumbnails.connect(self.left_menu.tree_wid.init_ui)
-            UThreadPool.start(task)
+        def fin_remove():
+            single_dir_scaner.start()
         
-        def poll_task(task: ProcessWorker, dirs_to_scan: list[str]):
-            q = task.proc_q
-            if not q.empty():
-                files = q.get()
-                fin_remove(dirs_to_scan)
-            if not task.is_alive():
-                task.terminate()
+        def poll_file_remover():
+            if not file_remover.proc_q.empty():
+                file_remover.proc_q.get()
+                fin_remove()
+            if not file_remover.is_alive():
+                file_remover.terminate_join()
             else:
-                QTimer.singleShot(ms, lambda: poll_task(task, dirs_to_scan))
+                QTimer.singleShot(ms, poll_file_remover)
 
-        def start_remove(paths: list[str], dirs_to_scan: list[str]):
-            task = ProcessWorker(
-                target=FilesRemover.start,
-                args=(paths, )
-            )
-            task.start()
-            QTimer.singleShot(ms, lambda: poll_task(task, dirs_to_scan))
+        def start_file_remover():
+            file_remover.start()
+            QTimer.singleShot(ms, poll_file_remover)
 
         abs_paths = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
@@ -459,10 +449,23 @@ class WinMain(UMainWindow):
             Lng.attention[cfg.lng],
             f"{Lng.delete_forever[cfg.lng]} ({len(abs_paths)})?"
         )
+
+        file_remover = ProcessWorker(
+                target=FilesRemover.start,
+                args=(abs_paths, )
+            )
+
+        single_dir_scaner = ProcessWorker(
+            target=SingleDirScaner.start,
+            args=(mf, dirs_to_scan, )
+            )
+
         self.remove_files_win.resize(330, 80)
         self.remove_files_win.center_to_parent(self.window())
-        self.remove_files_win.ok_clicked.connect(lambda: start_remove(abs_paths, dirs_to_scan))
-        self.remove_files_win.ok_clicked.connect(self.remove_files_win.deleteLater)
+        self.remove_files_win.ok_clicked.connect(start_file_remover)
+        self.remove_files_win.ok_clicked.connect(
+            self.remove_files_win.deleteLater
+        )
         self.remove_files_win.show()
     
     @with_conn
@@ -487,7 +490,7 @@ class WinMain(UMainWindow):
             self.clipboard_item.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
             self.paste_files_here(self.grid, Mf.current)
 
-        target_dir = Utils.get_abs_img_path(mf.curr_path, Dynamic.current_dir)
+        target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
 
         self.upload_win = WinUpload(target_dir)
         self.upload_win.center_to_parent(self)
@@ -498,7 +501,7 @@ class WinMain(UMainWindow):
     def open_info_win(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
         
         abs_paths = [
-            Utils.get_abs_img_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_paths
         ]
         self.info_win = WinInfo(abs_paths)
