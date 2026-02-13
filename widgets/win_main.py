@@ -217,10 +217,7 @@ class WinMain(UMainWindow):
             if not tsk.is_alive():
                 tsk.terminate_join()
                 if argv[-1] != "noscan":
-                    self.start_scaner_task(
-                        mf=None,
-                        dirs_to_scan=None
-                    )
+                    self.start_scaner_task(mf=None, dirs_to_scan=None)
             else:
                 tmr.start(ms)
 
@@ -642,10 +639,7 @@ class WinMain(UMainWindow):
 
     def restart_scaner_task(self):
         self.scaner_task.terminate_join()
-        self.start_scaner_task(
-            mf=None,
-            dirs_to_scan=None
-        )
+        self.start_scaner_task(mf=None, dirs_to_scan=None)
         
     def set_window_title(self):
         if Dynamic.current_dir is None:
