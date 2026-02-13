@@ -62,7 +62,7 @@ class WinMain(UMainWindow):
     update_mins = 30
     min_w = 750
     left_side_width = 250
-    max_timeout = 15 * 60
+    scaner_timeout_max = 15 * 60
     warning_svg = "./images/warning.svg"
 
     def __init__(self, argv: list[Literal["noscan", ""]]):
@@ -73,7 +73,6 @@ class WinMain(UMainWindow):
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
 
-        self.scaner_timeout = time()
         self.view_win: WinImageView
         self.clipboard_item: ClipBoardItem = None
 
@@ -203,6 +202,7 @@ class WinMain(UMainWindow):
 
         self.grid.setFocus()
 
+        self.scaner_timeout = time()
         self.scaner_loop_timer = QTimer(self)
         self.scaner_loop_timer.timeout.connect(self.start_scaner_task)
         self.scaner_loop_timer.start(100)
@@ -592,49 +592,23 @@ class WinMain(UMainWindow):
             else:
                 tmr.start(ms)
 
-        self.scaner_task = ProcessWorker(
-            target=AllDirScaner.start,
-            args=(Mf.list_, )
+        stmt = (
+            time() - self.scaner_timeout > self.scaner_timeout_max
+            or
+            not self.scaner_task.is_alive()
         )
-        tmr = QTimer(self)
-        tmr.setSingleShot(True)
-        tmr.timeout.connect(lambda: poll_task(self.scaner_task, tmr))
+        if stmt:
+            self.scaner_timeout = time()
+            self.scaner_task = ProcessWorker(
+                target=AllDirScaner.start,
+                args=(Mf.list_, )
+            )
+            tmr = QTimer(self)
+            tmr.setSingleShot(True)
+            tmr.timeout.connect(lambda: poll_task(self.scaner_task, tmr))
 
-        self.scaner_task.start()
-        tmr.start(ms)
-
-        # """
-        # Инициализирует и запускает задачу сканирования ScanerTask.
-
-        # Если задача ещё не была создана (self.scaner_task is None), создаётся новая задача,
-        # подключаются её сигналы к соответствующим обработчикам, и она отправляется на выполнение
-        # в пользовательский пул потоков (UThreadPool).
-
-        # Если текущая задача уже завершена, объект self.scaner_task сбрасывается в None и метод
-        # рекурсивно вызывает сам себя для запуска новой задачи.
-
-        # Если задача ещё выполняется, метод откладывает повторную попытку запуска на 3 секунды
-        # с помощью QTimer.singleShot.
-        # """
-
-        # if cfg.new_scaner:
-        #     from system.new_scaner.scaner_task import ScanerTask
-        # else:
-        #     from system.old_scaner.scaner_task import ScanerTask
-
-        # if self.scaner_task is None:
-        #     self.scaner_task = ScanerTask()
-        #     self.scaner_task.sigs.finished_.connect(self.on_scaner_finished)
-        #     self.scaner_task.sigs.progress_text.connect(self.bar_bottom.progress_bar.setText)
-        #     self.scaner_task.sigs.reload_thumbnails.connect(self.grid.reload_thumbnails)
-        #     self.scaner_task.sigs.reload_menu.connect(self.left_menu.tree_wid.init_ui)
-        #     UThreadPool.start(self.scaner_task)
-        # elif self.scaner_task.task_state.finished():
-        #     self.scaner_task = None
-        #     gc.collect()
-        #     self.start_scaner_task()
-        # else:
-        #     QTimer.singleShot(3000, self.start_scaner_task)
+            self.scaner_task.start()
+            tmr.start(ms)
 
     # def on_scaner_finished(self):
     #     """
