@@ -49,7 +49,7 @@ class ImgItem:
     rel_thumb_path: str = ""
 
 
-class DirLoader:
+class AllDirLoader:
     @staticmethod
     def start(scaner_item: IntScanerItem):
         """
@@ -57,8 +57,8 @@ class DirLoader:
         - Собирает список всех директорий из базы данных, которые
           соответствуют `Mf.alias`
         """
-        finder_dirs = DirLoader.get_finder_dirs(scaner_item)
-        db_dirs = DirLoader.get_db_dirs(scaner_item)
+        finder_dirs = AllDirLoader.get_finder_dirs(scaner_item)
+        db_dirs = AllDirLoader.get_db_dirs(scaner_item)
         return (finder_dirs, db_dirs)
 
     @staticmethod
@@ -650,7 +650,7 @@ class AllDirScaner:
     @staticmethod
     def single_mf_scan(scaner_item: IntScanerItem):
         # собираем Finder директории и директории из БД
-        finder_dirs, db_dirs = DirLoader.start(scaner_item)
+        finder_dirs, db_dirs = AllDirLoader.start(scaner_item)
         if not finder_dirs:
             print(scaner_item.mf.alias, "no finder dirs")
             return
