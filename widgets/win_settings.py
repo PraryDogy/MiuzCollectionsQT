@@ -974,7 +974,6 @@ class WinSettings(SingleActionWindow):
             "general": 0,
             "filters": 1,
             "new_folder": 2,
-            # "edit_folder": 3,  # лучше добавить все ключи
         }
 
         if settings_item.type_ in mapping:
