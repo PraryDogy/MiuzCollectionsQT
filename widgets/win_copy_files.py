@@ -15,7 +15,7 @@ from .progressbar_win import ProgressbarWin
 
 
 class ReplaceFilesWin(SingleActionWindow):
-    btn_w = 105
+    btn_w = 115
     icon_size = 50
     icon_path = "./images/warning.svg"
 

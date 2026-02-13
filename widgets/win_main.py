@@ -357,7 +357,7 @@ class WinMain(UMainWindow):
         def set_files_copied(f: list[str]):
             self.clipboard_item.files_copied = f
 
-        def scan_dirs():
+        def scan_dirs(scaner_task: ProcessWorker):
             if not self.clipboard_item.files_copied:
                 print("ни один файл не был скопирован")
                 self.clipboard_item = None
@@ -366,10 +366,10 @@ class WinMain(UMainWindow):
             else:
                 scaner_task.start()
 
-        def start_copy_files():
+        def start_copy_files(scaner_task: ProcessWorker):
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda f: set_files_copied(f))
-            copy_files_win.finished_.connect(lambda _: scan_dirs())
+            copy_files_win.finished_.connect(lambda _: scan_dirs(scaner_task))
 
         abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
         copy_self = abs_current_dir in self.clipboard_item.source_dirs
@@ -401,7 +401,7 @@ class WinMain(UMainWindow):
                         dirs
                     )
                 )
-            start_copy_files()
+            start_copy_files(scaner_task)
 
     @with_conn
     def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
