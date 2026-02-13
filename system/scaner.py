@@ -661,3 +661,15 @@ class AllDirScaner:
         if removed_dirs:
             # print("removed dirs", removed_dirs)
             RemovedDirsWorker.start(removed_dirs, scaner_item)
+
+
+class SingleDirScaner:
+    @staticmethod
+    def start(mf: Mf, new_dir: str, rem_dir: str, q: Queue):
+        engine = Dbase.create_engine()
+        scaner_item = IntScanerItem(mf, engine, q)
+        if scaner_item.mf.get_available_path():
+            if new_dir:
+                NewDirsWorker.start([new_dir, ], scaner_item)
+            elif rem_dir:
+                RemovedDirsWorker.start([rem_dir, ], scaner_item)
