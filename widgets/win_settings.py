@@ -3,17 +3,16 @@ import os
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAbstractScrollArea, QAction, QApplication,
-                             QFrame, QGroupBox, QLabel, QLineEdit, QPushButton,
-                             QSpacerItem, QSpinBox, QSplitter, QTableWidget,
-                             QTableWidgetItem, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
+                             QLineEdit, QSpacerItem, QSpinBox, QSplitter,
+                             QTableWidget, QTableWidgetItem, QWidget)
 
 from cfg import Cfg, Static, cfg
 from system.filters import Filters
-from system.items import NeedResetItem
+from system.items import NeedResetItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.paletes import ThemeChanger
@@ -21,9 +20,9 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (SettingsItem, SingleActionWindow, UHBoxLayout,
+from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
-                            UTextEdit, UVBoxLayout, VListWidget, SmallBtn)
+                            UTextEdit, UVBoxLayout, VListWidget)
 from .win_warn import WinQuestion, WinWarn
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 

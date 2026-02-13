@@ -341,17 +341,6 @@ class VListWidget(QListWidget):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
 
-class SettingsItem:
-    type_general = "general"
-    type_filters = "filters"
-    type_new_folder = "new_folder"
-    type_edit_folder = "edit_folder"
-
-    def __init__(self):
-        self.action_type: str
-        self.content: None | str | Mf
-
-
 class ClipBoardItem:
     
     def __init__(self):

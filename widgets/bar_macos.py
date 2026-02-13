@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QAction, QLabel, QMenu, QMenuBar, QSpacerItem,
                              QWidget)
 
 from cfg import Static, cfg
+from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
 
@@ -147,6 +148,7 @@ class BarMacos(QMenuBar):
 
     def open_settings_window(self):
         """Открывает окно настроек приложения."""
+        item = Sett
         self.settings_win = WinSettings()
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
