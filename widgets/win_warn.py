@@ -3,14 +3,15 @@ import os
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QSizePolicy,
-                             QSpacerItem, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import QLabel, QWidget
 
 from cfg import cfg
 from system.lang import Lng
 
-from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
+from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
+                            UVBoxLayout)
 from .path_widget import PathWidget
+
 
 class BaseWinWarn(SingleActionWindow):
     svg_warning = "./images/warning.svg"
@@ -54,7 +55,7 @@ class WinWarn(BaseWinWarn):
     def __init__(self, title: str, text: str, char_limit: int = 40):
         super().__init__(title, text, char_limit)
         
-        ok_btn = QPushButton(text=Lng.ok[cfg.lng])
+        ok_btn = SmallBtn(text=Lng.ok[cfg.lng])
         ok_btn.setFixedWidth(90)
         ok_btn.clicked.connect(self.deleteLater)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -63,6 +64,7 @@ class WinWarn(BaseWinWarn):
 
 class WinQuestion(BaseWinWarn):
     ok_clicked = pyqtSignal()
+    btn_w = 80
 
     def __init__(self, title: str, text: str, char_limit = 40):
         super().__init__(title, text, char_limit)
@@ -72,12 +74,12 @@ class WinQuestion(BaseWinWarn):
         btn_lay.setSpacing(10)
         btn_wid.setLayout(btn_lay)
 
-        ok_btn = QPushButton(Lng.ok[cfg.lng])
+        ok_btn = SmallBtn(Lng.ok[cfg.lng])
         ok_btn.clicked.connect(self.ok_clicked.emit)
-        ok_btn.setFixedWidth(90)
+        ok_btn.setFixedWidth(self.btn_w)
 
-        cancel_btn = QPushButton(Lng.cancel[cfg.lng])
-        cancel_btn.setFixedWidth(90)
+        cancel_btn = SmallBtn(Lng.cancel[cfg.lng])
+        cancel_btn.setFixedWidth(self.btn_w)
         cancel_btn.clicked.connect(self.deleteLater)
 
         btn_lay.addStretch()

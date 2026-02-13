@@ -4,8 +4,8 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsDropShadowEffect, QHBoxLayout, QLabel,
                              QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QScrollArea, QTextEdit,
-                             QVBoxLayout, QWidget)
+                             QMainWindow, QMenu, QPushButton, QScrollArea,
+                             QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
 from cfg import Static, cfg
@@ -424,3 +424,11 @@ class NotifyWid(QFrame):
         self.setGraphicsEffect(None)
         self.hide()
         self.deleteLater()
+
+
+class SmallBtn(QPushButton):
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.setStyleSheet("""
+        font-size: 11pt;
+        """)
