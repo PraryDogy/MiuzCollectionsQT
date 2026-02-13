@@ -666,8 +666,8 @@ class AllDirScaner:
         if new_dirs:
             new_dirs.extend(removed_dirs)
             NewDirsWorker.start(new_dirs, scaner_item)
-        # if removed_dirs:
-            # RemovedDirsWorker.start(removed_dirs, scaner_item)
+        if removed_dirs:
+            RemovedDirsWorker.start(removed_dirs, scaner_item)
 
 
 class SingleDirScaner:
