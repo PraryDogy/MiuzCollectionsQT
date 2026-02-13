@@ -956,10 +956,12 @@ class WinSettings(SingleActionWindow):
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.ok_btn = UPushButton(Lng.ok[cfg.lng])
+        self.ok_btn.setFixedWidth(90)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
         cancel_btn = UPushButton(Lng.cancel[cfg.lng])
+        cancel_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
 
