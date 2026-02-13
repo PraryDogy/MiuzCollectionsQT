@@ -59,7 +59,6 @@ class USep(QFrame):
 
 
 class WinMain(UMainWindow):
-    update_mins = 30
     min_w = 750
     left_side_width = 250
     scaner_timeout_max = 5 * 60
