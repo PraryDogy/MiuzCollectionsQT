@@ -583,7 +583,12 @@ class WinMain(UMainWindow):
             self.scaner_timeout = time()
             self.loop_tmr = QTimer(self)
             self.loop_tmr.setSingleShot(True)
-            self.loop_tmr.timeout.connect(self.start_scaner_task)
+            self.loop_tmr.timeout.connect(
+                lambda: self.start_scaner_task(
+                    mf=mf,
+                    dirs_to_scan=dirs_to_scan,
+                )
+            )
             self.scaner_task = None
 
         can_start = False
