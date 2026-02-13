@@ -585,19 +585,42 @@ class WinMain(UMainWindow):
             else:
                 tmr.start(ms)
 
-        can_start = False
-        stmt = (
-            not hasattr(self, "scaner_timeout")
-            or
-            time() - self.scaner_timeout > self.scaner_timeout_max
-            or
-            not self.scaner_task.is_alive()
-        )
-        if stmt:
+        loop_tmr = QTimer(self)
+        loop_tmr.setSingleShot(True)
+        loop_tmr.timeout.connect(self.start_scaner_task)
+
+        # первая инициация
+        if not hasattr(self, "scaner_timeout"):
             can_start = True
             self.scaner_timeout = time()
+
+        # задача зависла
+        elif (
+            self.scaner_task.is_alive()
+            and
+            time() - self.scaner_timeout > self.scaner_timeout_max
+        ):
+            self.scaner_task.terminate()
+            can_start = True
+
+        # задача завершена
+        elif not self.scaner_task.is_alive():
+            can_start = True
+
+        # соответственно последним условием будет
+        # задача живая и таймаут меньше заданного времени
+        # то есть задача еще что то делает и сбрасывает таймаут
+        elif (
+            self.scaner_task.is_alive()
+            and
+            time() - self.scaner_timeout < self.scaner_timeout_max
+        ):
+            can_start = False
+
         if can_start:
             self.scaner_timeout = time()
+            loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
+
             self.scaner_task = ProcessWorker(
                 target=AllDirScaner.start,
                 args=(Mf.list_, )
@@ -608,6 +631,9 @@ class WinMain(UMainWindow):
 
             self.scaner_task.start()
             tmr.start(ms)
+        else:
+            # проверяем каждую минуту, что задача завершена
+            loop_tmr.start(1*60*1000)
 
     # def on_scaner_finished(self):
     #     """
