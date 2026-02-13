@@ -234,4 +234,4 @@ class WinCopyFiles(ProgressbarWin):
 
     def stop_task(self):
         self.copy_timer.stop()
-        self.copy_task.terminate()
+        self.copy_task.terminate_join()

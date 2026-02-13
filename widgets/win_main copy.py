@@ -223,7 +223,7 @@ class WinMain(UMainWindow):
         def poll_task():
             self.on_start_timer.stop()
             if not self.on_start_task.is_alive():
-                self.on_start_task.terminate()
+                self.on_start_task.terminate_join()
                 if argv[-1] != "noscan":
                     self.start_scaner_task()
             else:

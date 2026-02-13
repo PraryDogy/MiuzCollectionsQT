@@ -115,7 +115,7 @@ class WinInfo(SingleActionWindow):
                 self.single_img_fin(info_item)
 
             if not self.task_.is_alive() and q.empty():
-                self.task_.terminate()
+                self.task_.terminate_join()
             else:
                 self.task_timer.start(500)
 
@@ -151,11 +151,11 @@ class WinInfo(SingleActionWindow):
     def deleteLater(self):
         if self.task_.is_alive():
             self.task_timer.stop()
-            self.task_.terminate()
+            self.task_.terminate_join()
         return super().deleteLater()
 
     def closeEvent(self, a0):
         if self.task_.is_alive():
             self.task_timer.stop()
-            self.task_.terminate()
+            self.task_.terminate_join()
         return super().closeEvent(a0)

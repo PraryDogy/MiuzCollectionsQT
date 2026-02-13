@@ -216,7 +216,7 @@ class WinMain(UMainWindow):
 
         def poll_task(tsk: ProcessWorker, tmr: QTimer):
             if not tsk.is_alive():
-                tsk.terminate()
+                tsk.terminate_join()
                 if argv[-1] != "noscan":
                     self.start_scaner_task()
             else:
@@ -580,7 +580,7 @@ class WinMain(UMainWindow):
                 if bar.text() != scaner_item.gui_text:
                     bar.setText(scaner_item.gui_text)
             if not tsk.is_alive():
-                tsk.terminate()
+                tsk.terminate_join()
                 bar.setText("")
             else:
                 tmr.start(ms)
@@ -599,8 +599,7 @@ class WinMain(UMainWindow):
             and
             time() - self.scaner_timeout > self.scaner_timeout_max
         ):
-            self.scaner_task.terminate()
-            # self.scaner_task.join(0.1)
+            self.scaner_task.terminate_join()
             can_start = True
 
         # задача завершена

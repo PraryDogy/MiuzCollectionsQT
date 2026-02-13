@@ -347,12 +347,12 @@ class WinImageView(AppModalWindow):
                     self.show_text_label(t)
             
             if not self.read_img_task.is_alive():
-                self.read_img_task.terminate()
+                self.read_img_task.terminate_join()
             else:
                 self.read_img_timer.start(ms)
 
         try:
-            self.read_img_task.terminate()
+            self.read_img_task.terminate_join()
             self.read_img_timer.stop()
         except AttributeError as e:
             print("widgets > win image view error", e)
@@ -628,7 +628,7 @@ class WinImageView(AppModalWindow):
 
     def closeEvent(self, a0):
         try:
-            self.read_img_task.terminate()
+            self.read_img_task.terminate_join()
             self.read_img_timer.stop()
         except AttributeError as e:
             print("close img view error", e)
@@ -640,7 +640,7 @@ class WinImageView(AppModalWindow):
     
     def deleteLater(self):
         try:
-            self.read_img_task.terminate()
+            self.read_img_task.terminate_join()
             self.read_img_timer.stop()
         except AttributeError as e:
             print("close img view error", e)
