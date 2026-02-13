@@ -9,7 +9,6 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QSpacerItem, QSpinBox, QSplitter,
                              QTableWidget, QTableWidgetItem, QWidget)
-from typing_extensions import Literal
 
 from cfg import Cfg, Static, cfg
 from system.filters import Filters
