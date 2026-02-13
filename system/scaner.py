@@ -667,6 +667,9 @@ class AllDirScaner:
             new_dirs.extend(removed_dirs)
             NewDirsWorker.start(new_dirs, scaner_item)
         # это нужно, когда удален целый каталог вместе с корневой папкой
+        # типа не все фотки из папки "test" и папка "test" пуста,
+        # а была удалена папка "test"
+        # тогда это улетает в RemovedDirsWorker
         if removed_dirs:
             RemovedDirsWorker.start(removed_dirs, scaner_item)
 
