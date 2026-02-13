@@ -1,8 +1,12 @@
-from typing_extensions import Optional
+from typing_extensions import Optional, Literal
+from dataclasses import dataclass
+
+@dataclass(slots=True)
+class Test:
+    varibale: Literal["a", "b"]
 
 
-def test(text: Optional[str]):
-    print(text)
-
-
-test("dfsdfe")
+data = {
+    "a": 1,
+    "b": 2
+}
