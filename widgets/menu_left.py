@@ -350,6 +350,10 @@ class MenuLeft(QTabWidget):
         self.mf_list.setCurrentRow(0)
         QTimer.singleShot(10, lambda: _mf_open(Mf.current))
 
+    def reload_tree(self):
+        self.tree_wid.clear()
+        self.tree_wid.init_ui()
+
     def dragEnterEvent(self, a0):
         a0.accept()
 

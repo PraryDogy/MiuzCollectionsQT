@@ -570,7 +570,7 @@ class WinMain(UMainWindow):
                 bar.setText("")
                 if reload_gui:
                     self.grid.reload_thumbnails()
-                    self.left_menu.init_ui()
+                    self.left_menu.reload_tree()
             else:
                 tmr.start(ms)
 
