@@ -65,11 +65,11 @@ class CopyTaskItem:
         self.src_urls = src_urls
         self.is_cut = is_cut
 
-        self.current_size: int
-        self.total_size: int
-        self.current_count: int
-        self.total_count: int
-        self.dst_urls: list[str]
+        self.current_size: int = 0
+        self.total_size: int = 0
+        self.current_count: int = 0
+        self.total_count: int = 0
+        self.dst_urls: list[str] = []
         self.msg: Literal[
             "none",
             "error",

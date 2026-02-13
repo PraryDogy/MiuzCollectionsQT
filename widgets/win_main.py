@@ -353,7 +353,6 @@ class WinMain(UMainWindow):
 
     @with_conn
     def paste_files_here(self, parent: QWidget, mf: Mf):
-        return
 
         def reset_clipboard():
             self.clipboard_item = None
@@ -371,34 +370,24 @@ class WinMain(UMainWindow):
                 reset_clipboard()
                 return
             if self.clipboard_item.action_type == self.clipboard_item.type_cut:
-                scaner_task = DirListScanTask(
-                    self.clipboard_item.source_mf,
-                    self.clipboard_item.source_dirs
+                scaner_task = ProcessWorker(
+                    target=SingleDirScaner.start,
+                    args=(
+                        self.clipboard_item.source_mf,
+                        self.clipboard_item.source_dirs
+                    )
                 )
-                scaner_task.sigs.progress_text.connect(
-                    self.bar_bottom.progress_bar.setText
-                )
-                scaner_task.sigs.reload_thumbnails.connect(
-                    lambda: set_type(self.clipboard_item.type_copy)
-                )
-                scaner_task.sigs.reload_thumbnails.connect(scan_dirs)
-                UThreadPool.start(scaner_task)
+                scaner_task.start()
             elif self.clipboard_item.action_type == self.clipboard_item.type_copy:
                 dirs = [self.clipboard_item.target_dir, ]
-                scaner_task = DirListScanTask(
-                    self.clipboard_item.target_mf,
-                    dirs
+                scaner_task = ProcessWorker(
+                    target=SingleDirScaner.start,
+                    args=(
+                        self.clipboard_item.target_mf,
+                        dirs
+                    )
                 )
-                scaner_task.sigs.progress_text.connect(
-                    self.bar_bottom.progress_bar.setText
-                )
-                scaner_task.sigs.reload_thumbnails.connect(
-                    reset_clipboard
-                )
-                scaner_task.sigs.reload_thumbnails.connect(
-                    self.grid.reload_thumbnails
-                )
-                UThreadPool.start(scaner_task)
+                scaner_task.start()
 
         def start_copy_files():
             copy_files_win = self.copy_files_win()
@@ -419,6 +408,7 @@ class WinMain(UMainWindow):
         elif self.clipboard_item:
             self.clipboard_item.target_mf = Mf.current
             self.clipboard_item.target_dir = abs_current_dir
+
             start_copy_files()
 
     @with_conn
