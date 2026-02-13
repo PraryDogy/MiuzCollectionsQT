@@ -203,11 +203,9 @@ class WinMain(UMainWindow):
 
         self.grid.setFocus()
 
-        # self.scaner_timer = QTimer(self)
-        # self.scaner_timer.setSingleShot(True)
-        # self.scaner_timer.timeout.connect(self.start_scaner_task)
-        # self.scaner_task = None
-        # self.scaner_task_canceled = False
+        self.scaner_loop_timer = QTimer(self)
+        self.scaner_loop_timer.timeout.connect(self.start_scaner_task)
+        self.scaner_loop_timer.start(100)
 
         self.on_start(argv)
 
@@ -580,32 +578,30 @@ class WinMain(UMainWindow):
 
     def start_scaner_task(self, ms: int = 1000):
 
-        def poll_task():
-            self.scaner_poll_timer.stop()
-            q = self.scaner_task.proc_q
+        def poll_task(tsk: ProcessWorker, tmr: QTimer):
             bar = self.bar_bottom.progress_bar
-            while not q.empty():
-                res: ExtScanerItem = q.get()
+            while not tsk.proc_q.empty():
+                res: ExtScanerItem = tsk.proc_q.get()
                 if bar.text() != res.gui_text:
                     bar.setText(res.gui_text)
                     self.scaner_timeout = time()
             
-            if not self.scaner_task.is_alive():
-                self.scaner_task.terminate()
+            if not tsk.is_alive():
+                tsk.terminate()
                 bar.setText("")
             else:
-                self.scaner_poll_timer.start(ms)
+                tmr.start(ms)
 
         self.scaner_task = ProcessWorker(
             target=AllDirScaner.start,
             args=(Mf.list_, )
         )
-        self.scaner_poll_timer = QTimer(self)
-        self.scaner_poll_timer.setSingleShot(True)
-        self.scaner_poll_timer.timeout.connect(poll_task)
+        tmr = QTimer(self)
+        tmr.setSingleShot(True)
+        tmr.timeout.connect(lambda: poll_task(self.scaner_task, tmr))
 
         self.scaner_task.start()
-        self.scaner_poll_timer.start(ms)
+        tmr.start(ms)
 
         # """
         # Инициализирует и запускает задачу сканирования ScanerTask.
