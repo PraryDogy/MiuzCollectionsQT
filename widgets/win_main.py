@@ -596,7 +596,6 @@ class WinMain(UMainWindow):
         if stmt:
             can_start = True
             self.scaner_timeout = time()
-
         if can_start:
             self.scaner_timeout = time()
             self.scaner_task = ProcessWorker(
