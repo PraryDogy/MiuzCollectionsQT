@@ -461,13 +461,18 @@ class DbImgUpdater:
     def start(
         scaner_item: IntScanerItem,
         del_images: list[ImgItem],
-        new_images: list[ImgItem]
+        new_images: list[ImgItem],
+        q: Queue
     ):
         if del_images:
             DbImgUpdater.remove_del_imgs(scaner_item, del_images)
+            ext_item = ExtScanerItem("", True)
+            q.put(ext_item)
         if new_images:
             DbImgUpdater.remove_exits_imgs(scaner_item, new_images)
             DbImgUpdater.add_new_imgs(scaner_item, new_images)
+            ext_item = ExtScanerItem("", True)
+            q.put(ext_item)
         return None
 
     @staticmethod
@@ -544,10 +549,6 @@ class NewDirsWorker:
             finder_images=finder_images,
             db_images=db_images
         )
-
-        # print("del images", del_images)
-        # print("new images", new_images)
-        # return
 
         del_images, new_images = HashdirImgUpdater.start(
             scaner_item=scaner_item,
