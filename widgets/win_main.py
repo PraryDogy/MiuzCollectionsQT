@@ -222,23 +222,22 @@ class WinMain(UMainWindow):
     
     def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):
 
-        def poll_task():
-            self.on_start_timer.stop()
-            if not self.on_start_task.is_alive():
-                self.on_start_task.terminate()
+        def poll_task(tsk: ProcessWorker, tmr: QTimer):
+            if not tsk.is_alive():
+                tsk.terminate()
                 if argv[-1] != "noscan":
                     self.start_scaner_task()
             else:
-                self.on_start_timer.start(ms)
+                tmr.start(ms)
 
         self.grid.reload_thumbnails()
         self.set_window_title()
 
         on_start_item = OnStartItem(Mf.list_)
-        self.on_start_task = ProcessWorker(target=OnStartTask.start, args=(on_start_item, ))
-        self.on_start_timer = QTimer(self)
-        self.on_start_timer.setSingleShot(True)
-        self.on_start_timer.timeout.connect(poll_task)
+        tsk = ProcessWorker(target=OnStartTask.start, args=(on_start_item, ))
+        tmr = QTimer(self)
+        tmr.setSingleShot(True)
+        tmr.timeout.connect(lambda: poll_task(tsk, tmr))
 
         self.on_start_task.start()
         self.on_start_timer.start(ms)
@@ -582,7 +581,7 @@ class WinMain(UMainWindow):
     def start_scaner_task(self, ms: int = 1000):
 
         def poll_task():
-            self.scaner_timer.stop()
+            self.scaner_poll_timer.stop()
             q = self.scaner_task.proc_q
             bar = self.bar_bottom.progress_bar
             while not q.empty():
@@ -595,18 +594,18 @@ class WinMain(UMainWindow):
                 self.scaner_task.terminate()
                 bar.setText("")
             else:
-                self.scaner_timer.start(ms)
+                self.scaner_poll_timer.start(ms)
 
         self.scaner_task = ProcessWorker(
             target=AllDirScaner.start,
             args=(Mf.list_, )
         )
-        self.scaner_timer = QTimer(self)
-        self.scaner_timer.setSingleShot(True)
-        self.scaner_timer.timeout.connect(poll_task)
+        self.scaner_poll_timer = QTimer(self)
+        self.scaner_poll_timer.setSingleShot(True)
+        self.scaner_poll_timer.timeout.connect(poll_task)
 
         self.scaner_task.start()
-        self.scaner_timer.start(ms)
+        self.scaner_poll_timer.start(ms)
 
         # """
         # Инициализирует и запускает задачу сканирования ScanerTask.
