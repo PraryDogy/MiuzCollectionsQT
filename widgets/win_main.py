@@ -588,6 +588,7 @@ class WinMain(UMainWindow):
 
         # первая инициация
         if not hasattr(self, "scaner_timeout"):
+            print("первая инициация сканера")
             self.scaner_timeout = time()
             self.loop_tmr = QTimer(self)
             self.loop_tmr.setSingleShot(True)
@@ -600,19 +601,23 @@ class WinMain(UMainWindow):
 
         # задача зависла
         if alive and timeout > self.scaner_timeout_max:
+            print("сканер завис, принудительно завершаю")
             self.scaner_task.terminate_join()
             can_start = True
 
         # задача завершена
         elif not alive:
+            print("сканер завершен, можно запускать новый")
             can_start = True
 
         # задача жива и таймаут меньше заданного времени
         # то есть задача еще что то делает и сбрасывает таймаут
         elif alive and timeout < self.scaner_timeout_max:
+            print("сканер еще работает, жду завершения")
             can_start = False
 
         if can_start:
+            print("старт сканера")
             self.scaner_task = ProcessWorker(
                 target=AllDirScaner.start,
                 args=(Mf.list_, )
