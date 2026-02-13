@@ -589,32 +589,28 @@ class WinMain(UMainWindow):
 
         # первая инициация
         if not hasattr(self, "scaner_timeout"):
-            can_start = True
             self.scaner_timeout = time()
             self.loop_tmr = QTimer(self)
             self.loop_tmr.setSingleShot(True)
             self.loop_tmr.timeout.connect(self.start_scaner_task)
+            self.scaner_task = None
+
+        can_start = False
+        alive = self.scaner_task.is_alive() if self.scaner_task else False
+        timeout = time() - self.scaner_timeout
 
         # задача зависла
-        elif (
-            self.scaner_task.is_alive()
-            and
-            time() - self.scaner_timeout > self.scaner_timeout_max
-        ):
+        if alive and timeout > self.scaner_timeout_max:
             self.scaner_task.terminate_join()
             can_start = True
 
         # задача завершена
-        elif not self.scaner_task.is_alive():
+        elif not alive:
             can_start = True
 
         # задача жива и таймаут меньше заданного времени
         # то есть задача еще что то делает и сбрасывает таймаут
-        elif (
-            self.scaner_task.is_alive()
-            and
-            time() - self.scaner_timeout < self.scaner_timeout_max
-        ):
+        elif alive and timeout < self.scaner_timeout_max:
             can_start = False
 
         if can_start:
