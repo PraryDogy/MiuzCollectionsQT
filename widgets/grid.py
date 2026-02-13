@@ -717,11 +717,11 @@ class Grid(VScrollArea):
             select_all()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
             self.copy_files.emit(
-                (ClipBoardItem.type_copy, [i.rel_path for i in self.selected_widgets])
+                ("copy", [i.rel_path for i in self.selected_widgets])
             )
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_X:
             self.copy_files.emit(
-                (ClipBoardItem.type_cut, [i.rel_path for i in self.selected_widgets])
+                ("cut", [i.rel_path for i in self.selected_widgets])
             )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             if not event.isAutoRepeat():
@@ -946,13 +946,13 @@ class Grid(VScrollArea):
             # cut / copy / paste
             act = CutFiles(self.menu_, len(rel_paths))
             act.triggered.connect(
-                lambda: self.copy_files.emit((ClipBoardItem.type_cut, rel_paths))
+                lambda: self.copy_files.emit(("cut", rel_paths))
             )
             self.menu_.addAction(act)
 
             act = CopyFiles(self.menu_, len(rel_paths))
             act.triggered.connect(
-                lambda: self.copy_files.emit((ClipBoardItem.type_copy, rel_paths))
+                lambda: self.copy_files.emit(("copy", rel_paths))
             )
             self.menu_.addAction(act)
 

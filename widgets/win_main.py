@@ -310,7 +310,7 @@ class WinMain(UMainWindow):
                 os.path.dirname(i)
                 for i in abs_paths
             ))
-            if action_type == self.clipboard_item.type_cut:
+            if action_type == "cut":
                 for i in self.grid.selected_widgets:
                     i.set_transparent_frame(0.5)
 
@@ -358,9 +358,6 @@ class WinMain(UMainWindow):
             self.clipboard_item = None
             self.grid.clipboard_item = None
 
-        def set_type(type: str):
-            self.clipboard_item.action_type = type
-
         def set_files_copied(files: list[str]):
             self.clipboard_item.files_copied = files
 
@@ -369,24 +366,7 @@ class WinMain(UMainWindow):
                 print("ни один файл не был скопирован")
                 reset_clipboard()
                 return
-            if self.clipboard_item.action_type == self.clipboard_item.type_cut:
-                scaner_task = ProcessWorker(
-                    target=SingleDirScaner.start,
-                    args=(
-                        self.clipboard_item.source_mf,
-                        self.clipboard_item.source_dirs
-                    )
-                )
-                scaner_task.start()
-            elif self.clipboard_item.action_type == self.clipboard_item.type_copy:
-                dirs = [self.clipboard_item.target_dir, ]
-                scaner_task = ProcessWorker(
-                    target=SingleDirScaner.start,
-                    args=(
-                        self.clipboard_item.target_mf,
-                        dirs
-                    )
-                )
+            else:
                 scaner_task.start()
 
         def start_copy_files():
@@ -408,7 +388,22 @@ class WinMain(UMainWindow):
         elif self.clipboard_item:
             self.clipboard_item.target_mf = Mf.current
             self.clipboard_item.target_dir = abs_current_dir
-
+            if self.clipboard_item.action_type == "cut":
+                scaner_task = ProcessWorker(
+                    target=SingleDirScaner.start,
+                    args=(self.clipboard_item.source_mf,
+                        self.clipboard_item.source_dirs
+                    )
+                )
+            elif self.clipboard_item.action_type == "copy":
+                dirs = [self.clipboard_item.target_dir, ]
+                scaner_task = ProcessWorker(
+                    target=SingleDirScaner.start,
+                    args=(
+                        self.clipboard_item.target_mf,
+                        dirs
+                    )
+                )
             start_copy_files()
 
     @with_conn
@@ -473,7 +468,7 @@ class WinMain(UMainWindow):
             self.upload_win.deleteLater()
             self.clipboard_item = ClipBoardItem()
             self.grid.clipboard_item = self.clipboard_item
-            self.clipboard_item.action_type = ClipBoardItem.type_copy
+            self.clipboard_item.action_type = "copy"
             self.clipboard_item.target_mf = Mf.current
             self.clipboard_item.target_dir = target_dir
             self.clipboard_item.files_to_copy = abs_paths

@@ -353,8 +353,6 @@ class SettingsItem:
 
 
 class ClipBoardItem:
-    type_cut = "cut"
-    type_copy = "copy"
     
     def __init__(self):
         self.action_type: Literal["cut", "copy"]
