@@ -14,8 +14,16 @@ from ._base_widgets import SingleActionWindow
 from .progressbar_win import ProgressbarWin
 
 
+class ReplaceBtn(QPushButton):
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.setStyleSheet("""
+        font-size: 11pt;
+        """)
+
+
 class ReplaceFilesWin(SingleActionWindow):
-    btn_w = 115
+    btn_w = 100
     icon_size = 50
     icon_path = "./images/warning.svg"
 
@@ -55,17 +63,17 @@ class ReplaceFilesWin(SingleActionWindow):
         btn_wid.setLayout(btn_lay)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        replace_all_btn = QPushButton(Lng.replace_all[cfg.lng])
+        replace_all_btn = ReplaceBtn(Lng.replace_all[cfg.lng])
         replace_all_btn.setFixedWidth(self.btn_w)
         replace_all_btn.clicked.connect(lambda: self.replace_all_cmd())
         btn_lay.addWidget(replace_all_btn)
 
-        replace_one_btn = QPushButton(Lng.replace_one[cfg.lng])
+        replace_one_btn = ReplaceBtn(Lng.replace_one[cfg.lng])
         replace_one_btn.setFixedWidth(self.btn_w)
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        stop_btn = QPushButton(Lng.stop[cfg.lng])
+        stop_btn = ReplaceBtn(Lng.stop[cfg.lng])
         stop_btn.setFixedWidth(self.btn_w)
         stop_btn.clicked.connect(lambda: self.stop_cmd())
         btn_lay.addWidget(stop_btn)
@@ -111,7 +119,7 @@ class ErrorWin(SingleActionWindow):
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
-        ok_btn = QPushButton(Lng.ok[cfg.lng])
+        ok_btn = ReplaceBtn(Lng.ok[cfg.lng])
         ok_btn.clicked.connect(self.deleteLater)
         ok_btn.setFixedWidth(90)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
