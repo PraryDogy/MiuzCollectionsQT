@@ -1019,7 +1019,6 @@ class WinSettings(SingleActionWindow):
             mf_sett = MfSettings(mf)
             mf_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
             mf_sett.remove.connect(lambda: self.remove_mf(item))
-            mf_sett.reset_data.connect(lambda: print("test test"))
             mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
             self.right_lay.insertWidget(0, mf_sett)
 
