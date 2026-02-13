@@ -666,6 +666,7 @@ class AllDirScaner:
         if new_dirs:
             new_dirs.extend(removed_dirs)
             NewDirsWorker.start(new_dirs, scaner_item)
+        # это нужно, когда удален целый каталог вместе с корневой папкой
         if removed_dirs:
             RemovedDirsWorker.start(removed_dirs, scaner_item)
 
@@ -699,25 +700,3 @@ class SingleDirScaner:
                 dir_items.append(item)
             if dir_items:
                 NewDirsWorker.start(dir_items, scaner_item)
-
-            dirs_to_remove: list[DirItem] = []
-            for i in dir_items:
-                try:
-                    files = os.listdir(i.abs_path)
-                except Exception as e:
-                    print("SingleDirScaner error", e)
-                    continue
-                if not files:
-                    dirs_to_remove.append(i)
-
-            if dirs_to_remove:
-                print("директория пуста")
-                RemovedDirsWorker.start(dirs_to_remove, scaner_item)
-
-
-"""
-короче щас проблема в том, что если удалить папку с фотками, сканер пропустит такую
-то есть если папку оставить, но удалить в ней фотки - это ок
-а вот сама проблема что удаленная папка игнорится
-
-"""
