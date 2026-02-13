@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
-from typing_extensions import Literal
+from typing_extensions import Literal, Optional
 
 from cfg import Dynamic, Static, cfg
 from system.filters import Filters
@@ -546,8 +546,8 @@ class WinMain(UMainWindow):
 
     def start_scaner_task(
             self,
-            mf: Mf = None,
-            dirs_to_scan: list[str] = None,
+            mf: Optional[Mf],
+            dirs_to_scan: Optional[list[str]],
             ms: int = 1000
         ):
 
