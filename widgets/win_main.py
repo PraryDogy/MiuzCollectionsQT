@@ -585,14 +585,13 @@ class WinMain(UMainWindow):
             else:
                 tmr.start(ms)
 
-        loop_tmr = QTimer(self)
-        loop_tmr.setSingleShot(True)
-        loop_tmr.timeout.connect(self.start_scaner_task)
-
         # первая инициация
         if not hasattr(self, "scaner_timeout"):
             can_start = True
             self.scaner_timeout = time()
+            self.loop_tmr = QTimer(self)
+            self.loop_tmr.setSingleShot(True)
+            self.loop_tmr.timeout.connect(self.start_scaner_task)
 
         # задача зависла
         elif (
@@ -601,6 +600,7 @@ class WinMain(UMainWindow):
             time() - self.scaner_timeout > self.scaner_timeout_max
         ):
             self.scaner_task.terminate()
+            # self.scaner_task.join(0.1)
             can_start = True
 
         # задача завершена
@@ -627,11 +627,12 @@ class WinMain(UMainWindow):
 
             self.scaner_task.start()
             tmr.start(ms)
-            loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
+            self.loop_tmr.stop()
+            self.loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
 
         else:
             # проверяем каждую минуту, что задача завершена
-            loop_tmr.start(1*60*1000)
+            self.loop_tmr.start(1*60*1000)
 
     # def on_scaner_finished(self):
     #     """
