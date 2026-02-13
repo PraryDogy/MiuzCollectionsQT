@@ -357,19 +357,45 @@ class WinMain(UMainWindow):
         def set_files_copied(f: list[str]):
             self.clipboard_item.files_copied = f
 
-        def scan_dirs(scaner_task: ProcessWorker):
+        def scan_dirs():
+
             if not self.clipboard_item.files_copied:
                 print("ни один файл не был скопирован")
                 self.clipboard_item = None
                 self.grid.clipboard_item = None
                 return
-            else:
-                scaner_task.start()
 
-        def start_copy_files(scaner_task: ProcessWorker):
+            self.clipboard_item.target_mf = Mf.current
+            self.clipboard_item.target_dir = abs_current_dir
+
+            if self.clipboard_item.action_type == "cut":
+                self.start_scaner_task(
+                    mf=self.clipboard_item.source_mf,
+                    dirs_to_scan=self.clipboard_item.source_dirs
+                )
+                # self.single_dir_task = ProcessWorker(
+                #     target=SingleDirScaner.start,
+                #     args=(self.clipboard_item.source_mf,
+                #         self.clipboard_item.source_dirs
+                #     )
+                # )
+            elif self.clipboard_item.action_type == "copy":
+                self.start_scaner_task(
+                    mf=self.clipboard_item.target_mf,
+                    dirs_to_scan=[self.clipboard_item.target_dir, ]
+                )
+                # self.single_dir_task = ProcessWorker(
+                #     target=SingleDirScaner.start,
+                #     args=(
+                #         self.clipboard_item.target_mf,
+                #         dirs
+                #     )
+                # )
+
+        def start_copy_files():
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda f: set_files_copied(f))
-            copy_files_win.finished_.connect(lambda _: scan_dirs(scaner_task))
+            copy_files_win.finished_.connect(scan_dirs)
 
         abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
         copy_self = abs_current_dir in self.clipboard_item.source_dirs
@@ -383,33 +409,7 @@ class WinMain(UMainWindow):
             self.win_warn.center_to_parent(self)
             self.win_warn.show()
         elif self.clipboard_item:
-            self.clipboard_item.target_mf = Mf.current
-            self.clipboard_item.target_dir = abs_current_dir
-            if self.clipboard_item.action_type == "cut":
-                self.start_scaner_task(
-                    mf=self.clipboard_item.source_mf,
-                    dirs_to_scan=self.clipboard_item.source_dirs
-                )
-                # self.single_dir_task = ProcessWorker(
-                #     target=SingleDirScaner.start,
-                #     args=(self.clipboard_item.source_mf,
-                #         self.clipboard_item.source_dirs
-                #     )
-                # )
-            elif self.clipboard_item.action_type == "copy":
-                dirs = [self.clipboard_item.target_dir, ]
-                self.start_scaner_task(
-                    self.clipboard_item.target_mf,
-                    dirs_to_scan=[self.clipboard_item.target_dir, ]
-                )
-                # self.single_dir_task = ProcessWorker(
-                #     target=SingleDirScaner.start,
-                #     args=(
-                #         self.clipboard_item.target_mf,
-                #         dirs
-                #     )
-                # )
-            start_copy_files(self.single_dir_task)
+            start_copy_files()
 
     @with_conn
     def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
