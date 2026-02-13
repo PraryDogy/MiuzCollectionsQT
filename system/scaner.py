@@ -671,12 +671,18 @@ class SingleDirScaner:
         if scaner_item.mf.get_available_path():
             dir_items: list[DirItem] = []
             for i in dirs_to_scan:
+                try:
+                    mod = int(os.stat(i).st_mtime)
+                except Exception as e:
+                    print("SingleDirScaner error", e)
+                    continue
                 item = DirItem(
                     abs_path=i,
                     rel_path=Utils.get_rel_any_path(mf.curr_path, i),
-                    mod=int(os.stat(i).st_mtime)
+                    mod=mod
                 )
                 dir_items.append(item)
-            NewDirsWorker.start(dir_items, scaner_item)
+            if dir_items:
+                NewDirsWorker.start(dir_items, scaner_item)
             # elif rem_dir:
             #     RemovedDirsWorker.start([rem_dir, ], scaner_item)
