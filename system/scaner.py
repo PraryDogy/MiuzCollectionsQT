@@ -653,24 +653,13 @@ class AllDirScaner:
     def single_mf_scan(scaner_item: IntScanerItem):
         # собираем Finder директории и директории из БД
         finder_dirs, db_dirs = DirLoader.start(scaner_item)
-
-        # for i in finder_dirs:
-        #     print(i)
-
-        # print()
-
-        # for i in db_dirs:
-        #     print(i)
-
         if not finder_dirs:
             print(scaner_item.mf.alias, "no finder dirs")
             return
-
         removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
         if new_dirs:
             # print("new dirs", new_dirs)
             NewDirsWorker.start(new_dirs, scaner_item)
-
         if removed_dirs:
             # print("removed dirs", removed_dirs)
             RemovedDirsWorker.start(removed_dirs, scaner_item)
