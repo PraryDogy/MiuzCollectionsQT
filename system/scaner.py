@@ -566,53 +566,53 @@ class NewDirsWorker:
         return None
     
 
-class RemovedDirsWorker:
-    @staticmethod
-    def start(dirs_to_del: list[DirItem], scaner_item: IntScanerItem):
-        conn = scaner_item.eng.connect()
-        for dir_item in dirs_to_del:
-            RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
-            RemovedDirsWorker.remove_dir_entry(dir_item, scaner_item, conn)
-        conn.commit()
-        conn.close()
+# class RemovedDirsWorker:
+#     @staticmethod
+#     def start(dirs_to_del: list[DirItem], scaner_item: IntScanerItem):
+#         conn = scaner_item.eng.connect()
+#         for dir_item in dirs_to_del:
+#             RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
+#             RemovedDirsWorker.remove_dir_entry(dir_item, scaner_item, conn)
+#         conn.commit()
+#         conn.close()
 
-    @staticmethod
-    def remove_thumbs(
-        dir_item: DirItem,
-        scaner_item: IntScanerItem,
-        conn: sqlalchemy.Connection
-    ):
-        stmt = (
-            sqlalchemy.select(Thumbs.rel_thumb_path)
-            .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
-            .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
-            .where(Thumbs.mf_alias == scaner_item.mf.alias)
-        )
-        for rel_thumb_path in conn.execute(stmt).scalars():
-            try:
-                os.remove(Utils.get_abs_thumb_path(rel_thumb_path))
-            except Exception as e:
-                print("DelDirsHandler, remove thumb:", e)
+#     @staticmethod
+#     def remove_thumbs(
+#         dir_item: DirItem,
+#         scaner_item: IntScanerItem,
+#         conn: sqlalchemy.Connection
+#     ):
+#         stmt = (
+#             sqlalchemy.select(Thumbs.rel_thumb_path)
+#             .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
+#             .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+#             .where(Thumbs.mf_alias == scaner_item.mf.alias)
+#         )
+#         for rel_thumb_path in conn.execute(stmt).scalars():
+#             try:
+#                 os.remove(Utils.get_abs_thumb_path(rel_thumb_path))
+#             except Exception as e:
+#                 print("DelDirsHandler, remove thumb:", e)
 
-        del_stmt = (
-            sqlalchemy.delete(Thumbs.table)
-            .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
-            .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
-            .where(Thumbs.mf_alias == scaner_item.mf.alias)
-        )
-        conn.execute(del_stmt)
+#         del_stmt = (
+#             sqlalchemy.delete(Thumbs.table)
+#             .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
+#             .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+#             .where(Thumbs.mf_alias == scaner_item.mf.alias)
+#         )
+#         conn.execute(del_stmt)
 
-    def remove_dir_entry(
-            dir_item: DirItem,
-            scaner_item: IntScanerItem,
-            conn: sqlalchemy.Connection
-        ):
-        stmt = (
-            sqlalchemy.delete(Dirs.table)
-            .where(Dirs.rel_dir_path == dir_item.rel_path)
-            .where(Dirs.mf_alias == scaner_item.mf.alias)
-        )
-        conn.execute(stmt)
+#     def remove_dir_entry(
+#             dir_item: DirItem,
+#             scaner_item: IntScanerItem,
+#             conn: sqlalchemy.Connection
+#         ):
+#         stmt = (
+#             sqlalchemy.delete(Dirs.table)
+#             .where(Dirs.rel_dir_path == dir_item.rel_path)
+#             .where(Dirs.mf_alias == scaner_item.mf.alias)
+#         )
+#         conn.execute(stmt)
 
 
 class AllDirScaner:
@@ -658,9 +658,9 @@ class AllDirScaner:
         if new_dirs:
             # print("new dirs", new_dirs)
             NewDirsWorker.start(new_dirs, scaner_item)
-        if removed_dirs:
+        # if removed_dirs:
             # print("removed dirs", removed_dirs)
-            RemovedDirsWorker.start(removed_dirs, scaner_item)
+            # RemovedDirsWorker.start(removed_dirs, scaner_item)
 
 
 class SingleDirScaner:
@@ -692,12 +692,12 @@ class SingleDirScaner:
                 dir_items.append(item)
             if dir_items:
                 NewDirsWorker.start(dir_items, scaner_item)
-            for i in dir_items:
-                try:
-                    files = os.listdir(i.abs_path)
-                except Exception as e:
-                    print("SingleDirScaner error", e)
-                    continue
-                if not files:
-                    print("директория пуста")
-                    RemovedDirsWorker.start(dir_items, scaner_item)
+            # for i in dir_items:
+            #     try:
+            #         files = os.listdir(i.abs_path)
+            #     except Exception as e:
+            #         print("SingleDirScaner error", e)
+            #         continue
+            #     if not files:
+            #         print("директория пуста")
+            #         RemovedDirsWorker.start(dir_items, scaner_item)
