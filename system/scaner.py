@@ -75,7 +75,7 @@ class AllDirLoader:
             f"({scaner_item.mf.alias}): "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
-        ext_scaner_item = ExtScanerItem(gui_text)
+        ext_scaner_item = ExtScanerItem(gui_text, False)
         scaner_item.q.put(ext_scaner_item)
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.curr_path]
@@ -249,7 +249,7 @@ class ImgLoader:
             f"({scaner_item.mf.alias}): "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
-        ext_scaner_item = ExtScanerItem(gui_text)
+        ext_scaner_item = ExtScanerItem(gui_text, False)
         scaner_item.q.put(ext_scaner_item)
         finder_images: list[ImgItem] = []
         for dir_item in dir_list:
@@ -391,7 +391,7 @@ class HashdirImgUpdater:
         - Он был присвоен при загрузуке записей из БД
         - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
         """
-        ext_scaner_item = ExtScanerItem("not now")
+        ext_scaner_item = ExtScanerItem("none", False)
         new_del_images: list[ImgItem] = []
         for img_item in del_images:
             thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
@@ -417,7 +417,7 @@ class HashdirImgUpdater:
         Пытается создать изображения в "hashdir".     
         Возвращает список успешно созданных изображений.
         """
-        ext_scaner_item = ExtScanerItem("not now")
+        ext_scaner_item = ExtScanerItem("none", False)
         new_new_images: list[ImgItem] = []
         for img_item in new_images:
             img = ImgUtils.read_img(img_item.abs_img_path)
@@ -637,7 +637,7 @@ class AllDirScaner:
                     f"({scaner_item.mf.alias}): "
                     f"{no_conn}"
                 )
-                ext_scaner_item = ExtScanerItem(gui_text)
+                ext_scaner_item = ExtScanerItem(gui_text, False)
                 scaner_item.q.put(ext_scaner_item)
                 print(
                     "scaner no connection",

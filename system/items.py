@@ -36,6 +36,7 @@ class OnStartItem:
 @dataclass(slots=True)
 class ExtScanerItem:
     gui_text: str
+    reload_gui: bool
 
 
 class IntScanerItem:
