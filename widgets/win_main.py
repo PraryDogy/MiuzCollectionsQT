@@ -617,8 +617,6 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
-            loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
-
             self.scaner_task = ProcessWorker(
                 target=AllDirScaner.start,
                 args=(Mf.list_, )
@@ -629,6 +627,8 @@ class WinMain(UMainWindow):
 
             self.scaner_task.start()
             tmr.start(ms)
+            loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
+
         else:
             # проверяем каждую минуту, что задача завершена
             loop_tmr.start(1*60*1000)
