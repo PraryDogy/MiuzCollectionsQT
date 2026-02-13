@@ -486,7 +486,7 @@ class WinMain(UMainWindow):
         self.bar_top.settings_btn.set_solid_style()
         self.settings_win = WinSettings(settings_item)
         self.settings_win.closed.connect(self.bar_top.settings_btn.set_normal_style)
-        self.settings_win.reset_data.connect(lambda mf: self.reset_data_cmd(mf))
+        self.settings_win.reset_data.connect(lambda mf: self.reset_single_mf(mf))
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
 
@@ -670,14 +670,8 @@ class WinMain(UMainWindow):
         )
         UThreadPool.start(self.task)
 
-    def reset_data_cmd(self, mf: Mf):
-
-        # def reset_data_finished():
-        #     self.grid.reload_thumbnails()
-        #     self.restart_scaner_task()
-
+    def reset_single_mf(self, mf: Mf):
         self.reset_task = MfDataCleaner(mf.alias)
-        # self.reset_task.sigs.finished_.connect(reset_data_finished)
         UThreadPool.start(self.reset_task)
 
     def copy_files_win(self):
