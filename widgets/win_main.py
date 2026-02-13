@@ -582,6 +582,8 @@ class WinMain(UMainWindow):
             if not tsk.is_alive():
                 tsk.terminate_join()
                 bar.setText("")
+                self.grid.reload_thumbnails()
+                self.left_menu.init_ui()
             else:
                 tmr.start(ms)
 
@@ -634,34 +636,9 @@ class WinMain(UMainWindow):
             self.loop_tmr.stop()
             self.loop_tmr.start(1*60*1000)
 
-    # def restart_scaner_task(self):
-    #     """
-    #     Прерывает текущую задачу сканирования и инициирует её перезапуск.
-
-    #     Если текущая задача ещё не завершена, устанавливается флаг отмены (self.scaner_task_canceled = True),
-    #     и флаг состояния задачи переводится в "не должно выполняться" с помощью set_should_run(False).
-    #     После завершения текущей задачи метод on_scaner_finished запустит короткий таймер.
-
-    #     Если задача уже завершена, активный таймер останавливается, и запускается короткий таймер на 1 секунду
-    #     для немедленного запуска новой задачи сканирования.
-    #     """
-    #     self.bar_bottom.progress_bar.setText(Lng.preparing[cfg.lng])
-        
-    #     if self.scaner_task is None:
-    #         self.scaner_timer.stop()
-    #         self.scaner_timer.start(1000)
-
-    #     # если задача не закончена, прерываем ее
-    #     elif not self.scaner_task.task_state.finished():
-    #         self.scaner_task.task_state.set_should_run(False)
-    #         # ставим флаг,чтобы on_scaner_finished запустил короткий таймер
-    #         # прерванная задача завершится и запустит короткий таймер
-    #         self.scaner_task_canceled = True
-    #     else:
-    #         # если задача закончена, значит стоит долгий таймер
-    #         self.scaner_timer.stop()
-    #         # если задача закончена, немедленно запускаем новый сканер
-    #         self.scaner_timer.start(1000)
+    def restart_scaner_task(self):
+        self.scaner_task.terminate_join()
+        self.start_scaner_task()
         
     def set_window_title(self):
         if Dynamic.current_dir is None:
