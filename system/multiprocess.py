@@ -147,8 +147,6 @@ class CopyTask:
             try:
                 CopyTask.copy_file_with_progress(proc_q, copy_item, src, dest)
             except Exception as e:
-                import traceback
-                print(traceback.format_exc())
                 print("CopyTask copy error", e)
                 copy_item.msg = "error"
                 proc_q.put(copy_item)
