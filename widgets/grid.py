@@ -414,7 +414,7 @@ class Grid(VScrollArea):
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
-        self.clipboard_item: Buffer = None
+        self.buffer: Buffer = None
         self.go_to_url: str = None
 
         self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(cfg.apps)}
@@ -846,7 +846,7 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(reload)
 
-            if self.clipboard_item:
+            if self.buffer:
                 self.menu_.addSeparator()
                 paste = PasteFiles(self.menu_)
                 paste.triggered.connect(

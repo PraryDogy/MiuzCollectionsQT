@@ -302,16 +302,18 @@ class WinMain(UMainWindow):
                 Utils.get_abs_any_path(mf.curr_path, i)
                 for i in rel_paths
             ]
-            self.buffer = Buffer()
-            self.grid.clipboard_item = self.buffer
-            self.buffer.type_ = action_type
-            self.buffer.src_files = abs_paths
-            self.buffer.src_mf = Mf.current
-            self.buffer.src_dirs = list(set(
-                os.path.dirname(i)
-                for i in abs_paths
-            ))
-            if action_type == "cut":
+            src_dirs = list(set(os.path.dirname(i) for i in abs_paths))
+            self.buffer = Buffer(
+                type_=action_type,
+                src_dirs=src_dirs,
+                src_mf=Mf.current,
+                src_files=abs_paths,
+                dst_dir="",
+                dst_mf="",
+                dst_files=""
+            )
+            self.grid.buffer = self.buffer
+            if self.buffer.type_ == "cut":
                 for i in self.grid.selected_widgets:
                     i.set_transparent_frame(0.5)
 
@@ -363,7 +365,7 @@ class WinMain(UMainWindow):
             if not self.buffer.dst_files:
                 print("ни один файл не был скопирован")
                 self.buffer = None
-                self.grid.clipboard_item = None
+                self.grid.buffer = None
                 return
 
             self.buffer.dst_mf = Mf.current
@@ -457,13 +459,18 @@ class WinMain(UMainWindow):
 
         def fin(target_dir: str):
             self.upload_win.deleteLater()
-            self.buffer = Buffer()
-            self.grid.clipboard_item = self.buffer
-            self.buffer.type_ = "copy"
-            self.buffer.dst_mf = Mf.current
-            self.buffer.dst_dir = target_dir
-            self.buffer.src_files = abs_paths
-            self.buffer.src_dirs = list(set(os.path.dirname(i) for i in abs_paths))
+
+            self.buffer = Buffer(
+                type_="copy",
+                src_dirs=list(set(os.path.dirname(i) for i in abs_paths)),
+                src_mf="",
+                src_files=abs_paths,
+                dst_dir=target_dir,
+                dst_mf=Mf.current,
+                dst_files=""
+            )
+
+            self.grid.buffer = self.buffer
             self.paste_files_here(self.grid, Mf.current)
 
         target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
