@@ -279,7 +279,7 @@ class WinMain(UMainWindow):
     @with_conn
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
         dest, dst_rel_paths = data
-        dst_abs_paths = [
+        src_abs_paths = [
             Utils.get_abs_any_path(mf.curr_path, i)
             for i in dst_rel_paths
         ]
@@ -289,14 +289,15 @@ class WinMain(UMainWindow):
                 type_="copy",
                 src_dirs=None,
                 src_mf=None,
-                src_files=None,
+                src_files=src_abs_paths,
                 dst_dir=None,
                 dst_mf=None,
-                dst_files=dst_abs_paths
+                dst_files=None
             )
             self.grid.buffer = self.buffer
         else:
-            self.buffer.src_files = dst_abs_paths
+            self.buffer.src_files = src_abs_paths
+
         if dest is None:
             dest = QFileDialog.getExistingDirectory()
             if dest:
