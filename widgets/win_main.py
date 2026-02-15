@@ -397,7 +397,7 @@ class WinMain(UMainWindow):
                     scaner_item.data[self.buffer.dst_mf].extend(
                         self.buffer.src_dirs
                     )
-
+            self.buffer = None
             self.start_scaner_task(scaner_item=scaner_item)
 
         def start_copy_files():
