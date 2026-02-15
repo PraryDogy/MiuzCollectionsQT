@@ -358,7 +358,7 @@ class WinMain(UMainWindow):
     @with_conn
     def paste_files_here(self, parent: QWidget, mf: Mf):
 
-        def set_files_copied(f: list[str]):
+        def set_buffer_dst_files(f: list[str]):
             self.buffer.dst_files = f
 
         def scan_dirs():
@@ -392,7 +392,7 @@ class WinMain(UMainWindow):
 
         def start_copy_files():
             copy_files_win = self.copy_files_win()
-            copy_files_win.finished_.connect(lambda f: set_files_copied(f))
+            copy_files_win.finished_.connect(lambda f: set_buffer_dst_files(f))
             copy_files_win.finished_.connect(scan_dirs)
 
         abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
