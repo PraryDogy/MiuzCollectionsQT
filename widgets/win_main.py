@@ -218,7 +218,7 @@ class WinMain(UMainWindow):
             if not tsk.is_alive():
                 tsk.terminate_join()
                 if argv[-1] != "noscan":
-                    self.start_scaner_task(mf=None, dirs_to_scan=None)
+                    self.start_scaner_task(scaner_item=None)
             else:
                 tmr.start(ms)
 
@@ -385,7 +385,7 @@ class WinMain(UMainWindow):
                     }
                 )
 
-            self.start_scaner_task(scaner_item)
+            self.start_scaner_task(scaner_item=scaner_item)
 
         def start_copy_files():
             copy_files_win = self.copy_files_win()
@@ -414,7 +414,8 @@ class WinMain(UMainWindow):
                 file_remover.proc_q.get()
             if not file_remover.is_alive():
                 file_remover.terminate_join()
-                self.start_scaner_task(mf=mf, dirs_to_scan=dirs_to_scan)
+                scaner_item = SingleDirScanerItem({mf: dirs_to_scan, })
+                self.start_scaner_task(scaner_item=scaner_item)
             else:
                 QTimer.singleShot(ms, poll_file_remover)
 
@@ -549,8 +550,7 @@ class WinMain(UMainWindow):
 
     def start_scaner_task(
             self,
-            mf: Optional[Mf],
-            dirs_to_scan: Optional[list[str]],
+            scaner_item: Optional[SingleDirScanerItem],
             ms: int = 1000
         ):
 
@@ -579,10 +579,7 @@ class WinMain(UMainWindow):
             self.loop_tmr = QTimer(self)
             self.loop_tmr.setSingleShot(True)
             self.loop_tmr.timeout.connect(
-                lambda: self.start_scaner_task(
-                    mf=mf,
-                    dirs_to_scan=dirs_to_scan,
-                )
+                lambda: self.start_scaner_task(scaner_item=scaner_item)
             )
             self.scaner_task = None
 
@@ -608,10 +605,10 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
-            if mf and dirs_to_scan:
+            if scaner_item:
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
-                    args=(mf, dirs_to_scan, )
+                    args=(scaner_item, )
                     )
             else:
                 self.scaner_task = ProcessWorker(
@@ -634,7 +631,7 @@ class WinMain(UMainWindow):
 
     def restart_scaner_task(self):
         self.scaner_task.terminate_join()
-        self.start_scaner_task(mf=None, dirs_to_scan=None)
+        self.start_scaner_task(scaner_item=None)
         
     def set_window_title(self):
         if Dynamic.current_dir is None:
