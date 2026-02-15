@@ -13,7 +13,7 @@ from system.main_folder import Mf
 from system.shared_utils import ImgUtils
 from system.utils import Utils
 
-from .items import ExtScanerItem, IntScanerItem
+from .items import ExtScanerItem, IntScanerItem, SingleDirScanerItem
 
 
 @dataclass(slots=True)
@@ -676,10 +676,18 @@ class AllDirScaner:
 
 class SingleDirScaner:
     @staticmethod
-    def start(mf: Mf, dirs_to_scan: list[str], q: Queue):
+    def start(scaner_item: SingleDirScanerItem):
+        for mf, dirs_to_scan in scaner_item.data.items():
+            SingleDirScaner.single_mf_scan(
+                mf=mf,
+                dirs_to_scan=dirs_to_scan
+            )
+
+    @staticmethod
+    def single_mf_scan(mf: Mf, dirs_to_scan: list[str], q: Queue):
         """
-        Сканирует заданную директорию на предмет новых или удаленных
-        изображений.
+        Сканирует заданне директории в пределах Mf на предмет новых или
+        удаленных изображений.
 
         Параметры:
         - mf: сканируемая директория должна принадлежать определенному Mf

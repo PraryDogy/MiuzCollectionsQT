@@ -58,6 +58,11 @@ class IntScanerItem:
         self.total_count = 0
 
 
+@dataclass(slots=True)
+class SingleDirScanerItem:
+    data: dict[Mf, list[str]]
+
+
 class CopyTaskItem:
     def __init__(self, dst_dir: str, src_urls: list[str], is_cut: bool):
         super().__init__()
