@@ -373,24 +373,11 @@ class WinMain(UMainWindow):
                     mf=self.clipboard_item.source_mf,
                     dirs_to_scan=self.clipboard_item.source_dirs
                 )
-                # self.single_dir_task = ProcessWorker(
-                #     target=SingleDirScaner.start,
-                #     args=(self.clipboard_item.source_mf,
-                #         self.clipboard_item.source_dirs
-                #     )
-                # )
             elif self.clipboard_item.action_type == "copy":
                 self.start_scaner_task(
                     mf=self.clipboard_item.target_mf,
                     dirs_to_scan=[self.clipboard_item.target_dir, ]
                 )
-                # self.single_dir_task = ProcessWorker(
-                #     target=SingleDirScaner.start,
-                #     args=(
-                #         self.clipboard_item.target_mf,
-                #         dirs
-                #     )
-                # )
 
         def start_copy_files():
             copy_files_win = self.copy_files_win()
