@@ -464,11 +464,11 @@ class WinMain(UMainWindow):
             self.buffer = Buffer(
                 type_="copy",
                 src_dirs=list(set(os.path.dirname(i) for i in abs_paths)),
-                src_mf="",
+                src_mf=None,
                 src_files=abs_paths,
                 dst_dir=target_dir,
                 dst_mf=Mf.current,
-                dst_files=""
+                dst_files=None
             )
 
             self.grid.buffer = self.buffer

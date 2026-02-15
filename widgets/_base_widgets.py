@@ -347,9 +347,9 @@ class VListWidget(QListWidget):
 class Buffer:
     type_: Literal["cut", "copy"]
 
-    src_dirs: list[str]
-    src_mf: Mf
-    src_files: list[str]
+    src_dirs: Optional[list[str]]
+    src_mf: Optional[Mf]
+    src_files: Optional[list[str]]
 
     dst_dir: Optional[str]
     dst_mf: Optional[Mf]
