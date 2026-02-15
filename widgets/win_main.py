@@ -373,9 +373,7 @@ class WinMain(UMainWindow):
             self.buffer.dst_dir = abs_current_dir
 
             scaner_item = SingleDirScanerItem(
-                data={
-                    self.buffer.dst_mf: [self.buffer.dst_dir, ],
-                    }
+                data={self.buffer.dst_mf: [self.buffer.dst_dir, ],}
             )
 
             if self.buffer.type_ == "cut":
@@ -383,9 +381,7 @@ class WinMain(UMainWindow):
                 # откуда был вырезан контент
                 # и тот Mf и директории, куда был вставлен контент
                 scaner_item.data.update(
-                    {
-                        self.buffer.src_mf: self.buffer.src_dirs,
-                    }
+                    {self.buffer.src_mf: self.buffer.src_dirs,}
                 )
 
             self.start_scaner_task(scaner_item=scaner_item)
