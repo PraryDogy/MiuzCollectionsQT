@@ -106,7 +106,7 @@ class Lng:
     open_settings_window = ("Открыть настройки", "Open settings window")
     paste = ("Вставить", "Paste")
     place = ("Место", "Place")
-    scan_folder = ("Искать изорбажения", "Find images")
+    scan_folder = ("Искать изображения", "Find images")
     update_grid = ("Обновить", "Update")
     reset = ("Сбросить", "Reset")
     resol = ("Разрешение", "Resolution")
