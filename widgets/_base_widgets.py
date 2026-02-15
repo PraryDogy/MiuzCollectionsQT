@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
@@ -341,22 +343,18 @@ class VListWidget(QListWidget):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
 
-class ClipBoardItem:
-    
-    def __init__(self):
-        self.action_type: Literal["cut", "copy"]
+@dataclass(slots=True)
+class Buffer:
+    type_: Literal["cut", "copy"]
 
-        self.source_dirs: list[str]
-        self.source_mf: Mf
-        self.files_to_copy: list[str]
+    src_dirs: list[str]
+    src_mf: Mf
+    src_files: list[str]
 
-        self.target_dir: str
-        self.target_mf: Mf
-        self.files_copied: list[str]
+    dst_dir: str
+    dst_mf: Mf
+    dst_files: list[str]
    
-    def set_files_copied(self, files: list[str]):
-        self.files_copied = files
-
 
 class NotifyWid(QFrame):
     blue = "rgb(70, 130, 240)"

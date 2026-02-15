@@ -19,7 +19,7 @@ from system.multiprocess import FilesRemover, OnStartTask, ProcessWorker
 from system.scaner import AllDirScaner, SingleDirScaner
 from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
-from ._base_widgets import (ClipBoardItem, NotifyWid, UHBoxLayout, UMainWindow,
+from ._base_widgets import (Buffer, NotifyWid, UHBoxLayout, UMainWindow,
                             UVBoxLayout)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -74,7 +74,7 @@ class WinMain(UMainWindow):
         self.setMenuBar(BarMacos())
 
         self.view_win: WinImageView
-        self.buffer: ClipBoardItem = None
+        self.buffer: Buffer = None
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -286,11 +286,11 @@ class WinMain(UMainWindow):
         if dest is None:
             dest = QFileDialog.getExistingDirectory()
             if dest:
-                self.buffer.target_dir = dest
+                self.buffer.dst_dir = dest
                 copy_files_win = self.copy_files_win()
                 copy_files_win.finished_.connect(Utils.reveal_files)
         else:
-            self.buffer.target_dir = dest
+            self.buffer.dst_dir = dest
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(Utils.reveal_files)
 
@@ -302,12 +302,12 @@ class WinMain(UMainWindow):
                 Utils.get_abs_any_path(mf.curr_path, i)
                 for i in rel_paths
             ]
-            self.buffer = ClipBoardItem()
+            self.buffer = Buffer()
             self.grid.clipboard_item = self.buffer
-            self.buffer.action_type = action_type
-            self.buffer.files_to_copy = abs_paths
-            self.buffer.source_mf = Mf.current
-            self.buffer.source_dirs = list(set(
+            self.buffer.type_ = action_type
+            self.buffer.src_files = abs_paths
+            self.buffer.src_mf = Mf.current
+            self.buffer.src_dirs = list(set(
                 os.path.dirname(i)
                 for i in abs_paths
             ))
@@ -356,32 +356,32 @@ class WinMain(UMainWindow):
     def paste_files_here(self, parent: QWidget, mf: Mf):
 
         def set_files_copied(f: list[str]):
-            self.buffer.files_copied = f
+            self.buffer.dst_files = f
 
         def scan_dirs():
 
-            if not self.buffer.files_copied:
+            if not self.buffer.dst_files:
                 print("ни один файл не был скопирован")
                 self.buffer = None
                 self.grid.clipboard_item = None
                 return
 
-            self.buffer.target_mf = Mf.current
-            self.buffer.target_dir = abs_current_dir
+            self.buffer.dst_mf = Mf.current
+            self.buffer.dst_dir = abs_current_dir
 
             scaner_item = SingleDirScanerItem(
                 data={
-                    self.buffer.target_mf: [self.buffer.target_dir, ],
+                    self.buffer.dst_mf: [self.buffer.dst_dir, ],
                     }
             )
 
-            if self.buffer.action_type == "cut":
+            if self.buffer.type_ == "cut":
                 # нам нужно просканировать тот Mf и директории
                 # откуда был вырезан контент
                 # и тот Mf и директории, куда был вставлен контент
                 scaner_item.data.update(
                     {
-                        self.buffer.source_mf: self.buffer.source_dirs,
+                        self.buffer.src_mf: self.buffer.src_dirs,
                     }
                 )
 
@@ -393,7 +393,7 @@ class WinMain(UMainWindow):
             copy_files_win.finished_.connect(scan_dirs)
 
         abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
-        copy_self = abs_current_dir in self.buffer.source_dirs
+        copy_self = abs_current_dir in self.buffer.src_dirs
         if copy_self:
             # копировать в себя нельзя
             self.win_warn = WinWarn(
@@ -457,13 +457,13 @@ class WinMain(UMainWindow):
 
         def fin(target_dir: str):
             self.upload_win.deleteLater()
-            self.buffer = ClipBoardItem()
+            self.buffer = Buffer()
             self.grid.clipboard_item = self.buffer
-            self.buffer.action_type = "copy"
-            self.buffer.target_mf = Mf.current
-            self.buffer.target_dir = target_dir
-            self.buffer.files_to_copy = abs_paths
-            self.buffer.source_dirs = list(set(os.path.dirname(i) for i in abs_paths))
+            self.buffer.type_ = "copy"
+            self.buffer.dst_mf = Mf.current
+            self.buffer.dst_dir = target_dir
+            self.buffer.src_files = abs_paths
+            self.buffer.src_dirs = list(set(os.path.dirname(i) for i in abs_paths))
             self.paste_files_here(self.grid, Mf.current)
 
         target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
@@ -690,9 +690,9 @@ class WinMain(UMainWindow):
 
     def copy_files_win(self):
         progress_win = WinCopyFiles(
-            src_urls=self.buffer.files_to_copy,
-            dst_dir=self.buffer.target_dir,
-            is_cut=self.buffer.action_type
+            src_urls=self.buffer.src_files,
+            dst_dir=self.buffer.dst_dir,
+            is_cut=self.buffer.type_
         )
         progress_win.center_to_parent(self)
         progress_win.show()   

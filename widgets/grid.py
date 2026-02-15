@@ -18,7 +18,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (ClipBoardItem, NotifyWid, UMenu, USubMenu,
+from ._base_widgets import (Buffer, NotifyWid, UMenu, USubMenu,
                             USvgSqareWidget, UVBoxLayout, VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save, SaveAs,
@@ -414,7 +414,7 @@ class Grid(VScrollArea):
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
-        self.clipboard_item: ClipBoardItem = None
+        self.clipboard_item: Buffer = None
         self.go_to_url: str = None
 
         self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(cfg.apps)}
