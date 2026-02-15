@@ -170,7 +170,7 @@ class WinMain(UMainWindow):
         self.grid.open_in_app.connect(
             lambda data: self.open_in_app(self.grid, Mf.current, data))
         self.grid.paste_files.connect(
-            lambda: self.paste_files_here(self.grid,  Mf.current)
+            lambda: self.paste_files(self.grid,  Mf.current)
         )
         self.grid.copy_files.connect(
             lambda data: self.set_clipboard(self.grid, Mf.current, data)
@@ -356,7 +356,7 @@ class WinMain(UMainWindow):
         Utils.copy_text("\n".join(abs_paths))
 
     @with_conn
-    def paste_files_here(self, parent: QWidget, mf: Mf):
+    def paste_files(self, parent: QWidget, mf: Mf):
 
         def set_buffer_dst_files(f: list[str]):
             self.buffer.dst_files = f
@@ -391,6 +391,17 @@ class WinMain(UMainWindow):
             self.start_scaner_task(scaner_item=scaner_item)
 
         def start_copy_files():
+            self.buffer.dst_dir = Utils.get_abs_any_path(
+                mf_path=Mf.current.curr_path,
+                rel_path=Dynamic.current_dir
+            )
+            
+
+            # print(self.buffer.src_files)
+            # print(self.buffer.dst_dir)
+            # print(self.buffer.type_)
+            # return
+        
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda f: set_buffer_dst_files(f))
             copy_files_win.finished_.connect(scan_dirs)
@@ -472,7 +483,7 @@ class WinMain(UMainWindow):
             )
 
             self.grid.buffer = self.buffer
-            self.paste_files_here(self.grid, Mf.current)
+            self.paste_files(self.grid, Mf.current)
 
         target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
 
@@ -718,7 +729,7 @@ class WinMain(UMainWindow):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         
         if a0.key() == Qt.Key.Key_V:
-            self.paste_files_here(self.grid, Mf.current)
+            self.paste_files(self.grid, Mf.current)
         
         elif a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
