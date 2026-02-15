@@ -375,12 +375,7 @@ class WinMain(UMainWindow):
             scaner_item = SingleDirScanerItem(
                 data={self.buffer.dst_mf: [self.buffer.dst_dir, ], }
             )
-            from dataclasses import asdict
-            print(asdict(scaner_item))
             if self.buffer.type_ == "cut":
-                # нам нужно просканировать тот Mf и директории
-                # откуда был вырезан контент
-                # и тот Mf и директории, куда был вставлен контент
                 if self.buffer.dst_mf != self.buffer.src_mf:
                     scaner_item.data.update(
                         {self.buffer.src_mf: self.buffer.src_dirs,}
