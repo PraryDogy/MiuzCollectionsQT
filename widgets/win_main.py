@@ -378,15 +378,8 @@ class WinMain(UMainWindow):
     @with_conn
     def paste_files(self, parent: QWidget, mf: Mf):
 
-        def set_buffer_dst_files(f: list[str]):
-            self.buffer.dst_files = f
-
-        def scan_dirs():
-
-            if not self.buffer.dst_files:
-                print("ни один файл не был скопирован")
-                self.buffer = None
-                self.grid.buffer = None
+        def scan_dirs(files: list[str]):
+            if not files:
                 return
 
             self.buffer.dst_mf = Mf.current
@@ -414,8 +407,7 @@ class WinMain(UMainWindow):
             )
         
             copy_files_win = self.copy_files_win()
-            copy_files_win.finished_.connect(lambda f: set_buffer_dst_files(f))
-            copy_files_win.finished_.connect(scan_dirs)
+            copy_files_win.finished_.connect(lambda files: scan_dirs(files))
 
         abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
         copy_self = abs_current_dir in self.buffer.src_dirs
@@ -489,8 +481,7 @@ class WinMain(UMainWindow):
                 src_mf=None,
                 src_files=abs_paths,
                 dst_dir=target_dir,
-                dst_mf=Mf.current,
-                dst_files=None
+                dst_mf=Mf.current
             )
 
             self.grid.buffer = self.buffer
