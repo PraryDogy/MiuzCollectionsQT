@@ -304,7 +304,9 @@ class WinMain(UMainWindow):
             self.buffer.src_files = src_abs_paths
 
         if dest is None:
-            dest = QFileDialog.getExistingDirectory()
+            dest = QFileDialog.getExistingDirectory(
+                directory=os.path.expanduser("~/Downloads")
+            )
             if dest:
                 self.buffer.dst_dir = dest
                 copy_files_win = self.copy_files_win()
