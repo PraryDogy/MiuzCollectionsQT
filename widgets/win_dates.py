@@ -5,13 +5,13 @@ from typing import Literal
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QLabel, QPushButton, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QLabel, QSpacerItem, QWidget
 
 from cfg import Dynamic, cfg
 from system.lang import Lng
 
-from ._base_widgets import (SingleActionWindow, UHBoxLayout, ULineEdit,
-                            UVBoxLayout)
+from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
+                            ULineEdit, UVBoxLayout)
 
 
 class DatesTools:
@@ -229,7 +229,7 @@ class WinDates(SingleActionWindow):
         self.right_date_wid.dateChangedSignal.connect(right_cmd)
         dates_h_lay.addWidget(self.right_date_wid)
 
-        clear_btn = QPushButton(text=Lng.reset[cfg.lng])
+        clear_btn = SmallBtn(text=Lng.reset[cfg.lng])
         clear_btn.setFixedWidth(100)
         clear_btn.clicked.connect(self.clear_btn_cmd)
         self.central_layout.addWidget(
@@ -247,7 +247,7 @@ class WinDates(SingleActionWindow):
         btns_h_lay.addStretch(1)
         btns_h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.ok_btn = QPushButton(text=Lng.ok[cfg.lng])
+        self.ok_btn = SmallBtn(text=Lng.ok[cfg.lng])
         self.ok_btn.setFixedWidth(90)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_h_lay.addWidget(self.ok_btn)
@@ -255,7 +255,7 @@ class WinDates(SingleActionWindow):
         spacer_item = QSpacerItem(10, 1)
         btns_h_lay.addItem(spacer_item)
 
-        cancel_btn = QPushButton(text=Lng.cancel[cfg.lng])
+        cancel_btn = SmallBtn(text=Lng.cancel[cfg.lng])
         self.ok_btn.setFixedWidth(90)
         cancel_btn.clicked.connect(self.cancel_cmd)
         btns_h_lay.addWidget(cancel_btn)
