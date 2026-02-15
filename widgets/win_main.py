@@ -312,6 +312,7 @@ class WinMain(UMainWindow):
                 dst_mf=None,
                 dst_files=None
             )
+
             self.grid.buffer = self.buffer
             if self.buffer.type_ == "cut":
                 for i in self.grid.selected_widgets:
