@@ -1,12 +1,13 @@
-from typing_extensions import Optional, Literal
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 @dataclass(slots=True)
 class Test:
-    varibale: Literal["a", "b"]
+    data: dict
 
 
-data = {
-    "a": 1,
-    "b": 2
-}
+a = Test({"a": 1})
+
+a.data.update({"b": 2})
+
+
+print(asdict(a))
