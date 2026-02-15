@@ -395,12 +395,6 @@ class WinMain(UMainWindow):
                 mf_path=Mf.current.curr_path,
                 rel_path=Dynamic.current_dir
             )
-            
-
-            # print(self.buffer.src_files)
-            # print(self.buffer.dst_dir)
-            # print(self.buffer.type_)
-            # return
         
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda f: set_buffer_dst_files(f))
