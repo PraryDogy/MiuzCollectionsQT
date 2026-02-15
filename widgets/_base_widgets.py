@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QPushButton, QScrollArea,
                              QTextEdit, QVBoxLayout, QWidget)
-from typing_extensions import Literal
+from typing_extensions import Literal, Optional
 
 from cfg import Static, cfg
 from system.lang import Lng
@@ -351,9 +351,9 @@ class Buffer:
     src_mf: Mf
     src_files: list[str]
 
-    dst_dir: str
-    dst_mf: Mf
-    dst_files: list[str]
+    dst_dir: Optional[str]
+    dst_mf: Optional[Mf]
+    dst_files: Optional[list[str]]
    
 
 class NotifyWid(QFrame):

@@ -308,9 +308,9 @@ class WinMain(UMainWindow):
                 src_dirs=src_dirs,
                 src_mf=Mf.current,
                 src_files=abs_paths,
-                dst_dir="",
-                dst_mf="",
-                dst_files=""
+                dst_dir=None,
+                dst_mf=None,
+                dst_files=None
             )
             self.grid.buffer = self.buffer
             if self.buffer.type_ == "cut":
