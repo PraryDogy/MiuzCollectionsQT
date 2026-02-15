@@ -278,6 +278,11 @@ class WinMain(UMainWindow):
 
     @with_conn
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
+
+        def save_finished(files):
+            Utils.reveal_files(files)
+            self.buffer = None
+
         dest, dst_rel_paths = data
         src_abs_paths = [
             Utils.get_abs_any_path(mf.curr_path, i)
@@ -303,7 +308,7 @@ class WinMain(UMainWindow):
             if dest:
                 self.buffer.dst_dir = dest
                 copy_files_win = self.copy_files_win()
-                copy_files_win.finished_.connect(Utils.reveal_files)
+                copy_files_win.finished_.connect(save_finished)
         else:
             self.buffer.dst_dir = dest
             copy_files_win = self.copy_files_win()
