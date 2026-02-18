@@ -627,6 +627,9 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
+            from datetime import datetime
+            now = datetime.now().time().replace(microsecond=0)
+            print("штатно запускаю сканер", now)
             if scaner_item:
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,

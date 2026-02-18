@@ -1,13 +1,3 @@
-from dataclasses import dataclass, asdict
+from datetime import datetime
 
-@dataclass(slots=True)
-class Test:
-    data: dict
-
-
-a = Test({"a": 1})
-
-a.data.update({"b": 2})
-
-
-print(asdict(a))
+print(datetime.now().time().replace(microsecond=0))
