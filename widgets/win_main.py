@@ -490,10 +490,14 @@ class WinMain(UMainWindow):
 
         target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
 
-        self.upload_win = WinUpload(target_dir)
-        self.upload_win.center_to_parent(self)
-        self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
+        from test import TreeWid
+        self.upload_win = TreeWid([target_dir, ])
         self.upload_win.show()
+
+        # self.upload_win = WinUpload(target_dir)
+        # self.upload_win.center_to_parent(self)
+        # self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
+        # self.upload_win.show()
 
     @with_conn
     def open_info_win(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
