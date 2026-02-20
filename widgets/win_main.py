@@ -411,7 +411,10 @@ class WinMain(UMainWindow):
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda files: scan_dirs(files))
 
-        abs_current_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
+        abs_current_dir = Utils.get_abs_any_path(
+            mf_path=mf.curr_path, 
+            rel_path=Dynamic.current_dir
+        )
         copy_self = abs_current_dir in self.buffer.src_dirs
         if copy_self:
             # копировать в себя нельзя
