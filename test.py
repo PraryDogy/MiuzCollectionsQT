@@ -2,7 +2,11 @@ import os
 
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
+from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QWidget
+
+from cfg import cfg
+from system.lang import Lng
+from widgets._base_widgets import SingleActionWindow, SmallBtn, UHBoxLayout
 
 
 class TreeWid(QTreeWidget):
@@ -17,64 +21,57 @@ class TreeWid(QTreeWidget):
         super().__init__()
         self.selected_path: str = None
         self.items: dict[str, QTreeWidgetItem] = {}
-
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
-        self.setIndentation(15)
+        self.setIndentation(10)
+        self.build_tree(paths)
 
-        root_item = self.init_ui()
-        self.build_tree(root_item, paths)
-
-    # --- построение ---
-    def init_ui(self):
-        root_item = QTreeWidgetItem(["TEST"])
-        root_item.setSizeHint(0, QSize(0, self.item_height))
-        root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
-        root_item.setIcon(0, QIcon(self.svg_folder))
-        self.addTopLevelItem(root_item)
-        return root_item
-
-    def build_tree(self, root_item: QTreeWidgetItem, paths: list[str]) -> None:
-        self.items = {os.sep: root_item}
+    def build_tree(self, paths: list[str]) -> None:
+        self.clear()
+        self.items = {}
 
         for full_path in sorted(paths):
             full_path = os.path.normpath(full_path)
-
             parts = full_path.split(os.sep)
+
             current_path = ""
+            parent_item = None
 
             for part in parts:
-                if not part:
+                if part == "":
                     current_path = os.sep
                     continue
 
-                current_path = os.path.join(current_path, part)
+                if current_path == os.sep:
+                    current_path = os.path.join(os.sep, part)
+                else:
+                    current_path = os.path.join(current_path, part)
 
                 if current_path not in self.items:
-                    parent_path = os.path.dirname(current_path) or os.sep
-                    parent_item = self.items.get(parent_path)
-                    if parent_item is None:
-                        continue
-
                     item = QTreeWidgetItem([part])
                     item.setIcon(0, QIcon(self.svg_folder))
                     item.setSizeHint(0, QSize(0, self.item_height))
                     item.setData(0, Qt.UserRole, current_path)
 
-                    parent_item.addChild(item)
+                    if parent_item:
+                        parent_item.addChild(item)
+                    else:
+                        self.addTopLevelItem(item)
+
                     self.items[current_path] = item
 
-        root_item.setExpanded(True)
+                parent_item = self.items[current_path]
+
         if paths:
-            last_path = max(paths, key=len)  # самый глубокий
-            self.expand_to_path(last_path)
+            last_path = max(paths, key=len)
+            self.expand_to_path(os.path.normpath(last_path))
 
     def expand_to_path(self, path: str):
-        if not path or path not in self.items:
+        path = os.path.normpath(path)
+        item = self.items.get(path)
+        if not item:
             return
-
-        item = self.items[path]
 
         while item:
             item.setExpanded(True)
@@ -83,10 +80,38 @@ class TreeWid(QTreeWidget):
         self.setCurrentItem(self.items[path])
         self.scrollToItem(self.items[path], QTreeWidget.PositionAtCenter)
 
-# from PyQt5.QtWidgets import QApplication
 
-# paths = ["/Users/evlosh/Desktop",]
-# app = QApplication([])
-# wid = TreeWid(paths)
-# wid.show()
-# app.exec()
+class UploadWin(SingleActionWindow):
+    ok_clicked = pyqtSignal()
+
+    def __init__(self, paths: list[str]):
+        super().__init__()
+        self.setWindowTitle(Lng.upload_in[cfg.lng])
+        self.setFixedSize(400, 400)
+        tree = TreeWid(paths)
+        self.central_layout.addWidget(tree)
+        self.central_layout.setSpacing(10)
+
+        btn_wid = QWidget()
+        self.central_layout.addWidget(btn_wid)
+        btn_lay = UHBoxLayout()
+        btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        btn_lay.setSpacing(10)
+        btn_wid.setLayout(btn_lay)
+
+        ok_btn = SmallBtn(Lng.ok[cfg.lng])
+        ok_btn.clicked.connect(self.ok_clicked)
+        ok_btn.setFixedWidth(90)
+        btn_lay.addWidget(ok_btn)
+
+        cancel_btn = SmallBtn(Lng.cancel[cfg.lng])
+        cancel_btn.clicked.connect(self.deleteLater)
+        cancel_btn.setFixedWidth(90)
+        btn_lay.addWidget(cancel_btn)
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+            self.ok_clicked.emit()
+        return super().keyPressEvent(a0)
