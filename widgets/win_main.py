@@ -1,7 +1,6 @@
 import gc
 import os
 import subprocess
-from test import UploadWin
 from time import time
 
 from PyQt5.QtCore import Qt, QTimer
@@ -28,12 +27,13 @@ from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
 from .servers_win import ServersWin
+from .upload_win import UploadWin
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
-from .win_warn import WinQuestion, WinUpload, WinWarn
+from .win_warn import WinQuestion, WinWarn
 
 
 class TestWid(QFrame):

@@ -7,8 +7,9 @@ from PyQt5.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
 
 from cfg import cfg
 from system.lang import Lng
-from widgets._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
-                                   UVBoxLayout)
+
+from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
+                            UVBoxLayout)
 
 
 class TreeWid(QTreeWidget):
@@ -27,6 +28,7 @@ class TreeWid(QTreeWidget):
         self.setAutoScroll(False)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
         self.setIndentation(10)
+        self.setSelectionMode(QTreeWidget.NoSelection)
         self.build_tree(paths)
 
     def build_tree(self, paths: list[str]) -> None:
