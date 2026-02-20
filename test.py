@@ -17,7 +17,7 @@ class TreeWid(QTreeWidget):
 
     svg_folder = "./images/folder.svg"
     svg_size = 16
-    item_height = 25
+    item_height = 20
 
     def __init__(self, paths: list[str]):
         super().__init__()
