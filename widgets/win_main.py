@@ -483,7 +483,8 @@ class WinMain(UMainWindow):
                 src_mf=None,
                 src_files=abs_paths,
                 dst_dir=target_dir,
-                dst_mf=Mf.current
+                dst_mf=Mf.current,
+                dst_files=None
             )
 
             self.grid.buffer = self.buffer
