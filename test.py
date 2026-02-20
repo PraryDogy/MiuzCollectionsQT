@@ -2,11 +2,13 @@ import os
 
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QWidget
+from PyQt5.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
+                             QWidget)
 
 from cfg import cfg
 from system.lang import Lng
-from widgets._base_widgets import SingleActionWindow, SmallBtn, UHBoxLayout
+from widgets._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
+                                   UVBoxLayout)
 
 
 class TreeWid(QTreeWidget):
@@ -88,9 +90,19 @@ class UploadWin(SingleActionWindow):
         super().__init__()
         self.setWindowTitle(Lng.upload_in[cfg.lng])
         self.setFixedSize(400, 400)
+        self.central_layout.setSpacing(10)
+
+        group = QGroupBox()
+        self.central_layout.addWidget(group)
+
+        group_lay = UVBoxLayout()
+        group.setLayout(group_lay)
+
+        descr = QLabel(Lng.upload_descr[cfg.lng])
+        group_lay.addWidget(descr)
+
         tree = TreeWid(paths)
         self.central_layout.addWidget(tree)
-        self.central_layout.setSpacing(10)
 
         btn_wid = QWidget()
         self.central_layout.addWidget(btn_wid)

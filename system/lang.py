@@ -166,8 +166,6 @@ class Lng:
         "At least one images folder required."
     )
     confirm_delete_folder = ("Вы уверены, что хотите удалить папку?", "Are you sure you want to delete the folder?")
-    upload_path = ("Директория загрузки", "Upload path")
-    upload = ("Загрузка", "Upload")
     images = ("Изображения", "Images")
     menu = ("Меню", "Menu")
     dates = ("Календарь", "Calendar")
@@ -275,7 +273,6 @@ class Lng:
     )
     all_images = ("Все изображения", "All images")
     only_this_folder = ("Показать только в этой папке", "Show only this folder")
-    upload_files_in = ("Файлы будут загружены в папку:", "Files will be uploaded to:")
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрывать нумерацию", "Hide numbering")
     go_to_folder = ("Перейти к папке", "Go to folder")
@@ -311,6 +308,10 @@ class Lng:
     login = ("логин", "login")
     password = ("пароль", "password")
     upload_in = ("Загрузить в ...", "Upload in ...")
+    upload_descr = (
+        "Вы загрузите изображения в коллекции.\nНажмите Oк.",
+        "You will upload images to collections.\nClick Ok."
+    )
     swipe_text = ("\u2039 Проведите мышкой \u203A", "\u2039 Drag with mouse \u203A")
     rotate = ("Повернуть", "Rotate")
     clockwise = ("Повернуть по ч.с.", "Rotate cw")
