@@ -85,6 +85,7 @@ class TreeWid(QTreeWidget):
 
 class UploadWin(SingleActionWindow):
     ok_clicked = pyqtSignal()
+    mrg = 2
 
     def __init__(self, target_dir: str, target_files: list[str]):
         super().__init__()
@@ -96,6 +97,7 @@ class UploadWin(SingleActionWindow):
         self.central_layout.addWidget(group)
 
         group_lay = UVBoxLayout()
+        group_lay.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
         group.setLayout(group_lay)
 
         descr = QLabel(Lng.upload_descr[cfg.lng])
