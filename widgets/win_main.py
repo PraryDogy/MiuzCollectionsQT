@@ -294,7 +294,6 @@ class WinMain(UMainWindow):
             self.buffer = Buffer(
                 type_="copy",
                 dirs_to_scan=None,
-                src_mf=None,
                 files_to_copy=src_abs_paths,
                 dst_dir=None,
                 mf_to_scan=None
@@ -328,7 +327,6 @@ class WinMain(UMainWindow):
             self.buffer = Buffer(
                 type_=action_type,
                 dirs_to_scan=src_dirs,
-                src_mf=Mf.current,
                 files_to_copy=abs_paths,
                 dst_dir=None,
                 mf_to_scan=None
@@ -387,12 +385,14 @@ class WinMain(UMainWindow):
             self.buffer.dst_dir = abs_current_dir
 
             scaner_item = SingleDirScanerItem(
-                data={self.buffer.mf_to_scan: [self.buffer.dst_dir, ], }
+                data={
+                    self.buffer.mf_to_scan: [self.buffer.dst_dir, ], 
+                }
             )
             if self.buffer.type_ == "cut":
-                if self.buffer.mf_to_scan != self.buffer.src_mf:
+                if self.buffer.mf_to_scan != Mf.current:
                     scaner_item.data.update(
-                        {self.buffer.src_mf: self.buffer.dirs_to_scan,}
+                        {Mf.current: self.buffer.dirs_to_scan,}
                     )
                 else:
                     scaner_item.data[self.buffer.mf_to_scan].extend(
@@ -481,7 +481,6 @@ class WinMain(UMainWindow):
             self.buffer = Buffer(
                 type_="copy",
                 dirs_to_scan=list(set(os.path.dirname(i) for i in abs_paths)),
-                src_mf=None,
                 files_to_copy=abs_paths,
                 dst_dir=target_dir,
                 mf_to_scan=Mf.current
