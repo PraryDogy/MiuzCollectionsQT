@@ -297,7 +297,7 @@ class WinMain(UMainWindow):
                 src_mf=None,
                 files_to_copy=src_abs_paths,
                 dst_dir=None,
-                dst_mf=None
+                mf_to_scan=None
             )
             self.grid.buffer = self.buffer
         else:
@@ -331,7 +331,7 @@ class WinMain(UMainWindow):
                 src_mf=Mf.current,
                 files_to_copy=abs_paths,
                 dst_dir=None,
-                dst_mf=None
+                mf_to_scan=None
             )
 
             self.grid.buffer = self.buffer
@@ -383,19 +383,19 @@ class WinMain(UMainWindow):
             if not files:
                 return
 
-            self.buffer.dst_mf = Mf.current
+            self.buffer.mf_to_scan = Mf.current
             self.buffer.dst_dir = abs_current_dir
 
             scaner_item = SingleDirScanerItem(
-                data={self.buffer.dst_mf: [self.buffer.dst_dir, ], }
+                data={self.buffer.mf_to_scan: [self.buffer.dst_dir, ], }
             )
             if self.buffer.type_ == "cut":
-                if self.buffer.dst_mf != self.buffer.src_mf:
+                if self.buffer.mf_to_scan != self.buffer.src_mf:
                     scaner_item.data.update(
                         {self.buffer.src_mf: self.buffer.dirs_to_scan,}
                     )
                 else:
-                    scaner_item.data[self.buffer.dst_mf].extend(
+                    scaner_item.data[self.buffer.mf_to_scan].extend(
                         self.buffer.dirs_to_scan
                     )
             self.start_scaner_task(scaner_item=scaner_item)
@@ -484,7 +484,7 @@ class WinMain(UMainWindow):
                 src_mf=None,
                 files_to_copy=abs_paths,
                 dst_dir=target_dir,
-                dst_mf=Mf.current
+                mf_to_scan=Mf.current
             )
 
             self.grid.buffer = self.buffer

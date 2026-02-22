@@ -352,7 +352,7 @@ class Buffer:
     files_to_copy: Optional[list[str]]
 
     dst_dir: Optional[str]
-    dst_mf: Optional[Mf]
+    mf_to_scan: Optional[Mf]
    
 
 class NotifyWid(QFrame):
