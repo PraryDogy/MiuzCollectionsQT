@@ -4,7 +4,7 @@ from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
                              QWidget)
-
+from PyQt5.QtSvg import QSvgWidget
 from cfg import cfg
 from system.lang import Lng
 
@@ -86,6 +86,11 @@ class TreeWid(QTreeWidget):
 class UploadWin(SingleActionWindow):
     ok_clicked = pyqtSignal()
     mrg = 2
+    group_spacing = 7
+    btn_spacing = 10
+    icon_size = 35
+    btn_w = 90
+    icon_path = "./images/warning.svg"
 
     def __init__(self, target_dir: str, target_files: list[str]):
         super().__init__()
@@ -96,9 +101,15 @@ class UploadWin(SingleActionWindow):
         group = QGroupBox()
         self.central_layout.addWidget(group)
 
-        group_lay = UVBoxLayout()
+        group_lay = UHBoxLayout()
         group_lay.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
+        group_lay.setSpacing(self.group_spacing)
         group.setLayout(group_lay)
+
+        warn = QSvgWidget()
+        warn.load(self.icon_path)
+        warn.setFixedSize(self.icon_size, self.icon_size)
+        group_lay.addWidget(warn)
 
         descr = QLabel(Lng.upload_descr[cfg.lng])
         group_lay.addWidget(descr)
@@ -110,17 +121,17 @@ class UploadWin(SingleActionWindow):
         self.central_layout.addWidget(btn_wid)
         btn_lay = UHBoxLayout()
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        btn_lay.setSpacing(10)
+        btn_lay.setSpacing(self.btn_spacing)
         btn_wid.setLayout(btn_lay)
 
         ok_btn = SmallBtn(Lng.ok[cfg.lng])
         ok_btn.clicked.connect(self.ok_clicked)
-        ok_btn.setFixedWidth(90)
+        ok_btn.setFixedWidth(self.btn_w)
         btn_lay.addWidget(ok_btn)
 
         cancel_btn = SmallBtn(Lng.cancel[cfg.lng])
         cancel_btn.clicked.connect(self.deleteLater)
-        cancel_btn.setFixedWidth(90)
+        cancel_btn.setFixedWidth(self.btn_w)
         btn_lay.addWidget(cancel_btn)
 
     def keyPressEvent(self, a0):
