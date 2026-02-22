@@ -383,21 +383,24 @@ class WinMain(UMainWindow):
 
             self.buffer.mf_to_scan = Mf.current
             self.buffer.dst_dir = abs_current_dir
-
-            scaner_item = SingleDirScanerItem(
-                data={
-                    self.buffer.mf_to_scan: [self.buffer.dst_dir, ], 
-                }
-            )
+            scaner_data = {
+                self.buffer.mf_to_scan: [self.buffer.dst_dir, ], 
+            }
             if self.buffer.type_ == "cut":
+                # если Mf откуда вырезаны файлы и Mf куда вставлены файла
+                # это разные объекты, то нужно просканировать оба объекта
                 if self.buffer.mf_to_scan != Mf.current:
-                    scaner_item.data.update(
+                    scaner_data.update(
                         {Mf.current: self.buffer.dirs_to_scan,}
                     )
+                # если файлы вырезаны и вставлены в рамках одного Mf,
+                # то нужно просканировать директорию, откуда вырезаны файлы
+                # и директорию, куда вставлены файлы
                 else:
-                    scaner_item.data[self.buffer.mf_to_scan].extend(
+                    scaner_data[self.buffer.mf_to_scan].extend(
                         self.buffer.dirs_to_scan
                     )
+            scaner_item = SingleDirScanerItem(data=scaner_data)
             self.start_scaner_task(scaner_item=scaner_item)
 
         def start_copy_files():
