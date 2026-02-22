@@ -347,13 +347,12 @@ class VListWidget(QListWidget):
 class Buffer:
     type_: Literal["cut", "copy"]
 
-    src_dirs: Optional[list[str]]
+    dirs_to_scan: Optional[list[str]]
     src_mf: Optional[Mf]
-    src_files: Optional[list[str]]
+    files_to_copy: Optional[list[str]]
 
     dst_dir: Optional[str]
     dst_mf: Optional[Mf]
-    dst_files: Optional[list[str]]
    
 
 class NotifyWid(QFrame):
