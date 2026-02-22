@@ -483,6 +483,7 @@ class WinMain(UMainWindow):
                     for i in abs_paths
                 )
             )
+            
             self.buffer = Buffer(
                 type_="copy",
                 dirs_to_scan=dirs_to_scan,
