@@ -468,23 +468,25 @@ class WinMain(UMainWindow):
         self.remove_files_win.show()
     
     @with_conn
-    def upload_files(self, parent: QWidget, mf: Mf, abs_paths: list):
-
-        def shorten_path(path: str, max_len=50):
-            splited = path.strip(os.sep).split(os.sep)
-            max_len = max_len - len(splited[0]) - len(splited[-1])
-            while len(os.sep.join(splited[1:-1])) > max_len:
-                splited.pop(1)
-            splited.insert(1, "...")
-            return os.sep + os.sep.join(splited)
+    def upload_files(self, parent: QWidget, mf: Mf, abs_paths: list[str]):
 
         def fin(target_dir: str):
             self.upload_win.deleteLater()
-
+            files_to_copy = [
+                i
+                for i in abs_paths
+                if i.endswith(ImgUtils.ext_all)
+            ]
+            dirs_to_scan = list(
+                set(
+                    os.path.dirname(i)
+                    for i in abs_paths
+                )
+            )
             self.buffer = Buffer(
                 type_="copy",
-                dirs_to_scan=list(set(os.path.dirname(i) for i in abs_paths)),
-                files_to_copy=abs_paths,
+                dirs_to_scan=dirs_to_scan,
+                files_to_copy=files_to_copy,
                 dst_dir=target_dir,
                 mf_to_scan=Mf.current
             )
@@ -805,18 +807,6 @@ class WinMain(UMainWindow):
             for i in a0.mimeData().urls()
         ]
 
-        for i in paths:
-            if os.path.isdir(i):
-                self.win_warn = WinWarn(
-                    Lng.attention[cfg.lng],
-                    Lng.drop_only_files[cfg.lng]
-                )
-                self.win_warn.resize(280, 80)
-                self.win_warn.center_to_parent(self)
-                self.win_warn.show()
-                return
-
         if paths:
             self.upload_files(self.grid, Mf.current, paths)
-
         return super().dropEvent(a0)
