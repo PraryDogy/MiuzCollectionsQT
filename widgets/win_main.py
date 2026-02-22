@@ -11,7 +11,7 @@ from typing_extensions import Literal, Optional
 
 from cfg import Dynamic, Static, cfg
 from system.filters import Filters
-from system.items import (ExtScanerItem, OnStartItem, SettingsItem,
+from system.items import (Buffer, ExtScanerItem, OnStartItem, SettingsItem,
                           SingleDirScanerItem)
 from system.lang import Lng
 from system.main_folder import Mf
@@ -19,8 +19,7 @@ from system.multiprocess import FilesRemover, OnStartTask, ProcessWorker
 from system.scaner import AllDirScaner, SingleDirScaner
 from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
-from ._base_widgets import (Buffer, NotifyWid, UHBoxLayout, UMainWindow,
-                            UVBoxLayout)
+from ._base_widgets import NotifyWid, UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop

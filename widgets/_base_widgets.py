@@ -343,15 +343,6 @@ class VListWidget(QListWidget):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
 
-@dataclass(slots=True)
-class Buffer:
-    type_: Literal["cut", "copy"]
-    dirs_to_scan: Optional[list[str]]
-    files_to_copy: Optional[list[str]]
-    dst_dir: Optional[str]
-    mf_to_scan: Optional[Mf]
-   
-
 class NotifyWid(QFrame):
     blue = "rgb(70, 130, 240)"
     yy = 10

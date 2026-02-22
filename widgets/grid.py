@@ -11,15 +11,15 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGridLayout, QLabel, QRubberBand, QWidget)
 
 from cfg import Dynamic, Static, cfg
-from system.items import SettingsItem
+from system.items import Buffer, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (Buffer, NotifyWid, UMenu, USubMenu,
-                            USvgSqareWidget, UVBoxLayout, VScrollArea)
+from ._base_widgets import (NotifyWid, UMenu, USubMenu, USvgSqareWidget,
+                            UVBoxLayout, VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save, SaveAs,
                       ScanerRestart, SetFav, WinInfoAction)
