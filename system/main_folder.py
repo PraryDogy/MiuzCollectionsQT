@@ -78,12 +78,6 @@ class Mf:
             i: getattr(self, i)
             for i in self.__slots__
         }
-    
-    def get_real_name(self):
-        if self.curr_path:
-            return os.path.basename(self.curr_path)
-        else:
-            return os.path.basename(self.paths[0])
 
     @classmethod
     def init(cls):
