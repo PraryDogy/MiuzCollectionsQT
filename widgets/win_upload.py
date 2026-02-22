@@ -20,7 +20,7 @@ class TreeWid(QTreeWidget):
     svg_size = 16
     item_height = 20
 
-    def __init__(self, dest: str, files: list[str]):
+    def __init__(self, target_dir: str, target_files: list[str]):
         super().__init__()
         self.selected_path: str = None
         self.items: dict[str, QTreeWidgetItem] = {}
@@ -29,13 +29,14 @@ class TreeWid(QTreeWidget):
         self.setIconSize(QSize(self.svg_size, self.svg_size))
         self.setIndentation(10)
         self.setSelectionMode(QTreeWidget.NoSelection)
-        self.build_tree(dest, files)
+        self.build_tree(target_dir, target_files)
 
-    def build_tree(self, dest: str, files: list[str]):
+    def build_tree(self, target_dir: str, target_files: list[str]):
         self.clear()
         self.items = {}
 
-        parts = dest.split(os.sep)
+        # строим папки
+        parts = target_dir.split(os.sep)
         current_path = ""
         parent_item = None
         for part in parts:
@@ -57,10 +58,16 @@ class TreeWid(QTreeWidget):
                     self.addTopLevelItem(item)
                 self.items[current_path] = item
             parent_item = self.items[current_path]
-        self.expand_to_path(dest)
-        # if paths:
-            # last_path = max(paths, key=len)
-            # self.expand_to_path(os.path.normpath(last_path))
+
+        # добавляем файлы
+        for target_file in target_files:
+            file_name = os.path.basename(target_file)
+            file_item = QTreeWidgetItem([file_name])
+            file_item.setSizeHint(0, QSize(0, self.item_height))
+            file_item.setData(0, Qt.UserRole, file_name)
+            parent_item.addChild(file_item)
+
+        self.expand_to_path(target_dir)
 
     def expand_to_path(self, path: str):
         path = os.path.normpath(path)
@@ -77,13 +84,11 @@ class TreeWid(QTreeWidget):
 class UploadWin(SingleActionWindow):
     ok_clicked = pyqtSignal()
 
-    def __init__(self, dest: str, files: list[str]):
+    def __init__(self, target_dir: str, target_files: list[str]):
         super().__init__()
         self.setWindowTitle(Lng.upload_in[cfg.lng])
         self.setFixedSize(400, 400)
         self.central_layout.setSpacing(10)
-
-        print(files)
 
         group = QGroupBox()
         self.central_layout.addWidget(group)
@@ -94,7 +99,7 @@ class UploadWin(SingleActionWindow):
         descr = QLabel(Lng.upload_descr[cfg.lng])
         group_lay.addWidget(descr)
 
-        tree = TreeWid(dest, files)
+        tree = TreeWid(target_dir, target_files)
         self.central_layout.addWidget(tree)
 
         btn_wid = QWidget()
