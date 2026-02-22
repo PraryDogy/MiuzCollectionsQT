@@ -416,16 +416,18 @@ class WinMain(UMainWindow):
             mf_path=mf.curr_path, 
             rel_path=Dynamic.current_dir
         )
-        copy_self = abs_current_dir in self.buffer.dirs_to_scan
-        if copy_self:
-            # копировать в себя нельзя
-            self.win_warn = WinWarn(
-                Lng.attention[cfg.lng],
-                Lng.copy_name_same_dir[cfg.lng]
-            )
-            self.win_warn.resize(330, 90)
-            self.win_warn.center_to_parent(self)
-            self.win_warn.show()
+        if self.buffer.dirs_to_scan:
+            copy_self = abs_current_dir in self.buffer.dirs_to_scan
+            if copy_self:
+                # копировать в себя нельзя
+                self.win_warn = WinWarn(
+                    Lng.attention[cfg.lng],
+                    Lng.copy_name_same_dir[cfg.lng]
+                )
+                self.win_warn.resize(330, 90)
+                self.win_warn.center_to_parent(self)
+                self.win_warn.show()
+                return
         elif self.buffer:
             start_copy_files()
 
@@ -477,16 +479,10 @@ class WinMain(UMainWindow):
                 for i in abs_paths
                 if i.endswith(ImgUtils.ext_all)
             ]
-            dirs_to_scan = list(
-                set(
-                    os.path.dirname(i)
-                    for i in abs_paths
-                )
-            )
-            
+
             self.buffer = Buffer(
                 type_="copy",
-                dirs_to_scan=dirs_to_scan,
+                dirs_to_scan=None,
                 files_to_copy=files_to_copy,
                 dst_dir=target_dir,
                 mf_to_scan=Mf.current
