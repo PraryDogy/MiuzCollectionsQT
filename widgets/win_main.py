@@ -26,7 +26,7 @@ from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
 from .servers_win import ServersWin
-from .upload_win import UploadWin
+from .win_upload import UploadWin
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_image_view import WinImageView
@@ -492,8 +492,11 @@ class WinMain(UMainWindow):
             self.paste_files(self.grid, Mf.current)
 
         target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
-
-        self.upload_win = UploadWin([target_dir, ])
+        target_files = [
+            os.path.join(target_dir, os.path.basename(i))
+            for i in abs_paths
+        ]
+        self.upload_win = UploadWin(target_dir, target_files)
         self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
         self.upload_win.center_to_parent(self)
         self.upload_win.show()

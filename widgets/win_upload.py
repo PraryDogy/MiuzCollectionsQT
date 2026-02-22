@@ -20,7 +20,7 @@ class TreeWid(QTreeWidget):
     svg_size = 16
     item_height = 20
 
-    def __init__(self, paths: list[str]):
+    def __init__(self, dest: str, files: list[str]):
         super().__init__()
         self.selected_path: str = None
         self.items: dict[str, QTreeWidgetItem] = {}
@@ -29,58 +29,47 @@ class TreeWid(QTreeWidget):
         self.setIconSize(QSize(self.svg_size, self.svg_size))
         self.setIndentation(10)
         self.setSelectionMode(QTreeWidget.NoSelection)
-        self.build_tree(paths)
+        self.build_tree(dest, files)
 
-    def build_tree(self, paths: list[str]) -> None:
+    def build_tree(self, dest: str, files: list[str]):
         self.clear()
         self.items = {}
 
-        for full_path in sorted(paths):
-            full_path = os.path.normpath(full_path)
-            parts = full_path.split(os.sep)
-
-            current_path = ""
-            parent_item = None
-
-            for part in parts:
-                if part == "":
-                    current_path = os.sep
-                    continue
-
-                if current_path == os.sep:
-                    current_path = os.path.join(os.sep, part)
+        parts = dest.split(os.sep)
+        current_path = ""
+        parent_item = None
+        for part in parts:
+            if part == "":
+                current_path = os.sep
+                continue
+            if current_path == os.sep:
+                current_path = os.path.join(os.sep, part)
+            else:
+                current_path = os.path.join(current_path, part)
+            if current_path not in self.items:
+                item = QTreeWidgetItem([part])
+                item.setIcon(0, QIcon(self.svg_folder))
+                item.setSizeHint(0, QSize(0, self.item_height))
+                item.setData(0, Qt.UserRole, current_path)
+                if parent_item:
+                    parent_item.addChild(item)
                 else:
-                    current_path = os.path.join(current_path, part)
-
-                if current_path not in self.items:
-                    item = QTreeWidgetItem([part])
-                    item.setIcon(0, QIcon(self.svg_folder))
-                    item.setSizeHint(0, QSize(0, self.item_height))
-                    item.setData(0, Qt.UserRole, current_path)
-
-                    if parent_item:
-                        parent_item.addChild(item)
-                    else:
-                        self.addTopLevelItem(item)
-
-                    self.items[current_path] = item
-
-                parent_item = self.items[current_path]
-
-        if paths:
-            last_path = max(paths, key=len)
-            self.expand_to_path(os.path.normpath(last_path))
+                    self.addTopLevelItem(item)
+                self.items[current_path] = item
+            parent_item = self.items[current_path]
+        self.expand_to_path(dest)
+        # if paths:
+            # last_path = max(paths, key=len)
+            # self.expand_to_path(os.path.normpath(last_path))
 
     def expand_to_path(self, path: str):
         path = os.path.normpath(path)
         item = self.items.get(path)
         if not item:
             return
-
         while item:
             item.setExpanded(True)
             item = item.parent()
-
         self.setCurrentItem(self.items[path])
         self.scrollToItem(self.items[path], QTreeWidget.PositionAtCenter)
 
@@ -88,11 +77,13 @@ class TreeWid(QTreeWidget):
 class UploadWin(SingleActionWindow):
     ok_clicked = pyqtSignal()
 
-    def __init__(self, paths: list[str]):
+    def __init__(self, dest: str, files: list[str]):
         super().__init__()
         self.setWindowTitle(Lng.upload_in[cfg.lng])
         self.setFixedSize(400, 400)
         self.central_layout.setSpacing(10)
+
+        print(files)
 
         group = QGroupBox()
         self.central_layout.addWidget(group)
@@ -103,7 +94,7 @@ class UploadWin(SingleActionWindow):
         descr = QLabel(Lng.upload_descr[cfg.lng])
         group_lay.addWidget(descr)
 
-        tree = TreeWid(paths)
+        tree = TreeWid(dest, files)
         self.central_layout.addWidget(tree)
 
         btn_wid = QWidget()
