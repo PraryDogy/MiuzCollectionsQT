@@ -346,11 +346,8 @@ class VListWidget(QListWidget):
 @dataclass(slots=True)
 class Buffer:
     type_: Literal["cut", "copy"]
-
     dirs_to_scan: Optional[list[str]]
-    src_mf: Optional[Mf]
     files_to_copy: Optional[list[str]]
-
     dst_dir: Optional[str]
     mf_to_scan: Optional[Mf]
    
