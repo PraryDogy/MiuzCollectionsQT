@@ -17,6 +17,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import FilesRemover, OnStartTask, ProcessWorker
 from system.scaner import AllDirScaner, SingleDirScaner
+from system.shared_utils import ImgUtils
 from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
 from ._base_widgets import NotifyWid, UHBoxLayout, UMainWindow, UVBoxLayout
@@ -26,12 +27,12 @@ from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
 from .servers_win import ServersWin
-from .win_upload import UploadWin
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
+from .win_upload import UploadWin
 from .win_warn import WinQuestion, WinWarn
 
 
@@ -495,6 +496,7 @@ class WinMain(UMainWindow):
         target_files = [
             os.path.join(target_dir, os.path.basename(i))
             for i in abs_paths
+            if i.endswith(ImgUtils.ext_all)
         ]
         self.upload_win = UploadWin(target_dir, target_files)
         self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
