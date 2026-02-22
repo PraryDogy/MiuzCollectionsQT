@@ -846,7 +846,11 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(reload)
 
-            if self.buffer:
+            if (
+                self.buffer
+                and
+                a0.modifiers() == Qt.KeyboardModifier.ControlModifier
+            ):
                 self.menu_.addSeparator()
                 paste = PasteFiles(self.menu_)
                 paste.triggered.connect(
@@ -943,20 +947,21 @@ class Grid(VScrollArea):
 
             self.menu_.addSeparator()
 
-            # cut / copy / paste
-            act = CutFiles(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.copy_files.emit(("cut", rel_paths))
-            )
-            self.menu_.addAction(act)
+            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+                # cut / copy / paste
+                act = CutFiles(self.menu_, len(rel_paths))
+                act.triggered.connect(
+                    lambda: self.copy_files.emit(("cut", rel_paths))
+                )
+                self.menu_.addAction(act)
 
-            act = CopyFiles(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.copy_files.emit(("copy", rel_paths))
-            )
-            self.menu_.addAction(act)
+                act = CopyFiles(self.menu_, len(rel_paths))
+                act.triggered.connect(
+                    lambda: self.copy_files.emit(("copy", rel_paths))
+                )
+                self.menu_.addAction(act)
 
-            self.menu_.addSeparator()
+                self.menu_.addSeparator()
 
             # save / remove
             act = Save(self.menu_, len(rel_paths))
