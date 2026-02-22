@@ -29,7 +29,7 @@ class TreeWid(QTreeWidget):
         self.setAutoScroll(False)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
         self.setIndentation(10)
-        self.setSelectionMode(QTreeWidget.NoSelection)
+        # self.setSelectionMode(QTreeWidget.NoSelection)
         self.build_tree(target_dir, target_files)
 
     def build_tree(self, target_dir: str, target_files: list[str]):
