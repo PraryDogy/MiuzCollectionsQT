@@ -17,6 +17,7 @@ class TreeWid(QTreeWidget):
     tree_open = pyqtSignal(str)
 
     svg_folder = "./images/folder.svg"
+    svg_image = "./images/img.svg"
     svg_size = 16
     item_height = 20
 
@@ -63,6 +64,7 @@ class TreeWid(QTreeWidget):
         for target_file in target_files:
             file_name = os.path.basename(target_file)
             file_item = QTreeWidgetItem([file_name])
+            file_item.setIcon(0, QIcon(self.svg_image))
             file_item.setSizeHint(0, QSize(0, self.item_height))
             file_item.setData(0, Qt.UserRole, file_name)
             parent_item.addChild(file_item)
