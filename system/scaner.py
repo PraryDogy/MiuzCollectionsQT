@@ -563,7 +563,8 @@ class NewDirsWorker:
             scaner_item=scaner_item,
             dirs_to_scan=dirs_to_scan
         )
-        return None
+
+        return (del_images, new_images)
     
 
 
@@ -665,7 +666,13 @@ class AllDirScaner:
         removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
         if new_dirs:
             new_dirs.extend(removed_dirs)
-            NewDirsWorker.start(new_dirs, scaner_item)
+            del_images, new_images = NewDirsWorker.start(new_dirs, scaner_item)
+            if del_images or new_images:
+                ext_scaner_item = ExtScanerItem(
+                    gui_text="",
+                    reload_gui=True
+                )
+                scaner_item.q.put(ext_scaner_item)
         # это нужно, когда удален целый каталог вместе с корневой папкой
         # типа не все фотки из папки "test" и папка "test" пуста,
         # а была удалена папка "test"
@@ -713,4 +720,10 @@ class SingleDirScaner:
                 )
                 dir_items.append(item)
             if dir_items:
-                NewDirsWorker.start(dir_items, scaner_item)
+                del_img, new_img = NewDirsWorker.start(dir_items, scaner_item)
+                if del_img or new_img:
+                    ext_scaner_item = ExtScanerItem(
+                        gui_text="",
+                        reload_gui=True
+                    )
+                    scaner_item.q.put(ext_scaner_item)

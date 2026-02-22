@@ -589,7 +589,8 @@ class WinMain(UMainWindow):
             while not tsk.proc_q.empty():
                 self.scaner_timeout = time()
                 scaner_item: ExtScanerItem = tsk.proc_q.get()
-                reload_gui = scaner_item.reload_gui
+                if not reload_gui:
+                    reload_gui = scaner_item.reload_gui
                 if bar.text() != scaner_item.gui_text:
                     bar.setText(scaner_item.gui_text)
             if not tsk.is_alive():
