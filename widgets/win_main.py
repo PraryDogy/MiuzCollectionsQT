@@ -23,6 +23,7 @@ from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 from ._base_widgets import NotifyWid, UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
+from .bar_path import PathBar
 from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
@@ -97,6 +98,9 @@ class WinMain(UMainWindow):
         )
         self.left_menu.reload_thumbnails.connect(
             lambda: self.set_window_title()
+        )
+        self.left_menu.reload_thumbnails.connect(
+            lambda: self.path_bar_update()
         )
         self.left_menu.mf_edit.connect(
             lambda settings_item: self.open_settings_win(settings_item)
@@ -187,6 +191,13 @@ class WinMain(UMainWindow):
         sep_bottom = USep()
         right_lay.addWidget(sep_bottom)
 
+        self.bar_path = PathBar()
+        right_lay.addWidget(self.bar_path)
+        self.path_bar_update()
+
+        sep_bottom = USep()
+        right_lay.addWidget(sep_bottom)
+
         self.bar_bottom = BarBottom()
         self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
         right_lay.addWidget(self.bar_bottom)
@@ -212,6 +223,16 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(parent, mf)
         return wrapper
+    
+    def path_bar_update(self):
+        if Mf.current.curr_path:
+            path = os.path.basename(Mf.current.curr_path)
+            alias = Mf.current.alias
+            first_section = f"{path} ({alias})"
+        else:
+            first_section = f"{alias}"
+        dir = f"/{first_section}{Dynamic.current_dir}"
+        self.bar_path.update(dir)
     
     def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):
 
