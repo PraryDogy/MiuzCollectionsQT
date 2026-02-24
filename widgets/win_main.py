@@ -85,8 +85,8 @@ class WinMain(UMainWindow):
         self.central_layout.addWidget(h_wid_main)
 
         # Создаем QSplitter
-        splitter = QSplitter(Qt.Horizontal)
-        splitter.setHandleWidth(14)
+        self.splitter = QSplitter(Qt.Horizontal)
+        self.splitter.setHandleWidth(14)
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
@@ -108,11 +108,11 @@ class WinMain(UMainWindow):
         self.left_menu.mf_new.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
-        splitter.addWidget(self.left_menu)
+        self.splitter.addWidget(self.left_menu)
 
         # Правый виджет
         right_wid = QWidget()
-        splitter.addWidget(right_wid)
+        self.splitter.addWidget(right_wid)
         right_lay = UVBoxLayout()
         right_lay.setContentsMargins(0, 0, 0, 0)
         right_wid.setLayout(right_lay)
@@ -197,6 +197,11 @@ class WinMain(UMainWindow):
         self.bar_path = PathBar()
         self.path_bar_update("")
         right_lay.addWidget(self.bar_path)
+        wid = self.splitter.widget(1)
+        QTimer.singleShot(
+            100,
+            lambda: self.bar_path.setMaximumWidth(wid.width())
+        )
 
         sep_bottom = USep()
         right_lay.addWidget(sep_bottom)
@@ -206,11 +211,11 @@ class WinMain(UMainWindow):
         right_lay.addWidget(self.bar_bottom)
 
         # Добавляем splitter в основной layout
-        h_lay_main.addWidget(splitter)
+        h_lay_main.addWidget(self.splitter)
 
-        splitter.setStretchFactor(0, 0)
-        splitter.setStretchFactor(1, 1)
-        splitter.setSizes([
+        self.splitter.setStretchFactor(0, 0)
+        self.splitter.setStretchFactor(1, 1)
+        self.splitter.setSizes([
             self.left_side_width,
             self.width() - self.left_side_width
         ])
@@ -832,3 +837,8 @@ class WinMain(UMainWindow):
         if paths:
             self.upload_files(self.grid, Mf.current, paths)
         return super().dropEvent(a0)
+    
+    def resizeEvent(self, a0):
+        wid = self.splitter.widget(1)
+        self.bar_path.setMaximumWidth(wid.width())
+        return super().resizeEvent(a0)
