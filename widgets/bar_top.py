@@ -371,20 +371,19 @@ class BarTop(QWidget):
         self.h_layout.setSpacing(self.text_spacing)
         self.setLayout(self.h_layout)
 
-        self.back_btn = BackBtn()
-        self.back_btn.clicked_.connect(lambda: self.history_press.emit())
-        self.h_layout.addWidget(self.back_btn)
+        # self.back_btn = BackBtn()
+        # self.back_btn.clicked_.connect(lambda: self.history_press.emit())
+        # self.h_layout.addWidget(self.back_btn)
 
-        self.next_btn = NextBtn()
-        self.next_btn.clicked_.connect(lambda: self.history_press.emit())
-        self.h_layout.addWidget(self.next_btn)
+        # self.next_btn = NextBtn()
+        # self.next_btn.clicked_.connect(lambda: self.history_press.emit())
+        # self.h_layout.addWidget(self.next_btn)
 
-        self.level_up_btn = LevelUpBtn()
-        self.level_up_btn.clicked_.connect(lambda: self.level_up.emit())
-        self.h_layout.addWidget(self.level_up_btn)
+        # self.level_up_btn = LevelUpBtn()
+        # self.level_up_btn.clicked_.connect(lambda: self.level_up.emit())
+        # self.h_layout.addWidget(self.level_up_btn)
 
-        self.h_layout.addStretch(1)
-        self.h_layout.addSpacerItem(QSpacerItem(25, 0))
+        self.h_layout.addStretch(0)
 
         # --- Кнопка сортировки ---
         self.sort_btn = SortBtn()
@@ -408,8 +407,7 @@ class BarTop(QWidget):
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        self.h_layout.addStretch(1)
-        self.h_layout.addSpacerItem(QSpacerItem(25, 0))
+        self.h_layout.addStretch()
 
         # --- Виджет поиска ---
         self.search_wid = WidSearch()
