@@ -100,7 +100,7 @@ class WinMain(UMainWindow):
             lambda: self.set_window_title()
         )
         self.left_menu.reload_thumbnails.connect(
-            lambda: self.path_bar_update()
+            lambda: self.path_bar_update(Dynamic.current_dir)
         )
         self.left_menu.mf_edit.connect(
             lambda settings_item: self.open_settings_win(settings_item)
@@ -186,14 +186,17 @@ class WinMain(UMainWindow):
         self.grid.go_to_widget.connect(
             lambda rel_path: self.go_to_widget(rel_path)
         )
+        self.grid.path_bar_update.connect(
+            lambda rel_path: self.path_bar_update(rel_path)
+        )
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
         right_lay.addWidget(sep_bottom)
 
         self.bar_path = PathBar()
+        self.path_bar_update("")
         right_lay.addWidget(self.bar_path)
-        self.path_bar_update()
 
         sep_bottom = USep()
         right_lay.addWidget(sep_bottom)
@@ -224,14 +227,14 @@ class WinMain(UMainWindow):
                 self.open_win_smb(parent, mf)
         return wrapper
     
-    def path_bar_update(self):
+    def path_bar_update(self, path: str):
         if Mf.current.curr_path:
-            path = os.path.basename(Mf.current.curr_path)
+            real_name = os.path.basename(Mf.current.curr_path)
             alias = Mf.current.alias
-            first_section = f"{path} ({alias})"
+            first_section = f"{real_name} ({alias})"
         else:
             first_section = f"{alias}"
-        dir = f"/{first_section}{Dynamic.current_dir}"
+        dir = f"/{first_section}{path}"
         self.bar_path.update(dir)
     
     def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):

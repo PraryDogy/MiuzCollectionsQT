@@ -384,7 +384,7 @@ class Grid(VScrollArea):
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
     save_files = pyqtSignal(tuple)
-    update_bottom_bar = pyqtSignal()
+    path_bar_update = pyqtSignal(str)
     open_img_view = pyqtSignal()
     no_connection = pyqtSignal()
     open_info_win = pyqtSignal(list)
@@ -1031,11 +1031,16 @@ class Grid(VScrollArea):
         if self.wid_under_mouse:
             self.clear_selected_widgets()
             self.wid_to_selected_widgets(self.wid_under_mouse)
+            self.path_bar_update.emit(self.wid_under_mouse.rel_path)
             self.open_img_view.emit()
 
     def mousePressEvent(self, a0):
         self.origin_pos = a0.pos()
         self.wid_under_mouse = self.get_clicked_widget(a0)
+        if self.wid_under_mouse:
+            self.path_bar_update.emit(self.wid_under_mouse.rel_path)
+        else:
+            self.path_bar_update.emit(Dynamic.current_dir)
         return super().mousePressEvent(a0)
     
     def mouseMoveEvent(self, a0):

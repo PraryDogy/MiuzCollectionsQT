@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from cfg import Static
 from system.utils import Utils
-
+from system.shared_utils import ImgUtils
 from ._base_widgets import UMenu
 
 
@@ -162,7 +162,6 @@ class PathBar(QWidget):
         self.setLayout(self.main_lay)
 
     def update(self, dir: str):
-        print(dir)
         """
         Отобразить новый путь сетки / папки / файла     
         src: путь сетки / папки / файла
@@ -190,6 +189,8 @@ class PathBar(QWidget):
 
         # path_items.get(1).img_wid.setPixmap(self.computer)
         last_item = path_items.get(len(root))
+        if dir.endswith(ImgUtils.ext_all):
+            last_item.img_wid.load(last_item.img_svg)
 
         text_ = last_item.text_wid.text()
         if len(text_) > PathBar.last_item_limit:
