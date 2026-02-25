@@ -600,18 +600,17 @@ class WinMain(UMainWindow):
         ):
 
         def poll_task(tsk: ProcessWorker, tmr: QTimer):
-            bar = self.bar_bottom.progress_bar
             reload_gui = False
             while not tsk.proc_q.empty():
                 self.scaner_timeout = time()
                 scaner_item: ExtScanerItem = tsk.proc_q.get()
                 if not reload_gui:
                     reload_gui = scaner_item.reload_gui
-                if bar.text() != scaner_item.gui_text:
-                    bar.setText(scaner_item.gui_text)
+                if self.bar_bottom.progress_bar.text() != scaner_item.gui_text:
+                    self.bar_bottom.progress_bar.setText(scaner_item.gui_text)
             if not tsk.is_alive():
                 tsk.terminate_join()
-                bar.setText("")
+                self.bar_bottom.progress_bar.start_timer_text()
                 if reload_gui:
                     self.grid.reload_thumbnails()
                     self.left_menu.reload_tree()

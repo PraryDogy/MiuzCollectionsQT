@@ -324,11 +324,4 @@ class Lng:
     replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
     copy_error = ("Произошла ошибка при копировании", "An error occurred while copying")
     error = ("Ошибка", "Error")
-
-
-
-# class Lng:
-#     location = ("Расположение", "Location")
-#     modified = ("Изменен", "Modified")
-#     statistic = ("Статистика данных", "Data statistics")
-#     level_up = ("Наверх", "Level up")
+    next_search = ("Поиск изображений через", "Search images in")

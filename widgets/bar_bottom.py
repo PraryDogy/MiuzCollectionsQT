@@ -1,8 +1,9 @@
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 
-from cfg import Dynamic, Static
+from cfg import Dynamic, Static, cfg
+from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout
 
@@ -78,13 +79,38 @@ class CustomSlider(QSlider):
 
 
 class ProgressWidget(QLabel):
+    interval_ms = 60 * 1000
+
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.minutes = cfg.scaner_minutes
+        self.min_timer = QTimer(self)
+        self.min_timer.timeout.connect(self.update_timer_text)
+        self.min_timer.setSingleShot(True)
 
-    def setText(self, a0):
-        # if a0 == "":
-            # a0 = str(Dynamic.loaded_thumbs)
-        return super().setText(a0)
+    def start_timer_text(self):
+        self.min_timer.stop()
+        text = (
+            f"{Lng.next_search[cfg.lng]} "
+            f"{cfg.scaner_minutes} "
+            f"{Lng.minutes[cfg.lng]}"
+        )
+        self.setText(text)
+        self.minutes = cfg.scaner_minutes
+        self.min_timer.start(self.interval_ms)
+
+    def update_timer_text(self):
+        self.minutes -= 1
+        if self.minutes <= 0:
+            return
+
+        text = (
+            f"{Lng.next_search[cfg.lng]} "
+            f"{self.minutes} "
+            f"{Lng.minutes[cfg.lng]}"
+        )
+        self.setText(text)
+        self.min_timer.start(self.interval_ms)
 
 
 class BarBottom(QWidget):
