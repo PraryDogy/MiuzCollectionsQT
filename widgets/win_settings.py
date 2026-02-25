@@ -634,12 +634,12 @@ class MfSettings(QGroupBox):
 
         # Верхний ряд с названием
         first_row = QGroupBox()
-        first_row.setFixedHeight(50)
+        first_row.setFixedHeight(30)
         v_lay.addWidget(first_row)
         first_lay = UHBoxLayout()
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_row.setLayout(first_lay)
-        name_descr = ULabel(Lng.alias[cfg.lng] + ":")
+        name_descr = ULabel(f"{Lng.alias[cfg.lng]}: ")
         first_lay.addWidget(name_descr)
         name_label = ULabel(mf.alias)
         first_lay.addWidget(name_label)
@@ -734,10 +734,16 @@ class NewFolder(QGroupBox):
         self.setLayout(v_lay)
 
         first_row = QGroupBox()
-        first_row.setFixedHeight(50)
+        # first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
         first_lay = UVBoxLayout()
+        first_lay.setSpacing(10)
+        first_lay.setContentsMargins(0, 3, 0, 3)
         first_row.setLayout(first_lay)
+
+        self.name_folder = QLabel(Lng.folder_name[cfg.lng])
+        first_lay.addWidget(self.name_folder)
+
         self.name_label = ULineEdit()
         self.name_label.setPlaceholderText(Lng.alias_immutable[cfg.lng])
         self.name_label.textChanged.connect(self.name_cmd)
@@ -897,7 +903,7 @@ class WinSettings(SingleActionWindow):
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
         self.setWindowTitle(Lng.settings[cfg.lng])
-        self.setFixedSize(700, 550)
+        self.setFixedSize(700, 560)
         self.mf_list_copy = copy.deepcopy(Mf.list_)
         self.json_data_copy = copy.deepcopy(cfg)
         self.filters_copy = copy.deepcopy(Filters.filters)

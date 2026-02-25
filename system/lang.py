@@ -324,7 +324,7 @@ class Lng:
     replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
     copy_error = ("Произошла ошибка при копировании", "An error occurred while copying")
     error = ("Ошибка", "Error")
-    next_search = ("Поиск изображений через", "Search images in")
+    next_search = ("Поиск новых изображений через", "Search new images in")
     string_limit = (
         "Имя — не более 30 символов",
         "Name — up to 30 characters",
@@ -334,4 +334,14 @@ class Lng:
         "цифры и пробелы",
         "The name may contain only Russian and English letters, "
         "digits and spaces",
+    )
+    folder_name = (
+        "Имя:\n"
+        "• уникальное\n"
+        "• до 30 символов\n"
+        "• русские и английские буквы, цифры и пробелы",
+        "Folder name:\n"
+        "• unique\n"
+        "• up to 30 characters\n"
+        "• Russian and English letters, digits, and spaces",
     )
