@@ -71,8 +71,7 @@ class AllDirLoader:
         # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки (псевдоним папки): поиск в папке
         gui_text = (
-            f"{scaner_item.mf_real_name} "
-            f"({scaner_item.mf.alias}): "
+            f"{scaner_item.mf.alias}: "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text, False)
@@ -245,8 +244,7 @@ class ImgLoader:
         # передает в гуи текст
         # имя папки (псевдоним): поиск
         gui_text = (
-            f"{scaner_item.mf_real_name} "
-            f"({scaner_item.mf.alias}): "
+            f"{scaner_item.mf.alias}: "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text, False)
@@ -447,8 +445,7 @@ class HashdirImgUpdater:
         Имя папки (псевдоним): обновление (оставшееся число)
         """
         text = (
-            f"{scaner_item.mf_real_name} "
-            f"({scaner_item.mf.alias}): "
+            f"{scaner_item.mf.alias}: "
             f"{Lng.updating[cfg.lng].lower()} "
             f"({scaner_item.total_count})"
         )
@@ -642,8 +639,7 @@ class AllDirScaner:
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
                 gui_text = (
-                    f"{scaner_item.mf_real_name} "
-                    f"({scaner_item.mf.alias}): "
+                    f"{scaner_item.mf.alias}: "
                     f"{no_conn}"
                 )
                 ext_scaner_item = ExtScanerItem(gui_text, False)

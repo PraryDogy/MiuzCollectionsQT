@@ -96,7 +96,8 @@ class BarBottom(QWidget):
     """
 
     resize_thumbnails = pyqtSignal()
-    hh = 28
+    hh = 25
+    # bar_height = 25
 
     def __init__(self):
         super().__init__()

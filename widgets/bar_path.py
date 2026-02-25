@@ -22,6 +22,7 @@ class PathItem(QWidget):
     del_fav = pyqtSignal(str)
     type_to_pixmap: dict = {}
     folder_svg = "./images/folder.svg"
+    img_folder_svg = "./images/img_folder.svg"
     img_svg = "./images/img.svg"
 
     def __init__(self, dir: str, name: str):
@@ -42,7 +43,6 @@ class PathItem(QWidget):
         self.text_wid = QLabel(text=name)
         self.collapse()
         item_layout.addWidget(self.text_wid)
-
 
     def add_arrow(self):
         """
@@ -187,7 +187,9 @@ class PathBar(QWidget):
             path_items[x] = path_item
             self.main_lay.addWidget(path_item)
 
-        # path_items.get(1).img_wid.setPixmap(self.computer)
+
+        path_items[1].img_wid.load(path_items[1].img_folder_svg)
+
         last_item = path_items.get(len(root))
         if dir.endswith(ImgUtils.ext_all):
             last_item.img_wid.load(last_item.img_svg)

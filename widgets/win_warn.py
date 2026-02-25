@@ -1,5 +1,3 @@
-import os
-
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
@@ -10,7 +8,6 @@ from system.lang import Lng
 
 from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
                             UVBoxLayout)
-from .path_widget import PathWidget
 
 
 class BaseWinWarn(SingleActionWindow):
@@ -93,19 +90,3 @@ class WinQuestion(BaseWinWarn):
         if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.ok_clicked.emit()
         return super().keyPressEvent(a0)
-
-
-class WinUpload(WinQuestion):
-    arrow = "▸"
-    ww = 380
-
-    def __init__(self, path: str):
-        super().__init__(title=Lng.upload_in[cfg.lng], text=None, char_limit=0)
-        self.central_layout.setContentsMargins(10, 5, 10, 0)
-        self.setFixedWidth(self.ww)
-        self.text_label.deleteLater()
-
-        self.text_label = PathWidget(path)
-        self.right_layout.addWidget(self.text_label)
-        self.adjustSize()
-        self.setFixedHeight(self.height() - 20) # срезаем лишнюю высоту
