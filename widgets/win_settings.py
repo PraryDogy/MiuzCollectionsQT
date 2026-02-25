@@ -261,6 +261,8 @@ class SimpleSettings(QGroupBox):
 
 class ScanerSettings(QGroupBox):
     changed = pyqtSignal()
+    spin_max = 60
+    spin_min = 0
 
     def __init__(self, json_data_copy: Cfg):
         super().__init__()
@@ -278,8 +280,8 @@ class ScanerSettings(QGroupBox):
         self.spin_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         self.spin = QSpinBox(self)
-        self.spin.setMinimum(1)
-        self.spin.setMaximum(59)
+        self.spin.setMinimum(self.spin_min)
+        self.spin.setMaximum(self.spin_max)
         self.spin.setFixedHeight(27)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[cfg.lng]}")
@@ -293,6 +295,17 @@ class ScanerSettings(QGroupBox):
         self.change_spin_width()
 
     def change_scan_time(self, value: int):
+        if value == self.spin_max:
+            self.spin.blockSignals(True)
+            self.spin.setValue(self.spin_min + 1)
+            self.spin.blockSignals(False)
+            value = self.spin.minimum()
+        elif value == self.spin_min:
+            self.spin.blockSignals(True)
+            self.spin.setValue(self.spin_max - 1)
+            self.spin.blockSignals(False)
+            value = self.spin.maximum()
+
         self.json_data_copy.scaner_minutes = value
         self.changed.emit()
 
