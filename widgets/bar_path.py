@@ -197,9 +197,9 @@ class PathBar(QWidget):
         text_ = last_item.text_wid.text()
         if len(text_) > PathBar.last_item_limit:
             path_item.text_wid.setText(text_[:PathBar.last_item_limit] + "...")
-
-        last_item.del_arrow()
-        last_item.expand()
-        last_item.enterEvent = lambda *args, **kwargs: None
-        last_item.leaveEvent = lambda *args, **kwargs: None
-
+        
+        if len(root) != 1:
+            last_item.del_arrow()
+            last_item.expand()
+            last_item.enterEvent = lambda *args, **kwargs: None
+            last_item.leaveEvent = lambda *args, **kwargs: None
