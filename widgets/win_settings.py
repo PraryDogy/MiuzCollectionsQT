@@ -802,16 +802,16 @@ class NewFolder(QGroupBox):
         elif any(i.alias == self.mf.alias for i in self.mf_list):
             show_warn(
                 f'{Lng.alias[cfg.lng]} "{self.mf.alias}" '
-                f'{Lng.already_taken[cfg.lng].lower()}.'
+                f'{Lng.already_taken[cfg.lng].lower()}'
             )
             return
 
         elif len(self.mf.alias) > 30:
-            show_warn(f'{Lng.string_limit[cfg.lng]}.')
+            show_warn(f'{Lng.string_limit[cfg.lng]}')
             return
 
         elif not re.fullmatch(pattern, self.mf.alias):
-            show_warn(f'{Lng.valid_message[cfg.lng]}.')
+            show_warn(f'{Lng.valid_message[cfg.lng]}')
             return
 
         elif not self.mf.paths:
