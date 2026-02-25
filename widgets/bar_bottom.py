@@ -114,7 +114,6 @@ class BarBottom(QWidget):
         self.progress_bar = ProgressWidget()
         self.progress_bar.setText("")
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        # self.progress_bar.setFixedSize(300, 20)
         self.progress_bar.setFixedHeight(20)
         self.h_layout.addWidget(self.progress_bar)
 

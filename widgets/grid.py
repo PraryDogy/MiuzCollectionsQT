@@ -120,7 +120,7 @@ class BelowTextWid(QLabel):
     def set_text(self):
         root = self.wid.rel_path.strip(os.sep).split(os.sep)
         if not root:
-            root = os.path.basename(Mf.current.curr_path)
+            root = os.path.basename(Mf.current.alias)
         else:
             root = root[0]
         first_row = self.short_text(root)
@@ -225,7 +225,7 @@ class Thumbnail(QFrame):
         self.below_text = BelowTextWid(self)
         self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        location = f"{Lng.location[cfg.lng]}: ...{rel_path}"
+        location = f"{Lng.location[cfg.lng]}: {Mf.current.alias}{rel_path}"
         modified = f"{Lng.modified[cfg.lng]}: {self.mod}"
         self.setToolTip("\n".join([location, modified, ]))
 
