@@ -148,13 +148,13 @@ class Lng:
     open_default = ("Открыть по умолчанию", "Open by default")
     open_in = ("Открыть в приложении", "Open in application")
     alias_immutable = (
-        "Псевдоним (нельзя изменить после сохранения)",
-        "Alias (cannot be changed after saving)"
+        "Имя (нельзя изменить после сохранения)",
+        "Name (cannot be changed after saving)"
     )
     save = ("Сохранить", "Save")
     new_folder = ("Новая папка", "New folder")
     enter_alias_warning = (
-        "Поле «Псевдоним» обязательно для заполнения.",
+        "Поле \"Имя\" обязательно для заполнения.",
         "Alias field is required."
     )
     select_folder_path = ("Укажите путь к папке с изображениями.", "Select path to the images folder.")
@@ -187,7 +187,7 @@ class Lng:
         "Solution: open settings and add a new path to the images folder."
     )
     ok = ("Ок", "Ok")
-    alias = ("Псевдоним", "Alias")
+    alias = ("Имя", "Name")
     images_folder_path = (
         "Путь к папке с изображениями: перетащите сюда папку или укажите путь с новой строки.",
         "Path to the images folder: drag a folder here or enter a path on a new line."
@@ -225,7 +225,7 @@ class Lng:
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
     show_about = ("Об авторе", "About")
-    alias_error = ("Псевдоним должен быть уникальным", "Alias must be unique")
+    alias_error = ("Имя должно быть уникальным", "Name must be unique")
     already_taken = ("Уже используется", "Is already taken")
     image = ("Изображение", "Image")
     other_folders = ("Прочие папки", "Other folders")
@@ -325,3 +325,7 @@ class Lng:
     copy_error = ("Произошла ошибка при копировании", "An error occurred while copying")
     error = ("Ошибка", "Error")
     next_search = ("Поиск изображений через", "Search images in")
+    string_limit = (
+        "Имя — не более 30 символов",
+        "Name — up to 30 characters",
+    )

@@ -69,7 +69,7 @@ class AllDirLoader:
         - не в стоп листе `Mf.stop_list`
         """
         # Отправляем текст в гуи что идет поиск в папке
-        # gui_text: Имя папки (псевдоним папки): поиск в папке
+        # gui_text: Имя папки: поиск в папке
         gui_text = (
             f"{scaner_item.mf.alias}: "
             f"{Lng.search_in[cfg.lng].lower()}"
@@ -242,7 +242,7 @@ class ImgLoader:
         - fider_images список ImgItem
         """
         # передает в гуи текст
-        # имя папки (псевдоним): поиск
+        # имя папки: поиск
         gui_text = (
             f"{scaner_item.mf.alias}: "
             f"{Lng.search_in[cfg.lng].lower()}"
@@ -440,10 +440,6 @@ class HashdirImgUpdater:
 
     @staticmethod
     def q_put(scaner_item: IntScanerItem, ext_scaner_item: ExtScanerItem):
-        """
-        Посылает текст в гуи.   
-        Имя папки (псевдоним): обновление (оставшееся число)
-        """
         text = (
             f"{scaner_item.mf.alias}: "
             f"{Lng.updating[cfg.lng].lower()} "

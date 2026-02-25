@@ -783,6 +783,14 @@ class NewFolder(QGroupBox):
             self.win_warn.resize(380, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
+        elif len(self.mf.alias) > 30:
+            self.win_warn = WinWarn(
+                Lng.attention[cfg.lng],
+                f"{Lng.string_limit[cfg.lng]}."
+                )
+            self.win_warn.resize(380, 80)
+            self.win_warn.center_to_parent(self.window())
+            self.win_warn.show()
         elif not self.mf.paths:
             self.win_warn = WinWarn(
                 Lng.attention[cfg.lng],
@@ -999,7 +1007,7 @@ class WinSettings(SingleActionWindow):
             else:
                 self.new_folder.preset_new_folder(self.settings_item.content)
         else:
-            # Находим в копии списка Mf объект с нужным псевдонимом,
+            # Находим в копии списка Mf объект с нужным именем,
             # чтобы передать его в дочерний виджет MfSettings.
             # Изменения, внесённые в дочернем виджете, будут напрямую
             # применяться к этому объекту в копии списка.
