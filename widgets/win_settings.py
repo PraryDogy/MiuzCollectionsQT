@@ -4,7 +4,7 @@ import re
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
@@ -1017,14 +1017,40 @@ class WinSettings(SingleActionWindow):
                     self.init_right_side(index)
                     break
 
+    def blink_ok_btn(self):
+        text = Lng.restart[cfg.lng]
+        blink_text = "❗❗❗"
+
+        # если таймер уже существует и работает — не запускаем новое мигание
+        if hasattr(self, "_blink_timer") and self._blink_timer.isActive():
+            return
+
+        count = 0
+
+        def toggle():
+            nonlocal count
+            if self.ok_btn.text() == text:
+                self.ok_btn.setText(blink_text)
+            else:
+                self.ok_btn.setText(text)
+            count += 1
+            if count >= 6:  # 3 мигания
+                self._blink_timer.stop()
+                self.ok_btn.setText(text)
+                del self._blink_timer  # удаляем таймер после завершения
+
+        self._blink_timer = QTimer(self)
+        self._blink_timer.timeout.connect(toggle)
+        self._blink_timer.start(300)
+
     def init_right_side(self, index: int):
         if index == 0:
             self.gen_settings = GeneralSettings(self.json_data_copy, self.need_reset_item)
-            self.gen_settings.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
+            self.gen_settings.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
             self.filters_wid = FiltersWid(self.filters_copy)
-            self.filters_wid.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
+            self.filters_wid.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
             self.new_folder = NewFolder(self.mf_list_copy)
@@ -1046,7 +1072,7 @@ class WinSettings(SingleActionWindow):
                 if i.alias == item.mf.alias
             )
             mf_sett = MfSettings(mf)
-            mf_sett.changed.connect(lambda: self.ok_btn.setText(Lng.restart[cfg.lng]))
+            mf_sett.changed.connect(self.blink_ok_btn)
             mf_sett.remove.connect(lambda: self.remove_mf(item))
             mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
             self.right_lay.insertWidget(0, mf_sett)
@@ -1118,11 +1144,6 @@ class WinSettings(SingleActionWindow):
                     self.win_warn.show()
                     return False
             return True
-        
-
-        # print(self.need_reset_item.need_reset)
-        # self.deleteLater()
-        # return
 
         if self.ok_btn.text() in Lng.restart:
             if not validate_folders():
