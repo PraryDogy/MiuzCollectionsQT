@@ -79,38 +79,38 @@ class CustomSlider(QSlider):
 
 
 class ProgressWidget(QLabel):
-    interval_ms = 60 * 1000
+    interval_ms = 1000  # 1 секунда
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.minutes = cfg.scaner_minutes
-        self.min_timer = QTimer(self)
-        self.min_timer.timeout.connect(self.update_timer_text)
-        self.min_timer.setSingleShot(True)
+        self.total_seconds = cfg.scaner_minutes * 60
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_timer_text)
 
     def start_timer_text(self):
-        self.min_timer.stop()
-        text = (
-            f"{Lng.next_search[cfg.lng]} "
-            f"{cfg.scaner_minutes} "
-            f"{Lng.minutes[cfg.lng]}"
-        )
-        self.setText(text)
-        self.minutes = cfg.scaner_minutes
-        self.min_timer.start(self.interval_ms)
+        self.timer.stop()
+        self.total_seconds = cfg.scaner_minutes * 60
+        self.update_label()
+        self.timer.start(self.interval_ms)
 
     def update_timer_text(self):
-        self.minutes -= 1
-        if self.minutes <= 0:
+        self.total_seconds -= 1
+        if self.total_seconds <= 0:
+            self.timer.stop()
             return
+
+        self.update_label()
+
+    def update_label(self):
+        minutes = self.total_seconds // 60
+        seconds = self.total_seconds % 60
 
         text = (
             f"{Lng.next_search[cfg.lng]} "
-            f"{self.minutes} "
-            f"{Lng.minutes[cfg.lng]}"
+            f"{minutes:02d}:{seconds:02d}"
         )
         self.setText(text)
-        self.min_timer.start(self.interval_ms)
 
 
 class BarBottom(QWidget):
