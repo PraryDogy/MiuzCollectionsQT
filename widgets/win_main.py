@@ -1,10 +1,9 @@
-import gc
 import os
 import subprocess
 from time import time
 
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QCloseEvent, QKeyEvent
+from PyQt5.QtGui import QCloseEvent, QIcon, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal, Optional
@@ -71,6 +70,10 @@ class WinMain(UMainWindow):
         super().__init__()
         self.resize(Static.ww, Static.hh)
         self.setMinimumWidth(self.min_w)
+        self.setWindowTitle(f"{Static.app_name} {Static.app_ver}")
+
+        self.setWindowIcon(QIcon("./images/icon.png"))
+        self.setWindowIconText(f"{Static.app_name} {Static.app_ver}")
 
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
@@ -97,9 +100,6 @@ class WinMain(UMainWindow):
             lambda: self.grid.reload_thumbnails()
         )
         self.left_menu.reload_thumbnails.connect(
-            lambda: self.set_window_title()
-        )
-        self.left_menu.reload_thumbnails.connect(
             lambda: self.path_bar_update(Dynamic.current_dir)
         )
         self.left_menu.mf_edit.connect(
@@ -124,9 +124,6 @@ class WinMain(UMainWindow):
         )
         self.bar_top.reload_thumbnails.connect(
             lambda: self.grid.reload_thumbnails()
-            )
-        self.bar_top.reload_thumbnails.connect(
-            lambda: self.set_window_title()
             )
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
@@ -233,14 +230,7 @@ class WinMain(UMainWindow):
         return wrapper
     
     def path_bar_update(self, path: str):
-        if Mf.current.curr_path:
-            real_name = os.path.basename(Mf.current.curr_path)
-            alias = Mf.current.alias
-            first_section = f"{real_name} ({alias})"
-        else:
-            alias = Mf.current.alias
-            first_section = f"{alias}"
-        dir = f"/{first_section}{path}"
+        dir = f"/{Mf.current.alias}{path}"
         self.bar_path.update(dir)
     
     def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):
@@ -254,7 +244,6 @@ class WinMain(UMainWindow):
                 tmr.start(ms)
 
         self.grid.reload_thumbnails()
-        self.set_window_title()
 
         on_start_item = OnStartItem(Mf.list_)
         tsk = ProcessWorker(target=OnStartTask.start, args=(on_start_item, ))
@@ -274,13 +263,11 @@ class WinMain(UMainWindow):
             self.left_menu.tree_wid.expand_to_path(root)
             self.left_menu.setCurrentIndex(1)
             self.grid.reload_thumbnails()
-            self.set_window_title()
 
     def history_press(self):
         self.left_menu.tree_wid.expand_to_path(Dynamic.current_dir)
         self.left_menu.setCurrentIndex(1)
         self.grid.reload_thumbnails()
-        self.set_window_title()
     
     def go_to_widget(self, rel_path: str):
         dirname = os.path.dirname(rel_path)
@@ -289,7 +276,6 @@ class WinMain(UMainWindow):
         self.left_menu.setCurrentIndex(1)
         self.grid.go_to_url = rel_path
         self.grid.reload_thumbnails()
-        self.set_window_title()
 
     def open_win_smb(self, parent: QWidget, mf: Mf):
         try:
@@ -696,19 +682,6 @@ class WinMain(UMainWindow):
         self.scaner_task.terminate_join()
         self.start_scaner_task(scaner_item=None)
         
-    def set_window_title(self):
-        if Dynamic.current_dir is None:
-            return
-        if Mf.current.get_available_path():
-            real_name = os.path.basename(Mf.current.curr_path)
-        else:
-            real_name = os.path.basename(Mf.current.paths[0])
-        if Dynamic.current_dir == "":
-            t = f"{real_name} ({Mf.current.alias})"
-        else:
-            t = os.path.basename(Dynamic.current_dir)
-        self.setWindowTitle(t)
-
     def center_screen(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
