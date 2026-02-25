@@ -1090,7 +1090,7 @@ class WinSettings(SingleActionWindow):
         self.clear_right_side()
         index = self.left_menu.count() - 1
         self.init_right_side(index)
-        self.ok_btn.setText(Lng.restart[cfg.lng])
+        self.blink_ok_btn()
 
     def remove_mf(self, item: SettingsListItem):
 
@@ -1102,7 +1102,7 @@ class WinSettings(SingleActionWindow):
                     self.left_menu.setCurrentRow(0)
                     self.clear_right_side()
                     self.init_right_side(0)
-                    self.ok_btn.setText(Lng.restart[cfg.lng])
+                    self.blink_ok_btn()
                     break
 
         try:
