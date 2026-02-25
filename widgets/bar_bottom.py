@@ -82,8 +82,8 @@ class ProgressWidget(QLabel):
         super().__init__(parent)
 
     def setText(self, a0):
-        if a0 == "":
-            a0 = "Collections"
+        # if a0 == "":
+            # a0 = str(Dynamic.loaded_thumbs)
         return super().setText(a0)
 
 
