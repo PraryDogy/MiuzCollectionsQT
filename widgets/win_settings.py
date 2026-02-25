@@ -767,49 +767,36 @@ class NewFolder(QGroupBox):
         name = self.name_label.text().strip()
         self.mf.alias = name
 
-    def save(self):      
-        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'  
-        if not self.mf.alias:
+    def save(self):
+        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
+
+        def show_warn(message, width=380):
             self.win_warn = WinWarn(
                 Lng.attention[cfg.lng],
-                Lng.enter_alias_warning[cfg.lng]
-                )
-            self.win_warn.resize(380, 80)
-            self.win_warn.center_to_parent(self.window())
-            self.win_warn.show()
-        elif any(i.alias == self.mf.alias for i in self.mf_list):
-            self.win_warn = WinWarn(
-                Lng.attention[cfg.lng],
-                f"{Lng.alias[cfg.lng]} \"{self.mf.alias}\" {Lng.already_taken[cfg.lng].lower()}."
-                )
-            self.win_warn.resize(380, 80)
-            self.win_warn.center_to_parent(self.window())
-            self.win_warn.show()
-        elif len(self.mf.alias) > 30:
-            self.win_warn = WinWarn(
-                Lng.attention[cfg.lng],
-                f"{Lng.string_limit[cfg.lng]}."
-                )
-            self.win_warn.resize(380, 80)
-            self.win_warn.center_to_parent(self.window())
-            self.win_warn.show()
-        elif not re.fullmatch(pattern, self.mf.alias):
-            self.win_warn = WinWarn(
-                Lng.attention[cfg.lng],
-                f"{Lng.valid_message[cfg.lng]}."
-                )
-            self.win_warn.resize(380, 80)
+                message
+            )
+            self.win_warn.resize(width, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
 
+        if not self.mf.alias:
+            show_warn(Lng.enter_alias_warning[cfg.lng])
+
+        elif any(i.alias == self.mf.alias for i in self.mf_list):
+            show_warn(
+                f'{Lng.alias[cfg.lng]} "{self.mf.alias}" '
+                f'{Lng.already_taken[cfg.lng].lower()}.'
+            )
+
+        elif len(self.mf.alias) > 30:
+            show_warn(f'{Lng.string_limit[cfg.lng]}.')
+
+        elif not re.fullmatch(pattern, self.mf.alias):
+            show_warn(f'{Lng.valid_message[cfg.lng]}.')
+
         elif not self.mf.paths:
-            self.win_warn = WinWarn(
-                Lng.attention[cfg.lng],
-                Lng.select_folder_path[cfg.lng]
-                )
-            self.win_warn.resize(330, 80)
-            self.win_warn.center_to_parent(self.window())
-            self.win_warn.show()
+            show_warn(Lng.select_folder_path[cfg.lng], width=330)
+
         else:
             self.new_folder.emit(self.mf)
 
