@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtWidgets import QLabel, QSlider, QWidget
-
+from PyQt5.QtSvg import QSvgWidget
 from cfg import Dynamic, Static, cfg
 from system.lang import Lng
 
@@ -123,7 +123,8 @@ class BarBottom(QWidget):
 
     resize_thumbnails = pyqtSignal()
     hh = 25
-    # bar_height = 25
+    icon = "./images/next.svg"
+    svg_size = 15
 
     def __init__(self):
         super().__init__()
@@ -133,17 +134,22 @@ class BarBottom(QWidget):
 
         # --- Горизонтальный layout ---
         self.h_layout = UHBoxLayout(self)
-        self.h_layout.setSpacing(20)
+        self.h_layout.setSpacing(5)
         self.h_layout.setContentsMargins(0, 0, 15, 0)
 
         # self.h_layout.addStretch()
 
+        self.svg_wid = QSvgWidget()
+        self.svg_wid.load(self.icon)
+        self.svg_wid.setFixedSize(self.svg_size, self.svg_size)
+        self.h_layout.addWidget(self.svg_wid)
+
         # --- Прогресс-бар ---
         self.progress_bar = ProgressWidget()
+        self.progress_bar.setFixedHeight(self.svg_size)
         self.progress_bar.setText("")
-        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        self.progress_bar.setFixedHeight(20)
-        self.h_layout.addWidget(self.progress_bar)
+        self.progress_bar.setFixedHeight(self.svg_size)
+        self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         # --- Разделитель перед слайдером ---
         self.h_layout.addStretch()
