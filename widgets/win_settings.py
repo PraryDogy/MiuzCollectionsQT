@@ -927,13 +927,7 @@ class WinSettings(SingleActionWindow):
         self.left_menu.addItem(spacer)
 
         for i in Mf.list_:
-            if i.curr_path:
-                true_name = os.path.basename(i.curr_path)
-            else:
-                true_name = os.path.basename(i.paths[0])
-            alias = i.alias
-            text = f"{true_name} ({alias})"
-            new_folder = SettingsListItem(self.left_menu, text=text)
+            new_folder = SettingsListItem(self.left_menu, text=i.alias)
             new_folder.mf = i
             new_folder.setIcon(QIcon(self.svg_folder))
             self.left_menu.addItem(new_folder)
@@ -1025,12 +1019,7 @@ class WinSettings(SingleActionWindow):
 
     def add_mf(self, mf: Mf):
         self.mf_list_copy.append(mf)
-        if mf.get_available_path():
-            real_name = os.path.basename(mf.curr_path)
-        else:
-            real_name = os.path.basename(mf.paths[0])
-        text = f"{real_name} ({mf.alias})"
-        item = SettingsListItem(self.left_menu, text=text)
+        item = SettingsListItem(self.left_menu, text=mf.alias)
         item.setIcon(QIcon(self.svg_folder))
         item.mf = mf
         self.left_menu.addItem(item)

@@ -77,6 +77,16 @@ class CustomSlider(QSlider):
         self.resize_thumbnails.emit()
 
 
+class ProgressWidget(QLabel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def setText(self, a0):
+        if a0 == "":
+            a0 = "Collections"
+        return super().setText(a0)
+
+
 class BarBottom(QWidget):
     """
     Нижняя панель с прогресс-баром и слайдером для изменения размера миниатюр.
@@ -100,7 +110,8 @@ class BarBottom(QWidget):
         self.h_layout.setContentsMargins(0, 0, 15, 0)
 
         # --- Прогресс-бар ---
-        self.progress_bar = QLabel(text="")
+        self.progress_bar = ProgressWidget()
+        self.progress_bar.setText("")
         self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         # self.progress_bar.setFixedSize(300, 20)
         self.progress_bar.setFixedHeight(20)

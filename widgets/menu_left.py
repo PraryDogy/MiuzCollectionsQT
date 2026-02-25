@@ -214,7 +214,7 @@ class MfList(VListWidget):
                 true_name = os.path.basename(i.curr_path)
             else:
                 true_name = os.path.basename(i.paths[0])
-            text = f"{true_name} ({i.alias})"
+            text = i.alias
             item = MfListItem(parent=self, text=text)
             item.setIcon(QIcon(self.svg_folder))
             item.mf = i
