@@ -797,38 +797,44 @@ class NewFolder(QGroupBox):
 
         if not self.mf.alias:
             show_warn(Lng.enter_alias_warning[cfg.lng])
+            return
 
         elif any(i.alias == self.mf.alias for i in self.mf_list):
             show_warn(
                 f'{Lng.alias[cfg.lng]} "{self.mf.alias}" '
                 f'{Lng.already_taken[cfg.lng].lower()}.'
             )
+            return
 
         elif len(self.mf.alias) > 30:
             show_warn(f'{Lng.string_limit[cfg.lng]}.')
+            return
 
         elif not re.fullmatch(pattern, self.mf.alias):
             show_warn(f'{Lng.valid_message[cfg.lng]}.')
+            return
 
         elif not self.mf.paths:
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
+            return
 
         elif not any(os.path.exists(i) for i in self.mf.paths):
             show_warn(Lng.folder_not_exists[cfg.lng], width=330)
+            return
 
-        elif (x in self.mf.paths for i in self.mf_list for x in i.paths):
-            name = ""
-            for i in self.mf_list:
-                for x in i.paths:
-                    if x in self.mf.paths:
-                        name = i.alias
+        name = None
+        for i in self.mf_list:
+            for x in i.paths:
+                if x in self.mf.paths:
+                    name = i.alias
+        if name:
             show_warn(
                 f"{Lng.folder_path_exists[cfg.lng]} {name}",
                 width=330
             )
+            return
 
-        else:
-            self.new_folder.emit(self.mf)
+        self.new_folder.emit(self.mf)
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
