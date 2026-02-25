@@ -326,14 +326,14 @@ class Lng:
     error = ("Ошибка", "Error")
     next_search = ("Поиск новых изображений через", "Search new images in")
     string_limit = (
-        "Имя — не более 30 символов",
-        "Name — up to 30 characters",
+        "Имя — не более 30 символов.",
+        "Name — up to 30 characters.",
     )
     valid_message = (
         "Имя может содержать только русские и английские буквы, "
-        "цифры и пробелы",
+        "цифры и пробелы.",
         "The name may contain only Russian and English letters, "
-        "digits and spaces",
+        "digits and spaces.",
     )
     folder_name = (
         "Имя:\n"
@@ -344,4 +344,12 @@ class Lng:
         "• unique\n"
         "• up to 30 characters\n"
         "• Russian and English letters, digits, and spaces",
+    )
+    folder_not_exists = (
+        "Добавьте существующий путь к папке.",
+        "Please provide an existing folder path.",
+    )
+    folder_path_exists = (
+        "Папка с таким путем уже добавлена.\nИмя папки:",
+        "A folder with this path has already been added.\nFolder name:",
     )

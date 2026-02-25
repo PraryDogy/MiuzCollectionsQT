@@ -747,7 +747,6 @@ class NewFolder(QGroupBox):
         self.setLayout(v_lay)
 
         first_row = QGroupBox()
-        # first_row.setFixedHeight(50)
         v_lay.addWidget(first_row)
         first_lay = UVBoxLayout()
         first_lay.setSpacing(10)
@@ -777,8 +776,6 @@ class NewFolder(QGroupBox):
         btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def preset_new_folder(self, url: str):
-        # name = os.path.basename(url)
-        # self.name_label.setText(name)
         text_edit = self.findChildren(DropableGroupBox)[0].text_edit
         text_edit.setPlainText(url)
 
@@ -815,6 +812,20 @@ class NewFolder(QGroupBox):
 
         elif not self.mf.paths:
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
+
+        elif not any(os.path.exists(i) for i in self.mf.paths):
+            show_warn(Lng.folder_not_exists[cfg.lng], width=330)
+
+        elif (x in self.mf.paths for i in self.mf_list for x in i.paths):
+            name = ""
+            for i in self.mf_list:
+                for x in i.paths:
+                    if x in self.mf.paths:
+                        name = i.alias
+            show_warn(
+                f"{Lng.folder_path_exists[cfg.lng]} {name}",
+                width=330
+            )
 
         else:
             self.new_folder.emit(self.mf)
