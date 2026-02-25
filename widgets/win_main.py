@@ -664,6 +664,8 @@ class WinMain(UMainWindow):
                     target=AllDirScaner.start,
                     args=(Mf.list_, )
                 )
+
+            self.bar_bottom.progress_bar.stop_timer_text()
             tmr = QTimer(self)
             tmr.setSingleShot(True)
             tmr.timeout.connect(lambda: poll_task(self.scaner_task, tmr))

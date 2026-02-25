@@ -88,17 +88,14 @@ class ProgressWidget(QLabel):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer_text)
 
-        # self.setStyleSheet(
-        #     """
-        #     color: rgba(255, 255, 255, 0.7);
-        #     """
-        # )
-
     def start_timer_text(self):
         self.timer.stop()
         self.total_seconds = cfg.scaner_minutes * 60
         self.update_label()
         self.timer.start(self.interval_ms)
+
+    def stop_timer_text(self):
+        self.timer.stop()
 
     def update_timer_text(self):
         self.total_seconds -= 1
