@@ -179,7 +179,12 @@ class CopyTask:
                 fdst.write(buf)
                 copy_item.current_size += len(buf) // 1024
                 proc_q.put(copy_item)
-        shutil.copystat(src, dest, follow_symlinks=True)
+        try:
+            shutil.copystat(src, dest, follow_symlinks=True)
+        except OSError as e:
+            # import traceback
+            # print(traceback.format_exc())
+            print("copy task - copy stat error", e)
 
 
 class FilesRemover:
