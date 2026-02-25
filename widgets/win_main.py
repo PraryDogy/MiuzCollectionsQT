@@ -204,6 +204,7 @@ class WinMain(UMainWindow):
         right_lay.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
+        self.bar_bottom.progress_bar.setText(Lng.loading[cfg.lng])
         self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
         right_lay.addWidget(self.bar_bottom)
 

@@ -278,7 +278,7 @@ class ScanerSettings(QGroupBox):
 
         self.spin = QSpinBox(self)
         self.spin.setMinimum(1)
-        self.spin.setMaximum(60)
+        self.spin.setMaximum(59)
         self.spin.setFixedHeight(27)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[cfg.lng]}")
