@@ -367,12 +367,7 @@ class HashDirSize(URunnable):
                 for i in res
                 if os.path.exists(Utils.get_abs_thumb_path(i))
             ])
-            if i.get_available_path():
-                real_name = os.path.basename(i.curr_path)
-            else:
-                real_name = os.path.basename(i.paths[0])
-            name = f"{real_name} ({i.alias})"
-            main_folder_sizes[name] = {"size": size, "total": len(res)}
+            main_folder_sizes[i.alias] = {"size": size, "total": len(res)}
         return main_folder_sizes
     
 
