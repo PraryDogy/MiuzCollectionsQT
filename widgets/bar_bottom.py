@@ -136,6 +136,8 @@ class BarBottom(QWidget):
         self.h_layout.setSpacing(20)
         self.h_layout.setContentsMargins(0, 0, 15, 0)
 
+        # self.h_layout.addStretch()
+
         # --- Прогресс-бар ---
         self.progress_bar = ProgressWidget()
         self.progress_bar.setText("")
