@@ -828,10 +828,7 @@ class NewFolder(QGroupBox):
                 if x in self.mf.paths:
                     name = i.alias
         if name:
-            show_warn(
-                f"{Lng.folder_path_exists[cfg.lng]} {name}",
-                width=330
-            )
+            show_warn(f"{Lng.folder_path_exists[cfg.lng]} {name}", width=330)
             return
 
         self.new_folder.emit(self.mf)
