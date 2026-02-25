@@ -238,6 +238,7 @@ class WinMain(UMainWindow):
             alias = Mf.current.alias
             first_section = f"{real_name} ({alias})"
         else:
+            alias = Mf.current.alias
             first_section = f"{alias}"
         dir = f"/{first_section}{path}"
         self.bar_path.update(dir)
