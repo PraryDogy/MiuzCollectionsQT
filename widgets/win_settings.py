@@ -1019,7 +1019,8 @@ class WinSettings(SingleActionWindow):
 
     def blink_ok_btn(self):
         text = Lng.restart[cfg.lng]
-        blink_text = "❗❗❗"
+        original_style = self.ok_btn.styleSheet()
+        blink_style = "color: red; font-size: 11pt;"  # текст красным
 
         # если таймер уже существует и работает — не запускаем новое мигание
         if hasattr(self, "_blink_timer") and self._blink_timer.isActive():
@@ -1029,19 +1030,19 @@ class WinSettings(SingleActionWindow):
 
         def toggle():
             nonlocal count
-            if self.ok_btn.text() == text:
-                self.ok_btn.setText(blink_text)
+            if count % 2 == 0:
+                self.ok_btn.setStyleSheet(blink_style)
             else:
-                self.ok_btn.setText(text)
+                self.ok_btn.setStyleSheet(original_style)
             count += 1
             if count >= 6:  # 3 мигания
                 self._blink_timer.stop()
-                self.ok_btn.setText(text)
-                del self._blink_timer  # удаляем таймер после завершения
+                self.ok_btn.setStyleSheet(original_style)
 
+        self.ok_btn.setText(text)
         self._blink_timer = QTimer(self)
         self._blink_timer.timeout.connect(toggle)
-        self._blink_timer.start(300)
+        self._blink_timer.start(500)
 
     def init_right_side(self, index: int):
         if index == 0:
