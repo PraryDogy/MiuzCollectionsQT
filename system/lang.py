@@ -329,3 +329,9 @@ class Lng:
         "Имя — не более 30 символов",
         "Name — up to 30 characters",
     )
+    valid_message = (
+        "Имя может содержать только русские и английские буквы, "
+        "цифры и пробелы",
+        "The name may contain only Russian and English letters, "
+        "digits and spaces",
+    )

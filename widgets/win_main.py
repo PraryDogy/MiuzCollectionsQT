@@ -70,7 +70,7 @@ class WinMain(UMainWindow):
         super().__init__()
         self.resize(Static.ww, Static.hh)
         self.setMinimumWidth(self.min_w)
-        self.setWindowTitle(f"{Static.app_name} {Static.app_ver}")
+        self.setWindowTitle(f"{Static.app_name}")
 
         self.setWindowIcon(QIcon("./images/icon.png"))
         self.setWindowIconText(f"{Static.app_name} {Static.app_ver}")

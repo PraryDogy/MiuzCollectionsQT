@@ -1,5 +1,6 @@
 import copy
 import os
+import re
 import shutil
 import subprocess
 
@@ -766,7 +767,8 @@ class NewFolder(QGroupBox):
         name = self.name_label.text().strip()
         self.mf.alias = name
 
-    def save(self):        
+    def save(self):      
+        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'  
         if not self.mf.alias:
             self.win_warn = WinWarn(
                 Lng.attention[cfg.lng],
@@ -791,6 +793,15 @@ class NewFolder(QGroupBox):
             self.win_warn.resize(380, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
+        elif not re.fullmatch(pattern, self.mf.alias):
+            self.win_warn = WinWarn(
+                Lng.attention[cfg.lng],
+                f"{Lng.valid_message[cfg.lng]}."
+                )
+            self.win_warn.resize(380, 80)
+            self.win_warn.center_to_parent(self.window())
+            self.win_warn.show()
+
         elif not self.mf.paths:
             self.win_warn = WinWarn(
                 Lng.attention[cfg.lng],
