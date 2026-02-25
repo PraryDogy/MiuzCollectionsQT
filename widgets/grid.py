@@ -118,13 +118,11 @@ class BelowTextWid(QLabel):
         self.set_text()
 
     def set_text(self):
-        # root = os.path.dirname(self.wid.rel_path).strip("/").replace("/", self.sep)
         root = self.wid.rel_path.strip(os.sep).split(os.sep)
         if not root:
             root = os.path.basename(Mf.current.curr_path)
         else:
             root = root[0]
-        print(root)
         first_row = self.short_text(root)
         text = "\n".join((first_row, self.wid.mod))
         self.setText(text)
