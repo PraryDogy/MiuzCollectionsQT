@@ -176,6 +176,7 @@ class PathBar(QWidget):
 
         for x, name in enumerate(root, start=1):
             dir = os.path.join(os.sep, *root[:x])
+            # name = self.shorten_filename(name)
             path_item = PathItem(dir, name)
             cmd_ = lambda dir: self.new_history_item.emit(dir)
             path_item.new_history_item.connect(cmd_)
@@ -187,7 +188,6 @@ class PathBar(QWidget):
             path_items[x] = path_item
             self.main_lay.addWidget(path_item)
 
-
         path_items[1].img_wid.load(path_items[1].img_folder_svg)
 
         last_item = path_items.get(len(root))
@@ -196,10 +196,23 @@ class PathBar(QWidget):
 
         text_ = last_item.text_wid.text()
         if len(text_) > PathBar.last_item_limit:
-            path_item.text_wid.setText(text_[:PathBar.last_item_limit] + "...")
+            path_item.text_wid.setText(
+                # text_[:PathBar.last_item_limit] + "..."
+                self.shorten_filename(text_)
+            )
         
         if len(root) != 1:
             last_item.del_arrow()
             last_item.expand()
             last_item.enterEvent = lambda *args, **kwargs: None
             last_item.leaveEvent = lambda *args, **kwargs: None
+
+    def shorten_filename(self, filename: str, max_len: int = 40) -> str:
+        name, ext = os.path.splitext(filename)
+        if len(filename) <= max_len:
+            return filename
+        # сколько символов оставить до "..." и после него
+        keep = max_len - 3 - len(ext)
+        start_len = keep // 2
+        end_len = keep - start_len
+        return f"{name[:start_len]}...{name[-end_len:]}{ext}"   
