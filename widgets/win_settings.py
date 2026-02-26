@@ -651,12 +651,12 @@ class MfSettings(QGroupBox):
         self.setLayout(v_lay)
 
         # Верхний ряд с названием
-        first_row = QGroupBox()
-        first_row.setFixedHeight(30)
-        v_lay.addWidget(first_row)
+        self.name_wid = QGroupBox()
+        self.name_wid.setFixedHeight(30)
+        v_lay.addWidget(self.name_wid)
         first_lay = UHBoxLayout()
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        first_row.setLayout(first_lay)
+        self.name_wid.setLayout(first_lay)
         name_descr = ULabel(f"{Lng.alias[cfg.lng]}: ")
         first_lay.addWidget(name_descr)
         name_label = ULabel(mf.alias)
@@ -666,11 +666,11 @@ class MfSettings(QGroupBox):
         self.advanced = MfAdvanced(mf)
         v_lay.addWidget(self.advanced)
 
-        reset_remove = QGroupBox()
-        v_lay.addWidget(reset_remove)
+        self.res_rem_wid = QGroupBox()
+        v_lay.addWidget(self.res_rem_wid)
         res_rem_lay = UVBoxLayout()
         res_rem_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        reset_remove.setLayout(res_rem_lay)
+        self.res_rem_wid.setLayout(res_rem_lay)
 
         res_lay = UHBoxLayout()
         res_lay.setSpacing(15)
@@ -703,9 +703,15 @@ class MfSettings(QGroupBox):
 
     def set_remove_flag(self):
         self.need_remove = True
+        self.advanced.setDisabled(True)
+        self.res_rem_wid.setDisabled(True)
+        self.name_wid.setDisabled(True)
 
     def set_reset_flag(self):
         self.need_reset = True
+        self.advanced.setDisabled(True)
+        self.res_rem_wid.setDisabled(True)
+        self.name_wid.setDisabled(True)
 
     def save(self):
         def show_warn(message, width=380):
@@ -720,7 +726,7 @@ class MfSettings(QGroupBox):
             self.remove.emit()
             return
         elif self.need_reset:
-            self.reset_data.emit()
+            self.reset_data.emit(self.mf)
             self.show_reset_win()
             return
         if not self.mf.paths:

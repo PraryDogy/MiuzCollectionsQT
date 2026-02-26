@@ -681,8 +681,11 @@ class WinMain(UMainWindow):
             self.loop_tmr.start(1*60*1000)
 
     def restart_scaner_task(self):
-        self.scaner_task.terminate_join()
-        self.start_scaner_task(scaner_item=None)
+        try:
+            self.scaner_task.terminate_join()
+            self.start_scaner_task(scaner_item=None)
+        except AttributeError:
+            print("Win main restart scaner task", e)
         
     def center_screen(self):
         screen = QDesktopWidget().screenGeometry()
