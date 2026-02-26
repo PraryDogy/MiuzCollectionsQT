@@ -727,7 +727,8 @@ class MfSettings(QGroupBox):
             return
         elif self.need_reset:
             self.reset_data.emit(self.mf)
-            self.show_reset_win()
+            self.window().deleteLater()
+            self.show_finish_win()
             return
         if not self.mf.paths:
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
@@ -750,39 +751,6 @@ class MfSettings(QGroupBox):
         self.finish_win.resize(330, 80)
         self.finish_win.center_to_parent(self.window())
         self.finish_win.show()
-
-    def show_reset_win(self, mf: Mf):
-        self.reset_win = WinQuestion(
-            Lng.attention[cfg.lng],
-            Lng.reset_mf_text[cfg.lng]
-        )
-        self.reset_win.resize(380, 95)
-        self.reset_win.center_to_parent(self.window())
-        self.reset_win.ok_clicked.connect(
-            lambda: self.show_finish_win()
-        )
-        self.reset_win.ok_clicked.connect(
-            lambda: self.reset_data.emit(mf)
-        )
-        self.reset_win.ok_clicked.connect(
-            lambda: self.reset_win.deleteLater()
-        )
-        self.reset_win.show()
-
-    def show_remove_win(self):
-        self.remove_win = WinQuestion(
-            Lng.attention[cfg.lng],
-            Lng.folder_removed_text[cfg.lng]
-        )
-        self.remove_win.resize(330, 80)
-        self.remove_win.center_to_parent(self.window())
-        self.remove_win.ok_clicked.connect(
-            lambda: self.remove.emit()
-        )
-        self.remove_win.ok_clicked.connect(
-            lambda: self.remove_win.deleteLater()
-        )
-        self.remove_win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
