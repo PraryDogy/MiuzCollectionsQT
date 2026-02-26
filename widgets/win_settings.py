@@ -4,12 +4,13 @@ import re
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QIcon
+from PyQt5.QtCore import QRegExp, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QContextMenuEvent, QIcon, QTextCursor
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QSpacerItem, QSpinBox, QSplitter,
-                             QTableWidget, QTableWidgetItem, QWidget)
+                             QTableWidget, QTableWidgetItem, QTextEdit,
+                             QWidget)
 
 from cfg import Cfg, Static, cfg
 from system.filters import Filters
@@ -708,17 +709,15 @@ class MfSettings(QGroupBox):
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
             return
 
-        name = None
+        self.mf_list.remove(self.mf)
         for i in self.mf_list:
-            for x in i.paths:
-                if x in self.mf.paths:
-                    name = i.alias
-                    text_edit = self.advanced.mf_paths.text_edit
-                    text_edit.setSelection
-                    break
-        if name:
-            show_warn(f"{Lng.folder_path_exists[cfg.lng]} {name}", width=330)
-            return
+            for path in i.paths:
+                if path in self.mf.paths:
+                    show_warn(
+                        f"{Lng.folder_path_exists[cfg.lng]} {i.alias}",
+                        width=330
+                    )
+                    return
 
         self.changed.emit()
 
