@@ -665,11 +665,7 @@ class MfSettings(QGroupBox):
         # advanced.changed.connect(self.changed.emit)
         v_lay.addWidget(self.advanced)
 
-        # QGroupBox для кнопок и описания
-        btn_group = QWidget()
-        btn_main_lay = UVBoxLayout()
-        btn_main_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        btn_group.setLayout(btn_main_lay)
+
 
         # btn_first_row = UHBoxLayout()
         # # btn_first_row.setContentsMargins(0, 0, 0, 10)
@@ -685,12 +681,14 @@ class MfSettings(QGroupBox):
         # self.remove_btn.clicked.connect(lambda: self.show_remove_win())
         # btn_first_row.addWidget(self.remove_btn)
 
-        save_lay = UHBoxLayout()
-        btn_main_lay.addLayout(save_lay)
-
+        # QGroupBox для кнопок и описания
+        btn_group = QWidget()
+        btn_main_lay = UVBoxLayout()
+        btn_main_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        btn_group.setLayout(btn_main_lay)
         self.save_btn = UPushButton(Lng.save[cfg.lng])
         self.save_btn.clicked.connect(self.save)
-        save_lay.addWidget(self.save_btn)
+        btn_main_lay.addWidget(self.save_btn)
 
         v_lay.addWidget(btn_group)
 
