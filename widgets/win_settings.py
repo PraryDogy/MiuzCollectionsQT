@@ -690,6 +690,33 @@ class MfSettings(QGroupBox):
 
         v_lay.addWidget(btn_group)
 
+    def save(self):
+        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
+
+        def show_warn(message, width=380):
+            self.win_warn = WinWarn(
+                Lng.attention[cfg.lng],
+                message
+            )
+            self.win_warn.resize(width, 80)
+            self.win_warn.center_to_parent(self.window())
+            self.win_warn.show()
+
+        if not self.mf.paths:
+            show_warn(Lng.select_folder_path[cfg.lng], width=330)
+            return
+
+        name = None
+        for i in self.mf_list:
+            for x in i.paths:
+                if x in self.mf.paths:
+                    name = i.alias
+        if name:
+            show_warn(f"{Lng.folder_path_exists[cfg.lng]} {name}", width=330)
+            return
+
+        self.new_folder.emit(self.mf)
+
     def show_finish_win(self):
         self.finish_win = WinWarn(
             Lng.attention[cfg.lng],
@@ -823,10 +850,6 @@ class NewFolder(QGroupBox):
         elif not self.mf.paths:
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
             return
-
-        # elif not any(os.path.exists(i) for i in self.mf.paths):
-        #     show_warn(Lng.folder_not_exists[cfg.lng], width=330)
-        #     return
 
         name = None
         for i in self.mf_list:
