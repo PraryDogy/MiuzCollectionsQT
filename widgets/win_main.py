@@ -684,7 +684,7 @@ class WinMain(UMainWindow):
         try:
             self.scaner_task.terminate_join()
             self.start_scaner_task(scaner_item=None)
-        except AttributeError:
+        except AttributeError as e:
             print("Win main restart scaner task", e)
         
     def center_screen(self):
