@@ -818,9 +818,9 @@ class NewFolder(QGroupBox):
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
             return
 
-        elif not any(os.path.exists(i) for i in self.mf.paths):
-            show_warn(Lng.folder_not_exists[cfg.lng], width=330)
-            return
+        # elif not any(os.path.exists(i) for i in self.mf.paths):
+        #     show_warn(Lng.folder_not_exists[cfg.lng], width=330)
+        #     return
 
         name = None
         for i in self.mf_list:

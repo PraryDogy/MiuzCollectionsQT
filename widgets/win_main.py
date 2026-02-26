@@ -288,7 +288,7 @@ class WinMain(UMainWindow):
         alias = mf.alias
         self.noti_wid = NotifyWid(
             parent,
-            f"{basename} ({alias}): {Lng.no_connection_full[cfg.lng].lower()}",
+            f"{alias}: {Lng.no_connection_full[cfg.lng].lower()}",
             self.warning_svg,
             ms=3000
             )
