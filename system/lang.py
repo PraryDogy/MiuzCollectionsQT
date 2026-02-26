@@ -283,12 +283,12 @@ class Lng:
     data_size = ("Размер данных", "Data size")
     calculating = ("Вычисление", "Calculating")
     reset_mf_text = (
-        "Данные папки будут сброшены, и все изображения будут заново просканированы. Продолжить?",
-        "The data for this folder will be reset, and all images will be rescanned. Continue?"
+        "Все данные папки будут сброшены.",
+        "All folder data will be reset."
     )
     folder_removed_text = (
-        "Папка будет удалена из приложения. Продолжить?",
-        "The folder will be removed from the application. Continue?"
+        "Папка будет удалена из приложения.",
+        "The folder will be removed from the application."
     )
     filters_reset = (
         "Список фильтров будет сброшен по умолчанию. Продолжить?",

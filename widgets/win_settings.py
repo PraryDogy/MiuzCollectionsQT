@@ -665,21 +665,29 @@ class MfSettings(QGroupBox):
         # advanced.changed.connect(self.changed.emit)
         v_lay.addWidget(self.advanced)
 
+        reset_remove = QGroupBox()
+        v_lay.addWidget(reset_remove)
+        res_rem_lay = UVBoxLayout()
+        res_rem_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        reset_remove.setLayout(res_rem_lay)
 
+        res_lay = UHBoxLayout()
+        res_lay.setSpacing(15)
+        res_rem_lay.addLayout(res_lay)
+        self.reset_btn = UPushButton(Lng.reset[cfg.lng])
+        self.reset_btn.clicked.connect(lambda: self.show_reset_win(mf))
+        res_lay.addWidget(self.reset_btn)
+        res_descr = QLabel(Lng.reset_mf_text[cfg.lng])
+        res_lay.addWidget(res_descr)
 
-        # btn_first_row = UHBoxLayout()
-        # # btn_first_row.setContentsMargins(0, 0, 0, 10)
-        # btn_first_row.setSpacing(15)
-        # btn_first_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # btn_main_lay.addLayout(btn_first_row)
-
-        # self.reset_btn = UPushButton(Lng.reset[cfg.lng])
-        # self.reset_btn.clicked.connect(lambda: self.show_reset_win(mf))
-        # btn_first_row.addWidget(self.reset_btn)
-
-        # self.remove_btn = UPushButton(Lng.delete[cfg.lng])
-        # self.remove_btn.clicked.connect(lambda: self.show_remove_win())
-        # btn_first_row.addWidget(self.remove_btn)
+        rem_lay = UHBoxLayout()
+        rem_lay.setSpacing(15)
+        res_rem_lay.addLayout(rem_lay)
+        self.remove_btn = UPushButton(Lng.delete[cfg.lng])
+        self.remove_btn.clicked.connect(lambda: self.show_remove_win())
+        rem_lay.addWidget(self.remove_btn)
+        rem_descr = QLabel(Lng.folder_removed_text[cfg.lng])
+        rem_lay.addWidget(rem_descr)
 
         # QGroupBox для кнопок и описания
         btn_group = QWidget()
@@ -693,7 +701,6 @@ class MfSettings(QGroupBox):
         v_lay.addWidget(btn_group)
 
     def save(self):
-
         def show_warn(message, width=380):
             self.win_warn = WinWarn(
                 Lng.attention[cfg.lng],
@@ -702,11 +709,9 @@ class MfSettings(QGroupBox):
             self.win_warn.resize(width, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
-
         if not self.mf.paths:
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
             return
-
         for i in self.mf_list:
             for path in i.paths:
                 if path in self.mf.paths and self.mf.alias != i.alias:
@@ -715,7 +720,6 @@ class MfSettings(QGroupBox):
                         width=330
                     )
                     return
-
         self.changed.emit()
 
     def show_finish_win(self):
