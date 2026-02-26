@@ -644,6 +644,8 @@ class MfSettings(QGroupBox):
         super().__init__()
         self.mf = mf
         self.mf_list = mf_list
+        self.need_remove = False
+        self.need_reset = False
         v_lay = UVBoxLayout()
         v_lay.setSpacing(15)
         self.setLayout(v_lay)
@@ -662,7 +664,6 @@ class MfSettings(QGroupBox):
 
         # Advanced настройки
         self.advanced = MfAdvanced(mf)
-        # advanced.changed.connect(self.changed.emit)
         v_lay.addWidget(self.advanced)
 
         reset_remove = QGroupBox()
@@ -675,7 +676,7 @@ class MfSettings(QGroupBox):
         res_lay.setSpacing(15)
         res_rem_lay.addLayout(res_lay)
         self.reset_btn = UPushButton(Lng.reset[cfg.lng])
-        self.reset_btn.clicked.connect(lambda: self.show_reset_win(mf))
+        self.reset_btn.clicked.connect(self.set_reset_flag)
         res_lay.addWidget(self.reset_btn)
         res_descr = QLabel(Lng.reset_mf_text[cfg.lng])
         res_lay.addWidget(res_descr)
@@ -684,7 +685,7 @@ class MfSettings(QGroupBox):
         rem_lay.setSpacing(15)
         res_rem_lay.addLayout(rem_lay)
         self.remove_btn = UPushButton(Lng.delete[cfg.lng])
-        self.remove_btn.clicked.connect(lambda: self.show_remove_win())
+        self.remove_btn.clicked.connect(self.set_remove_flag)
         rem_lay.addWidget(self.remove_btn)
         rem_descr = QLabel(Lng.folder_removed_text[cfg.lng])
         rem_lay.addWidget(rem_descr)
@@ -700,6 +701,12 @@ class MfSettings(QGroupBox):
 
         v_lay.addWidget(btn_group)
 
+    def set_remove_flag(self):
+        self.need_remove = True
+
+    def set_reset_flag(self):
+        self.need_reset = True
+
     def save(self):
         def show_warn(message, width=380):
             self.win_warn = WinWarn(
@@ -709,6 +716,13 @@ class MfSettings(QGroupBox):
             self.win_warn.resize(width, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
+        if self.need_remove:
+            self.remove.emit()
+            return
+        elif self.need_reset:
+            self.reset_data.emit()
+            self.show_reset_win()
+            return
         if not self.mf.paths:
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
             return
