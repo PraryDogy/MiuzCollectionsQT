@@ -502,7 +502,6 @@ class GeneralSettings(QGroupBox):
 
         data_settings = DataSettings()
         data_settings.reset.connect(self.set_need_reset)
-        data_settings.changed.connect(self.changed.emit)
         v_lay.addWidget(data_settings)
 
         simple_settings = SimpleSettings()
@@ -520,8 +519,8 @@ class GeneralSettings(QGroupBox):
         v_lay.addWidget(about)
 
     def set_need_reset(self):
-        print("need teset")
         self.need_reset_item.need_reset = True
+        self.changed.emit()
 
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
 
