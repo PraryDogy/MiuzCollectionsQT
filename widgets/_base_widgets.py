@@ -165,7 +165,7 @@ class UTextEdit(QTextEdit):
         super().__init__()
 
     def copy_selection(self):
-        cur = self.parent_.textCursor()
+        cur = self.textCursor()
         text = cur.selectedText().strip()
         Utils.copy_text(text)
 

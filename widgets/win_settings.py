@@ -611,14 +611,14 @@ class MfAdvanced(QWidget):
         v_lay.setSpacing(15)
         self.setLayout(v_lay)
 
-        self.paths_wid = MfPaths(mf)
-        self.paths_wid.text_changed.connect(self.changed.emit)
-        v_lay.addWidget(self.paths_wid)
-        self.paths_wid.top_label.setText(
+        self.mf_paths = MfPaths(mf)
+        self.mf_paths.text_changed.connect(self.changed.emit)
+        v_lay.addWidget(self.mf_paths)
+        self.mf_paths.top_label.setText(
             self.insert_linebreaks(Lng.images_folder_path[cfg.lng])
         )
         text_ = "\n".join(i for i in mf.paths)
-        self.paths_wid.text_edit.setPlainText(text_)
+        self.mf_paths.text_edit.setPlainText(text_)
 
         third_row = StopList(mf)
         third_row.text_changed.connect(self.changed.emit)
@@ -639,8 +639,10 @@ class MfSettings(QGroupBox):
     changed = pyqtSignal()
     reset_data = pyqtSignal(Mf)
 
-    def __init__(self, mf: Mf):
+    def __init__(self, mf: Mf, mf_list: list[Mf]):
         super().__init__()
+        self.mf = mf
+        self.mf_list = mf_list
         v_lay = UVBoxLayout()
         v_lay.setSpacing(15)
         self.setLayout(v_lay)
@@ -658,9 +660,9 @@ class MfSettings(QGroupBox):
         first_lay.addWidget(name_label)
 
         # Advanced настройки
-        advanced = MfAdvanced(mf)
-        advanced.changed.connect(self.changed.emit)
-        v_lay.addWidget(advanced)
+        self.advanced = MfAdvanced(mf)
+        # advanced.changed.connect(self.changed.emit)
+        v_lay.addWidget(self.advanced)
 
         # QGroupBox для кнопок и описания
         btn_group = QWidget()
@@ -668,30 +670,30 @@ class MfSettings(QGroupBox):
         btn_main_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btn_group.setLayout(btn_main_lay)
 
-        btn_first_row = UHBoxLayout()
-        # btn_first_row.setContentsMargins(0, 0, 0, 10)
-        btn_first_row.setSpacing(15)
-        btn_first_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        btn_main_lay.addLayout(btn_first_row)
+        # btn_first_row = UHBoxLayout()
+        # # btn_first_row.setContentsMargins(0, 0, 0, 10)
+        # btn_first_row.setSpacing(15)
+        # btn_first_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # btn_main_lay.addLayout(btn_first_row)
 
-        self.reset_btn = UPushButton(Lng.reset[cfg.lng])
-        self.reset_btn.clicked.connect(lambda: self.show_reset_win(mf))
-        btn_first_row.addWidget(self.reset_btn)
+        # self.reset_btn = UPushButton(Lng.reset[cfg.lng])
+        # self.reset_btn.clicked.connect(lambda: self.show_reset_win(mf))
+        # btn_first_row.addWidget(self.reset_btn)
 
-        self.remove_btn = UPushButton(Lng.delete[cfg.lng])
-        self.remove_btn.clicked.connect(lambda: self.show_remove_win())
-        btn_first_row.addWidget(self.remove_btn)
+        # self.remove_btn = UPushButton(Lng.delete[cfg.lng])
+        # self.remove_btn.clicked.connect(lambda: self.show_remove_win())
+        # btn_first_row.addWidget(self.remove_btn)
 
         save_lay = UHBoxLayout()
         btn_main_lay.addLayout(save_lay)
 
         self.save_btn = UPushButton(Lng.save[cfg.lng])
+        self.save_btn.clicked.connect(self.save)
         save_lay.addWidget(self.save_btn)
 
         v_lay.addWidget(btn_group)
 
     def save(self):
-        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
 
         def show_warn(message, width=380):
             self.win_warn = WinWarn(
@@ -711,11 +713,14 @@ class MfSettings(QGroupBox):
             for x in i.paths:
                 if x in self.mf.paths:
                     name = i.alias
+                    text_edit = self.advanced.mf_paths.text_edit
+                    text_edit.setSelection
+                    break
         if name:
             show_warn(f"{Lng.folder_path_exists[cfg.lng]} {name}", width=330)
             return
 
-        self.new_folder.emit(self.mf)
+        self.changed.emit()
 
     def show_finish_win(self):
         self.finish_win = WinWarn(
@@ -1104,7 +1109,7 @@ class WinSettings(SingleActionWindow):
                 for i in self.mf_list_copy
                 if i.alias == item.mf.alias
             )
-            mf_sett = MfSettings(mf)
+            mf_sett = MfSettings(mf, self.mf_list_copy)
             mf_sett.changed.connect(self.blink_ok_btn)
             mf_sett.remove.connect(lambda: self.remove_mf(item))
             mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
