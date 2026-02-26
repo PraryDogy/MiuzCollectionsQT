@@ -636,8 +636,8 @@ class MfAdvanced(QWidget):
 
 
 class MfSettings(QGroupBox):
-    remove = pyqtSignal()
     changed = pyqtSignal()
+    remove = pyqtSignal()
     reset_data = pyqtSignal(Mf)
 
     def __init__(self, mf: Mf, mf_list: list[Mf]):
@@ -709,10 +709,9 @@ class MfSettings(QGroupBox):
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
             return
 
-        self.mf_list.remove(self.mf)
         for i in self.mf_list:
             for path in i.paths:
-                if path in self.mf.paths:
+                if path in self.mf.paths and self.mf.alias != i.alias:
                     show_warn(
                         f"{Lng.folder_path_exists[cfg.lng]} {i.alias}",
                         width=330
