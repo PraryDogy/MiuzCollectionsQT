@@ -664,23 +664,29 @@ class MfSettings(QGroupBox):
 
         # QGroupBox для кнопок и описания
         btn_group = QWidget()
-        btn_lay = UHBoxLayout()
-        btn_lay.setContentsMargins(0, 0, 0, 10)
-        btn_lay.setSpacing(15)
-        btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        btn_group.setLayout(btn_lay)
+        btn_main_lay = UVBoxLayout()
+        btn_main_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        btn_group.setLayout(btn_main_lay)
+
+        btn_first_row = UHBoxLayout()
+        # btn_first_row.setContentsMargins(0, 0, 0, 10)
+        btn_first_row.setSpacing(15)
+        btn_first_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        btn_main_lay.addLayout(btn_first_row)
 
         self.reset_btn = UPushButton(Lng.reset[cfg.lng])
-        self.reset_btn.clicked.connect(
-            lambda: self.show_reset_win(mf)
-        )
-        btn_lay.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.reset_btn.clicked.connect(lambda: self.show_reset_win(mf))
+        btn_first_row.addWidget(self.reset_btn)
 
         self.remove_btn = UPushButton(Lng.delete[cfg.lng])
-        self.remove_btn.clicked.connect(
-            lambda: self.show_remove_win()
-        )
-        btn_lay.addWidget(self.remove_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.remove_btn.clicked.connect(lambda: self.show_remove_win())
+        btn_first_row.addWidget(self.remove_btn)
+
+        save_lay = UHBoxLayout()
+        btn_main_lay.addLayout(save_lay)
+
+        self.save_btn = UPushButton(Lng.save[cfg.lng])
+        save_lay.addWidget(self.save_btn)
 
         v_lay.addWidget(btn_group)
 
