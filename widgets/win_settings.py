@@ -663,6 +663,9 @@ class MfSettings(QGroupBox):
 
         # Advanced настройки
         self.advanced = MfAdvanced(mf)
+        self.advanced.changed.connect(
+            lambda: self.save_btn.setDisabled(False)
+        )
         v_lay.addWidget(self.advanced)
 
         self.res_rem_wid = QGroupBox()
@@ -696,21 +699,18 @@ class MfSettings(QGroupBox):
         btn_group.setLayout(btn_main_lay)
         self.save_btn = UPushButton(Lng.save[cfg.lng])
         self.save_btn.clicked.connect(self.save)
+        self.save_btn.setDisabled(True)
         btn_main_lay.addWidget(self.save_btn)
 
         v_lay.addWidget(btn_group)
 
     def set_remove_flag(self):
         self.need_remove = True
-        self.advanced.setDisabled(True)
-        self.res_rem_wid.setDisabled(True)
-        self.name_wid.setDisabled(True)
+        self.save_btn.setDisabled(False)
 
     def set_reset_flag(self):
         self.need_reset = True
-        self.advanced.setDisabled(True)
-        self.res_rem_wid.setDisabled(True)
-        self.name_wid.setDisabled(True)
+        self.save_btn.setDisabled(False)
 
     def save(self):
         def show_warn(message, width=380):
@@ -721,6 +721,7 @@ class MfSettings(QGroupBox):
             self.win_warn.resize(width, 80)
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
+        self.save_btn.setDisabled(True)
         if self.need_remove:
             self.remove.emit()
             return
@@ -787,6 +788,7 @@ class NewFolder(QGroupBox):
         first_lay.addWidget(self.name_label)
 
         self.advanced = MfAdvanced(self.mf)
+        self.advanced.changed.connect(self.toggle_save_btn)
         v_lay.addWidget(self.advanced)
 
         btn_wid = QWidget()
@@ -797,6 +799,7 @@ class NewFolder(QGroupBox):
         btn_wid.setLayout(btn_lay)
 
         self.save_btn = UPushButton(Lng.save[cfg.lng])
+        self.save_btn.setDisabled(True)
         self.save_btn.clicked.connect(self.save)
         btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
@@ -807,6 +810,10 @@ class NewFolder(QGroupBox):
     def name_cmd(self):
         name = self.name_label.text().strip()
         self.mf.alias = name
+
+    def toggle_save_btn(self):
+        if self.name_label.text() and self.advanced.mf_paths.get_data():
+            self.save_btn.setDisabled(False)
 
     def save(self):
         pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
