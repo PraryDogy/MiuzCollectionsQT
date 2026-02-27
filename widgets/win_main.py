@@ -671,10 +671,6 @@ class WinMain(UMainWindow):
             self.scaner_task.start()
             tmr.start(ms)
             self.loop_tmr.stop()
-            self.loop_tmr.disconnect()
-            self.loop_tmr.timeout.connect(
-                lambda : self.start_scaner_task(scaner_item=scaner_item)
-            )
             self.loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
 
         else:
