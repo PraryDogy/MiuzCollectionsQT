@@ -1,7 +1,8 @@
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtWidgets import QLabel, QSlider, QWidget
 from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import QGraphicsOpacityEffect, QLabel, QSlider, QWidget
+
 from cfg import Dynamic, Static, cfg
 from system.lang import Lng
 
@@ -89,6 +90,10 @@ class ProgressWidget(QLabel):
         self.timer.timeout.connect(self.update_timer_text)
 
     def start_timer_text(self):
+        effect = QGraphicsOpacityEffect(self)
+        effect.setOpacity(0.5)
+        self.setGraphicsEffect(effect)
+
         self.timer.stop()
         self.total_seconds = cfg.scaner_minutes * 60
         self.update_label()
@@ -96,6 +101,9 @@ class ProgressWidget(QLabel):
 
     def stop_timer_text(self):
         self.timer.stop()
+        effect = QGraphicsOpacityEffect(self)
+        effect.setOpacity(1.0)
+        self.setGraphicsEffect(effect)
 
     def update_timer_text(self):
         self.total_seconds -= 1
