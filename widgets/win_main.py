@@ -625,7 +625,7 @@ class WinMain(UMainWindow):
             self.loop_tmr = QTimer(self)
             self.loop_tmr.setSingleShot(True)
             self.loop_tmr.timeout.connect(
-                lambda: self.start_scaner_task(scaner_item=scaner_item)
+                lambda : self.start_scaner_task(scaner_item=scaner_item)
             )
             self.scaner_task = None
 
@@ -653,13 +653,14 @@ class WinMain(UMainWindow):
         if can_start:
             from datetime import datetime
             now = datetime.now().time().replace(microsecond=0)
-            print("штатно запускаю сканер", now)
             if scaner_item:
+                print("штатно запускаю SINGLE сканер", now)
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
                     args=(scaner_item, )
                     )
             else:
+                print("штатно запускаю ОБЩИЙ сканер", now)
                 self.scaner_task = ProcessWorker(
                     target=AllDirScaner.start,
                     args=(Mf.list_, )
@@ -677,8 +678,13 @@ class WinMain(UMainWindow):
 
         else:
             # проверяем каждую минуту, что задача завершена
+            self.loop_tmr.disconnect()
+            self.loop_tmr.timeout.connect(
+                lambda : self.start_scaner_task(scaner_item=scaner_item)
+            )
             self.loop_tmr.stop()
-            self.loop_tmr.start(1*60*1000)
+            self.loop_tmr.start(1*1000)
+            print("ожидание сканера")
 
     def restart_scaner_task(self):
         try:
