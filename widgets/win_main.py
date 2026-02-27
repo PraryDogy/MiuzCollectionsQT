@@ -624,6 +624,9 @@ class WinMain(UMainWindow):
             self.scaner_timeout = time()
             self.loop_tmr = QTimer(self)
             self.loop_tmr.setSingleShot(True)
+            self.loop_tmr.timeout.connect(
+                lambda : self.start_scaner_task(scaner_item=scaner_item)
+            )
             self.scaner_task = None
 
         can_start = False
