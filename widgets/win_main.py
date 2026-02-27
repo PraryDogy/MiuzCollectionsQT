@@ -604,15 +604,15 @@ class WinMain(UMainWindow):
             reload_gui = False
             while not tsk.proc_q.empty():
                 self.scaner_timeout = time()
-                scaner_item: ExtScanerItem = tsk.proc_q.get()
+                x_scan_item: ExtScanerItem = tsk.proc_q.get()
                 if not reload_gui:
-                    reload_gui = scaner_item.reload_gui
-                if self.bar_bottom.progress_bar.text() != scaner_item.gui_text:
-                    self.bar_bottom.progress_bar.setText(scaner_item.gui_text)
+                    reload_gui = x_scan_item.reload_gui
+                if self.bar_bottom.progress_bar.text() != x_scan_item.gui_text:
+                    self.bar_bottom.progress_bar.setText(x_scan_item.gui_text)
             if not tsk.is_alive():
                 tsk.terminate_join()
                 self.bar_bottom.progress_bar.start_timer_text()
-                if reload_gui:
+                if reload_gui or scaner_item:
                     self.grid.reload_thumbnails()
                     self.left_menu.reload_tree()
             else:
