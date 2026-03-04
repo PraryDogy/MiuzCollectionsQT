@@ -645,25 +645,22 @@ class DropableGroupBox(QGroupBox):
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
-        self.setFixedHeight(150)
 
-        v_lay = UVBoxLayout()
-        v_lay.setSpacing(10)
-        v_lay.setContentsMargins(0, 10, 0, 10)
-        self.setLayout(v_lay)
+        group_lay = GroupLay()
+        self.setLayout(group_lay)
 
-        self.top_label = ULabel()
-        v_lay.addWidget(self.top_label)
+        self.dropable_text = ULabel()
+        group_lay.addWidget(self.dropable_text)
 
-        self.text_edit = UTextEdit()
-        self.text_edit.textChanged.connect(self.text_changed.emit)
-        self.text_edit.setAcceptDrops(False)
-        v_lay.addWidget(self.text_edit)
+        self.dropable_edit = UTextEdit()
+        self.dropable_edit.textChanged.connect(self.text_changed.emit)
+        self.dropable_edit.setAcceptDrops(False)
+        group_lay.addWidget(self.dropable_edit)
 
     def get_data(self):
         return [
             i
-            for i in self.text_edit.toPlainText().split("\n")
+            for i in self.dropable_edit.toPlainText().split("\n")
             if i.strip()
         ]
 
@@ -677,7 +674,7 @@ class MfPaths(DropableGroupBox):
         super().__init__()
         self.mf = mf
         self.text_changed.connect(self.set_data)
-        self.text_edit.setPlaceholderText(Lng.folder_path[cfg.lng])
+        self.dropable_edit.setPlaceholderText(Lng.folder_path[cfg.lng])
 
     def set_data(self, *args):
         self.mf.paths = self.get_data()
@@ -689,8 +686,8 @@ class MfPaths(DropableGroupBox):
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
-            text = "\n".join((self.text_edit.toPlainText(), *urls)).strip()
-            self.text_edit.setPlainText(text)
+            text = "\n".join((self.dropable_edit.toPlainText(), *urls)).strip()
+            self.dropable_edit.setPlainText(text)
         return super().dropEvent(a0)
 
 
@@ -699,7 +696,7 @@ class StopList(DropableGroupBox):
         super().__init__()
         self.mf = mf
         self.text_changed.connect(self.set_data)
-        self.text_edit.setPlaceholderText(Lng.ignore_list[cfg.lng])
+        self.dropable_edit.setPlaceholderText(Lng.ignore_list[cfg.lng])
 
     def set_data(self, *args):
         self.mf.stop_list = self.get_data()
@@ -711,8 +708,8 @@ class StopList(DropableGroupBox):
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
-            text = "\n".join((self.text_edit.toPlainText(), *urls)).strip()
-            self.text_edit.setPlainText(text)
+            text = "\n".join((self.dropable_edit.toPlainText(), *urls)).strip()
+            self.dropable_edit.setPlainText(text)
         return super().dropEvent(a0)
 
 
@@ -728,18 +725,18 @@ class MfAdvanced(QWidget):
         self.mf_paths = MfPaths(mf)
         self.mf_paths.text_changed.connect(self.changed.emit)
         v_lay.addWidget(self.mf_paths)
-        self.mf_paths.top_label.setText(
+        self.mf_paths.dropable_text.setText(
             self.insert_linebreaks(Lng.images_folder_path[cfg.lng])
         )
         text_ = "\n".join(i for i in mf.paths)
-        self.mf_paths.text_edit.setPlainText(text_)
+        self.mf_paths.dropable_edit.setPlainText(text_)
 
         third_row = StopList(mf)
         third_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(third_row)
-        third_row.top_label.setText(Lng.ignore_list_descr[cfg.lng])
+        third_row.dropable_text.setText(Lng.ignore_list_descr[cfg.lng])
         text_ = "\n".join(i for i in mf.stop_list)
-        third_row.text_edit.setPlainText(text_)
+        third_row.dropable_edit.setPlainText(text_)
 
     def insert_linebreaks(self, text: str, n: int = 64) -> str:
         return '\n'.join(
@@ -918,7 +915,7 @@ class NewFolder(QWidget):
         btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def preset_new_folder(self, url: str):
-        text_edit = self.findChildren(DropableGroupBox)[0].text_edit
+        text_edit = self.findChildren(DropableGroupBox)[0].dropable_edit
         text_edit.setPlainText(url)
 
     def name_cmd(self):
