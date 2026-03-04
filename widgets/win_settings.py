@@ -198,27 +198,27 @@ class RebootSettings(QGroupBox):
         self.reset_data_btn = SvgArrow()
         reset_data_lay.addWidget(self.reset_data_btn)
 
+    def show_win_warn(self, text: str, size: int):
+        win = WinQuestion(Lng.attention[cfg.lng], text)
+        win.resize(330, size)
+        win.center_to_parent(self.window())
+        return win
+
     def lang_action_cmd(self, value: int):
         self.cfg_clone.lng = value
         self.lng_btn.setText(Lng.russian[value])
         self.cfg_changed.emit()
 
     def reset_btn_cmd(self, *args):
-
         def fin():
+            self.deleteLater()
             shutil.rmtree(Static.app_support)
             QApplication.quit()
             Utils.start_new_app()
-
-        self.reset_win = WinQuestion(
-            Lng.attention[cfg.lng],
-            Lng.erase_data_long[cfg.lng]
-        )
-        self.reset_win.resize(330, 120)
-        self.reset_win.text_label.setFixedHeight(80)
-        self.reset_win.ok_clicked.connect(fin)
-        self.reset_win.center_to_parent(self.window())
-        self.reset_win.show()
+        reset_win = self.show_win_warn(Lng.erase_data_long[cfg.lng], 115)
+        reset_win.text_label.setFixedHeight(85)
+        reset_win.ok_clicked.connect(fin)
+        reset_win.show()
 
     def change_scan_time(self, value: int):
         if value == self.spin_max:
