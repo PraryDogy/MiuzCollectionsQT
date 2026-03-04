@@ -5,12 +5,11 @@ import shutil
 import subprocess
 
 from PyQt5.QtCore import QRegExp, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QIcon, QTextCursor
+from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QSpacerItem, QSpinBox, QSplitter,
-                             QTableWidget, QTableWidgetItem, QTextEdit,
-                             QWidget)
+                             QTableWidget, QTableWidgetItem, QWidget)
 
 from cfg import Cfg, Static, cfg
 from system.filters import Filters
