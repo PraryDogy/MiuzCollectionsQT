@@ -220,8 +220,8 @@ class RebootSettings(QGroupBox):
             self.deleteLater()
             shutil.rmtree(Static.app_support)
             restart_app()
-        reset_win = self.show_win_warn(Lng.erase_data_long[cfg.lng], 115)
-        reset_win.text_label.setFixedHeight(85)
+        reset_win = self.show_win_warn(Lng.erase_data_long[cfg.lng], 90)
+        # reset_win.text_label.setFixedHeight(85)
         reset_win.ok_clicked.connect(fin)
         reset_win.show()
 

@@ -299,14 +299,14 @@ class Lng:
         "All folder data will be deleted. Original images will remain intact."
     )
     filters_reset = (
-        "Список фильтров будет сброшен по умолчанию. Продолжить?",
-        "The filter list will be reset to default. Continue?"
+        "Список фильтров будет сброшен по умолчанию.",
+        "The filter list will be reset to default."
     )
     erase_data_long = (
         "Все кэшированные изображения будут удалены, а настройки приложения "
-        "сброшены до значений по умолчанию. Продолжить?",
+        "сброшены до значений по умолчанию",
         "All cached images will be deleted and app settings will be reset "
-        "to defaults. Continue?"
+        "to defaults."
     )
     location = ("Расположение", "Location")
     modified = ("Изменен", "Modified")
