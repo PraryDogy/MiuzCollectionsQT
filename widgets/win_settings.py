@@ -78,15 +78,18 @@ class RebootSettings(QGroupBox):
         reset_data_wid = QWidget()
         reset_data_lay = UHBoxLayout()
         reset_data_lay.setSpacing(15)
-        reset_data_wid.setLayout(lng_lay)
+        reset_data_wid.setLayout(reset_data_lay)
         group_lay.addWidget(reset_data_wid)
+
+        reset_data_text = ULabel(Lng.reset_settings[cfg.lng])
+        reset_data_lay.addWidget(reset_data_text)
+
+        reset_data_lay.addStretch()
 
         self.reset_data_btn = UPushButton(Lng.reset[cfg.lng])
         self.reset_data_btn.clicked.connect(self.reset_btn_cmd)
         reset_data_lay.addWidget(self.reset_data_btn)
 
-        reset_data_text = ULabel(Lng.reset_settings[cfg.lng])
-        reset_data_lay.addWidget(reset_data_text)
 
     def lang_btn_cmd(self, *args):
         if self.cfg_clone.lng == 0:
