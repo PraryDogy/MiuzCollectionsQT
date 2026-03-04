@@ -78,6 +78,45 @@ class SvgArrow(QSvgWidget):
         return super().mouseReleaseEvent(a0)
 
 
+class TextEditWidget(QGroupBox):
+    text_changed = pyqtSignal()
+
+    def __init__(self, title: str, placeholder: str):
+        super().__init__()
+        self.setAcceptDrops(True)
+
+        group_lay = GroupLay()
+        self.setLayout(group_lay)
+
+        # self.dropable_text = ULabel(self.insert_linebreaks(text))
+        self.title_wid = ULabel(title)
+        self.title_wid.setWordWrap(True)
+        group_lay.addWidget(self.title_wid)
+
+        self.text_edit_wid = UTextEdit()
+        self.text_edit_wid.setPlaceholderText(placeholder)
+        self.text_edit_wid.textChanged.connect(self.text_changed.emit)
+        self.text_edit_wid.setAcceptDrops(False)
+        group_lay.addWidget(self.text_edit_wid)
+
+    def insert_linebreaks(self, text: str, n: int = 65) -> str:
+        return '\n'.join(
+            text[i:i+n]
+            for i in range(0, len(text), n)
+        )
+
+    def get_lined_text(self):
+        return [
+            i
+            for i in self.text_edit_wid.toPlainText().split("\n")
+            if i.strip()
+        ]
+
+    def dragEnterEvent(self, a0):
+        a0.accept()
+        return super().dragEnterEvent(a0)
+    
+
 
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ
 
@@ -640,49 +679,10 @@ class FiltersWid(QGroupBox):
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
 
 
-class DropableGroupBox(QGroupBox):
-    text_changed = pyqtSignal()
-
-    def __init__(self, text: str, placeholder: str):
-        super().__init__()
-        self.setAcceptDrops(True)
-
-        group_lay = GroupLay()
-        self.setLayout(group_lay)
-
-        # self.dropable_text = ULabel(self.insert_linebreaks(text))
-        self.dropable_text = ULabel(text)
-        self.dropable_text.setWordWrap(True)
-        group_lay.addWidget(self.dropable_text)
-
-        self.dropable_edit = UTextEdit()
-        self.dropable_edit.setPlaceholderText(placeholder)
-        self.dropable_edit.textChanged.connect(self.text_changed.emit)
-        self.dropable_edit.setAcceptDrops(False)
-        group_lay.addWidget(self.dropable_edit)
-
-    def insert_linebreaks(self, text: str, n: int = 65) -> str:
-        return '\n'.join(
-            text[i:i+n]
-            for i in range(0, len(text), n)
-        )
-
-    def get_lined_text(self):
-        return [
-            i
-            for i in self.dropable_edit.toPlainText().split("\n")
-            if i.strip()
-        ]
-
-    def dragEnterEvent(self, a0):
-        a0.accept()
-        return super().dragEnterEvent(a0)
-    
-
-class MfPaths(DropableGroupBox):
+class MfPaths(TextEditWidget):
     def __init__(self, mf: Mf):
         super().__init__(
-            text=Lng.images_folder_path[cfg.lng],
+            title=Lng.images_folder_path[cfg.lng],
             placeholder=Lng.folder_path[cfg.lng]
         )
         self.mf = mf
@@ -698,15 +698,15 @@ class MfPaths(DropableGroupBox):
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
-            text = "\n".join((self.dropable_edit.toPlainText(), *urls)).strip()
-            self.dropable_edit.setPlainText(text)
+            text = "\n".join((self.text_edit_wid.toPlainText(), *urls)).strip()
+            self.text_edit_wid.setPlainText(text)
         return super().dropEvent(a0)
 
 
-class MfStopList(DropableGroupBox):
+class MfStopList(TextEditWidget):
     def __init__(self, mf: Mf):
         super().__init__(
-            text=Lng.ignore_list_descr[cfg.lng],
+            title=Lng.ignore_list_descr[cfg.lng],
             placeholder=Lng.ignore_list[cfg.lng]
         )
         self.mf = mf
@@ -722,8 +722,8 @@ class MfStopList(DropableGroupBox):
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
-            text = "\n".join((self.dropable_edit.toPlainText(), *urls)).strip()
-            self.dropable_edit.setPlainText(text)
+            text = "\n".join((self.text_edit_wid.toPlainText(), *urls)).strip()
+            self.text_edit_wid.setPlainText(text)
         return super().dropEvent(a0)
 
 
@@ -743,13 +743,13 @@ class MfAdvanced(QWidget):
         #     self.insert_linebreaks(Lng.images_folder_path[cfg.lng])
         # )
         text_ = "\n".join(i for i in mf.paths)
-        self.mf_paths.dropable_edit.setPlainText(text_)
+        self.mf_paths.text_edit_wid.setPlainText(text_)
 
         third_row = MfStopList(mf)
         third_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(third_row)
         text_ = "\n".join(i for i in mf.stop_list)
-        third_row.dropable_edit.setPlainText(text_)
+        third_row.text_edit_wid.setPlainText(text_)
 
 
 class MfSettings(QWidget):
@@ -922,7 +922,7 @@ class NewFolder(QWidget):
         btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def preset_new_folder(self, url: str):
-        text_edit = self.findChildren(DropableGroupBox)[0].dropable_edit
+        text_edit = self.findChildren(TextEditWidget)[0].text_edit_wid
         text_edit.setPlainText(url)
 
     def name_cmd(self):
