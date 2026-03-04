@@ -29,6 +29,13 @@ from .win_warn import WinQuestion, WinWarn
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ 
 
 
+class WhatChange:
+    def __init__(self):
+        self.change_lng = False
+        self.reset_data = False
+        self.scaner_time = False
+
+
 class ULabel(QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,9 +51,10 @@ class UPushButton(SmallBtn):
 class LangSettings(QGroupBox):
     cfg_changed = pyqtSignal()
 
-    def __init__(self, cfg_clone: Cfg):
+    def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
         super().__init__()
         self.cfg_clone = cfg_clone
+        self.what_change = what_change
 
         group_lay = UVBoxLayout()
         self.setLayout(group_lay)
@@ -83,12 +91,16 @@ class LangSettings(QGroupBox):
         else:
             self.cfg_clone.lng = 0
         self.lng_btn.setText(Lng.russian[self.cfg_clone.lng])
+
         self.cfg_changed.emit()
+        self.what_change.change_lng = True
 
     def reset_btn_cmd(self):
 
         def fin():
             self.cfg_changed.emit()
+            self.what_change.reset_data = True
+
             self.reset_win.deleteLater()
 
         self.reset_win = WinQuestion(
