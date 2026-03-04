@@ -298,9 +298,13 @@ class Lng:
         "Все данные папки будут удалены. Исходные изображения сохранятся.",
         "All folder data will be deleted. Original images will remain intact."
     )
-    filters_reset = (
-        "Список фильтров будет сброшен по умолчанию.",
-        "The filter list will be reset to default."
+    reset_filters = (
+        "Сбросить фильтры.",
+        "Reset filters."
+    )
+    reset_filters_long = (
+        "Фильтры будут сброшены к значениям по умолчанию.",
+        "All filters will be reset to their default values.",
     )
     erase_data_long = (
         "Все кэшированные изображения будут удалены, а настройки приложения "

@@ -618,43 +618,43 @@ class FiltersWid(QGroupBox):
         filters_text.setWordWrap(True)
         group_lay.addWidget(filters_text)
 
+        group_lay.addWidget(USep())
+
+        erase_filters_wid = GroupChild()
+        erase_filters_wid.mouseReleaseEvent = self.reset_btn_cmd
+        erase_filters_lay = UHBoxLayout()
+        erase_filters_wid.setLayout(erase_filters_lay)
+        group_lay.addWidget(erase_filters_wid)
+
+        erase_filters_text = QLabel(Lng.reset_filters[cfg.lng])
+        erase_filters_lay.addWidget(erase_filters_text)
+
+        erase_filters_lay.addStretch()
+
+        self.reset_btn = SvgArrow()
+        erase_filters_lay.addWidget(self.reset_btn)
+
+        group_lay.addWidget(USep())
+
         self.filters_edit = UTextEdit()
         self.filters_edit.setFixedHeight(220)
         self.filters_edit.setPlaceholderText(Lng.filters[cfg.lng])
         self.filters_edit.setPlainText("\n".join(self.filters_clone))
         self.filters_edit.textChanged.connect(self.on_text_changed)
         group_lay.addWidget(self.filters_edit)
-
-        btns_wid = QWidget()
-        btns_lay = UHBoxLayout()
-        btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        btns_lay.setSpacing(10)
-        btns_wid.setLayout(btns_lay)
-        group_lay.addWidget(btns_wid)
-
-        self.save_btn = UPushButton(Lng.save[cfg.lng])
-        self.save_btn.clicked.connect(self.save_btn_cmd)
-        btns_lay.addWidget(self.save_btn)
-
-        self.reset_btn = UPushButton(Lng.reset[cfg.lng])
-        self.reset_btn.clicked.connect(self.reset_btn_cmd)
-        btns_lay.addWidget(self.reset_btn)
-
-        self.save_btn.setDisabled(True)
         
-    def reset_btn_cmd(self):
+    def reset_btn_cmd(self, *args):
         def fin():
             self.filters_edit.clear()
             self.filters_edit.insertPlainText(
                 "\n".join(Filters.default)
             )
             self.filters_win.deleteLater()
-            self.reset_btn.setDisabled(True)
-            self.save_btn.setDisabled(False)
+            self.changed.emit
 
         self.filters_win = WinQuestion(
             Lng.attention[cfg.lng],
-            Lng.filters_reset[cfg.lng]
+            Lng.reset_filters_long[cfg.lng]
         )
         self.filters_win.resize(330, 80)
         self.filters_win.ok_clicked.connect(fin)
@@ -666,11 +666,6 @@ class FiltersWid(QGroupBox):
         lines = [line for line in text.split("\n") if line]
         self.filters_clone.clear()   # очищаем текущий список
         self.filters_clone.extend(lines)  # добавляем новые элементы
-        self.reset_btn.setDisabled(False)
-        self.save_btn.setDisabled(False)
-
-    def save_btn_cmd(self, *args):
-        self.save_btn.setDisabled(True)
         self.changed.emit()
 
     def mouseReleaseEvent(self, a0):

@@ -917,7 +917,7 @@ class FiltersWid(QWidget):
 
         self.filters_win = WinQuestion(
             Lng.attention[cfg.lng],
-            Lng.filters_reset[cfg.lng]
+            Lng.reset_filters[cfg.lng]
         )
         self.filters_win.resize(330, 80)
         self.filters_win.ok_clicked.connect(fin)
