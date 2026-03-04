@@ -52,7 +52,16 @@ class USep(QFrame):
         self.setFixedHeight(1)
 
 
-class GroupLay(UVBoxLayout):
+class GroupVLay(UVBoxLayout):
+    mrg = 2
+    spc = 5
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.setContentsMargins(6, 2, 6, 2)
+        self.setSpacing(self.spc)
+
+
+class GroupHLay(UHBoxLayout):
     mrg = 2
     spc = 5
     def __init__(self, *args, **kwargs):
@@ -91,7 +100,7 @@ class TextEditWidget(QGroupBox):
         super().__init__()
         self.setAcceptDrops(True)
 
-        group_lay = GroupLay()
+        group_lay = GroupVLay()
         self.setLayout(group_lay)
 
         self.title_wid = ULabel(title)
@@ -134,7 +143,7 @@ class RebootSettings(QGroupBox):
         super().__init__()
         self.cfg_clone = cfg_clone
 
-        group_lay = GroupLay()
+        group_lay = GroupVLay()
         self.setLayout(group_lay)
 
         lng_wid = GroupChild()
@@ -327,7 +336,7 @@ class NonRebootSettings(QGroupBox):
         self.setFixedHeight(80)
         self.data = {}
 
-        group_lay = GroupLay()
+        group_lay = GroupVLay()
         self.setLayout(group_lay)
 
         data_size_wid = GroupChild()
@@ -443,7 +452,7 @@ class Themes(QGroupBox):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(120)
-        group_lay = GroupLay()
+        group_lay = GroupVLay()
         self.setLayout(group_lay)
 
         title_wid = GroupChild()
@@ -603,7 +612,7 @@ class FiltersWid(QGroupBox):
         super().__init__()
         self.filters_clone = filters_clone
 
-        group_lay = GroupLay()
+        group_lay = GroupVLay()
         group_lay.setSpacing(5)
         self.setLayout(group_lay)
 
@@ -738,7 +747,7 @@ class MfSettings(QWidget):
 
         # Верхний ряд с названием
         self.name_wid = QGroupBox()
-        name_lay = GroupLay()
+        name_lay = GroupVLay()
         self.name_wid.setLayout(name_lay)
         main_lay.addWidget(self.name_wid)
         name_text = ULabel(f"{Lng.alias[cfg.lng]}: {target_mf.alias}")
@@ -754,7 +763,7 @@ class MfSettings(QWidget):
         main_lay.addWidget(mf_stop_list)
 
         general_wid = QGroupBox()
-        general_lay = GroupLay()
+        general_lay = GroupVLay()
         general_wid.setLayout(general_lay)
         main_lay.addWidget(general_wid)
 
@@ -851,7 +860,7 @@ class NewFolder(QWidget):
         self.setLayout(main_lay)
 
         name_wid = QGroupBox()
-        name_lay = GroupLay()
+        name_lay = GroupVLay()
         name_wid.setLayout(name_lay)
         main_lay.addWidget(name_wid)
 
@@ -868,9 +877,10 @@ class NewFolder(QWidget):
         self.mf_stop_list = MfStopList(self.mf)
         main_lay.addWidget(self.mf_stop_list)
 
-        save_wid = GroupChild()
+        save_wid = QGroupBox()
+        save_wid.setFixedHeight(GroupChild.hh)
         save_wid.mouseReleaseEvent = self.save
-        save_lay = UHBoxLayout()
+        save_lay = GroupHLay()
         save_wid.setLayout(save_lay)
         main_lay.addWidget(save_wid)
 
