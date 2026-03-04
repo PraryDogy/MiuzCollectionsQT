@@ -240,10 +240,7 @@ class SizesWin(SingleActionWindow):
         return super().keyPressEvent(a0)
 
 
-class DataSettings(QGroupBox):
-    reset = pyqtSignal()
-    changed = pyqtSignal()
-
+class NonRebootSettings(QGroupBox):
     def __init__(self):
         super().__init__()
         self.data = {}
@@ -568,7 +565,7 @@ class GeneralSettings(QWidget):
         reboot_settings.cfg_changed.connect(self.changed.emit)
         v_lay.addWidget(reboot_settings)
 
-        data_settings = DataSettings()
+        data_settings = NonRebootSettings()
         data_settings.reset.connect(self.set_need_reset)
         v_lay.addWidget(data_settings)
 
