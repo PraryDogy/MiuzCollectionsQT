@@ -402,11 +402,26 @@ class Themes(QGroupBox):
 
     def __init__(self):
         super().__init__()
-        h_lay = UHBoxLayout()
-        h_lay.setContentsMargins(10, 10, 10, 10)
-        h_lay.setSpacing(20)
-        h_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.setLayout(h_lay)
+        self.setFixedHeight(120)
+        group_lay = GroupLay()
+        self.setLayout(group_lay)
+
+        title_wid = QWidget()
+        title_lay = UHBoxLayout()
+        title_wid.setLayout(title_lay)
+        group_lay.addWidget(title_wid)
+
+        title_text = ULabel("Тема")
+        title_lay.addWidget(title_text)
+
+        group_lay.addWidget(USep())
+
+        themes_wid = QWidget()
+        themes_lay = UHBoxLayout()
+        themes_lay.setSpacing(20)
+        themes_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        themes_wid.setLayout(themes_lay)
+        group_lay.addWidget(themes_wid)
 
         self.frames = []
 
@@ -424,7 +439,7 @@ class Themes(QGroupBox):
         )
 
         for f in (self.system_theme, self.dark_theme, self.light_theme):
-            h_lay.addWidget(f)
+            themes_lay.addWidget(f)
             self.frames.append(f)
             f.clicked.connect(self.on_frame_clicked)
 
