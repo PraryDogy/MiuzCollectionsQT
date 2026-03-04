@@ -43,11 +43,11 @@ class UPushButton(SmallBtn):
 
 
 class LangSettings(QGroupBox):
-    changed = pyqtSignal()
+    lang_changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: Cfg):
+    def __init__(self, cfg_clone: Cfg):
         super().__init__()
-        self.json_data_copy = json_data_copy
+        self.cfg_clone = cfg_clone
 
         v_lay = UVBoxLayout()
         self.setLayout(v_lay)
@@ -66,14 +66,13 @@ class LangSettings(QGroupBox):
 
         v_lay.addWidget(first_row_wid)
 
-
     def lang_btn_cmd(self, *args):
-        if self.json_data_copy.lng == 0:
-            self.json_data_copy.lng = 1
+        if self.cfg_clone.lng == 0:
+            self.cfg_clone.lng = 1
         else:
-            self.json_data_copy.lng = 0
-        self.lang_btn.setText(Lng.russian[self.json_data_copy.lng])
-        self.changed.emit()
+            self.cfg_clone.lng = 0
+        self.lang_btn.setText(Lng.russian[self.cfg_clone.lng])
+        self.lang_changed.emit()
 
 
 class SizesWin(SingleActionWindow):
@@ -497,7 +496,7 @@ class GeneralSettings(QWidget):
         self.setLayout(v_lay)
 
         lang_reset = LangSettings(json_data_copy)
-        lang_reset.changed.connect(self.changed.emit)
+        lang_reset.lang_changed.connect(self.changed.emit)
         v_lay.addWidget(lang_reset)
 
         data_settings = DataSettings()
