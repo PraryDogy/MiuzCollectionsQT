@@ -10,6 +10,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QSpacerItem, QSpinBox, QSplitter,
                              QTableWidget, QTableWidgetItem, QWidget)
+from typing_extensions import Optional
 
 from cfg import Cfg, Static, cfg
 from system.filters import Filters
@@ -81,7 +82,7 @@ class SvgArrow(QSvgWidget):
 class TextEditWidget(QGroupBox):
     text_changed = pyqtSignal()
 
-    def __init__(self, title: str, placeholder: str):
+    def __init__(self, title: str, placeholder: str, text: Optional[str]):
         super().__init__()
         self.setAcceptDrops(True)
 
@@ -97,6 +98,9 @@ class TextEditWidget(QGroupBox):
         self.text_edit_wid.textChanged.connect(self.text_changed.emit)
         self.text_edit_wid.setAcceptDrops(False)
         group_lay.addWidget(self.text_edit_wid)
+
+        if text:
+            self.text_edit_wid.setPlainText(text)
 
     def get_lined_text(self):
         return [
@@ -669,14 +673,15 @@ class FiltersWid(QGroupBox):
         return super().mouseReleaseEvent(a0)
 
 
-# ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
+# ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛ
 
 
 class MfPaths(TextEditWidget):
     def __init__(self, mf: Mf):
         super().__init__(
             title=Lng.images_folder_path[cfg.lng],
-            placeholder=Lng.folder_path[cfg.lng]
+            placeholder=Lng.folder_path[cfg.lng],
+            text="\n".join(i for i in mf.paths),
         )
         self.mf = mf
         self.text_changed.connect(self.set_data)
@@ -700,7 +705,8 @@ class MfStopList(TextEditWidget):
     def __init__(self, mf: Mf):
         super().__init__(
             title=Lng.ignore_list_descr[cfg.lng],
-            placeholder=Lng.ignore_list[cfg.lng]
+            placeholder=Lng.ignore_list[cfg.lng],
+            text="\n".join(i for i in mf.stop_list),
         )
         self.mf = mf
         self.text_changed.connect(self.set_data)
@@ -732,17 +738,10 @@ class MfAdvanced(QWidget):
         self.mf_paths = MfPaths(mf)
         self.mf_paths.text_changed.connect(self.changed.emit)
         v_lay.addWidget(self.mf_paths)
-        # self.mf_paths.dropable_text.setText(
-        #     self.insert_linebreaks(Lng.images_folder_path[cfg.lng])
-        # )
-        text_ = "\n".join(i for i in mf.paths)
-        self.mf_paths.text_edit_wid.setPlainText(text_)
 
         third_row = MfStopList(mf)
         third_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(third_row)
-        text_ = "\n".join(i for i in mf.stop_list)
-        third_row.text_edit_wid.setPlainText(text_)
 
 
 class MfSettings(QWidget):
