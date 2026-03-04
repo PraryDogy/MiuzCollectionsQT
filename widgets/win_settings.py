@@ -84,6 +84,7 @@ class RebootSettings(QGroupBox):
 
     def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
         super().__init__()
+        self.setFixedHeight(80)
         self.cfg_clone = cfg_clone
         self.what_change = what_change
 
@@ -241,6 +242,7 @@ class SizesWin(SingleActionWindow):
 class NonRebootSettings(QGroupBox):
     def __init__(self):
         super().__init__()
+        self.setFixedHeight(80)
         self.data = {}
 
         group_lay = GroupLay()
