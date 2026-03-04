@@ -484,7 +484,7 @@ class AboutWid(QGroupBox):
         h_lay.addWidget(lbl)
 
 
-class GeneralSettings(QGroupBox):
+class GeneralSettings(QWidget):
     changed = pyqtSignal()
 
     def __init__(self, json_data_copy: Cfg, need_reset_item: NeedResetItem):
@@ -634,7 +634,7 @@ class MfAdvanced(QWidget):
         )
 
 
-class MfSettings(QGroupBox):
+class MfSettings(QWidget):
     changed = pyqtSignal()
     remove = pyqtSignal()
     reset_data = pyqtSignal(Mf)
@@ -759,7 +759,7 @@ class MfSettings(QGroupBox):
 
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
-class NewFolder(QGroupBox):
+class NewFolder(QWidget):
     new_folder = pyqtSignal(Mf)
     svg_warning = "./images/warning.svg"
 
@@ -870,7 +870,7 @@ class NewFolder(QGroupBox):
 # ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ 
 
 
-class FiltersWid(QGroupBox):
+class FiltersWid(QWidget):
     changed = pyqtSignal()
 
     def __init__(self, filters_copy: list[str]):
