@@ -64,6 +64,14 @@ class GroupLay(UVBoxLayout):
         self.setSpacing(self.spc)
 
 
+class GroupChild(QWidget):
+    hh = 30
+
+    def __init__(self):
+        super().__init__()
+        self.setFixedHeight(self.hh)
+
+
 class SvgArrow(QSvgWidget):
     clicked = pyqtSignal()
     img = "./images/next.svg"
@@ -126,14 +134,13 @@ class RebootSettings(QGroupBox):
 
     def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
         super().__init__()
-        self.setFixedHeight(120)
         self.cfg_clone = cfg_clone
         self.what_change = what_change
 
         group_lay = GroupLay()
         self.setLayout(group_lay)
 
-        lng_wid = QWidget()
+        lng_wid = GroupChild()
         lng_lay = UHBoxLayout()
         lng_wid.setLayout(lng_lay)
         group_lay.addWidget(lng_wid)
@@ -156,7 +163,7 @@ class RebootSettings(QGroupBox):
 
         group_lay.addWidget(USep())
 
-        reset_data_wid = QWidget()
+        reset_data_wid = GroupChild()
         reset_data_lay = UHBoxLayout()
         reset_data_wid.setLayout(reset_data_lay)
         group_lay.addWidget(reset_data_wid)
@@ -173,7 +180,7 @@ class RebootSettings(QGroupBox):
 
         group_lay.addWidget(USep())
 
-        scaner_time_wid = QWidget()
+        scaner_time_wid = GroupChild()
         scaner_timer_lay = UHBoxLayout()
         scaner_time_wid.setLayout(scaner_timer_lay)
         group_lay.addWidget(scaner_time_wid)
@@ -330,7 +337,7 @@ class NonRebootSettings(QGroupBox):
         group_lay = GroupLay()
         self.setLayout(group_lay)
 
-        data_size_wid = QWidget()
+        data_size_wid = GroupChild()
         data_size_wid.mouseReleaseEvent = self.show_sizes_win
         data_size_lay = UHBoxLayout()
         data_size_wid.setLayout(data_size_lay)
@@ -346,7 +353,7 @@ class NonRebootSettings(QGroupBox):
 
         group_lay.addWidget(USep())
 
-        show_files_wid = QWidget()
+        show_files_wid = GroupChild()
         show_files_wid.mouseReleaseEvent = self.show_files_cmd
         show_files_lay = UHBoxLayout()
         show_files_wid.setLayout(show_files_lay)
@@ -446,7 +453,7 @@ class Themes(QGroupBox):
         group_lay = GroupLay()
         self.setLayout(group_lay)
 
-        title_wid = QWidget()
+        title_wid = GroupChild()
         title_lay = UHBoxLayout()
         title_wid.setLayout(title_lay)
         group_lay.addWidget(title_wid)
@@ -757,47 +764,34 @@ class MfSettings(QWidget):
         mf_stop_list = MfStopList(target_mf)
         main_lay.addWidget(mf_stop_list)
 
-        # self.advanced = MfAdvanced(mf)
-        # self.advanced.changed.connect(
-        #     lambda: self.save_btn.setDisabled(False)
-        # )
-        # v_lay.addWidget(self.advanced)
+        general_wid = QGroupBox()
+        general_wid.setFixedHeight(110)
+        general_lay = GroupLay()
+        general_wid.setLayout(general_lay)
+        main_lay.addWidget(general_wid)
 
-        self.res_rem_wid = QGroupBox()
-        main_lay.addWidget(self.res_rem_wid)
-        res_rem_lay = UVBoxLayout()
-        res_rem_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.res_rem_wid.setLayout(res_rem_lay)
+        reset_wid = QWidget()
+        reset_lay = UHBoxLayout()
+        reset_wid.setLayout(reset_lay)
+        general_lay.addWidget(reset_wid)
+        reset_text = ULabel(text=Lng.reset_mf_text[cfg.lng])
+        reset_lay.addWidget(reset_text)
+        reset_lay.addStretch()
+        reset_btn = SvgArrow()
+        reset_lay.addWidget(reset_btn)
 
-        res_lay = UHBoxLayout()
-        res_lay.setSpacing(15)
-        res_rem_lay.addLayout(res_lay)
-        self.reset_btn = UPushButton(Lng.reset[cfg.lng])
-        self.reset_btn.clicked.connect(self.set_reset_flag)
-        res_lay.addWidget(self.reset_btn)
-        res_descr = QLabel(Lng.reset_mf_text[cfg.lng])
-        res_lay.addWidget(res_descr)
+        general_lay.addWidget(USep())
 
-        rem_lay = UHBoxLayout()
-        rem_lay.setSpacing(15)
-        res_rem_lay.addLayout(rem_lay)
-        self.remove_btn = UPushButton(Lng.delete[cfg.lng])
-        self.remove_btn.clicked.connect(self.set_remove_flag)
-        rem_lay.addWidget(self.remove_btn)
-        rem_descr = QLabel(Lng.folder_removed_text[cfg.lng])
-        rem_lay.addWidget(rem_descr)
-
-        # QGroupBox для кнопок и описания
-        btn_group = QWidget()
-        btn_main_lay = UVBoxLayout()
-        btn_main_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        btn_group.setLayout(btn_main_lay)
-        self.save_btn = UPushButton(Lng.save[cfg.lng])
-        self.save_btn.clicked.connect(self.save)
-        self.save_btn.setDisabled(True)
-        btn_main_lay.addWidget(self.save_btn)
-
-        main_lay.addWidget(btn_group)
+        remove_wid = QWidget()
+        remove_lay = UHBoxLayout()
+        remove_wid.setLayout(remove_lay)
+        general_lay.addWidget(remove_wid)
+        remove_text = ULabel(text=Lng.folder_removed_text[cfg.lng])
+        remove_lay.addWidget(remove_text)
+        remove_lay.addStretch()
+        remove_btn = SvgArrow()
+        remove_lay.addWidget(remove_btn)
+        
 
     def set_remove_flag(self):
         self.need_remove = True
