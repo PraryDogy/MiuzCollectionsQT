@@ -70,8 +70,15 @@ class RebootSettings(QGroupBox):
 
         lng_lay.addStretch()
 
+
+        self.lng_menu = UMenu(None)
+        one = QAction(Lng.russian[0], self.lng_menu)
+        self.lng_menu.addAction(one)
+        two = QAction(Lng.russian[1], self.lng_menu)
+        self.lng_menu.addAction(two)
+
         self.lng_btn = UPushButton(text=Lng.russian[cfg.lng])
-        self.lng_btn.clicked.connect(self.lang_btn_cmd)
+        self.lng_btn.setMenu(self.lng_menu)
         lng_lay.addWidget(self.lng_btn)
 
 
@@ -90,26 +97,16 @@ class RebootSettings(QGroupBox):
         self.reset_data_btn.clicked.connect(self.reset_btn_cmd)
         reset_data_lay.addWidget(self.reset_data_btn)
 
-    def lang_btn_test(self):
-        self.lng_menu = UMenu()
-
-
-    def lang_btn_cmd(self, *args):
-        if self.cfg_clone.lng == 0:
-            self.cfg_clone.lng = 1
-        else:
-            self.cfg_clone.lng = 0
-        self.lng_btn.setText(Lng.russian[self.cfg_clone.lng])
-
+    def lang_action_cmd(self, value: int):
+        self.cfg_clone.lng = value
+        self.lng_btn.setText(Lng.russian[value])
         self.cfg_changed.emit()
         self.what_change.change_lng = True
 
     def reset_btn_cmd(self):
-
         def fin():
             self.cfg_changed.emit()
             self.what_change.reset_data = True
-
             self.reset_win.deleteLater()
 
         self.reset_win = WinQuestion(
