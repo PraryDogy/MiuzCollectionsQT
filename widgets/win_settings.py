@@ -53,7 +53,13 @@ class UGroupBox(QGroupBox):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
+
+
+class USep(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setStyleSheet("background: rgba(128, 128, 128, 0.2)")
+        self.setFixedHeight(1)
 
 
 class RebootSettings(UGroupBox):
@@ -61,11 +67,12 @@ class RebootSettings(UGroupBox):
 
     def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
         super().__init__()
-        self.setContentsMargins(5, 0, 5, 0)
         self.cfg_clone = cfg_clone
         self.what_change = what_change
 
         group_lay = UVBoxLayout()
+        group_lay.setContentsMargins(2, 2, 2, 2)
+        group_lay.setSpacing(5)
         self.setLayout(group_lay)
 
         lng_wid = QWidget()
@@ -79,7 +86,6 @@ class RebootSettings(UGroupBox):
 
         lng_lay.addStretch()
 
-
         self.lng_menu = UMenu(None)
         for value in (0, 1):
             action = QAction(Lng.russian[value], self.lng_menu)
@@ -91,6 +97,8 @@ class RebootSettings(UGroupBox):
         self.lng_btn.setMenu(self.lng_menu)
         lng_lay.addWidget(self.lng_btn)
 
+        sep = USep()
+        group_lay.addWidget(sep)
 
         reset_data_wid = QWidget()
         reset_data_lay = UHBoxLayout()
@@ -113,8 +121,6 @@ class RebootSettings(UGroupBox):
         self.lng_btn.setText(Lng.russian[value])
         self.cfg_changed.emit()
         self.what_change.change_lng = True
-
-        print(value)
 
     def reset_btn_cmd(self):
         def fin():
