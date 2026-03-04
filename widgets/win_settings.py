@@ -642,22 +642,31 @@ class FiltersWid(QGroupBox):
 class DropableGroupBox(QGroupBox):
     text_changed = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, text: str, placeholder: str):
         super().__init__()
         self.setAcceptDrops(True)
 
         group_lay = GroupLay()
         self.setLayout(group_lay)
 
-        self.dropable_text = ULabel()
+        # self.dropable_text = ULabel(self.insert_linebreaks(text))
+        self.dropable_text = ULabel(text)
+        self.dropable_text.setWordWrap(True)
         group_lay.addWidget(self.dropable_text)
 
         self.dropable_edit = UTextEdit()
+        self.dropable_edit.setPlaceholderText(placeholder)
         self.dropable_edit.textChanged.connect(self.text_changed.emit)
         self.dropable_edit.setAcceptDrops(False)
         group_lay.addWidget(self.dropable_edit)
 
-    def get_data(self):
+    def insert_linebreaks(self, text: str, n: int = 65) -> str:
+        return '\n'.join(
+            text[i:i+n]
+            for i in range(0, len(text), n)
+        )
+
+    def get_lined_text(self):
         return [
             i
             for i in self.dropable_edit.toPlainText().split("\n")
@@ -671,13 +680,15 @@ class DropableGroupBox(QGroupBox):
 
 class MfPaths(DropableGroupBox):
     def __init__(self, mf: Mf):
-        super().__init__()
+        super().__init__(
+            text=Lng.images_folder_path[cfg.lng],
+            placeholder=Lng.folder_path[cfg.lng]
+        )
         self.mf = mf
         self.text_changed.connect(self.set_data)
-        self.dropable_edit.setPlaceholderText(Lng.folder_path[cfg.lng])
 
     def set_data(self, *args):
-        self.mf.paths = self.get_data()
+        self.mf.paths = self.get_lined_text()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -691,15 +702,17 @@ class MfPaths(DropableGroupBox):
         return super().dropEvent(a0)
 
 
-class StopList(DropableGroupBox):
+class MfStopList(DropableGroupBox):
     def __init__(self, mf: Mf):
-        super().__init__()
+        super().__init__(
+            text=Lng.ignore_list_descr[cfg.lng],
+            placeholder=Lng.ignore_list[cfg.lng]
+        )
         self.mf = mf
         self.text_changed.connect(self.set_data)
-        self.dropable_edit.setPlaceholderText(Lng.ignore_list[cfg.lng])
 
     def set_data(self, *args):
-        self.mf.stop_list = self.get_data()
+        self.mf.stop_list = self.get_lined_text()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -725,24 +738,17 @@ class MfAdvanced(QWidget):
         self.mf_paths = MfPaths(mf)
         self.mf_paths.text_changed.connect(self.changed.emit)
         v_lay.addWidget(self.mf_paths)
-        self.mf_paths.dropable_text.setText(
-            self.insert_linebreaks(Lng.images_folder_path[cfg.lng])
-        )
+        # self.mf_paths.dropable_text.setText(
+        #     self.insert_linebreaks(Lng.images_folder_path[cfg.lng])
+        # )
         text_ = "\n".join(i for i in mf.paths)
         self.mf_paths.dropable_edit.setPlainText(text_)
 
-        third_row = StopList(mf)
+        third_row = MfStopList(mf)
         third_row.text_changed.connect(self.changed.emit)
         v_lay.addWidget(third_row)
-        third_row.dropable_text.setText(Lng.ignore_list_descr[cfg.lng])
         text_ = "\n".join(i for i in mf.stop_list)
         third_row.dropable_edit.setPlainText(text_)
-
-    def insert_linebreaks(self, text: str, n: int = 64) -> str:
-        return '\n'.join(
-            text[i:i+n]
-            for i in range(0, len(text), n)
-        )
 
 
 class MfSettings(QWidget):
@@ -923,7 +929,7 @@ class NewFolder(QWidget):
         self.mf.alias = name
 
     def toggle_save_btn(self):
-        if self.name_label.text() and self.advanced.mf_paths.get_data():
+        if self.name_label.text() and self.advanced.mf_paths.get_lined_text():
             self.save_btn.setDisabled(False)
 
     def save(self):
