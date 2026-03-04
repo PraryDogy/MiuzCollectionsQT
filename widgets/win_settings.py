@@ -48,7 +48,7 @@ class UPushButton(SmallBtn):
         self.setFixedWidth(100)
 
 
-class LangSettings(QGroupBox):
+class RebootSettings(QGroupBox):
     cfg_changed = pyqtSignal()
 
     def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
@@ -65,12 +65,15 @@ class LangSettings(QGroupBox):
         lng_wid.setLayout(lng_lay)
         group_lay.addWidget(lng_wid)
 
+        self.lng_text = ULabel(Lng.language_max[cfg.lng])
+        lng_lay.addWidget(self.lng_text)
+
+        lng_lay.addStretch()
+
         self.lng_btn = UPushButton(text=Lng.russian[cfg.lng])
         self.lng_btn.clicked.connect(self.lang_btn_cmd)
         lng_lay.addWidget(self.lng_btn)
 
-        self.lng_text = ULabel(Lng.language_max[cfg.lng])
-        lng_lay.addWidget(self.lng_text)
 
         reset_data_wid = QWidget()
         reset_data_lay = UHBoxLayout()
@@ -508,18 +511,18 @@ class AboutWid(QGroupBox):
 class GeneralSettings(QWidget):
     changed = pyqtSignal()
 
-    def __init__(self, json_data_copy: Cfg, need_reset_item: NeedResetItem):
+    def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
         super().__init__()
-        self.need_reset_item = need_reset_item
+
         v_lay = UVBoxLayout()
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.setSpacing(10)
         v_lay.setContentsMargins(0, 0, 0, 10)
         self.setLayout(v_lay)
 
-        lang_reset = LangSettings(json_data_copy)
-        lang_reset.cfg_changed.connect(self.changed.emit)
-        v_lay.addWidget(lang_reset)
+        reboot_settings = RebootSettings(cfg_clone, what_change)
+        reboot_settings.cfg_changed.connect(self.changed.emit)
+        v_lay.addWidget(reboot_settings)
 
         data_settings = DataSettings()
         data_settings.reset.connect(self.set_need_reset)
@@ -528,7 +531,7 @@ class GeneralSettings(QWidget):
         simple_settings = SimpleSettings()
         v_lay.addWidget(simple_settings)
 
-        scaner_settings = ScanerSettings(json_data_copy)
+        scaner_settings = ScanerSettings(cfg_clone)
         scaner_settings.changed.connect(self.changed.emit)
         v_lay.addWidget(scaner_settings)
 
@@ -980,9 +983,13 @@ class WinSettings(SingleActionWindow):
         super().__init__()
         self.setWindowTitle(Lng.settings[cfg.lng])
         self.setFixedSize(700, 560)
-        self.mf_list_copy = copy.deepcopy(Mf.list_)
-        self.json_data_copy = copy.deepcopy(cfg)
-        self.filters_copy = copy.deepcopy(Filters.filters)
+
+        self.what_change = WhatChange()
+        self.cfg_clone = copy.deepcopy(cfg)
+        self.mf_list_clone = copy.deepcopy(Mf.list_)
+        self.filters_clone = copy.deepcopy(Filters.filters)
+
+        # удалить бы
         self.need_reset_item = NeedResetItem()
         self.mf_items: list[SettingsListItem] = []
         self.settings_item = settings_item
@@ -1098,15 +1105,15 @@ class WinSettings(SingleActionWindow):
 
     def init_right_side(self, index: int):
         if index == 0:
-            self.gen_settings = GeneralSettings(self.json_data_copy, self.need_reset_item)
+            self.gen_settings = GeneralSettings(self.cfg_clone, self.what_change)
             self.gen_settings.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
-            self.filters_wid = FiltersWid(self.filters_copy)
+            self.filters_wid = FiltersWid(self.filters_clone)
             self.filters_wid.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
-            self.new_folder = NewFolder(self.mf_list_copy)
+            self.new_folder = NewFolder(self.mf_list_clone)
             self.new_folder.new_folder.connect(self.add_mf)
             self.right_lay.insertWidget(0, self.new_folder)
             if self.settings_item.type_ == "general":
@@ -1121,10 +1128,10 @@ class WinSettings(SingleActionWindow):
             item: SettingsListItem = self.left_menu.item(index)
             mf = next(
                 i
-                for i in self.mf_list_copy
+                for i in self.mf_list_clone
                 if i.alias == item.mf.alias
             )
-            mf_sett = MfSettings(mf, self.mf_list_copy)
+            mf_sett = MfSettings(mf, self.mf_list_clone)
             mf_sett.changed.connect(self.blink_ok_btn)
             mf_sett.remove.connect(lambda: self.remove_mf(item))
             mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
@@ -1133,7 +1140,7 @@ class WinSettings(SingleActionWindow):
         self.settings_item.type_ = "general"
 
     def add_mf(self, mf: Mf):
-        self.mf_list_copy.append(mf)
+        self.mf_list_clone.append(mf)
         item = SettingsListItem(self.left_menu, text=mf.alias)
         item.setIcon(QIcon(self.svg_folder))
         item.mf = mf
@@ -1147,9 +1154,9 @@ class WinSettings(SingleActionWindow):
     def remove_mf(self, item: SettingsListItem):
 
         def fin():
-            for i in self.mf_list_copy:
+            for i in self.mf_list_clone:
                 if i.alias == item.mf.alias:
-                    self.mf_list_copy.remove(i)
+                    self.mf_list_clone.remove(i)
                     self.left_menu.takeItem(self.left_menu.currentRow())
                     self.left_menu.setCurrentRow(0)
                     self.clear_right_side()
@@ -1158,7 +1165,7 @@ class WinSettings(SingleActionWindow):
                     break
 
         try:
-            if len(self.mf_list_copy) == 1:
+            if len(self.mf_list_clone) == 1:
                 self.win_warn = WinWarn(
                     Lng.attention[cfg.lng],
                     Lng.at_least_one_folder_required[cfg.lng],
@@ -1186,7 +1193,7 @@ class WinSettings(SingleActionWindow):
 
         def validate_folders() -> bool:
             """Check that all folders have paths, show warning if not."""
-            for folder in self.mf_list_copy:
+            for folder in self.mf_list_clone:
                 if not folder.paths:
                     self.win_warn = WinWarn(
                         Lng.attention[cfg.lng],
@@ -1204,9 +1211,9 @@ class WinSettings(SingleActionWindow):
             if self.need_reset_item.need_reset:
                 shutil.rmtree(Static.app_support)
             else:
-                Mf.list_ = self.mf_list_copy
-                Filters.filters = self.filters_copy
-                for key, value in vars(self.json_data_copy).items():
+                Mf.list_ = self.mf_list_clone
+                Filters.filters = self.filters_clone
+                for key, value in vars(self.cfg_clone).items():
                     setattr(cfg, key, value)
                 Mf.write_json_data()
                 Filters.write_json_data()
