@@ -19,13 +19,18 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.shared_utils import SharedUtils
-from system.tasks import HashDirSize, UThreadPool
+from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
                             UTextEdit, UVBoxLayout, VListWidget)
 from .win_warn import WinQuestion, WinWarn
+
+
+def restart_app():
+    QApplication.quit()
+    Utils.start_new_app()
 
 
 class WhatChange:
@@ -213,8 +218,7 @@ class RebootSettings(QGroupBox):
         def fin():
             self.deleteLater()
             shutil.rmtree(Static.app_support)
-            QApplication.quit()
-            Utils.start_new_app()
+            restart_app()
         reset_win = self.show_win_warn(Lng.erase_data_long[cfg.lng], 115)
         reset_win.text_label.setFixedHeight(85)
         reset_win.ok_clicked.connect(fin)
@@ -793,27 +797,37 @@ class MfSettings(QWidget):
         self.save_btn.setDisabled(True)
 
     def show_warn(self, message, width=380):
-        self.win_warn = WinWarn(
+        win_warn = WinQuestion(
             Lng.attention[cfg.lng],
             message
         )
-        self.win_warn.resize(width, 80)
-        self.win_warn.center_to_parent(self.window())
-        self.win_warn.show()
+        win_warn.resize(width, 80)
+        win_warn.center_to_parent(self.window())
+        return win_warn
 
     def set_remove_flag(self, *args):
-        self.show_warn(Lng.remove_folder_long[cfg.lng])
-        self.need_remove = True
-        self.save_btn.setDisabled(False)
-        for i in self.findChildren(QGroupBox):
-            i.setDisabled(True)
+        def fin():
+            for i in Mf.list_:
+                if i.alias == self.target_mf.alias:
+                    Mf.list_.remove(i)
+                    break
+            Mf.write_json_data()
+            restart_app()
+
+        win = self.show_warn(Lng.remove_folder_long[cfg.lng])
+        win.ok_clicked.connect(fin)
+        win.show()
 
     def set_reset_flag(self, *args):
-        self.show_warn(Lng.reset_mf_long[cfg.lng])
-        self.need_reset = True
-        self.save_btn.setDisabled(False)
-        for i in self.findChildren(QGroupBox):
-            i.setDisabled(True)
+
+        def reset_data():
+            self.reset_task = MfDataCleaner(self.target_mf.alias)
+            self.reset_task.sigs.finished_.connect(restart_app)
+            UThreadPool.start(self.reset_task)
+
+        win = self.show_warn(Lng.reset_mf_long[cfg.lng])
+        win.ok_clicked.connect(reset_data)
+        win.show()
 
     def save(self):
 
