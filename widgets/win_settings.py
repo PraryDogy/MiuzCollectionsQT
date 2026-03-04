@@ -42,36 +42,63 @@ class UPushButton(SmallBtn):
 
 
 class LangSettings(QGroupBox):
-    lang_changed = pyqtSignal()
+    cfg_changed = pyqtSignal()
 
     def __init__(self, cfg_clone: Cfg):
         super().__init__()
         self.cfg_clone = cfg_clone
 
-        v_lay = UVBoxLayout()
-        self.setLayout(v_lay)
+        group_lay = UVBoxLayout()
+        self.setLayout(group_lay)
 
-        first_row_wid = QWidget()
-        first_row_lay = UHBoxLayout()
-        first_row_lay.setSpacing(15)
-        first_row_wid.setLayout(first_row_lay)
+        lng_wid = QWidget()
+        lng_lay = UHBoxLayout()
+        lng_lay.setSpacing(15)
+        lng_wid.setLayout(lng_lay)
+        group_lay.addWidget(lng_wid)
 
-        self.lang_btn = UPushButton(text=Lng.russian[cfg.lng])
-        self.lang_btn.clicked.connect(self.lang_btn_cmd)
-        first_row_lay.addWidget(self.lang_btn)
+        self.lng_btn = UPushButton(text=Lng.russian[cfg.lng])
+        self.lng_btn.clicked.connect(self.lang_btn_cmd)
+        lng_lay.addWidget(self.lng_btn)
 
-        self.lang_label = ULabel(Lng.language_max[cfg.lng])
-        first_row_lay.addWidget(self.lang_label)
+        self.lng_text = ULabel(Lng.language_max[cfg.lng])
+        lng_lay.addWidget(self.lng_text)
 
-        v_lay.addWidget(first_row_wid)
+        reset_data_wid = QWidget()
+        reset_data_lay = UHBoxLayout()
+        reset_data_lay.setSpacing(15)
+        reset_data_wid.setLayout(lng_lay)
+        group_lay.addWidget(reset_data_wid)
+
+        self.reset_data_btn = UPushButton(Lng.reset[cfg.lng])
+        self.reset_data_btn.clicked.connect(self.reset_btn_cmd)
+        reset_data_lay.addWidget(self.reset_data_btn)
+
+        reset_data_text = ULabel(Lng.reset_settings[cfg.lng])
+        reset_data_lay.addWidget(reset_data_text)
 
     def lang_btn_cmd(self, *args):
         if self.cfg_clone.lng == 0:
             self.cfg_clone.lng = 1
         else:
             self.cfg_clone.lng = 0
-        self.lang_btn.setText(Lng.russian[self.cfg_clone.lng])
-        self.lang_changed.emit()
+        self.lng_btn.setText(Lng.russian[self.cfg_clone.lng])
+        self.cfg_changed.emit()
+
+    def reset_btn_cmd(self):
+
+        def fin():
+            self.cfg_changed.emit()
+            self.reset_win.deleteLater()
+
+        self.reset_win = WinQuestion(
+            Lng.attention[cfg.lng],
+            Lng.reset_settings_max[cfg.lng]
+        )
+        self.reset_win.resize(330, 80)
+        self.reset_win.ok_clicked.connect(fin)
+        self.reset_win.center_to_parent(self.window())
+        self.reset_win.show()
 
 
 class SizesWin(SingleActionWindow):
@@ -173,12 +200,12 @@ class DataSettings(QGroupBox):
         first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         first_wid.setLayout(first_lay)
 
-        self.reset_data_btn = UPushButton(Lng.reset[cfg.lng])
-        self.reset_data_btn.clicked.connect(self.reset_cmd)
-        first_lay.addWidget(self.reset_data_btn)
+        # self.reset_data_btn = UPushButton(Lng.reset[cfg.lng])
+        # self.reset_data_btn.clicked.connect(self.reset_cmd)
+        # first_lay.addWidget(self.reset_data_btn)
 
-        reset_lbl = ULabel(Lng.reset_settings[cfg.lng])
-        first_lay.addWidget(reset_lbl)
+        # reset_lbl = ULabel(Lng.reset_settings[cfg.lng])
+        # first_lay.addWidget(reset_lbl)
 
         self.v_lay.addWidget(first_wid)
 
@@ -197,22 +224,6 @@ class DataSettings(QGroupBox):
         self.v_lay.addWidget(sec_wid)
 
         self.get_sizes()
-
-    def reset_cmd(self):
-
-        def fin():
-            self.changed.emit()
-            self.reset.emit()
-            self.reset_win.deleteLater()
-
-        self.reset_win = WinQuestion(
-            Lng.attention[cfg.lng],
-            Lng.reset_settings_max[cfg.lng]
-        )
-        self.reset_win.resize(330, 80)
-        self.reset_win.ok_clicked.connect(fin)
-        self.reset_win.center_to_parent(self.window())
-        self.reset_win.show()
 
     def open_win(self, data: dict):
         self.sizes_win = SizesWin(data)
@@ -495,7 +506,7 @@ class GeneralSettings(QWidget):
         self.setLayout(v_lay)
 
         lang_reset = LangSettings(json_data_copy)
-        lang_reset.lang_changed.connect(self.changed.emit)
+        lang_reset.cfg_changed.connect(self.changed.emit)
         v_lay.addWidget(lang_reset)
 
         data_settings = DataSettings()
