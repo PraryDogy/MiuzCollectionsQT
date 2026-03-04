@@ -837,36 +837,36 @@ class NewFolder(QWidget):
     new_folder = pyqtSignal(Mf)
     svg_warning = "./images/warning.svg"
 
-    def __init__(self, mf_list: list[Mf]):
+    def __init__(self, mf_list_clone: list[Mf]):
         super().__init__()
         self.mf = Mf("", [], [])
-        self.mf_list = mf_list
+        self.mf_list = mf_list_clone
 
-        v_lay = UVBoxLayout()
-        v_lay.setSpacing(15)
-        self.setLayout(v_lay)
+        main_lay = UVBoxLayout()
+        main_lay.setSpacing(15)
+        self.setLayout(main_lay)
 
-        first_row = QGroupBox()
-        v_lay.addWidget(first_row)
-        first_lay = UVBoxLayout()
-        first_lay.setSpacing(10)
-        first_lay.setContentsMargins(0, 3, 0, 3)
-        first_row.setLayout(first_lay)
+        name_wid = QGroupBox()
+        name_lay = GroupLay()
+        name_wid.setLayout(name_lay)
+        main_lay.addWidget(name_wid)
 
-        self.name_folder = QLabel(Lng.folder_name[cfg.lng])
-        first_lay.addWidget(self.name_folder)
+        self.name_text = QLabel(Lng.folder_name[cfg.lng])
+        name_lay.addWidget(self.name_text)
 
-        self.name_label = ULineEdit()
-        self.name_label.setPlaceholderText(Lng.alias_immutable[cfg.lng])
-        self.name_label.textChanged.connect(self.name_cmd)
-        first_lay.addWidget(self.name_label)
+        self.name_line_edit = ULineEdit()
+        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[cfg.lng])
+        self.name_line_edit.textChanged.connect(self.name_cmd)
+        name_lay.addWidget(self.name_line_edit)
 
-        self.advanced = MfAdvanced(self.mf)
-        self.advanced.changed.connect(self.toggle_save_btn)
-        v_lay.addWidget(self.advanced)
+        self.mf_paths = MfPaths(self.mf)
+        main_lay.addWidget(self.mf_paths)
+
+        self.mf_stop_list = MfStopList(self.mf)
+        main_lay.addWidget(self.mf_stop_list)
 
         btn_wid = QWidget()
-        v_lay.addWidget(btn_wid)
+        main_lay.addWidget(btn_wid)
         btn_lay = UHBoxLayout()
         btn_lay.setContentsMargins(0, 0, 0, 10)
         btn_lay.setSpacing(15)
@@ -882,11 +882,11 @@ class NewFolder(QWidget):
         text_edit.setPlainText(url)
 
     def name_cmd(self):
-        name = self.name_label.text().strip()
+        name = self.name_line_edit.text().strip()
         self.mf.alias = name
 
     def toggle_save_btn(self):
-        if self.name_label.text() and self.advanced.mf_paths.get_lined_text():
+        if self.name_line_edit.text() and self.advanced.mf_paths.get_lined_text():
             self.save_btn.setDisabled(False)
 
     def save(self):
