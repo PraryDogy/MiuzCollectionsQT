@@ -34,6 +34,7 @@ class WhatChange:
         self.change_lng = False
         self.reset_data = False
         self.scaner_time = False
+        self.filters = False
 
 
 class ULabel(QLabel):
@@ -901,42 +902,51 @@ class NewFolder(QWidget):
 class FiltersWid(QGroupBox):
     changed = pyqtSignal()
 
-    def __init__(self, filters_clone: list[str]):
+    def __init__(self, filters_clone: list[str], what_change: WhatChange):
         super().__init__()
         self.filters_clone = filters_clone
+        self.what_change = what_change
 
-        self.group_lay = GroupLay()
-        self.group_lay.setSpacing(15)
-        self.setLayout(self.group_lay)
+        group_lay = GroupLay()
+        group_lay.setSpacing(5)
+        self.setLayout(group_lay)
 
-        descr = ULabel(Lng.filters_descr[cfg.lng])
-        self.group_lay.addWidget(descr)
+        filters_text = ULabel(Lng.filters_descr[cfg.lng])
+        group_lay.addWidget(filters_text)
 
-        self.text_wid = UTextEdit()
-        self.text_wid.setFixedHeight(220)
-        self.text_wid.setPlaceholderText(Lng.filters[cfg.lng])
-        self.text_wid.setPlainText("\n".join(self.filters_clone))
-        self.text_wid.textChanged.connect(self.on_text_changed)
-        self.group_lay.addWidget(self.text_wid)
+        self.filters_edit = UTextEdit()
+        self.filters_edit.setFixedHeight(220)
+        self.filters_edit.setPlaceholderText(Lng.filters[cfg.lng])
+        self.filters_edit.setPlainText("\n".join(self.filters_clone))
+        self.filters_edit.textChanged.connect(self.on_text_changed)
+        group_lay.addWidget(self.filters_edit)
 
         btns_wid = QWidget()
-        self.group_lay.addWidget(btns_wid)
         btns_lay = UHBoxLayout()
-        btns_lay.setContentsMargins(0, 0, 0, 10)
+        btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        btns_lay.setSpacing(10)
         btns_wid.setLayout(btns_lay)
+        group_lay.addWidget(btns_wid)
 
-        reset_btn = UPushButton(Lng.reset[cfg.lng])
-        reset_btn.clicked.connect(self.reset_filters)
-        btns_lay.addWidget(reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.save_btn = UPushButton(Lng.save[cfg.lng])
+        self.save_btn.clicked.connect(self.save_btn_cmd)
+        btns_lay.addWidget(self.save_btn)
+
+        self.reset_btn = UPushButton(Lng.reset[cfg.lng])
+        self.reset_btn.clicked.connect(self.reset_btn_cmd)
+        btns_lay.addWidget(self.reset_btn)
+
+        self.save_btn.setDisabled(True)
         
-    def reset_filters(self):
-
+    def reset_btn_cmd(self):
         def fin():
-            self.text_wid.clear()
-            self.text_wid.insertPlainText(
+            self.filters_edit.clear()
+            self.filters_edit.insertPlainText(
                 "\n".join(Filters.default)
             )
             self.filters_win.deleteLater()
+            self.reset_btn.setDisabled(True)
+            self.save_btn.setDisabled(False)
 
         self.filters_win = WinQuestion(
             Lng.attention[cfg.lng],
@@ -948,12 +958,16 @@ class FiltersWid(QGroupBox):
         self.filters_win.show()
 
     def on_text_changed(self):
-        text = self.text_wid.toPlainText().strip()
+        text = self.filters_edit.toPlainText().strip()
         lines = [line for line in text.split("\n") if line]
-
         self.filters_clone.clear()   # очищаем текущий список
         self.filters_clone.extend(lines)  # добавляем новые элементы
-        
+        self.reset_btn.setDisabled(False)
+        self.save_btn.setDisabled(False)
+
+    def save_btn_cmd(self, *args):
+        self.save_btn.setDisabled(True)
+        self.what_change.filters = True
         self.changed.emit()
 
     def mouseReleaseEvent(self, a0):
@@ -1108,7 +1122,7 @@ class WinSettings(SingleActionWindow):
             self.gen_settings.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
-            self.filters_wid = FiltersWid(self.filters_clone)
+            self.filters_wid = FiltersWid(self.filters_clone, self.what_change)
             self.filters_wid.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
