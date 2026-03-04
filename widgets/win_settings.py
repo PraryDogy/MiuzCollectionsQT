@@ -67,7 +67,7 @@ class GroupLay(UVBoxLayout):
 class SvgArrow(QSvgWidget):
     clicked = pyqtSignal()
     img = "./images/next.svg"
-    size_ = 20
+    size_ = 16
 
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -92,7 +92,6 @@ class RebootSettings(QGroupBox):
 
         lng_wid = QWidget()
         lng_lay = UHBoxLayout()
-        lng_lay.setSpacing(15)
         lng_wid.setLayout(lng_lay)
         group_lay.addWidget(lng_wid)
 
@@ -117,7 +116,6 @@ class RebootSettings(QGroupBox):
 
         reset_data_wid = QWidget()
         reset_data_lay = UHBoxLayout()
-        reset_data_lay.setSpacing(15)
         reset_data_wid.setLayout(reset_data_lay)
         group_lay.addWidget(reset_data_wid)
 
@@ -566,7 +564,6 @@ class GeneralSettings(QWidget):
         v_lay.addWidget(reboot_settings)
 
         data_settings = NonRebootSettings()
-        data_settings.reset.connect(self.set_need_reset)
         v_lay.addWidget(data_settings)
 
         simple_settings = SimpleSettings()
