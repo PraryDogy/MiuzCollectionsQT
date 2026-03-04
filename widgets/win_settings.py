@@ -48,13 +48,6 @@ class UPushButton(SmallBtn):
         self.setFixedWidth(100)
 
 
-class UGroupBox(QGroupBox):
-    mrg = 5
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
 class USep(QFrame):
     def __init__(self):
         super().__init__()
@@ -62,7 +55,31 @@ class USep(QFrame):
         self.setFixedHeight(1)
 
 
-class RebootSettings(UGroupBox):
+class GroupLay(UVBoxLayout):
+    mrg = 2
+    spc = 5
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
+        self.setSpacing(self.spc)
+
+
+class SvgArrow(QSvgWidget):
+    clicked = pyqtSignal()
+    img = "./images/next.svg"
+    size_ = 20
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.load(self.img)
+        self.setFixedSize(self.size_, self.size_)
+
+    def mouseReleaseEvent(self, a0):
+        self.clicked.emit()
+        return super().mouseReleaseEvent(a0)
+
+
+class RebootSettings(QGroupBox):
     cfg_changed = pyqtSignal()
 
     def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
@@ -70,9 +87,7 @@ class RebootSettings(UGroupBox):
         self.cfg_clone = cfg_clone
         self.what_change = what_change
 
-        group_lay = UVBoxLayout()
-        group_lay.setContentsMargins(2, 2, 2, 2)
-        group_lay.setSpacing(5)
+        group_lay = GroupLay()
         self.setLayout(group_lay)
 
         lng_wid = QWidget()
@@ -139,10 +154,13 @@ class RebootSettings(UGroupBox):
 
 
 class SizesWin(SingleActionWindow):
+    ww = 500
+    hh = 330
+
     def __init__(self, sizes: dict[str, int], parent=None):
         super().__init__(parent)
         self.setWindowTitle(Lng.data_size[cfg.lng])
-        self.resize(500, 330)
+        self.resize(self.ww, self.hh)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -222,63 +240,67 @@ class SizesWin(SingleActionWindow):
         return super().keyPressEvent(a0)
 
 
-class DataSettings(UGroupBox):
+class DataSettings(QGroupBox):
     reset = pyqtSignal()
     changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
-        self.v_lay = UVBoxLayout()
-        self.setLayout(self.v_lay)
+        self.data = {}
 
-        first_wid = QWidget()
-        first_lay = UHBoxLayout()
-        first_lay.setSpacing(15)
-        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        first_wid.setLayout(first_lay)
+        group_lay = GroupLay()
+        self.setLayout(group_lay)
 
-        # self.reset_data_btn = UPushButton(Lng.reset[cfg.lng])
-        # self.reset_data_btn.clicked.connect(self.reset_cmd)
-        # first_lay.addWidget(self.reset_data_btn)
+        data_size_wid = QWidget()
+        data_size_wid.mouseReleaseEvent = self.show_sizes_win
+        data_size_lay = UHBoxLayout()
+        data_size_wid.setLayout(data_size_lay)
+        group_lay.addWidget(data_size_wid)
 
-        # reset_lbl = ULabel(Lng.reset_settings[cfg.lng])
-        # first_lay.addWidget(reset_lbl)
+        data_size_text = ULabel(text=Lng.statistic[cfg.lng])
+        data_size_lay.addWidget(data_size_text)
 
-        self.v_lay.addWidget(first_wid)
+        data_size_lay.addStretch()
 
-        sec_wid = QWidget()
-        sec_lay = UHBoxLayout()
-        sec_lay.setSpacing(15)
-        sec_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        sec_wid.setLayout(sec_lay)
+        data_size_btn = SvgArrow()
+        data_size_lay.addWidget(data_size_btn)
 
-        self.data_size_btn = UPushButton(Lng.show[cfg.lng])
-        sec_lay.addWidget(self.data_size_btn)
+        group_lay.addWidget(USep())
 
-        self.size_lbl = ULabel(text=Lng.statistic[cfg.lng])
-        sec_lay.addWidget(self.size_lbl)
+        show_files_wid = QWidget()
+        show_files_wid.mouseReleaseEvent = self.show_files_cmd
+        show_files_lay = UHBoxLayout()
+        show_files_wid.setLayout(show_files_lay)
+        group_lay.addWidget(show_files_wid)
 
-        self.v_lay.addWidget(sec_wid)
+        show_files_text = ULabel(Lng.show_system_files[cfg.lng])
+        show_files_lay.addWidget(show_files_text)
+
+        show_files_btn = SvgArrow(text=Lng.show[cfg.lng])
+        show_files_lay.addWidget(show_files_btn)
 
         self.get_sizes()
 
-    def open_win(self, data: dict):
-        self.sizes_win = SizesWin(data)
+    def show_sizes_win(self, *args):
+        self.sizes_win = SizesWin(self.data)
         self.sizes_win.center_to_parent(self.window())
         self.sizes_win.show()
 
     def get_sizes(self):
-        
-        def on_finish(data: dict[str, dict[int, int]]):
-            self.data_size_btn.disconnect()
-            self.data_size_btn.clicked.connect(lambda: self.open_win(data))
-
+        def on_finish(data: dict):
+            self.data = data
         self.hashdir_size = HashDirSize()
         self.hashdir_size.sigs.finished_.connect(on_finish)
         UThreadPool.start(self.hashdir_size)
 
+    def show_files_cmd(self, *args):
+        try:
+            subprocess.Popen(["open", Static.app_support])
+        except Exception as e:
+            print(e)
 
-class SimpleSettings(UGroupBox):
+
+class SimpleSettings(QGroupBox):
     def __init__(self):
         super().__init__()
 
@@ -306,7 +328,7 @@ class SimpleSettings(UGroupBox):
             print(e)
 
 
-class ScanerSettings(UGroupBox):
+class ScanerSettings(QGroupBox):
     changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
@@ -418,7 +440,7 @@ class ThemesBtn(QFrame):
             self.clicked.emit()
 
 
-class Themes(UGroupBox):
+class Themes(QGroupBox):
     clicked = pyqtSignal()
     svg_theme_system = "./images/system_theme.svg"
     svg_theme_dark = "./images/dark_theme.svg"
@@ -511,7 +533,7 @@ class SelectableLabel(ULabel):
         Utils.copy_text(self.selectedText())
 
 
-class AboutWid(UGroupBox):
+class AboutWid(QGroupBox):
     svg_icon = "./images/icon.svg"
 
     def __init__(self):
@@ -571,7 +593,7 @@ class GeneralSettings(QWidget):
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
 
 
-class DropableGroupBox(UGroupBox):
+class DropableGroupBox(QGroupBox):
     text_changed = pyqtSignal()
 
     def __init__(self):
@@ -696,7 +718,7 @@ class MfSettings(QWidget):
         self.setLayout(v_lay)
 
         # Верхний ряд с названием
-        self.name_wid = UGroupBox()
+        self.name_wid = QGroupBox()
         self.name_wid.setFixedHeight(30)
         v_lay.addWidget(self.name_wid)
         first_lay = UHBoxLayout()
@@ -714,7 +736,7 @@ class MfSettings(QWidget):
         )
         v_lay.addWidget(self.advanced)
 
-        self.res_rem_wid = UGroupBox()
+        self.res_rem_wid = QGroupBox()
         v_lay.addWidget(self.res_rem_wid)
         res_rem_lay = UVBoxLayout()
         res_rem_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -738,7 +760,7 @@ class MfSettings(QWidget):
         rem_descr = QLabel(Lng.folder_removed_text[cfg.lng])
         rem_lay.addWidget(rem_descr)
 
-        # UGroupBox для кнопок и описания
+        # QGroupBox для кнопок и описания
         btn_group = QWidget()
         btn_main_lay = UVBoxLayout()
         btn_main_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -818,7 +840,7 @@ class NewFolder(QWidget):
         v_lay.setSpacing(15)
         self.setLayout(v_lay)
 
-        first_row = UGroupBox()
+        first_row = QGroupBox()
         v_lay.addWidget(first_row)
         first_lay = UVBoxLayout()
         first_lay.setSpacing(10)
@@ -927,7 +949,7 @@ class FiltersWid(QWidget):
         self.v_lay.setSpacing(15)
         self.setLayout(self.v_lay)
 
-        group = UGroupBox()
+        group = QGroupBox()
         g_lay = UVBoxLayout(group)
         g_lay.setSpacing(15)
 
