@@ -207,7 +207,7 @@ class Lng:
     russian = ("Русский", "English")
     language = ("Язык", "Language")
     language_max = ("Сменить язык (Change language)", "Change language (Сменить язык)")
-    reset_settings = ("Сбросить все данные", "Reset all data")
+    erase_data = ("Сбросить все данные", "Reset all data")
     copying = ("Копирование", "Copying")
     from_ = ("из", "from")
     in_ = ("в", "in")
@@ -282,21 +282,31 @@ class Lng:
     details = ("Подробнее", "Details")
     data_size = ("Размер данных", "Data size")
     calculating = ("Вычисление", "Calculating")
-    reset_mf_text = (
-        "Все данные папки будут сброшены.",
-        "All folder data will be reset."
+    reset_mf = (
+        "Сбросить все данные папки.",
+        "Reset all folder data ."
     )
-    folder_removed_text = (
-        "Папка будет удалена из приложения.",
-        "The folder will be removed from the application."
+    reset_mf_long = (
+        "Кэшированные изображения будут удалены и созданы заново.",
+        "Cached images will be deleted and recreated."
+    )
+    remove_folder = (
+        "Удалить папку из приложения.",
+        "Remove folder from app."
+    )
+    remove_folder_long = (
+        "Все данные папки будут удалены. Исходные изображения сохранятся.",
+        "All folder data will be deleted. Original images will remain intact."
     )
     filters_reset = (
         "Список фильтров будет сброшен по умолчанию. Продолжить?",
         "The filter list will be reset to default. Continue?"
     )
-    reset_settings_max = (
-        "Будут удалены все данные приложения. Продолжить?",
-        "All application data will be deleted. Continue?"
+    erase_data_long = (
+        "Все кэшированные изображения будут удалены, а настройки приложения "
+        "сброшены до значений по умолчанию. Продолжить?",
+        "All cached images will be deleted and app settings will be reset "
+        "to defaults. Continue?"
     )
     location = ("Расположение", "Location")
     modified = ("Изменен", "Modified")

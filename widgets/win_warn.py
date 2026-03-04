@@ -71,16 +71,16 @@ class WinQuestion(BaseWinWarn):
         btn_lay.setSpacing(10)
         btn_wid.setLayout(btn_lay)
 
-        ok_btn = SmallBtn(Lng.ok[cfg.lng])
-        ok_btn.clicked.connect(self.ok_clicked.emit)
-        ok_btn.setFixedWidth(self.btn_w)
+        self.ok_btn = SmallBtn(Lng.ok[cfg.lng])
+        self.ok_btn.clicked.connect(self.ok_clicked.emit)
+        self.ok_btn.setFixedWidth(self.btn_w)
 
         cancel_btn = SmallBtn(Lng.cancel[cfg.lng])
         cancel_btn.setFixedWidth(self.btn_w)
         cancel_btn.clicked.connect(self.deleteLater)
 
         btn_lay.addStretch()
-        btn_lay.addWidget(ok_btn)
+        btn_lay.addWidget(self.ok_btn)
         btn_lay.addWidget(cancel_btn)
         btn_lay.addStretch()
 

@@ -30,10 +30,8 @@ from .win_warn import WinQuestion, WinWarn
 
 class WhatChange:
     def __init__(self):
-        self.change_lng = False
-        self.reset_app_data = False
-        self.scaner_time = False
-        self.filters = False
+        self.removed_mf_list: list[Mf] = []
+        self.erased_mf_list: list[Mf] = []
 
 
 class ULabel(QLabel):
@@ -163,23 +161,6 @@ class RebootSettings(QGroupBox):
 
         group_lay.addWidget(USep())
 
-        reset_data_wid = GroupChild()
-        reset_data_lay = UHBoxLayout()
-        reset_data_wid.setLayout(reset_data_lay)
-        group_lay.addWidget(reset_data_wid)
-
-        reset_data_text = ULabel(Lng.reset_settings[cfg.lng])
-        reset_data_lay.addWidget(reset_data_text)
-
-        reset_data_lay.addStretch()
-
-        self.reset_data_btn = UPushButton(Lng.reset[cfg.lng])
-        self.reset_data_btn.setFixedWidth(110)
-        self.reset_data_btn.clicked.connect(self.reset_btn_cmd)
-        reset_data_lay.addWidget(self.reset_data_btn)
-
-        group_lay.addWidget(USep())
-
         scaner_time_wid = GroupChild()
         scaner_timer_lay = UHBoxLayout()
         scaner_time_wid.setLayout(scaner_timer_lay)
@@ -201,25 +182,40 @@ class RebootSettings(QGroupBox):
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_timer_lay.addWidget(self.spin)
 
-        # self.change_spin_width()
+        group_lay.addWidget(USep())
+
+        reset_data_wid = GroupChild()
+        reset_data_wid.mouseReleaseEvent = self.reset_btn_cmd
+        reset_data_lay = UHBoxLayout()
+        reset_data_wid.setLayout(reset_data_lay)
+        group_lay.addWidget(reset_data_wid)
+
+        reset_data_text = ULabel(Lng.erase_data[cfg.lng])
+        reset_data_lay.addWidget(reset_data_text)
+
+        reset_data_lay.addStretch()
+
+        self.reset_data_btn = SvgArrow()
+        reset_data_lay.addWidget(self.reset_data_btn)
 
     def lang_action_cmd(self, value: int):
         self.cfg_clone.lng = value
         self.lng_btn.setText(Lng.russian[value])
-        self.what_change.change_lng = True
         self.cfg_changed.emit()
 
-    def reset_btn_cmd(self):
+    def reset_btn_cmd(self, *args):
+
         def fin():
-            self.what_change.reset_app_data = True
-            self.cfg_changed.emit()
-            self.reset_win.deleteLater()
+            shutil.rmtree(Static.app_support)
+            QApplication.quit()
+            Utils.start_new_app()
 
         self.reset_win = WinQuestion(
             Lng.attention[cfg.lng],
-            Lng.reset_settings_max[cfg.lng]
+            Lng.erase_data_long[cfg.lng]
         )
-        self.reset_win.resize(330, 80)
+        self.reset_win.resize(330, 120)
+        self.reset_win.text_label.setFixedHeight(80)
         self.reset_win.ok_clicked.connect(fin)
         self.reset_win.center_to_parent(self.window())
         self.reset_win.show()
@@ -237,7 +233,6 @@ class RebootSettings(QGroupBox):
             value = self.spin.maximum()
 
         self.cfg_clone.scaner_minutes = value
-        self.what_change.scaner_time = True
         self.cfg_changed.emit()
 
 
@@ -606,10 +601,9 @@ class GeneralSettings(QWidget):
 class FiltersWid(QGroupBox):
     changed = pyqtSignal()
 
-    def __init__(self, filters_clone: list[str], what_change: WhatChange):
+    def __init__(self, filters_clone: list[str]):
         super().__init__()
         self.filters_clone = filters_clone
-        self.what_change = what_change
 
         group_lay = GroupLay()
         group_lay.setSpacing(5)
@@ -672,7 +666,6 @@ class FiltersWid(QGroupBox):
 
     def save_btn_cmd(self, *args):
         self.save_btn.setDisabled(True)
-        self.what_change.filters = True
         self.changed.emit()
 
     def mouseReleaseEvent(self, a0):
@@ -756,6 +749,7 @@ class MfSettings(QWidget):
         self.name_wid.setLayout(name_lay)
         main_lay.addWidget(self.name_wid)
         name_text = ULabel(f"{Lng.alias[cfg.lng]}: {target_mf.alias}")
+        name_text.setFixedHeight(GroupChild.hh)
         name_lay.addWidget(name_text)
 
         mf_paths = MfPaths(target_mf)
@@ -765,16 +759,16 @@ class MfSettings(QWidget):
         main_lay.addWidget(mf_stop_list)
 
         general_wid = QGroupBox()
-        general_wid.setFixedHeight(110)
         general_lay = GroupLay()
         general_wid.setLayout(general_lay)
         main_lay.addWidget(general_wid)
 
-        reset_wid = QWidget()
+        reset_wid = GroupChild()
+        reset_wid.mouseReleaseEvent = self.set_reset_flag
         reset_lay = UHBoxLayout()
         reset_wid.setLayout(reset_lay)
         general_lay.addWidget(reset_wid)
-        reset_text = ULabel(text=Lng.reset_mf_text[cfg.lng])
+        reset_text = ULabel(text=Lng.reset_mf[cfg.lng])
         reset_lay.addWidget(reset_text)
         reset_lay.addStretch()
         reset_btn = SvgArrow()
@@ -782,34 +776,47 @@ class MfSettings(QWidget):
 
         general_lay.addWidget(USep())
 
-        remove_wid = QWidget()
+        remove_wid = GroupChild()
+        remove_wid.mouseReleaseEvent = self.set_remove_flag
         remove_lay = UHBoxLayout()
         remove_wid.setLayout(remove_lay)
         general_lay.addWidget(remove_wid)
-        remove_text = ULabel(text=Lng.folder_removed_text[cfg.lng])
+        remove_text = ULabel(text=Lng.remove_folder[cfg.lng])
         remove_lay.addWidget(remove_text)
         remove_lay.addStretch()
         remove_btn = SvgArrow()
         remove_lay.addWidget(remove_btn)
-        
 
-    def set_remove_flag(self):
+        self.save_btn = UPushButton(Lng.save[cfg.lng])
+        main_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.save_btn.setDisabled(True)
+
+    def show_warn(self, message, width=380):
+        self.win_warn = WinWarn(
+            Lng.attention[cfg.lng],
+            message
+        )
+        self.win_warn.resize(width, 80)
+        self.win_warn.center_to_parent(self.window())
+        self.win_warn.show()
+
+    def set_remove_flag(self, *args):
+        self.show_warn(Lng.remove_folder_long[cfg.lng])
         self.need_remove = True
         self.save_btn.setDisabled(False)
+        for i in self.findChildren(QGroupBox):
+            i.setDisabled(True)
 
-    def set_reset_flag(self):
+    def set_reset_flag(self, *args):
+        self.show_warn(Lng.reset_mf_long[cfg.lng])
         self.need_reset = True
         self.save_btn.setDisabled(False)
+        for i in self.findChildren(QGroupBox):
+            i.setDisabled(True)
 
     def save(self):
-        def show_warn(message, width=380):
-            self.win_warn = WinWarn(
-                Lng.attention[cfg.lng],
-                message
-            )
-            self.win_warn.resize(width, 80)
-            self.win_warn.center_to_parent(self.window())
-            self.win_warn.show()
+
         self.save_btn.setDisabled(True)
         if self.need_remove:
             self.remove.emit()
@@ -1089,7 +1096,7 @@ class WinSettings(SingleActionWindow):
             self.gen_settings.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
-            self.filters_wid = FiltersWid(self.filters_clone, self.what_change)
+            self.filters_wid = FiltersWid(self.filters_clone)
             self.filters_wid.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:

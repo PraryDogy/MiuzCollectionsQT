@@ -179,7 +179,7 @@ class DataSettings(QGroupBox):
         self.reset_data_btn.clicked.connect(self.reset_cmd)
         first_lay.addWidget(self.reset_data_btn)
 
-        reset_lbl = ULabel(Lng.reset_settings[cfg.lng])
+        reset_lbl = ULabel(Lng.erase_data[cfg.lng])
         first_lay.addWidget(reset_lbl)
 
         self.v_lay.addWidget(first_wid)
@@ -209,7 +209,7 @@ class DataSettings(QGroupBox):
 
         self.reset_win = WinQuestion(
             Lng.attention[cfg.lng],
-            Lng.reset_settings_max[cfg.lng]
+            Lng.erase_data_long[cfg.lng]
         )
         self.reset_win.resize(330, 80)
         self.reset_win.ok_clicked.connect(fin)
@@ -680,7 +680,7 @@ class MfSettings(QWidget):
         self.reset_btn = UPushButton(Lng.reset[cfg.lng])
         self.reset_btn.clicked.connect(self.set_reset_flag)
         res_lay.addWidget(self.reset_btn)
-        res_descr = QLabel(Lng.reset_mf_text[cfg.lng])
+        res_descr = QLabel(Lng.reset_mf[cfg.lng])
         res_lay.addWidget(res_descr)
 
         rem_lay = UHBoxLayout()
@@ -689,7 +689,7 @@ class MfSettings(QWidget):
         self.remove_btn = UPushButton(Lng.delete[cfg.lng])
         self.remove_btn.clicked.connect(self.set_remove_flag)
         rem_lay.addWidget(self.remove_btn)
-        rem_descr = QLabel(Lng.folder_removed_text[cfg.lng])
+        rem_descr = QLabel(Lng.remove_folder[cfg.lng])
         rem_lay.addWidget(rem_descr)
 
         # QGroupBox для кнопок и описания
