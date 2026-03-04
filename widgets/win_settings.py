@@ -7,8 +7,7 @@ import subprocess
 from PyQt5.QtCore import QRegExp, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
-                             QGraphicsOpacityEffect, QGroupBox, QLabel,
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QSpacerItem, QSpinBox, QSplitter,
                              QTableWidget, QTableWidgetItem, QWidget)
 from typing_extensions import Optional
@@ -32,12 +31,6 @@ from .win_warn import WinQuestion, WinWarn
 def restart_app():
     QApplication.quit()
     Utils.start_new_app()
-
-
-class WhatChange:
-    def __init__(self):
-        self.removed_mf_list: list[Mf] = []
-        self.erased_mf_list: list[Mf] = []
 
 
 class ULabel(QLabel):
@@ -64,7 +57,7 @@ class GroupLay(UVBoxLayout):
     spc = 5
     def __init__(self, *args, **kwargs):
         super().__init__()
-        self.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
+        self.setContentsMargins(6, 2, 6, 2)
         self.setSpacing(self.spc)
 
 
@@ -106,6 +99,7 @@ class TextEditWidget(QGroupBox):
         group_lay.addWidget(self.title_wid)
 
         self.text_edit_wid = UTextEdit()
+        self.text_edit_wid.setFixedHeight(100)
         self.text_edit_wid.setPlaceholderText(placeholder)
         self.text_edit_wid.textChanged.connect(self.text_changed.emit)
         self.text_edit_wid.setAcceptDrops(False)
@@ -136,10 +130,9 @@ class RebootSettings(QGroupBox):
     spin_max = 60
     spin_min = 0
 
-    def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
+    def __init__(self, cfg_clone: Cfg):
         super().__init__()
         self.cfg_clone = cfg_clone
-        self.what_change = what_change
 
         group_lay = GroupLay()
         self.setLayout(group_lay)
@@ -571,7 +564,7 @@ class AboutWid(QGroupBox):
 class GeneralSettings(QWidget):
     changed = pyqtSignal()
 
-    def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
+    def __init__(self, cfg_clone: Cfg):
         super().__init__()
 
         v_lay = UVBoxLayout()
@@ -580,7 +573,7 @@ class GeneralSettings(QWidget):
         v_lay.setContentsMargins(0, 0, 0, 10)
         self.setLayout(v_lay)
 
-        reboot_settings = RebootSettings(cfg_clone, what_change)
+        reboot_settings = RebootSettings(cfg_clone)
         reboot_settings.cfg_changed.connect(self.changed.emit)
         v_lay.addWidget(reboot_settings)
 
@@ -618,6 +611,7 @@ class FiltersWid(QGroupBox):
         filters_text.setWordWrap(True)
         group_lay.addWidget(filters_text)
 
+        group_lay.addSpacerItem(QSpacerItem(0, 5))
         group_lay.addWidget(USep())
 
         erase_filters_wid = GroupChild()
@@ -733,9 +727,10 @@ class MfStopList(TextEditWidget):
 class MfSettings(QWidget):
     changed = pyqtSignal()
 
-    def __init__(self, target_mf: Mf):
+    def __init__(self, target_mf: Mf, mf_list_clone: list[Mf]):
         super().__init__()
         self.target_mf = target_mf
+        self.mf_list_clone = mf_list_clone
 
         main_lay = UVBoxLayout()
         main_lay.setSpacing(15)
@@ -800,6 +795,7 @@ class MfSettings(QWidget):
         return win_warn
 
     def set_remove_flag(self, *args):
+
         def fin():
             for i in Mf.list_:
                 if i.alias == self.target_mf.alias:
@@ -808,9 +804,18 @@ class MfSettings(QWidget):
             Mf.write_json_data()
             restart_app()
 
-        win = self.show_warn(Lng.remove_folder_long[cfg.lng])
-        win.ok_clicked.connect(fin)
-        win.show()
+        if len(self.mf_list_clone) == 1:
+            win = self.show_warn(
+                Lng.at_least_one_folder_required[cfg.lng],
+                width=360
+            )
+            win.ok_clicked.connect(win.deleteLater)
+            win.cancel_btn.deleteLater()
+            win.show()
+        else:
+            win = self.show_warn(Lng.remove_folder_long[cfg.lng])
+            win.ok_clicked.connect(fin)
+            win.show()
 
     def set_reset_flag(self, *args):
 
@@ -834,13 +839,12 @@ class MfSettings(QWidget):
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
 class NewFolder(QWidget):
-    new_folder = pyqtSignal(Mf)
     svg_warning = "./images/warning.svg"
 
     def __init__(self, mf_list_clone: list[Mf]):
         super().__init__()
         self.mf = Mf("", [], [])
-        self.mf_list = mf_list_clone
+        self.mf_list_clone = mf_list_clone
 
         main_lay = UVBoxLayout()
         main_lay.setSpacing(15)
@@ -856,7 +860,6 @@ class NewFolder(QWidget):
 
         self.name_line_edit = ULineEdit()
         self.name_line_edit.setPlaceholderText(Lng.alias_immutable[cfg.lng])
-        self.name_line_edit.textChanged.connect(self.name_cmd)
         name_lay.addWidget(self.name_line_edit)
 
         self.mf_paths = MfPaths(self.mf)
@@ -873,24 +876,18 @@ class NewFolder(QWidget):
         btn_wid.setLayout(btn_lay)
 
         self.save_btn = UPushButton(Lng.save[cfg.lng])
-        self.save_btn.setDisabled(True)
+        # self.save_btn.setDisabled(True)
         self.save_btn.clicked.connect(self.save)
         btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def preset_new_folder(self, url: str):
-        text_edit = self.findChildren(TextEditWidget)[0].text_edit_wid
-        text_edit.setPlainText(url)
-
-    def name_cmd(self):
-        name = self.name_line_edit.text().strip()
-        self.mf.alias = name
-
-    def toggle_save_btn(self):
-        if self.name_line_edit.text() and self.advanced.mf_paths.get_lined_text():
-            self.save_btn.setDisabled(False)
+        self.mf_paths.text_edit_wid.setPlainText(url)
 
     def save(self):
         pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
+        folder_name = self.name_line_edit.text()
+        paths = self.mf_paths.text_edit_wid.toPlainText().split("\n")
+        stop_list = self.mf_stop_list.text_edit_wid.toPlainText().split("\n")
 
         def show_warn(message, width=380):
             self.win_warn = WinWarn(
@@ -901,39 +898,36 @@ class NewFolder(QWidget):
             self.win_warn.center_to_parent(self.window())
             self.win_warn.show()
 
-        if not self.mf.alias:
+        if not folder_name:
             show_warn(Lng.enter_alias_warning[cfg.lng])
             return
 
-        elif any(i.alias == self.mf.alias for i in self.mf_list):
+        elif any(i.alias == folder_name for i in self.mf_list_clone):
             show_warn(
                 f'{Lng.alias[cfg.lng]} "{self.mf.alias}" '
                 f'{Lng.already_taken[cfg.lng].lower()}'
             )
             return
 
-        elif len(self.mf.alias) > 30:
+        elif len(folder_name) > 30:
             show_warn(f'{Lng.string_limit[cfg.lng]}')
             return
 
-        elif not re.fullmatch(pattern, self.mf.alias):
+        elif not re.fullmatch(pattern, folder_name):
             show_warn(f'{Lng.valid_message[cfg.lng]}')
             return
 
-        elif not self.mf.paths:
+        elif not paths:
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
             return
 
-        name = None
-        for i in self.mf_list:
-            for x in i.paths:
-                if x in self.mf.paths:
-                    name = i.alias
-        if name:
-            show_warn(f"{Lng.folder_path_exists[cfg.lng]} {name}", width=330)
-            return
-
-        self.new_folder.emit(self.mf)
+        self.mf.alias = folder_name
+        self.mf.paths = paths
+        self.mf.stop_list = stop_list
+        self.mf_list_clone.append(self.mf)
+        Mf.list_ = self.mf_list_clone
+        Mf.write_json_data()
+        restart_app()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -957,7 +951,6 @@ class WinSettings(SingleActionWindow):
         self.setWindowTitle(Lng.settings[cfg.lng])
         self.setFixedSize(700, 560)
 
-        self.what_change = WhatChange()
         self.cfg_clone = copy.deepcopy(cfg)
         self.mf_list_clone = copy.deepcopy(Mf.list_)
         self.filters_clone = copy.deepcopy(Filters.filters)
@@ -1031,10 +1024,14 @@ class WinSettings(SingleActionWindow):
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
+        # self.ok_btn.setIcon(QIcon('./images/warning.svg'))
+
         cancel_btn = UPushButton(Lng.cancel[cfg.lng])
         cancel_btn.setFixedWidth(95)
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
+
+        self.central_layout.addSpacerItem(QSpacerItem(0, 5))
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)
@@ -1065,7 +1062,7 @@ class WinSettings(SingleActionWindow):
 
     def init_right_side(self, index: int):
         if index == 0:
-            self.gen_settings = GeneralSettings(self.cfg_clone, self.what_change)
+            self.gen_settings = GeneralSettings(self.cfg_clone)
             self.gen_settings.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, self.gen_settings)
         elif index == 1:
@@ -1074,7 +1071,6 @@ class WinSettings(SingleActionWindow):
             self.right_lay.insertWidget(0, self.filters_wid)
         elif index == 2:
             self.new_folder = NewFolder(self.mf_list_clone)
-            self.new_folder.new_folder.connect(self.add_mf)
             self.right_lay.insertWidget(0, self.new_folder)
             if self.settings_item.type_ == "general":
                 self.new_folder.preset_new_folder("")
@@ -1091,7 +1087,7 @@ class WinSettings(SingleActionWindow):
                 for i in self.mf_list_clone
                 if i.alias == item.text()
             )
-            mf_sett = MfSettings(mf)
+            mf_sett = MfSettings(mf, self.mf_list_clone)
             mf_sett.changed.connect(self.blink_ok_btn)
             self.right_lay.insertWidget(0, mf_sett)
 
@@ -1108,34 +1104,6 @@ class WinSettings(SingleActionWindow):
         index = self.left_menu.count() - 1
         self.init_right_side(index)
         self.blink_ok_btn()
-
-    def remove_mf(self, item: UListWidgetItem):
-
-        def fin():
-            for i in self.mf_list_clone:
-                if i.alias == item.text():
-                    self.mf_list_clone.remove(i)
-                    self.left_menu.takeItem(self.left_menu.currentRow())
-                    self.left_menu.setCurrentRow(0)
-                    self.clear_right_side()
-                    self.init_right_side(0)
-                    self.blink_ok_btn()
-                    break
-
-        try:
-            if len(self.mf_list_clone) == 1:
-                self.win_warn = WinWarn(
-                    Lng.attention[cfg.lng],
-                    Lng.at_least_one_folder_required[cfg.lng],
-                )
-                self.win_warn.resize(360, 80)
-                self.win_warn.center_to_parent(self)
-                self.win_warn.show()
-            else:
-                fin()
-
-        except Exception as e:
-            print("win settings > ошибка удаления main folder по кнопке удалить", e)
 
     def clear_right_side(self):
         wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
