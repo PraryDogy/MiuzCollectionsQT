@@ -88,7 +88,6 @@ class TextEditWidget(QGroupBox):
         group_lay = GroupLay()
         self.setLayout(group_lay)
 
-        # self.dropable_text = ULabel(self.insert_linebreaks(text))
         self.title_wid = ULabel(title)
         self.title_wid.setWordWrap(True)
         group_lay.addWidget(self.title_wid)
@@ -98,12 +97,6 @@ class TextEditWidget(QGroupBox):
         self.text_edit_wid.textChanged.connect(self.text_changed.emit)
         self.text_edit_wid.setAcceptDrops(False)
         group_lay.addWidget(self.text_edit_wid)
-
-    def insert_linebreaks(self, text: str, n: int = 65) -> str:
-        return '\n'.join(
-            text[i:i+n]
-            for i in range(0, len(text), n)
-        )
 
     def get_lined_text(self):
         return [
