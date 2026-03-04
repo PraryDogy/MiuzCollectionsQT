@@ -7,7 +7,8 @@ import subprocess
 from PyQt5.QtCore import QRegExp, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
+                             QGraphicsOpacityEffect, QGroupBox, QLabel,
                              QLineEdit, QSpacerItem, QSpinBox, QSplitter,
                              QTableWidget, QTableWidgetItem, QWidget)
 from typing_extensions import Optional
@@ -1013,33 +1014,30 @@ class WinSettings(SingleActionWindow):
         self.right_lay.addStretch()
 
         btns_wid = QWidget()
-        btns_wid.setFixedHeight(40)
-        self.right_lay.addWidget(btns_wid, alignment=Qt.AlignmentFlag.AlignBottom)
+        btns_wid.setFixedHeight(26)
+        self.right_lay.addWidget(btns_wid)
         btns_lay = UHBoxLayout()
-        btns_lay.setSpacing(15)
-        btns_wid.setLayout(btns_lay)
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        warn_wid = QWidget()
-        warn_wid.setFixedSize(22, 22)
-        warn_wid.setStyleSheet("background: red;")
-        warn_lay = UHBoxLayout()
-        warn_wid.setLayout(warn_lay)
-        btns_lay.addWidget(warn_wid, alignment=Qt.AlignmentFlag.AlignVCenter)
+        btns_lay.setSpacing(10)
+        btns_wid.setLayout(btns_lay)
 
         self.warn_svg = QSvgWidget()
-        self.warn_svg.setFixedSize(20, 20)
+        self.warn_svg.setParent(btns_wid)
+        self.warn_svg.setFixedSize(22, 22)
         self.warn_svg.load("./images/warning.svg")
-        warn_lay.addWidget(self.warn_svg)
+        pol = self.warn_svg.sizePolicy()
+        pol.setRetainSizeWhenHidden(True)
+        self.warn_svg.setSizePolicy(pol)
+        btns_lay.addWidget(self.warn_svg)
         self.warn_svg.hide()
 
         self.ok_btn = UPushButton(Lng.ok[cfg.lng])
-        self.ok_btn.setFixedWidth(90)
+        self.ok_btn.setFixedWidth(95)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
         cancel_btn = UPushButton(Lng.cancel[cfg.lng])
-        cancel_btn.setFixedWidth(90)
+        cancel_btn.setFixedWidth(95)
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
 
