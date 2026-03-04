@@ -868,22 +868,29 @@ class NewFolder(QWidget):
         self.mf_stop_list = MfStopList(self.mf)
         main_lay.addWidget(self.mf_stop_list)
 
-        btn_wid = QWidget()
-        main_lay.addWidget(btn_wid)
-        btn_lay = UHBoxLayout()
-        btn_lay.setContentsMargins(0, 0, 0, 10)
-        btn_lay.setSpacing(15)
-        btn_wid.setLayout(btn_lay)
+        save_wid = GroupChild()
+        save_wid.mouseReleaseEvent = self.save
+        save_lay = UHBoxLayout()
+        save_wid.setLayout(save_lay)
+        main_lay.addWidget(save_wid)
 
-        self.save_btn = UPushButton(Lng.save[cfg.lng])
+        save_text = ULabel(Lng.save[cfg.lng])
+        save_lay.addWidget(save_text)
+
+        save_btn = SvgArrow()
+        save_lay.addWidget(save_btn)
+
+        # main_lay.addStretch()
+
+        # self.save_btn = UPushButton(Lng.save[cfg.lng])
         # self.save_btn.setDisabled(True)
-        self.save_btn.clicked.connect(self.save)
-        btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        # self.save_btn.clicked.connect(self.save)
+        # btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def preset_new_folder(self, url: str):
         self.mf_paths.text_edit_wid.setPlainText(url)
 
-    def save(self):
+    def save(self, *args):
         pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
         folder_name = self.name_line_edit.text()
         paths = self.mf_paths.text_edit_wid.toPlainText().split("\n")
