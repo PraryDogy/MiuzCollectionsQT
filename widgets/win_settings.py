@@ -573,6 +573,7 @@ class FiltersWid(QGroupBox):
         self.setLayout(group_lay)
 
         filters_text = ULabel(Lng.filters_descr[cfg.lng])
+        filters_text.setWordWrap(True)
         group_lay.addWidget(filters_text)
 
         self.filters_edit = UTextEdit()
