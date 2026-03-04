@@ -736,8 +736,6 @@ class MfStopList(TextEditWidget):
 
 class MfSettings(QWidget):
     changed = pyqtSignal()
-    remove = pyqtSignal()
-    reset_data = pyqtSignal(Mf)
 
     def __init__(self, target_mf: Mf):
         super().__init__()
@@ -757,9 +755,11 @@ class MfSettings(QWidget):
         name_lay.addWidget(name_text)
 
         mf_paths = MfPaths(target_mf)
+        mf_paths.text_changed.connect(self.changed.emit)
         main_lay.addWidget(mf_paths)
 
         mf_stop_list = MfStopList(target_mf)
+        mf_stop_list.text_changed.connect(self.changed.emit)
         main_lay.addWidget(mf_stop_list)
 
         general_wid = QGroupBox()
@@ -791,10 +791,8 @@ class MfSettings(QWidget):
         remove_btn = SvgArrow()
         remove_lay.addWidget(remove_btn)
 
-        self.save_btn = UPushButton(Lng.save[cfg.lng])
-        main_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        main_lay.addSpacerItem(QSpacerItem(0, 15))
 
-        self.save_btn.setDisabled(True)
 
     def show_warn(self, message, width=380):
         win_warn = WinQuestion(
@@ -830,29 +828,7 @@ class MfSettings(QWidget):
         win.show()
 
     def save(self):
-
-        self.save_btn.setDisabled(True)
-        if self.need_remove:
-            self.remove.emit()
-            return
-        elif self.need_reset:
-            self.reset_data.emit(self.target_mf)
-            self.window().deleteLater()
-            self.show_finish_win()
-            return
-        if not self.target_mf.paths:
-            show_warn(Lng.select_folder_path[cfg.lng], width=330)
-            return
         self.changed.emit()
-
-    def show_finish_win(self):
-        self.finish_win = WinWarn(
-            Lng.attention[cfg.lng],
-            f"{Lng.data_was_reset[cfg.lng]}"
-        )
-        self.finish_win.resize(330, 80)
-        self.finish_win.center_to_parent(self.window())
-        self.finish_win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -1044,6 +1020,19 @@ class WinSettings(SingleActionWindow):
         btns_wid.setLayout(btns_lay)
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        warn_wid = QWidget()
+        warn_wid.setFixedSize(22, 22)
+        warn_wid.setStyleSheet("background: red;")
+        warn_lay = UHBoxLayout()
+        warn_wid.setLayout(warn_lay)
+        btns_lay.addWidget(warn_wid, alignment=Qt.AlignmentFlag.AlignVCenter)
+
+        self.warn_svg = QSvgWidget()
+        self.warn_svg.setFixedSize(20, 20)
+        self.warn_svg.load("./images/warning.svg")
+        warn_lay.addWidget(self.warn_svg)
+        self.warn_svg.hide()
+
         self.ok_btn = UPushButton(Lng.ok[cfg.lng])
         self.ok_btn.setFixedWidth(90)
         self.ok_btn.clicked.connect(self.ok_cmd)
@@ -1078,31 +1067,8 @@ class WinSettings(SingleActionWindow):
                     break
 
     def blink_ok_btn(self):
-        text = Lng.restart[cfg.lng]
-        original_style = self.ok_btn.styleSheet()
-        blink_style = "color: red; font-size: 11pt;"  # текст красным
-
-        # если таймер уже существует и работает — не запускаем новое мигание
-        if hasattr(self, "_blink_timer") and self._blink_timer.isActive():
-            return
-
-        count = 0
-
-        def toggle():
-            nonlocal count
-            if count % 2 == 0:
-                self.ok_btn.setStyleSheet(blink_style)
-            else:
-                self.ok_btn.setStyleSheet(original_style)
-            count += 1
-            if count >= 6:  # 3 мигания
-                self._blink_timer.stop()
-                self.ok_btn.setStyleSheet(original_style)
-
-        self.ok_btn.setText(text)
-        self._blink_timer = QTimer(self)
-        self._blink_timer.timeout.connect(toggle)
-        self._blink_timer.start(500)
+        self.ok_btn.setText(Lng.restart[cfg.lng])
+        self.warn_svg.show()
 
     def init_right_side(self, index: int):
         if index == 0:
@@ -1134,8 +1100,6 @@ class WinSettings(SingleActionWindow):
             )
             mf_sett = MfSettings(mf)
             mf_sett.changed.connect(self.blink_ok_btn)
-            mf_sett.remove.connect(lambda: self.remove_mf(item))
-            mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
             self.right_lay.insertWidget(0, mf_sett)
 
         self.settings_item.type_ = "general"
