@@ -898,34 +898,29 @@ class NewFolder(QWidget):
 # ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ 
 
 
-class FiltersWid(QWidget):
+class FiltersWid(QGroupBox):
     changed = pyqtSignal()
 
-    def __init__(self, filters_copy: list[str]):
+    def __init__(self, filters_clone: list[str]):
         super().__init__()
-        self.filters_copy = filters_copy
+        self.filters_clone = filters_clone
 
-        self.v_lay = UVBoxLayout()
-        self.v_lay.setSpacing(15)
-        self.setLayout(self.v_lay)
-
-        group = QGroupBox()
-        g_lay = UVBoxLayout(group)
-        g_lay.setSpacing(15)
+        self.group_lay = GroupLay()
+        self.group_lay.setSpacing(15)
+        self.setLayout(self.group_lay)
 
         descr = ULabel(Lng.filters_descr[cfg.lng])
-        g_lay.addWidget(descr)
+        self.group_lay.addWidget(descr)
 
         self.text_wid = UTextEdit()
         self.text_wid.setFixedHeight(220)
         self.text_wid.setPlaceholderText(Lng.filters[cfg.lng])
-        self.text_wid.setPlainText("\n".join(self.filters_copy))
+        self.text_wid.setPlainText("\n".join(self.filters_clone))
         self.text_wid.textChanged.connect(self.on_text_changed)
-        g_lay.addWidget(self.text_wid)
-        self.v_lay.addWidget(group)
+        self.group_lay.addWidget(self.text_wid)
 
         btns_wid = QWidget()
-        self.v_lay.addWidget(btns_wid)
+        self.group_lay.addWidget(btns_wid)
         btns_lay = UHBoxLayout()
         btns_lay.setContentsMargins(0, 0, 0, 10)
         btns_wid.setLayout(btns_lay)
@@ -956,8 +951,8 @@ class FiltersWid(QWidget):
         text = self.text_wid.toPlainText().strip()
         lines = [line for line in text.split("\n") if line]
 
-        self.filters_copy.clear()   # очищаем текущий список
-        self.filters_copy.extend(lines)  # добавляем новые элементы
+        self.filters_clone.clear()   # очищаем текущий список
+        self.filters_clone.extend(lines)  # добавляем новые элементы
         
         self.changed.emit()
 

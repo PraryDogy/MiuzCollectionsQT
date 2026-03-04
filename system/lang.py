@@ -259,17 +259,17 @@ class Lng:
     )
     filters_descr = (
         "Фильтры:\n"
-        "- Показывают файлы, путь которых содержит указанный текст.\n"
-        "- Каждый фильтр вводится с новой строки.\n"
+        "• Показывают файлы, путь которых содержит указанный текст.\n"
+        "• Каждый фильтр вводится с новой строки.\n"
         "Пример:\n"
-        "- Добавьте фильтр \".jpg\" и нажмите \"Сохранить\".\n"
-        "- В приложении выберите фильтр \".jpg\" — будут показаны все .jpg файлы.",
+        "• Добавьте фильтр \".jpg\" и нажмите \"Сохранить\".\n"
+        "• В приложении выберите фильтр \".jpg\" — будут показаны все .jpg файлы.",
         "Filters:\n"
-        "- Show files whose path contains the specified text.\n"
-        "- Enter each filter on a new line.\n"
+        "• Show files whose path contains the specified text.\n"
+        "• Enter each filter on a new line.\n"
         "Example:\n"
-        "- Add the filter \".jpg\" and click \"Save\".\n"
-        "- In the app, select the \".jpg\" filter — all .jpg files will be displayed."
+        "• Add the filter \".jpg\" and click \"Save\".\n"
+        "• In the app, select the \".jpg\" filter — all .jpg files will be displayed."
     )
     all_images = ("Все изображения", "All images")
     only_this_folder = ("Показать только в этой папке", "Show only this folder")
