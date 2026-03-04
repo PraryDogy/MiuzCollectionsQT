@@ -81,10 +81,12 @@ class SvgArrow(QSvgWidget):
 
 class RebootSettings(QGroupBox):
     cfg_changed = pyqtSignal()
+    spin_max = 60
+    spin_min = 0
 
     def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
         super().__init__()
-        self.setFixedHeight(80)
+        self.setFixedHeight(120)
         self.cfg_clone = cfg_clone
         self.what_change = what_change
 
@@ -112,8 +114,7 @@ class RebootSettings(QGroupBox):
         self.lng_btn.setMenu(self.lng_menu)
         lng_lay.addWidget(self.lng_btn)
 
-        sep = USep()
-        group_lay.addWidget(sep)
+        group_lay.addWidget(USep())
 
         reset_data_wid = QWidget()
         reset_data_lay = UHBoxLayout()
@@ -130,16 +131,41 @@ class RebootSettings(QGroupBox):
         self.reset_data_btn.clicked.connect(self.reset_btn_cmd)
         reset_data_lay.addWidget(self.reset_data_btn)
 
+        group_lay.addWidget(USep())
+
+        scaner_time_wid = QWidget()
+        scaner_timer_lay = UHBoxLayout()
+        scaner_time_wid.setLayout(scaner_timer_lay)
+        group_lay.addWidget(scaner_time_wid)
+
+        scaner_time_text = ULabel(Lng.search_interval[cfg.lng], self)
+        scaner_timer_lay.addWidget(scaner_time_text)
+
+        scaner_timer_lay.addStretch()
+
+        self.spin = QSpinBox(self)
+        self.spin.setMinimum(self.spin_min)
+        self.spin.setMaximum(self.spin_max)
+        self.spin.setFixedHeight(27)
+        self.spin.setFixedWidth(100)
+        self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
+        self.spin.setSuffix(f" {Lng.minutes[cfg.lng]}")
+        self.spin.setValue(self.cfg_clone.scaner_minutes)
+        self.spin.valueChanged.connect(self.change_scan_time)
+        scaner_timer_lay.addWidget(self.spin)
+
+        # self.change_spin_width()
+
     def lang_action_cmd(self, value: int):
         self.cfg_clone.lng = value
         self.lng_btn.setText(Lng.russian[value])
-        self.cfg_changed.emit()
         self.what_change.change_lng = True
+        self.cfg_changed.emit()
 
     def reset_btn_cmd(self):
         def fin():
-            self.cfg_changed.emit()
             self.what_change.reset_data = True
+            self.cfg_changed.emit()
             self.reset_win.deleteLater()
 
         self.reset_win = WinQuestion(
@@ -150,6 +176,22 @@ class RebootSettings(QGroupBox):
         self.reset_win.ok_clicked.connect(fin)
         self.reset_win.center_to_parent(self.window())
         self.reset_win.show()
+
+    def change_scan_time(self, value: int):
+        if value == self.spin_max:
+            self.spin.blockSignals(True)
+            self.spin.setValue(self.spin_min + 1)
+            self.spin.blockSignals(False)
+            value = self.spin.minimum()
+        elif value == self.spin_min:
+            self.spin.blockSignals(True)
+            self.spin.setValue(self.spin_max - 1)
+            self.spin.blockSignals(False)
+            value = self.spin.maximum()
+
+        self.cfg_clone.scaner_minutes = value
+        self.what_change.scaner_time = True
+        self.cfg_changed.emit()
 
 
 class SizesWin(SingleActionWindow):
@@ -295,91 +337,6 @@ class NonRebootSettings(QGroupBox):
             subprocess.Popen(["open", Static.app_support])
         except Exception as e:
             print(e)
-
-
-class SimpleSettings(QGroupBox):
-    def __init__(self):
-        super().__init__()
-
-        v_lay = UVBoxLayout()
-        v_lay.setSpacing(5)
-        self.setLayout(v_lay)
-
-        first_row_wid = QWidget()
-        v_lay.addWidget(first_row_wid)
-        first_row_lay = UHBoxLayout()
-        first_row_lay.setSpacing(15)
-        first_row_wid.setLayout(first_row_lay)
-
-        self.show_files_btn = UPushButton(text=Lng.show[cfg.lng])
-        self.show_files_btn.clicked.connect(self.show_files_cmd)
-        first_row_lay.addWidget(self.show_files_btn)
-
-        self.lang_label = ULabel(Lng.show_system_files[cfg.lng])
-        first_row_lay.addWidget(self.lang_label)
-
-    def show_files_cmd(self, *args):
-        try:
-            subprocess.Popen(["open", Static.app_support])
-        except Exception as e:
-            print(e)
-
-
-class ScanerSettings(QGroupBox):
-    changed = pyqtSignal()
-    spin_max = 60
-    spin_min = 0
-
-    def __init__(self, json_data_copy: Cfg):
-        super().__init__()
-        self.json_data_copy = json_data_copy
-
-        self.main_lay = UVBoxLayout()
-        self.main_lay.setSpacing(5)
-        self.setLayout(self.main_lay)
-
-        sec_row = QWidget()
-        self.main_lay.addWidget(sec_row)
-        self.spin_lay = UHBoxLayout()
-        sec_row.setLayout(self.spin_lay)
-        self.spin_lay.setSpacing(15)
-        self.spin_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-
-        self.spin = QSpinBox(self)
-        self.spin.setMinimum(self.spin_min)
-        self.spin.setMaximum(self.spin_max)
-        self.spin.setFixedHeight(27)
-        self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
-        self.spin.setSuffix(f" {Lng.minutes[cfg.lng]}")
-        self.spin.setValue(self.json_data_copy.scaner_minutes)
-        self.spin.valueChanged.connect(self.change_scan_time)
-        self.spin_lay.addWidget(self.spin)
-
-        label = ULabel(Lng.search_interval[cfg.lng], self)
-        self.spin_lay.addWidget(label)
-
-        self.change_spin_width()
-
-    def change_scan_time(self, value: int):
-        if value == self.spin_max:
-            self.spin.blockSignals(True)
-            self.spin.setValue(self.spin_min + 1)
-            self.spin.blockSignals(False)
-            value = self.spin.minimum()
-        elif value == self.spin_min:
-            self.spin.blockSignals(True)
-            self.spin.setValue(self.spin_max - 1)
-            self.spin.blockSignals(False)
-            value = self.spin.maximum()
-
-        self.json_data_copy.scaner_minutes = value
-        self.changed.emit()
-
-    def change_spin_width(self):
-        if cfg.dark_mode == 0:
-            self.spin.setFixedWidth(109)
-        else:
-            self.spin.setFixedWidth(115)
 
 
 class ThemesBtn(QFrame):
@@ -568,15 +525,7 @@ class GeneralSettings(QWidget):
         data_settings = NonRebootSettings()
         v_lay.addWidget(data_settings)
 
-        simple_settings = SimpleSettings()
-        v_lay.addWidget(simple_settings)
-
-        scaner_settings = ScanerSettings(cfg_clone)
-        scaner_settings.changed.connect(self.changed.emit)
-        v_lay.addWidget(scaner_settings)
-
         themes = Themes()
-        themes.clicked.connect(scaner_settings.change_spin_width)
         v_lay.addWidget(themes)
 
         about = AboutWid()
