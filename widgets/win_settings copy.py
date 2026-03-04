@@ -458,7 +458,7 @@ class SelectableLabel(ULabel):
         select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
-        context_menu.show_umenu()
+        context_menu.show_menu()
         return super().contextMenuEvent(ev)
 
     def copy_text_md(self):

@@ -77,12 +77,15 @@ class UMenu(UMenuBase):
         event (QContextMenuEvent): Событие контекстного меню.
     """
 
-    def __init__(self, event: QContextMenuEvent):
+    def __init__(self, event: Optional[QContextMenuEvent]):
         super().__init__()
-        self.ev = event
+        self.event_ = event
 
-    def show_umenu(self):
-        self.exec_(self.ev.globalPos())
+    def show_menu(self):
+        if self.event_:
+            self.exec_(self.event_.globalPos())
+        else:
+            self.exec_()
 
 
 class USubMenu(UMenuBase):
@@ -142,7 +145,7 @@ class ULineEdit(QLineEdit):
             act.triggered.connect(slot)
             self.menu_.addAction(act)
 
-        self.menu_.show_umenu()
+        self.menu_.show_menu()
 
 
 class USvgSqareWidget(QSvgWidget):
@@ -195,7 +198,7 @@ class UTextEdit(QTextEdit):
             act.triggered.connect(slot)
             menu_.addAction(act)
 
-        menu_.show_umenu()
+        menu_.show_menu()
 
 
 class WinManager:

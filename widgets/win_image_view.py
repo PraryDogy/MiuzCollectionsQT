@@ -596,7 +596,7 @@ class WinImageView(AppModalWindow):
         rotate_ccw.triggered.connect(lambda: self.rotate(-90))
         rotate_menu.addAction(rotate_ccw)
 
-        self.menu_.show_umenu()
+        self.menu_.show_menu()
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2

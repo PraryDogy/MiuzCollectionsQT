@@ -181,7 +181,7 @@ class TreeWid(QTreeWidget):
         reveal.triggered.connect(lambda: self.tree_reveal.emit(abs_path))
         menu.addAction(reveal)
 
-        menu.show_umenu()
+        menu.show_menu()
 
         return super().contextMenuEvent(a0)
 
@@ -247,7 +247,7 @@ class MfList(VListWidget):
             new_folder = QAction(Lng.new_folder[cfg.lng], menu)
             new_folder.triggered.connect(lambda: self.mf_new.emit())
             menu.addAction(new_folder)
-        menu.show_umenu()
+        menu.show_menu()
 
     def dropEvent(self, event):
         super().dropEvent(event)

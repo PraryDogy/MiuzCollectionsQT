@@ -90,6 +90,9 @@ class RebootSettings(QGroupBox):
         self.reset_data_btn.clicked.connect(self.reset_btn_cmd)
         reset_data_lay.addWidget(self.reset_data_btn)
 
+    def lang_btn_test(self):
+        self.lng_menu = UMenu()
+
 
     def lang_btn_cmd(self, *args):
         if self.cfg_clone.lng == 0:
@@ -485,7 +488,7 @@ class SelectableLabel(ULabel):
         select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
-        context_menu.show_umenu()
+        context_menu.show_menu()
         return super().contextMenuEvent(ev)
 
     def copy_text_md(self):

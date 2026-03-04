@@ -58,7 +58,7 @@ class Selectable(ULabel):
         if is_path:
             menu_.addAction(reveal)
 
-        menu_.show_umenu()
+        menu_.show_menu()
 
 
 class WinInfo(SingleActionWindow):

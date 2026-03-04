@@ -63,7 +63,7 @@ class SelectableLabel(QLabel):
         context_menu.addAction(select_all)
 
         # --- Показать контекстное меню ---
-        context_menu.show_umenu()
+        context_menu.show_menu()
 
 
 class AboutWin(SingleActionWindow):

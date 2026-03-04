@@ -989,7 +989,7 @@ class Grid(VScrollArea):
         else:
             menu_widget(clicked_wid)
 
-        self.menu_.show_umenu()
+        self.menu_.show_menu()
 
     def checkScrollValue(self, value: int):
         """Обрабатывает прокрутку: показывает кнопку вверх, дату и подгружает миниатюры."""
