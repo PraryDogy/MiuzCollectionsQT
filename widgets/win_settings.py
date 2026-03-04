@@ -31,7 +31,7 @@ from .win_warn import WinQuestion, WinWarn
 class WhatChange:
     def __init__(self):
         self.change_lng = False
-        self.reset_data = False
+        self.reset_app_data = False
         self.scaner_time = False
         self.filters = False
 
@@ -204,7 +204,7 @@ class RebootSettings(QGroupBox):
 
     def reset_btn_cmd(self):
         def fin():
-            self.what_change.reset_data = True
+            self.what_change.reset_app_data = True
             self.cfg_changed.emit()
             self.reset_win.deleteLater()
 
@@ -696,7 +696,9 @@ class MfPaths(TextEditWidget):
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
-            text = "\n".join((self.text_edit_wid.toPlainText(), *urls)).strip()
+            text = "\n".join(
+                (self.text_edit_wid.toPlainText(), *urls)
+            ).strip()
             self.text_edit_wid.setPlainText(text)
         return super().dropEvent(a0)
 
@@ -721,27 +723,11 @@ class MfStopList(TextEditWidget):
                 for i in a0.mimeData().urls()
                 if os.path.isdir(i.toLocalFile())
             ]
-            text = "\n".join((self.text_edit_wid.toPlainText(), *urls)).strip()
+            text = "\n".join(
+                (self.text_edit_wid.toPlainText(), *urls)
+            ).strip()
             self.text_edit_wid.setPlainText(text)
         return super().dropEvent(a0)
-
-
-class MfAdvanced(QWidget):
-    changed = pyqtSignal()
-
-    def __init__(self, mf: Mf):
-        super().__init__()
-        v_lay = UVBoxLayout()
-        v_lay.setSpacing(15)
-        self.setLayout(v_lay)
-
-        self.mf_paths = MfPaths(mf)
-        self.mf_paths.text_changed.connect(self.changed.emit)
-        v_lay.addWidget(self.mf_paths)
-
-        third_row = MfStopList(mf)
-        third_row.text_changed.connect(self.changed.emit)
-        v_lay.addWidget(third_row)
 
 
 class MfSettings(QWidget):
@@ -749,37 +735,36 @@ class MfSettings(QWidget):
     remove = pyqtSignal()
     reset_data = pyqtSignal(Mf)
 
-    def __init__(self, mf: Mf, mf_list: list[Mf]):
+    def __init__(self, target_mf: Mf):
         super().__init__()
-        self.mf = mf
-        self.mf_list = mf_list
-        self.need_remove = False
-        self.need_reset = False
-        v_lay = UVBoxLayout()
-        v_lay.setSpacing(15)
-        self.setLayout(v_lay)
+        self.target_mf = target_mf
+
+        main_lay = UVBoxLayout()
+        main_lay.setSpacing(15)
+        self.setLayout(main_lay)
 
         # Верхний ряд с названием
         self.name_wid = QGroupBox()
-        self.name_wid.setFixedHeight(30)
-        v_lay.addWidget(self.name_wid)
-        first_lay = UHBoxLayout()
-        first_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.name_wid.setLayout(first_lay)
-        name_descr = ULabel(f"{Lng.alias[cfg.lng]}: ")
-        first_lay.addWidget(name_descr)
-        name_label = ULabel(mf.alias)
-        first_lay.addWidget(name_label)
+        name_lay = GroupLay()
+        self.name_wid.setLayout(name_lay)
+        main_lay.addWidget(self.name_wid)
+        name_text = ULabel(f"{Lng.alias[cfg.lng]}: {target_mf.alias}")
+        name_lay.addWidget(name_text)
 
-        # Advanced настройки
-        self.advanced = MfAdvanced(mf)
-        self.advanced.changed.connect(
-            lambda: self.save_btn.setDisabled(False)
-        )
-        v_lay.addWidget(self.advanced)
+        mf_paths = MfPaths(target_mf)
+        main_lay.addWidget(mf_paths)
+
+        mf_stop_list = MfStopList(target_mf)
+        main_lay.addWidget(mf_stop_list)
+
+        # self.advanced = MfAdvanced(mf)
+        # self.advanced.changed.connect(
+        #     lambda: self.save_btn.setDisabled(False)
+        # )
+        # v_lay.addWidget(self.advanced)
 
         self.res_rem_wid = QGroupBox()
-        v_lay.addWidget(self.res_rem_wid)
+        main_lay.addWidget(self.res_rem_wid)
         res_rem_lay = UVBoxLayout()
         res_rem_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.res_rem_wid.setLayout(res_rem_lay)
@@ -812,7 +797,7 @@ class MfSettings(QWidget):
         self.save_btn.setDisabled(True)
         btn_main_lay.addWidget(self.save_btn)
 
-        v_lay.addWidget(btn_group)
+        main_lay.addWidget(btn_group)
 
     def set_remove_flag(self):
         self.need_remove = True
@@ -836,21 +821,13 @@ class MfSettings(QWidget):
             self.remove.emit()
             return
         elif self.need_reset:
-            self.reset_data.emit(self.mf)
+            self.reset_data.emit(self.target_mf)
             self.window().deleteLater()
             self.show_finish_win()
             return
-        if not self.mf.paths:
+        if not self.target_mf.paths:
             show_warn(Lng.select_folder_path[cfg.lng], width=330)
             return
-        for i in self.mf_list:
-            for path in i.paths:
-                if path in self.mf.paths and self.mf.alias != i.alias:
-                    show_warn(
-                        f"{Lng.folder_path_exists[cfg.lng]} {i.alias}",
-                        width=330
-                    )
-                    return
         self.changed.emit()
 
     def show_finish_win(self):
@@ -979,12 +956,6 @@ class NewFolder(QWidget):
 # ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
 
-class SettingsListItem(UListWidgetItem):
-    def __init__(self, parent, height = 30, text = None):
-        super().__init__(parent, height, text)
-        self.mf: Mf = None
-
-
 class WinSettings(SingleActionWindow):
     closed = pyqtSignal()
     reset_data = pyqtSignal(Mf)
@@ -1006,7 +977,7 @@ class WinSettings(SingleActionWindow):
 
         # удалить бы
         self.need_reset_item = NeedResetItem()
-        self.mf_items: list[SettingsListItem] = []
+        self.mf_items: list[UListWidgetItem] = []
         self.settings_item = settings_item
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -1021,15 +992,15 @@ class WinSettings(SingleActionWindow):
         self.left_menu.setIconSize(QSize(self.svg_size, self.svg_size))
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = SettingsListItem(self.left_menu, text=Lng.general[cfg.lng])
+        main_settings_item = UListWidgetItem(self.left_menu, text=Lng.general[cfg.lng])
         main_settings_item.setIcon(QIcon(self.svg_settings))
         self.left_menu.addItem(main_settings_item)
         
-        filter_settings = SettingsListItem(self.left_menu, text=Lng.filters[cfg.lng])
+        filter_settings = UListWidgetItem(self.left_menu, text=Lng.filters[cfg.lng])
         filter_settings.setIcon(QIcon(self.svg_filters))
         self.left_menu.addItem(filter_settings)
 
-        new_folder = SettingsListItem(self.left_menu, text=Lng.new_folder[cfg.lng])
+        new_folder = UListWidgetItem(self.left_menu, text=Lng.new_folder[cfg.lng])
         new_folder.setIcon(QIcon(self.svg_new_folder))
         self.left_menu.addItem(new_folder)
         
@@ -1037,7 +1008,7 @@ class WinSettings(SingleActionWindow):
         self.left_menu.addItem(spacer)
 
         for i in Mf.list_:
-            new_folder = SettingsListItem(self.left_menu, text=i.alias)
+            new_folder = UListWidgetItem(self.left_menu, text=i.alias)
             new_folder.mf = i
             new_folder.setIcon(QIcon(self.svg_folder))
             self.left_menu.addItem(new_folder)
@@ -1140,13 +1111,13 @@ class WinSettings(SingleActionWindow):
             # чтобы передать его в дочерний виджет MfSettings.
             # Изменения, внесённые в дочернем виджете, будут напрямую
             # применяться к этому объекту в копии списка.
-            item: SettingsListItem = self.left_menu.item(index)
+            item: UListWidgetItem = self.left_menu.item(index)
             mf = next(
                 i
                 for i in self.mf_list_clone
-                if i.alias == item.mf.alias
+                if i.alias == item.text()
             )
-            mf_sett = MfSettings(mf, self.mf_list_clone)
+            mf_sett = MfSettings(mf)
             mf_sett.changed.connect(self.blink_ok_btn)
             mf_sett.remove.connect(lambda: self.remove_mf(item))
             mf_sett.reset_data.connect(lambda mf: self.reset_data.emit(mf))
@@ -1156,7 +1127,7 @@ class WinSettings(SingleActionWindow):
 
     def add_mf(self, mf: Mf):
         self.mf_list_clone.append(mf)
-        item = SettingsListItem(self.left_menu, text=mf.alias)
+        item = UListWidgetItem(self.left_menu, text=mf.alias)
         item.setIcon(QIcon(self.svg_folder))
         item.mf = mf
         self.left_menu.addItem(item)
@@ -1166,11 +1137,11 @@ class WinSettings(SingleActionWindow):
         self.init_right_side(index)
         self.blink_ok_btn()
 
-    def remove_mf(self, item: SettingsListItem):
+    def remove_mf(self, item: UListWidgetItem):
 
         def fin():
             for i in self.mf_list_clone:
-                if i.alias == item.mf.alias:
+                if i.alias == item.text():
                     self.mf_list_clone.remove(i)
                     self.left_menu.takeItem(self.left_menu.currentRow())
                     self.left_menu.setCurrentRow(0)
