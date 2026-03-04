@@ -48,11 +48,20 @@ class UPushButton(SmallBtn):
         self.setFixedWidth(100)
 
 
-class RebootSettings(QGroupBox):
+class UGroupBox(QGroupBox):
+    mrg = 5
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
+
+
+class RebootSettings(UGroupBox):
     cfg_changed = pyqtSignal()
 
     def __init__(self, cfg_clone: Cfg, what_change: WhatChange):
         super().__init__()
+        self.setContentsMargins(5, 0, 5, 0)
         self.cfg_clone = cfg_clone
         self.what_change = what_change
 
@@ -72,12 +81,13 @@ class RebootSettings(QGroupBox):
 
 
         self.lng_menu = UMenu(None)
-        one = QAction(Lng.russian[0], self.lng_menu)
-        self.lng_menu.addAction(one)
-        two = QAction(Lng.russian[1], self.lng_menu)
-        self.lng_menu.addAction(two)
+        for value in (0, 1):
+            action = QAction(Lng.russian[value], self.lng_menu)
+            action.triggered.connect(lambda e, v=value: self.lang_action_cmd(v))
+            self.lng_menu.addAction(action)
 
         self.lng_btn = UPushButton(text=Lng.russian[cfg.lng])
+        self.lng_btn.setFixedWidth(109)
         self.lng_btn.setMenu(self.lng_menu)
         lng_lay.addWidget(self.lng_btn)
 
@@ -94,6 +104,7 @@ class RebootSettings(QGroupBox):
         reset_data_lay.addStretch()
 
         self.reset_data_btn = UPushButton(Lng.reset[cfg.lng])
+        self.reset_data_btn.setFixedWidth(110)
         self.reset_data_btn.clicked.connect(self.reset_btn_cmd)
         reset_data_lay.addWidget(self.reset_data_btn)
 
@@ -102,6 +113,8 @@ class RebootSettings(QGroupBox):
         self.lng_btn.setText(Lng.russian[value])
         self.cfg_changed.emit()
         self.what_change.change_lng = True
+
+        print(value)
 
     def reset_btn_cmd(self):
         def fin():
@@ -203,7 +216,7 @@ class SizesWin(SingleActionWindow):
         return super().keyPressEvent(a0)
 
 
-class DataSettings(QGroupBox):
+class DataSettings(UGroupBox):
     reset = pyqtSignal()
     changed = pyqtSignal()
 
@@ -259,7 +272,7 @@ class DataSettings(QGroupBox):
         UThreadPool.start(self.hashdir_size)
 
 
-class SimpleSettings(QGroupBox):
+class SimpleSettings(UGroupBox):
     def __init__(self):
         super().__init__()
 
@@ -287,7 +300,7 @@ class SimpleSettings(QGroupBox):
             print(e)
 
 
-class ScanerSettings(QGroupBox):
+class ScanerSettings(UGroupBox):
     changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
@@ -399,7 +412,7 @@ class ThemesBtn(QFrame):
             self.clicked.emit()
 
 
-class Themes(QGroupBox):
+class Themes(UGroupBox):
     clicked = pyqtSignal()
     svg_theme_system = "./images/system_theme.svg"
     svg_theme_dark = "./images/dark_theme.svg"
@@ -492,7 +505,7 @@ class SelectableLabel(ULabel):
         Utils.copy_text(self.selectedText())
 
 
-class AboutWid(QGroupBox):
+class AboutWid(UGroupBox):
     svg_icon = "./images/icon.svg"
 
     def __init__(self):
@@ -552,7 +565,7 @@ class GeneralSettings(QWidget):
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ
 
 
-class DropableGroupBox(QGroupBox):
+class DropableGroupBox(UGroupBox):
     text_changed = pyqtSignal()
 
     def __init__(self):
@@ -677,7 +690,7 @@ class MfSettings(QWidget):
         self.setLayout(v_lay)
 
         # Верхний ряд с названием
-        self.name_wid = QGroupBox()
+        self.name_wid = UGroupBox()
         self.name_wid.setFixedHeight(30)
         v_lay.addWidget(self.name_wid)
         first_lay = UHBoxLayout()
@@ -695,7 +708,7 @@ class MfSettings(QWidget):
         )
         v_lay.addWidget(self.advanced)
 
-        self.res_rem_wid = QGroupBox()
+        self.res_rem_wid = UGroupBox()
         v_lay.addWidget(self.res_rem_wid)
         res_rem_lay = UVBoxLayout()
         res_rem_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -719,7 +732,7 @@ class MfSettings(QWidget):
         rem_descr = QLabel(Lng.folder_removed_text[cfg.lng])
         rem_lay.addWidget(rem_descr)
 
-        # QGroupBox для кнопок и описания
+        # UGroupBox для кнопок и описания
         btn_group = QWidget()
         btn_main_lay = UVBoxLayout()
         btn_main_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -799,7 +812,7 @@ class NewFolder(QWidget):
         v_lay.setSpacing(15)
         self.setLayout(v_lay)
 
-        first_row = QGroupBox()
+        first_row = UGroupBox()
         v_lay.addWidget(first_row)
         first_lay = UVBoxLayout()
         first_lay.setSpacing(10)
@@ -908,7 +921,7 @@ class FiltersWid(QWidget):
         self.v_lay.setSpacing(15)
         self.setLayout(self.v_lay)
 
-        group = QGroupBox()
+        group = UGroupBox()
         g_lay = UVBoxLayout(group)
         g_lay.setSpacing(15)
 
