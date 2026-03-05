@@ -1047,8 +1047,8 @@ class WinSettings(SingleActionWindow):
 
     def left_menu_click(self, *args):
         self.clear_right_side()
-        index = self.left_menu.currentRow()
-        self.init_right_side(index)
+        idx = self.left_menu.currentRow()
+        self.init_right_side(idx)
 
     def ok_cmd(self):
 
