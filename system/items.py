@@ -83,7 +83,7 @@ class CopyTaskItem:
 @dataclass(slots=True)
 class SettingsItem:
     type_: Literal["general", "filters", "new_folder", "edit_folder"]
-    content: Optional[str | Mf]
+    content: Optional[str]
 
 
 @dataclass(slots=True)

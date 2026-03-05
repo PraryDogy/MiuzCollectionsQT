@@ -985,24 +985,26 @@ class WinSettings(SingleActionWindow):
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([200, 600])
 
-        # ссылаемся на SettingsItem.action_type
-        mapping = {
-            "general": 0,
-            "filters": 1,
-            "new_folder": 2,
-        }
+        # idx соответствует номеру строки в левом меню
+        # при этом важно помнить, что номер 3 зарезервирован за пустым
+        # спейсером
 
-        if settings_item.type_ in mapping:
-            idx = mapping[settings_item.type_]
-            self.left_menu.setCurrentRow(idx)
-            self.init_right_side(idx)
-        else:
-            for i in self.mf_items:
-                if i.mf == self.settings_item.content:
-                    index = self.left_menu.row(i)
-                    self.left_menu.setCurrentRow(index)
-                    self.init_right_side(index)
+        if settings_item.type_ == "general":
+            idx = 0
+        elif settings_item.type_ == "filters":
+            idx = 1
+        elif settings_item.type_ == "new_folder":
+            idx = 2
+        elif settings_item.type_ == "edit_folder":
+            for x, i in enumerate(Mf.list_, start=4):
+                if i.alias == self.settings_item.content:
+                    idx = x
                     break
+
+
+        print(idx)
+        self.left_menu.setCurrentRow(idx)
+        self.init_right_side(idx)
 
     def blink_ok_btn(self):
         self.ok_btn.setText(Lng.restart[cfg.lng])

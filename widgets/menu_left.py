@@ -317,7 +317,7 @@ class MenuLeft(QTabWidget):
             self.reload_thumbnails.emit()
 
         def _mf_edit(mf: Mf):
-            item = SettingsItem("edit_folder", mf)
+            item = SettingsItem("edit_folder", mf.alias)
             self.mf_edit.emit(item)
 
         def _mf_new():

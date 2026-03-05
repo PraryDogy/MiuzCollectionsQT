@@ -530,7 +530,6 @@ class WinMain(UMainWindow):
         self.bar_top.settings_btn.set_solid_style()
         self.settings_win = WinSettings(settings_item)
         self.settings_win.closed.connect(self.bar_top.settings_btn.set_normal_style)
-        self.settings_win.reset_data.connect(lambda mf: self.reset_data_cmd(mf))
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
 
