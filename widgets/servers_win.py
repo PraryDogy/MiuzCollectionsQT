@@ -5,14 +5,14 @@ import subprocess
 from PyQt5.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
-                             QListWidget, QListWidgetItem, QMenu, QPushButton,
-                             QTableView, QVBoxLayout, QWidget)
+                             QListWidgetItem, QMenu, QPushButton, QTableView,
+                             QWidget)
 
 from cfg import Static, cfg
 from system.lang import Lng
 from system.shared_utils import SharedUtils
 
-from ._base_widgets import SingleActionWindow, ULineEdit, UMenu
+from ._base_widgets import SingleActionWindow, ULineEdit
 
 
 class ServersWidget(QTableView):

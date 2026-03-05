@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel, QProgressBar, QWidget
 
-from ._base_widgets import UHBoxLayout, UVBoxLayout, SingleActionWindow
+from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
 
 
 class ProgressbarWin(SingleActionWindow):

@@ -33,7 +33,7 @@ from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
 from .win_upload import UploadWin
-from .win_warn import WinQuestion, WinWarn
+from .win_warn import ConfirmWindow, WarningWindow
 
 
 class TestWid(QFrame):
@@ -437,11 +437,7 @@ class WinMain(UMainWindow):
             copy_self = abs_current_dir in self.buffer.dirs_to_scan
             if copy_self:
                 # копировать в себя нельзя
-                self.win_warn = WinWarn(
-                    Lng.attention[cfg.lng],
-                    Lng.copy_name_same_dir[cfg.lng]
-                )
-                self.win_warn.resize(330, 90)
+                self.win_warn = WarningWindow(Lng.copy_name_same_dir[cfg.lng])
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
                 return
@@ -470,15 +466,13 @@ class WinMain(UMainWindow):
             for i in rel_paths
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
-        self.remove_files_win = WinQuestion(
-            Lng.attention[cfg.lng],
+        self.remove_files_win = ConfirmWindow(
             f"{Lng.delete_forever[cfg.lng]} ({len(abs_paths)})?"
         )
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
                 args=(abs_paths, )
             )
-        self.remove_files_win.resize(330, 80)
         self.remove_files_win.center_to_parent(self.window())
         self.remove_files_win.ok_clicked.connect(start_file_remover)
         self.remove_files_win.ok_clicked.connect(

@@ -2,14 +2,14 @@ import os
 
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
                              QWidget)
-from PyQt5.QtSvg import QSvgWidget
+
 from cfg import cfg
 from system.lang import Lng
 
-from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
-                            UVBoxLayout)
+from ._base_widgets import SingleActionWindow, SmallBtn, UHBoxLayout
 
 
 class TreeWid(QTreeWidget):

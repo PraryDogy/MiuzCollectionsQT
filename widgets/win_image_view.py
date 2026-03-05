@@ -9,8 +9,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QCursor, QImage, QKeyEvent,
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsPixmapItem, QGraphicsScene,
-                             QGraphicsView, QHBoxLayout, QLabel, QSpacerItem,
-                             QVBoxLayout, QWidget)
+                             QGraphicsView, QHBoxLayout, QLabel, QWidget)
 
 from cfg import cfg
 from system.lang import Lng

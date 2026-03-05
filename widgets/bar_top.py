@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QAction, QFrame, QLabel, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QAction, QFrame, QLabel, QWidget
 
 from cfg import Dynamic, cfg
 from system.filters import Filters

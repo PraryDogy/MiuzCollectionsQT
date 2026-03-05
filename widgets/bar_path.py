@@ -1,14 +1,11 @@
 import os
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QImage, QPixmap
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from cfg import Static
-from system.utils import Utils
 from system.shared_utils import ImgUtils
-from ._base_widgets import UMenu
 
 
 class PathItem(QWidget):

@@ -2,8 +2,7 @@ import os
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from cfg import cfg
 from system.items import CopyTaskItem
