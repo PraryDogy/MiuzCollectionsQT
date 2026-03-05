@@ -793,6 +793,7 @@ class MfSettings(QWidget):
 
 class NewFolder(QWidget):
     svg_warning = "./images/warning.svg"
+    changed = pyqtSignal()
 
     def __init__(self, mf_list_clone: list[Mf]):
         super().__init__()
@@ -978,8 +979,6 @@ class WinSettings(SingleActionWindow):
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
-        # self.ok_btn.setIcon(QIcon('./images/warning.svg'))
-
         cancel_btn = UPushButton(Lng.cancel[cfg.lng])
         cancel_btn.setFixedWidth(95)
         cancel_btn.clicked.connect(self.deleteLater)
@@ -1001,7 +1000,7 @@ class WinSettings(SingleActionWindow):
         elif settings_item.type_ == "new_folder":
             idx = 2
         elif settings_item.type_ == "edit_folder":
-            for x, i in enumerate(Mf.list_, start=4):
+            for x, i in enumerate(self.mf_list_clone, start=4):
                 if i.alias == self.settings_item.content:
                     idx = x
                     break
@@ -1012,38 +1011,22 @@ class WinSettings(SingleActionWindow):
         self.ok_btn.setText(Lng.restart[cfg.lng])
         self.warn_svg.show()
 
-    def init_right_side(self, index: int):
-        if index == 0:
-            self.gen_settings = GeneralSettings(self.cfg_clone)
-            self.gen_settings.changed.connect(self.blink_ok_btn)
-            self.right_lay.insertWidget(0, self.gen_settings)
-        elif index == 1:
-            self.filters_wid = FiltersWid(self.filters_clone)
-            self.filters_wid.changed.connect(self.blink_ok_btn)
-            self.right_lay.insertWidget(0, self.filters_wid)
-        elif index == 2:
-            self.new_folder = NewFolder(self.mf_list_clone)
-            self.right_lay.insertWidget(0, self.new_folder)
-            if self.settings_item.type_ == "general":
-                self.new_folder.preset_new_folder("")
-            else:
-                self.new_folder.preset_new_folder(self.settings_item.content)
-        else:
-            # Находим в копии списка Mf объект с нужным именем,
-            # чтобы передать его в дочерний виджет MfSettings.
-            # Изменения, внесённые в дочернем виджете, будут напрямую
-            # применяться к этому объекту в копии списка.
-            item: UListWidgetItem = self.left_menu.item(index)
-            mf = next(
-                i
-                for i in self.mf_list_clone
-                if i.alias == item.text()
-            )
-            mf_sett = MfSettings(mf, self.mf_list_clone)
-            mf_sett.changed.connect(self.blink_ok_btn)
-            self.right_lay.insertWidget(0, mf_sett)
-
-        self.settings_item.type_ = "general"
+    def init_right_side(self, idx: int):
+        if idx == 0:
+            r_wid = GeneralSettings(self.cfg_clone)
+        elif idx == 1:
+            r_wid = FiltersWid(self.filters_clone)
+        elif idx == 2:
+            r_wid = NewFolder(self.mf_list_clone)
+            r_wid.preset_new_folder(self.settings_item.content)
+        elif idx > 3:
+            item: UListWidgetItem = self.left_menu.item(idx)
+            for mf in self.mf_list_clone:
+                if mf.alias == item.text():
+                    r_wid = MfSettings(mf, self.mf_list_clone)
+                    break
+        r_wid.changed.connect(self.blink_ok_btn)
+        self.right_lay.insertWidget(0, r_wid)
 
     def add_mf(self, mf: Mf):
         self.mf_list_clone.append(mf)

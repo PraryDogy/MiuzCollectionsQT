@@ -148,7 +148,7 @@ class BarMacos(QMenuBar):
 
     def open_settings_window(self):
         """Открывает окно настроек приложения."""
-        item = SettingsItem("general", None)
+        item = SettingsItem("general", "")
         self.settings_win = WinSettings(item)
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
