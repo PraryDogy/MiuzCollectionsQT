@@ -26,12 +26,66 @@ from system.utils import Utils
 from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
                             UTextEdit, UVBoxLayout, VListWidget)
-from .win_warn import WinQuestion, WinWarn
 
 
 def restart_app():
     QApplication.quit()
     Utils.start_new_app()
+
+
+class AttentionWin(SingleActionWindow):
+    ok_clicked = pyqtSignal()
+    ww = 360
+    svg_icon = "./images/warning.svg"
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.setWindowTitle(Lng.attention[cfg.lng])
+        self.setFixedWidth(self.ww)
+        # self.central_layout.setContentsMargins(5, 7, 5, 0)
+
+        text_layout = UHBoxLayout()
+        text_layout.setSpacing(15)
+        self.central_layout.addLayout(text_layout)
+
+        svg_wid = QSvgWidget()
+        svg_wid.load(self.svg_icon)
+        svg_wid.setFixedSize(50, 50)
+        text_layout.addWidget(svg_wid)
+
+        text_wid = QLabel(text)
+        text_wid.setWordWrap(True)
+        text_wid.adjustSize()
+        text_layout.addWidget(text_wid)
+
+        btn_layout = UHBoxLayout()
+        btn_layout.setSpacing(10)
+        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.central_layout.addLayout(btn_layout)
+
+        ok_btn = SmallBtn(Lng.ok[cfg.lng])
+        ok_btn.setFixedWidth(90)
+        ok_btn.clicked.connect(self.ok_clicked.emit)
+        btn_layout.addWidget(ok_btn)
+
+        self.cancel_btn = SmallBtn(Lng.cancel[cfg.lng])
+        self.cancel_btn.setFixedWidth(90)
+        self.cancel_btn.clicked.connect(self.deleteLater)
+        btn_layout.addWidget(self.cancel_btn)
+
+        self.adjustSize()
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+    
+
+class WarningWin(AttentionWin):
+    def __init__(self, text):
+        super().__init__(text)
+        self.cancel_btn.deleteLater()
+
 
 
 class ULabel(QLabel):
@@ -193,12 +247,6 @@ class RebootSettings(GroupWid):
         self.reset_data_btn = SvgArrow()
         reset_data_wid.layout_.addWidget(self.reset_data_btn)
 
-    def show_win_warn(self, text: str, size: int):
-        win = WinQuestion(Lng.attention[cfg.lng], text)
-        win.resize(330, size)
-        win.center_to_parent(self.window())
-        return win
-
     def lang_action_cmd(self, value: int):
         self.cfg_clone.lng = value
         self.lng_btn.setText(Lng.russian[value])
@@ -210,8 +258,8 @@ class RebootSettings(GroupWid):
             shutil.rmtree(Static.app_support)
             restart_app()
 
-        reset_win = self.show_win_warn(Lng.erase_data_long[cfg.lng], 90)
-        reset_win.text_label.setFixedHeight(85)
+        reset_win = AttentionWin(Lng.erase_data_long[cfg.lng])
+        reset_win.center_to_parent(self.window())
         reset_win.ok_clicked.connect(fin)
         reset_win.show()
 
@@ -628,11 +676,7 @@ class FiltersWid(GroupWid):
             self.filters_win.deleteLater()
             self.changed.emit
 
-        self.filters_win = WinQuestion(
-            Lng.attention[cfg.lng],
-            Lng.reset_filters_long[cfg.lng]
-        )
-        self.filters_win.resize(330, 80)
+        self.filters_win = AttentionWin(Lng.reset_filters_long[cfg.lng])
         self.filters_win.ok_clicked.connect(fin)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
@@ -751,7 +795,7 @@ class MfSettings(QWidget):
         general_wid.layout_.addWidget(USep())
 
         remove_wid = GroupChild()
-        remove_wid.mouseReleaseEvent = self.set_remove_flag
+        remove_wid.mouseReleaseEvent = self.remove_cmd
         general_wid.layout_.addWidget(remove_wid)
 
         remove_text = ULabel(text=Lng.remove_folder[cfg.lng])
@@ -763,16 +807,12 @@ class MfSettings(QWidget):
         main_lay.addSpacerItem(QSpacerItem(0, 15))
 
 
-    def show_warn(self, message, width=380):
-        win_warn = WinQuestion(
-            Lng.attention[cfg.lng],
-            message
-        )
-        win_warn.resize(width, 80)
+    def show_warn(self, text):
+        win_warn = AttentionWin(text)
         win_warn.center_to_parent(self.window())
         return win_warn
 
-    def set_remove_flag(self, *args):
+    def remove_cmd(self, *args):
 
         def fin():
             for i in Mf.list_:
@@ -783,17 +823,13 @@ class MfSettings(QWidget):
             restart_app()
 
         if len(self.mf_list_clone) == 1:
-            win = self.show_warn(
-                Lng.at_least_one_folder_required[cfg.lng],
-                width=360
-            )
+            win = WarningWin(Lng.at_least_one_folder_required[cfg.lng])
             win.ok_clicked.connect(win.deleteLater)
-            win.cancel_btn.deleteLater()
-            win.show()
         else:
-            win = self.show_warn(Lng.remove_folder_long[cfg.lng])
+            win = AttentionWin(Lng.remove_folder_long[cfg.lng])
             win.ok_clicked.connect(fin)
-            win.show()
+        win.center_to_parent(self.window())
+        win.show()
 
     def set_reset_flag(self, *args):
 
@@ -870,14 +906,10 @@ class NewFolder(QWidget):
         paths = self.mf_paths.text_edit_wid.toPlainText().split("\n")
         stop_list = self.mf_stop_list.text_edit_wid.toPlainText().split("\n")
 
-        def show_warn(message, width=380):
-            self.win_warn = WinWarn(
-                Lng.attention[cfg.lng],
-                message
-            )
-            self.win_warn.resize(width, 80)
-            self.win_warn.center_to_parent(self.window())
-            self.win_warn.show()
+        def show_warn(text):
+            win_warn = WarningWin(text)
+            win_warn.center_to_parent(self.window())
+            win_warn.show()
 
         if not folder_name:
             show_warn(Lng.enter_alias_warning[cfg.lng])
@@ -899,7 +931,7 @@ class NewFolder(QWidget):
             return
 
         elif not paths:
-            show_warn(Lng.select_folder_path[cfg.lng], width=330)
+            show_warn(Lng.select_folder_path[cfg.lng])
             return
 
         self.mf.alias = folder_name
