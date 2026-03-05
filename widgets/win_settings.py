@@ -736,27 +736,27 @@ class MfSettings(QWidget):
 
         reset_wid = GroupChild()
         reset_wid.mouseReleaseEvent = self.set_reset_flag
-        reset_lay = UHBoxLayout()
-        reset_wid.setLayout(reset_lay)
         general_wid.layout_.addWidget(reset_wid)
+
         reset_text = ULabel(text=Lng.reset_mf[cfg.lng])
-        reset_lay.addWidget(reset_text)
-        reset_lay.addStretch()
+        reset_wid.layout_.addWidget(reset_text)
+
+        reset_wid.layout_.addStretch()
+
         reset_btn = SvgArrow()
-        reset_lay.addWidget(reset_btn)
+        reset_wid.layout_.addWidget(reset_btn)
 
         general_wid.layout_.addWidget(USep())
 
         remove_wid = GroupChild()
         remove_wid.mouseReleaseEvent = self.set_remove_flag
-        remove_lay = UHBoxLayout()
-        remove_wid.setLayout(remove_lay)
         general_wid.layout_.addWidget(remove_wid)
+
         remove_text = ULabel(text=Lng.remove_folder[cfg.lng])
-        remove_lay.addWidget(remove_text)
-        remove_lay.addStretch()
+        remove_wid.layout_.addWidget(remove_text)
+        remove_wid.layout_.addStretch()
         remove_btn = SvgArrow()
-        remove_lay.addWidget(remove_btn)
+        remove_wid.layout_.addWidget(remove_btn)
 
         main_lay.addSpacerItem(QSpacerItem(0, 15))
 
@@ -826,43 +826,43 @@ class NewFolder(QWidget):
         main_lay.setSpacing(15)
         self.setLayout(main_lay)
 
-        # name_wid = QGroupBox()
-        # name_lay = GroupVLay()
-        # name_wid.setLayout(name_lay)
-        # main_lay.addWidget(name_wid)
+        name_wid = QGroupBox()
+        name_lay = GroupVLay()
+        name_wid.setLayout(name_lay)
+        main_lay.addWidget(name_wid)
 
-        # self.name_text = QLabel(Lng.folder_name[cfg.lng])
-        # name_lay.addWidget(self.name_text)
+        self.name_text = QLabel(Lng.folder_name[cfg.lng])
+        name_lay.addWidget(self.name_text)
 
-        # self.name_line_edit = ULineEdit()
-        # self.name_line_edit.setPlaceholderText(Lng.alias_immutable[cfg.lng])
-        # name_lay.addWidget(self.name_line_edit)
+        self.name_line_edit = ULineEdit()
+        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[cfg.lng])
+        name_lay.addWidget(self.name_line_edit)
 
-        # self.mf_paths = MfPaths(self.mf)
-        # main_lay.addWidget(self.mf_paths)
+        self.mf_paths = MfPaths(self.mf)
+        main_lay.addWidget(self.mf_paths)
 
-        # self.mf_stop_list = MfStopList(self.mf)
-        # main_lay.addWidget(self.mf_stop_list)
+        self.mf_stop_list = MfStopList(self.mf)
+        main_lay.addWidget(self.mf_stop_list)
 
-        # save_wid = QGroupBox()
-        # save_wid.setFixedHeight(GroupChild.hh)
-        # save_wid.mouseReleaseEvent = self.save
-        # save_lay = GroupHLay()
-        # save_wid.setLayout(save_lay)
-        # main_lay.addWidget(save_wid)
+        save_wid = QGroupBox()
+        save_wid.setFixedHeight(GroupChild.hh)
+        save_wid.mouseReleaseEvent = self.save
+        save_lay = GroupHLay()
+        save_wid.setLayout(save_lay)
+        main_lay.addWidget(save_wid)
 
-        # save_text = ULabel(Lng.save[cfg.lng])
-        # save_lay.addWidget(save_text)
+        save_text = ULabel(Lng.save[cfg.lng])
+        save_lay.addWidget(save_text)
 
-        # save_btn = SvgArrow()
-        # save_lay.addWidget(save_btn)
+        save_btn = SvgArrow()
+        save_lay.addWidget(save_btn)
 
-        # main_lay.addStretch()
+        main_lay.addStretch()
 
-        # self.save_btn = UPushButton(Lng.save[cfg.lng])
-        # self.save_btn.setDisabled(True)
-        # self.save_btn.clicked.connect(self.save)
-        # btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.save_btn = UPushButton(Lng.save[cfg.lng])
+        self.save_btn.setDisabled(True)
+        self.save_btn.clicked.connect(self.save)
+        btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
     def preset_new_folder(self, url: str):
         self.mf_paths.text_edit_wid.setPlainText(url)
