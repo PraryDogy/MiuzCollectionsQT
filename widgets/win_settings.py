@@ -8,8 +8,9 @@ from PyQt5.QtCore import QRegExp, QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
-                             QLineEdit, QSpacerItem, QSpinBox, QSplitter,
-                             QTableWidget, QTableWidgetItem, QWidget)
+                             QLineEdit, QMessageBox, QSpacerItem, QSpinBox,
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QWidget)
 from typing_extensions import Optional
 
 from cfg import Cfg, Static, cfg
@@ -208,8 +209,9 @@ class RebootSettings(GroupWid):
             self.deleteLater()
             shutil.rmtree(Static.app_support)
             restart_app()
+
         reset_win = self.show_win_warn(Lng.erase_data_long[cfg.lng], 90)
-        # reset_win.text_label.setFixedHeight(85)
+        reset_win.text_label.setFixedHeight(85)
         reset_win.ok_clicked.connect(fin)
         reset_win.show()
 
@@ -587,8 +589,6 @@ class FiltersWid(GroupWid):
         super().__init__()
         self.filters_clone = filters_clone
 
-        # self.group_lay.setSpacing(5)
-
         filters_text = ULabel(Lng.filters_descr[cfg.lng])
         filters_text.setWordWrap(True)
         self.layout_.addWidget(filters_text)
@@ -597,6 +597,7 @@ class FiltersWid(GroupWid):
         self.layout_.addWidget(USep())
 
         erase_filters_wid = GroupChild()
+        erase_filters_wid.setFixedHeight(40)
         erase_filters_wid.mouseReleaseEvent = self.reset_btn_cmd
         self.layout_.addWidget(erase_filters_wid)
 
@@ -609,6 +610,7 @@ class FiltersWid(GroupWid):
         erase_filters_wid.layout_.addWidget(self.reset_btn)
 
         self.layout_.addWidget(USep())
+        self.layout_.addSpacerItem(QSpacerItem(0, 10))
 
         self.filters_edit = UTextEdit()
         self.filters_edit.setFixedHeight(220)
@@ -826,17 +828,15 @@ class NewFolder(QWidget):
         main_lay.setSpacing(15)
         self.setLayout(main_lay)
 
-        name_wid = QGroupBox()
-        name_lay = GroupVLay()
-        name_wid.setLayout(name_lay)
+        name_wid = GroupWid()
         main_lay.addWidget(name_wid)
 
         self.name_text = QLabel(Lng.folder_name[cfg.lng])
-        name_lay.addWidget(self.name_text)
+        name_wid.layout_.addWidget(self.name_text)
 
         self.name_line_edit = ULineEdit()
         self.name_line_edit.setPlaceholderText(Lng.alias_immutable[cfg.lng])
-        name_lay.addWidget(self.name_line_edit)
+        name_wid.layout_.addWidget(self.name_line_edit)
 
         self.mf_paths = MfPaths(self.mf)
         main_lay.addWidget(self.mf_paths)
@@ -844,25 +844,22 @@ class NewFolder(QWidget):
         self.mf_stop_list = MfStopList(self.mf)
         main_lay.addWidget(self.mf_stop_list)
 
-        save_wid = QGroupBox()
-        save_wid.setFixedHeight(GroupChild.hh)
+        save_wid = GroupWid()
         save_wid.mouseReleaseEvent = self.save
-        save_lay = GroupHLay()
-        save_wid.setLayout(save_lay)
         main_lay.addWidget(save_wid)
+        
+        save_wid_child = GroupChild()
+        save_wid.layout_.addWidget(save_wid_child)
 
         save_text = ULabel(Lng.save[cfg.lng])
-        save_lay.addWidget(save_text)
+        save_wid_child.layout_.addWidget(save_text)
+
+        save_wid_child.layout_.addStretch()
 
         save_btn = SvgArrow()
-        save_lay.addWidget(save_btn)
+        save_wid_child.layout_.addWidget(save_btn)
 
-        main_lay.addStretch()
-
-        self.save_btn = UPushButton(Lng.save[cfg.lng])
-        self.save_btn.setDisabled(True)
-        self.save_btn.clicked.connect(self.save)
-        btn_lay.addWidget(self.save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        # main_lay.addStretch()
         
     def preset_new_folder(self, url: str):
         self.mf_paths.text_edit_wid.setPlainText(url)
