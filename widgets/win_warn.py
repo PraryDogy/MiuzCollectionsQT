@@ -17,6 +17,7 @@ class ConfirmWindow(SingleActionWindow):
         super().__init__()
         self.setWindowTitle(Lng.attention[cfg.lng])
         self.setMaximumWidth(360)
+        self.setMinimumWidth(300)
 
         text_layout = UHBoxLayout()
         text_layout.setSpacing(15)

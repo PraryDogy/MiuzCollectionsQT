@@ -112,7 +112,7 @@ class TextEditWidget(GroupWid):
         if text:
             self.text_edit_wid.setPlainText(text)
 
-    def get_lined_text(self):
+    def get_list(self):
         return [
             i
             for i in self.text_edit_wid.toPlainText().split("\n")
@@ -652,7 +652,7 @@ class MfPaths(TextEditWidget):
         self.text_changed.connect(self.set_data)
 
     def set_data(self, *args):
-        self.mf.paths = self.get_lined_text()
+        self.mf.paths = self.get_list()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -679,7 +679,7 @@ class MfStopList(TextEditWidget):
         self.text_changed.connect(self.set_data)
 
     def set_data(self, *args):
-        self.mf.stop_list = self.get_lined_text()
+        self.mf.stop_list = self.get_list()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -842,8 +842,8 @@ class NewFolder(QWidget):
     def save(self, *args):
         pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
         folder_name = self.name_line_edit.text()
-        paths = self.mf_paths.text_edit_wid.toPlainText().split("\n")
-        stop_list = self.mf_stop_list.text_edit_wid.toPlainText().split("\n")
+        paths = self.mf_paths.get_list()
+        stop_list = self.mf_stop_list.get_list()
 
         def show_warn(text: str):
             win_warn = WarningWindow(text)
@@ -856,7 +856,7 @@ class NewFolder(QWidget):
 
         elif any(i.alias == folder_name for i in self.mf_list_clone):
             show_warn(
-                f'{Lng.alias[cfg.lng]} "{self.mf.alias}" '
+                f'{Lng.alias[cfg.lng]} "{folder_name}" '
                 f'{Lng.already_taken[cfg.lng].lower()}'
             )
             return
