@@ -54,18 +54,26 @@ class USep(QFrame):
 
 class GroupWid(QGroupBox):
     def __init__(self):
+        """
+        QGroupBox + vertical layout
+        """
         super().__init__()
-        self.group_lay = UVBoxLayout()
-        self.group_lay.setContentsMargins(6, 2, 6, 2)
-        self.group_lay.setSpacing(2)
-        self.setLayout(self.group_lay)
+        self.layout_ = UVBoxLayout()
+        self.layout_.setContentsMargins(6, 2, 6, 2)
+        self.layout_.setSpacing(2)
+        self.setLayout(self.layout_)
 
 
 class GroupChild(QWidget):
     hh = 30
     def __init__(self):
+        """
+        QWidget fixed height + horizontal layout
+        """
         super().__init__()
         self.setFixedHeight(self.hh)
+        self.layout_ = UHBoxLayout()
+        self.setLayout(self.layout_)
 
 
 class SvgArrow(QSvgWidget):
@@ -88,18 +96,18 @@ class TextEditWidget(GroupWid):
     def __init__(self, title: str, placeholder: str, text: Optional[str]):
         super().__init__()
         self.setAcceptDrops(True)
-        self.group_lay.setSpacing(10)
+        self.layout_.setSpacing(10)
 
         self.title_wid = ULabel(title)
         self.title_wid.setWordWrap(True)
-        self.group_lay.addWidget(self.title_wid)
+        self.layout_.addWidget(self.title_wid)
 
         self.text_edit_wid = UTextEdit()
         self.text_edit_wid.setFixedHeight(100)
         self.text_edit_wid.setPlaceholderText(placeholder)
         self.text_edit_wid.textChanged.connect(self.text_changed.emit)
         self.text_edit_wid.setAcceptDrops(False)
-        self.group_lay.addWidget(self.text_edit_wid)
+        self.layout_.addWidget(self.text_edit_wid)
 
         if text:
             self.text_edit_wid.setPlainText(text)
@@ -131,14 +139,12 @@ class RebootSettings(GroupWid):
         self.cfg_clone = cfg_clone
 
         lng_wid = GroupChild()
-        lng_lay = UHBoxLayout()
-        lng_wid.setLayout(lng_lay)
-        self.group_lay.addWidget(lng_wid)
+        self.layout_.addWidget(lng_wid)
 
         self.lng_text = ULabel(Lng.language_max[cfg.lng])
-        lng_lay.addWidget(self.lng_text)
+        lng_wid.layout_.addWidget(self.lng_text)
 
-        lng_lay.addStretch()
+        lng_wid.layout_.addStretch()
 
         self.lng_menu = UMenu(None)
         for value in (0, 1):
@@ -149,19 +155,17 @@ class RebootSettings(GroupWid):
         self.lng_btn = UPushButton(text=Lng.russian[cfg.lng])
         self.lng_btn.setFixedWidth(109)
         self.lng_btn.setMenu(self.lng_menu)
-        lng_lay.addWidget(self.lng_btn)
+        lng_wid.layout_.addWidget(self.lng_btn)
 
-        self.group_lay.addWidget(USep())
+        self.layout_.addWidget(USep())
 
         scaner_time_wid = GroupChild()
-        scaner_timer_lay = UHBoxLayout()
-        scaner_time_wid.setLayout(scaner_timer_lay)
-        self.group_lay.addWidget(scaner_time_wid)
+        self.layout_.addWidget(scaner_time_wid)
 
         scaner_time_text = ULabel(Lng.search_interval[cfg.lng], self)
-        scaner_timer_lay.addWidget(scaner_time_text)
+        scaner_time_wid.layout_.addWidget(scaner_time_text)
 
-        scaner_timer_lay.addStretch()
+        scaner_time_wid.layout_.addStretch()
 
         self.spin = QSpinBox(self)
         self.spin.setMinimum(self.spin_min)
@@ -172,23 +176,21 @@ class RebootSettings(GroupWid):
         self.spin.setSuffix(f" {Lng.minutes[cfg.lng]}")
         self.spin.setValue(self.cfg_clone.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
-        scaner_timer_lay.addWidget(self.spin)
+        scaner_time_wid.layout_.addWidget(self.spin)
 
-        self.group_lay.addWidget(USep())
+        self.layout_.addWidget(USep())
 
         reset_data_wid = GroupChild()
         reset_data_wid.mouseReleaseEvent = self.reset_btn_cmd
-        reset_data_lay = UHBoxLayout()
-        reset_data_wid.setLayout(reset_data_lay)
-        self.group_lay.addWidget(reset_data_wid)
+        self.layout_.addWidget(reset_data_wid)
 
         reset_data_text = ULabel(Lng.erase_data[cfg.lng])
-        reset_data_lay.addWidget(reset_data_text)
+        reset_data_wid.layout_.addWidget(reset_data_text)
 
-        reset_data_lay.addStretch()
+        reset_data_wid.layout_.addStretch()
 
         self.reset_data_btn = SvgArrow()
-        reset_data_lay.addWidget(self.reset_data_btn)
+        reset_data_wid.layout_.addWidget(self.reset_data_btn)
 
     def show_win_warn(self, text: str, size: int):
         win = WinQuestion(Lng.attention[cfg.lng], text)
@@ -324,7 +326,7 @@ class NonRebootSettings(GroupWid):
         data_size_wid.mouseReleaseEvent = self.show_sizes_win
         data_size_lay = UHBoxLayout()
         data_size_wid.setLayout(data_size_lay)
-        self.group_lay.addWidget(data_size_wid)
+        self.layout_.addWidget(data_size_wid)
 
         data_size_text = ULabel(text=Lng.statistic[cfg.lng])
         data_size_lay.addWidget(data_size_text)
@@ -334,13 +336,13 @@ class NonRebootSettings(GroupWid):
         data_size_btn = SvgArrow()
         data_size_lay.addWidget(data_size_btn)
 
-        self.group_lay.addWidget(USep())
+        self.layout_.addWidget(USep())
 
         show_files_wid = GroupChild()
         show_files_wid.mouseReleaseEvent = self.show_files_cmd
         show_files_lay = UHBoxLayout()
         show_files_wid.setLayout(show_files_lay)
-        self.group_lay.addWidget(show_files_wid)
+        self.layout_.addWidget(show_files_wid)
 
         show_files_text = ULabel(Lng.show_system_files[cfg.lng])
         show_files_lay.addWidget(show_files_text)
@@ -437,19 +439,19 @@ class Themes(GroupWid):
         title_wid = GroupChild()
         title_lay = UHBoxLayout()
         title_wid.setLayout(title_lay)
-        self.group_lay.addWidget(title_wid)
+        self.layout_.addWidget(title_wid)
 
         title_text = ULabel("Тема")
         title_lay.addWidget(title_text)
 
-        self.group_lay.addWidget(USep())
+        self.layout_.addWidget(USep())
 
         themes_wid = QWidget()
         themes_lay = UHBoxLayout()
         themes_lay.setSpacing(20)
         themes_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
         themes_wid.setLayout(themes_lay)
-        self.group_lay.addWidget(themes_wid)
+        self.layout_.addWidget(themes_wid)
 
         self.frames = []
 
@@ -595,16 +597,16 @@ class FiltersWid(GroupWid):
 
         filters_text = ULabel(Lng.filters_descr[cfg.lng])
         filters_text.setWordWrap(True)
-        self.group_lay.addWidget(filters_text)
+        self.layout_.addWidget(filters_text)
 
-        self.group_lay.addSpacerItem(QSpacerItem(0, 5))
-        self.group_lay.addWidget(USep())
+        self.layout_.addSpacerItem(QSpacerItem(0, 5))
+        self.layout_.addWidget(USep())
 
         erase_filters_wid = GroupChild()
         erase_filters_wid.mouseReleaseEvent = self.reset_btn_cmd
         erase_filters_lay = UHBoxLayout()
         erase_filters_wid.setLayout(erase_filters_lay)
-        self.group_lay.addWidget(erase_filters_wid)
+        self.layout_.addWidget(erase_filters_wid)
 
         erase_filters_text = QLabel(Lng.reset_filters[cfg.lng])
         erase_filters_lay.addWidget(erase_filters_text)
@@ -614,14 +616,14 @@ class FiltersWid(GroupWid):
         self.reset_btn = SvgArrow()
         erase_filters_lay.addWidget(self.reset_btn)
 
-        self.group_lay.addWidget(USep())
+        self.layout_.addWidget(USep())
 
         self.filters_edit = UTextEdit()
         self.filters_edit.setFixedHeight(220)
         self.filters_edit.setPlaceholderText(Lng.filters[cfg.lng])
         self.filters_edit.setPlainText("\n".join(self.filters_clone))
         self.filters_edit.textChanged.connect(self.on_text_changed)
-        self.group_lay.addWidget(self.filters_edit)
+        self.layout_.addWidget(self.filters_edit)
         
     def reset_btn_cmd(self, *args):
         def fin():
@@ -727,7 +729,7 @@ class MfSettings(QWidget):
         main_lay.addWidget(self.name_wid)
         name_text = ULabel(f"{Lng.alias[cfg.lng]}: {target_mf.alias}")
         name_text.setFixedHeight(GroupChild.hh)
-        self.name_wid.group_lay.addWidget(name_text)
+        self.name_wid.layout_.addWidget(name_text)
 
         mf_paths = MfPaths(target_mf)
         mf_paths.text_changed.connect(self.changed.emit)
@@ -744,20 +746,20 @@ class MfSettings(QWidget):
         reset_wid.mouseReleaseEvent = self.set_reset_flag
         reset_lay = UHBoxLayout()
         reset_wid.setLayout(reset_lay)
-        general_wid.group_lay.addWidget(reset_wid)
+        general_wid.layout_.addWidget(reset_wid)
         reset_text = ULabel(text=Lng.reset_mf[cfg.lng])
         reset_lay.addWidget(reset_text)
         reset_lay.addStretch()
         reset_btn = SvgArrow()
         reset_lay.addWidget(reset_btn)
 
-        general_wid.group_lay.addWidget(USep())
+        general_wid.layout_.addWidget(USep())
 
         remove_wid = GroupChild()
         remove_wid.mouseReleaseEvent = self.set_remove_flag
         remove_lay = UHBoxLayout()
         remove_wid.setLayout(remove_lay)
-        general_wid.group_lay.addWidget(remove_wid)
+        general_wid.layout_.addWidget(remove_wid)
         remove_text = ULabel(text=Lng.remove_folder[cfg.lng])
         remove_lay.addWidget(remove_text)
         remove_lay.addStretch()
