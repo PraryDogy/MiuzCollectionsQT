@@ -1,92 +1,63 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QLabel, QWidget
+from PyQt5.QtWidgets import QLabel
 
 from cfg import cfg
 from system.lang import Lng
 
-from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
-                            UVBoxLayout)
+from ._base_widgets import SingleActionWindow, SmallBtn, UHBoxLayout
 
 
-class BaseWinWarn(SingleActionWindow):
-    svg_warning = "./images/warning.svg"
-    svg_size = 40
-
-    def __init__(self, title: str, text: str, char_limit: int):
-        super().__init__()
-        self.setWindowTitle(title)
-        self.setMinimumSize(200, 1)
-        self.resize(200, 1)
-
-        h_wid = QWidget()
-        self.central_layout.addWidget(h_wid)
-        self.content_layout = UHBoxLayout()
-        h_wid.setLayout(self.content_layout)
-
-        self.svg_wid = QSvgWidget()
-        self.svg_wid.load(self.svg_warning)
-        self.svg_wid.setFixedSize(self.svg_size, self.svg_size)
-        self.content_layout.addWidget(self.svg_wid)
-
-        self.content_layout.setSpacing(15)
-
-        self.right_wid = QWidget()
-        self.content_layout.addWidget(self.right_wid)
-        self.right_layout = UVBoxLayout()
-        self.right_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        self.right_wid.setLayout(self.right_layout)
-
-        # text = SharedUtils.insert_linebreaks(text, char_limit)
-        self.text_label = QLabel(text)
-        self.text_label.setWordWrap(True)
-        self.right_layout.addWidget(self.text_label)
-
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-            self.deleteLater()
-
-
-class WinWarn(BaseWinWarn):
-    def __init__(self, title: str, text: str, char_limit: int = 40):
-        super().__init__(title, text, char_limit)
-        
-        ok_btn = SmallBtn(text=Lng.ok[cfg.lng])
-        ok_btn.setFixedWidth(90)
-        ok_btn.clicked.connect(self.deleteLater)
-        self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.central_layout.setContentsMargins(5, 5, 5, 10)
-
-
-class WinQuestion(BaseWinWarn):
+class ConfirmWindow(SingleActionWindow):
     ok_clicked = pyqtSignal()
-    btn_w = 80
+    ww = 360
+    svg_icon = "./images/warning.svg"
 
-    def __init__(self, title: str, text: str, char_limit = 40):
-        super().__init__(title, text, char_limit)
+    def __init__(self, text: str):
+        super().__init__()
+        self.setWindowTitle(Lng.attention[cfg.lng])
+        self.setMaximumWidth(360)
 
-        btn_wid = QWidget()
-        btn_lay = UHBoxLayout()
-        btn_lay.setSpacing(10)
-        btn_wid.setLayout(btn_lay)
+        text_layout = UHBoxLayout()
+        text_layout.setSpacing(15)
+        self.central_layout.addLayout(text_layout)
+
+        svg_wid = QSvgWidget()
+        svg_wid.load(self.svg_icon)
+        svg_wid.setFixedSize(50, 50)
+        text_layout.addWidget(svg_wid)
+
+        text_wid = QLabel(text)
+        text_wid.setWordWrap(True)
+        text_wid.adjustSize()
+        text_layout.addWidget(text_wid)
+
+        btn_layout = UHBoxLayout()
+        btn_layout.setSpacing(10)
+        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.central_layout.addLayout(btn_layout)
 
         self.ok_btn = SmallBtn(Lng.ok[cfg.lng])
+        self.ok_btn.setFixedWidth(90)
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
-        self.ok_btn.setFixedWidth(self.btn_w)
+        btn_layout.addWidget(self.ok_btn)
 
         self.cancel_btn = SmallBtn(Lng.cancel[cfg.lng])
-        self.cancel_btn.setFixedWidth(self.btn_w)
+        self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.deleteLater)
+        btn_layout.addWidget(self.cancel_btn)
 
-        btn_lay.addStretch()
-        btn_lay.addWidget(self.ok_btn)
-        btn_lay.addWidget(self.cancel_btn)
-        btn_lay.addStretch()
-
-        self.central_layout.addWidget(btn_wid)
+        self.adjustSize()
 
     def keyPressEvent(self, a0):
-        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-            self.ok_clicked.emit()
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
         return super().keyPressEvent(a0)
+    
+
+class WarningWindow(ConfirmWindow):
+    def __init__(self, text):
+        super().__init__(text)
+        self.cancel_btn.deleteLater()
+        self.ok_btn.disconnect()
+        self.ok_btn.clicked.connect(self.deleteLater)

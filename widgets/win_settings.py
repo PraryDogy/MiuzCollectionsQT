@@ -4,13 +4,12 @@ import re
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QRegExp, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
-                             QLineEdit, QMessageBox, QSpacerItem, QSpinBox,
-                             QSplitter, QTableWidget, QTableWidgetItem,
-                             QWidget)
+                             QLineEdit, QSpacerItem, QSpinBox, QSplitter,
+                             QTableWidget, QTableWidgetItem, QWidget)
 from typing_extensions import Optional
 
 from cfg import Cfg, Static, cfg
@@ -26,65 +25,12 @@ from system.utils import Utils
 from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
                             UTextEdit, UVBoxLayout, VListWidget)
+from .win_warn import ConfirmWindow, WarningWindow
 
 
 def restart_app():
     QApplication.quit()
     Utils.start_new_app()
-
-
-class AttentionWin(SingleActionWindow):
-    ok_clicked = pyqtSignal()
-    ww = 360
-    svg_icon = "./images/warning.svg"
-
-    def __init__(self, text: str):
-        super().__init__()
-        self.setWindowTitle(Lng.attention[cfg.lng])
-        self.setMaximumWidth(360)
-
-        text_layout = UHBoxLayout()
-        text_layout.setSpacing(15)
-        self.central_layout.addLayout(text_layout)
-
-        svg_wid = QSvgWidget()
-        svg_wid.load(self.svg_icon)
-        svg_wid.setFixedSize(50, 50)
-        text_layout.addWidget(svg_wid)
-
-        text_wid = QLabel(text)
-        text_wid.setWordWrap(True)
-        text_wid.adjustSize()
-        text_layout.addWidget(text_wid)
-
-        btn_layout = UHBoxLayout()
-        btn_layout.setSpacing(10)
-        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.central_layout.addLayout(btn_layout)
-
-        ok_btn = SmallBtn(Lng.ok[cfg.lng])
-        ok_btn.setFixedWidth(90)
-        ok_btn.clicked.connect(self.ok_clicked.emit)
-        btn_layout.addWidget(ok_btn)
-
-        self.cancel_btn = SmallBtn(Lng.cancel[cfg.lng])
-        self.cancel_btn.setFixedWidth(90)
-        self.cancel_btn.clicked.connect(self.deleteLater)
-        btn_layout.addWidget(self.cancel_btn)
-
-        self.adjustSize()
-
-    def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
-            self.deleteLater()
-        return super().keyPressEvent(a0)
-    
-
-class WarningWin(AttentionWin):
-    def __init__(self, text):
-        super().__init__(text)
-        self.cancel_btn.deleteLater()
-
 
 
 class ULabel(QLabel):
@@ -257,7 +203,7 @@ class RebootSettings(GroupWid):
             shutil.rmtree(Static.app_support)
             restart_app()
 
-        reset_win = AttentionWin(Lng.erase_data_long[cfg.lng])
+        reset_win = ConfirmWindow(Lng.erase_data_long[cfg.lng])
         reset_win.center_to_parent(self.window())
         reset_win.ok_clicked.connect(fin)
         reset_win.show()
@@ -675,7 +621,7 @@ class FiltersWid(GroupWid):
             self.filters_win.deleteLater()
             self.changed.emit
 
-        self.filters_win = AttentionWin(Lng.reset_filters_long[cfg.lng])
+        self.filters_win = ConfirmWindow(Lng.reset_filters_long[cfg.lng])
         self.filters_win.ok_clicked.connect(fin)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
@@ -805,12 +751,6 @@ class MfSettings(QWidget):
 
         main_lay.addSpacerItem(QSpacerItem(0, 15))
 
-
-    def show_warn(self, text):
-        win_warn = AttentionWin(text)
-        win_warn.center_to_parent(self.window())
-        return win_warn
-
     def remove_cmd(self, *args):
 
         def fin():
@@ -822,10 +762,9 @@ class MfSettings(QWidget):
             restart_app()
 
         if len(self.mf_list_clone) == 1:
-            win = WarningWin(Lng.at_least_one_folder_required[cfg.lng])
-            win.ok_clicked.connect(win.deleteLater)
+            win = WarningWindow(Lng.at_least_one_folder_required[cfg.lng])
         else:
-            win = AttentionWin(Lng.remove_folder_long[cfg.lng])
+            win = ConfirmWindow(Lng.remove_folder_long[cfg.lng])
             win.ok_clicked.connect(fin)
         win.center_to_parent(self.window())
         win.show()
@@ -837,8 +776,9 @@ class MfSettings(QWidget):
             self.reset_task.sigs.finished_.connect(restart_app)
             UThreadPool.start(self.reset_task)
 
-        win = self.show_warn(Lng.reset_mf_long[cfg.lng])
+        win = ConfirmWindow(Lng.reset_mf_long[cfg.lng])
         win.ok_clicked.connect(reset_data)
+        win.center_to_parent(self.window())
         win.show()
 
     def save(self):
@@ -906,7 +846,7 @@ class NewFolder(QWidget):
         stop_list = self.mf_stop_list.text_edit_wid.toPlainText().split("\n")
 
         def show_warn(text: str):
-            win_warn = WarningWin(text)
+            win_warn = WarningWindow(text)
             win_warn.center_to_parent(self.window())
             win_warn.show()
 
@@ -1133,7 +1073,7 @@ class WinSettings(SingleActionWindow):
             """Check that all folders have paths, show warning if not."""
             for folder in self.mf_list_clone:
                 if not folder.paths:
-                    win_warn = WarningWin(
+                    win_warn = WarningWindow(
                         f"{Lng.select_folder_path[cfg.lng]} \"{folder.alias}\""
                     )
                     win_warn.center_to_parent(self.window())
