@@ -1088,6 +1088,9 @@ class WinSettings(SingleActionWindow):
                 Mf.list_ = self.mf_list_clone
                 Filters.filters = self.filters_clone
                 cfg = self.cfg_clone
+                Mf.write_json_data()
+                Filters.write_json_data()
+                cfg.write_json_data()
                 self.deleteLater()
 
     def deleteLater(self):
