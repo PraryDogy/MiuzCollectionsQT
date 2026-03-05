@@ -988,7 +988,6 @@ class WinSettings(SingleActionWindow):
         # idx соответствует номеру строки в левом меню
         # при этом важно помнить, что номер 3 зарезервирован за пустым
         # спейсером
-
         if settings_item.type_ == "general":
             idx = 0
         elif settings_item.type_ == "filters":
@@ -1000,9 +999,6 @@ class WinSettings(SingleActionWindow):
                 if i.alias == self.settings_item.content:
                     idx = x
                     break
-
-
-        print(idx)
         self.left_menu.setCurrentRow(idx)
         self.init_right_side(idx)
 
