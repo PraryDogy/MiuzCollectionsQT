@@ -157,7 +157,7 @@ class Lng:
         "Поле \"Имя\" обязательно для заполнения.",
         "Alias field is required."
     )
-    select_folder_path = ("Укажите путь к папке с изображениями.", "Select path to the images folder.")
+    select_folder_path = ("Укажите путь к папке с изображениями", "Select path to the images folder")
     folder_path = ("Путь к папке с изображениями", "Images folder path")
     general = ("Основные", "General")
     restart = ("Перезапуск", "Restart")
