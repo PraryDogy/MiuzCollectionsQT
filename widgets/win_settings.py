@@ -891,7 +891,6 @@ class NewFolder(QWidget):
 
 class WinSettings(SingleActionWindow):
     closed = pyqtSignal()
-    reset_data = pyqtSignal(Mf)
     svg_folder = "./images/img_folder.svg"
     svg_filters = "./images/filters.svg"
     svg_settings = "./images/settings.svg"
@@ -906,9 +905,6 @@ class WinSettings(SingleActionWindow):
         self.cfg_clone = copy.deepcopy(cfg)
         self.mf_list_clone = copy.deepcopy(Mf.list_)
         self.filters_clone = copy.deepcopy(Filters.filters)
-
-        # удалить бы
-        self.need_reset_item = NeedResetItem()
         self.mf_items: list[UListWidgetItem] = []
         self.settings_item = settings_item
 
