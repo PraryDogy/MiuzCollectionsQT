@@ -1073,31 +1073,22 @@ class WinSettings(SingleActionWindow):
             """Check that all folders have paths, show warning if not."""
             for folder in self.mf_list_clone:
                 if not folder.paths:
-                    win_warn = WarningWindow(
-                        f"{Lng.select_folder_path[cfg.lng]} \"{folder.alias}\""
-                    )
-                    win_warn.center_to_parent(self.window())
-                    win_warn.show()
-                    return False
-            return True
+                    return folder.alias
+            return None
 
-        if self.ok_btn.text() in Lng.restart:
-            if not validate_folders():
-                return
-            if self.need_reset_item.need_reset:
-                shutil.rmtree(Static.app_support)
+        if self.warn_svg.isHidden(False):
+            folder_no_paths = validate_folders()
+            if folder_no_paths:
+                win_warn = WarningWindow(
+                    f"{Lng.select_folder_path[cfg.lng]} \"{folder_no_paths}\""
+                )
+                win_warn.center_to_parent(self.window())
+                win_warn.show()
             else:
                 Mf.list_ = self.mf_list_clone
                 Filters.filters = self.filters_clone
-                for key, value in vars(self.cfg_clone).items():
-                    setattr(cfg, key, value)
-                Mf.write_json_data()
-                Filters.write_json_data()
-                cfg.write_json_data()
-            QApplication.quit()
-            Utils.start_new_app()
-        else:
-            self.deleteLater()
+                cfg = self.cfg_clone
+                self.deleteLater()
 
     def deleteLater(self):
         self.closed.emit()
