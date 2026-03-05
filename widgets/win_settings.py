@@ -1053,7 +1053,6 @@ class WinSettings(SingleActionWindow):
     def ok_cmd(self):
 
         def validate_folders() -> bool:
-            """Check that all folders have paths, show warning if not."""
             for folder in self.mf_list_clone:
                 if not folder.paths:
                     return folder.alias
