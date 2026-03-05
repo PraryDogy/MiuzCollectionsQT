@@ -841,6 +841,18 @@ class NewFolder(QWidget):
         self.mf_paths.text_edit_wid.setPlainText(url)
 
     def save(self, *args):
+
+        def fin():
+            self.mf.alias = folder_name
+            self.mf.paths = paths
+            self.mf.stop_list = stop_list
+            # мы добавляем новую папку менно в Mf.list_ а не в clone
+            # чтобы отменить изменения из других отделов
+            # и применить изменения только по новой папке
+            Mf.list_.append(self.mf)
+            Mf.write_json_data()
+            restart_app()
+
         pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
         folder_name = self.name_line_edit.text()
         paths = self.mf_paths.get_list()
@@ -874,13 +886,10 @@ class NewFolder(QWidget):
             show_warn(Lng.select_folder_path[cfg.lng])
             return
 
-        self.mf.alias = folder_name
-        self.mf.paths = paths
-        self.mf.stop_list = stop_list
-        self.mf_list_clone.append(self.mf)
-        Mf.list_ = self.mf_list_clone
-        Mf.write_json_data()
-        restart_app()
+        win = ConfirmWindow(Lng.save_text_long[cfg.lng])
+        win.ok_clicked.connect(fin)
+        win.center_to_parent(self.window())
+        win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()

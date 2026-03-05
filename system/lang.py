@@ -249,9 +249,9 @@ class Lng:
         "Завершите поиск, затем перетащите файлы",
         "Finish the search, then drag the files"
     )
-    save_btn_description = (
-        "Нажмите \"Сохранить\" и \"Перезапуск\"",  # русский
-        "Click \"Save\" and \"Restart\""           # английский
+    save_text_long = (
+        "Изменения сохранены. Приложение будет перезапущено.",
+        "Changes saved. The application will restart."
     )
     save_new_folder = (
         "Сохраните и нажмите «Перезапуск», чтобы применить изменения.",
