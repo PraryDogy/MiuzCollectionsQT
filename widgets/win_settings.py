@@ -1076,22 +1076,29 @@ class WinSettings(SingleActionWindow):
                     return folder.alias
             return None
 
-        if self.warn_svg.isHidden(False):
-            folder_no_paths = validate_folders()
-            if folder_no_paths:
-                win_warn = WarningWindow(
-                    f"{Lng.select_folder_path[cfg.lng]} \"{folder_no_paths}\""
-                )
-                win_warn.center_to_parent(self.window())
-                win_warn.show()
-            else:
-                Mf.list_ = self.mf_list_clone
-                Filters.filters = self.filters_clone
-                cfg = self.cfg_clone
-                Mf.write_json_data()
-                Filters.write_json_data()
-                cfg.write_json_data()
-                self.deleteLater()
+        if self.warn_svg.isHidden():
+            self.deleteLater()
+            return
+
+        folder_no_paths = validate_folders()
+        if folder_no_paths:
+            win_warn = WarningWindow(
+                f"{Lng.select_folder_path[cfg.lng]} \"{folder_no_paths}\""
+            )
+            win_warn.center_to_parent(self.window())
+            win_warn.show()
+        else:
+            Mf.list_ = self.mf_list_clone
+            Mf.write_json_data()
+
+            Filters.filters = self.filters_clone
+            Filters.write_json_data()
+
+            cfg.lng = self.cfg_clone.lng
+            cfg.scaner_minutes = self.cfg_clone.scaner_minutes
+            cfg.write_json_data()
+
+            restart_app()
 
     def deleteLater(self):
         self.closed.emit()
