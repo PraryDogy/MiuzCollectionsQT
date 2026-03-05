@@ -286,17 +286,9 @@ class AppModalWindow(UMainWindow):
 
 
 class UListWidgetItem(QListWidgetItem):
-    """
-    QListWidgetItem с фиксированной высотой и шириной, совпадающей с родителем.
-    """
-
     def __init__(self, parent: QListWidget, height: int = 30, text: str | None = None):
         super().__init__(parent)
-
-        # фиксированный размер
         self.setSizeHint(QSize(parent.width(), height))
-
-        # текст, если указан
         if text:
             self.setText(text)
 

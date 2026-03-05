@@ -941,7 +941,7 @@ class WinSettings(SingleActionWindow):
         new_folder.setIcon(QIcon(self.svg_new_folder))
         self.left_menu.addItem(new_folder)
         
-        spacer = UListWidgetItem(self.left_menu)
+        spacer = UListSpacerItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
         for i in Mf.list_:
