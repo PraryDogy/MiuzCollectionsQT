@@ -598,17 +598,15 @@ class FiltersWid(GroupWid):
 
         erase_filters_wid = GroupChild()
         erase_filters_wid.mouseReleaseEvent = self.reset_btn_cmd
-        erase_filters_lay = UHBoxLayout()
-        erase_filters_wid.setLayout(erase_filters_lay)
         self.layout_.addWidget(erase_filters_wid)
 
         erase_filters_text = QLabel(Lng.reset_filters[cfg.lng])
-        erase_filters_lay.addWidget(erase_filters_text)
+        erase_filters_wid.layout_.addWidget(erase_filters_text)
 
-        erase_filters_lay.addStretch()
+        erase_filters_wid.layout_.addStretch()
 
         self.reset_btn = SvgArrow()
-        erase_filters_lay.addWidget(self.reset_btn)
+        erase_filters_wid.layout_.addWidget(self.reset_btn)
 
         self.layout_.addWidget(USep())
 
