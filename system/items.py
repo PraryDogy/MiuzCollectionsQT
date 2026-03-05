@@ -24,11 +24,6 @@ class ReadImgItem:
 
 
 @dataclass(slots=True)
-class NeedResetItem:
-    need_reset: bool = False
-
-
-@dataclass(slots=True)
 class OnStartItem:
     mf_list: list["Mf"]
 

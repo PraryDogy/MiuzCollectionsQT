@@ -14,7 +14,7 @@ from typing_extensions import Optional
 
 from cfg import Cfg, Static, cfg
 from system.filters import Filters
-from system.items import NeedResetItem, SettingsItem
+from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.paletes import ThemeChanger
