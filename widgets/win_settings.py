@@ -41,8 +41,7 @@ class AttentionWin(SingleActionWindow):
     def __init__(self, text: str):
         super().__init__()
         self.setWindowTitle(Lng.attention[cfg.lng])
-        self.setFixedWidth(self.ww)
-        # self.central_layout.setContentsMargins(5, 7, 5, 0)
+        self.setMaximumWidth(360)
 
         text_layout = UHBoxLayout()
         text_layout.setSpacing(15)
@@ -906,7 +905,7 @@ class NewFolder(QWidget):
         paths = self.mf_paths.text_edit_wid.toPlainText().split("\n")
         stop_list = self.mf_stop_list.text_edit_wid.toPlainText().split("\n")
 
-        def show_warn(text):
+        def show_warn(text: str):
             win_warn = WarningWin(text)
             win_warn.center_to_parent(self.window())
             win_warn.show()
@@ -1134,13 +1133,11 @@ class WinSettings(SingleActionWindow):
             """Check that all folders have paths, show warning if not."""
             for folder in self.mf_list_clone:
                 if not folder.paths:
-                    self.win_warn = WinWarn(
-                        Lng.attention[cfg.lng],
+                    win_warn = WarningWin(
                         f"{Lng.select_folder_path[cfg.lng]} \"{folder.alias}\""
                     )
-                    self.win_warn.resize(330, 80)
-                    self.win_warn.center_to_parent(self.window())
-                    self.win_warn.show()
+                    win_warn.center_to_parent(self.window())
+                    win_warn.show()
                     return False
             return True
 
