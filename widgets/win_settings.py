@@ -324,31 +324,27 @@ class NonRebootSettings(GroupWid):
 
         data_size_wid = GroupChild()
         data_size_wid.mouseReleaseEvent = self.show_sizes_win
-        data_size_lay = UHBoxLayout()
-        data_size_wid.setLayout(data_size_lay)
         self.layout_.addWidget(data_size_wid)
 
         data_size_text = ULabel(text=Lng.statistic[cfg.lng])
-        data_size_lay.addWidget(data_size_text)
+        data_size_wid.layout_.addWidget(data_size_text)
 
-        data_size_lay.addStretch()
+        data_size_wid.layout_.addStretch()
 
         data_size_btn = SvgArrow()
-        data_size_lay.addWidget(data_size_btn)
+        data_size_wid.layout_.addWidget(data_size_btn)
 
         self.layout_.addWidget(USep())
 
         show_files_wid = GroupChild()
         show_files_wid.mouseReleaseEvent = self.show_files_cmd
-        show_files_lay = UHBoxLayout()
-        show_files_wid.setLayout(show_files_lay)
         self.layout_.addWidget(show_files_wid)
 
         show_files_text = ULabel(Lng.show_system_files[cfg.lng])
-        show_files_lay.addWidget(show_files_text)
+        show_files_wid.layout_.addWidget(show_files_text)
 
         show_files_btn = SvgArrow(text=Lng.show[cfg.lng])
-        show_files_lay.addWidget(show_files_btn)
+        show_files_wid.layout_.addWidget(show_files_btn)
 
         self.get_sizes()
 
@@ -434,23 +430,21 @@ class Themes(GroupWid):
 
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(120)
+        # self.setFixedHeight(120)
 
         title_wid = GroupChild()
-        title_lay = UHBoxLayout()
-        title_wid.setLayout(title_lay)
         self.layout_.addWidget(title_wid)
 
         title_text = ULabel("Тема")
-        title_lay.addWidget(title_text)
+        title_wid.layout_.addWidget(title_text)
 
         self.layout_.addWidget(USep())
+        self.layout_.addSpacerItem(QSpacerItem(0, 10))
 
-        themes_wid = QWidget()
-        themes_lay = UHBoxLayout()
-        themes_lay.setSpacing(20)
-        themes_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        themes_wid.setLayout(themes_lay)
+        themes_wid = GroupChild()
+        themes_wid.setFixedHeight(80)
+        themes_wid.layout_.setSpacing(20)
+        themes_wid.layout_.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.layout_.addWidget(themes_wid)
 
         self.frames = []
@@ -469,7 +463,7 @@ class Themes(GroupWid):
         )
 
         for f in (self.system_theme, self.dark_theme, self.light_theme):
-            themes_lay.addWidget(f)
+            themes_wid.layout_.addWidget(f)
             self.frames.append(f)
             f.clicked.connect(self.on_frame_clicked)
 
