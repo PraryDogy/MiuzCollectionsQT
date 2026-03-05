@@ -905,7 +905,6 @@ class WinSettings(SingleActionWindow):
         self.cfg_clone = copy.deepcopy(cfg)
         self.mf_list_clone = copy.deepcopy(Mf.list_)
         self.filters_clone = copy.deepcopy(Filters.filters)
-        self.mf_items: list[UListWidgetItem] = []
         self.settings_item = settings_item
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -920,27 +919,34 @@ class WinSettings(SingleActionWindow):
         self.left_menu.setIconSize(QSize(self.svg_size, self.svg_size))
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = UListWidgetItem(self.left_menu, text=Lng.general[cfg.lng])
+        main_settings_item = UListWidgetItem(
+            parent=self.left_menu,
+            text=Lng.general[cfg.lng]
+        )
         main_settings_item.setIcon(QIcon(self.svg_settings))
         self.left_menu.addItem(main_settings_item)
         
-        filter_settings = UListWidgetItem(self.left_menu, text=Lng.filters[cfg.lng])
+        filter_settings = UListWidgetItem(
+            parent=self.left_menu,
+            text=Lng.filters[cfg.lng]
+        )
         filter_settings.setIcon(QIcon(self.svg_filters))
         self.left_menu.addItem(filter_settings)
 
-        new_folder = UListWidgetItem(self.left_menu, text=Lng.new_folder[cfg.lng])
+        new_folder = UListWidgetItem(
+            parent=self.left_menu,
+            text=Lng.new_folder[cfg.lng]
+        )
         new_folder.setIcon(QIcon(self.svg_new_folder))
         self.left_menu.addItem(new_folder)
         
-        spacer = UListSpacerItem(self.left_menu)
+        spacer = UListWidgetItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
         for i in Mf.list_:
             new_folder = UListWidgetItem(self.left_menu, text=i.alias)
-            new_folder.mf = i
             new_folder.setIcon(QIcon(self.svg_folder))
             self.left_menu.addItem(new_folder)
-            self.mf_items.append(new_folder)
 
         self.right_wid = QWidget()
         self.right_lay = UVBoxLayout()

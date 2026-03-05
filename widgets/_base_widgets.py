@@ -302,15 +302,6 @@ class UListWidgetItem(QListWidgetItem):
 
 
 class UListSpacerItem(QListWidgetItem):
-    """
-    Пустой элемент списка QListWidget, используемый как разделитель/отступ.
-
-    Аргументы:
-        parent (QListWidget): родительский список.
-        height (int, optional): высота элемента. По умолчанию 15.
-    """
-
-
     def __init__(self, parent: QListWidget, height: int = 15):
         super().__init__()
         self.setSizeHint(QSize(parent.width(), height))
