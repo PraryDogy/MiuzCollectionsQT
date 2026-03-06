@@ -644,16 +644,14 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
-            from datetime import datetime
-            now = datetime.now().time().replace(microsecond=0)
             if scaner_item:
-                print("штатно запускаю SINGLE сканер", now)
+                print("штатно запускаю SINGLE сканер")
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
                     args=(scaner_item, )
                     )
             else:
-                print("штатно запускаю ОБЩИЙ сканер", now)
+                print("штатно запускаю ОБЩИЙ сканер")
                 self.scaner_task = ProcessWorker(
                     target=AllDirScaner.start,
                     args=(Mf.list_, )
