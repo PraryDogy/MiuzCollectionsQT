@@ -4,7 +4,7 @@ import re
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
@@ -88,10 +88,22 @@ class SvgArrow(QSvgWidget):
     def mouseReleaseEvent(self, a0):
         self.clicked.emit()
         return super().mouseReleaseEvent(a0)
+    
+
+class SvgWarning(QSvgWidget):
+    img = "./images/warning.svg"
+    size_ = 22
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(self.size_, self.size_)
+        self.load(self.img)
+        pol = self.sizePolicy()
+        pol.setRetainSizeWhenHidden(True)
+        self.setSizePolicy(pol)
 
 
 class TextEditWidget(GroupWid):
-    text_changed = pyqtSignal()
+    textChanged = pyqtSignal()
 
     def __init__(self, title: str, placeholder: str, text: Optional[str]):
         super().__init__()
@@ -105,7 +117,7 @@ class TextEditWidget(GroupWid):
         self.text_edit_wid = UTextEdit()
         self.text_edit_wid.setFixedHeight(100)
         self.text_edit_wid.setPlaceholderText(placeholder)
-        self.text_edit_wid.textChanged.connect(self.text_changed.emit)
+        self.text_edit_wid.textChanged.connect(self.textChanged.emit)
         self.text_edit_wid.setAcceptDrops(False)
         self.layout_.addWidget(self.text_edit_wid)
 
@@ -649,7 +661,7 @@ class MfPaths(TextEditWidget):
             text="\n".join(i for i in mf.paths),
         )
         self.mf = mf
-        self.text_changed.connect(self.set_data)
+        self.textChanged.connect(self.set_data)
 
     def set_data(self, *args):
         self.mf.paths = self.get_list()
@@ -676,7 +688,7 @@ class MfStopList(TextEditWidget):
             text="\n".join(i for i in mf.stop_list),
         )
         self.mf = mf
-        self.text_changed.connect(self.set_data)
+        self.textChanged.connect(self.set_data)
 
     def set_data(self, *args):
         self.mf.stop_list = self.get_list()
@@ -715,11 +727,11 @@ class MfSettings(QWidget):
         self.name_wid.layout_.addWidget(name_text)
 
         mf_paths = MfPaths(target_mf)
-        mf_paths.text_changed.connect(self.changed.emit)
+        mf_paths.textChanged.connect(self.changed.emit)
         main_lay.addWidget(mf_paths)
 
         mf_stop_list = MfStopList(target_mf)
-        mf_stop_list.text_changed.connect(self.changed.emit)
+        mf_stop_list.textChanged.connect(self.changed.emit)
         main_lay.addWidget(mf_stop_list)
 
         general_wid = GroupWid()
@@ -830,12 +842,23 @@ class NewFolder(QWidget):
         save_text = ULabel(Lng.save[cfg.lng])
         save_wid_child.layout_.addWidget(save_text)
 
+        save_wid_child.layout_.addSpacerItem(QSpacerItem(10, 0))
+
+        self.warning_svg = SvgWarning()
+        self.warning_svg.setFixedSize(14, 14)
+        save_wid_child.layout_.addWidget(self.warning_svg)
+        self.warning_svg.hide()
+
         save_wid_child.layout_.addStretch()
 
         save_btn = SvgArrow()
         save_wid_child.layout_.addWidget(save_btn)
 
-        # main_lay.addStretch()
+        QTimer.singleShot(100, self.text_changed)
+
+    def text_changed(self):
+        for i in (self.name_line_edit, self.mf_paths, self.mf_stop_list):
+            i.textChanged.connect(self.warning_svg.show)
         
     def preset_new_folder(self, url: str):
         self.mf_paths.text_edit_wid.setPlainText(url)
@@ -973,13 +996,7 @@ class WinSettings(SingleActionWindow):
         btns_lay.setSpacing(10)
         btns_wid.setLayout(btns_lay)
 
-        self.warn_svg = QSvgWidget()
-        self.warn_svg.setParent(btns_wid)
-        self.warn_svg.setFixedSize(22, 22)
-        self.warn_svg.load("./images/warning.svg")
-        pol = self.warn_svg.sizePolicy()
-        pol.setRetainSizeWhenHidden(True)
-        self.warn_svg.setSizePolicy(pol)
+        self.warn_svg = SvgWarning()
         btns_lay.addWidget(self.warn_svg)
         self.warn_svg.hide()
 
