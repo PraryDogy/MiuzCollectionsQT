@@ -592,7 +592,8 @@ class WinMain(UMainWindow):
         self.view_win.show()
 
     def start_wachdog(self):
-        
+        return
+
         def poll_task():
             q = self.watchdog_task.proc_q
             if not q.empty():
@@ -601,15 +602,15 @@ class WinMain(UMainWindow):
                     watchdog_item.mf.alias,
                     watchdog_item.event.event_type
                 )
-
             self.watchdog_timer.start(1000)
 
-
+        if hasattr(self, "watchdog_task"):
+            self.watchdog_task.terminate_join()
+            
         mf_list: list[Mf] = []
         for mf in Mf.list_:
             if mf.get_available_path():
                 mf_list.append(mf)
-
         if mf_list:
             self.watchdog_task = ProcessWorker(
                 target=DirWatcher.start,
@@ -618,7 +619,6 @@ class WinMain(UMainWindow):
             self.watchdog_timer = QTimer(self)
             self.watchdog_timer.setSingleShot(True)
             self.watchdog_timer.timeout.connect(poll_task)
-
             self.watchdog_timer.start(1000)
             self.watchdog_task.start()
 
