@@ -347,7 +347,6 @@ class MenuLeft(QTabWidget):
         QTimer.singleShot(10, lambda: _mf_open(Mf.current))
 
     def reload_tree(self):
-        self.tree_wid.clear()
         self.tree_wid.init_ui()
 
     def dragEnterEvent(self, a0):
