@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal, Optional
 from watchdog.events import FileSystemEvent
-
+from collections import defaultdict
 from cfg import Dynamic, Static, cfg
 from system.filters import Filters
 from system.items import (Buffer, ExtScanerItem, OnStartItem, SettingsItem,
@@ -80,7 +80,7 @@ class WinMain(UMainWindow):
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
 
-        self.watchdog_data: dict[Mf, list[str]] = {}
+        self.watchdog_data: defaultdict[Mf, list[str]] = defaultdict(list)
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -243,7 +243,7 @@ class WinMain(UMainWindow):
             if not tsk.is_alive():
                 tsk.terminate_join()
                 if argv[-1] != "noscan":
-                    self.start_scaner_task(scaner_item=None)
+                    self.start_scaner_task()
             else:
                 tmr.start(ms)
 
@@ -401,27 +401,28 @@ class WinMain(UMainWindow):
             if not files:
                 return
 
-            self.buffer.mf_to_scan = Mf.current
+            # self.buffer.mf_to_scan = Mf.current
             self.buffer.dst_dir = abs_current_dir
-            scaner_data = {
-                self.buffer.mf_to_scan: [self.buffer.dst_dir, ], 
-            }
+
+            self.watchdog_data[self.buffer.mf_to_scan].append(
+                self.buffer.dst_dir
+            )
             if self.buffer.type_ == "cut":
                 # если Mf откуда вырезаны файлы и Mf куда вставлены файла
                 # это разные объекты, то нужно просканировать оба объекта
                 if self.buffer.mf_to_scan != Mf.current:
-                    scaner_data.update(
-                        {Mf.current: self.buffer.dirs_to_scan,}
+                    self.watchdog_data[Mf.current].extend(
+                        self.buffer.dirs_to_scan
                     )
                 # если файлы вырезаны и вставлены в рамках одного Mf,
                 # то нужно просканировать директорию, откуда вырезаны файлы
                 # и директорию, куда вставлены файлы
                 else:
-                    scaner_data[self.buffer.mf_to_scan].extend(
+                    self.watchdog_data[self.buffer.mf_to_scan].extend(
                         self.buffer.dirs_to_scan
                     )
-            scaner_item = SingleDirScanerItem(data=scaner_data)
-            self.start_scaner_task(scaner_item=scaner_item)
+
+            self.start_scaner_task()
 
         def start_copy_files():
             self.buffer.dst_dir = Utils.get_abs_any_path(
@@ -455,8 +456,8 @@ class WinMain(UMainWindow):
                 file_remover.proc_q.get()
             if not file_remover.is_alive():
                 file_remover.terminate_join()
-                scaner_item = SingleDirScanerItem({mf: dirs_to_scan, })
-                self.start_scaner_task(scaner_item=scaner_item)
+                self.watchdog_data[mf].extend(dirs_to_scan)
+                self.start_scaner_task()
             else:
                 QTimer.singleShot(ms, poll_file_remover)
 
@@ -621,11 +622,7 @@ class WinMain(UMainWindow):
             self.watchdog_timer.start(1000)
             self.watchdog_task.start()
 
-    def start_scaner_task(
-            self,
-            scaner_item: Optional[SingleDirScanerItem],
-            ms: int = 1000
-        ):
+    def start_scaner_task(self, ms: int = 1000):
 
         def poll_task(tsk: ProcessWorker, tmr: QTimer):
             reload_gui = False
@@ -639,7 +636,7 @@ class WinMain(UMainWindow):
             if not tsk.is_alive():
                 tsk.terminate_join()
                 self.bar_bottom.progress_bar.start_timer_text()
-                if reload_gui or scaner_item:
+                if reload_gui:
                     self.grid.reload_thumbnails()
                     self.left_menu.tree_wid.init_ui()
             else:
@@ -651,9 +648,7 @@ class WinMain(UMainWindow):
             self.scaner_timeout = time()
             self.loop_tmr = QTimer(self)
             self.loop_tmr.setSingleShot(True)
-            self.loop_tmr.timeout.connect(
-                lambda : self.start_scaner_task(scaner_item=scaner_item)
-            )
+            self.loop_tmr.timeout.connect(self.start_scaner_task)
             self.scaner_task = None
 
         can_start = False
@@ -678,11 +673,11 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
-            if scaner_item:
+            if self.watchdog_data:
                 print("штатно запускаю SINGLE сканер")
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
-                    args=(scaner_item, )
+                    args=(SingleDirScanerItem(self.watchdog_data), )
                     )
             else:
                 print("штатно запускаю ОБЩИЙ сканер")
@@ -698,15 +693,14 @@ class WinMain(UMainWindow):
 
             self.scaner_task.start()
             tmr.start(ms)
+            self.watchdog_data.clear()
             self.loop_tmr.stop()
             self.loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
 
         else:
             # проверяем каждую минуту, что задача завершена
             self.loop_tmr.disconnect()
-            self.loop_tmr.timeout.connect(
-                lambda : self.start_scaner_task(scaner_item=scaner_item)
-            )
+            self.loop_tmr.timeout.connect(self.start_scaner_task)
             self.loop_tmr.stop()
             self.loop_tmr.start(1*1000)
             print("ожидание сканера")
@@ -716,7 +710,7 @@ class WinMain(UMainWindow):
             self.scaner_task.terminate_join()
         except AttributeError as e:
             print("Win main restart scaner task", e)
-        self.start_scaner_task(scaner_item=None)
+        self.start_scaner_task()
         
     def center_screen(self):
         screen = QDesktopWidget().screenGeometry()

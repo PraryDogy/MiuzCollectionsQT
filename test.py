@@ -1,8 +1,9 @@
-import os
+from collections import defaultdict
 
 
-a = '/Users/Loshkarev/Desktop/Test/One/TEST.jpg'
-b = '/Users/Loshkarev/Desktop/Test/One'
+a: defaultdict[str, list] = defaultdict(list)
 
 
-print(os.path.dirname(a))
+a["gello"].extend([1,2, 3])
+
+print(a)
