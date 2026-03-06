@@ -80,7 +80,6 @@ class WinMain(UMainWindow):
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
 
-        # self.view_win: WinImageView
         self.buffer: Buffer = None
         self.watchdog_data: dict[Mf, list[str]] = {}
 
