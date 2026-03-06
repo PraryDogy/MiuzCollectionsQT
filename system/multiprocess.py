@@ -6,6 +6,8 @@ from pathlib import Path
 from time import sleep
 
 import sqlalchemy
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers.polling import PollingObserver as Observer
 
 from cfg import Static, cfg
 
@@ -333,3 +335,31 @@ class OnStartTask:
         _DeletedMfRemover.start(engine, on_start_item, q)
         _EmptyRecordsRemover.start(engine, q)
         _EmptyHashdirRemover.start(q)
+
+
+class _DirChangedHandler(FileSystemEventHandler):
+    def __init__(self, callback):
+        super().__init__()
+        self.callback = callback
+
+    def on_any_event(self, event):
+        self.callback(event)
+
+
+class DirWatcher:
+    @staticmethod
+    def start(path: str, q: Queue):
+        if not path or not os.path.exists(path):
+            return
+        observer = Observer()
+        handler = _DirChangedHandler(lambda e: q.put(e))
+        observer.schedule(handler, path, recursive=False)
+        observer.start()
+        try:
+            while True:
+                sleep(1)
+                if not os.path.exists(path):
+                    break
+        finally:
+            observer.stop()
+            observer.join()
