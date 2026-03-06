@@ -349,18 +349,20 @@ class _DirChangedHandler(FileSystemEventHandler):
 
 class DirWatcher:
     @staticmethod
-    def start(path: str, q: Queue):
-        if not path or not os.path.exists(path):
-            return
+    def start(mf_list: list[Mf], q: Queue):
         observer = Observer()
-        handler = _DirChangedHandler(lambda e: q.put(e))
-        observer.schedule(handler, path, recursive=False)
-        observer.start()
+
+        for mf in mf_list:
+            callback = lambda e, mf=mf: q.put(
+                (mf, e)
+            )
+            handler = _DirChangedHandler(callback)
+            observer.schedule(handler, mf.curr_path, recursive=False)
+            observer.start()
+
         try:
             while True:
                 sleep(1)
-                if not os.path.exists(path):
-                    break
         finally:
             observer.stop()
             observer.join()

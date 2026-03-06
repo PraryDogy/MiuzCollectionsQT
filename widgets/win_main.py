@@ -591,12 +591,15 @@ class WinMain(UMainWindow):
         self.view_win.show()
 
     def start_wachdog(self):
+        mf_list: list[Mf] = []
+        for mf in Mf.list_:
+            if mf.get_available_path():
+                mf_list.append(mf)
 
-        path = Mf.current.get_available_path()
-        if path:
+        if mf_list:
             self.task = ProcessWorker(
                 target=DirWatcher.start,
-                args=(path, )
+                args=(mf_list, )
             )
             self.task.start()
         else:
