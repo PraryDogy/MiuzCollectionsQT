@@ -183,6 +183,38 @@ class DirsCompator:
 
 class DbDirUpdater:
     @staticmethod
+    def prepare(
+        bad_del_images: list[ImgItem],
+        bad_new_images: list[ImgItem],
+        dirs_to_scan: list[DirItem]
+    ):
+        """
+        Удаляет директории, в которых произошли ошибки при записи изображений.
+        Информация о таких директориях не обновляется в базе данных, поэтому
+        они будут автоматически обработаны при следующем сканировании.
+
+        Схема работы сканирования:
+
+        1. Сбор информации о директории (дата последнего изменения).
+        2. Сравнение полученной даты с записью в базе данных.
+        3. Если дата изменения новее, чем в базе данных — директория сканируется.
+        4. Если во время сканирования возникают ошибки записи изображений:
+        - информация о директории не сохраняется в базе данных;
+        - директория удаляется;
+        - при следующем сканировании она снова попадет под проверку (шаг 3).
+        """
+        bad_images = {
+            os.path.dirname(i.abs_img_path): i
+            for i in bad_del_images + bad_new_images
+        }
+
+        return [
+            i
+            for i in dirs_to_scan
+            if i.abs_path not in bad_images
+        ]
+
+    @staticmethod
     def start(scaner_item: IntScanerItem, dirs_to_scan: list[DirItem]):
         """
         Запускать только, когда:
@@ -563,14 +595,20 @@ class NewDirsWorker:
             scaner_item=scaner_item,
             del_images=del_images,
             new_images=new_images
-        )        
+        )
         DbImgUpdater.start(
             scaner_item=scaner_item,
             del_images=result["ok_del_images"],
             new_images=result["ok_new_images"]
         )
 
-        print(result)
+        dirs_to_scan = DbDirUpdater.prepare(
+            bad_del_images=result["bad_del_images"],
+            bad_new_images=result["bad_new_images"],
+            dirs_to_scan=dirs_to_scan
+        )
+
+        print(dirs_to_scan)
 
         DbDirUpdater.start(
             scaner_item=scaner_item,
