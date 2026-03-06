@@ -163,6 +163,10 @@ class TreeWid(QTreeWidget):
             menu.addAction(view)
             menu.addSeparator()
 
+        update = QAction(Lng.update_grid[cfg.lng])
+        update.triggered.connect(self.init_ui)
+        menu.addAction(update)
+
         expand_all = QAction(Lng.expand_all[cfg.lng], menu)
         expand_all.triggered.connect(lambda: self.expandAll())
         menu.addAction(expand_all)
