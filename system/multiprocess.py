@@ -338,6 +338,7 @@ class OnStartTask:
         _EmptyHashdirRemover.start(q)
 
 
+
 class _DirChangedHandler(FileSystemEventHandler):
     def __init__(self, callback):
         super().__init__()

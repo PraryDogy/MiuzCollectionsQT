@@ -597,7 +597,10 @@ class WinMain(UMainWindow):
             q = self.watchdog_task.proc_q
             if not q.empty():
                 watchdog_item: WatchDogItem = q.get()
-                print(watchdog_item.mf.alias, watchdog_item.event.event_type)
+                print(
+                    watchdog_item.mf.alias,
+                    watchdog_item.event.event_type
+                )
 
             self.watchdog_timer.start(1000)
 
