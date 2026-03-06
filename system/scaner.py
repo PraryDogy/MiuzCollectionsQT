@@ -451,6 +451,8 @@ class HashdirImgUpdater:
                     print("scaner HashdirImgUpdater error", e)
                     bad_new_images.append(img_item)
                     continue
+            else:
+                bad_new_images.append(img_item)
         return ok_new_images, bad_new_images
 
     @staticmethod
