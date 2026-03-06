@@ -80,7 +80,6 @@ class WinMain(UMainWindow):
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
 
-        self.buffer: Buffer = None
         self.watchdog_data: dict[Mf, list[str]] = {}
 
         h_wid_main = QWidget()
@@ -429,7 +428,7 @@ class WinMain(UMainWindow):
                 mf_path=Mf.current.curr_path,
                 rel_path=Dynamic.current_dir
             )
-        
+
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda files: scan_dirs(files))
 
@@ -445,7 +444,7 @@ class WinMain(UMainWindow):
                 self.win_warn.center_to_parent(self)
                 self.win_warn.show()
                 return
-        elif self.buffer:
+        if self.buffer:
             start_copy_files()
 
     @with_conn
@@ -592,6 +591,7 @@ class WinMain(UMainWindow):
         self.view_win.show()
 
     def start_wachdog(self):
+        return
 
         def poll_task():
             q = self.watchdog_task.proc_q
