@@ -14,7 +14,8 @@ from system.items import (Buffer, ExtScanerItem, OnStartItem, SettingsItem,
                           SingleDirScanerItem)
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import FilesRemover, OnStartTask, ProcessWorker
+from system.multiprocess import (DirWatcher, FilesRemover, OnStartTask,
+                                 ProcessWorker)
 from system.scaner import AllDirScaner, SingleDirScaner
 from system.shared_utils import ImgUtils
 from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
@@ -220,6 +221,8 @@ class WinMain(UMainWindow):
 
         self.grid.setFocus()
         self.on_start(argv)
+
+        self.start_wachdog()
 
     @staticmethod
     def with_conn(fn):
@@ -586,6 +589,18 @@ class WinMain(UMainWindow):
             self.view_win.resize(WinImageView.ww, WinImageView.hh)
             self.view_win.move(WinImageView.xx, WinImageView.yy)
         self.view_win.show()
+
+    def start_wachdog(self):
+
+        path = Mf.current.get_available_path()
+        if path:
+            self.task = ProcessWorker(
+                target=DirWatcher.start,
+                args=(path, )
+            )
+            self.task.start()
+        else:
+            print("no path")
 
     def start_scaner_task(
             self,

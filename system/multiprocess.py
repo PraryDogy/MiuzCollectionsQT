@@ -344,6 +344,7 @@ class _DirChangedHandler(FileSystemEventHandler):
 
     def on_any_event(self, event):
         self.callback(event)
+        print(event.event_type)
 
 
 class DirWatcher:
