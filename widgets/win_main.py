@@ -80,8 +80,9 @@ class WinMain(UMainWindow):
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
 
-        self.view_win: WinImageView
+        # self.view_win: WinImageView
         self.buffer: Buffer = None
+        self.watchdog_data: dict[Mf, list[str]] = {}
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -592,7 +593,6 @@ class WinMain(UMainWindow):
         self.view_win.show()
 
     def start_wachdog(self):
-        return
 
         def poll_task():
             q = self.watchdog_task.proc_q

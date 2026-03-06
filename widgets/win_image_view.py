@@ -350,11 +350,9 @@ class WinImageView(AppModalWindow):
             else:
                 self.read_img_timer.start(ms)
 
-        try:
+        if hasattr(self, "read_img_task"):
             self.read_img_task.terminate_join()
             self.read_img_timer.stop()
-        except AttributeError as e:
-            print("widgets > win image view error", e)
 
         if self.path in self.cached_images:
             self.restart_img_wid(self.cached_images[self.path])
