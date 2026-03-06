@@ -608,8 +608,6 @@ class NewDirsWorker:
             dirs_to_scan=dirs_to_scan
         )
 
-        print(dirs_to_scan)
-
         DbDirUpdater.start(
             scaner_item=scaner_item,
             dirs_to_scan=dirs_to_scan
