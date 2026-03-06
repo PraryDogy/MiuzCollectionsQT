@@ -6,13 +6,14 @@ from pathlib import Path
 from time import sleep
 
 import sqlalchemy
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver as Observer
 
 from cfg import Static, cfg
 
 from .database import Dbase, Dirs, Thumbs
-from .items import CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem
+from .items import (CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem,
+                    WatchDogItem)
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils, SharedUtils
@@ -342,9 +343,9 @@ class _DirChangedHandler(FileSystemEventHandler):
         super().__init__()
         self.callback = callback
 
-    def on_any_event(self, event):
-        self.callback(event)
-        print(event.event_type)
+    def on_any_event(self, event: FileSystemEvent):
+        if event.is_directory:
+            self.callback(event)
 
 
 class DirWatcher:
@@ -354,11 +355,11 @@ class DirWatcher:
 
         for mf in mf_list:
             callback = lambda e, mf=mf: q.put(
-                (mf, e)
+                WatchDogItem(mf=mf, event=e)
             )
             handler = _DirChangedHandler(callback)
             observer.schedule(handler, mf.curr_path, recursive=False)
-            observer.start()
+        observer.start()
 
         try:
             while True:

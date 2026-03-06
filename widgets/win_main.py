@@ -7,11 +7,12 @@ from PyQt5.QtGui import QCloseEvent, QIcon, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal, Optional
+from watchdog.events import FileSystemEvent
 
 from cfg import Dynamic, Static, cfg
 from system.filters import Filters
 from system.items import (Buffer, ExtScanerItem, OnStartItem, SettingsItem,
-                          SingleDirScanerItem)
+                          SingleDirScanerItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, OnStartTask,
@@ -591,19 +592,32 @@ class WinMain(UMainWindow):
         self.view_win.show()
 
     def start_wachdog(self):
+        
+        def poll_task():
+            q = self.watchdog_task.proc_q
+            if not q.empty():
+                watchdog_item: WatchDogItem = q.get()
+                print(watchdog_item.mf.alias, watchdog_item.event.event_type)
+
+            self.watchdog_timer.start(1000)
+
+
         mf_list: list[Mf] = []
         for mf in Mf.list_:
             if mf.get_available_path():
                 mf_list.append(mf)
 
         if mf_list:
-            self.task = ProcessWorker(
+            self.watchdog_task = ProcessWorker(
                 target=DirWatcher.start,
                 args=(mf_list, )
             )
-            self.task.start()
-        else:
-            print("no path")
+            self.watchdog_timer = QTimer(self)
+            self.watchdog_timer.setSingleShot(True)
+            self.watchdog_timer.timeout.connect(poll_task)
+
+            self.watchdog_timer.start(1000)
+            self.watchdog_task.start()
 
     def start_scaner_task(
             self,

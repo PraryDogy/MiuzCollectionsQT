@@ -5,6 +5,7 @@ from typing import Literal, Optional
 
 import numpy as np
 import sqlalchemy
+from watchdog.events import FileSystemEvent
 
 from .main_folder import Mf
 
@@ -93,3 +94,9 @@ class Buffer:
     files_to_copy: Optional[list[str]]
     dst_dir: Optional[str]
     mf_to_scan: Optional[Mf]
+
+
+@dataclass(slots=True)
+class WatchDogItem:
+    mf: Mf
+    event: FileSystemEvent
