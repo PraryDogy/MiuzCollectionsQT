@@ -364,33 +364,44 @@ class HashdirImgUpdater:
         - del_images список ImgItem
         - new_images список ImgItem
 
-        Возвращает:     
-        - успешно удаленные из `hashdir` список `ImgItem`
-        - успешно добавленные в `hashdir` список `ImgItem`
+        Возвращает:
+        Словарь
+        - "ok_del_images": успешно удаленные из `hashdir` список `ImgItem`
+        - "bad_del_images": неудачно удаленные из `hashdir` список `ImgItem`
+        - "ok_new_images": успешно добавленные в `hashdir` список `ImgItem`
+        - "bad_new_images": неудачно добавленные в `hashdir` список `ImgItem`
         """
         scaner_item.total_count = len(del_images) + len(new_images)
-        new_del_images = HashdirImgUpdater.run_del_images(
+        ok_del_images, bad_del_images = HashdirImgUpdater.run_del_images(
             scaner_item=scaner_item,
             del_images=del_images
         )
-        new_items = HashdirImgUpdater.run_new_images(
+        ok_new_images, bad_new_images = HashdirImgUpdater.run_new_images(
             scaner_item=scaner_item,
             new_images=new_images
         )
-        return new_del_images, new_items
+
+        return {
+            "ok_del_images": ok_del_images,
+            "bad_del_images": bad_del_images,
+            "ok_new_images": ok_new_images,
+            "bad_new_images": bad_new_images
+        }
 
     @staticmethod
     def run_del_images(scaner_item: IntScanerItem, del_images: list[ImgItem]):
         """
         Пытается удалить изображения из `hashdir` и пустые папки.   
-        Возвращает список успешно удаленных изображений.
+        Возвращает список успешно удаленных изображений и
+        список неудачно удаленных изображений.
         Обрати внимание:
         - Только в списке del_images есть параметр `ImgItem.rel_thumb_path`
         - Он был присвоен при загрузуке записей из БД
         - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
         """
         ext_scaner_item = ExtScanerItem("none", False)
-        new_del_images: list[ImgItem] = []
+        ok_del_images: list[ImgItem] = []
+        bad_del_images: list[ImgItem] = []
         for img_item in del_images:
             thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
             if os.path.exists(thumb_path):
@@ -399,24 +410,27 @@ class HashdirImgUpdater:
                     folder = os.path.dirname(thumb_path)
                     if not os.listdir(folder):
                         shutil.rmtree(folder)
-                    new_del_images.append(img_item)
+                    ok_del_images.append(img_item)
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
                     # и чтобы в основном потоке сбрасывался таймер таймаута
                     HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
+                    bad_del_images.append(img_item)
                     continue
-        return new_del_images
+        return ok_del_images, bad_del_images
 
     @staticmethod
     def run_new_images(scaner_item: IntScanerItem, new_images: list[ImgItem]):
         """
         Пытается создать изображения в "hashdir".     
-        Возвращает список успешно созданных изображений.
+        Возвращает список успешно созданных изображений и
+        список неудачно созданных изображений.
         """
         ext_scaner_item = ExtScanerItem("none", False)
-        new_new_images: list[ImgItem] = []
+        ok_new_images: list[ImgItem] = []
+        bad_new_images: list[ImgItem] = []
         for img_item in new_images:
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = Utils.fit_to_thumb(img, Static.max_img_size)
@@ -428,15 +442,16 @@ class HashdirImgUpdater:
                     )
                     thumb_path = Utils.create_abs_thumb_path(rel_img_path)
                     Utils.write_thumb(thumb_path, img)
-                    new_new_images.append(img_item)
+                    ok_new_images.append(img_item)
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
                     # и чтобы в основном потоке сбрасывался таймер таймаута
                     HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
+                    bad_new_images.append(img_item)
                     continue
-        return new_new_images
+        return ok_new_images, bad_new_images
 
     @staticmethod
     def q_put(scaner_item: IntScanerItem, ext_scaner_item: ExtScanerItem):
@@ -542,16 +557,19 @@ class NewDirsWorker:
             db_images=db_images
         )
 
-        del_images, new_images = HashdirImgUpdater.start(
+        result = HashdirImgUpdater.start(
             scaner_item=scaner_item,
             del_images=del_images,
             new_images=new_images
-        )
+        )        
         DbImgUpdater.start(
             scaner_item=scaner_item,
-            del_images=del_images,
-            new_images=new_images
+            del_images=result["ok_del_images"],
+            new_images=result["ok_new_images"]
         )
+
+        print(result)
+
         DbDirUpdater.start(
             scaner_item=scaner_item,
             dirs_to_scan=dirs_to_scan
