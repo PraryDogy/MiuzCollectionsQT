@@ -582,6 +582,7 @@ class NewDirsWorker:
         - на основе этого списка добавляются и удаляются миниатюры в "hashdir"
         - обновляются базы данных THUMBS и DIRS
         """
+
         finder_images, db_images = ImgLoader.start(
             scaner_item=scaner_item,
             dirs_to_scan=dirs_to_scan
