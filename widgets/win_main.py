@@ -390,21 +390,7 @@ class WinMain(UMainWindow):
     def paste_files(self, parent: QWidget, mf: Mf):
 
         def scan_dirs(*args):
-            self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
-            if self.buffer.type_ == "cut":
-                # если Mf откуда вырезаны файлы и Mf куда вставлены файла
-                # это разные объекты, то нужно просканировать оба объекта
-                if self.buffer.src_mf != Mf.current:
-                    self.single_scaner_data[Mf.current].extend(
-                        self.buffer.dirs_to_scan
-                    )
-                # если файлы вырезаны и вставлены в рамках одного Mf,
-                # то нужно просканировать директорию, откуда вырезаны файлы
-                # и директорию, куда вставлены файлы
-                else:
-                    self.single_scaner_data[self.buffer.src_mf].extend(
-                        self.buffer.dirs_to_scan
-                    )
+            # self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
             self.start_scaner_task()
 
         def start_copy_files():
@@ -417,6 +403,25 @@ class WinMain(UMainWindow):
             mf_path=Mf.current.curr_path,
             rel_path=Dynamic.current_dir
         )
+
+        # готовим информацию для сканера
+        self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
+
+        # if self.buffer.type_ == "cut":
+        #     # если Mf откуда вырезаны файлы и Mf куда вставлены файла
+        #     # это разные объекты, то нужно просканировать оба объекта
+        #     if self.buffer.src_mf != Mf.current:
+        #         self.single_scaner_data[Mf.current].extend(
+        #             self.buffer.dirs_to_scan
+        #         )
+        #     # если файлы вырезаны и вставлены в рамках одного Mf,
+        #     # то нужно просканировать директорию, откуда вырезаны файлы
+        #     # и директорию, куда вставлены файлы
+        #     else:
+        #         self.single_scaner_data[self.buffer.src_mf].extend(
+        #             self.buffer.dirs_to_scan
+        #         )
+
 
         # если файл скопирован и вставляется в одну и ту же директорию
         # то добавлять циферку
