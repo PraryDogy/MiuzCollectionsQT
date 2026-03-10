@@ -396,7 +396,7 @@ class Grid(VScrollArea):
     set_fav = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
     paste_files = pyqtSignal()
-    copy_files = pyqtSignal(tuple)
+    set_clipboard = pyqtSignal(tuple)
     setup_mf = pyqtSignal(SettingsItem)
     go_to_widget = pyqtSignal(str)
     
@@ -718,11 +718,11 @@ class Grid(VScrollArea):
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_A:
             select_all()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
-            self.copy_files.emit(
+            self.set_clipboard.emit(
                 ("copy", [i.rel_path for i in self.selected_widgets])
             )
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_X:
-            self.copy_files.emit(
+            self.set_clipboard.emit(
                 ("cut", [i.rel_path for i in self.selected_widgets])
             )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
@@ -953,13 +953,13 @@ class Grid(VScrollArea):
                 # cut / copy / paste
                 act = CutFiles(self.menu_, len(rel_paths))
                 act.triggered.connect(
-                    lambda: self.copy_files.emit(("cut", rel_paths))
+                    lambda: self.set_clipboard.emit(("cut", rel_paths))
                 )
                 self.menu_.addAction(act)
 
                 act = CopyFiles(self.menu_, len(rel_paths))
                 act.triggered.connect(
-                    lambda: self.copy_files.emit(("copy", rel_paths))
+                    lambda: self.set_clipboard.emit(("copy", rel_paths))
                 )
                 self.menu_.addAction(act)
 

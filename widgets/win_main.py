@@ -175,7 +175,7 @@ class WinMain(UMainWindow):
         self.grid.paste_files.connect(
             lambda: self.paste_files(self.grid,  Mf.current)
         )
-        self.grid.copy_files.connect(
+        self.grid.set_clipboard.connect(
             lambda data: self.set_clipboard(self.grid, Mf.current, data)
         )
         self.grid.setup_mf.connect(
@@ -324,31 +324,32 @@ class WinMain(UMainWindow):
             if target_dir:
                 self.buffer.target_dir = target_dir
                 copy_files_win = self.copy_files_win()
+                del self.buffer
                 copy_files_win.finished_.connect(save_finished)
         else:
             self.buffer.target_dir = target_dir
             copy_files_win = self.copy_files_win()
+            del self.buffer
             copy_files_win.finished_.connect(Utils.reveal_files)
 
     @with_conn
     def set_clipboard(self, parent: QWidget, mf: Mf, data: tuple):
-        action_type, rel_paths = data
-        if rel_paths:
-            abs_paths = [
-                Utils.get_abs_any_path(mf.curr_path, i)
-                for i in rel_paths
-            ]
-            self.buffer = Buffer(
-                type_=action_type,
-                files_to_copy=abs_paths,
-                target_dir=None,
-                src_mf=None
-            )
+        buffer_type, rel_files_to_copy = data
+        abs_files_to_copy = [
+            Utils.get_abs_any_path(mf.curr_path, i)
+            for i in rel_files_to_copy
+        ]
+        self.buffer = Buffer(
+            type_=buffer_type,
+            files_to_copy=abs_files_to_copy,
+            target_dir=None,
+            src_mf=None
+        )
 
-            self.grid.buffer = self.buffer
-            if self.buffer.type_ == "cut":
-                for i in self.grid.selected_widgets:
-                    i.set_transparent_frame(0.5)
+        self.grid.buffer = self.buffer
+        if self.buffer.type_ == "cut":
+            for i in self.grid.selected_widgets:
+                i.set_transparent_frame(0.5)
 
     @with_conn
     def open_in_app(self, parent: QWidget, mf: Mf, data: tuple):
