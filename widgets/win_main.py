@@ -291,7 +291,6 @@ class WinMain(UMainWindow):
             files_to_copy=abs_files_to_copy,
             target_dir=None
         )
-        self.grid.buffer = self.buffer
 
         if target_dir is None:
             target_dir = QFileDialog.getExistingDirectory(
