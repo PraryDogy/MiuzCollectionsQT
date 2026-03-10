@@ -129,12 +129,6 @@ class WinMain(UMainWindow):
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
-        self.bar_top.history_press.connect(
-            lambda: self.history_press()
-        )
-        self.bar_top.level_up.connect(
-            lambda: self.level_up()
-        )
         right_lay.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -258,21 +252,6 @@ class WinMain(UMainWindow):
         tsk.start()
         tmr.start(ms)
     
-    def level_up(self):
-        if Dynamic.current_dir:
-            root = os.path.dirname(Dynamic.current_dir)
-            if root == os.sep:
-                root = ""
-            Dynamic.current_dir = root
-            self.left_menu.tree_wid.expand_to_path(root)
-            self.left_menu.setCurrentIndex(1)
-            self.grid.reload_thumbnails()
-
-    def history_press(self):
-        self.left_menu.tree_wid.expand_to_path(Dynamic.current_dir)
-        self.left_menu.setCurrentIndex(1)
-        self.grid.reload_thumbnails()
-    
     def go_to_widget(self, rel_path: str):
         dirname = os.path.dirname(rel_path)
         Dynamic.current_dir = dirname
@@ -287,7 +266,6 @@ class WinMain(UMainWindow):
         except (AttributeError, RuntimeError) as e:
             print(e)
 
-        basename = os.path.basename(mf.current.paths[0])
         alias = mf.alias
         self.noti_wid = NotifyWid(
             parent,
@@ -311,8 +289,7 @@ class WinMain(UMainWindow):
         self.buffer = Buffer(
             type_="copy",
             files_to_copy=abs_files_to_copy,
-            target_dir=None,
-            src_mf=None
+            target_dir=None
         )
         self.grid.buffer = self.buffer
 
