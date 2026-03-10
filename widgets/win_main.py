@@ -80,7 +80,7 @@ class WinMain(UMainWindow):
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
 
-        self.single_scaner_data: defaultdict[Mf, list[str]] = defaultdict(list)
+        self.scaner_data: defaultdict[Mf, list[str]] = defaultdict(list)
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -322,7 +322,7 @@ class WinMain(UMainWindow):
 
         # готовим информацию для сканера
         # сканировать директорию куда вставлены изображения
-        self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
+        self.scaner_data[Mf.current].append(self.buffer.target_dir)
 
         # сканировать директорию откуда вырезано
         if self.buffer.type_ == "cut":
@@ -331,9 +331,9 @@ class WinMain(UMainWindow):
                 for i in self.buffer.files_to_copy
             ))
             if self.buffer.source_mf == Mf.current:
-                self.single_scaner_data[Mf.current].extend(dirs_to_scan)
+                self.scaner_data[Mf.current].extend(dirs_to_scan)
             else:
-                self.single_scaner_data[self.buffer.source_mf].extend(dirs_to_scan)
+                self.scaner_data[self.buffer.source_mf].extend(dirs_to_scan)
         copy_files_win = self.copy_files_win(
             files_to_copy=self.buffer.files_to_copy,
             target_dir=self.buffer.target_dir,
@@ -386,7 +386,7 @@ class WinMain(UMainWindow):
                 file_remover.proc_q.get()
             if not file_remover.is_alive():
                 file_remover.terminate_join()
-                self.single_scaner_data[mf].extend(dirs_to_scan)
+                self.scaner_data[mf].extend(dirs_to_scan)
                 self.start_scaner_task()
             else:
                 QTimer.singleShot(ms, poll_file_remover)
@@ -602,11 +602,11 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
-            if self.single_scaner_data:
+            if self.scaner_data:
                 print("штатно запускаю SINGLE сканер")
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
-                    args=(SingleDirScanerItem(self.single_scaner_data), )
+                    args=(SingleDirScanerItem(self.scaner_data), )
                     )
             else:
                 print("штатно запускаю ОБЩИЙ сканер")
@@ -622,7 +622,7 @@ class WinMain(UMainWindow):
 
             self.scaner_task.start()
             tmr.start(ms)
-            self.single_scaner_data.clear()
+            self.scaner_data.clear()
             self.loop_tmr.stop()
             self.loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
 
