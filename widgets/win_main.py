@@ -304,34 +304,30 @@ class WinMain(UMainWindow):
             Utils.reveal_files(files)
             self.buffer = None
 
-        dest, dst_rel_paths = data
+        target_dir, dst_rel_paths = data
         src_abs_paths = [
             Utils.get_abs_any_path(mf.curr_path, i)
             for i in dst_rel_paths
         ]
 
-        if self.buffer is None:
-            self.buffer = Buffer(
-                type_="copy",
-                dirs_to_scan=None,
-                files_to_copy=src_abs_paths,
-                dst_dir=None,
-                mf_to_scan=None
-            )
-            self.grid.buffer = self.buffer
-        else:
-            self.buffer.files_to_copy = src_abs_paths
+        self.buffer = Buffer(
+            type_="copy",
+            files_to_copy=src_abs_paths,
+            target_dir=None,
+            src_mf=None
+        )
+        self.grid.buffer = self.buffer
 
-        if dest is None:
-            dest = QFileDialog.getExistingDirectory(
+        if target_dir is None:
+            target_dir = QFileDialog.getExistingDirectory(
                 directory=os.path.expanduser("~/Downloads")
             )
-            if dest:
-                self.buffer.dst_dir = dest
+            if target_dir:
+                self.buffer.target_dir = target_dir
                 copy_files_win = self.copy_files_win()
                 copy_files_win.finished_.connect(save_finished)
         else:
-            self.buffer.dst_dir = dest
+            self.buffer.target_dir = target_dir
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(Utils.reveal_files)
 
@@ -343,13 +339,11 @@ class WinMain(UMainWindow):
                 Utils.get_abs_any_path(mf.curr_path, i)
                 for i in rel_paths
             ]
-            src_dirs = list(set(os.path.dirname(i) for i in abs_paths))
             self.buffer = Buffer(
                 type_=action_type,
-                dirs_to_scan=src_dirs,
                 files_to_copy=abs_paths,
-                dst_dir=None,
-                mf_to_scan=None
+                target_dir=None,
+                src_mf=None
             )
 
             self.grid.buffer = self.buffer
@@ -398,11 +392,11 @@ class WinMain(UMainWindow):
     def paste_files(self, parent: QWidget, mf: Mf):
 
         def scan_dirs(*args):
-            self.single_scaner_data[Mf.current].append(self.buffer.dst_dir)
+            self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
             if self.buffer.type_ == "cut":
                 # если Mf откуда вырезаны файлы и Mf куда вставлены файла
                 # это разные объекты, то нужно просканировать оба объекта
-                if self.buffer.mf_to_scan != Mf.current:
+                if self.buffer.src_mf != Mf.current:
                     self.single_scaner_data[Mf.current].extend(
                         self.buffer.dirs_to_scan
                     )
@@ -410,10 +404,9 @@ class WinMain(UMainWindow):
                 # то нужно просканировать директорию, откуда вырезаны файлы
                 # и директорию, куда вставлены файлы
                 else:
-                    self.single_scaner_data[self.buffer.mf_to_scan].extend(
+                    self.single_scaner_data[self.buffer.src_mf].extend(
                         self.buffer.dirs_to_scan
                     )
-            print(self.single_scaner_data)
             self.start_scaner_task()
 
         def start_copy_files():
@@ -424,12 +417,13 @@ class WinMain(UMainWindow):
             self.open_win_smb(self, Mf.current)
             return
 
-        self.buffer.dst_dir = Utils.get_abs_any_path(
+        self.buffer.target_dir = Utils.get_abs_any_path(
             mf_path=Mf.current.curr_path,
             rel_path=Dynamic.current_dir
         )
+        # self.buffer.src_mf = Mf.current
 
-        if self.buffer.dst_dir in self.buffer.dirs_to_scan:
+        if self.buffer.target_dir in self.buffer.dirs_to_scan:
             # копировать в себя нельзя
             self.win_warn = WarningWindow(Lng.copy_name_same_dir[cfg.lng])
             self.win_warn.center_to_parent(self)
@@ -489,8 +483,8 @@ class WinMain(UMainWindow):
                 type_="copy",
                 dirs_to_scan=None,
                 files_to_copy=files_to_copy,
-                dst_dir=target_dir,
-                mf_to_scan=Mf.current
+                target_dir=target_dir,
+                src_mf=Mf.current
             )
 
             self.grid.buffer = self.buffer
@@ -746,9 +740,9 @@ class WinMain(UMainWindow):
 
     def copy_files_win(self):
         progress_win = WinCopyFiles(
-            src_urls=self.buffer.files_to_copy,
-            dst_dir=self.buffer.dst_dir,
-            is_cut=self.buffer.type_
+            files_to_copy=self.buffer.files_to_copy,
+            target_dir=self.buffer.target_dir,
+            buffer_type=self.buffer.type_
         )
         progress_win.center_to_parent(self)
         progress_win.show()   

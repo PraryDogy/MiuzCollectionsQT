@@ -968,7 +968,9 @@ class Grid(VScrollArea):
             # save / remove
             act = Save(self.menu_, len(rel_paths))
             act.triggered.connect(
-                lambda: self.save_files.emit((os.path.expanduser("~/Downloads"), rel_paths))
+                lambda: self.save_files.emit(
+                    (os.path.expanduser("~/Downloads"), rel_paths)
+                )
             )
             self.menu_.addAction(act)
 
