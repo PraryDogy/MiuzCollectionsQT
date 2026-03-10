@@ -302,7 +302,6 @@ class WinMain(UMainWindow):
 
         def save_finished(files):
             Utils.reveal_files(files)
-            self.buffer = None
 
         target_dir, rel_files_to_copy = data
         abs_files_to_copy = [
@@ -343,7 +342,6 @@ class WinMain(UMainWindow):
             type_=buffer_type,
             files_to_copy=abs_files_to_copy,
             target_dir=None,
-            src_mf=None
         )
 
         self.grid.buffer = self.buffer
@@ -411,25 +409,16 @@ class WinMain(UMainWindow):
 
         def start_copy_files():
             copy_files_win = self.copy_files_win()
-            copy_files_win.finished_.connect(lambda files: scan_dirs(files))
-
-        if not Mf.current.get_available_path():
-            self.open_win_smb(self, Mf.current)
-            return
+            copy_files_win.finished_.connect(
+                lambda files: scan_dirs(files)
+            )
 
         self.buffer.target_dir = Utils.get_abs_any_path(
             mf_path=Mf.current.curr_path,
             rel_path=Dynamic.current_dir
         )
-        # self.buffer.src_mf = Mf.current
 
-        if self.buffer.target_dir in self.buffer.dirs_to_scan:
-            # копировать в себя нельзя
-            self.win_warn = WarningWindow(Lng.copy_name_same_dir[cfg.lng])
-            self.win_warn.center_to_parent(self)
-            self.win_warn.show()
-            return
-
+        # копировать файлы добавлять циферку чтобы не заменялись файлы
         start_copy_files()
 
     @with_conn

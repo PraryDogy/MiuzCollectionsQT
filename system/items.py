@@ -92,7 +92,6 @@ class Buffer:
     type_: Literal["cut", "copy"]
     files_to_copy: Optional[list[str]]
     target_dir: Optional[str]
-    src_mf: Optional[Mf]
 
 
 @dataclass(slots=True)
