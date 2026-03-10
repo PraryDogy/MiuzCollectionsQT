@@ -304,15 +304,14 @@ class WinMain(UMainWindow):
             Utils.reveal_files(files)
             self.buffer = None
 
-        target_dir, dst_rel_paths = data
-        src_abs_paths = [
+        target_dir, rel_files_to_copy = data
+        abs_files_to_copy = [
             Utils.get_abs_any_path(mf.curr_path, i)
-            for i in dst_rel_paths
+            for i in rel_files_to_copy
         ]
-
         self.buffer = Buffer(
             type_="copy",
-            files_to_copy=src_abs_paths,
+            files_to_copy=abs_files_to_copy,
             target_dir=None,
             src_mf=None
         )
