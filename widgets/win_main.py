@@ -277,35 +277,22 @@ class WinMain(UMainWindow):
 
     @with_conn
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
-
-        def save_finished(files):
-            Utils.reveal_files(files)
-
         target_dir, rel_files_to_copy = data
         abs_files_to_copy = [
             Utils.get_abs_any_path(mf.curr_path, i)
             for i in rel_files_to_copy
         ]
-        self.buffer = Buffer(
-            type_="copy",
-            files_to_copy=abs_files_to_copy,
-            target_dir=None
-        )
-
         if target_dir is None:
-            target_dir = QFileDialog.getExistingDirectory(
-                directory=os.path.expanduser("~/Downloads")
-            )
-            if target_dir:
-                self.buffer.target_dir = target_dir
-                copy_files_win = self.copy_files_win()
-                del self.buffer
-                copy_files_win.finished_.connect(save_finished)
-        else:
-            self.buffer.target_dir = target_dir
-            copy_files_win = self.copy_files_win()
-            del self.buffer
-            copy_files_win.finished_.connect(Utils.reveal_files)
+            downloads = os.path.expanduser("~/Downloads")
+            target_dir = QFileDialog.getExistingDirectory(directory=downloads)
+            if not target_dir:
+                target_dir = downloads
+        copy_files_win = self.copy_files_win(
+            files_to_copy=abs_files_to_copy,
+            target_dir=target_dir,
+            action_type="copy"
+        )
+        copy_files_win.finished_.connect(Utils.reveal_files)
 
     @with_conn
     def set_clipboard(self, parent: QWidget, mf: Mf, data: tuple):
@@ -316,14 +303,14 @@ class WinMain(UMainWindow):
         ]
         self.buffer = Buffer(
             type_=buffer_type,
+            source_mf=Mf.current,
             files_to_copy=abs_files_to_copy,
             target_dir=None,
         )
-
-        self.grid.buffer = self.buffer
         if self.buffer.type_ == "cut":
             for i in self.grid.selected_widgets:
                 i.set_transparent_frame(0.5)
+        self.grid.buffer = self.buffer
 
     @with_conn
     def open_in_app(self, parent: QWidget, mf: Mf, data: tuple):
@@ -383,20 +370,15 @@ class WinMain(UMainWindow):
         # готовим информацию для сканера
         self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
 
-        # if self.buffer.type_ == "cut":
-        #     # если Mf откуда вырезаны файлы и Mf куда вставлены файла
-        #     # это разные объекты, то нужно просканировать оба объекта
-        #     if self.buffer.src_mf != Mf.current:
-        #         self.single_scaner_data[Mf.current].extend(
-        #             self.buffer.dirs_to_scan
-        #         )
-        #     # если файлы вырезаны и вставлены в рамках одного Mf,
-        #     # то нужно просканировать директорию, откуда вырезаны файлы
-        #     # и директорию, куда вставлены файлы
-        #     else:
-        #         self.single_scaner_data[self.buffer.src_mf].extend(
-        #             self.buffer.dirs_to_scan
-        #         )
+        if self.buffer.type_ == "cut":
+            if self.buffer.src_mf != Mf.current:
+                self.single_scaner_data[Mf.current].extend(
+                    self.buffer.dirs_to_scan
+                )
+            else:
+                self.single_scaner_data[self.buffer.src_mf].extend(
+                    self.buffer.dirs_to_scan
+                )
 
 
         # если файл скопирован и вставляется в одну и ту же директорию
@@ -710,11 +692,16 @@ class WinMain(UMainWindow):
         self.reset_task.sigs.finished_.connect(reset_data_finished)
         UThreadPool.start(self.reset_task)
 
-    def copy_files_win(self):
+    def copy_files_win(
+            self,
+            files_to_copy: list[str],
+            target_dir: str,
+            action_type: Literal["cut", "copy"]
+        ):
         progress_win = WinCopyFiles(
-            files_to_copy=self.buffer.files_to_copy,
-            target_dir=self.buffer.target_dir,
-            buffer_type=self.buffer.type_
+            files_to_copy=files_to_copy,
+            target_dir=target_dir,
+            action_type=action_type
         )
         progress_win.center_to_parent(self)
         progress_win.show()   

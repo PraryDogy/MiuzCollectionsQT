@@ -90,6 +90,7 @@ class SettingsItem:
 @dataclass(slots=True)
 class Buffer:
     type_: Literal["cut", "copy"]
+    source_mf: Mf
     files_to_copy: Optional[list[str]]
     target_dir: Optional[str]
 

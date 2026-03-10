@@ -132,7 +132,7 @@ class WinCopyFiles(ProgressbarWin):
     finished_ = pyqtSignal(list)
     ms = 500
 
-    def __init__(self, target_dir: str, files_to_copy: list[str], buffer_type: bool):
+    def __init__(self, target_dir: str, files_to_copy: list[str], action_type: bool):
         super().__init__(Lng.copying[cfg.lng])
         self.above_label.setText(
             f"{Lng.copying[cfg.lng]} {Lng.in_[cfg.lng]} \"{os.path.basename(target_dir)}\""
@@ -140,12 +140,12 @@ class WinCopyFiles(ProgressbarWin):
 
         self.dst_urls: list[str] = []
         self.cancel.connect(self.deleteLater)
-        buffer_type = True if buffer_type == "cut" else False
+        action_type = True if action_type == "cut" else False
 
         self.copy_task_item = CopyTaskItem(
             dst_dir=target_dir,
             src_urls=files_to_copy,
-            is_cut=buffer_type
+            is_cut=action_type
         )
         self.copy_task = CopyTaskWorker(
             target=CopyTask.start,
