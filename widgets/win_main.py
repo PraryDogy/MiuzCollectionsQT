@@ -315,17 +315,6 @@ class WinMain(UMainWindow):
 
     @with_conn
     def paste_files(self, parent: QWidget, mf: Mf):
-
-        def scan_dirs(*args):
-            # self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
-            self.start_scaner_task()
-
-        def start_copy_files():
-            copy_files_win = self.copy_files_win()
-            copy_files_win.finished_.connect(
-                lambda files: scan_dirs(files)
-            )
-
         self.buffer.target_dir = Utils.get_abs_any_path(
             mf_path=Mf.current.curr_path,
             rel_path=Dynamic.current_dir
@@ -344,12 +333,13 @@ class WinMain(UMainWindow):
             if self.buffer.source_mf == Mf.current:
                 self.single_scaner_data[Mf.current].extend(dirs_to_scan)
             else:
-                self.single_scaner_data[self.buffer.source_mf].extend(
-                    self.buffer.dirs_to_scan
-                )
-
-        copy_files_win = self.copy_files_win()
-        copy_files_win.finished_.connect(self.start_scaner_task)
+                self.single_scaner_data[self.buffer.source_mf].extend(dirs_to_scan)
+        copy_files_win = self.copy_files_win(
+            files_to_copy=self.buffer.files_to_copy,
+            target_dir=self.buffer.target_dir,
+            action_type=self.buffer.type_
+        )
+        copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
 
     @with_conn
     def open_in_app(self, parent: QWidget, mf: Mf, data: tuple):
