@@ -1,19 +1,38 @@
-a  = [
-    "/Users/evlosh/Desktop/08.11.2024_R2018-HDR-0161.jpg",
-    "/Users/evlosh/Desktop/IMAGE 2026-03-10 13:54:00.tif",
-    "/Users/evlosh/Desktop/2017-09-10_14-28-38.jpg",
-    "/Users/evlosh/Desktop/Без названия.txt",
-]
 
-import os
-
-dirs = []
-dirs_to_scan = list(set(
-    os.path.dirname(i)
-    for i in a
-))
+def check(x: int, y: int):
+    
 
 
-dirs.append(*dirs_to_scan)
 
-print
+    if x > 0 and y > 0:
+        return 1
+    elif x < 0 and y > 0:
+        return 2
+    elif x < 0 and y < 0:
+        return 3
+    elif x > 0 and y < 0:
+        return 4
+    else:
+        return None
+
+
+counters = {
+    1: {"name": "Первая четверть", "count": 0},
+    2: {"name": "Вторая четверть", "count": 0},
+    3: {"name": "Третья четверть", "count": 0},
+    4: {"name": "Четвертая четверть", "count": 0},
+}
+
+count = int(input())
+for i in range(1, count + 1):
+    try:
+        x, y = map(int, input().split())
+        res = check(x, y)
+        if res:
+            counters[res]["count"] += 1
+    except Exception:
+        break
+
+for v in counters.values():
+    text = f'{v["name"]}: {v["count"]}'
+    print(text)
