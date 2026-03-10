@@ -429,20 +429,23 @@ class WinMain(UMainWindow):
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda files: scan_dirs(files))
 
+        if not Mf.current.get_available_path():
+            self.open_win_smb(self, Mf.current)
+            return
+
         abs_current_dir = Utils.get_abs_any_path(
             mf_path=mf.curr_path, 
             rel_path=Dynamic.current_dir
         )
-        if self.buffer.dirs_to_scan:
-            copy_self = abs_current_dir in self.buffer.dirs_to_scan
-            if copy_self:
-                # копировать в себя нельзя
-                self.win_warn = WarningWindow(Lng.copy_name_same_dir[cfg.lng])
-                self.win_warn.center_to_parent(self)
-                self.win_warn.show()
-                return
-        if self.buffer:
-            start_copy_files()
+
+        if abs_current_dir in self.buffer.dirs_to_scan:
+            # копировать в себя нельзя
+            self.win_warn = WarningWindow(Lng.copy_name_same_dir[cfg.lng])
+            self.win_warn.center_to_parent(self)
+            self.win_warn.show()
+            return
+
+        start_copy_files()
 
     @with_conn
     def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
