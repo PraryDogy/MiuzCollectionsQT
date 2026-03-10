@@ -398,10 +398,6 @@ class WinMain(UMainWindow):
     def paste_files(self, parent: QWidget, mf: Mf):
 
         def scan_dirs(files: list[str]):
-            if not files:
-                return
-
-            self.buffer.dst_dir = abs_current_dir
             self.single_scaner_data[Mf.current].append(self.buffer.dst_dir)
             if self.buffer.type_ == "cut":
                 # если Mf откуда вырезаны файлы и Mf куда вставлены файла
@@ -421,11 +417,6 @@ class WinMain(UMainWindow):
             self.start_scaner_task()
 
         def start_copy_files():
-            self.buffer.dst_dir = Utils.get_abs_any_path(
-                mf_path=Mf.current.curr_path,
-                rel_path=Dynamic.current_dir
-            )
-
             copy_files_win = self.copy_files_win()
             copy_files_win.finished_.connect(lambda files: scan_dirs(files))
 
@@ -433,12 +424,12 @@ class WinMain(UMainWindow):
             self.open_win_smb(self, Mf.current)
             return
 
-        abs_current_dir = Utils.get_abs_any_path(
-            mf_path=mf.curr_path, 
+        self.buffer.dst_dir = Utils.get_abs_any_path(
+            mf_path=Mf.current.curr_path,
             rel_path=Dynamic.current_dir
         )
 
-        if abs_current_dir in self.buffer.dirs_to_scan:
+        if self.buffer.dst_dir in self.buffer.dirs_to_scan:
             # копировать в себя нельзя
             self.win_warn = WarningWindow(Lng.copy_name_same_dir[cfg.lng])
             self.win_warn.center_to_parent(self)
