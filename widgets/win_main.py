@@ -304,8 +304,7 @@ class WinMain(UMainWindow):
         self.buffer = Buffer(
             type_=buffer_type,
             source_mf=Mf.current,
-            files_to_copy=abs_files_to_copy,
-            target_dir=None,
+            files_to_copy=abs_files_to_copy
         )
         if self.buffer.type_ == "cut":
             for i in self.grid.selected_widgets:
@@ -315,15 +314,13 @@ class WinMain(UMainWindow):
 
     @with_conn
     def paste_files(self, parent: QWidget, mf: Mf):
-        self.buffer.target_dir = Utils.get_abs_any_path(
+        target_dir = Utils.get_abs_any_path(
             mf_path=Mf.current.curr_path,
             rel_path=Dynamic.current_dir
         )
-
         # готовим информацию для сканера
         # сканировать директорию куда вставлены изображения
-        self.scaner_data[Mf.current].append(self.buffer.target_dir)
-
+        self.scaner_data[Mf.current].append(target_dir)
         # сканировать директорию откуда вырезано
         if self.buffer.type_ == "cut":
             dirs_to_scan = list(set(
@@ -336,7 +333,7 @@ class WinMain(UMainWindow):
                 self.scaner_data[self.buffer.source_mf].extend(dirs_to_scan)
         copy_files_win = self.copy_files_win(
             files_to_copy=self.buffer.files_to_copy,
-            target_dir=self.buffer.target_dir,
+            target_dir=target_dir,
             action_type=self.buffer.type_
         )
         copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
@@ -428,8 +425,7 @@ class WinMain(UMainWindow):
             self.buffer = Buffer(
                 type_="copy",
                 source_mf=Mf.current,
-                files_to_copy=files_to_copy,
-                target_dir=target_dir,
+                files_to_copy=files_to_copy
             )
 
             self.grid.buffer = self.buffer
