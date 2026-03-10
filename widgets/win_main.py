@@ -170,7 +170,7 @@ class WinMain(UMainWindow):
             lambda: self.paste_files(self.grid,  Mf.current)
         )
         self.grid.set_clipboard.connect(
-            lambda data: self.set_clipboard(self.grid, Mf.current, data)
+            lambda data: self.set_buffer(self.grid, Mf.current, data)
         )
         self.grid.setup_mf.connect(
             self.open_settings_win
@@ -295,7 +295,7 @@ class WinMain(UMainWindow):
         copy_files_win.finished_.connect(Utils.reveal_files)
 
     @with_conn
-    def set_clipboard(self, parent: QWidget, mf: Mf, data: tuple):
+    def set_buffer(self, parent: QWidget, mf: Mf, data: tuple):
         buffer_type, rel_files_to_copy = data
         abs_files_to_copy = [
             Utils.get_abs_any_path(mf.curr_path, i)
@@ -311,6 +311,45 @@ class WinMain(UMainWindow):
             for i in self.grid.selected_widgets:
                 i.set_transparent_frame(0.5)
         self.grid.buffer = self.buffer
+
+
+    @with_conn
+    def paste_files(self, parent: QWidget, mf: Mf):
+
+        def scan_dirs(*args):
+            # self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
+            self.start_scaner_task()
+
+        def start_copy_files():
+            copy_files_win = self.copy_files_win()
+            copy_files_win.finished_.connect(
+                lambda files: scan_dirs(files)
+            )
+
+        self.buffer.target_dir = Utils.get_abs_any_path(
+            mf_path=Mf.current.curr_path,
+            rel_path=Dynamic.current_dir
+        )
+
+        # готовим информацию для сканера
+        # сканировать директорию куда вставлены изображения
+        self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
+
+        # сканировать директорию откуда вырезано
+        if self.buffer.type_ == "cut":
+            dirs_to_scan = list(set(
+                os.path.dirname(i)
+                for i in self.buffer.files_to_copy
+            ))
+            if self.buffer.source_mf == Mf.current:
+                self.single_scaner_data[Mf.current].extend(dirs_to_scan)
+            else:
+                self.single_scaner_data[self.buffer.source_mf].extend(
+                    self.buffer.dirs_to_scan
+                )
+
+        copy_files_win = self.copy_files_win()
+        copy_files_win.finished_.connect(self.start_scaner_task)
 
     @with_conn
     def open_in_app(self, parent: QWidget, mf: Mf, data: tuple):
@@ -348,43 +387,6 @@ class WinMain(UMainWindow):
             for i in rel_paths
         ]
         Utils.copy_text("\n".join(abs_paths))
-
-    @with_conn
-    def paste_files(self, parent: QWidget, mf: Mf):
-
-        def scan_dirs(*args):
-            # self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
-            self.start_scaner_task()
-
-        def start_copy_files():
-            copy_files_win = self.copy_files_win()
-            copy_files_win.finished_.connect(
-                lambda files: scan_dirs(files)
-            )
-
-        self.buffer.target_dir = Utils.get_abs_any_path(
-            mf_path=Mf.current.curr_path,
-            rel_path=Dynamic.current_dir
-        )
-
-        # готовим информацию для сканера
-        self.single_scaner_data[Mf.current].append(self.buffer.target_dir)
-
-        if self.buffer.type_ == "cut":
-            if self.buffer.src_mf != Mf.current:
-                self.single_scaner_data[Mf.current].extend(
-                    self.buffer.dirs_to_scan
-                )
-            else:
-                self.single_scaner_data[self.buffer.src_mf].extend(
-                    self.buffer.dirs_to_scan
-                )
-
-
-        # если файл скопирован и вставляется в одну и ту же директорию
-        # то добавлять циферку
-        # в иных случаях предлагать заменить или отменить
-        start_copy_files()
 
     @with_conn
     def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
@@ -435,10 +437,9 @@ class WinMain(UMainWindow):
 
             self.buffer = Buffer(
                 type_="copy",
-                dirs_to_scan=None,
+                source_mf=Mf.current,
                 files_to_copy=files_to_copy,
                 target_dir=target_dir,
-                src_mf=Mf.current
             )
 
             self.grid.buffer = self.buffer
