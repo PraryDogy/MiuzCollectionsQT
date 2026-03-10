@@ -1,9 +1,8 @@
-from collections import defaultdict
+def test(callback: callable):
+    callback(123)
+
+def abc(*args):
+    print(args)
 
 
-a: defaultdict[str, list] = defaultdict(list)
-
-
-a["gello"].extend([1,2, 3])
-
-print(a)
+final = test(lambda e, a=1: abc(e, a))

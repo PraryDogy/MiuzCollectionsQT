@@ -80,7 +80,7 @@ class WinMain(UMainWindow):
         self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
 
-        self.watchdog_data: defaultdict[Mf, list[str]] = defaultdict(list)
+        self.single_scaner_data: defaultdict[Mf, list[str]] = defaultdict(list)
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -401,27 +401,23 @@ class WinMain(UMainWindow):
             if not files:
                 return
 
-            # self.buffer.mf_to_scan = Mf.current
             self.buffer.dst_dir = abs_current_dir
-
-            self.watchdog_data[self.buffer.mf_to_scan].append(
-                self.buffer.dst_dir
-            )
+            self.single_scaner_data[Mf.current].append(self.buffer.dst_dir)
             if self.buffer.type_ == "cut":
                 # если Mf откуда вырезаны файлы и Mf куда вставлены файла
                 # это разные объекты, то нужно просканировать оба объекта
                 if self.buffer.mf_to_scan != Mf.current:
-                    self.watchdog_data[Mf.current].extend(
+                    self.single_scaner_data[Mf.current].extend(
                         self.buffer.dirs_to_scan
                     )
                 # если файлы вырезаны и вставлены в рамках одного Mf,
                 # то нужно просканировать директорию, откуда вырезаны файлы
                 # и директорию, куда вставлены файлы
                 else:
-                    self.watchdog_data[self.buffer.mf_to_scan].extend(
+                    self.single_scaner_data[self.buffer.mf_to_scan].extend(
                         self.buffer.dirs_to_scan
                     )
-
+            print(self.single_scaner_data)
             self.start_scaner_task()
 
         def start_copy_files():
@@ -456,7 +452,7 @@ class WinMain(UMainWindow):
                 file_remover.proc_q.get()
             if not file_remover.is_alive():
                 file_remover.terminate_join()
-                self.watchdog_data[mf].extend(dirs_to_scan)
+                self.single_scaner_data[mf].extend(dirs_to_scan)
                 self.start_scaner_task()
             else:
                 QTimer.singleShot(ms, poll_file_remover)
@@ -673,11 +669,11 @@ class WinMain(UMainWindow):
             can_start = False
 
         if can_start:
-            if self.watchdog_data:
+            if self.single_scaner_data:
                 print("штатно запускаю SINGLE сканер")
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
-                    args=(SingleDirScanerItem(self.watchdog_data), )
+                    args=(SingleDirScanerItem(self.single_scaner_data), )
                     )
             else:
                 print("штатно запускаю ОБЩИЙ сканер")
@@ -693,7 +689,7 @@ class WinMain(UMainWindow):
 
             self.scaner_task.start()
             tmr.start(ms)
-            self.watchdog_data.clear()
+            self.single_scaner_data.clear()
             self.loop_tmr.stop()
             self.loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
 
