@@ -397,7 +397,7 @@ class WinMain(UMainWindow):
     @with_conn
     def paste_files(self, parent: QWidget, mf: Mf):
 
-        def scan_dirs(files: list[str]):
+        def scan_dirs(*args):
             self.single_scaner_data[Mf.current].append(self.buffer.dst_dir)
             if self.buffer.type_ == "cut":
                 # если Mf откуда вырезаны файлы и Mf куда вставлены файла
