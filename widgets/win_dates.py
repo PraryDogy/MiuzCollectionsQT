@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from typing import Literal
 
 from PyQt5.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QIcon, QKeyEvent
 from PyQt5.QtWidgets import (QCalendarWidget, QFrame, QLabel, QSpacerItem,
-                             QVBoxLayout, QWidget)
+                             QToolButton, QVBoxLayout, QWidget)
 
 from cfg import Dynamic, cfg
 from system.lang import Lng
@@ -74,15 +74,29 @@ class MyCalendar(QFrame):
         else:
             self.calendar.setLocale(QLocale(QLocale.Language.English))
         self.calendar.clicked.connect(self.on_date_clicked)
+        self.set_calendar_icons()
 
     def on_date_clicked(self, date: QDate):
         self.dateSelected.emit(date)
 
     def set_date(self, py_date: datetime):
         qdate = QDate(py_date.year, py_date.month, py_date.day)
-        print(qdate, qdate.isValid())  # проверка
-        QTimer.singleShot(100, lambda: self.calendar.setSelectedDate(qdate))
-        # self.calendar.setCurrentPage(qdate.year(), qdate.month())
+        self.calendar.setSelectedDate(qdate)
+
+    def set_calendar_icons(self, icon_size: int = 10):
+        buttons = self.findChildren(QToolButton)
+
+        for btn in buttons:
+            name = btn.objectName()
+
+            if name == "qt_calendar_prevmonth":
+                btn.setIcon(QIcon("./images/prev.svg"))
+                # btn.setIconSize(icon_size)
+
+            elif name == "qt_calendar_nextmonth":
+                btn.setIcon(QIcon("./images/next.svg"))
+                # btn.setIconSize(QSize())
+
 
 
 class WinDates(SingleActionWindow):
