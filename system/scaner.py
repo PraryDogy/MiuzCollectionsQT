@@ -370,44 +370,44 @@ class ImgCompator:
 
 
 class HashdirImgUpdater:
-    @staticmethod
-    def start(scaner_item: IntScanerItem, del_images: list, new_images: list):
-        """
-        - Удаляет из `hashdir` миниатюры, которых больше нет в Finder
-        - Добавляет миниатюры в `hashdir`, которые есть в Finder
-        - Возвращает список успешно удаленных и список успешно добавленных
-          миниатюр.
-        - Далее необходимо обновить информацию в базе данных на основе
-          полученных списков.
+    # @staticmethod
+    # def start(scaner_item: IntScanerItem, del_images: list, new_images: list):
+    #     """
+    #     - Удаляет из `hashdir` миниатюры, которых больше нет в Finder
+    #     - Добавляет миниатюры в `hashdir`, которые есть в Finder
+    #     - Возвращает список успешно удаленных и список успешно добавленных
+    #       миниатюр.
+    #     - Далее необходимо обновить информацию в базе данных на основе
+    #       полученных списков.
 
-        Получить данные del_images и new_images необходимо из ImgCompator.  
-        Параметры:  
-        - del_images список ImgItem
-        - new_images список ImgItem
+    #     Получить данные del_images и new_images необходимо из ImgCompator.  
+    #     Параметры:  
+    #     - del_images список ImgItem
+    #     - new_images список ImgItem
 
-        Возвращает:
-        Словарь
-        - "ok_del_images": успешно удаленные из `hashdir` список `ImgItem`
-        - "bad_del_images": неудачно удаленные из `hashdir` список `ImgItem`
-        - "ok_new_images": успешно добавленные в `hashdir` список `ImgItem`
-        - "bad_new_images": неудачно добавленные в `hashdir` список `ImgItem`
-        """
-        scaner_item.total_count = len(del_images) + len(new_images)
-        ok_del_images, bad_del_images = HashdirImgUpdater.run_del_images(
-            scaner_item=scaner_item,
-            del_images=del_images
-        )
-        ok_new_images, bad_new_images = HashdirImgUpdater.run_new_images(
-            scaner_item=scaner_item,
-            new_images=new_images
-        )
+    #     Возвращает:
+    #     Словарь
+    #     - "ok_del_images": успешно удаленные из `hashdir` список `ImgItem`
+    #     - "bad_del_images": неудачно удаленные из `hashdir` список `ImgItem`
+    #     - "ok_new_images": успешно добавленные в `hashdir` список `ImgItem`
+    #     - "bad_new_images": неудачно добавленные в `hashdir` список `ImgItem`
+    #     """
+    #     scaner_item.total_count = len(del_images) + len(new_images)
+    #     ok_del_images, bad_del_images = HashdirImgUpdater.run_del_images(
+    #         scaner_item=scaner_item,
+    #         del_images=del_images
+    #     )
+    #     ok_new_images, bad_new_images = HashdirImgUpdater.run_new_images(
+    #         scaner_item=scaner_item,
+    #         new_images=new_images
+    #     )
 
-        return {
-            "ok_del_images": ok_del_images,
-            "bad_del_images": bad_del_images,
-            "ok_new_images": ok_new_images,
-            "bad_new_images": bad_new_images
-        }
+    #     return {
+    #         "ok_del_images": ok_del_images,
+    #         "bad_del_images": bad_del_images,
+    #         "ok_new_images": ok_new_images,
+    #         "bad_new_images": bad_new_images
+    #     }
 
     @staticmethod
     def run_del_images(scaner_item: IntScanerItem, del_images: list[ImgItem]):
@@ -491,25 +491,24 @@ class HashdirImgUpdater:
 
 
 class DbImgUpdater:
-    @staticmethod
-    def start(
-        scaner_item: IntScanerItem,
-        del_images: list[ImgItem],
-        new_images: list[ImgItem],
-    ):
-        if del_images:
-            DbImgUpdater.remove_del_imgs(scaner_item, del_images)
-            ext_item = ExtScanerItem("", True)
-            scaner_item.q.put(ext_item)
-        if new_images:
-            DbImgUpdater.remove_exits_imgs(scaner_item, new_images)
-            DbImgUpdater.add_new_imgs(scaner_item, new_images)
-            ext_item = ExtScanerItem("", True)
-            scaner_item.q.put(ext_item)
-        return None
+    # @staticmethod
+    # def start(
+    #     scaner_item: IntScanerItem,
+    #     del_images: list[ImgItem],
+    #     new_images: list[ImgItem],
+    # ):
+    #     if del_images:
+    #         DbImgUpdater.remove_del_imgs(scaner_item, del_images)
+    #     if new_images:
+    #         DbImgUpdater.remove_exits_imgs(scaner_item, new_images)
+    #         DbImgUpdater.add_new_imgs(scaner_item, new_images)
+    #     return None
 
     @staticmethod
     def remove_del_imgs(scaner_item: IntScanerItem, del_images: list[ImgItem]):
+        """
+        Удаляет из БД удаленные изображения.
+        """
         conn = scaner_item.eng.connect()
         rel_thumb_paths = [i.rel_thumb_path for i in del_images]
         q = sqlalchemy.delete(Thumbs.table).where(
@@ -519,9 +518,14 @@ class DbImgUpdater:
         conn.execute(q)
         conn.commit()
         conn.close()
+        ext_item = ExtScanerItem("", True)
+        scaner_item.q.put(ext_item)
 
     @staticmethod
     def remove_exits_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
+        """
+        Удаляет записи из БД об успешно сохраненных изображениях.
+        """
         conn = scaner_item.eng.connect()
         rel_img_paths = [
             Utils.get_rel_any_path(
@@ -540,6 +544,9 @@ class DbImgUpdater:
 
     @staticmethod
     def add_new_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
+        """
+        Добавляет записи из БД об успешно сохраненных изображениях.
+        """
         conn = scaner_item.eng.connect()
         values_list = []
         for img_item in new_images:
@@ -566,6 +573,8 @@ class DbImgUpdater:
         conn.execute(sqlalchemy.insert(Thumbs.table), values_list)
         conn.commit()
         conn.close()
+        ext_item = ExtScanerItem("", True)
+        scaner_item.q.put(ext_item)
 
 
 class NewDirsWorker:    
@@ -587,11 +596,59 @@ class NewDirsWorker:
             db_images=db_images
         )
 
-        result = HashdirImgUpdater.start(
+        # общий счет для отображения в GUI
+        scaner_item.total_count = len(del_images) + len(new_images)
+
+        # удаляем миниатюры
+        ok_del_images, bad_del_images = HashdirImgUpdater.run_del_images(
             scaner_item=scaner_item,
-            del_images=del_images,
-            new_images=new_images
+            del_images=del_images
         )
+
+        # обновляем БД об успешно удаленных миниатюрах
+        DbImgUpdater.remove_del_imgs(
+            scaner_item=scaner_item,
+            del_images=ok_del_images
+        )
+
+        # создаем список неуспешно созданных миниатюр
+        bad_new_images: list[ImgItem] = []
+        # шаг про котором мы пишем минитюры и обновляем БД
+        step = 10
+        # делим новые миниатюры на списки по 10
+        chunked_new_images = [
+            new_images[i:i+step]
+            for i in range(0, len(new_images), step)
+        ]
+        for new_images_chunk in chunked_new_images:
+            # создаем миниатюры с шагом 10
+            # получаем успешно и неуспешно созданные миниатюры
+            ok_chunks, bad_chunks = HashdirImgUpdater.run_new_images(
+                scaner_item=scaner_item,
+                new_images=new_images_chunk
+            )
+            # обновляем БД об успешно созданных миниатюрах
+            # удаляем записи для последующего добавляения
+            # аналог sqlalchemy.update - delete + insert
+            DbImgUpdater.remove_exits_imgs(
+                scaner_item=scaner_item,
+                new_images=ok_chunks
+            )
+            # обновляем БД об успешно созданных миниатюрах
+            # добавляем записи для последующего добавляения
+            # аналог sqlalchemy.update - delete + insert
+            DbImgUpdater.add_new_imgs(
+                scaner_item=scaner_item,
+                new_images=ok_chunks
+            )
+            # обновляем список неуспешно созданных миниатюр
+            bad_new_images.extend(bad_chunks)
+
+        # result = HashdirImgUpdater.start(
+        #     scaner_item=scaner_item,
+        #     del_images=del_images,
+        #     new_images=new_images
+        # )
         DbImgUpdater.start(
             scaner_item=scaner_item,
             del_images=result["ok_del_images"],
