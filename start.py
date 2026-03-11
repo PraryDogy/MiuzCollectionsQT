@@ -111,17 +111,15 @@ class App(QApplication):
                 i.show()
         return super().eventFilter(a0, a1)
 
+# показывает откуда принты
 # import builtins
 # import inspect
-
 # _original_print = print
-
 # def debug_print(*args, **kwargs):
 #     frame = inspect.currentframe().f_back
 #     filename = frame.f_code.co_filename
 #     lineno = frame.f_lineno
 #     _original_print(f"[{filename}:{lineno}]", *args, **kwargs)
-
 # builtins.print = debug_print
 
 
