@@ -861,6 +861,9 @@ class NewFolder(QWidget):
             i.textChanged.connect(self.warning_svg.show)
         
     def preset_new_folder(self, url: str):
+        url = os.sep + url.strip(os.sep)
+        basename = os.path.basename(url)
+        self.name_line_edit.setText(basename)
         self.mf_paths.text_edit_wid.setPlainText(url)
 
     def save(self, *args):
