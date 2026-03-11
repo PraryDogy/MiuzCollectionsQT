@@ -336,6 +336,7 @@ class WinMain(UMainWindow):
             action_type=self.buffer.type_
         )
         del self.buffer
+        del self.grid.buffer
         copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
 
     @with_conn
@@ -706,7 +707,8 @@ class WinMain(UMainWindow):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         
         if a0.key() == Qt.Key.Key_V:
-            self.paste_files(self.grid, Mf.current)
+            if hasattr(self, "buffer"):
+                self.paste_files(self.grid, Mf.current)
         
         elif a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:

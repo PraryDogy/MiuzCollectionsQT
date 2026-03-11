@@ -849,7 +849,7 @@ class Grid(VScrollArea):
             self.menu_.addAction(reload)
 
             if (
-                self.buffer
+                hasattr(self, "buffer")
                 and
                 a0.modifiers() == Qt.KeyboardModifier.ControlModifier
             ):
