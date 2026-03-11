@@ -21,9 +21,7 @@ class WinFilters(SingleActionWindow):
         self.setFixedSize(self.ww, self.hh)
 
         self.list_widget = VListWidget()
-        self.list_widget.itemClicked.connect(
-            self.item_cmd
-        )
+        self.list_widget.itemClicked.connect(self.item_cmd)
         self.central_layout.addWidget(self.list_widget)
 
         favs_item = UListWidgetItem(
@@ -35,6 +33,8 @@ class WinFilters(SingleActionWindow):
         )
         favs_item.setCheckState(Qt.CheckState.Unchecked)
         self.list_widget.addItem(favs_item)
+        if Dynamic.filter_favs:
+            favs_item.setCheckState(Qt.CheckState.Checked)
 
         folder_item = UListWidgetItem(
             parent=self.list_widget,
@@ -45,6 +45,8 @@ class WinFilters(SingleActionWindow):
         )
         folder_item.setCheckState(Qt.CheckState.Unchecked)
         self.list_widget.addItem(folder_item)
+        if Dynamic.filter_only_folder:
+            folder_item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.addItem(UListSpacerItem(parent=self.list_widget))
 
@@ -62,7 +64,21 @@ class WinFilters(SingleActionWindow):
         self.list_widget.setCurrentRow(0)
 
     def item_cmd(self, item: UListWidgetItem):
-        if item.text() in Dynamic.filters_enabled:
+        if item.text() == Lng.favorites[cfg.lng]:
+            if Dynamic.filter_favs:
+                Dynamic.filter_favs = False
+                item.setCheckState(Qt.CheckState.Unchecked)
+            else:
+                Dynamic.filter_favs = True
+                item.setCheckState(Qt.CheckState.Checked)
+        elif item.text() == Lng.only_this_folder[cfg.lng]:
+            if Dynamic.filter_only_folder:
+                Dynamic.filter_only_folder = False
+                item.setCheckState(Qt.CheckState.Unchecked)
+            else:
+                Dynamic.filter_only_folder = True
+                item.setCheckState(Qt.CheckState.Checked)
+        elif item.text() in Dynamic.filters_enabled:
             Dynamic.filters_enabled.remove(item.text())
             item.setCheckState(Qt.CheckState.Unchecked)
         else:

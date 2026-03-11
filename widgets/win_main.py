@@ -266,11 +266,18 @@ class WinMain(UMainWindow):
         self.grid.reload_thumbnails()
     
     def open_filters_win(self):
+
+        def on_closed():
+            if not any((
+                Dynamic.filters_enabled,
+                Dynamic.filter_favs,
+                *Dynamic.filters_enabled,
+            )):
+                self.bar_top.filters_btn.set_normal_style()
+
         self.bar_top.filters_btn.set_solid_style()
         self.filters_win = WinFilters()
-        self.filters_win.closed_.connect(
-            lambda: self.bar_top.filters_btn.set_normal_style()
-        )
+        self.filters_win.closed_.connect(on_closed)
         self.filters_win.reload_thumbnails.connect(
             self.grid.reload_thumbnails
         )
