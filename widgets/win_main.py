@@ -644,12 +644,12 @@ class WinMain(UMainWindow):
                 self.scaner_data.clear()
 
             self.bar_bottom.progress_bar.default_text()
+            self.scaner_task.start()
+
+            self.scaner_poll_timer.stop()
+            self.scaner_poll_timer.start(ms)
 
             self.scaner_check_timer.stop()
-            self.scaner_poll_timer.stop()
-
-            self.scaner_task.start()
-            self.scaner_poll_timer.start(ms)
             self.scaner_check_timer.start(cfg.scaner_minutes * 60 * 1000)
 
         else:
@@ -657,7 +657,7 @@ class WinMain(UMainWindow):
             self.scaner_check_timer.disconnect()
             self.scaner_check_timer.stop()
             self.scaner_check_timer.timeout.connect(self.start_scaner_task)
-            self.scaner_check_timer.start(1*1000)
+            self.scaner_check_timer.start(1*5000)
             print("ожидание сканера")
 
     def restart_scaner_task(self):
