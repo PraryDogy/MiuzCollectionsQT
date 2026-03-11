@@ -88,7 +88,6 @@ class MyCalendar(QFrame):
 
         for btn in buttons:
             name = btn.objectName()
-
             if name == "qt_calendar_prevmonth":
                 btn.setIcon(QIcon("./images/prev.svg"))
 
@@ -96,11 +95,12 @@ class MyCalendar(QFrame):
                 btn.setIcon(QIcon("./images/next.svg"))
 
         self.calendar.setStyleSheet("""
-        #qt_calendar_monthbutton::menu-indicator {
-            image: none;
-            width: 0px;
-        }
+            #qt_calendar_monthbutton::menu-indicator {
+                image: none;
+                width: 0px;
+            }
         """)
+        self.calendar.enterEvent = None
 
 
 class WinDates(SingleActionWindow):
