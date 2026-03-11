@@ -861,9 +861,11 @@ class NewFolder(QWidget):
             i.textChanged.connect(self.warning_svg.show)
         
     def preset_new_folder(self, url: str):
-        url = os.sep + url.strip(os.sep)
-        basename = os.path.basename(url)
-        self.name_line_edit.setText(basename)
+        if url:
+            url = os.sep + url.strip(os.sep)
+            basename = os.path.basename(url)
+            self.name_line_edit.setText(basename)
+            self.warning_svg.show()
         self.mf_paths.text_edit_wid.setPlainText(url)
 
     def save(self, *args):
@@ -991,13 +993,13 @@ class WinSettings(SingleActionWindow):
 
         self.right_lay.addStretch()
 
-        btns_wid = QWidget()
-        btns_wid.setFixedHeight(26)
-        self.right_lay.addWidget(btns_wid)
+        self.btns_wid = QWidget()
+        self.btns_wid.setFixedHeight(26)
+        self.right_lay.addWidget(self.btns_wid)
         btns_lay = UHBoxLayout()
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btns_lay.setSpacing(10)
-        btns_wid.setLayout(btns_lay)
+        self.btns_wid.setLayout(btns_lay)
 
         self.warn_svg = SvgWarning()
         btns_lay.addWidget(self.warn_svg)
@@ -1042,13 +1044,17 @@ class WinSettings(SingleActionWindow):
 
     def init_right_side(self, idx: int):
         if idx == 0:
+            self.btns_wid.show()
             r_wid = GeneralSettings(self.cfg_clone)
         elif idx == 1:
+            self.btns_wid.show()
             r_wid = FiltersWid(self.filters_clone)
         elif idx == 2:
+            self.btns_wid.hide()
             r_wid = NewFolder(self.mf_list_clone)
             r_wid.preset_new_folder(self.settings_item.content)
         elif idx > 3:
+            self.btns_wid.hide()
             item: UListWidgetItem = self.left_menu.item(idx)
             for mf in self.mf_list_clone:
                 if mf.alias == item.text():
