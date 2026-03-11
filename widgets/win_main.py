@@ -655,8 +655,8 @@ class WinMain(UMainWindow):
         else:
             # проверяем каждую минуту, что задача завершена
             self.scaner_check_timer.disconnect()
-            self.scaner_check_timer.timeout.connect(self.start_scaner_task)
             self.scaner_check_timer.stop()
+            self.scaner_check_timer.timeout.connect(self.start_scaner_task)
             self.scaner_check_timer.start(1*1000)
             print("ожидание сканера")
 
