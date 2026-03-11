@@ -59,12 +59,6 @@ class AllDirLoader:
         """
         finder_dirs = AllDirLoader.get_finder_dirs(scaner_item)
         db_dirs = AllDirLoader.get_db_dirs(scaner_item)
-
-        # print(finder_dirs[-1])
-        # for i in db_dirs:
-        #     if i.rel_path == os.sep:
-        #         print(i)
-
         return (finder_dirs, db_dirs)
 
     @staticmethod
@@ -153,9 +147,6 @@ class DirsCompator:
         """
         dirs_to_remove = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         dirs_to_scan = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
-        # корневая директория нестабильно получает время модификации
-        # из-за чего compator будет считать ее неизменной
-        # dirs_to_scan.append(finder_dirs[-1])
         return (dirs_to_remove, dirs_to_scan)
 
     @staticmethod
