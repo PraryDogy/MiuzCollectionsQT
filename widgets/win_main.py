@@ -67,7 +67,6 @@ class USep(QFrame):
 class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
-    scaner_timeout_max = 5 * 60
     warning_svg = "./images/warning.svg"
 
     def __init__(self, argv: list[Literal["noscan", ""]]):
@@ -578,7 +577,6 @@ class WinMain(UMainWindow):
             return
         reload_gui = False
         while not self.scaner_task.proc_q.empty():
-            self.scaner_timeout = time()
             x_scan_item: ExtScanerItem = self.scaner_task.proc_q.get()
             if not reload_gui:
                 reload_gui = x_scan_item.reload_gui
@@ -597,7 +595,6 @@ class WinMain(UMainWindow):
 
         if not hasattr(self, "scaner_task"):
             print("первая инициация сканера")
-            self.scaner_timeout = time()
             self.scaner_task = None
 
             self.scaner_check_timer = QTimer(self)
@@ -610,24 +607,11 @@ class WinMain(UMainWindow):
 
         can_start = False
         alive = self.scaner_task.is_alive() if self.scaner_task else False
-        timeout = time() - self.scaner_timeout
-
-        # задача зависла
-        if alive and timeout > self.scaner_timeout_max:
-            print("сканер завис, принудительно завершаю")
-            self.scaner_task.terminate_join()
-            can_start = True
 
         # задача завершена
-        elif not alive:
+        if not alive:
             print("сканер завершен, можно запускать новый")
             can_start = True
-
-        # задача жива и таймаут меньше заданного времени
-        # то есть задача еще что то делает и сбрасывает таймаут
-        elif alive and timeout < self.scaner_timeout_max:
-            print("сканер еще работает, жду завершения")
-            can_start = False
 
         if can_start:
             if self.scaner_data:
