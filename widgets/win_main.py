@@ -643,7 +643,7 @@ class WinMain(UMainWindow):
                     args=(Mf.list_, )
                 )
                 self.scaner_data.clear()
-            self.bar_bottom.progress_bar.default_text()
+            self.bar_bottom.progress_bar.stop_timer_text()
             self.scaner_task.start()
             self.scaner_poll_timer.stop()
             self.scaner_poll_timer.start(ms)
