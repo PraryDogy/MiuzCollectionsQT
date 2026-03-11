@@ -1120,6 +1120,10 @@ class WinSettings(SingleActionWindow):
     def deleteLater(self):
         self.closed.emit()
         return super().deleteLater()
+    
+    def closeEvent(self, a0):
+        self.closed.emit()
+        return super().closeEvent(a0)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
