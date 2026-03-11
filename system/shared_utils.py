@@ -231,10 +231,6 @@ class ImgUtils:
         return None
 
     @classmethod
-    def _read_psb(cls, path: str):
-        return cls._read_quicklook(path)
-
-    @classmethod
     def _read_quicklook(cls, path: str, size: int = 5000) -> np.ndarray:
         tmp_dir = Path(tempfile.gettempdir())
         subprocess.run(
@@ -245,6 +241,7 @@ class ImgUtils:
         )
         generated_files = list(tmp_dir.glob(Path(path).stem + "*.png"))
         if not generated_files:
+            return None
             raise FileNotFoundError("QuickLook не создал PNG")
         generated = generated_files[0]
         with Image.open(generated) as img:
@@ -396,7 +393,7 @@ class ImgUtils:
         read_any_dict: dict[str, callable] = {}
 
         for i in cls.ext_psd:
-            read_any_dict[i] = cls._read_psb
+            read_any_dict[i] = cls._read_quicklook
         for i in cls.ext_tiff:
             read_any_dict[i] = cls._read_tiff
         for i in cls.ext_raw:
