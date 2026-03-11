@@ -481,7 +481,10 @@ class HashdirImgUpdater:
                         mf_path=scaner_item.mf.curr_path,
                         abs_img_path=img_item.abs_img_path
                     )
-                    thumb_path = Utils.create_abs_thumb_path(rel_img_path)
+                    thumb_path = Utils.create_abs_thumb_path(
+                        rel_img_path=rel_img_path,
+                        mf_alias=scaner_item.mf.alias
+                    )
                     Utils.write_thumb(thumb_path, img)
                     ok_new_images.append(img_item)
                     scaner_item.total_count -= 1
@@ -564,7 +567,10 @@ class DbImgUpdater:
                 mf_path=scaner_item.mf.curr_path,
                 abs_img_path=img_item.abs_img_path
             )
-            abs_thumb_path = Utils.create_abs_thumb_path(rel_img_path)
+            abs_thumb_path = Utils.create_abs_thumb_path(
+                rel_img_path=rel_img_path,
+                mf_alias=scaner_item.mf.alias
+            )
             rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
             values_list.append({
                 ColumnNames.rel_item_path: rel_img_path,

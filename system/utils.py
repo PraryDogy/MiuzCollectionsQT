@@ -66,11 +66,14 @@ class Utils:
             return None
 
     @classmethod
-    def create_abs_thumb_path(cls, rel_img_path: str) -> str | None:
-        new_name = hashlib.md5(rel_img_path.encode('utf-8')).hexdigest() + ".jpg"
-        new_folder = os.path.join(Static.app_support_hashdir, new_name[:2])
+    def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str) -> str | None:
+        filename = hashlib.md5(rel_img_path.encode('utf-8')).hexdigest() + ".jpg"
+        new_folder = os.path.join(
+            Static.app_support_hashdir,
+            f"{mf_alias}-{filename[:2]}"
+        )
         os.makedirs(new_folder, exist_ok=True)
-        return os.path.join(new_folder, new_name)
+        return os.path.join(new_folder, filename)
 
     @classmethod
     def get_rel_thumb_path(cls, thumb_path: str) -> str | None:
