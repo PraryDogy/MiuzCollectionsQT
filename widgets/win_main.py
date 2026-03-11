@@ -642,16 +642,12 @@ class WinMain(UMainWindow):
                     args=(Mf.list_, )
                 )
                 self.scaner_data.clear()
-
             self.bar_bottom.progress_bar.default_text()
             self.scaner_task.start()
-
             self.scaner_poll_timer.stop()
             self.scaner_poll_timer.start(ms)
-
             self.scaner_check_timer.stop()
             self.scaner_check_timer.start(cfg.scaner_minutes * 60 * 1000)
-
         else:
             # проверяем каждую минуту, что задача завершена
             self.scaner_check_timer.stop()
