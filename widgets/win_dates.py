@@ -74,7 +74,7 @@ class MyCalendar(QFrame):
         else:
             self.calendar.setLocale(QLocale(QLocale.Language.English))
         self.calendar.clicked.connect(self.on_date_clicked)
-        self.set_calendar_icons()
+        self.set_custom_ui()
 
     def on_date_clicked(self, date: QDate):
         self.dateSelected.emit(date)
@@ -83,7 +83,7 @@ class MyCalendar(QFrame):
         qdate = QDate(py_date.year, py_date.month, py_date.day)
         self.calendar.setSelectedDate(qdate)
 
-    def set_calendar_icons(self, icon_size: int = 10):
+    def set_custom_ui(self, icon_size: int = 10):
         buttons = self.findChildren(QToolButton)
 
         for btn in buttons:
@@ -91,12 +91,16 @@ class MyCalendar(QFrame):
 
             if name == "qt_calendar_prevmonth":
                 btn.setIcon(QIcon("./images/prev.svg"))
-                # btn.setIconSize(icon_size)
 
             elif name == "qt_calendar_nextmonth":
                 btn.setIcon(QIcon("./images/next.svg"))
-                # btn.setIconSize(QSize())
 
+        self.calendar.setStyleSheet("""
+        #qt_calendar_monthbutton::menu-indicator {
+            image: none;
+            width: 0px;
+        }
+        """)
 
 
 class WinDates(SingleActionWindow):
