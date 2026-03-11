@@ -392,3 +392,10 @@ class SmallBtn(QPushButton):
         self.setStyleSheet("""
         font-size: 11pt;
         """)
+
+
+class HSep(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setStyleSheet("background: rgba(128, 128, 128, 0.2)")
+        self.setFixedHeight(1)

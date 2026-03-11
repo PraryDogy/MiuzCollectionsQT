@@ -4,7 +4,7 @@ import re
 import shutil
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal, QTimer
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
@@ -22,7 +22,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (SingleActionWindow, SmallBtn, UHBoxLayout,
+from ._base_widgets import (HSep, SingleActionWindow, SmallBtn, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
                             UTextEdit, UVBoxLayout, VListWidget)
 from .win_warn import ConfirmWindow, WarningWindow
@@ -43,13 +43,6 @@ class UPushButton(SmallBtn):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setFixedWidth(100)
-
-
-class USep(QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setStyleSheet("background: rgba(128, 128, 128, 0.2)")
-        self.setFixedHeight(1)
 
 
 class GroupWid(QGroupBox):
@@ -169,7 +162,7 @@ class RebootSettings(GroupWid):
         self.lng_btn.setMenu(self.lng_menu)
         lng_wid.layout_.addWidget(self.lng_btn)
 
-        self.layout_.addWidget(USep())
+        self.layout_.addWidget(HSep())
 
         scaner_time_wid = GroupChild()
         self.layout_.addWidget(scaner_time_wid)
@@ -190,7 +183,7 @@ class RebootSettings(GroupWid):
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_time_wid.layout_.addWidget(self.spin)
 
-        self.layout_.addWidget(USep())
+        self.layout_.addWidget(HSep())
 
         reset_data_wid = GroupChild()
         reset_data_wid.mouseReleaseEvent = self.reset_btn_cmd
@@ -341,7 +334,7 @@ class NonRebootSettings(GroupWid):
         data_size_btn = SvgArrow()
         data_size_wid.layout_.addWidget(data_size_btn)
 
-        self.layout_.addWidget(USep())
+        self.layout_.addWidget(HSep())
 
         show_files_wid = GroupChild()
         show_files_wid.mouseReleaseEvent = self.show_files_cmd
@@ -445,7 +438,7 @@ class Themes(GroupWid):
         title_text = ULabel("Тема")
         title_wid.layout_.addWidget(title_text)
 
-        self.layout_.addWidget(USep())
+        self.layout_.addWidget(HSep())
         self.layout_.addSpacerItem(QSpacerItem(0, 10))
 
         themes_wid = GroupChild()
@@ -599,7 +592,7 @@ class FiltersWid(GroupWid):
         self.layout_.addWidget(filters_text)
 
         self.layout_.addSpacerItem(QSpacerItem(0, 5))
-        self.layout_.addWidget(USep())
+        self.layout_.addWidget(HSep())
 
         erase_filters_wid = GroupChild()
         erase_filters_wid.setFixedHeight(40)
@@ -614,7 +607,7 @@ class FiltersWid(GroupWid):
         self.reset_btn = SvgArrow()
         erase_filters_wid.layout_.addWidget(self.reset_btn)
 
-        self.layout_.addWidget(USep())
+        self.layout_.addWidget(HSep())
         self.layout_.addSpacerItem(QSpacerItem(0, 10))
 
         self.filters_edit = UTextEdit()
@@ -749,7 +742,7 @@ class MfSettings(QWidget):
         reset_btn = SvgArrow()
         reset_wid.layout_.addWidget(reset_btn)
 
-        general_wid.layout_.addWidget(USep())
+        general_wid.layout_.addWidget(HSep())
 
         remove_wid = GroupChild()
         remove_wid.mouseReleaseEvent = self.remove_cmd
