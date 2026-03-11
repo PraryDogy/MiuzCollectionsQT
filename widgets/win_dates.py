@@ -156,6 +156,9 @@ class WinDates(SingleActionWindow):
         else:
             Dynamic.date_end = date
             self.right_calendar.title.set_named_date_text(date)
+            self.left_calendar.calendar.setMaximumDate(
+                QDate(date.year, date.month, date.day)
+            )
 
         if all((Dynamic.date_start, Dynamic.date_end)):
             Dynamic.f_date_start = self.named_date(Dynamic.date_start)

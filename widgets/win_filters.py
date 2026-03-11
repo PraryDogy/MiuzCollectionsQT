@@ -111,6 +111,7 @@ class WinFilters(SingleActionWindow):
         Dynamic.filter_only_folder = False
         Dynamic.filters_enabled.clear()
         self.reload_thumbnails.emit()
+        self.deleteLater()
 
     def closeEvent(self, a0):
         self.closed_.emit()
