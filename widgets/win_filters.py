@@ -8,8 +8,10 @@ from ._base_widgets import (SingleActionWindow, UListSpacerItem,
                             UListWidgetItem, VListWidget)
 
 
+
 class WinFilters(SingleActionWindow):
     closed_ = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
     ww = 400
     hh = 400
 
@@ -23,6 +25,28 @@ class WinFilters(SingleActionWindow):
             self.item_cmd
         )
         self.central_layout.addWidget(self.list_widget)
+
+        favs_item = UListWidgetItem(
+            parent=self.list_widget,
+            text=Lng.favorites[cfg.lng]
+        )
+        favs_item.setFlags(
+            favs_item.flags() | Qt.ItemFlag.ItemIsUserCheckable
+        )
+        favs_item.setCheckState(Qt.CheckState.Unchecked)
+        self.list_widget.addItem(favs_item)
+
+        folder_item = UListWidgetItem(
+            parent=self.list_widget,
+            text=Lng.only_this_folder[cfg.lng]
+        )
+        folder_item.setFlags(
+            folder_item.flags() | Qt.ItemFlag.ItemIsUserCheckable
+        )
+        folder_item.setCheckState(Qt.CheckState.Unchecked)
+        self.list_widget.addItem(folder_item)
+
+        self.list_widget.addItem(UListSpacerItem(parent=self.list_widget))
 
         for i in Filters.filters:
             item = UListWidgetItem(
@@ -44,6 +68,7 @@ class WinFilters(SingleActionWindow):
         else:
             Dynamic.filters_enabled.append(item.text())
             item.setCheckState(Qt.CheckState.Checked)
+        self.reload_thumbnails.emit()
 
     def closeEvent(self, a0):
         self.closed_.emit()

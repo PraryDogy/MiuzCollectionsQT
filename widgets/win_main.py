@@ -271,6 +271,9 @@ class WinMain(UMainWindow):
         self.filters_win.closed_.connect(
             lambda: self.bar_top.filters_btn.set_normal_style()
         )
+        self.filters_win.reload_thumbnails.connect(
+            self.grid.reload_thumbnails
+        )
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
 
