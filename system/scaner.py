@@ -595,22 +595,18 @@ class NewDirsWorker:
             finder_images=finder_images,
             db_images=db_images
         )
-
         # общий счет для отображения в GUI
         scaner_item.total_count = len(del_images) + len(new_images)
-
         # удаляем миниатюры
         ok_del_images, bad_del_images = HashdirImgUpdater.run_del_images(
             scaner_item=scaner_item,
             del_images=del_images
         )
-
         # обновляем БД об успешно удаленных миниатюрах
         DbImgUpdater.remove_del_imgs(
             scaner_item=scaner_item,
             del_images=ok_del_images
         )
-
         # создаем список неуспешно созданных миниатюр
         bad_new_images: list[ImgItem] = []
         # шаг про котором мы пишем минитюры и обновляем БД
@@ -644,20 +640,9 @@ class NewDirsWorker:
             # обновляем список неуспешно созданных миниатюр
             bad_new_images.extend(bad_chunks)
 
-        # result = HashdirImgUpdater.start(
-        #     scaner_item=scaner_item,
-        #     del_images=del_images,
-        #     new_images=new_images
-        # )
-        DbImgUpdater.start(
-            scaner_item=scaner_item,
-            del_images=result["ok_del_images"],
-            new_images=result["ok_new_images"]
-        )
-
         dirs_to_scan = DbDirUpdater.get_good_dirs(
-            bad_del_images=result["bad_del_images"],
-            bad_new_images=result["bad_new_images"],
+            bad_del_images=bad_del_images,
+            bad_new_images=bad_new_images,
             dirs_to_scan=dirs_to_scan
         )
 
