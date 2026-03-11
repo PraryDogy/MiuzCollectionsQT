@@ -370,44 +370,6 @@ class ImgCompator:
 
 
 class HashdirImgUpdater:
-    # @staticmethod
-    # def start(scaner_item: IntScanerItem, del_images: list, new_images: list):
-    #     """
-    #     - Удаляет из `hashdir` миниатюры, которых больше нет в Finder
-    #     - Добавляет миниатюры в `hashdir`, которые есть в Finder
-    #     - Возвращает список успешно удаленных и список успешно добавленных
-    #       миниатюр.
-    #     - Далее необходимо обновить информацию в базе данных на основе
-    #       полученных списков.
-
-    #     Получить данные del_images и new_images необходимо из ImgCompator.  
-    #     Параметры:  
-    #     - del_images список ImgItem
-    #     - new_images список ImgItem
-
-    #     Возвращает:
-    #     Словарь
-    #     - "ok_del_images": успешно удаленные из `hashdir` список `ImgItem`
-    #     - "bad_del_images": неудачно удаленные из `hashdir` список `ImgItem`
-    #     - "ok_new_images": успешно добавленные в `hashdir` список `ImgItem`
-    #     - "bad_new_images": неудачно добавленные в `hashdir` список `ImgItem`
-    #     """
-    #     scaner_item.total_count = len(del_images) + len(new_images)
-    #     ok_del_images, bad_del_images = HashdirImgUpdater.run_del_images(
-    #         scaner_item=scaner_item,
-    #         del_images=del_images
-    #     )
-    #     ok_new_images, bad_new_images = HashdirImgUpdater.run_new_images(
-    #         scaner_item=scaner_item,
-    #         new_images=new_images
-    #     )
-
-    #     return {
-    #         "ok_del_images": ok_del_images,
-    #         "bad_del_images": bad_del_images,
-    #         "ok_new_images": ok_new_images,
-    #         "bad_new_images": bad_new_images
-    #     }
 
     @staticmethod
     def run_del_images(scaner_item: IntScanerItem, del_images: list[ImgItem]):
@@ -491,18 +453,6 @@ class HashdirImgUpdater:
 
 
 class DbImgUpdater:
-    # @staticmethod
-    # def start(
-    #     scaner_item: IntScanerItem,
-    #     del_images: list[ImgItem],
-    #     new_images: list[ImgItem],
-    # ):
-    #     if del_images:
-    #         DbImgUpdater.remove_del_imgs(scaner_item, del_images)
-    #     if new_images:
-    #         DbImgUpdater.remove_exits_imgs(scaner_item, new_images)
-    #         DbImgUpdater.add_new_imgs(scaner_item, new_images)
-    #     return None
 
     @staticmethod
     def remove_del_imgs(scaner_item: IntScanerItem, del_images: list[ImgItem]):
