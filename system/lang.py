@@ -115,10 +115,8 @@ class Lng:
     save_as = ("Сохранить как", "Save as")
     search = ("Поиск", "Search")
     search_dates = (
-        "Поиск фотографий по датам.\n"
-        "Управляйте датами с клавишами вверх/вниз.",
-        "Searching for photos by dates.\n"
-        "Control dates with up/down keys."
+        "Поиск фотографий по датам.",
+        "Searching for photos by dates."
     )
     settings = ("Настройки", "Settings")
     total = ("Всего", "Total")

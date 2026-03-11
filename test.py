@@ -1,13 +1,11 @@
-from PyQt5.QtWidgets import QApplication, QCalendarWidget, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QCalendarWidget
+from PyQt5.QtCore import QLocale
 import sys
 
 app = QApplication(sys.argv)
 
-window = QWidget()
-layout = QVBoxLayout(window)
-
 calendar = QCalendarWidget()
-layout.addWidget(calendar)
+calendar.setLocale(QLocale(QLocale.Russian))  # дни недели и месяцы на русском
+calendar.show()
 
-window.show()
 sys.exit(app.exec_())

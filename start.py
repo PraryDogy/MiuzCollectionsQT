@@ -84,9 +84,9 @@ from widgets.win_main import WinMain
 
 class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
-        super().__init__(argv)
         self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
         self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
+        super().__init__(argv)
 
         cfg.initialize()
         Filters.init()
