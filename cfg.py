@@ -142,6 +142,11 @@ class Cfg:
     def initialize(self):
         self.check_dirs()
         self.set_json_data()
+        if Static.app_ver != self.app_ver:
+            shutil.rmtree(Static.app_support)
+            self.check_dirs()
+            self.app_ver = Static.app_ver
+            self.write_json_data()
 
 
 cfg = Cfg()
