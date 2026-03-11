@@ -99,6 +99,14 @@ class MyCalendar(QFrame):
                 image: none;
                 width: 0px;
             }
+            QCalendarWidget QToolButton {
+                color: #ffffff;  /* текст кнопок */
+                background: transparent;
+            }
+            QCalendarWidget #qt_calendar_monthbutton {
+                color: #ffffff;  /* текст месяца */
+                background: transparent;
+            }
         """)
         self.calendar.enterEvent = None
 
