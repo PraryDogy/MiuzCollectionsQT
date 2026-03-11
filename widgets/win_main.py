@@ -311,7 +311,6 @@ class WinMain(UMainWindow):
                 i.set_transparent_frame(0.5)
         self.grid.buffer = self.buffer
 
-
     @with_conn
     def paste_files(self, parent: QWidget, mf: Mf):
         target_dir = Utils.get_abs_any_path(
@@ -336,6 +335,7 @@ class WinMain(UMainWindow):
             target_dir=target_dir,
             action_type=self.buffer.type_
         )
+        del self.buffer
         copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
 
     @with_conn
