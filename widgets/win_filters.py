@@ -69,6 +69,7 @@ class WinFilters(SingleActionWindow):
 
         self.reset_btn = SmallBtn(Lng.reset[cfg.lng])
         self.reset_btn.setFixedWidth(100)
+        self.reset_btn.clicked.connect(self.reset_cmd)
         self.central_layout.addWidget(
             self.reset_btn,
             alignment=Qt.AlignmentFlag.AlignCenter
@@ -95,6 +96,20 @@ class WinFilters(SingleActionWindow):
         else:
             Dynamic.filters_enabled.append(item.text())
             item.setCheckState(Qt.CheckState.Checked)
+        self.reload_thumbnails.emit()
+
+    def reset_cmd(self):
+        items = [
+            self.list_widget.item(i)
+            for i in range(self.list_widget.count())
+        ]
+        # удаляем спейсер
+        items.pop(2)
+        for item in items:
+            item.setCheckState(Qt.CheckState.Unchecked)
+        Dynamic.filter_favs = False
+        Dynamic.filter_only_folder = False
+        Dynamic.filters_enabled.clear()
         self.reload_thumbnails.emit()
 
     def closeEvent(self, a0):
