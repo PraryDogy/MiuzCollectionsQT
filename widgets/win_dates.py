@@ -79,10 +79,10 @@ class MyCalendar(QFrame):
         self.dateSelected.emit(date)
 
     def set_date(self, py_date: datetime):
-            qdate = QDate(py_date.year, py_date.month, py_date.day)
-            print(qdate, qdate.isValid())  # проверка
-            self.calendar.setSelectedDate(qdate)
-            self.calendar.setCurrentPage(qdate.year(), qdate.month())
+        qdate = QDate(py_date.year, py_date.month, py_date.day)
+        print(qdate, qdate.isValid())  # проверка
+        QTimer.singleShot(100, lambda: self.calendar.setSelectedDate(qdate))
+        # self.calendar.setCurrentPage(qdate.year(), qdate.month())
 
 
 class WinDates(SingleActionWindow):
@@ -125,39 +125,24 @@ class WinDates(SingleActionWindow):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-        # ok cancel button # ok cancel button # ok cancel button # ok cancel button
-
-        btns_h_wid = QWidget()
-        self.central_layout.addWidget(btns_h_wid)
-        btns_h_lay = UHBoxLayout()
-        btns_h_wid.setLayout(btns_h_lay)
-
-        btns_h_lay.addStretch(1)
-        btns_h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.ok_btn = SmallBtn(text=Lng.ok[cfg.lng])
-        self.ok_btn.setFixedWidth(90)
-        self.ok_btn.clicked.connect(self.ok_cmd)
-        btns_h_lay.addWidget(self.ok_btn)
-
-        spacer_item = QSpacerItem(10, 1)
-        btns_h_lay.addItem(spacer_item)
-
-        cancel_btn = SmallBtn(text=Lng.cancel[cfg.lng])
-        self.ok_btn.setFixedWidth(90)
-        cancel_btn.clicked.connect(self.cancel_cmd)
-        btns_h_lay.addWidget(cancel_btn)
-        btns_h_lay.addStretch(1)
-
         self.adjustSize()
 
         if Dynamic.date_start:
             self.left_calendar.set_date(Dynamic.date_start)
+            self.left_calendar.title.set_named_date_text(Dynamic.date_start)
         if Dynamic.date_end:
-            self.left_calendar.set_date(Dynamic.date_end)
+            self.right_calendar.set_date(Dynamic.date_end)
+            self.right_calendar.title.set_named_date_text(Dynamic.date_end)
 
     def clear_btn_cmd(self, *args):
-        return
+        Dynamic.loaded_thumbs = 0
+        Dynamic.date_start = None
+        Dynamic.date_end = None
+        Dynamic.f_date_start = None
+        Dynamic.f_date_end = None
+        self.reload_thumbnails.emit()
+        self.dates_btn_normal.emit()
+        self.deleteLater()
 
     def date_change(self, date: QDate, flag: Literal["start", "end"]):
         date = date.toPyDate()
@@ -169,58 +154,13 @@ class WinDates(SingleActionWindow):
             self.right_calendar.title.set_named_date_text(date)
 
         if all((Dynamic.date_start, Dynamic.date_end)):
+            Dynamic.f_date_start = self.named_date(Dynamic.date_start)
+            Dynamic.f_date_end = self.named_date(Dynamic.date_end)
             self.reload_thumbnails.emit()
             self.dates_btn_solid.emit()
-
-
     
     def named_date(self, date: datetime) -> str:
         return date.strftime("%d.%m.%Y")
-
-    def ok_cmd(self, *args):
-
-        if self.date_start and self.date_end:
-            Dynamic.date_start = self.date_start
-            Dynamic.date_end = self.date_end
-            Dynamic.f_date_start = self.named_date(date=self.date_start)
-            Dynamic.f_date_end = self.named_date(date=self.date_end)
-            self.reload_thumbnails.emit()
-            self.dates_btn_solid.emit()
-
-        elif not self.date_start and not self.date_end:
-            Dynamic.date_start, Dynamic.date_end = None, None
-            Dynamic.f_date_start, Dynamic.f_date_end = None, None
-            Dynamic.loaded_thumbs = 0
-            self.reload_thumbnails.emit()
-            self.dates_btn_normal.emit()
-
-        elif not self.date_start:
-            self.left_calendar.setStyleSheet(
-                "background: red;"
-            )
-            QTimer.singleShot(
-                300,
-                lambda: self.left_calendar.setStyleSheet("")
-            )
-            return
-        elif not self.date_end:
-            self.right_calendar.setStyleSheet(
-                "background: red;"
-            )
-            QTimer.singleShot(
-                300,
-                lambda: self.right_calendar.setStyleSheet("")
-            )
-            return
-
-        self.deleteLater()
-
-    def cancel_cmd(self, *args):
-        self.deleteLater()
-        
-    def mouseReleaseEvent(self, a0):
-        self.setFocus()
-        return super().mouseReleaseEvent(a0)
     
     def closeEvent(self, a0):
         if not all((Dynamic.date_start, Dynamic.date_end)):
@@ -235,8 +175,4 @@ class WinDates(SingleActionWindow):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
-
-        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-            self.ok_cmd(a0)
-
         return super().keyPressEvent(a0)
