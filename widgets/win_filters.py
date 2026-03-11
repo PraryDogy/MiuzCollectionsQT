@@ -1,12 +1,11 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 
-from cfg import cfg, Dynamic
+from cfg import Dynamic, cfg
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (SingleActionWindow, UListSpacerItem,
+from ._base_widgets import (SingleActionWindow, SmallBtn, UListSpacerItem,
                             UListWidgetItem, VListWidget)
-
 
 
 class WinFilters(SingleActionWindow):
@@ -62,6 +61,18 @@ class WinFilters(SingleActionWindow):
                 item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.setCurrentRow(0)
+
+        self.central_layout.setSpacing(10)
+        marings = self.central_layout.contentsMargins()
+        marings.setBottom(15)
+        self.central_layout.setContentsMargins(marings)
+
+        self.reset_btn = SmallBtn(Lng.reset[cfg.lng])
+        self.reset_btn.setFixedWidth(100)
+        self.central_layout.addWidget(
+            self.reset_btn,
+            alignment=Qt.AlignmentFlag.AlignCenter
+        )
 
     def item_cmd(self, item: UListWidgetItem):
         if item.text() == Lng.favorites[cfg.lng]:
