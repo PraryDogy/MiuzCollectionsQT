@@ -574,31 +574,37 @@ class WinMain(UMainWindow):
 
     def start_scaner_task(self, ms: int = 1000):
 
-        def poll_task(tsk: ProcessWorker, tmr: QTimer):
+        def poll_task():
             reload_gui = False
-            while not tsk.proc_q.empty():
+            while not self.scaner_task.proc_q.empty():
                 self.scaner_timeout = time()
-                x_scan_item: ExtScanerItem = tsk.proc_q.get()
+                x_scan_item: ExtScanerItem = self.scaner_task.proc_q.get()
                 if not reload_gui:
                     reload_gui = x_scan_item.reload_gui
                 if self.bar_bottom.progress_bar.text() != x_scan_item.gui_text:
                     self.bar_bottom.progress_bar.setText(x_scan_item.gui_text)
-            if not tsk.is_alive():
-                tsk.terminate_join()
+            if not self.scaner_task.is_alive():
+                self.scaner_task.terminate_join()
                 self.bar_bottom.progress_bar.start_timer_text()
                 if reload_gui:
                     self.grid.reload_thumbnails()
                     self.left_menu.tree_wid.init_ui()
             else:
-                tmr.start(ms)
+                self.scaner_poll_timer.start(ms)
 
         # первая инициация
         if not hasattr(self, "scaner_timeout"):
             print("первая инициация сканера")
             self.scaner_timeout = time()
-            self.loop_tmr = QTimer(self)
-            self.loop_tmr.setSingleShot(True)
-            self.loop_tmr.timeout.connect(self.start_scaner_task)
+
+            self.scaner_check_timer = QTimer(self)
+            self.scaner_check_timer.setSingleShot(True)
+            self.scaner_check_timer.timeout.connect(self.start_scaner_task)
+
+            self.scaner_poll_timer = QTimer(self)
+            self.scaner_poll_timer.setSingleShot(True)
+            self.scaner_poll_timer.timeout.connect(poll_task)
+
             self.scaner_task = None
 
         can_start = False
@@ -635,24 +641,23 @@ class WinMain(UMainWindow):
                     target=AllDirScaner.start,
                     args=(Mf.list_, )
                 )
+                self.scaner_data.clear()
 
-            self.bar_bottom.progress_bar.stop_timer_text()
-            tmr = QTimer(self)
-            tmr.setSingleShot(True)
-            tmr.timeout.connect(lambda: poll_task(self.scaner_task, tmr))
+            self.bar_bottom.progress_bar.default_text()
+
+            self.scaner_check_timer.stop()
+            self.scaner_poll_timer.stop()
 
             self.scaner_task.start()
-            tmr.start(ms)
-            self.scaner_data.clear()
-            self.loop_tmr.stop()
-            self.loop_tmr.start(cfg.scaner_minutes * 60 * 1000)
+            self.scaner_poll_timer.start(ms)
+            self.scaner_check_timer.start(cfg.scaner_minutes * 60 * 1000)
 
         else:
             # проверяем каждую минуту, что задача завершена
-            self.loop_tmr.disconnect()
-            self.loop_tmr.timeout.connect(self.start_scaner_task)
-            self.loop_tmr.stop()
-            self.loop_tmr.start(1*1000)
+            self.scaner_check_timer.disconnect()
+            self.scaner_check_timer.timeout.connect(self.start_scaner_task)
+            self.scaner_check_timer.stop()
+            self.scaner_check_timer.start(1*1000)
             print("ожидание сканера")
 
     def restart_scaner_task(self):
