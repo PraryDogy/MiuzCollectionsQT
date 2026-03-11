@@ -125,6 +125,10 @@ class WinDates(SingleActionWindow):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
+        m = self.central_layout.contentsMargins()
+        m.setBottom(15)
+        self.central_layout.setContentsMargins(m)
+
         self.adjustSize()
 
         if Dynamic.date_start:
