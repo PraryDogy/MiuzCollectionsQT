@@ -67,7 +67,7 @@ else:
     sys.excepthook = System_.catch_error_in_proj
 
 
-from PyQt5.QtCore import QEvent, QObject
+from PyQt5.QtCore import QEvent, QObject, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
 from typing_extensions import Literal
@@ -85,6 +85,8 @@ from widgets.win_main import WinMain
 class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
         super().__init__(argv)
+        self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
+        self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
         cfg.initialize()
         Filters.init()
