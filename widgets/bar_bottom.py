@@ -99,7 +99,7 @@ class ProgressWidget(QLabel):
         self.update_label()
         self.timer.start(self.interval_ms)
 
-    def default_text(self):
+    def stop_timer_text(self):
         self.timer.stop()
         effect = QGraphicsOpacityEffect(self)
         effect.setOpacity(1.0)
