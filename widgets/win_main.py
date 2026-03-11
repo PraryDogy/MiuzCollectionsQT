@@ -1,5 +1,6 @@
 import os
 import subprocess
+from collections import defaultdict
 from time import time
 
 from PyQt5.QtCore import Qt, QTimer
@@ -8,7 +9,7 @@ from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal, Optional
 from watchdog.events import FileSystemEvent
-from collections import defaultdict
+
 from cfg import Dynamic, Static, cfg
 from system.filters import Filters
 from system.items import (Buffer, ExtScanerItem, OnStartItem, SettingsItem,
@@ -31,11 +32,12 @@ from .menu_left import MenuLeft
 from .servers_win import ServersWin
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
+from .win_filters import WinFilters
 from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_settings import WinSettings
 from .win_upload import UploadWin
-from .win_warn import ConfirmWindow, WarningWindow
+from .win_warn import ConfirmWindow
 
 
 class TestWid(QFrame):
@@ -128,6 +130,9 @@ class WinMain(UMainWindow):
             )
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
+        )
+        self.bar_top.open_filters_win.connect(
+            lambda: self.open_filters_win()
         )
         right_lay.addWidget(self.bar_top)
 
@@ -259,6 +264,15 @@ class WinMain(UMainWindow):
         self.left_menu.setCurrentIndex(1)
         self.grid.go_to_url = rel_path
         self.grid.reload_thumbnails()
+    
+    def open_filters_win(self):
+        self.bar_top.filters_btn.set_solid_style()
+        self.filters_win = WinFilters()
+        self.filters_win.closed_.connect(
+            lambda: self.bar_top.filters_btn.set_normal_style()
+        )
+        self.filters_win.center_to_parent(self.window())
+        self.filters_win.show()
 
     def open_win_smb(self, parent: QWidget, mf: Mf):
         try:

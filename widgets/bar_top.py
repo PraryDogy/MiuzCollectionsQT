@@ -124,88 +124,88 @@ class FiltersBtn(BarTopBtn):
 
     ICON_PATH = "./images/filters.svg"
     menu_ww = 200
-    edit_filters = pyqtSignal(SettingsItem)
+    # edit_filters = pyqtSignal(SettingsItem)
 
     def __init__(self):
         super().__init__()
         self.lbl.setText(Lng.filters[cfg.lng])
         self.svg_btn.load(self.ICON_PATH)
         
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
+    # def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
 
-        def on_action(val: str):
-            """Добавляет или удаляет фильтр из списка включённых и испускает сигнал."""
-            if val in Dynamic.filters_enabled:
-                Dynamic.filters_enabled.remove(val)
-            else:
-                Dynamic.filters_enabled.append(val)
-            self.clicked_.emit()
+    #     def on_action(val: str):
+    #         """Добавляет или удаляет фильтр из списка включённых и испускает сигнал."""
+    #         if val in Dynamic.filters_enabled:
+    #             Dynamic.filters_enabled.remove(val)
+    #         else:
+    #             Dynamic.filters_enabled.append(val)
+    #         self.clicked_.emit()
         
-        def reset():
-            """Сбрасывает все фильтры и испускает сигнал."""
-            Dynamic.filters_enabled.clear()
-            self.clicked_.emit()
+    #     def reset():
+    #         """Сбрасывает все фильтры и испускает сигнал."""
+    #         Dynamic.filters_enabled.clear()
+    #         self.clicked_.emit()
    
-        def edit_filters():
-            item = SettingsItem("filters", "")
-            self.edit_filters.emit(item)
+    #     def edit_filters():
+    #         item = SettingsItem("filters", "")
+    #         self.edit_filters.emit(item)
 
-        def favs_cmd():
-            Dynamic.filter_favs = not Dynamic.filter_favs
-            self.clicked_.emit()
+    #     def favs_cmd():
+    #         Dynamic.filter_favs = not Dynamic.filter_favs
+    #         self.clicked_.emit()
 
-        def only_folder_cmd():
-            Dynamic.filter_only_folder = not Dynamic.filter_only_folder
-            self.clicked_.emit()
+    #     def only_folder_cmd():
+    #         Dynamic.filter_only_folder = not Dynamic.filter_only_folder
+    #         self.clicked_.emit()
 
-        """Показывает меню фильтров при клике левой кнопкой мыши."""
-        if ev and ev.button() == Qt.MouseButton.LeftButton:
-            self.set_solid_style()
-            menu = UMenu(self)
-            menu.setMinimumWidth(self.menu_ww)
+    #     """Показывает меню фильтров при клике левой кнопкой мыши."""
+    #     if ev and ev.button() == Qt.MouseButton.LeftButton:
+    #         self.set_solid_style()
+    #         menu = UMenu(self)
+    #         menu.setMinimumWidth(self.menu_ww)
 
-            favs = QAction(Lng.favorites[cfg.lng], self, checkable=True)
-            favs.setChecked(Dynamic.filter_favs)
-            favs.triggered.connect(favs_cmd)
-            menu.addAction(favs)
+    #         favs = QAction(Lng.favorites[cfg.lng], self, checkable=True)
+    #         favs.setChecked(Dynamic.filter_favs)
+    #         favs.triggered.connect(favs_cmd)
+    #         menu.addAction(favs)
 
-            only_folder = QAction(Lng.only_this_folder[cfg.lng], self, checkable=True)
-            only_folder.setChecked(Dynamic.filter_only_folder)
-            only_folder.triggered.connect(only_folder_cmd)
-            menu.addAction(only_folder)
+    #         only_folder = QAction(Lng.only_this_folder[cfg.lng], self, checkable=True)
+    #         only_folder.setChecked(Dynamic.filter_only_folder)
+    #         only_folder.triggered.connect(only_folder_cmd)
+    #         menu.addAction(only_folder)
 
-            menu.addSeparator()
+    #         menu.addSeparator()
 
-            # --- Добавляем фильтры ---
-            for f in Filters.filters:
-                act = QAction(f, self, checkable=True)
-                act.setChecked(f in Dynamic.filters_enabled)
-                act.triggered.connect(lambda _, val=f: on_action(val))
-                menu.addAction(act)
+    #         # --- Добавляем фильтры ---
+    #         for f in Filters.filters:
+    #             act = QAction(f, self, checkable=True)
+    #             act.setChecked(f in Dynamic.filters_enabled)
+    #             act.triggered.connect(lambda _, val=f: on_action(val))
+    #             menu.addAction(act)
 
-            # --- Разделитель и пункт сброса ---
-            menu.addSeparator()
+    #         # --- Разделитель и пункт сброса ---
+    #         menu.addSeparator()
 
-            edit = QAction(Lng.setup[cfg.lng], self)
-            edit.triggered.connect(edit_filters)
-            menu.addAction(edit)
+    #         edit = QAction(Lng.setup[cfg.lng], self)
+    #         edit.triggered.connect(edit_filters)
+    #         menu.addAction(edit)
             
-            act_reset = QAction(Lng.reset[cfg.lng], menu)
-            act_reset.triggered.connect(reset)
-            menu.addAction(act_reset)
+    #         act_reset = QAction(Lng.reset[cfg.lng], menu)
+    #         act_reset.triggered.connect(reset)
+    #         menu.addAction(act_reset)
 
-            # --- Показ меню под кнопкой ---
-            pos = self.mapToGlobal(self.rect().bottomLeft())
-            menu.exec(pos)
+    #         # --- Показ меню под кнопкой ---
+    #         pos = self.mapToGlobal(self.rect().bottomLeft())
+    #         menu.exec(pos)
 
-            filters = (
-                *Dynamic.filters_enabled,
-                Dynamic.filter_favs,
-                Dynamic.filter_only_folder
-            )
+    #         filters = (
+    #             *Dynamic.filters_enabled,
+    #             Dynamic.filter_favs,
+    #             Dynamic.filter_only_folder
+    #         )
 
-            if not any(filters):
-                self.set_normal_style()
+    #         if not any(filters):
+    #             self.set_normal_style()
 
 
 class SortBtn(BarTopBtn):
@@ -357,6 +357,7 @@ class BarTop(QWidget):
 
     open_dates_win = pyqtSignal()
     open_settings_win = pyqtSignal(SettingsItem)
+    open_filters_win = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     history_press = pyqtSignal()
     level_up = pyqtSignal()
@@ -371,18 +372,6 @@ class BarTop(QWidget):
         self.h_layout.setSpacing(self.text_spacing)
         self.setLayout(self.h_layout)
 
-        # self.back_btn = BackBtn()
-        # self.back_btn.clicked_.connect(lambda: self.history_press.emit())
-        # self.h_layout.addWidget(self.back_btn)
-
-        # self.next_btn = NextBtn()
-        # self.next_btn.clicked_.connect(lambda: self.history_press.emit())
-        # self.h_layout.addWidget(self.next_btn)
-
-        # self.level_up_btn = LevelUpBtn()
-        # self.level_up_btn.clicked_.connect(lambda: self.level_up.emit())
-        # self.h_layout.addWidget(self.level_up_btn)
-
         self.h_layout.addStretch(0)
 
         # --- Кнопка сортировки ---
@@ -392,8 +381,7 @@ class BarTop(QWidget):
 
         # --- Кнопка фильтров ---
         self.filters_btn = FiltersBtn()
-        self.filters_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
-        self.filters_btn.edit_filters.connect(self.open_settings_win.emit)
+        self.filters_btn.clicked_.connect(self.open_filters_win.emit)
         self.h_layout.addWidget(self.filters_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка выбора даты ---
