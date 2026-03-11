@@ -572,30 +572,33 @@ class WinMain(UMainWindow):
             self.watchdog_timer.start(1000)
             self.watchdog_task.start()
 
-    def start_scaner_task(self, ms: int = 1000):
+    def poll_scaner_task(self, ms: int = 3000):
+        if not hasattr(self, "scaner_task") or not self.scaner_task:
+            self.scaner_poll_timer.start(ms)
+            return
+        reload_gui = False
+        while not self.scaner_task.proc_q.empty():
+            self.scaner_timeout = time()
+            x_scan_item: ExtScanerItem = self.scaner_task.proc_q.get()
+            if not reload_gui:
+                reload_gui = x_scan_item.reload_gui
+            if self.bar_bottom.progress_bar.text() != x_scan_item.gui_text:
+                self.bar_bottom.progress_bar.setText(x_scan_item.gui_text)
+        if not self.scaner_task.is_alive():
+            self.scaner_task.terminate_join()
+            self.bar_bottom.progress_bar.start_timer_text()
+            if reload_gui:
+                self.grid.reload_thumbnails()
+                self.left_menu.tree_wid.init_ui()
+        else:
+            self.scaner_poll_timer.start(ms)
 
-        def poll_task():
-            reload_gui = False
-            while not self.scaner_task.proc_q.empty():
-                self.scaner_timeout = time()
-                x_scan_item: ExtScanerItem = self.scaner_task.proc_q.get()
-                if not reload_gui:
-                    reload_gui = x_scan_item.reload_gui
-                if self.bar_bottom.progress_bar.text() != x_scan_item.gui_text:
-                    self.bar_bottom.progress_bar.setText(x_scan_item.gui_text)
-            if not self.scaner_task.is_alive():
-                self.scaner_task.terminate_join()
-                self.bar_bottom.progress_bar.start_timer_text()
-                if reload_gui:
-                    self.grid.reload_thumbnails()
-                    self.left_menu.tree_wid.init_ui()
-            else:
-                self.scaner_poll_timer.start(ms)
+    def start_scaner_task(self, ms: int = 3000):
 
-        # первая инициация
-        if not hasattr(self, "scaner_timeout"):
+        if not hasattr(self, "scaner_task"):
             print("первая инициация сканера")
             self.scaner_timeout = time()
+            self.scaner_task = None
 
             self.scaner_check_timer = QTimer(self)
             self.scaner_check_timer.setSingleShot(True)
@@ -603,9 +606,7 @@ class WinMain(UMainWindow):
 
             self.scaner_poll_timer = QTimer(self)
             self.scaner_poll_timer.setSingleShot(True)
-            self.scaner_poll_timer.timeout.connect(poll_task)
-
-            self.scaner_task = None
+            self.scaner_poll_timer.timeout.connect(self.poll_scaner_task)
 
         can_start = False
         alive = self.scaner_task.is_alive() if self.scaner_task else False
