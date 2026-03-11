@@ -119,7 +119,7 @@ class BelowTextWid(QLabel):
 
     def set_text(self):
         root = self.wid.rel_path.strip(os.sep).split(os.sep)
-        if not root:
+        if len(root) == 1:
             root = os.path.basename(Mf.current.alias)
         else:
             root = root[0]
