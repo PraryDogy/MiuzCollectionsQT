@@ -183,25 +183,14 @@ class DirsCompator:
 
 class DbDirUpdater:
     @staticmethod
-    def prepare(
+    def get_good_dirs(
         bad_del_images: list[ImgItem],
         bad_new_images: list[ImgItem],
         dirs_to_scan: list[DirItem]
     ):
         """
-        Удаляет директории, в которых произошли ошибки при записи изображений.
-        Информация о таких директориях не обновляется в базе данных, поэтому
-        они будут автоматически обработаны при следующем сканировании.
-
-        Схема работы сканирования:
-
-        1. Сбор информации о директории (дата последнего изменения).
-        2. Сравнение полученной даты с записью в базе данных.
-        3. Если дата изменения новее, чем в базе данных — директория сканируется.
-        4. Если во время сканирования возникают ошибки записи изображений:
-        - информация о директории не сохраняется в базе данных;
-        - директория удаляется;
-        - при следующем сканировании она снова попадет под проверку (шаг 3).
+        Возвращает только те директории,
+        где были успешно обработаны все изображения.
         """
         bad_images = {
             os.path.dirname(i.abs_img_path): i
@@ -609,7 +598,7 @@ class NewDirsWorker:
             new_images=result["ok_new_images"]
         )
 
-        dirs_to_scan = DbDirUpdater.prepare(
+        dirs_to_scan = DbDirUpdater.get_good_dirs(
             bad_del_images=result["bad_del_images"],
             bad_new_images=result["bad_new_images"],
             dirs_to_scan=dirs_to_scan
