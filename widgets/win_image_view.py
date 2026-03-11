@@ -447,8 +447,7 @@ class WinImageView(AppModalWindow):
             self.switch_image_sig.emit(self.rel_path)
 
     def set_title(self):
-        filename = os.path.basename(self.wid.rel_path)
-        self.setWindowTitle(filename)
+        self.setWindowTitle(os.path.basename(self.wid.rel_path))
 
     def button_switch_cmd(self, flag: Literal["+", "-"]) -> None:
         if flag == "+":
