@@ -290,7 +290,6 @@ class ImgUtils:
             print("read png, PIL error", e)
             return None
 
-
     @classmethod
     def _read_jpg(cls, path: str):
         try:
