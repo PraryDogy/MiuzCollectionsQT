@@ -1,8 +1,7 @@
-test = [i for i in range(0, 100)]
-step = 10
-chunks = [
-    test[i:i+step]
-    for i in range(0, len(test), step)
-]
+from system.shared_utils import ImgUtils
 
-print(chunks)
+
+src = "/Users/Loshkarev/Desktop/2022_MIUZ_3005_7195.psb"
+img = ImgUtils.read_img(
+    src
+)

@@ -231,18 +231,27 @@ class ImgUtils:
         return None
 
     @classmethod
-    def _read_quicklook(cls, path: str, size: int = 5000) -> np.ndarray:
+    def _read_quicklook(
+        cls,
+        path: str,
+        size: int = 5000,
+        timeout: int = 120
+    ) -> np.ndarray:
+
         tmp_dir = Path(tempfile.gettempdir())
-        subprocess.run(
-            ["qlmanage", "-t", "-s", str(size), "-o", str(tmp_dir), path],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL  # отключаем вывод ошибок
-        )
+        try:
+            subprocess.run(
+                ["qlmanage", "-t", "-s", str(size), "-o", str(tmp_dir), path],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=timeout
+            )
+        except subprocess.TimeoutExpired:
+            return None
         generated_files = list(tmp_dir.glob(Path(path).stem + "*.png"))
         if not generated_files:
             return None
-            raise FileNotFoundError("QuickLook не создал PNG")
         generated = generated_files[0]
         with Image.open(generated) as img:
             arr = np.array(img)
