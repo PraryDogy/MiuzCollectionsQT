@@ -204,8 +204,8 @@ class WinDates(SingleActionWindow):
         Dynamic.f_date_end = None
         if reload:
             self.reload_thumbnails.emit()
-        self.dates_btn_normal.emit()
-        self.deleteLater()
+            self.dates_btn_normal.emit()
+            self.deleteLater()
 
     def date_change(self, date: QDate, flag: Literal["start", "end"]):
         date = date.toPyDate()
