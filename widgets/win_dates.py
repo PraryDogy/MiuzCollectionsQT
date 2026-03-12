@@ -5,8 +5,8 @@ from typing import Literal
 
 from PyQt5.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import (QCalendarWidget, QFrame, QLabel, QSpacerItem,
-                             QToolButton, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QCalendarWidget, QFrame, QGroupBox, QLabel,
+                             QSpacerItem, QToolButton, QVBoxLayout, QWidget)
 
 from cfg import Dynamic, cfg
 from system.lang import Lng
@@ -31,8 +31,9 @@ class DatesTools:
 
 class DatesTitle(QLabel):
     def __init__(self, default_text: str):
+        super().__init__()
         self.default_text = default_text
-        super().__init__(self.default_text)
+        self.setText(default_text)
 
     def set_named_date_text(self, date: datetime):
         weekday = self.get_named_weekday(date)
@@ -51,15 +52,22 @@ class DatesTitle(QLabel):
         month_number = str(date.month)
         month = Lng.months_genitive_case[cfg.lng][month_number]
         return f"{date.day} {month} {date.year}"
+    
+    def setText(self, a0):
+        a0 = " " + a0
+        return super().setText(a0)
 
 
-class MyCalendar(QFrame):
+class MyCalendar(QGroupBox):
     dateSelected = pyqtSignal(QDate)
 
     def __init__(self, title: str):
         super().__init__()
         v_layout = UVBoxLayout(self)
         v_layout.setSpacing(10)
+        margins = v_layout.contentsMargins()
+        margins.setTop(5)
+        v_layout.setContentsMargins(margins)
 
         self.title = DatesTitle(title)
         v_layout.addWidget(self.title)
@@ -84,6 +92,9 @@ class MyCalendar(QFrame):
         self.calendar.setSelectedDate(qdate)
 
     def set_custom_ui(self, icon_size: int = 10):
+        self.calendar.setVerticalHeaderFormat(
+            QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
+        )
         buttons = self.findChildren(QToolButton)
 
         for btn in buttons:
@@ -99,16 +110,22 @@ class MyCalendar(QFrame):
                 image: none;
                 width: 0px;
             }
-            QCalendarWidget QToolButton {
-                color: #ffffff;  /* текст кнопок */
-                background: transparent;
-            }
-            QCalendarWidget #qt_calendar_monthbutton {
-                color: #ffffff;  /* текст месяца */
-                background: transparent;
-            }
         """)
-        self.calendar.enterEvent = None
+
+        # self.calendar.setStyleSheet("""
+        #     #qt_calendar_monthbutton::menu-indicator {
+        #         image: none;
+        #         width: 0px;
+        #     }
+        #     QCalendarWidget QToolButton {
+        #         color: #ffffff;  /* текст кнопок */
+        #         background: transparent;
+        #     }
+        #     QCalendarWidget #qt_calendar_monthbutton {
+        #         color: #ffffff;  /* текст месяца */
+        #         background: transparent;
+        #     }
+        # """)
 
 
 class WinDates(SingleActionWindow):
