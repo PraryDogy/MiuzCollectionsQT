@@ -16,8 +16,8 @@ class ColumnNames:
     size: Literal["size"] = "size"
     birth: Literal["birth"] = "birth"
     mod: Literal["mod"] = "mod"
-    resol: Literal["resol"] = "resol"
-    coll: Literal["coll"] = "coll"
+    resol: Literal["resol (не используется)"] = "resol"
+    coll: Literal["coll (не используется)"] = "coll"
     fav: Literal["fav"] = "fav"
     mf_alias: Literal["brand"] = "brand"
 

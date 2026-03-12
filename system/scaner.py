@@ -516,8 +516,15 @@ class DbImgUpdater:
                 ColumnNames.fav: 0,
                 ColumnNames.mf_alias: scaner_item.mf.alias
             })
-        conn.execute(sqlalchemy.insert(Thumbs.table), values_list)
-        conn.commit()
+        try:
+            conn.execute(sqlalchemy.insert(Thumbs.table), values_list)
+            conn.commit()
+        except OverflowError as e:
+            print("***")
+            for i in new_images:
+                print(i)
+            print("***")
+            os._exit(0)
         conn.close()
 
 
