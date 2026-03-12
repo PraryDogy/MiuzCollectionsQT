@@ -507,8 +507,8 @@ class DbImgUpdater:
                 ColumnNames.size: img_item.size,
                 ColumnNames.birth: 0,
                 ColumnNames.mod: img_item.mod,
-                ColumnNames.resol: "",
-                ColumnNames.coll: "",
+                ColumnNames.resol: "none",
+                ColumnNames.coll: "none",
                 ColumnNames.fav: 0,
                 ColumnNames.mf_alias: scaner_item.mf.alias
             })
