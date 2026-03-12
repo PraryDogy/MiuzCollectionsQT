@@ -281,6 +281,9 @@ class ImgUtils:
             if img.mode != "RGBA":
                 img = img.convert("RGBA")  # сохраняем альфа-канал
             array_img = np.array(img)
+            alpha = array_img[:, :, 3]
+            array_img[alpha == 0, :3] = 255 
+            array_img = cv2.cvtColor(array_img, cv2.COLOR_RGBA2BGR)
             img.close()
             return array_img
         except Exception as e:
