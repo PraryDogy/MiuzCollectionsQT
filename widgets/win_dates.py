@@ -95,13 +95,12 @@ class MyCalendar(QGroupBox):
         self.calendar.setVerticalHeaderFormat(
             QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
         )
-        buttons = self.findChildren(QToolButton)
 
+        buttons = self.findChildren(QToolButton)
         for btn in buttons:
             name = btn.objectName()
             if name == "qt_calendar_prevmonth":
                 btn.setIcon(QIcon("./images/prev.svg"))
-
             elif name == "qt_calendar_nextmonth":
                 btn.setIcon(QIcon("./images/next.svg"))
 
@@ -110,22 +109,26 @@ class MyCalendar(QGroupBox):
                 image: none;
                 width: 0px;
             }
-        """)
+            #qt_calendar_navigationbar {
+                background-color: transparent;
+            }
 
-        # self.calendar.setStyleSheet("""
-        #     #qt_calendar_monthbutton::menu-indicator {
-        #         image: none;
-        #         width: 0px;
-        #     }
-        #     QCalendarWidget QToolButton {
-        #         color: #ffffff;  /* текст кнопок */
-        #         background: transparent;
-        #     }
-        #     QCalendarWidget #qt_calendar_monthbutton {
-        #         color: #ffffff;  /* текст месяца */
-        #         background: transparent;
-        #     }
-        # """)
+                                                #qt_calendar_navigationbar {
+                background-color: transparent;
+            }
+                                    
+                                                #qt_calendar_navigationbar {
+                background-color: transparent;
+            }
+                                    
+                                                #qt_calendar_navigationbar {
+                background-color: transparent;
+            }
+                                    
+                                                #qt_calendar_navigationbar {
+                background-color: transparent;
+            }
+        """)
 
 
 class WinDates(SingleActionWindow):
