@@ -389,6 +389,7 @@ class HashdirImgUpdater:
             thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
             if os.path.exists(thumb_path):
                 try:
+                    print("Удаляю изображение", img_item.abs_img_path)
                     os.remove(thumb_path)
                     folder = os.path.dirname(thumb_path)
                     if not os.listdir(folder):
@@ -427,6 +428,7 @@ class HashdirImgUpdater:
                         rel_img_path=rel_img_path,
                         mf_alias=scaner_item.mf.alias
                     )
+                    print("Создаю изображение", img_item.abs_img_path)
                     Utils.write_thumb(thumb_path, img)
                     ok_new_images.append(img_item)
                     scaner_item.total_count -= 1
