@@ -53,6 +53,11 @@ class BaseProcessWorker:
         if self in BaseProcessWorker._registry:
             BaseProcessWorker._registry.remove(self)
 
+    def stop_all(self):
+        for i in BaseProcessWorker._registry:
+            i: Process
+            i.kill()
+
 class ProcessWorker(BaseProcessWorker):
     """
         Передает в BaseProcessWorker args + self.proc (Queue)
