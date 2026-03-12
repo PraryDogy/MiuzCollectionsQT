@@ -594,7 +594,7 @@ class WinMain(UMainWindow):
     def start_scaner_task(self, ms: int = 3000):
 
         if not hasattr(self, "scaner_task"):
-            print("первая инициация сканера")
+            # print("первая инициация сканера")
             self.scaner_task = None
 
             self.scaner_check_timer = QTimer(self)
@@ -610,18 +610,18 @@ class WinMain(UMainWindow):
 
         # задача завершена
         if not alive:
-            print("сканер завершен, можно запускать новый")
+            # print("сканер завершен, можно запускать новый")
             can_start = True
 
         if can_start:
             if self.scaner_data:
-                print("штатно запускаю SINGLE сканер")
+                # print("штатно запускаю SINGLE сканер")
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
                     args=(SingleDirScanerItem(self.scaner_data), )
                     )
             else:
-                print("штатно запускаю ОБЩИЙ сканер")
+                # print("штатно запускаю ОБЩИЙ сканер")
                 self.scaner_task = ProcessWorker(
                     target=AllDirScaner.start,
                     args=(Mf.list_, )
@@ -637,7 +637,7 @@ class WinMain(UMainWindow):
             # проверяем каждую минуту, что задача завершена
             self.scaner_check_timer.stop()
             self.scaner_check_timer.start(1*5000)
-            print("ожидание сканера")
+            # print("ожидание сканера")
 
     def restart_scaner_task(self):
         try:
