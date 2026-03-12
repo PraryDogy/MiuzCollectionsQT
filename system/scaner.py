@@ -386,6 +386,7 @@ class HashdirImgUpdater:
         ok_del_images: list[ImgItem] = []
         bad_del_images: list[ImgItem] = []
         for img_item in del_images:
+            scaner_item.total_count -= 1
             HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
             thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
             if os.path.exists(thumb_path):
@@ -395,7 +396,6 @@ class HashdirImgUpdater:
                     if not os.listdir(folder):
                         shutil.rmtree(folder)
                     ok_del_images.append(img_item)
-                    scaner_item.total_count -= 1
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     bad_del_images.append(img_item)
@@ -413,6 +413,7 @@ class HashdirImgUpdater:
         ok_new_images: list[ImgItem] = []
         bad_new_images: list[ImgItem] = []
         for img_item in new_images:
+            scaner_item.total_count -= 1    
             HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = Utils.fit_to_thumb(img, Static.max_img_size)
@@ -428,7 +429,6 @@ class HashdirImgUpdater:
                     )
                     Utils.write_thumb(thumb_path, img)
                     ok_new_images.append(img_item)
-                    scaner_item.total_count -= 1
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     bad_new_images.append(img_item)
