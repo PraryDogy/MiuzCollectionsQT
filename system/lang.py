@@ -338,8 +338,8 @@ class Lng:
     error = ("Ошибка", "Error")
     next_search = ("Поиск новых изображений через", "Search new images in")
     string_limit = (
-        "Имя — не более 30 символов.",
-        "Name — up to 30 characters.",
+        "Имя — 5-30 символов.",
+        "Name — up to 5-30 characters.",
     )
     valid_message = (
         "Имя может содержать только русские и английские буквы, "
@@ -350,11 +350,11 @@ class Lng:
     folder_name = (
         "Имя:\n"
         "• уникальное\n"
-        "• до 30 символов\n"
+        "• 5-30 символов\n"
         "• русские и английские буквы, цифры и пробелы",
         "Folder name:\n"
         "• unique\n"
-        "• up to 30 characters\n"
+        "• up to 5-30 characters\n"
         "• Russian and English letters, digits, and spaces",
     )
     folder_not_exists = (

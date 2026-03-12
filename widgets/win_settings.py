@@ -895,7 +895,7 @@ class NewFolder(QWidget):
             )
             return
 
-        elif len(folder_name) > 30:
+        elif len(folder_name) < 5 or len(folder_name) > 30:
             show_warn(f'{Lng.string_limit[cfg.lng]}')
             return
 
