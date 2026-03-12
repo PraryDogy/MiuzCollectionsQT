@@ -150,10 +150,6 @@ class Utils:
     @classmethod
     def reveal_files(cls, paths: list[str]):
         subprocess.Popen(["osascript", REVEAL_SCPT] + paths)
-
-    @classmethod
-    def start_new_app(cls):
-        os.execl(sys.executable, sys.executable, *sys.argv)
         
     @classmethod
     def get_abs_any_path(cls, mf_path: str, rel_path: str) -> str:

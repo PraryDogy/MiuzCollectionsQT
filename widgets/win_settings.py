@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
@@ -17,6 +18,7 @@ from system.filters import Filters
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
+from system.multiprocess import ProcessWorker
 from system.paletes import ThemeChanger
 from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
@@ -29,8 +31,9 @@ from .win_warn import ConfirmWindow, WarningWindow
 
 
 def restart_app():
+    ProcessWorker.stop_all()
     QApplication.quit()
-    Utils.start_new_app()
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 class ULabel(QLabel):
