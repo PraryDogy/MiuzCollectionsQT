@@ -26,7 +26,8 @@ class BaseProcessWorker:
     def __init__(self, target: callable, args: tuple):
         super().__init__()
         self.proc = Process(target=target, args=(*args, ))
-        BaseProcessWorker._registry.append(self.proc)
+        self._queues: list[Queue] = [a for a in args if hasattr(a, 'put')]
+        BaseProcessWorker._registry.append(self)
 
     def start(self):
         self.proc.start()
@@ -42,10 +43,9 @@ class BaseProcessWorker:
         self.proc.terminate()
         self.proc.join(timeout=0.2)
 
-        queues: tuple[Queue] = (i for i in dir(self) if hasattr(i, "put"))
-        for i in queues:
-                i.close()
-                i.join_thread()
+        for q in self._queues:
+            q.close()
+            q.cancel_join_thread()
 
         if self.proc.is_alive():
             self.proc.kill()
@@ -53,10 +53,12 @@ class BaseProcessWorker:
         if self in BaseProcessWorker._registry:
             BaseProcessWorker._registry.remove(self)
 
-    def stop_all(self):
-        for i in BaseProcessWorker._registry:
-            i: Process
-            i.kill()
+    @staticmethod
+    def stop_all():
+        for worker in BaseProcessWorker._registry.copy():
+            worker: BaseProcessWorker
+            worker.terminate_join()
+
 
 class ProcessWorker(BaseProcessWorker):
     """
