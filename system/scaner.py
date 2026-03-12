@@ -25,7 +25,7 @@ class DirItem:
         - Mf.curr_path = /User/Downloads/parent/folder
         - подкаталог = /User/Downloads/parent/folder/subfolder
         - rel_path = /subfolder
-    - mod: дата модификации каталога (os.stat.st_birthtime)
+    - mod: дата модификации каталога (os.stat.st_mtime)
     """
     abs_path: str
     rel_path: str
@@ -38,13 +38,11 @@ class ImgItem:
     Параметры:
     - abs_img_path: полный путь до изображения
     - size: размер изображения в байтах
-    - birth: os.stat.st_birthtime
     - mod: os.stat.st_mtime
     - rel_thumb_path: путь до миниатюры /hashdir/thumb.jpg
     """
     abs_img_path: str
     size: int
-    birth: int
     mod: int
     rel_thumb_path: str = ""
 
@@ -288,9 +286,8 @@ class ImgLoader:
                     # чтобы в основном потоке сбрасывался таймер таймаута
                     scaner_item.q.put(ext_scaner_item)
                     size = int(stat.st_size)
-                    birth = int(stat.st_birthtime)
                     mod = int(stat.st_mtime)
-                    img_item = ImgItem(entry.path, size, birth, mod)
+                    img_item = ImgItem(entry.path, size, mod)
                     finder_images.append(img_item)
         return finder_images
 
@@ -307,7 +304,6 @@ class ImgLoader:
                 Thumbs.rel_thumb_path,
                 Thumbs.rel_img_path,
                 Thumbs.size,
-                Thumbs.birth,
                 Thumbs.mod
                 )
             q = q.where(Thumbs.mf_alias == scaner_item.mf.alias)
@@ -321,13 +317,13 @@ class ImgLoader:
                 q = q.where(
                     Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%")
                 )
-            for rel_thumb_path, rel_path, size, birth, mod in conn.execute(q):
+            for rel_thumb_path, rel_path, size, mod in conn.execute(q):
                 abs_img_path = Utils.get_abs_any_path(
                     mf_path=scaner_item.mf.curr_path,
                     rel_path=rel_path
                 )
                 img_item = ImgItem(
-                    abs_img_path, size, birth, mod, rel_thumb_path
+                    abs_img_path, size, mod, rel_thumb_path
                 )
                 db_images.append(img_item)
         conn.close()
@@ -349,11 +345,11 @@ class ImgCompator:
         - изображения, которых нет в БД, но есть в Finder
         """
         finder_dict = {
-            (i.abs_img_path, i.size, i.birth, i.mod): i
+            (i.abs_img_path, i.size, i.mod): i
             for i in finder_images
         }
         db_dict = {
-            (i.abs_img_path, i.size, i.birth, i.mod): i
+            (i.abs_img_path, i.size, i.mod): i
             for i in db_images
         }
         removed_images = [
@@ -509,7 +505,7 @@ class DbImgUpdater:
                 ColumnNames.rel_item_path: rel_img_path,
                 ColumnNames.rel_thumb_path: rel_thumb_path,
                 ColumnNames.size: img_item.size,
-                ColumnNames.birth: img_item.birth,
+                ColumnNames.birth: 0,
                 ColumnNames.mod: img_item.mod,
                 ColumnNames.resol: "",
                 ColumnNames.coll: "",

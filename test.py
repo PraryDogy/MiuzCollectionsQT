@@ -1,12 +1,11 @@
-from system.utils import Utils
-from system.shared_utils import ImgUtils
-import cv2
+import os
 
-src = '/Users/Loshkarev/Desktop/ПРОБЛЕМНЫЙ ПНГ/E2018-EMP-0067.png'
-# src = '/Users/Loshkarev/Desktop/ПРОБЛЕМНЫЙ ПНГ/E2018-EMP-0067 — копия.png'
-dst = '/Users/Loshkarev/Desktop/ПРОБЛЕМНЫЙ ПНГ/test.png'
 
-# img = ImgUtils.read_img(src)
-img = ImgUtils._read_png(src)
-# cv2.imshow("1", img)
-# cv2.waitKey(0)
+src_one = '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/IMG_2212.psd'
+src_two = '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/IMG_2226.psd'
+
+for i in (src_one, src_two):
+    stats = os.stat(i)
+    birth = stats.st_birthtime
+
+    print(birth)

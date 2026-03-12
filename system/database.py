@@ -14,7 +14,7 @@ class ColumnNames:
     rel_item_path: Literal["short_src"] = "short_src"
     rel_thumb_path: Literal["short_hash"] = "short_hash"
     size: Literal["size"] = "size"
-    birth: Literal["birth"] = "birth"
+    birth: Literal["birth упразднен, неверно отобр. на smb дисках"] = "birth"
     mod: Literal["mod"] = "mod"
     resol: Literal["resol (не используется)"] = "resol"
     coll: Literal["coll (не используется)"] = "coll"
