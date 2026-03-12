@@ -97,18 +97,13 @@ class MyCalendar(QGroupBox):
             QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
         )
 
-        buttons = self.findChildren((QToolButton, QSpinBox))
-        for btn in buttons:
-            name = btn.objectName()
+        widgets = self.findChildren(QToolButton)
+        for wid in widgets:
+            name = wid.objectName()
             if name == "qt_calendar_prevmonth":
-                btn.setIcon(QIcon("./images/prev.svg"))
+                wid.setIcon(QIcon("./images/prev.svg"))
             elif name == "qt_calendar_nextmonth":
-                btn.setIcon(QIcon("./images/next.svg"))
-            # elif name == "qt_calendar_yearedit":
-            #     btn: QSpinBox
-            #     btn.setFixedHeight(27)
-            #     btn.setFixedWidth(100)
-                # btn.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
+                wid.setIcon(QIcon("./images/next.svg"))
 
         self.calendar.setStyleSheet("""
             #qt_calendar_monthbutton::menu-indicator {
