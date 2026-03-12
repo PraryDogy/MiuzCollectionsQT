@@ -1,14 +1,23 @@
+import sqlite3
+from cfg import Static
 
+# Подключение к базе
+conn = sqlite3.connect(Static.app_support_db)
+cursor = conn.cursor()
 
-read jpg, PIL error, try cv2 read cannot identify image file '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/IMG_8088 копия 2.jpg'
-fit_to_thumb: ошибка масштабирования: 'NoneType' object has no attribute 'shape'
-read jpg, PIL error, try cv2 read cannot identify image file '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/IMG_7657 копия.jpg'
-fit_to_thumb: ошибка масштабирования: 'NoneType' object has no attribute 'shape'
-read jpg, PIL error, try cv2 read cannot identify image file '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/IMG_1812.JPG'
-fit_to_thumb: ошибка масштабирования: 'NoneType' object has no attribute 'shape'
-read jpg, PIL error, try cv2 read cannot identify image file '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/IMG_7657.JPG'
-fit_to_thumb: ошибка масштабирования: 'NoneType' object has no attribute 'shape'
-read jpg, PIL error, try cv2 read cannot identify image file '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/IMG_8088 копия.jpg'
-fit_to_thumb: ошибка масштабирования: 'NoneType' object has no attribute 'shape'
-read jpg, PIL error, try cv2 read cannot identify image file '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready/0 No collection/1 IMG/IMG_1798.JPG'
-fit_to_thumb: ошибка масштабирования: 'NoneType' object has no attribute 'shape'
+# SQL запрос
+query = """
+UPDATE thumbs 
+SET birth = 0, 
+    resol = 'none', 
+    coll = 'none';
+"""
+
+try:
+    cursor.execute(query)
+    conn.commit()
+    print(f"Обновлено записей: {cursor.rowcount}")
+except sqlite3.Error as e:
+    print(f"Ошибка базы данных: {e}")
+finally:
+    conn.close()

@@ -287,6 +287,9 @@ class ImgLoader:
                     scaner_item.q.put(ext_scaner_item)
                     size = int(stat.st_size)
                     mod = int(stat.st_mtime)
+                    if size == 0:
+                        print("нулевой размер", entry.path, size)
+                        continue
                     img_item = ImgItem(entry.path, size, mod)
                     finder_images.append(img_item)
         return finder_images
