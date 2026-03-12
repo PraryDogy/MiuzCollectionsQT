@@ -203,7 +203,7 @@ class ImgUtils:
     )
 
     @classmethod
-    def _read_tiff(cls, path: str) -> np.ndarray | None:
+    def _read_tiff(cls, path: str):
         def process_image(img: np.ndarray) -> np.ndarray:
             if img.ndim == 3:
                 # Транспонируем, если каналы на первом месте
@@ -231,12 +231,7 @@ class ImgUtils:
         return None
 
     @classmethod
-    def _read_quicklook(
-        cls,
-        path: str,
-        size: int = 5000,
-        timeout: int = 120
-    ) -> np.ndarray:
+    def _read_quicklook(cls, path: str, size: int = 5000, timeout: int = 120):
 
         tmp_dir = Path(tempfile.gettempdir())
         try:
@@ -272,7 +267,7 @@ class ImgUtils:
         return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
 
     @classmethod
-    def _read_png(cls, path: str) -> np.ndarray | None:
+    def _read_png(cls, path: str):
         try:
             img = Image.open(path)
             if img.mode != "RGBA":
@@ -286,7 +281,7 @@ class ImgUtils:
 
 
     @classmethod
-    def _read_jpg(cls, path: str) -> np.ndarray | None:
+    def _read_jpg(cls, path: str):
         try:
             img = Image.open(path)
             img = ImageOps.exif_transpose(img) 
@@ -305,7 +300,7 @@ class ImgUtils:
                 return None
 
     @classmethod
-    def _read_raw(cls, path: str) -> np.ndarray | None:
+    def _read_raw(cls, path: str):
         try:
             # https://github.com/letmaik/rawpy
             # Извлечение встроенного эскиза/превью из RAW-файла и преобразование в изображение:
@@ -344,7 +339,7 @@ class ImgUtils:
             return None
 
     @classmethod
-    def _read_movie(cls, path: str, time_sec=1) -> np.ndarray | None:
+    def _read_movie(cls, path: str, time_sec=1):
         try:
             cap = cv2.VideoCapture(path)
             cap.set(cv2.CAP_PROP_POS_MSEC, time_sec * 1000)
@@ -360,7 +355,7 @@ class ImgUtils:
             return None
 
     @classmethod
-    def _read_any(cls, path: str) -> np.ndarray | None:
+    def _read_any(cls, path: str):
         ...
 
     @classmethod
@@ -396,7 +391,7 @@ class ImgUtils:
             return None
 
     @classmethod
-    def read_img(cls, path: str) -> np.ndarray | None:
+    def read_img(cls, path: str):
         _, ext = os.path.splitext(path)
         ext = ext.lower()
         read_any_dict: dict[str, callable] = {}
