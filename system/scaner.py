@@ -416,7 +416,7 @@ class HashdirImgUpdater:
         ok_new_images: list[ImgItem] = []
         bad_new_images: list[ImgItem] = []
         for img_item in new_images:
-            print("читаю изображдение", img_item.abs_img_path)
+            # print("читаю изображдение", img_item.abs_img_path)
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = Utils.fit_to_thumb(img, Static.max_img_size)
             if img is not None:
@@ -429,15 +429,15 @@ class HashdirImgUpdater:
                         rel_img_path=rel_img_path,
                         mf_alias=scaner_item.mf.alias
                     )
-                    print("Создаю изображение", img_item.abs_img_path)
+                    # print("Создаю изображение", img_item.abs_img_path)
                     Utils.write_thumb(thumb_path, img)
-                    print("Записал thumb", img_item.abs_img_path)
+                    # print("Записал thumb", img_item.abs_img_path)
                     ok_new_images.append(img_item)
                     scaner_item.total_count -= 1
                     # передаем в основной поток текст для отображения
                     # и чтобы в основном потоке сбрасывался таймер таймаута
                     HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
-                    print("отправил в очередь", img_item.abs_img_path)
+                    # print("отправил в очередь", img_item.abs_img_path)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     bad_new_images.append(img_item)
