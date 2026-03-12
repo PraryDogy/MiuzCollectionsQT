@@ -528,8 +528,6 @@ class DbImgUpdater:
         conn.execute(sqlalchemy.insert(Thumbs.table), values_list)
         conn.commit()
         conn.close()
-        ext_item = ExtScanerItem("", True)
-        scaner_item.q.put(ext_item)
 
 
 class NewDirsWorker:    
@@ -562,6 +560,8 @@ class NewDirsWorker:
             scaner_item=scaner_item,
             del_images=ok_del_images
         )
+        scaner_item.q.put(ExtScanerItem("", True))
+
         # создаем список неуспешно созданных миниатюр
         bad_new_images: list[ImgItem] = []
         # шаг про котором мы пишем минитюры и обновляем БД
@@ -594,6 +594,8 @@ class NewDirsWorker:
             )
             # обновляем список неуспешно созданных миниатюр
             bad_new_images.extend(bad_chunks)
+
+        scaner_item.q.put(ExtScanerItem("", True))
 
         dirs_to_scan = DbDirUpdater.get_good_dirs(
             bad_del_images=bad_del_images,
