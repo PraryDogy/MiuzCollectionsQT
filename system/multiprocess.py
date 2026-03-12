@@ -21,13 +21,12 @@ from .tasks import Utils
 
 
 class BaseProcessWorker:
+    _registry = []
+
     def __init__(self, target: callable, args: tuple):
         super().__init__()
-
-        self.proc = Process(
-            target=target,
-            args=(*args, )
-        )
+        self.proc = Process(target=target, args=(*args, ))
+        BaseProcessWorker._registry.append(self.proc)
 
     def start(self):
         self.proc.start()
@@ -42,11 +41,17 @@ class BaseProcessWorker:
         """
         self.proc.terminate()
         self.proc.join(timeout=0.2)
+
         queues: tuple[Queue] = (i for i in dir(self) if hasattr(i, "put"))
         for i in queues:
                 i.close()
                 i.join_thread()
 
+        if self.proc.is_alive():
+            self.proc.kill()
+
+        if self in BaseProcessWorker._registry:
+            BaseProcessWorker._registry.remove(self)
 
 class ProcessWorker(BaseProcessWorker):
     """
