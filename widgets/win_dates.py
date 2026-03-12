@@ -109,25 +109,29 @@ class MyCalendar(QGroupBox):
                 image: none;
                 width: 0px;
             }
-            #qt_calendar_navigationbar {
-                background-color: transparent;
+
+            #qt_calendar_prevmonth,
+            #qt_calendar_nextmonth,
+            #qt_calendar_monthbutton,
+            #qt_calendar_yearbutton {
+                height: 25px;
+                background: transparent;                                 
             }
 
-                                                #qt_calendar_navigationbar {
-                background-color: transparent;
+            #qt_calendar_prevmonth,
+            #qt_calendar_nextmont {
+                width: 25px;
             }
-                                    
-                                                #qt_calendar_navigationbar {
-                background-color: transparent;
+
+            #qt_calendar_prevmonth:hover,
+            #qt_calendar_nextmonth:hover,
+            #qt_calendar_monthbutton:hover,
+            #qt_calendar_yearbutton:hover {                  
+                background: transparent;  
+                border: transparent;
+                color: white;                                 
             }
-                                    
-                                                #qt_calendar_navigationbar {
-                background-color: transparent;
-            }
-                                    
-                                                #qt_calendar_navigationbar {
-                background-color: transparent;
-            }
+
         """)
 
 
