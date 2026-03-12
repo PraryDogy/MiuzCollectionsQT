@@ -189,12 +189,16 @@ class WinDates(SingleActionWindow):
             self.right_calendar.title.set_named_date_text(Dynamic.date_end)
 
     def clear_btn_cmd(self, *args):
+        reload = True
+        if not Dynamic.date_start or not Dynamic.date_end:
+            reload = False
         Dynamic.loaded_thumbs = 0
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.f_date_start = None
         Dynamic.f_date_end = None
-        self.reload_thumbnails.emit()
+        if reload:
+            self.reload_thumbnails.emit()
         self.dates_btn_normal.emit()
         self.deleteLater()
 
