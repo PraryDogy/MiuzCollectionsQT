@@ -6,7 +6,8 @@ from typing import Literal
 from PyQt5.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QIcon, QKeyEvent
 from PyQt5.QtWidgets import (QCalendarWidget, QFrame, QGroupBox, QLabel,
-                             QSpacerItem, QToolButton, QVBoxLayout, QWidget)
+                             QLineEdit, QSpacerItem, QSpinBox, QToolButton,
+                             QVBoxLayout, QWidget)
 
 from cfg import Dynamic, cfg
 from system.lang import Lng
@@ -96,13 +97,18 @@ class MyCalendar(QGroupBox):
             QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
         )
 
-        buttons = self.findChildren(QToolButton)
+        buttons = self.findChildren((QToolButton, QSpinBox))
         for btn in buttons:
             name = btn.objectName()
             if name == "qt_calendar_prevmonth":
                 btn.setIcon(QIcon("./images/prev.svg"))
             elif name == "qt_calendar_nextmonth":
                 btn.setIcon(QIcon("./images/next.svg"))
+            # elif name == "qt_calendar_yearedit":
+            #     btn: QSpinBox
+            #     btn.setFixedHeight(27)
+            #     btn.setFixedWidth(100)
+                # btn.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
 
         self.calendar.setStyleSheet("""
             #qt_calendar_monthbutton::menu-indicator {
@@ -131,7 +137,6 @@ class MyCalendar(QGroupBox):
                 border: transparent;
                 color: white;                                 
             }
-
         """)
 
 

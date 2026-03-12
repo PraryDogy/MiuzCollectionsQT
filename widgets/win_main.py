@@ -654,6 +654,10 @@ class WinMain(UMainWindow):
         self.move(x, y)
 
     def on_exit(self):
+        try:
+            self.scaner_task.terminate_join()
+        except Exception as e:
+            print("on exit main win terminate error", e)
         cfg.write_json_data()
         Filters.write_json_data()
         Mf.write_json_data()

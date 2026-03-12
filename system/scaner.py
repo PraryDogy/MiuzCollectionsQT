@@ -672,6 +672,7 @@ class AllDirScaner:
             if scaner_item.mf.get_available_path():
                 try:
                     print("scaner started", scaner_item.mf.alias)
+                    engine.dispose()
                     AllDirScaner.single_mf_scan(scaner_item)
                     print("scaner finished", scaner_item.mf.alias)
                 except Exception as e:
