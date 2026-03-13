@@ -146,7 +146,7 @@ class App(QApplication):
 
     def set_miuz(self):
         cfg.copy_files()
-        os._exit(1)
+        self.setup_app()
 
     def setup_app(self):
         Filters.init()

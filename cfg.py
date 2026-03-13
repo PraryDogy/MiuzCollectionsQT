@@ -122,7 +122,7 @@ class Cfg:
             Static.internal_filters: Static.external_filters,
             Static.internal_servers: Static.external_servers,
         }
-        for src, external_hashdir_zip in dirs:
+        for src, dst in dirs.items():
             shutil.copy2(src, Static.external_files_dir)
 
         external_hashdir_zip = shutil.copy2(
