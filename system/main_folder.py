@@ -24,14 +24,15 @@ class Mf:
         self.mf_paths = kw["mf_paths"]
         self.mf_stop_list = kw["mf_stop_list"]
         self.mf_current_path: str = kw["mf_current_path"]
-            
-    def set_mf_current_path(self) -> str | None:
-        self.mf_current_path = ""
+
+    def get_avaiable_mf_path(self):
         for i in self.mf_paths:
             if os.path.exists(i):
-                self.mf_current_path = i
-                return self.mf_current_path
+                return i
         return None
+
+    def set_mf_current_path(self, path: str):
+        self.mf_current_path = path
     
     def get_data(self):
         return {i: getattr(self, i) for i in self.__slots__}
