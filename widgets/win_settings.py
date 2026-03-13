@@ -623,6 +623,7 @@ class FiltersWid(GroupWid):
         
     def reset_btn_cmd(self, *args):
         def fin():
+            Filters.filter_list.clear()
             self.filters_edit.clear()
             self.filters_edit.insertPlainText()
             self.filters_win.deleteLater()
