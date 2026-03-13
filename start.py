@@ -85,7 +85,18 @@ class Lng:
         "Настроить приложение",
         "Configure Application"
     )
-
+    description = (
+        (
+            "Приложение \"Collections\" позволяет индексировать и "
+            "быстро просматривать изображения, что полезно на "
+            "медных сетевых дисках."
+        ),
+        (
+            "The \"Collections\" app allows you to index and "
+            "quickly browse images, which is especially useful "
+            "for slow network drives."
+        )
+    )
 
 
 class ClickableGroupBox(QGroupBox):
@@ -141,6 +152,34 @@ class FirstLoad(QDialog):
         self.set_miuz.emit()
         self.deleteLater()
 
+    def closeEvent(self, a0):
+        os._exit(1)
+        return super().closeEvent(a0)
+
+
+class LanguageSelect(QDialog):
+    closed_ = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Language / Язык")
+        self.setFixedSize(300, 120)
+        
+        btn_layout = QHBoxLayout()
+        self.setLayout(btn_layout)
+
+        self.btn_ru = QPushButton("Русский")
+        self.btn_en = QPushButton("English")
+        
+        self.btn_ru.clicked.connect(lambda: self.select_lang(0))
+        self.btn_en.clicked.connect(lambda: self.select_lang(1))
+        
+        btn_layout.addWidget(self.btn_ru)
+        btn_layout.addWidget(self.btn_en)
+
+    def select_lang(self, index):
+        Lng.lng = index
+    
     def closeEvent(self, a0):
         os._exit(1)
         return super().closeEvent(a0)
