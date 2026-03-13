@@ -135,5 +135,20 @@ class Cfg:
         )
         os.remove(external_hashdir_zip)
 
+    def make_external_files(self):
+        if os.path.exists(Static.external_files_dir):
+            shutil.rmtree(Static.external_files_dir)
+        os.makedirs(Static.external_files_dir, exist_ok=True)
+        os.makedirs(Static.external_hashdir, exist_ok=True)
+        dirs = {
+            Static.internal_cfg: Static.external_cfg,
+            Static.internal_db: Static.external_db,
+            Static.internal_mf: Static.external_mf,
+            Static.internal_filters: Static.external_filters,
+            Static.internal_servers: Static.external_servers,
+        }
+        for src, dst in dirs.items():
+            with open(dst, "w") as file:
+                ...
 
 cfg = Cfg()

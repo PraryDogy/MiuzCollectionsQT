@@ -118,7 +118,7 @@ class FirstLoad(QDialog):
         main_layout.addWidget(self.group_miuz)
 
     def _setup_app(self):
-        print("Настройка приложения...")
+        self.set_default.emit()
         self.deleteLater()
 
     def setup_miuz(self):
@@ -141,11 +141,28 @@ class App(QApplication):
         if not check_files:
             first_load = FirstLoad()
             first_load.set_miuz.connect(self.set_miuz)
+            first_load.set_default.connect(self.set_default)
             first_load.exec_()
-            return
+        else:
+            self.setup_app()
 
     def set_miuz(self):
         cfg.copy_files()
+        self.setup_app()
+
+    def set_default(self):
+        mf_name = "Test"
+        mf_path = "/Users/Loshkarev/Desktop/Test"
+        cfg.make_external_files()
+        mf = Mf(
+            mf_alias = mf_name,
+            mf_paths = [mf_path, ],
+            mf_stop_list = [],
+            mf_current_path = ""
+        )
+        Mf.mf_list.append(mf)
+        Mf.write_json_data()
+        Mf.mf_list.clear()
         self.setup_app()
 
     def setup_app(self):
