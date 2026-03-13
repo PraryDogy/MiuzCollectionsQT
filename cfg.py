@@ -122,15 +122,18 @@ class Cfg:
             Static.internal_filters: Static.external_filters,
             Static.internal_servers: Static.external_servers,
         }
-        for src, external_zip in dirs:
+        for src, external_hashdir_zip in dirs:
             shutil.copy2(src, Static.external_files_dir)
 
-        external_zip = shutil.copy2(
+        external_hashdir_zip = shutil.copy2(
             Static.internal_hashdir_zip,
             Static.external_files_dir
         )
-        shutil.unpack_archive(external_zip, Static.external_files_dir)
-        os.remove(external_zip)
+        shutil.unpack_archive(
+            external_hashdir_zip,
+            Static.external_files_dir
+        )
+        os.remove(external_hashdir_zip)
 
 
 cfg = Cfg()
