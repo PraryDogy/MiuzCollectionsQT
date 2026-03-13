@@ -123,14 +123,14 @@ class FirstLoad(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Настройки")
+        self.setWindowTitle(Lng.settings_title[Lng.lng])
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         main_layout = QHBoxLayout(self)
         main_layout.setSpacing(10)
 
         self.group_app = ClickableGroupBox(
-            "Настроить приложение", 
+            Lng.setup_app[Lng.lng],
             self._setup_app
         )
         self.group_miuz = ClickableGroupBox(
@@ -179,8 +179,11 @@ class LanguageSelect(QDialog):
 
     def select_lang(self, index):
         Lng.lng = index
+        self.closed_.emit()
+        self.deleteLater()
     
     def closeEvent(self, a0):
+        Lng.lng = 0
         os._exit(1)
         return super().closeEvent(a0)
 
@@ -194,16 +197,24 @@ class App(QApplication):
 
         check_files = cfg.check_files()
         if not check_files:
-            first_load = FirstLoad()
-            first_load.set_miuz.connect(self.set_miuz)
-            first_load.set_default.connect(self.set_default)
-            first_load.exec_()
+            self.lng_win()
         else:
-            self.setup_app()
+            self.start_app()
+
+    def lng_win(self):
+        lng_win = LanguageSelect()
+        lng_win.closed_.connect(self.first_load_win)
+        lng_win.exec_()
+
+    def first_load_win(self):
+        first_load = FirstLoad()
+        first_load.set_miuz.connect(self.set_miuz)
+        first_load.set_default.connect(self.set_default)
+        first_load.exec_()
 
     def set_miuz(self):
         cfg.copy_files()
-        self.setup_app()
+        self.start_app()
 
     def set_default(self):
         mf_name = "Test"
@@ -218,9 +229,9 @@ class App(QApplication):
         Mf.mf_list.append(mf)
         Mf.write_json_data()
         Mf.mf_list.clear()
-        self.setup_app()
+        self.start_app()
 
-    def setup_app(self):
+    def start_app(self):
         Filters.init()
         Dbase.init()
         Mf.init()
