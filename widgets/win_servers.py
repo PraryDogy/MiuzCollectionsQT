@@ -199,15 +199,12 @@ class ServersWin(SingleActionWindow):
 
     def connect_cmd(self):
         delay = 0
-
         for server, login, password in self.data:
             if SharedUtils.is_mounted(server):
                 continue
             cmd = f"smb://{login}:{password}@{server}"
             QTimer.singleShot(delay, lambda c=cmd: subprocess.run(["open", c]))
             delay += 200  # задержка 200 мс между подключениями
-
-        # Закрыть окно через общее время + небольшой запас
         QTimer.singleShot(delay + 100, self.deleteLater)
 
     def keyPressEvent(self, a0):
