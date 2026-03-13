@@ -75,6 +75,19 @@ class System_:
             return False
 
 
+class Lng:
+    lng = 0
+    settings_title = (
+        "Настройки",
+        "Settings"
+    )
+    setup_app = (
+        "Настроить приложение",
+        "Configure Application"
+    )
+
+
+
 class ClickableGroupBox(QGroupBox):
     def __init__(self, title: str, callback: callable):
         super().__init__()
@@ -99,7 +112,7 @@ class FirstLoad(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Начальная настройка")
+        self.setWindowTitle("Настройки")
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         main_layout = QHBoxLayout(self)
