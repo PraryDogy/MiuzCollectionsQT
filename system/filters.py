@@ -5,8 +5,6 @@ from cfg import Static
 
 class Filters:
     filter_list = []
-    default_filters = [
-    ]
 
     @classmethod
     def init(cls):

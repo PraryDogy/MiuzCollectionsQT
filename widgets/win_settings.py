@@ -624,9 +624,7 @@ class FiltersWid(GroupWid):
     def reset_btn_cmd(self, *args):
         def fin():
             self.filters_edit.clear()
-            self.filters_edit.insertPlainText(
-                "\n".join(Filters.default_filters)
-            )
+            self.filters_edit.insertPlainText()
             self.filters_win.deleteLater()
             self.changed.emit
 
