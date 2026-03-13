@@ -6,7 +6,7 @@ from time import sleep
 
 import sqlalchemy
 
-from cfg import Static, Cfg
+from cfg import Static
 from system.database import ColumnNames, Dbase, Dirs, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
