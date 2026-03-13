@@ -15,6 +15,8 @@ class Static:
     app_support_cfg = f"{app_support}/cfg.json"
     app_support_db = f"{app_support}/db.db"
     app_support_hashdir = f"{app_support}/{hashdir}"
+    app_support_mf = os.path.join(app_support, "mf.json")
+
     _preload_db = f"{_preload}/db.db"
     _preload_hashdir = f"{_preload}/{hashdir}"
     _preload_zip = f"{_preload}/hashdir.zip"
@@ -90,6 +92,19 @@ class Cfg:
             json.dump(vars(self), file, ensure_ascii=False, indent=4)
 
     def check_dirs(self):
+        if not os.path.exists(Static.app_support):
+            return None
+        dirs = (
+            Static.app_support_db,
+            Static.app_support_hashdir,
+            Static.app_support_cfg,
+            Static.app_support_mf
+        )
+        if not all(os.path.exists(p) for p in dirs):   
+            return None
+        return True
+
+
         dirs = (Static._preload, Static._preload_zip, Static._preload_db)
         if not all(os.path.exists(p) for p in dirs):
             self.make_internal_files()
@@ -142,11 +157,6 @@ class Cfg:
     def initialize(self):
         self.check_dirs()
         self.set_json_data()
-        if Static.app_ver != self.app_ver:
-            shutil.rmtree(Static.app_support)
-            self.check_dirs()
-            self.app_ver = Static.app_ver
-            self.write_json_data()
 
 
 cfg = Cfg()

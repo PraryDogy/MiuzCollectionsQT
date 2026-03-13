@@ -3,13 +3,11 @@ import os
 
 from cfg import Static
 
-from .utils import Utils
 
 
 class Mf:
     current_mf: "Mf" = None
     mf_list: list["Mf"] = []
-    __json_file = os.path.join(Static.app_support, "mf.json")
     __slots__ = ["mf_alias", "mf_paths", "mf_stop_list", "mf_current_path",]
 
     def __init__(self, **kw):
@@ -39,11 +37,11 @@ class Mf:
 
     @classmethod
     def init(cls):
-        if not os.path.exists(cls.__json_file):
+        if not os.path.exists(Static.app_support_mf):
             return None
         
         try:
-            with open(cls.__json_file, "r", encoding="utf-8") as file:
+            with open(Static.app_support_mf, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
 
             for mf in data:
@@ -67,6 +65,6 @@ class Mf:
 
     @classmethod
     def write_json_data(cls):
-        with open(cls.__json_file, "w", encoding="utf-8") as file:
+        with open(Static.app_support_mf, "w", encoding="utf-8") as file:
             data = [i.get_data() for i in cls.mf_list]
             json.dump(data, file, ensure_ascii=False, indent=4)
