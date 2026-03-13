@@ -90,7 +90,7 @@ class Cfg:
         }
     
     @classmethod
-    def set_json_data(cls):
+    def json_to_app(cls):
         def cmd():
             with open(Static.external_cfg, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
@@ -123,7 +123,7 @@ class Cfg:
         return True
     
     @classmethod
-    def copy_files(cls):
+    def copy_miuz_files(cls):
         if os.path.exists(Static.external_files_dir):
             shutil.rmtree(Static.external_files_dir)
         os.makedirs(Static.external_files_dir, exist_ok=True)

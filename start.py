@@ -164,6 +164,9 @@ class FirstLoad(QDialog):
     def closeEvent(self, a0):
         os._exit(1)
         return super().closeEvent(a0)
+    
+    def keyPressEvent(self, a0):
+        a0.ignore()
 
 
 class LanguageSelect(QDialog):
@@ -198,6 +201,9 @@ class LanguageSelect(QDialog):
     def closeEvent(self, a0):
         os._exit(1)
         return super().closeEvent(a0)
+    
+    def keyPressEvent(self, a0):
+        a0.ignore()
 
 
 class App(QApplication):
@@ -225,7 +231,9 @@ class App(QApplication):
         first_load.exec_()
 
     def set_miuz(self):
-        Cfg.copy_files()
+        lng = Cfg.lng
+        Cfg.copy_miuz_files()
+        Cfg.write_json_data()
         self.start_app()
 
     def set_default(self):
@@ -233,6 +241,7 @@ class App(QApplication):
         self.single_settings.show()
 
     def start_app(self):
+        Cfg.json_to_app()
         Servers.init()
         Filters.init()
         Mf.init()
