@@ -54,7 +54,7 @@ class Mf:
                 return
 
             for mf in data:
-                if not list(mf.keys()) == Mf.__slots__:
+                if list(mf.keys()) != Mf.__slots__:
                     print("mf не сооветствует слотам", mf["mf_alias"])
                     continue
                 elif not mf["mf_paths"]:
