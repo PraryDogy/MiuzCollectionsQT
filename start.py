@@ -235,9 +235,8 @@ class App(QApplication):
 
     def start_app(self):
         Filters.init()
-        Dbase.init()
         Mf.init()
-        
+        Dbase.init()
         ThemeChanger.init()
         UThreadPool.init()
 
