@@ -12,6 +12,7 @@ from system.database import Dbase
 from system.filters import Filters
 from system.main_folder import Mf
 from system.paletes import ThemeChanger
+from system.servers import Servers
 from system.tasks import UThreadPool
 from widgets._base_widgets import WinManager
 from widgets.win_main import WinMain
@@ -234,6 +235,7 @@ class App(QApplication):
         self.single_settings.show()
 
     def start_app(self):
+        Servers.init()
         Filters.init()
         Mf.init()
         Dbase.init()

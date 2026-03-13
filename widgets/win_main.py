@@ -19,6 +19,7 @@ from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, OnStartTask,
                                  ProcessWorker)
 from system.scaner import AllDirScaner, SingleDirScaner
+from system.servers import Servers
 from system.shared_utils import ImgUtils
 from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
 
@@ -662,6 +663,7 @@ class WinMain(UMainWindow):
         except Exception as e:
             print("on exit main win terminate error", e)
         cfg.write_json_data()
+        Servers.write_json_data()
         Filters.write_json_data()
         Mf.write_json_data()
         os._exit(0)
