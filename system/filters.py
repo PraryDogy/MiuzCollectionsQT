@@ -12,9 +12,12 @@ class Filters:
     def init(cls):
         try:
             with open(Static.external_filters, "r", encoding="utf-8") as f:
-                for i in json.load(f):
-                    if i not in cls.filter_list:
-                        cls.filter_list.append(i)
+                data: list[str] = json.load(f)
+            cls.filter_list = [
+                i
+                for i in data
+                if i not in cls.filter_list
+            ]
         except Exception as e:
             ...
 
