@@ -1012,7 +1012,7 @@ class WinSettings(SingleActionWindow):
         self.setWindowTitle(Lng.settings[Cfg.lng])
         self.setFixedSize(700, 560)
 
-        self.cfg_clone = copy.deepcopy(cfg)
+        self.cfg_clone = copy.deepcopy(Cfg)
         self.mf_list_clone = copy.deepcopy(Mf.mf_list)
         self.filters_clone = copy.deepcopy(Filters.filter_list)
         self.settings_item = settings_item
