@@ -1231,7 +1231,6 @@ class SingleSettings(SingleActionWindow):
         Mf.mf_list.append(mf)
         cfg.make_external_empty_files()
         Mf.write_json_data()
-        cfg.lng = 1
         cfg.write_json_data()
         Filters.write_json_data()
         Servers.write_json_data()
