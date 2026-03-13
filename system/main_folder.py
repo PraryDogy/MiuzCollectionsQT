@@ -4,7 +4,6 @@ import os
 from cfg import Static
 
 
-
 class Mf:
     current_mf: "Mf" = None
     mf_list: list["Mf"] = []
@@ -12,7 +11,7 @@ class Mf:
 
     def __init__(self, **kw):
         """
-        mf_alias: str  
+        mf_alias: str   
         mf_paths: list[str]    
         mf_stop_list: list[str]     
         mf_current_path: str    

@@ -100,7 +100,7 @@ class FirstLoad(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Начальная настройка")
-        self.setFixedSize(500, 200)
+        self.setFixedHeight(150)
 
         main_layout = QHBoxLayout(self)
         main_layout.setSpacing(5)
@@ -116,6 +116,7 @@ class FirstLoad(QDialog):
 
         main_layout.addWidget(self.group_app)
         main_layout.addWidget(self.group_miuz)
+        self.adjustSize()
 
     def _setup_app(self):
         self.set_default.emit()
