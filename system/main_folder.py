@@ -1,6 +1,6 @@
 import json
 import os
-import shutil
+
 from cfg import Static
 
 from .utils import Utils
@@ -47,16 +47,22 @@ class Mf:
         try:
             with open(cls.__json_file, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
+
             if not isinstance(data, list):
                 cls.mf_list = cls.get_default_mfs()
                 cls.current_mf = cls.mf_list[0]
-            else:
-                for mf in data:
-                    if mf["mf_paths"]:
-                        item = Mf(**mf)
-                        cls.mf_list.append(item)
-                    else:
-                        print("папка не имеет путей")
+                return
+
+            for mf in data:
+                if not list(mf.keys()) == Mf.__slots__:
+                    print("mf не сооветствует слотам", mf["mf_alias"])
+                    continue
+                elif not mf["mf_paths"]:
+                    print("mf нет путей", mf["mf_alias"])
+                    continue
+                else:
+                    cls.mf_list.append(Mf(**mf))
+
             if len(cls.mf_list) == 0:
                 cls.mf_list = cls.get_default_mfs()
             cls.current_mf = cls.mf_list[0]
