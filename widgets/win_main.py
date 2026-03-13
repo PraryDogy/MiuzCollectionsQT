@@ -656,7 +656,8 @@ class WinMain(UMainWindow):
 
     def on_exit(self):
         try:
-            self.scaner_task.terminate_join()
+            if hasattr(self, "scaner_task"):
+                self.scaner_task.terminate_join()
             ProcessWorker.stop_all()
         except Exception as e:
             print("on exit main win terminate error", e)

@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
 
 from cfg import Cfg, Static
 from system.lang import Lng
+from system.servers import Servers
 from system.shared_utils import SharedUtils
 
 from ._base_widgets import SingleActionWindow, ULineEdit
@@ -96,8 +97,6 @@ class ServersWidget(QTableView):
 
 
 class ServersWin(SingleActionWindow):
-    json_file = os.path.join(Static.external_files_dir, "servers.json")
-
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.connect_to_server[Cfg.lng])
@@ -107,13 +106,9 @@ class ServersWin(SingleActionWindow):
         self.data: list[list[str]] = []
         self.init_data()
 
-        # Layout
-        # self.central_layout = QVBoxLayout()
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(10)
-        # self.centralWidget().setLayout(self.central_layout)
 
-        # QLineEdit для нового сервера
         self.new_server = ULineEdit()
         self.new_server.setPlaceholderText(
             f"{Lng.server[Cfg.lng]}, {Lng.login[Cfg.lng]}, {Lng.password[Cfg.lng]}"
@@ -157,8 +152,8 @@ class ServersWin(SingleActionWindow):
 
     # Загрузка данных из JSON
     def init_data(self):
-        if os.path.exists(self.json_file):
-            with open(self.json_file, "r", encoding="utf-8") as f:
+        if os.path.exists(Static.external_servers):
+            with open(Static.external_servers, "r", encoding="utf-8") as f:
                 self.data = json.load(f)
 
     def add_server(self):
@@ -199,7 +194,7 @@ class ServersWin(SingleActionWindow):
         self.save_cmd()
 
     def save_cmd(self):
-        with open(self.json_file, "w", encoding="utf-8") as file:
+        with open(Static.external_servers, "w", encoding="utf-8") as file:
             json.dump(self.data, file, indent=4, ensure_ascii=False)
 
     def connect_cmd(self):
