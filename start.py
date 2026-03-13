@@ -89,7 +89,7 @@ class Lng:
         (
             "Приложение \"Collections\" позволяет индексировать и "
             "быстро просматривать изображения, что полезно на "
-            "медных сетевых дисках."
+            "медленных сетевых дисках."
         ),
         (
             "The \"Collections\" app allows you to index and "
@@ -126,8 +126,17 @@ class FirstLoad(QDialog):
         self.setWindowTitle(Lng.settings_title[Lng.lng])
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
-        main_layout = QHBoxLayout(self)
-        main_layout.setSpacing(10)
+        layout = QVBoxLayout(self)
+        layout.setSpacing(15)
+
+        self.title_label = QLabel(Lng.description[Lng.lng])
+        self.title_label.setWordWrap(True)
+        self.title_label.setFixedWidth(310)
+        self.title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.title_label)
+
+        groups_layout = QHBoxLayout()
+        groups_layout.setSpacing(10)
 
         self.group_app = ClickableGroupBox(
             Lng.setup_app[Lng.lng],
@@ -138,9 +147,11 @@ class FirstLoad(QDialog):
             self.setup_miuz
         )
 
-        main_layout.addWidget(self.group_app)
-        main_layout.addWidget(self.group_miuz)
+        groups_layout.addWidget(self.group_app)
+        groups_layout.addWidget(self.group_miuz)
+        layout.addLayout(groups_layout)
         self.adjustSize()
+
 
     def _setup_app(self):
         self.hide()
@@ -163,19 +174,23 @@ class LanguageSelect(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Language / Язык")
-        self.setFixedSize(300, 120)
         
         btn_layout = QHBoxLayout()
         self.setLayout(btn_layout)
 
-        self.btn_ru = QPushButton("Русский")
-        self.btn_en = QPushButton("English")
-        
-        self.btn_ru.clicked.connect(lambda: self.select_lang(0))
-        self.btn_en.clicked.connect(lambda: self.select_lang(1))
+        self.btn_ru = ClickableGroupBox(
+            "Русский",
+            lambda: self.select_lang(0)
+        )
+        self.btn_en = ClickableGroupBox(
+            "English",
+            lambda: self.select_lang(1)
+        )
         
         btn_layout.addWidget(self.btn_ru)
         btn_layout.addWidget(self.btn_en)
+        
+        self.adjustSize()
 
     def select_lang(self, index):
         Lng.lng = index
