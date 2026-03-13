@@ -1208,13 +1208,34 @@ class WinSettings(SingleActionWindow):
 
 
 class SingleSettings(SingleActionWindow):
+    """
+    Окно настроек при первой настройке приложения.
+    """
     def __init__(self):
         super().__init__()
         self.setFixedSize(500, 500)
         self.mf_list_clone = copy.deepcopy(Mf.mf_list)
         self.new_mf = NewFolder(mf_list_clone=self.mf_list_clone)
+        # перехватываем нажатие кнопки "сохранить"
+        self.new_mf.save_fin = self.new_save_fin
         self.central_layout.addWidget(self.new_mf)
         self.central_layout.addSpacerItem(QSpacerItem(0, 15))
+
+    def new_save_fin(self, folder_name, paths, stop_list):
+        mf = Mf(
+            mf_alias=folder_name,
+            mf_paths=paths,
+            mf_stop_list=stop_list,
+            mf_current_path=""
+        )
+        Mf.mf_list.append(mf)
+
+        cfg.make_external_files()
+        Mf.write_json_data()
+        Filters.write_json_data()
+        Servers.write_json_data()
+        
+        restart_app()
 
     def closeEvent(self, a0):
         os._exit(1)
