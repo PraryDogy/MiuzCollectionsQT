@@ -8,7 +8,7 @@ class Servers:
     server_list = []
 
     @classmethod
-    def init(cls):
+    def json_to_app(cls):
         try:
             with open(Static.external_servers, "r", encoding="utf-8") as f:
                 server_list: list = json.load(f)

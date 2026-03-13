@@ -242,9 +242,9 @@ class App(QApplication):
 
     def start_app(self):
         Cfg.json_to_app()
-        Servers.init()
-        Filters.init()
-        Mf.init()
+        Servers.json_to_app()
+        Filters.json_to_app()
+        Mf.json_to_app()
         Dbase.init()
         ThemeChanger.init()
         UThreadPool.init()

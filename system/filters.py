@@ -7,7 +7,7 @@ class Filters:
     filter_list = []
 
     @classmethod
-    def init(cls):
+    def json_to_app(cls):
         try:
             with open(Static.external_filters, "r", encoding="utf-8") as f:
                 data: list[str] = json.load(f)

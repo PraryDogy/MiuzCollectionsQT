@@ -35,7 +35,7 @@ class Mf:
         return {i: getattr(self, i) for i in self.__slots__}
 
     @classmethod
-    def init(cls):
+    def json_to_app(cls):
         if not os.path.exists(Static.external_mf):
             return None
         
