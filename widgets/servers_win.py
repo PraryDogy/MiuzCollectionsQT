@@ -96,7 +96,7 @@ class ServersWidget(QTableView):
 
 
 class ServersWin(SingleActionWindow):
-    json_file = os.path.join(Static.app_support, "servers.json")
+    json_file = os.path.join(Static.external_files_dir, "servers.json")
 
     def __init__(self):
         super().__init__()

@@ -119,11 +119,11 @@ class FirstLoad(QDialog):
 
     def _setup_app(self):
         print("Настройка приложения...")
-        self.close()
+        self.deleteLater()
 
     def setup_miuz(self):
         self.set_miuz.emit()
-        self.close()
+        self.deleteLater()
 
     def closeEvent(self, a0):
         os._exit(1)
@@ -135,6 +135,7 @@ class App(QApplication):
         self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
         self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         super().__init__(argv)
+        self.argv = argv
 
         check_files = cfg.check_files()
         if not check_files:
@@ -143,24 +144,24 @@ class App(QApplication):
             first_load.exec_()
             return
 
+    def set_miuz(self):
+        cfg.copy_files()
+        os._exit(1)
+
+    def setup_app(self):
         Filters.init()
         Dbase.init()
         Mf.init()
-
         
         ThemeChanger.init()
         UThreadPool.init()
 
-        self.win_main = WinMain(argv)
+        self.win_main = WinMain(self.argv)
         self.win_main.center_screen()
         self.win_main.show()
 
         self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: self.win_main.on_exit())
-
-    def set_miuz(self):
-        cfg.copy_files()
-
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:

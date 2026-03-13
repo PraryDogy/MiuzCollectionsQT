@@ -8,22 +8,24 @@ class Static:
     app_ver = 4.25
     app_name = "Collections"
     thumbs_load_limit = 100
+    
+    external_files_dir = os.path.expanduser(f"~/Library/Application Support/{app_name}")
+    external_cfg = f"{external_files_dir}/cfg.json"
+    external_db = f"{external_files_dir}/db.db"
+    external_hashdir = f"{external_files_dir}/hashdir"
+    external_mf = f"{external_files_dir}/mf.json"
+    external_filters = f"{external_files_dir}/filters.json"
+    external_servers = f"{external_files_dir}/servers.json"
 
-    hashdir = "hashdir"
-    _preload = "_preload"
-    app_support = os.path.expanduser(f"~/Library/Application Support/{app_name}")
-    app_support_cfg = f"{app_support}/cfg.json"
-    app_support_db = f"{app_support}/db.db"
-    app_support_hashdir = f"{app_support}/{hashdir}"
-    app_support_mf = os.path.join(app_support, "mf.json")
-    app_support_filters = os.path.join(app_support, "filters.json")
-    app_support_servers = os.path.join(app_support, "servers.json")
+    internal_files_dir = "./_preload"
+    internal_cfg = f"{internal_files_dir}/cfg.json"
+    internal_db = f"{internal_files_dir}/db.db"
+    internal_hashdir_zip = f"{internal_files_dir}/hashdir.zip"
+    internal_mf = f"{internal_files_dir}/mf.json"
+    internal_filters = f"{internal_files_dir}/filters.json"
+    internal_servers = f"{internal_files_dir}/servers.json"
 
-    _preload_db = f"{_preload}/db.db"
-    _preload_hashdir = f"{_preload}/{hashdir}"
-    _preload_zip = f"{_preload}/hashdir.zip"
     ww, hh = 1120, 760
-
     max_img_size = 210
     spacing = 2
     margins = 15
@@ -80,7 +82,7 @@ class Cfg:
 
     def set_json_data(self):
         def cmd():
-            with open(Static.app_support_cfg, "r", encoding="utf-8") as file:
+            with open(Static.external_cfg, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(self, k, v) if hasattr(self, k) else None
@@ -90,18 +92,18 @@ class Cfg:
             print("cfg, set json data error",e)
  
     def write_json_data(self):
-        with open(Static.app_support_cfg, "w", encoding="utf-8") as file:
+        with open(Static.external_cfg, "w", encoding="utf-8") as file:
             json.dump(vars(self), file, ensure_ascii=False, indent=4)
 
     def check_files(self):
         dirs = (
-            Static.app_support_cfg,
-            Static.app_support_db,
-            Static.app_support_filters,
-            Static.app_support_hashdir,
-            Static.app_support_mf,
-            Static.app_support_servers
-
+            Static.external_files_dir,
+            Static.external_cfg,
+            Static.external_db,
+            Static.external_filters,
+            Static.external_hashdir,
+            Static.external_mf,
+            Static.external_servers
         )
         for i in dirs:
             if not os.path.exists(i):
@@ -109,42 +111,26 @@ class Cfg:
         return True
     
     def copy_files(self):
-        if os.path.exists(Static.app_support):
-            shutil.rmtree(Static.app_support)
-        os.makedirs(Static.app_support, exist_ok=True)
-        for i in os.scandir(Static._preload):
-            print(i.path)
-            return
+        if os.path.exists(Static.external_files_dir):
+            shutil.rmtree(Static.external_files_dir)
+        os.makedirs(Static.external_files_dir, exist_ok=True)
 
-        # dirs = (Static._preload, Static._preload_zip, Static._preload_db)
-        # if not all(os.path.exists(p) for p in dirs):
-        #     self.make_internal_files()
-        # os.makedirs(Static.app_support, exist_ok=True)
-        # if not os.path.exists(Static.app_support_db):
-        #     self.copy_preload_db()
-        # if not os.path.exists(Static.app_support_hashdir):
-        #     self.copy_preload_hashdir_zip()
-        # if not os.path.exists(Static.app_support_cfg):
-        #     self.write_json_data()
+        dirs = {
+            Static.internal_cfg: Static.external_cfg,
+            Static.internal_db: Static.external_db,
+            Static.internal_mf: Static.external_mf,
+            Static.internal_filters: Static.external_filters,
+            Static.internal_servers: Static.external_servers,
+        }
+        for src, external_zip in dirs:
+            shutil.copy2(src, Static.external_files_dir)
 
-
-    # def copy_preload_hashdir_zip(self):
-    #     if os.path.exists(Static.app_support_hashdir):
-    #         print("Удаляю пользовательскую HASH_DIR")
-    #         shutil.rmtree(Static.app_support_hashdir)
-
-    #     print("копирую предустановленную HASH_DIR")
-    #     dest = shutil.copy2(Static._preload_zip, Static.app_support)
-    #     shutil.unpack_archive(dest, Static.app_support)
-    #     os.remove(dest)
-
-    # def copy_preload_db(self):
-    #     if os.path.exists(Static.app_support_db):
-    #         print("Удаляю пользовательский DB_FILE")
-    #         os.remove(Static.app_support_db)
-
-    #     print("Копирую предустановленный DB_FILE")
-    #     shutil.copy2(Static._preload_db, Static.app_support)
+        external_zip = shutil.copy2(
+            Static.internal_hashdir_zip,
+            Static.external_files_dir
+        )
+        shutil.unpack_archive(external_zip, Static.external_files_dir)
+        os.remove(external_zip)
 
 
 cfg = Cfg()

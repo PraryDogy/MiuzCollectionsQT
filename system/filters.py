@@ -19,8 +19,8 @@ class Filters:
 
     @classmethod
     def init(cls):
-        if os.path.exists(Static.app_support_filters):
-            with open(Static.app_support_filters, "r", encoding="utf-8") as f:
+        if os.path.exists(Static.external_filters):
+            with open(Static.external_filters, "r", encoding="utf-8") as f:
                 for i in json.load(f):
                     if i not in cls.filter_list:
                         cls.filter_list.append(i)
@@ -29,5 +29,5 @@ class Filters:
 
     @classmethod
     def write_json_data(cls):
-        with open(Static.app_support_filters, "w", encoding="utf-8") as f:
+        with open(Static.external_filters, "w", encoding="utf-8") as f:
             json.dump(cls.filter_list, f, indent=4, ensure_ascii=False)

@@ -208,7 +208,7 @@ class RebootSettings(GroupWid):
     def reset_btn_cmd(self, *args):
         def fin():
             self.deleteLater()
-            shutil.rmtree(Static.app_support)
+            shutil.rmtree(Static.external_files_dir)
             restart_app()
 
         reset_win = ConfirmWindow(Lng.erase_data_long[cfg.lng])
@@ -365,7 +365,7 @@ class NonRebootSettings(GroupWid):
 
     def show_files_cmd(self, *args):
         try:
-            subprocess.Popen(["open", Static.app_support])
+            subprocess.Popen(["open", Static.external_files_dir])
         except Exception as e:
             print(e)
 

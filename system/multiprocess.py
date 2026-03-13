@@ -330,7 +330,7 @@ class _EmptyHashdirRemover:
         Передает в Queue список удаленных директорий
         """
         removed_dirs: list[str] = []
-        for i in os.scandir(Static.app_support_hashdir):
+        for i in os.scandir(Static.external_hashdir):
             if os.path.isdir(i.path) and not os.listdir(i.path):
                 try:
                     shutil.rmtree(i.path)
