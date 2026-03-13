@@ -3,7 +3,6 @@ import sys
 import traceback
 
 from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
-from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
