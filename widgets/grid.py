@@ -1074,7 +1074,7 @@ class Grid(VScrollArea):
 
             # собираем пути выбранных изображений
             paths = []
-            if Mf.current_mf.get_available_path():
+            if Mf.current_mf.set_mf_current_path():
                 paths = [
                     Utils.get_abs_any_path(Mf.current_mf.mf_current_path, wid.rel_path)
                     for wid in self.selected_widgets

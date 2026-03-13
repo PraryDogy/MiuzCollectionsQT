@@ -9,15 +9,15 @@ from .utils import Utils
 class Mf:
     current_mf: "Mf" = None
     mf_list: list["Mf"] = []
-    json_file = os.path.join(Static.app_support, "mf.json")
+    __json_file = os.path.join(Static.app_support, "mf.json")
     __slots__ = ["mf_alias", "mf_paths", "mf_stop_list", "mf_current_path",]
 
     def __init__(self, **kw):
         """
-        mf_alias: str,
-        mf_paths: list[str],
-        mf_stop_list: list[str]
-        mf_current_path: str
+        mf_alias: str  
+        mf_paths: list[str]    
+        mf_stop_list: list[str]     
+        mf_current_path: str    
         """
         super().__init__()
         self.mf_alias = kw["mf_alias"]
@@ -25,11 +25,7 @@ class Mf:
         self.mf_stop_list = kw["mf_stop_list"]
         self.mf_current_path: str = kw["mf_current_path"]
             
-    def get_available_path(self) -> str | None:
-        """
-        Проверяет и устанавливает путь Mf.currpath  
-        Возвращает доступный путь Mf.curr_path или None
-        """
+    def set_mf_current_path(self) -> str | None:
         self.mf_current_path = ""
         for i in self.mf_paths:
             if os.path.exists(i):
@@ -42,13 +38,13 @@ class Mf:
 
     @classmethod
     def init(cls):
-        if not os.path.exists(cls.json_file):
+        if not os.path.exists(cls.__json_file):
             cls.mf_list = cls.get_default_mfs()
             cls.current_mf = cls.mf_list[0]
             return
         
         try:
-            with open(cls.json_file, "r", encoding="utf-8") as file:
+            with open(cls.__json_file, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
             if not isinstance(data, list):
                 cls.mf_list = cls.get_default_mfs()
@@ -72,7 +68,7 @@ class Mf:
 
     @classmethod
     def write_json_data(cls):
-        with open(cls.json_file, "w", encoding="utf-8") as file:
+        with open(cls.__json_file, "w", encoding="utf-8") as file:
             data = [i.get_data() for i in cls.mf_list]
             json.dump(data, file, ensure_ascii=False, indent=4)
 

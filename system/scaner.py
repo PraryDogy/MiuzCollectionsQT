@@ -667,7 +667,7 @@ class AllDirScaner:
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
             scaner_item = IntScanerItem(mf, engine, q)
-            if scaner_item.mf.get_available_path():
+            if scaner_item.mf.set_mf_current_path():
                 try:
                     print("scaner started", scaner_item.mf.mf_alias)
                     engine.dispose()
@@ -743,7 +743,7 @@ class SingleDirScaner:
         """
         engine = Dbase.create_engine()
         scaner_item = IntScanerItem(mf, engine, q)
-        if scaner_item.mf.get_available_path():
+        if scaner_item.mf.set_mf_current_path():
             dir_items: list[DirItem] = []
             for i in dirs_to_scan:
                 try:
