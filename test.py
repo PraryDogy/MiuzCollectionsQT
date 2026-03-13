@@ -1,4 +1,15 @@
-sts = '/Users/Loshkarev/Desktop/ПРОБЛЕМНЫЕ ФАЙЛЫ1'
-import shutil
+from cfg import Cfg
 
-shutil.rmtree(sts)
+
+
+a = [
+    k for k in vars(Cfg)
+    if not k.startswith("__")
+    and
+    not callable(getattr(Cfg, k))
+]
+
+# Cfg.write_json_data()
+
+for i in a:
+    print(i)

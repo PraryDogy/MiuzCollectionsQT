@@ -80,6 +80,16 @@ class Cfg:
     ]
 
     @classmethod
+    def get_data(cls):
+        return {
+            k: v
+            for k, v in vars(Cfg).items()
+            if not k.startswith("__")
+            and
+            not callable(getattr(Cfg, k))
+        }
+    
+    @classmethod
     def set_json_data(cls):
         def cmd():
             with open(Static.external_cfg, "r", encoding="utf-8") as file:
@@ -94,7 +104,7 @@ class Cfg:
     @classmethod
     def write_json_data(cls):
         with open(Static.external_cfg, "w", encoding="utf-8") as file:
-            json.dump(vars(cls), file, ensure_ascii=False, indent=4)
+            json.dump(cls.get_data(), file, ensure_ascii=False, indent=4)
 
     @classmethod
     def check_files(cls):
