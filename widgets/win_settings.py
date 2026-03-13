@@ -624,7 +624,7 @@ class FiltersWid(GroupWid):
         def fin():
             self.filters_edit.clear()
             self.filters_edit.insertPlainText(
-                "\n".join(Filters.default)
+                "\n".join(Filters.default_filters)
             )
             self.filters_win.deleteLater()
             self.changed.emit
@@ -1006,7 +1006,7 @@ class WinSettings(SingleActionWindow):
 
         self.cfg_clone = copy.deepcopy(cfg)
         self.mf_list_clone = copy.deepcopy(Mf.mf_list)
-        self.filters_clone = copy.deepcopy(Filters.filters)
+        self.filters_clone = copy.deepcopy(Filters.filter_list)
         self.settings_item = settings_item
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -1172,7 +1172,7 @@ class WinSettings(SingleActionWindow):
             Mf.mf_list = self.mf_list_clone
             Mf.write_json_data()
 
-            Filters.filters = self.filters_clone
+            Filters.filter_list = self.filters_clone
             Filters.write_json_data()
 
             cfg.lng = self.cfg_clone.lng

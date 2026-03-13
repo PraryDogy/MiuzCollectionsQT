@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import traceback
 
@@ -9,7 +10,7 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
-from cfg import cfg
+from cfg import Static, cfg
 from system.database import Dbase
 from system.filters import Filters
 from system.main_folder import Mf
@@ -121,7 +122,7 @@ class FirstLoad(QDialog):
         self.close()
 
     def setup_miuz(self):
-        print("Настройка MIUZ...")
+        self.set_miuz.emit()
         self.close()
 
     def closeEvent(self, a0):
@@ -135,13 +136,13 @@ class App(QApplication):
         self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         super().__init__(argv)
 
-        checked_dirs = cfg.check_dirs()
-        if not checked_dirs:
+        check_files = cfg.check_files()
+        if not check_files:
             first_load = FirstLoad()
+            first_load.set_miuz.connect(self.set_miuz)
             first_load.exec_()
             return
 
-        cfg.initialize()
         Filters.init()
         Dbase.init()
         Mf.init()
@@ -158,7 +159,8 @@ class App(QApplication):
         self.aboutToQuit.connect(lambda: self.win_main.on_exit())
 
     def set_miuz(self):
-        os.makedirs(Static.app_support, exist_ok=True)
+        cfg.copy_files()
+
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:

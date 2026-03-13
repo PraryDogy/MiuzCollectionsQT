@@ -49,7 +49,7 @@ class WinFilters(SingleActionWindow):
 
         self.list_widget.addItem(UListSpacerItem(parent=self.list_widget))
 
-        for i in Filters.filters:
+        for i in Filters.filter_list:
             item = UListWidgetItem(
                 parent=self.list_widget,
                 text=i

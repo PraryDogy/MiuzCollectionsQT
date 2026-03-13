@@ -1,11 +1,12 @@
-import os
 import json
-from cfg import Static, Dynamic
+import os
+
+from cfg import Static
+
 
 class Filters:
-    filepath = os.path.join(Static.app_support, "filters.json")
-    filters = []
-    default = [
+    filter_list = []
+    default_filters = [
         "/1 IMG/",
         "/2 MODEL IMG/",
         ".tif",
@@ -18,15 +19,15 @@ class Filters:
 
     @classmethod
     def init(cls):
-        if os.path.exists(cls.filepath):
-            with open(cls.filepath, "r", encoding="utf-8") as f:
+        if os.path.exists(Static.app_support_filters):
+            with open(Static.app_support_filters, "r", encoding="utf-8") as f:
                 for i in json.load(f):
-                    if i not in cls.filters:
-                        cls.filters.append(i)
+                    if i not in cls.filter_list:
+                        cls.filter_list.append(i)
         else:
-            cls.filters.extend(cls.default)
+            cls.filter_list.extend(cls.default_filters)
 
     @classmethod
     def write_json_data(cls):
-        with open(cls.filepath, "w", encoding="utf-8") as f:
-            json.dump(cls.filters, f, indent=4, ensure_ascii=False)
+        with open(Static.app_support_filters, "w", encoding="utf-8") as f:
+            json.dump(cls.filter_list, f, indent=4, ensure_ascii=False)

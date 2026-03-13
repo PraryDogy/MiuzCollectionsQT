@@ -16,6 +16,8 @@ class Static:
     app_support_db = f"{app_support}/db.db"
     app_support_hashdir = f"{app_support}/{hashdir}"
     app_support_mf = os.path.join(app_support, "mf.json")
+    app_support_filters = os.path.join(app_support, "filters.json")
+    app_support_servers = os.path.join(app_support, "servers.json")
 
     _preload_db = f"{_preload}/db.db"
     _preload_hashdir = f"{_preload}/{hashdir}"
@@ -91,72 +93,58 @@ class Cfg:
         with open(Static.app_support_cfg, "w", encoding="utf-8") as file:
             json.dump(vars(self), file, ensure_ascii=False, indent=4)
 
-    def check_dirs(self):
-        if not os.path.exists(Static.app_support):
-            return None
+    def check_files(self):
         dirs = (
-            Static.app_support_db,
-            Static.app_support_hashdir,
             Static.app_support_cfg,
-            Static.app_support_mf
+            Static.app_support_db,
+            Static.app_support_filters,
+            Static.app_support_hashdir,
+            Static.app_support_mf,
+            Static.app_support_servers
+
         )
-        if not all(os.path.exists(p) for p in dirs):   
-            return None
+        for i in dirs:
+            if not os.path.exists(i):
+                return None
         return True
-
-
-        dirs = (Static._preload, Static._preload_zip, Static._preload_db)
-        if not all(os.path.exists(p) for p in dirs):
-            self.make_internal_files()
+    
+    def copy_files(self):
+        if os.path.exists(Static.app_support):
+            shutil.rmtree(Static.app_support)
         os.makedirs(Static.app_support, exist_ok=True)
-        if not os.path.exists(Static.app_support_db):
-            self.copy_preload_db()
-        if not os.path.exists(Static.app_support_hashdir):
-            self.copy_preload_hashdir_zip()
-        if not os.path.exists(Static.app_support_cfg):
-            self.write_json_data()
+        for i in os.scandir(Static._preload):
+            print(i.path)
+            return
 
-    def make_internal_files(self):
-        print("Создаю пустую базу данных")
-        print("Создаю пустую hashdir")
-        os.makedirs(Static._preload, exist_ok=True)
-        open(Static._preload_db, "w").close()
+        # dirs = (Static._preload, Static._preload_zip, Static._preload_db)
+        # if not all(os.path.exists(p) for p in dirs):
+        #     self.make_internal_files()
+        # os.makedirs(Static.app_support, exist_ok=True)
+        # if not os.path.exists(Static.app_support_db):
+        #     self.copy_preload_db()
+        # if not os.path.exists(Static.app_support_hashdir):
+        #     self.copy_preload_hashdir_zip()
+        # if not os.path.exists(Static.app_support_cfg):
+        #     self.write_json_data()
 
-        os.makedirs(Static._preload_hashdir, exist_ok=True)
-        dummy_file = os.path.join(Static._preload_hashdir, 'dummy.keep')
-        open(dummy_file, 'a').close()
 
-        shutil.make_archive(
-            base_name=os.path.join(Static._preload, Static.hashdir), 
-            format="zip",
-            root_dir=Static._preload,
-            base_dir=Static.hashdir
-        )
-        shutil.rmtree(Static._preload_hashdir)
+    # def copy_preload_hashdir_zip(self):
+    #     if os.path.exists(Static.app_support_hashdir):
+    #         print("Удаляю пользовательскую HASH_DIR")
+    #         shutil.rmtree(Static.app_support_hashdir)
 
-    def copy_preload_hashdir_zip(self):
-        # удаляем пользовательскую hashdir из ApplicationSupport
-        if os.path.exists(Static.app_support_hashdir):
-            print("Удаляю пользовательскую HASH_DIR")
-            shutil.rmtree(Static.app_support_hashdir)
+    #     print("копирую предустановленную HASH_DIR")
+    #     dest = shutil.copy2(Static._preload_zip, Static.app_support)
+    #     shutil.unpack_archive(dest, Static.app_support)
+    #     os.remove(dest)
 
-        print("копирую предустановленную HASH_DIR")
-        dest = shutil.copy2(Static._preload_zip, Static.app_support)
-        shutil.unpack_archive(dest, Static.app_support)
-        os.remove(dest)
+    # def copy_preload_db(self):
+    #     if os.path.exists(Static.app_support_db):
+    #         print("Удаляю пользовательский DB_FILE")
+    #         os.remove(Static.app_support_db)
 
-    def copy_preload_db(self):
-        # удаляем пользовательный db.db из Application Support если он есть
-        if os.path.exists(Static.app_support_db):
-            print("Удаляю пользовательский DB_FILE")
-            os.remove(Static.app_support_db)
-
-        print("Копирую предустановленный DB_FILE")
-        shutil.copy2(Static._preload_db, Static.app_support)
-
-    def initialize(self):
-        self.check_dirs()
-        self.set_json_data()
+    #     print("Копирую предустановленный DB_FILE")
+    #     shutil.copy2(Static._preload_db, Static.app_support)
 
 
 cfg = Cfg()
