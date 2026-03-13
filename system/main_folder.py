@@ -56,10 +56,10 @@ class Mf:
 
         """
         super().__init__()
-        self.mf_alias = alias
-        self.mf_paths = paths
-        self.mf_stop_list = stop_list
-        self.mf_current_path: str = curr_path
+        self.mf_alias = mf_alias
+        self.mf_paths = mf_paths
+        self.mf_stop_list = mf_stop_list
+        self.mf_current_path: str = mf_current_path
             
     def get_available_path(self) -> str | None:
         """
