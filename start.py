@@ -75,7 +75,7 @@ class System_:
 
 
 class Lng:
-    lng = 0
+    lng_index = None
     settings_title = (
         "Настройки",
         "Settings"
@@ -122,13 +122,13 @@ class FirstLoad(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(Lng.settings_title[Lng.lng])
+        self.setWindowTitle(Lng.settings_title[Lng.lng_index])
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         layout = QVBoxLayout(self)
         layout.setSpacing(15)
 
-        self.title_label = QLabel(Lng.description[Lng.lng])
+        self.title_label = QLabel(Lng.description[Lng.lng_index])
         self.title_label.setWordWrap(True)
         self.title_label.setFixedWidth(310)
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -138,7 +138,7 @@ class FirstLoad(QDialog):
         groups_layout.setSpacing(10)
 
         self.group_app = ClickableGroupBox(
-            Lng.setup_app[Lng.lng],
+            Lng.setup_app[Lng.lng_index],
             self._setup_app
         )
         self.group_miuz = ClickableGroupBox(
@@ -192,13 +192,11 @@ class LanguageSelect(QDialog):
         self.adjustSize()
 
     def select_lang(self, index):
-        Lng.lng = index
-        cfg.lng = index
+        Lng.lng_index = index
         self.closed_.emit()
         self.deleteLater()
     
     def closeEvent(self, a0):
-        Lng.lng = 0
         os._exit(1)
         return super().closeEvent(a0)
 
@@ -232,7 +230,7 @@ class App(QApplication):
         self.start_app()
 
     def set_default(self):
-        self.single_settings = SingleSettings()
+        self.single_settings = SingleSettings(Lng.lng_index)
         self.single_settings.show()
 
     def start_app(self):
