@@ -873,7 +873,12 @@ class NewFolder(QWidget):
 
     def __init__(self, mf_list_clone: list[Mf]):
         super().__init__()
-        self.mf = Mf("", [], [])
+        self.mf = Mf(
+            mf_alias = "",
+            mf_paths = [],
+            mf_stop_list = [],
+            mf_current_path = ""
+        )
         self.mf_list_clone = mf_list_clone
 
         main_lay = UVBoxLayout()
@@ -1197,3 +1202,17 @@ class WinSettings(SingleActionWindow):
     def mouseReleaseEvent(self, a0):
         self.setFocus()
         return super().mouseReleaseEvent(a0)
+
+
+class SingleSettings(SingleActionWindow):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(500, 500)
+        self.mf_list_clone = copy.deepcopy(Mf.mf_list)
+        self.new_mf = NewFolder(mf_list_clone=self.mf_list_clone)
+        self.central_layout.addWidget(self.new_mf)
+        self.central_layout.addSpacerItem(QSpacerItem(0, 15))
+
+    def closeEvent(self, a0):
+        os._exit(1)
+        return super().closeEvent(a0)

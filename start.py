@@ -1,13 +1,11 @@
 import os
-import shutil
 import sys
 import traceback
 
 from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
-                             QLabel, QListWidget, QListWidgetItem, QPushButton,
-                             QTextEdit, QVBoxLayout, QWidget)
+                             QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
 
 from cfg import Static, cfg
@@ -18,6 +16,7 @@ from system.paletes import ThemeChanger
 from system.tasks import UThreadPool
 from widgets._base_widgets import WinManager
 from widgets.win_main import WinMain
+from widgets.win_settings import SingleSettings
 
 
 class System_:
@@ -232,19 +231,8 @@ class App(QApplication):
         self.start_app()
 
     def set_default(self):
-        mf_name = "Test"
-        mf_path = "/Users/Loshkarev/Desktop/Test"
-        cfg.make_external_files()
-        mf = Mf(
-            mf_alias = mf_name,
-            mf_paths = [mf_path, ],
-            mf_stop_list = [],
-            mf_current_path = ""
-        )
-        Mf.mf_list.append(mf)
-        Mf.write_json_data()
-        Mf.mf_list.clear()
-        self.start_app()
+        self.single_settings = SingleSettings()
+        self.single_settings.show()
 
     def start_app(self):
         Filters.init()
