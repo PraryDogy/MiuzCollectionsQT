@@ -10,7 +10,7 @@ from system.lang import Lng
 from system.utils import Utils
 
 from ._base_widgets import SingleActionWindow, UMenu
-from .servers_win import ServersWin
+from .win_servers import ServersWin
 from .win_settings import WinSettings
 
 

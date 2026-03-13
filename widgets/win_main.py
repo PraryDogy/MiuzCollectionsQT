@@ -28,7 +28,7 @@ from .bar_path import PathBar
 from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
-from .servers_win import ServersWin
+from .win_servers import ServersWin
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_filters import WinFilters
