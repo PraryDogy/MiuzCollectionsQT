@@ -281,8 +281,11 @@ class MenuLeft(QTabWidget):
         def with_conn(fn: callable):
             def wrapper(mf: Mf, *args, **kwargs):
                 fn(mf, *args, **kwargs)
-                if not mf.set_mf_current_path():
+                avaiable_path = mf.get_avaiable_mf_path()
+                if not avaiable_path:
                     self.no_connection.emit(mf)
+                else:
+                    mf.set_mf_current_path(avaiable_path)
             return wrapper
 
         @with_conn

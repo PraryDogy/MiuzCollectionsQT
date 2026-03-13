@@ -273,8 +273,11 @@ class WinImageView(AppModalWindow):
 
 
     def first_load(self):
-        if not Mf.current_mf.set_mf_current_path():
+        avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
+        if not avaiable_mf_path:
             self.no_connection.emit()
+        else:
+            Mf.current_mf.set_mf_current_path(avaiable_mf_path)
         self.load_thumb()
     
     def zoom_cmd(self, flag: str):
@@ -317,7 +320,9 @@ class WinImageView(AppModalWindow):
             t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[cfg.lng]}"
             self.show_text_label(t)
 
-        if Mf.current_mf.set_mf_current_path():
+        avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
+        if avaiable_mf_path:
+            Mf.current_mf.set_mf_current_path(avaiable_mf_path)
             self.path = Utils.get_abs_any_path(Mf.current_mf.mf_current_path, self.rel_path)
             self.load_image()
         else:

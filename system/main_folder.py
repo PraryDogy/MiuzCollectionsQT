@@ -20,9 +20,9 @@ class Mf:
         mf_current_path: str    
         """
         super().__init__()
-        self.mf_alias = kw["mf_alias"]
-        self.mf_paths = kw["mf_paths"]
-        self.mf_stop_list = kw["mf_stop_list"]
+        self.mf_alias: str = kw["mf_alias"]
+        self.mf_paths: list[str] = kw["mf_paths"]
+        self.mf_stop_list: list[str] = kw["mf_stop_list"]
         self.mf_current_path: str = kw["mf_current_path"]
 
     def get_avaiable_mf_path(self):

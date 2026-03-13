@@ -667,16 +667,16 @@ class AllDirScaner:
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
             scaner_item = IntScanerItem(mf, engine, q)
-            if scaner_item.mf.set_mf_current_path():
+            avaible_mf_path = scaner_item.mf.get_avaiable_mf_path()
+            if avaible_mf_path:
+                scaner_item.mf.set_mf_current_path(avaible_mf_path)
                 try:
                     print("scaner started", scaner_item.mf.mf_alias)
-                    engine.dispose()
                     AllDirScaner.single_mf_scan(scaner_item)
                     print("scaner finished", scaner_item.mf.mf_alias)
                 except Exception as e:
                     import traceback
                     print(traceback.format_exc())
-                    print("scaner AllDirsScaner error", e)
                     continue
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
@@ -743,7 +743,9 @@ class SingleDirScaner:
         """
         engine = Dbase.create_engine()
         scaner_item = IntScanerItem(mf, engine, q)
-        if scaner_item.mf.set_mf_current_path():
+        avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
+        if avaiable_mf_path:
+            scaner_item.mf.set_mf_current_path(avaiable_mf_path)
             dir_items: list[DirItem] = []
             for i in dirs_to_scan:
                 try:

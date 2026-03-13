@@ -225,7 +225,9 @@ class WinMain(UMainWindow):
     @staticmethod
     def with_conn(fn):
         def wrapper(self: "WinMain", parent: QWidget, mf: Mf, *args, **kwargs):
-            if mf.set_mf_current_path():
+            avaiable_mf_path = mf.get_avaiable_mf_path()
+            if avaiable_mf_path:
+                mf.set_mf_current_path(avaiable_mf_path)
                 return fn(self, parent, mf, *args, **kwargs)
             else:
                 self.open_win_smb(parent, mf)
