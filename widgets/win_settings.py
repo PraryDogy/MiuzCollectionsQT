@@ -1211,9 +1211,8 @@ class SingleSettings(SingleActionWindow):
     """
     Окно настроек при первой настройке приложения.
     """
-    def __init__(self, lng_index: int):
+    def __init__(self):
         super().__init__()
-        self.lng_index = lng_index
         self.setFixedSize(500, 500)
         self.mf_list_clone = copy.deepcopy(Mf.mf_list)
         self.new_mf = NewFolder(mf_list_clone=self.mf_list_clone)
@@ -1232,10 +1231,8 @@ class SingleSettings(SingleActionWindow):
         Mf.mf_list.append(mf)
         cfg.make_external_files()
         Mf.write_json_data()
-        cfg.lng = self.lng_index
         cfg.write_json_data()
-        print(cfg.lng)
-        # restart_app()
+        restart_app()
 
     def closeEvent(self, a0):
         os._exit(1)
