@@ -56,7 +56,7 @@ class TreeWid(QTreeWidget):
     def init_ui(self):
         self.clear()
 
-        root_item = QTreeWidgetItem([Mf.current_mf.alias])
+        root_item = QTreeWidgetItem([Mf.current_mf.mf_alias])
         root_item.setSizeHint(0, QSize(0, self.item_height))
         root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
         root_item.setIcon(0, QIcon(self.svg_folder))
@@ -217,11 +217,11 @@ class MfList(VListWidget):
         self.setIconSize(QSize(self.svg_size, self.svg_size))
 
         for i in Mf.mf_list:
-            if i.curr_path:
-                true_name = os.path.basename(i.curr_path)
+            if i.mf_current_path:
+                true_name = os.path.basename(i.mf_current_path)
             else:
-                true_name = os.path.basename(i.paths[0])
-            text = i.alias
+                true_name = os.path.basename(i.mf_paths[0])
+            text = i.mf_alias
             item = MfListItem(parent=self, text=text)
             item.setIcon(QIcon(self.svg_folder))
             item.mf = i
@@ -287,11 +287,11 @@ class MenuLeft(QTabWidget):
 
         @with_conn
         def _mf_reveal(mf: Mf):
-            subprocess.Popen(["open", mf.curr_path])
+            subprocess.Popen(["open", mf.mf_current_path])
 
         @with_conn
         def _tree_reveal(mf: Mf, rel_path: str):
-            abs_path = Utils.get_abs_any_path(mf.curr_path, rel_path)
+            abs_path = Utils.get_abs_any_path(mf.mf_current_path, rel_path)
             subprocess.Popen(["open", abs_path])
 
         def _mf_open(mf: Mf):
@@ -324,7 +324,7 @@ class MenuLeft(QTabWidget):
             self.reload_thumbnails.emit()
 
         def _mf_edit(mf: Mf):
-            item = SettingsItem("edit_folder", mf.alias)
+            item = SettingsItem("edit_folder", mf.mf_alias)
             self.mf_edit.emit(item)
 
         def _mf_new():

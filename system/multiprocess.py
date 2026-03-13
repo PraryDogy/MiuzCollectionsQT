@@ -233,7 +233,7 @@ class _DeletedMfRemover:
         conn = engine.connect()
         stmt = sqlalchemy.select(Thumbs.mf_alias).distinct()
         db_mf_list = conn.execute(stmt).scalars().all()
-        json_mf_list = [i.alias for i in on_start_item.mf_list]
+        json_mf_list = [i.mf_alias for i in on_start_item.mf_list]
         removed_mf_list: list[str] = [
             i
             for i in db_mf_list
@@ -290,7 +290,7 @@ class _DeletedMfRemover:
     def remove_dirs(conn: sqlalchemy.Connection):
         q = sqlalchemy.select(Dirs.mf_alias).distinct()
         db_brands = set(conn.execute(q).scalars())
-        app_brands = set(i.alias for i in Mf.mf_list)
+        app_brands = set(i.mf_alias for i in Mf.mf_list)
         to_delete = db_brands - app_brands
 
         if to_delete:
@@ -371,7 +371,7 @@ class DirWatcher:
                 WatchDogItem(mf=mf, event=e)
             )
             handler = _DirChangedHandler(callback)
-            observer.schedule(handler, mf.curr_path, recursive=False)
+            observer.schedule(handler, mf.mf_current_path, recursive=False)
         observer.start()
 
         try:

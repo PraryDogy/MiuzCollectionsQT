@@ -69,13 +69,13 @@ class AllDirLoader:
         # Отправляем текст в гуи что идет поиск в папке
         # gui_text: Имя папки: поиск в папке
         gui_text = (
-            f"{scaner_item.mf.alias}: "
+            f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text, False)
         scaner_item.q.put(ext_scaner_item)
         dirs: list[DirItem] = []
-        stack = [scaner_item.mf.curr_path]
+        stack = [scaner_item.mf.mf_current_path]
         while stack:
             try:
                 scandir_iterator = os.scandir(stack.pop())
@@ -84,7 +84,7 @@ class AllDirLoader:
                 continue
             for entry in scandir_iterator:
                 try:
-                    is_allowed = entry.name not in scaner_item.mf.stop_list
+                    is_allowed = entry.name not in scaner_item.mf.mf_stop_list
                     stmt = (entry.is_dir() and is_allowed)
                 except Exception as e:
                     print("scaner > DirLoader error", e)
@@ -95,7 +95,7 @@ class AllDirLoader:
                     scaner_item.q.put(ext_scaner_item)
                     stack.append(entry.path)
                     rel_path = Utils.get_rel_any_path(
-                        mf_path=scaner_item.mf.curr_path,
+                        mf_path=scaner_item.mf.mf_current_path,
                         abs_img_path=entry.path
                     )
                     stats = entry.stat()
@@ -103,9 +103,9 @@ class AllDirLoader:
                     dir_item = DirItem(entry.path, rel_path, mod)
                     dirs.append(dir_item)
         try:
-            stats = os.stat(scaner_item.mf.curr_path)
+            stats = os.stat(scaner_item.mf.mf_current_path)
             mod = int(stats.st_mtime)
-            dir_item = DirItem(scaner_item.mf.curr_path, os.sep, mod)
+            dir_item = DirItem(scaner_item.mf.mf_current_path, os.sep, mod)
             dirs.append(dir_item)
         except Exception as e:
             print("new scaner dirs loader finder dirs error add root dir", e)
@@ -119,14 +119,14 @@ class AllDirLoader:
         """
         conn = scaner_item.eng.connect()
         q = sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod).where(
-            Dirs.mf_alias == scaner_item.mf.alias
+            Dirs.mf_alias == scaner_item.mf.mf_alias
         )
         dirs: list[DirItem] = []
         for rel_path, mod in conn.execute(q):
             rel_path: str
             abs_dir_path = os.path.join(
                 os.sep,
-                scaner_item.mf.curr_path.strip(os.sep),
+                scaner_item.mf.mf_current_path.strip(os.sep),
                 rel_path.strip(os.sep)
             )
             item = DirItem(abs_dir_path, rel_path, mod)
@@ -220,7 +220,7 @@ class DbDirUpdater:
         rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
         del_stmt = sqlalchemy.delete(Dirs.table).where(
             Dirs.rel_dir_path.in_(rel_paths),
-            Dirs.mf_alias == scaner_item.mf.alias
+            Dirs.mf_alias == scaner_item.mf.mf_alias
         )
         conn.execute(del_stmt)
 
@@ -229,7 +229,7 @@ class DbDirUpdater:
             {
                 ColumnNames.rel_item_path: dir_item.rel_path,
                 ColumnNames.mod: dir_item.mod,
-                ColumnNames.mf_alias: scaner_item.mf.alias
+                ColumnNames.mf_alias: scaner_item.mf.mf_alias
             }
             for dir_item in dirs_to_scan
         ]
@@ -263,7 +263,7 @@ class ImgLoader:
         # передает в гуи текст
         # имя папки: поиск
         gui_text = (
-            f"{scaner_item.mf.alias}: "
+            f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[cfg.lng].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text, False)
@@ -308,7 +308,7 @@ class ImgLoader:
                 Thumbs.size,
                 Thumbs.mod
                 )
-            q = q.where(Thumbs.mf_alias == scaner_item.mf.alias)
+            q = q.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
             if dir_item.rel_path == os.sep:
                 q = q.where(Thumbs.rel_img_path.ilike("/%"))
                 q = q.where(Thumbs.rel_img_path.not_ilike(f"/%/%"))
@@ -321,7 +321,7 @@ class ImgLoader:
                 )
             for rel_thumb_path, rel_path, size, mod in conn.execute(q):
                 abs_img_path = Utils.get_abs_any_path(
-                    mf_path=scaner_item.mf.curr_path,
+                    mf_path=scaner_item.mf.mf_current_path,
                     rel_path=rel_path
                 )
                 img_item = ImgItem(
@@ -418,12 +418,12 @@ class HashdirImgUpdater:
             if img is not None:
                 try:
                     rel_img_path = Utils.get_rel_any_path(
-                        mf_path=scaner_item.mf.curr_path,
+                        mf_path=scaner_item.mf.mf_current_path,
                         abs_img_path=img_item.abs_img_path
                     )
                     thumb_path = Utils.create_abs_thumb_path(
                         rel_img_path=rel_img_path,
-                        mf_alias=scaner_item.mf.alias
+                        mf_alias=scaner_item.mf.mf_alias
                     )
                     Utils.write_thumb(thumb_path, img)
                     ok_new_images.append(img_item)
@@ -438,7 +438,7 @@ class HashdirImgUpdater:
     @staticmethod
     def q_put(scaner_item: IntScanerItem, ext_scaner_item: ExtScanerItem):
         text = (
-            f"{scaner_item.mf.alias}: "
+            f"{scaner_item.mf.mf_alias}: "
             f"{Lng.updating[cfg.lng].lower()} "
             f"({scaner_item.total_count})"
         )
@@ -457,7 +457,7 @@ class DbImgUpdater:
         rel_thumb_paths = [i.rel_thumb_path for i in del_images]
         q = sqlalchemy.delete(Thumbs.table).where(
             Thumbs.rel_thumb_path.in_(rel_thumb_paths),
-            Thumbs.mf_alias == scaner_item.mf.alias
+            Thumbs.mf_alias == scaner_item.mf.mf_alias
         )
         conn.execute(q)
         conn.commit()
@@ -473,14 +473,14 @@ class DbImgUpdater:
         conn = scaner_item.eng.connect()
         rel_img_paths = [
             Utils.get_rel_any_path(
-                mf_path=scaner_item.mf.curr_path,
+                mf_path=scaner_item.mf.mf_current_path,
                 abs_img_path=img_item.abs_img_path
             )
             for img_item in new_images
         ]
         q = sqlalchemy.delete(Thumbs.table).where(
             Thumbs.rel_img_path.in_(rel_img_paths),
-            Thumbs.mf_alias == scaner_item.mf.alias
+            Thumbs.mf_alias == scaner_item.mf.mf_alias
         )
         conn.execute(q)
         conn.commit()
@@ -495,12 +495,12 @@ class DbImgUpdater:
         values_list = []
         for img_item in new_images:
             rel_img_path = Utils.get_rel_any_path(
-                mf_path=scaner_item.mf.curr_path,
+                mf_path=scaner_item.mf.mf_current_path,
                 abs_img_path=img_item.abs_img_path
             )
             abs_thumb_path = Utils.create_abs_thumb_path(
                 rel_img_path=rel_img_path,
-                mf_alias=scaner_item.mf.alias
+                mf_alias=scaner_item.mf.mf_alias
             )
             rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
             values_list.append({
@@ -512,7 +512,7 @@ class DbImgUpdater:
                 ColumnNames.resol: "none",
                 ColumnNames.coll: "none",
                 ColumnNames.fav: 0,
-                ColumnNames.mf_alias: scaner_item.mf.alias
+                ColumnNames.mf_alias: scaner_item.mf.mf_alias
             })
         conn.execute(sqlalchemy.insert(Thumbs.table), values_list)
         conn.commit()
@@ -631,7 +631,7 @@ class RemovedDirsWorker:
             sqlalchemy.select(Thumbs.rel_thumb_path)
             .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
             .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
-            .where(Thumbs.mf_alias == scaner_item.mf.alias)
+            .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
         )
         for rel_thumb_path in conn.execute(stmt).scalars():
             try:
@@ -643,7 +643,7 @@ class RemovedDirsWorker:
             sqlalchemy.delete(Thumbs.table)
             .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
             .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
-            .where(Thumbs.mf_alias == scaner_item.mf.alias)
+            .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
         )
         conn.execute(del_stmt)
 
@@ -655,7 +655,7 @@ class RemovedDirsWorker:
         stmt = (
             sqlalchemy.delete(Dirs.table)
             .where(Dirs.rel_dir_path == dir_item.rel_path)
-            .where(Dirs.mf_alias == scaner_item.mf.alias)
+            .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
         )
         conn.execute(stmt)
 
@@ -669,10 +669,10 @@ class AllDirScaner:
             scaner_item = IntScanerItem(mf, engine, q)
             if scaner_item.mf.get_available_path():
                 try:
-                    print("scaner started", scaner_item.mf.alias)
+                    print("scaner started", scaner_item.mf.mf_alias)
                     engine.dispose()
                     AllDirScaner.single_mf_scan(scaner_item)
-                    print("scaner finished", scaner_item.mf.alias)
+                    print("scaner finished", scaner_item.mf.mf_alias)
                 except Exception as e:
                     import traceback
                     print(traceback.format_exc())
@@ -681,7 +681,7 @@ class AllDirScaner:
             else:
                 no_conn = Lng.no_connection[cfg.lng].lower()
                 gui_text = (
-                    f"{scaner_item.mf.alias}: "
+                    f"{scaner_item.mf.mf_alias}: "
                     f"{no_conn}"
                 )
                 ext_scaner_item = ExtScanerItem(gui_text, False)
@@ -689,7 +689,7 @@ class AllDirScaner:
                 print(
                     "scaner no connection",
                     scaner_item.mf_real_name,
-                    scaner_item.mf.alias
+                    scaner_item.mf.mf_alias
                 )
                 sleep(3)
         engine.dispose()
@@ -699,7 +699,7 @@ class AllDirScaner:
         # собираем Finder директории и директории из БД
         finder_dirs, db_dirs = AllDirLoader.start(scaner_item)
         if not finder_dirs:
-            print(scaner_item.mf.alias, "no finder dirs")
+            print(scaner_item.mf.mf_alias, "no finder dirs")
             return
         removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
         if new_dirs:
@@ -723,13 +723,13 @@ class SingleDirScaner:
     @staticmethod
     def start(scaner_item: SingleDirScanerItem, q: Queue):
         for mf, dirs_to_scan in scaner_item.data.items():
-            print("single dir scaner started, mf:", mf.alias)
+            print("single dir scaner started, mf:", mf.mf_alias)
             SingleDirScaner.single_mf_scan(
                 mf=mf,
                 dirs_to_scan=dirs_to_scan,
                 q=q
             )
-            print("single dir scaner finished, mf:", mf.alias)
+            print("single dir scaner finished, mf:", mf.mf_alias)
 
     @staticmethod
     def single_mf_scan(mf: Mf, dirs_to_scan: list[str], q: Queue):
@@ -753,7 +753,7 @@ class SingleDirScaner:
                     continue
                 item = DirItem(
                     abs_path=i,
-                    rel_path=Utils.get_rel_any_path(mf.curr_path, i),
+                    rel_path=Utils.get_rel_any_path(mf.mf_current_path, i),
                     mod=mod
                 )
                 dir_items.append(item)

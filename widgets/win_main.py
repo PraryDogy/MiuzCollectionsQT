@@ -232,7 +232,7 @@ class WinMain(UMainWindow):
         return wrapper
     
     def path_bar_update(self, path: str):
-        dir = f"/{Mf.current_mf.alias}{path}"
+        dir = f"/{Mf.current_mf.mf_alias}{path}"
         self.bar_path.update(dir)
     
     def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):
@@ -289,7 +289,7 @@ class WinMain(UMainWindow):
         except (AttributeError, RuntimeError) as e:
             print(e)
 
-        alias = mf.alias
+        alias = mf.mf_alias
         self.noti_wid = NotifyWid(
             parent,
             f"{alias}: {Lng.no_connection_full[cfg.lng].lower()}",
@@ -302,7 +302,7 @@ class WinMain(UMainWindow):
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
         target_dir, rel_files_to_copy = data
         abs_files_to_copy = [
-            Utils.get_abs_any_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.mf_current_path, i)
             for i in rel_files_to_copy
         ]
         if target_dir is None:
@@ -321,7 +321,7 @@ class WinMain(UMainWindow):
     def set_buffer(self, parent: QWidget, mf: Mf, data: tuple):
         buffer_type, rel_files_to_copy = data
         abs_files_to_copy = [
-            Utils.get_abs_any_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.mf_current_path, i)
             for i in rel_files_to_copy
         ]
         self.buffer = Buffer(
@@ -337,7 +337,7 @@ class WinMain(UMainWindow):
     @with_conn
     def paste_files(self, parent: QWidget, mf: Mf):
         target_dir = Utils.get_abs_any_path(
-            mf_path=Mf.current_mf.curr_path,
+            mf_path=Mf.current_mf.mf_current_path,
             rel_path=Dynamic.current_dir
         )
         # готовим информацию для сканера
@@ -366,7 +366,7 @@ class WinMain(UMainWindow):
     def open_in_app(self, parent: QWidget, mf: Mf, data: tuple):
         rel_paths, app_path = data
         for i in rel_paths:
-            abs_path = Utils.get_abs_any_path(mf.curr_path, i)
+            abs_path = Utils.get_abs_any_path(mf.mf_current_path, i)
             if app_path:
                 subprocess.Popen(["open", "-a", app_path, abs_path])
             else:
@@ -375,7 +375,7 @@ class WinMain(UMainWindow):
     @with_conn
     def reveal_in_finder(self, parent: QWidget, mf: Mf, rel_paths: list):
         abs_paths = [
-            Utils.get_abs_any_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.mf_current_path, i)
             for i in rel_paths
         ]
         if os.path.isdir(abs_paths[0]):
@@ -394,7 +394,7 @@ class WinMain(UMainWindow):
     @with_conn
     def copy_path(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
         abs_paths = [
-            Utils.get_abs_any_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.mf_current_path, i)
             for i in rel_paths
         ]
         Utils.copy_text("\n".join(abs_paths))
@@ -417,7 +417,7 @@ class WinMain(UMainWindow):
             QTimer.singleShot(ms, poll_file_remover)
 
         abs_paths = [
-            Utils.get_abs_any_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.mf_current_path, i)
             for i in rel_paths
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
@@ -455,7 +455,7 @@ class WinMain(UMainWindow):
             self.grid.buffer = self.buffer
             self.paste_files(self.grid, Mf.current_mf)
 
-        target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
+        target_dir = Utils.get_abs_any_path(mf.mf_current_path, Dynamic.current_dir)
         target_files = [
             os.path.join(target_dir, os.path.basename(i))
             for i in abs_paths
@@ -470,7 +470,7 @@ class WinMain(UMainWindow):
     def open_info_win(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
         
         abs_paths = [
-            Utils.get_abs_any_path(mf.curr_path, i)
+            Utils.get_abs_any_path(mf.mf_current_path, i)
             for i in rel_paths
         ]
         self.info_win = WinInfo(abs_paths)
@@ -689,7 +689,7 @@ class WinMain(UMainWindow):
 
         self.grid.reload_thumbnails()
         self.left_menu.tree_wid.init_ui()
-        self.reset_task = MfDataCleaner(mf.alias)
+        self.reset_task = MfDataCleaner(mf.mf_alias)
         self.reset_task.sigs.finished_.connect(reset_data_finished)
         UThreadPool.start(self.reset_task)
 

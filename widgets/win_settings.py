@@ -653,13 +653,13 @@ class MfPaths(TextEditWidget):
         super().__init__(
             title=Lng.images_folder_path[cfg.lng],
             placeholder=Lng.folder_path[cfg.lng],
-            text="\n".join(i for i in mf.paths),
+            text="\n".join(i for i in mf.mf_paths),
         )
         self.mf = mf
         self.textChanged.connect(self.set_data)
 
     def set_data(self, *args):
-        self.mf.paths = self.get_list()
+        self.mf.mf_paths = self.get_list()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -680,13 +680,13 @@ class MfStopList(TextEditWidget):
         super().__init__(
             title=Lng.ignore_list_descr[cfg.lng],
             placeholder=Lng.ignore_list[cfg.lng],
-            text="\n".join(i for i in mf.stop_list),
+            text="\n".join(i for i in mf.mf_stop_list),
         )
         self.mf = mf
         self.textChanged.connect(self.set_data)
 
     def set_data(self, *args):
-        self.mf.stop_list = self.get_list()
+        self.mf.mf_stop_list = self.get_list()
 
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -749,7 +749,7 @@ class MfSettings(QWidget):
         # Верхний ряд с названием
         self.name_wid = GroupWid()
         main_lay.addWidget(self.name_wid)
-        name_text = ULabel(f"{Lng.alias[cfg.lng]}: {mf.alias}")
+        name_text = ULabel(f"{Lng.alias[cfg.lng]}: {mf.mf_alias}")
         name_text.setFixedHeight(GroupChild.hh)
         self.name_wid.layout_.addWidget(name_text)
 
@@ -802,7 +802,7 @@ class MfSettings(QWidget):
 
         def fin():
             for i in Mf.mf_list:
-                if i.alias == self.mf.alias:
+                if i.mf_alias == self.mf.mf_alias:
                     Mf.mf_list.remove(i)
                     break
             Mf.write_json_data()
@@ -819,7 +819,7 @@ class MfSettings(QWidget):
     def set_reset_flag(self, *args):
 
         def reset_data():
-            self.reset_task = MfDataCleaner(self.mf.alias)
+            self.reset_task = MfDataCleaner(self.mf.mf_alias)
             self.reset_task.sigs.finished_.connect(restart_app)
             UThreadPool.start(self.reset_task)
 
@@ -831,13 +831,13 @@ class MfSettings(QWidget):
     def save(self, *args):
 
         def fin():
-            self.mf.paths = paths
-            self.mf.stop_list = stop_list
+            self.mf.mf_paths = paths
+            self.mf.mf_stop_list = stop_list
 
             for i in Mf.mf_list:
-                if i.alias == self.mf.alias:
-                    i.paths = paths
-                    i.stop_list = stop_list
+                if i.mf_alias == self.mf.mf_alias:
+                    i.mf_paths = paths
+                    i.mf_stop_list = stop_list
                     break
 
             Mf.write_json_data()
@@ -935,9 +935,9 @@ class NewFolder(QWidget):
     def save(self, *args):
 
         def fin():
-            self.mf.alias = folder_name
-            self.mf.paths = paths
-            self.mf.stop_list = stop_list
+            self.mf.mf_alias = folder_name
+            self.mf.mf_paths = paths
+            self.mf.mf_stop_list = stop_list
             # мы добавляем новую папку менно в Mf.list_ а не в clone
             # чтобы отменить изменения из других отделов
             # и применить изменения только по новой папке
@@ -959,7 +959,7 @@ class NewFolder(QWidget):
             show_warn(Lng.enter_alias_warning[cfg.lng])
             return
 
-        elif any(i.alias == folder_name for i in self.mf_list_clone):
+        elif any(i.mf_alias == folder_name for i in self.mf_list_clone):
             show_warn(
                 f'{Lng.alias[cfg.lng]} "{folder_name}" '
                 f'{Lng.already_taken[cfg.lng].lower()}'
@@ -1046,7 +1046,7 @@ class WinSettings(SingleActionWindow):
         self.left_menu.addItem(spacer)
 
         for i in Mf.mf_list:
-            new_folder = UListWidgetItem(self.left_menu, text=i.alias)
+            new_folder = UListWidgetItem(self.left_menu, text=i.mf_alias)
             new_folder.setIcon(QIcon(self.svg_folder))
             self.left_menu.addItem(new_folder)
 
@@ -1096,7 +1096,7 @@ class WinSettings(SingleActionWindow):
             idx = 2
         elif settings_item.type_ == "edit_folder":
             for x, i in enumerate(self.mf_list_clone, start=4):
-                if i.alias == self.settings_item.content:
+                if i.mf_alias == self.settings_item.content:
                     idx = x
                     break
         self.left_menu.setCurrentRow(idx)
@@ -1121,7 +1121,7 @@ class WinSettings(SingleActionWindow):
             self.btns_wid.hide()
             item: UListWidgetItem = self.left_menu.item(idx)
             for mf in self.mf_list_clone:
-                if mf.alias == item.text():
+                if mf.mf_alias == item.text():
                     r_wid = MfSettings(mf, self.mf_list_clone)
                     break
         r_wid.changed.connect(self.blink_ok_btn)
@@ -1129,7 +1129,7 @@ class WinSettings(SingleActionWindow):
 
     def add_mf(self, mf: Mf):
         self.mf_list_clone.append(mf)
-        item = UListWidgetItem(self.left_menu, text=mf.alias)
+        item = UListWidgetItem(self.left_menu, text=mf.mf_alias)
         item.setIcon(QIcon(self.svg_folder))
         item.mf = mf
         self.left_menu.addItem(item)
@@ -1153,8 +1153,8 @@ class WinSettings(SingleActionWindow):
 
         def validate_folders() -> bool:
             for folder in self.mf_list_clone:
-                if not folder.paths:
-                    return folder.alias
+                if not folder.mf_paths:
+                    return folder.mf_alias
             return None
 
         if self.warn_svg.isHidden():

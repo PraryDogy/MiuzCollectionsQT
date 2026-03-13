@@ -120,7 +120,7 @@ class BelowTextWid(QLabel):
     def set_text(self):
         root = self.wid.rel_path.strip(os.sep).split(os.sep)
         if len(root) == 1:
-            root = os.path.basename(Mf.current_mf.alias)
+            root = os.path.basename(Mf.current_mf.mf_alias)
         else:
             root = root[0]
         first_row = self.short_text(root)
@@ -225,7 +225,7 @@ class Thumbnail(QFrame):
         self.below_text = BelowTextWid(self)
         self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        location = f"{Lng.location[cfg.lng]}: {Mf.current_mf.alias}{rel_path}"
+        location = f"{Lng.location[cfg.lng]}: {Mf.current_mf.mf_alias}{rel_path}"
         modified = f"{Lng.modified[cfg.lng]}: {self.mod}"
         self.setToolTip("\n".join([location, modified, ]))
 
@@ -1076,7 +1076,7 @@ class Grid(VScrollArea):
             paths = []
             if Mf.current_mf.get_available_path():
                 paths = [
-                    Utils.get_abs_any_path(Mf.current_mf.curr_path, wid.rel_path)
+                    Utils.get_abs_any_path(Mf.current_mf.mf_current_path, wid.rel_path)
                     for wid in self.selected_widgets
                 ]
 

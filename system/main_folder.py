@@ -12,18 +12,18 @@ class Mf:
     json_file = os.path.join(Static.app_support, "mf.json")
     json_file_backup = os.path.join(Static.app_support, "mf_backup.json")
     __slots__ = [
-        "alias",
-        "paths",
-        "stop_list",
-        "curr_path",
+        "mf_alias",
+        "mf_paths",
+        "mf_stop_list",
+        "mf_current_path",
     ]
 
     def __init__(
             self,
-            alias: str = "Имя/Name",
-            paths: list[str] = ["/path", ],
-            stop_list: list[str] = ["stop word", ],
-            curr_path: str = "",
+            mf_alias: str = "Имя/Name",
+            mf_paths: list[str] = ["/path", ],
+            mf_stop_list: list[str] = ["stop word", ],
+            mf_current_path: str = "",
             **kw
     ):
         """
@@ -56,21 +56,21 @@ class Mf:
 
         """
         super().__init__()
-        self.alias = alias
-        self.paths = paths
-        self.stop_list = stop_list
-        self.curr_path: str = curr_path
+        self.mf_alias = alias
+        self.mf_paths = paths
+        self.mf_stop_list = stop_list
+        self.mf_current_path: str = curr_path
             
     def get_available_path(self) -> str | None:
         """
         Проверяет и устанавливает путь Mf.currpath  
         Возвращает доступный путь Mf.curr_path или None
         """
-        self.curr_path = ""
-        for i in self.paths:
+        self.mf_current_path = ""
+        for i in self.mf_paths:
             if os.path.exists(i):
-                self.curr_path = i
-                return self.curr_path
+                self.mf_current_path = i
+                return self.mf_current_path
         return None
     
     def get_data(self):

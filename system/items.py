@@ -47,10 +47,10 @@ class IntScanerItem:
         self.eng = eng
         self.q = q
 
-        if mf.curr_path:
-            self.mf_real_name = os.path.basename(mf.curr_path)
+        if mf.mf_current_path:
+            self.mf_real_name = os.path.basename(mf.mf_current_path)
         else:
-            self.mf_real_name = os.path.basename(mf.paths[0])
+            self.mf_real_name = os.path.basename(mf.mf_paths[0])
         self.total_count = 0
 
 
