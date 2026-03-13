@@ -619,13 +619,13 @@ class WinMain(UMainWindow):
                 # print("штатно запускаю SINGLE сканер")
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
-                    args=(SingleDirScanerItem(self.scaner_data), )
+                    args=(SingleDirScanerItem(self.scaner_data), Cfg.lng, )
                     )
             else:
                 # print("штатно запускаю ОБЩИЙ сканер")
                 self.scaner_task = ProcessWorker(
                     target=AllDirScaner.start,
-                    args=(Mf.mf_list, )
+                    args=(Mf.mf_list, Cfg.lng, )
                 )
                 self.scaner_data.clear()
             self.bar_bottom.progress_bar.stop_timer_text()

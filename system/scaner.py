@@ -70,7 +70,7 @@ class AllDirLoader:
         # gui_text: Имя папки: поиск в папке
         gui_text = (
             f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.search_in[Cfg.lng].lower()}"
+            f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text, False)
         scaner_item.q.put(ext_scaner_item)
@@ -264,7 +264,7 @@ class ImgLoader:
         # имя папки: поиск
         gui_text = (
             f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.search_in[Cfg.lng].lower()}"
+            f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text, False)
         scaner_item.q.put(ext_scaner_item)
@@ -439,7 +439,7 @@ class HashdirImgUpdater:
     def q_put(scaner_item: IntScanerItem, ext_scaner_item: ExtScanerItem):
         text = (
             f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.updating[Cfg.lng].lower()} "
+            f"{Lng.updating[scaner_item.lng_index].lower()} "
             f"({scaner_item.total_count})"
         )
         ext_scaner_item.gui_text = text
@@ -661,7 +661,7 @@ class RemovedDirsWorker:
 
 class AllDirScaner:
     @staticmethod
-    def start(mf_list: list[Mf], q: Queue):
+    def start(mf_list: list[Mf], lng_index: int, q: Queue):
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
@@ -669,7 +669,7 @@ class AllDirScaner:
                 mf=mf,
                 eng=engine,
                 q=q,
-                lng_index=Cfg.lng
+                lng_index=lng_index
             )
             avaible_mf_path = scaner_item.mf.get_avaiable_mf_path()
             if avaible_mf_path:
@@ -683,7 +683,7 @@ class AllDirScaner:
                     print(traceback.format_exc())
                     continue
             else:
-                no_conn = Lng.no_connection[Cfg.lng].lower()
+                no_conn = Lng.no_connection[lng_index].lower()
                 gui_text = (
                     f"{scaner_item.mf.mf_alias}: "
                     f"{no_conn}"
@@ -724,19 +724,21 @@ class AllDirScaner:
 
 
 class SingleDirScaner:
+
     @staticmethod
-    def start(scaner_item: SingleDirScanerItem, q: Queue):
+    def start(scaner_item: SingleDirScanerItem, lng_index: int, q: Queue):
         for mf, dirs_to_scan in scaner_item.data.items():
             print("single dir scaner started, mf:", mf.mf_alias)
             SingleDirScaner.single_mf_scan(
                 mf=mf,
                 dirs_to_scan=dirs_to_scan,
+                lng_index=lng_index,
                 q=q
             )
             print("single dir scaner finished, mf:", mf.mf_alias)
 
     @staticmethod
-    def single_mf_scan(mf: Mf, dirs_to_scan: list[str], q: Queue):
+    def single_mf_scan(mf: Mf, dirs_to_scan: list[str], lng_index: int, q: Queue):
         """
         Сканирует заданне директории в пределах Mf на предмет новых или
         удаленных изображений.
@@ -750,7 +752,7 @@ class SingleDirScaner:
             mf=mf,
             eng=engine,
             q=q,
-            lng_index=Cfg.lng
+            lng_index=lng_index
         )
         avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
         if avaiable_mf_path:
