@@ -231,7 +231,7 @@ class App(QApplication):
         self.start_app()
 
     def set_default(self):
-        self.single_settings = SingleSettings(Lng.lng_index)
+        self.single_settings = SingleSettings()
         self.single_settings.show()
 
     def start_app(self):

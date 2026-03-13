@@ -585,7 +585,6 @@ class NewDirsWorker:
             # обновляем список неуспешно созданных миниатюр
             bad_new_images.extend(bad_chunks)
 
-        print("end")
         # отправляем в GUI пустой текст чтобы очистить строку состояния
         # scaner_item.q.put(ExtScanerItem("", True))
 
