@@ -9,14 +9,13 @@ class Servers:
 
     @classmethod
     def init(cls):
-        if os.path.exists(Static.external_servers):
-            try:
-                with open(Static.external_servers, "r", encoding="utf-8") as f:
-                    server_list: list = json.load(f)
-                for i in server_list:
-                    Servers.server_list.append(i)
-            except Exception as e:
-                print("servers error", e)
+        try:
+            with open(Static.external_servers, "r", encoding="utf-8") as f:
+                server_list: list = json.load(f)
+            for i in server_list:
+                Servers.server_list.append(i)
+        except Exception as e:
+            print("servers error", e)
     
     @classmethod
     def write_json_data(cls):
