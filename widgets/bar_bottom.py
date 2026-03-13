@@ -3,7 +3,7 @@ from PyQt5.QtGui import QMouseEvent, QWheelEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QGraphicsOpacityEffect, QLabel, QSlider, QWidget
 
-from cfg import Dynamic, Static, cfg
+from cfg import Dynamic, Static, Cfg
 from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout
@@ -84,7 +84,7 @@ class ProgressWidget(QLabel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.total_seconds = cfg.scaner_minutes * 60
+        self.total_seconds = Cfg.scaner_minutes * 60
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer_text)
@@ -95,7 +95,7 @@ class ProgressWidget(QLabel):
         self.setGraphicsEffect(effect)
 
         self.timer.stop()
-        self.total_seconds = cfg.scaner_minutes * 60
+        self.total_seconds = Cfg.scaner_minutes * 60
         self.update_label()
         self.timer.start(self.interval_ms)
 
@@ -118,7 +118,7 @@ class ProgressWidget(QLabel):
         seconds = self.total_seconds % 60
 
         text = (
-            f"{Lng.next_search[cfg.lng]} "
+            f"{Lng.next_search[Cfg.lng]} "
             f"{minutes:02d}:{seconds:02d}"
         )
         self.setText(text)

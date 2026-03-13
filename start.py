@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
 
-from cfg import Cfg, Static, cfg
+from cfg import Cfg, Static
 from system.database import Dbase
 from system.filters import Filters
 from system.main_folder import Mf
@@ -208,7 +208,7 @@ class App(QApplication):
         super().__init__(argv)
         self.argv = argv
 
-        check_files = cfg.check_files()
+        check_files = Cfg.check_files()
         if not check_files:
             self.lng_win()
         else:
@@ -226,12 +226,12 @@ class App(QApplication):
         first_load.exec_()
 
     def set_miuz(self):
-        cfg.copy_files()
-        cfg.lng = Lng.lng_index
+        Cfg.copy_files()
+        Cfg.lng = Lng.lng_index
         self.start_app()
 
     def set_default(self):
-        cfg.lng = Lng.lng_index
+        Cfg.lng = Lng.lng_index
         self.single_settings = SingleSettings()
         self.single_settings.show()
 

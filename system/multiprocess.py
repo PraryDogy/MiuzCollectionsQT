@@ -9,7 +9,7 @@ import sqlalchemy
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver as Observer
 
-from cfg import Static, cfg
+from cfg import Cfg, Static
 
 from .database import Dbase, Dirs, Thumbs
 from .items import (CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem,
@@ -104,7 +104,7 @@ class OneFileInfo:
         stats = os.stat(path)
         size = SharedUtils.get_f_size(stats.st_size)
         date_time = datetime.fromtimestamp(stats.st_mtime)
-        month = Lng.months_genitive_case[cfg.lng][str(date_time.month)]
+        month = Lng.months_genitive_case[Cfg.lng][str(date_time.month)]
         mod = f"{date_time.day} {month} {date_time.year}"
         item = OneFileInfoItem(type_, size, mod, "")
         return item

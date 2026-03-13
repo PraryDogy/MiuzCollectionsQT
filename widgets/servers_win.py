@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
                              QListWidgetItem, QMenu, QPushButton, QTableView,
                              QWidget)
 
-from cfg import Static, cfg
+from cfg import Cfg, Static
 from system.lang import Lng
 from system.shared_utils import SharedUtils
 
@@ -23,7 +23,7 @@ class ServersWidget(QTableView):
 
         self.model_ = QStandardItemModel(0, 3, self)
         self.model_.setHorizontalHeaderLabels([
-            Lng.server[cfg.lng], Lng.login[cfg.lng], Lng.password[cfg.lng]
+            Lng.server[Cfg.lng], Lng.login[Cfg.lng], Lng.password[Cfg.lng]
         ])
         self.setModel(self.model_)
 
@@ -76,8 +76,8 @@ class ServersWidget(QTableView):
             return
 
         menu = QMenu(self)
-        copy_action = menu.addAction(Lng.copy[cfg.lng])
-        delete_action = menu.addAction(Lng.delete[cfg.lng])
+        copy_action = menu.addAction(Lng.copy[Cfg.lng])
+        delete_action = menu.addAction(Lng.delete[Cfg.lng])
         action = menu.exec_(self.viewport().mapToGlobal(pos))
 
         if action == copy_action:
@@ -100,7 +100,7 @@ class ServersWin(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.connect_to_server[cfg.lng])
+        self.setWindowTitle(Lng.connect_to_server[Cfg.lng])
         self.setFixedWidth(400)
 
         # Загрузка данных
@@ -116,7 +116,7 @@ class ServersWin(SingleActionWindow):
         # QLineEdit для нового сервера
         self.new_server = ULineEdit()
         self.new_server.setPlaceholderText(
-            f"{Lng.server[cfg.lng]}, {Lng.login[cfg.lng]}, {Lng.password[cfg.lng]}"
+            f"{Lng.server[Cfg.lng]}, {Lng.login[Cfg.lng]}, {Lng.password[Cfg.lng]}"
         )
         self.central_layout.addWidget(self.new_server)
 
@@ -141,7 +141,7 @@ class ServersWin(SingleActionWindow):
         btn_remove.clicked.connect(lambda: self.remove_btn_cmd())
 
         # Connect справа
-        btn_connect = QPushButton(Lng.connect_short[cfg.lng])
+        btn_connect = QPushButton(Lng.connect_short[Cfg.lng])
         btn_connect.setFixedWidth(90)
         btn_connect.clicked.connect(self.connect_cmd)
 

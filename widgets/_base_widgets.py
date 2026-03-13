@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
@@ -10,7 +8,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Literal, Optional
 
-from cfg import Static, cfg
+from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
 from system.utils import Utils
@@ -135,9 +133,9 @@ class ULineEdit(QLineEdit):
         self.menu_.setFixedWidth(self.menu_width)
 
         actions = [
-            (Lng.cut[cfg.lng], self.cut_selection),
-            (Lng.copy[cfg.lng], lambda: Utils.copy_text(self.selectedText())),
-            (Lng.paste[cfg.lng], self.paste_text),
+            (Lng.cut[Cfg.lng], self.cut_selection),
+            (Lng.copy[Cfg.lng], lambda: Utils.copy_text(self.selectedText())),
+            (Lng.paste[Cfg.lng], self.paste_text),
         ]
 
         for text, slot in actions:
@@ -188,9 +186,9 @@ class UTextEdit(QTextEdit):
         menu_.setFixedWidth(120)
 
         actions = [
-            (Lng.cut[cfg.lng], self.cut_selection),
-            (Lng.copy[cfg.lng], self.copy_selection),
-            (Lng.paste[cfg.lng], self.paste_text),
+            (Lng.cut[Cfg.lng], self.cut_selection),
+            (Lng.copy[Cfg.lng], self.copy_selection),
+            (Lng.paste[Cfg.lng], self.paste_text),
         ]
 
         for text, slot in actions:

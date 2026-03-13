@@ -1,13 +1,12 @@
 import os
 import re
 import subprocess
-from typing import Dict
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
 
-from cfg import Dynamic, cfg
+from cfg import Cfg, Dynamic
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -74,7 +73,7 @@ class TreeWid(QTreeWidget):
                 continue
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
-            if cfg.hide_digits:
+            if Cfg.hide_digits:
                 old_name = name
                 name = self.strip_to_first_letter(name)
                 if not name:
@@ -142,7 +141,7 @@ class TreeWid(QTreeWidget):
     def contextMenuEvent(self, a0):
 
         def hide_digits_cmd():
-            cfg.hide_digits = not cfg.hide_digits
+            Cfg.hide_digits = not Cfg.hide_digits
             self.init_ui()
 
         def collapse_all_cmd():
@@ -158,33 +157,33 @@ class TreeWid(QTreeWidget):
         if item:
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
 
-            view = QAction(Lng.open[cfg.lng], menu)
+            view = QAction(Lng.open[Cfg.lng], menu)
             view.triggered.connect(lambda: self.tree_open.emit(abs_path))
             menu.addAction(view)
             menu.addSeparator()
 
-        update = QAction(Lng.update_grid[cfg.lng])
+        update = QAction(Lng.update_grid[Cfg.lng])
         update.triggered.connect(self.init_ui)
         menu.addAction(update)
 
-        expand_all = QAction(Lng.expand_all[cfg.lng], menu)
+        expand_all = QAction(Lng.expand_all[Cfg.lng], menu)
         expand_all.triggered.connect(lambda: self.expandAll())
         menu.addAction(expand_all)
 
-        collapse_all = QAction(Lng.collapse_all[cfg.lng], menu)
+        collapse_all = QAction(Lng.collapse_all[Cfg.lng], menu)
         collapse_all.triggered.connect(lambda: collapse_all_cmd())
         menu.addAction(collapse_all)
 
         menu.addSeparator()
 
-        hide_digits = QAction(Lng.hide_digits[cfg.lng], menu)
+        hide_digits = QAction(Lng.hide_digits[Cfg.lng], menu)
         hide_digits.triggered.connect(hide_digits_cmd)
         hide_digits.setCheckable(True)
-        hide_digits.setChecked(cfg.hide_digits)
+        hide_digits.setChecked(Cfg.hide_digits)
         menu.addAction(hide_digits)
         menu.addSeparator()
 
-        reveal = QAction(Lng.reveal_in_finder[cfg.lng], menu)
+        reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
         reveal.triggered.connect(lambda: self.tree_reveal.emit(abs_path))
         menu.addAction(reveal)
 
@@ -239,19 +238,19 @@ class MfList(VListWidget):
         menu = UMenu(a0)
         item: MfListItem = self.itemAt(a0.pos())
         if item:
-            open = QAction(Lng.open[cfg.lng], menu)
+            open = QAction(Lng.open[Cfg.lng], menu)
             open.triggered.connect(lambda: self.mf_open.emit(item.mf))
             menu.addAction(open)
             menu.addSeparator()
-            reveal = QAction(Lng.reveal_in_finder[cfg.lng], menu)
+            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], menu)
             reveal.triggered.connect(lambda: self.mf_reveal.emit(item.mf))
             menu.addAction(reveal)
             menu.addSeparator()
-            setup = QAction(Lng.setup[cfg.lng], menu)
+            setup = QAction(Lng.setup[Cfg.lng], menu)
             setup.triggered.connect(lambda: self.mf_edit.emit(item.mf))
             menu.addAction(setup)
         else:
-            new_folder = QAction(Lng.new_folder[cfg.lng], menu)
+            new_folder = QAction(Lng.new_folder[Cfg.lng], menu)
             new_folder.triggered.connect(lambda: self.mf_new.emit())
             menu.addAction(new_folder)
         menu.show_menu()
@@ -350,8 +349,8 @@ class MenuLeft(QTabWidget):
             lambda rel_path: _tree_open(Mf.current_mf, rel_path)
         )
 
-        self.addTab(self.mf_list, Lng.folders[cfg.lng])
-        self.addTab(self.tree_wid, Lng.contents[cfg.lng])
+        self.addTab(self.mf_list, Lng.folders[Cfg.lng])
+        self.addTab(self.tree_wid, Lng.contents[Cfg.lng])
 
         self.mf_list.setCurrentRow(0)
         QTimer.singleShot(10, lambda: _mf_open(Mf.current_mf))

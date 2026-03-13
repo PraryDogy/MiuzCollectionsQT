@@ -1,16 +1,14 @@
 import os
 import subprocess
 from collections import defaultdict
-from time import time
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCloseEvent, QIcon, QKeyEvent
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
-from typing_extensions import Literal, Optional
-from watchdog.events import FileSystemEvent
+from typing_extensions import Literal
 
-from cfg import Dynamic, Static, cfg
+from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
 from system.items import (Buffer, ExtScanerItem, OnStartItem, SettingsItem,
                           SingleDirScanerItem, WatchDogItem)
@@ -204,7 +202,7 @@ class WinMain(UMainWindow):
         right_lay.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
-        self.bar_bottom.progress_bar.setText(Lng.loading[cfg.lng])
+        self.bar_bottom.progress_bar.setText(Lng.loading[Cfg.lng])
         self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
         right_lay.addWidget(self.bar_bottom)
 
@@ -295,7 +293,7 @@ class WinMain(UMainWindow):
         alias = mf.mf_alias
         self.noti_wid = NotifyWid(
             parent,
-            f"{alias}: {Lng.no_connection_full[cfg.lng].lower()}",
+            f"{alias}: {Lng.no_connection_full[Cfg.lng].lower()}",
             self.warning_svg,
             ms=3000
             )
@@ -425,7 +423,7 @@ class WinMain(UMainWindow):
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
         self.remove_files_win = ConfirmWindow(
-            f"{Lng.delete_forever[cfg.lng]} ({len(abs_paths)})?"
+            f"{Lng.delete_forever[Cfg.lng]} ({len(abs_paths)})?"
         )
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
@@ -635,7 +633,7 @@ class WinMain(UMainWindow):
             self.scaner_poll_timer.stop()
             self.scaner_poll_timer.start(ms)
             self.scaner_check_timer.stop()
-            self.scaner_check_timer.start(cfg.scaner_minutes * 60 * 1000)
+            self.scaner_check_timer.start(Cfg.scaner_minutes * 60 * 1000)
         else:
             # проверяем каждую минуту, что задача завершена
             self.scaner_check_timer.stop()
@@ -662,7 +660,7 @@ class WinMain(UMainWindow):
             ProcessWorker.stop_all()
         except Exception as e:
             print("on exit main win terminate error", e)
-        cfg.write_json_data()
+        Cfg.write_json_data()
         Servers.write_json_data()
         Filters.write_json_data()
         Mf.write_json_data()
@@ -775,7 +773,7 @@ class WinMain(UMainWindow):
                 print(e)
             self.noti_wid = NotifyWid(
                 self.grid,
-                Lng.drop_event_denied_msg[cfg.lng],
+                Lng.drop_event_denied_msg[Cfg.lng],
                 self.warning_svg,
                 ms=3000
                 )

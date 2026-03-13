@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsPixmapItem, QGraphicsScene,
                              QGraphicsView, QHBoxLayout, QLabel, QWidget)
 
-from cfg import cfg
+from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
@@ -232,7 +232,7 @@ class WinImageView(AppModalWindow):
     def __init__(self, rel_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
         super().__init__()
 
-        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(cfg.apps)}
+        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
         self.cached_images: dict[str, QPixmap] = {}
         self.is_selection = is_selection
         self.path_to_wid = path_to_wid
@@ -317,7 +317,7 @@ class WinImageView(AppModalWindow):
         if pixmap:
             self.restart_img_wid(pixmap)
         else:
-            t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[cfg.lng]}"
+            t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng]}"
             self.show_text_label(t)
 
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
@@ -347,7 +347,7 @@ class WinImageView(AppModalWindow):
                             lambda qimage: fin(item.src, qimage))
                         UThreadPool.start(qimage_task)
                 else:
-                    t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[cfg.lng]}"
+                    t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[Cfg.lng]}"
                     self.show_text_label(t)
             
             if not self.read_img_task.is_alive():
@@ -513,11 +513,11 @@ class WinImageView(AppModalWindow):
 
         # открыть в приложении
         open_menu = USubMenu(
-            f"{Lng.open_in[cfg.lng]} ({len(rel_paths)})",
+            f"{Lng.open_in[Cfg.lng]} ({len(rel_paths)})",
             self.menu_
         )
 
-        act = QAction(Lng.open_default[cfg.lng], open_menu)
+        act = QAction(Lng.open_default[Cfg.lng], open_menu)
         act.triggered.connect(
             lambda: self.open_in_app.emit((rel_paths, None))
         )
@@ -585,14 +585,14 @@ class WinImageView(AppModalWindow):
         )
         self.menu_.addAction(save_as)
 
-        rotate_menu = USubMenu(Lng.rotate[cfg.lng], self.menu_)
+        rotate_menu = USubMenu(Lng.rotate[Cfg.lng], self.menu_)
         self.menu_.addMenu(rotate_menu)
 
-        rotate_cw = QAction(Lng.clockwise[cfg.lng] + " (⌘ + →)", rotate_menu)
+        rotate_cw = QAction(Lng.clockwise[Cfg.lng] + " (⌘ + →)", rotate_menu)
         rotate_cw.triggered.connect(lambda: self.rotate(90))
         rotate_menu.addAction(rotate_cw)
 
-        rotate_ccw = QAction(Lng.counter_clockwise[cfg.lng] + " (⌘ + ←)", rotate_menu)
+        rotate_ccw = QAction(Lng.counter_clockwise[Cfg.lng] + " (⌘ + ←)", rotate_menu)
         rotate_ccw.triggered.connect(lambda: self.rotate(-90))
         rotate_menu.addAction(rotate_ccw)
 

@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
-from cfg import cfg
+from cfg import Cfg
 from system.items import CopyTaskItem
 from system.lang import Lng
 from system.multiprocess import CopyTask, CopyTaskWorker
@@ -24,7 +24,7 @@ class ReplaceFilesWin(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.replace[cfg.lng])
+        self.setWindowTitle(Lng.replace[Cfg.lng])
         self.setFixedSize(350, 90)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -41,7 +41,7 @@ class ReplaceFilesWin(SingleActionWindow):
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
-        test_two = QLabel(Lng.replace_existing_files[cfg.lng])
+        test_two = QLabel(Lng.replace_existing_files[Cfg.lng])
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
@@ -54,17 +54,17 @@ class ReplaceFilesWin(SingleActionWindow):
         btn_wid.setLayout(btn_lay)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        replace_all_btn = SmallBtn(Lng.replace_all[cfg.lng])
+        replace_all_btn = SmallBtn(Lng.replace_all[Cfg.lng])
         replace_all_btn.setFixedWidth(self.btn_w)
         replace_all_btn.clicked.connect(lambda: self.replace_all_cmd())
         btn_lay.addWidget(replace_all_btn)
 
-        replace_one_btn = SmallBtn(Lng.replace_one[cfg.lng])
+        replace_one_btn = SmallBtn(Lng.replace_one[Cfg.lng])
         replace_one_btn.setFixedWidth(self.btn_w)
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        stop_btn = SmallBtn(Lng.stop[cfg.lng])
+        stop_btn = SmallBtn(Lng.stop[Cfg.lng])
         stop_btn.setFixedWidth(self.btn_w)
         stop_btn.clicked.connect(lambda: self.stop_cmd())
         btn_lay.addWidget(stop_btn)
@@ -90,7 +90,7 @@ class ErrorWin(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.error[cfg.lng])
+        self.setWindowTitle(Lng.error[Cfg.lng])
         self.setFixedSize(350, 90)
 
         h_wid = QWidget()
@@ -106,11 +106,11 @@ class ErrorWin(SingleActionWindow):
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
-        test_two = QLabel(Lng.copy_error[cfg.lng])
+        test_two = QLabel(Lng.copy_error[Cfg.lng])
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
-        ok_btn = SmallBtn(Lng.ok[cfg.lng])
+        ok_btn = SmallBtn(Lng.ok[Cfg.lng])
         ok_btn.clicked.connect(self.deleteLater)
         ok_btn.setFixedWidth(90)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -133,9 +133,9 @@ class WinCopyFiles(ProgressbarWin):
     ms = 500
 
     def __init__(self, target_dir: str, files_to_copy: list[str], action_type: bool):
-        super().__init__(Lng.copying[cfg.lng])
+        super().__init__(Lng.copying[Cfg.lng])
         self.above_label.setText(
-            f"{Lng.copying[cfg.lng]} {Lng.in_[cfg.lng]} \"{os.path.basename(target_dir)}\""
+            f"{Lng.copying[Cfg.lng]} {Lng.in_[Cfg.lng]} \"{os.path.basename(target_dir)}\""
         )
 
         self.dst_urls: list[str] = []
@@ -193,13 +193,13 @@ class WinCopyFiles(ProgressbarWin):
 
             self.progressbar.setValue(self.copy_item.current_size)
             self.below_label.setText(
-                f'{self.windowTitle()} {self.copy_item.current_count} {Lng.from_[cfg.lng]} {self.copy_item.total_count}'
+                f'{self.windowTitle()} {self.copy_item.current_count} {Lng.from_[Cfg.lng]} {self.copy_item.total_count}'
             )
 
         if not self.copy_task.is_alive() or finished:
             self.progressbar.setValue(self.progressbar.maximum())
             self.below_label.setText(
-                f'{self.windowTitle()} {self.copy_item.total_count} {Lng.from_[cfg.lng]} {self.copy_item.total_count}'
+                f'{self.windowTitle()} {self.copy_item.total_count} {Lng.from_[Cfg.lng]} {self.copy_item.total_count}'
             )     
             self.finished_.emit(self.dst_urls)
             self.stop_task()

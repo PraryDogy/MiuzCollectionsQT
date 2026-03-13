@@ -1,6 +1,4 @@
-import gc
 import os
-import subprocess
 
 from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
@@ -10,7 +8,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QWidget)
 
-from cfg import Dynamic, Static, cfg
+from cfg import Cfg, Dynamic, Static
 from system.items import Buffer, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -225,8 +223,8 @@ class Thumbnail(QFrame):
         self.below_text = BelowTextWid(self)
         self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        location = f"{Lng.location[cfg.lng]}: {Mf.current_mf.mf_alias}{rel_path}"
-        modified = f"{Lng.modified[cfg.lng]}: {self.mod}"
+        location = f"{Lng.location[Cfg.lng]}: {Mf.current_mf.mf_alias}{rel_path}"
+        modified = f"{Lng.modified[Cfg.lng]}: {self.mod}"
         self.setToolTip("\n".join([location, modified, ]))
 
         self.setup()
@@ -419,7 +417,7 @@ class Grid(VScrollArea):
         self.buffer: Buffer = None
         self.go_to_url: str = None
 
-        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(cfg.apps)}
+        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
 
         # --- Таймеры ---
         self.resize_timer = QTimer(self)
@@ -483,7 +481,7 @@ class Grid(VScrollArea):
             self.clear_selected_widgets()
             Thumbnail.calculate_size()
             if not db_images:
-                lbl = QLabel(Lng.no_photo[cfg.lng])
+                lbl = QLabel(Lng.no_photo[Cfg.lng])
                 self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
                 self.grid_lay.setRowStretch(0, 1)
                 self.grid_lay.setColumnStretch(0, 1)
@@ -836,7 +834,7 @@ class Grid(VScrollArea):
         def menu_empty():
             self.clear_selected_widgets()
 
-            update_grid = QAction(Lng.update_grid[cfg.lng], self.menu_)
+            update_grid = QAction(Lng.update_grid[Cfg.lng], self.menu_)
             update_grid.triggered.connect(
                 lambda: self.reload_thumbnails()
             )
@@ -862,7 +860,7 @@ class Grid(VScrollArea):
                 self.menu_.addSeparator()
 
             self.menu_.addSeparator()
-            reveal = QAction(Lng.reveal_in_finder[cfg.lng], self.menu_)
+            reveal = QAction(Lng.reveal_in_finder[Cfg.lng], self.menu_)
             reveal.triggered.connect(
                 lambda: self.reveal_in_finder.emit([Dynamic.current_dir])
             )
@@ -886,11 +884,11 @@ class Grid(VScrollArea):
 
             # открыть в приложении
             open_menu = USubMenu(
-                f"{Lng.open_in[cfg.lng]} ({len(rel_paths)})",
+                f"{Lng.open_in[Cfg.lng]} ({len(rel_paths)})",
                 self.menu_
             )
 
-            act = QAction(Lng.open_default[cfg.lng], open_menu)
+            act = QAction(Lng.open_default[Cfg.lng], open_menu)
             act.triggered.connect(
                 lambda: self.open_in_app.emit((rel_paths, None))
             )
@@ -941,7 +939,7 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
-            expand_to_path = QAction(Lng.go_to_folder[cfg.lng] + " (1)", self.menu_)
+            expand_to_path = QAction(Lng.go_to_folder[Cfg.lng] + " (1)", self.menu_)
             expand_to_path.triggered.connect(
                 lambda: self.go_to_widget.emit(clicked.rel_path)
             )

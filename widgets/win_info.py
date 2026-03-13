@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QSpacerItem, QWidget
 
-from cfg import cfg
+from cfg import Cfg
 from system.items import OneFileInfoItem
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
@@ -45,12 +45,12 @@ class Selectable(ULabel):
 
         menu_ = UMenu(event=ev)
 
-        label_text = Lng.copy[cfg.lng]
+        label_text = Lng.copy[Cfg.lng]
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(lambda: Utils.copy_text(text))
         menu_.addAction(sel)
 
-        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[cfg.lng])
+        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[Cfg.lng])
         reveal.triggered.connect(
             lambda: Utils.reveal_files([full_text])
         )
@@ -66,7 +66,7 @@ class WinInfo(SingleActionWindow):
 
     def __init__(self, paths: list[str]):
         super().__init__()
-        self.setWindowTitle(Lng.info[cfg.lng])
+        self.setWindowTitle(Lng.info[Cfg.lng])
         self.path = paths[0]
 
         wid = QWidget()
@@ -78,12 +78,12 @@ class WinInfo(SingleActionWindow):
         wid.setLayout(self.grid_lay)
 
         self.data = {
-            Lng.file_name[cfg.lng]: OneFileInfo.lined_text(os.path.basename(self.path)),
-            Lng.type_[cfg.lng]: Lng.calculating[cfg.lng],
-            Lng.file_size[cfg.lng]: Lng.calculating[cfg.lng],
-            Lng.place[cfg.lng]: OneFileInfo.lined_text(self.path),
-            Lng.changed[cfg.lng]: Lng.calculating[cfg.lng],
-            Lng.resol[cfg.lng]: Lng.calculating[cfg.lng],
+            Lng.file_name[Cfg.lng]: OneFileInfo.lined_text(os.path.basename(self.path)),
+            Lng.type_[Cfg.lng]: Lng.calculating[Cfg.lng],
+            Lng.file_size[Cfg.lng]: Lng.calculating[Cfg.lng],
+            Lng.place[Cfg.lng]: OneFileInfo.lined_text(self.path),
+            Lng.changed[Cfg.lng]: Lng.calculating[Cfg.lng],
+            Lng.resol[Cfg.lng]: Lng.calculating[Cfg.lng],
         }
 
         selectable_labels: list[Selectable] = []

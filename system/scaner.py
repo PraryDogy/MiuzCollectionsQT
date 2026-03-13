@@ -6,7 +6,7 @@ from time import sleep
 
 import sqlalchemy
 
-from cfg import Static, cfg
+from cfg import Static, Cfg
 from system.database import ColumnNames, Dbase, Dirs, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
@@ -70,7 +70,7 @@ class AllDirLoader:
         # gui_text: Имя папки: поиск в папке
         gui_text = (
             f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.search_in[cfg.lng].lower()}"
+            f"{Lng.search_in[Cfg.lng].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text, False)
         scaner_item.q.put(ext_scaner_item)
@@ -264,7 +264,7 @@ class ImgLoader:
         # имя папки: поиск
         gui_text = (
             f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.search_in[cfg.lng].lower()}"
+            f"{Lng.search_in[Cfg.lng].lower()}"
         )
         ext_scaner_item = ExtScanerItem(gui_text, False)
         scaner_item.q.put(ext_scaner_item)
@@ -439,7 +439,7 @@ class HashdirImgUpdater:
     def q_put(scaner_item: IntScanerItem, ext_scaner_item: ExtScanerItem):
         text = (
             f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.updating[cfg.lng].lower()} "
+            f"{Lng.updating[Cfg.lng].lower()} "
             f"({scaner_item.total_count})"
         )
         ext_scaner_item.gui_text = text
@@ -678,7 +678,7 @@ class AllDirScaner:
                     print(traceback.format_exc())
                     continue
             else:
-                no_conn = Lng.no_connection[cfg.lng].lower()
+                no_conn = Lng.no_connection[Cfg.lng].lower()
                 gui_text = (
                     f"{scaner_item.mf.mf_alias}: "
                     f"{no_conn}"
