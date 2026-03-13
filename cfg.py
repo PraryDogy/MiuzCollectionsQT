@@ -53,49 +53,51 @@ class Dynamic:
 
 
 class Cfg:
-    def __init__(self):
-        self.app_ver: str = Static.app_ver
-        self.lng: int = 0
-        self.dark_mode: int = 0
-        self.scaner_minutes: int = 5
-        self.new_scaner: int = True
-        self.hide_digits: bool = True
-        self.apps = [
-            "preview",
-            "photos",
-            "photoshop",
-            "lightroom",
-            "affinity photo",
-            "pixelmator",
-            "gimp",
-            "capture one",
-            "dxo photolab",
-            "luminar neo",
-            "sketch",
-            "graphicconverter",
-            "imageoptim",
-            "snapheal",
-            "photoscape",
-            "preview",
-            "просмотр"
-        ]
+    app_ver: str = Static.app_ver
+    lng: int = 0
+    dark_mode: int = 0
+    scaner_minutes: int = 5
+    new_scaner: int = True
+    hide_digits: bool = True
+    apps = [
+        "preview",
+        "photos",
+        "photoshop",
+        "lightroom",
+        "affinity photo",
+        "pixelmator",
+        "gimp",
+        "capture one",
+        "dxo photolab",
+        "luminar neo",
+        "sketch",
+        "graphicconverter",
+        "imageoptim",
+        "snapheal",
+        "photoscape",
+        "preview",
+        "просмотр"
+    ]
 
-    def set_json_data(self):
+    @classmethod
+    def set_json_data(cls):
         def cmd():
             with open(Static.external_cfg, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
             for k, v in data.items():
-                setattr(self, k, v) if hasattr(self, k) else None
+                setattr(cls, k, v) if hasattr(cls, k) else None
         try:
             cmd()
         except Exception as e:
             print("cfg, set json data error",e)
- 
-    def write_json_data(self):
+    
+    @classmethod
+    def write_json_data(cls):
         with open(Static.external_cfg, "w", encoding="utf-8") as file:
-            json.dump(vars(self), file, ensure_ascii=False, indent=4)
+            json.dump(vars(cls), file, ensure_ascii=False, indent=4)
 
-    def check_files(self):
+    @classmethod
+    def check_files(cls):
         dirs = (
             Static.external_files_dir,
             Static.external_cfg,
@@ -110,7 +112,8 @@ class Cfg:
                 return None
         return True
     
-    def copy_files(self):
+    @classmethod
+    def copy_files(cls):
         if os.path.exists(Static.external_files_dir):
             shutil.rmtree(Static.external_files_dir)
         os.makedirs(Static.external_files_dir, exist_ok=True)
@@ -135,7 +138,8 @@ class Cfg:
         )
         os.remove(external_hashdir_zip)
 
-    def make_external_empty_files(self):
+    @classmethod
+    def make_external_empty_files(cls):
         if os.path.exists(Static.external_files_dir):
             shutil.rmtree(Static.external_files_dir)
         os.makedirs(Static.external_files_dir, exist_ok=True)
@@ -150,5 +154,3 @@ class Cfg:
         for src, dst in dirs.items():
             with open(dst, "w") as file:
                 ...
-
-cfg = Cfg()
