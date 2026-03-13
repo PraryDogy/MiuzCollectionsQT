@@ -227,6 +227,7 @@ class App(QApplication):
 
     def set_miuz(self):
         cfg.copy_files()
+        cfg.lng = Lng.lng_index
         self.start_app()
 
     def set_default(self):
