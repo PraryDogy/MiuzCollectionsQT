@@ -78,7 +78,7 @@ class System_:
 class ClickableGroupBox(QGroupBox):
     def __init__(self, title: str, callback: callable):
         super().__init__()
-        self.setFixedWidth(200)
+        self.setFixedSize(150, 70)
         self.callback = callback
         
         layout = QVBoxLayout(self)
@@ -100,17 +100,17 @@ class FirstLoad(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Начальная настройка")
-        self.setFixedHeight(150)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         main_layout = QHBoxLayout(self)
-        main_layout.setSpacing(5)
+        main_layout.setSpacing(10)
 
         self.group_app = ClickableGroupBox(
             "Настроить приложение", 
             self._setup_app
         )
         self.group_miuz = ClickableGroupBox(
-            "Установить настройки для MIUZ Diamonds", 
+            "MIUZ Diamonds", 
             self.setup_miuz
         )
 
@@ -119,10 +119,12 @@ class FirstLoad(QDialog):
         self.adjustSize()
 
     def _setup_app(self):
+        self.hide()
         self.set_default.emit()
         self.deleteLater()
 
     def setup_miuz(self):
+        self.hide()
         self.set_miuz.emit()
         self.deleteLater()
 

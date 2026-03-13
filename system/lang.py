@@ -365,3 +365,7 @@ class Lng:
         "Папка с таким путем уже добавлена.\nИмя папки:",
         "A folder with this path has already been added.\nFolder name:",
     )
+    first_load_title = (
+        "Начальная настройка",
+        ""
+    )
