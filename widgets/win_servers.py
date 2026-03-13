@@ -194,8 +194,8 @@ class ServersWin(SingleActionWindow):
         self.save_cmd()
 
     def save_cmd(self):
-        with open(Static.external_servers, "w", encoding="utf-8") as file:
-            json.dump(self.data, file, indent=4, ensure_ascii=False)
+        Servers.server_list = self.data
+        Servers.write_json_data()
 
     def connect_cmd(self):
         delay = 0
