@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
 
-from cfg import Static, cfg
+from cfg import Cfg, Static, cfg
 from system.database import Dbase
 from system.filters import Filters
 from system.main_folder import Mf
@@ -193,6 +193,7 @@ class LanguageSelect(QDialog):
 
     def select_lang(self, index):
         Lng.lng = index
+        cfg.lng = index
         self.closed_.emit()
         self.deleteLater()
     
