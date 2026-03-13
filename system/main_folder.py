@@ -40,18 +40,11 @@ class Mf:
     @classmethod
     def init(cls):
         if not os.path.exists(cls.__json_file):
-            cls.mf_list = cls.get_default_mfs()
-            cls.current_mf = cls.mf_list[0]
             return
         
         try:
             with open(cls.__json_file, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
-
-            if not isinstance(data, list):
-                cls.mf_list = cls.get_default_mfs()
-                cls.current_mf = cls.mf_list[0]
-                return
 
             for mf in data:
                 if list(mf.keys()) != Mf.__slots__:
@@ -63,48 +56,15 @@ class Mf:
                 else:
                     cls.mf_list.append(Mf(**mf))
 
-            if len(cls.mf_list) == 0:
-                cls.mf_list = cls.get_default_mfs()
-            cls.current_mf = cls.mf_list[0]
+            if len(cls.mf_list) != 0:
+                cls.current_mf = cls.mf_list[0]
 
         except Exception as e:
-            Utils.print_error()
-            cls.mf_list = cls.get_default_mfs()
-            cls.current_mf = cls.mf_list[0]
+            import traceback
+            print(traceback.format_exc())
 
     @classmethod
     def write_json_data(cls):
         with open(cls.__json_file, "w", encoding="utf-8") as file:
             data = [i.get_data() for i in cls.mf_list]
             json.dump(data, file, ensure_ascii=False, indent=4)
-
-    @classmethod
-    def get_default_mfs(cls) -> list["Mf"]:
-        miuz = Mf(
-            mf_alias = "miuz",
-            mf_paths = [
-                '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
-                '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
-                '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
-            ],
-            mf_stop_list = [
-                "_Archive_Commerce_Брендинг",
-                "Chosed",
-                "LEVIEV",
-            ],
-            mf_current_path = ""
-        )
-
-        panacea = Mf(
-            mf_alias = "panacea",
-            mf_paths = [
-                '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready',
-                '/Volumes/Shares-1/Studio/Panacea/Photo/Art/Ready',
-                '/Volumes/Shares-2/Studio/Panacea/Photo/Art/Ready',
-            ],
-            mf_stop_list = [
-            ],
-            mf_current_path = ""
-        )
-
-        return [miuz, panacea]
