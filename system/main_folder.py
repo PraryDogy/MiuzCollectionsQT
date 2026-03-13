@@ -12,19 +12,18 @@ class Mf:
     json_file = os.path.join(Static.app_support, "mf.json")
     __slots__ = ["mf_alias", "mf_paths", "mf_stop_list", "mf_current_path",]
 
-    def __init__(
-            self,
-            mf_alias: str = "Имя/Name",
-            mf_paths: list[str] = ["/path", ],
-            mf_stop_list: list[str] = ["stop word", ],
-            mf_current_path: str = "",
-            **kw
-    ):
+    def __init__(self, **kw):
+        """
+        mf_alias: str,
+        mf_paths: list[str],
+        mf_stop_list: list[str]
+        mf_current_path: str
+        """
         super().__init__()
-        self.mf_alias = mf_alias
-        self.mf_paths = mf_paths
-        self.mf_stop_list = mf_stop_list
-        self.mf_current_path: str = mf_current_path
+        self.mf_alias = kw["mf_alias"]
+        self.mf_paths = kw["mf_paths"]
+        self.mf_stop_list = kw["mf_stop_list"]
+        self.mf_current_path: str = kw["mf_current_path"]
             
     def get_available_path(self) -> str | None:
         """
@@ -39,10 +38,7 @@ class Mf:
         return None
     
     def get_data(self):
-        return {
-            i: getattr(self, i)
-            for i in self.__slots__
-        }
+        return {i: getattr(self, i) for i in self.__slots__}
 
     @classmethod
     def init(cls):
