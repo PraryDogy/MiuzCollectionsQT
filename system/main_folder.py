@@ -52,14 +52,13 @@ class Mf:
                 cls.current_mf = cls.mf_list[0]
             else:
                 for mf in data:
-                    if mf["paths"]:
+                    if mf["mf_paths"]:
                         item = Mf(**mf)
                         cls.mf_list.append(item)
                     else:
                         print("папка не имеет путей")
             if len(cls.mf_list) == 0:
                 cls.mf_list = cls.get_default_mfs()
-
             cls.current_mf = cls.mf_list[0]
 
         except Exception as e:
@@ -76,30 +75,30 @@ class Mf:
     @classmethod
     def get_default_mfs(cls) -> list["Mf"]:
         miuz = Mf(
-            "miuz",
-            [
+            mf_alias = "miuz",
+            mf_paths = [
                 '/Volumes/Shares/Studio/MIUZ/Photo/Art/Ready',
                 '/Volumes/Shares-1/Studio/MIUZ/Photo/Art/Ready',
                 '/Volumes/Shares-2/Studio/MIUZ/Photo/Art/Ready',
             ],
-            [
+            mf_stop_list = [
                 "_Archive_Commerce_Брендинг",
                 "Chosed",
                 "LEVIEV",
             ],
-            ""
+            mf_current_path = ""
         )
 
         panacea = Mf(
-            "panacea",
-            [
+            mf_alias = "panacea",
+            mf_paths = [
                 '/Volumes/Shares/Studio/Panacea/Photo/Art/Ready',
                 '/Volumes/Shares-1/Studio/Panacea/Photo/Art/Ready',
                 '/Volumes/Shares-2/Studio/Panacea/Photo/Art/Ready',
             ],
-            [
+            mf_stop_list = [
             ],
-            ""
+            mf_current_path = ""
         )
 
         return [miuz, panacea]
