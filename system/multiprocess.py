@@ -290,7 +290,7 @@ class _DeletedMfRemover:
     def remove_dirs(conn: sqlalchemy.Connection):
         q = sqlalchemy.select(Dirs.mf_alias).distinct()
         db_brands = set(conn.execute(q).scalars())
-        app_brands = set(i.alias for i in Mf.list_)
+        app_brands = set(i.alias for i in Mf.mf_list)
         to_delete = db_brands - app_brands
 
         if to_delete:

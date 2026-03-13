@@ -51,7 +51,7 @@ class UPushButton(SmallBtn):
 class GroupWid(QGroupBox):
     def __init__(self):
         """
-        QGroupBox + vertical layout
+        QGroupBox + self.layout_ (vertical layout)
         """
         super().__init__()
         self.layout_ = UVBoxLayout()
@@ -646,8 +646,7 @@ class FiltersWid(GroupWid):
         return super().mouseReleaseEvent(a0)
 
 
-# ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛ
-
+# ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ 
 
 class MfPaths(TextEditWidget):
     def __init__(self, mf: Mf):
@@ -703,12 +702,44 @@ class MfStopList(TextEditWidget):
         return super().dropEvent(a0)
 
 
+class MfSave(GroupWid):
+    clicked_ = pyqtSignal()
+    def __init__(self):
+        super().__init__()        
+
+        save_wid_child = GroupChild()
+        self.layout_.addWidget(save_wid_child)
+
+        save_text = ULabel(Lng.save[cfg.lng])
+        save_wid_child.layout_.addWidget(save_text)
+
+        save_wid_child.layout_.addSpacerItem(QSpacerItem(10, 0))
+
+        self.warning_svg = SvgWarning()
+        self.warning_svg.setFixedSize(14, 14)
+        save_wid_child.layout_.addWidget(self.warning_svg)
+        self.warning_svg.hide()
+
+        save_wid_child.layout_.addStretch()
+
+        save_btn = SvgArrow()
+        save_wid_child.layout_.addWidget(save_btn)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked_.emit()
+        return super().mouseReleaseEvent(event)
+
+
+# ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ 
+
+
 class MfSettings(QWidget):
     changed = pyqtSignal()
 
-    def __init__(self, target_mf: Mf, mf_list_clone: list[Mf]):
+    def __init__(self, mf: Mf, mf_list_clone: list[Mf]):
         super().__init__()
-        self.target_mf = target_mf
+        self.mf = mf
         self.mf_list_clone = mf_list_clone
 
         main_lay = UVBoxLayout()
@@ -718,17 +749,25 @@ class MfSettings(QWidget):
         # Верхний ряд с названием
         self.name_wid = GroupWid()
         main_lay.addWidget(self.name_wid)
-        name_text = ULabel(f"{Lng.alias[cfg.lng]}: {target_mf.alias}")
+        name_text = ULabel(f"{Lng.alias[cfg.lng]}: {mf.alias}")
         name_text.setFixedHeight(GroupChild.hh)
         self.name_wid.layout_.addWidget(name_text)
 
-        mf_paths = MfPaths(target_mf)
-        mf_paths.textChanged.connect(self.changed.emit)
-        main_lay.addWidget(mf_paths)
+        self.mf_paths = MfPaths(mf)
+        self.mf_paths.textChanged.connect(
+            lambda: self.mf_save.warning_svg.show()
+        )
+        main_lay.addWidget(self.mf_paths)
 
-        mf_stop_list = MfStopList(target_mf)
-        mf_stop_list.textChanged.connect(self.changed.emit)
-        main_lay.addWidget(mf_stop_list)
+        self.mf_stop_list = MfStopList(mf)
+        self.mf_stop_list.textChanged.connect(
+            lambda: self.mf_save.warning_svg.show()
+        )
+        main_lay.addWidget(self.mf_stop_list)
+
+        self.mf_save = MfSave()
+        self.mf_save.clicked_.connect(self.save)
+        main_lay.addWidget(self.mf_save)
 
         general_wid = GroupWid()
         main_lay.addWidget(general_wid)
@@ -762,9 +801,9 @@ class MfSettings(QWidget):
     def remove_cmd(self, *args):
 
         def fin():
-            for i in Mf.list_:
-                if i.alias == self.target_mf.alias:
-                    Mf.list_.remove(i)
+            for i in Mf.mf_list:
+                if i.alias == self.mf.alias:
+                    Mf.mf_list.remove(i)
                     break
             Mf.write_json_data()
             restart_app()
@@ -780,7 +819,7 @@ class MfSettings(QWidget):
     def set_reset_flag(self, *args):
 
         def reset_data():
-            self.reset_task = MfDataCleaner(self.target_mf.alias)
+            self.reset_task = MfDataCleaner(self.mf.alias)
             self.reset_task.sigs.finished_.connect(restart_app)
             UThreadPool.start(self.reset_task)
 
@@ -789,8 +828,37 @@ class MfSettings(QWidget):
         win.center_to_parent(self.window())
         win.show()
 
-    def save(self):
-        self.changed.emit()
+    def save(self, *args):
+
+        def fin():
+            self.mf.paths = paths
+            self.mf.stop_list = stop_list
+
+            for i in Mf.mf_list:
+                if i.alias == self.mf.alias:
+                    i.paths = paths
+                    i.stop_list = stop_list
+                    break
+
+            Mf.write_json_data()
+            restart_app()
+
+        paths = self.mf_paths.get_list()
+        stop_list = self.mf_stop_list.get_list()
+
+        def show_warn(text: str):
+            win_warn = WarningWindow(text)
+            win_warn.center_to_parent(self.window())
+            win_warn.show()
+
+        if not paths:
+            show_warn(Lng.select_folder_path[cfg.lng])
+            return
+
+        win = ConfirmWindow(Lng.save_text_long[cfg.lng])
+        win.ok_clicked.connect(fin)
+        win.center_to_parent(self.window())
+        win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -873,7 +941,7 @@ class NewFolder(QWidget):
             # мы добавляем новую папку менно в Mf.list_ а не в clone
             # чтобы отменить изменения из других отделов
             # и применить изменения только по новой папке
-            Mf.list_.append(self.mf)
+            Mf.mf_list.append(self.mf)
             Mf.write_json_data()
             restart_app()
 
@@ -937,7 +1005,7 @@ class WinSettings(SingleActionWindow):
         self.setFixedSize(700, 560)
 
         self.cfg_clone = copy.deepcopy(cfg)
-        self.mf_list_clone = copy.deepcopy(Mf.list_)
+        self.mf_list_clone = copy.deepcopy(Mf.mf_list)
         self.filters_clone = copy.deepcopy(Filters.filters)
         self.settings_item = settings_item
 
@@ -977,7 +1045,7 @@ class WinSettings(SingleActionWindow):
         spacer = UListSpacerItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
-        for i in Mf.list_:
+        for i in Mf.mf_list:
             new_folder = UListWidgetItem(self.left_menu, text=i.alias)
             new_folder.setIcon(QIcon(self.svg_folder))
             self.left_menu.addItem(new_folder)
@@ -1101,7 +1169,7 @@ class WinSettings(SingleActionWindow):
             win_warn.center_to_parent(self.window())
             win_warn.show()
         else:
-            Mf.list_ = self.mf_list_clone
+            Mf.mf_list = self.mf_list_clone
             Mf.write_json_data()
 
             Filters.filters = self.filters_clone

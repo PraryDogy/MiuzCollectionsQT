@@ -7,8 +7,8 @@ from .utils import Utils
 
 
 class Mf:
-    current: "Mf" = None
-    list_: list["Mf"] = []
+    current_mf: "Mf" = None
+    mf_list: list["Mf"] = []
     json_file = os.path.join(Static.app_support, "mf.json")
     json_file_backup = os.path.join(Static.app_support, "mf_backup.json")
     __slots__ = [
@@ -82,38 +82,38 @@ class Mf:
     @classmethod
     def init(cls):
         if not os.path.exists(cls.json_file):
-            cls.list_ = cls.get_default_mfs()
-            cls.current = cls.list_[0]
+            cls.mf_list = cls.get_default_mfs()
+            cls.current_mf = cls.mf_list[0]
             return
         
         try:
             with open(cls.json_file, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
             if not isinstance(data, list):
-                cls.list_ = cls.get_default_mfs()
-                cls.current = cls.list_[0]
+                cls.mf_list = cls.get_default_mfs()
+                cls.current_mf = cls.mf_list[0]
             else:
                 for mf in data:
                     if mf["paths"]:
                         item = Mf(**mf)
-                        cls.list_.append(item)
+                        cls.mf_list.append(item)
                     else:
                         print("папка не имеет путей")
-            if len(cls.list_) == 0:
-                cls.list_ = cls.get_default_mfs()
+            if len(cls.mf_list) == 0:
+                cls.mf_list = cls.get_default_mfs()
 
-            cls.current = cls.list_[0]
+            cls.current_mf = cls.mf_list[0]
 
         except Exception as e:
             Utils.print_error()
             cls.backup_corruped_file()
-            cls.list_ = cls.get_default_mfs()
-            cls.current = cls.list_[0]
+            cls.mf_list = cls.get_default_mfs()
+            cls.current_mf = cls.mf_list[0]
 
     @classmethod
     def write_json_data(cls):
         with open(cls.json_file, "w", encoding="utf-8") as file:
-            data = [i.get_data() for i in cls.list_]
+            data = [i.get_data() for i in cls.mf_list]
             json.dump(data, file, ensure_ascii=False, indent=4)
 
     @classmethod

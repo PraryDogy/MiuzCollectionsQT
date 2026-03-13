@@ -56,13 +56,13 @@ class TreeWid(QTreeWidget):
     def init_ui(self):
         self.clear()
 
-        root_item = QTreeWidgetItem([Mf.current.alias])
+        root_item = QTreeWidgetItem([Mf.current_mf.alias])
         root_item.setSizeHint(0, QSize(0, self.item_height))
         root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
         root_item.setIcon(0, QIcon(self.svg_folder))
         self.addTopLevelItem(root_item)
 
-        task = DbDirsLoader(Mf.current)
+        task = DbDirsLoader(Mf.current_mf)
         task.sigs.finished_.connect(lambda lst: self.build_tree(root_item, lst))
         UThreadPool.start(task)
 
@@ -216,7 +216,7 @@ class MfList(VListWidget):
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
 
-        for i in Mf.list_:
+        for i in Mf.mf_list:
             if i.curr_path:
                 true_name = os.path.basename(i.curr_path)
             else:
@@ -262,7 +262,7 @@ class MfList(VListWidget):
         for i in range(self.count()):
             item: MfListItem = self.item(i)
             new_order.append(item.mf)
-        Mf.list_ = new_order
+        Mf.mf_list = new_order
 
 
 class MenuLeft(QTabWidget):
@@ -295,9 +295,9 @@ class MenuLeft(QTabWidget):
             subprocess.Popen(["open", abs_path])
 
         def _mf_open(mf: Mf):
-            if Mf.current == mf:
+            if Mf.current_mf == mf:
                 return
-            Mf.current = mf
+            Mf.current_mf = mf
             # Корневая директория представляется пустой строкой.
             # Это нужно потому, что в запросах к БД формируется шаблон вида `path + '/%'` (ILIKE/LIKE).
             # Если хранить корень как `'/'`, шаблон превратится в `'//%'` — поиск будет неверным.
@@ -341,17 +341,17 @@ class MenuLeft(QTabWidget):
         self.tree_wid = TreeWid()
         self.tree_wid.init_ui()
         self.tree_wid.tree_reveal.connect(
-            lambda rel_path: _tree_reveal(Mf.current, rel_path)
+            lambda rel_path: _tree_reveal(Mf.current_mf, rel_path)
         )
         self.tree_wid.tree_open.connect(
-            lambda rel_path: _tree_open(Mf.current, rel_path)
+            lambda rel_path: _tree_open(Mf.current_mf, rel_path)
         )
 
         self.addTab(self.mf_list, Lng.folders[cfg.lng])
         self.addTab(self.tree_wid, Lng.contents[cfg.lng])
 
         self.mf_list.setCurrentRow(0)
-        QTimer.singleShot(10, lambda: _mf_open(Mf.current))
+        QTimer.singleShot(10, lambda: _mf_open(Mf.current_mf))
 
     def reload_tree(self):
         self.tree_wid.init_ui()

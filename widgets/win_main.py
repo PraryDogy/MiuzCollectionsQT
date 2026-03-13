@@ -143,38 +143,38 @@ class WinMain(UMainWindow):
             lambda: self.restart_scaner_task()
         )
         self.grid.remove_files.connect(
-            lambda rel_paths: self.remove_files(self, Mf.current, rel_paths, ))
+            lambda rel_paths: self.remove_files(self, Mf.current_mf, rel_paths, ))
         self.grid.no_connection.connect(
-            lambda: self.open_win_smb(self.grid, Mf.current)
+            lambda: self.open_win_smb(self.grid, Mf.current_mf)
         )
         self.grid.open_img_view.connect(
             lambda: self.open_view_win()
         )
         self.grid.save_files.connect(
-            lambda data: self.save_files(self.grid, Mf.current, data)
+            lambda data: self.save_files(self.grid, Mf.current_mf, data)
         )
         self.grid.open_info_win.connect(
-            lambda rel_paths: self.open_info_win(self.grid, Mf.current, rel_paths)
+            lambda rel_paths: self.open_info_win(self.grid, Mf.current_mf, rel_paths)
         )
         self.grid.copy_path.connect(
-            lambda rel_paths: self.copy_path(self.grid, Mf.current, rel_paths)
+            lambda rel_paths: self.copy_path(self.grid, Mf.current_mf, rel_paths)
         )
         self.grid.copy_name.connect(
-            lambda rel_paths: self.copy_name(self.grid, Mf.current, rel_paths)
+            lambda rel_paths: self.copy_name(self.grid, Mf.current_mf, rel_paths)
         )
         self.grid.reveal_in_finder.connect(
-            lambda rel_paths: self.reveal_in_finder(self.grid, Mf.current, rel_paths)
+            lambda rel_paths: self.reveal_in_finder(self.grid, Mf.current_mf, rel_paths)
         )
         self.grid.set_fav.connect(
             self.set_fav
         )
         self.grid.open_in_app.connect(
-            lambda data: self.open_in_app(self.grid, Mf.current, data))
+            lambda data: self.open_in_app(self.grid, Mf.current_mf, data))
         self.grid.paste_files.connect(
-            lambda: self.paste_files(self.grid,  Mf.current)
+            lambda: self.paste_files(self.grid,  Mf.current_mf)
         )
         self.grid.set_clipboard.connect(
-            lambda data: self.set_buffer(self.grid, Mf.current, data)
+            lambda data: self.set_buffer(self.grid, Mf.current_mf, data)
         )
         self.grid.setup_mf.connect(
             self.open_settings_win
@@ -232,7 +232,7 @@ class WinMain(UMainWindow):
         return wrapper
     
     def path_bar_update(self, path: str):
-        dir = f"/{Mf.current.alias}{path}"
+        dir = f"/{Mf.current_mf.alias}{path}"
         self.bar_path.update(dir)
     
     def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):
@@ -247,7 +247,7 @@ class WinMain(UMainWindow):
 
         self.grid.reload_thumbnails()
 
-        on_start_item = OnStartItem(Mf.list_)
+        on_start_item = OnStartItem(Mf.mf_list)
         tsk = ProcessWorker(target=OnStartTask.start, args=(on_start_item, ))
         tmr = QTimer(self)
         tmr.setSingleShot(True)
@@ -326,7 +326,7 @@ class WinMain(UMainWindow):
         ]
         self.buffer = Buffer(
             type_=buffer_type,
-            source_mf=Mf.current,
+            source_mf=Mf.current_mf,
             files_to_copy=abs_files_to_copy
         )
         if self.buffer.type_ == "cut":
@@ -337,20 +337,20 @@ class WinMain(UMainWindow):
     @with_conn
     def paste_files(self, parent: QWidget, mf: Mf):
         target_dir = Utils.get_abs_any_path(
-            mf_path=Mf.current.curr_path,
+            mf_path=Mf.current_mf.curr_path,
             rel_path=Dynamic.current_dir
         )
         # готовим информацию для сканера
         # сканировать директорию куда вставлены изображения
-        self.scaner_data[Mf.current].append(target_dir)
+        self.scaner_data[Mf.current_mf].append(target_dir)
         # сканировать директорию откуда вырезано
         if self.buffer.type_ == "cut":
             dirs_to_scan = list(set(
                 os.path.dirname(i)
                 for i in self.buffer.files_to_copy
             ))
-            if self.buffer.source_mf == Mf.current:
-                self.scaner_data[Mf.current].extend(dirs_to_scan)
+            if self.buffer.source_mf == Mf.current_mf:
+                self.scaner_data[Mf.current_mf].extend(dirs_to_scan)
             else:
                 self.scaner_data[self.buffer.source_mf].extend(dirs_to_scan)
         copy_files_win = self.copy_files_win(
@@ -448,12 +448,12 @@ class WinMain(UMainWindow):
 
             self.buffer = Buffer(
                 type_="copy",
-                source_mf=Mf.current,
+                source_mf=Mf.current_mf,
                 files_to_copy=files_to_copy
             )
 
             self.grid.buffer = self.buffer
-            self.paste_files(self.grid, Mf.current)
+            self.paste_files(self.grid, Mf.current_mf)
 
         target_dir = Utils.get_abs_any_path(mf.curr_path, Dynamic.current_dir)
         target_files = [
@@ -505,31 +505,31 @@ class WinMain(UMainWindow):
         wid = self.grid.selected_widgets[-1]
         self.view_win = WinImageView(wid.rel_path, path_to_wid, is_selection)
         self.view_win.open_win_info.connect(
-            lambda rel_paths: self.open_info_win(self.view_win, Mf.current, rel_paths)
+            lambda rel_paths: self.open_info_win(self.view_win, Mf.current_mf, rel_paths)
         )
         self.view_win.copy_path.connect(
-            lambda rel_paths: self.copy_path(self.view_win, Mf.current, rel_paths)
+            lambda rel_paths: self.copy_path(self.view_win, Mf.current_mf, rel_paths)
         )
         self.view_win.copy_name.connect(
-            lambda rel_paths: self.copy_name(self.view_win, Mf.current, rel_paths)
+            lambda rel_paths: self.copy_name(self.view_win, Mf.current_mf, rel_paths)
         )
         self.view_win.reveal_in_finder.connect(
-            lambda rel_paths: self.reveal_in_finder(self.view_win, Mf.current, rel_paths)
+            lambda rel_paths: self.reveal_in_finder(self.view_win, Mf.current_mf, rel_paths)
         )
         self.view_win.set_fav.connect(
             self.set_fav
         )
         self.view_win.save_files.connect(
-            lambda data: self.save_files(self.view_win, Mf.current, data)
+            lambda data: self.save_files(self.view_win, Mf.current_mf, data)
         )
         self.view_win.switch_image_sig.connect(
             lambda path: self.grid.select_viewed_image(path)
         )
         self.view_win.no_connection.connect(
-            lambda: self.open_win_smb(self.view_win, Mf.current)
+            lambda: self.open_win_smb(self.view_win, Mf.current_mf)
         )
         self.view_win.open_in_app.connect(
-            lambda data: self.open_in_app(self.window(), Mf.current, data)
+            lambda data: self.open_in_app(self.window(), Mf.current_mf, data)
         )
 
         if WinImageView.xx == 0:
@@ -557,7 +557,7 @@ class WinMain(UMainWindow):
             self.watchdog_task.terminate_join()
             
         mf_list: list[Mf] = []
-        for mf in Mf.list_:
+        for mf in Mf.mf_list:
             if mf.get_available_path():
                 mf_list.append(mf)
         if mf_list:
@@ -624,7 +624,7 @@ class WinMain(UMainWindow):
                 # print("штатно запускаю ОБЩИЙ сканер")
                 self.scaner_task = ProcessWorker(
                     target=AllDirScaner.start,
-                    args=(Mf.list_, )
+                    args=(Mf.mf_list, )
                 )
                 self.scaner_data.clear()
             self.bar_bottom.progress_bar.stop_timer_text()
@@ -721,7 +721,7 @@ class WinMain(UMainWindow):
         
         if a0.key() == Qt.Key.Key_V:
             if hasattr(self, "buffer"):
-                self.paste_files(self.grid, Mf.current)
+                self.paste_files(self.grid, Mf.current_mf)
         
         elif a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
@@ -784,7 +784,7 @@ class WinMain(UMainWindow):
         ]
 
         if paths:
-            self.upload_files(self.grid, Mf.current, paths)
+            self.upload_files(self.grid, Mf.current_mf, paths)
         return super().dropEvent(a0)
     
     def resizeEvent(self, a0):
