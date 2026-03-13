@@ -40,7 +40,7 @@ class Mf:
     @classmethod
     def init(cls):
         if not os.path.exists(cls.__json_file):
-            return
+            return None
         
         try:
             with open(cls.__json_file, "r", encoding="utf-8") as file:
@@ -58,10 +58,12 @@ class Mf:
 
             if len(cls.mf_list) != 0:
                 cls.current_mf = cls.mf_list[0]
+                return True
 
         except Exception as e:
             import traceback
             print(traceback.format_exc())
+            return None
 
     @classmethod
     def write_json_data(cls):
