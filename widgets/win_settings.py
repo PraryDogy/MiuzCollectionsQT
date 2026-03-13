@@ -1229,12 +1229,8 @@ class SingleSettings(SingleActionWindow):
             mf_current_path=""
         )
         Mf.mf_list.append(mf)
-
         cfg.make_external_files()
-        Mf.write_json_data()
-        Filters.write_json_data()
-        Servers.write_json_data()
-        
+        Mf.write_json_data()        
         restart_app()
 
     def closeEvent(self, a0):
