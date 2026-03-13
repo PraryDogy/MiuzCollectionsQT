@@ -36,21 +36,23 @@ class ExtScanerItem:
 
 
 class IntScanerItem:
-    def __init__(
-            self,
-            mf: Mf,
-            eng: Optional[sqlalchemy.Engine],
-            q: Optional[Queue]
-        ):
+    def __init__(self, **kw):
+        """
+        - mf: Mf
+        - eng: sqlalchemy Engine
+        - q: Queue
+        - lng_index: int (Cfg.lng)
+        """
         super().__init__()
-        self.mf = mf
-        self.eng = eng
-        self.q = q
+        self.mf: Mf = kw["mf"]
+        self.eng: sqlalchemy.Engine = kw["eng"]
+        self.q: Queue = kw["q"]
+        self.lng_index: int = kw["lng_index"]
 
-        if mf.mf_current_path:
-            self.mf_real_name = os.path.basename(mf.mf_current_path)
+        if self.mf.mf_current_path:
+            self.mf_real_name = os.path.basename(self.mf.mf_current_path)
         else:
-            self.mf_real_name = os.path.basename(mf.mf_paths[0])
+            self.mf_real_name = os.path.basename(self.mf.mf_paths[0])
         self.total_count = 0
 
 

@@ -665,7 +665,12 @@ class AllDirScaner:
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
-            scaner_item = IntScanerItem(mf, engine, q)
+            scaner_item = IntScanerItem(
+                mf=mf,
+                eng=engine,
+                q=q,
+                lng_index=Cfg.lng
+            )
             avaible_mf_path = scaner_item.mf.get_avaiable_mf_path()
             if avaible_mf_path:
                 scaner_item.mf.set_mf_current_path(avaible_mf_path)
@@ -741,7 +746,12 @@ class SingleDirScaner:
         - dirs_to_scan: директории, которые нужно просканировать
         """
         engine = Dbase.create_engine()
-        scaner_item = IntScanerItem(mf, engine, q)
+        scaner_item = IntScanerItem(
+            mf=mf,
+            eng=engine,
+            q=q,
+            lng_index=Cfg.lng
+        )
         avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             scaner_item.mf.set_mf_current_path(avaiable_mf_path)
