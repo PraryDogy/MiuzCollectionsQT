@@ -135,7 +135,7 @@ class Cfg:
         )
         os.remove(external_hashdir_zip)
 
-    def make_external_files(self):
+    def make_external_empty_files(self):
         if os.path.exists(Static.external_files_dir):
             shutil.rmtree(Static.external_files_dir)
         os.makedirs(Static.external_files_dir, exist_ok=True)
