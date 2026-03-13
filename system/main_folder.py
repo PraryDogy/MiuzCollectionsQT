@@ -10,13 +10,7 @@ class Mf:
     current_mf: "Mf" = None
     mf_list: list["Mf"] = []
     json_file = os.path.join(Static.app_support, "mf.json")
-    json_file_backup = os.path.join(Static.app_support, "mf_backup.json")
-    __slots__ = [
-        "mf_alias",
-        "mf_paths",
-        "mf_stop_list",
-        "mf_current_path",
-    ]
+    __slots__ = ["mf_alias", "mf_paths", "mf_stop_list", "mf_current_path",]
 
     def __init__(
             self,
@@ -77,7 +71,6 @@ class Mf:
 
         except Exception as e:
             Utils.print_error()
-            cls.backup_corruped_file()
             cls.mf_list = cls.get_default_mfs()
             cls.current_mf = cls.mf_list[0]
 
@@ -86,10 +79,6 @@ class Mf:
         with open(cls.json_file, "w", encoding="utf-8") as file:
             data = [i.get_data() for i in cls.mf_list]
             json.dump(data, file, ensure_ascii=False, indent=4)
-
-    @classmethod
-    def backup_corruped_file(cls):
-        shutil.copy2(cls.json_file, cls.json_file_backup)
 
     @classmethod
     def get_default_mfs(cls) -> list["Mf"]:
