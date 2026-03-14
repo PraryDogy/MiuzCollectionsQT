@@ -17,7 +17,7 @@ class Static:
     external_filters = f"{external_files_dir}/filters.json"
     external_servers = f"{external_files_dir}/servers.json"
 
-    internal_files_dir = "./_preload"
+    internal_files_dir = "./_preload/miuz"
     internal_cfg = f"{internal_files_dir}/cfg.json"
     internal_db = f"{internal_files_dir}/db.db"
     internal_hashdir_zip = f"{internal_files_dir}/hashdir.zip"
