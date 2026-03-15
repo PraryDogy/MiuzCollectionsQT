@@ -138,7 +138,7 @@ class FirstLoad(QDialog):
 
         self.group_app = ClickableGroupBox(
             Lng.setup_app[Cfg.lng],
-            self._setup_app
+            self.setup_app
         )
 
         internal_files = [
@@ -159,7 +159,7 @@ class FirstLoad(QDialog):
         self.adjustSize()
 
 
-    def _setup_app(self):
+    def setup_app(self):
         self.hide()
         self.set_default.emit()
         self.deleteLater()
