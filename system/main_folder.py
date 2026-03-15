@@ -36,13 +36,9 @@ class Mf:
 
     @classmethod
     def json_to_app(cls):
-        if not os.path.exists(Static.external_mf):
-            return None
-        
         try:
             with open(Static.external_mf, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
-
             for mf in data:
                 if list(mf.keys()) != Mf.__slots__:
                     print("mf не сооветствует слотам", mf["mf_alias"])
@@ -52,7 +48,6 @@ class Mf:
                     continue
                 else:
                     cls.mf_list.append(Mf(**mf))
-
             if len(cls.mf_list) != 0:
                 cls.current_mf = cls.mf_list[0]
                 return True
