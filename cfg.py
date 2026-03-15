@@ -123,21 +123,26 @@ class Cfg:
         return True
     
     @classmethod
-    def copy_miuz_files(cls):
-        if os.path.exists(Static.external_files_dir):
-            shutil.rmtree(Static.external_files_dir)
-        os.makedirs(Static.external_files_dir, exist_ok=True)
-
-        dirs = {
+    def get_file_dirs(cls):
+        return {
             Static.internal_cfg: Static.external_cfg,
             Static.internal_db: Static.external_db,
             Static.internal_mf: Static.external_mf,
             Static.internal_filters: Static.external_filters,
             Static.internal_servers: Static.external_servers,
         }
-        for src, dst in dirs.items():
-            shutil.copy2(src, Static.external_files_dir)
 
+    @classmethod
+    def make_external_new_dir(cls):
+        if os.path.exists(Static.external_files_dir):
+            shutil.rmtree(Static.external_files_dir)
+        os.makedirs(Static.external_files_dir, exist_ok=True)
+
+    @classmethod
+    def copy_miuz_files(cls):
+        cls.make_external_new_dir()
+        for src, dst in cls.get_file_dirs().items():
+            shutil.copy2(src, Static.external_files_dir)
         external_hashdir_zip = shutil.copy2(
             Static.internal_hashdir_zip,
             Static.external_files_dir
@@ -150,17 +155,8 @@ class Cfg:
 
     @classmethod
     def make_external_empty_files(cls):
-        if os.path.exists(Static.external_files_dir):
-            shutil.rmtree(Static.external_files_dir)
-        os.makedirs(Static.external_files_dir, exist_ok=True)
+        cls.make_external_new_dir()
         os.makedirs(Static.external_hashdir, exist_ok=True)
-        dirs = {
-            Static.internal_cfg: Static.external_cfg,
-            Static.internal_db: Static.external_db,
-            Static.internal_mf: Static.external_mf,
-            Static.internal_filters: Static.external_filters,
-            Static.internal_servers: Static.external_servers,
-        }
-        for src, dst in dirs.items():
+        for src, dst in cls.get_file_dirs().items():
             with open(dst, "w") as file:
                 ...
