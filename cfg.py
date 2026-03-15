@@ -9,7 +9,9 @@ class Static:
     app_name = "Collections"
     thumbs_load_limit = 100
     
-    external_files_dir = os.path.expanduser(f"~/Library/Application Support/{app_name}")
+    external_files_dir = os.path.expanduser(
+        f"~/Library/Application Support/{app_name}"
+    )
     external_cfg = f"{external_files_dir}/cfg.json"
     external_db = f"{external_files_dir}/db.db"
     external_hashdir = f"{external_files_dir}/hashdir"
@@ -91,13 +93,11 @@ class Cfg:
     
     @classmethod
     def json_to_app(cls):
-        def cmd():
+        try:
             with open(Static.external_cfg, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
-        try:
-            cmd()
         except Exception as e:
             print("cfg, set json data error",e)
     
