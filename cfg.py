@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 from datetime import datetime
+from pathlib import Path
 
 
 class Static:
@@ -135,11 +136,11 @@ class Cfg:
     @classmethod
     def copy_miuz_files(cls):
         cls.make_external_new_dir()
-        zip_file = os.scandir(Static.internal_files_dir)[0].path
-        print(zip_file)
-        # dst  = shutil.copy2(zip_file, Static.external_files_dir)
-        # shutil.unpack_archive(dst, Static.external_files_dir)
-        # os.remove(dst)
+        zip_file = os.listdir(Static.internal_files_dir)[0]
+        zip_file = Path(Static.internal_files_dir) / zip_file
+        dst  = shutil.copy2(zip_file, Static.external_files_dir)
+        shutil.unpack_archive(dst, Static.external_files_dir)
+        os.remove(dst)
 
     @classmethod
     def make_external_empty_files(cls):
