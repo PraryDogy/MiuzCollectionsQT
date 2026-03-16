@@ -118,16 +118,6 @@ class Cfg:
         return True
     
     @classmethod
-    def get_file_dirs(cls):
-        return {
-            Static.internal_cfg: Static.external_cfg,
-            Static.internal_db: Static.external_db,
-            Static.internal_mf: Static.external_mf,
-            Static.internal_filters: Static.external_filters,
-            Static.internal_servers: Static.external_servers,
-        }
-
-    @classmethod
     def remake_external_dir(cls):
         if os.path.exists(Static.external_files_dir):
             shutil.rmtree(Static.external_files_dir)
@@ -142,8 +132,15 @@ class Cfg:
         os.remove(dst)
 
     @classmethod
-    def make_external_empty_files(cls):
+    def make_empty_external_files(cls):
         os.makedirs(Static.external_hashdir, exist_ok=True)
-        for src, dst in cls.get_file_dirs().items():
-            with open(dst, "w") as file:
+        files = (
+            Static.external_cfg,
+            Static.external_db,
+            Static.external_filters,
+            Static.external_mf,
+            Static.external_servers
+        )
+        for i in files:
+            with open(i, "w") as file:
                 ...

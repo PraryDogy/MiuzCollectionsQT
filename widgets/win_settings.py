@@ -1229,7 +1229,7 @@ class SingleSettings(SingleActionWindow):
         )
         Mf.mf_list.append(mf)
         Cfg.remake_external_dir()
-        Cfg.make_external_empty_files()
+        Cfg.make_empty_external_files()
         Mf.write_json_data()
         Cfg.write_json_data()
         Filters.write_json_data()
