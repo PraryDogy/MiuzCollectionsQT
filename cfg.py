@@ -141,17 +141,10 @@ class Cfg:
     @classmethod
     def copy_miuz_files(cls):
         cls.make_external_new_dir()
-        for src, dst in cls.get_file_dirs().items():
-            shutil.copy2(src, Static.external_files_dir)
-        external_hashdir_zip = shutil.copy2(
-            Static.internal_hashdir_zip,
-            Static.external_files_dir
-        )
-        shutil.unpack_archive(
-            external_hashdir_zip,
-            Static.external_files_dir
-        )
-        os.remove(external_hashdir_zip)
+        zip_file = os.listdir(Static.internal_files_dir)[0]
+        dst  = shutil.copy2(zip_file, Static.external_files_dir)
+        shutil.unpack_archive(dst, Static.external_files_dir)
+        os.remove(dst)
 
     @classmethod
     def make_external_empty_files(cls):
