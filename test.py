@@ -1,5 +1,9 @@
-from pathlib import Path
+file = "/Users/Loshkarev/Downloads/broken_file.svg"
 
-a = "/Users/Loshkarev/Desktop/IMG_7334.tif"
-a = Path(a)
-print(a.stem)
+from system.shared_utils import ImgUtils
+import cv2
+
+a = ImgUtils._read_svg(file)
+
+cv2.imshow("1", a)
+cv2.waitKey(0)
