@@ -204,7 +204,7 @@ class ImgUtils:
 
     @classmethod
     def _get_broken_image(cls):
-        img = Path("./images/broken_image.svg")
+        img = Path("./images/broken_image.jpg")
         return cls._read_jpg(img)
 
     @classmethod
