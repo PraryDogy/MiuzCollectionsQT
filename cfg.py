@@ -128,14 +128,13 @@ class Cfg:
         }
 
     @classmethod
-    def make_external_new_dir(cls):
+    def remake_external_dir(cls):
         if os.path.exists(Static.external_files_dir):
             shutil.rmtree(Static.external_files_dir)
         os.makedirs(Static.external_files_dir, exist_ok=True)
 
     @classmethod
     def copy_miuz_files(cls):
-        cls.make_external_new_dir()
         zip_file = os.listdir(Static.internal_files_dir)[0]
         zip_file = Path(Static.internal_files_dir) / zip_file
         dst  = shutil.copy2(zip_file, Static.external_files_dir)
@@ -144,7 +143,6 @@ class Cfg:
 
     @classmethod
     def make_external_empty_files(cls):
-        cls.make_external_new_dir()
         os.makedirs(Static.external_hashdir, exist_ok=True)
         for src, dst in cls.get_file_dirs().items():
             with open(dst, "w") as file:

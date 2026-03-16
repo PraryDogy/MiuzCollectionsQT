@@ -1228,6 +1228,7 @@ class SingleSettings(SingleActionWindow):
             mf_current_path=""
         )
         Mf.mf_list.append(mf)
+        Cfg.remake_external_dir()
         Cfg.make_external_empty_files()
         Mf.write_json_data()
         Cfg.write_json_data()

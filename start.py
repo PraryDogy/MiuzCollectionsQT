@@ -234,6 +234,7 @@ class App(QApplication):
         first_load.exec_()
 
     def set_miuz(self):
+        Cfg.remake_external_dir()
         Cfg.copy_miuz_files()
         Cfg.write_json_data()
         self.start_app()
