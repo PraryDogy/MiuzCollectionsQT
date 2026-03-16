@@ -117,8 +117,8 @@ class ClickableGroupBox(QGroupBox):
 
 
 class FirstLoad(QDialog):
-    set_miuz = pyqtSignal()
-    set_default = pyqtSignal()
+    preload_selected = pyqtSignal()
+    open_settings = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -145,23 +145,23 @@ class FirstLoad(QDialog):
 
         zip_file = os.listdir(Static.internal_files_dir)[0]
         zip_file = Path(Static.internal_files_dir) / zip_file
-        self.group_miuz = ClickableGroupBox(
+        self.preload = ClickableGroupBox(
             zip_file.stem, 
-            self.setup_miuz
+            self.preload_selected_cmd
         )
-        groups_layout.addWidget(self.group_miuz)
+        groups_layout.addWidget(self.preload)
 
         layout.addLayout(groups_layout)
         self.adjustSize()
 
     def setup_app(self):
         self.hide()
-        self.set_default.emit()
+        self.open_settings.emit()
         self.deleteLater()
 
-    def setup_miuz(self):
+    def preload_selected_cmd(self):
         self.hide()
-        self.set_miuz.emit()
+        self.preload_selected.emit()
         self.deleteLater()
 
     def closeEvent(self, a0):
@@ -229,17 +229,17 @@ class App(QApplication):
 
     def first_load_win(self):
         first_load = FirstLoad()
-        first_load.set_miuz.connect(self.set_miuz)
-        first_load.set_default.connect(self.set_default)
+        first_load.preload_selected.connect(self.start_with_preloaded_files)
+        first_load.open_settings.connect(self.open_settings)
         first_load.exec_()
 
-    def set_miuz(self):
+    def start_with_preloaded_files(self):
         Cfg.remake_external_dir()
-        Cfg.copy_miuz_files()
+        Cfg.copy_preloaded_zip()
         Cfg.write_json_data()
         self.start_app()
 
-    def set_default(self):
+    def open_settings(self):
         self.single_settings = SingleSettings()
         self.single_settings.show()
 

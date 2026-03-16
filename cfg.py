@@ -134,7 +134,7 @@ class Cfg:
         os.makedirs(Static.external_files_dir, exist_ok=True)
 
     @classmethod
-    def copy_miuz_files(cls):
+    def copy_preloaded_zip(cls):
         zip_file = os.listdir(Static.internal_files_dir)[0]
         zip_file = Path(Static.internal_files_dir) / zip_file
         dst  = shutil.copy2(zip_file, Static.external_files_dir)
