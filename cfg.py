@@ -11,14 +11,15 @@ class Static:
     thumbs_load_limit = 100
     
     external_files_dir = os.path.expanduser(
-        f"~/Library/Application Support/{app_name}"
+        os.path.join("~", "Library", "Application Support", app_name)
     )
-    external_cfg = f"{external_files_dir}/cfg.json"
-    external_db = f"{external_files_dir}/db.db"
-    external_hashdir = f"{external_files_dir}/hashdir"
-    external_mf = f"{external_files_dir}/mf.json"
-    external_filters = f"{external_files_dir}/filters.json"
-    external_servers = f"{external_files_dir}/servers.json"
+
+    external_cfg = os.path.join(external_files_dir, "cfg.json")
+    external_db = os.path.join(external_files_dir, "db.db")
+    external_hashdir = os.path.join(external_files_dir, "hashdir")
+    external_mf = os.path.join(external_files_dir, "mf.json")
+    external_filters = os.path.join(external_files_dir, "filters.json")
+    external_servers = os.path.join(external_files_dir, "servers.json")
 
     internal_files_dir = "./_preload"
 
