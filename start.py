@@ -141,18 +141,13 @@ class FirstLoad(QDialog):
             self.setup_app
         )
 
-        internal_files = [
-            v
-            for k, v in vars(Static).items()
-            if "internal" in k
-        ]
-        all_files_ok = all(os.path.exists(i) for i in internal_files)
-        if all_files_ok:
-            self.group_miuz = ClickableGroupBox(
-                "MIUZ Diamonds", 
-                self.setup_miuz
-            )
-            groups_layout.addWidget(self.group_miuz)
+        zip_file = os.listdir(Static.internal_files_dir)[0]
+
+        self.group_miuz = ClickableGroupBox(
+            "MIUZ Diamonds", 
+            self.setup_miuz
+        )
+        groups_layout.addWidget(self.group_miuz)
 
         groups_layout.addWidget(self.group_app)
         layout.addLayout(groups_layout)
@@ -239,7 +234,6 @@ class App(QApplication):
         first_load.exec_()
 
     def set_miuz(self):
-        lng = Cfg.lng
         Cfg.copy_miuz_files()
         Cfg.write_json_data()
         self.start_app()

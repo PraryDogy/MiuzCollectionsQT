@@ -19,13 +19,7 @@ class Static:
     external_filters = f"{external_files_dir}/filters.json"
     external_servers = f"{external_files_dir}/servers.json"
 
-    internal_files_dir = "./_preload/miuz"
-    internal_cfg = f"{internal_files_dir}/cfg.json"
-    internal_db = f"{internal_files_dir}/db.db"
-    internal_hashdir_zip = f"{internal_files_dir}/hashdir.zip"
-    internal_mf = f"{internal_files_dir}/mf.json"
-    internal_filters = f"{internal_files_dir}/filters.json"
-    internal_servers = f"{internal_files_dir}/servers.json"
+    internal_files_dir = "./_preload"
 
     ww, hh = 1120, 760
     max_img_size = 210
@@ -141,10 +135,11 @@ class Cfg:
     @classmethod
     def copy_miuz_files(cls):
         cls.make_external_new_dir()
-        zip_file = os.listdir(Static.internal_files_dir)[0]
-        dst  = shutil.copy2(zip_file, Static.external_files_dir)
-        shutil.unpack_archive(dst, Static.external_files_dir)
-        os.remove(dst)
+        zip_file = os.scandir(Static.internal_files_dir)[0].path
+        print(zip_file)
+        # dst  = shutil.copy2(zip_file, Static.external_files_dir)
+        # shutil.unpack_archive(dst, Static.external_files_dir)
+        # os.remove(dst)
 
     @classmethod
     def make_external_empty_files(cls):
