@@ -1,5 +1,5 @@
-from cfg import Cfg
+from pathlib import Path
 
-
-
-Cfg.copy_miuz_files()
+a = "/Users/Loshkarev/Desktop/IMG_7334.tif"
+a = Path(a)
+print(a.stem)

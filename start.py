@@ -1,6 +1,7 @@
 import os
 import sys
 import traceback
+from pathlib import Path
 
 from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
 from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
@@ -140,19 +141,18 @@ class FirstLoad(QDialog):
             Lng.setup_app[Cfg.lng],
             self.setup_app
         )
+        groups_layout.addWidget(self.group_app)
 
         zip_file = os.listdir(Static.internal_files_dir)[0]
-
+        zip_file = Path(Static.internal_files_dir) / zip_file
         self.group_miuz = ClickableGroupBox(
-            "MIUZ Diamonds", 
+            zip_file.stem, 
             self.setup_miuz
         )
         groups_layout.addWidget(self.group_miuz)
 
-        groups_layout.addWidget(self.group_app)
         layout.addLayout(groups_layout)
         self.adjustSize()
-
 
     def setup_app(self):
         self.hide()
