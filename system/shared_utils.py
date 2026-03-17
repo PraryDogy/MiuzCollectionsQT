@@ -511,3 +511,4 @@ class ImgUtils:
         except Exception as e:
             print(f"read_thumb: ошибка чтения thumb: {e}")
             return None
+            
