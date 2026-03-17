@@ -92,36 +92,6 @@ class Utils:
             return None
 
     @classmethod
-    def write_thumb(cls, thumb_path: str, thumb: np.ndarray) -> bool:
-        try:
-            if len(thumb.shape) == 2:  # grayscale
-                img = thumb
-            elif thumb.shape[2] == 3:  # BGR
-                img = cv2.cvtColor(thumb, cv2.COLOR_BGR2RGB)
-            elif thumb.shape[2] == 4:  # BGRA
-                img = cv2.cvtColor(thumb, cv2.COLOR_BGRA2RGB)
-            else:
-                print(f"write_thumb: неподдерживаемое число каналов {thumb.shape}")
-                return None
-            return cv2.imwrite(thumb_path, img)
-        except Exception as e:
-            print(f"write_thumb: ошибка записи thumb на диск: {e}")
-            return None
-
-    @classmethod
-    def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
-        try:
-            if os.path.exists(thumb_path):
-                img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
-                return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            else:
-                print(f"read_thumb: файл не существует {thumb_path}")
-                return None
-        except Exception as e:
-            print(f"read_thumb: ошибка чтения thumb: {e}")
-            return None
-
-    @classmethod
     def copy_text(cls, text: str):
         QApplication.clipboard().setText(text)
         return True
@@ -144,16 +114,6 @@ class Utils:
     @classmethod
     def get_rel_any_path(cls, mf_path: str, abs_img_path: str) -> str:
         return abs_img_path.replace(mf_path, "")
-
-    @classmethod
-    def rm_rf(cls, folder_path: str):
-        try:
-            subprocess.run(["rm", "-rf", folder_path], check=True)
-            print(f"Папка '{folder_path}' успешно удалена.")
-        except subprocess.CalledProcessError as e:
-            print(f"Ошибка удаления: {e}")
-        except Exception as e:
-            print(f"Неизвестная ошибка: {e}")
 
     @classmethod
     def desaturate_image(cls, image: np.ndarray, factor=0.2):

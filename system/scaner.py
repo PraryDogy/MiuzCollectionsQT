@@ -425,7 +425,7 @@ class HashdirImgUpdater:
                         rel_img_path=rel_img_path,
                         mf_alias=scaner_item.mf.mf_alias
                     )
-                    Utils.write_thumb(thumb_path, img)
+                    ImgUtils.write_thumb(thumb_path, img)
                     ok_new_images.append(img_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)

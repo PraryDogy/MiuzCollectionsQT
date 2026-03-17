@@ -170,7 +170,7 @@ class DbImagesLoader(URunnable):
 
             f_mod = datetime.fromtimestamp(mod).date()
             thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-            thumb = Utils.read_thumb(thumb_path)
+            thumb = ImgUtils.read_thumb(thumb_path)
             if not isinstance(thumb, ndarray):
                 continue
 
