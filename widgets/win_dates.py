@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 from typing import Literal
 
 from PyQt5.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QIcon, QKeyEvent
+from PyQt5.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
 from PyQt5.QtWidgets import (QCalendarWidget, QFrame, QGroupBox, QLabel,
                              QLineEdit, QSpacerItem, QSpinBox, QToolButton,
                              QVBoxLayout, QWidget)
 
-from cfg import Dynamic, Cfg
+from cfg import Cfg, Dynamic
 from system.lang import Lng
 
 from ._base_widgets import (HSep, SingleActionWindow, SmallBtn, UHBoxLayout,
@@ -91,6 +91,25 @@ class MyCalendar(QGroupBox):
     def set_date(self, py_date: datetime):
         qdate = QDate(py_date.year, py_date.month, py_date.day)
         self.calendar.setSelectedDate(qdate)
+
+    def highlight_range(self, start_date: datetime, end_date: datetime):
+        # Преобразуем datetime в QDate
+        q_start = QDate(start_date.year, start_date.month, start_date.day)
+        q_end = QDate(end_date.year, end_date.month, end_date.day)
+        
+        # Настраиваем стиль выделения
+        fmt = QTextCharFormat()
+        fmt.setBackground(QColor(100, 150, 255, 100)) # Светло-синий цвет фона
+        # fmt.setForeground(QColor("white")) # Можно также изменить цвет текста
+        
+        # Сначала очищаем предыдущие выделения (опционально)
+        self.calendar.setDateTextFormat(QDate(), QTextCharFormat())
+        
+        # Проходим циклом по всем датам диапазона и применяем формат
+        current = q_start
+        while current <= q_end:
+            self.calendar.setDateTextFormat(current, fmt)
+            current = current.addDays(1)
 
     def set_custom_ui(self, icon_size: int = 10):
         self.calendar.setVerticalHeaderFormat(
@@ -182,10 +201,14 @@ class WinDates(SingleActionWindow):
         self.adjustSize()
 
         if Dynamic.date_start:
-            self.left_calendar.set_date(Dynamic.date_start)
+            self.left_calendar.highlight_range(
+                Dynamic.date_start, Dynamic.date_end
+            )
             self.left_calendar.title.set_named_date_text(Dynamic.date_start)
         if Dynamic.date_end:
-            self.right_calendar.set_date(Dynamic.date_end)
+            self.right_calendar.highlight_range(
+                Dynamic.date_start, Dynamic.date_end
+            )
             self.right_calendar.title.set_named_date_text(Dynamic.date_end)
 
     def clear_btn_cmd(self, *args):
@@ -212,13 +235,16 @@ class WinDates(SingleActionWindow):
             self.right_calendar.title.set_named_date_text(date)
             self.left_calendar.calendar.setMaximumDate(
                 QDate(date.year, date.month, date.day)
-            )
+            )            
 
         if all((Dynamic.date_start, Dynamic.date_end)):
             Dynamic.f_date_start = self.named_date(Dynamic.date_start)
             Dynamic.f_date_end = self.named_date(Dynamic.date_end)
             self.reload_thumbnails.emit()
             self.dates_btn_solid.emit()
+
+            for i in (self.left_calendar, self.right_calendar):
+                i.highlight_range(Dynamic.date_start, Dynamic.date_end)
     
     def named_date(self, date: datetime) -> str:
         return date.strftime("%d.%m.%Y")
