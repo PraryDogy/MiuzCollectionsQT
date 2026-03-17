@@ -11,7 +11,7 @@ from watchdog.observers.polling import PollingObserver as Observer
 
 from cfg import Cfg, Static
 
-from .database import Dbase, Dirs, Thumbs
+from .database import ColumnNames, Dbase, Dirs, Thumbs
 from .items import (CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem,
                     WatchDogItem)
 from .lang import Lng
@@ -386,22 +386,48 @@ class UpdateThumb:
 
     @staticmethod
     def start(mf: Mf, rel_img_path: str, q: Queue):
-
         abs_img_path = Utils.get_abs_any_path(
             mf.mf_current_path, rel_img_path
         )
+        abs_thumb_path = Utils.create_abs_thumb_path(
+            rel_img_path, mf.mf_alias
+        )
+        rel_thumb_path = Utils.get_rel_thumb_path(
+            abs_thumb_path
+        )
+        root = os.path.dirname(abs_thumb_path)
+        stats = os.stat(abs_img_path)
+        size = int(stats.st_size)
+        mod = int(stats.st_mtime)
         img_array = ImgUtils.read_img(abs_img_path)
         img_array = ImgUtils.fit_to_thumb(img_array, Static.max_img_size)
+        values = {
+            ColumnNames.rel_item_path: rel_img_path,
+            ColumnNames.rel_thumb_path: rel_thumb_path,
+            ColumnNames.size: size,
+            ColumnNames.birth: 0,
+            ColumnNames.mod: mod,
+            ColumnNames.resol: "none",
+            ColumnNames.coll: "none",
+            ColumnNames.fav: 0,
+            ColumnNames.mf_alias: mf.mf_alias
+            }
+        
+        os.remove(abs_thumb_path)
+        if not os.listdir(root):
+            shutil.rmtree(root)
+        ImgUtils.write_thumb(abs_thumb_path, img_array)
 
         engine = Dbase.create_engine()
         conn = engine.connect()
-
-        stmt = sqlalchemy.select(Thumbs.table).where(
+        stmt = sqlalchemy.delete(Thumbs.table).where(
             Thumbs.mf_alias == mf.mf_alias,
             Thumbs.rel_img_path == rel_img_path
         )
-        res = conn.execute(stmt).mappings().first()
-
-
-
+        conn.execute(stmt)
+        stmt = sqlalchemy.insert(Thumbs.table).values(values)
+        conn.execute(stmt)
+        conn.commit()
         conn.close()
+
+        q.put(True)
