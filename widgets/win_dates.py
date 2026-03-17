@@ -111,6 +111,8 @@ class MyCalendar(QGroupBox):
             self.calendar.setDateTextFormat(current, fmt)
             current = current.addDays(1)
 
+        self.calendar.update()
+
     def set_custom_ui(self, icon_size: int = 10):
         self.calendar.setVerticalHeaderFormat(
             QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
