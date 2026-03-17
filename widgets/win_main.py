@@ -306,11 +306,28 @@ class WinMain(UMainWindow):
 
     @with_conn
     def start_update_thumb(self, parent: QWidget, mf: Mf, rel_thumb_path: str):
+
+        def poll_task():
+            q = self.update_thumb_task.proc_q
+            if not q.empty():
+                img_array = q.get()
+                if img_array is not None:
+                    wid = self.grid.path_to_wid.get(rel_thumb_path)
+                    wid.img = Utils.pixmap_from_array(img_array)
+                    wid.setup()
+            if not self.update_thumb_task.is_alive():
+                print("remove task")
+                self.update_thumb_task.terminate_join()
+            else:
+                QTimer.singleShot(300, poll_task)
+                print("repoll task")
+
         self.update_thumb_task = ProcessWorker(
             target=UpdateThumb.start,
             args=(Mf.current_mf, rel_thumb_path, )
         )
         self.update_thumb_task.start()
+        QTimer.singleShot(300, poll_task)
 
     @with_conn
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):

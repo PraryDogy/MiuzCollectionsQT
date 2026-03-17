@@ -386,6 +386,15 @@ class UpdateThumb:
 
     @staticmethod
     def start(mf: Mf, rel_img_path: str, q: Queue):
+        try:
+            img_array = UpdateThumb._start(mf, rel_img_path, q)
+            q.put(img_array)
+        except Exception as e:
+            print("UpdateThumb task error", e)
+            q.put(False)
+
+    @staticmethod
+    def _start(mf: Mf, rel_img_path: str, q: Queue):
         abs_img_path = Utils.get_abs_any_path(
             mf.mf_current_path, rel_img_path
         )
@@ -430,4 +439,4 @@ class UpdateThumb:
         conn.commit()
         conn.close()
 
-        q.put(True)
+        return img_array
