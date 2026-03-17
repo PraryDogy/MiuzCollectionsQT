@@ -211,13 +211,17 @@ class LanguageSelect(QDialog):
 
 class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
+        Cfg.json_to_app()
+        Servers.json_to_app()
+        Filters.json_to_app()
+        Mf.json_to_app()
+        Dbase.init()
         self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
         self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         super().__init__(argv)
         self.argv = argv
 
-        check_files = Cfg.check_files()
-        if not check_files:
+        if not  Cfg.check_files() or not Mf.mf_list:
             self.lng_win()
         else:
             self.start_app()
@@ -244,11 +248,6 @@ class App(QApplication):
         self.single_settings.show()
 
     def start_app(self):
-        Cfg.json_to_app()
-        Servers.json_to_app()
-        Filters.json_to_app()
-        Mf.json_to_app()
-        Dbase.init()
         ThemeChanger.init()
         UThreadPool.init()
 
