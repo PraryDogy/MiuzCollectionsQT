@@ -512,3 +512,25 @@ class ImgUtils:
             print(f"read_thumb: ошибка чтения thumb: {e}")
             return None
             
+    @classmethod
+    def desaturate_image(cls, image: np.ndarray, factor=0.2):
+        try:
+            # если 4 канала (RGBA), убираем альфу для операции
+            has_alpha = image.shape[2] == 4
+            img = image[:, :, :3] if has_alpha else image
+
+            # преобразуем в серый
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+
+            # объединяем с оригиналом
+            desat = cv2.addWeighted(img, 1 - factor, gray_bgr, factor, 0)
+
+            # если был альфа-канал, добавляем обратно
+            if has_alpha:
+                desat = np.dstack([desat, image[:, :, 3]])
+
+            return desat
+        except Exception:
+            cls.print_error()
+            return image

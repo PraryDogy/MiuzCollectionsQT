@@ -74,7 +74,7 @@ class ReadImg:
     def start(src: str, desaturate: bool, q: Queue):
         img_array = ImgUtils.read_img(src)
         if desaturate:
-            img_array = Utils.desaturate_image(img_array, 0.2)
+            img_array = ImgUtils.desaturate_image(img_array, 0.2)
         q.put(ReadImgItem(src, img_array))
 
 
