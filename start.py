@@ -247,6 +247,7 @@ class App(QApplication):
         Cfg.json_to_app()
         Servers.json_to_app()
         Filters.json_to_app()
+        Mf.mf_list.clear()
         Mf.json_to_app()
         Dbase.init()
         ThemeChanger.init()
