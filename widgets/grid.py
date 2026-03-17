@@ -20,7 +20,7 @@ from ._base_widgets import (NotifyWid, UMenu, USubMenu, USvgSqareWidget,
                             UVBoxLayout, VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save, SaveAs,
-                      ScanerRestart, SetFav, WinInfoAction)
+                      ScanerRestart, SetFav, UpdateThumbAction, WinInfoAction)
 
 
 class FilenameWid(QLabel):
@@ -397,6 +397,7 @@ class Grid(VScrollArea):
     set_clipboard = pyqtSignal(tuple)
     setup_mf = pyqtSignal(SettingsItem)
     go_to_widget = pyqtSignal(str)
+    update_thumb = pyqtSignal(str)
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -960,6 +961,15 @@ class Grid(VScrollArea):
                     lambda: self.set_clipboard.emit(("copy", rel_paths))
                 )
                 self.menu_.addAction(act)
+
+                self.menu_.addSeparator()
+                update_thumb = UpdateThumbAction(self.menu_)
+                update_thumb.triggered.connect(
+                    lambda: self.update_thumb.emit(
+                        self.wid_under_mouse.rel_path
+                    )
+                )
+                self.menu_.addAction(update_thumb)
 
                 self.menu_.addSeparator()
 

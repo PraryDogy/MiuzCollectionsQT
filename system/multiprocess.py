@@ -380,3 +380,28 @@ class DirWatcher:
         finally:
             observer.stop()
             observer.join()
+
+
+class UpdateThumb:
+
+    @staticmethod
+    def start(mf: Mf, rel_img_path: str, q: Queue):
+
+        abs_img_path = Utils.get_abs_any_path(
+            mf.mf_current_path, rel_img_path
+        )
+        img_array = ImgUtils.read_img(abs_img_path)
+        img_array = Utils.fit_to_thumb(img_array, Static.max_img_size)
+
+        engine = Dbase.create_engine()
+        conn = engine.connect()
+
+        stmt = sqlalchemy.select(Thumbs.table).where(
+            Thumbs.mf_alias == mf.mf_alias,
+            Thumbs.rel_img_path == rel_img_path
+        )
+        res = conn.execute(stmt).mappings().first()
+
+
+
+        conn.close()

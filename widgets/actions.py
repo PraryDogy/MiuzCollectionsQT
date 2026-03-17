@@ -77,3 +77,8 @@ class CopyFiles(QAction):
 class PasteFiles(QAction):
     def __init__(self, parent: QMenu):
         super().__init__(text=Lng.paste[Cfg.lng], parent=parent)
+
+
+class UpdateThumbAction(QAction):
+    def __init__(self, parent: QMenu):
+        super().__init__(text=Lng.update_thumb[Cfg.lng], parent=parent)

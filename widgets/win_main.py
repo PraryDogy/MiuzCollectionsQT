@@ -15,7 +15,7 @@ from system.items import (Buffer, ExtScanerItem, OnStartItem, SettingsItem,
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, OnStartTask,
-                                 ProcessWorker)
+                                 ProcessWorker, UpdateThumb)
 from system.scaner import AllDirScaner, SingleDirScaner
 from system.servers import Servers
 from system.shared_utils import ImgUtils
@@ -28,12 +28,12 @@ from .bar_path import PathBar
 from .bar_top import BarTop
 from .grid import Grid
 from .menu_left import MenuLeft
-from .win_servers import ServersWin
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_filters import WinFilters
 from .win_image_view import WinImageView
 from .win_info import WinInfo
+from .win_servers import ServersWin
 from .win_settings import WinSettings
 from .win_upload import UploadWin
 from .win_warn import ConfirmWindow
@@ -184,6 +184,11 @@ class WinMain(UMainWindow):
         self.grid.path_bar_update.connect(
             lambda rel_path: self.path_bar_update(rel_path)
         )
+        self.grid.update_thumb.connect(
+            lambda rel_path: self.start_update_thumb(
+                self.grid, Mf.current_mf, rel_path
+            )
+        )
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -298,6 +303,14 @@ class WinMain(UMainWindow):
             ms=3000
             )
         self.noti_wid._show()
+
+    @with_conn
+    def start_update_thumb(self, parent: QWidget, mf: Mf, rel_thumb_path: str):
+        self.update_thumb_task = ProcessWorker(
+            target=UpdateThumb.start,
+            args=(Mf.current_mf, rel_thumb_path, )
+        )
+        self.update_thumb_task.start()
 
     @with_conn
     def save_files(self, parent: QWidget, mf: Mf, data: tuple):
