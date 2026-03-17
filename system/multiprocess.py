@@ -391,7 +391,7 @@ class UpdateThumb:
             mf.mf_current_path, rel_img_path
         )
         img_array = ImgUtils.read_img(abs_img_path)
-        img_array = Utils.fit_to_thumb(img_array, Static.max_img_size)
+        img_array = ImgUtils.fit_to_thumb(img_array, Static.max_img_size)
 
         engine = Dbase.create_engine()
         conn = engine.connect()

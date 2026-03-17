@@ -414,7 +414,7 @@ class HashdirImgUpdater:
             scaner_item.total_count -= 1    
             HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
             img = ImgUtils.read_img(img_item.abs_img_path)
-            img = Utils.fit_to_thumb(img, Static.max_img_size)
+            img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
             if img is not None:
                 try:
                     rel_img_path = Utils.get_rel_any_path(
