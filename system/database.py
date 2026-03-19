@@ -26,7 +26,7 @@ _table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column(ColumnNames.id, sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column(ColumnNames.rel_item_path, sqlalchemy.Text),
-    sqlalchemy.Column(ColumnNames.rel_thumb_path, sqlalchemy.Text),
+    sqlalchemy.Column(ColumnNames.rel_thumb_path, sqlalchemy.Text, unique=True),
     sqlalchemy.Column(ColumnNames.size, sqlalchemy.Integer),
     sqlalchemy.Column(ColumnNames.birth, sqlalchemy.Integer),
     sqlalchemy.Column(ColumnNames.mod, sqlalchemy.Integer),
@@ -85,8 +85,8 @@ class Dbase:
 
     @classmethod
     def init(cls) -> sqlalchemy.Engine:
-        cls.engine = cls.create_engine()
-        cls.toggle_wal(False)
+        engine = cls.create_engine()
+        cls.toggle_wal(engine, False)
 
     @classmethod
     def create_engine(cls):
@@ -106,8 +106,8 @@ class Dbase:
             raise Exception(t)
         
     @classmethod
-    def toggle_wal(cls, value: bool):
-        conn = cls.engine.connect()
+    def toggle_wal(cls, engine: sqlalchemy.Engine, value: bool):
+        conn = engine.connect()
         if value:
             conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
             cls.WAL_ = True
