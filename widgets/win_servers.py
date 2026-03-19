@@ -200,11 +200,13 @@ class ServersWin(SingleActionWindow):
     def connect_cmd(self):
         delay = 0
         for server, login, password in self.data:
-            if SharedUtils.is_mounted(server):
-                continue
+            # if SharedUtils.is_mounted(server):
+                # continue
             smb = "smb://"
             ip = server.split(smb)[-1]
             cmd = f"{smb}{login}:{password}@{ip}"
+            print(cmd)
+            continue
             QTimer.singleShot(delay, lambda c=cmd: subprocess.run(["open", c]))
             delay += 200  # задержка 200 мс между подключениями
         QTimer.singleShot(delay + 100, self.deleteLater)
