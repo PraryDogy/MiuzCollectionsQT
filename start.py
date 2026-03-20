@@ -252,7 +252,11 @@ class App(QApplication):
         elif not Mf.mf_list:
             lng_win()
         elif Static.app_ver > Cfg.app_ver:
+            print("we are here")
             Dbase.set_short_hash_unique()
+            Cfg.app_ver = Static.app_ver
+            Cfg.write_json_data()
+            self.start()
         else:
             Dbase.init()
             ThemeChanger.init()

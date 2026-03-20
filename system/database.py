@@ -155,7 +155,7 @@ class Dbase:
             )
             SELECT
                 id, short_src, short_hash, size, birth, mod,
-                resol, coll, fav, brang
+                resol, coll, fav, brand
             FROM {old_table};
         """
 
