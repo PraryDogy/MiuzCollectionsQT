@@ -129,10 +129,11 @@ class Dbase:
         conn.close()
 
     @classmethod
-    def copy_table(cls):
+    def set_short_hash_unique(cls):
         old_table = "thumbs"
         new_table = "thumbs_new"
-        create_thumbs_table = f"""
+
+        create_table_sql = f"""
             CREATE TABLE {new_table} (
                 id INTEGER PRIMARY KEY,
                 short_src TEXT,
@@ -143,21 +144,28 @@ class Dbase:
                 resol TEXT,
                 coll TEXT,
                 fav INTEGER,
-                brang TEXT
+                brand TEXT
             );
         """
-        copy_data = f"""
-            INSERT INTO {new_table} (id, short_hash /*, ...*/)
-            SELECT id, short_hash /*, ...*/
+
+        copy_data_sql = f"""
+            INSERT INTO {new_table} (
+                id, short_src, short_hash, size, birth, mod,
+                resol, coll, fav, brand
+            )
+            SELECT
+                id, short_src, short_hash, size, birth, mod,
+                resol, coll, fav, brang
             FROM {old_table};
         """
-        rename_table = f"""
-            DROP TABLE {old_table};
-            ALTER TABLE {new_table} RENAME TO {old_table};
-        """
+
+        drop_old_sql = f"DROP TABLE {old_table};"
+        rename_sql = f"ALTER TABLE {new_table} RENAME TO {old_table};"
+
         engine = cls.create_engine()
-        conn = engine.connect()
-        stmt = sqlalchemy.text(create_thumbs_table + copy_data + rename_table)
-        conn.execute(stmt)
-        conn.commit()
-        conn.close()
+
+        with engine.begin() as conn:
+            conn.execute(sqlalchemy.text(create_table_sql))
+            conn.execute(sqlalchemy.text(copy_data_sql))
+            conn.execute(sqlalchemy.text(drop_old_sql))
+            conn.execute(sqlalchemy.text(rename_sql))

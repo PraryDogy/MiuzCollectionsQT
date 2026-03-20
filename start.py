@@ -252,7 +252,7 @@ class App(QApplication):
         elif not Mf.mf_list:
             lng_win()
         elif Static.app_ver > Cfg.app_ver:
-            ...
+            Dbase.set_short_hash_unique()
         else:
             Dbase.init()
             ThemeChanger.init()
