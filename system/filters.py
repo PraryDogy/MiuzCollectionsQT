@@ -17,7 +17,7 @@ class Filters:
                 if i not in cls.filter_list
             ]
         except Exception as e:
-            ...
+            print("Filters json to app error", e)
 
     @classmethod
     def write_json_data(cls):

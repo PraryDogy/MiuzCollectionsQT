@@ -17,7 +17,7 @@ from system.servers import Servers
 from system.tasks import UThreadPool
 from widgets._base_widgets import WinManager
 from widgets.win_main import WinMain
-from widgets.win_settings import SingleSettings
+from widgets.win_settings import NewMfWin
 
 
 class System_:
@@ -117,8 +117,8 @@ class ClickableGroupBox(QGroupBox):
 
 
 class FirstLoad(QDialog):
-    preload_selected = pyqtSignal()
-    open_settings = pyqtSignal()
+    copy_preload_files = pyqtSignal()
+    setup_new_mf = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -156,12 +156,12 @@ class FirstLoad(QDialog):
 
     def setup_app(self):
         self.hide()
-        self.open_settings.emit()
+        self.setup_new_mf.emit()
         self.deleteLater()
 
     def preload_selected_cmd(self):
         self.hide()
-        self.preload_selected.emit()
+        self.copy_preload_files.emit()
         self.deleteLater()
 
     def closeEvent(self, a0):
@@ -215,50 +215,51 @@ class App(QApplication):
         self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         super().__init__(argv)
         self.argv = argv
+        self.start()
 
-        Mf.json_to_app()
-        if not  Cfg.check_files() or not Mf.mf_list:
-            self.lng_win()
+    def start(self):
+
+        def json_to_app():
+            Mf.mf_list.clear()
+            objects = (Cfg, Mf, Servers, Filters)
+            for i in objects:
+                i.json_to_app()
+
+        def setup_new_mf():
+            new_mf_win = NewMfWin()
+            new_mf_win.show()
+
+        def copy_preload_files():
+            Cfg.remake_external_dir()
+            Cfg.copy_preloaded_zip()
+            Cfg.write_json_data()
+
+        def first_load_win():
+            first_load = FirstLoad()
+            first_load.copy_preload_files.connect(copy_preload_files)
+            first_load.copy_preload_files.connect(self.start_app)
+            first_load.setup_new_mf.connect(setup_new_mf)
+            first_load.exec_()
+
+        def lng_win():
+            lng_win = LanguageSelect()
+            lng_win.closed_.connect(first_load_win)
+            lng_win.exec_()
+
+        json_to_app()
+        if not Cfg.check_files():
+            lng_win()
+        elif not Mf.mf_list:
+            lng_win()
         else:
-            self.start_app()
-
-    def lng_win(self):
-        lng_win = LanguageSelect()
-        lng_win.closed_.connect(self.first_load_win)
-        lng_win.exec_()
-
-    def first_load_win(self):
-        first_load = FirstLoad()
-        first_load.preload_selected.connect(self.start_with_preloaded_files)
-        first_load.open_settings.connect(self.open_settings)
-        first_load.exec_()
-
-    def start_with_preloaded_files(self):
-        Cfg.remake_external_dir()
-        Cfg.copy_preloaded_zip()
-        Cfg.write_json_data()
-        self.start_app()
-
-    def open_settings(self):
-        self.single_settings = SingleSettings()
-        self.single_settings.show()
-
-    def start_app(self):
-        Cfg.json_to_app()
-        Servers.json_to_app()
-        Filters.json_to_app()
-        Mf.mf_list.clear()
-        Mf.json_to_app()
-        Dbase.init()
-        ThemeChanger.init()
-        UThreadPool.init()
-
-        self.win_main = WinMain(self.argv)
-        self.win_main.center_screen()
-        self.win_main.show()
-
-        self.installEventFilter(self)
-        self.aboutToQuit.connect(lambda: self.win_main.on_exit())
+            Dbase.init()
+            ThemeChanger.init()
+            UThreadPool.init()
+            self.win_main = WinMain(self.argv)
+            self.win_main.center_screen()
+            self.win_main.show()
+            self.installEventFilter(self)
+            self.aboutToQuit.connect(lambda: self.win_main.on_exit())
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:

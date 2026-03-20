@@ -15,7 +15,7 @@ class Servers:
             for i in server_list:
                 Servers.server_list.append(i)
         except Exception as e:
-            print("servers error", e)
+            print("Servers json to app error", e)
     
     @classmethod
     def write_json_data(cls):

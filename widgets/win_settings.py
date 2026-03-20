@@ -1206,7 +1206,7 @@ class WinSettings(SingleActionWindow):
         return super().mouseReleaseEvent(a0)
 
 
-class SingleSettings(SingleActionWindow):
+class NewMfWin(SingleActionWindow):
     """
     Окно настроек при первой настройке приложения.
     """

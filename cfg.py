@@ -95,7 +95,7 @@ class Cfg:
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
         except Exception as e:
-            print("cfg, set json data error",e)
+            print("Cfg json to app error",e)
     
     @classmethod
     def write_json_data(cls):
@@ -104,6 +104,9 @@ class Cfg:
 
     @classmethod
     def check_files(cls):
+        """
+        Проверяет наличие файлов
+        """
         dirs = (
             Static.external_files_dir,
             Static.external_cfg,

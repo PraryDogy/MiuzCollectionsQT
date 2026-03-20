@@ -53,8 +53,9 @@ class Mf:
                 return True
 
         except Exception as e:
-            import traceback
-            print(traceback.format_exc())
+            # import traceback
+            # print(traceback.format_exc())
+            print("Mf json to app error", e)
             return None
 
     @classmethod
