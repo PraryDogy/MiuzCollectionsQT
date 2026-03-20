@@ -127,3 +127,37 @@ class Dbase:
             Utils.print_error()
 
         conn.close()
+
+    @classmethod
+    def copy_table(cls):
+        old_table = "thumbs"
+        new_table = "thumbs_new"
+        create_thumbs_table = f"""
+            CREATE TABLE {new_table} (
+                id INTEGER PRIMARY KEY,
+                short_src TEXT,
+                short_hash TEXT UNIQUE,
+                size INTEGER,
+                birth INTEGER,
+                mod INTEGER,
+                resol TEXT,
+                coll TEXT,
+                fav INTEGER,
+                brang TEXT
+            );
+        """
+        copy_data = f"""
+            INSERT INTO {new_table} (id, short_hash /*, ...*/)
+            SELECT id, short_hash /*, ...*/
+            FROM {old_table};
+        """
+        rename_table = f"""
+            DROP TABLE {old_table};
+            ALTER TABLE {new_table} RENAME TO {old_table};
+        """
+        engine = cls.create_engine()
+        conn = engine.connect()
+        stmt = sqlalchemy.text(create_thumbs_table + copy_data + rename_table)
+        conn.execute(stmt)
+        conn.commit()
+        conn.close()
