@@ -251,6 +251,8 @@ class App(QApplication):
             lng_win()
         elif not Mf.mf_list:
             lng_win()
+        elif Static.app_ver > Cfg.app_ver:
+            ...
         else:
             Dbase.init()
             ThemeChanger.init()
