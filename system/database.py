@@ -150,8 +150,16 @@ class Dbase:
 
         copy_data_sql = f"""
             INSERT INTO {new_table} (
-                id, short_src, short_hash, size, birth, mod,
-                resol, coll, fav, brand
+                {ColumnNames.id},
+                {ColumnNames.rel_item_path},
+                {ColumnNames.rel_thumb_path},
+                {ColumnNames.size},
+                {ColumnNames.birth},
+                {ColumnNames.mod},
+                {ColumnNames.resol},
+                {ColumnNames.coll},
+                {ColumnNames.fav},
+                {ColumnNames.mf_alias}
             )
             SELECT
                 id, short_src, short_hash, size, birth, mod,
