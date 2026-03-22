@@ -466,26 +466,26 @@ class DbImgUpdater:
         ext_item = ExtScanerItem("", True)
         scaner_item.q.put(ext_item)
 
-    @staticmethod
-    def remove_exits_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
-        """
-        Удаляет записи из БД об успешно сохраненных изображениях.
-        """
-        conn = scaner_item.eng.connect()
-        rel_img_paths = [
-            Utils.get_rel_any_path(
-                mf_path=scaner_item.mf.mf_current_path,
-                abs_img_path=img_item.abs_img_path
-            )
-            for img_item in new_images
-        ]
-        q = sqlalchemy.delete(Thumbs.table).where(
-            Thumbs.rel_img_path.in_(rel_img_paths),
-            Thumbs.mf_alias == scaner_item.mf.mf_alias
-        )
-        conn.execute(q)
-        conn.commit()
-        conn.close()
+    # @staticmethod
+    # def remove_exits_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
+    #     """
+    #     Удаляет записи из БД об успешно сохраненных изображениях.
+    #     """
+    #     conn = scaner_item.eng.connect()
+    #     rel_img_paths = [
+    #         Utils.get_rel_any_path(
+    #             mf_path=scaner_item.mf.mf_current_path,
+    #             abs_img_path=img_item.abs_img_path
+    #         )
+    #         for img_item in new_images
+    #     ]
+    #     q = sqlalchemy.delete(Thumbs.table).where(
+    #         Thumbs.rel_img_path.in_(rel_img_paths),
+    #         Thumbs.mf_alias == scaner_item.mf.mf_alias
+    #     )
+    #     conn.execute(q)
+    #     conn.commit()
+    #     conn.close()
 
     @staticmethod
     def add_new_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
@@ -583,13 +583,20 @@ class NewDirsWorker:
                 scaner_item=scaner_item,
                 new_images=new_images_chunk
             )
-            # обновляем БД об успешно созданных миниатюрах
-            # удаляем записи для последующего добавляения
-            # аналог sqlalchemy.update - delete + insert
-            DbImgUpdater.remove_exits_imgs(
-                scaner_item=scaner_item,
-                new_images=ok_chunks
-            )
+
+
+
+
+            # # обновляем БД об успешно созданных миниатюрах
+            # # удаляем записи для последующего добавляения
+            # # аналог sqlalchemy.update - delete + insert
+            # DbImgUpdater.remove_exits_imgs(
+            #     scaner_item=scaner_item,
+            #     new_images=ok_chunks
+            # )
+
+
+
             # обновляем БД об успешно созданных миниатюрах
             # добавляем записи для последующего добавляения
             # аналог sqlalchemy.update - delete + insert
