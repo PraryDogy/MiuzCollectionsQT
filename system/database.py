@@ -148,7 +148,7 @@ class Dbase:
             );
         """
         copy_data_sql = f"""
-            INSERT INTO {new_table}
+            INSERT OR IGNORE INTO {new_table}
             SELECT * FROM {old_table};
         """
 
