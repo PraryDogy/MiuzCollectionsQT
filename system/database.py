@@ -133,6 +133,8 @@ class Dbase:
         old_table = "thumbs"
         new_table = "thumbs_new"
 
+        drop_new_sql = f"DROP TABLE IF EXISTS {new_table};"
+
         create_table_sql = f"""
             CREATE TABLE {new_table} (
                 {ColumnNames.id} INTEGER PRIMARY KEY,
@@ -152,12 +154,18 @@ class Dbase:
             SELECT * FROM {old_table};
         """
 
-        drop_old_sql = f"DROP TABLE {old_table};"
-        rename_sql = f"ALTER TABLE {new_table} RENAME TO {old_table};"
+        drop_old_sql = f"""
+            DROP TABLE {old_table};
+        """
+
+        rename_sql = f"""
+            ALTER TABLE {new_table} RENAME TO {old_table};
+        """
 
         engine = cls.create_engine()
 
         with engine.begin() as conn:
+            conn.execute(sqlalchemy.text(drop_new_sql))
             conn.execute(sqlalchemy.text(create_table_sql))
             conn.execute(sqlalchemy.text(copy_data_sql))
             conn.execute(sqlalchemy.text(drop_old_sql))
