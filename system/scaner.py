@@ -543,8 +543,6 @@ class NewDirsWorker:
             scaner_item=scaner_item,
             del_images=ok_del_images
         )
-        # отправляем в GUI пустой текст чтобы очистить строку состояния
-        # scaner_item.q.put(ExtScanerItem("", True))
 
         # создаем список неуспешно созданных миниатюр
         bad_new_images: list[ImgItem] = []
@@ -570,9 +568,6 @@ class NewDirsWorker:
             )
             # обновляем список неуспешно созданных миниатюр
             bad_new_images.extend(bad_chunks)
-
-        # отправляем в GUI пустой текст чтобы очистить строку состояния
-        # scaner_item.q.put(ExtScanerItem("", True))
 
         dirs_to_scan = DbDirUpdater.get_good_dirs(
             bad_del_images=bad_del_images,
