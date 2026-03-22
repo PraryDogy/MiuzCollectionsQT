@@ -519,14 +519,14 @@ class DbImgUpdater:
         stmt = stmt.on_conflict_do_update(
             index_elements=[Thumbs.rel_thumb_path],
             set_={
-                ColumnNames.rel_item_path: stmt.excluded[rel_img_path],
-                ColumnNames.size: stmt.excluded[img_item.size],
-                ColumnNames.birth: stmt.excluded[0],
-                ColumnNames.mod: stmt.excluded[img_item.mod],
-                ColumnNames.resol: stmt.excluded["none"],
-                ColumnNames.coll: stmt.excluded["none"],
-                ColumnNames.fav: stmt.excluded[0],
-                ColumnNames.mf_alias: stmt.excluded[scaner_item.mf.mf_alias]
+                ColumnNames.rel_item_path: stmt.excluded[ColumnNames.rel_item_path],
+                ColumnNames.size: stmt.excluded[ColumnNames.size],
+                ColumnNames.birth: stmt.excluded[ColumnNames.birth],
+                ColumnNames.mod: stmt.excluded[ColumnNames.mod],
+                ColumnNames.resol: stmt.excluded[ColumnNames.resol],
+                ColumnNames.coll: stmt.excluded[ColumnNames.coll],
+                ColumnNames.fav: stmt.excluded[ColumnNames.fav],
+                ColumnNames.mf_alias: stmt.excluded[ColumnNames.mf_alias]
             }
         )
         conn.execute(stmt)
