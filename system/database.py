@@ -135,7 +135,7 @@ class Dbase:
 
         create_table_sql = f"""
             CREATE TABLE {new_table} (
-                id INTEGER PRIMARY KEY,
+                {ColumnNames.id} INTEGER PRIMARY KEY,
                 {ColumnNames.rel_item_path} TEXT,
                 {ColumnNames.rel_thumb_path} TEXT UNIQUE,
                 {ColumnNames.size} INTEGER,
@@ -162,8 +162,16 @@ class Dbase:
                 {ColumnNames.mf_alias}
             )
             SELECT
-                id, short_src, short_hash, size, birth, mod,
-                resol, coll, fav, brand
+                {ColumnNames.id},
+                {ColumnNames.rel_item_path},
+                {ColumnNames.rel_thumb_path},
+                {ColumnNames.size},
+                {ColumnNames.birth},
+                {ColumnNames.mod},
+                {ColumnNames.resol},
+                {ColumnNames.coll},
+                {ColumnNames.fav},
+                {ColumnNames.mf_alias}
             FROM {old_table};
         """
 
