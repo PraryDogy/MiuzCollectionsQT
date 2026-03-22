@@ -8,7 +8,7 @@ import sqlalchemy
 from sqlalchemy.dialects.sqlite import insert
 
 from cfg import Static
-from system.database import ColumnNames, Dbase, Dirs, Thumbs
+from system.database import ClmnNames, Dbase, Dirs, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils
@@ -228,9 +228,9 @@ class DbDirUpdater:
         # вставить новые записи батчем
         values_list = [
             {
-                ColumnNames.rel_item_path: dir_item.rel_path,
-                ColumnNames.mod: dir_item.mod,
-                ColumnNames.mf_alias: scaner_item.mf.mf_alias
+                ClmnNames.rel_item_path: dir_item.rel_path,
+                ClmnNames.mod: dir_item.mod,
+                ClmnNames.mf_alias: scaner_item.mf.mf_alias
             }
             for dir_item in dirs_to_scan
         ]
@@ -484,28 +484,28 @@ class DbImgUpdater:
             )
             rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
             values_list.append({
-                ColumnNames.rel_item_path: rel_img_path,
-                ColumnNames.rel_thumb_path: rel_thumb_path,
-                ColumnNames.size: img_item.size,
-                ColumnNames.birth: 0,
-                ColumnNames.mod: img_item.mod,
-                ColumnNames.resol: "none",
-                ColumnNames.coll: "none",
-                ColumnNames.fav: 0,
-                ColumnNames.mf_alias: scaner_item.mf.mf_alias
+                ClmnNames.rel_item_path: rel_img_path,
+                ClmnNames.rel_thumb_path: rel_thumb_path,
+                ClmnNames.size: img_item.size,
+                ClmnNames.birth: 0,
+                ClmnNames.mod: img_item.mod,
+                ClmnNames.resol: "none",
+                ClmnNames.coll: "none",
+                ClmnNames.fav: 0,
+                ClmnNames.mf_alias: scaner_item.mf.mf_alias
             })
         stmt = insert(Thumbs.table).values(values_list)
         stmt = stmt.on_conflict_do_update(
             index_elements=[Thumbs.rel_thumb_path],
             set_={
-                ColumnNames.rel_item_path: stmt.excluded[ColumnNames.rel_item_path],
-                ColumnNames.size: stmt.excluded[ColumnNames.size],
-                ColumnNames.birth: stmt.excluded[ColumnNames.birth],
-                ColumnNames.mod: stmt.excluded[ColumnNames.mod],
-                ColumnNames.resol: stmt.excluded[ColumnNames.resol],
-                ColumnNames.coll: stmt.excluded[ColumnNames.coll],
-                ColumnNames.fav: stmt.excluded[ColumnNames.fav],
-                ColumnNames.mf_alias: stmt.excluded[ColumnNames.mf_alias]
+                ClmnNames.rel_item_path: stmt.excluded[ClmnNames.rel_item_path],
+                ClmnNames.size: stmt.excluded[ClmnNames.size],
+                ClmnNames.birth: stmt.excluded[ClmnNames.birth],
+                ClmnNames.mod: stmt.excluded[ClmnNames.mod],
+                ClmnNames.resol: stmt.excluded[ClmnNames.resol],
+                ClmnNames.coll: stmt.excluded[ClmnNames.coll],
+                ClmnNames.fav: stmt.excluded[ClmnNames.fav],
+                ClmnNames.mf_alias: stmt.excluded[ClmnNames.mf_alias]
             }
         )
         conn.execute(stmt)

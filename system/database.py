@@ -9,7 +9,7 @@ from system.utils import Utils
 METADATA = sqlalchemy.MetaData()
 
 
-class ColumnNames:
+class ClmnNames:
     id: Literal["id"] = "id"
     rel_item_path: Literal["наст. имя: short_src"] = "short_src"
     rel_thumb_path: Literal["наст. имя: short_hash"] = "short_hash"
@@ -24,25 +24,25 @@ class ColumnNames:
 
 _table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
-    sqlalchemy.Column(ColumnNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ColumnNames.rel_item_path, sqlalchemy.Text),
-    sqlalchemy.Column(ColumnNames.rel_thumb_path, sqlalchemy.Text, unique=True),
-    sqlalchemy.Column(ColumnNames.size, sqlalchemy.Integer),
-    sqlalchemy.Column(ColumnNames.birth, sqlalchemy.Integer),
-    sqlalchemy.Column(ColumnNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ColumnNames.resol, sqlalchemy.Text),
-    sqlalchemy.Column(ColumnNames.coll, sqlalchemy.Text),
-    sqlalchemy.Column(ColumnNames.fav, sqlalchemy.Integer),
-    sqlalchemy.Column(ColumnNames.mf_alias, sqlalchemy.Text),
+    sqlalchemy.Column(ClmnNames.id, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ClmnNames.rel_item_path, sqlalchemy.Text),
+    sqlalchemy.Column(ClmnNames.rel_thumb_path, sqlalchemy.Text, unique=True),
+    sqlalchemy.Column(ClmnNames.size, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmnNames.birth, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmnNames.mod, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmnNames.resol, sqlalchemy.Text),
+    sqlalchemy.Column(ClmnNames.coll, sqlalchemy.Text),
+    sqlalchemy.Column(ClmnNames.fav, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmnNames.mf_alias, sqlalchemy.Text),
 )
 
 
 _table_dirs = sqlalchemy.Table(
     "dirs", METADATA,
-    sqlalchemy.Column(ColumnNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ColumnNames.rel_item_path, sqlalchemy.Text),
-    sqlalchemy.Column(ColumnNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ColumnNames.mf_alias, sqlalchemy.Text),
+    sqlalchemy.Column(ClmnNames.id, sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(ClmnNames.rel_item_path, sqlalchemy.Text),
+    sqlalchemy.Column(ClmnNames.mod, sqlalchemy.Integer),
+    sqlalchemy.Column(ClmnNames.mf_alias, sqlalchemy.Text),
 )
 
 
@@ -137,16 +137,16 @@ class Dbase:
 
         create_table_sql = f"""
             CREATE TABLE {new_table} (
-                {ColumnNames.id} INTEGER PRIMARY KEY,
-                {ColumnNames.rel_item_path} TEXT,
-                {ColumnNames.rel_thumb_path} TEXT UNIQUE,
-                {ColumnNames.size} INTEGER,
-                {ColumnNames.birth} INTEGER,
-                {ColumnNames.mod} INTEGER,
-                {ColumnNames.resol} TEXT,
-                {ColumnNames.coll} TEXT,
-                {ColumnNames.fav} INTEGER,
-                {ColumnNames.mf_alias} TEXT
+                {ClmnNames.id} INTEGER PRIMARY KEY,
+                {ClmnNames.rel_item_path} TEXT,
+                {ClmnNames.rel_thumb_path} TEXT UNIQUE,
+                {ClmnNames.size} INTEGER,
+                {ClmnNames.birth} INTEGER,
+                {ClmnNames.mod} INTEGER,
+                {ClmnNames.resol} TEXT,
+                {ClmnNames.coll} TEXT,
+                {ClmnNames.fav} INTEGER,
+                {ClmnNames.mf_alias} TEXT
             );
         """
         copy_data_sql = f"""

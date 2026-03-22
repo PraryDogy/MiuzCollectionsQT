@@ -11,7 +11,7 @@ from watchdog.observers.polling import PollingObserver as Observer
 
 from cfg import Cfg, Static
 
-from .database import ColumnNames, Dbase, Dirs, Thumbs
+from .database import ClmnNames, Dbase, Dirs, Thumbs
 from .items import (CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem,
                     WatchDogItem)
 from .lang import Lng
@@ -411,15 +411,15 @@ class UpdateThumb:
         img_array = ImgUtils.read_img(abs_img_path)
         img_array = ImgUtils.fit_to_thumb(img_array, Static.max_img_size)
         values = {
-            ColumnNames.rel_item_path: rel_img_path,
-            ColumnNames.rel_thumb_path: rel_thumb_path,
-            ColumnNames.size: size,
-            ColumnNames.birth: 0,
-            ColumnNames.mod: mod,
-            ColumnNames.resol: "none",
-            ColumnNames.coll: "none",
-            ColumnNames.fav: 0,
-            ColumnNames.mf_alias: mf.mf_alias
+            ClmnNames.rel_item_path: rel_img_path,
+            ClmnNames.rel_thumb_path: rel_thumb_path,
+            ClmnNames.size: size,
+            ClmnNames.birth: 0,
+            ClmnNames.mod: mod,
+            ClmnNames.resol: "none",
+            ClmnNames.coll: "none",
+            ClmnNames.fav: 0,
+            ClmnNames.mf_alias: mf.mf_alias
             }
         
         os.remove(abs_thumb_path)
