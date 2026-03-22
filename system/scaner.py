@@ -5,6 +5,7 @@ from multiprocessing import Queue
 from time import sleep
 
 import sqlalchemy
+from sqlalchemy.dialects.sqlite import insert
 
 from cfg import Static
 from system.database import ColumnNames, Dbase, Dirs, Thumbs
@@ -514,7 +515,20 @@ class DbImgUpdater:
                 ColumnNames.fav: 0,
                 ColumnNames.mf_alias: scaner_item.mf.mf_alias
             })
-        stmt = sqlalchemy.insert(Thumbs.table), values_list
+        stmt = insert(Thumbs.table).values(values_list)
+        stmt = stmt.on_conflict_update(
+            index_elements=[Thumbs.rel_thumb_path],
+            set_={
+                ColumnNames.rel_item_path: rel_img_path,
+                ColumnNames.size: img_item.size,
+                ColumnNames.birth: 0,
+                ColumnNames.mod: img_item.mod,
+                ColumnNames.resol: "none",
+                ColumnNames.coll: "none",
+                ColumnNames.fav: 0,
+                ColumnNames.mf_alias: scaner_item.mf.mf_alias
+            }
+        )
         conn.execute(stmt)
         conn.commit()
         conn.close()
