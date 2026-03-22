@@ -115,8 +115,8 @@ class ULineEdit(QLineEdit):
         style = f"""
             padding-left: {self.padding[0]}px;
             padding-right: {self.padding[1]}px;
-            border-radius: 6px;
         """
+        # border-radius: 6px;
         self.setStyleSheet(self.styleSheet() + style)
 
     def cut_selection(self, *args):
@@ -163,9 +163,19 @@ class USvgSqareWidget(QSvgWidget):
 
 class UTextEdit(QTextEdit):
     """QTextEdit с кастомным контекстным меню для копирования/вставки"""
+    padding = (2, 28)
 
     def __init__(self):
         super().__init__()
+        style = f"""
+            padding-left: {self.padding[0]}px;
+            padding-right: {self.padding[1]}px;
+        """
+        self.setStyleSheet(self.styleSheet() + style)
+
+            # border: 1px solid transparent;
+            # border-radius:6px;
+            # background-color: palette(base);
 
     def copy_selection(self):
         cur = self.textCursor()
@@ -292,6 +302,7 @@ class UListWidgetItem(QListWidgetItem):
         if text:
             self.setText(text)
 
+
 class UListSpacerItem(QListWidgetItem):
     def __init__(self, parent: QListWidget, height: int = 15):
         super().__init__()
@@ -388,6 +399,8 @@ class NotifyWid(QFrame):
 class SmallBtn(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
+
+        self.setFixedHeight(20)
         self.setStyleSheet("""
         font-size: 11pt;
         """)
