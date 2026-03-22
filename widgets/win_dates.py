@@ -3,8 +3,8 @@ from typing import Literal
 
 from PyQt5.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
-from PyQt5.QtWidgets import (QCalendarWidget, QGroupBox, QLabel, QToolButton,
-                             QWidget)
+from PyQt5.QtWidgets import (QCalendarWidget, QGroupBox, QLabel, QSpinBox,
+                             QToolButton, QWidget)
 
 from cfg import Cfg, Dynamic
 from system.lang import Lng
@@ -74,6 +74,7 @@ class MyCalendar(QGroupBox):
         self.calendar.setMaximumDate(QDate.currentDate())
         self.calendar.setMinimumDate(QDate(2000, 1, 1))
         self.calendar.setFixedSize(300, 300)
+
         v_layout.addWidget(self.calendar)
         if Cfg.lng == 0:
             self.calendar.setLocale(QLocale(QLocale.Language.Russian))
@@ -122,6 +123,9 @@ class MyCalendar(QGroupBox):
                 wid.setIcon(QIcon("./images/prev.svg"))
             elif name == "qt_calendar_nextmonth":
                 wid.setIcon(QIcon("./images/next.svg"))
+
+        for child in self.calendar.findChildren(QSpinBox):
+            child.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
 
         self.calendar.setStyleSheet("""
             #qt_calendar_monthbutton::menu-indicator {

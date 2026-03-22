@@ -177,6 +177,7 @@ class RebootSettings(GroupWid):
         scaner_time_wid.layout_.addStretch()
 
         self.spin = QSpinBox(self)
+        self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.spin.setMinimum(self.spin_min)
         self.spin.setMaximum(self.spin_max)
         self.spin.setFixedHeight(27)
