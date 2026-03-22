@@ -147,32 +147,9 @@ class Dbase:
                 {ColumnNames.mf_alias} TEXT
             );
         """
-
         copy_data_sql = f"""
-            INSERT INTO {new_table} (
-                {ColumnNames.id},
-                {ColumnNames.rel_item_path},
-                {ColumnNames.rel_thumb_path},
-                {ColumnNames.size},
-                {ColumnNames.birth},
-                {ColumnNames.mod},
-                {ColumnNames.resol},
-                {ColumnNames.coll},
-                {ColumnNames.fav},
-                {ColumnNames.mf_alias}
-            )
-            SELECT
-                {ColumnNames.id},
-                {ColumnNames.rel_item_path},
-                {ColumnNames.rel_thumb_path},
-                {ColumnNames.size},
-                {ColumnNames.birth},
-                {ColumnNames.mod},
-                {ColumnNames.resol},
-                {ColumnNames.coll},
-                {ColumnNames.fav},
-                {ColumnNames.mf_alias}
-            FROM {old_table};
+            INSERT INTO {new_table}
+            SELECT * FROM {old_table};
         """
 
         drop_old_sql = f"DROP TABLE {old_table};"

@@ -259,6 +259,11 @@ class App(QApplication):
             self.start()
         else:
             Dbase.init()
+
+            
+            Dbase.set_short_hash_unique()
+
+
             ThemeChanger.init()
             UThreadPool.init()
             self.win_main = WinMain(self.argv)
