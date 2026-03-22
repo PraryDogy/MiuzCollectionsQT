@@ -70,7 +70,7 @@ class ImgWid(QGraphicsView):
 
     # ---------------------- Drag через мышь ----------------------
     def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
             self._last_mouse_pos = event.pos()
         super().mousePressEvent(event)

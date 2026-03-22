@@ -165,6 +165,7 @@ class UTextEdit(QTextEdit):
 
     def __init__(self):
         super().__init__()
+        # self.setStyleSheet(self.styleSheet() + "border-radius: 6px; border: 3px solid transparent;")
         # background-color: palette(base);
 
     def copy_selection(self):
