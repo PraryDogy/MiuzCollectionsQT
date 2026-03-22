@@ -1,9 +1,8 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QLineEdit
 
-from cfg import Dynamic, Cfg
+from cfg import Cfg, Dynamic
 from system.lang import Lng
 
 from ._base_widgets import ULineEdit
@@ -14,7 +13,7 @@ class ClearBtn(QSvgWidget):
     svg_clear = "./images/clear.svg"
     svg_size = 14
 
-    def __init__(self, parent: QLineEdit):
+    def __init__(self, parent: ULineEdit):
         super().__init__(parent=parent)
         self.setFixedSize(self.svg_size, self.svg_size)
         self.load(self.svg_clear)
@@ -51,11 +50,6 @@ class WidSearch(ULineEdit):
             self.width() - ClearBtn.svg_size - 8,
             (ClearBtn.svg_size * 2) // 4
         )
-
-        self.setStyleSheet(
-            self.styleSheet() + "border-radius: 3px;"
-        )
-
 
     def create_search(self, new_text):
         if len(new_text) > 0:

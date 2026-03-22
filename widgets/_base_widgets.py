@@ -112,10 +112,12 @@ class ULineEdit(QLineEdit):
         super().__init__()
 
         self.setFixedHeight(self.hh)
-        self.setStyleSheet(f"""
+        style = f"""
             padding-left: {self.padding[0]}px;
             padding-right: {self.padding[1]}px;
-        """)
+            border-radius: 6px;
+        """
+        self.setStyleSheet(self.styleSheet() + style)
 
     def cut_selection(self, *args):
         text = self.selectedText()

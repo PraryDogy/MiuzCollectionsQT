@@ -1,19 +1,16 @@
-import calendar
-import re
 from datetime import datetime, timedelta
 from typing import Literal
 
 from PyQt5.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
-from PyQt5.QtWidgets import (QCalendarWidget, QFrame, QGroupBox, QLabel,
-                             QLineEdit, QSpacerItem, QSpinBox, QToolButton,
-                             QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QCalendarWidget, QGroupBox, QLabel, QToolButton,
+                             QWidget)
 
 from cfg import Cfg, Dynamic
 from system.lang import Lng
 
 from ._base_widgets import (HSep, SingleActionWindow, SmallBtn, UHBoxLayout,
-                            ULineEdit, UVBoxLayout)
+                            UVBoxLayout)
 
 
 class DatesTools:
