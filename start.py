@@ -107,7 +107,7 @@ class ClickableGroupBox(QGroupBox):
         layout = QVBoxLayout(self)
         self.label = QLabel(title)
         self.label.setWordWrap(True)
-        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.label)
 
     def mouseReleaseEvent(self, event):
@@ -211,8 +211,6 @@ class LanguageSelect(QDialog):
 
 class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
-        # self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
-        # self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         super().__init__(argv)
         self.argv = argv
         self.start()
@@ -261,6 +259,7 @@ class App(QApplication):
             objects = (Dbase, ThemeChanger, UThreadPool)
             for i in objects:
                 i.init()
+
             self.win_main = WinMain(self.argv)
             self.win_main.center_screen()
             self.win_main.show()

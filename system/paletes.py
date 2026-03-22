@@ -47,6 +47,8 @@ class ThemeChanger:
 
     @classmethod
     def init(cls):
+        print("theme changer is disabled")
+        return
         app: QApplication = QApplication.instance()
         if Cfg.dark_mode == 0:
             app.setPalette(QPalette())

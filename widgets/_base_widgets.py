@@ -352,7 +352,7 @@ class NotifyWid(QFrame):
 
         # текст
         self.label = QLabel(text, self)
-        self.label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
 
         # лейаут
         layout = QHBoxLayout(self)
