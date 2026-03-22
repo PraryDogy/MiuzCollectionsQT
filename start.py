@@ -258,14 +258,9 @@ class App(QApplication):
             Cfg.write_json_data()
             self.start()
         else:
-            Dbase.init()
-
-            
-            Dbase.set_short_hash_unique()
-
-
-            ThemeChanger.init()
-            UThreadPool.init()
+            objects = (Dbase, ThemeChanger, UThreadPool)
+            for i in objects:
+                i.init()
             self.win_main = WinMain(self.argv)
             self.win_main.center_screen()
             self.win_main.show()
