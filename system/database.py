@@ -136,15 +136,15 @@ class Dbase:
         create_table_sql = f"""
             CREATE TABLE {new_table} (
                 id INTEGER PRIMARY KEY,
-                short_src TEXT,
-                short_hash TEXT UNIQUE,
-                size INTEGER,
-                birth INTEGER,
-                mod INTEGER,
-                resol TEXT,
-                coll TEXT,
-                fav INTEGER,
-                brand TEXT
+                {ColumnNames.rel_item_path} TEXT,
+                {ColumnNames.rel_thumb_path} TEXT UNIQUE,
+                {ColumnNames.size} INTEGER,
+                {ColumnNames.birth} INTEGER,
+                {ColumnNames.mod} INTEGER,
+                {ColumnNames.resol} TEXT,
+                {ColumnNames.coll} TEXT,
+                {ColumnNames.fav} INTEGER,
+                {ColumnNames.mf_alias} TEXT
             );
         """
 
