@@ -390,7 +390,7 @@ class SmallBtn(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
 
-        self.setFixedHeight(20)
+        self.setFixedHeight(30)
         self.setStyleSheet("""
         font-size: 11pt;
         """)

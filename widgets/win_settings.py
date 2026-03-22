@@ -422,7 +422,7 @@ class ThemesBtn(QFrame):
             )
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
 
 
