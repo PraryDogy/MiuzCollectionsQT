@@ -1,11 +1,11 @@
-from PyQt6.QtCore import QSize, Qt, QTimer
-from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-                         QPalette)
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
-                             QHBoxLayout, QLabel, QLineEdit, QListWidget,
-                             QListWidgetItem, QMainWindow, QMenu, QPushButton,
-                             QScrollArea, QTextEdit, QVBoxLayout, QWidget)
+from PyQt5.QtCore import QSize, Qt, QTimer
+from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
+                             QGraphicsDropShadowEffect, QHBoxLayout, QLabel,
+                             QLineEdit, QListWidget, QListWidgetItem,
+                             QMainWindow, QMenu, QPushButton, QScrollArea,
+                             QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
 from cfg import Cfg
@@ -31,13 +31,9 @@ class UVBoxLayout(QVBoxLayout):
         self.setSpacing(0)
 
 
-from PyQt6.QtWidgets import QMenu, QApplication
-from PyQt6.QtGui import QPalette
-from PyQt6.QtCore import Qt
-
 class UMenuBase(QMenu):
     """
-    Базовый QMenu с кастомной окраской разделителей и закруглёнными углами.
+    Базовый QMenu с кастомной окраской разделителей, подстроенной под цвет текста приложения.
     """
 
     def __init__(self, *args, **kwargs):
@@ -54,17 +50,8 @@ class UMenuBase(QMenu):
         }
         sep_color = color_data.get(text_color, "#8a8a8a")  # дефолт
 
-        # --- флаги окна и прозрачность для скруглений ---
-        self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-
         # --- стили ---
         self.setStyleSheet(f"""
-            QMenu {{
-                background-color: {palette.color(QPalette.ColorRole.Base).name()};
-                border-radius: 6px;
-                padding: 5px;
-            }}
             QMenu::separator {{
                 height: 1px;
                 background: {sep_color};
@@ -93,9 +80,9 @@ class UMenu(UMenuBase):
 
     def show_menu(self):
         if self.event_:
-            self.exec(self.event_.globalPos())
+            self.exec_(self.event_.globalPos())
         else:
-            self.exec()
+            self.exec_()
 
 
 class USubMenu(UMenuBase):
@@ -178,7 +165,6 @@ class UTextEdit(QTextEdit):
 
     def __init__(self):
         super().__init__()
-        # self.setStyleSheet(self.styleSheet() + "border-radius: 6px; border: 3px solid transparent;")
         # background-color: palette(base);
 
     def copy_selection(self):
@@ -404,9 +390,9 @@ class SmallBtn(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
 
-        # self.setFixedHeight(30)
+        # self.setFixedHeight(20)
         self.setStyleSheet("""
-            font-size: 11pt;
+        font-size: 11pt;
         """)
 
 

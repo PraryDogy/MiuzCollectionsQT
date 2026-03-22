@@ -6,8 +6,8 @@ from datetime import datetime
 import numpy as np
 import sqlalchemy
 from numpy import ndarray
-from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
-from PyQt6.QtGui import QImage
+from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
+from PyQt5.QtGui import QImage
 
 from cfg import Cfg, Dynamic, Static
 

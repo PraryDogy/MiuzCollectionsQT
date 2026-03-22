@@ -1,8 +1,8 @@
 import os
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from cfg import Static
 from system.shared_utils import ImgUtils
@@ -97,6 +97,45 @@ class PathItem(QWidget):
         Отложено схолпывает виджет до указанной минимальной длины
         """
         QTimer.singleShot(500, self.collapse)
+
+    # def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+    #     urls = [self.main_win_item.main_dir]
+    #     menu_ = UMenu(parent=self)
+
+    #     if self.item_dir in JsonData.favs:
+    #         cmd_ = lambda: self.fav_cmd(offset=-1, src=self.item_dir)
+    #         fav_action = ItemActions.FavRemove(menu_)
+    #         fav_action.triggered.connect(cmd_)
+    #         menu_.addAction(fav_action)
+    #     else:
+    #         cmd_ = lambda: self.fav_cmd(offset=1, src=self.item_dir)
+    #         fav_action = ItemActions.FavAdd(menu_)
+    #         fav_action.triggered.connect(cmd_)
+    #         menu_.addAction(fav_action)
+
+    #     info = ItemActions.Info(menu_)
+    #     info.triggered.connect(self.open_info_win)
+    #     menu_.addAction(info)
+
+    #     menu_.addSeparator()
+
+    #     show_in_finder_action = ItemActions.RevealInFinder(menu_, urls)
+    #     menu_.addAction(show_in_finder_action)
+
+    #     copy_path = ItemActions.CopyPath(menu_, urls)
+    #     menu_.addAction(copy_path)
+
+    #     self.solid_style()
+    #     menu_.show_under_cursor()
+    #     self.default_style()
+
+    # def mouseReleaseEvent(self, a0):
+    #     if a0.button() == Qt.MouseButton.LeftButton:
+    #         if os.path.isdir(self.item_dir) and self.item_dir != self.main_win_item.main_dir:
+    #             self.main_win_item.main_dir = self.item_dir
+    #             self.new_history_item.emit(self.item_dir)
+    #             self.load_st_grid.emit()
+    #     return super().mouseReleaseEvent(a0)
 
 
 class PathBar(QWidget):

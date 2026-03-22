@@ -1,8 +1,8 @@
 import os
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from cfg import Cfg
 from system.items import CopyTaskItem

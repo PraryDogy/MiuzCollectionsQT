@@ -1,9 +1,9 @@
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QMouseEvent, QWheelEvent
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QGraphicsOpacityEffect, QLabel, QSlider, QWidget
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QMouseEvent, QWheelEvent
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import QGraphicsOpacityEffect, QLabel, QSlider, QWidget
 
-from cfg import Cfg, Dynamic, Static
+from cfg import Dynamic, Static, Cfg
 from system.lang import Lng
 
 from ._base_widgets import UHBoxLayout
@@ -54,7 +54,7 @@ class CustomSlider(QSlider):
 
     def mousePressEvent(self, ev: QMouseEvent) -> None:
         """Устанавливает значение слайдера при клике мышью по шкале."""
-        if ev.button() != Qt.MouseButton.LeftButton:
+        if ev.button() != Qt.LeftButton:
             ev.ignore()
             return
 

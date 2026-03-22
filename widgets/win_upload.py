@@ -1,9 +1,9 @@
 import os
 
-from PyQt6.QtCore import QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QIcon
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtGui import QIcon
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
                              QWidget)
 
 from cfg import Cfg

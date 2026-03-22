@@ -1,12 +1,12 @@
 import os
 
-from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
+from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
-from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QDrag, QKeyEvent,
+from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
                          QMouseEvent, QPalette, QPixmap, QResizeEvent)
-from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
-                             QGraphicsOpacityEffect, QGridLayout, QLabel,
-                             QRubberBand, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
+                             QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
+                             QGridLayout, QLabel, QRubberBand, QWidget)
 
 from cfg import Cfg, Dynamic, Static
 from system.items import Buffer, SettingsItem
@@ -467,7 +467,7 @@ class Grid(VScrollArea):
         self.grid_lay = QGridLayout()
         self.grid_lay.setSpacing(1)
         self.grid_wid.setLayout(self.grid_lay)
-        self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
         
     def remove_grid_container(self):
         self.grid_wid.deleteLater()
@@ -603,13 +603,8 @@ class Grid(VScrollArea):
         if self.glob_col != 0:
             _next_row()
 
-    def get_clicked_widget(self, a0: QMouseEvent | QContextMenuEvent) -> None | Thumbnail:
-        if isinstance(a0, QMouseEvent):
-            pos = a0.globalPosition().toPoint()
-        elif isinstance(a0, QContextMenuEvent):
-            pos = a0.globalPos()
-        
-        wid = QApplication.widgetAt(pos)
+    def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumbnail:
+        wid = QApplication.widgetAt(a0.globalPos())
         if isinstance(wid, (ImgWid, FilenameWid)):
             return wid.parent()
         else:
@@ -1109,7 +1104,7 @@ class Grid(VScrollArea):
 
             # назначаем urls
             mime_data.setUrls([QUrl.fromLocalFile(p) for p in paths])
-            drag.exec(Qt.DropAction.CopyAction)
+            drag.exec_(Qt.DropAction.CopyAction)
 
         # --- Основная логика ---
         if self.wid_under_mouse is None and not self.rubberBand.isVisible():

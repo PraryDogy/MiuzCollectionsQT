@@ -2,15 +2,14 @@ import gc
 import os
 from typing import Literal
 
-from PyQt6.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
+from PyQt5.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
                           pyqtSignal)
-from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QImage,
-                         QKeyEvent, QMouseEvent, QPixmap, QResizeEvent,
-                         QTransform)
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsPixmapItem,
-                             QGraphicsScene, QGraphicsView, QHBoxLayout,
-                             QLabel, QWidget)
+from PyQt5.QtGui import (QContextMenuEvent, QCursor, QImage, QKeyEvent,
+                         QMouseEvent, QPixmap, QResizeEvent, QTransform)
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
+                             QGraphicsPixmapItem, QGraphicsScene,
+                             QGraphicsView, QHBoxLayout, QLabel, QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
@@ -64,14 +63,14 @@ class ImgWid(QGraphicsView):
     def zoom_fit(self):
         if self.pixmap_item:
             self.resetTransform()
-            self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
+            self.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
             self.is_zoomed = False
             self.setCursor(Qt.CursorShape.ArrowCursor)
 
     # ---------------------- Drag через мышь ----------------------
     def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.setCursor(Qt.CursorShape.ClosedHandCursor)
+        if event.button() == Qt.LeftButton:
+            self.setCursor(Qt.ClosedHandCursor)
             self._last_mouse_pos = event.pos()
         super().mousePressEvent(event)
 
@@ -95,7 +94,7 @@ class ImgWid(QGraphicsView):
 
     def keyPressEvent(self, event):
         # Если это стрелки, не обрабатываем их здесь
-        if event.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down):
+        if event.key() in (Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down):
             event.ignore()  # передаём событие родителю
             return
         # для остальных клавиш можно оставить стандартную обработку
@@ -104,7 +103,7 @@ class ImgWid(QGraphicsView):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         if self.pixmap_item:
-            self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
+            self.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
     
 
 class UserSvg(USvgSqareWidget):

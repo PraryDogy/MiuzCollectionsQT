@@ -2,9 +2,9 @@ import json
 import os
 import subprocess
 
-from PyQt6.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QStandardItem, QStandardItemModel
-from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
+from PyQt5.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
                              QListWidgetItem, QMenu, QPushButton, QTableView,
                              QWidget)
 
@@ -55,7 +55,7 @@ class ServersWidget(QTableView):
         self.verticalHeader().setDefaultSectionSize(25)
 
         # Контекстное меню
-        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
 
     def add_row(self, data: list[str]):
@@ -79,7 +79,7 @@ class ServersWidget(QTableView):
         menu = QMenu(self)
         copy_action = menu.addAction(Lng.copy[Cfg.lng])
         delete_action = menu.addAction(Lng.delete[Cfg.lng])
-        action = menu.exec(self.viewport().mapToGlobal(pos))
+        action = menu.exec_(self.viewport().mapToGlobal(pos))
 
         if action == copy_action:
             QApplication.clipboard().setText(row_text)

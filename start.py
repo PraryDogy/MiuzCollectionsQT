@@ -3,8 +3,8 @@ import sys
 import traceback
 from pathlib import Path
 
-from PyQt6.QtCore import QEvent, QObject, Qt, pyqtSignal
-from PyQt6.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
+from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
+from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
 
@@ -50,7 +50,7 @@ class System_:
         l.addWidget(QPushButton("Закрыть", clicked=d.close))
         d.resize(500, 400)
         d.setFocus()
-        d.exec()
+        d.exec_()
 
     def catch_error_in_proj(exctype, value, tb):
         if exctype == RuntimeError:
@@ -107,7 +107,7 @@ class ClickableGroupBox(QGroupBox):
         layout = QVBoxLayout(self)
         self.label = QLabel(title)
         self.label.setWordWrap(True)
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label)
 
     def mouseReleaseEvent(self, event):
@@ -211,6 +211,8 @@ class LanguageSelect(QDialog):
 
 class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
+        self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
+        self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         super().__init__(argv)
         self.argv = argv
         self.start()
@@ -237,12 +239,12 @@ class App(QApplication):
             first_load.copy_preload_files.connect(copy_preload_files)
             first_load.copy_preload_files.connect(self.start_app)
             first_load.setup_new_mf.connect(setup_new_mf)
-            first_load.exec()
+            first_load.exec_()
 
         def lng_win():
             lng_win = LanguageSelect()
             lng_win.closed_.connect(first_load_win)
-            lng_win.exec()
+            lng_win.exec_()
 
         json_to_app()
         if not Cfg.check_files():
@@ -259,7 +261,6 @@ class App(QApplication):
             objects = (Dbase, ThemeChanger, UThreadPool)
             for i in objects:
                 i.init()
-
             self.win_main = WinMain(self.argv)
             self.win_main.center_screen()
             self.win_main.show()

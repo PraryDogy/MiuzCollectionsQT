@@ -1,8 +1,8 @@
 import os
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent
-from PyQt6.QtWidgets import QGridLayout, QLabel, QSpacerItem, QWidget
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
+from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg
 from system.items import OneFileInfoItem

@@ -1,7 +1,8 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QLabel, QMenu, QMenuBar, QSpacerItem, QWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import (QAction, QLabel, QMenu, QMenuBar, QSpacerItem,
+                             QWidget)
 
 from cfg import Cfg, Static
 from system.items import SettingsItem

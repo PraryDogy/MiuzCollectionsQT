@@ -1,3 +1,5 @@
+import colorsys
+import gc
 import os
 import shutil
 import subprocess
@@ -6,10 +8,10 @@ import sys
 import cv2
 import numpy as np
 from PIL import Image
-from PyQt6.QtCore import (QObject, QRunnable, QSize, Qt, QThreadPool, QTimer,
+from PyQt5.QtCore import (QObject, QRunnable, QSize, Qt, QThreadPool, QTimer,
                           pyqtSignal)
-from PyQt6.QtGui import QColor, QDropEvent, QIcon, QImage, QPixmap
-from PyQt6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
+from PyQt5.QtGui import QColor, QDropEvent, QIcon, QImage, QPixmap
+from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                              QLabel, QListWidget, QListWidgetItem, QPushButton,
                              QScrollArea, QSplitter, QTextEdit, QVBoxLayout,
                              QWidget)
@@ -187,7 +189,7 @@ class ColorHighlighter(QRunnable):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         h, w, ch = img_rgb.shape
         bytes_per_line = ch * w
-        return QImage(img_rgb.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
+        return QImage(img_rgb.data, w, h, bytes_per_line, QImage.Format_RGB888)
 
 
 class ImageOpener(QRunnable):
@@ -518,7 +520,7 @@ class MainWindow(QWidget):
         for color_name, (lower, upper, hex_color) in search_colors.items():
             item = QListWidgetItem(color_name)
             item.setSizeHint(QSize(0, 28))
-            item.setCheckState(Qt.CheckState.Checked if color_name in self.selected_colors else Qt.CheckState.Unchecked)
+            item.setCheckState(Qt.Checked if color_name in self.selected_colors else Qt.Unchecked)
             item.value = (lower, upper)
 
             pixmap = QPixmap(12, 12)
@@ -563,11 +565,11 @@ class MainWindow(QWidget):
                 print("GeoFinder MainWindow remove file error", e)    
 
     def on_color_item_changed(self, item: QListWidgetItem):
-        if item.checkState() == Qt.CheckState.Checked:
-            item.setCheckState(Qt.CheckState.Unchecked)
+        if item.checkState() == Qt.Checked:
+            item.setCheckState(Qt.Unchecked)
             self.selected_colors.pop(item.text(), None)
         else:
-            item.setCheckState(Qt.CheckState.Checked)
+            item.setCheckState(Qt.Checked)
             self.selected_colors[item.text()] = item.value
     
     def start_cmd(self):
@@ -625,4 +627,4 @@ if __name__ == "__main__":
     app.aboutToQuit.connect(MainWindow.on_exit)
     w = MainWindow()
     w.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
