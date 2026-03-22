@@ -2,10 +2,10 @@ import os
 import subprocess
 from collections import defaultdict
 
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QCloseEvent, QIcon, QKeyEvent
-from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
-                             QPushButton, QSplitter, QVBoxLayout, QWidget)
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent
+from PyQt6.QtWidgets import (QFileDialog, QFrame, QPushButton, QSplitter,
+                             QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
@@ -89,7 +89,7 @@ class WinMain(UMainWindow):
         self.central_layout.addWidget(h_wid_main)
 
         # Создаем QSplitter
-        self.splitter = QSplitter(Qt.Horizontal)
+        self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(14)
 
         # Левый виджет (MenuLeft)
@@ -676,12 +676,14 @@ class WinMain(UMainWindow):
         except AttributeError as e:
             print("Win main restart scaner task", e)
         self.start_scaner_task()
-        
+            
     def center_screen(self):
-        screen = QDesktopWidget().screenGeometry()
-        size = self.geometry()
+        screen = QGuiApplication.primaryScreen().availableGeometry()
+        size = self.frameGeometry()
+
         x = (screen.width() - size.width()) // 2
         y = (screen.height() - size.height()) // 2
+
         self.move(x, y)
 
     def on_exit(self):

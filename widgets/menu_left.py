@@ -2,9 +2,9 @@ import os
 import re
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import QTabWidget, QTreeWidget, QTreeWidgetItem
 
 from cfg import Cfg, Dynamic
 from system.items import SettingsItem

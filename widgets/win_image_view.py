@@ -2,14 +2,15 @@ import gc
 import os
 from typing import Literal
 
-from PyQt5.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
+from PyQt6.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import (QContextMenuEvent, QCursor, QImage, QKeyEvent,
-                         QMouseEvent, QPixmap, QResizeEvent, QTransform)
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
-                             QGraphicsPixmapItem, QGraphicsScene,
-                             QGraphicsView, QHBoxLayout, QLabel, QWidget)
+from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QImage,
+                         QKeyEvent, QMouseEvent, QPixmap, QResizeEvent,
+                         QTransform)
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsPixmapItem,
+                             QGraphicsScene, QGraphicsView, QHBoxLayout,
+                             QLabel, QWidget)
 
 from cfg import Cfg
 from system.lang import Lng

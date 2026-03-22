@@ -3,8 +3,8 @@ import sys
 import traceback
 from pathlib import Path
 
-from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
-from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
+from PyQt6.QtCore import QEvent, QObject, Qt, pyqtSignal
+from PyQt6.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
 
@@ -211,8 +211,8 @@ class LanguageSelect(QDialog):
 
 class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
-        self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
-        self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
+        # self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
+        # self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         super().__init__(argv)
         self.argv = argv
         self.start()

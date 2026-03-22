@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtSvg import QSvgWidget
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtSvgWidgets import QSvgWidget
 
 from cfg import Cfg, Dynamic
 from system.lang import Lng

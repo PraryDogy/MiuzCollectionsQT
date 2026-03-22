@@ -1,16 +1,15 @@
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
-                             QGraphicsDropShadowEffect, QHBoxLayout, QLabel,
-                             QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QPushButton, QScrollArea,
-                             QTextEdit, QVBoxLayout, QWidget)
-from typing_extensions import Literal, Optional
+from PyQt6.QtCore import QSize, Qt, QTimer
+from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
+                         QPalette)
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
+                             QHBoxLayout, QLabel, QLineEdit, QListWidget,
+                             QListWidgetItem, QMainWindow, QMenu, QPushButton,
+                             QScrollArea, QTextEdit, QVBoxLayout, QWidget)
+from typing_extensions import Optional
 
 from cfg import Cfg
 from system.lang import Lng
-from system.main_folder import Mf
 from system.utils import Utils
 
 
@@ -42,7 +41,7 @@ class UMenuBase(QMenu):
 
         # --- палитра ---
         palette = QApplication.palette()
-        text_color = palette.color(QPalette.WindowText).name().lower()
+        text_color = palette.color(QPalette.ColorRole.WindowText).name().lower()
 
         # --- соответствие цвета текста и разделителя ---
         color_data = {

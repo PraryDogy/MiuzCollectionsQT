@@ -5,10 +5,10 @@ import shutil
 import subprocess
 import sys
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QIcon
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import (QApplication, QFrame, QGroupBox, QLabel,
                              QLineEdit, QSpacerItem, QSpinBox, QSplitter,
                              QTableWidget, QTableWidgetItem, QWidget)
 from typing_extensions import Optional
@@ -392,7 +392,7 @@ class ThemesBtn(QFrame):
         svg_lay.addWidget(self.svg_widget)
 
         label = ULabel(label_text)
-        label.setAlignment(Qt.AlignCenter)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         v_lay.addWidget(label)
 
     def regular_style(self):

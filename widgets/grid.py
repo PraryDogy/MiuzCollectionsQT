@@ -1,12 +1,12 @@
 import os
 
-from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
+from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
-from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
+from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QDrag, QKeyEvent,
                          QMouseEvent, QPalette, QPixmap, QResizeEvent)
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
-                             QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-                             QGridLayout, QLabel, QRubberBand, QWidget)
+from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
+                             QGraphicsOpacityEffect, QGridLayout, QLabel,
+                             QRubberBand, QWidget)
 
 from cfg import Cfg, Dynamic, Static
 from system.items import Buffer, SettingsItem
@@ -467,7 +467,7 @@ class Grid(VScrollArea):
         self.grid_lay = QGridLayout()
         self.grid_lay.setSpacing(1)
         self.grid_wid.setLayout(self.grid_lay)
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
+        self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
         
     def remove_grid_container(self):
         self.grid_wid.deleteLater()

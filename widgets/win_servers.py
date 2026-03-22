@@ -2,9 +2,9 @@ import json
 import os
 import subprocess
 
-from PyQt5.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
+from PyQt6.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QStandardItem, QStandardItemModel
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
                              QListWidgetItem, QMenu, QPushButton, QTableView,
                              QWidget)
 

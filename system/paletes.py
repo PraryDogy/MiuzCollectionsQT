@@ -1,5 +1,5 @@
-from PyQt5.QtGui import QColor, QPalette
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtGui import QColor, QPalette
+from PyQt6.QtWidgets import QApplication
 
 from cfg import Cfg
 
@@ -50,7 +50,7 @@ class ThemeChanger:
         app: QApplication = QApplication.instance()
         if Cfg.dark_mode == 0:
             app.setPalette(QPalette())
-            app.setStyle("macintosh")
+            app.setStyle("macos")
         elif Cfg.dark_mode == 1:
             app.setPalette(UPallete.dark())
             app.setStyle("Fusion")
