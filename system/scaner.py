@@ -5,7 +5,7 @@ from multiprocessing import Queue
 from time import sleep
 
 import sqlalchemy
-from sqlalchemy.dialects.sqlite import insert
+from sqlalchemy.dialects.sqlite import insert as dialect_insert
 
 from cfg import Static
 from system.database import ClmnNames, Dbase, Dirs, Thumbs
@@ -494,7 +494,7 @@ class DbImgUpdater:
                 ClmnNames.fav: 0,
                 ClmnNames.mf_alias: scaner_item.mf.mf_alias
             })
-        stmt = insert(Thumbs.table).values(values_list)
+        stmt = dialect_insert(Thumbs.table).values(values_list)
         stmt = stmt.on_conflict_do_update(
             index_elements=[Thumbs.rel_thumb_path],
             set_={
