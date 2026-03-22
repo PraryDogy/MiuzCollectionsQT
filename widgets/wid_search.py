@@ -52,6 +52,11 @@ class WidSearch(ULineEdit):
             (ClearBtn.svg_size * 2) // 4
         )
 
+        self.setStyleSheet(
+            self.styleSheet() + "border-radius: 3px;"
+        )
+
+
     def create_search(self, new_text):
         if len(new_text) > 0:
             Dynamic.search_widget_text = new_text

@@ -290,7 +290,6 @@ class UListWidgetItem(QListWidgetItem):
         if text:
             self.setText(text)
 
-
 class UListSpacerItem(QListWidgetItem):
     def __init__(self, parent: QListWidget, height: int = 15):
         super().__init__()

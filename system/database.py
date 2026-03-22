@@ -77,7 +77,7 @@ class Dirs:
 
 
 class Dbase:
-    engine: sqlalchemy.Engine = None
+    main_engine: sqlalchemy.Engine = None
     _timeout = 5
     _echo = False
     _same_thread = False
@@ -85,8 +85,8 @@ class Dbase:
 
     @classmethod
     def init(cls) -> sqlalchemy.Engine:
-        engine = cls.create_engine()
-        cls.toggle_wal(engine, False)
+        Dbase.main_engine = cls.create_engine()
+        cls.toggle_wal(False)
 
     @classmethod
     def create_engine(cls):
@@ -106,8 +106,8 @@ class Dbase:
             raise Exception(t)
         
     @classmethod
-    def toggle_wal(cls, engine: sqlalchemy.Engine, value: bool):
-        conn = engine.connect()
+    def toggle_wal(cls, value: bool):
+        conn = Dbase.main_engine.connect()
         if value:
             conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
             cls.WAL_ = True
@@ -118,7 +118,7 @@ class Dbase:
 
     @classmethod
     def vacuum(cls):
-        conn = cls.engine.connect()
+        conn = cls.main_engine.connect()
 
         try:
             conn.execute(sqlalchemy.text("VACUUM"))

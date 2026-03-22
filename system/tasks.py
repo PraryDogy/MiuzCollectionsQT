@@ -98,7 +98,7 @@ class FavManager(URunnable):
         self.sigs = FavManager.Sigs()
         self.rel_path = rel_path
         self.value = value
-        self.conn = Dbase.engine.connect()
+        self.conn = Dbase.main_engine.connect()
 
     def task(self):
         """Обновляет поле 'fav' в БД и эмитит сигнал с результатом."""
@@ -143,7 +143,7 @@ class DbImagesLoader(URunnable):
     def __init__(self):
         super().__init__()
         self.sigs = DbImagesLoader.Sigs()
-        self.conn = Dbase.engine.connect()
+        self.conn = Dbase.main_engine.connect()
 
     def task(self):
         try:
@@ -251,7 +251,7 @@ class MfDataCleaner(URunnable):
         super().__init__()
         self.sigs = MfDataCleaner.Sigs()
         self.mf_name = mf_name
-        self.conn = Dbase.engine.connect()
+        self.conn = Dbase.main_engine.connect()
 
     def task(self):
         try:
@@ -304,7 +304,7 @@ class DbDirsLoader(URunnable):
         super().__init__()
         self.sigs = DbDirsLoader.Sigs()
         self.mf = mf
-        self.conn = Dbase.engine.connect()
+        self.conn = Dbase.main_engine.connect()
 
     def task(self):
         try:
@@ -344,7 +344,7 @@ class HashDirSize(URunnable):
     def __init__(self):
         super().__init__()
         self.sigs = HashDirSize.Sigs()
-        self.conn = Dbase.engine.connect()
+        self.conn = Dbase.main_engine.connect()
 
     def task(self):
         try:
