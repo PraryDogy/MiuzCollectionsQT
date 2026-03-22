@@ -80,9 +80,9 @@ class UMenu(UMenuBase):
 
     def show_menu(self):
         if self.event_:
-            self.exec_(self.event_.globalPos())
+            self.exec(self.event_.globalPos())
         else:
-            self.exec_()
+            self.exec()
 
 
 class USubMenu(UMenuBase):

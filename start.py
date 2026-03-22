@@ -50,7 +50,7 @@ class System_:
         l.addWidget(QPushButton("Закрыть", clicked=d.close))
         d.resize(500, 400)
         d.setFocus()
-        d.exec_()
+        d.exec()
 
     def catch_error_in_proj(exctype, value, tb):
         if exctype == RuntimeError:
@@ -237,12 +237,12 @@ class App(QApplication):
             first_load.copy_preload_files.connect(copy_preload_files)
             first_load.copy_preload_files.connect(self.start_app)
             first_load.setup_new_mf.connect(setup_new_mf)
-            first_load.exec_()
+            first_load.exec()
 
         def lng_win():
             lng_win = LanguageSelect()
             lng_win.closed_.connect(first_load_win)
-            lng_win.exec_()
+            lng_win.exec()
 
         json_to_app()
         if not Cfg.check_files():

@@ -603,8 +603,13 @@ class Grid(VScrollArea):
         if self.glob_col != 0:
             _next_row()
 
-    def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumbnail:
-        wid = QApplication.widgetAt(a0.globalPos())
+    def get_clicked_widget(self, a0: QMouseEvent | QContextMenuEvent) -> None | Thumbnail:
+        if isinstance(a0, QMouseEvent):
+            pos = a0.globalPosition().toPoint()
+        elif isinstance(a0, QContextMenuEvent):
+            pos = a0.globalPos()
+        
+        wid = QApplication.widgetAt(pos)
         if isinstance(wid, (ImgWid, FilenameWid)):
             return wid.parent()
         else:
@@ -1104,7 +1109,7 @@ class Grid(VScrollArea):
 
             # назначаем urls
             mime_data.setUrls([QUrl.fromLocalFile(p) for p in paths])
-            drag.exec_(Qt.DropAction.CopyAction)
+            drag.exec(Qt.DropAction.CopyAction)
 
         # --- Основная логика ---
         if self.wid_under_mouse is None and not self.rubberBand.isVisible():

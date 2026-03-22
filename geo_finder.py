@@ -625,4 +625,4 @@ if __name__ == "__main__":
     app.aboutToQuit.connect(MainWindow.on_exit)
     w = MainWindow()
     w.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

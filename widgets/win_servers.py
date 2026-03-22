@@ -79,7 +79,7 @@ class ServersWidget(QTableView):
         menu = QMenu(self)
         copy_action = menu.addAction(Lng.copy[Cfg.lng])
         delete_action = menu.addAction(Lng.delete[Cfg.lng])
-        action = menu.exec_(self.viewport().mapToGlobal(pos))
+        action = menu.exec(self.viewport().mapToGlobal(pos))
 
         if action == copy_action:
             QApplication.clipboard().setText(row_text)
