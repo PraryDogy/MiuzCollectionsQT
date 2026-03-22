@@ -31,9 +31,13 @@ class UVBoxLayout(QVBoxLayout):
         self.setSpacing(0)
 
 
+from PyQt6.QtWidgets import QMenu, QApplication
+from PyQt6.QtGui import QPalette
+from PyQt6.QtCore import Qt
+
 class UMenuBase(QMenu):
     """
-    Базовый QMenu с кастомной окраской разделителей, подстроенной под цвет текста приложения.
+    Базовый QMenu с кастомной окраской разделителей и закруглёнными углами.
     """
 
     def __init__(self, *args, **kwargs):
@@ -50,8 +54,17 @@ class UMenuBase(QMenu):
         }
         sep_color = color_data.get(text_color, "#8a8a8a")  # дефолт
 
+        # --- флаги окна и прозрачность для скруглений ---
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
         # --- стили ---
         self.setStyleSheet(f"""
+            QMenu {{
+                background-color: {palette.color(QPalette.ColorRole.Base).name()};
+                border-radius: 6px;
+                padding: 5px;
+            }}
             QMenu::separator {{
                 height: 1px;
                 background: {sep_color};
