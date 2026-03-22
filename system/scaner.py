@@ -514,7 +514,8 @@ class DbImgUpdater:
                 ColumnNames.fav: 0,
                 ColumnNames.mf_alias: scaner_item.mf.mf_alias
             })
-        conn.execute(sqlalchemy.insert(Thumbs.table), values_list)
+        stmt = sqlalchemy.insert(Thumbs.table), values_list
+        conn.execute(stmt)
         conn.commit()
         conn.close()
 
