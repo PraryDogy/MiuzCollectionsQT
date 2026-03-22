@@ -516,17 +516,17 @@ class DbImgUpdater:
                 ColumnNames.mf_alias: scaner_item.mf.mf_alias
             })
         stmt = insert(Thumbs.table).values(values_list)
-        stmt = stmt.on_conflict_update(
+        stmt = stmt.on_conflict_do_update(
             index_elements=[Thumbs.rel_thumb_path],
             set_={
-                ColumnNames.rel_item_path: rel_img_path,
-                ColumnNames.size: img_item.size,
-                ColumnNames.birth: 0,
-                ColumnNames.mod: img_item.mod,
-                ColumnNames.resol: "none",
-                ColumnNames.coll: "none",
-                ColumnNames.fav: 0,
-                ColumnNames.mf_alias: scaner_item.mf.mf_alias
+                ColumnNames.rel_item_path: stmt.excluded[rel_img_path],
+                ColumnNames.size: stmt.excluded[img_item.size],
+                ColumnNames.birth: stmt.excluded[0],
+                ColumnNames.mod: stmt.excluded[img_item.mod],
+                ColumnNames.resol: stmt.excluded["none"],
+                ColumnNames.coll: stmt.excluded["none"],
+                ColumnNames.fav: stmt.excluded[0],
+                ColumnNames.mf_alias: stmt.excluded[scaner_item.mf.mf_alias]
             }
         )
         conn.execute(stmt)
