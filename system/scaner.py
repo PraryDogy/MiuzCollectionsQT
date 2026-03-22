@@ -450,7 +450,7 @@ class HashdirImgUpdater:
 class DbImgUpdater:
 
     @staticmethod
-    def remove_del_imgs(scaner_item: IntScanerItem, del_images: list[ImgItem]):
+    def delete_records(scaner_item: IntScanerItem, del_images: list[ImgItem]):
         """
         Удаляет из БД удаленные изображения.
         """
@@ -467,7 +467,7 @@ class DbImgUpdater:
         scaner_item.q.put(ext_item)
 
     @staticmethod
-    def add_new_imgs(scaner_item: IntScanerItem, new_images: list[ImgItem]):
+    def upsert_records(scaner_item: IntScanerItem, new_images: list[ImgItem]):
         """
         Добавляет записи из БД об успешно сохраненных изображениях.
         """
@@ -539,7 +539,7 @@ class NewDirsWorker:
             del_images=del_images
         )
         # обновляем БД об успешно удаленных миниатюрах
-        DbImgUpdater.remove_del_imgs(
+        DbImgUpdater.delete_records(
             scaner_item=scaner_item,
             del_images=ok_del_images
         )
@@ -562,7 +562,7 @@ class NewDirsWorker:
             )
 
             # обновляем БД об успешно созданных миниатюрах
-            DbImgUpdater.add_new_imgs(
+            DbImgUpdater.upsert_records(
                 scaner_item=scaner_item,
                 new_images=ok_chunks
             )
