@@ -107,7 +107,7 @@ class ClickableGroupBox(QGroupBox):
         layout = QVBoxLayout(self)
         self.label = QLabel(title)
         self.label.setWordWrap(True)
-        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.label)
 
     def mouseReleaseEvent(self, event):

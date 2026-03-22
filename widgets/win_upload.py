@@ -52,7 +52,7 @@ class TreeWid(QTreeWidget):
                 item = QTreeWidgetItem([part])
                 item.setIcon(0, QIcon(self.svg_folder))
                 item.setSizeHint(0, QSize(0, self.item_height))
-                item.setData(0, Qt.UserRole, current_path)
+                item.setData(0, Qt.ItemDataRole.UserRole, current_path)
                 if parent_item:
                     parent_item.addChild(item)
                 else:
@@ -66,7 +66,7 @@ class TreeWid(QTreeWidget):
             file_item = QTreeWidgetItem([file_name])
             file_item.setIcon(0, QIcon(self.svg_image))
             file_item.setSizeHint(0, QSize(0, self.item_height))
-            file_item.setData(0, Qt.UserRole, file_name)
+            file_item.setData(0, Qt.ItemDataRole.UserRole, file_name)
             parent_item.addChild(file_item)
 
         self.expand_to_path(target_dir)

@@ -55,7 +55,7 @@ class ServersWidget(QTableView):
         self.verticalHeader().setDefaultSectionSize(25)
 
         # Контекстное меню
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
 
     def add_row(self, data: list[str]):

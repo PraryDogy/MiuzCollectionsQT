@@ -393,7 +393,7 @@ class ThemesBtn(QFrame):
         svg_lay.addWidget(self.svg_widget)
 
         label = ULabel(label_text)
-        label.setAlignment(Qt.AlignCenter)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         v_lay.addWidget(label)
 
     def regular_style(self):
@@ -423,7 +423,7 @@ class ThemesBtn(QFrame):
             )
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
 
 

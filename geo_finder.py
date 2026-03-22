@@ -520,7 +520,7 @@ class MainWindow(QWidget):
         for color_name, (lower, upper, hex_color) in search_colors.items():
             item = QListWidgetItem(color_name)
             item.setSizeHint(QSize(0, 28))
-            item.setCheckState(Qt.Checked if color_name in self.selected_colors else Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Checked if color_name in self.selected_colors else Qt.CheckState.Unchecked)
             item.value = (lower, upper)
 
             pixmap = QPixmap(12, 12)
@@ -565,11 +565,11 @@ class MainWindow(QWidget):
                 print("GeoFinder MainWindow remove file error", e)    
 
     def on_color_item_changed(self, item: QListWidgetItem):
-        if item.checkState() == Qt.Checked:
-            item.setCheckState(Qt.Unchecked)
+        if item.checkState() == Qt.CheckState.Checked:
+            item.setCheckState(Qt.CheckState.Unchecked)
             self.selected_colors.pop(item.text(), None)
         else:
-            item.setCheckState(Qt.Checked)
+            item.setCheckState(Qt.CheckState.Checked)
             self.selected_colors[item.text()] = item.value
     
     def start_cmd(self):

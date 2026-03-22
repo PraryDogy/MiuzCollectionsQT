@@ -54,7 +54,7 @@ class CustomSlider(QSlider):
 
     def mousePressEvent(self, ev: QMouseEvent) -> None:
         """Устанавливает значение слайдера при клике мышью по шкале."""
-        if ev.button() != Qt.LeftButton:
+        if ev.button() != Qt.MouseButton.LeftButton:
             ev.ignore()
             return
 
