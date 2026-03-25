@@ -365,10 +365,11 @@ class DbImgUpdater:
         """
         conn = scaner_item.engine.connect()
 
-        del_stmt = sqlalchemy.delete(Thumbs.table).where(
-            Thumbs.rel_thumb_path.in_([i.rel_thumb_path for i in new_images]),
-            Thumbs.mf_alias == scaner_item.mf.mf_alias
+        del_stmt = sqlalchemy.delete(Thumbs.table)
+        del_stmt = del_stmt.where(Thumbs.rel_thumb_path.in_(
+            [i.rel_thumb_path for i in new_images])
         )
+        del_stmt = del_stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
         conn.execute(del_stmt)
         conn.commit()
 
