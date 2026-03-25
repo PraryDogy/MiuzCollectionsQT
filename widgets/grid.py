@@ -971,30 +971,36 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
-            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                # cut / copy / paste
-                act = CutFiles(self.menu_, len(rel_paths))
-                act.triggered.connect(
-                    lambda: self.set_clipboard.emit(("cut", rel_paths))
-                )
-                self.menu_.addAction(act)
+            self.menu_.addSeparator()
 
-                act = CopyFiles(self.menu_, len(rel_paths))
-                act.triggered.connect(
-                    lambda: self.set_clipboard.emit(("copy", rel_paths))
-                )
-                self.menu_.addAction(act)
+            advanced_menu = USubMenu(
+                Lng.advanced[Cfg.lng_index],
+                self.menu_
+            )
+            self.menu_.addMenu(advanced_menu)
 
-                self.menu_.addSeparator()
+            act = CutFiles(self.menu_, len(rel_paths))
+            act.triggered.connect(
+                lambda: self.set_clipboard.emit(("cut", rel_paths))
+            )
+            advanced_menu.addAction(act)
+
+            act = CopyFiles(self.menu_, len(rel_paths))
+            act.triggered.connect(
+                lambda: self.set_clipboard.emit(("copy", rel_paths))
+            )
+            advanced_menu.addAction(act)
+
+            if len(rel_paths) == 1:
+                advanced_menu.addSeparator()
                 update_thumb = UpdateThumbAction(self.menu_)
                 update_thumb.triggered.connect(
                     lambda: self.update_thumb.emit(
                         self.wid_under_mouse.rel_path
                     )
                 )
-                self.menu_.addAction(update_thumb)
+                advanced_menu.addAction(update_thumb)
 
-                self.menu_.addSeparator()
 
         if not clicked_wid:
             menu_empty()

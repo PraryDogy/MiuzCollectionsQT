@@ -375,3 +375,7 @@ class Lng:
         "Обновить изображение",
         "Update image"
     )
+    advanced = (
+        "Дополнительно",
+        "Advanced"
+    )
