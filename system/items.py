@@ -36,7 +36,6 @@ class ScanerItem:
     q: Queue
     lng_index: int
     total_count: int
-    mf_real_name: str
 
 
 @dataclass(slots=True)
