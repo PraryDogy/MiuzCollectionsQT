@@ -282,7 +282,10 @@ class ImgUtils:
             import cairosvg
             png_data = cairosvg.svg2png(url=path)
             nparr = np.frombuffer(png_data, np.uint8)
-            return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
+            img = cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
+            if img is None:
+                return cls._get_broken_image()
+            return img
         except Exception as e:
             print("read svg error", e)
             return cls._get_broken_image()
@@ -371,7 +374,7 @@ class ImgUtils:
             return cls._get_broken_image()
 
     @classmethod
-    def _read_any(cls, path: str):
+    def _read_any(cls, path: str) -> np.ndarray:
         ...
 
     @classmethod
