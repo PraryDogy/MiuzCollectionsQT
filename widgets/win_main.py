@@ -587,17 +587,15 @@ class WinMain(UMainWindow):
         if not hasattr(self, "scaner_task") or not self.scaner_task:
             self.scaner_poll_timer.start(ms)
             return
-        reload_gui_ = False
         while not self.scaner_task.process_queue.empty():
-            text, reload_gui = self.scaner_task.process_queue.get()
-            if not reload_gui_:
-                reload_gui_ = reload_gui
+            text = self.scaner_task.process_queue.get()
             if self.bar_bottom.progress_bar.text() != text:
                 self.bar_bottom.progress_bar.setText(text)
         if not self.scaner_task.is_alive():
             self.scaner_task.terminate_join()
             self.bar_bottom.progress_bar.start_timer_text()
-            if reload_gui_:
+            new_db_time = int(os.stat(Static.external_db).st_mtime)
+            if self.db_mtime != new_db_time:
                 self.grid.reload_thumbnails()
                 self.left_menu.tree_wid.init_ui()
         else:
@@ -608,6 +606,7 @@ class WinMain(UMainWindow):
         if not hasattr(self, "scaner_task"):
             # print("первая инициация сканера")
             self.scaner_task = None
+            self.db_mtime = 0
 
             self.scaner_check_timer = QTimer(self)
             self.scaner_check_timer.setSingleShot(True)
@@ -639,6 +638,7 @@ class WinMain(UMainWindow):
                     args=(Mf.mf_list, Cfg.lng_index, )
                 )
                 self.scaner_data.clear()
+            self.db_mtime = int(os.stat(Static.external_db).st_mtime)
             self.bar_bottom.progress_bar.stop_timer_text()
             self.scaner_task.start()
             self.scaner_poll_timer.stop()

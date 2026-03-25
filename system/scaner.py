@@ -16,8 +16,8 @@ from .items import (ScanerDirItem, ScanerImgItem, ScanerItem,
 
 
 class Gui:
-    def send_data(queue: Queue, text: str, reload_gui: bool = False):
-        queue.put((text, reload_gui))
+    def send_text(queue: Queue, text: str):
+        queue.put(text)
 
 
 class AllDirLoader:
@@ -32,7 +32,7 @@ class AllDirLoader:
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        Gui.send_data(scaner_item.queue, text)
+        Gui.send_text(scaner_item.queue, text)
 
         dirs: list[ScanerDirItem] = []
         stack = [scaner_item.mf.mf_current_path]
@@ -178,7 +178,7 @@ class ImgLoader:
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        Gui.send_data(scaner_item.queue, text)
+        Gui.send_text(scaner_item.queue, text)
         finder_images: list[ScanerImgItem] = []
         for dir_item in dirs_to_scan:
             try:
@@ -291,7 +291,7 @@ class HashdirImgUpdater:
         """
         for img_item in del_images:
             scaner_item.total_count -= 1
-            Gui.send_data(
+            Gui.send_text(
                 scaner_item.queue,
                 HashdirImgUpdater.get_gui_text(scaner_item)
             )
@@ -313,7 +313,7 @@ class HashdirImgUpdater:
         """
         for img_item in new_images:
             scaner_item.total_count -= 1
-            Gui.send_data(
+            Gui.send_text(
                 scaner_item.queue,
                 HashdirImgUpdater.get_gui_text(scaner_item)
             )
@@ -510,7 +510,7 @@ class AllDirScaner:
                     f"{scaner_item.mf.mf_alias}: "
                     f"{Lng.no_connection[lng_index].lower()}"
                 )
-                Gui.send_data(scaner_item.queue, text)
+                Gui.send_text(scaner_item.queue, text)
                 print(text)
                 sleep(3)
         engine.dispose()
@@ -528,9 +528,7 @@ class AllDirScaner:
         # это нужно, когда удалена вся папка "имя папки"
         # то есть не когда "имя папки" пуста, но существует,
         # а когда папка "имя папки" не существует
-        reload_gui = False
         if removed_dirs:
-            reload_gui = True
             conn = scaner_item.engine.connect()
             for dir_item in removed_dirs:
                 RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
@@ -538,9 +536,8 @@ class AllDirScaner:
             conn.commit()
             conn.close()
         if dirs_to_scan:
-            reload_gui = True
             DirsToScanWorker.start(dirs_to_scan, scaner_item)
-        Gui.send_data(scaner_item.queue, "", reload_gui)
+        Gui.send_text(scaner_item.queue, "")
 
 
 class SingleDirScaner:
@@ -586,8 +583,6 @@ class SingleDirScaner:
                 )
                 if item not in dir_items:
                     dir_items.append(item)
-            reload_gui = False
             if dir_items:
                 DirsToScanWorker.start(dir_items, scaner_item)
-                reload_gui = True
-            Gui.send_data(scaner_item.queue, "", reload_gui)
+            Gui.send_text(scaner_item.queue, "")
