@@ -466,12 +466,12 @@ class ImgUtils:
         return resol
     
     @classmethod
-    def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray | None:
+    def fit_to_thumb(cls, image: np.ndarray, size: int):
         try:
             h, w = image.shape[:2]
             if h == 0 or w == 0:
                 print("fit_to_thumb: пустое изображение")
-                return None
+                return cls.fit_to_thumb(cls._get_broken_image())
 
             scale = size / max(h, w)
             new_w = max(1, int(w * scale))
@@ -484,7 +484,7 @@ class ImgUtils:
             )
         except Exception as e:
             print(f"fit_to_thumb: ошибка масштабирования: {e}")
-            return None
+            return cls.fit_to_thumb(cls._get_broken_image())
 
     @classmethod
     def write_thumb(cls, thumb_path: str, thumb: np.ndarray) -> bool:
