@@ -119,7 +119,7 @@ class BarMacos(QMenuBar):
         super().__init__()
         self.mainMenu = QMenu(Lng.menu[Cfg.lng_index], self)
 
-        server_win = QAction("Подключение (⌘ + K)", self)
+        server_win = QAction(Lng.connect_to_server[Cfg.lng_index], self)
         server_win.triggered.connect(self.open_server_window)
         self.mainMenu.addAction(server_win)
 
