@@ -656,16 +656,20 @@ class AllDirScaner:
                 RemovedDirsWorker.remove_dirs(dir_item, scaner_item, conn)
             conn.commit()
             conn.close()
+            # обновляем ГУИ чтобы исчезли удаленные папки
+            ext_scaner_item = ExtScanerItem(
+                gui_text="",
+                reload_gui=True
+            )
+            scaner_item.q.put(ext_scaner_item)
 
         if dirs_to_scan:
-        #     # new_dirs.extend(removed_dirs)
-            del_images, new_images = DirsToScanWorker.start(new_dirs, scaner_item)
-        #     if del_images or new_images:
-        #         ext_scaner_item = ExtScanerItem(
-        #             gui_text="",
-        #             reload_gui=True
-        #         )
-        #         scaner_item.q.put(ext_scaner_item)
+            DirsToScanWorker.start(dirs_to_scan, scaner_item)
+            ext_scaner_item = ExtScanerItem(
+                gui_text="",
+                reload_gui=True
+            )
+            scaner_item.q.put(ext_scaner_item)
 
         # # тогда это улетает в RemovedDirsWorker
         # if removed_dirs:
