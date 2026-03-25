@@ -250,9 +250,9 @@ class _DeletedMfRemover:
         queue.put(removed_mf_list)
     
     @staticmethod
-    def get_rows(mf_name: str, conn: sqlalchemy.Connection):
+    def get_rows(mf_alias: str, conn: sqlalchemy.Connection):
         q = sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path).where(
-            Thumbs.mf_alias == mf_name
+            Thumbs.mf_alias == mf_alias
         )
         return [
             (id_, Utils.get_abs_thumb_path(rel_thumb_path))
