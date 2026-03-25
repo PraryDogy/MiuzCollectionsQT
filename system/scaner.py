@@ -17,9 +17,12 @@ from system.utils import Utils
 from .items import ExtScanerItem, IntScanerItem, SingleDirScanerItem
 
 
-def put(q: Queue, text: str, reload_gui: bool):
-    item = ExtScanerItem(text, reload_gui)
-    q.put(item)
+class Gui:
+    item = ExtScanerItem("", None)
+    def send_data(q: Queue, text: str, reload_gui: bool = False):
+        Gui.item.gui_text = text
+        Gui.item.reload_gui = reload_gui
+        q.put(Gui.item)
 
 
 @dataclass(slots=True)
@@ -65,7 +68,7 @@ class AllDirLoader:
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        put(scaner_item.q, text, False)
+        Gui.send_data(scaner_item.q, text)
 
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.mf_current_path]
@@ -207,14 +210,11 @@ class ImgLoader:
         Собирает список `ImgItem` из указанных директорий:
         - fider_images список ImgItem
         """
-        # передает в гуи текст
-        # имя папки: поиск
-        gui_text = (
+        text = (
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        ext_scaner_item = ExtScanerItem(gui_text, False)
-        scaner_item.q.put(ext_scaner_item)
+        Gui.send_data(scaner_item.q, text)
         finder_images: list[ImgItem] = []
         for dir_item in dirs_to_scan:
             try:
