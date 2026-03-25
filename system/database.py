@@ -26,7 +26,7 @@ _table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column(ClmnNames.id, sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column(ClmnNames.rel_item_path, sqlalchemy.Text),
-    sqlalchemy.Column(ClmnNames.rel_thumb_path, sqlalchemy.Text, unique=True),
+    sqlalchemy.Column(ClmnNames.rel_thumb_path, sqlalchemy.Text),
     sqlalchemy.Column(ClmnNames.size, sqlalchemy.Integer),
     sqlalchemy.Column(ClmnNames.birth, sqlalchemy.Integer),
     sqlalchemy.Column(ClmnNames.mod, sqlalchemy.Integer),
@@ -129,7 +129,7 @@ class Dbase:
         conn.close()
 
     @classmethod
-    def set_short_hash_unique(cls):
+    def set_short_hash_not_unique(cls):
         old_table = "thumbs"
         new_table = "thumbs_new"
 
@@ -139,7 +139,7 @@ class Dbase:
             CREATE TABLE {new_table} (
                 {ClmnNames.id} INTEGER PRIMARY KEY,
                 {ClmnNames.rel_item_path} TEXT,
-                {ClmnNames.rel_thumb_path} TEXT UNIQUE,
+                {ClmnNames.rel_thumb_path} TEXT,
                 {ClmnNames.size} INTEGER,
                 {ClmnNames.birth} INTEGER,
                 {ClmnNames.mod} INTEGER,
