@@ -495,9 +495,8 @@ class Grid(VScrollArea):
                 self.rearrange()
                 self.grid_wid.show()
                 for i in prev_selection:
-                    self.wid_to_selected_widgets(
-                        self.path_to_wid[i]
-                    )
+                    if i in self.path_to_wid:
+                        self.wid_to_selected_widgets(self.path_to_wid[i])
                 if self.go_to_url and self.go_to_url in self.path_to_wid:
                     wid = self.path_to_wid[self.go_to_url]
                     wid.set_frame()
