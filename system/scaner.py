@@ -21,6 +21,8 @@ class Gui:
     def send_data(q: Queue, text: str, reload_gui: bool = False):
         q.put((text, reload_gui))
 
+        print(text)
+
 
 @dataclass(slots=True)
 class DirItem:
@@ -324,7 +326,10 @@ class HashdirImgUpdater:
         """
         for img_item in del_images:
             scaner_item.total_count -= 1
-            Gui.send_data(scaner_item.q, HashdirImgUpdater.get_gui_text())
+            Gui.send_data(
+                scaner_item.q,
+                HashdirImgUpdater.get_gui_text(scaner_item)
+            )
             abs_thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
             root = os.path.dirname(abs_thumb_path)
             try:
@@ -343,7 +348,10 @@ class HashdirImgUpdater:
         """
         for img_item in new_images:
             scaner_item.total_count -= 1
-            Gui.send_data(scaner_item.q, HashdirImgUpdater.get_gui_text())
+            Gui.send_data(
+                scaner_item.q,
+                HashdirImgUpdater.get_gui_text(scaner_item)
+            )
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
             try:
