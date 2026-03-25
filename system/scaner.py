@@ -174,11 +174,6 @@ class ImgLoader:
         Собирает список `ImgItem` из указанных директорий:
         - fider_images список ImgItem
         """
-        text = (
-            f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.search_in[scaner_item.lng_index].lower()}"
-        )
-        Gui.send_text(scaner_item.queue, text)
         finder_images: list[ScanerImgItem] = []
         for dir_item in dirs_to_scan:
             try:
@@ -537,7 +532,6 @@ class AllDirScaner:
             conn.close()
         if dirs_to_scan:
             DirsToScanWorker.start(dirs_to_scan, scaner_item)
-        Gui.send_text(scaner_item.queue, "")
 
 
 class SingleDirScaner:
@@ -585,4 +579,3 @@ class SingleDirScaner:
                     dir_items.append(item)
             if dir_items:
                 DirsToScanWorker.start(dir_items, scaner_item)
-            Gui.send_text(scaner_item.queue, "")

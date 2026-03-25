@@ -593,6 +593,7 @@ class WinMain(UMainWindow):
                 self.bar_bottom.progress_bar.setText(text)
         if not self.scaner_task.is_alive():
             self.scaner_task.terminate_join()
+            self.bar_bottom.progress_bar.setText("")
             self.bar_bottom.progress_bar.start_timer_text()
             new_db_time = int(os.stat(Static.external_db).st_mtime)
             if self.db_mtime != new_db_time:
