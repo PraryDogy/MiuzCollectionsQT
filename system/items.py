@@ -45,7 +45,7 @@ class IntScanerItem:
         """
         super().__init__()
         self.mf: Mf = kw["mf"]
-        self.eng: sqlalchemy.Engine = kw["eng"]
+        self.engine: sqlalchemy.Engine = kw["eng"]
         self.q: Queue = kw["q"]
         self.lng_index: int = kw["lng_index"]
 

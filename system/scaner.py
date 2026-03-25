@@ -50,17 +50,6 @@ class ImgItem:
 
 class AllDirLoader:
     @staticmethod
-    def start(scaner_item: IntScanerItem):
-        """
-        - Собирает список всех вложенных директорий в каталоге `Mf.curr_path`
-        - Собирает список всех директорий из базы данных, которые
-          соответствуют `Mf.alias`
-        """
-        finder_dirs = AllDirLoader.get_finder_dirs(scaner_item)
-        db_dirs = AllDirLoader.get_db_dirs(scaner_item)
-        return (finder_dirs, db_dirs)
-
-    @staticmethod
     def get_finder_dirs(scaner_item: IntScanerItem):
         """
         Собирает список директорий, которые:
@@ -118,7 +107,7 @@ class AllDirLoader:
         Возвращает список директорий из базы данных, которые:
         - соответствуют условию DIRS.c.brand == `Mf.alias`
         """
-        conn = scaner_item.eng.connect()
+        conn = scaner_item.engine.connect()
         q = sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod).where(
             Dirs.mf_alias == scaner_item.mf.mf_alias
         )
@@ -137,16 +126,6 @@ class AllDirLoader:
 
 
 class DirsCompator:
-    @staticmethod
-    def start(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
-        """
-        Сравнивает директории из Finder и из базы данных:
-        - Создает список удаленных директорий (нет в Finer, есть в БД)
-        - Создает список новых директорий (есть в Finder, нет в БД)
-        """
-        dirs_to_remove = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
-        dirs_to_scan = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
-        return (dirs_to_remove, dirs_to_scan)
 
     @staticmethod
     def get_dirs_to_remove(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
@@ -217,7 +196,7 @@ class DbDirUpdater:
         # удалить старые записи
         if not dirs_to_scan:
             return
-        conn = scaner_item.eng.connect()
+        conn = scaner_item.engine.connect()
         rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
         del_stmt = sqlalchemy.delete(Dirs.table).where(
             Dirs.rel_dir_path.in_(rel_paths),
@@ -243,20 +222,10 @@ class DbDirUpdater:
 
 class ImgLoader:
     @staticmethod
-    def start(scaner_item: IntScanerItem, dirs_to_scan: list[DirItem]):
-        """
-        - Обходит список `DirItem`:
-            - Находит в Finder изображения и создает список `ImgItem`
-            - Создает список `ImgItem` из записей БД с фильтрами:
-                - Только из итерируемой директории
-                - Если запись соответствует `Mf.alias`
-        """
-        finder_images = ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
-        db_images = ImgLoader.get_db_images(scaner_item, dirs_to_scan)
-        return (finder_images, db_images)
-
-    @staticmethod
-    def get_finder_images(scaner_item: IntScanerItem, dir_list: list[DirItem]):
+    def get_finder_images(
+        scaner_item: IntScanerItem,
+        dirs_to_scan: list[DirItem]
+    ):
         """
         Собирает список `ImgItem` из указанных директорий:
         - fider_images список ImgItem
@@ -270,7 +239,7 @@ class ImgLoader:
         ext_scaner_item = ExtScanerItem(gui_text, False)
         scaner_item.q.put(ext_scaner_item)
         finder_images: list[ImgItem] = []
-        for dir_item in dir_list:
+        for dir_item in dirs_to_scan:
             try:
                 scandir_iterator = os.scandir(dir_item.abs_path)
             except Exception as e:
@@ -295,14 +264,17 @@ class ImgLoader:
         return finder_images
 
     @staticmethod
-    def get_db_images(scaner_item: IntScanerItem, dir_list: list[DirItem]):
+    def get_db_images(
+        scaner_item: IntScanerItem,
+        dirs_to_scan: list[DirItem]
+    ):
         """
         Возвращает информацию об изображениях в БД из указанных директорий:
         - db_images список ImgItem
         """
-        conn = scaner_item.eng.connect()
+        conn = scaner_item.engine.connect()
         db_images: list[ImgItem] = []
-        for dir_item in dir_list:
+        for dir_item in dirs_to_scan:
             q = sqlalchemy.select(
                 Thumbs.rel_thumb_path,
                 Thumbs.rel_img_path,
@@ -454,7 +426,7 @@ class DbImgUpdater:
         """
         Удаляет из БД удаленные изображения.
         """
-        conn = scaner_item.eng.connect()
+        conn = scaner_item.engine.connect()
         q = sqlalchemy.delete(Thumbs.table).where(
             Thumbs.rel_thumb_path.in_([i.rel_thumb_path for i in del_images]),
             Thumbs.mf_alias == scaner_item.mf.mf_alias
@@ -470,7 +442,7 @@ class DbImgUpdater:
         """
         Добавляет записи из БД об успешно сохраненных изображениях.
         """
-        conn = scaner_item.eng.connect()
+        conn = scaner_item.engine.connect()
 
         del_stmt = sqlalchemy.delete(Thumbs.table).where(
             Thumbs.rel_thumb_path.in_([i.rel_thumb_path for i in new_images]),
@@ -508,7 +480,7 @@ class DbImgUpdater:
         conn.close()
 
 
-class NewDirsWorker:    
+class DirsToScanWorker:    
     @staticmethod
     def start(dirs_to_scan: list[DirItem], scaner_item: IntScanerItem):
         """
@@ -517,15 +489,9 @@ class NewDirsWorker:
         - на основе этого списка добавляются и удаляются миниатюры в "hashdir"
         - обновляются базы данных THUMBS и DIRS
         """
-
-        finder_images, db_images = ImgLoader.start(
-            scaner_item=scaner_item,
-            dirs_to_scan=dirs_to_scan
-        )
-        del_images, new_images = ImgCompator.start(
-            finder_images=finder_images,
-            db_images=db_images
-        )
+        finder_images = ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
+        db_images = ImgLoader.get_db_images(scaner_item, dirs_to_scan)
+        del_images, new_images = ImgCompator.start(finder_images, db_images)
         # общий счет для отображения в GUI
         scaner_item.total_count = len(del_images) + len(new_images)
         # удаляем миниатюры
@@ -583,18 +549,6 @@ class NewDirsWorker:
 # ЭТОТ КЛАСС НУЖЕН ЕСЛИ САМА ПАПКА С ФОТКАМИ БЫЛА УДАЛЕНА
 
 class RemovedDirsWorker:
-    @staticmethod
-    def start(dirs_to_del: list[DirItem], scaner_item: IntScanerItem):
-        """
-        Если директория с содержимым была удалена, она не попадет в new_dirs,
-        так как ее как бы не существует
-        """
-        conn = scaner_item.eng.connect()
-        for dir_item in dirs_to_del:
-            RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
-            RemovedDirsWorker.remove_dir_entry(dir_item, scaner_item, conn)
-        conn.commit()
-        conn.close()
 
     @staticmethod
     def remove_thumbs(
@@ -602,31 +556,39 @@ class RemovedDirsWorker:
         scaner_item: IntScanerItem,
         conn: sqlalchemy.Connection
     ):
-        stmt = (
-            sqlalchemy.select(Thumbs.rel_thumb_path)
+        """
+        Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
+        """
+        stmt_thumbs_to_remove = (
+            sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
             .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
             .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
             .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
         )
-        for rel_thumb_path in conn.execute(stmt).scalars():
+        thumbs_to_remove = conn.execute(stmt_thumbs_to_remove).all()
+
+        for _, rel_thumb_path in thumbs_to_remove:
             try:
                 os.remove(Utils.get_abs_thumb_path(rel_thumb_path))
+                root = os.path.dirname(rel_thumb_path)
+                if not os.listdir(root):
+                    shutil.rmtree(root)
             except Exception as e:
                 print("DelDirsHandler, remove thumb:", e)
 
-        del_stmt = (
-            sqlalchemy.delete(Thumbs.table)
-            .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
-            .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
-            .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+        del_stmt = sqlalchemy.delete(Thumbs.table).where(
+            Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
         )
         conn.execute(del_stmt)
 
-    def remove_dir_entry(
+    def remove_dirs(
             dir_item: DirItem,
             scaner_item: IntScanerItem,
             conn: sqlalchemy.Connection
         ):
+        """
+        Удаляет записи в базе данных Dirs
+        """
         stmt = (
             sqlalchemy.delete(Dirs.table)
             .where(Dirs.rel_dir_path == dir_item.rel_path)
@@ -681,22 +643,33 @@ class AllDirScaner:
         if not finder_dirs:
             print(scaner_item.mf.mf_alias, "no finder dirs")
             return
-        removed_dirs, new_dirs = DirsCompator.start(finder_dirs, db_dirs)
-        if new_dirs:
-            new_dirs.extend(removed_dirs)
-            del_images, new_images = NewDirsWorker.start(new_dirs, scaner_item)
-            if del_images or new_images:
-                ext_scaner_item = ExtScanerItem(
-                    gui_text="",
-                    reload_gui=True
-                )
-                scaner_item.q.put(ext_scaner_item)
-        # это нужно, когда удален целый каталог вместе с корневой папкой
-        # типа не все фотки из папки "test" и папка "test" пуста,
-        # а была удалена папка "test"
-        # тогда это улетает в RemovedDirsWorker
+        removed_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
+        dirs_to_scan = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
+
+        # это нужно, когда удалена вся папка "имя папки"
+        # то есть не когда "имя папки" пуста, но существует,
+        # а когда папка "имя папки" не существует
         if removed_dirs:
-            RemovedDirsWorker.start(removed_dirs, scaner_item)
+            conn = scaner_item.engine.connect()
+            for dir_item in removed_dirs:
+                RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
+                RemovedDirsWorker.remove_dirs(dir_item, scaner_item, conn)
+            conn.commit()
+            conn.close()
+
+        if dirs_to_scan:
+        #     # new_dirs.extend(removed_dirs)
+            del_images, new_images = DirsToScanWorker.start(new_dirs, scaner_item)
+        #     if del_images or new_images:
+        #         ext_scaner_item = ExtScanerItem(
+        #             gui_text="",
+        #             reload_gui=True
+        #         )
+        #         scaner_item.q.put(ext_scaner_item)
+
+        # # тогда это улетает в RemovedDirsWorker
+        # if removed_dirs:
+        #     RemovedDirsWorker.start(removed_dirs, scaner_item)
 
 
 class SingleDirScaner:
@@ -747,7 +720,7 @@ class SingleDirScaner:
                 )
                 dir_items.append(item)
             if dir_items:
-                del_img, new_img = NewDirsWorker.start(dir_items, scaner_item)
+                del_img, new_img = DirsToScanWorker.start(dir_items, scaner_item)
                 if del_img or new_img:
                     ext_scaner_item = ExtScanerItem(
                         gui_text="",
