@@ -136,6 +136,7 @@ class FirstLoad(QDialog):
 
         groups_layout = QHBoxLayout()
         groups_layout.setSpacing(10)
+        layout.addLayout(groups_layout)
 
         self.group_app = ClickableGroupBox(
             Lng.setup_app[Cfg.lng_index],
@@ -143,15 +144,17 @@ class FirstLoad(QDialog):
         )
         groups_layout.addWidget(self.group_app)
 
-        zip_file = os.listdir(Static.internal_files_dir)[0]
-        zip_file = Path(Static.internal_files_dir) / zip_file
-        self.preload = ClickableGroupBox(
-            zip_file.stem, 
-            self.preload_selected_cmd
-        )
-        groups_layout.addWidget(self.preload)
+        if os.path.exists(Static.internal_files_dir):
+            for i in os.scandir(Static.internal_files_dir):
+                if i.name.endswith((".zip", ".ZIP")):
+                    zip_file = Path(i.path)
+                    self.preload = ClickableGroupBox(
+                        zip_file.stem, 
+                        self.preload_selected_cmd
+                    )
+                    groups_layout.addWidget(self.preload)
+                    break
 
-        layout.addLayout(groups_layout)
         self.adjustSize()
 
     def setup_app(self):
@@ -237,7 +240,7 @@ class App(QApplication):
         def first_load_win():
             first_load = FirstLoad()
             first_load.copy_preload_files.connect(copy_preload_files)
-            first_load.copy_preload_files.connect(self.start_app)
+            first_load.copy_preload_files.connect(self.start)
             first_load.setup_new_mf.connect(setup_new_mf)
             first_load.exec_()
 
