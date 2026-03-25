@@ -79,3 +79,34 @@ class Buffer:
 class WatchDogItem:
     mf: Mf
     event: FileSystemEvent
+
+
+@dataclass(slots=True)
+class ScanerDirItem:
+    """
+    Параметры:
+    - rel_path: относительный путь к подкаталогу относительно `Mf.curr_path`.
+      Пример:
+        - Mf.curr_path = /User/Downloads/parent/folder
+        - подкаталог = /User/Downloads/parent/folder/subfolder
+        - rel_path = /subfolder
+    - mod: дата модификации каталога (os.stat.st_mtime)
+    """
+    abs_path: str
+    rel_path: str
+    mod: int
+
+
+@dataclass(slots=True)
+class ScanerImgItem:
+    """
+    Параметры:
+    - abs_img_path: полный путь до изображения
+    - size: размер изображения в байтах
+    - mod: os.stat.st_mtime
+    - rel_thumb_path: путь до миниатюры /hashdir/thumb.jpg
+    """
+    abs_img_path: str
+    size: int
+    mod: int
+    rel_thumb_path: str = ""

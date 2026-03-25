@@ -1,5 +1,4 @@
 import os
-from dataclasses import dataclass
 from multiprocessing import Queue
 from time import sleep
 
@@ -12,43 +11,13 @@ from system.main_folder import Mf
 from system.shared_utils import ImgUtils
 from system.utils import Utils
 
-from .items import ScanerItem, SingleDirScanerItem
+from .items import (ScanerDirItem, ScanerImgItem, ScanerItem,
+                    SingleDirScanerItem)
 
 
 class Gui:
     def send_data(queue: Queue, text: str, reload_gui: bool = False):
         queue.put((text, reload_gui))
-
-
-@dataclass(slots=True)
-class DirItem:
-    """
-    Параметры:
-    - rel_path: относительный путь к подкаталогу относительно `Mf.curr_path`.
-      Пример:
-        - Mf.curr_path = /User/Downloads/parent/folder
-        - подкаталог = /User/Downloads/parent/folder/subfolder
-        - rel_path = /subfolder
-    - mod: дата модификации каталога (os.stat.st_mtime)
-    """
-    abs_path: str
-    rel_path: str
-    mod: int
-
-
-@dataclass(slots=True)
-class ImgItem:
-    """
-    Параметры:
-    - abs_img_path: полный путь до изображения
-    - size: размер изображения в байтах
-    - mod: os.stat.st_mtime
-    - rel_thumb_path: путь до миниатюры /hashdir/thumb.jpg
-    """
-    abs_img_path: str
-    size: int
-    mod: int
-    rel_thumb_path: str = ""
 
 
 class AllDirLoader:
@@ -65,7 +34,7 @@ class AllDirLoader:
         )
         Gui.send_data(scaner_item.queue, text)
 
-        dirs: list[DirItem] = []
+        dirs: list[ScanerDirItem] = []
         stack = [scaner_item.mf.mf_current_path]
         while stack:
             try:
@@ -88,12 +57,12 @@ class AllDirLoader:
                     )
                     stats = entry.stat()
                     mod = int(stats.st_mtime)
-                    dir_item = DirItem(entry.path, rel_path, mod)
+                    dir_item = ScanerDirItem(entry.path, rel_path, mod)
                     dirs.append(dir_item)
         try:
             stats = os.stat(scaner_item.mf.mf_current_path)
             mod = int(stats.st_mtime)
-            dir_item = DirItem(scaner_item.mf.mf_current_path, os.sep, mod)
+            dir_item = ScanerDirItem(scaner_item.mf.mf_current_path, os.sep, mod)
             dirs.append(dir_item)
         except Exception as e:
             print("new scaner dirs loader finder dirs error add root dir", e)
@@ -109,7 +78,7 @@ class AllDirLoader:
         q = sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod).where(
             Dirs.mf_alias == scaner_item.mf.mf_alias
         )
-        dirs: list[DirItem] = []
+        dirs: list[ScanerDirItem] = []
         for rel_path, mod in conn.execute(q):
             rel_path: str
             abs_dir_path = os.path.join(
@@ -117,7 +86,7 @@ class AllDirLoader:
                 scaner_item.mf.mf_current_path.strip(os.sep),
                 rel_path.strip(os.sep)
             )
-            item = DirItem(abs_dir_path, rel_path, mod)
+            item = ScanerDirItem(abs_dir_path, rel_path, mod)
             dirs.append(item)
         conn.close()
         return dirs
@@ -126,7 +95,7 @@ class AllDirLoader:
 class DirsCompator:
 
     @staticmethod
-    def get_dirs_to_remove(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
+    def get_dirs_to_remove(finder_dirs: list[ScanerDirItem], db_dirs: list[ScanerDirItem]):
         """
         Собирает список `DirItem`:
         - которых больше нет в Finder, но есть в базе данных
@@ -140,7 +109,7 @@ class DirsCompator:
         ]
 
     @staticmethod
-    def get_dirs_to_scan(finder_dirs: list[DirItem], db_dirs: list[DirItem]):
+    def get_dirs_to_scan(finder_dirs: list[ScanerDirItem], db_dirs: list[ScanerDirItem]):
         """
         Собирает список `DirItem`:
         - которые есть в Finder, но нет в базе данных
@@ -159,7 +128,7 @@ class DirsCompator:
 
 class DbDirUpdater:
     @staticmethod
-    def upsert_records(scaner_item: ScanerItem, dirs_to_scan: list[DirItem]):
+    def upsert_records(scaner_item: ScanerItem, dirs_to_scan: list[ScanerDirItem]):
         """
         Запускать только, когда:
         - добавлены и удалены изображения `ImgItem` из БД
@@ -199,7 +168,7 @@ class ImgLoader:
     @staticmethod
     def get_finder_images(
         scaner_item: ScanerItem,
-        dirs_to_scan: list[DirItem]
+        dirs_to_scan: list[ScanerDirItem]
     ):
         """
         Собирает список `ImgItem` из указанных директорий:
@@ -210,7 +179,7 @@ class ImgLoader:
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
         Gui.send_data(scaner_item.queue, text)
-        finder_images: list[ImgItem] = []
+        finder_images: list[ScanerImgItem] = []
         for dir_item in dirs_to_scan:
             try:
                 scandir_iterator = os.scandir(dir_item.abs_path)
@@ -228,21 +197,21 @@ class ImgLoader:
                     mod = int(stat.st_mtime)
                     if size == 0:
                         continue
-                    img_item = ImgItem(entry.path, size, mod)
+                    img_item = ScanerImgItem(entry.path, size, mod)
                     finder_images.append(img_item)
         return finder_images
 
     @staticmethod
     def get_db_images(
         scaner_item: ScanerItem,
-        dirs_to_scan: list[DirItem]
+        dirs_to_scan: list[ScanerDirItem]
     ):
         """
         Возвращает информацию об изображениях в БД из указанных директорий:
         - db_images список ImgItem
         """
         conn = scaner_item.engine.connect()
-        db_images: list[ImgItem] = []
+        db_images: list[ScanerImgItem] = []
         for dir_item in dirs_to_scan:
             q = sqlalchemy.select(
                 Thumbs.rel_thumb_path,
@@ -266,7 +235,7 @@ class ImgLoader:
                     mf_path=scaner_item.mf.mf_current_path,
                     rel_path=rel_path
                 )
-                img_item = ImgItem(
+                img_item = ScanerImgItem(
                     abs_img_path, size, mod, rel_thumb_path
                 )
                 db_images.append(img_item)
@@ -276,7 +245,7 @@ class ImgLoader:
 
 class ImgCompator:
     @staticmethod
-    def start(finder_images: list[ImgItem], db_images: list[ImgItem]):
+    def start(finder_images: list[ScanerImgItem], db_images: list[ScanerImgItem]):
         """
         Сравнивает данные об изображениях из Finder и базы данных.  
         Получить данные об изображениях необходимо из ImgLoader.    
@@ -312,7 +281,7 @@ class ImgCompator:
 class HashdirImgUpdater:
 
     @staticmethod
-    def run_del_images(scaner_item: ScanerItem, del_images: list[ImgItem]):
+    def run_del_images(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
         """
         Пытается удалить изображения из `hashdir` и пустые папки.   
         Обрати внимание:
@@ -338,7 +307,7 @@ class HashdirImgUpdater:
                 pass
 
     @staticmethod
-    def run_new_images(scaner_item: ScanerItem, new_images: list[ImgItem]):
+    def run_new_images(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
         """
         Пытается создать изображения в "hashdir"
         """
@@ -375,7 +344,7 @@ class HashdirImgUpdater:
 class DbImgUpdater:
 
     @staticmethod
-    def delete_records(scaner_item: ScanerItem, del_images: list[ImgItem]):
+    def delete_records(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
         """
         Удаляет из БД удаленные изображения.
         """
@@ -389,7 +358,7 @@ class DbImgUpdater:
         conn.close()
 
     @staticmethod
-    def upsert_records(scaner_item: ScanerItem, new_images: list[ImgItem]):
+    def upsert_records(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
         """
         Добавляет записи из БД об успешно сохраненных изображениях.
         """
@@ -433,7 +402,7 @@ class DbImgUpdater:
 
 class DirsToScanWorker:    
     @staticmethod
-    def start(dirs_to_scan: list[DirItem], scaner_item: ScanerItem):
+    def start(dirs_to_scan: list[ScanerDirItem], scaner_item: ScanerItem):
         """
         Параметры: 
         - dirs_to_scan список DirItem
@@ -468,7 +437,7 @@ class RemovedDirsWorker:
 
     @staticmethod
     def remove_thumbs(
-        dir_item: DirItem,
+        dir_item: ScanerDirItem,
         scaner_item: ScanerItem,
         conn: sqlalchemy.Connection
     ):
@@ -501,7 +470,7 @@ class RemovedDirsWorker:
         conn.execute(del_stmt)
 
     def remove_dirs(
-            dir_item: DirItem,
+            dir_item: ScanerDirItem,
             scaner_item: ScanerItem,
             conn: sqlalchemy.Connection
         ):
@@ -601,14 +570,14 @@ class SingleDirScaner:
         avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             scaner_item.mf.set_mf_current_path(avaiable_mf_path)
-            dir_items: list[DirItem] = []
+            dir_items: list[ScanerDirItem] = []
             for i in dirs_to_scan:
                 try:
                     mod = int(os.stat(i).st_mtime)
                 except Exception as e:
                     print("SingleDirScaner error", e)
                     continue
-                item = DirItem(
+                item = ScanerDirItem(
                     abs_path=i,
                     rel_path=Utils.get_rel_any_path(mf.mf_current_path, i),
                     mod=mod
