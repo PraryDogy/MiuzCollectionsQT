@@ -73,6 +73,19 @@ class System_:
             return True
         else:
             return False
+    
+    @classmethod
+    def show_prints(cls):
+        """показывает откуда принты"""
+        import builtins
+        import inspect
+        _original_print = print
+        def debug_print(*args, **kwargs):
+            frame = inspect.currentframe().f_back
+            filename = frame.f_code.co_filename
+            lineno = frame.f_lineno
+            _original_print(f"[{filename}:{lineno}]", *args, **kwargs)
+        builtins.print = debug_print
 
 
 class Lng:
@@ -276,17 +289,8 @@ class App(QApplication):
                 i.show()
         return super().eventFilter(a0, a1)
 
-# показывает откуда принты
-# import builtins
-# import inspect
-# _original_print = print
-# def debug_print(*args, **kwargs):
-#     frame = inspect.currentframe().f_back
-#     filename = frame.f_code.co_filename
-#     lineno = frame.f_lineno
-#     _original_print(f"[{filename}:{lineno}]", *args, **kwargs)
-# builtins.print = debug_print
 
+# System_.show_prints()
 if __name__ == "__main__":
     if System_.set_plugin_path():
         sys.excepthook = System_.catch_error_in_app
