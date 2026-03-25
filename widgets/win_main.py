@@ -14,8 +14,8 @@ from system.items import (Buffer, OnStartItem, SettingsItem,
                           SingleDirScanerItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import (DirWatcher, FilesRemover, OnStartTask,
-                                 ProcessWorker, UpdateThumb)
+from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
+                                 UpdateThumb)
 from system.scaner import AllDirScaner, SingleDirScaner
 from system.servers import Servers
 from system.shared_utils import ImgUtils
@@ -222,7 +222,9 @@ class WinMain(UMainWindow):
         ])
 
         self.grid.setFocus()
-        self.on_start(argv)
+
+        if argv[-1] != "noscan":
+            self.start_scaner_task()
 
         self.start_wachdog()
 
@@ -240,27 +242,6 @@ class WinMain(UMainWindow):
     def path_bar_update(self, path: str):
         dir = f"/{Mf.current_mf.mf_alias}{path}"
         self.bar_path.update(dir)
-    
-    def on_start(self, argv: list[Literal["noscan", ""]], ms = 300):
-
-        def poll_task(tsk: ProcessWorker, tmr: QTimer):
-            if not tsk.is_alive():
-                tsk.terminate_join()
-                if argv[-1] != "noscan":
-                    self.start_scaner_task()
-            else:
-                tmr.start(ms)
-
-        self.grid.reload_thumbnails()
-
-        on_start_item = OnStartItem(Mf.mf_list)
-        tsk = ProcessWorker(target=OnStartTask.start, args=(on_start_item, ))
-        tmr = QTimer(self)
-        tmr.setSingleShot(True)
-        tmr.timeout.connect(lambda: poll_task(tsk, tmr))
-
-        tsk.start()
-        tmr.start(ms)
     
     def go_to_widget(self, rel_path: str):
         dirname = os.path.dirname(rel_path)

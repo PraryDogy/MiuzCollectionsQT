@@ -215,96 +215,33 @@ class FilesRemover:
         queue.put(deleted_files)
         
 
-class _DeletedMfRemover:
-
-    def start(engine: sqlalchemy.Engine, on_start_item: OnStartItem, queue: Queue):
-        """
-        Логика такая:
-        - Пользователь в настройках приложения удаляет Mf
-        - Данные удаляются из БД, приложение перезапускается
-        - RemoveMfCleaner вызывается при перезапуске приложения
-        - Сравнивается список Mf в базе данных и список Mf в mf.json
-        Если Mf нет в базе данных, но есть в mf.json, нужно удалить все данные
-        по этой Mf:
-        - изображения thumbs из hashdir в ApplicationSupport    
-        - записи в базе данных
-        Передает в Queue список удаленных Mf (список имен str)
-        """
-        conn = engine.connect()
-        stmt = sqlalchemy.select(Thumbs.mf_alias).distinct()
-        db_mf_list = conn.execute(stmt).scalars().all()
-        json_mf_list = [i.mf_alias for i in on_start_item.mf_list]
-        removed_mf_list: list[str] = [
-            i
-            for i in db_mf_list
-            if i not in json_mf_list and i is not None
-        ]
-
-        if removed_mf_list:
-            for i in removed_mf_list:
-                rows = _DeletedMfRemover.get_rows(i, conn)
-                _DeletedMfRemover.remove_images(rows)
-                _DeletedMfRemover.remove_rows(rows, conn)
-            _DeletedMfRemover.remove_dirs(conn)
-        conn.close()
-        queue.put(removed_mf_list)
-    
-    @staticmethod
-    def get_rows(mf_alias: str, conn: sqlalchemy.Connection):
-        q = sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path).where(
-            Thumbs.mf_alias == mf_alias
-        )
-        return [
-            (id_, Utils.get_abs_thumb_path(rel_thumb_path))
-            for id_, rel_thumb_path in conn.execute(q).fetchall()
-        ]
-
-    @staticmethod
-    def remove_images(rows: list):
-        """
-        rows: [(row id int, thumb path), ...]
-        """
-        for id_, image_path in rows:
-            try:
-                if os.path.exists(image_path):
-                    os.remove(image_path)
-                folder = os.path.dirname(image_path)
-                if os.path.exists(folder) and not os.listdir(folder):
-                    shutil.rmtree(folder)
-            except Exception as e:
-                print(f"new scaner utils, MfRemover, remove images error. ID: {id_}, Path: {image_path}, Error: {e}")
-                continue
-
-    @staticmethod
-    def remove_rows(rows: list, conn: sqlalchemy.Connection):
-        """
-        rows: [(row id int, thumb path), ...]
-        """
-        ids = [id_ for id_, _ in rows]
-        if ids:
-            q = sqlalchemy.delete(Thumbs.table).where(Thumbs.id.in_(ids))
-            conn.execute(q)
-            conn.commit()
-
-    @staticmethod
-    def remove_dirs(conn: sqlalchemy.Connection):
-        q = sqlalchemy.select(Dirs.mf_alias).distinct()
-        db_brands = set(conn.execute(q).scalars())
-        app_brands = set(i.mf_alias for i in Mf.mf_list)
-        to_delete = db_brands - app_brands
-
-        if to_delete:
-            del_stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias.in_(to_delete))
-            conn.execute(del_stmt)
-            conn.commit()
-
-
-class OnStartTask:
-    @staticmethod
-    def start(on_start_item: OnStartItem, queue: Queue):
+class MfRemover:
+    def start(mf_alias: str, queue: Queue):
         engine = Dbase.create_engine()
-        _DeletedMfRemover.start(engine, on_start_item, queue)
+        conn = engine.connect()
 
+        stmt = sqlalchemy.select(Thumbs.rel_thumb_path).where(
+            Thumbs.mf_alias==mf_alias
+        )
+        res = conn.execute(stmt).scalars()
+
+        for rel_thumb_path in res:
+            abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+            try:
+                os.remove(abs_thumb_path)
+                os.rmdir(os.path.dirname(abs_thumb_path))
+            except Exception as e:
+                pass
+
+        stmt = sqlalchemy.delete(Thumbs.table).where(Thumbs.mf_alias == mf_alias)
+        conn.execute(stmt)
+
+        stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias == mf_alias)
+        conn.execute(stmt)
+
+        conn.commit()
+        conn.close()
+        engine.dispose()
 
 
 class _DirChangedHandler(FileSystemEventHandler):
