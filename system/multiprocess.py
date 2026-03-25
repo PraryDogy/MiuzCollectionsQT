@@ -25,30 +25,30 @@ class BaseProcessWorker:
 
     def __init__(self, target: callable, args: tuple):
         super().__init__()
-        self.proc = Process(target=target, args=(*args, ))
+        self.process = Process(target=target, args=(*args, ))
         self._queues: list[Queue] = [a for a in args if hasattr(a, 'put')]
         BaseProcessWorker._registry.append(self)
 
     def start(self):
-        self.proc.start()
+        self.process.start()
 
     def is_alive(self):
-        return self.proc.is_alive()
+        return self.process.is_alive()
     
     def terminate_join(self):
         """
         Корректно terminate с join
         Завершает все очереди Queue
         """
-        self.proc.terminate()
-        self.proc.join(timeout=0.2)
+        self.process.terminate()
+        self.process.join(timeout=0.2)
 
         for q in self._queues:
             q.close()
             q.cancel_join_thread()
 
-        if self.proc.is_alive():
-            self.proc.kill()
+        if self.process.is_alive():
+            self.process.kill()
 
         if self in BaseProcessWorker._registry:
             BaseProcessWorker._registry.remove(self)
