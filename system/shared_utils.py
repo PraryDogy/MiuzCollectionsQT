@@ -471,7 +471,7 @@ class ImgUtils:
             h, w = image.shape[:2]
             if h == 0 or w == 0:
                 print("fit_to_thumb: пустое изображение")
-                return cls.fit_to_thumb(cls._get_broken_image())
+                return cls.fit_to_thumb(cls._get_broken_image(), size)
 
             scale = size / max(h, w)
             new_w = max(1, int(w * scale))
@@ -482,9 +482,10 @@ class ImgUtils:
                 (new_w, new_h),
                 interpolation=cv2.INTER_AREA
             )
+
         except Exception as e:
             print(f"fit_to_thumb: ошибка масштабирования: {e}")
-            return cls.fit_to_thumb(cls._get_broken_image())
+            return cls.fit_to_thumb(cls._get_broken_image(), size)
 
     @classmethod
     def write_thumb(cls, thumb_path: str, thumb: np.ndarray) -> bool:
