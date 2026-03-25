@@ -10,7 +10,7 @@ from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
-from system.items import (Buffer, ExtScanerItem, OnStartItem, SettingsItem,
+from system.items import (Buffer, OnStartItem, SettingsItem,
                           SingleDirScanerItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
@@ -606,17 +606,17 @@ class WinMain(UMainWindow):
         if not hasattr(self, "scaner_task") or not self.scaner_task:
             self.scaner_poll_timer.start(ms)
             return
-        reload_gui = False
+        reload_gui_ = False
         while not self.scaner_task.proc_q.empty():
-            x_scan_item: ExtScanerItem = self.scaner_task.proc_q.get()
-            if not reload_gui:
-                reload_gui = x_scan_item.reload_gui
-            if self.bar_bottom.progress_bar.text() != x_scan_item.gui_text:
-                self.bar_bottom.progress_bar.setText(x_scan_item.gui_text)
+            text, reload_gui = self.scaner_task.proc_q.get()
+            if not reload_gui_:
+                reload_gui_ = reload_gui
+            if self.bar_bottom.progress_bar.text() != text:
+                self.bar_bottom.progress_bar.setText(text)
         if not self.scaner_task.is_alive():
             self.scaner_task.terminate_join()
             self.bar_bottom.progress_bar.start_timer_text()
-            if reload_gui:
+            if reload_gui_:
                 self.grid.reload_thumbnails()
                 self.left_menu.tree_wid.init_ui()
         else:

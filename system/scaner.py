@@ -14,15 +14,13 @@ from system.main_folder import Mf
 from system.shared_utils import ImgUtils
 from system.utils import Utils
 
-from .items import ExtScanerItem, IntScanerItem, SingleDirScanerItem
+from .items import ScanerItem, SingleDirScanerItem
 
 
 class Gui:
-    item = ExtScanerItem("", None)
+
     def send_data(q: Queue, text: str, reload_gui: bool = False):
-        Gui.item.gui_text = text
-        Gui.item.reload_gui = reload_gui
-        q.put(Gui.item)
+        q.put((text, reload_gui))
 
 
 @dataclass(slots=True)
@@ -58,7 +56,7 @@ class ImgItem:
 
 class AllDirLoader:
     @staticmethod
-    def get_finder_dirs(scaner_item: IntScanerItem):
+    def get_finder_dirs(scaner_item: ScanerItem):
         """
         Собирает список директорий, которые:
         - есть в каталоге `Mf.curr_path`
@@ -105,7 +103,7 @@ class AllDirLoader:
         return dirs
 
     @staticmethod
-    def get_db_dirs(scaner_item: IntScanerItem):
+    def get_db_dirs(scaner_item: ScanerItem):
         """
         Возвращает список директорий из базы данных, которые:
         - соответствуют условию DIRS.c.brand == `Mf.alias`
@@ -164,7 +162,7 @@ class DirsCompator:
 
 class DbDirUpdater:
     @staticmethod
-    def upsert_records(scaner_item: IntScanerItem, dirs_to_scan: list[DirItem]):
+    def upsert_records(scaner_item: ScanerItem, dirs_to_scan: list[DirItem]):
         """
         Запускать только, когда:
         - добавлены и удалены изображения `ImgItem` из БД
@@ -203,7 +201,7 @@ class DbDirUpdater:
 class ImgLoader:
     @staticmethod
     def get_finder_images(
-        scaner_item: IntScanerItem,
+        scaner_item: ScanerItem,
         dirs_to_scan: list[DirItem]
     ):
         """
@@ -239,7 +237,7 @@ class ImgLoader:
 
     @staticmethod
     def get_db_images(
-        scaner_item: IntScanerItem,
+        scaner_item: ScanerItem,
         dirs_to_scan: list[DirItem]
     ):
         """
@@ -317,7 +315,7 @@ class ImgCompator:
 class HashdirImgUpdater:
 
     @staticmethod
-    def run_del_images(scaner_item: IntScanerItem, del_images: list[ImgItem]):
+    def run_del_images(scaner_item: ScanerItem, del_images: list[ImgItem]):
         """
         Пытается удалить изображения из `hashdir` и пустые папки.   
         Обрати внимание:
@@ -340,7 +338,7 @@ class HashdirImgUpdater:
                 pass
 
     @staticmethod
-    def run_new_images(scaner_item: IntScanerItem, new_images: list[ImgItem]):
+    def run_new_images(scaner_item: ScanerItem, new_images: list[ImgItem]):
         """
         Пытается создать изображения в "hashdir"
         """
@@ -363,7 +361,7 @@ class HashdirImgUpdater:
                 print("scaner HashdirImgUpdater error", e)
                 continue
     
-    def get_gui_text(scaner_item: IntScanerItem):
+    def get_gui_text(scaner_item: ScanerItem):
         return (
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.updating[scaner_item.lng_index].lower()} "
@@ -374,7 +372,7 @@ class HashdirImgUpdater:
 class DbImgUpdater:
 
     @staticmethod
-    def delete_records(scaner_item: IntScanerItem, del_images: list[ImgItem]):
+    def delete_records(scaner_item: ScanerItem, del_images: list[ImgItem]):
         """
         Удаляет из БД удаленные изображения.
         """
@@ -388,7 +386,7 @@ class DbImgUpdater:
         conn.close()
 
     @staticmethod
-    def upsert_records(scaner_item: IntScanerItem, new_images: list[ImgItem]):
+    def upsert_records(scaner_item: ScanerItem, new_images: list[ImgItem]):
         """
         Добавляет записи из БД об успешно сохраненных изображениях.
         """
@@ -432,7 +430,7 @@ class DbImgUpdater:
 
 class DirsToScanWorker:    
     @staticmethod
-    def start(dirs_to_scan: list[DirItem], scaner_item: IntScanerItem):
+    def start(dirs_to_scan: list[DirItem], scaner_item: ScanerItem):
         """
         Параметры: 
         - dirs_to_scan список DirItem
@@ -468,7 +466,7 @@ class RemovedDirsWorker:
     @staticmethod
     def remove_thumbs(
         dir_item: DirItem,
-        scaner_item: IntScanerItem,
+        scaner_item: ScanerItem,
         conn: sqlalchemy.Connection
     ):
         """
@@ -501,7 +499,7 @@ class RemovedDirsWorker:
 
     def remove_dirs(
             dir_item: DirItem,
-            scaner_item: IntScanerItem,
+            scaner_item: ScanerItem,
             conn: sqlalchemy.Connection
         ):
         """
@@ -521,7 +519,7 @@ class AllDirScaner:
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
-            scaner_item = IntScanerItem(
+            scaner_item = ScanerItem(
                 mf=mf,
                 eng=engine,
                 q=q,
@@ -549,7 +547,7 @@ class AllDirScaner:
         engine.dispose()
 
     @staticmethod
-    def single_mf_scan(scaner_item: IntScanerItem):
+    def single_mf_scan(scaner_item: ScanerItem):
         finder_dirs = AllDirLoader.get_finder_dirs(scaner_item)
         db_dirs = AllDirLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
@@ -601,7 +599,7 @@ class SingleDirScaner:
         - dirs_to_scan: директории, которые нужно просканировать
         """
         engine = Dbase.create_engine()
-        scaner_item = IntScanerItem(
+        scaner_item = ScanerItem(
             mf=mf,
             eng=engine,
             q=q,

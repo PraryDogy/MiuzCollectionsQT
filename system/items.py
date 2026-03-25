@@ -29,13 +29,7 @@ class OnStartItem:
     mf_list: list["Mf"]
 
 
-@dataclass(slots=True)
-class ExtScanerItem:
-    gui_text: str
-    reload_gui: bool
-
-
-class IntScanerItem:
+class ScanerItem:
     def __init__(self, **kw):
         """
         - mf: Mf
