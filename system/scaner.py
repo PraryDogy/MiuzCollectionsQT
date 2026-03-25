@@ -652,10 +652,9 @@ class SingleDirScaner:
                 )
                 dir_items.append(item)
             if dir_items:
-                del_img, new_img = DirsToScanWorker.start(dir_items, scaner_item)
-                if del_img or new_img:
-                    ext_scaner_item = ExtScanerItem(
-                        gui_text="",
-                        reload_gui=True
-                    )
-                    scaner_item.q.put(ext_scaner_item)
+                DirsToScanWorker.start(dir_items, scaner_item)
+                ext_scaner_item = ExtScanerItem(
+                    gui_text="",
+                    reload_gui=True
+                )
+                scaner_item.q.put(ext_scaner_item)
