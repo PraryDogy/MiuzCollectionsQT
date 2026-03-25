@@ -349,11 +349,12 @@ class DbImgUpdater:
         Удаляет из БД удаленные изображения.
         """
         conn = scaner_item.engine.connect()
-        q = sqlalchemy.delete(Thumbs.table).where(
-            Thumbs.rel_thumb_path.in_([i.rel_thumb_path for i in del_images]),
-            Thumbs.mf_alias == scaner_item.mf.mf_alias
+        stmt = sqlalchemy.delete(Thumbs.table)
+        stmt = stmt.where(Thumbs.rel_thumb_path.in_(
+            [i.rel_thumb_path for i in del_images])
         )
-        conn.execute(q)
+        stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+        conn.execute(stmt)
         conn.commit()
         conn.close()
 
