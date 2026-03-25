@@ -27,7 +27,7 @@ from system.utils import Utils
 
 from ._base_widgets import (HSep, SingleActionWindow, SmallBtn, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
-                            UTextEdit, UVBoxLayout, VListWidget)
+                            UTextEdit, UVBoxLayout, VListWidget, WinManager)
 from .win_warn import ConfirmWindow, WarningWindow
 
 
@@ -813,8 +813,8 @@ class MfSettings(QWidget):
                 QTimer.singleShot(1000, poll_task)
 
         def fin():
-            for widget in QApplication.allWidgets():
-                widget.hide()
+            for i in WinManager.win_list:
+                i.hide()
             self.mf_remover.start()
             QTimer.singleShot(1000, poll_task)
 
