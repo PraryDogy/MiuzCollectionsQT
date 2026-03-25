@@ -813,6 +813,8 @@ class MfSettings(QWidget):
                 QTimer.singleShot(1000, poll_task)
 
         def fin():
+            for widget in QApplication.allWidgets():
+                widget.hide()
             self.mf_remover.start()
             QTimer.singleShot(1000, poll_task)
 
