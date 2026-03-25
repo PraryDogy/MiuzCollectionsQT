@@ -337,8 +337,10 @@ class HashdirImgUpdater:
                 try:
                     os.remove(thumb_path)
                     folder = os.path.dirname(thumb_path)
-                    if not os.listdir(folder):
-                        shutil.rmtree(folder)
+                    try:
+                        os.rmdir(os.path.dirname(thumb_path))
+                    except OSError:
+                        pass
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     continue
@@ -495,9 +497,10 @@ class RemovedDirsWorker:
         for _, rel_thumb_path in thumbs_to_remove:
             try:
                 os.remove(Utils.get_abs_thumb_path(rel_thumb_path))
-                root = os.path.dirname(rel_thumb_path)
-                if not os.listdir(root):
-                    shutil.rmtree(root)
+                try:
+                 os.rmdir(os.path.dirname(rel_thumb_path))
+                except OSError:
+                    pass
             except Exception as e:
                 print("DelDirsHandler, remove thumb:", e)
 
