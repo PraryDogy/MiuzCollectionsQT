@@ -332,18 +332,16 @@ class HashdirImgUpdater:
         for img_item in del_images:
             scaner_item.total_count -= 1
             HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
-            thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
-            if os.path.exists(thumb_path):
-                try:
-                    os.remove(thumb_path)
-                    folder = os.path.dirname(thumb_path)
-                    try:
-                        os.rmdir(os.path.dirname(thumb_path))
-                    except OSError:
-                        pass
-                except Exception as e:
-                    print("scaner HashdirImgUpdater error", e)
-                    continue
+            abs_thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
+            root = os.path.dirname(abs_thumb_path)
+            try:
+                os.remove(abs_thumb_path)
+            except Exception as e:
+                pass
+            try:
+                os.rmdir(root)
+            except OSError:
+                pass
 
     @staticmethod
     def run_new_images(scaner_item: IntScanerItem, new_images: list[ImgItem]):
@@ -496,9 +494,11 @@ class RemovedDirsWorker:
 
         for _, rel_thumb_path in thumbs_to_remove:
             try:
-                os.remove(Utils.get_abs_thumb_path(rel_thumb_path))
+                abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+                root = os.path.dirname(abs_thumb_path)
+                os.remove(abs_thumb_path)
                 try:
-                 os.rmdir(os.path.dirname(rel_thumb_path))
+                 os.rmdir(root)
                 except OSError:
                     pass
             except Exception as e:
