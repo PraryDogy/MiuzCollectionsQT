@@ -56,6 +56,14 @@ class AllDirLoader:
         - есть в каталоге `Mf.curr_path`
         - не в стоп листе `Mf.stop_list`
         """
+        # Отправляем текст в гуи что идет поиск в папке
+        # gui_text: Имя папки: поиск в папке
+        gui_text = (
+            f"{scaner_item.mf.mf_alias}: "
+            f"{Lng.search_in[scaner_item.lng_index].lower()}"
+        )
+        ext_scaner_item = ExtScanerItem(gui_text, False)
+        scaner_item.q.put(ext_scaner_item)
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.mf_current_path]
         while stack:
@@ -218,9 +226,6 @@ class ImgLoader:
                     except Exception as e:
                         print("scaner > ImgLoader error", e)
                         continue
-                    # передаем в основной поток ScanerItem
-                    # чтобы в основном потоке сбрасывался таймер таймаута
-                    scaner_item.q.put(ext_scaner_item)
                     size = int(stat.st_size)
                     mod = int(stat.st_mtime)
                     if size == 0:
@@ -383,8 +388,6 @@ class DbImgUpdater:
         conn.execute(q)
         conn.commit()
         conn.close()
-        ext_item = ExtScanerItem("", True)
-        scaner_item.q.put(ext_item)
 
     @staticmethod
     def upsert_records(scaner_item: IntScanerItem, new_images: list[ImgItem]):
@@ -538,31 +541,18 @@ class AllDirScaner:
                     print(traceback.format_exc())
                     continue
             else:
-                no_conn = Lng.no_connection[lng_index].lower()
                 gui_text = (
                     f"{scaner_item.mf.mf_alias}: "
-                    f"{no_conn}"
+                    f"{Lng.no_connection[lng_index].lower()}"
                 )
                 ext_scaner_item = ExtScanerItem(gui_text, False)
                 scaner_item.q.put(ext_scaner_item)
-                print(
-                    "scaner no connection",
-                    scaner_item.mf_real_name,
-                    scaner_item.mf.mf_alias
-                )
+                print(gui_text)
                 sleep(3)
         engine.dispose()
 
     @staticmethod
     def single_mf_scan(scaner_item: IntScanerItem):
-        ext_scaner_item = ExtScanerItem("", False)
-
-        ext_scaner_item.gui_text = (
-            f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.search_in[scaner_item.lng_index].lower()}"
-        )
-        scaner_item.q.put(ext_scaner_item)
-
         finder_dirs = AllDirLoader.get_finder_dirs(scaner_item)
         db_dirs = AllDirLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
