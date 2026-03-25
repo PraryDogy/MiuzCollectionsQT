@@ -299,55 +299,11 @@ class _DeletedMfRemover:
             conn.commit()
 
 
-class _EmptyRecordsRemover:
-    @staticmethod
-    def start(engine: sqlalchemy.Engine, queue: Queue):
-        """
-        При запуске приложения проверяет данные в базе данных и удаляет
-        записи со значениями None
-        Передает в очередь None
-        """
-        conn = engine.connect()
-        stmt = (
-            sqlalchemy.delete(Thumbs.table).where(
-                sqlalchemy.or_(
-                    Thumbs.rel_thumb_path == None,
-                    Thumbs.rel_img_path == None
-                )
-            )
-        )
-        conn.execute(stmt)
-        conn.commit()
-        queue.put(None)
-
-
-class _EmptyHashdirRemover:
-    @staticmethod
-    def start(queue: Queue):
-        """
-        При запуске приложения проверяет, есть ли пустые директории в thumbnails,
-        удаляет лишние
-        Передает в Queue список удаленных директорий
-        """
-        removed_dirs: list[str] = []
-        for i in os.scandir(Static.external_hashdir):
-            if os.path.isdir(i.path) and not os.listdir(i.path):
-                try:
-                    shutil.rmtree(i.path)
-                    removed_dirs.append(i.path)
-                except Exception as e:
-                    print("new scaner, empty hashdir remover", e)
-        if removed_dirs:
-            queue.put(removed_dirs)
-
-
 class OnStartTask:
     @staticmethod
     def start(on_start_item: OnStartItem, queue: Queue):
         engine = Dbase.create_engine()
         _DeletedMfRemover.start(engine, on_start_item, queue)
-        _EmptyRecordsRemover.start(engine, queue)
-        _EmptyHashdirRemover.start(queue)
 
 
 
