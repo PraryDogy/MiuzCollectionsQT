@@ -145,7 +145,13 @@ class WinCopyFiles(ProgressbarWin):
         self.copy_task_item = CopyTaskItem(
             dst_dir=target_dir,
             src_urls=files_to_copy,
-            is_cut=action_type
+            is_cut=action_type,
+            current_size=0,
+            total_size=0,
+            current_count=0,
+            total_count=0,
+            dst_urls=[],
+            msg="none"
         )
         self.copy_task = CopyTaskWorker(
             target=CopyTask.start,

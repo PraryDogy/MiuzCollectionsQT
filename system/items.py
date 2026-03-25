@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 from multiprocessing import Queue
 from typing import Literal, Optional
@@ -43,26 +42,24 @@ class SingleDirScanerItem:
     data: dict[Mf, list[str]]
 
 
+@dataclass(slots=True)
 class CopyTaskItem:
-    def __init__(self, dst_dir: str, src_urls: list[str], is_cut: bool):
-        super().__init__()
-        self.dst_dir = dst_dir
-        self.src_urls = src_urls
-        self.is_cut = is_cut
-
-        self.current_size: int = 0
-        self.total_size: int = 0
-        self.current_count: int = 0
-        self.total_count: int = 0
-        self.dst_urls: list[str] = []
-        self.msg: Literal[
-            "none",
-            "error",
-            "need_replace",
-            "replace_one",
-            "replace_all",
-            "finished"
-        ]
+    dst_dir: str
+    src_urls: list[str]
+    is_cut: bool
+    current_size: int
+    total_size: int
+    current_count: int
+    total_count: int
+    dst_urls: list[str]
+    msg: Literal[
+        "none",
+        "error",
+        "need_replace",
+        "replace_one",
+        "replace_all",
+        "finished"
+    ]
 
 
 @dataclass(slots=True)
