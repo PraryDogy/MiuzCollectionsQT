@@ -18,7 +18,7 @@ from system.filters import Filters
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import ProcessWorker
+from system.multiprocess import MfRemover, ProcessWorker
 from system.paletes import ThemeChanger
 from system.servers import Servers
 from system.shared_utils import SharedUtils
@@ -800,14 +800,26 @@ class MfSettings(QWidget):
         main_lay.addSpacerItem(QSpacerItem(0, 15))
 
     def remove_cmd(self, *args):
+        
+        def poll_task():
+            if not self.mf_remover.is_alive():
+                for i in Mf.mf_list:
+                    if i.mf_alias == self.mf.mf_alias:
+                        Mf.mf_list.remove(i)
+                        break
+                Mf.write_json_data()
+                restart_app()
+            else:
+                QTimer.singleShot(1000, poll_task)
 
         def fin():
-            for i in Mf.mf_list:
-                if i.mf_alias == self.mf.mf_alias:
-                    Mf.mf_list.remove(i)
-                    break
-            Mf.write_json_data()
-            restart_app()
+            self.mf_remover.start()
+            QTimer.singleShot(1000, poll_task)
+
+        self.mf_remover = ProcessWorker(
+            target=MfRemover.start,
+            args=(self.mf.mf_alias, )
+        )
 
         if len(self.mf_list_clone) == 1:
             win = WarningWindow(Lng.at_least_one_folder_required[Cfg.lng_index])
