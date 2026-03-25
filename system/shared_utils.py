@@ -204,8 +204,11 @@ class ImgUtils:
 
     @classmethod
     def _get_broken_image(cls):
-        img = Path("./images/broken_image.jpg")
-        return cls._read_jpg(img)
+        path = Path("./images/broken_image.jpg")
+        img = Image.open(path)
+        array_img = np.array(img)
+        img.close()
+        return array_img
 
     @classmethod
     def _read_tiff(cls, path: str):
@@ -275,10 +278,14 @@ class ImgUtils:
     @classmethod
     def _read_svg(cls, path: str):
         # ленивый импорт происходит здесь, чтобы через py2app не падало приложение
-        import cairosvg
-        png_data = cairosvg.svg2png(url=path)
-        nparr = np.frombuffer(png_data, np.uint8)
-        return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
+        try:
+            import cairosvg
+            png_data = cairosvg.svg2png(url=path)
+            nparr = np.frombuffer(png_data, np.uint8)
+            return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
+        except Exception as e:
+            print("read svg error", e)
+            return cls._get_broken_image()
 
     @classmethod
     def _read_png(cls, path: str):
@@ -305,14 +312,8 @@ class ImgUtils:
             img.close()
             return array_img
         except Exception as e:
-            print("read jpg, PIL error, try cv2 read", e)
-            try:
-                img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-                # img = np.array(img)
-                return img
-            except Exception as e:
-                print("read jpg, cv2 error, try cv2 read", e)
-                return cls._get_broken_image()
+            print("read jpg error", e)
+            return cls._get_broken_image()
 
     @classmethod
     def _read_raw(cls, path: str):
