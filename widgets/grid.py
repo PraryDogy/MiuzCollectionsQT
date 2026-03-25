@@ -853,11 +853,14 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(reload)
 
-            if (
-                hasattr(self, "buffer")
-                and
-                a0.modifiers() == Qt.KeyboardModifier.ControlModifier
-            ):
+            self.menu_.addSeparator()
+            reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], self.menu_)
+            reveal.triggered.connect(
+                lambda: self.reveal_in_finder.emit([Dynamic.current_dir])
+            )
+            self.menu_.addAction(reveal)
+
+            if hasattr(self, "buffer"):
                 self.menu_.addSeparator()
                 paste = PasteFiles(self.menu_)
                 paste.triggered.connect(
@@ -865,13 +868,6 @@ class Grid(VScrollArea):
                 )
                 self.menu_.addAction(paste)
                 self.menu_.addSeparator()
-
-            self.menu_.addSeparator()
-            reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], self.menu_)
-            reveal.triggered.connect(
-                lambda: self.reveal_in_finder.emit([Dynamic.current_dir])
-            )
-            self.menu_.addAction(reveal)
 
         def menu_widget(clicked: Thumbnail):
             if not self.selected_widgets:
