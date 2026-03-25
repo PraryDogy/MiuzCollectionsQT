@@ -21,8 +21,6 @@ class Gui:
     def send_data(q: Queue, text: str, reload_gui: bool = False):
         q.put((text, reload_gui))
 
-        print(text)
-
 
 @dataclass(slots=True)
 class DirItem:
