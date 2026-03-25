@@ -1,8 +1,8 @@
 def test(callback: callable):
     for i in range(0, 10):
-        callback(i)
+        callback("ewrwerw", i)
 
 
 test(
-    callback=lambda v: print(v)
+    callback=lambda *args: print(999, *args)
 )
