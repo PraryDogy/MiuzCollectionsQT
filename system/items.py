@@ -29,27 +29,6 @@ class OnStartItem:
     mf_list: list["Mf"]
 
 
-# class ScanerItem:
-#     def __init__(self, **kw):
-#         """
-#         - mf: Mf
-#         - eng: sqlalchemy Engine
-#         - q: Queue
-#         - lng_index: int (Cfg.lng)
-#         """
-#         super().__init__()
-#         self.mf: Mf = kw["mf"]
-#         self.engine: sqlalchemy.Engine = kw["eng"]
-#         self.q: Queue = kw["q"]
-#         self.lng_index: int = kw["lng_index"]
-
-#         if self.mf.mf_current_path:
-#             self.mf_real_name = os.path.basename(self.mf.mf_current_path)
-#         else:
-#             self.mf_real_name = os.path.basename(self.mf.mf_paths[0])
-#         self.total_count = 0
-
-
 @dataclass(slots=True)
 class ScanerItem:
     mf: Mf
