@@ -17,6 +17,11 @@ from system.utils import Utils
 from .items import ExtScanerItem, IntScanerItem, SingleDirScanerItem
 
 
+def put(q: Queue, text: str, reload_gui: bool):
+    item = ExtScanerItem(text, reload_gui)
+    q.put(item)
+
+
 @dataclass(slots=True)
 class DirItem:
     """
@@ -56,14 +61,12 @@ class AllDirLoader:
         - есть в каталоге `Mf.curr_path`
         - не в стоп листе `Mf.stop_list`
         """
-        # Отправляем текст в гуи что идет поиск в папке
-        # gui_text: Имя папки: поиск в папке
-        gui_text = (
+        text = (
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        ext_scaner_item = ExtScanerItem(gui_text, False)
-        scaner_item.q.put(ext_scaner_item)
+        put(scaner_item.q, text, False)
+
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.mf_current_path]
         while stack:
