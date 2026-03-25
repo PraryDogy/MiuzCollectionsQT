@@ -161,27 +161,6 @@ class DirsCompator:
 
 class DbDirUpdater:
     @staticmethod
-    def get_good_dirs(
-        bad_del_images: list[ImgItem],
-        bad_new_images: list[ImgItem],
-        dirs_to_scan: list[DirItem]
-    ):
-        """
-        Возвращает только те директории,
-        где были успешно обработаны все изображения.
-        """
-        bad_images = {
-            os.path.dirname(i.abs_img_path): i
-            for i in bad_del_images + bad_new_images
-        }
-
-        return [
-            i
-            for i in dirs_to_scan
-            if i.abs_path not in bad_images
-        ]
-
-    @staticmethod
     def upsert_records(scaner_item: IntScanerItem, dirs_to_scan: list[DirItem]):
         """
         Запускать только, когда:
@@ -194,8 +173,6 @@ class DbDirUpdater:
         - по сути это замена `sqlalchemy.update`
         """
         # удалить старые записи
-        if not dirs_to_scan:
-            return
         conn = scaner_item.engine.connect()
         rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
         del_stmt = sqlalchemy.delete(Dirs.table).where(
@@ -346,16 +323,12 @@ class HashdirImgUpdater:
     def run_del_images(scaner_item: IntScanerItem, del_images: list[ImgItem]):
         """
         Пытается удалить изображения из `hashdir` и пустые папки.   
-        Возвращает список успешно удаленных изображений и
-        список неудачно удаленных изображений.
         Обрати внимание:
         - Только в списке del_images есть параметр `ImgItem.rel_thumb_path`
         - Он был присвоен при загрузуке записей из БД
         - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
         """
         ext_scaner_item = ExtScanerItem("none", False)
-        ok_del_images: list[ImgItem] = []
-        bad_del_images: list[ImgItem] = []
         for img_item in del_images:
             scaner_item.total_count -= 1
             HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
@@ -366,47 +339,34 @@ class HashdirImgUpdater:
                     folder = os.path.dirname(thumb_path)
                     if not os.listdir(folder):
                         shutil.rmtree(folder)
-                    ok_del_images.append(img_item)
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
-                    bad_del_images.append(img_item)
                     continue
-        return ok_del_images, bad_del_images
 
     @staticmethod
     def run_new_images(scaner_item: IntScanerItem, new_images: list[ImgItem]):
         """
-        Пытается создать изображения в "hashdir".     
-        Возвращает список успешно созданных изображений и
-        список неудачно созданных изображений.
+        Пытается создать изображения в "hashdir"
         """
         ext_scaner_item = ExtScanerItem("none", False)
-        ok_new_images: list[ImgItem] = []
-        bad_new_images: list[ImgItem] = []
         for img_item in new_images:
             scaner_item.total_count -= 1    
             HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
-            if img is not None:
-                try:
-                    rel_img_path = Utils.get_rel_any_path(
-                        mf_path=scaner_item.mf.mf_current_path,
-                        abs_img_path=img_item.abs_img_path
-                    )
-                    thumb_path = Utils.create_abs_thumb_path(
-                        rel_img_path=rel_img_path,
-                        mf_alias=scaner_item.mf.mf_alias
-                    )
-                    ImgUtils.write_thumb(thumb_path, img)
-                    ok_new_images.append(img_item)
-                except Exception as e:
-                    print("scaner HashdirImgUpdater error", e)
-                    bad_new_images.append(img_item)
-                    continue
-            else:
-                bad_new_images.append(img_item)
-        return ok_new_images, bad_new_images
+            try:
+                rel_img_path = Utils.get_rel_any_path(
+                    mf_path=scaner_item.mf.mf_current_path,
+                    abs_img_path=img_item.abs_img_path
+                )
+                thumb_path = Utils.create_abs_thumb_path(
+                    rel_img_path=rel_img_path,
+                    mf_alias=scaner_item.mf.mf_alias
+                )
+                ImgUtils.write_thumb(thumb_path, img)
+            except Exception as e:
+                print("scaner HashdirImgUpdater error", e)
+                continue
 
     @staticmethod
     def q_put(scaner_item: IntScanerItem, ext_scaner_item: ExtScanerItem):
@@ -495,53 +455,22 @@ class DirsToScanWorker:
         # общий счет для отображения в GUI
         scaner_item.total_count = len(del_images) + len(new_images)
         # удаляем миниатюры
-        ok_del_images, bad_del_images = HashdirImgUpdater.run_del_images(
-            scaner_item=scaner_item,
-            del_images=del_images
-        )
-        # обновляем БД об успешно удаленных миниатюрах
-        DbImgUpdater.delete_records(
-            scaner_item=scaner_item,
-            del_images=ok_del_images
-        )
+        # обновляем БД
+        HashdirImgUpdater.run_del_images(scaner_item, del_images)
+        DbImgUpdater.delete_records(scaner_item, del_images)
 
-        # создаем список неуспешно созданных миниатюр
-        bad_new_images: list[ImgItem] = []
-        # шаг про котором мы пишем минитюры и обновляем БД
-        step = 10
         # делим новые миниатюры на списки по 10
+        step = 10
         chunked_new_images = [
             new_images[i:i+step]
             for i in range(0, len(new_images), step)
         ]
         for new_images_chunk in chunked_new_images:
             # создаем миниатюры с шагом 10
-            # получаем успешно и неуспешно созданные миниатюры
-            ok_chunks, bad_chunks = HashdirImgUpdater.run_new_images(
-                scaner_item=scaner_item,
-                new_images=new_images_chunk
-            )
+            HashdirImgUpdater.run_new_images(scaner_item, new_images_chunk)
+            DbImgUpdater.upsert_records(scaner_item, new_images_chunk)
 
-            # обновляем БД об успешно созданных миниатюрах
-            DbImgUpdater.upsert_records(
-                scaner_item=scaner_item,
-                new_images=ok_chunks
-            )
-            # обновляем список неуспешно созданных миниатюр
-            bad_new_images.extend(bad_chunks)
-
-        dirs_to_scan = DbDirUpdater.get_good_dirs(
-            bad_del_images=bad_del_images,
-            bad_new_images=bad_new_images,
-            dirs_to_scan=dirs_to_scan
-        )
-
-        DbDirUpdater.upsert_records(
-            scaner_item=scaner_item,
-            dirs_to_scan=dirs_to_scan
-        )
-
-        return (del_images, new_images)
+        DbDirUpdater.upsert_records(scaner_item, dirs_to_scan)
     
 
 
