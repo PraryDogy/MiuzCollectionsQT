@@ -168,8 +168,8 @@ class WinCopyFiles(ProgressbarWin):
         self.copy_timer.stop()
         finished = False
 
-        if not self.copy_task.proc_q.empty():
-            self.copy_item: CopyTaskItem = self.copy_task.proc_q.get()
+        if not self.copy_task.process_queue.empty():
+            self.copy_item: CopyTaskItem = self.copy_task.process_queue.get()
 
             if self.copy_item.msg == "error":
                 self.error_win = ErrorWin()
@@ -226,14 +226,14 @@ class WinCopyFiles(ProgressbarWin):
     def replace_one(self):
         self.copy_timer.stop()
         self.copy_item.msg = "replace_one"
-        self.copy_task.gui_q.put(self.copy_item)
+        self.copy_task.gui_queue.put(self.copy_item)
         self.replace_win.deleteLater()
         self.copy_timer.start(self.ms)
 
     def replace_all(self):
         self.copy_timer.stop()
         self.copy_item.msg = "replace_all"
-        self.copy_task.gui_q.put(self.copy_item)
+        self.copy_task.gui_queue.put(self.copy_item)
         self.replace_win.deleteLater()
         self.copy_timer.start(self.ms)
 

@@ -109,7 +109,7 @@ class WinInfo(SingleActionWindow):
 
         def poll():
             self.task_timer.stop()
-            q = self.task_.proc_q
+            q = self.task_.process_queue
             if not q.empty():
                 info_item: OneFileInfoItem = q.get()
                 self.single_img_fin(info_item)

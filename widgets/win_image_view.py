@@ -337,7 +337,7 @@ class WinImageView(AppModalWindow):
 
         def poll():
             self.read_img_timer.stop()
-            q = self.read_img_task.proc_q
+            q = self.read_img_task.process_queue
             if not q.empty():
                 item: ReadImgItem = q.get()
                 if item.img_array is not None:

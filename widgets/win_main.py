@@ -308,7 +308,7 @@ class WinMain(UMainWindow):
     def start_update_thumb(self, parent: QWidget, mf: Mf, rel_thumb_path: str):
 
         def poll_task():
-            q = self.update_thumb_task.proc_q
+            q = self.update_thumb_task.process_queue
             if not q.empty():
                 img_array = q.get()
                 if img_array is not None:
@@ -434,8 +434,8 @@ class WinMain(UMainWindow):
     def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
         
         def poll_file_remover():
-            if not file_remover.proc_q.empty():
-                file_remover.proc_q.get()
+            if not file_remover.process_queue.empty():
+                file_remover.process_queue.get()
             if not file_remover.is_alive():
                 file_remover.terminate_join()
                 self.scaner_data[mf].extend(dirs_to_scan)
@@ -607,8 +607,8 @@ class WinMain(UMainWindow):
             self.scaner_poll_timer.start(ms)
             return
         reload_gui_ = False
-        while not self.scaner_task.proc_q.empty():
-            text, reload_gui = self.scaner_task.proc_q.get()
+        while not self.scaner_task.process_queue.empty():
+            text, reload_gui = self.scaner_task.process_queue.get()
             if not reload_gui_:
                 reload_gui_ = reload_gui
             if self.bar_bottom.progress_bar.text() != text:

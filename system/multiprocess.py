@@ -65,8 +65,8 @@ class ProcessWorker(BaseProcessWorker):
         Передает в BaseProcessWorker args + self.proc (Queue)
     """
     def __init__(self, target: callable, args: tuple):
-        self.proc_q = Queue()
-        super().__init__(target, (*args, self.proc_q))
+        self.process_queue = Queue()
+        super().__init__(target, (*args, self.process_queue))
 
 
 class ReadImg:
@@ -122,9 +122,9 @@ class OneFileInfo:
 
 class CopyTaskWorker(BaseProcessWorker):
     def __init__(self, target, args):
-        self.proc_q = Queue()
-        self.gui_q = Queue()
-        super().__init__(target, (*args, self.proc_q, self.gui_q))
+        self.process_queue = Queue()
+        self.gui_queue = Queue()
+        super().__init__(target, (*args, self.process_queue, self.gui_queue))
 
 
 class CopyTask:
