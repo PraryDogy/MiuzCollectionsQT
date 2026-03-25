@@ -291,6 +291,7 @@ class App(QApplication):
 
 
 if "print" in sys.argv:
+    print("ПРИНТЫ ВКЛЮЧЕНЫ")
     System_.show_prints()
 
 if __name__ == "__main__":
