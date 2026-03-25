@@ -109,12 +109,12 @@ class WinInfo(SingleActionWindow):
 
         def poll():
             self.task_timer.stop()
-            q = self.task_.process_queue
-            if not q.empty():
-                info_item: OneFileInfoItem = q.get()
+            queue = self.task_.process_queue
+            if not queue.empty():
+                info_item: OneFileInfoItem = queue.get()
                 self.single_img_fin(info_item)
 
-            if not self.task_.is_alive() and q.empty():
+            if not self.task_.is_alive() and queue.empty():
                 self.task_.terminate_join()
             else:
                 self.task_timer.start(500)

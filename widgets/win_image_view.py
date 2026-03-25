@@ -337,9 +337,9 @@ class WinImageView(AppModalWindow):
 
         def poll():
             self.read_img_timer.stop()
-            q = self.read_img_task.process_queue
-            if not q.empty():
-                item: ReadImgItem = q.get()
+            queue = self.read_img_task.process_queue
+            if not queue.empty():
+                item: ReadImgItem = queue.get()
                 if item.img_array is not None:
                     if item.src == self.path:
                         qimage_task = ImgArrayQImage(item.img_array)

@@ -43,9 +43,9 @@ class BaseProcessWorker:
         self.process.terminate()
         self.process.join(timeout=0.2)
 
-        for q in self._queues:
-            q.close()
-            q.cancel_join_thread()
+        for queue in self._queues:
+            queue.close()
+            queue.cancel_join_thread()
 
         if self.process.is_alive():
             self.process.kill()

@@ -308,9 +308,9 @@ class WinMain(UMainWindow):
     def start_update_thumb(self, parent: QWidget, mf: Mf, rel_thumb_path: str):
 
         def poll_task():
-            q = self.update_thumb_task.process_queue
-            if not q.empty():
-                img_array = q.get()
+            queue = self.update_thumb_task.process_queue
+            if not queue.empty():
+                img_array = queue.get()
                 if img_array is not None:
                     wid = self.grid.path_to_wid.get(rel_thumb_path)
                     wid.img = Utils.pixmap_from_array(img_array)
@@ -576,8 +576,8 @@ class WinMain(UMainWindow):
 
         def poll_task():
             q = self.watchdog_task.proc_q
-            if not q.empty():
-                watchdog_item: WatchDogItem = q.get()
+            if not queue.empty():
+                watchdog_item: WatchDogItem = queue.get()
                 print(
                     watchdog_item.mf.alias,
                     watchdog_item.event.event_type

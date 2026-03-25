@@ -213,24 +213,24 @@ class ImgLoader:
         conn = scaner_item.engine.connect()
         db_images: list[ScanerImgItem] = []
         for dir_item in dirs_to_scan:
-            q = sqlalchemy.select(
+            stmt = sqlalchemy.select(
                 Thumbs.rel_thumb_path,
                 Thumbs.rel_img_path,
                 Thumbs.size,
                 Thumbs.mod
                 )
-            q = q.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+            stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
             if dir_item.rel_path == os.sep:
-                q = q.where(Thumbs.rel_img_path.ilike("/%"))
-                q = q.where(Thumbs.rel_img_path.not_ilike(f"/%/%"))
+                stmt = stmt.where(Thumbs.rel_img_path.ilike("/%"))
+                stmt = stmt.where(Thumbs.rel_img_path.not_ilike(f"/%/%"))
             else:
-                q = q.where(
+                stmt = stmt.where(
                     Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%")
                 )
-                q = q.where(
+                stmt = stmt.where(
                     Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%")
                 )
-            for rel_thumb_path, rel_path, size, mod in conn.execute(q):
+            for rel_thumb_path, rel_path, size, mod in conn.execute(stmt):
                 abs_img_path = Utils.get_abs_any_path(
                     mf_path=scaner_item.mf.mf_current_path,
                     rel_path=rel_path
