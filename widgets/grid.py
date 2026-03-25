@@ -476,6 +476,9 @@ class Grid(VScrollArea):
     def load_initial_grid(self, db_images: dict[str, list[DbImagesLoader.Item]]):
 
         def load_grid_delayed():
+            # QTimer.singleShot(2000, lambda: self.reload_thumbnails())
+            # value = self.verticalScrollBar().maximum()
+            prev_selection = [i.rel_path for i in self.selected_widgets]
             self.remove_grid_container()
             self.load_grid_container()
             self.reset_grid_properties()
@@ -491,6 +494,10 @@ class Grid(VScrollArea):
                     self.add_thumbnails_to_grid(db_images_list)
                 self.rearrange()
                 self.grid_wid.show()
+                for i in prev_selection:
+                    self.wid_to_selected_widgets(
+                        self.path_to_wid[i]
+                    )
                 if self.go_to_url and self.go_to_url in self.path_to_wid:
                     wid = self.path_to_wid[self.go_to_url]
                     wid.set_frame()
