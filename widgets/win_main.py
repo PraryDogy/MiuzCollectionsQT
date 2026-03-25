@@ -224,9 +224,10 @@ class WinMain(UMainWindow):
         self.grid.setFocus()
 
         self.grid.reload_thumbnails()
-        if "noscan" in argv:
-            print("СКАНЕР ВЫКЛЮЧЕН")
+        if "noscan" not in argv:
             self.start_scaner_task()
+        else:
+            print("СКАНЕР ВЫКЛЮЧЕН")
         self.start_wachdog()
 
     @staticmethod
