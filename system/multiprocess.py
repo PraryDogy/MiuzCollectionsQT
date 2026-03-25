@@ -144,6 +144,9 @@ class CopyTask:
 
         for count, (src, dest) in enumerate(src_dst_urls, start=1):
 
+            if src == dest:
+                dest = CopyTask.set_count_name(dest)
+
             if not replace_all and dest.exists() and src.name == dest.name:
                 copy_item.msg = "need_replace"
                 process_queue.put(copy_item)
@@ -182,6 +185,17 @@ class CopyTask:
             new_path = dst_dir.joinpath(url.name)
             src_dst_urls.append((url, new_path))
         return src_dst_urls
+    
+    @staticmethod
+    def set_count_name(path: Path):
+        counter = 2
+        filename, ext = os.path.splitext(path.name)
+        while os.path.exists(path):
+            new_filename = f"{filename} ({counter}){ext}"
+            path = os.path.join(path.parent, new_filename)
+            path = Path(path)
+            counter += 1
+        return path
         
     @staticmethod
     def copy_file_with_progress(process_queue: Queue, copy_item: CopyTaskItem, src: Path, dest: Path):
