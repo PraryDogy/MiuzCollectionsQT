@@ -203,7 +203,7 @@ class DbDirUpdater:
         ]
 
     @staticmethod
-    def start(scaner_item: IntScanerItem, dirs_to_scan: list[DirItem]):
+    def upsert_records(scaner_item: IntScanerItem, dirs_to_scan: list[DirItem]):
         """
         Запускать только, когда:
         - добавлены и удалены изображения `ImgItem` из БД
@@ -455,9 +455,8 @@ class DbImgUpdater:
         Удаляет из БД удаленные изображения.
         """
         conn = scaner_item.eng.connect()
-        rel_thumb_paths = [i.rel_thumb_path for i in del_images]
         q = sqlalchemy.delete(Thumbs.table).where(
-            Thumbs.rel_thumb_path.in_(rel_thumb_paths),
+            Thumbs.rel_thumb_path.in_([i.rel_thumb_path for i in del_images]),
             Thumbs.mf_alias == scaner_item.mf.mf_alias
         )
         conn.execute(q)
@@ -472,6 +471,15 @@ class DbImgUpdater:
         Добавляет записи из БД об успешно сохраненных изображениях.
         """
         conn = scaner_item.eng.connect()
+
+        del_stmt = sqlalchemy.delete(Thumbs.table).where(
+            Thumbs.rel_thumb_path.in_([i.rel_thumb_path for i in new_images]),
+            Thumbs.mf_alias == scaner_item.mf.mf_alias
+        )
+        conn.execute(del_stmt)
+        conn.commit()
+
+        # добавляем записи
         values_list = []
         for img_item in new_images:
             rel_img_path = Utils.get_rel_any_path(
@@ -494,20 +502,7 @@ class DbImgUpdater:
                 ClmnNames.fav: 0,
                 ClmnNames.mf_alias: scaner_item.mf.mf_alias
             })
-        stmt = dialect_insert(Thumbs.table).values(values_list)
-        stmt = stmt.on_conflict_do_update(
-            index_elements=[Thumbs.rel_thumb_path],
-            set_={
-                ClmnNames.rel_item_path: stmt.excluded[ClmnNames.rel_item_path],
-                ClmnNames.size: stmt.excluded[ClmnNames.size],
-                ClmnNames.birth: stmt.excluded[ClmnNames.birth],
-                ClmnNames.mod: stmt.excluded[ClmnNames.mod],
-                ClmnNames.resol: stmt.excluded[ClmnNames.resol],
-                ClmnNames.coll: stmt.excluded[ClmnNames.coll],
-                ClmnNames.fav: stmt.excluded[ClmnNames.fav],
-                ClmnNames.mf_alias: stmt.excluded[ClmnNames.mf_alias]
-            }
-        )
+        stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
         conn.execute(stmt)
         conn.commit()
         conn.close()
@@ -575,7 +570,7 @@ class NewDirsWorker:
             dirs_to_scan=dirs_to_scan
         )
 
-        DbDirUpdater.start(
+        DbDirUpdater.upsert_records(
             scaner_item=scaner_item,
             dirs_to_scan=dirs_to_scan
         )
