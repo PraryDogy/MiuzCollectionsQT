@@ -94,7 +94,7 @@ class UploadWin(SingleActionWindow):
 
     def __init__(self, target_dir: str, target_files: list[str]):
         super().__init__()
-        self.setWindowTitle(Lng.upload_in[Cfg.lng])
+        self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
         self.setFixedSize(400, 400)
         self.central_layout.setSpacing(10)
 
@@ -111,7 +111,7 @@ class UploadWin(SingleActionWindow):
         warn.setFixedSize(self.icon_size, self.icon_size)
         group_lay.addWidget(warn)
 
-        descr = QLabel(Lng.upload_descr[Cfg.lng])
+        descr = QLabel(Lng.upload_descr[Cfg.lng_index])
         group_lay.addWidget(descr)
 
         tree = TreeWid(target_dir, target_files)
@@ -124,12 +124,12 @@ class UploadWin(SingleActionWindow):
         btn_lay.setSpacing(self.btn_spacing)
         btn_wid.setLayout(btn_lay)
 
-        ok_btn = SmallBtn(Lng.ok[Cfg.lng])
+        ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
         ok_btn.clicked.connect(self.ok_clicked)
         ok_btn.setFixedWidth(self.btn_w)
         btn_lay.addWidget(ok_btn)
 
-        cancel_btn = SmallBtn(Lng.cancel[Cfg.lng])
+        cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
         cancel_btn.setFixedWidth(self.btn_w)
         btn_lay.addWidget(cancel_btn)

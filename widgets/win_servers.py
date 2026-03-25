@@ -24,7 +24,7 @@ class ServersWidget(QTableView):
 
         self.model_ = QStandardItemModel(0, 3, self)
         self.model_.setHorizontalHeaderLabels([
-            Lng.server[Cfg.lng], Lng.login[Cfg.lng], Lng.password[Cfg.lng]
+            Lng.server[Cfg.lng_index], Lng.login[Cfg.lng_index], Lng.password[Cfg.lng_index]
         ])
         self.setModel(self.model_)
 
@@ -77,8 +77,8 @@ class ServersWidget(QTableView):
             return
 
         menu = QMenu(self)
-        copy_action = menu.addAction(Lng.copy[Cfg.lng])
-        delete_action = menu.addAction(Lng.delete[Cfg.lng])
+        copy_action = menu.addAction(Lng.copy[Cfg.lng_index])
+        delete_action = menu.addAction(Lng.delete[Cfg.lng_index])
         action = menu.exec_(self.viewport().mapToGlobal(pos))
 
         if action == copy_action:
@@ -99,7 +99,7 @@ class ServersWidget(QTableView):
 class ServersWin(SingleActionWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.connect_to_server[Cfg.lng])
+        self.setWindowTitle(Lng.connect_to_server[Cfg.lng_index])
         self.setFixedWidth(400)
 
         # Загрузка данных
@@ -111,7 +111,7 @@ class ServersWin(SingleActionWindow):
 
         self.new_server = ULineEdit()
         self.new_server.setPlaceholderText(
-            f"{Lng.server[Cfg.lng]}, {Lng.login[Cfg.lng]}, {Lng.password[Cfg.lng]}"
+            f"{Lng.server[Cfg.lng_index]}, {Lng.login[Cfg.lng_index]}, {Lng.password[Cfg.lng_index]}"
         )
         self.central_layout.addWidget(self.new_server)
 
@@ -136,7 +136,7 @@ class ServersWin(SingleActionWindow):
         btn_remove.clicked.connect(lambda: self.remove_btn_cmd())
 
         # Connect справа
-        btn_connect = QPushButton(Lng.connect_short[Cfg.lng])
+        btn_connect = QPushButton(Lng.connect_short[Cfg.lng_index])
         btn_connect.setFixedWidth(90)
         btn_connect.clicked.connect(self.connect_cmd)
 

@@ -134,9 +134,9 @@ class ULineEdit(QLineEdit):
         self.menu_.setFixedWidth(self.menu_width)
 
         actions = [
-            (Lng.cut[Cfg.lng], self.cut_selection),
-            (Lng.copy[Cfg.lng], lambda: Utils.copy_text(self.selectedText())),
-            (Lng.paste[Cfg.lng], self.paste_text),
+            (Lng.cut[Cfg.lng_index], self.cut_selection),
+            (Lng.copy[Cfg.lng_index], lambda: Utils.copy_text(self.selectedText())),
+            (Lng.paste[Cfg.lng_index], self.paste_text),
         ]
 
         for text, slot in actions:
@@ -188,9 +188,9 @@ class UTextEdit(QTextEdit):
         menu_.setFixedWidth(120)
 
         actions = [
-            (Lng.cut[Cfg.lng], self.cut_selection),
-            (Lng.copy[Cfg.lng], self.copy_selection),
-            (Lng.paste[Cfg.lng], self.paste_text),
+            (Lng.cut[Cfg.lng_index], self.cut_selection),
+            (Lng.copy[Cfg.lng_index], self.copy_selection),
+            (Lng.paste[Cfg.lng_index], self.paste_text),
         ]
 
         for text, slot in actions:

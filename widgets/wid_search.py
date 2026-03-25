@@ -41,7 +41,7 @@ class WidSearch(ULineEdit):
         self.setFixedWidth(150)
 
         self.textChanged.connect(self.create_search)
-        self.setPlaceholderText(Lng.search[Cfg.lng])
+        self.setPlaceholderText(Lng.search[Cfg.lng_index])
 
         self.clear_btn = ClearBtn(parent=self)
         self.clear_btn.clicked_.connect(self.clear_search)

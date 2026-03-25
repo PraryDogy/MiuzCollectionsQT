@@ -122,13 +122,13 @@ class FirstLoad(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(Lng.settings_title[Cfg.lng])
+        self.setWindowTitle(Lng.settings_title[Cfg.lng_index])
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         layout = QVBoxLayout(self)
         layout.setSpacing(15)
 
-        self.title_label = QLabel(Lng.description[Cfg.lng])
+        self.title_label = QLabel(Lng.description[Cfg.lng_index])
         self.title_label.setWordWrap(True)
         self.title_label.setFixedWidth(310)
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -138,7 +138,7 @@ class FirstLoad(QDialog):
         groups_layout.setSpacing(10)
 
         self.group_app = ClickableGroupBox(
-            Lng.setup_app[Cfg.lng],
+            Lng.setup_app[Cfg.lng_index],
             self.setup_app
         )
         groups_layout.addWidget(self.group_app)
@@ -197,7 +197,7 @@ class LanguageSelect(QDialog):
         self.adjustSize()
 
     def select_lang(self, index):
-        Cfg.lng = index
+        Cfg.lng_index = index
         self.closed_.emit()
         self.deleteLater()
     

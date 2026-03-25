@@ -179,10 +179,10 @@ class DbImagesLoader(URunnable):
             if Dynamic.date_start or Dynamic.date_end:
                 f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             else:
-                f_mod = f"{Lng.months[Cfg.lng][str(f_mod.month)]} {f_mod.year}"
+                f_mod = f"{Lng.months[Cfg.lng_index][str(f_mod.month)]} {f_mod.year}"
 
             date_time = datetime.fromtimestamp(mod)
-            month = Lng.months_genitive_case[Cfg.lng][str(date_time.month)]
+            month = Lng.months_genitive_case[Cfg.lng_index][str(date_time.month)]
             mod = f"{date_time.day} {month} {date_time.year}"
 
             item = DbImagesLoader.Item(qimage, rel_path, fav, f_mod, mod)

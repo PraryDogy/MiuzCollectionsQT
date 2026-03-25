@@ -150,7 +150,7 @@ class RebootSettings(GroupWid):
         lng_wid = GroupChild()
         self.layout_.addWidget(lng_wid)
 
-        self.lng_text = ULabel(Lng.language_max[Cfg.lng])
+        self.lng_text = ULabel(Lng.language_max[Cfg.lng_index])
         lng_wid.layout_.addWidget(self.lng_text)
 
         lng_wid.layout_.addStretch()
@@ -161,7 +161,7 @@ class RebootSettings(GroupWid):
             action.triggered.connect(lambda e, v=value: self.lang_action_cmd(v))
             self.lng_menu.addAction(action)
 
-        self.lng_btn = UPushButton(text=Lng.russian[Cfg.lng])
+        self.lng_btn = UPushButton(text=Lng.russian[Cfg.lng_index])
         self.lng_btn.setFixedWidth(109)
         self.lng_btn.setMenu(self.lng_menu)
         lng_wid.layout_.addWidget(self.lng_btn)
@@ -171,7 +171,7 @@ class RebootSettings(GroupWid):
         scaner_time_wid = GroupChild()
         self.layout_.addWidget(scaner_time_wid)
 
-        scaner_time_text = ULabel(Lng.search_interval[Cfg.lng], self)
+        scaner_time_text = ULabel(Lng.search_interval[Cfg.lng_index], self)
         scaner_time_wid.layout_.addWidget(scaner_time_text)
 
         scaner_time_wid.layout_.addStretch()
@@ -183,7 +183,7 @@ class RebootSettings(GroupWid):
         self.spin.setFixedHeight(27)
         self.spin.setFixedWidth(100)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
-        self.spin.setSuffix(f" {Lng.minutes[Cfg.lng]}")
+        self.spin.setSuffix(f" {Lng.minutes[Cfg.lng_index]}")
         self.spin.setValue(self.cfg_clone.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_time_wid.layout_.addWidget(self.spin)
@@ -194,7 +194,7 @@ class RebootSettings(GroupWid):
         reset_data_wid.mouseReleaseEvent = self.reset_btn_cmd
         self.layout_.addWidget(reset_data_wid)
 
-        reset_data_text = ULabel(Lng.erase_data[Cfg.lng])
+        reset_data_text = ULabel(Lng.erase_data[Cfg.lng_index])
         reset_data_wid.layout_.addWidget(reset_data_text)
 
         reset_data_wid.layout_.addStretch()
@@ -203,7 +203,7 @@ class RebootSettings(GroupWid):
         reset_data_wid.layout_.addWidget(self.reset_data_btn)
 
     def lang_action_cmd(self, value: int):
-        self.cfg_clone.lng = value
+        self.cfg_clone.lng_index = value
         self.lng_btn.setText(Lng.russian[value])
         self.cfg_changed.emit()
 
@@ -213,7 +213,7 @@ class RebootSettings(GroupWid):
             shutil.rmtree(Static.external_files_dir)
             restart_app()
 
-        reset_win = ConfirmWindow(Lng.erase_data_long[Cfg.lng])
+        reset_win = ConfirmWindow(Lng.erase_data_long[Cfg.lng_index])
         reset_win.center_to_parent(self.window())
         reset_win.ok_clicked.connect(fin)
         reset_win.show()
@@ -240,7 +240,7 @@ class SizesWin(SingleActionWindow):
 
     def __init__(self, sizes: dict[str, int], parent=None):
         super().__init__(parent)
-        self.setWindowTitle(Lng.data_size[Cfg.lng])
+        self.setWindowTitle(Lng.data_size[Cfg.lng_index])
         self.resize(self.ww, self.hh)
 
         central = QWidget()
@@ -254,16 +254,16 @@ class SizesWin(SingleActionWindow):
         info_layout.setSpacing(5)
 
         total_size = SharedUtils.get_f_size(sum(i['size'] for i in sizes.values()))
-        first_row = QLabel(f"{Lng.data_size[Cfg.lng]}: {total_size}")
+        first_row = QLabel(f"{Lng.data_size[Cfg.lng_index]}: {total_size}")
         info_layout.addWidget(first_row)
 
         total = sum(i["total"] for i in sizes.values())
-        sec_row = QLabel(f"{Lng.images[Cfg.lng]}: {total}")
+        sec_row = QLabel(f"{Lng.images[Cfg.lng_index]}: {total}")
         info_layout.addWidget(sec_row)
 
         layout.addWidget(info_widget)
 
-        headers = [Lng.folder[Cfg.lng], Lng.file_size[Cfg.lng], Lng.images[Cfg.lng]]
+        headers = [Lng.folder[Cfg.lng_index], Lng.file_size[Cfg.lng_index], Lng.images[Cfg.lng_index]]
         self.table = QTableWidget()
         self.table.setSortingEnabled(True)
         self.table.setColumnCount(len(headers))
@@ -331,7 +331,7 @@ class NonRebootSettings(GroupWid):
         data_size_wid.mouseReleaseEvent = self.show_sizes_win
         self.layout_.addWidget(data_size_wid)
 
-        data_size_text = ULabel(text=Lng.statistic[Cfg.lng])
+        data_size_text = ULabel(text=Lng.statistic[Cfg.lng_index])
         data_size_wid.layout_.addWidget(data_size_text)
 
         data_size_wid.layout_.addStretch()
@@ -345,10 +345,10 @@ class NonRebootSettings(GroupWid):
         show_files_wid.mouseReleaseEvent = self.show_files_cmd
         self.layout_.addWidget(show_files_wid)
 
-        show_files_text = ULabel(Lng.show_system_files[Cfg.lng])
+        show_files_text = ULabel(Lng.show_system_files[Cfg.lng_index])
         show_files_wid.layout_.addWidget(show_files_text)
 
-        show_files_btn = SvgArrow(text=Lng.show[Cfg.lng])
+        show_files_btn = SvgArrow(text=Lng.show[Cfg.lng_index])
         show_files_wid.layout_.addWidget(show_files_btn)
 
         self.get_sizes()
@@ -456,15 +456,15 @@ class Themes(GroupWid):
 
         self.system_theme = ThemesBtn(
             self.svg_theme_system,
-            Lng.theme_auto[Cfg.lng]
+            Lng.theme_auto[Cfg.lng_index]
         )
         self.dark_theme = ThemesBtn(
             self.svg_theme_dark,
-            Lng.theme_dark[Cfg.lng]
+            Lng.theme_dark[Cfg.lng_index]
         )
         self.light_theme = ThemesBtn(
             self.svg_theme_light,
-            Lng.theme_light[Cfg.lng]
+            Lng.theme_light[Cfg.lng_index]
         )
 
         for f in (self.system_theme, self.dark_theme, self.light_theme):
@@ -514,13 +514,13 @@ class SelectableLabel(ULabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng])
+        copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng_index])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng])
+        select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng_index])
         select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -592,7 +592,7 @@ class FiltersWid(GroupWid):
         super().__init__()
         self.filters_clone = filters_clone
 
-        filters_text = ULabel(Lng.filters_descr[Cfg.lng])
+        filters_text = ULabel(Lng.filters_descr[Cfg.lng_index])
         filters_text.setWordWrap(True)
         self.layout_.addWidget(filters_text)
 
@@ -604,7 +604,7 @@ class FiltersWid(GroupWid):
         erase_filters_wid.mouseReleaseEvent = self.reset_btn_cmd
         self.layout_.addWidget(erase_filters_wid)
 
-        erase_filters_text = QLabel(Lng.reset_filters[Cfg.lng])
+        erase_filters_text = QLabel(Lng.reset_filters[Cfg.lng_index])
         erase_filters_wid.layout_.addWidget(erase_filters_text)
 
         erase_filters_wid.layout_.addStretch()
@@ -617,7 +617,7 @@ class FiltersWid(GroupWid):
 
         self.filters_edit = UTextEdit()
         self.filters_edit.setFixedHeight(220)
-        self.filters_edit.setPlaceholderText(Lng.filters[Cfg.lng])
+        self.filters_edit.setPlaceholderText(Lng.filters[Cfg.lng_index])
         self.filters_edit.setPlainText("\n".join(self.filters_clone))
         self.filters_edit.textChanged.connect(self.on_text_changed)
         self.layout_.addWidget(self.filters_edit)
@@ -630,7 +630,7 @@ class FiltersWid(GroupWid):
             self.filters_win.deleteLater()
             self.changed.emit
 
-        self.filters_win = ConfirmWindow(Lng.reset_filters_long[Cfg.lng])
+        self.filters_win = ConfirmWindow(Lng.reset_filters_long[Cfg.lng_index])
         self.filters_win.ok_clicked.connect(fin)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
@@ -652,8 +652,8 @@ class FiltersWid(GroupWid):
 class MfPaths(TextEditWidget):
     def __init__(self, mf: Mf):
         super().__init__(
-            title=Lng.images_folder_path[Cfg.lng],
-            placeholder=Lng.folder_path[Cfg.lng],
+            title=Lng.images_folder_path[Cfg.lng_index],
+            placeholder=Lng.folder_path[Cfg.lng_index],
             text="\n".join(i for i in mf.mf_paths),
         )
         self.mf = mf
@@ -679,8 +679,8 @@ class MfPaths(TextEditWidget):
 class MfStopList(TextEditWidget):
     def __init__(self, mf: Mf):
         super().__init__(
-            title=Lng.ignore_list_descr[Cfg.lng],
-            placeholder=Lng.ignore_list[Cfg.lng],
+            title=Lng.ignore_list_descr[Cfg.lng_index],
+            placeholder=Lng.ignore_list[Cfg.lng_index],
             text="\n".join(i for i in mf.mf_stop_list),
         )
         self.mf = mf
@@ -711,7 +711,7 @@ class MfSave(GroupWid):
         save_wid_child = GroupChild()
         self.layout_.addWidget(save_wid_child)
 
-        save_text = ULabel(Lng.save[Cfg.lng])
+        save_text = ULabel(Lng.save[Cfg.lng_index])
         save_wid_child.layout_.addWidget(save_text)
 
         save_wid_child.layout_.addSpacerItem(QSpacerItem(10, 0))
@@ -750,7 +750,7 @@ class MfSettings(QWidget):
         # Верхний ряд с названием
         self.name_wid = GroupWid()
         main_lay.addWidget(self.name_wid)
-        name_text = ULabel(f"{Lng.alias[Cfg.lng]}: {mf.mf_alias}")
+        name_text = ULabel(f"{Lng.alias[Cfg.lng_index]}: {mf.mf_alias}")
         name_text.setFixedHeight(GroupChild.hh)
         self.name_wid.layout_.addWidget(name_text)
 
@@ -777,7 +777,7 @@ class MfSettings(QWidget):
         reset_wid.mouseReleaseEvent = self.set_reset_flag
         general_wid.layout_.addWidget(reset_wid)
 
-        reset_text = ULabel(text=Lng.reset_mf[Cfg.lng])
+        reset_text = ULabel(text=Lng.reset_mf[Cfg.lng_index])
         reset_wid.layout_.addWidget(reset_text)
 
         reset_wid.layout_.addStretch()
@@ -791,7 +791,7 @@ class MfSettings(QWidget):
         remove_wid.mouseReleaseEvent = self.remove_cmd
         general_wid.layout_.addWidget(remove_wid)
 
-        remove_text = ULabel(text=Lng.remove_folder[Cfg.lng])
+        remove_text = ULabel(text=Lng.remove_folder[Cfg.lng_index])
         remove_wid.layout_.addWidget(remove_text)
         remove_wid.layout_.addStretch()
         remove_btn = SvgArrow()
@@ -810,9 +810,9 @@ class MfSettings(QWidget):
             restart_app()
 
         if len(self.mf_list_clone) == 1:
-            win = WarningWindow(Lng.at_least_one_folder_required[Cfg.lng])
+            win = WarningWindow(Lng.at_least_one_folder_required[Cfg.lng_index])
         else:
-            win = ConfirmWindow(Lng.remove_folder_long[Cfg.lng])
+            win = ConfirmWindow(Lng.remove_folder_long[Cfg.lng_index])
             win.ok_clicked.connect(fin)
         win.center_to_parent(self.window())
         win.show()
@@ -824,7 +824,7 @@ class MfSettings(QWidget):
             self.reset_task.sigs.finished_.connect(restart_app)
             UThreadPool.start(self.reset_task)
 
-        win = ConfirmWindow(Lng.reset_mf_long[Cfg.lng])
+        win = ConfirmWindow(Lng.reset_mf_long[Cfg.lng_index])
         win.ok_clicked.connect(reset_data)
         win.center_to_parent(self.window())
         win.show()
@@ -853,10 +853,10 @@ class MfSettings(QWidget):
             win_warn.show()
 
         if not paths:
-            show_warn(Lng.select_folder_path[Cfg.lng])
+            show_warn(Lng.select_folder_path[Cfg.lng_index])
             return
 
-        win = ConfirmWindow(Lng.save_text_long[Cfg.lng])
+        win = ConfirmWindow(Lng.save_text_long[Cfg.lng_index])
         win.ok_clicked.connect(fin)
         win.center_to_parent(self.window())
         win.show()
@@ -889,11 +889,11 @@ class NewFolder(QWidget):
         name_wid = GroupWid()
         main_lay.addWidget(name_wid)
 
-        self.name_text = QLabel(Lng.folder_name[Cfg.lng])
+        self.name_text = QLabel(Lng.folder_name[Cfg.lng_index])
         name_wid.layout_.addWidget(self.name_text)
 
         self.name_line_edit = ULineEdit()
-        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[Cfg.lng])
+        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[Cfg.lng_index])
         name_wid.layout_.addWidget(self.name_line_edit)
 
         self.mf_paths = MfPaths(self.mf)
@@ -909,7 +909,7 @@ class NewFolder(QWidget):
         save_wid_child = GroupChild()
         save_wid.layout_.addWidget(save_wid_child)
 
-        save_text = ULabel(Lng.save[Cfg.lng])
+        save_text = ULabel(Lng.save[Cfg.lng_index])
         save_wid_child.layout_.addWidget(save_text)
 
         save_wid_child.layout_.addSpacerItem(QSpacerItem(10, 0))
@@ -962,29 +962,29 @@ class NewFolder(QWidget):
             win_warn.show()
 
         if not folder_name:
-            show_warn(Lng.enter_alias_warning[Cfg.lng])
+            show_warn(Lng.enter_alias_warning[Cfg.lng_index])
             return
 
         elif any(i.mf_alias == folder_name for i in self.mf_list_clone):
             show_warn(
-                f'{Lng.alias[Cfg.lng]} "{folder_name}" '
-                f'{Lng.already_taken[Cfg.lng].lower()}'
+                f'{Lng.alias[Cfg.lng_index]} "{folder_name}" '
+                f'{Lng.already_taken[Cfg.lng_index].lower()}'
             )
             return
 
         elif len(folder_name) < 5 or len(folder_name) > 30:
-            show_warn(f'{Lng.string_limit[Cfg.lng]}')
+            show_warn(f'{Lng.string_limit[Cfg.lng_index]}')
             return
 
         elif not re.fullmatch(pattern, folder_name):
-            show_warn(f'{Lng.valid_message[Cfg.lng]}')
+            show_warn(f'{Lng.valid_message[Cfg.lng_index]}')
             return
 
         elif not paths:
-            show_warn(Lng.select_folder_path[Cfg.lng])
+            show_warn(Lng.select_folder_path[Cfg.lng_index])
             return
 
-        win = ConfirmWindow(Lng.save_text_long[Cfg.lng])
+        win = ConfirmWindow(Lng.save_text_long[Cfg.lng_index])
         win.ok_clicked.connect(
             self.save_fin(folder_name, paths, stop_list)
         )
@@ -1009,7 +1009,7 @@ class WinSettings(SingleActionWindow):
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
-        self.setWindowTitle(Lng.settings[Cfg.lng])
+        self.setWindowTitle(Lng.settings[Cfg.lng_index])
         self.setFixedSize(700, 560)
 
         self.cfg_clone = copy.deepcopy(Cfg)
@@ -1031,21 +1031,21 @@ class WinSettings(SingleActionWindow):
 
         main_settings_item = UListWidgetItem(
             parent=self.left_menu,
-            text=Lng.general[Cfg.lng]
+            text=Lng.general[Cfg.lng_index]
         )
         main_settings_item.setIcon(QIcon(self.svg_settings))
         self.left_menu.addItem(main_settings_item)
         
         filter_settings = UListWidgetItem(
             parent=self.left_menu,
-            text=Lng.filters[Cfg.lng]
+            text=Lng.filters[Cfg.lng_index]
         )
         filter_settings.setIcon(QIcon(self.svg_filters))
         self.left_menu.addItem(filter_settings)
 
         new_folder = UListWidgetItem(
             parent=self.left_menu,
-            text=Lng.new_folder[Cfg.lng]
+            text=Lng.new_folder[Cfg.lng_index]
         )
         new_folder.setIcon(QIcon(self.svg_new_folder))
         self.left_menu.addItem(new_folder)
@@ -1077,12 +1077,12 @@ class WinSettings(SingleActionWindow):
         btns_lay.addWidget(self.warn_svg)
         self.warn_svg.hide()
 
-        self.ok_btn = UPushButton(Lng.ok[Cfg.lng])
+        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.setFixedWidth(95)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
-        cancel_btn = UPushButton(Lng.cancel[Cfg.lng])
+        cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
         cancel_btn.setFixedWidth(95)
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
@@ -1111,7 +1111,7 @@ class WinSettings(SingleActionWindow):
         self.init_right_side(idx)
 
     def blink_ok_btn(self):
-        self.ok_btn.setText(Lng.restart[Cfg.lng])
+        self.ok_btn.setText(Lng.restart[Cfg.lng_index])
         self.warn_svg.show()
 
     def init_right_side(self, idx: int):
@@ -1172,7 +1172,7 @@ class WinSettings(SingleActionWindow):
         folder_no_paths = validate_folders()
         if folder_no_paths:
             win_warn = WarningWindow(
-                f"{Lng.select_folder_path[Cfg.lng]} \"{folder_no_paths}\""
+                f"{Lng.select_folder_path[Cfg.lng_index]} \"{folder_no_paths}\""
             )
             win_warn.center_to_parent(self.window())
             win_warn.show()
@@ -1183,7 +1183,7 @@ class WinSettings(SingleActionWindow):
             Filters.filter_list = self.filters_clone
             Filters.write_json_data()
 
-            Cfg.lng = self.cfg_clone.lng
+            Cfg.lng_index = self.cfg_clone.lng_index
             Cfg.scaner_minutes = self.cfg_clone.scaner_minutes
             Cfg.write_json_data()
 

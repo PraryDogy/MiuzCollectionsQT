@@ -15,7 +15,7 @@ class ConfirmWindow(SingleActionWindow):
 
     def __init__(self, text: str):
         super().__init__()
-        self.setWindowTitle(Lng.attention[Cfg.lng])
+        self.setWindowTitle(Lng.attention[Cfg.lng_index])
         self.setMaximumWidth(360)
         self.setMinimumWidth(300)
 
@@ -38,12 +38,12 @@ class ConfirmWindow(SingleActionWindow):
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.addLayout(btn_layout)
 
-        self.ok_btn = SmallBtn(Lng.ok[Cfg.lng])
+        self.ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
         self.ok_btn.setFixedWidth(90)
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
         btn_layout.addWidget(self.ok_btn)
 
-        self.cancel_btn = SmallBtn(Lng.cancel[Cfg.lng])
+        self.cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.cancel_btn)

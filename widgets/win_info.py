@@ -45,12 +45,12 @@ class Selectable(ULabel):
 
         menu_ = UMenu(event=ev)
 
-        label_text = Lng.copy[Cfg.lng]
+        label_text = Lng.copy[Cfg.lng_index]
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(lambda: Utils.copy_text(text))
         menu_.addAction(sel)
 
-        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[Cfg.lng])
+        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[Cfg.lng_index])
         reveal.triggered.connect(
             lambda: Utils.reveal_files([full_text])
         )
@@ -66,7 +66,7 @@ class WinInfo(SingleActionWindow):
 
     def __init__(self, paths: list[str]):
         super().__init__()
-        self.setWindowTitle(Lng.info[Cfg.lng])
+        self.setWindowTitle(Lng.info[Cfg.lng_index])
         self.path = paths[0]
 
         wid = QWidget()
@@ -78,12 +78,12 @@ class WinInfo(SingleActionWindow):
         wid.setLayout(self.grid_lay)
 
         self.data = {
-            Lng.file_name[Cfg.lng]: OneFileInfo.lined_text(os.path.basename(self.path)),
-            Lng.type_[Cfg.lng]: Lng.calculating[Cfg.lng],
-            Lng.file_size[Cfg.lng]: Lng.calculating[Cfg.lng],
-            Lng.place[Cfg.lng]: OneFileInfo.lined_text(self.path),
-            Lng.changed[Cfg.lng]: Lng.calculating[Cfg.lng],
-            Lng.resol[Cfg.lng]: Lng.calculating[Cfg.lng],
+            Lng.file_name[Cfg.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
+            Lng.type_[Cfg.lng_index]: Lng.calculating[Cfg.lng_index],
+            Lng.file_size[Cfg.lng_index]: Lng.calculating[Cfg.lng_index],
+            Lng.place[Cfg.lng_index]: OneFileInfo.lined_text(self.path),
+            Lng.changed[Cfg.lng_index]: Lng.calculating[Cfg.lng_index],
+            Lng.resol[Cfg.lng_index]: Lng.calculating[Cfg.lng_index],
         }
 
         selectable_labels: list[Selectable] = []

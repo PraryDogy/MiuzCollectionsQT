@@ -52,7 +52,7 @@ class Dynamic:
 
 class Cfg:
     app_ver: str = Static.app_ver
-    lng: int = 0
+    lng_index: int = 0
     dark_mode: int = 0
     scaner_minutes: int = 5
     new_scaner: int = True

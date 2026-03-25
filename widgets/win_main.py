@@ -207,7 +207,7 @@ class WinMain(UMainWindow):
         right_lay.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
-        self.bar_bottom.progress_bar.setText(Lng.loading[Cfg.lng])
+        self.bar_bottom.progress_bar.setText(Lng.loading[Cfg.lng_index])
         self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
         right_lay.addWidget(self.bar_bottom)
 
@@ -298,7 +298,7 @@ class WinMain(UMainWindow):
         alias = mf.mf_alias
         self.noti_wid = NotifyWid(
             parent,
-            f"{alias}: {Lng.no_connection_full[Cfg.lng].lower()}",
+            f"{alias}: {Lng.no_connection_full[Cfg.lng_index].lower()}",
             self.warning_svg,
             ms=3000
             )
@@ -453,7 +453,7 @@ class WinMain(UMainWindow):
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
         self.remove_files_win = ConfirmWindow(
-            f"{Lng.delete_forever[Cfg.lng]} ({len(abs_paths)})?"
+            f"{Lng.delete_forever[Cfg.lng_index]} ({len(abs_paths)})?"
         )
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
@@ -649,13 +649,13 @@ class WinMain(UMainWindow):
                 # print("штатно запускаю SINGLE сканер")
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
-                    args=(SingleDirScanerItem(self.scaner_data), Cfg.lng, )
+                    args=(SingleDirScanerItem(self.scaner_data), Cfg.lng_index, )
                     )
             else:
                 # print("штатно запускаю ОБЩИЙ сканер")
                 self.scaner_task = ProcessWorker(
                     target=AllDirScaner.start,
-                    args=(Mf.mf_list, Cfg.lng, )
+                    args=(Mf.mf_list, Cfg.lng_index, )
                 )
                 self.scaner_data.clear()
             self.bar_bottom.progress_bar.stop_timer_text()
@@ -804,7 +804,7 @@ class WinMain(UMainWindow):
                 print(e)
             self.noti_wid = NotifyWid(
                 self.grid,
-                Lng.drop_event_denied_msg[Cfg.lng],
+                Lng.drop_event_denied_msg[Cfg.lng_index],
                 self.warning_svg,
                 ms=3000
                 )

@@ -16,7 +16,7 @@ class WinFilters(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.filters[Cfg.lng])
+        self.setWindowTitle(Lng.filters[Cfg.lng_index])
         self.setFixedSize(self.ww, self.hh)
 
         self.list_widget = VListWidget()
@@ -25,7 +25,7 @@ class WinFilters(SingleActionWindow):
 
         favs_item = UListWidgetItem(
             parent=self.list_widget,
-            text=Lng.favorites[Cfg.lng]
+            text=Lng.favorites[Cfg.lng_index]
         )
         favs_item.setFlags(
             favs_item.flags() | Qt.ItemFlag.ItemIsUserCheckable
@@ -37,7 +37,7 @@ class WinFilters(SingleActionWindow):
 
         folder_item = UListWidgetItem(
             parent=self.list_widget,
-            text=Lng.only_this_folder[Cfg.lng]
+            text=Lng.only_this_folder[Cfg.lng_index]
         )
         folder_item.setFlags(
             folder_item.flags() | Qt.ItemFlag.ItemIsUserCheckable
@@ -67,7 +67,7 @@ class WinFilters(SingleActionWindow):
         marings.setBottom(15)
         self.central_layout.setContentsMargins(marings)
 
-        self.reset_btn = SmallBtn(Lng.reset[Cfg.lng])
+        self.reset_btn = SmallBtn(Lng.reset[Cfg.lng_index])
         self.reset_btn.setFixedWidth(100)
         self.reset_btn.clicked.connect(self.reset_cmd)
         self.central_layout.addWidget(
@@ -76,14 +76,14 @@ class WinFilters(SingleActionWindow):
         )
 
     def item_cmd(self, item: UListWidgetItem):
-        if item.text() == Lng.favorites[Cfg.lng]:
+        if item.text() == Lng.favorites[Cfg.lng_index]:
             if Dynamic.filter_favs:
                 Dynamic.filter_favs = False
                 item.setCheckState(Qt.CheckState.Unchecked)
             else:
                 Dynamic.filter_favs = True
                 item.setCheckState(Qt.CheckState.Checked)
-        elif item.text() == Lng.only_this_folder[Cfg.lng]:
+        elif item.text() == Lng.only_this_folder[Cfg.lng_index]:
             if Dynamic.filter_only_folder:
                 Dynamic.filter_only_folder = False
                 item.setCheckState(Qt.CheckState.Unchecked)

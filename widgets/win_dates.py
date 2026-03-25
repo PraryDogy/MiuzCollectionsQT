@@ -44,11 +44,11 @@ class DatesTitle(QLabel):
 
     def get_named_weekday(self, date: datetime) -> str:
         day_number = str(date.weekday())
-        return Lng.weekdays_short[Cfg.lng][day_number]
+        return Lng.weekdays_short[Cfg.lng_index][day_number]
     
     def get_named_date(self, date: datetime) -> str:
         month_number = str(date.month)
-        month = Lng.months_genitive_case[Cfg.lng][month_number]
+        month = Lng.months_genitive_case[Cfg.lng_index][month_number]
         return f"{date.day} {month} {date.year}"
     
     def setText(self, a0):
@@ -76,7 +76,7 @@ class MyCalendar(QGroupBox):
         self.calendar.setFixedSize(300, 300)
 
         v_layout.addWidget(self.calendar)
-        if Cfg.lng == 0:
+        if Cfg.lng_index == 0:
             self.calendar.setLocale(QLocale(QLocale.Language.Russian))
         else:
             self.calendar.setLocale(QLocale(QLocale.Language.English))
@@ -164,7 +164,7 @@ class WinDates(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.search_dates[Cfg.lng])
+        self.setWindowTitle(Lng.search_dates[Cfg.lng_index])
 
         self.central_layout.setSpacing(10)
         self.central_layout.setContentsMargins(10, 10, 10, 10)
@@ -175,13 +175,13 @@ class WinDates(SingleActionWindow):
         dates_h_lay.setSpacing(10)
         dates_h_wid.setLayout(dates_h_lay)
 
-        self.left_calendar = MyCalendar(Lng.start_date[Cfg.lng])
+        self.left_calendar = MyCalendar(Lng.start_date[Cfg.lng_index])
         self.left_calendar.dateSelected.connect(
             lambda date: self.date_change(date=date, flag="start")
         )
         dates_h_lay.addWidget(self.left_calendar)
 
-        self.right_calendar = MyCalendar(Lng.end_date[Cfg.lng])
+        self.right_calendar = MyCalendar(Lng.end_date[Cfg.lng_index])
         self.right_calendar.dateSelected.connect(
             lambda date: self.date_change(date=date, flag="end")
         )
@@ -189,7 +189,7 @@ class WinDates(SingleActionWindow):
 
         self.central_layout.addWidget(HSep())
 
-        clear_btn = SmallBtn(text=Lng.reset[Cfg.lng])
+        clear_btn = SmallBtn(text=Lng.reset[Cfg.lng_index])
         clear_btn.setFixedWidth(100)
         clear_btn.clicked.connect(self.clear_btn_cmd)
         self.central_layout.addWidget(

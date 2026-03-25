@@ -100,7 +100,7 @@ class DatesBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__()
-        self.lbl.setText(Lng.dates[Cfg.lng])
+        self.lbl.setText(Lng.dates[Cfg.lng_index])
         self.svg_btn.load(self.ICON_PATH)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -127,7 +127,7 @@ class FiltersBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__()
-        self.lbl.setText(Lng.filters[Cfg.lng])
+        self.lbl.setText(Lng.filters[Cfg.lng_index])
         self.svg_btn.load(self.ICON_PATH)
         
 
@@ -150,7 +150,7 @@ class SortBtn(BarTopBtn):
 
     def set_text(self):
         """Устанавливает текст кнопки в зависимости от текущей сортировки."""
-        text = Lng.sort_by_mod_short[Cfg.lng] if Dynamic.sort_by_mod else Lng.sort_by_recent_short[Cfg.lng]
+        text = Lng.sort_by_mod_short[Cfg.lng_index] if Dynamic.sort_by_mod else Lng.sort_by_recent_short[Cfg.lng_index]
         self.lbl.setText(text)
 
     def menu_clicked(self, value: bool):
@@ -166,8 +166,8 @@ class SortBtn(BarTopBtn):
             menu = UMenu(ev)
 
             # --- Создаем пункты меню ---
-            act_mod = QAction(Lng.sort_by_mod[Cfg.lng], self, checkable=True)
-            act_recent = QAction(Lng.sort_by_recent[Cfg.lng], self, checkable=True)
+            act_mod = QAction(Lng.sort_by_mod[Cfg.lng_index], self, checkable=True)
+            act_recent = QAction(Lng.sort_by_recent[Cfg.lng_index], self, checkable=True)
 
             act_mod.setChecked(Dynamic.sort_by_mod)
             act_recent.setChecked(not Dynamic.sort_by_mod)
@@ -199,7 +199,7 @@ class SettingsBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__()
-        self.lbl.setText(Lng.settings[Cfg.lng])
+        self.lbl.setText(Lng.settings[Cfg.lng_index])
         self.svg_btn.load(self.ICON_PATH)
 
 

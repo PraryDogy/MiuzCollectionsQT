@@ -118,7 +118,7 @@ class ProgressWidget(QLabel):
         seconds = self.total_seconds % 60
 
         text = (
-            f"{Lng.next_search[Cfg.lng]} "
+            f"{Lng.next_search[Cfg.lng_index]} "
             f"{minutes:02d}:{seconds:02d}"
         )
         self.setText(text)

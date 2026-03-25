@@ -317,7 +317,7 @@ class WinImageView(AppModalWindow):
         if pixmap:
             self.restart_img_wid(pixmap)
         else:
-            t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng]}"
+            t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng_index]}"
             self.show_text_label(t)
 
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
@@ -347,7 +347,7 @@ class WinImageView(AppModalWindow):
                             lambda qimage: fin(item.src, qimage))
                         UThreadPool.start(qimage_task)
                 else:
-                    t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[Cfg.lng]}"
+                    t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[Cfg.lng_index]}"
                     self.show_text_label(t)
             
             if not self.read_img_task.is_alive():
@@ -513,11 +513,11 @@ class WinImageView(AppModalWindow):
 
         # открыть в приложении
         open_menu = USubMenu(
-            f"{Lng.open_in[Cfg.lng]} ({len(rel_paths)})",
+            f"{Lng.open_in[Cfg.lng_index]} ({len(rel_paths)})",
             self.menu_
         )
 
-        act = QAction(Lng.open_default[Cfg.lng], open_menu)
+        act = QAction(Lng.open_default[Cfg.lng_index], open_menu)
         act.triggered.connect(
             lambda: self.open_in_app.emit((rel_paths, None))
         )
@@ -585,14 +585,14 @@ class WinImageView(AppModalWindow):
         )
         self.menu_.addAction(save_as)
 
-        rotate_menu = USubMenu(Lng.rotate[Cfg.lng], self.menu_)
+        rotate_menu = USubMenu(Lng.rotate[Cfg.lng_index], self.menu_)
         self.menu_.addMenu(rotate_menu)
 
-        rotate_cw = QAction(Lng.clockwise[Cfg.lng] + " (⌘ + →)", rotate_menu)
+        rotate_cw = QAction(Lng.clockwise[Cfg.lng_index] + " (⌘ + →)", rotate_menu)
         rotate_cw.triggered.connect(lambda: self.rotate(90))
         rotate_menu.addAction(rotate_cw)
 
-        rotate_ccw = QAction(Lng.counter_clockwise[Cfg.lng] + " (⌘ + ←)", rotate_menu)
+        rotate_ccw = QAction(Lng.counter_clockwise[Cfg.lng_index] + " (⌘ + ←)", rotate_menu)
         rotate_ccw.triggered.connect(lambda: self.rotate(-90))
         rotate_menu.addAction(rotate_ccw)
 
