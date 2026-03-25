@@ -890,26 +890,27 @@ class Grid(VScrollArea):
             self.menu_.addAction(act)
 
             # открыть в приложении
-            open_menu = USubMenu(
-                f"{Lng.open_in[Cfg.lng_index]} ({len(rel_paths)})",
-                self.menu_
-            )
+            if len(rel_paths) == 1:
+                open_menu = USubMenu(
+                    f"{Lng.open_in[Cfg.lng_index]}",
+                    self.menu_
+                )
 
-            act = QAction(Lng.open_default[Cfg.lng_index], open_menu)
-            act.triggered.connect(
-                lambda: self.open_in_app.emit((rel_paths, None))
-            )
-            open_menu.addAction(act)
-            open_menu.addSeparator()
-
-            for app_path, basename in self.image_apps.items():
-                act = QAction(basename, open_menu)
+                act = QAction(Lng.open_default[Cfg.lng_index], open_menu)
                 act.triggered.connect(
-                    lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))
+                    lambda: self.open_in_app.emit((rel_paths, None))
                 )
                 open_menu.addAction(act)
+                open_menu.addSeparator()
 
-            self.menu_.addMenu(open_menu)
+                for app_path, basename in self.image_apps.items():
+                    act = QAction(basename, open_menu)
+                    act.triggered.connect(
+                        lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))
+                    )
+                    open_menu.addAction(act)
+
+                self.menu_.addMenu(open_menu)
 
             # избранное
             if len(rel_paths) == 1:
@@ -919,13 +920,13 @@ class Grid(VScrollArea):
                 )
                 self.menu_.addAction(fav)
 
-            # инфо
-            act = WinInfoAction(self.menu_)
-            act.triggered.connect(
-                lambda: self.open_info_win.emit(rel_paths)
-            )
-            self.menu_.addAction(act)
-            self.menu_.addSeparator()
+                # инфо
+                act = WinInfoAction(self.menu_)
+                act.triggered.connect(
+                    lambda: self.open_info_win.emit(rel_paths)
+                )
+                self.menu_.addAction(act)
+                self.menu_.addSeparator()
 
             # reveal / copy
             act = RevealInFinder(self.menu_, len(rel_paths))
@@ -946,11 +947,14 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
-            expand_to_path = QAction(Lng.go_to_folder[Cfg.lng_index] + " (1)", self.menu_)
-            expand_to_path.triggered.connect(
-                lambda: self.go_to_widget.emit(clicked.rel_path)
-            )
-            self.menu_.addAction(expand_to_path)
+            if len(rel_paths) == 1:
+                self.menu_.addSeparator()
+
+                expand_to_path = QAction(Lng.go_to_folder[Cfg.lng_index], self.menu_)
+                expand_to_path.triggered.connect(
+                    lambda: self.go_to_widget.emit(clicked.rel_path)
+                )
+                self.menu_.addAction(expand_to_path)
 
             self.menu_.addSeparator()
 
@@ -985,12 +989,6 @@ class Grid(VScrollArea):
                 lambda: self.save_files.emit(
                     (os.path.expanduser("~/Downloads"), rel_paths)
                 )
-            )
-            self.menu_.addAction(act)
-
-            act = SaveAs(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.save_files.emit((None, rel_paths))
             )
             self.menu_.addAction(act)
 

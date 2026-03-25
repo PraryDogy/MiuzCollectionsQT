@@ -21,19 +21,25 @@ class WinInfoAction(QAction):
 
 class CopyPath(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.copy_filepath[Cfg.lng_index]} ({total})"
+        if total > 1:
+            text = f"{Lng.copy_filepaths[Cfg.lng_index]} ({total})"
+        else:
+            text = f"{Lng.copy_filepath[Cfg.lng_index]}"
         super().__init__(parent=parent, text=text)
 
 
 class CopyName(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.copy_name[Cfg.lng_index]} ({total})"
+        if total > 1:
+            text = f"{Lng.copy_names[Cfg.lng_index]} ({total})"
+        else:
+            text = f"{Lng.copy_name[Cfg.lng_index]}"
         super().__init__(parent=parent, text=text)
 
 
 class RevealInFinder(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.reveal_in_finder[Cfg.lng_index]} ({total})"
+        text = f"{Lng.reveal_in_finder[Cfg.lng_index]}"
         super().__init__(parent=parent, text=text)
 
 
@@ -48,7 +54,10 @@ class SetFav(QAction):
 
 class Save(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.save_to_downloads[Cfg.lng_index]} ({total})"
+        if total > 1:
+            text = f"{Lng.save_to_downloads[Cfg.lng_index]} ({total})"
+        else:
+            text = f"{Lng.save_to_downloads[Cfg.lng_index]}"
         super().__init__(parent=parent, text=text)
 
 
@@ -60,19 +69,30 @@ class SaveAs(QAction):
 
 class RemoveFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text_ = f"{Lng.delete[Cfg.lng_index]} ({total})"
+        if total > 1:
+            text_ = f"{Lng.delete[Cfg.lng_index]} ({total})"
+        else:
+            text_ = f"{Lng.delete[Cfg.lng_index]}"
         super().__init__(text_, parent)
 
 
 class CutFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.cut[Cfg.lng_index]} ({total})"
+        if total > 1:
+            text = f"{Lng.cut[Cfg.lng_index]} ({total})"
+        else:
+            text = f"{Lng.cut[Cfg.lng_index]}"
         super().__init__(text=text, parent=parent)
+
 
 class CopyFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.copy[Cfg.lng_index]} ({total})"
+        if total > 1:
+            text = f"{Lng.copy[Cfg.lng_index]} ({total})"
+        else:
+            text = f"{Lng.copy[Cfg.lng_index]}"
         super().__init__(text=text, parent=parent)
+
 
 class PasteFiles(QAction):
     def __init__(self, parent: QMenu):
