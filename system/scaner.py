@@ -1,11 +1,9 @@
 import os
-import shutil
 from dataclasses import dataclass
 from multiprocessing import Queue
 from time import sleep
 
 import sqlalchemy
-from sqlalchemy.dialects.sqlite import insert as dialect_insert
 
 from cfg import Static
 from system.database import ClmnNames, Dbase, Dirs, Thumbs
