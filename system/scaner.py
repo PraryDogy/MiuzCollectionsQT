@@ -676,8 +676,8 @@ class AllDirScaner:
 
     @staticmethod
     def single_mf_scan(scaner_item: IntScanerItem):
-        # собираем Finder директории и директории из БД
-        finder_dirs, db_dirs = AllDirLoader.start(scaner_item)
+        finder_dirs = AllDirLoader.get_finder_dirs(scaner_item)
+        db_dirs = AllDirLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
             print(scaner_item.mf.mf_alias, "no finder dirs")
             return
