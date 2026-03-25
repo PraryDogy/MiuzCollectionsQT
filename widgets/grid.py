@@ -912,8 +912,6 @@ class Grid(VScrollArea):
 
                 self.menu_.addMenu(open_menu)
 
-            # избранное
-            if len(rel_paths) == 1:
                 fav = SetFav(self.menu_, clicked.fav_value)
                 fav.triggered.connect(
                     lambda: self.set_fav.emit((clicked.rel_path, not clicked.fav_value))
@@ -926,6 +924,15 @@ class Grid(VScrollArea):
                     lambda: self.open_info_win.emit(rel_paths)
                 )
                 self.menu_.addAction(act)
+
+                self.menu_.addSeparator()
+
+                expand_to_path = QAction(Lng.go_to_folder[Cfg.lng_index], self.menu_)
+                expand_to_path.triggered.connect(
+                    lambda: self.go_to_widget.emit(clicked.rel_path)
+                )
+                self.menu_.addAction(expand_to_path)
+
                 self.menu_.addSeparator()
 
             # reveal / copy
@@ -947,16 +954,22 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
-            if len(rel_paths) == 1:
-                self.menu_.addSeparator()
-
-                expand_to_path = QAction(Lng.go_to_folder[Cfg.lng_index], self.menu_)
-                expand_to_path.triggered.connect(
-                    lambda: self.go_to_widget.emit(clicked.rel_path)
-                )
-                self.menu_.addAction(expand_to_path)
-
             self.menu_.addSeparator()
+
+            # save / remove
+            act = Save(self.menu_, len(rel_paths))
+            act.triggered.connect(
+                lambda: self.save_files.emit(
+                    (os.path.expanduser("~/Downloads"), rel_paths)
+                )
+            )
+            self.menu_.addAction(act)
+
+            act = RemoveFiles(self.menu_, len(self.selected_widgets))
+            act.triggered.connect(
+                lambda: self.remove_files.emit(rel_paths)
+            )
+            self.menu_.addAction(act)
 
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 # cut / copy / paste
@@ -982,21 +995,6 @@ class Grid(VScrollArea):
                 self.menu_.addAction(update_thumb)
 
                 self.menu_.addSeparator()
-
-            # save / remove
-            act = Save(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.save_files.emit(
-                    (os.path.expanduser("~/Downloads"), rel_paths)
-                )
-            )
-            self.menu_.addAction(act)
-
-            act = RemoveFiles(self.menu_, len(self.selected_widgets))
-            act.triggered.connect(
-                lambda: self.remove_files.emit(rel_paths)
-            )
-            self.menu_.addAction(act)
 
         if not clicked_wid:
             menu_empty()
