@@ -487,11 +487,11 @@ class RemovedDirsWorker:
 
 class AllDirScaner:
     @staticmethod
-    def start(mf_list: list[Mf], lng_index: int, q: Queue):
+    def start(mf_list: list[Mf], lng_index: int, queue: Queue):
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
-            scaner_item = ScanerItem(mf, engine, q, lng_index, 0)
+            scaner_item = ScanerItem(mf, engine, queue, lng_index, 0)
             avaible_mf_path = scaner_item.mf.get_avaiable_mf_path()
             if avaible_mf_path:
                 scaner_item.mf.set_mf_current_path(avaible_mf_path)
@@ -544,19 +544,19 @@ class AllDirScaner:
 class SingleDirScaner:
 
     @staticmethod
-    def start(scaner_item: SingleDirScanerItem, lng_index: int, q: Queue):
+    def start(scaner_item: SingleDirScanerItem, lng_index: int, queue: Queue):
         for mf, dirs_to_scan in scaner_item.data.items():
             print("single dir scaner started, mf:", mf.mf_alias)
             SingleDirScaner.single_mf_scan(
                 mf=mf,
                 dirs_to_scan=dirs_to_scan,
                 lng_index=lng_index,
-                q=q
+                queue=queue
             )
             print("single dir scaner finished, mf:", mf.mf_alias)
 
     @staticmethod
-    def single_mf_scan(mf: Mf, dirs_to_scan: list[str], lng_index: int, q: Queue):
+    def single_mf_scan(mf: Mf, dirs_to_scan: list[str], lng_index: int, queue: Queue):
         """
         Сканирует заданне директории в пределах Mf на предмет новых или
         удаленных изображений.
@@ -566,7 +566,7 @@ class SingleDirScaner:
         - dirs_to_scan: директории, которые нужно просканировать
         """
         engine = Dbase.create_engine()
-        scaner_item = ScanerItem(mf, engine, q, lng_index, 0)
+        scaner_item = ScanerItem(mf, engine, queue, lng_index, 0)
         avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             scaner_item.mf.set_mf_current_path(avaiable_mf_path)

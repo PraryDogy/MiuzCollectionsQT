@@ -71,29 +71,29 @@ class ProcessWorker(BaseProcessWorker):
 
 class ReadImg:
     @staticmethod
-    def start(src: str, desaturate: bool, q: Queue):
+    def start(src: str, desaturate: bool, queue: Queue):
         img_array = ImgUtils.read_img(src)
         if desaturate:
             img_array = ImgUtils.desaturate_image(img_array, 0.2)
-        q.put(ReadImgItem(src, img_array))
+        queue.put(ReadImgItem(src, img_array))
 
 
 class OneFileInfo:
 
     @staticmethod
-    def start(path: str, proc_q: Queue):
+    def start(path: str, process_queue: Queue):
         """
         Возвращает в Queue либо dict либо str
         Если str, процесс окончен
         """
         try:
             info_item = OneFileInfo._gather_info(path)
-            proc_q.put(info_item)
+            process_queue.put(info_item)
 
             resol = ImgUtils.get_img_res(path)
             if resol:
                 info_item.res = resol
-            proc_q.put(info_item)
+            process_queue.put(info_item)
         except Exception as e:
             Utils.print_error()
 
@@ -129,7 +129,7 @@ class CopyTaskWorker(BaseProcessWorker):
 
 class CopyTask:
     @staticmethod
-    def start(copy_item: CopyTaskItem, proc_q: Queue, gui_q: Queue):
+    def start(copy_item: CopyTaskItem, process_queue: Queue, que_queue: Queue):
 
         src_dst_urls = CopyTask.get_another_dir_urls(copy_item)
         copy_item.dst_urls = [dst for src, dst in src_dst_urls]
@@ -146,11 +146,11 @@ class CopyTask:
 
             if not replace_all and dest.exists() and src.name == dest.name:
                 copy_item.msg = "need_replace"
-                proc_q.put(copy_item)
+                process_queue.put(copy_item)
                 while True:
                     sleep(1)
-                    if not gui_q.empty():
-                        new_copy_item: CopyTaskItem = gui_q.get()
+                    if not que_queue.empty():
+                        new_copy_item: CopyTaskItem = que_queue.get()
                         if new_copy_item.msg == "replace_one":
                             break
                         elif new_copy_item.msg == "replace_all":
@@ -160,18 +160,18 @@ class CopyTask:
             copy_item.current_count = count
             copy_item.msg = ""
             try:
-                CopyTask.copy_file_with_progress(proc_q, copy_item, src, dest)
+                CopyTask.copy_file_with_progress(process_queue, copy_item, src, dest)
             except Exception as e:
                 print("CopyTask copy error", e)
                 copy_item.msg = "error"
-                proc_q.put(copy_item)
+                process_queue.put(copy_item)
                 return
             if copy_item.is_cut:
                 os.remove(src)
                 "удаляем файлы чтобы очистить директории"
         
         copy_item.msg = "finished"
-        proc_q.put(copy_item)
+        process_queue.put(copy_item)
 
     @staticmethod
     def get_another_dir_urls(copy_item: CopyTaskItem):
@@ -184,7 +184,7 @@ class CopyTask:
         return src_dst_urls
         
     @staticmethod
-    def copy_file_with_progress(proc_q: Queue, copy_item: CopyTaskItem, src: Path, dest: Path):
+    def copy_file_with_progress(process_queue: Queue, copy_item: CopyTaskItem, src: Path, dest: Path):
         block = 4 * 1024 * 1024  # 4 MB
         with open(src, "rb") as fsrc, open(dest, "wb") as fdst:
             while True:
@@ -193,7 +193,7 @@ class CopyTask:
                     break
                 fdst.write(buf)
                 copy_item.current_size += len(buf) // 1024
-                proc_q.put(copy_item)
+                process_queue.put(copy_item)
         try:
             shutil.copystat(src, dest, follow_symlinks=True)
         except OSError as e:
@@ -204,7 +204,7 @@ class CopyTask:
 
 class FilesRemover:
     @staticmethod
-    def start(paths: list[str], q: Queue):
+    def start(paths: list[str], queue: Queue):
         deleted_files = []
         for path in paths:
             try:
@@ -212,12 +212,12 @@ class FilesRemover:
                 deleted_files.append(path)
             except Exception as e:
                 print("FilesRemover error:", e)
-        q.put(deleted_files)
+        queue.put(deleted_files)
         
 
 class _DeletedMfRemover:
 
-    def start(engine: sqlalchemy.Engine, on_start_item: OnStartItem, q: Queue):
+    def start(engine: sqlalchemy.Engine, on_start_item: OnStartItem, queue: Queue):
         """
         Логика такая:
         - Пользователь в настройках приложения удаляет Mf
@@ -247,7 +247,7 @@ class _DeletedMfRemover:
                 _DeletedMfRemover.remove_rows(rows, conn)
             _DeletedMfRemover.remove_dirs(conn)
         conn.close()
-        q.put(removed_mf_list)
+        queue.put(removed_mf_list)
     
     @staticmethod
     def get_rows(mf_name: str, conn: sqlalchemy.Connection):
@@ -301,7 +301,7 @@ class _DeletedMfRemover:
 
 class _EmptyRecordsRemover:
     @staticmethod
-    def start(engine: sqlalchemy.Engine, q: Queue):
+    def start(engine: sqlalchemy.Engine, queue: Queue):
         """
         При запуске приложения проверяет данные в базе данных и удаляет
         записи со значениями None
@@ -318,12 +318,12 @@ class _EmptyRecordsRemover:
         )
         conn.execute(stmt)
         conn.commit()
-        q.put(None)
+        queue.put(None)
 
 
 class _EmptyHashdirRemover:
     @staticmethod
-    def start(q: Queue):
+    def start(queue: Queue):
         """
         При запуске приложения проверяет, есть ли пустые директории в thumbnails,
         удаляет лишние
@@ -338,16 +338,16 @@ class _EmptyHashdirRemover:
                 except Exception as e:
                     print("new scaner, empty hashdir remover", e)
         if removed_dirs:
-            q.put(removed_dirs)
+            queue.put(removed_dirs)
 
 
 class OnStartTask:
     @staticmethod
-    def start(on_start_item: OnStartItem, q: Queue):
+    def start(on_start_item: OnStartItem, queue: Queue):
         engine = Dbase.create_engine()
-        _DeletedMfRemover.start(engine, on_start_item, q)
-        _EmptyRecordsRemover.start(engine, q)
-        _EmptyHashdirRemover.start(q)
+        _DeletedMfRemover.start(engine, on_start_item, queue)
+        _EmptyRecordsRemover.start(engine, queue)
+        _EmptyHashdirRemover.start(queue)
 
 
 
@@ -363,11 +363,11 @@ class _DirChangedHandler(FileSystemEventHandler):
 
 class DirWatcher:
     @staticmethod
-    def start(mf_list: list[Mf], q: Queue):
+    def start(mf_list: list[Mf], queue: Queue):
         observer = Observer()
 
         for mf in mf_list:
-            callback = lambda e, mf=mf: q.put(
+            callback = lambda e, mf=mf: queue.put(
                 WatchDogItem(mf=mf, event=e)
             )
             handler = _DirChangedHandler(callback)
@@ -385,16 +385,16 @@ class DirWatcher:
 class UpdateThumb:
 
     @staticmethod
-    def start(mf: Mf, rel_img_path: str, q: Queue):
+    def start(mf: Mf, rel_img_path: str, queue: Queue):
         try:
-            img_array = UpdateThumb._start(mf, rel_img_path, q)
-            q.put(img_array)
+            img_array = UpdateThumb._start(mf, rel_img_path, queue)
+            queue.put(img_array)
         except Exception as e:
             print("UpdateThumb task error", e)
-            q.put(False)
+            queue.put(False)
 
     @staticmethod
-    def _start(mf: Mf, rel_img_path: str, q: Queue):
+    def _start(mf: Mf, rel_img_path: str, queue: Queue):
         abs_img_path = Utils.get_abs_any_path(
             mf.mf_current_path, rel_img_path
         )
