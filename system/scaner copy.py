@@ -56,6 +56,14 @@ class AllDirLoader:
         - есть в каталоге `Mf.curr_path`
         - не в стоп листе `Mf.stop_list`
         """
+        # Отправляем текст в гуи что идет поиск в папке
+        # gui_text: Имя папки: поиск в папке
+        gui_text = (
+            f"{scaner_item.mf.mf_alias}: "
+            f"{Lng.search_in[scaner_item.lng_index].lower()}"
+        )
+        ext_scaner_item = ExtScanerItem(gui_text, False)
+        scaner_item.q.put(ext_scaner_item)
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.mf_current_path]
         while stack:
@@ -72,6 +80,9 @@ class AllDirLoader:
                     print("scaner > DirLoader error", e)
                     continue
                 if stmt:
+                    # передаем с каждой итерацией в основной поток ScanerItem
+                    # чтобы в основном потоке сбрасывался таймер таймаута
+                    scaner_item.q.put(ext_scaner_item)
                     stack.append(entry.path)
                     rel_path = Utils.get_rel_any_path(
                         mf_path=scaner_item.mf.mf_current_path,
@@ -555,14 +566,6 @@ class AllDirScaner:
 
     @staticmethod
     def single_mf_scan(scaner_item: IntScanerItem):
-        ext_scaner_item = ExtScanerItem("", False)
-
-        ext_scaner_item.gui_text = (
-            f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.search_in[scaner_item.lng_index].lower()}"
-        )
-        scaner_item.q.put(ext_scaner_item)
-
         finder_dirs = AllDirLoader.get_finder_dirs(scaner_item)
         db_dirs = AllDirLoader.get_db_dirs(scaner_item)
         if not finder_dirs:

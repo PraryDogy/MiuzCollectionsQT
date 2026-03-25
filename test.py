@@ -1,8 +1,8 @@
-from system.shared_utils import ImgUtils
-from PIL import Image
-from pathlib import Path
-import cv2
+def test(callback: callable):
+    for i in range(0, 10):
+        callback(i)
 
-img = ImgUtils._get_broken_image()
-cv2.imshow("1", img)
-cv2.waitKey(0)
+
+test(
+    callback=lambda v: print(v)
+)
