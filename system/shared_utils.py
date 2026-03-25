@@ -466,7 +466,7 @@ class ImgUtils:
         return resol
     
     @classmethod
-    def fit_to_thumb(cls, image: np.ndarray, size: int):
+    def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray:
         try:
             h, w = image.shape[:2]
             if h == 0 or w == 0:
