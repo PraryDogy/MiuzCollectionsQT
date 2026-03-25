@@ -19,6 +19,5 @@ class Servers:
     
     @classmethod
     def write_json_data(cls):
-        print(Servers.server_list)
         with open(Static.external_servers, "w", encoding="utf-8") as file:
             json.dump(cls.server_list, file, indent=4, ensure_ascii=False)
