@@ -473,10 +473,6 @@ class DirsToScanWorker:
         DbDirUpdater.upsert_records(scaner_item, dirs_to_scan)
     
 
-
-
-# ЭТОТ КЛАСС НУЖЕН ЕСЛИ САМА ПАПКА С ФОТКАМИ БЫЛА УДАЛЕНА
-
 class RemovedDirsWorker:
 
     @staticmethod
