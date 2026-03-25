@@ -113,7 +113,10 @@ class Utils:
     
     @classmethod
     def get_rel_any_path(cls, mf_path: str, abs_img_path: str) -> str:
-        return abs_img_path.replace(mf_path, "")
+        res = abs_img_path.replace(mf_path, "")
+        if not res:
+            return os.sep
+        return res
 
     @classmethod
     def qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:

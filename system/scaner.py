@@ -584,7 +584,8 @@ class SingleDirScaner:
                     rel_path=Utils.get_rel_any_path(mf.mf_current_path, i),
                     mod=mod
                 )
-                dir_items.append(item)
+                if item not in dir_items:
+                    dir_items.append(item)
             reload_gui = False
             if dir_items:
                 DirsToScanWorker.start(dir_items, scaner_item)
