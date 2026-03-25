@@ -18,7 +18,6 @@ from .items import ScanerItem, SingleDirScanerItem
 
 
 class Gui:
-
     def send_data(q: Queue, text: str, reload_gui: bool = False):
         q.put((text, reload_gui))
 
@@ -603,7 +602,8 @@ class SingleDirScaner:
             mf=mf,
             eng=engine,
             q=q,
-            lng_index=lng_index
+            lng_index=lng_index,
+            total_count=0
         )
         avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
         if avaiable_mf_path:
