@@ -544,13 +544,12 @@ class AllDirScaner:
                     print(traceback.format_exc())
                     continue
             else:
-                gui_text = (
+                text = (
                     f"{scaner_item.mf.mf_alias}: "
                     f"{Lng.no_connection[lng_index].lower()}"
                 )
-                ext_scaner_item = ExtScanerItem(gui_text, False)
-                scaner_item.q.put(ext_scaner_item)
-                print(gui_text)
+                Gui.send_data(scaner_item.q, text)
+                print(text)
                 sleep(3)
         engine.dispose()
 
@@ -567,27 +566,19 @@ class AllDirScaner:
         # это нужно, когда удалена вся папка "имя папки"
         # то есть не когда "имя папки" пуста, но существует,
         # а когда папка "имя папки" не существует
+        reload_gui = False
         if removed_dirs:
+            reload_gui = True
             conn = scaner_item.engine.connect()
             for dir_item in removed_dirs:
                 RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
                 RemovedDirsWorker.remove_dirs(dir_item, scaner_item, conn)
             conn.commit()
             conn.close()
-            # обновляем ГУИ чтобы исчезли удаленные папки
-            ext_scaner_item = ExtScanerItem(
-                gui_text="",
-                reload_gui=True
-            )
-            scaner_item.q.put(ext_scaner_item)
-
         if dirs_to_scan:
+            reload_gui = True
             DirsToScanWorker.start(dirs_to_scan, scaner_item)
-            ext_scaner_item = ExtScanerItem(
-                gui_text="",
-                reload_gui=True
-            )
-            scaner_item.q.put(ext_scaner_item)
+        Gui.send_data(scaner_item.q, "", reload_gui)
 
 
 class SingleDirScaner:
@@ -637,10 +628,8 @@ class SingleDirScaner:
                     mod=mod
                 )
                 dir_items.append(item)
+            reload_gui = False
             if dir_items:
                 DirsToScanWorker.start(dir_items, scaner_item)
-                ext_scaner_item = ExtScanerItem(
-                    gui_text="",
-                    reload_gui=True
-                )
-                scaner_item.q.put(ext_scaner_item)
+                reload_gui = True
+            Gui.send_data(scaner_item.q, "", reload_gui)
