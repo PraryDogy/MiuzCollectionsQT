@@ -325,10 +325,9 @@ class HashdirImgUpdater:
         - Он был присвоен при загрузуке записей из БД
         - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
         """
-        ext_scaner_item = ExtScanerItem("none", False)
         for img_item in del_images:
             scaner_item.total_count -= 1
-            HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
+            Gui.send_data(scaner_item.q, HashdirImgUpdater.get_gui_text())
             abs_thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
             root = os.path.dirname(abs_thumb_path)
             try:
@@ -345,10 +344,9 @@ class HashdirImgUpdater:
         """
         Пытается создать изображения в "hashdir"
         """
-        ext_scaner_item = ExtScanerItem("none", False)
         for img_item in new_images:
-            scaner_item.total_count -= 1    
-            HashdirImgUpdater.q_put(scaner_item, ext_scaner_item)
+            scaner_item.total_count -= 1
+            Gui.send_data(scaner_item.q, HashdirImgUpdater.get_gui_text())
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
             try:
@@ -364,16 +362,13 @@ class HashdirImgUpdater:
             except Exception as e:
                 print("scaner HashdirImgUpdater error", e)
                 continue
-
-    @staticmethod
-    def q_put(scaner_item: IntScanerItem, ext_scaner_item: ExtScanerItem):
-        text = (
+    
+    def get_gui_text(scaner_item: IntScanerItem):
+        return (
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.updating[scaner_item.lng_index].lower()} "
             f"({scaner_item.total_count})"
         )
-        ext_scaner_item.gui_text = text
-        scaner_item.q.put(ext_scaner_item)
 
 
 class DbImgUpdater:
