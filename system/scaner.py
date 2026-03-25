@@ -599,10 +599,6 @@ class AllDirScaner:
             )
             scaner_item.q.put(ext_scaner_item)
 
-        # # тогда это улетает в RemovedDirsWorker
-        # if removed_dirs:
-        #     RemovedDirsWorker.start(removed_dirs, scaner_item)
-
 
 class SingleDirScaner:
 
