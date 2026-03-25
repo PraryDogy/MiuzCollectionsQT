@@ -33,7 +33,7 @@ class OnStartItem:
 class ScanerItem:
     mf: Mf
     engine: sqlalchemy.Engine
-    q: Queue
+    queue: Queue
     lng_index: int
     total_count: int
 

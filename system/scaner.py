@@ -18,8 +18,8 @@ from .items import ScanerItem, SingleDirScanerItem
 
 
 class Gui:
-    def send_data(q: Queue, text: str, reload_gui: bool = False):
-        q.put((text, reload_gui))
+    def send_data(queue: Queue, text: str, reload_gui: bool = False):
+        queue.put((text, reload_gui))
 
 
 @dataclass(slots=True)
@@ -65,7 +65,7 @@ class AllDirLoader:
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        Gui.send_data(scaner_item.q, text)
+        Gui.send_data(scaner_item.queue, text)
 
         dirs: list[DirItem] = []
         stack = [scaner_item.mf.mf_current_path]
@@ -211,7 +211,7 @@ class ImgLoader:
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        Gui.send_data(scaner_item.q, text)
+        Gui.send_data(scaner_item.queue, text)
         finder_images: list[ImgItem] = []
         for dir_item in dirs_to_scan:
             try:
@@ -325,7 +325,7 @@ class HashdirImgUpdater:
         for img_item in del_images:
             scaner_item.total_count -= 1
             Gui.send_data(
-                scaner_item.q,
+                scaner_item.queue,
                 HashdirImgUpdater.get_gui_text(scaner_item)
             )
             abs_thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
@@ -347,7 +347,7 @@ class HashdirImgUpdater:
         for img_item in new_images:
             scaner_item.total_count -= 1
             Gui.send_data(
-                scaner_item.q,
+                scaner_item.queue,
                 HashdirImgUpdater.get_gui_text(scaner_item)
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
@@ -541,7 +541,7 @@ class AllDirScaner:
                     f"{scaner_item.mf.mf_alias}: "
                     f"{Lng.no_connection[lng_index].lower()}"
                 )
-                Gui.send_data(scaner_item.q, text)
+                Gui.send_data(scaner_item.queue, text)
                 print(text)
                 sleep(3)
         engine.dispose()
@@ -571,7 +571,7 @@ class AllDirScaner:
         if dirs_to_scan:
             reload_gui = True
             DirsToScanWorker.start(dirs_to_scan, scaner_item)
-        Gui.send_data(scaner_item.q, "", reload_gui)
+        Gui.send_data(scaner_item.queue, "", reload_gui)
 
 
 class SingleDirScaner:
@@ -620,4 +620,4 @@ class SingleDirScaner:
             if dir_items:
                 DirsToScanWorker.start(dir_items, scaner_item)
                 reload_gui = True
-            Gui.send_data(scaner_item.q, "", reload_gui)
+            Gui.send_data(scaner_item.queue, "", reload_gui)
