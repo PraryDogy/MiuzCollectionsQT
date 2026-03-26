@@ -463,7 +463,9 @@ class RemovedDirsWorker:
         with scaner_item.engine.begin() as conn:
             stmt_thumbs_to_remove = (
                 sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
+                # как /путь к директории
                 .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
+                # но не как /путь к директории/субдиректория
                 .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
                 .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
             )
