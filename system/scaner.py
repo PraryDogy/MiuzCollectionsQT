@@ -299,14 +299,14 @@ class ThumbsUpdater:
         прерывается при его недоступности.
         """
 
-        def _del_records(chunk: list[ScanerImgItem]):
+        def _del_records(good_chunk: list[ScanerImgItem]):
             """
             Удаляет из БД удаленные изображения.
             """
             conn = scaner_item.engine.connect()
             stmt = sqlalchemy.delete(Thumbs.table)
             stmt = stmt.where(Thumbs.rel_thumb_path.in_(
-                [i.rel_thumb_path for i in chunk])
+                [i.rel_thumb_path for i in good_chunk])
             )
             stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
             conn.execute(stmt)
@@ -324,12 +324,14 @@ class ThumbsUpdater:
             )
             try:
                 os.remove(abs_thumb_path)
+                try:
+                    os.rmdir(os.path.dirname(abs_thumb_path))
+                except OSError:
+                    pass
+                return True
             except Exception as e:
                 print("scaner remove thumb error", e)
-            try:
-                os.rmdir(os.path.dirname(abs_thumb_path))
-            except OSError:
-                pass
+                return False
 
         step = 10
         chunked_del_images = [
@@ -339,9 +341,11 @@ class ThumbsUpdater:
         for chunk in chunked_del_images:
             if not Tools.exists(scaner_item):
                 break
+            good_chunk: list[ScanerImgItem] = []
             for img_item in chunk:
-                _remove_thumb(img_item)
-            _del_records(chunk)
+                if _remove_thumb(img_item):
+                    good_chunk.append(img_item)
+            _del_records(good_chunk)
 
     @staticmethod
     def add_thumbs(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
