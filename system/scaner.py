@@ -294,10 +294,10 @@ class ImgCompator:
         return removed_images, new_images
 
 
-class ImgUpdater:
+class ThumbsUpdater:
 
     @staticmethod
-    def run_del_images(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
+    def del_thumbs(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
         """
         Пытается удалить изображения из `hashdir` и пустые папки.   
         Обрати внимание:
@@ -317,7 +317,7 @@ class ImgUpdater:
                 scaner_item.total_count -= 1
                 Tools.send_text(
                     scaner_item.queue,
-                    ImgUpdater.get_gui_text(scaner_item)
+                    ThumbsUpdater.get_gui_text(scaner_item)
                 )
                 abs_thumb_path = Utils.get_abs_thumb_path(
                     img_item.rel_thumb_path
@@ -330,7 +330,7 @@ class ImgUpdater:
                     os.rmdir(os.path.dirname(abs_thumb_path))
                 except OSError:
                     pass
-            ImgUpdater._delete_records(scaner_item, lst)
+            ThumbsUpdater._delete_records(scaner_item, lst)
 
     @staticmethod
     def _delete_records(
@@ -363,7 +363,7 @@ class ImgUpdater:
             scaner_item.total_count -= 1
             Tools.send_text(
                 scaner_item.queue,
-                ImgUpdater.get_gui_text(scaner_item)
+                ThumbsUpdater.get_gui_text(scaner_item)
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
@@ -470,7 +470,7 @@ class DirsToScanWorker:
         scaner_item.total_count = len(del_images) + len(new_images)
         # удаляем миниатюры
         # обновляем БД
-        ImgUpdater.run_del_images(scaner_item, del_images)
+        ThumbsUpdater.del_thumbs(scaner_item, del_images)
         DbImgUpdater.delete_records(scaner_item, del_images)
 
         # делим новые миниатюры на списки по 10
@@ -481,7 +481,7 @@ class DirsToScanWorker:
         ]
         for new_images_chunk in chunked_new_images:
             # создаем миниатюры с шагом 10
-            ImgUpdater.run_new_images(scaner_item, new_images_chunk)
+            ThumbsUpdater.run_new_images(scaner_item, new_images_chunk)
             DbImgUpdater.upsert_records(scaner_item, new_images_chunk)
 
         DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
