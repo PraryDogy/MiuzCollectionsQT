@@ -359,7 +359,6 @@ class ThumbsUpdater:
             """
             Добавляет записи в БД об миниатюрах.
             """
-
             with scaner_item.engine.begin() as conn:
                 del_stmt = sqlalchemy.delete(Thumbs.table)
                 del_stmt = del_stmt.where(Thumbs.rel_thumb_path.in_(
