@@ -294,7 +294,7 @@ class ImgCompator:
         return removed_images, new_images
 
 
-class HashdirImgUpdater:
+class ImgUpdater:
 
     @staticmethod
     def run_del_images(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
@@ -305,24 +305,52 @@ class HashdirImgUpdater:
         - Он был присвоен при загрузуке записей из БД
         - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
         """
-        for img_item in del_images:
+        step = 10
+        chunked = [
+            del_images[i:i+step]
+            for i in range(0, len(del_images), step)
+        ]
+        for lst in chunked:
             if not Tools.exists(scaner_item):
                 break
-            scaner_item.total_count -= 1
-            Tools.send_text(
-                scaner_item.queue,
-                HashdirImgUpdater.get_gui_text(scaner_item)
-            )
-            abs_thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
-            root = os.path.dirname(abs_thumb_path)
-            try:
-                os.remove(abs_thumb_path)
-            except Exception as e:
-                continue
-            try:
-                os.rmdir(root)
-            except OSError:
-                pass
+            for img_item in lst:
+                scaner_item.total_count -= 1
+                Tools.send_text(
+                    scaner_item.queue,
+                    ImgUpdater.get_gui_text(scaner_item)
+                )
+                abs_thumb_path = Utils.get_abs_thumb_path(
+                    img_item.rel_thumb_path
+                )
+                try:
+                    os.remove(abs_thumb_path)
+                except Exception as e:
+                    continue
+                try:
+                    os.rmdir(os.path.dirname(abs_thumb_path))
+                except OSError:
+                    pass
+            ImgUpdater._delete_records(scaner_item, lst)
+
+    @staticmethod
+    def _delete_records(
+        scaner_item: ScanerItem,
+        del_images: list[ScanerImgItem]
+    ):
+        """
+        Удаляет из БД удаленные изображения.
+        """
+        if not Tools.exists(scaner_item):
+            return
+        conn = scaner_item.engine.connect()
+        stmt = sqlalchemy.delete(Thumbs.table)
+        stmt = stmt.where(Thumbs.rel_thumb_path.in_(
+            [i.rel_thumb_path for i in del_images])
+        )
+        stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+        conn.execute(stmt)
+        conn.commit()
+        conn.close()
 
     @staticmethod
     def run_new_images(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
@@ -335,7 +363,7 @@ class HashdirImgUpdater:
             scaner_item.total_count -= 1
             Tools.send_text(
                 scaner_item.queue,
-                HashdirImgUpdater.get_gui_text(scaner_item)
+                ImgUpdater.get_gui_text(scaner_item)
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
@@ -442,7 +470,7 @@ class DirsToScanWorker:
         scaner_item.total_count = len(del_images) + len(new_images)
         # удаляем миниатюры
         # обновляем БД
-        HashdirImgUpdater.run_del_images(scaner_item, del_images)
+        ImgUpdater.run_del_images(scaner_item, del_images)
         DbImgUpdater.delete_records(scaner_item, del_images)
 
         # делим новые миниатюры на списки по 10
@@ -453,7 +481,7 @@ class DirsToScanWorker:
         ]
         for new_images_chunk in chunked_new_images:
             # создаем миниатюры с шагом 10
-            HashdirImgUpdater.run_new_images(scaner_item, new_images_chunk)
+            ImgUpdater.run_new_images(scaner_item, new_images_chunk)
             DbImgUpdater.upsert_records(scaner_item, new_images_chunk)
 
         DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
