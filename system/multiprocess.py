@@ -336,10 +336,9 @@ class UpdateThumb:
                         ClmnNames.mf_alias: mf.mf_alias
                     })
             with engine.begin() as conn:
-                stmt = sqlalchemy.delete(Thumbs.table).where(
-                    Thumbs.mf_alias == mf.mf_alias,
-                    Thumbs.rel_img_path.in_(chunk_rel_img_paths)
-                )
+                stmt = sqlalchemy.delete(Thumbs.table)
+                stmt = stmt.where(Thumbs.mf_alias == mf.mf_alias)
+                stmt = stmt.where(Thumbs.rel_img_path.in_(chunk_rel_img_paths))
                 conn.execute(stmt)
                 stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
                 conn.execute(stmt)
