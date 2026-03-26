@@ -143,40 +143,28 @@ class DirsDbUpdater:
     @staticmethod
     def upsert_records(scaner_item: ScanerItem, dirs_to_scan: list[ScanerDirItem]):
         """
-        Запускать только, когда:
-        - добавлены и удалены изображения `ImgItem` из БД
-        - добавлены и удалены изображения `ImgItem` из `hashdir`
-
-        Работает с БД:
-        - удаляет записи из `DIRS`, которые соответствуют `Mf.alias`
-        - добавляет записи в `DIRS`, которые соответствуют `Mf.alias`
-        - по сути это замена `sqlalchemy.update`
+        Запускать в самом конце сканирования, когда обновлена таблица Thumbs
+        и произведена работа с миниатюрами в `hashdir`.
         """
         if not Tools.exists(scaner_item):
             return
-        # удалить старые записи
-        conn = scaner_item.engine.connect()
-        rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
-        del_stmt = sqlalchemy.delete(Dirs.table).where(
-            Dirs.rel_dir_path.in_(rel_paths),
-            Dirs.mf_alias == scaner_item.mf.mf_alias
-        )
-        conn.execute(del_stmt)
-
-        # вставить новые записи батчем
-        values_list = [
-            {
-                ClmnNames.rel_item_path: dir_item.rel_path,
-                ClmnNames.mod: dir_item.mod,
-                ClmnNames.mf_alias: scaner_item.mf.mf_alias
-            }
-            for dir_item in dirs_to_scan
-        ]
-        if values_list:
-            conn.execute(sqlalchemy.insert(Dirs.table), values_list)
-        conn.commit()
-        conn.close()
-        return None
+        with scaner_item.engine.begin() as conn:
+            rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
+            del_stmt = sqlalchemy.delete(Dirs.table).where(
+                Dirs.rel_dir_path.in_(rel_paths),
+                Dirs.mf_alias == scaner_item.mf.mf_alias
+            )
+            conn.execute(del_stmt)
+            values_list = [
+                {
+                    ClmnNames.rel_item_path: dir_item.rel_path,
+                    ClmnNames.mod: dir_item.mod,
+                    ClmnNames.mf_alias: scaner_item.mf.mf_alias
+                }
+                for dir_item in dirs_to_scan
+            ]
+            if values_list:
+                conn.execute(sqlalchemy.insert(Dirs.table), values_list)
 
 
 class ImgLoader:
