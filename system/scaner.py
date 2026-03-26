@@ -352,7 +352,7 @@ class ThumbsUpdater:
         прерывается при его недоступности.
         """
 
-        def _upsert_records(chunk: list[ScanerImgItem]):
+        def _upsert_records(good_chunk: list[ScanerImgItem]):
             """
             Добавляет записи в БД об миниатюрах.
             """
@@ -360,7 +360,7 @@ class ThumbsUpdater:
 
             del_stmt = sqlalchemy.delete(Thumbs.table)
             del_stmt = del_stmt.where(Thumbs.rel_thumb_path.in_(
-                [i.rel_thumb_path for i in chunk])
+                [i.rel_thumb_path for i in good_chunk])
             )
             del_stmt = del_stmt.where(
                 Thumbs.mf_alias == scaner_item.mf.mf_alias
@@ -369,7 +369,7 @@ class ThumbsUpdater:
             conn.commit()
 
             values_list = []
-            for img_item in chunk:
+            for img_item in good_chunk:
                 rel_img_path = Utils.get_rel_any_path(
                     mf_path=scaner_item.mf.mf_current_path,
                     abs_img_path=img_item.abs_img_path
@@ -429,11 +429,12 @@ class ThumbsUpdater:
         for chunk in chunked_new_images:
             if not Tools.exists(scaner_item):
                 break
+            good_chunk: list[ScanerImgItem] = []
             for img_item in chunk:
                 result = _create_thumb(img_item)
-                if not result:
-                    chunk.remove(img_item)
-            _upsert_records(chunk)
+                if result:
+                    good_chunk.append(img_item)
+            _upsert_records(good_chunk)
     
     def get_gui_text(scaner_item: ScanerItem):
         return (
