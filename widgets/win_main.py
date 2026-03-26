@@ -185,8 +185,8 @@ class WinMain(UMainWindow):
             lambda rel_path: self.path_bar_update(rel_path)
         )
         self.grid.update_thumb.connect(
-            lambda rel_path: self.start_update_thumb(
-                self.grid, Mf.current_mf, rel_path
+            lambda rel_img_paths: self.start_update_thumb(
+                self.grid, Mf.current_mf, rel_img_paths
             )
         )
         right_lay.addWidget(self.grid)
@@ -288,14 +288,14 @@ class WinMain(UMainWindow):
         self.noti_wid._show()
 
     @with_conn
-    def start_update_thumb(self, parent: QWidget, mf: Mf, rel_thumb_path: str):
+    def start_update_thumb(self, parent: QWidget, mf: Mf, rel_img_paths: list[str]):
 
         def poll_task():
             queue = self.update_thumb_task.process_queue
             if not queue.empty():
                 img_array = queue.get()
                 if img_array is not None:
-                    wid = self.grid.path_to_wid.get(rel_thumb_path)
+                    wid = self.grid.path_to_wid.get(rel_img_paths)
                     wid.img = Utils.pixmap_from_array(img_array)
                     wid.setup()
             if not self.update_thumb_task.is_alive():
@@ -307,7 +307,7 @@ class WinMain(UMainWindow):
 
         self.update_thumb_task = ProcessWorker(
             target=UpdateThumb.start,
-            args=(Mf.current_mf, rel_thumb_path, )
+            args=(Mf.current_mf, rel_img_paths, )
         )
         self.update_thumb_task.start()
         QTimer.singleShot(300, poll_task)

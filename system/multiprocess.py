@@ -291,16 +291,7 @@ class DirWatcher:
 class UpdateThumb:
 
     @staticmethod
-    def start(mf: Mf, rel_img_path: str, queue: Queue):
-        try:
-            img_array = UpdateThumb._start(mf, rel_img_path, queue)
-            queue.put(img_array)
-        except Exception as e:
-            print("UpdateThumb task error", e)
-            queue.put(False)
-
-    @staticmethod
-    def _start(mf: Mf, rel_img_paths: list[str], queue: Queue):
+    def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
 
         def _write_thumb(abs_img_path: str, abs_thumb_path: str):
             img_array = ImgUtils.read_img(abs_img_path)
@@ -341,6 +332,5 @@ class UpdateThumb:
                     Thumbs.rel_img_path.in_(chunk_rel_img_paths)
                 )
                 conn.execute(stmt)
-            
                 stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
                 conn.execute(stmt)

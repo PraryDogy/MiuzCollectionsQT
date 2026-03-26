@@ -397,7 +397,7 @@ class Grid(VScrollArea):
     set_clipboard = pyqtSignal(tuple)
     setup_mf = pyqtSignal(SettingsItem)
     go_to_widget = pyqtSignal(str)
-    update_thumb = pyqtSignal(str)
+    update_thumb = pyqtSignal(list)
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -986,16 +986,12 @@ class Grid(VScrollArea):
             )
             advanced_menu.addAction(act)
 
-            if len(rel_paths) == 1:
-                advanced_menu.addSeparator()
-                update_thumb = UpdateThumbAction(self.menu_)
-                update_thumb.triggered.connect(
-                    lambda: self.update_thumb.emit(
-                        self.wid_under_mouse.rel_path
-                    )
-                )
-                advanced_menu.addAction(update_thumb)
-
+            advanced_menu.addSeparator()
+            update_thumb = UpdateThumbAction(self.menu_)
+            update_thumb.triggered.connect(
+                lambda: self.update_thumb.emit(rel_paths)
+            )
+            advanced_menu.addAction(update_thumb)
 
         if not clicked_wid:
             menu_empty()
