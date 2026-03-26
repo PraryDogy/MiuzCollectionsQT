@@ -114,4 +114,4 @@ class ScanerImgItem:
 
 @dataclass(slots=True)
 class UpdateThumbItem:
-    rel_path_to_array: dict[str, np.ndarray]
+    rel_img_path_to_array: dict[str, np.ndarray]

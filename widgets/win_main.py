@@ -294,7 +294,7 @@ class WinMain(UMainWindow):
             queue = self.update_thumb_task.process_queue
             if not queue.empty():
                 item: UpdateThumbItem = queue.get()
-                for rel_img_path, array in item.rel_path_to_array.items():
+                for rel_img_path, array in item.rel_img_path_to_array.items():
                     wid = self.grid.path_to_wid.get(rel_img_path)
                     if wid:
                         wid.img = Utils.pixmap_from_array(array)
