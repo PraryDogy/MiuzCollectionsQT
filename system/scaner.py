@@ -432,7 +432,8 @@ class ThumbsUpdater:
             for img_item in chunk:
                 if _create_thumb(img_item):
                     good_chunk.append(img_item)
-            _upsert_records(good_chunk)
+            if good_chunk:
+                _upsert_records(good_chunk)
     
     def get_gui_text(scaner_item: ScanerItem):
         return (
