@@ -308,10 +308,6 @@ class UpdateThumb:
             if ImgUtils.write_thumb(abs_thumb_path, img_array):
                 return True
             return False
-        
-        def _upsert():
-            with engine.begin():
-                ...
 
         engine = Dbase.create_engine()
         step = 10
