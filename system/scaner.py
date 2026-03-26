@@ -148,6 +148,8 @@ class DirsDbUpdater:
         """
         if not Tools.exists(scaner_item):
             return
+        if not dirs_to_scan:
+            return
         with scaner_item.engine.begin() as conn:
             rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
             del_stmt = sqlalchemy.delete(Dirs.table).where(
