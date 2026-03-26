@@ -87,21 +87,20 @@ class DirLoader:
         Возвращает список директорий из базы данных, которые:
         - соответствуют условию DIRS.c.brand == `Mf.alias`
         """
-        conn = scaner_item.engine.connect()
-        q = sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod).where(
-            Dirs.mf_alias == scaner_item.mf.mf_alias
-        )
-        dirs: list[ScanerDirItem] = []
-        for rel_path, mod in conn.execute(q):
-            rel_path: str
-            abs_dir_path = os.path.join(
-                os.sep,
-                scaner_item.mf.mf_current_path.strip(os.sep),
-                rel_path.strip(os.sep)
+        with scaner_item.engine.begin() as conn:
+            stmt = sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod).where(
+                Dirs.mf_alias == scaner_item.mf.mf_alias
             )
-            item = ScanerDirItem(abs_dir_path, rel_path, mod)
-            dirs.append(item)
-        conn.close()
+            dirs: list[ScanerDirItem] = []
+            for rel_path, mod in conn.execute(stmt):
+                rel_path: str
+                abs_dir_path = os.path.join(
+                    os.sep,
+                    scaner_item.mf.mf_current_path.strip(os.sep),
+                    rel_path.strip(os.sep)
+                )
+                item = ScanerDirItem(abs_dir_path, rel_path, mod)
+                dirs.append(item)
         return dirs
 
 
