@@ -360,44 +360,43 @@ class ThumbsUpdater:
             """
             Добавляет записи в БД об миниатюрах.
             """
-            conn = scaner_item.engine.connect()
 
-            del_stmt = sqlalchemy.delete(Thumbs.table)
-            del_stmt = del_stmt.where(Thumbs.rel_thumb_path.in_(
-                [i.rel_thumb_path for i in good_chunk])
-            )
-            del_stmt = del_stmt.where(
-                Thumbs.mf_alias == scaner_item.mf.mf_alias
-            )
-            conn.execute(del_stmt)
-            conn.commit()
+            with scaner_item.engine.connect() as conn:
+                del_stmt = sqlalchemy.delete(Thumbs.table)
+                del_stmt = del_stmt.where(Thumbs.rel_thumb_path.in_(
+                    [i.rel_thumb_path for i in good_chunk])
+                )
+                del_stmt = del_stmt.where(
+                    Thumbs.mf_alias == scaner_item.mf.mf_alias
+                )
+                conn.execute(del_stmt)
+                conn.commit()
 
-            values_list = []
-            for img_item in good_chunk:
-                rel_img_path = Utils.get_rel_any_path(
-                    mf_path=scaner_item.mf.mf_current_path,
-                    abs_img_path=img_item.abs_img_path
-                )
-                abs_thumb_path = Utils.create_abs_thumb_path(
-                    rel_img_path=rel_img_path,
-                    mf_alias=scaner_item.mf.mf_alias
-                )
-                rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
-                values_list.append({
-                    ClmnNames.rel_item_path: rel_img_path,
-                    ClmnNames.rel_thumb_path: rel_thumb_path,
-                    ClmnNames.size: img_item.size,
-                    ClmnNames.birth: 0,
-                    ClmnNames.mod: img_item.mod,
-                    ClmnNames.resol: "none",
-                    ClmnNames.coll: "none",
-                    ClmnNames.fav: 0,
-                    ClmnNames.mf_alias: scaner_item.mf.mf_alias
-                })
-            stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
-            conn.execute(stmt)
-            conn.commit()
-            conn.close()
+                values_list = []
+                for img_item in good_chunk:
+                    rel_img_path = Utils.get_rel_any_path(
+                        mf_path=scaner_item.mf.mf_current_path,
+                        abs_img_path=img_item.abs_img_path
+                    )
+                    abs_thumb_path = Utils.create_abs_thumb_path(
+                        rel_img_path=rel_img_path,
+                        mf_alias=scaner_item.mf.mf_alias
+                    )
+                    rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
+                    values_list.append({
+                        ClmnNames.rel_item_path: rel_img_path,
+                        ClmnNames.rel_thumb_path: rel_thumb_path,
+                        ClmnNames.size: img_item.size,
+                        ClmnNames.birth: 0,
+                        ClmnNames.mod: img_item.mod,
+                        ClmnNames.resol: "none",
+                        ClmnNames.coll: "none",
+                        ClmnNames.fav: 0,
+                        ClmnNames.mf_alias: scaner_item.mf.mf_alias
+                    })
+                stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
+                conn.execute(stmt)
+                conn.commit()
 
         def _create_thumb(img_item: ScanerImgItem):
             """
