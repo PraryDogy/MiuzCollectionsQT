@@ -304,15 +304,30 @@ class ThumbsUpdater:
         Перед каждым пакетом проверяет доступность источника (Mf) и
         прерывается при его недоступности.
         """
+
+        def _del_records(chunk: list[ScanerImgItem]):
+            """
+            Удаляет из БД удаленные изображения.
+            """
+            conn = scaner_item.engine.connect()
+            stmt = sqlalchemy.delete(Thumbs.table)
+            stmt = stmt.where(Thumbs.rel_thumb_path.in_(
+                [i.rel_thumb_path for i in chunk])
+            )
+            stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+            conn.execute(stmt)
+            conn.commit()
+            conn.close()
+
         step = 10
-        chunked = [
+        chunked_del_images = [
             del_images[i:i+step]
             for i in range(0, len(del_images), step)
         ]
-        for lst in chunked:
+        for chunk in chunked_del_images:
             if not Tools.exists(scaner_item):
                 break
-            for img_item in lst:
+            for img_item in chunk:
                 scaner_item.total_count -= 1
                 Tools.send_text(
                     scaner_item.queue,
@@ -329,25 +344,7 @@ class ThumbsUpdater:
                     os.rmdir(os.path.dirname(abs_thumb_path))
                 except OSError:
                     pass
-            ThumbsUpdater._delete_records(scaner_item, lst)
-
-    @staticmethod
-    def _delete_records(
-        scaner_item: ScanerItem,
-        del_images: list[ScanerImgItem]
-    ):
-        """
-        Удаляет из БД удаленные изображения.
-        """
-        conn = scaner_item.engine.connect()
-        stmt = sqlalchemy.delete(Thumbs.table)
-        stmt = stmt.where(Thumbs.rel_thumb_path.in_(
-            [i.rel_thumb_path for i in del_images])
-        )
-        stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
-        conn.execute(stmt)
-        conn.commit()
-        conn.close()
+            _del_records(chunk)
 
     @staticmethod
     def run_new_images(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
