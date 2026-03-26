@@ -220,12 +220,19 @@ class ImgLoader:
                 )
             stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
             if dir_item.rel_path == os.sep:
+                # если относительный путь является корневым каталогом /
+                # как путь /изображение.jpg
                 stmt = stmt.where(Thumbs.rel_img_path.ilike("/%"))
+                # не как путь /директория/изображение.jpg
                 stmt = stmt.where(Thumbs.rel_img_path.not_ilike(f"/%/%"))
             else:
+                # иначе относительный путь является каталогом /директория
+                # как путь /директория/изображение.jpg
                 stmt = stmt.where(
                     Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%")
                 )
+                # иначе относительный путь является каталогом /директория
+                # не как путь /директория/субдиректория/изображение.jpg
                 stmt = stmt.where(
                     Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%")
                 )
