@@ -431,8 +431,7 @@ class ThumbsUpdater:
                 break
             good_chunk: list[ScanerImgItem] = []
             for img_item in chunk:
-                result = _create_thumb(img_item)
-                if result:
+                if _create_thumb(img_item):
                     good_chunk.append(img_item)
             _upsert_records(good_chunk)
     
