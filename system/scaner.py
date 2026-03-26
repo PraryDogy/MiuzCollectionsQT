@@ -349,19 +349,27 @@ class ThumbsUpdater:
     @staticmethod
     def add_thumbs(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
         """
-        Пытается создать изображения в "hashdir"
+        Создает миниатюры и соответствующие записи из БД пакетами по 10.
+
+        Перед каждым пакетом проверяет доступность источника (Mf) и
+        прерывается при его недоступности.
         """
-        for img_item in new_images:
+        step = 10
+        chunked_new_images = [
+            new_images[i:i+step]
+            for i in range(0, len(new_images), step)
+        ]
+        for chunk in chunked_new_images:
             if not Tools.exists(scaner_item):
                 break
-            scaner_item.total_count -= 1
-            Tools.send_text(
-                scaner_item.queue,
-                ThumbsUpdater.get_gui_text(scaner_item)
-            )
-            img = ImgUtils.read_img(img_item.abs_img_path)
-            img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
-            try:
+            for img_item in chunk:
+                scaner_item.total_count -= 1
+                Tools.send_text(
+                    scaner_item.queue,
+                    ThumbsUpdater.get_gui_text(scaner_item)
+                )
+                img = ImgUtils.read_img(img_item.abs_img_path)
+                img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
                 rel_img_path = Utils.get_rel_any_path(
                     mf_path=scaner_item.mf.mf_current_path,
                     abs_img_path=img_item.abs_img_path
@@ -370,10 +378,11 @@ class ThumbsUpdater:
                     rel_img_path=rel_img_path,
                     mf_alias=scaner_item.mf.mf_alias
                 )
-                ImgUtils.write_thumb(thumb_path, img)
-            except Exception as e:
-                print("scaner HashdirImgUpdater error", e)
-                continue
+                try:
+                    ImgUtils.write_thumb(thumb_path, img)
+                except Exception as e:
+                    print("scaner HashdirImgUpdater error", e)
+                    continue
     
     def get_gui_text(scaner_item: ScanerItem):
         return (
@@ -384,23 +393,6 @@ class ThumbsUpdater:
 
 
 class DbImgUpdater:
-
-    @staticmethod
-    def delete_records(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
-        """
-        Удаляет из БД удаленные изображения.
-        """
-        if not Tools.exists(scaner_item):
-            return
-        conn = scaner_item.engine.connect()
-        stmt = sqlalchemy.delete(Thumbs.table)
-        stmt = stmt.where(Thumbs.rel_thumb_path.in_(
-            [i.rel_thumb_path for i in del_images])
-        )
-        stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
-        conn.execute(stmt)
-        conn.commit()
-        conn.close()
 
     @staticmethod
     def upsert_records(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
