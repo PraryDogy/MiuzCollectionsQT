@@ -54,14 +54,14 @@ class DirLoader:
             try:
                 scandir_iterator = os.scandir(stack.pop())
             except Exception as e:
-                print("scaner > DirLoader error", e)
+                print(traceback.format_exc())
                 continue
             for entry in scandir_iterator:
                 try:
                     is_allowed = entry.name not in scaner_item.mf.mf_stop_list
                     stmt = (entry.is_dir() and is_allowed)
                 except Exception as e:
-                    print("scaner > DirLoader error", e)
+                    print(traceback.format_exc())
                     continue
                 if stmt:
                     stack.append(entry.path)
@@ -79,7 +79,7 @@ class DirLoader:
             dir_item = ScanerDirItem(scaner_item.mf.mf_current_path, os.sep, mod)
             dirs.append(dir_item)
         except Exception as e:
-            print("new scaner dirs loader finder dirs error add root dir", e)
+            print(traceback.format_exc())
         return dirs
 
     @staticmethod
@@ -183,14 +183,14 @@ class ImgLoader:
             try:
                 scandir_iterator = os.scandir(dir_item.abs_path)
             except Exception as e:
-                print("scaner > ImgLoader error", e)
+                print(traceback.format_exc())
                 continue
             for entry in scandir_iterator:
                 if entry.path.endswith(ImgUtils.ext_all):
                     try:
                         stat = entry.stat()
                     except Exception as e:
-                        print("scaner > ImgLoader error", e)
+                        print(traceback.format_exc())
                         continue
                     size = int(stat.st_size)
                     mod = int(stat.st_mtime)
@@ -324,7 +324,7 @@ class ThumbsUpdater:
                     pass
                 return True
             except Exception as e:
-                print("scaner remove thumb error", e)
+                print(traceback.format_exc())
                 return False
 
         step = 10
@@ -413,7 +413,7 @@ class ThumbsUpdater:
                 ImgUtils.write_thumb(thumb_path, img)
                 return True
             except Exception as e:
-                print("scaner write thumb error", e)
+                print(traceback.format_exc())
                 return False
 
         step = 10
@@ -485,7 +485,7 @@ class RemovedDirsWorker:
                 try:
                     os.remove(abs_thumb_path)
                 except Exception as e:
-                    print("removed dirs worker remove thumb error", e)
+                    print(traceback.format_exc())
                     continue
                 try:
                     os.rmdir(root)
@@ -542,7 +542,6 @@ class AllDirScaner:
         finder_dirs = DirLoader.get_finder_dirs(scaner_item)
         db_dirs = DirLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
-            print(scaner_item.mf.mf_alias, "no finder dirs")
             return
         removed_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         dirs_to_scan = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
@@ -592,7 +591,7 @@ class SingleDirScaner:
                 try:
                     mod = int(os.stat(i).st_mtime)
                 except Exception as e:
-                    print("SingleDirScaner error", e)
+                    print(traceback.format_exc())
                     continue
                 item = ScanerDirItem(
                     abs_path=i,
