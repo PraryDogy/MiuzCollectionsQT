@@ -487,20 +487,17 @@ class RemovedDirsWorker:
             )
             conn.execute(del_stmt)
 
-    def remove_dirs(
-            dir_item: ScanerDirItem,
-            scaner_item: ScanerItem,
-            conn: sqlalchemy.Connection
-        ):
+    def remove_dirs(dir_item: ScanerDirItem, scaner_item: ScanerItem):
         """
         Удаляет записи в базе данных Dirs
         """
-        stmt = (
-            sqlalchemy.delete(Dirs.table)
-            .where(Dirs.rel_dir_path == dir_item.rel_path)
-            .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
-        )
-        conn.execute(stmt)
+        with scaner_item.engine.begin() as conn:
+            stmt = (
+                sqlalchemy.delete(Dirs.table)
+                .where(Dirs.rel_dir_path == dir_item.rel_path)
+                .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
+            )
+            conn.execute(stmt)
 
 
 class AllDirScaner:
@@ -545,12 +542,9 @@ class AllDirScaner:
         # то есть не когда "имя папки" пуста, но существует,
         # а когда папка "имя папки" не существует
         if removed_dirs:
-            conn = scaner_item.engine.connect()
             for dir_item in removed_dirs:
-                RemovedDirsWorker.remove_thumbs(dir_item, scaner_item, conn)
-                RemovedDirsWorker.remove_dirs(dir_item, scaner_item, conn)
-            conn.commit()
-            conn.close()
+                RemovedDirsWorker.remove_thumbs(dir_item, scaner_item)
+                RemovedDirsWorker.remove_dirs(dir_item, scaner_item)
         if dirs_to_scan:
             DirsToScanWorker.start(dirs_to_scan, scaner_item)
 
