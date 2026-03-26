@@ -340,8 +340,6 @@ class ThumbsUpdater:
         """
         Удаляет из БД удаленные изображения.
         """
-        if not Tools.exists(scaner_item):
-            return
         conn = scaner_item.engine.connect()
         stmt = sqlalchemy.delete(Thumbs.table)
         stmt = stmt.where(Thumbs.rel_thumb_path.in_(
