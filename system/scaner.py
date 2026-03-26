@@ -318,7 +318,7 @@ class HashdirImgUpdater:
             try:
                 os.remove(abs_thumb_path)
             except Exception as e:
-                pass
+                continue
             try:
                 os.rmdir(root)
             except OSError:
