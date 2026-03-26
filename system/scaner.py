@@ -347,7 +347,7 @@ class ThumbsUpdater:
             _del_records(chunk)
 
     @staticmethod
-    def run_new_images(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
+    def add_thumbs(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
         """
         Пытается создать изображения в "hashdir"
         """
@@ -476,7 +476,7 @@ class DirsToScanWorker:
         ]
         for new_images_chunk in chunked_new_images:
             # создаем миниатюры с шагом 10
-            ThumbsUpdater.run_new_images(scaner_item, new_images_chunk)
+            ThumbsUpdater.add_thumbs(scaner_item, new_images_chunk)
             DbImgUpdater.upsert_records(scaner_item, new_images_chunk)
 
         DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
