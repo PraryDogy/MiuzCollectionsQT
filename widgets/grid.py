@@ -987,7 +987,7 @@ class Grid(VScrollArea):
             advanced_menu.addAction(act)
 
             advanced_menu.addSeparator()
-            update_thumb = UpdateThumbAction(self.menu_)
+            update_thumb = UpdateThumbAction(self.menu_, len(rel_paths))
             update_thumb.triggered.connect(
                 lambda: self.update_thumb.emit(rel_paths)
             )

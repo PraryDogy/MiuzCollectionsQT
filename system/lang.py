@@ -374,6 +374,10 @@ class Lng:
         "Обновить изображение",
         "Update image"
     )
+    update_thumbs = (
+        "Обновить изображения",
+        "Update images"
+    )
     advanced = (
         "Дополнительно",
         "Advanced"

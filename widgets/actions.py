@@ -78,19 +78,13 @@ class RemoveFiles(QAction):
 
 class CutFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
-        if total > 1:
-            text = f"{Lng.cut[Cfg.lng_index]} ({total})"
-        else:
-            text = f"{Lng.cut[Cfg.lng_index]}"
+        text = f"{Lng.cut[Cfg.lng_index]}"
         super().__init__(text=text, parent=parent)
 
 
 class CopyFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
-        if total > 1:
-            text = f"{Lng.copy[Cfg.lng_index]} ({total})"
-        else:
-            text = f"{Lng.copy[Cfg.lng_index]}"
+        text = f"{Lng.copy[Cfg.lng_index]}"
         super().__init__(text=text, parent=parent)
 
 
@@ -100,5 +94,9 @@ class PasteFiles(QAction):
 
 
 class UpdateThumbAction(QAction):
-    def __init__(self, parent: QMenu):
-        super().__init__(text=Lng.update_thumb[Cfg.lng_index], parent=parent)
+    def __init__(self, parent: QMenu, total: int):
+        if total > 1:
+            text = f"{Lng.update_thumbs[Cfg.lng_index]} ({total})"
+        else:
+            text = Lng.update_thumb[Cfg.lng_index]
+        super().__init__(text=text, parent=parent)
