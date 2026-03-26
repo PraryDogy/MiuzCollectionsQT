@@ -56,9 +56,6 @@ class DirLoader:
                 print("scaner > DirLoader error", e)
                 continue
             for entry in scandir_iterator:
-                if not Tools.exists(scaner_item):
-                    dirs.clear()
-                    return dirs
                 try:
                     is_allowed = entry.name not in scaner_item.mf.mf_stop_list
                     stmt = (entry.is_dir() and is_allowed)
@@ -200,9 +197,6 @@ class ImgLoader:
                 print("scaner > ImgLoader error", e)
                 continue
             for entry in scandir_iterator:
-                if not Tools.exists(scaner_item):
-                    finder_images.clear()
-                    return finder_images
                 if entry.path.endswith(ImgUtils.ext_all):
                     try:
                         stat = entry.stat()
