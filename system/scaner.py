@@ -354,6 +354,50 @@ class ThumbsUpdater:
         Перед каждым пакетом проверяет доступность источника (Mf) и
         прерывается при его недоступности.
         """
+
+        def _upsert_records(chunk: list[ScanerImgItem]):
+            """
+            Добавляет записи из БД об успешно сохраненных изображениях.
+            """
+            conn = scaner_item.engine.connect()
+
+            del_stmt = sqlalchemy.delete(Thumbs.table)
+            del_stmt = del_stmt.where(Thumbs.rel_thumb_path.in_(
+                [i.rel_thumb_path for i in chunk])
+            )
+            del_stmt = del_stmt.where(
+                Thumbs.mf_alias == scaner_item.mf.mf_alias
+            )
+            conn.execute(del_stmt)
+            conn.commit()
+
+            values_list = []
+            for img_item in chunk:
+                rel_img_path = Utils.get_rel_any_path(
+                    mf_path=scaner_item.mf.mf_current_path,
+                    abs_img_path=img_item.abs_img_path
+                )
+                abs_thumb_path = Utils.create_abs_thumb_path(
+                    rel_img_path=rel_img_path,
+                    mf_alias=scaner_item.mf.mf_alias
+                )
+                rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
+                values_list.append({
+                    ClmnNames.rel_item_path: rel_img_path,
+                    ClmnNames.rel_thumb_path: rel_thumb_path,
+                    ClmnNames.size: img_item.size,
+                    ClmnNames.birth: 0,
+                    ClmnNames.mod: img_item.mod,
+                    ClmnNames.resol: "none",
+                    ClmnNames.coll: "none",
+                    ClmnNames.fav: 0,
+                    ClmnNames.mf_alias: scaner_item.mf.mf_alias
+                })
+            stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
+            conn.execute(stmt)
+            conn.commit()
+            conn.close()
+
         step = 10
         chunked_new_images = [
             new_images[i:i+step]
@@ -383,6 +427,7 @@ class ThumbsUpdater:
                 except Exception as e:
                     print("scaner HashdirImgUpdater error", e)
                     continue
+            _upsert_records(chunk)
     
     def get_gui_text(scaner_item: ScanerItem):
         return (
