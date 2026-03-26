@@ -23,7 +23,7 @@ class Tools:
         queue.put(text)
 
     @staticmethod
-    def exists(scaner_item: ScanerItem):
+    def mf_exists(scaner_item: ScanerItem):
         """
         обязательная проверка подключения к сетевому диску
         потому что если сканер прервется и добавит не все директории
@@ -147,7 +147,7 @@ class DirsDbUpdater:
         Запускать в самом конце сканирования, когда обновлена таблица Thumbs
         и произведена работа с миниатюрами в `hashdir`.
         """
-        if not Tools.exists(scaner_item):
+        if not Tools.mf_exists(scaner_item):
             return
         with scaner_item.engine.begin() as conn:
             rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
@@ -326,7 +326,7 @@ class ThumbsUpdater:
             for i in range(0, len(del_images), step)
         ]
         for chunk in chunked_del_images:
-            if not Tools.exists(scaner_item):
+            if not Tools.mf_exists(scaner_item):
                 break
             good_chunk: list[ScanerImgItem] = []
             for img_item in chunk:
@@ -415,7 +415,7 @@ class ThumbsUpdater:
             for i in range(0, len(new_images), step)
         ]
         for chunk in chunked_new_images:
-            if not Tools.exists(scaner_item):
+            if not Tools.mf_exists(scaner_item):
                 break
             good_chunk: list[ScanerImgItem] = []
             for img_item in chunk:
