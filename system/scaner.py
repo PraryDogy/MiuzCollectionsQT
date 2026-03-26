@@ -303,15 +303,14 @@ class ThumbsUpdater:
             """
             Удаляет из БД записи о миниатюрах.
             """
-            conn = scaner_item.engine.connect()
-            stmt = sqlalchemy.delete(Thumbs.table)
-            stmt = stmt.where(Thumbs.rel_thumb_path.in_(
-                [i.rel_thumb_path for i in good_chunk])
-            )
-            stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
-            conn.execute(stmt)
-            conn.commit()
-            conn.close()
+            with scaner_item.engine.connect() as conn:
+                stmt = sqlalchemy.delete(Thumbs.table)
+                stmt = stmt.where(Thumbs.rel_thumb_path.in_(
+                    [i.rel_thumb_path for i in good_chunk])
+                )
+                stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+                conn.execute(stmt)
+                conn.commit()
 
         def _remove_thumb(img_item: ScanerImgItem):
             scaner_item.total_count -= 1
