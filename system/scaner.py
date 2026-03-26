@@ -148,8 +148,6 @@ class DirsDbUpdater:
         """
         if not Tools.exists(scaner_item):
             return
-        if not dirs_to_scan:
-            return
         with scaner_item.engine.begin() as conn:
             rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
             del_stmt = sqlalchemy.delete(Dirs.table).where(
@@ -458,38 +456,36 @@ class DirsToScanWorker:
 class RemovedDirsWorker:
 
     @staticmethod
-    def remove_thumbs(
-        dir_item: ScanerDirItem,
-        scaner_item: ScanerItem,
-        conn: sqlalchemy.Connection
-    ):
+    def remove_thumbs(dir_item: ScanerDirItem, scaner_item: ScanerItem):
         """
         Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
         """
-        stmt_thumbs_to_remove = (
-            sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
-            .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
-            .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
-            .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
-        )
-        thumbs_to_remove = conn.execute(stmt_thumbs_to_remove).all()
+        with scaner_item.engine.begin() as conn:
+            stmt_thumbs_to_remove = (
+                sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
+                .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
+                .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+                .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+            )
+            thumbs_to_remove = conn.execute(stmt_thumbs_to_remove).all()
 
-        for _, rel_thumb_path in thumbs_to_remove:
-            try:
+            for _, rel_thumb_path in thumbs_to_remove:
                 abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
                 root = os.path.dirname(abs_thumb_path)
-                os.remove(abs_thumb_path)
                 try:
-                 os.rmdir(root)
+                    os.remove(abs_thumb_path)
+                except Exception as e:
+                    print("removed dirs worker remove thumb error", e)
+                    continue
+                try:
+                    os.rmdir(root)
                 except OSError:
                     pass
-            except Exception as e:
-                print("DelDirsHandler, remove thumb:", e)
 
-        del_stmt = sqlalchemy.delete(Thumbs.table).where(
-            Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
-        )
-        conn.execute(del_stmt)
+            del_stmt = sqlalchemy.delete(Thumbs.table).where(
+                Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
+            )
+            conn.execute(del_stmt)
 
     def remove_dirs(
             dir_item: ScanerDirItem,
