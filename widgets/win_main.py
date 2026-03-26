@@ -10,8 +10,8 @@ from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
-from system.items import (Buffer, OnStartItem, SettingsItem,
-                          SingleDirScanerItem, WatchDogItem)
+from system.items import (Buffer, SettingsItem, SingleDirScanerItem,
+                          UpdateThumbItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
@@ -293,17 +293,16 @@ class WinMain(UMainWindow):
         def poll_task():
             queue = self.update_thumb_task.process_queue
             if not queue.empty():
-                img_array = queue.get()
-                if img_array is not None:
-                    wid = self.grid.path_to_wid.get(rel_img_paths)
-                    wid.img = Utils.pixmap_from_array(img_array)
-                    wid.setup()
+                item: UpdateThumbItem = queue.get()
+                for rel_img_path, array in item.rel_path_to_array.items():
+                    wid = self.grid.path_to_wid.get(rel_img_path)
+                    if wid:
+                        wid.img = Utils.pixmap_from_array(array)
+                        wid.setup()
             if not self.update_thumb_task.is_alive():
-                print("remove task")
                 self.update_thumb_task.terminate_join()
             else:
                 QTimer.singleShot(300, poll_task)
-                print("repoll task")
 
         self.update_thumb_task = ProcessWorker(
             target=UpdateThumb.start,
