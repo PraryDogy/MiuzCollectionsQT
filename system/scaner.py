@@ -344,7 +344,8 @@ class ThumbsUpdater:
             for img_item in chunk:
                 if _remove_thumb(img_item):
                     good_chunk.append(img_item)
-            _del_records(good_chunk)
+            if good_chunk:
+                _del_records(good_chunk)
 
     @staticmethod
     def add_thumbs(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
