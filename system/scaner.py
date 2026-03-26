@@ -15,9 +15,22 @@ from .items import (ScanerDirItem, ScanerImgItem, ScanerItem,
                     SingleDirScanerItem)
 
 
-class Gui:
+class Tools:
+    
+    @staticmethod
     def send_text(queue: Queue, text: str):
         queue.put(text)
+
+    @staticmethod
+    def exists(scaner_item: ScanerItem):
+        """
+        обязательная проверка подключения к сетевому диску
+        потому что если сканер прервется и добавит не все директории
+        то при сравнении с БД он посчитает директории удаленными
+        """
+        if os.path.exists(scaner_item.mf.mf_current_path):
+            return True
+        return False
 
 
 class DirLoader:
@@ -32,7 +45,7 @@ class DirLoader:
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        Gui.send_text(scaner_item.queue, text)
+        Tools.send_text(scaner_item.queue, text)
 
         dirs: list[ScanerDirItem] = []
         stack = [scaner_item.mf.mf_current_path]
@@ -43,6 +56,9 @@ class DirLoader:
                 print("scaner > DirLoader error", e)
                 continue
             for entry in scandir_iterator:
+                if not Tools.exists(scaner_item):
+                    dirs.clear()
+                    return dirs
                 try:
                     is_allowed = entry.name not in scaner_item.mf.mf_stop_list
                     stmt = (entry.is_dir() and is_allowed)
@@ -126,7 +142,7 @@ class DirsCompator:
         ]
 
 
-class DbDirUpdater:
+class DirsDbUpdater:
     @staticmethod
     def upsert_records(scaner_item: ScanerItem, dirs_to_scan: list[ScanerDirItem]):
         """
@@ -139,6 +155,8 @@ class DbDirUpdater:
         - добавляет записи в `DIRS`, которые соответствуют `Mf.alias`
         - по сути это замена `sqlalchemy.update`
         """
+        if not Tools.exists(scaner_item):
+            return
         # удалить старые записи
         conn = scaner_item.engine.connect()
         rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
@@ -182,6 +200,9 @@ class ImgLoader:
                 print("scaner > ImgLoader error", e)
                 continue
             for entry in scandir_iterator:
+                if not Tools.exists(scaner_item):
+                    finder_images.clear()
+                    return finder_images
                 if entry.path.endswith(ImgUtils.ext_all):
                     try:
                         stat = entry.stat()
@@ -285,8 +306,10 @@ class HashdirImgUpdater:
         - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
         """
         for img_item in del_images:
+            if not Tools.exists(scaner_item):
+                break
             scaner_item.total_count -= 1
-            Gui.send_text(
+            Tools.send_text(
                 scaner_item.queue,
                 HashdirImgUpdater.get_gui_text(scaner_item)
             )
@@ -307,8 +330,10 @@ class HashdirImgUpdater:
         Пытается создать изображения в "hashdir"
         """
         for img_item in new_images:
+            if not Tools.exists(scaner_item):
+                break
             scaner_item.total_count -= 1
-            Gui.send_text(
+            Tools.send_text(
                 scaner_item.queue,
                 HashdirImgUpdater.get_gui_text(scaner_item)
             )
@@ -343,6 +368,8 @@ class DbImgUpdater:
         """
         Удаляет из БД удаленные изображения.
         """
+        if not Tools.exists(scaner_item):
+            return
         conn = scaner_item.engine.connect()
         stmt = sqlalchemy.delete(Thumbs.table)
         stmt = stmt.where(Thumbs.rel_thumb_path.in_(
@@ -358,6 +385,8 @@ class DbImgUpdater:
         """
         Добавляет записи из БД об успешно сохраненных изображениях.
         """
+        if not Tools.exists(scaner_item):
+            return
         conn = scaner_item.engine.connect()
 
         del_stmt = sqlalchemy.delete(Thumbs.table)
@@ -427,7 +456,7 @@ class DirsToScanWorker:
             HashdirImgUpdater.run_new_images(scaner_item, new_images_chunk)
             DbImgUpdater.upsert_records(scaner_item, new_images_chunk)
 
-        DbDirUpdater.upsert_records(scaner_item, dirs_to_scan)
+        DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
     
 
 class RemovedDirsWorker:
@@ -505,7 +534,7 @@ class AllDirScaner:
                     f"{scaner_item.mf.mf_alias}: "
                     f"{Lng.no_connection[lng_index].lower()}"
                 )
-                Gui.send_text(scaner_item.queue, text)
+                Tools.send_text(scaner_item.queue, text)
                 print(text)
                 sleep(3)
         engine.dispose()
