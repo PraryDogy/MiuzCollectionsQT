@@ -357,15 +357,13 @@ class ThumbsUpdater:
             Добавляет записи в БД об миниатюрах.
             """
             conn = scaner_item.engine.connect()
-            rel_paths = [i.rel_thumb_path for i in good_chunk]
-            ids_ = []
 
             del_stmt = sqlalchemy.delete(Thumbs.table)
-            del_stmt = del_stmt.where(
-                Thumbs.rel_thumb_path.in_(rel_paths)
+            del_stmt = del_stmt.where(Thumbs.rel_thumb_path.in_(
+                [i.rel_thumb_path for i in good_chunk])
             )
             del_stmt = del_stmt.where(
-                Thumbs.mf_alias==scaner_item.mf.mf_alias
+                Thumbs.mf_alias == scaner_item.mf.mf_alias
             )
             conn.execute(del_stmt)
             conn.commit()
