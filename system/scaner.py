@@ -351,7 +351,7 @@ class ThumbsUpdater:
 
         def _upsert_records(chunk: list[ScanerImgItem]):
             """
-            Добавляет записи из БД об успешно сохраненных изображениях.
+            Добавляет записи в БД об миниатюрах.
             """
             conn = scaner_item.engine.connect()
 
@@ -392,6 +392,30 @@ class ThumbsUpdater:
             conn.commit()
             conn.close()
 
+        def _create_thumb(img_item: ScanerImgItem):
+            """
+            Создает и записывает в `hashdir` миниатюру.
+            """
+            scaner_item.total_count -= 1
+            Tools.send_text(
+                scaner_item.queue,
+                ThumbsUpdater.get_gui_text(scaner_item)
+            )
+            img = ImgUtils.read_img(img_item.abs_img_path)
+            img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
+            rel_img_path = Utils.get_rel_any_path(
+                mf_path=scaner_item.mf.mf_current_path,
+                abs_img_path=img_item.abs_img_path
+            )
+            thumb_path = Utils.create_abs_thumb_path(
+                rel_img_path=rel_img_path,
+                mf_alias=scaner_item.mf.mf_alias
+            )
+            try:
+                ImgUtils.write_thumb(thumb_path, img)
+            except Exception as e:
+                print("scaner write thumb error", e)
+
         step = 10
         chunked_new_images = [
             new_images[i:i+step]
@@ -401,26 +425,7 @@ class ThumbsUpdater:
             if not Tools.exists(scaner_item):
                 break
             for img_item in chunk:
-                scaner_item.total_count -= 1
-                Tools.send_text(
-                    scaner_item.queue,
-                    ThumbsUpdater.get_gui_text(scaner_item)
-                )
-                img = ImgUtils.read_img(img_item.abs_img_path)
-                img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
-                rel_img_path = Utils.get_rel_any_path(
-                    mf_path=scaner_item.mf.mf_current_path,
-                    abs_img_path=img_item.abs_img_path
-                )
-                thumb_path = Utils.create_abs_thumb_path(
-                    rel_img_path=rel_img_path,
-                    mf_alias=scaner_item.mf.mf_alias
-                )
-                try:
-                    ImgUtils.write_thumb(thumb_path, img)
-                except Exception as e:
-                    print("scaner HashdirImgUpdater error", e)
-                    continue
+                _create_thumb(img_item)
             _upsert_records(chunk)
     
     def get_gui_text(scaner_item: ScanerItem):
