@@ -299,11 +299,8 @@ class ThumbsUpdater:
     @staticmethod
     def del_thumbs(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
         """
-        Пытается удалить изображения из `hashdir` и пустые папки.   
-        Обрати внимание:
-        - Только в списке del_images есть параметр `ImgItem.rel_thumb_path`
-        - Он был присвоен при загрузуке записей из БД
-        - Необходим, чтоб сформировать полный путь до миниатюры и удалить ее
+        Пытается удалить миниатюры из `hashdir` и пустые папки.
+        Делает это по 10 шт за раз, обновляя каждые 10 штук БД.
         """
         step = 10
         chunked = [
