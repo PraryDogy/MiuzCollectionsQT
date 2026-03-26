@@ -303,14 +303,13 @@ class ThumbsUpdater:
             """
             Удаляет из БД записи о миниатюрах.
             """
-            with scaner_item.engine.connect() as conn:
+            with scaner_item.engine.begin() as conn:
                 stmt = sqlalchemy.delete(Thumbs.table)
                 stmt = stmt.where(Thumbs.rel_thumb_path.in_(
                     [i.rel_thumb_path for i in good_chunk])
                 )
                 stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
                 conn.execute(stmt)
-                conn.commit()
 
         def _remove_thumb(img_item: ScanerImgItem):
             scaner_item.total_count -= 1
@@ -361,7 +360,7 @@ class ThumbsUpdater:
             Добавляет записи в БД об миниатюрах.
             """
 
-            with scaner_item.engine.connect() as conn:
+            with scaner_item.engine.begin() as conn:
                 del_stmt = sqlalchemy.delete(Thumbs.table)
                 del_stmt = del_stmt.where(Thumbs.rel_thumb_path.in_(
                     [i.rel_thumb_path for i in good_chunk])
@@ -370,7 +369,6 @@ class ThumbsUpdater:
                     Thumbs.mf_alias == scaner_item.mf.mf_alias
                 )
                 conn.execute(del_stmt)
-                conn.commit()
 
                 values_list = []
                 for img_item in good_chunk:
@@ -396,7 +394,6 @@ class ThumbsUpdater:
                     })
                 stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
                 conn.execute(stmt)
-                conn.commit()
 
         def _create_thumb(img_item: ScanerImgItem):
             """
