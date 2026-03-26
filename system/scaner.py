@@ -461,12 +461,13 @@ class DirsToScanWorker:
         finder_images = ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
         db_images = ImgLoader.get_db_images(scaner_item, dirs_to_scan)
         del_images, new_images = ImgCompator.start(finder_images, db_images)
+
         # общий счет для отображения в GUI
         scaner_item.total_count = len(del_images) + len(new_images)
+
         # удаляем миниатюры
         # обновляем БД
         ThumbsUpdater.del_thumbs(scaner_item, del_images)
-        DbImgUpdater.delete_records(scaner_item, del_images)
 
         # делим новые миниатюры на списки по 10
         step = 10
