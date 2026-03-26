@@ -416,8 +416,10 @@ class ThumbsUpdater:
             )
             try:
                 ImgUtils.write_thumb(thumb_path, img)
+                return True
             except Exception as e:
                 print("scaner write thumb error", e)
+                return False
 
         step = 10
         chunked_new_images = [
@@ -428,7 +430,9 @@ class ThumbsUpdater:
             if not Tools.exists(scaner_item):
                 break
             for img_item in chunk:
-                _create_thumb(img_item)
+                result = _create_thumb(img_item)
+                if not result:
+                    chunk.remove(img_item)
             _upsert_records(chunk)
     
     def get_gui_text(scaner_item: ScanerItem):
