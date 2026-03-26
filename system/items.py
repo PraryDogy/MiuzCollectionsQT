@@ -110,3 +110,8 @@ class ScanerImgItem:
     size: int
     mod: int
     rel_thumb_path: str = ""
+
+
+@dataclass(slots=True)
+class UpdateThumbItem:
+    rel_path_to_array: dict[str, np.ndarray]

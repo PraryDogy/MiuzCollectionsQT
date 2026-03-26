@@ -1,5 +1,6 @@
 import os
 import shutil
+import traceback
 from datetime import datetime
 from multiprocessing import Process, Queue
 from pathlib import Path
@@ -12,13 +13,13 @@ from watchdog.observers.polling import PollingObserver as Observer
 from cfg import Cfg, Static
 
 from .database import ClmnNames, Dbase, Dirs, Thumbs
-from .items import (CopyTaskItem, OneFileInfoItem, OnStartItem, ReadImgItem,
-                    WatchDogItem)
+from .items import (CopyTaskItem, OneFileInfoItem, ReadImgItem,
+                    UpdateThumbItem, WatchDogItem)
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils, SharedUtils
 from .tasks import Utils
-import traceback
+import numpy as np
 
 class BaseProcessWorker:
     _registry = []
@@ -297,26 +298,34 @@ class UpdateThumb:
             img_array = ImgUtils.read_img(abs_img_path)
             img_array = ImgUtils.fit_to_thumb(img_array, Static.max_img_size)
             if ImgUtils.write_thumb(abs_thumb_path, img_array):
-                return True
-            return False
+                return img_array
+            return None
 
+        rel_img_path_to_array: dict[str, np.ndarray] = {}
         engine = Dbase.create_engine()
         step = 10
         chunked_rel_img_paths = [
             rel_img_paths[i:i+step]
             for i in range(0, len(rel_img_paths), step)
         ]
-
         for chunk_rel_img_paths in chunked_rel_img_paths:
             values_list: list[dict] = []
-            for i in chunk_rel_img_paths:
-                abs_img_path = Utils.get_abs_any_path(mf.mf_current_path, i)
-                abs_thumb_path = Utils.create_abs_thumb_path(i, mf.mf_alias)
+            for rel_img_path in chunk_rel_img_paths:
+                abs_img_path = Utils.get_abs_any_path(
+                    mf.mf_current_path,
+                    rel_img_path
+                )
+                abs_thumb_path = Utils.create_abs_thumb_path(
+                    rel_img_path,
+                    mf.mf_alias
+                )
                 rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
-                if _write_thumb(abs_img_path, abs_thumb_path):
+                thumb = _write_thumb(abs_img_path, abs_thumb_path)
+                if thumb is not None:
+                    rel_img_path_to_array[rel_img_path] = thumb
                     stats = os.stat(abs_img_path)
                     values_list.append({
-                        ClmnNames.rel_item_path: i,
+                        ClmnNames.rel_item_path: rel_img_path,
                         ClmnNames.rel_thumb_path: rel_thumb_path,
                         ClmnNames.size: int(stats.st_size),
                         ClmnNames.birth: 0,
@@ -334,3 +343,6 @@ class UpdateThumb:
                 conn.execute(stmt)
                 stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
                 conn.execute(stmt)
+
+        item = UpdateThumbItem(rel_img_path_to_array)
+        queue.put(item)
