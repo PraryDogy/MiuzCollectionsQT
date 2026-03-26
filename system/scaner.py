@@ -301,7 +301,7 @@ class ThumbsUpdater:
 
         def _del_records(good_chunk: list[ScanerImgItem]):
             """
-            Удаляет из БД удаленные изображения.
+            Удаляет из БД записи о миниатюрах.
             """
             conn = scaner_item.engine.connect()
             stmt = sqlalchemy.delete(Thumbs.table)
