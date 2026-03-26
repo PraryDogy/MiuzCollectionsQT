@@ -454,20 +454,8 @@ class DirsToScanWorker:
         scaner_item.total_count = len(del_images) + len(new_images)
 
         # удаляем миниатюры
-        # обновляем БД
         ThumbsUpdater.del_thumbs(scaner_item, del_images)
-
-        # делим новые миниатюры на списки по 10
-        step = 10
-        chunked_new_images = [
-            new_images[i:i+step]
-            for i in range(0, len(new_images), step)
-        ]
-        for new_images_chunk in chunked_new_images:
-            # создаем миниатюры с шагом 10
-            ThumbsUpdater.add_thumbs(scaner_item, new_images_chunk)
-            DbImgUpdater.upsert_records(scaner_item, new_images_chunk)
-
+        ThumbsUpdater.add_thumbs(scaner_item, new_images)
         DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
     
 
