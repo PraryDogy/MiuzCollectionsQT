@@ -488,7 +488,7 @@ class ImgUtils:
             return cls.fit_to_thumb(cls._get_broken_image(), size)
 
     @classmethod
-    def write_thumb(cls, thumb_path: str, thumb: np.ndarray) -> bool:
+    def write_thumb(cls, thumb_path: str, thumb: np.ndarray):
         try:
             if len(thumb.shape) == 2:  # grayscale
                 img = thumb
@@ -498,11 +498,12 @@ class ImgUtils:
                 img = cv2.cvtColor(thumb, cv2.COLOR_BGRA2RGB)
             else:
                 print(f"write_thumb: неподдерживаемое число каналов {thumb.shape}")
-                return None
-            return cv2.imwrite(thumb_path, img)
+                return False
+            cv2.imwrite(thumb_path, img)
+            return True
         except Exception as e:
             print(f"write_thumb: ошибка записи thumb на диск: {e}")
-            return None
+            return False
 
     @classmethod
     def read_thumb(cls, thumb_path: str) -> np.ndarray | None:

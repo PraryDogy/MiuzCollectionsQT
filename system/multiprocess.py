@@ -18,7 +18,7 @@ from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils, SharedUtils
 from .tasks import Utils
-
+import traceback
 
 class BaseProcessWorker:
     _registry = []
@@ -117,7 +117,6 @@ class OneFileInfo:
                 for i in range(0, len(text), max_row)
             )
         return text
-    
 
 
 class CopyTaskWorker(BaseProcessWorker):
@@ -301,49 +300,51 @@ class UpdateThumb:
             queue.put(False)
 
     @staticmethod
-    def _start(mf: Mf, rel_img_path: str, queue: Queue):
-        abs_img_path = Utils.get_abs_any_path(
-            mf.mf_current_path, rel_img_path
-        )
-        abs_thumb_path = Utils.create_abs_thumb_path(
-            rel_img_path, mf.mf_alias
-        )
-        rel_thumb_path = Utils.get_rel_thumb_path(
-            abs_thumb_path
-        )
-        root = os.path.dirname(abs_thumb_path)
-        stats = os.stat(abs_img_path)
-        size = int(stats.st_size)
-        mod = int(stats.st_mtime)
-        img_array = ImgUtils.read_img(abs_img_path)
-        img_array = ImgUtils.fit_to_thumb(img_array, Static.max_img_size)
-        values = {
-            ClmnNames.rel_item_path: rel_img_path,
-            ClmnNames.rel_thumb_path: rel_thumb_path,
-            ClmnNames.size: size,
-            ClmnNames.birth: 0,
-            ClmnNames.mod: mod,
-            ClmnNames.resol: "none",
-            ClmnNames.coll: "none",
-            ClmnNames.fav: 0,
-            ClmnNames.mf_alias: mf.mf_alias
-            }
+    def _start(mf: Mf, rel_img_paths: list[str], queue: Queue):
+
+        def _write_thumb(abs_img_path: str, abs_thumb_path: str):
+            img_array = ImgUtils.read_img(abs_img_path)
+            img_array = ImgUtils.fit_to_thumb(img_array, Static.max_img_size)
+            if ImgUtils.write_thumb(abs_thumb_path, img_array):
+                return True
+            return False
         
-        os.remove(abs_thumb_path)
-        if not os.listdir(root):
-            shutil.rmtree(root)
-        ImgUtils.write_thumb(abs_thumb_path, img_array)
+        def _upsert():
+            with engine.begin():
+                ...
 
         engine = Dbase.create_engine()
-        conn = engine.connect()
-        stmt = sqlalchemy.delete(Thumbs.table).where(
-            Thumbs.mf_alias == mf.mf_alias,
-            Thumbs.rel_img_path == rel_img_path
-        )
-        conn.execute(stmt)
-        stmt = sqlalchemy.insert(Thumbs.table).values(values)
-        conn.execute(stmt)
-        conn.commit()
-        conn.close()
+        step = 10
+        chunked_rel_img_paths = [
+            rel_img_paths[i:i+step]
+            for i in range(0, len(rel_img_paths), step)
+        ]
 
-        return img_array
+        for chunk_rel_img_paths in chunked_rel_img_paths:
+            values_list: list[dict] = []
+            for i in chunk_rel_img_paths:
+                abs_img_path = Utils.get_abs_any_path(mf.mf_current_path, i)
+                abs_thumb_path = Utils.create_abs_thumb_path(i, mf.mf_alias)
+                rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
+                if _write_thumb(abs_img_path, abs_thumb_path):
+                    stats = os.stat(abs_img_path)
+                    values_list.append({
+                        ClmnNames.rel_item_path: i,
+                        ClmnNames.rel_thumb_path: rel_thumb_path,
+                        ClmnNames.size: int(stats.st_size),
+                        ClmnNames.birth: 0,
+                        ClmnNames.mod: int(stats.st_mtime),
+                        ClmnNames.resol: "none",
+                        ClmnNames.coll: "none",
+                        ClmnNames.fav: 0,
+                        ClmnNames.mf_alias: mf.mf_alias
+                    })
+            with engine.begin() as conn:
+                stmt = sqlalchemy.delete(Thumbs.table).where(
+                    Thumbs.mf_alias == mf.mf_alias,
+                    Thumbs.rel_img_path.in_(chunk_rel_img_paths)
+                )
+                conn.execute(stmt)
+            
+                stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
+                conn.execute(stmt)
