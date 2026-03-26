@@ -313,6 +313,24 @@ class ThumbsUpdater:
             conn.commit()
             conn.close()
 
+        def _remove_thumb(img_item: ScanerImgItem):
+            scaner_item.total_count -= 1
+            Tools.send_text(
+                scaner_item.queue,
+                ThumbsUpdater.get_gui_text(scaner_item)
+            )
+            abs_thumb_path = Utils.get_abs_thumb_path(
+                img_item.rel_thumb_path
+            )
+            try:
+                os.remove(abs_thumb_path)
+            except Exception as e:
+                print("scaner remove thumb error", e)
+            try:
+                os.rmdir(os.path.dirname(abs_thumb_path))
+            except OSError:
+                pass
+
         step = 10
         chunked_del_images = [
             del_images[i:i+step]
@@ -322,22 +340,7 @@ class ThumbsUpdater:
             if not Tools.exists(scaner_item):
                 break
             for img_item in chunk:
-                scaner_item.total_count -= 1
-                Tools.send_text(
-                    scaner_item.queue,
-                    ThumbsUpdater.get_gui_text(scaner_item)
-                )
-                abs_thumb_path = Utils.get_abs_thumb_path(
-                    img_item.rel_thumb_path
-                )
-                try:
-                    os.remove(abs_thumb_path)
-                except Exception as e:
-                    continue
-                try:
-                    os.rmdir(os.path.dirname(abs_thumb_path))
-                except OSError:
-                    pass
+                _remove_thumb(img_item)
             _del_records(chunk)
 
     @staticmethod
