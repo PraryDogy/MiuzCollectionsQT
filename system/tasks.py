@@ -233,9 +233,13 @@ class DbImagesLoader(URunnable):
                 .where(Thumbs.rel_img_path.not_ilike(two_slash))
             )
         if Dynamic.filters_enabled:
+            filters = [
+                Thumbs.rel_img_path.ilike(f"%{filter}%")
+                for filter in Dynamic.filters_enabled
+            ]
             stmt = (
                 stmt
-                .where(sqlalchemy.or_(*[Thumbs.rel_img_path.ilike(f"%{f}%") for f in Dynamic.filters_enabled]))
+                .where(sqlalchemy.or_(*filters))
             )
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
