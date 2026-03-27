@@ -34,7 +34,7 @@ class Tools:
         return False
 
 
-class _DirsLoader:
+class DirLoader:
     @staticmethod
     def get_finder_dirs(scaner_item: ScanerItem):
         """
@@ -106,7 +106,7 @@ class _DirsLoader:
         return dirs
 
 
-class _DirsCompator:
+class DirsCompator:
 
     @staticmethod
     def get_dirs_to_remove(finder_dirs: list[ScanerDirItem], db_dirs: list[ScanerDirItem]):
@@ -140,8 +140,7 @@ class _DirsCompator:
         ]
 
 
-class _DirsDbUpdater:
-
+class DirsDbUpdater:
     @staticmethod
     def upsert_records(scaner_item: ScanerItem, dirs_to_scan: list[ScanerDirItem]):
         """
@@ -169,7 +168,7 @@ class _DirsDbUpdater:
                 conn.execute(sqlalchemy.insert(Dirs.table), values_list)
 
 
-class _ImgLoader:
+class ImgLoader:
     @staticmethod
     def get_finder_images(
         scaner_item: ScanerItem,
@@ -250,7 +249,7 @@ class _ImgLoader:
         return db_images
 
 
-class _ImgCompator:
+class ImgCompator:
     @staticmethod
     def start(finder_images: list[ScanerImgItem], db_images: list[ScanerImgItem]):
         """
@@ -285,7 +284,7 @@ class _ImgCompator:
         return removed_images, new_images
 
 
-class _ThumbsUpdater:
+class ThumbsUpdater:
 
     @staticmethod
     def del_thumbs(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
@@ -312,7 +311,7 @@ class _ThumbsUpdater:
             scaner_item.total_count -= 1
             Tools.send_text(
                 scaner_item.queue,
-                _ThumbsUpdater.get_gui_text(scaner_item)
+                ThumbsUpdater.get_gui_text(scaner_item)
             )
             abs_thumb_path = Utils.get_abs_thumb_path(
                 img_item.rel_thumb_path
@@ -398,7 +397,7 @@ class _ThumbsUpdater:
             scaner_item.total_count -= 1
             Tools.send_text(
                 scaner_item.queue,
-                _ThumbsUpdater.get_gui_text(scaner_item)
+                ThumbsUpdater.get_gui_text(scaner_item)
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
@@ -437,7 +436,7 @@ class _ThumbsUpdater:
         )
 
 
-class _DirsToScanWorker:    
+class DirsToScanWorker:    
     @staticmethod
     def start(dirs_to_scan: list[ScanerDirItem], scaner_item: ScanerItem):
         """
@@ -446,68 +445,66 @@ class _DirsToScanWorker:
         - на основе этого списка добавляются и удаляются миниатюры в "hashdir"
         - обновляются базы данных THUMBS и DIRS
         """
-        finder_images = _ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
-        db_images = _ImgLoader.get_db_images(scaner_item, dirs_to_scan)
-        del_images, new_images = _ImgCompator.start(finder_images, db_images)
+        finder_images = ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
+        db_images = ImgLoader.get_db_images(scaner_item, dirs_to_scan)
+        del_images, new_images = ImgCompator.start(finder_images, db_images)
 
         # общий счет для отображения в GUI
         scaner_item.total_count = len(del_images) + len(new_images)
 
         # удаляем миниатюры
-        _ThumbsUpdater.del_thumbs(scaner_item, del_images)
-        _ThumbsUpdater.add_thumbs(scaner_item, new_images)
-        _DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
+        ThumbsUpdater.del_thumbs(scaner_item, del_images)
+        ThumbsUpdater.add_thumbs(scaner_item, new_images)
+        DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
     
 
-class _RemovedDirsWorker:
+class RemovedDirsWorker:
 
     @staticmethod
-    def remove_thumbs(removed_dirs: list[ScanerDirItem], scaner_item: ScanerItem):
+    def remove_thumbs(dir_item: ScanerDirItem, scaner_item: ScanerItem):
         """
         Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
         """
         with scaner_item.engine.begin() as conn:
-            for dir_item in removed_dirs:
-                stmt_thumbs_to_remove = (
-                    sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
-                    # как /путь к директории
-                    .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
-                    # но не как /путь к директории/субдиректория
-                    .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
-                    .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
-                )
-                thumbs_to_remove = conn.execute(stmt_thumbs_to_remove).all()
+            stmt_thumbs_to_remove = (
+                sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
+                # как /путь к директории
+                .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
+                # но не как /путь к директории/субдиректория
+                .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+                .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+            )
+            thumbs_to_remove = conn.execute(stmt_thumbs_to_remove).all()
 
-                for _, rel_thumb_path in thumbs_to_remove:
-                    abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-                    root = os.path.dirname(abs_thumb_path)
-                    try:
-                        os.remove(abs_thumb_path)
-                    except Exception as e:
-                        print(traceback.format_exc())
-                        continue
-                    try:
-                        os.rmdir(root)
-                    except OSError:
-                        pass
+            for _, rel_thumb_path in thumbs_to_remove:
+                abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+                root = os.path.dirname(abs_thumb_path)
+                try:
+                    os.remove(abs_thumb_path)
+                except Exception as e:
+                    print(traceback.format_exc())
+                    continue
+                try:
+                    os.rmdir(root)
+                except OSError:
+                    pass
 
-                del_stmt = sqlalchemy.delete(Thumbs.table).where(
-                    Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
-                )
-                conn.execute(del_stmt)
+            del_stmt = sqlalchemy.delete(Thumbs.table).where(
+                Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
+            )
+            conn.execute(del_stmt)
 
-    def remove_dirs(removed_dirs: list[ScanerDirItem], scaner_item: ScanerItem):
+    def remove_dirs(dir_item: ScanerDirItem, scaner_item: ScanerItem):
         """
         Удаляет записи в базе данных Dirs
         """
         with scaner_item.engine.begin() as conn:
-            for dir_item in removed_dirs:
-                stmt = (
-                    sqlalchemy.delete(Dirs.table)
-                    .where(Dirs.rel_dir_path == dir_item.rel_path)
-                    .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
-                )
-                conn.execute(stmt)
+            stmt = (
+                sqlalchemy.delete(Dirs.table)
+                .where(Dirs.rel_dir_path == dir_item.rel_path)
+                .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
+            )
+            conn.execute(stmt)
 
 
 class AllDirScaner:
@@ -539,21 +536,22 @@ class AllDirScaner:
 
     @staticmethod
     def single_mf_scan(scaner_item: ScanerItem):
-        finder_dirs = _DirsLoader.get_finder_dirs(scaner_item)
-        db_dirs = _DirsLoader.get_db_dirs(scaner_item)
+        finder_dirs = DirLoader.get_finder_dirs(scaner_item)
+        db_dirs = DirLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
             return
-        removed_dirs = _DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
-        dirs_to_scan = _DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
+        removed_dirs = DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
+        dirs_to_scan = DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
 
         # это нужно, когда удалена вся папка "имя папки"
         # то есть не когда "имя папки" пуста, но существует,
         # а когда папка "имя папки" не существует
         if removed_dirs:
-            _RemovedDirsWorker.remove_thumbs(removed_dirs, scaner_item)
-            _RemovedDirsWorker.remove_dirs(removed_dirs, scaner_item)
+            for dir_item in removed_dirs:
+                RemovedDirsWorker.remove_thumbs(dir_item, scaner_item)
+                RemovedDirsWorker.remove_dirs(dir_item, scaner_item)
         if dirs_to_scan:
-            _DirsToScanWorker.start(dirs_to_scan, scaner_item)
+            DirsToScanWorker.start(dirs_to_scan, scaner_item)
 
 
 class SingleDirScaner:
@@ -600,4 +598,4 @@ class SingleDirScaner:
                 if item not in dir_items:
                     dir_items.append(item)
             if dir_items:
-                _DirsToScanWorker.start(dir_items, scaner_item)
+                DirsToScanWorker.start(dir_items, scaner_item)
