@@ -466,31 +466,36 @@ class _RemovedDirsWorker:
         """
         Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
         """
+
+        def _get_thumbs(conn: sqlalchemy.Connection, dir_item: ScanerDirItem):
+            stmt_thumbs_to_remove = (
+                sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
+                # как /путь к директории
+                .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
+                # но не как /путь к директории/субдиректория
+                .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+                .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+            )
+            return conn.execute(stmt_thumbs_to_remove).all()
+        
+        def _remove_thumb(rel_thumb_path: str):
+            abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+            try:
+                os.remove(abs_thumb_path)
+            except Exception as e:
+                print(traceback.format_exc())
+            try:
+                os.rmdir(os.path.dirname(abs_thumb_path))
+            except OSError:
+                pass
+
         with scaner_item.engine.begin() as conn:
             for dir_item in removed_dirs:
-                stmt_thumbs_to_remove = (
-                    sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
-                    # как /путь к директории
-                    .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
-                    # но не как /путь к директории/субдиректория
-                    .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
-                    .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
-                )
-                thumbs_to_remove = conn.execute(stmt_thumbs_to_remove).all()
-
+                thumbs_to_remove = _get_thumbs(conn, dir_item)
+                if not thumbs_to_remove:
+                    continue
                 for _, rel_thumb_path in thumbs_to_remove:
-                    abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-                    root = os.path.dirname(abs_thumb_path)
-                    try:
-                        os.remove(abs_thumb_path)
-                    except Exception as e:
-                        print(traceback.format_exc())
-                        continue
-                    try:
-                        os.rmdir(root)
-                    except OSError:
-                        pass
-
+                    _remove_thumb(rel_thumb_path)
                 del_stmt = sqlalchemy.delete(Thumbs.table).where(
                     Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
                 )
