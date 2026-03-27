@@ -243,10 +243,19 @@ class DbImagesLoader(URunnable):
             )
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
-            stmt = stmt.where(Thumbs.rel_img_path.ilike(f"%{text}%"))
+            stmt = (
+                stmt
+                .where(Thumbs.rel_img_path.ilike(f"%{text}%"))
+            )
         if any((Dynamic.date_start, Dynamic.date_end)):
-            start, end = self.combine_dates(Dynamic.date_start, Dynamic.date_end)
-            stmt = stmt.where(Thumbs.mod > start).where(Thumbs.mod < end)
+            start, end = self.combine_dates(
+                Dynamic.date_start,
+                Dynamic.date_end
+            )
+            stmt = (
+                stmt
+                .where(Thumbs.mod > start).where(Thumbs.mod < end)
+            )
         return stmt
 
     def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:
