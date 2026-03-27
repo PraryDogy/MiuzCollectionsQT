@@ -328,25 +328,23 @@ class DbDirsLoader(URunnable):
         super().__init__()
         self.sigs = DbDirsLoader.Sigs()
         self.mf = mf
-        self.conn = Dbase.main_engine.connect()
 
     def task(self):
         try:
             res = self._task()
             self.sigs.finished_.emit(res)
         except Exception as e:
-            print("DbDirsLoader error:", e)
-            import traceback
             print(traceback.format_exc())
 
     def _task(self):
-        stmt = (
-            sqlalchemy.select(Dirs.rel_dir_path)
-            .where(Dirs.mf_alias == self.mf.mf_alias)
-        )
+        with Dbase.create_engine().begin() as conn:
+            stmt = (
+                sqlalchemy.select(Dirs.rel_dir_path)
+                .where(Dirs.mf_alias == self.mf.mf_alias)
+            )
 
-        res = list(self.conn.execute(stmt).scalars())
-        return self.fill_missing_paths(res)
+            res = conn.execute(stmt).scalars().all()
+            return self.fill_missing_paths(res)
         
     def fill_missing_paths(self, paths: list[str]) -> list[str]:
         """Добавляет недостающие промежуточные директории."""
