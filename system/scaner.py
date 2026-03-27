@@ -76,7 +76,11 @@ class _DirsLoader:
         try:
             stats = os.stat(scaner_item.mf.mf_current_path)
             mod = int(stats.st_mtime)
-            dir_item = ScanerDirItem(scaner_item.mf.mf_current_path, os.sep, mod)
+            dir_item = ScanerDirItem(
+                scaner_item.mf.mf_current_path,
+                os.sep,
+                mod
+            )
             dirs.append(dir_item)
         except Exception as e:
             print(traceback.format_exc())
@@ -110,7 +114,10 @@ class _DirsLoader:
 class _DirsCompator:
 
     @staticmethod
-    def get_dirs_to_remove(finder_dirs: list[ScanerDirItem], db_dirs: list[ScanerDirItem]):
+    def get_dirs_to_remove(
+        finder_dirs: list[ScanerDirItem],
+        db_dirs: list[ScanerDirItem]
+    ):
         """
         Собирает список `DirItem`:
         - которых больше нет в Finder, но есть в базе данных
@@ -124,7 +131,10 @@ class _DirsCompator:
         ]
 
     @staticmethod
-    def get_dirs_to_scan(finder_dirs: list[ScanerDirItem], db_dirs: list[ScanerDirItem]):
+    def get_dirs_to_scan(
+        finder_dirs: list[ScanerDirItem],
+        db_dirs: list[ScanerDirItem]
+    ):
         """
         Собирает список `DirItem`:
         - которые есть в Finder, но нет в базе данных
@@ -144,7 +154,10 @@ class _DirsCompator:
 class _DirsDbUpdater:
 
     @staticmethod
-    def upsert_records(scaner_item: ScanerItem, dirs_to_scan: list[ScanerDirItem]):
+    def upsert_records(
+        scaner_item: ScanerItem,
+        dirs_to_scan: list[ScanerDirItem]
+    ):
         """
         Запускать в самом конце сканирования, когда обновлена таблица Thumbs
         и произведена работа с миниатюрами в `hashdir`.
@@ -168,9 +181,7 @@ class _DirsDbUpdater:
                 for dir_item in dirs_to_scan
             ]
             if values_list:
-                conn.execute(
-                    sqlalchemy.insert(Dirs.table), values_list
-                )
+                conn.execute(sqlalchemy.insert(Dirs.table), values_list)
 
 
 class _ImgLoader:
@@ -257,7 +268,10 @@ class _ImgLoader:
 
 class _ImgCompator:
     @staticmethod
-    def start(finder_images: list[ScanerImgItem], db_images: list[ScanerImgItem]):
+    def start(
+        finder_images: list[ScanerImgItem],
+        db_images: list[ScanerImgItem]
+    ):
         """
         Сравнивает данные об изображениях из Finder и базы данных.  
         Получить данные об изображениях необходимо из ImgLoader.    
@@ -471,7 +485,10 @@ class _DirsToScanWorker:
 class _RemovedDirsWorker:
 
     @staticmethod
-    def remove_thumbs(removed_dirs: list[ScanerDirItem], scaner_item: ScanerItem):
+    def remove_thumbs(
+        removed_dirs: list[ScanerDirItem],
+        scaner_item: ScanerItem
+    ):
         """
         Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
         """
@@ -514,7 +531,10 @@ class _RemovedDirsWorker:
                         _remove_thumb(rel_thumb_path)
                     _remove_records(conn, thumbs_to_remove)
 
-    def remove_dirs(removed_dirs: list[ScanerDirItem], scaner_item: ScanerItem):
+    def remove_dirs(
+            removed_dirs: list[ScanerDirItem],
+            scaner_item: ScanerItem
+        ):
         """
         Удаляет записи в базе данных Dirs
         """
