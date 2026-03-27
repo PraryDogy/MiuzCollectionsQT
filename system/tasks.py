@@ -366,7 +366,6 @@ class HashDirSize(URunnable):
     def __init__(self):
         super().__init__()
         self.sigs = HashDirSize.Sigs()
-        self.conn = Dbase.main_engine.connect()
 
     def task(self):
         try:
@@ -377,19 +376,20 @@ class HashDirSize(URunnable):
             print("HashDirSize error", e)
 
     def _task(self):
-        main_folder_sizes = {}
-        for i in Mf.mf_list:
-            stmt = (
-                sqlalchemy.select(Thumbs.rel_thumb_path)
-                .where(Thumbs.mf_alias == i.mf_alias)
-            )
-            res = list(self.conn.execute(stmt).scalars())
-            size = sum([
-                os.path.getsize(Utils.get_abs_thumb_path(i))
-                for i in res
-                if os.path.exists(Utils.get_abs_thumb_path(i))
-            ])
-            main_folder_sizes[i.mf_alias] = {"size": size, "total": len(res)}
+        with Dbase.main_engine.begin() as conn:
+            main_folder_sizes = {}
+            for i in Mf.mf_list:
+                stmt = (
+                    sqlalchemy.select(Thumbs.rel_thumb_path)
+                    .where(Thumbs.mf_alias == i.mf_alias)
+                )
+                res = conn.execute(stmt).scalars().all()
+                size = sum([
+                    os.path.getsize(Utils.get_abs_thumb_path(i))
+                    for i in res
+                    if os.path.exists(Utils.get_abs_thumb_path(i))
+                ])
+                main_folder_sizes[i.mf_alias] = {"size": size, "total": len(res)}
         return main_folder_sizes
     
 
