@@ -288,7 +288,7 @@ class MfDataCleaner(URunnable):
             self.sigs.finished_.emit()
 
     def _task(self):
-        with Dbase.create_engine().begin() as conn:
+        with Dbase.main_engine.begin() as conn:
             stmt = (
                 sqlalchemy.select(Thumbs.rel_thumb_path)
                 .where(Thumbs.mf_alias == self.mf_alias)
@@ -337,7 +337,7 @@ class DbDirsLoader(URunnable):
             print(traceback.format_exc())
 
     def _task(self):
-        with Dbase.create_engine().begin() as conn:
+        with Dbase.main_engine.begin() as conn:
             stmt = (
                 sqlalchemy.select(Dirs.rel_dir_path)
                 .where(Dirs.mf_alias == self.mf.mf_alias)
