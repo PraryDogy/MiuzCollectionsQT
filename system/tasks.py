@@ -278,7 +278,6 @@ class MfDataCleaner(URunnable):
         super().__init__()
         self.sigs = MfDataCleaner.Sigs()
         self.mf_name = mf_name
-        self.conn = Dbase.main_engine.connect()
 
     def task(self):
         try:
@@ -286,38 +285,48 @@ class MfDataCleaner(URunnable):
         except Exception as e:
             print(traceback.format_exc())
         finally:
-            self.conn.close()
             self.sigs.finished_.emit()
 
     def _task(self):
-        abs_path_list: list[str] = []
-        stmt = (
-            sqlalchemy.select(Thumbs.rel_img_path, Thumbs.rel_thumb_path)
-            .where(Thumbs.mf_alias == self.mf_name)
-        )
-        res = self.conn.execute(stmt)
-        for rel_path, rel_thumb_path in res:
-            if not rel_path or not rel_thumb_path:
-                continue
-            abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-            if os.path.exists(abs_thumb_path):
-                stmt = sqlalchemy.delete(Thumbs.table).where(Thumbs.rel_img_path == rel_path)
-                self.conn.execute(stmt)
-                abs_path_list.append(abs_thumb_path)
-        self.conn.commit()
+        with Dbase.create_engine().begin() as conn:
+            abs_path_list: list[str] = []
+            stmt = (
+                sqlalchemy.select(
+                    Thumbs.rel_img_path,
+                    Thumbs.rel_thumb_path
+                )
+                .where(Thumbs.mf_alias == self.mf_name)
+            )
+            res = conn.execute(stmt)
+            if not res:
+                return
+            for rel_path, rel_thumb_path in res:
+                if not rel_path or not rel_thumb_path:
+                    continue
+                abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+                if os.path.exists(abs_thumb_path):
+                    stmt = (
+                        sqlalchemy.delete(Thumbs.table)
+                        .where(Thumbs.rel_img_path == rel_path)
+                    )
+                    conn.execute(stmt)
+                    abs_path_list.append(abs_thumb_path)
 
-        stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias == self.mf_name)
-        self.conn.execute(stmt)
-        self.conn.commit()
+            stmt = (
+                sqlalchemy.delete(Dirs.table)
+                .where(Dirs.mf_alias == self.mf_name)
+            )
+            conn.execute(stmt)
 
-        for i in abs_path_list:
-            try:
-                os.remove(i)
-                parent = os.path.dirname(i)
-                if not os.listdir(parent):
-                    shutil.rmtree(parent)
-            except Exception as e:
-                print("system>tasks>MfDataCleaner remove thumb error", e)
+            for i in abs_path_list:
+                try:
+                    os.remove(i)
+                except Exception as e:
+                    print(traceback.format_exc())
+                try:
+                    os.rmdir(os.path.dirname(i))
+                except OSError:
+                    pass
 
 
 class DbDirsLoader(URunnable):
