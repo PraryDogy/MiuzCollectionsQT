@@ -89,8 +89,9 @@ class _DirsLoader:
         - соответствуют условию DIRS.c.brand == `Mf.alias`
         """
         conn = scaner_item.engine.connect()
-        q = sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod).where(
-            Dirs.mf_alias == scaner_item.mf.mf_alias
+        q = (
+            sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
+            .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
         )
         dirs: list[ScanerDirItem] = []
         for rel_path, mod in conn.execute(q):
