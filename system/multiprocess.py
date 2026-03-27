@@ -332,7 +332,6 @@ class UpdateThumb:
             }
 
         update_thumb_items: list[UpdateThumbItem] = []
-        engine = Dbase.create_engine()
         step = 10
         chunked_rel_img_paths = [
             rel_img_paths[i:i+step]
@@ -364,6 +363,7 @@ class UpdateThumb:
                         item = UpdateThumbItem(rel_img_path, thumb)
                         update_thumb_items.append(item)
 
+            engine = Dbase.create_engine()
             with engine.begin() as conn:
                 if chunk_rel_img_paths:
                     stmt = sqlalchemy.delete(Thumbs.table)
