@@ -277,7 +277,7 @@ class MfDataCleaner(URunnable):
     def __init__(self, mf_name: str):
         super().__init__()
         self.sigs = MfDataCleaner.Sigs()
-        self.mf_name = mf_name
+        self.mf_alias = mf_name
 
     def task(self):
         try:
@@ -289,42 +289,32 @@ class MfDataCleaner(URunnable):
 
     def _task(self):
         with Dbase.create_engine().begin() as conn:
-            abs_path_list: list[str] = []
             stmt = (
-                sqlalchemy.select(
-                    Thumbs.rel_img_path,
-                    Thumbs.rel_thumb_path
-                )
-                .where(Thumbs.mf_alias == self.mf_name)
+                sqlalchemy.select(Thumbs.rel_thumb_path)
+                .where(Thumbs.mf_alias == self.mf_alias)
             )
-            res = conn.execute(stmt)
-            if not res:
-                return
-            for rel_path, rel_thumb_path in res:
-                if not rel_path or not rel_thumb_path:
-                    continue
-                abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-                if os.path.exists(abs_thumb_path):
-                    stmt = (
-                        sqlalchemy.delete(Thumbs.table)
-                        .where(Thumbs.rel_img_path == rel_path)
-                    )
-                    conn.execute(stmt)
-                    abs_path_list.append(abs_thumb_path)
+            rel_thumb_paths = conn.execute(stmt).scalars().all()
 
             stmt = (
-                sqlalchemy.delete(Dirs.table)
-                .where(Dirs.mf_alias == self.mf_name)
+                sqlalchemy.delete(Thumbs.table)
+                .where(Thumbs.mf_alias == self.mf_alias)
             )
             conn.execute(stmt)
 
-            for i in abs_path_list:
+            stmt = (
+                sqlalchemy.delete(Dirs.table)
+                .where(Dirs.mf_alias == self.mf_alias)
+            )
+            conn.execute(stmt)
+
+            for i in rel_thumb_paths:
+                abs_thumb_path = Utils.get_abs_thumb_path(i)
                 try:
-                    os.remove(i)
+                    os.remove(abs_thumb_path)
                 except Exception as e:
                     print(traceback.format_exc())
                 try:
-                    os.rmdir(os.path.dirname(i))
+                    os.rmdir(os.path.dirname(abs_thumb_path))
                 except OSError:
                     pass
 
